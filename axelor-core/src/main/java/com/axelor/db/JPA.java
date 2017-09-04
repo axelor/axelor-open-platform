@@ -421,7 +421,7 @@ public final class JPA {
 					p.addAll(bean, items);
 				}
 				value = items;
-			} else if (value instanceof Map) {
+			} else if (p.isReference() && value instanceof Map) {
 				value = _edit(target, (Map) value, visited, edited);
 			}
 			Object oldValue = mapper.set(bean, name, value);

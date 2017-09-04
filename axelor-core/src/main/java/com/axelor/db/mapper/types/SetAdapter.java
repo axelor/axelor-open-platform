@@ -33,16 +33,15 @@ public class SetAdapter implements TypeAdapter<Set<?>> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Set<Model> adapt(Object value, Class<?> type, Type genericType, Annotation[] annotations) {
-		
-		Class<?> fieldType = (Class<?>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
-
-		Set<Model> val = new HashSet<Model>();
+	public Object adapt(Object value, Class<?> type, Type genericType, Annotation[] annotations) {
+		final Class<?> fieldType = (Class<?>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
+		final Set<Object> val = new HashSet<>();
 		for (Object obj : (Collection<?>) value) {
-			if (obj instanceof Map)
-				val.add(Mapper.toBean((Class<Model>) fieldType, (Map<String, Object>) obj));
-			if (obj instanceof Model)
-				val.add((Model) obj);
+			if (Model.class.isAssignableFrom(fieldType) && obj instanceof Map) {
+				val.add(Mapper.toBean(fieldType.asSubclass(Model.class), (Map<String, Object>) obj));
+			} else {
+				val.add(obj);
+			}
 		}
 		return val;
 	}

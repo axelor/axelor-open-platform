@@ -29,9 +29,10 @@ public class MapAdapter implements TypeAdapter<Map<?, ?>> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Model adapt(Object value, Class<?> type, Type genericType, Annotation[] annotations) {
-		if (value instanceof Model)
-			return (Model) value;
-		return Mapper.toBean((Class<Model>) type, (Map<String, Object>) value);
+	public Object adapt(Object value, Class<?> type, Type genericType, Annotation[] annotations) {
+		if (Model.class.isAssignableFrom(type) && value instanceof Map) {
+			return Mapper.toBean(type.asSubclass(Model.class), (Map<String, Object>) value);
+		}
+		return value;
 	}
 }

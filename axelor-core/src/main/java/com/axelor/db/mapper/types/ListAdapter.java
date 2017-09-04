@@ -30,19 +30,18 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.TypeAdapter;
 
 public class ListAdapter implements TypeAdapter<List<?>> {
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Model> adapt(Object value, Class<?> type, Type genericType, Annotation[] annotations) {
-		
-		Class<?> fieldType = (Class<?>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
-
-		List<Model> val = new ArrayList<Model>();
+	public Object adapt(Object value, Class<?> type, Type genericType, Annotation[] annotations) {
+		final Class<?> fieldType = (Class<?>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
+		final List<Object> val = new ArrayList<>();
 		for (Object obj : (Collection<?>) value) {
-			if (obj instanceof Map)
-				val.add(Mapper.toBean((Class<Model>) fieldType, (Map<String, Object>) obj));
-			if (obj instanceof Model)
-				val.add((Model) obj);
+			if (Model.class.isAssignableFrom(fieldType) && obj instanceof Map) {
+				val.add(Mapper.toBean(fieldType.asSubclass(Model.class), (Map<String, Object>) obj));
+			} else {
+				val.add(obj);
+			}
 		}
 		return val;
 	}
