@@ -58,6 +58,7 @@ import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.Repository;
+import com.axelor.db.ValueEnum;
 import com.axelor.db.hibernate.type.JsonFunction;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -1129,6 +1130,16 @@ public class Resource<T extends Model> {
 			}
 
 			result.put(name, value);
+			
+			// include custom enum value
+			if (prop.isEnum() && value instanceof ValueEnum<?>) {
+				String enumName = ((Enum<?>) value).name();
+				Object enumValue = ((ValueEnum<?>) value).getValue();
+				if (!Objects.equal(enumName, enumValue)) {
+					result.put(name + "$value", ((ValueEnum<?>) value).getValue());
+				}
+			}
+
 		}
 
 		return result;

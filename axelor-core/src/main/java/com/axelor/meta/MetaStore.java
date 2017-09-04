@@ -59,6 +59,7 @@ import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.Selection;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -385,10 +386,13 @@ public final class MetaStore {
 			final String name = item.name();
 			
 			option.setValue(name);
+
 			if (item instanceof ValueEnum<?>) {
 				Object value = ((ValueEnum<?>) item).getValue();
-				if (value != null) {
-					option.setValue(value.toString());
+				if (!Objects.equal(name, value)) {
+					Map<String, Object> data = new HashMap<>();
+					data.put("value", value);
+					option.setData(data);
 				}
 			}
 

@@ -328,6 +328,27 @@ ui.formInput('Select', 'BaseSelect', {
 			}
 			return item.label;
 		};
+		
+		if (field.enumType) {
+			var __enumValues = {};
+			var __hasValue = false;
+
+			_.each(selectionList, function (item) {
+				__enumValues[item.value] = (item.data || {}).value;
+				__hasValue = __hasValue || __enumValues[item.value] !== undefined;
+			});
+			
+			if (__hasValue) {
+				scope.$watch('record.' + field.name, function (value, old) {
+					if (value && value !== old) {
+						var enumValue = __enumValues[value];
+						if (scope.record && enumValue !== value) {
+							scope.record[field.name + '$value'] = enumValue;
+						}
+					}
+				});
+			}
+		}
 	},
 
 	link_editable: function(scope, element, attrs, model) {

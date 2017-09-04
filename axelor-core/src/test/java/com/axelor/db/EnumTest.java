@@ -166,6 +166,7 @@ public class EnumTest extends JpaTest {
 		assertTrue(json.contains("\"status\":\"OPEN\""));
 		entity.setStatusNumber(EnumStatusNumber.THREE);
 		json = objectMapper.writeValueAsString(entity);
-		assertTrue(json.contains("\"statusNumber\":3"));
+		assertTrue(json.contains("\"statusNumber\":\"THREE\""));
+		assertTrue(json.contains("\"statusNumber$value\":3"));
 	}
 }
