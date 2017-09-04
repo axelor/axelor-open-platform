@@ -176,8 +176,9 @@ public class I18nExtractor {
 						viewType = qName;
 					}
 
-					if (StringUtils.isBlank(title) && name != null
-							&& (FIELD_NODES.contains(qName) || ("tree".equals(viewType) && "column".equals(qName)))) {
+					if (name != null
+							&& StringUtils.isBlank(title)
+							&& (FIELD_NODES.contains(qName) || "item".equals(qName) || ("tree".equals(viewType) && "column".equals(qName)))) {
 						title = Inflector.getInstance().humanize(name);
 					}
 

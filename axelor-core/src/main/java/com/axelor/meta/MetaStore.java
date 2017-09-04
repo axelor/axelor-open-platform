@@ -403,8 +403,12 @@ public final class MetaStore {
 					option.setTitle(widget.title());;
 				}
 			} catch (Exception e) {
+			}
+
+			if (option.getTitle() == null) {
 				option.setTitle(Inflector.getInstance().humanize(name));
 			}
+
 			all.add(option);
 		}
 		return all;
