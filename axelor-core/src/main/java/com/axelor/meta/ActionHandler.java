@@ -71,7 +71,7 @@ public class ActionHandler {
 
 	private ScriptHelper scriptHelper;
 	
-	private Pattern pattern = Pattern.compile("^(select\\[\\]|select|action|call|eval):\\s*(.*)");
+	private Pattern pattern = Pattern.compile("^\\s*(select\\[\\]|select|action|call|eval):\\s*(.*)");
 	
 	public ActionHandler(ActionRequest request) {
 
