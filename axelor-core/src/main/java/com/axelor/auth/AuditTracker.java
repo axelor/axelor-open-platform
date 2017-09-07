@@ -103,22 +103,21 @@ final class AuditTracker {
 		return entity.getClass().getAnnotation(Track.class);
 	}
 
-	private boolean hasEvent(TrackField field, TrackEvent event) {
-		for (TrackEvent e : field.on()) {
-			if (e == event) {
+	private boolean hasEvent(TrackEvent[] events, TrackEvent event) {
+		for (TrackEvent e : events) {
+			if (e == event || e == TrackEvent.ALWAYS) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private boolean hasEvent(TrackMessage message, TrackEvent event) {
-		for (TrackEvent e : message.on()) {
-			if (e == event) {
-				return true;
-			}
-		}
-		return false;
+	private boolean hasEvent(Track track, TrackField field, TrackEvent event) {
+		return hasEvent(field.on(), event) || (field.on().length == 0 && hasEvent(track.on(), event));
+	}
+
+	private boolean hasEvent(Track track, TrackMessage message, TrackEvent event) {
+		return hasEvent(message.on(), event) || (message.on().length == 0 && hasEvent(track.on(), event));
 	}
 
 	private String format(Property property, Object value) {
@@ -183,10 +182,9 @@ final class AuditTracker {
 		EntityState.create(entity, values, oldValues);
 	}
 	
-	private String findMessage(TrackMessage[] messages, Map<String, Object> values, Map<String, Object> oldValues, ScriptHelper scriptHelper) {
+	private String findMessage(Track track, TrackMessage[] messages, Map<String, Object> values, Map<String, Object> oldValues, ScriptHelper scriptHelper) {
 		for (TrackMessage tm : messages) {
-			if (hasEvent(tm, TrackEvent.ALWAYS) ||
-				hasEvent(tm, oldValues.isEmpty() ? TrackEvent.CREATE : TrackEvent.UPDATE)) {
+			if (hasEvent(track, tm, oldValues.isEmpty() ? TrackEvent.CREATE : TrackEvent.UPDATE)) {
 				boolean matched = tm.fields().length == 0;
 				for (String field : tm.fields()) {
 					if (isBlank(field)) {
@@ -231,15 +229,15 @@ final class AuditTracker {
 		final Set<String> tagFields = new HashSet<>();
 
 		// find matched message
-		String msg = findMessage(track.messages(), values, oldValues, scriptHelper);
+		String msg = findMessage(track, track.messages(), values, oldValues, scriptHelper);
 		
 		// find matched content message
-		String content = findMessage(track.contents(), values, oldValues, scriptHelper);
+		String content = findMessage(track, track.contents(), values, oldValues, scriptHelper);
 
 		for (TrackField field : track.fields()) {
 
-			if (!hasEvent(field, TrackEvent.ALWAYS) &&
-				!hasEvent(field, previousState == null ? TrackEvent.CREATE: TrackEvent.UPDATE)) {
+			if (!hasEvent(track, field, TrackEvent.ALWAYS) &&
+				!hasEvent(track, field, previousState == null ? TrackEvent.CREATE: TrackEvent.UPDATE)) {
 				continue;
 			}
 
@@ -285,8 +283,7 @@ final class AuditTracker {
 				if (canTag) { break; }
 			}
 			if (!canTag) { continue; }
-			if (hasEvent(tm, TrackEvent.ALWAYS) ||
-				hasEvent(tm, previousState == null ? TrackEvent.CREATE: TrackEvent.UPDATE)) {
+			if (hasEvent(track, tm, previousState == null ? TrackEvent.CREATE: TrackEvent.UPDATE)) {
 				if (!isBlank(tm.tag()) && scriptHelper.test(tm.condition())) {
 					final Map<String, String> item = new HashMap<>();
 					item.put("title", tm.message());

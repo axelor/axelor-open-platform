@@ -781,6 +781,11 @@
         <xsd:documentation>Specify whether to track attached files.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="on" type="dm:TrackEvent" default="ALWAYS">
+      <xsd:annotation>
+        <xsd:documentation>Specify on which event to track the changes</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 
   <xsd:complexType name="Entity" mixed="true">

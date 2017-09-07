@@ -51,5 +51,5 @@ public @interface TrackField {
 	 * 
 	 * @return the list of events
 	 */
-	TrackEvent[] on() default TrackEvent.ALWAYS;
+	TrackEvent[] on() default {};
 }

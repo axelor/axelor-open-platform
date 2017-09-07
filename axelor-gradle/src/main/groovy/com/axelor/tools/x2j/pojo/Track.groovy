@@ -25,7 +25,7 @@ class Track {
 	private List<Annotation> messages = []
 	private List<Annotation> contents = []
 
-	private List<String> imports = []
+	private Set<String> imports = []
 
 	private Entity entity
 
@@ -34,6 +34,8 @@ class Track {
 	private boolean replace;
 
 	private boolean files;
+	
+	private String on;
 
 	private Track(Entity entity) {
 		this.entity = entity;
@@ -53,6 +55,11 @@ class Track {
 		subscribe = node.'@subscribe' == "true"
 		replace = node.'@replace' == "true"
 		files = node.'@files' == "true"
+		on = node.'@on'
+
+		if (on) {
+			imports += ['com.axelor.db.annotations.TrackEvent']
+		}
 	}
 
 	private Annotation $field(NodeChild node) {
@@ -106,6 +113,7 @@ class Track {
 	def $track() {
 		def annon = new Annotation(this.entity, "com.axelor.db.annotations.Track")
 		imports.each { name -> this.entity.importType(name) }
+		if (on) annon.add("on", "com.axelor.db.annotations.TrackEvent.${on}", false)
 		if (!fields.empty) annon.add("fields", fields, false, false)
 		if (!messages.empty) annon.add("messages", messages, false, false)
 		if (!contents.empty) annon.add("contents", contents, false, false)

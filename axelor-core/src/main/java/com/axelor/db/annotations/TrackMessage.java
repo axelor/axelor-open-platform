@@ -50,7 +50,7 @@ public @interface TrackMessage {
 	 * 
 	 * @return the events
 	 */
-	TrackEvent[] on() default TrackEvent.ALWAYS;
+	TrackEvent[] on() default {};
 
 	/**
 	 * Provide tag style if this message is a tag.

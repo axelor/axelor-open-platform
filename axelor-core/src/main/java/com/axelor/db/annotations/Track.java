@@ -69,4 +69,11 @@ public @interface Track {
 	 * @return true if marked for tracking attachments
 	 */
 	boolean files() default false;
+	
+	/**
+	 * Specify the events on which to track.
+	 * 
+	 * @return the list of events
+	 */
+	TrackEvent[] on() default TrackEvent.ALWAYS;
 }
