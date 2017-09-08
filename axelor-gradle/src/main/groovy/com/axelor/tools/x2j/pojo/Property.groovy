@@ -635,6 +635,7 @@ class Property {
 		
 		if (isJson() && type == 'string') {
 			return [
+				annon("javax.persistence.Basic").add("fetch", "javax.persistence.FetchType.LAZY", false),
 				annon("org.hibernate.annotations.Type").add("type", "json")
 			]
 		}
