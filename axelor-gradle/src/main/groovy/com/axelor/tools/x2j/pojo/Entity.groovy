@@ -414,17 +414,17 @@ class Entity {
 
 		importType("com.google.common.base.MoreObjects")
 
-		def code = []
+		def code = ""
 
-		code += "final MoreObjects.ToStringHelper tsh = MoreObjects.toStringHelper(this);\n"
-		code += "tsh.add(\"id\", this.getId());"
+		code += "return MoreObjects.toStringHelper(this)\n"
+		code += "\t\t\t.add(\"id\", getId())\n"
 		int count = 0
 		for(Property p : properties) {
-			if (p.virtual || p.password || !p.simple || p.name == "id" || p.name == "version") continue
-			code += "tsh.add(\"${p.name}\", this.${p.getter}());"
+			if (p.virtual || p.password || p.json || !p.simple || p.name == "id" || p.name == "version") continue
+			code += "\t\t\t.add(\"${p.name}\", ${p.getter}())\n"
 			if (count++ == 10) break
 		}
-		return code.join("\n\t\t") + "\n\n\t\treturn tsh.omitNullValues().toString();"
+		return code + "\t\t\t.omitNullValues()\n\t\t\t.toString();"
 	}
 
 	String importType(String fqn) {
