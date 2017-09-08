@@ -71,9 +71,9 @@
   <entity name="Country" sequential="false" jsonAttrs="true">
     <string name="code" required="true" unique="true" min="2" />
     <string name="name" required="true" unique="true" min="2" />
+    <string name="extra" json="true" />
     <finder-method name="findByName" using="code, name" filter="self.code = :code OR self.name = :name" orderBy="name" cacheable="true" flush="false"/>
     <finder-method name="findByNameAndCode" using="code, name" all="true"/>
-    <string name="extra" json="true" />
     <!-- should have 'attrs' json field as well -->
   </entity>
 
