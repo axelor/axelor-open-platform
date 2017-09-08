@@ -17,7 +17,6 @@
  */
 package com.axelor.web.service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,6 +61,7 @@ import com.axelor.meta.schema.views.PanelTabs;
 import com.axelor.meta.schema.views.Search;
 import com.axelor.meta.schema.views.SearchFilters;
 import com.axelor.meta.schema.views.SimpleContainer;
+import com.axelor.meta.schema.views.SimpleWidget;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
@@ -190,6 +190,14 @@ public class ViewService extends AbstractService {
 		} else if (widget instanceof PanelRelated) {
 			names.add(((PanelRelated) widget).getName());
 		}
+		
+		if (widget instanceof SimpleWidget) {
+			String depends = ((SimpleWidget) widget).getDepends();
+			if (StringUtils.notBlank(depends)) {
+				Collections.addAll(names, depends.trim().split("\\s*,\\s*"));
+			}
+		}
+
 		if (all == null) {
 			return names;
 		}
@@ -199,7 +207,7 @@ public class ViewService extends AbstractService {
 		return names;
 	}
 
-	public List<String> findNames(final AbstractView view) {
+	private Set<String> findNames(final AbstractView view) {
 		Set<String> names = new HashSet<>();
 		List<AbstractWidget> items = null;
 		if (view instanceof FormView) {
@@ -216,12 +224,12 @@ public class ViewService extends AbstractService {
 			items = ((SearchFilters) view).getItems();
 		}
 		if (items == null || items.isEmpty()) {
-			return new ArrayList<>(names);
+			return names;
 		}
 		for (AbstractWidget widget : items) {
 			findNames(names, widget);
 		}
-		return new ArrayList<>(names);
+		return names;
 	}
 
 	@GET

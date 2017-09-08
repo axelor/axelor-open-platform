@@ -19,14 +19,18 @@ package com.axelor.meta.schema.views;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.common.StringUtils;
 import com.axelor.meta.MetaStore;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -85,9 +89,16 @@ public class PanelEditor extends AbstractPanel {
 		this.items = items;
 	}
 
-	private List<String> findFields(AbstractWidget widget) {
+	private Set<String> findFields(AbstractWidget widget) {
 
-		final List<String> all = new ArrayList<>();
+		final Set<String> all = new HashSet<>();
+
+		if (widget instanceof SimpleWidget) {
+			String depends = ((SimpleWidget) widget).getDepends();
+			if (StringUtils.notBlank(depends)) {
+				Collections.addAll(all, depends.trim().split("\\s*,\\s*"));
+			}
+		}
 
 		if (widget instanceof Field) {
 			all.add(((Field) widget).getName());

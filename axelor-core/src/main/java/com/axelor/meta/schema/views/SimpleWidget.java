@@ -59,6 +59,9 @@ public abstract class SimpleWidget extends AbstractWidget {
 	private String readonlyIf;
 
 	@XmlAttribute
+	private String depends;
+
+	@XmlAttribute
 	private Integer colSpan;
 
 	@XmlAttribute
@@ -164,6 +167,14 @@ public abstract class SimpleWidget extends AbstractWidget {
 
 	public void setReadonlyIf(String readonlyIf) {
 		this.readonlyIf = readonlyIf;
+	}
+
+	public String getDepends() {
+		return depends;
+	}
+
+	public void setDepends(String depends) {
+		this.depends = depends;
 	}
 
 	public Integer getColSpan() {

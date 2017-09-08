@@ -19,6 +19,7 @@ package com.axelor.meta;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -144,7 +145,7 @@ public final class MetaStore {
 		return property;
 	}
 	
-	public static Map<String, Object> findFields(final Class<?> modelClass, final List<String> names) {
+	public static Map<String, Object> findFields(final Class<?> modelClass, final Collection<String> names) {
 		final Map<String, Object> data = new HashMap<>();
 		final Mapper mapper = Mapper.of(modelClass);
 		final Map<String, Property> fieldsMap = new LinkedHashMap<>();

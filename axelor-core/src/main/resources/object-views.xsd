@@ -480,6 +480,13 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="depends" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            Specify comma separated list of field names on which this widget depends.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:anyAttribute processContents="skip" />
       </xsd:extension>
     </xsd:complexContent>
