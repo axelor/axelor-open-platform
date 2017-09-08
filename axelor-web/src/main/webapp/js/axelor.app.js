@@ -158,6 +158,26 @@
 
 		return evalScope;
 	};
+	
+	function evalScopeProxy(evalScope, context) {
+		if (axelor.config['application.mode'] !== 'dev' || window.Proxy === undefined) {
+			return evalScope;
+		}
+		var scope = evalScope.$parent || evalScope;
+		var fields = scope.fields || {};
+		return new Proxy(context || evalScope, {
+			get: function (target, name) {
+				if (context.hasOwnProperty(name) || fields.hasOwnProperty(name)) {
+					return context[name];
+				}
+				var val = evalScope[name];
+				if (val === undefined) {
+					console.error('Unknown field:', name);
+				}
+				return val;
+			}
+		});
+	}
 
 	axelor.$eval = function (scope, expr, context) {
 		if (!scope || !expr) {
@@ -165,9 +185,9 @@
 		}
 
 		var evalScope = axelor.$evalScope(scope);
+		evalScope.$context = context;
 		try {
-			evalScope.$context = context;
-			return evalScope.$eval(expr, context);
+			return evalScopeProxy(evalScope, context).$eval(expr, context);
 		} finally {
 			evalScope.$destroy();
 			evalScope = null;
