@@ -404,7 +404,7 @@ class Entity {
 			def hash = name.hashCode()
 			return "return Objects.hash(${hash}, ${data});"
 		}
-		return "return 0;"
+		return "return 31;"
 	}
 
 	String getToStringCode() {
