@@ -1084,7 +1084,10 @@ public class Resource<T extends Model> {
 				continue;
 			}
 
-			if (isSaved && prop.isCollection() && !fields.isEmpty() && !fields.containsKey(name)) {
+			if (isSaved
+					&& !name.matches("id|version")
+					&& !fields.isEmpty()
+					&& !fields.containsKey(name)) {
 				continue;
 			}
 
