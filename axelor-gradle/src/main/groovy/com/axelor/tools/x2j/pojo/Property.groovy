@@ -420,6 +420,13 @@ class Property {
 	static Property idProperty(Entity entity) {
 		new Property(entity, "id", "long")
 	}
+	
+	static Property attrsProperty(Entity entity) {
+		def prop = new Property(entity, 'attrs', 'string')
+		prop.attrs.put('json', 'true')
+		prop.attrs.put('title', 'Attributes')
+		return prop
+	}
 
 	List<Annotation> getAnnotations() {
 		[

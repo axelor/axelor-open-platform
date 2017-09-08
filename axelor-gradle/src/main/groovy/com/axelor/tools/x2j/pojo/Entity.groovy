@@ -23,6 +23,13 @@ import com.axelor.common.Inflector
 import com.axelor.tools.x2j.Utils
 
 class Entity {
+	
+	private static Set<String> INTERNAL_PACKAGES = [
+		'com.axelor.auth.db',
+		'com.axelor.meta.db',
+		'com.axelor.mail.db',
+		'com.axelor.dms.db',
+	]
 
 	String name
 
@@ -159,6 +166,12 @@ class Entity {
 			importType("com.axelor.db.EntityHelper")
 		}
 
+		def jsonAttrs = node.'@jsonAttrs'
+		def jsonAttrsAdd = jsonAttrs == 'true' || !INTERNAL_PACKAGES.contains(namespace)
+		if (jsonAttrs == 'false') {
+			jsonAttrsAdd = false
+		}
+
 		node."*".each {
 			switch (it.name()) {
 			case "index":
@@ -192,7 +205,18 @@ class Entity {
 				if (field.indexable) {
 					indexes += field.index
 				}
+				if (field.json || field.name == 'attrs') {
+					jsonAttrsAdd = false
+				}
+				if (field.name == 'attrs') {
+					jsonAttrs = 'false'
+				}
 			}
+		}
+
+		if (jsonAttrsAdd || jsonAttrs == 'true') {
+			propertyMap.put("attrs", Property.attrsProperty(this));
+			properties.add(propertyMap.get("attrs"));
 		}
 	}
 	

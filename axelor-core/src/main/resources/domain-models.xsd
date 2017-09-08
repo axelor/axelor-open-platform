@@ -969,6 +969,13 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="jsonAttrs" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify whether the entity should have 'attrs' json field.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="lang" default="java">
       <xsd:annotation>
         <xsd:documentation>

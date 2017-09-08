@@ -54,22 +54,27 @@
     </extra-code>
   </entity>
 
-  <entity name="Group" repository="none">
+  <entity name="Group" repository="none" jsonAttrs="false">
     <string name="code" required="true" unique="true" min="2" />
     <string name="name" required="true" unique="true" min="2" />
     <many-to-many name="contacts" ref="Contact" copy="false" />
+    <!-- should not have 'attrs' json field -->
   </entity>
 
   <entity name="Company">
     <string name="code" required="true" unique="true" min="2" />
     <string name="name" required="true" unique="true" min="2" />
+    <string name="extra" json="true" />
+    <!-- should not have 'attrs' json field as we define one json field -->
   </entity>
-  
-  <entity name="Country" sequential="false">
+
+  <entity name="Country" sequential="false" jsonAttrs="true">
     <string name="code" required="true" unique="true" min="2" />
     <string name="name" required="true" unique="true" min="2" />
     <finder-method name="findByName" using="code, name" filter="self.code = :code OR self.name = :name" orderBy="name" cacheable="true" flush="false"/>
     <finder-method name="findByNameAndCode" using="code, name" all="true"/>
+    <string name="extra" json="true" />
+    <!-- should have 'attrs' json field as well -->
   </entity>
 
   <entity name="Contact" sequential="true" hashAll="true" cachable="false">
