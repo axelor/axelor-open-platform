@@ -944,6 +944,14 @@ function FormViewCtrl($scope, $element) {
 	}
 	
 	function showLog() {
+		ds.read($scope.record.id, {
+			fields: ['createdBy', 'createdOn', 'updatedBy', 'updatedOn']
+		}).success(function (record) {
+			showLogDialog(record);
+		});
+	}
+	
+	function showLogDialog(record) {
 
 		function nameOf(user) {
 			if (!user) {
@@ -953,8 +961,7 @@ function FormViewCtrl($scope, $element) {
 			return user[name] || "";
 		}
 		
-		var info = {},
-			record = $scope.record || {};
+		var info = {};
 		if (record.createdOn) {
 			info.createdOn = moment(record.createdOn).format('DD/MM/YYYY HH:mm');
 			info.createdBy = nameOf(record.createdBy);
@@ -963,25 +970,25 @@ function FormViewCtrl($scope, $element) {
 			info.updatedOn = moment(record.updatedOn).format('DD/MM/YYYY HH:mm');
 			info.updatedBy = nameOf(record.updatedBy);
 		}
-		var table = $("<table class='field-details'>");
+		var table = $("<table class='table field-details'>");
 		var tr;
-		
-		tr = $("<tr></tr>").appendTo(table);
-		$("<th></th>").text(_t("Created On:")).appendTo(tr);
-		$("<td></td>").text(info.createdOn).appendTo(tr);
 		
 		tr = $("<tr></tr>").appendTo(table);
 		$("<th></th>").text(_t("Created By:")).appendTo(tr);
 		$("<td></td>").text(info.createdBy).appendTo(tr);
 		
 		tr = $("<tr></tr>").appendTo(table);
-		$("<th></th>").text(_t("Updated On:")).appendTo(tr);
-		$("<td></td>").text(info.updatedOn).appendTo(tr);
+		$("<th></th>").text(_t("Created On:")).appendTo(tr);
+		$("<td></td>").text(info.createdOn).appendTo(tr);
 		
 		tr = $("<tr></tr>").appendTo(table);
 		$("<th></th>").text(_t("Updated By:")).appendTo(tr);
 		$("<td></td>").text(info.updatedBy).appendTo(tr);
 
+		tr = $("<tr></tr>").appendTo(table);
+		$("<th></th>").text(_t("Updated On:")).appendTo(tr);
+		$("<td></td>").text(info.updatedOn).appendTo(tr);
+		
 		var text = $('<div>').append(table).html();
 
 		axelor.dialogs.say(text);
@@ -1029,10 +1036,10 @@ function FormViewCtrl($scope, $element) {
 			},
 		}, {
 		}, {
-			title: _t('Log...'),
 			active: function () {
 				return $scope.hasAuditLog();
 			},
+			title: _t('Last modified...'),
 			click: showLog
 		}]
 	}];
@@ -1279,8 +1286,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 		};
 		
 		scope.hasAuditLog = function() {
-			var record = scope.record || {};
-			return record.createdOn || record.updatedOn || record.createBy || record.updatedBy;
+			return scope.record && scope.record.id > -1;
 		};
 
 		scope.hasWidth = function() {

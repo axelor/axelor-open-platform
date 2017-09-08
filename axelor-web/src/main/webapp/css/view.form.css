@@ -692,17 +692,19 @@ form.readonly .form-item-container:hover .hot-edit-icon {
 }
 
 table.field-details {
-	width: 220px;
+  margin-bottom: 0;
 }
 
 table.field-details th {
 	width: 5%;
 	text-align: right;
+	font-weight: 600;
 }
 
 table.field-details th,
 table.field-details td {
 	white-space: nowrap;
+	border-top: none;
 }
 
 table.field-details .help-text {
