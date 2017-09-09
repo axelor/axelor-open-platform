@@ -463,8 +463,23 @@
 				acceptItems(editor.items);
 			}
 
+			function acceptViewer(item) {
+				var collect = items;
+				var viewer = item.viewer;
+				if (item.target) {
+					collect = result.related[item.name] || (result.related[item.name] = []);
+				}
+				_.each(viewer.fields, function (item) {
+					collect.push(item.name);
+				});
+				if (viewer.fields) {
+					viewer.fields = processFields(viewer.fields);
+				}
+			}
+
 			_.each(fields, function(item) {
 				if (item.editor) acceptEditor(item);
+				if (item.viewer) acceptViewer(item);
 				if (item.type === 'panel-related') {
 					items.push(item.name);
 				} else if (item.items || item.pages) {

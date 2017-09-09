@@ -1211,7 +1211,7 @@
     <xsd:complexContent>
       <xsd:extension base="tns:BaseField">
         <xsd:sequence>
-          <xsd:element name="viewer" minOccurs="0">
+          <xsd:element name="viewer" type="tns:PanelViewer" minOccurs="0">
             <xsd:annotation>
               <xsd:documentation>
                 Template to display the field value.
@@ -1228,6 +1228,13 @@
         </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="PanelViewer">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="depends" type="xsd:string" />
+      </xsd:extension>
+    </xsd:simpleContent>
   </xsd:complexType>
   <xsd:complexType name="PanelEditor">
     <xsd:complexContent>

@@ -1011,7 +1011,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 
 	template_readonly:function (scope) {
 		var field = scope.field;
-		var tmpl = field.viewer;
+		var tmpl = (field.viewer || {}).template;
 		if (!tmpl && field.editor && (field.editor.viewer || !field.targetName)) {
 			tmpl = '<div class="o2m-editor-form" ui-panel-editor></div>';
 		}
