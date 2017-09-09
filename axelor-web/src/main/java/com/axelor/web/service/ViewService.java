@@ -186,6 +186,12 @@ public class ViewService extends AbstractService {
 				if (field.getEditor() != null && field.getTarget() == null) {
 					all = field.getEditor().getItems();
 				}
+				if (field.getViewer() != null && field.getTarget() == null) {
+					String depends = field.getViewer().getDepends();
+					if (StringUtils.notBlank(depends)) {
+						Collections.addAll(names, depends.trim().split("\\s*,\\s*"));
+					}
+				}
 			}
 		} else if (widget instanceof PanelRelated) {
 			names.add(((PanelRelated) widget).getName());
