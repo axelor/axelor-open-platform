@@ -159,35 +159,38 @@
 		return evalScope;
 	};
 	
-	function evalScopeProxy(evalScope, context) {
-		if (axelor.config['application.mode'] !== 'dev' || window.Proxy === undefined) {
-			return evalScope;
-		}
-		var scope = evalScope.$parent || evalScope;
-		var fields = scope.fields || {};
-		return new Proxy(context || evalScope, {
-			get: function (target, name) {
-				if (context.hasOwnProperty(name) || fields.hasOwnProperty(name)) {
+	axelor.$eval = function (scope, expr, context) {
+		if (!scope || !expr) return null;
+		var evalScope = axelor.$evalScope(scope);
+		var evalFn = evalScope.$eval;
+		var getter = null;
+		
+		if (axelor.config['application.mode'] == 'dev' && window.Proxy) {
+			getter = function getter(target, name) {
+				if (['id', 'version'].indexOf(name) > -1
+						|| context.hasOwnProperty(name)
+						|| (scope.fields || {}).hasOwnProperty(name)
+						|| ((scope.field || {}).target && (scope.$parent.fields || {}).hasOwnProperty(name))) {
 					return context[name];
 				}
-				var val = evalScope[name];
-				if (val === undefined) {
-					console.error('Unknown field:', name);
+				if (target.hasOwnProperty(name)) {
+					return target[name];
 				}
-				return val;
+				if (window.hasOwnProperty(name)) {
+					return window[name];
+				}
+				throw new ReferenceError(name);
 			}
-		});
-	}
-
-	axelor.$eval = function (scope, expr, context) {
-		if (!scope || !expr) {
-			return null;
 		}
 
-		var evalScope = axelor.$evalScope(scope);
 		evalScope.$context = context;
+		evalScope.$eval = function (e, l) {
+			var evalTarget = getter ? new Proxy(this, { get: getter }) : this;
+			return evalFn.call(evalTarget, e, l);
+		};
+
 		try {
-			return evalScopeProxy(evalScope, context).$eval(expr, context);
+			return evalScope.$eval(expr, context);
 		} finally {
 			evalScope.$destroy();
 			evalScope = null;

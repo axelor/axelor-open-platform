@@ -237,7 +237,9 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 			var value;
 			try {
 				value = axelor.$eval(scope, expr, withContext(scope, rec));
-			} catch (e) {}
+			} catch (e) {
+				console.error('FAILED:', condition, e);
+			}
 			scope.attr(attr, negative ? !value : value);
 		}
 	}
@@ -257,7 +259,9 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 				var value = false;
 				try {
 					value = axelor.$eval(scope, expr, withContext(scope, rec));
-				} catch (e) {}
+				} catch (e) {
+					console.error('FAILED:', hilite, e);
+				}
 				if (value) {
 					return scope.attr('highlight', {
 						hilite: hilite,
@@ -291,7 +295,9 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 				if (value.length === 0) {
 					value = null;
 				}
-			} catch (e) {}
+			} catch (e) {
+				console.error('FAILED:', field.bind, e);
+			}
 
 			if (scope.setValue && scope.record && last !== value) {
 				scope.setValue(last = value);
