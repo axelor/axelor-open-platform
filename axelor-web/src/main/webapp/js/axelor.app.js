@@ -158,37 +158,39 @@
 
 		return evalScope;
 	};
-	
+
 	axelor.$eval = function (scope, expr, context) {
-		if (!scope || !expr) return null;
+		if (!scope || !expr) {
+			return null;
+		}
+
+		var USE_PROXY = axelor.config['application.mode'] === 'dev' && window.Proxy;
+		var IGNORE = ['constructor', 'window', 'children', 'nodeName', 'prop', 'attr', 'find'];
+		var FIELDS = ['id', 'version'];
+		
 		var evalScope = axelor.$evalScope(scope);
 		var evalFn = evalScope.$eval;
-		var getter = null;
-		
-		if (axelor.config['application.mode'] == 'dev' && window.Proxy) {
-			getter = function getter(target, name) {
-				if (['id', 'version'].indexOf(name) > -1
-						|| context.hasOwnProperty(name)
-						|| (scope.fields || {}).hasOwnProperty(name)
-						|| ((scope.field || {}).target && (scope.$parent.fields || {}).hasOwnProperty(name))) {
-					return context[name];
-				}
-				if (target.hasOwnProperty(name)) {
-					return target[name];
-				}
-				if (window.hasOwnProperty(name)) {
-					return window[name];
-				}
-				throw new ReferenceError(name);
-			}
-		}
 
 		evalScope.$context = context;
 		evalScope.$eval = function (e, l) {
-			var evalTarget = getter ? new Proxy(this, { get: getter }) : this;
+			var evalTarget = USE_PROXY ? new Proxy(this, {
+					get: function (target, name) {
+						if (FIELDS.indexOf(name) > -1
+								|| context.hasOwnProperty(name)
+								|| (scope.fields || {}).hasOwnProperty(name)
+								|| ((scope.field || {}).target && (scope.$parent.fields || {}).hasOwnProperty(name))) {
+							return context[name];
+						}
+						if (name in target) {
+							return target[name];
+						}
+						if (IGNORE.indexOf(name) === -1) {
+							throw new ReferenceError(name);
+						}
+					}
+				}) : this;
 			return evalFn.call(evalTarget, e, l);
 		};
-
 		try {
 			return evalScope.$eval(expr, context);
 		} finally {
