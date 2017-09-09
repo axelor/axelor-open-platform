@@ -159,23 +159,22 @@
 		return evalScope;
 	};
 
+	const FIELDS_IGNORE = ['constructor', 'window', 'children', 'nodeName', 'prop', 'attr', 'find'];
+	const FIELDS_BASE = ['id', 'version', 'archived'];
+
 	axelor.$eval = function (scope, expr, context) {
 		if (!scope || !expr) {
 			return null;
 		}
 
-		var USE_PROXY = axelor.config['application.mode'] === 'dev' && window.Proxy;
-		var IGNORE = ['constructor', 'window', 'children', 'nodeName', 'prop', 'attr', 'find'];
-		var FIELDS = ['id', 'version', 'archived'];
-		
 		var evalScope = axelor.$evalScope(scope);
 		var evalFn = evalScope.$eval;
 
 		evalScope.$context = context;
 		evalScope.$eval = function (e, l) {
-			var evalTarget = USE_PROXY ? new Proxy(this, {
+			var evalTarget = axelor.config.DEV && window.Proxy ? new Proxy(this, {
 					get: function (target, name) {
-						if (FIELDS.indexOf(name) > -1
+						if (FIELDS_BASE.indexOf(name) > -1
 								|| context.hasOwnProperty(name)
 								|| (scope.fields || {}).hasOwnProperty(name)
 								|| ((scope.field || {}).target && (scope.$parent.fields || {}).hasOwnProperty(name))) {
@@ -184,7 +183,7 @@
 						if (name in target) {
 							return target[name];
 						}
-						if (IGNORE.indexOf(name) === -1) {
+						if (FIELDS_IGNORE.indexOf(name) === -1) {
 							throw new ReferenceError(name);
 						}
 					}
@@ -197,6 +196,61 @@
 			evalScope.$destroy();
 			evalScope = null;
 		}
+	};
+
+	const INTERPOLATION_REGEX = /\{\{\s*(\:\:)?\s*([\w.]+)\s*(\|.*?)?\s*\}\}/g;
+
+	axelor.$fixTemplate = function $fixTemplate(template) {
+		if (template) {
+			template = template.replace(INTERPOLATION_REGEX, function (match, p, n, s) {
+				return "{{" + (p || '') + "$get(this, '" + (n || '') + "')" + (s || '') + "}}";
+			});
+		}
+		return template;
+	};
+
+	axelor.deepGet = function deepGet(obj, path) {
+		var index = 0;
+		var length = path.length;
+		while (obj != null && index < length) {
+			obj = obj[path[index++]];
+		}
+		return (index && index == length) ? obj : undefined;
+	}
+
+	axelor.$get = function $get(scope, name) {
+		var record = scope.record || {};
+		if (name in record) {
+			return record[name];
+		}
+		if (name in scope) {
+			return scope[name];
+		}
+		var path = name.split(/\./);
+		var first = _.first(path);
+		if (first === 'record') {
+			path = _.rest(path);
+			first = _.first(path);
+		}
+		
+		var field = scope.field || {};
+		var found = false;
+
+		if (first in record || FIELDS_BASE.indexOf(first) > -1) {
+			found = true;
+		} else if (field.viewer || field.editor) {
+			found = name in ((field.viewer || {}).fields || {}) ||
+					name in ((field.editor || {}).fields || {});
+		} else {
+			found = name in scope.fields;
+		}
+
+		if (found) {
+			return this.deepGet(record, path);
+		}
+		
+		console.error('FAILED:', '{{' + name + '}}', new ReferenceError(first));
+		return undefined;
 	};
 
 	axelor.$adjustSize = _.debounce(function () {
@@ -409,7 +463,12 @@
 
 		function fetchConfig() {
 			return $http.get('ws/app/info').then(function(response) {
-				_.extend(axelor.config, response.data);
+				var config = _.extend(axelor.config, response.data);
+				$scope.$user.id = config["user.id"];
+				$scope.$user.name = config["user.name"];
+				$scope.$user.image = config["user.image"];
+				config.DEV = config['application.mode'] == 'dev';
+				config.PROD = config['application.mode'] == 'prod'
 			});
 		}
 
@@ -427,9 +486,6 @@
 
 		// load app config
 		fetchConfig().then(function () {
-			$scope.$user.id = axelor.config["user.id"];
-			$scope.$user.name = axelor.config["user.name"];
-			$scope.$user.image = axelor.config["user.image"];
 			openHomeTab();
 		});
 

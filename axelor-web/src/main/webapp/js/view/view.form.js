@@ -1093,6 +1093,10 @@ function FormViewCtrl($scope, $element) {
 		}
 		return record[name];
 	};
+
+	$scope.$get = function (scope, name) {
+		return axelor.$get(scope, name);
+	};
 }
 
 ui.formBuild = function (scope, schema, fields) {
