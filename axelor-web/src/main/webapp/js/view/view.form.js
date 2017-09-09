@@ -666,6 +666,18 @@ function FormViewCtrl($scope, $element) {
 		});
 	};
 	
+	$scope.hasFormItem = function (name) {
+		if ($scope.fields_view_map === undefined) {
+			$scope.fields_view_map = _.object(_.keys($scope.fields), []);
+			_.each($scope.fields_view, function (item) {
+				if (item.name) {
+					$scope.fields_view_map[item.name] = undefined;
+				}
+			});
+		}
+		return name in $scope.fields_view_map;
+	}
+	
 	$scope.getDummyValues = function() {
 		if (!$scope.record) return {};
 		var fields = _.keys($scope.fields);

@@ -176,8 +176,7 @@
 					get: function (target, name) {
 						if (FIELDS_BASE.indexOf(name) > -1
 								|| context.hasOwnProperty(name)
-								|| (scope.fields || {}).hasOwnProperty(name)
-								|| ((scope.field || {}).target && (scope.$parent.fields || {}).hasOwnProperty(name))) {
+								|| (scope.hasFormItem && scope.hasFormItem(name))) {
 							return context[name];
 						}
 						if (name in target) {
