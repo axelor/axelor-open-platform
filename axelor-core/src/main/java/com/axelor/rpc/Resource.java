@@ -1085,13 +1085,17 @@ public class Resource<T extends Model> {
 			}
 
 			if (isSaved
-					&& !name.matches("id|version")
+					&& !name.matches("id|version|archived")
 					&& !fields.isEmpty()
 					&& !fields.containsKey(name)) {
 				continue;
 			}
 
 			Object value = mapper.get(bean, name);
+			
+			if (name.equals("archived") && value == null) {
+				continue;
+			}
 
 			if (prop.isImage() && byte[].class.isInstance(value)) {
 				value = new String((byte[]) value);

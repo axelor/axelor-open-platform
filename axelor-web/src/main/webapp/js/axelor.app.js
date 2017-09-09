@@ -166,7 +166,7 @@
 
 		var USE_PROXY = axelor.config['application.mode'] === 'dev' && window.Proxy;
 		var IGNORE = ['constructor', 'window', 'children', 'nodeName', 'prop', 'attr', 'find'];
-		var FIELDS = ['id', 'version'];
+		var FIELDS = ['id', 'version', 'archived'];
 		
 		var evalScope = axelor.$evalScope(scope);
 		var evalFn = evalScope.$eval;
