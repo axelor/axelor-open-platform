@@ -238,8 +238,7 @@
 		if (first in record || FIELDS_BASE.indexOf(first) > -1) {
 			found = true;
 		} else if (field.viewer || field.editor) {
-			found = name in ((field.viewer || {}).fields || {}) ||
-					name in ((field.editor || {}).fields || {});
+			found = name in ((scope.$parent.$parent.fields_related || {})[field.name] || scope.fields);
 		} else {
 			found = name in scope.fields;
 		}
