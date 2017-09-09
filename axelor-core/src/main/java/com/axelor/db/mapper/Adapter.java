@@ -52,6 +52,14 @@ public class Adapter {
 			annotations = new Annotation[]{};
 		}
 
+		if (type.isInstance(value)) {
+			return value;
+		}
+
+		if (type.isEnum()) {
+			return enumAdapter.adapt(value, type, genericType, annotations);
+		}
+
 		// one2many
 		if (value instanceof Collection && List.class.isAssignableFrom(type)) {
 			return listAdapter.adapt(value, type, genericType, annotations);
@@ -65,14 +73,6 @@ public class Adapter {
 		// many2one
 		if (value instanceof Map) {
 			return mapAdapter.adapt(value, type, genericType, annotations);
-		}
-
-		if (type.isInstance(value)) {
-			return value;
-		}
-		
-		if (type.isEnum()) {
-			return enumAdapter.adapt(value, type, genericType, annotations);
 		}
 
 		// collection of simple types

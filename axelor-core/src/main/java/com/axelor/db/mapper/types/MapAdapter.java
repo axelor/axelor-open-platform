@@ -27,10 +27,14 @@ import com.axelor.db.mapper.TypeAdapter;
 
 public class MapAdapter implements TypeAdapter<Map<?, ?>> {
 
+	static boolean isModelMap(Class<?> type, Object value) {
+		return value instanceof Map && Model.class.isAssignableFrom(type) && !Model.class.isInstance(value);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object adapt(Object value, Class<?> type, Type genericType, Annotation[] annotations) {
-		if (Model.class.isAssignableFrom(type) && value instanceof Map) {
+		if (isModelMap(type, value)) {
 			return Mapper.toBean(type.asSubclass(Model.class), (Map<String, Object>) value);
 		}
 		return value;
