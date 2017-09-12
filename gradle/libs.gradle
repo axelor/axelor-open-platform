@@ -88,7 +88,7 @@ libs.hibernate = [
     "org.hibernate:hibernate-core:${versions.hibernate}",
 	"org.hibernate:hibernate-hikaricp:${versions.hibernate}",
     "org.hibernate:hibernate-validator:${versions.hibernate_validator}",
-	"org.hibernate:hibernate-infinispan:${versions.hibernate}",
+	"org.hibernate:hibernate-ehcache:${versions.hibernate}",
 	"org.hibernate:hibernate-jcache:${versions.hibernate}",
 ]
 

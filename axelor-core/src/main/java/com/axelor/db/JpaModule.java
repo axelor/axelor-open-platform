@@ -24,7 +24,7 @@ import java.util.Properties;
 import javax.inject.Inject;
 
 import org.hibernate.MultiTenancyStrategy;
-import org.hibernate.cache.infinispan.InfinispanRegionFactory;
+import org.hibernate.cache.ehcache.EhCacheRegionFactory;
 import org.hibernate.cache.jcache.JCacheRegionFactory;
 import org.hibernate.cfg.Environment;
 import org.hibernate.hikaricp.internal.HikariCPConnectionProvider;
@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuditInterceptor;
-import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.hibernate.dialect.CustomDialectResolver;
 import com.axelor.db.hibernate.naming.ImplicitNamingStrategyImpl;
@@ -57,9 +56,6 @@ import com.google.inject.persist.jpa.JpaPersistModule;
  *
  */
 public class JpaModule extends AbstractModule {
-
-	private static final String INFINISPAN_CONFIG = "infinispan.xml";
-	private static final String INFINISPAN_CONFIG_FALLBACK = "infinispan-fallback.xml";
 
 	private static Logger log = LoggerFactory.getLogger(JpaModule.class);
 
@@ -220,18 +216,8 @@ public class JpaModule extends AbstractModule {
 			properties.put(JCacheRegionFactory.PROVIDER, jcacheProvider);
 			properties.put(JCacheRegionFactory.CONFIG_URI, jcacheConfig);
 		} else {
-			// use infinispan
-			properties.put(Environment.CACHE_REGION_FACTORY, InfinispanRegionFactory.class.getName());
-			String infinispanConfig = settings.get(InfinispanRegionFactory.INFINISPAN_CONFIG_RESOURCE_PROP);
-			if (infinispanConfig == null) {
-				infinispanConfig = ResourceUtils.getResource(INFINISPAN_CONFIG) != null
-						? INFINISPAN_CONFIG
-						: INFINISPAN_CONFIG_FALLBACK;
-			}
-			if (INFINISPAN_CONFIG_FALLBACK.equals(infinispanConfig)) {
-				properties.put(Environment.DEFAULT_CACHE_CONCURRENCY_STRATEGY, "read-write");
-			}
-			properties.put(InfinispanRegionFactory.INFINISPAN_CONFIG_RESOURCE_PROP, infinispanConfig);
+			// use ehcache
+			properties.put(Environment.CACHE_REGION_FACTORY, EhCacheRegionFactory.class.getName());
 		}
 	}
 
