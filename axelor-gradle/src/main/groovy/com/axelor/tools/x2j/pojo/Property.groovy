@@ -474,12 +474,14 @@ class Property {
 				"Invalid use of a Java keyword '${name}' in domain object: ${entity.name}")
 		}
 
-		if (!collection) {
-			def col = getColumnAuto()
-			if (Naming.isKeyword(col)) {
-				throw new IllegalArgumentException(
-					"Invalid use of an SQL keyword '${col}' in domain object: ${entity.name}")
-			}
+		if (collection) {
+			return null
+		}
+
+		def col = getColumnAuto()
+		if (Naming.isKeyword(col)) {
+			throw new IllegalArgumentException(
+				"Invalid use of an SQL keyword '${col}' in domain object: ${entity.name}")
 		}
 
 		if (column == null && unique == null)
