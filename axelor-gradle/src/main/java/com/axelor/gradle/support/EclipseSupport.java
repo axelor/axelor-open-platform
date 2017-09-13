@@ -112,7 +112,7 @@ public class EclipseSupport extends AbstractSupport {
 				.stream()
 				.filter(it -> it instanceof Container).map(it -> (Container) it)
 				.filter(it -> it.getPath().contains("org.eclipse.jdt.launching.JRE_CONTAINER"))
-				.forEach(it -> it.getAccessRules().add(new AccessRule("0", "jdk/nashorn/api/**")));
+				.forEach(it -> it.getAccessRules().add(new AccessRule("accessible", "jdk/nashorn/api/**")));
 			
 			// generate launcher
 			if (project.getPlugins().hasPlugin(AppPlugin.class)) {
