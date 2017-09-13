@@ -37,7 +37,7 @@ public class ListAdapter implements TypeAdapter<List<?>> {
 		final Class<?> fieldType = (Class<?>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
 		final List<Object> val = new ArrayList<>();
 		for (Object obj : (Collection<?>) value) {
-			if (MapAdapter.isModelMap(fieldType, value)) {
+			if (MapAdapter.isModelMap(fieldType, obj)) {
 				val.add(Mapper.toBean(fieldType.asSubclass(Model.class), (Map<String, Object>) obj));
 			} else {
 				val.add(obj);
