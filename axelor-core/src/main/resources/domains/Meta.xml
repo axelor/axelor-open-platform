@@ -13,7 +13,7 @@
     <string name="name" required="true" unique="true"/>
     <string name="title" required="true" />
     <string name="description" large="true"/>
-    <string name="depends" max="512"/>
+    <string name="depends" max="1024" />
     <string name="moduleVersion" required="true" title="Version"/>
     <boolean name="application" />
     <boolean name="removable" />
