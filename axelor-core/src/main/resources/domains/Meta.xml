@@ -13,8 +13,9 @@
     <string name="name" required="true" unique="true"/>
     <string name="title" required="true" />
     <string name="description" large="true"/>
-    <string name="depends" max="1024" />
     <string name="moduleVersion" required="true" title="Version"/>
+    <many-to-many name="depends" ref="MetaModule"
+      table="META_MODULE_DEPENDS" column="module_id" column2="depend_id" />
     <boolean name="application" />
     <boolean name="removable" />
     <boolean name="installed" />

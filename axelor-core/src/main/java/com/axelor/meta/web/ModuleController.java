@@ -24,7 +24,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.repo.MetaModuleRepository;
@@ -76,18 +75,16 @@ public class ModuleController {
 
 	private Set<String> resolve(MetaModule module) {
 		final Set<String> all = new HashSet<>();
+		final Set<MetaModule> depends = module.getDepends();
+
 		all.add(module.getName());
 
-		final String depends = module.getDepends();
-		if (StringUtils.isBlank(depends)) {
+		if (depends == null || depends.isEmpty()) {
 			return all;
 		}
-		for (String name : depends.trim().split("\\s*,\\s*")) {
-			MetaModule mod = modules.findByName(name);
-			if (mod != null && mod.getInstalled() != Boolean.TRUE) {
-				all.add(name);
-			}
-		}
+
+		depends.stream().map(MetaModule::getName).forEach(all::add);
+		
 		return all;
 	}
 

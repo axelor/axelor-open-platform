@@ -24,8 +24,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -41,6 +43,7 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.common.StringUtils;
 import com.axelor.db.internal.DBHelper;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
@@ -51,7 +54,6 @@ import com.axelor.meta.db.repo.MetaMenuRepository;
 import com.axelor.meta.db.repo.MetaModuleRepository;
 import com.axelor.meta.db.repo.MetaSelectRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
-import com.google.common.base.Joiner;
 import com.google.inject.persist.Transactional;
 
 public class ModuleManager {
@@ -346,6 +348,7 @@ public class ModuleManager {
 	@Transactional
 	void resolve(boolean update) {
 		final Set<String> forceInstall = new HashSet<>();
+		final Map<MetaModule, String[]> dependencies = new HashMap<>();
 		final boolean forceInit = modules.all().count() == 0;
 
 		for (final Properties properties : MetaScanner.findModuleProperties()) {
@@ -371,7 +374,6 @@ public class ModuleManager {
 			if (stored == null) {
 				stored = new MetaModule();
 				stored.setName(name);
-				stored.setDepends(Joiner.on(",").join(depends));
 			}
 
 			if (stored.getId() == null || update) {
@@ -381,6 +383,7 @@ public class ModuleManager {
 				stored.setRemovable(removable);
 				stored.setApplication(application);
 				stored = modules.save(stored);
+				dependencies.put(stored, depends);
 			}
 
 			module.setVersion(version);
@@ -389,6 +392,21 @@ public class ModuleManager {
 			module.setInstalled(stored.getInstalled() == Boolean.TRUE);
 			module.setPending(stored.getPending() == Boolean.TRUE);
 			module.setInstalledVersion(stored.getModuleVersion());
+		}
+		
+		// resolve dependencies
+		for (MetaModule stored : dependencies.keySet()) {
+			final Set<MetaModule> depends = new HashSet<>();
+			for (String name : dependencies.get(stored)) {
+				if (StringUtils.isBlank(name)) continue;
+				final MetaModule depending = modules.findByName(name);
+				if (depending == null) {
+					throw new RuntimeException("No such depemodule found: " + name + ", required by: " + stored.getName());
+				}
+				depends.add(depending);
+			}
+			stored.clearDepends();
+			stored.setDepends(depends);
 		}
 
 		for (String name : forceInstall) {
