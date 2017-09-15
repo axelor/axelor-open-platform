@@ -20,7 +20,9 @@ package com.axelor.db.mapper;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,8 +34,6 @@ import com.axelor.db.mapper.types.ListAdapter;
 import com.axelor.db.mapper.types.MapAdapter;
 import com.axelor.db.mapper.types.SetAdapter;
 import com.axelor.db.mapper.types.SimpleAdapter;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 public class Adapter {
 
@@ -50,10 +50,6 @@ public class Adapter {
 
 		if (annotations == null) {
 			annotations = new Annotation[]{};
-		}
-
-		if (type.isInstance(value)) {
-			return value;
 		}
 
 		if (type.isEnum()) {
@@ -77,11 +73,16 @@ public class Adapter {
 
 		// collection of simple types
 		if (value instanceof Collection) {
-			Collection<Object> all = value instanceof Set ? Sets.newHashSet() : Lists.newArrayList();
+			Collection<Object> all = value instanceof Set ? new HashSet<>() : new ArrayList<>();
 			for (Object item : (Collection<?>) value) {
 				all.add(adapt(item, type, genericType, annotations));
 			}
 			return all;
+		}
+
+		// must be after adapting collections
+		if (type.isInstance(value)) {
+			return value;
 		}
 		
 		if (javaTimeAdapter.isJavaTimeObject(type)) {
