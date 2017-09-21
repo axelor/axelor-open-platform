@@ -1,6 +1,18 @@
 # Current (4.1.5)
 
+## Improvements
+
+- consider X-Forwarded-* headers when preparing base url
+- optimize menu loading
+
 ## Bug fixes
+
+- fix hilite issue
+- fix multi-value field editor issue
+- fix menu groups issue
+- fix menu permission check issue
+- fix multiple view popup rendering issue
+- fix expression with leading whitespace issue
 
 # 4.1.4 (2017-06-19)
 
