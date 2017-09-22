@@ -279,7 +279,9 @@
 							}
 							return;
 						}
-						field.title = field.title || field.autoTitle;
+						if (field.type !== 'separator') {
+							field.title = field.title || field.autoTitle;
+						}
 						var colSpan = (field.widgetAttrs||{}).colSpan || field.colSpan;
 						if (field.type == 'one-to-many') {
 							field.type = 'many-to-many';
