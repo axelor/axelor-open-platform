@@ -50,6 +50,7 @@ class AppPlugin extends AbstractPlugin {
 				compile		"com.axelor:axelor-core:${sdkVersion}"
 				compile		"com.axelor:axelor-web:${sdkVersion}"
 				
+				providedCompile	libs.javax_el
 				providedCompile	libs.javax_servlet
 				providedCompile	libs.javax_servlet_jsp
 
