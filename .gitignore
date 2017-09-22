@@ -12,6 +12,8 @@ application.gzip.*
 *~
 .#*
 [#]*#
-.idea/
+out
+.idea
 *.iml
+*.ipr
 *.iws
