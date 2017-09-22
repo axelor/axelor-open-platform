@@ -245,6 +245,10 @@ table.form-layout td.form-item.v-align-top {
 	resize: vertical;
 }
 
+.form-item fieldset {
+	min-width: inherit;
+}
+
 table.form-layout fieldset {
 	padding: 4px 0;
 }
