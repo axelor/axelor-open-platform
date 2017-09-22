@@ -602,7 +602,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 				task.progress = rec[schema.taskProgress];
 			}
 			
-			if(schema.taskParent && rec[schema.taskParent]){
+			if(schema.taskParent && rec[schema.taskParent] && rec[schema.taskParent].id != task.id){
 				task.parent = rec[schema.taskParent].id;
 			}
 			
