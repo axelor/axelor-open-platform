@@ -930,19 +930,24 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			return values.length === 0;
 		}
 
-		scope.$watch('items', function (items, old) {
-			if (!items || items.length === 0) return;
-			var changed = false;
-			var values = _.filter(items, function (item) {
-				if (item.$changed) {
-					changed = true;
+		function itemsChanged() {
+			var items = scope.items;
+			if (items && items.length > 0) {
+				var changed = false;
+				var values = _.filter(items, function (item) {
+					if (item.$changed) {
+						changed = true;
+					}
+					return !isEmpty(item);
+				});
+				if (changed) {
+					model.$setViewValue(values);
 				}
-				return !isEmpty(item);
-			});
-			if (changed) {
-				model.$setViewValue(values);
 			}
-		}, true);
+		};
+
+		scope.$watch('items', itemsChanged, true);
+		scope.$itemsChanged = itemsChanged;
 
 		scope.$watch('$$readonly', function (readonly, old) {
 			if (readonly === undefined) return;
