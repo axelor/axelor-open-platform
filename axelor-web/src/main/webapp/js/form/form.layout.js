@@ -502,7 +502,8 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 				}
 				var valid = scope.isValid();
 				if (!valid && !scope.$parent.isRequired() && isEmpty(scope.record)) {
-					valid = true;
+					var errors = (scope.form || {}).$error || {};
+					valid = !errors.valid;
 				}
 				if (scope.setValidity) {
 					scope.setValidity('valid', valid);
