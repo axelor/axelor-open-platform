@@ -389,6 +389,7 @@ function FormViewCtrl($scope, $element) {
 		if (!$scope.$hasPanels) {
 			context._form = true;
 		}
+		$scope.$broadcast('on:update-context', context);
 		return ui.prepareContext(ds._model, context, dummy);
 	};
 

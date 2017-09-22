@@ -180,6 +180,12 @@ ui.formInput('JsonField', 'String', {
 				scope.$parent.attr('hidden', true);
 			}
 		});
+
+		scope.$on('on:update-context', function (e, context) {
+			if (context && !context[field.name]) {
+				context[field.name] = angular.toJson(scope.record || {});
+			}
+		});
 	}
 });
 
