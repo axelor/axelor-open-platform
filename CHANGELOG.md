@@ -16,6 +16,9 @@
 - fix wrong form items matching
 - fix DMS permission issues
 - fix recursive gantt when a task refer itself as parent task
+- fix o2m editor issues with invalid fields
+- fix o2m editor fields loosing values
+- fix master-details widget causing overflow
 
 # 4.1.4 (2017-06-19)
 
