@@ -459,6 +459,10 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 						fetchMissing(value.id);
 					}
 					scope.$broadcast("on:record-change", value);
+					// if it's an o2m editor, make sure to update values
+					if (scope.$itemsChanged) {
+						scope.$itemsChanged();
+					}
 				};
 				scope.$watch('record', _.debounce(watchRun, 100), true);
 				scope.$timeout(function () {
