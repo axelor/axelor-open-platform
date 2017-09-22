@@ -239,14 +239,12 @@ function GridViewCtrl($scope, $element) {
 	};
 
 	$scope.selectFields = function() {
-		var fields = _.pluck($scope.fields, 'name');
 		return _.map($scope.fields, function (field) {
 			if (field.jsonField) {
 				return field.name + '::' + (field.jsonType || 'text');
 			}
 			return field.name;
 		});
-		return fields;
 	};
 
 	$scope.filter = function(searchFilter) {
