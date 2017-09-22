@@ -541,7 +541,9 @@ var FormInput = {
 					scope.$apply(function() {
 						var val = scope.parse(value);
 						var txt = scope.format(value);
-
+						if (!scope.record) { // m2o editor with null value?
+							scope.record = {};
+						}
 						model.$setViewValue(val);
 						scope.text = txt;
 					});
@@ -566,6 +568,13 @@ var FormInput = {
 
 		if (element.is(':input')) {
 			setTimeout(bindListeners);
+			// clear input value
+			scope.$on('on:edit', function () {
+				if (model.$viewValue && !scope.record) {
+					model.$setViewValue(undefined);
+					scope.$render_editable();
+				}
+			});
 		}
 
 		scope.$render_editable();
