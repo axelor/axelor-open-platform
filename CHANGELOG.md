@@ -13,6 +13,9 @@
 - fix menu permission check issue
 - fix multiple view popup rendering issue
 - fix expression with leading whitespace issue
+- fix wrong form items matching
+- fix DMS permission issues
+- fix recursive gantt when a task refer itself as parent task
 
 # 4.1.4 (2017-06-19)
 
