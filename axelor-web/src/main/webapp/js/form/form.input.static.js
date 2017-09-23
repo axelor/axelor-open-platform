@@ -513,7 +513,11 @@ ui.formItem('Button', {
 
 		scope.$watch('attr("icon")', function (icon, old) {
 			if (icon === old || (icon && icon.indexOf('fa-') !== 0)) return;
-			element.find('i.fa:first').removeClass(old || '').addClass(icon || field.icon || '');
+			var iconElem = element.find('i.fa:first');
+			if (iconElem.size() == 0) {
+				iconElem = $('<i>').addClass('fa').prependTo(element.prepend(' '));
+			}
+			iconElem.removeClass(old || '').addClass(icon || field.icon || '');
 		});
 	},
 	template: '<a href="" class="btn btn-primary">'+

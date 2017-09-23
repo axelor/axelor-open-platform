@@ -60,6 +60,15 @@ public class PanelRelated extends AbstractPanel {
 	private Boolean editable;
 
 	@XmlAttribute
+	private Boolean required;
+
+	@XmlAttribute
+	private String requiredIf;
+
+	@XmlAttribute
+	private String validIf;
+
+	@XmlAttribute
 	private String orderBy;
 
 	@XmlAttribute
@@ -188,7 +197,31 @@ public class PanelRelated extends AbstractPanel {
 	public void setEditable(Boolean editable) {
 		this.editable = editable;
 	}
-	
+
+	public Boolean getRequired() {
+		return required;
+	}
+
+	public void setRequired(Boolean required) {
+		this.required = required;
+	}
+
+	public String getRequiredIf() {
+		return requiredIf;
+	}
+
+	public void setRequiredIf(String requiredIf) {
+		this.requiredIf = requiredIf;
+	}
+
+	public String getValidIf() {
+		return validIf;
+	}
+
+	public void setValidIf(String validIf) {
+		this.validIf = validIf;
+	}
+
 	public String getDomain() {
 		return domain;
 	}

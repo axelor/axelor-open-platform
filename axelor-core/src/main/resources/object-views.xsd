@@ -1174,6 +1174,9 @@
         <xsd:attribute name="stacked" use="prohibited"/>
         <xsd:attribute name="field" type="xsd:string" use="required" />
         <xsd:attribute name="editable" type="xsd:boolean" />
+        <xsd:attribute name="required" type="xsd:boolean" />
+        <xsd:attribute name="requiredIf" type="xsd:string" />
+        <xsd:attribute name="validIf" type="xsd:string" />
         <xsd:attribute name="orderBy" type="xsd:string" />
         <xsd:attribute name="groupBy" type="xsd:string" />
         <xsd:attribute name="onNew" type="xsd:string" />

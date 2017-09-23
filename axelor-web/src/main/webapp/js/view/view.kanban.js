@@ -201,7 +201,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
 				_.each(all, function (item) {
 					_.extend(item, ds.get(item.id));
 				});
-				record.version = rec.version;
+				_.extend(record, rec);
 			});
 		}
 
@@ -291,7 +291,8 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 			function fetch(options) {
 				var opts = _.extend({
 					offset: 0,
-					sortBy: [view.sequenceBy]
+					sortBy: [view.sequenceBy],
+					fields: _.pluck(scope.fields, 'name')
 				}, options);
 				elemMore.hide();
 				var promise = ds.search(opts);

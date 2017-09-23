@@ -127,15 +127,7 @@ public class ModuleManager {
 	}
 
 	public void updateAll(boolean withDemo) {
-		try {
-			this.createUsers();
-			this.resolve(true);
-			resolver.all().stream()
-				.map(Module::getName)
-				.forEach(m -> install(m, true, withDemo, false));
-		} finally {
-			this.doCleanUp();
-		}
+		update(withDemo);
 	}
 
 	public void update(boolean withDemo, String... moduleNames) {
@@ -155,6 +147,9 @@ public class ModuleManager {
 			resolver.all().stream()
 				.filter(m -> names.contains(m.getName()))
 				.forEach(m -> install(m, true, withDemo));
+			resolver.all().stream()
+				.filter(m -> names.contains(m.getName()))
+				.forEach(m -> viewLoader.doLast(m, true));
 		} finally {
 			this.doCleanUp();
 		}
@@ -163,7 +158,7 @@ public class ModuleManager {
 	public void restoreMeta() {
 		try {
 			loadData = false;
-			update(false);
+			updateAll(false);
 		} finally {
 			loadData = true;
 		}

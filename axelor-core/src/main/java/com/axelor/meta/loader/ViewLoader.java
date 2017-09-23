@@ -44,6 +44,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
@@ -56,7 +57,6 @@ import com.axelor.meta.db.repo.MetaActionMenuRepository;
 import com.axelor.meta.db.repo.MetaActionRepository;
 import com.axelor.meta.db.repo.MetaMenuRepository;
 import com.axelor.meta.db.repo.MetaSelectRepository;
-import com.axelor.meta.db.repo.MetaViewCustomRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
@@ -71,6 +71,7 @@ import com.axelor.meta.schema.views.Panel;
 import com.axelor.meta.schema.views.PanelField;
 import com.axelor.meta.schema.views.PanelRelated;
 import com.axelor.meta.schema.views.Selection;
+import com.axelor.meta.service.MetaService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
@@ -89,9 +90,6 @@ public class ViewLoader extends AbstractLoader {
 	
 	@Inject
 	private MetaViewRepository views;
-	
-	@Inject
-	private MetaViewCustomRepository customViews;
 
 	@Inject
 	private MetaSelectRepository selects;
@@ -246,7 +244,10 @@ public class ViewLoader extends AbstractLoader {
 
 		// delete personalized dashboards
 		if ("dashboard".equals(type) && !xml.equals(entity.getXml())) {
-			customViews.all().filter("self.name = ? AND self.user is not null", entity.getName()).remove();
+			int deleted = Beans.get(MetaService.class).removeCustomViews(entity);
+			if (deleted > 0) {
+				log.info(deleted + " custom views are deleted : " + entity.getName());
+			}
 		}
 
 		entity.setXmlId(xmlId);

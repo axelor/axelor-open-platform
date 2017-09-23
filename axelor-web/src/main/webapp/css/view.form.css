@@ -568,6 +568,11 @@ td.form-item > * {
 	right: 0;
 	height: inherit;
 }
+
+.ng-invalid > .CodeMirror {
+	border-color: #B94A48 !important;
+}
+
 .form-item div.code-editor .CodeMirror-scroll {
 	height: calc(100% + 30px);
 	width: 100%;

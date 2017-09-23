@@ -236,7 +236,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		function handle(rec) {
 			var value;
 			try {
-				value = axelor.$eval(scope, expr, withContext(scope, rec));
+				value = !!axelor.$eval(scope, expr, withContext(scope, rec));
 			} catch (e) {
 				console.error('FAILED:', condition, e);
 			}

@@ -34,6 +34,7 @@ import com.axelor.app.AppSettings;
 import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
+import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
@@ -47,6 +48,7 @@ import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.actions.ActionView;
+import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.google.common.collect.ImmutableList;
@@ -115,6 +117,15 @@ public class MetaController {
 	}
 
 	public void clearCache(ActionRequest request, ActionResponse response) {
+		if (request.getBeanClass() != null && MetaView.class.isAssignableFrom(request.getBeanClass())) {
+			final MetaView view = request.getContext().asType(MetaView.class);
+			int deleted = Beans.get(MetaService.class).removeCustomViews(view);
+			if (deleted > 0) {
+				response.setNotify(I18n.get(
+						"{0} customized view is deleted.",
+						"{0} customized views are deleted.", deleted));
+			}
+		}
 		MetaStore.clear();
 	}
 
