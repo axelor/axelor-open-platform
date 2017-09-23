@@ -17,10 +17,11 @@
  */
 package com.axelor.meta;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,6 +48,7 @@ import com.axelor.common.reflections.Reflections;
 public final class MetaScanner {
 
 	private static final String MODULE_PROPERTIES = "module.properties";
+	private static final String SCHEME_JAR = "jar";
 	
 	private static final String BUILD_CLASSES = "build/classes/main";
 	private static final String BUILD_RESOURCES = "build/resources/main";
@@ -104,28 +106,38 @@ public final class MetaScanner {
 	 */
 	private static List<URL> findClassPath(URL moduleFile) {
 		final List<URL> paths = new ArrayList<>();
-		String file = moduleFile.getFile();
-		file = file.substring(0, file.lastIndexOf(MODULE_PROPERTIES) - 1);
-		file = file.startsWith("file:") ? file.substring(5, file.length() - 1) : file;
-		if (file.endsWith(".jar")) {
+		final String scheme = moduleFile.getProtocol();
+		final boolean isJar = SCHEME_JAR.equals(scheme);
+
+		String fileName = isJar ? moduleFile.getFile() : moduleFile.toString();
+		fileName = fileName.substring(0, fileName.length() - MODULE_PROPERTIES.length() - (isJar ? 2 : 1));
+		
+		final Path file;
+		try {
+			file = Paths.get(new URI(fileName));
+		} catch (URISyntaxException e) {
+			// this should never happen
+			throw new RuntimeException(e);
+		}
+
+		if (fileName.endsWith(".jar")) {
 			try {
-				paths.add(new File(file).toURI().toURL());
+				paths.add(file.toUri().toURL());
 			} catch (MalformedURLException e) {
 				// this should never happen
 			}
 			return paths;
 		}
-		final Path dir = Paths.get(file);
 		final Path next;
-		if (dir.endsWith(Paths.get(BUILD_CLASSES))) {
-			next = dir.resolve("../../..").resolve(BUILD_RESOURCES).normalize();
-		} else if (dir.endsWith(Paths.get(BUILD_RESOURCES))) {
-			next = dir.resolve("../../..").resolve(BUILD_CLASSES).normalize();
+		if (file.endsWith(Paths.get(BUILD_CLASSES))) {
+			next = file.resolve("../../..").resolve(BUILD_RESOURCES).normalize();
+		} else if (file.endsWith(Paths.get(BUILD_RESOURCES))) {
+			next = file.resolve("../../..").resolve(BUILD_CLASSES).normalize();
 		} else {
 			next = null;
 		}
 		try {
-			paths.add(dir.toUri().toURL());
+			paths.add(file.toUri().toURL());
 			if (next != null && Files.exists(next)) {
 				paths.add(next.toUri().toURL());
 			}
