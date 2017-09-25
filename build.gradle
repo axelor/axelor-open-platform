@@ -2,6 +2,9 @@ buildscript {
 	apply from: "gradle/repos.gradle"
 }
 
+apply plugin: "eclipse"
+apply plugin: "idea"
+
 apply from: "version.gradle"
 
 subprojects {
