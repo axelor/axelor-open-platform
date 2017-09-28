@@ -183,10 +183,6 @@ public class AuthService {
 	 * @return true if they match
 	 */
 	public boolean match(String plain, String saved) {
-		// TODO: remove plain text match in final version
-		if (Objects.equal(plain, saved)) { // plain text match
-			return true;
-		}
 		return passwordService.passwordsMatch(plain, saved);
 	}
 
