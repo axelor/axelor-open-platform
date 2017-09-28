@@ -575,25 +575,24 @@
 					progress_cb(complete);
 				}, false);
 				
-				xhr.onreadystatechange = function(e) {
-					if (xhr.readyState == 1) {
-						_.each($http.defaults.transformRequest, function(tr) {
-							tr(data);
-						});
+				_.each($http.defaults.transformRequest, function(tr) {
+					tr(data);
+				});
+
+				xhr.onerror = deferred.reject;
+				xhr.onabort = deferred.reject;
+				xhr.onload = function () {
+					var data =  angular.fromJson(xhr.response || xhr.responseText);
+					var response = {
+						data: data,
+						status: xhr.status
+					};
+					if (xhr.status == 200) {
+						deferred.resolve(response);
+					} else {
+						deferred.reject(response);
 					}
-					if (xhr.readyState == 4) {
-						var data = angular.fromJson(xhr.responseText);
-						var response = {
-							data: data,
-							status: xhr.status
-						};
-						if (xhr.status == 200) {
-							deferred.resolve(response);
-						} else {
-							deferred.reject(response);
-						}
-						$rootScope.$applyAsync();
-					}
+					$rootScope.$applyAsync();
 				};
 
 				xhr.open("POST", "ws/rest/" + this._model + "/upload", true);

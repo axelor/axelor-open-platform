@@ -298,7 +298,9 @@ public class RestService extends ResourceService {
             if ((filename.trim().startsWith("filename"))) {
                 String name = filename.split("=")[1].trim();
                 // remove quotes
-                return name.replaceAll("^\"|\"$", "");
+                name = name.replaceAll("^\"|\"$", "");
+                // on IE11, sometime we get full path, so get name only
+                return new File(name).getName();
             }
         }
         return null;
