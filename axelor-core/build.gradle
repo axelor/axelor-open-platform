@@ -66,7 +66,7 @@ dependencies {
 
 	testCompile libs.greenmail
 
-	testCompile("org.apache.directory.jdbm:apacheds-jdbm1:2.0.0-M3-SNAPSHOT");
+	testCompile("org.apache.directory.jdbm:apacheds-jdbm1:2.0.0-M3");
 	testCompile("org.apache.directory.server:apacheds-test-framework:2.0.0-M15") {
 		exclude group: "org.apache.directory.jdbm"
 	}
