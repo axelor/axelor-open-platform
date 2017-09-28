@@ -23,7 +23,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -225,29 +227,30 @@ public class ViewService extends AbstractService {
 	private Set<String> findNames(final AbstractView view) {
 		final Set<String> names = new HashSet<>();
 		final List<AbstractWidget> items = new ArrayList<>();
+		final Consumer<List<AbstractWidget>> collect = all -> Optional.ofNullable(all).ifPresent(items::addAll);
 		if (view instanceof FormView) {
 			FormView form = (FormView) view;
-			items.addAll(form.getItems());
+			collect.accept(form.getItems());
 			if (form.getToolbar() != null) {
 				items.addAll(form.getToolbar());
 			}
 			if (form.getMenubar() != null) {
 				form.getMenubar().stream()
 					.filter(m -> m.getItems() != null)
-					.forEach(m -> items.addAll(m.getItems()));
+					.forEach(m -> collect.accept(m.getItems()));
 			}
 		}
 		if (view instanceof GridView) {
 			GridView grid = (GridView) view;
-			items.addAll(grid.getItems());
+			collect.accept(grid.getItems());
 			if ("sequence".equals(grid.getOrderBy())) {
 				names.add("sequence");
 			}
 		}
 		if (view instanceof SearchFilters) {
-			items.addAll(((SearchFilters) view).getItems());
+			collect.accept(((SearchFilters) view).getItems());
 		}
-		if (items == null || items.isEmpty()) {
+		if (items.isEmpty()) {
 			return names;
 		}
 		for (AbstractWidget widget : items) {
