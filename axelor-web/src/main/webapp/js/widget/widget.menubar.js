@@ -153,6 +153,7 @@ ui.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, Acti
 				formScope.$watch('record', function(rec) {
 					scope.record = rec;
 				});
+				scope.hasFormItem = formScope.hasFormItem;
 			}
 
 			scope.onClick = function(e) {

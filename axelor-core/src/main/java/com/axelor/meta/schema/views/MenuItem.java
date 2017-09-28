@@ -76,6 +76,9 @@ public class MenuItem extends AbstractWidget {
 	private Boolean hidden;
 
 	@XmlAttribute
+	private String depends;
+
+	@XmlAttribute
 	private String showIf;
 
 	@XmlAttribute
@@ -234,6 +237,14 @@ public class MenuItem extends AbstractWidget {
 
 	public void setHidden(Boolean hidden) {
 		this.hidden = hidden;
+	}
+
+	public String getDepends() {
+		return depends;
+	}
+
+	public void setDepends(String depends) {
+		this.depends = depends;
 	}
 
 	public String getShowIf() {

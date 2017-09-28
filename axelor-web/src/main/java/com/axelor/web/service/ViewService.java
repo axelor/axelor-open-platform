@@ -17,6 +17,7 @@
  */
 package com.axelor.web.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,6 +54,7 @@ import com.axelor.meta.schema.views.Field;
 import com.axelor.meta.schema.views.FormInclude;
 import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.GridView;
+import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.schema.views.Notebook;
 import com.axelor.meta.schema.views.Panel;
 import com.axelor.meta.schema.views.PanelField;
@@ -204,6 +206,13 @@ public class ViewService extends AbstractService {
 			}
 		}
 
+		if (widget instanceof MenuItem) {
+			String depends = ((MenuItem) widget).getDepends();
+			if (StringUtils.notBlank(depends)) {
+				Collections.addAll(names, depends.trim().split("\\s*,\\s*"));
+			}
+		}
+
 		if (all == null) {
 			return names;
 		}
@@ -214,20 +223,29 @@ public class ViewService extends AbstractService {
 	}
 
 	private Set<String> findNames(final AbstractView view) {
-		Set<String> names = new HashSet<>();
-		List<AbstractWidget> items = null;
+		final Set<String> names = new HashSet<>();
+		final List<AbstractWidget> items = new ArrayList<>();
 		if (view instanceof FormView) {
-			items = ((FormView) view).getItems();
+			FormView form = (FormView) view;
+			items.addAll(form.getItems());
+			if (form.getToolbar() != null) {
+				items.addAll(form.getToolbar());
+			}
+			if (form.getMenubar() != null) {
+				form.getMenubar().stream()
+					.filter(m -> m.getItems() != null)
+					.forEach(m -> items.addAll(m.getItems()));
+			}
 		}
 		if (view instanceof GridView) {
 			GridView grid = (GridView) view;
-			items = grid.getItems();
+			items.addAll(grid.getItems());
 			if ("sequence".equals(grid.getOrderBy())) {
 				names.add("sequence");
 			}
 		}
 		if (view instanceof SearchFilters) {
-			items = ((SearchFilters) view).getItems();
+			items.addAll(((SearchFilters) view).getItems());
 		}
 		if (items == null || items.isEmpty()) {
 			return names;
