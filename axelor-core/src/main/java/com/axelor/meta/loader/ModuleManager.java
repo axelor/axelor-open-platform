@@ -478,7 +478,11 @@ public class ModuleManager {
 		final UserRepository users = Beans.get(UserRepository.class);
 		final GroupRepository groups = Beans.get(GroupRepository.class);
 
-		if(users.all().count() != 0) {
+		if (users.all().count() != 0) {
+			// encrypt plain passwords
+			for (User user : users.all().filter("self.password not like :shiro").bind("shiro", "$shiro1$%").fetch()) {
+				authService.encrypt(user);
+			}
 			return;
 		}
 
