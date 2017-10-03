@@ -273,19 +273,12 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			return success(value);
 		}
 		
-		var criterion = {
-			'fieldName': 'id',
-			'operator': 'in',
-			'value': ids
-		};
-
 		var fields = _.pluck($scope.fields, 'name');
-		var filter = {
-			operator: 'and',
-			criteria: [criterion]
-		};
-		
+
 		function doFetch(view) {
+			var domain = "self.id in (:_field_ids)";
+			var context = _.pick($scope.getContext(), ['id', '_model']);
+
 			var sortBy = view.sortBy || view.orderBy;
 			if (sortBy) {
 				sortBy = sortBy.split(",");
@@ -293,13 +286,17 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			if (view.canMove && fields.indexOf('sequence') === -1) {
 				fields.push('sequence');
 			}
+
+			context._field = field.name;
+			context._field_ids = ids;
+
 			return fetchDS().search({
-				filter: filter,
 				fields: fields,
 				sortBy: fetchDS()._sortBy || sortBy,
 				archived: true,
 				limit: -1,
-				domain: null
+				domain: domain,
+				context: context
 			}).success(function(records, page){
 				// only edited records should have version property
 				var items = _.map(records, function(item){
