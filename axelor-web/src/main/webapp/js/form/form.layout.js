@@ -385,6 +385,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 			}
 
 			scope.fields = editor.fields || scope.fields;
+			scope.$$isPanelEditor = true;
 
 			var form = ui.formBuild(scope, schema, scope.fields);
 			var isRelational = /-to-one$/.test(field.type);
