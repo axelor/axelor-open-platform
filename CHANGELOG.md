@@ -2,6 +2,12 @@
 
 ## Bug fixes
 
+- fix file upload issue on IE11
+- remove plain text password match
+- fix french translation
+- fix relational fields permission issues
+- fix regression caused by invalid value in editor
+
 # 4.1.5 (2017-09-22)
 
 ## Improvements
