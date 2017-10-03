@@ -1,3 +1,7 @@
+# Current (4.1.7)
+
+## Bug fixes
+
 # 4.1.6 (2017-10-03)
 
 ## Bug fixes
