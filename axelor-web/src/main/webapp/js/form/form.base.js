@@ -563,7 +563,6 @@ var FormInput = {
 			if (scope.$$isPanelEditor) {
 				scope.$on('on:edit', function () {
 					if (model.$viewValue && !scope.record) {
-						scope.record = {};
 						model.$setViewValue(undefined);
 						scope.$render_editable();
 					}
