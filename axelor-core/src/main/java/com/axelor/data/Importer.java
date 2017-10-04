@@ -23,6 +23,7 @@ import com.axelor.data.adapter.BooleanAdapter;
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.data.adapter.JavaTimeAdapter;
 import com.axelor.data.adapter.NumberAdapter;
+import com.axelor.data.adapter.PasswordAdapter;
 import com.axelor.data.csv.CSVImporter;
 import com.google.inject.ImplementedBy;
 
@@ -39,7 +40,8 @@ public interface Importer {
 		new DataAdapter("LocalDateTime", JavaTimeAdapter.class, "type", "LocalDateTime", "format", "dd/MM/yyyy HH:mm"),
 		new DataAdapter("ZonedDateTime", JavaTimeAdapter.class, "type", "ZonedDateTime", "format", "dd/MM/yyyy HH:mm"),
 		new DataAdapter("Boolean", BooleanAdapter.class, "falsePattern", "(0|f|n|false|no)"),
-		new DataAdapter("Number", NumberAdapter.class, "decimalSeparator", ".", "thousandSeparator", ",")
+		new DataAdapter("Number", NumberAdapter.class, "decimalSeparator", ".", "thousandSeparator", ","),
+		new DataAdapter("Password", PasswordAdapter.class)
 	};
 
 	/**
