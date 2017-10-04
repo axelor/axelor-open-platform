@@ -639,7 +639,7 @@ public class ViewLoader extends AbstractLoader {
 			try {
 				log.debug("Creating default views: {}", out);
 				Files.createParentDirs(out);
-				Files.write(xml, out, Charsets.UTF_8);
+				Files.asCharSink(out, Charsets.UTF_8).write(xml);
 			} catch (IOException e) {
 				log.error("Unable to create: {}", out);
 			}

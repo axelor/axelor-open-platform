@@ -119,7 +119,7 @@ public class ActionExport extends Action {
 		}
 
 		Files.createParentDirs(output);
-		Files.write(contents, output, Charsets.UTF_8);
+		Files.asCharSink(output, Charsets.UTF_8).write(contents);
 
 		log.info("file saved: {}", output);
 

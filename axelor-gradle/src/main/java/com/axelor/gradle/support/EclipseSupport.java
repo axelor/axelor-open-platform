@@ -317,7 +317,7 @@ public class EclipseSupport extends AbstractSupport {
 		final File output = FileUtils.getFile(project.getProjectDir(), ".settings", String.format("%s (run).launch", project.getName()));
 		try {
 			Files.createParentDirs(output);
-			Files.write(builder, output, Charsets.UTF_8);
+			Files.asCharSink(output, Charsets.UTF_8).write(builder);
 		} catch (IOException e) {
 		}
 	}

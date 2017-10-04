@@ -30,6 +30,7 @@ import org.gradle.api.tasks.TaskAction;
 
 import com.axelor.common.VersionUtils;
 import com.axelor.gradle.AxelorPlugin;
+import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
 public class UpdateVersion extends DefaultTask {
@@ -66,7 +67,7 @@ public class UpdateVersion extends DefaultTask {
 
 	private void processFile(File file) throws IOException {
 		final String name = file.getName();
-		final String str = Files.toString(file, Charset.forName("UTF-8"));
+		final String str = Files.asCharSource(file, Charset.forName("UTF-8")).read();
 		
 		String txt = str;
 		if (name.endsWith(".xsd")) txt = process_xsd(txt);
@@ -79,7 +80,7 @@ public class UpdateVersion extends DefaultTask {
 		}
 
 		getLogger().info("Processing {}", file);
-		Files.write(txt, file, Charset.forName("UTF-8"));
+		Files.asCharSink(file, Charsets.UTF_8).write(txt);
 	}
 
 	private String process_xml(String text) {

@@ -122,7 +122,7 @@ public class Generator {
 
 		log.info("Generating: " + entityFile.getPath());
 		String code = Expander.expand(entity);
-		Files.write(Utils.stripTrailing(code), entityFile, Charsets.UTF_8);
+		Files.asCharSink(entityFile, Charsets.UTF_8).write(Utils.stripTrailing(code));
 		rendered.add(entityFile);
 
 		return rendered;
@@ -192,13 +192,13 @@ public class Generator {
 
 		log.info("Generating: " + entityFile.getPath());
 		String code = Expander.expand(entity, false);
-		Files.write(Utils.stripTrailing(code), entityFile, Charsets.UTF_8);
+		Files.asCharSink(entityFile, Charsets.UTF_8).write(Utils.stripTrailing(code));
 		rendered.add(entityFile);
 
 		if (repoFile != null) {
 			log.info("Generating: " + repoFile.getPath());
 			String repo = Expander.expand(entity, true);
-			Files.write(Utils.stripTrailing(repo) + "\n", repoFile, Charsets.UTF_8);
+			Files.asCharSink(repoFile, Charsets.UTF_8).write(Utils.stripTrailing(repo) + "\n");
 			rendered.add(repoFile);
 		}
 

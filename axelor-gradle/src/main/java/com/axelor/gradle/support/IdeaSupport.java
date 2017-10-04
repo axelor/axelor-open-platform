@@ -101,7 +101,7 @@ public class IdeaSupport extends AbstractSupport {
 
 		try {
 			Files.createParentDirs(outFile);
-			Files.write(code, outFile, Charsets.UTF_8);
+			Files.asCharSink(outFile, Charsets.UTF_8).write(code);
 		} catch (IOException e) {
 		}
 	}

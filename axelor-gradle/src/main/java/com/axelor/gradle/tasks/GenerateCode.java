@@ -19,7 +19,6 @@ package com.axelor.gradle.tasks;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -44,6 +43,7 @@ import com.axelor.gradle.AppPlugin;
 import com.axelor.gradle.AxelorExtension;
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.tools.x2j.Generator;
+import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.io.Files;
@@ -154,7 +154,7 @@ public class GenerateCode extends DefaultTask {
 				.append("\n");
 		}
 
-		Files.write(text, outputPath, Charset.forName("UTF-8"));
+		Files.asCharSink(outputPath, Charsets.UTF_8).write(text);
 	}
 
 	private Project findProject(ResolvedArtifact artifact) {
