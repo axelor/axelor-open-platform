@@ -940,7 +940,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 					}
 					return !isEmpty(item);
 				});
-				if (changed) {
+				if (changed && values.length) {
 					model.$setViewValue(values);
 				}
 			}
