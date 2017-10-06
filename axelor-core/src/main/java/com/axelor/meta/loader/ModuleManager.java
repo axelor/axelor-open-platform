@@ -139,6 +139,7 @@ public class ModuleManager {
 			this.resolve(true);
 			jobRunner.run(job);
 		} finally {
+			this.encryptPasswords();
 			this.doCleanUp();
 		}
 	}
@@ -521,4 +522,17 @@ public class ModuleManager {
 
 		admin = users.save(admin);
 	}
+
+	@Transactional
+	public void encryptPasswords() {
+		final UserRepository users = Beans.get(UserRepository.class);
+
+		if (users.all().count() != 0) {
+			// encrypt plain passwords
+			for (User user : users.all().filter("self.password not like :shiro").bind("shiro", "$shiro1$%").fetch()) {
+				authService.encrypt(user);
+			}
+		}
+	}
+
 }
