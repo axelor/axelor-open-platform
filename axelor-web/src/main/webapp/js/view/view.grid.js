@@ -80,7 +80,7 @@ function GridViewCtrl($scope, $element) {
 			initialized = true;
 		} else {
 			setTimeout(focusFilter);
-			if (reloadDotted) {
+			if (reloadDotted || $scope._viewTypeLast !== 'grid') {
 				return $scope.reload().then(function() {
 					$scope.updateRoute();
 				});
