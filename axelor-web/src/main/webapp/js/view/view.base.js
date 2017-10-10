@@ -104,7 +104,7 @@ function ViewCtrl($scope, DataSource, ViewService) {
 			
 			switchedTo = viewType;
 
-			$scope._viewTypeLast = $scope._viewType;
+			$scope._viewTypeLast = $scope._viewType === 'form' ? $scope._viewTypeLast : $scope._viewType;
 			$scope._viewType = viewType;
 			$scope._viewParams.viewType = viewType; //XXX: remove
 			$scope._viewParams.$viewScope = viewScope;
