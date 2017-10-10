@@ -542,8 +542,8 @@ var FormInput = {
 					scope.$applyAsync(function() {
 						var val = scope.parse(value);
 						var txt = scope.format(value);
-						if (scope.$$isPanelEditor && !scope.record) { // m2o editor with null value?
-							scope.record = {};
+						if (scope.$$setEditorValue && !scope.record) { // m2o editor with null value?
+							scope.$$setEditorValue({}, false);
 						}
 						model.$setViewValue(val);
 						scope.text = txt;
@@ -570,7 +570,7 @@ var FormInput = {
 		if (element.is(':input')) {
 			setTimeout(bindListeners);
 			// clear input value
-			if (scope.$$isPanelEditor) {
+			if (scope.$$setEditorValue) {
 				scope.$on('on:edit', function () {
 					if (model.$viewValue && !scope.record) {
 						model.$setViewValue(undefined);
