@@ -51,6 +51,49 @@
 - do not copy non-owning m2m fields
 - show 'No records found' message on cards view
 
+# 4.1.7 (2017-10-10)
+
+## Bug fixes
+
+- fix regression causing onLoad called on new record
+- fix x-bind causing dirty flag issue
+- encrypt all plain text passwords at server startup after module initialization.
+- fix IE font loading issues
+- fix regression causing values lost in popup
+- reload grid view is switching back from non-form view
+
+# 4.1.6 (2017-10-03)
+
+## Bug fixes
+
+- fix file upload issue on IE11
+- remove plain text password match
+- fix french translation
+- fix relational fields permission issues
+- fix regression caused by invalid value in editor
+
+# 4.1.5 (2017-09-22)
+
+## Improvements
+
+- consider X-Forwarded-* headers when preparing base url
+- optimize menu loading
+
+## Bug fixes
+
+- fix hilite issue
+- fix multi-value field editor issue
+- fix menu groups issue
+- fix menu permission check issue
+- fix multiple view popup rendering issue
+- fix expression with leading whitespace issue
+- fix wrong form items matching
+- fix DMS permission issues
+- fix recursive gantt when a task refer itself as parent task
+- fix o2m editor issues with invalid fields
+- fix o2m editor fields loosing values
+- fix master-details widget causing overflow
+
 # 4.1.4 (2017-06-19)
 
 ## Bug fixes
