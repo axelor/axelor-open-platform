@@ -80,7 +80,7 @@ function GridViewCtrl($scope, $element) {
 			initialized = true;
 		} else {
 			setTimeout(focusFilter);
-			if (reloadDotted || ['kanban', 'cards'].indexOf($scope._viewTypeLast) > -1) {
+			if (reloadDotted || ['form', 'grid'].indexOf($scope._viewTypeLast) === -1) {
 				return $scope.reload().then(function() {
 					$scope.updateRoute();
 				});
