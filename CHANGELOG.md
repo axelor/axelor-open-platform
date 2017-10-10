@@ -2,6 +2,13 @@
 
 ## Bug fixes
 
+- fix regression causing onLoad called on new record
+- fix x-bind causing dirty flag issue
+- encrypt all plain text passwords at server startup after module initialization.
+- fix IE font loading issues
+- fix regression causing values lost in popup
+- reload grid view is switching back from non-form view
+
 # 4.1.6 (2017-10-03)
 
 ## Bug fixes
