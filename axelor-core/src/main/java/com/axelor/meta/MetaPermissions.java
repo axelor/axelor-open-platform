@@ -23,6 +23,12 @@ import javax.inject.Singleton;
 
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
+import com.axelor.common.StringUtils;
+import com.axelor.db.JpaSecurity;
+import com.axelor.db.Model;
+import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
+import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaPermission;
 import com.axelor.meta.db.MetaPermissionRule;
 
@@ -80,6 +86,21 @@ public class MetaPermissions {
 			}
 		}
 		return null;
+	}
+	
+	public boolean isCollectionReadable(User user, String object, String field) {
+		if (StringUtils.isBlank(object)) return true;
+		final Class<?> klass;
+		try {
+			klass = Class.forName(object);
+		} catch (ClassNotFoundException e) {
+			throw new IllegalArgumentException(e);
+		}
+		final Mapper mapper = Mapper.of(klass);
+		final Property property = mapper.getProperty(field);
+		return property == null
+				|| !property.isCollection()
+				|| Beans.get(JpaSecurity.class).isPermitted(JpaSecurity.CAN_READ, property.getTarget().asSubclass(Model.class));
 	}
 
 	private boolean can(User user, String object, String field, String access) {

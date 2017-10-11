@@ -498,7 +498,8 @@
         }
       }      
 
-      groups.sort(groupingInfos[level].comparer);
+      //XXX: see RM-8301, breaks grouping on date/datetime columns, it's actually not necessary
+      //XXX: groups.sort(groupingInfos[level].comparer);
 
       return groups;
     }

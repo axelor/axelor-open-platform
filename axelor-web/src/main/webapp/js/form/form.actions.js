@@ -907,6 +907,7 @@ ActionHandler.prototype = {
 				
 				switch(attr) {
 				case 'hidden':
+					if (itemScope.field && itemScope.field.hideIf === "true") return;
 				case 'required':
 				case 'readonly':
 				case 'collapse':

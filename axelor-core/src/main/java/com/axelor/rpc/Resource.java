@@ -283,11 +283,45 @@ public class Resource<T extends Model> {
 		}
 		return request.getCriteria();
 	}
+
+	private boolean shouldCheckPermissions(Request request) {
+		final Context context = request.getContext();
+		// if o2m/m2m search request
+		if (context != null
+				&& context.containsKey("_field")
+				&& context.containsKey("_field_ids")
+				&& context.containsKey("id")) {
+			final Model parent = context.asType(Model.class);
+			return !security.get().isPermitted(JpaSecurity.CAN_READ, EntityHelper.getEntityClass(parent), parent.getId());
+		}
+		return true;
+	}
+
+	private Query<?> getQuery(Request request) {
+		return getQuery(request, security.get().getFilter(JpaSecurity.CAN_READ, model));
+	}
+
+	private Query<?> getQuery(Request request, Filter filter) {
+		Criteria criteria = getCriteria(request);
+		Query<?> query = JPA.all(model);
+
+		if (criteria != null) {
+			query = criteria.createQuery(model, filter);
+		} else if (filter != null) {
+			query = filter.build(model);
+		}
+
+		for(String spec : getSortBy(request)) {
+			query = query.order(spec);
+		}
+
+		return query;
+	}
 	
-	private Query<?> getSearchQuery(Request request) {
+	private Query<?> getSearchQuery(Request request, Filter filter) {
 		final SearchService searchService = Beans.get(SearchService.class);
 		if (request.getData() == null || !searchService.isEnabled()) {
-			return getQuery(request);
+			return filter == null ? getQuery(request) : getQuery(request, filter);
 		}
 
 		final Map<String, Object> data = request.getData();
@@ -305,31 +339,18 @@ public class Resource<T extends Model> {
 				LOG.error("Unable to do full-text search: " + e.getMessage(), e);
 			}
 		}
-		return getQuery(request);
-	}
-
-	private Query<?> getQuery(Request request) {
-		Criteria criteria = getCriteria(request);
-		Filter filter = security.get().getFilter(JpaSecurity.CAN_READ, model);
-		Query<?> query = JPA.all(model);
-
-		if (criteria != null) {
-			query = criteria.createQuery(model, filter);
-		} else if (filter != null) {
-			query = filter.build(model);
-		}
-
-		for(String spec : getSortBy(request)) {
-			query = query.order(spec);
-		}
-
-		return query;
+		return filter == null ? getQuery(request) : getQuery(request, filter);
 	}
 
 	@SuppressWarnings("all")
 	public Response search(Request request) {
+		
+		final Filter filter = security.get().getFilter(JpaSecurity.CAN_READ, model);
+		boolean check = filter == null || shouldCheckPermissions(request);
 
-		security.get().check(JpaSecurity.CAN_READ, model);
+		if (check) {
+			security.get().check(JpaSecurity.CAN_READ, model);
+		}
 
 		LOG.debug("Searching '{}' with {}", model.getCanonicalName(), request.getData());
 
@@ -338,7 +359,7 @@ public class Resource<T extends Model> {
 		int offset = request.getOffset();
 		int limit = request.getLimit();
 
-		Query<?> query = getSearchQuery(request).cacheable().readOnly();
+		Query<?> query = getSearchQuery(request, check ? filter : null).cacheable().readOnly();
 		List<?> data = null;
 		try {
 			if (limit > 0) {
