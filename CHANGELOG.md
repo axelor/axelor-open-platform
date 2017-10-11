@@ -2,6 +2,8 @@
 
 ## Bug fixes
 
+- fix grouping on date/datetime fields
+
 # 4.1.7 (2017-10-10)
 
 ## Bug fixes
