@@ -85,9 +85,16 @@ public class NoCacheFilter implements Filter {
 
 		if (!production) {
 			res.setHeader("Expires", "Fri, 01 Jan 1990 00:00:00 GMT");
-	        res.setHeader("Last-Modified", new Date().toString());
-	        res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0");
-	        res.setHeader("Pragma", "no-cache");
+			res.setHeader("Last-Modified", new Date().toString());
+			if (uri.matches(".*\\.(eot|ttf|woff|woff2).*")) {
+				res.setHeader("Pragma", "no-cache");
+				res.setHeader("Cache-Control", "no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0");
+			} else {
+				res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0");
+				res.setHeader("Pragma", "no-cache");
+			}
+		}
+
 		}
 
         chain.doFilter(request, response);
