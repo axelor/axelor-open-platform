@@ -23,6 +23,12 @@
 
 "use strict";
 
+$(function () {
+	$('<script>')
+		.attr('type', 'text/javascript')
+		.attr('src', 'https://export.dhtmlx.com/gantt/api.js').appendTo('head');
+});
+
 var regional = {
 	month_full: [
 		_t('January'),
@@ -238,7 +244,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 					var weekScaleTemplate = function(date){
 						var dateToStr = gantt.date.date_to_str("%d/%m/%Y");
 						var endDate = gantt.date.add(gantt.date.add(date, 1, "week"), -1, "day");
-						return dateToStr(date) + " - " + dateToStr(endDate);
+						return gantt.date.date_to_str("%W")(date) + "(" + dateToStr(date) + " - " + dateToStr(endDate) + ")";
 					};
 					gantt.config.scale_unit = "week";
 					gantt.templates.date_scale = weekScaleTemplate;
@@ -250,7 +256,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 					gantt.config.scale_unit = "month";
 					gantt.config.date_scale = "%F, %Y";
 					gantt.config.subscales = [
-						{unit:"day", step:1, date:"%D %d" }
+						{unit:"week", step:1, date:"%W" }
 					];
 					gantt.templates.date_scale = null;
 					gantt.config.min_column_width = 50;
@@ -286,7 +292,28 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 		   var isTree = true;
 		   _.each(fieldNames, function(fname){
 			   var field = fields[fname];
-			   columns.push({ name:field.name, label:field.title, tree:isTree });
+			   if (columns.length == 0) {
+				   columns.push({ name:"text", label:field.title, tree:isTree, width:200,
+				 template: function(item){ 
+					        if(moment(item[fname], moment.ISO_8601, true).isValid()) {
+						  return moment(item[fname], moment.ISO_8601, true).format("MM/DD/YYYY h:mm:ss");							
+						}
+						return item.text;
+					   }})
+			   }
+			   else {
+				   columns.push({ name:field.name, label:field.title, tree:isTree,
+					   template: function(item){ 
+						   if (!item.label) {
+						        if(moment(item[fname], moment.ISO_8601, true).isValid()) {
+							  return moment(item[fname], moment.ISO_8601, true).format("MM/DD/YYYY h:mm:ss");							
+							}
+							return item[fname];
+						   }
+						   return "";
+					   }
+				   })
+			   }
 			   isTree = false;
 		   });
 		   columns.push({ name:"buttons", label:colHeader, width:75, template:colContent });
@@ -354,8 +381,12 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 	   }
 
 	   function ganttInit(){
+		   gantt = main.dhx_gantt();
 		   setScaleConfig("week");
 		   gantt.templates.leftside_text = function(start, end, task){
+			    if (!task.progress){
+					return "";
+				}
 				return "<span style='text-align:left;'>"+Math.round(task.progress*100)+ "% </span>";
 			};
 		   gantt.config.step = 1;
@@ -368,9 +399,20 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 		   gantt._onTaskIdChange = null;
 		   gantt._onLinkIdChange = null;
 		   gantt.config.autosize = "x";
+		   gantt.config.grid_resize = true;
+		   gantt.config.order_branch = true;
+		   gantt.config.date_grid = "%d/%m/%Y %H %i";
+		   gantt.templates.grid_row_class =
+				gantt.templates.task_row_class = function(start, end, task){
+					if(task.$virtual)
+						return "summary-row"
+		   };
+		   gantt.templates.task_class=function(start, end, task){
+			if(task.$virtual)
+				return "summary-bar";
+		   };
 		   ganttAttachEvents();
 		   setChildTaskDisplay();
-		   main.dhx_gantt();
 		   fetchRecords();	
 	   }
 
@@ -466,7 +508,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 			record[firstField.name] = item.text;
 			
 			if(schema.taskProgress){ 
-				record[schema.taskProgress] = item.progress; 
+				record[schema.taskProgress] = item.progress*100; 
 			}
 			if(schema.taskSequence){ 
 				record[schema.taskSequence] = item.order; 
@@ -599,7 +641,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 			}
 			
 			if(schema.taskProgress){
-				task.progress = rec[schema.taskProgress];
+				task.progress = rec[schema.taskProgress]/100;
 			}
 			
 			if(schema.taskParent && rec[schema.taskParent] && rec[schema.taskParent].id != task.id){
@@ -627,6 +669,14 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 		scope.onRefresh = function () {
 			gantt.clearAll();
 			fetchRecords();
+		};
+		
+		scope.onPrint = function () {
+			gantt.exportToPDF({
+				name: "Gantt.pdf",	
+			    callback: function(result){
+				window.open(result.url , '_self');
+			}});
 		};
 
 		scope.$on('$destroy', function() {
