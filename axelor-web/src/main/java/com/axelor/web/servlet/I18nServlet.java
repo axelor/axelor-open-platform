@@ -36,6 +36,7 @@ import com.axelor.app.internal.AppFilter;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Charsets;
 
 @Singleton
 public class I18nServlet extends HttpServlet {
@@ -91,7 +92,7 @@ public class I18nServlet extends HttpServlet {
 			return;
 		}
 
-		out.write(builder.toString().getBytes());
+		out.write(builder.toString().getBytes(Charsets.UTF_8));
 		out.close();
 	}
 }
