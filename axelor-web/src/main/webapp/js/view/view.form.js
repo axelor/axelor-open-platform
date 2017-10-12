@@ -480,23 +480,27 @@ function FormViewCtrl($scope, $element) {
 				$scope.onNewPromise = null;
 			}
 			
+			function withDefaults(defaults) {
+				if ($scope.isDirty()) {
+					var rec = _.extend({}, defaults, $scope.record);
+					var old = $scope.$$original;
+					var res = $scope.editRecord(rec);
+					if (rec) {
+						rec._dirty = true;
+					}
+					$scope.$$original = old;
+					return res;
+				} else if (defaults) {
+					$scope.editRecord(_.extend({}, defaults, $scope.record));
+				}
+			}
+			
 			function handle(defaults) {
 				var promise = handler();
 				if (promise && promise.then) {
 					promise.then(reset, reset);
 					promise = promise.then(function () {
-						if ($scope.isDirty()) {
-							var rec = _.extend({}, defaults, $scope.record);
-							var old = $scope.$$original;
-							var res = $scope.editRecord(rec);
-							if (rec) {
-								rec._dirty = true;
-							}
-							$scope.$$original = old;
-							return res;
-						} else if (defaults) {
-							$scope.editRecord(defaults);
-						}
+						return withDefaults(defaults);
 					});
 				}
 				return promise;
@@ -511,7 +515,7 @@ function FormViewCtrl($scope, $element) {
 				}
 				$scope.onNewPromise = handle($scope.defaultValues);
 			} else if ($scope.defaultValues) {
-				$scope.editRecord($scope.defaultValues);
+				withDefaults($scope.defaultValues);
 			}
 		}
 		
