@@ -91,7 +91,9 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 					id: value.id,
 					$version: value.version || value.$version
 				});
-				record[nameField] = rec[nameField];
+				if (nameField in rec) {
+					record[nameField] = rec[nameField];
+				}
 				_.each(missing, function(name) {
 					var prefix = name.split('.')[0];
 					record[prefix] = rec[prefix];
