@@ -124,7 +124,7 @@
 "Install module","Installer le module",,
 "Installed","Installé ?",,
 "Invalid XML.","XML invalide.",,
-"Invalid cron:","Cron non valide:",,
+"Invalid cron: %s","Cron non valide: %s",,
 "Invalid field value.","Valeur non valide.",,
 "Invalid permission","Permission invalide",,
 "Invalid use of action-record: %s, must be the last action.","Utilisation incorrecte de l'action-record :%s, doit être la dernière action.",,

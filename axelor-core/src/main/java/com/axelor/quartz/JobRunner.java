@@ -144,7 +144,7 @@ public class JobRunner {
 		try {
 			CronScheduleBuilder.cronSchedule(cron);
 		} catch (Exception e) {
-			throw new IllegalArgumentException(I18n.get("Invalid cron: ") + cron);
+			throw new IllegalArgumentException(String.format(I18n.get("Invalid cron: %s"), cron));
 		}
 	}
 

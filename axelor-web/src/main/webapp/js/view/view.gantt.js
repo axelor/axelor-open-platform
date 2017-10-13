@@ -86,8 +86,8 @@ gantt.locale = {
 		/* link confirmation */
 		link: _t("Link"),
 		confirm_link_deleting: _t("will be deleted"),
-		link_start: _t(" (start)"),
-		link_end: _t(" (end)"),
+		link_start: _t("(start)"),
+		link_end: _t("(end)"),
 
 		type_task: _t("Task"),
 		type_project: _t("Project"),
