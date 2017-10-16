@@ -412,7 +412,6 @@
 }
 
 .slick-cell:not(.button) > a {
-	line-height: 24px;
 	color: #0088cc;
 }
 

@@ -509,15 +509,18 @@ _.extend(Factory.prototype, {
 			return Formatters[type](field, value, dataContext, this.grid);
 		}
 
-		if(["Url", "url", "duration"].indexOf(widget) > 0) {
+		if (["Url", "url", "duration"].indexOf(widget) > 0) {
 			type = widget.toLowerCase();
 		}
 
-		if (widget.toLowerCase() === "image" || (type === "binary" && field.name === "image")) {
+		if (widget.toLowerCase() === "image" || widget.toLowerCase() === "binary-link" || (type === "binary" && field.name === "image")) {
 			var url = null;
 			if (field.target === "com.axelor.meta.db.MetaFile") {
 				if (value) {
 					url = ui.makeImageURL("com.axelor.meta.db.MetaFile", "content", (value.id || value));
+				}
+				if (url && widget.toLowerCase() === "binary-link") {
+					return '<a href="' + url + '" download="' + value.fileName + '">' + value.fileName + '</a>';
 				}
 			} else {
 				url = ui.makeImageURL(this.grid.handler._model, field.name, dataContext) + "&image=true";
