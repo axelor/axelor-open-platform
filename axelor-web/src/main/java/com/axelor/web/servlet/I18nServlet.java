@@ -19,6 +19,8 @@ package com.axelor.web.servlet;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
@@ -36,6 +38,7 @@ import com.axelor.app.internal.AppFilter;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Charsets;
 
 @Singleton
 public class I18nServlet extends HttpServlet {
@@ -91,7 +94,7 @@ public class I18nServlet extends HttpServlet {
 			return;
 		}
 
-		out.write(builder.toString().getBytes());
+		out.write(builder.toString().getBytes(StandardCharsets.UTF_8));
 		out.close();
 	}
 }
