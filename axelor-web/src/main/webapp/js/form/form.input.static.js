@@ -162,6 +162,13 @@ function makePopover(scope, element, callback, placement) {
 			table.remove();
 			table = null;
 		}
+		// Handle tab case with middle click closing
+		// where we haven't received the 'leave' event
+		// when destroying
+		if (popoverTimer) {
+			clearTimeout(popoverTimer);
+			popoverTimer = null;
+		}
 		doc.off('mousemove.popover');
 	}
 	
