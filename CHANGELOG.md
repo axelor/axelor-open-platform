@@ -3,6 +3,8 @@
 ## Bug fixes
 
 - fix grouping on date/datetime fields
+- fix default values resetting current record values
+- fix typo in open-sans.css
 
 # 4.1.7 (2017-10-10)
 
