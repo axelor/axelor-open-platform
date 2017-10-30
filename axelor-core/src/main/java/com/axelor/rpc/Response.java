@@ -24,6 +24,9 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.NumberSerializer;
 import com.google.common.base.Throwables;
 
 @JsonInclude(Include.NON_EMPTY)
@@ -38,13 +41,39 @@ public class Response {
 	public static int STATUS_SUCCESS = 0;
 	public static int STATUS_TRANSPORT_ERROR = -90;
 	public static int STATUS_VALIDATION_ERROR = -4;
+	
+	@SuppressWarnings("serial")
+	private static class OffsetSerializer extends NumberSerializer {
+
+		public OffsetSerializer() {
+			super(Integer.class);
+		}
+
+		@Override
+		public boolean isEmpty(SerializerProvider provider, Number value) {
+			return value == null || value.intValue() == -1;
+		}
+	}
+	
+	@SuppressWarnings("serial")
+	private static class TotalSerializer extends NumberSerializer {
+
+		public TotalSerializer() {
+			super(Long.class);
+		}
+
+		@Override
+		public boolean isEmpty(SerializerProvider provider, Number value) {
+			return value == null || value.longValue() == -1;
+		}
+	}
 
 	private int status;
 	
-	@JsonInclude(Include.NON_DEFAULT)
+	@JsonSerialize(using = OffsetSerializer.class)
 	private int offset = -1;
 	
-	@JsonInclude(Include.NON_DEFAULT)
+	@JsonSerialize(using = TotalSerializer.class)
 	private long total = -1;
 
 	private Object data;
