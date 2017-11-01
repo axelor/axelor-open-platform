@@ -20,6 +20,13 @@
     <string name="showIf" />
     <string name="hideIf" />
     <string name="requiredIf" />
+
+    <string name="contextField" />
+    <string name="contextFieldTarget" />
+    <string name="contextFieldTargetName" />
+    <string name="contextFieldValue" />
+    <string name="contextFieldTitle" />
+
     <boolean name="hidden" column="is_hidden" />
     <boolean name="required" column="is_required" />
     <boolean name="nameField" />

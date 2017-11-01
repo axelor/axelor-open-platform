@@ -61,6 +61,14 @@ ui.formInput('JsonField', 'String', {
 					return v;
 				}
 			}
+			if (item.contextField && item.contextFieldValue) {
+				var condition = "$record." + item.contextField + ".id === " + item.contextFieldValue;
+				if (item.showIf) {
+					item.showIf = "(" + item.showIf + ") and (" + condition + ")";
+				} else {
+					item.showIf = condition;
+				}
+			}
 		});
 
 		function getDefaultValues() {
@@ -407,6 +415,130 @@ ui.formInput('JsonRefItem', 'ManyToOne', {
 		}
 
 		scope.$watch("record", doSelect);
+	}
+});
+
+ui.formInput('JsonContextSelect', 'Select', {
+
+	controller: ['$scope', 'DataSource', 'ViewService', function ($scope, DataSource, ViewService) {
+
+		var fetchDS;
+		
+		$scope.fetchDS = function () {
+			var target = ($scope.record || {}).contextFieldTarget;
+			if (!fetchDS || fetchDS._model !== target) {
+				fetchDS = DataSource.create(target);
+			}
+			return fetchDS;
+		};
+		
+		$scope.canNew = function () {
+			return false;
+		};
+
+		$scope.showSelector = function () {
+			var record = $scope.record;
+			var model = record.contextFieldTarget;
+
+			var params = {
+				model: model,
+				views: [{
+					type: 'grid',
+					items: [{
+						type: 'field',
+						name: record.contextFieldTargetName
+					}]
+				}]
+			};
+			
+			var child = $scope.$new();
+			child._viewParams = params;
+
+			var selector = ViewService.compile('<div ui-selector-popup x-select-mode="single"></div>')(child);
+			var popup = selector.isolateScope();
+
+			selector.on('dialogclose', function () {
+				selector.remove();
+				child.$destroy();
+			});
+
+			popup.show();
+		};
+	}],
+
+	init: function(scope) {
+		this._super.apply(this, arguments);
+	
+		scope.formatItem = function (value) {
+			var record = scope.record || {};
+			return record.contextFieldTitle;
+		};
+
+		scope.select = function (value) {
+			var item = _.isArray(value) ? _.first(value) : value;
+			scope.setValue(item);
+		};
+
+		scope.setValue = function (value) {
+			var record = scope.record || {};
+			var nameField = record.contextFieldTargetName;
+			var val = value || {};
+			record.contextFieldValue = val.id;
+			record.contextFieldTitle = val[nameField];
+		};
+	},
+
+	link_editable: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+
+		scope.handleSelect = function(e, ui) {
+			if (ui.item.click) {
+				ui.item.click.call(scope);
+			} else {
+				scope.select(ui.item.value);
+			}
+			scope.$applyAsync();
+		};
+
+		scope.loadSelection = function(request, response) {
+			var record = scope.record || {};
+			var targetName = record.contextFieldTargetName;
+			
+			if (!targetName) {
+				return response([]);
+			}
+
+			var ds = scope.fetchDS();
+			var filter = {};
+
+			if (request.term) {
+				filter[targetName] = request.term;
+			}
+
+			ds.search({
+				fields: ['id', targetName],
+				filter: filter,
+				limit: axelor.device.small ? 6 : 10
+			}).success(function (records, page) {
+				var items = _.map(records, function(record) {
+					return {
+						label: record[targetName],
+						value: record
+					};
+				});
+
+				if (items.length < page.total || (request.term && items.length === 0)) {
+					items.push({
+						label: _t("Search more..."),
+						click: function() {
+							scope.showSelector();
+						}
+					});
+				}
+
+				response(items, page);
+			});
+		};
 	}
 });
 
