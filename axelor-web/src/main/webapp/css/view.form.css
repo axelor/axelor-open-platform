@@ -1301,7 +1301,8 @@ label.has-help > span:after {
 }
 
 .filter-form .form-layout .form-item > input {
-	height: 26px;
+	height: 28px;
+	line-height: 28px;
 }
 
 .filter-form .form-layout .form-item.filter-select {
@@ -1310,10 +1311,10 @@ label.has-help > span:after {
 }
 
 .filter-form .form-layout .form-item select {
-	height: 26px;
-	line-height: 26px;
-	
+	height: 28px;
+	line-height: 28px;
 	padding: inherit;
+	min-width: 170px;
 }
 
 .filter-form .form-layout .filter-remove {
@@ -1326,6 +1327,12 @@ label.has-help > span:after {
 
 .filter-form .form-layout {
 	width: auto;
+}
+
+.filter-form .filter-form-context {
+    border-bottom: 1px solid #eeeeee;
+    margin-bottom: 0;
+    padding-bottom: 8px;
 }
 
 .record-toolbar button.update-menu-button {

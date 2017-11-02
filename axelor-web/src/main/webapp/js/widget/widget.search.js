@@ -152,6 +152,23 @@ ui.directive('uiFilterItem', function() {
 				scope.operators = getOperators();
 			});
 
+			scope.getOptions = function () {
+				var all = [];
+				var data = scope.$parent.contextData || {};
+				var field = data.field || {};
+				_.each(scope.options, function (item) {
+					var name = field.name;
+					if (name && item.name === name) {
+						return;
+					}
+					if (item.contextField && !(item.contextField === name && item.contextFieldValue === data.value)) {
+						return;
+					}
+					all.push(item);
+				});
+				return all;
+			};
+
 			var unwatch = scope.$watch('fields', function(fields, old) {
 				if (_.isEmpty(fields)) return;
 				unwatch();
@@ -167,7 +184,7 @@ ui.directive('uiFilterItem', function() {
 						"<a href='' ng-click='remove(filter)'><i class='fa fa-times'></i></a>" +
 					"</td>" +
 					"<td class='form-item filter-select'>" +
-						"<select ng-model='filter.field' ng-options='v.name as v.title for v in options' ng-change='onFieldChange()' class='input-medium'></select> " +
+						"<select ng-model='filter.field' ng-options='v.name as v.title for v in getOptions()' ng-change='onFieldChange()' class='input-medium'></select> " +
 					"</td>" +
 					"<td class='form-item filter-select'>" +
 						"<select ng-model='filter.operator' ng-options='o.name as o.title for o in operators' ng-change='onOperatorChange()' class='input-medium'></select> "+
@@ -278,6 +295,67 @@ ui.directive('uiFilterInput', function() {
 	};
 });
 
+ui.directive('uiFilterContext', function () {
+
+	return {
+		scope: {
+			fields: '=',
+			context: '='
+		},
+		controller: ['$scope', function ($scope) {
+			$scope.field = {
+				name: 'contextValue',
+				evalTarget: 'context.field.target',
+				evalTargetName: 'context.field.targetName',
+				evalValue: 'context.value',
+				evalTitle: 'context.title'
+			};
+
+			$scope.getViewDef = function () {
+				return $scope.field;
+			};
+			
+			$scope.remove = function () {
+				$scope.context = {};
+			};
+
+			$scope.onFields = function (fields) {
+				var contextFields = [];
+				for (var item in fields) {
+					var field = fields[item];
+					if (field.contextField && fields[field.contextField]) {
+						contextFields.push(fields[field.contextField]);
+					}
+				}
+				$scope.contextFields = contextFields;
+			};
+		}],
+		link: function (scope, element, attrs) {
+			var unwatch = scope.$watch('fields', function (fields) {
+				if (_.isEmpty(fields)) return;
+				unwatch();
+				scope.onFields(fields);
+			}, true);
+		},
+		template:
+		"<form class='form-inline filter-form-context' ng-show='contextFields.length'>" +
+			"<table class='form-layout'>" +
+				"<tr>" +
+					"<td class='filter-remove'>" +
+						"<a href='' ng-click='remove()'><i class='fa fa-times'></i></a>" +
+					"</td>" +
+					"<td class='form-item filter-select'>" +
+						"<select ng-model='context.field' ng-options='v as v.title for v in contextFields' class='input-medium'></select>" +
+					"</td>" +
+					"<td class='form-item filter-select'>" +
+						"<input ui-eval-ref-select ng-model='context.value' x-field='contextValue' >" +
+					"</td>" +
+				"</tr>" +
+			"</table>" +
+		"</form>"
+	};
+});
+
 FilterFormCtrl.$inject = ['$scope', '$element', 'ViewService'];
 function FilterFormCtrl($scope, $element, ViewService) {
 
@@ -363,6 +441,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	$scope.$on('on:select-custom', function(e, custom) {
 
 		$scope.filters.length = 0;
+		$scope.contextData = {};
 
 		if (custom.$selected) {
 			select(custom);
@@ -393,10 +472,24 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	function select(custom) {
 
 		var criteria = custom.criteria;
+		var filters = criteria.criteria;
+		
+		if (filters && filters.length === 2 && filters[1].criteria) {
+			var first = _.first(filters);
+			var last = _.last(filters);
+			var name = first.fieldName.replace('.id', '');
+			filters = last.criteria;
+			$scope.contextData = {
+				field: $scope.fields[name],
+				value: first.value,
+				title: first.title,
+				saved: true
+			};
+		}
 
 		$scope.operator = criteria.operator || 'and';
 
-		_.each(criteria.criteria, function(item) {
+		_.each(filters, function(item) {
 			
 			var fieldName = item.fieldName || '';
 			if (fieldName && fieldName.indexOf('.') > -1) {
@@ -441,6 +534,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		$scope.filters.length = 0;
 		$scope.showArchived = false;
 		$scope.addFilter();
+		$scope.contextData = {};
 
 		if ($scope.$parent.onClear) {
 			$scope.$parent.onClear();
@@ -520,6 +614,29 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
 			criteria.criteria.push(criterion);
 		});
+		
+		var contextData = $scope.contextData || {};
+		
+		if (contextData.value && contextData.field && contextData.field.name) {
+			var previous = criteria.criteria;
+			var operator = criteria.operator;
+
+			criteria.operator = "and";
+			criteria.criteria = [{
+				fieldName: contextData.field.name + ".id",
+				operator: "=",
+				value: contextData.value,
+				title: contextData.title,
+				$new: !contextData.saved
+			}];
+
+			if (previous && previous.length) {
+				criteria.criteria.push({
+					operator: operator,
+					criteria: previous
+				});
+			}
+		}
 
 		return criteria;
 	};
@@ -571,6 +688,7 @@ ui.directive('uiFilterForm', function() {
 		},
 		template:
 		"<div class='filter-form'>" +
+			"<div ui-filter-context fields='fields' context='contextData'></div>" +
 			"<form class='filter-operator form-inline'>" +
 				"<label class='radio inline'>" +
 					"<input type='radio' name='operator' ng-model='operator' value='and' x-translate><span x-translate>and</span>" +
