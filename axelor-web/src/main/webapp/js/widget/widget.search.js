@@ -1100,7 +1100,7 @@ ui.directive('uiFilterBox', function() {
 
 			function hideMenu() {
 				$(document).off('mousedown.search-menu', onMouseDown);
-				scope.$applyAsync(function () {
+				scope.$timeout(function () {
 					scope.visible = false;
 				});
 				menu.hide();
