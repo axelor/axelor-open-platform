@@ -68,12 +68,18 @@
            x-domain="self.model = :targetModel AND self.type = 'form'"/>
       </panel>
       <panel title="Conditions" itemSpan="12">
-        <field name="contextField" title="Only if" colSpan="6" widget="ref-text"
+        <field name="contextField" title="Only if" colSpan="6" showIf="model"
+          widget="ref-text"
           x-target-name="name"
           x-target="com.axelor.meta.db.MetaField"
           x-domain="self.name not in ('createdBy', 'updatedBy') and self.relationship = 'ManyToOne' and self.metaModel.fullName = :model"
           onChange="com.axelor.meta.web.MetaController:contextFieldChange"/>
-        <field name="contextFieldValue" colSpan="6" title="Value" widget="JsonContextSelect" />
+        <field name="contextFieldValue" colSpan="6" title="Value" showIf="model"
+          widget="EvalRefSelect"
+          x-eval-target="record.contextFieldTarget"
+          x-eval-target-name="record.contextFieldTargetName"
+          x-eval-value="record.contextFieldValue"
+          x-eval-title="record.contextFieldTitle" />
         <field name="contextFieldTitle" hidden="true" />
         <field name="contextFieldTarget" hidden="true" />
         <field name="contextFieldTargetName" hidden="true" />
