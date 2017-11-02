@@ -913,4 +913,164 @@ ui.formInput('RefText', 'ManyToOne', {
 	}
 });
 
+ui.formInput('EvalRefSelect', 'Select', {
+
+	controller: ['$scope', '$element', 'DataSource', 'ViewService', function ($scope, $element, DataSource, ViewService) {
+
+		var fetchDS;
+
+		$scope.$fetchDS = function () {
+			var target = this.$target;
+			if (!fetchDS || fetchDS._model !== target) {
+				fetchDS = DataSource.create(target);
+			}
+			return fetchDS;
+		};
+
+		$scope.canNew = function () {
+			return false;
+		};
+
+		$scope.showSelector = function () {
+			var child = $scope.$new();
+			child._viewParams = {
+				model: $scope.$target,
+				views: [{
+					type: 'grid',
+					items: [{
+						type: 'field',
+						name: $scope.$targetName
+					}]
+				}]
+			};
+
+			var selector = ViewService.compile('<div ui-selector-popup x-select-mode="single"></div>')(child);
+			var popup = selector.isolateScope();
+
+			selector.on('dialogclose', function () {
+				selector.remove();
+				child.$destroy();
+			});
+
+			popup.show();
+		};
+	}],
+
+	init: function(scope) {
+		this._super.apply(this, arguments);
+		
+		var field = scope.field;
+		
+		function toValue(value) {
+			var val = value;
+			if (val === undefined || val === null) {
+				val = null;
+			} else {
+				val = '"' + val + '"';
+			}
+			return val;
+		}
+		
+		Object.defineProperties(scope, {
+
+			$target: {
+				get: function () {
+					return scope.$eval(field.evalTarget);
+				}
+			},
+
+			$targetName: {
+				get: function () {
+					return scope.$eval(field.evalTargetName);
+				}
+			},
+
+			$recordValue: {
+				get: function () {
+					return scope.$eval(field.evalValue);
+				},
+				set: function (value) {
+					scope.$eval(field.evalValue + " = " + toValue(value));
+				}
+			},
+
+			$recordTitle: {
+				get: function () {
+					return scope.$eval(field.evalTitle);
+				},
+				set: function (value) {
+					scope.$eval(field.evalTitle + " = " + toValue(value));
+				}
+			}
+		});
+	
+		scope.formatItem = function (value) {
+			return scope.$recordTitle;
+		};
+
+		scope.select = function (value) {
+			var item = _.isArray(value) ? _.first(value) : value;
+			scope.setValue(item);
+		};
+
+		scope.setValue = function (value) {
+			var nameField = scope.$targetName;
+			var val = value || {};
+			scope.$recordValue = val.id;
+			scope.$recordTitle = val[nameField];
+		};
+	},
+
+	link_editable: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+
+		scope.handleSelect = function(e, ui) {
+			if (ui.item.click) {
+				ui.item.click.call(scope);
+			} else {
+				scope.select(ui.item.value);
+			}
+			scope.$applyAsync();
+		};
+
+		scope.loadSelection = function(request, response) {
+			var targetName = scope.$targetName;
+			if (!targetName) {
+				return response([]);
+			}
+
+			var ds = scope.$fetchDS();
+			var filter = {};
+
+			if (request.term) {
+				filter[targetName] = request.term;
+			}
+
+			ds.search({
+				fields: ['id', targetName],
+				filter: filter,
+				limit: axelor.device.small ? 6 : 10
+			}).success(function (records, page) {
+				var items = _.map(records, function(record) {
+					return {
+						label: record[targetName],
+						value: record
+					};
+				});
+
+				if (items.length < page.total || (request.term && items.length === 0)) {
+					items.push({
+						label: _t("Search more..."),
+						click: function() {
+							scope.showSelector();
+						}
+					});
+				}
+
+				response(items, page);
+			});
+		};
+	}
+});
+
 })();
