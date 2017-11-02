@@ -44,6 +44,7 @@ var OPERATORS = {
 
 var OPERATORS_BY_TYPE = {
 	"enum"		: ["=", "!=", "isNull", "notNull"],
+	"text"		: ["like", "notLike", "isNull", "notNull"],
 	"string"	: ["=", "!=", "like", "notLike", "isNull", "notNull"],
 	"integer"	: ["=", "!=", ">=", "<=", ">", "<", "between", "notBetween", "isNull", "notNull"],
 	"boolean"	: ["true", "false"]
@@ -53,8 +54,8 @@ _.each(["long", "decimal", "date", "time", "datetime"], function(type) {
 	OPERATORS_BY_TYPE[type] = OPERATORS_BY_TYPE.integer;
 });
 
-_.each(["text", "one-to-one", "many-to-one", "one-to-many", "many-to-many"], function(type) {
-	OPERATORS_BY_TYPE[type] = OPERATORS_BY_TYPE.string;
+_.each(["one-to-one", "many-to-one", "one-to-many", "many-to-many"], function(type) {
+	OPERATORS_BY_TYPE[type] = OPERATORS_BY_TYPE.text;
 });
 
 ui.directive('uiFilterItem', function() {
@@ -80,7 +81,9 @@ ui.directive('uiFilterItem', function() {
 				}
 
 				var field = scope.fields[filter.field] || {};
-				var operators = OPERATORS_BY_TYPE[filter.type] || [];
+				var operators = filter.selectionList
+					? OPERATORS_BY_TYPE["enum"] || []
+					: OPERATORS_BY_TYPE[filter.type] || [];
 
 				if (field.target && !field.targetName) {
 					operators = ["isNull", "notNull"];
