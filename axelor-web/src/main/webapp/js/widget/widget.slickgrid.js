@@ -1355,14 +1355,8 @@ Grid.prototype.resetColumns = function() {
 	var grid = this.grid,
 		cols = this.getVisibleCols(true);
 
-	var currentCols = this.visibleCols || [];
-	var visibleCols = _.pluck(cols, 'id');
-	if (currentCols.length && _.difference(currentCols, visibleCols).length === 0) {
-		return;
-	}
+	this.visibleCols = _.pluck(cols, 'id');
 
-	this.visibleCols = visibleCols;
-	
 	grid.setColumns(cols);
 	grid.getViewport().rightPx = 0;
 	grid.resizeCanvas();
