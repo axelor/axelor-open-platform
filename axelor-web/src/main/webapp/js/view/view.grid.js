@@ -415,6 +415,24 @@ function GridViewCtrl($scope, $element) {
 			options.offset = (pageNum - 1 ) * ds._page.limit;
 		}
 
+		var advance = arguments.length > 1 ? arguments[1] : null;
+		if (advance && advance.criteria && advance.criteria.length) {
+			if (_.isEmpty(criteria.criteria)) {
+				options.filter = advance;
+			} else {
+				criteria.criteria = [{
+					operator: criteria.operator,
+					criteria: criteria.criteria
+				}, {
+					operator: advance.operator,
+					criteria: advance.criteria
+				}];
+				criteria.operator = "and";
+			}
+		}
+		if (advance && criteria.archived === undefined) {
+			criteria.archived = advance.archived;
+		}
 		return ds.search(options).then(fixPage);
 	};
 

@@ -1055,7 +1055,7 @@ Grid.prototype._doInit = function(view) {
 		filtersRow.on('keypress', ':input', function(event){
 			if (event.keyCode === 13) {
 				updateFilters.call(this, event);
-				scope.handler.filter(filters);
+				scope.handler.filter(filters, that.advanceFilter);
 			}
 		});
 
@@ -1141,6 +1141,12 @@ Grid.prototype._doInit = function(view) {
 		that.resetColumns();
 	});
 	
+	scope.$on("on:advance-filter", function (e, criteria) {
+		if (e.targetScope === handler) {
+			that.advanceFilter = criteria;
+		}
+	});
+
 	scope.$on("on:context-field-change", function (e, data) {
 		that.contextField = data && data.field ? data.field.name : null;
 		that.contextValue = data.value;
