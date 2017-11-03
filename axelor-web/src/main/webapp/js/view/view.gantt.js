@@ -402,6 +402,32 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 		   gantt.config.grid_resize = true;
 		   gantt.config.order_branch = true;
 		   gantt.config.date_grid = "%d/%m/%Y %H %i";
+		   
+		   gantt.eachSuccessor = function(callback, root){
+			   if(!this.isTaskExists(root))
+			     return;
+			  
+			   // remember tasks we've already iterated in order to avoid infinite loops
+			   var traversedTasks = arguments[2] || {};
+			   if(traversedTasks[root])
+			     return;
+			   traversedTasks[root] = true;
+			  
+			   var rootTask = this.getTask(root);
+			   var links = rootTask.$source;
+			   if(links){
+			     for(var i=0; i < links.length; i++){
+			       var link = this.getLink(links[i]);
+			       if(this.isTaskExists(link.target)){
+			         callback.call(this, this.getTask(link.target));
+			  
+			         // iterate the whole branch, not only first-level dependencies
+			         this.eachSuccessor(callback, link.target, traversedTasks);
+			       }
+			     }
+			   }
+		   };
+		   
 		   gantt.templates.grid_row_class =
 				gantt.templates.task_row_class = function(start, end, task){
 					if(task.$virtual)
@@ -435,6 +461,29 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 			   var task = gantt.getTask(id);
 			   scope.showEditor(task, false);
 			   return false;
+		   });
+		   
+		   var diff = 0;
+		   
+		   gantt.attachEvent("onBeforeTaskChanged", function(id, mode, originalTask){
+		     var modes = gantt.config.drag_mode;
+		     if(mode == modes.move ){
+		       var modifiedTask = gantt.getTask(id);
+		       diff = modifiedTask.start_date - originalTask.start_date;
+		     }
+		     return true;
+		   });
+		  
+		   //rounds positions of the child items to scale
+		   gantt.attachEvent("onAfterTaskDrag", function(id, mode, e){
+		     var modes = gantt.config.drag_mode;
+		     if(mode == modes.move ){
+		       gantt.eachSuccessor(function(child){
+		         child.start_date = gantt.roundDate(new Date(child.start_date.valueOf() + diff));
+		         child.end_date = gantt.calculateEndDate(child.start_date, child.duration);
+		         gantt.updateTask(child.id);
+		       },id );
+		     }
 		   });
 
 	   }
