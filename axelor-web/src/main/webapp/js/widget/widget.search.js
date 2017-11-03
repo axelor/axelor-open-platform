@@ -1032,6 +1032,14 @@ ui.directive('uiFilterBox', function() {
 						value2: v2
 					});
 				}
+				
+				function countCustom(criteria) {
+					var n = _.filter(criteria, function (item) { return item.$new; }).length;
+					if (criteria.length === 2 && criteria[1].criteria) {
+						n += countCustom(criteria[1].criteria);
+					}
+					return n;
+				}
 
 				var tag = {};
 				var all = _.chain([$scope.viewFilters, $scope.custFilters])
@@ -1042,7 +1050,7 @@ ui.directive('uiFilterBox', function() {
 				   .pluck('title')
 				   .value();
 
-				var nCustom = _.filter((criteria||{}).criteria, function (item) { return item.$new; }).length;
+				var nCustom = countCustom((criteria||{}).criteria);
 				if (nCustom > 0) {
 					all.push(_t('Custom ({0})', nCustom));
 				}
