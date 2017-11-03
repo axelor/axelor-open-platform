@@ -320,14 +320,15 @@ ui.directive('uiFilterContext', function () {
 			};
 
 			$scope.onFields = function (fields) {
-				var contextFields = [];
+				var contextFields = {};
 				for (var item in fields) {
 					var field = fields[item];
-					if (field.contextField && fields[field.contextField]) {
-						contextFields.push(fields[field.contextField]);
+					var name = field.contextField;
+					if (name && fields[name] && !contextFields[name]) {
+						contextFields[name] = fields[name];
 					}
 				}
-				$scope.contextFields = contextFields;
+				$scope.contextFields = _.sortBy(_.values(contextFields), 'title');
 			};
 		}],
 		link: function (scope, element, attrs) {
