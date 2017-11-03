@@ -649,6 +649,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		if ($scope.$parent && hide) {
 			$scope.$parent.$broadcast('on:hide-menu');
 		}
+		handler.$broadcast('on:context-field-change', $scope.contextData);
 	};
 	
 	$scope.canExport = function() {

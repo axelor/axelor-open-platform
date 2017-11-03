@@ -1141,6 +1141,12 @@ Grid.prototype._doInit = function(view) {
 		that.resetColumns();
 	});
 	
+	scope.$on("on:context-field-change", function (e, data) {
+		that.contextField = data && data.field ? data.field.name : null;
+		that.contextValue = data.value;
+		that.resetColumns();
+	});
+	
 	scope.$on("on:before-save", function(e) {
 
 		// only for editable grid
@@ -1328,8 +1334,16 @@ Grid.prototype.showColumn = function(name, show) {
 Grid.prototype.getVisibleCols = function(reset) {
 	var visible = reset ? [] : (this.visibleCols || []);
 	if (visible.length === 0) {
+		var contextField = this.contextField;
+		var contextValue = this.contextValue;
 		return this.cols.filter(function (col) {
-			return !(col.descriptor||{}).hidden;
+			var desc = col.descriptor||{};
+			if (desc.contextField) {
+				return !desc.hidden
+					&& desc.contextField === contextField
+					&& desc.contextFieldValue === contextValue;
+			}
+			return !desc.hidden;
 		});
 	}
 	return this.cols.filter(function (col) {
@@ -1343,7 +1357,7 @@ Grid.prototype.resetColumns = function() {
 
 	var currentCols = this.visibleCols || [];
 	var visibleCols = _.pluck(cols, 'id');
-	if (_.difference(currentCols, visibleCols).length == 0) {
+	if (currentCols.length && _.difference(currentCols, visibleCols).length === 0) {
 		return;
 	}
 
