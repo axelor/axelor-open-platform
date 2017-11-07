@@ -194,7 +194,7 @@
 	};
 
 	const FIELDS_IGNORE = ['constructor', 'window', 'children', 'nodeName', 'prop', 'attr', 'find'];
-	const FIELDS_BASE = ['id', 'version', 'archived'];
+	const FIELDS_BASE = ['id', 'version', 'archived', 'record', '$record'];
 
 	axelor.$eval = function (scope, expr, context) {
 		if (!scope || !expr) {
