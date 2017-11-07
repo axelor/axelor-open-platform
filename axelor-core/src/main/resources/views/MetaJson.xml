@@ -87,6 +87,10 @@
         <field name="hideIf" />
         <field name="requiredIf" />
       </panel>
+      <panel title="Value Expression">
+        <field name="valueExpr" showTitle="false" colSpan="12" 
+          widget="code-editor" x-height="100" x-mode="javascript"/>
+      </panel>
       <panel-related field="roles">
         <field name="name" />
       </panel-related>

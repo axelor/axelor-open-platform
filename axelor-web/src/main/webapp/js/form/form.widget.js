@@ -313,6 +313,41 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		});
 	}
 	
+	function handleValueExpr(scope, field) {
+		
+		if (!field.valueExpr || !field.name) {
+			return;
+		}
+
+		var expr = $parse(field.valueExpr);
+
+		function handle(rec) {
+			var value;
+			try {
+				value = axelor.$eval(scope, expr, withContext(scope, rec));
+				if (value && value.length === 0) {
+					value = null;
+				}
+			} catch (e) {
+				console.error('FAILED:', field.valueExpr, e);
+			}
+
+			if (scope.setValue && scope.record) {
+				scope.setValue(value, false);
+			}
+		}
+		
+		scope.$on("on:record-change", function(e, rec) {
+			scope.$timeout(function () {
+				if (field && field.jsonField) {
+					handle(scope.record);
+				} else if (rec && rec === scope.record) {
+					handle(rec);
+				}
+			});
+		});
+	}
+	
 	function handleFor(scope, field, attr, conditional, negative) {
 		if (field[conditional]) {
 			handleCondition(scope, field, attr, field[conditional], negative);
@@ -335,6 +370,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		handleFor(scope, field, "canSelect", "canSelect");
 		handleHilites(scope, field);
 		handleBind(scope, field);
+		handleValueExpr(scope, field);
 	}
 	
 	function handleForView(scope) {

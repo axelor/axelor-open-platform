@@ -126,6 +126,40 @@
 		evalScope.$number = function(d) { return +d; };				// number helper
 		evalScope.$popup = function() { return scope._isPopup; };	// popup detect
 		evalScope.$iif = function(c, t, f) { return c ? t : f; };
+		
+		evalScope.$sum = function (items, field, operation, field2) {
+			var total = 0;
+			if (items && items.length) {
+				items.forEach(function (item) {
+					var value = 0;
+					var value2 = 0;
+					if (field in item) {
+						value = +(item[field] || 0);
+					}
+					if (operation && field2 && field2 in item) {
+						value2 = +(item[field2] || 0);
+						switch (operation) {
+						case '*':
+							value = value * value2;
+							break;
+						case '/':
+							value = value2 ? value / value2 : value;
+							break;
+						case '+':
+							value = value + value2;
+							break;
+						case '-':
+							value = value - value2;
+							break;
+						}
+					}
+					if (value) {
+						total += value;
+					}
+				});
+			}
+			return total;
+		};
 
 		// current user and group
 		evalScope.$user = axelor.config['user.login'];

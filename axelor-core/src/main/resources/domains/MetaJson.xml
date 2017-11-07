@@ -14,6 +14,7 @@
     <string name="model" required="true" column="model_name" />
     <string name="modelField" required="true" column="model_field" />
     <many-to-one name="jsonModel" ref="MetaJsonModel" />
+
     <string name="selection" />
     <string name="widget" />
     <string name="help" />
@@ -31,21 +32,28 @@
     <boolean name="required" column="is_required" />
     <boolean name="nameField" />
     <boolean name="hiddenInGrid" />
+
     <integer name="minSize" column="min_size" />
     <integer name="maxSize" column="max_size" />
     <integer name="precision" default="6" column="decimal_precision" />
     <integer name="scale" default="2" column="decimal_scale" />
+    <integer name="sequence" />
+
     <string name="regex" />
+    <string name="valueExpr" large="true" title="Value Expression" />
+
     <string name="targetModel" />
     <string name="enumType" />
     <string name="formView" />
     <string name="gridView" />
     <string name="domain" />
     <many-to-one name="targetJsonModel" ref="MetaJsonModel" />
-    <integer name="sequence" />
+
     <string name="onChange" />
     <string name="onClick" />
+
     <string name="widgetAttrs" json="true" />
+
     <many-to-many name="roles" ref="com.axelor.auth.db.Role" />
   </entity>
 
