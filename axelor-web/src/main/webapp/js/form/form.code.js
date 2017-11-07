@@ -39,6 +39,9 @@ ui.formInput('CodeEditor', {
 		var props = {
 			autofocus: true,
 			lineNumbers: true,
+			tabSize : 2,
+			indentUnit : 2,
+			indentWithTabs: false,
 			theme: field.codeTheme || "default",
 			extraKeys: {
 				'Ctrl-F': function () {}
@@ -54,10 +57,7 @@ ui.formInput('CodeEditor', {
 				foldGutter : true,
 				gutters : ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
 				autoCloseBrackets : true,
-				autoCloseTags : true,
-				tabSize : 2,
-				indentUnit : 2,
-				indentWithTabs: false
+				autoCloseTags : true
 			});
 		}
 
