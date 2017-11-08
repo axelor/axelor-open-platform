@@ -1212,6 +1212,12 @@ label.has-help > span:after {
 	color: black;
 }
 
+@media (max-width: 767px) {
+  .filter-box {
+    width: 172px;
+  }
+}
+
 .update-menu,
 .filter-menu {
 
