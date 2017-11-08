@@ -685,7 +685,7 @@ Grid.prototype.parse = function(view) {
 
 		if (field.type == "button" || field.type == "icon") {
 			item.title = "&nbsp;";
-			item.width = 10;
+			item.width = field.width || 32;
 		}
 
 		var column = {
@@ -703,6 +703,7 @@ Grid.prototype.parse = function(view) {
 			xpath: path
 		};
 
+		column.minWidth = Math.min(100, column.width || 100);
 		column._title = column.name;
 		
 		var css = [type];
@@ -1280,11 +1281,6 @@ Grid.prototype.adjustToScreen = function() {
 		var field = col.descriptor || {};
 		if (field.hidden) {
 			return;
-		}
-		var hidden = col.hidden;
-		col.hidden = (mobile && i > 3);
-		if (hidden !== col.hidden) {
-			this.showColumn(col.field, !col.hidden);
 		}
 	}, this);
 };
