@@ -314,10 +314,21 @@ ui.directive('uiFilterContext', function () {
 			$scope.getViewDef = function () {
 				return $scope.field;
 			};
-			
+
 			$scope.remove = function () {
-				$scope.context = {};
+				var context = {};
+				var fields = $scope.contextFields || [];
+				if (fields.length === 1) {
+					context.field = fields[0];
+				}
+				$scope.context = context;
 			};
+			
+			$scope.$watch('context.field.name', function (name) {
+				if (!name) {
+					$scope.remove();
+				}
+			});
 
 			$scope.onFields = function (fields) {
 				var contextFields = {};
@@ -329,6 +340,7 @@ ui.directive('uiFilterContext', function () {
 					}
 				}
 				$scope.contextFields = _.sortBy(_.values(contextFields), 'title');
+				$scope.remove();
 			};
 		}],
 		link: function (scope, element, attrs) {
@@ -390,7 +402,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 					key += '::' + (field.jsonType || 'text');
 					items[key] = _.extend({}, field, {
 						name: key,
-						title: items[prefix].title + ' > ' + (field.title || field.autoTitle)
+						title: (field.title || field.autoTitle) + " (" + items[prefix].title + ")"
 					});
 				});
 				// don't search parent
@@ -1282,11 +1294,11 @@ ui.directive('uiFilterBox', function() {
 				"</li>" +
 			  "</ul>" +
 			  "<span class='picker-icons'>" +
-				"<i ng-click='onSearch($event)' class='fa fa-caret-down hidden-phone'></i>"+
+				"<i ng-click='onSearch($event)' class='fa fa-caret-down'></i>"+
 				"<i ng-click='onRefresh()' class='fa fa-search'></i>" +
 			  "</span>" +
 			"</div>" +
-			"<div class='filter-menu hidden-phone' ui-watch-if='visible'>" +
+			"<div class='filter-menu' ui-watch-if='visible'>" +
 				"<strong x-translate>Advanced Search</strong>" +
 				"<hr>"+
 				"<div class='filter-list'>" +
