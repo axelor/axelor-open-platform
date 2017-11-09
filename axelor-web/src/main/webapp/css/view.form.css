@@ -1229,9 +1229,8 @@ label.has-help > span:after {
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 	background: #fff;
 	
-	border-radius: 4px;
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
+	border-radius: 0;
+	border: 1px solid #e7e7e7;
 
 	z-index: 11;
 }
@@ -1391,11 +1390,13 @@ label.has-help > span:after {
         margin-top: 8px;
     }
     .filter-menu {
+        top: 0 !important;
         left: 0 !important;
         right: 0 !important;
         bottom: 0 !important;
         box-shadow: none;
         overflow-y: auto;
+        z-index: 10000 !important;
     }
 }
 

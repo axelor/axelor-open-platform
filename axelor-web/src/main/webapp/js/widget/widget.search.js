@@ -1262,6 +1262,8 @@ ui.directive('uiFilterBox', function() {
 					hideMenu();
 				}
 			}
+			
+			scope.hideMenu = hideMenu;
 
 			scope.handler.$watch('schema.freeSearch', function (value, old) {
 				if (value === 'none') {
@@ -1299,7 +1301,10 @@ ui.directive('uiFilterBox', function() {
 			  "</span>" +
 			"</div>" +
 			"<div class='filter-menu' ui-watch-if='visible'>" +
-				"<strong x-translate>Advanced Search</strong>" +
+				"<span>" +
+					"<strong x-translate>Advanced Search</strong>" +
+					"<a href='' class='pull-right' ng-click='hideMenu()'><i class='fa fa-times'></i></a>" +
+				"</span>" +
 				"<hr>"+
 				"<div class='filter-list'>" +
 					"<dl ng-show='!hasFilters() && handler.schema.customSearch == false' style='display: hidden;'>" +
