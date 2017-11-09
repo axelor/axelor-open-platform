@@ -1129,7 +1129,8 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 		scope.onDropdown = function () {
 			dropdownVisible = !dropdownVisible;
 			if (!dropdownVisible) {
-				return wrapper.hide();
+				wrapper.hide();
+				return;
 			}
 			if (renderPending) {
 				renderPending = false;
