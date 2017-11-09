@@ -149,9 +149,9 @@ public class JpaModule extends AbstractModule {
 
 		// Use HikariCP as default pool provider
 		properties.put(Environment.CONNECTION_PROVIDER, HikariCPConnectionProvider.class.getName());
-		properties.put("hibernate.hikari.minimumIdle", "10");
-		properties.put("hibernate.hikari.maximumPoolSize", "200");
-		properties.put("hibernate.hikari.idleTimeout", "30000");
+		properties.put("hibernate.hikari.minimumIdle", "5");
+		properties.put("hibernate.hikari.maximumPoolSize", "20");
+		properties.put("hibernate.hikari.idleTimeout", "300000");
 
 		// update properties with all hibernate.* settings from app configuration
 		settings.getProperties().stringPropertyNames().stream()
