@@ -1242,12 +1242,13 @@ label.has-help > span:after {
 
 .filter-menu .filter-list {
 	display: table;
+	width: 100%;
 }
 
 .filter-menu .filter-list > dl {
 	display: table-cell;
 	width: 50%;
-	padding-right: 40px;
+	padding-right: 8px;
 }
 
 .filter-menu .filter-list > dl dt {
@@ -1276,6 +1277,10 @@ label.has-help > span:after {
 	cursor: default;
 }
 
+.filter-menu .filter-form {
+    margin-top: -6px;
+}
+
 .filter-menu .filter-form .links {
 	line-height: 20px;
 }
@@ -1299,46 +1304,10 @@ label.has-help > span:after {
 	margin-left: 26px;
 }
 
-.filter-form .form-layout .form-item > input,
-.filter-form .form-layout .form-item > .form-item-container {
-	width: auto;
-	min-width: inherit;
-	max-width: 170px;
-}
-
-.filter-form .form-layout .form-item > input {
-	height: 28px;
-	line-height: 28px;
-}
-
-.filter-form .form-layout .form-item.filter-select {
-	width: 170px;
-	min-width: 170px;
-}
-
-.filter-form .form-layout .form-item select {
-	height: 28px;
-	line-height: 28px;
-	padding: inherit;
-	min-width: 170px;
-}
-
-.filter-form .form-layout .filter-remove {
-	width: 16px;
-	min-width: 16px;
-	max-width: 16px;
-	padding-top: 5px;
-	vertical-align: top;
-}
-
-.filter-form .form-layout {
-	width: auto;
-}
-
-.filter-form .filter-form-context {
+.filter-form .filter-context {
     border-bottom: 1px solid #eeeeee;
     margin-bottom: 0;
-    padding-bottom: 8px;
+    padding: 6px 0 8px 0;
 }
 
 .record-toolbar button.update-menu-button {
@@ -1360,6 +1329,74 @@ label.has-help > span:after {
 
 .filter-menu .btn-small {
 	font-size: 12px;
+}
+
+.filter-form .flex-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.filter-form .flex-layout,
+.filter-form .flex-layout * {
+    box-sizing: border-box;
+}
+
+.filter-form .flex-layout .flex-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.filter-form .flex-layout .flex-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 2px;
+}
+
+.filter-form .flex-layout .flex-item > span {
+    width: 170px;
+    margin: 0 2px;
+}
+
+.filter-form .flex-layout .flex-item > span > input,
+.filter-form .flex-layout .flex-item > span > select {
+    width: 100%;
+    margin: 0;
+    height: 28px;
+    line-height: 28px;
+}
+
+.filter-form .flex-layout .flex-item.filter-inputs {
+    flex: 1;
+}
+
+@media all and (max-width: 640px) {
+    .filter-form .flex-layout .flex-item {
+        flex-direction: column;
+    }
+    .filter-form .flex-layout .flex-item > span {
+        margin: 2px 0;
+        width: 100%;
+    }
+    .filter-menu .filter-list > dl {
+        float: left;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+    .filter-menu .filter-list > dl:last-child {
+        margin-top: 8px;
+    }
+    .filter-menu {
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        box-shadow: none;
+        overflow-y: auto;
+    }
 }
 
 /* end filter/update menu */

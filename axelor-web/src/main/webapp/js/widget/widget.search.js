@@ -177,30 +177,30 @@ ui.directive('uiFilterItem', function() {
 			}, true);
 		},
 		template:
-		"<div class='form-inline'>" +
-			"<table class='form-layout'>" +
-				"<tr>" +
-					"<td class='filter-remove'>" +
+			"<div class='flex-layout'>" +
+				"<div class='flex-row'>" +
+					"<div class='flex-item filter-remove'>" +
 						"<a href='' ng-click='remove(filter)'><i class='fa fa-times'></i></a>" +
-					"</td>" +
-					"<td class='form-item filter-select'>" +
-						"<select ng-model='filter.field' ng-options='v.name as v.title for v in getOptions()' ng-change='onFieldChange()' class='input-medium'></select> " +
-					"</td>" +
-					"<td class='form-item filter-select'>" +
-						"<select ng-model='filter.operator' ng-options='o.name as o.title for o in operators' ng-change='onOperatorChange()' class='input-medium'></select> "+
-					"</td>" +
-					"<td class='form-item filter-select' ng-show='canShowSelect()'>" +
-						"<select ng-model='filter.value' class='input=medium' ng-options='o.value as o.title for o in getSelection()'></select>" +
-					"</td>" +
-					"<td class='form-item' ng-show='canShowInput()'>" +
-						"<input type='text' ui-filter-input ng-model='filter.value' class='input-medium'> " +
-					"</td>" +
-					"<td class='form-item' ng-show='canShowRange()'>" +
-						"<input type='text' ui-filter-input ng-model='filter.value2' class='input-medium'> " +
-					"</td>" +
-				"</tr>" +
-			"</table>" +
-		"</div>"
+					"</div>" +
+					"<div class='flex-item filter-inputs'>" +
+						"<span>" +
+							"<select ng-model='filter.field' ng-options='v.name as v.title for v in getOptions()' ng-change='onFieldChange()' class='input-medium'></select> " +
+						"</span>" +
+						"<span>" +
+							"<select ng-model='filter.operator' ng-options='o.name as o.title for o in operators' ng-change='onOperatorChange()' class='input-medium'></select> "+
+						"</span>" +
+						"<span ng-show='canShowSelect()'>" +
+							"<select ng-model='filter.value' class='input=medium' ng-options='o.value as o.title for o in getSelection()'></select>" +
+						"</span>" +
+						"<span ng-show='canShowInput()'>" +
+							"<input type='text' ui-filter-input ng-model='filter.value' class='input-medium'> " +
+						"</span>" +
+						"<span ng-show='canShowRange()'>" +
+							"<input type='text' ui-filter-input ng-model='filter.value2' class='input-medium'> " +
+						"</span>" +
+					"</div>" +
+				"</div>" +
+			"</div>"
 	};
 });
 
@@ -351,21 +351,21 @@ ui.directive('uiFilterContext', function () {
 			}, true);
 		},
 		template:
-		"<form class='form-inline filter-form-context' ng-show='contextFields.length'>" +
-			"<table class='form-layout'>" +
-				"<tr>" +
-					"<td class='filter-remove'>" +
+			"<div class='flex-layout filter-context' ng-show='contextFields.length'>" +
+				"<div class='flex-row'>" +
+					"<div class='flex-item filter-remove'>" +
 						"<a href='' ng-click='remove()'><i class='fa fa-times'></i></a>" +
-					"</td>" +
-					"<td class='form-item filter-select'>" +
-						"<select ng-model='context.field' ng-options='v as v.title for v in contextFields' class='input-medium'></select>" +
-					"</td>" +
-					"<td class='form-item filter-select'>" +
-						"<input ui-eval-ref-select ng-model='context.value' x-field='contextValue' >" +
-					"</td>" +
-				"</tr>" +
-			"</table>" +
-		"</form>"
+					"</div>" +
+					"<div class='flex-item filter-inputs'>" +
+						"<span>" +
+							"<select ng-model='context.field' ng-options='v as v.title for v in contextFields'></select>" +
+						"</span>" +
+						"<span>" +
+							"<input ui-eval-ref-select ng-model='context.value' x-field='contextValue'>" +
+						"</span>" +
+					"</div>" +
+				"</div>" +
+			"</div>"
 	};
 });
 
