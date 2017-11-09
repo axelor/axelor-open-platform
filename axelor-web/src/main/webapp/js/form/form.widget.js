@@ -203,7 +203,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 	
 	function handleCondition(scope, field, attr, condition, negative) {
 
-		if (!condition) {
+		if (!condition || _.isBoolean(condition)) {
 			return;
 		}
 
