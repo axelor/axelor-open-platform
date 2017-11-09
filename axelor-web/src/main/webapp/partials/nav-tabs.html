@@ -18,6 +18,7 @@
   <ul ng-if="::singleTabOnly" class="nav nav-tabs">
     <li ng-repeat="tab in navTabs" ng-class="{ dirty: tabDirty(tab) }">
        <i ng-show="canCloseTab(tab)" class="fa fa-times" ng-click="closeTab(tab)"></i>
+       <span ui-view-switcher-menu class="pull-right"></span>
        <a href="" ng-click="navClick(tab)">{{tabTitle(tab)}}</a>
      </li>
   </ul>

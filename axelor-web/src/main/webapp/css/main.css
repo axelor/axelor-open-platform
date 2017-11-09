@@ -916,3 +916,26 @@ img.prefix-icon {
     text-align: center;
     cursor: pointer;
 }
+
+.view-tabs-single .navigation-tabs > .nav-tabs > li > span.view-switch-menu > a {
+    cursor: pointer;
+    color: #555;
+    display: block;
+    line-height: 32px;
+}
+
+.view-tabs-single .navigation-tabs > .nav-tabs > li > span.view-switch-menu a[disabled] {
+    cursor: default;
+    color: #ccc;
+}
+
+.view-tabs-single .navigation-tabs > .nav-tabs > li > span.view-switch-menu a[disabled]:hover {
+    background-color: #fff;
+}
+
+.view-tabs-single .navigation-tabs > .nav-tabs > li > span.view-switch-menu > a > i {
+    width: 28px;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 11px;
+}

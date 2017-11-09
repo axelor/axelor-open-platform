@@ -636,43 +636,55 @@ ui.directive('uiViewCustomize', ['NavService', function(NavService) {
 	};
 }]);
 
+function viewSwitcher(scope, element, attrs) {
+
+	var params = (scope._viewParams || scope.tab);
+	var viewTypes = _.pluck(params.views, 'type');
+
+	element.find("[x-view-type]").click(function(e) {
+		if (this.disabled) {
+			return;
+		}
+		var type = $(this).attr("x-view-type");
+		var vs = scope.selectedTab.$viewScope;
+		var ds = vs._dataSource;
+		var page = ds && ds._page;
+
+		if (type === "form" && page) {
+			if (page.index === -1) page.index = 0;
+		}
+
+		if (scope.selectedTab.viewType === 'grid') {
+			var items = vs.getItems() || [];
+			var index = _.first(vs.selection || []);
+			if (index === undefined && items.length === 0 && vs.schema.canNew === false) {
+				return;
+			}
+			if (index !== undefined) page.index = index;
+		}
+
+		vs.switchTo(type);
+		vs.$applyAsync();
+	}).each(function() {
+		var type = $(this).attr("x-view-type");
+		if (viewTypes.indexOf(type) === -1) {
+			$(this).hide();
+		}
+	});
+
+	var watchExpr = scope._viewParams ? '_viewType' : 'tab.viewType';
+	scope.$watch(watchExpr, function(type) {
+		element.find("[x-view-type]").attr("disabled", false);
+		element.find("[x-view-type][x-view-type=" + type + "]").attr("disabled", true);
+	});
+}
+
 ui.directive('uiViewSwitcher', function(){
 	return {
 		scope: true,
 		link: function(scope, element, attrs) {
-
 			element.parents('.view-container:first').addClass('has-toolbar');
-
-			element.find("button").click(function(e){
-				var type = $(this).attr("x-view-type"),
-					ds = scope._dataSource,
-					page = ds && ds._page;
-
-				if (type === "form" && page) {
-					if (page.index === -1) page.index = 0;
-				}
-
-				if (scope.selectedTab.viewType === 'grid') {
-					var items = scope.getItems() || [];
-					var index = _.first(scope.selection || []);
-					if (index === undefined && items.length === 0 && scope.schema.canNew === false) {
-						return;
-					}
-					if (index !== undefined) page.index = index;
-				}
-
-				scope.switchTo(type);
-				scope.$applyAsync();
-			})
-			.each(function() {
-				if (scope._views[$(this).attr("x-view-type")] === undefined) {
-					$(this).hide();
-				}
-			});
-			scope.$watch("_viewType", function(type){
-				element.find("button").attr("disabled", false);
-				element.find("button[x-view-type=" + type + "]").attr("disabled", true);
-			});
+			viewSwitcher(scope, element, attrs);
 		},
 		replace: true,
 		template:
@@ -687,6 +699,29 @@ ui.directive('uiViewSwitcher', function(){
 		  		'<button class="btn" x-view-type="form"	><i class="fa fa-file-text-o"></i></button>'+
 		    '</div>'+
 		'</div>'
+	};
+});
+
+ui.directive('uiViewSwitcherMenu', function(){
+	return {
+		scope: true,
+		link: function(scope, element, attrs) {
+			viewSwitcher(scope, element, attrs);
+		},
+		replace: true,
+		template:
+			"<span class='view-switch-menu dropdown pull-right'>" +
+				"<a href='' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-ellipsis-v'></i></a>" +
+				"<ul class='dropdown-menu'>" +
+				   "<li><a href='' x-view-type='grid' x-translate>Grid</a></li>" +
+				   "<li><a href='' x-view-type='cards' x-translate>Cards</a></li>" +
+				   "<li><a href='' x-view-type='kanban' x-translate>Kanban</a></li>" +
+				   "<li><a href='' x-view-type='calendar' x-translate>Calendar</a></li>" +
+				   "<li><a href='' x-view-type='gantt' x-translate>Gantt</a></li>" +
+				   "<li><a href='' x-view-type='chart' x-translate>Chart</a></li>" +
+				   "<li><a href='' x-view-type='form' x-translate>Form</a></li>" +
+				"</ul>" +
+			"</span>"
 	};
 });
 
