@@ -25,7 +25,6 @@ dependencies {
 	compile libs.jdbc_mysql
 	compile libs.hibernate
 	compile libs.hibernate_search
-	compile libs.ehcache3
 
 	runtime libs.apache_tika
 

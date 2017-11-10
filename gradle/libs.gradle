@@ -88,11 +88,9 @@ libs.hibernate = [
     "org.hibernate:hibernate-core:${versions.hibernate}",
 	"org.hibernate:hibernate-hikaricp:${versions.hibernate}",
     "org.hibernate:hibernate-validator:${versions.hibernate_validator}",
+	"org.hibernate:hibernate-ehcache:${versions.hibernate}",
 	"org.hibernate:hibernate-jcache:${versions.hibernate}",
 ]
-
-// ehcache3
-libs.ehcache3 = "org.ehcache:ehcache:3.4.0"
 
 // Hibernate search
 libs.hibernate_search = "org.hibernate:hibernate-search-orm:${versions.hibernate_search}"

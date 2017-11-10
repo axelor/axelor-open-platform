@@ -24,6 +24,7 @@ import java.util.Properties;
 import javax.inject.Inject;
 
 import org.hibernate.MultiTenancyStrategy;
+import org.hibernate.cache.ehcache.EhCacheRegionFactory;
 import org.hibernate.cache.jcache.JCacheRegionFactory;
 import org.hibernate.cfg.Environment;
 import org.hibernate.hikaricp.internal.HikariCPConnectionProvider;
@@ -57,8 +58,6 @@ import com.google.inject.persist.jpa.JpaPersistModule;
 public class JpaModule extends AbstractModule {
 
 	private static Logger log = LoggerFactory.getLogger(JpaModule.class);
-	
-	private static final String DEFAULT_JCACHE_PROVIDER = "org.ehcache.jsr107.EhcacheCachingProvider";
 
 	private String jpaUnit;
 	private boolean autoscan;
@@ -208,15 +207,17 @@ public class JpaModule extends AbstractModule {
 		properties.put(Environment.USE_SECOND_LEVEL_CACHE, "true");
 		properties.put(Environment.USE_QUERY_CACHE, "true");
 
-		final String jcacheProvider = settings.get(JCacheRegionFactory.PROVIDER, DEFAULT_JCACHE_PROVIDER);
+		final String jcacheProvider = settings.get(JCacheRegionFactory.PROVIDER);
 		final String jcacheConfig = settings.get(JCacheRegionFactory.CONFIG_URI);
 
-		// use jcache
-		properties.put(Environment.CACHE_REGION_FACTORY, JCacheRegionFactory.class.getName());
-		properties.put(JCacheRegionFactory.PROVIDER, jcacheProvider);
-
-		if (StringUtils.notBlank(jcacheConfig)) {
+		if (jcacheProvider != null) {
+			// use jcache
+			properties.put(Environment.CACHE_REGION_FACTORY, JCacheRegionFactory.class.getName());
+			properties.put(JCacheRegionFactory.PROVIDER, jcacheProvider);
 			properties.put(JCacheRegionFactory.CONFIG_URI, jcacheConfig);
+		} else {
+			// use ehcache
+			properties.put(Environment.CACHE_REGION_FACTORY, EhCacheRegionFactory.class.getName());
 		}
 	}
 
