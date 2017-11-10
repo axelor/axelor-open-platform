@@ -73,9 +73,6 @@ public class AboutService extends AbstractService {
 
 		int mb = 1024;
 
-		final boolean isTechnicalStaff = user.getGroup() != null
-				&& user.getGroup().getTechnicalStaff() == TRUE;
-
 		for (String id : sessions) {
 			HttpSession session = AppSessionListener.getSession(id);
 			if (session == null ||
@@ -103,7 +100,7 @@ public class AboutService extends AbstractService {
 		info.put("memUsed", ((runtime.totalMemory() - runtime.freeMemory()) / mb) + " Kb");
 		info.put("memFree", (runtime.freeMemory() / mb) + " Kb");
 
-		if (isTechnicalStaff) {
+		if (AuthUtils.isTechnicalStaff(user)) {
 			info.put("users", users);
 		}
 
