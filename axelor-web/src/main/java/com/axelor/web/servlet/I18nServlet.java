@@ -19,6 +19,7 @@ package com.axelor.web.servlet;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
@@ -91,7 +92,7 @@ public class I18nServlet extends HttpServlet {
 			return;
 		}
 
-		out.write(builder.toString().getBytes());
+		out.write(builder.toString().getBytes(Charset.forName("UTF-8")));
 		out.close();
 	}
 }
