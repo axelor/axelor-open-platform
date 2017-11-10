@@ -114,7 +114,7 @@ public class MapperTest extends JpaTest {
 	@Test
 	public void testTypes() {
 		Map<String, Object> values = new HashMap<String, Object>();
-		values.put("boolValue", true);
+		values.put("boolValue", "true");
 		values.put("intValue", 121);
 		values.put("longValue", 199L);
 		values.put("doubleValue", 23.12);
@@ -131,8 +131,8 @@ public class MapperTest extends JpaTest {
 		values.put("localDate2", null);
 		
 		TypeCheck bean = JPA.edit(TypeCheck.class, values);
-		
-		Assert.assertEquals(true, bean.getBoolValue());
+
+		Assert.assertSame(Boolean.TRUE, bean.getBoolValue());
 		Assert.assertTrue(121 == bean.getIntValue());
 		Assert.assertTrue(199L == bean.getLongValue());
 		Assert.assertTrue(23.12 == bean.getDoubleValue());
