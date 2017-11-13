@@ -465,7 +465,9 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 						value.$editorModel = scope._model;
 						fetchMissing(value.id);
 					}
-					scope.$broadcast("on:record-change", value);
+					scope.$applyAsync(function () {
+						scope.$broadcast("on:record-change", value);
+					});
 					// if it's an o2m editor, make sure to update values
 					if (scope.$itemsChanged) {
 						scope.$itemsChanged();
