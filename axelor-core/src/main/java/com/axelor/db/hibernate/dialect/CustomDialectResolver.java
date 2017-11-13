@@ -40,7 +40,7 @@ public class CustomDialectResolver extends StandardDialectResolver {
 			return new HSQLDialect();
 		}
 		if ("PostgreSQL".equals(databaseName)) {
-			if (majorVersion >= 9 && minorVersion >= 4) {
+			if ((majorVersion >= 9 && minorVersion >= 4) || majorVersion >= 10) {
 				return new PostgreSQLDialect();
 			}
 			log.error("PostgreSQL 9.4 or later is required.");
