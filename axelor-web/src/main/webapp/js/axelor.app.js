@@ -125,8 +125,11 @@
 		evalScope.$moment = function(d) { return moment(d); };		// moment.js helper
 		evalScope.$number = function(d) { return +d; };				// number helper
 		evalScope.$popup = function() { return scope._isPopup; };	// popup detect
-		evalScope.$iif = function(c, t, f) { return c ? t : f; };
-		
+		evalScope.$iif = function(c, t, f) {
+			console.warn('Use ternary operator instead of $iif() helper.');
+			return c ? t : f;
+		};
+
 		evalScope.$sum = function (items, field, operation, field2) {
 			var total = 0;
 			if (items && items.length) {
