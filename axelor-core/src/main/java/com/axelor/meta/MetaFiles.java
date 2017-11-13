@@ -623,6 +623,9 @@ public class MetaFiles {
 
 	public String fileTypeIcon(MetaFile file) {
 		String fileType = file.getFileType();
+		if (fileType == null) {
+			return "fa-file-o";
+		}
 		switch (fileType) {
 		case "application/msword":
 		case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
