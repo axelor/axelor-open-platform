@@ -468,6 +468,7 @@ class Property {
 
 		def column = attrs.column
 		def unique = attrs.unique
+		def nullable = attrs.nullable
 
 		if (Naming.isReserved(name)) {
 			throw new IllegalArgumentException(
@@ -484,12 +485,18 @@ class Property {
 				"Invalid use of an SQL keyword '${col}' in domain object: ${entity.name}")
 		}
 
-		if (column == null && unique == null)
+		if (column == null && unique == null && nullable == null)
 			return null
 
-		annon(reference ? "javax.persistence.JoinColumn" : "javax.persistence.Column")
-				.add("name", column)
-				.add("unique", unique, false)
+		def res = annon(reference ? "javax.persistence.JoinColumn" : "javax.persistence.Column")
+			.add("name", column)
+			.add("unique", unique, false)
+			
+		if (nullable) {
+			res.add("nullable", nullable, false)
+		}
+
+		return res
 	}
 	
 	private Annotation $joinTable() {
