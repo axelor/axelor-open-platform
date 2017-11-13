@@ -197,6 +197,16 @@ public class ViewService extends AbstractService {
 					}
 				}
 			}
+
+			// include related field for ref-select widget
+			String widgetAttr = ((Field) widget).getWidget();
+			if (widgetAttr != null && widgetAttr.matches("RefSelect|ref-select")) {
+				String relatedAttr = ((Field) widget).getRelated();
+				if (StringUtils.isBlank(relatedAttr)) {
+					relatedAttr = ((Field) widget).getName() + "Id";
+				}
+				names.add(relatedAttr);
+			}
 		} else if (widget instanceof PanelRelated) {
 			names.add(((PanelRelated) widget).getName());
 		}
