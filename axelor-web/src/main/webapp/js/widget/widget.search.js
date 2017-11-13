@@ -746,11 +746,14 @@ ui.directive('uiFilterBox', function() {
 			var filterDS = DataSource.create('com.axelor.meta.db.MetaFilter');
 
 			this.$scope = $scope;
+
 			$scope.model = handler._model;
 			$scope.view = {};
 
 			$scope.viewFilters = [];
 			$scope.custFilters = [];
+
+			$scope.canShare = axelor.config["view.adv-search.share"] !== 'false';
 
 			if (filterView) {
 				ViewService.getMetaDef($scope.model, {name: filterView, type: 'search-filters'})
@@ -1336,7 +1339,7 @@ ui.directive('uiFilterBox', function() {
 					"<div class='form-inline'>" +
 						"<div class='control-group'>" +
 							"<input type='text' placeholder='{{\"Save filter as\" | t}}' ng-model='custTitle'> " +
-							"<label class='checkbox'>" +
+							"<label class='checkbox' ng-if='canShare'>" +
 								"<input type='checkbox' ng-model='custShared'><span x-translate>Share</span>" +
 							"</label>" +
 						"</div>" +
