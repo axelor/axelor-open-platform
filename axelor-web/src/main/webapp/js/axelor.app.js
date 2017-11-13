@@ -272,10 +272,10 @@
 		if (first in record || FIELDS_BASE.indexOf(first) > -1) {
 			found = true;
 		} else if (field.target && (field.viewer || field.editor)) {
-			found = name in ((field.viewer || {}).fields || {}) ||
-					name in ((field.editor || {}).fields || {});
+			found = first in ((field.viewer || {}).fields || {}) ||
+					first in ((field.editor || {}).fields || {});
 		} else {
-			found = name in scope.fields;
+			found = first in scope.fields;
 		}
 
 		if (found) {
