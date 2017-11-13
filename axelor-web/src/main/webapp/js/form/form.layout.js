@@ -363,6 +363,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 			}
 
 			var items = editor.items || [];
+			var itemNames = _.pluck(items, 'name');
 			var widths = _.map(items, function (item) {
 				applyAttrs(item);
 				var width = item.width || (item.widgetAttrs||{}).width;
@@ -409,6 +410,9 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 				scope.$$setEditorValue = function (value, fireOnChange) {
 					scope.setValue(value, fireOnChange === undefined ? true: fireOnChange);
 				};
+				scope.hasFormItem = function (name) {
+					return itemNames.indexOf(name) > -1;
+				}
 			}
 
 			if (field.target) {
