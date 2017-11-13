@@ -818,12 +818,17 @@ ui.formInput('RefItem', 'ManyToOne', {
 		var ref = element.attr('x-ref');
 		var watch = element.attr('x-watch-name');
 		var target = element.attr('x-target');
-		
+		var refField = scope.fields[ref] || {};
+
 		function setRef(value) {
 			if (!scope.record) {
 				return;
 			}
 			
+			if (value && refField.type === 'string') {
+				value = '' + value;
+			}
+
 			var old = scope.record[ref];
 			scope.record[ref] = value;
 			
