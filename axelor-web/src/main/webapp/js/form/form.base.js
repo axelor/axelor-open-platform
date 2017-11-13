@@ -370,6 +370,7 @@ ui.formDirective = function(name, object) {
 				var template_readonly = self.template_readonly;
 				if (field.viewer) {
 					template_readonly = axelor.$fixTemplate(field.viewer.template);
+					scope.$moment = function(d) { return moment(d); };
 					scope.$image = function (fieldName, imageName) { return ui.formatters.$image(scope, fieldName, imageName); };
 					scope.$fmt = function (fieldName, fieldValue) {
 						var args = [scope, fieldName];
