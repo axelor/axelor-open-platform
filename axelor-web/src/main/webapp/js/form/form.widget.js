@@ -217,10 +217,6 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		scope.$on("on:grid-selection-change", function(e, context) {
 			handle(context);
 		});
-
-		scope.$watch("isReadonly()", watcher);
-		scope.$watch("isRequired()", watcher);
-		scope.$watch("isValid()", watcher);
 		
 		var expr = $parse(condition);
 
