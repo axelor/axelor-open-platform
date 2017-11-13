@@ -293,12 +293,7 @@ var Formatters = {
 	},
 
 	"decimal": function(field, value) {
-		var scale = (field.widgetAttrs||{}).scale || field.scale || 2;
-		var num = +(value || 0);
-		if (_.isNumber(num)) {
-			return num.toFixed(scale);
-		}
-		return value;
+		return ui.formatters.decimal(field, value);
 	},
 	
 	"boolean": function(field, value) {

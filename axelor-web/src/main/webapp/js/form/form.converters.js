@@ -28,8 +28,11 @@
 		},
 
 		"decimal": function(field, value) {
-			var scale = field.scale || 2,
-				num = +(value);
+			var scale = (field.widgetAttrs||{}).scale || field.scale || 2;
+			var num = +(value);
+			if ((value === null || value === undefined) && !field.defaultValue) {
+				return value;
+			}
 			if (num === 0 || num) {
 				return num.toFixed(scale);
 			}
