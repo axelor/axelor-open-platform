@@ -361,7 +361,7 @@ ui.directive('uiFilterContext', function () {
 							"<select ng-model='context.field' ng-options='v as v.title for v in contextFields'></select>" +
 						"</span>" +
 						"<span>" +
-							"<input ui-eval-ref-select ng-model='context.value' x-field='contextValue'>" +
+							"<span ui-eval-ref-select ng-model='context.value' x-field='contextValue'></span>" +
 						"</span>" +
 					"</div>" +
 				"</div>" +
