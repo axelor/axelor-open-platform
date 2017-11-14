@@ -465,6 +465,7 @@ public class Resource<T extends Model> {
 	@SuppressWarnings("all")
 	public void export(Request request, Writer writer) throws IOException {
 		security.get().check(JpaSecurity.CAN_READ, model);
+		security.get().check(JpaSecurity.CAN_EXPORT, model);
 		LOG.debug("Exporting '{}' with {}", model.getName(), request.getData());
 
 		List<String> fields = request.getFields();
