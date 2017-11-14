@@ -1258,7 +1258,7 @@ ui.directive('uiFilterBox', function() {
 				if (all.is(e.target) || all.has(e.target).size() > 0) {
 					return;
 				}
-				if ($(e.target).zIndex() > $(menu).zIndex()) {
+				if ($(e.target).zIndex() > $(menu).zIndex() || $(e.target).parents('.ui-dialog').size()) {
 					return;
 				}
 				if(menu) {
