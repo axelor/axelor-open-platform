@@ -27,7 +27,7 @@ ui.prepareContext = function(model, values, dummyValues, parentContext) {
 
 	function compact(item) {
 		if (!item || _.isNumber(item)) return item;
-		if (item.id > 0 && item.version === undefined) {
+		if (item.id > 0 && item.version === undefined && !item.$dirty) {
 			return {
 				id: item.id,
 				selected: item.selected,
@@ -37,6 +37,9 @@ ui.prepareContext = function(model, values, dummyValues, parentContext) {
 		item = _.extend({}, item);
 		if (item.id <= 0) {
 			item.id = null;
+		}
+		if (item.version === undefined && item.$version !== undefined) {
+			item.version = item.$version;
 		}
 		return item;
 	}
