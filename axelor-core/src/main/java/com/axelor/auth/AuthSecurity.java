@@ -194,7 +194,7 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
 			return;
 		}
 		final AuthSecurityException cause = new AuthSecurityException(type, model, ids);
-		throw new UnauthorizedException(type.getMessage(), cause);
+		throw new UnauthorizedException(cause.getMessage(), cause);
 	}
 
 	@Override
