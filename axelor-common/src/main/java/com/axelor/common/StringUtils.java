@@ -145,7 +145,9 @@ public final class StringUtils {
 			if (!isBlank(line)) {
 				builder.append(leading <= line.length() ? line.substring(leading) : "");
 			}
-			builder.append("\n");
+			if(lines.length > 1) {
+				builder.append("\n");
+			}
 		}
 
 		return builder.toString();

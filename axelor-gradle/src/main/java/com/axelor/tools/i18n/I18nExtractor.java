@@ -203,7 +203,7 @@ public class I18nExtractor {
 				@Override
 				public void endElement(String uri, String localName, String qName) throws SAXException {
 					if (TEXT_NODES.contains(qName)) {
-						String text = StringUtils.stripIndent(readTextLines.toString()).trim();
+						String text = StringUtils.stripIndent(readTextLines.toString());
 						accept(new I18nItem(text, file, locator.getLineNumber()));
 						readText = false;
 						readTextLines.setLength(0);
@@ -292,11 +292,11 @@ public class I18nExtractor {
 				if (isString) {
 					sb.append(next);
 				} else if (next == ',') { // next argument
-					accept(new I18nItem(sb.toString().trim(), file, line));
+					accept(new I18nItem(sb.toString(), file, line));
 					sb = new StringBuilder();
 				}
 			}
-			accept(new I18nItem(sb.toString().trim(), file, line));
+			accept(new I18nItem(sb.toString(), file, line));
 			return i;
 		}
 		
@@ -351,6 +351,9 @@ public class I18nExtractor {
 				String location = null;
 				if (item.file != null) {
 					location = "" + srcPath.relativize(item.file) + ":" + item.line;
+				}
+				if (item.text.length() != item.text.trim().length()) {
+					log.warn("Remove leading/trailing white spaces from '{}', of following text: '{}'", location, item.text);
 				}
 				items.put(item.text.trim(), location);
 			}
