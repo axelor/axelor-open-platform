@@ -285,7 +285,7 @@
 							}
 						}
 						if (field.type === 'panel' || field.type === 'separator') {
-							field.hiddenInGrid = true;
+							field.visibleInGrid = false;
 						}
 						if (field.type === 'panel') {
 							panel = _.extend({}, field, { items: [] });
@@ -339,7 +339,7 @@
 					if (item.jsonFields) {
 						_.each(item.jsonFields, function (field) {
 							var type = field.type || 'text';
-							if (type.indexOf('-to-many') === -1 && !field.hiddenInGrid) {
+							if (type.indexOf('-to-many') === -1 && field.visibleInGrid) {
 								items.push(_.extend({}, field, { name: item.name + '.' + field.name }));
 							}
 						});

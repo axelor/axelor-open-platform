@@ -31,7 +31,7 @@
     <boolean name="hidden" column="is_hidden" />
     <boolean name="required" column="is_required" />
     <boolean name="nameField" />
-    <boolean name="hiddenInGrid" />
+    <boolean name="visibleInGrid" />
 
     <integer name="minSize" column="min_size" />
     <integer name="maxSize" column="max_size" />
