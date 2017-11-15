@@ -169,6 +169,28 @@
 			meta = meta || {};
 			view = view || {};
 
+			if (meta.jsonAttrs && view && view.items) {
+				if (view.type === 'grid') {
+					view.items.push({
+						type: 'field',
+						name: 'attrs',
+						jsonFields: meta.jsonAttrs
+					});
+				}
+				if (view.type === 'form') {
+					view.items.push({
+						type: 'panel',
+						title: _t('Attributes'),
+						itemSpan: 12,
+						items: [{
+							type: 'field',
+							name: 'attrs',
+							jsonFields: meta.jsonAttrs
+						}]
+					});
+				}
+			}
+			
 			view = processJsonForm(view);
 			meta.fields = processFields(meta.fields);
 			
