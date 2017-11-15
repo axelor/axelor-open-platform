@@ -828,7 +828,8 @@ public class Query<T extends Model> {
 					String item = path[i].replace("[]", "");
 					Property property = currentMapper.getProperty(item);
 					if (property == null) {
-						break;
+						throw new org.hibernate.QueryException("could not resolve property: " + item + " of: "
+								+ currentMapper.getBeanClass().getName());
 					}
 
 					if (property.isJson()) {

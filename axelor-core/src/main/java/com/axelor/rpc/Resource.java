@@ -277,7 +277,7 @@ public class Resource<T extends Model> {
 					String qs = request.getCriteria().createQuery(model).toString();
 					JPA.em().createQuery(qs);
 				} catch (Exception e) {
-					throw new IllegalArgumentException("Invalid domain: " + domain);
+					throw new IllegalArgumentException("Invalid domain: " + domain, e);
 				}
 			}
 		}
