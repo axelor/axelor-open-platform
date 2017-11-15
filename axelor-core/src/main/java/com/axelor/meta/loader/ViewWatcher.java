@@ -219,7 +219,7 @@ public final class ViewWatcher {
 	public void stop() {
 		if (running) {
 			running = false;
-			log.info("Stoping view watch....");
+			log.info("Stopping view watch....");
 			keys.keySet().forEach(WatchKey::cancel);
 			keys.clear();
 		}
