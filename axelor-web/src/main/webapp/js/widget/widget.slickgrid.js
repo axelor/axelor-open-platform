@@ -838,6 +838,7 @@ Grid.prototype.parse = function(view) {
 		formatterFactory: factory,
 		enableCellNavigation: true,
 		enableColumnReorder: false,
+		fullWidthRows: true,
 		multiColumnSort: true,
 		showHeaderRow: this.showFilters,
 		multiSelect: scope.selector !== "single",
@@ -1233,7 +1234,10 @@ Grid.prototype._doInit = function(view) {
 
 	this.zIndexFix();
 
-	scope.$timeout(grid.invalidate);
+	scope.$timeout(function () {
+		grid.invalidate();
+		grid.autosizeColumns();
+	});
 };
 
 Grid.prototype.subscribe = function(event, handler) {
@@ -1255,7 +1259,6 @@ Grid.prototype.adjustSize = function() {
 	this.doInit();
 	this.adjustToScreen();
 	this.grid.resizeCanvas();
-	this.grid.autosizeColumns();
 };
 
 Grid.prototype.adjustToScreen = function() {

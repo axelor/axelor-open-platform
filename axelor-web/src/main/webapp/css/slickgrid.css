@@ -22,6 +22,11 @@
 	border-top: 0 !important;
 }
 
+.slickgrid,
+.slickgrid * {
+    box-sizing: border-box;
+}
+
 .slickgrid .slick-header,
 .slickgrid .slick-header-column {
 	color: #333;
@@ -59,6 +64,7 @@
 
 .slick-row {
 	background: #f9f9f9;
+	border-bottom: 1px solid #e7eaec !important;
 }
 .slick-row.odd {
   	background: #fff;
@@ -70,7 +76,6 @@
 
 .slick-row .slick-cell {
 	border: 0;
-	border-bottom: 1px solid #e7eaec;
 	padding: 2px 8px;
 }
 
@@ -80,7 +85,7 @@
 	height: 100% !important;
 }
 
-.slick-row .slick-cell.selected {
+.slick-row.active {
   	background-color: #abb9d3;
 }
 
