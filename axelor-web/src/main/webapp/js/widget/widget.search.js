@@ -753,7 +753,7 @@ ui.directive('uiFilterBox', function() {
 			$scope.viewFilters = [];
 			$scope.custFilters = [];
 
-			$scope.canShare = axelor.config["view.adv-search.share"] !== 'false';
+			$scope.canShare = axelor.config["view.adv-search.share"];
 
 			if (filterView) {
 				ViewService.getMetaDef($scope.model, {name: filterView, type: 'search-filters'})
