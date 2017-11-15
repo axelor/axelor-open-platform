@@ -720,6 +720,10 @@ public class MetaService {
 		data.put("config", config);
 		data.put("search", chart.getSearchFields());
 		data.put("onInit", chart.getOnInit());
+		
+		if ("sql".equals(chart.getDataSet().getType())) {
+			data.put("usingSQL", true);
+		}
 
 		return response;
 	}

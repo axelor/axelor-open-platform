@@ -83,6 +83,7 @@ function ChartCtrl($scope, $element, $http, ActionService) {
 			if ($scope.searchFields === undefined && data.search) {
 				$scope.searchFields = data.search;
 				$scope.searchInit = data.onInit;
+				$scope.usingSQL = data.usingSQL;
 			} else {
 				$scope.render(data);
 				if (isInitial) {
@@ -222,6 +223,11 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 					if (_.isArray(value)) value = _.pluck(value, "id");
 					if (_.isString(value)) value = value.split(/\s*,\s*/g);
 					ctx[item.name] = value;
+				} else if (item.target && $scope.usingSQL) {
+					var value = ctx[item.name];
+					if (value) {
+						ctx[item.name] = value.id;
+					}
 				}
 			});
 			return ctx;
