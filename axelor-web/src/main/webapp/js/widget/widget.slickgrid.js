@@ -838,7 +838,6 @@ Grid.prototype.parse = function(view) {
 		formatterFactory: factory,
 		enableCellNavigation: true,
 		enableColumnReorder: false,
-		forceFitColumns: true,
 		multiColumnSort: true,
 		showHeaderRow: this.showFilters,
 		multiSelect: scope.selector !== "single",
