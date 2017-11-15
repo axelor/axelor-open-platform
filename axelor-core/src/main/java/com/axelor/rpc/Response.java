@@ -136,8 +136,13 @@ public class Response {
 		
 		final Map<String, Object> report = new HashMap<>();
 		
+		String message = throwable.getMessage();
+		if (message == null || message.startsWith(cause.getClass().getName())) {
+			message = cause.getMessage();
+		}
+
 		report.put("class", throwable.getClass());
-		report.put("message", cause.getMessage());
+		report.put("message", message);
 		report.put("string", cause.toString());
 		report.put("stacktrace", Throwables.getStackTraceAsString(throwable));
 		report.put("cause", Throwables.getStackTraceAsString(cause));

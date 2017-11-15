@@ -104,9 +104,6 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 		if (ex instanceof SQLException) {
 			return onSQLException((SQLException) ex, response);
 		}
-		if (ex.getCause() != null) {
-			return onException(ex.getCause(), response);
-		}
 		response.setException(ex);
 		log.error("Error: {}", ex.getMessage());
 		return response;
