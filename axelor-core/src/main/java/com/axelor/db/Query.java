@@ -826,6 +826,7 @@ public class Query<T extends Model> {
 				Mapper currentMapper = mapper;
 				for(int i = 0 ; i < path.length - 1 ; i++) {
 					String item = path[i].replace("[]", "");
+					if (i == 0 && "self".equals(item)) continue;
 					Property property = currentMapper.getProperty(item);
 					if (property == null) {
 						throw new org.hibernate.QueryException("could not resolve property: " + item + " of: "
