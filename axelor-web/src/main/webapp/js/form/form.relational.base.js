@@ -355,7 +355,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		var domain = this._domain,
 			context = this._context;
 	
-		if (domain && this.getContext) {
+		if (domain !== undefined && this.getContext) {
 			context = _.extend({}, context, this.getContext());
 		}
 
@@ -371,7 +371,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			limit: limit
 		};
 
-		if (domain) {
+		if (domain !== undefined) {
 			params.domain = domain;
 			params.context = context;
 		}
