@@ -1039,7 +1039,6 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 			tmpl = '{{record.' + field.targetName + '}}';
 		}
 		tmpl = tmpl || '{{record.id}}';
-		tmpl = axelor.$fixTemplate(tmpl);
 		return "<div class='o2m-list'>" +
 		"<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items'>" + tmpl + "</div>" +
 		"</div>";

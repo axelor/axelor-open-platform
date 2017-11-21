@@ -234,61 +234,6 @@
 		}
 	};
 
-	const INTERPOLATION_REGEX = /\{\{\s*(\:\:)?\s*([\w.]+)\s*(\|.*?)?\s*\}\}/g;
-
-	axelor.$fixTemplate = function $fixTemplate(template) {
-		if (template) {
-			template = template.replace(INTERPOLATION_REGEX, function (match, p, n, s) {
-				return "{{" + (p || '') + "$get(this, '" + (n || '') + "')" + (s || '') + "}}";
-			});
-		}
-		return template;
-	};
-
-	axelor.deepGet = function deepGet(obj, path) {
-		var index = 0;
-		var length = path.length;
-		while (obj != null && index < length) {
-			obj = obj[path[index++]];
-		}
-		return (index && index == length) ? obj : undefined;
-	}
-
-	axelor.$get = function $get(scope, name) {
-		var record = scope.record || {};
-		if (name in record) {
-			return record[name];
-		}
-		if (name in scope) {
-			return scope[name];
-		}
-		var path = name.split(/\./);
-		var first = _.first(path);
-		if (first === 'record') {
-			path = _.rest(path);
-			first = _.first(path);
-		}
-		
-		var field = scope.field || {};
-		var found = false;
-
-		if (first in record || FIELDS_BASE.indexOf(first) > -1) {
-			found = true;
-		} else if (field.target && (field.viewer || field.editor)) {
-			found = first in ((field.viewer || {}).fields || {}) ||
-					first in ((field.editor || {}).fields || {});
-		} else {
-			found = first in scope.fields;
-		}
-
-		if (found) {
-			return this.deepGet(record, path);
-		}
-		
-		console.error('FAILED:', '{{' + name + '}}', new ReferenceError(first));
-		return undefined;
-	};
-
 	axelor.$adjustSize = _.debounce(function () {
 		$.event.trigger('adjustSize');
 	}, 100);
