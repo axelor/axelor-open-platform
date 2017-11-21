@@ -592,7 +592,7 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 	template_readonly: function (scope) {
 		var field = scope.field || {};
 		if (field.viewer) {
-			return field.viewer;
+			return field.viewer.template;
 		}
 		if (field.editor && (field.editor.viewer || !field.targetName)) {
 			return null;
