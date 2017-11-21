@@ -32,7 +32,7 @@ ui.formInput('Boolean', {
 	
 	link: function (scope, element, attrs, model) {
 
-		element.on('click', 'input', function (e) {
+		element.on('click', 'input:not(.no-toggle)', function (e) {
 			scope.setValue(e.target.checked, true);
 		});
 
@@ -147,7 +147,7 @@ ui.formInput('BooleanSelect', 'Boolean', {
 		};
 
 		scope.$render_editable = function () {
-			var value = model.$viewValue || false;
+			var value = model.$viewValue;
 			var text = scope.format(value);
 			input.val(text);
 		};
@@ -160,7 +160,7 @@ ui.formInput('BooleanSelect', 'Boolean', {
 	template: "<span class='form-item-container'></span>",
 	template_readonly: '<span>{{text}}</span>',
 	template_editable: "<span class='picker-input'>" +
-				"<input type='text' readonly='readonly'>" +
+				"<input type='text' readonly='readonly' class='no-toggle'>" +
 				"<span class='picker-icons picker-icons-1'>" +
 					"<i class='fa fa-caret-down' ng-click='doShowSelect()'></i>" +
 				"</span>" +
