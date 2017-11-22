@@ -857,10 +857,10 @@ Grid.prototype.parse = function(view) {
 	element.data('grid', grid);
 	
 	// delegate some methods to handler scope
-	//TODO: this spoils the handler scope, find some better way
 	handler.showColumn = _.bind(this.showColumn, this);
 	handler.resetColumns = _.bind(this.resetColumns, this);
 	handler.setColumnTitle = _.bind(this.setColumnTitle, this);
+	handler.getVisibleCols = _.bind(this.getVisibleCols, this);
 
 	// set dummy columns to apply attrs if grid is not initialized yet
 	setDummyCols(element, this.cols);

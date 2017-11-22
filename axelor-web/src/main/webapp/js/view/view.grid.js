@@ -655,7 +655,16 @@ function GridViewCtrl($scope, $element) {
 	$scope.onExport = function (full) {
 		var view = $scope.view || $scope.schema || {};
 		if (!view.items) return;
-		var fields = full ? [] : _.pluck(view.items, 'name');
+
+		var names = _.pluck(view.items, 'name');
+		var fields = full
+			? []
+			: _.chain($scope.getVisibleCols())
+			   .map(function (col) { return (col.descriptor||{}).name; })
+			   .compact()
+			   .filter(function (name) { return names.indexOf(name) > -1; })
+			   .value();
+
 		return ds.export_(fields).success(function(res) {
 			var fileName = res.fileName;
 			var filePath = 'ws/rest/' + $scope._model + '/export/' + fileName;
