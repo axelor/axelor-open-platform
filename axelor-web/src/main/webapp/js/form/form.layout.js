@@ -188,11 +188,15 @@ ui.directive('uiTableLayout', ['$compile', function($compile) {
 function PanelLayout(items, attrs, $scope, $compile) {
 	
 	var stacked = attrs.stacked || false,
+		flexbox = attrs.flexbox || false,
 		numCols = 12,
 		numSpan = +(attrs.itemSpan) || 6,
 		curCol = 0,
-		layout = [$('<div class="row-fluid">')];
-	
+		canAddRow = !stacked && !flexbox,
+		rowClass = flexbox ? 'panel-flex' : 'row-fluid',
+		cellClass = flexbox ? 'flex' : 'span',
+		layout = [$('<div>').addClass(rowClass)];
+
 	function add(item, label) {
 		var row = _.last(layout),
 			cell = $('<div>'),
@@ -210,8 +214,8 @@ function PanelLayout(items, attrs, $scope, $compile) {
 			return;
 		}
 
-		if (curCol + (span + offset) >= numCols + 1 && !stacked) {
-			curCol = 0, row = $('<div class="row-fluid">');
+		if (curCol + (span + offset) >= numCols + 1 && canAddRow) {
+			curCol = 0, row = $('<div>').addClass(rowClass);
 			layout.push(row);
 		}
 		if (label) {
@@ -222,7 +226,7 @@ function PanelLayout(items, attrs, $scope, $compile) {
 		cell.addClass(item.attr('x-cell-css'));
 
 		if (span) {
-			cell.addClass('span' + span);
+			cell.addClass(cellClass + span);
 		}
 		if (offset) {
 			cell.addClass('offset' + offset);
@@ -380,7 +384,8 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 				schema = {
 					items: [{
 						type: 'panel',
-						items: items
+						items: items,
+						flexbox: editor.flexbox
 					}]
 				};
 			}

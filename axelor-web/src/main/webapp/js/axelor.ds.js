@@ -272,7 +272,8 @@
 				if (item.jsonFields && item.widget !== 'json-raw') {
 					var editor = {
 						layout: view.type === 'panel-json' ? 'table' : undefined,
-						items: []
+						flexbox: true,
+						items: [],
 					};
 					var panel = null;
 					var panelTab = null;
