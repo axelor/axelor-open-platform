@@ -49,7 +49,7 @@ public class MailController extends JpaSupport {
 			+ "WHERE (m.parent IS NULL) AND "
 			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
 			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "((g IS NULL) OR (g.user.id != :uid) OR (g.user.id = :uid AND g.isRead = false))) "
+			+ "(g IS NULL OR (g.user.id = :uid AND g.isRead = false))) "
 			+ "ORDER BY mm.createdOn DESC";
 
 	private static final String SQL_SUBSCRIBERS = ""
@@ -68,7 +68,7 @@ public class MailController extends JpaSupport {
 			+ "WHERE (m.parent IS NULL) AND "
 			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
 			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "((g IS NULL) OR (g.user.id != :uid) OR (g.user.id = :uid AND (g.isRead = false OR g.isArchived = false)))) "
+			+ "(g IS NULL OR (g.user.id = :uid AND (g.isRead = false OR g.isArchived = false)))) "
 			+ "ORDER BY mm.createdOn DESC";
 
 	private static final String SQL_IMPORTANT = ""
