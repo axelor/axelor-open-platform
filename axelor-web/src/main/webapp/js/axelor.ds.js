@@ -536,7 +536,7 @@
 			return {
 				get: function (name) {
 					return new $q(function (resolve) {
-						resolve(viewCache.get(toKey(name)));
+						resolve(angular.copy(viewCache.get(toKey(name))));
 					});
 				},
 				set: function (name, value) {
