@@ -89,8 +89,8 @@ function TableLayout(items, attrs, $scope, $compile) {
 		}
 
 		if (numCols > 1 && !noTitle && title) {
-			var label = $('<label ui-label></label>').html(title).attr('x-for-widget', el.attr('id')),
-				labelElem = $compile(label)(labelScope || $scope);
+			var label = $('<label ui-label></label>').attr('x-for-widget', el.attr('id')),
+				labelElem = $compile(label)(labelScope || $scope).html(title);
 			el.data('label', labelElem);
 			return add(el, labelElem);
 		}
@@ -249,8 +249,8 @@ function PanelLayout(items, attrs, $scope, $compile) {
 		}
 	
 		if (!noTitle && title) {
-			var label = $('<label ui-label></label>').html(title).attr('x-for-widget', el.attr('id')),
-				labelElem = $compile(label)(labelScope || $scope);
+			var label = $('<label ui-label></label>').attr('x-for-widget', el.attr('id')),
+				labelElem = $compile(label)(labelScope || $scope).html(title);
 			el.data('label', labelElem);
 			return add(el, labelElem);
 		}
