@@ -388,11 +388,12 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 			});
 			
 			element.on("click", ".kanban-card", function (e) {
-				if ($(e.target).parents(".kanban-card-menu").size()) {
+				var elem = $(e.target);
+				var selector = '[ng-click],[ui-action-click],button,a,.iswitch,.ibox,.kanban-card-menu';
+				if (elem.is(selector) || element.find(selector).has(elem).size()) {
 					return;
 				}
-				var elem = $(this);
-				var record = elem.scope().record;
+				var record = $(this).scope().record;
 				scope.onEdit(record, true);
 				scope.$applyAsync();
 			});
@@ -442,15 +443,6 @@ ui.directive('uiCards', function () {
 		scope.handleEmpty = function () {
 			element.toggleClass('empty', scope.isEmpty());
 		};
-
-		element.on("click", ".kanban-card", function (e) {
-			if (element.find('[ng-click],[ui-action-click],button,a,.iswitch,.ibox,.kanban-card-menu').has(e.target).size()) {
-				return;
-			}
-			var record = $(this).scope().record;
-			scope.onEdit(record, true);
-			scope.$applyAsync();
-		});
 	};
 });
 
@@ -539,6 +531,17 @@ ui.directive('uiCard', ["$compile", function ($compile) {
 			}
 
 			element.fadeIn("slow");
+
+			element.on("click", function (e) {
+				var elem = $(e.target);
+				var selector = '[ng-click],[ui-action-click],button,a,.iswitch,.ibox,.kanban-card-menu';
+				if (elem.is(selector) || element.find(selector).has(elem).size()) {
+					return;
+				}
+				var record = $(this).scope().record;
+				scope.onEdit(record, true);
+				scope.$applyAsync();
+			});
 		}
 	};
 }]);
