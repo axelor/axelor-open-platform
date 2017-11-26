@@ -166,10 +166,12 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		entity.setRoot(root);
 
 		// mark root as unread
-		if (root != null && root.getFlags() != null) {
-			for (MailFlags rootFlags : root.getFlags()) {
-				rootFlags.setIsRead(false);
-			}
+		if (root != null) {
+			Beans.get(MailFlagsRepository.class).all()
+				.filter("self.message.id = :mid and self.user.id != :uid")
+				.bind("mid", root.getId())
+				.bind("uid", AuthUtils.getUser().getId())
+				.update("isRead", false);
 		}
 
 		boolean isNew = entity.getId() == null;

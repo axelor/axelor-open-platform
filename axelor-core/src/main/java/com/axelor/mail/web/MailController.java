@@ -45,11 +45,13 @@ import com.axelor.team.db.repo.TeamRepository;
 public class MailController extends JpaSupport {
 	
 	private static final String SQL_UNREAD = ""
-			+ "SELECT mm FROM MailMessage mm WHERE mm.id IN(SELECT DISTINCT(m.id) FROM MailMessage m LEFT JOIN m.flags g "
-			+ "WHERE (m.parent IS NULL) AND "
-			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
-			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "(g IS NULL OR (g.user.id = :uid AND g.isRead = false))) "
+			+ "SELECT mm FROM MailMessage mm "
+			+ "LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel "
+			+ "LEFT JOIN MailFlags g ON g.user = f.user AND g.message = mm.id "
+			+ "WHERE"
+			+ " (mm.parent IS NULL) AND "
+			+ " (f.user.id = :uid AND f.archived = false) AND"
+			+ " (g.isRead IS NULL OR g.isRead = false) "
 			+ "ORDER BY mm.createdOn DESC";
 
 	private static final String SQL_SUBSCRIBERS = ""
@@ -64,27 +66,33 @@ public class MailController extends JpaSupport {
 			+ " (gr.id IN (SELECT mr.id FROM Team m LEFT JOIN m.roles mr WHERE m.id = :id)))";
 
 	private static final String SQL_INBOX = ""
-			+ "SELECT mm FROM MailMessage mm WHERE mm.id IN (SELECT DISTINCT(m.id) FROM MailMessage m LEFT JOIN m.flags g "
-			+ "WHERE (m.parent IS NULL) AND "
-			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
-			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "(g IS NULL OR (g.user.id = :uid AND (g.isRead = false OR g.isArchived = false)))) "
+			+ "SELECT mm FROM MailMessage mm "
+			+ "LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel "
+			+ "LEFT JOIN MailFlags g ON g.user = f.user AND g.message = mm.id "
+			+ "WHERE"
+			+ " (mm.parent IS NULL) AND "
+			+ " (f.user.id = :uid AND f.archived = false) AND"
+			+ " (g.isRead IS NULL OR g.isRead = false OR g.isArchived = false) "
 			+ "ORDER BY mm.createdOn DESC";
 
 	private static final String SQL_IMPORTANT = ""
-			+ "SELECT mm FROM MailMessage mm WHERE mm.id IN (SELECT DISTINCT(m.id) FROM MailMessage m LEFT JOIN m.flags g "
-			+ "WHERE (m.parent IS NULL) AND "
-			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
-			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "((g.user.id = :uid AND g.isStarred = true AND g.isArchived = false))) "
+			+ "SELECT mm FROM MailMessage mm "
+			+ "LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel "
+			+ "LEFT JOIN MailFlags g ON g.user = f.user AND g.message = mm.id "
+			+ "WHERE"
+			+ " (mm.parent IS NULL) AND "
+			+ " (f.user.id = :uid AND f.archived = false) AND"
+			+ " (g.isStarred = true AND g.isArchived = false) "
 			+ "ORDER BY mm.createdOn DESC";
 
 	private static final String SQL_ARCHIVE = ""
-			+ "SELECT mm FROM MailMessage mm WHERE mm.id IN (SELECT DISTINCT(m.id) FROM MailMessage m LEFT JOIN m.flags g "
-			+ "WHERE (m.parent IS NULL) AND "
-			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
-			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "((g.user.id = :uid AND g.isArchived = true))) "
+			+ "SELECT mm FROM MailMessage mm "
+			+ "LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel "
+			+ "LEFT JOIN MailFlags g ON g.user = f.user AND g.message = mm.id "
+			+ "WHERE"
+			+ " (mm.parent IS NULL) AND "
+			+ " (f.user.id = :uid AND f.archived = false) AND"
+			+ " (g.isArchived = true) "
 			+ "ORDER BY mm.createdOn DESC";
 
 	@Inject
