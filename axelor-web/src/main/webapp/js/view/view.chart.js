@@ -716,7 +716,13 @@ function Chart(scope, element, data) {
 		type = "multi";
 	}
 
-	element.off('adjustSize').empty();
+	// clean up last instance
+	(function () {
+		var chart = element.off('adjustSize').empty().data('chart');
+		if (chart && chart.tooltip && chart.tooltip.id) {
+			d3.select('#' + chart.tooltip.id()).remove();
+		}
+	})();
 
 	nv.addGraph(function generate() {
 		
@@ -824,7 +830,7 @@ function Chart(scope, element, data) {
 			chart.update();
 		}
 
-		element.on('adjustSize', _.debounce(adjust, 100));
+		element.on('adjustSize', _.debounce(adjust, 100)).data('chart', chart);
 		setTimeout(chart.update, 10);
 
 		return chart;
