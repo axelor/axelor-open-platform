@@ -303,7 +303,7 @@ ui.directive('uiMailMessage', function () {
 							"</span>" +
 							"<span>" +
 								"<a href='' ng-click='showAuthor(message)'>{{::$userName(message)}}</a> " +
-								"<span>{{formatEvent(message)}}</span>" +
+								"<span ng-bind-html='formatEvent(message)'></span>" +
 							"</span>" +
 						"</div>" +
 					"</div>" +
@@ -409,7 +409,11 @@ ui.formWidget('uiMailMessages', {
 			if (message.$eventLine) {
 				return message.$eventLine;
 			}
-			var line = message.$eventText + " - " + moment(message.$eventTime).fromNow();
+			var line = message.$eventText
+				+ " - "
+				+ "<a href='javascript:void(0)' title='" + moment(message.$eventTime).format('DD/MM/YYYY HH:mm') + "'>"
+				+ moment(message.$eventTime).fromNow()
+				+ "</a>";
 			message.$eventLine = line;
 			return line;
 		};

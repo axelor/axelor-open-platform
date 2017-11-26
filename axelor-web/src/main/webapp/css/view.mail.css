@@ -180,6 +180,10 @@
 	font-size: smaller;
 }
 
+.mail-thread .mail-message-footer a {
+    cursor: pointer;
+}
+
 .mail-thread .mail-message-files {
 	margin: 4px 0 4px -4px;
 }
