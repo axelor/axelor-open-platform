@@ -15,7 +15,7 @@
   <form name="mail-thread-inbox" title="Inbox" model="com.axelor.mail.db.MailMessage" width="100%"
         css="mail-thread-view">
     <panel showIf="__empty" hidden="true" x-item-span="12">
-      <label title="Inbox is empty!" css="label-bold label-large"/>
+      <label name="__empty" title="Inbox is empty!" css="label-bold label-large"/>
       <label title="Come back later. There are no messages in this folder..." css="label-italic label-big" />
     </panel>
     <panel-mail>
@@ -26,7 +26,7 @@
   <form name="mail-thread-important" title="Important" model="com.axelor.mail.db.MailMessage" width="100%"
         css="mail-thread-view">
     <panel showIf="__empty" hidden="true" x-item-span="12">
-      <label title="No important messages!" css="label-bold label-large"/>
+      <label name="__empty" title="No important messages!" css="label-bold label-large"/>
       <label title="Come back later. There are no messages in this folder..." css="label-italic label-big" />
     </panel>
     <panel-mail>
@@ -37,7 +37,7 @@
   <form name="mail-thread-archive" title="Archived" model="com.axelor.mail.db.MailMessage" width="100%"
         css="mail-thread-view">
     <panel showIf="__empty" hidden="true" x-item-span="12">
-      <label title="No archived messages!" css="label-bold label-large"/>
+      <label name="__empty" title="No archived messages!" css="label-bold label-large"/>
       <label title="Come back later. There are no messages in this folder..." css="label-italic label-big" />
     </panel>
     <panel-mail>
@@ -54,6 +54,7 @@
   <action-view name="mail.unread" model="com.axelor.mail.db.MailMessage" title="Unread">
     <view name="mail-thread-inbox" type="form" />
     <view-param name="show-toolbar" value="false"/>
+    <view-param name="forceTitle" value="true"/>
   </action-view>
 
   <action-view name="mail.important" model="com.axelor.mail.db.MailMessage" title="Important">
