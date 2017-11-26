@@ -172,17 +172,34 @@ ui.directive('reportTable',  function() {
 			var fields = {};
 			var schema = scope.$parent.$parent.schema;
 
-			(scope.columns||'').split(',').forEach(function (name) {
-				var field = _.findWhere(schema.items, { name: name }) || {};
-				var col = _.extend({}, field, field.widgetAttrs, {
-					name: name,
-					title: _.humanize(name)
+			function makeColumns(names) {
+				cols = [];
+				fields = {};
+				_.each(names, function (name) {
+					var field = _.findWhere(schema.items, { name: name }) || {};
+					var col = _.extend({}, field, field.widgetAttrs, {
+						name: name,
+						title: _.humanize(name)
+					});
+					fields[name] = col;
+					cols.push(col);
 				});
-				fields[name] = col;
-				cols.push(col);
-			});
+				scope.cols = cols;
+			}
 
-			scope.cols = cols;
+			if (scope.columns) {
+				makeColumns((scope.columns||'').split(','));
+			} else {
+				var unwatch = scope.$watch('data', function (data) {
+					if (data) {
+						unwatch();
+						var first = _.first(data) || {};
+						var names = _.keys(first).filter(function (name) { return name !== '$$hashKey'; });
+						makeColumns(names.sort());
+					}
+				});
+			}
+
 			scope.sums = sums;
 
 			scope.format = function(value, name) {
