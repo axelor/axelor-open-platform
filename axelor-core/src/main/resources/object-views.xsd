@@ -3189,7 +3189,7 @@
               <xsd:enumeration value="pdf" />
               <xsd:enumeration value="html" />
               <xsd:enumeration value="doc" />
-              <xsd:enumeration value="xsl" />
+              <xsd:enumeration value="xls" />
             </xsd:restriction>
           </xsd:simpleType>
         </xsd:attribute>
