@@ -471,7 +471,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 						fetchMissing(value.id);
 					}
 					scope.$applyAsync(function () {
-						scope.$broadcast("on:record-change", value);
+						scope.$broadcast("on:record-change", value || {});
 					});
 					// if it's an o2m editor, make sure to update values
 					if (scope.$itemsChanged) {
@@ -480,7 +480,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 				};
 				scope.$watch('record', _.debounce(watchRun, 100), true);
 				scope.$timeout(function () {
-					scope.$broadcast("on:record-change", scope.record);
+					scope.$broadcast("on:record-change", scope.record || {});
 				});
 			}
 
