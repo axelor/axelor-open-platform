@@ -795,7 +795,7 @@ function Chart(scope, element, data) {
 			chart.yAxis.axisLabel(data.yTitle);
 		}
 
-		var margin = null;
+		var margin = data.xType === 'date' ? { 'bottom': 65 } : null;
 		['top', 'left', 'bottom', 'right'].forEach(function (side) {
 			var key = 'margin-' + side;
 			var val = parseInt(config[key]);
