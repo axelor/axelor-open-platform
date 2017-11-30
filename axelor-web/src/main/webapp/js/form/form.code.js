@@ -105,6 +105,7 @@ ui.formInput('CodeEditor', {
 		}
 
 		function resize() {
+			if (element[0].offsetHeight === 0) return; // is hidden?
 			if (editor) {
 				editor.refresh();
 			}
