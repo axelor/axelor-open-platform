@@ -2078,9 +2078,13 @@ Grid.prototype.onSelectionChanged = function(event, args) {
 	if (this.handler.onSelectionChanged) {
 		this.handler.onSelectionChanged(event, args);
 	}
-	if (!args.rows.length) {
-		this.element.find('.slick-row.active').removeClass('active');
-	}
+	this.element.find(' > .slick-viewport > .grid-canvas > .slick-row')
+		.removeClass('selected')
+		.find(' > .slick-cell.selected')
+		.parent()
+		.each(function () {
+			$(this).addClass('selected');
+		});
 };
 
 Grid.prototype.onCellChange = function(event, args) {

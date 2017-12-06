@@ -85,7 +85,7 @@
 	height: 100% !important;
 }
 
-.slick-row.active,
+.slick-row.selected,
 .slick-row .slick-cell.selected {
   	background-color: #abb9d3;
 }
