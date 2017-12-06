@@ -306,6 +306,24 @@ ui.directive('uiDialogSize', function() {
 				elemDialog.removeClass('maximized');
 			});
 		});
+		var addCollapseButton = _.once(function () {
+			var elemDialog = element.parent();
+			var elemTitle = elemDialog.find('.ui-dialog-title');
+			$('<a href="#" class="ui-dialog-titlebar-collapse"><i class="fa fa-chevron-up"></i></a>')
+			.click(function (e) {
+				$(this).children('i').toggleClass('fa-chevron-up fa-chevron-down');
+				elemDialog.toggleClass('collapsed');
+				axelor.$adjustSize();
+				return false;
+			}).insertAfter(elemTitle);
+
+			// remove maximized and collapsed states on close
+			element.on('dialogclose', function(e, ui) {
+				elemTitle.parent().find('i.fa-compress').toggleClass('fa-expand fa-compress');
+				elemTitle.parent().find('i.fa-chevron-down').toggleClass('fa-chevron-down fa-chevron-up');
+				elemDialog.removeClass('maximized collapsed');
+			});
+		});
 
 		function doAdjust() {
 			element.dialog('open');
@@ -318,6 +336,7 @@ ui.directive('uiDialogSize', function() {
 
 		function doShow() {
 			addMaximizeButton();
+			addCollapseButton();
 			if (loaded) {
 				return setTimeout(doAdjust);
 			}

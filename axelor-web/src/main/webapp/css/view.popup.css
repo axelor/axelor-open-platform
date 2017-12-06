@@ -97,16 +97,22 @@
 	font-weight: inherit;
 }
 
-.ui-dialog .ui-dialog-titlebar-max {
+.ui-dialog .ui-dialog-titlebar-max,
+.ui-dialog .ui-dialog-titlebar-collapse {
 	position: absolute;
 	right: 1.6em;
 	top: 7px;
 	opacity: 0.2;
 }
-.ui-dialog .ui-dialog-titlebar-max:hover {
+.ui-dialog .ui-dialog-titlebar-max:hover,
+.ui-dialog .ui-dialog-titlebar-collapse:hover {
 	font-weight: bold;
 	color: #212121;
 	opacity: 0.4;
+}
+
+.ui-dialog .ui-dialog-titlebar-collapse {
+    right: 2.6em;  
 }
 
 .ui-dialog .ui-dialog-titlebar-close span::before {
@@ -150,6 +156,11 @@
 	margin-top: 0;
 	padding: .3em .5em .5em .5em;
 	flex: 0 0 auto;
+}
+
+.ui-dialog.collapsed .ui-dialog-content,
+.ui-dialog.collapsed .ui-dialog-buttonpane {
+    display: none !important; 
 }
 
 .ui-dialog-buttonpane .btn-group > .btn {
