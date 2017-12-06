@@ -2075,8 +2075,12 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 };
 
 Grid.prototype.onSelectionChanged = function(event, args) {
-	if (this.handler.onSelectionChanged)
+	if (this.handler.onSelectionChanged) {
 		this.handler.onSelectionChanged(event, args);
+	}
+	if (!args.rows.length) {
+		this.element.find('.slick-row.active').removeClass('active');
+	}
 };
 
 Grid.prototype.onCellChange = function(event, args) {
