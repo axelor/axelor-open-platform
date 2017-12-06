@@ -561,7 +561,21 @@ function GridViewCtrl($scope, $element) {
 			$scope.reload();
 		}
 	};
-	
+
+	$scope.isDirty = function () {
+		if ($scope.$details && $scope.$details.isDirty) {
+			return $scope.$details.isDirty();
+		}
+		return false;
+	};
+
+	$scope.confirmDirty = function(callback, cancelCallback) {
+		if ($scope.$details && $scope.$details.confirmDirty) {
+			return $scope.$details.confirmDirty(callback, cancelCallback);
+		}
+		return callback();
+	};
+
 	$scope.reload = function() {
 		var fields = $scope.selectFields();
 		return ds.search({

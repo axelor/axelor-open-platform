@@ -477,9 +477,6 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 		if (viewScope && viewScope.isDirty) {
 			return viewScope.isDirty();
 		}
-		if (viewScope && viewScope.$details && viewScope.$details.isDirty) {
-			return viewScope.$details.isDirty();
-		}
 		return false;
 	};
 
