@@ -1238,6 +1238,17 @@ Grid.prototype._doInit = function(view) {
 		grid.invalidate();
 		grid.autosizeColumns();
 	});
+	
+	var onColumnsResized = false;
+	this.subscribe(grid.onColumnsResized, function (e, args) {
+		onColumnsResized = true;
+	});
+
+	scope.$on('grid:adjust-columns', function () {
+		if (!onColumnsResized) {
+			grid.autosizeColumns();
+		}
+	});
 };
 
 Grid.prototype.subscribe = function(event, handler) {

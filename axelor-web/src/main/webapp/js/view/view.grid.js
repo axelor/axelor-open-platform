@@ -187,6 +187,8 @@ function GridViewCtrl($scope, $element) {
 		} else {
 			syncSelection();
 		}
+
+		$scope.$broadcast('grid:adjust-columns');
 	};
 
 	$scope.attr = function (name) {
