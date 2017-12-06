@@ -382,6 +382,9 @@ public class Field extends SimpleWidget {
 	}
 
 	public String getRelated() {
+		if (StringUtils.isBlank(related) && StringUtils.notBlank(widget) && widget.matches("RefSelect|ref-select")) {
+			return getName() + "Id";
+		}
 		return related;
 	}
 

@@ -712,7 +712,7 @@ ui.formInput('RefSelect', {
 			var setValue = selectScope.setValue;
 			selectScope.setValue = function (value) {
 				var old = scope.getValue();
-				if (old !== value) {
+				if (old !== value && scope.record) {
 					scope.record[related] = null;
 				}
 				setValue.apply(selectScope, arguments);

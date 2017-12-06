@@ -483,6 +483,9 @@
 						} else if (child.type === 'panel') {
 							acceptItems(child.items);
 						}
+						if (/RefSelect|ref-select/.test(child.widget)) {
+							collect.push(child.related);
+						}
 					});
 				};
 				acceptItems(editor.items);

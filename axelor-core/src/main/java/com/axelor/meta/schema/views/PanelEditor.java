@@ -102,6 +102,11 @@ public class PanelEditor extends AbstractPanel {
 
 		if (widget instanceof Field) {
 			all.add(((Field) widget).getName());
+			// include related field for ref-select widget
+			String relatedAttr = ((Field) widget).getRelated();
+			if (StringUtils.notBlank(relatedAttr)) {
+				all.add(relatedAttr);
+			}
 			return all;
 		}
 
