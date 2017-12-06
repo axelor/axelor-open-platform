@@ -215,7 +215,9 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 			}
 		});
 		scope.$on("on:grid-selection-change", function(e, context) {
-			handle(context);
+			if (!scope._isDetailsForm) {
+				handle(context);
+			}
 		});
 
 		scope.$watch("isReadonly()", watcher);

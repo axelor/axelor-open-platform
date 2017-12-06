@@ -774,6 +774,7 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
 
 			params.views = [view];
 			$scope._viewParams = params;
+			$scope._isDetailsForm = true;
 
 			ui.ViewCtrl.call(this, $scope, DataSource, ViewService);
 
