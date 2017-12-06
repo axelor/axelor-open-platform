@@ -181,8 +181,9 @@
 
 .ui-dialog-titlebar .record-pager {
 	position: absolute;
-	right: 60px;
-	top: 6px;
+	right: 76px;
+    top: 8px;
+    line-height: 25px;
 }
 
 .ui-dialog-titlebar .record-pager-text {
