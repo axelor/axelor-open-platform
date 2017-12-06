@@ -486,6 +486,11 @@
 						if (/RefSelect|ref-select/.test(child.widget)) {
 							collect.push(child.related);
 						}
+						if (child.depends) {
+							child.depends.split(/\s*,\s*/).forEach(function (name) {
+								collect.push(name);
+							});
+						}
 					});
 				};
 				acceptItems(editor.items);
