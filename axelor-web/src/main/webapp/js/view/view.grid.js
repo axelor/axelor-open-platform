@@ -796,9 +796,12 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
 			}
 
 			$scope.selectionChanged = _.debounce(function (selection) {
+				var current = $scope.record || {};
 				var first = _.first(selection);
 				if (first !== undefined) {
 					doEdit(first);
+				} else if (current.id > 0) {
+					$scope.edit(null);
 				}
 			}, 300);
 
