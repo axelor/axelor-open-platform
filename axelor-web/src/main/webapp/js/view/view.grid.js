@@ -149,6 +149,13 @@ function GridViewCtrl($scope, $element) {
 	$scope.setItems = function(items, pageInfo) {
 
 		var dataView = $scope.dataView;
+		var syncSelection = function () {
+			if (dataView.$syncSelection) {
+				setTimeout(function(){
+					dataView.$syncSelection();
+				});
+			}
+		};
 		
 		//XXX: clear existing items (bug?)
 		if (dataView.getLength()) {
@@ -164,15 +171,21 @@ function GridViewCtrl($scope, $element) {
 		if (pageInfo) {
 	    	page = pageInfo;
 		}
-		
-		if (dataView.$syncSelection) {
-			setTimeout(function(){
-				dataView.$syncSelection();
-			});
-		}
 
-		if ($scope.$details) {
-			$scope.$details.editRecord(null);
+		var details = $scope.$details;
+		if (details) {
+			details.$timeout(function () {
+				var record = details.record || {};
+				var found = _.findWhere(items, { id: record.id });
+				if (found) {
+					found.selected = true;
+					return;
+				}
+				details.edit(null);
+				syncSelection();
+			});
+		} else {
+			syncSelection();
 		}
 	};
 
@@ -775,6 +788,8 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
 			
 			function doEdit(index) {
 				var found = ds.at(index);
+				var record = $scope.record;
+				if (record && found.id === record.id) return;
 				$scope.doRead(found.id).success(function(record) {
 					$scope.edit(record);
 				});
@@ -786,6 +801,25 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
 					doEdit(first);
 				}
 			}, 300);
+
+			$scope.$on("on:new", function(e) {
+				var dataView = parent.dataView;
+				if (dataView && dataView.$syncSelection) {
+					dataView.$syncSelection([], [], true);
+				}
+			});
+			
+			$scope.$on("on:edit", function(e) {
+				var record = $scope.record || {};
+				var dataView = parent.dataView;
+				if (dataView && record.id > 0) {
+					var found = _.findWhere(dataView.getItems(), { id: record.id });
+					if (found) {
+						found.selected = true;
+					}
+					dataView.$syncSelection([], [], false);
+				}
+			});
 		}],
 		link: function (scope, element, attrs) {
 			var overlay = $("<div class='slickgrid-overlay'>");
