@@ -154,7 +154,7 @@ class EnumType {
 	}
 	
 	String getImplementsCode() {
-		if (numeric) {
+		if (numeric || valueEnum) {
 			importManager.importType("java.util.Objects")
 		}
 		importManager.importType("com.axelor.db.ValueEnum")
