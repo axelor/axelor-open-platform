@@ -25,6 +25,7 @@ import javax.script.Bindings;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
 import com.axelor.db.Model;
+import com.axelor.db.ValueEnum;
 import com.axelor.internal.javax.el.BeanELResolver;
 import com.axelor.internal.javax.el.ELClass;
 import com.axelor.internal.javax.el.ELContext;
@@ -66,6 +67,9 @@ public class ELScriptHelper extends AbstractScriptHelper {
 				cls = JpaScanner.findRepository(property.toString());
 			}
 			if (cls == null) {
+				cls = JpaScanner.findEnum(property.toString());
+			}
+			if (cls == null) {
 				return null;
 			}
 
@@ -101,11 +105,16 @@ public class ELScriptHelper extends AbstractScriptHelper {
 	
 	class BeanResolver extends BeanELResolver {
 		
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		@Override
 		public Object getValue(ELContext context, Object base, Object property) {
 			if (base instanceof Map<?, ?> && ((Map<?, ?>) base).containsKey(property)) {
 				context.setPropertyResolved(true);
 				return ((Map<?, ?>) base).get(property);
+			}
+			if (base instanceof Class<?> && ((Class<?>) base).isEnum()) {
+				context.setPropertyResolved(true);
+				return ValueEnum.of((Class) base, property);
 			}
 			return super.getValue(context, base, property);
 		}
