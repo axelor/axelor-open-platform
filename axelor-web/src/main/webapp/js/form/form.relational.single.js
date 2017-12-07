@@ -441,10 +441,14 @@ ui.formInput('ManyToOne', 'Select', {
 		scope.handleEnter = function (e) {
 			var widget = input.autocomplete('widget');
 			if (widget) {
-				var item = widget.find('li:first').data('ui-autocomplete-item');
-				if (item) {
+				var item = widget.find('li .ui-state-focus').parent();
+				if (item.size() === 0) {
+					item = widget.find('li:first');
+				}
+				var data = item.data('ui-autocomplete-item');
+				if (data) {
 					input.autocomplete('close');
-					scope.select(item.value);
+					scope.select(data.value);
 				}
 			}
 		};
