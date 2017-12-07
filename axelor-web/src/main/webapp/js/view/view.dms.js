@@ -1265,7 +1265,7 @@ ui.directive("uiDmsDetails", function () {
 		}],
 		link: function (scope, element, attrs) {
 			//XXX: ui-dialog issue
-			element.zIndex(element.siblings(".slickgrid").zIndex() + 1);
+			element.zIndex(element.siblings(".slickgrid").zIndex() + 2);
 		}
 	};
 });
@@ -1592,7 +1592,7 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 					setTimeout(function () {
 						//XXX: ui-dialog issue
 						element.find('.filter-box').zIndex(element.zIndex() + 1);
-					});
+					}, 100);
 				}
 
 				if (!formScope) {
