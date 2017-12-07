@@ -1089,10 +1089,15 @@
     <xsd:annotation>
       <xsd:documentation>Define enumeration item.</xsd:documentation>
     </xsd:annotation>
-    <xsd:attribute name="name" type="xsd:string" use="required">
+    <xsd:attribute name="name" use="required">
       <xsd:annotation>
         <xsd:documentation>Enumeration item name.</xsd:documentation>
       </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="[A-Z][A-Z0-9_]*[A-Z0-9]" />
+        </xsd:restriction>
+      </xsd:simpleType>
     </xsd:attribute>
     <xsd:attribute name="title" type="xsd:string">
       <xsd:annotation>
@@ -1126,7 +1131,7 @@
       </xsd:annotation>
       <xsd:simpleType>
         <xsd:restriction base="xsd:string">
-          <xsd:pattern value="(([a-z][a-zA-Z0-9]+)(\.[a-z][a-zA-Z0-9]+)*\.)?([A-Z][a-zA-Z0-9]+)" />
+          <xsd:pattern value="[A-Z][a-zA-Z0-9_]+" />
         </xsd:restriction>
       </xsd:simpleType>
     </xsd:attribute>
