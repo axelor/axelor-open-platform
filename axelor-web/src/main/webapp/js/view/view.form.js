@@ -875,19 +875,22 @@ function FormViewCtrl($scope, $element) {
 	};
 
 	var __switchTo = $scope.switchTo;
-	var __switchBack = null;
 
 	$scope.switchBack = function () {
-		if (__switchBack === null) {
-			var views = ($scope._viewParams||{}).views || [];
-			for (var i = 0 ; i < views.length; i++) {
-				var view = views[i];
-				if (view.type !== "form") {
-					__switchBack = view.type;
-					break;
-				}
-			}
-		}
+		var __switchBack = null;
+        if($scope._viewTypeLast && $scope._viewTypeLast !== "form") {
+            __switchBack = $scope._viewTypeLast;
+        }
+        if (__switchBack === null) {
+            var views = ($scope._viewParams||{}).views || [];
+            for (var i = 0 ; i < views.length; i++) {
+                var view = views[i];
+                if (view.type !== "form") {
+                    __switchBack = view.type;
+                    break;
+                }
+            }
+        }
 		if (__switchBack) {
 			return $scope.switchTo(__switchBack);
 		}
