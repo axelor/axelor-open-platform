@@ -54,6 +54,9 @@ public interface ValueEnum<T> {
 		if (value == null) {
 			throw new NullPointerException("Value is null.");
 		}
+		if (value instanceof Enum) {
+			return enumType.cast(value);
+		}
 		if (ValueEnum.class.isAssignableFrom(enumType)) {
 			for (T item : enumType.getEnumConstants()) {
 				if (Objects.equals(((ValueEnum<?>) item).getValue(), value)) {

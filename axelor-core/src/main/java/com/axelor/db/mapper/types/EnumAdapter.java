@@ -34,6 +34,9 @@ public class EnumAdapter implements TypeAdapter<Enum<?>> {
 		if (!actualType.isEnum()) {
 			throw new IllegalArgumentException("Given type is not enum: " + actualType.getName());
 		}
+		if (value instanceof Enum) {
+			return value;
+		}
 		return ValueEnum.class.isAssignableFrom(actualType)
 				? ValueEnum.of(actualType.asSubclass(Enum.class), value)
 				: Enum.valueOf(actualType.asSubclass(Enum.class), value.toString());
