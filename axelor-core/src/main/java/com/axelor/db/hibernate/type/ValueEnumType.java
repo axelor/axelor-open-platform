@@ -31,8 +31,8 @@ import org.hibernate.usertype.UserType;
 
 import com.axelor.db.ValueEnum;
 
-@SuppressWarnings("unchecked")
-public class ValueEnumType implements DynamicParameterizedType, UserType {
+@SuppressWarnings({ "unchecked", "serial" })
+public class ValueEnumType implements DynamicParameterizedType, UserType, Serializable {
 
 	private int sqlType;
 
