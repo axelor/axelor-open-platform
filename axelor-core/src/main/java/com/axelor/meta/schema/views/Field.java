@@ -351,11 +351,14 @@ public class Field extends SimpleWidget {
 	}
 
 	public List<?> getSelectionList() {
-		if (StringUtils.notBlank(getEnumType())) {
+		final String typeName = StringUtils.isBlank(enumType) && "enum".equals(serverType)
+				? target
+				: enumType;
+		if (StringUtils.notBlank(typeName)) {
 			try {
-				return MetaStore.getSelectionList(Class.forName(getEnumType()));
+				return MetaStore.getSelectionList(Class.forName(typeName));
 			} catch (ClassNotFoundException e) {
-				throw new RuntimeException("No such enum type found: " + getEnumType(), e);
+				throw new RuntimeException("No such enum type found: " + typeName, e);
 			}
 		}
 		return MetaStore.getSelectionList(getSelection());
