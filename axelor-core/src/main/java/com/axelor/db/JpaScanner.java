@@ -59,9 +59,11 @@ public class JpaScanner extends AbstractScannerImpl {
 
 	private static Map<String, Class<?>> modelCache = new HashMap<>();
 	private static Map<String, Class<?>> repoCache = new HashMap<>();
+	private static Map<String, Class<?>> enumCache = new HashMap<>();
 
 	private static Map<String, String> modelNames = new HashMap<>();
 	private static Map<String, String> repoNames = new HashMap<>();
+	private static Map<String, String> enumNames = new HashMap<>();
 
 	private static Set<String> excludes = new HashSet<>();
 	private static Set<String> includes = new HashSet<>();
@@ -165,9 +167,32 @@ public class JpaScanner extends AbstractScannerImpl {
 				}
 				log.debug("Repository classes found: {}", repoCache.size());
 			});
+			final Future<?> enums = executor.submit(() -> {
+				log.debug("Searching for value enum classes...");
+				enumCache.clear();
+				enumNames.clear();
+	
+				ClassFinder<?> finder = MetaScanner.findSubTypesOf(ValueEnum.class);
+	
+				for (String pkg : includes) {
+					finder = finder.within(pkg);
+				}
+	
+				for (Class<?> klass : finder.any().find()) {
+					if (enumCache.containsKey(klass.getName()) ||
+						excludes.contains(klass.getPackage().getName())) {
+						continue;
+					}
+					log.trace("Found value enum: {}", klass.getName());
+					enumCache.put(klass.getName(), klass);
+					enumNames.put(klass.getSimpleName(), klass.getName());
+				}
+				log.debug("Value enum classes found: {}", modelCache.size());
+			});
 			try {
 				models.get();
 				repos.get();
+				enums.get();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			} finally {
@@ -211,5 +236,14 @@ public class JpaScanner extends AbstractScannerImpl {
 			}
 		}
 		return repoCache.get(repoNames.getOrDefault(name, name));
+	}
+	
+	public static Class<?> findEnum(String name) {
+		synchronized (lock) {
+			if (modelCache.isEmpty()) {
+				findClasses();
+			}
+		}
+		return enumCache.get(enumNames.getOrDefault(name, name));
 	}
 }

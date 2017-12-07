@@ -52,10 +52,13 @@ public class JpaClassLoader extends ClassLoader {
 		if (!className.startsWith("java.lang.") || className.contains("$")) {
 			return null;
 		}
-		final String name = className.substring(className.lastIndexOf('.') + 1);
-		final Class<?> klass = JpaScanner.findRepository(name);
+		String name = className.substring(className.lastIndexOf('.') + 1);
+		Class<?> klass = JpaScanner.findRepository(name);
 		if (klass == null) {
-			return JpaScanner.findModel(name);
+			klass = JpaScanner.findModel(name);
+		}
+		if (klass == null) {
+			klass = JpaScanner.findEnum(name);
 		}
 		return klass;
 	}
