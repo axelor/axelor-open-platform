@@ -316,9 +316,16 @@ input, button, textarea, select, fieldset, pre {
 .panel .panel-related .panel-header,
 .panel-tabs .panel-related .panel-header,
 .panel .dashboard .dashlet-header,
-.panel-tabs .dashboard .dashlet-header {
+.panel-tabs .dashboard .dashlet-header,
+.panel .one2many-item > .navbar .navbar-inner,
+.panel-tabs .one2many-item > .navbar .navbar-inner {
   border: 0;
   padding: 8px 2px;
+}
+
+.panel .one2many-item > .slickgrid,
+.panel-tabs .one2many-item > .slickgrid {
+  top: 34px;
 }
 
 .panel .panel-related,
@@ -326,6 +333,7 @@ input, button, textarea, select, fieldset, pre {
 .panel .form-item .dashlet,
 .panel-tabs .form-item .dashlet {
   border: 0;
+  box-shadow: none;
 }
 
 .panel .panel-related .panel-body .slickgrid,
@@ -336,7 +344,8 @@ input, button, textarea, select, fieldset, pre {
   height: calc(100% - 2px);
 }
 
-.panel-related .panel-header .icons-bar > a {
+.panel-related .panel-header .icons-bar > a,
+.one2many-item .navbar .icons-bar > a {
   margin-left: 16px;
 }
 

@@ -664,32 +664,49 @@ ui.formInput('OneToMany', {
 	template_readonly: null,
 	
 	template:
-	'<div class="stackbar" ng-class="{noEdit: canView() && !canEdit()}">'+
-	'<div class="navbar">'+
-		'<div class="navbar-inner">'+
-			'<div class="container-fluid">'+
-				'<span class="brand" href="" ui-help-popover ng-bind-html="title"></span>'+
-				'<span class="icons-bar pull-right" ng-show="!isReadonly()">'+
-					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowEdit()" title="{{\'Edit\' | t}}" class="fa fa-pencil"></i>'+
-					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowView()" title="{{\'View\' | t}}" class="fa fa-file-text-o"></i>'+
-					'<i ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled() && canNew()" title="{{\'New\' | t}}" class="fa fa-plus"></i>'+
-					'<i ng-click="onCopy()" ng-show="hasPermission(\'create\') && !isDisabled() && canCopy()" title="{{\'Duplicate\' | t}}" class="fa fa-files-o"></i>' +
-					'<i ng-click="onRemove()" ng-show="hasPermission(\'remove\') && !isDisabled() && canRemove()" title="{{\'Remove\' | t}}" class="fa fa-minus"></i>'+
-					'<i ng-click="onSelect()" ng-show="hasPermission(\'read\') && !isDisabled() && canSelect()" title="{{\'Select\' | t}}" class="fa fa-search"></i>'+
-				'</span>'+
-			'</div>'+
-		'</div>'+
-	'</div>'+
-	'<div ui-view-grid ' +
-		'x-view="schema" '+
-		'x-data-view="dataView" '+
-		'x-handler="this" '+
-		'x-no-filter="true" '+
-		'x-on-init="onGridInit" '+
-		'x-on-before-save="onGridBeforeSave" '+
-		'x-on-after-save="onGridAfterSave" '+
-		'></div>'+
-	'</div>'
+	"<div class='stackbar' ng-class='{noEdit: canView() && !canEdit()}'>" +
+	"<div class='navbar'>" +
+	    "<div class='navbar-inner'>" +
+	        "<div class='container-fluid'>" +
+	            "<span class='brand' href='' ui-help-popover ng-bind-html='title'></span>" +
+	    		"<span class='icons-bar dropdown pull-right' ng-show='viewCanCopy() || viewCanExport()'>" +
+					"<a href='' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-caret-down'></i></a>" +
+					"<ul class='dropdown-menu'>" +
+						"<li ng-show='viewCanCopy()'><a href='' ng-click='onCopy()' x-translate>Duplicate</a></li>" +
+						"<li ng-show='viewCanExport()'><a href='' ng-click='onExport()' x-translate>Export</a></li>" +
+					"</ul>" +
+				"</span>" +
+	            "<span class='icons-bar pull-right' ng-show='!isReadonly()'>" +
+					"<a href='' ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()'>" +
+						"<i class='fa fa-search'></i><span x-translate>Select</span>" +
+					"</a>" +
+					"<a href='' ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()'>" +
+						"<i class='fa fa-plus'></i><span x-translate>New</span>" +
+					"</a>" +
+					"<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()'>" +
+						"<i class='fa fa-pencil'></i><span x-translate>Edit</span>" +
+					"</a>" +
+					"<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowView()'>" +
+						"<i class='fa fa-file-text-o'></i><span x-translate>Show</span>" +
+					"</a>" +
+					"<a href='' ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()'>" +
+						"<i class='fa fa-remove'></i><span x-translate>Remove</span>" +
+					"</a>" +
+	                "<i ng-click='onCopy()' ng-show='hasPermission(\"create\") && !isDisabled() && canCopy()' title='{{\"Duplicate\" | t}}' class='fa fa-files-o'></i>" +
+	            "</span>" +
+	        "</div>" +
+	    "</div>" +
+	"</div>" +
+	"<div ui-view-grid " +
+	    "x-view='schema' " +
+	    "x-data-view='dataView' " +
+	    "x-handler='this' " +
+	    "x-no-filter='true' " +
+	    "x-on-init='onGridInit' " +
+	    "x-on-before-save='onGridBeforeSave' " +
+	    "x-on-after-save='onGridAfterSave' " +
+	    "></div>" +
+	"</div>"
 });
 
 ui.formInput('ManyToMany', 'OneToMany', {
