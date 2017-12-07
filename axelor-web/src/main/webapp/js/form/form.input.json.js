@@ -64,7 +64,7 @@ ui.formInput('JsonField', 'String', {
 			if (item.contextField && item.contextFieldValue) {
 				var condition = "$record." + item.contextField + ".id === " + item.contextFieldValue;
 				if (item.showIf) {
-					item.showIf = "(" + item.showIf + ") and (" + condition + ")";
+					item.showIf = "(" + item.showIf + ") && (" + condition + ")";
 				} else {
 					item.showIf = condition;
 				}
