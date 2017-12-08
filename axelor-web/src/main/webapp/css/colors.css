@@ -318,13 +318,17 @@ input, button, textarea, select, fieldset, pre {
 .panel .dashboard .dashlet-header,
 .panel-tabs .dashboard .dashlet-header,
 .panel .one2many-item > .navbar .navbar-inner,
-.panel-tabs .one2many-item > .navbar .navbar-inner {
+.panel-tabs .one2many-item > .navbar .navbar-inner,
+.panel .many2many-item > .navbar .navbar-inner,
+.panel-tabs .many2many-item > .navbar .navbar-inner {
   border: 0;
   padding: 8px 2px;
 }
 
 .panel .one2many-item > .slickgrid,
-.panel-tabs .one2many-item > .slickgrid {
+.panel-tabs .one2many-item > .slickgrid,
+.panel .many2many-item > .slickgrid,
+.panel-tabs .many2many-item > .slickgrid {
   top: 34px;
 }
 
@@ -345,7 +349,8 @@ input, button, textarea, select, fieldset, pre {
 }
 
 .panel-related .panel-header .icons-bar > a,
-.one2many-item .navbar .icons-bar > a {
+.one2many-item .navbar .icons-bar > a,
+.many2many-item .navbar .icons-bar > a {
   margin-left: 16px;
 }
 
