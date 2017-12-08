@@ -443,9 +443,10 @@ ui.formInput('ManyToOne', 'Select', {
 			if (widget) {
 				var item = widget.find('li .ui-state-focus').parent();
 				if (item.size() === 0) {
-					item = widget.find('li:first');
+					item = widget.find('li:not(.tag-select-action)');
+					item = item.size() === 1 ? item.first() : null;
 				}
-				var data = item.data('ui-autocomplete-item');
+				var data = item ? item.data('ui-autocomplete-item') : null;
 				if (data) {
 					input.autocomplete('close');
 					scope.select(data.value);
