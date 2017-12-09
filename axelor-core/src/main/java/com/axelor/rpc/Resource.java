@@ -714,27 +714,24 @@ public class Resource<T extends Model> {
 			return values;
 		}
 		final Mapper mapper = Mapper.of(model);
-		for (final String name : related.keySet()) {
-			final String[] names = related.get(name).toArray(new String[] {});
-			Object old = values.get(name);
-			Object value = mapper.get(entity, name);
-			if (value instanceof Collection<?>) {
-				value = Collections2.transform(
-					(Collection<?>) value,
-					new Function<Object, Object>() {
-						@Override
-						public Object apply(Object input) {
-							return toMap(input, names);
-						}
-					});
-			} else if (value instanceof Model) {
-				value = toMap(value, names);
-				if (old instanceof Map) {
-					value = mergeMaps((Map) value, (Map) old);
+		related.entrySet().stream()
+			.filter(e -> e.getValue() != null)
+			.filter(e -> e.getValue().size() > 0)
+			.forEach(e -> {
+				final String name = e.getKey();
+				final String[] names = e.getValue().toArray(new String[] {});
+				Object old = values.get(name);
+				Object value = mapper.get(entity, name);
+				if (value instanceof Collection<?>) {
+					value = Collections2.transform((Collection<?>) value, input -> toMap(input, names));
+				} else if (value instanceof Model) {
+					value = toMap(value, names);
+					if (old instanceof Map) {
+						value = mergeMaps((Map) value, (Map) old);
+					}
 				}
-			}
-			values.put(name, value);
-		}
+				values.put(name, value);
+			});
 		return values;
 	}
 
