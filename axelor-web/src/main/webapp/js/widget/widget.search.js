@@ -687,6 +687,9 @@ function FilterFormCtrl($scope, $element, ViewService) {
 			
 			if (filter.operator == 'in' ||
 				filter.operator == 'notIn') {
+				if (_.isEmpty(filter.value)) {
+					return;
+				}
 				criterion.fieldName += '.id';
 			} else if (filter.targetName && criterion.fieldName.indexOf(':') == -1 && (
 					filter.operator !== 'isNull' ||
