@@ -31,6 +31,9 @@ var OPERATORS = {
 
 	"like" 		: _t("contains"),
 	"notLike"	: _t("doesn't contain"),
+	
+	"in" 		: _t("contains"),
+	"notIn"	: _t("doesn't contain"),
 
 	"between"		: _t("in range"),
 	"notBetween"	: _t("not in range"),
@@ -54,8 +57,12 @@ _.each(["long", "decimal", "date", "time", "datetime"], function(type) {
 	OPERATORS_BY_TYPE[type] = OPERATORS_BY_TYPE.integer;
 });
 
-_.each(["one-to-one", "many-to-one", "one-to-many", "many-to-many"], function(type) {
+_.each(["one-to-many"], function(type) {
 	OPERATORS_BY_TYPE[type] = OPERATORS_BY_TYPE.text;
+});
+
+_.each(["one-to-one", "many-to-one", "many-to-many"], function(type) {
+	OPERATORS_BY_TYPE[type] = ["in", "notIn", "isNull", "notNull"];
 });
 
 ui.directive('uiFilterItem', function() {
@@ -65,7 +72,8 @@ ui.directive('uiFilterItem', function() {
 		require: '^uiFilterForm',
 		scope: {
 			fields: "=",
-			filter: "="
+			filter: "=",
+			model: "="
 		},
 		link: function(scope, element, attrs, form) {
 
@@ -107,9 +115,17 @@ ui.directive('uiFilterItem', function() {
 					   scope.filter.operator == 'isNull' ||
 					   scope.filter.operator == 'notNull');
 			};
+			
+			scope.canShowTags = function() {
+				return scope.filter &&
+				   ['many-to-one', 'one-to-one', 'many-to-many'].indexOf(scope.filter.type) > -1 &&
+				   scope.filter.operator && !(
+				   scope.filter.operator == 'isNull' ||
+				   scope.filter.operator == 'notNull');
+			};
 
 			scope.canShowInput = function() {
-				return scope.filter && !scope.canShowSelect() &&
+				return scope.filter && !scope.canShowSelect() && !scope.canShowTags() &&
 					   scope.filter.operator && !(
 					   scope.filter.type == 'boolean' ||
 					   scope.filter.operator == 'isNull' ||
@@ -192,6 +208,9 @@ ui.directive('uiFilterItem', function() {
 						"<span ng-show='canShowSelect()'>" +
 							"<select ng-model='filter.value' class='input=medium' ng-options='o.value as o.title for o in getSelection()'></select>" +
 						"</span>" +
+						"<span ng-if='canShowTags()'>" +
+							"<div ui-filter-tags x-filter='filter' x-model='model' x-fields='fields'></div>" +
+						"</span>" +
 						"<span ng-show='canShowInput()'>" +
 							"<input type='text' ui-filter-input ng-model='filter.value' class='input-medium'> " +
 						"</span>" +
@@ -202,6 +221,85 @@ ui.directive('uiFilterItem', function() {
 				"</div>" +
 			"</div>"
 	};
+});
+
+ui.directive('uiFilterTags', function() {
+	return {
+		scope: {
+			filter: '=',
+			fields: '=',
+			model: '='
+		},
+		controller: ['$scope', '$element', 'DataSource', 'ViewService',
+			function ($scope, $element, DataSource, ViewService) {
+			
+			var filter = $scope.filter || {};
+			var fields = $scope.fields || {};
+			
+			var field = _.extend({}, fields[filter.field], {
+				required: false,
+				readonly: false,
+				widget: 'tag-select',
+				showTitle: false,
+				canNew: false,
+				canEdit: false,
+				colSpan: 12
+			});
+
+			var schema = {
+				cols: 1,
+				type: 'form',
+				items: [{
+					type: 'panel',
+					items: [field]
+				}]
+			};
+
+			$scope._viewParams = {
+				model: $scope.model,
+				views: [schema],
+				fields: fields
+			};
+
+			ui.ViewCtrl($scope, DataSource, ViewService);
+			ui.FormViewCtrl.call(this, $scope, $element);
+
+			$scope.schema = schema;
+			$scope.schema.loaded = true;
+			
+			$scope.$watch('record.' + filter.field, function (value) {
+				filter.value = _.pluck(value, 'id');
+			});
+
+			function fetchValues(value) {
+				$scope._dataSource._new(field.target).search({
+					fields: [field.targetName],
+					domain: 'self.id in (:ids)',
+					context: { ids: value }
+				}).success(function (records) {
+					var record = {};
+					record[filter.field] = records;
+					$scope.edit(record);
+				});
+			}
+
+			$scope.defaultValues = {};
+			$scope.editRecord = function (record) {
+				if (record && record !== $scope.defaultValues) {
+					$scope.record = record;
+				}
+			};
+
+			$scope.setEditable();
+			$scope.show();
+
+			if (_.isArray(filter.value) && filter.value.length) {
+				fetchValues(filter.value);
+			}
+		}],
+		template:
+			"<div ui-view-form x-handler='true'></div>"
+	}
 });
 
 ui.directive('uiFilterInput', function() {
@@ -584,13 +682,15 @@ function FilterFormCtrl($scope, $element, ViewService) {
 				operator: filter.operator,
 				value: filter.value
 			};
-
-			if (filter.targetName && criterion.fieldName.indexOf(':') == -1 && (
+			
+			if (filter.operator == 'in' ||
+				filter.operator == 'notIn') {
+				criterion.fieldName += '.id';
+			} else if (filter.targetName && criterion.fieldName.indexOf(':') == -1 && (
 					filter.operator !== 'isNull' ||
 					filter.operator !== 'notNull')) {
 				criterion.fieldName += '.' + filter.targetName;
-			}
-			if (/-many/.test(filter.type) && (
+			} else if (/-many/.test(filter.type) && (
 					filter.operator !== 'isNull' ||
 					filter.operator !== 'notNull')) {
 				criterion.fieldName += '.id';
@@ -715,7 +815,7 @@ ui.directive('uiFilterForm', function() {
 					"<input type='checkbox' ng-model='showArchived'><span x-translate>Show archived</span>" +
 				"</label>" +
 			"</form>" +
-			"<div ng-repeat='filter in filters' ui-filter-item x-fields='fields' x-filter='filter'></div>" +
+			"<div ng-repeat='filter in filters' ui-filter-item x-model='model' x-fields='fields' x-filter='filter'></div>" +
 			"<div class='links'>"+
 				"<a href='' ng-click='addFilter()' x-translate>Add filter</a>"+
 				"<span class='divider'>|</span>"+

@@ -1293,6 +1293,35 @@ label.has-help > span:after {
 	margin-bottom: 8px;
 }
 
+.filter-menu .filter-inputs form {
+  margin: 0;
+  padding: 0;
+}
+
+.filter-menu .filter-inputs .panel,
+.filter-menu .filter-inputs .panel .panel-body {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.filter-menu .filter-inputs .tag-select {
+  border: 1px solid #ccc !important;
+  display: block;
+}
+
+.filter-menu .filter-inputs .multi-select-item {
+  margin-bottom: 0 !important;
+}
+
+.filter-menu .filter-inputs .tag-select > .picker-icons {
+  right: 2px;
+}
+
+.filter-menu .filter-inputs .tag-select ul {
+  margin-left: 2px;
+}
+
 .filter-menu input[type=radio],
 .filter-menu input[type=checkbox] {
 	margin-top: 3px;
