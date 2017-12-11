@@ -79,6 +79,7 @@ public class TenantConnectionProvider extends AbstractDataSourceBasedMultiTenant
 		hc.setJdbcUrl(config.getJdbcUrl());
 		hc.setUsername(config.getJdbcUser());
 		hc.setPassword(config.getJdbcPassword());
+		hc.setAutoCommit(false);
 		return new HikariDataSource(hc);
 	}
 
