@@ -115,6 +115,9 @@ public class Field extends SimpleWidget {
 	@XmlAttribute
 	private String aggregate;
 
+	@XmlAttribute
+	private Boolean massUpdate;
+
 	@XmlAttribute(name = "edit-window")
 	private String editWindow;
 
@@ -374,6 +377,14 @@ public class Field extends SimpleWidget {
 
 	public void setAggregate(String aggregate) {
 		this.aggregate = aggregate;
+	}
+
+	public Boolean getMassUpdate() {
+		return massUpdate;
+	}
+
+	public void setMassUpdate(Boolean massUpdate) {
+		this.massUpdate = massUpdate;
 	}
 
 	public String getBind() {

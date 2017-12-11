@@ -246,7 +246,7 @@ function GridViewCtrl($scope, $element) {
 	
 	$scope.canMassUpdate = function () {
 		// this permission is actually calculated from fields marked for mass update
-		return $scope.hasPermission('massUpdate', false);
+		return $scope.hasPermission('massUpdate', false) || ($scope.schema && $scope.schema.canMassUpdate);
 	};
 
 	$scope.canExport = function() {

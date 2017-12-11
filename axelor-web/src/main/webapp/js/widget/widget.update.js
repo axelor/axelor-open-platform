@@ -191,11 +191,11 @@ ui.directive('uiUpdateDummy', function () {
 
 ui.directive('uiUpdateForm',  function () {
 	
-	function findFields(fields) {
+	function findFields(fields, items) {
 		
 		var all = {};
-		
-		_.each(fields, function (field, name) {
+		var accept = function (field) {
+			var name = field.name;
 			if (!field.massUpdate) return;
 			if (/id|version|selected|((updated|created)(On|By))/.test(name)) return;
 			if (field.large || field.unique) return;
@@ -217,6 +217,14 @@ ui.directive('uiUpdateForm',  function () {
 			field.placeholder = field.placeholder || field.title;
 			
 			all[name] = field;
+		};
+
+		_.each(fields, function (field, name) { accept(field); });
+		_.each(items, function (item) {
+			var field = fields[item.name];
+			if (field) {
+				accept(_.extend({}, field, item, { type: field.type }));
+			}
 		});
 
 		return all;
@@ -234,7 +242,7 @@ ui.directive('uiUpdateForm',  function () {
 				var handler = $scope.handler;
 				var promise = ViewService.getFields(handler._model);
 				promise.success(function (fields) {
-					$scope.fields = findFields(fields);
+					$scope.fields = findFields(fields, view.items);
 					$scope.options = _.sortBy(_.values($scope.fields), 'title');
 					$scope.record = {};
 				});

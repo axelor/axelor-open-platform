@@ -2535,6 +2535,7 @@
             </xsd:restriction>
           </xsd:simpleType>
         </xsd:attribute>
+        <xsd:attribute name="massUpdate" type="xsd:boolean" />
         <xsd:attribute name="canSelect" use="prohibited" />
         <xsd:attribute name="edit-window" use="prohibited" />
         <xsd:attribute name="summary-view" use="prohibited" />
