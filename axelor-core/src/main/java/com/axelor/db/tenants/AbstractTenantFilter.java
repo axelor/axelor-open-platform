@@ -20,6 +20,7 @@ package com.axelor.db.tenants;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -50,6 +51,7 @@ public abstract class AbstractTenantFilter implements Filter {
 	protected static final String SESSION_KEY_PREFIX_SHIRO = "org.apache.shiro";
 
 	private boolean enabled;
+	private AtomicBoolean cleared = new AtomicBoolean();
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -66,6 +68,9 @@ public abstract class AbstractTenantFilter implements Filter {
 		if (enabled) {
 			doFilterInternal(request, response, chain);
 		} else {
+			if (!cleared.getAndSet(true)) {
+				((HttpServletRequest) request).removeAttribute(SESSION_KEY_TENANT_MAP);
+			}
 			chain.doFilter(request, response);
 		}
 	}
