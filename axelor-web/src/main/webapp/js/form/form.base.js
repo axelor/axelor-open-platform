@@ -369,7 +369,7 @@ ui.formDirective = function(name, object) {
 				var field = scope.field || {};
 				var template_readonly = self.template_readonly;
 				if (field.viewer) {
-					template_readonly = axelor.$fixTemplate(field.viewer.template);
+					template_readonly = field.viewer.template;
 					scope.$moment = function(d) { return moment(d); };
 					scope.$image = function (fieldName, imageName) { return ui.formatters.$image(scope, fieldName, imageName); };
 					scope.$fmt = function (fieldName, fieldValue) {
@@ -390,8 +390,11 @@ ui.formDirective = function(name, object) {
 				}
 				if (_.isString(template_readonly)) {
 					template_readonly = template_readonly.trim();
-					if (template_readonly[0] !== '<') {
+					if (template_readonly[0] !== '<' || $(template_readonly).size() > 1) {
 						template_readonly = '<span>' + template_readonly + '</span>';
+					}
+					if (field.viewer) {
+						template_readonly = template_readonly.replace(/^(\s*<\w+)/, '$1 ui-panel-viewer');
 					}
 				}
 				if (!scope.$elem_readonly) {

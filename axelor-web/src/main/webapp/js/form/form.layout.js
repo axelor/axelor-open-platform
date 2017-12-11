@@ -339,6 +339,24 @@ ui.directive('uiBarLayout', ['$compile', function($compile) {
 	};
 }]);
 
+ui.directive('uiPanelViewer', function () {
+	return {
+		scope: true,
+		link: function (scope, element, attrs) {
+			var field = scope.field;
+			var isRelational = /-to-one$/.test(field.type);
+			if (isRelational) {
+				Object.defineProperty(scope, 'record', {
+					enumerable: true,
+					get: function () {
+						return (scope.$parent.record||{})[field.name];
+					}
+				});
+			}
+		}
+	};
+});
+
 ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, ActionService) {
 
 	return {
@@ -414,9 +432,6 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 				scope.$$setEditorValue = function (value, fireOnChange) {
 					scope.setValue(value, fireOnChange === undefined ? true: fireOnChange);
 				};
-				scope.hasFormItem = function (name) {
-					return ((scope.fields_related||{})[field.name] || []).indexOf(name) > -1;
-				}
 			}
 
 			if (field.target) {
