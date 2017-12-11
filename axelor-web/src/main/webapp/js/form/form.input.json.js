@@ -62,12 +62,11 @@ ui.formInput('JsonField', 'String', {
 				}
 			}
 			if (item.contextField && item.contextFieldValue) {
-				var condition = "$record." + item.contextField + ".id === " + item.contextFieldValue;
-				if (item.showIf) {
-					item.showIf = "(" + item.showIf + ") && (" + condition + ")";
-				} else {
-					item.showIf = condition;
-				}
+				var condition = "($record." + item.contextField + ".id === " + item.contextFieldValue + ")";
+				if (item.showIf) condition += " && (" + item.showIf + ")";
+				if (item.hideIf) condition += " && !(" + item.hideIf + ")";
+				item.showIf = condition;
+				item.hideIf = null;
 			}
 		});
 
