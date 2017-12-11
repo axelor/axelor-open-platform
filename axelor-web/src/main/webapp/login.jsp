@@ -24,14 +24,26 @@
 <%@ page import="java.util.Calendar" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.Map" %>
+<%@page import="java.util.function.Function"%>
 <%@ page import="com.axelor.i18n.I18n" %>
 <%
-String loginTitle = I18n.get("Please sign in");
-String loginRemember = I18n.get("Remember me");
-String loginSubmit = I18n.get("Log in");
 
-String loginUserName = I18n.get("Username");
-String loginPassword = I18n.get("Password");
+Function<String, String> T = new Function<String, String>() {
+  public String apply(String t) {
+    try {
+      return I18n.get(t);
+    } catch (Exception e) {
+      return t; 
+    }
+  }
+};
+
+String loginTitle = T.apply("Please sign in");
+String loginRemember = T.apply("Remember me");
+String loginSubmit = T.apply("Log in");
+
+String loginUserName = T.apply("Username");
+String loginPassword = T.apply("Password");
 
 int year = Calendar.getInstance().get(Calendar.YEAR);
 String copyright = String.format("&copy; 2005 - %s Axelor. All Rights Reserved.", year);
