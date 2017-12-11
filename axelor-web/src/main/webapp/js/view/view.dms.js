@@ -1207,6 +1207,14 @@ ui.directive("uiDmsDetails", function () {
 	return {
 		controller: ["$scope", function ($scope) {
 
+			function getUserName(record) {
+				if(!record) {
+					return null;
+				}
+				var key = axelor.config["user.nameField"] || "name";
+				return record[key] || record.name || record.code;
+			}
+
 			function set(record) {
 				var info = $scope.details = {};
 				if (record) {
@@ -1215,7 +1223,7 @@ ui.directive("uiDmsDetails", function () {
 					info.name = record.fileName;
 					info.type = record.fileType || _t("Unknown");
 					info.tags = record.tags;
-					info.owner = (record.createdBy||{}).name;
+					info.owner = getUserName(record.createdBy);
 					info.created = moment(record.createdOn).format('DD/MM/YYYY HH:mm');
 					info.updated = moment(record.updatedOn || record.createdOn).format('DD/MM/YYYY HH:mm');
 					info.canOffline = !record.isDirectory && (record.metaFile || record['metaFile.id']);
