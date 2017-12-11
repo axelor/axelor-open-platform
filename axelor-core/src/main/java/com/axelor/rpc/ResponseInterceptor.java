@@ -191,8 +191,8 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 		// http://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
 		switch (state) {
 		case "23503":   // foreign key violation
-			title = I18n.get("Foreign key violation");
-			message = I18n.get("The record(s) can't be updated or deleted as it violates foreign key constraint.");
+			title = I18n.get("Reference error");
+			message = I18n.get("The record(s) are referenced by other records, please remove all the references first.");
 			break;
 		case "23505":	// unique constraint violation
 			title = I18n.get("Unique constraint violation");
