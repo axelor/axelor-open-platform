@@ -390,6 +390,7 @@ function GridViewCtrl($scope, $element) {
 					value = (operator == 'between' ? val.startOf('day') : val).toDate().toISOString();
 					value2 = (operator == 'between' ? val.endOf('day') : val).toDate().toISOString();
 					break;
+				case 'enum':
 				case 'selection':
 					operator = '=';
 					break;
