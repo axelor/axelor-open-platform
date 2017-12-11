@@ -71,7 +71,7 @@ ui.formInput('InlineCheckbox', 'Boolean', {
 		"<label class='ibox'>" +
 			"<input type='checkbox' ng-model='$value' ng-disabled='isReadonly()'>" +
 			"<div class='box'></div>" +
-			"<span class='title'>{{label}}</span>" +
+			"<span class='title' ui-help-popover>{{label}}</span>" +
 		"</label>"
 });
 
