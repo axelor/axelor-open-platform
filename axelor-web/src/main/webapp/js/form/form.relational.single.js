@@ -219,6 +219,39 @@ ui.directive('uiCanSuggest', function () {
 		}
 		element.attr("readonly", "readonly");
 		element.addClass("not-readonly");
+		
+		// jquery-ui doesn't allow keyboard navigation on autocomplete list
+		element.on('keydown', function (e) {
+			var inst = element.data('autocomplete');
+			console.log(e.keyCode);
+			switch (e.keyCode) {
+			case 38: // up
+				inst._keyEvent('previous', e);
+				console.log('up');
+				break;
+			case 40: // down
+				inst._keyEvent('next', e);
+				console.log('down');
+				break;
+			case  9: // tab
+				if (inst.menu.active) {
+					inst.menu.select(event);
+				}
+				break;
+			case 13: // enter
+				if (inst.menu.active) {
+					inst.menu.select(event);
+					e.preventDefault();
+				}
+				break;
+			case 27: // escape
+				if (inst.menu.element.is(':visible')) {
+					inst.close(e);
+					e.preventDefault();
+				}
+				break;
+			}
+		});
 	};
 });
 
