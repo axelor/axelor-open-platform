@@ -30,7 +30,7 @@ ui.directive('uiDeleteButton', [function () {
 		replace: true,
 		template:
 			"<div class='btn-group delete-button'>" +
-				"<button class='btn' ng-click='onDelete()' ng-if='hasButton(\"delete\")' ng-disabled='!canDelete()' title='{{ 'Delete' | t}}'>" +
+				"<button class='btn' ng-click='onDelete()' ng-if='hasButton(\"delete\")' ng-disabled='!canDelete()' title='{{ \"Delete\" | t}}'>" +
 					"<i class='fa fa-trash-o'></i> <span ng-if='::!tbTitleHide' x-translate>Delete</span>" +
 				"</button>" +
 				"<button class='btn dropdown-toggle' data-toggle='dropdown' ng-if='hasButton(\"archive\")' ng-disabled='!canArchive()'>" +
