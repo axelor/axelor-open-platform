@@ -610,6 +610,12 @@ ui.directive('uiViewCustomize', ['NavService', function(NavService) {
 					mode: "edit",
 					state: id
 				});
+				scope.waitForActions(function () {
+					var vs = scope.selectedTab.$viewScope;
+					if (vs && vs.setEditable) {
+						vs.setEditable();
+					}
+				});
 			}
 
 			scope.onShowModel = function () {
