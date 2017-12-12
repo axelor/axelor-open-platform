@@ -129,10 +129,16 @@ public class TenantConfigImpl implements TenantConfig {
 		cfg.tenantHosts = get(props, prefix, "hosts");
 		cfg.tenantRoles = get(props, prefix, "roles");
 
+		cfg.jndiDataSource = get(props, prefix, "datasource");
+
 		cfg.jdbcDriver = get(props, prefix, "driver");
 		cfg.jdbcUrl = get(props, prefix, "url");
 		cfg.jdbcUser = get(props, prefix, "user");
 		cfg.jdbcPassword = get(props, prefix, "password");
+
+		if (cfg.jndiDataSource == null && (cfg.jdbcDriver == null || cfg.jdbcUrl == null)) {
+			return null;
+		}
 
 		CONFIGS.put(tenantId, cfg);
 
