@@ -86,6 +86,7 @@
         <field name="showIf" />
         <field name="hideIf" />
         <field name="requiredIf" />
+        <field name="readonlyIf" />
       </panel>
       <panel title="Value Expression">
         <field name="valueExpr" showTitle="false" colSpan="12" 
@@ -97,6 +98,7 @@
     </panel-tabs>
     <panel title="Options" sidebar="true" itemSpan="6">
       <field name="required" widget="inline-checkbox" />
+      <field name="readonly" widget="inline-checkbox" />
       <field name="nameField" widget="inline-checkbox" showIf="type === 'string'" />
       <field name="hidden" widget="inline-checkbox" />
       <field name="visibleInGrid" widget="inline-checkbox" />

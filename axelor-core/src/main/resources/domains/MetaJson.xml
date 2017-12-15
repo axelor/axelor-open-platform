@@ -21,6 +21,7 @@
     <string name="showIf" />
     <string name="hideIf" />
     <string name="requiredIf" />
+    <string name="readonlyIf" />
 
     <string name="contextField" />
     <string name="contextFieldTarget" />
@@ -30,6 +31,7 @@
 
     <boolean name="hidden" column="is_hidden" />
     <boolean name="required" column="is_required" />
+    <boolean name="readonly" column="is_readonly" />
     <boolean name="nameField" />
     <boolean name="visibleInGrid" />
 
