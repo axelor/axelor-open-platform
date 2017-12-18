@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -77,7 +76,7 @@ public class PreSessionTenantFilter extends AbstractTenantFilter {
 
 		if (isLoginRequest(req)) {
 			final HttpSession session = req.getSession();
-			final Map<String, String> tenants = getTenants();
+			final Map<String, String> tenants = getTenants(true);
 			final String switchTo = !isLoginSubmit(req) ? req.getParameter("tenant") : null;
 
 			if (tenants.containsKey(switchTo)) {
@@ -108,12 +107,6 @@ public class PreSessionTenantFilter extends AbstractTenantFilter {
 		}
 
 		return StringUtils.isBlank(tenantId) ? null : tenantId;
-	}
-	
-	@Override
-	protected boolean hasAccess(User user, TenantConfig config) {
-		// there is no user at this stage, so show all available tenants
-		return true;
 	}
 
 	@Override

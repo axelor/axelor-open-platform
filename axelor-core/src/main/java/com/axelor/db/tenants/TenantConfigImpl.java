@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -106,6 +107,8 @@ public class TenantConfigImpl implements TenantConfig {
 			all.sort((a, b) -> a.getTenantName().compareTo(b.getTenantName()));
 		} catch (Exception e) {
 		}
+		
+		all.removeIf(Objects::isNull);
 
 		return all;
 	}

@@ -78,18 +78,26 @@ public abstract class AbstractTenantFilter implements Filter {
 	protected abstract void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException;
 
-	protected boolean hasAccess(User user, TenantConfig config) {
+	private boolean canAccess(TenantConfig config) {
+		final User user;
+		try {
+			user = AuthUtils.getUser();
+		} catch (TenantNotFoundException e) {
+			return false;
+		}
 		final TenantConfigProvider provider = TenantSupport.get().getConfigProvider();
 		return provider.hasAccess(user, config);
 	}
 
-	protected Map<String, String> getTenants() {
+	protected Map<String, String> getTenants(boolean all) {
 		final TenantConfigProvider provider = TenantSupport.get().getConfigProvider();
 		final Map<String, String> map = new LinkedHashMap<>();
 		String first = null;
 		for (TenantConfig config : provider.findAll(TenantResolver.CURRENT_HOST.get())) {
-			if (config.getActive() == Boolean.FALSE || config.getVisible() == Boolean.FALSE
-					|| !hasAccess(AuthUtils.getUser(), config)) {
+			if (config.getActive() == Boolean.FALSE || config.getVisible() == Boolean.FALSE) {
+				continue;
+			}
+			if (!all && !canAccess(config)) {
 				continue;
 			}
 			if (first == null) {

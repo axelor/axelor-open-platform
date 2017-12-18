@@ -64,8 +64,8 @@ public class TenantConnectionProvider extends AbstractDataSourceBasedMultiTenant
 	protected final DataSource selectDataSource(String tenantIdentifier) {
 		if (configProvider.find(tenantIdentifier) == null) {
 			dataSourceMap().remove(tenantIdentifier);
-			LOGGER.debug("no such tenant: {}", tenantIdentifier);
-			return null;
+			LOGGER.debug("no such tenant found: {}", tenantIdentifier);
+			throw new TenantNotFoundException("No such tenant found: " + tenantIdentifier);
 		}
 		DataSource dataSource = dataSourceMap().get(tenantIdentifier);
 		LOGGER.debug("using tenant: {}", tenantIdentifier);
