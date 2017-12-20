@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppSettings;
 import com.axelor.db.search.SearchService;
+import com.axelor.db.tenants.TenantModule;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.quartz.JobRunner;
 
@@ -67,7 +68,11 @@ public class AppInitializer extends HttpServlet {
 
 		try {
 			if (jobRunner.isEnabled()) {
-				jobRunner.start();
+				if (TenantModule.isEnabled()) {
+					LOGGER.info("Scheduler is not supported in multi-tenant mode.");
+				} else {
+					jobRunner.start();
+				}
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);

@@ -32,7 +32,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 
@@ -55,7 +54,7 @@ public abstract class AbstractTenantFilter implements Filter {
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		enabled = AppSettings.get().getBoolean(TenantModule.CONFIG_MULTI_TENANCY, false);
+		enabled = TenantModule.isEnabled();
 	}
 
 	@Override

@@ -17,6 +17,7 @@
  */
 package com.axelor.db.tenants;
 
+import com.axelor.app.AppSettings;
 import com.google.inject.AbstractModule;
 
 /**
@@ -26,6 +27,10 @@ import com.google.inject.AbstractModule;
 public class TenantModule extends AbstractModule {
 
 	public static final String CONFIG_MULTI_TENANCY = "application.multi_tenancy";
+	
+	public static boolean isEnabled() {
+		return AppSettings.get().getBoolean(CONFIG_MULTI_TENANCY, false);
+	}
 
 	@Override
 	protected void configure() {

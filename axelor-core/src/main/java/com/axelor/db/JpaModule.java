@@ -223,7 +223,7 @@ public class JpaModule extends AbstractModule {
 
 	private void configureMultiTenancy(final AppSettings settings, final Properties properties) {
 		// multi-tenancy support
-		if (settings.getBoolean(TenantModule.CONFIG_MULTI_TENANCY, false)) {
+		if (TenantModule.isEnabled()) {
 			properties.put(Environment.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name());
 			properties.put(Environment.MULTI_TENANT_CONNECTION_PROVIDER, TenantConnectionProvider.class.getName());
 			properties.put(Environment.MULTI_TENANT_IDENTIFIER_RESOLVER, TenantResolver.class.getName());

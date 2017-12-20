@@ -19,8 +19,6 @@ package com.axelor.db.tenants;
 
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 
-import com.axelor.app.AppSettings;
-
 /**
  * The tenant identifier resolver.
  *
@@ -33,7 +31,7 @@ public class TenantResolver implements CurrentTenantIdentifierResolver {
 	private static boolean enabled;
 
 	public TenantResolver() {
-		enabled = AppSettings.get().getBoolean(TenantModule.CONFIG_MULTI_TENANCY, false);
+		enabled = TenantModule.isEnabled();
 	}
 	
 	public static String currentTenantIdentifier() {
