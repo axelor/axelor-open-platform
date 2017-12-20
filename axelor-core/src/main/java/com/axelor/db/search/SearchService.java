@@ -38,7 +38,6 @@ import org.hibernate.search.query.dsl.QueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axelor.app.AppSettings;
 import com.axelor.auth.db.User;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
@@ -68,7 +67,7 @@ public class SearchService {
 	private Provider<JpaSecurity> security;
 
 	public SearchService() {
-		this.enabled = !"none".equalsIgnoreCase(AppSettings.get().get(SearchModule.CONFIG_DIRECTORY_PROVIDER));
+		this.enabled = SearchModule.isEnabled();
 	}
 
 	private FullTextEntityManager getFullTextEntityManager() {

@@ -232,7 +232,7 @@ public class JpaModule extends AbstractModule {
 
 	private void configureSearch(final AppSettings settings, final Properties properties) {
 		// hibernate-search support
-		if ("none".equalsIgnoreCase(settings.get(SearchModule.CONFIG_DIRECTORY_PROVIDER))) {
+		if (!SearchModule.isEnabled()) {
 			properties.put(org.hibernate.search.cfg.Environment.AUTOREGISTER_LISTENERS, "false");
 			properties.remove(SearchModule.CONFIG_DIRECTORY_PROVIDER);
 		} else {

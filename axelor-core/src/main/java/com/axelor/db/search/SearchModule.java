@@ -17,6 +17,7 @@
  */
 package com.axelor.db.search;
 
+import com.axelor.app.AppSettings;
 import com.google.inject.AbstractModule;
 
 /**
@@ -30,6 +31,10 @@ public class SearchModule extends AbstractModule {
 
 	public static final String DEFAULT_DIRECTORY_PROVIDER = "filesystem";
 	public static final String DEFAULT_INDEX_BASE = "{user.home}/.axelor/indexes";
+	
+	public static boolean isEnabled() {
+		return !"none".equalsIgnoreCase(AppSettings.get().get(SearchModule.CONFIG_DIRECTORY_PROVIDER, "none"));
+	}
 
 	@Override
 	protected void configure() {
