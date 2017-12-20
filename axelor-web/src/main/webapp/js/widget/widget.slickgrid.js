@@ -524,7 +524,7 @@ _.extend(Factory.prototype, {
 		}
 		
 		if (widget.toLowerCase() === "html") {
-			return '<span>' + value + '</span>';
+			return value ? '<span>' + value + '</span>' : '';
 		}
 
 		// try to get dotted field value from related object
