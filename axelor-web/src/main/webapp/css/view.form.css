@@ -1386,7 +1386,7 @@ label.has-help > span:after {
 
 .filter-form .flex-layout .flex-item > span {
     width: 170px;
-    margin: 0 2px;
+    margin: 2px;
 }
 
 .filter-form .flex-layout .flex-item > span > input,
@@ -1406,7 +1406,6 @@ label.has-help > span:after {
         flex-direction: column;
     }
     .filter-form .flex-layout .flex-item > span {
-        margin: 2px 0;
         width: 100%;
     }
     .filter-menu .filter-list > dl {

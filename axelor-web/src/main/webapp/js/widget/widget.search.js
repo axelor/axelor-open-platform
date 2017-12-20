@@ -519,8 +519,19 @@ function FilterFormCtrl($scope, $element, ViewService) {
 				}
 			});
 
+			var contextFieldNames = [];
+			for (var item in items) {
+				var field = items[item];
+				var name = field.contextField;
+				if (name && items[name] && contextFieldNames.indexOf(name) === -1) {
+					contextFieldNames.push(name);
+				}
+			}
 			$scope.fields = items;
+			$scope.contextFieldNames = contextFieldNames;
+
 			$scope.$parent.fields = $scope.fields;
+			$scope.$parent.contextFieldNames = $scope.contextFieldNames;
 			$scope.$parent.nameField = nameField || ($scope.fields.name ? 'name' : null);
 		});
 	};
@@ -586,18 +597,21 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
 		var criteria = custom.criteria;
 		var filters = criteria.criteria;
-		
-		if (filters && filters.length === 2 && filters[1].criteria) {
+		var contextFieldNames = $scope.contextFieldNames || [];
+
+		if (filters && filters.length && filters.length < 3) {
 			var first = _.first(filters);
 			var last = _.last(filters);
 			var name = first.fieldName.replace('.id', '');
-			filters = last.criteria;
-			$scope.contextData = {
-				field: $scope.fields[name],
-				value: first.value,
-				title: first.title,
-				saved: true
-			};
+			if (contextFieldNames.indexOf(name) > -1) {
+				$scope.contextData = {
+						field: $scope.fields[name],
+						value: first.value,
+						title: first.title,
+						saved: true
+				};
+				filters = (last||{}).criteria || [{}];
+			}
 		}
 
 		$scope.operator = criteria.operator || 'and';
@@ -605,7 +619,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		_.each(filters, function(item) {
 			
 			var fieldName = item.fieldName || '';
-			if (fieldName && fieldName.indexOf('.') > -1) {
+			if (fieldName && fieldName.indexOf('.') > -1 && fieldName.indexOf('::') === -1) {
 				fieldName = fieldName.substring(0, fieldName.indexOf('.'));
 			}
 
