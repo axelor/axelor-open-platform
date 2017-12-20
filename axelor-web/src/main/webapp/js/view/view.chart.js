@@ -356,35 +356,37 @@ function PlusData(series, data) {
 }
 
 function PlotData(series, data) {
-	var ticks = _.chain(data.dataset).pluck(data.xAxis).unique().map(function (v) { return $conv(v, data.xType); }).value();
-	var groupBy = series.groupBy;
 	var datum = [];
+	_.forEach(series, function(s) {
+		var ticks = _.chain(data.dataset).pluck(data.xAxis).unique().map(function (v) { return $conv(v, data.xType); }).value();
+		var groupBy = s.groupBy;
 
-	_.chain(data.dataset).groupBy(groupBy)
-	.map(function (group, groupName) {
-		var name = groupBy ? groupName : null;
-		var values = _.map(group, function (item) {
-			var x = $conv(item[data.xAxis], data.xType) || 0;
-			var y = $conv(item[series.key] || name || 0);
-			return { x: x, y: y, raw: item };
-		});
+		_.chain(data.dataset).groupBy(groupBy)
+		.map(function (group, groupName) {
+			var name = groupBy ? groupName : null;
+			var values = _.map(group, function (item) {
+				var x = $conv(item[data.xAxis], data.xType) || 0;
+				var y = $conv(item[s.key] || name || 0);
+				return { x: x, y: y, raw: item };
+			});
 
-		var my = _.pluck(values, 'x');
-		var missing = _.difference(ticks, my);
-		if (ticks.length === missing.length) {
-			return;
-		}
+			var my = _.pluck(values, 'x');
+			var missing = _.difference(ticks, my);
+			if (ticks.length === missing.length) {
+				return;
+			}
 
-		_.each(missing, function(x) {
-			values.push({ x: x, y: 0 });
-		});
+			_.each(missing, function(x) {
+				values.push({ x: x, y: 0 });
+			});
 
-		values = _.sortBy(values, 'x');
+			values = _.sortBy(values, 'x');
 
-		datum.push({
-			key: name || series.title,
-			type: series.type,
-			values: values
+			datum.push({
+				key: name || s.title,
+				type: s.type,
+				values: values
+			});
 		});
 	});
 
@@ -454,8 +456,7 @@ function DBarChart(scope, element, data) {
 
 function BarChart(scope, element, data) {
 	
-	var series = _.first(data.series);
-	var datum = PlotData(series, data);
+	var datum = PlotData(data.series, data);
 
 	var chart = nv.models.multiBarChart()
 		.reduceXTicks(false);
@@ -476,8 +477,7 @@ function BarChart(scope, element, data) {
 
 function HBarChart(scope, element, data) {
 	
-	var series = _.first(data.series);
-	var datum = PlotData(series, data);
+	var datum = PlotData(data.series, data);
 
 	var chart = nv.models.multiBarHorizontalChart();
 
@@ -532,8 +532,7 @@ CHARTS.funnel = FunnelChart;
 
 function LineChart(scope, element, data) {
 
-	var series = _.first(data.series);
-	var datum = PlotData(series, data);
+	var datum = PlotData(data.series, data);
 
 	var chart = nv.models.lineChart()
 		.showLegend(true)
@@ -551,8 +550,7 @@ function LineChart(scope, element, data) {
 
 function AreaChart(scope, element, data) {
 
-	var series = _.first(data.series);
-	var datum = PlotData(series, data);
+	var datum = PlotData(data.series, data);
 
 	var chart = nv.models.stackedAreaChart();
 
