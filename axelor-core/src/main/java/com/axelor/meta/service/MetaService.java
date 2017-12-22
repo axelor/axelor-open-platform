@@ -324,6 +324,8 @@ public class MetaService {
 				});
 		}
 
+		final Set<String> denied = new HashSet<>();
+
 		for (final MetaMenu menu : records) {
 			// check for user menus
 			if (menu.getUser() != null && menu.getUser() != user) {
@@ -338,7 +340,8 @@ public class MetaService {
 					|| (myRoles != null && !Collections.disjoint(userRoles, myRoles))
 					|| (myRoles == null && menu.getParent() != null);
 
-			if (!allowed) {
+			if (!allowed || denied.contains(menu.getName())) {
+				denied.add(menu.getName());
 				continue;
 			}
 
