@@ -324,7 +324,7 @@ public class MetaService {
 				});
 		}
 
-		for(final MetaMenu menu : records) {
+		for (final MetaMenu menu : records) {
 			// check for user menus
 			if (menu.getUser() != null && menu.getUser() != user) {
 				continue;
@@ -332,9 +332,13 @@ public class MetaService {
 			// if no group access, check for roles
 			final Set<String> myGroups = menuGroups.get(menu.getId());
 			final Set<String> myRoles = menuRoles.get(menu.getId());
-			
-			if ((myGroups != null && !myGroups.contains(userGroup)) || (!AuthUtils.isAdmin(user) && myGroups == null
-					&& myRoles != null && Collections.disjoint(userRoles, myRoles))) {
+
+			boolean allowed = AuthUtils.isAdmin(user)
+					|| (myGroups != null && myGroups.contains(userGroup))
+					|| (myRoles != null && !Collections.disjoint(userRoles, myRoles))
+					|| (myRoles == null && menu.getParent() != null);
+
+			if (!allowed) {
 				continue;
 			}
 
