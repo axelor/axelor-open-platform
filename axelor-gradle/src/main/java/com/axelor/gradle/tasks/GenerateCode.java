@@ -222,7 +222,7 @@ public class GenerateCode extends DefaultTask {
 		// copy module.properties
 		project.copy(copy -> {
 			copy.from(new File(getOutputDirectory(), "module.properties"));
-			copy.into(new File(project.getBuildDir(), "classes/main"));
+			copy.into(new File(project.getBuildDir(), "resources/main"));
 		});
 
 		// start code generation

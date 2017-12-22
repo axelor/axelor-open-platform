@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
@@ -49,9 +50,15 @@ public final class MetaScanner {
 
 	private static final String MODULE_PROPERTIES = "module.properties";
 	private static final String SCHEME_JAR = "jar";
-	
-	private static final String BUILD_CLASSES = "build/classes/main";
-	private static final String BUILD_RESOURCES = "build/resources/main";
+
+	private static final String[] BUILD_OUTPUT_PATHS = {
+		"bin/main",
+		"out/production",
+		"build/resources/main",
+		"build/classes/main",
+		"build/classes/java/main",
+		"build/classes/groovy/main",
+	};
 
 	private MetaScanner() {
 	}
@@ -120,7 +127,7 @@ public final class MetaScanner {
 			throw new RuntimeException(e);
 		}
 
-		if (fileName.endsWith(".jar")) {
+		if (fileName.endsWith(".jar") || file.endsWith("WEB-INF/classes")) {
 			try {
 				paths.add(file.toUri().toURL());
 			} catch (MalformedURLException e) {
@@ -128,18 +135,19 @@ public final class MetaScanner {
 			}
 			return paths;
 		}
-		final Path next;
-		if (file.endsWith(Paths.get(BUILD_CLASSES))) {
-			next = file.resolve("../../..").resolve(BUILD_RESOURCES).normalize();
-		} else if (file.endsWith(Paths.get(BUILD_RESOURCES))) {
-			next = file.resolve("../../..").resolve(BUILD_CLASSES).normalize();
-		} else {
-			next = null;
-		}
+
+		final Path base = Arrays.stream(BUILD_OUTPUT_PATHS)
+				.filter(p -> file.endsWith(p))
+				.findFirst()
+				.map(p -> p.replaceAll("[^/]+", ".."))
+				.map(p -> file.resolve(p))
+				.get();
 		try {
-			paths.add(file.toUri().toURL());
-			if (next != null && Files.exists(next)) {
-				paths.add(next.toUri().toURL());
+			for (String path : BUILD_OUTPUT_PATHS) {
+				Path next = base.resolve(path).normalize();
+				if (Files.exists(next)) {
+					paths.add(next.toUri().toURL());
+				}
 			}
 		} catch (MalformedURLException e) {
 			// this should never happen

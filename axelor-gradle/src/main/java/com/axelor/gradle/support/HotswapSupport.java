@@ -39,6 +39,7 @@ import org.gradle.api.invocation.Gradle;
 import org.gradle.composite.internal.IncludedBuildInternal;
 
 import com.axelor.common.FileUtils;
+import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.HotswapExtension;
 import com.axelor.gradle.tasks.GenerateCode;
 import com.google.common.base.Joiner;
@@ -113,7 +114,8 @@ public class HotswapSupport extends AbstractSupport {
 		final HotswapExtension extension = project.getExtensions().getByType(HotswapExtension.class);
 		final Function<Project, List<File>> findClasses = p -> Arrays.asList(
 				FileUtils.getFile(p.getProjectDir(), "bin", "main"),
-				FileUtils.getFile(p.getBuildDir(), "classes", "main"));
+				AxelorPlugin.getClassOutputDir(p, "java"),
+				AxelorPlugin.getClassOutputDir(p, "groovy"));
 		final Function<Project, File> findResources = p ->
 				FileUtils.getFile(p.getProjectDir(), "src", "main", "resources");
 
