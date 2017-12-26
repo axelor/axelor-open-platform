@@ -20,6 +20,8 @@ dependencies {
 	tomcat libs.hotswap_agent
 	tomcat project(":axelor-tomcat")
 
+	runtime project(":axelor-tomcat")
+
 	provided libs.javax_servlet
 	provided libs.javax_servlet_jsp
 }

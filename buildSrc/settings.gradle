@@ -1,7 +1,0 @@
-include 'axelor-common'
-include 'axelor-tomcat'
-include 'axelor-gradle'
-
-project(':axelor-common').projectDir = new File(rootDir, "../axelor-common")
-project(':axelor-tomcat').projectDir = new File(rootDir, "../axelor-tomcat")
-project(':axelor-gradle').projectDir = new File(rootDir, "../axelor-gradle")
