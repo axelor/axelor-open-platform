@@ -18,6 +18,7 @@
 package com.axelor.gradle.support;
 
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.WarPlugin;
@@ -39,7 +40,7 @@ public class WarSupport extends AbstractSupport {
 
 		project.getPlugins().apply(WarPlugin.class);
 		
-		project.getConfigurations().create("axelorWeb").setTransitive(false);
+		Configuration axelorWeb = project.getConfigurations().create("axelorWeb").setTransitive(false);
 
 		// apply providedCompile dependencies
 		applyConfigurationLibs(project, "provided", "compileOnly");
@@ -54,8 +55,8 @@ public class WarSupport extends AbstractSupport {
  			task.into("webapp", spec -> spec.from("src/main/webapp"));
  			task.dependsOn(GenerateCode.TASK_NAME);
  			task.dependsOn(JavaPlugin.PROCESS_RESOURCES_TASK_NAME);
- 			project.getConfigurations().getByName("axelorWeb")
- 				.getFiles()
+ 			task.dependsOn(axelorWeb);
+ 			axelorWeb.getFiles()
  				.stream()
  				.filter(file -> file.getName().startsWith("axelor-web"))
  				.forEach(file -> {
