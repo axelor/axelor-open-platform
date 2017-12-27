@@ -369,18 +369,20 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 				return;
 			}
 
-			function applyAttrs(item) {
+			function applyAttrs(item, level) {
 				if (item.showTitle === undefined && !item.items) {
 					item.showTitle = (editor.widgetAttrs||{}).showTitles !== "false";
 				}
 				if (!item.showTitle && !item.items) {
 					item.placeholder = item.placeholder || item.title || item.autoTitle;
 				}
-				if (editor.itemSpan && !item.colSpan) {
+				if (editor.itemSpan && !item.colSpan && !level) {
 					item.colSpan = editor.itemSpan;
 				}
 				if (item.items) {
-					_.map(item.items, applyAttrs);
+					_.map(item.items, function (x) {
+						applyAttrs(x, (level||0) + 1);
+					});
 				}
 			}
 
