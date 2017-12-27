@@ -25,7 +25,7 @@ import org.gradle.api.file.ConfigurableFileTree;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.compile.JavaCompile;
+import org.gradle.api.tasks.compile.AbstractCompile;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
 import org.gradle.util.GradleVersion;
@@ -92,7 +92,7 @@ public class AxelorPlugin implements Plugin<Project> {
 			task.setGroup(GenerateCode.TASK_GROUP);
 		});
 
-		project.getTasks().withType(JavaCompile.class).all(task -> task.dependsOn(GenerateCode.TASK_NAME));
+		project.getTasks().withType(AbstractCompile.class).all(task -> task.dependsOn(GenerateCode.TASK_NAME));
 
 		// add src-gen
 		project.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets()

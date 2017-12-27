@@ -17,6 +17,8 @@
  */
 package com.axelor.gradle.support;
 
+import java.util.ArrayList;
+
 import org.gradle.api.Project;
 import org.gradle.api.internal.plugins.DslObject;
 import org.gradle.api.plugins.GroovyPlugin;
@@ -25,8 +27,6 @@ import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.GroovySourceSet;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.compile.JavaCompile;
-
-import com.google.common.collect.Lists;
 
 public class JavaSupport extends AbstractSupport {
 
@@ -56,8 +56,8 @@ public class JavaSupport extends AbstractSupport {
 			final GroovySourceSet testGroovy = new DslObject(test).getConvention().getPlugin(GroovySourceSet.class);
 			mainGroovy.getGroovy().srcDirs(main.getJava().getSrcDirs());
 			testGroovy.getGroovy().srcDirs(test.getJava().getSrcDirs());
-			main.getJava().setSrcDirs(Lists.newArrayList());
-			test.getJava().setSrcDirs(Lists.newArrayList());
+			main.getJava().setSrcDirs(new ArrayList<>());
+			test.getJava().setSrcDirs(new ArrayList<>());
 		}
 
 		// make sure to include non-java resources from src/main/java
@@ -66,6 +66,8 @@ public class JavaSupport extends AbstractSupport {
 				res.srcDir(dir);
 				res.exclude("**/*.java");
 				res.exclude("**/*.groovy");
+				res.exclude("**/*.scala");
+				res.exclude("**/*.kt");
 			});
 		});
 		test.getJava().getSrcDirs().forEach( dir -> {
@@ -73,6 +75,8 @@ public class JavaSupport extends AbstractSupport {
 				res.srcDir(dir);
 				res.exclude("**/*.java");
 				res.exclude("**/*.groovy");
+				res.exclude("**/*.scala");
+				res.exclude("**/*.kt");
 			});
 		});
 	}

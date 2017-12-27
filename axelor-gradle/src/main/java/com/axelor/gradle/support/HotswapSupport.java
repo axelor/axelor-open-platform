@@ -115,7 +115,9 @@ public class HotswapSupport extends AbstractSupport {
 		final Function<Project, List<File>> findClasses = p -> Arrays.asList(
 				FileUtils.getFile(p.getProjectDir(), "bin", "main"),
 				AxelorPlugin.getClassOutputDir(p, "java"),
-				AxelorPlugin.getClassOutputDir(p, "groovy"));
+				AxelorPlugin.getClassOutputDir(p, "groovy"),
+				AxelorPlugin.getClassOutputDir(p, "kotlin"),
+				AxelorPlugin.getClassOutputDir(p, "scala"));
 		final Function<Project, File> findResources = p ->
 				FileUtils.getFile(p.getProjectDir(), "src", "main", "resources");
 

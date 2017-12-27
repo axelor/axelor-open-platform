@@ -57,6 +57,8 @@ public final class MetaScanner {
 		"build/resources/main",
 		"build/classes/main",
 		"build/classes/java/main",
+		"build/classes/scala/main",
+		"build/classes/kotlin/main",
 		"build/classes/groovy/main",
 	};
 
