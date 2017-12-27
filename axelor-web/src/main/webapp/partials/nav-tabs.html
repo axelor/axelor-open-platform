@@ -5,7 +5,7 @@
 	<div class="nav-tabs-strip">
 	<ul class="nav nav-tabs nav-tabs-main nav-tabs-scrollable nav-tabs-closable">
 	 <li ng-repeat="tab in navTabs" ng-class="{ active: tab.selected, notclosable: !canCloseTab(tab), dirty: tabDirty(tab) }">
-	   <a href="" ng-click="navClick(tab)" ng-class="tab.topCss" ng-style="{borderTopColor: tab.color}">
+	   <a href="" ng-click="navClick(tab)" ng-mousedown="$event.which === 2 && closeTab(tab)" ng-class="tab.topCss" ng-style="{borderTopColor: tab.color}">
 	     <img class="prefix-icon" ng-show="tab.icon" ng-src="{{tab.icon}}">
          <i class="prefix-icon fa" ng-show="tab.fa" ng-class="tab.fa" ng-style="{color: tab.color}"></i>
          <span ui-tab-popover>{{tabTitle(tab)}}</span>

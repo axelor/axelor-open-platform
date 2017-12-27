@@ -152,6 +152,10 @@ function makePopover(scope, element, callback, placement) {
 	}
 
 	function destroy() {
+		if (popoverTimer) {
+			clearTimeout(popoverTimer);
+			popoverTimer = null;
+		}
 		if (element) {
 			element.off('mouseenter.popover');
 			element.off('mouseleave.popover');
@@ -165,6 +169,7 @@ function makePopover(scope, element, callback, placement) {
 		doc.off('mousemove.popover');
 	}
 	
+	element.on('$destroy', destroy);
 	scope.$on('$destroy', destroy);
 }
 
