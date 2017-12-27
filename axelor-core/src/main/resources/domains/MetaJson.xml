@@ -22,6 +22,7 @@
     <string name="hideIf" />
     <string name="requiredIf" />
     <string name="readonlyIf" />
+    <string name="includeIf" />
 
     <string name="contextField" />
     <string name="contextFieldTarget" />

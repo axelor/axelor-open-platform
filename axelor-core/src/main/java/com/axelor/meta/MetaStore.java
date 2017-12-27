@@ -58,6 +58,8 @@ import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.Selection;
+import com.axelor.rpc.Request;
+import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
@@ -264,6 +266,8 @@ public final class MetaStore {
 		final List<MetaJsonField> jsonFields = new ArrayList<>(records);
 		final User user = AuthUtils.getUser();
 
+		ScriptHelper scriptHelper = null;
+
 		jsonFields.sort((a, b) -> {
 			int x = a.getSequence() == null ? 0 : a.getSequence();
 			int y = b.getSequence() == null ? 0 : b.getSequence();
@@ -284,6 +288,16 @@ public final class MetaStore {
 					roles.addAll(user.getGroup().getRoles());
 				}
 				if (Collections.disjoint(roles, record.getRoles())) {
+					continue;
+				}
+			}
+
+			// check server condition
+			if (StringUtils.notBlank(record.getIncludeIf())) {
+				if (scriptHelper == null && Request.current() != null) {
+					scriptHelper = Request.current().getScriptHelper();
+				}
+				if (scriptHelper == null || !scriptHelper.test(record.getIncludeIf())) {
 					continue;
 				}
 			}

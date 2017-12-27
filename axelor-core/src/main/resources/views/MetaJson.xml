@@ -87,6 +87,7 @@
         <field name="hideIf" />
         <field name="requiredIf" />
         <field name="readonlyIf" />
+        <field name="includeIf" help="Server expression to check whether to use this field."/>
       </panel>
       <panel title="Value Expression">
         <field name="valueExpr" showTitle="false" colSpan="12" 
