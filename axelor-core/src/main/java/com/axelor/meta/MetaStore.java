@@ -58,7 +58,7 @@ import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.Selection;
-import com.axelor.rpc.Request;
+import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -294,8 +294,8 @@ public final class MetaStore {
 
 			// check server condition
 			if (StringUtils.notBlank(record.getIncludeIf())) {
-				if (scriptHelper == null && Request.current() != null) {
-					scriptHelper = Request.current().getScriptHelper();
+				if (scriptHelper == null) {
+					scriptHelper = new CompositeScriptHelper(null);
 				}
 				if (scriptHelper == null || !scriptHelper.test(record.getIncludeIf())) {
 					continue;
