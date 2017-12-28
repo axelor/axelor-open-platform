@@ -1212,6 +1212,7 @@ ui.directive('uiFilterBox', function() {
 			$scope.onFreeSearch = function() {
 
 				var filters = [],
+					cols = $scope.findCols(),
 					fields = {},
 					nameField = this.nameField,
 					text = this.custTerm,
@@ -1219,8 +1220,8 @@ ui.directive('uiFilterBox', function() {
 
 				text = text ? text.trim() : null;
 
-				if ((handler.schema || {}).freeSearch === 'all') {
-					fields = _.extend({}, this.$parent.fields, this.fields);
+				if (cols && (handler.schema || {}).freeSearch !== 'name') {
+					fields = _.pick(this.$parent.fields, cols);
 				}
 				
 				if (!nameField) {
@@ -1386,6 +1387,13 @@ ui.directive('uiFilterBox', function() {
 			}
 			
 			scope.hideMenu = hideMenu;
+			
+			scope.findCols = function () {
+				var grid = element.parents('.grid-view:first').children('[ui-slick-grid]:first').data('grid');
+				return grid ? _.pluck(grid.getColumns(), 'field').filter(function (n) {
+					return n in scope.$parent.fields;
+				}) : [];
+			};
 
 			scope.handler.$watch('schema.freeSearch', function (value, old) {
 				if (value === 'none') {
