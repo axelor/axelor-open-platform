@@ -1237,6 +1237,13 @@ Grid.prototype._doInit = function(view) {
 	scope.$timeout(function () {
 		grid.invalidate();
 		grid.autosizeColumns();
+		// focus first filter input
+		if (!axelor.device.mobile) {
+			that.element
+				.find('.slick-headerrow:first input[type=text]:first')
+				.focus()
+				.select();
+		}
 	});
 	
 	var onColumnsResized = false;

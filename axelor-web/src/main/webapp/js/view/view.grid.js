@@ -73,13 +73,10 @@ function GridViewCtrl($scope, $element) {
 					$scope.$broadcast('on:grid-selection-change', $scope.getContext());
 					$scope.updateRoute();
 				});
-
-				setTimeout(focusFilter);
 			});
 			
 			initialized = true;
 		} else {
-			setTimeout(focusFilter);
 			if (reloadDotted || ($scope._viewTypeLast && $scope._viewTypeLast !== 'grid')) {
 				return $scope.reload().then(function() {
 					$scope.updateRoute();
@@ -707,17 +704,6 @@ function GridViewCtrl($scope, $element) {
 		var first = $scope.dataView.getItem(index);
 		if (first) {
 			$scope.dataView.$syncSelection([], [first.id], true);
-		}
-	}
-	
-	function focusFilter() {
-		// don't focus on mobile, as it will bring keypad up
-		if (axelor.device.mobile) {
-			return;
-		}
-		var filterBox = $('.filter-box .search-query:visible input');
-		if (filterBox.size()) {
-			filterBox.focus().select();
 		}
 	}
 
