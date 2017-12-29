@@ -21,12 +21,15 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.axelor.auth.db.AuditableModel;
@@ -35,6 +38,7 @@ import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaJsonRecord;
+import com.google.common.collect.Collections2;
 
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
@@ -284,25 +288,62 @@ public class ContextHandler<T> {
 	}
 
 	@RuntimeType
+	public Map<String, Object> getContextMap() {
+		final Map<String, Object> data = new HashMap<>();
+		final Object bean = getContextEntity();
+
+		final Function<Object, Object> transform = (item) -> {
+			if (item instanceof ContextEntity) {
+				return ((ContextEntity) item).getContextMap();
+			}
+			if (item instanceof Model) {
+				Model m = (Model) item;
+				return m.getId() == null
+						? Resource.toMap(m)
+						: Resource.toMapCompact(m);
+			}
+			return item;
+		};
+
+		// get context data only
+		Arrays.stream(beanMapper.getProperties())
+			.map(Property::getName)
+			.filter(validated::contains)
+			.forEach(name -> {
+				Object value = beanMapper.get(bean, name);
+				if (value instanceof Collection) {
+					value = Collections2.transform((Collection<?>) value, transform::apply);
+				} else {
+					value = transform.apply(value);
+				}
+				data.put(name, value);
+			});
+
+		return data;
+	}
+
+	@RuntimeType
 	public Object getContextEntity() {
 		final Object bean = getUnmanagedEntity();
 		final Object managed = getManagedEntity();
 
-		// populate the bean
-		for (Property property : beanMapper.getProperties()) {
-			this.validate(property);
-			if (managed != null && property.isVirtual()) {
-				final Set<String> depends = beanMapper.getComputeDependencies(property);
-				if (depends != null) {
-					depends.stream()
-						.filter(n -> !validated.contains(n))
-						.forEach(n -> beanMapper.set(bean, n, beanMapper.get(managed, n)));
-				}
-			}
+		// populate from context values
+		Arrays.stream(beanMapper.getProperties()).forEach(this::validate);
+
+		if (managed == null) {
+			return bean;
 		}
 
+		// populate dependent fields of computed property
+		Arrays.stream(beanMapper.getProperties())
+			.filter(Property::isVirtual)
+			.flatMap(p -> beanMapper.getComputeDependencies(p).stream())
+			.filter(n -> !validated.contains(n))
+			.distinct()
+			.forEach(n -> beanMapper.set(bean, n, beanMapper.get(managed, n)));
+
 		// make sure to have version value
-		if (managed != null && bean instanceof Model && !values.containsKey(FIELD_VERSION)) {
+		if (bean instanceof Model && !values.containsKey(FIELD_VERSION)) {
 			((Model) bean).setVersion(((Model) managed).getVersion());
 		}
 

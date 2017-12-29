@@ -71,7 +71,9 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 				throws IOException, JsonProcessingException {
 			if (value != null) {
 				final JsonSerializer<Object> serializer = provider.findValueSerializer(Map.class, null);
-				final Map<String, Object> map = Resource.toMap(value);
+				final Map<String, Object> map = value instanceof ContextEntity
+						? ((ContextEntity) value).getContextMap()
+						: Resource.toMap(value);
 				serializer.serialize(map, jgen, provider);
 			}
 		}

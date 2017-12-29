@@ -17,6 +17,8 @@
  */
 package com.axelor.rpc;
 
+import java.util.Map;
+
 /**
  * This interface is used by {@link ContextHandler} to return real context entity.
  * 
@@ -24,4 +26,6 @@ package com.axelor.rpc;
 public interface ContextEntity {
 
 	Object getContextEntity();
+
+	Map<String, Object> getContextMap();
 }

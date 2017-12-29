@@ -84,6 +84,7 @@ public class TestContext extends ScriptTest {
 		
 		Assert.assertTrue(proxy instanceof ContextEntity);
 		Assert.assertNotNull(((ContextEntity) proxy).getContextEntity());
+		Assert.assertNotNull(((ContextEntity) proxy).getContextMap());
 	}
 
 	@Test
