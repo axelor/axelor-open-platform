@@ -18,8 +18,14 @@
 package com.axelor.gradle.support;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.gradle.api.Project;
@@ -40,9 +46,11 @@ public class TomcatSupport extends AbstractSupport {
 	public static final String TOMCAT_RUN_TASK = "run";
 	public static final String TOMCAT_RUNNER_WAR_TASK = "runnerWar";
 	public static final String TOMCAT_RUNNER_JAR_TASK = "runnerJar";
+	public static final String TOMCAT_RUNNER_CONFIG_TASK = "runnerConfig";
 
 	public static final String TOMCAT_RUNNER_CLASS = "com.axelor.tomcat.TomcatRunner";
 	public static final String TOMCAT_RUNNER_JAR = "axelor-tomcat.jar";
+	public static final String TOMCAT_RUNNER_CONFIG = "axelor-tomcat.properties";
 
 	public static final String GENERATE_LAUNCHER_TASK = "generateLauncher";
 	
@@ -67,9 +75,15 @@ public class TomcatSupport extends AbstractSupport {
 			task.into(warDir);
 			task.with((War) project.getTasks().findByName(WarPlugin.WAR_TASK_NAME));
 		});
+		
+		project.getTasks().create(TOMCAT_RUNNER_CONFIG_TASK, task -> {
+			task.setDescription("Generate axelor-tomcat.properties.");
+			task.doLast(a -> generateConfig(project));
+		});
 
 		project.getTasks().create(TOMCAT_RUNNER_JAR_TASK, Jar.class, task -> {
 			task.dependsOn(TOMCAT_RUNNER_WAR_TASK);
+			task.dependsOn(TOMCAT_RUNNER_CONFIG_TASK);
 			task.setArchiveName(TOMCAT_RUNNER_JAR);
 			task.setDestinationDir(baseDir);
 			task.onlyIf(t -> !task.getArchivePath().exists());
@@ -90,5 +104,56 @@ public class TomcatSupport extends AbstractSupport {
 			task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
 			task.dependsOn(TOMCAT_RUNNER_JAR_TASK);
 		});
+	}
+	
+	public static List<File> findWebapps(Project project) {
+		final List<File> webapps = new ArrayList<>();
+		final File baseDir = FileUtils.getFile(project.getBuildDir(), "tomcat");
+		final File warDir = FileUtils.getFile(baseDir, "webapps", "exploded");
+		final File webapp = new File(project.getProjectDir(), "src/main/webapp");
+
+		if (webapp.exists()) {
+			webapps.add(webapp);
+		}
+
+		// try to use linked axelor-web's webapp dir
+		project.getGradle().getIncludedBuilds().stream()
+			.map(it -> new File(it.getProjectDir(), "axelor-web/src/main/webapp"))
+			.filter(it -> it.exists())
+			.findFirst().ifPresent(webapps::add);
+
+		// finally add exploded war
+		webapps.add(warDir);
+
+		return webapps;
+	}
+	
+	private void generateConfig(Project project) {
+		final Properties props = new Properties();
+
+		props.setProperty("extraClasses", HotswapSupport.findOutputPaths(project).stream()
+				.filter(File::exists)
+				.map(File::getAbsolutePath)
+				.collect(Collectors.joining(",")));
+
+		props.setProperty("webapps", findWebapps(project).stream()
+				.filter(File::exists)
+				.map(File::getAbsolutePath)
+				.collect(Collectors.joining(",")));
+
+		props.setProperty("baseDir", FileUtils.getFile(project.getBuildDir(), "tomcat").getAbsolutePath());
+		props.setProperty("port", "8080");
+		props.setProperty("contextPath", "/" + ((War) project.getTasks().getByName("war")).getBaseName());
+
+		final File target = FileUtils.getFile(project.getBuildDir(), "tomcat", TOMCAT_RUNNER_CONFIG);
+
+		// make sure to have parent dir
+		target.getParentFile().mkdirs();
+
+		try (OutputStream os = new FileOutputStream(target)) {
+			props.store(os, null);
+		} catch (IOException e) {
+			project.getLogger().error(e.getMessage(), e);
+		}
 	}
 }
