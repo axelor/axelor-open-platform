@@ -107,26 +107,27 @@ public class IdeaSupport extends AbstractSupport {
 	}
 
 	private String generateRunConfiguration(Project project, String name) {
-		final TomcatRun tomcatRun = (TomcatRun) project.getTasks().getByName(TomcatSupport.TOMCAT_RUN_TASK);
-		// configure tomcatRun
-		tomcatRun.configure(false, true);
-
 		final StringBuilder builder = new StringBuilder();
-		builder.append("  <configuration default='false' name='").append(name).append("'")
-			.append(" type='JarApplication' factoryName='JAR Application' singleton='true'>\n");
-		builder.append("    <option name='JAR_PATH' value='$PROJECT_DIR$/build/tomcat/axelor-tomcat.jar' />\n");
-		builder.append("    <option name='VM_PARAMETERS' value='")
-			.append(Joiner.on(" ").join(tomcatRun.getJvmArgs())).append("' />\n");
-		builder.append("    <option name='PROGRAM_PARAMETERS' value='")
-			.append(Joiner.on(" ").join(tomcatRun.getArgs())).append("' />\n");
-		builder.append("    <option name='WORKING_DIRECTORY' value='$PROJECT_DIR$' />\n");
-		builder.append("    <option name='ALTERNATIVE_JRE_PATH' />\n");
-		builder.append("    <envs />\n");
-		builder.append("    <module name='").append(project.getName()).append("' />\n");
-		builder.append("    <method>\n");
-		builder.append("      <option name='Gradle.BeforeRunTask' enabled='true' tasks='runnerJar' externalProjectPath='$PROJECT_DIR$' vmOptions='' scriptParameters='' />\n");
-		builder.append("    </method>\n");
-		builder.append("  </configuration>\n");
+		builder.append("<configuration default=\"false\" name=\"")
+				.append(name).append("\" type=\"Application\" factoryName=\"Application\" singleton=\"true\">\n");
+		builder.append("  <extension name=\"coverage\" enabled=\"false\" merge=\"false\" sample_coverage=\"true\" runner=\"idea\" />\n");
+		builder.append("  <option name=\"MAIN_CLASS_NAME\" value=\"com.axelor.app.internal.AppRunner\" />\n");
+		builder.append("  <option name=\"VM_PARAMETERS\" value=\"")
+				.append(Joiner.on(" ").join(TomcatRun.getJvmArgs(project, true, false))).append("\" />\n");
+		builder.append("  <option name=\"PROGRAM_PARAMETERS\" value=\"")
+				.append(Joiner.on(" ").join(TomcatRun.getArgs(project, 8080))).append("\" />\n");
+		builder.append("  <option name=\"WORKING_DIRECTORY\" value=\"file://$PROJECT_DIR$\" />\n");
+		builder.append("  <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"false\" />\n");
+		builder.append("  <option name=\"ALTERNATIVE_JRE_PATH\" />\n");
+		builder.append("  <option name=\"ENABLE_SWING_INSPECTOR\" value=\"false\" />\n");
+		builder.append("  <option name=\"ENV_VARIABLES\" />\n");
+		builder.append("  <option name=\"PASS_PARENT_ENVS\" value=\"true\" />\n");
+		builder.append("  <module name=\"").append(project.getName()).append("_main").append("\" />\n");
+		builder.append("  <envs />\n");
+		builder.append("  <method>\n");
+		builder.append("    <option name=\"Make\" enabled=\"true\" />\n");
+		builder.append("  </method>\n");
+		builder.append("</configuration>\n");
 		return builder.toString();
 	}
 }
