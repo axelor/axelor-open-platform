@@ -29,6 +29,7 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.realm.MemoryRealm;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Tomcat;
@@ -107,9 +108,11 @@ public class TomcatServer {
 		tomcat.setConnector(connector);
 		tomcat.setPort(port);
 
+		final WebappLoader loader = new WebappLoader(getClass().getClassLoader());
 		final StandardContext context = (StandardContext) tomcat.addWebapp(contextPath, docBase);
 		final StandardRoot resources = new StandardRoot();
 
+		context.setLoader(loader);
 		context.setResources(resources);
 		context.setUnpackWAR(false);
 
