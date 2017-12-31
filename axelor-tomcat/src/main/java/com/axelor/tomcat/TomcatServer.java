@@ -98,12 +98,14 @@ public class TomcatServer {
 		};
 
 		tomcat.setBaseDir(baseDir.toFile().getAbsolutePath());
-		
+		tomcat.getHost().setAutoDeploy(false);
+
 		final MemoryRealm memoryRealm = new MemoryRealm();
 		tomcat.getEngine().setRealm(memoryRealm);
 
 		final Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
 		connector.setPort(port);
+		connector.setProperty("bindOnInit", "false");
 
 		tomcat.setConnector(connector);
 		tomcat.setPort(port);
@@ -147,7 +149,9 @@ public class TomcatServer {
 				System.err.println("Context [" + contextPath + "] failed in [" + lifecycle.getClass().getName() + "] lifecycle.");
 				break;
 			case STARTED:
-				System.err.println("Running at http://localhost:" + port + contextPath);
+				System.out.println();
+				System.out.println("Running at http://localhost:" + port + contextPath);
+				System.out.println();
 				break;
 			default:
 				break;

@@ -70,6 +70,7 @@ public final class TldSkipPatterns {
 
 		// Additional typical for Axelor applications
 		patterns.add("activation-*.jar");
+		patterns.add("animal-sniffer-annotations-*.jar");
 		patterns.add("antlr-*.jar");
 		patterns.add("antlr-runtime-*.jar");
 		patterns.add("aopalliance-*.jar");
@@ -85,7 +86,8 @@ public final class TldSkipPatterns {
 		patterns.add("commons-*.jar");
 		patterns.add("dom4j-*.jar");
 		patterns.add("ecj-*.jar");
-		patterns.add("ehcache-core-*.jar");
+		patterns.add("ehcache-*.jar");
+		patterns.add("error_prone_annotations-*.jar");
 		patterns.add("flute-*.jar");
 		patterns.add("flyway-core-*.jar");
 		patterns.add("fontbox-*.jar");
@@ -100,6 +102,7 @@ public final class TldSkipPatterns {
 		patterns.add("httpclient-*.jar");
 		patterns.add("httpcore-*.jar");
 		patterns.add("infinispan-*.jar");
+		patterns.add("j2objc-annotations-*.jar");
 		patterns.add("jackson-*.jar");
 		patterns.add("jandex-*.jar");
 		patterns.add("jansi-*.jar");
