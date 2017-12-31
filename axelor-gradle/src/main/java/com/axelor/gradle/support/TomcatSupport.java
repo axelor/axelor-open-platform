@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.plugins.WarPlugin;
-import org.gradle.api.tasks.Sync;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.bundling.War;
 
@@ -44,7 +43,6 @@ public class TomcatSupport extends AbstractSupport {
 	public static final String TOMCAT_CONFIGURATION = "tomcat";
 
 	public static final String TOMCAT_RUN_TASK = "run";
-	public static final String TOMCAT_RUNNER_WAR_TASK = "runnerWar";
 	public static final String TOMCAT_RUNNER_JAR_TASK = "runnerJar";
 	public static final String TOMCAT_RUNNER_CONFIG_TASK = "runnerConfig";
 
@@ -61,7 +59,6 @@ public class TomcatSupport extends AbstractSupport {
 		applyConfigurationLibs(project, TOMCAT_CONFIGURATION, TOMCAT_CONFIGURATION);
 		
 		final File baseDir = FileUtils.getFile(project.getBuildDir(), "tomcat");
-		final File warDir = FileUtils.getFile(baseDir, "webapps", "exploded");
 
 		project.getTasks().create(TOMCAT_RUN_TASK, TomcatRun.class, task -> {
 			task.dependsOn(TOMCAT_RUNNER_JAR_TASK);
@@ -69,20 +66,12 @@ public class TomcatSupport extends AbstractSupport {
 			task.setGroup(AxelorPlugin.AXELOR_APP_GROUP);
 		});
 
-		project.getTasks().create(TOMCAT_RUNNER_WAR_TASK, Sync.class, task -> {
-			task.dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
-			task.setDescription("Prepare exploded war for tomcat runner.");
-			task.into(warDir);
-			task.with((War) project.getTasks().findByName(WarPlugin.WAR_TASK_NAME));
-		});
-		
 		project.getTasks().create(TOMCAT_RUNNER_CONFIG_TASK, task -> {
 			task.setDescription("Generate axelor-tomcat.properties.");
 			task.doLast(a -> generateConfig(project));
 		});
 
 		project.getTasks().create(TOMCAT_RUNNER_JAR_TASK, Jar.class, task -> {
-			task.dependsOn(TOMCAT_RUNNER_WAR_TASK);
 			task.dependsOn(TOMCAT_RUNNER_CONFIG_TASK);
 			task.setArchiveName(TOMCAT_RUNNER_JAR);
 			task.setDestinationDir(baseDir);
@@ -108,8 +97,6 @@ public class TomcatSupport extends AbstractSupport {
 	
 	public static List<File> findWebapps(Project project) {
 		final List<File> webapps = new ArrayList<>();
-		final File baseDir = FileUtils.getFile(project.getBuildDir(), "tomcat");
-		final File warDir = FileUtils.getFile(baseDir, "webapps", "exploded");
 		final File webapp = new File(project.getProjectDir(), "src/main/webapp");
 
 		if (webapp.exists()) {
@@ -122,16 +109,33 @@ public class TomcatSupport extends AbstractSupport {
 			.filter(it -> it.exists())
 			.findFirst().ifPresent(webapps::add);
 
-		// finally add exploded war
-		webapps.add(warDir);
-
 		return webapps;
 	}
 	
 	private void generateConfig(Project project) {
 		final Properties props = new Properties();
+		final War war = (War) project.getTasks().getByName(WarPlugin.WAR_TASK_NAME);
+		
+		final List<File> extraClasses = new ArrayList<>();
+		final List<File> extraLibs = new ArrayList<>();
 
-		props.setProperty("extraClasses", HotswapSupport.findOutputPaths(project).stream()
+		extraClasses.addAll(HotswapSupport.findOutputPaths(project));
+
+		for (File file : war.getClasspath()) {
+			if (file.isDirectory()) {
+				extraClasses.add(file);
+			}
+			if (file.getName().endsWith(".jar")) {
+				extraLibs.add(file);
+			}
+		}
+
+		props.setProperty("extraClasses", extraClasses.stream()
+				.filter(File::exists)
+				.map(File::getAbsolutePath)
+				.collect(Collectors.joining(",")));
+
+		props.setProperty("extraLibs", extraLibs.stream()
 				.filter(File::exists)
 				.map(File::getAbsolutePath)
 				.collect(Collectors.joining(",")));
