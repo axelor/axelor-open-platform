@@ -6,6 +6,9 @@ task generateDocs(type: Javadoc) {
 	destinationDir = file("${buildDir}/docs")
 	failOnError = false
 
+	source = subprojects.sourceSets.main.allJava
+	classpath = files(subprojects.sourceSets.main.compileClasspath)
+
 	exclude '**/internal/**'
 	exclude '**/*Impl.java'
 
@@ -64,12 +67,5 @@ task generateDocs(type: Javadoc) {
 
 	doFirst {
 		title = "Axelor Development Kit $version API"
-	}
-}
-
-subprojects {
-	rootProject.tasks.generateDocs {
-		source sourceSets.main.allJava
-		classpath = files(sourceSets.main.compileClasspath)
 	}
 }
