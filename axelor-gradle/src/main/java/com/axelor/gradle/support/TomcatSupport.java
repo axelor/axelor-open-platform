@@ -119,8 +119,6 @@ public class TomcatSupport extends AbstractSupport {
 		final List<File> extraClasses = new ArrayList<>();
 		final List<File> extraLibs = new ArrayList<>();
 
-		extraClasses.addAll(HotswapSupport.findOutputPaths(project));
-
 		for (File file : war.getClasspath()) {
 			if (file.isDirectory()) {
 				extraClasses.add(file);
@@ -129,6 +127,8 @@ public class TomcatSupport extends AbstractSupport {
 				extraLibs.add(file);
 			}
 		}
+
+		extraClasses.addAll(HotswapSupport.findOutputPaths(project));
 
 		props.setProperty("extraClasses", extraClasses.stream()
 				.filter(File::exists)
