@@ -19,11 +19,14 @@ package com.axelor.gradle.support;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.composite.internal.IncludedBuildInternal;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin;
 import org.gradle.plugins.ide.eclipse.model.AccessRule;
@@ -58,8 +61,6 @@ public class EclipseSupport extends AbstractSupport {
 					.dependsOn(GenerateCode.TASK_NAME);
 			}
 			if (project.getPlugins().hasPlugin(AppPlugin.class)) {
-				project.getTasks().getByName(EclipsePlugin.ECLIPSE_CP_TASK_NAME).
-					dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
 				project.getTasks().create("generateEclipseLauncher", task -> {
 					final File cpFile = new File(project.getRootDir(), ".classpath");
 					task.onlyIf(t -> cpFile.exists());
@@ -69,6 +70,14 @@ public class EclipseSupport extends AbstractSupport {
 						generateLauncher.finalizedBy(task);
 					}
 				});
+				// Fix wtp issue in included builds (with buildship)
+				// see: https://discuss.gradle.org/t/gradle-composite-builds-and-eclipse-wtp/23503
+				project.getGradle().getIncludedBuilds().stream()
+					.map(ib -> ((IncludedBuildInternal) ib).getConfiguredBuild().getRootProject())
+					.flatMap(ib -> Stream.concat(Arrays.asList(ib).stream(), ib.getSubprojects().stream()))
+					.filter(ip -> ip.getPlugins().hasPlugin(EclipseWtpPlugin.class))
+					.map(ip -> ip.getTasks().getByName("eclipseWtp"))
+					.forEach(it -> project.getTasks().getByName("eclipseWtp").dependsOn(it));
 			}
 		});
 
