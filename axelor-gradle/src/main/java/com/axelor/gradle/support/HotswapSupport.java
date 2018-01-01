@@ -28,9 +28,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -39,7 +41,6 @@ import org.gradle.composite.internal.IncludedBuildInternal;
 
 import com.axelor.common.FileUtils;
 import com.axelor.gradle.HotswapExtension;
-import com.axelor.gradle.tasks.GenerateCode;
 import com.google.common.base.Joiner;
 
 public class HotswapSupport extends AbstractSupport {
@@ -105,7 +106,8 @@ public class HotswapSupport extends AbstractSupport {
 			});
 		});
 
-		project.getTasks().withType(GenerateCode.class).all(task -> task.finalizedBy(GENERATE_HOTSWAP_CONFIG_TASK));
+		project.getTasks().getByName(TomcatSupport.TOMCAT_RUNNER_JAR_TASK,
+				task -> task.dependsOn(GENERATE_HOTSWAP_CONFIG_TASK));
 	}
 
 	/**
@@ -114,14 +116,17 @@ public class HotswapSupport extends AbstractSupport {
 	 */
 	public static List<File> findOutputPaths(Project project) {
 		final List<File> extraClasses = new ArrayList<>();
-		final Function<Project, List<File>> findClasses = p -> Arrays.asList(
+		final Function<Project, Optional<File>> findClasses = p -> Stream.of(
 				FileUtils.getFile(p.getProjectDir(), "bin", "main"),
-				FileUtils.getFile(p.getProjectDir(), "out", "production"));
+				FileUtils.getFile(p.getProjectDir(), "out", "production"))
+				.filter(File::exists)
+				.findFirst();
 
 		project.getAllprojects().stream()
 			.filter(p -> FileUtils.getFile(p.getProjectDir(), "build.gradle").exists())
-			.flatMap(p -> findClasses.apply(p).stream())
-			.filter(File::exists)
+			.map(p -> findClasses.apply(p))
+			.filter(p -> p.isPresent())
+			.map(p -> p.get())
 			.forEach(extraClasses::add);
 
 		project.getGradle().getIncludedBuilds().forEach(b -> {
@@ -130,8 +135,9 @@ public class HotswapSupport extends AbstractSupport {
 				.filter(p -> !p.getName().equals("axelor-gradle"))
 				.filter(p -> !p.getName().equals("axelor-tomcat"))
 				.filter(p -> !p.getName().equals("axelor-test"))
-				.flatMap(p -> findClasses.apply(p).stream())
-				.filter(File::exists)
+				.map(p -> findClasses.apply(p))
+				.filter(p -> p.isPresent())
+				.map(p -> p.get())
 				.forEach(extraClasses::add);
 		});
 
@@ -166,8 +172,6 @@ public class HotswapSupport extends AbstractSupport {
 		}
 
 		findOutputPaths(project).stream()
-			.map(f -> toRelativePath(project, f))
-			.map(f -> new File(f))
 			.forEach(extraClasspath::add);
 
 		hotswapProps.setProperty("extraClasspath", extraClasspath.stream()
