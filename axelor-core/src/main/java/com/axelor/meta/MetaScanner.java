@@ -53,7 +53,8 @@ public final class MetaScanner {
 
 	private static final String[] BUILD_OUTPUT_PATHS = {
 		"bin/main",
-		"out/production",
+		"out/production/classes",
+		"out/production/resources",
 		"build/resources/main",
 		"build/classes/main",
 		"build/classes/java/main",

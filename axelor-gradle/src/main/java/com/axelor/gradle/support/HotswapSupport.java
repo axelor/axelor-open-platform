@@ -118,7 +118,8 @@ public class HotswapSupport extends AbstractSupport {
 		final List<File> extraClasses = new ArrayList<>();
 		final Function<Project, Optional<File>> findClasses = p -> Stream.of(
 				FileUtils.getFile(p.getProjectDir(), "bin", "main"),
-				FileUtils.getFile(p.getProjectDir(), "out", "production"))
+				FileUtils.getFile(p.getProjectDir(), "out", "production", "classes"),
+				FileUtils.getFile(p.getProjectDir(), "out", "production", "resources"))
 				.filter(File::exists)
 				.findFirst();
 
