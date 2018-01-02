@@ -94,9 +94,12 @@ public class AxelorPlugin implements Plugin<Project> {
 
 		project.getTasks().withType(AbstractCompile.class).all(task -> task.dependsOn(GenerateCode.TASK_NAME));
 
-		// add src-gen
+		// add src-gen dirs
 		project.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets()
 				.getByName(SourceSet.MAIN_SOURCE_SET_NAME).getJava()
-				.srcDir(GenerateCode.getOutputDirectory(project));
+				.srcDir(GenerateCode.getJavaOutputDir(project));
+		project.getConvention().getPlugin(JavaPluginConvention.class).getSourceSets()
+				.getByName(SourceSet.MAIN_SOURCE_SET_NAME).getResources()
+				.srcDir(GenerateCode.getResourceOutputDir(project));
 	}
 }

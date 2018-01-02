@@ -89,7 +89,7 @@ public class EclipseSupport extends AbstractSupport {
 			// separate output for main & test sources
 			cp.getEntries().stream()
 				.filter(it -> it instanceof SourceFolder).map(it -> (SourceFolder) it)
-				.filter(it -> it.getPath().startsWith("src/main/") || it.getPath().endsWith("src-gen"))
+				.filter(it -> it.getPath().startsWith("src/main/") || it.getPath().contains("src-gen/"))
 				.forEach(it -> it.setOutput("bin/main"));
 			
 			cp.getEntries().stream()

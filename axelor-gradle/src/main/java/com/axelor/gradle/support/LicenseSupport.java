@@ -57,7 +57,7 @@ public class LicenseSupport extends AbstractSupport {
 		project.getPlugins().apply(LicensePlugin.class);
 		
 		project.getTasks().create("licenseFormatGenerated", License.class, task -> {
-			final ConfigurableFileTree source = project.fileTree("build/src-gen");
+			final ConfigurableFileTree source = project.fileTree(GenerateCode.getJavaOutputDir(project));
 			source.include("**/*.java");
 			source.include("**/*.groovy");
 			task.setSource(source);

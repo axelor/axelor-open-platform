@@ -59,25 +59,5 @@ public class JavaSupport extends AbstractSupport {
 			main.getJava().setSrcDirs(new ArrayList<>());
 			test.getJava().setSrcDirs(new ArrayList<>());
 		}
-
-		// make sure to include non-java resources from src/main/java
-		main.getJava().getSrcDirs().forEach( dir -> {
-			main.resources(res -> {
-				res.srcDir(dir);
-				res.exclude("**/*.java");
-				res.exclude("**/*.groovy");
-				res.exclude("**/*.scala");
-				res.exclude("**/*.kt");
-			});
-		});
-		test.getJava().getSrcDirs().forEach( dir -> {
-			test.resources(res -> {
-				res.srcDir(dir);
-				res.exclude("**/*.java");
-				res.exclude("**/*.groovy");
-				res.exclude("**/*.scala");
-				res.exclude("**/*.kt");
-			});
-		});
 	}
 }

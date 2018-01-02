@@ -51,8 +51,10 @@ public class IdeaSupport extends AbstractSupport {
 		project.afterEvaluate(p -> {
 			if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
 				project.getTasks().getByName("ideaModule").dependsOn(GenerateCode.TASK_NAME);
-				project.getExtensions().getByType(IdeaModel.class).getModule()
-					.getGeneratedSourceDirs().add(GenerateCode.getOutputDirectory(project));
+				project.getTasks().getByName(GenerateCode.TASK_NAME, task -> {
+					project.getExtensions().getByType(IdeaModel.class).getModule()
+							.getGeneratedSourceDirs().addAll(((GenerateCode) task).getOutputDirectories());
+				});
 			}
 			if (project.getPlugins().hasPlugin(AppPlugin.class)) {
 				final String name = String.format("%s (run)", project.getName());
