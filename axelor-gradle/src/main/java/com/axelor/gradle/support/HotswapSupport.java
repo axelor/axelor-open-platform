@@ -115,19 +115,27 @@ public class HotswapSupport extends AbstractSupport {
 	 * 
 	 */
 	public static List<File> findOutputPaths(Project project) {
+
+		final Function<Project, Stream<File>> findClasses;
+
+		if (FileUtils.getFile(project.getProjectDir(), "bin", "main").exists()) { // eclipse
+			findClasses = p -> Stream.of(FileUtils.getFile(p.getProjectDir(), "bin", "main"));
+		} else if (FileUtils.getFile(project.getProjectDir(), "out", "production").exists()) { // idea
+			findClasses = p -> Stream.of(
+					FileUtils.getFile(p.getProjectDir(), "out", "production", "classes"),
+					FileUtils.getFile(p.getProjectDir(), "out", "production", "resources"));
+		} else { // gradle
+			findClasses = p -> Stream.of(
+					FileUtils.getFile(p.getProjectDir(), "build", "main", "classes"),
+					FileUtils.getFile(p.getProjectDir(), "build", "main", "resources"));
+		}
+
 		final List<File> extraClasses = new ArrayList<>();
-		final Function<Project, Optional<File>> findClasses = p -> Stream.of(
-				FileUtils.getFile(p.getProjectDir(), "bin", "main"),
-				FileUtils.getFile(p.getProjectDir(), "out", "production", "classes"),
-				FileUtils.getFile(p.getProjectDir(), "out", "production", "resources"))
-				.filter(File::exists)
-				.findFirst();
 
 		project.getAllprojects().stream()
 			.filter(p -> FileUtils.getFile(p.getProjectDir(), "build.gradle").exists())
-			.map(p -> findClasses.apply(p))
-			.filter(p -> p.isPresent())
-			.map(p -> p.get())
+			.flatMap(findClasses::apply)
+			.filter(File::exists)
 			.forEach(extraClasses::add);
 
 		project.getGradle().getIncludedBuilds().forEach(b -> {
@@ -136,9 +144,8 @@ public class HotswapSupport extends AbstractSupport {
 				.filter(p -> !p.getName().equals("axelor-gradle"))
 				.filter(p -> !p.getName().equals("axelor-tomcat"))
 				.filter(p -> !p.getName().equals("axelor-test"))
-				.map(p -> findClasses.apply(p))
-				.filter(p -> p.isPresent())
-				.map(p -> p.get())
+				.flatMap(findClasses::apply)
+				.filter(File::exists)
 				.forEach(extraClasses::add);
 		});
 
