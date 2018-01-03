@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,8 +34,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import org.eclipse.birt.core.framework.URLClassLoader;
 
 import com.axelor.common.ClassUtils;
 import com.axelor.common.StringUtils;
@@ -51,7 +50,7 @@ public final class MetaScanner {
 	private static final String MODULE_PROPERTIES = "module.properties";
 	private static final String SCHEME_JAR = "jar";
 
-	private static final String[] BUILD_OUTPUT_PATHS = {
+	private static final List<String> BUILD_OUTPUT_PATHS = Arrays.asList(
 		"bin/main",
 		"out/production/classes",
 		"out/production/resources",
@@ -60,8 +59,8 @@ public final class MetaScanner {
 		"build/classes/java/main",
 		"build/classes/scala/main",
 		"build/classes/kotlin/main",
-		"build/classes/groovy/main",
-	};
+		"build/classes/groovy/main"
+	);
 
 	private MetaScanner() {
 	}
@@ -139,22 +138,44 @@ public final class MetaScanner {
 			return paths;
 		}
 
-		final Path base = Arrays.stream(BUILD_OUTPUT_PATHS)
+		final Path base = BUILD_OUTPUT_PATHS.stream()
 				.filter(p -> file.endsWith(p))
 				.findFirst()
 				.map(p -> p.replaceAll("[^/]+", ".."))
-				.map(p -> file.resolve(p))
+				.map(p -> file.resolve(p).normalize())
 				.get();
+
 		try {
-			for (String path : BUILD_OUTPUT_PATHS) {
-				Path next = base.resolve(path).normalize();
-				if (Files.exists(next)) {
-					paths.add(next.toUri().toURL());
-				}
-			}
-		} catch (MalformedURLException e) {
+			paths.add(file.toUri().toURL());
+		} catch (MalformedURLException e1) {
 			// this should never happen
 		}
+
+		final ClassLoader loader = ClassUtils.getContextClassLoader();
+		if (loader instanceof URLClassLoader) {
+			for (URL url : ((URLClassLoader) loader).getURLs()) {
+				try {
+					Path next = Paths.get(url.toURI());
+					if (Files.isDirectory(next) && next.startsWith(base)) {
+						paths.add(url);
+					}
+				} catch (URISyntaxException e) {
+					// this should never happen
+				}
+			}
+		} else {
+			BUILD_OUTPUT_PATHS.stream()
+				.map(base::resolve)
+				.filter(Files::exists)
+				.forEach(next -> {
+					try {
+						paths.add(next.toUri().toURL());
+					} catch (MalformedURLException e) {
+						// this should never happen
+					}
+				});
+		}
+
 		return paths;
 	}
 
