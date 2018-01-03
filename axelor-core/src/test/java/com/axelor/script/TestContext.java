@@ -53,7 +53,7 @@ public class TestContext extends ScriptTest {
 	public void testContext() throws Exception {
 
 		final Context context = new Context(contextMap(), Contact.class);
-		final Contact proxy = context.asLazyType(Contact.class);
+		final Contact proxy = context.asType(Contact.class);
 		final Contact managed = getEntityManager().find(Contact.class, proxy.getId());
 
 		Assert.assertNotNull(proxy.getTitle());

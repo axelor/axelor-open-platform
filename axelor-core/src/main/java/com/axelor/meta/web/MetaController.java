@@ -124,7 +124,7 @@ public class MetaController {
 	 *
 	 */
 	public void contextFieldChange(ActionRequest request, ActionResponse response) {
-		final MetaJsonField jsonField = request.getContext().asLazyType(MetaJsonField.class);
+		final MetaJsonField jsonField = request.getContext().asType(MetaJsonField.class);
 		final String modelName = jsonField.getModel();
 		final String fieldName = jsonField.getContextField();
 

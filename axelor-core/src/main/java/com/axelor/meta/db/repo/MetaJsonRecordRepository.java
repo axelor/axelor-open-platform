@@ -94,7 +94,7 @@ public class MetaJsonRecordRepository extends JpaRepository<MetaJsonRecord> {
 		if (values != null) {
 			context.putAll(values);
 		}
-		return context.asLazyType(MetaJsonRecord.class);
+		return context.asType(MetaJsonRecord.class);
 	}
 
 	/**

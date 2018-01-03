@@ -45,6 +45,7 @@ import com.axelor.meta.schema.actions.ActionMethod;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
+import com.axelor.rpc.ContextEntity;
 import com.axelor.rpc.Resource;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptHelper;
@@ -323,7 +324,7 @@ public class ActionHandler {
 	 */
 	@SuppressWarnings("all")
 	private Object process(Object data) {
-		if (data == null) return data;
+		if (data == null || data instanceof ContextEntity) return data;
 		if (data instanceof Collection) {
 			final List items = new ArrayList<>();
 			for (Object item : (Collection) data) {
@@ -333,7 +334,9 @@ public class ActionHandler {
 		}
 		if (data instanceof Map) {
 			final Map<String, Object> item = new HashMap<>((Map<String, Object>) data);
-			if (item.containsKey(KEY_VALUES) && item.get(KEY_VALUES) instanceof Map) {
+			if (item.containsKey(KEY_VALUES)
+					&& item.get(KEY_VALUES) instanceof Map
+					&& !(item.get(KEY_VALUES) instanceof ContextEntity)) {
 				final Map<String, Object> values = (Map) item.get(KEY_VALUES);
 				for (String key : values.keySet()) {
 					Object value = values.get(key);
@@ -342,7 +345,9 @@ public class ActionHandler {
 					}
 				}
 			}
-			if (item.containsKey(KEY_ATTRS) && item.get(KEY_ATTRS) instanceof Map) {
+			if (item.containsKey(KEY_ATTRS)
+					&& item.get(KEY_ATTRS) instanceof Map
+					&& !(item.get(KEY_ATTRS) instanceof ContextEntity)) {
 				final Map<String, Object> values = (Map) item.get(KEY_ATTRS);
 				for (String key : values.keySet()) {
 					final Map<String, Object> attrs = (Map) values.get(key);

@@ -25,6 +25,13 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.axelor.db.EntityHelper;
+import com.axelor.db.JPA;
+import com.axelor.db.Model;
+
 /**
  * An implementation of {@link Response} to be used with controllers.
  * 
@@ -34,6 +41,8 @@ import javax.xml.bind.annotation.XmlType;
 public class ActionResponse extends Response {
 
 	private Map<String, Object> dataMap;
+	
+	private static final Logger log = LoggerFactory.getLogger(ActionResponse.class);
 
 	private Map<String, Object> dataMap() {
 		if (dataMap == null) {
@@ -158,31 +167,35 @@ public class ActionResponse extends Response {
 	/**
 	 * Set record values.
 	 * <p>
-	 * The client updates current view with these values.
-	 * </p>
+	 * The client will update current view with these values.
 	 * 
-	 * @param context
-	 *            a map or a model instance
-	 * @see #setValue(String, Object)
-	 * @see #setValues(Map)
-	 */
-	@Deprecated
-	public void setValues(Object context) {
-		set("values", context);
-	}
-
-	/**
-	 * Set record values.
 	 * <p>
-	 * The client updates current view with these values.
+	 * The context can be a {@link Map}, {@link Context} or {@link Model} proxy
+	 * obtained with {@link Context#asType(Class)}. Managed instance of
+	 * {@link Model} should be avoided.
 	 * </p>
 	 * 
 	 * @param context
-	 *            a map or a model instance
+	 *            the context to set, a map or context proxy
 	 * @see #setValue(String, Object)
+	 * @see Context#asType(Class)
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if passed context is detached non-proxy entity.
 	 */
-	public void setValues(Map<String, Object> values) {
-		set("values", values);
+	public void setValues(Object context) {
+		boolean managed = false;
+		if (context instanceof ContextEntity
+				|| context instanceof Map
+				|| (managed = context instanceof Model && JPA.em().contains(context))) {
+			if (managed) {
+				log.warn("managed instance passed as context: {}#{}",
+						EntityHelper.getEntityClass(context), ((Model) context).getId());
+			}
+			set("values", context);
+		} else {
+			throw new IllegalArgumentException("Invalid context object.");
+		}
 	}
 
 	/**

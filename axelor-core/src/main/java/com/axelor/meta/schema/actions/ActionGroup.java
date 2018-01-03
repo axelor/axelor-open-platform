@@ -35,6 +35,7 @@ import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.views.AbstractView;
+import com.axelor.rpc.ContextEntity;
 import com.axelor.rpc.Response;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
@@ -338,10 +339,11 @@ public class ActionGroup extends ActionResumable {
 		Object values = value.get("values");
 		Map<String, Object> map = Maps.newHashMap();
 		
-    	if (values instanceof Model) {
+		if (values instanceof ContextEntity) {
+			map = ((ContextEntity) values).getContextMap();
+		} else if (values instanceof Model) {
     		map = Mapper.toMap(value);
-    	}
-    	if (values instanceof Map) {
+    	} else if (values instanceof Map) {
     		map = Maps.newHashMap((Map) values);
     	}
     	

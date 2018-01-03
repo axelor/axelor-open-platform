@@ -36,6 +36,7 @@ import com.axelor.db.internal.DBHelper;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
+import com.axelor.rpc.ContextEntity;
 import com.axelor.rpc.Resource;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -556,6 +557,11 @@ public class Query<T extends Model> {
 	 * @return the same instance
 	 */
 	public Query<T> bind(String name, Object value) {
+		if (value instanceof ContextEntity) {
+			throw new IllegalArgumentException(
+					String.format("Cannot bind proxy instance: %s#%s",
+							EntityHelper.getEntityClass(value), ((Model) value).getId()));
+		}
 		Map<String, Object> params = Maps.newHashMap();
 		params.put(name, value);
 		return this.bind(params);
