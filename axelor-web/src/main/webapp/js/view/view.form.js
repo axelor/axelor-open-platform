@@ -402,14 +402,6 @@ function FormViewCtrl($scope, $element) {
 	};
 
 	$scope.$watch("record", function(rec, old) {
-		var view = $scope.schema;
-		if (view && view.readonlyIf) {
-			var readonly = axelor.$eval($scope, view.readonlyIf, _.extend({}, $scope._context, rec));
-			if (_.isFunction($scope.attr)) {
-				$scope.attr('readonly', readonly);
-			}
-			editable = !readonly;
-		}
 		if (rec === old) {
 			$scope.$$dirty = false;
 			return;
@@ -421,6 +413,17 @@ function FormViewCtrl($scope, $element) {
 	$scope.$broadcastRecordChange = function () {
 		$scope.$broadcast("on:record-change", $scope.record);
 	};
+	
+	$scope.$on("on:record-change", function () {
+		var view = $scope.schema;
+		if (view && view.readonlyIf) {
+			var readonly = axelor.$eval($scope, view.readonlyIf, _.extend({}, $scope._context, $scope.record));
+			if (_.isFunction($scope.attr)) {
+				$scope.attr('readonly', readonly);
+			}
+			editable = !readonly;
+		}
+	});
 
 	$scope.isValid = function() {
 		return $scope.form && $scope.form.$valid;
