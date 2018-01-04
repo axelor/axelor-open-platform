@@ -251,12 +251,18 @@ public class QueryBinder {
 		if (type == null) {
 			return value;
 		}
+
 		value = Adapter.adapt(value, type, type, null);
-		if (value instanceof Model && type.isInstance(value)) {
+
+		if (value instanceof Number && Model.class.isAssignableFrom(type)) {
+			value = JPA.em().find(type, value);
+		} else if (value instanceof Model && type.isInstance(value)) {
 			Model bean = (Model) value;
-			if (bean.getId() != null)
+			if (bean.getId() != null) {
 				value = JPA.find(bean.getClass(), bean.getId());
+			}
 		}
+
 		return value;
 	}
 }

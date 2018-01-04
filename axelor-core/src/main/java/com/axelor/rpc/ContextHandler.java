@@ -39,6 +39,7 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.google.common.collect.Collections2;
+import com.google.common.primitives.Longs;
 
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
@@ -320,6 +321,11 @@ public class ContextHandler<T> {
 			});
 
 		return data;
+	}
+	
+	@RuntimeType
+	public Long getContextId() {
+		return Longs.tryParse(values.getOrDefault("id", "").toString());
 	}
 
 	@RuntimeType

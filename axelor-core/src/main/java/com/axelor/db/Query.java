@@ -558,9 +558,7 @@ public class Query<T extends Model> {
 	 */
 	public Query<T> bind(String name, Object value) {
 		if (value instanceof ContextEntity) {
-			throw new IllegalArgumentException(
-					String.format("Cannot bind proxy instance: %s#%s",
-							EntityHelper.getEntityClass(value), ((Model) value).getId()));
+			value = ((ContextEntity) value).getContextId();
 		}
 		Map<String, Object> params = Maps.newHashMap();
 		params.put(name, value);

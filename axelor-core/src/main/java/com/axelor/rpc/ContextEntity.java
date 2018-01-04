@@ -25,6 +25,8 @@ import java.util.Map;
  */
 public interface ContextEntity {
 
+	Long getContextId();
+
 	Object getContextEntity();
 
 	Map<String, Object> getContextMap();
