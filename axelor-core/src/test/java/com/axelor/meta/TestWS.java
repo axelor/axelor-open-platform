@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.axelor.inject.Beans;
@@ -44,6 +45,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
+@Ignore
 public class TestWS extends MetaTest {
 	
 	private ActionHandler createHandler(String actions, Map<String, Object> context) {

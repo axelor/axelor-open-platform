@@ -3,7 +3,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
   
-  <form name="contact-form1" title="Contact" model="com.axelor.contact.db.Contact">
+  <form name="contact-form1" title="Contact" model="com.axelor.test.db.Contact">
     <field name="firstName"/>
     <field name="lastName"/>
   </form>

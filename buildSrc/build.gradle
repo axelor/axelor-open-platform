@@ -28,3 +28,5 @@ dependencies {
 	compile libs.opencsv
 	compile libs.plugin_license
 }
+
+test.enabled = false
