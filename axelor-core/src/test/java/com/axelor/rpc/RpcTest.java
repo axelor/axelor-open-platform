@@ -51,7 +51,7 @@ abstract class RpcTest extends JpaTest {
 	}
 	
 	protected <T> T fromJson(String json, Class<T> klass) {
-		if (json.endsWith(".js"))
+		if (json.endsWith(".json"))
 			return fromJson(read(json), klass);
 		try {
 			return mapper.readValue(json, klass);

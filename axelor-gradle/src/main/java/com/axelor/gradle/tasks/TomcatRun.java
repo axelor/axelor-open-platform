@@ -23,15 +23,13 @@ import java.util.List;
 
 import org.gradle.api.Project;
 import org.gradle.api.internal.tasks.options.Option;
-import org.gradle.api.plugins.WarPlugin;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.api.tasks.bundling.War;
 import org.gradle.jvm.tasks.Jar;
 
+import com.axelor.common.FileUtils;
 import com.axelor.gradle.support.HotswapSupport;
 import com.axelor.gradle.support.TomcatSupport;
-import com.google.common.base.Joiner;
 
 public class TomcatRun extends JavaExec {
 
@@ -49,72 +47,40 @@ public class TomcatRun extends JavaExec {
 		this.port = Integer.parseInt(port);
 	}
 
-	public void configure(boolean hot, boolean debug) {
-		final Project project = getProject();
-		final War war = (War) project.getTasks().getByName(WarPlugin.WAR_TASK_NAME);
-		final File baseDir = new File(project.getBuildDir(), "tomcat");
-
-		final List<String> webapps = new ArrayList<>();
-		final List<String> classes = new ArrayList<>();
-		final List<String> libs = new ArrayList<>();
-		
-		for (File file : war.getClasspath()) {
-			if (file.isDirectory()) {
-				classes.add(file.getAbsolutePath());
-			}
-			if (file.getName().endsWith(".jar")) {
-				libs.add(file.getAbsolutePath());
-			}
-		}
-		
-		final File webapp = new File(project.getProjectDir(), "src/main/webapp");
-		if (webapp.exists()) {
-			webapps.add(webapp.getAbsolutePath());
-		}
-
-		// try to use linked axelor-web's webapp dir
-		project.getGradle().getIncludedBuilds().stream()
-			.map(it -> new File(it.getProjectDir(), "axelor-web/src/main/webapp"))
-			.filter(it -> it.exists())
-			.findFirst().ifPresent(dir -> webapps.add(dir.getAbsolutePath()));
-		
-		final File merged = new File(project.getBuildDir(), "webapp");
-		if (merged.exists()) {
-			webapps.add(merged.getAbsolutePath());
-		}
+	public static List<String> getArgs(Project project, int port) {
+		final File baseDir = FileUtils.getFile(project.getBuildDir(), "tomcat");
+		final File confFile = FileUtils.getFile(baseDir, TomcatSupport.TOMCAT_RUNNER_CONFIG);
 
 		final List<String> args = new ArrayList<>();
-		final List<String> jvmArgs = new ArrayList<>();
 
 		args.add("--port");
 		args.add("" + port);
-		args.add("--base-dir");
-		args.add(baseDir.getAbsolutePath());
-		args.add("--context-path");
-		args.add(war.getBaseName());
-		args.add("--extra-classes");
-		args.add(Joiner.on(",").join(classes));
-		args.add("--extra-libs");
-		args.add(Joiner.on(",").join(libs));
-		args.addAll(webapps);
+		args.add("--config");
+		args.add(TomcatSupport.toRelativePath(project, confFile));
 
+		return args;
+	}
+	
+	public static List<String> getJvmArgs(Project project, boolean hot, boolean debug) {
+		final List<String> jvmArgs = new ArrayList<>();
 		if (hot || debug) {
 			if (HotswapSupport.hasDCEVM()) {
 				HotswapSupport.getAgentArgs(project, !debug).forEach(jvmArgs::add);
 			} else {
-				getLogger().info("Cannot enable hot-swaping as DCEVM is not installed.");
+				project.getLogger().info("Cannot enable hot-swaping as DCEVM is not installed.");
 			}
 		}
-		setClasspath(((Jar) project.getTasks().getByName(TomcatSupport.TOMCAT_RUNNER_TASK)).getOutputs().getFiles());
-		setMain(TomcatSupport.TOMCAT_RUNNER_CLASS);
-		setArgs(args);
-		setJvmArgs(jvmArgs);
+		return jvmArgs;
 	}
 
 	@TaskAction
 	@Override
 	public void exec() {
-		configure(hot, getDebug());
+		final Project project = getProject();
+		setArgs(getArgs(project, port));
+		setJvmArgs(getJvmArgs(project, hot, getDebug()));
+		setClasspath(((Jar) project.getTasks().getByName(TomcatSupport.TOMCAT_RUNNER_JAR_TASK)).getOutputs().getFiles());
+		setMain(TomcatSupport.TOMCAT_RUNNER_CLASS);
 		super.exec();
 	}
 }

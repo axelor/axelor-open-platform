@@ -57,7 +57,7 @@ public class ResourceTest extends RpcTest {
 	@Test
 	public void testSearch() throws Exception {
 
-		Request req = fromJson("find3.js", Request.class);
+		Request req = fromJson("find3.json", Request.class);
 		Response res = resource.search(req);
 		
 		Assert.assertNotNull(res);
@@ -69,7 +69,7 @@ public class ResourceTest extends RpcTest {
 	@Transactional
 	public void testAdd() throws Exception {
 
-		Request req = fromJson("add2.js", Request.class);
+		Request req = fromJson("add2.json", Request.class);
 		Response res = resource.save(req);
 		
 		Assert.assertNotNull(res);
@@ -133,8 +133,6 @@ public class ResourceTest extends RpcTest {
 							n.getAddresses().size());
 		
 		Assert.assertSame(c, c.getAddresses().get(0).getContact());
-		Assert.assertSame(n, n.getAddresses().get(0).getContact());
-		Assert.assertNotSame(c.getAddresses().get(0).getContact(), 
-							 n.getAddresses().get(0).getContact());
+		Assert.assertNull(n.getAddresses().get(0).getContact());
 	}
 }

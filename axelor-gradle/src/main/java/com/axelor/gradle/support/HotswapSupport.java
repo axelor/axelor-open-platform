@@ -40,7 +40,6 @@ import org.gradle.composite.internal.IncludedBuildInternal;
 
 import com.axelor.common.FileUtils;
 import com.axelor.gradle.HotswapExtension;
-import com.axelor.gradle.tasks.GenerateCode;
 import com.google.common.base.Joiner;
 
 public class HotswapSupport extends AbstractSupport {
@@ -81,7 +80,7 @@ public class HotswapSupport extends AbstractSupport {
 				final StringBuilder agent = new StringBuilder("-javaagent:").append(agentJar.getAbsolutePath());
 				final List<String> agentArgs = new ArrayList<>();
 				if (config.exists()) {
-					agentArgs.add("propertiesFilePath=" + config.getAbsolutePath());
+					agentArgs.add("propertiesFilePath=" + toRelativePath(project, config));
 				}
 				if (auto) {
 					agentArgs.add("autoHotswap=true");
@@ -106,39 +105,58 @@ public class HotswapSupport extends AbstractSupport {
 			});
 		});
 
-		project.getTasks().withType(GenerateCode.class).all(task -> task.finalizedBy(GENERATE_HOTSWAP_CONFIG_TASK));
+		project.getTasks().getByName(TomcatSupport.TOMCAT_RUNNER_JAR_TASK,
+				task -> task.dependsOn(GENERATE_HOTSWAP_CONFIG_TASK));
 	}
 
-	private void generateHotswapConfig(Project project) {
-		final HotswapExtension extension = project.getExtensions().getByType(HotswapExtension.class);
-		final Function<Project, List<File>> findClasses = p -> Arrays.asList(
-				FileUtils.getFile(p.getProjectDir(), "bin", "main"),
-				FileUtils.getFile(p.getBuildDir(), "classes", "main"));
-		final Function<Project, File> findResources = p ->
-				FileUtils.getFile(p.getProjectDir(), "src", "main", "resources");
+	/**
+	 * Find IDE output paths.
+	 * 
+	 */
+	public static List<File> findOutputPaths(Project project) {
 
-		final List<File> extraClasspath = new ArrayList<>();
-		final List<File> watchResources = new ArrayList<>();
+		final Function<Project, Stream<File>> findClasses;
+
+		if (FileUtils.getFile(project.getProjectDir(), "bin", "main").exists()) { // eclipse
+			findClasses = p -> Stream.of(FileUtils.getFile(p.getProjectDir(), "bin", "main"));
+		} else if (FileUtils.getFile(project.getProjectDir(), "out", "production").exists()) { // idea
+			findClasses = p -> Stream.of(
+					FileUtils.getFile(p.getProjectDir(), "out", "production", "classes"),
+					FileUtils.getFile(p.getProjectDir(), "out", "production", "resources"));
+		} else { // gradle
+			findClasses = p -> Stream.of(
+					FileUtils.getFile(p.getProjectDir(), "build", "main", "classes"),
+					FileUtils.getFile(p.getProjectDir(), "build", "main", "resources"));
+		}
+
+		final List<File> extraClasses = new ArrayList<>();
 
 		project.getAllprojects().stream()
 			.filter(p -> FileUtils.getFile(p.getProjectDir(), "build.gradle").exists())
-			.forEach(p -> {
-				extraClasspath.addAll(findClasses.apply(p));
-				watchResources.add(findResources.apply(p));
-			});
+			.flatMap(findClasses::apply)
+			.filter(File::exists)
+			.forEach(extraClasses::add);
+
 		project.getGradle().getIncludedBuilds().forEach(b -> {
 			Gradle included = ((IncludedBuildInternal) b).getConfiguredBuild();
 			included.getRootProject().getAllprojects().stream()
 				.filter(p -> !p.getName().equals("axelor-gradle"))
 				.filter(p -> !p.getName().equals("axelor-tomcat"))
 				.filter(p -> !p.getName().equals("axelor-test"))
-				.forEach(p -> {
-					extraClasspath.addAll(findClasses.apply(p));
-					watchResources.add(findResources.apply(p));
-				});
+				.flatMap(findClasses::apply)
+				.filter(File::exists)
+				.forEach(extraClasses::add);
 		});
 
+		return extraClasses;
+	}
+
+	private void generateHotswapConfig(Project project) {
 		final Properties hotswapProps = new Properties();
+		final HotswapExtension extension = project.getExtensions().getByType(HotswapExtension.class);
+
+		final List<File> extraClasspath = new ArrayList<>();
+		final List<File> watchResources = new ArrayList<>();
 
 		if (!extension.getDisabledPlugins().isEmpty()) {
 			hotswapProps.setProperty("disabledPlugins", Joiner.on(",").join(extension.getDisabledPlugins()));
@@ -156,23 +174,28 @@ public class HotswapSupport extends AbstractSupport {
 			hotswapProps.setProperty("logAppend", extension.getLogAppend() == Boolean.TRUE ? "true" : "false");
 		}
 
-		final Stream<File> classpath = extension.getExtraClasspath() != null
-				? Stream.concat(extension.getExtraClasspath().stream(), extraClasspath.stream())
-				: extraClasspath.stream();
+		if (extension.getExtraClasspath() != null) {
+			extension.getExtraClasspath().stream().forEach(extraClasspath::add);
+		}
 
-		final Stream<File> resources = extension.getExtraClasspath() != null
-				? Stream.concat(extension.getExtraClasspath().stream(), extraClasspath.stream())
-				: extraClasspath.stream();
+		findOutputPaths(project).stream()
+			.forEach(extraClasspath::add);
 
-		hotswapProps.setProperty("extraClasspath", classpath
+		hotswapProps.setProperty("extraClasspath", extraClasspath.stream()
 				.filter(File::exists)
 				.map(File::getPath)
 				.collect(Collectors.joining(",")));
 
-		hotswapProps.setProperty("watchResources", resources
+		if (extension.getWatchResources() != null) {
+			extension.getWatchResources().stream()
 				.filter(File::exists)
-				.map(File::getPath)
-				.collect(Collectors.joining(",")));
+				.forEach(watchResources::add);
+			if (!watchResources.isEmpty()) {
+				hotswapProps.setProperty("watchResources", watchResources.stream()
+					.map(File::getPath)
+					.collect(Collectors.joining(",")));
+			}
+		}
 
 		final File target = new File(project.getBuildDir(), "hotswap-agent.properties");
 

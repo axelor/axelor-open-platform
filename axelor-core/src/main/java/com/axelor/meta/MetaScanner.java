@@ -23,17 +23,17 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import org.eclipse.birt.core.framework.URLClassLoader;
 
 import com.axelor.common.ClassUtils;
 import com.axelor.common.StringUtils;
@@ -49,9 +49,18 @@ public final class MetaScanner {
 
 	private static final String MODULE_PROPERTIES = "module.properties";
 	private static final String SCHEME_JAR = "jar";
-	
-	private static final String BUILD_CLASSES = "build/classes/main";
-	private static final String BUILD_RESOURCES = "build/resources/main";
+
+	private static final List<String> BUILD_OUTPUT_PATHS = Arrays.asList(
+		"bin/main",
+		"out/production/classes",
+		"out/production/resources",
+		"build/resources/main",
+		"build/classes/main",
+		"build/classes/java/main",
+		"build/classes/scala/main",
+		"build/classes/kotlin/main",
+		"build/classes/groovy/main"
+	);
 
 	private MetaScanner() {
 	}
@@ -120,7 +129,7 @@ public final class MetaScanner {
 			throw new RuntimeException(e);
 		}
 
-		if (fileName.endsWith(".jar")) {
+		if (fileName.endsWith(".jar") || file.endsWith("WEB-INF/classes")) {
 			try {
 				paths.add(file.toUri().toURL());
 			} catch (MalformedURLException e) {
@@ -128,22 +137,45 @@ public final class MetaScanner {
 			}
 			return paths;
 		}
-		final Path next;
-		if (file.endsWith(Paths.get(BUILD_CLASSES))) {
-			next = file.resolve("../../..").resolve(BUILD_RESOURCES).normalize();
-		} else if (file.endsWith(Paths.get(BUILD_RESOURCES))) {
-			next = file.resolve("../../..").resolve(BUILD_CLASSES).normalize();
-		} else {
-			next = null;
-		}
+
+		final Path base = BUILD_OUTPUT_PATHS.stream()
+				.filter(p -> file.endsWith(p))
+				.findFirst()
+				.map(p -> p.replaceAll("[^/]+", ".."))
+				.map(p -> file.resolve(p).normalize())
+				.get();
+
 		try {
 			paths.add(file.toUri().toURL());
-			if (next != null && Files.exists(next)) {
-				paths.add(next.toUri().toURL());
-			}
-		} catch (MalformedURLException e) {
+		} catch (MalformedURLException e1) {
 			// this should never happen
 		}
+
+		final ClassLoader loader = ClassUtils.getContextClassLoader();
+		if (loader instanceof URLClassLoader) {
+			for (URL url : ((URLClassLoader) loader).getURLs()) {
+				try {
+					Path next = Paths.get(url.toURI());
+					if (Files.isDirectory(next) && next.startsWith(base)) {
+						paths.add(url);
+					}
+				} catch (URISyntaxException e) {
+					// this should never happen
+				}
+			}
+		} else {
+			BUILD_OUTPUT_PATHS.stream()
+				.map(base::resolve)
+				.filter(Files::exists)
+				.forEach(next -> {
+					try {
+						paths.add(next.toUri().toURL());
+					} catch (MalformedURLException e) {
+						// this should never happen
+					}
+				});
+		}
+
 		return paths;
 	}
 

@@ -123,8 +123,9 @@ public class EnumTest extends JpaTest {
 		assertNotNull(selectionList);
 		assertEquals(3, selectionList.size());
 
-		// make sure values are numeric
-		assertEquals("3", selectionList.get(2).getValue());
+		// make sure value are stored as extra data
+		assertNotNull(selectionList.get(2).getData());
+		assertEquals(3, selectionList.get(2).getData().get("value"));
 
 		EnumCheck entity = new EnumCheck();
 		assertNull(entity.getStatus());

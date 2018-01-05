@@ -20,6 +20,7 @@ package com.axelor.gradle.tasks;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +36,7 @@ import org.gradle.api.artifacts.ResolvedDependency;
 import org.gradle.api.artifacts.component.ComponentIdentifier;
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier;
 import org.gradle.api.tasks.InputFiles;
-import org.gradle.api.tasks.OutputDirectory;
+import org.gradle.api.tasks.OutputDirectories;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.util.PatternSet;
 
@@ -54,9 +55,11 @@ public class GenerateCode extends DefaultTask {
 	public static final String TASK_DESCRIPTION = "Generate code for domain models from xml definitions.";
 	public static final String TASK_GROUP = AxelorPlugin.AXELOR_BUILD_GROUP;
 
-	private static final String DIR_OUTPUT = "src-gen";
-	private static final String DIR_SOURCE = "src/main/resources/domains";
-	
+	private static final String DIR_INPUT = "src/main/resources/domains";
+
+	private static final String DIR_OUTPUT_JAVA = "src-gen/java";
+	private static final String DIR_OUTPUT_RESOURCES = "src-gen/resources";
+
 	private List<ResolvedArtifact> artifacts;
 
 	private List<ResolvedArtifact> artifacts() {
@@ -66,12 +69,20 @@ public class GenerateCode extends DefaultTask {
 		return artifacts;
 	}
 
-	public static File getInputDirectory(Project project) {
-		return new File(project.getProjectDir(), DIR_SOURCE);
+	public static File getInputDir(Project project) {
+		return new File(project.getProjectDir(), DIR_INPUT);
 	}
 
-	public static File getOutputDirectory(Project project) {
-		return new File(project.getBuildDir(), DIR_OUTPUT);
+	private static File getOutputBase(Project project) {
+		return project.getBuildDir();
+	}
+
+	public static File getJavaOutputDir(Project project) {
+		return new File(getOutputBase(project), DIR_OUTPUT_JAVA);
+	}
+
+	public static File getResourceOutputDir(Project project) {
+		return new File(getOutputBase(project), DIR_OUTPUT_RESOURCES);
 	}
 
 	@InputFiles
@@ -79,23 +90,23 @@ public class GenerateCode extends DefaultTask {
 		return artifacts().stream()
 			.map(artifact -> findProject(artifact))
 			.filter(Objects::nonNull)
-			.map(sub -> getOutputDirectory(sub))
+			.map(sub -> getJavaOutputDir(sub))
 			.collect(Collectors.toList());
 	}
 
 	@InputFiles
 	public File getInputDirectory() {
-		return getInputDirectory(getProject());
+		return getInputDir(getProject());
 	}
 
-	@OutputDirectory
-	public File getOutputDirectory() {
-		return getOutputDirectory(getProject());
+	@OutputDirectories
+	public List<File> getOutputDirectories() {
+		return Arrays.asList(getJavaOutputDir(getProject()), getResourceOutputDir(getProject()));
 	}
 
 	private void generateInfo(AxelorExtension extension, List<ResolvedArtifact> artifacts) throws IOException {
 		final Project project = getProject();
-		final File outputPath = new File(getOutputDirectory(), "module.properties");
+		final File outputPath = new File(getResourceOutputDir(getProject()), "module.properties");
 		try {
 			outputPath.getParentFile().mkdirs();
 		} catch (Exception e) {
@@ -203,8 +214,8 @@ public class GenerateCode extends DefaultTask {
 	}
 	
 	private Generator buildGenerator(Project project) {
-		final File domainPath = getInputDirectory(project);
-		final File targetPath = getOutputDirectory(project);
+		final File domainPath = getInputDir(project);
+		final File targetPath = getJavaOutputDir(project);
 		return new Generator(domainPath, targetPath);
 	}
 
@@ -218,12 +229,6 @@ public class GenerateCode extends DefaultTask {
 
 		// generate module info
 		generateInfo(extension, artifacts());
-
-		// copy module.properties
-		project.copy(copy -> {
-			copy.from(new File(getOutputDirectory(), "module.properties"));
-			copy.into(new File(project.getBuildDir(), "classes/main"));
-		});
 
 		// start code generation
 		final Generator generator = buildGenerator(project);

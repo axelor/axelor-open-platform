@@ -17,6 +17,7 @@
  */
 package com.axelor.gradle.support;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -38,5 +39,9 @@ public abstract class AbstractSupport implements Plugin<Project> {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static String toRelativePath(Project project, File file) {
+		return project.getProjectDir().toPath().relativize(file.toPath()).toString();
 	}
 }

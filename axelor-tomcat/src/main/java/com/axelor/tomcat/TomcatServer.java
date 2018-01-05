@@ -29,6 +29,7 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.realm.MemoryRealm;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Tomcat;
@@ -97,19 +98,23 @@ public class TomcatServer {
 		};
 
 		tomcat.setBaseDir(baseDir.toFile().getAbsolutePath());
-		
+		tomcat.getHost().setAutoDeploy(false);
+
 		final MemoryRealm memoryRealm = new MemoryRealm();
 		tomcat.getEngine().setRealm(memoryRealm);
 
 		final Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
 		connector.setPort(port);
+		connector.setProperty("bindOnInit", "false");
 
 		tomcat.setConnector(connector);
 		tomcat.setPort(port);
 
+		final WebappLoader loader = new WebappLoader(getClass().getClassLoader());
 		final StandardContext context = (StandardContext) tomcat.addWebapp(contextPath, docBase);
 		final StandardRoot resources = new StandardRoot();
 
+		context.setLoader(loader);
 		context.setResources(resources);
 		context.setUnpackWAR(false);
 
@@ -144,7 +149,9 @@ public class TomcatServer {
 				System.err.println("Context [" + contextPath + "] failed in [" + lifecycle.getClass().getName() + "] lifecycle.");
 				break;
 			case STARTED:
-				System.err.println("Running at http://localhost:" + port + contextPath);
+				System.out.println();
+				System.out.println("Running at http://localhost:" + port + contextPath);
+				System.out.println();
 				break;
 			default:
 				break;

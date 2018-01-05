@@ -70,11 +70,16 @@ public final class TldSkipPatterns {
 
 		// Additional typical for Axelor applications
 		patterns.add("activation-*.jar");
+		patterns.add("animal-sniffer-annotations-*.jar");
 		patterns.add("antlr-*.jar");
 		patterns.add("antlr-runtime-*.jar");
 		patterns.add("aopalliance-*.jar");
 		patterns.add("apache-mime4j-*.jar");
 		patterns.add("axelor-*.jar");
+		patterns.add("backport-util-concurrent-*.jar");
+		patterns.add("bcmail-*.jar");
+		patterns.add("bcprov-*.jar");
+		patterns.add("bctsp-*.jar");
 		patterns.add("boilerpipe-*.jar");
 		patterns.add("byte-buddy-*.jar");
 		patterns.add("cache-api-*.jar");
@@ -83,13 +88,17 @@ public final class TldSkipPatterns {
 		patterns.add("com.ibm.icu-*.jar");
 		patterns.add("com.lowagie.text-*.jar");
 		patterns.add("commons-*.jar");
+		patterns.add("core-*.jar");
 		patterns.add("dom4j-*.jar");
+		patterns.add("ebics-*.jar");
 		patterns.add("ecj-*.jar");
-		patterns.add("ehcache-core-*.jar");
+		patterns.add("ehcache-*.jar");
+		patterns.add("error_prone_annotations-*.jar");
 		patterns.add("flute-*.jar");
 		patterns.add("flyway-core-*.jar");
 		patterns.add("fontbox-*.jar");
 		patterns.add("groovy-*.jar");
+		patterns.add("gson-*.jar");
 		patterns.add("guava-*.jar");
 		patterns.add("guice-*.jar");
 		patterns.add("hamcrest-core-*.jar");
@@ -99,7 +108,13 @@ public final class TldSkipPatterns {
 		patterns.add("hsqldb-*.jar");
 		patterns.add("httpclient-*.jar");
 		patterns.add("httpcore-*.jar");
+		patterns.add("httpmime-*.jar");
+		patterns.add("iban4j-*.jar");
+		patterns.add("ical4j-*.jar");
 		patterns.add("infinispan-*.jar");
+		patterns.add("itextpdf-*.jar");
+		patterns.add("j2objc-annotations-*.jar");
+		patterns.add("jackrabbit-webdav-*.jar");
 		patterns.add("jackson-*.jar");
 		patterns.add("jandex-*.jar");
 		patterns.add("jansi-*.jar");
@@ -110,6 +125,7 @@ public final class TldSkipPatterns {
 		patterns.add("javax.servlet-api-*.jar");
 		patterns.add("javax.wsdl-*.jar");
 		patterns.add("javax.xml.stream-*.jar");
+		patterns.add("jaxb-*.jar");
 		patterns.add("jboss-annotations-api_1.2_spec-*.jar");
 		patterns.add("jboss-jaxrs-api_2.0_spec-*.jar");
 		patterns.add("jboss-logging-*.jar");
@@ -130,6 +146,7 @@ public final class TldSkipPatterns {
 		patterns.add("logback-classic-*.jar");
 		patterns.add("logback-core-*.jar");
 		patterns.add("lucene-*.jar");
+		patterns.add("lutung-*.jar");
 		patterns.add("metadata-extractor-*.jar");
 		patterns.add("mysql-connector-java-*.jar");
 		patterns.add("opencsv-*.jar");
@@ -152,6 +169,7 @@ public final class TldSkipPatterns {
 		patterns.add("quartz-*.jar");
 		patterns.add("resteasy-*.jar");
 		patterns.add("rome-*.jar");
+		patterns.add("serializer-*.jar");
 		patterns.add("shiro-cas-*.jar");
 		patterns.add("shiro-core-*.jar");
 		patterns.add("shiro-guice-*.jar");
@@ -168,6 +186,7 @@ public final class TldSkipPatterns {
 		patterns.add("tomcat-embed-jasper-*.jar");
 		patterns.add("tomcat-embed-logging-log4j-*.jar");
 		patterns.add("validation-api-*.jar");
+		patterns.add("xalan-*.jar");
 		patterns.add("xml-apis-*.jar");
 		patterns.add("xmlbeans-*.jar");
 		patterns.add("xmlpull-*.jar");

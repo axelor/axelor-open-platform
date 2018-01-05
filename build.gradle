@@ -49,7 +49,7 @@ task updateVersion(type: com.axelor.gradle.tasks.UpdateVersion) {
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = "3.4.1"
+	gradleVersion = "4.4.1"
 }
 
 apply from: "gradle/javadoc.gradle"
