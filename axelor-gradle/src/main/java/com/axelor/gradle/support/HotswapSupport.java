@@ -104,9 +104,6 @@ public class HotswapSupport extends AbstractSupport {
 				generateHotswapConfig(project);
 			});
 		});
-
-		project.getTasks().getByName(TomcatSupport.TOMCAT_RUNNER_JAR_TASK,
-				task -> task.dependsOn(GENERATE_HOTSWAP_CONFIG_TASK));
 	}
 
 	/**

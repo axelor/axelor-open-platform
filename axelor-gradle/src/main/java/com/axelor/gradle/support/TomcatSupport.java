@@ -70,6 +70,7 @@ public class TomcatSupport extends AbstractSupport {
 		project.getTasks().create(TOMCAT_RUNNER_CONFIG_TASK, task -> {
 			task.dependsOn(JavaPlugin.CLASSES_TASK_NAME);
 			task.dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
+			task.dependsOn(HotswapSupport.GENERATE_HOTSWAP_CONFIG_TASK);
 			task.setDescription("Generate axelor-tomcat.properties.");
 			task.doLast(a -> generateConfig(project));
 		});
