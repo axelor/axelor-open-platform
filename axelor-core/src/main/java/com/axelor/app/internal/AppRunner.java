@@ -17,19 +17,20 @@
  */
 package com.axelor.app.internal;
 
-import com.axelor.app.AppSettings;
-import com.axelor.common.logging.LoggerConfiguration;
-
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 
 /**
  * This class is used to launch app from IDE.
@@ -127,13 +128,46 @@ public final class AppRunner {
 		}
 	}
 
-	public static void main(String[] args) {
-		LoggerConfiguration conf = new LoggerConfiguration(AppSettings.get().getProperties());
-		conf.install();
+	private static boolean isTestPath(URL url) {
 		try {
-			run(args);
+			Path path = Paths.get(url.toURI());
+			for (int n = path.getNameCount() - 1; n >= 0; n--) {
+				if (path.getName(n).getFileName().toString().equals("test")) {
+					return true;
+				}
+			}
+		} catch (URISyntaxException e) {
+			// ignore
+		}
+		return false;
+	}
+
+	public static void main(String[] args) {
+		
+		final URLClassLoader systemLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+		final List<URL> urls = Arrays.stream(systemLoader.getURLs())
+				.filter(u -> !isTestPath(u)) // remove test paths (eclipse may add them)
+				.collect(Collectors.toList());
+
+		try (URLClassLoader loader = new URLClassLoader(urls.toArray(new URL[] {}), null)) {
+			Thread.currentThread().setContextClassLoader(loader);
+			Properties props = new Properties();
+
+			props.load(loader.getResourceAsStream("application.properties"));
+			Class<?> loggerClass = loader.loadClass("com.axelor.common.logging.LoggerConfiguration");
+			Object logger = loggerClass.getConstructor(Properties.class).newInstance(props);
+			Method install = loggerClass.getDeclaredMethod("install");
+			Method uninstall = loggerClass.getDeclaredMethod("uninstall");
+			install.invoke(logger);
+			try {
+				run(args);
+			} finally {
+				uninstall.invoke(logger);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
-			conf.uninstall();
+			Thread.currentThread().setContextClassLoader(systemLoader);
 		}
 	}
 }
