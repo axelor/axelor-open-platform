@@ -23,15 +23,18 @@ import java.util.List;
 
 import org.gradle.api.Project;
 import org.gradle.api.internal.tasks.options.Option;
+import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.JavaExec;
+import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.jvm.tasks.Jar;
 
 import com.axelor.common.FileUtils;
 import com.axelor.gradle.support.HotswapSupport;
 import com.axelor.gradle.support.TomcatSupport;
 
 public class TomcatRun extends JavaExec {
+
+	private static final String MAIN_CLASS = "com.axelor.app.internal.AppRunner";
 
 	private boolean hot;
 
@@ -77,10 +80,14 @@ public class TomcatRun extends JavaExec {
 	@Override
 	public void exec() {
 		final Project project = getProject();
+		setMain(MAIN_CLASS);
 		setArgs(getArgs(project, port));
 		setJvmArgs(getJvmArgs(project, hot, getDebug()));
-		setClasspath(((Jar) project.getTasks().getByName(TomcatSupport.TOMCAT_RUNNER_JAR_TASK)).getOutputs().getFiles());
-		setMain(TomcatSupport.TOMCAT_RUNNER_CLASS);
+		setClasspath(project.getConvention()
+			.getPlugin(JavaPluginConvention.class)
+			.getSourceSets()
+			.getByName(SourceSet.MAIN_SOURCE_SET_NAME)
+			.getRuntimeClasspath());
 		super.exec();
 	}
 }
