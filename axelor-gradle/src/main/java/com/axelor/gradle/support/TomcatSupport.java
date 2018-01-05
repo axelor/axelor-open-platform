@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.WarPlugin;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.bundling.War;
@@ -67,6 +68,8 @@ public class TomcatSupport extends AbstractSupport {
 		});
 
 		project.getTasks().create(TOMCAT_RUNNER_CONFIG_TASK, task -> {
+			task.dependsOn(JavaPlugin.CLASSES_TASK_NAME);
+			task.dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
 			task.setDescription("Generate axelor-tomcat.properties.");
 			task.doLast(a -> generateConfig(project));
 		});
@@ -108,6 +111,11 @@ public class TomcatSupport extends AbstractSupport {
 			.map(it -> new File(it.getProjectDir(), "axelor-web/src/main/webapp"))
 			.filter(it -> it.exists())
 			.findFirst().ifPresent(webapps::add);
+		
+		final File merged = new File(project.getBuildDir(), "webapp");
+		if (merged.exists()) {
+			webapps.add(merged);
+		}
 
 		return webapps;
 	}
