@@ -145,12 +145,10 @@ table.form-layout td.form-item > *,
 	width: 100%;
 }
 
-.form-item-container.editable.translatable::before {
-	font-family: FontAwesome;
-	font-size: 12px;
-	content: "\f024";
+.form-item > label.translatable > i.fa-flag {
 	float: right;
-  	margin-top: -18px;
+	line-height: 18px;
+	padding: 0 4px;
 }
 
 table.form-layout td.form-item.v-align-top {
@@ -278,6 +276,7 @@ table.form-layout fieldset {
 	border-radius: 0;
 	box-shadow: none;
 	background: transparent;
+	padding-left: 0;
 }
 
 .form-item-container > a.display-text {

@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -800,9 +801,6 @@ public class Resource<T extends Model> {
 			Map<String, Object> orig = (Map) ((Map) record).get("_original");
 			JPA.verify(model, orig);
 
-			// save translatable values and remove them from record
-			Translator.saveTranslatables((Map) record, model);
-
 			Model bean = JPA.edit(model, (Map) record);
 			id = bean.getId();
 
@@ -1069,6 +1067,8 @@ public class Resource<T extends Model> {
 
 		boolean isSaved = ((Model)bean).getId() != null;
 		boolean isCompact = compact || fields.containsKey("$version");
+		
+		final Set<Property> translatables = new HashSet<>();
 
 		if ((isCompact && isSaved) || (isSaved && level >= 1 ) || (level > 1)) {
 
@@ -1078,12 +1078,21 @@ public class Resource<T extends Model> {
 			result.put("id", mapper.get(bean, "id"));
 			result.put("$version", mapper.get(bean, "version"));
 
-			if (pn != null)
+			if (pn != null) {
 				result.put(pn.getName(), mapper.get(bean, pn.getName()));
-			if (pc != null)
+			}
+			if (pc != null) {
 				result.put(pc.getName(), mapper.get(bean, pc.getName()));
+			}
 
-			for(String name: fields.keySet()) {
+			if (pn != null && pn.isTranslatable()) {
+				Translator.translate(result, pn);
+			}
+			if (pc != null && pc.isTranslatable()) {
+				Translator.translate(result, pc);
+			}
+
+			for (String name: fields.keySet()) {
 				Object child = mapper.get(bean, name);
 				if (child instanceof Model) {
 					child = _toMap(child, (Map) fields.get(name), true, level + 1);
@@ -1152,11 +1161,11 @@ public class Resource<T extends Model> {
 				value = items;
 			}
 
-			if (prop.isTranslatable() && value instanceof String) {
-				value = Translator.getTranslation(prop, (String) value);
-			}
-
 			result.put(name, value);
+
+			if (prop.isTranslatable() && value instanceof String) {
+				Translator.translate(result, prop);
+			}
 			
 			// include custom enum value
 			if (prop.isEnum() && value instanceof ValueEnum<?>) {

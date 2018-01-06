@@ -316,6 +316,36 @@
 	margin-top: 45px;
 }
 
+.ui-dialog .translation-form {
+	overflow: auto;
+}
+.ui-dialog .translation-form i {
+	cursor: pointer;
+}
+.ui-dialog .translation-form i.fa-times {
+	line-height: 28px;
+	margin-right: -12px;
+	float: right;
+}
+.ui-dialog .translation-form i.fa-plus {
+	margin-right: 4px;
+}
+.ui-dialog .translation-form form {
+	margin: 0;
+	margin-right: 8px;
+}
+.ui-dialog .translation-form form label {
+	font-weight: 600;
+	min-height: 0;
+	margin-left: 6px;
+}
+.ui-dialog .translation-form form input {
+	margin-left: 6px;
+}
+.ui-dialog .translation-form form hr {
+	margin: 8px 0;
+}
+
 #loginWindow * {
 	box-sizing: border-box;
 }

@@ -27,6 +27,24 @@ var ui = angular.module('axelor.ui');
 ui.formInput('String', {
 	css: 'string-item',
 
+	init: function(scope) {
+		var field = scope.field;
+		var isReadonly = scope.isReadonly;
+		var trKey = "$t:" + field.name;
+
+		scope.isReadonly = function () {
+			scope.$$readonlyOrig = isReadonly.apply(this, arguments);
+			return (scope.record && scope.record[trKey]) || scope.$$readonlyOrig;
+		};
+
+		scope.format = function (value) {
+			if ((scope.record && scope.record[trKey])) {
+				return scope.record[trKey];
+			}
+			return value;
+		};
+	},
+
 	link_editable: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);
 

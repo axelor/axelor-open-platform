@@ -288,6 +288,14 @@ var Editor = function(args) {
 
 var Formatters = {
 
+	"string": function(field, value, context) {
+		if (field.translatable && value && context) {
+			var key = '$t:' + field.name;
+			return context[key] || value;
+		}
+		return value;
+	},
+
 	"integer": function(field, value) {
 		return value;
 	},
