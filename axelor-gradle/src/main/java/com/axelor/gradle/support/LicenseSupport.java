@@ -26,6 +26,7 @@ import org.gradle.api.logging.LogLevel;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.ExtraPropertiesExtension;
 
+import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.tasks.GenerateCode;
 
 import nl.javadude.gradle.plugins.license.License;
@@ -60,7 +61,9 @@ public class LicenseSupport extends AbstractSupport {
 			final ConfigurableFileTree source = project.fileTree(GenerateCode.getJavaOutputDir(project));
 			source.include("**/*.java");
 			source.include("**/*.groovy");
-			task.setSource(source);
+			if (AxelorPlugin.GRADLE_VERSION_3_X) {
+				task.setSource((Object) source);
+			}
 			task.getLogging().setLevel(LogLevel.QUIET);
 			task.onlyIf(spec -> header != null && header.exists());
 		});
