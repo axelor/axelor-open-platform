@@ -31,7 +31,11 @@ class XmlHelper {
 	 */
 	public static List<Entity> entities(File input) {
 		return new XmlSlurper().parse(input).'entity'.collect {
-			return new Entity(it)
+			try {
+				return new Entity(it)
+			} catch (Exception e) {
+				throw new IllegalArgumentException("Error processing: ${input}", e)
+			}
 		}
 	}
 

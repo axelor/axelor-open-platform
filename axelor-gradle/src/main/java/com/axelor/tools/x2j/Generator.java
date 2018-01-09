@@ -349,7 +349,10 @@ public class Generator {
 		}
 		for (String name : extendedEntities.keySet()) {
 			final List<Entity> all = new ArrayList<>(extendedEntities.get(name));
-			if (all == null || all.size() < 2) {
+			if (all == null || all.isEmpty()) {
+				continue;
+			}
+			if (all.size() == 1 && !all.get(0).isModelClass()) { // generate extended Model class in root
 				continue;
 			}
 			Collections.reverse(all);

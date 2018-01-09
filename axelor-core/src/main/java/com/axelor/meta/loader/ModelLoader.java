@@ -118,6 +118,9 @@ public class ModelLoader extends AbstractLoader {
 	
 	private void importModels(Element element, boolean update) {
 		final String name = element.getAttribute("name");
+		if ("Model".equals(name)) {
+			return;
+		}
 		log.debug("Loading model: {}", name);
 		service.process(JPA.model(name));
 	}

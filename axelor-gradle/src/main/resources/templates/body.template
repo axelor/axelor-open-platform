@@ -2,15 +2,16 @@ ${ pojo.documentation }\
 <% pojo.annotations.each { a -> %>
 ${a}\
 <% } %>
-public class ${pojo.name} extends ${pojo.baseClass}${pojo.implementStmt} {
+public ${pojo.abstractStmt}class ${pojo.name}${pojo.extendsImplementStmt} {
 <% pojo.fields.each { p -> %>\
 <% p.annotations.each { a -> %>
 	${a}\
 <% } %>
 	private $p.type ${p.name}${p.defaultExpression};
 <% } %>\
-
+<% if (!pojo.modelClass) { %>
 ${pojo.ctorCode}\
+<% } %>\
 
 <% pojo.fields.each { p -> %>\
 ${p.documentation}
@@ -114,7 +115,44 @@ ${p.documentation}
 	}
 <% } %>\
 <% } %>\
+<% if (pojo.modelClass) { %>
+	@Version
+	private Integer version;
+	
+	@Transient
+	private transient boolean selected;
 
+	@Widget(massUpdate = true)
+	private Boolean archived;
+
+	public abstract Long getId();
+
+	public abstract void setId(Long id);
+	
+	public Boolean getArchived() {
+		return archived;
+	}
+	
+	public void setArchived(Boolean archived) {
+		this.archived = archived;
+	}
+
+	public Integer getVersion() {
+		return version;
+	}
+
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
+	
+	public void setSelected(boolean selected) {
+		this.selected = selected;
+	}
+
+	public boolean isSelected() {
+		return selected;
+	}
+<% } else { %>
 	@Override
 	public boolean equals(Object obj) {
 		${pojo.equalsCode}
@@ -129,4 +167,5 @@ ${p.documentation}
 	public String toString() {
 		${pojo.toStringCode}
 	}
+<% } %>\
 }

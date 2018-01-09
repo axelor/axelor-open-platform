@@ -75,6 +75,7 @@ public class MetaModelService {
 	
 	@Transactional
 	public void process(Class<?> klass){
+		if (Modifier.isAbstract(klass.getModifiers())) return;
 		final MetaModel entity;
 		if (models.all().filter("self.fullName = ?1", klass.getName()).count() == 0){
 			entity = this.createEntity(klass);

@@ -89,6 +89,8 @@ class Entity {
 
 	private Track track
 
+	private boolean modelClass
+
 	Entity baseEntity
 
 	Entity(NodeChild node) {
@@ -116,6 +118,12 @@ class Entity {
 			throw new IllegalArgumentException("Namespace details not given or incomplete.")
 		}
 
+		modelClass = namespace == 'com.axelor.db' && name == 'Model'
+		if (modelClass) {
+			baseClass = null
+			mappedSuper = true
+		}
+
 		if (!repoNamespace) {
 			repoNamespace = "${namespace}.repo"
 		}
@@ -137,7 +145,7 @@ class Entity {
 
 		importManager = new ImportManager(namespace, groovy)
 
-		if (node.@repository != "none" && !mappedSuper) {
+		if (!modelClass && node.@repository != "none" && !mappedSuper) {
 			repository = new Repository(this)
 			repository.concrete = node.@repository != "abstract"
 		}
@@ -153,22 +161,24 @@ class Entity {
 			interfaces = interfaces.split(",").collect { importType(it.trim()) }.join(", ")
 		}
 
-		if (!baseClass) {
-			if (node.@logUpdates != "false") {
-				baseClass = "com.axelor.auth.db.AuditableModel"
+		if (!modelClass) {
+			if (!baseClass) {
+				if (node.@logUpdates != "false") {
+					baseClass = "com.axelor.auth.db.AuditableModel"
+				} else {
+					baseClass = "com.axelor.db.Model"
+				}
+				propertyMap.put("id", Property.idProperty(this));
+				properties.add(propertyMap.get("id"));
 			} else {
-				baseClass = "com.axelor.db.Model"
+				hasExtends = true
+				importType("com.axelor.db.EntityHelper")
 			}
-			propertyMap.put("id", Property.idProperty(this));
-			properties.add(propertyMap.get("id"));
-		} else {
-			hasExtends = true
-			importType("com.axelor.db.EntityHelper")
 		}
 
 		def jsonAttrs = node.'@jsonAttrs'
 		def jsonAttrsAdd = jsonAttrs == 'true' || !INTERNAL_PACKAGES.contains(namespace)
-		if (jsonAttrs == 'false') {
+		if (jsonAttrs == 'false' || modelClass) {
 			jsonAttrsAdd = false
 		}
 
@@ -194,6 +204,9 @@ class Entity {
 				break
 			default:
 				Property field = new Property(this, it)
+				if (modelClass && !field.simple) {
+					throw new IllegalArgumentException("Only simple fields can be added to Model class.")
+				}
 				properties += field
 				propertyMap[field.name] = field
 				if (field.isVirtual() && !field.isTransient()) {
@@ -296,6 +309,20 @@ class Entity {
 		if (!interfaces || interfaces.trim() == "") return ""
 		return " implements " + interfaces
 	}
+	
+	String getExtendsImplementStmt() {
+		if (modelClass) {
+			importType('javax.persistence.Transient')
+			importType('javax.persistence.Version')
+			importType('com.axelor.db.annotations.Widget')
+			return ""
+		}
+		return " extends " + getBaseClass() + getImplementStmt()
+	}
+	
+	String getAbstractStmt() {
+		return modelClass ? "abstract " : ""
+	}
 
 	String findDocs(parent) {
 		def children = parent.getAt(0).children
@@ -361,6 +388,10 @@ class Entity {
 
 	private List<Property> getHashables() {
 		return properties.findAll { p -> p.hashKey }
+	}
+	
+	boolean isModelClass() {
+		return modelClass;
 	}
 
 	String getEqualsCode() {
