@@ -31,6 +31,7 @@ import com.axelor.db.Model;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.axelor.rpc.ActionResponse;
+import com.axelor.rpc.ContextEntity;
 import com.axelor.rpc.Resource;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -186,11 +187,17 @@ public class ActionView extends Action {
 					if (ctx.getCanCopy() == Boolean.TRUE && value instanceof Model) {
 						value = JPA.copy((Model)value, true);
 					}
+					if (value instanceof ContextEntity) {
+						value = ((ContextEntity) value).getContextMap();
+					}
 					if (value instanceof Model && JPA.em().contains(value)) {
 						value = Resource.toMapCompact(value);
 					}
 					if (value instanceof Collection) {
 						value = Collections2.transform((Collection<?>) value, item -> {
+							if (item instanceof ContextEntity) {
+								return ((ContextEntity) item).getContextMap();
+							}
 							return item instanceof Model && JPA.em().contains(item) ? Resource.toMapCompact(item) : item;
 						});
 					}
