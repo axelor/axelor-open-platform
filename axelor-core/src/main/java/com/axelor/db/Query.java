@@ -559,6 +559,8 @@ public class Query<T extends Model> {
 	public Query<T> bind(String name, Object value) {
 		if (value instanceof ContextEntity) {
 			value = ((ContextEntity) value).getContextId();
+		} else if (value instanceof Model) {
+			value = ((Model) value).getId();
 		}
 		Map<String, Object> params = Maps.newHashMap();
 		params.put(name, value);
