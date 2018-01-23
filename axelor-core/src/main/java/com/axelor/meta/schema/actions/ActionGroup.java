@@ -334,7 +334,7 @@ public class ActionGroup extends ActionResumable {
 	
 	@SuppressWarnings("all")
 	private void updateContext(ActionHandler handler, Map<String, Object> value) {
-		if (value == null) return;
+		if (value == null || value instanceof ContextEntity) return;
 		
 		Object values = value.get("values");
 		Map<String, Object> map = Maps.newHashMap();
