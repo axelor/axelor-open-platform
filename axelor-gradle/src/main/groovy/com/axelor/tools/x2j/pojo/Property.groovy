@@ -231,7 +231,7 @@ class Property {
 		if (orphanRemoval || !mapped || type != "one-to-many") {
 			return null
 		}
-		return """for (${target} item : ${name}) {
+		return """for (${target} item : ${getter}()) {
 				item.set${firstUpper(mapped)}(null);
 			}"""
 	}
@@ -331,10 +331,10 @@ class Property {
 	String newCollection() {
 		if (type == "many-to-many") {
 			importName("java.util.HashSet")
-			return "new HashSet<$target>()"
+			return "new HashSet<>()"
 		}
 		importName("java.util.ArrayList")
-		return "new ArrayList<$target>()"
+		return "new ArrayList<>()"
 	}
 
 	String firstUpper(String string) {

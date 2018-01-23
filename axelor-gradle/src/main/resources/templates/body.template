@@ -59,10 +59,10 @@ ${p.documentation}
 	 *            the item to add
 	 */
 	public void add${p.firstUpper(p.singularName)}($p.target item) {
-		if (${p.name} == null) {
-			${p.name} = ${p.newCollection()};
+		if (${p.getter}() == null) {
+			${p.setter}(${p.newCollection()});
 		}
-		${p.name}.add(item);
+		${p.getter}().add(item);
 <% if (p.linkCode) { %>\
 		${p.linkCode}
 <% } %>\
@@ -81,10 +81,10 @@ ${p.documentation}
 	 *            the item to remove
 	 */
 	public void remove${p.firstUpper(p.singularName)}($p.target item) {
-		if (${p.name} == null) {
+		if (${p.getter}() == null) {
 			return;
 		}
-		${p.name}.remove(item);
+		${p.getter}().remove(item);
 <% if (p.delinkCode) { %>\
 		${p.delinkCode}
 <% } %>\
@@ -106,11 +106,11 @@ ${p.documentation}
 <% } %>\
 	 */
 	public void clear${p.firstUpper(p.name)}() {
-		if (${p.name} != null) {
+		if (${p.getter}() != null) {
 <% if (p.delinkAllCode) { %>\
 			${p.delinkAllCode}
 <% } %>\
-			${p.name}.clear();
+			${p.getter}().clear();
 		}
 	}
 <% } %>\
