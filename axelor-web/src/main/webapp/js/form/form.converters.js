@@ -95,7 +95,7 @@
 		var model = scope._model;
 
 		if (fieldName) {
-			var field = findField(scope, fieldName);
+			var field = (scope.fields||{})[fieldName];
 			if (field && field.target) {
 				record = record[fieldName] || {};
 				model = field.target;
