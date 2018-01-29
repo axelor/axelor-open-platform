@@ -316,7 +316,7 @@ ui.directive('uiHelpPopover', function() {
 		if (!_.isEmpty(field)) {
 			return doLink(scope, element, attrs);
 		}
-		var unwatch = scope.$watch('field', function(field, old) {
+		var unwatch = scope.$watch('field', function popoverFieldWatch(field, old) {
 			if (!field) {
 				return;
 			}
@@ -754,13 +754,13 @@ ui.formItem('Button', {
 		}
 
 		var readonlySet = false;
-		scope.$watch('isReadonlyExclusive()', function(readonly, old) {
+		scope.$watch('isReadonlyExclusive()', function buttonReadonlyWatch(readonly, old) {
 			if (readonly === old && readonlySet) return;
 			readonlySet = true;
 			return setDisabled(readonly);
 		});
 		
-		scope.$watch('attr("title")', function(title, old) {
+		scope.$watch('attr("title")', function buttonTitleWatch(title, old) {
 			if (!title || title === old) return;
 			if (element.is('button')) {
 				return element.html(title);
@@ -768,7 +768,7 @@ ui.formItem('Button', {
 			element.children('.btn-text').html(title);
 		});
 
-		scope.$watch('attr("css")', function (css, old) {
+		scope.$watch('attr("css")', function buttonCssWatch(css, old) {
 			var curr = css || field.css || 'btn-success';
 			var prev = old || field.css || 'btn-success';
 			if (curr !== prev) {
@@ -776,7 +776,7 @@ ui.formItem('Button', {
 			}
 		});
 
-		scope.$watch('attr("icon")', function (icon, old) {
+		scope.$watch('attr("icon")', function buttonIconWatch(icon, old) {
 			if (icon === old || (icon && icon.indexOf('fa-') !== 0)) return;
 			var iconElem = element.find('i.fa:first');
 			if (iconElem.size() == 0) {
@@ -795,7 +795,7 @@ ui.formItem('InfoButton', 'Button', {
 		this._super.apply(this, arguments);
 		var field = scope.field || {};
 		scope.title = field.title;
-		scope.$watch('attr("title")', function(title, old) {
+		scope.$watch('attr("title")', function infoButtonTitleWatch(title, old) {
 			if (!title || title === old) return;
 			scope.title = title;
 		});

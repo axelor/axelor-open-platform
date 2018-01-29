@@ -340,7 +340,7 @@ ui.formInput('Select', 'BaseSelect', {
 			});
 			
 			if (__hasValue) {
-				scope.$watch('record.' + field.name, function (value, old) {
+				scope.$watch('record.' + field.name, function selectFieldNameWatch(value, old) {
 					if (value && value !== old) {
 						var enumValue = __enumValues[value];
 						if (scope.record && enumValue !== value) {
@@ -424,7 +424,7 @@ ui.formInput('ImageSelect', 'Select', {
 			return selectIcons[value] || this.BLANK;
 		};
 
-		scope.$watch('getValue()', function (value, old) {
+		scope.$watch('getValue()', function selectFieldValueWatch(value, old) {
 			scope.image = scope.findImage(value);
 			element.toggleClass('empty', !value);
 		}.bind(this));
@@ -649,7 +649,7 @@ ui.formInput('MultiSelect', 'Select', {
 			}
 		});
 
-		scope.$watch('items.length', function (value, old) {
+		scope.$watch('items.length', function selectItemsLengthWatch(value, old) {
 			setTimeout(function () {
 				scaleInput(50);
 			});
@@ -830,7 +830,7 @@ ui.formInput('NavSelect', {
 			return filterSelection(scope, field, selection, scope.getValue()) || [];
 		};
 
-		scope.$watch('text', function (text, old) {
+		scope.$watch('text', function navSelectTextWatch(text, old) {
 			adjust();
 		});
 

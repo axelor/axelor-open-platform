@@ -62,7 +62,7 @@ ui.formWidget('Form', {
 			e.preventDefault();
 		});
 
-		scope.$watch('record', function(rec, old) {
+		scope.$watch('record', function formRecordWatch(rec, old) {
 			if (element.is(':visible')) {
 				return;
 			}

@@ -274,7 +274,7 @@ function SearchFormCtrl($scope, $element, ViewService) {
 	// prevent requesting defaults
 	$scope.defaultValues = {};
 	
-	$scope.$watch('_searchView', function(schema) {
+	$scope.$watch('_searchView', function searchSchemaWatch(schema) {
 		if (!schema) return;
 		var form = {
 			title: 'Search',
@@ -357,7 +357,7 @@ function SearchGridCtrl($scope, $element, ViewService, $interpolate) {
 	
 	var viewTitles = {};
 
-	$scope.$watch('_searchView', function(schema) {
+	$scope.$watch('_searchView', function searchSchemaWatch(schema) {
 		if (!schema) return;
 		var view = {
 			title: 'Search',
@@ -544,7 +544,7 @@ function SearchToolbarCtrl($scope, $element, $http) {
 		});
 	};
 
-	$scope.$watch('_searchView', function(schema) {
+	$scope.$watch('_searchView', function searchSchemaWatch(schema) {
 		
 		if (!schema) {
 			return;

@@ -2717,7 +2717,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 			}
 
 			element.addClass('slickgrid').hide();
-			var unwatch = scope.$watch("view.loaded", function(viewLoaded) {
+			var unwatch = scope.$watch("view.loaded", function gridSchemaWatch(viewLoaded) {
 				if (!viewLoaded || !scope.dataView) {
 					return;
 				}

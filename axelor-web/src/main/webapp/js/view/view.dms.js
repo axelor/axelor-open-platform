@@ -1075,7 +1075,7 @@ ui.directive("uiDmsFolders", function () {
 				});
 			});
 
-			scope.$watch("currentFolder", function (folder) {
+			scope.$watch("currentFolder", function dmsCurrentFolderWatch(folder) {
 				var folders = scope.folders || {};
 				var rootFolders = scope.rootFolders || [];
 				var id, node;
@@ -1262,7 +1262,7 @@ ui.directive("uiDmsDetails", function () {
 				ds.save(record).success(doClose);
 			};
 
-			$scope.$watch("selection[0]", function (index) {
+			$scope.$watch("selection[0]", function dmsSelectionWatch(index) {
 				if (index === undefined || !$scope.showDetails) return;
 				var details = $scope.details || {};
 				var record = $scope.dataView.getItem(index) || {};

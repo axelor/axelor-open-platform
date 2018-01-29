@@ -216,7 +216,7 @@ ui.directive('uiViewPortlet', ['$compile', function($compile){
 
 						lazy = !element.parent().is(".portal");
 
-						var unwatch = scope.$watch(function () {
+						var unwatch = scope.$watch(function portalVisibleWatch() {
 							var action = attrs.action;
 							if (!action) {
 								return;

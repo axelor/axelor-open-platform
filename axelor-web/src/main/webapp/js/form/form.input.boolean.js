@@ -62,7 +62,7 @@ ui.formInput('InlineCheckbox', 'Boolean', {
 	showTitle: false,
 	link: function (scope, element, attrs, model) {
 		this._super.apply(this, arguments);
-		scope.$watch('attr("title")', function(title) {
+		scope.$watch('attr("title")', function booleanTitleWatch(title) {
 			scope.label = title;
 		});
 	},
@@ -152,7 +152,7 @@ ui.formInput('BooleanSelect', 'Boolean', {
 			input.val(text);
 		};
 
-		scope.$watch('isReadonly()', function (readonly) {
+		scope.$watch('isReadonly()', function booleanReadonlyWatch(readonly) {
 			input.autocomplete(readonly ? "disable" : "enable");
 			input.toggleClass('not-readonly', !readonly);
 		});

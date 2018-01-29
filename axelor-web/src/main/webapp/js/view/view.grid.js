@@ -834,7 +834,7 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
 				element.parent().children('.slickgrid').append(overlay);
 			});
 			
-			scope.$watch('$$dirty', function (dirty) {
+			scope.$watch('$$dirty', function gridDirtyWatch(dirty) {
 				overlay.toggle(dirty);
 			});
 		},
@@ -927,7 +927,7 @@ ui.directive('uiPortletGrid', function(){
 					return;
 				}
 
-				unwatch =  $scope.$watch(function () {
+				unwatch =  $scope.$watch(function gridVisibleWatch() {
 					if ($element.is(":hidden")) {
 						return;
 					}
@@ -980,7 +980,7 @@ ui.directive('uiPortletGrid', function(){
 ui.directive('uiTopHelp', function () {
 	return {
 		link: function (scope, element) {
-			var unwatch = scope.$watch('schema', function (view) {
+			var unwatch = scope.$watch('schema', function gridSchemaWatch(view) {
 				if (view) {
 					unwatch();
 				}

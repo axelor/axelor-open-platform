@@ -32,7 +32,7 @@ ui.ProgressMixin = {
 		var field = scope.field || {},
 			that = this;
 
-		scope.$watch("getValue()", function(value, old) {
+		scope.$watch("getValue()", function progressValueWatch(value, old) {
 			var props = that.compute(field, value);
 			scope.cssClasses = 'progress ' + props.css;
 			scope.styles = {

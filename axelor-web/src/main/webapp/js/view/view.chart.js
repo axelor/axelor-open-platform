@@ -119,7 +119,7 @@ function ChartCtrl($scope, $element, $http, ActionService) {
 			return;
 		}
 
-		unwatch = $scope.$watch(function () {
+		unwatch = $scope.$watch(function chartRefreshWatch() {
 			if ($element.is(":hidden")) {
 				return;
 			}
@@ -163,7 +163,7 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 		return fields;
 	}
 	
-	var unwatch = $scope.$watch('searchFields', function (fields) {
+	var unwatch = $scope.$watch('searchFields', function chartSearchFieldsWatch(fields) {
 		if (!fields) {
 			return;
 		}
@@ -236,7 +236,7 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 		$scope.$on('on:new', onNewOrEdit);
 		$scope.$on('on:edit', onNewOrEdit);
 
-		$scope.$watch('record', function (record) {
+		$scope.$watch('record', function chartSearchRecordWatch(record) {
 			if (interval === undefined) {
 				interval = null;
 				return;
@@ -244,7 +244,7 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 			if ($scope.isValid()) delayedReload();
 		}, true);
 		
-		$scope.$watch('$events.onLoad', function (handler) {
+		$scope.$watch('$events.onLoad', function chartOnLoadWatch(handler) {
 			if (handler) {
 				handler().then(delayedReload);
 			}

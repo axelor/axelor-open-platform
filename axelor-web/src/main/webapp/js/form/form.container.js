@@ -65,7 +65,7 @@ ui.formWidget('Group', {
 			scope.setCollapsed(scope.collapsed);
 		};
 		
-		scope.$watch("attr('collapse')", function(collapsed) {
+		scope.$watch("attr('collapse')", function groupCollapseWatch(collapsed) {
 			scope.setCollapsed(collapsed);
 		});
 		
@@ -75,7 +75,7 @@ ui.formWidget('Group', {
 		}
 
 		if (props.showTitle !== false) {
-			scope.$watch('attr("title")', function(value){
+			scope.$watch('attr("title")', function groupTitleWatch(value){
 				scope.title = value;
 			});
 		}
@@ -141,7 +141,7 @@ ui.formWidget('Dashlet', {
 		scope.dashlet = dashlet;
 		scope.formPath = field.name || field.action;
 
-		scope.$watch('attr("title")', function (title, old) {
+		scope.$watch('attr("title")', function dashletTitleWatch(title, old) {
 			if (title === old) {
 				return;
 			}
@@ -357,11 +357,11 @@ ui.formWidget('Tab', {
 
 		tabs.addTab(scope);
 		
-		scope.$watch('attr("title")', function(value){
+		scope.$watch('attr("title")', function tabTitleWatch(value){
 			scope.title = value;
 		});
 		
-		scope.$watch("isHidden()", function(hidden, old) {
+		scope.$watch("isHidden()", function tabHiddenWatch(hidden, old) {
 			if (hidden) {
 				return tabs.hideTab(scope.index);
 			}
@@ -385,7 +385,7 @@ ui.formWidget('Tab', {
 ui.formWidget('ButtonGroup', {
 
 	link: function (scope, element, attrs) {
-		function adjust() {
+		function adjustButtons() {
 			var visible = element.children('.btn:visible').size();
 			if (visible) {
 				element.children('.btn:visible')
@@ -393,7 +393,7 @@ ui.formWidget('ButtonGroup', {
 					.css('width', (100.00/visible) + '%');
 			}
 		}
-		scope.$watch(adjust);
+		scope.$watch(adjustButtons);
 		scope.$callWhen(function () {
 			return element.is(':visible');
 		}, adjust);
@@ -453,7 +453,7 @@ ui.formWidget('Panel', {
 			scope.setCollapsed(!scope.collapsed);
 		};
 
-		scope.$watch("attr('collapse')", function(collapsed) {
+		scope.$watch("attr('collapse')", function panelCollapseWatch(collapsed) {
 			scope.setCollapsed(collapsed);
 		});
 
@@ -466,7 +466,7 @@ ui.formWidget('Panel', {
 		}
 		scope.notitle = field.showFrame === false || field.showTitle === false;
 		scope.title = field.title;
-		scope.$watch('attr("title")', function (title, old) {
+		scope.$watch('attr("title")', function panelTitleWatch(title, old) {
 			if (title === undefined || title === old) return;
 			scope.title = title;
 		});
@@ -810,12 +810,12 @@ ui.formWidget('PanelTab', {
 			return !tab.selected || isHidden.call(scope);
 		};
 
-		scope.$watch("attr('title')", function(value) {
+		scope.$watch("attr('title')", function tabTitleWatch(value) {
 			var tab = findTab();
 			tab.title = value;
 		});
 
-		scope.$watch("attr('hidden')", function(hidden, old) {
+		scope.$watch("attr('hidden')", function tabHiddenWatch(hidden, old) {
 			scope.$evalAsync(function () {
 				if (hidden) {
 					return scope.hideTab(index);

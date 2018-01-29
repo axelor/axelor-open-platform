@@ -401,7 +401,7 @@ function FormViewCtrl($scope, $element) {
 		return $scope.$$dirty;
 	};
 
-	$scope.$watch("record", function(rec, old) {
+	$scope.$watch("record", function formRecordWatch(rec, old) {
 		if (rec === old) {
 			$scope.$$dirty = false;
 			return;
@@ -1376,7 +1376,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			});
 		});
 
-		var unwatch = scope.$watch('schema.loaded', function(viewLoaded){
+		var unwatch = scope.$watch('schema.loaded', function formSchemaWatch(viewLoaded){
 
 			if (!viewLoaded) return;
 			

@@ -123,7 +123,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			}
 		});
 		
-		scope.$watch("isEditable()", function(editable, old) {
+		scope.$watch("isEditable()", function isEditableWatch(editable, old) {
 			if (editable === undefined) return;
 			if (editable === old) return;
 			scope.$$readonly = scope.$$isReadonly();
@@ -131,7 +131,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 
 		// js expressions should be evaluated on dummy value changes
 		if (field.name && field.name[0] === '$') {
-			scope.$watch('record.' + field.name, function (a, b) {
+			scope.$watch('record.' + field.name, function fieldValueWatch(a, b) {
 				if (a !== b) {
 					scope.$broadcastRecordChange();
 				}
@@ -232,14 +232,14 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		var hideFn = _.contains(this.handles, 'isHidden') ? angular.noop : hideWidget;
 
 		var hiddenSet = false;
-		scope.$watch("isHidden()", function(hidden, old) {
+		scope.$watch("isHidden()", function isHiddenWatch(hidden, old) {
 			if (hiddenSet && hidden === old) return;
 			hiddenSet = true;
 			return hideFn(hidden);
 		});
 		
 		var readonlySet = false;
-		scope.$watch("isReadonly()", function(readonly, old) {
+		scope.$watch("isReadonly()", function isReadonlyWatch(readonly, old) {
 			if (readonlySet && readonly === old) return;
 			readonlySet = true;
 			element.toggleClass("readonly", readonly);
@@ -410,13 +410,13 @@ ui.formDirective = function(name, object) {
 				return true;
 			}
 			
-			scope.$watch("isReadonly()", function(readonly) {
+			scope.$watch("isReadonly()", function isReadonlyWatch(readonly) {
 				if (readonly && showReadonly()) {
 					return;
 				}
 				return showEditable();
 			});
-			scope.$watch("isRequired()", function(required, old) {
+			scope.$watch("isRequired()", function isRequiredWatch(required, old) {
 				if (required === old) return;
 				var elem = element,
 					label = elem.data('label') || $();
@@ -427,7 +427,7 @@ ui.formDirective = function(name, object) {
 			});
 			
 			if (scope.field && scope.field.validIf) {
-				scope.$watch("attr('valid')", function(valid) {
+				scope.$watch("attr('valid')", function attrValidWatch(valid) {
 					if (valid === undefined) return;
 					model.$setValidity('invalid', valid);
 				});

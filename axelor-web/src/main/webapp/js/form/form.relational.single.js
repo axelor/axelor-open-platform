@@ -63,14 +63,21 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 
 	$scope.selectMode = "single";
 
-	$scope.findRelativeFields = function () {
-		var path = $element.attr('x-path');
-		var relatives = $element.parents().find('[x-field][x-path^="'+path+'."]:not(label)').map(function() {
-			return $(this).attr('x-path').replace(path+'.','');
-		}).get();
-		relatives.push($scope.field.targetName);
-		return _.unique(_.compact(relatives));
-	};
+	$scope.findRelativeFields = (function () {
+		var relatives = null;
+		return function () {
+			if (relatives) {
+				return relatives;
+			}
+			var path = $element.attr('x-path');
+			relatives = $element.parents().find('[x-field][x-path^="'+path+'."]:not(label)').map(function() {
+				return $(this).attr('x-path').replace(path+'.','');
+			}).get();
+			relatives.push($scope.field.targetName);
+			relatives = _.unique(_.compact(relatives));
+			return relatives;
+		};
+	})();
 
 	$scope.fetchMissingValues = function (value, fields) {
 		var nameField = $scope.field.targetName || 'id';
@@ -313,7 +320,7 @@ ui.formInput('ManyToOne', 'Select', {
 		scope.$evalAsync(function() {
 			var relatives = scope.findRelativeFields();
 			if (relatives.length > 0) {
-				scope.$watch(attrs.ngModel, function (value, old) {
+				scope.$watch(attrs.ngModel, function m2oValueWatch(value, old) {
 					if (value && value.id > 0) {
 						scope.fetchMissingValues(scope.getValue(), relatives);
 					}
@@ -337,7 +344,7 @@ ui.formInput('ManyToOne', 'Select', {
 			var hiddenSet = false;
 			var hasHidden = false;
 			
-			scope.$watch('attr("hidden")', function (hidden, old) {
+			scope.$watch('attr("hidden")', function m2oHiddenWatch(hidden, old) {
 				if (hidden && !hiddenSet) hasHidden = true;
 				if (hiddenSet && hidden === old) return;
 				hiddenSet = true;

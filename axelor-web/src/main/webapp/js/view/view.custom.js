@@ -108,7 +108,7 @@ var customDirective = ["$compile", function ($compile) {
 				element.append(elem);
 			}
 
-			var unwatch = scope.$watch('schema.template', function (template) {
+			var unwatch = scope.$watch('schema.template', function customTemplateWatch(template) {
 				if (template) {
 					unwatch();
 					render(template);
@@ -117,7 +117,7 @@ var customDirective = ["$compile", function ($compile) {
 			
 			scope.showToggle = false;
 
-			scope.$watch('data', function (data) {
+			scope.$watch('data', function customDataWatch(data) {
 				evalScope.data = data;
 				evalScope.first = _.first(data);
 			});
@@ -190,7 +190,7 @@ ui.directive('reportTable',  function() {
 			if (scope.columns) {
 				makeColumns((scope.columns||'').split(','));
 			} else {
-				var unwatch = scope.$watch('data', function (data) {
+				var unwatch = scope.$watch('data', function reportDataWatch(data) {
 					if (data) {
 						unwatch();
 						var first = _.first(data) || {};

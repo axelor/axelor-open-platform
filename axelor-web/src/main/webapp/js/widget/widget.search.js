@@ -163,7 +163,7 @@ ui.directive('uiFilterItem', function() {
 				});
 			};
 
-			scope.$watch('filter.field', function (value, old) {
+			scope.$watch('filter.field', function searchFilterFieldWatch(value, old) {
 				scope.operators = getOperators();
 			});
 
@@ -184,7 +184,7 @@ ui.directive('uiFilterItem', function() {
 				return all;
 			};
 
-			var unwatch = scope.$watch('fields', function(fields, old) {
+			var unwatch = scope.$watch('fields', function searchFiledsWatch(fields, old) {
 				if (_.isEmpty(fields)) return;
 				unwatch();
 				var options = _.values(fields);
@@ -266,7 +266,7 @@ ui.directive('uiFilterTags', function() {
 			$scope.schema = schema;
 			$scope.schema.loaded = true;
 			
-			$scope.$watch('record.' + filter.field, function (value) {
+			$scope.$watch('record.' + filter.field, function searchFilterFieldWatch(value) {
 				filter.value = _.pluck(value, 'id');
 			});
 
@@ -421,7 +421,7 @@ ui.directive('uiFilterContext', function () {
 				$scope.context = context;
 			};
 			
-			$scope.$watch('context.field.name', function (name) {
+			$scope.$watch('context.field.name', function searchContextFieldWatch(name) {
 				if (!name) {
 					$scope.remove();
 				}
@@ -441,7 +441,7 @@ ui.directive('uiFilterContext', function () {
 			};
 		}],
 		link: function (scope, element, attrs) {
-			var unwatch = scope.$watch('fields', function (fields) {
+			var unwatch = scope.$watch('fields', function searchContextFieldsWatch(fields) {
 				if (_.isEmpty(fields)) return;
 				unwatch();
 				scope.onFields(fields);
@@ -817,7 +817,7 @@ ui.directive('uiFilterForm', function() {
 		controller: FilterFormCtrl,
 
 		link: function(scope, element, attrs, ctrl) {
-			var unwatch = scope.$watch("$parent.viewItems", function (items) {
+			var unwatch = scope.$watch("$parent.viewItems", function searchViewItemsWatch(items) {
 				if (items === undefined) return;
 				unwatch();
 				ctrl.doInit(scope.model, items);
@@ -1398,7 +1398,7 @@ ui.directive('uiFilterBox', function() {
 				}) : [];
 			};
 
-			scope.handler.$watch('schema.freeSearch', function (value, old) {
+			scope.handler.$watch('schema.freeSearch', function searchFreeSearchWatch(value, old) {
 				if (value === 'none') {
 					var input = element.find('input:first')
 						.addClass('not-readonly')

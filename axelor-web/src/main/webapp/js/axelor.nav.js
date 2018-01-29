@@ -484,13 +484,13 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 	$scope.$root.openTab = $scope.openTab;
 	$scope.$root.openTabByName = $scope.openTabByName;
 
-	$scope.$watch('selectedTab.viewType', function(viewType){
+	$scope.$watch('selectedTab.viewType', function tabViewTypeWatch(viewType){
 		if (viewType) {
 			axelor.$adjustSize();
 		}
 	});
 
-	$scope.$watch('routePath', function(path) {
+	$scope.$watch('routePath', function routePathWatch(path) {
 		$scope.openHomeTab();
 	});
 

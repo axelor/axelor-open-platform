@@ -117,7 +117,7 @@ ui.directive('uiViewDashboard', ['ViewService', function(ViewService) {
 				}
 			};
 
-			var unwatch = scope.$watch("schema", function (schema) {
+			var unwatch = scope.$watch("schema", function dashboardSchemaWatch(schema) {
 				if (!schema) {
 					return;
 				}
@@ -211,7 +211,7 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 					lazy = !element.parent().is(".dashlet-row");
 
 					scope.waitForActions(function () {
-						var unwatch = scope.$watch(function () {
+						var unwatch = scope.$watch(function dashletInitWatch() {
 							var dashlet = scope.dashlet;
 							if (!dashlet) {
 								return;

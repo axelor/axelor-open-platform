@@ -513,7 +513,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 						action: editor.onNew
 					});
 				}
-				scope.$watch('record.id', function (value, old) {
+				scope.$watch('record.id', function editorRecordIdWatch(value, old) {
 					if (!value && handler) {
 						handler.onNew();
 					}
@@ -532,7 +532,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 				return values.length === 0;
 			}
 
-			scope.$watch(function () {
+			scope.$watch(function editorValidWatch() {
 				if (isRelational && editor.showOnNew === false && !scope.canShowEditor()) {
 					return;
 				}

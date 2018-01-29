@@ -405,7 +405,7 @@ ui.directive('uiViewPane', function() {
 				return switchTo(type, callback);
 			};
 			
-			$scope.$watch('selectedTab.viewType', function (type) {
+			$scope.$watch('selectedTab.viewType', function viewTypeWatch(type) {
 				var params = $scope._viewParams;
 				if (params && params.$viewScope !== $scope.selectedTab.$viewScope) {
 					return;
@@ -495,12 +495,12 @@ ui.directive('uiViewPopup', function() {
 		}],
 		link: function (scope, element, attrs) {
 
-			scope.$watch('viewTitle', function (title) {
+			scope.$watch('viewTitle', function viewTitleWatch(title) {
 				scope._setTitle(title);
 			});
 
 			scope.waitForActions(function () {
-				var unwatch = scope.$watch("_viewParams.$viewScope.schema.loaded", function(loaded) {
+				var unwatch = scope.$watch("_viewParams.$viewScope.schema.loaded", function viewLoadedWatch(loaded) {
 					if (!loaded) {
 						return;
 					}
@@ -679,7 +679,7 @@ function viewSwitcher(scope, element, attrs) {
 	});
 
 	var watchExpr = scope._viewParams ? '_viewType' : 'tab.viewType';
-	scope.$watch(watchExpr, function(type) {
+	scope.$watch(watchExpr, function viewTypeWatch(type) {
 		element.find("[x-view-type]").attr("disabled", false);
 		element.find("[x-view-type][x-view-type=" + type + "]").attr("disabled", true);
 	});
@@ -863,7 +863,7 @@ ui.directive('uiHotKeys', function() {
 					fs.$applyAsync();
 				});
 				elem.on('$destroy.hot-edit', cleanup);
-				unwatch = fs.$watch("attr('force-edit')", function(edit) {
+				unwatch = fs.$watch("attr('force-edit')", function forceEditWatch(edit) {
 					if (!edit) {
 						cleanup();
 					}

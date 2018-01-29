@@ -179,7 +179,7 @@ ui.directive('navMenuBar', function() {
 				}
 			});
 			
-			var unwatch = scope.$watch('menus', function(menus, old) {
+			var unwatch = scope.$watch('menus', function navMenusWatch(menus, old) {
 				if (!menus || menus.length === 0  || menus === old) {
 					return;
 				}

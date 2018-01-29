@@ -698,7 +698,7 @@ ui.directive('uiViewTree', function(){
 				scope.onSort(column);
 			};
 
-			var watcher = scope.$watch('loaders', function(loaders) {
+			var watcher = scope.$watch('loaders', function treeLoadersWatch(loaders) {
 				
 				if (loaders === undefined) {
 					return;

@@ -391,7 +391,7 @@ ui.directive('uiEditorPopup', function() {
 				scope._doShow(viewPromise);
 			};
 			
-			scope.$watch('schema.title', function (title) {
+			scope.$watch('schema.title', function popupTitleWatch(title) {
 				scope._setTitle(title);
 			});
 
@@ -449,7 +449,7 @@ ui.directive('uiSelectorPopup', function(){
 				scope._doShow(viewPromise);
 			};
 			
-			scope.$watch('schema.title', function(title){
+			scope.$watch('schema.title', function popupTitleWatch(title){
 				scope._setTitle(title);
 			});
 

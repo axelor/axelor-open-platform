@@ -104,7 +104,7 @@ ui.formInput('JsonField', 'String', {
 
 		function watchParent() {
 			unwatchParent();
-			parentUnwatch = scope.$watch('$parent.record.' + field.name, function (value, old) {
+			parentUnwatch = scope.$watch('$parent.record.' + field.name, function jsonParentWatch(value, old) {
 				if (value === old) return;
 				onRender();
 			});
@@ -112,7 +112,7 @@ ui.formInput('JsonField', 'String', {
 
 		function watchSelf() {
 			unwatchSelf();
-			selfUnwatch = scope.$watch('record', function (record, old) {
+			selfUnwatch = scope.$watch('record', function jsonRecordWatch(record, old) {
 				if (record !== old) {
 					onUpdate();
 				}
@@ -223,7 +223,7 @@ ui.formInput('JsonRaw', 'String', {
 			if (unwatch) {
 				unwatch();
 			}
-			unwatch = scope.$watch('items', function (items, old) {
+			unwatch = scope.$watch('items', function jsonItemsWatch(items, old) {
 				if (items === old) return;
 				var record = null;
 				_.each(items, function (item) {
@@ -330,7 +330,7 @@ ui.formInput('JsonRefSelect', {
 			element.append(elem);
 		});
 
-		scope.$watch("record." + name + ".model", function (value, old) {
+		scope.$watch("record." + name + ".model", function jsonModelWatch(value, old) {
 			if (value === old || old === undefined) return;
 			if (scope.record && scope.record[name]) {
 				scope.record[name] = _.pick(scope.record[name], 'model');

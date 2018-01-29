@@ -172,7 +172,7 @@ ui.directive('uiUpdateDummy', function () {
 				if (initialized) return;
 				initialized = true;
 				
-				var unwatch = parent.$watch('fields', function (fields) {
+				var unwatch = parent.$watch('fields', function massFieldsWatch(fields) {
 					if (_.isEmpty(fields)) return;
 					unwatch();
 					prepare(fields);

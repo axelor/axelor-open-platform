@@ -490,7 +490,7 @@ ui.directive('uiCard', ["$compile", function ($compile) {
 				return record;
 			}
 
-			evalScope.$watch("record", function (record) {
+			evalScope.$watch("record", function cardRecordWatch(record) {
 				_.extend(evalScope, process(record));
 			}, true);
 

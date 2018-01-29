@@ -490,7 +490,7 @@ ui.formWidget('uiMailMessages', {
 			}
 		});
 
-		$scope.$watch("record", function (record, old) {
+		$scope.$watch("record", function mailMessageWatch(record, old) {
 			if (record === old) { return; }
 			if (record && record.id) {
 				$scope.onLoadMessages();
@@ -1019,7 +1019,7 @@ ui.formWidget('uiMailFollowers', {
 			});
 		}
 
-		$scope.$watch("record", function (record) {
+		$scope.$watch("record", function mailFollowerWatch(record) {
 			if (record && record.id) {
 				doLoadFollowers(record);
 			}

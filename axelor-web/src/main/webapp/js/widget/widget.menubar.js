@@ -150,7 +150,7 @@ ui.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, Acti
 			var formScope = form.data('$scope');
 
 			if (formScope) {
-				formScope.$watch('record', function(rec) {
+				formScope.$watch('record', function menubarRecordWatch(rec) {
 					scope.record = rec;
 				});
 			}

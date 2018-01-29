@@ -245,7 +245,7 @@ ui.formInput('Image', 'ImageLink', {
 			image.get(0).src = scope.getLink(model.$viewValue);
 		};
 
-		scope.$watch("record.id", function(id, old) {
+		scope.$watch("record.id", function imageRecordIdWatch(id, old) {
 			if (!scope.isReadonly()) {
 				scope.$render_editable();
 			}

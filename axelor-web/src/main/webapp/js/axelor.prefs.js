@@ -38,7 +38,7 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 	
 	var __version = null;
 	
-	$scope.$watch('record.version', function (value) {
+	$scope.$watch('record.version', function recordVersionWatch(value) {
 		if (value === null || value === undefined) return;
 		if (__version !== null) return;
 		__version = value;

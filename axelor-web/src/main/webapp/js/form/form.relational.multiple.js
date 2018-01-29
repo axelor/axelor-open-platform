@@ -460,14 +460,14 @@ ui.formInput('OneToMany', {
 		};
 		
 		if (scope.field.requiredIf) {
-			scope.$watch("attr('required')", function(required) {
+			scope.$watch("attr('required')", function o2mRequiredWatch(required) {
 				if (required !== undefined) {
 					model.$validate();
 				}
 			});
 		}
 		if (scope.field.validIf) {
-			scope.$watch("attr('valid')", function(valid) {
+			scope.$watch("attr('valid')", function o2mValidWatch(valid) {
 				if (valid !== undefined) {
 					model.$setValidity('invalid', valid);
 				}
@@ -478,7 +478,7 @@ ui.formInput('OneToMany', {
 			if (doRenderUnwatch) {
 				return;
 			}
-			doRenderUnwatch = scope.$watch(function () {
+			doRenderUnwatch = scope.$watch(function o2mFetchWatch() {
 				if (!isVisible() || !doViewPromised) {
 					return;
 				}
@@ -536,7 +536,7 @@ ui.formInput('OneToMany', {
 		})();
 
 		var collapseIfEmpty = this.collapseIfEmpty;
-		scope.$watch(attrs.ngModel, function(value){
+		scope.$watch(attrs.ngModel, function o2mAdjustWatch(value){
 			if (!value) {
 				// clear data view
 				scope.dataView.setItems([]);
@@ -574,7 +574,7 @@ ui.formInput('OneToMany', {
 						grid.setSelectedRows([]);
 					}
 				});
-				scope.$watch("isReadonly()", function(readonly) {
+				scope.$watch("isReadonly()", function o2mReadonlyWatch(readonly) {
 					grid.setOptions({
 						editable: !readonly && scope.canEdit()
 					});
@@ -654,7 +654,7 @@ ui.formInput('OneToMany', {
 			});
 		}
 
-		scope.$watch("attr('title')", function(title){
+		scope.$watch("attr('title')", function o2mTitleWatch(title){
 			scope.title = title;
 		});
 	},
@@ -961,7 +961,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 				return;
 			}
 			scope.items = showOnNew && canAdd() ? [{}] : [];
-			unwatch = scope.$watch('items[0]', function (item, old) {
+			unwatch = scope.$watch('items[0]', function o2mFirstItemWatch(item, old) {
 				if (!item) return;
 				if (item.$changed) {
 					unwatch();
@@ -998,7 +998,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		scope.$watch('items', itemsChanged, true);
 		scope.$itemsChanged = itemsChanged;
 
-		scope.$watch('$$readonly', function (readonly, old) {
+		scope.$watch('$$readonly', function o2mReadonlyWatch(readonly, old) {
 			if (readonly === undefined) return;
 			var items = model.$viewValue;
 			if (_.isEmpty(items)) {
@@ -1199,14 +1199,14 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 		
 		$(document).on('mousedown.mini-grid', hidePopup);
 		
-		scope.$watch(attrs.ngModel, function(value) {
+		scope.$watch(attrs.ngModel, function o2mModelWatch(value) {
 			var text = "";
 			if (value && value.length)
 				text = "(" + value.length + ")";
 			input.val(text);
 		});
 		
-		scope.$watch('schema.loaded', function(viewLoaded) {
+		scope.$watch('schema.loaded', function o2mSchemaWatch(viewLoaded) {
 			var schema = scope.schema;
 			if (schema && scope.attr('canEdit') === false) {
 				schema.editIcon = false;
