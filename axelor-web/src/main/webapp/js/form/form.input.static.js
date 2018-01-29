@@ -112,7 +112,7 @@ function makePopover(scope, element, callback, placement) {
         }
     }
 
-	function enter(e) {
+	function enter(e, show) {
 		if (popoverTimer) {
 			clearTimeout(popoverTimer);
 		}
@@ -129,7 +129,7 @@ function makePopover(scope, element, callback, placement) {
 				tip.attr('tabIndex', 0);
 				tip.css('outline', 'none');
 			}
-		}, e.ctrlKey ? 0 : 1000);
+		}, (e.ctrlKey || show) ? 0 : 1000);
 	}
 	
 	function leave(e) {
@@ -173,6 +173,32 @@ function makePopover(scope, element, callback, placement) {
 	scope.$on('$destroy', destroy);
 }
 
+function setupPopover(scope, element, getHelp, placement) {
+
+	if (!canDisplayPopover(scope, false)) {
+		return;
+	}
+	
+	var timer = null;
+	element.on('mouseenter.help.setup', function (e) {
+		if (timer) {
+			clearTimeout(timer);
+		}
+		timer = setTimeout(function () {
+			element.off('mouseenter.help.setup');
+			element.off('mouseleave.help.setup');
+			makePopover(scope, element, getHelp, placement);
+			element.trigger('mouseenter.popover', true);
+		}, e.ctrlKey ? 0 : 1000);
+	});
+	element.on('mouseleave.help.setup', function () {
+		if (timer) {
+			clearTimeout(timer);
+			timer = null;
+		}
+	});
+}
+
 ui.directive('uiTabPopover', function() {
 	
 	function getHelp(scope, addRow) {
@@ -199,10 +225,8 @@ ui.directive('uiTabPopover', function() {
 		}
 	}
 
-	return function (scope, element, attrs) {
-		if(canDisplayPopover(scope, true)) {
-			return makePopover(scope, element, getHelp, 'bottom');
-		}
+	return function(scope, element, attrs) {
+		setupPopover(scope, element, getHelp, 'bottom');
 	};
 });
 
@@ -284,9 +308,7 @@ ui.directive('uiHelpPopover', function() {
 		if (field == null) {
 			return;
 		}
-		if(canDisplayPopover(scope, false)) {
-			makePopover(scope, element, getHelp);
-		}
+		setupPopover(scope, element, getHelp);
 	}
 
 	return function(scope, element, attrs) {
