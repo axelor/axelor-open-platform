@@ -501,7 +501,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 			}
 
 			form = $compile(form)(scope);
-			form.children('div.row').removeClass('row').addClass('row-fluid');
+			form.removeClass('mid-form mini-form').children('div.row').removeClass('row').addClass('row-fluid');
 			element.append(form);
 
 			if (field.target) {
