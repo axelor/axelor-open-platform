@@ -32,8 +32,8 @@ var OPERATORS = {
 	"like" 		: _t("contains"),
 	"notLike"	: _t("doesn't contain"),
 	
-	"in" 		: _t("contains"),
-	"notIn"	: _t("doesn't contain"),
+	"in" 		: _t("in"),
+	"notIn"	: _t("not in"),
 
 	"between"		: _t("in range"),
 	"notBetween"	: _t("not in range"),
@@ -62,7 +62,7 @@ _.each(["one-to-many"], function(type) {
 });
 
 _.each(["one-to-one", "many-to-one", "many-to-many"], function(type) {
-	OPERATORS_BY_TYPE[type] = ["in", "notIn", "isNull", "notNull"];
+	OPERATORS_BY_TYPE[type] = ["like", "notLike", "in", "notIn", "isNull", "notNull"];
 });
 
 ui.directive('uiFilterItem', function() {
@@ -118,10 +118,9 @@ ui.directive('uiFilterItem', function() {
 			
 			scope.canShowTags = function() {
 				return scope.filter &&
-				   ['many-to-one', 'one-to-one', 'many-to-many'].indexOf(scope.filter.type) > -1 &&
-				   scope.filter.operator && !(
-				   scope.filter.operator == 'isNull' ||
-				   scope.filter.operator == 'notNull');
+				   ['many-to-one', 'one-to-one', 'many-to-many'].indexOf(scope.filter.type) > -1
+				   && ( scope.filter.operator == 'in' ||
+						scope.filter.operator == 'notNot');
 			};
 
 			scope.canShowInput = function() {
