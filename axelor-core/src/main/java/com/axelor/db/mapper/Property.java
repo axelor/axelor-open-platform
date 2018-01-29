@@ -369,7 +369,7 @@ public class Property {
 				targetSearch.addAll(Arrays.asList(nameField.getNameSearch()));
 			}
 		}
-		if (codeField != null) {
+		if (codeField != null && codeField.getType() == PropertyType.STRING) {
 			targetSearch.add(codeField.getName());
 		}
 
