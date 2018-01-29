@@ -190,6 +190,7 @@ ui.formWidget('BaseSelect', {
 
 		input.focus(function(e) {
 			element.addClass('focus');
+			doSetup(input);
 		}).blur(function() {
 			element.removeClass('focus');
 			if (showing) {
