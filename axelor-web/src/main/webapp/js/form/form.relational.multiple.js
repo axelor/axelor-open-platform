@@ -529,7 +529,7 @@ ui.formInput('OneToMany', {
 					height = (rowSize * count) + (minSize + rowSize);
 				}
 				if (elem && adjustHeight) {
-					elem.css('min-height', Math.min(height, maxSize));
+					elem.css('min-height', count ? Math.min(height, maxSize) : (minSize + 26));
 				}
 				axelor.$adjustSize();
 			};
