@@ -18,6 +18,7 @@
 package com.axelor.rpc;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.JpaSupport;
 import com.axelor.db.Model;
 import com.axelor.i18n.I18n;
+import com.google.common.base.Throwables;
 
 public class ResponseInterceptor extends JpaSupport implements MethodInterceptor {
 
@@ -88,24 +90,28 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 		return response;
 	}
 
-	private Response onException(Throwable ex, Response response) {
-		if (ex instanceof AuthorizationException) {
-			return onAuthorizationException((AuthorizationException) ex, response);
+	private Response onException(Throwable throwable, Response response) {
+		final Throwable cause = throwable.getCause();
+		final Throwable root = Throwables.getRootCause(throwable);
+		for (Throwable ex : Arrays.asList(throwable, cause, root)) {
+			if (ex instanceof AuthorizationException) {
+				return onAuthorizationException((AuthorizationException) ex, response);
+			}
+			if (ex instanceof AuthSecurityException) {
+				return onAuthSecurityException((AuthSecurityException) ex, response);
+			}
+			if (ex instanceof OptimisticLockException) {
+				return onOptimisticLockException((OptimisticLockException) ex, response);
+			}
+			if (ex instanceof ConstraintViolationException) {
+				return onConstraintViolationException((ConstraintViolationException) ex, response);
+			}
+			if (ex instanceof SQLException) {
+				return onSQLException((SQLException) ex, response);
+			}
 		}
-		if (ex instanceof AuthSecurityException) {
-			return onAuthSecurityException((AuthSecurityException) ex, response);
-		}
-		if (ex instanceof OptimisticLockException) {
-			return onOptimisticLockException((OptimisticLockException) ex, response);
-		}
-		if (ex instanceof ConstraintViolationException) {
-			return onConstraintViolationException((ConstraintViolationException) ex, response);
-		}
-		if (ex instanceof SQLException) {
-			return onSQLException((SQLException) ex, response);
-		}
-		response.setException(ex);
-		log.error("Error: {}", ex.getMessage());
+		response.setException(throwable);
+		log.error("Error: {}", throwable.getMessage());
 		return response;
 	}
 
