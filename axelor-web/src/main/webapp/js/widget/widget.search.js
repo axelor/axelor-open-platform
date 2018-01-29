@@ -631,6 +631,10 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
 			filter.type = field.type || 'string';
 			filter.operator = item.operator;
+			
+			if (field.selectionList) {
+				filter.selectionList = field.selectionList;
+			}
 
 			if (item.operator === '=' && filter.value === true) {
 				filter.operator = 'true';
