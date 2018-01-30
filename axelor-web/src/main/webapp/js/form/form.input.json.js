@@ -184,7 +184,7 @@ ui.formInput('JsonField', 'String', {
 		scope.$evalAsync(function () {
 			var parent = scope.$parent.field || {};
 			if (parent.type === 'panel' && _.size(parent.items) === 1 && _.isEmpty(field.jsonFields)) {
-				scope.$parent.attr('hidden', true);
+				element.parents('.panel:first').addClass('hide').hide();
 			}
 		});
 
