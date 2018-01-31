@@ -1381,14 +1381,21 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			if (!viewLoaded) return;
 			
 			unwatch();
+			
+			var preparing = true;
+
+			scope.$watchChecker(function () {
+				return !preparing;
+			});
 
 			var params = (scope._viewParams || {}).params || {};
 			var schema = scope.schema;
 			var form = ui.formBuild(scope, schema, scope.fields);
 
 			form = $compile(form)(scope);
-			element.append(form);
 
+			var numFields = form.find('[x-field]').size();
+			
 			if (!scope._isPopup && !scope._isPanelForm) {
 				element.addClass('has-width');
 			}
@@ -1405,11 +1412,14 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 				});
 				form.removeClass('large-form mid-form mini-form');
 			}
-			
-			if (scope._viewResolver) {
-				scope._viewResolver.resolve(schema, element);
-				scope.$broadcast("adjust:dialog");
-			}
+			scope.$timeout(function () {
+				element.append(form);
+				preparing = false;
+				if (scope._viewResolver) {
+					scope._viewResolver.resolve(schema, element);
+					scope.$broadcast("adjust:dialog");
+				}
+			}, Math.min(300, numFields * 2));
 		});
 		
 		element.on('dblclick', '[x-field].readonly', function (e) {
