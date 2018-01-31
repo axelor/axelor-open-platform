@@ -16206,7 +16206,7 @@ function $RootScopeProvider() {
 
           traverseScopesLoop:
           do { // "traverse the scopes" loop
-            if ((watchers = current.$$watchers)) {
+        	  if ((!current.$$canWatch || current.$$canWatch(current)) && (watchers = current.$$watchers)) {
               // process our watches
               length = watchers.length;
               while (length--) {
