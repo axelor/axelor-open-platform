@@ -385,7 +385,7 @@ ui.formInput('ManyToOne', 'Select', {
 		});
 		input.on("focus", function () {
 			// XXX: firefox prevents click event, bug in FF?
-			if (!$.browser.mozilla) {
+			if (!axelor.browser.mozilla) {
 				input.attr('placeholder', _t('Search...'));
 			}
 		});

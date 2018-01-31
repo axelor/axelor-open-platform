@@ -136,7 +136,7 @@ ui.formInput('Text', {
 		textarea.rows = parseInt(field.height) || 8;
 
 		//Firefox add one more line
-		if ($.browser.mozilla){
+		if (axelor.browser.mozilla) {
 			textarea.rows -= 1;
 		}
 

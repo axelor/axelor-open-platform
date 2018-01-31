@@ -77,21 +77,55 @@
 		hideLoading();
 	}
 
-	// screen size detection
-	Object.defineProperty(axelor, 'device', {
-		enumerable: true,
-		get: function () {
-			var device = {
-				small: false,
-				large: false
-			};
-			device.large = $(window).width() > 768;
-			device.small = !device.large;
-			device.mobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(navigator.userAgent);
-			device.webkit = /Webkit/i.test(navigator.userAgent);
-			return device;
+	(function () {
+		// browser detection (adopted from jquery)
+		var ua = navigator.userAgent.toLowerCase();
+		var browser = {};
+		var match =
+			/(chrome)[ \/]([\w.]+)/.exec(ua) ||
+			/(webkit)[ \/]([\w.]+)/.exec(ua) ||
+			/(opera)(?:.*version|)[ \/]([\w.]+)/.exec(ua) ||
+			/(msie) ([\w.]+)/.exec(ua) ||
+			ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua) ||
+			[];
+		
+		var matched = {
+			browser: match[1] || "",
+			version: match[2] || "0"
+		};
+
+		if (matched.name) {
+			browser[matched.browser] = true;
+			browser.version = matched.version;
 		}
-	});
+		if (browser.chrome) {
+	        browser.webkit = true;
+		} else if (browser.webkit) {
+	        browser.safari = true;
+		}
+
+		Object.defineProperty(axelor, 'browser', {
+			enumerable: true,
+			get: function () {
+				return _.extend({}, browser);
+			}
+		});
+
+		// screen size detection
+		Object.defineProperty(axelor, 'device', {
+			enumerable: true,
+			get: function () {
+				var device = {
+					small: false,
+					large: false
+				};
+				device.large = $(window).width() > 768;
+				device.small = !device.large;
+				device.mobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(ua);
+				return device;
+			}
+		});
+	})();
 	
 	axelor.$evalScope = function (scope) {
 

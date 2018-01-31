@@ -1612,7 +1612,7 @@ Grid.prototype.onKeyDown = function(e, args) {
 	}
 
 	// firefox & IE fails to trigger onChange
-	if (($.browser.mozilla || $.browser.msie) &&
+	if ((axelor.browser.mozilla || axelor.browser.msie) &&
 			(e.which === $.ui.keyCode.TAB || e.which === $.ui.keyCode.ENTER)) {
 		var editor = grid.getCellEditor(),
 			target = $(e.target);
