@@ -1264,6 +1264,16 @@ Grid.prototype._doInit = function(view) {
 			grid.autosizeColumns();
 		}
 	});
+	
+	scope.$on('$destroy', function () {
+		if (that.editorForm) {
+			that.editorForm.remove();
+		}
+		if (that.editorScope) {
+			that.editorScope.$destroy();
+		}
+		grid.destroy();
+	});
 };
 
 Grid.prototype.subscribe = function(event, handler) {
