@@ -1408,7 +1408,7 @@ ui.directive('uiFilterBox', function() {
 			});
 
 			element.on('$destroy', function() {
-				$(document).on('mousedown.search-menu', onMouseDown);
+				$(document).off('mousedown.search-menu', onMouseDown);
 				if (menu) {
 					menu.remove();
 					menu = null;
