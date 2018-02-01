@@ -223,7 +223,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			if (hidden) {
 				elem.add(label).hide();
 			} else {
-				elem.add(label).show();
+				elem.add(label).show().css('display', ''); //XXX: jquery may add display style
 			}
 
 			return axelor.$adjustSize();
