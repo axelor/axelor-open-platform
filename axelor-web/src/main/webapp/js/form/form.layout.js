@@ -149,9 +149,6 @@ function TableLayout(items, attrs, $scope, $compile) {
 				if (_.isArray(widths) && widths[i]) {
 					el.width(widths[i]);
 				}
-				if ($(cell.elem).is('.form-item-container') && axelor.config['view.form.hot-edit']) {
-					$(cell.elem).prepend($('<span class="fa fa-pencil hot-edit-icon"></span>'));
-				}
 				numCells += cell.colspan || 1;
 		});
 		

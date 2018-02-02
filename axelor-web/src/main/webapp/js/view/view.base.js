@@ -92,9 +92,6 @@ function ViewCtrl($scope, DataSource, ViewService) {
 			return;
 		}
 		
-		// cancel hot edit
-		$.event.trigger('cancel:hot-edit');
-		
 		var promise = view.deferred.promise;
 		promise.then(function(viewScope){
 
@@ -820,59 +817,6 @@ ui.directive('uiHotKeys', function() {
 			if (_.isFunction(vs.onHotKey)) {
 				return vs.onHotKey(e, action);
 			}
-		});
-		
-		function hotEdit(elem) {
-			var fs = elem.data('$scope');
-			var field = fs ? fs.field : null;
-			if (!field || field.readonly) {
-				return;
-			}
-			
-			var isHotEdit = fs.attr("force-edit");
-			var unwatch = null;
-
-			$.event.trigger('cancel:hot-edit');
-			
-			if (isHotEdit || !fs.hasPermission("write") || !fs.isReadonly()) {
-				return;
-			}
-
-			function cleanup() {
-				if (unwatch) {
-					unwatch();
-					unwatch = null;
-				}
-				fs.attr("force-edit", false);
-				if (elem) {
-					elem.off('cancel:hot-edit');
-					elem.off('$destroy:hot-edit');
-					elem = null;
-				}
-			}
-
-			$.event.trigger('cancel:hot-edit');
-				
-			fs.$applyAsync(function () {
-				fs.attr("force-edit", true);
-				setTimeout(function() {
-					elem.find(':input:first').focus();
-				}, 100);
-				elem.on('cancel:hot-edit', function () {
-					cleanup();
-					fs.$applyAsync();
-				});
-				elem.on('$destroy.hot-edit', cleanup);
-				unwatch = fs.$watch("attr('force-edit')", function forceEditWatch(edit) {
-					if (!edit) {
-						cleanup();
-					}
-				});
-			});
-		}
-		
-		$(document).on("click.hot-edit", ".hot-edit-icon", function (e) {
-			hotEdit($(e.target).parent());
 		});
 
 		scope.$on('$destroy', function() {
