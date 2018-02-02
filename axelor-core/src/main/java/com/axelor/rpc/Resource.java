@@ -784,6 +784,11 @@ public class Resource<T extends Model> {
 			records.add(request.getData());
 		}
 
+		String[] names = {};
+		if (request.getFields() != null) {
+			names = request.getFields().toArray(names);
+		}
+
 		for(Object record : records) {
 
 			if (record == null) {
@@ -818,7 +823,7 @@ public class Resource<T extends Model> {
 				I18nBundle.invalidate();
 			}
 
-			data.add(repository.populate(toMap(bean), request.getContext()));
+			data.add(repository.populate(toMap(bean, names), request.getContext()));
 		}
 
 		response.setData(data);

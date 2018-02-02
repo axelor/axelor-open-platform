@@ -638,12 +638,13 @@
 				return promise;
 			},
 			
-			saveAll: function(items) {
+			saveAll: function(items, fields) {
 
 				var that = this,
 					page = this._page,
 					records = this._data,
 					promise = this._request().post({
+						fields: fields,
 						records: items
 					});
 

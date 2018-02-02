@@ -1826,7 +1826,14 @@ Grid.prototype.__saveChanges = function(args, callback) {
 		});
 	}
 
-	return saveDS.saveAll(records).success(function(records, page) {
+	records = _.where(records, { $dirty: true });
+	if (records.length === 0) {
+		return setTimeout(focus, 200);
+	}
+
+	var fields = handler.selectFields ? handler.selectFields() : undefined;
+
+	return saveDS.saveAll(records, fields).success(function(records, page) {
 		if (data.getItemById(0)) {
 			data.deleteItem(0);
 		}
