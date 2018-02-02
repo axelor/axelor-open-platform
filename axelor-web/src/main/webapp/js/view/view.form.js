@@ -239,7 +239,7 @@ function FormViewCtrl($scope, $element) {
 		}
 		locationChangeOff = $scope.$on("$locationChangeStart", function (event, newUrl, oldUrl) {
 			// block navigation if popup is open
-			var hasDialogs = $('body .ui-dialog:visible').size() > 0;
+			var hasDialogs = $('body .ui-dialog:visible').length > 0;
 			if (hasDialogs) {
 				event.preventDefault();
 				return;
@@ -1317,7 +1317,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			}
 
 			var elems = element.find('[x-field].ng-invalid:not(fieldset)').filter(function() {
-				var isInline = $(this).parents('.slickgrid,.nested-not-required').size() > 0;
+				var isInline = $(this).parents('.slickgrid,.nested-not-required').length > 0;
 				if (isInline) {
 					return false;
 				}
@@ -1393,7 +1393,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 
 			form = $compile(form)(scope);
 
-			var numFields = form.find('[x-field]').size();
+			var numFields = form.find('[x-field]').length;
 			
 			if (!scope._isPopup && !scope._isPanelForm) {
 				element.addClass('has-width');

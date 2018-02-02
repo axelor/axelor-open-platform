@@ -97,7 +97,7 @@ function TableLayout(items, attrs, $scope, $compile) {
 		add(el);
 	});
 	
-	var table = $('<table class="form-layout"></table');
+	var table = $('<table class="form-layout"></table>');
 	
 	function isLabel(cell) {
 		return cell.css === "form-label" || (cell.elem && cell.elem.is('label,.spacer-item'));
@@ -254,7 +254,7 @@ function PanelLayout(items, attrs, $scope, $compile) {
 		add(el);
 	});
 	
-	var container = $('<div class="panel-layout"></div').append(layout);
+	var container = $('<div class="panel-layout"></div>').append(layout);
 
 	return container;
 }
@@ -291,7 +291,7 @@ function BarLayout(items, attrs, $scope, $compile) {
 		}
 	});
 
-	if (side.children().size() === 0) {
+	if (side.children().length === 0) {
 		main.removeClass("span8").addClass("span12");
 		side = null;
 	}
@@ -324,7 +324,7 @@ ui.directive('uiBarLayout', ['$compile', function($compile) {
 		element.append(layout);
 		element.addClass('bar-layout');
 
-		if (element.has('[x-sidebar]').size() === 0) {
+		if (element.has('[x-sidebar]').length === 0) {
 			css = "mid";
 		}
 		if (element.is('form') && ["mini", "mid", "large"].indexOf(schema.width) > -1) {

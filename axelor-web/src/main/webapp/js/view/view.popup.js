@@ -346,7 +346,7 @@ ui.directive('uiDialogSize', function() {
 
 		function doFocus() {
 			var focusElem = element.find('input:tabbable');
-			if (focusElem.size() == 0) {
+			if (focusElem.length == 0) {
 				focusElem = element.parent().find('.ui-dialog-buttonset').find(':tabbable');
 			}
 			if (focusElem[0]) {

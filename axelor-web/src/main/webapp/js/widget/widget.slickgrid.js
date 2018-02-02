@@ -106,7 +106,7 @@ var Editor = function(args) {
 		if (external) {
 			container = container.parents('.ui-dialog-content:first,.view-container:first').first();
 			$(document).on('mousedown.slick-external', function (e) {
-				if (element.is(e.target) || element.find(e.target).size() > 0) {
+				if (element.is(e.target) || element.find(e.target).length > 0) {
 					return;
 				}
 				args.grid.getEditorLock().commitCurrentEdit();
@@ -1206,7 +1206,7 @@ Grid.prototype._doInit = function(view) {
 		if (node.parent().is('.slick-cell')) {
 			node = node.parent();
 		}
-		if (node.size()) {
+		if (node.length) {
 			that.grid.setActiveNode(node[0]);
 			that.grid.editActiveCell();
 			e.preventDefault();
@@ -1685,7 +1685,7 @@ Grid.prototype.isCellEditable = function(cell) {
 	}
 
 	var item = this.element.find('[x-field=' + field.name + ']:first');
-	if (item.size()) {
+	if (item.length) {
 		return !item.scope().isReadonly();
 	}
 	return !field.readonly;

@@ -224,7 +224,7 @@ ui.directive('uiCanSuggest', function () {
 		if (field.canSuggest !== false) {
 			return;
 		}
-		element.attr("readonly", "readonly");
+		element.prop("readonly", true);
 		element.addClass("not-readonly");
 		
 		// jquery-ui doesn't allow keyboard navigation on autocomplete list
@@ -482,9 +482,9 @@ ui.formInput('ManyToOne', 'Select', {
 			var widget = input.autocomplete('widget');
 			if (widget) {
 				var item = widget.find('li .ui-state-focus').parent();
-				if (item.size() === 0) {
+				if (item.length === 0) {
 					item = widget.find('li:not(.tag-select-action)');
-					item = item.size() === 1 ? item.first() : null;
+					item = item.length === 1 ? item.first() : null;
 				}
 				var data = item ? item.data('ui-autocomplete-item') : null;
 				if (data) {
@@ -542,7 +542,7 @@ ui.formInput('ManyToOne', 'Select', {
 
 		function adjustPadding() {
 			var tag = element.find('span.tag-link');
-			if (tag.size() && tag.is(':visible')) {
+			if (tag.length && tag.is(':visible')) {
 				input.css('padding-left', tag.width() + 24);
 			} else {
 				input.css('padding-left', '');

@@ -127,7 +127,7 @@ ui.directive('navMenuBar', function() {
 				elemTop.hide();
 				elemSub.hide();
 				
-				while (count < elemTop.size()) {
+				while (count < elemTop.length) {
 					var elem = $(elemTop[count]).show();
 					var width = siblingsWidth + element.width();
 					if (width > parentWidth) {
@@ -146,10 +146,10 @@ ui.directive('navMenuBar', function() {
 					count++;
 				}
 				
-				if (count === elemTop.size()) {
+				if (count === elemTop.length) {
 					elemMore.hide();
 				}
-				while(count < elemTop.size()) {
+				while(count < elemTop.length) {
 					$(elemSub[count++]).show();
 				}
 				

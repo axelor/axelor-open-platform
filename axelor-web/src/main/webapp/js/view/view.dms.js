@@ -602,7 +602,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 		function onDragOver(e) {
 			if (dndInternal) return;
 			clearClassName(true);
-			if (element.is(e.target) || element.has(e.target).size()) {
+			if (element.is(e.target) || element.has(e.target).length) {
 				element.addClass(dndDropClass);
 			} else {
 				clearClassName();

@@ -143,7 +143,7 @@
 		
 		_adjustTab: function(tab, animate) {
 		
-			if (!$(tab).size()) return;
+			if (!$(tab).length) return;
 
             var w = this.$elemStrip.innerWidth();
             var scrollTo = this.$elemTabs.position().left;

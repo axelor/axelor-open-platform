@@ -64,7 +64,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			state["force-edit"] = false;
 			if (label && state.title) {
 				var span = label.children('span[ui-help-popover]:first');
-				if (span.size() === 0) {
+				if (span.length === 0) {
 					span = label;
 				}
 				span.html(state.title);
@@ -213,8 +213,8 @@ ui.formCompile = function(element, attrs, linkerFn) {
 				lScope.isHidden = scope.isHidden;
 			}
 			
-			elem = isTable && parent.size() ? parent : elem;
-			label = isTable && label_parent.size() ? label_parent : label;
+			elem = isTable && parent.length ? parent : elem;
+			label = isTable && label_parent.length ? label_parent : label;
 
 			if (!isTable) {
 				parent.toggleClass("form-item-hidden", hidden);
@@ -390,7 +390,7 @@ ui.formDirective = function(name, object) {
 				}
 				if (_.isString(template_readonly)) {
 					template_readonly = template_readonly.trim();
-					if (template_readonly[0] !== '<' || $(template_readonly).size() > 1) {
+					if (template_readonly[0] !== '<' || $(template_readonly).length > 1) {
 						template_readonly = '<span>' + template_readonly + '</span>';
 					}
 					if (field.viewer) {

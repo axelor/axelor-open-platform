@@ -386,7 +386,7 @@ ui.formWidget('ButtonGroup', {
 
 	link: function (scope, element, attrs) {
 		function adjustButtons() {
-			var visible = element.children('.btn:visible').size();
+			var visible = element.children('.btn:visible').length;
 			if (visible) {
 				element.children('.btn:visible')
 					.css('max-width', (100.00/visible) + '%')
@@ -457,7 +457,7 @@ ui.formWidget('Panel', {
 			scope.setCollapsed(collapsed);
 		});
 
-		var nested = element.parents('.panel:first').size() > 0;
+		var nested = element.parents('.panel:first').length > 0;
 		if (nested) {
 			element.addClass("panel-nested");
 		}
@@ -494,7 +494,7 @@ ui.formWidget('Panel', {
 		}
 		
 		setTimeout(function () {
-			var nestedJson = element.parents('.panel-json:first').size() > 0;
+			var nestedJson = element.parents('.panel-json:first').length > 0;
 			if (nestedJson) {
 				element.removeClass("panel-nested");
 			}
@@ -714,7 +714,7 @@ ui.formWidget('PanelTabs', {
 			setMenuTitle(null);
 
 			var elem = null;
-			var index = elemTabs.size();
+			var index = elemTabs.length;
 			var selectedIndex = scope.tabs.indexOf(selected);
 
 			while (elemTabs.parent().width() > parentWidth) {

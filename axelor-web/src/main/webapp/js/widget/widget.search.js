@@ -1378,10 +1378,10 @@ ui.directive('uiFilterBox', function() {
 
 			function onMouseDown(e) {
 				var all = $(menu).add(toggleButton);
-				if (all.is(e.target) || all.has(e.target).size() > 0) {
+				if (all.is(e.target) || all.has(e.target).length > 0) {
 					return;
 				}
-				if ($(e.target).zIndex() > $(menu).zIndex() || $(e.target).parents('.ui-dialog').size()) {
+				if ($(e.target).zIndex() > $(menu).zIndex() || $(e.target).parents('.ui-dialog').length) {
 					return;
 				}
 				if(menu) {
@@ -1402,7 +1402,7 @@ ui.directive('uiFilterBox', function() {
 				if (value === 'none') {
 					var input = element.find('input:first')
 						.addClass('not-readonly')
-						.attr('readonly', true)
+						.prop('readonly', true)
 						.click(scope.onSearch.bind(scope));
 				}
 			});

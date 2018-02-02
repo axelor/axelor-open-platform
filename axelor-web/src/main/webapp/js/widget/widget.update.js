@@ -99,11 +99,11 @@ ui.directive('uiUpdateButton', ['$compile', function ($compile) {
 
 			function onMouseDown(e) {
 				var all = $(menu).add(toggleButton);
-				if (all.is(e.target) || all.has(e.target).size() > 0) {
+				if (all.is(e.target) || all.has(e.target).length > 0) {
 					return;
 				}
 				all = $('.ui-widget-overlay,.ui-datepicker:visible,.ui-dialog:visible,.ui-menu:visible');
-				if (all.is(e.target) || all.has(e.target).size() > 0) {
+				if (all.is(e.target) || all.has(e.target).length > 0) {
 					return;
 				}
 				if(menu){

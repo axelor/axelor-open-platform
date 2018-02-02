@@ -776,12 +776,12 @@ ui.directive('uiHotKeys', function() {
 
 			if (action === "focus-menu") {
 				var activeMenu = $('.sidebar .nav-tree li.active');
-				if (activeMenu.size() === 0) {
+				if (activeMenu.length === 0) {
 					activeMenu = $('.sidebar .nav-tree li:first');
 				}
 				
 				var navTree = activeMenu.parents('[nav-tree]:first');
-				if (navTree.size()) {
+				if (navTree.length) {
 					navTree.navtree('selectItem', activeMenu);
 				}
 				return false;
@@ -791,7 +791,7 @@ ui.directive('uiHotKeys', function() {
 				dlg = $('[ui-editor-popup]:visible:last,[ui-view-popup]:visible:last,[ui-dms-popup]:visible:last').first(),
 				vs = tab ? tab.$viewScope : null;
 
-			if (dlg.size()) {
+			if (dlg.length) {
 				vs = dlg.scope();
 			}
 			
@@ -808,7 +808,7 @@ ui.directive('uiHotKeys', function() {
 			
 			if (action === "search") {
 				var filterBox = $('.filter-box .search-query:visible');
-				if (filterBox.size()) {
+				if (filterBox.length) {
 					filterBox.focus().select();
 					return false;
 				}

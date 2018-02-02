@@ -97,7 +97,7 @@ var customDirective = ["$compile", function ($compile) {
 
 			function render(template) {
 				var elem = $('<span>' + template.trim() + '</span>');
-				if (elem.children().size() === 1) {
+				if (elem.children().length === 1) {
 					elem = elem.children().first();
 				}
 				if (scope.schema && scope.schema.css) {

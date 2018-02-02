@@ -390,7 +390,7 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 			element.on("click", ".kanban-card", function (e) {
 				var elem = $(e.target);
 				var selector = '[ng-click],[ui-action-click],button,a,.iswitch,.ibox,.kanban-card-menu';
-				if (elem.is(selector) || element.find(selector).has(elem).size()) {
+				if (elem.is(selector) || element.find(selector).has(elem).length) {
 					return;
 				}
 				var record = $(this).scope().record;
@@ -535,7 +535,7 @@ ui.directive('uiCard', ["$compile", function ($compile) {
 			element.on("click", function (e) {
 				var elem = $(e.target);
 				var selector = '[ng-click],[ui-action-click],button,a,.iswitch,.ibox,.kanban-card-menu';
-				if (elem.is(selector) || element.find(selector).has(elem).size()) {
+				if (elem.is(selector) || element.find(selector).has(elem).length) {
 					return;
 				}
 				var record = $(this).scope().record;

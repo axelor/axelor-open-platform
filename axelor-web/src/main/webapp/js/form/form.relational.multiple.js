@@ -1190,7 +1190,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 			}
 			var all = element.add(wrapper);
 			var elem = $(e.target);
-			if (all.is(elem) || all.has(elem).size() > 0) return;
+			if (all.is(elem) || all.has(elem).length > 0) return;
 			if (elem.zIndex() > element.parents('.slickgrid:first').zIndex()) return;
 			if (elem.parents(".ui-dialog:first").zIndex() > element.parents('.slickgrid:first').zIndex()) return;
 

@@ -212,7 +212,7 @@ ui.directive('uiMailMessage', function () {
 				element.addClass('fadeIn');
 				// dim avatar background color
 				var avatar = element.find('.avatar[class*=bg-]');
-				if (avatar.size()) {
+				if (avatar.length) {
 					var color = avatar.css('background-color');
 					var bg = d3.hsl(color);
 					bg.l += 0.1;

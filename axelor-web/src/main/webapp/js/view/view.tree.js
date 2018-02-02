@@ -602,7 +602,7 @@ ui.directive('uiViewTree', function(){
 				if (parent.data('id') === source.data('id')) {
 					return true;
 				}
-				if (parent.size()) {
+				if (parent.length) {
 					return isParent(source, parent);
 				}
 				return false;

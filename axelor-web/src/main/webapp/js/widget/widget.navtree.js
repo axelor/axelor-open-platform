@@ -289,7 +289,7 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
 
 			setTimeout(function () {
 				var icon = element.find("span.nav-icon:first");
-				if (menu.iconBackground && icon.size() > 0) {
+				if (menu.iconBackground && icon.length > 0) {
 					var cssName = menu.parent ? 'color' : 'background-color';
 					var clsName = menu.parent ? 'fg-' : 'bg-';
 
@@ -391,7 +391,7 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
 						ctrl.onClick(e, menu);
 					});
 				}
-				if ($list.size() === 0) return;
+				if ($list.length === 0) return;
 				if (element.hasClass('open')) {
 					hide($list);
 				} else {

@@ -449,8 +449,8 @@ ui.directive('uiTranslateAction', ['$q', function ($q) {
 				var form = $("<form>");
 				
 				var valueInput = $("<input type='text' class='span12'>")
-				.attr('name', scope.field.name)
-				.attr('required', 'required')
+				.prop('name', scope.field.name)
+				.prop('required', true)
 				.val(value)
 				.on('input', function () {
 					value = this.value;
@@ -486,13 +486,13 @@ ui.directive('uiTranslateAction', ['$q', function ($q) {
 					item.key = item.key || ('value:' + value);
 
 					var input1 = $("<input type='text' class='span8'>")
-						.attr("name", "message")
-						.attr("required", "required")
+						.prop("name", "message")
+						.prop("required", true)
 						.val(item.message)
 						.on("input", onchange);
 					var input2 = $("<input type='text' class='span4'>")
-						.attr("name", "language")
-						.attr("required", "required")
+						.prop("name", "language")
+						.prop("required", true)
 						.val(item.language)
 						.on("input", onchange);
 					var row = $("<div class='row-fluid'>")
@@ -525,7 +525,7 @@ ui.directive('uiTranslateAction', ['$q', function ($q) {
 				
 				function validate() {
 					var empty = html.find('input:text[value=""]');
-					if (empty.size()) {
+					if (empty.length) {
 						empty.first().focus();
 						return false;
 					}
@@ -779,7 +779,7 @@ ui.formItem('Button', {
 		scope.$watch('attr("icon")', function buttonIconWatch(icon, old) {
 			if (icon === old || (icon && icon.indexOf('fa-') !== 0)) return;
 			var iconElem = element.find('i.fa:first');
-			if (iconElem.size() == 0) {
+			if (iconElem.length == 0) {
 				iconElem = $('<i>').addClass('fa').prependTo(element.prepend(' '));
 			}
 			iconElem.removeClass(old || '').addClass(icon || field.icon || '');
