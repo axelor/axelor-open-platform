@@ -705,8 +705,10 @@ Grid.prototype.parse = function(view) {
 			headerCssClass: type,
 			xpath: path
 		};
+		
+		var minWidth = view.colWidth || 100;
 
-		column.minWidth = Math.min(100, column.width || 100);
+		column.minWidth = Math.min(minWidth, column.width || minWidth);
 		column._title = column.name;
 		
 		var css = [type];

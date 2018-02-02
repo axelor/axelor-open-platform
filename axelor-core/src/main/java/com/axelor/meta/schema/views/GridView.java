@@ -72,6 +72,9 @@ public class GridView extends AbstractView {
 	@XmlAttribute(name = "x-row-height")
 	private Integer rowHeight;
 
+	@XmlAttribute(name = "x-col-width")
+	private Integer colWidth;
+
 	@XmlElement(name = "help")
 	private Help inlineHelp;
 
@@ -194,6 +197,14 @@ public class GridView extends AbstractView {
 
 	public void setRowHeight(Integer rowHeight) {
 		this.rowHeight = rowHeight;
+	}
+
+	public Integer getColWidth() {
+		return colWidth;
+	}
+
+	public void setColWidth(Integer colWidth) {
+		this.colWidth = colWidth;
 	}
 
 	public Help getInlineHelp() {
