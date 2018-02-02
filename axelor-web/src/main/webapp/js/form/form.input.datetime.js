@@ -373,11 +373,11 @@ ui.formInput('DateTime', {
 				value = input.datetimepicker('getDate') || null,
 				oldValue = scope.getValue() || null;
 
-			if (value && !input.mask("valid")) {
-				return model.$setViewValue(value); // force validation
-			}
 			if (_.isEmpty(masked)) {
 				value = null;
+			}
+			if (!input.mask("valid")) {
+				return model.$setViewValue(value); // force validation
 			}
 
 			value = scope.parse(value);
