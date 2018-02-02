@@ -881,12 +881,13 @@ Grid.prototype.parse = function(view) {
 		});
 	}
 
-	element.on('adjustSize', _.debounce(adjustSize, 100));
+	scope.$onAdjust(adjustSize, 100); // handle global events
+	element.on('adjust:size', adjustSize); // handle element specific events
 
 	scope.$callWhen(function () {
 		return element.is(':visible');
 	}, function () {
-		return element.trigger('adjustSize');
+		return element.trigger('adjust:size');
 	}, 100);
 
 	element.addClass('slickgrid-empty');

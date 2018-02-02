@@ -32,7 +32,7 @@ ui.directive('uiNavTabs', function() {
 			}
 
 			scope.$watch('tabs.length', function navTabsWatch(value, oldValue){
-				if (value != oldValue) $.event.trigger('adjust');
+				if (value != oldValue) elem.trigger('adjust:tabs');
 			});
 
 			var menu = $();

@@ -142,7 +142,6 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 			}
 
 			setTimeout(function(){
-				$.event.trigger('adjust');
 				axelor.$adjustSize();
 			});
 		}

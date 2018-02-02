@@ -830,7 +830,7 @@ function Chart(scope, element, data) {
 			chart.update();
 		}
 
-		element.on('adjustSize', _.debounce(adjust, 100)).data('chart', chart);
+		scope.$onAdjust(adjust, 100).data('chart', chart);
 		setTimeout(chart.update, 10);
 
 		return chart;

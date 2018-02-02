@@ -1366,7 +1366,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 		};
 
 		element.scroll(function (e) {
-			$.event.trigger('adjustScroll');
+			$(document).trigger('adjust:scroll', element);
 		});
 
 		scope.$on("on:form-show", function () {

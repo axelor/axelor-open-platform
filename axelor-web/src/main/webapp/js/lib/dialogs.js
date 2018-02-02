@@ -130,10 +130,6 @@
 				buttons: buttons
 			});
 
-			element.on('adjustSize', _.throttle(function () {
-				element.dialog('option', 'position', 'center');
-			}));
-
 			// maintain overlay opacity
 			var opacity = null;
 			dialog.on('dialogopen dialogclose', function(e, ui){

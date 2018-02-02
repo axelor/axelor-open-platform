@@ -117,7 +117,7 @@ ui.formInput('CodeEditor', {
 			resize: resize
 		});
 		
-		element.on('adjustSize', _.debounce(resize));
+		scope.$onAdjust(resize);
 	},
 
 	replace: true,

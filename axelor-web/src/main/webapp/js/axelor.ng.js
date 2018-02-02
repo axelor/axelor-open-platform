@@ -117,6 +117,24 @@
 				return $timeout.apply(null, arguments);
 			};
 
+			__custom__.$onAdjust = function (events, handler, wait) {
+				var names = events;
+				if (_.isFunction(names)) {
+					wait = handler;
+					handler = names;
+					names = 'adjust:size';
+				} else {
+					names = names.replace(/(\w+)/g, 'adjust:$1');
+				}
+
+				var func = wait ? _.throttle(handler, wait) : handler;
+
+				$(document).on(names, func);
+				this.$on('$destroy', function () {
+					$(document).off(names, func);
+				});
+			};
+
 			__custom__.$new = function $new() {
 				var inst = __super__.$new.apply(this, arguments);
 				inst.$$watchChecker = this.$$watchChecker;

@@ -396,7 +396,7 @@ ui.directive('uiEditorPopup', function() {
 			});
 
 			element.scroll(function (e) {
-				$.event.trigger('adjustScroll');
+				$(document).trigger('adjust:scroll', element);
 			});
 
 			var onNewHandler = scope.onNewHandler;

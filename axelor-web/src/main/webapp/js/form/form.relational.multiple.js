@@ -1112,7 +1112,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 			if (wrapper.is(":visible")) {
 				renderPending = false;
 				render();
-				grid.trigger('adjustSize');
+				grid.trigger('adjust:size');
 			} else {
 				renderPending = true;
 			}
@@ -1176,7 +1176,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 			wrapper.hide();
 		});
 		
-		element.on("adjustSize", _.debounce(adjust, 300));
+		scope.$onAdjust(adjust, 300);
 		
 		input.on('keydown', function (e) {
 			if (e.keyCode === 40 && e.ctrlKey && !dropdownVisible) {

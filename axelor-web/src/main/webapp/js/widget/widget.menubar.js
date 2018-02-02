@@ -208,7 +208,7 @@ ui.directive('uiToolbarAdjust', function() {
 			elemToolbarMobile = element.children('.view-toolbar-mobile').hide();
 			
 			var running = false;
-			element.on('adjustSize', function () {
+			scope.$onAdjust(function () {
 				if (running) {
 					return;
 				}

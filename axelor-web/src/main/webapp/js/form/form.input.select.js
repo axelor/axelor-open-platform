@@ -185,7 +185,7 @@ ui.formWidget('BaseSelect', {
 	
 			input.data('ui-autocomplete')._renderItem = scope.renderSelectItem || renderItem;
 
-			element.on('adjustSize adjustScroll', function (e) {
+			scope.$onAdjust('size scroll', function () {
 				if (showing) {
 					input.autocomplete('close');
 				}
@@ -924,7 +924,7 @@ ui.formInput('NavSelect', {
 			elemNavs.parent().css('visibility', '');
 		}
 
-		element.on('adjustSize', adjust);
+		scope.$onAdjust(adjust);
 		scope.$timeout(setup);
 	},
 	template_editable: null,

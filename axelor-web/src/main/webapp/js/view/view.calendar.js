@@ -685,7 +685,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 					  - (parseInt(legend.css('marginBottom')) || 0));
 		}
 
-		main.on("adjustSize", _.debounce(adjustSize, 100));
+		scope.$onAdjust(adjustSize, 100);
 
 		scope.$callWhen(function () {
 			return main.is(':visible');

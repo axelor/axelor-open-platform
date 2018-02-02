@@ -361,7 +361,7 @@ ui.formInput('DateTime', {
 			}
 		});
 
-		element.on('adjustSize adjustScroll', function (e) {
+		scope.$onAdjust('size scroll', function () {
 			if (isShowing) {
 				input.datepicker('widget').hide();
 				input.datetimepicker('hide');

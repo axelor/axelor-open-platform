@@ -51,23 +51,27 @@
 		    	return false;
 		    });
 		    
-		    $(window).on('resize', _.debounce(function() {
-		    	self._adjustScroll();
-		    }, 300));
-
-		    this.element.on('adjustSize', function(event){
-	    		self._adjustScroll();
-		    });
-		     
-		    this.element.on('adjust', function(event){
+		    var _onResize = _.debounce(function () { self._adjustScroll(); }, 300);
+		    var _onAdjustSize = _.debounce(function () { self._adjustScroll(); });
+		    var _onAdjust = function(event) {
 		    	event.stopPropagation();
 		    	setTimeout(function (){
 		    		self._adjustScroll();
 		    	});
-		    });
+		    };
+		    
+		    $(window).on('resize', _onResize);
+		    $(document).on('adjust:size', _onAdjustSize);
+
+		    this.element.on('adjust:tabs', _onAdjust);
 
 		    this.$elemTabs.on("click", " > li > a", function(event){
 		    	self._adjustTab($(this).parent(), true);
+		    });
+
+		    this.element.on('$destroy', function () {
+			    $(window).off('resize', _onResize);
+			    $(document).off('adjust:size', _onAdjustSize);
 		    });
 		},
 		

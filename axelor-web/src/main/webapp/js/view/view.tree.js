@@ -741,7 +741,7 @@ ui.directive('uiViewTree', function(){
 				});
 			}
 			
-			table.on('adjustSize', _.debounce(adjustCols, 100));
+			scope.$onAdjust(adjustCols, 100);
 
 			table.on('mousedown.treeview', 'tbody tr', function(e) {
 				table.find('tr.selected').removeClass('selected');

@@ -246,7 +246,7 @@
 	};
 
 	axelor.$adjustSize = _.debounce(function () {
-		$.event.trigger('adjustSize');
+		$(document).trigger('adjust:size');
 	}, 100);
 
 	var module = angular.module('axelor.app', ['axelor.ng', 'axelor.ds', 'axelor.ui', 'axelor.auth']);
@@ -681,8 +681,9 @@
     //trigger adjustSize event on window resize -->
 	$(function(){
 		$(window).resize(function(event){
-			if (!event.isTrigger)
-				$.event.trigger('adjustSize');
+			if (!event.isTrigger) {
+				$(document).trigger('adjust:size');
+			}
 			$('body').toggleClass('device-small', axelor.device.small);
 			$('body').toggleClass('device-mobile', axelor.device.mobile);
 		});

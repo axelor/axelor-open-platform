@@ -681,7 +681,7 @@ angular.module('axelor.ui').directive('uiViewSearch', function(){
 			});
 			
 			var grid = element.children('.search-view-grid');
-			element.on('adjustSize', function(){
+			scope.$onAdjust(function(){
 				if (!element.is(':visible'))
 					return;
 				grid.height(element.height() - grid.position().top);

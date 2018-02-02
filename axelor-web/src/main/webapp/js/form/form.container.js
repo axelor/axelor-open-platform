@@ -206,7 +206,7 @@ ui.formWidget('Tabs', {
 			
 			setTimeout(function() {
 				if ($scope.$tabs) {
-					$scope.$tabs.trigger('adjust');
+					$scope.$tabs.trigger('adjust:tabs');
 				}
 				axelor.$adjustSize();
 				if(current != selected){
@@ -738,7 +738,7 @@ ui.formWidget('PanelTabs', {
 		}
 
 		var adjusting = false;
-		element.on('adjustSize', _.debounce(function() {
+		scope.$onAdjust(function() {
 			if (adjusting) { return; }
 			try {
 				adjusting = true;
@@ -747,7 +747,7 @@ ui.formWidget('PanelTabs', {
 				adjusting = false;
 				adjustPending = false;
 			}
-		}, 10));
+		}, 10);
 
 		scope.$timeout(function() {
 			setup();
