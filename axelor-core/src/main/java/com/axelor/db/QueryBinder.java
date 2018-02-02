@@ -24,6 +24,7 @@ import javax.persistence.Parameter;
 
 import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Adapter;
+import com.axelor.rpc.ContextEntity;
 import com.axelor.script.ScriptBindings;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
@@ -185,7 +186,11 @@ public class QueryBinder {
 		for (int i = 0; i < params.length; i++) {
 			Parameter<?> param;
 			Object value = params[i];
-			if (value instanceof String
+			if (value instanceof ContextEntity) {
+				value = ((ContextEntity) value).getContextId();
+			} else if (value instanceof Model) {
+				value = ((Model) value).getId();
+			} else if (value instanceof String
 					&& !StringUtils.isBlank((String) value)
 					&& bindings.containsKey(value)) {
 				value = bindings.get(value);
@@ -224,7 +229,11 @@ public class QueryBinder {
 			return this;
 		}
 
-		if (value == null || value instanceof String && "".equals(((String) value).trim())) {
+		if (value instanceof ContextEntity) {
+			value = ((ContextEntity) value).getContextId();
+		} else if (value instanceof Model) {
+			value = ((Model) value).getId();
+		} else if (value == null || value instanceof String && "".equals(((String) value).trim())) {
 			value = adapt(value, parameter);
 		}
 
