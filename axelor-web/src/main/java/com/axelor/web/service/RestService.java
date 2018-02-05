@@ -61,6 +61,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
@@ -713,7 +714,7 @@ public class RestService extends ResourceService {
 		@SuppressWarnings("all")
 		final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
 		final Context ctx = new Context(request.getData(), MailMessage.class);
-		final MailMessage msg = ctx.asType(MailMessage.class);
+		final MailMessage msg = EntityHelper.getEntity(ctx.asType(MailMessage.class));
 
 		final Model entity = repo.find(id);
 		final List<?> ids = (List<?>) request.getData().get("files");
