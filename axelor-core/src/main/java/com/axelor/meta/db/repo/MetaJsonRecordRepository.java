@@ -20,6 +20,7 @@ package com.axelor.meta.db.repo;
 import java.util.Map;
 import java.util.Objects;
 
+import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Query;
 import com.axelor.db.hibernate.type.JsonFunction;
@@ -94,7 +95,7 @@ public class MetaJsonRecordRepository extends JpaRepository<MetaJsonRecord> {
 		if (values != null) {
 			context.putAll(values);
 		}
-		return context.asType(MetaJsonRecord.class);
+		return EntityHelper.getEntity(context.asType(MetaJsonRecord.class));
 	}
 
 	/**
