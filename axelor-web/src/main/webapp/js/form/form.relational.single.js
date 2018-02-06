@@ -477,7 +477,11 @@ ui.formInput('ManyToOne', 'Select', {
 			e.stopPropagation();
 			return false;
 		});
-		
+
+		scope.handleClose = function () {
+			input.val(scope.getText());
+		};
+
 		scope.handleEnter = function (e) {
 			var widget = input.autocomplete('widget');
 			if (widget) {
@@ -489,16 +493,17 @@ ui.formInput('ManyToOne', 'Select', {
 				var data = item ? item.data('ui-autocomplete-item') : null;
 				if (data) {
 					input.autocomplete('close');
-					scope.select(data.value);
+					if (data.click) {
+						data.click.call(scope);
+					} else {
+						scope.select(data.value);
+					}
 				}
 			}
 		};
 
 		scope.handleSelect = function(e, ui) {
 			if (ui.item.click) {
-				setTimeout(function(){
-					input.val("");
-				});
 				ui.item.click.call(scope);
 			} else {
 				scope.select(ui.item.value);
