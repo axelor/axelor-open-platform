@@ -1159,13 +1159,52 @@ ui.directive('uiFilterBox', function() {
 						filter.criteria = process(filter.criteria);
 						return filter;
 					}
-					if (filter.operator != '=') return filter;
-					if (($scope.fields[filter.fieldName]||{}).type != 'datetime') return filter;
+					var name = filter.fieldName;
+					var type = ($scope.fields[filter.fieldName]||{}).type;
+
+					var v1 = filter.value;
+					var v2 = filter.value2;
+
+					// if json date/datetime field
+					if (name.indexOf('::') > -1 && (type === 'date' || type === 'datetime')) {
+						filter = _.extend({}, filter);
+						switch (filter.operator) {
+						case '>':
+							filter.value = moment(v1).endOf('day').toDate();
+							filter.value2 = undefined;
+							break;
+						case '<':
+							filter.value = moment(v1).startOf('day').toDate();
+							filter.value2 = undefined;
+							break;
+						case '=':
+							filter.operator = 'between';
+							filter.value = moment(v1).startOf('day').toDate();
+							filter.value2 = moment(v1).endOf('day').toDate();
+							break;
+						case '!=':
+							filter.operator = 'notBetween';
+							filter.value = moment(v1).startOf('day').toDate();
+							filter.value2 = moment(v1).endOf('day').toDate();
+							break;
+						case 'between':
+						case 'notBetween':
+							filter.value = moment(v1).startOf('day').toDate();
+							filter.value2 = moment(v2).endOf('day').toDate();
+							break;
+						}
+						return filter;
+					}
+
+					if (filter.operator !== '=') return filter;
+					if (type != 'datetime') return filter;
+
 					if (!(/\d+-\d+\d+T/.test(filter.value) || _.isDate(filter.value))) {
 						return filter;
 					}
-					var v1 = moment(filter.value).startOf('day').toDate();
-					var v2 = moment(filter.value).endOf('day').toDate();
+
+					v1 = moment(v1).startOf('day').toDate();
+					v2 = moment(v1).endOf('day').toDate();
 					return _.extend({}, filter, {
 						operator: 'between',
 						value: v1,
