@@ -1655,7 +1655,8 @@ ui.download = function download(url, fileName) {
 		success : doDownload,
 		error : function (e) {
 			if (e.status == 404) {
-				axelor.notify.error("<p>" + _t("File {0} does not exist." + "</p>", "<strong>" + fileName + "</strong>"));
+				var name = "<strong>" + fileName + "</strong>";
+				axelor.notify.error("<p>" + _t("File {0} does not exist.", name) + "</p>");
 			}
 		}
 	});
