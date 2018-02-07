@@ -383,6 +383,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		handleFor(scope, field, "canSave", "canSave");
 		handleFor(scope, field, "canCopy", "canCopy");
 		handleFor(scope, field, "canDelete", "canDelete");
+		handleFor(scope, field, "canArchive", "canArchive");
 		handleFor(scope, field, "canAttach", "canAttach");
 	}
 	

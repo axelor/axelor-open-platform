@@ -143,7 +143,11 @@ ui.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, Acti
 			};
 
 			scope.isHidden = function(){
-				return attrs.hidden;
+				if (attrs.hidden) return true;
+				if (_.isFunction(item.visible)) {
+					return !item.visible();
+				}
+				return false;
 			};
 
 			var form = element.parents('.form-view:first');
