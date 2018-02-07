@@ -60,3 +60,13 @@
 * Method `Response#setValues(Object)` only excepts `Map` or context proxy
 * Changed scripting helper `__repo__.of()` to `__repo__()`
 * Gradle tasks `init` and `migrate` are replaced with new `database` task
+
+#### Breaking Schema Changes (from v4)
+
+* `auth_permission.condition_value` column size changed from `255` to `1024`
+* `mail_group` table dropped
+* `mail_group_users` table dropped
+* `mail_group_groups` table dropped
+* `meta_module.depends` column dropped
+* `meta_translation.message_key` column type changed from `text` to `varchar(1024)`
+* `meta_translation.message_value` column type changed from `text` to `varchar(1024)`
