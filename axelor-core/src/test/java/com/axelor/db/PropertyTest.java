@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -16,6 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.axelor.db;
+
+import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,6 +55,10 @@ public class PropertyTest extends AbstractTest {
 		Assert.assertEquals("fullName", p.getName());
 		Assert.assertEquals(PropertyType.STRING, p.getType());
 		
+		// virtual column dependencies
+		Assert.assertNotNull(mapper.getComputeDependencies(p));
+		Assert.assertTrue(mapper.getComputeDependencies(p).containsAll(Arrays.asList("firstName", "lastName", "title")));
+
 		// binary column
 		p = mapper.getProperty("image");
 		Assert.assertEquals(Contact.class, p.getEntity());

@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -32,13 +32,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import au.com.bytecode.opencsv.CSVParser;
-import au.com.bytecode.opencsv.CSVReader;
 
 import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
@@ -50,8 +46,9 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVReader;
 
-@Singleton
 public class I18nLoader extends AbstractLoader {
 
 	private Logger log = LoggerFactory.getLogger(I18nLoader.class);

@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -24,6 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,11 +35,9 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.joda.time.DateTime;
-
 import com.axelor.app.AppSettings;
-import com.axelor.common.ClassUtils;
 import com.axelor.common.FileUtils;
+import com.axelor.common.ResourceUtils;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.axelor.text.GroovyTemplates;
@@ -88,7 +89,7 @@ public class ActionExport extends Action {
 		}
 
 		if (reader == null) {
-			InputStream is = ClassUtils.getResourceStream(templatePath);
+			InputStream is = ResourceUtils.getResourceStream(templatePath);
 			if (is == null) {
 				throw new FileNotFoundException("No such template: " + templatePath);
 			}
@@ -118,7 +119,7 @@ public class ActionExport extends Action {
 		}
 
 		Files.createParentDirs(output);
-		Files.write(contents, output, Charsets.UTF_8);
+		Files.asCharSink(output, Charsets.UTF_8).write(contents);
 
 		log.info("file saved: {}", output);
 
@@ -132,8 +133,8 @@ public class ActionExport extends Action {
 		String dir = output == null ? DEFAULT_DIR : output;
 
 		dir = dir.replace("${name}", getName())
-				 .replace("${date}", new DateTime().toString("yyyyMMdd"))
-				 .replace("${time}", new DateTime().toString("HHmmss"));
+				 .replace("${date}", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
+				 .replace("${time}", LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss")));
 		dir = handler.evaluate(dir).toString();
 
 		for(Export export : exports) {

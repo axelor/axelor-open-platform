@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -19,9 +19,11 @@ package com.axelor.data.csv;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -42,12 +44,12 @@ import com.axelor.data.Listener;
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.db.internal.DBHelper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import au.com.bytecode.opencsv.CSVReader;
+import com.opencsv.CSVReader;
 
 public class CSVImporter implements Importer {
 
@@ -137,15 +139,6 @@ public class CSVImporter implements Importer {
 		for (String name : names)
 			all.add(new File(dataDir, name));
 		return all;
-	}
-
-	private int getBatchSize() {
-		try {
-			Object val = JPA.em().getEntityManagerFactory().getProperties().get("hibernate.jdbc.batch_size");
-			return Integer.parseInt(val.toString());
-		} catch (Exception e) {
-		}
-		return DEFAULT_BATCH_SIZE;
 	}
 
 	public CSVLogger getLoggerManager() {
@@ -247,7 +240,7 @@ public class CSVImporter implements Importer {
 	 * @throws ClassNotFoundException
 	 */
 	private void process(CSVInput input, File file) throws IOException, ClassNotFoundException {
-		this.process(input, new FileReader(file));
+		this.process(input, new InputStreamReader(new FileInputStream(file), Charset.forName("UTF-8")));
 	}
 
 	/**
@@ -285,7 +278,7 @@ public class CSVImporter implements Importer {
 
 		int count = 0;
 		int total = 0;
-		int batchSize = getBatchSize();
+		int batchSize = DBHelper.getJdbcBatchSize();
 
 		JPA.em().getTransaction().begin();
 		try {

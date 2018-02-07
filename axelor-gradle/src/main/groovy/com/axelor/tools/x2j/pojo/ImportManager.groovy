@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -107,6 +107,10 @@ class ImportManager {
 		if (coms) {
 			all.addAll(coms.sort())
 			all.add(null)
+		}
+
+		if (all.empty) {
+			return all
 		}
 
 		all.pop()

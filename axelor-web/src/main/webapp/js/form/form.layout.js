@@ -97,7 +97,7 @@ function TableLayout(items, attrs, $scope, $compile) {
 		add(el);
 	});
 	
-	var table = $('<table class="form-layout"></table');
+	var table = $('<table class="form-layout"></table>');
 	
 	function isLabel(cell) {
 		return cell.css === "form-label" || (cell.elem && cell.elem.is('label,.spacer-item'));
@@ -149,9 +149,6 @@ function TableLayout(items, attrs, $scope, $compile) {
 				if (_.isArray(widths) && widths[i]) {
 					el.width(widths[i]);
 				}
-				if ($(cell.elem).is('.form-item-container') && axelor.config['view.form.hot-edit']) {
-					$(cell.elem).prepend($('<span class="fa fa-pencil hot-edit-icon"></span>'));
-				}
 				numCells += cell.colspan || 1;
 		});
 		
@@ -188,11 +185,15 @@ ui.directive('uiTableLayout', ['$compile', function($compile) {
 function PanelLayout(items, attrs, $scope, $compile) {
 	
 	var stacked = attrs.stacked || false,
+		flexbox = attrs.flexbox || false,
 		numCols = 12,
 		numSpan = +(attrs.itemSpan) || 6,
 		curCol = 0,
-		layout = [$('<div class="row-fluid">')];
-	
+		canAddRow = !stacked && !flexbox,
+		rowClass = flexbox ? 'panel-flex' : 'row-fluid',
+		cellClass = flexbox ? 'flex' : 'span',
+		layout = [$('<div>').addClass(rowClass)];
+
 	function add(item, label) {
 		var row = _.last(layout),
 			cell = $('<div>'),
@@ -210,8 +211,8 @@ function PanelLayout(items, attrs, $scope, $compile) {
 			return;
 		}
 
-		if (curCol + (span + offset) >= numCols + 1 && !stacked) {
-			curCol = 0, row = $('<div class="row-fluid">');
+		if (curCol + (span + offset) >= numCols + 1 && canAddRow) {
+			curCol = 0, row = $('<div>').addClass(rowClass);
 			layout.push(row);
 		}
 		if (label) {
@@ -222,7 +223,7 @@ function PanelLayout(items, attrs, $scope, $compile) {
 		cell.addClass(item.attr('x-cell-css'));
 
 		if (span) {
-			cell.addClass('span' + span);
+			cell.addClass(cellClass + span);
 		}
 		if (offset) {
 			cell.addClass('offset' + offset);
@@ -253,7 +254,7 @@ function PanelLayout(items, attrs, $scope, $compile) {
 		add(el);
 	});
 	
-	var container = $('<div class="panel-layout"></div').append(layout);
+	var container = $('<div class="panel-layout"></div>').append(layout);
 
 	return container;
 }
@@ -290,13 +291,19 @@ function BarLayout(items, attrs, $scope, $compile) {
 		}
 	});
 
-	if (side.children().size() === 0) {
+	if (side.children().length === 0) {
 		main.removeClass("span8").addClass("span12");
 		side = null;
 	}
 
 	var row = $('<div class="row-fluid">').append(main);
 	
+	if (side && axelor.device.small) {
+		side.children().first().prependTo(main);
+		side.children().appendTo(main);
+		main.children('[ui-panel-mail]').appendTo(main);
+	}
+
 	if (side) {
 		side.appendTo(row);
 	}
@@ -317,7 +324,7 @@ ui.directive('uiBarLayout', ['$compile', function($compile) {
 		element.append(layout);
 		element.addClass('bar-layout');
 
-		if (element.has('[x-sidebar]').size() === 0) {
+		if (element.has('[x-sidebar]').length === 0) {
 			css = "mid";
 		}
 		if (element.is('form') && ["mini", "mid", "large"].indexOf(schema.width) > -1) {
@@ -328,6 +335,24 @@ ui.directive('uiBarLayout', ['$compile', function($compile) {
 		}
 	};
 }]);
+
+ui.directive('uiPanelViewer', function () {
+	return {
+		scope: true,
+		link: function (scope, element, attrs) {
+			var field = scope.field;
+			var isRelational = /-to-one$/.test(field.type);
+			if (isRelational) {
+				Object.defineProperty(scope, 'record', {
+					enumerable: true,
+					get: function () {
+						return (scope.$parent.record||{})[field.name];
+					}
+				});
+			}
+		}
+	};
+});
 
 ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, ActionService) {
 
@@ -341,18 +366,20 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 				return;
 			}
 
-			function applyAttrs(item) {
+			function applyAttrs(item, level) {
 				if (item.showTitle === undefined && !item.items) {
 					item.showTitle = (editor.widgetAttrs||{}).showTitles !== "false";
 				}
 				if (!item.showTitle && !item.items) {
 					item.placeholder = item.placeholder || item.title || item.autoTitle;
 				}
-				if (editor.itemSpan && !item.colSpan) {
+				if (editor.itemSpan && !item.colSpan && !level) {
 					item.colSpan = editor.itemSpan;
 				}
 				if (item.items) {
-					_.map(item.items, applyAttrs);
+					_.map(item.items, function (x) {
+						applyAttrs(x, (level||0) + 1);
+					});
 				}
 			}
 
@@ -373,7 +400,8 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 				schema = {
 					items: [{
 						type: 'panel',
-						items: items
+						items: items,
+						flexbox: editor.flexbox
 					}]
 				};
 			}
@@ -455,7 +483,9 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 						value.$editorModel = scope._model;
 						fetchMissing(value.id);
 					}
-					scope.$broadcast("on:record-change", value);
+					scope.$applyAsync(function () {
+						scope.$broadcast("on:record-change", value || {}, true);
+					});
 					// if it's an o2m editor, make sure to update values
 					if (scope.$itemsChanged) {
 						scope.$itemsChanged();
@@ -463,12 +493,12 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 				};
 				scope.$watch('record', _.debounce(watchRun, 100), true);
 				scope.$timeout(function () {
-					scope.$broadcast("on:record-change", scope.record);
+					scope.$broadcast("on:record-change", scope.record || {}, true);
 				});
 			}
 
 			form = $compile(form)(scope);
-			form.children('div.row').removeClass('row').addClass('row-fluid');
+			form.removeClass('mid-form mini-form').children('div.row').removeClass('row').addClass('row-fluid');
 			element.append(form);
 
 			if (field.target) {
@@ -480,7 +510,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 						action: editor.onNew
 					});
 				}
-				scope.$watch('record.id', function (value, old) {
+				scope.$watch('record.id', function editorRecordIdWatch(value, old) {
 					if (!value && handler) {
 						handler.onNew();
 					}
@@ -499,7 +529,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 				return values.length === 0;
 			}
 
-			scope.$watch(function () {
+			scope.$watch(function editorValidWatch() {
 				if (isRelational && editor.showOnNew === false && !scope.canShowEditor()) {
 					return;
 				}

@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.schema.actions;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +31,11 @@ import com.axelor.db.Model;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.axelor.rpc.ActionResponse;
+import com.axelor.rpc.ContextEntity;
+import com.axelor.rpc.Resource;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -183,10 +187,24 @@ public class ActionView extends Action {
 					if (ctx.getCanCopy() == Boolean.TRUE && value instanceof Model) {
 						value = JPA.copy((Model)value, true);
 					}
+					if (value instanceof ContextEntity) {
+						value = ((ContextEntity) value).getContextMap();
+					}
+					if (value instanceof Model && JPA.em().contains(value)) {
+						value = Resource.toMapCompact(value);
+					}
+					if (value instanceof Collection) {
+						value = Collections2.transform((Collection<?>) value, item -> {
+							if (item instanceof ContextEntity) {
+								return ((ContextEntity) item).getContextMap();
+							}
+							return item instanceof Model && JPA.em().contains(item) ? Resource.toMapCompact(item) : item;
+						});
+					}
 					context.put(ctx.getName(), value);
 
 					// make it available to the evaluation context
-					if (ctx.getName().startsWith("_")) {
+					if (handler.getContext() != null && ctx.getName().startsWith("_")) {
 						handler.getContext().put(ctx.getName(), value);
 					}
 				}

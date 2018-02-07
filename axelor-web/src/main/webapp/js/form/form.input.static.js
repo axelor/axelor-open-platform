@@ -112,7 +112,7 @@ function makePopover(scope, element, callback, placement) {
         }
     }
 
-	function enter(e) {
+	function enter(e, show) {
 		if (popoverTimer) {
 			clearTimeout(popoverTimer);
 		}
@@ -129,7 +129,7 @@ function makePopover(scope, element, callback, placement) {
 				tip.attr('tabIndex', 0);
 				tip.css('outline', 'none');
 			}
-		}, e.ctrlKey ? 0 : 1000);
+		}, (e.ctrlKey || show) ? 0 : 1000);
 	}
 	
 	function leave(e) {
@@ -152,6 +152,10 @@ function makePopover(scope, element, callback, placement) {
 	}
 
 	function destroy() {
+		if (popoverTimer) {
+			clearTimeout(popoverTimer);
+			popoverTimer = null;
+		}
 		if (element) {
 			element.off('mouseenter.popover');
 			element.off('mouseleave.popover');
@@ -165,7 +169,34 @@ function makePopover(scope, element, callback, placement) {
 		doc.off('mousemove.popover');
 	}
 	
+	element.on('$destroy', destroy);
 	scope.$on('$destroy', destroy);
+}
+
+function setupPopover(scope, element, getHelp, placement) {
+
+	if (!canDisplayPopover(scope, false)) {
+		return;
+	}
+	
+	var timer = null;
+	element.on('mouseenter.help.setup', function (e) {
+		if (timer) {
+			clearTimeout(timer);
+		}
+		timer = setTimeout(function () {
+			element.off('mouseenter.help.setup');
+			element.off('mouseleave.help.setup');
+			makePopover(scope, element, getHelp, placement);
+			element.trigger('mouseenter.popover', true);
+		}, e.ctrlKey ? 0 : 1000);
+	});
+	element.on('mouseleave.help.setup', function () {
+		if (timer) {
+			clearTimeout(timer);
+			timer = null;
+		}
+	});
 }
 
 ui.directive('uiTabPopover', function() {
@@ -194,10 +225,8 @@ ui.directive('uiTabPopover', function() {
 		}
 	}
 
-	return function (scope, element, attrs) {
-		if(canDisplayPopover(scope, true)) {
-			return makePopover(scope, element, getHelp, 'bottom');
-		}
+	return function(scope, element, attrs) {
+		setupPopover(scope, element, getHelp, 'bottom');
 	};
 });
 
@@ -279,9 +308,7 @@ ui.directive('uiHelpPopover', function() {
 		if (field == null) {
 			return;
 		}
-		if(canDisplayPopover(scope, false)) {
-			makePopover(scope, element, getHelp);
-		}
+		setupPopover(scope, element, getHelp);
 	}
 
 	return function(scope, element, attrs) {
@@ -289,7 +316,7 @@ ui.directive('uiHelpPopover', function() {
 		if (!_.isEmpty(field)) {
 			return doLink(scope, element, attrs);
 		}
-		var unwatch = scope.$watch('field', function(field, old) {
+		var unwatch = scope.$watch('field', function popoverFieldWatch(field, old) {
 			if (!field) {
 				return;
 			}
@@ -318,10 +345,248 @@ ui.formItem('Label', {
 		if (field && field.help && axelor.config['user.noHelp'] !== true) {
 			element.addClass('has-help');
 		}
+
+		if (field.translatable) {
+			var icon = $("<i class='fa fa-flag'></i>").attr('title', _t('Show translations.')).appendTo(element);
+			var toggle = function () {
+				icon.toggle(!scope.$$readonlyOrig);
+			};
+			
+			scope.$watch("$$readonlyOrig", toggle);
+			scope.$on("on:new", toggle);
+			scope.$on("on:edit", toggle);
+		}
 	},
 
-	template: '<label><span ui-help-popover ng-transclude></span></label>'
+	template:
+		"<label ui-translate-action><span ui-help-popover ng-transclude></span></label>"
 });
+
+ui.directive('uiTranslateAction', ['$q', function ($q) {
+	return {
+		link: function (scope, element) {
+			if (!scope.field.translatable) {
+				return;
+			}
+
+			var myDs = scope._dataSource;
+			var trDs = scope._dataSource._new("com.axelor.meta.db.MetaTranslation");
+			trDs._sortBy = ["id"];
+
+			function saveData(value, data, orig, callback) {
+				var changed = [];
+				var removed = [];
+				
+				data.forEach(function (item) {
+					var found = _.findWhere(orig, { id: item.id });
+					if (!angular.equals(found, item)) {
+						changed.push(item);
+					}
+				});
+				
+				orig.forEach(function (item) {
+					var found = _.findWhere(data, { id: item.id });
+					if (!found) {
+						removed.push(item);
+					}
+				});
+				
+				function saveTranslations() {
+					var all = [];
+
+					if (removed.length) {
+						all.push(trDs.removeAll(removed));
+					}
+					if (changed.length) {
+						all.push(trDs.saveAll(changed));
+					}
+					
+					if (all.length) {
+						$q.all(all).then(function () {
+							var lang = axelor.config['user.lang'] || en;
+							var key = 'value:' + scope.getValue();
+							var trKey = '$t:' + scope.field.name;
+							return trDs.search({
+								domain: "self.key = :key and self.language = :lang",
+								context: { key: key, lang: lang },
+								limit: 1
+							}).success(function (records) {
+								var record = _.first(records);
+								if (scope.record) {
+									scope.record[trKey] = (record||{}).message;
+									scope.$parent.$parent.text = scope.format(scope.getValue());
+									var rec = scope._dataSource.get(scope.record.id);
+									if (rec) {
+										rec[trKey] = scope.record[trKey];
+									}
+								}
+							});
+						}).then(callback, callback);
+					} else {
+						callback();
+					}
+				}
+
+				if (value !== scope.getValue()) {
+					scope.$parent.$parent.setValue(value, true);
+					scope.waitForActions(function () {
+						scope.$parent.$parent.onSave().then(saveTranslations, callback);
+					});
+				} else {
+					saveTranslations();
+				}
+			}
+
+			function showPopup(data) {
+				
+				if (!data || data.length == 0) {
+					data = [];
+				}
+				
+				var value = scope.getValue();
+
+				var orig = angular.copy(data);
+				var form = $("<form>");
+				
+				var valueInput = $("<input type='text' class='span12'>")
+				.prop('name', scope.field.name)
+				.prop('required', true)
+				.val(value)
+				.on('input', function () {
+					value = this.value;
+					data.forEach(function (item) {
+						item.key = 'value:' + value;
+					});
+				});
+
+				// add value fields
+				$("<div class='row-fluid'>")
+					.append($("<label class='span12'>").text(_t("Value")))
+					.appendTo(form);
+				$("<div class='row-fluid'>")
+					.append(valueInput)
+					.appendTo(form);
+
+				form.append('<hr>');
+
+				// add translation fields
+				$("<div class='row-fluid'>")
+					.append($("<label class='span8'>").text(_t("Translation")))
+					.append($("<label class='span4'>").text(_t("Language")))
+					.appendTo(form);
+
+				function addRow(item) {
+					var onchange = function () {
+						var v = item[this.name];
+						if (v !== this.value) {
+							item[this.name] = this.value;
+						}
+					};
+
+					item.key = item.key || ('value:' + value);
+
+					var input1 = $("<input type='text' class='span8'>")
+						.prop("name", "message")
+						.prop("required", true)
+						.val(item.message)
+						.on("input", onchange);
+					var input2 = $("<input type='text' class='span4'>")
+						.prop("name", "language")
+						.prop("required", true)
+						.val(item.language)
+						.on("input", onchange);
+					var row = $("<div class='row-fluid'>")
+						.append(input1)
+						.append(input2)
+						.appendTo(form);
+					
+					if (dialog) {
+						input1.focus();
+					}
+					
+					// remove icon
+					$("<i class='fa fa-times'>")
+						.add('help', _t('Remove'))
+						.appendTo(row)
+						.click(function () {
+							var i = data.indexOf(item);
+							data.splice(i, 1);
+							row.remove();
+						});
+				}
+
+				function addNew() {
+					var item = {};
+					data.push(item);
+					addRow(item);
+				}
+				
+				var dialog;
+				
+				function validate() {
+					var empty = html.find('input:text[value=""]');
+					if (empty.length) {
+						empty.first().focus();
+						return false;
+					}
+					return true;
+				}
+
+				var html = $("<div>").append(form);
+
+				// add icon
+				$("<i class='fa fa-plus'>")
+					.attr('help', _t('Add'))
+					.appendTo(html)
+					.click(function () {
+						if (validate()) {
+							addNew();
+						}
+					});
+
+				data.forEach(addRow);
+				
+				if (data.length === 0) {
+					addNew();
+				}
+				
+				function close() {
+					if (dialog) {
+						dialog.dialog('close');
+					}
+				}
+
+				dialog = axelor.dialogs.box(html, {
+					title: _t('Translations'),
+					buttons: [{
+						'text'	: _t('Cancel'),
+						'class'	: 'btn',
+						'click'	: close
+					}, {
+						'text'	: _t('OK'),
+						'class'	: 'btn btn-primary',
+						'click'	: function() {
+							if (validate()) {
+								saveData(value, data, orig, close);
+							}
+						}
+					}]
+				}).addClass('translation-form');
+			}
+
+			element.on('click', 'i.fa-flag', function (e) {
+				var value = scope.getValue();
+				if (value && scope.record && scope.record.id > 0) {
+					trDs.search({
+						domain: "self.key = :key",
+						context: { key: 'value:' + value }
+					}).success(showPopup);
+				}
+			});
+			
+		}
+	};
+}]);
 
 /**
  * The Spacer widget.
@@ -339,7 +604,7 @@ ui.formItem('Spacer', {
 ui.formItem('Separator', {
 	css: 'separator-item',
 	showTitle: false,
-	template: '<div><span>{{field.title}}</span><hr></div>'
+	template: '<div>{{field.title}}</div>'
 });
 
 /**
@@ -401,8 +666,12 @@ ui.formItem('Button', {
 		}
 
 		var css = field.css || '';
-		if (css.indexOf('btn-') > -1 && css.indexOf('btn-success') === -1) {
-			element.removeClass('btn-success');
+		if (css.indexOf('btn-') > -1 && css.indexOf('btn-primary') === -1) {
+			element.removeClass('btn-primary');
+		}
+
+		if (field && field.help && axelor.config['user.noHelp'] !== true) {
+			element.addClass('has-help');
 		}
 
 		if (isIcon) {
@@ -423,7 +692,7 @@ ui.formItem('Button', {
 		}
 		
 		if (_.isString(field.link)) {
-			element.removeClass('btn btn-success').addClass('btn-link');
+			element.removeClass('btn btn-primary').addClass('btn-link');
 			element.attr("href", field.link);
 		}
 		
@@ -485,13 +754,13 @@ ui.formItem('Button', {
 		}
 
 		var readonlySet = false;
-		scope.$watch('isReadonlyExclusive()', function(readonly, old) {
+		scope.$watch('isReadonlyExclusive()', function buttonReadonlyWatch(readonly, old) {
 			if (readonly === old && readonlySet) return;
 			readonlySet = true;
 			return setDisabled(readonly);
 		});
 		
-		scope.$watch('attr("title")', function(title, old) {
+		scope.$watch('attr("title")', function buttonTitleWatch(title, old) {
 			if (!title || title === old) return;
 			if (element.is('button')) {
 				return element.html(title);
@@ -499,7 +768,7 @@ ui.formItem('Button', {
 			element.children('.btn-text').html(title);
 		});
 
-		scope.$watch('attr("css")', function (css, old) {
+		scope.$watch('attr("css")', function buttonCssWatch(css, old) {
 			var curr = css || field.css || 'btn-success';
 			var prev = old || field.css || 'btn-success';
 			if (curr !== prev) {
@@ -507,16 +776,16 @@ ui.formItem('Button', {
 			}
 		});
 
-		scope.$watch('attr("icon")', function (icon, old) {
+		scope.$watch('attr("icon")', function buttonIconWatch(icon, old) {
 			if (icon === old || (icon && icon.indexOf('fa-') !== 0)) return;
 			var iconElem = element.find('i.fa:first');
-			if (iconElem.size() == 0) {
+			if (iconElem.length == 0) {
 				iconElem = $('<i>').addClass('fa').prependTo(element.prepend(' '));
 			}
 			iconElem.removeClass(old || '').addClass(icon || field.icon || '');
 		});
 	},
-	template: '<a href="" class="btn btn-success">'+
+	template: '<a href="" class="btn btn-primary">'+
 		'<span class="btn-text" ng-transclude></span>'+
 	'</a>'
 });
@@ -526,7 +795,7 @@ ui.formItem('InfoButton', 'Button', {
 		this._super.apply(this, arguments);
 		var field = scope.field || {};
 		scope.title = field.title;
-		scope.$watch('attr("title")', function(title, old) {
+		scope.$watch('attr("title")', function infoButtonTitleWatch(title, old) {
 			if (!title || title === old) return;
 			scope.title = title;
 		});

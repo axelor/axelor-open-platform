@@ -28,6 +28,8 @@ ui.formInput('CodeEditor', {
 
 	css: "code-editor",
 
+	metaWidget: true,
+
 	link: function(scope, element, attrs, model) {
 		
 		var editor = null;
@@ -37,6 +39,9 @@ ui.formInput('CodeEditor', {
 		var props = {
 			autofocus: true,
 			lineNumbers: true,
+			tabSize : 2,
+			indentUnit : 2,
+			indentWithTabs: false,
 			theme: field.codeTheme || "default",
 			extraKeys: {
 				'Ctrl-F': function () {}
@@ -52,10 +57,7 @@ ui.formInput('CodeEditor', {
 				foldGutter : true,
 				gutters : ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
 				autoCloseBrackets : true,
-				autoCloseTags : true,
-				tabSize : 2,
-				indentUnit : 2,
-				indentWithTabs: false
+				autoCloseTags : true
 			});
 		}
 
@@ -99,10 +101,11 @@ ui.formInput('CodeEditor', {
 			if (value !== model.$viewValue) {
 				model.$setViewValue(value);
 			}
-			scope.applyLater();
+			scope.$applyAsync();
 		}
 
 		function resize() {
+			if (element[0].offsetHeight === 0) return; // is hidden?
 			if (editor) {
 				editor.refresh();
 			}
@@ -114,7 +117,7 @@ ui.formInput('CodeEditor', {
 			resize: resize
 		});
 		
-		element.on('adjustSize', _.debounce(resize));
+		scope.$onAdjust(resize);
 	},
 
 	replace: true,

@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,23 +17,31 @@
  */
 package com.axelor.script;
 
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.script.Bindings;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.axelor.common.StringUtils;
 import com.google.common.base.Preconditions;
 
 public abstract class AbstractScriptHelper implements ScriptHelper {
 
-	private ScriptBindings bindings;
+	protected final Logger log = LoggerFactory.getLogger(getClass());
+	
+	private Bindings bindings;
 
 	@Override
-	public ScriptBindings getBindings() {
+	public Bindings getBindings() {
 		return bindings;
 	}
 
 	@Override
-	public void setBindings(ScriptBindings bindings) {
+	public void setBindings(Bindings bindings) {
 		this.bindings = bindings;
 	}
 
@@ -66,5 +74,24 @@ public abstract class AbstractScriptHelper implements ScriptHelper {
 		return doCall(obj, methodCall);
 	}
 
-	protected abstract Object doCall(Object obj, String methodCall);
+	protected Object doCall(Object obj, String methodCall) {
+		final String key = "__obj__" + Math.abs(UUID.randomUUID().getMostSignificantBits());
+		final Bindings bindings = getBindings();
+		try {
+			bindings.put(key, obj);
+			return eval(key + "." + methodCall);
+		} finally {
+			bindings.remove(key);
+		}
+	}
+	
+	@Override
+	public Object eval(String expr) {
+		try {
+			return eval(expr, getBindings());
+		} catch (Exception e) {
+			log.error("Script error: {}", expr, e);
+			return null;
+		}
+	}
 }

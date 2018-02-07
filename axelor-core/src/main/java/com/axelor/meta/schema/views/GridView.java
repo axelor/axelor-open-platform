@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -61,10 +61,19 @@ public class GridView extends AbstractView {
 	private Boolean canDelete;
 
 	@XmlAttribute
+	private Boolean canArchive;
+
+	@XmlAttribute
 	private Boolean canMove;
 
 	@XmlAttribute(name = "edit-icon")
 	private Boolean editIcon = Boolean.TRUE;
+
+	@XmlAttribute(name = "x-row-height")
+	private Integer rowHeight;
+
+	@XmlAttribute(name = "x-col-width")
+	private Integer colWidth;
 
 	@XmlElement(name = "help")
 	private Help inlineHelp;
@@ -158,6 +167,14 @@ public class GridView extends AbstractView {
 		this.canDelete = canDelete;
 	}
 
+	public Boolean getCanArchive() {
+		return canArchive;
+	}
+	
+	public void setCanArchive(Boolean canArchive) {
+		this.canArchive = canArchive;
+	}
+
 	public Boolean getCanMove() {
 		return canMove;
 	}
@@ -172,6 +189,22 @@ public class GridView extends AbstractView {
 
 	public void setEditIcon(Boolean editIcon) {
 		this.editIcon = editIcon;
+	}
+
+	public Integer getRowHeight() {
+		return rowHeight;
+	}
+
+	public void setRowHeight(Integer rowHeight) {
+		this.rowHeight = rowHeight;
+	}
+
+	public Integer getColWidth() {
+		return colWidth;
+	}
+
+	public void setColWidth(Integer colWidth) {
+		this.colWidth = colWidth;
 	}
 
 	public Help getInlineHelp() {

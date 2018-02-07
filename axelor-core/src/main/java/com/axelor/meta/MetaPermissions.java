@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -23,7 +23,6 @@ import javax.inject.Singleton;
 
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
-import com.axelor.common.ClassUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
@@ -91,7 +90,13 @@ public class MetaPermissions {
 	
 	public boolean isCollectionReadable(User user, String object, String field) {
 		if (StringUtils.isBlank(object)) return true;
-		final Mapper mapper = Mapper.of(ClassUtils.findClass(object));
+		final Class<?> klass;
+		try {
+			klass = Class.forName(object);
+		} catch (ClassNotFoundException e) {
+			throw new IllegalArgumentException(e);
+		}
+		final Mapper mapper = Mapper.of(klass);
 		final Property property = mapper.getProperty(field);
 		return property == null
 				|| !property.isCollection()

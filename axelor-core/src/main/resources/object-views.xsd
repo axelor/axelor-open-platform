@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema targetNamespace="http://axelor.com/xml/ns/object-views"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
-  attributeFormDefault="unqualified" xmlns:tns="http://axelor.com/xml/ns/object-views" version="4.2">
+  attributeFormDefault="unqualified" xmlns:tns="http://axelor.com/xml/ns/object-views" version="5.0">
 
   <xsd:element name="object-views">
     <xsd:complexType>
@@ -27,6 +27,7 @@
         <xsd:element name="action-attrs" type="tns:ActionAttrs" />
         <xsd:element name="action-method" type="tns:ActionMethod" />
         <xsd:element name="action-view" type="tns:ActionView" />
+        <xsd:element name="action-script" type="tns:ActionScript" />
         <xsd:element name="action-ws" type="tns:ActionWS" />
         <xsd:element name="action-import" type="tns:ActionImport" />
         <xsd:element name="action-export" type="tns:ActionExport" />
@@ -197,45 +198,49 @@
   </xsd:complexType>
 
   <xsd:complexType name="MenubarMenuItem">
-    <xsd:attribute name="title" type="xsd:string" use="required">
-      <xsd:annotation>
-        <xsd:documentation>The display text</xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="action" type="xsd:string" use="required">
-      <xsd:annotation>
-        <xsd:documentation>Comma separate list of actions to execute on click event.</xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="prompt" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>
-          Show a confirmation message before performing client action.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="showIf" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>Show if the given JavaScript expression is true.</xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="hideIf" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>Hide if the given JavaScript expression is true.</xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="readonlyIf" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>Readonly if the given JavaScript expression is true.</xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="if-module" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>
-          Only show if the given module is installed.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractWidget">
+        <xsd:attribute name="title" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>The display text</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="action" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>Comma separate list of actions to execute on click event.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="prompt" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              Show a confirmation message before performing client action.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="depends" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            Specify comma separated list of field names on which this widget depends.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="showIf" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Show if the given JavaScript expression is true.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="hideIf" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Hide if the given JavaScript expression is true.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="readonlyIf" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Readonly if the given JavaScript expression is true.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
   </xsd:complexType>
   
   <xsd:complexType name="MenubarMenu">
@@ -244,23 +249,27 @@
         <xsd:element name="item" type="tns:MenubarMenuItem" />
         <xsd:element name="divider">
           <xsd:complexType>
-            <xsd:attribute name="showIf" type="xsd:string">
-              <xsd:annotation>
-                <xsd:documentation>Show if the given JavaScript expression is true.</xsd:documentation>
-              </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="hideIf" type="xsd:string">
-              <xsd:annotation>
-                <xsd:documentation>Hide if the given JavaScript expression is true.</xsd:documentation>
-              </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="if-module" type="xsd:string">
-		      <xsd:annotation>
-		        <xsd:documentation>
-		          Only show if the given module is installed.
-		        </xsd:documentation>
-		      </xsd:annotation>
-		    </xsd:attribute>
+            <xsd:complexContent>
+              <xsd:extension base="tns:AbstractWidget">
+                <xsd:attribute name="depends" type="xsd:string">
+                  <xsd:annotation>
+                    <xsd:documentation>
+                    Specify comma separated list of field names on which this widget depends.
+                    </xsd:documentation>
+                  </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="showIf" type="xsd:string">
+                  <xsd:annotation>
+                    <xsd:documentation>Show if the given JavaScript expression is true.</xsd:documentation>
+                  </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="hideIf" type="xsd:string">
+                  <xsd:annotation>
+                    <xsd:documentation>Hide if the given JavaScript expression is true.</xsd:documentation>
+                  </xsd:annotation>
+                </xsd:attribute>              
+              </xsd:extension>
+            </xsd:complexContent>
           </xsd:complexType>
         </xsd:element>
         <xsd:element name="menu" type="tns:MenubarMenu">
@@ -479,6 +488,13 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="depends" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            Specify comma separated list of field names on which this widget depends.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:anyAttribute processContents="skip" />
       </xsd:extension>
     </xsd:complexContent>
@@ -642,6 +658,11 @@
         <xsd:documentation>Specify an angular.js expression to bind to the field.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-enum-type">
+      <xsd:annotation>
+        <xsd:documentation>Specify the fully qualified enum type name</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="x-related" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>Specify the name of the related field (for RefSelect widget).</xsd:documentation>
@@ -685,6 +706,11 @@
     <xsd:attribute name="x-can-copy" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>Specify whether to allow copy of o2m/m2m field items.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-can-export" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether to allow export to csv from o2m/m2m.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="x-direction" type="xsd:string">
@@ -937,6 +963,16 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="x-row-height" type="xsd:int">
+          <xsd:annotation>
+            <xsd:documentation>Specify custom row height.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="x-col-width" type="xsd:int">
+          <xsd:annotation>
+            <xsd:documentation>Specify minimum column width.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="edit-icon" type="xsd:boolean" default="true">
           <xsd:annotation>
             <xsd:documentation>Whether to show edit icon.</xsd:documentation>
@@ -965,6 +1001,11 @@
         <xsd:attribute name="canDelete" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>Specify whether to show the 'Remove' button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canArchive" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the 'Archive' button.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canMove" type="xsd:boolean">
@@ -1072,6 +1113,7 @@
       <xsd:element name="help" type="tns:Help" />
       <xsd:element name="static" type="tns:Static" />
       <xsd:element name="spacer" type="tns:Spacer" />
+      <xsd:element name="separator" type="tns:Separator" />
       <xsd:element name="button" type="tns:Button" />
       <xsd:element name="button-group">
         <xsd:complexType>
@@ -1121,6 +1163,16 @@
             <xsd:documentation>Specify a boolean expression to collapse/expend this panel.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="icon" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Specify an icon to show in panel title.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="icon-background" type="tns:ColorStyle">
+          <xsd:annotation>
+            <xsd:documentation>Specify icon background color (predefined or html hex color)</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1167,6 +1219,7 @@
         <xsd:attribute name="title" use="prohibited"/>
         <xsd:attribute name="help" use="prohibited"/>
         <xsd:attribute name="onTabSelect" use="prohibited"/>
+        <xsd:attribute name="x-row-height" type="xsd:int"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1174,7 +1227,7 @@
     <xsd:complexContent>
       <xsd:extension base="tns:BaseField">
         <xsd:sequence>
-          <xsd:element name="viewer" minOccurs="0">
+          <xsd:element name="viewer" type="tns:PanelViewer" minOccurs="0">
             <xsd:annotation>
               <xsd:documentation>
                 Template to display the field value.
@@ -1191,6 +1244,13 @@
         </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="PanelViewer">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="depends" type="xsd:string" />
+      </xsd:extension>
+    </xsd:simpleContent>
   </xsd:complexType>
   <xsd:complexType name="PanelEditor">
     <xsd:complexContent>
@@ -1345,6 +1405,11 @@
         <xsd:attribute name="canDelete" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>Show the 'Remove' button if the given JavaScript expression is true.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canArchive" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Show the 'Archive' button if the given JavaScript expression is true.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canCopy" type="xsd:string">
@@ -1689,11 +1754,6 @@
         <xsd:attribute name="model" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>Specify the model object name.</xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="cardWidth" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>Specify width of the cards.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="orderBy" type="xsd:string">
@@ -2474,6 +2534,7 @@
             </xsd:restriction>
           </xsd:simpleType>
         </xsd:attribute>
+        <xsd:attribute name="massUpdate" type="xsd:boolean" />
         <xsd:attribute name="canSelect" use="prohibited" />
         <xsd:attribute name="edit-window" use="prohibited" />
         <xsd:attribute name="summary-view" use="prohibited" />
@@ -2844,6 +2905,44 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
+  
+  <xsd:complexType name="ActionScript">
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractBaseAction">
+        <xsd:sequence>
+          <xsd:element name="script">
+            <xsd:complexType>
+              <xsd:simpleContent>
+                <xsd:extension base="xsd:string">
+                  <xsd:attribute name="language" use="required">
+                    <xsd:annotation>
+                      <xsd:documentation>
+                      Specify the scripting language.
+                      </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:simpleType>
+                      <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="js"/>
+                        <xsd:enumeration value="groovy"/>
+                      </xsd:restriction>
+                    </xsd:simpleType>
+                  </xsd:attribute>
+                  <xsd:attribute name="transactional" type="xsd:boolean">
+                    <xsd:annotation>
+                      <xsd:documentation>
+                      Specify whether the action is transactional.
+                      In that case, EntityManager will be available as $em variable.
+                      </xsd:documentation>
+                    </xsd:annotation>
+                  </xsd:attribute>
+                </xsd:extension>
+              </xsd:simpleContent>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
 
   <xsd:complexType name="ActionWS">
     <xsd:annotation>
@@ -3090,7 +3189,7 @@
               <xsd:enumeration value="pdf" />
               <xsd:enumeration value="html" />
               <xsd:enumeration value="doc" />
-              <xsd:enumeration value="xsl" />
+              <xsd:enumeration value="xls" />
             </xsd:restriction>
           </xsd:simpleType>
         </xsd:attribute>

@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -24,8 +24,10 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.NumberSerializer;
 import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
 
 @JsonInclude(Include.NON_EMPTY)
 public class Response {
@@ -39,13 +41,39 @@ public class Response {
 	public static int STATUS_SUCCESS = 0;
 	public static int STATUS_TRANSPORT_ERROR = -90;
 	public static int STATUS_VALIDATION_ERROR = -4;
+	
+	@SuppressWarnings("serial")
+	private static class OffsetSerializer extends NumberSerializer {
+
+		public OffsetSerializer() {
+			super(Integer.class);
+		}
+
+		@Override
+		public boolean isEmpty(SerializerProvider provider, Number value) {
+			return value == null || value.intValue() == -1;
+		}
+	}
+	
+	@SuppressWarnings("serial")
+	private static class TotalSerializer extends NumberSerializer {
+
+		public TotalSerializer() {
+			super(Long.class);
+		}
+
+		@Override
+		public boolean isEmpty(SerializerProvider provider, Number value) {
+			return value == null || value.longValue() == -1;
+		}
+	}
 
 	private int status;
 	
-	@JsonInclude(Include.NON_DEFAULT)
+	@JsonSerialize(using = OffsetSerializer.class)
 	private int offset = -1;
 	
-	@JsonInclude(Include.NON_DEFAULT)
+	@JsonSerialize(using = TotalSerializer.class)
 	private long total = -1;
 
 	private Object data;
@@ -94,7 +122,7 @@ public class Response {
 
 	public void addError(String fieldName, String errorMessage) {
 		if (this.errors == null) {
-			this.errors = new HashMap<String, String>();
+			this.errors = new HashMap<>();
 		}
 		this.errors.put(fieldName, errorMessage);
 	}
@@ -106,10 +134,15 @@ public class Response {
 			cause = ((BatchUpdateException) cause).getNextException();
 		}
 		
-		Map<String, Object> report = Maps.newHashMap();
+		final Map<String, Object> report = new HashMap<>();
 		
+		String message = throwable.getMessage();
+		if (message == null || message.startsWith(cause.getClass().getName())) {
+			message = cause.getMessage();
+		}
+
 		report.put("class", throwable.getClass());
-		report.put("message", cause.getMessage());
+		report.put("message", message);
 		report.put("string", cause.toString());
 		report.put("stacktrace", Throwables.getStackTraceAsString(throwable));
 		report.put("cause", Throwables.getStackTraceAsString(cause));

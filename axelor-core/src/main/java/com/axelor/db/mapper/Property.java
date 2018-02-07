@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -80,7 +80,9 @@ public class Property {
 	private String targetName;
 
 	private List<String> targetSearch;
-
+	
+	private Class<?> enumType;
+	
 	private boolean primary;
 
 	private boolean required;
@@ -116,6 +118,8 @@ public class Property {
 	private boolean virtual;
 	
 	private boolean transient_;
+	
+	private boolean json;
 
 	private boolean password;
 
@@ -148,6 +152,11 @@ public class Property {
 			this.type = PropertyType
 					.get(javaType.getSimpleName().toUpperCase());
 		} catch (Exception e) {
+		}
+		
+		if (javaType.isEnum()) {
+			type = PropertyType.ENUM;
+			enumType = javaType;
 		}
 
 		for (Annotation annotation : annotations) {
@@ -258,6 +267,10 @@ public class Property {
 				sequenceName = ((Sequence) annotation).value();
 			}
 
+			if (annotation instanceof org.hibernate.annotations.Type) {
+				json = "json".equalsIgnoreCase(((org.hibernate.annotations.Type) annotation).type());
+			}
+
 			// Widget attributes
 			if (annotation instanceof Widget) {
 				Widget w = (Widget) annotation;
@@ -331,6 +344,10 @@ public class Property {
 		}
 		return targetSearch;
 	}
+	
+	public Class<?> getEnumType() {
+		return enumType;
+	}
 
 	private void findTargetName() {
 
@@ -394,6 +411,14 @@ public class Property {
 	
 	public boolean isTransient() {
 		return transient_;
+	}
+
+	public boolean isJson() {
+		return json;
+	}
+	
+	public boolean isEnum() {
+		return type == PropertyType.ENUM;
 	}
 
 	public boolean isPassword() {
@@ -743,7 +768,7 @@ public class Property {
 			map.put("targetName", getTargetName());
 			map.put("targetSearch", getTargetSearch());
 		}
-
+		
 		return map;
 	}
 

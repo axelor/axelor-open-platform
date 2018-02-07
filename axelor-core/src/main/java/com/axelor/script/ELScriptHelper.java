@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -20,10 +20,12 @@ package com.axelor.script;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import com.axelor.common.ClassUtils;
+import javax.script.Bindings;
+
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
 import com.axelor.db.Model;
+import com.axelor.db.ValueEnum;
 import com.axelor.internal.javax.el.BeanELResolver;
 import com.axelor.internal.javax.el.ELClass;
 import com.axelor.internal.javax.el.ELContext;
@@ -65,6 +67,9 @@ public class ELScriptHelper extends AbstractScriptHelper {
 				cls = JpaScanner.findRepository(property.toString());
 			}
 			if (cls == null) {
+				cls = JpaScanner.findEnum(property.toString());
+			}
+			if (cls == null) {
 				return null;
 			}
 
@@ -77,7 +82,7 @@ public class ELScriptHelper extends AbstractScriptHelper {
 
 		@Override
 		public Object getValue(ELContext context, Object base, Object property) {
-			final ScriptBindings bindings = getBindings();
+			final Bindings bindings = getBindings();
 			if (bindings == null || base != null) {
 				return null;
 			}
@@ -100,11 +105,16 @@ public class ELScriptHelper extends AbstractScriptHelper {
 	
 	class BeanResolver extends BeanELResolver {
 		
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		@Override
 		public Object getValue(ELContext context, Object base, Object property) {
 			if (base instanceof Map<?, ?> && ((Map<?, ?>) base).containsKey(property)) {
 				context.setPropertyResolved(true);
 				return ((Map<?, ?>) base).get(property);
+			}
+			if (base instanceof Class<?> && ((Class<?>) base).isEnum()) {
+				context.setPropertyResolved(true);
+				return ValueEnum.of((Class) base, property);
 			}
 			return super.getValue(context, base, property);
 		}
@@ -133,7 +143,12 @@ public class ELScriptHelper extends AbstractScriptHelper {
 
 		private static Class<?> typeClass(Object type) {
 			if (type instanceof Class<?>) return (Class<?>) type;
-			if (type instanceof String) return ClassUtils.findClass(type.toString());
+			if (type instanceof String)
+				try {
+					return Class.forName(type.toString());
+				} catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(e);
+				}
 			if (type instanceof ELClass) return ((ELClass) type).getKlass();
 			throw new IllegalArgumentException("Invalid type: " + type);
 		}
@@ -155,7 +170,11 @@ public class ELScriptHelper extends AbstractScriptHelper {
 		}
 
 		public static Class<?> importClass(String name) {
-			return ClassUtils.findClass(name);
+			try {
+				return Class.forName(name);
+			} catch (ClassNotFoundException e) {
+				throw new IllegalArgumentException(e);
+			}
 		}
 
 		public static <T extends Model> JpaRepository<T> repo(Class<T> model) {
@@ -188,7 +207,7 @@ public class ELScriptHelper extends AbstractScriptHelper {
 		}
 	}
 
-	public ELScriptHelper(ScriptBindings bindings) {
+	public ELScriptHelper(Bindings bindings) {
 
 		this.processor = new ELProcessor();
 		this.processor.getELManager().addELResolver(new ClassResolver());
@@ -211,7 +230,7 @@ public class ELScriptHelper extends AbstractScriptHelper {
 
 		final String[] packages = {
 			"java.util",
-			"org.joda.time",
+			"java.time",
 			"com.axelor.common",
 			"com.axelor.script.util",
 			"com.axelor.apps.tool"
@@ -236,15 +255,13 @@ public class ELScriptHelper extends AbstractScriptHelper {
 	}
 
 	@Override
-	public Object eval(String expr) {
-		return processor.eval(expr);
-	}
-
-	@Override
-	protected Object doCall(Object obj, String methodCall) {
-		ScriptBindings bindings = new ScriptBindings(getBindings());
-		ELScriptHelper sh = new ELScriptHelper(bindings);
-		bindings.put("__obj__", obj);
-		return sh.eval("__obj__." + methodCall);
+	public Object eval(String expr, Bindings bindings) {
+		final Bindings current = getBindings();
+		try {
+			setBindings(bindings);
+			return processor.eval(expr);
+		} finally {
+			setBindings(current);
+		}
 	}
 }

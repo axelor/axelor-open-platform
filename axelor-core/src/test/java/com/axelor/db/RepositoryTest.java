@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -72,7 +72,7 @@ public class RepositoryTest extends JpaTest {
 		// test groovy expression
 		ScriptBindings bindings = new ScriptBindings(new HashMap<String, Object>());
 		GroovyScriptHelper helper = new GroovyScriptHelper(bindings);
-		String expr = "__repo__.of(Contact)";
+		String expr = "__repo__(Contact)";
 		Object obj = helper.eval(expr);
 		assertNotNull(obj);
 		assertTrue(obj instanceof ContactRepositoryEx);

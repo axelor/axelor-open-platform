@@ -24,6 +24,7 @@
 var ui = angular.module('axelor.ui');
 var widgets = {};
 var registry = {};
+var metaWidgets = [];
 
 /**
  * Perform common compile operations.
@@ -63,7 +64,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			state["force-edit"] = false;
 			if (label && state.title) {
 				var span = label.children('span[ui-help-popover]:first');
-				if (span.size() === 0) {
+				if (span.length === 0) {
 					span = label;
 				}
 				span.html(state.title);
@@ -122,7 +123,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			}
 		});
 		
-		scope.$watch("isEditable()", function(editable, old) {
+		scope.$watch("isEditable()", function isEditableWatch(editable, old) {
 			if (editable === undefined) return;
 			if (editable === old) return;
 			scope.$$readonly = scope.$$isReadonly();
@@ -130,7 +131,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 
 		// js expressions should be evaluated on dummy value changes
 		if (field.name && field.name[0] === '$') {
-			scope.$watch('record.' + field.name, function (a, b) {
+			scope.$watch('record.' + field.name, function fieldValueWatch(a, b) {
 				if (a !== b) {
 					scope.$broadcastRecordChange();
 				}
@@ -212,8 +213,8 @@ ui.formCompile = function(element, attrs, linkerFn) {
 				lScope.isHidden = scope.isHidden;
 			}
 			
-			elem = isTable && parent.size() ? parent : elem;
-			label = isTable && label_parent.size() ? label_parent : label;
+			elem = isTable && parent.length ? parent : elem;
+			label = isTable && label_parent.length ? label_parent : label;
 
 			if (!isTable) {
 				parent.toggleClass("form-item-hidden", hidden);
@@ -222,7 +223,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 			if (hidden) {
 				elem.add(label).hide();
 			} else {
-				elem.add(label).show();
+				elem.add(label).show().css('display', ''); //XXX: jquery may add display style
 			}
 
 			return axelor.$adjustSize();
@@ -231,14 +232,14 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		var hideFn = _.contains(this.handles, 'isHidden') ? angular.noop : hideWidget;
 
 		var hiddenSet = false;
-		scope.$watch("isHidden()", function(hidden, old) {
+		scope.$watch("isHidden()", function isHiddenWatch(hidden, old) {
 			if (hiddenSet && hidden === old) return;
 			hiddenSet = true;
 			return hideFn(hidden);
 		});
 		
 		var readonlySet = false;
-		scope.$watch("isReadonly()", function(readonly, old) {
+		scope.$watch("isReadonly()", function isReadonlyWatch(readonly, old) {
 			if (readonlySet && readonly === old) return;
 			readonlySet = true;
 			element.toggleClass("readonly", readonly);
@@ -368,10 +369,11 @@ ui.formDirective = function(name, object) {
 				var field = scope.field || {};
 				var template_readonly = self.template_readonly;
 				if (field.viewer) {
-					template_readonly = field.viewer;
-					scope.$image = function (fieldName, imageName) { return ui.formatters.$image(scope, fieldName, imageName); };
+					template_readonly = field.viewer.template;
+					scope.$moment = function(d) { return moment(d); };
+					scope.$image = function (fieldName, imageName) { return ui.formatters.$image(this, fieldName, imageName); };
 					scope.$fmt = function (fieldName, fieldValue) {
-						var args = [scope, fieldName];
+						var args = [this, fieldName];
 						if (arguments.length > 1) {
 							args.push(fieldValue);
 						}
@@ -388,8 +390,11 @@ ui.formDirective = function(name, object) {
 				}
 				if (_.isString(template_readonly)) {
 					template_readonly = template_readonly.trim();
-					if (template_readonly[0] !== '<') {
+					if (template_readonly[0] !== '<' || $(template_readonly).length > 1) {
 						template_readonly = '<span>' + template_readonly + '</span>';
+					}
+					if (field.viewer) {
+						template_readonly = template_readonly.replace(/^(\s*<\w+)/, '$1 ui-panel-viewer');
 					}
 				}
 				if (!scope.$elem_readonly) {
@@ -405,13 +410,13 @@ ui.formDirective = function(name, object) {
 				return true;
 			}
 			
-			scope.$watch("isReadonly()", function(readonly) {
+			scope.$watch("isReadonly()", function isReadonlyWatch(readonly) {
 				if (readonly && showReadonly()) {
 					return;
 				}
 				return showEditable();
 			});
-			scope.$watch("isRequired()", function(required, old) {
+			scope.$watch("isRequired()", function isRequiredWatch(required, old) {
 				if (required === old) return;
 				var elem = element,
 					label = elem.data('label') || $();
@@ -422,7 +427,7 @@ ui.formDirective = function(name, object) {
 			});
 			
 			if (scope.field && scope.field.validIf) {
-				scope.$watch("attr('valid')", function(valid) {
+				scope.$watch("attr('valid')", function attrValidWatch(valid) {
 					if (valid === undefined) return;
 					model.$setValidity('invalid', valid);
 				});
@@ -538,7 +543,7 @@ var FormInput = {
 			function listener() {
 				var value = _.str.trim(element.val()) || null;
 				if (value !== model.$viewValue) {
-					scope.$apply(function() {
+					scope.$applyAsync(function() {
 						var val = scope.parse(value);
 						var txt = scope.format(value);
 						if (scope.$$setEditorValue && !scope.record) { // m2o editor with null value?
@@ -644,6 +649,10 @@ ui.formWidget = function(name, object) {
 	var widget = _.str.capitalize(name.replace(/^ui/, ''));
 	var directive = "ui" + widget;
 
+	if (obj.metaWidget) {
+		metaWidgets.push(widget);
+	}
+
 	registry[directive] = directive;
 	_.each(obj.widgets, function(alias){
 		registry[alias] = directive;
@@ -677,6 +686,14 @@ ui.getWidget = function(type) {
 		return _.chain(widget).underscored().dasherize().value();
 	}
 	return null;
+};
+
+ui.getWidgetDef = function (name) {
+	return widgets[name];
+};
+
+ui.getMetaWidgets = function () {
+	return metaWidgets;
 };
 
 })();

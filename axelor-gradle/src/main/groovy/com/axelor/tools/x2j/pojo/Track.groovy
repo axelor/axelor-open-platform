@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -23,14 +23,19 @@ class Track {
 
 	private List<Annotation> fields = []
 	private List<Annotation> messages = []
+	private List<Annotation> contents = []
 
-	private List<String> imports = []
+	private Set<String> imports = []
 
 	private Entity entity
 
 	private boolean subscribe;
 
 	private boolean replace;
+
+	private boolean files;
+	
+	private String on;
 
 	private Track(Entity entity) {
 		this.entity = entity;
@@ -41,12 +46,20 @@ class Track {
 		node."*".each {
 			if (it.name() == "field") fields += $field(it)
 			if (it.name() == "message") messages += $message(it)
+			if (it.name() == "content") contents += $message(it)
 		}
 
 		fields = fields.grep { it != null }
 		messages = messages.grep { it != null }
+		contents = contents.grep { it != null }
 		subscribe = node.'@subscribe' == "true"
 		replace = node.'@replace' == "true"
+		files = node.'@files' == "true"
+		on = node.'@on'
+
+		if (on) {
+			imports += ['com.axelor.db.annotations.TrackEvent']
+		}
 	}
 
 	private Annotation $field(NodeChild node) {
@@ -100,15 +113,19 @@ class Track {
 	def $track() {
 		def annon = new Annotation(this.entity, "com.axelor.db.annotations.Track")
 		imports.each { name -> this.entity.importType(name) }
+		if (on) annon.add("on", "com.axelor.db.annotations.TrackEvent.${on}", false)
 		if (!fields.empty) annon.add("fields", fields, false, false)
 		if (!messages.empty) annon.add("messages", messages, false, false)
+		if (!contents.empty) annon.add("contents", contents, false, false)
 		if (subscribe) annon.add("subscribe", "true", false, false)
+		if (files) annon.add("files", "true", false, false)
 		return annon
 	}
 
 	def merge(Track other) {
 		fields.addAll(other.fields);
 		messages.addAll(other.messages);
+		contents.addAll(other.contents);
 		imports.addAll(other.imports);
 		if (other.replace) {
 			subscribe = other.subscribe;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <object-views xmlns="http://axelor.com/xml/ns/object-views"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_4.2.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
 
   <selection name="view.type.selection">
     <option value="grid">Grid</option>
@@ -21,6 +21,7 @@
   <selection name="action.type.selection">
     <option value="action-attrs">action-attrs</option>
     <option value="action-view">action-view</option>
+    <option value="action-script">action-script</option>
     <option value="action-group">action-group</option>
     <option value="action-validate">action-validate</option>
     <option value="action-condition">action-condition</option>
@@ -40,6 +41,12 @@
     <option value="inverse">Inverse</option>
     <option value="info">Information</option>
   </selection>
+  
+  <selection name="help.type.selection">
+    <option value="tooltip">Tooltip</option>
+    <option value="placeholder">Placeholder</option>
+    <option value="inline">Inline</option>
+  </selection>
 
   <grid title="All Modules" name="meta-module-grid" model="com.axelor.meta.db.MetaModule"
     canDelete="false" canNew="false" canEdit="false" edit-icon="false">
@@ -56,17 +63,20 @@
   <form name="meta-module-form" title="Module" model="com.axelor.meta.db.MetaModule"
     canAttach="false" canCopy="false" canNew="false" canDelete="false" canEdit="false">
     <panel title="Module">
-      <field name="title"/>
       <field name="name"/>
       <field name="moduleVersion"/>
-      <field name="depends"/>
-      <field name="installed" colSpan="4"/>
-      <field name="pending" colSpan="4"/>
-      <field name="removable" colSpan="4"/>
-      <panel stacked="true" showIf="removable">
+      <field name="title"/>
+      <field name="application"/>
+      <field name="removable" widget="inline-checkbox"/>
+      <field name="installed" widget="inline-checkbox"/>
+      <field name="pending" widget="inline-checkbox"/>
+      <panel showIf="removable" stacked="true" colSpan="3">
         <button name="btnInstall" title="Install" showIf="!installed &amp;&amp; !pending" onClick="com.axelor.meta.web.ModuleController:validInstall(name),com.axelor.meta.web.ModuleController:install(name)"/>
         <button name="btnUninstall" title="Uninstall" showIf="installed &amp;&amp; !pending &amp;&amp; removable" onClick="com.axelor.meta.web.ModuleController:validUninstall(name),com.axelor.meta.web.ModuleController:uninstall(name)"/>
       </panel>
+    </panel>
+    <panel title="Depends On">
+      <field name="depends" widget="TagSelect" colSpan="12" showTitle="false"/>
     </panel>
     <panel title="Description">
       <field name="description" showTitle="false" colSpan="12"/>
@@ -370,6 +380,54 @@
       <field name="key"/>
       <field name="message"/>
       <field name="language"/>
+    </panel>
+  </form>
+
+  <grid title="All View Help" name="meta-help-view-grid" model="com.axelor.meta.db.MetaHelp">
+    <field name="model" />
+    <field name="field" />
+    <field name="type" selection="help.type.selection" />
+    <field name="view" />
+    <field name="language" />
+  </grid>
+
+  <form title="View Help" name="meta-help-view-form" model="com.axelor.meta.db.MetaHelp">
+    <panel title="Overview">
+      <field name="model" required="true" widget="ref-text"
+        x-target-name="fullName"
+        x-target="com.axelor.meta.db.MetaModel" />
+      <field name="field" required="true" widget="ref-text"
+        x-target-name="name"
+        x-target="com.axelor.meta.db.MetaField"
+        x-create="name"
+        x-domain="self.metaModel.fullName = :model AND self.name NOT IN ('id', 'version', 'archived', 'createdBy', 'updatedBy', 'createdOn', 'updatedOn')" />
+      <field name="type" selection="help.type.selection" />
+      <field name="style" />
+      <field name="view" widget="ref-text"
+        x-target-name="name"
+        x-target="com.axelor.meta.db.MetaView"
+        x-domain="self.model = :model AND self.type IN ('form', 'grid')" />
+      <field name="language" />
+    </panel>
+    <panel title="Help">
+      <field name="help" showTitle="false" colSpan="12" />
+    </panel>
+  </form>
+  
+  <grid title="All Menu Help" name="meta-help-menu-grid" model="com.axelor.meta.db.MetaHelp">
+    <field name="menu" />
+    <field name="language" />
+  </grid>
+
+  <form title="Menu Help" name="meta-help-menu-form" model="com.axelor.meta.db.MetaHelp">
+    <panel title="Overview">
+      <field name="menu" required="true" widget="ref-text"
+        x-target-name="name"
+        x-target="com.axelor.meta.db.MetaMenu" />
+      <field name="language" />
+    </panel>
+    <panel title="Help">
+      <field name="help" showTitle="false" colSpan="12" />
     </panel>
   </form>
 

@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -24,11 +24,15 @@ import java.util.Map;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.TypedQuery;
 
+import com.axelor.common.StringUtils;
+import com.axelor.db.hibernate.type.JsonFunction;
+import com.axelor.db.internal.DBHelper;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -67,9 +71,9 @@ public class Query<T extends Model> {
 	private FlushModeType flushMode = FlushModeType.AUTO;
 
 	private static final String NAME_PATTERN = "((?:[a-zA-Z_]\\w+)(?:(?:\\[\\])?\\.\\w+)*)";
-
-	private static final Pattern orderPattern = Pattern.compile(
-			"(\\-)?(?:self\\.)?" + NAME_PATTERN, Pattern.CASE_INSENSITIVE);
+	
+	private static final Pattern PLACEHOLDER_PLAIN = Pattern.compile("(?<!\\?)\\?(?!(\\d+|\\?))");
+	private static final Pattern PLACEHOLDER_INDEXED = Pattern.compile("\\?\\d+");
 
 	/**
 	 * Create a new instance of {@code Query} with given bean class.
@@ -130,8 +134,27 @@ public class Query<T extends Model> {
 		if (this.filter != null) {
 			throw new IllegalStateException("Query is already filtered.");
 		}
+		if (StringUtils.isBlank(filter)) {
+			throw new IllegalArgumentException("filter string is required.");
+		}
 
-		this.filter = joinHelper.parse(filter);
+		// check for mixed style positional parameters
+		if (PLACEHOLDER_PLAIN.matcher(filter).find() &&
+			PLACEHOLDER_INDEXED.matcher(filter).find()) {
+			throw new IllegalArgumentException(
+					"JDBC and JPA-style positional parameters can't be mixed: " + filter);
+		}
+
+		// fix JDBC style parameters
+		int i = 1;
+		final Matcher matcher = PLACEHOLDER_PLAIN.matcher(filter);
+		final StringBuffer sb = new StringBuffer();
+		while (matcher.find()) {
+			matcher.appendReplacement(sb, "?" + (i++));
+		}
+		matcher.appendTail(sb);
+
+		this.filter = joinHelper.parse(sb.toString());
 		this.params = params;
 		return this;
 	}
@@ -172,19 +195,19 @@ public class Query<T extends Model> {
 	 * @return the same query instance
 	 */
 	public Query<T> order(String spec) {
-		Matcher m = orderPattern.matcher(spec.trim());
-		if (!m.matches()) {
-			throw new IllegalArgumentException("Invalid order spec: " + spec);
-		}
-
 		if (orderBy.length() > 0) {
 			orderBy += ", ";
 		} else {
 			orderBy = " ORDER BY ";
 		}
-
-		String name = this.joinHelper.joinName(m.group(2));
-		orderBy += name + ("-".equals(m.group(1)) ? " DESC" : "");
+		
+		String name = spec.trim();
+		if (name.charAt(0) == '-') {
+			name = name.substring(1);
+			orderBy += this.joinHelper.joinName(name) + " DESC";
+		} else {
+			orderBy += this.joinHelper.joinName(name);
+		}
 
 		return this;
 	}
@@ -215,6 +238,70 @@ public class Query<T extends Model> {
 	}
 
 	/**
+	 * Fetch all the matched records as {@link Stream}.
+	 * 
+	 * <p>
+	 * Recommended only when dealing with large data, for example, batch processing.
+	 * For normal use cases, the {@link #fetch()} is more appropriate.
+	 * 
+	 * <p>
+	 * Also configure <code>hibernate.jdbc.fetch_size</code> (default is 20) to fine
+	 * tune the fetch size.
+	 * 
+	 * @return stream of matched records.
+	 * @see #fetchSteam(int)
+	 * @see #fetchSteam(int, int)
+	 */
+	public Stream<T> fetchSteam() {
+		return fetchSteam(0, 0);
+	}
+
+	/**
+	 * Fetch the matched records as {@link Stream} with the given limit.
+	 *
+	 * <p>
+	 * Recommended only when dealing with large data, for example, batch processing.
+	 * For normal use cases, the {@link #fetch()} is more appropriate.
+	 * 
+	 * <p>
+	 * Also configure <code>hibernate.jdbc.fetch_size</code> (default is 20) to fine
+	 * tune the fetch size.
+	 * 
+	 * @param limit
+	 *            the limit
+	 * @return stream of matched records within the limit
+	 * @see #fetchSteam(int, int)
+	 */
+	public Stream<T> fetchSteam(int limit) {
+		return fetchSteam(limit, 0);
+	}
+
+	/**
+	 * Fetch the matched records as {@link Stream} within the given range.
+	 *
+	 * <p>
+	 * Recommended only when dealing with large data, for example, batch processing.
+	 * For normal use cases, the {@link #fetch()} is more appropriate.
+	 * 
+	 * <p>
+	 * Also configure <code>hibernate.jdbc.fetch_size</code> (default is 20) to fine
+	 * tune the fetch size.
+	 * 
+	 * @param limit
+	 *            the limit
+	 * @param offset
+	 *            the offset
+	 * @return stream of matched records within the range
+	 */
+	public Stream<T> fetchSteam(int limit, int offset) {
+		final org.hibernate.query.Query<T> query = (org.hibernate.query.Query<T>) fetchQuery(limit, offset);
+		if (limit <= 0) {
+			query.setFetchSize(DBHelper.getJdbcFetchSize());
+		}
+		return query.stream();
+	}
+
+	/**
 	 * Fetch all the matched records.
 	 *
 	 * @return list of all the matched records.
@@ -224,11 +311,11 @@ public class Query<T extends Model> {
 	}
 
 	/**
-	 * Fetch the matchied records with the given limit.
+	 * Fetch the matched records with the given limit.
 	 *
 	 * @param limit
 	 *            the limit
-	 * @return matched records withing the limit
+	 * @return matched records within the limit
 	 */
 	public List<T> fetch(int limit) {
 		return fetch(limit, 0);
@@ -244,6 +331,10 @@ public class Query<T extends Model> {
 	 * @return list of matched records within the range
 	 */
 	public List<T> fetch(int limit, int offset) {
+		return fetchQuery(limit, offset).getResultList();
+	}
+	
+	private TypedQuery<T> fetchQuery(int limit, int offset) {
 		final TypedQuery<T> query = em().createQuery(selectQuery(), beanClass);
 		if (limit > 0) {
 			query.setMaxResults(limit);
@@ -256,7 +347,7 @@ public class Query<T extends Model> {
 		if (readOnly) {
 			binder.setReadOnly();
 		}
-		return query.getResultList();
+		return query;
 	}
 
 	/**
@@ -378,12 +469,9 @@ public class Query<T extends Model> {
 	 * @return total number of records removed.
 	 */
 	public long remove() {
-		long n = this.count();
-		while(this.count() > 0) {
-			for(T o : this.fetch(100))
-				JPA.remove(o);
-		}
-		return n;
+		return fetchSteam()
+			.peek(JPA::remove)
+			.count();
 	}
 
 	protected String selectQuery() {
@@ -449,9 +537,6 @@ public class Query<T extends Model> {
 	 * @return the same instance
 	 */
 	public Query<T> bind(Map<String, Object> params) {
-		if (this.filter == null) {
-			throw new IllegalStateException("Query is not filtered yet.");
-		}
 		if (this.namedParams == null) {
 			this.namedParams = Maps.newHashMap();
 		}
@@ -528,6 +613,13 @@ public class Query<T extends Model> {
 						selects.add(joinHelper.joinName(name + ".id"));
 						selects.add(joinHelper.joinName(name + ".version"));
 						selects.add(joinHelper.joinName(name + "." + property.getTargetName()));
+					}
+				} else if (name.indexOf('.') > -1) {
+					final JsonFunction func = JsonFunction.fromPath(name);
+					final Property json = mapper.getProperty(func.getField());
+					if (json != null && json.isJson()) {
+						this.names.add(func.getField() + "." + func.getAttribute());
+						selects.add(func.toString());
 					}
 				}
 			}
@@ -734,9 +826,15 @@ public class Query<T extends Model> {
 				Mapper currentMapper = mapper;
 				for(int i = 0 ; i < path.length - 1 ; i++) {
 					String item = path[i].replace("[]", "");
+					if (i == 0 && "self".equals(item)) continue;
 					Property property = currentMapper.getProperty(item);
 					if (property == null) {
-						break;
+						throw new org.hibernate.QueryException("could not resolve property: " + item + " of: "
+								+ currentMapper.getBeanClass().getName());
+					}
+
+					if (property.isJson()) {
+						return JsonFunction.fromPath(name).toString();
 					}
 
 					if (prefix == null) {

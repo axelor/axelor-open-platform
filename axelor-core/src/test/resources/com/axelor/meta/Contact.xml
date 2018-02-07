@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <object-views xmlns="http://axelor.com/xml/ns/object-views"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_4.2.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
   
-    <grid name="contact-grid" title="Contacts" model="com.axelor.contact.db.Contact">
+    <grid name="contact-grid" title="Contacts" model="com.axelor.contact.test.db.Contact">
         <hilite background="warning" if="$contains(email, 'gmeil.com')"/>
         <field name="fullName"/>
         <field name="email">
@@ -14,7 +14,7 @@
         <field name="dateOfBirth"/>
     </grid>
     
-    <form name="contact-form" title="Contact" model="com.axelor.contact.db.Contact" cols="2" colWidths="*,200"
+    <form name="contact-form" title="Contact" model="com.axelor.contact.test.db.Contact" cols="2" colWidths="*,200"
     	onLoad="action-contact-defaults,action-contact-attrs"
     	onSave="action-contact-validate">
         <group title="Personal Information" colSpan="1" cols="4">

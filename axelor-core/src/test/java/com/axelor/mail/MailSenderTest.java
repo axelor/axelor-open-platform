@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,6 +18,8 @@
 package com.axelor.mail;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 import javax.mail.MessagingException;
@@ -25,11 +27,10 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.joda.time.LocalDateTime;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.axelor.common.ClassUtils;
+import com.axelor.common.ResourceUtils;
 
 public class MailSenderTest extends AbstractMailTest {
 
@@ -62,8 +63,8 @@ public class MailSenderTest extends AbstractMailTest {
 
 		final MailSender sender = new MailSender(account);
 
-		final String file = ClassUtils.getResource("com/axelor/mail/test-file.txt").getFile();
-		final String image = ClassUtils.getResource("com/axelor/mail/test-image.png").getFile();
+		final String file = ResourceUtils.getResource("com/axelor/mail/test-file.txt").getFile();
+		final String image = ResourceUtils.getResource("com/axelor/mail/test-image.png").getFile();
 
 		sender.compose()
 			.to(SEND_TO)
@@ -87,7 +88,7 @@ public class MailSenderTest extends AbstractMailTest {
 	@Test
 	public void testLocal() throws Exception {
 
-		final Date sentOn = new LocalDateTime().withMillisOfSecond(0).minusDays(15).toDate();
+		final Date sentOn = Date.from(LocalDateTime.now().minusDays(15).toInstant(ZoneOffset.UTC));
 
 		send(SMTP_ACCOUNT, sentOn);
 
@@ -98,7 +99,7 @@ public class MailSenderTest extends AbstractMailTest {
 
 		Assert.assertNotNull(m1);
 		Assert.assertEquals("Hello...", m1.getSubject());
-		Assert.assertEquals(sentOn, m1.getSentDate());
+		Assert.assertTrue(sentOn.compareTo(m1.getSentDate()) >= 0);
 		Assert.assertTrue(m1.getContent() instanceof MimeMultipart);
 
 		final MimeMultipart parts = (MimeMultipart) m1.getContent();

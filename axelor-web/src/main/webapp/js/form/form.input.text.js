@@ -27,6 +27,24 @@ var ui = angular.module('axelor.ui');
 ui.formInput('String', {
 	css: 'string-item',
 
+	init: function(scope) {
+		var field = scope.field;
+		var isReadonly = scope.isReadonly;
+		var trKey = "$t:" + field.name;
+
+		scope.isReadonly = function () {
+			scope.$$readonlyOrig = isReadonly.apply(this, arguments);
+			return (scope.record && scope.record[trKey]) || scope.$$readonlyOrig;
+		};
+
+		scope.format = function (value) {
+			if ((scope.record && scope.record[trKey])) {
+				return scope.record[trKey];
+			}
+			return value;
+		};
+	},
+
 	link_editable: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);
 
@@ -66,6 +84,8 @@ ui.formInput('Email', {
 
 	css: 'email-item',
 
+	metaWidget: true,
+
 	pattern: /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
 
 	link: function(scope, element, attrs, model) {
@@ -89,6 +109,7 @@ ui.formInput('Email', {
  */
 ui.formInput('Url', {
 	css: 'url-item',
+	metaWidget: true,
 	template_editable: '<input type="url">',
 	template_readonly: '<a target="_blank" ng-show="text" href="{{text}}">{{text}}</a>'
 });
@@ -115,7 +136,7 @@ ui.formInput('Text', {
 		textarea.rows = parseInt(field.height) || 8;
 
 		//Firefox add one more line
-		if ($.browser.mozilla){
+		if (axelor.browser.mozilla) {
 			textarea.rows -= 1;
 		}
 
@@ -152,6 +173,8 @@ ui.formInput('Text', {
 ui.formInput('Password', 'String', {
 
 	css: 'password-item',
+
+	metaWidget: true,
 
 	init: function(scope) {
 

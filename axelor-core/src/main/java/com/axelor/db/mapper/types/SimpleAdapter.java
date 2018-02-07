@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -37,6 +37,12 @@ public class SimpleAdapter implements TypeAdapter<Object> {
 			return adaptNull(value, type, genericType, annotations);
 		}
 		
+		// handle Boolean first to avoid constructor as in that case equal comparison
+		// using (==) with Boolean.TRUE, Boolean.FALSE will fail.
+		if (type == Boolean.TYPE || type == Boolean.class) {
+			return Boolean.valueOf(value.toString());
+		}
+
 		// try a constructor with exact value type
 		try {
 			return type.getConstructor(new Class<?>[] { value.getClass() })
@@ -54,9 +60,6 @@ public class SimpleAdapter implements TypeAdapter<Object> {
 		if (type == byte[].class && value instanceof String) {
 			return ((String) value).getBytes();
 		}
-
-		if (type == Boolean.TYPE || type == Boolean.class)
-			return Boolean.valueOf(value.toString());
 
 		if (type == Character.TYPE || type == Character.class)
 			return Character.valueOf(value.toString().charAt(0));

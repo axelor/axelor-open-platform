@@ -63,12 +63,12 @@ header .navbar .brand-logo img {
 }
 
 header .container-fluid {
-	padding: 0 10px;
+	padding: 0 4px;
 }
 
 @media (max-width: 767px) {
 	header .container-fluid {
-		padding: 0 10px;
+		padding: 0 4px;
 	}
 	header .navbar-fixed-top {
 		margin-left: 0;
@@ -83,7 +83,7 @@ header .nav-menu-bar li.empty > a > i {
 
 header .nav-menu-bar li.empty > a,
 header .navbar .nav-shortcuts > li > a {
-	padding: 9px 6px 10px;
+	padding: 9px 5px 10px;
 }
 
 header .nav-menu-bar li > a > img {
@@ -110,6 +110,16 @@ header .navbar .nav-shortcuts .nav-link-mail sup {
 	top: 8px;
 }
 
+header .navbar .nav-shortcuts .nav-link-tasks .badge {
+    display: inline-block;
+    position: absolute;
+    padding: 5px 4px;
+    width: 11px;
+    height: 9px;
+    top: 1px;
+    right: -3px;
+}
+
 header .navbar .nav-link-user > img {
 	width: 20px;
 	height: 20px;
@@ -120,10 +130,12 @@ header .navbar .nav-link-user > img {
 header .navbar .nav-link-user-name,
 header .navbar .nav-link-user-sub {
 	display: block;
+	font-weight: 600;
+	opacity: .9;
 }
 header .navbar .nav-link-user-sub {
 	font-size: 10px;
-	opacity: .5;
+	opacity: .7;
 }
 
 .fill-parent {
@@ -218,6 +230,13 @@ header .navbar .nav-link-user-sub {
 .ui-datepicker,
 .dropdown-menu {
 	z-index: 9999999999 !important;
+}
+
+.tooltip {
+    font-size: 12px;
+}
+.tooltip.fade.in {
+    opacity: 1;
 }
 
 .ui-menu {
@@ -318,6 +337,11 @@ header .navbar .nav-link-user-sub {
 
 #offcanvas {
 	height: 100%;
+}
+
+#offcanvas-toggle {
+    margin: 0;
+    margin-left: 4px;
 }
 
 #offcanvas-toggle a {
@@ -445,6 +469,16 @@ header .navbar .nav-link-user-sub {
 	top: 0px; left: 0px; right: 0px; bottom: 0px;
 }
 
+.ui-dialog-content .view-pane {
+	position: inherit;
+}
+
+.ui-dialog-content .view-pane > .view-container,
+.ui-dialog-content .view-pane > .view-container > div:not(.slick-editor-dropdown),
+.ui-dialog-content .view-pane > .view-container .form-view > div:last-child {
+	position: inherit;
+}
+
 .view-pane > .view-container.has-toolbar {
 	top: -6px;
 }
@@ -460,6 +494,22 @@ header .navbar .nav-link-user-sub {
 
 .grid-view > .help-item {
 	margin: 8px;
+}
+
+.grid-view.has-details-view > .slickgrid {
+	right: 50%;
+	border-right: 1px solid #ddd;
+}
+
+.grid-view > .details-view {
+	position: absolute !important;
+	top: 40px; left: 50%; right: 0px; bottom: 0px;
+}
+
+.grid-view > .details-view > [ui-view-form] {
+	overflow: auto;
+	position: absolute;
+	top: 42px; left: 0; right: 0; bottom: 0;
 }
 
 .record-toolbar {
@@ -485,6 +535,11 @@ header .navbar .nav-link-user-sub {
 .record-toolbar button span {
 	position: relative;
 	top: -1px;
+}
+
+.record-toolbar button[ui-top-help] {
+  background: none;
+  outline: none;
 }
 
 .record-toolbar .view-customize,
@@ -517,6 +572,13 @@ header .navbar .nav-link-user-sub {
 	top: 0;
 	right: 6px;
 	position: absolute;
+}
+
+.grid-view > .details-view .record-toolbar {
+}
+
+.grid-view > .details-view .record-toolbar .navbar-inner {
+	border-top: 1px solid #e7e7e7;
 }
 
 @media (max-width: 767px) {
@@ -631,8 +693,13 @@ header .navbar .nav-link-user-sub {
 	top: 0; bottom: 0; left: 0; right: 0;
 }
 
+.html-view > .dashlet-body {
+  overflow: inherit !important;
+  height: auto !important;
+  min-height: 50px;
+}
+
 .iframe-container > iframe {
-	position: absolute;
 	width: 100%;
 	height: 100%;
 }
@@ -682,6 +749,10 @@ img.prefix-icon {
 	margin-top: -1px;
 }
 
+.nav-tabs > li > a > i.prefix-icon {
+	margin-right: 2px;
+}
+
 .fa, [class^=fa-] {
 	font-size: 14px;
 }
@@ -704,6 +775,10 @@ img.prefix-icon {
 	float: inherit;
 	vertical-align: middle;
 	white-space: nowrap;
+}
+
+.device-small .record-toolbar .menu-bar .has-icon .menu-title {
+  display: none;
 }
 
 .record-toolbar .menu-bar,
@@ -745,6 +820,14 @@ img.prefix-icon {
 .record-toolbar .menu-bar a.disabled:focus {
 	background-color: inherit;
 	background-image: inherit;
+}
+
+.record-toolbar .delete-button {
+  margin: 0 !important;
+}
+
+.record-toolbar .delete-button .dropdown-toggle {
+  padding: 4px;
 }
 
 .about-page,
@@ -832,4 +915,27 @@ img.prefix-icon {
     line-height: 32px;
     text-align: center;
     cursor: pointer;
+}
+
+.view-tabs-single .navigation-tabs > .nav-tabs > li > span.view-switch-menu > a {
+    cursor: pointer;
+    color: #555;
+    display: block;
+    line-height: 32px;
+}
+
+.view-tabs-single .navigation-tabs > .nav-tabs > li > span.view-switch-menu a[disabled] {
+    cursor: default;
+    color: #ccc;
+}
+
+.view-tabs-single .navigation-tabs > .nav-tabs > li > span.view-switch-menu a[disabled]:hover {
+    background-color: #fff;
+}
+
+.view-tabs-single .navigation-tabs > .nav-tabs > li > span.view-switch-menu > a > i {
+    width: 28px;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 11px;
 }

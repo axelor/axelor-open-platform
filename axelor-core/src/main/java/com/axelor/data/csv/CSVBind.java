@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -96,12 +96,24 @@ public class CSVBind {
 		return type;
 	}
 
+	public void setType(String type) {
+		this.type = type;
+	}
+
 	public String getSearch() {
 		return search;
 	}
 
+	public void setSearch(String search) {
+		this.search = search;
+	}
+
 	public boolean isUpdate() {
 		return update;
+	}
+
+	public void setUpdate(boolean update) {
+		this.update = update;
 	}
 
 	public String getExpression() {
@@ -132,8 +144,16 @@ public class CSVBind {
 		return bindings;
 	}
 
+	public void setBindings(List<CSVBind> bindings) {
+		this.bindings = bindings;
+	}
+
 	public String getAdapter() {
 		return adapter;
+	}
+
+	public void setAdapter(String adapter) {
+		this.adapter = adapter;
 	}
 
 	public static CSVBind getBinding(final String column, final String field, Set<String> cols) {

@@ -62,7 +62,7 @@ ui.formWidget('Form', {
 			e.preventDefault();
 		});
 
-		scope.$watch('record', function(rec, old) {
+		scope.$watch('record', function formRecordWatch(rec, old) {
 			if (element.is(':visible')) {
 				return;
 			}
@@ -194,10 +194,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 	}
 	
 	function withContext(scope, record) {
-		var values = _.extend({}, record);
-		if (scope._context) {
-			values = _.extend({}, scope._context, values);
-		}
+		var values = _.extend({}, scope._context, scope._jsonContext, record);
 		return _.extend(values, {
 			$user: axelor.config['user.login'],
 			$group: axelor.config['user.group']
@@ -206,17 +203,21 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 	
 	function handleCondition(scope, field, attr, condition, negative) {
 
-		if (!condition) {
+		if (!condition || _.isBoolean(condition)) {
 			return;
 		}
 
 		scope.$on("on:record-change", function(e, rec, force) {
-			if (rec === scope.record || force) {
+			if (field && field.jsonField) {
+				handle(scope.record);
+			} else if (rec === scope.record || force) {
 				handle(rec);
 			}
 		});
 		scope.$on("on:grid-selection-change", function(e, context) {
-			handle(context);
+			if (!scope._isDetailsForm) {
+				handle(context);
+			}
 		});
 
 		scope.$watch("isReadonly()", watcher);
@@ -238,7 +239,9 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 			var value;
 			try {
 				value = !!axelor.$eval(scope, expr, withContext(scope, rec));
-			} catch (e) {}
+			} catch (e) {
+				console.error('FAILED:', condition, e);
+			}
 			scope.attr(attr, negative ? !value : value);
 		}
 	}
@@ -258,7 +261,9 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 				var value = false;
 				try {
 					value = axelor.$eval(scope, expr, withContext(scope, rec));
-				} catch (e) {}
+				} catch (e) {
+					console.error('FAILED:', hilite, e);
+				}
 				if (value) {
 					return scope.attr('highlight', {
 						hilite: hilite,
@@ -292,7 +297,9 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 				if (value.length === 0) {
 					value = null;
 				}
-			} catch (e) {}
+			} catch (e) {
+				console.error('FAILED:', field.bind, e);
+			}
 
 			if (scope.setValue && scope.record && last !== value) {
 				scope.setValue(last = value);
@@ -300,9 +307,46 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		}
 		
 		scope.$on("on:record-change", function(e, rec) {
-			if (rec && rec === scope.record) {
+			if (field && field.jsonField) {
+				handle(scope.record);
+			} else if (rec && rec === scope.record) {
 				handle(rec);
 			}
+		});
+	}
+	
+	function handleValueExpr(scope, field) {
+		
+		if (!field.valueExpr || !field.name) {
+			return;
+		}
+
+		var expr = $parse(field.valueExpr);
+
+		function handle(rec) {
+			var value;
+			try {
+				value = axelor.$eval(scope, expr, withContext(scope, rec));
+				if (value && value.length === 0) {
+					value = null;
+				}
+			} catch (e) {
+				console.error('FAILED:', field.valueExpr, e);
+			}
+
+			if (scope.setValue && scope.record) {
+				scope.setValue(value, false);
+			}
+		}
+		
+		scope.$on("on:record-change", function(e, rec) {
+			scope.$timeout(function () {
+				if (field && field.jsonField) {
+					handle(scope.record);
+				} else if (rec && rec === scope.record) {
+					handle(rec);
+				}
+			});
 		});
 	}
 	
@@ -328,6 +372,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		handleFor(scope, field, "canSelect", "canSelect");
 		handleHilites(scope, field);
 		handleBind(scope, field);
+		handleValueExpr(scope, field);
 	}
 	
 	function handleForView(scope) {
@@ -338,6 +383,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		handleFor(scope, field, "canSave", "canSave");
 		handleFor(scope, field, "canCopy", "canCopy");
 		handleFor(scope, field, "canDelete", "canDelete");
+		handleFor(scope, field, "canArchive", "canArchive");
 		handleFor(scope, field, "canAttach", "canAttach");
 	}
 	

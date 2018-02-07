@@ -32,7 +32,7 @@ ui.formInput('Boolean', {
 	
 	link: function (scope, element, attrs, model) {
 
-		element.on('click', 'input', function (e) {
+		element.on('click', 'input:not(.no-toggle)', function (e) {
 			scope.setValue(e.target.checked, true);
 		});
 
@@ -58,10 +58,11 @@ ui.formInput('Boolean', {
  */
 ui.formInput('InlineCheckbox', 'Boolean', {
 	css: 'checkbox-inline',
+	metaWidget: true,
 	showTitle: false,
 	link: function (scope, element, attrs, model) {
 		this._super.apply(this, arguments);
-		scope.$watch('attr("title")', function(title) {
+		scope.$watch('attr("title")', function booleanTitleWatch(title) {
 			scope.label = title;
 		});
 	},
@@ -70,12 +71,13 @@ ui.formInput('InlineCheckbox', 'Boolean', {
 		"<label class='ibox'>" +
 			"<input type='checkbox' ng-model='$value' ng-disabled='isReadonly()'>" +
 			"<div class='box'></div>" +
-			"<span class='title'>{{label}}</span>" +
+			"<span class='title' ui-help-popover>{{label}}</span>" +
 		"</label>"
 });
 
 ui.formInput('Toggle', 'Boolean', {
 	cellCss: 'form-item toggle-item',
+	metaWidget: true,
 	link: function (scope, element, attrs, model) {
 		this._super.apply(this, arguments);
 
@@ -107,6 +109,7 @@ ui.formInput('Toggle', 'Boolean', {
 
 ui.formInput('BooleanSelect', 'Boolean', {
 	css: 'form-item boolean-select-item',
+	metaWidget: true,
 	init: function (scope) {
 		var field = scope.field;
 		var trueText = _t((field.widgetAttrs||{}).trueText) || _t('Yes');
@@ -133,7 +136,7 @@ ui.formInput('BooleanSelect', 'Boolean', {
 			source: scope.$selection,
 			select: function (e, u) {
 				scope.setValue(u.item.val, true);
-				scope.applyLater();
+				scope.$applyAsync();
 			}
 		}).click(function (e) {
 			input.autocomplete("search" , '');
@@ -144,12 +147,12 @@ ui.formInput('BooleanSelect', 'Boolean', {
 		};
 
 		scope.$render_editable = function () {
-			var value = model.$viewValue || false;
+			var value = model.$viewValue;
 			var text = scope.format(value);
 			input.val(text);
 		};
 
-		scope.$watch('isReadonly()', function (readonly) {
+		scope.$watch('isReadonly()', function booleanReadonlyWatch(readonly) {
 			input.autocomplete(readonly ? "disable" : "enable");
 			input.toggleClass('not-readonly', !readonly);
 		});
@@ -157,7 +160,7 @@ ui.formInput('BooleanSelect', 'Boolean', {
 	template: "<span class='form-item-container'></span>",
 	template_readonly: '<span>{{text}}</span>',
 	template_editable: "<span class='picker-input'>" +
-				"<input type='text' readonly='readonly'>" +
+				"<input type='text' readonly='readonly' class='no-toggle'>" +
 				"<span class='picker-icons picker-icons-1'>" +
 					"<i class='fa fa-caret-down' ng-click='doShowSelect()'></i>" +
 				"</span>" +
@@ -166,6 +169,7 @@ ui.formInput('BooleanSelect', 'Boolean', {
 
 ui.formInput('BooleanRadio', 'BooleanSelect', {
 	css: 'form-item boolean-radio-item',
+	metaWidget: true,
 	link_editable: function (scope, element, attrs, model) {
 
 		var inputName = _.uniqueId('boolean-radio');
@@ -194,7 +198,7 @@ ui.formInput('BooleanRadio', 'BooleanSelect', {
 		element.on('change', 'input', function (e) {
 			var value = $(this).data('value') === true;
 			scope.setValue(value, true);
-			scope.applyLater();
+			scope.$applyAsync();
 		});
 	},
 	template_editable: "<span></span>"
@@ -202,6 +206,7 @@ ui.formInput('BooleanRadio', 'BooleanSelect', {
 
 ui.formInput('BooleanSwitch', 'Boolean', {
 	css: 'form-item',
+	metaWidget: true,
 	template_readonly: null,
 	template_editable:
 		"<label class='iswitch'>" +

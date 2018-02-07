@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -23,7 +23,7 @@ import java.util.Calendar;
 import java.util.Properties;
 
 import com.axelor.app.internal.AppFilter;
-import com.axelor.common.ClassUtils;
+import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
 
 public final class AppSettings {
@@ -40,7 +40,7 @@ public final class AppSettings {
 		InputStream stream = null;
 		try {
 			if (StringUtils.isBlank(config)) {
-				stream = ClassUtils.getResourceStream(config = DEFAULT_CONFIG_LOCATION);
+				stream = ResourceUtils.getResourceStream(config = DEFAULT_CONFIG_LOCATION);
 			} else {
 				stream = new FileInputStream(config);
 			}

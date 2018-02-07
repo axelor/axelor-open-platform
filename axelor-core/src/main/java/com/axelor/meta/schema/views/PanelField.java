@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -22,8 +22,6 @@ import static com.axelor.common.StringUtils.isBlank;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.eclipse.persistence.oxm.annotations.XmlCDATA;
-
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
@@ -31,17 +29,19 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 public class PanelField extends Field {
 
 	@XmlElement
-	@XmlCDATA
-	private String viewer;
+	private PanelViewer viewer;
 
 	@XmlElement
 	private PanelEditor editor;
 
-	public String getViewer() {
+	public PanelViewer getViewer() {
+		if (viewer != null) {
+			viewer.forField = this;
+		}
 		return viewer;
 	}
 
-	public void setViewer(String viewer) {
+	public void setViewer(PanelViewer viewer) {
 		this.viewer = viewer;
 	}
 

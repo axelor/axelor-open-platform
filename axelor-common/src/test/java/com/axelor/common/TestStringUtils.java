@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -54,6 +54,11 @@ public class TestStringUtils {
 			+ "  this is some text\n"
 			+ " this is some text\n";
 
+	final static String text4 = ""
+			+ "this is some text\n"
+			+ "    |this is some text\n"
+			+ "    |this is some text\n";
+
 	@Test
 	public void testStripIndent() {
 		String[] lines = StringUtils.stripIndent(text1).split("\n");
@@ -82,5 +87,24 @@ public class TestStringUtils {
 				+ " this is some text\n"
 				+ " this is some text\n"
 				+ "this is some text");
+	}
+
+	@Test
+	public void testStripMargin() {
+		String[] lines = StringUtils.stripMargin(text4).split("\n");
+		Assert.assertEquals(Joiner.on("\n").join(lines), ""
+				+ "this is some text\n"
+				+ "this is some text\n"
+				+ "this is some text");
+	}
+
+	@Test
+	public void testStripAccent() {
+		Assert.assertEquals("AAAAAACEEEEIIIINOOOOOUUUUY", StringUtils.stripAccent("ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ"));
+		Assert.assertEquals("aaaaaaceeeeiiiinooooouuuuyy", StringUtils.stripAccent("àáâãäåçèéêëìíîïñòóôõöùúûüýÿ"));
+		Assert.assertEquals("L", StringUtils.stripAccent("Ł"));
+		Assert.assertEquals("l", StringUtils.stripAccent("ł"));
+		Assert.assertEquals("Cesar", StringUtils.stripAccent("César"));
+		Assert.assertEquals("Andre", StringUtils.stripAccent("André"));
 	}
 }

@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -31,6 +31,7 @@ import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -58,7 +59,7 @@ public final class DataScriptHelper {
 
 	static {
 		final ImportCustomizer importCustomizer = new ImportCustomizer();
-		importCustomizer.addImport("__repo__", "com.axelor.db.JpaRepository");
+		importCustomizer.addStaticImport("__repo__", JpaRepository.class.getName(), "of");
 
 		configIndy.getOptimizationOptions().put("indy", true);
 		configIndy.getOptimizationOptions().put("int", false);

@@ -92,9 +92,6 @@ function ViewCtrl($scope, DataSource, ViewService) {
 			return;
 		}
 		
-		// cancel hot edit
-		$.event.trigger('cancel:hot-edit');
-		
 		var promise = view.deferred.promise;
 		promise.then(function(viewScope){
 
@@ -240,10 +237,6 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
 					})
 				}];
 
-				$scope.menubarAsMenu = _.isEmpty(schema.menubar) ? null : [_.extend({}, _.first(schema.menubar), {
-					isButton: true
-				})];
-
 				// watch on view.loaded to improve performance
 				schema.loaded = true;
 			});
@@ -289,6 +282,7 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
 			'edit': 'write',
 			'save': 'write',
 			'delete': 'remove',
+			'archive': 'remove',
 			'export': 'export'
 		};
 		var actions = {
@@ -297,6 +291,7 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
 			'save': 'canSave',
 			'copy': 'canCopy',
 			'delete': 'canDelete',
+			'archive': 'canArchive',
 			'attach': 'canAttach'
 		};
 
@@ -407,7 +402,7 @@ ui.directive('uiViewPane', function() {
 				return switchTo(type, callback);
 			};
 			
-			$scope.$watch('selectedTab.viewType', function (type) {
+			$scope.$watch('selectedTab.viewType', function viewTypeWatch(type) {
 				var params = $scope._viewParams;
 				if (params && params.$viewScope !== $scope.selectedTab.$viewScope) {
 					return;
@@ -476,7 +471,7 @@ ui.directive('uiViewPopup', function() {
 				if (parent && parent.reload && params.popup === "reload") {
 					parent.reload();
 				}
-				$scope.applyLater();
+				$scope.$applyAsync();
 			};
 
 			$scope.onPopupOK = function () {
@@ -486,9 +481,7 @@ ui.directive('uiViewPopup', function() {
 				}
 				return viewScope.onSave().then(function(record, page) {
 					viewScope.edit(record);
-					viewScope.applyLater(function() {
-						$scope.onOK();
-					});
+					viewScope.$timeout($scope.onOK.bind($scope));
 				});
 			};
 
@@ -499,12 +492,12 @@ ui.directive('uiViewPopup', function() {
 		}],
 		link: function (scope, element, attrs) {
 
-			scope.$watch('viewTitle', function (title) {
+			scope.$watch('viewTitle', function viewTitleWatch(title) {
 				scope._setTitle(title);
 			});
 
 			scope.waitForActions(function () {
-				var unwatch = scope.$watch("_viewParams.$viewScope.schema.loaded", function(loaded) {
+				var unwatch = scope.$watch("_viewParams.$viewScope.schema.loaded", function viewLoadedWatch(loaded) {
 					if (!loaded) {
 						return;
 					}
@@ -614,6 +607,12 @@ ui.directive('uiViewCustomize', ['NavService', function(NavService) {
 					mode: "edit",
 					state: id
 				});
+				scope.waitForActions(function () {
+					var vs = scope.selectedTab.$viewScope;
+					if (vs && vs.setEditable) {
+						vs.setEditable();
+					}
+				});
 			}
 
 			scope.onShowModel = function () {
@@ -640,43 +639,55 @@ ui.directive('uiViewCustomize', ['NavService', function(NavService) {
 	};
 }]);
 
+function viewSwitcher(scope, element, attrs) {
+
+	var params = (scope._viewParams || scope.tab);
+	var viewTypes = _.pluck(params.views, 'type');
+
+	element.find("[x-view-type]").click(function(e) {
+		if (this.disabled) {
+			return;
+		}
+		var type = $(this).attr("x-view-type");
+		var vs = scope.selectedTab.$viewScope;
+		var ds = vs._dataSource;
+		var page = ds && ds._page;
+
+		if (type === "form" && page) {
+			if (page.index === -1) page.index = 0;
+		}
+
+		if (scope.selectedTab.viewType === 'grid') {
+			var items = vs.getItems() || [];
+			var index = _.first(vs.selection || []);
+			if (index === undefined && items.length === 0 && vs.schema.canNew === false) {
+				return;
+			}
+			if (index !== undefined) page.index = index;
+		}
+
+		vs.switchTo(type);
+		vs.$applyAsync();
+	}).each(function() {
+		var type = $(this).attr("x-view-type");
+		if (viewTypes.indexOf(type) === -1) {
+			$(this).hide();
+		}
+	});
+
+	var watchExpr = scope._viewParams ? '_viewType' : 'tab.viewType';
+	scope.$watch(watchExpr, function viewTypeWatch(type) {
+		element.find("[x-view-type]").attr("disabled", false);
+		element.find("[x-view-type][x-view-type=" + type + "]").attr("disabled", true);
+	});
+}
+
 ui.directive('uiViewSwitcher', function(){
 	return {
 		scope: true,
 		link: function(scope, element, attrs) {
-
 			element.parents('.view-container:first').addClass('has-toolbar');
-
-			element.find("button").click(function(e){
-				var type = $(this).attr("x-view-type"),
-					ds = scope._dataSource,
-					page = ds && ds._page;
-
-				if (type === "form" && page) {
-					if (page.index === -1) page.index = 0;
-				}
-
-				if (scope.selectedTab.viewType === 'grid') {
-					var items = scope.getItems() || [];
-					var index = _.first(scope.selection || []);
-					if (index === undefined && items.length === 0 && scope.schema.canNew === false) {
-						return;
-					}
-					if (index !== undefined) page.index = index;
-				}
-
-				scope.switchTo(type);
-				scope.$apply();
-			})
-			.each(function() {
-				if (scope._views[$(this).attr("x-view-type")] === undefined) {
-					$(this).hide();
-				}
-			});
-			scope.$watch("_viewType", function(type){
-				element.find("button").attr("disabled", false);
-				element.find("button[x-view-type=" + type + "]").attr("disabled", true);
-			});
+			viewSwitcher(scope, element, attrs);
 		},
 		replace: true,
 		template:
@@ -691,6 +702,29 @@ ui.directive('uiViewSwitcher', function(){
 		  		'<button class="btn" x-view-type="form"	><i class="fa fa-file-text-o"></i></button>'+
 		    '</div>'+
 		'</div>'
+	};
+});
+
+ui.directive('uiViewSwitcherMenu', function(){
+	return {
+		scope: true,
+		link: function(scope, element, attrs) {
+			viewSwitcher(scope, element, attrs);
+		},
+		replace: true,
+		template:
+			"<span class='view-switch-menu dropdown pull-right'>" +
+				"<a href='' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-ellipsis-v'></i></a>" +
+				"<ul class='dropdown-menu'>" +
+				   "<li><a href='' x-view-type='grid' x-translate>Grid</a></li>" +
+				   "<li><a href='' x-view-type='cards' x-translate>Cards</a></li>" +
+				   "<li><a href='' x-view-type='kanban' x-translate>Kanban</a></li>" +
+				   "<li><a href='' x-view-type='calendar' x-translate>Calendar</a></li>" +
+				   "<li><a href='' x-view-type='gantt' x-translate>Gantt</a></li>" +
+				   "<li><a href='' x-view-type='chart' x-translate>Chart</a></li>" +
+				   "<li><a href='' x-view-type='form' x-translate>Form</a></li>" +
+				"</ul>" +
+			"</span>"
 	};
 });
 
@@ -742,12 +776,12 @@ ui.directive('uiHotKeys', function() {
 
 			if (action === "focus-menu") {
 				var activeMenu = $('.sidebar .nav-tree li.active');
-				if (activeMenu.size() === 0) {
+				if (activeMenu.length === 0) {
 					activeMenu = $('.sidebar .nav-tree li:first');
 				}
 				
 				var navTree = activeMenu.parents('[nav-tree]:first');
-				if (navTree.size()) {
+				if (navTree.length) {
 					navTree.navtree('selectItem', activeMenu);
 				}
 				return false;
@@ -757,7 +791,7 @@ ui.directive('uiHotKeys', function() {
 				dlg = $('[ui-editor-popup]:visible:last,[ui-view-popup]:visible:last,[ui-dms-popup]:visible:last').first(),
 				vs = tab ? tab.$viewScope : null;
 
-			if (dlg.size()) {
+			if (dlg.length) {
 				vs = dlg.scope();
 			}
 			
@@ -767,14 +801,14 @@ ui.directive('uiHotKeys', function() {
 
 			if (action === "close") {
 				scope.closeTab(tab, function() {
-					scope.applyLater();
+					scope.$applyAsync();
 				});
 				return false;
 			}
 			
 			if (action === "search") {
 				var filterBox = $('.filter-box .search-query:visible');
-				if (filterBox.size()) {
+				if (filterBox.length) {
 					filterBox.focus().select();
 					return false;
 				}
@@ -783,59 +817,6 @@ ui.directive('uiHotKeys', function() {
 			if (_.isFunction(vs.onHotKey)) {
 				return vs.onHotKey(e, action);
 			}
-		});
-		
-		function hotEdit(elem) {
-			var fs = elem.data('$scope');
-			var field = fs ? fs.field : null;
-			if (!field || field.readonly) {
-				return;
-			}
-			
-			var isHotEdit = fs.attr("force-edit");
-			var unwatch = null;
-
-			$.event.trigger('cancel:hot-edit');
-			
-			if (isHotEdit || !fs.hasPermission("write") || !fs.isReadonly()) {
-				return;
-			}
-
-			function cleanup() {
-				if (unwatch) {
-					unwatch();
-					unwatch = null;
-				}
-				fs.attr("force-edit", false);
-				if (elem) {
-					elem.off('cancel:hot-edit');
-					elem.off('$destroy:hot-edit');
-					elem = null;
-				}
-			}
-
-			$.event.trigger('cancel:hot-edit');
-				
-			fs.applyLater(function () {
-				fs.attr("force-edit", true);
-				fs.$timeout(function() {
-					elem.find(':input:first').focus();
-				}, 100);
-				elem.on('cancel:hot-edit', function () {
-					cleanup();
-					fs.applyLater();
-				});
-				elem.on('$destroy.hot-edit', cleanup);
-				unwatch = fs.$watch("attr('force-edit')", function(edit) {
-					if (!edit) {
-						cleanup();
-					}
-				});
-			});
-		}
-		
-		$(document).on("click.hot-edit", ".hot-edit-icon", function (e) {
-			hotEdit($(e.target).parent());
 		});
 
 		scope.$on('$destroy', function() {

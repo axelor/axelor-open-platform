@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -31,6 +31,7 @@ import org.hibernate.Transaction;
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.annotations.Track;
 import com.axelor.db.annotations.TrackEvent;
@@ -102,22 +103,21 @@ final class AuditTracker {
 		return entity.getClass().getAnnotation(Track.class);
 	}
 
-	private boolean hasEvent(TrackField field, TrackEvent event) {
-		for (TrackEvent e : field.on()) {
-			if (e == event) {
+	private boolean hasEvent(TrackEvent[] events, TrackEvent event) {
+		for (TrackEvent e : events) {
+			if (e == event || e == TrackEvent.ALWAYS) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private boolean hasEvent(TrackMessage message, TrackEvent event) {
-		for (TrackEvent e : message.on()) {
-			if (e == event) {
-				return true;
-			}
-		}
-		return false;
+	private boolean hasEvent(Track track, TrackField field, TrackEvent event) {
+		return hasEvent(field.on(), event) || (field.on().length == 0 && hasEvent(track.on(), event));
+	}
+
+	private boolean hasEvent(Track track, TrackMessage message, TrackEvent event) {
+		return hasEvent(message.on(), event) || (message.on().length == 0 && hasEvent(track.on(), event));
 	}
 
 	private String format(Property property, Object value) {
@@ -181,6 +181,33 @@ final class AuditTracker {
 
 		EntityState.create(entity, values, oldValues);
 	}
+	
+	private String findMessage(Track track, TrackMessage[] messages, Map<String, Object> values, Map<String, Object> oldValues, ScriptHelper scriptHelper) {
+		for (TrackMessage tm : messages) {
+			if (hasEvent(track, tm, oldValues.isEmpty() ? TrackEvent.CREATE : TrackEvent.UPDATE)) {
+				boolean matched = tm.fields().length == 0;
+				for (String field : tm.fields()) {
+					if (isBlank(field)) {
+						matched = true;
+						break;
+					}
+					matched = oldValues.isEmpty() ? values.containsKey(field) : !Objects.equal(values.get(field), oldValues.get(field));
+					if (matched) {
+						break;
+					}
+				}
+				if (matched && isBlank(tm.tag()) && scriptHelper.test(tm.condition())) {
+					String msg = tm.message();
+					// evaluate message expression
+					if (msg != null && msg.indexOf("#{") == 0) {
+						msg = (String) scriptHelper.eval(msg);
+					}
+					return msg;
+				}
+			}
+		}
+		return null;
+	}
 
 	private void process(EntityState state, User user) {
 
@@ -201,34 +228,16 @@ final class AuditTracker {
 		final List<Map<String, String>> tracks = new ArrayList<>();
 		final Set<String> tagFields = new HashSet<>();
 
-		String msg = null;
-
-		// find first matched message
-		for (TrackMessage tm : track.messages()) {
-			if (hasEvent(tm, TrackEvent.ALWAYS) ||
-				hasEvent(tm, previousState == null ? TrackEvent.CREATE : TrackEvent.UPDATE)) {
-				boolean matched = tm.fields().length == 0;
-				for (String field : tm.fields()) {
-					if (isBlank(field)) {
-						matched = true;
-						break;
-					}
-					matched = previousState != null && !Objects.equal(values.get(field), oldValues.get(field));
-					if (matched) {
-						break;
-					}
-				}
-				if (matched && isBlank(tm.tag()) && scriptHelper.test(tm.condition())) {
-					msg = tm.message();
-					break;
-				}
-			}
-		}
+		// find matched message
+		String msg = findMessage(track, track.messages(), values, oldValues, scriptHelper);
+		
+		// find matched content message
+		String content = findMessage(track, track.contents(), values, oldValues, scriptHelper);
 
 		for (TrackField field : track.fields()) {
 
-			if (!hasEvent(field, TrackEvent.ALWAYS) &&
-				!hasEvent(field, previousState == null ? TrackEvent.CREATE: TrackEvent.UPDATE)) {
+			if (!hasEvent(track, field, TrackEvent.ALWAYS) &&
+				!hasEvent(track, field, previousState == null ? TrackEvent.CREATE: TrackEvent.UPDATE)) {
 				continue;
 			}
 
@@ -274,8 +283,7 @@ final class AuditTracker {
 				if (canTag) { break; }
 			}
 			if (!canTag) { continue; }
-			if (hasEvent(tm, TrackEvent.ALWAYS) ||
-				hasEvent(tm, previousState == null ? TrackEvent.CREATE: TrackEvent.UPDATE)) {
+			if (hasEvent(track, tm, previousState == null ? TrackEvent.CREATE: TrackEvent.UPDATE)) {
 				if (!isBlank(tm.tag()) && scriptHelper.test(tm.condition())) {
 					final Map<String, String> item = new HashMap<>();
 					item.put("title", tm.message());
@@ -286,7 +294,7 @@ final class AuditTracker {
 		}
 
 		// don't generate empty tracking info
-		if (msg == null && tracks.isEmpty()) {
+		if (msg == null && content == null && tracks.isEmpty()) {
 			return;
 		}
 
@@ -298,6 +306,10 @@ final class AuditTracker {
 		json.put("title", msg);
 		json.put("tags", tags);
 		json.put("tracks", tracks);
+
+		if (!StringUtils.isBlank(content)) {
+			json.put("content", content);
+		}
 
 		message.setSubject(msg);
 		message.setBody(toJSON(json));

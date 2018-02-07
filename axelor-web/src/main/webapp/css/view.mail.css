@@ -79,9 +79,25 @@
 	display: inline-block;
 	width:  40px;
 	height: 40px;
-	margin-left: -22px;
+	margin-left: -21px;
 	border-radius: 500px;
-	background-color: #e7e7e7;
+	line-height: 40px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    color: #ffffff;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 0 rgba(0,0,0,.15);
+}
+
+.mail-thread .avatar:not([class*=bg-]) {
+    background-color: #0275d8;
+}
+
+.mail-thread .avatar:hover,
+.mail-thread .avatar:active,
+.mail-thread .avatar:focus {
+  text-decoration: none;
 }
 
 .mail-thread .avatar img {
@@ -164,6 +180,10 @@
 	font-size: smaller;
 }
 
+.mail-thread .mail-message-footer a {
+    cursor: pointer;
+}
+
 .mail-thread .mail-message-files {
 	margin: 4px 0 4px -4px;
 }
@@ -211,7 +231,7 @@
     text-overflow: ellipsis;
 }
 
-.mail-followers .panel-title .icons i {
+.mail-followers .panel-icons i {
 	margin-left: 8px;
 	cursor: pointer;
 }
@@ -250,6 +270,10 @@
 
 .mail-message .track-message {
 	font-weight: 600;
+}
+
+.mail-message .track-content {
+	margin-bottom: 8px;
 }
 
 .mail-message .track-fields {

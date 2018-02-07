@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -19,15 +19,16 @@ package com.axelor.common.reflections;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ResourceInfo;
 
@@ -39,9 +40,9 @@ import com.google.common.reflect.ClassPath.ResourceInfo;
 public final class ResourceFinder {
 	
 	private ClassLoader loader;
-	private Set<Pattern> namePatterns = Sets.newLinkedHashSet();
-	private Set<Pattern> pathPatterns = Sets.newLinkedHashSet();
-	
+	private Set<Pattern> namePatterns = new LinkedHashSet<>();
+	private Set<Pattern> pathPatterns = new LinkedHashSet<>();
+
 	ResourceFinder() {
 
 	}
@@ -58,7 +59,7 @@ public final class ResourceFinder {
 	 * @return the same finder
 	 */
 	public ResourceFinder byName(String pattern) {
-		Preconditions.checkNotNull(pattern, "pattern must not be null");
+		Objects.requireNonNull(pattern, "pattern must not be null");
 		namePatterns.add(Pattern.compile(pattern));
 		return this;
 	}
@@ -71,7 +72,7 @@ public final class ResourceFinder {
 	 * @return the same finder
 	 */
 	public ResourceFinder byURL(String pattern) {
-		Preconditions.checkNotNull(pattern, "pattern must not be null");
+		Objects.requireNonNull(pattern, "pattern must not be null");
 		pathPatterns.add(Pattern.compile(pattern));
 		return this;
 	}
@@ -82,7 +83,7 @@ public final class ResourceFinder {
 	 * 
 	 * @return list of URL objects
 	 */
-	public ImmutableList<URL> match() {
+	public List<URL> match() {
 		return find(false);
 	}
 
@@ -92,12 +93,12 @@ public final class ResourceFinder {
 	 * 
 	 * @return list of URL objects
 	 */
-	public ImmutableList<URL> find() {
+	public List<URL> find() {
 		return find(true);
 	}
 	
-	private ImmutableList<URL> find(boolean partial) {
-		ImmutableList.Builder<URL> all = ImmutableList.builder();
+	private List<URL> find(boolean partial) {
+		List<URL> all = new ArrayList<>();
 		for (Pattern namePattern : namePatterns) {
 			for (URL file : getResources(namePattern, loader, partial)) {
 				if (pathPatterns.isEmpty()) {
@@ -113,11 +114,11 @@ public final class ResourceFinder {
 				}
 			}
 		}
-		return all.build();
+		return Collections.unmodifiableList(all);
 	}
 
-	private static ImmutableList<URL> getResources(Pattern pattern, ClassLoader loader, boolean partial) {
-		final ImmutableList.Builder<URL> builder = ImmutableList.builder();
+	private static List<URL> getResources(Pattern pattern, ClassLoader loader, boolean partial) {
+		final List<URL> all = new ArrayList<>();
 		final ClassLoader classLoader = loader == null ? Thread.currentThread().getContextClassLoader() : loader;
 		try {
 			for (ResourceInfo info : ClassPath.from(classLoader).getResources()) {
@@ -127,13 +128,13 @@ public final class ResourceFinder {
 				if (matched) {
 					Enumeration<URL> urls = classLoader.getResources(name);
 					while (urls.hasMoreElements()) {
-						builder.add(urls.nextElement());
+						all.add(urls.nextElement());
 					}
 				}
 			}
 		} catch (IOException e) {
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
-		return builder.build();
+		return Collections.unmodifiableList(all);
 	}
 }

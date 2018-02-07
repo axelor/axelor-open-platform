@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_5.0.xsd">
+
+  <module name="team" package="com.axelor.team.db" />
+
+  <entity name="Team" table="TEAM_TEAM" repository="none">
+    <string name="name" required="true" unique="true" />
+    <string name="description" large="true" />
+    <binary name="image" title="Photo" />
+    <many-to-many name="roles" ref="com.axelor.auth.db.Role" title="Authorized roles" />
+    <many-to-many name="members" ref="com.axelor.auth.db.User" />
+    <one-to-many name="topics" ref="TeamTopic" mappedBy="team" />
+  </entity>
+
+  <entity name="TeamTask" table="TEAM_TASK">
+    <many-to-one name="team" ref="Team" />
+    <string name="name" required="true" />
+    <string name="description" large="true" />
+    <string name="status" selection="team.task.status" />
+    <string name="priority" selection="team.task.priority" />
+    <integer name="sequence" />
+    <date name="taskDate" />
+    <integer name="taskDuration" />
+    <date name="taskDeadline" />
+    <string name="relatedModel" />
+    <string name="relatedName" />
+    <long name="relatedId" />
+    <many-to-one name="assignedTo" ref="com.axelor.auth.db.User" />
+    <string name="attrs" json="true" />
+
+    <track files="true">
+      <field name="name" />
+      <field name="status" />
+      <field name="priority" />
+      <field name="taskDate" />
+      <field name="taskDuration" />
+      <field name="taskDeadline" />
+      <field name="assignedTo" />
+      <message if="true" on="CREATE">Task created</message>
+      <message if="status == 'closed'" on="UPDATE" tag="success" fields="status">Task closed</message>
+      <message if="priority == 'urgent'" on="UPDATE" tag="important" fields="priority">Urgent</message>
+      <content if="true" fields="description">#{description}</content>
+    </track>
+  </entity>
+  
+  <entity name="TeamTopic" table="TEAM_TOPIC">
+    <string name="name" required="true" />
+    <string name="description" large="true" />
+    <boolean name="active" default="true" />
+    <many-to-one name="team" ref="Team" required="true" />
+
+    <track subscribe="true">
+      <field name="name" />
+      <message if="true" on="CREATE">Topic created</message>
+      <message if="!active" on="UPDATE" fields="active">Topic closed</message>
+      <message if="active" on="UPDATE" fields="active">Topic re-opened</message>
+      <content if="true" fields="description">#{description}</content>
+    </track>
+  </entity>
+
+</domain-models>

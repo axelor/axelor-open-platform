@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,6 +17,8 @@
  */
 package com.axelor.script;
 
+import javax.script.Bindings;
+
 /**
  * The DataScriptHelper interface to implement dynamic script evaluation support.
  *
@@ -28,7 +30,7 @@ public interface ScriptHelper {
 	 *
 	 * @return bindings
 	 */
-	ScriptBindings getBindings();
+	Bindings getBindings();
 
 	/**
 	 * Set script bindings.
@@ -36,7 +38,7 @@ public interface ScriptHelper {
 	 * @param bindings
 	 *            new script bindings.
 	 */
-	void setBindings(ScriptBindings bindings);
+	void setBindings(Bindings bindings);
 
 	/**
 	 * Evaluate the given expression.
@@ -46,6 +48,17 @@ public interface ScriptHelper {
 	 * @return expression result
 	 */
 	Object eval(String expr);
+
+	/**
+	 * Evaluate the given expression with the given bindings.
+	 * 
+	 * @param expr
+	 *            the expression to evaluate
+	 * @param bindings
+	 *            the context bindings
+	 * @return expression result
+	 */
+	Object eval(String expr, Bindings bindings) throws Exception;
 
 	/**
 	 * Evaluate a boolean expression.

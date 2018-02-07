@@ -65,7 +65,7 @@ ui.formWidget('Group', {
 			scope.setCollapsed(scope.collapsed);
 		};
 		
-		scope.$watch("attr('collapse')", function(collapsed) {
+		scope.$watch("attr('collapse')", function groupCollapseWatch(collapsed) {
 			scope.setCollapsed(collapsed);
 		});
 		
@@ -75,7 +75,7 @@ ui.formWidget('Group', {
 		}
 
 		if (props.showTitle !== false) {
-			scope.$watch('attr("title")', function(value){
+			scope.$watch('attr("title")', function groupTitleWatch(value){
 				scope.title = value;
 			});
 		}
@@ -141,7 +141,7 @@ ui.formWidget('Dashlet', {
 		scope.dashlet = dashlet;
 		scope.formPath = field.name || field.action;
 
-		scope.$watch('attr("title")', function (title, old) {
+		scope.$watch('attr("title")', function dashletTitleWatch(title, old) {
 			if (title === old) {
 				return;
 			}
@@ -206,7 +206,7 @@ ui.formWidget('Tabs', {
 			
 			setTimeout(function() {
 				if ($scope.$tabs) {
-					$scope.$tabs.trigger('adjust');
+					$scope.$tabs.trigger('adjust:tabs');
 				}
 				axelor.$adjustSize();
 				if(current != selected){
@@ -357,11 +357,11 @@ ui.formWidget('Tab', {
 
 		tabs.addTab(scope);
 		
-		scope.$watch('attr("title")', function(value){
+		scope.$watch('attr("title")', function tabTitleWatch(value){
 			scope.title = value;
 		});
 		
-		scope.$watch("isHidden()", function(hidden, old) {
+		scope.$watch("isHidden()", function tabHiddenWatch(hidden, old) {
 			if (hidden) {
 				return tabs.hideTab(scope.index);
 			}
@@ -385,15 +385,15 @@ ui.formWidget('Tab', {
 ui.formWidget('ButtonGroup', {
 
 	link: function (scope, element, attrs) {
-		function adjust() {
-			var visible = element.children('.btn:visible').size();
+		function adjustButtons() {
+			var visible = element.children('.btn:visible').length;
 			if (visible) {
 				element.children('.btn:visible')
 					.css('max-width', (100.00/visible) + '%')
 					.css('width', (100.00/visible) + '%');
 			}
 		}
-		scope.$watch(adjust);
+		scope.$watch(adjustButtons);
 		scope.$callWhen(function () {
 			return element.is(':visible');
 		}, adjust);
@@ -453,11 +453,11 @@ ui.formWidget('Panel', {
 			scope.setCollapsed(!scope.collapsed);
 		};
 
-		scope.$watch("attr('collapse')", function(collapsed) {
+		scope.$watch("attr('collapse')", function panelCollapseWatch(collapsed) {
 			scope.setCollapsed(collapsed);
 		});
 
-		var nested = element.parents('.panel:first').size() > 0;
+		var nested = element.parents('.panel:first').length > 0;
 		if (nested) {
 			element.addClass("panel-nested");
 		}
@@ -466,9 +466,38 @@ ui.formWidget('Panel', {
 		}
 		scope.notitle = field.showFrame === false || field.showTitle === false;
 		scope.title = field.title;
-		scope.$watch('attr("title")', function (title, old) {
+		scope.$watch('attr("title")', function panelTitleWatch(title, old) {
 			if (title === undefined || title === old) return;
 			scope.title = title;
+		});
+
+		var icon = field.icon;
+		var iconBg = field.iconBackground;
+		
+		if (icon && icon.indexOf('fa-') === 0) {
+			scope.icon = icon;
+		} else if (icon) {
+			scope.image = icon;
+		}
+
+		if (scope.icon && iconBg) {
+			setTimeout(function() {
+				var iconElem = element.children('.panel-header').children('.panel-icon');
+				if (iconBg.indexOf("#") === 0) {
+					iconElem.css('background-color', iconBg);
+				} else {
+					iconElem.addClass('bg-' + iconBg);
+				}
+				iconElem.addClass('has-bg');
+				iconElem.find('i').addClass('fg-white');
+			});
+		}
+		
+		setTimeout(function () {
+			var nestedJson = element.parents('.panel-json:first').length > 0;
+			if (nestedJson) {
+				element.removeClass("panel-nested");
+			}
 		});
 	},
 
@@ -476,11 +505,13 @@ ui.formWidget('Panel', {
 	template:
 		"<div class='panel panel-default'>" +
 			"<div class='panel-header' ng-show='field.title' ng-if='!notitle'>" +
-				"<div ng-show='canCollapse()' class='panel-icons pull-right'>" +
+				"<div class='panel-icon' ng-if='icon'><i class='fa' ng-class='icon'></i></div>" +
+				"<img class='panel-image' ng-if='image' ng-src='{{image}}'>" +
+				"<div class='panel-title'>{{title}}</div>" +
+				"<div ng-if='menus' ui-menu-bar menus='menus' handler='this'></div>" +
+				"<div ng-show='canCollapse()' class='panel-icons'>" +
 					"<a href='' ng-click='toggle()'><i class='fa' ng-class='collapsedIcon'></i></a>" +
 				"</div>" +
-				"<div ng-if='menus' ui-menu-bar menus='menus' handler='this' class='pull-right'></div>" +
-				"<div class='panel-title'>{{title}}</div>" +
 			"</div>" +
 			"<div class='panel-body' ui-transclude></div>" +
 		"</div>"
@@ -683,7 +714,7 @@ ui.formWidget('PanelTabs', {
 			setMenuTitle(null);
 
 			var elem = null;
-			var index = elemTabs.size();
+			var index = elemTabs.length;
 			var selectedIndex = scope.tabs.indexOf(selected);
 
 			while (elemTabs.parent().width() > parentWidth) {
@@ -707,7 +738,7 @@ ui.formWidget('PanelTabs', {
 		}
 
 		var adjusting = false;
-		element.on('adjustSize', _.debounce(function() {
+		scope.$onAdjust(function() {
 			if (adjusting) { return; }
 			try {
 				adjusting = true;
@@ -716,7 +747,7 @@ ui.formWidget('PanelTabs', {
 				adjusting = false;
 				adjustPending = false;
 			}
-		}, 10));
+		}, 10);
 
 		scope.$timeout(function() {
 			setup();
@@ -779,12 +810,12 @@ ui.formWidget('PanelTab', {
 			return !tab.selected || isHidden.call(scope);
 		};
 
-		scope.$watch("attr('title')", function(value) {
+		scope.$watch("attr('title')", function tabTitleWatch(value) {
 			var tab = findTab();
 			tab.title = value;
 		});
 
-		scope.$watch("attr('hidden')", function(hidden, old) {
+		scope.$watch("attr('hidden')", function tabHiddenWatch(hidden, old) {
 			scope.$evalAsync(function () {
 				if (hidden) {
 					return scope.hideTab(index);

@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -23,13 +23,23 @@ import org.junit.Test;
 public class TestClassUtils {
 
 	@Test
-	public void testFindClass() {
-		Class<?> cls = ClassUtils.findClass("com.axelor.common.StringUtils");
-		Assert.assertEquals(cls, StringUtils.class);
+	public void testClassLoaderUtils() {
+		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		Assert.assertEquals(cl, ClassUtils.getContextClassLoader());
+		Assert.assertEquals(cl, ClassUtils.getDefaultClassLoader());
+		try {
+			ClassUtils.setContextClassLoader(cl.getParent());
+			Assert.assertNotEquals(cl, ClassUtils.getContextClassLoader());
+		} finally {
+			ClassUtils.setContextClassLoader(cl);
+		}
 	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testFindClassFail() {
-		ClassUtils.findClass("com.axelor.common.StringUtil");
+	
+	@Test
+	public void testNames() {
+		String resourceName = "com/axelor/common/TestClassUtils.class";
+		String className = "com.axelor.common.TestClassUtils";
+		Assert.assertEquals(resourceName, ClassUtils.classToResourceName(className));
+		Assert.assertEquals(className, ClassUtils.resourceToClassName(resourceName));
 	}
 }

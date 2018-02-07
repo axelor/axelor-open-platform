@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -27,7 +27,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.axelor.common.ClassUtils;
+import com.axelor.common.ResourceUtils;
 
 public class MailBuilderTest extends AbstractMailTest {
 
@@ -100,7 +100,7 @@ public class MailBuilderTest extends AbstractMailTest {
 	@Test
 	public void testAttachment() throws Exception {
 
-		String file = ClassUtils.getResource("log4j.properties").getFile();
+		String file = ResourceUtils.getResource("logback.xml").getFile();
 		String url = "file://" + file;
 
 		Message message = sender.compose()
@@ -108,8 +108,8 @@ public class MailBuilderTest extends AbstractMailTest {
 				.bcc("you@localhost")
 				.subject("Hello...")
 				.text("Hello!!!")
-				.attach("log4j.properties", file)
-				.attach("log4j.properties", url)
+				.attach("logback.xml", file)
+				.attach("logback.xml", url)
 				.build();
 
 		MimeMessage msg = sendAndRecieve(message);

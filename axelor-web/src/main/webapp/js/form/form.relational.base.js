@@ -34,6 +34,10 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		},
 		views = {};
 	
+	if (field.jsonTarget) {
+		params.context = _.extend({}, params.context, { jsonModel: field.jsonTarget });
+	}
+	
 	if (!$element.is('fieldset')) {
 		
 		_.each(field.views, function(view){
@@ -128,14 +132,13 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		
 		var popup = editor.isolateScope();
 		popup.show(record);
-		if (record == null) {
-			popup.ajaxStop(function() {
+		popup._afterPopupShow = function() {
+			if (record == null) {
 				popup.$broadcast("on:new");
-				popup.applyLater();
-			});
-		}
+			}
+		};
 	};
-	
+
 	function _showEditor(record) {
 		
 		if (!$scope._isPopup && field.editWindow === "blank" && record && record.id > 0) {
@@ -272,8 +275,8 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		if (ids.length === 0) {
 			return success(value);
 		}
-		
-		var fields = _.pluck($scope.fields, 'name');
+
+		var fields = $scope.selectFields();
 
 		function doFetch(view) {
 			var domain = "self.id in (:_field_ids)";
@@ -352,7 +355,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 		var domain = this._domain,
 			context = this._context;
 	
-		if (domain && this.getContext) {
+		if (domain !== undefined && this.getContext) {
 			context = _.extend({}, context, this.getContext());
 		}
 
@@ -368,7 +371,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 			limit: limit
 		};
 
-		if (domain) {
+		if (domain !== undefined) {
 			params.domain = domain;
 			params.context = context;
 		}

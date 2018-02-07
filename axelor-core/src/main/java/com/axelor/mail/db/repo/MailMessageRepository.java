@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.db.EntityHelper;
+import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
@@ -79,18 +80,28 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		super(MailMessage.class);
 	}
 
-	public List<MailMessage> findRelated(Model entity, int limit, int offset) {
+	public List<MailMessage> findAll(Model related, int limit, int offset) {
 		return all().filter("self.relatedModel = ? AND self.relatedId = ?",
-				EntityHelper.getEntityClass(entity).getName(),
-				entity.getId())
+				EntityHelper.getEntityClass(related).getName(),
+				related.getId())
 				.order("-createdOn")
 				.fetch(limit, offset);
 	}
 
-	public long countRelated(Model entity) {
+	public long count(Model related) {
 		return all().filter("self.relatedModel = ? AND self.relatedId = ?",
-				EntityHelper.getEntityClass(entity).getName(),
-				entity.getId()).count();
+				EntityHelper.getEntityClass(related).getName(),
+				related.getId()).count();
+	}
+	
+	public Model findRelated(MailMessage message) {
+		if (message.getRelatedId() == null) return null;
+		try {
+			Class<?> klass = Class.forName(message.getRelatedModel());
+			return (Model) JPA.em().find(klass, message.getRelatedId());
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	@Override
@@ -135,12 +146,9 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 	public MailMessage save(MailMessage entity) {
 		if (entity.getParent() == null && entity.getRelatedId() != null) {
 			MailMessage parent = all()
-				.filter("self.parent is null AND "
-						+ "self.type = :type AND "
-						+ "self.relatedId = :id AND self.relatedModel = :model")
+				.filter("self.parent is null AND self.relatedId = :id AND self.relatedModel = :model")
 				.bind("id", entity.getRelatedId())
 				.bind("model", entity.getRelatedModel())
-				.bind("type", MailConstants.MESSAGE_TYPE_NOTIFICATION)
 				.order("id")
 				.cacheable()
 				.autoFlush(false)
@@ -158,10 +166,12 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		entity.setRoot(root);
 
 		// mark root as unread
-		if (root != null && root.getFlags() != null && entity.getFlags() == null) {
-			for (MailFlags rootFlags : root.getFlags()) {
-				rootFlags.setIsRead(false);
-			}
+		if (root != null) {
+			Beans.get(MailFlagsRepository.class).all()
+				.filter("self.message.id = :mid and self.user.id != :uid")
+				.bind("mid", root.getId())
+				.bind("uid", AuthUtils.getUser().getId())
+				.update("isRead", false);
 		}
 
 		boolean isNew = entity.getId() == null;
@@ -336,9 +346,8 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 			details.put("$authorModel", authorModel);
 		}
 
-		String avatar = "img/user.png";
 		if (user != null && user.getImage() != null) {
-			avatar = "ws/rest/" + User.class.getName() + "/" + user.getId() + "/image/download?image=true&v=" + user.getVersion();
+			details.put("$avatar", "ws/rest/" + User.class.getName() + "/" + user.getId() + "/image/download?image=true&v=" + user.getVersion());
 		}
 
 		try {
@@ -346,7 +355,6 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 		} catch (Exception e) {
 		}
 
-		details.put("$avatar", avatar);
 		details.put("$from", Resource.toMap(email, "address", "personal"));
 		details.put("$author", author);
 		details.put("$files", files);

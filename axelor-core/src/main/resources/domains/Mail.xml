@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <domain-models xmlns="http://axelor.com/xml/ns/domain-models"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_4.2.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_5.0.xsd">
 
   <module name="mail" package="com.axelor.mail.db"/>
 
@@ -70,19 +70,6 @@
 
     <!-- follow by email id -->
     <many-to-one name="email" ref="MailAddress" />
-  </entity>
-
-  <entity name="MailGroup" table="MAIL_GROUP" cachable="true" repository="none">
-    <![CDATA[
-    The model to define mail groups to share message in discussion groups.
-    ]]>
-    <string name="name" unique="true" namecolumn="true" />
-    <string name="description" multiline="true" />
-    <binary name="image" title="Photo" />
-    <many-to-many name="groups" ref="com.axelor.auth.db.Group"
-      title="Authorized groups" />
-    <many-to-many name="users" ref="com.axelor.auth.db.User"
-      title="Authorized users" />
   </entity>
 
 </domain-models>

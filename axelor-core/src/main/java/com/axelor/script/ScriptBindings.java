@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -19,6 +19,9 @@ package com.axelor.script;
 
 import static com.axelor.common.StringUtils.isBlank;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -26,12 +29,9 @@ import java.util.Set;
 
 import javax.script.SimpleBindings;
 
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
@@ -75,13 +75,15 @@ public class ScriptBindings extends SimpleBindings {
 		if (variables.isEmpty() || variables instanceof Context) {
 			return variables;
 		}
-		Class<?> klass = null;
 		try {
-			klass = Class.forName((String) variables.get(MODEL_KEY));
-		} catch (NullPointerException | ClassNotFoundException e) {
+			final String klassName = (String) variables.get(MODEL_KEY);
+			if (StringUtils.isBlank(klassName)) {
+				return variables;
+			}
+			return new Context(variables, Class.forName((String) variables.get(MODEL_KEY)));
+		} catch (ClassNotFoundException e) {
 			return variables;
 		}
-		return Context.create(variables, klass);
 	}
 
 	@SuppressWarnings("all")
@@ -96,13 +98,13 @@ public class ScriptBindings extends SimpleBindings {
 		case "__this__":
 			return ((Context) variables).asType(Model.class);
 		case "__parent__":
-			return ((Context) variables).getParentContext();
+			return ((Context) variables).getParent();
 		case "__date__":
-			return new LocalDate();
+			return LocalDate.now();
 		case "__time__":
-			return new LocalDateTime();
+			return LocalDateTime.now();
 		case "__datetime__":
-			return new DateTime();
+			return ZonedDateTime.now();
 		case "__config__":
 			if (configContext == null) {
 				configContext = new ConfigContext();
@@ -189,7 +191,7 @@ public class ScriptBindings extends SimpleBindings {
 	}
 
 	@SuppressWarnings("serial")
-	private static class ConfigContext extends HashMap<String, Object> {
+	static class ConfigContext extends HashMap<String, Object> {
 
 		private static Map<String, String> CONFIG;
 		private Map<String, Object> values = new HashMap<>();

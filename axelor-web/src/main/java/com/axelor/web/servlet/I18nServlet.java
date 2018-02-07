@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -19,6 +19,7 @@ package com.axelor.web.servlet;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
@@ -91,7 +92,7 @@ public class I18nServlet extends HttpServlet {
 			return;
 		}
 
-		out.write(builder.toString().getBytes());
+		out.write(builder.toString().getBytes(Charset.forName("UTF-8")));
 		out.close();
 	}
 }

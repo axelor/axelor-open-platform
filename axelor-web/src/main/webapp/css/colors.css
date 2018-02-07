@@ -24,22 +24,14 @@ header .navbar-inner {
 	box-shadow: none !important;
 }
 
-header .navbar .nav > li > a {
-	color: #676a6c;
-	font-weight: 600;
-}
-
-header .navbar .nav li.dropdown.open > .dropdown-toggle {
-	background-color: #fff;
-}
-
 header .navbar .nav .dropdown-menu {
-	box-shadow: none;
-	border: 1px solid #e7e7e7;
+	border: 1px solid #d3d3d3;
+	border-top: 1px solid #e7e7e7;
 }
 
 header .navbar .nav .dropdown-submenu > .dropdown-menu {
 	margin-left: 0;
+	border-top: 1px solid #d3d3d3;
 }
 
 header .navbar .nav .dropdown-menu > li > a {
@@ -51,22 +43,37 @@ header .navbar .nav .dropdown-submenu > a:after {
 	margin-right: -15px;
 }
 
-header .navbar .nav > li > a:focus,
-header .navbar .nav > li > a:hover,
-header .navbar .nav > li.dropdown.open > a.dropdown-toggle {
-	color: #16a765;
-}
-
-header .navbar .nav .dropdown-menu > li > a:hover,
-header .navbar .nav .dropdown-menu > li > a:focus,
-header .navbar .nav .dropdown-submenu:hover > a,
-header .navbar .nav .dropdown-submenu:focus > a {
-	color: #fff;
-	background-color: #16a765;
-}
-
 header .navbar .nav .dropdown-submenu:hover > a:after {
 	border-left-color: #fff;
+}
+
+header .navbar .nav .fa-bars,
+header .navbar .dropdown-toggle .caret {
+    color: #16a765;
+}
+
+.navbar .nav li.dropdown.open > .dropdown-toggle,
+.navbar .nav li.dropdown.active > .dropdown-toggle,
+.navbar .nav li.dropdown.open.active > .dropdown-toggle {
+    color: #107a4a;
+}
+
+header .navbar .nav > li > a:focus,
+header .navbar .nav > li > a:hover {
+    color: #16a765;
+}
+
+header .navbar .nav .fa-bars:hover,
+header .navbar .nav .fa-bars:focus {
+    color: #107a4a;
+}
+
+header .dropdown-menu > li > a:hover,
+header .dropdown-menu > li > a:focus,
+header .dropdown-submenu:hover > a,
+header .dropdown-submenu:focus > a {
+    color: #fff;
+    background-color: #16a765;
 }
 
 .slick-header-menuitem:hover {
@@ -77,13 +84,13 @@ header .navbar .nav .dropdown-submenu:hover > a:after {
 .ui-datepicker .ui-state-active,
 .ui-datepicker .ui-slider-handle.ui-state-hover {
 	color: #fff !important;
-	background-color: #16a765 !important;
+	background-color: #0275d8 !important;
 	background-image: none !important;
 }
 .ui-datepicker .ui-slider-handle.ui-state-focus,
 .ui-datepicker .ui-slider-handle.ui-state-hover,
 .ui-datepicker .ui-state-highlight {
-	border: 1px solid #16a765 !important
+	border: 1px solid #0275d8 !important
 }
 .ui-menu .ui-menu-item a.ui-state-focus {
 	color: #262626;
@@ -146,10 +153,20 @@ header .navbar .nav .dropdown-submenu:hover > a:after {
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
 	border: 1px solid #e7e7e7;
+	border-top: 3px solid #0275d8;
 	border-bottom: 1px solid transparent;
 	background-color: #fff;
-	border-top: 2px solid #16a765 !important;
-	padding-top: 5px;
+	padding-top: 4px;
+    border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+}
+
+.nav-tabs-main > li:not(.active) > a {
+  border-top-color: #e7e7e7 !important;
+}
+
+.nav-tabs-main > li:not(.active) > a > i.fa {
+  opacity: 0.55;
 }
 
 .nav-tabs-strip {
@@ -218,6 +235,9 @@ input, button, textarea, select, fieldset, pre {
 .tag-select .picker-icons > i.fa {
 	padding-top: 3px;
 }
+.tag-select .label {
+    background-color: #0275d8;
+}
 
 .select-item .picker-icons i.fa-times {
 	font-size: 12px;
@@ -255,3 +275,83 @@ input, button, textarea, select, fieldset, pre {
 .ui-dialog .ui-dialog-titlebar a {
 	color: #222;
 }
+
+/* == v5 == */
+
+.record-toolbar button,
+.record-toolbar .btn {
+  border: 0;
+}
+
+.record-toolbar .button-menu a.btn:hover,
+.record-toolbar .button-menu a.btn:focus {
+  background-color: #eee;  
+}
+
+.tag-select {
+    border-top-width: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    padding-left: 0;
+}
+.tag-select > .picker-icons {
+  right: 0;
+}
+
+.nav-tabs-main > li.active > a.bg-red { border-top-color: #DB2828 !important; }
+.nav-tabs-main > li.active > a.bg-orange { border-top-color: #F2711C !important; }
+.nav-tabs-main > li.active > a.bg-yellow { border-top-color: #FBBD08 !important; }
+.nav-tabs-main > li.active > a.bg-olive { border-top-color: #B5CC18 !important; }
+.nav-tabs-main > li.active > a.bg-green { border-top-color: #21BA45 !important; }
+.nav-tabs-main > li.active > a.bg-teal { border-top-color: #00B5AD !important; }
+.nav-tabs-main > li.active > a.bg-blue { border-top-color: #2185D0 !important; }
+.nav-tabs-main > li.active > a.bg-violet { border-top-color: #6435C9 !important; }
+.nav-tabs-main > li.active > a.bg-purple { border-top-color: #A333C8 !important; }
+.nav-tabs-main > li.active > a.bg-pink { border-top-color: #E03997 !important; }
+.nav-tabs-main > li.active > a.bg-brown { border-top-color: #A5673F !important; }
+.nav-tabs-main > li.active > a.bg-grey { border-top-color: #767676 !important; }
+.nav-tabs-main > li.active > a.bg-black { border-top-color: #1B1C1D !important; }
+.nav-tabs-main > li.active > a.bg-white { border-top-color: #F9FAFB !important; }
+
+.panel .panel-related .panel-header,
+.panel-tabs .panel-related .panel-header,
+.panel .dashboard .dashlet-header,
+.panel-tabs .dashboard .dashlet-header,
+.panel .one2many-item > .navbar .navbar-inner,
+.panel-tabs .one2many-item > .navbar .navbar-inner,
+.panel .many2many-item > .navbar .navbar-inner,
+.panel-tabs .many2many-item > .navbar .navbar-inner {
+  border: 0;
+  padding: 8px 2px;
+}
+
+.panel .one2many-item > .slickgrid,
+.panel-tabs .one2many-item > .slickgrid,
+.panel .many2many-item > .slickgrid,
+.panel-tabs .many2many-item > .slickgrid {
+  top: 34px;
+}
+
+.panel .panel-related,
+.panel-tabs .panel-related,
+.panel .form-item .dashlet,
+.panel-tabs .form-item .dashlet {
+  border: 0;
+  box-shadow: none;
+}
+
+.panel .panel-related .panel-body .slickgrid,
+.panel-tabs .panel-related .panel-body .slickgrid,
+.panel .form-item .dashlet .dashlet-body .portlet-grid .slickgrid,
+.panel-tabs .form-item .dashlet .dashlet-body .portlet-grid .slickgrid {
+  border: 1px solid #ddd;
+  height: calc(100% - 2px);
+}
+
+.panel-related .panel-header .icons-bar > a,
+.one2many-item .navbar .icons-bar > a,
+.many2many-item .navbar .icons-bar > a {
+  margin-left: 16px;
+}
+
+/* == v5 == */

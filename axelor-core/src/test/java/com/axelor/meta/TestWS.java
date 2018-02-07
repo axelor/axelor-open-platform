@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -19,13 +19,14 @@ package com.axelor.meta;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.Period;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.axelor.inject.Beans;
@@ -44,6 +45,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 
+@Ignore
 public class TestWS extends MetaTest {
 	
 	private ActionHandler createHandler(String actions, Map<String, Object> context) {
@@ -73,8 +75,8 @@ public class TestWS extends MetaTest {
 		Action action = MetaStore.getAction("data.import.1");
 		Map<String, Object> context = Maps.newHashMap();
 		
-		DateTime dt = new DateTime();
-		dt = dt.plus(Period.days(20));
+		ZonedDateTime dt = ZonedDateTime.now();
+		dt = dt.plus(Period.ofDays(20));
 		
 		context.put("dt", dt);
 
@@ -92,7 +94,7 @@ public class TestWS extends MetaTest {
 		Map<String, Object> context = Maps.newHashMap();
 		
 		context.put("name", "SO001");
-		context.put("orderDate", new LocalDate());
+		context.put("orderDate", LocalDate.now());
 		context.put("customer", ImmutableMap.of("name", "John Smith"));
 
 		List<Object> items = Lists.newArrayList();

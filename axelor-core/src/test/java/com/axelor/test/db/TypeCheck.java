@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,13 +18,12 @@
 package com.axelor.test.db;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.Digits;
-
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 
 import com.axelor.db.JpaModel;
 
@@ -53,9 +52,9 @@ public class TypeCheck extends JpaModel {
 	
 	private BigDecimal decimalValue2;
 	
-	private DateTime dateTime1;
+	private ZonedDateTime dateTime1;
 	
-	private DateTime dateTime2;
+	private ZonedDateTime dateTime2;
 	
 	private LocalDate localDate1;
 	
@@ -141,19 +140,19 @@ public class TypeCheck extends JpaModel {
 		this.decimalValue2 = decimalValue2;
 	}
 
-	public DateTime getDateTime1() {
+	public ZonedDateTime getDateTime1() {
 		return dateTime1;
 	}
 
-	public void setDateTime1(DateTime dateTime1) {
+	public void setDateTime1(ZonedDateTime dateTime1) {
 		this.dateTime1 = dateTime1;
 	}
 
-	public DateTime getDateTime2() {
+	public ZonedDateTime getDateTime2() {
 		return dateTime2;
 	}
 
-	public void setDateTime2(DateTime dateTime2) {
+	public void setDateTime2(ZonedDateTime dateTime2) {
 		this.dateTime2 = dateTime2;
 	}
 

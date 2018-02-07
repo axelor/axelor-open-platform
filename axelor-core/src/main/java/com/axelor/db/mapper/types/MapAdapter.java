@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -27,11 +27,16 @@ import com.axelor.db.mapper.TypeAdapter;
 
 public class MapAdapter implements TypeAdapter<Map<?, ?>> {
 
+	static boolean isModelMap(Class<?> type, Object value) {
+		return value instanceof Map && Model.class.isAssignableFrom(type) && !Model.class.isInstance(value);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
-	public Model adapt(Object value, Class<?> type, Type genericType, Annotation[] annotations) {
-		if (value instanceof Model)
-			return (Model) value;
-		return Mapper.toBean((Class<Model>) type, (Map<String, Object>) value);
+	public Object adapt(Object value, Class<?> type, Type genericType, Annotation[] annotations) {
+		if (isModelMap(type, value)) {
+			return Mapper.toBean(type.asSubclass(Model.class), (Map<String, Object>) value);
+		}
+		return value;
 	}
 }

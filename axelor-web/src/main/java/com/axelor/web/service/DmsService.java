@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -22,6 +22,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,6 +38,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -49,8 +52,6 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.eclipse.persistence.annotations.Transformation;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.common.ObjectUtils;
@@ -239,18 +240,31 @@ public class DmsService {
 		response.setStatus(Response.STATUS_SUCCESS);
 		return response;
 	}
+	
+	private File findFile(DMSFile file) {
+		if (file == null || file.getMetaFile() == null) {
+			return null;
+		}
+		final File path = MetaFiles.getPath(file.getMetaFile()).toFile();
+		return path.exists() ? path : null;
+	}
+
+	@HEAD
+	@Path("offline/{id}")
+	public javax.ws.rs.core.Response doDownloadCheck(@PathParam("id") long id) {
+		final DMSFile file = repository.find(id);
+		return findFile(file) == null
+			? javax.ws.rs.core.Response.status(Status.NOT_FOUND).build()
+			: javax.ws.rs.core.Response.ok().build();
+	}
 
 	@GET
 	@Path("offline/{id}")
 	public javax.ws.rs.core.Response doDownload(@PathParam("id") long id) {
 
 		final DMSFile file = repository.find(id);
-		if (file == null || file.getMetaFile() == null) {
-			return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
-		}
-
-		final File path = MetaFiles.getPath(file.getMetaFile()).toFile();
-		if (!path.exists()) {
+		final File path = findFile(file);
+		if (path == null) {
 			return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
 		}
 
@@ -288,7 +302,7 @@ public class DmsService {
 		final String batchId = UUID.randomUUID().toString();
 		final Map<String, Object> data = new HashMap<>();
 
-		String batchName = "documents-" + new LocalDate().toString("yyyy-MM-dd") + ".zip";
+		String batchName = "documents-" + LocalDate.now() + ".zip";
 		if (records.size() == 1) {
 			batchName = records.get(0).getFileName();
 		}
@@ -301,11 +315,7 @@ public class DmsService {
 		return javax.ws.rs.core.Response.ok(data).build();
 	}
 
-	@GET
-	@Path("download/{id}")
-	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public javax.ws.rs.core.Response doDownload(@PathParam("id") String batchOrId) {
-
+	private List<?> findBatchIds(String batchOrId) {
 		List<?> ids = (List<?>) httpRequest.getSession().getAttribute(batchOrId);
 		if (ids == null) {
 			Long id = Longs.tryParse(batchOrId);
@@ -313,6 +323,26 @@ public class DmsService {
 		}
 
 		if (ids == null || ids.isEmpty()) {
+			return null;
+		}
+		return ids;
+	}
+	
+	@HEAD
+	@Path("download/{id}")
+	public javax.ws.rs.core.Response doDownloadCheck(@PathParam("id") String batchOrId) {
+		return findBatchIds(batchOrId) == null
+				? javax.ws.rs.core.Response.status(Status.NOT_FOUND).build()
+				: javax.ws.rs.core.Response.ok().build();
+	}
+
+	@GET
+	@Path("download/{id}")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	public javax.ws.rs.core.Response doDownload(@PathParam("id") String batchOrId) {
+
+		final List<?> ids = findBatchIds(batchOrId);
+		if (ids == null) {
 			return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
 		}
 
@@ -345,7 +375,7 @@ public class DmsService {
 			}
 		};
 
-		final String batchName = "documents-" + new LocalDate().toString("yyyy-MM-dd") + ".zip";
+		final String batchName = "documents-" + LocalDate.now() + ".zip";
 		return stream(so, batchName);
 	}
 

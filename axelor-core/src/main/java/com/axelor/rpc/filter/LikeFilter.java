@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -44,9 +44,9 @@ class LikeFilter extends SimpleFilter {
 	@Override
 	public String getQuery() {
 		if (DBHelper.isUnaccentEnabled()) {
-			return String.format("(unaccent(UPPER(self.%s)) %s unaccent(?))", getFieldName(), getOperator());
+			return String.format("(unaccent(UPPER(%s)) %s unaccent(?))", getOperand(), getOperator());
 		}
-		return String.format("(UPPER(self.%s) %s ?)", getFieldName(), getOperator());
+		return String.format("(UPPER(%s) %s ?)", getOperand(), getOperator());
 	}
 
 }

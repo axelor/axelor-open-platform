@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -53,6 +53,23 @@ public class AuthSecurityException extends RuntimeException {
 	
 	@Override
 	public String getMessage() {
-		return type.getMessage();
+		if (model == null || AuthUtils.getUser() == null || !AuthUtils.isTechnicalStaff(AuthUtils.getUser())) {
+			return type.getMessage();
+		}
+		final StringBuilder builder = new StringBuilder(type.getMessage()).append("[").append(model.getName());
+		if (ids.length > 0) {
+			builder.append("#");
+			for (int i = 0, n = Math.min(5, ids.length); i < n; i++) {
+				builder.append(ids[i]);
+				if (i < n - 1) {
+					builder.append(",");
+				}
+			}
+			if (ids.length > 5) {
+				builder.append(",...");
+			}
+		}
+		builder.append("]");
+		return builder.toString();
 	}
 }

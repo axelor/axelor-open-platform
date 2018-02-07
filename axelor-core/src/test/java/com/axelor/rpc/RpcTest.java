@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -22,7 +22,7 @@ import java.io.InputStreamReader;
 import javax.inject.Inject;
 
 import com.axelor.JpaTest;
-import com.axelor.common.ClassUtils;
+import com.axelor.common.ResourceUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 abstract class RpcTest extends JpaTest {
@@ -31,7 +31,7 @@ abstract class RpcTest extends JpaTest {
 	protected ObjectMapper mapper;
 
 	protected InputStreamReader read(String json) {
-		return new InputStreamReader(ClassUtils.getResourceStream("json/" + json));
+		return new InputStreamReader(ResourceUtils.getResourceStream("json/" + json));
 	}
 
 	protected String toJson(Object value) {
@@ -51,7 +51,7 @@ abstract class RpcTest extends JpaTest {
 	}
 	
 	protected <T> T fromJson(String json, Class<T> klass) {
-		if (json.endsWith(".js"))
+		if (json.endsWith(".json"))
 			return fromJson(read(json), klass);
 		try {
 			return mapper.readValue(json, klass);

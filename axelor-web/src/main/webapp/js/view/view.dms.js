@@ -88,7 +88,17 @@ function DMSFileListCtrl($scope, $element) {
 	}
 
 	$scope.$emptyMessage = _t("No documents found.");
-	$scope.$confirmMessage = _t("Are you sure you want to delete selected documents?");
+	$scope.$confirmMessage = function() {
+		var strong = function (text, quote) {
+			return "<strong>" + (quote ? "<em>\"" + text + "\"</em>" : text) + "</strong>";
+		}
+		var all = getSelectedAll();
+		if (all.length === 1 || $scope.currentFolder) {
+			var doc = _.first(all) || $scope.currentFolder;
+			return _t('Are you sure you want to delete {0}?', strong(doc.fileName));
+		}
+		return _t("Are you sure you want to delete the {0} selected documents?", strong(all.length));
+	};
 
 	$scope.currentFilter = null;
 	$scope.currentFolder = null;
@@ -248,13 +258,17 @@ function DMSFileListCtrl($scope, $element) {
 				return $scope.onEditFile(record);
 			}
 			$scope.onEdit();
-			$scope.$apply();
+			$scope.$applyAsync();
 		});
 	};
 
 	function getSelected() {
 		var index = _.first($scope.selection || []);
 		return $scope.dataView.getItem(index);
+	}
+	
+	function getSelectedAll() {
+		return _.map($scope.selection || [], function(i) { return $scope.dataView.getItem(i); });
 	}
 
 	function onNew(options, callback) {
@@ -339,7 +353,7 @@ function DMSFileListCtrl($scope, $element) {
 	};
 
 	$scope.onRename = function () {
-		var record = getSelected();
+		var record = getSelected() || $scope.currentFolder;
 		if (!record || !record.id) {
 			return;
 		}
@@ -356,12 +370,36 @@ function DMSFileListCtrl($scope, $element) {
 		});
 
 		function rename(record, done) {
-			var promise = $scope._dataSource.save(record);
+			var rec = _.pick(record, ['id', 'version', 'fileName']);
+			var promise = $scope._dataSource.save(rec);
 			promise.then(done, done);
-			promise.success(function (record) {
+			promise.success(function (res) {
+				record.version = res.version;
 				$scope.reload();
 			});
 		}
+	};
+	
+	var __onDelete = $scope.onDelete;
+	$scope.onDelete = function () {
+		var record = getSelected();
+		if (record) {
+			return __onDelete.apply($scope, arguments);
+		}
+		record = $scope.currentFolder;
+		if (!record || !record.id) {
+			return;
+		}
+		var message = $scope.$confirmMessage();
+		axelor.dialogs.confirm(message, function(confirmed) {
+			if (!confirmed) {
+				return;
+			}
+			var rec = _.pick(record, ['id', 'version']);
+			$scope._dataSource.removeAll([rec]).success(function() {
+				$scope.onFolder(record.parent);
+			});
+		});
 	};
 
 	$scope.onMoveFiles = function (files, toFolder) {
@@ -387,6 +425,9 @@ function DMSFileListCtrl($scope, $element) {
 
 		var http = $scope._dataSource._http;
 		var records = _.map($scope.selection, function (i) { return $scope.dataView.getItem(i); });
+		if (records.length === 0 && $scope.currentFolder) {
+			records = [$scope.currentFolder];
+		}
 		var ids = _.pluck(_.compact(records), "id");
 		if (ids.length === 0) {
 			return;
@@ -561,7 +602,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 		function onDragOver(e) {
 			if (dndInternal) return;
 			clearClassName(true);
-			if (element.is(e.target) || element.has(e.target).size()) {
+			if (element.is(e.target) || element.has(e.target).length) {
 				element.addClass(dndDropClass);
 			} else {
 				clearClassName();
@@ -754,7 +795,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 
 				// continue with next chunk
 				sendChunk();
-				scope.applyLater();
+				scope.$applyAsync();
 			}
 
 			function sendChunk() {
@@ -804,7 +845,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 				info.progress = done > 95 ? "95%" : done + "%";
 				info.transfer = formatSize(total, file.size);
 				info.loaded = total === file.size;
-				scope.applyLater();
+				scope.$applyAsync();
 			});
 
 			xhr.onreadystatechange = function(e) {
@@ -820,7 +861,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 					default:
 						onError();
 					}
-					scope.applyLater();
+					scope.$applyAsync();
 				}
 			};
 
@@ -830,7 +871,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 		}
 
 		input.change(function() {
-			scope.applyLater(function () {
+			scope.$applyAsync(function () {
 				doUpload(input.get(0).files);
 				input.val(null);
 			});
@@ -952,7 +993,7 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 	$scope.onFolderClick = function (node) {
 		if (!node || !node.id || node.home) {
 			$scope.onFolder();
-			$scope.applyLater();
+			$scope.$applyAsync();
 			return;
 		}
 		var paths = [];
@@ -962,7 +1003,7 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 			parent = parent.parent;
 		}
 		$scope.onFolder(node, paths);
-		$scope.applyLater();
+		$scope.$applyAsync();
 	};
 }
 
@@ -1034,7 +1075,7 @@ ui.directive("uiDmsFolders", function () {
 				});
 			});
 
-			scope.$watch("currentFolder", function (folder) {
+			scope.$watch("currentFolder", function dmsCurrentFolderWatch(folder) {
 				var folders = scope.folders || {};
 				var rootFolders = scope.rootFolders || [];
 				var id, node;
@@ -1166,6 +1207,14 @@ ui.directive("uiDmsDetails", function () {
 	return {
 		controller: ["$scope", function ($scope) {
 
+			function getUserName(record) {
+				if(!record) {
+					return null;
+				}
+				var key = axelor.config["user.nameField"] || "name";
+				return record[key] || record.name || record.code;
+			}
+
 			function set(record) {
 				var info = $scope.details = {};
 				if (record) {
@@ -1174,7 +1223,7 @@ ui.directive("uiDmsDetails", function () {
 					info.name = record.fileName;
 					info.type = record.fileType || _t("Unknown");
 					info.tags = record.tags;
-					info.owner = (record.createdBy||{}).name;
+					info.owner = getUserName(record.createdBy);
 					info.created = moment(record.createdOn).format('DD/MM/YYYY HH:mm');
 					info.updated = moment(record.updatedOn || record.createdOn).format('DD/MM/YYYY HH:mm');
 					info.canOffline = !record.isDirectory && (record.metaFile || record['metaFile.id']);
@@ -1213,7 +1262,7 @@ ui.directive("uiDmsDetails", function () {
 				ds.save(record).success(doClose);
 			};
 
-			$scope.$watch("selection[0]", function (index) {
+			$scope.$watch("selection[0]", function dmsSelectionWatch(index) {
 				if (index === undefined || !$scope.showDetails) return;
 				var details = $scope.details || {};
 				var record = $scope.dataView.getItem(index) || {};
@@ -1224,7 +1273,7 @@ ui.directive("uiDmsDetails", function () {
 		}],
 		link: function (scope, element, attrs) {
 			//XXX: ui-dialog issue
-			element.zIndex(element.siblings(".slickgrid").zIndex() + 1);
+			element.zIndex(element.siblings(".slickgrid").zIndex() + 2);
 		}
 	};
 });
@@ -1243,12 +1292,20 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 			var form = null;
 
 			scope.permissionFormName = "dms-file-permission-form";
-			scope.permissionFormTitle = _t("Permissions");
+
+			Object.defineProperty(scope, 'permissionFormTitle', {
+				get: function () {
+					return scope.fileName ? _t("Permissions ({0})", scope.fileName) : _t("Permissions");
+				}
+			});
+
+			function getSelected() {
+				var index = _.first(scope.selection || []);
+				return scope.dataView.getItem(index) || scope.currentFolder;
+			}
 
 			scope.canShare = function () {
-				if (!scope.selection || scope.selection.length === 0) return false;
-				var selected = _.first(scope.selection);
-				var record = scope.dataView.getItem(selected);
+				var record = getSelected();
 				return record && record.canShare;
 			};
 
@@ -1264,16 +1321,17 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 					form.width("100%");
 				}
 
-				var selected = _.first(scope.selection);
-				var record = scope.dataView.getItem(selected);
-
+				var record = getSelected();
 				var formScope = form.isolateScope();
+
+				scope.fileName = record.fileName;
 
 				formScope.doRead(record.id).success(function (rec) {
 					formScope.edit(rec);
 					formScope.setEditable(true);
 					setTimeout(function () {
 						element.dialog("option", "height", 320);
+						element.dialog("option", "title", scope.permissionFormTitle);
 						element.dialog("open");
 					});
 				});
@@ -1303,6 +1361,7 @@ ui.directive("uiDmsMembersPopup", ["$compile", function ($compile) {
 				function doClose() {
 					element.dialog("close");
 					formScope.edit(null);
+					scope.fileName = null;
 				}
 
 				var promise = null;
@@ -1465,6 +1524,7 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 
 				promise.success(function (records) {
 					record.$attachments = _.size(records);
+					forScope.$broadcast('on:load-messages', record);
 				});
 
 				return promise.then(done, done);
@@ -1491,7 +1551,7 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 		link: function (scope, element, attrs) {
 
 			scope._onSelectFiles = function (items) {
-				scope.applyLater(function () {
+				scope.$applyAsync(function () {
 					var promise = scope.onSelect()(items);
 					if (promise && promise.then) {
 						promise.then(function () {
@@ -1503,27 +1563,9 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 				});
 			};
 			
-			function adjustSize() {
-				var height = $(window).height() - 16;
-				height = Math.min(480, height);
-				element.dialog('option', 'height', height);
-			}
-
-			setTimeout(function () {
-				var elemDialog = element.parent();
-				var elemTitle = elemDialog.find('.ui-dialog-title');
-				$('<a href="#" class="ui-dialog-titlebar-max"><i class="fa fa-expand"></i></a>').click(function (e) {
-					$(this).children('i').toggleClass('fa-expand fa-compress');
-					elemDialog.toggleClass('maximized');
-					axelor.$adjustSize();
-					return false;
-				}).insertAfter(elemTitle);
-
-				elemTitle.html(_t('Attachments'));
-				adjustSize();
+			scope.$evalAsync(function () {
+				scope._setTitle(_t('Attachments'));
 			});
-			
-			element.on("adjustSize", _.debounce(adjustSize));
 
 			scope.onHotKey = function (e, action) {
 				var elem = element.find(".grid-view:first");
@@ -1554,13 +1596,11 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 					var content = "<div ng-include='\"partials/views/dms-file-list.html\"'></div>";
 					content = $compile(content)(scope);
 					content.appendTo(element);
+					scope._doShow();
 					setTimeout(function () {
-						element.dialog("open");
-						setTimeout(function () {
-							//XXX: ui-dialog issue
-							element.find('.filter-box').zIndex(element.zIndex() + 1);
-						});
-					});
+						//XXX: ui-dialog issue
+						element.find('.filter-box').zIndex(element.zIndex() + 1);
+					}, 100);
 				}
 
 				if (!formScope) {
@@ -1575,37 +1615,51 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 
 		},
 		replace: true,
-		template: "<div ui-dialog x-buttons='buttons' x-on-ok='false' x-on-close='onClose' class='dms-popup' title='Attachments'></div>"
+		template: "<div ui-dialog ui-dialog-size x-buttons='buttons' x-on-ok='false' x-on-close='onClose' class='dms-popup' title='Attachments'></div>"
 	};
 }]);
 
-ui.download =	function download(url, fileName) {
+ui.download = function download(url, fileName) {
 
-	var link = document.createElement('a');
+	function doDownload() {
+		var link = document.createElement('a');
 
-	link.innerHTML = fileName;
-	link.download = fileName;
-	link.href = url;
+		link.innerHTML = fileName;
+		link.download = fileName;
+		link.href = url;
 
-	_.extend(link.style, {
-		position: "absolute",
-		visibility: "hidden",
-		zIndex: 1000000000
-	});
+		_.extend(link.style, {
+			position: "absolute",
+			visibility: "hidden",
+			zIndex: 1000000000
+		});
 
-	document.body.appendChild(link);
+		document.body.appendChild(link);
 
-	link.onclick = function(e) {
+		link.onclick = function(e) {
+			setTimeout(function () {
+				document.body.removeChild(e.target);
+			}, 300);
+		};
+
 		setTimeout(function () {
-			document.body.removeChild(e.target);
-		}, 300);
-	};
+			link.click();
+		}, 100);
 
-	setTimeout(function () {
-		link.click();
-	}, 100);
+		axelor.notify.info(_t("Downloading {0}...", fileName));
+	}
 
-	axelor.notify.info(_t("Downloading {0}...", fileName));
+	$.ajax({
+		url : url,
+		type : 'HEAD',
+		success : doDownload,
+		error : function (e) {
+			if (e.status == 404) {
+				var name = "<strong>" + fileName + "</strong>";
+				axelor.notify.error("<p>" + _t("File {0} does not exist.", name) + "</p>");
+			}
+		}
+	});
 };
 
 // prevent download on droping files

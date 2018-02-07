@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,17 +17,24 @@
  */
 package com.axelor.data.xml;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.jxpath.JXPathContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.axelor.data.AuditHelper;
 import com.axelor.data.adapter.DataAdapter;
@@ -312,7 +319,26 @@ public abstract class XMLBinder {
 		return adapter.adapt(value, ctx);
 	}
 
+	private XPath xpath = null;
+
 	@SuppressWarnings("unchecked")
+	private List<Node> selectNodes(Node node, String path) throws XPathExpressionException {
+		// if referencing parents use jdk xpath, see RM-6911
+		if (path.contains("../")) {
+			if (xpath == null) {
+				xpath = XPathFactory.newInstance().newXPath();
+			}
+			final XPathExpression expression = xpath.compile(path);
+			final List<Node> nodes = new ArrayList<>();
+			final NodeList items = (NodeList) expression.evaluate(node, XPathConstants.NODESET);
+			for (int i = 0; i < items.getLength(); i++) {
+				nodes.add(items.item(i));
+			}
+			return nodes;
+		}
+		return JXPathContext.newContext(node).selectNodes(path);
+	}
+
 	private List<Node> find(Node node, XMLBind bind, String prefix) {
 		List<Node> nodes = Lists.newArrayList();
 		String name = bind.getNode();
@@ -331,8 +357,7 @@ public abstract class XMLBinder {
 
 		try {
 			LOG.trace("xpath: " + path);
-			JXPathContext context = JXPathContext.newContext(node);
-			nodes = context.selectNodes(path);
+			nodes = selectNodes(node, path);
 			LOG.trace("xpath match: " + nodes.size());
 		} catch (Exception e) {
 			LOG.error("Invalid xpath expression: {}", path);

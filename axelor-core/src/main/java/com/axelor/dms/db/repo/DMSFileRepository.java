@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,7 +18,10 @@
 package com.axelor.dms.db.repo;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,28 +29,32 @@ import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 
 import org.apache.shiro.authz.UnauthorizedException;
-import org.joda.time.LocalDateTime;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
-import com.axelor.common.ClassUtils;
 import com.axelor.common.Inflector;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Model;
+import com.axelor.db.annotations.Track;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.dms.db.DMSFile;
 import com.axelor.dms.db.DMSFileTag;
 import com.axelor.dms.db.DMSPermission;
 import com.axelor.i18n.I18n;
+import com.axelor.inject.Beans;
+import com.axelor.mail.db.MailMessage;
+import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.rpc.Resource;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.primitives.Longs;
@@ -79,12 +86,50 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 		}
 		Class<? extends Model> klass = null;
 		try {
-			klass = (Class) ClassUtils.findClass(file.getRelatedModel());
+			klass = (Class) Class.forName(file.getRelatedModel());
 		} catch (Exception e) {
 			return null;
 		}
 		final Model entity = JpaRepository.of(klass).find(file.getRelatedId());
 		return EntityHelper.getEntity(entity);
+	}
+
+	private void createMessage(DMSFile file, boolean delete) {
+		final Model related = findRelated(file);
+		if (related == null || related.getId() == null || file.getMetaFile() == null) {
+			return;
+		}
+		final Class<?> klass = EntityHelper.getEntityClass(related);
+		final Track track = klass.getAnnotation(Track.class);
+		if (track == null || !track.files()) {
+			return;
+		}
+		final ObjectMapper objectMapper = Beans.get(ObjectMapper.class);
+		final MailMessageRepository messages = Beans.get(MailMessageRepository.class);
+		final MailMessage message = new MailMessage();
+		
+		message.setRelatedId(related.getId());
+		message.setRelatedModel(klass.getName());
+		message.setAuthor(AuthUtils.getUser());
+
+		message.setSubject(delete
+				? I18n.get("File removed")
+				: I18n.get("File added"));
+		
+		final Map<String, Object> json = new HashMap<>();
+		final Map<String, Object> attrs = new HashMap<>();
+		
+		attrs.put("id", file.getMetaFile().getId());
+		attrs.put("fileName", file.getFileName());
+		attrs.put("fileIcon", metaFiles.fileTypeIcon(file.getMetaFile()));
+
+		json.put("files", Arrays.asList(attrs));
+		try {
+			message.setBody(objectMapper.writeValueAsString(json));
+		} catch (JsonProcessingException e) {
+		}
+
+		messages.save(message);
 	}
 
 	@Override
@@ -104,7 +149,6 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 							related.getClass().getName())
 					.fetchOne();
 			if (attachmentOld != null) {
-				System.err.println("OLD: " + attachmentOld);
 				attachments.remove(attachmentOld);
 			}
 
@@ -118,8 +162,11 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 				attachment = metaFiles.attach(entity.getMetaFile(), related);
 				attachments.save(attachment);
 			}
-		}
 
+			// generate track message
+			createMessage(entity, false);
+		}
+		
 		// if not an attachment or has parent, do nothing
 		if (parent != null || related == null) {
 			return super.save(entity);
@@ -197,6 +244,9 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 						.filter("self.metaFile = ?", metaFile)
 						.fetchOne();
 				attachments.remove(attachment);
+
+				// generate track message
+				createMessage(entity, true);
 			}
 			count = all()
 					.filter("self.metaFile = ?", metaFile)

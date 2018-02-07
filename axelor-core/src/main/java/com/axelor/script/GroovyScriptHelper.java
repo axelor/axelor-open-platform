@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,22 +17,27 @@
  */
 package com.axelor.script;
 
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+
+import javax.persistence.EntityManager;
+import javax.script.Bindings;
+
+import org.codehaus.groovy.control.CompilerConfiguration;
+import org.codehaus.groovy.control.customizers.ImportCustomizer;
+
+import com.axelor.db.JPA;
+import com.axelor.db.JpaRepository;
+import com.axelor.db.JpaScanner;
+import com.axelor.rpc.Context;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 import groovy.lang.Binding;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.MissingPropertyException;
 import groovy.lang.Script;
-
-import java.util.concurrent.TimeUnit;
-
-import org.codehaus.groovy.control.CompilerConfiguration;
-import org.codehaus.groovy.control.customizers.ImportCustomizer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.axelor.db.JpaScanner;
-import com.axelor.rpc.Context;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 
 public class GroovyScriptHelper extends AbstractScriptHelper {
 
@@ -45,9 +50,17 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 	private static int cacheExpireTime;
 
 	private static final GroovyClassLoader GCL;
-	private static final Cache<String, Class<?>> SCRIPT_CACHE;
+	private static final LoadingCache<String, Class<?>> SCRIPT_CACHE;
 
-	private static Logger log = LoggerFactory.getLogger(GroovyScriptHelper.class);
+	public static class Helpers {
+
+		@SuppressWarnings("unchecked")
+		public static <T> T doInJPA(Function<EntityManager, T> task) {
+			final Object[] result = { null };
+			JPA.runInTransaction(() -> result[0] = task.apply(JPA.em()));
+			return (T) result[0];
+		}
+	}
 
 	static {
 		config.getOptimizationOptions().put("indy", Boolean.TRUE);
@@ -55,12 +68,13 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 
 		final ImportCustomizer importCustomizer = new ImportCustomizer();
 
-		importCustomizer.addImport("__repo__", "com.axelor.db.JpaRepository");
+		importCustomizer.addStaticImport("__repo__", JpaRepository.class.getName(), "of");
+		importCustomizer.addStaticImport(Helpers.class.getName(), "doInJPA");
 
-		importCustomizer.addImports("org.joda.time.DateTime");
-		importCustomizer.addImports("org.joda.time.LocalDateTime");
-		importCustomizer.addImports("org.joda.time.LocalDate");
-		importCustomizer.addImports("org.joda.time.LocalTime");
+		importCustomizer.addImports("java.time.ZonedDateTime");
+		importCustomizer.addImports("java.time.LocalDateTime");
+		importCustomizer.addImports("java.time.LocalDate");
+		importCustomizer.addImports("java.time.LocalTime");
 
 		config.addCompilationCustomizers(importCustomizer);
 
@@ -80,15 +94,25 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 			cacheExpireTime = DEFAULT_CACHE_EXPIRE_TIME;
 		}
 
+		GCL = new GroovyClassLoader(JpaScanner.getClassLoader(), config);
+
 		SCRIPT_CACHE = CacheBuilder.newBuilder()
 				.maximumSize(cacheSize)
 				.expireAfterAccess(cacheExpireTime, TimeUnit.MINUTES)
-				.build();
+				.build(new CacheLoader<String, Class<?>>() {
 
-		GCL = new GroovyClassLoader(JpaScanner.getClassLoader(), config);
+					@Override
+					public Class<?> load(String code) throws Exception {
+						try {
+							return GCL.parseClass(code);
+						} finally {
+							GCL.clearCache();
+						}
+					}
+				});
 	}
 
-	public GroovyScriptHelper(ScriptBindings bindings) {
+	public GroovyScriptHelper(Bindings bindings) {
 		this.setBindings(bindings);
 	}
 
@@ -96,52 +120,21 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 		this(new ScriptBindings(context));
 	}
 
-	private Class<?> parseClass(String code) {
-
-		Class<?> klass = SCRIPT_CACHE.getIfPresent(code);
-		if (klass != null) {
-			return klass;
-		}
-
-		try {
-			klass = GCL.parseClass(code);
-		} finally {
-			GCL.clearCache();
-		}
-
-		SCRIPT_CACHE.put(code, klass);
-
-		return klass;
-	}
-
 	@Override
-	public Object eval(String expr) {
-		try {
-			Class<?> klass = parseClass(expr);
-			Script script = (Script) klass.newInstance();
-			script.setBinding(new Binding(getBindings()) {
+	public Object eval(String expr, Bindings bindings) throws Exception {
+		Class<?> klass = SCRIPT_CACHE.get(expr);
+		Script script = (Script) klass.newInstance();
+		script.setBinding(new Binding(bindings) {
 
-				@Override
-				public Object getVariable(String name) {
-					try {
-						return super.getVariable(name);
-					} catch (MissingPropertyException e) {
-					}
-					return null;
+			@Override
+			public Object getVariable(String name) {
+				try {
+					return super.getVariable(name);
+				} catch (MissingPropertyException e) {
 				}
-			});
-			return script.run();
-		} catch (Exception e) {
-			log.error("Script error: {}", expr, e);
-		}
-		return null;
-	}
-
-	@Override
-	protected Object doCall(Object obj, String methodCall) {
-		ScriptBindings bindings = new ScriptBindings(getBindings());
-		GroovyScriptHelper sh = new GroovyScriptHelper(bindings);
-		bindings.put("__obj__", obj);
-		return sh.eval("__obj__." + methodCall);
+				return null;
+			}
+		});
+		return script.run();
 	}
 }

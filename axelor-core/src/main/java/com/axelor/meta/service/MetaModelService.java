@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -75,6 +75,7 @@ public class MetaModelService {
 	
 	@Transactional
 	public void process(Class<?> klass){
+		if (Modifier.isAbstract(klass.getModifiers())) return;
 		final MetaModel entity;
 		if (models.all().filter("self.fullName = ?1", klass.getName()).count() == 0){
 			entity = this.createEntity(klass);
@@ -127,7 +128,7 @@ public class MetaModelService {
 		
 		for (Property property :mapper.getProperties()) {
 			if (fields.all().filter("self.metaModel = ?1 AND self.name = ?2", metaModel, property.getName()).count() == 0){
-				metaModel.getMetaFields().add(createField(metaModel, getField(klass, property.getName())));
+				metaModel.getMetaFields().add(createField(metaModel, getField(klass, property.getName()), property));
 			}
 		}
 		
@@ -140,13 +141,15 @@ public class MetaModelService {
 	 * @param metaModel
 	 * 		MetaModel attachment. 
 	 * @param field
-	 * 		Field to load. 
-	 * 
+	 * 		Field to load.
+	 * @param property
+	 * 		The property
+	 *
 	 * @return
 	 * @see MetaModel
 	 * @see MetaField
 	 */
-	private MetaField createField(MetaModel metaModel, Field field){
+	private MetaField createField(MetaModel metaModel, Field field, Property property){
 		
 		MetaField metaField = null;
 		
@@ -159,11 +162,16 @@ public class MetaModelService {
 			metaField.setMetaModel(metaModel);
 			metaField.setName(field.getName());
 			metaField.setTypeName(field.getType().getSimpleName());
+			metaField.setJson(property.isJson());
 			
 			if (field.getType().getPackage() != null){
 				metaField.setPackageName(field.getType().getPackage().getName());
 			}
 			
+			if (field.getType().isEnum()) {
+				metaField.setTypeName(field.getType().getSimpleName());
+			}
+
 			if (field.isAnnotationPresent(Widget.class)){
 				metaField.setLabel(field.getAnnotation(Widget.class).title());
 				metaField.setDescription(field.getAnnotation(Widget.class).help());
@@ -214,7 +222,7 @@ public class MetaModelService {
 		Mapper mapper = Mapper.of(klass);
 		
 		for (Property property :mapper.getProperties()) {
-			MetaField metaField = this.createField(metaModel, getField(klass, property.getName()));
+			MetaField metaField = this.createField(metaModel, getField(klass, property.getName()), property);
 			if (metaField != null) {
 				modelFields.add(metaField);
 			}

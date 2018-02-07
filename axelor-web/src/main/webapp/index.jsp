@@ -2,7 +2,7 @@
 
     Axelor Business Solutions
 
-    Copyright (C) 2012-2014 Axelor (<http://axelor.com>).
+    Copyright (C) 2012-2016 Axelor (<http://axelor.com>).
 
     This program is free software: you can redistribute it and/or  modify
     it under the terms of the GNU Affero General Public License, version 3,
@@ -22,8 +22,11 @@
 <%@ taglib prefix="x" uri="WEB-INF/axelor.tld" %>
 <%@ page import="com.axelor.app.AppSettings" %>
 <%@ page import="com.axelor.web.internal.AppInfo" %>
-<%@ page import="java.util.Map" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
 <%@ page import="java.util.Locale"%>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.stream.Collectors" %>
 <%
 AppSettings settings = AppSettings.get();
 AppInfo info = new AppInfo();
@@ -55,6 +58,10 @@ if (pageContext.getServletContext().getResource(extraFoot) == null) {
 if (pageContext.getServletContext().getResource(extraButtons) == null) {
 	extraButtons = null;
 }
+
+@SuppressWarnings("all")
+Map<String, String> tenantMap = (Map) session.getAttribute("tenantMap");
+String tenantId = (String) session.getAttribute("tenantId");
 
 %>
 <!DOCTYPE html>
@@ -109,18 +116,20 @@ if (pageContext.getServletContext().getResource(extraButtons) == null) {
                 <a href="#/" class="nav-link-home"><i class="fa fa-home"></i></a>
               </li>
               <li class="divider-vertical"></li>
-              <li>
-                <a href="" class="nav-link-mail"
-                  ng-click="showMailBox()"><i class="fa fa-envelope"></i><sup
-                    ng-show="unreadCount=$unreadMailCount()">{{unreadCount}}</sup></a>
-              </li>
-              <li class="divider-vertical"></li>
               <li class="dropdown">
                 <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown">
                   <i class="fa fa-star"></i>
                 </a>
                 <ul class="dropdown-menu" nav-menu-fav></ul>
               </li>
+              <li class="divider-vertical"></li>
+              <li>
+                <a href="" class="nav-link-mail"
+                  ng-click="showMailBox()"><i class="fa fa-envelope"></i><sup
+                    ng-show="unreadCount=$unreadMailCount()">{{unreadCount}}</sup></a>
+              </li>
+              <li class="divider-vertical"></li>
+              <li nav-menu-tasks></li>
               <li class="divider-vertical"></li>
               <li class="dropdown">
                 <a href="javascript:" class="dropdown-toggle nav-link-user" data-toggle="dropdown">
@@ -133,6 +142,22 @@ if (pageContext.getServletContext().getResource(extraButtons) == null) {
                       <span class="nav-link-user-sub" x-translate>Preferences</span>
                     </a>
                   </li>
+                  <% if (tenantMap != null && tenantMap.size() > 1) { %>
+                  <li class="divider"></li>
+	              <li>
+	                <a href=""><strong><%= tenantMap.get(tenantId) %></strong></a>
+	              </li>
+                  <li class="dropdown-submenu">
+                  	<a tabIndex="-1" href="" x-translate>More...</a>
+                  	<ul class="dropdown-menu">
+                  	<% for (String key : tenantMap.keySet()) { %>
+                  	<% if (!key.equals(tenantId)) { %>
+                  	  <li><a href="login.jsp?tenant=<%= key %>"><%= tenantMap.get(key) %></a></li>
+                  	<% } %>
+                  	<% } %>
+                  	</ul>
+                  </li>
+                  <% } %>
                   <li class="divider"></li>
                   <li><a href="#/about"><span x-translate>About</span></a></li>
                   <li><a href="logout"><span x-translate>Log out</span></a></li>

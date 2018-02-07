@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,6 +17,8 @@
  */
 package com.axelor.script;
 
+import javax.script.Bindings;
+
 import com.axelor.common.StringUtils;
 import com.axelor.rpc.Context;
 
@@ -25,7 +27,7 @@ public class CompositeScriptHelper extends AbstractScriptHelper {
 	private GroovyScriptHelper gsh;
 	private ELScriptHelper esh;
 
-	public CompositeScriptHelper(ScriptBindings bindings) {
+	public CompositeScriptHelper(Bindings bindings) {
 		this.setBindings(bindings);
 	}
 
@@ -72,10 +74,9 @@ public class CompositeScriptHelper extends AbstractScriptHelper {
 	}
 
 	@Override
-	public Object eval(String expr) {
-		if (isEL(expr)) {
-			return getESH().eval(strip(expr));
-		}
-		return getGSH().eval(expr);
+	public Object eval(String expr, Bindings bindings) throws Exception {
+		return isEL(expr)
+				? getESH().eval(strip(expr), bindings)
+				: getGSH().eval(expr, bindings);
 	}
 }

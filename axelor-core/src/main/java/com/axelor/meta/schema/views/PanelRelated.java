@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,17 +17,21 @@
  */
 package com.axelor.meta.schema.views;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.common.ClassUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.meta.MetaStore;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
@@ -48,6 +52,9 @@ public class PanelRelated extends AbstractPanel {
 
 	@XmlAttribute(name = "x-search-limit")
 	private Integer searchLimit;
+
+	@XmlAttribute(name = "x-row-height")
+	private Integer rowHeight;
 
 	@XmlAttribute
 	private Boolean editable;
@@ -157,6 +164,14 @@ public class PanelRelated extends AbstractPanel {
 
 	public void setSearchLimit(Integer searchLimit) {
 		this.searchLimit = searchLimit;
+	}
+
+	public Integer getRowHeight() {
+		return rowHeight;
+	}
+	
+	public void setRowHeight(Integer rowHeight) {
+		this.rowHeight = rowHeight;
 	}
 
 	public String getOrderBy() {
@@ -321,8 +336,42 @@ public class PanelRelated extends AbstractPanel {
 
 	public Map<String, Object> getPerms() {
 		try {
-			return MetaStore.getPermissions(ClassUtils.findClass(getTarget()));
+			return MetaStore.getPermissions(Class.forName(getTarget()));
 		} catch (Exception e) {}
 		return null;
+	}
+	
+	@JsonGetter("fields")
+	public List<Object> getTargetFields() {
+		if (getItems() == null || getItems().isEmpty()) {
+			return null;
+		}
+
+		Class<?> target;
+		try {
+			target = Class.forName(getTarget());
+		} catch (Exception e) {
+			try {
+				target = Mapper.of(Class.forName(getModel())).getProperty(getName()).getTarget();
+			} catch (Exception ex) {
+				return null;
+			}
+		}
+		if (target == null) {
+			return null;
+		}
+		
+		List<Object> targetFields = new ArrayList<>();
+		List<String> names = getItems()
+				.stream()
+				.filter(x -> x instanceof SimpleWidget)
+				.map(x -> ((SimpleWidget) x).getName())
+				.filter(n -> !StringUtils.isBlank(n))
+				.collect(Collectors.toList());
+
+		final Map<String, Object> fields = MetaStore.findFields(target, names);
+		targetFields.addAll((Collection<?>)fields.get("fields"));
+
+		return targetFields;
 	}
 }

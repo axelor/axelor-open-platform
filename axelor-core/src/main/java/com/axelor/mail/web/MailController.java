@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -31,77 +31,90 @@ import com.axelor.db.JpaSupport;
 import com.axelor.db.Model;
 import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailFlags;
-import com.axelor.mail.db.MailGroup;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.db.repo.MailFlagsRepository;
 import com.axelor.mail.db.repo.MailFollowerRepository;
-import com.axelor.mail.db.repo.MailGroupRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.Response;
+import com.axelor.team.db.Team;
+import com.axelor.team.db.repo.TeamRepository;
 
 public class MailController extends JpaSupport {
 	
 	private static final String SQL_UNREAD = ""
-			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
-			+ "WHERE (m.parent IS NULL) AND "
-			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
-			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "((g IS NULL) OR (g.user.id != :uid) OR (g.user.id = :uid AND g.isRead = false)) "
-			+ "ORDER BY m.createdOn DESC";
+			+ "SELECT mm FROM MailMessage mm "
+			+ "LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel "
+			+ "LEFT JOIN MailFlags g ON g.user = f.user AND g.message = mm.id "
+			+ "WHERE"
+			+ " (mm.parent IS NULL) AND "
+			+ " (f.user.id = :uid AND f.archived = false) AND"
+			+ " (g.isRead IS NULL OR g.isRead = false) "
+			+ "ORDER BY mm.createdOn DESC";
 
 	private static final String SQL_SUBSCRIBERS = ""
-			+ "SELECT DISTINCT(u) FROM User u LEFT JOIN u.group g WHERE "
+			+ "SELECT DISTINCT(u) FROM User u "
+			+ "LEFT JOIN u.group g "
+			+ "LEFT JOIN u.roles r "
+			+ "LEFT JOIN g.roles gr "
+			+ "WHERE "
 			+ "(u.id NOT IN (SELECT fu.id FROM MailFollower f LEFT JOIN f.user fu WHERE f.relatedId = :id AND f.relatedModel = :model)) AND "
-			+ "((u.id IN (SELECT mu.id FROM MailGroup m LEFT JOIN m.users mu WHERE m.id = :id)) OR "
-			+ "	(g.id IN (SELECT mg.id FROM MailGroup m LEFT JOIN m.groups mg WHERE m.id = :id)))";
+			+ "((u.id IN (SELECT mu.id FROM Team m LEFT JOIN m.members mu WHERE m.id = :id)) OR "
+			+ "	(r.id IN (SELECT mr.id FROM Team m LEFT JOIN m.roles mr WHERE m.id = :id)) OR "
+			+ " (gr.id IN (SELECT mr.id FROM Team m LEFT JOIN m.roles mr WHERE m.id = :id)))";
 
 	private static final String SQL_INBOX = ""
-			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
-			+ "WHERE (m.parent IS NULL) AND "
-			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
-			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "((g IS NULL) OR (g.user.id != :uid) OR (g.user.id = :uid AND (g.isRead = false OR g.isArchived = false))) "
-			+ "ORDER BY m.createdOn DESC";
+			+ "SELECT mm FROM MailMessage mm "
+			+ "LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel "
+			+ "LEFT JOIN MailFlags g ON g.user = f.user AND g.message = mm.id "
+			+ "WHERE"
+			+ " (mm.parent IS NULL) AND "
+			+ " (f.user.id = :uid AND f.archived = false) AND"
+			+ " (g.isRead IS NULL OR g.isRead = false OR g.isArchived = false) "
+			+ "ORDER BY mm.createdOn DESC";
 
 	private static final String SQL_IMPORTANT = ""
-			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
-			+ "WHERE (m.parent IS NULL) AND "
-			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
-			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "((g.user.id = :uid AND g.isStarred = true AND g.isArchived = false)) "
-			+ "ORDER BY m.createdOn DESC";
+			+ "SELECT mm FROM MailMessage mm "
+			+ "LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel "
+			+ "LEFT JOIN MailFlags g ON g.user = f.user AND g.message = mm.id "
+			+ "WHERE"
+			+ " (mm.parent IS NULL) AND "
+			+ " (f.user.id = :uid AND f.archived = false) AND"
+			+ " (g.isStarred = true AND g.isArchived = false) "
+			+ "ORDER BY mm.createdOn DESC";
 
 	private static final String SQL_ARCHIVE = ""
-			+ "SELECT DISTINCT(m) FROM MailMessage m LEFT JOIN m.flags g "
-			+ "WHERE (m.parent IS NULL) AND "
-			+ "(CONCAT(m.relatedId, m.relatedModel) IN "
-			+ " (SELECT CONCAT(f.relatedId, f.relatedModel) FROM MailFollower f WHERE f.user.id = :uid AND f.archived = false)) AND "
-			+ "((g.user.id = :uid AND g.isArchived = true)) "
-			+ "ORDER BY m.createdOn DESC";
+			+ "SELECT mm FROM MailMessage mm "
+			+ "LEFT JOIN MailFollower f ON f.relatedId = mm.relatedId and f.relatedModel = mm.relatedModel "
+			+ "LEFT JOIN MailFlags g ON g.user = f.user AND g.message = mm.id "
+			+ "WHERE"
+			+ " (mm.parent IS NULL) AND "
+			+ " (f.user.id = :uid AND f.archived = false) AND"
+			+ " (g.isArchived = true) "
+			+ "ORDER BY mm.createdOn DESC";
 
 	@Inject
 	private MailMessageRepository messages;
 
 	public void countMail(ActionRequest request, ActionResponse response) {
 		final Map<String, Object> value = new HashMap<>();
-		value.put("total", count(SQL_INBOX));
-		value.put("unread", count(SQL_UNREAD));
+		value.put("total", countMessages(SQL_INBOX));
+		value.put("unread", countMessages(SQL_UNREAD));
 		response.setValue("mail", value);
 		response.setStatus(Response.STATUS_SUCCESS);
 	}
 
 	public void countUnread(ActionRequest request, ActionResponse response) {
-		response.setValue("unread", count(SQL_UNREAD));
+		response.setValue("unread", countMessages(SQL_UNREAD));
 		response.setStatus(Response.STATUS_SUCCESS);
 	}
 
 	public void unread(ActionRequest request, ActionResponse response) {
 
 		final List<Object> all = find(SQL_UNREAD, request.getOffset(), request.getLimit());
-		final Long total = count(SQL_UNREAD);
+		final Long total = countMessages(SQL_UNREAD);
 
 		response.setData(all);
 		response.setOffset(request.getOffset());
@@ -111,7 +124,7 @@ public class MailController extends JpaSupport {
 	public void inbox(ActionRequest request, ActionResponse response) {
 
 		final List<Object> all = find(SQL_INBOX, request.getOffset(), request.getLimit());
-		final Long total = count(SQL_INBOX);
+		final Long total = countMessages(SQL_INBOX);
 
 		response.setData(all);
 		response.setOffset(request.getOffset());
@@ -121,7 +134,7 @@ public class MailController extends JpaSupport {
 	public void important(ActionRequest request, ActionResponse response) {
 
 		final List<Object> all = find(SQL_IMPORTANT, request.getOffset(), request.getLimit());
-		final Long total = count(SQL_IMPORTANT);
+		final Long total = countMessages(SQL_IMPORTANT);
 
 		response.setData(all);
 		response.setOffset(request.getOffset());
@@ -131,7 +144,7 @@ public class MailController extends JpaSupport {
 	public void archived(ActionRequest request, ActionResponse response) {
 
 		final List<Object> all = find(SQL_ARCHIVE, request.getOffset(), request.getLimit());
-		final Long total = count(SQL_ARCHIVE);
+		final Long total = countMessages(SQL_ARCHIVE);
 
 		response.setData(all);
 		response.setOffset(request.getOffset());
@@ -146,8 +159,8 @@ public class MailController extends JpaSupport {
 		}
 
 		final Model related = (Model) request.getRecords().get(0);
-		final List<MailMessage> all = messages.findRelated(related, request.getLimit(), request.getOffset());
-		final Long count = messages.countRelated(related);
+		final List<MailMessage> all = messages.findAll(related, request.getLimit(), request.getOffset());
+		final Long count = messages.count(related);
 
 		final List<Object> data = new ArrayList<>();
 		for (MailMessage message : all) {
@@ -183,19 +196,19 @@ public class MailController extends JpaSupport {
 	public void autoSubscribe(ActionRequest request, ActionResponse response) {
 
 		final MailFollowerRepository followers = Beans.get(MailFollowerRepository.class);
-		final MailGroupRepository groups = Beans.get(MailGroupRepository.class);
-		final MailGroup group = request.getContext().asType(MailGroup.class);
+		final TeamRepository teams = Beans.get(TeamRepository.class);
+		final Team team = request.getContext().asType(Team.class);
 
-		if (group == null || group.getId() == null) {
+		if (team == null || team.getId() == null) {
 			return;
 		}
 
 		final TypedQuery<User> query = getEntityManager().createQuery(SQL_SUBSCRIBERS, User.class);
-		query.setParameter("id", group.getId());
-		query.setParameter("model", MailGroup.class.getName());
+		query.setParameter("id", team.getId());
+		query.setParameter("model", Team.class.getName());
 
 		final List<User> users = query.getResultList();
-		final MailGroup entity = groups.find(group.getId());
+		final Team entity = teams.find(team.getId());
 		for (User user : users) {
 			followers.follow(entity, user);
 		}
@@ -228,8 +241,8 @@ public class MailController extends JpaSupport {
 	}
 
 	public String inboxMenuTag() {
-		Long total = count(SQL_INBOX);
-		Long unread = count(SQL_UNREAD);
+		Long total = countMessages(SQL_INBOX);
+		Long unread = countMessages(SQL_UNREAD);
 		if (total == null) {
 			return null;
 		}
@@ -252,11 +265,11 @@ public class MailController extends JpaSupport {
 		return all;
 	}
 
-	private Long count(String queryString) {
+	private Long countMessages(String queryString) {
 
 		final String countString = queryString
-				.replace("DISTINCT(m)", "COUNT(DISTINCT m)")
-				.replace(" ORDER BY m.createdOn DESC", "");
+				.replace("SELECT mm FROM MailMessage mm", "SELECT COUNT(mm.id) FROM MailMessage mm")
+				.replace(" ORDER BY mm.createdOn DESC", "");
 
 		final TypedQuery<Long> query = getEntityManager().createQuery(countString, Long.class);
 

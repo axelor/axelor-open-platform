@@ -116,6 +116,10 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 
 		tab.options = options;
 		tab.title = tab.title || findTabTitle(tab);
+		
+		if (tab.action && MenuService.updateTabStyle) {
+			MenuService.updateTabStyle(tab);
+		}
 
 		function __doSelect(found) {
 
@@ -138,7 +142,6 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 			}
 
 			setTimeout(function(){
-				$.event.trigger('adjust');
 				axelor.$adjustSize();
 			});
 		}
@@ -257,7 +260,7 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 				return close(tab);
 			}, function() {
 				close(null, tab);
-				viewScope.applyLater();
+				viewScope.$applyAsync();
 			});
 		}
 
@@ -380,7 +383,7 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 		}
 
 		$scope.openTabByName(record.action);
-		$scope.$apply();
+		$scope.$applyAsync();
 	};
 
 	$scope.navClick = function(tab) {
@@ -480,13 +483,13 @@ function NavCtrl($scope, $rootScope, $location, NavService) {
 	$scope.$root.openTab = $scope.openTab;
 	$scope.$root.openTabByName = $scope.openTabByName;
 
-	$scope.$watch('selectedTab.viewType', function(viewType){
+	$scope.$watch('selectedTab.viewType', function tabViewTypeWatch(viewType){
 		if (viewType) {
 			axelor.$adjustSize();
 		}
 	});
 
-	$scope.$watch('routePath', function(path) {
+	$scope.$watch('routePath', function routePathWatch(path) {
 		$scope.openHomeTab();
 	});
 

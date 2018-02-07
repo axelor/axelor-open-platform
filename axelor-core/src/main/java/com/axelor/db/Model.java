@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -21,6 +21,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 import javax.persistence.Version;
+
+import com.axelor.db.annotations.Widget;
 
 /**
  * The base abstract model class to extend all domain objects.
@@ -42,6 +44,7 @@ public abstract class Model {
 	@Transient
 	private transient boolean selected;
 
+	@Widget(massUpdate = true)
 	private Boolean archived;
 
 	public abstract Long getId();

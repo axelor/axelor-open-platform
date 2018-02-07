@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -21,6 +21,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +33,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 import org.eclipse.birt.core.exception.BirtException;
-import org.joda.time.DateTime;
 
 import com.axelor.app.internal.AppFilter;
 import com.axelor.db.JPA;
@@ -42,7 +44,6 @@ import com.axelor.meta.MetaFiles;
 import com.axelor.report.ReportGenerator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Throwables;
 
 public class ActionReport extends Action {
 
@@ -122,8 +123,8 @@ public class ActionReport extends Action {
 		final Long id = (Long) handler.getContext().get("id");
 
 		final String outputName = this.outputName
-				.replace("${date}", new DateTime().toString("yyyyMMdd"))
-				.replace("${time}", new DateTime().toString("HHmmss"))
+				.replace("${date}", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
+				.replace("${time}", LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss")))
 				.replace("${name}", getName());
 
 		final String fileName = String.format("%s.%s", outputName, format);
@@ -149,7 +150,7 @@ public class ActionReport extends Action {
 		try {
 			return _evaluate(handler);
 		} catch (Exception e) {
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 	}
 

@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,12 +17,12 @@
  */
 package com.axelor.rpc;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -44,7 +44,7 @@ public class RequestTest extends RpcTest {
 	@Test
 	public void testObjects() {
 
-		Request req = fromJson("find.js", Request.class);
+		Request req = fromJson("find.json", Request.class);
 
 		Assert.assertTrue(req.getData() instanceof Map);
 		Assert.assertTrue(req.getData().get("criteria") instanceof List);
@@ -57,7 +57,7 @@ public class RequestTest extends RpcTest {
 	@Test
 	public void testFind() {
 
-		Request req = fromJson("find.js", Request.class);
+		Request req = fromJson("find.json", Request.class);
 		
 		Criteria c = Criteria.parse(req);
 		Query<Contact> q = c.createQuery(Contact.class);
@@ -69,7 +69,7 @@ public class RequestTest extends RpcTest {
 	@Test
 	public void testFind2() {
 
-		Request req = fromJson("find2.js", Request.class);
+		Request req = fromJson("find2.json", Request.class);
 
 		Criteria c = Criteria.parse(req);
 		Query<Contact> q = c.createQuery(Contact.class);
@@ -82,7 +82,7 @@ public class RequestTest extends RpcTest {
 	@Test
 	public void testFind3() {
 
-		Request req = fromJson("find3.js", Request.class);
+		Request req = fromJson("find3.json", Request.class);
 
 		Criteria c = Criteria.parse(req);
 		Query<Contact> q = c.createQuery(Contact.class);
@@ -93,7 +93,7 @@ public class RequestTest extends RpcTest {
 	@Test
 	public void testAdd() {
 
-		Request req = fromJson("add.js", Request.class);
+		Request req = fromJson("add.json", Request.class);
 
 		Assert.assertTrue(req.getData() instanceof Map);
 
@@ -108,7 +108,7 @@ public class RequestTest extends RpcTest {
 	@Test @Transactional
 	public void testAdd2() {
 
-		Request req = fromJson("add2.js", Request.class);
+		Request req = fromJson("add2.json", Request.class);
 
 		Assert.assertTrue(req.getData() instanceof Map);
 

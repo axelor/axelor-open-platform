@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -19,14 +19,19 @@ package com.axelor.tools.x2j;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.tools.x2j.pojo.Entity;
+import com.axelor.tools.x2j.pojo.EnumType;
 import com.axelor.tools.x2j.pojo.Repository;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -42,8 +47,13 @@ public class Generator {
 
 	private File outputPath;
 
-	private final Multimap<String, Entity> lookup = LinkedHashMultimap.create();
+	private final Set<String> definedEntities = new HashSet<>();
+	private final Set<String> definedEnums = new HashSet<>();
+
+	private final List<Generator> lookup = new ArrayList<>();
+
 	private final Multimap<String, Entity> entities = LinkedHashMultimap.create();
+	private final Multimap<String, EnumType> enums = LinkedHashMultimap.create();
 
 	public Generator(File domainPath, File outputPath) {
 		this.domainPath = domainPath;
@@ -53,15 +63,75 @@ public class Generator {
 	private File file(File base, String... parts) {
 		return new File(base.getPath() + "/" + Joiner.on("/").join(parts));
 	}
-
-	private void expand(Collection<Entity> items, boolean doLookup) throws IOException {
-		expand(outputPath, items, doLookup);
-	}
 	
-	private void expand(File outputPath, Collection<Entity> items, boolean doLookup) throws IOException {
+	private List<File> renderEnum(Collection<EnumType> items, boolean doLookup) throws IOException {
 
 		if (items == null || items.isEmpty()) {
-			return;
+			return null;
+		}
+
+		final List<EnumType> all = new ArrayList<>(items);
+		final EnumType first = all.get(0);
+
+		final String ns = first.getNamespace();
+		final String name = first.getName();
+
+		// prepend all lookup entities
+		if (doLookup) {
+			for (Generator gen : lookup) {
+				if (gen.definedEnums.contains(name)) {
+					if (gen.enums.isEmpty()) {
+						gen.processAll(false);
+					}
+					all.addAll(0, gen.enums.get(name));
+				}
+			}
+		}
+		
+		// check that all entities have same namespace
+		for (EnumType it : all) {
+			if (!ns.equals(it.getNamespace())) {
+				throw new IllegalArgumentException(String.format(
+						"Invalid namespace: %s.%s != %s.%s", ns, name,
+						it.getNamespace(), name));
+			}
+		}
+
+		final EnumType entity = all.remove(0);
+
+		final File entityFile = this.file(outputPath, entity.getFile());
+
+		for (EnumType it : all) {
+			entity.merge(it);
+		}
+		
+		entityFile.getParentFile().mkdirs();
+
+		String[] existing = {
+			entity.getName() + ".java"
+		};
+
+		for (String fname : existing) {
+			File ex = this.file(entityFile.getParentFile(), fname);
+			if (ex.exists()) {
+				ex.delete();
+			}
+		}
+
+		final List<File> rendered = new ArrayList<>();
+
+		log.info("Generating: " + entityFile.getPath());
+		String code = Expander.expand(entity);
+		Files.asCharSink(entityFile, Charsets.UTF_8).write(Utils.stripTrailing(code));
+		rendered.add(entityFile);
+
+		return rendered;
+	}
+
+	private List<File> render(Collection<Entity> items, boolean doLookup) throws IOException {
+
+		if (items == null || items.isEmpty()) {
+			return null;
 		}
 
 		final List<Entity> all = new ArrayList<>(items);
@@ -71,8 +141,15 @@ public class Generator {
 		final String name = first.getName();
 
 		// prepend all lookup entities
-		if (doLookup && lookup.get(name) != null) {
-			all.addAll(0, lookup.get(name));
+		if (doLookup) {
+			for (Generator gen : lookup) {
+				if (gen.definedEntities.contains(name)) {
+					if (gen.entities.isEmpty()) {
+						gen.processAll(false);
+					}
+					all.addAll(0, gen.entities.get(name));
+				}
+			}
 		}
 		
 		// check that all entities have same namespace
@@ -90,18 +167,6 @@ public class Generator {
 		final File entityFile = this.file(outputPath, entity.getFile());
 		final File repoFile = repository == null ? null : this.file(outputPath, repository.getFile());
 
-		long lastModified = entity.getLastModified();
-		
-		for (Entity it : all) {
-			if (lastModified < it.getLastModified()) {
-				lastModified = it.getLastModified();
-			}
-		}
-		
-		if (lastModified < entityFile.lastModified()) {
-			return;
-		}
-		
 		for (Entity it : all) {
 			entity.merge(it);
 		}
@@ -123,18 +188,38 @@ public class Generator {
 			}
 		}
 
+		final List<File> rendered = new ArrayList<>();
+
 		log.info("Generating: " + entityFile.getPath());
 		String code = Expander.expand(entity, false);
-		Files.write(Utils.stringTrailing(code), entityFile, Charsets.UTF_8);
-		
-		if (repoFile == null) return;
+		Files.asCharSink(entityFile, Charsets.UTF_8).write(Utils.stripTrailing(code));
+		rendered.add(entityFile);
 
-		log.info("Generating: " + repoFile.getPath());
-		String repo = Expander.expand(entity, true);
-		Files.write(Utils.stringTrailing(repo), repoFile, Charsets.UTF_8);
+		if (repoFile != null) {
+			log.info("Generating: " + repoFile.getPath());
+			String repo = Expander.expand(entity, true);
+			Files.asCharSink(repoFile, Charsets.UTF_8).write(Utils.stripTrailing(repo) + "\n");
+			rendered.add(repoFile);
+		}
+
+		return rendered;
 	}
 
-	private void process(File input, boolean verbose) throws IOException {
+	protected void findFrom(File input) throws IOException {
+		definedEnums.addAll(XmlHelper.findEnumNames(input));
+		definedEntities.addAll(XmlHelper.findEntityNames(input));
+	}
+
+	protected void findAll() throws IOException {
+		if (!domainPath.exists()) return;
+		for (File file : domainPath.listFiles()) {
+			if (file.getName().endsWith(".xml")) {
+				findFrom(file);
+			}
+		}
+	}
+
+	protected void process(File input, boolean verbose) throws IOException {
 		
 		if (verbose) {
 			log.info("Processing: " + input);
@@ -144,6 +229,20 @@ public class Generator {
 		for (Entity entity : all) {
 			entity.setLastModified(input.lastModified());
 			entities.put(entity.getName(), entity);
+		}
+		
+		for (EnumType entity : XmlHelper.enums(input)) {
+			entity.setLastModified(input.lastModified());
+			enums.put(entity.getName(), entity);
+		}
+	}
+
+	protected void processAll(boolean verbose) throws IOException {
+		if (!domainPath.exists()) return;
+		for (File file : domainPath.listFiles()) {
+			if (file.getName().endsWith(".xml")) {
+				process(file, verbose);
+			}
 		}
 	}
 
@@ -155,22 +254,13 @@ public class Generator {
 		}
 		file.delete();
 	}
-
-	private void processAll(boolean verbose) throws IOException {
-		if (!domainPath.exists()) return;
-		for (File file : domainPath.listFiles()) {
-			if (file.getName().endsWith(".xml")) {
-				process(file, verbose);
-			}
-		}
-	}
 	
 	public void addLookupSource(Generator generator) throws IOException {
 		if (generator == null) return;
-		if (generator.entities.isEmpty()) {
-			generator.processAll(false);
+		if (generator.definedEntities.isEmpty()) {
+			generator.findAll();
 		}
-		lookup.putAll(generator.entities);
+		lookup.add(0, generator);
 	}
 	
 	public void clean() {
@@ -187,11 +277,13 @@ public class Generator {
 
 	public void start() throws IOException {
 
-		log.info("Generating JPA classes.");
+		log.info("Generating classes...");
 		log.info("Domain path: " + domainPath);
 		log.info("Output path: " + outputPath);
 
 		outputPath.mkdirs();
+
+		final Set<File> generated = new HashSet<>();
 
 		if (this.domainPath.exists()) {
 			for (File file : domainPath.listFiles()) {
@@ -200,22 +292,85 @@ public class Generator {
 				}
 			}
 		}
-		
-		for (String name : entities.keySet()) {
-			expand(entities.get(name), true);
-		}
 
-		// make sure to generate extended entities from parent modules
-		for (String name : lookup.keySet()) {
-			if (entities.containsKey(name)) {
-				continue;
+		// generate enums
+		for (String name : enums.keySet()) {
+			final List<File> rendered = renderEnum(enums.get(name), true);
+			if (rendered != null) {
+				generated.addAll(rendered);
 			}
-			final Collection<Entity> all = lookup.get(name);
+		}
+		
+		// make sure to generate extended enums from parent modules
+		final Multimap<String, EnumType> extendedEnums = LinkedHashMultimap.create();
+		for (Generator generator : lookup) {
+			for (String name : generator.definedEnums) {
+				if (enums.containsKey(name)) {
+					continue;
+				}
+				if (generator.enums.isEmpty()) {
+					generator.processAll(false);
+				}
+				extendedEnums.putAll(name, generator.enums.get(name));
+			}
+		}
+		for (String name : extendedEnums.keySet()) {
+			final List<EnumType> all = new ArrayList<>(extendedEnums.get(name));
 			if (all == null || all.size() < 2) {
 				continue;
 			}
-			expand(all, false);
+			Collections.reverse(all);
+			final List<File> rendered = renderEnum(all, false);
+			if (rendered != null) {
+				generated.addAll(rendered);
+			}
 		}
+
+		// generate entities
+		for (String name : entities.keySet()) {
+			final List<File> rendered = render(entities.get(name), true);
+			if (rendered != null) {
+				generated.addAll(rendered);
+			}
+		}
+
+		// make sure to generate extended entities from parent modules
+		final Multimap<String, Entity> extendedEntities = LinkedHashMultimap.create();
+		for (Generator generator : lookup) {
+			for (String name : generator.definedEntities) {
+				if (entities.containsKey(name)) {
+					continue;
+				}
+				if (generator.entities.isEmpty()) {
+					generator.processAll(false);
+				}
+				extendedEntities.putAll(name, generator.entities.get(name));
+			}
+		}
+		for (String name : extendedEntities.keySet()) {
+			final List<Entity> all = new ArrayList<>(extendedEntities.get(name));
+			if (all == null || all.isEmpty()) {
+				continue;
+			}
+			if (all.size() == 1 && !all.get(0).isModelClass()) { // generate extended Model class in root
+				continue;
+			}
+			Collections.reverse(all);
+			final List<File> rendered = render(all, false);
+			if (rendered != null) {
+				generated.addAll(rendered);
+			}
+		}
+
+		// clean up obsolete files
+		java.nio.file.Files.walk(outputPath.toPath())
+			.map(Path::toFile)
+			.filter(f -> f.getName().endsWith(".java") || f.getName().endsWith(".groovy"))
+			.filter(f -> !generated.contains(f))
+			.forEach(f -> {
+				log.info("Deleting obsolete file: {}", f);
+				f.delete();
+			});
 	}
 	
 	/**
@@ -227,7 +382,7 @@ public class Generator {
 	 *            input files
 	 * @return a {@link Generator} instance
 	 */
-	public static Generator forFiles(Collection<File> files) {
+	public static Generator forFiles(final Collection<File> files) {
 		if (files == null || files.isEmpty()) {
 			return null;
 		}
@@ -241,10 +396,17 @@ public class Generator {
 
 			@Override
 			public void addLookupSource(Generator generator) throws IOException {}
+			
+			@Override
+			protected void processAll(boolean verbose) throws IOException {
+				for (File file : files) {
+					process(file, verbose);
+				}
+			}
 		};
 		for (File file : files) {
 			try {
-				gen.process(file, false);
+				gen.findFrom(file);
 			} catch (IOException e) {
 			}
 		}

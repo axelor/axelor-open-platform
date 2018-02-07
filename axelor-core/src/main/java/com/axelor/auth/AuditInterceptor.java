@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,13 +18,13 @@
 package com.axelor.auth;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import javax.persistence.PersistenceException;
 
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.Transaction;
 import org.hibernate.type.Type;
-import org.joda.time.LocalDateTime;
 
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.auth.db.Group;
@@ -154,7 +154,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 						entity.getClass().getName(), id, propertyNames[i], currentState[i]));
 			}
 			if (UPDATED_ON.equals(propertyNames[i])) {
-				currentState[i] = new LocalDateTime();
+				currentState[i] = LocalDateTime.now();
 			}
 			if (UPDATED_BY.equals(propertyNames[i]) && user != null) {
 				currentState[i] = user;
@@ -183,7 +183,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 				continue;
 			}
 			if (CREATED_ON.equals(propertyNames[i])) {
-				state[i] = new LocalDateTime();
+				state[i] = LocalDateTime.now();
 			}
 			if (CREATED_BY.equals(propertyNames[i]) && user != null) {
 				state[i] = user;

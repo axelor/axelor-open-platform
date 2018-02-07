@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -29,6 +29,7 @@ public enum PropertyType {
 	TIME,
 	DATETIME,
 	BINARY,
+	ENUM,
 	ONE_TO_ONE,
 	MANY_TO_ONE,
 	ONE_TO_MANY,
@@ -46,6 +47,7 @@ public enum PropertyType {
 			if (value.equals("LOCALTIME")) return PropertyType.TIME;
 			if (value.equals("LOCALDATETIME")) return PropertyType.DATETIME;
 			if (value.equals("CALENDAR")) return PropertyType.DATETIME;
+			if (value.equals("ZONEDDATETIME")) return PropertyType.DATETIME;
 			if (value.equals("BYTE[]")) return PropertyType.BINARY;
 		}
 		return null;

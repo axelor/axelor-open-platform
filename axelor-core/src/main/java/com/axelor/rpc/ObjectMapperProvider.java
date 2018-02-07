@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -22,16 +22,13 @@ import static com.axelor.meta.loader.ModuleManager.isInstalled;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Provider;
 import javax.inject.Singleton;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
@@ -56,14 +53,16 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
 import groovy.lang.GString;
 
 @Singleton
 public class ObjectMapperProvider implements Provider<ObjectMapper> {
 
-	private ObjectMapper mapper;
+	private final ObjectMapper mapper;
 
 	static class ModelSerializer extends JsonSerializer<Model> {
 
@@ -71,15 +70,17 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 		public void serialize(Model value, JsonGenerator jgen, SerializerProvider provider)
 				throws IOException, JsonProcessingException {
 			if (value != null) {
-				JsonSerializer<Object> serializer = provider.findValueSerializer(Map.class, null);
-				Map<String, Object> map = Resource.toMap(value);
+				final JsonSerializer<Object> serializer = provider.findValueSerializer(Map.class, null);
+				final Map<String, Object> map = value instanceof ContextEntity
+						? ((ContextEntity) value).getContextMap()
+						: Resource.toMap(value);
 				serializer.serialize(map, jgen, provider);
 			}
 		}
 	}
-	
+
 	static class GStringSerializer extends JsonSerializer<GString> {
-		
+
 		@Override
 		public void serialize(GString value, JsonGenerator jgen, SerializerProvider provider)
 				throws IOException, JsonProcessingException {
@@ -88,52 +89,45 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 			}
 		}
 	}
-	
-	static class DateTimeSerializer extends JsonSerializer<DateTime> {
-		
+
+	static class ZonedDateTimeSerializer extends JsonSerializer<java.time.ZonedDateTime> {
+
 		@Override
-		public void serialize(DateTime value, JsonGenerator jgen,
-				SerializerProvider provider) throws IOException,
-				JsonProcessingException {
+		public void serialize(java.time.ZonedDateTime value, JsonGenerator jgen, SerializerProvider provider)
+				throws IOException, JsonProcessingException {
 			if (value != null) {
-				String text = value.withZone(DateTimeZone.UTC).toString();
-				jgen.writeString(text);
+				jgen.writeString(value.withZoneSameInstant(ZoneOffset.UTC).toString());
 			}
 		}
 	}
 
-	static class LocalDateTimeSerializer extends JsonSerializer<LocalDateTime> {
-		
+	static class LocalDateTimeSerializer extends JsonSerializer<java.time.LocalDateTime> {
+
 		@Override
-		public void serialize(LocalDateTime value, JsonGenerator jgen,
-				SerializerProvider provider) throws IOException,
-				JsonProcessingException {
+		public void serialize(java.time.LocalDateTime value, JsonGenerator jgen, SerializerProvider provider)
+				throws IOException, JsonProcessingException {
 			if (value != null) {
-				String text = value.toDateTime().withZone(DateTimeZone.UTC).toString();
-				jgen.writeString(text);
+				jgen.writeString(value.atZone(ZoneOffset.systemDefault()).withZoneSameInstant(ZoneOffset.UTC).toString());
 			}
 		}
 	}
-	
-	static class LocalTimeSerializer extends JsonSerializer<LocalTime> {
-		
+
+	static class LocalTimeSerializer extends JsonSerializer<java.time.LocalTime> {
+
 		@Override
-		public void serialize(LocalTime value, JsonGenerator jgen,
-				SerializerProvider provider) throws IOException,
-				JsonProcessingException {
+		public void serialize(java.time.LocalTime value, JsonGenerator jgen, SerializerProvider provider)
+				throws IOException, JsonProcessingException {
 			if (value != null) {
-				String text = value.toString("HH:mm");
-				jgen.writeString(text);
+				jgen.writeString(value.format(DateTimeFormatter.ofPattern("HH:mm")));
 			}
 		}
 	}
-	
+
 	static class DecimalSerializer extends JsonSerializer<BigDecimal> {
-		
+
 		@Override
-		public void serialize(BigDecimal value, JsonGenerator jgen,
-				SerializerProvider provider) throws IOException,
-				JsonProcessingException {
+		public void serialize(BigDecimal value, JsonGenerator jgen, SerializerProvider provider)
+				throws IOException, JsonProcessingException {
 			if (value != null) {
 				jgen.writeString(value.toPlainString());
 			}
@@ -145,7 +139,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 		private boolean test(AbstractWidget widget) {
 
 			final String module = widget.getModuleToCheck();
-			final String condition =  widget.getConditionToCheck();
+			final String condition = widget.getConditionToCheck();
 			if (!isBlank(module) && !isInstalled(module)) {
 				return false;
 			}
@@ -208,16 +202,15 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 		}
 
 		@Override
-		public void serialize(List<AbstractWidget> value, JsonGenerator jgen,
-				SerializerProvider provider) throws IOException,
-				JsonProcessingException {
-			
+		public void serialize(List<AbstractWidget> value, JsonGenerator jgen, SerializerProvider provider)
+				throws IOException, JsonProcessingException {
+
 			if (value == null) {
 				return;
 			}
 
 			jgen.writeStartArray();
-			
+
 			for (AbstractWidget widget : value) {
 				if (test(widget) && hasAccess(widget)) {
 					jgen.writeObject(widget);
@@ -231,10 +224,9 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 	static class ListSerializerModifier extends BeanSerializerModifier {
 
 		private WidgetListSerializer listSerializer = new WidgetListSerializer();
-		
+
 		@Override
-		public JsonSerializer<?> modifyCollectionSerializer(
-				SerializationConfig config, CollectionType valueType,
+		public JsonSerializer<?> modifyCollectionSerializer(SerializationConfig config, CollectionType valueType,
 				BeanDescription beanDesc, JsonSerializer<?> serializer) {
 
 			if (AbstractWidget.class.isAssignableFrom(valueType.getContentType().getRawClass())) {
@@ -244,28 +236,42 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 			return serializer;
 		}
 	}
-	
-	public ObjectMapperProvider() {
-		mapper = new ObjectMapper();
-		
+
+	static ObjectMapper createObjectMapper() {
+		return createObjectMapper(new ModelSerializer());
+	}
+
+	static ObjectMapper createObjectMapper(JsonSerializer<Model> modelSerializer) {
+
+		final ObjectMapper mapper = new ObjectMapper();
+
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
 		SimpleModule module = new SimpleModule("MyModule");
-		module.addSerializer(Model.class, new ModelSerializer());
+		module.addSerializer(Model.class, modelSerializer);
 		module.addSerializer(GString.class, new GStringSerializer());
 		module.addSerializer(BigDecimal.class, new DecimalSerializer());
 
 		module.setSerializerModifier(new ListSerializerModifier());
 
-		JodaModule jodaModule = new JodaModule();
-		jodaModule.addSerializer(DateTime.class, new DateTimeSerializer());
-		jodaModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer());
-		jodaModule.addSerializer(LocalTime.class, new LocalTimeSerializer());
+		JavaTimeModule javaTimeModule = new JavaTimeModule();
+
+		javaTimeModule.addSerializer(java.time.ZonedDateTime.class, new ZonedDateTimeSerializer());
+		javaTimeModule.addSerializer(java.time.LocalDateTime.class, new LocalDateTimeSerializer());
+		javaTimeModule.addSerializer(java.time.LocalTime.class, new LocalTimeSerializer());
 
 		mapper.registerModule(module);
-		mapper.registerModule(jodaModule);
+		mapper.registerModule(javaTimeModule);
+		mapper.registerModule(new Jdk8Module());
+		mapper.registerModule(new ParameterNamesModule());
 		mapper.registerModule(new GuavaModule());
+
+		return mapper;
+	}
+
+	public ObjectMapperProvider() {
+		this.mapper = createObjectMapper();
 	}
 
 	@Override

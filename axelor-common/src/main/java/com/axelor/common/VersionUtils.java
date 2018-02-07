@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -33,8 +33,8 @@ public final class VersionUtils {
 	private static Version version;
 
 	private static final String VERSION_FILE = "axelor-version.txt";
-	private static final Pattern VERSION_PATTERN = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+)(?:\\-rc(\\d+))?$");
-	private static final Pattern VERSION_SPEC_PATTERN = Pattern.compile("(~)?((\\d+)\\.(\\d+)\\.(\\d+)(?:\\-rc(\\d+))?)");
+	private static final Pattern VERSION_PATTERN = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+)(?:\\-rc(\\d+))?(-SNAPSHOT)?$");
+	private static final Pattern VERSION_SPEC_PATTERN = Pattern.compile("(~)?((\\d+)\\.(\\d+)\\.(\\d+)(?:\\-rc(\\d+))?(-SNAPSHOT)?)");
 
 	/**
 	 * This class stores version details of axelor modules.
@@ -127,9 +127,9 @@ public final class VersionUtils {
 		}
 		return version;
 	}
-
+	
 	private static Version getVersion(String file) {
-		try (InputStream is = ClassUtils.getResourceStream(file)) {
+		try (InputStream is = ResourceUtils.getResourceStream(file)) {
 			String version = CharStreams.toString(new InputStreamReader(is));
 			return new Version(version);
 		} catch (Exception e) {

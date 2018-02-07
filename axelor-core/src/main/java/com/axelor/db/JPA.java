@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -46,7 +47,6 @@ import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -421,7 +421,7 @@ public final class JPA {
 					p.addAll(bean, items);
 				}
 				value = items;
-			} else if (value instanceof Map) {
+			} else if (p.isReference() && value instanceof Map) {
 				value = _edit(target, (Map) value, visited, edited);
 			}
 			Object oldValue = mapper.set(bean, name, value);
@@ -507,14 +507,9 @@ public final class JPA {
 	 * @return Set of model classes
 	 */
 	public static Set<Class<?>> models() {
-
-		return Sets.filter(JpaScanner.findModels(), new Predicate<Class<?>>() {
-
-			@Override
-			public boolean apply(Class<?> input) {
-				return !Modifier.isAbstract(input.getModifiers());
-			}
-		});
+		return JpaScanner.findModels().stream()
+				.filter(c -> !Modifier.isAbstract(c.getModifiers()))
+				.collect(Collectors.toSet());
 	}
 	
 	/**
@@ -602,7 +597,10 @@ public final class JPA {
 			if (value instanceof List && deep) {
 				List items = Lists.newArrayList();
 				for(Object item : (List) value) {
-					items.add(copy((Model) item, true));
+					Object val = copy((Model) item, true);
+					// break bi-directional association
+					p.setAssociation(val, null);
+					items.add(val);
 				}
 				value = items;
 			} else if (value instanceof List) {
@@ -615,7 +613,12 @@ public final class JPA {
 				value = ((String) value) + " Copy (" +  random + ")";
 			}
 
-			p.set(obj, value);
+			if (p.getType() == PropertyType.ONE_TO_MANY) {
+				// prevent auto bi-directional association
+				mapper.set(obj, p.getName(), value);
+			} else {
+				p.set(obj, value);
+			}
 		}
 
 		return obj;

@@ -71,7 +71,7 @@ ui.formInput('Number', {
 			var valid = scope.isNumber(value);
             if (valid && isDecimal && _.isString(value)) {
             	value = scope.format(value);
-		valid = _.string.trim(value, '-').length - 1 <= precision();
+            	valid = _.string.trim(value, '-').length - 1 <= precision();
             	value = +value;
             }
 
@@ -159,7 +159,7 @@ ui.formInput('Number', {
 			}
 
 			scope.setValue(val);
-			scope.applyLater();
+			scope.$applyAsync();
 			
 			pendingChange = true;
 			

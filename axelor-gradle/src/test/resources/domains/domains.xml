@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <domain-models xmlns="http://axelor.com/xml/ns/domain-models"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_4.2.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_5.0.xsd">
 
   <module name="contact" package="com.axelor.contact.db"/>
   
@@ -54,22 +54,27 @@
     </extra-code>
   </entity>
 
-  <entity name="Group" repository="none">
+  <entity name="Group" repository="none" jsonAttrs="false">
     <string name="code" required="true" unique="true" min="2" />
     <string name="name" required="true" unique="true" min="2" />
     <many-to-many name="contacts" ref="Contact" copy="false" />
+    <!-- should not have 'attrs' json field -->
   </entity>
 
   <entity name="Company">
     <string name="code" required="true" unique="true" min="2" />
     <string name="name" required="true" unique="true" min="2" />
+    <string name="extra" json="true" />
+    <!-- should not have 'attrs' json field as we define one json field -->
   </entity>
-  
-  <entity name="Country" sequential="false">
+
+  <entity name="Country" sequential="false" jsonAttrs="true">
     <string name="code" required="true" unique="true" min="2" />
     <string name="name" required="true" unique="true" min="2" />
+    <string name="extra" json="true" />
     <finder-method name="findByName" using="code, name" filter="self.code = :code OR self.name = :name" orderBy="name" cacheable="true" flush="false"/>
     <finder-method name="findByNameAndCode" using="code, name" all="true"/>
+    <!-- should have 'attrs' json field as well -->
   </entity>
 
   <entity name="Contact" sequential="true" hashAll="true" cachable="false">
@@ -91,7 +96,7 @@
     <string name="phone" max="20"  hashKey="false" massUpdate="true"/>
     <string name="notes" multiline="true" title="About Me" />
     <date name="dateOfBirth" default="now" />
-    <many-to-many name="groups" ref="Group" mappedBy="contacts"/>
+    <many-to-many name="groups" ref="Group" mappedBy="contacts" table="contact_groups" column="contact_id" column2="group_id" />
 
     <!-- test o2m fields with mappedBy & orphanRemoval -->
     <one-to-many name="addresses" ref="Address" mappedBy="contact" orderBy="area"/>
@@ -135,8 +140,32 @@
     <finder-method name="findByUser" using="user" all="false"/>
     
   </entity>
+  
+  <enum name="AccountStatus">
+    <item name="OPEN" />
+    <item name="CLOSED" title="Closed" />
+  </enum>
+  
+  <enum name="AccountStatus">
+    <item name="CANCELED" />
+  </enum>
+  
+  <enum name="NumStatus" numeric="true">
+    <item name="ONE" value="1" />
+    <item name="TWO" value="2" />
+    <item name="THREE" value="3" />
+  </enum>
+  
+  <enum name="StrStatus">
+    <item name="ONE" value="one" />
+    <item name="TWO" value="two" />
+    <item name="THREE" value="three" />
+  </enum>
 
   <entity name="Account">
+    <enum name="status" ref="AccountStatus" default="OPEN" />
+    <enum name="numStatus" ref="NumStatus" />
+    <enum name="strStatus" ref="StrStatus" />
     <boolean name="active" />
     <string name="name" required="true" />
     <string name="notes" />

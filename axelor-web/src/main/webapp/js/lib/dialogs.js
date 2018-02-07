@@ -123,12 +123,12 @@
 					element.dialog('destroy');
 					element.remove();
 				},
+				show: {
+					effect: 'fade',
+					duration: 300
+				},
 				buttons: buttons
 			});
-
-			element.on('adjustSize', _.throttle(function () {
-				element.dialog('option', 'position', 'center');
-			}));
 
 			// maintain overlay opacity
 			var opacity = null;
@@ -215,7 +215,7 @@
 		success: function(message, options) {
 			var opts = _.extend({
 				title: _t('Success'),
-				css: 'alert-success'
+				css: 'alert-primary'
 			}, options);
 			return doNotify(message, opts);
 		},

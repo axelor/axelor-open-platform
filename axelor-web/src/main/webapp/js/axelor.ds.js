@@ -169,7 +169,84 @@
 			meta = meta || {};
 			view = view || {};
 
+			if (meta.jsonAttrs && view && view.items) {
+				if (view.type === 'grid') {
+					view.items.push({
+						type: 'field',
+						name: 'attrs',
+						jsonFields: meta.jsonAttrs
+					});
+				}
+				if (view.type === 'form') {
+					view.items.push({
+						type: 'panel',
+						title: _t('Attributes'),
+						itemSpan: 12,
+						items: [{
+							type: 'field',
+							name: 'attrs',
+							jsonFields: meta.jsonAttrs
+						}]
+					});
+				}
+			}
+			
+			view = processJsonForm(view);
 			meta.fields = processFields(meta.fields);
+			
+			(function () {
+				var helps = meta.helps = meta.helps || {};
+				var items = [];
+
+				if (view.helpOverride && view.helpOverride.length) {
+					helps = _.groupBy(view.helpOverride || [], 'type');
+					helps = meta.helps = _.object(_.map(helps, function(items, key) {
+						return [key, _.reduce(items, function(memo, item) {
+							memo[item.field] = item;
+							return memo;
+						}, {})];
+					}));
+					
+					if (helps.tooltip && helps.tooltip.__top__) {
+						view.help = helps.tooltip.__top__.help;
+					}
+				}
+
+				var help = helps.tooltip || {};
+				var placeholder = helps.placeholder || {};
+				var inline = helps.inline || {};
+
+				forEach(view.items, function (item) {
+					if (help[item.name]) {
+						item.help = help[item.name].help;
+					}
+					if (meta.view && meta.view.type === 'form') {
+						if (placeholder[item.name]) {
+							item.placeholder = placeholder[item.name].help;
+						}
+						if (inline[item.name] && !inline[item.name].used) {
+							inline[item.name].used = true;
+							items.push({
+								type: 'help',
+								text: inline[item.name].help,
+								css: inline[item.name].style,
+								colSpan: 12
+							});
+						}
+					}
+					items.push(item);
+				});
+	
+				forEach(view.toolbar, function (item) {
+					if (help[item.name]) {
+						item.help = help[item.name].help;
+					}
+				});
+	
+				if (items.length) {
+					view.items = items;
+				}
+			})();
 
 			forEach(view.items || view.pages, function(item) {
 				processWidget(item);
@@ -192,9 +269,109 @@
 				if (item.password) {
 					item.widget = "password";
 				}
+				if (item.jsonFields && item.widget !== 'json-raw') {
+					var editor = {
+						layout: view.type === 'panel-json' ? 'table' : undefined,
+						flexbox: true,
+						items: [],
+					};
+					var panel = null;
+					var panelTab = null;
+					item.jsonFields.forEach(function (field) {
+						if (field.widgetAttrs) {
+							field.widgetAttrs = angular.fromJson(field.widgetAttrs);
+							processWidget(field);
+							if (field.widgetAttrs.showTitle !== undefined) {
+								field.showTitle = field.widgetAttrs.showTitle;
+							}
+						}
+						if (field.type === 'panel' || field.type === 'separator') {
+							field.visibleInGrid = false;
+						}
+						if (field.type === 'panel') {
+							panel = _.extend({}, field, { items: [] });
+							if ((field.widgetAttrs || {}).tab) {
+								panelTab = panelTab || {
+									type: 'panel-tabs',
+									colSpan: 12,
+									items: []
+								};
+								panelTab.items.push(panel);
+							} else {
+								editor.items.push(panel);
+							}
+							return;
+						}
+						if (field.type !== 'separator') {
+							field.title = field.title || field.autoTitle;
+						}
+						var colSpan = (field.widgetAttrs||{}).colSpan || field.colSpan;
+						if (field.type == 'one-to-many') {
+							field.type = 'many-to-many';
+							field.canSelect = false;
+						}
+						if (field.type == 'separator' || field.type == 'many-to-many') {
+							field.showTitle = false;
+							field.colSpan = colSpan || 12;
+						}
+						if (panel) {
+							panel.items.push(field);
+						} else {
+							editor.items.push(field);
+						}
+					});
+
+					if (panelTab) {
+						editor.items.push(panelTab);
+					}
+
+					item.widget = 'json-field';
+					item.editor = editor;
+					if (!item.viewer) {
+						item.editor.viewer = true;
+					}
+				}
 			});
+
+			// include json fields in grid
+			if (view.type === 'grid') {
+				var items = [];
+				_.each(view.items, function (item) {
+					if (item.jsonFields) {
+						_.each(item.jsonFields, function (field) {
+							var type = field.type || 'text';
+							if (type.indexOf('-to-many') === -1 && field.visibleInGrid) {
+								items.push(_.extend({}, field, { name: item.name + '.' + field.name }));
+							}
+						});
+					} else {
+						items.push(item);
+					}
+				});
+				view.items = items;
+			}
 		};
 		
+		function processJsonForm(view) {
+			if (view.type !== 'form') return view;
+			if (view.model !== 'com.axelor.meta.db.MetaJsonRecord') return view;
+
+			var panel = _.first(view.items) || {};
+			var jsonField = _.first(panel.items) || {};
+			var jsonFields = jsonField.jsonFields || [];
+
+			var first = _.first(jsonFields) || {};
+			if (first.type === 'panel') {
+				panel.type = 'panel-json';
+				if (first.widgetAttrs) {
+					var attrs = angular.fromJson(first.widgetAttrs);
+					view.width = view.width || attrs.width;
+				}
+			}
+
+			return view;
+		}
+
 		function processFields(fields) {
 			var result = {};
 			if (isArray(fields)) {
@@ -306,13 +483,36 @@
 						} else if (child.type === 'panel') {
 							acceptItems(child.items);
 						}
+						if (/RefSelect|ref-select/.test(child.widget)) {
+							collect.push(child.related);
+						}
+						if (child.depends) {
+							child.depends.split(/\s*,\s*/).forEach(function (name) {
+								collect.push(name);
+							});
+						}
 					});
 				};
 				acceptItems(editor.items);
 			}
 
+			function acceptViewer(item) {
+				var collect = items;
+				var viewer = item.viewer;
+				if (item.target) {
+					collect = result.related[item.name] || (result.related[item.name] = []);
+				}
+				_.each(viewer.fields, function (item) {
+					collect.push(item.name);
+				});
+				if (viewer.fields) {
+					viewer.fields = processFields(viewer.fields);
+				}
+			}
+
 			_.each(fields, function(item) {
 				if (item.editor) acceptEditor(item);
+				if (item.viewer) acceptViewer(item);
 				if (item.type === 'panel-related') {
 					items.push(item.name);
 				} else if (item.items || item.pages) {
@@ -344,7 +544,7 @@
 			return {
 				get: function (name) {
 					return new $q(function (resolve) {
-						resolve(viewCache.get(toKey(name)));
+						resolve(angular.copy(viewCache.get(toKey(name))));
 					});
 				},
 				set: function (name, value) {
@@ -537,7 +737,7 @@
 			}
 			
 			if (_.isArray(view.items)) {
-				return fetchFields({ view: view });
+				return fetchFields({ view: view, fields: view.fields });
 			}
 			return fetchView();
 		};
@@ -575,11 +775,14 @@
 			return promise;
 		};
 
-		ViewService.prototype.getFields = function(model) {
+		ViewService.prototype.getFields = function(model, jsonModel) {
 
 			var that = this,
 				promise = $http.get('ws/meta/fields/' + model, {
-					cache: true
+					cache: true,
+					params: jsonModel ? {
+						jsonModel: jsonModel
+					} : undefined
 				});
 
 			promise.success = function(fn) {
@@ -587,7 +790,7 @@
 					var res = response.data,
 						data = res.data;
 					that.process(data);
-					fn(data.fields);
+					fn(data.fields, data.jsonFields);
 				});
 				return promise;
 			};

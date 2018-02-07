@@ -28,8 +28,11 @@
 		},
 
 		"decimal": function(field, value) {
-			var scale = field.scale || 2,
-				num = +(value);
+			var scale = (field.widgetAttrs||{}).scale || field.scale || 2;
+			var num = +(value);
+			if ((value === null || value === undefined) && !field.defaultValue) {
+				return value;
+			}
 			if (num === 0 || num) {
 				return num.toFixed(scale);
 			}
@@ -77,18 +80,32 @@
 		}
 	};
 
+	ui.formatters["enum"] = ui.formatters.selection;
+	
+	function findField(scope, name) {
+		if (scope.field && scope.field.target) {
+			return ((scope.field.viewer||{}).fields||{})[name]
+				|| ((scope.field.editor||{}).fields||{})[name];
+		}
+		return (scope.viewItems || scope.fields || {})[name];
+	}
+
 	ui.formatters.$image = function (scope, fieldName, imageName) {
 		var record = scope.record || {};
-		var fields = scope.fields || {}
-		var v = record.version || record.$version || 0;
+		var model = scope._model;
 
-		if (fieldName === null && imageName) {
-			return "ws/rest/" + scope._model + "/" + record.id + "/" + imageName + "/download?image=true&v=" + v;
+		if (fieldName) {
+			var field = (scope.fields||{})[fieldName];
+			if (field && field.target) {
+				record = record[fieldName] || {};
+				model = field.target;
+			}
 		}
-		var field = fields[fieldName];
-		if (field && field.target && record[fieldName]) {
-			var val = record[fieldName];
-			return "ws/rest/" + field.target + "/" + val.id + "/" + imageName + "/download?image=true&v=" + v;
+
+		var v = record.version || record.$version || 0;
+		var n = record.id;
+		if (n > 0) {
+			return "ws/rest/" + model + "/" + n + "/" + imageName + "/download?image=true&v=" + v;
 		}
 		return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 	};
@@ -98,7 +115,7 @@
 		if (value === undefined || value === null) {
 			return "";
 		}
-		var field = (scope.viewItems || scope.fields || {})[fieldName];
+		var field = findField(scope, fieldName);
 		if (!field) {
 			return value;
 		}

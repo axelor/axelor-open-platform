@@ -27,7 +27,7 @@ ui.prepareContext = function(model, values, dummyValues, parentContext) {
 
 	function compact(item) {
 		if (!item || _.isNumber(item)) return item;
-		if (item.id > 0 && item.version === undefined) {
+		if (item.id > 0 && item.version === undefined && !item.$dirty) {
 			return {
 				id: item.id,
 				selected: item.selected,
@@ -37,6 +37,9 @@ ui.prepareContext = function(model, values, dummyValues, parentContext) {
 		item = _.extend({}, item);
 		if (item.id <= 0) {
 			item.id = null;
+		}
+		if (item.version === undefined && item.$version !== undefined) {
+			item.version = item.$version;
 		}
 		return item;
 	}
@@ -236,7 +239,7 @@ function FormViewCtrl($scope, $element) {
 		}
 		locationChangeOff = $scope.$on("$locationChangeStart", function (event, newUrl, oldUrl) {
 			// block navigation if popup is open
-			var hasDialogs = $('body .ui-dialog:visible').size() > 0;
+			var hasDialogs = $('body .ui-dialog:visible').length > 0;
 			if (hasDialogs) {
 				event.preventDefault();
 				return;
@@ -389,6 +392,7 @@ function FormViewCtrl($scope, $element) {
 		if (!$scope.$hasPanels) {
 			context._form = true;
 		}
+		$scope.$broadcast('on:update-context', context);
 		return ui.prepareContext(ds._model, context, dummy);
 	};
 
@@ -397,15 +401,7 @@ function FormViewCtrl($scope, $element) {
 		return $scope.$$dirty;
 	};
 
-	$scope.$watch("record", function(rec, old) {
-		var view = $scope.schema;
-		if (view && view.readonlyIf) {
-			var readonly = axelor.$eval($scope, view.readonlyIf, _.extend({}, $scope._context, rec));
-			if (_.isFunction($scope.attr)) {
-				$scope.attr('readonly', readonly);
-			}
-			editable = !readonly;
-		}
+	$scope.$watch("record", function formRecordWatch(rec, old) {
 		if (rec === old) {
 			$scope.$$dirty = false;
 			return;
@@ -417,6 +413,17 @@ function FormViewCtrl($scope, $element) {
 	$scope.$broadcastRecordChange = function () {
 		$scope.$broadcast("on:record-change", $scope.record);
 	};
+	
+	$scope.$on("on:record-change", function () {
+		var view = $scope.schema;
+		if (view && view.readonlyIf) {
+			var readonly = axelor.$eval($scope, view.readonlyIf, _.extend({}, $scope._context, $scope.record));
+			if (_.isFunction($scope.attr)) {
+				$scope.attr('readonly', readonly);
+			}
+			editable = !readonly;
+		}
+	});
 
 	$scope.isValid = function() {
 		return $scope.form && $scope.form.$valid;
@@ -438,6 +445,24 @@ function FormViewCtrl($scope, $element) {
 		return $scope.hasButton('delete') && ($scope.record || {}).id > 0;
 	};
 	
+	$scope.canArchive = function() {
+		return $scope.hasPermission('write')
+			&& $scope.hasButton('archive')
+			&& ($scope.record || {}).id > 0
+			&& !$scope.$$dirty
+			&& !$scope.record.archived
+			&& $scope.isValid();
+	};
+	
+	$scope.canUnarchive = function() {
+		return $scope.hasPermission('write')
+			&& $scope.hasButton('archive')
+			&& ($scope.record || {}).id > 0
+			&& !$scope.$$dirty
+			&& $scope.record.archived
+			&& $scope.isValid();
+	};
+
 	$scope.canCopy = function() {
 		return $scope.canNew() && $scope.hasButton('copy') && !$scope.$$dirty && ($scope.record || {}).id;
 	};
@@ -479,7 +504,8 @@ function FormViewCtrl($scope, $element) {
 			
 			var handler = $scope.$events.onNew;
 			var last = $scope.$parent.onNewPromise || $scope.onNewPromise;
-			
+			var params = ($scope._viewParams || {}).params || {};
+
 			function reset() {
 				$scope.onNewPromise = null;
 			}
@@ -496,7 +522,9 @@ function FormViewCtrl($scope, $element) {
 							if (rec) {
 								rec._dirty = true;
 							}
-							$scope.$$original = old;
+							if (!params['details-view']) {
+								$scope.$$original = old;
+							}
 							return res;
 						} else if (defaults) {
 							$scope.editRecord(defaults);
@@ -628,7 +656,6 @@ function FormViewCtrl($scope, $element) {
 	};
 	
 	$scope.onEdit = function() {
-		$.event.trigger('cancel:hot-edit');
 		$scope.setEditable();
 	};
 
@@ -743,7 +770,7 @@ function FormViewCtrl($scope, $element) {
 				}
 				return;
 			}
-			$scope.applyLater(callback);
+			$scope.$applyAsync(callback);
 		});
 	};
 	
@@ -759,6 +786,40 @@ function FormViewCtrl($scope, $element) {
 			}
 			ds.removeAll([record]).success(function(records, page){
 				$scope.switchBack();
+			});
+		});
+	};
+	
+	$scope.onArchive = function() {
+		var record = $scope.record || {};
+		if (!record.id  || record.id < 0) {
+			return;
+		}
+		axelor.dialogs.confirm(_t("Do you really want to archive the selected record?"),
+		function(confirmed) {
+			if (!confirmed) {
+				return;
+			}
+			var item = _.extend({}, record, { archived: true });
+			ds.saveAll([item]).success(function() {
+				$scope.switchBack();
+			});
+		});
+	};
+	
+	$scope.onUnarchive = function() {
+		var record = $scope.record || {};
+		if (!record.id  || record.id < 0) {
+			return;
+		}
+		axelor.dialogs.confirm(_t("Do you really want to unarchive the selected record?"),
+		function(confirmed) {
+			if (!confirmed) {
+				return;
+			}
+			var item = _.extend({}, record, { archived: false });
+			ds.saveAll([item]).success(function() {
+				$scope.reload();
 			});
 		});
 	};
@@ -804,19 +865,22 @@ function FormViewCtrl($scope, $element) {
 	};
 
 	var __switchTo = $scope.switchTo;
-	var __switchBack = null;
 
 	$scope.switchBack = function () {
-		if (__switchBack === null) {
-			var views = ($scope._viewParams||{}).views || [];
-			for (var i = 0 ; i < views.length; i++) {
-				var view = views[i];
-				if (view.type !== "form") {
-					__switchBack = view.type;
-					break;
-				}
-			}
-		}
+		var __switchBack = null;
+        if($scope._viewTypeLast && $scope._viewTypeLast !== "form") {
+            __switchBack = $scope._viewTypeLast;
+        }
+        if (__switchBack === null) {
+            var views = ($scope._viewParams||{}).views || [];
+            for (var i = 0 ; i < views.length; i++) {
+                var view = views[i];
+                if (view.type !== "form") {
+                    __switchBack = view.type;
+                    break;
+                }
+            }
+        }
 		if (__switchBack) {
 			return $scope.switchTo(__switchBack);
 		}
@@ -889,6 +953,14 @@ function FormViewCtrl($scope, $element) {
 	}
 	
 	function showLog() {
+		ds.read($scope.record.id, {
+			fields: ['createdBy', 'createdOn', 'updatedBy', 'updatedOn']
+		}).success(function (record) {
+			showLogDialog(record);
+		});
+	}
+	
+	function showLogDialog(record) {
 
 		function nameOf(user) {
 			if (!user) {
@@ -898,8 +970,7 @@ function FormViewCtrl($scope, $element) {
 			return user[name] || "";
 		}
 		
-		var info = {},
-			record = $scope.record || {};
+		var info = {};
 		if (record.createdOn) {
 			info.createdOn = moment(record.createdOn).format('DD/MM/YYYY HH:mm');
 			info.createdBy = nameOf(record.createdBy);
@@ -908,25 +979,25 @@ function FormViewCtrl($scope, $element) {
 			info.updatedOn = moment(record.updatedOn).format('DD/MM/YYYY HH:mm');
 			info.updatedBy = nameOf(record.updatedBy);
 		}
-		var table = $("<table class='field-details'>");
+		var table = $("<table class='table field-details'>");
 		var tr;
-		
-		tr = $("<tr></tr>").appendTo(table);
-		$("<th></th>").text(_t("Created On:")).appendTo(tr);
-		$("<td></td>").text(info.createdOn).appendTo(tr);
 		
 		tr = $("<tr></tr>").appendTo(table);
 		$("<th></th>").text(_t("Created By:")).appendTo(tr);
 		$("<td></td>").text(info.createdBy).appendTo(tr);
 		
 		tr = $("<tr></tr>").appendTo(table);
-		$("<th></th>").text(_t("Updated On:")).appendTo(tr);
-		$("<td></td>").text(info.updatedOn).appendTo(tr);
+		$("<th></th>").text(_t("Created On:")).appendTo(tr);
+		$("<td></td>").text(info.createdOn).appendTo(tr);
 		
 		tr = $("<tr></tr>").appendTo(table);
 		$("<th></th>").text(_t("Updated By:")).appendTo(tr);
 		$("<td></td>").text(info.updatedBy).appendTo(tr);
 
+		tr = $("<tr></tr>").appendTo(table);
+		$("<th></th>").text(_t("Updated On:")).appendTo(tr);
+		$("<td></td>").text(info.updatedOn).appendTo(tr);
+		
 		var text = $('<div>').append(table).html();
 
 		axelor.dialogs.say(text);
@@ -956,11 +1027,37 @@ function FormViewCtrl($scope, $element) {
 				$scope.onCopy();
 			}
 		}, {
+			visible: function () {
+				return $scope.canArchive();
+			},
 		}, {
-			title: _t('Log...'),
+			title: _t('Archive'),
+			active: function () {
+				return $scope.canArchive();
+			},
+			visible: function () {
+				return $scope.canArchive();
+			},
+			click: function(e) {
+				$scope.onArchive();
+			},
+		}, {
+			title: _t('Unarchive'),
+			active: function () {
+				return $scope.canUnarchive();
+			},
+			visible: function () {
+				return $scope.canArchive();
+			},
+			click: function(e) {
+				$scope.onUnarchive();
+			},
+		}, {
+		}, {
 			active: function () {
 				return $scope.hasAuditLog();
 			},
+			title: _t('Last modified...'),
 			click: showLog
 		}]
 	}];
@@ -1000,7 +1097,7 @@ function FormViewCtrl($scope, $element) {
 			$scope.onBack();
 		}
 		
-		$scope.applyLater();
+		$scope.$applyAsync();
 		
 		return false;
 	};
@@ -1014,6 +1111,8 @@ function FormViewCtrl($scope, $element) {
 		}
 		return record[name];
 	};
+
+	$scope.$evalViewerExpr = axelor.$evalViewerExpr;
 }
 
 ui.formBuild = function (scope, schema, fields) {
@@ -1038,7 +1137,7 @@ ui.formBuild = function (scope, schema, fields) {
 			if (this.type == 'field') {
 				delete this.type;
 			}
-			if (['panel', 'panel-related'].indexOf(this.type) > -1) {
+			if (['panel', 'panel-json', 'panel-related'].indexOf(this.type) > -1) {
 				scope.$hasPanels = hasPanels = true;
 			}
 
@@ -1085,6 +1184,7 @@ ui.formBuild = function (scope, schema, fields) {
 						type: 'grid',
 						title: attrs.title || field.title || field.autoTitle,
 						items: attrs.items,
+						fields: attrs.fields,
 						canMove: attrs.canMove,
 						orderBy: attrs.orderBy,
 						editable: attrs.editable,
@@ -1125,6 +1225,7 @@ ui.formBuild = function (scope, schema, fields) {
 					'x-rowspan'		: this.rowSpan,
 					'x-sidebar'		: this.sidebar,
 					'x-stacked'		: this.stacked,
+					'x-flexbox'		: this.flexbox,
 					'x-widths'		: this.colWidths,
 					'x-field'		: this.name,
 					'x-title'		: attrs.title
@@ -1206,8 +1307,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 		};
 		
 		scope.hasAuditLog = function() {
-			var record = scope.record || {};
-			return record.createdOn || record.updatedOn || record.createBy || record.updatedBy;
+			return scope.record && scope.record.id > -1;
 		};
 
 		scope.hasWidth = function() {
@@ -1226,7 +1326,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			}
 
 			var elems = element.find('[x-field].ng-invalid:not(fieldset)').filter(function() {
-				var isInline = $(this).parents('.slickgrid,.nested-not-required').size() > 0;
+				var isInline = $(this).parents('.slickgrid,.nested-not-required').length > 0;
 				if (isInline) {
 					return false;
 				}
@@ -1275,7 +1375,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 		};
 
 		element.scroll(function (e) {
-			$.event.trigger('adjustScroll');
+			$(document).trigger('adjust:scroll', element);
 		});
 
 		scope.$on("on:form-show", function () {
@@ -1284,25 +1384,32 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 			});
 		});
 
-		var unwatch = scope.$watch('schema.loaded', function(viewLoaded){
+		var unwatch = scope.$watch('schema.loaded', function formSchemaWatch(viewLoaded){
 
 			if (!viewLoaded) return;
 			
 			unwatch();
+			
+			var preparing = true;
+
+			scope.$watchChecker(function () {
+				return !preparing;
+			});
 
 			var params = (scope._viewParams || {}).params || {};
 			var schema = scope.schema;
 			var form = ui.formBuild(scope, schema, scope.fields);
 
 			form = $compile(form)(scope);
-			element.append(form);
 
+			var numFields = form.find('[x-field]').length;
+			
 			if (!scope._isPopup && !scope._isPanelForm) {
 				element.addClass('has-width');
 			}
 
 			var width = schema.width || params.width;
-			if (width && !scope.$hasPanels) {
+			if (width) {
 				if (width === '100%' || width === '*') {
 					element.removeClass('has-width');
 				}
@@ -1311,12 +1418,16 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 					minWidth: schema.minWidth || params.minWidth,
 					maxWidth: schema.maxWidth || params.maxWidth
 				});
+				form.removeClass('large-form mid-form mini-form');
 			}
-			
-			if (scope._viewResolver) {
-				scope._viewResolver.resolve(schema, element);
-				scope.$broadcast("adjust:dialog");
-			}
+			scope.$timeout(function () {
+				element.append(form);
+				preparing = false;
+				if (scope._viewResolver) {
+					scope._viewResolver.resolve(schema, element);
+					scope.$broadcast("adjust:dialog");
+				}
+			}, Math.min(300, numFields * 2));
 		});
 		
 		element.on('dblclick', '[x-field].readonly', function (e) {

@@ -80,7 +80,7 @@ ui.formInput('Spreadsheet', {
 				return;
 			}
 			scope.setValue(value, true);
-			scope.applyLater();
+			scope.$applyAsync();
 		}
 
 		function compact(items) {

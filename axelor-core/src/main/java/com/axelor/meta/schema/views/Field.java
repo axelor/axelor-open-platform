@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,18 +17,23 @@
  */
 package com.axelor.meta.schema.views;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.MetaStore;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
@@ -110,6 +115,9 @@ public class Field extends SimpleWidget {
 	@XmlAttribute
 	private String aggregate;
 
+	@XmlAttribute
+	private Boolean massUpdate;
+
 	@XmlAttribute(name = "edit-window")
 	private String editWindow;
 
@@ -124,6 +132,9 @@ public class Field extends SimpleWidget {
 
 	@XmlAttribute(name = "x-bind")
 	private String bind;
+
+	@XmlAttribute(name = "x-enum-type")
+	private String enumType;
 
 	@XmlAttribute(name = "x-related")
 	private String related;
@@ -175,6 +186,9 @@ public class Field extends SimpleWidget {
 
 	@XmlAttribute(name = "x-search-limit")
 	private Integer searchLimit;
+	
+	@XmlAttribute(name = "x-json-model")
+	private String jsonModel;
 
 	@XmlElement(name = "hilite")
 	private List<Hilite> hilites;
@@ -340,6 +354,16 @@ public class Field extends SimpleWidget {
 	}
 
 	public List<?> getSelectionList() {
+		final String typeName = StringUtils.isBlank(enumType) && "enum".equals(serverType)
+				? target
+				: enumType;
+		if (StringUtils.notBlank(typeName)) {
+			try {
+				return MetaStore.getSelectionList(Class.forName(typeName));
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException("No such enum type found: " + typeName, e);
+			}
+		}
 		return MetaStore.getSelectionList(getSelection());
 	}
 
@@ -355,11 +379,26 @@ public class Field extends SimpleWidget {
 		this.aggregate = aggregate;
 	}
 
+	public Boolean getMassUpdate() {
+		return massUpdate;
+	}
+
+	public void setMassUpdate(Boolean massUpdate) {
+		this.massUpdate = massUpdate;
+	}
+
 	public String getBind() {
 		return bind;
 	}
 
+	public String getEnumType() {
+		return enumType;
+	}
+
 	public String getRelated() {
+		if (StringUtils.isBlank(related) && StringUtils.notBlank(widget) && widget.matches("RefSelect|ref-select")) {
+			return getName() + "Id";
+		}
 		return related;
 	}
 
@@ -487,6 +526,14 @@ public class Field extends SimpleWidget {
 		this.searchLimit = searchLimit;
 	}
 
+	public String getJsonModel() {
+		return jsonModel;
+	}
+
+	public void setJsonModel(String jsonModel) {
+		this.jsonModel = jsonModel;
+	}
+
 	public List<Hilite> getHilites() {
 		return hilites;
 	}
@@ -590,5 +637,14 @@ public class Field extends SimpleWidget {
 		} catch (NullPointerException e) {
 		}
 		return null;
+	}
+
+	@XmlTransient
+	@JsonProperty
+	public Collection<?> getJsonFields() {
+		final Map<String, Object> fields = StringUtils.isBlank(jsonModel) ?
+				MetaStore.findJsonFields(getModel(), getName()) :
+				MetaStore.findJsonFields(jsonModel);
+		return fields == null ? null : fields.values();
 	}
 }

@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -20,7 +20,6 @@ package com.axelor.meta.service;
 import static com.axelor.common.StringUtils.isBlank;
 import static com.axelor.meta.loader.ModuleManager.isInstalled;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,21 +34,24 @@ import javax.inject.Inject;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import org.hibernate.query.internal.AbstractProducedQuery;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
-import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.inject.Beans;
 import com.axelor.meta.ActionHandler;
+import com.axelor.meta.MetaFiles;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaActionMenu;
@@ -58,8 +60,8 @@ import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.MetaViewCustom;
-import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.meta.db.repo.MetaFileRepository;
+import com.axelor.meta.db.repo.MetaHelpRepository;
 import com.axelor.meta.db.repo.MetaViewCustomRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.loader.XMLViews;
@@ -99,7 +101,7 @@ public class MetaService {
 	private MetaFileRepository files;
 	
 	@Inject
-	private MetaAttachmentRepository attachments;
+	private MetaFiles metaFiles;
 
 	private boolean canShow(MenuItem item, Map<String, MenuItem> map, Set<String> visited, ScriptHelper helper) {
 		if (visited == null) {
@@ -234,6 +236,11 @@ public class MetaService {
 
 	public List<MenuItem> getMenus(boolean withTagsOnly) {
 
+		// make sure to apply hot updates
+		if (!withTagsOnly) {
+			XMLViews.applyHotUpdates();
+		}
+		
 		final User user = AuthUtils.getUser();
 		final Map<Long, Set<String>> menuGroups = new HashMap<>();
 		final Map<Long, Set<String>> menuRoles = new HashMap<>();
@@ -301,8 +308,25 @@ public class MetaService {
 				userRoles.add(role.getName());
 			}
 		}
+		
+		final Map<String, String> help = new HashMap<>();
+		if (!withTagsOnly && user.getNoHelp() != Boolean.TRUE) {
+			final MetaHelpRepository helpRepo = Beans.get(MetaHelpRepository.class);
+			final String lang = AppFilter.getLocale() == null ? "en" : AppFilter.getLocale().getLanguage();
+			helpRepo.all()
+				.filter("self.menu is not null and self.language = :lang")
+				.bind("lang", lang)
+				.cacheable()
+				.select("menu", "help")
+				.fetch(-1, 0)
+				.forEach(item -> {
+					help.put((String) item.get("menu"), (String) item.get("help"));
+				});
+		}
 
-		for(final MetaMenu menu : records) {
+		final Set<String> denied = new HashSet<>();
+
+		for (final MetaMenu menu : records) {
 			// check for user menus
 			if (menu.getUser() != null && menu.getUser() != user) {
 				continue;
@@ -310,9 +334,14 @@ public class MetaService {
 			// if no group access, check for roles
 			final Set<String> myGroups = menuGroups.get(menu.getId());
 			final Set<String> myRoles = menuRoles.get(menu.getId());
-			
-			if ((myGroups != null && !myGroups.contains(userGroup)) || (!AuthUtils.isAdmin(user) && myGroups == null
-					&& myRoles != null && Collections.disjoint(userRoles, myRoles))) {
+
+			boolean allowed = AuthUtils.isAdmin(user)
+					|| (myGroups != null && myGroups.contains(userGroup))
+					|| (myRoles != null && !Collections.disjoint(userRoles, myRoles))
+					|| (myRoles == null && menu.getParent() != null);
+
+			if (!allowed || denied.contains(menu.getName())) {
+				denied.add(menu.getName());
 				continue;
 			}
 
@@ -330,6 +359,10 @@ public class MetaService {
 			item.setHidden(menu.getHidden());
 			item.setModuleToCheck(menu.getModuleToCheck());
 			item.setConditionToCheck(menu.getConditionToCheck());
+			
+			if (help.containsKey(menu.getName())) {
+				item.setHelp(help.get(menu.getName()));
+			}
 
 			if (menu.getParent() != null) {
 				item.setParent(menu.getParent().getName());
@@ -539,7 +572,7 @@ public class MetaService {
 	}
 
 	@Transactional
-	public Response removeAttachment(Request request, String uploadPath) {
+	public Response removeAttachment(Request request) {
 		Response response = new Response();
 		List<Object> result = Lists.newArrayList();
 		List<Object> records = request.getRecords();
@@ -555,17 +588,12 @@ public class MetaService {
 
 			if (fileId != null) {
 				MetaFile obj = files.find(fileId);
-				if (uploadPath != null) {
-					File file = FileUtils.getFile(uploadPath, obj.getFilePath());
-					if (file.exists() && !file.delete()) {
-						continue;
-					}
+				try {
+					metaFiles.delete(obj);
+					result.add(record);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
 				}
-
-				attachments.all().filter("self.metaFile.id = ?1", fileId).delete();
-				files.remove(obj);
-
-				result.add(record);
 			}
 		}
 
@@ -655,8 +683,7 @@ public class MetaService {
 						JPA.em().createQuery(string);
 
 				// return result as list of map
-				((org.hibernate.ejb.QueryImpl<?>) query).getHibernateQuery()
-					.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+				this.transformQueryResult(query);
 
 				if (request.getData() != null) {
 					QueryBinder.of(query).bind(context);
@@ -700,6 +727,10 @@ public class MetaService {
 		data.put("config", config);
 		data.put("search", chart.getSearchFields());
 		data.put("onInit", chart.getOnInit());
+		
+		if ("sql".equals(chart.getDataSet().getType())) {
+			data.put("usingSQL", true);
+		}
 
 		return response;
 	}
@@ -765,8 +796,7 @@ public class MetaService {
 			}
 
 			// return result as list of map
-			((org.hibernate.ejb.QueryImpl<?>) query).getHibernateQuery()
-				.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+			this.transformQueryResult(query);
 
 			if (request.getData() != null) {
 				QueryBinder.of(query).bind(context);
@@ -776,5 +806,10 @@ public class MetaService {
 		}
 
 		return response;
+	}
+
+	private void transformQueryResult(Query query) {
+		//TODO: fix deprecation when new transformer api is implemented in hibernate
+		((AbstractProducedQuery<?>) query).setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 	}
 }

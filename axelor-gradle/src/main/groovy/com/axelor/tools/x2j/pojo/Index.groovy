@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -46,8 +46,15 @@ class Index {
 			Property property = entity.getField(field)
 
 			fields.add(field)
-			columns.add(Index.getColumn(property, column))
+			columns.add(getColumn(property, column))
 		}
+	}
+
+	Index(Entity entity, String name, List<String> fields) {
+		this.entity = entity
+		this.name = name
+		this.fields = fields
+		this.columns = fields.collect { String n -> getColumn(entity.getField(n), n) }
 	}
 
 	private static String getColumn(Property property, String column) {

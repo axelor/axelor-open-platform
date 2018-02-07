@@ -127,7 +127,7 @@ ui.directive('navMenuBar', function() {
 				elemTop.hide();
 				elemSub.hide();
 				
-				while (count < elemTop.size()) {
+				while (count < elemTop.length) {
 					var elem = $(elemTop[count]).show();
 					var width = siblingsWidth + element.width();
 					if (width > parentWidth) {
@@ -146,10 +146,10 @@ ui.directive('navMenuBar', function() {
 					count++;
 				}
 				
-				if (count === elemTop.size()) {
+				if (count === elemTop.length) {
 					elemMore.hide();
 				}
-				while(count < elemTop.size()) {
+				while(count < elemTop.length) {
 					$(elemSub[count++]).show();
 				}
 				
@@ -179,7 +179,7 @@ ui.directive('navMenuBar', function() {
 				}
 			});
 			
-			var unwatch = scope.$watch('menus', function(menus, old) {
+			var unwatch = scope.$watch('menus', function navMenusWatch(menus, old) {
 				if (!menus || menus.length === 0  || menus === old) {
 					return;
 				}
@@ -190,7 +190,7 @@ ui.directive('navMenuBar', function() {
 
 		template:
 			"<ul class='nav nav-menu-bar'>" +
-				"<li class='nav-menu dropdown' ng-class='{empty: !hasText(menu)}' ng-repeat='menu in menus'>" +
+				"<li class='nav-menu dropdown' ng-class='{empty: !hasText(menu)}' ng-repeat='menu in menus track by menu.name'>" +
 					"<a href='javascript:' class='dropdown-toggle' data-toggle='dropdown'>" +
 						"<img ng-if='hasImage(menu)' ng-src='{{menu.icon}}'> " +
 						"<i ng-if='hasIcon(menu)' class='fa {{menu.icon}}'></i> " +
@@ -223,7 +223,7 @@ ui.directive('navMenu', function() {
 		},
 		template:
 			"<ul class='dropdown-menu'>" +
-				"<li ng-repeat='item in menu.children' nav-menu-item='item'>" +
+				"<li ng-repeat='item in menu.children track by item.name' nav-menu-item='item'>" +
 			"</ul>"
 	};
 });
@@ -365,10 +365,82 @@ ui.directive('navMenuFav', function() {
 			"<ul class='dropdown-menu'>" +
 				"<li><a href='' ng-click='addFav()' x-translate>Add to favorites...</a></li>" +
 				"<li class='divider'></li>" +
-				"<li ng-repeat='item in items'><a ng-href='#{{item.link}}'>{{item.title}}</a></li>" +
+				"<li ng-repeat='item in items track by item.name'><a ng-href='#{{item.link}}'>{{item.title}}</a></li>" +
 				"<li class='divider'></li>" +
 				"<li><a href='' ng-click='manageFav()' x-translate>Organize favorites...</a></li>" +
 			"</ul>"
+	};
+});
+
+ui.directive('navMenuTasks', function() {
+	return {
+		replace: true,
+		controller: ['$scope', '$location', 'TagService', 'NavService', function ($scope, $location, TagService, NavService) {
+
+			var TEAM_TASK = "com.axelor.team.db.TeamTask";
+
+			function taskText(count) {
+				var n = count || 0;
+				if (n <= 0) return _t('no tasks');
+				return n > 1 ? _t('{0} tasks', n) : _t('{0} task', n);
+			}
+
+			function update(data) {
+				var counts = data || {};
+				if (counts.current) {
+					counts.css = 'badge-primary';
+				}
+				if (counts.pending) {
+					counts.css = 'badge-important';
+				}
+				counts.currentText = taskText(counts.current);
+				counts.pendingText = taskText(counts.pending);
+				counts.total = Math.min(99, counts.current);
+
+				$scope.counts = counts;
+			}
+			
+			TagService.listen(function (data) {
+				update(data.tasks || {});
+			});
+
+			$scope.showTasks = function (type) {
+				NavService.openTabByName('team.tasks.' + type);
+			};
+
+			function onDataChange(e, ds) {
+				if (ds._model === TEAM_TASK) {
+					TagService.find();
+				}
+			}
+
+			$scope.$on('ds:saved', onDataChange);
+			$scope.$on('ds:removed', onDataChange);
+
+			update({});
+		}],
+		template:
+			"<li class='dropdown'>" +
+				"<a href='' class='nav-link-tasks dropdown-toggle' data-toggle='dropdown'>" +
+					"<i class='fa fa-bell'></i>" +
+					"<span class='badge' ng-show='counts.css' ng-class='counts.css'>{{counts.total}}</span>" +
+				"</a>" +
+				"<ul class='dropdown-menu'>" +
+					"<li>" +
+						"<a href='' ng-click='showTasks(\"due\")'>" +
+							"<span class='nav-link-user-name' x-translate>Tasks due</span>" +
+							"<span class='nav-link-user-sub' ng-class='{\"fg-red\": counts.pending > 0}'>{{counts.pendingText}}</span>" +
+						"</a>" +
+					"</li>" +
+					"<li class='divider'></li>" +
+					"<li>" +
+						"<a href='' ng-click='showTasks((\"todo\"))'>" +
+							"<span class='nav-link-user-name' x-translate>Tasks todo</span>" +
+							"<span class='nav-link-user-sub'>{{counts.currentText}}</span>" +
+						"</a>" +
+					"</li>" +
+				"</ul>" +
+			"</li>"
 	};
 });
 

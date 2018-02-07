@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,6 +17,7 @@
  */
 package com.axelor.rpc;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +25,12 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.axelor.db.EntityHelper;
+import com.axelor.db.JPA;
+import com.axelor.db.Model;
 
 /**
  * An implementation of {@link Response} to be used with controllers.
@@ -35,16 +40,23 @@ import com.google.common.collect.Maps;
 @XmlRootElement(name = "response")
 public class ActionResponse extends Response {
 
-	final Map<String, Object> _data = Maps.newHashMap();
+	private Map<String, Object> dataMap;
+	
+	private static final Logger log = LoggerFactory.getLogger(ActionResponse.class);
+
+	private Map<String, Object> dataMap() {
+		if (dataMap == null) {
+			dataMap = new HashMap<>();
+			List<Object> data = new ArrayList<>();
+			data.add(dataMap);
+			setData(data);
+		}
+		return dataMap;
+	}
 
 	@SuppressWarnings("all")
 	private void set(String name, Object value) {
-		if (getData() == null) {
-			List<Object> data = Lists.newArrayList();
-			data.add(_data);
-			setData(data);
-		}
-		_data.put(name, value);
+		dataMap().put(name, value);
 	}
 
 	/**
@@ -155,15 +167,35 @@ public class ActionResponse extends Response {
 	/**
 	 * Set record values.
 	 * <p>
-	 * The client updates current view with these values.
+	 * The client will update current view with these values.
+	 * 
+	 * <p>
+	 * The context can be a {@link Map}, {@link Context} or {@link Model} proxy
+	 * obtained with {@link Context#asType(Class)}. Managed instance of
+	 * {@link Model} should be avoided.
 	 * </p>
 	 * 
 	 * @param context
-	 *            a map or a model instance
+	 *            the context to set, a map or context proxy
 	 * @see #setValue(String, Object)
+	 * @see Context#asType(Class)
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if passed context is detached non-proxy entity.
 	 */
 	public void setValues(Object context) {
-		set("values", context);
+		boolean managed = false;
+		if (context instanceof ContextEntity
+				|| context instanceof Map
+				|| (managed = context instanceof Model && JPA.em().contains(context))) {
+			if (managed) {
+				log.warn("managed instance passed as context: {}#{}",
+						EntityHelper.getEntityClass(context), ((Model) context).getId());
+			}
+			set("values", context);
+		} else {
+			throw new IllegalArgumentException("Invalid context object.");
+		}
 	}
 
 	/**
@@ -177,12 +209,12 @@ public class ActionResponse extends Response {
 	 */
 	@SuppressWarnings("all")
 	public void setValue(String fieldName, Object value) {
-		Map<String, Object> values = (Map) _data.get("values");
+		Map<String, Object> values = (Map) dataMap().get("values");
 		if (values == null) {
-			values = Maps.newHashMap();
+			values = new HashMap<>();
+			setValues(values);
 		}
 		values.put(fieldName, value);
-		setValues(values);
 	}
 
 	/**
@@ -208,7 +240,7 @@ public class ActionResponse extends Response {
 	 *            the filter
 	 */
 	public void setView(String title, String model, String mode, String domain) {
-		Map<String, Object> view = Maps.newHashMap();
+		final Map<String, Object> view = new HashMap<>();
 		view.put("title", title);
 		view.put("model", model);
 		view.put("type", mode);
@@ -256,19 +288,18 @@ public class ActionResponse extends Response {
 	public void setAttr(String fieldName, String attr, Object value) {
 
 		Map<String, Map<String, Object>> attrs = null;
-
 		try {
 			attrs = (Map) ((Map) getItem(0)).get("attrs");
 		} catch (Exception e) {
 		}
 
 		if (attrs == null) {
-			attrs = new HashMap<String, Map<String, Object>>();
+			attrs = new HashMap<>();
 		}
-
+		
 		Map<String, Object> my = attrs.get(fieldName);
 		if (my == null) {
-			my = new HashMap<String, Object>();
+			my = new HashMap<>();
 		}
 
 		my.put(attr, value);

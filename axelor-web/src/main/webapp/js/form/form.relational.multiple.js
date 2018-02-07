@@ -133,7 +133,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 
 		$scope.itemsPending = records;
 		$scope.setValue(records, callOnChange);
-		$scope.applyLater(function(){
+		$scope.$timeout(function() {
 			$scope.$broadcast('grid:changed');
 		});
 	};
@@ -168,7 +168,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		});
 		
 		$scope.setValue(records, fireOnChange);
-		$scope.applyLater();
+		$scope.$applyAsync();
 	};
 
 	$scope.removeSelected = function(selection) {
@@ -185,7 +185,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 			$scope.dataView.deleteItem(id);
 		});
 		$scope.setValue(items, true);
-		$scope.applyLater();
+		$scope.$applyAsync();
 	};
 
 	$scope.canEditTarget = function () {
@@ -260,6 +260,15 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		}
 	};
 	
+	$scope.viewCanCopy = function () {
+		return this.hasPermission("create") && !this.isDisabled() && !this.isReadonly() && this.canCopy();
+	};
+
+	$scope.viewCanExport = function () {
+		if (!$scope.field || !($scope.field.widgetAttrs||{}).canExport) return false;
+		return this.hasPermission("export") && this.canExport();
+	};
+
 	$scope.getSelectedRecord = function() {
 		var selected = _.first($scope.selection || []);
 		if (_.isUndefined(selected))
@@ -295,7 +304,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 	$scope.onItemDblClick = function(event, args) {
 		if($scope.canView()){
 			$scope.onEdit();
-			$scope.$apply();
+			$scope.$applyAsync();
 		}
 	};
 
@@ -356,7 +365,14 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		var sortBy = [];
 		
 		angular.forEach(args.sortCols, function(column){
+			var field = column.sortCol.descriptor;
 			var name = column.sortCol.field;
+			if (field.jsonField) {
+				if (field.type === 'many-to-one' && field.targetName) {
+					name = name + "." + field.targetName;
+				}
+				name += '::' + ('integer,boolean,decimal'.indexOf(field.type) > -1 ? field.type : 'text');
+			}
 			var spec = column.sortAsc ? name : '-' + name;
 			sortBy.push(spec);
 		});
@@ -368,7 +384,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 			'value': ids
 		};
 
-		var fields = _.pluck($scope.fields, 'name');
+		var fields = $scope.selectFields();
 		var filter = {
 			operator: 'and',
 			criteria: [criterion]
@@ -444,14 +460,14 @@ ui.formInput('OneToMany', {
 		};
 		
 		if (scope.field.requiredIf) {
-			scope.$watch("attr('required')", function(required) {
+			scope.$watch("attr('required')", function o2mRequiredWatch(required) {
 				if (required !== undefined) {
 					model.$validate();
 				}
 			});
 		}
 		if (scope.field.validIf) {
-			scope.$watch("attr('valid')", function(valid) {
+			scope.$watch("attr('valid')", function o2mValidWatch(valid) {
 				if (valid !== undefined) {
 					model.$setValidity('invalid', valid);
 				}
@@ -462,7 +478,7 @@ ui.formInput('OneToMany', {
 			if (doRenderUnwatch) {
 				return;
 			}
-			doRenderUnwatch = scope.$watch(function () {
+			doRenderUnwatch = scope.$watch(function o2mFetchWatch() {
 				if (!isVisible() || !doViewPromised) {
 					return;
 				}
@@ -489,7 +505,7 @@ ui.formInput('OneToMany', {
 
 		var adjustHeight = false;
 		var adjustSize = (function() {
-			var rowSize = 26;
+			var rowSize = +(scope.field.rowHeight) || 26;
 			var	minSize = 56;
 			var elem = element;
 			if (elem.is('.panel-related')) {
@@ -513,14 +529,14 @@ ui.formInput('OneToMany', {
 					height = (rowSize * count) + (minSize + rowSize);
 				}
 				if (elem && adjustHeight) {
-					elem.css('min-height', Math.min(height, maxSize));
+					elem.css('min-height', count ? Math.min(height, maxSize) : (minSize + 26));
 				}
 				axelor.$adjustSize();
 			};
 		})();
 
 		var collapseIfEmpty = this.collapseIfEmpty;
-		scope.$watch(attrs.ngModel, function(value){
+		scope.$watch(attrs.ngModel, function o2mAdjustWatch(value){
 			if (!value) {
 				// clear data view
 				scope.dataView.setItems([]);
@@ -558,7 +574,7 @@ ui.formInput('OneToMany', {
 						grid.setSelectedRows([]);
 					}
 				});
-				scope.$watch("isReadonly()", function(readonly) {
+				scope.$watch("isReadonly()", function o2mReadonlyWatch(readonly) {
 					grid.setOptions({
 						editable: !readonly && scope.canEdit()
 					});
@@ -638,7 +654,7 @@ ui.formInput('OneToMany', {
 			});
 		}
 
-		scope.$watch("attr('title')", function(title){
+		scope.$watch("attr('title')", function o2mTitleWatch(title){
 			scope.title = title;
 		});
 	},
@@ -648,32 +664,49 @@ ui.formInput('OneToMany', {
 	template_readonly: null,
 	
 	template:
-	'<div class="stackbar" ng-class="{noEdit: canView() && !canEdit()}">'+
-	'<div class="navbar">'+
-		'<div class="navbar-inner">'+
-			'<div class="container-fluid">'+
-				'<span class="brand" href="" ui-help-popover ng-bind-html="title"></span>'+
-				'<span class="icons-bar pull-right" ng-show="!isReadonly()">'+
-					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowEdit()" title="{{\'Edit\' | t}}" class="fa fa-pencil"></i>'+
-					'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowView()" title="{{\'View\' | t}}" class="fa fa-file-text-o"></i>'+
-					'<i ng-click="onNew()" ng-show="hasPermission(\'write\') && !isDisabled() && canNew()" title="{{\'New\' | t}}" class="fa fa-plus"></i>'+
-					'<i ng-click="onCopy()" ng-show="hasPermission(\'create\') && !isDisabled() && canCopy()" title="{{\'Duplicate\' | t}}" class="fa fa-files-o"></i>' +
-					'<i ng-click="onRemove()" ng-show="hasPermission(\'remove\') && !isDisabled() && canRemove()" title="{{\'Remove\' | t}}" class="fa fa-minus"></i>'+
-					'<i ng-click="onSelect()" ng-show="hasPermission(\'read\') && !isDisabled() && canSelect()" title="{{\'Select\' | t}}" class="fa fa-search"></i>'+
-				'</span>'+
-			'</div>'+
-		'</div>'+
-	'</div>'+
-	'<div ui-view-grid ' +
-		'x-view="schema" '+
-		'x-data-view="dataView" '+
-		'x-handler="this" '+
-		'x-no-filter="true" '+
-		'x-on-init="onGridInit" '+
-		'x-on-before-save="onGridBeforeSave" '+
-		'x-on-after-save="onGridAfterSave" '+
-		'></div>'+
-	'</div>'
+	"<div class='stackbar' ng-class='{noEdit: canView() && !canEdit()}'>" +
+	"<div class='navbar'>" +
+	    "<div class='navbar-inner'>" +
+	        "<div class='container-fluid'>" +
+	            "<span class='brand' href='' ui-help-popover ng-bind-html='title'></span>" +
+	    		"<span class='icons-bar dropdown pull-right' ng-show='viewCanCopy() || viewCanExport()'>" +
+					"<a href='' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-caret-down'></i></a>" +
+					"<ul class='dropdown-menu'>" +
+						"<li ng-show='viewCanCopy()'><a href='' ng-click='onCopy()' x-translate>Duplicate</a></li>" +
+						"<li ng-show='viewCanExport()'><a href='' ng-click='onExport()' x-translate>Export</a></li>" +
+					"</ul>" +
+				"</span>" +
+	            "<span class='icons-bar pull-right' ng-show='!isReadonly()'>" +
+					"<a href='' ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()'>" +
+						"<i class='fa fa-search'></i><span x-translate>Select</span>" +
+					"</a>" +
+					"<a href='' ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()'>" +
+						"<i class='fa fa-plus'></i><span x-translate>New</span>" +
+					"</a>" +
+					"<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()'>" +
+						"<i class='fa fa-pencil'></i><span x-translate>Edit</span>" +
+					"</a>" +
+					"<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowView()'>" +
+						"<i class='fa fa-file-text-o'></i><span x-translate>Show</span>" +
+					"</a>" +
+					"<a href='' ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()'>" +
+						"<i class='fa fa-remove'></i><span x-translate>Remove</span>" +
+					"</a>" +
+	                "<i ng-click='onCopy()' ng-show='hasPermission(\"create\") && !isDisabled() && canCopy()' title='{{\"Duplicate\" | t}}' class='fa fa-files-o'></i>" +
+	            "</span>" +
+	        "</div>" +
+	    "</div>" +
+	"</div>" +
+	"<div ui-view-grid " +
+	    "x-view='schema' " +
+	    "x-data-view='dataView' " +
+	    "x-handler='this' " +
+	    "x-no-filter='true' " +
+	    "x-on-init='onGridInit' " +
+	    "x-on-before-save='onGridBeforeSave' " +
+	    "x-on-after-save='onGridAfterSave' " +
+	    "></div>" +
+	"</div>"
 });
 
 ui.formInput('ManyToMany', 'OneToMany', {
@@ -686,15 +719,31 @@ ui.formInput('ManyToMany', 'OneToMany', {
 var panelRelatedTemplate = 
 "<div class='panel panel-related' ng-class='{noEdit: canView() && !canEdit()}'>" +
 	"<div class='panel-header'>" +
-		"<div class='icons-bar pull-right' ng-show='!isReadonly()'>" +
-			"<i ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()' title='{{\"Edit\" | t}}' class='fa fa-pencil'></i>" +
-			'<i ng-click="onEdit()" ng-show="hasPermission(\'read\') && canShowView()" title="{{\'View\' | t}}" class="fa fa-file-text-o"></i>'+
-			"<i ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()' title='{{\"New\" | t}}' class='fa fa-plus'></i>" +
-			"<i ng-click='onCopy()' ng-show='hasPermission(\"create\") && !isDisabled() && canCopy()' title='{{\"Duplicate\" | t}}' class='fa fa-files-o'></i>" +
-			"<i ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()' title='{{\"Remove\" | t}}' class='fa fa-minus'></i>" +
-			"<i ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()' title='{{\"Select\" | t}}' class='fa fa-search'></i>" +
-		"</div>" +
 		"<div class='panel-title'><span ui-help-popover ng-bind-html='title'></span></div>" +
+		"<div class='icons-bar' ng-show='!isReadonly()'>" +
+			"<a href='' ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()'>" +
+				"<i class='fa fa-search'></i><span x-translate>Select</span>" +
+			"</a>" +
+			"<a href='' ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()'>" +
+				"<i class='fa fa-plus'></i><span x-translate>New</span>" +
+			"</a>" +
+			"<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()'>" +
+				"<i class='fa fa-pencil'></i><span x-translate>Edit</span>" +
+			"</a>" +
+			"<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowView()'>" +
+				"<i class='fa fa-file-text-o'></i><span x-translate>Show</span>" +
+			"</a>" +
+			"<a href='' ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()'>" +
+				"<i class='fa fa-remove'></i><span x-translate>Remove</span>" +
+			"</a>" +
+		"</div>" +
+		"<div class='icons-bar dropdown' ng-show='viewCanCopy() || viewCanExport()'>" +
+			"<a href='' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-caret-down'></i></a>" +
+			"<ul class='dropdown-menu'>" +
+				"<li ng-show='viewCanCopy()'><a href='' ng-click='onCopy()' x-translate>Duplicate</a></li>" +
+				"<li ng-show='viewCanExport()'><a href='' ng-click='onExport()' x-translate>Export</a></li>" +
+			"</ul>" +
+		"</div>" +
 	"</div>" +
 	"<div class='panel-body panel-layout'>" +
 		"<div ui-view-grid " +
@@ -838,7 +887,7 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 					input.val("");
 				});
 				ui.item.click.call(scope);
-				return scope.applyLater();
+				return scope.$applyAsync();
 			}
 			return _handleSelect.apply(this, arguments);
 		};
@@ -912,7 +961,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 				return;
 			}
 			scope.items = showOnNew && canAdd() ? [{}] : [];
-			unwatch = scope.$watch('items[0]', function (item, old) {
+			unwatch = scope.$watch('items[0]', function o2mFirstItemWatch(item, old) {
 				if (!item) return;
 				if (item.$changed) {
 					unwatch();
@@ -949,7 +998,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 		scope.$watch('items', itemsChanged, true);
 		scope.$itemsChanged = itemsChanged;
 
-		scope.$watch('$$readonly', function (readonly, old) {
+		scope.$watch('$$readonly', function o2mReadonlyWatch(readonly, old) {
 			if (readonly === undefined) return;
 			var items = model.$viewValue;
 			if (_.isEmpty(items)) {
@@ -999,7 +1048,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 
 	template_readonly:function (scope) {
 		var field = scope.field;
-		var tmpl = field.viewer;
+		var tmpl = (field.viewer || {}).template;
 		if (!tmpl && field.editor && (field.editor.viewer || !field.targetName)) {
 			tmpl = '<div class="o2m-editor-form" ui-panel-editor></div>';
 		}
@@ -1063,7 +1112,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 			if (wrapper.is(":visible")) {
 				renderPending = false;
 				render();
-				grid.trigger('adjustSize');
+				grid.trigger('adjust:size');
 			} else {
 				renderPending = true;
 			}
@@ -1096,7 +1145,8 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 		scope.onDropdown = function () {
 			dropdownVisible = !dropdownVisible;
 			if (!dropdownVisible) {
-				return wrapper.hide();
+				wrapper.hide();
+				return;
 			}
 			if (renderPending) {
 				renderPending = false;
@@ -1126,7 +1176,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 			wrapper.hide();
 		});
 		
-		element.on("adjustSize", _.debounce(adjust, 300));
+		scope.$onAdjust(adjust, 300);
 		
 		input.on('keydown', function (e) {
 			if (e.keyCode === 40 && e.ctrlKey && !dropdownVisible) {
@@ -1140,7 +1190,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 			}
 			var all = element.add(wrapper);
 			var elem = $(e.target);
-			if (all.is(elem) || all.has(elem).size() > 0) return;
+			if (all.is(elem) || all.has(elem).length > 0) return;
 			if (elem.zIndex() > element.parents('.slickgrid:first').zIndex()) return;
 			if (elem.parents(".ui-dialog:first").zIndex() > element.parents('.slickgrid:first').zIndex()) return;
 
@@ -1149,14 +1199,14 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 		
 		$(document).on('mousedown.mini-grid', hidePopup);
 		
-		scope.$watch(attrs.ngModel, function(value) {
+		scope.$watch(attrs.ngModel, function o2mModelWatch(value) {
 			var text = "";
 			if (value && value.length)
 				text = "(" + value.length + ")";
 			input.val(text);
 		});
 		
-		scope.$watch('schema.loaded', function(viewLoaded) {
+		scope.$watch('schema.loaded', function o2mSchemaWatch(viewLoaded) {
 			var schema = scope.schema;
 			if (schema && scope.attr('canEdit') === false) {
 				schema.editIcon = false;

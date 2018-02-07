@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
+
+  <selection name="json.field.type">
+    <option value="string">String</option>
+    <option value="integer">Integer</option>
+    <option value="decimal">Decimal</option>
+    <option value="boolean">Boolean</option>
+    <option value="datetime">DateTime</option>
+    <option value="date">Date</option>
+    <option value="time">Time</option>
+    <option value="panel">Panel</option>
+    <option value="enum">Enum</option>
+    <option value="button">Button</option>
+    <option value="separator">Separator</option>
+    <option value="many-to-one">ManyToOne</option>
+    <option value="many-to-many">ManyToMany</option>
+    <option value="one-to-many">OneToMany</option>
+    <option value="json-many-to-one">Custom-ManyToOne</option>
+    <option value="json-many-to-many">Custom-ManyToMany</option>
+    <option value="json-one-to-many">Custom-OneToMany</option>
+  </selection>
+
+  <grid name="json-field-grid" title="Custom fields" model="com.axelor.meta.db.MetaJsonField">
+    <field name="name" />
+    <field name="type" />
+    <field name="model" />
+    <field name="modelField" />
+  </grid>
+
+  <form name="json-field-form-base" title="Custom field" model="com.axelor.meta.db.MetaJsonField">
+    <panel-tabs>
+      <panel title="Options">
+        <panel itemSpan="12">
+          <field name="enumType" showIf="type === 'enum'" widget="ref-text"
+            x-target="com.axelor.meta.db.MetaEnum"
+            x-target-name="name"/>
+          <field name="selection" showIf="type !== 'enum'" widget="ref-text"
+            x-target="com.axelor.meta.db.MetaSelect"
+            x-target-name="name" />
+        </panel>
+        <field name="widget" widget="widget-select" />
+        <field name="onChange" colSpan="12" hideIf="type === 'button'"/>
+        <field name="onClick" colSpan="12" showIf="type === 'button'" requiredIf="type === 'button'"/>
+        <field name="minSize" title="Min" showIf="type.match('string|integer|decimal')" />
+        <field name="maxSize" title="Max" showIf="type.match('string|integer|decimal')" />
+        <field name="precision" showIf="type === 'decimal'" />
+        <field name="scale" showIf="type === 'decimal'" />
+        <field name="regex" showIf="type === 'string'" colSpan="12" />
+        <panel itemSpan="12">
+          <field name="targetModel" showIf="type.match('^(one|many)-to-')" widget="ref-text"
+            x-target="com.axelor.meta.db.MetaModel"
+            x-target-name="fullName" />
+          <field name="targetJsonModel" showIf="type.match('^json-')"
+            title="Target custom model"
+            canEdit="false" canView="false" />
+        </panel>
+        <field name="domain" showIf="type.match('-to-')" />
+        <field name="gridView" showIf="type.match('^(one|many)-to-')" widget="ref-text"
+           x-target="com.axelor.meta.db.MetaView"
+           x-target-name="name"
+           x-domain="self.model = :targetModel AND self.type = 'grid'"/>
+        <field name="formView" showIf="type.match('^(one|many)-to-')" widget="ref-text"
+           x-target="com.axelor.meta.db.MetaView"
+           x-target-name="name"
+           x-domain="self.model = :targetModel AND self.type = 'form'"/>
+      </panel>
+      <panel title="Conditions" itemSpan="12">
+        <field name="contextField" title="Only if" colSpan="6" showIf="model"
+          widget="ref-text"
+          x-target-name="name"
+          x-target="com.axelor.meta.db.MetaField"
+          x-domain="self.name not in ('createdBy', 'updatedBy') and self.relationship = 'ManyToOne' and self.metaModel.fullName = :model"
+          onChange="com.axelor.meta.web.MetaController:contextFieldChange"/>
+        <field name="contextFieldValue" colSpan="6" title="Value" showIf="model"
+          widget="EvalRefSelect"
+          x-eval-target="record.contextFieldTarget"
+          x-eval-target-name="record.contextFieldTargetName"
+          x-eval-value="record.contextFieldValue"
+          x-eval-title="record.contextFieldTitle" />
+        <field name="contextFieldTitle" hidden="true" />
+        <field name="contextFieldTarget" hidden="true" />
+        <field name="contextFieldTargetName" hidden="true" />
+        <field name="showIf" />
+        <field name="hideIf" />
+        <field name="requiredIf" />
+        <field name="readonlyIf" />
+        <field name="includeIf" help="Server expression to check whether to use this field."/>
+      </panel>
+      <panel title="Value Expression">
+        <field name="valueExpr" showTitle="false" colSpan="12" 
+          widget="code-editor" x-height="100" x-mode="javascript"/>
+      </panel>
+      <panel-related field="roles">
+        <field name="name" />
+      </panel-related>
+    </panel-tabs>
+    <panel title="Options" sidebar="true" itemSpan="6">
+      <field name="required" widget="inline-checkbox" />
+      <field name="readonly" widget="inline-checkbox" />
+      <field name="nameField" widget="inline-checkbox" showIf="type === 'string'" />
+      <field name="hidden" widget="inline-checkbox" />
+      <field name="visibleInGrid" widget="inline-checkbox" />
+    </panel>
+    <panel title="Widget Attributes" sidebar="true">
+      <field name="widgetAttrs" widget="json-raw" />
+    </panel>
+  </form>
+  <form name="json-field-form" title="Custom field" model="com.axelor.meta.db.MetaJsonField">
+    <panel title="Overview">
+      <field name="name" x-pattern="[a-zA-Z][a-zA-Z0-9_\\$]+"/>
+      <field name="type" />
+      <field name="title" />
+      <field name="defaultValue" />
+      <field name="help" />
+      <field name="sequence" />
+      <field name="model" widget="ref-text"
+        x-target-name="fullName"
+        x-target="com.axelor.meta.db.MetaModel"
+        x-domain="self.metaFields.json = true AND self.fullName NOT LIKE 'com.axelor.meta.db%'" />
+      <field name="modelField" widget="ref-text"
+        x-target-name="name"
+        x-target="com.axelor.meta.db.MetaField"
+        x-domain="self.json = true AND self.metaModel.fullName = :model"/>
+    </panel>
+    <panel-include view="json-field-form-base" />
+  </form>
+  <form name="json-field-form-2" title="Custom field" model="com.axelor.meta.db.MetaJsonField"
+    onNew="action-json-field-defaults">
+    <panel title="Overview">
+      <field name="name" x-pattern="[a-zA-Z][a-zA-Z0-9_\\$]+"/>
+      <field name="type" />
+      <field name="title" />
+      <field name="defaultValue" />
+      <field name="help" />
+      <field name="sequence" />
+    </panel>
+    <panel-include view="json-field-form-base" />
+  </form>
+
+  <grid name="json-model-grid" title="Custom models" model="com.axelor.meta.db.MetaJsonModel">
+    <field name="title" />
+    <field name="name" />
+  </grid>
+
+  <form name="json-model-form" title="Custom model" model="com.axelor.meta.db.MetaJsonModel">
+    <panel title="Overview">
+      <field name="name" readonlyIf="id" x-pattern="[a-zA-Z][a-zA-Z0-9_\\$]+"/>
+      <field name="title" />
+      <field name="onNew" />
+      <field name="onSave" />
+    </panel>
+    <panel-tabs>
+  	  <panel-related field="fields" form-view="json-field-form-2" orderBy="sequence" canMove="true">
+        <field name="name"/>
+        <field name="type"/>
+      </panel-related>
+      <panel-related field="roles">
+        <field name="name" />
+      </panel-related>
+    </panel-tabs>
+  </form>
+
+  <grid name="json-record-grid" title="Form records" model="com.axelor.meta.db.MetaJsonRecord">
+    <field name="attrs" />
+  </grid>
+
+  <form name="json-record-form" title="Form record" model="com.axelor.meta.db.MetaJsonRecord"
+    onNew="action-json-record-defaults">
+    <panel title="Overview">
+      <field name="attrs" colSpan="12" />
+    </panel>
+  </form>
+
+  <menuitem name="menu-custom-models" parent="menu-model"
+    title="Custom Models"
+    action="custom.models.all" />
+  <menuitem name="menu-custom-fields" parent="menu-model"
+    title="Custom Fields"
+    action="custom.fields.all" />
+
+  <action-record name="action-json-field-defaults" model="com.axelor.meta.db.MetaJsonField">
+    <field name="model" expr="com.axelor.meta.db.MetaJsonRecord" />
+    <field name="modelField" expr="attrs" />
+  </action-record>
+
+  <action-record name="action-json-record-defaults" model="com.axelor.meta.db.MetaJsonRecord">
+    <field name="jsonModel" expr="#{jsonModel}" />
+  </action-record>
+
+  <action-view name="custom.models.all"
+    title="Custom Models"
+    model="com.axelor.meta.db.MetaJsonModel">
+    <view type="grid" name="json-model-grid" />
+    <view type="form" name="json-model-form" />
+  </action-view>
+
+  <action-view name="custom.fields.all"
+    title="Custom Fields"
+    model="com.axelor.meta.db.MetaJsonField">
+    <view type="grid" name="json-field-grid" />
+    <view type="form" name="json-field-form" />
+    <domain>self.jsonModel is null</domain>
+  </action-view>
+
+</object-views>

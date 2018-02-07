@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -22,6 +22,7 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import javax.persistence.Column;
 import javax.validation.constraints.Digits;
 
 import com.axelor.db.mapper.TypeAdapter;
@@ -29,28 +30,34 @@ import com.axelor.db.mapper.TypeAdapter;
 public class DecimalAdapter implements TypeAdapter<BigDecimal> {
 
 	@Override
-	public Object adapt(Object value, Class<?> actualType, Type genericType,
-			Annotation[] annotations) {
-		
+	public Object adapt(Object value, Class<?> actualType, Type genericType, Annotation[] annotations) {
+
 		Integer scale = null;
+		Boolean nullable = null;
 		for (Annotation a : annotations) {
 			if (a instanceof Digits) {
 				scale = ((Digits) a).fraction();
 			}
+			if (a instanceof Column) {
+				nullable = ((Column) a).nullable();
+			}
 		}
 		
-		if (value == null || (value instanceof String && "".equals(((String) value).trim())))
-			return BigDecimal.ZERO;
+		boolean empty = value == null || (value instanceof String && "".equals(((String) value).trim()));
+		if (empty) {
+			return nullable == Boolean.TRUE ? null : BigDecimal.ZERO;
+		}
 
-		if (value instanceof BigDecimal)
-			return adjust((BigDecimal)value, scale);
-		
+		if (value instanceof BigDecimal) {
+			return adjust((BigDecimal) value, scale);
+		}
 		return adjust(new BigDecimal(value.toString()), scale);
 	}
-	
+
 	private BigDecimal adjust(BigDecimal value, Integer scale) {
-		if (scale != null)
+		if (scale != null) {
 			return value.setScale(scale, RoundingMode.HALF_UP);
+		}
 		return value;
 	}
 }

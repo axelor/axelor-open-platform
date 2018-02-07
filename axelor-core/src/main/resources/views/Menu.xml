@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <object-views xmlns="http://axelor.com/xml/ns/object-views"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_4.2.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
 
   <menuitem name="menu-admin" title="Administration" order="100" groups="admins" icon="fa-wrench" icon-background="red" />
   <menuitem name="menu-auth" parent="menu-admin" title="User Management" />
   <menuitem name="menu-model" title="Model Management" parent="menu-admin"/>
   <menuitem name="menu-view-management" title="View Management" parent="menu-admin"/>
+  <menuitem name="menu-help-management" title="Help Management" parent="menu-admin"/>
   <menuitem name="menu-module-management" title="Module Management" parent="menu-admin" />
   <menuitem name="menu-job-management" title="Job Management" parent="menu-admin" />
 
@@ -124,6 +125,25 @@
   <action-view name="action-meta-translations" title="All Translations" model="com.axelor.meta.db.MetaTranslation">
     <view type="grid" name="meta-translations-grid"/>
     <view type="form" name="meta-translations-form"/>
+  </action-view>
+
+  <menuitem name="menu-view-help-views" parent="menu-help-management"
+    title="View Help"
+    action="action-meta-help-views" />
+  <menuitem name="menu-view-help-menus" parent="menu-help-management"
+    title="Menu Help"
+    action="action-meta-help-menus" />
+
+  <action-view name="action-meta-help-views" title="View Help" model="com.axelor.meta.db.MetaHelp">
+    <view type="grid" name="meta-help-view-grid"/>
+    <view type="form" name="meta-help-view-form"/>
+    <domain>self.menu is null</domain>
+  </action-view>
+
+  <action-view name="action-meta-help-menus" title="Menu Help" model="com.axelor.meta.db.MetaHelp">
+    <view type="grid" name="meta-help-menu-grid"/>
+    <view type="form" name="meta-help-menu-form"/>
+    <domain>self.menu is not null</domain>
   </action-view>
 
   <menuitem name="menu-view-charts" parent="menu-view-management"

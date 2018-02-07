@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -20,6 +20,7 @@ package com.axelor.rpc.filter;
 import java.util.Collection;
 import java.util.List;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.google.common.collect.Lists;
@@ -40,7 +41,9 @@ public abstract class Filter {
 			sb.replace(i, i + 1, "?" + (++n));
 			i = sb.indexOf("?", i + 1);
 		}
-		query.filter(sb.toString(), getParams().toArray());
+		if (StringUtils.notBlank(sb)) {
+			query.filter(sb.toString(), getParams().toArray());
+		}
 		return query;
 	}
 
@@ -60,11 +63,11 @@ public abstract class Filter {
 		return new SimpleFilter(Operator.NOT_EQUAL, fieldName, value);
 	}
 
-	public static Filter lessThen(String fieldName, Object value) {
+	public static Filter lessThan(String fieldName, Object value) {
 		return new SimpleFilter(Operator.LESS_THAN, fieldName, value);
 	}
 
-	public static Filter greaterThen(String fieldName, Object value) {
+	public static Filter greaterThan(String fieldName, Object value) {
 		return new SimpleFilter(Operator.GREATER_THAN, fieldName, value);
 	}
 

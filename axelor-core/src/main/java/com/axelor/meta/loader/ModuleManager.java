@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,16 +17,15 @@
  */
 package com.axelor.meta.loader;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -44,6 +43,7 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.common.StringUtils;
 import com.axelor.db.internal.DBHelper;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
@@ -54,10 +54,6 @@ import com.axelor.meta.db.repo.MetaMenuRepository;
 import com.axelor.meta.db.repo.MetaModuleRepository;
 import com.axelor.meta.db.repo.MetaSelectRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
-import com.google.common.base.Joiner;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.inject.persist.Transactional;
 
 public class ModuleManager {
@@ -89,55 +85,42 @@ public class ModuleManager {
 	@Inject
 	private DemoLoader demoLoader;
 
-	@Inject
-	private AuditableRunner jobRunner;
+	private static final Set<String> SKIP = new HashSet<>();
 
-	private static final Set<String> SKIP = Sets.newHashSet(
-			"axelor-common",
-			"axelor-cglib",
-			"axelor-test");
+	static {
+		SKIP.add("axelor-common");
+		SKIP.add("axelor-cglib");
+		SKIP.add("axelor-test");
+	}
 
 	public ModuleManager() {
-
 	}
 
 	public void initialize(final boolean update, final boolean withDemo) {
-
-		final Runnable job = new Runnable() {
-
-			@Override
-			public void run() {
-
-				log.info("modules found:");
-				for (String name : resolver.names()) {
-					log.info("  " + name);
-				}
-
-				// install modules
-				for (Module module : resolver.all()) {
-					if (!module.isRemovable() || (module.isInstalled() && module.isPending())) {
-						install(module.getName(), update, withDemo, false);
-					}
-				}
-				// second iteration ensures proper view sequence
-				for (Module module : resolver.all()) {
-					if (module.isInstalled()) {
-						viewLoader.doLast(module, update);
-					}
-				}
-				// uninstall pending modules
-				for (Module module : resolver.all()) {
-					if (module.isRemovable() && !module.isInstalled() && module.isPending()) {
-						uninstall(module.getName());
-					}
-				}
-			}
-		};
-
 		try {
-			this.createUsers();
-			this.resolve(true);
-			jobRunner.run(job);
+			createUsers();
+			resolve(true);
+			Beans.get(AuditableRunner.class).run(() -> {
+				// install modules
+				resolver.all().stream()
+					.filter(m -> !m.isRemovable() || m.isInstalled())
+					.peek(m -> log.info("Loading package " + m.getName() + "..."))
+					.filter(m -> !m.isRemovable() || m.isPending())
+					.forEach(m -> install(m.getName(), update, withDemo, false));
+
+				// second iteration ensures proper view sequence
+				resolver.all().stream()
+					.filter(Module::isInstalled)
+					.forEach(m -> viewLoader.doLast(m, update));
+
+				// uninstall pending modules
+				resolver.all().stream()
+					.filter(Module::isRemovable)
+					.filter(Module::isPending)
+					.filter(m -> !m.isInstalled())
+					.map(Module::getName)
+					.forEach(this::uninstall);
+			});
 		} finally {
 			this.encryptPasswords();
 			this.doCleanUp();
@@ -149,40 +132,30 @@ public class ModuleManager {
 	}
 
 	public void update(boolean withDemo, String... moduleNames) {
-
+		final List<String> names = new ArrayList<>();
+		if (moduleNames != null) {
+			Collections.addAll(names, moduleNames);
+		}
 		try {
 			this.createUsers();
 			this.resolve(true);
-
-			List<String> names = Lists.newArrayList();
-			if (moduleNames != null) {
-				names = Lists.newArrayList(moduleNames);
-			}
-
 			if (names.isEmpty()) {
-				for (Module module : resolver.all()) {
-					if (module.isInstalled()) {
-						names.add(module.getName());
-					}
-				}
+				resolver.all().stream()
+					.filter(Module::isInstalled)
+					.map(Module::getName)
+					.forEach(names::add);
 			}
-
-			for (Module module : resolver.all()) {
-				if (names.contains(module.getName())) {
-					install(module, true, withDemo);
-				}
-			}
-
-			for (Module module : resolver.all()) {
-				if (names.contains(module.getName())) {
-					viewLoader.doLast(module, true);
-				}
-			}
+			resolver.all().stream()
+				.filter(m -> names.contains(m.getName()))
+				.forEach(m -> install(m, true, withDemo));
+			resolver.all().stream()
+				.filter(m -> names.contains(m.getName()))
+				.forEach(m -> viewLoader.doLast(m, true));
 		} finally {
 			this.doCleanUp();
 		}
 	}
-	
+
 	public void restoreMeta() {
 		try {
 			loadData = false;
@@ -196,26 +169,19 @@ public class ModuleManager {
 		return resolver.names();
 	}
 
-	public static List<Module> getAll() {
+	static List<Module> getAll() {
 		return resolver.all();
 	}
 
-	public static URL getModulePath(String module) {
-		try {
-			return resolver.get(module).getPath();
-		} catch (NullPointerException e) {
-			return null;
-		}
+	static Module getModule(String name) {
+		return resolver.get(name);
 	}
 
 	public void install(String moduleName, boolean update, boolean withDemo) {
 		try {
-			for (Module module: resolver.resolve(moduleName)) {
-				install(module.getName(), update, withDemo, true);
-			}
-			for (Module module: resolver.resolve(moduleName)) {
-				viewLoader.doLast(module, update);
-			}
+			resolver.resolve(moduleName).stream().map(Module::getName)
+					.forEach(name -> install(name, update, withDemo, true));
+			resolver.resolve(moduleName).stream().forEach(m -> viewLoader.doLast(m, update));
 		} finally {
 			this.doCleanUp();
 		}
@@ -223,10 +189,9 @@ public class ModuleManager {
 
 	@Transactional
 	public void uninstall(String module) {
+		log.info("Removing package " + module + "...");
 
-		log.info("Uninstall module: {}", module);
-		
-		MetaModule entity = modules.findByName(module);
+		final MetaModule entity = modules.findByName(module);
 
 		Beans.get(MetaViewRepository.class).findByModule(module).remove();
 		Beans.get(MetaSelectRepository.class).findByModule(module).remove();
@@ -241,24 +206,15 @@ public class ModuleManager {
 
 		resolver.get(module).setInstalled(false);
 		resolver.get(module).setPending(false);
-
-		log.info("Module uninstalled: {}", module);
 	}
 
-	public void doCleanUp() {
+	private void doCleanUp() {
 		AbstractLoader.doCleanUp();
 	}
 
-	@Transactional
-	MetaModule findModule(String name) {
-		return modules.findByName(name);
-	}
-	
 	private void install(String moduleName, boolean update, boolean withDemo, boolean force) {
-
 		final Module module = resolver.get(moduleName);
-		final MetaModule metaModule = findModule(moduleName);
-
+		final MetaModule metaModule = modules.findByName(moduleName);
 		if (metaModule == null) {
 			return;
 		}
@@ -268,22 +224,20 @@ public class ModuleManager {
 		if (module.isInstalled() && !(update || module.isUpgradable() || module.isPending())) {
 			return;
 		}
-
 		install(module, update, withDemo);
 	}
 
 	private void install(Module module, boolean update, boolean withDemo) {
-
 		if (SKIP.contains(module.getName())) {
 			return;
 		}
 
-		String message = "installing: {}";
+		String message = "Installing package ";
 		if (module.isInstalled()) {
-			message = "updating: {}";
+			message = "Updating package ";
 		}
 
-		log.info(message, module);
+		log.info(message + module + "...");
 
 		// load meta
 		installMeta(module, update);
@@ -347,35 +301,25 @@ public class ModuleManager {
 	 * candidates).
 	 *
 	 */
-	public static Map<String, URL> findInstalled() {
+	public static List<String> findInstalled() {
 		final Resolver resolver = new Resolver();
 		final Set<String> installed = getInstalledModules();
 		final List<String> found = new ArrayList<>();
 
-		for (URL file : MetaScanner.findAll("module\\.properties")) {
-			if (!file.getFile().endsWith("/module.properties")) {
-				continue;
-			}
-			Properties properties = new Properties();
-			try {
-				properties.load(file.openStream());
-			} catch (IOException e) {
-				throw Throwables.propagate(e);
-			}
-
-			String name = properties.getProperty("name");
-
+		for (final Properties properties : MetaScanner.findModuleProperties()) {
+			final String name = properties.getProperty("name");
 			if (SKIP.contains(name)) {
 				continue;
 			}
 
-			String[] depends = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
-			String[] installs = properties.getProperty("installs", "").trim().split("\\s*,\\s*");
-			boolean removable = "true".equals(properties.getProperty("removable"));
+			final String[] depends = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
+			final String[] installs = properties.getProperty("installs", "").trim().split("\\s*,\\s*");
+			final boolean removable = "true".equals(properties.getProperty("removable"));
+			final boolean application = "true".equals(properties.getProperty("application"));
 
-			Module module = resolver.add(name, depends);
+			final Module module = resolver.add(name, depends);
 			module.setRemovable(removable);
-			module.setPath(file);
+			module.setApplication(application);
 
 			// install forced modules on init
 			if (installed.isEmpty()) {
@@ -394,54 +338,38 @@ public class ModuleManager {
 			}
 		}
 
-		final Map<String, URL> result = new LinkedHashMap<>();
-		for (String name : found) {
-			result.put(name, resolver.get(name).getPath());
-		}
-
-		return result;
+		return found;
 	}
 
 	@Transactional
 	void resolve(boolean update) {
-
 		final Set<String> forceInstall = new HashSet<>();
+		final Map<MetaModule, String[]> dependencies = new HashMap<>();
 		final boolean forceInit = modules.all().count() == 0;
 
-		for (URL file : MetaScanner.findAll("module\\.properties")) {
-			if (!file.getFile().endsWith("/module.properties")) {
-				continue;
-			}
-			Properties properties = new Properties();
-			try {
-				properties.load(file.openStream());
-			} catch (IOException e) {
-				throw Throwables.propagate(e);
-			}
-
-			String name = properties.getProperty("name");
-
+		for (final Properties properties : MetaScanner.findModuleProperties()) {
+			final String name = properties.getProperty("name");
 			if (SKIP.contains(name)) {
 				continue;
 			}
 
-			String[] depends = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
-			String title = properties.getProperty("title");
-			String description = properties.getProperty("description");
-			String version = properties.getProperty("version");
-			boolean removable = "true".equals(properties.getProperty("removable"));
+			final String[] depends = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
+			final String title = properties.getProperty("title");
+			final String description = properties.getProperty("description");
+			final String version = properties.getProperty("version");
+			final boolean removable = "true".equals(properties.getProperty("removable"));
+			final boolean application = "true".equals(properties.getProperty("application"));
 
 			if (forceInit && forceInstall.isEmpty()) {
 				String[] installs = properties.getProperty("installs", "").trim().split("\\s*,\\s*");
 				forceInstall.addAll(Arrays.asList(installs));
 			}
 
-			Module module = resolver.add(name, depends);
+			final Module module = resolver.add(name, depends);
 			MetaModule stored = modules.findByName(name);
 			if (stored == null) {
 				stored = new MetaModule();
 				stored.setName(name);
-				stored.setDepends(Joiner.on(",").join(depends));
 			}
 
 			if (stored.getId() == null || update) {
@@ -449,15 +377,32 @@ public class ModuleManager {
 				stored.setDescription(description);
 				stored.setModuleVersion(version);
 				stored.setRemovable(removable);
+				stored.setApplication(application);
 				stored = modules.save(stored);
+				dependencies.put(stored, depends);
 			}
 
-			module.setPath(file);
 			module.setVersion(version);
+			module.setApplication(application);
 			module.setRemovable(removable);
 			module.setInstalled(stored.getInstalled() == Boolean.TRUE);
 			module.setPending(stored.getPending() == Boolean.TRUE);
 			module.setInstalledVersion(stored.getModuleVersion());
+		}
+		
+		// resolve dependencies
+		for (MetaModule stored : dependencies.keySet()) {
+			final Set<MetaModule> depends = new HashSet<>();
+			for (String name : dependencies.get(stored)) {
+				if (StringUtils.isBlank(name)) continue;
+				final MetaModule depending = modules.findByName(name);
+				if (depending == null) {
+					throw new RuntimeException("No such depemodule found: " + name + ", required by: " + stored.getName());
+				}
+				depends.add(depending);
+			}
+			stored.clearDepends();
+			stored.setDepends(depends);
 		}
 
 		for (String name : forceInstall) {

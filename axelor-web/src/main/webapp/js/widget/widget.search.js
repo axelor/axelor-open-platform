@@ -31,6 +31,9 @@ var OPERATORS = {
 
 	"like" 		: _t("contains"),
 	"notLike"	: _t("doesn't contain"),
+	
+	"in" 		: _t("in"),
+	"notIn"	: _t("not in"),
 
 	"between"		: _t("in range"),
 	"notBetween"	: _t("not in range"),
@@ -43,6 +46,8 @@ var OPERATORS = {
 };
 
 var OPERATORS_BY_TYPE = {
+	"enum"		: ["=", "!=", "isNull", "notNull"],
+	"text"		: ["like", "notLike", "isNull", "notNull"],
 	"string"	: ["=", "!=", "like", "notLike", "isNull", "notNull"],
 	"integer"	: ["=", "!=", ">=", "<=", ">", "<", "between", "notBetween", "isNull", "notNull"],
 	"boolean"	: ["true", "false"]
@@ -52,8 +57,12 @@ _.each(["long", "decimal", "date", "time", "datetime"], function(type) {
 	OPERATORS_BY_TYPE[type] = OPERATORS_BY_TYPE.integer;
 });
 
-_.each(["text", "one-to-one", "many-to-one", "one-to-many", "many-to-many"], function(type) {
-	OPERATORS_BY_TYPE[type] = OPERATORS_BY_TYPE.string;
+_.each(["one-to-many"], function(type) {
+	OPERATORS_BY_TYPE[type] = OPERATORS_BY_TYPE.text;
+});
+
+_.each(["one-to-one", "many-to-one", "many-to-many"], function(type) {
+	OPERATORS_BY_TYPE[type] = ["like", "notLike", "in", "notIn", "isNull", "notNull"];
 });
 
 ui.directive('uiFilterItem', function() {
@@ -63,7 +72,8 @@ ui.directive('uiFilterItem', function() {
 		require: '^uiFilterForm',
 		scope: {
 			fields: "=",
-			filter: "="
+			filter: "=",
+			model: "="
 		},
 		link: function(scope, element, attrs, form) {
 
@@ -79,7 +89,9 @@ ui.directive('uiFilterItem', function() {
 				}
 
 				var field = scope.fields[filter.field] || {};
-				var operators = OPERATORS_BY_TYPE[filter.type] || [];
+				var operators = filter.selectionList
+					? OPERATORS_BY_TYPE["enum"] || []
+					: OPERATORS_BY_TYPE[filter.type] || [];
 
 				if (field.target && !field.targetName) {
 					operators = ["isNull", "notNull"];
@@ -98,14 +110,21 @@ ui.directive('uiFilterItem', function() {
 			};
 			
 			scope.canShowSelect = function () {
-				return scope.filter && scope.filter.selection &&
+				return scope.filter && scope.filter.selectionList &&
 					   scope.filter.operator && !(
 					   scope.filter.operator == 'isNull' ||
 					   scope.filter.operator == 'notNull');
 			};
+			
+			scope.canShowTags = function() {
+				return scope.filter &&
+				   ['many-to-one', 'one-to-one', 'many-to-many'].indexOf(scope.filter.type) > -1
+				   && ( scope.filter.operator == 'in' ||
+						scope.filter.operator == 'notNot');
+			};
 
 			scope.canShowInput = function() {
-				return scope.filter && !scope.canShowSelect() &&
+				return scope.filter && !scope.canShowSelect() && !scope.canShowTags() &&
 					   scope.filter.operator && !(
 					   scope.filter.type == 'boolean' ||
 					   scope.filter.operator == 'isNull' ||
@@ -129,7 +148,7 @@ ui.directive('uiFilterItem', function() {
 					field = scope.fields[filter.field] || {};
 
 				filter.type = field.type || 'string';
-				filter.selection = field.selection;
+				filter.selectionList = field.selectionList;
 
 				if (field.type === 'many-to-one' || field.type === 'one-to-one') {
 					filter.targetName = field.targetName;
@@ -144,11 +163,28 @@ ui.directive('uiFilterItem', function() {
 				});
 			};
 
-			scope.$watch('filter.field', function (value, old) {
+			scope.$watch('filter.field', function searchFilterFieldWatch(value, old) {
 				scope.operators = getOperators();
 			});
 
-			var unwatch = scope.$watch('fields', function(fields, old) {
+			scope.getOptions = function () {
+				var all = [];
+				var data = scope.$parent.contextData || {};
+				var field = data.field || {};
+				_.each(scope.options, function (item) {
+					var name = field.name;
+					if (name && item.name === name) {
+						return;
+					}
+					if (item.contextField && !(item.contextField === name && item.contextFieldValue === data.value)) {
+						return;
+					}
+					all.push(item);
+				});
+				return all;
+			};
+
+			var unwatch = scope.$watch('fields', function searchFiledsWatch(fields, old) {
 				if (_.isEmpty(fields)) return;
 				unwatch();
 				var options = _.values(fields);
@@ -156,31 +192,113 @@ ui.directive('uiFilterItem', function() {
 			}, true);
 		},
 		template:
-		"<div class='form-inline'>" +
-			"<table class='form-layout'>" +
-				"<tr>" +
-					"<td class='filter-remove'>" +
+			"<div class='flex-layout'>" +
+				"<div class='flex-row'>" +
+					"<div class='flex-item filter-remove'>" +
 						"<a href='' ng-click='remove(filter)'><i class='fa fa-times'></i></a>" +
-					"</td>" +
-					"<td class='form-item filter-select'>" +
-						"<select ng-model='filter.field' ng-options='v.name as v.title for v in options' ng-change='onFieldChange()' class='input-medium'></select> " +
-					"</td>" +
-					"<td class='form-item filter-select'>" +
-						"<select ng-model='filter.operator' ng-options='o.name as o.title for o in operators' ng-change='onOperatorChange()' class='input-medium'></select> "+
-					"</td>" +
-					"<td class='form-item filter-select' ng-show='canShowSelect()'>" +
-						"<select ng-model='filter.value' class='input=medium' ng-options='o.value as o.title for o in getSelection()'></select>" +
-					"</td>" +
-					"<td class='form-item' ng-show='canShowInput()'>" +
-						"<input type='text' ui-filter-input ng-model='filter.value' class='input-medium'> " +
-					"</td>" +
-					"<td class='form-item' ng-show='canShowRange()'>" +
-						"<input type='text' ui-filter-input ng-model='filter.value2' class='input-medium'> " +
-					"</td>" +
-				"</tr>" +
-			"</table>" +
-		"</div>"
+					"</div>" +
+					"<div class='flex-item filter-inputs'>" +
+						"<span>" +
+							"<select ng-model='filter.field' ng-options='v.name as v.title for v in getOptions()' ng-change='onFieldChange()' class='input-medium'></select> " +
+						"</span>" +
+						"<span>" +
+							"<select ng-model='filter.operator' ng-options='o.name as o.title for o in operators' ng-change='onOperatorChange()' class='input-medium'></select> "+
+						"</span>" +
+						"<span ng-show='canShowSelect()'>" +
+							"<select ng-model='filter.value' class='input=medium' ng-options='o.value as o.title for o in getSelection()'></select>" +
+						"</span>" +
+						"<span ng-if='canShowTags()'>" +
+							"<div ui-filter-tags x-filter='filter' x-model='model' x-fields='fields'></div>" +
+						"</span>" +
+						"<span ng-show='canShowInput()'>" +
+							"<input type='text' ui-filter-input ng-model='filter.value' class='input-medium'> " +
+						"</span>" +
+						"<span ng-show='canShowRange()'>" +
+							"<input type='text' ui-filter-input ng-model='filter.value2' class='input-medium'> " +
+						"</span>" +
+					"</div>" +
+				"</div>" +
+			"</div>"
 	};
+});
+
+ui.directive('uiFilterTags', function() {
+	return {
+		scope: {
+			filter: '=',
+			fields: '=',
+			model: '='
+		},
+		controller: ['$scope', '$element', 'DataSource', 'ViewService',
+			function ($scope, $element, DataSource, ViewService) {
+			
+			var filter = $scope.filter || {};
+			var fields = $scope.fields || {};
+			
+			var field = _.extend({}, fields[filter.field], {
+				required: false,
+				readonly: false,
+				widget: 'tag-select',
+				showTitle: false,
+				canNew: false,
+				canEdit: false,
+				colSpan: 12
+			});
+
+			var schema = {
+				cols: 1,
+				type: 'form',
+				items: [{
+					type: 'panel',
+					items: [field]
+				}]
+			};
+
+			$scope._viewParams = {
+				model: $scope.model,
+				views: [schema],
+				fields: fields
+			};
+
+			ui.ViewCtrl($scope, DataSource, ViewService);
+			ui.FormViewCtrl.call(this, $scope, $element);
+
+			$scope.schema = schema;
+			$scope.schema.loaded = true;
+			
+			$scope.$watch('record.' + filter.field, function searchFilterFieldWatch(value) {
+				filter.value = _.pluck(value, 'id');
+			});
+
+			function fetchValues(value) {
+				$scope._dataSource._new(field.target).search({
+					fields: [field.targetName],
+					domain: 'self.id in (:ids)',
+					context: { ids: value }
+				}).success(function (records) {
+					var record = {};
+					record[filter.field] = records;
+					$scope.edit(record);
+				});
+			}
+
+			$scope.defaultValues = {};
+			$scope.editRecord = function (record) {
+				if (record && record !== $scope.defaultValues) {
+					$scope.record = record;
+				}
+			};
+
+			$scope.setEditable();
+			$scope.show();
+
+			if (_.isArray(filter.value) && filter.value.length) {
+				fetchValues(filter.value);
+			}
+		}],
+		template:
+			"<div ui-view-form x-handler='true'></div>"
+	}
 });
 
 ui.directive('uiFilterInput', function() {
@@ -274,13 +392,88 @@ ui.directive('uiFilterInput', function() {
 	};
 });
 
+ui.directive('uiFilterContext', function () {
+
+	return {
+		scope: {
+			fields: '=',
+			context: '='
+		},
+		controller: ['$scope', function ($scope) {
+			$scope.field = {
+				name: 'contextValue',
+				evalTarget: 'context.field.target',
+				evalTargetName: 'context.field.targetName',
+				evalValue: 'context.value',
+				evalTitle: 'context.title'
+			};
+
+			$scope.getViewDef = function () {
+				return $scope.field;
+			};
+
+			$scope.remove = function () {
+				var context = {};
+				var fields = $scope.contextFields || [];
+				if (fields.length === 1) {
+					context.field = fields[0];
+				}
+				$scope.context = context;
+			};
+			
+			$scope.$watch('context.field.name', function searchContextFieldWatch(name) {
+				if (!name) {
+					$scope.remove();
+				}
+			});
+
+			$scope.onFields = function (fields) {
+				var contextFields = {};
+				for (var item in fields) {
+					var field = fields[item];
+					var name = field.contextField;
+					if (name && fields[name] && !contextFields[name]) {
+						contextFields[name] = fields[name];
+					}
+				}
+				$scope.contextFields = _.sortBy(_.values(contextFields), 'title');
+				$scope.remove();
+			};
+		}],
+		link: function (scope, element, attrs) {
+			var unwatch = scope.$watch('fields', function searchContextFieldsWatch(fields) {
+				if (_.isEmpty(fields)) return;
+				unwatch();
+				scope.onFields(fields);
+			}, true);
+		},
+		template:
+			"<div class='flex-layout filter-context' ng-show='contextFields.length'>" +
+				"<div class='flex-row'>" +
+					"<div class='flex-item filter-remove'>" +
+						"<a href='' ng-click='remove()'><i class='fa fa-times'></i></a>" +
+					"</div>" +
+					"<div class='flex-item filter-inputs'>" +
+						"<span>" +
+							"<select ng-model='context.field' ng-options='v as v.title for v in contextFields'></select>" +
+						"</span>" +
+						"<span>" +
+							"<span ui-eval-ref-select ng-model='context.value' x-field='contextValue'></span>" +
+						"</span>" +
+					"</div>" +
+				"</div>" +
+			"</div>"
+	};
+});
+
 FilterFormCtrl.$inject = ['$scope', '$element', 'ViewService'];
 function FilterFormCtrl($scope, $element, ViewService) {
 
 	this.doInit = function(model, viewItems) {
+		var context = $scope.$parent.$parent._context || {};
 		return ViewService
-		.getFields(model)
-		.success(function(fields) {
+		.getFields(model, context.jsonModel)
+		.success(function(fields, jsonFields) {
 
 			var items = {};
 			var nameField = null;
@@ -298,6 +491,23 @@ function FilterFormCtrl($scope, $element, ViewService) {
 				items[name] = field;
 			});
 
+			// include json fields
+			_.each(jsonFields, function (fields, prefix) {
+				_.each(fields, function (field, name) {
+					if (field.type === 'many-to-many') return;
+					var key = prefix + '.' + name;
+					if (field.type !== 'many-to-one') {
+						key += '::' + (field.jsonType || 'text');
+					}
+					items[key] = _.extend({}, field, {
+						name: key,
+						title: (field.title || field.autoTitle) + " (" + items[prefix].title + ")"
+					});
+				});
+				// don't search parent
+				delete items[prefix];
+			});
+
 			nameField = nameField || _.first(nameFields);
 
 			_.each(viewItems, function (item) {
@@ -308,8 +518,19 @@ function FilterFormCtrl($scope, $element, ViewService) {
 				}
 			});
 
+			var contextFieldNames = [];
+			for (var item in items) {
+				var field = items[item];
+				var name = field.contextField;
+				if (name && items[name] && contextFieldNames.indexOf(name) === -1) {
+					contextFieldNames.push(name);
+				}
+			}
 			$scope.fields = items;
+			$scope.contextFieldNames = contextFieldNames;
+
 			$scope.$parent.fields = $scope.fields;
+			$scope.$parent.contextFieldNames = $scope.contextFieldNames;
 			$scope.$parent.nameField = nameField || ($scope.fields.name ? 'name' : null);
 		});
 	};
@@ -343,6 +564,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	$scope.$on('on:select-custom', function(e, custom) {
 
 		$scope.filters.length = 0;
+		$scope.contextData = {};
 
 		if (custom.$selected) {
 			select(custom);
@@ -373,13 +595,30 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	function select(custom) {
 
 		var criteria = custom.criteria;
+		var filters = criteria.criteria;
+		var contextFieldNames = $scope.contextFieldNames || [];
+
+		if (filters && filters.length && filters.length < 3) {
+			var first = _.first(filters);
+			var last = _.last(filters);
+			var name = first.fieldName.replace('.id', '');
+			if (contextFieldNames.indexOf(name) > -1) {
+				$scope.contextData = {
+						field: $scope.fields[name],
+						value: first.value,
+						title: first.title,
+						saved: true
+				};
+				filters = (last||{}).criteria || [{}];
+			}
+		}
 
 		$scope.operator = criteria.operator || 'and';
 
-		_.each(criteria.criteria, function(item) {
+		_.each(filters, function(item) {
 			
 			var fieldName = item.fieldName || '';
-			if (fieldName && fieldName.indexOf('.') > -1) {
+			if (fieldName && fieldName.indexOf('.') > -1 && fieldName.indexOf('::') === -1) {
 				fieldName = fieldName.substring(0, fieldName.indexOf('.'));
 			}
 
@@ -392,6 +631,10 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
 			filter.type = field.type || 'string';
 			filter.operator = item.operator;
+			
+			if (field.selectionList) {
+				filter.selectionList = field.selectionList;
+			}
 
 			if (item.operator === '=' && filter.value === true) {
 				filter.operator = 'true';
@@ -419,7 +662,9 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
 	$scope.clearFilter = function(options) {
 		$scope.filters.length = 0;
+		$scope.showArchived = false;
 		$scope.addFilter();
+		$scope.contextData = {};
 
 		if ($scope.$parent.onClear) {
 			$scope.$parent.onClear();
@@ -456,13 +701,18 @@ function FilterFormCtrl($scope, $element, ViewService) {
 				operator: filter.operator,
 				value: filter.value
 			};
-
-			if (filter.targetName && (
+			
+			if (filter.operator == 'in' ||
+				filter.operator == 'notIn') {
+				if (_.isEmpty(filter.value)) {
+					return;
+				}
+				criterion.fieldName += '.id';
+			} else if (filter.targetName && criterion.fieldName.indexOf(':') == -1 && (
 					filter.operator !== 'isNull' ||
 					filter.operator !== 'notNull')) {
 				criterion.fieldName += '.' + filter.targetName;
-			}
-			if (/-many/.test(filter.type) && (
+			} else if (/-many/.test(filter.type) && (
 					filter.operator !== 'isNull' ||
 					filter.operator !== 'notNull')) {
 				criterion.fieldName += '.id';
@@ -499,6 +749,29 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
 			criteria.criteria.push(criterion);
 		});
+		
+		var contextData = $scope.contextData || {};
+		
+		if (contextData.value && contextData.field && contextData.field.name) {
+			var previous = criteria.criteria;
+			var operator = criteria.operator;
+
+			criteria.operator = "and";
+			criteria.criteria = [{
+				fieldName: contextData.field.name + ".id",
+				operator: "=",
+				value: contextData.value,
+				title: contextData.title,
+				$new: !contextData.saved
+			}];
+
+			if (previous && previous.length) {
+				criteria.criteria.push({
+					operator: operator,
+					criteria: previous
+				});
+			}
+		}
 
 		return criteria;
 	};
@@ -511,6 +784,8 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		if ($scope.$parent && hide) {
 			$scope.$parent.$broadcast('on:hide-menu');
 		}
+		handler.$broadcast('on:advance-filter', criteria);
+		handler.$broadcast('on:context-field-change', $scope.contextData);
 	};
 	
 	$scope.canExport = function() {
@@ -542,7 +817,7 @@ ui.directive('uiFilterForm', function() {
 		controller: FilterFormCtrl,
 
 		link: function(scope, element, attrs, ctrl) {
-			var unwatch = scope.$watch("$parent.viewItems", function (items) {
+			var unwatch = scope.$watch("$parent.viewItems", function searchViewItemsWatch(items) {
 				if (items === undefined) return;
 				unwatch();
 				ctrl.doInit(scope.model, items);
@@ -550,6 +825,7 @@ ui.directive('uiFilterForm', function() {
 		},
 		template:
 		"<div class='filter-form'>" +
+			"<div ui-filter-context fields='fields' context='contextData'></div>" +
 			"<form class='filter-operator form-inline'>" +
 				"<label class='radio inline'>" +
 					"<input type='radio' name='operator' ng-model='operator' value='and' x-translate><span x-translate>and</span>" +
@@ -561,7 +837,7 @@ ui.directive('uiFilterForm', function() {
 					"<input type='checkbox' ng-model='showArchived'><span x-translate>Show archived</span>" +
 				"</label>" +
 			"</form>" +
-			"<div ng-repeat='filter in filters' ui-filter-item x-fields='fields' x-filter='filter'></div>" +
+			"<div ng-repeat='filter in filters' ui-filter-item x-model='model' x-fields='fields' x-filter='filter'></div>" +
 			"<div class='links'>"+
 				"<a href='' ng-click='addFilter()' x-translate>Add filter</a>"+
 				"<span class='divider'>|</span>"+
@@ -592,11 +868,14 @@ ui.directive('uiFilterBox', function() {
 			var filterDS = DataSource.create('com.axelor.meta.db.MetaFilter');
 
 			this.$scope = $scope;
+
 			$scope.model = handler._model;
 			$scope.view = {};
 
 			$scope.viewFilters = [];
 			$scope.custFilters = [];
+
+			$scope.canShare = axelor.config["view.adv-search.share"] !== false;
 
 			if (filterView) {
 				ViewService.getMetaDef($scope.model, {name: filterView, type: 'search-filters'})
@@ -835,6 +1114,10 @@ ui.directive('uiFilterBox', function() {
 				} else {
 					search.criteria = _.clone(search.criteria);
 				}
+				
+				if (arguments.length > 1 && _.isString(arguments[1])) {
+					search._searchText = arguments[1];
+				}
 
 				var domains = [],
 					customs = [];
@@ -876,18 +1159,65 @@ ui.directive('uiFilterBox', function() {
 						filter.criteria = process(filter.criteria);
 						return filter;
 					}
-					if (filter.operator != '=') return filter;
-					if (($scope.fields[filter.fieldName]||{}).type != 'datetime') return filter;
+					var name = filter.fieldName;
+					var type = ($scope.fields[filter.fieldName]||{}).type;
+
+					var v1 = filter.value;
+					var v2 = filter.value2;
+
+					// if json date/datetime field
+					if (name.indexOf('::') > -1 && (type === 'date' || type === 'datetime')) {
+						filter = _.extend({}, filter);
+						switch (filter.operator) {
+						case '>':
+							filter.value = moment(v1).endOf('day').toDate();
+							filter.value2 = undefined;
+							break;
+						case '<':
+							filter.value = moment(v1).startOf('day').toDate();
+							filter.value2 = undefined;
+							break;
+						case '=':
+							filter.operator = 'between';
+							filter.value = moment(v1).startOf('day').toDate();
+							filter.value2 = moment(v1).endOf('day').toDate();
+							break;
+						case '!=':
+							filter.operator = 'notBetween';
+							filter.value = moment(v1).startOf('day').toDate();
+							filter.value2 = moment(v1).endOf('day').toDate();
+							break;
+						case 'between':
+						case 'notBetween':
+							filter.value = moment(v1).startOf('day').toDate();
+							filter.value2 = moment(v2).endOf('day').toDate();
+							break;
+						}
+						return filter;
+					}
+
+					if (filter.operator !== '=') return filter;
+					if (type != 'datetime') return filter;
+
 					if (!(/\d+-\d+\d+T/.test(filter.value) || _.isDate(filter.value))) {
 						return filter;
 					}
-					var v1 = moment(filter.value).startOf('day').toDate();
-					var v2 = moment(filter.value).endOf('day').toDate();
+
+					v1 = moment(v1).startOf('day').toDate();
+					v2 = moment(v1).endOf('day').toDate();
 					return _.extend({}, filter, {
 						operator: 'between',
 						value: v1,
 						value2: v2
 					});
+				}
+				
+				function countCustom(criteria) {
+					var n = _.filter(criteria, function (item) { return item.$new; }).length;
+					if (criteria.length === 2 && criteria[1].criteria) {
+						n += countCustom(criteria[1].criteria);
+					}
+					return n;
 				}
 
 				var tag = {};
@@ -899,7 +1229,7 @@ ui.directive('uiFilterBox', function() {
 				   .pluck('title')
 				   .value();
 
-				var nCustom = _.filter((criteria||{}).criteria, function (item) { return item.$new; }).length;
+				var nCustom = countCustom((criteria||{}).criteria);
 				if (nCustom > 0) {
 					all.push(_t('Custom ({0})', nCustom));
 				}
@@ -924,19 +1254,25 @@ ui.directive('uiFilterBox', function() {
 			$scope.onFreeSearch = function() {
 
 				var filters = [],
+					cols = $scope.findCols(),
 					fields = {},
+					nameField = this.nameField,
 					text = this.custTerm,
 					number = +(text);
 
 				text = text ? text.trim() : null;
 
-				if ((handler.schema || {}).freeSearch === 'all') {
-					fields = _.extend({}, this.$parent.fields, this.fields);
+				if (cols && (handler.schema || {}).freeSearch !== 'name') {
+					fields = _.pick(this.$parent.fields, cols);
+				}
+				
+				if (!nameField) {
+					nameField = (_.extend({}, this.$parent.fields, this.fields).name || {}).name;
 				}
 
-				if (this.nameField && text) {
+				if (nameField && text) {
 					filters.push({
-						fieldName: this.nameField,
+						fieldName: nameField,
 						operator: 'like',
 						value: text
 					});
@@ -944,7 +1280,7 @@ ui.directive('uiFilterBox', function() {
 
 				for(var name in fields) {
 
-					if (name === this.nameField || !text) continue;
+					if (name === nameField || !text) continue;
 
 					var fieldName = null,
 						operator = "like",
@@ -967,7 +1303,9 @@ ui.directive('uiFilterBox', function() {
 						break;
 					case 'one-to-one':
 					case 'many-to-one':
-						if (field.targetName) {
+						if (field.jsonField) {
+							fieldName = name;
+						} else if (field.targetName) {
 							fieldName = name + '.' + field.targetName;
 						}
 						break;
@@ -994,7 +1332,7 @@ ui.directive('uiFilterBox', function() {
 					criteria: filters
 				};
 
-				this.onFilter(criteria);
+				this.onFilter(criteria, text);
 			};
 		}],
 		link: function(scope, element, attrs) {
@@ -1014,7 +1352,7 @@ ui.directive('uiFilterBox', function() {
 
 				$(document).on('mousedown.search-menu', onMouseDown);
 				
-				scope.applyLater(function () {
+				scope.$applyAsync(function () {
 					scope.visible = true;
 				});
 			};
@@ -1071,7 +1409,7 @@ ui.directive('uiFilterBox', function() {
 
 			function hideMenu() {
 				$(document).off('mousedown.search-menu', onMouseDown);
-				scope.applyLater(function () {
+				scope.$timeout(function () {
 					scope.visible = false;
 				});
 				menu.hide();
@@ -1079,28 +1417,37 @@ ui.directive('uiFilterBox', function() {
 
 			function onMouseDown(e) {
 				var all = $(menu).add(toggleButton);
-				if (all.is(e.target) || all.has(e.target).size() > 0) {
+				if (all.is(e.target) || all.has(e.target).length > 0) {
 					return;
 				}
-				if ($(e.target).zIndex() > $(menu).zIndex()) {
+				if ($(e.target).zIndex() > $(menu).zIndex() || $(e.target).parents('.ui-dialog').length) {
 					return;
 				}
 				if(menu) {
 					hideMenu();
 				}
 			}
+			
+			scope.hideMenu = hideMenu;
+			
+			scope.findCols = function () {
+				var grid = element.parents('.grid-view:first').children('[ui-slick-grid]:first').data('grid');
+				return grid ? _.pluck(grid.getColumns(), 'field').filter(function (n) {
+					return n in scope.$parent.fields;
+				}) : [];
+			};
 
-			scope.handler.$watch('schema.freeSearch', function (value, old) {
+			scope.handler.$watch('schema.freeSearch', function searchFreeSearchWatch(value, old) {
 				if (value === 'none') {
 					var input = element.find('input:first')
 						.addClass('not-readonly')
-						.attr('readonly', true)
+						.prop('readonly', true)
 						.click(scope.onSearch.bind(scope));
 				}
 			});
 
 			element.on('$destroy', function() {
-				$(document).on('mousedown.search-menu', onMouseDown);
+				$(document).off('mousedown.search-menu', onMouseDown);
 				if (menu) {
 					menu.remove();
 					menu = null;
@@ -1112,7 +1459,7 @@ ui.directive('uiFilterBox', function() {
 		"<div class='filter-box'>" +
 			"<div class='tag-select picker-input search-query'>" +
 			  "<ul>" +
-				"<li class='tag-item label label-info' ng-repeat='item in tagItems'>" +
+				"<li class='tag-item label label-primary' ng-repeat='item in tagItems'>" +
 					"<span class='tag-text' title='{{item.help}}'>{{item.title}}</span> " +
 					"<i class='fa fa-times fa-small' ng-click='onClearFilter()'></i>" +
 				"</li>" +
@@ -1121,12 +1468,15 @@ ui.directive('uiFilterBox', function() {
 				"</li>" +
 			  "</ul>" +
 			  "<span class='picker-icons'>" +
-				"<i ng-click='onSearch($event)' class='fa fa-caret-down hidden-phone'></i>"+
+				"<i ng-click='onSearch($event)' class='fa fa-caret-down'></i>"+
 				"<i ng-click='onRefresh()' class='fa fa-search'></i>" +
 			  "</span>" +
 			"</div>" +
-			"<div class='filter-menu hidden-phone' ui-watch-if='visible'>" +
-				"<strong x-translate>Advanced Search</strong>" +
+			"<div class='filter-menu' ui-watch-if='visible'>" +
+				"<span>" +
+					"<strong x-translate>Advanced Search</strong>" +
+					"<a href='' class='pull-right' ng-click='hideMenu()'><i class='fa fa-times'></i></a>" +
+				"</span>" +
 				"<hr>"+
 				"<div class='filter-list'>" +
 					"<dl ng-show='!hasFilters() && handler.schema.customSearch == false' style='display: hidden;'>" +
@@ -1158,7 +1508,7 @@ ui.directive('uiFilterBox', function() {
 					"<div class='form-inline'>" +
 						"<div class='control-group'>" +
 							"<input type='text' placeholder='{{\"Save filter as\" | t}}' ng-model='custTitle'> " +
-							"<label class='checkbox'>" +
+							"<label class='checkbox' ng-if='canShare'>" +
 								"<input type='checkbox' ng-model='custShared'><span x-translate>Share</span>" +
 							"</label>" +
 						"</div>" +

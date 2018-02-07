@@ -21,6 +21,29 @@
 
 var ui = angular.module('axelor.ui');
 
+
+ui.directive('uiDeleteButton', [function () {
+	return {
+		link: function (scope, element, attrs) {
+			
+		},
+		replace: true,
+		template:
+			"<div class='btn-group delete-button'>" +
+				"<button class='btn' ng-click='onDelete()' ng-if='hasButton(\"delete\")' ng-disabled='!canDelete()' title='{{ \"Delete\" | t}}'>" +
+					"<i class='fa fa-trash-o'></i> <span ng-if='::!tbTitleHide' x-translate>Delete</span>" +
+				"</button>" +
+				"<button class='btn dropdown-toggle' data-toggle='dropdown' ng-if='hasButton(\"archive\")' ng-disabled='!canArchive()'>" +
+					"<i class='fa fa-caret-down'></i>" +
+				"</button>" +
+				"<ul class='dropdown-menu' ng-if='hasButton(\"archive\")'>" +
+					"<li><a href='' ng-click='onArchive()'>Archive</a></li>" +
+					"<li><a href='' ng-click='onUnarchive()'>Unarchive</a></li>" +
+				"</ul>" +
+			"</div>"
+	};
+}]);
+
 ui.directive('uiUpdateButton', ['$compile', function ($compile) {
 	
 	return {
@@ -46,7 +69,7 @@ ui.directive('uiUpdateButton', ['$compile', function ($compile) {
 				
 				$(document).on('mousedown.update-menu', onMouseDown);
 				
-				scope.applyLater(function () {
+				scope.$applyAsync(function () {
 					scope.visible = true;
 				});
 			};
@@ -68,7 +91,7 @@ ui.directive('uiUpdateButton', ['$compile', function ($compile) {
 				if (toggleButton) {
 					toggleButton.removeClass("active");
 				}
-				scope.applyLater(function () {
+				scope.$applyAsync(function () {
 					scope.visible = false;
 				});
 				return menu.hide();
@@ -76,11 +99,11 @@ ui.directive('uiUpdateButton', ['$compile', function ($compile) {
 
 			function onMouseDown(e) {
 				var all = $(menu).add(toggleButton);
-				if (all.is(e.target) || all.has(e.target).size() > 0) {
+				if (all.is(e.target) || all.has(e.target).length > 0) {
 					return;
 				}
 				all = $('.ui-widget-overlay,.ui-datepicker:visible,.ui-dialog:visible,.ui-menu:visible');
-				if (all.is(e.target) || all.has(e.target).size() > 0) {
+				if (all.is(e.target) || all.has(e.target).length > 0) {
 					return;
 				}
 				if(menu){
@@ -149,7 +172,7 @@ ui.directive('uiUpdateDummy', function () {
 				if (initialized) return;
 				initialized = true;
 				
-				var unwatch = parent.$watch('fields', function (fields) {
+				var unwatch = parent.$watch('fields', function massFieldsWatch(fields) {
 					if (_.isEmpty(fields)) return;
 					unwatch();
 					prepare(fields);
@@ -168,13 +191,13 @@ ui.directive('uiUpdateDummy', function () {
 
 ui.directive('uiUpdateForm',  function () {
 	
-	function findFields(fields) {
+	function findFields(fields, items) {
 		
 		var all = {};
-		
-		_.each(fields, function (field, name) {
+		var accept = function (field) {
+			var name = field.name;
 			if (!field.massUpdate) return;
-			if (/id|version|selected|archived|((updated|created)(On|By))/.test(name)) return;
+			if (/id|version|selected|((updated|created)(On|By))/.test(name)) return;
 			if (field.large || field.unique) return;
 			switch (field.type) {
 			case 'one-to-many':
@@ -194,6 +217,14 @@ ui.directive('uiUpdateForm',  function () {
 			field.placeholder = field.placeholder || field.title;
 			
 			all[name] = field;
+		};
+
+		_.each(fields, function (field, name) { accept(field); });
+		_.each(items, function (item) {
+			var field = fields[item.name];
+			if (field) {
+				accept(_.extend({}, field, item, { type: field.type }));
+			}
 		});
 
 		return all;
@@ -211,7 +242,7 @@ ui.directive('uiUpdateForm',  function () {
 				var handler = $scope.handler;
 				var promise = ViewService.getFields(handler._model);
 				promise.success(function (fields) {
-					$scope.fields = findFields(fields);
+					$scope.fields = findFields(fields, view.items);
 					$scope.options = _.sortBy(_.values($scope.fields), 'title');
 					$scope.record = {};
 				});

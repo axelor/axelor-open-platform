@@ -145,7 +145,7 @@
 }
 
 .dms-file-list .slick-icon.fa-table {
-	color: #16a765;
+	color: #0275d8;
 }
 
 .dms-folder-dialog input {
@@ -389,7 +389,7 @@
 }
 
 .ui-dialog .ui-dialog-content.dms-popup {
-	max-height: calc(100% - 45px - 52px) !important;
+	height: 450px !important;
 }
 .ui-dialog.maximized .ui-dialog-content.dms-popup {
 	height: 100% !important;

@@ -29,11 +29,11 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 	var view = $scope._views.tree;
 	var viewPromise = $scope.loadView('tree', view.name);
 
-	$scope.applyLater(function() {
+	$scope.$applyAsync(function() {
 		if (view.deferred) {
 			view.deferred.resolve($scope);
 		}
-	}, 0);
+	});
 	
 	viewPromise.success(function(fields, schema){
 		$scope.parse(schema);
@@ -602,7 +602,7 @@ ui.directive('uiViewTree', function(){
 				if (parent.data('id') === source.data('id')) {
 					return true;
 				}
-				if (parent.size()) {
+				if (parent.length) {
 					return isParent(source, parent);
 				}
 				return false;
@@ -698,7 +698,7 @@ ui.directive('uiViewTree', function(){
 				scope.onSort(column);
 			};
 
-			var watcher = scope.$watch('loaders', function(loaders) {
+			var watcher = scope.$watch('loaders', function treeLoadersWatch(loaders) {
 				
 				if (loaders === undefined) {
 					return;
@@ -741,7 +741,7 @@ ui.directive('uiViewTree', function(){
 				});
 			}
 			
-			table.on('adjustSize', _.debounce(adjustCols, 100));
+			scope.$onAdjust(adjustCols, 100);
 
 			table.on('mousedown.treeview', 'tbody tr', function(e) {
 				table.find('tr.selected').removeClass('selected');

@@ -138,6 +138,11 @@ header .navbar .brand-logo img {
 	width: calc(100% - 60px);
 }
 
+#login-form .input-prepend select {
+	height: 34px;
+	width: calc(100% - 38px);
+}
+
 body > footer {
 	position: relative;
 	margin-top: 28px;

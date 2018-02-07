@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -36,6 +36,12 @@ public class Panel extends AbstractPanel {
 	@XmlAttribute
 	private String collapseIf;
 
+	@XmlAttribute
+	private String icon;
+
+	@XmlAttribute(name = "icon-background")
+	private String iconBackground;
+
 	@XmlElement
 	private Menu menu;
 
@@ -44,6 +50,7 @@ public class Panel extends AbstractPanel {
 		@XmlElement(name = "spacer", type = Spacer.class),
 		@XmlElement(name = "label", type = Label.class),
 		@XmlElement(name = "static", type = Static.class),
+		@XmlElement(name = "separator", type = Separator.class),
 		@XmlElement(name = "help", type = Help.class),
 		@XmlElement(name = "button", type = Button.class),
 		@XmlElement(name = "button-group", type = ButtonGroup.class),
@@ -68,6 +75,22 @@ public class Panel extends AbstractPanel {
 
 	public void setCollapseIf(String collapseIf) {
 		this.collapseIf = collapseIf;
+	}
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+
+	public String getIconBackground() {
+		return iconBackground;
+	}
+
+	public void setIconBackground(String iconBackground) {
+		this.iconBackground = iconBackground;
 	}
 
 	public Menu getMenu() {

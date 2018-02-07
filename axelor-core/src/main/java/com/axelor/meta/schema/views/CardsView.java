@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -32,9 +32,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 public class CardsView extends AbstractView {
 
 	@XmlAttribute
-	private String cardWidth;
-
-	@XmlAttribute
 	private String orderBy;
 
 	@XmlElement(name = "field", type = Field.class)
@@ -46,14 +43,6 @@ public class CardsView extends AbstractView {
 	@XmlCDATA
 	@XmlElement
 	private String template;
-
-	public String getCardWidth() {
-		return cardWidth;
-	}
-
-	public void setCardWidth(String cardWidth) {
-		this.cardWidth = cardWidth;
-	}
 
 	public String getOrderBy() {
 		return orderBy;

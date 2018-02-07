@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -26,14 +26,21 @@ class Annotation {
 	boolean empty
 
 	Entity entity
+	
+	ImportManager importManager
 
 	Annotation(Entity entity, String name) {
 		this(entity, name, false)
 	}
 
 	Annotation(Entity entity, String name, boolean empty) {
+		this(entity.importManager, name, empty)
 		this.entity = entity
-		this.name = "@" + entity.importType(name)
+	}
+	
+	Annotation(ImportManager importer, String name, boolean empty) {
+		this.importManager = importer
+		this.name = "@" + importer.importType(name)
 		this.empty = empty
 	}
 
@@ -90,7 +97,7 @@ class Annotation {
 		values = values.collect {
 			if (it instanceof Annotation)
 				return it
-			quote ? this.quote(it) : entity.importType(it)
+			quote ? this.quote(it) : importManager.importType(it)
 		}
 
 		def value = unwrapSingle && values.size() == 1 ? values[0] : wrap(values)

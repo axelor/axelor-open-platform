@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,6 +18,7 @@
 package com.axelor.test.db;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -35,7 +36,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
-import org.joda.time.LocalDate;
+import org.hibernate.annotations.Type;
 
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaModel;
@@ -91,6 +92,10 @@ public class Contact extends JpaModel {
 	@Transient
 	@Widget(multiline = true)
 	private String notes;
+	
+	@Widget(title = "Attributes")
+	@Type(type = "json")
+	private String attrs;
 
 	public Contact() {
 	}
@@ -129,10 +134,10 @@ public class Contact extends JpaModel {
 	}
 	
 	public String getFullName() {
-		return fullName = calculateFullName();
+		return fullName = computeFullName();
 	}
 
-	protected String calculateFullName() {
+	protected String computeFullName() {
 		fullName = firstName + " " + lastName;
 		if (this.title != null) {
 			return this.title.getName() + " " + fullName;
@@ -236,7 +241,15 @@ public class Contact extends JpaModel {
 	public void setNotes(String notes) {
 		this.notes = notes;
 	}
-	
+
+	public String getAttrs() {
+		return attrs;
+	}
+
+	public void setAttrs(String attrs) {
+		this.attrs = attrs;
+	}
+
 	@Override
 	public String toString() {
 		return EntityHelper.toString(this);

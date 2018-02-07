@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -26,7 +26,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import com.axelor.JpaTest;
-import com.axelor.common.ClassUtils;
+import com.axelor.common.ResourceUtils;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,7 +37,7 @@ public abstract class MetaTest extends JpaTest {
 	private ObjectMapper mapper;
 
 	protected InputStream read(String resource) {
-		return ClassUtils.getResourceStream(resource);
+		return ResourceUtils.getResourceStream(resource);
 	}
 
 	protected ObjectMapper getObjectMapper() {

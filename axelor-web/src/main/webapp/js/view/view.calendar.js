@@ -455,7 +455,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 					start: start,
 					end: end
 				};
-				scope.applyLater(function(){
+				scope.$applyAsync(function(){
 					scope.showEditor(event);
 				});
 				main.fullCalendar('unselect');
@@ -532,7 +532,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 						.appendTo(html)
 						.click(function(e){
 							hideBubble();
-							scope.$apply(function(){
+							scope.$applyAsync(function(){
 								scope.removeEvent(event, function() {
 									RecordManager.remove(event.record);
 								});
@@ -545,7 +545,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 					.appendTo(html)
 					.click(function(e){
 						hideBubble();
-						scope.$apply(function(){
+						scope.$applyAsync(function(){
 							scope.showEditor(event);
 						});
 					});
@@ -685,7 +685,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 					  - (parseInt(legend.css('marginBottom')) || 0));
 		}
 
-		main.on("adjustSize", _.debounce(adjustSize, 100));
+		scope.$onAdjust(adjustSize, 100);
 
 		scope.$callWhen(function () {
 			return main.is(':visible');

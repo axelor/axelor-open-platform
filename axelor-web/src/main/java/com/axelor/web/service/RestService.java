@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -41,6 +41,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -59,8 +60,8 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
-import com.axelor.common.ClassUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
@@ -283,9 +284,6 @@ public class RestService extends ResourceService {
 		return getResource().getRecordName(request);
 	}
 	
-	private static final String DEFAULT_UPLOAD_PATH = "{java.io.tmpdir}/axelor/attachments";
-	private static String uploadPath = AppSettings.get().getPath("file.upload.dir", DEFAULT_UPLOAD_PATH);
-
 	private void uploadSave(InputStream in, OutputStream out) throws IOException {
 		int read = 0;
 		byte[] bytes = new byte[1024];
@@ -452,7 +450,7 @@ public class RestService extends ResourceService {
 			return fail();
 		}
 		request.setModel(getModel());
-		return service.removeAttachment(request, uploadPath);
+		return service.removeAttachment(request);
 	}
 
 	@POST
@@ -494,6 +492,14 @@ public class RestService extends ResourceService {
 					AppSettings.get().get("data.export.encoding"));
 		} catch (Exception e) {
 		}
+	}
+
+	@HEAD
+	@Path("export/{name}")
+	public javax.ws.rs.core.Response exportCheck(@PathParam("name") final String name) {
+		return Files.exists(MetaFiles.findTempFile(name))
+			? javax.ws.rs.core.Response.ok().build()
+			: javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
 	}
 
 	@GET
@@ -568,7 +574,7 @@ public class RestService extends ResourceService {
 		Model related = null;
 
 		try {
-			relatedClass = ClassUtils.findClass(relatedModel);
+			relatedClass = Class.forName(relatedModel);
 		} catch (Exception e) {}
 
 		if (relatedClass != null && relatedId != null) {
@@ -707,8 +713,8 @@ public class RestService extends ResourceService {
 		final Response response = new Response();
 		@SuppressWarnings("all")
 		final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
-		final Context ctx = Context.create(request.getData(), MailMessage.class);
-		final MailMessage msg = ctx.asType(MailMessage.class);
+		final Context ctx = new Context(request.getData(), MailMessage.class);
+		final MailMessage msg = EntityHelper.getEntity(ctx.asType(MailMessage.class));
 
 		final Model entity = repo.find(id);
 		final List<?> ids = (List<?>) request.getData().get("files");

@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -68,7 +68,6 @@ import com.axelor.mail.MailSender;
 import com.axelor.mail.SmtpAccount;
 import com.axelor.mail.db.MailAddress;
 import com.axelor.mail.db.MailFollower;
-import com.axelor.mail.db.MailGroup;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.db.repo.MailAddressRepository;
 import com.axelor.mail.db.repo.MailFollowerRepository;
@@ -77,6 +76,7 @@ import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
+import com.axelor.team.db.Team;
 import com.axelor.text.GroovyTemplates;
 import com.axelor.text.Template;
 import com.axelor.text.Templates;
@@ -243,8 +243,8 @@ public class MailServiceImpl implements MailService, MailConstants {
 			subject = getSubject(message.getParent() == null ? message.getRoot() : message.getParent(), entity);
 		}
 		// in case of message groups
-		if (subject == null && entity instanceof MailGroup) {
-			subject = ((MailGroup) entity).getName();
+		if (subject == null && entity instanceof Team) {
+			subject = ((Team) entity).getName();
 		}
 		if (message.getParent() != null && subject != null) {
 			subject = "Re: " + subject;

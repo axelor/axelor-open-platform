@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,12 +17,12 @@
  */
 package com.axelor.db;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -77,7 +77,7 @@ public class MapperTest extends JpaTest {
 		
 		LocalDate date = contact.getDateOfBirth();
 		Assert.assertEquals(1975, date.getYear());
-		Assert.assertEquals(3, date.getMonthOfYear());
+		Assert.assertEquals(3, date.getMonthValue());
 		Assert.assertEquals(23, date.getDayOfMonth());
 		
 		Assert.assertNotNull(contact.getTitle());
@@ -114,7 +114,7 @@ public class MapperTest extends JpaTest {
 	@Test
 	public void testTypes() {
 		Map<String, Object> values = new HashMap<String, Object>();
-		values.put("boolValue", true);
+		values.put("boolValue", "true");
 		values.put("intValue", 121);
 		values.put("longValue", 199L);
 		values.put("doubleValue", 23.12);
@@ -131,8 +131,8 @@ public class MapperTest extends JpaTest {
 		values.put("localDate2", null);
 		
 		TypeCheck bean = JPA.edit(TypeCheck.class, values);
-		
-		Assert.assertEquals(true, bean.getBoolValue());
+
+		Assert.assertSame(Boolean.TRUE, bean.getBoolValue());
 		Assert.assertTrue(121 == bean.getIntValue());
 		Assert.assertTrue(199L == bean.getLongValue());
 		Assert.assertTrue(23.12 == bean.getDoubleValue());

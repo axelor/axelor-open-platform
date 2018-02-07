@@ -246,6 +246,7 @@ function getButtons(scope, element) {
 ui.formInput('Html', {
 
 	css: "html-item",
+	metaWidget: true,
 
 	init: function(scope) {
 
@@ -328,7 +329,7 @@ ui.formInput('Html', {
 			}
 
 			scope.setValue(value, true);
-			scope.applyLater();
+			scope.$applyAsync();
 		}
 
 		scope.$render_editable = function () {
@@ -391,7 +392,7 @@ ui.formInput('Html', {
 
     		div.find('ol,ul').each(function() {
     			var el = $(this);
-    			if (el.parents('ol,ul').size()) return;
+    			if (el.parents('ol,ul').length) return;
     			el.css({
 	    			'margin-top': 0,
 	    			'margin-bottom': '1em'});
@@ -400,7 +401,7 @@ ui.formInput('Html', {
     		div.find('blockquote').each(function() {
     			var el = $(this);
     			el.css({
-	    			'margin': el.parents('blockquote').size() ? '0 0 0 2em' : '0 0 1em 2em',
+	    			'margin': el.parents('blockquote').length ? '0 0 0 2em' : '0 0 1em 2em',
 	    			'border': 'none',
 	    			'padding': 0
 	    		});

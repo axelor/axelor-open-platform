@@ -25,13 +25,14 @@ ui.ProgressMixin = {
 
 	css: 'progress-item',
 	cellCss: 'form-item progress-item',
-	
+	metaWidget: true,
+
 	link_readonly: function(scope, element, attrs, model) {
 		
 		var field = scope.field || {},
 			that = this;
 
-		scope.$watch("getValue()", function(value, old) {
+		scope.$watch("getValue()", function progressValueWatch(value, old) {
 			var props = that.compute(field, value);
 			scope.cssClasses = 'progress ' + props.css;
 			scope.styles = {
@@ -63,7 +64,7 @@ ui.ProgressMixin = {
 		var styles = {
 			"r": "progress-danger",
 			"y": "progress-warning",
-			"b": "",
+			"b": "progress-primary",
 			"g": "progress-success"
 		};
 

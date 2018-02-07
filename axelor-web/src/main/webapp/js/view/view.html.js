@@ -22,19 +22,49 @@
 var ui = angular.module('axelor.ui');
 
 ui.HtmlViewCtrl = HtmlViewCtrl;
-ui.HtmlViewCtrl.$inject = ['$scope', '$element', '$sce'];
+ui.HtmlViewCtrl.$inject = ['$scope', '$element', '$sce', '$interpolate'];
 
-function HtmlViewCtrl($scope, $element, $sce) {
+function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
 
 	var views = $scope._views;
+	var stamp = -1;
+
 	$scope.view = views.html;
 
-	$scope.getURL = function () {
+	$scope.getContext = function () {
+		var params = $scope._viewParams || {};
+		var parent = $scope.$parent;
+		return _.extend({}, params.context, parent.getContext ? parent.getContext() : {})
+	};
+	
+	
+
+	$scope.getURL = function getURL() {
 		var view = $scope.view;
 		if (view) {
-			return $sce.trustAsResourceUrl(view.name || view.resource);
+			var url = view.name || view.resource;
+			if (stamp > 0) {
+				var q = url.lastIndexOf('?');
+				if (q > -1) {
+					url += "&t" + stamp;
+				} else {
+					url += "?t" + stamp;
+				}
+			}
+			if (url && url.indexOf('{{') > -1) {
+				url = $interpolate(url)($scope.getContext());
+			}
+			return $sce.trustAsResourceUrl(url);
 		}
 		return null;
+	};
+
+	$scope.onRefresh = function () {
+		if (stamp > -1) {
+			stamp = new Date().getTime();
+		} else {
+			stamp = 0;
+		}
 	};
 }
 

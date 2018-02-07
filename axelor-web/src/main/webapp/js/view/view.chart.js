@@ -47,12 +47,6 @@ function ChartCtrl($scope, $element, $http, ActionService) {
 		var context = $scope._context || {};
 		if ($scope.getContext) {
 			context = _.extend({}, $scope.getContext(), context);
-			if ($scope.onSave && !context.id) { // if embedded inside form view
-				if (viewChart) {
-					$scope.render(_.omit(viewChart, 'dataset'));
-				}
-				return;
-			}
 		}
 		
 		if (searchScope) {
@@ -89,6 +83,7 @@ function ChartCtrl($scope, $element, $http, ActionService) {
 			if ($scope.searchFields === undefined && data.search) {
 				$scope.searchFields = data.search;
 				$scope.searchInit = data.onInit;
+				$scope.usingSQL = data.usingSQL;
 			} else {
 				$scope.render(data);
 				if (isInitial) {
@@ -124,7 +119,7 @@ function ChartCtrl($scope, $element, $http, ActionService) {
 			return;
 		}
 
-		unwatch = $scope.$watch(function () {
+		unwatch = $scope.$watch(function chartRefreshWatch() {
 			if ($element.is(":hidden")) {
 				return;
 			}
@@ -168,7 +163,7 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 		return fields;
 	}
 	
-	var unwatch = $scope.$watch('searchFields', function (fields) {
+	var unwatch = $scope.$watch('searchFields', function chartSearchFieldsWatch(fields) {
 		if (!fields) {
 			return;
 		}
@@ -205,7 +200,7 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 
 		function reload() {
 			$scope.$parent.onRefresh();
-			$scope.applyLater();
+			$scope.$applyAsync();
 		}
 		
 		function delayedReload() {
@@ -228,6 +223,11 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 					if (_.isArray(value)) value = _.pluck(value, "id");
 					if (_.isString(value)) value = value.split(/\s*,\s*/g);
 					ctx[item.name] = value;
+				} else if (item.target && $scope.usingSQL) {
+					var value = ctx[item.name];
+					if (value) {
+						ctx[item.name] = value.id;
+					}
 				}
 			});
 			return ctx;
@@ -236,7 +236,7 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 		$scope.$on('on:new', onNewOrEdit);
 		$scope.$on('on:edit', onNewOrEdit);
 
-		$scope.$watch('record', function (record) {
+		$scope.$watch('record', function chartSearchRecordWatch(record) {
 			if (interval === undefined) {
 				interval = null;
 				return;
@@ -244,7 +244,7 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 			if ($scope.isValid()) delayedReload();
 		}, true);
 		
-		$scope.$watch('$events.onLoad', function (handler) {
+		$scope.$watch('$events.onLoad', function chartOnLoadWatch(handler) {
 			if (handler) {
 				handler().then(delayedReload);
 			}
@@ -271,21 +271,68 @@ function applyXY(chart, data) {
 	return chart.x(function (d) { return d.x; });
 }
 
-var color_shades = [
-	d3.scale.category10().range(), // no shades
-	d3.scale.category20().range(), // 2 shades
-	d3.scale.category20b().range() // 4 shades
-];
+var themes = {
 
-function colors(color, shades, type) {
-	if (color) {
-		var n = +(shades) || 4;
-		var rest = color_shades[n-1];
-		return _.flatten(color.split(',').map(function (c) {
+	// default
+	d3: d3.scale.category10().range(),
+	
+	// material
+	material: [
+		'#f44336', // Red
+		'#E91E63', // Pink
+		'#9c27b0', // Purple
+		'#673ab7', // Deep Purple
+		'#3f51b5', // Indigo
+		'#2196F3', // Blue
+		'#03a9f4', // Light Blue
+		'#00bcd4', // Cyan
+		'#009688', // Teal
+		'#4caf50', // Green
+		'#8bc34a', // Light Green
+		'#cddc39', // Lime
+		'#ffeb3b', // Yellow
+		'#ffc107', // Amber
+		'#ff9800', // Orange
+		'#ff5722', // Deep Orange
+		'#795548', // Brown
+		'#9e9e9e', // Grey
+		'#607d8b', // Blue Grey
+	],
+
+	// chart.js
+	chartjs: [
+		'#ff6384', '#ff9f40', '#ffcd56', '#4bc0c0',
+		'#36a2eb', '#9966ff', '#c9cbcf',
+	],
+
+	// echart - roma
+	roma: [
+		'#E01F54','#001852','#f5e8c8','#b8d2c7','#c6b38e',
+	    '#a4d8c2','#f3d999','#d3758f','#dcc392','#2e4783',
+	    '#82b6e9','#ff6347','#a092f1','#0a915d','#eaf889',
+	    '#6699FF','#ff6666','#3cb371','#d5b158','#38b6b6',
+	],
+
+	// echart - macarons
+	macarons: [
+	    '#2ec7c9','#b6a2de','#5ab1ef','#ffb980','#d87a80',
+	    '#8d98b3','#e5cf0d','#97b552','#95706d','#dc69aa',
+	    '#07a2a4','#9a7fd1','#588dd5','#f5994e','#c05050',
+	    '#59678c','#c9ab00','#7eb00a','#6f5553','#c14089',
+	]
+};
+
+function colors(names, shades, type) {
+	var given = themes[names] ? themes[names] : names;
+	given = given || themes.material;
+	given = _.isArray(given) ? given : given.split(',');
+	if (given && shades > 1) {
+		var n = Math.max(0, Math.min(+(shades) || 4, 4));
+		return _.flatten(given.map(function (c) {
 			return _.first(_.range(0, n + 1).map(d3.scale.linear().domain([0, n + 1]).range([c, 'white'])), n);
-		}).concat(rest));
+		}));
 	}
-	return type == 'pie' ? d3.scale.category10().range() : d3.scale.category20().range();
+	return given;
 }
 
 var CHARTS = {};
@@ -669,7 +716,13 @@ function Chart(scope, element, data) {
 		type = "multi";
 	}
 
-	element.off('adjustSize').empty();
+	// clean up last instance
+	(function () {
+		var chart = element.off('adjustSize').empty().data('chart');
+		if (chart && chart.tooltip && chart.tooltip.id) {
+			d3.select('#' + chart.tooltip.id()).remove();
+		}
+	})();
 
 	nv.addGraph(function generate() {
 		
@@ -742,7 +795,7 @@ function Chart(scope, element, data) {
 			chart.yAxis.axisLabel(data.yTitle);
 		}
 
-		var margin = null;
+		var margin = data.xType === 'date' ? { 'bottom': 65 } : null;
 		['top', 'left', 'bottom', 'right'].forEach(function (side) {
 			var key = 'margin-' + side;
 			var val = parseInt(config[key]);
@@ -777,7 +830,8 @@ function Chart(scope, element, data) {
 			chart.update();
 		}
 
-		element.on('adjustSize', _.debounce(adjust, 100));
+		element.data('chart', chart);
+		scope.$onAdjust(adjust, 100);
 		setTimeout(chart.update, 10);
 
 		return chart;
@@ -792,6 +846,31 @@ var directiveFn = function(){
 			var svg = element.children('svg');
 			var form = element.children('.chart-controls');
 			
+			function doExport(data) {
+				var dataset = data.dataset || [];
+				var header = [];
+				_.each(dataset, function (item) {
+					header = _.unique(_.flatten([header, _.keys(item)]));
+				
+				});
+
+				var content = "data:text/csv;charset=utf-8," + header.join(';') + '\n';
+
+				dataset.forEach(function (item) {
+					var row = header.map(function (key) {
+						var val = item[key];
+						if (val === undefined || val === null) {
+							val = '';
+						}
+						return '"' + (''+val).replace(/"/g, '""') + '"';
+					});
+					content += row.join(';') + '\n';
+				});
+
+				var name = (data.title || 'export').toLowerCase();
+				ui.download(encodeURI(content), _.underscored(name) + '.csv');
+			}
+
 			scope.render = function(data) {
 				if (element.is(":hidden")) {
 					return;
@@ -802,6 +881,13 @@ var directiveFn = function(){
 						scope.title = data.title;
 					}
 					Chart(scope, svg, data);
+					var canExport = data && _.isArray(data.dataset);
+					scope.canExport = function () {
+						return canExport;
+					};
+					scope.onExport = function () {
+						doExport(data);
+					}
 					return;
 				});
 			};

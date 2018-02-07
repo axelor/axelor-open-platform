@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -57,6 +57,9 @@ public abstract class SimpleWidget extends AbstractWidget {
 
 	@XmlAttribute
 	private String readonlyIf;
+
+	@XmlAttribute
+	private String depends;
 
 	@XmlAttribute
 	private Integer colSpan;
@@ -164,6 +167,14 @@ public abstract class SimpleWidget extends AbstractWidget {
 
 	public void setReadonlyIf(String readonlyIf) {
 		this.readonlyIf = readonlyIf;
+	}
+
+	public String getDepends() {
+		return depends;
+	}
+
+	public void setDepends(String depends) {
+		this.depends = depends;
 	}
 
 	public Integer getColSpan() {

@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -35,7 +35,12 @@ public class TestModule extends AbstractModule {
 
 		bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
 
-		install(new JpaModule("testUnit", true, false).scan("com.axelor.web.db").properties(properties));
+		install(new JpaModule("testUnit", true, false)
+				.scan("com.axelor.auth.db")
+				.scan("com.axelor.meta.db")
+				.scan("com.axelor.dms.db")
+				.scan("com.axelor.web.db")
+				.properties(properties));
 		install(new AuthModule().properties(properties));
 		install(new AppModule());
 	}

@@ -1,24 +1,29 @@
 apply plugin: 'groovy'
+apply plugin: 'java-gradle-plugin'
 
 configurations {
-    gradleApi
-    gradleApi.extendsFrom groovy
-    compile.extendsFrom gradleApi
+	tomcat
+	tomcat.transitive false
+	provided
+	provided.transitive false
 }
 
 dependencies {
-
 	testCompile	libs.junit
-
-	gradleApi gradleApi()
+	
+	compile project(':axelor-common')
 
 	compile	libs.guava
 	compile libs.opencsv
-
-	compile project(':axelor-common')
-
 	compile libs.plugin_license
-	compile libs.plugin_tomcat
+
+	tomcat libs.hotswap_agent
+	tomcat project(":axelor-tomcat")
+
+	runtime project(":axelor-tomcat")
+
+	provided libs.javax_servlet
+	provided libs.javax_servlet_jsp
 }
 
 sourceSets {
@@ -28,13 +33,28 @@ sourceSets {
 	}
 }
 
-// sometime installApp fails to process resources
-processResources.outputs.upToDateWhen { false }
+gradlePlugin {
+	plugins {
+		appPlugin {
+			id = "com.axelor.app"
+			implementationClass = "com.axelor.gradle.AppPlugin"
+		}
+		appModulePlugin {
+			id = "com.axelor.app-module"
+			implementationClass = "com.axelor.gradle.ModulePlugin"
+		}
+	}
+}
 
-task dist(type: Copy) {
-	destinationDir = file("${rootProject.buildDir}/dist")
-    into('gradle/libs') {
-		from jar
-        from configurations.runtime - configurations.gradleApi
-    }
+def generateLibsList(config) {
+	def outDir = new File(project.buildDir, "resources/main/com/axelor/gradle")
+	def outFile = new File(outDir, "${config}-libs.txt");
+	outDir.mkdirs()
+	outFile.text = ""
+	configurations.getByName(config).dependencies.each { outFile << "${it.group}:${it.name}:${it.version}\n" }
+}
+
+classes.doLast {
+	generateLibsList "tomcat"
+	generateLibsList "provided"
 }

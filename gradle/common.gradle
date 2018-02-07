@@ -1,48 +1,20 @@
 apply plugin: "java"
+apply plugin: "eclipse"
+apply plugin: "idea"
 
 dependencies {
-	compile libs.slf4j
 	testCompile	libs.junit
+	if (project.name != "axelor-tomcat") {
+		compile libs.slf4j_logback
+	}
+}
+
+configurations.all {
+	exclude group: 'org.slf4j', module: 'slf4j-log4j12'
 }
 
 tasks.withType(JavaCompile) {
-	options.encoding = 'utf-8'
+	options.encoding = 'UTF-8'
 	options.compilerArgs = ['-Xlint:-options']
-}
-tasks.withType(GroovyCompile) {
-	options.encoding = 'utf-8'
-	options.compilerArgs = ['-Xlint:-options']
-	groovyOptions.encoding = 'utf-8'
-}
-
-project.afterEvaluate {
-
-	// add src-gen
-	if (tasks.findByName("generateCode")) {
-		sourceSets.main.java.srcDir "${buildDir}/src-gen"
-	}
-
-	// force groovy compiler
-	if (plugins.hasPlugin("groovy")) {
-		sourceSets.main.groovy.srcDirs += project.sourceSets.main.java.srcDirs
-		sourceSets.main.java.srcDirs = []
-		sourceSets.test.groovy.srcDirs += project.sourceSets.test.java.srcDirs
-		sourceSets.test.java.srcDirs = []
-	}
-
-	// make sure to include non-java resources from src/main/java
-	sourceSets.main.java.srcDirs.each { dir ->
-		sourceSets.main.resources {
-			srcDir dir
-			exclude '**/*.java'
-			exclude '**/*.groovy'
-		}
-	}
-	sourceSets.test.java.srcDirs.each { dir ->
-		sourceSets.test.resources {
-			srcDir dir
-			exclude '**/*.java'
-			exclude '**/*.groovy'
-		}
-	}
+   	options.incremental = true
 }

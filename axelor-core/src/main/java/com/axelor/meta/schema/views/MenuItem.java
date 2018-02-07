@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -35,6 +35,9 @@ public class MenuItem extends AbstractWidget {
 
 	@XmlAttribute
 	private String title;
+
+	@XmlAttribute
+	private String help;
 
 	@XmlAttribute
 	private String parent;
@@ -71,6 +74,9 @@ public class MenuItem extends AbstractWidget {
 
 	@XmlAttribute
 	private Boolean hidden;
+
+	@XmlAttribute
+	private String depends;
 
 	@XmlAttribute
 	private String showIf;
@@ -179,6 +185,14 @@ public class MenuItem extends AbstractWidget {
 		this.title = title;
 	}
 
+	public String getHelp() {
+		return help;
+	}
+
+	public void setHelp(String help) {
+		this.help = help;
+	}
+
 	public String getIcon() {
 		return icon;
 	}
@@ -223,6 +237,14 @@ public class MenuItem extends AbstractWidget {
 
 	public void setHidden(Boolean hidden) {
 		this.hidden = hidden;
+	}
+
+	public String getDepends() {
+		return depends;
+	}
+
+	public void setDepends(String depends) {
+		this.depends = depends;
 	}
 
 	public String getShowIf() {

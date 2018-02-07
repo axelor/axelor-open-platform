@@ -1,23 +1,21 @@
-apply plugin: "axelor-module"
+apply plugin: com.axelor.gradle.AxelorPlugin
 
-module {
-	name "axelor-web"
-	title "Axelor :: Web"
+axelor {
+	title = "Axelor Web"
 }
 
 dependencies {
 
-	compile libs.javax_servlet
-	compile libs.javax_servlet_jsp
+	testCompile project(":axelor-test")
+	compile project(":axelor-core")
+
+	compileOnly libs.javax_servlet
+	compileOnly libs.javax_servlet_jsp
 
 	compile libs.resteasy
 	compile libs.resteasy_guice
+	compile libs.resteasy_multipart
 	compile libs.jackson_libs
-
-	compile(libs.resteasy_multipart) {
-		exclude module: "resteasy-jaxb-provider"
-		exclude module: "mail", group: "javax.mail"
-	}
 }
 
 jar {

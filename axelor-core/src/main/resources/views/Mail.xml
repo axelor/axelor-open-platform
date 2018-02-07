@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <object-views xmlns="http://axelor.com/xml/ns/object-views"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_4.2.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
 
   <!-- selection -->
   <selection name="message.type.selection">
@@ -15,7 +15,7 @@
   <form name="mail-thread-inbox" title="Inbox" model="com.axelor.mail.db.MailMessage" width="100%"
         css="mail-thread-view">
     <panel showIf="__empty" hidden="true" x-item-span="12">
-      <label title="Inbox is empty!" css="label-bold label-large"/>
+      <label name="__empty" title="Inbox is empty!" css="label-bold label-large"/>
       <label title="Come back later. There are no messages in this folder..." css="label-italic label-big" />
     </panel>
     <panel-mail>
@@ -26,7 +26,7 @@
   <form name="mail-thread-important" title="Important" model="com.axelor.mail.db.MailMessage" width="100%"
         css="mail-thread-view">
     <panel showIf="__empty" hidden="true" x-item-span="12">
-      <label title="No important messages!" css="label-bold label-large"/>
+      <label name="__empty" title="No important messages!" css="label-bold label-large"/>
       <label title="Come back later. There are no messages in this folder..." css="label-italic label-big" />
     </panel>
     <panel-mail>
@@ -37,57 +37,11 @@
   <form name="mail-thread-archive" title="Archived" model="com.axelor.mail.db.MailMessage" width="100%"
         css="mail-thread-view">
     <panel showIf="__empty" hidden="true" x-item-span="12">
-      <label title="No archived messages!" css="label-bold label-large"/>
+      <label name="__empty" title="No archived messages!" css="label-bold label-large"/>
       <label title="Come back later. There are no messages in this folder..." css="label-italic label-big" />
     </panel>
     <panel-mail>
       <mail-messages limit="10"/>
-    </panel-mail>
-  </form>
-
-  <grid name="mail-group-grid" title="Groups" model="com.axelor.mail.db.MailGroup">
-    <field name="name"/>
-    <field name="description"/>
-  </grid>
-
-  <cards name="mail-group-cards" title="Groups" model="com.axelor.mail.db.MailGroup">
-    <field name="name"/>
-    <field name="description"/>
-    <template><![CDATA[
-    <div>
-      <div class="span4 card-image">
-        <img ng-src="{{$image(null, 'image')}}">
-        <strong>{{name}}</strong>
-      </div>
-      <div class="span8">
-        <strong>{{name}}</strong>
-        <p class="muted">{{description}}</p>
-        <div class="buttons">
-          <a class="btn btn-small btn-success" href="" ng-show="!_following" ui-action-click="com.axelor.mail.web.MailController:follow" x-translate>Subscribe</a>
-          <a class="btn btn-small btn-danger" href="" ng-show="_following" ui-action-click="com.axelor.mail.web.MailController:unfollow" x-translate>Unsubscribe</a>
-        </div>
-      </div>
-    </div>
-    ]]>
-    </template>
-  </cards>
-
-  <form name="mail-group-form" title="Group" model="com.axelor.mail.db.MailGroup"
-    onSave="com.axelor.mail.web.MailController:autoSubscribe">
-    <panel title="Overview" css="fix-child-3">
-      <panel colSpan="3">
-        <field name="image" showTitle="false" colSpan="12" widget="Image"/>
-      </panel>
-      <panel colSpan="9" itemSpan="12">
-        <field name="name"/>
-        <field name="description" showTitle="false" height="4"/>
-        <field name="groups" widget="TagSelect"/>
-        <field name="users" widget="TagSelect"/>
-      </panel>
-    </panel>
-    <panel-mail>
-      <mail-messages limit="5"/>
-      <mail-followers/>
     </panel-mail>
   </form>
 
@@ -100,6 +54,7 @@
   <action-view name="mail.unread" model="com.axelor.mail.db.MailMessage" title="Unread">
     <view name="mail-thread-inbox" type="form" />
     <view-param name="show-toolbar" value="false"/>
+    <view-param name="forceTitle" value="true"/>
   </action-view>
 
   <action-view name="mail.important" model="com.axelor.mail.db.MailMessage" title="Important">
@@ -112,14 +67,9 @@
     <view-param name="show-toolbar" value="false"/>
   </action-view>
 
-  <action-view name="mail.groups" model="com.axelor.mail.db.MailGroup" title="Groups">
-    <view name="mail-group-cards" type="cards" />
-    <view name="mail-group-form" type="form" />
-  </action-view>
-
   <!-- menu -->
   <menuitem name="menu-mail" order="-110"
-    title="Messaging" icon="fa-envelope" icon-background="teal"/>
+    title="Mail" icon="fa-envelope" parent="menu-team"/>
 
   <menuitem name="menu-mail-inbox" title="Inbox" parent="menu-mail"
     action="mail.inbox" order="-90" tag-get="com.axelor.mail.web.MailController:inboxMenuTag()" tag-style="warning"/>
@@ -127,8 +77,5 @@
     action="mail.important" order="-85"/>
   <menuitem name="menu-mail-archive" title="Archived" parent="menu-mail"
     action="mail.archive" order="-80"/>
-  <menuitem name="menu-mail-groups" title="Groups" parent="menu-mail" order="-70"/>
-  <menuitem name="menu-mail-groups-all" title="All Groups" parent="menu-mail-groups"
-    action="mail.groups" order="-10"/>
 
 </object-views>

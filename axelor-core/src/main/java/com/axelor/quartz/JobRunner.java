@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -33,12 +33,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppSettings;
-import com.axelor.common.ClassUtils;
 import com.axelor.db.Query;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaSchedule;
 import com.axelor.meta.db.MetaScheduleParam;
-import com.google.common.base.Throwables;
 
 /**
  * The {@link JobRunner} controls the scheduler.<br>
@@ -90,7 +88,13 @@ public class JobRunner {
 		final String jobClass = meta.getJob();
 
 		log.info("Configuring job: {}, {}", name, cron);
-		final Class<?> klass = ClassUtils.findClass(jobClass);
+		Class<?> klass;
+		try {
+			klass = Class.forName(jobClass);
+		} catch (ClassNotFoundException e1) {
+			log.error("No such job class found: {}", jobClass);
+			return;
+		}
 		if (klass == null || !Job.class.isAssignableFrom(klass)) {
 			log.error("Invalid job class: {}", jobClass);
 			return;
@@ -144,7 +148,7 @@ public class JobRunner {
 		try {
 			CronScheduleBuilder.cronSchedule(cron);
 		} catch (Exception e) {
-			throw new IllegalArgumentException(I18n.get("Invalid cron: ") + cron);
+			throw new IllegalArgumentException(I18n.get("Invalid cron:") + " " + cron);
 		}
 	}
 
@@ -163,7 +167,7 @@ public class JobRunner {
 		} catch (SchedulerException e) {
 			log.error("Unable to start the scheduler...");
 			log.trace("Scheduler error: {}", e.getMessage(), e);
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 		log.info("Job scheduler is running...");
 	}
@@ -173,7 +177,7 @@ public class JobRunner {
 	 * 
 	 */
 	public void stop() {
-		log.info("Stoping scheduler...");
+		log.info("Stopping scheduler...");
 		try {
 			scheduler.shutdown(true);
 		} catch (SchedulerException e) {
@@ -193,7 +197,7 @@ public class JobRunner {
 		} catch (SchedulerException e) {
 			log.error("Unable to clear existing jobs...");
 			log.trace("Scheduler error: {}", e.getMessage(), e);
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 		total = 0;
 		this.start();

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_5.0.xsd">
+
+  <module name="meta" package="com.axelor.meta.db" />
+
+  <entity name="MetaJsonField" table="META_JSON_FIELD">
+    <string name="name" required="true" />
+    <string name="title" />
+    <string name="type" column="type_name" required="true"
+      selection="json.field.type" />
+    <string name="defaultValue" />
+    <string name="model" required="true" column="model_name" />
+    <string name="modelField" required="true" column="model_field" />
+    <many-to-one name="jsonModel" ref="MetaJsonModel" />
+
+    <string name="selection" />
+    <string name="widget" />
+    <string name="help" />
+    <string name="showIf" />
+    <string name="hideIf" />
+    <string name="requiredIf" />
+    <string name="readonlyIf" />
+    <string name="includeIf" />
+
+    <string name="contextField" />
+    <string name="contextFieldTarget" />
+    <string name="contextFieldTargetName" />
+    <string name="contextFieldValue" />
+    <string name="contextFieldTitle" />
+
+    <boolean name="hidden" column="is_hidden" />
+    <boolean name="required" column="is_required" />
+    <boolean name="readonly" column="is_readonly" />
+    <boolean name="nameField" />
+    <boolean name="visibleInGrid" />
+
+    <integer name="minSize" column="min_size" />
+    <integer name="maxSize" column="max_size" />
+    <integer name="precision" default="6" column="decimal_precision" />
+    <integer name="scale" default="2" column="decimal_scale" />
+    <integer name="sequence" />
+
+    <string name="regex" />
+    <string name="valueExpr" large="true" title="Value Expression" />
+
+    <string name="targetModel" />
+    <string name="enumType" />
+    <string name="formView" />
+    <string name="gridView" />
+    <string name="domain" />
+    <many-to-one name="targetJsonModel" ref="MetaJsonModel" />
+
+    <string name="onChange" />
+    <string name="onClick" />
+
+    <string name="widgetAttrs" json="true" />
+
+    <many-to-many name="roles" ref="com.axelor.auth.db.Role" />
+  </entity>
+
+  <entity name="MetaJsonModel" table="META_JSON_MODEL" repository="abstract">
+    <string name="name" required="true" unique="true" />
+    <string name="title" namecolumn="true" required="true" />
+    <string name="onNew" />
+    <string name="onSave" />
+    <string name="nameField" />
+    <many-to-one name="menu" ref="MetaMenu" copy="false" />
+    <many-to-one name="action" ref="MetaAction" copy="false" />
+    <many-to-one name="gridView" ref="MetaView" copy="false" />
+    <many-to-one name="formView" ref="MetaView" copy="false" />
+    <one-to-many name="fields" ref="MetaJsonField" mappedBy="jsonModel" />
+    <many-to-many name="roles" ref="com.axelor.auth.db.Role" />
+  </entity>
+
+  <entity name="MetaJsonRecord" table="META_JSON_RECORD" repository="none">
+    <string name="jsonModel" required="true" />
+    <string name="name" namecolumn="true" />
+    <string name="attrs" json="true" />
+  </entity>
+
+</domain-models>

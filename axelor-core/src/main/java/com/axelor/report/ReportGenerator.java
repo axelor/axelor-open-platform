@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -51,7 +51,6 @@ import com.axelor.app.internal.AppFilter;
 import com.axelor.db.JPA;
 import com.axelor.meta.MetaFiles;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 
 /**
  * The report generator service.
@@ -140,7 +139,7 @@ public class ReportGenerator {
 					try {
 						task.run();
 					} catch (EngineException e) {
-						Throwables.propagate(e);
+						new RuntimeException(e);
 					} finally {
 						task.close();
 					}

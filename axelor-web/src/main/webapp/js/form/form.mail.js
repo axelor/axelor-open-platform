@@ -198,6 +198,10 @@ ui.directive('uiMailMessage', function () {
 			}
 
 			message.$title = (body||{}).title || message.subject;
+			if (!message.$avatar) {
+				var a = scope.$userName(message) || "";
+				message.$a = a[0] || "?";
+			}
 
 			scope.showFull = !message.summary;
 			scope.onShowFull = function () {
@@ -206,12 +210,22 @@ ui.directive('uiMailMessage', function () {
 
 			setTimeout(function () {
 				element.addClass('fadeIn');
+				// dim avatar background color
+				var avatar = element.find('.avatar[class*=bg-]');
+				if (avatar.length) {
+					var color = avatar.css('background-color');
+					var bg = d3.hsl(color);
+					bg.l += 0.1;
+					bg.s -= 0.1;
+					avatar.css('background-color', bg.toString());
+				}
 			});
 		},
 		template: "" +
 			"<div class='fade'>" +
-				"<a href='' class='pull-left avatar' title='{{::$userName(message)}}' ng-click='showAuthor(message)'>" +
-					"<img ng-src='{{::message.$avatar}}' width='32px'>" +
+				"<a href='' class='pull-left avatar' ng-class='userColor(message)' title='{{::$userName(message)}}' ng-click='showAuthor(message)'>" +
+					"<img ng-if='message.$avatar' ng-src='{{::message.$avatar}}' width='32px'>" +
+					"<span ng-if='message.$a'>{{::message.$a}}</span>" +
 				"</a>" +
 				"<div class='mail-message'>" +
 					"<span class='arrow left'></span>" +
@@ -247,7 +261,7 @@ ui.directive('uiMailMessage', function () {
 						"<span class='subject' ng-if='::message.$thread'>" +
 							"<a ng-if='message.relatedId && message.$name' href='#ds/form::{{::message.relatedModel}}/edit/{{::message.relatedId}}'>{{::message.$name}}</a>" +
 							"<span ng-if='::!message.relatedId && message.$name'>{{::message.$name}}</span>" +
-							"<span ng-if='::message.$name'> - </span>" +
+							"<span ng-if='::message.$name && message.$title'> - </span>" +
 							"<span ng-if='::message.$title'>" +
 								"<a ng-if='::message.relatedId' href='#ds/form::{{::message.relatedModel}}/edit/{{::message.relatedId}}'>{{:: _t(message.$title) }}</a>" +
 								"<span ng-if='::!message.relatedId'>{{:: _t(message.$title) }}</span>" +
@@ -269,10 +283,16 @@ ui.directive('uiMailMessage', function () {
 								"<strong>{{:: _t(item.title) }}</strong> : <span ng-bind-html='::item.displayValue'></span>" +
 							"</li>" +
 						"</ul>" +
+						"<div class='track-content' ng-if='::body.content'>" +
+							"<div ui-bind-template x-text='body.content'></div>" +
+						"</div>" +
 						"<div ng-if='!body'>" +
 							"<div ng-if='message.summary && !showFull' ui-bind-template x-text='message.summary'></div>" +
 							"<div ng-if='!message.summary || showFull' ui-bind-template x-text='message.body'></div>" +
 							"<a ng-if='!showFull' href='' ng-click='onShowFull()' class='show-full'><i class='fa fa-ellipsis-h'></i></a>" +
+						"</div>" +
+						"<div class='mail-message-files' ng-if='::body.files'>" +
+							"<div ui-mail-files x-removable='false' x-files='body.files' class='inline'></div>" +
 						"</div>" +
 						"<div class='mail-message-files' ng-show='::message.$files.length'>" +
 							"<div ui-mail-files x-removable='false' x-files='message.$files' class='inline'></div>" +
@@ -283,7 +303,7 @@ ui.directive('uiMailMessage', function () {
 							"</span>" +
 							"<span>" +
 								"<a href='' ng-click='showAuthor(message)'>{{::$userName(message)}}</a> " +
-								"<span>{{formatEvent(message)}}</span>" +
+								"<span ng-bind-html='formatEvent(message)'></span>" +
 							"</span>" +
 						"</div>" +
 					"</div>" +
@@ -296,6 +316,38 @@ ui.directive('uiMailMessage', function () {
 ui.formWidget('uiMailMessages', {
 	scope: true,
 	controller: ['$scope', 'MessageService', function ($scope, MessageService) {
+		
+		var userColors = {};
+		var usedColors = [];
+		var colorNames = [
+			'blue', 
+			'green', 
+			'red', 
+			'orange', 
+			'yellow', 
+			'olive', 
+			'teal', 
+			'violet', 
+			'purple', 
+			'pink', 
+			'brown'
+		];
+
+		$scope.userColor = function (message) {
+			var user = message.$author;
+			if (!user) return null;
+			if (userColors[user.code]) {
+				return userColors[user.code];
+			}
+			if (usedColors.length === colorNames.length) {
+				usedColors = [];
+			}
+			var color = _.find(colorNames, function (n) {
+				return usedColors.indexOf(n) === -1;
+			});
+			usedColors.push(color);
+			return userColors[user.code] = 'bg-' + color;
+		};
 
 		function updateReadCount(messages) {
 			var unread = [];
@@ -357,7 +409,11 @@ ui.formWidget('uiMailMessages', {
 			if (message.$eventLine) {
 				return message.$eventLine;
 			}
-			var line = message.$eventText + " - " + moment(message.$eventTime).fromNow();
+			var line = message.$eventText
+				+ " - "
+				+ "<a href='javascript:void(0)' title='" + moment(message.$eventTime).format('DD/MM/YYYY HH:mm') + "'>"
+				+ moment(message.$eventTime).fromNow()
+				+ "</a>";
 			message.$eventLine = line;
 			return line;
 		};
@@ -411,7 +467,7 @@ ui.formWidget('uiMailMessages', {
 
 				$scope.waitForActions(function () {
 					if (folder) {
-						$scope.record.__empty = count === 0;
+						$scope.record.__empty = !count;
 						updateReadCount(found);
 					}
 				}, 100);
@@ -434,9 +490,15 @@ ui.formWidget('uiMailMessages', {
 			}
 		});
 
-		$scope.$watch("record", function (record, old) {
+		$scope.$watch("record", function mailMessageWatch(record, old) {
 			if (record === old) { return; }
 			if (record && record.id) {
+				$scope.onLoadMessages();
+			}
+		});
+		
+		$scope.$on("on:load-messages", function (e, record) {
+			if ($scope.record === record) {
 				$scope.onLoadMessages();
 			}
 		});
@@ -587,6 +649,10 @@ ui.directive('uiMailEditor', ["$compile", function ($compile) {
 		scope.select = function (record) {
 
 		};
+		
+		scope.isEditable = function () {
+			return true;
+		};
 
 		scope.onEditEmail = function (record, onSelect) {
 
@@ -603,7 +669,7 @@ ui.directive('uiMailEditor', ["$compile", function ($compile) {
 				.click(function() {
 					var uploader = $compile('<div ui-dms-popup x-on-select="onSelectFiles"></div>')(popup);
 					uploader.isolateScope().showPopup();
-					uploader.isolateScope().applyLater();
+					uploader.isolateScope().$applyAsync();
 				});
 
 				$('<div class="pull-left ui-dialog-buttonset" style="float: left;"></div>')
@@ -637,6 +703,7 @@ ui.formWidget('uiMailFileList', {
 });
 
 ui.formInput('uiMailSelect', 'MultiSelect', {
+	metaWidget: false,
 
 	init: function (scope) {
 		this._super.apply(this, arguments);
@@ -790,7 +857,7 @@ ui.formWidget('uiMailComposer', {
 		textarea.on('blur', function () {
 			if (scope.post || !scope.message) return;
 			scope.message.$reply = false;
-			scope.applyLater();
+			scope.$applyAsync();
 		});
 
 		scope.$on('on:message-add', function () {
@@ -952,7 +1019,7 @@ ui.formWidget('uiMailFollowers', {
 			});
 		}
 
-		$scope.$watch("record", function (record) {
+		$scope.$watch("record", function mailFollowerWatch(record) {
 			if (record && record.id) {
 				doLoadFollowers(record);
 			}
@@ -966,22 +1033,20 @@ ui.formWidget('uiMailFollowers', {
 	template:
 		"<div class='mail-followers panel panel-default span3'>" +
 			"<div class='panel-header'>" +
-			"<div class='panel-title'>" +
-				"<span x-translate>Followers</span>" +
-				"<div class='icons pull-right'>" +
+				"<div class='panel-title' x-translate>Followers</div>" +
+				"<div class='panel-icons'>" +
 					"<i class='fa fa-star-o' ng-click='onFollow()' ng-show='!following'></i>" +
 					"<i class='fa fa-star' ng-click='onUnfollow()' ng-show='following'></i>" +
 					"<i class='fa fa-plus' ui-mail-editor x-email-title='emailTitle' x-send-title='sendTitle' ng-click='onAddFollowers()'></i>" +
 				"</div>" +
 			"</div>" +
-			"</div>" +
 			"<div class='panel-body'>" +
-			"<ul class='links'>" +
-				"<li ng-repeat='follower in followers'>" +
-				"<i class='fa fa-remove' ng-click='onUnfollow(follower)'></i>" +
-				"<a href='' ng-click='showAuthor(follower)'>{{$userName(follower)}}</a> " +
-				"</li>" +
-			"</ul>" +
+				"<ul class='links'>" +
+					"<li ng-repeat='follower in followers'>" +
+					"<i class='fa fa-remove' ng-click='onUnfollow(follower)'></i>" +
+					"<a href='' ng-click='showAuthor(follower)'>{{$userName(follower)}}</a> " +
+					"</li>" +
+				"</ul>" +
 			"</div>" +
 		"</div>"
 });
@@ -1049,14 +1114,14 @@ ui.formWidget('PanelMail', {
 	template: "<div class='form-mail row-fluid' ng-show='record.id > 0 || folder' ui-transclude></div>"
 });
 
-ui.controller("MailGroupListCtrl", MailGroupListCtrl);
-MailGroupListCtrl.$inject = ['$scope', '$element'];
-function MailGroupListCtrl($scope, $element) {
+ui.controller("TeamListCtrl", TeamListCtrl);
+TeamListCtrl.$inject = ['$scope', '$element'];
+function TeamListCtrl($scope, $element) {
 	ui.GridViewCtrl.call(this, $scope, $element);
 
 	$scope.getUrl = function (record) {
 		if (!record || !record.id) return null;
-		return "ws/rest/com.axelor.mail.db.MailGroup/" + record.id + "/image/download?image=true&v=" + record.version;
+		return "ws/rest/com.axelor.team.db.Team/" + record.id + "/image/download?image=true&v=" + record.version;
 	};
 
 	$scope.onEdit = function(record) {

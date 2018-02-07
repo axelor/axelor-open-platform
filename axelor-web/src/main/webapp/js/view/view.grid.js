@@ -73,14 +73,11 @@ function GridViewCtrl($scope, $element) {
 					$scope.$broadcast('on:grid-selection-change', $scope.getContext());
 					$scope.updateRoute();
 				});
-
-				setTimeout(focusFilter);
 			});
 			
 			initialized = true;
 		} else {
-			setTimeout(focusFilter);
-			if (reloadDotted || $scope._viewTypeLast !== 'grid') {
+			if (reloadDotted || ($scope._viewTypeLast && $scope._viewTypeLast !== 'grid')) {
 				return $scope.reload().then(function() {
 					$scope.updateRoute();
 				});
@@ -149,6 +146,13 @@ function GridViewCtrl($scope, $element) {
 	$scope.setItems = function(items, pageInfo) {
 
 		var dataView = $scope.dataView;
+		var syncSelection = function () {
+			if (dataView.$syncSelection) {
+				setTimeout(function(){
+					dataView.$syncSelection();
+				});
+			}
+		};
 		
 		//XXX: clear existing items (bug?)
 		if (dataView.getLength()) {
@@ -164,12 +168,24 @@ function GridViewCtrl($scope, $element) {
 		if (pageInfo) {
 	    	page = pageInfo;
 		}
-		
-		if (dataView.$syncSelection) {
-			setTimeout(function(){
-				dataView.$syncSelection();
+
+		var details = $scope.$details;
+		if (details) {
+			details.$timeout(function () {
+				var record = details.record || {};
+				var found = _.findWhere(items, { id: record.id });
+				if (found) {
+					found.selected = true;
+					return;
+				}
+				details.edit(null);
+				syncSelection();
 			});
+		} else {
+			syncSelection();
 		}
+
+		$scope.$broadcast('grid:adjust-columns');
 	};
 
 	$scope.attr = function (name) {
@@ -187,30 +203,65 @@ function GridViewCtrl($scope, $element) {
 		return $scope.hasButton('edit') && $scope.selection.length > 0;
 	};
 	
+	$scope.canShowDetailsView = function () {
+		var params = ($scope._viewParams || {}).params || {};
+		return params['details-view'] && !axelor.device.mobile;
+	};
+	
+	$scope.canShowSave = function () {
+		if ($scope.$details) {
+			return true;
+		}
+		return $scope.hasButton('save') && $scope.canEditInline();
+	}
+
 	$scope.canSave = function() {
+		if ($scope.$details && $scope.$details.canSave()) {
+			return true;
+		}
 		return $scope.hasButton('save') && this.dataView.canSave && this.dataView.canSave();
 	};
 	
 	$scope.canDelete = function() {
 		return $scope.hasButton('delete') && !$scope.canSave() && $scope.selection.length > 0;
 	};
+
+	$scope.canArchive = function() {
+		return $scope.hasPermission('write')
+			&& $scope.hasButton('archive')
+			&& !$scope.canSave()
+			&& $scope.selection.length > 0;
+	};
 	
+	$scope.canUnarchive = function() {
+		return $scope.canArchive();
+	};
+
 	$scope.canEditInline = function() {
 		return _.isFunction(this.dataView.canSave);
 	};
 	
 	$scope.canMassUpdate = function () {
 		// this permission is actually calculated from fields marked for mass update
-		return $scope.hasPermission('massUpdate', false);
+		return $scope.hasPermission('massUpdate', false) || ($scope.schema && $scope.schema.canMassUpdate);
 	};
 
 	$scope.canExport = function() {
 		return $scope.hasPermission('export');
 	};
 
+	$scope.selectFields = function() {
+		return _.map($scope.fields, function (field) {
+			if (field.jsonField) {
+				return field.name + '::' + (field.jsonType || 'text');
+			}
+			return field.name;
+		});
+	};
+
 	$scope.filter = function(searchFilter) {
 
-		var fields = _.pluck($scope.fields, 'name'),
+		var fields = $scope.selectFields(),
 			options = {};
 
 		function fixPage() {
@@ -264,11 +315,12 @@ function GridViewCtrl($scope, $element) {
 			var field = $scope.fields[key] || {};
 			var type = field.type || 'string';
 			var operator = 'like';
+			var origValue = value;
 			var value2;
 
 			//TODO: implement expression parser
 			
-			if (type === 'many-to-one') {
+			if (type === 'many-to-one' && !field.jsonField) {
 				if (field.targetName) {
 					key = key + '.' + field.targetName;
 				} else {
@@ -335,9 +387,15 @@ function GridViewCtrl($scope, $element) {
 					value = (operator == 'between' ? val.startOf('day') : val).toDate().toISOString();
 					value2 = (operator == 'between' ? val.endOf('day') : val).toDate().toISOString();
 					break;
+				case 'enum':
 				case 'selection':
 					operator = '=';
 					break;
+			}
+
+			// tag json fields
+			if (field.jsonField) {
+				key += '::' + (field.jsonType || 'text');
 			}
 
 			return {
@@ -349,9 +407,13 @@ function GridViewCtrl($scope, $element) {
 		});
 		
 		domain = domain || $scope._domain;
+		context = _.extend({}, $scope._context, context);
+
 		if (domain && $scope.getContext) {
-			context = _.extend({}, $scope._context, context, $scope.getContext());
+			context = _.extend(context, $scope.getContext());
 		}
+
+		context._model = context._model || $scope._model;
 		
 		options = {
 			filter: criteria,
@@ -366,6 +428,24 @@ function GridViewCtrl($scope, $element) {
 			options.offset = (pageNum - 1 ) * ds._page.limit;
 		}
 
+		var advance = arguments.length > 1 ? arguments[1] : null;
+		if (advance && advance.criteria && advance.criteria.length) {
+			if (_.isEmpty(criteria.criteria)) {
+				options.filter = advance;
+			} else {
+				criteria.criteria = [{
+					operator: criteria.operator,
+					criteria: criteria.criteria
+				}, {
+					operator: advance.operator,
+					criteria: advance.criteria
+				}];
+				criteria.operator = "and";
+			}
+		}
+		if (advance && criteria.archived === undefined) {
+			criteria.archived = advance.archived;
+		}
 		return ds.search(options).then(fixPage);
 	};
 
@@ -387,14 +467,14 @@ function GridViewCtrl($scope, $element) {
 	};
 
 	$scope.onNext = function() {
-		var fields = _.pluck($scope.fields, 'name');
+		var fields = $scope.selectFields();
 		ds.next(fields).then(function(){
 			$scope.updateRoute();
 		});
 	};
 	
 	$scope.onPrev = function() {
-		var fields = _.pluck($scope.fields, 'name');
+		var fields = $scope.selectFields();
 		ds.prev(fields).then(function(){
 			$scope.updateRoute();
 		});
@@ -402,9 +482,13 @@ function GridViewCtrl($scope, $element) {
 	
 	$scope.onNew = function() {
 		page.index = -1;
+		if ($scope.$details) {
+			$scope.$details.onNew();
+			return;
+		}
 		$scope.switchTo('form', function(viewScope){
 			$scope.ajaxStop(function(){
-				$scope.applyLater(function(){
+				$scope.$timeout(function(){
 					viewScope.$broadcast('on:new');
 				});
 			});
@@ -419,10 +503,14 @@ function GridViewCtrl($scope, $element) {
 	};
 
 	$scope.$confirmMessage = _t("Do you really want to delete the selected record(s)?");
+	$scope.$confirmArchiveMessage = _t("Do you really want to archive the selected record(s)?");
+	$scope.$confirmUnarchiveMessage = _t("Do you really want to unarchive the selected record(s)?");
 
 	$scope.onDelete = function() {
-		
-		axelor.dialogs.confirm($scope.$confirmMessage, function(confirmed){
+		var message = $scope.$confirmMessage;
+		var message = _.isFunction(message) ? message() : message;
+
+		axelor.dialogs.confirm(message, function(confirmed){
 
 			if (!confirmed)
 				return;
@@ -439,21 +527,73 @@ function GridViewCtrl($scope, $element) {
 		});
 	};
 	
-	$scope.onRefresh = function() {
-		return $scope.reload();
+	$scope._doArchive = function (message, archive) {
+		axelor.dialogs.confirm(message, function(confirmed) {
+			if (!confirmed) {
+				return;
+			}
+
+			var selected = _.map($scope.selection, function(index) {
+				var item = $scope.dataView.getItem(index);
+				return _.extend({}, _.pick(item, 'id', 'version'), { archived: archive });
+			});
+			
+			ds.saveAll(selected).success(function() {
+				$scope.onRefresh();
+			});
+		});
+	}
+	
+	$scope.onArchive = function() {
+		$scope._doArchive($scope.$confirmArchiveMessage, true);
 	};
 	
+	$scope.onUnarchive = function() {
+		$scope._doArchive($scope.$confirmUnarchiveMessage, false);
+	};
+	
+	$scope.onRefresh = function() {
+		if ($scope.$details) {
+			$scope.$details.onNew().then(function () {
+				$scope.reload();
+			});
+		} else {
+			$scope.reload();
+		}
+	};
+
+	$scope.isDirty = function () {
+		if ($scope.$details && $scope.$details.isDirty) {
+			return $scope.$details.isDirty();
+		}
+		return false;
+	};
+
+	$scope.confirmDirty = function(callback, cancelCallback) {
+		if ($scope.$details && $scope.$details.confirmDirty) {
+			return $scope.$details.confirmDirty(callback, cancelCallback);
+		}
+		return callback();
+	};
+
 	$scope.reload = function() {
-		var fields = _.pluck($scope.fields, 'name');
+		var fields = $scope.selectFields();
 		return ds.search({
 			fields: fields
 		});
 	};
 
 	$scope.onSort = function(event, args) {
-		var fields = _.pluck($scope.fields, 'name');
+		var fields = $scope.selectFields();
 		var sortBy = _.map(args.sortCols, function(column) {
+			var field = column.sortCol.descriptor;
 			var name = column.sortCol.field;
+			if (field.jsonField) {
+				if (field.type === 'many-to-one' && field.targetName) {
+					name = name + "." + field.targetName;
+				}
+				name += '::' + ('integer,boolean,decimal'.indexOf(field.type) > -1 ? field.type : 'text');
+			}
 			var spec = column.sortAsc ? name : '-' + name;
 			return spec;
 		});
@@ -479,9 +619,13 @@ function GridViewCtrl($scope, $element) {
 		});
 
 		$scope.selection = selection;
-		$scope.applyLater(function () {
+		$scope.$timeout(function () {
 			$scope.$broadcast('on:grid-selection-change', $scope.getContext());
 		});
+		
+		if ($scope.$details) {
+			$scope.$details.selectionChanged(selection);
+		}
 	};
 	
 	$scope.onItemClick = function(event, args) {
@@ -494,7 +638,7 @@ function GridViewCtrl($scope, $element) {
 	
 	$scope.onItemDblClick = function(event, args) {
 		$scope.onEdit();
-		$scope.$apply();
+		$scope.$applyAsync();
 	};
 	
 	var _getContext = $scope.getContext;
@@ -515,14 +659,19 @@ function GridViewCtrl($scope, $element) {
 	};
 	
 	$scope.onSave = function() {
-		this.dataView.saveChanges();
+		if ($scope.$details) {
+			$scope.$details.onSave();
+		}
+		if ($scope.dataView.saveChanges) {
+			$scope.dataView.saveChanges();
+		}
 	};
 	
 	$scope.onArchived = function(e) {
 		var button = $(e.currentTarget);
 		setTimeout(function(){
 			var active = button.is('.active');
-			var fields = _.pluck($scope.fields, 'name');
+			var fields = $scope.selectFields();
 			ds.search({
 				fields: fields,
 				archived: active
@@ -531,7 +680,18 @@ function GridViewCtrl($scope, $element) {
 	};
 	
 	$scope.onExport = function (full) {
-		var fields = full ? [] : _.pluck($scope.view.items, 'name');
+		var view = $scope.view || $scope.schema || {};
+		if (!view.items) return;
+
+		var names = _.pluck(view.items, 'name');
+		var fields = full
+			? []
+			: _.chain($scope.getVisibleCols())
+			   .map(function (col) { return (col.descriptor||{}).name; })
+			   .compact()
+			   .filter(function (name) { return names.indexOf(name) > -1; })
+			   .value();
+
 		return ds.export_(fields).success(function(res) {
 			var fileName = res.fileName;
 			var filePath = 'ws/rest/' + $scope._model + '/export/' + fileName;
@@ -544,13 +704,6 @@ function GridViewCtrl($scope, $element) {
 		var first = $scope.dataView.getItem(index);
 		if (first) {
 			$scope.dataView.$syncSelection([], [first.id], true);
-		}
-	}
-	
-	function focusFilter() {
-		var filterBox = $('.filter-box .search-query:visible input');
-		if (filterBox.size()) {
-			filterBox.focus().select();
 		}
 	}
 
@@ -584,7 +737,7 @@ function GridViewCtrl($scope, $element) {
 			$scope.onNext();
 		}
 
-		$scope.applyLater();
+		$scope.$applyAsync();
 		return false;
 	};
 }
@@ -595,6 +748,100 @@ ui.directive('uiViewGrid', function(){
 		template: '<div ui-slick-grid ui-widget-states></div>'
 	};
 });
+
+ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource, ViewService) {
+	return {
+		scope: {},
+		controller: ['$scope', '$element', function ($scope, $element) {
+			var parent = $scope.$parent;
+			var params =  _.pick(parent._viewParams, ['views', 'model', 'domain', 'context', 'params']);
+
+			var view = _.findWhere(params.views, { type: 'form' }) || { type: 'form' };
+			if (params.params && _.isString(params.params['details-view'])) {
+				view = { type: 'form', name: params.params['details-view']};
+			}
+
+			params.views = [view];
+			$scope._viewParams = params;
+			$scope._isDetailsForm = true;
+
+			ui.ViewCtrl.call(this, $scope, DataSource, ViewService);
+
+			// use same ds as grid
+			$scope._dataSource = parent._dataSource;
+
+			ui.FormViewCtrl.call(this, $scope, $element);
+
+			parent.$parent.$details = $scope;
+
+			var ds = $scope._dataSource;
+			var noop = angular.noop;
+
+			$scope.getRouteOptions = noop;
+			$scope.setRouteOptions = noop;
+			$scope.updateRoute = noop;
+			$scope.$locationChangeCheck = noop;
+			$scope.switchBack = noop;
+			$scope.switchTo = noop;
+			$scope.onHotKey = noop;
+
+			$scope._dataSource = parent._dataSource;
+
+			$scope.setEditable(true);
+			$scope.show();
+			
+			function doEdit(index) {
+				var found = ds.at(index);
+				var record = $scope.record;
+				if (record && found.id === record.id) return;
+				$scope.doRead(found.id).success(function(record) {
+					$scope.edit(record);
+				});
+			}
+
+			$scope.selectionChanged = _.debounce(function (selection) {
+				var current = $scope.record || {};
+				var first = _.first(selection);
+				if (first !== undefined) {
+					doEdit(first);
+				} else if (current.id > 0) {
+					$scope.edit(null);
+				}
+			}, 300);
+
+			$scope.$on("on:new", function(e) {
+				var dataView = parent.dataView;
+				if (dataView && dataView.$syncSelection) {
+					dataView.$syncSelection([], [], true);
+				}
+			});
+			
+			$scope.$on("on:edit", function(e) {
+				var record = $scope.record || {};
+				var dataView = parent.dataView;
+				if (dataView && record.id > 0) {
+					var found = _.findWhere(dataView.getItems(), { id: record.id });
+					if (found) {
+						found.selected = true;
+					}
+					dataView.$syncSelection([], [], false);
+				}
+			});
+		}],
+		link: function (scope, element, attrs) {
+			var overlay = $("<div class='slickgrid-overlay'>");
+			scope.waitForActions(function () {
+				element.parent().children('.slickgrid').append(overlay);
+			});
+			
+			scope.$watch('$$dirty', function gridDirtyWatch(dirty) {
+				overlay.toggle(dirty);
+			});
+		},
+		replace: true,
+		templateUrl: "partials/views/details-form.html"
+	}
+}]);
 
 ui.directive('uiPortletGrid', function(){
 	return {
@@ -635,7 +882,7 @@ ui.directive('uiPortletGrid', function(){
 
 				setTimeout(function(){
 					NavService.openView(tab);
-					$scope.$apply();
+					$scope.$applyAsync();
 					if (force) {
 						$scope.waitForActions(function() {
 							var scope = tab.$viewScope || ($scope.selectedTab || {}).$viewScope;
@@ -680,7 +927,7 @@ ui.directive('uiPortletGrid', function(){
 					return;
 				}
 
-				unwatch =  $scope.$watch(function () {
+				unwatch =  $scope.$watch(function gridVisibleWatch() {
 					if ($element.is(":hidden")) {
 						return;
 					}
@@ -727,6 +974,34 @@ ui.directive('uiPortletGrid', function(){
 		'<div class="portlet-grid">'+
 			'<div ui-view-grid x-view="schema" x-data-view="dataView" x-editable="false" x-no-filter="{{noFilter}}" x-handler="this"></div>'+
 		'</div>'
+	};
+});
+
+ui.directive('uiTopHelp', function () {
+	return {
+		link: function (scope, element) {
+			var unwatch = scope.$watch('schema', function gridSchemaWatch(view) {
+				if (view) {
+					unwatch();
+				}
+				if (view && view.help) {
+					element.popover({
+						html: true,
+						title: view.title,
+						content: view.help,
+						placement: 'bottom',
+						trigger: 'hover',
+						delay: { show: 500, hide: 100 },
+						container: 'body'
+					});
+				}
+			});
+		},
+		replace: true,
+		template:
+			"<button ng-show='schema.help'>" +
+				"<i class='fa fa-info'></i>" +
+			"</button>"
 	};
 });
 

@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,53 +17,55 @@
  */
 package com.axelor.rpc;
 
-import static com.axelor.common.StringUtils.isBlank;
-
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
-import com.axelor.app.internal.AppFilter;
-import com.axelor.db.JPA;
-import com.axelor.db.Model;
+import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
-import com.axelor.i18n.I18nBundle;
-import com.axelor.inject.Beans;
-import com.axelor.meta.db.MetaTranslation;
-import com.axelor.meta.db.repo.MetaTranslationRepository;
 
 final class Translator {
 
 	private Translator() {
 	}
 
-	private static Long findId(Map<String, Object> values) {
-		try {
-			return Long.parseLong(values.get("id").toString());
-		} catch (Exception e){}
-		return null;
-	}
-
-	public static String getTranslation(Property property, String value) {
-		if (property.isTranslatable()) {
-			return I18n.get(value);
+	private static String getTranslation(Property property, String value) {
+		if (property.isTranslatable() && StringUtils.notBlank(value)) {
+			String key = "value:" + value;
+			String val = I18n.get(key);
+			if (val != key) {
+				return val;
+			}
 		}
 		return value;
 	}
 
+	private static String toKey(String name) {
+		return String.format("$t:%s", name);
+	}
+
+	static Map<String, Object> translate(Map<String, Object> values, Property property) {
+		String name = property.getName();
+		Object value = values.get(name);
+		if (value instanceof String) {
+			Object val = getTranslation(property, (String) value);
+			if (val != value) {
+				values.put(toKey(name), val);
+			}
+		}
+		return values;
+	}
+
 	@SuppressWarnings("all")
-	public static void applyTranslatables(Map<String, Object> values, Class<?> model) {
+	static void applyTranslatables(Map<String, Object> values, Class<?> model) {
 		if (values == null || values.isEmpty()) return;
 		final Mapper mapper = Mapper.of(model);
 		for (Property property : mapper.getProperties()) {
 			final String name = property.getName();
 			final Object value = values.get(name);
 			if (property.isTranslatable() && value instanceof String) {
-				values.put(property.getName(), I18n.get((String) value));
+				translate(values, property);
 			}
 			if (property.getTarget() != null && value instanceof Map) {
 				applyTranslatables((Map) value, property.getTarget());
@@ -76,72 +78,5 @@ final class Translator {
 				}
 			}
 		}
-	}
-
-	@SuppressWarnings("all")
-	public static void saveTranslatables(Map<String, Object> json, Class<?> model) {
-		final Mapper mapper = Mapper.of(model);
-		final Set<String> translated = new HashSet<>();
-		final Long id = findId(json);
-		final Model bean = id == null ? null : JPA.find((Class) model, id);
-		for (String name : json.keySet()) {
-			final Property property = mapper.getProperty(name);
-			if (property == null) continue;
-			if (property.isTranslatable()) {
-				String val = (String) json.get(property.getName());
-				String key = bean == null ? val : (String) property.get(bean);
-				if (saveTranslation(property, key, val)) {
-					translated.add(name);
-				}
-				continue;
-			}
-			if (property.getTarget() == null) {
-				continue;
-			}
-			final Object value = json.get(name);
-			if (value instanceof Map) {
-				saveTranslatables((Map) value, property.getTarget());
-			}
-			if (value instanceof Collection) {
-				for (Object item : (Collection) value) {
-					if (item instanceof Map) {
-						saveTranslatables((Map) item, property.getTarget());
-					}
-				}
-			}
-		}
-
-		if (findId(json) != null) {
-			// remove translated values from json to prevent persistence
-			for (String name : translated) {
-				json.remove(name);
-			}
-		}
-	}
-
-	private static boolean saveTranslation(Property property, String key, String value) {
-		Locale locale = AppFilter.getLocale();
-		if (locale == null) {
-			locale = Locale.getDefault();
-		}
-		if (isBlank(key)) {
-			key = value;
-		}
-		if (isBlank(key)) {
-			return false;
-		}
-		MetaTranslationRepository repo = Beans.get(MetaTranslationRepository.class);
-		MetaTranslation record = repo.findByKey(key, locale.getLanguage());
-		if (record == null) {
-			record = new MetaTranslation();
-			record.setKey(key);
-			record.setMessage(value);
-			record.setLanguage(locale.getLanguage());
-		} else {
-			record.setMessage(value);
-		}
-		repo.save(record);
-		I18nBundle.invalidate();
-		return true;
 	}
 }

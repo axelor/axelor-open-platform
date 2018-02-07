@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,16 +17,16 @@
  */
 package com.axelor.meta.loader;
 
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.axelor.common.StringUtils;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * Module dependency resolver.
@@ -34,7 +34,7 @@ import com.google.common.collect.Sets;
  */
 final class Resolver {
 
-	private HashMap<String, Module> modules = Maps.newLinkedHashMap();
+	private HashMap<String, Module> modules = new LinkedHashMap<>();
 
 	private Module module(String name) {
 		Module module = modules.get(name);
@@ -72,11 +72,10 @@ final class Resolver {
 	 */
 	public Module add(String name, String... depends) {
 		Module module = module(name);
-		for(String dep : depends) {
-			if (!StringUtils.isBlank(dep)) {
-				module.dependsOn(module(dep));
-			}
-		}
+		Stream.of(depends)
+			.filter(StringUtils::notBlank)
+			.map(this::module)
+			.forEach(m -> module.dependsOn(m));
 		return module;
 	}
 
@@ -87,22 +86,16 @@ final class Resolver {
 	 * @return list of the resolved dependencies.
 	 */
 	public List<Module> resolve(String name) {
-		
-		List<String> resolved = Lists.newArrayList();
-		Set<String> unresolved = Sets.newHashSet();
+		final List<String> resolved = new ArrayList<>();
+		final Set<String> unresolved = new HashSet<>();
 
 		this.resolve(name, resolved, unresolved);
-		
+
 		if (!unresolved.isEmpty()) {
 			throw new IllegalArgumentException("Unresolved dependencies: " + unresolved);
 		}
-		
-		List<Module> all = Lists.newArrayList();
-		for (String n : resolved) {
-			all.add(module(n));
-		}
-		
-		return all;
+
+		return resolved.stream().map(this::module).collect(Collectors.toList());
 	}
 
 	/**
@@ -111,45 +104,33 @@ final class Resolver {
 	 * @return list of module in dependency order.
 	 */
 	public List<Module> all() {
-		
-		List<Module> resolved = Lists.newArrayList();
-		List<List<Module>> resolutions = Lists.newArrayList();
+		final List<List<Module>> resolutions = new ArrayList<>();
+		final List<Module> resolved = new ArrayList<>();
 
-		for(String key : modules.keySet()) {
+		for (String key : modules.keySet()) {
 			resolutions.add(resolve(key));
 		}
 
-		Collections.sort(resolutions, new Comparator<List<?>>() {
-			@Override
-			public int compare(List<?> o1, List<?> o2) {
-				return Integer.compare(o1.size(), o2.size());
-			}
-		});
-
-		for(List<Module> resolution : resolutions) {
-			for(Module module : resolution) {
-				if (resolved.contains(module)) continue;
-				resolved.add(module);
+		for (List<Module> resolution : resolutions) {
+			for (Module module : resolution) {
+				if (!resolved.contains(module)) {
+					resolved.add(module);
+				}
 			}
 		}
-		
+
 		return resolved;
 	}
-	
+
 	/**
 	 * Return resolved module names.
 	 * 
 	 * @return list of module names in dependency order.
 	 */
 	public List<String> names() {
-		List<Module> all = this.all();
-		List<String> names = Lists.newArrayList();
-		for (Module module : all) {
-			names.add(module.getName());
-		}
-		return names;
+		return all().stream().map(Module::getName).collect(Collectors.toList());
 	}
-	
+
 	/**
 	 * Get the instance of the module by given name.
 	 * 

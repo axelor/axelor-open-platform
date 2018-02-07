@@ -176,7 +176,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 		}
 	});
 	
-	$scope.$parent.$watch('isReadonly()', function(readonly, old) {
+	$scope.$parent.$watch('isReadonly()', function nestedReadonlyWatch(readonly, old) {
 		if (readonly === old) return;
 		$scope.setEditable(!readonly);
 	});
@@ -225,7 +225,7 @@ function NestedEditorCtrl($scope, $element, DataSource, ViewService) {
 	$scope.registerNested = function(scope) {
 		$scope.nested = scope;
 		
-		$scope.$watch("isReadonly()", function(readonly) {
+		$scope.$watch("isReadonly()", function nestedReadonlyWatch(readonly) {
 			scope.setEditable(!readonly);
 		});
 	};
@@ -249,16 +249,16 @@ var NestedEditor = {
 		var configure = _.once(function (nested) {
 
 			//FIX: select on M2O doesn't apply to nested editor
-			var unwatchId = scope.$watch(attrs.ngModel + '.id', function(id, old){
+			var unwatchId = scope.$watch(attrs.ngModel + '.id', function nestedRecordIdWatch(id, old){
 				if (id === old) {
 					return;
 				}
 				unwatchId();
 				unwatchId = null;
-				scope.applyLater();
+				scope.$applyAsync();
 			});
 
-			var unwatchValid = nested.$watch('form.$valid', function(valid, old){
+			var unwatchValid = nested.$watch('form.$valid', function nestedValidWatch(valid, old){
 				if (valid === old) {
 					return;
 				}
@@ -295,7 +295,7 @@ var NestedEditor = {
 
 			original = angular.copy(record);
 
-			unwatch = nested.$watch('record', function(rec, old) {
+			unwatch = nested.$watch('record', function nestedRecordWatch(rec, old) {
 
 				if (counter++ === 0 && !nested.$$forceCounter) {
 					return;

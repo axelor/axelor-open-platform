@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -100,6 +100,7 @@ public class AuthModule extends AbstractModule {
 		@SuppressWarnings("unchecked")
 		protected void configureShiroWeb() {
 			this.addFilterChain("/public/**", ANON);
+			this.addFilterChain("/dist/**", ANON);
 			this.addFilterChain("/lib/**", ANON);
 			this.addFilterChain("/img/**", ANON);
 			this.addFilterChain("/ico/**", ANON);

@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,10 +17,10 @@
  */
 package com.axelor.tools.x2j.pojo
 
-import groovy.util.slurpersupport.NodeChild
-
 import com.axelor.common.Inflector
 import com.axelor.tools.x2j.Utils
+
+import groovy.util.slurpersupport.NodeChild
 
 class Property {
 
@@ -80,14 +80,15 @@ class Property {
 			case "decimal":
 				return entity.importType("java.math.BigDecimal")
 			case "date":
-				return entity.importType("org.joda.time.LocalDate")
+				return entity.importType("java.time.LocalDate")
 			case "time":
-				return entity.importType("org.joda.time.LocalTime")
+				return entity.importType("java.time.LocalTime")
 			case "datetime":
-				def t = attrs['tz'] == 'true' ? 'DateTime' : 'LocalDateTime'
-				return entity.importType('org.joda.time.' + t)
+				def t = attrs['tz'] == 'true' ? 'ZonedDateTime' : 'LocalDateTime'
+				return entity.importType('java.time.' + t)
 			case "binary":
 				return "byte[]"
+			case "enum":
 			case "one-to-one":
 			case "many-to-one":
 				return entity.importType(targetFqn)
@@ -118,6 +119,7 @@ class Property {
 			case "date":
 			case "time":
 			case "datetime":
+			case "enum":
 				return true
 		}
 		return false
@@ -143,12 +145,14 @@ class Property {
 			case "decimal":
 				return "new BigDecimal(\"${value}\")"
 			case "date":
-				return value == "now" ? "new LocalDate()" : "new LocalDate(\"${value}\")"
+				return value == "now" ? "LocalDate.now()" : "LocalDate.parse(\"${value}\")"
 			case "time":
-				return value == "now" ? "new LocalTime()" : "new LocalTime(\"${value}\")"
+				return value == "now" ? "LocalTime.now()" : "LocalTime.parse(\"${value}\")"
 			case "datetime":
-				def t = attrs['tz'] == 'true' ? 'DateTime' : 'LocalDateTime'
-				return value == "now" ? "new ${t}()" : "new ${t}(\"${value}\")"
+				def t = attrs['tz'] == 'true' ? 'ZonedDateTime' : 'LocalDateTime'
+				return value == "now" ? "${t}.now()" : "${t}.parse(\"${value}\")"
+			case "enum":
+				return entity.importType(targetFqn) + "." + value
 		}
 	}
 
@@ -227,7 +231,7 @@ class Property {
 		if (orphanRemoval || !mapped || type != "one-to-many") {
 			return null
 		}
-		return """for (${target} item : ${name}) {
+		return """for (${target} item : ${getter}()) {
 				item.set${firstUpper(mapped)}(null);
 			}"""
 	}
@@ -260,7 +264,18 @@ class Property {
 		if (col) {
 			return col
 		}
-		return Inflector.getInstance().underscore(name)
+		// follow hibernate naming
+		final StringBuilder buf = new StringBuilder(name.replace('.', '_'));
+		for (int i = 1; i < buf.length() - 1; i++) {
+			if (
+				Character.isLowerCase(buf.charAt(i-1)) &&
+				Character.isUpperCase(buf.charAt(i) ) &&
+				Character.isLowerCase(buf.charAt(i+1))
+			) {
+				buf.insert(i++, '_');
+			}
+		}
+		return buf.toString().toLowerCase()
 	}
 
 	boolean isInitParam() {
@@ -280,6 +295,14 @@ class Property {
 			return attrs["orphan"] == "false"
 		}
 		return type == "one-to-many" && attrs["mappedBy"] != null
+	}
+	
+	boolean isEnum() {
+		return type == 'enum'
+	}
+
+	boolean isJson() {
+		return attrs["json"] == "true"
 	}
 
 	boolean isPassword() {
@@ -308,10 +331,10 @@ class Property {
 	String newCollection() {
 		if (type == "many-to-many") {
 			importName("java.util.HashSet")
-			return "new HashSet<$target>()"
+			return "new HashSet<>()"
 		}
 		importName("java.util.ArrayList")
-		return "new ArrayList<$target>()"
+		return "new ArrayList<>()"
 	}
 
 	String firstUpper(String string) {
@@ -397,6 +420,13 @@ class Property {
 	static Property idProperty(Entity entity) {
 		new Property(entity, "id", "long")
 	}
+	
+	static Property attrsProperty(Entity entity) {
+		def prop = new Property(entity, 'attrs', 'string')
+		prop.attrs.put('json', 'true')
+		prop.attrs.put('title', 'Attributes')
+		return prop
+	}
 
 	List<Annotation> getAnnotations() {
 		[
@@ -409,13 +439,13 @@ class Property {
 			$required(),
 			$size(),
 			$digits(),
-			$index(),
 			$transient(),
 			$column(),
 			$one2one(),
 			$many2one(),
 			$one2many(),
 			$many2many(),
+			$joinTable(),
 			$orderBy(),
 			$sequence()
 		]
@@ -438,26 +468,52 @@ class Property {
 
 		def column = attrs.column
 		def unique = attrs.unique
+		def nullable = attrs.nullable
 
 		if (Naming.isReserved(name)) {
 			throw new IllegalArgumentException(
 				"Invalid use of a Java keyword '${name}' in domain object: ${entity.name}")
 		}
 
-		if (!collection) {
-			def col = getColumnAuto()
-			if (Naming.isKeyword(col)) {
-				throw new IllegalArgumentException(
-					"Invalid use of an SQL keyword '${col}' in domain object: ${entity.name}")
-			}
+		if (collection) {
+			return null
 		}
 
-		if (column == null && unique == null)
+		def col = getColumnAuto()
+		if (Naming.isKeyword(col)) {
+			throw new IllegalArgumentException(
+				"Invalid use of an SQL keyword '${col}' in domain object: ${entity.name}")
+		}
+
+		if (column == null && unique == null && nullable == null)
 			return null
 
-		annon(reference ? "javax.persistence.JoinColumn" : "javax.persistence.Column")
-				.add("name", column)
-				.add("unique", unique, false)
+		def res = annon(reference ? "javax.persistence.JoinColumn" : "javax.persistence.Column")
+			.add("name", column)
+			.add("unique", unique, false)
+			
+		if (nullable) {
+			res.add("nullable", nullable, false)
+		}
+
+		return res
+	}
+	
+	private Annotation $joinTable() {
+		
+		def joinTable = attrs.table
+		def fk1 = attrs.column
+		def fk2 = attrs.column2
+
+		if (joinTable == null)
+			return null
+
+		def res = annon("javax.persistence.JoinTable").add("name", joinTable)
+
+		if (fk1) res.add("joinColumns", annon("javax.persistence.JoinColumn").add("name", fk1, true).toString(), false)
+		if (fk2) res.add("inverseJoinColumns", annon("javax.persistence.JoinColumn").add("name", fk2, true).toString(), false)
+
+		return res
 	}
 
 	private Annotation $transient() {
@@ -585,12 +641,26 @@ class Property {
 	}
 
 	private List<Annotation> $binary() {
+		
+		if (isJson() && type == 'string') {
+			return [
+				annon("javax.persistence.Basic").add("fetch", "javax.persistence.FetchType.LAZY", false),
+				annon("org.hibernate.annotations.Type").add("type", "json")
+			]
+		}
+		
+		if (isEnum()) {
+			return [
+				annon("javax.persistence.Basic", true),
+				annon("org.hibernate.annotations.Type").add("type", "com.axelor.db.hibernate.type.ValueEnumType")
+			]
+		}
 
 		if (isLarge() && type == 'string') {
 			return [
 				annon("javax.persistence.Lob", true),
 				annon("javax.persistence.Basic").add("fetch", "javax.persistence.FetchType.LAZY", false),
-				annon("org.hibernate.annotations.Type").add("type", "org.hibernate.type.TextType")
+				annon("org.hibernate.annotations.Type").add("type", "text")
 			]
 		}
 
@@ -602,12 +672,12 @@ class Property {
 		}
 	}
 
-	private Annotation $index() {
+	private Index getIndex() {
 		if (!this.isIndexable()) return null
 		String index = attrs['index'] as String
 		if (!index || index == 'true' || index.trim().empty)
-			index = "${entity.table}_${columnAuto}_IDX".toUpperCase()
-		return annon("org.hibernate.annotations.Index").add("name", index)
+			index = null
+		return new Index(this.entity, index, [this.name])
 	}
 
 	private List<Annotation> $id() {

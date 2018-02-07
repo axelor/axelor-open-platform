@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <domain-models xmlns="http://axelor.com/xml/ns/domain-models"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_4.2.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_5.0.xsd">
 
   <module name="meta" package="com.axelor.meta.db" />
   
@@ -13,8 +13,10 @@
     <string name="name" required="true" unique="true"/>
     <string name="title" required="true" />
     <string name="description" large="true"/>
-    <string name="depends" max="512"/>
     <string name="moduleVersion" required="true" title="Version"/>
+    <many-to-many name="depends" ref="MetaModule"
+      table="META_MODULE_DEPENDS" column="module_id" column2="depend_id" />
+    <boolean name="application" />
     <boolean name="removable" />
     <boolean name="installed" />
     <boolean name="pending" />
@@ -135,6 +137,13 @@
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
   
+  <entity name="MetaEnum" table="META_ENUM" cachable="true">
+    <![CDATA[
+    This object store the enum types.
+    ]]>
+    <string name="name" required="true" unique="true" />
+  </entity>
+
   <entity name="MetaSelect" table="META_SELECT" cachable="true">
     <![CDATA[
     This object store the selects.
@@ -189,14 +198,26 @@
     <string name="relationship" title="Relationship" selection="relationship.field.selection"/>
     <string name="mappedBy" title="Mapped by" />
     <string name="description" title="Description" large="true" />
+    <boolean name="json" column="is_json" />
   </entity>
-  
+
   <entity name="MetaTranslation" table="META_TRANSLATION" logUpdates="false">
-    <string name="key" column="message_key" required="true" large="true" />
-    <string name="message" column="message_value" large="true" />
+    <string name="key" column="message_key" required="true" max="1024" multiline="true" />
+    <string name="message" column="message_value" max="1024" multiline="true" />
     <string name="language" required="true" />
     <unique-constraint columns="message_key,language"/>
     <finder-method name="findByKey" using="key,language" cacheable="true" />
+  </entity>
+
+  <entity name="MetaHelp" table="META_HELP" logUpdates="false">
+    <string name="menu" column="menu_name" />
+    <string name="model" column="model_name" />
+    <string name="field" column="field_name" />
+    <string name="view" column="view_name" />
+    <string name="language" required="true" selection="select.language" />
+    <string name="style" />
+    <string name="type" column="help_type" selection="help.type.selection" />
+    <string name="help" column="help_value" max="1024" multiline="true" required="true" />
   </entity>
 
   <entity name="MetaFile" table="META_FILE">

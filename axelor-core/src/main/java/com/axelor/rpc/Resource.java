@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -24,14 +24,19 @@ import java.io.Writer;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -39,15 +44,13 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.OptimisticLockException;
 
 import org.hibernate.StaleObjectStateException;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
+import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
@@ -56,9 +59,12 @@ import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.Repository;
+import com.axelor.db.ValueEnum;
+import com.axelor.db.hibernate.type.JsonFunction;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
+import com.axelor.db.search.SearchService;
 import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.i18n.L10n;
@@ -66,6 +72,7 @@ import com.axelor.inject.Beans;
 import com.axelor.meta.MetaPermissions;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
+import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.schema.views.Selection;
 import com.axelor.rpc.filter.Filter;
@@ -271,7 +278,8 @@ public class Resource<T extends Model> {
 					String qs = request.getCriteria().createQuery(model).toString();
 					JPA.em().createQuery(qs);
 				} catch (Exception e) {
-					throw new IllegalArgumentException("Invalid domain: " + domain);
+					LOG.error("Error: " + e.getMessage(), e);
+					throw new IllegalArgumentException("Invalid domain: " + domain, e);
 				}
 			}
 		}
@@ -311,6 +319,30 @@ public class Resource<T extends Model> {
 
 		return query;
 	}
+	
+	private Query<?> getSearchQuery(Request request, Filter filter) {
+		final SearchService searchService = Beans.get(SearchService.class);
+		if (request.getData() == null || !searchService.isEnabled()) {
+			return filter == null ? getQuery(request) : getQuery(request, filter);
+		}
+
+		final Map<String, Object> data = request.getData();
+		final String searchText = (String) data.get("_searchText");
+
+		// try full-text search
+		if (!StringUtils.isEmpty(searchText)) {
+			try {
+				final List<Long> ids = searchService.fullTextSearch(model, searchText, request.getLimit());
+				if (ids.size() > 0) {
+					return JPA.all(model).filter("self.id in :ids").bind("ids", ids);
+				}
+			} catch (Exception e) {
+				// just log and fallback to default search
+				LOG.error("Unable to do full-text search: " + e.getMessage(), e);
+			}
+		}
+		return filter == null ? getQuery(request) : getQuery(request, filter);
+	}
 
 	@SuppressWarnings("all")
 	public Response search(Request request) {
@@ -329,7 +361,7 @@ public class Resource<T extends Model> {
 		int offset = request.getOffset();
 		int limit = request.getLimit();
 
-		Query<?> query = getQuery(request, check ? filter : null).cacheable().readOnly();
+		Query<?> query = getSearchQuery(request, check ? filter : null).cacheable().readOnly();
 		List<?> data = null;
 		try {
 			if (limit > 0) {
@@ -432,21 +464,44 @@ public class Resource<T extends Model> {
 		}
 	}
 
+	@SuppressWarnings("all")
 	public void export(Request request, Writer writer) throws IOException {
 		security.get().check(JpaSecurity.CAN_READ, model);
+		security.get().check(JpaSecurity.CAN_EXPORT, model);
 		LOG.debug("Exporting '{}' with {}", model.getName(), request.getData());
 
 		List<String> fields = request.getFields();
 		List<String> header = new ArrayList<>();
 		List<String> names = new ArrayList<>();
 		Map<Integer, Map<String, String>> selection = new HashMap<>();
+		Map<String, Map<String, Object>> jsonFieldsMap = new HashMap<>();
 
 		Mapper mapper = Mapper.of(model);
 		MetaPermissions perms = Beans.get(MetaPermissions.class);
 
+		final Function<String, Map<String, Object>> findJsonFields = name -> jsonFieldsMap.computeIfAbsent(name,
+				(n) -> {
+					return MetaJsonRecord.class.isAssignableFrom(model)
+							? MetaStore.findJsonFields((String) request.getContext().get("jsonModel"))
+							: MetaStore.findJsonFields(model.getName(), n);
+				});
+
+		final Function<String, List<String>> findJsonPaths = name -> {
+			final Map<String, Object> map = findJsonFields.apply(name);
+			return map == null
+					? Collections.EMPTY_LIST
+					: map.keySet().stream().map(n -> name + "." + n).collect(Collectors.toList());
+		};
+
 		if (fields == null) {
 			fields = new ArrayList<>();
 		}
+
+		if (fields.isEmpty() && MetaJsonRecord.class.isAssignableFrom(model)) {
+			fields.add("id");
+			fields.addAll(findJsonPaths.apply("attrs"));
+		}
+
 		if (fields.isEmpty()) {
 			fields.add("id");
 			try {
@@ -466,20 +521,28 @@ public class Resource<T extends Model> {
 				if (fields.contains(name) || name.matches("^(created|updated)(On|By)$")) {
 					continue;
 				}
-				fields.add(name);
+				if (property.isJson()) {
+					fields.addAll(findJsonPaths.apply(property.getName()));
+				} else {
+					fields.add(name);
+				}
 			}
 		}
 
 		for(String field : fields) {
 			Iterator<String> iter = Splitter.on(".").split(field).iterator();
 			Property prop = mapper.getProperty(iter.next());
-			while(iter.hasNext() && prop != null) {
+
+			while(iter.hasNext() && prop != null && !prop.isJson()) {
 				prop = Mapper.of(prop.getTarget()).getProperty(iter.next());
 			}
 			if (prop == null ||
 				prop.isCollection() ||
 				prop.isTransient() ||
 				prop.getType() == PropertyType.BINARY) {
+				continue;
+			}
+			if (prop.isJson() && !iter.hasNext()) {
 				continue;
 			}
 
@@ -492,10 +555,32 @@ public class Resource<T extends Model> {
 			if (!perms.canExport(AuthUtils.getUser(), model, name)) {
 				continue;
 			}
-			if(iter != null) {
+			if (iter != null) {
 				name = field;
 			}
 
+			List<Selection.Option> options = MetaStore.getSelectionList(prop.getSelection());
+
+			if (prop.isJson()) {
+				Map<String, Object> jsonFields = findJsonFields.apply(prop.getName());
+				Map<String, Object> jsonField = (Map) jsonFields.get(iter.next());
+				name = field;
+				if (jsonField != null) {
+					title = (String) jsonField.get("title");
+					if (title == null) {
+						title = (String) jsonField.get("autoTitle");
+					}
+					options = (List) jsonField.get("selectionList");
+					if ("many-to-one".equals(jsonField.get("type"))) {
+						try {
+							String targetName = jsonField.get("targetName").toString();
+							targetName = targetName.substring(targetName.indexOf(".") + 1);
+							name = name + "." + targetName;
+						} catch (Exception e) {
+						}
+					}
+				}
+			}
 			if (isBlank(title)) {
 				title = Inflector.getInstance().humanize(prop.getName());
 			}
@@ -506,12 +591,7 @@ public class Resource<T extends Model> {
 					continue;
 				}
 				name = name + '.' + prop.getName();
-			} else if(!isBlank(prop.getSelection())) {
-				List<Selection.Option> options = MetaStore.getSelectionList(prop.getSelection());
-				if (options == null || options.isEmpty()) {
-					continue;
-				}
-
+			} else if(options != null && !options.isEmpty()) {
 				Map<String, String> map = new HashMap<>();
 				for (Selection.Option option : options) {
 					map.put(option.getValue(), option.getLocalizedTitle());
@@ -558,8 +638,8 @@ public class Resource<T extends Model> {
 					if (objValue instanceof LocalDateTime) {
 						objValue = formatter.format((LocalDateTime) objValue);
 					}
-					if (objValue instanceof DateTime) {
-						objValue = formatter.format((DateTime) objValue);
+					if (objValue instanceof ZonedDateTime) {
+						objValue = formatter.format((ZonedDateTime) objValue);
 					}
 					String strValue = objValue == null ? "" : escapeCsv(objValue.toString());
 					line.add(strValue);
@@ -635,27 +715,24 @@ public class Resource<T extends Model> {
 			return values;
 		}
 		final Mapper mapper = Mapper.of(model);
-		for (final String name : related.keySet()) {
-			final String[] names = related.get(name).toArray(new String[] {});
-			Object old = values.get(name);
-			Object value = mapper.get(entity, name);
-			if (value instanceof Collection<?>) {
-				value = Collections2.transform(
-					(Collection<?>) value,
-					new Function<Object, Object>() {
-						@Override
-						public Object apply(Object input) {
-							return toMap(input, names);
-						}
-					});
-			} else if (value instanceof Model) {
-				value = toMap(value, names);
-				if (old instanceof Map) {
-					value = mergeMaps((Map) value, (Map) old);
+		related.entrySet().stream()
+			.filter(e -> e.getValue() != null)
+			.filter(e -> e.getValue().size() > 0)
+			.forEach(e -> {
+				final String name = e.getKey();
+				final String[] names = e.getValue().toArray(new String[] {});
+				Object old = values.get(name);
+				Object value = mapper.get(entity, name);
+				if (value instanceof Collection<?>) {
+					value = Collections2.transform((Collection<?>) value, input -> toMap(input, names));
+				} else if (value instanceof Model) {
+					value = toMap(value, names);
+					if (old instanceof Map) {
+						value = mergeMaps((Map) value, (Map) old);
+					}
 				}
-			}
-			values.put(name, value);
-		}
+				values.put(name, value);
+			});
 		return values;
 	}
 
@@ -707,6 +784,11 @@ public class Resource<T extends Model> {
 			records.add(request.getData());
 		}
 
+		String[] names = {};
+		if (request.getFields() != null) {
+			names = request.getFields().toArray(names);
+		}
+
 		for(Object record : records) {
 
 			if (record == null) {
@@ -723,9 +805,6 @@ public class Resource<T extends Model> {
 
 			Map<String, Object> orig = (Map) ((Map) record).get("_original");
 			JPA.verify(model, orig);
-
-			// save translatable values and remove them from record
-			Translator.saveTranslatables((Map) record, model);
 
 			Model bean = JPA.edit(model, (Map) record);
 			id = bean.getId();
@@ -744,7 +823,7 @@ public class Resource<T extends Model> {
 				I18nBundle.invalidate();
 			}
 
-			data.add(repository.populate(toMap(bean), request.getContext()));
+			data.add(repository.populate(toMap(bean, names), request.getContext()));
 		}
 
 		response.setData(data);
@@ -917,27 +996,48 @@ public class Resource<T extends Model> {
 
 		Mapper mapper = Mapper.of(model);
 		Map<String, Object> data = request.getData();
+		
+		String name = request.getFields().get(0);
+
+		if (name == null) {
+			name = "id";
+		}
 
 		Property property = null;
 		try {
-			property = mapper.getProperty(request.getFields().get(0));
+			property = mapper.getProperty(name);
 		} catch (Exception e) {
 		}
 
-		if (property == null) {
+		String selectName = null;
+
+		if (property == null && name.indexOf('.') > -1) {
+			JsonFunction func = JsonFunction.fromPath(name);
+			Property p = mapper.getProperty(func.getField());
+			if (p != null && p.isJson()) {
+				selectName = func.toString();
+			}
+		}
+
+		if (property == null && selectName == null) {
 			property = mapper.getNameField();
 		}
 
-		if (property != null) {
+		if (property != null && selectName == null) {
+			selectName = "self." + property.getName();
+			name = property.getName();
+		}
+
+		if (selectName != null) {
 			String qs = String.format(
-					"SELECT self.%s FROM %s self WHERE self.id = :id",
-					property.getName(), model.getSimpleName());
+					"SELECT %s FROM %s self WHERE self.id = :id",
+					selectName, model.getSimpleName());
 
 			javax.persistence.Query query = JPA.em().createQuery(qs);
 			QueryBinder.of(query).setCacheable().setReadOnly().bind(data);
 
-			Object name = query.getSingleResult();
-			data.put(property.getName(), name);
+			Object value = query.getSingleResult();
+			data.put(name, value);
 		}
 
 		response.setData(ImmutableList.of(data));
@@ -972,6 +1072,8 @@ public class Resource<T extends Model> {
 
 		boolean isSaved = ((Model)bean).getId() != null;
 		boolean isCompact = compact || fields.containsKey("$version");
+		
+		final Set<Property> translatables = new HashSet<>();
 
 		if ((isCompact && isSaved) || (isSaved && level >= 1 ) || (level > 1)) {
 
@@ -981,12 +1083,21 @@ public class Resource<T extends Model> {
 			result.put("id", mapper.get(bean, "id"));
 			result.put("$version", mapper.get(bean, "version"));
 
-			if (pn != null)
+			if (pn != null) {
 				result.put(pn.getName(), mapper.get(bean, pn.getName()));
-			if (pc != null)
+			}
+			if (pc != null) {
 				result.put(pc.getName(), mapper.get(bean, pc.getName()));
+			}
 
-			for(String name: fields.keySet()) {
+			if (pn != null && pn.isTranslatable()) {
+				Translator.translate(result, pn);
+			}
+			if (pc != null && pc.isTranslatable()) {
+				Translator.translate(result, pc);
+			}
+
+			for (String name: fields.keySet()) {
 				Object child = mapper.get(bean, name);
 				if (child instanceof Model) {
 					child = _toMap(child, (Map) fields.get(name), true, level + 1);
@@ -1007,11 +1118,18 @@ public class Resource<T extends Model> {
 				continue;
 			}
 
-			if (isSaved && prop.isCollection() && !fields.isEmpty() && !fields.containsKey(name)) {
+			if (isSaved
+					&& !name.matches("id|version|archived")
+					&& !fields.isEmpty()
+					&& !fields.containsKey(name)) {
 				continue;
 			}
 
 			Object value = mapper.get(bean, name);
+			
+			if (name.equals("archived") && value == null) {
+				continue;
+			}
 
 			if (prop.isImage() && byte[].class.isInstance(value)) {
 				value = new String((byte[]) value);
@@ -1048,11 +1166,21 @@ public class Resource<T extends Model> {
 				value = items;
 			}
 
+			result.put(name, value);
+
 			if (prop.isTranslatable() && value instanceof String) {
-				value = Translator.getTranslation(prop, (String) value);
+				Translator.translate(result, prop);
+			}
+			
+			// include custom enum value
+			if (prop.isEnum() && value instanceof ValueEnum<?>) {
+				String enumName = ((Enum<?>) value).name();
+				Object enumValue = ((ValueEnum<?>) value).getValue();
+				if (!Objects.equal(enumName, enumValue)) {
+					result.put(name + "$value", ((ValueEnum<?>) value).getValue());
+				}
 			}
 
-			result.put(name, value);
 		}
 
 		return result;

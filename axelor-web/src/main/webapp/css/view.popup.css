@@ -15,10 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* jquery-ui fix */
+
 .ui-dialog {
 	padding: 0;
 	border: 0;
+	top: 30px !important;
+	left: 0 !important;
+	right: 0 !important;
+	display: flex;
+	flex-flow: column nowrap;
 }
 
 .ui-dialog .ui-dialog-titlebar {
@@ -31,6 +36,7 @@
 	font-size: 20.5px;
 	font-weight: 600;
 	line-height: 26px;
+	flex: 0 0 auto;
 }
 
 .ui-dialog .ui-dialog-title {
@@ -91,16 +97,22 @@
 	font-weight: inherit;
 }
 
-.ui-dialog .ui-dialog-titlebar-max {
+.ui-dialog .ui-dialog-titlebar-max,
+.ui-dialog .ui-dialog-titlebar-collapse {
 	position: absolute;
 	right: 1.6em;
 	top: 7px;
 	opacity: 0.2;
 }
-.ui-dialog .ui-dialog-titlebar-max:hover {
+.ui-dialog .ui-dialog-titlebar-max:hover,
+.ui-dialog .ui-dialog-titlebar-collapse:hover {
 	font-weight: bold;
 	color: #212121;
 	opacity: 0.4;
+}
+
+.ui-dialog .ui-dialog-titlebar-collapse {
+    right: 2.6em;  
 }
 
 .ui-dialog .ui-dialog-titlebar-close span::before {
@@ -121,8 +133,18 @@
 
 .ui-dialog .ui-dialog-content {
 	padding: 4px;
-	min-height: 250px;
+	min-height: 50px;
 	max-height: calc(100% - 45px - 60px) !important;
+	height: inherit !important;
+}
+
+.ui-dialog .ui-dialog-content[ui-editor-popup] {
+	min-height: 200px !important;
+}
+
+.ui-dialog .ui-dialog-content[ui-selector-popup] {
+	overflow: hidden;
+	height: 450px !important;
 }
 
 .ui-widget-overlay {
@@ -132,7 +154,13 @@
 
 .ui-dialog .ui-dialog-buttonpane {
 	margin-top: 0;
-	padding: .3em .5em .5em .5em
+	padding: .3em .5em .5em .5em;
+	flex: 0 0 auto;
+}
+
+.ui-dialog.collapsed .ui-dialog-content,
+.ui-dialog.collapsed .ui-dialog-buttonpane {
+    display: none !important; 
 }
 
 .ui-dialog-buttonpane .btn-group > .btn {
@@ -153,8 +181,9 @@
 
 .ui-dialog-titlebar .record-pager {
 	position: absolute;
-	right: 60px;
-	top: 6px;
+	right: 76px;
+    top: 8px;
+    line-height: 25px;
 }
 
 .ui-dialog-titlebar .record-pager-text {
@@ -184,13 +213,10 @@
 
 .ui-dialog-responsive {
 	position: absolute;
-
 	width: 100% !important;
-	margin: 8px !important;
-
+	margin: 0 auto !important;
 	max-width: calc(100% - 16px) !important;
-	max-height: calc(100% - 16px) !important;
-
+	max-height: calc(100% - 64px) !important;
 	border: none;
 }
 
@@ -234,6 +260,7 @@
 		left: 0 !important;
 		width: calc(100% - 16px) !important;
 		height: calc(100% - 16px) !important;
+		max-height: calc(100% - 16px) !important;
 	}
 	.ui-dialog .ui-dialog-title {
 		top: 0;
@@ -274,6 +301,7 @@
 	margin: 8px !important;
 	width: calc(100% - 16px) !important;
 	height: calc(100% - 16px) !important;
+	max-height: calc(100% - 16px) !important;
 }
 .ui-dialog.maximized .ui-dialog-title {
 	top: 0;
@@ -286,6 +314,36 @@
 	height: calc(100% - 45px - 60px) !important;
 	overflow: auto;
 	margin-top: 45px;
+}
+
+.ui-dialog .translation-form {
+	overflow: auto;
+}
+.ui-dialog .translation-form i {
+	cursor: pointer;
+}
+.ui-dialog .translation-form i.fa-times {
+	line-height: 28px;
+	margin-right: -12px;
+	float: right;
+}
+.ui-dialog .translation-form i.fa-plus {
+	margin-right: 4px;
+}
+.ui-dialog .translation-form form {
+	margin: 0;
+	margin-right: 8px;
+}
+.ui-dialog .translation-form form label {
+	font-weight: 600;
+	min-height: 0;
+	margin-left: 6px;
+}
+.ui-dialog .translation-form form input {
+	margin-left: 6px;
+}
+.ui-dialog .translation-form form hr {
+	margin: 8px 0;
 }
 
 #loginWindow * {

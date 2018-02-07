@@ -19,7 +19,7 @@
           </ul>
         </div>
         <div class="btn-group pull-left">
-          <button class="btn dropdown-toggle" data-toggle="dropdown" ng-disabled="!selection.length" tabIndex="-1" title="{{ 'More actions' | t }}"><i class="fa fa-ellipsis-v"></i></button>
+          <button class="btn dropdown-toggle" data-toggle="dropdown" ng-disabled="!(selection.length || currentFolder)" tabIndex="-1" title="{{ 'More actions' | t }}"><i class="fa fa-ellipsis-v"></i></button>
           <ul class="dropdown-menu">
             <li><a href="javascript:" ng-click="onEditFile()" ng-show="canEditFile()" x-translate>Edit...</a></li>
             <li class="divider" ng-show="canEditFile()"></li>
@@ -51,8 +51,8 @@
   <div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-no-filter="true" x-on-init="onGridInit"></div>
   <div ui-dms-details class="dms-details panel x-animate ng-hide" ng-show="showDetails">
     <div class="panel-header">
-      <div class="panel-title pull-left">{{details.name}}</div>
-      <div class="panel-buttons pull-right">
+      <div class="panel-title">{{details.name}}</div>
+      <div class="panel-icons">
         <a href='' ng-click="onCloseDetails()"><i class="fa fa-times"></i></a>
       </div>
     </div>

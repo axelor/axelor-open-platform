@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -58,7 +58,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -87,7 +86,7 @@ public class XMLViews {
 		try {
 			init();
 		} catch (JAXBException | SAXException e) {
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -208,7 +207,15 @@ public class XMLViews {
 		StringReader reader = new StringReader(xml);
 		return (ObjectViews) unmarshaller.unmarshal(reader);
 	}
-	
+
+	/**
+	 * Apply pending updates if auto-update watch is running.
+	 * 
+	 */
+	public static void applyHotUpdates() {
+		ViewWatcher.process();
+	}
+
 	public static Map<String, Object> findViews(String model, Map<String, String> views) {
 		final Map<String, Object> result = Maps.newHashMap();
 		if (views == null || views.isEmpty()) {
@@ -300,6 +307,9 @@ public class XMLViews {
 			custom = custom == null ? customViews.findByUser(name, user) : custom;
 		}
 
+		// make sure hot updates are applied
+		applyHotUpdates();
+
 		// first find by name
 		if (name != null) {
 			// with group
@@ -390,11 +400,12 @@ public class XMLViews {
 	}
 
 	public static Action findAction(String name) {
-		MetaAction action = Beans.get(MetaActionRepository.class).findByName(name);
+		applyHotUpdates();
+		final MetaAction action = Beans.get(MetaActionRepository.class).findByName(name);
 		try {
 			return ((ObjectViews) XMLViews.unmarshal(action.getXml())).getActions().get(0);
 		} catch (Exception e) {
+			return null;
 		}
-		return null;
 	}
 }

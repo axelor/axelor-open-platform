@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -53,10 +53,9 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
-
-import au.com.bytecode.opencsv.CSVParser;
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 
 public class I18nExtractor {
 	
@@ -72,7 +71,7 @@ public class I18nExtractor {
 
 	private static final Set<String> FIELD_NODES = Sets.newHashSet(
 			"string", "boolean", "integer", "long", "decimal", "date", "time", "datetime", "binary",
-			"one-to-one", "many-to-one", "one-to-many", "many-to-many");
+			"enum", "one-to-one", "many-to-one", "one-to-many", "many-to-many");
 
 	private static final Set<String> TEXT_ATTRS = Sets.newHashSet("tag", "prompt", "placeholder", "x-true-text",
 			"x-false-text");
@@ -177,8 +176,9 @@ public class I18nExtractor {
 						viewType = qName;
 					}
 
-					if (StringUtils.isBlank(title) && name != null
-							&& (FIELD_NODES.contains(qName) || ("tree".equals(viewType) && "column".equals(qName)))) {
+					if (name != null
+							&& StringUtils.isBlank(title)
+							&& (FIELD_NODES.contains(qName) || "item".equals(qName) || ("tree".equals(viewType) && "column".equals(qName)))) {
 						title = Inflector.getInstance().humanize(name);
 					}
 
@@ -203,7 +203,7 @@ public class I18nExtractor {
 				@Override
 				public void endElement(String uri, String localName, String qName) throws SAXException {
 					if (TEXT_NODES.contains(qName)) {
-						String text = StringUtils.stripIndent(readTextLines.toString()).trim();
+						String text = StringUtils.stripIndent(readTextLines.toString());
 						accept(new I18nItem(text, file, locator.getLineNumber()));
 						readText = false;
 						readTextLines.setLength(0);
@@ -292,11 +292,11 @@ public class I18nExtractor {
 				if (isString) {
 					sb.append(next);
 				} else if (next == ',') { // next argument
-					accept(new I18nItem(sb.toString().trim(), file, line));
+					accept(new I18nItem(sb.toString(), file, line));
 					sb = new StringBuilder();
 				}
 			}
-			accept(new I18nItem(sb.toString().trim(), file, line));
+			accept(new I18nItem(sb.toString(), file, line));
 			return i;
 		}
 		
@@ -351,6 +351,9 @@ public class I18nExtractor {
 				String location = null;
 				if (item.file != null) {
 					location = "" + srcPath.relativize(item.file) + ":" + item.line;
+				}
+				if (item.text.length() != item.text.trim().length()) {
+					log.warn("Remove leading/trailing white spaces from '{}', of following text: '{}'", location, item.text);
 				}
 				items.put(item.text.trim(), location);
 			}

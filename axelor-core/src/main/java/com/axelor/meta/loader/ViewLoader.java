@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,9 +18,11 @@
 package com.axelor.meta.loader;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 import javax.xml.bind.JAXBException;
@@ -45,6 +46,7 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
+import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaActionMenu;
 import com.axelor.meta.db.MetaMenu;
@@ -75,14 +77,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.inject.persist.Transactional;
 
-@Singleton
 public class ViewLoader extends AbstractLoader {
 	
 	@Inject
@@ -114,7 +114,7 @@ public class ViewLoader extends AbstractLoader {
 			try {
 				process(file.openStream(), module, update);
 			} catch (IOException | JAXBException e) {
-				throw Throwables.propagate(e);
+				throw new RuntimeException(e);
 			}
 		}
 	}
@@ -139,6 +139,16 @@ public class ViewLoader extends AbstractLoader {
 		return list;
 	}
 
+	@Transactional
+	void updateFrom(Path file, String moduleName) throws IOException, JAXBException {
+		final Module module = ModuleManager.getModule(moduleName);
+		try (FileInputStream stream = new FileInputStream(file.toFile())) {
+			process(stream, module, true);
+		} finally {
+			doCleanUp();
+		}
+	}
+
 	void process(InputStream stream, Module module, boolean update) throws JAXBException {
 		final ObjectViews all = XMLViews.unmarshal(stream);
 
@@ -152,6 +162,7 @@ public class ViewLoader extends AbstractLoader {
 
 		for (Action action : getList(all.getActions())) {
 			importAction(action, module, update);
+			MetaStore.invalidate(action.getName());
 		}
 
 		for (MenuItem item : getList(all.getMenus())) {
@@ -628,7 +639,7 @@ public class ViewLoader extends AbstractLoader {
 			try {
 				log.debug("Creating default views: {}", out);
 				Files.createParentDirs(out);
-				Files.write(xml, out, Charsets.UTF_8);
+				Files.asCharSink(out, Charsets.UTF_8).write(xml);
 			} catch (IOException e) {
 				log.error("Unable to create: {}", out);
 			}

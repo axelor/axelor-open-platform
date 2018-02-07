@@ -30,10 +30,10 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 	
 	$scope._dataSource = DataSource.create('multi-search');
 	
-	$scope.applyLater(function(){
+	$scope.$applyAsync(function(){
 		if (view.deferred)
 			view.deferred.resolve($scope);
-	}, 0);
+	});
 	
 	function fixFields(fields) {
 		_.each(fields, function(field){
@@ -274,7 +274,7 @@ function SearchFormCtrl($scope, $element, ViewService) {
 	// prevent requesting defaults
 	$scope.defaultValues = {};
 	
-	$scope.$watch('_searchView', function(schema) {
+	$scope.$watch('_searchView', function searchSchemaWatch(schema) {
 		if (!schema) return;
 		var form = {
 			title: 'Search',
@@ -357,7 +357,7 @@ function SearchGridCtrl($scope, $element, ViewService, $interpolate) {
 	
 	var viewTitles = {};
 
-	$scope.$watch('_searchView', function(schema) {
+	$scope.$watch('_searchView', function searchSchemaWatch(schema) {
 		if (!schema) return;
 		var view = {
 			title: 'Search',
@@ -544,7 +544,7 @@ function SearchToolbarCtrl($scope, $element, $http) {
 		});
 	};
 
-	$scope.$watch('_searchView', function(schema) {
+	$scope.$watch('_searchView', function searchSchemaWatch(schema) {
 		
 		if (!schema) {
 			return;
@@ -681,7 +681,7 @@ angular.module('axelor.ui').directive('uiViewSearch', function(){
 			});
 			
 			var grid = element.children('.search-view-grid');
-			element.on('adjustSize', function(){
+			scope.$onAdjust(function(){
 				if (!element.is(':visible'))
 					return;
 				grid.height(element.height() - grid.position().top);

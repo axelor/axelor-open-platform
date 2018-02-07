@@ -63,13 +63,21 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 
 	$scope.selectMode = "single";
 
-	$scope.findRelativeFields = function () {
-		var path = $element.attr('x-path');
-		var relatives = $element.parents().find('[x-field][x-path^="'+path+'."]').map(function() {
-			return $(this).attr('x-path').replace(path+'.','');
-		}).get();
-		return _.unique(relatives);
-	};
+	$scope.findRelativeFields = (function () {
+		var relatives = null;
+		return function () {
+			if (relatives) {
+				return relatives;
+			}
+			var path = $element.attr('x-path');
+			relatives = $element.parents().find('[x-field][x-path^="'+path+'."]:not(label)').map(function() {
+				return $(this).attr('x-path').replace(path+'.','');
+			}).get();
+			relatives.push($scope.field.targetName);
+			relatives = _.unique(_.compact(relatives));
+			return relatives;
+		};
+	})();
 
 	$scope.fetchMissingValues = function (value, fields) {
 		var nameField = $scope.field.targetName || 'id';
@@ -90,7 +98,9 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 					id: value.id,
 					$version: value.version || value.$version
 				});
-				record[nameField] = rec[nameField];
+				if (nameField in rec) {
+					record[nameField] = rec[nameField];
+				}
 				_.each(missing, function(name) {
 					var prefix = name.split('.')[0];
 					record[prefix] = rec[prefix];
@@ -214,8 +224,41 @@ ui.directive('uiCanSuggest', function () {
 		if (field.canSuggest !== false) {
 			return;
 		}
-		element.attr("readonly", "readonly");
+		element.prop("readonly", true);
 		element.addClass("not-readonly");
+		
+		// jquery-ui doesn't allow keyboard navigation on autocomplete list
+		element.on('keydown', function (e) {
+			var inst = element.data('autocomplete');
+			console.log(e.keyCode);
+			switch (e.keyCode) {
+			case 38: // up
+				inst._keyEvent('previous', e);
+				console.log('up');
+				break;
+			case 40: // down
+				inst._keyEvent('next', e);
+				console.log('down');
+				break;
+			case  9: // tab
+				if (inst.menu.active) {
+					inst.menu.select(event);
+				}
+				break;
+			case 13: // enter
+				if (inst.menu.active) {
+					inst.menu.select(event);
+					e.preventDefault();
+				}
+				break;
+			case 27: // escape
+				if (inst.menu.element.is(':visible')) {
+					inst.close(e);
+					e.preventDefault();
+				}
+				break;
+			}
+		});
 	};
 });
 
@@ -277,7 +320,7 @@ ui.formInput('ManyToOne', 'Select', {
 		scope.$evalAsync(function() {
 			var relatives = scope.findRelativeFields();
 			if (relatives.length > 0) {
-				scope.$watch(attrs.ngModel, function (value, old) {
+				scope.$watch(attrs.ngModel, function m2oValueWatch(value, old) {
 					if (value && value.id > 0) {
 						scope.fetchMissingValues(scope.getValue(), relatives);
 					}
@@ -301,7 +344,7 @@ ui.formInput('ManyToOne', 'Select', {
 			var hiddenSet = false;
 			var hasHidden = false;
 			
-			scope.$watch('attr("hidden")', function (hidden, old) {
+			scope.$watch('attr("hidden")', function m2oHiddenWatch(hidden, old) {
 				if (hidden && !hiddenSet) hasHidden = true;
 				if (hiddenSet && hidden === old) return;
 				hiddenSet = true;
@@ -342,13 +385,25 @@ ui.formInput('ManyToOne', 'Select', {
 		});
 		input.on("focus", function () {
 			// XXX: firefox prevents click event, bug in FF?
-			if (!$.browser.mozilla) {
+			if (!axelor.browser.mozilla) {
 				input.attr('placeholder', _t('Search...'));
 			}
 		});
 		input.on("blur", function () {
 			input.attr('placeholder', field.placeholder || '');
 		});
+		
+		function validateSearch() {
+			var my = input.val() || '';
+			var text = scope.text || '';
+			var invalid = my && my !== text;
+			scope.setValidity('search', !invalid);
+		}
+
+		input.on("input", validateSearch);
+		scope.$on("on:edit", validateSearch);
+		scope.$on("on:new", validateSearch);
+		scope.$watch("text", validateSearch);
 
 		scope.loadSelection = function(request, response) {
 
@@ -360,10 +415,17 @@ ui.formInput('ManyToOne', 'Select', {
 				var term = request.term;
 				
 				if (scope.canSelect() && (items.length < page.total || (request.term && items.length === 0))) {
-					items.push({
-						label: _t("Search more..."),
-						click: function() { scope.showSelector(); }
-					});
+					if (items.length === 0) {
+						items.push({
+							label: _t("No results found"),
+							click: function() {}
+						});
+					} else {
+						items.push({
+							label: _t("Search more..."),
+							click: function() { scope.showSelector(); }
+						});
+					}
 				}
 				
 				if (field.create && term && scope.canNew()) {
@@ -434,18 +496,35 @@ ui.formInput('ManyToOne', 'Select', {
 			e.stopPropagation();
 			return false;
 		});
+		
+		scope.handleEnter = function (e) {
+			var widget = input.autocomplete('widget');
+			if (widget) {
+				var item = widget.find('li .ui-state-focus').parent();
+				if (item.length === 0) {
+					item = widget.find('li:not(.tag-select-action)');
+					item = item.length === 1 ? item.first() : null;
+				}
+				var data = item ? item.data('ui-autocomplete-item') : null;
+				if (data) {
+					input.autocomplete('close');
+					if (data.click) {
+						data.click.call(scope);
+					} else {
+						scope.select(data.value);
+					}
+				}
+			}
+		};
 
 		scope.handleSelect = function(e, ui) {
 			if (ui.item.click) {
-				setTimeout(function(){
-					input.val("");
-				});
 				ui.item.click.call(scope);
 			} else {
 				scope.select(ui.item.value);
 			}
 			setTimeout(adjustPadding, 100);
-			scope.applyLater();
+			scope.$applyAsync();
 		};
 		
 		scope.$render_editable = function() {
@@ -483,7 +562,7 @@ ui.formInput('ManyToOne', 'Select', {
 
 		function adjustPadding() {
 			var tag = element.find('span.tag-link');
-			if (tag.size() && tag.is(':visible')) {
+			if (tag.length && tag.is(':visible')) {
 				input.css('padding-left', tag.width() + 24);
 			} else {
 				input.css('padding-left', '');
@@ -578,7 +657,7 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 	template_readonly: function (scope) {
 		var field = scope.field || {};
 		if (field.viewer) {
-			return field.viewer;
+			return field.viewer.template;
 		}
 		if (field.editor && (field.editor.viewer || !field.targetName)) {
 			return null;
@@ -616,7 +695,7 @@ ui.formInput('InlineManyToOne', 'ManyToOne', {
 });
 
 ui.formInput('SuggestBox', 'ManyToOne', {
-
+	metaWidget: true,
 	link_editable: function(scope, element, attrs, model) {
 		this._super.apply(this, arguments);
 		var field = scope.field;
@@ -628,7 +707,7 @@ ui.formInput('SuggestBox', 'ManyToOne', {
 		}
 	},
 	template_editable:
-	'<span class="picker-input">'+
+	'<span class="picker-input picker-icons-2">'+
 		'<input type="text" autocomplete="off" ui-can-suggest>'+
 		'<span class="picker-icons picker-icons-2">'+
 			'<i class="fa fa-pencil" ng-click="onEdit()" ng-show="hasPermission(\'read\') && canView() && canEdit()" title="{{\'Edit\' | t}}"></i>'+
@@ -640,6 +719,8 @@ ui.formInput('SuggestBox', 'ManyToOne', {
 ui.formInput('RefSelect', {
 
 	css: 'multi-object-select',
+
+	metaWidget: true,
 
 	controller: ['$scope', 'ViewService', function($scope, ViewService) {
 
@@ -661,7 +742,7 @@ ui.formInput('RefSelect', {
 			});
 
 			elemGroup
-				.append($('<div></div>').append(elemSelect))
+				.append($('<div class="multi-object-select-first" ng-show="!isLink || (isLink && !isReadonly())"></div>').append(elemSelect))
 				.append(elemSelects.append(elemItems));
 
 			return ViewService.compile(elemGroup)($scope);
@@ -674,7 +755,8 @@ ui.formInput('RefSelect', {
 		var name = scope.field.name,
 			selectionList = scope.field.selectionList,
 			related = scope.field.related || scope.field.name + "Id";
-		
+
+		scope.isLink = this.isLink;
 		scope.fieldsCache = {};
 		scope.selectionList = selectionList;
 
@@ -689,16 +771,26 @@ ui.formInput('RefSelect', {
 		setTimeout(function() {
 			element.append(elem);
 		});
-		
-		scope.$watch("record." + name, function (value, old) {
-			if (value === old || old === undefined) return;
-			if (scope.record) {
-				scope.record[related] = null;
-			}
+
+		setTimeout(function () {
+			var selectScope = element.find('[name="'+name+'"]').scope();
+			var setValue = selectScope.setValue;
+			selectScope.setValue = function (value) {
+				var old = scope.getValue();
+				if (old !== value && scope.record) {
+					scope.record[related] = null;
+				}
+				setValue.apply(selectScope, arguments);
+			};
 		});
 	},
 	template_editable: null,
 	template_readonly: null
+});
+
+ui.formInput('RefLink', 'RefSelect', {
+	css: 'multi-object-select multi-object-link',
+	isLink: true
 });
 
 ui.formInput('RefItem', 'ManyToOne', {
@@ -759,6 +851,21 @@ ui.formInput('RefItem', 'ManyToOne', {
 
 			self._link(scope, element, attrs, model);
 			scope.setDomain(data.domain, data.context);
+
+			if (scope.$parent.isLink) {
+				scope.onEdit = function () {
+					var value = scope.getValue() || {};
+					scope.openTab({
+						action: _.uniqueId('$act'),
+						model: scope._model,
+						viewType: "form",
+						views: [{ type: "form" }]
+					}, {
+						mode: "edit",
+						state: value.id
+					});
+				};
+			}
 		}
 
 		if (scope.fieldsCache[scope._model]) {
@@ -776,12 +883,17 @@ ui.formInput('RefItem', 'ManyToOne', {
 		var ref = element.attr('x-ref');
 		var watch = element.attr('x-watch-name');
 		var target = element.attr('x-target');
-		
+		var refField = scope.fields[ref] || {};
+
 		function setRef(value) {
 			if (!scope.record) {
 				return;
 			}
 			
+			if (value && refField.type === 'string') {
+				value = '' + value;
+			}
+
 			var old = scope.record[ref];
 			scope.record[ref] = value;
 			
@@ -810,6 +922,224 @@ ui.formInput('RefItem', 'ManyToOne', {
 		var watchExpr = "record.id + record." + watch + " + record." + ref;
 		scope.$watch(watchExpr, doSelect);
 		scope.$watch("record", doSelect);
+	}
+});
+
+ui.formInput('RefText', 'ManyToOne', {
+	metaWidget: true,
+	link_editable: function (scope, element, attrs) {
+		this._super.apply(this, arguments);
+		
+		if (!scope.field.create) {
+			return;
+		}
+
+		function freeSelect(text) {
+			return function () { 
+				scope.$timeout(function () {
+					scope.select(text);
+				});
+			};
+		}
+
+		scope.loadSelection = function(request, response) {
+			this.fetchSelection(request, function(items, page) {
+				var term = request.term;
+				if (term) {
+					items.push({
+						label : _t('Select "{0}"...', term),
+						click : freeSelect(term)
+					});
+				}
+				response(items);
+			});
+		};
+	},
+	link: function (scope, element, attrs, model) {
+		scope.canNew = function () { return false; };
+		scope.canView = function () { return false; };
+		scope.canEdit = function () { return false; };
+		
+		var field = scope.field;
+		var targetName = field.targetName || "name";
+		
+		scope._viewParams.views = [{
+			type: "grid",
+			items: [{ name: targetName, type: "field" }]
+		}];
+		
+		scope.formatItem = function (record) {
+			return record || "";
+		};
+
+		scope.select = function (value) {
+			var record = _.isArray(value) ? _.first(value) : value;
+			var val = _.isString(record) ? record : (record || {})[targetName];
+			if (val === undefined) {
+				val = null;
+			}
+			scope.setValue(val, true);
+		};
+	}
+});
+
+ui.formInput('EvalRefSelect', 'Select', {
+
+	controller: ['$scope', '$element', 'DataSource', 'ViewService', function ($scope, $element, DataSource, ViewService) {
+
+		var fetchDS;
+
+		$scope.$fetchDS = function () {
+			var target = this.$target;
+			if (!fetchDS || fetchDS._model !== target) {
+				fetchDS = DataSource.create(target);
+			}
+			return fetchDS;
+		};
+
+		$scope.canNew = function () {
+			return false;
+		};
+
+		$scope.showSelector = function () {
+			var child = $scope.$new();
+			child._viewParams = {
+				model: $scope.$target,
+				views: [{
+					type: 'grid',
+					items: [{
+						type: 'field',
+						name: $scope.$targetName
+					}]
+				}]
+			};
+
+			var selector = ViewService.compile('<div ui-selector-popup x-select-mode="single"></div>')(child);
+			var popup = selector.isolateScope();
+
+			selector.on('dialogclose', function () {
+				selector.remove();
+				child.$destroy();
+			});
+
+			popup.show();
+		};
+	}],
+
+	init: function(scope) {
+		this._super.apply(this, arguments);
+		
+		var field = scope.field;
+		
+		function toValue(value) {
+			var val = value;
+			if (val === undefined || val === null) {
+				val = null;
+			} else {
+				val = '"' + val + '"';
+			}
+			return val;
+		}
+		
+		Object.defineProperties(scope, {
+
+			$target: {
+				get: function () {
+					return scope.$eval(field.evalTarget);
+				}
+			},
+
+			$targetName: {
+				get: function () {
+					return scope.$eval(field.evalTargetName);
+				}
+			},
+
+			$recordValue: {
+				get: function () {
+					return scope.$eval(field.evalValue);
+				},
+				set: function (value) {
+					scope.$eval(field.evalValue + " = " + toValue(value));
+				}
+			},
+
+			$recordTitle: {
+				get: function () {
+					return scope.$eval(field.evalTitle);
+				},
+				set: function (value) {
+					scope.$eval(field.evalTitle + " = " + toValue(value));
+				}
+			}
+		});
+	
+		scope.formatItem = function (value) {
+			return scope.$recordTitle;
+		};
+
+		scope.select = function (value) {
+			var item = _.isArray(value) ? _.first(value) : value;
+			scope.setValue(item);
+		};
+
+		scope.setValue = function (value) {
+			var nameField = scope.$targetName;
+			var val = value || {};
+			scope.$recordValue = val.id;
+			scope.$recordTitle = val[nameField];
+		};
+	},
+
+	link_editable: function(scope, element, attrs, model) {
+		this._super.apply(this, arguments);
+
+		scope.handleSelect = function(e, ui) {
+			if (ui.item.click) {
+				ui.item.click.call(scope);
+			} else {
+				scope.select(ui.item.value);
+			}
+			scope.$applyAsync();
+		};
+
+		scope.loadSelection = function(request, response) {
+			var targetName = scope.$targetName;
+			if (!targetName) {
+				return response([]);
+			}
+
+			var ds = scope.$fetchDS();
+			var filter = {};
+
+			if (request.term) {
+				filter[targetName] = request.term;
+			}
+
+			ds.search({
+				fields: ['id', targetName],
+				filter: filter,
+				limit: axelor.device.small ? 6 : 10
+			}).success(function (records, page) {
+				var items = _.map(records, function(record) {
+					return {
+						label: record[targetName],
+						value: record
+					};
+				});
+
+				if (items.length < page.total || (request.term && items.length === 0)) {
+					items.push({
+						label: _t("Search more..."),
+						click: function() {
+							scope.showSelector();
+						}
+					});
+				}
+
+				response(items, page);
+			});
+		};
 	}
 });
 

@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -23,6 +23,13 @@ import com.axelor.common.Inflector
 import com.axelor.tools.x2j.Utils
 
 class Entity {
+	
+	private static Set<String> INTERNAL_PACKAGES = [
+		'com.axelor.auth.db',
+		'com.axelor.meta.db',
+		'com.axelor.mail.db',
+		'com.axelor.dms.db',
+	]
 
 	String name
 
@@ -82,6 +89,8 @@ class Entity {
 
 	private Track track
 
+	private boolean modelClass
+
 	Entity baseEntity
 
 	Entity(NodeChild node) {
@@ -109,6 +118,12 @@ class Entity {
 			throw new IllegalArgumentException("Namespace details not given or incomplete.")
 		}
 
+		modelClass = namespace == 'com.axelor.db' && name == 'Model'
+		if (modelClass) {
+			baseClass = null
+			mappedSuper = true
+		}
+
 		if (!repoNamespace) {
 			repoNamespace = "${namespace}.repo"
 		}
@@ -130,7 +145,7 @@ class Entity {
 
 		importManager = new ImportManager(namespace, groovy)
 
-		if (node.@repository != "none" && !mappedSuper) {
+		if (!modelClass && node.@repository != "none" && !mappedSuper) {
 			repository = new Repository(this)
 			repository.concrete = node.@repository != "abstract"
 		}
@@ -146,17 +161,25 @@ class Entity {
 			interfaces = interfaces.split(",").collect { importType(it.trim()) }.join(", ")
 		}
 
-		if (!baseClass) {
-			if (node.@logUpdates != "false") {
-				baseClass = "com.axelor.auth.db.AuditableModel"
+		if (!modelClass) {
+			if (!baseClass) {
+				if (node.@logUpdates != "false") {
+					baseClass = "com.axelor.auth.db.AuditableModel"
+				} else {
+					baseClass = "com.axelor.db.Model"
+				}
+				propertyMap.put("id", Property.idProperty(this));
+				properties.add(propertyMap.get("id"));
 			} else {
-				baseClass = "com.axelor.db.Model"
+				hasExtends = true
+				importType("com.axelor.db.EntityHelper")
 			}
-			propertyMap.put("id", Property.idProperty(this));
-			properties.add(propertyMap.get("id"));
-		} else {
-			hasExtends = true
-			importType("com.axelor.db.EntityHelper")
+		}
+
+		def jsonAttrs = node.'@jsonAttrs'
+		def jsonAttrsAdd = jsonAttrs == 'true' || !INTERNAL_PACKAGES.contains(namespace)
+		if (jsonAttrs == 'false' || modelClass) {
+			jsonAttrsAdd = false
 		}
 
 		node."*".each {
@@ -181,6 +204,9 @@ class Entity {
 				break
 			default:
 				Property field = new Property(this, it)
+				if (modelClass && !field.simple) {
+					throw new IllegalArgumentException("Only simple fields can be added to Model class.")
+				}
 				properties += field
 				propertyMap[field.name] = field
 				if (field.isVirtual() && !field.isTransient()) {
@@ -189,7 +215,21 @@ class Entity {
 				if (field.isNameField()) {
 					nameField = field
 				}
+				if (field.indexable) {
+					indexes += field.index
+				}
+				if (field.json || field.name == 'attrs') {
+					jsonAttrsAdd = false
+				}
+				if (field.name == 'attrs') {
+					jsonAttrs = 'false'
+				}
 			}
+		}
+
+		if (jsonAttrsAdd || jsonAttrs == 'true') {
+			propertyMap.put("attrs", Property.attrsProperty(this));
+			properties.add(propertyMap.get("attrs"));
 		}
 	}
 	
@@ -199,7 +239,7 @@ class Entity {
 
 	private boolean isCompatible(Property existing, Property property) {
 		if (existing == null) return true
-		if (existing.isCollection() || existing.isTransient()) return false;
+		if (existing.isCollection() || existing.isTransient() || existing.name == "id") return false;
 		if (existing.type != property.type) return false
 		if (existing.target != property.target) return false
 		if (existing.large && !property.large) return false
@@ -269,6 +309,20 @@ class Entity {
 		if (!interfaces || interfaces.trim() == "") return ""
 		return " implements " + interfaces
 	}
+	
+	String getExtendsImplementStmt() {
+		if (modelClass) {
+			importType('javax.persistence.Transient')
+			importType('javax.persistence.Version')
+			importType('com.axelor.db.annotations.Widget')
+			return ""
+		}
+		return " extends " + getBaseClass() + getImplementStmt()
+	}
+	
+	String getAbstractStmt() {
+		return modelClass ? "abstract " : ""
+	}
 
 	String findDocs(parent) {
 		def children = parent.getAt(0).children
@@ -335,6 +389,10 @@ class Entity {
 	private List<Property> getHashables() {
 		return properties.findAll { p -> p.hashKey }
 	}
+	
+	boolean isModelClass() {
+		return modelClass;
+	}
 
 	String getEqualsCode() {
 
@@ -377,7 +435,7 @@ class Entity {
 			def hash = name.hashCode()
 			return "return Objects.hash(${hash}, ${data});"
 		}
-		return "return 0;"
+		return "return 31;"
 	}
 
 	String getToStringCode() {
@@ -387,17 +445,17 @@ class Entity {
 
 		importType("com.google.common.base.MoreObjects")
 
-		def code = []
+		def code = ""
 
-		code += "final MoreObjects.ToStringHelper tsh = MoreObjects.toStringHelper(this);\n"
-		code += "tsh.add(\"id\", this.getId());"
+		code += "return MoreObjects.toStringHelper(this)\n"
+		code += "\t\t\t.add(\"id\", getId())\n"
 		int count = 0
 		for(Property p : properties) {
-			if (p.virtual || p.password || !p.simple || p.name == "id" || p.name == "version") continue
-			code += "tsh.add(\"${p.name}\", this.${p.getter}());"
+			if (p.virtual || p.password || p.json || !p.simple || p.name == "id" || p.name == "version") continue
+			code += "\t\t\t.add(\"${p.name}\", ${p.getter}())\n"
 			if (count++ == 10) break
 		}
-		return code.join("\n\t\t") + "\n\n\t\treturn tsh.omitNullValues().toString();"
+		return code + "\t\t\t.omitNullValues()\n\t\t\t.toString();"
 	}
 
 	String importType(String fqn) {
@@ -450,9 +508,9 @@ class Entity {
 		return all
 	}
 
-	List<Annotation> $table() {
+	Annotation $table() {
 
-		if (!table || mappedSuper) return []
+		if (!table || mappedSuper) return null
 
 		def constraints = this.constraints.collect {
 			def idx = new Annotation(this, "javax.persistence.UniqueConstraint", false)
@@ -463,24 +521,20 @@ class Entity {
 		}
 
 		def indexes = this.indexes.collect {
-			def idx = new Annotation(this, "org.hibernate.annotations.Index", false)
+			def idx = new Annotation(this, "javax.persistence.Index", false)
 			if (it.name) {
 				idx.add("name", it.name)
 			}
-			return idx.add("columnNames", it.columns, true)
+			return idx.add("columnList", it.columns.join(','), true)
 		}
 
 		def a1 = new Annotation(this, "javax.persistence.Table", false).add("name", this.table)
 		if (!constraints.empty)
 			a1.add("uniqueConstraints", constraints, false)
+		if (!indexes.empty)
+			a1.add("indexes", indexes, false)
 
-		if (indexes.empty)
-			return [a1]
-
-		def a2 = new Annotation(this, "org.hibernate.annotations.Table", false).add("appliesTo", this.table.toLowerCase())
-		a2.add("indexes", indexes, false)
-
-		return [a1, a2]
+		return a1
 	}
 
 	Annotation $cachable() {

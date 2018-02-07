@@ -106,6 +106,10 @@ ui.formWidget('BaseSelect', {
 		scope.handleDelete = function(e) {
 
 		};
+		
+		scope.handleEnter = function(e) {
+
+		};
 
 		scope.handleSelect = function(e, ui) {
 			
@@ -181,7 +185,7 @@ ui.formWidget('BaseSelect', {
 	
 			input.data('ui-autocomplete')._renderItem = scope.renderSelectItem || renderItem;
 
-			element.on('adjustSize adjustScroll', function (e) {
+			scope.$onAdjust('size scroll', function () {
 				if (showing) {
 					input.autocomplete('close');
 				}
@@ -207,6 +211,10 @@ ui.formWidget('BaseSelect', {
 			case KEY.DELETE:
 			case KEY.BACKSPACE:
 				scope.handleDelete(e);
+				break;
+			case KEY.ENTER:
+				scope.handleEnter(e);
+				break;
 			}
 		}).click(function() {
 			scope.showSelection();
@@ -321,6 +329,27 @@ ui.formInput('Select', 'BaseSelect', {
 			}
 			return item.label;
 		};
+		
+		if (field.enumType) {
+			var __enumValues = {};
+			var __hasValue = false;
+
+			_.each(selectionList, function (item) {
+				__enumValues[item.value] = (item.data || {}).value;
+				__hasValue = __hasValue || __enumValues[item.value] !== undefined;
+			});
+			
+			if (__hasValue) {
+				scope.$watch('record.' + field.name, function selectFieldNameWatch(value, old) {
+					if (value && value !== old) {
+						var enumValue = __enumValues[value];
+						if (scope.record && enumValue !== value) {
+							scope.record[field.name + '$value'] = enumValue;
+						}
+					}
+				});
+			}
+		}
 	},
 
 	link_editable: function(scope, element, attrs, model) {
@@ -331,7 +360,7 @@ ui.formInput('Select', 'BaseSelect', {
 		function update(value) {
 			var val = parseNumber(scope.field, value);
 			scope.setValue(val, true);
-			scope.applyLater();
+			scope.$applyAsync();
 		}
 
 		scope.handleDelete = function(e) {
@@ -361,8 +390,12 @@ ui.formInput('Select', 'BaseSelect', {
 	}
 });
 
+ui.formInput('Enum', 'Select');
+
 ui.formInput('ImageSelect', 'Select', {
-	
+
+	metaWidget: true,
+
 	BLANK: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
 	
 	link: function(scope, element, attrs) {
@@ -391,7 +424,7 @@ ui.formInput('ImageSelect', 'Select', {
 			return selectIcons[value] || this.BLANK;
 		};
 
-		scope.$watch('getValue()', function (value, old) {
+		scope.$watch('getValue()', function selectFieldValueWatch(value, old) {
 			scope.image = scope.findImage(value);
 			element.toggleClass('empty', !value);
 		}.bind(this));
@@ -435,7 +468,8 @@ ui.formInput('MultiSelect', 'Select', {
 
 	css: 'multi-select-item',
 	cellCss: 'form-item multi-select-item',
-	
+	metaWidget: true,
+
 	init: function(scope) {
 		this._super(scope);
 
@@ -538,7 +572,7 @@ ui.formInput('MultiSelect', 'Select', {
 		function update(value) {
 			var val = parseNumber(scope.field, value);
 			scope.setValue(val, true);
-			scope.applyLater();
+			scope.$applyAsync();
 			setTimeout(function () {
 				scaleInput(50);
 			});
@@ -615,7 +649,7 @@ ui.formInput('MultiSelect', 'Select', {
 			}
 		});
 
-		scope.$watch('items.length', function (value, old) {
+		scope.$watch('items.length', function selectItemsLengthWatch(value, old) {
 			setTimeout(function () {
 				scaleInput(50);
 			});
@@ -624,7 +658,7 @@ ui.formInput('MultiSelect', 'Select', {
 	template_editable:
 	'<div class="tag-select picker-input" ng-click="onShowSelection($event)">'+
 	  '<ul>'+
-		'<li class="tag-item label label-info" ng-repeat="item in items">'+
+		'<li class="tag-item label label-primary" ng-repeat="item in items">'+
 			'<span ng-class="{\'tag-link\': handleClick}" class="tag-text" ng-click="handleClick($event, item.value)">{{item.title}}</span> '+
 			'<i class="fa fa-times fa-small" ng-click="removeItem(item)"></i>'+
 		'</li>'+
@@ -638,7 +672,7 @@ ui.formInput('MultiSelect', 'Select', {
 	'</div>',
 	template_readonly:
 	'<div class="tag-select">'+
-		'<span class="label label-info" ng-repeat="item in limited(items)">'+
+		'<span class="label label-primary" ng-repeat="item in limited(items)">'+
 			'<span ng-class="{\'tag-link\': handleClick}" class="tag-text" ng-click="handleClick($event, item.value)">{{item.title}}</span>'+
 		'</span>'+
 		'<span ng-show="more"> {{more}}</span>'+
@@ -655,7 +689,7 @@ ui.formInput('SelectQuery', 'Select', {
 		
 		function update(value) {
 			scope.setValue(value);
-			scope.applyLater();
+			scope.$applyAsync();
 		}
 
 		scope.format = function(value) {
@@ -687,7 +721,8 @@ ui.formInput('SelectQuery', 'Select', {
 ui.formInput('RadioSelect', {
 	
 	css: "radio-select",
-	
+	metaWidget: true,
+
 	link: function(scope, element, attrs, model) {
 		
 		var field = scope.field;
@@ -700,7 +735,7 @@ ui.formInput('RadioSelect', {
 		element.on("change", ":input", function(e) {
 			var val = parseNumber(scope.field, $(e.target).val());
 			scope.setValue(val, true);
-			scope.$apply();
+			scope.$applyAsync();
 		});
 		
 		if (field.direction === "vertical" || field.dir === "vert") {
@@ -728,6 +763,7 @@ ui.formInput('RadioSelect', {
 ui.formInput('CheckboxSelect', {
 
 	css: "checkbox-select",
+	metaWidget: true,
 
 	link: function(scope, element, attrs, model) {
 
@@ -755,7 +791,7 @@ ui.formInput('CheckboxSelect', {
 			});
 			var value =  selected.length === 0 ? null : selected.join(",");
 			scope.setValue(value, true);
-			scope.$apply();
+			scope.$applyAsync();
 		});
 
 		if (field.direction === "vertical" || field.dir === "vert") {
@@ -783,7 +819,8 @@ ui.formInput('CheckboxSelect', {
 ui.formInput('NavSelect', {
 	
 	css: "nav-select",
-	
+	metaWidget: true,
+
 	link: function(scope, element, attrs, model) {
 		
 		var field = scope.field;
@@ -793,7 +830,7 @@ ui.formInput('NavSelect', {
 			return filterSelection(scope, field, selection, scope.getValue()) || [];
 		};
 
-		scope.$watch('text', function (text, old) {
+		scope.$watch('text', function navSelectTextWatch(text, old) {
 			adjust();
 		});
 
@@ -887,7 +924,7 @@ ui.formInput('NavSelect', {
 			elemNavs.parent().css('visibility', '');
 		}
 
-		element.on('adjustSize', adjust);
+		scope.$onAdjust(adjust);
 		scope.$timeout(setup);
 	},
 	template_editable: null,
@@ -919,6 +956,16 @@ ui.formInput('ThemeSelect', 'Select', {
 		scope.field.selectionList.unshift({
 			value: "default",
 			title: "Default"
+		});
+		this._super(scope);
+	}
+});
+
+ui.formInput('WidgetSelect', 'Select', {
+
+	init: function (scope) {
+		scope.field.selectionList = _.map(ui.getMetaWidgets(), function (name) {
+			return { value: name, title: name };
 		});
 		this._super(scope);
 	}

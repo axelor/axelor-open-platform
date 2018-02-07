@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -30,7 +30,7 @@ import javax.persistence.Query;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.axelor.common.ClassUtils;
+import com.axelor.common.ResourceUtils;
 import com.axelor.meta.MetaTest;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.views.AbstractView;
@@ -120,7 +120,7 @@ public class TestViews extends MetaTest {
 	@Transactional
 	public void testInclude() throws Exception {
 		
-		try (InputStream is = ClassUtils.getResourceStream("com/axelor/meta/Include.xml")) {
+		try (InputStream is = ResourceUtils.getResourceStream("com/axelor/meta/Include.xml")) {
 			loader.process(is, new Module("test"), false);
 
 			final AbstractView form1 = XMLViews.findView("contact-form1", null, null, "test");

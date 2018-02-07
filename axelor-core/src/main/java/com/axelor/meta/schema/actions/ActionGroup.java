@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -26,7 +26,6 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.common.ClassUtils;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
@@ -36,6 +35,7 @@ import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.views.AbstractView;
+import com.axelor.rpc.ContextEntity;
 import com.axelor.rpc.Response;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
@@ -121,7 +121,12 @@ public class ActionGroup extends ActionResumable {
 				actionView.setViews(ImmutableList.of(view));
 
 				if (parts.length == 3) {
-					Class<?> model = ClassUtils.findClass(parts[2]);
+					Class<?> model;
+					try {
+						model = Class.forName(parts[2]);
+					} catch (ClassNotFoundException e) {
+						throw new IllegalArgumentException(e);
+					}
 					actionView.setModel(model.getName());
 					xml = XMLViews.findView(parts[1], parts[0], model.getName());
 				}
@@ -329,15 +334,16 @@ public class ActionGroup extends ActionResumable {
 	
 	@SuppressWarnings("all")
 	private void updateContext(ActionHandler handler, Map<String, Object> value) {
-		if (value == null) return;
+		if (value == null || value instanceof ContextEntity) return;
 		
 		Object values = value.get("values");
 		Map<String, Object> map = Maps.newHashMap();
 		
-    	if (values instanceof Model) {
+		if (values instanceof ContextEntity) {
+			map = ((ContextEntity) values).getContextMap();
+		} else if (values instanceof Model) {
     		map = Mapper.toMap(value);
-    	}
-    	if (values instanceof Map) {
+    	} else if (values instanceof Map) {
     		map = Maps.newHashMap((Map) values);
     	}
     	
@@ -358,12 +364,12 @@ public class ActionGroup extends ActionResumable {
     	}
     	
 		try {
-			handler.getContext().update(map);
+			handler.getContext().putAll(map);
 		} catch (IllegalArgumentException e) {
 			// SEE: RM-5373
 			// for some reasons, if we have incompatible value types in response map,
 			// try convert them with type adapters and try again.
-			handler.getContext().update(Mapper.toMap(Mapper.toBean(handler.getContext().getContextClass(), map)));
+			handler.getContext().putAll(Mapper.toMap(Mapper.toBean(handler.getContext().getContextClass(), map)));
 		}
 	}
 

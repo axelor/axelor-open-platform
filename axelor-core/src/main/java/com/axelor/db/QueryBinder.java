@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -24,6 +24,7 @@ import javax.persistence.Parameter;
 
 import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Adapter;
+import com.axelor.rpc.ContextEntity;
 import com.axelor.script.ScriptBindings;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
@@ -76,7 +77,7 @@ public class QueryBinder {
 	 * @return the same query binder instance
 	 */
 	public QueryBinder setCacheable(boolean cacheable) {
-		query.unwrap(org.hibernate.Query.class).setCacheable(cacheable);
+		query.setHint("org.hibernate.cacheable", "" + cacheable);
 		return this;
 	}
 	
@@ -100,7 +101,7 @@ public class QueryBinder {
 	 * @return the same query binder instance
 	 */
 	public QueryBinder setReadOnly(boolean readOnly) {
-		query.unwrap(org.hibernate.Query.class).setReadOnly(readOnly);
+		query.unwrap(org.hibernate.query.Query.class).setReadOnly(readOnly);
 		return this;
 	}
 
@@ -168,28 +169,44 @@ public class QueryBinder {
 				}
 			}
 		}
+		
+		if (params == null) {
+			return this;
+		}
 
-		if (params != null) {
-			for (int i = 0; i < params.length; i++) {
-				Object param = params[i];
-				if (param instanceof String
-						&& !StringUtils.isBlank((String) param)
-						&& bindings.containsKey(param)) {
-					param = bindings.get(param);
-				}
-				try {
-					query.getParameter(i + 1);
-				} catch (Exception e) {
-					continue;
-				}
-				try {
-					query.setParameter(i + 1, param);
-				} catch (IllegalArgumentException e) {
-					Parameter<?> p = query.getParameter(i + 1);
-					query.setParameter(i + 1, adapt(param, p));
-				}
+		// check if we have 1 based positional params
+		int offset = 0;
+		try {
+			query.getParameter(0);
+			// TODO: enforce JPA style positional params
+		} catch (Exception e) {
+			offset = 1;
+		}
+
+		for (int i = 0; i < params.length; i++) {
+			Parameter<?> param;
+			Object value = params[i];
+			if (value instanceof ContextEntity) {
+				value = ((ContextEntity) value).getContextId();
+			} else if (value instanceof Model) {
+				value = ((Model) value).getId();
+			} else if (value instanceof String
+					&& !StringUtils.isBlank((String) value)
+					&& bindings.containsKey(value)) {
+				value = bindings.get(value);
+			}
+			try {
+				param = query.getParameter(i + offset);
+			} catch (Exception e) {
+				continue;
+			}
+			try {
+				query.setParameter(i + offset, value);
+			} catch (IllegalArgumentException e) {
+				query.setParameter(i + offset, adapt(value, param));
 			}
 		}
+
 		return this;
 	}
 
@@ -212,7 +229,11 @@ public class QueryBinder {
 			return this;
 		}
 
-		if (value == null || value instanceof String && "".equals(((String) value).trim())) {
+		if (value instanceof ContextEntity) {
+			value = ((ContextEntity) value).getContextId();
+		} else if (value instanceof Model) {
+			value = ((Model) value).getId();
+		} else if (value == null || value instanceof String && "".equals(((String) value).trim())) {
 			value = adapt(value, parameter);
 		}
 
@@ -233,18 +254,24 @@ public class QueryBinder {
 	public javax.persistence.Query getQuery() {
 		return query;
 	}
-
+	
 	private Object adapt(Object value, Parameter<?> param) {
 		final Class<?> type = param.getParameterType();
 		if (type == null) {
 			return value;
 		}
+
 		value = Adapter.adapt(value, type, type, null);
-		if (value instanceof Model && type.isInstance(value)) {
+
+		if (value instanceof Number && Model.class.isAssignableFrom(type)) {
+			value = JPA.em().find(type, value);
+		} else if (value instanceof Model && type.isInstance(value)) {
 			Model bean = (Model) value;
-			if (bean.getId() != null)
+			if (bean.getId() != null) {
 				value = JPA.find(bean.getClass(), bean.getId());
+			}
 		}
+
 		return value;
 	}
 }

@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,13 +18,12 @@
 package com.axelor.db;
 
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Map;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Construct;
@@ -33,7 +32,7 @@ import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.Tag;
 
-import com.axelor.common.ClassUtils;
+import com.axelor.common.ResourceUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
@@ -132,7 +131,7 @@ import com.google.inject.persist.Transactional;
 public class JpaFixture {
 
 	private InputStream read(String resource) {
-		return ClassUtils.getResourceStream("fixtures/" + resource);
+		return ResourceUtils.getResourceStream("fixtures/" + resource);
 	}
 
 	@Transactional
@@ -159,12 +158,12 @@ public class JpaFixture {
 					if (nnode.getTag().equals(Tag.TIMESTAMP)) {
 						Date date = (Date) dateConstructor.construct(nnode);
 						if (nnode.getType() == LocalDate.class) {
-							return new LocalDate(date, DateTimeZone.UTC);
+							return date.toInstant().atZone(ZoneOffset.UTC).toLocalDate();
 						}
 						if (nnode.getType() == LocalDateTime.class) {
-							return new LocalDateTime(date, DateTimeZone.UTC);
+							return date.toInstant().atZone(ZoneOffset.UTC).toLocalDateTime();
 						}
-						return new DateTime(date, DateTimeZone.UTC);
+						return date.toInstant().atZone(ZoneOffset.UTC);
 					} else {
 						return super.construct(nnode);
 					}

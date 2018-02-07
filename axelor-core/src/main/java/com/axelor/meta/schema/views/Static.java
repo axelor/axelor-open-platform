@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
+import org.eclipse.persistence.oxm.annotations.XmlValueExtension;
 
 import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
@@ -34,6 +35,7 @@ public class Static extends SimpleWidget {
 
 	@XmlCDATA
 	@XmlValue
+	@XmlValueExtension
 	private String text;
 
 	@JsonGetter("text")

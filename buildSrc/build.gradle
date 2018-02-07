@@ -1,24 +1,32 @@
 apply plugin: "java"
+apply plugin: "groovy"
 
-allprojects {
-	apply from: "../gradle/repo.gradle"
-	apply from: "../gradle/libs.gradle"
-	apply from: "../version.gradle"
-}
+apply from: "../version.gradle"
+apply from: "../gradle/repos.gradle"
+apply from: "../gradle/libs.gradle"
+apply from: "../gradle/common.gradle"
 
-subprojects {
-
-	// build in separate directory to speed up build
-	project.buildDir = "${rootDir}/build/${project.name}"
-
-	// disable tests to speed up build
-	afterEvaluate {
-		project.test.enabled = false
+sourceSets {
+	main {
+		java {
+			srcDirs '../axelor-common/src/main/java'
+		}
+		groovy {
+			srcDirs '../axelor-gradle/src/main/java'
+			srcDirs '../axelor-gradle/src/main/groovy'
+		}
+		resources {
+			srcDirs '../axelor-common/src/main/resources'
+			srcDirs '../axelor-gradle/src/main/resources'
+		}
 	}
 }
 
 dependencies {
-	runtime project(':axelor-gradle')
+	compile libs.guava
+	compile libs.axelor_asm
+	compile libs.opencsv
+	compile libs.plugin_license
 }
 
-tasks.compileGroovy.enabled = false
+test.enabled = false

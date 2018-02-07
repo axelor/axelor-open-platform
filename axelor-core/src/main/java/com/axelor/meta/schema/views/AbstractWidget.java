@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -25,7 +25,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
-import com.axelor.common.ClassUtils;
 import com.axelor.db.mapper.Mapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -115,7 +114,7 @@ public abstract class AbstractWidget {
 		}
 		if (attrs.containsKey("target") && !attrs.containsKey("targetName")) {
 			try {
-				Class<?> target = ClassUtils.findClass(attrs.get("target").toString());
+				Class<?> target = Class.forName(attrs.get("target").toString());
 				String targetName = Mapper.of(target).getNameField().getName();
 				attrs.put("targetName", targetName);
 			} catch (Exception e) {

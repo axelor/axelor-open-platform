@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -19,6 +19,8 @@ package com.axelor.rpc.filter;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.axelor.db.hibernate.type.JsonFunction;
 
 
 class SimpleFilter extends Filter {
@@ -51,9 +53,17 @@ class SimpleFilter extends Filter {
 		this.operator = operator;
 	}
 
+	protected String getOperand() {
+		final String name = getFieldName();
+		if (name.indexOf("::") > -1) {
+			return JsonFunction.fromPath(name).toString();
+		}
+		return "self." + name;
+	}
+
 	@Override
 	public String getQuery() {
-		return String.format("(self.%s %s ?)", fieldName, operator);
+		return String.format("(%s %s ?)", getOperand(), operator);
 	}
 
 	@Override

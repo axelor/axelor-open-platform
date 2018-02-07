@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -24,7 +24,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.repo.MetaModuleRepository;
@@ -76,18 +75,16 @@ public class ModuleController {
 
 	private Set<String> resolve(MetaModule module) {
 		final Set<String> all = new HashSet<>();
+		final Set<MetaModule> depends = module.getDepends();
+
 		all.add(module.getName());
 
-		final String depends = module.getDepends();
-		if (StringUtils.isBlank(depends)) {
+		if (depends == null || depends.isEmpty()) {
 			return all;
 		}
-		for (String name : depends.trim().split("\\s*,\\s*")) {
-			MetaModule mod = modules.findByName(name);
-			if (mod != null && mod.getInstalled() != Boolean.TRUE) {
-				all.add(name);
-			}
-		}
+
+		depends.stream().map(MetaModule::getName).forEach(all::add);
+		
 		return all;
 	}
 
@@ -99,9 +96,11 @@ public class ModuleController {
 	private Set<String> resolveLink(MetaModule module, String mainModule) {
 		final Set<String> all = new HashSet<>();
 		all.add(module.getName());
-
-		for (MetaModule metaModule : modules.all().filter("self.depends LIKE ?1", "%" + module.getName() + "%").fetch()) {
-			if(metaModule.getInstalled() != Boolean.TRUE || mainModule.equals(metaModule.getName())) {
+		for (MetaModule metaModule : modules.all()
+				.filter("self.depends LIKE ?1", "%" + module.getName() + "%").fetch()) {
+			if (metaModule.getApplication() == Boolean.TRUE ||
+				metaModule.getInstalled() != Boolean.TRUE ||
+				mainModule.equals(metaModule.getName())) {
 				continue;
 			}
 			if(metaModule.getPending() == Boolean.TRUE) {

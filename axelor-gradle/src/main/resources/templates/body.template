@@ -2,15 +2,16 @@ ${ pojo.documentation }\
 <% pojo.annotations.each { a -> %>
 ${a}\
 <% } %>
-public class ${pojo.name} extends ${pojo.baseClass}${pojo.implementStmt} {
+public ${pojo.abstractStmt}class ${pojo.name}${pojo.extendsImplementStmt} {
 <% pojo.fields.each { p -> %>\
 <% p.annotations.each { a -> %>
 	${a}\
 <% } %>
 	private $p.type ${p.name}${p.defaultExpression};
 <% } %>\
-
+<% if (!pojo.modelClass) { %>
 ${pojo.ctorCode}\
+<% } %>\
 
 <% pojo.fields.each { p -> %>\
 ${p.documentation}
@@ -58,10 +59,10 @@ ${p.documentation}
 	 *            the item to add
 	 */
 	public void add${p.firstUpper(p.singularName)}($p.target item) {
-		if (${p.name} == null) {
-			${p.name} = ${p.newCollection()};
+		if (${p.getter}() == null) {
+			${p.setter}(${p.newCollection()});
 		}
-		${p.name}.add(item);
+		${p.getter}().add(item);
 <% if (p.linkCode) { %>\
 		${p.linkCode}
 <% } %>\
@@ -80,10 +81,10 @@ ${p.documentation}
 	 *            the item to remove
 	 */
 	public void remove${p.firstUpper(p.singularName)}($p.target item) {
-		if (${p.name} == null) {
+		if (${p.getter}() == null) {
 			return;
 		}
-		${p.name}.remove(item);
+		${p.getter}().remove(item);
 <% if (p.delinkCode) { %>\
 		${p.delinkCode}
 <% } %>\
@@ -105,16 +106,53 @@ ${p.documentation}
 <% } %>\
 	 */
 	public void clear${p.firstUpper(p.name)}() {
-		if (${p.name} != null) {
+		if (${p.getter}() != null) {
 <% if (p.delinkAllCode) { %>\
 			${p.delinkAllCode}
 <% } %>\
-			${p.name}.clear();
+			${p.getter}().clear();
 		}
 	}
 <% } %>\
 <% } %>\
+<% if (pojo.modelClass) { %>
+	@Version
+	private Integer version;
+	
+	@Transient
+	private transient boolean selected;
 
+	@Widget(massUpdate = true)
+	private Boolean archived;
+
+	public abstract Long getId();
+
+	public abstract void setId(Long id);
+	
+	public Boolean getArchived() {
+		return archived;
+	}
+	
+	public void setArchived(Boolean archived) {
+		this.archived = archived;
+	}
+
+	public Integer getVersion() {
+		return version;
+	}
+
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
+	
+	public void setSelected(boolean selected) {
+		this.selected = selected;
+	}
+
+	public boolean isSelected() {
+		return selected;
+	}
+<% } else { %>
 	@Override
 	public boolean equals(Object obj) {
 		${pojo.equalsCode}
@@ -129,4 +167,5 @@ ${p.documentation}
 	public String toString() {
 		${pojo.toStringCode}
 	}
+<% } %>\
 }

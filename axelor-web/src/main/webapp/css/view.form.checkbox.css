@@ -76,17 +76,17 @@
 }
 
 .ibox input:focus + .box:before {
-	border: 1px solid #16a765;
+	border: 1px solid #0275d8;
 }
 
 .ibox:hover .box:before,
 .ibox:hover input:focus + .box:before {
-	border: 2px solid #16a765;
+	border: 2px solid #0275d8;
 }
 
 .ibox input:checked + .box:before {
-	border: 1px solid #16a765;
-	background-color: #16a765;
+	border: 1px solid #0275d8;
+	background-color: #0275d8;
 }
 
 .ibox input:checked + .box:after {
@@ -111,7 +111,7 @@
 }
 
 .ibox:hover input:disabled:checked + .box:before {
-	border: 1px solid #16a765;
+	border: 1px solid #0275d8;
 }
 
 .form-item.iswitch {
@@ -125,7 +125,7 @@
     height: 20px;
     margin: 0;
     cursor: pointer;
-    background-color: #16a765;
+    background-color: #0275d8;
     border-radius: 30px
 }
 
@@ -167,7 +167,7 @@
 }
 
 .iswitch input:focus + .box:before {
-	border: 1px solid #16a765;
+	border: 1px solid #0275d8;
 }
 
 .iswitch .box:after {

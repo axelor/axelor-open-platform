@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -59,7 +59,7 @@ public class Criteria {
 					//throw new RuntimeException(e);
 				}
 			}
-			Context context = Context.create(domainContext, domainClass);
+			Context context = new Context(domainContext, domainClass);
 			q.bind(context);
 		}
 		return q;
@@ -218,9 +218,9 @@ public class Criteria {
 		case NOT_EQUAL:
 			return Filter.notEquals(fieldName, value);
 		case LESS_THAN:
-			return Filter.lessThen(fieldName, value);
+			return Filter.lessThan(fieldName, value);
 		case GREATER_THAN:
-			return Filter.greaterThen(fieldName, value);
+			return Filter.greaterThan(fieldName, value);
 		case LESS_OR_EQUAL:
 			return Filter.lessOrEqual(fieldName, value);
 		case GREATER_OR_EQUAL:

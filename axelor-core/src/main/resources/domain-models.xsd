@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema targetNamespace="http://axelor.com/xml/ns/domain-models"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dm="http://axelor.com/xml/ns/domain-models"
-  elementFormDefault="qualified" attributeFormDefault="unqualified" version="4.2">
+  elementFormDefault="qualified" attributeFormDefault="unqualified" version="5.0">
 
   <xsd:element name="domain-models">
     <xsd:complexType>
@@ -13,23 +13,39 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:element>
-        <xsd:element name="sequence" minOccurs="0" maxOccurs="unbounded" type="dm:Sequence">
-          <xsd:annotation>
-            <xsd:documentation>
-              Define a custom sequence.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:element>
-        <xsd:element name="entity" maxOccurs="unbounded"
-          minOccurs="1" type="dm:Entity">
-          <xsd:annotation>
-            <xsd:documentation>
-              Define an Entity (domain model).
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:element>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="sequence" type="dm:Sequence">
+            <xsd:annotation>
+              <xsd:documentation>
+                Define a custom sequence.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="enum" type="dm:EnumType">
+            <xsd:annotation>
+              <xsd:documentation>
+                Define an enum.
+              </xsd:documentation>
+            </xsd:annotation>
+            <xsd:unique name="unique-enum-items">
+              <xsd:selector xpath="dm:item" />
+              <xsd:field xpath="@name" />
+            </xsd:unique>
+          </xsd:element>
+          <xsd:element name="entity" type="dm:Entity">
+            <xsd:annotation>
+              <xsd:documentation>
+                Define an Entity (domain model).
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:choice>
       </xsd:sequence>
     </xsd:complexType>
+    <xsd:unique name="unique-sequences">
+      <xsd:selector xpath="dm:sequence" />
+      <xsd:field xpath="@name" />
+    </xsd:unique>
   </xsd:element>
 
   <xsd:complexType name="Namespace">
@@ -114,7 +130,9 @@
       <xsd:annotation>
         <xsd:documentation>
           Name of the column in the underlying database table (should be
-          defined when the field name is reserved word in database systems).
+          defined when the field name is reserved word in database systems).&lt;br&gt;&lt;br&gt;
+          When used on many-to-many with 'table' attribute, it's used as the foreign key column
+          in the underlying database table referring the owing table.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -321,6 +339,20 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="table" type="xsd:string">
+        	<xsd:annotation>
+        		<xsd:documentation>
+        		Specify the join table name.
+        		</xsd:documentation>
+        	</xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="column2" type="xsd:string">
+        	<xsd:annotation>
+        		<xsd:documentation>
+        		Name of the foreign key column in the underlying database table referring the non-owing table.
+        		</xsd:documentation>
+        	</xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -415,6 +447,13 @@
             </xsd:restriction>
           </xsd:simpleType>
         </xsd:attribute>
+        <xsd:attribute name="json" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+            Whether the field is used to store json data.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="password" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>
@@ -482,6 +521,28 @@
         <xsd:attribute name="unique" use="prohibited"/>
         <xsd:attribute name="hidden" use="prohibited"/>
         <xsd:attribute name="massUpdate" use="prohibited"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="Enum">
+    <xsd:annotation>
+      <xsd:documentation>Enum field.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="dm:Column">
+        <xsd:attribute name="ref" use="required">
+          <xsd:annotation>
+            <xsd:documentation>
+              Fully qualified name of the reference entity class.
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:pattern value="(([a-z][a-zA-Z0-9_]+)(\.[a-z][a-zA-Z0-9_]+)*\.)?([A-Z][a-zA-Z0-9_]+)" />
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -685,7 +746,19 @@
           <xsd:documentation>Specify a change message</xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
-          <xsd:simpleContent >
+          <xsd:simpleContent>
+            <xsd:restriction base="dm:TrackMessage">
+              <xsd:minLength value="1"/>
+            </xsd:restriction>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="content" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>Specify a body message</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:simpleContent>
             <xsd:restriction base="dm:TrackMessage">
               <xsd:minLength value="1"/>
             </xsd:restriction>
@@ -701,6 +774,16 @@
     <xsd:attribute name="replace" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>Specify whether to replace original change track config.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="files" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether to track attached files.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="on" type="dm:TrackEvent" default="ALWAYS">
+      <xsd:annotation>
+        <xsd:documentation>Specify on which event to track the changes</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
@@ -771,6 +854,13 @@
           <xsd:annotation>
             <xsd:documentation>
               Binary type field (binary data, e.g. image, pdf etc).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="enum" type="dm:Enum">
+          <xsd:annotation>
+            <xsd:documentation>
+              Enum field.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:element>
@@ -876,6 +966,13 @@
         <xsd:documentation>
           Whether the records of this entity should be in
           unique sequence (else a global sequence will be used).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="jsonAttrs" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify whether the entity should have 'attrs' json field.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -985,6 +1082,65 @@
           </xsd:enumeration>
         </xsd:restriction>
       </xsd:simpleType>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="EnumItem">
+    <xsd:annotation>
+      <xsd:documentation>Define enumeration item.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="name" use="required">
+      <xsd:annotation>
+        <xsd:documentation>Enumeration item name.</xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="[A-Z][A-Z0-9_]*[A-Z0-9]" />
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="title" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Display title for UI components.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="value" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Specify custom value for the enum item.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="help" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>Help string.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="EnumType" mixed="true">
+    <xsd:annotation>
+      <xsd:documentation>Define enumeration type.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="item" type="dm:EnumItem" minOccurs="1" maxOccurs="unbounded" />
+    </xsd:sequence>
+    <xsd:attribute name="name" use="required">
+      <xsd:annotation>
+        <xsd:documentation>
+          Enumeration name.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="[A-Z][a-zA-Z0-9_]+" />
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="numeric" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify whether to use numeric values, all enum items must provide a numeric value.
+        </xsd:documentation>
+      </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
 </xsd:schema>

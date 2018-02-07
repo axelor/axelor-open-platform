@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,6 +17,8 @@
  */
 package com.axelor.auth;
 
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.FlushModeType;
@@ -26,12 +28,12 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.UnavailableSecurityManagerException;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.subject.Subject;
-import org.joda.time.LocalDate;
 
 import com.axelor.auth.db.User;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.QueryBinder;
+import com.google.common.base.Preconditions;
 
 public class AuthUtils {
 
@@ -88,15 +90,18 @@ public class AuthUtils {
 	}
 
 	private static final String QS_HAS_ROLE = "SELECT self.id FROM Role self WHERE "
-			+ "(self.name = :name) AND "
+			+ "(self.name IN (:roles)) AND "
 			+ "("
 			+ "  (self.id IN (SELECT r.id FROM User u LEFT JOIN u.roles AS r WHERE u.code = :user)) OR "
 			+ "  (self.id IN (SELECT r.id FROM User u LEFT JOIN u.group AS g LEFT JOIN g.roles AS r WHERE u.code = :user))"
 			+ ")";
 	
-	public static boolean hasRole(final User user, final String role) {
+	public static boolean hasRole(final User user, final String... roles) {
+		Preconditions.checkArgument(user != null, "user not provided.");
+		Preconditions.checkArgument(roles != null, "roles not provided.");
+		Preconditions.checkArgument(roles.length > 0, "roles not provided.");
 		final TypedQuery<Long> query = JPA.em().createQuery(QS_HAS_ROLE, Long.class);
-		query.setParameter("name", role);
+		query.setParameter("roles", Arrays.asList(roles));
 		query.setParameter("user", user.getCode());
 		query.setMaxResults(1);
 		

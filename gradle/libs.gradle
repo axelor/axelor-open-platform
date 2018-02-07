@@ -2,26 +2,57 @@ def libs = ext.libs = [:]
 def versions = [:]
 
 // versions
-versions.guice = "4.0"
-versions.hibernate = "4.2.21.Final"
-versions.hibernate_validator = "5.2.0.Final"
+versions.guice = "4.1.0"
+versions.guava = "23.0"
+versions.hibernate = "5.2.10.Final"
+versions.hibernate_validator = "5.4.1.Final"
+versions.hibernate_search = "5.7.0.Final"
+
+versions.groovy = "2.4.10"
+versions.resteasy = "3.1.2.Final"
+versions.jackson = "2.8.8"
+versions.shiro = "1.2.6"
+
+versions.junit = "4.12"
+versions.slf4j = "1.7.25"
+
+versions.tomcat = "8.5.24"
+versions.tomcat_embed = "${versions.tomcat}"
 
 // unit testing
-libs.junit = "junit:junit:4.11"
+libs.junit = "junit:junit:${versions.junit}"
 
 // logging
-libs.slf4j			= ["org.slf4j:slf4j-api:1.7.7", "org.slf4j:slf4j-log4j12:1.7.7", "org.slf4j:jcl-over-slf4j:1.7.7"]
-libs.slf4j_simple	= ["org.slf4j:slf4j-api:1.7.7", "org.slf4j:slf4j-simple:1.7.7"]
-libs.slf4j_logback	= ["org.slf4j:slf4j-api:1.7.7", "ch.qos.logback:logback-classic:1.1.2"]
+libs.slf4j_base = [
+    "org.slf4j:slf4j-api:${versions.slf4j}",
+    "org.slf4j:jul-to-slf4j:${versions.slf4j}",
+    "org.slf4j:jcl-over-slf4j:${versions.slf4j}",
+    "org.slf4j:log4j-over-slf4j:${versions.slf4j}"
+]
+
+libs.slf4j_log4j = libs.slf4j_base + [
+	"org.apache.logging.log4j:log4j-slf4j-impl:2.7",
+	"org.apache.logging.log4j:log4j-api:2.7",
+	"org.apache.logging.log4j:log4j-core:2.7"
+]
+
+libs.slf4j_log4j_web = "org.apache.logging.log4j:log4j-web:2.7"
+
+libs.slf4j_simple = libs.slf4j_base + [
+	"org.slf4j:slf4j-simple:${versions.slf4j}"
+]
+
+libs.slf4j_logback = libs.slf4j_base + [
+	"ch.qos.logback:logback-core:1.2.3",
+	"ch.qos.logback:logback-classic:1.2.3",
+	"org.fusesource.jansi:jansi:1.15"
+]
 
 // Guava
-libs.guava = ["com.google.guava:guava:18.0", "com.google.code.findbugs:jsr305:3.0.1"]
-
-// joda
-libs.joda_time = ["joda-time:joda-time:2.3", "org.jadira.usertype:usertype.core:3.0.0.GA"]
+libs.guava = ["com.google.guava:guava:${versions.guava}", "com.google.code.findbugs:jsr305:3.0.1"]
 
 // yaml
-libs.snakeyaml = "org.yaml:snakeyaml:1.13"
+libs.snakeyaml = "org.yaml:snakeyaml:1.17"
 
 // Guice
 libs.guice = "com.google.inject:guice:${versions.guice}"
@@ -29,107 +60,157 @@ libs.guice_servlet = "com.google.inject.extensions:guice-servlet:${versions.guic
 libs.guice_persist = "com.google.inject.extensions:guice-persist:${versions.guice}"
 libs.guice_multibindings = "com.google.inject.extensions:guice-multibindings:${versions.guice}"
 
-// CGLIB & ASM (repackaged to avoid version conflicts)
-libs.axelor_cglib = "com.axelor:axelor-cglib:3.1"
+// ASM (repackaged to avoid version conflicts)
+libs.axelor_asm = "com.axelor:axelor-asm:5.2"
+
+// Byte Buddy
+libs.byte_buddy = "net.bytebuddy:byte-buddy:1.6.14"
 
 // Tomcat EL (repackaged to avoid version conflicts)
-libs.axelor_el = "com.axelor:axelor-el:8.0.24"
+libs.axelor_el = "com.axelor:axelor-el:${versions.tomcat}"
 
 // javax libs
-libs.javax_servlet = "javax.servlet:javax.servlet-api:3.0.1"
-libs.javax_servlet_jsp = "javax.servlet.jsp:javax.servlet.jsp-api:2.2.1"
+libs.javax_servlet = "javax.servlet:javax.servlet-api:3.1.0"
+libs.javax_servlet_jsp = "javax.servlet.jsp:javax.servlet.jsp-api:2.3.1"
 libs.javax_validation = "javax.validation:validation-api:1.1.0.Final"
-libs.javax_el = ["javax.el:javax.el-api:3.0.0", "org.glassfish:javax.el:3.0.0"]
-libs.javax_mail = ["com.sun.mail:javax.mail:1.5.4"]
-libs.greenmail = "com.icegreen:greenmail:1.4.1"
+libs.javax_el = ["org.apache.tomcat:tomcat-jasper:${versions.tomcat}", "org.apache.tomcat:tomcat-el-api:${versions.tomcat}"]
+libs.javax_mail = ["com.sun.mail:javax.mail:1.5.6"]
+libs.greenmail = "com.icegreen:greenmail:1.5.3"
 
 // jdbc
-libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.3.3"
-libs.jdbc_postgres = "org.postgresql:postgresql:9.4.1212.jre7"
-libs.jdbc_mysql = "mysql:mysql-connector-java:5.1.36"
+libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.3.4"
+libs.jdbc_postgres = "org.postgresql:postgresql:42.0.0"
+libs.jdbc_mysql = "mysql:mysql-connector-java:5.1.41"
 
 // Hibernate
 libs.hibernate = [
     "org.hibernate:hibernate-core:${versions.hibernate}",
-    "org.hibernate:hibernate-entitymanager:${versions.hibernate}",
-    "org.hibernate:hibernate-c3p0:${versions.hibernate}",
-    "org.hibernate:hibernate-validator:${versions.hibernate_validator}"
+	"org.hibernate:hibernate-hikaricp:${versions.hibernate}",
+    "org.hibernate:hibernate-validator:${versions.hibernate_validator}",
+	"org.hibernate:hibernate-ehcache:${versions.hibernate}",
+	"org.hibernate:hibernate-jcache:${versions.hibernate}",
 ]
-libs.hibernate_ehcache = "org.hibernate:hibernate-ehcache:${versions.hibernate}"
-libs.ehcache_core = "net.sf.ehcache:ehcache-core:2.6.11"
+
+// Hibernate search
+libs.hibernate_search = "org.hibernate:hibernate-search-orm:${versions.hibernate_search}"
+
+// minimal set of tika-parsers
+libs.apache_tika = dependencies.create("org.apache.tika:tika-parsers:1.4") {
+	exclude group: 'org.gagravarr', module: 'vorbis-java-tika'
+	exclude group: 'edu.ucar', module: 'netcdf'
+	exclude group: 'org.apache.james', module: 'apache-mime4j-core'
+	exclude group: 'org.apache.james', module: 'apache-mime4j-dom'
+	exclude group: 'org.bouncycastle', module: 'bcmail-jdk15'
+	exclude group: 'org.bouncycastle', module: 'bcprov-jdk15'
+	exclude group: 'org.ow2.asm', module: 'asm-debug-all'
+	exclude group: 'com.googlecode.mp4parser', module: 'isoparser'
+	exclude group: 'xerces', module: 'xercesImpl'
+	exclude group: 'rome', module: 'rome'
+	exclude group: 'org.gagravarr', module: 'vorbis-java-core'
+	exclude group: 'org.apache.geronimo.specs', module: 'geronimo-stax-api_1.0_spec'
+}
 
 // flyway
-libs.flywaydb = "org.flywaydb:flyway-core:3.2.1"
+libs.flywaydb = "org.flywaydb:flyway-core:4.1.2"
 
 // eclipselink
-libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.5.2"
+libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.6.4"
 
 // groovy
-libs.groovy = "org.codehaus.groovy:groovy-all:2.4.4:indy"
-libs.groovy_wslite = "com.github.groovy-wslite:groovy-wslite:1.1.2"
+libs.groovy = "org.codehaus.groovy:groovy-all:${versions.groovy}:indy"
+libs.groovy_wslite = dependencies.create("com.github.groovy-wslite:groovy-wslite:1.1.2") { exclude group: "org.codehaus.groovy" }
 
 // jax-rs
 libs.resteasy = [
-	"org.jboss.resteasy:resteasy-jaxrs:3.0.11.Final",
-	"org.jboss.resteasy:resteasy-jackson2-provider:3.0.11.Final",
-	"org.jboss.resteasy:resteasy-servlet-initializer:3.0.11.Final"]
+	"org.jboss.resteasy:resteasy-jaxrs:${versions.resteasy}",
+	"org.jboss.resteasy:resteasy-jackson2-provider:${versions.resteasy}",
+	"org.jboss.resteasy:resteasy-servlet-initializer:${versions.resteasy}",
+]
 
-libs.resteasy_multipart = "org.jboss.resteasy:resteasy-multipart-provider:3.0.11.Final"
+libs.resteasy_multipart = dependencies.create("org.jboss.resteasy:resteasy-multipart-provider:${versions.resteasy}") {
+	exclude module: "resteasy-jaxb-provider"
+	exclude module: "mail", group: "javax.mail"
+}
 
-libs.resteasy_guice = "org.jboss.resteasy:resteasy-guice:3.0.11.Final"
-libs.resteasy_client = "org.jboss.resteasy:resteasy-client:3.0.11.Final"
+libs.resteasy_guice = "org.jboss.resteasy:resteasy-guice:${versions.resteasy}"
+libs.resteasy_client = "org.jboss.resteasy:resteasy-client:${versions.resteasy}"
 libs.resteasy_server = [
-	"org.jboss.resteasy:resteasy-undertow:3.0.11.Final",
-	"io.undertow:undertow-core:1.2.9.Final",
-	"io.undertow:undertow-servlet:1.2.9.Final"]
+	"org.jboss.resteasy:resteasy-undertow:${versions.resteasy}",
+	"io.undertow:undertow-core:1.4.4.Final",
+	"io.undertow:undertow-servlet:1.4.4.Final"]
 
 // jackson
 libs.jackson_libs = [
-	"com.fasterxml.jackson.core:jackson-core:2.5.4",
-	"com.fasterxml.jackson.core:jackson-databind:2.5.4",
-	"com.fasterxml.jackson.core:jackson-annotations:2.5.4",
-	"com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.5.4",
-	"com.fasterxml.jackson.datatype:jackson-datatype-joda:2.5.4",
-	"com.fasterxml.jackson.datatype:jackson-datatype-guava:2.5.4"]
+	"com.fasterxml.jackson.core:jackson-core:${versions.jackson}",
+	"com.fasterxml.jackson.core:jackson-databind:${versions.jackson}",
+	"com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}",
+	"com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:${versions.jackson}",
+	"com.fasterxml.jackson.datatype:jackson-datatype-guava:${versions.jackson}",
+	"com.fasterxml.jackson.module:jackson-module-parameter-names:${versions.jackson}",
+	"com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${versions.jackson}",
+	"com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${versions.jackson}"]
 
 // Apache Shiro
 libs.apache_shiro = [
-	"org.apache.shiro:shiro-core:1.2.3",
-	"org.apache.shiro:shiro-web:1.2.3",
-	"org.apache.shiro:shiro-guice:1.2.3"]
+	"org.apache.shiro:shiro-core:${versions.shiro}",
+	"org.apache.shiro:shiro-web:${versions.shiro}",
+	"org.apache.shiro:shiro-guice:${versions.shiro}"]
 
 // Apache Shiro CAS
 libs.apache_shiro_cas = [
-	"org.apache.shiro:shiro-cas:1.2.3",
+	"org.apache.shiro:shiro-cas:${versions.shiro}",
 	"commons-codec:commons-codec:1.10",
 	"org.opensaml:opensaml:1.1",
 	"org.apache.santuario:xmlsec:1.4.3"]
 
+// Apache DS (for testing only)
+libs.apache_ds = [
+	"org.apache.directory.jdbm:apacheds-jdbm1:2.0.0-M3",
+	dependencies.create("org.apache.directory.server:apacheds-test-framework:2.0.0-M15") {
+		exclude group: "org.apache.directory.jdbm"
+	}
+]
+
 // commons
-libs.commons_logging = "commons-logging:commons-logging:1.1.3"
-libs.commons_cli = "commons-cli:commons-cli:1.2"
+libs.commons_cli = "commons-cli:commons-cli:1.4"
+libs.commons_jxpath = "commons-jxpath:commons-jxpath:1.3"
 
 // BIRT Runtime
-libs.birt_runtime = "org.eclipse.birt.runtime:org.eclipse.birt.runtime:4.4.2"
+libs.birt_runtime = dependencies.create("org.eclipse.birt.runtime:org.eclipse.birt.runtime:4.4.2") {
+	exclude module: "derby"
+	exclude module: "org.apache.batik.pdf" // causing issue with commons-io
+	exclude module: "commons-cli"
+}
 
-// jline
-libs.jline = "jline:jline:2.12"
+// jcommander
+libs.jcommander = "com.beust:jcommander:1.71"
 
 // Quartz Scheduler
-libs.quartz = "org.quartz-scheduler:quartz:2.2.1"
+libs.quartz = dependencies.create("org.quartz-scheduler:quartz:2.2.3") { exclude module: "c3p0" }
 
 // xstream
-libs.xstream = "com.thoughtworks.xstream:xstream:1.4.7"
+libs.xstream = "com.thoughtworks.xstream:xstream:1.4.9"
 
 // opencsv
-libs.opencsv = "net.sf.opencsv:opencsv:2.3"
+libs.opencsv = "com.opencsv:opencsv:3.9"
 
 // jsoup for html parsing & sanitize
-libs.jsoup = "org.jsoup:jsoup:1.8.3"
+libs.jsoup = "org.jsoup:jsoup:1.10.2"
 
 // StringTemplate
-libs.ST4 = "org.antlr:ST4:4.0.7"
+libs.ST4 = "org.antlr:ST4:4.0.8"
+
+// gradle tooling
+libs.gradle_tooling = "org.gradle:gradle-tooling-api:${gradle.gradleVersion}"
 
 // gradle plugins
-libs.plugin_license = "nl.javadude.gradle.plugins:license-gradle-plugin:0.10.0"
-libs.plugin_tomcat = "com.bmuschko:gradle-tomcat-plugin:2.2.2"
+libs.plugin_license = "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0"
+
+// embeded tomcat
+libs.tomcat_embed = [
+	"org.apache.tomcat.embed:tomcat-embed-core:${versions.tomcat_embed}",
+	"org.apache.tomcat.embed:tomcat-embed-jasper:${versions.tomcat_embed}",
+]
+
+// currently deployed on axelor repo
+libs.hotswap_agent = "org.hotswap.agent:hotswap-agent:1.1.0-SNAPSHOT"

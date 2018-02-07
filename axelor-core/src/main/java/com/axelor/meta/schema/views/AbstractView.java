@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -25,9 +25,13 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import com.axelor.app.internal.AppFilter;
+import com.axelor.auth.AuthUtils;
 import com.axelor.db.Query;
 import com.axelor.i18n.I18n;
+import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaView;
+import com.axelor.meta.db.repo.MetaHelpRepository;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -274,5 +278,24 @@ public abstract class AbstractView {
 			return getClass().getAnnotation(JsonTypeName.class).value();
 		} catch(Exception e){}
 		return "unknown";
+	}
+	
+	@XmlTransient
+	@JsonProperty("helpOverride")
+	public List<?> getHelpOverride() {
+		if (AuthUtils.getUser() != null && AuthUtils.getUser().getNoHelp() == Boolean.TRUE) {
+			return null;
+		}
+		final MetaHelpRepository repo = Beans.get(MetaHelpRepository.class);
+		final String lang = AppFilter.getLocale() == null ? "en" : AppFilter.getLocale().getLanguage();
+		List<?> found = repo.all()
+			.filter("self.model = :model AND self.language = :lang and (self.view = :view OR self.view IS NULL)")
+			.bind("model", getModel())
+			.bind("lang", lang)
+			.bind("view", getName())
+			.order("-view")
+			.select("field", "type", "help", "style")
+			.fetch(-1, 0);
+		return found.isEmpty() ? null : found;
 	}
 }

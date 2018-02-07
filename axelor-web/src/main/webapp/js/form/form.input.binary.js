@@ -41,7 +41,7 @@ ui.makeImageURL = makeURL;
 ui.formInput('ImageLink', {
 	css: 'image-item',
 	cssClass: 'from-item image-item',
-
+	metaWidget: true,
 	controller: ['$scope', '$element', '$interpolate', function($scope, $element, $interpolate) {
 
 		$scope.parseText = function(text) {
@@ -227,7 +227,7 @@ ui.formInput('Image', 'ImageLink', {
 		}
 
 		function update(value) {
-			scope.applyLater(function() {
+			scope.$applyAsync(function() {
 				doUpdate(value);
 			});
 		}
@@ -245,7 +245,7 @@ ui.formInput('Image', 'ImageLink', {
 			image.get(0).src = scope.getLink(model.$viewValue);
 		};
 
-		scope.$watch("record.id", function(id, old) {
+		scope.$watch("record.id", function imageRecordIdWatch(id, old) {
 			if (!scope.isReadonly()) {
 				scope.$render_editable();
 			}
@@ -319,7 +319,7 @@ ui.formInput('Binary', {
 				if(scope._model === META_FILE) {
 					record.fileName = file.name;
 				}
-				scope.applyLater(function() {
+				scope.$applyAsync(function() {
 					record.fileType = file.type;
 					record.fileSize = file.size;
 				});
@@ -343,6 +343,7 @@ ui.formInput('BinaryLink', {
 
 	css: 'file-item',
 	cellCss: 'form-item file-item',
+	metaWidget: true,
 
 	link: function(scope, element, attrs, model) {
 

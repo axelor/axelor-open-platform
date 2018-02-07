@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -21,26 +21,35 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
+import com.axelor.common.ResourceUtils;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.Sequence;
+import com.axelor.internal.asm.ClassReader;
+import com.axelor.internal.asm.Opcodes;
+import com.axelor.internal.asm.tree.ClassNode;
+import com.axelor.internal.asm.tree.FieldInsnNode;
+import com.axelor.internal.asm.tree.MethodNode;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * This class can be used to map params to Java bean using reflection. It also
@@ -53,23 +62,29 @@ public class Mapper {
 			.newBuilder()
 			.maximumSize(1000)
 			.weakKeys()
-			.build(new CacheLoader<Class<?>, Mapper>() {
+			.build(CacheLoader.from(Mapper::new));
 
-				@Override
-				public Mapper load(Class<?> key) throws Exception {
-					return new Mapper(key);
-				}
-			});
+	private static final Cache<Method, Annotation[]> ANNOTATION_CACHE = CacheBuilder
+			.newBuilder()
+			.maximumSize(1000)
+			.weakKeys()
+			.build();
 
 	private static final Object[] NULL_ARGUMENTS = {};
+	
+	private static final String PREFIX_COMPUTE = "compute";
+	private static final String PREFIX_SET = "set";
 
-	private Map<String, Method> getters = new HashMap<String, Method>();
-	private Map<String, Method> setters = new HashMap<String, Method>();
+	private Map<String, Method> getters = new HashMap<>(); // field -> getter
+	private Map<String, Method> setters = new HashMap<>(); // field -> setter
+	private Map<String, String> methods = new HashMap<>(); // getter/setter/compute -> field
 
-	private Map<String, Class<?>> types = new HashMap<String, Class<?>>();
-	private Map<String, Property> fields = new HashMap<String, Property>();
+	private Map<String, Class<?>> types = new HashMap<>();
+	private Map<String, Property> fields = new HashMap<>();
 
-	private Set<Property> sequenceFields = new HashSet<Property>();
+	private Map<String, Set<String>> computeDependencies;
+
+	private Set<Property> sequenceFields = new HashSet<>();
 
 	private Property nameField;
 
@@ -81,7 +96,6 @@ public class Mapper {
 		try {
 			BeanInfo info = Introspector.getBeanInfo(beanClass, Object.class);
 			for (PropertyDescriptor descriptor : info.getPropertyDescriptors()) {
-
 				String name = descriptor.getName();
 				Method getter = descriptor.getReadMethod();
 				Method setter = descriptor.getWriteMethod();
@@ -89,6 +103,7 @@ public class Mapper {
 
 				if (getter != null) {
 					getters.put(name, getter);
+					methods.put(getter.getName(), name);
 					try {
 						Property property = new Property(beanClass, name, type,
 								getter.getGenericReturnType(),
@@ -97,21 +112,31 @@ public class Mapper {
 						if (property.isSequence()) {
 							sequenceFields.add(property);
 						}
+						if (property.isVirtual()) {
+							try {
+								final Method compute = beanClass.getDeclaredMethod(PREFIX_COMPUTE
+										+ name.substring(0, 1).toUpperCase()
+										+ name.substring(1));
+								methods.put(compute.getName(), name);
+							} catch (NoSuchMethodException | SecurityException e) {
+							}
+						}
 					} catch(Exception e) {
 						continue;
 					}
 				}
 				if (setter == null) {
 					try {
-						setter = beanClass.getDeclaredMethod(
-								"set" + name.substring(0, 1).toUpperCase()
-									  + name.substring(1), type);
+						setter = beanClass.getDeclaredMethod(PREFIX_SET
+								+ name.substring(0, 1).toUpperCase()
+								+ name.substring(1), type);
 						setter.setAccessible(true);
 					} catch (NoSuchMethodException | SecurityException e) {
 					}
 				}
 				if (setter != null) {
 					setters.put(name, setter);
+					methods.put(setter.getName(), name);
 				}
 				types.put(name, type);
 			}
@@ -119,19 +144,13 @@ public class Mapper {
 		}
 	}
 
-	private static final Cache<Method, Annotation[]> ANNOTATION_CACHE = CacheBuilder
-			.newBuilder()
-			.maximumSize(1000)
-			.weakKeys()
-			.build();
-
 	private Annotation[] getAnnotations(String name, Method method) {
 		Annotation[] found = ANNOTATION_CACHE.getIfPresent(method);
 		if (found != null) {
 			return found;
 		}
 
-		final List<Annotation> all = Lists.newArrayList();
+		final List<Annotation> all = new ArrayList<>();
 		try {
 			final Field field = getField(beanClass, name);
 			for (Annotation a : field.getAnnotations()) {
@@ -198,6 +217,18 @@ public class Mapper {
 	}
 
 	/**
+	 * Get {@link Property} by it's getter, setter or compute method.
+	 * 
+	 * @param method
+	 *            the getter, setter or compute method
+	 * @return the property associated with the method
+	 */
+	public Property getProperty(Method method) {
+		Preconditions.checkNotNull(method);
+		return getProperty(methods.get(method.getName()));
+	}
+
+	/**
 	 * Get the property of the name field.
 	 *
 	 * A name field annotated with {@link NameColumn} or a field with
@@ -224,6 +255,50 @@ public class Mapper {
 	 */
 	public Property[] getSequenceFields() {
 		return sequenceFields.toArray(new Property[]{});
+	}
+	
+	/**
+	 * Find the fields directly accessed by the compute method of the given
+	 * computed property.
+	 * 
+	 * @param property
+	 *            the computed property
+	 * @return set of fields accessed by computed property
+	 */
+	public Set<String> getComputeDependencies(Property property) {
+		Preconditions.checkNotNull(property);
+		if (computeDependencies == null) {
+			computeDependencies = findComputeDependencies();
+		}
+		return computeDependencies.get(property.getName());
+	}
+
+	private Map<String, Set<String>> findComputeDependencies() {
+		final String className = beanClass.getName().replace('.', '/');
+		final ClassReader reader;
+		try {
+			reader = new ClassReader(ResourceUtils.getResourceStream(className + ".class"));
+		} catch (IOException e) {
+			return new HashMap<>();
+		}
+
+		final ClassNode node = new ClassNode();
+		reader.accept(node, 0);
+
+		return ((List<?>) node.methods).stream()
+			.map(m -> (MethodNode) m)
+			.filter(m -> Modifier.isProtected(m.access))
+			.filter(m -> m.name.startsWith(PREFIX_COMPUTE))
+			.filter(m -> methods.containsKey(m.name))
+			.collect(Collectors.toMap(m -> methods.get(m.name), m -> {
+				return Arrays.stream(m.instructions.toArray())
+					.filter(n -> n.getOpcode() == Opcodes.GETFIELD)
+					.filter(n -> n instanceof FieldInsnNode)
+					.map(n -> (FieldInsnNode) n)
+					.filter(n -> !n.name.equals(methods.get(m.name)))
+					.map(n -> n.name)
+					.collect(Collectors.toSet());
+			}));
 	}
 
 	/**
@@ -268,19 +343,15 @@ public class Mapper {
 	 * @return property value
 	 */
 	public Object get(Object bean, String name) {
-
 		Preconditions.checkNotNull(bean);
 		Preconditions.checkNotNull(name);
-
 		Preconditions.checkArgument(beanClass.isInstance(bean));
 		Preconditions.checkArgument(!name.trim().equals(""));
-
-		Method method = getters.get((String) name);
 		try {
-			return method.invoke(bean, NULL_ARGUMENTS);
+			return getters.get((String) name).invoke(bean, NULL_ARGUMENTS);
 		} catch (Exception e) {
+			return null;
 		}
-		return null;
 	}
 
 	/**
@@ -295,28 +366,23 @@ public class Mapper {
 	 * @return old value of the property
 	 */
 	public Object set(Object bean, String name, Object value) {
-
 		Preconditions.checkNotNull(bean);
 		Preconditions.checkNotNull(name);
-
 		Preconditions.checkArgument(beanClass.isInstance(bean));
 		Preconditions.checkArgument(!name.trim().equals(""));
 
-		Object oldValue = get(bean, name);
-		Method method = setters.get(name);
+		final Method method = setters.get(name);
 		if (method == null) {
 			throw new IllegalArgumentException("The bean of type: "
 					+ beanClass.getName() + " has no property called: " + name);
 		}
 
-		Class<?> actualType = method.getParameterTypes()[0];
-		Type genericType = method.getGenericParameterTypes()[0];
-		Annotation[] annotations = getAnnotations(name, method);
-
-		value = Adapter.adapt(value, actualType, genericType, annotations);
-
+		final Object oldValue = get(bean, name);
+		final Class<?> actualType = method.getParameterTypes()[0];
+		final Type genericType = method.getGenericParameterTypes()[0];
+		final Annotation[] annotations = getAnnotations(name, method);
 		try {
-			method.invoke(bean, new Object[] { value });
+			method.invoke(bean, Adapter.adapt(value, actualType, genericType, annotations));
 		} catch (Exception e) {
 			throw new IllegalArgumentException(e);
 		}
@@ -336,21 +402,19 @@ public class Mapper {
 	 * @return an instance of the given class
 	 */
 	public static <T> T toBean(Class<T> klass, Map<String, Object> values) {
-		T bean = null;
+		final T bean;
 		try {
 			bean = klass.newInstance();
-		} catch (Exception ex) {
-			throw new IllegalArgumentException(ex);
+		} catch (Exception e) {
+			throw new IllegalArgumentException(e);
 		}
 		if (values == null || values.isEmpty()) {
 			return bean;
 		}
-		Mapper mapper = Mapper.of(klass);
-		for (String name : values.keySet()) {
-			if (mapper.setters.containsKey(name))
-				mapper.set(bean, name, values.get(name));
-		}
-
+		final Mapper mapper = Mapper.of(klass);
+		values.entrySet().stream()
+			.filter(e -> mapper.setters.containsKey(e.getKey()))
+			.forEach(e -> mapper.set(bean, e.getKey(), e.getValue()));
 		return bean;
 	}
 
@@ -363,15 +427,14 @@ public class Mapper {
 	 * @return a map
 	 */
 	public static Map<String, Object> toMap(Object bean) {
-		if (bean == null) return null;
-
-		Map<String, Object> map = Maps.newHashMap();
-		Mapper mapper = Mapper.of(bean.getClass());
-
-		for(Property p : mapper.getProperties()) {
+		if (bean == null) {
+			return null;
+		}
+		final Map<String, Object> map = new HashMap<>();
+		final Mapper mapper = Mapper.of(bean.getClass());
+		for (Property p : mapper.getProperties()) {
 			map.put(p.getName(), p.get(bean));
 		}
-
 		return map;
 	}
 }

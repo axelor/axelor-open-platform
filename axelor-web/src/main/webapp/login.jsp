@@ -2,7 +2,7 @@
 
     Axelor Business Solutions
 
-    Copyright (C) 2012-2014 Axelor (<http://axelor.com>).
+    Copyright (C) 2012-2016 Axelor (<http://axelor.com>).
 
     This program is free software: you can redistribute it and/or  modify
     it under the terms of the GNU Affero General Public License, version 3,
@@ -20,16 +20,30 @@
 <%@ taglib prefix="x" uri="WEB-INF/axelor.tld" %>
 <%@ page language="java" session="true" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page import="java.util.Calendar"%>
-<%@ page import="java.util.Date"%>
+<%@ page language="java" session="true" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.Map" %>
+<%@page import="java.util.function.Function"%>
 <%@ page import="com.axelor.i18n.I18n" %>
 <%
-String loginTitle = I18n.get("Please sign in");
-String loginRemember = I18n.get("Remember me");
-String loginSubmit = I18n.get("Log in");
 
-String loginUserName = I18n.get("Username");
-String loginPassword = I18n.get("Password");
+Function<String, String> T = new Function<String, String>() {
+  public String apply(String t) {
+    try {
+      return I18n.get(t);
+    } catch (Exception e) {
+      return t; 
+    }
+  }
+};
+
+String loginTitle = T.apply("Please sign in");
+String loginRemember = T.apply("Remember me");
+String loginSubmit = T.apply("Log in");
+
+String loginUserName = T.apply("Username");
+String loginPassword = T.apply("Password");
 
 int year = Calendar.getInstance().get(Calendar.YEAR);
 String copyright = String.format("&copy; 2005 - %s Axelor. All Rights Reserved.", year);
@@ -38,6 +52,11 @@ String loginHeader = "/login-header.jsp";
 if (pageContext.getServletContext().getResource(loginHeader) == null) {
   loginHeader = null;
 }
+
+@SuppressWarnings("all")
+Map<String, String> tenants = (Map) session.getAttribute("tenantMap");
+String tenantId = (String) session.getAttribute("tenantId");
+
 %>
 <!DOCTYPE html>
 <html>
@@ -71,6 +90,16 @@ if (pageContext.getServletContext().getResource(loginHeader) == null) {
                 <span class="add-on"><i class="fa fa-lock"></i></span>
                 <input type="password" id="passwordId" name="password" placeholder="<%= loginPassword %>">
               </div>
+              <% if (tenants != null && tenants.size() > 1) { %>
+              <div class="input-prepend">
+                <span class="add-on"><i class="fa fa-database"></i></span>
+                <select name="tenantId">
+                <% for (String key : tenants.keySet()) { %>
+                	<option value="<%= key %>" <%= (key.equals(tenantId) ? "selected" : "") %>><%= tenants.get(key) %></option>
+                <% } %>
+                </select>
+              </div>
+              <% } %>
               <label class="ibox">
                 <input type="checkbox" value="rememberMe" name="rememberMe">
                 <span class="box"></span>
@@ -78,7 +107,7 @@ if (pageContext.getServletContext().getResource(loginHeader) == null) {
               </label>
             </div>
             <div class="form-footer">
-              <button class="btn btn-success" type="submit"><%= loginSubmit %></button>
+              <button class="btn btn-primary" type="submit"><%= loginSubmit %></button>
             </div>
           </form>
         </div>

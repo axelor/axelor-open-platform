@@ -361,7 +361,7 @@ ui.formInput('DateTime', {
 			}
 		});
 
-		element.on('adjustSize adjustScroll', function (e) {
+		scope.$onAdjust('size scroll', function () {
 			if (isShowing) {
 				input.datepicker('widget').hide();
 				input.datetimepicker('hide');
@@ -373,11 +373,11 @@ ui.formInput('DateTime', {
 				value = input.datetimepicker('getDate') || null,
 				oldValue = scope.getValue() || null;
 
-			if (value && !input.mask("valid")) {
-				return model.$setViewValue(value); // force validation
-			}
 			if (_.isEmpty(masked)) {
 				value = null;
+			}
+			if (!input.mask("valid")) {
+				return model.$setViewValue(value); // force validation
 			}
 
 			value = scope.parse(value);
@@ -387,7 +387,7 @@ ui.formInput('DateTime', {
 			}
 			
 			scope.setValue(value, true);
-			scope.applyLater();
+			scope.$applyAsync();
 		}
 
 		scope.validate = function(value) {
@@ -509,7 +509,7 @@ ui.formInput('Time', 'DateTime', {
 			}
 			
 			scope.setValue(value, true);
-			scope.applyLater();
+			scope.$applyAsync();
 		}
 		
 		scope.$render_editable = function() {
@@ -525,7 +525,7 @@ ui.formInput('Time', 'DateTime', {
 });
 
 ui.formInput('RelativeTime', 'DateTime', {
-	
+	metaWidget: true,
 	init: function(scope) {
 		this._super(scope);
 		
@@ -567,7 +567,7 @@ function formatDuration(field, value) {
 ui.formatDuration = formatDuration;
 	
 ui.formInput('Duration', 'Time', {
-	
+	metaWidget: true,
 	mask: '99:mm',
 	
 	init: function(scope) {

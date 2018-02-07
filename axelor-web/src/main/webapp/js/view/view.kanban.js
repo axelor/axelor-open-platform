@@ -388,13 +388,14 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 			});
 			
 			element.on("click", ".kanban-card", function (e) {
-				if ($(e.target).parents(".kanban-card-menu").size()) {
+				var elem = $(e.target);
+				var selector = '[ng-click],[ui-action-click],button,a,.iswitch,.ibox,.kanban-card-menu';
+				if (elem.is(selector) || element.find(selector).has(elem).length) {
 					return;
 				}
-				var elem = $(this);
-				var record = elem.scope().record;
+				var record = $(this).scope().record;
 				scope.onEdit(record, true);
-				scope.applyLater();
+				scope.$applyAsync();
 			});
 
 			fetch();
@@ -442,15 +443,6 @@ ui.directive('uiCards', function () {
 		scope.handleEmpty = function () {
 			element.toggleClass('empty', scope.isEmpty());
 		};
-
-		element.on("click", ".kanban-card", function (e) {
-			if (element.find('[ng-click],[ui-action-click],button,a,.iswitch,.ibox,.kanban-card-menu').has(e.target).size()) {
-				return;
-			}
-			var record = $(this).scope().record;
-			scope.onEdit(record, true);
-			scope.applyLater();
-		});
 	};
 });
 
@@ -498,7 +490,7 @@ ui.directive('uiCard', ["$compile", function ($compile) {
 				return record;
 			}
 
-			evalScope.$watch("record", function (record) {
+			evalScope.$watch("record", function cardRecordWatch(record) {
 				_.extend(evalScope, process(record));
 			}, true);
 
@@ -528,11 +520,28 @@ ui.directive('uiCard', ["$compile", function ($compile) {
 				}
 			}
 
-			if (scope.schema.cardWidth) {
-				element.parent().css("width", scope.schema.cardWidth);
+			if (scope.schema.width) {
+				element.parent().css("width", scope.schema.width);
+			}
+			if (scope.schema.minWidth) {
+				element.parent().css("min-width", scope.schema.minWidth);
+			}
+			if (scope.schema.maxWidth) {
+				element.parent().css("max-width", scope.schema.maxWidth);
 			}
 
 			element.fadeIn("slow");
+
+			element.on("click", function (e) {
+				var elem = $(e.target);
+				var selector = '[ng-click],[ui-action-click],button,a,.iswitch,.ibox,.kanban-card-menu';
+				if (elem.is(selector) || element.find(selector).has(elem).length) {
+					return;
+				}
+				var record = $(this).scope().record;
+				scope.onEdit(record, true);
+				scope.$applyAsync();
+			});
 		}
 	};
 }]);

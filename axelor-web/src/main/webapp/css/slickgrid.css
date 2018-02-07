@@ -22,6 +22,11 @@
 	border-top: 0 !important;
 }
 
+.slickgrid,
+.slickgrid * {
+    box-sizing: border-box;
+}
+
 .slickgrid .slick-header,
 .slickgrid .slick-header-column {
 	color: #333;
@@ -59,6 +64,7 @@
 
 .slick-row {
 	background: #f9f9f9;
+	border-bottom: 1px solid #e7eaec !important;
 }
 .slick-row.odd {
   	background: #fff;
@@ -70,7 +76,6 @@
 
 .slick-row .slick-cell {
 	border: 0;
-	border-bottom: 1px solid #e7eaec;
 	padding: 2px 8px;
 }
 
@@ -80,8 +85,15 @@
 	height: 100% !important;
 }
 
+.slick-row.selected,
 .slick-row .slick-cell.selected {
   	background-color: #abb9d3;
+}
+
+.slick-row .slick-cell.text,
+.slick-row .slick-cell.html {
+	white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .slick-row .slick-cell.selected.active::after {
@@ -406,7 +418,6 @@
 }
 
 .slick-cell:not(.button) > a {
-	line-height: 24px;
 	color: #0088cc;
 }
 
@@ -436,4 +447,19 @@
 	width: 100%;
 	font-weight: 400;
 	text-align: center;
+}
+
+.slickgrid-empty-message .grid-canvas {
+  box-sizing: border-box;
+}
+
+.slickgrid-overlay {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: #ddd;
+	opacity: 0.25;
+	z-index: 2;
 }

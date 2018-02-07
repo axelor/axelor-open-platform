@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -32,6 +32,8 @@ import javax.xml.bind.JAXBException;
 
 import com.axelor.app.AppSettings;
 import com.axelor.common.StringUtils;
+import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.inject.Beans;
@@ -39,6 +41,7 @@ import com.axelor.meta.MetaScanner;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaField;
+import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
@@ -51,14 +54,12 @@ import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
-
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 
 public class MetaController {
 
@@ -116,6 +117,35 @@ public class MetaController {
 		}
 
 		response.setData(ImmutableList.of(data));
+	}
+
+	/**
+	 * This action is called from custom fields form when context field is changed.
+	 *
+	 */
+	public void contextFieldChange(ActionRequest request, ActionResponse response) {
+		final MetaJsonField jsonField = request.getContext().asType(MetaJsonField.class);
+		final String modelName = jsonField.getModel();
+		final String fieldName = jsonField.getContextField();
+
+		final Class<?> modelClass;
+		try {
+			modelClass = Class.forName(modelName);
+		} catch (ClassNotFoundException e) {
+			// this should not happen
+			response.setException(e);
+			return;
+		}
+
+		final Mapper mapper = Mapper.of(modelClass);
+		final Property property = mapper.getProperty(fieldName);
+		final String target = property == null ? null : property.getTarget().getName();
+		final String targetName = property == null ? null : property.getTargetName();
+
+		response.setValue("contextFieldTarget", target);
+		response.setValue("contextFieldTargetName", targetName);
+		response.setValue("contextFieldValue", null);
+		response.setValue("contextFieldTitle", null);
 	}
 
 	public void clearCache(ActionRequest request, ActionResponse response) {
@@ -228,7 +258,7 @@ public class MetaController {
 				try {
 					exportI18n(module, file);
 				} catch (IOException e) {
-					throw Throwables.propagate(e);
+					throw new RuntimeException(e);
 				}
 			}
 		}

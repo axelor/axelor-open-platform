@@ -97,7 +97,7 @@ var customDirective = ["$compile", function ($compile) {
 
 			function render(template) {
 				var elem = $('<span>' + template.trim() + '</span>');
-				if (elem.children().size() === 1) {
+				if (elem.children().length === 1) {
 					elem = elem.children().first();
 				}
 				if (scope.schema && scope.schema.css) {
@@ -108,7 +108,7 @@ var customDirective = ["$compile", function ($compile) {
 				element.append(elem);
 			}
 
-			var unwatch = scope.$watch('schema.template', function (template) {
+			var unwatch = scope.$watch('schema.template', function customTemplateWatch(template) {
 				if (template) {
 					unwatch();
 					render(template);
@@ -117,7 +117,7 @@ var customDirective = ["$compile", function ($compile) {
 			
 			scope.showToggle = false;
 
-			scope.$watch('data', function (data) {
+			scope.$watch('data', function customDataWatch(data) {
 				evalScope.data = data;
 				evalScope.first = _.first(data);
 			});
@@ -172,17 +172,34 @@ ui.directive('reportTable',  function() {
 			var fields = {};
 			var schema = scope.$parent.$parent.schema;
 
-			(scope.columns||'').split(',').forEach(function (name) {
-				var field = _.findWhere(schema.items, { name: name }) || {};
-				var col = _.extend({}, field, field.widgetAttrs, {
-					name: name,
-					title: _.humanize(name)
+			function makeColumns(names) {
+				cols = [];
+				fields = {};
+				_.each(names, function (name) {
+					var field = _.findWhere(schema.items, { name: name }) || {};
+					var col = _.extend({}, field, field.widgetAttrs, {
+						name: name,
+						title: _.humanize(name)
+					});
+					fields[name] = col;
+					cols.push(col);
 				});
-				fields[name] = col;
-				cols.push(col);
-			});
+				scope.cols = cols;
+			}
 
-			scope.cols = cols;
+			if (scope.columns) {
+				makeColumns((scope.columns||'').split(','));
+			} else {
+				var unwatch = scope.$watch('data', function reportDataWatch(data) {
+					if (data) {
+						unwatch();
+						var first = _.first(data) || {};
+						var names = _.keys(first).filter(function (name) { return name !== '$$hashKey'; });
+						makeColumns(names.sort());
+					}
+				});
+			}
+
 			scope.sums = sums;
 
 			scope.format = function(value, name) {

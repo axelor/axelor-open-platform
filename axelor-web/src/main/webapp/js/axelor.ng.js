@@ -94,10 +94,6 @@
 				}, waitFor);
 			};
 
-			__custom__.applyLater = function applyLater(func, wait) {
-				return this.$timeout(func ||angular.noop, wait);
-			};
-
 			__custom__.$callWhen = function (predicate, callback, wait) {
 				var count = wait || 100;
 
@@ -120,7 +116,25 @@
 				}
 				return $timeout.apply(null, arguments);
 			};
-			
+
+			__custom__.$onAdjust = function (events, handler, wait) {
+				var names = events;
+				if (_.isFunction(names)) {
+					wait = handler;
+					handler = names;
+					names = 'adjust:size';
+				} else {
+					names = names.replace(/(\w+)/g, 'adjust:$1');
+				}
+
+				var func = wait ? _.throttle(handler, wait) : handler;
+
+				$(document).on(names, func);
+				this.$on('$destroy', function () {
+					$(document).off(names, func);
+				});
+			};
+
 			__custom__.$new = function $new() {
 				var inst = __super__.$new.apply(this, arguments);
 				inst.$$watchChecker = this.$$watchChecker;
@@ -163,34 +177,6 @@
 						return previous(self) && checker(self);
 					};
 				}
-			};
-			
-			function debouncedApply(wait) {
-				return _.debounce(__super__.$apply, wait);
-			}
-
-			var $apply1 = _.debounce(__super__.$apply);
-			var $apply2 = _.debounce(__super__.$apply, 100);
-
-			var $debouncedApply = _.debounce(function $debouncedApply() {
-				if ($http === null) {
-					$http = $injector.get('$http');
-				}
-				if ($http.pendingRequests.length) {
-					return $apply2.call(this);
-				}
-				return $apply1.call(this);
-			});
-
-			__custom__.$apply = function $apply() {
-				if (arguments.length === 0) {
-					return $debouncedApply.call(this);
-				}
-				return __super__.$apply.apply(this, arguments);
-			};
-
-			__custom__.$applyNow = function $applyNow() {
-				return __super__.$apply.apply(this, arguments);
 			};
 
 			angular.extend(__orig__, __custom__);

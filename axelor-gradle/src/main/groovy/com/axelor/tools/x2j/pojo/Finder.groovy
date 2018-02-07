@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -76,10 +76,10 @@ class Finder {
 		"Double"	: "Double",
 		"Boolean"	: "Boolean",
 		"String"	: "String",
-		"LocalDate"		: "org.joda.time.LocalDate",
-		"LocalTime"		: "org.joda.time.LocalTime",
-		"LocalDateTime"	: "org.joda.time.LocalDateTime",
-		"DateTime"		: "org.joda.time.DateTime",
+		"LocalDate"		: "java.time.LocalDate",
+		"LocalTime"		: "java.time.LocalTime",
+		"LocalDateTime"	: "java.time.LocalDateTime",
+		"ZonedDateTime"	: "java.time.ZonedDateTime",
 		"BigDecimal"	: "java.math.BigDecimal"
 	]
 

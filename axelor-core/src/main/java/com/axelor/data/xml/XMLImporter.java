@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,9 +18,11 @@
 package com.axelor.data.xml;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +45,7 @@ import com.axelor.data.Listener;
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.db.internal.DBHelper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
@@ -135,15 +138,6 @@ public class XMLImporter implements Importer {
 	public void setCanClear(boolean canClear) {
 		this.canClear = canClear;
 	}
-	
-	private int getBatchSize() {
-		try {
-			Object val = JPA.em().getEntityManagerFactory().getProperties().get("hibernate.jdbc.batch_size");
-			return Integer.parseInt(val.toString());
-		} catch (Exception e) {
-		}
-		return DEFAULT_BATCH_SIZE;
-	}
 
 	@Override
 	public void run() {
@@ -196,7 +190,7 @@ public class XMLImporter implements Importer {
 	private void process(XMLInput input, File file) throws ImportException {
 		try {
 			log.info("Importing: {}", file.getName());
-			this.process(input, new FileReader(file));
+			this.process(input, new InputStreamReader(new FileInputStream(file), Charset.forName("UTF-8")));
 		} catch (IOException e) {
 			throw new ImportException(e);
 		}
@@ -204,7 +198,7 @@ public class XMLImporter implements Importer {
 	
 	private void process(XMLInput input, Reader reader) throws ImportException {
 
-		final int batchSize = getBatchSize();
+		final int batchSize = DBHelper.getJdbcBatchSize();
 
 		final XStream stream = new XStream(new StaxDriver()) {
 

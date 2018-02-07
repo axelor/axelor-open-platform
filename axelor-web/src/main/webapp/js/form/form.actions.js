@@ -50,6 +50,27 @@ function updateValues(source, target, itemScope, formScope) {
 		return;
 	}
 
+	// handle json records
+	if (source && formScope && formScope._model === 'com.axelor.meta.db.MetaJsonRecord') {
+		source = source.attrs ? _.extend({}, JSON.parse(source.attrs), source) : source;
+		delete source.attrs;
+		var fix = function (rec) {
+			if (!rec) return rec;
+			if (_.isArray(rec)) return _.map(rec, fix);
+			if (rec.id > 0 && (rec.version || rec.attrs)) {
+				rec = _.pick(rec, 'id', 'name', 'selected');
+				if (!rec.selected) delete rec.selected;
+			}
+			return rec;
+		}
+
+		_.each(source, function (v, k) {
+			source[k] = fix(v);
+		});
+	} else if (itemScope && itemScope.updateJsonValues) {
+		return itemScope.updateJsonValues(source);
+	}
+
 	function compact(value) {
 		if (!value) return value;
 		if (value.version === undefined) return value;
@@ -676,7 +697,7 @@ ActionHandler.prototype = {
 			axelor.dialogs.box(data.flash || data.info, {
 				onClose: function () {
 					if (data.pending) {
-						scope.applyLater(function(){
+						scope.$applyAsync(function(){
 							if (data.reload) {
 								return doReload(data.pending);
 							}
@@ -696,7 +717,7 @@ ActionHandler.prototype = {
 
 		if(data.error) {
 			axelor.dialogs.error(data.error, function(){
-				scope.applyLater(function(){
+				scope.$applyAsync(function(){
 					if (data.action) {
 						self._handleAction(data.action);
 					}
@@ -708,7 +729,7 @@ ActionHandler.prototype = {
 		
 		if (data.alert) {
 			axelor.dialogs.confirm(data.alert, function(confirmed){
-				scope.applyLater(function(){
+				scope.$applyAsync(function(){
 					if (confirmed) {
 						return deferred.resolve(data.pending);
 					}
@@ -818,6 +839,10 @@ ActionHandler.prototype = {
 				itemScope = item.data('$scope'),
 				hasValues = false,
 				column;
+			
+			if (item.is('[ui-menu-item]')) {
+				itemScope = item.isolateScope();
+			}
 
 			// handle o2m/m2m columns
 			if (item.is('.slick-dummy-column')) {
@@ -896,10 +921,10 @@ ActionHandler.prototype = {
 				case 'title':
 					(function () {
 						var span = $(label).add(item).children('span[ui-help-popover]:first');
-						if (span.size() === 0) {
+						if (span.length === 0) {
 							span = label;
 						}
-						if (span && span.size() > 0) {
+						if (span && span.length > 0) {
 							span.html(value);
 						} else if (item.is('label')) {
 							item.html(value);
@@ -977,7 +1002,7 @@ ActionHandler.prototype = {
 				record.$attachments = (record.$attachments || 0) + 1;
 				axelor.dialogs.confirm(_t('Report attached to current object. Would you like to download?'),
 				function(confirmed) {
-					scope.applyLater(function() {
+					scope.$applyAsync(function() {
 						if (confirmed) {
 							var url = "ws/rest/com.axelor.meta.db.MetaFile/" + data.attached.id + "/content/download";
 							ui.download(url);
@@ -1045,7 +1070,7 @@ ActionHandler.prototype = {
 					var url = view.name || view.resource;
 					var fileName = tab.params.fileName || "true";
 					ui.download(url, fileName);
-					return scope.applyLater();
+					return scope.$applyAsync();
 				}
 			}
 			if (tab.viewType === "html" && (tab.params||{}).target === "_blank") {
@@ -1055,14 +1080,14 @@ ActionHandler.prototype = {
 					setTimeout(function () {
 						window.open(url);
 					});
-					return scope.applyLater();
+					return scope.$applyAsync();
 				}
 			}
 			if ((tab.params && tab.params.popup) || axelor.device.mobile) {
 				tab.$popupParent = formScope;
 			}
 			openTab(scope, tab);
-			scope.applyLater();
+			scope.$applyAsync();
 		}
 		
 		if (data.view) {
@@ -1139,7 +1164,7 @@ ui.directive('uiActionClick', ['ViewService', function(ViewService) {
 				});
 				element.on("click", function () {
 					handler.handle();
-					scope.applyLater();
+					scope.$applyAsync();
 				});
 			});
 		}

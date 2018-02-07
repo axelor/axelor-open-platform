@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -79,10 +79,10 @@ public class I18nBundle extends ResourceBundle {
 		}
 
 		String lang = locale.getLanguage();
-		Query<MetaTranslation> query = Query.of(MetaTranslation.class).filter("self.language = ?", lang).order("id").autoFlush(false);
+		Query<MetaTranslation> query = Query.of(MetaTranslation.class).filter("self.language = ?1", lang).order("id").autoFlush(false);
 		
 		if (query.count() == 0 && lang.length() > 2) {
-			query = Query.of(MetaTranslation.class).filter("self.language = ?", lang.substring(0, 2)).order("id");
+			query = Query.of(MetaTranslation.class).filter("self.language = ?1", lang.substring(0, 2)).order("id");
 		}
 
 		long total = query.count();

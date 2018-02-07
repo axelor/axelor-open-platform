@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,10 +17,16 @@
  */
 package com.axelor.web.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -33,6 +39,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSecurity.AccessType;
@@ -41,6 +48,7 @@ import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
+import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.AbstractWidget;
@@ -49,10 +57,16 @@ import com.axelor.meta.schema.views.Field;
 import com.axelor.meta.schema.views.FormInclude;
 import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.GridView;
+import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.schema.views.Notebook;
+import com.axelor.meta.schema.views.Panel;
+import com.axelor.meta.schema.views.PanelField;
+import com.axelor.meta.schema.views.PanelRelated;
+import com.axelor.meta.schema.views.PanelTabs;
 import com.axelor.meta.schema.views.Search;
 import com.axelor.meta.schema.views.SearchFilters;
 import com.axelor.meta.schema.views.SimpleContainer;
+import com.axelor.meta.schema.views.SimpleWidget;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
@@ -109,25 +123,37 @@ public class ViewService extends AbstractService {
 	@GET
 	@Path("fields/{model}")
 	@SuppressWarnings("all")
-	public Response fields(@PathParam("model") String model) {
+	public Response fields(@PathParam("model") String model, @QueryParam("jsonModel") String jsonModel) {
 		final Response response = new Response();
 		final Map<String, Object> meta = Maps.newHashMap();
 		final Class<?> modelClass = findClass(model);
-		final List<String> names = Lists.newArrayList();
 		
 		if (!security.isPermitted(AccessType.READ, (Class) modelClass)) {
 			response.setStatus(Response.STATUS_FAILURE);
 			return response;
 		}
 		
-		for (Property p : Mapper.of(modelClass).getProperties()) {
-			if (!p.isTransient()) {
-				names.add(p.getName());
-			}
-		}
+		final Map<String, Object> jsonFields = Maps.newHashMap();
+		final List<String> names = Lists.newArrayList();
 
 		meta.put("model", model);
-		meta.putAll(MetaStore.findFields(modelClass, names));
+		meta.put("jsonFields", jsonFields);
+
+		if (StringUtils.isBlank(jsonModel)) {
+			for (Property p : Mapper.of(modelClass).getProperties()) {
+				if (!p.isTransient()) {
+					names.add(p.getName());
+				}
+				if (p.isJson()) {
+					jsonFields.put(p.getName(), MetaStore.findJsonFields(model, p.getName()));
+				}
+			}
+			meta.putAll(MetaStore.findFields(modelClass, names));
+		} else if (MetaJsonRecord.class.getName().equals(model)){
+			names.add("attrs");
+			meta.putAll(MetaStore.findFields(modelClass, names));
+			jsonFields.put("attrs", MetaStore.findJsonFields(jsonModel));
+		}
 
 		response.setData(meta);
 		response.setStatus(Response.STATUS_SUCCESS);
@@ -146,17 +172,55 @@ public class ViewService extends AbstractService {
 		return service.findViews(findClass(model), views);
 	}
 
-	private List<String> findNames(final List<String> names, final AbstractWidget widget) {
+	private Set<String> findNames(final Set<String> names, final AbstractWidget widget) {
 		List<? extends AbstractWidget> all = null;
 		if (widget instanceof Notebook) {
 			all = ((Notebook) widget).getPages();
 		} else if (widget instanceof SimpleContainer) {
 			all = ((SimpleContainer) widget).getItems();
+		} else if (widget instanceof Panel) {
+			all = ((Panel) widget).getItems();
+		} else if (widget instanceof PanelTabs) {
+			all = ((PanelTabs) widget).getItems();
 		} else if (widget instanceof FormInclude) {
 			names.addAll(findNames(((FormInclude) widget).getView()));
 		} else if (widget instanceof Field) {
 			names.add(((Field) widget).getName());
+			if (widget instanceof PanelField) {
+				PanelField field = (PanelField) widget;
+				if (field.getEditor() != null && field.getTarget() == null) {
+					all = field.getEditor().getItems();
+				}
+				if (field.getViewer() != null && field.getTarget() == null) {
+					String depends = field.getViewer().getDepends();
+					if (StringUtils.notBlank(depends)) {
+						Collections.addAll(names, depends.trim().split("\\s*,\\s*"));
+					}
+				}
+			}
+			// include related field for ref-select widget
+			String relatedAttr = ((Field) widget).getRelated();
+			if (StringUtils.notBlank(relatedAttr)) {
+				names.add(relatedAttr);
+			}
+		} else if (widget instanceof PanelRelated) {
+			names.add(((PanelRelated) widget).getName());
 		}
+		
+		if (widget instanceof SimpleWidget) {
+			String depends = ((SimpleWidget) widget).getDepends();
+			if (StringUtils.notBlank(depends)) {
+				Collections.addAll(names, depends.trim().split("\\s*,\\s*"));
+			}
+		}
+
+		if (widget instanceof MenuItem) {
+			String depends = ((MenuItem) widget).getDepends();
+			if (StringUtils.notBlank(depends)) {
+				Collections.addAll(names, depends.trim().split("\\s*,\\s*"));
+			}
+		}
+
 		if (all == null) {
 			return names;
 		}
@@ -166,23 +230,33 @@ public class ViewService extends AbstractService {
 		return names;
 	}
 
-	public List<String> findNames(final AbstractView view) {
-		List<String> names = Lists.newArrayList();
-		List<AbstractWidget> items = null;
+	private Set<String> findNames(final AbstractView view) {
+		final Set<String> names = new HashSet<>();
+		final List<AbstractWidget> items = new ArrayList<>();
+		final Consumer<List<AbstractWidget>> collect = all -> Optional.ofNullable(all).ifPresent(items::addAll);
 		if (view instanceof FormView) {
-			items = ((FormView) view).getItems();
+			FormView form = (FormView) view;
+			collect.accept(form.getItems());
+			if (form.getToolbar() != null) {
+				items.addAll(form.getToolbar());
+			}
+			if (form.getMenubar() != null) {
+				form.getMenubar().stream()
+					.filter(m -> m.getItems() != null)
+					.forEach(m -> collect.accept(m.getItems()));
+			}
 		}
 		if (view instanceof GridView) {
 			GridView grid = (GridView) view;
-			items = grid.getItems();
+			collect.accept(grid.getItems());
 			if ("sequence".equals(grid.getOrderBy())) {
 				names.add("sequence");
 			}
 		}
 		if (view instanceof SearchFilters) {
-			items = ((SearchFilters) view).getItems();
+			collect.accept(((SearchFilters) view).getItems());
 		}
-		if (items == null || items.isEmpty()) {
+		if (items.isEmpty()) {
 			return names;
 		}
 		for (AbstractWidget widget : items) {
@@ -212,7 +286,22 @@ public class ViewService extends AbstractService {
 		
 		final Class<?> modelClass = findClass(model);
 		if (view instanceof AbstractView && modelClass != null) {
-			data.putAll(MetaStore.findFields(modelClass, findNames((AbstractView) view)));
+			final Set<String> names = findNames((AbstractView) view);
+			if (view instanceof FormView || view instanceof GridView) {
+				Mapper mapper = Mapper.of(modelClass);
+				boolean hasJson = names.stream()
+						.map(mapper::getProperty)
+						.filter(Objects::nonNull)
+						.anyMatch(Property::isJson);
+				if (!hasJson && mapper.getProperty("attrs") != null) {
+					Map<String, Object> jsonAttrs = MetaStore.findJsonFields(model, "attrs");
+					if (jsonAttrs != null && jsonAttrs.size() > 0) {
+						names.add("attrs");
+						data.put("jsonAttrs", jsonAttrs.values());
+					}
+				}
+			}
+			data.putAll(MetaStore.findFields(modelClass, names));
 		}
 
 		response.setData(data);

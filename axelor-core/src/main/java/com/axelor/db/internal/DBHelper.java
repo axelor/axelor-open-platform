@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -38,8 +38,7 @@ import org.flywaydb.core.api.FlywayException;
 import org.w3c.dom.Document;
 
 import com.axelor.app.AppSettings;
-import com.axelor.common.ClassUtils;
-import com.google.common.base.Throwables;
+import com.axelor.common.ResourceUtils;
 
 /**
  * This class provides some database helper methods (for internal use only).
@@ -48,6 +47,9 @@ import com.google.common.base.Throwables;
 public class DBHelper {
 
 	private static Boolean unaccentSupport = null;
+	
+	private static final int DEFAULT_BATCH_SIZE = 20;
+	private static final int DEFAULT_FETCH_SIZE = 20;
 
 	private static final String UNACCENT_CHECK = "SELECT unaccent('text')";
 	private static final String UNACCENT_CREATE = "CREATE EXTENSION IF NOT EXISTS unaccent";
@@ -62,11 +64,18 @@ public class DBHelper {
 	private static final String XPATH_PERSISTENCE_URL 		= "properties/property[@name='javax.persistence.jdbc.url']/@value";
 	private static final String XPATH_PERSISTENCE_USER 		= "properties/property[@name='javax.persistence.jdbc.user']/@value";
 	private static final String XPATH_PERSISTENCE_PASSWORD 	= "properties/property[@name='javax.persistence.jdbc.password']/@value";
+	
+	private static final String XPATH_BATCH_SIZE 	= "properties/property[@name='hibernate.jdbc.batch_size']/@value";
+	private static final String XPATH_FETCH_SIZE 	= "properties/property[@name='hibernate.jdbc.fetch_size']/@value";
 
+	private static final String CONFIG_DATASOURCE	= "db.default.datasource";
 	private static final String CONFIG_DRIVER 		= "db.default.driver";
 	private static final String CONFIG_URL 			= "db.default.url";
 	private static final String CONFIG_USER 		= "db.default.user";
 	private static final String CONFIG_PASSWORD 	= "db.default.password";
+	
+	private static final String CONFIG_BATCH_SIZE 	= "hibernate.jdbc.batch_size";
+	private static final String CONFIG_FETCH_SIZE 	= "hibernate.jdbc.fetch_size";
 
 	private static String jndiName;
 	private static String cacheMode;
@@ -75,6 +84,9 @@ public class DBHelper {
 	private static String jdbcUrl;
 	private static String jdbcUser;
 	private static String jdbcPassword;
+
+	private static int jdbcBatchSize;
+	private static int jdbcFetchSize;
 
 	static {
 		initialize();
@@ -99,18 +111,36 @@ public class DBHelper {
 		final XPathFactory xpf = XPathFactory.newInstance();
 		final XPath xpath = xpf.newXPath();
 
+		jndiName		= settings.get(CONFIG_DATASOURCE);
 		jdbcDriver 		= settings.get(CONFIG_DRIVER);
 		jdbcUrl 		= settings.get(CONFIG_URL);
 		jdbcUser 		= settings.get(CONFIG_USER);
 		jdbcPassword 	= settings.get(CONFIG_PASSWORD);
+		
+		jdbcBatchSize	= settings.getInt(CONFIG_BATCH_SIZE, DEFAULT_BATCH_SIZE);
+		jdbcFetchSize	= settings.getInt(CONFIG_FETCH_SIZE, DEFAULT_FETCH_SIZE);
 
 		try (
-			final InputStream res = ClassUtils.getResourceStream("META-INF/persistence.xml")) {
+			final InputStream res = ResourceUtils.getResourceStream("META-INF/persistence.xml")) {
 			final DocumentBuilder db = dbf.newDocumentBuilder();
 			final Document document = db.parse(res);
 
-			jndiName = evaluate(xpath, XPATH_ROOT, XPATH_NON_JTA_DATA_SOURCE, document);
 			cacheMode = evaluate(xpath, XPATH_ROOT, XPATH_SHARED_CACHE_MODE, document);
+			
+			if (isBlank(jndiName)) {
+				try {
+					jdbcBatchSize = Integer.parseInt(evaluate(xpath, XPATH_ROOT, XPATH_BATCH_SIZE, document));
+				} catch (Exception e) {
+				}
+				try {
+					jdbcFetchSize = Integer.parseInt(evaluate(xpath, XPATH_ROOT, XPATH_FETCH_SIZE, document));
+				} catch (Exception e) {
+				}
+			}
+
+			if (isBlank(jndiName)) {
+				jndiName = evaluate(xpath, XPATH_ROOT, XPATH_NON_JTA_DATA_SOURCE, document);
+			}
 
 			if (isBlank(jndiName) && isBlank(jdbcDriver)) {
 				jdbcDriver		= evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_DRIVER, document);
@@ -154,7 +184,7 @@ public class DBHelper {
 		try {
 			Class.forName(jdbcDriver);
 		} catch (Exception e) {
-			throw Throwables.propagate(e);
+			throw new RuntimeException(e);
 		}
 
 		return DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPassword);
@@ -177,6 +207,10 @@ public class DBHelper {
 		}
 		flyway.migrate();
 	}
+	
+	public static String getDataSourceName() {
+		return jndiName;
+	}
 
 	/**
 	 * Check whether non-jta data source is used.
@@ -195,6 +229,34 @@ public class DBHelper {
 		if (cacheMode.equals("ALL")) return true;
 		if (cacheMode.equals("ENABLE_SELECTIVE")) return true;
 		return false;
+	}
+	
+	/**
+	 * Whether using oracle database.
+	 * 
+	 */
+	public static boolean isOracle() {
+		return jdbcDriver != null && jdbcDriver.contains("Oracle");
+	}
+
+	/**
+	 * Get the jdbc batch size configured with
+	 * <code>hibernate.jdbc.batch_size</code> property.
+	 * 
+	 * @return batch size
+	 */
+	public static int getJdbcBatchSize() {
+		return jdbcBatchSize;
+	}
+
+	/**
+	 * Get the jdbc fetch size configured with
+	 * <code>hibernate.jdbc.fetch_size</code> property.
+	 * 
+	 * @return batch size
+	 */
+	public static int getJdbcFetchSize() {
+		return jdbcFetchSize;
 	}
 
 	/**

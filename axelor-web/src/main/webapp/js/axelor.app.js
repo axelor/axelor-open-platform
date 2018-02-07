@@ -77,21 +77,55 @@
 		hideLoading();
 	}
 
-	// screen size detection
-	Object.defineProperty(axelor, 'device', {
-		enumerable: true,
-		get: function () {
-			var device = {
-				small: false,
-				large: false
-			};
-			device.large = $(window).width() > 768;
-			device.small = !device.large;
-			device.mobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(navigator.userAgent);
-			device.webkit = /Webkit/i.test(navigator.userAgent);
-			return device;
+	(function () {
+		// browser detection (adopted from jquery)
+		var ua = navigator.userAgent.toLowerCase();
+		var browser = {};
+		var match =
+			/(chrome)[ \/]([\w.]+)/.exec(ua) ||
+			/(webkit)[ \/]([\w.]+)/.exec(ua) ||
+			/(opera)(?:.*version|)[ \/]([\w.]+)/.exec(ua) ||
+			/(msie) ([\w.]+)/.exec(ua) ||
+			ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua) ||
+			[];
+		
+		var matched = {
+			browser: match[1] || "",
+			version: match[2] || "0"
+		};
+
+		if (matched.name) {
+			browser[matched.browser] = true;
+			browser.version = matched.version;
 		}
-	});
+		if (browser.chrome) {
+	        browser.webkit = true;
+		} else if (browser.webkit) {
+	        browser.safari = true;
+		}
+
+		Object.defineProperty(axelor, 'browser', {
+			enumerable: true,
+			get: function () {
+				return _.extend({}, browser);
+			}
+		});
+
+		// screen size detection
+		Object.defineProperty(axelor, 'device', {
+			enumerable: true,
+			get: function () {
+				var device = {
+					small: false,
+					large: false
+				};
+				device.large = $(window).width() > 768;
+				device.small = !device.large;
+				device.mobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(ua);
+				return device;
+			}
+		});
+	})();
 	
 	axelor.$evalScope = function (scope) {
 
@@ -125,7 +159,44 @@
 		evalScope.$moment = function(d) { return moment(d); };		// moment.js helper
 		evalScope.$number = function(d) { return +d; };				// number helper
 		evalScope.$popup = function() { return scope._isPopup; };	// popup detect
-		evalScope.$iif = function(c, t, f) { return c ? t : f; };
+		evalScope.$iif = function(c, t, f) {
+			console.warn('Use ternary operator instead of $iif() helper.');
+			return c ? t : f;
+		};
+
+		evalScope.$sum = function (items, field, operation, field2) {
+			var total = 0;
+			if (items && items.length) {
+				items.forEach(function (item) {
+					var value = 0;
+					var value2 = 0;
+					if (field in item) {
+						value = +(item[field] || 0);
+					}
+					if (operation && field2 && field2 in item) {
+						value2 = +(item[field2] || 0);
+						switch (operation) {
+						case '*':
+							value = value * value2;
+							break;
+						case '/':
+							value = value2 ? value / value2 : value;
+							break;
+						case '+':
+							value = value + value2;
+							break;
+						case '-':
+							value = value - value2;
+							break;
+						}
+					}
+					if (value) {
+						total += value;
+					}
+				});
+			}
+			return total;
+		};
 
 		// current user and group
 		evalScope.$user = axelor.config['user.login'];
@@ -136,7 +207,15 @@
 				return iter.indexOf(item) > -1;
 			return false;
 		};
-		
+
+		// access json field values
+		evalScope.$json = function (name) {
+			var value = (scope.record || {})[name];
+			if (value) {
+				return angular.fromJson(value);
+			}
+		}
+
 		evalScope.$readonly = scope.isReadonly ? _.bind(scope.isReadonly, scope) : angular.noop;
 		evalScope.$required = scope.isRequired ? _.bind(scope.isRequired, scope) : angular.noop;
 
@@ -157,8 +236,8 @@
 		}
 
 		var evalScope = axelor.$evalScope(scope);
+		evalScope.$context = context;
 		try {
-			evalScope.$context = context;
 			return evalScope.$eval(expr, context);
 		} finally {
 			evalScope.$destroy();
@@ -167,7 +246,7 @@
 	};
 
 	axelor.$adjustSize = _.debounce(function () {
-		$.event.trigger('adjustSize');
+		$(document).trigger('adjust:size');
 	}, 100);
 
 	var module = angular.module('axelor.app', ['axelor.ng', 'axelor.ds', 'axelor.ui', 'axelor.auth']);
@@ -194,6 +273,8 @@
 	}]);
 	
 	module.config(['$httpProvider', function(provider) {
+
+		provider.useApplyAsync(true);
 
 		var toString = Object.prototype.toString;
 
@@ -332,7 +413,25 @@
 			}
 		};
 	}]);
-	
+
+	module.filter('unaccent', function() {
+		var source = 'ąàáäâãåæăćčĉęèéëêĝĥìíïîĵłľńňòóöőôõðøśșşšŝťțţŭùúüűûñÿýçżźž';
+		var target = 'aaaaaaaaaccceeeeeghiiiijllnnoooooooossssstttuuuuuunyyczzz';
+
+		source += source.toUpperCase();
+		target += target.toUpperCase();
+
+		var unaccent = function (text) {
+			return typeof(text) !== 'string' ? text : text.replace(/.{1}/g, function(c) {
+				var i = source.indexOf(c);
+				return i === -1 ? c : target[i];
+			});
+		};
+		return function(input) {
+			return unaccent(input);
+		};
+	});
+
 	module.filter('t', function(){
 		return function(input) {
 			var t = _t || angular.nop;
@@ -356,7 +455,12 @@
 
 		function fetchConfig() {
 			return $http.get('ws/app/info').then(function(response) {
-				_.extend(axelor.config, response.data);
+				var config = _.extend(axelor.config, response.data);
+				$scope.$user.id = config["user.id"];
+				$scope.$user.name = config["user.name"];
+				$scope.$user.image = config["user.image"];
+				config.DEV = config['application.mode'] == 'dev';
+				config.PROD = config['application.mode'] == 'prod'
 			});
 		}
 
@@ -374,9 +478,6 @@
 
 		// load app config
 		fetchConfig().then(function () {
-			$scope.$user.id = axelor.config["user.id"];
-			$scope.$user.name = axelor.config["user.name"];
-			$scope.$user.image = axelor.config["user.image"];
 			openHomeTab();
 		});
 
@@ -412,6 +513,10 @@
 					resizable: false,
 					closeOnEscape: false,
 					zIndex: 100001,
+					show: {
+						effect: 'fade',
+						duration: 300
+					},
 					buttons: [{
 						text: _t("Log in"),
 						'class': 'btn btn-primary',
@@ -443,7 +548,11 @@
 					width: 420,
 					close: function() {
 						$scope.httpError = {};
-						$scope.$apply();
+						$scope.$applyAsync();
+					},
+					show: {
+						effect: 'fade',
+						duration: 300
 					},
 					buttons: [{
 						text: _t("Show Details"),
@@ -451,7 +560,7 @@
 						click: function(){
 							var elem = $(this);
 							$scope.onErrorWindowShow('stacktrace');
-							$scope.$apply(function () {
+							$scope.$applyAsync(function () {
 								setTimeout(function () {
 									var maxHeight = $(document).height() - 132;
 									var height = maxHeight;
@@ -572,8 +681,11 @@
     //trigger adjustSize event on window resize -->
 	$(function(){
 		$(window).resize(function(event){
-			if (!event.isTrigger)
-				$.event.trigger('adjustSize');
+			if (!event.isTrigger) {
+				$(document).trigger('adjust:size');
+			}
+			$('body').toggleClass('device-small', axelor.device.small);
+			$('body').toggleClass('device-mobile', axelor.device.mobile);
 		});
 	});
 

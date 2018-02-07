@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -25,14 +25,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.shiro.guice.web.GuiceShiroFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppModule;
 import com.axelor.app.AppSettings;
 import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
+import com.axelor.db.tenants.PostSessionTenantFilter;
+import com.axelor.db.tenants.PreSessionTenantFilter;
 import com.axelor.meta.MetaScanner;
 import com.axelor.quartz.SchedulerModule;
 import com.axelor.rpc.ObjectMapperProvider;
@@ -42,7 +42,6 @@ import com.axelor.rpc.Response;
 import com.axelor.rpc.ResponseInterceptor;
 import com.axelor.web.servlet.CorsFilter;
 import com.axelor.web.servlet.I18nServlet;
-import com.axelor.web.servlet.InitServlet;
 import com.axelor.web.servlet.NoCacheFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Module;
@@ -58,8 +57,6 @@ import com.google.inject.servlet.ServletModule;
 public class AppServletModule extends ServletModule {
 
 	private static final String DEFAULT_PERSISTANCE_UNIT = "persistenceUnit";
-
-	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private String jpaUnit;
 
@@ -81,7 +78,7 @@ public class AppServletModule extends ServletModule {
 
 	protected void afterConfigureServlets() {
 		// register initialization servlet
-		serve("_init").with(InitServlet.class);
+		serve("__init__").with(AppInitializer.class);
 	}
 
 	@Override
@@ -90,12 +87,6 @@ public class AppServletModule extends ServletModule {
 		// load application settings
 		AppSettings settings = AppSettings.get();
 
-		StringBuilder builder = new StringBuilder("Starting application:");
-		builder.append("\n  ").append("Name: ").append(settings.get("application.name"));
-		builder.append("\n  ").append("Version: ").append(settings.get("application.version"));
-
-		log.info(builder.toString());
-		
 		// some common bindings
 		bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
 
@@ -109,10 +100,14 @@ public class AppServletModule extends ServletModule {
 			protected void configureServlets() {
 				// check for CORS requests earlier
 				filter("*").through(CorsFilter.class);
+				// pre-session tenant filter should be come before PersistFilter
+				filter("*").through(PreSessionTenantFilter.class);
 				// order is important, PersistFilter must come first
 				filter("*").through(PersistFilter.class);
 				filter("*").through(AppFilter.class);
 				filter("*").through(GuiceShiroFilter.class);
+				// pre-session tenant filter should be come after shiro filter
+				filter("*").through(PostSessionTenantFilter.class);
 			}
 		});
 
@@ -148,7 +143,7 @@ public class AppServletModule extends ServletModule {
 
 		// bind all the web service resources
 		for (Class<?> type : MetaScanner
-				.findTypes()
+				.findSubTypesOf(Object.class)
 				.having(Path.class)
 				.having(Provider.class)
 				.any().find()) {

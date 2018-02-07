@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -33,13 +33,16 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
+import java.time.LocalDate;
 
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 
 import com.axelor.app.AppSettings;
+import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
+import com.axelor.db.tenants.TenantResolver;
 import com.axelor.dms.db.DMSFile;
 import com.axelor.dms.db.repo.DMSFileRepository;
 import com.axelor.inject.Beans;
@@ -59,7 +62,9 @@ public class MetaFiles {
 	private static final String DEFAULT_UPLOAD_PATH = "{java.io.tmpdir}/axelor/attachments";
 
 	private static final Path UPLOAD_PATH = Paths.get(AppSettings.get().get("file.upload.dir", DEFAULT_UPLOAD_PATH));
-	private static final Path UPLOAD_PATH_TEMP = UPLOAD_PATH.resolve("tmp");
+	
+	private static final String UPLOAD_NAME_PATTERN = AppSettings.get().get("file.upload.filename.pattern", "auto");
+	private static final String UPLOAD_NAME_PATTERN_AUTO = "auto";
 
 	private static final CopyOption[] COPY_OPTIONS = {
 		StandardCopyOption.REPLACE_EXISTING,
@@ -81,6 +86,26 @@ public class MetaFiles {
 	public MetaFiles(MetaFileRepository filesRepo) {
 		this.filesRepo = filesRepo;
 	}
+	
+	private static Path getUploadPath() {
+		String tenantId = TenantResolver.currentTenantIdentifier();
+		if (StringUtils.isBlank(tenantId)) {
+			return UPLOAD_PATH;
+		}
+		return UPLOAD_PATH.resolve(tenantId);
+	}
+	
+	private static Path getUploadPath(String fileName) {
+		return getUploadPath().resolve(fileName);
+	}
+
+	private static Path getTempPath() {
+		return getUploadPath("tmp");
+	}
+
+	private static Path getTempPath(String fileName) {
+		return getTempPath().resolve(fileName);
+	}
 
 	/**
 	 * Get the actual storage path of the file represented by the give
@@ -92,7 +117,7 @@ public class MetaFiles {
 	 */
 	public static Path getPath(MetaFile file) {
 		Preconditions.checkNotNull(file, "file instance can't be null");
-		return UPLOAD_PATH.resolve(file.getFilePath());
+		return getUploadPath(file.getFilePath());
 	}
 
 	/**
@@ -104,7 +129,7 @@ public class MetaFiles {
 	 */
 	public static Path getPath(String filePath) {
 		Preconditions.checkNotNull(filePath, "file path can't be null");
-		return UPLOAD_PATH.resolve(filePath);
+		return getUploadPath(filePath);
 	}
 
 	/**
@@ -123,8 +148,9 @@ public class MetaFiles {
 	 */
 	public static Path createTempFile(String prefix, String suffix, FileAttribute<?>... attrs) throws IOException {
 		// make sure the upload directories exist
-		Files.createDirectories(UPLOAD_PATH_TEMP);
-		return Files.createTempFile(UPLOAD_PATH_TEMP, prefix, suffix, attrs);
+		Path tmp = getTempPath();
+		Files.createDirectories(tmp);
+		return Files.createTempFile(tmp, prefix, suffix, attrs);
 	}
 
 	/**
@@ -135,7 +161,33 @@ public class MetaFiles {
 	 * @return file path
 	 */
 	public static Path findTempFile(String name) {
-		return UPLOAD_PATH_TEMP.resolve(name);
+		return getTempPath(name);
+	}
+	
+	private String getTargetName(String fileName) {
+		if (UPLOAD_NAME_PATTERN.equals(UPLOAD_NAME_PATTERN_AUTO)) {
+			return fileName;
+		}
+
+		LocalDate date = LocalDate.now();
+		String targetName = UPLOAD_NAME_PATTERN;
+
+		if (targetName.indexOf("{A}") > -1) {
+			targetName = targetName.replace("{A}", fileName.substring(0, 1).toUpperCase());
+		}
+		if (targetName.indexOf("{AA}") > -1) {
+			targetName = targetName.replace("{AA}", fileName.substring(0, Math.min(2, fileName.length())).toUpperCase());
+		}
+		if (targetName.indexOf("{AAA}") > -1) {
+			targetName = targetName.replace("{AAA}", fileName.substring(0, Math.min(3, fileName.length())).toUpperCase());
+		}
+
+		targetName = targetName.replace("{year}", "" + date.getYear());
+		targetName = targetName.replace("{month}", "" + date.getMonthValue());
+		targetName = targetName.replace("{day}", "" + date.getDayOfMonth());
+		targetName = targetName.replace("{name}", fileName);
+		
+		return targetName;
 	}
 
 	private Path getNextPath(String fileName) {
@@ -148,11 +200,12 @@ public class MetaFiles {
 				fileNameExt = fileName.substring(dotIndex);
 				fileNameBase = fileName.substring(0, dotIndex);
 			}
-			String targetName = fileName;
-			Path target = UPLOAD_PATH.resolve(targetName);
+			String targetName = getTargetName(fileName);
+			Path target = getUploadPath(targetName);
+			Path targetDir = target.getParent();
 			while (Files.exists(target)) {
 				targetName = fileNameBase + " (" + counter++ + ")" + fileNameExt;
-				target = UPLOAD_PATH.resolve(targetName);
+				target = targetDir.resolve(targetName);
 			}
 			return target;
 		}
@@ -165,11 +218,11 @@ public class MetaFiles {
 	 *             if an I/O error occurs
 	 */
 	public void clean() throws IOException {
-		if (!Files.isDirectory(UPLOAD_PATH_TEMP)) {
+		if (!Files.isDirectory(getTempPath())) {
 			return;
 		}
 		final long currentTime = System.currentTimeMillis();
-		Files.walkFileTree(UPLOAD_PATH_TEMP, new SimpleFileVisitor<Path>() {
+		Files.walkFileTree(getTempPath(), new SimpleFileVisitor<Path>() {
 			@Override
 			public FileVisitResult visitFile(Path file,
 					BasicFileAttributes attrs) throws IOException {
@@ -191,7 +244,7 @@ public class MetaFiles {
 	 *             if an I/O error occurs
 	 */
 	public void clean(String fileId) throws IOException {
-		Files.deleteIfExists(UPLOAD_PATH_TEMP.resolve(fileId));
+		Files.deleteIfExists(getTempPath(fileId));
 	}
 
 	/**
@@ -225,7 +278,7 @@ public class MetaFiles {
 	 *             if there is any error during io operations
 	 */
 	public File upload(InputStream chunk, long startOffset, long fileSize, String fileId) throws IOException {
-		final Path tmp = UPLOAD_PATH_TEMP.resolve(fileId);
+		final Path tmp = getTempPath(fileId);
 		if ((fileSize > -1 && startOffset > fileSize)
 				|| (Files.exists(tmp) && Files.size(tmp) != startOffset)
 				|| (!Files.exists(tmp) && startOffset > 0)) {
@@ -233,7 +286,7 @@ public class MetaFiles {
 		}
 
 		// make sure the upload directories exist
-		Files.createDirectories(UPLOAD_PATH_TEMP);
+		Files.createDirectories(getTempPath());
 
 		// clean up obsolete temporary files
 		try {
@@ -307,7 +360,7 @@ public class MetaFiles {
 
 		final String fileName = isBlank(metaFile.getFileName()) ? file.getName() : metaFile.getFileName();
 		final String targetName = update ? metaFile.getFilePath() : fileName;
-		final Path path = UPLOAD_PATH.resolve(targetName);
+		final Path path = getUploadPath(targetName);
 		final Path tmp = update ? createTempFile(null, null) : null;
 
 		if (update && Files.exists(path)) {
@@ -318,11 +371,11 @@ public class MetaFiles {
 			final Path source = file.toPath();
 			final Path target = getNextPath(fileName);
 
-			// make sure the upload path exists
-			Files.createDirectories(UPLOAD_PATH);
+			// make sure the target dirs exist
+			Files.createDirectories(target.getParent());
 
 			// if source is in tmp directory, move it otherwise copy
-			if (UPLOAD_PATH_TEMP.equals(source.getParent())) {
+			if (getTempPath().equals(source.getParent())) {
 				Files.move(source, target, MOVE_OPTIONS);
 			} else {
 				Files.copy(source, target, COPY_OPTIONS);
@@ -336,7 +389,7 @@ public class MetaFiles {
 				metaFile.setFileType(Files.probeContentType(target));
 			}
 			metaFile.setFileSize(Files.size(target));
-			metaFile.setFilePath(target.toFile().getName());
+			metaFile.setFilePath(getUploadPath().relativize(target).toString());
 
 			try {
 				return filesRepo.save(metaFile);
@@ -544,7 +597,7 @@ public class MetaFiles {
 
 		files.remove(metaFile);
 
-		Path target = UPLOAD_PATH.resolve(metaFile.getFilePath());
+		Path target = getUploadPath(metaFile.getFilePath());
 		Files.deleteIfExists(target);
 	}
 
@@ -561,7 +614,8 @@ public class MetaFiles {
 		Preconditions.checkNotNull(metaFile);
 		MetaFileRepository files = Beans.get(MetaFileRepository.class);
 
-		Path target = UPLOAD_PATH.resolve(metaFile.getFilePath());
+		Path target = getUploadPath(metaFile.getFilePath());
+
 		files.remove(metaFile);
 
 		Files.deleteIfExists(target);
@@ -569,6 +623,9 @@ public class MetaFiles {
 
 	public String fileTypeIcon(MetaFile file) {
 		String fileType = file.getFileType();
+		if (fileType == null) {
+			return "fa-file-o";
+		}
 		switch (fileType) {
 		case "application/msword":
 		case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":

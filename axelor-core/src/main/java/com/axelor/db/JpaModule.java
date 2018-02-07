@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,20 +17,32 @@
  */
 package com.axelor.db;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Inject;
 
+import org.hibernate.MultiTenancyStrategy;
+import org.hibernate.cache.ehcache.EhCacheRegionFactory;
+import org.hibernate.cache.jcache.JCacheRegionFactory;
+import org.hibernate.cfg.Environment;
+import org.hibernate.hikaricp.internal.HikariCPConnectionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.app.AppSettings;
-import com.axelor.common.ClassUtils;
+import com.axelor.auth.AuditInterceptor;
 import com.axelor.common.StringUtils;
+import com.axelor.db.hibernate.dialect.CustomDialectResolver;
+import com.axelor.db.hibernate.naming.ImplicitNamingStrategyImpl;
+import com.axelor.db.hibernate.naming.PhysicalNamingStrategyImpl;
 import com.axelor.db.internal.DBHelper;
+import com.axelor.db.search.SearchMappingFactory;
+import com.axelor.db.search.SearchModule;
+import com.axelor.db.tenants.TenantConnectionProvider;
+import com.axelor.db.tenants.TenantModule;
+import com.axelor.db.tenants.TenantResolver;
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.PersistService;
 import com.google.inject.persist.jpa.JpaPersistModule;
@@ -62,11 +74,11 @@ public class JpaModule extends AbstractModule {
 	 * Create new instance of the {@link JpaModule} with the given persistence
 	 * unit name.
 	 *
-	 * If <i>autoscan</i> is true then a custom Hibernate scanner will be used to scan
-	 * all the classpath entries for Entity classes.
+	 * If <i>autoscan</i> is true then a custom Hibernate scanner will be used
+	 * to scan all the classpath entries for Entity classes.
 	 *
-	 * If <i>autostart</i> is true then the {@link PersistService} will be started
-	 * automatically.
+	 * If <i>autostart</i> is true then the {@link PersistService} will be
+	 * started automatically.
 	 *
 	 * @param jpaUnit
 	 *            the persistence unit name
@@ -112,41 +124,50 @@ public class JpaModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		log.info("Configuring JPA...");
-		Properties properties = new Properties();
+		log.debug("Configuring database...");
+		
+		final AppSettings settings = AppSettings.get();
+		final Properties properties = new Properties();
+
 		if (this.properties != null) {
 			properties.putAll(this.properties);
 		}
 		if (this.autoscan) {
-			properties.put("hibernate.ejb.resource_scanner", "com.axelor.db.JpaScanner");
+			properties.put(Environment.SCANNER, JpaScanner.class.getName());
 		}
-		
-		properties.put("hibernate.ejb.interceptor", "com.axelor.auth.AuditInterceptor");
 
-		properties.put("hibernate.connection.autocommit", "false");
-		properties.put("hibernate.id.new_generator_mappings", "true");
-		properties.put("hibernate.ejb.naming_strategy", "org.hibernate.cfg.ImprovedNamingStrategy");
-		properties.put("hibernate.connection.charSet", "UTF-8");
-		properties.put("hibernate.max_fetch_depth", "3");
+		properties.put(Environment.INTERCEPTOR, AuditInterceptor.class.getName());
+		properties.put(Environment.USE_NEW_ID_GENERATOR_MAPPINGS, "true");
+		properties.put(Environment.IMPLICIT_NAMING_STRATEGY, ImplicitNamingStrategyImpl.class.getName());
+		properties.put(Environment.PHYSICAL_NAMING_STRATEGY, PhysicalNamingStrategyImpl.class.getName());
+		properties.put(Environment.DIALECT_RESOLVERS, CustomDialectResolver.class.getName());
 
-		properties.put("jadira.usertype.autoRegisterUserTypes", "true");
-		properties.put("jadira.usertype.databaseZone", "jvm");
+		properties.put(Environment.AUTOCOMMIT, "false");
+		properties.put(Environment.CONNECTION_PROVIDER_DISABLES_AUTOCOMMIT, "true");
+		properties.put(Environment.MAX_FETCH_DEPTH, "3");
 
-		if (DBHelper.isCacheEnabled()) {
-			properties.put("hibernate.cache.use_second_level_cache", "true");
-			properties.put("hibernate.cache.use_query_cache", "true");
-			properties.put("hibernate.cache.region.factory_class", "org.hibernate.cache.ehcache.EhCacheRegionFactory");
-			try {
-				updateCacheProperties(properties);
-			} catch (Exception e) {
-			}
-		}
-		
+		// Use HikariCP as default pool provider
+		properties.put(Environment.CONNECTION_PROVIDER, HikariCPConnectionProvider.class.getName());
+		properties.put("hibernate.hikari.minimumIdle", "5");
+		properties.put("hibernate.hikari.maximumPoolSize", "20");
+		properties.put("hibernate.hikari.idleTimeout", "300000");
+
+		// update properties with all hibernate.* settings from app configuration
+		settings.getProperties().stringPropertyNames().stream()
+			.filter(n -> n.startsWith("hibernate."))
+			.forEach(n -> properties.put(n, settings.get(n)));
+
+		configureCache(settings, properties);
+		configureMultiTenancy(settings, properties);
+		configureSearch(settings, properties);
+
 		try {
-			updatePersistenceProperties(properties);
+			configureConnection(settings, properties);
 		} catch (Exception e) {
 		}
-		
+
+		install(new SearchModule());
+		install(new TenantModule());
 		install(new JpaPersistModule(jpaUnit).properties(properties));
 		if (this.autostart) {
 			bind(Initializer.class).asEagerSingleton();
@@ -154,23 +175,21 @@ public class JpaModule extends AbstractModule {
 		bind(JPA.class).asEagerSingleton();
 	}
 
-	private Properties updatePersistenceProperties(Properties properties) {
-
+	private void configureConnection(final AppSettings settings, final Properties properties) {
 		if (DBHelper.isDataSourceUsed()) {
-			return properties;
+			properties.put(Environment.DATASOURCE, DBHelper.getDataSourceName());
+			return;
 		}
 
-		final AppSettings settings = AppSettings.get();
 		final Map<String, String> keys = new HashMap<>();
 		final String unit = jpaUnit.replaceAll("(PU|Unit)$", "").replaceAll("^persistence$", "default");
 
-		keys.put("db.%s.dialect", "hibernate.dialect");
-		keys.put("db.%s.driver", "javax.persistence.jdbc.driver");
-		keys.put("db.%s.ddl", "hibernate.hbm2ddl.auto");
-		keys.put("db.%s.url", "javax.persistence.jdbc.url");
-		keys.put("db.%s.user", "javax.persistence.jdbc.user");
-		keys.put("db.%s.password", "javax.persistence.jdbc.password");
-
+		keys.put("db.%s.ddl", Environment.HBM2DDL_AUTO);
+		keys.put("db.%s.driver", Environment.JPA_JDBC_DRIVER);
+		keys.put("db.%s.url", Environment.JPA_JDBC_URL);
+		keys.put("db.%s.user", Environment.JPA_JDBC_USER);
+		keys.put("db.%s.password", Environment.JPA_JDBC_PASSWORD);
+		
 		for (String key : keys.keySet()) {
 			String name = keys.get(key);
 			String value = settings.get(String.format(key, unit));
@@ -178,32 +197,61 @@ public class JpaModule extends AbstractModule {
 				properties.put(name, value.trim());
 			}
 		}
-		
-		return properties;
 	}
-	
-	private Properties updateCacheProperties(Properties properties) throws IOException {
-		final Properties config = new Properties();
-		config.load(ClassUtils.getResourceStream("ehcache-objects.properties"));
 
-		for (Object key : config.keySet()) {
-			String name = (String) key;
-			String value = config.getProperty((String) name).trim();
-			String prefix = "hibernate.ejb.classcache";
-			if (!Character.isUpperCase(name.charAt(name.lastIndexOf(".") + 1))) {
-				prefix = "hibernate.ejb.collectioncache";
-			}
-			properties.put(prefix + "." + name, value);
+	private void configureCache(final AppSettings settings, final Properties properties) {
+		if (!DBHelper.isCacheEnabled()) {
+			return;
 		}
 
-		return properties;
+		properties.put(Environment.USE_SECOND_LEVEL_CACHE, "true");
+		properties.put(Environment.USE_QUERY_CACHE, "true");
+
+		final String jcacheProvider = settings.get(JCacheRegionFactory.PROVIDER);
+		final String jcacheConfig = settings.get(JCacheRegionFactory.CONFIG_URI);
+
+		if (jcacheProvider != null) {
+			// use jcache
+			properties.put(Environment.CACHE_REGION_FACTORY, JCacheRegionFactory.class.getName());
+			properties.put(JCacheRegionFactory.PROVIDER, jcacheProvider);
+			properties.put(JCacheRegionFactory.CONFIG_URI, jcacheConfig);
+		} else {
+			// use ehcache
+			properties.put(Environment.CACHE_REGION_FACTORY, EhCacheRegionFactory.class.getName());
+		}
+	}
+
+	private void configureMultiTenancy(final AppSettings settings, final Properties properties) {
+		// multi-tenancy support
+		if (TenantModule.isEnabled()) {
+			properties.put(Environment.MULTI_TENANT, MultiTenancyStrategy.DATABASE.name());
+			properties.put(Environment.MULTI_TENANT_CONNECTION_PROVIDER, TenantConnectionProvider.class.getName());
+			properties.put(Environment.MULTI_TENANT_IDENTIFIER_RESOLVER, TenantResolver.class.getName());
+		}
+	}
+
+	private void configureSearch(final AppSettings settings, final Properties properties) {
+		// hibernate-search support
+		if (!SearchModule.isEnabled()) {
+			properties.put(org.hibernate.search.cfg.Environment.AUTOREGISTER_LISTENERS, "false");
+			properties.remove(SearchModule.CONFIG_DIRECTORY_PROVIDER);
+		} else {
+			if (properties.getProperty(SearchModule.CONFIG_DIRECTORY_PROVIDER) == null) {
+				properties.setProperty(SearchModule.CONFIG_DIRECTORY_PROVIDER, SearchModule.DEFAULT_DIRECTORY_PROVIDER);
+			}
+			if (properties.getProperty(SearchModule.CONFIG_INDEX_BASE) == null) {
+				properties.setProperty(SearchModule.CONFIG_INDEX_BASE,
+						settings.getPath(SearchModule.CONFIG_INDEX_BASE, SearchModule.DEFAULT_INDEX_BASE));
+			}
+			properties.put(org.hibernate.search.cfg.Environment.MODEL_MAPPING, SearchMappingFactory.class.getName());
+		}
 	}
 
 	public static class Initializer {
 
 		@Inject
 		Initializer(PersistService service) {
-			log.info("Initialize JPA...");
+			log.debug("Starting database service...");
 			service.start();
 		}
 	}

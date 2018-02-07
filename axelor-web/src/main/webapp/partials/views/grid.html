@@ -1,4 +1,4 @@
-<div class="grid-view" ng-controller="GridViewCtrl" ui-tab-gate>
+<div class="grid-view" ng-controller="GridViewCtrl" ui-tab-gate ng-class="{'has-details-view': canShowDetailsView() }">
   <div class="navbar record-toolbar">
     <div class="navbar-inner">
       <div class="container" ui-toolbar-adjust>
@@ -13,21 +13,19 @@
           <button class="btn hidden-phone" ng-click="onSave()" ng-if="hasButton('save') && canEditInline()" ng-disabled="!canSave()" title="{{ 'Save' | t}}">
             <i class="fa fa-floppy-o"></i> <span ng-if="::!tbTitleHide" x-translate>Save</span>
           </button>
-          <button class="btn" ng-click="onDelete()" ng-if="hasButton('delete')" ng-disabled="!canDelete()" title="{{ 'Delete' | t}}">
-            <i class="fa fa-trash-o"></i> <span ng-if="::!tbTitleHide" x-translate>Delete</span>
-          </button>
+          <button ui-delete-button></button>
           <button class="btn" ng-if="hasHelp()" ng-click="onShowHelp()"><i class="fa fa-info-circle"></i></button>
           <button class="btn" ng-click="onRefresh()" ng-if="hasButton('refresh')" title="{{ 'Refresh' | t}}">
             <i class="fa fa-refresh"></i> <span ng-if="::!tbTitleHide" x-translate>Refresh</span>
           </button>
+          <span ui-top-help></span>
         </div>
-        <div class="btn-group view-toolbar" ng-if="toolbar" style="display: none;">
+        <div class="btn-group view-toolbar" ng-if="toolbar.length" style="display: none;">
           <button ng-repeat="btn in toolbar | filter:{custom: true}" class="btn" ui-tool-button="btn">{{btn.title}}</button>
         </div>
-        <div ui-menu-bar x-menus="menubar" x-handler="this" ng-show="menubar"></div>
-        <div ui-filter-box x-handler="this"></div>
         <div ui-menu-bar x-menus="toolbarAsMenu" x-handler="this" class="view-toolbar-mobile" style="visibility: hidden;"></div>
-        <div ui-menu-bar x-menus="menubarAsMenu" x-handler="this" class="view-menubar-mobile" style="visibility: hidden;"></div>
+        <div ui-menu-bar x-menus="menubar" x-handler="this" class="view-menubar" ng-show="menubar"></div>
+        <div ui-filter-box x-handler="this"></div>
         <div class="record-toolbar-right">
           <div ui-view-customize class="pull-right"></div>
           <div ui-view-switcher class="pull-right"></div>
@@ -40,4 +38,5 @@
     <h3>{{schema.title}}</h3>
   </div>
   <div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this"></div>
+  <div ui-view-details ui-tab-gate ng-if="canShowDetailsView()"></div>
 </div>

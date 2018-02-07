@@ -31,8 +31,8 @@ ui.directive('uiNavTabs', function() {
 				return elem.parent().addClass("view-tabs-single");
 			}
 
-			scope.$watch('tabs.length', function(value, oldValue){
-				if (value != oldValue) $.event.trigger('adjust');
+			scope.$watch('tabs.length', function navTabsWatch(value, oldValue){
+				if (value != oldValue) elem.trigger('adjust:tabs');
 			});
 
 			var menu = $();

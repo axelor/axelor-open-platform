@@ -1,7 +1,7 @@
-/**
+/*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2017 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,12 +18,11 @@
 package com.axelor.data;
 
 import java.lang.reflect.Method;
-
-import org.joda.time.LocalDateTime;
+import java.time.LocalDateTime;
 
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.auth.db.User;
-import com.axelor.db.mapper.types.JodaAdapter;
+import com.axelor.db.mapper.types.JavaTimeAdapter;
 
 public class AuditHelper {
 
@@ -42,13 +41,13 @@ public class AuditHelper {
 	private static Method updatedOn;
 	private static Method updatedBy;
 
-	private static JodaAdapter adapter;
+	private static JavaTimeAdapter adapter;
 
 	private AuditHelper() {
 	}
 
 	private static void init() {
-		adapter = new JodaAdapter();
+		adapter = new JavaTimeAdapter();
 		try {
 			createdOn = AuditableModel.class.getDeclaredMethod(SET_CREATED_ON, LocalDateTime.class);
 			createdBy = AuditableModel.class.getDeclaredMethod(SET_CREATED_BY, User.class);
