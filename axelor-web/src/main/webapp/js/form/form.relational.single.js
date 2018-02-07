@@ -392,18 +392,18 @@ ui.formInput('ManyToOne', 'Select', {
 		input.on("blur", function () {
 			input.attr('placeholder', field.placeholder || '');
 		});
-
-		input.on("input", function () {
+		
+		function validateSearch() {
 			var my = input.val() || '';
 			var text = scope.text || '';
 			var invalid = my && my !== text;
 			scope.setValidity('search', !invalid);
-		});
-		scope.$watch("text", function (text) {
-			var my = input.val() || '';
-			var invalid = my && my !== text;
-			scope.setValidity('search', !invalid);
-		});
+		}
+
+		input.on("input", validateSearch);
+		scope.$on("on:edit", validateSearch);
+		scope.$on("on:new", validateSearch);
+		scope.$watch("text", validateSearch);
 
 		scope.loadSelection = function(request, response) {
 
