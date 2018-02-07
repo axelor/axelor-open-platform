@@ -393,6 +393,18 @@ ui.formInput('ManyToOne', 'Select', {
 			input.attr('placeholder', field.placeholder || '');
 		});
 
+		input.on("input", function () {
+			var my = input.val() || '';
+			var text = scope.text || '';
+			var invalid = my && my !== text;
+			scope.setValidity('search', !invalid);
+		});
+		scope.$watch("text", function (text) {
+			var my = input.val() || '';
+			var invalid = my && my !== text;
+			scope.setValidity('search', !invalid);
+		});
+
 		scope.loadSelection = function(request, response) {
 
 			if (!scope.canSelect()) {
@@ -403,10 +415,17 @@ ui.formInput('ManyToOne', 'Select', {
 				var term = request.term;
 				
 				if (scope.canSelect() && (items.length < page.total || (request.term && items.length === 0))) {
-					items.push({
-						label: _t("Search more..."),
-						click: function() { scope.showSelector(); }
-					});
+					if (items.length === 0) {
+						items.push({
+							label: _t("No results found"),
+							click: function() {}
+						});
+					} else {
+						items.push({
+							label: _t("Search more..."),
+							click: function() { scope.showSelector(); }
+						});
+					}
 				}
 				
 				if (field.create && term && scope.canNew()) {
@@ -489,16 +508,17 @@ ui.formInput('ManyToOne', 'Select', {
 				var data = item ? item.data('ui-autocomplete-item') : null;
 				if (data) {
 					input.autocomplete('close');
-					scope.select(data.value);
+					if (data.click) {
+						data.click.call(scope);
+					} else {
+						scope.select(data.value);
+					}
 				}
 			}
 		};
 
 		scope.handleSelect = function(e, ui) {
 			if (ui.item.click) {
-				setTimeout(function(){
-					input.val("");
-				});
 				ui.item.click.call(scope);
 			} else {
 				scope.select(ui.item.value);
