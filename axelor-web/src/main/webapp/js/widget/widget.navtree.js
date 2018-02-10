@@ -149,9 +149,7 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 			};
 			
 			MenuService.updateTabStyle = function (tab) {
-				$scope.ajaxStop(function () {
-					updateTabStyle(tab);
-				});
+				updateTabStyle(tab);
 			};
 		}],
 		link: function (scope, element, attrs, ctrl) {
