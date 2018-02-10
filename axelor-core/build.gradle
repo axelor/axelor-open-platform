@@ -57,5 +57,4 @@ dependencies {
 	compile libs.jcommander
 
 	testCompile libs.greenmail
-	testCompile libs.apache_ds
 }
