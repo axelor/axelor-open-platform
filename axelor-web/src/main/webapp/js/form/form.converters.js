@@ -22,6 +22,14 @@
 	var ui = angular.module('axelor.ui');
 
 	ui.formatters = {
+			
+		"string": function(field, value, context) {
+			if (field.translatable && value && context) {
+				var key = '$t:' + field.name;
+				return context[key] || value;
+			}
+			return value;
+		},
 
 		"integer": function(field, value) {
 			return value;
@@ -110,8 +118,9 @@
 		return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 	};
 
-	ui.formatters.$fmt = function (scope, fieldName, fieldValue) {
-		var value = arguments.length === 2 ? (scope.record || {})[fieldName] : fieldValue;
+	ui.formatters.$fmt = function (scope, fieldName, fieldValue, record) {
+		var context = record || scope.record || {};
+		var value = arguments.length === 2 ? context[fieldName] : fieldValue;
 		if (value === undefined || value === null) {
 			return "";
 		}
@@ -122,7 +131,7 @@
 		var type = field.selection ? "selection" : field.type;
 		var formatter = ui.formatters[type];
 		if (formatter) {
-			return formatter(field, value);
+			return formatter(field, value, context);
 		}
 		return value;
 	};
