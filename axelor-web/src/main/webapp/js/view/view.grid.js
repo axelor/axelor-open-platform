@@ -649,15 +649,26 @@ function GridViewCtrl($scope, $element) {
 			return _getContext();
 		}
 
-		var dataView = $scope.dataView,
-			selected = _.map($scope.selection || [], function(index) {
-				return dataView.getItem(index);
-			});
-		return {
-			'_ids': _.pluck(selected || [], "id")
-		};
+		var dataView = $scope.dataView;
+		var selected = _.map($scope.selection || [], function(index) {
+			return dataView.getItem(index).id;
+		});
+
+		return selected.length ? { _ids: selected } : {};
 	};
-	
+
+	$scope.getActionData = function() {
+		// ignore if nested grid or has selected rows
+		if (_getContext || !_.isEmpty($scope.selection)) {
+			return false;
+		}
+		return _.extend({
+			_domain: ds._lastDomain,
+			_domainContext: ds._lastContext,
+			_archived: ds._showArchived
+		}, ds._filter);
+	};
+
 	$scope.onSave = function() {
 		if ($scope.$details) {
 			$scope.$details.onSave();

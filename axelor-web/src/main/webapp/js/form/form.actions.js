@@ -622,7 +622,12 @@ ActionHandler.prototype = {
 		}
 
 		var model = context._model || scope._model;
-		var promise = this.ws.action(action, model, context).then(function(response){
+		var data =  scope.getActionData ? scope.getActionData() : null;
+		if (data && context._signal) {
+			data._signal = context._signal;
+		}
+
+		var promise = this.ws.action(action, model, context, data).then(function(response){
 			var resp = response.data,
 				data = resp.data || [];
 			if (resp.errors) {

@@ -746,17 +746,13 @@
 			return $q.defer();
 		};
 
-		ViewService.prototype.action = function(action, model, context) {
-
-			var ctx = _.extend({
-				_model: model
-			}, context);
+		ViewService.prototype.action = function(action, model, context, data) {
 
 			var params = {
 				model: model,
 				action: action,
-				data: {
-					context: ctx
+				data: data || {
+					context: _.extend({ _model: model }, context)
 				}
 			};
 

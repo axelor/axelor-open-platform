@@ -120,6 +120,14 @@ function BaseCardsCtrl(type, $scope, $element) {
 		var fields = _.pluck($scope.fields, 'name');
 		return ds.prev(fields).success(update);
 	};
+
+	$scope.getActionData = function() {
+		return _.extend({
+			_domain: ds._lastDomain,
+			_domainContext: ds._lastContext,
+			_archived: ds._showArchived
+		}, ds._filter);
+	};
 }
 
 ui.controller("CardsCtrl", ['$scope', '$element', function CardsCtrl($scope, $element) {
