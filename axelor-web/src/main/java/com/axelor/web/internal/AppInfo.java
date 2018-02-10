@@ -126,10 +126,25 @@ public class AppInfo {
 		return map;
 	}
 
+	public String getStyle() {
+		if (SETTINGS.get("context.appStyle") != null) {
+			final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
+			final ScriptHelper helper = new CompositeScriptHelper(bindings);
+			try {
+				Object style = helper.eval("__config__.appStyle");
+				if (style instanceof String) {
+					return style.toString();
+				}
+			} catch (Exception e) {
+			}
+		}
+		return null;
+	}
+
 	public String getLogo() throws JspException, IOException {
 		final String logo = SETTINGS.get("application.logo", "img/axelor-logo.png");
 		if (SETTINGS.get("context.appLogo") != null) {
-			final ScriptBindings bindings = new ScriptBindings(new HashMap<String, Object>());
+			final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
 			final ScriptHelper helper = new CompositeScriptHelper(bindings);
 			try {
 				return getLink(helper.eval("__config__.appLogo"), logo);

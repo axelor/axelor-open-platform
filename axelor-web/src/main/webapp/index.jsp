@@ -35,6 +35,7 @@ String appName = settings.get("application.name", "My App");
 String appDesc = settings.get("application.description", null);
 String appHome = settings.get("application.home", "");
 String appLogo = info.getLogo();
+String appStyle = info.getStyle();
 String appAuthor = settings.get("application.author", "");
 String appTheme = info.getTheme();
 String appMenu = settings.get("application.menu", "both");
@@ -78,6 +79,11 @@ String tenantId = (String) session.getAttribute("tenantId");
     <x:style src="css/application.css" />
     <% if (appTheme != null) { %>
     <link href="css/<%= appTheme %>/theme.css" rel="stylesheet">
+    <% } %>
+    <% if (appStyle != null) { %>
+    <style>
+    <%= appStyle %>
+    </style>
     <% } %>
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="ico/favicon.ico">
