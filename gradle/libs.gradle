@@ -156,13 +156,6 @@ libs.apache_shiro = [
 	"org.apache.shiro:shiro-web:${versions.shiro}",
 	"org.apache.shiro:shiro-guice:${versions.shiro}"]
 
-// Apache Shiro CAS
-libs.apache_shiro_cas = [
-	"org.apache.shiro:shiro-cas:${versions.shiro}",
-	"commons-codec:commons-codec:1.10",
-	"org.opensaml:opensaml:1.1",
-	"org.apache.santuario:xmlsec:1.4.3"]
-
 // Apache DS (for testing only)
 libs.apache_ds = [
 	"org.apache.directory.jdbm:apacheds-jdbm1:2.0.0-M3",
