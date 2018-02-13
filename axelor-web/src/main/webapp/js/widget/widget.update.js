@@ -37,8 +37,8 @@ ui.directive('uiDeleteButton', [function () {
 					"<i class='fa fa-caret-down'></i>" +
 				"</button>" +
 				"<ul class='dropdown-menu' ng-if='hasButton(\"archive\")'>" +
-					"<li><a href='' ng-click='onArchive()'>Archive</a></li>" +
-					"<li><a href='' ng-click='onUnarchive()'>Unarchive</a></li>" +
+					"<li><a href='' ng-click='onArchive()' x-translate>Archive</a></li>" +
+					"<li><a href='' ng-click='onUnarchive()' x-translate>Unarchive</a></li>" +
 				"</ul>" +
 			"</div>"
 	};
