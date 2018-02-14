@@ -865,6 +865,7 @@ ui.formInput('NavSelect', {
 			elemMenu = element.children('.nav-steps').children('li.dropdown');
 			elemMenuTitle = elemMenu.find('a.nav-label > span');
 			elemMenuItems = elemMenu.find('li');
+			adjust();
 		}
 
 		var setMenuTitle = (function() {
@@ -925,7 +926,9 @@ ui.formInput('NavSelect', {
 		}
 
 		scope.$onAdjust(adjust);
-		scope.$timeout(setup);
+		scope.$callWhen(setup, function () {
+			return element.is(':visible');
+		});
 	},
 	template_editable: null,
 	template_readonly: null,
