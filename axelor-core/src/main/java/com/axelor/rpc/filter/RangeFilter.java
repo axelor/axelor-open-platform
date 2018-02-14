@@ -46,6 +46,13 @@ class RangeFilter extends SimpleFilter {
 					getOperator());
 		}
 
+		if (values.isEmpty()) {
+			if (getOperator() == Operator.IN)
+				return "false";
+			else if (getOperator() == Operator.NOT_IN)
+				return "true";
+		}
+
 		StringBuilder sb = new StringBuilder("self.").append(getFieldName());
 		sb.append(" ").append(getOperator()).append(" (");
 
