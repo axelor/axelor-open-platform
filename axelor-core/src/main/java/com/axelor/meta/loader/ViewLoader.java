@@ -397,6 +397,7 @@ public class ViewLoader extends AbstractLoader {
 
 		if (entity == null) {
 			entity = new MetaAction(name);
+			entity.setXmlId(xmlId);
 		}
 
 		if (other == entity) {
@@ -473,6 +474,7 @@ public class ViewLoader extends AbstractLoader {
 
 		if (entity == null) {
 			entity = new MetaMenu(name);
+			entity.setXmlId(xmlId);
 		}
 
 		if (other == entity) {
@@ -563,6 +565,7 @@ public class ViewLoader extends AbstractLoader {
 
 		if (entity == null) {
 			entity = new MetaActionMenu(name);
+			entity.setXmlId(xmlId);
 		}
 
 		if (other == entity) {
