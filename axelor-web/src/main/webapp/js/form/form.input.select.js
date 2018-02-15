@@ -165,6 +165,10 @@ ui.formWidget('BaseSelect', {
 				},
 				
 				select: function(event, ui) {
+					// do not select with tab key, to prevent unexpected result on editable grid
+					if (event.keyCode === 9) {
+						return false;
+					}
 					var ret = scope.handleSelect(event, ui);
 					if (ret !== undefined) {
 						return ret;

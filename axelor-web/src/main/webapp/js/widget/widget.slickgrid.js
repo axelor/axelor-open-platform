@@ -2037,7 +2037,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 			grid.setActiveCell(cell.row, cell.cell);
 			
 			if (editor) {
-				grid.editActiveCell();
+				grid.focus();
 			}
 		}
 	};
