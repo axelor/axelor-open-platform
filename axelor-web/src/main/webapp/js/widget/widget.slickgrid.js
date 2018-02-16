@@ -115,7 +115,8 @@ var Editor = function(args) {
 
 		element.css('display', 'inline-block')
 			.addClass('slick-external-editor')
-			.appendTo(container);
+			.appendTo(container)
+			.hide();
 
 		if (!element.data('keydown.nav')) {
 			element.data('keydown.nav', true);
@@ -143,10 +144,6 @@ var Editor = function(args) {
 				}
 			});
 		}
-		
-		if (args.item && args.item.id > 0)
-			element.hide();
-		this.focus();
 	};
 
 	this.shouldWait = function () {
@@ -225,7 +222,8 @@ var Editor = function(args) {
 			updated = false;
 			
 		if ((!current.id || current.id < 0) && (current[column.field] === undefined)) {
-			current[column.field] = (scope.record||{})[column.field] || null;
+			var defaults = scope.$events.onNew ? scope.record : scope.defaultValues;
+			current[column.field] = (defaults||{})[column.field] || null;
 		}
 
 		var changed = (record.id !== item.id || record.version !== current.version);
