@@ -493,14 +493,26 @@ ui.formInput('Time', 'DateTime', {
 				updateModel();
 			}
 		});
+
+		element.on('grid:check', function () {
+			updateModel();
+		});
 		
 		scope.validate = function(value) {
 			return !value || /^(\d+:\d+)$/.test(value);
 		};
 		
 		function updateModel() {
-			var value = element.val() || '',
+			var masked = element.mask("value") || '',
+				value = element.val() || '',
 				oldValue = scope.getValue() || '';
+
+			if (value && !element.mask("valid")) {
+				return model.$setViewValue(value); // force validation
+			}
+			if (_.isEmpty(masked)) {
+				value = null;
+			}
 
 			value = scope.parse(value);
 			
