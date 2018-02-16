@@ -848,7 +848,7 @@ public class Resource<T extends Model> {
 
 		@SuppressWarnings("all")
 		Map<String, Object> values = (Map) data.get(0);
-		response.setTotal(query.update(values));
+		response.setTotal(query.update(values, AuthUtils.getUser()));
 
 		LOG.debug("Records updated: {}", response.getTotal());
 

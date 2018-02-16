@@ -17,7 +17,10 @@
  */
 package com.axelor.db;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +33,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.TypedQuery;
 
+import com.axelor.auth.db.AuditableModel;
+import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
 import com.axelor.db.hibernate.type.JsonFunction;
 import com.axelor.db.internal.DBHelper;
@@ -439,6 +444,67 @@ public class Query<T extends Model> {
 		Map<String, Object> values = Maps.newHashMap();
 		values.put(name.replaceFirst("^self\\.", ""), value);
 		return update(values);
+	}
+
+	/**
+	 * Perform versioned mass update on matched records with the given values.
+	 * 
+	 * @param values
+	 *            the key value map
+	 * @param updatedBy
+	 *            the user to set "updatedBy" field
+	 * @return total number of records updated
+	 */
+	public int update(Map<String, Object> values, User updatedBy) {
+		final Map<String, Object> params = new HashMap<>();
+		final Map<String, Object> namedParams = new HashMap<>();
+		final List<String> where = new ArrayList<>();
+
+		if (this.namedParams != null) {
+			namedParams.putAll(this.namedParams);
+		}
+
+		for(String key : values.keySet()) {
+			String name = key.replaceFirst("^self\\.", "");
+			params.put(name, values.get(key));
+			where.add("self." + name + " != :" + name);
+		}
+
+		if (AuditableModel.class.isAssignableFrom(beanClass)) {
+			params.put("updatedBy", updatedBy);
+			params.put("updatedOn", LocalDateTime.now());
+		}
+			
+		String wh = "WHERE (" + Joiner.on(" AND ").join(where) + ")";
+		String qs = updateQuery(params).replaceFirst("UPDATE ", "UPDATE VERSIONED ");
+
+		qs = StringUtils.isBlank(filter)
+				? qs + " " + wh
+				: qs.replaceFirst("WHERE self.id IN", wh + " AND self.id IN");
+		
+		namedParams.putAll(params);
+
+		return QueryBinder.of(em().createQuery(qs))
+			.bind(namedParams, this.params)
+			.getQuery()
+			.executeUpdate();
+	}
+
+	/**
+	 * This is similar to {@link #update(Map, User)} but updates only single field.
+	 *
+	 * @param name
+	 *            the field name whose value needs to be changed
+	 * @param value
+	 *            the new value
+	 * @param updatedBy
+	 *            the user to set "updatedBy" field
+	 * @return total number of records updated
+	 */
+	public int update(String name, Object value, User updatedBy) {
+		Map<String, Object> values = new HashMap<>();
+		values.put(name.replaceFirst("^self\\.", ""), value);
+		return update(values, updatedBy);
 	}
 
 	/**
