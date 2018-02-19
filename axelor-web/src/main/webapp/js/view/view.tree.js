@@ -238,24 +238,11 @@ function Column(scope, col) {
 
 			return res.title;
 		}
-		switch(col.type) {
-		case 'datetime':
-			return value ? moment(value).format('DD/MM/YYYY HH:mm') : "";
-		case 'date':
-			return value ? moment(value).format('DD/MM/YYYY') : "";
-		case 'reference':
-		case 'many-to-one':
-			if (value.name) return value.name;
-			if (value.code) return value.name;
-			for(var key in value) {
-				if (key === 'id' ||
-					key === 'version' ||
-					key.indexOf('$') === 0 ||
-					key.indexOf('_') === 0) continue;
-				return value[key] || value.id;
-			}
+		var fn = ui.formatters[col.type];
+		if (fn) {
+			value = fn(col, value, record);
 		}
-		return value;
+		return value === undefined || value === null ? '---' : value;
 	};
 }
 
