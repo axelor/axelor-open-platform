@@ -171,11 +171,19 @@
 
 			if (meta.jsonAttrs && view && view.items) {
 				if (view.type === 'grid') {
-					view.items.push({
-						type: 'field',
-						name: 'attrs',
-						jsonFields: meta.jsonAttrs
-					});
+					view.items = (function (items) {
+						var button = _.findWhere(items, { type: 'button' });
+						var index = items.indexOf(button);
+						if (index < 0) {
+							index = items.length;
+						}
+						items.splice(index, 0, {
+							type: 'field',
+							name: 'attrs',
+							jsonFields: meta.jsonAttrs
+						});
+						return items;
+					})(view.items);
 				}
 				if (view.type === 'form') {
 					view.items.push({
