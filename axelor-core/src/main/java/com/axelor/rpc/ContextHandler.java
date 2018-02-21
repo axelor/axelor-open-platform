@@ -171,13 +171,8 @@ public class ContextHandler<T> {
 		throw new IllegalArgumentException("Invalid collection item for field: " + property.getName());
 	}
 	
-	private void validate(Property property) {
-		if (property == null
-				|| validated.contains(property.getName())
-				|| !values.containsKey(property.getName())) {
-			return;
-		}
-		Object value = values.get(property.getName());
+	Object validate(Property property, Object value) {
+		if (property == null) { return value; }
 		if (property.isCollection() && value instanceof Collection) {
 			value = ((Collection<?>) value).stream()
 					.map(item -> createOrFind(property, item))
@@ -185,7 +180,17 @@ public class ContextHandler<T> {
 		} else if (property.isReference()) {
 			value = createOrFind(property, value);
 		}
+		return value;
+	}
 
+	private void validate(Property property) {
+		if (property == null
+				|| validated.contains(property.getName())
+				|| !values.containsKey(property.getName())) {
+			return;
+		}
+
+		final Object value = validate(property, values.get(property.getName()));
 		final Object bean = getUnmanagedEntity();
 
 		Mapper mapper = beanMapper;

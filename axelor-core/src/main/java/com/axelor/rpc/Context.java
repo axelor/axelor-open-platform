@@ -318,6 +318,6 @@ public class Context extends SimpleBindings {
 			}
 			return tryJsonPut(name, value);
 		}
-		return mapper.set(getProxy(), name, value);
+		return mapper.set(getProxy(), name, handler.validate(mapper.getProperty(name), value));
 	}
 }
