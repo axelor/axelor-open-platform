@@ -2015,7 +2015,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 	});
 	
 	form.prependTo(element).hide();
-	formScope.onChangeNotify = function(scope, values) {
+	formScope.onChangeNotify = function(scope, values, related) {
 		var item, editor, cell = grid.getActiveCell();
 		if (!cell || formScope.record !== scope.record) {
 			return;
@@ -2027,6 +2027,23 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 				grid.getEditorLock().commitCurrentEdit();
 			}
 			item = _.extend(item, values);
+			
+			// update dotted fields of the given related field
+			if (related) {
+				_.filter(grid.getColumns(), function (col) {
+					return col.field && col.field.indexOf('.') > -1 && col.field.startsWith(related);
+				}).forEach(function (col) {
+					var path = col.field.split('.');
+					var val = item || {};
+					var idx = 0;
+					while (val && idx < path.length) {
+						val = val[path[idx++]];
+					}
+					if (idx === path.length && val !== undefined) {
+						item[col.field] = val;
+					}
+				});
+			}
 
 			grid.updateRowCount();
 			grid.invalidateRow(cell.row);

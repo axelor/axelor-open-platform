@@ -518,13 +518,19 @@ ui.formInput('ManyToOne', 'Select', {
 		};
 
 		scope.handleSelect = function(e, ui) {
+			var handled = false;
 			if (ui.item.click) {
 				ui.item.click.call(scope);
 			} else {
 				scope.select(ui.item.value);
+				handled = true;
 			}
-			setTimeout(adjustPadding, 100);
-			scope.$applyAsync();
+			scope.$timeout(function () {
+				adjustPadding();
+				if (scope.onChangeNotify && handled) {
+					scope.onChangeNotify(scope, scope.record, scope.field.name);
+				}
+			}, 100);
 		};
 		
 		scope.$render_editable = function() {
