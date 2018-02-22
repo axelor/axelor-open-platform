@@ -1028,7 +1028,7 @@ function FormViewCtrl($scope, $element) {
 			}
 		}, {
 			visible: function () {
-				return $scope.canArchive();
+				return $scope.canArchive() || $scope.canUnarchive();
 			},
 		}, {
 			title: _t('Archive'),
@@ -1047,7 +1047,7 @@ function FormViewCtrl($scope, $element) {
 				return $scope.canUnarchive();
 			},
 			visible: function () {
-				return $scope.canArchive();
+				return $scope.canUnarchive();
 			},
 			click: function(e) {
 				$scope.onUnarchive();
