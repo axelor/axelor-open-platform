@@ -528,7 +528,7 @@ ui.formInput('ManyToOne', 'Select', {
 			scope.$timeout(function () {
 				adjustPadding();
 				if (scope.onChangeNotify && handled) {
-					scope.onChangeNotify(scope, scope.record, scope.field.name);
+					scope.onChangeNotify(scope, scope.record);
 				}
 			}, 100);
 		};
