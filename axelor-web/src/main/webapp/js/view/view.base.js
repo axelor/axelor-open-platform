@@ -468,6 +468,10 @@ ui.directive('uiViewPopup', function() {
 				var tab = $scope.tab,
 					params = tab.params || {},
 					parent = tab.$popupParent;
+
+				while (parent && parent.$$destroyed && parent.tab) {
+					parent = parent.tab.$popupParent;
+				}
 				if (parent && parent.reload && params.popup === "reload") {
 					parent.reload();
 				}
