@@ -184,6 +184,11 @@ ui.directive('uiMailMessage', function () {
 				if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
 					return moment(value).format("DD/MM/YYYY");
 				}
+				if (/^\d+(\.\d+)?$/.test(value)) {
+					var dot = value.indexOf('.');
+					var props = dot > -1 ? { scale: value.length - dot - 1 } : {};
+					return ui.formatters.decimal(props, value);
+				}
 				return value;
 			}
 

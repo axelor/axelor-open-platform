@@ -20,6 +20,47 @@
 	"use strict";
 
 	var ui = angular.module('axelor.ui');
+	
+	var currencySymbols = {
+		en: '\u0024',
+		fr: '\u20AC'
+	};
+	
+	var thousandSeparator = {
+		en: ',',
+		fr: ' '
+	};
+
+	function addCurrency(value, symbol) {
+		if (value) {
+			var lang = axelor.config['user.lang'];
+			var sym = symbol || currencySymbols[lang] || currencySymbols.en;
+			var val = '' + value;
+			if (lang === 'fr') {
+				return val.endsWith(sym) ? val : val + ' ' + sym;
+			}
+			return val.startsWith(sym) ? val : sym + ' ' + val;
+		}
+		return value;
+	}
+
+	// override angular.js currency filter
+	ui.filter('currency', function () {
+		return addCurrency;
+	});
+
+	function formatNumber(field, value, scale) {
+		var num = +(value);
+		if ((value === null || value === undefined) && !field.defaultValue) {
+			return value;
+		}
+		if (num === 0 || num) {
+			var lang = axelor.config['user.lang'];
+			var tsep = thousandSeparator[lang] || thousandSeparator.en;
+			return _.numberFormat(num, scale, '.', tsep);
+		}
+		return value;
+	}
 
 	ui.formatters = {
 			
@@ -28,7 +69,7 @@
 				var key = '$t:' + field.name;
 				return context[key] || value;
 			}
-			return value;
+			return formatNumber(field, value);
 		},
 
 		"integer": function(field, value) {
@@ -37,14 +78,12 @@
 
 		"decimal": function(field, value) {
 			var scale = (field.widgetAttrs||{}).scale || field.scale || 2;
-			var num = +(value);
-			if ((value === null || value === undefined) && !field.defaultValue) {
-				return value;
+			var currency = (field.widgetAttrs||{}).currency || field.currency;
+			var text = formatNumber(field, value, scale);
+			if (text && currency) {
+				text = addCurrency(text, currency === true ? null : currency);
 			}
-			if (num === 0 || num) {
-				return num.toFixed(scale);
-			}
-			return value;
+			return text;
 		},
 
 		"boolean": function(field, value) {

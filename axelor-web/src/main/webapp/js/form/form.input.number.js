@@ -32,6 +32,8 @@ ui.formInput('Number', {
 	
 	widgets: ['Integer', 'Long', 'Decimal'],
 	
+	template_readonly: '<span class="display-text">{{localeValue()}}</span>',
+	
 	link: function(scope, element, attrs, model) {
 		
 		var props = scope.field,
@@ -84,7 +86,14 @@ ui.formInput('Number', {
 
         	return valid;
 		};
-		
+
+		scope.localeValue = function localeValue() {
+			var value = scope.getValue();
+			return isDecimal
+				? ui.formatters.decimal(scope.field, value)
+				: ui.formatters.integer(scope.field, value);
+		};
+
 		scope.format = function format(value) {
 			if (isDecimal && _.isString(value) && value.trim().length > 0) {
 				return parseFloat(value).toFixed(scale());
