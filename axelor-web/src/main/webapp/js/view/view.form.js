@@ -685,10 +685,10 @@ function FormViewCtrl($scope, $element) {
 
 	$scope.onSave = function(options) {
 		
-		var opts = _.extend({}, options);
+		var opts = _.extend({ fireOnLoad: true }, options);
 		var defer = $scope._defer();
 		var saveAction = $scope.$events.onSave;
-		var fireOnLoad = true;
+		var fireOnLoad = opts.fireOnLoad;
 		
 		function fireBeforeSave() {
 			var event = $scope.$broadcast('on:before-save', $scope.record);
