@@ -396,7 +396,7 @@ ui.formWidget('ButtonGroup', {
 		scope.$watch(adjustButtons);
 		scope.$callWhen(function () {
 			return element.is(':visible');
-		}, adjust);
+		}, adjustButtons);
 	},
 	transclude: true,
 	template_editable: null,
