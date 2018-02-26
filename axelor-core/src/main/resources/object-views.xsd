@@ -765,7 +765,7 @@
     <xsd:attribute name="x-currency" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-        Specify whether to format field value with currency symbol.
+        Specify the field name for currency symbol.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>

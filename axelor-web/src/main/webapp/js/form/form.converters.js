@@ -32,16 +32,32 @@
 	};
 
 	function addCurrency(value, symbol) {
-		if (value) {
-			var lang = axelor.config['user.lang'];
-			var sym = symbol || currencySymbols[lang] || currencySymbols.en;
+		if (value && symbol) {
 			var val = '' + value;
-			if (lang === 'fr') {
-				return val.endsWith(sym) ? val : val + ' ' + sym;
+			if (axelor.config['user.lang'] === 'fr' ) {
+				return val.endsWith(symbol) ? val : val + ' ' + symbol;
 			}
-			return val.startsWith(sym) ? val : sym + ' ' + val;
+			return val.startsWith(symbol) ? val : symbol + val;
 		}
 		return value;
+	}
+
+	function findNested(record, name) {
+		if (record && name && name in record) {
+			return record[name];
+		}
+		if (name) {
+			var path = name.split('.');
+			var val = record || {};
+			var idx = 0;
+			while (val && idx < path.length) {
+				val = val[path[idx++]];
+			}
+			if (idx === path.length) {
+				return val;
+			}
+		}
+		return null;
 	}
 
 	// override angular.js currency filter
@@ -76,12 +92,13 @@
 			return value;
 		},
 
-		"decimal": function(field, value) {
+		"decimal": function(field, value, context) {
 			var scale = (field.widgetAttrs||{}).scale || field.scale || 2;
 			var currency = (field.widgetAttrs||{}).currency || field.currency;
+
 			var text = formatNumber(field, value, scale);
 			if (text && currency) {
-				text = addCurrency(text, currency === true ? null : currency);
+				text = addCurrency(text, findNested(context, currency));
 			}
 			return text;
 		},

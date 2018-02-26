@@ -294,8 +294,8 @@ var Formatters = {
 		return value;
 	},
 
-	"decimal": function(field, value) {
-		return ui.formatters.decimal(field, value);
+	"decimal": function(field, value, context) {
+		return ui.formatters.decimal(field, value, context);
 	},
 	
 	"boolean": function(field, value) {

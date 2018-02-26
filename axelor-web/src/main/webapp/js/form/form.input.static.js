@@ -802,7 +802,7 @@ ui.formItem('InfoButton', 'Button', {
 		Object.defineProperty(scope, 'value', {
 			get: function () {
 				return field.currency
-					? ui.formatters.decimal(field, (scope.record || {})[field.name])
+					? ui.formatters.decimal(field, (scope.record || {})[field.name], scope.record)
 					: ui.formatters.$fmt(scope, field.name);
 			}
 		});
