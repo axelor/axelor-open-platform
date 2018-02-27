@@ -67,6 +67,10 @@
     <string name="onSave" />
     <string name="nameField" />
     <many-to-one name="menu" ref="MetaMenu" copy="false" />
+    <many-to-one name="menuParent" ref="MetaMenu" />
+    <string name="menuIcon" />
+    <string name="menuBackground" />
+    <integer name="menuOrder" />
     <many-to-one name="action" ref="MetaAction" copy="false" />
     <many-to-one name="gridView" ref="MetaView" copy="false" />
     <many-to-one name="formView" ref="MetaView" copy="false" />
