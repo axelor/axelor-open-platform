@@ -33,28 +33,37 @@ public class MetaPermissions {
 	private static final String CAN_WRITE = "write";
 	private static final String CAN_EXPORT = "export";
 
-	private MetaPermission find(Set<MetaPermission> permissions, String object, String field) {
-		if (permissions == null) { return null; }
-		for (MetaPermission perm : permissions) {
-			if (!object.equals(perm.getObject())) { continue; }
-			if (perm.getActive() != Boolean.TRUE || perm.getRules() == null) { continue; }
-			for (MetaPermissionRule rule : perm.getRules()) {
-				if (field.equals(rule.getField())) {
-					return perm;
+	public static final String WILDCARD = "*";
+
+	private MetaPermissionRule findRule(Set<MetaPermission> permissions, String object, String field) {
+		MetaPermissionRule result = null;
+		if (permissions != null) {
+			for (MetaPermission perm : permissions) {
+				if (object.equals(perm.getObject())
+					&& perm.getActive())
+				{
+					for (MetaPermissionRule rule : perm.getRules()) {
+						if (field.equals(rule.getField())) {
+							result = rule;
+							break;
+						} else if (WILDCARD.equals(rule.getField())) {
+							result = rule;
+						}
+					}
 				}
 			}
 		}
-		return null;
+		return result;
 	}
 
-	private MetaPermission find(User user, String object, String field) {
-		MetaPermission permission = find(user.getMetaPermissions(), object, field);
+	public MetaPermissionRule findRule(User user, String object, String field) {
+		MetaPermissionRule permission = findRule(user.getMetaPermissions(), object, field);
 		if (permission == null && user.getGroup() != null) {
-			permission = find(user.getGroup().getMetaPermissions(), object, field);
+			permission = findRule(user.getGroup().getMetaPermissions(), object, field);
 		}
 		if (permission == null && user.getRoles() != null) {
 			for (Role role : user.getRoles()) {
-				permission = find(role.getMetaPermissions(), object, field);
+				permission = findRule(role.getMetaPermissions(), object, field);
 				if (permission != null) {
 					break;
 				}
@@ -62,24 +71,13 @@ public class MetaPermissions {
 		}
 		if (permission == null && user.getGroup() != null && user.getGroup().getRoles() != null) {
 			for (Role role : user.getGroup().getRoles()) {
-				permission = find(role.getMetaPermissions(), object, field);
+				permission = findRule(role.getMetaPermissions(), object, field);
 				if (permission != null) {
 					break;
 				}
 			}
 		}
 		return permission;
-	}
-
-	public MetaPermissionRule findRule(User user, String object, String field) {
-		final MetaPermission permission = find(user, object, field);
-		if (permission == null) { return null; }
-		for (MetaPermissionRule rule : permission.getRules()) {
-			if (field.equals(rule.getField())) {
-				return rule;
-			}
-		}
-		return null;
 	}
 
 	private boolean can(User user, String object, String field, String access) {
