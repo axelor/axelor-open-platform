@@ -345,8 +345,13 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 		var mini = element.find('.calendar-mini');
 		var legend = element.find('.calendar-legend');
 		
+		var ctx = (scope._viewParams.context||{});
+		var params = (scope._viewParams.params||{});
+		
 		var schema = scope.schema;
-		var mode = schema.mode || "month";
+		var mode = ctx.calendarMode || params.calendarMode || schema.mode || "month";
+		var date = ctx.calendarDate || params.calendarMode;
+
 		var editable = schema.editable === undefined ? true : schema.editable;
 		var calRange = {};
 		
@@ -421,6 +426,10 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 				events: events
 			};
 		}());
+		
+		if (date) {
+			date = moment(date).toDate();
+		}
 
 		mini.datepicker({
 			showOtherMonths: true,
@@ -429,7 +438,11 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 				main.fullCalendar('gotoDate', mini.datepicker('getDate'));
 			}
 		});
-		
+
+		if (date) {
+			mini.datepicker('setDate', date);
+		}
+
 		var lang = axelor.config["user.lang"] || 'en';
 		
 		var options = {
@@ -460,6 +473,8 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 				});
 				main.fullCalendar('unselect');
 			},
+
+			defaultDate: date,
 
 			events: RecordManager,
 
