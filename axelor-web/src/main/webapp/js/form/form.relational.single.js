@@ -498,6 +498,7 @@ ui.formInput('ManyToOne', 'Select', {
 		});
 		
 		scope.handleEnter = function (e) {
+			var handled = false;
 			var widget = input.autocomplete('widget');
 			if (widget) {
 				var item = widget.find('li .ui-state-focus').parent();
@@ -511,9 +512,17 @@ ui.formInput('ManyToOne', 'Select', {
 					if (data.click) {
 						data.click.call(scope);
 					} else {
+						scope.setValidity('search', true);
 						scope.select(data.value);
+						handled = true;
 					}
 				}
+				scope.$timeout(function () {
+					adjustPadding();
+					if (scope.onChangeNotify && handled) {
+						scope.onChangeNotify(scope, scope.record);
+					}
+				}, 100);
 			}
 		};
 
@@ -522,6 +531,7 @@ ui.formInput('ManyToOne', 'Select', {
 			if (ui.item.click) {
 				ui.item.click.call(scope);
 			} else {
+				scope.setValidity('search', true);
 				scope.select(ui.item.value);
 				handled = true;
 			}
