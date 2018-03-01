@@ -23,6 +23,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.inject.Beans;
+import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonModel;
@@ -158,6 +159,8 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 				.append("  <context name=\"jsonModel\" expr=\""+ jsonModel.getName() +"\" />\n")
 				.append("</action-view>\n").toString());
 		menu.setAction(action);
+
+		MetaStore.invalidate(action.getName());
 
 		jsonModel.setMenu(menu);
 		jsonModel.setAction(action);
