@@ -117,7 +117,7 @@ ui.directive('uiUpdateButton', ['$compile', function ($compile) {
 			});
 			
 			scope.$on('$destroy', function() {
-				$(document).on('mousedown.update-menu', onMouseDown);
+				$(document).off('mousedown.update-menu', onMouseDown);
 				if (menu) {
 					menu.remove();
 					menu = null;
