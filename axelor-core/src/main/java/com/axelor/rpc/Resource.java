@@ -464,11 +464,15 @@ public class Resource<T extends Model> {
 			((Map) item).put("_children", counts.get(((Map) item).get("id")));
 		}
 	}
+	
+	private static final int DEFAULT_EXPORT_MAX_SIZE = -1;
+	private static final int DEFAULT_EXPORT_FETCH_SIZE = 500;
 
-	private static final int EXPORT_MAX_LIMIT = AppSettings.get().getInt("data.export.max-limit", 20000);
+	private static final int EXPORT_MAX_SIZE = AppSettings.get().getInt("data.export.max-size", DEFAULT_EXPORT_MAX_SIZE);
+	private static final int EXPORT_FETCH_SIZE = AppSettings.get().getInt("data.export.fetch-size", DEFAULT_EXPORT_FETCH_SIZE);
 
 	@SuppressWarnings("all")
-	public void export(Request request, Writer writer) throws IOException {
+	public int export(Request request, Writer writer) throws IOException {
 		security.get().check(JpaSecurity.CAN_READ, model);
 		security.get().check(JpaSecurity.CAN_EXPORT, model);
 		LOG.debug("Exporting '{}' with {}", model.getName(), request.getData());
@@ -610,8 +614,9 @@ public class Resource<T extends Model> {
 
 		writer.write(Joiner.on(";").join(header));
 
-		int limit = Math.min(100, EXPORT_MAX_LIMIT);
+		int limit = EXPORT_MAX_SIZE > 0 ? Math.min(EXPORT_FETCH_SIZE, EXPORT_MAX_SIZE) : EXPORT_FETCH_SIZE;
 		int offset = 0;
+		int count = 0;
 
 		Query<?> query = getQuery(request);
 		Query<?>.Selector selector = query.select(names.toArray(new String[0]));
@@ -620,11 +625,10 @@ public class Resource<T extends Model> {
 
 		final L10n formatter = L10n.getInstance();
 
-		while (offset + limit <= EXPORT_MAX_LIMIT && !data.isEmpty()) {
-
-			for(Object item : data) {
+		while (!data.isEmpty()) {
+			for (Object item : data) {
 				List<?> row = (List<?>) item;
-				List<String> line = Lists.newArrayList();
+				List<String> line = new ArrayList<>();
 				int index = 0;
 				for(Object value: row) {
 					if (index++ < 2) continue; // ignore first two items (id, version)
@@ -650,10 +654,22 @@ public class Resource<T extends Model> {
 				writer.write("\n");
 				writer.write(Joiner.on(";").join(line));
 			}
+			
+			count += data.size();
+
+			int nextLimit = limit;
+			if (EXPORT_MAX_SIZE > -1) {
+				if (count >= EXPORT_MAX_SIZE) {
+					break;
+				}
+				nextLimit = Math.min(limit, EXPORT_MAX_SIZE - count);
+			}
 
 			offset += limit;
-			data = selector.values(limit, offset);
+			data = selector.values(nextLimit, offset);
 		}
+
+		return count;
 	}
 
 	private String escapeCsv(String value) {

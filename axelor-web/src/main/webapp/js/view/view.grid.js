@@ -706,6 +706,9 @@ function GridViewCtrl($scope, $element) {
 		return ds.export_(fields).success(function(res) {
 			var fileName = res.fileName;
 			var filePath = 'ws/rest/' + $scope._model + '/export/' + fileName;
+			if (ds._page.total > res.exportSize) {
+				axelor.notify.alert(_t("{0} records exported.", res.exportSize), { title: _t('Warning!') });
+			}
 			ui.download(filePath, fileName);
 		});
 	};

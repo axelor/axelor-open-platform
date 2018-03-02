@@ -209,7 +209,7 @@
 			var opts = _.extend({
 				title: _t('Alert')
 			}, options);
-			return doNotify(message, options);
+			return doNotify(message, opts);
 		},
 		
 		success: function(message, options) {

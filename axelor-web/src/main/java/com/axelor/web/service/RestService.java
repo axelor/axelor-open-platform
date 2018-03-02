@@ -538,7 +538,7 @@ public class RestService extends ResourceService {
 			final java.nio.file.Path tempFile = MetaFiles.createTempFile(null, ".csv");
 			try(final OutputStream os = new FileOutputStream(tempFile.toFile())) {
 				try (final Writer writer = new OutputStreamWriter(os, csvCharset)) {
-					getResource().export(request, writer);
+					data.put("exportSize", getResource().export(request, writer));
 				}
 			};
 			data.put("fileName", tempFile.toFile().getName());
