@@ -736,7 +736,7 @@ ui.directive('uiViewTree', function(){
 			});
 		},
 		template:
-		'<div class="tree-view-container">'+
+		'<div class="tree-view-container" ui-attach-scroll="> .tree-table">'+
 			'<table class="tree-header">'+
 				'<thead>'+
 					'<tr>'+

@@ -421,14 +421,20 @@ ui.directive('uiViewPane', function() {
 				return 'partials/views/' + template + '.html';
 			};
 
-			$scope.switchTo((params.viewType || params.type));
+			var type = params.viewType || params.type;
+			$scope.keepAttached = (params.params||{}).popup || type === 'html';
+			$scope.switchTo(type);
 		}],
 		link: function(scope, element, attrs) {
 		
 		},
 		template:
-			"<div class='view-pane'>" +
-				"<div class='view-container' ng-repeat='type in viewList' ui-show='type == viewType' ng-include='viewTemplate(type)'></div>" +
+			"<div class='view-pane' ui-attach='keepAttached || tab.selected'>" +
+				"<div class='view-container'" +
+				" ng-repeat='type in viewList'" +
+				" ui-show='type === viewType'" +
+				" ui-attach-scroll ui-attach='keepAttached || type == viewType'" +
+				" ng-include='viewTemplate(type)'></div>" +
 			"</div>"
 	};
 });

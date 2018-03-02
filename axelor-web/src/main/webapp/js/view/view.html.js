@@ -36,8 +36,6 @@ function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
 		var parent = $scope.$parent;
 		return _.extend({}, params.context, parent.getContext ? parent.getContext() : {})
 	};
-	
-	
 
 	$scope.getURL = function getURL() {
 		var view = $scope.view;
@@ -72,6 +70,13 @@ var directiveFn = function(){
 	return {
 		controller: HtmlViewCtrl,
 		replace: true,
+		link: function (scope, element) {
+			setTimeout(function () {
+				element.parents('[ui-attach]').each(function () {
+					$(this).scope().keepAttached = true;
+				});
+			}, 100);
+		},
 		template:
 		'<div class="iframe-container">'+
 			'<iframe ng-src="{{getURL()}}" frameborder="0" scrolling="auto"></iframe>'+

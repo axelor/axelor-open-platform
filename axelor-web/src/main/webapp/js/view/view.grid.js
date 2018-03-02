@@ -756,7 +756,7 @@ function GridViewCtrl($scope, $element) {
 ui.directive('uiViewGrid', function(){
 	return {
 		replace: true,
-		template: '<div ui-slick-grid ui-widget-states></div>'
+		template: '<div ui-slick-grid ui-attach-scroll="> .slick-viewport" ui-widget-states></div>'
 	};
 });
 
