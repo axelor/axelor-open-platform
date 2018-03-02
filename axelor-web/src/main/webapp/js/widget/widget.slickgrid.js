@@ -1251,6 +1251,18 @@ Grid.prototype._doInit = function(view) {
 		}
 	});
 	
+	var scrollTop;
+	this.subscribe(grid.onScroll, function (e, args) {
+		scrollTop = args.scrollTop;
+	});
+	function resetScroll() {
+		if (scrollTop) {
+			that.element.children('.slick-viewport').scrollTop(scrollTop);
+		}
+	}
+	scope.$on('dom:attach', resetScroll);
+	scope.$on('tab:select', resetScroll);
+
 	var onColumnsResized = false;
 	this.subscribe(grid.onColumnsResized, function (e, args) {
 		onColumnsResized = true;
