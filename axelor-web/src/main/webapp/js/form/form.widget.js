@@ -229,16 +229,16 @@ ui.directive('uiAttachScroll', function () {
 				elem = element.find(attrs.uiAttachScroll);
 			}
 
-			scope.$on('dom:detach', function () {
-				if (element.is(':visible')) {
-					scrollTop = elem.scrollTop();
-				}
+			elem.on('scroll', function () {
+				scrollTop = this.scrollTop;
 			});
-			scope.$on('dom:attach', function() {
-				if (element.is(':visible')) {
-					elem.scrollTop(scrollTop);
-				}
-			});
+
+			function resetScroll() {
+				elem.scrollTop(scrollTop);
+			};
+
+			scope.$on('dom:attach', resetScroll);
+			scope.$on('tab:select', resetScroll);
 		}, 300);
 	};
 });

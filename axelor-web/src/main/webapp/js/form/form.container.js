@@ -592,6 +592,7 @@ ui.formWidget('PanelTabs', {
 				.addClass('active');
 
 			setTimeout(function () {
+				scope.$broadcast('tab:select');
 				elemTabs.removeClass('open');
 				elemMenu.removeClass('open');
 				axelor.$adjustSize();
