@@ -1380,8 +1380,8 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 
 		scope.$on("on:form-show", function () {
 			setTimeout(function () {
-				element.scrollTop(0);
-			});
+				element.animate({ scrollTop: 0 }, 200);
+			}, 300);
 		});
 
 		var unwatch = scope.$watch('schema.loaded', function formSchemaWatch(viewLoaded){

@@ -516,13 +516,6 @@ ui.formWidget('uiMailMessages', {
 			}
 		});
 	}],
-	link: function (scope, element, attrs) {
-		if (scope.folder) {
-			setTimeout(function () {
-				element.parents('[ui-view-form]').css({ overflow: 'inherit' });
-			}, 100);
-		}
-	},
 	template_readonly: null,
 	template_editable: null,
 	template:
