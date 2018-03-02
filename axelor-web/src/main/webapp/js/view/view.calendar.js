@@ -350,7 +350,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 		
 		var schema = scope.schema;
 		var mode = ctx.calendarMode || params.calendarMode || schema.mode || "month";
-		var date = ctx.calendarDate || params.calendarMode;
+		var date = ctx.calendarDate || params.calendarDate;
 
 		var editable = schema.editable === undefined ? true : schema.editable;
 		var calRange = {};
