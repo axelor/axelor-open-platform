@@ -489,7 +489,8 @@ ui.directive('uiViewPopup', function() {
 				if (!viewScope.onSave || (!viewScope.isDirty() && viewScope.id)) {
 					return $scope.onOK();
 				}
-				return viewScope.onSave({ fireOnLoad: false }).then(function() {
+				return viewScope.onSave({ fireOnLoad: false }).then(function(record, page) {
+					viewScope.edit(record);
 					viewScope.$timeout($scope.onOK.bind($scope));
 				});
 			};
