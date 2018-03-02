@@ -47,6 +47,7 @@ import org.hibernate.StaleObjectStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
@@ -464,6 +465,8 @@ public class Resource<T extends Model> {
 		}
 	}
 
+	private static final int EXPORT_MAX_LIMIT = AppSettings.get().getInt("data.export.max-limit", 20000);
+
 	@SuppressWarnings("all")
 	public void export(Request request, Writer writer) throws IOException {
 		security.get().check(JpaSecurity.CAN_READ, model);
@@ -607,7 +610,7 @@ public class Resource<T extends Model> {
 
 		writer.write(Joiner.on(";").join(header));
 
-		int limit = 100;
+		int limit = Math.min(100, EXPORT_MAX_LIMIT);
 		int offset = 0;
 
 		Query<?> query = getQuery(request);
@@ -617,7 +620,7 @@ public class Resource<T extends Model> {
 
 		final L10n formatter = L10n.getInstance();
 
-		while(!data.isEmpty()) {
+		while (offset + limit <= EXPORT_MAX_LIMIT && !data.isEmpty()) {
 
 			for(Object item : data) {
 				List<?> row = (List<?>) item;
