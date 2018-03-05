@@ -659,7 +659,7 @@ function viewSwitcher(scope, element, attrs) {
 			return;
 		}
 		var type = $(this).attr("x-view-type");
-		var vs = scope.selectedTab.$viewScope;
+		var vs = params.$viewScope || scope.selectedTab.$viewScope;
 		var ds = vs._dataSource;
 		var page = ds && ds._page;
 
