@@ -89,9 +89,13 @@ ui.formInput('Number', {
 
 		scope.localeValue = function localeValue() {
 			var value = scope.getValue();
+			var field = isDecimal ? _.extend({}, scope.field, {
+				scale: scale(),
+				precision: precision()
+			}) : scope.field;
 			return isDecimal
-				? ui.formatters.decimal(scope.field, value)
-				: ui.formatters.integer(scope.field, value);
+				? ui.formatters.decimal(field, value)
+				: ui.formatters.integer(field, value);
 		};
 
 		scope.format = function format(value) {
