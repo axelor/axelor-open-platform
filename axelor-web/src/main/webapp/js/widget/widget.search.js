@@ -1346,7 +1346,7 @@ ui.directive('uiFilterBox', function() {
 					return;
 				}
 				toggleButton = $(e.currentTarget);
-				menu.zIndex(element.zIndex() + 1);
+				menu.zIndex(element.parent().zIndex() + 1);
 				menu.show();
 				scope.doAdjust();
 
