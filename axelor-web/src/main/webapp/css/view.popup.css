@@ -134,7 +134,7 @@
 .ui-dialog .ui-dialog-content {
 	padding: 4px;
 	min-height: 50px;
-	max-height: calc(100% - 45px - 60px) !important;
+	max-height: calc(100% - 45px - 52px) !important;
 	height: inherit !important;
 }
 
@@ -271,7 +271,7 @@
 	.ui-dialog .ui-dialog-content {
   		box-sizing: border-box;
 		width: 100% !important;
-		height: calc(100% - 45px - 60px) !important;
+		height: calc(100% - 45px - 52px) !important;
 		overflow: auto;
 		margin-top: 45px;
 	}
@@ -289,12 +289,6 @@
 	}
 }
 
-.ui-dialog.maximized .ui-dialog-titlebar,
-.ui-dialog.maximized .ui-dialog-buttonpane {
-	position: absolute;
-	left: 0;
-	right: 0;
-}
 .ui-dialog.maximized {
 	top: 0 !important;
 	left: 0 !important;
@@ -303,17 +297,15 @@
 	height: calc(100% - 16px) !important;
 	max-height: calc(100% - 16px) !important;
 }
-.ui-dialog.maximized .ui-dialog-title {
-	top: 0;
-}
 .ui-dialog.maximized .ui-dialog-buttonpane {
 	bottom: 0;
 }
 .ui-dialog.maximized .ui-dialog-content {
 	width: auto !important;
-	height: calc(100% - 45px - 60px) !important;
-	overflow: auto;
-	margin-top: 45px;
+	height: calc(100% - 45px - 52px) !important;
+}
+.ui-dialog.maximized.collapsed {
+	height: auto !important;
 }
 
 .ui-dialog .translation-form {

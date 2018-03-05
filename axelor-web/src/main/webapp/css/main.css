@@ -469,14 +469,31 @@ header .navbar .nav-link-user-sub {
 	top: 0px; left: 0px; right: 0px; bottom: 0px;
 }
 
-.ui-dialog-content .view-pane {
-	position: inherit;
+.ui-dialog > [ui-view-popup],
+.ui-dialog > [ui-view-popup] > .view-pane,
+.ui-dialog > [ui-view-popup] > .view-pane > .view-container,
+.ui-dialog > [ui-view-popup] > .view-pane > .view-container .form-view {
+	overflow: inherit;
+	display: flex;
+	flex-flow: column nowrap;
+	padding: 0 !important;
+	flex: 1 1 auto;
 }
 
-.ui-dialog-content .view-pane > .view-container,
-.ui-dialog-content .view-pane > .view-container > div:not(.slick-editor-dropdown),
-.ui-dialog-content .view-pane > .view-container .form-view > div:last-child {
+.ui-dialog > [ui-view-popup] > .view-pane,
+.ui-dialog > [ui-view-popup] > .view-pane > .view-container,
+.ui-dialog > [ui-view-popup] > .view-pane > .view-container > div:not(.slick-editor-dropdown),
+.ui-dialog > [ui-view-popup] > .view-pane > .view-container .form-view > div:last-child {
 	position: inherit;
+	top: 0 !important;
+}
+
+.ui-dialog > [ui-view-popup] > .view-pane > .view-container .grid-view {
+	height: 450px;
+}
+.ui-dialog.maximized > [ui-view-popup] > .view-pane > .view-container .grid-view {
+	position: absolute !important;
+	height: auto;
 }
 
 .view-pane > .view-container.has-toolbar {
@@ -488,7 +505,7 @@ header .navbar .nav-link-user-sub {
 
 .grid-view > .slickgrid {
 	position: absolute !important;
-	top: 40px; left: 0px; right: 0px; bottom: 0px;
+	top: 40px; left: 0px; right: 0px; bottom: -4px;
 	border: none;
 }
 

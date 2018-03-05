@@ -390,9 +390,11 @@
 
 .ui-dialog .ui-dialog-content.dms-popup {
 	height: 450px !important;
+	overflow: inherit !important;
 }
 .ui-dialog.maximized .ui-dialog-content.dms-popup {
 	height: 100% !important;
+    max-height: 100% !important;
 }
 
 .dms-popup > div,
@@ -402,6 +404,11 @@
 }
 
 .dms-popup > div > .grid-view {
+	position: absolute;
+	top: 2px;
+	right: 0;
+	bottom: -4px;
+	left: 0;
 	border: 0;
 }
 
