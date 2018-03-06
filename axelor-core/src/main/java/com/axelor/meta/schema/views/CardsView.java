@@ -34,6 +34,12 @@ public class CardsView extends AbstractView {
 	@XmlAttribute
 	private String orderBy;
 
+	@XmlAttribute
+	private Boolean customSearch;
+
+	@XmlAttribute
+	private String freeSearch;
+
 	@XmlElement(name = "field", type = Field.class)
 	private List<AbstractWidget> items;
 
@@ -50,6 +56,22 @@ public class CardsView extends AbstractView {
 
 	public void setOrderBy(String orderBy) {
 		this.orderBy = orderBy;
+	}
+
+	public Boolean getCustomSearch() {
+		return customSearch;
+	}
+
+	public void setCustomSearch(Boolean customSearch) {
+		this.customSearch = customSearch;
+	}
+
+	public String getFreeSearch() {
+		return freeSearch;
+	}
+
+	public void setFreeSearch(String freeSearch) {
+		this.freeSearch = freeSearch;
 	}
 
 	public List<AbstractWidget> getItems() {

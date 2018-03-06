@@ -1432,9 +1432,9 @@ ui.directive('uiFilterBox', function() {
 			
 			scope.findCols = function () {
 				var grid = element.parents('.grid-view:first').children('[ui-slick-grid]:first').data('grid');
-				return grid ? _.pluck(grid.getColumns(), 'field').filter(function (n) {
-					return n in scope.$parent.fields;
-				}) : [];
+				return grid
+					? _.pluck(grid.getColumns(), 'field').filter(function (n) { return n in scope.$parent.fields; })
+					: _.pluck(scope.$parent.fields, 'name');
 			};
 
 			scope.handler.$watch('schema.freeSearch', function searchFreeSearchWatch(value, old) {

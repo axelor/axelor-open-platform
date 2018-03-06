@@ -937,6 +937,38 @@
       </xsd:annotation>
     </xsd:attribute>
   </xsd:attributeGroup>
+  
+  <xsd:attributeGroup name="AdvanceSearchAttributes">
+    <xsd:attribute name="customSearch" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether advanced custom search is enabled.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="freeSearch" default="name">
+      <xsd:annotation>
+        <xsd:documentation>Specify the free search mode</xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="name">
+            <xsd:annotation>
+              <xsd:documentation>Search on name field only.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+          <xsd:enumeration value="all">
+            <xsd:annotation>
+              <xsd:documentation>Search all searchable fields.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+          <xsd:enumeration value="none">
+            <xsd:annotation>
+              <xsd:documentation>Don't allow free search.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:enumeration>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+  </xsd:attributeGroup>
 
   <xsd:complexType name="AbstractGridView" abstract="true">
     <xsd:complexContent>
@@ -1028,35 +1060,7 @@
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractGridView">
         <xsd:attributeGroup ref="tns:ObjectViewAttributes" />
-        <xsd:attribute name="customSearch" type="xsd:boolean">
-          <xsd:annotation>
-            <xsd:documentation>Specify whether advanced custom search is enabled.</xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="freeSearch" default="name">
-          <xsd:annotation>
-            <xsd:documentation>Specify the free search mode</xsd:documentation>
-          </xsd:annotation>
-          <xsd:simpleType>
-            <xsd:restriction base="xsd:string">
-              <xsd:enumeration value="name">
-                <xsd:annotation>
-                  <xsd:documentation>Search on name field only.</xsd:documentation>
-                </xsd:annotation>
-              </xsd:enumeration>
-              <xsd:enumeration value="all">
-                <xsd:annotation>
-                  <xsd:documentation>Search all searchable fields.</xsd:documentation>
-                </xsd:annotation>
-              </xsd:enumeration>
-              <xsd:enumeration value="none">
-                <xsd:annotation>
-                  <xsd:documentation>Don't allow free search.</xsd:documentation>
-                </xsd:annotation>
-              </xsd:enumeration>
-            </xsd:restriction>
-          </xsd:simpleType>
-        </xsd:attribute>
+        <xsd:attributeGroup ref="tns:AdvanceSearchAttributes" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1758,6 +1762,7 @@
             </xsd:annotation>
           </xsd:element>
         </xsd:sequence>
+        <xsd:attributeGroup ref="tns:AdvanceSearchAttributes" />
         <xsd:attribute name="model" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>Specify the model object name.</xsd:documentation>
