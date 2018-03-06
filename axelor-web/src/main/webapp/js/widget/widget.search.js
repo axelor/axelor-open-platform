@@ -1160,7 +1160,7 @@ ui.directive('uiFilterBox', function() {
 						return filter;
 					}
 					var name = filter.fieldName;
-					var type = ($scope.fields[filter.fieldName]||{}).type;
+					var type = (($scope.fields||$scope.$parent.fields||{})[filter.fieldName]||{}).type;
 
 					var v1 = filter.value;
 					var v2 = filter.value2;
