@@ -89,7 +89,7 @@
 		},
 
 		"integer": function(field, value) {
-			return value;
+			return formatNumber(field, value);
 		},
 
 		"decimal": function(field, value, context) {

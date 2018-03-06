@@ -291,7 +291,7 @@ var Formatters = {
 	},
 
 	"integer": function(field, value) {
-		return value;
+		return ui.formatters.integer(field, value);
 	},
 
 	"decimal": function(field, value, context) {
