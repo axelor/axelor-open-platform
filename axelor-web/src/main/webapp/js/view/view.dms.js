@@ -323,6 +323,7 @@ function DMSFileListCtrl($scope, $element) {
 				isDirectory: true
 			}
 		}, function (record) {
+			$scope.$broadcast('on:change-folders', [record]);
 		});
 	};
 
@@ -371,11 +372,24 @@ function DMSFileListCtrl($scope, $element) {
 
 		function rename(record, done) {
 			var rec = _.pick(record, ['id', 'version', 'fileName']);
-			var promise = $scope._dataSource.save(rec);
+			var ds = $scope._dataSource;
+
+			if (record === $scope.currentFolder) {
+				ds = ds._new(ds._model);
+			}
+
+			var promise = ds.save(rec);
 			promise.then(done, done);
 			promise.success(function (res) {
 				record.version = res.version;
-				$scope.reload();
+				var folder = $scope.folders[record.id];
+				if (folder) {
+					folder.version = record.version;
+					folder.fileName = record.fileName;
+				}
+				if ($scope._dataSource === ds) {
+					$scope.reloadNoSync();
+				}
 			});
 		}
 	};
@@ -403,21 +417,31 @@ function DMSFileListCtrl($scope, $element) {
 	};
 
 	$scope.onMoveFiles = function (files, toFolder) {
-		if (_.isEmpty(files)) { return; }
-		_.each(files, function (item) {
+		var items = files || [];
+		if (items.length === 0) {
+			return;
+		}
+
+		items = items.map(function (item) {
+			var res = _.extend({}, item);
 			if (toFolder && toFolder.id) {
-				item.parent = {
+				res.parent = {
 					id: toFolder.id
 				};
 			} else {
-				item.parent = null;
+				res.parent = null;
 			}
-			$scope.addRelatedValues(item, toFolder);
+			$scope.addRelatedValues(res, toFolder);
+			return res;
 		});
+		
+		var folders = items.filter(function (item) { return item.isDirectory; });
 
-		$scope._dataSource.saveAll(files)
-		.success(function (records) {
-			$scope.reloadNoSync();
+		$scope._dataSource.saveAll(items).success(function (records) {
+			$scope.$broadcast('on:change-folders', folders);
+			setTimeout(function () {
+				$scope.reloadNoSync();
+			});
 		});
 	};
 
@@ -1105,10 +1129,46 @@ ui.directive("uiDmsFolders", function () {
 
 			scope._dataSource.on("on:save", function (e) {
 				syncHome(scope._dataSource.at(0));
-				return scope.sync();
 			});
-			scope._dataSource.on("on:remove", function () {
-				return scope.sync();
+
+			scope._dataSource.on("on:remove", function (e, records) {
+				var ids = _.pluck(records, 'id');
+				records
+					.filter(function (record) { return record.id in scope.folders })
+					.forEach(function (record) {
+						var found = scope.folders[record.id];
+						var parent = scope.folders[(found.parent||{}).id] || _.first(scope.rootFolders);
+						if (parent) {
+							parent.nodes = _.filter(parent.nodes, function (node) {
+								return ids.indexOf(node.id) === -1;
+							});
+						}
+						delete scope.folders[record.id];
+					});
+			});
+			
+			scope.$on('on:change-folders', function (e, folders) {
+				// first remove from old parent
+				folders.forEach(function (record) {
+					var found = scope.folders[record.id];
+					var parent = scope.folders[((found||{}).parent||{}).id] || _.first(scope.rootFolders);
+					if (parent) {
+						parent.nodes = _.filter(parent.nodes, function (node) {
+							return node.id !== record.id;
+						});
+					}
+				});
+				// and add to new parent
+				folders.forEach(function (record) {
+					var found = scope.folders[record.id] || (scope.folders[record.id] = record);
+					var oldParent = found.parent;
+					var newParent = scope.folders[(record.parent||{}).id] || _.first(scope.rootFolders);
+					if (found && oldParent !== newParent) {
+						newParent.nodes.push(found);
+						found.parent = newParent;
+					}
+					found.nodes = found.nodes || [];
+				});
 			});
 
 			scope.sync();
