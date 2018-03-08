@@ -85,7 +85,7 @@
 				var key = '$t:' + field.name;
 				return context[key] || value;
 			}
-			return formatNumber(field, value);
+			return value;
 		},
 
 		"integer": function(field, value) {
