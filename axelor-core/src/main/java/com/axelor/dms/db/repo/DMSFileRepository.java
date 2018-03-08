@@ -141,6 +141,11 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 		}
 
 		final boolean isAttachment = related != null && entity.getMetaFile() != null;
+		
+		if (related != null) {
+			entity.setRelatedId(related.getId());
+			entity.setRelatedModel(related.getClass().getName());
+		}
 
 		// if new attachment, save attachment reference
 		if (isAttachment) {
