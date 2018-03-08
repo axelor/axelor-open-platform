@@ -1001,7 +1001,7 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 
 	$scope.sync = function () {
 		return ds.search({
-			fields: ["fileName", "parent.id", "relatedId", "relatedModel"],
+			fields: ["fileName", "parent.id"],
 			domain: getDomain(),
 			context: { _populate: false },
 			limit: -1
