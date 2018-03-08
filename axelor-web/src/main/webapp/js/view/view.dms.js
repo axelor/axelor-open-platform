@@ -186,6 +186,13 @@ function DMSFileListCtrl($scope, $element) {
 		$scope._dataSource._domain = null;
 		$scope.$broadcast("on:clear-filter-silent");
 	}
+	
+	var __onShow = $scope.onShow;
+	$scope.onShow = function (viewPromise) {
+		$scope.waitForActions(function () {
+			__onShow.call($scope, viewPromise);
+		});
+	};
 
 	var __filter = $scope.filter;
 	$scope.filter = function (searchFilter) {
