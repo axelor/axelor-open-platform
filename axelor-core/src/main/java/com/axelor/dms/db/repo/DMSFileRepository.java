@@ -134,19 +134,19 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
 
 	@Override
 	public DMSFile save(DMSFile entity) {
+		DMSFile parent = entity.getParent();
+		Model related = findRelated(entity);
+		if (related == null && parent != null) {
+			related = findRelated(parent);
+		}
 
-		final DMSFile parent = entity.getParent();
-		final Model related = findRelated(entity);
 		final boolean isAttachment = related != null && entity.getMetaFile() != null;
 
 		// if new attachment, save attachment reference
 		if (isAttachment) {
 			// remove old attachment if file is moved
 			MetaAttachment attachmentOld = attachments.all()
-					.filter("self.metaFile.id = ? AND self.objectId != ? AND self.objectName != ?",
-							entity.getMetaFile().getId(),
-							related.getId(),
-							related.getClass().getName())
+					.filter("self.metaFile.id = ?", entity.getMetaFile().getId())
 					.fetchOne();
 			if (attachmentOld != null) {
 				attachments.remove(attachmentOld);
