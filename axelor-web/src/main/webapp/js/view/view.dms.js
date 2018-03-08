@@ -979,6 +979,7 @@ function DmsFolderTreeCtrl($scope, DataSource) {
 		return ds.search({
 			fields: ["fileName", "parent.id", "relatedId", "relatedModel"],
 			domain: getDomain(),
+			context: { _populate: false },
 			limit: -1
 		}).success(syncFolders);
 	};
@@ -1172,9 +1173,9 @@ ui.directive("uiDmsTreeNode", function () {
 ui.directive("uiDmsTree", ['$compile', function ($compile) {
 
 	var template = "" +
-	"<li ng-repeat='node in nodes' ng-class='{empty: !node.nodes.length}' class='dms-tree-folder'>" +
+	"<li ng-repeat='node in nodes | limitTo: limit as items track by node.id' ng-class='{empty: !node.nodes.length}' class='dms-tree-folder'>" +
 		"<a x-node='node' ui-dms-tree-node></a>" +
-		"<ul ng-show='node.open' x-handler='handler' x-nodes='node.nodes' ui-dms-tree></ul>" +
+		"<ul ng-if='node.open' x-handler='handler' x-nodes='node.nodes' ui-dms-tree></ul>" +
 	"</li>";
 
 	return {
@@ -1183,6 +1184,40 @@ ui.directive("uiDmsTree", ['$compile', function ($compile) {
 			handler: "="
 		},
 		link: function (scope, element, attrs) {
+			
+			var maxNodes = 40;
+			var elemMore = null;
+
+			scope.limit = maxNodes;
+
+			function loadMore() {
+				scope.$applyAsync(function () {
+					scope.limit = Math.min(scope.nodes.length, scope.limit + maxNodes);
+					showMore();
+				});
+			}
+
+			function showMore() {
+				var hasMore = scope.limit < scope.nodes.length;
+				if (elemMore === null) {
+					var a = $("<a href='javascript:'></a>").append($("<span class='title'>").text(_t('load more') + '...'));
+					elemMore = $("<li class='dms-tree-more'>").append(a).appendTo(element);
+					elemMore.on('click', 'a', loadMore);
+				}
+				if (!hasMore) {
+					elemMore.remove();
+					elemMore = null;
+				}
+			}
+
+			var unwatch = scope.$watch('nodes.length', function (n) {
+				if (n === 0) {
+					return;
+				}
+				unwatch();
+				showMore();
+			});
+
 			var handler = scope.handler;
 
 			scope.onClick = function (e, node) {

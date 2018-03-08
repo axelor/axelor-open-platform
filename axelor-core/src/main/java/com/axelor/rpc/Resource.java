@@ -392,13 +392,16 @@ public class Resource<T extends Model> {
 		
 		final Repository repo = JpaRepository.of(model);
 		final List<Object> jsonData = new ArrayList<>();
+		final boolean populate = request.getContext() != null && request.getContext().get("_populate") != Boolean.FALSE;
 
 		for (Object item : data) {
 			if (item instanceof Model) {
 				item = toMap(item);
 			}
 			if (item instanceof Map) {
-				item = repo.populate((Map) item, request.getContext());
+				if (populate) {
+					item = repo.populate((Map) item, request.getContext());
+				}
 				Translator.applyTranslatables((Map) item, model);
 			}
 			jsonData.add(item);

@@ -366,6 +366,11 @@
 	font-weight: 600;
 }
 
+.dms-folder-tree li.dms-tree-more > a > span.title {
+	padding-left: 20px;
+	font-style: oblique;
+}
+
 .grid-dnd-proxy {
 	position: absolute;
 	display: inline-block;
