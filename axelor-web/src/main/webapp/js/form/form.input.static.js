@@ -24,17 +24,12 @@ var popoverElem = null;
 var popoverTimer = null;
 
 function canDisplayPopover(scope, details) {
-	var mode = axelor.config['application.mode'];
-	var tech = axelor.config['user.technical'];
-	
 	if (axelor.device.mobile) {
 		return false;
 	}
-
-	if(mode == 'prod' && !tech) {
+	if(!axelor.config['user.technical']) {
 		return details ? false : scope.field && scope.field.help;
 	}
-
 	return true;
 }
 
