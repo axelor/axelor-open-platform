@@ -709,6 +709,10 @@ table.field-details th {
 	font-weight: 600;
 }
 
+table.field-details th:after {
+	content: ' :';
+}
+
 table.field-details th,
 table.field-details td {
 	white-space: nowrap;
@@ -728,6 +732,18 @@ table.field-details .help-text hr {
 	max-width: 480px;
 	min-width: 220px;
 	z-index: 2147483647;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	padding: 0;
+}
+
+.popover,
+.popover-title {
+	border-radius: 0;
+}
+
+.popover-title {
+	font-weight: 600;
 }
 
 .popover-inner {
@@ -746,10 +762,11 @@ table.field-details .help-text hr {
 .popover .field-details code {
 	display: block;
 	white-space: pre-wrap;
-	max-width: 300px;
+	max-width: 450px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	font-size: 12px;
+	border-radius: 0;
 }
 
 .popover.bottom {

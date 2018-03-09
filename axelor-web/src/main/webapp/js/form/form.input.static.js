@@ -235,15 +235,15 @@ ui.directive('uiHelpPopover', function() {
 			text = text.replace(/\\n/g, '<br>');
 			addRow(null, text, 'help-text');
 		}
-
-		if (text) {
-			addRow(null, '<hr noshade>', 'help-text');
-		}
 		
 		if(!canDisplayPopover(scope, true)) {
 			return;
 		}
-		
+
+		if (text) {
+			addRow(null, '<hr noshade>', 'help-text');
+		}
+
 		var model = scope._model;
 		if (model === field.target) {
 			model = scope._parentModel || scope.$parent._model;
