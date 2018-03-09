@@ -132,7 +132,25 @@ public class Context extends SimpleBindings {
 	public Context(Class<?> beanClass) {
 		this(new HashMap<>(), beanClass);
 	}
-	
+
+	/**
+	 * Create a new {@link Context} for a record by given id.
+	 * 
+	 * <p>
+	 * This is useful when we have to use custom fields defined for an entity from
+	 * bussiness code.
+	 * </p>
+	 * 
+	 * @param id
+	 *            the record id
+	 * @param beanClass
+	 *            the record entity class
+	 */
+	public Context(Long id, Class<?> beanClass) {
+		this(beanClass);
+		this.values.put("id", id);
+	}
+
 	public void addChangeListener(PropertyChangeListener listener) {
 		getContextHandler().addChangeListener(listener);
 	}

@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -143,14 +144,8 @@ public class TestJsonContext extends JpaTest {
 			return null;
 		}
 	}
-
-	@Test
-	public void testCustomFields() throws Exception {
-		final Map<String, Object> values = new HashMap<>();
-		final String json = getCustomerAttrsJson();
-		values.put("attrs", json);
-
-		final Context context = new Context(values, Contact.class);
+	
+	private void testCustomFields(Context context, String json) throws Exception {
 		final ScriptHelper engine = new GroovyScriptHelper(context);
 
 		Assert.assertEquals(json, context.asType(Contact.class).getAttrs());
@@ -179,6 +174,29 @@ public class TestJsonContext extends JpaTest {
 			Assert.fail();
 		} catch (IllegalArgumentException e) {
 		}
+	}
+
+	@Test
+	public void testCustomFieldsUnmanaged() throws Exception {
+		final Map<String, Object> values = new HashMap<>();
+		final String json = getCustomerAttrsJson();
+		values.put("attrs", json);
+		testCustomFields(new Context(values, Contact.class), json);
+	}
+	
+	@Test
+	@Transactional
+	public void testCustomFieldsManaged() throws Exception {
+		final EntityManager em = getEntityManager();
+		final Contact contact = new Contact("Test", "NAME");
+		final String json = getCustomerAttrsJson();
+
+		contact.setAttrs(json);
+
+		em.persist(contact);
+		em.flush();
+
+		testCustomFields(new Context(contact.getId(), Contact.class), json);
 	}
 
 	@Test
