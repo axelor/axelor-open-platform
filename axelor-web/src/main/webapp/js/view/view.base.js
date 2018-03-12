@@ -654,6 +654,11 @@ function viewSwitcher(scope, element, attrs) {
 	var params = (scope._viewParams || scope.tab);
 	var viewTypes = _.pluck(params.views, 'type');
 
+	if ((params.viewType || params.type) === 'dashboard') {
+		element.hide();
+		return;
+	}
+
 	element.find("[x-view-type]").click(function(e) {
 		if (this.disabled) {
 			return;
