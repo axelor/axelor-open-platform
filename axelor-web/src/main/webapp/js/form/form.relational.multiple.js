@@ -316,7 +316,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 			var items = [];
 			angular.forEach(records, function(record){
 				var item = clone ? angular.copy(record, {}) : (record || {});
-				if (item.id == null) {
+				if (!item.id) {
 					item.id = item.$id || (item.$id = --dummyId);
 				}
 				items.push(item);

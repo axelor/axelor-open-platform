@@ -1879,11 +1879,17 @@ Grid.prototype.isDirty = function(row) {
 Grid.prototype.markDirty = function(row, field) {
 	
 	var grid = this.grid,
+		dataView = this.scope.dataView,
 		hash = grid.getCellCssStyles("highlight") || {},
 		items = hash[row] || {};
 	
 	items[field] = "dirty";
 	hash[row] = items;
+	
+	var record = dataView.getItem(row);
+	if (this.handler.$$ensureIds && record && !record.id) {
+		this.handler.$$ensureIds([record]);
+	}
 
 	grid.setCellCssStyles("highlight", hash);
 	grid.invalidateAllRows();
