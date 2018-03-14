@@ -622,7 +622,7 @@ ActionHandler.prototype = {
 		}
 
 		var model = context._model || scope._model;
-		var data =  scope.getActionData ? scope.getActionData() : null;
+		var data =  scope.getActionData ? scope.getActionData(context) : null;
 		if (data && context._signal) {
 			data._signal = context._signal;
 		}
