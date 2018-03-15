@@ -522,6 +522,17 @@ ui.formInput('OneToMany', {
 				height = +(scope.field.height) || 10;
 			var maxSize = (rowSize * height) + minSize;
 
+			var unwatch = scope.$watch('schema', function (schema) {
+				if (schema) {
+					unwatch();
+					unwatch = null;
+					if (schema.rowHeight && schema.rowHeight !== rowSize) {
+						rowSize = schema.rowHeight;
+						maxSize = (rowSize * height) + minSize
+					}
+				}
+			});
+
 			return function(value) {
 				inc = arguments[1] || inc;
 				var count = _.size(value) + inc, height = minSize;
