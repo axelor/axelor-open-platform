@@ -124,7 +124,9 @@
 		},
 
 		"many-to-one": function(field, value) {
-			return value ? value[field.targetName] : "";
+			return value
+				? (field.targetName ? value[field.targetName] : (value.name || value.code || value.id || ""))
+				: "";
 		},
 
 		"one-to-many": function(field, value) {

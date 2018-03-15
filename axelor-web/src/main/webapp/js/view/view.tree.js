@@ -238,7 +238,11 @@ function Column(scope, col) {
 
 			return res.title;
 		}
-		var fn = ui.formatters[col.type];
+		var type = col.type;
+		if (type === 'reference') {
+			type = 'many-to-one';
+		}
+		var fn = ui.formatters[type];
 		if (fn) {
 			value = fn(col, value, record);
 		}
