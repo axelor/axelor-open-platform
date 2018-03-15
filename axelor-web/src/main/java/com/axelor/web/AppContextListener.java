@@ -30,13 +30,11 @@ import org.jboss.resteasy.spi.Registry;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
-import com.axelor.app.AppSettings;
 import com.axelor.app.internal.AppLogger;
 import com.axelor.meta.loader.ViewWatcher;
 import com.google.inject.Binding;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Stage;
 import com.google.inject.servlet.GuiceServletContextListener;
 
 /**
@@ -104,7 +102,6 @@ public class AppContextListener extends GuiceServletContextListener {
 
 	@Override
 	protected Injector getInjector() {
-		final Stage stage = AppSettings.get().isProduction() ? Stage.PRODUCTION : Stage.DEVELOPMENT;
-		return Guice.createInjector(stage, new AppServletModule());
+		return Guice.createInjector(new AppServletModule());
 	}
 }
