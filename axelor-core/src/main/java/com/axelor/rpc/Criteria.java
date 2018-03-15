@@ -91,6 +91,7 @@ public class Criteria {
 
 		// simple search where data is field -> search value map
 		raw.put("operator", "or");
+		raw.put("_archived", request.getData().get("_archived"));
 		raw.put("_domain", request.getData().get("_domain"));
 		raw.put("_domainContext", request.getData().get("_domainContext"));
 		
