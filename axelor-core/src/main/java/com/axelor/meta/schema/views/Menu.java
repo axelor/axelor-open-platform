@@ -24,14 +24,12 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.i18n.I18n;
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("menu")
-public class Menu extends AbstractWidget {
+public class Menu extends SimpleWidget {
 
 	@XmlType
 	@JsonTypeName("menu-item")
@@ -65,13 +63,7 @@ public class Menu extends AbstractWidget {
 	}
 
 	@XmlAttribute
-	private String title;
-
-	@XmlAttribute
 	private String icon;
-
-	@XmlAttribute
-	private Boolean showTitle;
 
 	@XmlElements({
 		@XmlElement(name = "item", type = Item.class),
@@ -82,20 +74,6 @@ public class Menu extends AbstractWidget {
 	@JsonIgnore
 	private String model;
 
-	@JsonGetter("title")
-	public String getLocalizedTitle() {
-		return I18n.get(title);
-	}
-
-	@JsonIgnore
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
 	public String getIcon() {
 		return icon;
 	}
@@ -103,15 +81,7 @@ public class Menu extends AbstractWidget {
 	public void setIcon(String icon) {
 		this.icon = icon;
 	}
-
-	public Boolean getShowTitle() {
-		return showTitle;
-	}
-
-	public void setShowTitle(Boolean showTitle) {
-		this.showTitle = showTitle;
-	}
-
+	
 	public List<AbstractWidget> getItems() {
 		if(items != null) {
 			for (Object item : items) {
@@ -129,13 +99,4 @@ public class Menu extends AbstractWidget {
 	public void setItems(List<AbstractWidget> items) {
 		this.items = items;
 	}
-
-	public void setModel(String model) {
-		this.model = model;
-	}
-
-	public String getModel() {
-		return model;
-	}
-
 }

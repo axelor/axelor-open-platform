@@ -210,6 +210,11 @@
             <xsd:documentation>Comma separate list of actions to execute on click event.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="name" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>The name of this menu item.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="prompt" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
@@ -243,64 +248,63 @@
     </xsd:complexContent>
   </xsd:complexType>
   
-  <xsd:complexType name="MenubarMenu">
-    <xsd:sequence>
-      <xsd:choice maxOccurs="unbounded">
-        <xsd:element name="item" type="tns:MenubarMenuItem" />
-        <xsd:element name="divider">
-          <xsd:complexType>
-            <xsd:complexContent>
-              <xsd:extension base="tns:AbstractWidget">
-                <xsd:attribute name="depends" type="xsd:string">
-                  <xsd:annotation>
-                    <xsd:documentation>
-                    Specify comma separated list of field names on which this widget depends.
-                    </xsd:documentation>
-                  </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="showIf" type="xsd:string">
-                  <xsd:annotation>
-                    <xsd:documentation>Show if the given JavaScript expression is true.</xsd:documentation>
-                  </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="hideIf" type="xsd:string">
-                  <xsd:annotation>
-                    <xsd:documentation>Hide if the given JavaScript expression is true.</xsd:documentation>
-                  </xsd:annotation>
-                </xsd:attribute>              
-              </xsd:extension>
-            </xsd:complexContent>
-          </xsd:complexType>
-        </xsd:element>
-        <xsd:element name="menu" type="tns:MenubarMenu">
+  <xsd:complexType name="MenubarMenuDivider">
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractWidget">
+        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="depends" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Define a submenu.</xsd:documentation>
+            <xsd:documentation>
+            Specify comma separated list of field names on which this widget depends.
+            </xsd:documentation>
           </xsd:annotation>
-        </xsd:element>
-      </xsd:choice>
-    </xsd:sequence>
-    <xsd:attribute name="title" type="xsd:string" use="required">
-      <xsd:annotation>
-        <xsd:documentation>The display text</xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="icon" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>Path of the image.</xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="showTitle" type="xsd:boolean">
-      <xsd:annotation>
-        <xsd:documentation>Specify whether to show the title.</xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="if-module" type="xsd:string">
-      <xsd:annotation>
-        <xsd:documentation>
-          Only show if the given module is installed.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
+        </xsd:attribute>
+        <xsd:attribute name="showIf" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Show if the given JavaScript expression is true.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="hideIf" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Hide if the given JavaScript expression is true.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  
+  <xsd:complexType name="MenubarMenu">
+    <xsd:complexContent>
+      <xsd:extension base="tns:AbstractWidget">
+        <xsd:sequence>
+          <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="item" type="tns:MenubarMenuItem" />
+            <xsd:element name="divider" type="tns:MenubarMenuItem" />
+            <xsd:element name="menu" type="tns:MenubarMenu">
+              <xsd:annotation>
+                <xsd:documentation>Define a submenu.</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:choice>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="title" type="xsd:string" use="required">
+          <xsd:annotation>
+            <xsd:documentation>The display text</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="icon" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Path of the image.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="showTitle" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the title.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
   </xsd:complexType>
 
   <xsd:complexType name="AbstractView" abstract="true">
