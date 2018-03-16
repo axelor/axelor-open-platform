@@ -65,3 +65,24 @@
 	color:white;
 	font-weight: bold;
 }
+
+.gantt_task_line.gantt_project{
+			color:white;
+}
+
+.gantt_side_content{
+	color:#333;
+}
+
+.summary-bar{
+	font-weight: bold;
+}
+
+.gantt_resource_task .gantt_task_content{
+	color:inherit;
+}
+
+.gantt_resource_task .gantt_task_progress{
+	background-color:rgba(33,33,33,0.3);
+}
+

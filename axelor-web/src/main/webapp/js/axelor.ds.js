@@ -539,6 +539,10 @@
 				items.push(view.columnBy);
 				items.push(view.sequenceBy);
 			}
+			
+			if (view.type === "gantt") {
+				items.push(view.taskUser);
+			}
 
 			return result;
 		}

@@ -1691,6 +1691,13 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="taskUser" type="xsd:string" use="optional">
+          <xsd:annotation>
+            <xsd:documentation>
+              Name of the user field related to task.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="x-finish-to-start" type="xsd:string" use="optional">
           <xsd:annotation>
             <xsd:documentation>

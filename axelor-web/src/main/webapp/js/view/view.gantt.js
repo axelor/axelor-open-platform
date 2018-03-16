@@ -114,7 +114,7 @@ ui.controller('GanttViewCtrl', GanttViewCtrl);
 GanttViewCtrl.$inject = ['$scope', '$element'];
 
 function GanttViewCtrl($scope, $element) {
-
+	
 	ui.DSViewCtrl('gantt', $scope, $element);
 	var ds = $scope._dataSource;
 	var view = $scope._views.gantt;
@@ -140,7 +140,7 @@ function GanttViewCtrl($scope, $element) {
 	};
 
 	$scope.fetchItems = function(callback) {
-
+		
 		var schema = $scope.schema;
 
 		var searchFields = _.pluck(this.fields, "name");
@@ -155,7 +155,8 @@ function GanttViewCtrl($scope, $element) {
 		                      schema.finishToStart,
 		                      schema.startToStart,
 		                      schema.finishToFinish,
-		                      schema.startToFinish
+		                      schema.startToFinish,
+		                      schema.taskUser
 		];
 
 		_.each(optionalFields,function(optField){
@@ -208,12 +209,8 @@ function GanttViewCtrl($scope, $element) {
 	$scope.doRemove = function(id, task){
    		var record = _.clone(task.record);
 		return ds.remove(record).success(function(res){
-			return $scope.refresh();
+			return true;
 		});
-	};
-
-	$scope.refresh = function() {
-		
 	};
 
 }
@@ -229,6 +226,14 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 		var mode = schema.mode || "week";
 		var editor = null;
 		ganttInit();
+		
+		function byId(list, id) {
+			for (var i = 0; i < list.length; i++) {
+				if (list[i].key == id)
+					return list[i].label || "";
+			}
+			return "";
+		}	
 
 		function setScaleConfig(value){
 			
@@ -279,7 +284,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 
 		   var  colContent = function(task){
 				return '<i class="fa gantt_button_grid gantt_grid_add fa-plus" onclick="gantt.createTask(null, '+task.id+')"></i>'+
-				'<i class="fa gantt_button_grid gantt_grid_delete fa-times" onclick="dhtmlx.confirm({ ' +
+				'<i class="fa gantt_button_grid gantt_grid_delete fa-times" onclick="gantt.confirm({ ' +
 				'title: gantt.locale.labels.confirm_deleting_title,'+
 				'text: gantt.locale.labels.confirm_deleting,'+
 				'callback: function(res){ '+
@@ -288,12 +293,19 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 				'}})"></i>';
 			};
 			
+		   
 		   var columns = [];
+		   
+		   if (schema.taskUser) {
+			   columns.push({name: "users", label: fields[schema.taskUser].title, align: "center", template: function (item) {
+					return byId(gantt.serverList("users"), item.user_id)}});
+		   }
+		   
 		   var isTree = true;
 		   _.each(fieldNames, function(fname){
 			   var field = fields[fname];
 			   if (columns.length == 0) {
-				   columns.push({ name:"text", label:field.title, tree:isTree, width:200,
+				   columns.push({ name:"text", label:field.title, tree:isTree,
 				 template: function(item){ 
 					        if(moment(item[fname], moment.ISO_8601, true).isValid()) {
 						  return moment(item[fname], moment.ISO_8601, true).format("MM/DD/YYYY h:mm:ss");							
@@ -316,7 +328,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 			   }
 			   isTree = false;
 		   });
-		   columns.push({ name:"buttons", label:colHeader, width:75, template:colContent });
+		   columns.push({ name:"buttons", label:colHeader, width:30, template:colContent });
 
 		   return columns;
 	   }
@@ -346,38 +358,17 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 				if (!task.$open && gantt.hasChild(task.id)) {
 					css.push("task-collapsed");
 				}
+				
+				if (task.$virtual || task.type == gantt.config.types.project)
+					css.push("summary-bar");
+
+				if(task.user_id){
+					css.push("gantt_resource_task gantt_resource_" + task.user_id);
+				}
 
 				return css.join(" ");
 			};
 
-			gantt.addTaskLayer(function show_hidden(task) {
-				
-				if (!task.$open && gantt.hasChild(task.id)) {
-					
-					var sub_height = gantt.config.row_height - 5,
-						el = document.createElement('div'),
-						sizes = gantt.getTaskPosition(task);
-
-					var sub_tasks = gantt.getChildren(task.id);
-					var child_el;
-					for (var i = 0; i < sub_tasks.length; i++){
-						var child = gantt.getTask(sub_tasks[i]);
-						var child_sizes = gantt.getTaskPosition(child);
-
-						child_el = createBox({
-							height: sub_height,
-							top:sizes.top,
-							left:child_sizes.left,
-							width: child_sizes.width
-						}, "child_preview gantt_task_line");
-						child_el.innerHTML =  child.text;
-						el.appendChild(child_el);
-					}
-					return el;
-				}
-				
-				return false;
-			});
 	   }
 
 	   function ganttInit(){
@@ -402,6 +393,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 		   gantt.config.grid_resize = true;
 		   gantt.config.order_branch = true;
 		   gantt.config.date_grid = "%d/%m/%Y %H %i";
+		   gantt.serverList("users", []);
 		   
 		   gantt.eachSuccessor = function(callback, root){
 			   if(!this.isTaskExists(root))
@@ -428,11 +420,6 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 			   }
 		   };
 		   
-		   gantt.templates.grid_row_class =
-				gantt.templates.task_row_class = function(start, end, task){
-					if(task.$virtual)
-						return "summary-row"
-		   };
 		   gantt.templates.task_class=function(start, end, task){
 			if(task.$virtual)
 				return "summary-bar";
@@ -443,7 +430,42 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 	   }
 
 	   function ganttAttachEvents(){
-
+		   
+		   gantt.templates.rightside_text = function(start, end, task){
+				return byId(gantt.serverList("users"), task.user_id);
+		   };
+		   
+		  if (schema.taskUser) {
+			  gantt.attachEvent("onParse", function(){
+				var styleId = "dynamicGanttStyles";
+				var element = document.getElementById(styleId);
+				if(!element){
+					element = document.createElement("style");
+					element.id = styleId;
+					document.querySelector("head").appendChild(element);
+				}
+				var html = [".gantt_cell:nth-child(1) .gantt_tree_content{" +
+						" border-radius: 16px;" +
+						" width: 100%;" +
+						" height: 70%;" +
+						" margin: 5% 0;" +
+						" line-height: 230%;}"];
+				var resources = gantt.serverList("users");
+				
+				resources.forEach(function(r){
+					html.push(".gantt_task_line.gantt_resource_" + r.key + "{" +
+						"background-color:"+r.backgroundColor+"; " +
+						"color:"+r.textColor+";" +
+					"}");
+					html.push(".gantt_row.gantt_resource_" + r.key + " .gantt_cell:nth-child(1) .gantt_tree_content{" +
+						"background-color:"+r.backgroundColor+"; " +
+						"color:"+r.textColor+";" +
+						"}");
+				});
+				element.innerHTML = html.join("");
+			});
+		  }
+		   
 		   gantt.attachEvent("onAfterTaskAdd", updateRecord);
 		   gantt.attachEvent("onAfterTaskUpdate", updateRecord);
 		   gantt.attachEvent("onAfterTaskDelete", scope.doRemove);
@@ -597,7 +619,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 			}
 			
 		}
-
+		
 		function addLinkDict(links, targetRecordId, sourceRecords, linkType){
 			
 			_.each(sourceRecords, function(sourceRec){
@@ -660,7 +682,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 			var endDate = null;
 			if(schema.taskEnd && rec[schema.taskEnd]){
 				endDate = moment(rec[schema.taskEnd]);
-				task.end_date  = endDate;
+				task.end_date  = endDate.toDate();
 				if(task.isNew){
 					task.end_date  = endDate.format("DD-MM-YYYY HH:mm:SS");
 				}
@@ -701,9 +723,29 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 				task.sortorder = rec[schema.taskSequence];
 			}
 			
+			if(schema.taskUser && rec[schema.taskUser]) {
+				task.user_id = rec[schema.taskUser].id;
+				if(!byId(gantt.serverList("users"), task.user_id)) {
+					gantt.serverList("users").push({key:task.user_id, 
+						label:rec[schema.taskUser][fields[schema.taskUser].targetName], 
+						backgroundColor: get_random_color(),
+						textColor:"#FFF"
+						});
+				}
+			}
+			
 			return task;
 			
 		}
+		
+		function get_random_color() {
+	  		function c() {
+	  			var hex = Math.floor(Math.random()*256).toString(16);
+	  			return ("0"+String(hex)).substr(-2); // pad with zero
+	  		}
+	  		return "#"+c()+c()+c();
+	   }
+	   
 
 		scope.onMode = function(name) {
 			setScaleConfig(name);

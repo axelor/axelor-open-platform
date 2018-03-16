@@ -46,7 +46,10 @@ public class GanttView extends AbstractView {
 
 	@XmlAttribute
 	private String taskProgress;
-
+	
+	@XmlAttribute
+	private String taskUser;
+	
 	@XmlAttribute(name = "x-start-to-start")
 	private String startToStart;
 
@@ -108,6 +111,14 @@ public class GanttView extends AbstractView {
 
 	public void setTaskProgress(String taskProgress) {
 		this.taskProgress = taskProgress;
+	}
+	
+	public String getTaskUser() {
+		return taskUser;
+	}
+
+	public void setTaskUser(String taskUser) {
+		this.taskUser = taskUser;
 	}
 
 	public String getStartToStart() {
