@@ -94,7 +94,7 @@
 			version: match[2] || "0"
 		};
 
-		if (matched.name) {
+		if (matched.browser) {
 			browser[matched.browser] = true;
 			browser.version = matched.version;
 		}
