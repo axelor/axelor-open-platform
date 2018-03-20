@@ -371,7 +371,8 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
 					item.showTitle = (editor.widgetAttrs||{}).showTitles !== "false";
 				}
 				if (!item.showTitle && !item.items) {
-					item.placeholder = item.placeholder || item.title || item.autoTitle;
+					var itemField = (editor.fields||scope.fields||{})[item.name] || {};
+					item.placeholder = item.placeholder || itemField.placeholder || item.title || itemField.title || item.autoTitle;
 				}
 				if (editor.itemSpan && !item.colSpan && !level) {
 					item.colSpan = editor.itemSpan;
