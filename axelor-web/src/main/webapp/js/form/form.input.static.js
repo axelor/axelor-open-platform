@@ -340,29 +340,23 @@ ui.formItem('Label', {
 		if (field && field.help && axelor.config['user.noHelp'] !== true) {
 			element.addClass('has-help');
 		}
-
-		if (field.translatable) {
-			var icon = $("<i class='fa fa-flag'></i>").attr('title', _t('Show translations.')).appendTo(element);
-			var toggle = function () {
-				icon.toggle(!scope.$$readonlyOrig);
-			};
-			
-			scope.$watch("$$readonlyOrig", toggle);
-			scope.$on("on:new", toggle);
-			scope.$on("on:edit", toggle);
-		}
 	},
 
 	template:
-		"<label ui-translate-action><span ui-help-popover ng-transclude></span></label>"
+		"<label><span ui-help-popover ng-transclude></span></label>"
 });
 
-ui.directive('uiTranslateAction', ['$q', function ($q) {
+ui.directive('uiTranslateIcon', ['$q', function ($q) {
 	return {
 		link: function (scope, element) {
-			if (!scope.field.translatable) {
-				return;
-			}
+			var icon = $("<i class='fa fa-flag translate-icon'></i>").attr('title', _t('Show translations.')).appendTo(element);
+			var toggle = function () {
+				icon.toggle(!scope.$$readonlyOrig);
+			};
+
+			scope.$watch("$$readonlyOrig", toggle);
+			scope.$on("on:new", toggle);
+			scope.$on("on:edit", toggle);
 
 			var myDs = scope._dataSource;
 			var trDs = scope._dataSource._new("com.axelor.meta.db.MetaTranslation");
@@ -569,7 +563,7 @@ ui.directive('uiTranslateAction', ['$q', function ($q) {
 				}).addClass('translation-form');
 			}
 
-			element.on('click', 'i.fa-flag', function (e) {
+			icon.click(function (e) {
 				var value = scope.getValue();
 				if (value && scope.record && scope.record.id > 0) {
 					trDs.search({
@@ -578,7 +572,6 @@ ui.directive('uiTranslateAction', ['$q', function ($q) {
 					}).success(showPopup);
 				}
 			});
-			
 		}
 	};
 }]);

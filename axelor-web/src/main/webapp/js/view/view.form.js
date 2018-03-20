@@ -1258,7 +1258,11 @@ ui.formBuild = function (scope, schema, fields) {
 			if (/button|group|tabs|tab|separator|spacer|static|static-label/.test(type)) {
 				item.attr('x-show-title', false);
 			}
-		
+			
+			if (attrs.translatable) {
+				item.attr('ui-translate-icon', '');
+			}
+
 			var items = this.items || this.pages;
 			if (items && this.type != 'panel-related') {
 				process(items, item);

@@ -145,14 +145,17 @@ table.form-layout td.form-item > *,
 	width: 100%;
 }
 
-.form-item > label.translatable > i.fa-flag {
-	float: right;
-	line-height: 18px;
+.form-item-container > .translate-icon {
+	position: absolute;
+	right: 0;
+	width: auto;
+	line-height: 28px;
 	padding: 0 4px;
+	cursor: pointer;
 }
 
 table.form-layout td.form-item.v-align-top {
-	vertical-align: top;	
+	vertical-align: top;
 }
 
 .form-item-container,
@@ -163,6 +166,7 @@ table.form-layout td.form-item.v-align-top {
 
 .form-item-container {
 	min-width: 26px;
+	position: relative;
 }
 
 .form-item-container > span.display-text {
