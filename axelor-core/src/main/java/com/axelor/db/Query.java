@@ -207,6 +207,11 @@ public class Query<T extends Model> {
 		}
 		
 		String name = spec.trim();
+
+		if (name.matches("(-)?\\s*(self\\.).*")) {
+			throw new IllegalArgumentException("Query#order(String) called with 'self' prefixed argument: " + spec);
+		}
+
 		if (name.charAt(0) == '-') {
 			name = name.substring(1);
 			orderBy += this.joinHelper.joinName(name) + " DESC";
@@ -892,7 +897,6 @@ public class Query<T extends Model> {
 				Mapper currentMapper = mapper;
 				for(int i = 0 ; i < path.length - 1 ; i++) {
 					String item = path[i].replace("[]", "");
-					if (i == 0 && "self".equals(item)) continue;
 					Property property = currentMapper.getProperty(item);
 					if (property == null) {
 						throw new org.hibernate.QueryException("could not resolve property: " + item + " of: "
