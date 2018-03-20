@@ -713,10 +713,6 @@ table.field-details th {
 	font-weight: 600;
 }
 
-table.field-details th:after {
-	content: ' :';
-}
-
 table.field-details th,
 table.field-details td {
 	white-space: nowrap;
