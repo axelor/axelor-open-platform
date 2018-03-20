@@ -716,7 +716,7 @@ ui.directive('uiViewSwitcher', function(){
 		  	'<div class="btn-group">'+
 		  		'<button class="btn" x-view-type="grid"><i class="fa fa-list"></i></button>'+
 				'<button class="btn" x-view-type="cards"><i class="fa fa-th-large"></i></button>'+
-				'<button class="btn" x-view-type="kanban"><i class="fa fa-th-large"></i></button>'+
+				'<button class="btn" x-view-type="kanban"><i class="fa fa-columns"></i></button>'+
 		  		'<button class="btn" x-view-type="calendar"><i class="fa fa-calendar"></i></button>'+
 		  		'<button class="btn" x-view-type="gantt"><i class="fa fa-calendar"></i></button>'+
 		  		'<button class="btn" x-view-type="chart"><i class="fa fa-bar-chart-o"></i></button>'+
