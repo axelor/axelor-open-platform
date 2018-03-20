@@ -292,6 +292,9 @@ ActionHandler.prototype = {
 			viewParams = scope._viewParams || {};
 		
 		context = _.extend({}, viewParams.context, context);
+		if (context._model === undefined) {
+			context._model = scope._model;
+		}
 
 		// include button name as _signal (used by workflow engine)
 		if (this.element.is("button,a.button-item,li.action-item")) {
