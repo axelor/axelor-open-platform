@@ -664,7 +664,7 @@ ActionHandler.prototype = {
 
 		function doReload(pending) {
 			self._invalidateContext = true;
-			var promise = rootScope.reload();
+			var promise = _.isFunction(rootScope.reload) ? rootScope.reload() : scope.reload();
 			if (promise) {
 				promise.then(function(){
 					deferred.resolve(pending);
