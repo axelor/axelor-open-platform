@@ -507,6 +507,12 @@ ui.directive('uiViewPopup', function() {
 			});
 
 			scope.waitForActions(function () {
+				if (scope._viewParams.viewType === 'html') {
+					scope.viewTitle = scope.tabTitle(scope._viewParams);
+					scope._doShow();
+					return;
+				}
+				
 				var unwatch = scope.$watch("_viewParams.$viewScope.schema.loaded", function viewLoadedWatch(loaded) {
 					if (!loaded) {
 						return;

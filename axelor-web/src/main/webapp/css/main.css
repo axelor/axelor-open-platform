@@ -488,7 +488,8 @@ header .navbar .nav-link-user-sub {
 	top: 0 !important;
 }
 
-.ui-dialog > [ui-view-popup] > .view-pane > .view-container .grid-view {
+.ui-dialog > [ui-view-popup] > .view-pane > .view-container .grid-view,
+.ui-dialog > [ui-view-popup] > .view-pane > .view-container .html-view {
 	height: 450px;
 }
 .ui-dialog.maximized > [ui-view-popup] > .view-pane > .view-container .grid-view {
