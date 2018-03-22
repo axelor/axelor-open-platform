@@ -27,12 +27,13 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 		scope: {
 			itemClick: "&"
 		},
-		controller: ["$scope", function ($scope) {
+		controller: ["$scope", "$q", function ($scope, $q) {
 
 			var items = [];
 			var menus = [];
 			var nodes = {};
 			var searchItems = [];
+			var deferred = $q.defer();
 
 			var handler = $scope.itemClick();
 
@@ -96,6 +97,7 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 				});
 				$scope.menus = menus;
 				$scope.searchItems = searchItems;
+				deferred.resolve();
 			};
 
 			this.update = function (data) {
@@ -136,7 +138,12 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 				if (node) {
 					tab.icon = tab.icon || findProp(node, 'icon');
 					tab.color = tab.color || findProp(node, 'iconBackground');
-					tab.fa = tab.fa || findProp(node, 'fa');
+					if (tab.icon && tab.icon.indexOf('fa') === 0) {
+						tab.fa = tab.icon;
+						delete tab.icon;
+					} else {
+						tab.fa = tab.fa || findProp(node, 'fa');
+					}
 					if (tab.icon) {
 						tab.fa = null;
 					}
@@ -149,7 +156,9 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
 			};
 			
 			MenuService.updateTabStyle = function (tab) {
-				updateTabStyle(tab);
+				deferred.promise.then(function () {
+					updateTabStyle(tab);
+				});
 			};
 		}],
 		link: function (scope, element, attrs, ctrl) {
