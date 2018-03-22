@@ -154,6 +154,13 @@ table.form-layout td.form-item > *,
 	cursor: pointer;
 }
 
+.form-item-container.html-item > .translate-icon {
+	z-index: 1;
+}
+.form-item-container.html-item.readonly > .translate-icon {
+	display: none !important;
+}
+
 table.form-layout td.form-item.v-align-top {
 	vertical-align: top;
 }

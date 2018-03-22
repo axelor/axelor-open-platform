@@ -1259,7 +1259,7 @@ ui.formBuild = function (scope, schema, fields) {
 				item.attr('x-show-title', false);
 			}
 			
-			if (attrs.translatable) {
+			if (attrs.translatable && (attrs.serverType === 'string' || attrs.serverType === 'text')) {
 				item.attr('ui-translate-icon', '');
 			}
 
