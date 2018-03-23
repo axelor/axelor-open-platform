@@ -153,7 +153,8 @@
   <action-view name="meta.charts" title="All Charts" model="com.axelor.meta.db.MetaView">
     <view type="grid" name="meta-view-chart-grid"/>
     <view type="form" name="meta-view-form"/>
-    <domain>self.type = 'chart'</domain>
+    <domain>self.type = :defaultType</domain>
+    <context name="defaultType" expr="chart"/>
   </action-view>
   
   <menuitem name="menu-job-all" parent="menu-job-management"

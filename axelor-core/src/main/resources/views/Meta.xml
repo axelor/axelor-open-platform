@@ -108,9 +108,14 @@
     <field name="module"/>
     <field name="priority" width="75"/>
   </grid>
-  
+
+  <action-attrs name="action-view-defaults">
+    <attribute for="type" name="value" expr="#{defaultType}"/>
+  </action-attrs>
+
   <form name="meta-view-form" title="View" model="com.axelor.meta.db.MetaView" 
-        onSave="action-view-validate,com.axelor.meta.web.MetaController:clearCache" width="large" >
+    onNew="action-view-defaults"
+    onSave="action-view-validate,com.axelor.meta.web.MetaController:clearCache" width="large" >
     <panel title="Overview">
       <panel>
         <field name="name" colSpan="12"/>
