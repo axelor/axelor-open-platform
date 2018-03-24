@@ -459,10 +459,6 @@ header .navbar .nav-link-user-sub {
 	padding: 2px;
 }
 
-.view-pane > .view-container {
-	overflow: auto;
-}
-
 .view-pane > .view-container,
 .view-pane > .view-container > div:not(.slick-editor-dropdown) {
 	position: absolute;
