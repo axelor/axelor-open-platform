@@ -134,13 +134,40 @@
 					$(document).off(names, func);
 				});
 			};
+			
+			__custom__.$$onSuspend = function () {
+				if (this.$$watchersSuspended === undefined && this.$$watchers) { 
+					this.$$watchersSuspended = this.$$watchers;
+					this.$$watchersCount = 0;
+					this.$$watchers = this.$$watchersSuspended.filter(function (w) {
+						return w.fn.uiAttachWatch;
+					});
+				}
+			};
+
+			__custom__.$$onResume = function () {
+				if (this.$$watchersSuspended) {
+					this.$$watchers = this.$$watchersSuspended;
+					this.$$watchersCount = this.$$watchersSuspended.length;
+					this.$$watchersSuspended = undefined;
+					setTimeout(function () { this.$broadcast('dom:attach'); }.bind(this), 100);
+				}
+			};
 
 			__custom__.$new = function $new() {
 				var inst = __super__.$new.apply(this, arguments);
+
 				inst.$$watchChecker = this.$$watchChecker;
 				inst.$$watchInitialized = false;
 				inst.$$childCanWatch = true;
 				inst.$$shouldWatch = false;
+				
+				var onSuspend = inst.$$onSuspend.bind(inst);
+				var onResume = inst.$$onResume.bind(inst);
+
+				inst.$on('dom:detach', onSuspend);
+				inst.$on('dom:attach', onResume);
+
 				return inst;
 			};
 			

@@ -177,7 +177,7 @@ ui.directive('uiShow', function() {
 				var val = toBoolean(value);
 				element.css({ display: val ? '' : 'none', opacity: 0 }).toggleClass('ui-hide', !val);
 				if (val) {
-					element.animate({ opacity: 1 }, 400);
+					element.animate({ opacity: 1 }, 300);
 				}
 			});
 		}
@@ -190,23 +190,24 @@ ui.directive('uiShow', function() {
 ui.directive('uiAttach', function () {
 	return function (scope, element, attrs) {
 		var parent = null;
-		scope.$watch(attrs.uiAttach, function (attach) {
+		var uiAttachWatch = function uiAttachWatch(attach) {
 			var result = toBoolean(attach);
 			if (result) {
 				if (parent) {
 					element.appendTo(parent);
 					parent = null;
-					setTimeout(function () {
-						scope.$broadcast('dom:attach');
-					}, 100);
+					scope.$broadcast('dom:attach');
 				}
 			} else {
 				parent = element.parent();
 				scope.$broadcast('dom:detach');
 				element.detach();
 			}
-		}, true);
+		};
 
+		uiAttachWatch.uiAttachWatch = true;
+
+		scope.$watch(attrs.uiAttach, uiAttachWatch, true);
 		scope.$on('$destroy', function () {
 			if (parent) {
 				parent = null;
