@@ -127,7 +127,7 @@
 					names = names.replace(/(\w+)/g, 'adjust:$1');
 				}
 
-				var func = wait ? _.throttle(handler, wait) : handler;
+				var func = wait ? _.debounce(handler, wait) : handler;
 
 				$(document).on(names, func);
 				this.$on('$destroy', function () {
