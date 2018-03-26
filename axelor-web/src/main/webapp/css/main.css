@@ -459,6 +459,10 @@ header .navbar .nav-link-user-sub {
 	padding: 2px;
 }
 
+.view-pane > .view-container {
+	overflow: auto;
+}
+
 .view-pane > .view-container,
 .view-pane > .view-container > div:not(.slick-editor-dropdown) {
 	position: absolute;
@@ -502,7 +506,7 @@ header .navbar .nav-link-user-sub {
 
 .grid-view > .slickgrid {
 	position: absolute !important;
-	top: 40px; left: 0px; right: 0px; bottom: -4px;
+	top: 40px; left: 0px; right: 0px; bottom: 0px;
 	border: none;
 }
 
