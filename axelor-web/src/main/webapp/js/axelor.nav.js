@@ -22,7 +22,11 @@
 var app = angular.module("axelor.app");
 
 function useSingleTabOnly() {
-	return axelor.device.mobile || !!axelor.config['view.single.tab'] || axelor.config['user.singleTab'];
+	return axelor.device.mobile
+		|| !!axelor.config['view.single.tab']
+		|| axelor.config['user.singleTab']
+		|| +(axelor.config["view.tabs.max"]) === 0
+		|| +(axelor.config["view.tabs.max"]) === 1;
 }
 
 app.factory('NavService', ['$location', 'MenuService', function($location, MenuService) {
@@ -171,6 +175,7 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 
 		if (!found) {
 			found = tab;
+			__closeUnusedTabs();
 			if (options && options.__tab_prepend) {
 				tabs.unshift(tab);
 			} else {
@@ -183,6 +188,32 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 		});
 
 		return __doSelect(found);
+	}
+	
+	var MAX_TABS;
+	
+	function __closeUnusedTabs() {
+		if (MAX_TABS === undefined) {
+			MAX_TABS = +(axelor.config["view.tabs.max"]) || -1;
+		}
+		if (MAX_TABS <= 0 || tabs.length < MAX_TABS) {
+			return;
+		}
+		
+		var all = _.filter(tabs, canCloseTab);
+		var doClose = function doClose(tab) {
+			var index = _.indexOf(tabs, tab);
+			var vs = tab.$viewScope;
+			if (vs && vs.isDirty && vs.isDirty()) return;
+			if (vs && vs.$details && vs.$details.isDirty && vs.$details.isDirty()) return;
+			tabs.splice(index, 1);
+		};
+
+		for (var i = 0; i < all.length; i++) {
+			doClose(all[i]);
+			if (tabs.length === 0) selected = null;
+			if (tabs.length < MAX_TABS) break;
+		}
 	}
 
 	function __closeTab(tab, callback) {
