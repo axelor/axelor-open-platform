@@ -200,7 +200,9 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 			return;
 		}
 		
-		var all = _.filter(tabs, canCloseTab);
+		var all = _.filter(tabs, function (tab) {
+			return !tab.selected && canCloseTab(tab);
+		});
 		var doClose = function doClose(tab) {
 			var index = _.indexOf(tabs, tab);
 			var vs = tab.$viewScope;
