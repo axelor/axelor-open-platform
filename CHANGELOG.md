@@ -1,3 +1,64 @@
+## 5.0.0-rc2 (current)
+
+#### New Features
+
+* New setting `view.tabs.max` to control maximum number of tabs
+* Set calendar date with `calendarDate` from action context
+* Set calendar mode with `calendarMode` from action context
+* Currency formatting using `x-currency="field.name"`
+* Allow to provide custom css using `__config__.appStyle`
+* Filter detail of grid view is now accessible from action context 
+
+#### Enhancements
+
+* Allow to show html view in popup
+* Allow to manage view menus and menu items with field perms
+* Only show technical popup to technical staff even in dev mode
+* Optimize DMS view with huge file structure
+* Support `customSearch` and `freeSearch` attributes to cards and kanban views
+* Data export can be controlled with `data.export.max-size` and `data.export.fetch-size`
+* Optimize grid widget rendering
+* Optimize web ui by reducing DOM size
+* Customize menu for custom models
+* Thousand separator formatting for numeric fields
+* Implemented versioned bulk update
+* Custom fields in grid view are now added before buttons
+
+#### Bugs
+
+* Fix navigation tabs icon and colors not updated properly
+* Fix grid view reload with button action
+* Fix placeholder issue on editor fields
+* Fix `_model` key missing in context
+* Fix translate icon on field without label
+* Fix reference column formatting in tree view
+* Fix view xsd having action-view attribute home in wrong place
+* Fix o2m/m2m fields should always show archived records
+* Fix m2o selection should not include archived records
+* Fix duplicate row created on o2m when an action is using `response.setValues`
+* Fix attachment file updates with DMS view
+* Fix NPE caused by mail fetcher job
+* Fix `freeSearch` with name field not working on grid view
+* Fix various popup dialog layout issues
+* Fix advance search not visible in view popup
+* Fix memory leaks in web ui
+* Fix parent reload from popup 
+* Fix unarchive menu item not visible in form view
+* Fix dotted fields in editable grid not updated if related m2o changes 
+* Fix popup editor readonly issue
+* Fix o2m editable grid sometime duplicates previous cell's value when creating new rows
+* Fix time widget update issue in editable grid view
+* Fix m2o field dropdown menu in editable grid
+* Fix mass updatable field sometime not listed
+* Fix menu overriding issue caused by wrong ordering
+* Fix xml id is not utilized for menu and action definitions
+* Fix context update issue caused by `response.setValues` call
+* Fix value formatting issues in tree view
+* Fix `nav-select` widget initialization issue
+* Fix advance search field selection sorting
+* Fix view tabs icon and colors not updated properly
+* Fix translatable field value is sometime not translated
+
 ## 5.0.0-rc1 (2018-02-07)
 
 #### New Features
@@ -41,7 +102,7 @@
 * Allow to override file upload directory structure
 * Optimized code generation gradle task
 * Allow to add message content with change tracking
-* Re-implementation of context using proxy with seemless access to context values as well as database values
+* Re-implementation of context using proxy with seamless access to context values as well as database values
 * Improve DMS ergonomics
 * Allow to unarchive records
 * Allow closing tabs with mouse middle click
@@ -57,7 +118,6 @@
 * Removed shell
 * Mail groups are replaced with team (see basic teams feature)
 * Method `Context#asType(Class)` returns proxy instance
-* Method `Response#setValues(Object)` only excepts `Map` or context proxy
 * Changed scripting helper `__repo__.of()` to `__repo__()`
 * Gradle tasks `init` and `migrate` are replaced with new `database` task
 
