@@ -471,8 +471,13 @@ public class Query<T extends Model> {
 
 		for(String key : values.keySet()) {
 			String name = key.replaceFirst("^self\\.", "");
-			params.put(name, values.get(key));
-			where.add("self." + name + " != :" + name);
+			Object value = values.get(key);
+			params.put(name, value);
+			if (value == null) {
+				where.add("self." + name + " IS NOT NULL");
+			} else {
+				where.add("(self." + name + " IS NULL OR " + "self." + name + " != :" + name + ")");
+			}
 		}
 
 		if (AuditableModel.class.isAssignableFrom(beanClass)) {
