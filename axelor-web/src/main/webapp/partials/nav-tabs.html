@@ -23,7 +23,7 @@
      </li>
   </ul>
   <div class="view-content">
-    <div ui-show="tab.selected" ng-repeat="tab in navTabs"><div ui-view-pane="tab"></div></div>
+    <div ui-show="tab.selected" ng-repeat="tab in navTabs" ng-class="tab.viewType"><div ui-view-pane="tab"></div></div>
   </div>
   <div ng-if="::!singleTabOnly" id="nav-tabs-menu" class="dropdown clearfix">
     <ul class="dropdown-menu" style="display:block;position:static;margin-bottom:5px;">

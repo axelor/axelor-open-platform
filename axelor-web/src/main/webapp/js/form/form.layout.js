@@ -275,8 +275,10 @@ ui.directive('uiPanelLayout', ['$compile', function($compile) {
 
 function BarLayout(items, attrs, $scope, $compile) {
 	
-	var main = $('<div class="span8">');
-	var side = $('<div class="span4">');
+	var main = $('<div class="span8 bar-main">');
+	var side = $('<div class="span4 bar-side">');
+	var wrap = $('<div class="span12 bar-wrap">').appendTo(main);
+	
 
 	items.each(function(item, i) {
 		var elem = $(this);
@@ -284,7 +286,7 @@ function BarLayout(items, attrs, $scope, $compile) {
 		if (elem.attr('x-sidebar')) {
 			elem.appendTo(side);
 		} else {
-			elem.appendTo(main);
+			elem.appendTo(wrap);
 		}
 		if (prop.attached) {
 			elem.addClass("attached");
@@ -299,10 +301,11 @@ function BarLayout(items, attrs, $scope, $compile) {
 	var row = $('<div class="row-fluid">').append(main);
 	
 	if (side && axelor.device.small) {
-		side.children().first().prependTo(main);
-		side.children().appendTo(main);
-		main.children('[ui-panel-mail]').appendTo(main);
+		side.children().first().prependTo(wrap);
+		side.children().appendTo(wrap);
 	}
+	
+	wrap.children('[ui-panel-mail]').appendTo(main);
 
 	if (side) {
 		side.appendTo(row);
