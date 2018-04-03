@@ -238,6 +238,14 @@ function FormViewCtrl($scope, $element) {
 		if (locationChangeOff) {
 			return;
 		}
+		
+		var tab = $scope.selectedTab || {};
+		var params = $scope._viewParams;
+		
+		if (tab !== params) {
+			return;
+		}
+
 		locationChangeOff = $scope.$on("$locationChangeStart", function (event, newUrl, oldUrl) {
 			// block navigation if popup is open
 			var hasDialogs = $('body .ui-dialog:visible').length > 0;
@@ -246,8 +254,6 @@ function FormViewCtrl($scope, $element) {
 				return;
 			}
 
-			var tab = $scope.selectedTab || {};
-			var params = $scope._viewParams;
 			var $location = $scope.$location;
 
 			function resetForm() {
