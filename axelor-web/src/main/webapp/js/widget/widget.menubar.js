@@ -234,7 +234,9 @@ ui.directive('uiToolbarAdjust', function() {
 				elem.hide().css('visibility', 'hidden');
 			});
 			[first, second].forEach(function (elem) {
-				if (elem) elem.show().css('visibility', visibility || '');
+				if (elem && element.is(':visible')) {
+					elem.show().css('visibility', visibility || '');
+				}
 			});
 		}
 
