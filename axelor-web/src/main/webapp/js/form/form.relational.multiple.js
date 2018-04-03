@@ -1129,7 +1129,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 			}
 		};
 		
-		setTimeout(function(){
+		scope.waitForActions(function(){
 			container = element.parents('.ui-dialog-content,.view-container').first();
 			grid.height(175).appendTo(wrapper);
 			wrapper.height(175).appendTo(container);
