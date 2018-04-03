@@ -32,6 +32,10 @@
 	max-width: 1200px;
 }
 
+.bar-wrap {
+	min-height: 0 !important;
+}
+
 .panel-layout * {
 	box-sizing: border-box;
 }
