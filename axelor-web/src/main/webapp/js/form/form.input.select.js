@@ -189,13 +189,14 @@ ui.formWidget('BaseSelect', {
 	
 			input.data('ui-autocomplete')._renderItem = scope.renderSelectItem || renderItem;
 
-			setTimeout(function () {
-				scope.$onAdjust('size scroll', function () {
-					if (showing) {
-						input.autocomplete('close');
-					}
-				});
-			}, 200)
+			scope.$onAdjust('size scroll', function (e) {
+				if (e.type === 'adjust:size' && e.target !== document) {
+					return;
+				}
+				if (showing) {
+					input.autocomplete('close');
+				}
+			});
 		});
 
 		input.focus(function(e) {
