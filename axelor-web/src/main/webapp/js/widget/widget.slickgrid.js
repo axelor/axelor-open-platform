@@ -1879,6 +1879,13 @@ Grid.prototype.isDirty = function(row) {
 	return false;
 };
 
+Grid.prototype.__markHandlerDirty = function () {
+	if (this.scope.handler && this.scope.handler.$dirtyGrid) {
+		this.$gid = this.$gid || _.uniqueId('grid');
+		this.scope.handler.$dirtyGrid(this.$gid, this.isDirty());
+	}
+};
+
 Grid.prototype.markDirty = function(row, field) {
 	
 	var grid = this.grid,
@@ -1898,6 +1905,7 @@ Grid.prototype.markDirty = function(row, field) {
 	grid.invalidateAllRows();
 	grid.render();
 
+	this.__markHandlerDirty();
 	this.__beforeSavePending = true;
 };
 
@@ -1915,6 +1923,7 @@ Grid.prototype.clearDirty = function(row) {
 	grid.invalidateAllRows();
 	grid.render();
 
+	this.__markHandlerDirty();
 	this.__beforeSavePending = false;
 };
 

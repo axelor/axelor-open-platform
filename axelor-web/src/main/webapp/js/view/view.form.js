@@ -106,6 +106,7 @@ function FormViewCtrl($scope, $element) {
 	$scope.record = {};
 	$scope.$$original = null;
 	$scope.$$dirty = false;
+	$scope.$$dirtyGrids = [];
 	
 	$scope.$events = {};
 	
@@ -396,8 +397,18 @@ function FormViewCtrl($scope, $element) {
 		return ui.prepareContext(ds._model, context, dummy);
 	};
 
+	$scope.$dirtyGrid = function (gridId, dirty) {
+		var i = $scope.$$dirtyGrids.indexOf(gridId);
+		if (dirty && i === -1) {
+			$scope.$$dirtyGrids.push(gridId);
+		} else if (!dirty && i > -1) {
+			$scope.$$dirtyGrids.splice(i, 1);
+		}
+		return $scope.isDirty();
+	};
+
 	$scope.isDirty = function() {
-		$scope.$$dirty = !ds.equals($scope.record, $scope.$$original);
+		$scope.$$dirty = $scope.$$dirtyGrids.length > 0 || !ds.equals($scope.record, $scope.$$original);
 		return $scope.$$dirty;
 	};
 
