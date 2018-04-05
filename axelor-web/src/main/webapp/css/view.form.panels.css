@@ -242,6 +242,14 @@
 	padding-left: 0;
 }
 
+.panel-layout .slick-cell .form-item-container,
+.panel-layout .slick-cell .form-item-container > span.display-text {
+	min-height: auto;
+}
+.panel-layout .slick-cell .form-item-container > span.display-text {
+	padding: 2px 8px;
+}
+
 .panel-layout .image-item .btn,
 .panel-layout .file-item .btn {
 	width: 32px;
