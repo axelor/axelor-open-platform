@@ -176,7 +176,7 @@
 					this.$$watchers = this.$$watchersSuspended;
 					this.$$watchersCount = this.$$watchersSuspended.length;
 					this.$$watchersSuspended = undefined;
-					setTimeout(function () { this.$broadcast('dom:attach'); }.bind(this), 100);
+					this.$timeout(function () { this.$broadcast('dom:attach'); }.bind(this), 100);
 				}
 			};
 
