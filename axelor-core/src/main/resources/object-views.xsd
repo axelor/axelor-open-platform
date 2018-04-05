@@ -279,7 +279,7 @@
         <xsd:sequence>
           <xsd:choice maxOccurs="unbounded">
             <xsd:element name="item" type="tns:MenubarMenuItem" />
-            <xsd:element name="divider" type="tns:MenubarMenuItem" />
+            <xsd:element name="divider" type="tns:MenubarMenuDivider" />
             <xsd:element name="menu" type="tns:MenubarMenu">
               <xsd:annotation>
                 <xsd:documentation>Define a submenu.</xsd:documentation>
