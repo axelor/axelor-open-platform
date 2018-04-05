@@ -422,7 +422,7 @@ ui.directive('uiViewPane', function() {
 			};
 
 			var type = params.viewType || params.type;
-			$scope.keepAttached = (params.params||{}).popup || type === 'html';
+			$scope.keepAttached = $scope._isPopup || (params.params||{}).popup || type === 'html';
 			$scope.switchTo(type);
 		}],
 		link: function(scope, element, attrs) {
