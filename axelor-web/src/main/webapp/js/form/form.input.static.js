@@ -684,22 +684,28 @@ ui.formItem('Button', {
 			element.attr("href", field.link);
 		}
 		
-		element.tooltip({
-			html: true,
-			title: function() {
-				if (field.help) {
-					return field.help;
+		element.one('mouseover', function () {
+			element.tooltip({
+				html: true,
+				title: function() {
+					if (field.help) {
+						return field.help;
+					}
+					if (element.innerWidth() < element[0].scrollWidth) {
+						return field.title;
+					}
+				},
+				delay: { show: 1000, hide: 100 },
+				container: 'body'
+			});
+	
+			element.on("$destroy", function () {
+				var t = element.data('tooltip');
+				if (t) {
+					t.destroy();
+					t = null
 				}
-				if (element.innerWidth() < element[0].scrollWidth) {
-					return field.title;
-				}
-			},
-			delay: { show: 1000, hide: 100 },
-			container: 'body'
-		});
-
-		element.on("$destroy", function () {
-			element.tooltip("destroy");
+			});
 		});
 
 		element.on("click", function(e) {
