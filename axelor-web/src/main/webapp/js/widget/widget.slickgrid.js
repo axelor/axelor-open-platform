@@ -2142,7 +2142,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 					lock.commitCurrentEdit();
 				}
 
-				var cell = that.findNextEditable(that.grid.getDataLength() - 1, 0);
+				var cell = that.findNextEditable(that.grid.getDataLength() - 1, 0) || { row: that.grid.getDataLength(), cell: 0 };
 				that.grid.focus();
 				that.grid.setActiveCell(cell.row, cell.cell);
 				that.grid.editActiveCell();
