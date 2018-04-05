@@ -191,8 +191,8 @@
 				var onSuspend = inst.$$onSuspend.bind(inst);
 				var onResume = inst.$$onResume.bind(inst);
 
-				inst.$on('dom:detach', onSuspend);
-				inst.$on('dom:attach', onResume);
+//				inst.$on('dom:detach', onSuspend);
+//				inst.$on('dom:attach', onResume);
 
 				return inst;
 			};
