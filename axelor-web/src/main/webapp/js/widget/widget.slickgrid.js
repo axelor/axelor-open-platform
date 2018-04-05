@@ -869,7 +869,7 @@ Grid.prototype.parse = function(view) {
 	// set dummy columns to apply attrs if grid is not initialized yet
 	setDummyCols(element, this.cols);
 	
-	var adjustSize = _.debounce(function () {
+	function adjustSize() {
 		if (scope.$$watchersSuspended) {
 			return;
 		}
@@ -878,9 +878,9 @@ Grid.prototype.parse = function(view) {
 				that.adjustSize();
 			});
 		});
-	}, 300);
+	}
 
-	scope.$onAdjust(adjustSize); // handle global events
+	scope.$onAdjust(adjustSize, 100); // handle global events
 	element.on('adjust:size', adjustSize); // handle element specific events
 
 	scope.$callWhen(function () {
