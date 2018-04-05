@@ -1679,7 +1679,7 @@ Grid.prototype.onKeyDown = function(e, args) {
 	}
 };
 
-Grid.prototype.isCellEditable = function(cell) {
+Grid.prototype.isCellEditable = function(row, cell) {
 	var cols = this.grid.getColumns(),
 		col = cols[cell];
 	if (!col || col.id === "_edit_column" || col.id === "_move_column" || col.id === "_checkbox_selector") {
@@ -1694,11 +1694,15 @@ Grid.prototype.isCellEditable = function(cell) {
 	if (!form) {
 		return !field.readonly;
 	}
-
-	var item = this.element.find('[x-field=' + field.name + ']:first');
-	if (item.length) {
-		return !item.scope().isReadonly();
+	
+	var current = this.grid.getActiveCell();
+	if (current && current.row === row) {
+		var item = this.element.find('[x-field=' + field.name + ']:first');
+		if (item.length) {
+			return !item.scope().isReadonly();
+		}
 	}
+
 	return !field.readonly;
 };
 
@@ -1707,7 +1711,7 @@ Grid.prototype.findNextEditable = function(posY, posX) {
 		cols = grid.getColumns(),
 		args = {row: posY, cell: posX + 1};
 	while (args.cell < cols.length) {
-		if (this.isCellEditable(args.cell)) {
+		if (this.isCellEditable(args.row, args.cell)) {
 			return args;
 		}
 		args.cell += 1;
@@ -1717,7 +1721,7 @@ Grid.prototype.findNextEditable = function(posY, posX) {
 	}
 	args.cell = 0;
 	while (args.cell <= posX) {
-		if (this.isCellEditable(args.cell)) {
+		if (this.isCellEditable(args.row, args.cell)) {
 			return args;
 		}
 		args.cell += 1;
@@ -1730,7 +1734,7 @@ Grid.prototype.findPrevEditable = function(posY, posX) {
 		cols = grid.getColumns(),
 		args = {row: posY, cell: posX - 1};
 	while (args.cell > -1) {
-		if (this.isCellEditable(args.cell)) {
+		if (this.isCellEditable(args.row, args.cell)) {
 			return args;
 		}
 		args.cell -= 1;
@@ -1740,7 +1744,7 @@ Grid.prototype.findPrevEditable = function(posY, posX) {
 	}
 	args.cell = cols.length - 1;
 	while (args.cell >= posX) {
-		if (this.isCellEditable(args.cell)) {
+		if (this.isCellEditable(args.row, args.cell)) {
 			return args;
 		}
 		args.cell -= 1;
