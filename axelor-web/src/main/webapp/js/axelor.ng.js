@@ -43,25 +43,50 @@
 				$http = null,
 				$timeout = null;
 			
-			__custom__.ajaxStop = function ajaxStop(callback, context) {
-				var count, wait;
+			var ajaxStopQueue = [];
+			var ajaxStopPending = null;
+			
+			function processAjaxStopQueue(scope) {
+
+				function doCall(params) {
+					var cb = params[0];
+					var ctx = params[1];
+					var wait = params[2];
+					if (wait) {
+						setTimeout(function () { scope.$applyAsync(cb.bind(ctx)); }, wait);
+					} else {
+						scope.$applyAsync(cb.bind(ctx));
+					}
+				}
+
+				if (ajaxStopPending) {
+					clearTimeout(ajaxStopPending);
+					ajaxStopPending = null;
+				}
 
 				if ($http === null) {
 					$http = $injector.get('$http');
 				}
-				
-				count = _.size($http.pendingRequests || []);
-				wait = _.last(arguments) || 10;
 
+				while (($http.pendingRequests || []).length === 0 && ajaxStopQueue.length > 0) {
+					doCall(ajaxStopQueue.shift());
+				}
+
+				if (ajaxStopQueue.length > 0) {
+					ajaxStopPending = _.delay(processAjaxStopQueue, 100, scope);
+				}
+			}
+
+			__custom__.ajaxStop = function ajaxStop(callback, context, wait) {
 				if (_.isNumber(context)) {
+					wait = context;
 					context = undefined;
 				}
-				
-				if (count > 0) {
-					return _.delay(ajaxStop.bind(this), wait, callback, context);
-				}
 				if (_.isFunction(callback)) {
-					return this.$timeout(callback.bind(context), wait);
+					ajaxStopQueue.push([callback, context, wait]);
+				}
+				if (!ajaxStopPending) {
+					processAjaxStopQueue(this);
 				}
 			};
 
@@ -76,7 +101,7 @@
 				var that = this;
 				var args = arguments;
 				var waitFor = wait || 10;
-				this.$timeout(function () {
+				setTimeout(function () {
 					// wait for any pending ajax requests
 					that.ajaxStop(function () {
 						var all = args.length === 3 ? args[2] : that.$actionPromises;
@@ -96,15 +121,16 @@
 
 			__custom__.$callWhen = function (predicate, callback, wait) {
 				var count = wait || 100;
+				var that = this;
 
 				function later() {
 					if (count-- === 0 || (_.isFunction(predicate) && predicate())) {
-						return callback();
+						return that.$applyAsync(callback);
 					}
 					return _.delay(later, count);
 				}
 
-				this.$timeout(later, wait);
+				setTimeout(later, wait);
 			};
 
 			__custom__.$timeout = function(func, wait, invokeApply) {
