@@ -206,6 +206,18 @@
 				}
 			};
 
+			var __super__$$apply = _.debounce(__super__.$apply, 100);
+
+			__custom__.$apply = function $apply() {
+				return arguments.length === 0
+					? __super__$$apply.apply(this)
+					: __super__.$apply.apply(this, arguments);
+			};
+
+			__custom__.$applyNow = function $applyNow() {
+				return __super__.$apply.apply(this, arguments);
+			};
+
 			angular.extend(__orig__, __custom__);
 			angular.extend($rootScope, __custom__);
 
