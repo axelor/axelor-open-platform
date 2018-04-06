@@ -871,20 +871,17 @@ Grid.prototype.parse = function(view) {
 	
 	function adjustSize() {
 		scope.ajaxStop(function () {
-			setTimeout(function () {
+			if (element.is(':visible')) {
 				that.adjustSize();
-			});
+			}
 		});
 	}
 
 	scope.$onAdjust(adjustSize, 100); // handle global events
-	element.on('adjust:size', adjustSize); // handle element specific events
 
 	scope.$callWhen(function () {
 		return element.is(':visible');
-	}, function () {
-		return element.trigger('adjust:size');
-	}, 100);
+	}, adjustSize, 100);
 
 	element.addClass('slickgrid-empty');
 	this.doInit = _.once(function doInit() {
