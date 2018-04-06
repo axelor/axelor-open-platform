@@ -870,9 +870,6 @@ Grid.prototype.parse = function(view) {
 	setDummyCols(element, this.cols);
 	
 	function adjustSize() {
-		if (scope.$$watchersSuspended) {
-			return;
-		}
 		scope.ajaxStop(function () {
 			setTimeout(function () {
 				that.adjustSize();
