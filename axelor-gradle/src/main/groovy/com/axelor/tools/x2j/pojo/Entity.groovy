@@ -23,7 +23,7 @@ import com.axelor.common.Inflector
 import com.axelor.tools.x2j.Utils
 
 class Entity {
-	
+
 	private static Set<String> INTERNAL_PACKAGES = [
 		'com.axelor.auth.db',
 		'com.axelor.meta.db',
@@ -38,7 +38,7 @@ class Entity {
 	String module
 
 	String namespace
-	
+
 	String repoNamespace
 
 	String tablePrefix
@@ -75,6 +75,8 @@ class Entity {
 
 	List<String> finders
 
+	List<String> listeners
+
 	Map<String, Property> propertyMap
 
 	Property nameField
@@ -82,9 +84,9 @@ class Entity {
 	private Repository repository
 
 	private ImportManager importManager
-	
+
 	private String extraImports
-	
+
 	private String extraCode
 
 	private Track track
@@ -149,12 +151,13 @@ class Entity {
 			repository = new Repository(this)
 			repository.concrete = node.@repository != "abstract"
 		}
-		
+
 		properties = []
 		propertyMap = [:]
 		constraints = []
 		indexes = []
 		finders = []
+		listeners = []
 		extraCode = null
 
 		if (interfaces) {
@@ -202,6 +205,9 @@ class Entity {
 			case "track":
 				track = new Track(this, it)
 				break
+			case "entity-listener":
+				listeners += it.'@class'.text() + '.class'
+				break
 			default:
 				Property field = new Property(this, it)
 				if (modelClass && !field.simple) {
@@ -232,7 +238,7 @@ class Entity {
 			properties.add(propertyMap.get("attrs"));
 		}
 	}
-	
+
 	Repository getRepository() {
 		return this.repository
 	}
@@ -247,7 +253,7 @@ class Entity {
 	}
 
 	void merge(Entity other) {
-		
+
 		for (Property prop : other.properties) {
 			Property existing = propertyMap.get(prop.name)
 			if (isCompatible(existing, prop)) {
@@ -263,10 +269,11 @@ class Entity {
 				}
 			}
 		}
-		
+
 		indexes.addAll(other.indexes)
 		constraints.addAll(other.constraints)
 		finders.addAll(other.finders)
+		listeners.addAll(other.listeners)
 
 		if (other.track) {
 			if (track == null || other.track.replace) {
@@ -309,7 +316,7 @@ class Entity {
 		if (!interfaces || interfaces.trim() == "") return ""
 		return " implements " + interfaces
 	}
-	
+
 	String getExtendsImplementStmt() {
 		if (modelClass) {
 			importType('javax.persistence.Transient')
@@ -319,7 +326,7 @@ class Entity {
 		}
 		return " extends " + getBaseClass() + getImplementStmt()
 	}
-	
+
 	String getAbstractStmt() {
 		return modelClass ? "abstract " : ""
 	}
@@ -380,7 +387,7 @@ class Entity {
 	String getExtraCode() {
 		return stripCode(extraCode, "\n\t");
 	}
-	
+
 	String getExtraImports() {
 		if (!extraImports || extraImports.trim().isEmpty()) return "";
 		return "\n" + Utils.stripCode(extraImports, "\n") + "\n"
@@ -389,7 +396,7 @@ class Entity {
 	private List<Property> getHashables() {
 		return properties.findAll { p -> p.hashKey }
 	}
-	
+
 	boolean isModelClass() {
 		return modelClass;
 	}
@@ -487,6 +494,7 @@ class Entity {
 		all += $strategy()
 		all += $track()
 		all += $mappedSuperClass()
+		all += $listeners()
 
 		return all.grep { it != null }.flatten()
 				  .grep { Annotation a -> !a.empty }
@@ -567,6 +575,12 @@ class Entity {
 	Annotation $track() {
 		if (!track) return null
 		return track.$track()
+	}
+
+	Annotation $listeners() {
+		if(listeners.empty) return null;
+		return new Annotation(this, "javax.persistence.EntityListeners")
+				.add("{  ${ listeners.collect { importType(it) + '.class' }.join(', ') } }", false)
 	}
 
 	@Override
