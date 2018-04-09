@@ -75,6 +75,8 @@ class Entity {
 
 	List<String> finders
 
+	List<String> listeners
+
 	Map<String, Property> propertyMap
 
 	Property nameField
@@ -159,6 +161,7 @@ class Entity {
 		constraints = []
 		indexes = []
 		finders = []
+		listeners = []
 		extraCode = null
 
 		if (interfaces) {
@@ -205,6 +208,9 @@ class Entity {
 				break
 			case "track":
 				track = new Track(this, it)
+				break
+			case "entity-listener":
+				listeners += it.'@class'.text()
 				break
 			default:
 				Property field = new Property(this, it)
@@ -271,6 +277,7 @@ class Entity {
 		indexes.addAll(other.indexes)
 		constraints.addAll(other.constraints)
 		finders.addAll(other.finders)
+		listeners.addAll(other.listeners)
 
 		if (other.track) {
 			if (track == null || other.track.replace) {
@@ -491,6 +498,7 @@ class Entity {
 		all += $strategy()
 		all += $track()
 		all += $mappedSuperClass()
+		all += $listeners()
 
 		return all.grep { it != null }.flatten()
 				  .grep { Annotation a -> !a.empty }
@@ -571,6 +579,12 @@ class Entity {
 	Annotation $track() {
 		if (!track) return null
 		return track.$track()
+	}
+
+	Annotation $listeners() {
+		if(listeners.empty) return null;
+		return new Annotation(this, "javax.persistence.EntityListeners")
+				.add("{  ${ listeners.collect { importType(it) + '.class' }.join(', ') } }", false)
 	}
 
 	@Override

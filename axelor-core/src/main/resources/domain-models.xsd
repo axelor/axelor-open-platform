@@ -949,6 +949,14 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
+      <xsd:element name="entity-listener" type="dm:EntityListener" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>
+          Specify the callback listener class containing annotated methods (@PrePersist, etc.)
+          that will be called during entity lifecycle.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
     </xsd:sequence>
 
     <xsd:attribute use="required" name="name">
@@ -1162,6 +1170,22 @@
           Specify whether to use numeric values, all enum items must provide a numeric value.
         </xsd:documentation>
       </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="EntityListener">
+    <xsd:attribute name="class" use="required">
+      <xsd:simpleType>
+        <xsd:annotation>
+          <xsd:documentation>
+            FQDN of the listener class
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern
+            value="(([a-z][a-zA-Z0-9_]+)(\.[a-z][a-zA-Z0-9_]+)*\.)?([A-Z][a-zA-Z0-9_]+)" />
+        </xsd:restriction>
+      </xsd:simpleType>
     </xsd:attribute>
   </xsd:complexType>
 </xsd:schema>
