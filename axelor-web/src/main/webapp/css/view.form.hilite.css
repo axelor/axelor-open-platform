@@ -123,7 +123,21 @@
 
 }
 
-[class *= hilite-].form-item-container {
+.slick-row[class*="hilite-"].selected,
+.slick-row[class*="hilite-"] .slick-cell.selected {
+	background-image: linear-gradient(
+      rgba(0, 0, 0, 0.2), 
+      rgba(0, 0, 0, 0.2)
+    );
+}
+
+.slick-row[class*="-text"].selected,
+.slick-row[class*="-text"] .slick-cell.selected {
+	background-image: none;
+}
+
+.slickgrid-editable .slick-row[class*="hilite-"].active .slick-cell-editable:before,
+[class*="hilite-"].form-item-container {
 	background-color: inherit !important;
 }
 
