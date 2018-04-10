@@ -167,7 +167,7 @@ public abstract class XMLBinder {
 			if (bind.getExpression() != null) {
 				LOG.trace("expression: " + bind.getExpression());
 				// default value is already computed so only do eval for node binding
-				value = bind.getNode() == null ? value : bind.eval(ctx);
+				value = bind.getNode() == null ? value : bind.evaluate(ctx);
 				LOG.trace("value: " + value);
 			}
 
@@ -276,7 +276,7 @@ public abstract class XMLBinder {
 
 			// get default value
 			if (bind.getNode() == null && bind.getExpression() != null) {
-				value = bind.eval(toContext(map));
+				value = bind.evaluate(toContext(map));
 			}
 
 			map.put(name, value);

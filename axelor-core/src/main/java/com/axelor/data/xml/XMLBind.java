@@ -21,6 +21,10 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.codehaus.groovy.runtime.InvokerHelper;
 
 import com.axelor.data.DataScriptHelper;
 import com.axelor.data.ImportException;
@@ -189,9 +193,33 @@ public class XMLBind {
 		}
 	}
 
+	public static Pattern pattern = Pattern.compile("^(call|eval):\\s*(.*)");
 	private static DataScriptHelper helper = new DataScriptHelper(100, 10, false);
 
-	public Object eval(Map<String, Object> context) {
+	public Object evaluate(Map<String, Object> context) {
+		if (Strings.isNullOrEmpty(expression)) {
+			return handleGroovy(context);
+		}
+
+		String kind = null;
+		String expr = expression;
+		Matcher matcher = pattern.matcher(expression);
+
+		if (matcher.matches()) {
+			kind = matcher.group(1);
+			expr = matcher.group(2);
+		} else {
+			return handleGroovy(context);
+		}
+
+		if ("call".equals(kind)) {
+			return handleCall(context, expr);
+		}
+
+		return handleGroovy(context);
+	}
+
+	private Object handleGroovy(Map<String, Object> context) {
 		if (Strings.isNullOrEmpty(expression)) {
 			return context.get(this.getAliasOrName());
 		}
@@ -204,6 +232,36 @@ public class XMLBind {
 		}
 		String expr = condition + " ? true : false";
 		return (Boolean) helper.eval(expr, context);
+	}
+
+	private Object handleCall(Map<String, Object> context, String expr) {
+		if(Strings.isNullOrEmpty(expr)) {
+			return null;
+		}
+
+		try {
+
+			String className = expr.split("\\:")[0];
+			String method = expr.split("\\:")[1];
+
+			Class<?> klass = Class.forName(className);
+			Object object = Beans.get(klass);
+
+			Pattern p = Pattern.compile("(\\w+)\\((.*?)\\)");
+			Matcher m = p.matcher(method);
+
+			if (!m.matches()) return null;
+
+			String methodName = m.group(1);
+			String params = "[" + m.group(2) + "] as Object[]";
+			Object[] arguments = (Object[]) helper.eval(params, context);
+
+			return InvokerHelper.invokeMethod(object, methodName, arguments);
+		}
+		catch(Exception e) {
+			System.err.println("EEE: " + e);
+			return null;
+		}
 	}
 
 	@Override
