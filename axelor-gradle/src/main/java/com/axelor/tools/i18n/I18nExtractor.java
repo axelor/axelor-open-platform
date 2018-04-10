@@ -17,6 +17,7 @@
  */
 package com.axelor.tools.i18n;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -61,7 +62,7 @@ public class I18nExtractor {
 	
 	private static Logger log = LoggerFactory.getLogger(I18nExtractor.class);
 
-	private static final Pattern PATTERN_XML = Pattern.compile("/(domains|objects|views)/");
+	private static final Pattern PATTERN_XML = Pattern.compile("\\" + File.separator + "(domains|objects|views)\\" + File.separator);
 	private static final Pattern PATTERN_I18N = Pattern.compile("((_t\\s*\\()|(I18n.get\\s*\\()|(/\\*\\$\\$\\(\\*/))\\s*");
 	private static final Pattern PATTERN_HTML = Pattern.compile("((\\{\\{(.*?)\\|\\s*t\\s*\\}\\})|(x-translate.*?\\>(.*?)\\<))");
 	private static final Pattern PATTERN_EXCLUDE = Pattern.compile("(\\.min\\.)|(main.webapp.lib)|(js.i18n)");
@@ -141,9 +142,7 @@ public class I18nExtractor {
 				return;
 			}
 			
-			if (!isView) {
-				log.debug("processing: {}", base.getParent().relativize(file));
-			}
+			log.debug("processing XML for: {}", base.getParent().relativize(file));
 			
 			final SAXParserFactory factory = SAXParserFactory.newInstance();
 			final SAXParser parser = factory.newSAXParser();
@@ -236,7 +235,7 @@ public class I18nExtractor {
 				throw e;
 			}
 
-			log.debug("processing: {}", base.getParent().relativize(file));
+			log.debug("processing HTML for: {}", base.getParent().relativize(file));
 
 			Matcher matcher = PATTERN_HTML.matcher(source);
 			while (matcher.find()) {
@@ -309,7 +308,7 @@ public class I18nExtractor {
 				throw e;
 			}
 			
-			log.debug("processing: {}", base.getParent().relativize(file));
+			log.debug("processing Java for: {}", base.getParent().relativize(file));
 			
 			Matcher matcher = PATTERN_I18N.matcher(source);
 			while (matcher.find()) {
