@@ -24,22 +24,32 @@ label,
 .panel .panel-title,
 .slickgrid .slick-header,
 .slickgrid .slick-header-column {
-	color: #949494;
+	color: #8C8C8C;
 }
 
 .icons-bar .fa,
 .panel-icons .fa,
 .links .fa {
-	color: #949494;
+	color: #8C8C8C;
 }
 
 .panel .panel-header {
-	padding: 8px 0;
+	padding: 13px 0px 8px 0px;
     border-top: 0;
+    margin-bottom: 8px;
+}
+
+.panel .panel-related .panel-header,
+.panel-tabs .panel-related .panel-header {
+    margin-bottom: 0;
 }
 
 .panel .panel-title {
 	font-size: 16px;
+}
+
+[ui-panel-viewer] > div > h5 {
+	margin: 4px 0px;
 }
 
 .slickgrid .slick-header:hover,
@@ -55,7 +65,7 @@ label,
 
 .mail-message .mail-message-header .subject,
 .mail-message .track-fields li {
-	color: #949494;
+	color: #8C8C8C;
 }
 
 .track-fields span {
@@ -81,40 +91,24 @@ label,
 	border-radius: 7px;
 }
 
-.ui-dialog form > div > .bar-main > .bar-wrap {
-	box-shadow: none;
-	border: 0;
-	border-radius: 0;
+.chart-controls form > div > .bar-main > .bar-wrap {
+	box-shadow: none !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	margin: 0 !important;
 }
 
 [ui-view-form] .panel {
 	border-top: 0;
 	border-left: 0;
 	border-right: 0;
+	border-bottom: 0;
 	background-color: inherit;
-}
-
-.bar-main .panel-header {
-	border: none;
-}
-
-[ui-view-form] > form > div > .bar-side > .panel {
-	border-bottom: 0;
-}
-
-[ui-view-form] > form > div > .bar-wrap > .panel:last-child,
-[ui-view-form] > form > div > .bar-side > .panel:last-child {
-	border-bottom: 0;
 	margin-bottom: 0;
 }
 
 .panel .panel-body {
-	padding-left: 0;
-	padding-right: 0;
-}
-
-.panel > .panel-body:first-child {
-	padding-top: 0;
+	padding: 0;
 }
 
 .panel-tabs .tab-content {
@@ -192,8 +186,16 @@ label,
 	border-right: 0 !important;
 }
 .slickgrid .slick-header-menubutton {
-	border-left: 0;
+	border-left-color: #eee;
 }
+
+.slickgrid .slick-header-column.slick-header-column-active,
+.slickgrid .slick-header-column.ui-state-hover {
+	border-left: 1px solid #eee !important;
+	border-right: 1px solid #eee !important;
+	padding: 4px 7px;
+}
+
 .slickgrid .slick-headerrow-columns .slick-headerrow-column {
 	background: #fff;
 }
@@ -405,9 +407,9 @@ input[type="url"],
 	border-top-width: 1px;
 	border-top-color: #eee !important;
 }
-.dashboard .dashlet-header,
-.dashboard .dashlet-body {
-	border-color: #eee;
+
+.dashboard .dashlet {
+	border: 1px solid #e7e7e7;
 }
 
 .html > .view-pane,
