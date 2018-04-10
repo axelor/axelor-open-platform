@@ -20,6 +20,10 @@ input[type="color"],
 	background-color: inherit;
 }
 
+[ui-nav-tree] .nav-search input[type="text"] {
+	background-color: #fff;
+}
+
 label,
 .panel .panel-title,
 .slickgrid .slick-header,
@@ -223,7 +227,8 @@ label,
 .bar-main .wysiwyg-container {
 	border: 0;
 }
-.bar-main textarea {
+
+textarea {
 	border-top: 0;
 	border-left: 0;
 	border-right: 0;
