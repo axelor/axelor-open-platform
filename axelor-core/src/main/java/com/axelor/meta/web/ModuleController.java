@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -30,7 +31,6 @@ import com.axelor.meta.db.repo.MetaModuleRepository;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
-import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
@@ -38,8 +38,8 @@ import com.google.inject.persist.Transactional;
 public class ModuleController {
 
 	private static final String messageRestart = I18n.get("Restart the server for updates to take effect.");
-	private static final String alertInstall = I18n.get("Following modules will be installed : <br/> %s <br/> Are you sure ?");
-	private static final String alertUninstall = I18n.get("Following modules will be uninstalled : <br/> %s <br/> Are you sure ?");
+	private static final String alertInstall = I18n.get("Following modules will be installed : <p>%s</p> Are you sure ?");
+	private static final String alertUninstall = I18n.get("Following modules will be uninstalled : <p>%s</p> Are you sure ?");
 	private static final String errorDepends = I18n.get("The module can't be uninstalled because other non-removable modules depend on it.");
 	private static final String errorPending = I18n.get("The module can't be uninstalled because other modules are pending. Please restart the server before.");
 
@@ -83,7 +83,9 @@ public class ModuleController {
 			return all;
 		}
 
-		depends.stream().map(MetaModule::getName).forEach(all::add);
+		depends.stream()
+			.filter(m -> m.getInstalled() != Boolean.TRUE)
+			.map(MetaModule::getName).forEach(all::add);
 		
 		return all;
 	}
@@ -148,8 +150,14 @@ public class ModuleController {
 			if (module == null) {
 				throw new IllegalArgumentException("No such module: " + name);
 			}
+			
+			String text = resolve(module).stream()
+				.map(n -> "<li>" + n + "</li>")
+				.collect(Collectors.joining());
 
-			data.put("alert", String.format(alertInstall, Joiner.on("<br/>").join(resolve(module))));
+			text = "<ul>" + text + "</ul>";
+
+			data.put("alert", String.format(alertInstall, text));
 			response.setData(ImmutableList.of(data));
 		} catch (Exception e) {
 			response.setException(e);
@@ -166,8 +174,14 @@ public class ModuleController {
 			if (module == null) {
 				throw new IllegalArgumentException("No such module: " + name);
 			}
+			
+			String text = resolveLink(module, getMainModule()).stream()
+					.map(n -> "<li>" + n + "</li>")
+					.collect(Collectors.joining());
 
-			data.put("alert", String.format(alertUninstall, Joiner.on("<br/>").join(resolveLink(module, getMainModule()))));
+			text = "<ul>" + text + "</ul>";
+
+			data.put("alert", String.format(alertUninstall, text));
 			response.setData(ImmutableList.of(data));
 		} catch (Exception e) {
 			response.setException(e);
