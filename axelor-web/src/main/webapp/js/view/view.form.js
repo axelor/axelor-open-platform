@@ -737,6 +737,7 @@ function FormViewCtrl($scope, $element) {
 			
 			values = ds.diff(values, $scope.$$original);
 			promise = ds.save(values).success(function(record, page) {
+				$scope.$$dirtyGrids.length = 0;
 				return doEdit(record.id, dummy, fireOnLoad);
 			});
 
