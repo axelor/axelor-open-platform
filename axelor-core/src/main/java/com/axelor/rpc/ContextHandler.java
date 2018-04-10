@@ -232,6 +232,9 @@ public class ContextHandler<T> {
 	public Object interceptJsonAccess(Method method, Object[] args) throws Exception {
 		switch (method.getName()) {
 		case "get":
+			if ("class".equals(args[0])) {
+				return proxy.getClass();
+			}
 		case "put":
 			final String name = (String) args[0];
 			final Method found = args.length == 2
