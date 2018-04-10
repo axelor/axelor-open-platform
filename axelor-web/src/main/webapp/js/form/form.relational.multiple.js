@@ -535,7 +535,7 @@ ui.formInput('OneToMany', {
 
 			return function(value) {
 				inc = arguments[1] || inc;
-				var count = _.size(value) + inc, height = minSize;
+				var count = Math.max(_.size(value), scope.dataView.getLength()) + inc, height = minSize;
 				if (count > 0) {
 					height = (rowSize * count) + (minSize + rowSize);
 				}
