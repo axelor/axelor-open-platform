@@ -17,9 +17,14 @@
  */
 package com.axelor.tools.i18n;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -47,6 +52,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
+import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultimap;
@@ -61,7 +67,7 @@ public class I18nExtractor {
 	
 	private static Logger log = LoggerFactory.getLogger(I18nExtractor.class);
 
-	private static final Pattern PATTERN_XML = Pattern.compile("/(domains|objects|views)/");
+	private static final Pattern PATTERN_XML = Pattern.compile("\\" + File.separator + "(domains|objects|views)\\" + File.separator);
 	private static final Pattern PATTERN_I18N = Pattern.compile("((_t\\s*\\()|(I18n.get\\s*\\()|(/\\*\\$\\$\\(\\*/))\\s*");
 	private static final Pattern PATTERN_HTML = Pattern.compile("((\\{\\{(.*?)\\|\\s*t\\s*\\}\\})|(x-translate.*?\\>(.*?)\\<))");
 	private static final Pattern PATTERN_EXCLUDE = Pattern.compile("(\\.min\\.)|(main.webapp.lib)|(js.i18n)");
@@ -141,9 +147,7 @@ public class I18nExtractor {
 				return;
 			}
 			
-			if (!isView) {
-				log.debug("processing: {}", base.getParent().relativize(file));
-			}
+			log.debug("processing XML for: {}", base.getParent().relativize(file));
 			
 			final SAXParserFactory factory = SAXParserFactory.newInstance();
 			final SAXParser parser = factory.newSAXParser();
@@ -236,7 +240,7 @@ public class I18nExtractor {
 				throw e;
 			}
 
-			log.debug("processing: {}", base.getParent().relativize(file));
+			log.debug("processing HTML for: {}", base.getParent().relativize(file));
 
 			Matcher matcher = PATTERN_HTML.matcher(source);
 			while (matcher.find()) {
@@ -309,7 +313,7 @@ public class I18nExtractor {
 				throw e;
 			}
 			
-			log.debug("processing: {}", base.getParent().relativize(file));
+			log.debug("processing Java for: {}", base.getParent().relativize(file));
 			
 			Matcher matcher = PATTERN_I18N.matcher(source);
 			while (matcher.find()) {
@@ -437,8 +441,9 @@ public class I18nExtractor {
 	
 	private void update(Path file, List<String[]> lines) throws IOException {
 		if (!file.toFile().exists()) return;
+
 		final Map<String, Map<String, String>> values = new HashMap<>();
-		try(final CSVReader reader = new CSVReader(new FileReader(file.toFile()),
+		try(final CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(file.toFile()), Charsets.UTF_8),
 				CSVParser.DEFAULT_SEPARATOR,
 				CSVParser.DEFAULT_QUOTE_CHARACTER, '\0')) {
 			String[] headers = reader.readNext();
@@ -471,8 +476,7 @@ public class I18nExtractor {
 
 	private void save(Path file, List<String[]> values) throws IOException {
 		Files.createDirectories(file.getParent());
-		FileWriter writer = new FileWriter(file.toFile());
-		try (CSVWriter csv = new CSVWriter(writer)) {
+		try (CSVWriter csv = new CSVWriter(new OutputStreamWriter(new FileOutputStream(file.toFile()), Charsets.UTF_8))) {
 			csv.writeNext(CSV_HEADER);
 			for (String[] line : values) {
 				for (int i = 0; i < line.length; i++) {
