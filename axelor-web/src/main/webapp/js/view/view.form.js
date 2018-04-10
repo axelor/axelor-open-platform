@@ -1085,7 +1085,7 @@ function FormViewCtrl($scope, $element) {
 		if (action === "save") {
 			if (!$scope.canSave()) {
 				$scope.showErrorNotice();
-			} else {
+			} else if ($scope.hasButton('save')) {
 				$(e.target).blur().focus();
 				$scope.onSave();
 			}
