@@ -214,13 +214,14 @@ public class ContextHandler<T> {
 
 		for (String name : depends) {
 			final Property property;
+			final Object managed;
 			if (validated.contains(name) || (property = beanMapper.getProperty(name)) == null) {
 				continue;
 			}
 			if (values.containsKey(name)) {
 				validate(property);
-			} else {
-				beanMapper.set(getUnmanagedEntity(), name, property.get(getManagedEntity()));
+			} else if ((managed = getManagedEntity()) != null) {
+				beanMapper.set(getUnmanagedEntity(), name, property.get(managed));
 			}
 		}
 
