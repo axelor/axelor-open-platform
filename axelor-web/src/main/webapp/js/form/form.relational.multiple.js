@@ -533,9 +533,9 @@ ui.formInput('OneToMany', {
 				}
 			});
 
-			return function(n) {
-				inc = n || inc;
-				var count = scope.dataView.getLength() + inc, height = minSize;
+			return function(value) {
+				inc = arguments[1] || inc;
+				var count = _.size(value) + inc, height = minSize;
 				if (count > 0) {
 					height = (rowSize * count) + (minSize + rowSize);
 				}
@@ -553,7 +553,7 @@ ui.formInput('OneToMany', {
 				scope.dataView.setItems([]);
 			}
 			if (collapseIfEmpty) {
-				adjustSize();
+				adjustSize(value);
 			}
 		});
 
@@ -596,15 +596,17 @@ ui.formInput('OneToMany', {
 					}
 				});
 				
-				adjustSize(1);
+				adjustSize(scope.getValue(), 1);
 			} else {
-				adjustSize();
+				adjustSize(scope.getValue());
 			}
 
 			inst.showColumn('_edit_column', editIcon);
 
 			grid.onAddNewRow.subscribe(function (e, args) {
-				adjustSize(1);
+				var items = scope.getValue() || [];
+				var rows = grid.getDataLength();
+				adjustSize(items, rows - items.length + 1);
 			});
 
 			if (!(scope._viewParams || {}).summaryView || scope.field.widget === "MasterDetail") {
