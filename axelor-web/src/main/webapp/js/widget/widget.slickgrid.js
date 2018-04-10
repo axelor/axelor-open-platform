@@ -1240,7 +1240,7 @@ Grid.prototype._doInit = function(view) {
 		grid.invalidate();
 		grid.autosizeColumns();
 		// focus first filter input
-		if (!axelor.device.mobile) {
+		if (!axelor.device.mobile && !that.element.parent().is('.portlet-grid')) {
 			that.element
 				.find('.slick-headerrow:first input[type=text]:first')
 				.focus()
