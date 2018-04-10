@@ -146,8 +146,7 @@
 	margin-left: 0;
 }
 
-.panel .row-fluid:last-child > .form-item-hidden,
-.panel .row-fluid:last-child > .form-item {
+.panel .row-fluid:last-child > .form-item-hidden {
 	margin-bottom: 1px;
 }
 .panel[x-stacked] .row-fluid:last-child > .form-item {
