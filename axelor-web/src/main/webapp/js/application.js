@@ -63,6 +63,7 @@
 
 //= lib/angular-ui/sortable.js
 
+//= js/axelor.ns.js
 //= js/axelor.ng.js
 
 //= js/lib/i18n.js

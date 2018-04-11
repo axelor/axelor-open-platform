@@ -17,3 +17,4 @@
  */
 //= lib/jquery.ui/js/jquery.js
 //= lib/bootstrap/js/bootstrap.js
+//= js/axelor.ns.js

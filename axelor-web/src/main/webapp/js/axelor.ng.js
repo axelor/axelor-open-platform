@@ -18,10 +18,6 @@
 (function() {
 
 	"use strict";
-	
-	// create global axelor namespace exists
-	window.axelor = window.axelor || {};
-	window.axelor.config = {};
 
 	var module = angular.module('axelor.ng', []);
 
