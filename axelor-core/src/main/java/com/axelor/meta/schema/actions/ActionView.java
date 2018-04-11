@@ -236,6 +236,7 @@ public class ActionView extends Action {
 			title = handler.evaluate(toExpression(title, true)).toString();
 		}
 
+		result.put("actionId", getActionId());
 		result.put("title", title);
 		result.put("icon", getIcon());
 		result.put("model", getModel());

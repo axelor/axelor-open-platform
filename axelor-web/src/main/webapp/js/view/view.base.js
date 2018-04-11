@@ -616,6 +616,10 @@ ui.directive('uiViewCustomize', ['NavService', function(NavService) {
 				var view = viewScope && viewScope.schema;
 				return view && view.modelId;
 			}
+			
+			scope.hasActionID = function () {
+				return scope.selectedTab.actionId;
+			}
 
 			scope.onShowView = function () {
 				var id = scope.hasViewID();
@@ -638,6 +642,14 @@ ui.directive('uiViewCustomize', ['NavService', function(NavService) {
 					state: id
 				});
 			}
+			
+			scope.onShowAction = function () {
+				var id = scope.hasActionID();
+				NavService.openTabByName("form::com.axelor.meta.db.MetaAction", {
+					mode: "edit",
+					state: id
+				});
+			}
 		},
 		replace: true,
 		template:
@@ -649,6 +661,7 @@ ui.directive('uiViewCustomize', ['NavService', function(NavService) {
 					"<ul class='dropdown-menu pull-right'>" +
 						"<li><a ng-click='onShowView()' ng-show='hasViewID()'>View...</a></li>" +
 						"<li><a ng-click='onShowModel()' ng-show='hasModelID()'>Model...</a></li>" +
+						"<li><a ng-click='onShowAction()' ng-show='hasActionID()'>Action...</a></li>" +
 					"</ul>" +
 				"</li>" +
 			"</ul>"

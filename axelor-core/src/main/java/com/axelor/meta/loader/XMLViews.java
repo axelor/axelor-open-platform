@@ -401,9 +401,12 @@ public class XMLViews {
 
 	public static Action findAction(String name) {
 		applyHotUpdates();
-		final MetaAction action = Beans.get(MetaActionRepository.class).findByName(name);
+		final MetaAction metaAction = Beans.get(MetaActionRepository.class).findByName(name);
+		final Action action;
 		try {
-			return ((ObjectViews) XMLViews.unmarshal(action.getXml())).getActions().get(0);
+			action = ((ObjectViews) XMLViews.unmarshal(metaAction.getXml())).getActions().get(0);
+			action.setActionId(metaAction.getId());
+			return action;
 		} catch (Exception e) {
 			return null;
 		}

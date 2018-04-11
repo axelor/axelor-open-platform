@@ -20,12 +20,14 @@ package com.axelor.meta.schema.actions;
 import java.util.regex.Pattern;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.axelor.meta.ActionHandler;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 
@@ -36,6 +38,10 @@ public abstract class Action {
 	
 	@XmlAttribute(name = "id")
 	private String xmlId;
+
+	@XmlTransient
+	@JsonProperty
+	private Long actionId;
 
 	@XmlAttribute
 	private String name;
@@ -52,6 +58,14 @@ public abstract class Action {
 
 	public void setXmlId(String xmlId) {
 		this.xmlId = xmlId;
+	}
+
+	public Long getActionId() {
+		return actionId;
+	}
+
+	public void setActionId(Long actionId) {
+		this.actionId = actionId;
 	}
 
 	public String getName() {
