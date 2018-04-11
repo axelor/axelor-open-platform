@@ -117,10 +117,11 @@ function CalendarViewCtrl($scope, $element) {
 		}
 
 		// consider stored filter
-		if (ds._filter) {
-			_.each(ds._filter.criteria, function(criterion) {
-				criteria.criteria.push(criterion);
-			});
+		if (ds._filter && ds._filter.criteria) {
+			criteria = {
+				operator: "and",
+				criteria: [criteria].concat(ds._filter.criteria)
+			}
 		}
 
 		var opts = {
