@@ -14,10 +14,12 @@ input[type="url"],
 input[type="search"],
 input[type="tel"],
 input[type="color"],
+.tag-select,
 .form-item-container > .display-text,
 .uneditable-input {
 	color: #000;
 	background-color: inherit;
+	border-color: #eee;
 }
 
 [ui-nav-tree] .nav-search input[type="text"] {
@@ -253,15 +255,10 @@ textarea {
 	border-bottom-color: #eee !important;
 }
 
-input,
-textarea,
-select,
-input[type="text"],
-input[type="password"],
-input[type="number"],
-input[type="email"],
-input[type="url"],
-.tag-select {
+[ui-view-form] input,
+[ui-view-form] textarea,
+[ui-view-form] select,
+[ui-view-form] .tag-select {
 	border-color: #c0c0c0;
 }
 
