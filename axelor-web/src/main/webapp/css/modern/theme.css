@@ -37,10 +37,19 @@ label,
 	color: #8C8C8C;
 }
 
+.panel {
+	display: flex;
+	flex-direction: column;
+}
+
 .panel .panel-header {
 	padding: 13px 0px 8px 0px;
     border-top: 0;
     margin-bottom: 8px;
+}
+
+.panel.collapsed .panel-header {
+	border-bottom: 1px solid #eee;
 }
 
 .panel .panel-related .panel-header,
