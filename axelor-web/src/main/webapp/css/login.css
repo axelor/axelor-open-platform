@@ -76,12 +76,14 @@ header .navbar .brand-logo img {
 }
 
 @media (min-width: 1200px) {
+	.alert,
 	.login-panel {
 		width: 420px;
 	}
 }
 
 @media (max-width: 767px) {
+	.alert,
 	.login-panel {
 		width: 100%;
 	}
@@ -161,4 +163,15 @@ body > footer > p a:hover,
 body > footer > p a:active,
 body > footer > p a:visited {
 	color: #f2f2f2;
+}
+
+.alert {
+	box-sizing: border-box;
+	margin: auto;
+	margin-top: 8px;
+	border-radius: 0;
+}
+
+.alert h4 {
+	margin-bottom: 8px;
 }

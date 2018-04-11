@@ -24,7 +24,7 @@
 <%@ page import="java.util.Calendar" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.Map" %>
-<%@page import="java.util.function.Function"%>
+<%@ page import="java.util.function.Function"%>
 <%@ page import="com.axelor.i18n.I18n" %>
 <%
 
@@ -44,6 +44,10 @@ String loginSubmit = T.apply("Log in");
 
 String loginUserName = T.apply("Username");
 String loginPassword = T.apply("Password");
+
+String warningBrowser = T.apply("Update your browser!");
+String warningAdblock = T.apply("Adblocker detected!");
+String warningAdblock2 = T.apply("Please disable the adblocker as it may slow down the application.");
 
 int year = Calendar.getInstance().get(Calendar.YEAR);
 String copyright = String.format("&copy; 2005 - %s Axelor. All Rights Reserved.", year);
@@ -112,10 +116,36 @@ String tenantId = (String) session.getAttribute("tenantId");
           </form>
         </div>
       </div>
+      <div id="br-warning" class="alert alert-block alert-error hidden">
+	  	<h4><%= warningBrowser %></h4>
+	  	<ul>
+	  		<li>Chrome</li>
+	  		<li>Firefox</li>
+	  		<li>Safari</li>
+	  		<li>IE >= 11</li>
+	  	</ul>
+	  </div>
+	  <div id="ad-warning" class="alert hidden">
+	  	<h4><%= warningAdblock %></h4>
+	  	<%= warningAdblock2 %>
+	  </div>
     </div>
 
     <footer class="container-fluid">
       <p class="credit small"><%= copyright %></p>
     </footer>
+    
+    <div id="adblock"></div>
+
+    <script type="text/javascript">
+    $(function () {
+	    if (axelor.browser.msie && !axelor.browser.rv) {
+	    	$('#br-warning').removeClass('hidden');
+	    }
+	    if ($('#adblock') === undefined || $('#adblock').is(':hidden')) {
+	    	$('#ad-warning').removeClass('hidden');
+	    }
+    });
+    </script>
   </body>
 </html>
