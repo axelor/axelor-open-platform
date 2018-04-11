@@ -186,7 +186,7 @@ function setupPopover(scope, element, getHelp, placement) {
 			element.trigger('mouseenter.popover', true);
 		}, e.ctrlKey ? 0 : 1000);
 	});
-	element.on('mouseleave.help.setup', function () {
+	element.on('mouseleave.help.setup $destroy', function () {
 		if (timer) {
 			clearTimeout(timer);
 			timer = null;
