@@ -34,6 +34,7 @@ import com.axelor.gradle.support.EclipseSupport;
 import com.axelor.gradle.support.IdeaSupport;
 import com.axelor.gradle.support.JavaSupport;
 import com.axelor.gradle.support.LicenseSupport;
+import com.axelor.gradle.support.PublishSupport;
 import com.axelor.gradle.tasks.GenerateCode;
 import com.axelor.gradle.tasks.I18nTask;
 import com.axelor.gradle.tasks.UpdateVersion;
@@ -61,6 +62,7 @@ public class AxelorPlugin implements Plugin<Project> {
 		project.getExtensions().create(AxelorExtension.EXTENSION_NAME, AxelorExtension.class);
 
 		project.getPlugins().apply(JavaSupport.class);
+		project.getPlugins().apply(PublishSupport.class);
 		project.getPlugins().apply(LicenseSupport.class);
 
 		if (project.getPlugins().hasPlugin(EclipsePlugin.class)) {
