@@ -1,4 +1,4 @@
-## 5.0.0-rc2 (current)
+## 5.0.0-rc2 (2018-04-13)
 
 #### New Features
 
