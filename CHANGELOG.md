@@ -2,6 +2,8 @@
 
 #### New Features
 
+* Add maven publish support in gradle plugin
+* Added new clean theme "Modern"
 * New setting `view.tabs.max` to control maximum number of tabs
 * Set calendar date with `calendarDate` from action context
 * Set calendar mode with `calendarMode` from action context
@@ -11,6 +13,11 @@
 
 #### Enhancements
 
+* Added adblocker detection (warns on login page if adblocker is detected)
+* Added browser detection (warns on login page is using IE <= 11)
+* Allow any action as home action if home attribute is true
+* Optimize tooltip initialization
+* Improve UI layout for better theme support
 * Allow to show html view in popup
 * Allow to manage view menus and menu items with field perms
 * Only show technical popup to technical staff even in dev mode
@@ -26,6 +33,19 @@
 
 #### Bugs
 
+* Fix calendar view not using grid view filter
+* Fix module uninstall issue
+* Fix module install issue
+* Fix selected row color issue in grid view when row is highlighted
+* Fix encoding for CSV files
+* Fix xml import eval attribute not supporting call actions
+* Fix grid widget auto size issue with grouped data
+* Fix XML source file processing on Windows
+* Fix html widget style issues
+* Fix issues with editable grid when all fields of the row are readonly
+* Fix o2m/m2m field dropdown was not visible in editable grid
+* Fix editable grid was not marking parent form dirty
+* Fix mass update issues with null
 * Fix navigation tabs icon and colors not updated properly
 * Fix grid view reload with button action
 * Fix placeholder issue on editor fields
