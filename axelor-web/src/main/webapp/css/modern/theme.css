@@ -78,9 +78,14 @@ label,
 	background-color: #d3d3d3;
 }
 
+.slick-cell .picker-icons i.fa,
 .mail-message .mail-message-header .subject,
 .mail-message .track-fields li {
 	color: #8C8C8C;
+}
+
+.slick-cell .picker-icons i.fa:hover {
+	color: #000;
 }
 
 .track-fields span {
