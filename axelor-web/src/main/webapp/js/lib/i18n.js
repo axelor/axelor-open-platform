@@ -30,7 +30,7 @@ function gettext(key) {
 			message = message.replace(placeholder, value);
 		}
 	}
-	return message;
+	return axelor.sanitize(message);
 }
 
 this._t = gettext;

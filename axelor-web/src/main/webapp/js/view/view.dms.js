@@ -1727,9 +1727,10 @@ ui.download = function download(url, fileName) {
 
 	function doDownload() {
 		var link = document.createElement('a');
+		var name = axelor.sanitize(fileName);
 
-		link.innerHTML = fileName;
-		link.download = fileName;
+		link.innerHTML = name;
+		link.download = name;
 		link.href = url;
 
 		_.extend(link.style, {
@@ -1750,7 +1751,7 @@ ui.download = function download(url, fileName) {
 			link.click();
 		}, 100);
 
-		axelor.notify.info(_t("Downloading {0}...", fileName));
+		axelor.notify.info(_t("Downloading {0}...", name));
 	}
 
 	$.ajax({
@@ -1759,8 +1760,8 @@ ui.download = function download(url, fileName) {
 		success : doDownload,
 		error : function (e) {
 			if (e.status == 404) {
-				var name = "<strong>" + fileName + "</strong>";
-				axelor.notify.error("<p>" + _t("File {0} does not exist.", name) + "</p>");
+				var fname = "<strong>" + name + "</strong>";
+				axelor.notify.error("<p>" + _t("File {0} does not exist.", fname) + "</p>");
 			}
 		}
 	});

@@ -389,7 +389,7 @@ ui.formDirective = function(name, object) {
 					return false;
 				}
 				if (_.isString(template_readonly)) {
-					template_readonly = template_readonly.trim();
+					template_readonly = axelor.sanitize(template_readonly.trim());
 					if (template_readonly[0] !== '<' || $(template_readonly).length > 1) {
 						template_readonly = '<span>' + template_readonly + '</span>';
 					}

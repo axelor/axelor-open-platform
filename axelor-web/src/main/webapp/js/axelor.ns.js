@@ -79,4 +79,48 @@
 	axelor.browser = browser;
 	axelor.device = device;
 
+	function sanitizeElement(element) {
+		$.each(element.attributes, function() {
+			var attr = this.name;
+	        var value = this.value;
+	        if (attr.indexOf('xss-on') === 0 || value.indexOf('javascript:') === 0) {
+	            $(element).removeAttr(attr);
+	        }
+		});
+	}
+
+	// this function removes <script> and event attributes (onerror, onload etc.) from the given html text
+	function sanitizeText(html) {
+		if (typeof html !== 'string') {
+			return html;
+		}
+		var value = "<div>" + html.replace(/(\s)(on(?:\w+))(\s*=)/, '$1xss-$2$3') + "</div>";
+		var elems = $($.parseHTML(value, null, false));
+
+		elems.find('*').each(function() {
+			sanitizeElement(this);
+        });
+
+		return elems.html();
+	}
+
+	function sanitize() {
+		if (arguments.length === 0) {
+			return;
+		}
+		var args = arguments.length === 1 ? arguments[0] : Array.prototype.slice.call(arguments);
+		return Array.isArray(args) ? args.map(function (item) {
+			return Array.isArray(item) ? sanitize(item) : sanitizeText(item);
+		}) : sanitizeText(args);
+	}
+
+	axelor.sanitize = sanitize;
+	
+	// sanitize jquery html function
+	var jq = {
+		html: $.fn.html
+	};
+
+	$.fn.html = function html() { return jq.html.apply(this, sanitize(arguments)); };
+
 })();

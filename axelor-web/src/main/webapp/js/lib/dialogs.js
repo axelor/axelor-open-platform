@@ -176,6 +176,7 @@
 		
 		tmpl = opts.alt ? elemNotifyText2 : elemNotifyText;
 		tmpl = tmpl.replace("#title#", opts.title || '').replace("#message#", message);
+		tmpl = axelor.sanitize(tmpl);
 
 		elem = $(tmpl)
 			.css('margin-bottom', 7)
