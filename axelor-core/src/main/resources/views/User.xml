@@ -16,7 +16,7 @@
     <field name="group"/>
   </grid>
 
-  <form name="user-form" title="User" model="com.axelor.auth.db.User" onSave="com.axelor.auth.AuthService:validate">
+  <form name="user-form" title="User" model="com.axelor.auth.db.User">
     <panel title="Overview">
       <field name="name" placeholder="user name" onChange="action-condition-user-validName" validIf="name.length >= 2"/>
       <field name="code" placeholder="login name" onChange="action-condition-user-validCode" validIf="code.length >= 2" readonlyIf="id &amp;&amp; code == 'admin'"/>
@@ -36,9 +36,10 @@
       <field name="expiresOn" validIf="!expiresOn || (!activateOn &amp;&amp; expiresOn) || (activateOn &amp;&amp; expiresOn &amp;&amp; $moment(expiresOn) >= $moment(activateOn))"/>
       <field name="blocked"/>
       <field name="change" title="Change password?" showIf="id &amp;&amp; !$readonly()" widget="boolean"/>
-      <panel colSpan="12" showIf="change || !id" >
-        <field name="newPassword" title="Password" placeholder="new password" widget="password" requiredIf="!id" validIf="(!change &amp;&amp; id) || (newPassword.length >= 4 &amp;&amp; confirm == newPassword)"/>
-        <field name="confirm" title="Confirm" placeholder="confirm password" widget="password"/>
+      <panel showIf="change || !id" colSpan="12" itemSpan="12">
+        <field name="oldPassword" title="Current password" placeholder="current password" widget="password" requiredIf="id === $userId" showIf="id === $userId"/>
+        <field name="newPassword" title="New password" placeholder="new password" widget="password" requiredIf="!id" validIf="(!change &amp;&amp; id) || (newPassword.length >= 4 &amp;&amp; chkPassword === newPassword)"/>
+        <field name="chkPassword" title="Confirm password" placeholder="confirm password" widget="password"/>
       </panel>
     </panel>
     <panel-tabs>
@@ -48,8 +49,7 @@
     </panel-tabs>
   </form>
 
-  <form name="user-preferences-form" title="Preferences" model="com.axelor.auth.db.User"
-    onSave="com.axelor.auth.AuthService:validate">
+  <form name="user-preferences-form" title="Preferences" model="com.axelor.auth.db.User">
     <panel title="User preferences" itemSpan="12">
       <field name="image" showTitle="false" />
       <field name="email" widget="Email"/>
@@ -58,9 +58,10 @@
       <field name="singleTab" widget="inline-checkbox"/>
       <field name="noHelp" widget="inline-checkbox" />
       <field name="change" title="Change password?" widget="inline-checkbox"/>
-      <panel showIf="change">
-        <field name="newPassword" title="Password" placeholder="new password" widget="password" requiredIf="change" validIf="(!change) || (newPassword.length >= 4 &amp;&amp; confirm == newPassword)"/>
-        <field name="confirm" title="Confirm" placeholder="confirm password" widget="password"/>
+      <panel showIf="change" itemSpan="12">
+          <field name="oldPassword" title="Current password" placeholder="current password" widget="password" requiredIf="change" />
+          <field name="newPassword" title="New password" placeholder="new password" widget="password" requiredIf="change" validIf="(!change) || (newPassword.length >= 4 &amp;&amp; chkPassword === newPassword)"/>
+          <field name="chkPassword" title="Confirm password" placeholder="confirm password" widget="password"/>
       </panel>
     </panel>
   </form>

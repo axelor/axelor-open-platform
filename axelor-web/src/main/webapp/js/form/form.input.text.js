@@ -184,7 +184,7 @@ ui.formInput('Password', 'String', {
 		};
 	},
 	template_readonly: '<input type="password" ng-show="text" tabindex="-1" readonly="readonly" class="display-text" value="{{password()}}"></input>',
-	template_editable: '<input type="password">'
+	template_editable: '<input type="password" autocomplete="new-password">'
 });
 
 ui.directive('uiTextareaAutoSize', function () {

@@ -693,10 +693,17 @@ function FormViewCtrl($scope, $element) {
 		if (!$scope.record) return {};
 		var fields = _.keys($scope.fields);
 		var extra = _.chain($scope.fields_view)
-					  .filter(function(f){ return f.name && !_.contains(fields, f.name); })
+					  .filter(function(f) { return f.name && !_.contains(fields, f.name); })
 					  .pluck('name')
 					  .compact()
 					  .value();
+
+		if ($scope._model === 'com.axelor.auth.db.User') {
+			extra = extra.filter(function (n) {
+				return ['change', 'oldPassword', 'newPassword', 'chkPassword'].indexOf(n) === -1;
+			});
+		}
+
 		return _.pick($scope.record, extra);
 	};
 

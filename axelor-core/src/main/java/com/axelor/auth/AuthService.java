@@ -31,12 +31,9 @@ import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 import com.axelor.auth.db.User;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
-import com.axelor.i18n.I18n;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
-import com.google.common.base.Objects;
-import com.google.inject.persist.Transactional;
 
 /**
  * The {@link AuthService} class provides various utility services including
@@ -186,32 +183,5 @@ public class AuthService {
 		response.setValue("nameField", name.getName());
 		response.setValue("login", user.getCode());
 		response.setValue("lang", user.getLanguage());
-	}
-
-	/**
-	 * A helper method used to encrypt user password when the user record is
-	 * saved with user interface.
-	 *
-	 * @param request
-	 *            the request with user object as context
-	 * @param response
-	 *            the response, which is updated according to the validation
-	 */
-	@Transactional
-	public void validate(ActionRequest request, ActionResponse response) {
-		Context context = request.getContext();
-		if (context.get("confirm") == null) {
-			return;
-		}
-
-		String password = (String) context.get("newPassword");
-		String confirm = (String) context.get("confirm");
-
-		if (Objects.equal(password, confirm)) {
-			response.setValue("password", encrypt(password));
-			response.setValue("change", false);
-		} else {
-			response.setError(I18n.get("Password doesn't match"));
-		}
 	}
 }
