@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.axelor.app.AppSettings;
+import com.axelor.i18n.I18n;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -129,24 +131,30 @@ public class Response {
 	
 	public void setException(Throwable throwable) {
 		
-		Throwable cause = Throwables.getRootCause(throwable);
-		if (cause instanceof BatchUpdateException) {
-			cause = ((BatchUpdateException) cause).getNextException();
-		}
-		
 		final Map<String, Object> report = new HashMap<>();
-		
-		String message = throwable.getMessage();
-		if (message == null || message.startsWith(cause.getClass().getName())) {
-			message = cause.getMessage();
+
+		if (AppSettings.get().isProduction()) {
+			report.put("title", I18n.get("Internal Server Error"));
+			report.put("message", I18n.get("A server error occurred. Please contact the administrator."));
+			report.put("popup", true);
+		} else {
+			Throwable cause = Throwables.getRootCause(throwable);
+			if (cause instanceof BatchUpdateException) {
+				cause = ((BatchUpdateException) cause).getNextException();
+			}
+			
+			String message = throwable.getMessage();
+			if (message == null || message.startsWith(cause.getClass().getName())) {
+				message = cause.getMessage();
+			}
+	
+			report.put("class", throwable.getClass());
+			report.put("message", message);
+			report.put("string", cause.toString());
+			report.put("stacktrace", Throwables.getStackTraceAsString(throwable));
+			report.put("cause", Throwables.getStackTraceAsString(cause));
 		}
 
-		report.put("class", throwable.getClass());
-		report.put("message", message);
-		report.put("string", cause.toString());
-		report.put("stacktrace", Throwables.getStackTraceAsString(throwable));
-		report.put("cause", Throwables.getStackTraceAsString(cause));
-		
 		this.setData(report);
 		this.setStatus(STATUS_FAILURE);
 	}

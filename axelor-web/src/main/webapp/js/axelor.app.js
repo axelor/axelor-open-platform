@@ -587,7 +587,11 @@
 			var message = _t("Internal Server Error"),
 				report = data.data || data, stacktrace = null, cause = null, exception;
 			
-			if (report.stacktrace) {
+			if (report.popup && report.message) {
+				return axelor.dialogs.box(report.message, {
+					title: report.title
+				});
+			} else if (report.stacktrace) {
 				message = report.message || report.string;
 				exception = report['class'] || '';
 				
