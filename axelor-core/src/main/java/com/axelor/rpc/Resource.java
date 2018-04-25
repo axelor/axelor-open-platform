@@ -794,6 +794,10 @@ public class Resource<T extends Model> {
 			return user;
 		}
 
+		if (StringUtils.isBlank(oldPassword)) {
+			throw new ValidationException("Current user password is not provided.");
+		}
+
 		if (!newPassword.equals(chkPassword)) {
 			throw new ValidationException("Confirm password doesn't match with new password.");
 		}
@@ -801,13 +805,8 @@ public class Resource<T extends Model> {
 		final User current = AuthUtils.getUser();
 		final AuthService authService = AuthService.getInstance();
 
-		if (user == current) {
-			if (StringUtils.isBlank(oldPassword)) {
-				throw new ValidationException("Current password is not provided.");
-			}
-			if (!authService.match(oldPassword, user.getPassword())) {
-				throw new ValidationException("Current password is wrong.");
-			}
+		if (!authService.match(oldPassword, current.getPassword())) {
+			throw new ValidationException("Current user password is wrong.");
 		}
 
 		user.setPassword(authService.encrypt(newPassword));
