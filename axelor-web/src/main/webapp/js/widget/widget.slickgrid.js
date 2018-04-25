@@ -501,6 +501,10 @@ _.extend(Factory.prototype, {
 		if (_.isArray(field.selectionList) && widget !== "SelectProgress") {
 			type = "selection";
 		}
+		
+		if (typeof value === 'string') {
+			value = axelor.sanitize(value);
+		}
 
 		if (type === "button" || type === "progress") {
 			return Formatters[type](field, value, dataContext, this.grid);
@@ -526,7 +530,7 @@ _.extend(Factory.prototype, {
 		}
 		
 		if (widget.toLowerCase() === "html") {
-			return value ? '<span>' + axelor.sanitize(value) + '</span>' : '';
+			return value ? '<span>' + value + '</span>' : '';
 		}
 
 		// try to get dotted field value from related object
