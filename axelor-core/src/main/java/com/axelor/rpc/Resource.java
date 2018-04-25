@@ -401,10 +401,14 @@ public class Resource<T extends Model> {
 				item = toMap(item);
 			}
 			if (item instanceof Map) {
-				if (populate) {
-					item = repo.populate((Map) item, request.getContext());
+				Map<String, Object> map = (Map) item;
+				if (User.class.isAssignableFrom(model)) {
+					map.remove("password");
 				}
-				Translator.applyTranslatables((Map) item, model);
+				if (populate) {
+					item = repo.populate(map, request.getContext());
+				}
+				Translator.applyTranslatables(map, model);
 			}
 			jsonData.add(item);
 		}
