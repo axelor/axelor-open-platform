@@ -578,8 +578,7 @@ public class MetaService {
 		List<Object> records = request.getRecords();
 
 		if (records == null || records.isEmpty()) {
-			response.setException(new IllegalArgumentException("No records provides."));
-			return response;
+			return response.fail("No records provides.");
 		}
 
 		for(Object record : records) {

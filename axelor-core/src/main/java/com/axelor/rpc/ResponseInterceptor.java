@@ -131,11 +131,8 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 	}
 
 	private Response onAuthSecurityException(AuthSecurityException e, Response response) {
-		if (e.getType() != AccessType.READ) {
-			response.setException(e);
-		}
 		log.error("Access Error: {}", e.getMessage());
-		return response;
+		return e.getType() == AccessType.READ ? response : response.fail(e.getMessage());
 	}
 
 	private Response onOptimisticLockException(OptimisticLockException e, Response response) {

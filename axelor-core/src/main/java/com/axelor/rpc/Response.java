@@ -128,7 +128,15 @@ public class Response {
 		}
 		this.errors.put(fieldName, errorMessage);
 	}
-	
+
+	public Response fail(String message) {
+		final Map<String, Object> report = new HashMap<>();
+		report.put("message", message);
+		this.setData(report);
+		this.setStatus(STATUS_FAILURE);
+		return this;
+	}
+
 	public void setException(Throwable throwable) {
 		
 		final Map<String, Object> report = new HashMap<>();

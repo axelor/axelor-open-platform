@@ -110,16 +110,8 @@ public class RestService extends ResourceService {
 	private MailFollowerRepository followers;
 
 	private Response fail() {
-
-		final Map<String, Object> report = new HashMap<>();
 		final Response response = new Response();
-
-		report.put("message", "invalid request");
-
-		response.setData(report);
-		response.setStatus(Response.STATUS_FAILURE);
-
-		return response;
+		return response.fail("invalid request");
 	}
 
 	@GET
