@@ -14,12 +14,33 @@ input[type="url"],
 input[type="search"],
 input[type="tel"],
 input[type="color"],
-.tag-select,
+.tag-select.picker-input,
 .form-item-container > .display-text,
 .uneditable-input {
 	color: #000;
-	background-color: inherit;
 	border-color: #eee;
+}
+
+.bar-side select,
+.bar-side textarea,
+.bar-side input[type="text"],
+.bar-side input[type="password"],
+.bar-side input[type="datetime"],
+.bar-side input[type="datetime-local"],
+.bar-side input[type="date"],
+.bar-side input[type="month"],
+.bar-side input[type="time"],
+.bar-side input[type="week"],
+.bar-side input[type="number"],
+.bar-side input[type="email"],
+.bar-side input[type="url"],
+.bar-side input[type="search"],
+.bar-side input[type="tel"],
+.bar-side input[type="color"],
+.bar-side .tag-select.picker-input,
+.bar-side .form-item-container > .display-text,
+.bar-side .uneditable-input {
+	background-color: inherit;
 }
 
 [ui-nav-tree] .nav-search input[type="text"] {
@@ -78,7 +99,6 @@ label,
 	background-color: #d3d3d3;
 }
 
-.slick-cell .picker-icons i.fa,
 .mail-message .mail-message-header .subject,
 .mail-message .track-fields li {
 	color: #8C8C8C;
