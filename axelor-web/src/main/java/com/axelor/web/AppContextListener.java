@@ -19,6 +19,7 @@ package com.axelor.web;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
+import javax.servlet.SessionCookieConfig;
 
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.core.ResourceMethodRegistry;
@@ -30,6 +31,7 @@ import org.jboss.resteasy.spi.Registry;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
+import com.axelor.app.AppSettings;
 import com.axelor.app.internal.AppLogger;
 import com.axelor.meta.loader.ViewWatcher;
 import com.google.inject.Binding;
@@ -53,6 +55,11 @@ public class AppContextListener extends GuiceServletContextListener {
 		final ServletContext context = servletContextEvent.getServletContext();
 		final ListenerBootstrap config = new ListenerBootstrap(context);
 		final Injector injector = (Injector) context.getAttribute(Injector.class.getName());
+
+		final SessionCookieConfig cookieConfig = context.getSessionCookieConfig();
+		
+		cookieConfig.setHttpOnly(true);
+		cookieConfig.setSecure(AppSettings.get().getBoolean("session.cookie.secure", false));
 
 		deployment = config.createDeployment();
 
