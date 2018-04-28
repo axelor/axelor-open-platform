@@ -340,6 +340,7 @@ var Formatters = {
 		var elem;
 		var isIcon = field.icon && field.icon.indexOf('fa-') === 0;
 		var css = isIcon ? "slick-icon-button fa " + field.icon : "slick-img-button";
+		var help = field.help || field.title;
 		var handler = grid.scope.handler;
 
 		if (field.readonlyIf && axelor.$eval(grid.scope, field.readonlyIf, _.extend({}, handler._context, context))) {
@@ -348,14 +349,14 @@ var Formatters = {
 		
 		if(isIcon) {
 			elem = '<a href="javascript: void(0)" tabindex="-1"';
-			if (field.help) {
-				elem += ' title="' + _.escapeHTML(field.help) + '"';
+			if (help) {
+				elem += ' title="' + _.escapeHTML(help) + '"';
 			}
 			elem += '><i class="' + css + '"></i></a>';
 		} else if (field.icon) {
 			elem = '<img class="' + css + '" src="' + field.icon + '"';
-			if (field.help) {
-				elem += ' title="' + _.escapeHTML(field.help) + '"';
+			if (help) {
+				elem += ' title="' + _.escapeHTML(help) + '"';
 			}
 			elem += '>';
 		} else {
