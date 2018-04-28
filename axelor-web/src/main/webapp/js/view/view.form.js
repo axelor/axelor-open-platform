@@ -1222,7 +1222,7 @@ ui.formBuild = function (scope, schema, fields) {
 				this.items = attrs.items = null;
 			}
 
-			if (attrs.editor && attrs.target) {
+			if ((attrs.editor || attrs.viewer) && attrs.target) {
 				type = 'inline-' + type;
 			}
 

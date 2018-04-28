@@ -925,14 +925,12 @@ function InlineOneToManyCtrl($scope, $element, DataSource, ViewService) {
 		model: field.target
 	};
 
-	if (!field.editor) {
-		throw "No editor defined.";
+	if (field.editor) {
+		params.views = [{
+			type: 'grid',
+			items: field.editor.items
+		}];
 	}
-
-	params.views = [{
-		type: 'grid',
-		items: field.editor.items
-	}];
 
 	$scope._viewParams = params;
 

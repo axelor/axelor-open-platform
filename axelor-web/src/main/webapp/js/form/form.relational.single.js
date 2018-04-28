@@ -605,42 +605,39 @@ ui.InlineManyToOneCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewServi
 function InlineManyToOneCtrl($scope, $element, DataSource, ViewService) {
 
 	var field = $scope.field || $scope.getViewDef($element);
+	var names = [];
 	var params = {
 		model: field.target
 	};
 
-	if (!field.editor) {
-		throw "No editor defined.";
+	if (field.editor) {
+		params.views = [{
+			type: 'form',
+			items: field.editor.items
+		}];
+		names = _.pluck(field.editor.items, 'name');
+		names = _.compact(names);
+	} else if (field.viewer && field.viewer.depends) {
+		names = field.viewer.depends.split(/\s*,\s*/);
 	}
-
-	params.views = [{
-		type: 'form',
-		items: field.editor.items
-	}];
 
 	$scope._viewParams = params;
 
 	ManyToOneCtrl.call(this, $scope, $element, DataSource, ViewService);
+	
+	if (field.targetName) {
+		names.push(field.targetName);
+	}
+	
+	names = _.unique(names);
 
 	$scope.select = function (value) {
-		var editor = field.editor;
-		var names = [];
-
 		if (_.isArray(value)) {
 			value = _.first(value);
 		}
 		if (_.isEmpty(value)) {
 			return $scope.setValue(null, true);
 		}
-
-		names = _.pluck(editor.items, 'name');
-		names = _.compact(names);
-
-		if ($scope.field.targetName) {
-			names.push($scope.field.targetName);
-		}
-
-		names = _.unique(names);
 
 		function set(val) {
 			var record = _.pick(val, names);
