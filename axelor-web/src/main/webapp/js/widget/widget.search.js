@@ -618,7 +618,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		_.each(filters, function(item) {
 			
 			var fieldName = item.fieldName || '';
-			if (fieldName && fieldName.indexOf('.') > -1 && fieldName.indexOf('::') === -1) {
+			if (fieldName && $scope.fields[fieldName] === undefined && fieldName.indexOf('.') > -1 && fieldName.indexOf('::') === -1) {
 				fieldName = fieldName.substring(0, fieldName.indexOf('.'));
 			}
 
