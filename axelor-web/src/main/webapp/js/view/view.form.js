@@ -810,7 +810,9 @@ function FormViewCtrl($scope, $element) {
 				return;
 			}
 			ds.removeAll([record]).success(function(records, page){
-				$scope.switchBack();
+				if ($scope.switchBack() === false) {
+					$scope.onNew();
+				};
 			});
 		});
 	};
@@ -909,6 +911,7 @@ function FormViewCtrl($scope, $element) {
 		if (__switchBack) {
 			return $scope.switchTo(__switchBack);
 		}
+		return false;
 	};
 
 	$scope.switchTo = function(type, callback) {
