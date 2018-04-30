@@ -37,7 +37,7 @@
       <field name="blocked"/>
       <field name="change" title="Change password?" showIf="id &amp;&amp; !$readonly()" widget="boolean"/>
       <panel showIf="change || !id" colSpan="12" itemSpan="12">
-        <field name="oldPassword" title="Your password" placeholder="your password" widget="password" requiredIf="change"/>
+        <field name="oldPassword" title="Your password" placeholder="your password" widget="password" requiredIf="change || !id"/>
         <field name="newPassword" title="New password" placeholder="new password" widget="password" requiredIf="!id" validIf="(!change &amp;&amp; id) || (newPassword.length >= 4 &amp;&amp; chkPassword === newPassword)"/>
         <field name="chkPassword" title="Confirm password" placeholder="confirm password" widget="password"/>
       </panel>
