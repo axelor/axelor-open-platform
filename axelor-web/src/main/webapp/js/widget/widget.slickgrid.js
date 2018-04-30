@@ -1138,10 +1138,12 @@ Grid.prototype._doInit = function(view) {
 		that.resetColumns();
 	});
 	
-	scope.$on("on:edit", function(e) {
-		that.$oldValues = null;
-		that.clearDirty();
-		that.resetColumns();
+	scope.$on("on:edit", function(e, record) {
+		if (record && record.id > 0) {
+			that.$oldValues = null;
+			that.clearDirty();
+			that.resetColumns();
+		}
 	});
 	
 	scope.$on("on:advance-filter", function (e, criteria) {
