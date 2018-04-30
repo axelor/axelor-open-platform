@@ -68,7 +68,7 @@ public final class EntityHelper {
 
 		helper.add("id", entity.getId());
 		for (Property field : mapper.getProperties()) {
-			if (isSimple(field)) {
+			if (isSimple(field) && !field.isPassword()) {
 				helper.add(field.getName(), field.get(entity));
 			}
 		}
