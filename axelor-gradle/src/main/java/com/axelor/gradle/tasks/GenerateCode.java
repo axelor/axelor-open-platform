@@ -39,6 +39,7 @@ import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectories;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.util.PatternSet;
+import org.gradle.composite.internal.IncludedBuildInternal;
 
 import com.axelor.gradle.AppPlugin;
 import com.axelor.gradle.AxelorExtension;
@@ -171,7 +172,17 @@ public class GenerateCode extends DefaultTask {
 	private Project findProject(ResolvedArtifact artifact) {
 		final ComponentIdentifier cid = artifact.getId().getComponentIdentifier();
 		if (cid instanceof ProjectComponentIdentifier) {
-			return getProject().findProject(((ProjectComponentIdentifier) cid).getProjectPath());
+			String path = ((ProjectComponentIdentifier) cid).getProjectPath();
+			Project sub = getProject().findProject(path);
+			// consider projects from included builds
+			if (sub == null) {
+				sub = getProject().getGradle().getIncludedBuilds().stream()
+					.map(b -> ((IncludedBuildInternal) b).getConfiguredBuild().getRootProject())
+					.map(p -> p.findProject(path))
+					.findFirst()
+					.orElse(null);
+			}
+			return sub;
 		}
 		return null;
 	}
@@ -187,7 +198,12 @@ public class GenerateCode extends DefaultTask {
 			}
 			return false;
 		}
-		return sub.getPlugins().hasPlugin(AxelorPlugin.class);
+
+		// projects from included build has AxelorPlugin.class loaded with another class loader
+		return sub.getPlugins().stream()
+			.filter(p -> p.getClass().getName().equals(AxelorPlugin.class.getName()))
+			.findFirst()
+			.isPresent();
 	}
 
 	private void sortArtifacts(ResolvedDependency dependency, Set<Object> visited, List<ResolvedArtifact> result) {
