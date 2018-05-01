@@ -64,12 +64,12 @@ public class PublishSupport extends AbstractSupport {
 		}
 
 		final Path rootPath = project.getRootDir().toPath().toAbsolutePath();
-		final Object mavenUrl = URI.create(mavenRepo.toString()).isAbsolute() ? mavenRepo
-				: rootPath.resolve(mavenRepo.toString()).toUri();
+		final boolean isRemote = URI.create(mavenRepo.toString()).isAbsolute();
+		final Object mavenUrl = isRemote ? mavenRepo : rootPath.resolve(mavenRepo.toString()).toUri();
 
 		publishing.getRepositories().maven(maven -> {
 			maven.setUrl(mavenUrl);
-			if (mavenUser != null && mavenPass != null) {
+			if (isRemote && mavenUser != null && mavenPass != null) {
 				maven.credentials(auth -> {
 					auth.setUsername(mavenUser.toString());
 					auth.setPassword(mavenPass.toString());
