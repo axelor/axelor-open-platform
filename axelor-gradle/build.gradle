@@ -58,3 +58,8 @@ classes.doLast {
 	generateLibsList "tomcat"
 	generateLibsList "provided"
 }
+
+// prevent double publish
+tasks.withType(PublishToMavenRepository).all {
+	enabled =  name != 'publishMavenJavaPublicationToMavenRepository'
+}
