@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -131,10 +132,14 @@ public final class AppRunner {
 	private static boolean isTestPath(URL url) {
 		try {
 			Path path = Paths.get(url.toURI());
-			for (int n = path.getNameCount() - 1; n >= 0; n--) {
-				if (path.getName(n).getFileName().toString().equals("test")) {
+			if (!Files.isDirectory(path)) {
+				return false;
+			}
+			while (path != null && !Files.exists(path.resolve("build.gradle"))) {
+				if (path.getFileName().toString().equals("test")) {
 					return true;
 				}
+				path = path.getParent();
 			}
 		} catch (URISyntaxException e) {
 			// ignore
