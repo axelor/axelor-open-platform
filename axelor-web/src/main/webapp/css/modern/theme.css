@@ -265,9 +265,13 @@ label,
 }
 
 textarea {
-	border-top: 0;
-	border-left: 0;
-	border-right: 0;
+	border-width: 0;
+	border-bottom-width: 1px;
+}
+
+.slick-external-editor textarea {
+	border-width: 1px;
+	background-color: #fff;
 }
 
 .navbar-inner,
@@ -285,6 +289,15 @@ textarea {
 [ui-view-form] select,
 [ui-view-form] .tag-select {
 	border-color: #c0c0c0;
+}
+
+.ng-invalid > input,
+.ng-invalid > textarea,
+.ng-invalid > .picker-input input,
+.ng-invalid > .ui-spinner input,
+.ng-invalid > .tag-select,
+.ng-invalid > .form-item-container > .wysiwyg-container {
+	border-color: #B94A48;	
 }
 
 .btn,
