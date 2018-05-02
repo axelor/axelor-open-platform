@@ -915,14 +915,16 @@ function FormViewCtrl($scope, $element) {
 	};
 
 	$scope.switchTo = function(type, callback) {
-		$scope.confirmDirty(function() {
-			$scope.setEditable(false);
-			$scope.editRecord(null);
-			__switchTo(type, function () {
-				$scope.$locationChangeOff();
-				if (callback) {
-					callback();
-				}
+		$scope.waitForActions(function () {
+			$scope.confirmDirty(function() {
+				$scope.setEditable(false);
+				$scope.editRecord(null);
+					__switchTo(type, function () {
+						$scope.$locationChangeOff();
+						if (callback) {
+							callback();
+						}
+					});
 			});
 		});
 	};
