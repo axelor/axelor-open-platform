@@ -75,6 +75,10 @@ header .navbar .brand-logo img {
 	background-color: transparent;
 }
 
+.alert {
+	width: 420px;
+}
+
 @media (min-width: 1200px) {
 	.alert,
 	.login-panel {
