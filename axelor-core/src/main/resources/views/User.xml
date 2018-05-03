@@ -28,18 +28,22 @@
         <field name="homeAction" hidden="true" x-bind="{{__actionSelect.name}}"/>
         <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" target="com.axelor.meta.db.MetaAction" target-name="name" domain="self.home = true"/>
       </panel>
-      <field name="singleTab" widget="inline-checkbox" />
-      <field name="noHelp" widget="inline-checkbox" />
+      <panel itemSpan="4">
+        <field name="singleTab"/>
+        <field name="noHelp"/>
+      </panel>
     </panel>
     <panel title="Authorization">
       <field name="activateOn" validIf="!activateOn || (activateOn &amp;&amp; !expiresOn) || (activateOn &amp;&amp; expiresOn &amp;&amp; $moment(expiresOn) >= $moment(activateOn))"/>
       <field name="expiresOn" validIf="!expiresOn || (!activateOn &amp;&amp; expiresOn) || (activateOn &amp;&amp; expiresOn &amp;&amp; $moment(expiresOn) >= $moment(activateOn))"/>
       <field name="blocked"/>
       <field name="change" title="Change password?" showIf="id &amp;&amp; !$readonly()" widget="boolean"/>
-      <panel showIf="change || !id" colSpan="12" itemSpan="12">
-        <field name="oldPassword" title="Your password" placeholder="your password" widget="password" requiredIf="change || !id"/>
-        <field name="newPassword" title="New password" placeholder="new password" widget="password" requiredIf="!id" validIf="(!change &amp;&amp; id) || (newPassword.length >= 4 &amp;&amp; chkPassword === newPassword)"/>
-        <field name="chkPassword" title="Confirm password" placeholder="confirm password" widget="password"/>
+      <panel showIf="!$readonly()" colSpan="12" itemSpan="12">
+        <panel showIf="change || !id" itemSpan="12">
+          <field name="newPassword" title="New password" placeholder="new password" widget="password" requiredIf="change || !id" validIf="(!change &amp;&amp; id) || newPassword.length >= 4" />
+          <field name="chkPassword" title="Confirm password" placeholder="confirm password" widget="password" validIf="(!change &amp;&amp; id) || (newPassword.length >= 4 &amp;&amp; chkPassword === newPassword)"/>
+        </panel>
+        <field name="oldPassword" title="Your password" placeholder="your password" widget="password" requiredIf="!$readonly()"/>
       </panel>
     </panel>
     <panel-tabs>
