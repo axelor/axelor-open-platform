@@ -310,6 +310,8 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 				});
 				return promise.then(handleEmpty, handleEmpty);
 			}
+			
+			scope.$watch('records.length', handleEmpty);
 
 			scope.hasMore = function () {
 				var page = ds._page;
