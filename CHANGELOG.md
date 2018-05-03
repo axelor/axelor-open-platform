@@ -1,4 +1,4 @@
-## 5.0.0-rc3 (current)
+## 5.0.0-rc3 (2018-05-03)
 
 #### Enhancements
 
