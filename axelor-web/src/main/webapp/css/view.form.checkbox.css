@@ -19,8 +19,6 @@
 	display: inline-block;
     width: inherit;
 	margin: 0;
-	padding: 4px;
-	padding-left: 0;
 	overflow: hidden;
 }
 
@@ -50,7 +48,7 @@
 }
 
 .ibox .title {
-	margin-left: 4px;
+	margin-left: 8px;
 }
 
 .ibox .item-label {
@@ -185,4 +183,10 @@
 .ng-invalid > .ibox .box:before,
 .ng-invalid > .iswitch .box:before {
 	border-color: #B94A48;
+}
+
+.form-item-container > .ibox,
+.form-item-container > .iswitch {
+	margin: 4px 0 !important;
+	float: left;
 }
