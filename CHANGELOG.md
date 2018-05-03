@@ -1,3 +1,35 @@
+## 5.0.0-rc3 (current)
+
+#### Enhancements
+
+* Prevent form view to switch when actions are in progress
+* Improved maven publishing
+* Use title as on grid button tooltip if help is not given
+* Allow viewer template on relational fields without editor
+* Improved new modern theme
+
+#### Security Enhancements
+
+* Add `session.cookie.secure` config option, can be used when app is served over https
+* Do not show error stacktrace in production mode to prevent leaking sensitive details
+* Current user password is required for creating or changing user records
+* Reset session id to prevent session fixation
+
+#### Security Fixes
+
+* Fix user password hash in response
+* Fix XSS vulnerability by sanitizing text values
+
+#### Bugs
+
+* Fix kanban column no records message dispay issue
+* Fix $number helper is missing for viewer templates
+* Fix code generation with gradle composite builds
+* Fix m2o column reset issue with onNew action
+* Fix dotted field issue in saved search filter
+* Fix record delete issue with form only action-view
+* Fix m2o validation issue when clearing search text
+
 ## 5.0.0-rc2 (2018-04-13)
 
 #### New Features
