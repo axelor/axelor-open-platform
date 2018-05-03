@@ -371,6 +371,7 @@ ui.formDirective = function(name, object) {
 				if (field.viewer) {
 					template_readonly = field.viewer.template;
 					scope.$moment = function(d) { return moment(d); };
+					scope.$number = function(d) { return +d; };
 					scope.$image = function (fieldName, imageName) { return ui.formatters.$image(this, fieldName, imageName); };
 					scope.$fmt = function (fieldName, fieldValue) {
 						var args = [this, fieldName];
