@@ -133,6 +133,8 @@ public class FileService extends AbstractService {
 
 		final Map<String, Object> data = new HashMap<>();
 		try {
+			// check if file name is valid
+			MetaFiles.checkPath(fileName);
 			final File file = files.upload(stream, fileOffset, fileSize, fileId);
 			if (Files.size(file.toPath()) == fileSize) {
 				final MetaFile meta = new MetaFile();

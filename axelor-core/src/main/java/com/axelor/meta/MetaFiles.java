@@ -96,7 +96,12 @@ public class MetaFiles {
 	}
 	
 	private static Path getUploadPath(String fileName) {
-		return getUploadPath().resolve(fileName);
+		final Path uploadPath = getUploadPath().normalize();
+		final Path targetPath = uploadPath.resolve(fileName).normalize();
+		if (targetPath.startsWith(uploadPath) && !targetPath.equals(uploadPath)) {
+			return targetPath;
+		}
+		throw new IllegalArgumentException("Invalid file name: " + fileName);
 	}
 
 	private static Path getTempPath() {
@@ -130,6 +135,21 @@ public class MetaFiles {
 	public static Path getPath(String filePath) {
 		Preconditions.checkNotNull(filePath, "file path can't be null");
 		return getUploadPath(filePath);
+	}
+
+	/**
+	 * Check whether the given filePath is valid.
+	 * 
+	 * <p>
+	 * The filePath is value if it is inside upload directory.
+	 * 
+	 * @param filePath
+	 *            the file path to check
+	 * @throws IllegalArgumentException
+	 */
+	public static void checkPath(String filePath) {
+		Preconditions.checkNotNull(filePath, "file path can't be null");
+		getUploadPath(filePath);
 	}
 
 	/**
