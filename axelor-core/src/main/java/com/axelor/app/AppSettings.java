@@ -19,8 +19,12 @@ package com.axelor.app;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Properties;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.axelor.app.internal.AppFilter;
 import com.axelor.common.ResourceUtils;
@@ -72,6 +76,14 @@ public final class AppSettings {
 			value = defaultValue;
 		}
 		return sub(value);
+	}
+
+	public List<String> getList(String key) {
+		return Arrays.asList(get(key, "").trim().split("\\s*,\\s*"));
+	}
+	
+	public <T> List<T> getList(String key, Function<String, T> mapper) {
+		return getList(key).stream().map(mapper).collect(Collectors.toList());
 	}
 
 	public int getInt(String key, int defaultValue) {
