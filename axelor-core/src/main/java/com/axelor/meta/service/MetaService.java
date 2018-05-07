@@ -338,7 +338,7 @@ public class MetaService {
 			boolean allowed = AuthUtils.isAdmin(user)
 					|| (myGroups != null && myGroups.contains(userGroup))
 					|| (myRoles != null && !Collections.disjoint(userRoles, myRoles))
-					|| (myRoles == null && menu.getParent() != null);
+					|| (myRoles == null && myGroups == null && menu.getParent() != null);
 
 			if (!allowed || denied.contains(menu.getName())) {
 				denied.add(menu.getName());
