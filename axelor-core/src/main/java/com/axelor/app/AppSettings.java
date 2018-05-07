@@ -79,7 +79,9 @@ public final class AppSettings {
 	}
 
 	public List<String> getList(String key) {
-		return Arrays.asList(get(key, "").trim().split("\\s*,\\s*"));
+		return Arrays.stream(get(key, "").trim().split("\\s*,\\s*"))
+			.filter(StringUtils::notBlank)
+			.collect(Collectors.toList());
 	}
 	
 	public <T> List<T> getList(String key, Function<String, T> mapper) {
