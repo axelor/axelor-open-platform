@@ -402,7 +402,7 @@ ui.directive('uiEditorPopup', function() {
 
 			var onNewHandler = scope.onNewHandler;
 			scope.onNewHandler = function (event) {
-				if (element.dialog('isOpen')) {
+				if (scope.isPopupOpen) {
 					return onNewHandler.apply(scope, arguments);
 				}
 			};
