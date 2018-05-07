@@ -346,7 +346,10 @@ ui.directive('uiDialogSize', function() {
 		}
 
 		function doFocus() {
-			var focusElem = element.find('input:tabbable');
+			var container =  element.is('[ui-selector-popup]')
+				? element.find('.slick-headerrow')
+				: element;
+			var focusElem = container.find('input:tabbable');
 			if (focusElem.length == 0) {
 				focusElem = element.parent().find('.ui-dialog-buttonset').find(':tabbable');
 			}
