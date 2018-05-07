@@ -1224,7 +1224,7 @@ ui.formBuild = function (scope, schema, fields) {
 				this.items = attrs.items = null;
 			}
 
-			if ((attrs.editor || attrs.viewer) && attrs.target) {
+			if ((attrs.editor || attrs.viewer) && attrs.target && type !== 'image') {
 				type = 'inline-' + type;
 			}
 
