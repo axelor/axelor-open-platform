@@ -310,9 +310,10 @@ public class Field extends SimpleWidget {
 
 	public String getTargetName() {
 		if (targetName != null) return targetName;
-		if (target == null) return null;
+		String targetModel = getTarget();
+		if (targetModel == null) return null;
 		try {
-			return Mapper.of(Class.forName(getTarget())).getNameField().getName();
+			return Mapper.of(Class.forName(targetModel)).getNameField().getName();
 		} catch (Exception e){}
 		return null;
 	}

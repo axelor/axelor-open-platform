@@ -242,9 +242,11 @@ function Column(scope, col) {
 		if (type === 'reference') {
 			type = 'many-to-one';
 		}
+		var item = _.findWhere(record.$node.items, { type: 'field', as: col.name });
+		var attrs = _.extend({}, item, col);
 		var fn = ui.formatters[type];
 		if (fn) {
-			value = fn(col, value, record);
+			value = fn(attrs, value, record);
 		}
 		return value === undefined || value === null ? '---' : value;
 	};
