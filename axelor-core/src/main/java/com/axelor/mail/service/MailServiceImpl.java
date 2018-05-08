@@ -594,6 +594,7 @@ public class MailServiceImpl implements MailService, MailConstants {
 		}
 
 		log.debug("Fetched {} emails from: {}", count, store.getURLName());
+		inbox.close(false);
 	}
 
 	@Override
