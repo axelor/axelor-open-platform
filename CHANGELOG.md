@@ -1,5 +1,23 @@
 ## 5.0.0 (current)
 
+#### Enhancements
+
+* Updated translations
+
+#### Security Fixes
+
+* Fix file upload issue where file can be saved outside upload directory
+
+#### Bugs
+
+* Close mail inbox after fetching messages
+* Fix tree view field mapping
+* Fix group permission issue on menus
+* Fix grid column alignment issue in popup
+* Fix onNew event issue on popup editor
+* Fix image widget regression
+* Revert "Current user password should be required for changing users"
+
 ## 5.0.0-rc3 (2018-05-03)
 
 #### Enhancements
