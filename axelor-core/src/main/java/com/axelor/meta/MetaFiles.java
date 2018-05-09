@@ -34,9 +34,15 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.regex.Pattern;
 
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
+
+import org.apache.tika.Tika;
 
 import com.axelor.app.AppSettings;
 import com.axelor.common.StringUtils;
@@ -80,11 +86,28 @@ public class MetaFiles {
 
 	private static final Object lock = new Object();
 
+	private static final List<Pattern> WHITELIST_PATTERNS = AppSettings.get().getList("file.upload.whitelist.pattern", Pattern::compile);
+	private static final List<Pattern> BLACKLIST_PATTERNS = AppSettings.get().getList("file.upload.blacklist.pattern", Pattern::compile);
+	private static final List<MimeType> WHITELIST_TYPES = getMimeTypes("file.upload.whitelist.types");
+	private static final List<MimeType> BLACKLIST_TYPES = getMimeTypes("file.upload.blacklist.types");
+
+	private static final Tika TIKA = new Tika();
+
 	private MetaFileRepository filesRepo;
 
 	@Inject
 	public MetaFiles(MetaFileRepository filesRepo) {
 		this.filesRepo = filesRepo;
+	}
+	
+	private static List<MimeType> getMimeTypes(String key) {
+		return AppSettings.get().getList(key, (s) -> {
+			try {
+				return new MimeType(s);
+			} catch (MimeTypeParseException e) {
+				throw new RuntimeException("Invalid file type: " + s + " for '" + key + "'");
+			}
+		});
 	}
 	
 	private static Path getUploadPath() {
@@ -141,7 +164,8 @@ public class MetaFiles {
 	 * Check whether the given filePath is valid.
 	 * 
 	 * <p>
-	 * The filePath is value if it is inside upload directory.
+	 * The filePath is value if it is inside upload directory or matches upload file
+	 * whitelist pattern and doesn't match upload blacklist pattern.
 	 * 
 	 * @param filePath
 	 *            the file path to check
@@ -149,7 +173,97 @@ public class MetaFiles {
 	 */
 	public static void checkPath(String filePath) {
 		Preconditions.checkNotNull(filePath, "file path can't be null");
+
+		boolean blocked = BLACKLIST_PATTERNS.isEmpty() ? false : BLACKLIST_PATTERNS.stream()
+			.map(p -> p.matcher(filePath))
+			.filter(m -> m.find())
+			.findFirst()
+			.isPresent();
+
+		if (blocked) {
+			throw new IllegalArgumentException("File name is not allowed: " + filePath);
+		}
+
+		boolean allowed = WHITELIST_PATTERNS.isEmpty() ? true : WHITELIST_PATTERNS.stream()
+				.map(p -> p.matcher(filePath))
+				.filter(m -> m.find())
+				.findFirst()
+				.isPresent();
+
+		if (!allowed) {
+			throw new IllegalArgumentException("File name is not allowed: " + filePath);
+		}
+
 		getUploadPath(filePath);
+	}
+	
+	/**
+	 * Check whether the given file type is valid.
+	 * 
+	 * <p>
+	 * The file is valid if it matches file upload whitelist types and doesn't match
+	 * upload blacklist types.
+	 * 
+	 * @param fileType
+	 *            the file type to check
+	 * @throws IllegalArgumentException
+	 */
+	public static void checkType(String fileType) {
+		if (StringUtils.isBlank(fileType)) {
+			return;
+		}
+
+		final MimeType mimeType;
+		try {
+			mimeType = new MimeType(fileType);
+		} catch (MimeTypeParseException e) {
+			return;
+		}
+		
+		boolean blocked = BLACKLIST_TYPES.isEmpty() ? false : BLACKLIST_TYPES.stream()
+				.filter(m -> m.match(mimeType))
+				.findFirst()
+				.isPresent();
+
+		if (blocked) {
+			throw new IllegalArgumentException("File type is not allowed: " + fileType);
+		}
+
+		boolean allowed = WHITELIST_TYPES.isEmpty() ? true : WHITELIST_TYPES.stream()
+				.filter(m -> m.match(mimeType))
+				.findFirst()
+				.isPresent();
+
+		if (!allowed) {
+			throw new IllegalArgumentException("File type is not allowed: " + fileType);
+		}
+	}
+
+	/**
+	 * Check whether the given file is valid.
+	 * 
+	 * <p>
+	 * The file is valid if it matches file upload whitelist types and doesn't match
+	 * upload blacklist types.
+	 * 
+	 * @param file
+	 *            the file to check
+	 * @throws IllegalArgumentException
+	 */
+	public static void checkType(File file) {
+		Preconditions.checkNotNull(file, "file can't be null");
+		
+		String type = null;
+		try {
+			type = Files.probeContentType(file.toPath());
+			if (type == null) {
+				type = TIKA.detect(file);
+			}
+		} catch (IOException e1) {
+			throw new IllegalArgumentException("File is not accessible: " + file.getName());
+		}
+		
+		checkType(type);
 	}
 
 	/**

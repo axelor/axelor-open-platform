@@ -26,7 +26,8 @@ dependencies {
 	compile libs.hibernate
 	compile libs.hibernate_search
 
-	runtime libs.apache_tika
+	compile libs.apache_tika_core
+	runtime libs.apache_tika_parsers
 
 	compile libs.flywaydb
 

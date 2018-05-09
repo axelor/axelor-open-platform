@@ -135,7 +135,10 @@ public class FileService extends AbstractService {
 		try {
 			// check if file name is valid
 			MetaFiles.checkPath(fileName);
+			MetaFiles.checkType(fileType);
 			final File file = files.upload(stream, fileOffset, fileSize, fileId);
+			// check if file content is valid
+			MetaFiles.checkType(file);
 			if (Files.size(file.toPath()) == fileSize) {
 				final MetaFile meta = new MetaFile();
 				meta.setFileName(fileName);
