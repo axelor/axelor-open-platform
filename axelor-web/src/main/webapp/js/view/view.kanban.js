@@ -60,6 +60,7 @@ function BaseCardsCtrl(type, $scope, $element) {
 	};
 
 	$scope.onNew = function () {
+		ds._page.index = -1;
 		$scope.switchTo('form', function (formScope) {
 			formScope.edit(null);
 			formScope.setEditable();
