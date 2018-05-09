@@ -394,6 +394,7 @@ ui.formInput('ManyToOne', 'Select', {
 		});
 
 		var validateSearch = _.debounce(function () {
+			if (input.length === 0) return;
 			var my = input.val() || '';
 			var text = scope.text || '';
 			var invalid = my !== text;
@@ -402,11 +403,13 @@ ui.formInput('ManyToOne', 'Select', {
 			});
 		});
 
-		input.on("input", validateSearch);
-		input.on("keydown", validateSearch);
-		scope.$on("on:edit", validateSearch);
-		scope.$on("on:new", validateSearch);
-		scope.$watch("text", validateSearch);
+		if (input.length) {
+			input.on("input", validateSearch);
+			input.on("keydown", validateSearch);
+			scope.$on("on:edit", validateSearch);
+			scope.$on("on:new", validateSearch);
+			scope.$watch("text", validateSearch);
+		}
 
 		scope.loadSelection = function(request, response) {
 
