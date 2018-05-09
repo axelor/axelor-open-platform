@@ -176,7 +176,7 @@ ui.formInput('Image', 'ImageLink', {
 
 		input.change(function(e, ui) {
 			var file = input.get(0).files[0];
-			var uploadSize = axelor.config["file.upload.size"];
+			var uploadSize = +(axelor.config["file.upload.size"]) || 0;
 
 			// reset file selection
 			input.get(0).value = null;
@@ -185,7 +185,7 @@ ui.formInput('Image', 'ImageLink', {
 				return;
 			}
 
-			if(file.size > 1048576 * parseInt(uploadSize)) {
+			if(uploadSize > 0 && file.size > 1048576 * uploadSize) {
 				return axelor.dialogs.say(_t("You are not allow to upload a file bigger than") + ' ' + uploadSize + 'MB');
 			}
 			

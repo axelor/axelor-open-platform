@@ -731,6 +731,8 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 			uploads.pending.length = 0;
 		};
 
+		var uploadSize = +(axelor.config["file.upload.size"]) || 0;
+
 		function doUpload(files) {
 			if (!scope.canCreateDocument(true)) {
 				return;
@@ -744,6 +746,9 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 			var i, file;
 			for (i = 0; i < all.length; i++) {
 				file = all[i];
+				if (uploadSize > 0 && file.size > 1048576 * uploadSize) {
+					return axelor.dialogs.say(_t("You are not allow to upload a file bigger than") + ' ' + uploadSize + 'MB');
+				}
 			}
 			for (i = 0; i < all.length; i++) {
 				file = all[i];
