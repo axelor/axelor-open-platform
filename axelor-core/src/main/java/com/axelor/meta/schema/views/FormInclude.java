@@ -18,9 +18,11 @@
 package com.axelor.meta.schema.views;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import com.axelor.meta.loader.XMLViews;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
@@ -34,6 +36,8 @@ public class FormInclude extends AbstractWidget {
 	@XmlAttribute(name = "from")
 	private String module;
 	
+	@XmlTransient
+	@JsonIgnore
 	private transient AbstractView owner;
 
 	public String getName() {
@@ -62,6 +66,7 @@ public class FormInclude extends AbstractWidget {
 		if (view == owner) {
 			return null;
 		}
+		view.setOwner(owner);
 		return view;
 	}
 }

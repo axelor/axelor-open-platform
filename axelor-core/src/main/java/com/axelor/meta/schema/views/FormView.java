@@ -19,6 +19,7 @@ package com.axelor.meta.schema.views;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -221,6 +222,16 @@ public class FormView extends AbstractView {
 	@XmlTransient
 	@JsonProperty("items")
 	public List<AbstractWidget> getItemsWithExtensions() {
+		// check if this view is included in another view with same name
+		// in that case, don't use extension view as owner will already use it.
+		AbstractView owner = this.getOwner();
+		while (owner != null) {
+			if (Objects.equals(getName(), owner.getName())) {
+				return getItems();
+			}
+			owner = owner.getOwner();
+		}
+
 		final List<AbstractWidget> items = getItems();
 		final List<AbstractWidget> all = new ArrayList<>();
 		if (items != null) {

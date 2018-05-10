@@ -112,6 +112,10 @@ public abstract class AbstractView {
 	@XmlElement(name = "menu")
 	private List<Menu> menubar;
 
+	@XmlTransient
+	@JsonIgnore
+	private transient AbstractView owner;
+
 	public String getXmlId() {
 		return xmlId;
 	}
@@ -270,6 +274,14 @@ public abstract class AbstractView {
 
 	public void setMenubar(List<Menu> menubar) {
 		this.menubar = menubar;
+	}
+
+	public AbstractView getOwner() {
+		return owner;
+	}
+
+	public void setOwner(AbstractView owner) {
+		this.owner = owner;
 	}
 
 	@XmlTransient
