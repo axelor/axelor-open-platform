@@ -20,6 +20,7 @@ package com.axelor.mail.service;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.quartz.SchedulerException;
 
 import com.axelor.inject.Beans;
 
@@ -29,8 +30,23 @@ import com.axelor.inject.Beans;
  */
 public class MailFetchJob implements Job {
 
+	private boolean isRunning(JobExecutionContext context) {
+		try {
+			return context.getScheduler().getCurrentlyExecutingJobs().stream()
+					.filter(j -> j.getTrigger().equals(context.getTrigger()))
+					.filter(j -> !j.getFireInstanceId().equals(context.getFireInstanceId()))
+					.findFirst()
+					.isPresent();
+		} catch (SchedulerException e) {
+			return false;
+		}
+	}
+
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
+		if (isRunning(context)) {
+			return;
+		}
 		final MailService service = Beans.get(MailService.class);
 		try {
 			service.fetch();

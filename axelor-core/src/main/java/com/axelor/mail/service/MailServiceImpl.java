@@ -112,6 +112,8 @@ public class MailServiceImpl implements MailService, MailConstants {
 	private ExecutorService executor = Executors.newCachedThreadPool();
 
 	private Logger log = LoggerFactory.getLogger(MailService.class);
+	
+	private static final Object FETCH_LOCK = new Object();
 
 	public MailServiceImpl() {
 	}
@@ -599,21 +601,20 @@ public class MailServiceImpl implements MailService, MailConstants {
 
 	@Override
 	public void fetch() throws MailException {
-		final MailReader reader = getMailReader();
-		if (reader == null) {
-			return;
-		}
-		final AuditableRunner runner = Beans.get(AuditableRunner.class);
-		runner.run(new Runnable() {
-			@Override
-			public void run() {
+		synchronized (FETCH_LOCK) {
+			final MailReader reader = getMailReader();
+			if (reader == null) {
+				return;
+			}
+			final AuditableRunner runner = Beans.get(AuditableRunner.class);
+			runner.run(() -> {
 				try {
 					fetch(reader);
 				} catch (Exception e) {
 					log.error("Unable to fetch messages", e);
 				}
-			}
-		});
+			});
+		}
 	}
 
 	@Override
