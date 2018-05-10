@@ -236,7 +236,7 @@ public class ViewService extends AbstractService {
 		final Consumer<List<AbstractWidget>> collect = all -> Optional.ofNullable(all).ifPresent(items::addAll);
 		if (view instanceof FormView) {
 			FormView form = (FormView) view;
-			collect.accept(form.getItems());
+			collect.accept(form.getItemsWithExtensions());
 			if (form.getToolbar() != null) {
 				items.addAll(form.getToolbar());
 			}
