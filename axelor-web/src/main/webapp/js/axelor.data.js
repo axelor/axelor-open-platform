@@ -426,6 +426,7 @@
 				var opts = _.extend({}, options);
 				var data = _.extend({
 					body : text,
+					subject: opts.subject,
 					type: opts.type,
 					parent: opts.parent,
 					files: opts.files,

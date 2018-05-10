@@ -57,6 +57,7 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.mail.ImapAccount;
 import com.axelor.mail.MailBuilder;
@@ -234,7 +235,7 @@ public class MailServiceImpl implements MailService, MailConstants {
 		if (message == null) {
 			return null;
 		}
-		String subject = message.getSubject();
+		String subject = I18n.get(message.getSubject());
 		if (subject != null && entity != null) {
 			try {
 				subject = Mapper.of(entity.getClass()).getNameField().get(entity).toString() + " - " + subject;

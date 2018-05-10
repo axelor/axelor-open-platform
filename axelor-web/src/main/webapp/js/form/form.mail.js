@@ -842,6 +842,7 @@ ui.formWidget('uiMailComposer', {
 				type: 'comment',
 				parent: parent.id && parent,
 				files: files,
+				subject: email.subject,
 				recipients: recipients
 			}).success(function (res) {
 				var message = _.first(res.data);
@@ -893,7 +894,6 @@ ui.formWidget('uiMailComposer', {
 
 		scope.showEditor = function () {
 			var record = {
-				subject: "Re: " + findName(),
 				body: scope.post,
 				files: scope.files
 			};

@@ -199,7 +199,7 @@ public final class MailParser {
 	 * @return return short text as summary
 	 */
 	public String getSummary() {
-		if (summary == null && getText() != null) {
+		if (summary == null && getText() != null && text.indexOf("\n") > -1) {
 			final String text = getText();
 			summary = text.substring(0, text.indexOf("\n"));
 		}
