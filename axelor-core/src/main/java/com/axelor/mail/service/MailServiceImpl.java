@@ -44,7 +44,9 @@ import javax.mail.MessagingException;
 import javax.mail.Store;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.mail.search.AndTerm;
 import javax.mail.search.FlagTerm;
+import javax.mail.search.SearchTerm;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -577,8 +579,11 @@ public class MailServiceImpl implements MailService, MailConstants {
 
 		// find all unseen messages
 		final FlagTerm unseen = new FlagTerm(new Flags(Flags.Flag.SEEN), false);
+		final FlagTerm flagged = new FlagTerm(new Flags("fetched"), false);
+		final SearchTerm term = new AndTerm(unseen, flagged);
+
 		final FetchProfile profile = new FetchProfile();
-		final Message[] messages = inbox.search(unseen);
+		final Message[] messages = inbox.search(term);
 
 		profile.add(FetchProfile.Item.ENVELOPE);
 
@@ -592,6 +597,9 @@ public class MailServiceImpl implements MailService, MailConstants {
 				if (entity != null) {
 					repo.save(entity);
 					count += 1;
+				} else {
+					message.setFlag(Flags.Flag.SEEN, false);
+					message.setFlags(new Flags("fetched"), true);
 				}
 			}
 		}
