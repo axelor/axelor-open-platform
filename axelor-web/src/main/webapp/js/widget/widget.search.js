@@ -775,23 +775,33 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
 		return criteria;
 	};
+	
+	var applied = false;
+
+	$scope.$watch('filters', function (fitlers, old) {
+		applied = fitlers === old;
+	}, true);
 
 	$scope.applyFilter = function(hide) {
 		var criteria = $scope.prepareFilter();
+		var promise;
 		if ($scope.$parent.onFilter) {
-			$scope.$parent.onFilter(criteria);
+			promise = $scope.$parent.onFilter(criteria);
 		}
 		if ($scope.$parent && hide) {
 			$scope.$parent.$broadcast('on:hide-menu');
 		}
 		handler.$broadcast('on:advance-filter', criteria);
 		handler.$broadcast('on:context-field-change', $scope.contextData);
+		applied = true;
+		return promise;
 	};
 	
-	$scope.canExport = function() {
+	$scope.canExport = function(full) {
+		var allowFull = axelor.config["view.adv-search.export.full"] !== false;
 		var handler = $scope.$parent.handler;
 		if (handler && handler.hasPermission) {
-			return handler.hasPermission('export');
+			return full ? allowFull && handler.hasPermission('export') : handler.hasPermission('export');
 		}
 		return true;
 	};
@@ -799,7 +809,14 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	$scope.onExport = function(full) {
 		var handler = $scope.$parent.handler;
 		if (handler && handler.onExport) {
-			handler.onExport(full);
+			var promise = applied ? null : $scope.applyFilter(true);
+			if (promise && promise.then) {
+				promise.then(function () {
+					handler.onExport(full);
+				});
+			} else {
+				handler.onExport(full);
+			}
 		}
 	};
 }
@@ -845,8 +862,8 @@ ui.directive('uiFilterForm', function() {
 				"<span class='divider' ng-if='canExport()'>|</span>"+
 				"<a href='' ng-if='canExport()' ng-click='onExport()' x-translate>Export</a></li>"+
 				"<span class='divider' ng-if='canExport()'>|</span>"+
-				"<a href='' ng-if='canExport()' ng-click='onExport(true)' x-translate>Export full</a></li>"+
-				"<span class='divider'>|</span>"+
+				"<a href='' ng-if='canExport(true)' ng-click='onExport(true)' x-translate>Export full</a></li>"+
+				"<span class='divider' ng-if='canExport(true)'>|</span>"+
 				"<a href='' ng-click='applyFilter(true)' x-translate>Apply</a></li>"+
 			"<div>"+
 		"</div>"
@@ -1248,7 +1265,7 @@ ui.directive('uiFilterBox', function() {
 					$scope.tagItems = [tag];
 				}
 
-				handler.filter(search);
+				return handler.filter(search);
 			};
 
 			$scope.onFreeSearch = function() {
