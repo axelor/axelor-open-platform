@@ -173,7 +173,7 @@ ui.directive('uiFilterItem', function() {
 				var field = data.field || {};
 				_.each(scope.options, function (item) {
 					var name = field.name;
-					if (name && item.name === name) {
+					if (name && item.name === name && data.value) {
 						return;
 					}
 					if (item.contextField && !(item.contextField === name && item.contextFieldValue === data.value)) {
