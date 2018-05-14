@@ -1,5 +1,23 @@
 ## 5.0.0 (current)
 
+#### New Features
+
+* Allow to export with single click
+* Disable full export with `view.adv-search.export.full = false`
+* Add support for file type whitelist & blacklist for upload
+
+#### Bugs
+
+* Fix non-imported incoming emails marked as seen issue
+* Fix stream message mail subject issue
+* Fix file attachment issue for stream message from popup composer
+* Fix concurrent mail fetching issue of stream replies
+* Fix extension view is include multiple time issue
+* Fix route change issue from kanbank view
+* Fix `file.upload.size` setting was not used whith DMS interface
+* Refresh cards view after deleting a card to fix pagination issue
+* Fix regression caused by search text validation on m2o
+
 ## 5.0.0-rc4 (2018-05-08)
 
 #### Enhancements
