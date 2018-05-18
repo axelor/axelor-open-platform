@@ -149,6 +149,8 @@ ui.directive('uiFilterItem', function() {
 
 				filter.type = field.type || 'string';
 				filter.selectionList = field.selectionList;
+				filter.value = undefined;
+				filter.value2 = undefined;
 
 				if (field.type === 'many-to-one' || field.type === 'one-to-one') {
 					filter.targetName = field.targetName;
