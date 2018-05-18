@@ -65,22 +65,22 @@ label,
 	flex-direction: column;
 }
 
-.panel .panel-header {
+[ui-view-form] .panel .panel-header {
 	padding: 13px 0px 8px 0px;
     border-top: 0;
     margin-bottom: 8px;
 }
 
-.panel.collapsed .panel-header {
+[ui-view-form] .panel.collapsed .panel-header {
 	border-bottom: 1px solid #eee;
 }
 
-.panel .panel-related .panel-header,
-.panel-tabs .panel-related .panel-header {
+[ui-view-form] .panel .panel-related .panel-header,
+[ui-view-form] .panel-tabs .panel-related .panel-header {
     margin-bottom: 0;
 }
 
-.panel .panel-title {
+[ui-view-form] .panel .panel-title {
 	font-size: 16px;
 }
 
@@ -131,11 +131,17 @@ label,
 	border-radius: 7px;
 }
 
+.filter-menu .filter-inputs .tag-select {
+	border-color: #eee !important;
+}
+
+.filter-menu form > div > .bar-main > .bar-wrap,
 .chart-controls form > div > .bar-main > .bar-wrap {
 	box-shadow: none !important;
 	border: 0 !important;
 	border-radius: 0 !important;
 	margin: 0 !important;
+	padding: 0 !important;
 }
 
 [ui-view-form] .panel {
