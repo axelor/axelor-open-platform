@@ -609,6 +609,10 @@ ui.formInput('OneToMany', {
 				adjustSize(items, rows - items.length + 1);
 			});
 
+			scope.dataView.onRowCountChanged.subscribe(function (e, args) {
+				adjustSize();
+			});
+
 			if (!(scope._viewParams || {}).summaryView || scope.field.widget === "MasterDetail") {
 				return;
 			}
