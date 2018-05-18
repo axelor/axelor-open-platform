@@ -165,6 +165,8 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
 			}
 			if ($scope.isValid()) {
 				close(record);
+			} else if ($scope.showErrorNotice) {
+				$scope.showErrorNotice();
 			}
 		}, 100);
 	}

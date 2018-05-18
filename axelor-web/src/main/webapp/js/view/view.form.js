@@ -1378,7 +1378,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 				};
 			});
 
-			items = _.compact(items);
+			items = _.unique(_.compact(items), function (item) { return item.name; });
 
 			if (items.length === 0) {
 				return;
