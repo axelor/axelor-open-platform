@@ -313,6 +313,12 @@ public class RestService extends ResourceService {
 		final boolean isAttachment = MetaFile.class.getName().equals(getModel());
 		final String field = fieldPart.getBodyAsString();
 		final String fileName = getFileName(filePart.getHeaders());
+		final String fileType = filePart.getHeaders().getFirst("Content-Type");
+
+		// check if file name is valid
+		MetaFiles.checkPath(fileName);
+		MetaFiles.checkType(fileType);
+
 		final InputStream fileStream = filePart.getBody(InputStream.class, null);
 		final Request request = Beans.get(ObjectMapper.class).readValue(requestPart.getBodyAsString(), Request.class);
 
