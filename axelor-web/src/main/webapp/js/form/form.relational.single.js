@@ -394,7 +394,7 @@ ui.formInput('ManyToOne', 'Select', {
 		});
 
 		var validateSearch = _.debounce(function () {
-			if (input.length === 0) return;
+			if (input.length === 0 || input.is(':hidden')) return;
 			var my = String(input.val() || '');
 			var text = String(scope.text || '');
 			var invalid = my !== text;
