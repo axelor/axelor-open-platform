@@ -565,7 +565,7 @@ ui.directive('uiTranslateIcon', ['$q', function ($q) {
 
 			icon.click(function (e) {
 				var value = scope.getValue();
-				if (value && scope.record && scope.record.id > 0) {
+				if (value) {
 					trDs.search({
 						domain: "self.key = :key",
 						context: { key: 'value:' + value }
