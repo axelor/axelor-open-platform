@@ -406,6 +406,7 @@ ui.formInput('ManyToOne', 'Select', {
 		if (input.length) {
 			input.on("input", validateSearch);
 			input.on("keydown", validateSearch);
+			input.on("propertychange", validateSearch);
 			scope.$on("on:edit", validateSearch);
 			scope.$on("on:new", validateSearch);
 			scope.$watch("text", validateSearch);
@@ -561,10 +562,12 @@ ui.formInput('ManyToOne', 'Select', {
 				return scope._dataSource.details(value.id, name).success(function(rec) {
 					value[name] = rec[name];
 					input.val(scope.getText());
+					validateSearch();
 				});
 			}
 
 			input.val(scope.getText());
+			validateSearch();
 		};
 		
 		if (scope.field && scope.field['tag-edit']) {
