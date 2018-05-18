@@ -708,6 +708,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 					info.pending = false;
 					info.progress = 0;
 					info.transfer = reason.message;
+					info.failed = true;
 					return that.process();
 				}
 
@@ -787,7 +788,8 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 
 			function onError(reason) {
 				function done() {
-					deferred.reject({ message: _t("Failed"), failed: true });
+					var message = reason && reason.error ? reason.error : _t("Failed");
+					deferred.reject({ message: message, failed: true });
 				}
 				doClean().then(done, done);
 			}
@@ -897,7 +899,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 						onChunk(xhr.responseText ? angular.fromJson(xhr.responseText) : null);
 						break;
 					default:
-						onError();
+						onError(xhr.responseText ? angular.fromJson(xhr.responseText) : null);
 					}
 					scope.$applyAsync();
 				}
