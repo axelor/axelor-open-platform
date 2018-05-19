@@ -246,6 +246,7 @@ public class RestService extends ResourceService {
 		return getResource().getRecordName(request);
 	}
 	
+	private static final SecureRandom FILE_COUNT_GENERATOR = new SecureRandom();
 	private static final String DEFAULT_UPLOAD_PATH = "{java.io.tmpdir}/axelor/attachments";
 	private static String uploadPath = AppSettings.get().getPath("file.upload.dir", DEFAULT_UPLOAD_PATH);
 
@@ -292,11 +293,11 @@ public class RestService extends ResourceService {
 				if (counter++ > maxCounter) {
 					counter = System.currentTimeMillis();
 				}
+				if (counter > maxCounter) {
+					counter = Math.abs(FILE_COUNT_GENERATOR.nextLong());
+				}
 				filePath = fileDetails.getFileName();
 				filePath = Files.getNameWithoutExtension(filePath) + " (" + counter + ")." + Files.getFileExtension(filePath);
-				if (counter > maxCounter) {
-					break;
-				}
 			}
 			data.put("filePath", filePath);
 		}
@@ -443,7 +444,7 @@ public class RestService extends ResourceService {
 
 		Response response = new Response();
 		Map<String, Object> data = Maps.newHashMap();
-		String fileName = Math.abs(new SecureRandom().nextLong()) + ".csv";
+		String fileName = Math.abs(FILE_COUNT_GENERATOR.nextLong()) + ".csv";
 
 		EXPORT_REQUESTS.put(fileName, request);
 
