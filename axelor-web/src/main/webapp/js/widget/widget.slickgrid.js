@@ -673,7 +673,7 @@ Grid.prototype.parse = function(view) {
 			sortable = true;
 		}
 
-		if(field.transient || field.json) {
+		if (field.transient || field.json || field.encrypted) {
 			sortable = false;
 		}
 
@@ -1064,7 +1064,7 @@ Grid.prototype._doInit = function(view) {
 
 		function _setInputs(cols) {
 			_.each(cols, function(col){
-				if (!col.xpath || col.descriptor.type === 'button' || col.descriptor.json) return;
+				if (!col.xpath || col.descriptor.type === 'button' || col.descriptor.json || col.descriptor.encrypted) return;
 				var header = grid.getHeaderRowColumn(col.id),
 					input = $('<input type="text">').data("columnId", col.id).appendTo(header),
 					field = col.descriptor || {};

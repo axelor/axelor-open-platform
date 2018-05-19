@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
@@ -57,6 +58,7 @@ import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.Sequence;
 import com.axelor.db.annotations.VirtualColumn;
 import com.axelor.db.annotations.Widget;
+import com.axelor.db.converters.AbstractEncryptedConverter;
 import com.axelor.i18n.I18n;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -130,6 +132,8 @@ public class Property {
 	private boolean sequence;
 
 	private boolean translatable;
+
+	private boolean encrypted;
 
 	private boolean defaultNow;
 
@@ -269,6 +273,14 @@ public class Property {
 
 			if (annotation instanceof org.hibernate.annotations.Type) {
 				json = "json".equalsIgnoreCase(((org.hibernate.annotations.Type) annotation).type());
+			}
+			
+			// encrypted
+			if (annotation instanceof Convert) {
+				Class<?> converter = ((Convert) annotation).converter();
+				if (AbstractEncryptedConverter.class.isAssignableFrom(converter)) {
+					encrypted = true;
+				}
 			}
 
 			// Widget attributes
@@ -488,6 +500,10 @@ public class Property {
 
 	public boolean isTranslatable() {
 		return translatable;
+	}
+
+	public boolean isEncrypted() {
+		return encrypted;
 	}
 
 	public boolean isDefaultNow() {

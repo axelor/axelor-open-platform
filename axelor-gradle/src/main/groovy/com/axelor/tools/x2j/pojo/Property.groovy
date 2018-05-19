@@ -304,6 +304,10 @@ class Property {
 	boolean isJson() {
 		return attrs["json"] == "true"
 	}
+	
+	boolean isEncrypted() {
+		return attrs["encrypted"] == "true"
+	}
 
 	boolean isPassword() {
 		return attrs["password"] == "true"
@@ -447,7 +451,8 @@ class Property {
 			$many2many(),
 			$joinTable(),
 			$orderBy(),
-			$sequence()
+			$sequence(),
+			$converter()
 		]
 		.grep { it != null }
 		.flatten()
@@ -783,5 +788,13 @@ class Property {
 	private Annotation $hashKey() {
 		if (!hashKey) return null
 		return annon("com.axelor.db.annotations.HashKey", true)
+	}
+	
+	private Annotation $converter() {
+		if (!encrypted) return null
+		def converter = type == 'binary'
+			? importName("com.axelor.db.converters.EncryptedBytesConverter")
+			: importName("com.axelor.db.converters.EncryptedStringConverter")
+		return annon("javax.persistence.Convert").add("converter", "${converter}.class", false)
 	}
 }

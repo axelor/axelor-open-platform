@@ -489,7 +489,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 			_.each(fields, function(field, name) {
 				if (field.name === 'id' || field.name === 'version' ||
 					field.name === 'archived' || field.name === 'selected') return;
-				if (field.type === 'binary' || field.large) return;
+				if (field.type === 'binary' || field.large || field.encrypted) return;
 				if (field.nameColumn) {
 					nameField = name;
 				} else if (name === "name" || name === "code") {

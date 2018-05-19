@@ -93,6 +93,8 @@
       ]]>
     </string>
     <string name="email" required="true" unique="true" initParam="true" massUpdate="true"/>
+    <string name="personalEmail" encrypted="true" />
+    <binary name="personalPhoto" encrypted="true" />
     <string name="phone" max="20"  hashKey="false" massUpdate="true"/>
     <string name="notes" multiline="true" title="About Me" />
     <date name="dateOfBirth" default="now" />

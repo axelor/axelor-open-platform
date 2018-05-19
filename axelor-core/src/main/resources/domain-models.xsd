@@ -475,6 +475,13 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="encrypted" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+            Specify whether the field is encrypted. Encrypted fields are not searchable nor sortable.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -513,6 +520,13 @@
           <xsd:annotation>
             <xsd:documentation>
               Whether the field is intended to store image data.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="encrypted" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+            Specify whether the field is encrypted.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>

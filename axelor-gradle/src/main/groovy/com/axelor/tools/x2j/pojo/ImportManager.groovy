@@ -42,8 +42,11 @@ class ImportManager {
 
 		String simpleName = parts.pop()
 		def name = simpleName
-
-		if (name ==~ /[A-Z_]+/ && parts.last() ==~ /[A-Z_].*/) {
+		
+		if (name == 'class') {
+			simpleName = parts.pop()
+			name = simpleName
+		} else if (name ==~ /[A-Z_]+/ && parts.last() ==~ /[A-Z_].*/) {
 			simpleName = parts.pop()
 			name = simpleName + "." + name
 		}

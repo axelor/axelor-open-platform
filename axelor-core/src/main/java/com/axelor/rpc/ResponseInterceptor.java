@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.crypto.BadPaddingException;
 import javax.persistence.EntityTransaction;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import com.axelor.auth.AuthSecurityException;
 import com.axelor.auth.AuthUtils;
+import com.axelor.common.crypto.EncryptorException;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.JpaSupport;
 import com.axelor.db.Model;
@@ -109,6 +111,9 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 			if (ex instanceof SQLException) {
 				return onSQLException((SQLException) ex, response);
 			}
+			if (ex instanceof EncryptorException) {
+				return onEncryptorException((EncryptorException) ex, response);
+			}
 		}
 		response.setException(throwable);
 		log.error("Error: {}", throwable.getMessage());
@@ -171,6 +176,21 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 		response.setStatus(Response.STATUS_FAILURE);
 
 		log.error("Constraint Error: {}", e.getMessage());
+		return response;
+	}
+	
+	private Response onEncryptorException(EncryptorException e, Response response) {
+		Throwable cause = e.getCause();
+		final Map<String, Object> report = new HashMap<>();
+		String message = e.getMessage();
+		if (cause instanceof BadPaddingException) {
+			message = I18n.get("Encryption key might be wrong.");
+		}
+		report.put("title", I18n.get("Encryption error"));
+		report.put("message", message);
+		log.error("Encryption Error: {}", e.getMessage(), e);
+		response.setData(report);
+		response.setStatus(Response.STATUS_FAILURE);
 		return response;
 	}
 
