@@ -778,10 +778,15 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		return criteria;
 	};
 	
-	var applied = false;
+	var appliedFilters = false;
+	var appliedContext = false;
 
 	$scope.$watch('filters', function (fitlers, old) {
-		applied = fitlers === old;
+		appliedFilters = fitlers === old;
+	}, true);
+	
+	$scope.$watch('contextData', function (data, old) {
+		appliedContext = data === old;
 	}, true);
 
 	$scope.applyFilter = function(hide) {
@@ -795,7 +800,8 @@ function FilterFormCtrl($scope, $element, ViewService) {
 		}
 		handler.$broadcast('on:advance-filter', criteria);
 		handler.$broadcast('on:context-field-change', $scope.contextData);
-		applied = true;
+		appliedFilters = true;
+		appliedContext = true;
 		return promise;
 	};
 	
@@ -811,7 +817,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 	$scope.onExport = function(full) {
 		var handler = $scope.$parent.handler;
 		if (handler && handler.onExport) {
-			var promise = applied ? null : $scope.applyFilter(true);
+			var promise = appliedFilters && appliedContext ? null : $scope.applyFilter(true);
 			if (promise && promise.then) {
 				promise.then(function () {
 					handler.onExport(full);
