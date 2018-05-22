@@ -187,7 +187,7 @@ public class JpaScanner extends AbstractScannerImpl {
 					enumCache.put(klass.getName(), klass);
 					enumNames.put(klass.getSimpleName(), klass.getName());
 				}
-				log.debug("Value enum classes found: {}", modelCache.size());
+				log.debug("Value enum classes found: {}", enumCache.size());
 			});
 			try {
 				models.get();
