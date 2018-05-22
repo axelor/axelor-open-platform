@@ -124,6 +124,7 @@ public class IdeaSupport extends AbstractSupport {
 		builder.append("  <option name=\"ENABLE_SWING_INSPECTOR\" value=\"false\" />\n");
 		builder.append("  <option name=\"ENV_VARIABLES\" />\n");
 		builder.append("  <option name=\"PASS_PARENT_ENVS\" value=\"true\" />\n");
+		builder.append("  <shortenClasspath name=\"MANIFEST\" />\n");
 		builder.append("  <module name=\"").append(project.getName()).append("_main").append("\" />\n");
 		builder.append("  <envs />\n");
 		builder.append("  <method>\n");

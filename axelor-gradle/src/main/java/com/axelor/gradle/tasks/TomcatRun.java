@@ -18,10 +18,18 @@
 package com.axelor.gradle.tasks;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
+import java.util.stream.Collectors;
 
+import org.gradle.api.GradleException;
 import org.gradle.api.Project;
+import org.gradle.api.file.FileCollection;
 import org.gradle.api.internal.tasks.options.Option;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.JavaExec;
@@ -76,18 +84,45 @@ public class TomcatRun extends JavaExec {
 		return jvmArgs;
 	}
 
+	private static File createManifestJar(Project project) {
+		final File baseDir = FileUtils.getFile(project.getBuildDir(), "tomcat");
+		final File jarFile = FileUtils.getFile(baseDir, "classpath.jar");
+		final FileCollection classpath = project.getConvention()
+				.getPlugin(JavaPluginConvention.class)
+				.getSourceSets()
+				.getByName(SourceSet.MAIN_SOURCE_SET_NAME)
+				.getRuntimeClasspath();
+		
+		final Manifest manifest = new Manifest();
+		final Attributes attributes = manifest.getMainAttributes();
+
+		attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
+		attributes.put(Attributes.Name.MAIN_CLASS, MAIN_CLASS);
+		attributes.put(Attributes.Name.CLASS_PATH,
+				classpath.getFiles()
+					.stream()
+					.map(File::toURI)
+					.map(Object::toString)
+					.collect(Collectors.joining(" ")));
+
+		try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(jarFile), manifest)) {
+			return jarFile;
+		} catch (IOException e) {
+			throw new GradleException("Unexpected error occured.", e);
+		}
+	}
+
 	@TaskAction
 	@Override
 	public void exec() {
 		final Project project = getProject();
+
+		classpath(createManifestJar(project));
+
 		setMain(MAIN_CLASS);
 		setArgs(getArgs(project, port));
 		setJvmArgs(getJvmArgs(project, hot, getDebug()));
-		setClasspath(project.getConvention()
-			.getPlugin(JavaPluginConvention.class)
-			.getSourceSets()
-			.getByName(SourceSet.MAIN_SOURCE_SET_NAME)
-			.getRuntimeClasspath());
+
 		super.exec();
 	}
 }
