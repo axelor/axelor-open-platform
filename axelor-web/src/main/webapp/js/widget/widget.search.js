@@ -274,12 +274,17 @@ ui.directive('uiFilterTags', function() {
 
 			function fetchValues(value) {
 				$scope._dataSource._new(field.target).search({
-					fields: [field.targetName],
+					fields: _.compact([field.targetName]),
 					domain: 'self.id in (:ids)',
 					context: { ids: value }
 				}).success(function (records) {
 					var record = {};
-					record[filter.field] = records;
+					var names = filter.field.split('.');
+					var rec = record;
+					while (names.length > 1) {
+						rec = rec[names.shift()] = {};
+					}
+					rec[names[0]] = records;
 					$scope.edit(record);
 				});
 			}
@@ -621,7 +626,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 			
 			var fieldName = item.fieldName || '';
 			if (fieldName && $scope.fields[fieldName] === undefined && fieldName.indexOf('.') > -1 && fieldName.indexOf('::') === -1) {
-				fieldName = fieldName.substring(0, fieldName.indexOf('.'));
+				fieldName = fieldName.substring(0, fieldName.lastIndexOf('.'));
 			}
 
 			var field = $scope.fields[fieldName] || {};
