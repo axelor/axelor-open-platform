@@ -253,6 +253,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
 		items: ".kanban-card",
 		tolerance: "pointer",
 		stop: function (event, ui) {
+			$scope.$broadcast('on:re-attach-click');
 			var item = ui.item;
 			var sortable = item.sortable;
 			var source = sortable.source.scope();
@@ -540,9 +541,7 @@ ui.directive('uiCard', ["$compile", function ($compile) {
 				element.parent().css("max-width", scope.schema.maxWidth);
 			}
 
-			element.fadeIn("slow");
-
-			element.on("click", function (e) {
+			function onClick(e) {
 				var elem = $(e.target);
 				var selector = '[ng-click],[ui-action-click],button,a,.iswitch,.ibox,.kanban-card-menu';
 				if (elem.is(selector) || element.find(selector).has(elem).length) {
@@ -551,7 +550,20 @@ ui.directive('uiCard', ["$compile", function ($compile) {
 				var record = $(this).scope().record;
 				scope.onEdit(record, true);
 				scope.$applyAsync();
+			}
+
+			function attachClick() {
+				element.on('click', onClick);
+			}
+			
+			attachClick();
+			
+			scope.$on('on:re-attach-click', function () {
+				element.off('click', onClick);
+				setTimeout(attachClick, 100);
 			});
+			
+			element.fadeIn("slow");
 		}
 	};
 }]);
