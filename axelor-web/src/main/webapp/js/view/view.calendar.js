@@ -129,7 +129,8 @@ function CalendarViewCtrl($scope, $element) {
 			filter: criteria,
 			domain: this._domain,
 			context: this._context,
-			store: false
+			store: false,
+			limit: -1
 		};
 
 		ds.search(opts).success(function(records) {
