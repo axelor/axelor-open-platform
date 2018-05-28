@@ -190,15 +190,18 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
 		if(!record) {
 		    return;
 		}
-		var view = $scope.schema;
-		var rec = _.pick(record, "id", "version", view.sequenceBy);
 		var ds = $scope._dataSource._new($scope._model);
+		var view = $scope.schema;
+		
+		var rec = _.pick(record, "id", "version", view.sequenceBy);
+		var prv = prev ? _.pick(prev, "id", "version", view.sequenceBy) : null;
+		var nxt = next ? _.pick(next, "id", "version", view.sequenceBy) : null;
 
 		// update columnBy
 		rec[view.columnBy] = to;
 
 		// update sequenceBy
-		var all = _.compact([prev, rec, next]);
+		var all = _.compact([prv, rec, nxt]);
 		var offset = _.min(_.pluck(all, view.sequenceBy)) || 0;
 
 		_.each(all, function (item, i) {
@@ -207,7 +210,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
 
 		function doSave() {
 			return ds.saveAll(all).success(function (records) {
-				_.each(all, function (item) {
+				_.each(_.compact([prev, rec, next]), function (item) {
 					_.extend(item, ds.get(item.id));
 				});
 				_.extend(record, rec);
@@ -220,7 +223,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
 			actScope.getContext = function () {
 				return _.extend({}, $scope._context, rec);
 			};
-			return ActionService.handler(actScope, $(), { action: view.onMove}).handle().then(function () {
+			return ActionService.handler(actScope, $(), { action: view.onMove }).handle().then(function () {
 				return doSave();
 			}, function (err) {
 				axelor.notify.error(_t('Unable to move the record.'));
