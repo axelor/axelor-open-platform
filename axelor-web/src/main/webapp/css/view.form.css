@@ -724,6 +724,7 @@ table.field-details th,
 table.field-details td {
 	white-space: nowrap;
 	border-top: none;
+	padding: 4px;
 }
 
 table.field-details .help-text {
