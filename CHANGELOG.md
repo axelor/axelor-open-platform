@@ -1,8 +1,8 @@
-# Current (3.4.3)
+# 3.4.3 (2018-05-29)
 
 ## Bug fixes
 
-## Improvements
+- fix duplicate file name count issue
 
 # 3.4.2 (2017-07-24)
 
@@ -106,15 +106,15 @@
 
 ## Bug fixes
 
-- fix reload root record with actions 
+- fix reload root record with actions
 
 # 3.2.3 (2016-09-02)
 
 ## Bug fixes
 
 - fix unnecessary call to onLoad action
-- fix duplicate onChange action on o2m issue 
-- fix regression caused by save action fix 
+- fix duplicate onChange action on o2m issue
+- fix regression caused by save action fix
 
 ## Improvements
 
@@ -289,7 +289,7 @@ It's time to move forward with a new minor release.
 ## Bug fixes
 
 - fix onChange issue on grid widget
-- fix nested editor value lost issue 
+- fix nested editor value lost issue
 - fix lazy loading dashlet doesn't load data
 
 # 3.0.18 (2015-09-28)
