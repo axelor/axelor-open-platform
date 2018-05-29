@@ -60,6 +60,10 @@
         <field name="members" widget="TagSelect" colSpan="12"/>
       </panel>
     </panel>
+    <panel-mail>
+      <mail-messages limit="4"/>
+      <mail-followers/>
+    </panel-mail>
   </form>
 
   <grid name="team-task-grid" title="Tasks" model="com.axelor.team.db.TeamTask">
@@ -137,6 +141,12 @@
     <view name="team-cards" type="cards" />
     <view name="team-form" type="form" />
   </action-view>
+  
+  <action-view name="teams.my" model="com.axelor.team.db.Team" title="My Teams">
+    <view name="team-cards" type="cards" />
+    <view name="team-form" type="form" />
+    <domain>:__user__ member of self.members</domain>
+  </action-view>
 
   <action-view name="team.tasks.due" model="com.axelor.team.db.TeamTask" title="Tasks due">
     <view name="team-task-grid" type="grid" />
@@ -199,5 +209,6 @@
   <menuitem name="menu-team-tasks-created" title="Tasks created by me" parent="menu-team-tasks" action="team.tasks.created" order="-50" />
 
   <menuitem name="menu-team-teams-all" title="All Teams" parent="menu-team-teams" action="teams.all" order="-110" />
+  <menuitem name="menu-team-teams-my" title="My Teams" parent="menu-team-teams" action="teams.my" order="-100" />
 
 </object-views>
