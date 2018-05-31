@@ -488,7 +488,9 @@ public class MetaService {
 		if (view == null || StringUtils.isBlank(view.getName())) {
 			return 0;
 		}
-		return customViews.all().filter("self.name = :name").bind("name", view.getName()).delete();
+		Query deleteQuery = JPA.em().createQuery("DELETE FROM MetaViewCustom self WHERE self.name = :name");
+		deleteQuery.setParameter("name", view.getName());
+		return deleteQuery.executeUpdate();
 	}
 
 	@SuppressWarnings("all")
