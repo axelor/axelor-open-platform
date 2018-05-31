@@ -46,18 +46,21 @@ public class JavaSupport extends AbstractSupport {
 			}
 		});
 
+		// force groovy compiler
+		if (project.getPlugins().hasPlugin(GroovyPlugin.class)) {
+			project.afterEvaluate(this::configureGroovy);
+		}
+	}
+
+	private void configureGroovy(Project project) {
 		final JavaPluginConvention convention = project.getConvention().getPlugin(JavaPluginConvention.class);
 		final SourceSet main = convention.getSourceSets().findByName(SourceSet.MAIN_SOURCE_SET_NAME);
 		final SourceSet test = convention.getSourceSets().findByName(SourceSet.TEST_SOURCE_SET_NAME);
-
-		// force groovy compiler
-		if (project.getPlugins().hasPlugin(GroovyPlugin.class)) {
-			final GroovySourceSet mainGroovy = new DslObject(main).getConvention().getPlugin(GroovySourceSet.class);
-			final GroovySourceSet testGroovy = new DslObject(test).getConvention().getPlugin(GroovySourceSet.class);
-			mainGroovy.getGroovy().srcDirs(main.getJava().getSrcDirs());
-			testGroovy.getGroovy().srcDirs(test.getJava().getSrcDirs());
-			main.getJava().setSrcDirs(new ArrayList<>());
-			test.getJava().setSrcDirs(new ArrayList<>());
-		}
+		final GroovySourceSet mainGroovy = new DslObject(main).getConvention().getPlugin(GroovySourceSet.class);
+		final GroovySourceSet testGroovy = new DslObject(test).getConvention().getPlugin(GroovySourceSet.class);
+		mainGroovy.getGroovy().srcDirs(main.getJava().getSrcDirs());
+		testGroovy.getGroovy().srcDirs(test.getJava().getSrcDirs());
+		main.getJava().setSrcDirs(new ArrayList<>());
+		test.getJava().setSrcDirs(new ArrayList<>());
 	}
 }
