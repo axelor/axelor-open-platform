@@ -941,8 +941,8 @@ label.has-help > span:after {
 	        transform: scale(1) rotate(0);
 }
 
-.nav-select a.nav-label:hover,
-.nav-select a.nav-label:hover:after {
+.nav-select:not(.readonly) a.nav-label:hover,
+.nav-select:not(.readonly) a.nav-label:hover:after {
 	background: #d0d0d0;
 	transition: background-color 0.3s;
 }
@@ -957,6 +957,10 @@ label.has-help > span:after {
 .nav-select .nav-step > .dropdown-menu {
 	right: -16px;
 	margin-top: -2px;
+}
+
+.nav-select.readonly .nav-label {
+	cursor: inherit;
 }
 
 .tag-select {

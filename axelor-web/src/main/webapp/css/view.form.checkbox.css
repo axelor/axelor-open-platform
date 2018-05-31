@@ -112,6 +112,17 @@
 	border: 1px solid #0275d8;
 }
 
+.ibox input:disabled + .box:before,
+.iswitch input:disabled + .box:before {
+	opacity: 0.65;
+}
+
+.readonly > .ibox,
+.readonly > .iswitch {
+	opacity: 0.65;
+	cursor: inherit;
+}
+
 .form-item.iswitch {
 	margin-top: 4px;
 }
