@@ -303,6 +303,9 @@ ui.directive('uiHelpPopover', function() {
 		if (field == null) {
 			return;
 		}
+		if (field.help && axelor.config['user.noHelp'] !== true) {
+			element.parent('label').addClass('has-help');
+		}
 		setupPopover(scope, element, getHelp);
 	}
 
@@ -336,9 +339,6 @@ ui.formItem('Label', {
 		var field = scope.field;
 		if (field && field.required) {
 			element.addClass('required');
-		}
-		if (field && field.help && axelor.config['user.noHelp'] !== true) {
-			element.addClass('has-help');
 		}
 	},
 
