@@ -79,32 +79,26 @@ final class AuthResolver {
 	 * @return filtered set of {@link Permission}
 	 */
 	private Set<Permission> filterPermissions(final Set<Permission> permissions, final String object, final AccessType type) {
-		
-		if (permissions == null || permissions.isEmpty()) {
-			return Sets.newLinkedHashSet();
-		}
-
 		final Set<Permission> all = Sets.newLinkedHashSet();
-		
-		for (final Permission permission : permissions) {
-			if (Objects.equal(object, permission.getObject())
-					&& (permission.getCondition() == null || hasAccess(permission, type))) {
-				all.add(permission);
-			}
-		}
-		if (!all.isEmpty()) {
+		if (permissions == null || permissions.isEmpty()) {
 			return all;
 		}
-		
-		final String pkg = object.substring(0, object.lastIndexOf('.')) + ".*";
-		
+
+		// add object permissions
 		for (final Permission permission : permissions) {
-			if (Objects.equal(pkg, permission.getObject()) &&
-				(permission.getCondition() == null || hasAccess(permission, type))) {
+			if (Objects.equal(object, permission.getObject()) && hasAccess(permission, type)) {
 				all.add(permission);
 			}
 		}
-		
+
+		// add wild card permissions
+		final String pkg = object.substring(0, object.lastIndexOf('.')) + ".*";
+		for (final Permission permission : permissions) {
+			if (Objects.equal(pkg, permission.getObject()) && hasAccess(permission, type)) {
+				all.add(permission);
+			}
+		}
+
 		return all;
 	}
 	
@@ -128,28 +122,28 @@ final class AuthResolver {
 	 */
 	public Set<Permission> resolve(final User user, final String object, final AccessType type) {
 		
-		// first find user permissions
+		// user permissions
 		Set<Permission> all = filterPermissions(user.getPermissions(), object, type);
 
-		// else user role permissions
-		if (all.isEmpty() && user.getRoles() != null) {
+		// user's role permissions
+		if (user.getRoles() != null) {
 			for (final Role role : user.getRoles()) {
 				all.addAll(filterPermissions(role.getPermissions(), object, type));
 			}
 		}
 
-		// else group permissions
-		if (all.isEmpty() && user.getGroup() != null) {
+		// group permissions
+		if (user.getGroup() != null) {
 			all.addAll(filterPermissions(user.getGroup().getPermissions(), object, type));
 		}
 
-		// else group role permissions
-		if (all.isEmpty() && user.getGroup() != null && user.getGroup().getRoles() != null) {
+		// group's role permissions
+		if (user.getGroup() != null && user.getGroup().getRoles() != null) {
 			for (final Role role : user.getGroup().getRoles()) {
 				all.addAll(filterPermissions(role.getPermissions(), object, type));
 			}
 		}
-		
+
 		return all;
 	}
 }
