@@ -790,16 +790,23 @@ table.field-details .help-text hr {
 }
 
 label.has-help > span:after,
+[ui-help-popover].has-help:after,
 .button-item.has-help > span:after,
 .nav-tree a.has-help:after {
 	font: normal normal normal 14px/1 FontAwesome;
 	content: "\f06a";
 	font-size: 10px;
-	margin-left: 4px;
+	margin-left: 3px;
     position: absolute;
 }
 
-label.has-help > span:after {
+label.has-help > span,
+[ui-help-popover].has-help {
+	padding-right: 13px;
+}
+
+label.has-help > span:after,
+[ui-help-popover].has-help:after {
   color: #107a4a;
 }
 
