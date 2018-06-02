@@ -104,13 +104,16 @@ header .navbar-inner {
 	display: none;	
 }
 
-.nav-tabs > li {
+.nav-tabs {
 	border: none;
 	display: none !important;
 }
 
-.nav-tabs > li.active {
-	display: list-item !important;
+.bar-wrap {
+	border: none !important;
+	box-shadow: none !important;
+	padding: 0 !important;
+	margin-bottom: 0 !important;
 }
 
 .form-item .tabbable-tab,
@@ -124,6 +127,66 @@ header .navbar-inner {
 	display: none;
 }
 
+.panel,
+.panel-header,
+.panel-body {
+	border: none !important;
+	margin: 0 !important;
+	padding: 6px 0 !important;
+}
+
+.panel-body {
+	min-height: auto !important;
+}
+
+.panel, .panel-tabs, .panel-stack, .bar-layout .dashboard {
+	margin-bottom: 0 !important;	
+}
+
+.panel-tabs .tab-content > .panel {
+	padding: 0 !important;
+}
+
+.panel-tabs .tab-content > .panel > .panel-body {
+	padding: 0 !important;
+}
+
+.panel-header .icons-bar {
+	display: none !important;
+}
+
+.dashlet-buttons {
+	display: none;
+}
+
+.report-box .report-tags {
+	right: 0;
+}
+
+.dashlet.chart,
+.chart-container {
+	page-break-inside: avoid;
+}
+
+.nvtooltip {
+	display: none !important;
+}
+
+.dashboard .dashlet {
+	border: none !important;
+}
+
+.dashboard .dashlet-header {
+	border-top: none;
+	padding: 10px 0 !important;
+}
+
+.dashlet.grid .dashlet-body {
+	height: auto !important;
+	overflow: inherit !important;
+	position: relative !important;
+}
+
 .form-item-group > legend > i,
 .form-item-group > legend > i:before {
 	display: none !important;
@@ -135,18 +198,29 @@ header .navbar-inner {
 }
 
 .btn {
-	border: 1px solid gray !important;
+	display: none;
 }
 
 .picker-input > .picker-icons {
 	display: none !important;
 }
 
-input {
+input,
+select,
+textarea,
+.tag-select {
 	border: none !important;
 	box-shadow: none !important;
-	-webkit-box-shadow: none !important;
 	transition: inherit;
+}
+
+.dms-folder-tree {
+	display: none !important;
+}
+
+.dms-file-list > .slickgrid {
+	left: 0 !important;
+	border: none !important;
 }
 
 .grid-view,
@@ -154,17 +228,48 @@ form[ui-form] {
 	overflow: hidden;
 }
 
+.cards-view, .kanban-view {
+	top: 0;
+	position: relative !important;
+	overflow: inherit !important;
+}
+
+.kanban-column {
+	border: none !important;
+	margin-bottom: 0 !important;	
+}
+
+.kanban-column .input-group {
+	display: none !important;
+}
+
+.kanban-column ul.kanban-card-list {
+	padding: 0 !important;
+}
+
+.dashlet-body .slickgrid,
+.dashlet-body .slickgrid .slick-viewport,
 .panel-body .slickgrid,
-.grid-view > .slickgrid,
 .panel-body .slickgrid .slick-viewport,
+.grid-view > .slickgrid,
 .grid-view > .slickgrid .slick-viewport {
 	overflow: inherit !important;
 	position: relative !important;
 }
 
+.dashlet-body .slickgrid .slick-viewport,
 .panel-body .slickgrid .slick-viewport,
 .grid-view > .slickgrid .slick-viewport {
 	height: auto !important;
+}
+
+.grid-view > .slickgrid {
+	top: 0;
+}
+
+.slickgrid,
+.slickgrid .slick-header-column {
+	border: 0 !important;
 }
 
 .slick-row, .slick-cell {
@@ -179,7 +284,8 @@ form[ui-form] {
 	display: none !important;
 }
 
-.slick-row .slick-cell.edit-icon i {
+.slick-row .slick-cell.edit-icon,
+.slick-row .slick-cell.move-icon {
 	display: none;
 }
 
@@ -188,6 +294,103 @@ form[ui-form] {
 	border: none !important;
 }
 
+.nav-select .nav-step:not(.active) {
+	display: none !important;
+}
+
+.nav-select .nav-step.active a {
+	padding: 0 !important;
+}
+
+.nav-select .nav-step.active a:after {
+	display: none !important;
+}
+
+.mail-followers {
+	margin-left: 16px !important;
+}
+
+.mail-followers .fa {
+	display: none !important;
+}
+
+.mail-messages {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.mail-composer {
+	display: none;
+}
+
+.mail-thread {
+	margin-top: 0 !important;
+}
+
+.mail-thread .avatar {
+	background-color: #ddd !important;
+}
+
+.mail-thread .mail-message > .arrow {
+	background-color: #fff !important;
+}
+
+.mail-message-icons {
+	display: none !important;
+}
+
+.mail-thread-more {
+	display: none !important;
+}
+
+[ui-view-form] > form:not(.mail-thread-view) .mail-messages,
+[ui-view-form] > form:not(.mail-thread-view) .mail-followers {
+	display: none !important;
+}
+
+.ibox .box:before,
+.iswitch .box:before {
+	margin: 0 !important;
+	padding: 0 !important;
+	box-shadow: none;
+	border: none !important;
+}
+
+.ibox .box:after,
+.iswitch .box:after {
+	margin: 0 !important;
+	padding: 0 !important;
+	box-shadow: none;
+}
+
+.ibox .box:before,
+.iswitch .box:after {
+	content: "\f00d" !important;
+	font-family: FontAwesome;
+	transform: none;
+}
+
+.ibox input:checked + .box:before,
+.ibox input:checked + .box:before {
+	border: none !important;
+	background-color: #fff !important;
+}
+
+.iswitch input:checked + .box:after {
+	transform: none;
+	width: auto;
+	top: 0;
+	left: 0;
+}
+
+.iswitch input:checked + .box:after {
+	content: "\f00c";
+	font-family: FontAwesome;
+}
+
+.ibox input:checked + .box:after {
+	display: none;
+}
 
 /** responsive */
 

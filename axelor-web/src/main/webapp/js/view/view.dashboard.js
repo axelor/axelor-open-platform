@@ -255,6 +255,9 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 				if (dashlet.css) {
 					element.addClass(dashlet.css);
 				}
+				if (view && view.viewType) {
+					element.addClass(view.viewType);
+				}
 
 				element.removeClass('hidden');
 
