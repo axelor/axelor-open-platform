@@ -290,6 +290,27 @@ textarea {
 	border-bottom-color: #eee !important;
 }
 
+.popover {
+	border-radius: 6px;
+}
+
+.popover-title {
+	border-radius: 5px 5px 0 0;	
+	background-color: #fff;
+}
+
+.popover.bottom {
+	background-color: #fff;
+}
+
+.popover.bottom .arrow:after {
+	border-bottom-color: #fff;
+}
+
+.popover.bottom .popover-content {
+	background-color: #fff;	
+}
+
 [ui-view-form] input,
 [ui-view-form] textarea,
 [ui-view-form] select,
