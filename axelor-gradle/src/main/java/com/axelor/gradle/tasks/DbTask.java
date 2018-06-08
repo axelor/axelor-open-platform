@@ -47,6 +47,8 @@ public class DbTask extends JavaExec {
 
 	private boolean migrate;
 
+	private boolean encrypt;
+
 	private boolean verbose;
 
 	@Option(option = "config", description = "specify appliction config file path")
@@ -68,10 +70,15 @@ public class DbTask extends JavaExec {
 	public void setMigrate(boolean migrate) {
 		this.migrate = migrate;
 	}
+	
+	@Option(option = "encrypt", description = "update encrypted values")
+	public void setEncrypt(boolean encrypt) {
+		this.encrypt = encrypt;
+	}
 
 	@Option(option = "verbose", description = "verbose ouput")
 	public void setVerbose(boolean verbose) {
-		this.update = verbose;
+		this.verbose = verbose;
 	}
 
 	@Override
@@ -87,6 +94,8 @@ public class DbTask extends JavaExec {
 
 		if (migrate) {
 			args.add("-M");
+		} else if (encrypt) {
+			args.add("-E");
 		} else if (update) {
 			args.add("-u");
 		} else {
@@ -94,7 +103,7 @@ public class DbTask extends JavaExec {
 		}
 
 		if (verbose) {
-			args.add("-v");
+			args.add("--verbose");
 		}
 
 		if (StringUtils.notBlank(modules)) {
@@ -107,7 +116,7 @@ public class DbTask extends JavaExec {
 
 		final Path configFile = Paths.get(configPath);
 		if (Files.notExists(configFile)) {
-			throw new GradleException("\"Unable to find application config.");
+			throw new GradleException("Unable to find application config.");
 		}
 
 		jvmArgs.add("-Daxelor.config=" + configFile.toFile().getAbsolutePath());

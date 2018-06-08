@@ -24,6 +24,7 @@ import com.axelor.app.AppModule;
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
+import com.axelor.db.converters.EncryptedFieldService;
 import com.axelor.db.internal.DBHelper;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.rpc.ObjectMapperProvider;
@@ -53,6 +54,9 @@ public class AppCli {
 		@Parameter( names = { "-M", "--migrate" }, description = "run the db migration scripts")
 		public Boolean migrate;
 		
+		@Parameter( names = { "-E", "--encrypt" }, description = "update encrypted values")
+		public Boolean encrypt;
+
 		@Parameter( names = { "--verbose" }, description = "verbose ouput")
 		public Boolean verbose;
 
@@ -125,6 +129,23 @@ public class AppCli {
 		}
 
 		Injector injector = Guice.createInjector(new MyModule(PERSISTENCE_UNIT));
+
+		if (opts.encrypt) {
+			System.setProperty("database.encrypt.migrate", "true");
+			EncryptedFieldService service = injector.getInstance(EncryptedFieldService.class);
+			try {
+				service.migrate();
+				return 0;
+			} catch (Exception e) {
+				println("field value encryption failed.");
+				println(e.getMessage());
+				if (opts.verbose == Boolean.TRUE) {
+					e.printStackTrace();
+				}
+				return -1;
+			}
+		}
+
 		ModuleManager manager = injector.getInstance(ModuleManager.class);
 
 		boolean demo = AppSettings.get().getBoolean("data.import.demo-data", true);

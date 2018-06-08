@@ -28,7 +28,11 @@ public abstract class AbstractEncryptedConverter<T, R> implements AttributeConve
 	private static final String ENCRYPTION_ALGORITHM = AppSettings.get().get("encryption.algorithm");
 	private static final String ENCRYPTION_PASSWORD = AppSettings.get().get("encryption.password");
 
+	private static final String OLD_ENCRYPTION_ALGORITHM = AppSettings.get().get("encryption.algorithm.old");
+	private static final String OLD_ENCRYPTION_PASSWORD = AppSettings.get().get("encryption.password.old");
+
 	private Encryptor<T, R> encryptor;
+	private Encryptor<T, R> oldEncryptor;
 
 	protected abstract Encryptor<T, R> getEncryptor(String algorithm, String password);
 
@@ -37,6 +41,17 @@ public abstract class AbstractEncryptedConverter<T, R> implements AttributeConve
 			encryptor = getEncryptor(ENCRYPTION_ALGORITHM, ENCRYPTION_PASSWORD);
 		}
 		return encryptor;
+	}
+	
+	protected final Encryptor<T, R> oldEncryptor() {
+		if (oldEncryptor == null && StringUtils.notBlank(OLD_ENCRYPTION_PASSWORD)) {
+			oldEncryptor = getEncryptor(OLD_ENCRYPTION_ALGORITHM, OLD_ENCRYPTION_PASSWORD);
+		}
+		return oldEncryptor;
+	}
+	
+	protected boolean isMigrating() {
+		return "true".equalsIgnoreCase(System.getProperty("database.encrypt.migrate"));
 	}
 
 	@Override
@@ -49,7 +64,7 @@ public abstract class AbstractEncryptedConverter<T, R> implements AttributeConve
 	@Override
 	@SuppressWarnings("unchecked")
 	public T convertToEntityAttribute(R dbData) {
-		Encryptor<T, R> e = encryptor();
+		Encryptor<T, R> e = isMigrating() ? oldEncryptor() : encryptor();
 		return e == null ? (T) dbData : e.decrypt(dbData);
 	}
 }
