@@ -1,5 +1,36 @@
 ## 5.0.0 (current)
 
+#### New Features
+
+* Encrypted field support
+
+#### Enhancements
+
+* Simplified access control rules
+* Improve boolean widget readonly style
+* Improve nav-select and boolean widget readonly style
+* Remove unique constraints from User's name and email fields
+* Add message stream widget to teams form
+* Clear search value from advance filter when chaning field
+
+#### Bugs
+
+* Fix print.css
+* Fix missing help icon on some widgets
+* Fix groovy support
+* Fix json fields validation issue
+* Fix calendar view not fetching all events
+* Fix kanban drag and drop issue on firefox
+* Fix advance filter save issue with dotted fields
+* Fix value enum log message
+* Fix long command line issue on windows
+* Fix context filter ignored when exporting data
+* Fix file upload whitelist not checked with file fields
+* Fix grid widget auto size issue
+* Fix unable translate field value from unsaved records
+* Fix validation error notification not shown from popup
+* Fix search text validation issue on m2o field
+
 ## 5.0.0-rc5 (2018-05-14)
 
 #### New Features
