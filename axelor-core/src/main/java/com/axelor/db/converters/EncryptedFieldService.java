@@ -17,6 +17,7 @@
  */
 package com.axelor.db.converters;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -75,9 +76,20 @@ public class EncryptedFieldService {
 
 	@SuppressWarnings("all")
 	@Transactional
-	public void migrate(Class<?> model) {
-		final List<Property> encrypted = Arrays.stream(Mapper.of(model).getProperties()).filter(Property::isEncrypted)
-				.collect(Collectors.toList());
+	public void migrate(Class<?> model, String... fields) {
+		final Mapper mapper = Mapper.of(model);
+		final List<Property> encrypted = new ArrayList<>();
+
+		if (fields == null || fields.length == 0) {
+			Arrays.stream(mapper.getProperties())
+				.filter(Property::isEncrypted)
+				.forEach(encrypted::add);
+		} else {
+			Arrays.stream(fields)
+				.map(mapper::getProperty)
+				.filter(Property::isEncrypted)
+				.forEach(encrypted::add);
+		}
 
 		if (encrypted.isEmpty()) {
 			return;
@@ -114,8 +126,5 @@ public class EncryptedFieldService {
 			offset += limit;
 			values.forEach(map -> updater.update(map));
 		}
-		
-		LOG.info("Field encryption complete.");
-		LOG.warn("Remove 'encryption.password.old' from 'application.properties'");
 	}
 }

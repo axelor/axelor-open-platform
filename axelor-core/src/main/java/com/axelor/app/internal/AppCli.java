@@ -135,6 +135,8 @@ public class AppCli {
 			EncryptedFieldService service = injector.getInstance(EncryptedFieldService.class);
 			try {
 				service.migrate();
+				println("Field encryption complete.");
+				println("Remove 'encryption.password.old' from 'application.properties'");
 				return 0;
 			} catch (Exception e) {
 				println("field value encryption failed.");
