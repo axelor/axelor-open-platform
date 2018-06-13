@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
@@ -417,23 +418,7 @@ public class Query<T extends Model> {
 	 * @return total number of records updated
 	 */
 	public int update(Map<String, Object> values) {
-		final Map<String, Object> params = Maps.newHashMap();
-		final Map<String, Object> namedParams = Maps.newHashMap();
-		
-		if (this.namedParams != null) {
-			namedParams.putAll(this.namedParams);
-		}
-
-		for(String key : values.keySet()) {
-			String name = key.replaceFirst("^self\\.", "");
-			params.put(name, values.get(key));
-			namedParams.put(name, values.get(key));
-		}
-
-		javax.persistence.Query q = em().createQuery(updateQuery(params));
-		QueryBinder.of(q).bind(namedParams, this.params);
-
-		return q.executeUpdate();
+		return update(values, null);
 	}
 
 	/**
@@ -446,14 +431,18 @@ public class Query<T extends Model> {
 	 * @return total number of records updated
 	 */
 	public int update(String name, Object value) {
-		Map<String, Object> values = Maps.newHashMap();
+		Map<String, Object> values = new HashMap<>();
 		values.put(name.replaceFirst("^self\\.", ""), value);
 		return update(values);
 	}
-
+	
 	/**
-	 * Perform versioned mass update on matched records with the given values.
+	 * Perform mass update on matched records with the given values.
 	 * 
+	 * <p>
+	 * If <code>updatedBy</code> user is null, perform non-versioned update
+	 * otherwise performed versioned update.
+	 *
 	 * @param values
 	 *            the key value map
 	 * @param updatedBy
@@ -469,7 +458,7 @@ public class Query<T extends Model> {
 			namedParams.putAll(this.namedParams);
 		}
 
-		for(String key : values.keySet()) {
+		for (String key : values.keySet()) {
 			String name = key.replaceFirst("^self\\.", "");
 			Object value = values.get(key);
 			params.put(name, value);
@@ -480,24 +469,61 @@ public class Query<T extends Model> {
 			}
 		}
 
-		if (AuditableModel.class.isAssignableFrom(beanClass)) {
+		if (updatedBy != null && AuditableModel.class.isAssignableFrom(beanClass)) {
 			params.put("updatedBy", updatedBy);
 			params.put("updatedOn", LocalDateTime.now());
 		}
-			
-		String wh = "WHERE (" + Joiner.on(" AND ").join(where) + ")";
-		String qs = updateQuery(params).replaceFirst("UPDATE ", "UPDATE VERSIONED ");
 
-		qs = StringUtils.isBlank(filter)
-				? qs + " " + wh
-				: qs.replaceFirst("WHERE self.id IN", wh + " AND self.id IN");
-		
 		namedParams.putAll(params);
 
-		return QueryBinder.of(em().createQuery(qs))
-			.bind(namedParams, this.params)
-			.getQuery()
-			.executeUpdate();
+		boolean versioned = updatedBy != null;
+		boolean notMySQL = !DBHelper.isMySQL();
+
+		String whereClause = String.join(" AND ", where);
+		String selectQuery = selectQuery()
+				.replaceFirst("SELECT self", "SELECT self.id")
+				.replaceFirst(" ORDER BY.*", "");
+
+		if (selectQuery.contains(" WHERE ")) {
+			selectQuery = selectQuery.replaceFirst(" WHERE ", " WHERE " + whereClause + " AND ");
+		} else {
+			selectQuery = selectQuery + " WHERE " + whereClause;
+		}
+
+		selectQuery = selectQuery.replaceAll("\\bself", "that");
+
+		if (notMySQL) {
+			return QueryBinder.of(em().createQuery(updateQuery(params, versioned, "self.id IN (" + selectQuery + ")")))
+					.bind(namedParams, this.params)
+					.getQuery()
+					.executeUpdate();
+		}
+
+		// MySQL doesn't allow sub select on same table with UPDATE also, JPQL doesn't
+		// support JOIN with UPDATE query so we have to update in batch.
+
+		String updateQuery = updateQuery(params, versioned, "self.id IN (:ids)");
+
+		int count = 0;
+		int limit = 1000;
+
+		TypedQuery<Long> sq = em().createQuery(selectQuery, Long.class);
+		javax.persistence.Query uq = em().createQuery(updateQuery);
+
+		QueryBinder.of(sq).bind(namedParams, this.params);
+		QueryBinder.of(uq).bind(namedParams, this.params);
+
+		sq.setFirstResult(0);
+		sq.setMaxResults(limit);
+
+		List<Long> ids = sq.getResultList();
+		while (!ids.isEmpty()) {
+			uq.setParameter("ids", ids);
+			count += uq.executeUpdate();
+			ids = sq.getResultList();
+		}
+
+		return count;
 	}
 
 	/**
@@ -528,9 +554,41 @@ public class Query<T extends Model> {
 	 * @return total number of records affected.
 	 */
 	public int delete() {
-		javax.persistence.Query q = em().createQuery(deleteQuery());
-		this.bind(q);
-		return q.executeUpdate();
+		boolean notMySQL = !DBHelper.isMySQL();
+		String selectQuery = selectQuery()
+				.replaceFirst("SELECT self", "SELECT self.id")
+				.replaceFirst(" ORDER BY.*", "")
+				.replaceAll("\\bself", "that");
+
+		if (notMySQL) {
+			javax.persistence.Query q = em().createQuery(deleteQuery("self.id IN (" + selectQuery + ")"));
+			this.bind(q);
+			return q.executeUpdate();
+		}
+
+		// MySQL doesn't allow sub select on same table with DELETE also, JPQL doesn't
+		// support JOIN with DELETE query so we have to update in batch.
+		
+		TypedQuery<Long> sq = em().createQuery(selectQuery, Long.class);
+		javax.persistence.Query dq = em().createQuery(deleteQuery("self.id IN (:ids)"));
+		
+		this.bind(sq);
+		this.bind(dq);
+		
+		int count = 0;
+		int limit = 1000;
+
+		sq.setFirstResult(0);
+		sq.setMaxResults(limit);
+
+		List<Long> ids = sq.getResultList();
+		while (!ids.isEmpty()) {
+			dq.setParameter("ids", ids);
+			count += dq.executeUpdate();
+			ids = sq.getResultList();
+		}
+
+		return count;
 	}
 
 	/**
@@ -571,31 +629,32 @@ public class Query<T extends Model> {
 		return sb.toString();
 	}
 
-	protected String updateQuery(Map<String, Object> values) {
-		StringBuilder sb = new StringBuilder("UPDATE ")
+	protected String updateQuery(Map<String, Object> values, boolean versioned, String filter) {
+		final String items = values.keySet()
+				.stream()
+				.map(key -> String.format("self.%s = :%s", key, key))
+				.collect(Collectors.joining(", "));
+
+		final StringBuilder sb = new StringBuilder("UPDATE ")
+				.append(versioned ? "VERSIONED " : "")
 				.append(beanClass.getSimpleName())
-				.append(" self");
-		List<String> keys = Lists.newArrayList();
-		for (String key : values.keySet()) {
-			keys.add(String.format("self.%s = :%s", key, key));
+				.append(" self")
+				.append(" SET ")
+				.append(items);
+		
+		if (StringUtils.notBlank(filter)) {
+			sb.append(" WHERE ").append(filter);
 		}
-		sb.append(" SET ").append(Joiner.on(", ").join(keys));
-		if (filter != null && filter.trim().length() > 0) {
-			sb.append(" WHERE self.id IN (")
-			  .append(selectQuery().replaceFirst("SELECT self", "SELECT self.id").replaceAll("\\bself", "that"))
-			  .append(")");
-		}
+
 		return sb.toString();
 	}
 
-	protected String deleteQuery() {
-		StringBuilder sb = new StringBuilder("DELETE FROM ")
+	protected String deleteQuery(String filter) {
+		final StringBuilder sb = new StringBuilder("DELETE FROM ")
 				.append(beanClass.getSimpleName())
 				.append(" self");
-		if (filter != null && filter.trim().length() > 0) {
-			sb.append(" WHERE self.id IN (")
-			  .append(selectQuery().replaceFirst("SELECT self", "SELECT self.id").replaceAll("\\bself", "that"))
-			  .append(")");
+		if (StringUtils.notBlank(filter)) {
+			sb.append(" WHERE ").append(filter);
 		}
 		return sb.toString();
 	}
