@@ -108,7 +108,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		};
 		
 		scope.$on("on:edit", function(e, rec) {
-			if (_.isEmpty(rec)) {
+			if (angular.equals(rec, {})) {
 				resetAttrs();
 			}
 			scope.$$readonly = scope.$$isReadonly();
