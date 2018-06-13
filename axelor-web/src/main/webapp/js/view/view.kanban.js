@@ -211,7 +211,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
 		function doSave() {
 			return ds.saveAll(all).success(function (records) {
 				_.each(_.compact([prev, rec, next]), function (item) {
-					_.extend(item, ds.get(item.id));
+					_.extend(item, _.pick(ds.get(item.id), "version", view.sequenceBy));
 				});
 				_.extend(record, rec);
 			});
