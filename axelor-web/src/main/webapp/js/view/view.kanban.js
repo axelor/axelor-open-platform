@@ -226,7 +226,6 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
 			return ActionService.handler(actScope, $(), { action: view.onMove }).handle().then(function () {
 				return doSave();
 			}, function (err) {
-				axelor.notify.error(_t('Unable to move the record.'));
 				$scope.onRefresh();
 			});
 		}
