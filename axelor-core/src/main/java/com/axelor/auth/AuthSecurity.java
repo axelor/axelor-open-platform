@@ -27,6 +27,7 @@ import org.apache.shiro.authz.UnauthorizedException;
 
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.User;
+import com.axelor.common.StringUtils;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.rpc.filter.Filter;
@@ -49,14 +50,16 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
 
 			final List<Object> args = Lists.newArrayList();
 
-			for(String param : (params == null ? "" : params).split(",")) {
-				param = param.trim();
-				if ("__user__".equals(param)) {
-					args.add(user);
-				} else if (param.startsWith("__user__.")) {
-					args.add(this.eval(user, "__user__", param));
-				} else {
-					args.add(param);
+			if (StringUtils.notBlank(params)) {
+				for (String param : params.split(",")) {
+					param = param.trim();
+					if ("__user__".equals(param)) {
+						args.add(user);
+					} else if (param.startsWith("__user__.")) {
+						args.add(this.eval(user, "__user__", param));
+					} else {
+						args.add(param);
+					}
 				}
 			}
 
