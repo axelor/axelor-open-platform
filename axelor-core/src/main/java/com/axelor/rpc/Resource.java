@@ -852,6 +852,9 @@ public class Resource<T extends Model> {
 			record = (Map) repository.validate((Map) record, request.getContext());
 
 			Long id = findId((Map) record);
+			JpaSecurity.AccessType accessType = id == null || id <= 0L
+					? JpaSecurity.CAN_CREATE
+					: JpaSecurity.CAN_WRITE;
 
 			if (id == null || id <= 0L) {
 				security.get().check(JpaSecurity.CAN_CREATE, model);
@@ -876,6 +879,9 @@ public class Resource<T extends Model> {
 			if (repository != null) {
 				bean = repository.save(bean);
 			}
+
+			// check permission rules again
+			security.get().check(accessType, model, bean.getId());
 
 			// if it's a translation object, invalidate cache
 			if (bean instanceof MetaTranslation) {
