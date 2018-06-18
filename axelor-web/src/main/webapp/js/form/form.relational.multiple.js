@@ -182,7 +182,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 		});
 		// remove selected from data view
 		_.each(selected, function (id) {
-			$scope.dataView.deleteItem(id);
+			if (id && id > -1) $scope.dataView.deleteItem(id);
 		});
 		$scope.setValue(items, true);
 		$scope.$applyAsync();
