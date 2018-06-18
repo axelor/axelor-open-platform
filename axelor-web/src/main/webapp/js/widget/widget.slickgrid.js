@@ -1985,7 +1985,9 @@ Grid.prototype.addNewRow = function (args) {
 			if (cell) {
 				grid.focus();
 				grid.setActiveCell(cell.row, cell.cell);
-				grid.editActiveCell();
+				setTimeout(function () {
+					grid.editActiveCell();
+				}, 200);
 			}
 		}, 100);
 	}
