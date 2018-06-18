@@ -1,3 +1,15 @@
+## 5.0.1 (current)
+
+#### Bugs
+
+* Fix editable grid cell focus issue
+* Fix editable o2m item remove issue
+* Fix widget attribute reset issue
+* Fix kanban view missing values issue after card move
+* Fix bulk update/delete issue with MySQL
+* Fix conditional permissions with empty params value
+* Fix conditional permissions not checked against database values
+
 ## 5.0.0 (2018-06-11)
 
 #### New Features
