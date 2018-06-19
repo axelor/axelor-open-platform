@@ -230,10 +230,11 @@
 	margin-top: 0 !important;
 }
 
-.slick-cell .ibox {
+.slick-cell .form-item-container > .ibox {
 	width: auto;
 	margin-top: 2px !important;
 	padding: 0;
+	float: inherit !important;
 }
 
 .slick-editor-dropdown {
