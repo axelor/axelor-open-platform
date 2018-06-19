@@ -226,6 +226,14 @@ ui.formWidget('BaseSelect', {
 		}).click(function() {
 			scope.showSelection();
 		});
+		
+		if (axelor.browser.mozilla) {
+			input.mousedown(function () {
+				if (!input.is(':focus')) {
+					scope.showSelection(300);
+				}
+			});
+		}
 	},
 
 	template_editable:
