@@ -769,6 +769,10 @@ public class MetaFiles {
 		case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
 		case "application/vnd.oasis.opendocument.spreadsheet":
 			return "fa-file-excel-o";
+		case "application/vnd.ms-powerpoint":
+		case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+		case "application/vnd.oasis.opendocument.presentation":
+			return "fa-file-powerpoint-o";
 		case "application/pdf":
 			return "fa-file-pdf-o";
 		case "application/zip":
