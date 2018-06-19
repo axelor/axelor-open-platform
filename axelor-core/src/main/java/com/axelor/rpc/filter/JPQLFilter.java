@@ -19,8 +19,15 @@ package com.axelor.rpc.filter;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
+
+import com.axelor.app.AppSettings;
 
 public class JPQLFilter extends Filter {
+
+	private static final boolean SUB_SELECT_ALLOWED = AppSettings.get().getBoolean("domain.allow.sub-select", true);
+
+	private static final Pattern SUB_SELECT_PATTERN = Pattern.compile("\\(\\s*SELECT\\s+", Pattern.CASE_INSENSITIVE);
 
 	private String jpql;
 
@@ -29,6 +36,13 @@ public class JPQLFilter extends Filter {
 	public JPQLFilter(String jpql, Object... params) {
 		this.jpql = jpql;
 		this.params = params;
+	}
+
+	public static JPQLFilter forDomain(String jpql, Object... params) {
+		if (!SUB_SELECT_ALLOWED && SUB_SELECT_PATTERN.matcher(jpql).find()) {
+			throw new IllegalArgumentException("Invalid domain, sub queries are not allowed.");
+		}
+		return new JPQLFilter(jpql, params);
 	}
 
 	@Override

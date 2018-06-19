@@ -132,7 +132,7 @@ public class Criteria {
 
 		String domain = (String) rawCriteria.get("_domain");
 		if (domain != null) {
-			all.add(new JPQLFilter(domain));
+			all.add(JPQLFilter.forDomain(domain));
 		}
 		try {
 			context.putAll((Map<String, ?>) rawCriteria.get("_domainContext"));
@@ -163,7 +163,7 @@ public class Criteria {
 		for(final Object item : domains) {
 			if (item instanceof Map && ((Map) item).containsKey("domain")) {
 				final Map map = (Map) item;
-				filters.add(new JPQLFilter((String) map.get("domain")));
+				filters.add(JPQLFilter.forDomain((String) map.get("domain")));
 				try {
 					context.putAll((Map) map.get("context"));
 				} catch (Exception e){}
