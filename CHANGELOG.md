@@ -1,3 +1,14 @@
+## 5.0.2 (current)
+
+#### Enhancements
+
+* Add support to disallow sub-select in domain filters with `domain.allow.sub-select = false`
+
+#### Bugs
+
+* Fix tag select widget issue on firefox
+* Fix checkbox field in editable grid
+
 ## 5.0.1 (2018-06-18)
 
 #### Bugs
