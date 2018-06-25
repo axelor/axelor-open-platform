@@ -190,10 +190,9 @@ public class ReportGenerator {
 			throws IOException, BirtException {
 		Preconditions.checkNotNull(designName, "no report design name given");
 		final Path tmpFile = MetaFiles.createTempFile(null, "");
-		final FileOutputStream stream = new FileOutputStream(tmpFile.toFile());
-
-		generate(stream, designName, format, params, locale);
-
+		try (FileOutputStream stream = new FileOutputStream(tmpFile.toFile())) {
+			generate(stream, designName, format, params, locale);
+		}
 		return tmpFile.toFile();
 	}
 
