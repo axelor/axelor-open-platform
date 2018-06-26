@@ -708,10 +708,11 @@ public class Resource<T extends Model> {
 		final Repository<?> repository = JpaRepository.of(model);
 		final Model entity = repository.find(id);
 
-		response.setStatus(Response.STATUS_SUCCESS);
 		if (entity == null) {
-			return response;
+			throw new OptimisticLockException(new StaleObjectStateException(model.getName(), id));
 		}
+
+		response.setStatus(Response.STATUS_SUCCESS);
 
 		final List<Object> data = Lists.newArrayList();
 		final String[] fields = request.getFields() == null ? null : request.getFields().toArray(new String[]{});
@@ -975,7 +976,7 @@ public class Resource<T extends Model> {
 			security.get().check(JpaSecurity.CAN_REMOVE, model, id);
 			Model bean = JPA.find(model, id);
 
-			if (version != null && !Objects.equal(version, bean.getVersion())) {
+			if (bean == null || (version != null && !Objects.equal(version, bean.getVersion()))) {
 				throw new OptimisticLockException(
 						new StaleObjectStateException(model.getName(), id));
 			}
