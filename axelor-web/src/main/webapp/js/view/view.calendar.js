@@ -470,6 +470,13 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 					start: start,
 					end: end
 				};
+
+				// all day
+				if (!start.hasTime() && !end.hasTime()) {
+					event.start = start.clone().startOf("day").local();
+					event.end = end.clone().startOf("day").local();
+				}
+
 				scope.$applyAsync(function(){
 					scope.showEditor(event);
 				});
