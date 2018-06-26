@@ -800,6 +800,10 @@ label.has-help > span:after,
     position: absolute;
 }
 
+.record-toolbar .button-item.has-help > span:after {
+	content: ''
+}
+
 label.has-help > span,
 [ui-help-popover].has-help {
 	padding-right: 13px;
