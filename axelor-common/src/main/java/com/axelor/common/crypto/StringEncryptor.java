@@ -20,13 +20,13 @@ package com.axelor.common.crypto;
 import java.nio.charset.StandardCharsets;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.io.BaseEncoding;
+
 /**
  * The {@link StringEncryptor} can be used to encrypt/decrypt {@link String}
  * values.
  * 
  */
-import com.google.common.io.BaseEncoding;
-
 public class StringEncryptor implements Encryptor<String, String> {
 
 	private final BaseEncoding encoder;
