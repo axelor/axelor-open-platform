@@ -400,7 +400,7 @@ public class MailServiceImpl implements MailService, MailConstants {
 				references.add(message.getRoot().getMessageId());
 			}
 			if (!references.isEmpty()) {
-				email.setHeader("X-References", Joiner.on(" ").skipNulls().join(references));
+				email.setHeader("References", Joiner.on(" ").skipNulls().join(references));
 			}
 		} catch (MessagingException | IOException e) {
 			throw new MailException(e);
