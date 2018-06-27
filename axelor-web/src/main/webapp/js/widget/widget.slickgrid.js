@@ -2463,7 +2463,8 @@ Grid.prototype.onRowsChanged = function(event, args) {
 
 Grid.prototype.groupBy = function(names) {
 	
-	var data = this.scope.dataView,
+	var grid = this.grid,
+		data = this.scope.dataView,
 		cols = this.grid.getColumns();
 	
 	var aggregators = _.map(cols, function(col) {
@@ -2491,16 +2492,15 @@ Grid.prototype.groupBy = function(names) {
 		all = all.split(/\s*,\s*/);
 	}
 	
+	var fields = _.compact(_.pluck(this.cols, 'descriptor'));
+	
 	var grouping = _.map(all, function(name) {
-		
-		var col = this.getColumn(name),
-			grid = this.grid,
-			field = col.descriptor,
-			formatter = Formatters[field.selection ? 'selection' : field.type];
-		
+		var that = this;
+		var field = _.findWhere(fields, { name: name });
 		return {
 			getter: function(item) {
 				var value = item[name];
+				var formatter = Formatters[field.selection ? 'selection' : field.type];
 				if (field.jsonPath && field.jsonField) {
 					var jsonValue = item[field.jsonField];
 					if (jsonValue) {
@@ -2511,7 +2511,7 @@ Grid.prototype.groupBy = function(names) {
 				return (formatter ? formatter(field, value, item, grid) : value) || _t('N/A');
 			},
 			formatter: function(g) {
-				var title = col.name + ": " + g.value;
+				var title = field.title + ": " + g.value;
 				return '<span class="slick-group-text">' + title + '</span>' + ' ' +
 					   '<span class="slick-group-count">' + _t("({0} items)", g.count) + '</span>';
 			},
