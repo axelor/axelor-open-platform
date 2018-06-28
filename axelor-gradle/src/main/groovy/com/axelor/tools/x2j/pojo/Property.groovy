@@ -543,6 +543,9 @@ class Property {
 				if (max != null) all += annon("javax.validation.constraints.DecimalMax").add(max)
 				return all
 			case "string":
+				if (isEncrypted() && max != null && (max as Integer) < 256) {
+					throw new IllegalArgumentException("Encrypted field size should be more than 255: ${entity.name}.${name}")
+				}
 				return [
 					annon("javax.validation.constraints.Size")
 					.add("min", min, false)
@@ -648,6 +651,9 @@ class Property {
 	private List<Annotation> $binary() {
 		
 		if (isJson() && type == 'string') {
+			if (isEncrypted()) {
+				throw new IllegalArgumentException("Encryption is not supported on json field: ${entity.name}.${name}")
+			}
 			return [
 				annon("javax.persistence.Basic").add("fetch", "javax.persistence.FetchType.LAZY", false),
 				annon("org.hibernate.annotations.Type").add("type", "json")
@@ -665,7 +671,7 @@ class Property {
 			return [
 				annon("javax.persistence.Lob", true),
 				annon("javax.persistence.Basic").add("fetch", "javax.persistence.FetchType.LAZY", false),
-				annon("org.hibernate.annotations.Type").add("type", "text")
+				annon("org.hibernate.annotations.Type").add("type", isEncrypted() ? "encrypted_text" : "text")
 			]
 		}
 
@@ -791,7 +797,7 @@ class Property {
 	}
 	
 	private Annotation $converter() {
-		if (!encrypted) return null
+		if (!encrypted || isLarge()) return null
 		def converter = type == 'binary'
 			? importName("com.axelor.db.converters.EncryptedBytesConverter")
 			: importName("com.axelor.db.converters.EncryptedStringConverter")

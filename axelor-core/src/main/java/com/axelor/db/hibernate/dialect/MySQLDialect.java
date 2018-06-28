@@ -27,6 +27,7 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
+import com.axelor.db.hibernate.type.EncryptedTextType;
 import com.axelor.db.hibernate.type.JsonSqlTypeDescriptor;
 import com.axelor.db.hibernate.type.JsonType;
 
@@ -65,5 +66,6 @@ public class MySQLDialect extends MySQL57Dialect {
 	public void contributeTypes(TypeContributions typeContributions, ServiceRegistry serviceRegistry) {
 		super.contributeTypes(typeContributions, serviceRegistry);
 		typeContributions.contributeType(new JsonType(JsonSqlTypeDescriptor.INSTANCE));
+		typeContributions.contributeType(EncryptedTextType.INSTANCE);
 	}
 }

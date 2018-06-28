@@ -95,7 +95,10 @@ public class EncryptedFieldService {
 			return;
 		}
 
-		boolean hasBinary = encrypted.stream().anyMatch(p -> p.getType() == PropertyType.BINARY);
+		boolean hasLarge = encrypted.stream()
+				.map(Property::getType)
+				.anyMatch(t -> t == PropertyType.BINARY || t == PropertyType.TEXT);
+
 		List<String> names = encrypted.stream().map(Property::getName).collect(Collectors.toList());
 
 		StringBuilder sb = new StringBuilder("SELECT ").append("new Map(")
@@ -113,7 +116,7 @@ public class EncryptedFieldService {
 
 		long count = (Long) countQuery.getSingleResult();
 		long offset = 0;
-		int limit = hasBinary ? 40 : 1000;
+		int limit = hasLarge ? 40 : 1000;
 
 		LOG.info("Updating: {}", model.getName());
 		LOG.info("Records: {}", count);

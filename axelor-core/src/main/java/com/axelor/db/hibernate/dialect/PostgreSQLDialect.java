@@ -26,6 +26,7 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
+import com.axelor.db.hibernate.type.EncryptedTextType;
 import com.axelor.db.hibernate.type.JsonType;
 import com.axelor.db.hibernate.type.JsonbSqlTypeDescriptor;
 
@@ -57,5 +58,6 @@ public class PostgreSQLDialect extends PostgreSQL94Dialect {
 	public void contributeTypes(TypeContributions typeContributions, ServiceRegistry serviceRegistry) {
 		super.contributeTypes(typeContributions, serviceRegistry);
 		typeContributions.contributeType(new JsonType(JsonbSqlTypeDescriptor.INSTANCE));
+		typeContributions.contributeType(EncryptedTextType.INSTANCE);
 	}
 }

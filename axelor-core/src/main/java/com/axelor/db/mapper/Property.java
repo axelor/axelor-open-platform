@@ -273,6 +273,7 @@ public class Property {
 
 			if (annotation instanceof org.hibernate.annotations.Type) {
 				json = "json".equalsIgnoreCase(((org.hibernate.annotations.Type) annotation).type());
+				encrypted = "encrypted_text".equalsIgnoreCase(((org.hibernate.annotations.Type) annotation).type());
 			}
 			
 			// encrypted
