@@ -33,7 +33,7 @@ AppInfo info = new AppInfo();
 
 String appName = settings.get("application.name", "My App");
 String appDesc = settings.get("application.description", null);
-String appHome = settings.get("application.home", "");
+String appHome = settings.get("application.home", "#/");
 String appLogo = info.getLogo();
 String appStyle = info.getStyle();
 String appAuthor = settings.get("application.author", "");
