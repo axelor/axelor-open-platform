@@ -40,20 +40,20 @@ ui.directive('uiTransclude', function() {
  *
  */
 ui.formWidget('Group', {
-	
+
 	css: 'form-item-group',
 	cellCss: 'form-item v-align-top',
-		
+
 	link: function(scope, element, attrs) {
 
 		var props = scope.field;
 
 		scope.collapsed = false;
-		
+
 		scope.canCollapse = function() {
 			return props.canCollapse || props.collapseIf;
 		};
-		
+
 		scope.setCollapsed = function(collapsed) {
 			scope.collapsed = collapsed;
 			element.children('legend').nextAll(':not(br)')[collapsed ? 'hide' : 'show']();
@@ -64,11 +64,11 @@ ui.formWidget('Group', {
 			scope.collapsed = !scope.collapsed;
 			scope.setCollapsed(scope.collapsed);
 		};
-		
+
 		scope.$watch("attr('collapse')", function groupCollapseWatch(collapsed) {
 			scope.setCollapsed(collapsed);
 		});
-		
+
 		// if auto title, then don't show it
 		if (attrs.title === attrs.field) {
 			attrs.$set('title', '');
@@ -94,16 +94,16 @@ ui.formWidget('Portlet', {
 
 	css: 'form-item-portlet',
 	cellCss: 'form-item v-align-top',
-	
+
 	showTitle: false,
 
 	link: function(scope, element, attrs) {
-		
+
 		var field = scope.field;
-		
+
 		scope.canSearch = field.canSearch !== "false";
 		scope.actionName = field.action;
-		
+
 		if (field.name) {
 			scope.formPath = field.name;
 		}
@@ -111,7 +111,7 @@ ui.formWidget('Portlet', {
 		if (field.height) {
 			element.height(field.height);
 		}
-		
+
 		element.resizable({
 			handles: 's',
 			resize: _.debounce(function() {
@@ -120,7 +120,7 @@ ui.formWidget('Portlet', {
 			}, 100)
 		});
 	},
-	
+
 	template:
 	'<div>'+
 		'<div ui-view-portlet x-action="{{actionName}}" x-can-search="{{canSearch}}"></div>'+
@@ -162,13 +162,13 @@ ui.formWidget('Dashlet', {
  * The Tabs widget (notebook).
  */
 ui.formWidget('Tabs', {
-	
+
 	cellCss: 'form-item v-align-top',
-	
+
 	widgets: ['Notebook'],
 
 	controller: ['$scope', '$element', function($scope, $element) {
-		
+
 		var tabs = $scope.tabs = [],
 			selected = -1;
 
@@ -188,22 +188,22 @@ ui.formWidget('Tabs', {
 				});
 			});
 		}, 100);
-		
+
 		$scope.select = function(tab) {
-			
+
 			var current = selected;
 
 			angular.forEach(tabs, function(tab, i){
 				tab.tabSelected = false;
 			});
-			
+
 			tab.tabSelected = true;
 			selected = _.indexOf(tabs, tab);
-			
+
 			if (current === selected) {
 				return;
 			}
-			
+
 			setTimeout(function() {
 				if ($scope.$tabs) {
 					$scope.$tabs.trigger('adjust:tabs');
@@ -220,23 +220,23 @@ ui.formWidget('Tabs', {
 				doOnSelect();
 			}
 		});
-		
+
 		this.addTab = function(tab) {
 			if (tabs.length === 0) $scope.select(tab);
 			tab.index = tabs.length;
 			tabs.push(tab);
 		};
-		
+
 		function inRange(index) {
 			return index > -1 && index < tabs.length;
 		}
-		
+
 		function findItem(index) {
 			return $element.find('ul.nav-tabs:first > li:nth-child(' + (index+1) + ')');
 		}
-		
+
 		this.showTab = function(index) {
-			
+
 			if (!inRange(index)) {
 				return;
 			}
@@ -253,26 +253,26 @@ ui.formWidget('Tabs', {
 
 			axelor.$adjustSize();
 		};
-		
+
 		this.hideTab = function(index) {
-			
+
 			if (!inRange(index))
 				return;
-			
+
 			var item = findItem(index),
 				tab = tabs[index];
-			
+
 			var wasHidden = item.is(":hidden");
 
 			item.hide();
 			item.removeClass('active');
-			
+
 			tab.hidden = true;
 			tab.tabSelected = false;
-			
+
 			if (!wasHidden && selected > -1 && selected !== index)
 				return axelor.$adjustSize();
-			
+
 			for(var i = 0 ; i < tabs.length ; i++) {
 				tab = tabs[i];
 				if (!tab.hidden) {
@@ -281,7 +281,7 @@ ui.formWidget('Tabs', {
 			}
 			selected = -1;
 		};
-		
+
 		$scope.setTitle = function(value,index){
 			var item = findItem(index),
 				pageScope = item.first().data('$scope');
@@ -289,19 +289,19 @@ ui.formWidget('Tabs', {
 			pageScope.tab.title = value;
 		};
 	}],
-	
+
 	link: function(scope, elem, attrs) {
-		
+
 		var props = scope.field;
 
 		scope.$tabs = $(elem).bsTabs({
 			closable: false
 		});
-		
+
 		elem.on('click', '.dropdown-toggle', function(e){
 			axelor.$adjustSize();
 		});
-		
+
 		// set height (#1011)
 		if (props.height) {
 			elem.children('.tab-content:first').height(props.height);
@@ -341,33 +341,33 @@ ui.formWidget('Tabs', {
 
 /**
  * The Tab widget (notebook page).
- */ 
+ */
 ui.formWidget('Tab', {
-	
+
 	require: '^uiTabs',
-	
+
 	widgets: ['Page'],
-	
+
 	handles: ['isHidden'],
 
 	link: function(scope, elem, attrs, tabs) {
-		
+
 		scope.tabSelected = false;
 		scope.icon = scope.field && scope.field.icon;
 
 		tabs.addTab(scope);
-		
+
 		scope.$watch('attr("title")', function tabTitleWatch(value){
 			scope.title = value;
 		});
-		
+
 		scope.$watch("isHidden()", function tabHiddenWatch(hidden, old) {
 			if (hidden) {
 				return tabs.hideTab(scope.index);
 			}
 			return tabs.showTab(scope.index);
 		});
-		
+
 		scope.handleSelect = function () {
 			var onSelect = scope.$events.onSelect;
 			if (onSelect && !elem.is(":hidden")) {
@@ -473,7 +473,7 @@ ui.formWidget('Panel', {
 
 		var icon = field.icon;
 		var iconBg = field.iconBackground;
-		
+
 		if (icon && icon.indexOf('fa-') === 0) {
 			scope.icon = icon;
 		} else if (icon) {
@@ -492,7 +492,7 @@ ui.formWidget('Panel', {
 				iconElem.find('i').addClass('fg-white');
 			});
 		}
-		
+
 		setTimeout(function () {
 			var nestedJson = element.parents('.panel-json:first').length > 0;
 			if (nestedJson) {
@@ -543,7 +543,7 @@ ui.formWidget('PanelTabs', {
 			};
 			scope.tabs.push(tab);
 		});
-		
+
 		var selected = null;
 		var adjustPending = false;
 
@@ -554,7 +554,7 @@ ui.formWidget('PanelTabs', {
 			}
 			return found;
 		}
-		
+
 		var doOnSelectPending = false;
 		var doOnSelect = _.debounce(function () {
 			if (doOnSelectPending || !selected || !selected.elem) {

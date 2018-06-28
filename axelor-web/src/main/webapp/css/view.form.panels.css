@@ -82,7 +82,7 @@
 }
 
 .panel .panel-header .panel-icons {
-    margin-left: 4px;  
+	margin-left: 4px;
 }
 
 .panel .panel-header .panel-icons a {
@@ -113,7 +113,7 @@
 }
 
 .panel .panel-body {
-	padding: 14px;	
+	padding: 14px;
 	transition: height 0.3s ease-out;
 }
 
@@ -130,12 +130,13 @@
 	border: none;
 	box-shadow: none;
 }
-.panel.noframe .panel-body {
-	padding: 0;
-}
 
 .panel .row-fluid > .form-item {
 	margin-bottom: 6px;
+}
+
+.panel.noframe .panel-body {
+	padding: 0;
 }
 
 .panel .row-fluid > .form-item-hidden {
@@ -190,7 +191,7 @@
 .panel-layout .form-item-container.readonly > a,
 .panel-layout .form-item-container.readonly > input,
 .panel-layout .form-item-container.readonly > span.display-text {
-	padding-left: 0;	
+	padding-left: 0;
 }
 
 .panel-layout .readonly > .o2m-list > .o2m-list-row > a {

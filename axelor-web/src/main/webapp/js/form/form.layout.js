@@ -31,7 +31,7 @@ function TableLayout(items, attrs, $scope, $compile) {
 		layout = [[]];
 
 	function add(item, label) {
-		
+
 		if (item.is('br')) {
 			curCol = 0;
 			item.hide();
@@ -42,12 +42,12 @@ function TableLayout(items, attrs, $scope, $compile) {
 			cell = null,
 			colspan = +item.attr('x-colspan') || 1,
 			rowspan = +item.attr('x-rowspan') || 1;
-		
+
 		if (curCol + colspan >= numCols + 1) {
 			curCol = 0, row = [];
 			layout.push(row);
 		}
-		
+
 		if (label) {
 			cell = {};
 			cell.elem = label;
@@ -63,7 +63,7 @@ function TableLayout(items, attrs, $scope, $compile) {
 		cell.css = item.attr('x-cell-css');
 		if (colspan > 1) cell.colspan = colspan;
 		if (rowspan > 1) cell.rowspan = rowspan;
-	
+
 		row.push(cell);
 		curCol += colspan;
 	}
@@ -82,7 +82,7 @@ function TableLayout(items, attrs, $scope, $compile) {
 		var el = $(this),
 			title = el.attr('x-title'),
 			noTitle = el.attr('x-show-title') == 'false';
-		
+
 		var labelScope = el.data('$scope');
 		if (labelScope) {
 			labelScope = labelScope.$new();
@@ -96,9 +96,9 @@ function TableLayout(items, attrs, $scope, $compile) {
 		}
 		add(el);
 	});
-	
+
 	var table = $('<table class="form-layout"></table>');
-	
+
 	function isLabel(cell) {
 		return cell.css === "form-label" || (cell.elem && cell.elem.is('label,.spacer-item'));
 	}
@@ -119,7 +119,7 @@ function TableLayout(items, attrs, $scope, $compile) {
 		});
 
 		emptyCols = numCols - (labelCols + itemCols);
-		
+
 		labelCols += (emptyCols / 2);
 		itemCols += (emptyCols / 2) + (emptyCols % 2);
 
@@ -130,10 +130,10 @@ function TableLayout(items, attrs, $scope, $compile) {
 			var width = ((isLabel(cell) ? labelWidth : itemWidth) * (cell.colspan || 1));
 			widths[i] = width + "%";
 		});
-		
+
 		return widths;
 	}
-	
+
 	_.each(layout, function(row){
 		var tr = $('<tr></tr>'),
 			numCells = 0,
@@ -151,7 +151,7 @@ function TableLayout(items, attrs, $scope, $compile) {
 				}
 				numCells += cell.colspan || 1;
 		});
-		
+
 		// append remaining cells
 		for (var i = numCells ; i < numCols ; i++) {
 			$('<td></td>').appendTo(tr).width((widths||[])[i]);
@@ -159,7 +159,7 @@ function TableLayout(items, attrs, $scope, $compile) {
 
 		tr.appendTo(table);
 	});
-	
+
 	return table;
 } //- TableLayout
 
@@ -183,7 +183,7 @@ ui.directive('uiTableLayout', ['$compile', function($compile) {
 }]);
 
 function PanelLayout(items, attrs, $scope, $compile) {
-	
+
 	var stacked = attrs.stacked || false,
 		flexbox = attrs.flexbox || false,
 		numCols = 12,
@@ -199,7 +199,7 @@ function PanelLayout(items, attrs, $scope, $compile) {
 			cell = $('<div>'),
 			span = +item.attr('x-colspan') || numSpan,
 			offset = +item.attr('x-coloffset') || 0;
-		
+
 		span = Math.min(span, numCols);
 		if (stacked) {
 			span = 0;
@@ -239,12 +239,12 @@ function PanelLayout(items, attrs, $scope, $compile) {
 		var el = $(this),
 			title = el.attr('x-title'),
 			noTitle = el.attr('x-show-title') == 'false';
-		
+
 		var labelScope = el.data('$scope');
 		if (labelScope) {
 			labelScope = labelScope.$new();
 		}
-	
+
 		if (!noTitle && title) {
 			var label = $('<label ui-label></label>').html(title).attr('x-for-widget', el.attr('id')),
 				labelElem = $compile(label)(labelScope || $scope);
@@ -253,7 +253,7 @@ function PanelLayout(items, attrs, $scope, $compile) {
 		}
 		add(el);
 	});
-	
+
 	var container = $('<div class="panel-layout"></div>').append(layout);
 
 	return container;
@@ -274,11 +274,11 @@ ui.directive('uiPanelLayout', ['$compile', function($compile) {
 }]);
 
 function BarLayout(items, attrs, $scope, $compile) {
-	
+
 	var main = $('<div class="span8 bar-main">');
 	var side = $('<div class="span4 bar-side">');
 	var wrap = $('<div class="span12 bar-wrap">').appendTo(main);
-	
+
 
 	items.each(function(item, i) {
 		var elem = $(this);
@@ -299,23 +299,23 @@ function BarLayout(items, attrs, $scope, $compile) {
 	}
 
 	var row = $('<div class="row-fluid">').append(main);
-	
+
 	if (side && axelor.device.small) {
 		side.children().first().prependTo(wrap);
 		side.children().appendTo(wrap);
 	}
-	
+
 	wrap.children('[ui-panel-mail]').appendTo(main);
 
 	if (side) {
 		side.appendTo(row);
 	}
-	
+
 	return row;
 }
 
 ui.directive('uiBarLayout', ['$compile', function($compile) {
-	
+
 	return function(scope, element, attrs) {
 		var items = element.children();
 		var layout = BarLayout(items, attrs, scope, $compile);
