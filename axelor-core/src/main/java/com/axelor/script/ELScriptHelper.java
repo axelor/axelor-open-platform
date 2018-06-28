@@ -116,7 +116,7 @@ public class ELScriptHelper extends AbstractScriptHelper {
 				context.setPropertyResolved(true);
 				return ValueEnum.of((Class) base, property);
 			}
-			return super.getValue(context, base, property);
+			return null;
 		}
 		
 		@Override
@@ -135,7 +135,7 @@ public class ELScriptHelper extends AbstractScriptHelper {
 					throw new ELException(e);
 				}
 			}
-			return super.invoke(context, base, method, paramTypes, params);
+			return null;
 		}
 	}
 
