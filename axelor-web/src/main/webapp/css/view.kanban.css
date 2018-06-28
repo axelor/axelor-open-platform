@@ -87,6 +87,7 @@
 .kanban-column .input-group .form-control {
 	height: inherit;
 	margin: 0;
+	flex: 1;
 }
 
 .kanban-column .input-group .input-group-btn > .btn {
