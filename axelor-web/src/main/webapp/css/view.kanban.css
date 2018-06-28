@@ -33,12 +33,20 @@
 	box-sizing: border-box;
 }
 
+.kanban-view {
+	display: flex;
+	padding: 0;
+}
+
 .kanban-column {
+	flex: 1;
+	min-width: 20em;
 	background-color: #fff;
-	margin-bottom: 18px;
+	margin: 0 9px 18px;
 	border-color: #e7eaec;
 	border-style: solid solid none;
 	border-width: 1px 0;
+	height: calc(100% - 18px);
 }
 
 .kanban-column ul.kanban-card-list,
@@ -48,7 +56,9 @@
 
 .kanban-column ul.kanban-card-list {
 	margin: 0;
-	padding: 10px 20px 35px 20px;
+	padding: 10px 10px 35px;
+	overflow: auto;
+	max-height: calc(100% - 22px);
 }
 
 .kanban-column .ui-sortable-placeholder {
@@ -64,34 +74,22 @@
 	font-weight: 600;
 	font-size: 16px;
 	margin: 0;
-	padding: 15px 20px 5px 20px;
+	padding: 10px;
 	line-height: 18px;
+	border-bottom: 2px solid #eee;
 }
 
 .kanban-column .input-group {
-	display: table;
-	width: 100%;
-	padding: 10px 20px 0 20px;
-}
-
-.kanban-column .input-group .form-control,
-.kanban-column .input-group .input-group-btn {
-	display: table-cell;
+	display: flex;
+	padding: 10px 10px 0;
 }
 
 .kanban-column .input-group .form-control {
 	height: inherit;
-	width: 100%;
 	margin: 0;
-	position: relative;
-}
-
-.kanban-column .input-group .input-group-btn {
-	width: 1%;
 }
 
 .kanban-column .input-group .input-group-btn > .btn {
-	position: relative;
 	margin-left: -1px;
 }
 
@@ -290,38 +288,6 @@
     text-overflow: ellipsis;
 }
 
-[class*=kanban-cs] {
-  float: left;
-  margin-left: 9px;
-  margin-right: 9px;
-}
-.kanban-cs-1 {
-  width: calc(100% - 18px);
-}
-.kanban-cs-2 {
-  width: calc(100%/2 - 18px);
-}
-.kanban-cs-3 {
-  width: calc(100%/3 - 18px);
-}
-.kanban-cs-4 {
-  width: calc(100%/4 - 18px);
-}
-.kanban-cs-5 {
-  width: calc(100%/5 - 18px);
-}
-.kanban-cs-6 {
-  width: calc(100%/6 - 18px);
-}
-
-@media (min-width: 768px) and (max-width: 979px) {
-  .kanban-cs-4,
-  .kanban-cs-5,
-  .kanban-cs-6 {
-    width: calc(100%/3 - 18px);
-  }
-}
-
 @media (max-width: 767px) {
 	.cards-view {
 		padding: 12px 0;
@@ -330,8 +296,14 @@
 		width: 100% !important;
 		margin-bottom: 12px;
 	}
-	[class*=kanban-cs] {
-	   float: none;
-	   width: calc(100% - 18px);
+}
+
+@media (max-width: 480px) {
+	.kanban-view {
+		flex-direction: column;
+	}
+	.kanban-column {
+		flex: inherit;
+		width: 100%;
 	}
 }
