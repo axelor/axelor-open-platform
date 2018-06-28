@@ -332,6 +332,10 @@ ui.directive('uiFilterInput', function() {
 						               moment(value).startOf('day').toDate();
 
 					model.$setViewValue(value.toISOString());
+				},
+				onClose: function (dateText, inst) {
+					picker.datepicker('destroy');
+					picker = null;
 				}
 			};
 
