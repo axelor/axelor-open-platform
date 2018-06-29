@@ -83,6 +83,10 @@ angular.module('axelor.auth', []).provider('authService', function() {
           }
           return deferred.promise;
         }
+        // redirect to the CAS login page
+        if (response.status === 302 || response.status === 307) {
+          window.location.reload();
+        }
         // otherwise
         return $q.reject(response);
       }

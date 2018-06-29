@@ -27,6 +27,12 @@ import org.apache.shiro.guice.ShiroModule;
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.mgt.SecurityManager;
 
+import com.axelor.app.AppSettings;
+import com.axelor.auth.cas.AuthCasFilter;
+import com.axelor.auth.cas.AuthCasLogoutFilter;
+import com.axelor.auth.cas.AuthCasRealm;
+import com.axelor.auth.cas.AuthCasUserFilter;
+import com.axelor.common.StringUtils;
 import com.axelor.db.JpaSecurity;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -102,9 +108,51 @@ public class AuthModule extends AbstractModule {
 			this.addFilterChain("/js/**", ANON);
 			this.addFilterChain("/error.jsp", ANON);
 
-			this.bindRealm().to(AuthRealm.class);
-			this.addFilterChain("/logout", LOGOUT);
-			this.addFilterChain("/**", Key.get(AuthFilter.class));
+			if (bindCas()) {
+				this.bindRealm().to(AuthCasRealm.class);
+				this.addFilterChain("/cas", Key.get(AuthCasFilter.class));
+				this.addFilterChain("/logout", Key.get(AuthCasLogoutFilter.class));
+				this.addFilterChain("/**", Key.get(AuthCasUserFilter.class));
+			} else {
+				this.bindRealm().to(AuthRealm.class);
+				this.addFilterChain("/logout", LOGOUT);
+				this.addFilterChain("/**", Key.get(AuthFilter.class));
+			}
+		}
+
+		private boolean bindCas() {
+
+			final AppSettings settings = AppSettings.get();
+			final String casServerUrlPrefix = settings.get(AuthCasRealm.CONFIG_CAS_SERVER_PREFIX_URL);
+			final String casService = settings.get(AuthCasRealm.CONFIG_CAS_SERVICE);
+
+			if (StringUtils.isBlank(casServerUrlPrefix) ||
+				StringUtils.isBlank(casService)) {
+				return false;
+			}
+
+			String casLoginUrl = settings.get(AuthCasRealm.CONFIG_CAS_LOGIN_URL);
+			String casLogoutUrl = settings.get(AuthCasRealm.CONFIG_CAS_LOGOUT_URL);
+			String casProtocol = settings.get(AuthCasRealm.CONFIG_CAS_PROTOCOL);
+
+			if (StringUtils.isBlank(casLoginUrl)) {
+				casLoginUrl = String.format("%s/login?service=%s", casServerUrlPrefix, casService);
+			}
+			if (StringUtils.isBlank(casLogoutUrl)) {
+				casLogoutUrl = String.format("%s/logout?service=%s", casServerUrlPrefix, casService);
+			}
+			if (StringUtils.isBlank(casProtocol)) {
+				casProtocol = "SAML";
+			}
+
+			this.bindConstant().annotatedWith(Names.named("shiro.cas.failure.url")).to("/error.jsp");
+			this.bindConstant().annotatedWith(Names.named("shiro.cas.server.url.prefix")).to(casServerUrlPrefix);
+			this.bindConstant().annotatedWith(Names.named("shiro.cas.service")).to(casService);
+			this.bindConstant().annotatedWith(Names.named("shiro.cas.login.url")).to(casLoginUrl);
+			this.bindConstant().annotatedWith(Names.named("shiro.cas.logout.url")).to(casLogoutUrl);
+			this.bindConstant().annotatedWith(Names.named("shiro.cas.protocol")).to(casProtocol);
+
+			return true;
 		}
 	}
 

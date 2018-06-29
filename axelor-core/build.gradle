@@ -51,6 +51,9 @@ dependencies {
 
 	compile libs.eclipselink_moxy
 
+	// CAS
+	compile libs.apache_shiro_cas
+
 	// BIRT
 	compile libs.birt_runtime
 
