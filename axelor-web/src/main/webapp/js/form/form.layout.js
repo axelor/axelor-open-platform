@@ -275,8 +275,8 @@ ui.directive('uiPanelLayout', ['$compile', function($compile) {
 
 function BarLayout(items, attrs, $scope, $compile) {
 
-	var main = $('<div class="span8 bar-main">');
-	var side = $('<div class="span4 bar-side">');
+	var main = $('<div class="span9 bar-main">');
+	var side = $('<div class="span3 bar-side">');
 	var wrap = $('<div class="span12 bar-wrap">').appendTo(main);
 
 
@@ -294,7 +294,7 @@ function BarLayout(items, attrs, $scope, $compile) {
 	});
 
 	if (side.children().length === 0) {
-		main.removeClass("span8").addClass("span12");
+		main.removeClass("span9").addClass("span12");
 		side = null;
 	}
 

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 .bar-layout {
-	max-width: 1200px;
+	max-width: 1500px;
 	margin: auto;
 	padding: 14px;
 }
@@ -29,7 +29,7 @@
 	max-width: 480px;
 }
 .bar-layout.large-form {
-	max-width: 1200px;
+	max-width: 1500px;
 }
 
 .bar-wrap {
