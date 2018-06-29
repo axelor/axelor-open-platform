@@ -504,13 +504,13 @@ ui.formWidget('Panel', {
 	transclude: true,
 	template:
 		"<div class='panel panel-default'>" +
-			"<div class='panel-header' ng-if='!notitle &amp;&amp; field.title'>" +
+			"<div class='panel-header' ng-click='canCollapse() ? toggle() : null' ng-if='!notitle &amp;&amp; field.title' ng-class=\"canCollapse() ? 'clickable-header' : null\" tabindex='-1'>" +
 				"<div class='panel-icon' ng-if='icon'><i class='fa' ng-class='icon'></i></div>" +
 				"<img class='panel-image' ng-if='image' ng-src='{{image}}'>" +
 				"<div class='panel-title'>{{title}}</div>" +
 				"<div ng-if='menus' ui-menu-bar menus='menus' handler='this'></div>" +
 				"<div ng-show='canCollapse()' class='panel-icons'>" +
-					"<a href='' ng-click='toggle()'><i class='fa' ng-class='collapsedIcon'></i></a>" +
+					"<a href=''><i class='fa' ng-class='collapsedIcon'></i></a>" +
 				"</div>" +
 			"</div>" +
 			"<div class='panel-body' ui-transclude></div>" +

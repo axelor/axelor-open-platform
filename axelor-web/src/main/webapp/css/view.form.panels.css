@@ -112,6 +112,12 @@
 	border-bottom: 0;
 }
 
+.clickable-header{
+	cursor: pointer;
+	overflow: hidden;
+	outline: none !important;
+}
+
 .panel .panel-body {
 	padding: 14px;
 	transition: height 0.3s ease-out;
