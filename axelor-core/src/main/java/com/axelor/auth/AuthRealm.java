@@ -52,6 +52,14 @@ public class AuthRealm extends AuthorizingRealm {
 				plain = new String((char[]) plain);
 			}
 
+			try {
+				return service.ldapLogin((String) token.getPrincipal(), (String) plain);
+			} catch (IllegalStateException e) {
+			} catch (AuthenticationException e) {
+				log.error("Password authentication failed for user: {}", token.getPrincipal());
+				return false;
+			}
+
 			if (service.match((String) plain, (String) saved) || super.doCredentialsMatch(token, info)) {
 				return true;
 			}
@@ -72,6 +80,18 @@ public class AuthRealm extends AuthorizingRealm {
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 
 		final String code = ((UsernamePasswordToken) token).getUsername();
+		final String passwd = new String(((UsernamePasswordToken) token).getPassword());
+
+		final AuthService service = AuthService.getInstance();
+		if (service.ldapEnabled()) {
+			try {
+				service.ldapLogin(code, passwd);
+			} catch (IllegalStateException e) {
+			} catch (AuthenticationException e) {
+				log.error("LDAP authentication failed for user: {}", code);
+			}
+		}
+
 		final User user = AuthUtils.getUser(code);
 		if (user == null || !AuthUtils.isActive(user)) {
 			return null;

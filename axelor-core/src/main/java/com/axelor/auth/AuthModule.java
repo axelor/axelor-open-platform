@@ -63,6 +63,7 @@ public class AuthModule extends AbstractModule {
 
 		this.bind(JpaSecurity.class).toProvider(AuthSecurity.class);
 		this.bind(AuthService.class).asEagerSingleton();
+		this.bind(AuthLdap.class).asEagerSingleton();
 
 		this.configureAuth();
 
