@@ -45,6 +45,7 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.common.StringUtils;
 import com.axelor.db.Query;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Sets;
@@ -285,7 +286,13 @@ public class AuthLdap {
 			SearchResult result = (SearchResult) all.next();
 			Attributes attributes = result.getAttributes();
 			String name = (String) attributes.get("cn").get();
-			found.add(name);
+			if (StringUtils.notBlank(name)) {
+				found.add(name);
+			}
+		}
+
+		if (found.isEmpty()) {
+			return;
 		}
 
 		final List<Group> groups = Query.of(Group.class).filter("self.code not in (:names)").bind("names", found).fetch();
