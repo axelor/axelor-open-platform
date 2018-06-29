@@ -36,6 +36,7 @@
 .kanban-view {
 	display: flex;
 	padding: 0;
+	background-color: #fff;
 }
 
 .kanban-column {
@@ -44,7 +45,6 @@
 	background-color: #fff;
 	margin: 0 9px 18px;
 	border-color: #e7eaec;
-	border-style: solid solid none;
 	border-width: 1px 0;
 	height: calc(100% - 18px);
 }
