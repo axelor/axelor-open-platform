@@ -90,7 +90,7 @@ label,
 
 .form-item-container input {
 	padding: 0px 6px;
-	height: 20px;
+	height: 21px;
 }
 
 .icons-bar .fa,
@@ -103,6 +103,7 @@ label,
 	position: relative;
 	z-index: 1;
 	padding: 13px 3px 8px 3px !important;
+	outline: none !important;
 }
 
 .panel {
@@ -112,6 +113,10 @@ label,
 
 .panel .row-fluid > .form-item {
 	margin-bottom: 12px;
+}
+
+.panel .row-fluid > .form-item-hidden {
+	margin-bottom: 0px;
 }
 
 .panel .panel-header.clickable-header::before {
@@ -184,6 +189,15 @@ label,
 	background-color: #d3d3d3;
 }
 
+.mail-composer textarea {
+	background: transparent;
+}
+
+.mail-message {
+	border-radius: 3px !important;
+	box-shadow: 1px 1px 4px rgba(0,0,0,0.12) !important;
+}
+
 .mail-message .mail-message-header .subject,
 .mail-message .track-fields li {
 	color: #8C8C8C;
@@ -217,10 +231,14 @@ label,
 	background-color: #fff;
 }
 
+[ui-view-form], .cards-view, .kanban-view {
+	background: #fafafa;
+}
+
 [ui-view-form] > form:not(.mail-thread-view) > div > .bar-main > .bar-wrap {
 	padding: 16px;
 	border: 1px solid #eee;
-	box-shadow: 1px 2px 8px 1px rgba(0, 0, 0, 0.14);
+	box-shadow: 1px 2px 8px 0px rgba(0, 0, 0, 0.15);
 	margin-bottom: 22px;
 	border-radius: 5px;
 }
@@ -308,6 +326,10 @@ form .nav-tabs > li.active > a:focus {
 	margin-bottom: 0;
 }
 
+form .panel-tabs {
+	margin-top: 10px;
+}
+
 form .panel-tabs .nav-tabs > li:hover > a {
 	background: #efefef;
 	border-bottom: 1px solid #efefef;
@@ -387,6 +409,24 @@ textarea {
 	background-color: #fff;
 }
 
+header .navbar .nav .fa-bars, header .navbar .dropdown-toggle .caret,
+header .navbar .nav > li > a:focus,
+header .navbar .nav > li > a:hover,
+header .navbar .nav > li > a:active,
+.navbar .nav li.dropdown.open > .dropdown-toggle,
+.navbar .nav li.dropdown.active > .dropdown-toggle,
+.navbar .nav li.dropdown.open.active > .dropdown-toggle {
+	color: #2185D0;
+}
+
+header .dropdown-menu > li > a:hover,
+header .dropdown-menu > li > a:focus,
+header .dropdown-submenu:hover > a,
+header .dropdown-submenu:focus > a {
+	color: #fff;
+	background: #2185D0;
+}
+
 .navbar-inner,
 .panel .panel-header,
 .slickgrid .slick-header,
@@ -447,7 +487,6 @@ textarea {
 	border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-
 .btn {
 	border-radius: 3px !important;
 }
@@ -458,6 +497,11 @@ textarea {
 
 .btn-danger {
 	border-color: #d43f3a;
+}
+
+.navbar .btn-group .btn:not(:disabled):hover, .navbar .btn-group .btn:focus, .navbar .btn-group .btn:active {
+	background: #2185D0;
+	color: #fff;
 }
 
 .panel-layout .form-item > .btn-group .btn {
@@ -530,6 +574,11 @@ textarea {
 
 .info-button {
 	border-style: solid;
+	box-shadow: none !important;
+}
+
+.info-button:not([class*=btn-]) > i, .info-button:not([class*=btn-]) .info-button-value {
+    color: #2185D0;
 }
 
 .btn-default:hover,
@@ -602,9 +651,9 @@ textarea {
 	border-color: #eee;
 }
 
-.kanban-column {
+.kanban-column, .kanban-card-list {
 	border-top: 0;
-	background: transparent;
+	background: transparent !important;
 }
 
 .kanban-card,
@@ -613,15 +662,13 @@ textarea {
 }
 
 .kanban-card {
-	border-color: #eee;
 	border-left-width: 1px;
-	box-shadow: 0 1px 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-	transition: all ease-in 0.1s;
+	box-shadow: 1px 1px 4px rgba(0,0,0,0.12);
 }
 
 .kanban-card:hover{
-	background: #f3f3f3;
-	box-shadow: 0 3px 7px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.22);
+	background: #fafafa;
+	box-shadow: 2px 2px 6px 0 rgba(0,0,0,0.15);
 }
 
 .kanban-column .input-group .input-group-btn > .btn {
@@ -666,4 +713,9 @@ textarea {
 
 .wysiwyg-container.ui-resizable .ui-resizable-handle.ui-resizable-s {
 	background-color: #eee;
+}
+
+.progress {
+	border-radius: 5px !important;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.08);
 }
