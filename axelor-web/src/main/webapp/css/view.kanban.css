@@ -35,18 +35,19 @@
 
 .kanban-view {
 	display: flex;
-	padding: 0;
+	padding: 0 6px;
 	background-color: #fff;
 }
 
 .kanban-column {
+	display: flex;
+	flex-direction: column;
 	flex: 1;
 	min-width: 20em;
-	background-color: #fff;
-	margin: 0 9px 18px;
-	border-color: #e7eaec;
-	border-width: 1px 0;
-	height: calc(100% - 18px);
+	background-color: #e7eaec;
+	margin: 12px 6px 0;
+	border-top-left-radius: 6px;
+	border-top-right-radius: 6px;
 }
 
 .kanban-column ul.kanban-card-list,
@@ -55,10 +56,12 @@
 }
 
 .kanban-column ul.kanban-card-list {
-	margin: 0;
+	flex: 1;
+	margin: 0 4px 4px;
 	padding: 10px 10px 35px;
 	overflow: auto;
 	max-height: calc(100% - 22px);
+	background: #fff;
 }
 
 .kanban-column .ui-sortable-placeholder {
@@ -76,16 +79,15 @@
 	margin: 0;
 	padding: 10px;
 	line-height: 18px;
-	border-bottom: 2px solid #eee;
 }
 
 .kanban-column .input-group {
 	display: flex;
-	padding: 10px 10px 0;
+	margin: 0 8px 6px;
 }
 
 .kanban-column .input-group .form-control {
-	height: inherit;
+	height: 100%;
 	margin: 0;
 	flex: 1;
 }
@@ -302,9 +304,12 @@
 @media (max-width: 480px) {
 	.kanban-view {
 		flex-direction: column;
+		padding-bottom: 12px;
 	}
 	.kanban-column {
-		flex: inherit;
-		width: 100%;
+		display: block;
+	}
+	.kanban-column ul.kanban-card-list {
+		padding-bottom: 0;
 	}
 }
