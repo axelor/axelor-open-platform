@@ -139,7 +139,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
 		}
 
 		scope.isRequired = function() {
-			return this.attr("required") || false;
+			return this.attr("required") && this.text !== 0 && !this.text;
 		};
 		
 		scope.isReadonlyExclusive = function() {
