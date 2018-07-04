@@ -251,6 +251,11 @@ function SelectorCtrl($scope, $element, DataSource, ViewService) {
 	$scope.onShow = function(viewPromise) {
 		
 		viewPromise.then(function(){
+			var view = $scope.schema;
+			var field = $scope.field || $scope.$parent.field;
+			if (field) {
+				view.orderBy = field.orderBy || view.orderBy;
+			}
 			$element.dialog('open');
 			initialized = true;
 			origOnShow(viewPromise);
