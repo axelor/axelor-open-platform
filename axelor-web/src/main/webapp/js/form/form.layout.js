@@ -275,9 +275,9 @@ ui.directive('uiPanelLayout', ['$compile', function($compile) {
 
 function BarLayout(items, attrs, $scope, $compile) {
 
-	var main = $('<div class="span9 bar-main">');
-	var side = $('<div class="span3 bar-side">');
-	var wrap = $('<div class="span12 bar-wrap">').appendTo(main);
+	var main = $('<div class="bar-main">');
+	var side = $('<div class="bar-side">');
+	var wrap = $('<div class="bar-wrap">').appendTo(main);
 
 
 	items.each(function(item, i) {
@@ -293,12 +293,7 @@ function BarLayout(items, attrs, $scope, $compile) {
 		}
 	});
 
-	if (side.children().length === 0) {
-		main.removeClass("span9").addClass("span12");
-		side = null;
-	}
-
-	var row = $('<div class="row-fluid">').append(main);
+	var row = $('<div class="bar-container">').append(main);
 
 	if (side && axelor.device.small) {
 		side.children().first().prependTo(wrap);
@@ -307,7 +302,7 @@ function BarLayout(items, attrs, $scope, $compile) {
 
 	wrap.children('[ui-panel-mail]').appendTo(main);
 
-	if (side) {
+	if (side.children().length > 0) {
 		side.appendTo(row);
 	}
 

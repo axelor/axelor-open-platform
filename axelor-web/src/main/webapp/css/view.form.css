@@ -76,10 +76,6 @@ textarea[readonly] {
 	width: inherit !important;
 }
 
-form.dynamic-form {
-	margin: 4px auto;
-}
-
 table.form-layout {
 	width: 100%;
 	border-collapse: collapse;

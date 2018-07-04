@@ -32,8 +32,33 @@
 	max-width: 1500px;
 }
 
+.bar-container {
+	display: flex;
+}
+
+.bar-main {
+	flex: 1;
+}
+
 .bar-wrap {
 	min-height: 0 !important;
+}
+
+.bar-side {
+	width: 25%;
+	min-width: 15em;
+	margin-left: 14px;
+}
+
+@media (max-width: 767px) {
+	.bar-container {
+		flex-direction: column;
+	}
+	.bar-side {
+		margin: 0;
+		width: inherit;
+		min-width: auto;
+	}
 }
 
 .panel-layout * {
