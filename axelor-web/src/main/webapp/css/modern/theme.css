@@ -499,6 +499,10 @@ header .dropdown-submenu:focus > a {
 	border-color: #d43f3a;
 }
 
+.btn-group > .btn + .btn {
+	margin-left: -3px;
+}
+
 .navbar .btn-group .btn:not(:disabled):hover, .navbar .btn-group .btn:focus, .navbar .btn-group .btn:active {
 	background: #2185D0;
 	color: #fff;
