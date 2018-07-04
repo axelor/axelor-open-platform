@@ -450,7 +450,9 @@ ui.formWidget('Panel', {
 		};
 
 		scope.toggle = function() {
-			scope.setCollapsed(!scope.collapsed);
+			if (scope.canCollapse()) {
+				scope.setCollapsed(!scope.collapsed);
+			}
 		};
 
 		scope.$watch("attr('collapse')", function panelCollapseWatch(collapsed) {
@@ -504,7 +506,7 @@ ui.formWidget('Panel', {
 	transclude: true,
 	template:
 		"<div class='panel panel-default'>" +
-			"<div class='panel-header' ng-click='canCollapse() ? toggle() : null' ng-if='!notitle &amp;&amp; field.title' ng-class=\"canCollapse() ? 'clickable-header' : null\" tabindex='-1'>" +
+			"<div class='panel-header' ng-click='toggle()' ng-if='!notitle &amp;&amp; field.title' ng-class=\"{'clickable-header' : canCollapse()}\" tabindex='-1'>" +
 				"<div class='panel-icon' ng-if='icon'><i class='fa' ng-class='icon'></i></div>" +
 				"<img class='panel-image' ng-if='image' ng-src='{{image}}'>" +
 				"<div class='panel-title'>{{title}}</div>" +
