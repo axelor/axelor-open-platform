@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
@@ -88,11 +87,6 @@ public class AuthFilter extends FormAuthenticationFilter {
 		// set encoding to UTF-8 (see RM-4304)
 		request.setCharacterEncoding("UTF-8");
 
-		// make sure to re-create session on new login to prevent session fixation
-		if (isLoginRequest(request, response) && isLoginSubmission(request, response)) {
-			resetSession(request, response);
-		}
-
 		if (isXHR(request)) {
 			
 			int status = 401;
@@ -112,13 +106,12 @@ public class AuthFilter extends FormAuthenticationFilter {
 		return super.onAccessDenied(request, response);
 	}
 	
-	private void resetSession(ServletRequest request, ServletResponse response) {
-		final Subject subject = getSubject(request, response);
-		final Session session = subject.getSession();
-		if (session != null) {
-			session.stop();
-			subject.getSession(true);
-		}
+	@Override
+	protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,
+			ServletResponse response) throws Exception {
+		// change session id to prevent session fixation
+		((HttpServletRequest) request).changeSessionId();
+		return super.onLoginSuccess(token, subject, request, response);
 	}
 
 	@SuppressWarnings("unchecked")
