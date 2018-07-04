@@ -2602,6 +2602,12 @@ ui.directive('uiSlickEditors', function() {
 				return context;
 			};
 			
+			Object.defineProperty($scope, 'gridDataItem', {
+				get: function () {
+					return _.findWhere(this.dataView.getItems(), { selected: true });
+				}
+			});
+
 			$scope.show();
 		}],
 		link: function(scope, element, attrs) {

@@ -620,7 +620,8 @@ function GridViewCtrl($scope, $element) {
 
 		$scope.selection = selection;
 		$scope.$timeout(function () {
-			$scope.$broadcast('on:grid-selection-change', $scope.getContext());
+			$scope.$broadcast('on:grid-selection-change',
+					$scope.field ? _.findWhere(items, { selected: true }) : $scope.getContext());
 		});
 		
 		if ($scope.$details) {

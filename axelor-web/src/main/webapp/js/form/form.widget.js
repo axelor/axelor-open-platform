@@ -292,7 +292,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 		var expr = $parse(condition);
 
 		function watcher(current, old) {
-			var rec = scope.record;
+			var rec = scope.gridDataItem || scope.record;
 			if (rec === undefined && current === old) return;
 			if (rec === undefined && scope.getContext) {
 				rec = scope.getContext();
