@@ -868,7 +868,8 @@ ui.formInput('RefItem', 'ManyToOne', {
 				target: scope._model,
 				targetName: name,
 				targetSearch: search,
-				domain: data.domain
+				domain: data.domain,
+				canEdit: false
 			});
 
 			self._link(scope, element, attrs, model);
