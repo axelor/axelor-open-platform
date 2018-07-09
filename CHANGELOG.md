@@ -1,3 +1,29 @@
+## 5.0.3 (2018-07-09)
+
+#### Enhancements
+
+* Ref-select widget should not allow editing record
+* Panel header is now clickable if canCollapse is true
+* Improve form layout
+* Improve modern theme
+* Improve kanban design/UX
+* Add encryption support on large text fields
+* Bring back LDAP and CAS integration
+* Change `X-References` to `References` header in email message
+
+#### Bugs
+
+* Fix selection popup record ordering issue
+* Fix conditional expressions on fields on editable grid
+* Fix requiredIf condition issue
+* Fix group maping from LDAP issue
+* Fix advance search input issue
+* Fix JavaEL expression issue
+* Fix grid widget grouping issue on hidden column
+* Fix NPE when trying to delete non-existent record
+* Fix all day event issue in calendar view
+* Fix resource leak when generating report pdf
+
 ## 5.0.2 (2018-06-20)
 
 #### Enhancements
