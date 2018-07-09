@@ -38,6 +38,7 @@
 
 .bar-main {
 	flex: 1;
+	width: 75%;
 }
 
 .bar-wrap {
@@ -53,6 +54,9 @@
 @media (max-width: 767px) {
 	.bar-container {
 		flex-direction: column;
+	}
+	.bar-main {
+		width: inherit;
 	}
 	.bar-side {
 		margin: 0;
