@@ -80,6 +80,7 @@
 	margin-top: -1px;
 	display: flex;
     align-items: center;
+    outline: none;
 }
 
 .panel-nested > .panel-header {
