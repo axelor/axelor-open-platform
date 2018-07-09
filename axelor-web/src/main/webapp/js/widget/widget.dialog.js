@@ -83,6 +83,12 @@ ui.directive('uiDialog', function() {
 				$('body .ui-widget-overlay')
 					.css('opacity', 0).last()
 					.css('opacity', opacity);
+
+				$('body')
+					.children('.ui-dialog')
+					.removeClass('active')
+					.filter(':visible').last()
+					.addClass('active');
 			});
 			
 			// focus the previous visible dialog
