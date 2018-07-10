@@ -60,6 +60,7 @@
 		flex-direction: column;
 	}
 	.bar-main {
+		flex: inherit;
 		max-width: inherit !important;
 	}
 	.bar-side {
