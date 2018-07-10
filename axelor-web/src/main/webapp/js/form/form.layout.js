@@ -303,7 +303,7 @@ function BarLayout(items, attrs, $scope, $compile) {
 	wrap.children('[ui-panel-mail]').appendTo(main);
 
 	if (side.children().length > 0) {
-		side.appendTo(row);
+		side.appendTo(row.addClass('has-side'));
 	}
 
 	return row;

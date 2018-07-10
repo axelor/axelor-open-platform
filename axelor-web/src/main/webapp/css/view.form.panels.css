@@ -38,7 +38,7 @@
 
 .bar-main {
 	flex: 1;
-	width: 75%;
+	max-width: 100%;
 }
 
 .bar-wrap {
@@ -51,12 +51,16 @@
 	margin-left: 14px;
 }
 
+.bar-container.has-side .bar-main {
+	max-width: 75%;
+}
+
 @media (max-width: 767px) {
 	.bar-container {
 		flex-direction: column;
 	}
 	.bar-main {
-		width: inherit;
+		max-width: inherit !important;
 	}
 	.bar-side {
 		margin: 0;
