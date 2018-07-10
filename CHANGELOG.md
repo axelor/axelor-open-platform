@@ -1,3 +1,10 @@
+## 5.0.4 (2018-07-10)
+
+#### Bugs
+
+* Fix form layout regressions
+* Revert fix for conditional expressions on fields on editable grid
+
 ## 5.0.3 (2018-07-09)
 
 #### Enhancements
