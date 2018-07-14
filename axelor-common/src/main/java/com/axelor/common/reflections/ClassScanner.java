@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -28,7 +29,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import com.axelor.internal.asm.AnnotationVisitor;
 import com.axelor.internal.asm.ClassReader;
@@ -154,9 +154,14 @@ final class ClassScanner {
 	
 	private void scan() throws IOException {
 		final ClassPath classPath = ClassPath.from(loader);
-		final Map<String, ClassInfo> classes = classPath
-				.getTopLevelClasses().stream()
-				.collect(Collectors.toMap(ClassInfo::getName, c -> c));
+		final Map<String, ClassInfo> classes = new HashMap<>();
+
+		for (ClassInfo info : classPath.getTopLevelClasses()) {
+			// in case of duplicate classes, first one would win
+			if (!classes.containsKey(info.getName())) {
+				classes.put(info.getName(), info);
+			}
+		}
 
 		if (packages.isEmpty()) {
 			for (ClassInfo info : classes.values()) {
