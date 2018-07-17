@@ -56,6 +56,10 @@ function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
 		}
 		return null;
 	};
+	
+	$scope.show = function() {
+		$scope.updateRoute();
+	};
 
 	$scope.onRefresh = function () {
 		if (stamp > -1) {
@@ -64,6 +68,27 @@ function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
 			stamp = 0;
 		}
 	};
+	
+	$scope.getRouteOptions = function() {
+		return {
+			mode: "html"
+		};
+	};
+
+	$scope.setRouteOptions = function(options) {
+		$scope.updateRoute();
+	};
+
+	if ($scope._viewParams) {
+		$scope._viewParams.$viewScope = $scope;
+		$scope.show();
+	}
+	
+	$scope.$applyAsync(function() {
+		if ($scope.view.deferred) {
+			$scope.view.deferred.resolve($scope);
+		}
+	});
 }
 
 var directiveFn = function(){
