@@ -171,6 +171,12 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 
 		});
 	};
+	
+	$scope.$on('on:tab-reload', function(e, tab) {
+		if ($scope === e.targetScope && $scope.onRefresh) {
+			$scope.onRefresh();
+		}
+	});
 }
 
 /**
