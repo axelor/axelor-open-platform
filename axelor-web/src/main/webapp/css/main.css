@@ -717,9 +717,14 @@ header .navbar .nav-link-user-sub {
   min-height: 50px;
 }
 
+.iframe-container {
+	display: flex;
+}
+
 .iframe-container > iframe {
 	width: 100%;
 	height: 100%;
+	flex: 1;
 }
 
 .search-view form {
