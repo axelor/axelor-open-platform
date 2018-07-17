@@ -25,9 +25,9 @@ import com.axelor.app.AppSettings;
 
 public class JPQLFilter extends Filter {
 
-	private static final boolean SUB_SELECT_ALLOWED = AppSettings.get().getBoolean("domain.allow.sub-select", true);
-
-	private static final Pattern SUB_SELECT_PATTERN = Pattern.compile("\\(\\s*SELECT\\s+", Pattern.CASE_INSENSITIVE);
+	private static final Pattern BLACKLIST_PATTERN = AppSettings.get().get("domain.blacklist.pattern", null) == null
+			? null
+			: Pattern.compile(AppSettings.get().get("domain.blacklist.pattern").trim(), Pattern.CASE_INSENSITIVE);
 
 	private String jpql;
 
@@ -39,8 +39,8 @@ public class JPQLFilter extends Filter {
 	}
 
 	public static JPQLFilter forDomain(String jpql, Object... params) {
-		if (!SUB_SELECT_ALLOWED && SUB_SELECT_PATTERN.matcher(jpql).find()) {
-			throw new IllegalArgumentException("Invalid domain, sub queries are not allowed.");
+		if (BLACKLIST_PATTERN != null && BLACKLIST_PATTERN.matcher(jpql).find()) {
+			throw new IllegalArgumentException("Invalid domain, filter uses blacklisted keywords.");
 		}
 		return new JPQLFilter(jpql, params);
 	}
