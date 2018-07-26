@@ -55,6 +55,10 @@
 	max-width: 75%;
 }
 
+.bar-container.has-side .bar-main .bar-main {
+	max-width: inherit;
+}
+
 @media (max-width: 767px) {
 	.bar-container {
 		flex-direction: column;
