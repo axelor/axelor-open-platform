@@ -377,7 +377,10 @@ ui.formInput('DateTime', {
 				value = null;
 			}
 			if (!input.mask("valid")) {
-				return model.$setViewValue(value); // force validation
+				model.$setViewValue(value); // force validation
+				model.$render();
+				scope.$applyAsync();
+				return;
 			}
 
 			value = scope.parse(value);
