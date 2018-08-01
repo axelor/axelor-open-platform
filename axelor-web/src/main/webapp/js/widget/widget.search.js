@@ -1542,7 +1542,7 @@ ui.directive('uiFilterBox', function() {
 					"<div class='form-inline'>" +
 						"<div class='control-group'>" +
 							"<input type='text' placeholder='{{\"Save filter as\" | t}}' ng-model='custTitle'> " +
-							"<label class='checkbox' ng-if='canShare'>" +
+							"<label class='checkbox' ng-show='canShare'>" +
 								"<input type='checkbox' ng-model='custShared'><span x-translate>Share</span>" +
 							"</label>" +
 						"</div>" +
