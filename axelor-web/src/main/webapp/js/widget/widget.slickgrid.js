@@ -375,8 +375,9 @@ var Formatters = {
 	
 	"selection": function(field, value) {
 		var cmp = field.type === "integer" ? function(a, b) { return a == b ; } : _.isEqual;
+		var val = field.type === "integer" ? value : _.unescapeHTML(value);
 		var res = _.find(field.selectionList, function(item){
-			return cmp(item.value, value);
+			return cmp(item.value, val);
 		}) || {};
 
 		var text = _.isString(res.title) ? _.escapeHTML(res.title) : res.title;
