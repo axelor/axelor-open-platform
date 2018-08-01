@@ -1380,7 +1380,8 @@ ui.directive('uiFilterBox', function() {
 					return;
 				}
 				toggleButton = $(e.currentTarget);
-				menu.zIndex(element.parent().zIndex() + 1);
+				// more than top navbar's zIndex 1030 to hide
+				menu.zIndex(element.parent().zIndex() + 1031);
 				menu.show();
 				scope.doAdjust();
 
