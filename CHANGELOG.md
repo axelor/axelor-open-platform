@@ -1,3 +1,28 @@
+## 5.0.5 (2018-08-03)
+
+#### Bugs
+
+* Fix advance search popup not hiding on navbar click
+* Fix issue with custom filter sharing
+* Fix translations
+* Fix selection widget issue when value has html escape values
+* Fix validation issue on date widget
+* Fix form layout issue
+* Fix extra scrollbar with html view
+* Fix route change issue with html view
+* Fix tab refresh issue on tree view
+* Fix class path scanner issue with duplicate classes from bootstrap loader
+
+#### Enhancements
+
+* Add support for domain filter blacklist pattern
+
+	```
+	domain.blacklist.pattern = (\\(\\s*SELECT\\s+)|some_function
+	```
+
+  The old `domain.allow.sub-select` settings is removed in favor of this one.
+
 ## 5.0.4 (2018-07-10)
 
 #### Bugs
