@@ -74,7 +74,13 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 				return $(this).attr('x-path').replace(path+'.','');
 			}).get();
 			relatives.push($scope.field.targetName);
-			relatives = _.unique(_.compact(relatives));
+			relatives = _.unique(_.compact(relatives)).filter(function (name) {
+				var last = _.last(name.split('.'));
+				if (last[0] === '$' || last[0] === '_') {
+					return false;
+				}
+				return true;
+			});
 			return relatives;
 		};
 	})();
