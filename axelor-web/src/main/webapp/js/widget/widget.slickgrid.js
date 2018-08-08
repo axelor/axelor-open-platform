@@ -1262,7 +1262,9 @@ Grid.prototype._doInit = function(view) {
 	});
 	function resetScroll() {
 		if (scrollTop) {
-			that.element.children('.slick-viewport').scrollTop(scrollTop);
+			setTimeout(function () {
+				that.element.children('.slick-viewport').scrollTop(scrollTop);
+			});
 		}
 	}
 	scope.$on('dom:attach', resetScroll);
