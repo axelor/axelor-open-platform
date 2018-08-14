@@ -1067,11 +1067,6 @@ ActionHandler.prototype = {
 					});
 				}
 			}
-			if (tab.viewType == 'form' || tab.viewType == 'grid') {
-				var views = _.groupBy(tab.views, 'type');
-				if (!views.grid) tab.views.push({type: 'grid'});
-				if (!views.form) tab.views.push({type: 'form'});
-			}
 			if (tab.viewType === "html" && (tab.params||{}).download) {
 				var view = _.findWhere(tab.views, { type: "html" });
 				if (view) {
