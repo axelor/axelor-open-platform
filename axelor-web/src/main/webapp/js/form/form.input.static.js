@@ -441,7 +441,9 @@ ui.directive('uiTranslateIcon', ['$q', function ($q) {
 				var orig = angular.copy(data);
 				var form = $("<form>");
 				
-				var valueInput = $("<input type='text' class='span12'>")
+				var valueInput = (scope.field.multiline
+					? $("<textarea class='span12'>")
+					: $("<input type='text' class='span12'>"))
 				.prop('name', scope.field.name)
 				.prop('required', true)
 				.val(value)
@@ -478,7 +480,9 @@ ui.directive('uiTranslateIcon', ['$q', function ($q) {
 
 					item.key = item.key || ('value:' + value);
 
-					var input1 = $("<input type='text' class='span8'>")
+					var input1 = (scope.field.multiline
+							? $("<textarea class='span8'>")
+							: $("<input type='text' class='span8'>"))
 						.prop("name", "message")
 						.prop("required", true)
 						.val(item.message)
