@@ -273,7 +273,9 @@ ui.directive('uiToolbarAdjust', function() {
 			}
 
 			canShow(elemToolbar, elemMenubar) ||
-			canShow(elemToolbarMobile, elemMenubar);
+			canShow(elemToolbarMobile, elemMenubar) ||
+			canShow(elemToolbar, $()) ||
+			canShow(elemToolbarMobile, $());
 		}
 
 		scope.waitForActions(setup, 100);
