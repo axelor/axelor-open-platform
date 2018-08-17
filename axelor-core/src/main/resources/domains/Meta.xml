@@ -63,7 +63,7 @@
     ]]>
     
 	<integer name="priority" />
-    <integer name="order" column="order_seq" />
+    <integer name="order" column="order_seq" title="Menu order"/>
     <string name="xmlId" unique="true" />
 	<string name="name" required="true"/>
   	<string name="title" required="true" namecolumn="true"/>
