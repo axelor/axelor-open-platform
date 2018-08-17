@@ -42,6 +42,9 @@ input[type="color"],
 .bar-side .uneditable-input {
 	background-color: inherit;
 }
+.bar-side .ui-spinner {
+	background: none;
+}
 table.form-layout .tabbable-tabs .tab-content{
 	border: 2px solid #E7E7E7;
 }
@@ -554,10 +557,12 @@ header .dropdown-submenu:focus > a {
 	animation: ripple 1s ease-out;
 }
 
-.o2m-list-row .toggle-item button {
+.o2m-list .o2m-list-row .toggle-item button {
 	border-radius: 0 !important;
+	box-shadow: none;
 	height: 20px !important;
 	padding: 0 1px 2px 1px !important;
+	border-bottom-color: #c0c0c0;
 }
 
 .btn-default {
