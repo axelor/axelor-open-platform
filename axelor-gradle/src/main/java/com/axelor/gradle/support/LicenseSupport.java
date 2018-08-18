@@ -26,6 +26,7 @@ import org.gradle.api.logging.LogLevel;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.ExtraPropertiesExtension;
 
+import com.axelor.common.FileUtils;
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.tasks.GenerateCode;
 
@@ -83,6 +84,7 @@ public class LicenseSupport extends AbstractSupport {
 		license.include("**/*.scala");
 		license.include("**/*.js");
 		license.include("**/*.css");
+		license.include("**/*.jsp");
 		
 		license.exclude("**/LICENSE");
 		license.exclude("**/LICENSE.md");
@@ -106,8 +108,16 @@ public class LicenseSupport extends AbstractSupport {
 		ext.set("owner", "Axelor");
 		ext.set("website", "http://axelor.com");
 		
+		final File webapp = FileUtils.getFile(project.getProjectDir(), "src", "main", "webapp");
+
 		project.afterEvaluate(p -> {
-			project.getTasks().withType(License.class).all(task -> task.onlyIf(spec -> header != null && header.exists()));
+			project.getTasks().withType(License.class).all(task -> {
+				task.onlyIf(spec -> header != null && header.exists());
+				task.source(project.fileTree(webapp, tree -> {
+					tree.exclude("lib/**");
+					tree.exclude("WEB-INF/web.xml");
+				}));
+			});
 		});
 	}
 }
