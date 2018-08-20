@@ -147,6 +147,36 @@ public class HotswapSupport extends AbstractSupport {
 
 		return extraClasses;
 	}
+	
+	/**
+	 * Find src/main/resources paths from all projects
+	 * 
+	 */
+	private static List<File> findResourcePaths(Project project) {
+
+		final List<File> paths = new ArrayList<>();
+		final Function<Project, File> findResourcesDir =
+				p -> FileUtils.getFile(p.getProjectDir(), "src", "main", "resources");
+
+		project.getAllprojects().stream()
+			.filter(p -> FileUtils.getFile(p.getProjectDir(), "build.gradle").exists())
+			.map(findResourcesDir::apply)
+			.filter(File::exists)
+			.forEach(paths::add);
+
+		project.getGradle().getIncludedBuilds().forEach(b -> {
+			Gradle included = ((IncludedBuildInternal) b).getConfiguredBuild();
+			included.getRootProject().getAllprojects().stream()
+				.filter(p -> !p.getName().equals("axelor-gradle"))
+				.filter(p -> !p.getName().equals("axelor-tomcat"))
+				.filter(p -> !p.getName().equals("axelor-test"))
+				.map(findResourcesDir::apply)
+				.filter(File::exists)
+				.forEach(paths::add);
+		});
+
+		return paths;
+	}
 
 	private void generateHotswapConfig(Project project) {
 		final Properties hotswapProps = new Properties();
@@ -175,8 +205,8 @@ public class HotswapSupport extends AbstractSupport {
 			extension.getExtraClasspath().stream().forEach(extraClasspath::add);
 		}
 
-		findOutputPaths(project).stream()
-			.forEach(extraClasspath::add);
+		findOutputPaths(project).forEach(extraClasspath::add);
+		findResourcePaths(project).forEach(watchResources::add);
 
 		hotswapProps.setProperty("extraClasspath", extraClasspath.stream()
 				.filter(File::exists)
@@ -186,12 +216,14 @@ public class HotswapSupport extends AbstractSupport {
 		if (extension.getWatchResources() != null) {
 			extension.getWatchResources().stream()
 				.filter(File::exists)
+				.filter(f -> !watchResources.contains(f))
 				.forEach(watchResources::add);
-			if (!watchResources.isEmpty()) {
-				hotswapProps.setProperty("watchResources", watchResources.stream()
-					.map(File::getPath)
-					.collect(Collectors.joining(",")));
-			}
+		}
+
+		if (!watchResources.isEmpty()) {
+			hotswapProps.setProperty("watchResources", watchResources.stream()
+				.map(File::getPath)
+				.collect(Collectors.joining(",")));
 		}
 
 		final File target = new File(project.getBuildDir(), "hotswap-agent.properties");
