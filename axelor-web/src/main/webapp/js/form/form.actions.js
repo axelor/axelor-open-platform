@@ -52,8 +52,13 @@ function updateValues(source, target, itemScope, formScope) {
 
 	// handle json records
 	if (source && formScope && formScope._model === 'com.axelor.meta.db.MetaJsonRecord') {
-		source = source.attrs ? _.extend({}, JSON.parse(source.attrs), source) : source;
-		delete source.attrs;
+		if (source.attrs || source.id) {
+			source = source.id > 0
+				? _.pick(source, 'jsonModel', 'name', 'attrs', 'id', 'version')
+				: _.pick(source, 'jsonModel', 'name', 'attrs');
+		}
+
+		var values = source.attrs ? _.extend({}, JSON.parse(source.attrs)) : source;
 		var fix = function (rec) {
 			if (!rec) return rec;
 			if (_.isArray(rec)) return _.map(rec, fix);
@@ -64,9 +69,19 @@ function updateValues(source, target, itemScope, formScope) {
 			return rec;
 		}
 
-		_.each(source, function (v, k) {
-			source[k] = fix(v);
+		_.each(values, function (v, k) {
+			values[k] = fix(v);
 		});
+
+		// if called from form fields
+		if (itemScope && itemScope.updateJsonValues) {
+			return itemScope.updateJsonValues(values);
+		}
+
+		// onNew or onSave from main form
+		var current = target && target.attrs ? JSON.parse(target.attrs) : {};
+		source.attrs = JSON.stringify(_.extend({}, current, values));
+
 	} else if (itemScope && itemScope.updateJsonValues) {
 		return itemScope.updateJsonValues(source);
 	}
@@ -834,7 +849,15 @@ ActionHandler.prototype = {
 					.find('.record-toolbar:first,.search-view-toolbar:first');
 			}
 
-			items = containers.find('[x-path="' + (formScope.formPath ?  formScope.formPath + '.' + name : name) + '"]');
+			var formPath = formScope.formPath;
+			if (formScope._model === 'com.axelor.meta.db.MetaJsonRecord') {
+				formPath = formPath || 'attrs';
+			}
+
+			items = containers.find('[x-path="' + (formPath ?  formPath + '.' + name : name) + '"]');
+			if (items.length === 0 && formPath != 'attrs') {
+				items = containers.find('[x-path="attrs.' + name + '"]');
+			}
 			if (toolbar) {
 				return toolbar.find('[name="' + name + '"],[x-name="' + name + '"]').add(items);
 			}
