@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
@@ -61,7 +62,13 @@ public class GenerateCode extends DefaultTask {
 	private static final String DIR_OUTPUT_JAVA = "src-gen/java";
 	private static final String DIR_OUTPUT_RESOURCES = "src-gen/resources";
 
+	private Function<String, String> formatter;
+
 	private List<ResolvedArtifact> artifacts;
+
+	public void setFormatter(Function<String, String> formatter) {
+		this.formatter = formatter;
+	}
 
 	private List<ResolvedArtifact> artifacts() {
 		if (artifacts == null) {
@@ -232,7 +239,9 @@ public class GenerateCode extends DefaultTask {
 	private Generator buildGenerator(Project project) {
 		final File domainPath = getInputDir(project);
 		final File targetPath = getJavaOutputDir(project);
-		return new Generator(domainPath, targetPath);
+		return formatter != null
+				? new Generator(domainPath, targetPath, formatter)
+				: new Generator(domainPath, targetPath);
 	}
 
 	@TaskAction

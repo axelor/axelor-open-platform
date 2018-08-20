@@ -25,7 +25,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,13 +53,19 @@ public class Generator {
 	private final Set<String> definedEnums = new HashSet<>();
 
 	private final List<Generator> lookup = new ArrayList<>();
+	private final Function<String, String> formatter;
 
 	private final Multimap<String, Entity> entities = LinkedHashMultimap.create();
 	private final Multimap<String, EnumType> enums = LinkedHashMultimap.create();
 
 	public Generator(File domainPath, File outputPath) {
+		this(domainPath, outputPath, String -> String);
+	}
+
+	public Generator(File domainPath, File outputPath, Function<String, String> formatter) {
 		this.domainPath = domainPath;
 		this.outputPath = outputPath;
+		this.formatter = Objects.requireNonNull(formatter);
 	}
 
 	private File file(File base, String... parts) {
@@ -122,7 +130,7 @@ public class Generator {
 
 		log.info("Generating: " + entityFile.getPath());
 		String code = Expander.expand(entity);
-		Files.asCharSink(entityFile, Charsets.UTF_8).write(Utils.stripTrailing(code));
+		writeTo(entityFile, Utils.stripTrailing(code));
 		rendered.add(entityFile);
 
 		return rendered;
@@ -192,17 +200,22 @@ public class Generator {
 
 		log.info("Generating: " + entityFile.getPath());
 		String code = Expander.expand(entity, false);
-		Files.asCharSink(entityFile, Charsets.UTF_8).write(Utils.stripTrailing(code));
+		writeTo(entityFile, Utils.stripTrailing(code));
 		rendered.add(entityFile);
 
 		if (repoFile != null) {
 			log.info("Generating: " + repoFile.getPath());
 			String repo = Expander.expand(entity, true);
-			Files.asCharSink(repoFile, Charsets.UTF_8).write(Utils.stripTrailing(repo) + "\n");
+			writeTo(repoFile, Utils.stripTrailing(repo) + "\n");
 			rendered.add(repoFile);
 		}
 
 		return rendered;
+	}
+
+	protected void writeTo(File output, String content) throws IOException {
+		String text = this.formatter.apply(content);
+		Files.asCharSink(output, Charsets.UTF_8).write(text);
 	}
 
 	protected void findFrom(File input) throws IOException {
