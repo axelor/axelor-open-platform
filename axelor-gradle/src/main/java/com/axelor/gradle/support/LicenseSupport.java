@@ -18,23 +18,27 @@
 package com.axelor.gradle.support;
 
 import java.io.File;
+import java.io.StringWriter;
 import java.util.Calendar;
+import java.util.Map;
 
+import org.gradle.api.GradleException;
 import org.gradle.api.Project;
-import org.gradle.api.file.ConfigurableFileTree;
-import org.gradle.api.logging.LogLevel;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.ExtraPropertiesExtension;
 
 import com.axelor.common.FileUtils;
-import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.tasks.GenerateCode;
 
+import groovy.text.SimpleTemplateEngine;
+import groovy.text.TemplateEngine;
 import nl.javadude.gradle.plugins.license.License;
 import nl.javadude.gradle.plugins.license.LicenseExtension;
 import nl.javadude.gradle.plugins.license.LicensePlugin;
 
 public class LicenseSupport extends AbstractSupport {
+
+	private String headerText;
 
 	private File findHeaderFile(Project project) {
 		final String[] paths = {
@@ -52,27 +56,42 @@ public class LicenseSupport extends AbstractSupport {
 		return project.file("src/license/header.txt");
 	}
 
-	@SuppressWarnings("deprecation")
+	private String getLicenseText(Project project, Map<String, Object> props) {
+		final File licenseFile = findHeaderFile(project);
+		final StringWriter writer = new StringWriter();
+		final TemplateEngine engine = new SimpleTemplateEngine();
+		try {
+			engine.createTemplate(licenseFile).make(props).writeTo(writer);
+		} catch (Exception e) {
+			throw new GradleException(e.getMessage(), e);
+		}
+		String text = writer.toString().replaceAll("\n", "\n * ").trim();
+		return "/*\n * " + text + "/\n";
+	}
+
 	@Override
 	public void apply(Project project) {
 		final File header = findHeaderFile(project);
 		project.getPlugins().apply(LicensePlugin.class);
-		
-		project.getTasks().create("licenseFormatGenerated", License.class, task -> {
-			final ConfigurableFileTree source = project.fileTree(GenerateCode.getJavaOutputDir(project));
-			source.include("**/*.java");
-			source.include("**/*.groovy");
-			if (AxelorPlugin.GRADLE_VERSION_3_X) {
-				task.setSource((Object) source);
-			}
-			task.getLogging().setLevel(LogLevel.QUIET);
-			task.onlyIf(spec -> header != null && header.exists());
-		});
-		
-		// format generated code with license header
-		project.getTasks().withType(GenerateCode.class).all(task -> task.finalizedBy("licenseFormatGenerated"));
 
 		final LicenseExtension license = project.getExtensions().getByType(LicenseExtension.class);
+		final ExtraPropertiesExtension ext = ((ExtensionAware) license).getExtensions().getExtraProperties();
+
+		ext.set("product", "Axelor Business Solutions");
+		ext.set("inception", "2005");
+		ext.set("year", Calendar.getInstance().get(Calendar.YEAR));
+		ext.set("owner", "Axelor");
+		ext.set("website", "http://axelor.com");
+
+		// format generated code with license header
+		project.getTasks().withType(GenerateCode.class).all(task -> {
+			task.setFormatter(text -> {
+				if (headerText == null) {
+					headerText = getLicenseText(project, ext.getProperties());
+				}
+				return headerText + text;
+			});
+		});
 
 		license.setHeader(header);
 		license.setIgnoreFailures(true);
@@ -100,14 +119,6 @@ public class LicenseSupport extends AbstractSupport {
 		license.exclude("**/webapp/lib/**");
 		license.exclude("**/webapp/WEB-INF/web.xml");
 
-		final ExtraPropertiesExtension ext = ((ExtensionAware) license).getExtensions().getExtraProperties();
-
-		ext.set("product", "Axelor Business Solutions");
-		ext.set("inception", "2005");
-		ext.set("year", Calendar.getInstance().get(Calendar.YEAR));
-		ext.set("owner", "Axelor");
-		ext.set("website", "http://axelor.com");
-		
 		final File webapp = FileUtils.getFile(project.getProjectDir(), "src", "main", "webapp");
 
 		project.afterEvaluate(p -> {
