@@ -17,73 +17,68 @@
  */
 package com.axelor.db;
 
+import com.axelor.db.annotations.Widget;
 import javax.persistence.GeneratedValue;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
-import com.axelor.db.annotations.Widget;
-
 /**
  * The base abstract model class to extend all domain objects.
- * 
- * The derived model classes should implement {@link #getId()} and
- * {@link #setId(Long)} using appropriate {@link GeneratedValue#strategy()}.
- * 
- * A generic implementation {@link JpaModel} should be used in most cases if
- * sequence of record ids are important.
- * 
+ *
+ * <p>The derived model classes should implement {@link #getId()} and {@link #setId(Long)} using
+ * appropriate {@link GeneratedValue#strategy()}.
+ *
+ * <p>A generic implementation {@link JpaModel} should be used in most cases if sequence of record
+ * ids are important.
  */
 @MappedSuperclass
 public abstract class Model {
 
-	@Version
-	private Integer version;
-	
-	// Represents the selected state of the record in the UI widgets
-	@Transient
-	private transient boolean selected;
+  @Version private Integer version;
 
-	@Widget(massUpdate = true)
-	private Boolean archived;
+  // Represents the selected state of the record in the UI widgets
+  @Transient private transient boolean selected;
 
-	public abstract Long getId();
+  @Widget(massUpdate = true)
+  private Boolean archived;
 
-	public abstract void setId(Long id);
-	
-	public Boolean getArchived() {
-		return archived;
-	}
-	
-	public void setArchived(Boolean archived) {
-		this.archived = archived;
-	}
+  public abstract Long getId();
 
-	public Integer getVersion() {
-		return version;
-	}
+  public abstract void setId(Long id);
 
-	public void setVersion(Integer version) {
-		this.version = version;
-	}
-	
-	/**
-	 * Set the selected state of the record. The UI widget will use this flag to
-	 * mark/unmark the selection state.
-	 * 
-	 * @param selected
-	 *            selected state flag
-	 */
-	public void setSelected(boolean selected) {
-		this.selected = selected;
-	}
+  public Boolean getArchived() {
+    return archived;
+  }
 
-	/**
-	 * Check whether the record is selected in the UI widget.
-	 * 
-	 * @return selection state
-	 */
-	public boolean isSelected() {
-		return selected;
-	}
+  public void setArchived(Boolean archived) {
+    this.archived = archived;
+  }
+
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
+
+  /**
+   * Set the selected state of the record. The UI widget will use this flag to mark/unmark the
+   * selection state.
+   *
+   * @param selected selected state flag
+   */
+  public void setSelected(boolean selected) {
+    this.selected = selected;
+  }
+
+  /**
+   * Check whether the record is selected in the UI widget.
+   *
+   * @return selection state
+   */
+  public boolean isSelected() {
+    return selected;
+  }
 }

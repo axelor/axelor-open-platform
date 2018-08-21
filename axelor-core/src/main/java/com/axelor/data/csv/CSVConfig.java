@@ -17,69 +17,67 @@
  */
 package com.axelor.data.csv;
 
-import java.io.File;
-import java.util.List;
-
 import com.axelor.common.VersionUtils;
 import com.axelor.data.adapter.DataAdapter;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import java.io.File;
+import java.util.List;
 
 @XStreamAlias("csv-inputs")
 public class CSVConfig {
 
-	public static final String NAMESPACE = "http://axelor.com/xml/ns/data-import";
+  public static final String NAMESPACE = "http://axelor.com/xml/ns/data-import";
 
-	public static final String VERSION = VersionUtils.getVersion().feature;
+  public static final String VERSION = VersionUtils.getVersion().feature;
 
-	@XStreamImplicit(itemFieldName = "input")
-	private List<CSVInput> inputs = Lists.newArrayList();
+  @XStreamImplicit(itemFieldName = "input")
+  private List<CSVInput> inputs = Lists.newArrayList();
 
-	@XStreamImplicit(itemFieldName = "adapter")
-	private List<DataAdapter> adapters = Lists.newArrayList();
+  @XStreamImplicit(itemFieldName = "adapter")
+  private List<DataAdapter> adapters = Lists.newArrayList();
 
-	/**
-	 * Get all {@link #inputs} nodes
-	 * 
-	 * @return the inputs
-	 */
-	public List<CSVInput> getInputs() {
-		return inputs;
-	}
+  /**
+   * Get all {@link #inputs} nodes
+   *
+   * @return the inputs
+   */
+  public List<CSVInput> getInputs() {
+    return inputs;
+  }
 
-	/**
-	 * Set {@link #inputs} nodes
-	 * 
-	 * @param inputs the inputs
-	 */
-	public void setInputs(List<CSVInput> inputs) {
-		this.inputs = inputs;
-	}
+  /**
+   * Set {@link #inputs} nodes
+   *
+   * @param inputs the inputs
+   */
+  public void setInputs(List<CSVInput> inputs) {
+    this.inputs = inputs;
+  }
 
-	/**
-	 * Get all {@link #adapters} nodes.
-	 * 
-	 * @return list of all adapters
-	 */
-	public List<DataAdapter> getAdapters() {
-		if (adapters == null) {
-			adapters = Lists.newArrayList();
-		}
-		return adapters;
-	}
+  /**
+   * Get all {@link #adapters} nodes.
+   *
+   * @return list of all adapters
+   */
+  public List<DataAdapter> getAdapters() {
+    if (adapters == null) {
+      adapters = Lists.newArrayList();
+    }
+    return adapters;
+  }
 
-	/**
-	 * Parse the <code>input</code> File
-	 * 
-	 * @param input
-	 *            the input file
-	 * @return an instance of {@link CSVConfig} for the given file
-	 */
-	public static CSVConfig parse(File input) {
-		XStream stream = new XStream();
-		stream.processAnnotations(CSVConfig.class);
-		return (CSVConfig) stream.fromXML(input);
-	}
+  /**
+   * Parse the <code>input</code> File
+   *
+   * @param input the input file
+   * @return an instance of {@link CSVConfig} for the given file
+   */
+  public static CSVConfig parse(File input) {
+    XStream stream = new XStream();
+    stream.processAnnotations(CSVConfig.class);
+    return (CSVConfig) stream.fromXML(input);
+  }
 }

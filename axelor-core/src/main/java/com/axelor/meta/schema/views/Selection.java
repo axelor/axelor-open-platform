@@ -17,9 +17,11 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.axelor.i18n.I18n;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.bind.annotation.XmlAnyAttribute;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -28,128 +30,116 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 import javax.xml.namespace.QName;
 
-import com.axelor.i18n.I18n;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @XmlType
 public class Selection {
 
-	@XmlAttribute
-	private String name;
-	
-	@XmlAttribute(name = "id")
-	private String xmlId;
+  @XmlAttribute private String name;
 
-	@XmlElement(name = "option", required = true)
-	private List<Selection.Option> options;
+  @XmlAttribute(name = "id")
+  private String xmlId;
 
-	public String getName() {
-		return name;
-	}
+  @XmlElement(name = "option", required = true)
+  private List<Selection.Option> options;
 
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public String getXmlId() {
-		return xmlId;
-	}
-	
-	public void setXmlId(String xmlId) {
-		this.xmlId = xmlId;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public List<Selection.Option> getOptions() {
-		return options;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public void setOptions(List<Selection.Option> options) {
-		this.options = options;
-	}
+  public String getXmlId() {
+    return xmlId;
+  }
 
-	@XmlType
-	public static class Option {
+  public void setXmlId(String xmlId) {
+    this.xmlId = xmlId;
+  }
 
-		@XmlAttribute(required = true)
-		private String value;
+  public List<Selection.Option> getOptions() {
+    return options;
+  }
 
-		@XmlValue
-		private String title;
+  public void setOptions(List<Selection.Option> options) {
+    this.options = options;
+  }
 
-		@XmlAttribute
-		private String icon;
+  @XmlType
+  public static class Option {
 
-		@XmlAttribute
-		private Integer order;
+    @XmlAttribute(required = true)
+    private String value;
 
-		@XmlAttribute
-		private Boolean hidden;
+    @XmlValue private String title;
 
-		@JsonIgnore
-		@XmlAnyAttribute
-		private Map<QName, String> dataAttributes;
+    @XmlAttribute private String icon;
 
-		@XmlTransient
-		private Map<String, Object> data;
+    @XmlAttribute private Integer order;
 
-		public String getValue() {
-			return value;
-		}
+    @XmlAttribute private Boolean hidden;
 
-		public void setValue(String value) {
-			this.value = value;
-		}
+    @JsonIgnore @XmlAnyAttribute private Map<QName, String> dataAttributes;
 
-		@JsonGetter("title")
-		public String getLocalizedTitle(){
-			return I18n.get(title);
-		}
+    @XmlTransient private Map<String, Object> data;
 
-		@JsonIgnore
-		public String getTitle() {
-			return title;
-		}
+    public String getValue() {
+      return value;
+    }
 
-		public void setTitle(String title) {
-			this.title = title;
-		}
+    public void setValue(String value) {
+      this.value = value;
+    }
 
-		public String getIcon() {
-			return icon;
-		}
+    @JsonGetter("title")
+    public String getLocalizedTitle() {
+      return I18n.get(title);
+    }
 
-		public void setIcon(String icon) {
-			this.icon = icon;
-		}
+    @JsonIgnore
+    public String getTitle() {
+      return title;
+    }
 
-		public Integer getOrder() {
-			return order;
-		}
+    public void setTitle(String title) {
+      this.title = title;
+    }
 
-		public void setOrder(Integer order) {
-			this.order = order;
-		}
+    public String getIcon() {
+      return icon;
+    }
 
-		public Boolean getHidden() {
-			return hidden;
-		}
+    public void setIcon(String icon) {
+      this.icon = icon;
+    }
 
-		public void setHidden(Boolean hidden) {
-			this.hidden = hidden;
-		}
+    public Integer getOrder() {
+      return order;
+    }
 
-		public Map<QName, String> getDataAttributes() {
-			return dataAttributes;
-		}
+    public void setOrder(Integer order) {
+      this.order = order;
+    }
 
-		@JsonGetter
-		public Map<String, Object> getData() {
-			return data;
-		}
+    public Boolean getHidden() {
+      return hidden;
+    }
 
-		public void setData(Map<String, Object> data) {
-			this.data = data;
-		}
-	}
+    public void setHidden(Boolean hidden) {
+      this.hidden = hidden;
+    }
+
+    public Map<QName, String> getDataAttributes() {
+      return dataAttributes;
+    }
+
+    @JsonGetter
+    public Map<String, Object> getData() {
+      return data;
+    }
+
+    public void setData(Map<String, Object> data) {
+      this.data = data;
+    }
+  }
 }

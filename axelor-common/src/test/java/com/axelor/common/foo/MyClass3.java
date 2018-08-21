@@ -19,6 +19,4 @@ package com.axelor.common.foo;
 
 import com.axelor.common.bar.MyBase;
 
-public abstract class MyClass3 extends MyBase {
-
-}
+public abstract class MyClass3 extends MyBase {}

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 html, body {
-	overflow: inherit;
+  overflow: inherit;
 }
 
 #container,
@@ -29,222 +29,222 @@ html, body {
 .view-pane > .view-container,
 .view-pane > .view-container .form-view > div:last-child,
 .view-pane > .view-container > div:not(.slick-editor-dropdown) {
-	position: inherit !important;
+  position: inherit !important;
 }
 
 abbr[title]:after,
 a[href]:after, .ir a:after,
 a[href^="javascript:"]:after,
 a[href^="#"]:after {
-	content: "";
+  content: "";
 }
 
 .popover, .dropdown-menu,
 .ui-menu, .filter-menu {
-	display: none !important;
+  display: none !important;
 }
 
 .ui-dialog {
-	position: relative !important;
-	top: 48px !important;
-	left: inherit !important;
-	margin: auto !important;
-	background-color: white !important;
+  position: relative !important;
+  top: 48px !important;
+  left: inherit !important;
+  margin: auto !important;
+  background-color: white !important;
 }
 
 header .navbar-inner {
-	border-color: #d4d4d4 !important;
+  border-color: #d4d4d4 !important;
 }
 
 #container {
-	top: 16px;
+  top: 16px;
 }
 
 .view-content,
 .view-container .portal-view,
 .view-container .form-view > div:last-child {
-	top: 16px !important;
+  top: 16px !important;
 }
 
 .view-print-header,
 .view-print-header h3 {
-	text-align: center;
-	font-size: 17px !important;
+  text-align: center;
+  font-size: 17px !important;
 }
 
 .splitter-container .sidebar.splitter-panel,
 .splitter-container .splitter-vertical {
-	display: none;
+  display: none;
 }
 
 .splitter-container .splitter-panel {
-	width: 0;
+  width: 0;
 }
 
 .splitter-container .splitter-panel.view-tabs {
-	width: 100% !important;
-	left: 0 !important;
+  width: 100% !important;
+  left: 0 !important;
 }
 
 .nav-menu-bar {
-	display: none !important;
+  display: none !important;
 }
 
 .nav.nav-shortcuts {
-	display: none;
+  display: none;
 }
 
 .navigation-tabs .axelor-logo {
-	top: -16px !important;
-	border: none;
+  top: -16px !important;
+  border: none;
 }
 
 .navigation-tabs > .nav-tabs-wrap,
 .navigation-tabs .record-toolbar {
-	display: none;	
+  display: none;
 }
 
 .nav-tabs {
-	border: none;
-	display: none !important;
+  border: none;
+  display: none !important;
 }
 
 .bar-wrap {
-	border: none !important;
-	box-shadow: none !important;
-	padding: 0 !important;
-	margin-bottom: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .form-item .tabbable-tab,
 .form-item .tab-content {
-	border: none !important;
-	margin: 0 !important;
-	padding: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .form-item .nav-tabs-wrap {
-	display: none;
+  display: none;
 }
 
 .panel,
 .panel-header,
 .panel-body {
-	border: none !important;
-	margin: 0 !important;
-	padding: 6px 0 !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 6px 0 !important;
 }
 
 .panel-body {
-	min-height: auto !important;
+  min-height: auto !important;
 }
 
 .panel, .panel-tabs, .panel-stack, .bar-layout .dashboard {
-	margin-bottom: 0 !important;	
+  margin-bottom: 0 !important;
 }
 
 .panel-tabs .tab-content > .panel {
-	padding: 0 !important;
+  padding: 0 !important;
 }
 
 .panel-tabs .tab-content > .panel > .panel-body {
-	padding: 0 !important;
+  padding: 0 !important;
 }
 
 .panel-header .icons-bar {
-	display: none !important;
+  display: none !important;
 }
 
 .dashlet-buttons {
-	display: none;
+  display: none;
 }
 
 .report-box .report-tags {
-	right: 0;
+  right: 0;
 }
 
 .dashlet.chart,
 .chart-container {
-	page-break-inside: avoid;
+  page-break-inside: avoid;
 }
 
 .nvtooltip {
-	display: none !important;
+  display: none !important;
 }
 
 .dashboard .dashlet {
-	border: none !important;
+  border: none !important;
 }
 
 .dashboard .dashlet-header {
-	border-top: none;
-	padding: 10px 0 !important;
+  border-top: none;
+  padding: 10px 0 !important;
 }
 
 .dashlet.grid .dashlet-body {
-	height: auto !important;
-	overflow: inherit !important;
-	position: relative !important;
+  height: auto !important;
+  overflow: inherit !important;
+  position: relative !important;
 }
 
 .form-item-group > legend > i,
 .form-item-group > legend > i:before {
-	display: none !important;
+  display: none !important;
 }
 
 .form-item-group > legend > span {
-	background: initial !important;
-	background-color: white !important;
+  background: initial !important;
+  background-color: white !important;
 }
 
 .btn {
-	display: none;
+  display: none;
 }
 
 .picker-input > .picker-icons {
-	display: none !important;
+  display: none !important;
 }
 
 input,
 select,
 textarea,
 .tag-select {
-	border: none !important;
-	box-shadow: none !important;
-	transition: inherit;
+  border: none !important;
+  box-shadow: none !important;
+  transition: inherit;
 }
 
 .dms-folder-tree {
-	display: none !important;
+  display: none !important;
 }
 
 .dms-file-list > .slickgrid {
-	left: 0 !important;
-	border: none !important;
+  left: 0 !important;
+  border: none !important;
 }
 
 .grid-view,
 form[ui-form] {
-	overflow: hidden;
+  overflow: hidden;
 }
 
 .cards-view, .kanban-view {
-	top: 0;
-	position: relative !important;
-	overflow: inherit !important;
+  top: 0;
+  position: relative !important;
+  overflow: inherit !important;
 }
 
 .kanban-column {
-	border: none !important;
-	margin-bottom: 0 !important;	
+  border: none !important;
+  margin-bottom: 0 !important;
 }
 
 .kanban-column .input-group {
-	display: none !important;
+  display: none !important;
 }
 
 .kanban-column ul.kanban-card-list {
-	padding: 0 !important;
+  padding: 0 !important;
 }
 
 .dashlet-body .slickgrid,
@@ -253,166 +253,166 @@ form[ui-form] {
 .panel-body .slickgrid .slick-viewport,
 .grid-view > .slickgrid,
 .grid-view > .slickgrid .slick-viewport {
-	overflow: inherit !important;
-	position: relative !important;
+  overflow: inherit !important;
+  position: relative !important;
 }
 
 .dashlet-body .slickgrid .slick-viewport,
 .panel-body .slickgrid .slick-viewport,
 .grid-view > .slickgrid .slick-viewport {
-	height: auto !important;
+  height: auto !important;
 }
 
 .grid-view > .slickgrid {
-	top: 0;
+  top: 0;
 }
 
 .slickgrid,
 .slickgrid .slick-header-column {
-	border: 0 !important;
+  border: 0 !important;
 }
 
 .slick-row, .slick-cell {
-	border-bottom-style: none !important;
+  border-bottom-style: none !important;
 }
 
 .slick-headerrow {
-	display: none !important;
+  display: none !important;
 }
 
 .stackbar > .navbar .icons-bar {
-	display: none !important;
+  display: none !important;
 }
 
 .slick-row .slick-cell.edit-icon,
 .slick-row .slick-cell.move-icon {
-	display: none;
+  display: none;
 }
 
 .portlet .divider-vertical {
-	width: 0 !important;
-	border: none !important;
+  width: 0 !important;
+  border: none !important;
 }
 
 .nav-select .nav-step:not(.active) {
-	display: none !important;
+  display: none !important;
 }
 
 .nav-select .nav-step.active a {
-	padding: 0 !important;
+  padding: 0 !important;
 }
 
 .nav-select .nav-step.active a:after {
-	display: none !important;
+  display: none !important;
 }
 
 .mail-followers {
-	margin-left: 16px !important;
+  margin-left: 16px !important;
 }
 
 .mail-followers .fa {
-	display: none !important;
+  display: none !important;
 }
 
 .mail-messages {
-	margin: 0 !important;
-	padding: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .mail-composer {
-	display: none;
+  display: none;
 }
 
 .mail-thread {
-	margin-top: 0 !important;
+  margin-top: 0 !important;
 }
 
 .mail-thread .avatar {
-	background-color: #ddd !important;
+  background-color: #ddd !important;
 }
 
 .mail-thread .mail-message > .arrow {
-	background-color: #fff !important;
+  background-color: #fff !important;
 }
 
 .mail-message-icons {
-	display: none !important;
+  display: none !important;
 }
 
 .mail-thread-more {
-	display: none !important;
+  display: none !important;
 }
 
 [ui-view-form] > form:not(.mail-thread-view) .mail-messages,
 [ui-view-form] > form:not(.mail-thread-view) .mail-followers {
-	display: none !important;
+  display: none !important;
 }
 
 .ibox .box:before,
 .iswitch .box:before {
-	margin: 0 !important;
-	padding: 0 !important;
-	box-shadow: none;
-	border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-shadow: none;
+  border: none !important;
 }
 
 .ibox .box:after,
 .iswitch .box:after {
-	margin: 0 !important;
-	padding: 0 !important;
-	box-shadow: none;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-shadow: none;
 }
 
 .ibox .box:before,
 .iswitch .box:after {
-	content: "\f00d" !important;
-	font-family: FontAwesome;
-	transform: none;
+  content: "\f00d" !important;
+  font-family: FontAwesome;
+  transform: none;
 }
 
 .ibox input:checked + .box:before,
 .ibox input:checked + .box:before {
-	border: none !important;
-	background-color: #fff !important;
+  border: none !important;
+  background-color: #fff !important;
 }
 
 .iswitch input:checked + .box:after {
-	transform: none;
-	width: auto;
-	top: 0;
-	left: 0;
+  transform: none;
+  width: auto;
+  top: 0;
+  left: 0;
 }
 
 .iswitch input:checked + .box:after {
-	content: "\f00c";
-	font-family: FontAwesome;
+  content: "\f00c";
+  font-family: FontAwesome;
 }
 
 .ibox input:checked + .box:after {
-	display: none;
+  display: none;
 }
 
 /** responsive */
 
 header {
-	display: none;
+  display: none;
 }
 
 #sidebar {
-	display: none;
+  display: none;
 }
 
 #view-tabs {
-	left: 0;
+  left: 0;
 }
 
 #container,
 .view-content,
 .view-container .form-view > div:last-child,
 .navigation-tabs {
-	top: 0 !important;
+  top: 0 !important;
 }
 
 .panel-header .menu-bar {
-	display: none;
+  display: none;
 }

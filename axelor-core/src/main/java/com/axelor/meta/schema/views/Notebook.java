@@ -17,33 +17,29 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
-
-import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("notebook")
 public class Notebook extends AbstractContainer {
 
-	@XmlElements({
-		@XmlElement(name = "page", type = Page.class, required = true)
-	})
-	private List<Page> pages;
-	
-	public List<Page> getPages() {
-		if(pages != null) {
-			for (Page page : pages) {
-				page.setModel(super.getModel());
-			}
-		}
-		return pages;
-	}
-	
-	public void setPages(List<Page> pages) {
-		this.pages = pages;
-	}
+  @XmlElements({@XmlElement(name = "page", type = Page.class, required = true)})
+  private List<Page> pages;
+
+  public List<Page> getPages() {
+    if (pages != null) {
+      for (Page page : pages) {
+        page.setModel(super.getModel());
+      }
+    }
+    return pages;
+  }
+
+  public void setPages(List<Page> pages) {
+    this.pages = pages;
+  }
 }

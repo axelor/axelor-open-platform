@@ -19,7 +19,6 @@ package com.axelor.report;
 
 import javax.inject.Provider;
 import javax.inject.Singleton;
-
 import org.eclipse.birt.report.engine.api.EngineConfig;
 import org.eclipse.birt.report.engine.api.IReportEngine;
 import org.eclipse.birt.report.engine.api.ReportEngine;
@@ -27,19 +26,19 @@ import org.eclipse.birt.report.engine.api.ReportEngine;
 @Singleton
 public class ReportEngineProvider implements Provider<IReportEngine> {
 
-	private IReportEngine engine;
+  private IReportEngine engine;
 
-	private IReportEngine init() {
-		final EngineConfig config = new EngineConfig();
-		config.setResourceLocator(new ReportResourceLocator());
-		return new ReportEngine(config);
-	}
+  private IReportEngine init() {
+    final EngineConfig config = new EngineConfig();
+    config.setResourceLocator(new ReportResourceLocator());
+    return new ReportEngine(config);
+  }
 
-	@Override
-	public IReportEngine get() {
-		if (engine == null) {
-			engine = init();
-		}
-		return engine;
-	}
+  @Override
+  public IReportEngine get() {
+    if (engine == null) {
+      engine = init();
+    }
+    return engine;
+  }
 }

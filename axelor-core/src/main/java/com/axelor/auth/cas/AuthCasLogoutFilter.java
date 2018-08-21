@@ -19,14 +19,13 @@ package com.axelor.auth.cas;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.apache.shiro.web.filter.authc.LogoutFilter;
 
 public class AuthCasLogoutFilter extends LogoutFilter {
 
-	@Inject
-	@Override
-	public void setRedirectUrl(@Named("shiro.cas.logout.url") String redirectUrl) {
-		super.setRedirectUrl(redirectUrl);
-	}
+  @Inject
+  @Override
+  public void setRedirectUrl(@Named("shiro.cas.logout.url") String redirectUrl) {
+    super.setRedirectUrl(redirectUrl);
+  }
 }

@@ -17,6 +17,8 @@
  */
 package com.axelor.i18n;
 
+import com.axelor.app.AppSettings;
+import com.axelor.app.internal.AppFilter;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,121 +26,109 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-import com.axelor.app.AppSettings;
-import com.axelor.app.internal.AppFilter;
-
-/**
- * This class provider methods for localization (L10n) services.
- *
- */
+/** This class provider methods for localization (L10n) services. */
 public final class L10n {
 
-	private static final String DEFAULT_DATE_FORMAT = "yyy-MM-dd";
-	private static final String DEFAULT_TIME_FORMAT = "HH:mm";
+  private static final String DEFAULT_DATE_FORMAT = "yyy-MM-dd";
+  private static final String DEFAULT_TIME_FORMAT = "HH:mm";
 
-	private static final String DATE_FORMAT = AppSettings.get().get("date.format", DEFAULT_DATE_FORMAT);
-	private static final String TIME_FORMAT = DEFAULT_TIME_FORMAT;
-	private static final String DATE_TIME_FORMAT = DATE_FORMAT + " " + TIME_FORMAT;
+  private static final String DATE_FORMAT =
+      AppSettings.get().get("date.format", DEFAULT_DATE_FORMAT);
+  private static final String TIME_FORMAT = DEFAULT_TIME_FORMAT;
+  private static final String DATE_TIME_FORMAT = DATE_FORMAT + " " + TIME_FORMAT;
 
-	private Locale locale;
+  private Locale locale;
 
-	private L10n(Locale locale) {
-		this.locale = locale;
-	}
+  private L10n(Locale locale) {
+    this.locale = locale;
+  }
 
-	/**
-	 * Get instance of {@link L10n} using contextual locale.
-	 *
-	 * @return {@link L10n} instance for the context
-	 */
-	public static L10n getInstance() {
-		final Locale locale = AppFilter.getLocale();
-		return new L10n(locale);
-	}
+  /**
+   * Get instance of {@link L10n} using contextual locale.
+   *
+   * @return {@link L10n} instance for the context
+   */
+  public static L10n getInstance() {
+    final Locale locale = AppFilter.getLocale();
+    return new L10n(locale);
+  }
 
-	/**
-	 * Get instance of {@link L10n} for the given locale.
-	 *
-	 * @param locale
-	 *            the locale instance
-	 * @return {@link L10n} instance for the given locale
-	 */
-	public static L10n getInstance(Locale locale) {
-		return new L10n(locale);
-	}
+  /**
+   * Get instance of {@link L10n} for the given locale.
+   *
+   * @param locale the locale instance
+   * @return {@link L10n} instance for the given locale
+   */
+  public static L10n getInstance(Locale locale) {
+    return new L10n(locale);
+  }
 
-	/**
-	 * Format the number value.
-	 *
-	 * @param value
-	 *            the value to format
-	 * @return value as formated string
-	 */
-	public String format(Number value) {
-		if (value == null) {
-			return null;
-		}
-		final NumberFormat fmt = NumberFormat.getInstance(locale);
-		return fmt.format(value);
-	}
+  /**
+   * Format the number value.
+   *
+   * @param value the value to format
+   * @return value as formated string
+   */
+  public String format(Number value) {
+    if (value == null) {
+      return null;
+    }
+    final NumberFormat fmt = NumberFormat.getInstance(locale);
+    return fmt.format(value);
+  }
 
-	/**
-	 * Format the number value.
-	 *
-	 * @param value
-	 *            the value to format
-	 * @param grouping
-	 *            whether to use grouping in format
-	 * @return value as formated string
-	 */
-	public String format(Number value, boolean grouping) {
-		if (value == null) {
-			return null;
-		}
-		final NumberFormat fmt = NumberFormat.getInstance(locale);
-		fmt.setGroupingUsed(grouping);
-		return fmt.format(value);
-	}
+  /**
+   * Format the number value.
+   *
+   * @param value the value to format
+   * @param grouping whether to use grouping in format
+   * @return value as formated string
+   */
+  public String format(Number value, boolean grouping) {
+    if (value == null) {
+      return null;
+    }
+    final NumberFormat fmt = NumberFormat.getInstance(locale);
+    fmt.setGroupingUsed(grouping);
+    return fmt.format(value);
+  }
 
-	/**
-	 * Format the date value.
-	 *
-	 * @param value
-	 *            the value to format
-	 * @return value as formated string
-	 */
-	public String format(LocalDate value) {
-		if (value == null) {
-			return null;
-		}
-		return DateTimeFormatter.ofPattern(DATE_FORMAT).format(value);
-	}
+  /**
+   * Format the date value.
+   *
+   * @param value the value to format
+   * @return value as formated string
+   */
+  public String format(LocalDate value) {
+    if (value == null) {
+      return null;
+    }
+    return DateTimeFormatter.ofPattern(DATE_FORMAT).format(value);
+  }
 
-	/**
-	 * Format the date time value.
-	 *
-	 * @param value
-	 *            the value to format
-	 * @return value as formated string
-	 */
-	public String format(LocalDateTime value) {
-		if (value == null) {
-			return null;
-		}
-		return DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).format(value);
-	}
+  /**
+   * Format the date time value.
+   *
+   * @param value the value to format
+   * @return value as formated string
+   */
+  public String format(LocalDateTime value) {
+    if (value == null) {
+      return null;
+    }
+    return DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).format(value);
+  }
 
-	/**
-	 * Format the date time value.
-	 *
-	 * @param value
-	 *            the value to format
-	 * @return value as formated string
-	 */
-	public String format(ZonedDateTime value) {
-		if (value == null) {
-			return null;
-		}
-		return DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).format(value);
-	}
+  /**
+   * Format the date time value.
+   *
+   * @param value the value to format
+   * @return value as formated string
+   */
+  public String format(ZonedDateTime value) {
+    if (value == null) {
+      return null;
+    }
+    return DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).format(value);
+  }
 }

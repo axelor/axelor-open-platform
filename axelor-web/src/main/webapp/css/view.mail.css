@@ -18,49 +18,49 @@
 /* thread view */
 
 .mail-thread-view {
-	max-width: 720px;
-	margin: 0 4px 0 !important;
-	padding: 0;
+  max-width: 720px;
+  margin: 0 4px 0 !important;
+  padding: 0;
 }
 
 .mail-thread-view .panel {
-	border: none;
-	box-shadow: none;
-	background-color: transparent;
+  border: none;
+  box-shadow: none;
+  background-color: transparent;
 }
 
 /* form widgets */
 
 .mail-thread {
-	margin-top: 16px;
-	margin-left: 20px;
-	border-left: 2px solid #ddd;
+  margin-top: 16px;
+  margin-left: 20px;
+  border-left: 2px solid #ddd;
 }
 
 .mail-composer {
-	margin: -16px 0 20px 30px;
+  margin: -16px 0 20px 30px;
 }
 
 .mail-composer textarea {
-	max-width: 100%;
-	margin-bottom: 0;
+  max-width: 100%;
+  margin-bottom: 0;
 }
 
 .mail-composer .btn {
-	margin-right: 8px;
+  margin-right: 8px;
 }
 
 .mail-composer-buttons {
-	padding-top: 8px;
+  padding-top: 8px;
 }
 
 .mail-composer-files {
-	padding-top: 8px;
+  padding-top: 8px;
 }
 
 .mail-composer-files ul {
-	margin: 0;
-	list-style: none;
+  margin: 0;
+  list-style: none;
 }
 
 .mail-editor .mail-files {
@@ -68,20 +68,20 @@
 }
 
 .mail-files i {
-	margin-right: 4px;
+  margin-right: 4px;
 }
 .mail-files i.fa-close {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .mail-thread .avatar {
-	position: relative;
-	display: inline-block;
-	width:  40px;
-	height: 40px;
-	margin-left: -21px;
-	border-radius: 500px;
-	line-height: 40px;
+  position: relative;
+  display: inline-block;
+  width:  40px;
+  height: 40px;
+  margin-left: -21px;
+  border-radius: 500px;
+  line-height: 40px;
     text-align: center;
     font-size: 20px;
     font-weight: 600;
@@ -101,83 +101,83 @@
 }
 
 .mail-thread .avatar img {
-	width:  100%;
-	height: 100%;
-	border-radius: 500px;
+  width:  100%;
+  height: 100%;
+  border-radius: 500px;
 }
 
 .mail-thread .mail-message-indent {
-	padding-left: 40px;
+  padding-left: 40px;
 }
 
 .mail-thread .mail-message {
-	position: relative;
-	border-radius: 0;
-	margin-left: 30px;
-	margin-bottom: 20px;
-	border: 1px solid #ddd;
-	border-radius: 2px;
-	background-color: #fff;
-	box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+  position: relative;
+  border-radius: 0;
+  margin-left: 30px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  background-color: #fff;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.05);
 }
 
 .mail-thread .mail-message > .arrow {
-	position: absolute;
-	display: inline-block;
-	width: 11px;
-	height: 11px;
-	border: 1px solid #ddd;
-	left: -7px;
-	top: 12px;
-	background-color: #fff;
-	border-right: 0;
-	border-bottom: 0;
-	-webkit-transform: rotate(-45deg);
-	   -moz-transform: rotate(-45deg);
-	    -ms-transform: rotate(-45deg);
-	        transform: rotate(-45deg);
+  position: absolute;
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border: 1px solid #ddd;
+  left: -7px;
+  top: 12px;
+  background-color: #fff;
+  border-right: 0;
+  border-bottom: 0;
+  -webkit-transform: rotate(-45deg);
+     -moz-transform: rotate(-45deg);
+      -ms-transform: rotate(-45deg);
+          transform: rotate(-45deg);
 }
 
 .mail-thread .mail-message > .star {
-	position: absolute;
-	color: #d9534f;
-	left: 8px;
+  position: absolute;
+  color: #d9534f;
+  left: 8px;
 }
 
 .mail-thread .mail-message > .star i {
-	font-size: 8px;
+  font-size: 8px;
 }
 
 .mail-thread .mail-message-icons {
-	float: right;
-	margin: 10px;
+  float: right;
+  margin: 10px;
 }
 
 .mail-thread .mail-message-icons i {
-	cursor: pointer;
-	margin-left: 4px;
-	color: #0088cc;
+  cursor: pointer;
+  margin-left: 4px;
+  color: #0088cc;
 }
 
 .mail-thread .mail-message-icons .btn {
-	padding: 0;
-	margin-top: -4px;
-	outline: none !important;
-	border: 0 !important;
-	box-shadow: none !important;
+  padding: 0;
+  margin-top: -4px;
+  outline: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
 }
 
 .mail-thread .mail-message-icons .btn i {
-	margin: 0;
-	padding: 4px;
+  margin: 0;
+  padding: 4px;
 }
 
 .mail-thread .mail-message-body {
-	padding: 8px 16px;
+  padding: 8px 16px;
 }
 
 .mail-thread .mail-message-footer {
-	font-size: smaller;
+  font-size: smaller;
 }
 
 .mail-thread .mail-message-footer a {
@@ -185,106 +185,106 @@
 }
 
 .mail-thread .mail-message-files {
-	margin: 4px 0 4px -4px;
+  margin: 4px 0 4px -4px;
 }
 
 .mail-thread .mail-message-files ul {
-	margin:  0;
+  margin:  0;
 }
 
 .mail-thread-more {
-	border-bottom: 1px dashed #ddd;
-	text-align: center;
-	margin-top: -15px;
-	margin-left: -2px;
-	border-left: 2px solid #fff;
+  border-bottom: 1px dashed #ddd;
+  text-align: center;
+  margin-top: -15px;
+  margin-left: -2px;
+  border-left: 2px solid #fff;
 }
 
 .mail-thread-more .btn-load-more:hover {
-	background-color: #eaf2f8 !important;
-	color: #537c9f;
+  background-color: #eaf2f8 !important;
+  color: #537c9f;
 }
 
 .mail-thread-more .btn-load-more {
-	position: relative;
-	top: 10px;
-	padding: 0 4px;
-	outline: none;
+  position: relative;
+  top: 10px;
+  padding: 0 4px;
+  outline: none;
     border-color: #8aafce;
-	border-radius: 4px !important;
-	border-bottom-width: 2px;
-	color: #537c9f;
+  border-radius: 4px !important;
+  border-bottom-width: 2px;
+  color: #537c9f;
 }
 
 .mail-thread-view .mail-thread-more {
-	border-left: 2px solid #f3f3f4;
+  border-left: 2px solid #f3f3f4;
 }
 
 .mail-messages > div > .mail-composer:first-child {
-	margin: 0 0 20px 0;
+  margin: 0 0 20px 0;
 }
 
 .mail-followers .panel-title > span {
-	width: calc(100% - 40px);
+  width: calc(100% - 40px);
     display: inline-block;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .mail-followers .panel-icons i {
-	margin-left: 8px;
-	cursor: pointer;
+  margin-left: 8px;
+  cursor: pointer;
 }
 
 .mail-followers .links {
-	list-style: none;
-	margin: 0;
+  list-style: none;
+  margin: 0;
 }
 
 .mail-followers .links li {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .mail-followers .links i.fa-remove {
-	cursor: pointer;
-	margin-top: 3px;
-	margin-right: 4px;
+  cursor: pointer;
+  margin-top: 3px;
+  margin-right: 4px;
 }
 
 .mail-message i.fa:hover,
 .mail-followers i.fa:hover {
-	color: black;
+  color: black;
 }
 
 .mail-message .mail-message-header {
-	font-weight: 600;
-	padding: 10px 16px;
-	border-bottom: 1px solid #ddd;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-bottom: 1px solid #ddd;
 }
 
 .mail-message .mail-message-header .track-tags:before {
-	content: ' : ';
+  content: ' : ';
 }
 
 .mail-message .track-message {
-	font-weight: 600;
+  font-weight: 600;
 }
 
 .mail-message .track-content {
-	margin-bottom: 8px;
+  margin-bottom: 8px;
 }
 
 .mail-message .track-fields {
-	margin: 0 0 4px 26px;
+  margin: 0 0 4px 26px;
 }
 
 .mail-message .track-tags {
 }
 
 .mail-message .track-tags .label {
-	margin-right: 2px;
+  margin-right: 2px;
 }
 
 .mail-message-body a.show-full {
@@ -306,18 +306,18 @@
 }
 
 .form-mail .fade {
-	opacity: 0.1;
+  opacity: 0.1;
 }
 
 .form-mail .fadeIn {
-	opacity: 1;
-	-webkit-transition: all linear 0.5s;
-			transition: all linear 0.5s;
+  opacity: 1;
+  -webkit-transition: all linear 0.5s;
+      transition: all linear 0.5s;
 }
 
 .form-mail .fadeDim .fade,
 .form-mail .fadeDim .mail-thread-more {
-	display: none;
+  display: none;
 }
 
 /** special views */
@@ -328,8 +328,8 @@
 }
 
 .mail-group-form {
-	padding-left: 20px;
-	padding-right: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .mail-group-form {
@@ -337,56 +337,56 @@
 }
 
 .grid-cards {
-	padding: 12px;
+  padding: 12px;
 }
 
 .grid-cards .grid-card {
-	padding: 6px;
-	margin: 4px;
-	border: 1px solid #c0c0c0;
-	border-radius: 0;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
-	width: calc(25% - 22px);
-	min-width: 300px;
+  padding: 6px;
+  margin: 4px;
+  border: 1px solid #c0c0c0;
+  border-radius: 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  width: calc(25% - 22px);
+  min-width: 300px;
 }
 
 @media (max-width: 768px) {
-	.grid-cards .grid-card {
-		width: calc(50% - 22px);
-	}
+  .grid-cards .grid-card {
+    width: calc(50% - 22px);
+  }
 }
 
 @media (max-width: 480px) {
-	.grid-cards .grid-card {
-		width: calc(100% - 22px);
-	}
+  .grid-cards .grid-card {
+    width: calc(100% - 22px);
+  }
 }
 
 .grid-cards .grid-card,
 .grid-cards .grid-card-left,
 .grid-cards .grid-card-right {
-	position: relative;
-	display: inline-block;
-	vertical-align: top;
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
 }
 
 .grid-cards .grid-card-left {
-	overflow: hidden;
-	border-collapse: separate;
+  overflow: hidden;
+  border-collapse: separate;
 }
 
 .grid-cards .grid-card-left img {
-	width: 64px;
-	min-height: 64px;
-	padding: 2px;
+  width: 64px;
+  min-height: 64px;
+  padding: 2px;
 }
 
 .grid-cards .grid-card-right {
-	width: calc(100% - 86px);
-	min-height: 120px;
-	margin-left: 4px;
+  width: calc(100% - 86px);
+  min-height: 120px;
+  margin-left: 4px;
 }
 
 .grid-cards .grid-card-right .buttons {
-	margin-top: 4px;
+  margin-top: 4px;
 }

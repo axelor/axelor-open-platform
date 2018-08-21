@@ -21,15 +21,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.InputStream;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.persistence.Query;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.axelor.common.ResourceUtils;
 import com.axelor.meta.MetaTest;
 import com.axelor.meta.schema.ObjectViews;
@@ -41,98 +32,102 @@ import com.axelor.script.ScriptHelper;
 import com.axelor.test.db.Title;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
+import java.io.InputStream;
+import java.util.Map;
+import javax.inject.Inject;
+import javax.persistence.Query;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestViews extends MetaTest {
-	
-	@Inject
-	private ViewLoader loader;
 
-	@Test
-	public void test1() throws Exception {
-		ObjectViews views = this.unmarshal("com/axelor/meta/Contact.xml", ObjectViews.class);
+  @Inject private ViewLoader loader;
 
-		assertNotNull(views);
-		assertNotNull(views.getViews());
-		assertEquals(2, views.getViews().size());
+  @Test
+  public void test1() throws Exception {
+    ObjectViews views = this.unmarshal("com/axelor/meta/Contact.xml", ObjectViews.class);
 
-		String json = toJson(views);
+    assertNotNull(views);
+    assertNotNull(views.getViews());
+    assertEquals(2, views.getViews().size());
 
-		assertNotNull(json);
-	}
+    String json = toJson(views);
 
-	@Test
-	public void test2() throws Exception {
-		ObjectViews views = this.unmarshal("com/axelor/meta/Welcome.xml", ObjectViews.class);
+    assertNotNull(json);
+  }
 
-		assertNotNull(views);
-		assertNotNull(views.getViews());
-		assertEquals(1, views.getViews().size());
+  @Test
+  public void test2() throws Exception {
+    ObjectViews views = this.unmarshal("com/axelor/meta/Welcome.xml", ObjectViews.class);
 
-		String json = toJson(views);
+    assertNotNull(views);
+    assertNotNull(views.getViews());
+    assertEquals(1, views.getViews().size());
 
-		assertNotNull(json);
-	}
+    String json = toJson(views);
 
-	@Test
-	@Transactional
-	public void test3() throws Exception {
-		ObjectViews views = this.unmarshal("com/axelor/meta/Search.xml", ObjectViews.class);
-		assertNotNull(views);
-		assertNotNull(views.getViews());
-		assertEquals(1, views.getViews().size());
+    assertNotNull(json);
+  }
 
-		String json = toJson(views);
+  @Test
+  @Transactional
+  public void test3() throws Exception {
+    ObjectViews views = this.unmarshal("com/axelor/meta/Search.xml", ObjectViews.class);
+    assertNotNull(views);
+    assertNotNull(views.getViews());
+    assertEquals(1, views.getViews().size());
 
-		assertNotNull(json);
+    String json = toJson(views);
 
-		Search search = (Search) views.getViews().get(0);
+    assertNotNull(json);
 
-		Title title = all(Title.class).filter("self.code = ?", "mr").fetchOne();
-		Assert.assertNotNull(title);
+    Search search = (Search) views.getViews().get(0);
 
-		Map<String, Object> binding = Maps.newHashMap();
-		binding.put("customer", "Some");
-		binding.put("date", "2011-11-11");
-		binding.put("xxx", 111);
-		binding.put("title", title);
-		binding.put("country", "IN");
-		binding.put("value", "100.10");
+    Title title = all(Title.class).filter("self.code = ?", "mr").fetchOne();
+    Assert.assertNotNull(title);
 
-		Map<String, Object> partner = Maps.newHashMap();
-		partner.put("firstName", "Name");
+    Map<String, Object> binding = Maps.newHashMap();
+    binding.put("customer", "Some");
+    binding.put("date", "2011-11-11");
+    binding.put("xxx", 111);
+    binding.put("title", title);
+    binding.put("country", "IN");
+    binding.put("value", "100.10");
 
-		binding.put("partner", partner);
+    Map<String, Object> partner = Maps.newHashMap();
+    partner.put("firstName", "Name");
 
-		ScriptHelper helper = search.scriptHandler(binding);
+    binding.put("partner", partner);
 
-		for(Search.SearchSelect s : search.getSelects()) {
-			Query q = s.toQuery(search, helper);
-			if (q == null)
-				continue;
-			q.setFirstResult(0);
-			q.setMaxResults(search.getLimit());
+    ScriptHelper helper = search.scriptHandler(binding);
 
-			assertNotNull(q.getResultList());
-		}
-	}
+    for (Search.SearchSelect s : search.getSelects()) {
+      Query q = s.toQuery(search, helper);
+      if (q == null) continue;
+      q.setFirstResult(0);
+      q.setMaxResults(search.getLimit());
 
-	@Test
-	@Transactional
-	public void testInclude() throws Exception {
-		
-		try (InputStream is = ResourceUtils.getResourceStream("com/axelor/meta/Include.xml")) {
-			loader.process(is, new Module("test"), false);
+      assertNotNull(q.getResultList());
+    }
+  }
 
-			final AbstractView form1 = XMLViews.findView("contact-form1", null, null, "test");
-			final AbstractView form2 = XMLViews.findView("contact-form2", null, null, "test");
+  @Test
+  @Transactional
+  public void testInclude() throws Exception {
 
-			assertTrue(form1 instanceof FormView);
-			assertTrue(form2 instanceof FormView);
+    try (InputStream is = ResourceUtils.getResourceStream("com/axelor/meta/Include.xml")) {
+      loader.process(is, new Module("test"), false);
 
-			final FormInclude include = (FormInclude) ((FormView) form2).getItems().get(0);
-			final AbstractView included = include.getView();
+      final AbstractView form1 = XMLViews.findView("contact-form1", null, null, "test");
+      final AbstractView form2 = XMLViews.findView("contact-form2", null, null, "test");
 
-			assertEquals(form1.getName(), included.getName());
-		}
-	}
+      assertTrue(form1 instanceof FormView);
+      assertTrue(form2 instanceof FormView);
+
+      final FormInclude include = (FormInclude) ((FormView) form2).getItems().get(0);
+      final AbstractView included = include.getView();
+
+      assertEquals(form1.getName(), included.getName());
+    }
+  }
 }

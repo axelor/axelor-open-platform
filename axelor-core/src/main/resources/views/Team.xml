@@ -107,11 +107,11 @@
       <mail-followers/>
     </panel-mail>
   </form>
-  
+
   <grid name="team-topic-grid" title="Topics" model="com.axelor.team.db.TeamTopic">
     <field name="name" />
   </grid>
-  
+
   <form name="team-topic-form" title="Topic" model="com.axelor.team.db.TeamTopic"
     onNew="team.topic.on-new">
     <panel title="Overview">
@@ -132,7 +132,7 @@
     <attribute name="value" for="status" expr="new" />
     <attribute name="value" for="taskDate" expr="#{__date__}" />
   </action-attrs>
-  
+
   <action-attrs name="team.topic.on-new">
     <attribute name="value" for="team" if="teamId" expr="#{__repo__(Team).find(teamId)}" />
   </action-attrs>
@@ -141,7 +141,7 @@
     <view name="team-cards" type="cards" />
     <view name="team-form" type="form" />
   </action-view>
-  
+
   <action-view name="teams.my" model="com.axelor.team.db.Team" title="My Teams">
     <view name="team-cards" type="cards" />
     <view name="team-form" type="form" />
@@ -169,7 +169,7 @@
     ]]></domain>
     <context name="closed_status" expr="#{['closed', 'canceled']}"/>
   </action-view>
-  
+
   <action-view name="team.tasks.open" model="com.axelor.team.db.TeamTask" title="My open tasks">
     <view name="team-task-grid" type="grid" />
     <view name="team-task-calendar" type="calendar" />
@@ -177,7 +177,7 @@
     <domain>self.assignedTo = :__user__ AND self.status NOT IN :closed_status</domain>
     <context name="closed_status" expr="#{['closed', 'canceled']}"/>
   </action-view>
-  
+
   <action-view name="team.tasks.assigned" model="com.axelor.team.db.TeamTask" title="Tasks assigned to me">
     <view name="team-task-grid" type="grid" />
     <view name="team-task-calendar" type="calendar" />
@@ -192,7 +192,7 @@
     <domain>self.createdBy = :__user__ AND self.status NOT IN :closed_status</domain>
     <context name="closed_status" expr="#{['closed', 'canceled']}"/>
   </action-view>
-  
+
   <action-view name="topics.all" model="com.axelor.team.db.TeamTopic" title="Topics">
     <view name="team-topic-grid" type="grid" />
     <view name="team-topic-form" type="form" />

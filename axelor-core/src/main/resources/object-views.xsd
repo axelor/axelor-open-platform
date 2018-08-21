@@ -147,9 +147,9 @@
               Specify a method call to get tag value.
               This attribute gets preference over 'tag-count' attribute.
               The signature of the controller method should be:<br><br>
-    
+
               <code>
-              	void someMethod(ActionRequest request, ActionResponse response)
+                void someMethod(ActionRequest request, ActionResponse response)
               </code>
               ]]>
             </xsd:documentation>
@@ -247,7 +247,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:complexType name="MenubarMenuDivider">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractWidget">
@@ -272,7 +272,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:complexType name="MenubarMenu">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractWidget">
@@ -941,7 +941,7 @@
       </xsd:annotation>
     </xsd:attribute>
   </xsd:attributeGroup>
-  
+
   <xsd:attributeGroup name="AdvanceSearchAttributes">
     <xsd:attribute name="customSearch" type="xsd:boolean">
       <xsd:annotation>
@@ -1304,9 +1304,9 @@
             <xsd:documentation>Specify whether to use editor as viewer</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-       	<xsd:attribute name="x-show-titles" type="xsd:boolean">
+         <xsd:attribute name="x-show-titles" type="xsd:boolean">
           <xsd:annotation>
-          	<xsd:documentation>Specify whether to show item titles by default</xsd:documentation>
+            <xsd:documentation>Specify whether to show item titles by default</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="x-show-on-new" type="xsd:boolean">
@@ -2508,7 +2508,7 @@
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attributeGroup ref="tns:RelationalAttributes"/>
-       	<xsd:attributeGroup ref="tns:ExtraAttributes"/>
+         <xsd:attributeGroup ref="tns:ExtraAttributes"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -2626,7 +2626,7 @@
       </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
-  
+
   <xsd:complexType name="AbstractBaseAction">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractAction">
@@ -2722,7 +2722,7 @@
           <xsd:annotation>
             <xsd:documentation>
               Name of the attribute.&lt;br&gt;&lt;br&gt;
-              
+
               Exemple : hidden, readonly, ...
             </xsd:documentation>
           </xsd:annotation>
@@ -2862,7 +2862,7 @@
               <xsd:documentation>
                 <![CDATA[
                 Controller method call.<br><br>
-                
+
                 The signature of the controller method should be:<br><br>
 
                 <code>
@@ -2928,7 +2928,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:complexType name="ActionScript">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractBaseAction">

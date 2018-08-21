@@ -17,19 +17,6 @@
  */
 package com.axelor.meta.web;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.bind.JAXBException;
-
 import com.axelor.app.AppSettings;
 import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
@@ -60,208 +47,218 @@ import com.google.common.io.Files;
 import com.google.inject.Inject;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.xml.bind.JAXBException;
 
 public class MetaController {
 
-	@Inject
-	private ModuleManager moduleManager;
+  @Inject private ModuleManager moduleManager;
 
-	@Inject
-	private MetaTranslationRepository translations;
+  @Inject private MetaTranslationRepository translations;
 
-	private ObjectViews validateXML(String xml) {
-		try {
-			return XMLViews.fromXML(xml);
-		} catch (JAXBException e){
-			String message = I18n.get("Invalid XML.");
-			Throwable ex = e.getLinkedException();
-			if (ex != null) {
-				message = ex.getMessage().replaceFirst("[^:]+\\:(.*)", "$1");
-			}
-			throw new IllegalArgumentException(message);
-		}
-	}
+  private ObjectViews validateXML(String xml) {
+    try {
+      return XMLViews.fromXML(xml);
+    } catch (JAXBException e) {
+      String message = I18n.get("Invalid XML.");
+      Throwable ex = e.getLinkedException();
+      if (ex != null) {
+        message = ex.getMessage().replaceFirst("[^:]+\\:(.*)", "$1");
+      }
+      throw new IllegalArgumentException(message);
+    }
+  }
 
-	public void validateAction(ActionRequest request, ActionResponse response) {
+  public void validateAction(ActionRequest request, ActionResponse response) {
 
-		MetaAction meta = request.getContext().asType(MetaAction.class);
+    MetaAction meta = request.getContext().asType(MetaAction.class);
 
-		Action action = XMLViews.findAction(meta.getName());
-		Map<String, String> data = Maps.newHashMap();
+    Action action = XMLViews.findAction(meta.getName());
+    Map<String, String> data = Maps.newHashMap();
 
-		response.setData(ImmutableList.of(data));
+    response.setData(ImmutableList.of(data));
 
-		ObjectViews views;
-		try {
-			views = validateXML(meta.getXml());
-		} catch (Exception e){
-			data.put("error", e.getMessage());
-			return;
-		}
+    ObjectViews views;
+    try {
+      views = validateXML(meta.getXml());
+    } catch (Exception e) {
+      data.put("error", e.getMessage());
+      return;
+    }
 
-		Action current = views.getActions().get(0);
-		if (action != null && !action.getName().equals(current.getName())) {
-			data.put("error", I18n.get("Action name can't be changed."));
-			return;
-		}
-	}
+    Action current = views.getActions().get(0);
+    if (action != null && !action.getName().equals(current.getName())) {
+      data.put("error", I18n.get("Action name can't be changed."));
+      return;
+    }
+  }
 
-	public void validateView(ActionRequest request, ActionResponse response) {
-		MetaView meta = request.getContext().asType(MetaView.class);
-		Map<String, String> data = Maps.newHashMap();
+  public void validateView(ActionRequest request, ActionResponse response) {
+    MetaView meta = request.getContext().asType(MetaView.class);
+    Map<String, String> data = Maps.newHashMap();
 
-		try {
-			validateXML(meta.getXml());
-		} catch (Exception e){
-			data.put("error", e.getMessage());
-		}
+    try {
+      validateXML(meta.getXml());
+    } catch (Exception e) {
+      data.put("error", e.getMessage());
+    }
 
-		response.setData(ImmutableList.of(data));
-	}
+    response.setData(ImmutableList.of(data));
+  }
 
-	/**
-	 * This action is called from custom fields form when context field is changed.
-	 *
-	 */
-	public void contextFieldChange(ActionRequest request, ActionResponse response) {
-		final MetaJsonField jsonField = request.getContext().asType(MetaJsonField.class);
-		final String modelName = jsonField.getModel();
-		final String fieldName = jsonField.getContextField();
+  /** This action is called from custom fields form when context field is changed. */
+  public void contextFieldChange(ActionRequest request, ActionResponse response) {
+    final MetaJsonField jsonField = request.getContext().asType(MetaJsonField.class);
+    final String modelName = jsonField.getModel();
+    final String fieldName = jsonField.getContextField();
 
-		final Class<?> modelClass;
-		try {
-			modelClass = Class.forName(modelName);
-		} catch (ClassNotFoundException e) {
-			// this should not happen
-			response.setException(e);
-			return;
-		}
+    final Class<?> modelClass;
+    try {
+      modelClass = Class.forName(modelName);
+    } catch (ClassNotFoundException e) {
+      // this should not happen
+      response.setException(e);
+      return;
+    }
 
-		final Mapper mapper = Mapper.of(modelClass);
-		final Property property = mapper.getProperty(fieldName);
-		final String target = property == null ? null : property.getTarget().getName();
-		final String targetName = property == null ? null : property.getTargetName();
+    final Mapper mapper = Mapper.of(modelClass);
+    final Property property = mapper.getProperty(fieldName);
+    final String target = property == null ? null : property.getTarget().getName();
+    final String targetName = property == null ? null : property.getTargetName();
 
-		response.setValue("contextFieldTarget", target);
-		response.setValue("contextFieldTargetName", targetName);
-		response.setValue("contextFieldValue", null);
-		response.setValue("contextFieldTitle", null);
-	}
+    response.setValue("contextFieldTarget", target);
+    response.setValue("contextFieldTargetName", targetName);
+    response.setValue("contextFieldValue", null);
+    response.setValue("contextFieldTitle", null);
+  }
 
-	public void clearCache(ActionRequest request, ActionResponse response) {
-		if (request.getBeanClass() != null && MetaView.class.isAssignableFrom(request.getBeanClass())) {
-			final MetaView view = request.getContext().asType(MetaView.class);
-			int deleted = Beans.get(MetaService.class).removeCustomViews(view);
-			if (deleted > 0) {
-				response.setNotify(I18n.get(
-						"{0} customized view is deleted.",
-						"{0} customized views are deleted.", deleted));
-			}
-		}
-		MetaStore.clear();
-	}
+  public void clearCache(ActionRequest request, ActionResponse response) {
+    if (request.getBeanClass() != null && MetaView.class.isAssignableFrom(request.getBeanClass())) {
+      final MetaView view = request.getContext().asType(MetaView.class);
+      int deleted = Beans.get(MetaService.class).removeCustomViews(view);
+      if (deleted > 0) {
+        response.setNotify(
+            I18n.get(
+                "{0} customized view is deleted.", "{0} customized views are deleted.", deleted));
+      }
+    }
+    MetaStore.clear();
+  }
 
-	/**
-	 * Open ModelEntity of the relationship.
-	 *
-	 * @param request
-	 * @param response
-	 */
-	public void openModel(ActionRequest request, ActionResponse response) {
+  /**
+   * Open ModelEntity of the relationship.
+   *
+   * @param request
+   * @param response
+   */
+  public void openModel(ActionRequest request, ActionResponse response) {
 
-		MetaField metaField = request.getContext().asType(MetaField.class);
+    MetaField metaField = request.getContext().asType(MetaField.class);
 
-		String domain = String.format("self.packageName = '%s' AND self.name = '%s'", metaField.getPackageName(), metaField.getTypeName());
-		response.setView(ActionView
-			.define(metaField.getTypeName())
-			.model(MetaModel.class.getName())
-			.domain(domain)
-			.map());
-		response.setCanClose(true);
-	}
+    String domain =
+        String.format(
+            "self.packageName = '%s' AND self.name = '%s'",
+            metaField.getPackageName(), metaField.getTypeName());
+    response.setView(
+        ActionView.define(metaField.getTypeName())
+            .model(MetaModel.class.getName())
+            .domain(domain)
+            .map());
+    response.setCanClose(true);
+  }
 
-	public void restoreAll(ActionRequest request, ActionResponse response) {
-		try {
-			MetaStore.clear();
-			I18nBundle.invalidate();
-			moduleManager.restoreMeta();
-			response.setNotify(I18n.get("All views have been restored.") + "<br>" +
-					I18n.get("Please refresh your browser to see updated views."));
-		} catch (Exception e){
-			response.setException(e);
-		}
-	}
+  public void restoreAll(ActionRequest request, ActionResponse response) {
+    try {
+      MetaStore.clear();
+      I18nBundle.invalidate();
+      moduleManager.restoreMeta();
+      response.setNotify(
+          I18n.get("All views have been restored.")
+              + "<br>"
+              + I18n.get("Please refresh your browser to see updated views."));
+    } catch (Exception e) {
+      response.setException(e);
+    }
+  }
 
-	private static final String DEFAULT_EXPORT_DIR = "{java.io.tmpdir}/axelor/data-export";
-	private static final String EXPORT_DIR = AppSettings.get().getPath("data.export.dir", DEFAULT_EXPORT_DIR);
+  private static final String DEFAULT_EXPORT_DIR = "{java.io.tmpdir}/axelor/data-export";
+  private static final String EXPORT_DIR =
+      AppSettings.get().getPath("data.export.dir", DEFAULT_EXPORT_DIR);
 
-	private void exportI18n(String module, URL file) throws IOException {
+  private void exportI18n(String module, URL file) throws IOException {
 
-		String name = Paths.get(file.getFile()).getFileName().toString();
-		if (!name.startsWith("messages_")) {
-			return;
-		}
+    String name = Paths.get(file.getFile()).getFileName().toString();
+    if (!name.startsWith("messages_")) {
+      return;
+    }
 
-		Path path = Paths.get(EXPORT_DIR, "i18n");
-		String lang = name.substring(9, name.length() - 4);
-		Path target = path.resolve(Paths.get(module, "src/main/resources/i18n", name));
+    Path path = Paths.get(EXPORT_DIR, "i18n");
+    String lang = name.substring(9, name.length() - 4);
+    Path target = path.resolve(Paths.get(module, "src/main/resources/i18n", name));
 
-		List<String[]> items = new ArrayList<>();
-		CSVReader reader = new CSVReader(new InputStreamReader(file.openStream()));
-		try {
-			String[] header = reader.readNext();
-			String[] values = null;
-			while ((values = reader.readNext()) != null) {
-				if (header.length != values.length) {
-					continue;
-				}
+    List<String[]> items = new ArrayList<>();
+    CSVReader reader = new CSVReader(new InputStreamReader(file.openStream()));
+    try {
+      String[] header = reader.readNext();
+      String[] values = null;
+      while ((values = reader.readNext()) != null) {
+        if (header.length != values.length) {
+          continue;
+        }
 
-				final Map<String, String> map = new HashMap<>();
-				for (int i = 0; i < header.length; i++) {
-					map.put(header[i], values[i]);
-				}
+        final Map<String, String> map = new HashMap<>();
+        for (int i = 0; i < header.length; i++) {
+          map.put(header[i], values[i]);
+        }
 
-				String key = map.get("key");
-				String value = map.get("value");
+        String key = map.get("key");
+        String value = map.get("value");
 
-				if (StringUtils.isBlank(key)) {
-					continue;
-				}
+        if (StringUtils.isBlank(key)) {
+          continue;
+        }
 
-				MetaTranslation tr = translations.findByKey(key, lang);
-				if (tr != null) {
-					value = tr.getMessage();
-				}
-				String[] row = {
-					key, value, map.get("comment"), map.get("context")
-				};
-				items.add(row);
-			}
-		} finally {
-			reader.close();
-		}
+        MetaTranslation tr = translations.findByKey(key, lang);
+        if (tr != null) {
+          value = tr.getMessage();
+        }
+        String[] row = {key, value, map.get("comment"), map.get("context")};
+        items.add(row);
+      }
+    } finally {
+      reader.close();
+    }
 
-		Files.createParentDirs(target.toFile());
+    Files.createParentDirs(target.toFile());
 
-		CSVWriter writer = new CSVWriter(new FileWriter(target.toFile()));
-		try {
-			writer.writeNext(new String[]{"key", "message", "comment", "context"});
-			writer.writeAll(items);
-		} finally {
-			writer.close();
-		}
-	}
+    CSVWriter writer = new CSVWriter(new FileWriter(target.toFile()));
+    try {
+      writer.writeNext(new String[] {"key", "message", "comment", "context"});
+      writer.writeAll(items);
+    } finally {
+      writer.close();
+    }
+  }
 
-	public void exportI18n(ActionRequest request, ActionResponse response) {
-		for (String module : ModuleManager.getResolution()) {
-			for (URL file : MetaScanner.findAll(module, "i18n", "(.*?)\\.csv")) {
-				try {
-					exportI18n(module, file);
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}
-		response.setFlash(I18n.get("Export complete."));
-	}
+  public void exportI18n(ActionRequest request, ActionResponse response) {
+    for (String module : ModuleManager.getResolution()) {
+      for (URL file : MetaScanner.findAll(module, "i18n", "(.*?)\\.csv")) {
+        try {
+          exportI18n(module, file);
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+    response.setFlash(I18n.get("Export complete."));
+  }
 }

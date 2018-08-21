@@ -17,47 +17,48 @@
  */
 package com.axelor.app.internal;
 
+import com.axelor.app.AppSettings;
+import com.axelor.common.logging.LoggerConfiguration;
 import java.util.Properties;
 import java.util.function.Predicate;
 
-import com.axelor.app.AppSettings;
-import com.axelor.common.logging.LoggerConfiguration;
-
-/**
- * Helper to install/uninstall application logger.
- *
- */
+/** Helper to install/uninstall application logger. */
 public final class AppLogger {
 
-	private static LoggerConfiguration configuration;
+  private static LoggerConfiguration configuration;
 
-	private AppLogger() {
-	}
+  private AppLogger() {}
 
-	private static LoggerConfiguration createLoggerConfig() {
-		final AppSettings settings = AppSettings.get();
-		final Properties loggingConfig = new Properties();
-		final Predicate<String> isLogging = (n) -> n.startsWith("logging.");
-		settings.getProperties().stringPropertyNames().stream().filter(isLogging).forEach(n -> {
-			loggingConfig.setProperty(n, settings.get(n));
-		});
-		if (loggingConfig.containsKey("logging.path")) {
-			loggingConfig.setProperty("logging.path", settings.getPath("logging.path", null));
-		}
-		return new LoggerConfiguration(loggingConfig);
-	}
+  private static LoggerConfiguration createLoggerConfig() {
+    final AppSettings settings = AppSettings.get();
+    final Properties loggingConfig = new Properties();
+    final Predicate<String> isLogging = (n) -> n.startsWith("logging.");
+    settings
+        .getProperties()
+        .stringPropertyNames()
+        .stream()
+        .filter(isLogging)
+        .forEach(
+            n -> {
+              loggingConfig.setProperty(n, settings.get(n));
+            });
+    if (loggingConfig.containsKey("logging.path")) {
+      loggingConfig.setProperty("logging.path", settings.getPath("logging.path", null));
+    }
+    return new LoggerConfiguration(loggingConfig);
+  }
 
-	public static void install() {
-		if (configuration == null) {
-			configuration = createLoggerConfig();
-			configuration.install();
-		}
-	}
+  public static void install() {
+    if (configuration == null) {
+      configuration = createLoggerConfig();
+      configuration.install();
+    }
+  }
 
-	public static void uninstall() {
-		if (configuration != null) {
-			configuration.uninstall();
-			configuration = null;
-		}
-	}
+  public static void uninstall() {
+    if (configuration != null) {
+      configuration.uninstall();
+      configuration = null;
+    }
+  }
 }

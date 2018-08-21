@@ -27,7 +27,7 @@
     <view type="grid" name="group-grid" />
     <view type="form" name="group-form" />
   </action-view>
-  
+
   <menuitem name="menu-auth-roles" parent="menu-auth" title="Roles"
     action="action-auth-roles" />
 
@@ -36,7 +36,7 @@
     <view type="grid" name="role-grid" />
     <view type="form" name="role-form" />
   </action-view>
-  
+
   <menuitem name="menu-auth-permissions" parent="menu-auth" title="Permissions"
     action="action-auth-permissions"/>
 
@@ -45,16 +45,16 @@
     <view type="grid" name="permission-grid" />
     <view type="form" name="permission-form" />
   </action-view>
-  
+
   <menuitem name="menu-meta-module" parent="menu-module-management"
     title="All Modules"
     action="meta.modules"/>
-    
+
   <action-view name="meta.modules" title="Modules" model="com.axelor.meta.db.MetaModule">
     <view type="grid" name="meta-module-grid"/>
     <view type="form" name="meta-module-form"/>
   </action-view>
-  
+
   <menuitem name="menu-meta-model" parent="menu-model"
     title="All Models"
     action="action-meta-model-views"/>
@@ -100,7 +100,7 @@
     <view type="grid" name="meta-action-grid"/>
     <view type="form" name="meta-action-form"/>
   </action-view>
-  
+
   <menuitem name="menu-view-selects" parent="menu-view-management"
     title="All Selects" action="action-meta-select"/>
 
@@ -108,20 +108,20 @@
     <view type="grid" name="meta-select-grid"/>
     <view type="form" name="meta-select-form"/>
   </action-view>
-  
+
   <menuitem name="menu-view-action-menus" parent="menu-view-management"
     title="Action Menus"
     action="action-meta-action-menus"/>
-    
+
   <action-view name="action-meta-action-menus" title="Action Menus" model="com.axelor.meta.db.MetaActionMenu">
     <view type="grid" name="meta-action-menu-grid"/>
     <view type="form" name="meta-action-menu-form"/>
   </action-view>
-  
+
   <menuitem name="menu-view-translations" parent="menu-view-management"
     title="All Translations"
     action="action-meta-translations"/>
-    
+
   <action-view name="action-meta-translations" title="All Translations" model="com.axelor.meta.db.MetaTranslation">
     <view type="grid" name="meta-translations-grid"/>
     <view type="form" name="meta-translations-form"/>
@@ -156,14 +156,14 @@
     <domain>self.type = :defaultType</domain>
     <context name="defaultType" expr="chart"/>
   </action-view>
-  
+
   <menuitem name="menu-job-all" parent="menu-job-management"
     title="All Schedules"
     action="meta.jobs" />
-  
+
   <action-view name="meta.jobs" title="All Schedules" model="com.axelor.meta.db.MetaSchedule">
     <view type="grid" name="meta-schedule-grid"/>
     <view type="form" name="meta-schedule-form"/>
   </action-view>
-  
+
 </object-views>

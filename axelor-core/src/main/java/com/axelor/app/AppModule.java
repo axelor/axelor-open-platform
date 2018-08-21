@@ -17,60 +17,57 @@
  */
 package com.axelor.app;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.eclipse.birt.report.engine.api.IReportEngine;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axelor.inject.Beans;
 import com.axelor.inject.logger.LoggerModule;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.report.ReportEngineProvider;
 import com.google.inject.AbstractModule;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.eclipse.birt.report.engine.api.IReportEngine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * The application module scans the classpath and finds all the
- * {@link AxelorModule} and installs them in the dependency order.
- * 
+ * The application module scans the classpath and finds all the {@link AxelorModule} and installs
+ * them in the dependency order.
  */
 public class AppModule extends AbstractModule {
 
-	private static Logger log = LoggerFactory.getLogger(AppModule.class);
+  private static Logger log = LoggerFactory.getLogger(AppModule.class);
 
-	@Override
-	protected void configure() {
+  @Override
+  protected void configure() {
 
-		// initialize Beans helps
-		bind(Beans.class).asEagerSingleton();
+    // initialize Beans helps
+    bind(Beans.class).asEagerSingleton();
 
-		// report engine
-		bind(IReportEngine.class).toProvider(ReportEngineProvider.class);
+    // report engine
+    bind(IReportEngine.class).toProvider(ReportEngineProvider.class);
 
-		// Logger injection support
-		install(new LoggerModule());
+    // Logger injection support
+    install(new LoggerModule());
 
-		final List<Class<? extends AxelorModule>> moduleClasses = ModuleManager
-				.findInstalled()
-				.stream()
-				.flatMap(name -> MetaScanner.findSubTypesOf(name, AxelorModule.class).find().stream())
-				.collect(Collectors.toList());
+    final List<Class<? extends AxelorModule>> moduleClasses =
+        ModuleManager.findInstalled()
+            .stream()
+            .flatMap(name -> MetaScanner.findSubTypesOf(name, AxelorModule.class).find().stream())
+            .collect(Collectors.toList());
 
-		if (moduleClasses.isEmpty()) {
-			return;
-		}
+    if (moduleClasses.isEmpty()) {
+      return;
+    }
 
-		log.info("Configuring app modules...");
+    log.info("Configuring app modules...");
 
-		for (Class<? extends AxelorModule> module : moduleClasses) {
-			try {
-				log.debug("Configure module: {}", module.getName());
-				install(module.newInstance());
-			} catch (InstantiationException | IllegalAccessException e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
+    for (Class<? extends AxelorModule> module : moduleClasses) {
+      try {
+        log.debug("Configure module: {}", module.getName());
+        install(module.newInstance());
+      } catch (InstantiationException | IllegalAccessException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
 }

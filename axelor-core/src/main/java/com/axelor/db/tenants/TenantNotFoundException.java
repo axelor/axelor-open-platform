@@ -20,11 +20,11 @@ package com.axelor.db.tenants;
 @SuppressWarnings("serial")
 public class TenantNotFoundException extends RuntimeException {
 
-	public TenantNotFoundException(String message) {
-		super(message);
-	}
+  public TenantNotFoundException(String message) {
+    super(message);
+  }
 
-	public TenantNotFoundException(String message, Throwable cause) {
-		super(message, cause);
-	}
+  public TenantNotFoundException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

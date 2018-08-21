@@ -17,10 +17,16 @@
  */
 package com.axelor.web;
 
+import com.axelor.app.AppSettings;
+import com.axelor.app.internal.AppLogger;
+import com.axelor.meta.loader.ViewWatcher;
+import com.google.inject.Binding;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.servlet.GuiceServletContextListener;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.SessionCookieConfig;
-
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.core.ResourceMethodRegistry;
 import org.jboss.resteasy.core.SynchronousDispatcher;
@@ -31,84 +37,74 @@ import org.jboss.resteasy.spi.Registry;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
-import com.axelor.app.AppSettings;
-import com.axelor.app.internal.AppLogger;
-import com.axelor.meta.loader.ViewWatcher;
-import com.google.inject.Binding;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.servlet.GuiceServletContextListener;
-
-/**
- * Servlet context listener.
- *
- */
+/** Servlet context listener. */
 public class AppContextListener extends GuiceServletContextListener {
 
-	private ResteasyDeployment deployment;
+  private ResteasyDeployment deployment;
 
-	@Override
-	public void contextInitialized(ServletContextEvent servletContextEvent) {
-		AppLogger.install();
-		super.contextInitialized(servletContextEvent);
+  @Override
+  public void contextInitialized(ServletContextEvent servletContextEvent) {
+    AppLogger.install();
+    super.contextInitialized(servletContextEvent);
 
-		final ServletContext context = servletContextEvent.getServletContext();
-		final ListenerBootstrap config = new ListenerBootstrap(context);
-		final Injector injector = (Injector) context.getAttribute(Injector.class.getName());
+    final ServletContext context = servletContextEvent.getServletContext();
+    final ListenerBootstrap config = new ListenerBootstrap(context);
+    final Injector injector = (Injector) context.getAttribute(Injector.class.getName());
 
-		final SessionCookieConfig cookieConfig = context.getSessionCookieConfig();
-		
-		cookieConfig.setHttpOnly(true);
-		cookieConfig.setSecure(AppSettings.get().getBoolean("session.cookie.secure", false));
+    final SessionCookieConfig cookieConfig = context.getSessionCookieConfig();
 
-		deployment = config.createDeployment();
+    cookieConfig.setHttpOnly(true);
+    cookieConfig.setSecure(AppSettings.get().getBoolean("session.cookie.secure", false));
 
-		// use custom registry for hotswap-agent support
-		final ResteasyProviderFactory providerFactory = ResteasyProviderFactory.getInstance();
-		final ResourceMethodRegistry registry = new ResourceMethodRegistry(providerFactory) {
+    deployment = config.createDeployment();
 
-			@Override
-			@SuppressWarnings("all")
-			public void addPerRequestResource(Class clazz) {
-				final Binding<?> binding = injector.getBinding(clazz);
-				if (binding == null) {
-					super.addPerRequestResource(clazz);
-				} else {
-					super.addResourceFactory(new GuiceResourceFactory(binding.getProvider(), clazz));
-				}
-			}
-		};
-		final Dispatcher dispatcher = new SynchronousDispatcher(providerFactory, registry);
+    // use custom registry for hotswap-agent support
+    final ResteasyProviderFactory providerFactory = ResteasyProviderFactory.getInstance();
+    final ResourceMethodRegistry registry =
+        new ResourceMethodRegistry(providerFactory) {
 
-		deployment.setProviderFactory(providerFactory);
-		deployment.setAsyncJobServiceEnabled(false);
-		deployment.setDispatcher(dispatcher);
-		deployment.start();
+          @Override
+          @SuppressWarnings("all")
+          public void addPerRequestResource(Class clazz) {
+            final Binding<?> binding = injector.getBinding(clazz);
+            if (binding == null) {
+              super.addPerRequestResource(clazz);
+            } else {
+              super.addResourceFactory(new GuiceResourceFactory(binding.getProvider(), clazz));
+            }
+          }
+        };
+    final Dispatcher dispatcher = new SynchronousDispatcher(providerFactory, registry);
 
-		context.setAttribute(ResteasyProviderFactory.class.getName(), providerFactory);
-		context.setAttribute(Dispatcher.class.getName(), dispatcher);
-		context.setAttribute(Registry.class.getName(), registry);
+    deployment.setProviderFactory(providerFactory);
+    deployment.setAsyncJobServiceEnabled(false);
+    deployment.setDispatcher(dispatcher);
+    deployment.start();
 
-		final ModuleProcessor processor = new ModuleProcessor(registry, providerFactory);
+    context.setAttribute(ResteasyProviderFactory.class.getName(), providerFactory);
+    context.setAttribute(Dispatcher.class.getName(), dispatcher);
+    context.setAttribute(Registry.class.getName(), registry);
 
-		// process all injectors
-		Injector current = injector;
-		while (current != null) {
-			processor.processInjector(current);
-			current = injector.getParent();
-		}
-	}
+    final ModuleProcessor processor = new ModuleProcessor(registry, providerFactory);
 
-	@Override
-	public void contextDestroyed(ServletContextEvent servletContextEvent) {
-		ViewWatcher.getInstance().stop();
-		deployment.stop();
-		super.contextDestroyed(servletContextEvent);
-		AppLogger.uninstall();
-	}
+    // process all injectors
+    Injector current = injector;
+    while (current != null) {
+      processor.processInjector(current);
+      current = injector.getParent();
+    }
+  }
 
-	@Override
-	protected Injector getInjector() {
-		return Guice.createInjector(new AppServletModule());
-	}
+  @Override
+  public void contextDestroyed(ServletContextEvent servletContextEvent) {
+    ViewWatcher.getInstance().stop();
+    deployment.stop();
+    super.contextDestroyed(servletContextEvent);
+    AppLogger.uninstall();
+  }
+
+  @Override
+  protected Injector getInjector() {
+    return Guice.createInjector(new AppServletModule());
+  }
 }

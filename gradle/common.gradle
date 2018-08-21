@@ -3,18 +3,18 @@ apply plugin: "eclipse"
 apply plugin: "idea"
 
 dependencies {
-	testCompile	libs.junit
-	if (project.name != "axelor-tomcat") {
-		compile libs.slf4j_logback
-	}
+  testCompile	libs.junit
+  if (project.name != "axelor-tomcat") {
+    compile libs.slf4j_logback
+  }
 }
 
 configurations.all {
-	exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+  exclude group: 'org.slf4j', module: 'slf4j-log4j12'
 }
 
 tasks.withType(JavaCompile) {
-	options.encoding = 'UTF-8'
-	options.compilerArgs = ['-Xlint:-options']
-   	options.incremental = true
+  options.encoding = 'UTF-8'
+  options.compilerArgs = ['-Xlint:-options']
+     options.incremental = true
 }

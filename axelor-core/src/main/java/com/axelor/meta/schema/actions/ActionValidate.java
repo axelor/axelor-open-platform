@@ -17,155 +17,149 @@
  */
 package com.axelor.meta.schema.actions;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlType;
-
 import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 public class ActionValidate extends ActionResumable {
 
-	public static class Validator extends Element {
+  public static class Validator extends Element {
 
-		@XmlAttribute(name = "message")
-		private String message;
+    @XmlAttribute(name = "message")
+    private String message;
 
-		@XmlAttribute(name = "action")
-		private String action;
+    @XmlAttribute(name = "action")
+    private String action;
 
-		public String getMessage() {
-			return message;
-		}
+    public String getMessage() {
+      return message;
+    }
 
-		public void setMessage(String message) {
-			this.message = message;
-		}
+    public void setMessage(String message) {
+      this.message = message;
+    }
 
-		public String getAction() {
-			return action;
-		}
+    public String getAction() {
+      return action;
+    }
 
-		public void setAction(String action) {
-			this.action = action;
-		}
-	}
+    public void setAction(String action) {
+      this.action = action;
+    }
+  }
 
-	@XmlType
-	public static class Error extends Validator {
-	}
+  @XmlType
+  public static class Error extends Validator {}
 
-	@XmlType
-	public static class Alert extends Validator {
-	}
+  @XmlType
+  public static class Alert extends Validator {}
 
-	@XmlType
-	public static class Info extends Validator {
-	}
-	
-	@XmlType
-	public static class Notify extends Validator {
-	}
+  @XmlType
+  public static class Info extends Validator {}
 
-	@JsonIgnore
-	@XmlElements({
-		@XmlElement(name = "error", type = Error.class),
-		@XmlElement(name = "alert", type = Alert.class),
-		@XmlElement(name = "info", type = Info.class),
-		@XmlElement(name = "notify", type = Notify.class)
-	})
-	private List<Validator> validators;
+  @XmlType
+  public static class Notify extends Validator {}
 
-	public List<Validator> getValidators() {
-		return validators;
-	}
+  @JsonIgnore
+  @XmlElements({
+    @XmlElement(name = "error", type = Error.class),
+    @XmlElement(name = "alert", type = Alert.class),
+    @XmlElement(name = "info", type = Info.class),
+    @XmlElement(name = "notify", type = Notify.class)
+  })
+  private List<Validator> validators;
 
-	public void setValidators(List<Validator> validators) {
-		this.validators = validators;
-	}
+  public List<Validator> getValidators() {
+    return validators;
+  }
 
-	@Override
-	protected ActionValidate copy() {
-		final ActionValidate action = new ActionValidate();
-		final List<Validator> items = new ArrayList<>(validators);
-		action.setName(getName());
-		action.setModel(getModel());
-		action.setValidators(items);
-		return action;
-	}
+  public void setValidators(List<Validator> validators) {
+    this.validators = validators;
+  }
 
-	@Override
-	public Object evaluate(ActionHandler handler) {
+  @Override
+  protected ActionValidate copy() {
+    final ActionValidate action = new ActionValidate();
+    final List<Validator> items = new ArrayList<>(validators);
+    action.setName(getName());
+    action.setModel(getModel());
+    action.setValidators(items);
+    return action;
+  }
 
-		final List<String> info = Lists.newArrayList();
-		final List<String> notify = Lists.newArrayList();
-		final Map<String, Object> result = Maps.newHashMap();
+  @Override
+  public Object evaluate(ActionHandler handler) {
 
-		for (int i = getIndex(); i < validators.size(); i++) {
+    final List<String> info = Lists.newArrayList();
+    final List<String> notify = Lists.newArrayList();
+    final Map<String, Object> result = Maps.newHashMap();
 
-			final Validator validator = validators.get(i);
-			if (!validator.test(handler)) {
-				continue;
-			}
+    for (int i = getIndex(); i < validators.size(); i++) {
 
-			String key = validator.getClass().getSimpleName().toLowerCase();
-			String value = I18n.get(validator.getMessage());
+      final Validator validator = validators.get(i);
+      if (!validator.test(handler)) {
+        continue;
+      }
 
-			if (!StringUtils.isBlank(value)) {
-				value = handler.evaluate(toExpression(value, true)).toString();
-			}
+      String key = validator.getClass().getSimpleName().toLowerCase();
+      String value = I18n.get(validator.getMessage());
 
-			if (validator instanceof Info) {
-				info.add(value);
-				continue;
-			}
-			if (validator instanceof Notify) {
-				notify.add(value);
-				continue;
-			}
+      if (!StringUtils.isBlank(value)) {
+        value = handler.evaluate(toExpression(value, true)).toString();
+      }
 
-			result.put(key, value);
+      if (validator instanceof Info) {
+        info.add(value);
+        continue;
+      }
+      if (validator instanceof Notify) {
+        notify.add(value);
+        continue;
+      }
 
-			if (!StringUtils.isBlank(validator.getAction())) {
-				result.put("action", validator.getAction());
-			}
-			
-			if (i + 1 < validators.size() && validator instanceof Alert) {
-				result.put("pending", String.format("%s[%d]", getName(), i + 1));
-			}
+      result.put(key, value);
 
-			if (!info.isEmpty()) {
-				result.put("info", info);
-			}
-			if (!notify.isEmpty()) {
-				result.put("notify", notify);
-			}
+      if (!StringUtils.isBlank(validator.getAction())) {
+        result.put("action", validator.getAction());
+      }
 
-			return result;
-		}
+      if (i + 1 < validators.size() && validator instanceof Alert) {
+        result.put("pending", String.format("%s[%d]", getName(), i + 1));
+      }
 
-		if (!info.isEmpty()) {
-			result.put("info", info);
-		}
-		if (!notify.isEmpty()) {
-			result.put("notify", notify);
-		}
+      if (!info.isEmpty()) {
+        result.put("info", info);
+      }
+      if (!notify.isEmpty()) {
+        result.put("notify", notify);
+      }
 
-		return result.isEmpty() ? null : result;
-	}
+      return result;
+    }
 
-	@Override
-	public Object wrap(ActionHandler handler) {
-		return evaluate(handler);
-	}
+    if (!info.isEmpty()) {
+      result.put("info", info);
+    }
+    if (!notify.isEmpty()) {
+      result.put("notify", notify);
+    }
+
+    return result.isEmpty() ? null : result;
+  }
+
+  @Override
+  public Object wrap(ActionHandler handler) {
+    return evaluate(handler);
+  }
 }

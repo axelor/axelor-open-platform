@@ -17,147 +17,138 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-
-import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("gantt")
 public class GanttView extends AbstractView {
 
-	@XmlAttribute
-	private String taskStart;
+  @XmlAttribute private String taskStart;
 
-	@XmlAttribute
-	private String taskDuration;
+  @XmlAttribute private String taskDuration;
 
-	@XmlAttribute
-	private String taskEnd;
+  @XmlAttribute private String taskEnd;
 
-	@XmlAttribute
-	private String taskParent;
+  @XmlAttribute private String taskParent;
 
-	@XmlAttribute
-	private String taskSequence;
+  @XmlAttribute private String taskSequence;
 
-	@XmlAttribute
-	private String taskProgress;
-	
-	@XmlAttribute
-	private String taskUser;
-	
-	@XmlAttribute(name = "x-start-to-start")
-	private String startToStart;
+  @XmlAttribute private String taskProgress;
 
-	@XmlAttribute(name = "x-start-to-finish")
-	private String startToFinish;
+  @XmlAttribute private String taskUser;
 
-	@XmlAttribute(name = "x-finish-to-start")
-	private String finishToStart;
+  @XmlAttribute(name = "x-start-to-start")
+  private String startToStart;
 
-	@XmlAttribute(name = "x-finish-to-finish")
-	private String finishToFinish;
+  @XmlAttribute(name = "x-start-to-finish")
+  private String startToFinish;
 
-	@XmlElement(name="field", type=Field.class)
-	private List<AbstractWidget> items;
+  @XmlAttribute(name = "x-finish-to-start")
+  private String finishToStart;
 
-	public String getTaskStart() {
-		return taskStart;
-	}
+  @XmlAttribute(name = "x-finish-to-finish")
+  private String finishToFinish;
 
-	public void setTaskStart(String taskStart) {
-		this.taskStart = taskStart;
-	}
+  @XmlElement(name = "field", type = Field.class)
+  private List<AbstractWidget> items;
 
-	public String getTaskDuration() {
-		return taskDuration;
-	}
+  public String getTaskStart() {
+    return taskStart;
+  }
 
-	public void setTaskDuration(String taskDuration) {
-		this.taskDuration = taskDuration;
-	}
+  public void setTaskStart(String taskStart) {
+    this.taskStart = taskStart;
+  }
 
-	public String getTaskEnd() {
-		return taskEnd;
-	}
+  public String getTaskDuration() {
+    return taskDuration;
+  }
 
-	public void setTaskEnd(String taskEnd) {
-		this.taskEnd = taskEnd;
-	}
+  public void setTaskDuration(String taskDuration) {
+    this.taskDuration = taskDuration;
+  }
 
-	public String getTaskParent() {
-		return taskParent;
-	}
+  public String getTaskEnd() {
+    return taskEnd;
+  }
 
-	public void setTaskParent(String taskParent) {
-		this.taskParent = taskParent;
-	}
+  public void setTaskEnd(String taskEnd) {
+    this.taskEnd = taskEnd;
+  }
 
-	public String getTaskSequence() {
-		return taskSequence;
-	}
+  public String getTaskParent() {
+    return taskParent;
+  }
 
-	public void setTaskSequence(String taskSequence) {
-		this.taskSequence = taskSequence;
-	}
+  public void setTaskParent(String taskParent) {
+    this.taskParent = taskParent;
+  }
 
-	public String getTaskProgress() {
-		return taskProgress;
-	}
+  public String getTaskSequence() {
+    return taskSequence;
+  }
 
-	public void setTaskProgress(String taskProgress) {
-		this.taskProgress = taskProgress;
-	}
-	
-	public String getTaskUser() {
-		return taskUser;
-	}
+  public void setTaskSequence(String taskSequence) {
+    this.taskSequence = taskSequence;
+  }
 
-	public void setTaskUser(String taskUser) {
-		this.taskUser = taskUser;
-	}
+  public String getTaskProgress() {
+    return taskProgress;
+  }
 
-	public String getStartToStart() {
-		return startToStart;
-	}
+  public void setTaskProgress(String taskProgress) {
+    this.taskProgress = taskProgress;
+  }
 
-	public void setStartToStart(String startToStart) {
-		this.startToStart = startToStart;
-	}
+  public String getTaskUser() {
+    return taskUser;
+  }
 
-	public String getStartToFinish() {
-		return startToFinish;
-	}
+  public void setTaskUser(String taskUser) {
+    this.taskUser = taskUser;
+  }
 
-	public void setStartToFinish(String startToFinish) {
-		this.startToFinish = startToFinish;
-	}
+  public String getStartToStart() {
+    return startToStart;
+  }
 
-	public String getFinishToStart() {
-		return finishToStart;
-	}
+  public void setStartToStart(String startToStart) {
+    this.startToStart = startToStart;
+  }
 
-	public void setFinishToStart(String finishToStart) {
-		this.finishToStart = finishToStart;
-	}
+  public String getStartToFinish() {
+    return startToFinish;
+  }
 
-	public String getFinishToFinish() {
-		return finishToFinish;
-	}
+  public void setStartToFinish(String startToFinish) {
+    this.startToFinish = startToFinish;
+  }
 
-	public void setFinishToFinish(String finishToFinish) {
-		this.finishToFinish = finishToFinish;
-	}
+  public String getFinishToStart() {
+    return finishToStart;
+  }
 
-	public List<AbstractWidget> getItems() {
-		return items;
-	}
+  public void setFinishToStart(String finishToStart) {
+    this.finishToStart = finishToStart;
+  }
 
-	public void setItems(List<AbstractWidget> items) {
-		this.items = items;
-	}
+  public String getFinishToFinish() {
+    return finishToFinish;
+  }
+
+  public void setFinishToFinish(String finishToFinish) {
+    this.finishToFinish = finishToFinish;
+  }
+
+  public List<AbstractWidget> getItems() {
+    return items;
+  }
+
+  public void setItems(List<AbstractWidget> items) {
+    this.items = items;
+  }
 }

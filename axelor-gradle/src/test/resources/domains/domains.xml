@@ -4,51 +4,51 @@
   xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_5.0.xsd">
 
   <module name="contact" package="com.axelor.contact.db"/>
-  
+
   <entity name="Title" cachable="true" implements="java.io.Serializable" repository="abstract">
     <![CDATA[
     This class represents the name initial like Mr., Mrs. etc.
-    
+
     For example:
-    
+
     Title title = new Title();
     title.setCode("mr");
     title.setName("Mr.");
-    
+
     contact.setTitle(title);
-    
+
     @author John Smith <john.smith@gmail.com>
     @since 1.0
     ]]>
     <string name="code" column="ccc" required="true" unique="true" min="2" hashKey="false" help="The unique code."/>
     <string name="name" required="true" unique="true" min="2" help="The title name." index="idx_my"/>
-    
+
     <extra-imports>
     import org.slf4j.*;
     import java.util.List;
     import static com.google.common.collect.Lists.newArrayList;
     </extra-imports>
-    
+
     <extra-code>
     <![CDATA[
     private static final Logger log = LoggerFactory.getLogger(Title.class);
-    
-	public static List<String> getFooNames() {
-    	final List<String> names = newArrayList();
-    	names.add("foo");
-    	names.add("bar");
-    	return names;
-	}
 
-	public Title saveAndLog() {
-    	Title title = null;
-		log.info("saving Title instance: " + this.getCode());
-    	try {
-    		title = this.save();
-    	} catch (Exception e) {
-    		log.error("error saving Title");
-    	}
-    	return title;
+  public static List<String> getFooNames() {
+      final List<String> names = newArrayList();
+      names.add("foo");
+      names.add("bar");
+      return names;
+  }
+
+  public Title saveAndLog() {
+      Title title = null;
+    log.info("saving Title instance: " + this.getCode());
+      try {
+        title = this.save();
+      } catch (Exception e) {
+        log.error("error saving Title");
+      }
+      return title;
     }
     ]]>
     </extra-code>
@@ -141,24 +141,24 @@
 
     <finder-method name="findByContact" using="contact" all="false"/>
     <finder-method name="findByUser" using="user" all="false"/>
-    
+
   </entity>
-  
+
   <enum name="AccountStatus">
     <item name="OPEN" />
     <item name="CLOSED" title="Closed" />
   </enum>
-  
+
   <enum name="AccountStatus">
     <item name="CANCELED" />
   </enum>
-  
+
   <enum name="NumStatus" numeric="true">
     <item name="ONE" value="1" />
     <item name="TWO" value="2" />
     <item name="THREE" value="3" />
   </enum>
-  
+
   <enum name="StrStatus">
     <item name="ONE" value="one" />
     <item name="TWO" value="two" />
@@ -193,7 +193,7 @@
     <many-to-one name="myTitle" ref="Title"/>
     <unique-constraint columns="someName,anotherName,myTitle"/>
   </entity>
-  
+
   <!-- inheritance -->
   <entity name="Hello" strategy="SINGLE">
     <string name="title" required="true" translatable="true"/>
@@ -202,7 +202,7 @@
       <field name="message" on="CREATE" />
     </track>
   </entity>
-  
+
   <entity name="HelloWorld" extends="Hello" strategy="CLASS" hashAll="true">
     <string name="tags"/>
     <string name="hrCode" />

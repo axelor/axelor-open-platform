@@ -20,5 +20,4 @@ package com.axelor.common.bar;
 import org.junit.Ignore;
 
 @Ignore
-public abstract class MyClass1 extends MyBase {
-}
+public abstract class MyClass1 extends MyBase {}

@@ -26,387 +26,387 @@ ui.OneToManyCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewService'];
 
 function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) {
 
-	ui.RefFieldCtrl.call(this, $scope, $element, DataSource, ViewService, function(){
-		ui.GridViewCtrl.call(this, $scope, $element);
-		$scope.editorCanSave = false;
-		$scope.selectEnable = false;
-		if (initCallback) {
-			initCallback();
-		}
-	});
+  ui.RefFieldCtrl.call(this, $scope, $element, DataSource, ViewService, function(){
+    ui.GridViewCtrl.call(this, $scope, $element);
+    $scope.editorCanSave = false;
+    $scope.selectEnable = false;
+    if (initCallback) {
+      initCallback();
+    }
+  });
 
-	var embedded = null,
-		detailView = null;
+  var embedded = null,
+    detailView = null;
 
-	$scope.createNestedEditor = function() {
+  $scope.createNestedEditor = function() {
 
-		embedded = $('<div ui-embedded-editor class="inline-form"></div>');
-		embedded.attr('x-title', $element.attr('x-title'));
-		embedded = ViewService.compile(embedded)($scope);
-		embedded.hide();
-		
-		$element.append(embedded);
-		embedded.data('$rel', $element.children('.slickgrid:first').children('.slick-viewport'));
+    embedded = $('<div ui-embedded-editor class="inline-form"></div>');
+    embedded.attr('x-title', $element.attr('x-title'));
+    embedded = ViewService.compile(embedded)($scope);
+    embedded.hide();
 
-		return embedded;
-	};
-	
-	var _showNestedEditor = $scope.showNestedEditor;
-	$scope.showNestedEditor = function(show, record) {
-		_showNestedEditor(show, record);
-		if (embedded) {
-			embedded.data('$rel').hide();
-			var formScope = embedded.scope();
-			formScope._viewPromise.then(function () {
-				formScope.edit(record);
-			});
-		}
-		return embedded;
-	};
-	
-	$scope.showDetailView = function() {
-		if (detailView == null) {
-			detailView = $('<div ui-embedded-editor class="detail-form"></div>').attr('x-title', $element.attr('x-title'));
-			detailView = ViewService.compile(detailView)($scope);
-			detailView.data('$rel', $());
-			detailView.data('$scope').isDetailView = true;
-			$element.after(detailView);
-		}
-		var es = detailView.data('$scope');
-		detailView.toggle(es.visible = !es.visible);
-	};
-	
-	$scope.select = function(value) {
+    $element.append(embedded);
+    embedded.data('$rel', $element.children('.slickgrid:first').children('.slick-viewport'));
 
-		// if items are same, no need to set values
-		if ($scope._dataSource.equals(value, $scope.getValue())) {
-			return;
-		}
+    return embedded;
+  };
 
-		var items = _.chain([value]).flatten(true).compact().value();
-		var records = _.map($scope.getItems(), _.clone);
+  var _showNestedEditor = $scope.showNestedEditor;
+  $scope.showNestedEditor = function(show, record) {
+    _showNestedEditor(show, record);
+    if (embedded) {
+      embedded.data('$rel').hide();
+      var formScope = embedded.scope();
+      formScope._viewPromise.then(function () {
+        formScope.edit(record);
+      });
+    }
+    return embedded;
+  };
 
-		_.each(records, function(item) {
-			item.selected = false;
-		});
+  $scope.showDetailView = function() {
+    if (detailView == null) {
+      detailView = $('<div ui-embedded-editor class="detail-form"></div>').attr('x-title', $element.attr('x-title'));
+      detailView = ViewService.compile(detailView)($scope);
+      detailView.data('$rel', $());
+      detailView.data('$scope').isDetailView = true;
+      $element.after(detailView);
+    }
+    var es = detailView.data('$scope');
+    detailView.toggle(es.visible = !es.visible);
+  };
 
-		_.each($scope.itemsPending, function (item) {
-			var find = _.find(records, function(rec) {
-				if (rec.id && rec.id == item.id) {
-					return true;
-				}
-				var a = _.omit(item, 'id', 'version');
-				var b = _.omit(rec, 'id', 'version');
-				return $scope._dataSource.equals(a, b);
-			});
-			if (!find) {
-				records.push(item);
-			}
-		});
+  $scope.select = function(value) {
 
-		_.each(items, function(item){
-			item = _.clone(item);
-			var find = _.find(records, function(rec){
-				var id1 = rec.id || rec.$id;
-				var id2 = item.id || item.$id;
-				return id1 && id1 === id2;
-			});
-			
-			if (find) {
-				_.extend(find, item);
-			} else {
-				records.push(item);
-			}
-		});
-		
-		records = $scope.$$ensureIds(records);
+    // if items are same, no need to set values
+    if ($scope._dataSource.equals(value, $scope.getValue())) {
+      return;
+    }
 
-		_.each(records, function(rec){
-			if (rec.id <= 0) rec.id = null;
-		});
-		
-		if ($scope.dataView.$resequence) {
-			$scope.dataView.$resequence(records);
-		}
+    var items = _.chain([value]).flatten(true).compact().value();
+    var records = _.map($scope.getItems(), _.clone);
 
-		var callOnChange = $scope.dataView.$isResequencing !== true;
+    _.each(records, function(item) {
+      item.selected = false;
+    });
 
-		$scope.itemsPending = records;
-		$scope.setValue(records, callOnChange);
-		$scope.$timeout(function() {
-			$scope.$broadcast('grid:changed');
-		});
-	};
-	
-	var _setItems = $scope.setItems;
-	$scope.setItems = function(items) {
-		_setItems(items);
-		$scope.itemsPending = [];
-		if (embedded !== null) {
-			embedded.data('$scope').onClose();
-		}
-		if (detailView !== null)
-		if (items === null || _.isEmpty(items))
-			detailView.hide();
-		else
-			detailView.show();
-	};
-	
-	$scope.removeItems = function(items, fireOnChange) {
-		var all, ids, records;
-		
-		if (_.isEmpty(items)) return;
-		
-		all = _.isArray(items) ? items : [items];
-		
-		ids = _.map(all, function(item) {
-			return _.isNumber(item) ? item : item.id;
-		});
+    _.each($scope.itemsPending, function (item) {
+      var find = _.find(records, function(rec) {
+        if (rec.id && rec.id == item.id) {
+          return true;
+        }
+        var a = _.omit(item, 'id', 'version');
+        var b = _.omit(rec, 'id', 'version');
+        return $scope._dataSource.equals(a, b);
+      });
+      if (!find) {
+        records.push(item);
+      }
+    });
 
-		records = _.filter($scope.getItems(), function(item) {
-			return ids.indexOf(item.id) === -1;
-		});
-		
-		$scope.setValue(records, fireOnChange);
-		$scope.$applyAsync();
-	};
+    _.each(items, function(item){
+      item = _.clone(item);
+      var find = _.find(records, function(rec){
+        var id1 = rec.id || rec.$id;
+        var id2 = item.id || item.$id;
+        return id1 && id1 === id2;
+      });
 
-	$scope.removeSelected = function(selection) {
-		var selected, items;
-		if (_.isEmpty(selection)) return;
-		selected = _.map(selection, function (i) {
-			return $scope.dataView.getItem(i).id;
-		});
-		items = _.filter($scope.getItems(), function (item) {
-			return selected.indexOf(item.id) === -1;
-		});
-		// remove selected from data view
-		_.each(selected, function (id) {
-			if (id && id > -1) $scope.dataView.deleteItem(id);
-		});
-		$scope.setValue(items, true);
-		$scope.$applyAsync();
-	};
+      if (find) {
+        _.extend(find, item);
+      } else {
+        records.push(item);
+      }
+    });
 
-	$scope.canEditTarget = function () {
-		return $scope.canEdit() && $scope.attr('canEdit') !== false;
-	};
+    records = $scope.$$ensureIds(records);
 
-	$scope.canShowEdit = function () {
-		var selected = $scope.selection.length ? $scope.selection[0] : null;
-		return selected !== null && $scope.canEdit();
-	};
+    _.each(records, function(rec){
+      if (rec.id <= 0) rec.id = null;
+    });
 
-	$scope.canShowView = function () {
-		if ($scope.canShowEdit()) return false;
-		var selected = $scope.selection.length ? $scope.selection[0] : null;
-		return selected !== null && $scope.canView();
-	};
-	
-	$scope.canEdit = function () {
-		return $scope.attr('canEdit') !== false && $scope.canView();
-	};
-	
-	var _canRemove = $scope.canRemove;
-	$scope.canRemove = function () {
-		var selected = $scope.selection.length ? $scope.selection[0] : null;
-		return _canRemove() && selected !== null;
-	};
+    if ($scope.dataView.$resequence) {
+      $scope.dataView.$resequence(records);
+    }
 
-	$scope.canCopy = function () {
-		if (!$scope.field || !($scope.field.widgetAttrs||{}).canCopy) return false;
-		if (!$scope.canNew()) return false;
-		if (!$scope.selection || $scope.selection.length !== 1) return false;
-		var record = $scope.dataView.getItem(_.first($scope.selection));
-		return record && record.id > -1;
-	};
+    var callOnChange = $scope.dataView.$isResequencing !== true;
 
-	$scope.onCopy = function() {
-		var ds = $scope._dataSource;
-		var index = _.first($scope.selection);
-		var item = $scope.dataView.getItem(index);
-		if (item && item.id > 0) {
-			ds.copy(item.id).success(function(record) {
-				$scope.select([record]);
-				$scope.$timeout(function () {
-					$scope.dataView.$setSelection([$scope.dataView.getLength() - 1], true);
-				}, 100);
-			});
-		}
-	};
+    $scope.itemsPending = records;
+    $scope.setValue(records, callOnChange);
+    $scope.$timeout(function() {
+      $scope.$broadcast('grid:changed');
+    });
+  };
 
-	$scope.onEdit = function() {
-		var selected = $scope.selection.length ? $scope.selection[0] : null;
-		if (selected !== null) {
-			var record = $scope.dataView.getItem(selected);
-			$scope.showEditor(record);
-		}
-	};
-	
-	$scope.onRemove = function() {
-		if (this.isReadonly()) {
-			return;
-		}
-		axelor.dialogs.confirm(_t("Do you really want to delete the selected record(s)?"), function(confirmed){
-			if (confirmed && $scope.selection && $scope.selection.length)
-				$scope.removeSelected($scope.selection);
-		});
-	};
-	
-	$scope.onSummary = function() {
-		var selected = $scope.getSelectedRecord();
-		if (selected) {
-			$scope.showNestedEditor(true, selected);
-		}
-	};
-	
-	$scope.viewCanCopy = function () {
-		return this.hasPermission("create") && !this.isDisabled() && !this.isReadonly() && this.canCopy();
-	};
+  var _setItems = $scope.setItems;
+  $scope.setItems = function(items) {
+    _setItems(items);
+    $scope.itemsPending = [];
+    if (embedded !== null) {
+      embedded.data('$scope').onClose();
+    }
+    if (detailView !== null)
+    if (items === null || _.isEmpty(items))
+      detailView.hide();
+    else
+      detailView.show();
+  };
 
-	$scope.viewCanExport = function () {
-		if (!$scope.field || !($scope.field.widgetAttrs||{}).canExport) return false;
-		return this.hasPermission("export") && this.canExport();
-	};
+  $scope.removeItems = function(items, fireOnChange) {
+    var all, ids, records;
 
-	$scope.getSelectedRecord = function() {
-		var selected = _.first($scope.selection || []);
-		if (_.isUndefined(selected))
-			return null;
-		return $scope.dataView.getItem(selected);
-	};
-	
-	var _onSelectionChanged = $scope.onSelectionChanged;
-	$scope.onSelectionChanged = function(e, args) {
-		_onSelectionChanged(e, args);
+    if (_.isEmpty(items)) return;
 
-		var field = $scope.field,
-			record = $scope.record || {},
-			selection = $scope.selection || [];
+    all = _.isArray(items) ? items : [items];
 
-		record.$many = record.$many || (record.$many = {});
-		record.$many[field.name] = selection.length ? $scope.getItems : null;
+    ids = _.map(all, function(item) {
+      return _.isNumber(item) ? item : item.id;
+    });
 
-		if (detailView === null) {
-			return;
-		}
+    records = _.filter($scope.getItems(), function(item) {
+      return ids.indexOf(item.id) === -1;
+    });
 
-		$scope.$timeout(function() {
-			var dvs = detailView.scope();
-			var rec = $scope.getSelectedRecord() || {};
-			detailView.show();
-			if (!dvs.record || (dvs.record.id !== rec.id)) {
-				dvs.edit(rec);
-			}
-		});
-	};
-	
-	$scope.onItemDblClick = function(event, args) {
-		if($scope.canView()){
-			$scope.onEdit();
-			$scope.$applyAsync();
-		}
-	};
+    $scope.setValue(records, fireOnChange);
+    $scope.$applyAsync();
+  };
 
-	(function (scope) {
+  $scope.removeSelected = function(selection) {
+    var selected, items;
+    if (_.isEmpty(selection)) return;
+    selected = _.map(selection, function (i) {
+      return $scope.dataView.getItem(i).id;
+    });
+    items = _.filter($scope.getItems(), function (item) {
+      return selected.indexOf(item.id) === -1;
+    });
+    // remove selected from data view
+    _.each(selected, function (id) {
+      if (id && id > -1) $scope.dataView.deleteItem(id);
+    });
+    $scope.setValue(items, true);
+    $scope.$applyAsync();
+  };
 
-		var dummyId = 0;
+  $scope.canEditTarget = function () {
+    return $scope.canEdit() && $scope.attr('canEdit') !== false;
+  };
 
-		function ensureIds(records, clone) {
-			var items = [];
-			angular.forEach(records, function(record){
-				var item = clone ? angular.copy(record, {}) : (record || {});
-				if (!item.id) {
-					item.id = item.$id || (item.$id = --dummyId);
-				}
-				items.push(item);
-			});
-			return items;
-		}
+  $scope.canShowEdit = function () {
+    var selected = $scope.selection.length ? $scope.selection[0] : null;
+    return selected !== null && $scope.canEdit();
+  };
 
-		function fetchData() {
-			var items = scope.getValue();
-			return scope.fetchData(items, function(records){
-				scope.setItems(ensureIds(records, true));
-			});
-		}
+  $scope.canShowView = function () {
+    if ($scope.canShowEdit()) return false;
+    var selected = $scope.selection.length ? $scope.selection[0] : null;
+    return selected !== null && $scope.canView();
+  };
 
-		scope.$$ensureIds = ensureIds;
-		scope.$$fetchData = fetchData;
+  $scope.canEdit = function () {
+    return $scope.attr('canEdit') !== false && $scope.canView();
+  };
 
-	})($scope);
+  var _canRemove = $scope.canRemove;
+  $scope.canRemove = function () {
+    var selected = $scope.selection.length ? $scope.selection[0] : null;
+    return _canRemove() && selected !== null;
+  };
 
-	$scope.reload = function() {
-		return $scope.$$fetchData();
-	};
+  $scope.canCopy = function () {
+    if (!$scope.field || !($scope.field.widgetAttrs||{}).canCopy) return false;
+    if (!$scope.canNew()) return false;
+    if (!$scope.selection || $scope.selection.length !== 1) return false;
+    var record = $scope.dataView.getItem(_.first($scope.selection));
+    return record && record.id > -1;
+  };
 
-	$scope.filter = function() {
-		
-	};
-	
-	$scope.onSort = function(event, args) {
-		
-		//TODO: implement client side sorting (prevent losing O2M changes).
-		if ($scope.isDirty() && !$scope.editorCanSave) {
-			return;
-		}
+  $scope.onCopy = function() {
+    var ds = $scope._dataSource;
+    var index = _.first($scope.selection);
+    var item = $scope.dataView.getItem(index);
+    if (item && item.id > 0) {
+      ds.copy(item.id).success(function(record) {
+        $scope.select([record]);
+        $scope.$timeout(function () {
+          $scope.dataView.$setSelection([$scope.dataView.getLength() - 1], true);
+        }, 100);
+      });
+    }
+  };
 
-		var records = $scope.getItems();
-		if (records == null || records.length === 0)
-			return;
+  $scope.onEdit = function() {
+    var selected = $scope.selection.length ? $scope.selection[0] : null;
+    if (selected !== null) {
+      var record = $scope.dataView.getItem(selected);
+      $scope.showEditor(record);
+    }
+  };
 
-		for (var i = 0; i < records.length; i++) {
-			var item = records[i];
-			if (!item.id || item.id <= 0) {
-				return;
-			}
-		}
+  $scope.onRemove = function() {
+    if (this.isReadonly()) {
+      return;
+    }
+    axelor.dialogs.confirm(_t("Do you really want to delete the selected record(s)?"), function(confirmed){
+      if (confirmed && $scope.selection && $scope.selection.length)
+        $scope.removeSelected($scope.selection);
+    });
+  };
 
-		var sortBy = [];
-		
-		angular.forEach(args.sortCols, function(column){
-			var field = column.sortCol.descriptor;
-			var name = column.sortCol.field;
-			if (field.jsonField) {
-				if (field.type === 'many-to-one' && field.targetName) {
-					name = name + "." + field.targetName;
-				}
-				name += '::' + ('integer,boolean,decimal'.indexOf(field.type) > -1 ? field.type : 'text');
-			}
-			var spec = column.sortAsc ? name : '-' + name;
-			sortBy.push(spec);
-		});
-		
-		var ids = _.pluck(records, 'id');
-		var criterion = {
-			'fieldName': 'id',
-			'operator': 'in',
-			'value': ids
-		};
+  $scope.onSummary = function() {
+    var selected = $scope.getSelectedRecord();
+    if (selected) {
+      $scope.showNestedEditor(true, selected);
+    }
+  };
 
-		var fields = $scope.selectFields();
-		var filter = {
-			operator: 'and',
-			criteria: [criterion]
-		};
-		
-		$scope.selection = [];
-		$scope._dataSource.search({
-			filter: filter,
-			fields: fields,
-			sortBy: sortBy,
-			archived: true,
-			limit: -1,
-			domain: null,
-			context: null
-		});
-	};
-	
-	$scope.onShow = function(viewPromise) {
+  $scope.viewCanCopy = function () {
+    return this.hasPermission("create") && !this.isDisabled() && !this.isReadonly() && this.canCopy();
+  };
 
-	};
-	
-	$scope.show();
+  $scope.viewCanExport = function () {
+    if (!$scope.field || !($scope.field.widgetAttrs||{}).canExport) return false;
+    return this.hasPermission("export") && this.canExport();
+  };
+
+  $scope.getSelectedRecord = function() {
+    var selected = _.first($scope.selection || []);
+    if (_.isUndefined(selected))
+      return null;
+    return $scope.dataView.getItem(selected);
+  };
+
+  var _onSelectionChanged = $scope.onSelectionChanged;
+  $scope.onSelectionChanged = function(e, args) {
+    _onSelectionChanged(e, args);
+
+    var field = $scope.field,
+      record = $scope.record || {},
+      selection = $scope.selection || [];
+
+    record.$many = record.$many || (record.$many = {});
+    record.$many[field.name] = selection.length ? $scope.getItems : null;
+
+    if (detailView === null) {
+      return;
+    }
+
+    $scope.$timeout(function() {
+      var dvs = detailView.scope();
+      var rec = $scope.getSelectedRecord() || {};
+      detailView.show();
+      if (!dvs.record || (dvs.record.id !== rec.id)) {
+        dvs.edit(rec);
+      }
+    });
+  };
+
+  $scope.onItemDblClick = function(event, args) {
+    if($scope.canView()){
+      $scope.onEdit();
+      $scope.$applyAsync();
+    }
+  };
+
+  (function (scope) {
+
+    var dummyId = 0;
+
+    function ensureIds(records, clone) {
+      var items = [];
+      angular.forEach(records, function(record){
+        var item = clone ? angular.copy(record, {}) : (record || {});
+        if (!item.id) {
+          item.id = item.$id || (item.$id = --dummyId);
+        }
+        items.push(item);
+      });
+      return items;
+    }
+
+    function fetchData() {
+      var items = scope.getValue();
+      return scope.fetchData(items, function(records){
+        scope.setItems(ensureIds(records, true));
+      });
+    }
+
+    scope.$$ensureIds = ensureIds;
+    scope.$$fetchData = fetchData;
+
+  })($scope);
+
+  $scope.reload = function() {
+    return $scope.$$fetchData();
+  };
+
+  $scope.filter = function() {
+
+  };
+
+  $scope.onSort = function(event, args) {
+
+    //TODO: implement client side sorting (prevent losing O2M changes).
+    if ($scope.isDirty() && !$scope.editorCanSave) {
+      return;
+    }
+
+    var records = $scope.getItems();
+    if (records == null || records.length === 0)
+      return;
+
+    for (var i = 0; i < records.length; i++) {
+      var item = records[i];
+      if (!item.id || item.id <= 0) {
+        return;
+      }
+    }
+
+    var sortBy = [];
+
+    angular.forEach(args.sortCols, function(column){
+      var field = column.sortCol.descriptor;
+      var name = column.sortCol.field;
+      if (field.jsonField) {
+        if (field.type === 'many-to-one' && field.targetName) {
+          name = name + "." + field.targetName;
+        }
+        name += '::' + ('integer,boolean,decimal'.indexOf(field.type) > -1 ? field.type : 'text');
+      }
+      var spec = column.sortAsc ? name : '-' + name;
+      sortBy.push(spec);
+    });
+
+    var ids = _.pluck(records, 'id');
+    var criterion = {
+      'fieldName': 'id',
+      'operator': 'in',
+      'value': ids
+    };
+
+    var fields = $scope.selectFields();
+    var filter = {
+      operator: 'and',
+      criteria: [criterion]
+    };
+
+    $scope.selection = [];
+    $scope._dataSource.search({
+      filter: filter,
+      fields: fields,
+      sortBy: sortBy,
+      archived: true,
+      limit: -1,
+      domain: null,
+      context: null
+    });
+  };
+
+  $scope.onShow = function(viewPromise) {
+
+  };
+
+  $scope.show();
 }
 
 ui.ManyToManyCtrl = ManyToManyCtrl;
@@ -414,509 +414,509 @@ ui.ManyToManyCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewService'];
 
 function ManyToManyCtrl($scope, $element, DataSource, ViewService) {
 
-	OneToManyCtrl.call(this, $scope, $element, DataSource, ViewService, function(){
-		$scope.editorCanSave = true;
-		$scope.selectEnable = true;
-	});
-	
-	var _setValue = $scope.setValue;
-	$scope.setValue = function(value, trigger) {
-		var compact = _.map(value, function(item) {
-			return {
-				id: item.id,
-				$version: item.version
-			};
-		});
-		_setValue(compact, trigger);
-	};
+  OneToManyCtrl.call(this, $scope, $element, DataSource, ViewService, function(){
+    $scope.editorCanSave = true;
+    $scope.selectEnable = true;
+  });
+
+  var _setValue = $scope.setValue;
+  $scope.setValue = function(value, trigger) {
+    var compact = _.map(value, function(item) {
+      return {
+        id: item.id,
+        $version: item.version
+      };
+    });
+    _setValue(compact, trigger);
+  };
 }
 
 ui.formInput('OneToMany', {
-	
-	css: 'one2many-item',
-	
-	transclude: true,
-	
-	showTitle: false,
-	
-	collapseIfEmpty: true,
-	
-	controller: OneToManyCtrl,
-	
-	link: function(scope, element, attrs, model) {
 
-		scope.ngModel = model;
-		scope.title = attrs.title;
-		
-		scope.formPath = scope.formPath ? scope.formPath + "." + attrs.name : attrs.name;
-		
-		var doRenderUnwatch = null;
-		var doViewPromised = false;
+  css: 'one2many-item',
 
-		var validate = model.$validators.valid || function () { return true; }
-		model.$validators.valid = function(modelValue, viewValue) {
-			if (scope.isRequired() && _.isEmpty(viewValue)) return false;
-			return validate.call(model.$validators, viewValue);
-		};
-		
-		if (scope.field.requiredIf) {
-			scope.$watch("attr('required')", function o2mRequiredWatch(required) {
-				if (required !== undefined) {
-					model.$validate();
-				}
-			});
-		}
-		if (scope.field.validIf) {
-			scope.$watch("attr('valid')", function o2mValidWatch(valid) {
-				if (valid !== undefined) {
-					model.$setValidity('invalid', valid);
-				}
-			});
-		}
+  transclude: true,
 
-		function doRender() {
-			if (doRenderUnwatch) {
-				return;
-			}
-			doRenderUnwatch = scope.$watch(function o2mFetchWatch() {
-				if (!isVisible() || !doViewPromised) {
-					return;
-				}
-				doRenderUnwatch();
-				doRenderUnwatch = null;
-					scope.$$fetchData();
-				});
-		}
-		
-		function isVisible() {
-			return !element.is(':hidden');
-		}
+  showTitle: false,
 
-		scope._viewPromise.then(function () {
-			doViewPromised = true;
-			if (doRenderUnwatch) {
-				doRenderUnwatch();
-				doRenderUnwatch = null;
-				doRender();
-			}
-			});
+  collapseIfEmpty: true,
 
-		model.$render = doRender;
+  controller: OneToManyCtrl,
 
-		var adjustHeight = false;
-		var adjustSize = (function() {
-			var rowSize = +(scope.field.rowHeight) || 26;
-			var	minSize = 56;
-			var elem = element;
-			if (elem.is('.panel-related')) {
-				elem = element.children('.panel-body');
-				minSize = 28;
-			} else if (scope.$hasPanels) {
-				minSize += 28;
-			}
-			if (elem.is('.picker-input')) {
-				elem = null;
-			}
+  link: function(scope, element, attrs, model) {
 
-			var inc = 0,
-				height = +(scope.field.height) || 10;
-			var maxSize = (rowSize * height) + minSize;
+    scope.ngModel = model;
+    scope.title = attrs.title;
 
-			var unwatch = scope.$watch('schema', function (schema) {
-				if (schema) {
-					unwatch();
-					unwatch = null;
-					if (schema.rowHeight && schema.rowHeight !== rowSize) {
-						rowSize = schema.rowHeight;
-						maxSize = (rowSize * height) + minSize
-					}
-				}
-			});
+    scope.formPath = scope.formPath ? scope.formPath + "." + attrs.name : attrs.name;
 
-			return function(value) {
-				inc = arguments[1] || inc;
-				var count = Math.max(_.size(value), scope.dataView.getLength()) + inc, height = minSize;
-				if (count > 0) {
-					height = (rowSize * count) + (minSize + rowSize);
-				}
-				if (elem && adjustHeight) {
-					elem.css('min-height', count ? Math.min(height, maxSize) : (minSize + 26));
-				}
-				axelor.$adjustSize();
-			};
-		})();
+    var doRenderUnwatch = null;
+    var doViewPromised = false;
 
-		var collapseIfEmpty = this.collapseIfEmpty;
-		scope.$watch(attrs.ngModel, function o2mAdjustWatch(value){
-			if (!value) {
-				// clear data view
-				scope.dataView.setItems([]);
-			}
-			if (collapseIfEmpty) {
-				adjustSize(value);
-			}
-		});
+    var validate = model.$validators.valid || function () { return true; }
+    model.$validators.valid = function(modelValue, viewValue) {
+      if (scope.isRequired() && _.isEmpty(viewValue)) return false;
+      return validate.call(model.$validators, viewValue);
+    };
 
-		function deleteItemsById(id) {
-			var items = scope.dataView.getItems() || [];
-			while (items.length > 0) {
-				var item = _.findWhere(items, {id: id});
-				var index = _.indexOf(items, item);
-				if (index === -1) {
-					break;
-				}
-				items.splice(index, 1);
-			}
-			return items;
-		}
+    if (scope.field.requiredIf) {
+      scope.$watch("attr('required')", function o2mRequiredWatch(required) {
+        if (required !== undefined) {
+          model.$validate();
+        }
+      });
+    }
+    if (scope.field.validIf) {
+      scope.$watch("attr('valid')", function o2mValidWatch(valid) {
+        if (valid !== undefined) {
+          model.$setValidity('invalid', valid);
+        }
+      });
+    }
 
-		scope.onGridInit = function(grid, inst) {
-			var editIcon = scope.canView() || (!scope.isReadonly() && scope.canEdit());
-			var editable = grid.getOptions().editable && !axelor.device.mobile;
+    function doRender() {
+      if (doRenderUnwatch) {
+        return;
+      }
+      doRenderUnwatch = scope.$watch(function o2mFetchWatch() {
+        if (!isVisible() || !doViewPromised) {
+          return;
+        }
+        doRenderUnwatch();
+        doRenderUnwatch = null;
+          scope.$$fetchData();
+        });
+    }
 
-			adjustHeight = true;
+    function isVisible() {
+      return !element.is(':hidden');
+    }
 
-			if (editable) {
-				element.addClass('inline-editable');
-				scope.$on('on:new', function(event){
-					var items = deleteItemsById(0);
-					if (items.length === 0) {
-						scope.dataView.setItems([]);
-						grid.setSelectedRows([]);
-					}
-				});
-				scope.$watch("isReadonly()", function o2mReadonlyWatch(readonly) {
-					grid.setOptions({
-						editable: !readonly && scope.canEdit()
-					});
-					
-					var _editIcon = scope.canView() || (!readonly && scope.canEdit());
-					if (_editIcon != editIcon) {
-						inst.showColumn('_edit_column', editIcon = _editIcon);
-					}
-				});
-				
-				adjustSize(scope.getValue(), 1);
-			} else {
-				adjustSize(scope.getValue());
-			}
+    scope._viewPromise.then(function () {
+      doViewPromised = true;
+      if (doRenderUnwatch) {
+        doRenderUnwatch();
+        doRenderUnwatch = null;
+        doRender();
+      }
+      });
 
-			inst.showColumn('_edit_column', editIcon);
+    model.$render = doRender;
 
-			grid.onAddNewRow.subscribe(function (e, args) {
-				var items = scope.getValue() || [];
-				var rows = grid.getDataLength();
-				adjustSize(items, rows - items.length + 1);
-			});
+    var adjustHeight = false;
+    var adjustSize = (function() {
+      var rowSize = +(scope.field.rowHeight) || 26;
+      var	minSize = 56;
+      var elem = element;
+      if (elem.is('.panel-related')) {
+        elem = element.children('.panel-body');
+        minSize = 28;
+      } else if (scope.$hasPanels) {
+        minSize += 28;
+      }
+      if (elem.is('.picker-input')) {
+        elem = null;
+      }
 
-			scope.dataView.onRowCountChanged.subscribe(function (e, args) {
-				adjustSize();
-			});
+      var inc = 0,
+        height = +(scope.field.height) || 10;
+      var maxSize = (rowSize * height) + minSize;
 
-			if (!(scope._viewParams || {}).summaryView || scope.field.widget === "MasterDetail") {
-				return;
-			}
-			var col = {
-				id: '_summary',
-				name: '<span>&nbsp;</span>',
-				sortable: false,
-				resizable: false,
-				width: 16,
-				formatter: function(row, cell, value, columnDef, dataContext) {
-					return '<i class="fa fa-caret-right" style="display: inline-block; cursor: pointer; padding: 4px 10px;"></i>';
-				}
-			};
-			
-			var cols = grid.getColumns();
-			cols.splice(0, 0, col);
-			
-			grid.setColumns(cols);
-			grid.onClick.subscribe(function(e, args) {
-				if ($(e.target).is('.fa-caret-right'))
-					scope.$timeout(function(){
-						grid.setSelectedRows([args.row]);
-						grid.setActiveCell(args.row, args.cell);
-						scope.$timeout(function () {
-							scope.onSummary();
-						});
-					});
-			});
-		};
-		
-		scope.onGridBeforeSave = function(records) {
-			if (!scope.editorCanSave) {
-				deleteItemsById(0);
-				scope.select(records);
-				return false;
-			}
-			return true;
-		};
+      var unwatch = scope.$watch('schema', function (schema) {
+        if (schema) {
+          unwatch();
+          unwatch = null;
+          if (schema.rowHeight && schema.rowHeight !== rowSize) {
+            rowSize = schema.rowHeight;
+            maxSize = (rowSize * height) + minSize
+          }
+        }
+      });
 
-		scope.onGridAfterSave = function(records, args) {
-			if (scope.editorCanSave) {
-				scope.select(records);
-			}
-		};
-		
-		scope.isDisabled = function() {
-			return this.isReadonly();
-		};
+      return function(value) {
+        inc = arguments[1] || inc;
+        var count = Math.max(_.size(value), scope.dataView.getLength()) + inc, height = minSize;
+        if (count > 0) {
+          height = (rowSize * count) + (minSize + rowSize);
+        }
+        if (elem && adjustHeight) {
+          elem.css('min-height', count ? Math.min(height, maxSize) : (minSize + 26));
+        }
+        axelor.$adjustSize();
+      };
+    })();
 
-		var field = scope.field;
-		if (field.widget === 'MasterDetail') {
-			setTimeout(function(){
-				scope.showDetailView();
-			});
-		}
+    var collapseIfEmpty = this.collapseIfEmpty;
+    scope.$watch(attrs.ngModel, function o2mAdjustWatch(value){
+      if (!value) {
+        // clear data view
+        scope.dataView.setItems([]);
+      }
+      if (collapseIfEmpty) {
+        adjustSize(value);
+      }
+    });
 
-		scope.$watch("attr('title')", function o2mTitleWatch(title){
-			scope.title = title;
-		});
-	},
-	
-	template_editable: null,
-	
-	template_readonly: null,
-	
-	template:
-	"<div class='stackbar' ng-class='{noEdit: canView() && !canEdit()}'>" +
-	"<div class='navbar'>" +
-	    "<div class='navbar-inner'>" +
-	        "<div class='container-fluid'>" +
-	            "<span class='brand' href='' ui-help-popover ng-bind-html='title'></span>" +
-	    		"<span class='icons-bar dropdown pull-right' ng-show='viewCanCopy() || viewCanExport()'>" +
-					"<a href='' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-caret-down'></i></a>" +
-					"<ul class='dropdown-menu'>" +
-						"<li ng-show='viewCanCopy()'><a href='' ng-click='onCopy()' x-translate>Duplicate</a></li>" +
-						"<li ng-show='viewCanExport()'><a href='' ng-click='onExport()' x-translate>Export</a></li>" +
-					"</ul>" +
-				"</span>" +
-	            "<span class='icons-bar pull-right' ng-show='!isReadonly()'>" +
-					"<a href='' ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()'>" +
-						"<i class='fa fa-search'></i><span x-translate>Select</span>" +
-					"</a>" +
-					"<a href='' ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()'>" +
-						"<i class='fa fa-plus'></i><span x-translate>New</span>" +
-					"</a>" +
-					"<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()'>" +
-						"<i class='fa fa-pencil'></i><span x-translate>Edit</span>" +
-					"</a>" +
-					"<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowView()'>" +
-						"<i class='fa fa-file-text-o'></i><span x-translate>Show</span>" +
-					"</a>" +
-					"<a href='' ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()'>" +
-						"<i class='fa fa-remove'></i><span x-translate>Remove</span>" +
-					"</a>" +
-	                "<i ng-click='onCopy()' ng-show='hasPermission(\"create\") && !isDisabled() && canCopy()' title='{{\"Duplicate\" | t}}' class='fa fa-files-o'></i>" +
-	            "</span>" +
-	        "</div>" +
-	    "</div>" +
-	"</div>" +
-	"<div ui-view-grid " +
-	    "x-view='schema' " +
-	    "x-data-view='dataView' " +
-	    "x-handler='this' " +
-	    "x-no-filter='true' " +
-	    "x-on-init='onGridInit' " +
-	    "x-on-before-save='onGridBeforeSave' " +
-	    "x-on-after-save='onGridAfterSave' " +
-	    "></div>" +
-	"</div>"
+    function deleteItemsById(id) {
+      var items = scope.dataView.getItems() || [];
+      while (items.length > 0) {
+        var item = _.findWhere(items, {id: id});
+        var index = _.indexOf(items, item);
+        if (index === -1) {
+          break;
+        }
+        items.splice(index, 1);
+      }
+      return items;
+    }
+
+    scope.onGridInit = function(grid, inst) {
+      var editIcon = scope.canView() || (!scope.isReadonly() && scope.canEdit());
+      var editable = grid.getOptions().editable && !axelor.device.mobile;
+
+      adjustHeight = true;
+
+      if (editable) {
+        element.addClass('inline-editable');
+        scope.$on('on:new', function(event){
+          var items = deleteItemsById(0);
+          if (items.length === 0) {
+            scope.dataView.setItems([]);
+            grid.setSelectedRows([]);
+          }
+        });
+        scope.$watch("isReadonly()", function o2mReadonlyWatch(readonly) {
+          grid.setOptions({
+            editable: !readonly && scope.canEdit()
+          });
+
+          var _editIcon = scope.canView() || (!readonly && scope.canEdit());
+          if (_editIcon != editIcon) {
+            inst.showColumn('_edit_column', editIcon = _editIcon);
+          }
+        });
+
+        adjustSize(scope.getValue(), 1);
+      } else {
+        adjustSize(scope.getValue());
+      }
+
+      inst.showColumn('_edit_column', editIcon);
+
+      grid.onAddNewRow.subscribe(function (e, args) {
+        var items = scope.getValue() || [];
+        var rows = grid.getDataLength();
+        adjustSize(items, rows - items.length + 1);
+      });
+
+      scope.dataView.onRowCountChanged.subscribe(function (e, args) {
+        adjustSize();
+      });
+
+      if (!(scope._viewParams || {}).summaryView || scope.field.widget === "MasterDetail") {
+        return;
+      }
+      var col = {
+        id: '_summary',
+        name: '<span>&nbsp;</span>',
+        sortable: false,
+        resizable: false,
+        width: 16,
+        formatter: function(row, cell, value, columnDef, dataContext) {
+          return '<i class="fa fa-caret-right" style="display: inline-block; cursor: pointer; padding: 4px 10px;"></i>';
+        }
+      };
+
+      var cols = grid.getColumns();
+      cols.splice(0, 0, col);
+
+      grid.setColumns(cols);
+      grid.onClick.subscribe(function(e, args) {
+        if ($(e.target).is('.fa-caret-right'))
+          scope.$timeout(function(){
+            grid.setSelectedRows([args.row]);
+            grid.setActiveCell(args.row, args.cell);
+            scope.$timeout(function () {
+              scope.onSummary();
+            });
+          });
+      });
+    };
+
+    scope.onGridBeforeSave = function(records) {
+      if (!scope.editorCanSave) {
+        deleteItemsById(0);
+        scope.select(records);
+        return false;
+      }
+      return true;
+    };
+
+    scope.onGridAfterSave = function(records, args) {
+      if (scope.editorCanSave) {
+        scope.select(records);
+      }
+    };
+
+    scope.isDisabled = function() {
+      return this.isReadonly();
+    };
+
+    var field = scope.field;
+    if (field.widget === 'MasterDetail') {
+      setTimeout(function(){
+        scope.showDetailView();
+      });
+    }
+
+    scope.$watch("attr('title')", function o2mTitleWatch(title){
+      scope.title = title;
+    });
+  },
+
+  template_editable: null,
+
+  template_readonly: null,
+
+  template:
+  "<div class='stackbar' ng-class='{noEdit: canView() && !canEdit()}'>" +
+  "<div class='navbar'>" +
+      "<div class='navbar-inner'>" +
+          "<div class='container-fluid'>" +
+              "<span class='brand' href='' ui-help-popover ng-bind-html='title'></span>" +
+          "<span class='icons-bar dropdown pull-right' ng-show='viewCanCopy() || viewCanExport()'>" +
+          "<a href='' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-caret-down'></i></a>" +
+          "<ul class='dropdown-menu'>" +
+            "<li ng-show='viewCanCopy()'><a href='' ng-click='onCopy()' x-translate>Duplicate</a></li>" +
+            "<li ng-show='viewCanExport()'><a href='' ng-click='onExport()' x-translate>Export</a></li>" +
+          "</ul>" +
+        "</span>" +
+              "<span class='icons-bar pull-right' ng-show='!isReadonly()'>" +
+          "<a href='' ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()'>" +
+            "<i class='fa fa-search'></i><span x-translate>Select</span>" +
+          "</a>" +
+          "<a href='' ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()'>" +
+            "<i class='fa fa-plus'></i><span x-translate>New</span>" +
+          "</a>" +
+          "<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()'>" +
+            "<i class='fa fa-pencil'></i><span x-translate>Edit</span>" +
+          "</a>" +
+          "<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowView()'>" +
+            "<i class='fa fa-file-text-o'></i><span x-translate>Show</span>" +
+          "</a>" +
+          "<a href='' ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()'>" +
+            "<i class='fa fa-remove'></i><span x-translate>Remove</span>" +
+          "</a>" +
+                  "<i ng-click='onCopy()' ng-show='hasPermission(\"create\") && !isDisabled() && canCopy()' title='{{\"Duplicate\" | t}}' class='fa fa-files-o'></i>" +
+              "</span>" +
+          "</div>" +
+      "</div>" +
+  "</div>" +
+  "<div ui-view-grid " +
+      "x-view='schema' " +
+      "x-data-view='dataView' " +
+      "x-handler='this' " +
+      "x-no-filter='true' " +
+      "x-on-init='onGridInit' " +
+      "x-on-before-save='onGridBeforeSave' " +
+      "x-on-after-save='onGridAfterSave' " +
+      "></div>" +
+  "</div>"
 });
 
 ui.formInput('ManyToMany', 'OneToMany', {
-	
-	css	: 'many2many-item',
-	
-	controller: ManyToManyCtrl
+
+  css	: 'many2many-item',
+
+  controller: ManyToManyCtrl
 });
 
-var panelRelatedTemplate = 
+var panelRelatedTemplate =
 "<div class='panel panel-related' ng-class='{noEdit: canView() && !canEdit()}'>" +
-	"<div class='panel-header'>" +
-		"<div class='panel-title'><span ui-help-popover ng-bind-html='title'></span></div>" +
-		"<div class='icons-bar' ng-show='!isReadonly()'>" +
-			"<a href='' ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()'>" +
-				"<i class='fa fa-search'></i><span x-translate>Select</span>" +
-			"</a>" +
-			"<a href='' ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()'>" +
-				"<i class='fa fa-plus'></i><span x-translate>New</span>" +
-			"</a>" +
-			"<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()'>" +
-				"<i class='fa fa-pencil'></i><span x-translate>Edit</span>" +
-			"</a>" +
-			"<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowView()'>" +
-				"<i class='fa fa-file-text-o'></i><span x-translate>Show</span>" +
-			"</a>" +
-			"<a href='' ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()'>" +
-				"<i class='fa fa-remove'></i><span x-translate>Remove</span>" +
-			"</a>" +
-		"</div>" +
-		"<div class='icons-bar dropdown' ng-show='viewCanCopy() || viewCanExport()'>" +
-			"<a href='' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-caret-down'></i></a>" +
-			"<ul class='dropdown-menu'>" +
-				"<li ng-show='viewCanCopy()'><a href='' ng-click='onCopy()' x-translate>Duplicate</a></li>" +
-				"<li ng-show='viewCanExport()'><a href='' ng-click='onExport()' x-translate>Export</a></li>" +
-			"</ul>" +
-		"</div>" +
-	"</div>" +
-	"<div class='panel-body panel-layout'>" +
-		"<div ui-view-grid " +
-			"x-view='schema' " +
-			"x-data-view='dataView' " +
-			"x-handler='this' " +
-			"x-no-filter='true' " +
-			"x-on-init='onGridInit' " +
-			"x-on-before-save='onGridBeforeSave' " +
-			"x-on-after-save='onGridAfterSave'></div>" +
-	"</div>" +
+  "<div class='panel-header'>" +
+    "<div class='panel-title'><span ui-help-popover ng-bind-html='title'></span></div>" +
+    "<div class='icons-bar' ng-show='!isReadonly()'>" +
+      "<a href='' ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()'>" +
+        "<i class='fa fa-search'></i><span x-translate>Select</span>" +
+      "</a>" +
+      "<a href='' ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()'>" +
+        "<i class='fa fa-plus'></i><span x-translate>New</span>" +
+      "</a>" +
+      "<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()'>" +
+        "<i class='fa fa-pencil'></i><span x-translate>Edit</span>" +
+      "</a>" +
+      "<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowView()'>" +
+        "<i class='fa fa-file-text-o'></i><span x-translate>Show</span>" +
+      "</a>" +
+      "<a href='' ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()'>" +
+        "<i class='fa fa-remove'></i><span x-translate>Remove</span>" +
+      "</a>" +
+    "</div>" +
+    "<div class='icons-bar dropdown' ng-show='viewCanCopy() || viewCanExport()'>" +
+      "<a href='' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-caret-down'></i></a>" +
+      "<ul class='dropdown-menu'>" +
+        "<li ng-show='viewCanCopy()'><a href='' ng-click='onCopy()' x-translate>Duplicate</a></li>" +
+        "<li ng-show='viewCanExport()'><a href='' ng-click='onExport()' x-translate>Export</a></li>" +
+      "</ul>" +
+    "</div>" +
+  "</div>" +
+  "<div class='panel-body panel-layout'>" +
+    "<div ui-view-grid " +
+      "x-view='schema' " +
+      "x-data-view='dataView' " +
+      "x-handler='this' " +
+      "x-no-filter='true' " +
+      "x-on-init='onGridInit' " +
+      "x-on-before-save='onGridBeforeSave' " +
+      "x-on-after-save='onGridAfterSave'></div>" +
+  "</div>" +
 "</div>";
 
 ui.formInput('PanelOneToMany', 'OneToMany', {
-	template_editable: null,
-	template_readonly: null,
-	template: panelRelatedTemplate
+  template_editable: null,
+  template_readonly: null,
+  template: panelRelatedTemplate
 });
 
 ui.formInput('PanelManyToMany', 'ManyToMany', {
-	template_editable: null,
-	template_readonly: null,
-	template: panelRelatedTemplate
+  template_editable: null,
+  template_readonly: null,
+  template: panelRelatedTemplate
 });
 
 ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
 
-	css	: 'many2many-tags',
+  css	: 'many2many-tags',
 
-	showTitle: true,
-	
-	init: function(scope) {
-		this._super(scope);
+  showTitle: true,
 
-		var nameField = scope.field.targetName || 'id';
-		
-		scope.parse = function(value) {
-			return value;
-		};
+  init: function(scope) {
+    this._super(scope);
 
-		scope.formatItem = function(item) {
-			return item ? item[nameField] : item;
-		};
+    var nameField = scope.field.targetName || 'id';
 
-		scope.getItems = function() {
-			return _.pluck(this.getSelection(), "value");
-		};
-		
-		var _select = scope.select;
-		scope.select = function (value) {
-			var res = _select.apply(scope, arguments);
-			scope.itemsPending = [];
-			return res;
-		};
+    scope.parse = function(value) {
+      return value;
+    };
 
-		scope.handleClick = function(e, item) {
-			if (scope.field['tag-edit'] && scope.onTagEdit && !scope.isReadonly()) {
-				return scope.onTagEdit(e, item);
-			}
-        	scope.showEditor(item);
+    scope.formatItem = function(item) {
+      return item ? item[nameField] : item;
+    };
+
+    scope.getItems = function() {
+      return _.pluck(this.getSelection(), "value");
+    };
+
+    var _select = scope.select;
+    scope.select = function (value) {
+      var res = _select.apply(scope, arguments);
+      scope.itemsPending = [];
+      return res;
+    };
+
+    scope.handleClick = function(e, item) {
+      if (scope.field['tag-edit'] && scope.onTagEdit && !scope.isReadonly()) {
+        return scope.onTagEdit(e, item);
+      }
+          scope.showEditor(item);
         };
-	},
+  },
 
-	link_editable: function(scope, element, attrs, model) {
-		this._super.apply(this, arguments);
-		
-		var input = this.findInput(element);
-		var field = scope.field;
+  link_editable: function(scope, element, attrs, model) {
+    this._super.apply(this, arguments);
+
+    var input = this.findInput(element);
+    var field = scope.field;
 
         function create(term, popup) {
-			scope.createOnTheFly(term, popup, function (record) {
-				scope.select(record);
-				setTimeout(function() {
-					input.focus();
-				});
-			});
-		}
+      scope.createOnTheFly(term, popup, function (record) {
+        scope.select(record);
+        setTimeout(function() {
+          input.focus();
+        });
+      });
+    }
 
         scope.loadSelection = function(request, response) {
 
-			if (!scope.canSelect()) {
-				return response([]);
-			}
+      if (!scope.canSelect()) {
+        return response([]);
+      }
 
-			this.fetchSelection(request, function(items, page) {
-				var term = request.term;
-				var text = '<strong><em>' + term + '</em></strong>';
-				var canSelect = scope.canSelect() && (items.length < page.total || (request.term && items.length === 0));
-				if (field.create && term && scope.canNew()) {
-					items.push({
-						label : _t('Create "{0}" and select...', text),
-						click : function() { create(term); }
-					});
-					items.push({
-						label : _t('Create "{0}"...', text),
-						click : function() { create(term, true); }
-					});
-				}
-				if (canSelect) {
-					items.push({
-						label : _t("Search more..."),
-						click : function() { scope.showSelector(); }
-					});
-				}
-				if ((field.create === undefined || (field.create && !term)) && scope.canNew()) {
-					items.push({
-						label: _t("Create..."),
-						click: function() { scope.showPopupEditor(); }
-					});
-				}
-				response(items);
-			});
-		};
+      this.fetchSelection(request, function(items, page) {
+        var term = request.term;
+        var text = '<strong><em>' + term + '</em></strong>';
+        var canSelect = scope.canSelect() && (items.length < page.total || (request.term && items.length === 0));
+        if (field.create && term && scope.canNew()) {
+          items.push({
+            label : _t('Create "{0}" and select...', text),
+            click : function() { create(term); }
+          });
+          items.push({
+            label : _t('Create "{0}"...', text),
+            click : function() { create(term, true); }
+          });
+        }
+        if (canSelect) {
+          items.push({
+            label : _t("Search more..."),
+            click : function() { scope.showSelector(); }
+          });
+        }
+        if ((field.create === undefined || (field.create && !term)) && scope.canNew()) {
+          items.push({
+            label: _t("Create..."),
+            click: function() { scope.showPopupEditor(); }
+          });
+        }
+        response(items);
+      });
+    };
 
-		scope.matchValues = function(a, b) {
-			if (a === b) return true;
-			if (!a) return false;
-			if (!b) return false;
-			return a.id === b.id;
-		};
+    scope.matchValues = function(a, b) {
+      if (a === b) return true;
+      if (!a) return false;
+      if (!b) return false;
+      return a.id === b.id;
+    };
 
-		var _setValue = scope.setValue;
-		scope.setValue = function(value, fireOnChange) {
-			var items = _.map(value, function(item) {
-				if (item.version === undefined) {
-					return item;
-				}
-				var ver = item.version;
-				var val = _.omit(item, "version");
-				val.$version = ver;
-				return val;
-			});
-			items = _.isEmpty(items) ? null : items;
-			return _setValue.call(this, items, fireOnChange);
-		};
-		
-		var _handleSelect = scope.handleSelect;
-		scope.handleSelect = function(e, ui) {
-			if (ui.item.click) {
-				setTimeout(function(){
-					input.val("");
-				});
-				ui.item.click.call(scope);
-				return scope.$applyAsync();
-			}
-			return _handleSelect.apply(this, arguments);
-		};
+    var _setValue = scope.setValue;
+    scope.setValue = function(value, fireOnChange) {
+      var items = _.map(value, function(item) {
+        if (item.version === undefined) {
+          return item;
+        }
+        var ver = item.version;
+        var val = _.omit(item, "version");
+        val.$version = ver;
+        return val;
+      });
+      items = _.isEmpty(items) ? null : items;
+      return _setValue.call(this, items, fireOnChange);
+    };
 
-		var _removeItem = scope.removeItem;
-		scope.removeItem = function(e, ui) {
-			if (scope.attr('canRemove') === false) return;
-			_removeItem.apply(this, arguments);
-		};
+    var _handleSelect = scope.handleSelect;
+    scope.handleSelect = function(e, ui) {
+      if (ui.item.click) {
+        setTimeout(function(){
+          input.val("");
+        });
+        ui.item.click.call(scope);
+        return scope.$applyAsync();
+      }
+      return _handleSelect.apply(this, arguments);
+    };
 
-		if (scope.field && scope.field['tag-edit']) {
-			scope.attachTagEditor(scope, element, attrs);
-		}
-	}
+    var _removeItem = scope.removeItem;
+    scope.removeItem = function(e, ui) {
+      if (scope.attr('canRemove') === false) return;
+      _removeItem.apply(this, arguments);
+    };
+
+    if (scope.field && scope.field['tag-edit']) {
+      scope.attachTagEditor(scope, element, attrs);
+    }
+  }
 });
 
 ui.InlineOneToManyCtrl = InlineOneToManyCtrl;
@@ -924,170 +924,170 @@ ui.InlineOneToManyCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewServi
 
 function InlineOneToManyCtrl($scope, $element, DataSource, ViewService) {
 
-	var field = $scope.field || $scope.getViewDef($element);
-	var params = {
-		model: field.target
-	};
+  var field = $scope.field || $scope.getViewDef($element);
+  var params = {
+    model: field.target
+  };
 
-	if (field.editor) {
-		params.views = [{
-			type: 'grid',
-			items: field.editor.items
-		}];
-	}
+  if (field.editor) {
+    params.views = [{
+      type: 'grid',
+      items: field.editor.items
+    }];
+  }
 
-	$scope._viewParams = params;
+  $scope._viewParams = params;
 
-	OneToManyCtrl.call(this, $scope, $element, DataSource, ViewService, function(){
-		$scope.editorCanSave = false;
-		$scope.selectEnable = false;
-	});
+  OneToManyCtrl.call(this, $scope, $element, DataSource, ViewService, function(){
+    $scope.editorCanSave = false;
+    $scope.selectEnable = false;
+  });
 }
 
 // used in panel form
 ui.formInput('InlineOneToMany', 'OneToMany', {
 
-	showTitle: true,
+  showTitle: true,
 
-	controller: InlineOneToManyCtrl,
+  controller: InlineOneToManyCtrl,
 
-	link: function(scope, element, attrs, model) {
-		this._super.apply(this, arguments);
+  link: function(scope, element, attrs, model) {
+    this._super.apply(this, arguments);
 
-		scope.onGridInit = function() {};
-		scope.items = [];
+    scope.onGridInit = function() {};
+    scope.items = [];
 
-		var showOnNew = (scope.field.editor||{}).showOnNew !== false;
-		var unwatch = null;
+    var showOnNew = (scope.field.editor||{}).showOnNew !== false;
+    var unwatch = null;
 
-		function canAdd() {
-			return scope.hasPermission("write") && !scope.isDisabled() && scope.canNew();
-		}
+    function canAdd() {
+      return scope.hasPermission("write") && !scope.isDisabled() && scope.canNew();
+    }
 
-		model.$render = function () {
-			if (unwatch) {
-				unwatch();
-				unwatch = null;
-			}
-			scope.items = model.$viewValue;
-			if ((scope.items && scope.items.length > 0) || scope.$$readonly) {
-				return;
-			}
-			scope.items = showOnNew && canAdd() ? [{}] : [];
-			unwatch = scope.$watch('items[0]', function o2mFirstItemWatch(item, old) {
-				if (!item) return;
-				if (item.$changed) {
-					unwatch();
-					model.$setViewValue(scope.items);
-				}
-				item.$changed = true;
-			}, true);
-		};
-		
-		function isEmpty(record) {
-			if (!record || _.isEmpty(record)) return true;
-			var values = _.filter(record, function (value, name) {
-				return !(/[\$_]/.test(name) || value === null || value === undefined);
-			});
-			return values.length === 0;
-		}
+    model.$render = function () {
+      if (unwatch) {
+        unwatch();
+        unwatch = null;
+      }
+      scope.items = model.$viewValue;
+      if ((scope.items && scope.items.length > 0) || scope.$$readonly) {
+        return;
+      }
+      scope.items = showOnNew && canAdd() ? [{}] : [];
+      unwatch = scope.$watch('items[0]', function o2mFirstItemWatch(item, old) {
+        if (!item) return;
+        if (item.$changed) {
+          unwatch();
+          model.$setViewValue(scope.items);
+        }
+        item.$changed = true;
+      }, true);
+    };
 
-		function itemsChanged() {
-			var items = scope.items;
-			if (items && items.length > 0) {
-				var changed = false;
-				var values = _.filter(items, function (item) {
-					if (item.$changed) {
-						changed = true;
-					}
-					return !isEmpty(item);
-				});
-				if (changed && values.length) {
-					model.$setViewValue(values);
-				}
-			}
-		};
+    function isEmpty(record) {
+      if (!record || _.isEmpty(record)) return true;
+      var values = _.filter(record, function (value, name) {
+        return !(/[\$_]/.test(name) || value === null || value === undefined);
+      });
+      return values.length === 0;
+    }
 
-		scope.$watch('items', itemsChanged, true);
-		scope.$itemsChanged = itemsChanged;
+    function itemsChanged() {
+      var items = scope.items;
+      if (items && items.length > 0) {
+        var changed = false;
+        var values = _.filter(items, function (item) {
+          if (item.$changed) {
+            changed = true;
+          }
+          return !isEmpty(item);
+        });
+        if (changed && values.length) {
+          model.$setViewValue(values);
+        }
+      }
+    };
 
-		scope.$watch('$$readonly', function o2mReadonlyWatch(readonly, old) {
-			if (readonly === undefined) return;
-			var items = model.$viewValue;
-			if (_.isEmpty(items)) {
-				scope.items = (showOnNew && canAdd() && !readonly) ? [{}] : items;
-			}
-		});
+    scope.$watch('items', itemsChanged, true);
+    scope.$itemsChanged = itemsChanged;
 
-		scope.addItem = function () {
-			var items = scope.items || (scope.items = []);
-			var item = _.last(items);
-			if (items && items.length && isEmpty(item)) {
-				return;
-			}
-			if (canAdd()) {
-				items.push({});
-			}
-		};
+    scope.$watch('$$readonly', function o2mReadonlyWatch(readonly, old) {
+      if (readonly === undefined) return;
+      var items = model.$viewValue;
+      if (_.isEmpty(items)) {
+        scope.items = (showOnNew && canAdd() && !readonly) ? [{}] : items;
+      }
+    });
 
-		scope.removeItem = function (index) {
-			var items = scope.items;
-			items.splice(index, 1);
-			var values = _.filter(items, function (item) {
-				return !isEmpty(item);
-			});
-			if (items.length === 0 && showOnNew) {
-				scope.addItem();
-			}
-			model.$setViewValue(values);
-		};
+    scope.addItem = function () {
+      var items = scope.items || (scope.items = []);
+      var item = _.last(items);
+      if (items && items.length && isEmpty(item)) {
+        return;
+      }
+      if (canAdd()) {
+        items.push({});
+      }
+    };
 
-		scope.canRemove = function () {
-			return scope.attr('canRemove') !== false;
-		}
+    scope.removeItem = function (index) {
+      var items = scope.items;
+      items.splice(index, 1);
+      var values = _.filter(items, function (item) {
+        return !isEmpty(item);
+      });
+      if (items.length === 0 && showOnNew) {
+        scope.addItem();
+      }
+      model.$setViewValue(values);
+    };
 
-		scope.setValidity = function (key, value) {
-			model.$setValidity(key, value);
-		};
+    scope.canRemove = function () {
+      return scope.attr('canRemove') !== false;
+    }
 
-		scope.setExclusive = function (name, record) {
-			_.each(scope.items, function (item) {
-				if (record !== item) {
-					item[name] = false;
-				}
-			});
-		};
-	},
+    scope.setValidity = function (key, value) {
+      model.$setValidity(key, value);
+    };
 
-	template_readonly:function (scope) {
-		var field = scope.field;
-		var tmpl = (field.viewer || {}).template;
-		if (!tmpl && field.editor && (field.editor.viewer || !field.targetName)) {
-			tmpl = '<div class="o2m-editor-form" ui-panel-editor></div>';
-		}
-		if (!tmpl && field.targetName) {
-			tmpl = '{{record.' + field.targetName + '}}';
-		}
-		tmpl = tmpl || '{{record.id}}';
-		return "<div class='o2m-list'>" +
-		"<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items'>" + tmpl + "</div>" +
-		"</div>";
-	},
+    scope.setExclusive = function (name, record) {
+      _.each(scope.items, function (item) {
+        if (record !== item) {
+          item[name] = false;
+        }
+      });
+    };
+  },
 
-	template_editable: function (scope) {
-		return "<div class='o2m-list'>" +
-			"<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items'>" +
-				"<div class='o2m-editor-form' ui-panel-editor></div>" +
-				"<span class='o2m-list-remove' ng-show='hasPermission(\"remove\") && !isDisabled() && canRemove()'>" +
-					"<a tabindex='-1' href='' ng-click='removeItem($index)' title='{{\"Remove\" | t}}'><i class='fa fa-times'></i></a>" +
-				"</span>" +
-			"</div>" +
-			"<div class='o2m-list-row o2m-list-add' ng-show='hasPermission(\"write\") && !isDisabled() && canNew()'>" +
-				"<a tabindex='-1' href='' ng-click='addItem()'  title='{{\"Add\" | t}}'><i class='fa fa-plus'></i></a>" +
-			"</div>" +
-		"</div>";
-	},
-	template: null
+  template_readonly:function (scope) {
+    var field = scope.field;
+    var tmpl = (field.viewer || {}).template;
+    if (!tmpl && field.editor && (field.editor.viewer || !field.targetName)) {
+      tmpl = '<div class="o2m-editor-form" ui-panel-editor></div>';
+    }
+    if (!tmpl && field.targetName) {
+      tmpl = '{{record.' + field.targetName + '}}';
+    }
+    tmpl = tmpl || '{{record.id}}';
+    return "<div class='o2m-list'>" +
+    "<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items'>" + tmpl + "</div>" +
+    "</div>";
+  },
+
+  template_editable: function (scope) {
+    return "<div class='o2m-list'>" +
+      "<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items'>" +
+        "<div class='o2m-editor-form' ui-panel-editor></div>" +
+        "<span class='o2m-list-remove' ng-show='hasPermission(\"remove\") && !isDisabled() && canRemove()'>" +
+          "<a tabindex='-1' href='' ng-click='removeItem($index)' title='{{\"Remove\" | t}}'><i class='fa fa-times'></i></a>" +
+        "</span>" +
+      "</div>" +
+      "<div class='o2m-list-row o2m-list-add' ng-show='hasPermission(\"write\") && !isDisabled() && canNew()'>" +
+        "<a tabindex='-1' href='' ng-click='addItem()'  title='{{\"Add\" | t}}'><i class='fa fa-plus'></i></a>" +
+      "</div>" +
+    "</div>";
+  },
+  template: null
 });
 
 //used in panel form
@@ -1098,181 +1098,181 @@ ui.formInput('InlineManyToMany', 'InlineOneToMany', {
 // used in editable grid
 ui.formInput('OneToManyInline', 'OneToMany', {
 
-	css	: 'one2many-inline',
+  css	: 'one2many-inline',
 
-	collapseIfEmpty : false,
-	
-	link: function(scope, element, attrs, model) {
-		
-		this._super.apply(this, arguments);
+  collapseIfEmpty : false,
 
-		scope.onSort = function() {
-			
-		};
-		
-		var field = scope.field;
-		var input = element.children('input');
-		var grid = element.children('[ui-slick-grid]');
-		
-		var container = null;
-		var wrapper = $('<div class="slick-editor-dropdown"></div>')
-			.css("position", "absolute")
-			.hide();
+  link: function(scope, element, attrs, model) {
 
-		var render = model.$render,
-			renderPending = false;
-		model.$render = function() {
-			if (wrapper.is(":visible")) {
-				renderPending = false;
-				render();
-				grid.trigger('adjust:size');
-			} else {
-				renderPending = true;
-			}
-		};
-		
-		scope.waitForActions(function(){
-			container = element.parents('.ui-dialog-content,.view-container').first();
-			grid.height(175).appendTo(wrapper);
-			wrapper.height(175).appendTo(container);
-		});
-		
-		function adjust() {
-			if (!wrapper.is(":visible"))
-				return;
-			if (axelor.device.small) {
-				dropdownVisible = false;
-				return wrapper.hide();
-			}
-			wrapper.position({
-				my: "left top",
-				at: "left bottom",
-				of: element,
-				within: container
-			})
-			.zIndex(element.zIndex() + 1)
-			.width(element.width());
-		}
-		
-		var dropdownVisible = false;
-		scope.onDropdown = function () {
-			dropdownVisible = !dropdownVisible;
-			if (!dropdownVisible) {
-				wrapper.hide();
-				return;
-			}
-			if (renderPending) {
-				renderPending = false;
-				render();
-				setTimeout(function () {
-					axelor.$adjustSize();
-				});
-			}
-			wrapper.show();
-			adjust();
-		};
+    this._super.apply(this, arguments);
 
-		scope.canDropdown = function () {
-			return !axelor.device.small;
-		};
+    scope.onSort = function() {
 
-		scope.canShowAdd = function () {
-			return dropdownVisible && scope.canEdit();
-		};
+    };
 
-		scope.canShowRemove = function () {
-			return dropdownVisible && scope.canRemove() && !_.isEmpty(scope.selection);
-		};
+    var field = scope.field;
+    var input = element.children('input');
+    var grid = element.children('[ui-slick-grid]');
 
-		element.on("hide:slick-editor", function(e){
-			dropdownVisible = false;
-			wrapper.hide();
-		});
-		
-		scope.$onAdjust(adjust, 300);
-		
-		input.on('keydown', function (e) {
-			if (e.keyCode === 40 && e.ctrlKey && !dropdownVisible) {
-				scope.onDropdown();
-			}
-		});
+    var container = null;
+    var wrapper = $('<div class="slick-editor-dropdown"></div>')
+      .css("position", "absolute")
+      .hide();
 
-		function hidePopup(e) {
-			if (element.is(':hidden')) {
-				return;
-			}
-			var all = element.add(wrapper);
-			var elem = $(e.target);
-			if (all.is(elem) || all.has(elem).length > 0) return;
-			if (elem.zIndex() > element.parents('.slickgrid:first').zIndex()) return;
-			if (elem.parents(".ui-dialog:first").zIndex() > element.parents('.slickgrid:first').zIndex()) return;
+    var render = model.$render,
+      renderPending = false;
+    model.$render = function() {
+      if (wrapper.is(":visible")) {
+        renderPending = false;
+        render();
+        grid.trigger('adjust:size');
+      } else {
+        renderPending = true;
+      }
+    };
 
-			element.trigger('close:slick-editor');
-		}
-		
-		$(document).on('mousedown.mini-grid', hidePopup);
-		
-		scope.$watch(attrs.ngModel, function o2mModelWatch(value) {
-			var text = "";
-			if (value && value.length)
-				text = "(" + value.length + ")";
-			input.val(text);
-		});
-		
-		scope.$watch('schema.loaded', function o2mSchemaWatch(viewLoaded) {
-			var schema = scope.schema;
-			if (schema && scope.attr('canEdit') === false) {
-				schema.editIcon = false;
-			}
-		});
-		
-		scope.$on("$destroy", function(e){
-			wrapper.remove();
-			$(document).off('mousedown.mini-grid', hidePopup);
-		});
+    scope.waitForActions(function(){
+      container = element.parents('.ui-dialog-content,.view-container').first();
+      grid.height(175).appendTo(wrapper);
+      wrapper.height(175).appendTo(container);
+    });
 
-		scope.canEdit = function () {
-			return scope.hasPermission('create') && !scope.isReadonly() && scope.attr('canEdit') !== false;
-		};
+    function adjust() {
+      if (!wrapper.is(":visible"))
+        return;
+      if (axelor.device.small) {
+        dropdownVisible = false;
+        return wrapper.hide();
+      }
+      wrapper.position({
+        my: "left top",
+        at: "left bottom",
+        of: element,
+        within: container
+      })
+      .zIndex(element.zIndex() + 1)
+      .width(element.width());
+    }
 
-		scope.canRemove = function() {
-			return scope.hasPermission('create') && !scope.isReadonly() && scope.attr('canEdit') !== false;
-		};
-	},
-	
-	template_editable: null,
-	
-	template_readonly: null,
-	
-	template:
-	'<span class="picker-input picker-icons-2" style="position: absolute;">'+
-		'<input type="text" readonly>'+
-		'<span class="picker-icons">'+
-			'<i class="fa fa-plus" ng-click="onSelect()" ng-show="canShowAdd()" title="{{\'Select\' | t}}"></i>'+
-			'<i class="fa fa-minus" ng-click="onRemove()" ng-show="canShowRemove()" title="{{\'Select\' | t}}"></i>'+
-			'<i class="fa fa-caret-down" ng-show="canDropdown()" ng-click="onDropdown()" title="{{\'Show\' | t}}"></i>'+
-		'</span>'+
-		'<div ui-view-grid ' +
-			'x-view="schema" '+
-			'x-data-view="dataView" '+
-			'x-handler="this" '+
-			'x-no-filter="true" '+
-			'x-on-init="onGridInit" '+
-			'x-on-before-save="onGridBeforeSave" '+
-			'x-on-after-save="onGridAfterSave" '+
-			'></div>'+
-	'</span>'
+    var dropdownVisible = false;
+    scope.onDropdown = function () {
+      dropdownVisible = !dropdownVisible;
+      if (!dropdownVisible) {
+        wrapper.hide();
+        return;
+      }
+      if (renderPending) {
+        renderPending = false;
+        render();
+        setTimeout(function () {
+          axelor.$adjustSize();
+        });
+      }
+      wrapper.show();
+      adjust();
+    };
+
+    scope.canDropdown = function () {
+      return !axelor.device.small;
+    };
+
+    scope.canShowAdd = function () {
+      return dropdownVisible && scope.canEdit();
+    };
+
+    scope.canShowRemove = function () {
+      return dropdownVisible && scope.canRemove() && !_.isEmpty(scope.selection);
+    };
+
+    element.on("hide:slick-editor", function(e){
+      dropdownVisible = false;
+      wrapper.hide();
+    });
+
+    scope.$onAdjust(adjust, 300);
+
+    input.on('keydown', function (e) {
+      if (e.keyCode === 40 && e.ctrlKey && !dropdownVisible) {
+        scope.onDropdown();
+      }
+    });
+
+    function hidePopup(e) {
+      if (element.is(':hidden')) {
+        return;
+      }
+      var all = element.add(wrapper);
+      var elem = $(e.target);
+      if (all.is(elem) || all.has(elem).length > 0) return;
+      if (elem.zIndex() > element.parents('.slickgrid:first').zIndex()) return;
+      if (elem.parents(".ui-dialog:first").zIndex() > element.parents('.slickgrid:first').zIndex()) return;
+
+      element.trigger('close:slick-editor');
+    }
+
+    $(document).on('mousedown.mini-grid', hidePopup);
+
+    scope.$watch(attrs.ngModel, function o2mModelWatch(value) {
+      var text = "";
+      if (value && value.length)
+        text = "(" + value.length + ")";
+      input.val(text);
+    });
+
+    scope.$watch('schema.loaded', function o2mSchemaWatch(viewLoaded) {
+      var schema = scope.schema;
+      if (schema && scope.attr('canEdit') === false) {
+        schema.editIcon = false;
+      }
+    });
+
+    scope.$on("$destroy", function(e){
+      wrapper.remove();
+      $(document).off('mousedown.mini-grid', hidePopup);
+    });
+
+    scope.canEdit = function () {
+      return scope.hasPermission('create') && !scope.isReadonly() && scope.attr('canEdit') !== false;
+    };
+
+    scope.canRemove = function() {
+      return scope.hasPermission('create') && !scope.isReadonly() && scope.attr('canEdit') !== false;
+    };
+  },
+
+  template_editable: null,
+
+  template_readonly: null,
+
+  template:
+  '<span class="picker-input picker-icons-2" style="position: absolute;">'+
+    '<input type="text" readonly>'+
+    '<span class="picker-icons">'+
+      '<i class="fa fa-plus" ng-click="onSelect()" ng-show="canShowAdd()" title="{{\'Select\' | t}}"></i>'+
+      '<i class="fa fa-minus" ng-click="onRemove()" ng-show="canShowRemove()" title="{{\'Select\' | t}}"></i>'+
+      '<i class="fa fa-caret-down" ng-show="canDropdown()" ng-click="onDropdown()" title="{{\'Show\' | t}}"></i>'+
+    '</span>'+
+    '<div ui-view-grid ' +
+      'x-view="schema" '+
+      'x-data-view="dataView" '+
+      'x-handler="this" '+
+      'x-no-filter="true" '+
+      'x-on-init="onGridInit" '+
+      'x-on-before-save="onGridBeforeSave" '+
+      'x-on-after-save="onGridAfterSave" '+
+      '></div>'+
+  '</span>'
 });
 
 ui.formInput('ManyToManyInline', 'OneToManyInline', {
-	
-	css	: 'many2many-inline',
-	
-	controller: ManyToManyCtrl,
-	
-	link: function(scope, element, attrs, model) {
-		this._super.apply(this, arguments);
-	}
+
+  css	: 'many2many-inline',
+
+  controller: ManyToManyCtrl,
+
+  link: function(scope, element, attrs, model) {
+    this._super.apply(this, arguments);
+  }
 });
 
 })();

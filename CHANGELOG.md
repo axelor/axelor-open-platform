@@ -17,9 +17,9 @@
 
 * Add support for domain filter blacklist pattern
 
-	```
-	domain.blacklist.pattern = (\\(\\s*SELECT\\s+)|some_function
-	```
+  ```
+  domain.blacklist.pattern = (\\(\\s*SELECT\\s+)|some_function
+  ```
 
   The old `domain.allow.sub-select` settings is removed in favor of this one.
 

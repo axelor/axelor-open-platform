@@ -17,103 +17,94 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
-
 @XmlType
 @JsonTypeName("calendar")
 public class CalendarView extends AbstractView {
-	
-	@XmlAttribute
-	private String mode;
-	
-	@XmlAttribute
-	private String colorBy;
-	
-	@XmlAttribute
-	private String onChange;
 
-	@XmlAttribute
-	private String eventStart;
-	
-	@XmlAttribute
-	private String eventStop;
-	
-	@XmlAttribute
-	private Integer eventLength;
-	
-	@XmlAttribute
-	private Integer dayLength;
+  @XmlAttribute private String mode;
 
-	@XmlElement(name="field", type=Field.class)
-	private List<AbstractWidget> items;
+  @XmlAttribute private String colorBy;
 
-	public List<AbstractWidget> getItems() {
-		return items;
-	}
+  @XmlAttribute private String onChange;
 
-	public String getMode() {
-		return mode;
-	}
+  @XmlAttribute private String eventStart;
 
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
+  @XmlAttribute private String eventStop;
 
-	public String getColorBy() {
-		return colorBy;
-	}
+  @XmlAttribute private Integer eventLength;
 
-	public void setColorBy(String colorBy) {
-		this.colorBy = colorBy;
-	}
+  @XmlAttribute private Integer dayLength;
 
-	public String getOnChange() {
-		return onChange;
-	}
+  @XmlElement(name = "field", type = Field.class)
+  private List<AbstractWidget> items;
 
-	public void setOnChange(String onChange) {
-		this.onChange = onChange;
-	}
+  public List<AbstractWidget> getItems() {
+    return items;
+  }
 
-	public String getEventStart() {
-		return eventStart;
-	}
+  public String getMode() {
+    return mode;
+  }
 
-	public void setEventStart(String eventStart) {
-		this.eventStart = eventStart;
-	}
+  public void setMode(String mode) {
+    this.mode = mode;
+  }
 
-	public String getEventStop() {
-		return eventStop;
-	}
+  public String getColorBy() {
+    return colorBy;
+  }
 
-	public void setEventStop(String eventStop) {
-		this.eventStop = eventStop;
-	}
+  public void setColorBy(String colorBy) {
+    this.colorBy = colorBy;
+  }
 
-	public Integer getEventLength() {
-		return eventLength;
-	}
+  public String getOnChange() {
+    return onChange;
+  }
 
-	public void setEventLength(Integer eventLength) {
-		this.eventLength = eventLength;
-	}
-	
-	public Integer getDayLength() {
-		return dayLength;
-	}
-	
-	public void setDayLength(Integer dayLength) {
-		this.dayLength = dayLength;
-	}
+  public void setOnChange(String onChange) {
+    this.onChange = onChange;
+  }
 
-	public void setItems(List<AbstractWidget> items) {
-		this.items = items;
-	}
+  public String getEventStart() {
+    return eventStart;
+  }
+
+  public void setEventStart(String eventStart) {
+    this.eventStart = eventStart;
+  }
+
+  public String getEventStop() {
+    return eventStop;
+  }
+
+  public void setEventStop(String eventStop) {
+    this.eventStop = eventStop;
+  }
+
+  public Integer getEventLength() {
+    return eventLength;
+  }
+
+  public void setEventLength(Integer eventLength) {
+    this.eventLength = eventLength;
+  }
+
+  public Integer getDayLength() {
+    return dayLength;
+  }
+
+  public void setDayLength(Integer dayLength) {
+    this.dayLength = dayLength;
+  }
+
+  public void setItems(List<AbstractWidget> items) {
+    this.items = items;
+  }
 }

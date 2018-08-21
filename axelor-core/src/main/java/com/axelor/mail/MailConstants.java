@@ -19,49 +19,40 @@ package com.axelor.mail;
 
 import com.axelor.mail.db.MailMessage;
 
-/**
- * Defines constants for mail server configuration settings.
- *
- */
+/** Defines constants for mail server configuration settings. */
 public interface MailConstants {
 
-	public static final String CONFIG_SMTP_HOST = "mail.smtp.host";
-	public static final String CONFIG_SMTP_PORT = "mail.smtp.port";
-	public static final String CONFIG_SMTP_USER = "mail.smtp.user";
-	public static final String CONFIG_SMTP_PASS = "mail.smtp.pass";
-	public static final String CONFIG_SMTP_CHANNEL = "mail.smtp.channel";
-	public static final String CONFIG_SMTP_TIMEOUT = "mail.smtp.timeout";
-	public static final String CONFIG_SMTP_CONNECTION_TIMEOUT = "mail.smtp.connectionTimeout";
+  public static final String CONFIG_SMTP_HOST = "mail.smtp.host";
+  public static final String CONFIG_SMTP_PORT = "mail.smtp.port";
+  public static final String CONFIG_SMTP_USER = "mail.smtp.user";
+  public static final String CONFIG_SMTP_PASS = "mail.smtp.pass";
+  public static final String CONFIG_SMTP_CHANNEL = "mail.smtp.channel";
+  public static final String CONFIG_SMTP_TIMEOUT = "mail.smtp.timeout";
+  public static final String CONFIG_SMTP_CONNECTION_TIMEOUT = "mail.smtp.connectionTimeout";
 
-	public static final String CONFIG_IMAP_HOST = "mail.imap.host";
-	public static final String CONFIG_IMAP_PORT = "mail.imap.port";
-	public static final String CONFIG_IMAP_USER = "mail.imap.user";
-	public static final String CONFIG_IMAP_PASS = "mail.imap.pass";
-	public static final String CONFIG_IMAP_CHANNEL = "mail.imap.channel";
-	public static final String CONFIG_IMAP_TIMEOUT = "mail.imap.timeout";
-	public static final String CONFIG_IMAP_CONNECTION_TIMEOUT = "mail.imap.connectionTimeout";
+  public static final String CONFIG_IMAP_HOST = "mail.imap.host";
+  public static final String CONFIG_IMAP_PORT = "mail.imap.port";
+  public static final String CONFIG_IMAP_USER = "mail.imap.user";
+  public static final String CONFIG_IMAP_PASS = "mail.imap.pass";
+  public static final String CONFIG_IMAP_CHANNEL = "mail.imap.channel";
+  public static final String CONFIG_IMAP_TIMEOUT = "mail.imap.timeout";
+  public static final String CONFIG_IMAP_CONNECTION_TIMEOUT = "mail.imap.connectionTimeout";
 
-	public static final String PROTOCOL_IMAP = "imap";
-	public static final String PROTOCOL_IMAPS = "imaps";
-	public static final String PROTOCOL_POP3 = "pop3";
+  public static final String PROTOCOL_IMAP = "imap";
+  public static final String PROTOCOL_IMAPS = "imaps";
+  public static final String PROTOCOL_POP3 = "pop3";
 
-	public static final int DEFAULT_TIMEOUT = 60000;
+  public static final int DEFAULT_TIMEOUT = 60000;
 
-	public static final String CHANNEL_STARTTLS = "starttls";
-	public static final String CHANNEL_SSL = "ssl";
+  public static final String CHANNEL_STARTTLS = "starttls";
+  public static final String CHANNEL_SSL = "ssl";
 
-	/**
-	 * {@link MailMessage} type used for notification messages
-	 */
-	public static final String MESSAGE_TYPE_NOTIFICATION = "notification";
+  /** {@link MailMessage} type used for notification messages */
+  public static final String MESSAGE_TYPE_NOTIFICATION = "notification";
 
-	/**
-	 * {@link MailMessage} type used for comments
-	 */
-	public static final String MESSAGE_TYPE_COMMENT = "comment";
+  /** {@link MailMessage} type used for comments */
+  public static final String MESSAGE_TYPE_COMMENT = "comment";
 
-	/**
-	 * {@link MailMessage} type used for email messages
-	 */
-	public static final String MESSAGE_TYPE_EMAIL = "email";
+  /** {@link MailMessage} type used for email messages */
+  public static final String MESSAGE_TYPE_EMAIL = "email";
 }

@@ -4,12 +4,12 @@
   xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_5.0.xsd">
 
   <module name="meta" package="com.axelor.meta.db" />
-  
+
   <entity name="MetaModule" table="META_MODULE" cachable="true">
     <![CDATA[
     This object store the modules.
     ]]>
-    
+
     <string name="name" required="true" unique="true"/>
     <string name="title" required="true" />
     <string name="description" large="true"/>
@@ -21,23 +21,23 @@
     <boolean name="installed" />
     <boolean name="pending" />
   </entity>
-  
+
   <entity name="MetaView" table="META_VIEW" cachable="true">
     <![CDATA[
     This object store the xml views.
     ]]>
-    
-  	<string name="name" required="true"/>
-	<string name="title" required="true" namecolumn="true"/>
-  	<string name="type" required="true" selection="view.type.selection"/>
+
+    <string name="name" required="true"/>
+  <string name="title" required="true" namecolumn="true"/>
+    <string name="type" required="true" selection="view.type.selection"/>
     <integer name="priority" required="true" default="20"/>
-  	<string name="model"/>
+    <string name="model"/>
     <string name="module"/>
-  	<string name="xml" required="true" large="true"/>
+    <string name="xml" required="true" large="true"/>
     <string name="xmlId" unique="true" />
     <string name="helpLink" />
     <boolean name="extension" />
-  	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
+    <many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
 
     <finder-method name="findByID" using="xmlId" />
     <finder-method name="findByName" using="name" orderBy="-priority" cacheable="true"/>
@@ -61,13 +61,13 @@
     <![CDATA[
     This object store the menus.
     ]]>
-    
-	<integer name="priority" />
+
+  <integer name="priority" />
     <integer name="order" column="order_seq" title="Menu order"/>
     <string name="xmlId" unique="true" />
-	<string name="name" required="true"/>
-  	<string name="title" required="true" namecolumn="true"/>
-  	<string name="icon"/>
+  <string name="name" required="true"/>
+    <string name="title" required="true" namecolumn="true"/>
+    <string name="icon"/>
     <string name="iconBackground" />
     <string name="module"/>
     <string name="tag" title="Tag label"/>
@@ -81,11 +81,11 @@
 
     <string name="link" />
 
-  	<many-to-one name="parent" ref="MetaMenu"/>
-  	<many-to-one name="action" ref="MetaAction"/>
+    <many-to-one name="parent" ref="MetaMenu"/>
+    <many-to-one name="action" ref="MetaAction"/>
     <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" />
 
-  	<many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
+    <many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
     <many-to-many name="roles" ref="com.axelor.auth.db.Role"/>
 
     <string name="conditionToCheck" max="1024" title="If" help="Only use this menu-item if the given expression is true."/>
@@ -96,47 +96,47 @@
     <finder-method name="findByParent" using="Long:id" filter="self.parent.id = :id" all="true" cacheable="true"/>
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
-  
+
   <entity name="MetaActionMenu" table="META_ACTION_MENU" cachable="true">
     <![CDATA[
     This object store the actions menu.
     ]]>
-    
+
     <integer name="priority" />
     <integer name="order" column="order_seq" />
     <string name="xmlId" unique="true" />
-	<string name="name" required="true"/>
-  	<string name="title" required="true" namecolumn="true"/>
+  <string name="name" required="true"/>
+    <string name="title" required="true" namecolumn="true"/>
     <string name="category" help="Category name to group action menus."/>
     <string name="module"/>
     <boolean name="hidden" />
-  	<many-to-one name="parent" ref="MetaActionMenu"/>
-  	<many-to-one name="action" ref="MetaAction"/>
-    
+    <many-to-one name="parent" ref="MetaActionMenu"/>
+    <many-to-one name="action" ref="MetaAction"/>
+
     <finder-method name="findByID" using="xmlId" cacheable="true" />
     <finder-method name="findByName" using="name" orderBy="-order" cacheable="true"/>
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
-   
+
   <entity name="MetaAction" table="META_ACTION" cachable="true">
     <![CDATA[
     This object store the xml actions.
     ]]>
-    
+
     <integer name="priority" />
     <string name="xmlId" unique="true" />
-	<string name="name" required="true"/>
+  <string name="name" required="true"/>
     <string name="type" required="true" selection="action.type.selection"/>
     <boolean name="home" title="Used as home action" help="Specify whether this action can be used as home action."/>
     <string name="model" />
     <string name="module" />
-  	<string name="xml" required="true" large="true"/>
-    
+    <string name="xml" required="true" large="true"/>
+
     <finder-method name="findByID" using="xmlId" cacheable="true" />
     <finder-method name="findByName" using="name" orderBy="-priority" cacheable="true" />
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
-  
+
   <entity name="MetaEnum" table="META_ENUM" cachable="true">
     <![CDATA[
     This object store the enum types.
@@ -153,7 +153,7 @@
     <integer name="priority" required="true" default="20"/>
     <string name="module"/>
     <one-to-many name="items" ref="MetaSelectItem" mappedBy="select"/>
-    
+
     <finder-method name="findByID" using="xmlId" cacheable="true" />
     <finder-method name="findByName" using="name" orderBy="-priority" cacheable="true"/>
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
@@ -163,7 +163,7 @@
     <![CDATA[
     This object store the select items.
     ]]>
-    
+
     <string name="title" required="true" namecolumn="true" help="The select item title." />
     <string name="value" required="true" help="The select item value." />
     <string name="icon" help="The image icon to show in UI widgets." />
@@ -172,12 +172,12 @@
     <boolean name="hidden" />
     <many-to-one name="select" ref="MetaSelect" column="select_id" required="true"/>
   </entity>
-  
+
   <entity name="MetaModel" table="META_MODEL" cachable="true">
     <![CDATA[
     This object store the models.
     ]]>
-    
+
     <string name="name" title="Name" required="true"/>
     <string name="packageName" title="Package" required="true"/>
     <string name="tableName" title="Table" />
@@ -189,7 +189,7 @@
     <![CDATA[
     This object store the fields.
     ]]>
-    
+
     <many-to-one name="metaModel" ref="MetaModel" />
     <string name="name" title="Name" required="true"/>
     <string name="packageName" title="Package" />
@@ -224,12 +224,12 @@
     <![CDATA[
     This object store the files.
     ]]>
-  	<string name="fileName" required="true" namecolumn="true"/>
+    <string name="fileName" required="true" namecolumn="true"/>
     <string name="filePath" required="true"/>
-  	<long name="fileSize" title="Size in bytes" readonly="true"/>
-  	<string name="fileType" title="File type"/>
-  	<string name="description" multiline="true"/>
-  	<string name="sizeText" column="file_size_text" title="Size" readonly="true">
+    <long name="fileSize" title="Size in bytes" readonly="true"/>
+    <string name="fileType" title="File type"/>
+    <string name="description" multiline="true"/>
+    <string name="sizeText" column="file_size_text" title="Size" readonly="true">
       <![CDATA[
       if (fileSize == null) return null;
       if(fileSize > 1000000000) return String.format("%.2f GB", fileSize / 1000000000.00);
@@ -237,14 +237,14 @@
       if(fileSize >= 1000) return String.format("%.2f KB", fileSize / 1000.00);
       return fileSize + " B";
       ]]>
-  	</string>
+    </string>
   </entity>
-  
+
   <entity name="MetaAttachment" table="META_ATTACHMENT">
-  	<string name="objectName" required="true"/>
-  	<long name="objectId" required="true"/>
-  	<many-to-one name="metaFile" ref="MetaFile" title="File" required="true" column="meta_file"/>
-  	<unique-constraint columns="objectName,objectId,meta_file"/>
+    <string name="objectName" required="true"/>
+    <long name="objectId" required="true"/>
+    <many-to-one name="metaFile" ref="MetaFile" title="File" required="true" column="meta_file"/>
+    <unique-constraint columns="objectName,objectId,meta_file"/>
   </entity>
 
 </domain-models>

@@ -18,19 +18,18 @@
 package com.axelor.inject.logger;
 
 import javax.inject.Provider;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 final class LoggerProvider implements Provider<Logger> {
 
-	static final ThreadLocal<String> NAME = new ThreadLocal<>();
+  static final ThreadLocal<String> NAME = new ThreadLocal<>();
 
-	@Override
-	public Logger get() {
-		final String name = NAME.get();
-		return name == null
-			? LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)
-			: LoggerFactory.getLogger(name);
-	}
+  @Override
+  public Logger get() {
+    final String name = NAME.get();
+    return name == null
+        ? LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)
+        : LoggerFactory.getLogger(name);
+  }
 }

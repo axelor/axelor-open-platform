@@ -18,14 +18,13 @@
 package com.axelor.web.tags;
 
 import java.io.IOException;
-
 import javax.servlet.jsp.JspWriter;
 
 public class StyleTag extends AbstractTag {
 
-	@Override
-	protected void doTag(String src) throws IOException {
-		final JspWriter writer = getJspContext().getOut();
-		writer.println("<link href=\"" + src + "\" rel=\"stylesheet\">");
-	}
+  @Override
+  protected void doTag(String src) throws IOException {
+    final JspWriter writer = getJspContext().getOut();
+    writer.println("<link href=\"" + src + "\" rel=\"stylesheet\">");
+  }
 }

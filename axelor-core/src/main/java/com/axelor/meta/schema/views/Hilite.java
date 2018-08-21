@@ -23,61 +23,58 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType
 public class Hilite {
 
-	@XmlAttribute
-	private String color;
+  @XmlAttribute private String color;
 
-	@XmlAttribute
-	private String background;
+  @XmlAttribute private String background;
 
-	@XmlAttribute
-	private Boolean strong;
+  @XmlAttribute private Boolean strong;
 
-	@XmlAttribute(name = "if")
-	private String condition;
+  @XmlAttribute(name = "if")
+  private String condition;
 
-	public String getColor() {
-		return color;
-	}
+  public String getColor() {
+    return color;
+  }
 
-	public void setColor(String color) {
-		this.color = color;
-	}
+  public void setColor(String color) {
+    this.color = color;
+  }
 
-	public String getBackground() {
-		return background;
-	}
+  public String getBackground() {
+    return background;
+  }
 
-	public void setBackground(String background) {
-		this.background = background;
-	}
+  public void setBackground(String background) {
+    this.background = background;
+  }
 
-	public Boolean getStrong() {
-		return strong;
-	}
+  public Boolean getStrong() {
+    return strong;
+  }
 
-	public void setStrong(Boolean strong) {
-		this.strong = strong;
-	}
+  public void setStrong(Boolean strong) {
+    this.strong = strong;
+  }
 
-	public String getCss() {
-		String css = "";
-		if (color != null) {
-			css += " hilite-" + color + "-text";
-		}
-		if (background != null) {
-			css += " hilite-" + background;
-		}
-		if (strong == Boolean.TRUE) {
-			css += " strong";
-		}
-		return css.trim();
-	}
+  public String getCss() {
+    String css = "";
+    if (color != null) {
+      css += " hilite-" + color + "-text";
+    }
+    if (background != null) {
+      css += " hilite-" + background;
+    }
+    if (strong == Boolean.TRUE) {
+      css += " strong";
+    }
+    return css.trim();
+  }
 
-	public String getCondition() {
-		return condition;
-	}
+  public String getCondition() {
+    return condition;
+  }
 
-	public void setCondition(String condition) {
-		this.condition = condition;
-	}
+  public void setCondition(String condition) {
+    this.condition = condition;
+  }
 }

@@ -17,52 +17,47 @@
  */
 package com.axelor.meta.schema.views;
 
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
-
-import org.eclipse.persistence.oxm.annotations.XmlCDATA;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 
 @XmlType
 @JsonTypeName("custom")
 public class CustomView extends AbstractView {
 
-	@XmlElement(name = "field", type = Field.class)
-	private List<AbstractWidget> items;
+  @XmlElement(name = "field", type = Field.class)
+  private List<AbstractWidget> items;
 
-	@JsonIgnore
-	@XmlElement(name = "dataset")
-	private DataSet dataSet;
+  @JsonIgnore
+  @XmlElement(name = "dataset")
+  private DataSet dataSet;
 
-	@XmlCDATA
-	@XmlElement
-	private String template;
+  @XmlCDATA @XmlElement private String template;
 
-	public List<AbstractWidget> getItems() {
-		return items;
-	}
+  public List<AbstractWidget> getItems() {
+    return items;
+  }
 
-	public void setItems(List<AbstractWidget> items) {
-		this.items = items;
-	}
+  public void setItems(List<AbstractWidget> items) {
+    this.items = items;
+  }
 
-	public DataSet getDataSet() {
-		return dataSet;
-	}
+  public DataSet getDataSet() {
+    return dataSet;
+  }
 
-	public void setDataSet(DataSet dataSet) {
-		this.dataSet = dataSet;
-	}
+  public void setDataSet(DataSet dataSet) {
+    this.dataSet = dataSet;
+  }
 
-	public String getTemplate() {
-		return template;
-	}
+  public String getTemplate() {
+    return template;
+  }
 
-	public void setTemplate(String template) {
-		this.template = template;
-	}
+  public void setTemplate(String template) {
+    this.template = template;
+  }
 }

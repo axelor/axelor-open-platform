@@ -17,15 +17,6 @@
  */
 package com.axelor.data.xml;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.codehaus.groovy.runtime.InvokerHelper;
-
 import com.axelor.data.DataScriptHelper;
 import com.axelor.data.ImportException;
 import com.axelor.inject.Beans;
@@ -34,250 +25,244 @@ import com.google.common.collect.Sets;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.codehaus.groovy.runtime.InvokerHelper;
 
 @XStreamAlias("bind")
 public class XMLBind {
 
-	@XStreamAsAttribute
-	private String node;
+  @XStreamAsAttribute private String node;
 
-	@XStreamAlias("to")
-	@XStreamAsAttribute
-	private String field;
+  @XStreamAlias("to")
+  @XStreamAsAttribute
+  private String field;
 
-	@XStreamAsAttribute
-	private String alias;
+  @XStreamAsAttribute private String alias;
 
-	@XStreamAlias("type")
-	@XStreamAsAttribute
-	private String typeName;
+  @XStreamAlias("type")
+  @XStreamAsAttribute
+  private String typeName;
 
-	@XStreamAsAttribute
-	private String search;
+  @XStreamAsAttribute private String search;
 
-	@XStreamAsAttribute
-	private Boolean update;
-	
-	@XStreamAsAttribute
-	private Boolean create;
+  @XStreamAsAttribute private Boolean update;
 
-	@XStreamAlias("eval")
-	@XStreamAsAttribute
-	private String expression;
+  @XStreamAsAttribute private Boolean create;
 
-	@XStreamAlias("if")
-	@XStreamAsAttribute
-	private String condition;
+  @XStreamAlias("eval")
+  @XStreamAsAttribute
+  private String expression;
 
-	@XStreamAlias("if-empty")
-	@XStreamAsAttribute
-	private Boolean conditionEmpty;
+  @XStreamAlias("if")
+  @XStreamAsAttribute
+  private String condition;
 
-	@XStreamAlias("call")
-	@XStreamAsAttribute
-	private String callable;
+  @XStreamAlias("if-empty")
+  @XStreamAsAttribute
+  private Boolean conditionEmpty;
 
-	@XStreamAsAttribute
-	private String adapter;
+  @XStreamAlias("call")
+  @XStreamAsAttribute
+  private String callable;
 
-	@XStreamImplicit(itemFieldName = "bind")
-	private List<XMLBind> bindings;
+  @XStreamAsAttribute private String adapter;
 
-	public String getNode() {
-		return node;
-	}
+  @XStreamImplicit(itemFieldName = "bind")
+  private List<XMLBind> bindings;
 
-	public String getField() {
-		return field;
-	}
+  public String getNode() {
+    return node;
+  }
 
-	public String getAlias() {
-		return alias;
-	}
+  public String getField() {
+    return field;
+  }
 
-	public String getAliasOrName() {
-		if (alias == null || "".equals(alias.trim()))
-			return node;
-		return alias;
-	}
+  public String getAlias() {
+    return alias;
+  }
 
-	public String getTypeName() {
-		return typeName;
-	}
+  public String getAliasOrName() {
+    if (alias == null || "".equals(alias.trim())) return node;
+    return alias;
+  }
 
-	public Class<?> getType() {
-		try {
-			return Class.forName(typeName);
-		} catch (ClassNotFoundException e) {
-		}
-		return null;
-	}
+  public String getTypeName() {
+    return typeName;
+  }
 
-	public String getSearch() {
-		return search;
-	}
+  public Class<?> getType() {
+    try {
+      return Class.forName(typeName);
+    } catch (ClassNotFoundException e) {
+    }
+    return null;
+  }
 
-	public Boolean getUpdate() {
-		return update;
-	}
-	
-	public Boolean getCreate() {
-		return create;
-	}
+  public String getSearch() {
+    return search;
+  }
 
-	public String getExpression() {
-		return expression;
-	}
+  public Boolean getUpdate() {
+    return update;
+  }
 
-	public String getCondition() {
-		return condition;
-	}
+  public Boolean getCreate() {
+    return create;
+  }
 
-	public Boolean getConditionEmpty() {
-		return conditionEmpty;
-	}
+  public String getExpression() {
+    return expression;
+  }
 
-	public String getCallable() {
-		return callable;
-	}
+  public String getCondition() {
+    return condition;
+  }
 
-	public String getAdapter() {
-		return adapter;
-	}
+  public Boolean getConditionEmpty() {
+    return conditionEmpty;
+  }
 
-	public List<XMLBind> getBindings() {
-		return bindings;
-	}
+  public String getCallable() {
+    return callable;
+  }
 
-	private Set<String> multiples;
+  public String getAdapter() {
+    return adapter;
+  }
 
-	public boolean isMultiple(XMLBind bind) {
-		if (multiples == null) {
-			multiples = Sets.newHashSet();
-			Set<String> found = Sets.newHashSet();
-			for (XMLBind b : bindings) {
-				if (found.contains(b.getNode())) {
-					multiples.add(b.getNode());
-				}
-				found.add(b.getNode());
-			}
-		}
-		return multiples.contains(bind.getNode());
-	}
+  public List<XMLBind> getBindings() {
+    return bindings;
+  }
 
-	private Object callObject;
-	private Method callMethod;
+  private Set<String> multiples;
 
-	@SuppressWarnings("unchecked")
-	public <T> T call(T object, Map<String, Object> context) throws Exception {
+  public boolean isMultiple(XMLBind bind) {
+    if (multiples == null) {
+      multiples = Sets.newHashSet();
+      Set<String> found = Sets.newHashSet();
+      for (XMLBind b : bindings) {
+        if (found.contains(b.getNode())) {
+          multiples.add(b.getNode());
+        }
+        found.add(b.getNode());
+      }
+    }
+    return multiples.contains(bind.getNode());
+  }
 
-		if (Strings.isNullOrEmpty(callable))
-			return object;
+  private Object callObject;
+  private Method callMethod;
 
-		if (callObject == null) {
+  @SuppressWarnings("unchecked")
+  public <T> T call(T object, Map<String, Object> context) throws Exception {
 
-			String className = callable.split("\\:")[0];
-			String method = callable.split("\\:")[1];
+    if (Strings.isNullOrEmpty(callable)) return object;
 
-			Class<?> klass = Class.forName(className);
+    if (callObject == null) {
 
-			callMethod = klass.getMethod(method, Object.class, Map.class);
-			callObject = Beans.get(klass);
-		}
+      String className = callable.split("\\:")[0];
+      String method = callable.split("\\:")[1];
 
-		try {
-			return (T) callMethod.invoke(callObject, new Object[]{ object, context });
-		} catch (Exception e) {
-			System.err.println("EEE: " + e);
-			throw new ImportException(e);
-		}
-	}
+      Class<?> klass = Class.forName(className);
 
-	public static Pattern pattern = Pattern.compile("^(call|eval):\\s*(.*)");
-	private static DataScriptHelper helper = new DataScriptHelper(100, 10, false);
+      callMethod = klass.getMethod(method, Object.class, Map.class);
+      callObject = Beans.get(klass);
+    }
 
-	public Object evaluate(Map<String, Object> context) {
-		if (Strings.isNullOrEmpty(expression)) {
-			return handleGroovy(context);
-		}
+    try {
+      return (T) callMethod.invoke(callObject, new Object[] {object, context});
+    } catch (Exception e) {
+      System.err.println("EEE: " + e);
+      throw new ImportException(e);
+    }
+  }
 
-		String kind = null;
-		String expr = expression;
-		Matcher matcher = pattern.matcher(expression);
+  public static Pattern pattern = Pattern.compile("^(call|eval):\\s*(.*)");
+  private static DataScriptHelper helper = new DataScriptHelper(100, 10, false);
 
-		if (matcher.matches()) {
-			kind = matcher.group(1);
-			expr = matcher.group(2);
-		} else {
-			return handleGroovy(context);
-		}
+  public Object evaluate(Map<String, Object> context) {
+    if (Strings.isNullOrEmpty(expression)) {
+      return handleGroovy(context);
+    }
 
-		if ("call".equals(kind)) {
-			return handleCall(context, expr);
-		}
+    String kind = null;
+    String expr = expression;
+    Matcher matcher = pattern.matcher(expression);
 
-		return handleGroovy(context);
-	}
+    if (matcher.matches()) {
+      kind = matcher.group(1);
+      expr = matcher.group(2);
+    } else {
+      return handleGroovy(context);
+    }
 
-	private Object handleGroovy(Map<String, Object> context) {
-		if (Strings.isNullOrEmpty(expression)) {
-			return context.get(this.getAliasOrName());
-		}
-		return helper.eval(expression, context);
-	}
+    if ("call".equals(kind)) {
+      return handleCall(context, expr);
+    }
 
-	public boolean validate(Map<String, Object> context) {
-		if (Strings.isNullOrEmpty(condition)) {
-			return true;
-		}
-		String expr = condition + " ? true : false";
-		return (Boolean) helper.eval(expr, context);
-	}
+    return handleGroovy(context);
+  }
 
-	private Object handleCall(Map<String, Object> context, String expr) {
-		if(Strings.isNullOrEmpty(expr)) {
-			return null;
-		}
+  private Object handleGroovy(Map<String, Object> context) {
+    if (Strings.isNullOrEmpty(expression)) {
+      return context.get(this.getAliasOrName());
+    }
+    return helper.eval(expression, context);
+  }
 
-		try {
+  public boolean validate(Map<String, Object> context) {
+    if (Strings.isNullOrEmpty(condition)) {
+      return true;
+    }
+    String expr = condition + " ? true : false";
+    return (Boolean) helper.eval(expr, context);
+  }
 
-			String className = expr.split("\\:")[0];
-			String method = expr.split("\\:")[1];
+  private Object handleCall(Map<String, Object> context, String expr) {
+    if (Strings.isNullOrEmpty(expr)) {
+      return null;
+    }
 
-			Class<?> klass = Class.forName(className);
-			Object object = Beans.get(klass);
+    try {
 
-			Pattern p = Pattern.compile("(\\w+)\\((.*?)\\)");
-			Matcher m = p.matcher(method);
+      String className = expr.split("\\:")[0];
+      String method = expr.split("\\:")[1];
 
-			if (!m.matches()) return null;
+      Class<?> klass = Class.forName(className);
+      Object object = Beans.get(klass);
 
-			String methodName = m.group(1);
-			String params = "[" + m.group(2) + "] as Object[]";
-			Object[] arguments = (Object[]) helper.eval(params, context);
+      Pattern p = Pattern.compile("(\\w+)\\((.*?)\\)");
+      Matcher m = p.matcher(method);
 
-			return InvokerHelper.invokeMethod(object, methodName, arguments);
-		}
-		catch(Exception e) {
-			System.err.println("EEE: " + e);
-			return null;
-		}
-	}
+      if (!m.matches()) return null;
 
-	@Override
-	public String toString() {
+      String methodName = m.group(1);
+      String params = "[" + m.group(2) + "] as Object[]";
+      Object[] arguments = (Object[]) helper.eval(params, context);
 
-		StringBuilder sb = new StringBuilder("<bind");
+      return InvokerHelper.invokeMethod(object, methodName, arguments);
+    } catch (Exception e) {
+      System.err.println("EEE: " + e);
+      return null;
+    }
+  }
 
-		if (node != null)
-			sb.append(" node='").append(node).append("'");
-		if (field != null)
-			sb.append(" to=='").append(field).append("'");
-		if (typeName != null)
-			sb.append(" type='").append(typeName).append("'");
-		if (alias != null)
-			sb.append(" alias='").append(alias).append("'");
+  @Override
+  public String toString() {
 
-		return sb.append(" ... >").toString();
-	}
+    StringBuilder sb = new StringBuilder("<bind");
+
+    if (node != null) sb.append(" node='").append(node).append("'");
+    if (field != null) sb.append(" to=='").append(field).append("'");
+    if (typeName != null) sb.append(" type='").append(typeName).append("'");
+    if (alias != null) sb.append(" alias='").append(alias).append("'");
+
+    return sb.append(" ... >").toString();
+  }
 }

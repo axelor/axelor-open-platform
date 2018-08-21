@@ -17,79 +17,76 @@
  */
 package com.axelor.web.db;
 
+import com.axelor.db.JpaModel;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
-import com.axelor.db.JpaModel;
-
 @Entity
 public class Address extends JpaModel {
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-	private Contact contact;
+  @ManyToOne(
+    fetch = FetchType.LAZY,
+    cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+  )
+  private Contact contact;
 
-	@NotNull
-	private String street;
+  @NotNull private String street;
 
-	@NotNull
-	private String area;
+  @NotNull private String area;
 
-	@NotNull
-	private String city;
+  @NotNull private String city;
 
-	@NotNull
-	private String zip;
-	
-	public Address() {
-	}
+  @NotNull private String zip;
 
-	public Address(String street, String area, String city, String zip) {
-		this.street = street;
-		this.area = area;
-		this.city = city;
-		this.zip = zip;
-	}
+  public Address() {}
 
-	public Contact getContact() {
-		return contact;
-	}
+  public Address(String street, String area, String city, String zip) {
+    this.street = street;
+    this.area = area;
+    this.city = city;
+    this.zip = zip;
+  }
 
-	public void setContact(Contact contact) {
-		this.contact = contact;
-	}
+  public Contact getContact() {
+    return contact;
+  }
 
-	public String getStreet() {
-		return street;
-	}
+  public void setContact(Contact contact) {
+    this.contact = contact;
+  }
 
-	public void setStreet(String street) {
-		this.street = street;
-	}
+  public String getStreet() {
+    return street;
+  }
 
-	public String getArea() {
-		return area;
-	}
+  public void setStreet(String street) {
+    this.street = street;
+  }
 
-	public void setArea(String area) {
-		this.area = area;
-	}
+  public String getArea() {
+    return area;
+  }
 
-	public String getCity() {
-		return city;
-	}
+  public void setArea(String area) {
+    this.area = area;
+  }
 
-	public void setCity(String city) {
-		this.city = city;
-	}
+  public String getCity() {
+    return city;
+  }
 
-	public String getZip() {
-		return zip;
-	}
+  public void setCity(String city) {
+    this.city = city;
+  }
 
-	public void setZip(String zip) {
-		this.zip = zip;
-	}
+  public String getZip() {
+    return zip;
+  }
+
+  public void setZip(String zip) {
+    this.zip = zip;
+  }
 }

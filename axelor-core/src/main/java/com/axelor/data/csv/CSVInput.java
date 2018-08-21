@@ -17,10 +17,6 @@
  */
 package com.axelor.data.csv;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-
 import com.axelor.data.ImportException;
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.inject.Beans;
@@ -30,198 +26,194 @@ import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
 
 @XStreamAlias("input")
 public class CSVInput {
 
-	private static transient final char DEFAULT_SEPARATOR = ',';
+  private static final transient char DEFAULT_SEPARATOR = ',';
 
-	@XStreamAlias("file")
-	@XStreamAsAttribute
-	private String fileName;
-	
-	@XStreamAsAttribute
-	private String header;
+  @XStreamAlias("file")
+  @XStreamAsAttribute
+  private String fileName;
 
-	@XStreamAlias("type")
-	@XStreamAsAttribute
-	private String typeName;
+  @XStreamAsAttribute private String header;
 
-	@XStreamAsAttribute
-	private String separator;
+  @XStreamAlias("type")
+  @XStreamAsAttribute
+  private String typeName;
 
-	@XStreamAsAttribute
-	private String search;
+  @XStreamAsAttribute private String separator;
 
-	@XStreamAsAttribute
-	private boolean update;
+  @XStreamAsAttribute private String search;
 
-	@XStreamAlias("call")
-	@XStreamAsAttribute
-	private String callable;
+  @XStreamAsAttribute private boolean update;
 
-	@XStreamAlias("prepare-context")
-	@XStreamAsAttribute
-	private String prepareContext;
+  @XStreamAlias("call")
+  @XStreamAsAttribute
+  private String callable;
 
-	@XStreamAlias("search-call")
-	@XStreamAsAttribute
-	private String searchCall;
+  @XStreamAlias("prepare-context")
+  @XStreamAsAttribute
+  private String prepareContext;
 
-	@XStreamImplicit(itemFieldName = "bind")
-	private List<CSVBind> bindings = Lists.newArrayList();
+  @XStreamAlias("search-call")
+  @XStreamAsAttribute
+  private String searchCall;
 
-	@XStreamImplicit(itemFieldName = "adapter")
-	private List<DataAdapter> adapters = Lists.newArrayList();
+  @XStreamImplicit(itemFieldName = "bind")
+  private List<CSVBind> bindings = Lists.newArrayList();
 
-	public String getFileName() {
-		return fileName;
-	}
+  @XStreamImplicit(itemFieldName = "adapter")
+  private List<DataAdapter> adapters = Lists.newArrayList();
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-	
-	public String getHeader() {
-		return header;
-	}
-	
-	public void setHeader(String header) {
-		this.header = header;
-	}
+  public String getFileName() {
+    return fileName;
+  }
 
-	public String getTypeName() {
-		return typeName;
-	}
+  public void setFileName(String fileName) {
+    this.fileName = fileName;
+  }
 
-	public void setTypeName(String typeName) {
-		this.typeName = typeName;
-	}
+  public String getHeader() {
+    return header;
+  }
 
-	public char getSeparator() {
+  public void setHeader(String header) {
+    this.header = header;
+  }
 
-		if (Strings.isNullOrEmpty(separator))
-			return DEFAULT_SEPARATOR;
+  public String getTypeName() {
+    return typeName;
+  }
 
-		if ("\\t".equals(separator))
-			return '\t';
+  public void setTypeName(String typeName) {
+    this.typeName = typeName;
+  }
 
-		return separator.charAt(0);
-	}
+  public char getSeparator() {
 
-	public void setSeparator(char separator) {
-		this.separator = Character.toString(separator);
-	}
+    if (Strings.isNullOrEmpty(separator)) return DEFAULT_SEPARATOR;
 
-	public String getSearch() {
-		return search;
-	}
+    if ("\\t".equals(separator)) return '\t';
 
-	public void setSearch(String search) {
-		this.search = search;
-	}
+    return separator.charAt(0);
+  }
 
-	public boolean isUpdate() {
-		return update;
-	}
+  public void setSeparator(char separator) {
+    this.separator = Character.toString(separator);
+  }
 
-	public String getCallable() {
-		return callable;
-	}
+  public String getSearch() {
+    return search;
+  }
 
-	public void setCallable(String callable) {
-		this.callable = callable;
-	}
+  public void setSearch(String search) {
+    this.search = search;
+  }
 
-	public String getPrepareContext() {
-		return prepareContext;
-	}
+  public boolean isUpdate() {
+    return update;
+  }
 
-	public void setSearchCall(String searchCall) {
-		this.searchCall = searchCall;
-	}
+  public String getCallable() {
+    return callable;
+  }
 
-	public String getSearchCall() {
-		return searchCall;
-	}
+  public void setCallable(String callable) {
+    this.callable = callable;
+  }
 
-	public List<CSVBind> getBindings() {
-		return bindings;
-	}
+  public String getPrepareContext() {
+    return prepareContext;
+  }
 
-	public void setBindings(List<CSVBind> bindings) {
-		this.bindings = bindings;
-	}
+  public void setSearchCall(String searchCall) {
+    this.searchCall = searchCall;
+  }
 
-	public List<DataAdapter> getAdapters() {
-		if (adapters == null) {
-			adapters = Lists.newArrayList();
-		}
-		return adapters;
-	}
+  public String getSearchCall() {
+    return searchCall;
+  }
 
-	private Object callObject;
-	private Method callMethod;
+  public List<CSVBind> getBindings() {
+    return bindings;
+  }
 
-	private Object contextObject;
-	private Method contextMethod;
+  public void setBindings(List<CSVBind> bindings) {
+    this.bindings = bindings;
+  }
 
-	@SuppressWarnings("unchecked")
-	public <T> T call(T object, Map<String, Object> context) throws Exception {
+  public List<DataAdapter> getAdapters() {
+    if (adapters == null) {
+      adapters = Lists.newArrayList();
+    }
+    return adapters;
+  }
 
-		if (Strings.isNullOrEmpty(callable))
-			return object;
+  private Object callObject;
+  private Method callMethod;
 
-		if (callObject == null) {
+  private Object contextObject;
+  private Method contextMethod;
 
-			String className = callable.split("\\:")[0];
-			String method = callable.split("\\:")[1];
+  @SuppressWarnings("unchecked")
+  public <T> T call(T object, Map<String, Object> context) throws Exception {
 
-			Class<?> klass = Class.forName(className);
+    if (Strings.isNullOrEmpty(callable)) return object;
 
-			callMethod = klass.getMethod(method, Object.class, Map.class);
-			callObject = Beans.get(klass);
-		}
+    if (callObject == null) {
 
-		try {
-			return (T) callMethod.invoke(callObject, new Object[]{ object, context });
-		} catch (Exception e) {
-			System.err.println("EEE: " + e);
-			throw new ImportException(e);
-		}
-	}
+      String className = callable.split("\\:")[0];
+      String method = callable.split("\\:")[1];
 
-	public Map<String, Object> callPrepareContext(Map<String, Object> context) throws Exception {
+      Class<?> klass = Class.forName(className);
 
-		if (Strings.isNullOrEmpty(prepareContext))
-			return context;
+      callMethod = klass.getMethod(method, Object.class, Map.class);
+      callObject = Beans.get(klass);
+    }
 
-		if (contextObject == null) {
+    try {
+      return (T) callMethod.invoke(callObject, new Object[] {object, context});
+    } catch (Exception e) {
+      System.err.println("EEE: " + e);
+      throw new ImportException(e);
+    }
+  }
 
-			String className = prepareContext.split("\\:")[0];
-			String method = prepareContext.split("\\:")[1];
+  public Map<String, Object> callPrepareContext(Map<String, Object> context) throws Exception {
 
-			Class<?> klass = Class.forName(className);
+    if (Strings.isNullOrEmpty(prepareContext)) return context;
 
-			contextMethod = klass.getMethod(method, Map.class);
-			contextObject = Beans.get(klass);
-		}
+    if (contextObject == null) {
 
-		try {
-			contextMethod.invoke(contextObject, context);
-			return context;
-		} catch (Exception e) {
-			System.err.println("EEE: " + e);
-			throw new ImportException(e);
-		}
-	}
+      String className = prepareContext.split("\\:")[0];
+      String method = prepareContext.split("\\:")[1];
 
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(this)
-				.add("file", fileName)
-				.add("type", typeName)
-				.add("bindings", bindings)
-				.omitNullValues().toString();
-	}
+      Class<?> klass = Class.forName(className);
+
+      contextMethod = klass.getMethod(method, Map.class);
+      contextObject = Beans.get(klass);
+    }
+
+    try {
+      contextMethod.invoke(contextObject, context);
+      return context;
+    } catch (Exception e) {
+      System.err.println("EEE: " + e);
+      throw new ImportException(e);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("file", fileName)
+        .add("type", typeName)
+        .add("bindings", bindings)
+        .omitNullValues()
+        .toString();
+  }
 }

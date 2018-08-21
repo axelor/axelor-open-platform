@@ -22,7 +22,7 @@ import com.axelor.test.db.Invoice;
 
 public class InvoiceRepository extends JpaRepository<Invoice> {
 
-	public InvoiceRepository() {
-		super(Invoice.class);
-	}
+  public InvoiceRepository() {
+    super(Invoice.class);
+  }
 }

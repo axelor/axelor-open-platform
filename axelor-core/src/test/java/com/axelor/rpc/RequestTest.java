@@ -17,15 +17,6 @@
  */
 package com.axelor.rpc;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.axelor.db.Query;
 import com.axelor.test.db.Address;
 import com.axelor.test.db.Circle;
@@ -35,128 +26,135 @@ import com.axelor.test.db.repo.ContactRepository;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import javax.inject.Inject;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class RequestTest extends RpcTest {
 
-	@Inject
-	private ContactRepository contacts;
+  @Inject private ContactRepository contacts;
 
-	@Test
-	public void testObjects() {
+  @Test
+  public void testObjects() {
 
-		Request req = fromJson("find.json", Request.class);
+    Request req = fromJson("find.json", Request.class);
 
-		Assert.assertTrue(req.getData() instanceof Map);
-		Assert.assertTrue(req.getData().get("criteria") instanceof List);
+    Assert.assertTrue(req.getData() instanceof Map);
+    Assert.assertTrue(req.getData().get("criteria") instanceof List);
 
-		for (Object o : (List<?>) req.getData().get("criteria")) {
-			Assert.assertTrue(o instanceof Map);
-		}
-	}
+    for (Object o : (List<?>) req.getData().get("criteria")) {
+      Assert.assertTrue(o instanceof Map);
+    }
+  }
 
-	@Test
-	public void testFind() {
+  @Test
+  public void testFind() {
 
-		Request req = fromJson("find.json", Request.class);
-		
-		Criteria c = Criteria.parse(req);
-		Query<Contact> q = c.createQuery(Contact.class);
+    Request req = fromJson("find.json", Request.class);
 
-		String actual = q.toString();
-		Assert.assertNotNull(actual);
-	}
+    Criteria c = Criteria.parse(req);
+    Query<Contact> q = c.createQuery(Contact.class);
 
-	@Test
-	public void testFind2() {
+    String actual = q.toString();
+    Assert.assertNotNull(actual);
+  }
 
-		Request req = fromJson("find2.json", Request.class);
+  @Test
+  public void testFind2() {
 
-		Criteria c = Criteria.parse(req);
-		Query<Contact> q = c.createQuery(Contact.class);
-		
-		String actual = q.toString();
+    Request req = fromJson("find2.json", Request.class);
 
-		Assert.assertEquals("SELECT self FROM Contact self WHERE (self.archived is null OR self.archived = false)", actual);
-	}
+    Criteria c = Criteria.parse(req);
+    Query<Contact> q = c.createQuery(Contact.class);
 
-	@Test
-	public void testFind3() {
+    String actual = q.toString();
 
-		Request req = fromJson("find3.json", Request.class);
+    Assert.assertEquals(
+        "SELECT self FROM Contact self WHERE (self.archived is null OR self.archived = false)",
+        actual);
+  }
 
-		Criteria c = Criteria.parse(req);
-		Query<Contact> q = c.createQuery(Contact.class);
-		
-		Assert.assertTrue(q.count() > 0);
-	}
+  @Test
+  public void testFind3() {
 
-	@Test
-	public void testAdd() {
+    Request req = fromJson("find3.json", Request.class);
 
-		Request req = fromJson("add.json", Request.class);
+    Criteria c = Criteria.parse(req);
+    Query<Contact> q = c.createQuery(Contact.class);
 
-		Assert.assertTrue(req.getData() instanceof Map);
+    Assert.assertTrue(q.count() > 0);
+  }
 
-		Map<String, Object> data = req.getData();
+  @Test
+  public void testAdd() {
 
-		Assert.assertEquals("some", data.get("firstName"));
-		Assert.assertEquals("thing", data.get("lastName"));
-		Assert.assertEquals("some@thing.com", data.get("email"));
+    Request req = fromJson("add.json", Request.class);
 
-	}
+    Assert.assertTrue(req.getData() instanceof Map);
 
-	@Test @Transactional
-	public void testAdd2() {
+    Map<String, Object> data = req.getData();
 
-		Request req = fromJson("add2.json", Request.class);
+    Assert.assertEquals("some", data.get("firstName"));
+    Assert.assertEquals("thing", data.get("lastName"));
+    Assert.assertEquals("some@thing.com", data.get("email"));
+  }
 
-		Assert.assertTrue(req.getData() instanceof Map);
+  @Test
+  @Transactional
+  public void testAdd2() {
 
-		Map<String, Object> data = req.getData();
+    Request req = fromJson("add2.json", Request.class);
 
-		Assert.assertEquals("Jack", data.get("firstName"));
-		Assert.assertEquals("Sparrow", data.get("lastName"));
-		Assert.assertEquals("jack.sparrow@gmail.com", data.get("email"));
+    Assert.assertTrue(req.getData() instanceof Map);
 
-		Contact p = contacts.edit(data);
+    Map<String, Object> data = req.getData();
 
-		Assert.assertEquals(Title.class, p.getTitle().getClass());
-		Assert.assertEquals(Address.class, p.getAddresses().get(0).getClass());
-		Assert.assertEquals(Circle.class, p.getCircle(0).getClass());
-		Assert.assertEquals(LocalDate.class, p.getDateOfBirth().getClass());
+    Assert.assertEquals("Jack", data.get("firstName"));
+    Assert.assertEquals("Sparrow", data.get("lastName"));
+    Assert.assertEquals("jack.sparrow@gmail.com", data.get("email"));
 
-		Assert.assertEquals("mr", p.getTitle().getCode());
-		Assert.assertEquals("France", p.getAddresses().get(0).getCountry().getName());
-		Assert.assertEquals("family", p.getCircle(0).getCode());
-		Assert.assertEquals("1977-05-01", p.getDateOfBirth().toString());
-		
-		contacts.manage(p);
-	}
-	
-	@Test
-	@Transactional
-	public void testUpdate() {
-		
-		Contact c = contacts.all().fetchOne();
-		Map<String, Object> data = Maps.newHashMap();
+    Contact p = contacts.edit(data);
 
-		data.put("id", c.getId());
-		data.put("version", c.getVersion());
-		data.put("firstName", "Some");
-		data.put("lastName", "thing");
+    Assert.assertEquals(Title.class, p.getTitle().getClass());
+    Assert.assertEquals(Address.class, p.getAddresses().get(0).getClass());
+    Assert.assertEquals(Circle.class, p.getCircle(0).getClass());
+    Assert.assertEquals(LocalDate.class, p.getDateOfBirth().getClass());
 
-		String json = toJson(ImmutableMap.of("data", data));
-		Request req = fromJson(json, Request.class);
+    Assert.assertEquals("mr", p.getTitle().getCode());
+    Assert.assertEquals("France", p.getAddresses().get(0).getCountry().getName());
+    Assert.assertEquals("family", p.getCircle(0).getCode());
+    Assert.assertEquals("1977-05-01", p.getDateOfBirth().toString());
 
-		Assert.assertTrue(req.getData() instanceof Map);
+    contacts.manage(p);
+  }
 
-		data = req.getData();
+  @Test
+  @Transactional
+  public void testUpdate() {
 
-		Assert.assertEquals("Some", data.get("firstName"));
-		Assert.assertEquals("thing", data.get("lastName"));
+    Contact c = contacts.all().fetchOne();
+    Map<String, Object> data = Maps.newHashMap();
 
-		Contact o = contacts.edit(data);
-		
-		o = contacts.manage(o);
-	}
+    data.put("id", c.getId());
+    data.put("version", c.getVersion());
+    data.put("firstName", "Some");
+    data.put("lastName", "thing");
+
+    String json = toJson(ImmutableMap.of("data", data));
+    Request req = fromJson(json, Request.class);
+
+    Assert.assertTrue(req.getData() instanceof Map);
+
+    data = req.getData();
+
+    Assert.assertEquals("Some", data.get("firstName"));
+    Assert.assertEquals("thing", data.get("lastName"));
+
+    Contact o = contacts.edit(data);
+
+    o = contacts.manage(o);
+  }
 }

@@ -17,23 +17,6 @@
  */
 package com.axelor.common.logging;
 
-import java.io.File;
-import java.lang.management.ManagementFactory;
-import java.nio.charset.Charset;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
-
-import com.axelor.common.FileUtils;
-import com.axelor.common.ResourceUtils;
-import com.axelor.common.StringUtils;
-
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
@@ -51,259 +34,271 @@ import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
 import ch.qos.logback.core.spi.ContextAware;
 import ch.qos.logback.core.spi.LifeCycle;
 import ch.qos.logback.core.util.OptionHelper;
+import com.axelor.common.FileUtils;
+import com.axelor.common.ResourceUtils;
+import com.axelor.common.StringUtils;
+import java.io.File;
+import java.lang.management.ManagementFactory;
+import java.nio.charset.Charset;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
  * The logger configuration builder using logback-classic.
- * 
- * <p>
- * It can be configured with following properties:
- * </p>
- * 
+ *
+ * <p>It can be configured with following properties:
+ *
  * <ul>
- * <li><b>logging.config</b> - the path to custom logback config file</li>
- * <li><b>logging.path</b> - the directory where log files are saved</li>
- * <li><b>logging.pattern.file</b> - the logging pattern for file appender</li>
- * <li><b>logging.pattern.console</b> - the logging pattern for console appender
- * </li>
- * <li><b>logging.level.root</b> - the logging level of root logger</li>
- * <li><b>logging.level.com.axelor</b> - the logging level of given logger</li>
+ *   <li><b>logging.config</b> - the path to custom logback config file
+ *   <li><b>logging.path</b> - the directory where log files are saved
+ *   <li><b>logging.pattern.file</b> - the logging pattern for file appender
+ *   <li><b>logging.pattern.console</b> - the logging pattern for console appender
+ *   <li><b>logging.level.root</b> - the logging level of root logger
+ *   <li><b>logging.level.com.axelor</b> - the logging level of given logger
  * </ul>
- * 
+ *
  * If <b>logging.config</b> is given, all other properties will be ignored.<br>
- * If <b>logging.path</b> is not given, file appender will be disabled</br>
- * If <b>logging.pattern.file</b> is set to <code>OFF</code>, file appender will
- * be disabled<br>
- * If <b>logging.pattern.console</b> is set to <code>OFF</code>, console
- * appender will be disabled<br>
+ * If <b>logging.path</b> is not given, file appender will be disabled</br> If
+ * <b>logging.pattern.file</b> is set to <code>OFF</code>, file appender will be disabled<br>
+ * If <b>logging.pattern.console</b> is set to <code>OFF</code>, console appender will be disabled
+ * <br>
  * If <b>logback.xml</b> is found in classpath, no custom configuration is done.
  *
- * <p>
- * The logging pattern can use <code>%clr()</code> to highlight based on log
- * level, or <code>%clr(){color}</code> with
- * <code>faint, red, green, yellow, blue, magenta, cyan</code> as color to style
- * the log message on console output.
- * </p>
+ * <p>The logging pattern can use <code>%clr()</code> to highlight based on log level, or <code>
+ * %clr(){color}</code> with <code>faint, red, green, yellow, blue, magenta, cyan</code> as color to
+ * style the log message on console output.
  */
 public class LoggerConfiguration {
 
-	private static final String DEFAULT_CONFIG = "logback.xml";
+  private static final String DEFAULT_CONFIG = "logback.xml";
 
-	private static final String LOGGING_CONFIG = "logging.config";
-	private static final String LOGGING_PATH = "logging.path";
+  private static final String LOGGING_CONFIG = "logging.config";
+  private static final String LOGGING_PATH = "logging.path";
 
-	private static final String LOGGING_PATTERN_FILE = "logging.pattern.file";
-	private static final String LOGGING_PATTERN_CONSOLE = "logging.pattern.console";
+  private static final String LOGGING_PATTERN_FILE = "logging.pattern.file";
+  private static final String LOGGING_PATTERN_CONSOLE = "logging.pattern.console";
 
-	private static final Pattern LOGGING_LEVEL_PATTERN = Pattern.compile("logging\\.level\\.(.*?)");
+  private static final Pattern LOGGING_LEVEL_PATTERN = Pattern.compile("logging\\.level\\.(.*?)");
 
-	private static final String ANSI_LOG_PATTERN = "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) "
-			+ "%clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} "
-			+ "%clr(:){faint} %m%n";
+  private static final String ANSI_LOG_PATTERN =
+      "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) "
+          + "%clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} "
+          + "%clr(:){faint} %m%n";
 
-	private static final String FILE_LOG_PATTERN = "%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- [%t] %-40.40logger{39} : %m%n";
+  private static final String FILE_LOG_PATTERN =
+      "%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- [%t] %-40.40logger{39} : %m%n";
 
-	private static final Charset UTF8 = Charset.forName("UTF-8");
+  private static final Charset UTF8 = Charset.forName("UTF-8");
 
-	private LoggerContext context;
-	private Properties config;
+  private LoggerContext context;
+  private Properties config;
 
-	public LoggerConfiguration(Properties config) {
-		this.context = (LoggerContext) LoggerFactory.getILoggerFactory();
-		this.config = config;
-	}
+  public LoggerConfiguration(Properties config) {
+    this.context = (LoggerContext) LoggerFactory.getILoggerFactory();
+    this.config = config;
+  }
 
-	private boolean isInstalled() {
-		return this.context.getObject(LoggerConfiguration.class.getName()) != null;
-	}
-	
-	private void markInstalled() {
-		this.context.putObject(LoggerConfiguration.class.getName(), true);
-	}
-	
-	private void markUninstalled() {
-		this.context.removeObject(LoggerConfiguration.class.getName());
-	}
+  private boolean isInstalled() {
+    return this.context.getObject(LoggerConfiguration.class.getName()) != null;
+  }
 
-	public void install() {
-		if (isInstalled()) {
-			return;
-		}
+  private void markInstalled() {
+    this.context.putObject(LoggerConfiguration.class.getName(), true);
+  }
 
-		// install JUL handler
-		SLF4JBridgeHandler.removeHandlersForRootLogger();
-		SLF4JBridgeHandler.install();
-		
-		// set PID as system property
-		if (System.getProperty("PID") == null) {
-			System.setProperty("PID", getPid());
-		}
+  private void markUninstalled() {
+    this.context.removeObject(LoggerConfiguration.class.getName());
+  }
 
-		// configure logback
-		configure();
-		markInstalled();
-	}
+  public void install() {
+    if (isInstalled()) {
+      return;
+    }
 
-	public void uninstall() {
-		// uninstall JUL handler
-		SLF4JBridgeHandler.removeHandlersForRootLogger();
-		SLF4JBridgeHandler.uninstall();
-		markUninstalled();
-	}
+    // install JUL handler
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+    SLF4JBridgeHandler.install();
 
-	private String getPid() {
-		try {
-			String jvmName = ManagementFactory.getRuntimeMXBean().getName();
-			return jvmName.split("@")[0];
-		} catch (Throwable ex) {
-			return "???";
-		}
-	}
+    // set PID as system property
+    if (System.getProperty("PID") == null) {
+      System.setProperty("PID", getPid());
+    }
 
-	private void configure() {
-		if (config.getProperty(LOGGING_CONFIG) != null) {
-			final File file = FileUtils.getFile(config.getProperty(LOGGING_CONFIG));
-			if (file.exists()) {
-				reset(file);
-				return;
-			} else {
-				throw new RuntimeException("Unable to access logging config file: " + file);
-			}
-		}
+    // configure logback
+    configure();
+    markInstalled();
+  }
 
-		// don't do anything if default config found in classpath
-		if (ResourceUtils.getResource(DEFAULT_CONFIG) != null) {
-			return;
-		}
+  public void uninstall() {
+    // uninstall JUL handler
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+    SLF4JBridgeHandler.uninstall();
+    markUninstalled();
+  }
 
-		// start from scratch
-		reset(null);
+  private String getPid() {
+    try {
+      String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+      return jvmName.split("@")[0];
+    } catch (Throwable ex) {
+      return "???";
+    }
+  }
 
-		// add common loggers
-		logger("com.axelor", Level.INFO);
-		logger("org.apache.catalina.startup.DigesterFactory", Level.ERROR);
-		logger("org.apache.catalina.util.LifecycleBase", Level.ERROR);
-		logger("org.apache.coyote.http11.Http11NioProtocol", Level.WARN);
-		logger("org.apache.sshd.common.util.SecurityUtils", Level.WARN);
-		logger("org.apache.tomcat.util.net.NioSelectorPool", Level.WARN);
-		logger("org.eclipse.jetty.util.component.AbstractLifeCycle", Level.ERROR);
-		logger("org.hibernate.validator.internal.util.Version", Level.WARN);
+  private void configure() {
+    if (config.getProperty(LOGGING_CONFIG) != null) {
+      final File file = FileUtils.getFile(config.getProperty(LOGGING_CONFIG));
+      if (file.exists()) {
+        reset(file);
+        return;
+      } else {
+        throw new RuntimeException("Unable to access logging config file: " + file);
+      }
+    }
 
-		Level rootLevel = Level.ERROR;
+    // don't do anything if default config found in classpath
+    if (ResourceUtils.getResource(DEFAULT_CONFIG) != null) {
+      return;
+    }
 
-		// add loggers
-		for (String key : config.stringPropertyNames()) {
-			final Matcher matcher = LOGGING_LEVEL_PATTERN.matcher(key);
-			if (matcher.matches()) {
-				final String name = matcher.group(1);
-				final Level level = Level.toLevel(config.getProperty(key, "ERROR"));
-				if (org.slf4j.Logger.ROOT_LOGGER_NAME.equalsIgnoreCase(name)) {
-					rootLevel = level;
-				}
-				logger(name, level);
-			}
-		}
+    // start from scratch
+    reset(null);
 
-		final Logger rootLogger = this.context.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
-		final String logPath = config.getProperty(LOGGING_PATH);
+    // add common loggers
+    logger("com.axelor", Level.INFO);
+    logger("org.apache.catalina.startup.DigesterFactory", Level.ERROR);
+    logger("org.apache.catalina.util.LifecycleBase", Level.ERROR);
+    logger("org.apache.coyote.http11.Http11NioProtocol", Level.WARN);
+    logger("org.apache.sshd.common.util.SecurityUtils", Level.WARN);
+    logger("org.apache.tomcat.util.net.NioSelectorPool", Level.WARN);
+    logger("org.eclipse.jetty.util.component.AbstractLifeCycle", Level.ERROR);
+    logger("org.hibernate.validator.internal.util.Version", Level.WARN);
 
-		rootLogger.setLevel(rootLevel);
+    Level rootLevel = Level.ERROR;
 
-		// create console appender
-		if (!"OFF".equalsIgnoreCase(config.getProperty(LOGGING_PATTERN_CONSOLE))) {
-			rootLogger.addAppender(createConsoleAppender());
-		}
+    // add loggers
+    for (String key : config.stringPropertyNames()) {
+      final Matcher matcher = LOGGING_LEVEL_PATTERN.matcher(key);
+      if (matcher.matches()) {
+        final String name = matcher.group(1);
+        final Level level = Level.toLevel(config.getProperty(key, "ERROR"));
+        if (org.slf4j.Logger.ROOT_LOGGER_NAME.equalsIgnoreCase(name)) {
+          rootLevel = level;
+        }
+        logger(name, level);
+      }
+    }
 
-		// create file appender
-		if (!"OFF".equalsIgnoreCase(config.getProperty(LOGGING_PATTERN_FILE)) && !StringUtils.isBlank(logPath)) {
-			rootLogger.addAppender(createFileAppender(Paths.get(logPath, "axelor.log").toString()));
-		}
-	}
+    final Logger rootLogger = this.context.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+    final String logPath = config.getProperty(LOGGING_PATH);
 
-	private void reset(File configFile) {
-		final JoranConfigurator configurator = new JoranConfigurator();
-		configurator.setContext(context);
-		context.reset();
+    rootLogger.setLevel(rootLevel);
 
-		// register color converter
-		conversionRule("clr", ColorConverter.class);
+    // create console appender
+    if (!"OFF".equalsIgnoreCase(config.getProperty(LOGGING_PATTERN_CONSOLE))) {
+      rootLogger.addAppender(createConsoleAppender());
+    }
 
-		if (configFile == null) {
-			return;
-		}
-		try {
-			configurator.doConfigure(configFile);
-		} catch (JoranException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    // create file appender
+    if (!"OFF".equalsIgnoreCase(config.getProperty(LOGGING_PATTERN_FILE))
+        && !StringUtils.isBlank(logPath)) {
+      rootLogger.addAppender(createFileAppender(Paths.get(logPath, "axelor.log").toString()));
+    }
+  }
 
-	private Appender<ILoggingEvent> createConsoleAppender() {
-		final ConsoleAppender<ILoggingEvent> appender = new ConsoleAppender<ILoggingEvent>();
-		final PatternLayoutEncoder encoder = new PatternLayoutEncoder();
-		final String logPattern = config.getProperty(LOGGING_PATTERN_CONSOLE, ANSI_LOG_PATTERN);
+  private void reset(File configFile) {
+    final JoranConfigurator configurator = new JoranConfigurator();
+    configurator.setContext(context);
+    context.reset();
 
-		encoder.setPattern(OptionHelper.substVars(logPattern, this.context));
-		encoder.setCharset(UTF8);
+    // register color converter
+    conversionRule("clr", ColorConverter.class);
 
-		appender.setName("CONSOLE");
-		appender.setEncoder(encoder);
+    if (configFile == null) {
+      return;
+    }
+    try {
+      configurator.doConfigure(configFile);
+    } catch (JoranException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-		start(encoder);
-		start(appender);
+  private Appender<ILoggingEvent> createConsoleAppender() {
+    final ConsoleAppender<ILoggingEvent> appender = new ConsoleAppender<ILoggingEvent>();
+    final PatternLayoutEncoder encoder = new PatternLayoutEncoder();
+    final String logPattern = config.getProperty(LOGGING_PATTERN_CONSOLE, ANSI_LOG_PATTERN);
 
-		return appender;
-	}
+    encoder.setPattern(OptionHelper.substVars(logPattern, this.context));
+    encoder.setCharset(UTF8);
 
-	private Appender<ILoggingEvent> createFileAppender(String logFile) {
-		final RollingFileAppender<ILoggingEvent> appender = new RollingFileAppender<>();
-		final PatternLayoutEncoder encoder = new PatternLayoutEncoder();
-		final String logPattern = config.getProperty(LOGGING_PATTERN_FILE, FILE_LOG_PATTERN);
+    appender.setName("CONSOLE");
+    appender.setEncoder(encoder);
 
-		encoder.setPattern(OptionHelper.substVars(logPattern, this.context));
+    start(encoder);
+    start(appender);
 
-		appender.setName("FILE");
-		appender.setFile(logFile);
-		appender.setEncoder(encoder);
+    return appender;
+  }
 
-		final FixedWindowRollingPolicy rollingPolicy = new FixedWindowRollingPolicy();
-		final SizeBasedTriggeringPolicy<ILoggingEvent> triggeringPolicy = new SizeBasedTriggeringPolicy<>();
+  private Appender<ILoggingEvent> createFileAppender(String logFile) {
+    final RollingFileAppender<ILoggingEvent> appender = new RollingFileAppender<>();
+    final PatternLayoutEncoder encoder = new PatternLayoutEncoder();
+    final String logPattern = config.getProperty(LOGGING_PATTERN_FILE, FILE_LOG_PATTERN);
 
-		rollingPolicy.setFileNamePattern(logFile + ".%i");
-		rollingPolicy.setParent(appender);
+    encoder.setPattern(OptionHelper.substVars(logPattern, this.context));
 
-		appender.setRollingPolicy(rollingPolicy);
-		appender.setTriggeringPolicy(triggeringPolicy);
+    appender.setName("FILE");
+    appender.setFile(logFile);
+    appender.setEncoder(encoder);
 
-		start(encoder);
-		start(rollingPolicy);
-		start(triggeringPolicy);
-		start(appender);
+    final FixedWindowRollingPolicy rollingPolicy = new FixedWindowRollingPolicy();
+    final SizeBasedTriggeringPolicy<ILoggingEvent> triggeringPolicy =
+        new SizeBasedTriggeringPolicy<>();
 
-		return appender;
-	}
+    rollingPolicy.setFileNamePattern(logFile + ".%i");
+    rollingPolicy.setParent(appender);
 
-	public void conversionRule(String word, Class<? extends Converter<?>> converter) {
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		Map<String, Object> registry = (Map) this.context.getObject(CoreConstants.PATTERN_RULE_REGISTRY);
-		if (registry == null) {
-			registry = new HashMap<>();
-			this.context.putObject(CoreConstants.PATTERN_RULE_REGISTRY, registry);
-		}
-		registry.put(word, converter.getName());
-	}
+    appender.setRollingPolicy(rollingPolicy);
+    appender.setTriggeringPolicy(triggeringPolicy);
 
-	private Logger logger(String name, Level level) {
-		final Logger logger = this.context.getLogger(name);
-		if (level != null) {
-			logger.setLevel(level);
-		}
-		return logger;
-	}
+    start(encoder);
+    start(rollingPolicy);
+    start(triggeringPolicy);
+    start(appender);
 
-	private void start(LifeCycle lifeCycle) {
-		if (lifeCycle instanceof ContextAware) {
-			((ContextAware) lifeCycle).setContext(this.context);
-		}
-		lifeCycle.start();
-	}
+    return appender;
+  }
+
+  public void conversionRule(String word, Class<? extends Converter<?>> converter) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    Map<String, Object> registry =
+        (Map) this.context.getObject(CoreConstants.PATTERN_RULE_REGISTRY);
+    if (registry == null) {
+      registry = new HashMap<>();
+      this.context.putObject(CoreConstants.PATTERN_RULE_REGISTRY, registry);
+    }
+    registry.put(word, converter.getName());
+  }
+
+  private Logger logger(String name, Level level) {
+    final Logger logger = this.context.getLogger(name);
+    if (level != null) {
+      logger.setLevel(level);
+    }
+    return logger;
+  }
+
+  private void start(LifeCycle lifeCycle) {
+    if (lifeCycle instanceof ContextAware) {
+      ((ContextAware) lifeCycle).setContext(this.context);
+    }
+    lifeCycle.start();
+  }
 }

@@ -17,11 +17,16 @@
  */
 package com.axelor.test.db;
 
+import com.axelor.db.EntityHelper;
+import com.axelor.db.JpaModel;
+import com.axelor.db.annotations.NameColumn;
+import com.axelor.db.annotations.VirtualColumn;
+import com.axelor.db.annotations.Widget;
+import com.google.common.collect.Lists;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
-
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Basic;
@@ -35,223 +40,224 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
-
 import org.hibernate.annotations.Type;
-
-import com.axelor.db.EntityHelper;
-import com.axelor.db.JpaModel;
-import com.axelor.db.annotations.NameColumn;
-import com.axelor.db.annotations.VirtualColumn;
-import com.axelor.db.annotations.Widget;
-import com.google.common.collect.Lists;
 
 @Entity
 @Table(name = "CONTACT_CONTACT")
 public class Contact extends JpaModel {
 
-	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
-	private Title title;
+  @ManyToOne(
+    cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+    fetch = FetchType.LAZY
+  )
+  private Title title;
 
-	@NotNull
-	private String firstName;
+  @NotNull private String firstName;
 
-	@NotNull
-	private String lastName;
-	
-	@Widget(search = { "firstName", "lastName" })
-	@NameColumn
-	@VirtualColumn
-	@Access(AccessType.PROPERTY)
-	private String fullName;
+  @NotNull private String lastName;
 
-	private String email;
-	
-	private String proEmail;
+  @Widget(search = {"firstName", "lastName"})
+  @NameColumn
+  @VirtualColumn
+  @Access(AccessType.PROPERTY)
+  private String fullName;
 
-	private String phone;
+  private String email;
 
-	private String lang;
-	
-	@Widget(selection = "food.selection")
-	private String food;
-	
-	private BigDecimal credit;
+  private String proEmail;
 
-	private LocalDate dateOfBirth;
+  private String phone;
 
-	@OneToMany(mappedBy = "contact", cascade = CascadeType.ALL, fetch=FetchType.LAZY, orphanRemoval = true)
-	private List<Address> addresses;
+  private String lang;
 
-	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch=FetchType.LAZY)
-	private Set<Circle> circles;
+  @Widget(selection = "food.selection")
+  private String food;
 
-	@Widget(title = "Photo", help = "Max size 4MB.")
-	@Lob @Basic(fetch = FetchType.LAZY)
-	private byte[] image;
+  private BigDecimal credit;
 
-	@Transient
-	@Widget(multiline = true)
-	private String notes;
-	
-	@Widget(title = "Attributes")
-	@Type(type = "json")
-	private String attrs;
+  private LocalDate dateOfBirth;
 
-	public Contact() {
-	}
+  @OneToMany(
+    mappedBy = "contact",
+    cascade = CascadeType.ALL,
+    fetch = FetchType.LAZY,
+    orphanRemoval = true
+  )
+  private List<Address> addresses;
 
-	public Contact(String firstName) {
-		this.firstName = firstName;
-	}
+  @ManyToMany(
+    cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+    fetch = FetchType.LAZY
+  )
+  private Set<Circle> circles;
 
-	public Contact(String firstName, String lastName) {
-		this.firstName = firstName;
-		this.lastName = lastName;
-	}
+  @Widget(title = "Photo", help = "Max size 4MB.")
+  @Lob
+  @Basic(fetch = FetchType.LAZY)
+  private byte[] image;
 
-	public Title getTitle() {
-		return title;
-	}
+  @Transient
+  @Widget(multiline = true)
+  private String notes;
 
-	public void setTitle(Title title) {
-		this.title = title;
-	}
+  @Widget(title = "Attributes")
+  @Type(type = "json")
+  private String attrs;
 
-	public String getFirstName() {
-		return firstName;
-	}
+  public Contact() {}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+  public Contact(String firstName) {
+    this.firstName = firstName;
+  }
 
-	public String getLastName() {
-		return lastName;
-	}
+  public Contact(String firstName, String lastName) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+  }
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-	
-	public String getFullName() {
-		return fullName = computeFullName();
-	}
+  public Title getTitle() {
+    return title;
+  }
 
-	protected String computeFullName() {
-		fullName = firstName + " " + lastName;
-		if (this.title != null) {
-			return this.title.getName() + " " + fullName;
-		}
-		return fullName;
-	}
-	
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
+  public void setTitle(Title title) {
+    this.title = title;
+  }
 
-	public String getEmail() {
-		return email;
-	}
+  public String getFirstName() {
+    return firstName;
+  }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	
-	public String getProEmail() {
-		return proEmail;
-	}
-	
-	public void setProEmail(String proEmail) {
-		this.proEmail = proEmail;
-	}
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
 
-	public String getPhone() {
-		return phone;
-	}
+  public String getLastName() {
+    return lastName;
+  }
 
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
 
-	public String getLang() {
-		return lang;
-	}
+  public String getFullName() {
+    return fullName = computeFullName();
+  }
 
-	public void setLang(String lang) {
-		this.lang = lang;
-	}
-	
-	public String getFood() {
-		return food;
-	}
-	
-	public void setFood(String food) {
-		this.food = food;
-	}
-	
-	public BigDecimal getCredit() {
-		return credit;
-	}
-	
-	public void setCredit(BigDecimal credit) {
-		this.credit = credit;
-	}
-	
-	public LocalDate getDateOfBirth() {
-		return dateOfBirth;
-	}
+  protected String computeFullName() {
+    fullName = firstName + " " + lastName;
+    if (this.title != null) {
+      return this.title.getName() + " " + fullName;
+    }
+    return fullName;
+  }
 
-	public void setDateOfBirth(LocalDate dateOfBirth) {
-		this.dateOfBirth = dateOfBirth;
-	}
+  public void setFullName(String fullName) {
+    this.fullName = fullName;
+  }
 
-	public List<Address> getAddresses() {
-		return addresses;
-	}
+  public String getEmail() {
+    return email;
+  }
 
-	public void setAddresses(List<Address> addresses) {
-		this.addresses = addresses;
-	}
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-	public Circle getCircle(int index) {
-		if (circles == null) return null;
-		return Lists.newArrayList(circles).get(index);
-	}
+  public String getProEmail() {
+    return proEmail;
+  }
 
-	public Set<Circle> getCircles() {
-		return circles;
-	}
+  public void setProEmail(String proEmail) {
+    this.proEmail = proEmail;
+  }
 
-	public void setCircles(Set<Circle> groups) {
-		this.circles = groups;
-	}
-	
-	public byte[] getImage() {
-		return image;
-	}
-	
-	public void setImage(byte[] image) {
-		this.image = image;
-	}
-	
-	public String getNotes() {
-		return notes;
-	}
-	
-	public void setNotes(String notes) {
-		this.notes = notes;
-	}
+  public String getPhone() {
+    return phone;
+  }
 
-	public String getAttrs() {
-		return attrs;
-	}
+  public void setPhone(String phone) {
+    this.phone = phone;
+  }
 
-	public void setAttrs(String attrs) {
-		this.attrs = attrs;
-	}
+  public String getLang() {
+    return lang;
+  }
 
-	@Override
-	public String toString() {
-		return EntityHelper.toString(this);
-	}
+  public void setLang(String lang) {
+    this.lang = lang;
+  }
+
+  public String getFood() {
+    return food;
+  }
+
+  public void setFood(String food) {
+    this.food = food;
+  }
+
+  public BigDecimal getCredit() {
+    return credit;
+  }
+
+  public void setCredit(BigDecimal credit) {
+    this.credit = credit;
+  }
+
+  public LocalDate getDateOfBirth() {
+    return dateOfBirth;
+  }
+
+  public void setDateOfBirth(LocalDate dateOfBirth) {
+    this.dateOfBirth = dateOfBirth;
+  }
+
+  public List<Address> getAddresses() {
+    return addresses;
+  }
+
+  public void setAddresses(List<Address> addresses) {
+    this.addresses = addresses;
+  }
+
+  public Circle getCircle(int index) {
+    if (circles == null) return null;
+    return Lists.newArrayList(circles).get(index);
+  }
+
+  public Set<Circle> getCircles() {
+    return circles;
+  }
+
+  public void setCircles(Set<Circle> groups) {
+    this.circles = groups;
+  }
+
+  public byte[] getImage() {
+    return image;
+  }
+
+  public void setImage(byte[] image) {
+    this.image = image;
+  }
+
+  public String getNotes() {
+    return notes;
+  }
+
+  public void setNotes(String notes) {
+    this.notes = notes;
+  }
+
+  public String getAttrs() {
+    return attrs;
+  }
+
+  public void setAttrs(String attrs) {
+    this.attrs = attrs;
+  }
+
+  @Override
+  public String toString() {
+    return EntityHelper.toString(this);
+  }
 }

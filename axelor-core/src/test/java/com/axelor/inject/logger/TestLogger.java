@@ -20,48 +20,44 @@ package com.axelor.inject.logger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import com.axelor.test.GuiceModules;
+import com.axelor.test.GuiceRunner;
 import javax.inject.Inject;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 
-import com.axelor.test.GuiceModules;
-import com.axelor.test.GuiceRunner;
-
 @RunWith(GuiceRunner.class)
-@GuiceModules({ LoggerModule.class })
+@GuiceModules({LoggerModule.class})
 public class TestLogger {
 
-	private Logger log1;
-	
-	@Inject
-	private Logger log2;
-	
-	@Inject
-	private TestLoggerService service;
+  private Logger log1;
 
-	@Inject
-	public TestLogger(Logger log1) {
-		this.log1 = log1;
-	}
-	
-	@Test
-	public void testContructorInject() {
-		assertNotNull(log1);
-		assertEquals(TestLogger.class.getName(), log1.getName());
-	}
-	
-	@Test
-	public void testMemberInject() {
-		assertNotNull(log2);
-		assertEquals(TestLogger.class.getName(), log2.getName());
-	}
-	
-	@Test
-	public void testServiceInject() {
-		assertNotNull(service);
-		assertNotNull(service.getLog());
-		assertEquals(TestLoggerService.class.getName(), service.getLog().getName());
-	}
+  @Inject private Logger log2;
+
+  @Inject private TestLoggerService service;
+
+  @Inject
+  public TestLogger(Logger log1) {
+    this.log1 = log1;
+  }
+
+  @Test
+  public void testContructorInject() {
+    assertNotNull(log1);
+    assertEquals(TestLogger.class.getName(), log1.getName());
+  }
+
+  @Test
+  public void testMemberInject() {
+    assertNotNull(log2);
+    assertEquals(TestLogger.class.getName(), log2.getName());
+  }
+
+  @Test
+  public void testServiceInject() {
+    assertNotNull(service);
+    assertNotNull(service.getLog());
+    assertEquals(TestLoggerService.class.getName(), service.getLog().getName());
+  }
 }

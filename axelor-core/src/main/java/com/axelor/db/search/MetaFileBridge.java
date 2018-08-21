@@ -17,30 +17,31 @@
  */
 package com.axelor.db.search;
 
+import com.axelor.common.StringUtils;
+import com.axelor.meta.MetaFiles;
+import com.axelor.meta.db.MetaFile;
 import org.apache.lucene.document.Document;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.hibernate.search.bridge.builtin.TikaBridge;
 
-import com.axelor.common.StringUtils;
-import com.axelor.meta.MetaFiles;
-import com.axelor.meta.db.MetaFile;
-
 /**
- * Custom {@link TikaBridge} implementation to be used with {@link MetaFile} to
- * resolve correct filePath.
- *
+ * Custom {@link TikaBridge} implementation to be used with {@link MetaFile} to resolve correct
+ * filePath.
  */
 public class MetaFileBridge extends TikaBridge {
 
-	@Override
-	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
-		String filePath = null;
-		if (value instanceof String) {
-			filePath = (String) value;
-		} else if (value instanceof MetaFile) {
-			filePath = ((MetaFile) value).getFilePath();
-		}
-		filePath = StringUtils.isBlank(filePath) ? null : MetaFiles.getPath(filePath).toAbsolutePath().toString();
-		super.set(name, filePath, document, luceneOptions);
-	}
+  @Override
+  public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
+    String filePath = null;
+    if (value instanceof String) {
+      filePath = (String) value;
+    } else if (value instanceof MetaFile) {
+      filePath = ((MetaFile) value).getFilePath();
+    }
+    filePath =
+        StringUtils.isBlank(filePath)
+            ? null
+            : MetaFiles.getPath(filePath).toAbsolutePath().toString();
+    super.set(name, filePath, document, luceneOptions);
+  }
 }

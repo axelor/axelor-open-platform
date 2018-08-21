@@ -17,6 +17,9 @@
  */
 package com.axelor.gradle.tasks;
 
+import com.axelor.common.FileUtils;
+import com.axelor.gradle.support.HotswapSupport;
+import com.axelor.gradle.support.TomcatSupport;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,7 +29,6 @@ import java.util.jar.Attributes;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
-
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileCollection;
@@ -36,93 +38,93 @@ import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskAction;
 
-import com.axelor.common.FileUtils;
-import com.axelor.gradle.support.HotswapSupport;
-import com.axelor.gradle.support.TomcatSupport;
-
 public class TomcatRun extends JavaExec {
 
-	private static final String MAIN_CLASS = "com.axelor.app.internal.AppRunner";
+  private static final String MAIN_CLASS = "com.axelor.app.internal.AppRunner";
 
-	private boolean hot;
+  private boolean hot;
 
-	private int port = 8080;
+  private int port = 8080;
 
-	@Option(option = "hot", description = "Specify whether to enable hot-swaping.")
-	public void setHot(boolean hot) {
-		this.hot = hot;
-	}
+  @Option(option = "hot", description = "Specify whether to enable hot-swaping.")
+  public void setHot(boolean hot) {
+    this.hot = hot;
+  }
 
-	@Option(option = "port", description = "Specify the tomcat server port.")
-	public void setPort(String port) {
-		this.port = Integer.parseInt(port);
-	}
+  @Option(option = "port", description = "Specify the tomcat server port.")
+  public void setPort(String port) {
+    this.port = Integer.parseInt(port);
+  }
 
-	public static List<String> getArgs(Project project, int port) {
-		final File baseDir = FileUtils.getFile(project.getBuildDir(), "tomcat");
-		final File confFile = FileUtils.getFile(baseDir, TomcatSupport.TOMCAT_RUNNER_CONFIG);
+  public static List<String> getArgs(Project project, int port) {
+    final File baseDir = FileUtils.getFile(project.getBuildDir(), "tomcat");
+    final File confFile = FileUtils.getFile(baseDir, TomcatSupport.TOMCAT_RUNNER_CONFIG);
 
-		final List<String> args = new ArrayList<>();
+    final List<String> args = new ArrayList<>();
 
-		args.add("--port");
-		args.add("" + port);
-		args.add("--config");
-		args.add(TomcatSupport.toRelativePath(project, confFile));
+    args.add("--port");
+    args.add("" + port);
+    args.add("--config");
+    args.add(TomcatSupport.toRelativePath(project, confFile));
 
-		return args;
-	}
-	
-	public static List<String> getJvmArgs(Project project, boolean hot, boolean debug) {
-		final List<String> jvmArgs = new ArrayList<>();
-		if (hot || debug) {
-			if (HotswapSupport.hasDCEVM()) {
-				HotswapSupport.getAgentArgs(project, !debug).forEach(jvmArgs::add);
-			} else {
-				project.getLogger().info("Cannot enable hot-swaping as DCEVM is not installed.");
-			}
-		}
-		return jvmArgs;
-	}
+    return args;
+  }
 
-	private static File createManifestJar(Project project) {
-		final File baseDir = FileUtils.getFile(project.getBuildDir(), "tomcat");
-		final File jarFile = FileUtils.getFile(baseDir, "classpath.jar");
-		final FileCollection classpath = project.getConvention()
-				.getPlugin(JavaPluginConvention.class)
-				.getSourceSets()
-				.getByName(SourceSet.MAIN_SOURCE_SET_NAME)
-				.getRuntimeClasspath();
-		
-		final Manifest manifest = new Manifest();
-		final Attributes attributes = manifest.getMainAttributes();
+  public static List<String> getJvmArgs(Project project, boolean hot, boolean debug) {
+    final List<String> jvmArgs = new ArrayList<>();
+    if (hot || debug) {
+      if (HotswapSupport.hasDCEVM()) {
+        HotswapSupport.getAgentArgs(project, !debug).forEach(jvmArgs::add);
+      } else {
+        project.getLogger().info("Cannot enable hot-swaping as DCEVM is not installed.");
+      }
+    }
+    return jvmArgs;
+  }
 
-		attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
-		attributes.put(Attributes.Name.MAIN_CLASS, MAIN_CLASS);
-		attributes.put(Attributes.Name.CLASS_PATH,
-				classpath.getFiles()
-					.stream()
-					.map(File::toURI)
-					.map(Object::toString)
-					.collect(Collectors.joining(" ")));
+  private static File createManifestJar(Project project) {
+    final File baseDir = FileUtils.getFile(project.getBuildDir(), "tomcat");
+    final File jarFile = FileUtils.getFile(baseDir, "classpath.jar");
+    final FileCollection classpath =
+        project
+            .getConvention()
+            .getPlugin(JavaPluginConvention.class)
+            .getSourceSets()
+            .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
+            .getRuntimeClasspath();
 
-		try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(jarFile), manifest)) {
-			return jarFile;
-		} catch (IOException e) {
-			throw new GradleException("Unexpected error occured.", e);
-		}
-	}
+    final Manifest manifest = new Manifest();
+    final Attributes attributes = manifest.getMainAttributes();
 
-	@TaskAction
-	@Override
-	public void exec() {
-		final Project project = getProject();
+    attributes.put(Attributes.Name.MANIFEST_VERSION, "1.0");
+    attributes.put(Attributes.Name.MAIN_CLASS, MAIN_CLASS);
+    attributes.put(
+        Attributes.Name.CLASS_PATH,
+        classpath
+            .getFiles()
+            .stream()
+            .map(File::toURI)
+            .map(Object::toString)
+            .collect(Collectors.joining(" ")));
 
-		classpath(createManifestJar(project));
+    try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(jarFile), manifest)) {
+      return jarFile;
+    } catch (IOException e) {
+      throw new GradleException("Unexpected error occured.", e);
+    }
+  }
 
-		setMain(MAIN_CLASS);
-		setArgs(getArgs(project, port));
-		setJvmArgs(getJvmArgs(project, hot, getDebug()));
+  @TaskAction
+  @Override
+  public void exec() {
+    final Project project = getProject();
 
-		super.exec();
-	}
+    classpath(createManifestJar(project));
+
+    setMain(MAIN_CLASS);
+    setArgs(getArgs(project, port));
+    setJvmArgs(getJvmArgs(project, hot, getDebug()));
+
+    super.exec();
+  }
 }

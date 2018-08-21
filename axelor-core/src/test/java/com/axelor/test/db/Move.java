@@ -17,8 +17,8 @@
  */
 package com.axelor.test.db;
 
+import com.axelor.db.JpaModel;
 import java.util.List;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -26,31 +26,37 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.axelor.db.JpaModel;
-
 @Entity
 @Table(name = "TEST_MOVE")
 public class Move extends JpaModel {
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "move", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<MoveLine> moveLines;
-	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-	private Invoice invoice;
-	
-	public List<MoveLine> getMoveLines() {
-		return moveLines;
-	}
-	
-	public void setMoveLines(List<MoveLine> moveLines) {
-		this.moveLines = moveLines;
-	}
-	
-	public Invoice getInvoice() {
-		return invoice;
-	}
-	
-	public void setInvoice(Invoice invoice) {
-		this.invoice = invoice;
-	}
+  @OneToMany(
+    fetch = FetchType.LAZY,
+    mappedBy = "move",
+    cascade = CascadeType.ALL,
+    orphanRemoval = true
+  )
+  private List<MoveLine> moveLines;
+
+  @ManyToOne(
+    fetch = FetchType.LAZY,
+    cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+  )
+  private Invoice invoice;
+
+  public List<MoveLine> getMoveLines() {
+    return moveLines;
+  }
+
+  public void setMoveLines(List<MoveLine> moveLines) {
+    this.moveLines = moveLines;
+  }
+
+  public Invoice getInvoice() {
+    return invoice;
+  }
+
+  public void setInvoice(Invoice invoice) {
+    this.invoice = invoice;
+  }
 }

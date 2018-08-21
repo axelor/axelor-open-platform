@@ -17,43 +17,59 @@
  */
 package com.axelor.gradle.support;
 
+import com.axelor.gradle.AxelorPlugin;
+import com.axelor.gradle.tasks.DbTask;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.Exec;
 import org.gradle.api.tasks.SourceSet;
 
-import com.axelor.gradle.AxelorPlugin;
-import com.axelor.gradle.tasks.DbTask;
-
 public class ScriptsSupport extends AbstractSupport {
 
-	@Override
-	public void apply(Project project) {
+  @Override
+  public void apply(Project project) {
 
-		project.getTasks().create("npm-install", Exec.class, task -> {
- 			task.setDescription("Run 'npm install' command to install npm packages.");
- 			task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
- 			task.setWorkingDir(project.getBuildDir() + "/webapp");
- 			task.setCommandLine("npm", "install");
- 			task.dependsOn("copyWebapp");
- 		});
+    project
+        .getTasks()
+        .create(
+            "npm-install",
+            Exec.class,
+            task -> {
+              task.setDescription("Run 'npm install' command to install npm packages.");
+              task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
+              task.setWorkingDir(project.getBuildDir() + "/webapp");
+              task.setCommandLine("npm", "install");
+              task.dependsOn("copyWebapp");
+            });
 
-		project.getTasks().create("npm-build", Exec.class, task -> {
-			task.setDescription("Run 'npm run build' command to build web resource bundles.");
-			task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
-			task.setWorkingDir(project.getBuildDir() + "/webapp");
-			task.setCommandLine("npm", "run", "build");
-			task.dependsOn("npm-install");
-		});
+    project
+        .getTasks()
+        .create(
+            "npm-build",
+            Exec.class,
+            task -> {
+              task.setDescription("Run 'npm run build' command to build web resource bundles.");
+              task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
+              task.setWorkingDir(project.getBuildDir() + "/webapp");
+              task.setCommandLine("npm", "run", "build");
+              task.dependsOn("npm-install");
+            });
 
-		project.getTasks().create(DbTask.TASK_NAME, DbTask.class, task -> {
-			task.setDescription(DbTask.TASK_DESCRIPTION);
-			task.setGroup(DbTask.TASK_GROUP);
-			task.setClasspath(project.getConvention()
-					.getPlugin(JavaPluginConvention.class)
-					.getSourceSets()
-					.getByName(SourceSet.MAIN_SOURCE_SET_NAME)
-					.getRuntimeClasspath());
-		});
-	}
+    project
+        .getTasks()
+        .create(
+            DbTask.TASK_NAME,
+            DbTask.class,
+            task -> {
+              task.setDescription(DbTask.TASK_DESCRIPTION);
+              task.setGroup(DbTask.TASK_GROUP);
+              task.setClasspath(
+                  project
+                      .getConvention()
+                      .getPlugin(JavaPluginConvention.class)
+                      .getSourceSets()
+                      .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
+                      .getRuntimeClasspath());
+            });
+  }
 }

@@ -17,21 +17,20 @@
  */
 package com.axelor.gradle;
 
+import com.axelor.common.VersionUtils;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
-import com.axelor.common.VersionUtils;
-
 public class ModulePlugin implements Plugin<Project> {
 
-	private final String version = VersionUtils.getVersion().version;
+  private final String version = VersionUtils.getVersion().version;
 
-	@Override
-	public void apply(Project project) {
-		project.getPlugins().apply(AxelorPlugin.class);
+  @Override
+  public void apply(Project project) {
+    project.getPlugins().apply(AxelorPlugin.class);
 
-		// add core dependencies
-		project.getDependencies().add("compile", "com.axelor:axelor-core:" + version);
-		project.getDependencies().add("testCompile", "com.axelor:axelor-test:" + version);
-	}
+    // add core dependencies
+    project.getDependencies().add("compile", "com.axelor:axelor-core:" + version);
+    project.getDependencies().add("testCompile", "com.axelor:axelor-test:" + version);
+  }
 }

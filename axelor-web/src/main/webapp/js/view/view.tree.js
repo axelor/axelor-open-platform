@@ -18,7 +18,7 @@
 (function() {
 
 "use strict";
-	
+
 var ui = angular.module('axelor.ui');
 
 ui.controller('TreeViewCtrl', TreeViewCtrl);
@@ -26,771 +26,771 @@ ui.controller('TreeViewCtrl', TreeViewCtrl);
 TreeViewCtrl.$inject = ['$scope', '$element', 'DataSource', 'ActionService'];
 function TreeViewCtrl($scope, $element, DataSource, ActionService) {
 
-	var view = $scope._views.tree;
-	var viewPromise = $scope.loadView('tree', view.name);
+  var view = $scope._views.tree;
+  var viewPromise = $scope.loadView('tree', view.name);
 
-	$scope.$applyAsync(function() {
-		if (view.deferred) {
-			view.deferred.resolve($scope);
-		}
-	});
-	
-	viewPromise.success(function(fields, schema){
-		$scope.parse(schema);
-	});
-	
-	$scope.show = function() {
-		$scope.updateRoute();
-	};
+  $scope.$applyAsync(function() {
+    if (view.deferred) {
+      view.deferred.resolve($scope);
+    }
+  });
 
-	$scope.onShow = function(promise) {
-	
-	};
+  viewPromise.success(function(fields, schema){
+    $scope.parse(schema);
+  });
 
-	$scope.getRouteOptions = function() {
-		return {
-			mode: "tree"
-		};
-	};
-	
-	$scope.setRouteOptions = function(options) {
-		$scope.updateRoute();
-	};
-	
-	$scope.onRefresh = function() {
-		
-	};
+  $scope.show = function() {
+    $scope.updateRoute();
+  };
 
-	$scope.onSort = function(column) {
-		if (column) {
-			column.sort = true;
-			column.desc = column.desc !== undefined && !column.desc;
-			column.sortCss = column.desc ? "slick-sort-indicator-desc" : "slick-sort-indicator-asc";
-		}
-		$scope.onRefresh();
-	};
-	
-	var first = null;
+  $scope.onShow = function(promise) {
 
-	$scope.parse = function(schema) {
-		
-		var columns = _.map(schema.columns, function(col) {
-			return new Column($scope, col);
-		});
+  };
 
-		var last = null;
-		var draggable = false;
+  $scope.getRouteOptions = function() {
+    return {
+      mode: "tree"
+    };
+  };
 
-		var loaders = _.map(schema.nodes, function(node) {
-			var loader = new Loader($scope, node, DataSource);
-			if (last) {
-				last.child = loader;
-			}
-			if (loader.draggable) {
-				draggable = true;
-			}
-			return last = loader;
-		});
-		
-		$scope.viewTitle = schema.title;
+  $scope.setRouteOptions = function(options) {
+    $scope.updateRoute();
+  };
 
-		$scope.columns = columns;
-		$scope.loaders = loaders;
-		$scope.draggable = draggable;
-		
-		first = _.first(loaders);
-		
-		first.domain = $scope._domain;
-		first.context = $scope._context;
+  $scope.onRefresh = function() {
 
-		// recursive tree (parent -> child on same object)
-		if (loaders.length === 2 && first.model === last.model) {
-			last.child = last;
-			$scope._countOn = _.last(schema.nodes).parent;
-		}
-	};
-	
-	$scope.onNext = function() {
-		return first && first.onNext();
-	};
-	
-	$scope.onPrev = function() {
-		return first && first.onPrev();
-	};
-	
-	$scope.canNext = function() {
-		return first && first.canNext();
-	};
-	
-	$scope.canPrev = function() {
-		return first && first.canPrev();
-	};
-	
-	$scope.pagerText = function() {
-		return first ? first.pagerText() : "";
-	};
-	
-	$scope.resetPager = function() {
-		if (first) {
-			first.resetPager();
-		}
-	};
+  };
 
-	$scope.onClick = function(e, options) {
-		
-		var loader = options.loader,
-			record = options.record;
+  $scope.onSort = function(column) {
+    if (column) {
+      column.sort = true;
+      column.desc = column.desc !== undefined && !column.desc;
+      column.sortCss = column.desc ? "slick-sort-indicator-desc" : "slick-sort-indicator-asc";
+    }
+    $scope.onRefresh();
+  };
 
-		var target = $(e.target);
-		if (target.is('img,i')) {
-			target = target.parent();
-		}
-		if (e.type === 'click' && !target.is('.tree-button')) {
-			return;
-		}
-		var action = target.attr('x-action') || loader.action;
-		if (!action) {
-			return;
-		}
+  var first = null;
 
-		var $handler = ActionService.handler($scope.$new(), $(e.currentTarget), {
-			action: action
-		});
-			
-		var model = loader.model;
-		var context = record.$record;
+  $scope.parse = function(schema) {
 
-		$handler.scope.record = context;
-		$handler.scope.getContext = function() {
-			return _.extend({
-				_model: model
-			}, context);
-		};
+    var columns = _.map(schema.columns, function(col) {
+      return new Column($scope, col);
+    });
 
-		$handler.onClick().then(function(res){
+    var last = null;
+    var draggable = false;
 
-		});
-	};
-	
-	$scope.$on('on:tab-reload', function(e, tab) {
-		if ($scope === e.targetScope && $scope.onRefresh) {
-			$scope.onRefresh();
-		}
-	});
+    var loaders = _.map(schema.nodes, function(node) {
+      var loader = new Loader($scope, node, DataSource);
+      if (last) {
+        last.child = loader;
+      }
+      if (loader.draggable) {
+        draggable = true;
+      }
+      return last = loader;
+    });
+
+    $scope.viewTitle = schema.title;
+
+    $scope.columns = columns;
+    $scope.loaders = loaders;
+    $scope.draggable = draggable;
+
+    first = _.first(loaders);
+
+    first.domain = $scope._domain;
+    first.context = $scope._context;
+
+    // recursive tree (parent -> child on same object)
+    if (loaders.length === 2 && first.model === last.model) {
+      last.child = last;
+      $scope._countOn = _.last(schema.nodes).parent;
+    }
+  };
+
+  $scope.onNext = function() {
+    return first && first.onNext();
+  };
+
+  $scope.onPrev = function() {
+    return first && first.onPrev();
+  };
+
+  $scope.canNext = function() {
+    return first && first.canNext();
+  };
+
+  $scope.canPrev = function() {
+    return first && first.canPrev();
+  };
+
+  $scope.pagerText = function() {
+    return first ? first.pagerText() : "";
+  };
+
+  $scope.resetPager = function() {
+    if (first) {
+      first.resetPager();
+    }
+  };
+
+  $scope.onClick = function(e, options) {
+
+    var loader = options.loader,
+      record = options.record;
+
+    var target = $(e.target);
+    if (target.is('img,i')) {
+      target = target.parent();
+    }
+    if (e.type === 'click' && !target.is('.tree-button')) {
+      return;
+    }
+    var action = target.attr('x-action') || loader.action;
+    if (!action) {
+      return;
+    }
+
+    var $handler = ActionService.handler($scope.$new(), $(e.currentTarget), {
+      action: action
+    });
+
+    var model = loader.model;
+    var context = record.$record;
+
+    $handler.scope.record = context;
+    $handler.scope.getContext = function() {
+      return _.extend({
+        _model: model
+      }, context);
+    };
+
+    $handler.onClick().then(function(res){
+
+    });
+  };
+
+  $scope.$on('on:tab-reload', function(e, tab) {
+    if ($scope === e.targetScope && $scope.onRefresh) {
+      $scope.onRefresh();
+    }
+  });
 }
 
 /**
  * Column controller.
- * 
+ *
  */
 function Column(scope, col) {
 
-	this.css = col.type || 'string';
-	this.name = col.name;
-	this.title = col.title || col.autoTitle;
+  this.css = col.type || 'string';
+  this.name = col.name;
+  this.title = col.title || col.autoTitle;
 
-	if (this.title === null || this.title === undefined) {
-		this.title = _.humanize(col.name);
-	}
-	if (col.type == 'button') {
-		this.title = null;
-	}
+  if (this.title === null || this.title === undefined) {
+    this.title = _.humanize(col.name);
+  }
+  if (col.type == 'button') {
+    this.title = null;
+  }
 
-	this.cellCss = function(record) {
-		return this.css;
-	};
-	
-	this.cellText = function(record) {
+  this.cellCss = function(record) {
+    return this.css;
+  };
 
-		if (col.type === 'button') {
-			var template = "---";
-			var item = _.findWhere(record.$node.items, { type: 'button', name: col.name });
-			if (item) {
-				template = "<a href='javascript:' class='tree-button' x-action='"+ item.onClick +"'>";
-				if (item.icon) {
-					if (item.icon.indexOf('fa') === 0) {
-						template += "<i class='fa " + item.icon + "'></i>";
-					} else {
-						template += "<img width='16px' src='"+ item.icon +"'>";
-					}
-				}
-				if (item.title) {
-					template += item.title;
-				}
-				template += "</a>";
-			}
-			return template;
-		}
+  this.cellText = function(record) {
 
-		var value = record[this.name];
-		if (value === undefined || value === null) {
-			return '---';
-		}
+    if (col.type === 'button') {
+      var template = "---";
+      var item = _.findWhere(record.$node.items, { type: 'button', name: col.name });
+      if (item) {
+        template = "<a href='javascript:' class='tree-button' x-action='"+ item.onClick +"'>";
+        if (item.icon) {
+          if (item.icon.indexOf('fa') === 0) {
+            template += "<i class='fa " + item.icon + "'></i>";
+          } else {
+            template += "<img width='16px' src='"+ item.icon +"'>";
+          }
+        }
+        if (item.title) {
+          template += item.title;
+        }
+        template += "</a>";
+      }
+      return template;
+    }
 
-		var selection = (record.$selection || {})[this.name];
-		if (selection) {
-			var cmp = col.type === "integer" ? function(a, b) { return a == b ; } : _.isEqual;
-			var res = _.find(selection, function(item){
-				return cmp(item.value, value);
-			}) || {};
+    var value = record[this.name];
+    if (value === undefined || value === null) {
+      return '---';
+    }
 
-			if (col.widget === 'ImageSelect' && res.icon) {
-				var image = "<img style='max-height: 24px;' src='" + (res.icon || res.value) + "'>";
-				if (col.labels === false) {
-					return image;
-				}
-				return image + " " + res.title;
-			}
+    var selection = (record.$selection || {})[this.name];
+    if (selection) {
+      var cmp = col.type === "integer" ? function(a, b) { return a == b ; } : _.isEqual;
+      var res = _.find(selection, function(item){
+        return cmp(item.value, value);
+      }) || {};
 
-			return res.title;
-		}
-		var type = col.type;
-		if (type === 'reference') {
-			type = 'many-to-one';
-		}
-		var item = _.findWhere(record.$node.items, { type: 'field', as: col.name });
-		var attrs = _.extend({}, item, col);
-		var fn = ui.formatters[type];
-		if (fn) {
-			value = fn(attrs, value, record);
-		}
-		return value === undefined || value === null ? '---' : value;
-	};
+      if (col.widget === 'ImageSelect' && res.icon) {
+        var image = "<img style='max-height: 24px;' src='" + (res.icon || res.value) + "'>";
+        if (col.labels === false) {
+          return image;
+        }
+        return image + " " + res.title;
+      }
+
+      return res.title;
+    }
+    var type = col.type;
+    if (type === 'reference') {
+      type = 'many-to-one';
+    }
+    var item = _.findWhere(record.$node.items, { type: 'field', as: col.name });
+    var attrs = _.extend({}, item, col);
+    var fn = ui.formatters[type];
+    if (fn) {
+      value = fn(attrs, value, record);
+    }
+    return value === undefined || value === null ? '---' : value;
+  };
 }
 
 /**
  * Node loader.
- * 
+ *
  */
 function Loader(scope, node, DataSource) {
 
-	var ds = DataSource.create(node.model);
-	var names = _.pluck(node.items, 'name');
-	var domain = null;
-	
-	if (node.parent) {
-		domain = "self." + node.parent + ".id = :parentId";
-		ds._page.limit = -1;
-	}
+  var ds = DataSource.create(node.model);
+  var names = _.pluck(node.items, 'name');
+  var domain = null;
 
-	if (node.domain) {
-		if (domain) {
-			domain = '(' + domain + ') AND (' + node.domain + ')';
-		} else {
-			domain = node.domain;
-		}
-	}
+  if (node.parent) {
+    domain = "self." + node.parent + ".id = :parentId";
+    ds._page.limit = -1;
+  }
 
-	this.node = node;
+  if (node.domain) {
+    if (domain) {
+      domain = '(' + domain + ') AND (' + node.domain + ')';
+    } else {
+      domain = node.domain;
+    }
+  }
 
-	this.child = null;
-	
-	this.model = node.model;
+  this.node = node;
 
-	this.action = node.onClick;
-	
-	this.draggable = node.draggable;
-	
-	this.getDomain = function(context) {
-		var _domain = domain,
-			_context = context;
+  this.child = null;
 
-		if (_domain && this.domain) {
-			_domain = "(" + this.domain + ") AND (" + domain + ")";
-		}
-		
-		_domain = _domain || this.domain;
-		_context = _.extend({}, this.context, context);
-		
-		return {
-			domain: _domain,
-			context: _context
-		};
-	};
-	
-	this.resetPager = function () {
-		ds._page.from = 0;
-	};
+  this.model = node.model;
 
-	this.load = function(item, callback) {
+  this.action = node.onClick;
 
-		var context = _.extend({}, scope._context),
-			current = item && item.$record;
-		
-		var sortOn = _.filter(scope.columns, function (col) { return col.sort; });
-		var sortBy = _.map(sortOn, function (col) {
-			var field = _.findWhere(node.items, { as: col.name });
-			if (field) {
-				return col.desc ? '-' + field.name : field.name;
-			}
-		});
+  this.draggable = node.draggable;
 
-		sortBy = _.compact(sortBy).join(',') || node.orderBy;
+  this.getDomain = function(context) {
+    var _domain = domain,
+      _context = context;
 
-		if (scope.getContext) {
-			context = _.extend(context, scope.getContext());
-		}
-		if (current) {
-			context.parentId = current.id;
-		}
+    if (_domain && this.domain) {
+      _domain = "(" + this.domain + ") AND (" + domain + ")";
+    }
 
-		if (scope._countOn) {
-			context._countOn = scope._countOn;
-		} else if (this.child) {
-			var child = this.child.node;
-			context._childOn = {
-				model: child.model,
-				parent: child.parent
-			};
-		}
+    _domain = _domain || this.domain;
+    _context = _.extend({}, this.context, context);
 
-		var opts = _.extend(this.getDomain(context), {
-			fields: names,
-			archived: true,
-			action: scope._viewAction
-		});
+    return {
+      domain: _domain,
+      context: _context
+    };
+  };
 
-		if (sortBy) {
-			opts.sortBy = sortBy.split(',');
-		}
+  this.resetPager = function () {
+    ds._page.from = 0;
+  };
 
-		var promise = ds.search(opts);
+  this.load = function(item, callback) {
 
-		promise.success(function(records) {
-			if (callback) {
-				callback(accept(item, records));
-			}
-		});
+    var context = _.extend({}, scope._context),
+      current = item && item.$record;
 
-		return promise;
-	};
+    var sortOn = _.filter(scope.columns, function (col) { return col.sort; });
+    var sortBy = _.map(sortOn, function (col) {
+      var field = _.findWhere(node.items, { as: col.name });
+      if (field) {
+        return col.desc ? '-' + field.name : field.name;
+      }
+    });
 
-	this.move = function(item, callback) {
+    sortBy = _.compact(sortBy).join(',') || node.orderBy;
 
-		var record = item.$record,
-			parent = { id: item.$parentId };
+    if (scope.getContext) {
+      context = _.extend(context, scope.getContext());
+    }
+    if (current) {
+      context.parentId = current.id;
+    }
 
-		record[node.parent || scope._countOn] = parent;
+    if (scope._countOn) {
+      context._countOn = scope._countOn;
+    } else if (this.child) {
+      var child = this.child.node;
+      context._childOn = {
+        model: child.model,
+        parent: child.parent
+      };
+    }
 
-		return ds.save(record).success(function(rec) {
-			record.version = rec.version;
-			if (callback) {
-				callback(rec);
-			}
-		});
-	};
-	
-	var that = this;
-	
-	function accept(current, records) {
+    var opts = _.extend(this.getDomain(context), {
+      fields: names,
+      archived: true,
+      action: scope._viewAction
+    });
 
-		var fields = node.items,
-			parent = current && current.$record,
-			child = that.child;
+    if (sortBy) {
+      opts.sortBy = sortBy.split(',');
+    }
 
-		return _.map(records, function(record) {
-			
-			var $id = _.uniqueId('row');
-			var $parent = current ? current.$id : null;
+    var promise = ds.search(opts);
 
-			var item = {
-				'$id': $id,
-				'$model': node.model,
-				'$node': node,
-				'$record': record,
-				'$selection': {},
-				'$parent': $parent,
-				'$parentId': parent && parent.id,
-				'$parentModel': current && current.$model,
-				'$draggable': node.draggable,
-				'$folder': child && (record._children === undefined || record._children > 0)
-			};
+    promise.success(function(records) {
+      if (callback) {
+        callback(accept(item, records));
+      }
+    });
 
-			item.$expand = function(callback) {
-				if (child) {
-					return child.load(this, callback);
-				}
-			};
-			
-			item.$move = function(callback) {
-				return that.move(this, callback);
-			};
-			
-			item.$click = function(e) {
-				if (node.onClick) {
-					scope.onClick(e, {
-						loader: that,
-						record: item,
-						parent: parent
-					});
-				}
-			};
+    return promise;
+  };
 
-			_.each(fields, function(field) {
-				var name = field.as || field.name;
-				item[name] = record[field.name];
-				item.$selection[name] = field.selectionList;
-			});
+  this.move = function(item, callback) {
 
-			return item;
-		});
-	}
+    var record = item.$record,
+      parent = { id: item.$parentId };
 
-	var page = {};
-	
-	ds.on('change', function(e, _records, _page) {
-		page = _page;
-	});
-	
-	this.canNext = function() {
-		return ds.canNext();
-	};
-	
-	this.canPrev = function() {
-		return ds.canPrev();
-	};
-	
-	this.onNext = function() {
-		ds.next(names).success(function(records){
-			scope.setRootNodes(accept(null, records));
-		});
-	};
-	
-	this.onPrev = function() {
-		ds.prev(names).success(function(records){
-			scope.setRootNodes(accept(null, records));
-		});
-	};
-	
-	this.pagerText = function() {
-		if (page && page.from !== undefined) {
-			if (page.total === 0) return null;
-			return _t("{0} to {1} of {2}", page.from + 1, page.to, page.total);
-		}
-	};
+    record[node.parent || scope._countOn] = parent;
+
+    return ds.save(record).success(function(rec) {
+      record.version = rec.version;
+      if (callback) {
+        callback(rec);
+      }
+    });
+  };
+
+  var that = this;
+
+  function accept(current, records) {
+
+    var fields = node.items,
+      parent = current && current.$record,
+      child = that.child;
+
+    return _.map(records, function(record) {
+
+      var $id = _.uniqueId('row');
+      var $parent = current ? current.$id : null;
+
+      var item = {
+        '$id': $id,
+        '$model': node.model,
+        '$node': node,
+        '$record': record,
+        '$selection': {},
+        '$parent': $parent,
+        '$parentId': parent && parent.id,
+        '$parentModel': current && current.$model,
+        '$draggable': node.draggable,
+        '$folder': child && (record._children === undefined || record._children > 0)
+      };
+
+      item.$expand = function(callback) {
+        if (child) {
+          return child.load(this, callback);
+        }
+      };
+
+      item.$move = function(callback) {
+        return that.move(this, callback);
+      };
+
+      item.$click = function(e) {
+        if (node.onClick) {
+          scope.onClick(e, {
+            loader: that,
+            record: item,
+            parent: parent
+          });
+        }
+      };
+
+      _.each(fields, function(field) {
+        var name = field.as || field.name;
+        item[name] = record[field.name];
+        item.$selection[name] = field.selectionList;
+      });
+
+      return item;
+    });
+  }
+
+  var page = {};
+
+  ds.on('change', function(e, _records, _page) {
+    page = _page;
+  });
+
+  this.canNext = function() {
+    return ds.canNext();
+  };
+
+  this.canPrev = function() {
+    return ds.canPrev();
+  };
+
+  this.onNext = function() {
+    ds.next(names).success(function(records){
+      scope.setRootNodes(accept(null, records));
+    });
+  };
+
+  this.onPrev = function() {
+    ds.prev(names).success(function(records){
+      scope.setRootNodes(accept(null, records));
+    });
+  };
+
+  this.pagerText = function() {
+    if (page && page.from !== undefined) {
+      if (page.total === 0) return null;
+      return _t("{0} to {1} of {2}", page.from + 1, page.to, page.total);
+    }
+  };
 }
 
 ui.directive('uiViewTree', function(){
 
-	return {
-		
-		replace: true,
-		
-		link: function(scope, element, attrs) {
-			
-			var table = element.find('.tree-table > table');
+  return {
 
-			table.treetable({
-				
-				indent: 16,
-				
-				expandable: true,
-				
-				clickableNodeNames: true,
-				
-				nodeIdAttr: "id",
+    replace: true,
 
-				parentIdAttr: "parent",
+    link: function(scope, element, attrs) {
 
-				branchAttr: "folder",
-				
-				onNodeCollapse: function onNodeCollapse() {
-					var node = this,
-						row = node.row;
+      var table = element.find('.tree-table > table');
 
-					if (node._state === "collapsed") {
-						return;
-					}
-					node._state = "collapsed";
-					
-					table.treetable("collapseNode", row.data("id"));
-					adjustCols();
-				},
+      table.treetable({
 
-				onNodeExpand: function onNodeExpand() {
+        indent: 16,
 
-					var node = this,
-						row = this.row,
-						record = row.data('$record');
-					
-					if (node._loading || node._state === "expanded") {
-						return;
-					}
-					
-					node._state = "expanded";
+        expandable: true,
 
-					if (node._loaded) {
-						table.treetable("expandNode", row.data("id"));
-						return adjustCols();
-					}
+        clickableNodeNames: true,
 
-					node._loading = true;
+        nodeIdAttr: "id",
 
-					if (record.$expand) {
-						record.$expand(function(records) {
-							acceptNodes(records, node);
-							node._loading = false;
-							node._loaded = true;
-							adjustCols();
-						});
-					}
-				}
-			});
+        parentIdAttr: "parent",
 
-			function acceptNodes(records, after) {
-				var rows = _.map(records, makeRow);
-				table.treetable("loadBranch", after, rows);
-			}
+        branchAttr: "folder",
 
-			function makeRow(record) {
+        onNodeCollapse: function onNodeCollapse() {
+          var node = this,
+            row = node.row;
 
-				var tr = $('<tr>')
-					.attr('data-id', record.$id)
-					.attr('data-parent', record.$parent)
-					.attr('data-folder', record.$folder);
+          if (node._state === "collapsed") {
+            return;
+          }
+          node._state = "collapsed";
 
-				tr.data('$record', record);
+          table.treetable("collapseNode", row.data("id"));
+          adjustCols();
+        },
 
-				_.each(scope.columns, function(col) {
-					$('<td>').html(col.cellText(record)).appendTo(tr);
-				});
-				
-				if (scope.draggable && (record.$folder || scope._countOn || !record.$parent)) {
-					makeDroppable(tr);
-				}
-				if (record.$draggable || (scope.draggable && scope._countOn)) {
-					makeDraggable(tr);
-				}
+        onNodeExpand: function onNodeExpand() {
 
-				tr.on('click dblclick taphold', function(e) {
-					record.$click(e);
-				});
-				
-				return tr[0];
-			}
-			
-			function onDrop(e, ui) {
-				/* jshint validthis: true */
-				var row = ui.draggable,
-					record = row.data('$record'),
-					current = $(this).data('$record'),
-					node = table.treetable("node", row.data("id")),
-					nodeParent = node.parentNode();
+          var node = this,
+            row = this.row,
+            record = row.data('$record');
 
-				table.treetable("move", node.id, $(this).data("id"));
+          if (node._loading || node._state === "expanded") {
+            return;
+          }
 
-				// make sure to remove expander icon if no children left
-				if (nodeParent && nodeParent.children.length === 0) {
-					nodeParent.row.removeClass('expanded');
-					nodeParent.row.removeClass('branch');
-					nodeParent.row.addClass('leaf');
+          node._state = "expanded";
 
-					nodeParent.treeCell.off('click.treetable');
-					nodeParent.treeCell.off('keydown.treetable');
-					nodeParent.indenter.empty();
-				}
+          if (node._loaded) {
+            table.treetable("expandNode", row.data("id"));
+            return adjustCols();
+          }
 
-				record.$parentId = current.$record.id;
-				record.$move(function(result) {
-				
-				});
-			}
-			
-			function isParent(source, target) {
-				var parent = target.parent().find('[data-id=' + target.data('parent') + ']');
-				if (parent.data('id') === source.data('id')) {
-					return true;
-				}
-				if (parent.length) {
-					return isParent(source, parent);
-				}
-				return false;
-			}
-			
-			function makeDroppable(row) {
-				
-				row.droppable({
-					accept: function(draggable, x) {
-						var source = draggable.data('$record'),
-							target = row.data('$record');
-						
-						// don't allow moving parent to child
-						if (scope._countOn) {
-							return !isParent(draggable, $(this));
-						}
-						
-						return source && target && target.$model === source.$parentModel;
-					},
-			        hoverClass: "accept",
-			        drop: onDrop,
-			        over: function(e, ui) {
-			        	var row = ui.draggable;
-			        	if(this != row[0] && !$(this).is(".expanded")) {
-			        		table.treetable("expandNode", $(this).data("id"));
-			        	}
-			        }
-				});
-			}
+          node._loading = true;
 
-			function makeDraggable(row) {
+          if (record.$expand) {
+            record.$expand(function(records) {
+              acceptNodes(records, node);
+              node._loading = false;
+              node._loaded = true;
+              adjustCols();
+            });
+          }
+        }
+      });
 
-				var record = row.data('$record');
-				if (!record.$draggable && !scope._countOn) {
-					return;
-				}
+      function acceptNodes(records, after) {
+        var rows = _.map(records, makeRow);
+        table.treetable("loadBranch", after, rows);
+      }
 
-				row.draggable({
-					helper: function() {
-						return $('<span></span>').append(row.children('td:first').clone());
-					},
-					opacity: 0.75,
-					containment: 'document',
-					refreshPositions: true,
-					revert: "invalid",
-					revertDuration: 300,
-					delay: 300,
-					scroll: true
-				});
-			}
-			
-			function clear() {
-				
-				var tree = table.data('treetable');
-				if (tree === undefined) {
-					return;
-				}
-				
-				_.each(tree.roots, function(node) {
-					tree.unloadBranch(node);
-					node.row.remove();
-					delete tree.tree[node.id];
-				});
-				
-				tree.nodes.length = 0;
-				tree.roots.length = 0;
-			}
+      function makeRow(record) {
 
-			scope.onRefresh = function() {
-				var root = _.first(scope.loaders);
-				if (root) {
-					root.load(null, function(nodes) {
-						scope.setRootNodes(nodes);
-					});
-				}
-			};
+        var tr = $('<tr>')
+          .attr('data-id', record.$id)
+          .attr('data-parent', record.$parent)
+          .attr('data-folder', record.$folder);
 
-			scope.setRootNodes = function(nodes) {
-				clear();
-				acceptNodes(nodes);
-			};
-			
-			scope.onHeaderClick = function (event, column) {
-				if (!event.shiftKey) {
-					_.each(scope.columns, function (col) {
-						if (col !== column) {
-							col.sort = false;
-							col.desc = undefined;
-							col.sortCss = null;
-						}
-					});
-				}
-				scope.onSort(column);
-			};
+        tr.data('$record', record);
 
-			var watcher = scope.$watch('loaders', function treeLoadersWatch(loaders) {
-				
-				if (loaders === undefined) {
-					return;
-				}
-				
-				watcher();
-					
-				var root = _.first(loaders);
-				if (root) {
-					root.load(null, acceptNodes).then(adjustCols);
-				}
-			});
-			
-			var adjustCounter = 0;
-			
-			function adjustCols() {
-				
-				if (element.is(':hidden')) {
-					if (adjustCounter++ < 10) {
-						_.delay(adjustCols, 100);
-					}
-					return;
-				}
-				adjustCounter = 0;
+        _.each(scope.columns, function(col) {
+          $('<td>').html(col.cellText(record)).appendTo(tr);
+        });
 
-				var tds = table.find('tr:first').find('td');
-				var ths = element.find('.tree-header').find('th');
-				var widths = [];
+        if (scope.draggable && (record.$folder || scope._countOn || !record.$parent)) {
+          makeDroppable(tr);
+        }
+        if (record.$draggable || (scope.draggable && scope._countOn)) {
+          makeDraggable(tr);
+        }
 
-				if (tds.length !== ths.length) {
-					return;
-				}
-				
-				tds.each(function() {
-					widths.push($(this).outerWidth());
-				});
+        tr.on('click dblclick taphold', function(e) {
+          record.$click(e);
+        });
 
-				ths.each(function(i) {
-					$(this).width(widths[i] - 12);
-				});
-			}
-			
-			scope.$onAdjust(adjustCols, 100);
+        return tr[0];
+      }
 
-			table.on('mousedown.treeview', 'tbody tr', function(e) {
-				table.find('tr.selected').removeClass('selected');
-				$(this).addClass("selected");
-			});
-		},
-		template:
-		'<div class="tree-view-container" ui-attach-scroll="> .tree-table">'+
-			'<table class="tree-header">'+
-				'<thead>'+
-					'<tr>'+
-						'<th ng-repeat="column in columns" ng-class="column.css" ng-click="onHeaderClick($event, column)">' +
-							'<span>{{column.title}}</span>'+
-							'<span ng-if="column.sort" class="slick-sort-indicator" ng-class="column.sortCss"></span>'+
-						'</th>'+
-					'</tr>'+
-				'</thead>'+
-			'</table>'+
-			'<div class="tree-table">'+
-				'<table>'+
-					'<tbody></tbody>'+
-				'</table>'+
-			'</div>'+
-		'</div>'
-	};
+      function onDrop(e, ui) {
+        /* jshint validthis: true */
+        var row = ui.draggable,
+          record = row.data('$record'),
+          current = $(this).data('$record'),
+          node = table.treetable("node", row.data("id")),
+          nodeParent = node.parentNode();
+
+        table.treetable("move", node.id, $(this).data("id"));
+
+        // make sure to remove expander icon if no children left
+        if (nodeParent && nodeParent.children.length === 0) {
+          nodeParent.row.removeClass('expanded');
+          nodeParent.row.removeClass('branch');
+          nodeParent.row.addClass('leaf');
+
+          nodeParent.treeCell.off('click.treetable');
+          nodeParent.treeCell.off('keydown.treetable');
+          nodeParent.indenter.empty();
+        }
+
+        record.$parentId = current.$record.id;
+        record.$move(function(result) {
+
+        });
+      }
+
+      function isParent(source, target) {
+        var parent = target.parent().find('[data-id=' + target.data('parent') + ']');
+        if (parent.data('id') === source.data('id')) {
+          return true;
+        }
+        if (parent.length) {
+          return isParent(source, parent);
+        }
+        return false;
+      }
+
+      function makeDroppable(row) {
+
+        row.droppable({
+          accept: function(draggable, x) {
+            var source = draggable.data('$record'),
+              target = row.data('$record');
+
+            // don't allow moving parent to child
+            if (scope._countOn) {
+              return !isParent(draggable, $(this));
+            }
+
+            return source && target && target.$model === source.$parentModel;
+          },
+              hoverClass: "accept",
+              drop: onDrop,
+              over: function(e, ui) {
+                var row = ui.draggable;
+                if(this != row[0] && !$(this).is(".expanded")) {
+                  table.treetable("expandNode", $(this).data("id"));
+                }
+              }
+        });
+      }
+
+      function makeDraggable(row) {
+
+        var record = row.data('$record');
+        if (!record.$draggable && !scope._countOn) {
+          return;
+        }
+
+        row.draggable({
+          helper: function() {
+            return $('<span></span>').append(row.children('td:first').clone());
+          },
+          opacity: 0.75,
+          containment: 'document',
+          refreshPositions: true,
+          revert: "invalid",
+          revertDuration: 300,
+          delay: 300,
+          scroll: true
+        });
+      }
+
+      function clear() {
+
+        var tree = table.data('treetable');
+        if (tree === undefined) {
+          return;
+        }
+
+        _.each(tree.roots, function(node) {
+          tree.unloadBranch(node);
+          node.row.remove();
+          delete tree.tree[node.id];
+        });
+
+        tree.nodes.length = 0;
+        tree.roots.length = 0;
+      }
+
+      scope.onRefresh = function() {
+        var root = _.first(scope.loaders);
+        if (root) {
+          root.load(null, function(nodes) {
+            scope.setRootNodes(nodes);
+          });
+        }
+      };
+
+      scope.setRootNodes = function(nodes) {
+        clear();
+        acceptNodes(nodes);
+      };
+
+      scope.onHeaderClick = function (event, column) {
+        if (!event.shiftKey) {
+          _.each(scope.columns, function (col) {
+            if (col !== column) {
+              col.sort = false;
+              col.desc = undefined;
+              col.sortCss = null;
+            }
+          });
+        }
+        scope.onSort(column);
+      };
+
+      var watcher = scope.$watch('loaders', function treeLoadersWatch(loaders) {
+
+        if (loaders === undefined) {
+          return;
+        }
+
+        watcher();
+
+        var root = _.first(loaders);
+        if (root) {
+          root.load(null, acceptNodes).then(adjustCols);
+        }
+      });
+
+      var adjustCounter = 0;
+
+      function adjustCols() {
+
+        if (element.is(':hidden')) {
+          if (adjustCounter++ < 10) {
+            _.delay(adjustCols, 100);
+          }
+          return;
+        }
+        adjustCounter = 0;
+
+        var tds = table.find('tr:first').find('td');
+        var ths = element.find('.tree-header').find('th');
+        var widths = [];
+
+        if (tds.length !== ths.length) {
+          return;
+        }
+
+        tds.each(function() {
+          widths.push($(this).outerWidth());
+        });
+
+        ths.each(function(i) {
+          $(this).width(widths[i] - 12);
+        });
+      }
+
+      scope.$onAdjust(adjustCols, 100);
+
+      table.on('mousedown.treeview', 'tbody tr', function(e) {
+        table.find('tr.selected').removeClass('selected');
+        $(this).addClass("selected");
+      });
+    },
+    template:
+    '<div class="tree-view-container" ui-attach-scroll="> .tree-table">'+
+      '<table class="tree-header">'+
+        '<thead>'+
+          '<tr>'+
+            '<th ng-repeat="column in columns" ng-class="column.css" ng-click="onHeaderClick($event, column)">' +
+              '<span>{{column.title}}</span>'+
+              '<span ng-if="column.sort" class="slick-sort-indicator" ng-class="column.sortCss"></span>'+
+            '</th>'+
+          '</tr>'+
+        '</thead>'+
+      '</table>'+
+      '<div class="tree-table">'+
+        '<table>'+
+          '<tbody></tbody>'+
+        '</table>'+
+      '</div>'+
+    '</div>'
+  };
 });
 
 TreePortletCtrl.$inject = ['$scope', '$element', 'DataSource', 'ActionService'];
 function TreePortletCtrl($scope, $element, DataSource, ActionService) {
-	
-	TreeViewCtrl.call(this, $scope, $element, DataSource, ActionService);
-	
-	$scope.showPager = true;
 
-	$scope.$on("on:new", function(e) {
-		$scope.resetPager();
-		$scope.onRefresh();
-	});
-	$scope.$on("on:edit", function(e) {
-		$scope.resetPager();
-		$scope.onRefresh();
-	});
+  TreeViewCtrl.call(this, $scope, $element, DataSource, ActionService);
+
+  $scope.showPager = true;
+
+  $scope.$on("on:new", function(e) {
+    $scope.resetPager();
+    $scope.onRefresh();
+  });
+  $scope.$on("on:edit", function(e) {
+    $scope.resetPager();
+    $scope.onRefresh();
+  });
 }
 
 ui.directive('uiPortletTree', function(){
 
-	return {
-		controller: TreePortletCtrl,
-		template: '<div ui-view-tree></div>'
-	};
+  return {
+    controller: TreePortletCtrl,
+    template: '<div ui-view-tree></div>'
+  };
 });
 
 })();

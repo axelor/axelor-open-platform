@@ -20,24 +20,23 @@ package com.axelor.db.search;
 import com.axelor.app.AppSettings;
 import com.google.inject.AbstractModule;
 
-/**
- * A Guice module to configure full-text search feature.
- *
- */
+/** A Guice module to configure full-text search feature. */
 public class SearchModule extends AbstractModule {
 
-	public static final String CONFIG_DIRECTORY_PROVIDER = "hibernate.search.default.directory_provider";
-	public static final String CONFIG_INDEX_BASE = "hibernate.search.default.indexBase";
+  public static final String CONFIG_DIRECTORY_PROVIDER =
+      "hibernate.search.default.directory_provider";
+  public static final String CONFIG_INDEX_BASE = "hibernate.search.default.indexBase";
 
-	public static final String DEFAULT_DIRECTORY_PROVIDER = "filesystem";
-	public static final String DEFAULT_INDEX_BASE = "{user.home}/.axelor/indexes";
-	
-	public static boolean isEnabled() {
-		return !"none".equalsIgnoreCase(AppSettings.get().get(SearchModule.CONFIG_DIRECTORY_PROVIDER, "none"));
-	}
+  public static final String DEFAULT_DIRECTORY_PROVIDER = "filesystem";
+  public static final String DEFAULT_INDEX_BASE = "{user.home}/.axelor/indexes";
 
-	@Override
-	protected void configure() {
-		bind(SearchSupport.class).asEagerSingleton();
-	}
+  public static boolean isEnabled() {
+    return !"none"
+        .equalsIgnoreCase(AppSettings.get().get(SearchModule.CONFIG_DIRECTORY_PROVIDER, "none"));
+  }
+
+  @Override
+  protected void configure() {
+    bind(SearchSupport.class).asEagerSingleton();
+  }
 }

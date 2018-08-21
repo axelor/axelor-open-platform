@@ -17,56 +17,53 @@
  */
 package com.axelor.meta.schema.views;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
-
 import com.axelor.meta.loader.XMLViews;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("include")
 public class FormInclude extends AbstractWidget {
-	
-	@XmlAttribute(name = "view")
-	private String name;
 
-	@XmlAttribute(name = "from")
-	private String module;
-	
-	@XmlTransient
-	@JsonIgnore
-	private transient AbstractView owner;
+  @XmlAttribute(name = "view")
+  private String name;
 
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public String getModule() {
-		return module;
-	}
-	
-	public void setModule(String module) {
-		this.module = module;
-	}
-	
-	public void setOwner(AbstractView owner) {
-		this.owner = owner;
-	}
-	
-	@JsonInclude
-	public AbstractView getView() {
-		AbstractView view = XMLViews.findView(name, null, null, module);
-		if (view == owner) {
-			return null;
-		}
-		view.setOwner(owner);
-		return view;
-	}
+  @XmlAttribute(name = "from")
+  private String module;
+
+  @XmlTransient @JsonIgnore private transient AbstractView owner;
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getModule() {
+    return module;
+  }
+
+  public void setModule(String module) {
+    this.module = module;
+  }
+
+  public void setOwner(AbstractView owner) {
+    this.owner = owner;
+  }
+
+  @JsonInclude
+  public AbstractView getView() {
+    AbstractView view = XMLViews.findView(name, null, null, module);
+    if (view == owner) {
+      return null;
+    }
+    view.setOwner(owner);
+    return view;
+  }
 }

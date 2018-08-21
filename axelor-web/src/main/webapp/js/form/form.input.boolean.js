@@ -25,194 +25,194 @@ var ui = angular.module('axelor.ui');
  * The Boolean input widget.
  */
 ui.formInput('Boolean', {
-	
-	css: 'boolean-item',
-	
-	cellCss: 'form-item boolean-item',
-	
-	link: function (scope, element, attrs, model) {
 
-		element.on('click', 'input:not(.no-toggle)', function (e) {
-			scope.setValue(e.target.checked, true);
-		});
+  css: 'boolean-item',
 
-		Object.defineProperty(scope, '$value', {
-			get: function () {
-				return model.$viewValue;
-			},
-			set: function(value) {
-				model.$setViewValue(value);
-			}
-		});
-	},
-	template_readonly: null,
-	template_editable:
-		"<label class='ibox'>" +
-			"<input type='checkbox' ng-model='$value' ng-disabled='isReadonly()'>" +
-			"<span class='box'></span>" +
-		"</label>"
+  cellCss: 'form-item boolean-item',
+
+  link: function (scope, element, attrs, model) {
+
+    element.on('click', 'input:not(.no-toggle)', function (e) {
+      scope.setValue(e.target.checked, true);
+    });
+
+    Object.defineProperty(scope, '$value', {
+      get: function () {
+        return model.$viewValue;
+      },
+      set: function(value) {
+        model.$setViewValue(value);
+      }
+    });
+  },
+  template_readonly: null,
+  template_editable:
+    "<label class='ibox'>" +
+      "<input type='checkbox' ng-model='$value' ng-disabled='isReadonly()'>" +
+      "<span class='box'></span>" +
+    "</label>"
 });
 
 /**
  * The Boolean widget with label on right.
  */
 ui.formInput('InlineCheckbox', 'Boolean', {
-	css: 'checkbox-inline',
-	metaWidget: true,
-	showTitle: false,
-	link: function (scope, element, attrs, model) {
-		this._super.apply(this, arguments);
-		scope.$watch('attr("title")', function booleanTitleWatch(title) {
-			scope.label = title;
-		});
-	},
-	template_readonly: null,
-	template_editable:
-		"<label class='ibox'>" +
-			"<input type='checkbox' ng-model='$value' ng-disabled='isReadonly()'>" +
-			"<div class='box'></div>" +
-			"<span class='title' ui-help-popover>{{label}}</span>" +
-		"</label>"
+  css: 'checkbox-inline',
+  metaWidget: true,
+  showTitle: false,
+  link: function (scope, element, attrs, model) {
+    this._super.apply(this, arguments);
+    scope.$watch('attr("title")', function booleanTitleWatch(title) {
+      scope.label = title;
+    });
+  },
+  template_readonly: null,
+  template_editable:
+    "<label class='ibox'>" +
+      "<input type='checkbox' ng-model='$value' ng-disabled='isReadonly()'>" +
+      "<div class='box'></div>" +
+      "<span class='title' ui-help-popover>{{label}}</span>" +
+    "</label>"
 });
 
 ui.formInput('Toggle', 'Boolean', {
-	cellCss: 'form-item toggle-item',
-	metaWidget: true,
-	link: function (scope, element, attrs, model) {
-		this._super.apply(this, arguments);
+  cellCss: 'form-item toggle-item',
+  metaWidget: true,
+  link: function (scope, element, attrs, model) {
+    this._super.apply(this, arguments);
 
-		var field = scope.field;
-		var icon = element.find('i');
+    var field = scope.field;
+    var icon = element.find('i');
 
-		scope.icon = function () {
-			return model.$viewValue && field.iconActive ? field.iconActive : field.icon;
-		};
+    scope.icon = function () {
+      return model.$viewValue && field.iconActive ? field.iconActive : field.icon;
+    };
 
-		scope.toggle = function () {
-			var value = !model.$viewValue;
-			if (scope.setExclusive && field.exclusive) {
-				scope.setExclusive(field.name, scope.record);
-			}
-			scope.setValue(value, true);
-		};
+    scope.toggle = function () {
+      var value = !model.$viewValue;
+      if (scope.setExclusive && field.exclusive) {
+        scope.setExclusive(field.name, scope.record);
+      }
+      scope.setValue(value, true);
+    };
 
-		if (field.help || field.title) {
-			element.attr('title', field.help || field.title);
-		}
-	},
-	template_readonly: null,
-	template_editable:
-		"<button tabindex='-1' class='btn btn-default' ng-class='{active: $value}' ng-click='toggle()'>" +
-			"<i class='fa {{icon()}}'></i>" +
-		"</button>"
+    if (field.help || field.title) {
+      element.attr('title', field.help || field.title);
+    }
+  },
+  template_readonly: null,
+  template_editable:
+    "<button tabindex='-1' class='btn btn-default' ng-class='{active: $value}' ng-click='toggle()'>" +
+      "<i class='fa {{icon()}}'></i>" +
+    "</button>"
 });
 
 ui.formInput('BooleanSelect', 'Boolean', {
-	css: 'form-item boolean-select-item',
-	metaWidget: true,
-	init: function (scope) {
-		var field = scope.field;
-		var trueText = _t((field.widgetAttrs||{}).trueText) || _t('Yes');
-		var falseText = _t((field.widgetAttrs||{}).falseText) || _t('No');
+  css: 'form-item boolean-select-item',
+  metaWidget: true,
+  init: function (scope) {
+    var field = scope.field;
+    var trueText = _t((field.widgetAttrs||{}).trueText) || _t('Yes');
+    var falseText = _t((field.widgetAttrs||{}).falseText) || _t('No');
 
-		scope.$items = [trueText, falseText];
-		scope.$selection = [{ value: trueText, val: true}, { value: falseText, val: false }];
-		if (field.nullable) {
-			scope.$selection.unshift({ value: '', val: null });
-		}
-		scope.format = function (value) {
-			if (field.nullable && (value === null || value === undefined)) {
-				return "";
-			}
-			return value ? scope.$items[0] : scope.$items[1];
-		};
-	},
-	link_editable: function (scope, element, attrs, model) {
-		var input = element.find('input');
-		var items = scope.$items;
+    scope.$items = [trueText, falseText];
+    scope.$selection = [{ value: trueText, val: true}, { value: falseText, val: false }];
+    if (field.nullable) {
+      scope.$selection.unshift({ value: '', val: null });
+    }
+    scope.format = function (value) {
+      if (field.nullable && (value === null || value === undefined)) {
+        return "";
+      }
+      return value ? scope.$items[0] : scope.$items[1];
+    };
+  },
+  link_editable: function (scope, element, attrs, model) {
+    var input = element.find('input');
+    var items = scope.$items;
 
-		input.autocomplete({
-			minLength: 0,
-			source: scope.$selection,
-			select: function (e, u) {
-				scope.setValue(u.item.val, true);
-				scope.$applyAsync();
-			}
-		}).click(function (e) {
-			input.autocomplete("search" , '');
-		});
+    input.autocomplete({
+      minLength: 0,
+      source: scope.$selection,
+      select: function (e, u) {
+        scope.setValue(u.item.val, true);
+        scope.$applyAsync();
+      }
+    }).click(function (e) {
+      input.autocomplete("search" , '');
+    });
 
-		scope.doShowSelect = function () {
-			input.autocomplete("search" , '');
-		};
+    scope.doShowSelect = function () {
+      input.autocomplete("search" , '');
+    };
 
-		scope.$render_editable = function () {
-			var value = model.$viewValue;
-			var text = scope.format(value);
-			input.val(text);
-		};
+    scope.$render_editable = function () {
+      var value = model.$viewValue;
+      var text = scope.format(value);
+      input.val(text);
+    };
 
-		scope.$watch('isReadonly()', function booleanReadonlyWatch(readonly) {
-			input.autocomplete(readonly ? "disable" : "enable");
-			input.toggleClass('not-readonly', !readonly);
-		});
-	},
-	template: "<span class='form-item-container'></span>",
-	template_readonly: '<span>{{text}}</span>',
-	template_editable: "<span class='picker-input'>" +
-				"<input type='text' readonly='readonly' class='no-toggle'>" +
-				"<span class='picker-icons picker-icons-1'>" +
-					"<i class='fa fa-caret-down' ng-click='doShowSelect()'></i>" +
-				"</span>" +
-			"</span>"
+    scope.$watch('isReadonly()', function booleanReadonlyWatch(readonly) {
+      input.autocomplete(readonly ? "disable" : "enable");
+      input.toggleClass('not-readonly', !readonly);
+    });
+  },
+  template: "<span class='form-item-container'></span>",
+  template_readonly: '<span>{{text}}</span>',
+  template_editable: "<span class='picker-input'>" +
+        "<input type='text' readonly='readonly' class='no-toggle'>" +
+        "<span class='picker-icons picker-icons-1'>" +
+          "<i class='fa fa-caret-down' ng-click='doShowSelect()'></i>" +
+        "</span>" +
+      "</span>"
 });
 
 ui.formInput('BooleanRadio', 'BooleanSelect', {
-	css: 'form-item boolean-radio-item',
-	metaWidget: true,
-	link_editable: function (scope, element, attrs, model) {
+  css: 'form-item boolean-radio-item',
+  metaWidget: true,
+  link_editable: function (scope, element, attrs, model) {
 
-		var inputName = _.uniqueId('boolean-radio');
-		var trueInput = $('<input type="radio" data-value="true" name="' + inputName + '">');
-		var falseInput = $('<input type="radio" data-value="false" name="' + inputName + '">');
+    var inputName = _.uniqueId('boolean-radio');
+    var trueInput = $('<input type="radio" data-value="true" name="' + inputName + '">');
+    var falseInput = $('<input type="radio" data-value="false" name="' + inputName + '">');
 
-		var items = scope.$items;
+    var items = scope.$items;
 
-		$('<label class="ibox round">')
-			.append(trueInput)
-			.append($('<i class="box">'))
-			.append($('<span class="title">').text(items[0]))
-			.appendTo(element);
-		$('<label class="ibox round">')
-			.append(falseInput)
-			.append($('<i class="box">'))
-			.append($('<span class="title">').text(items[1]))
-			.appendTo(element);
+    $('<label class="ibox round">')
+      .append(trueInput)
+      .append($('<i class="box">'))
+      .append($('<span class="title">').text(items[0]))
+      .appendTo(element);
+    $('<label class="ibox round">')
+      .append(falseInput)
+      .append($('<i class="box">'))
+      .append($('<span class="title">').text(items[1]))
+      .appendTo(element);
 
-		scope.$render_editable = function () {
-			var value = model.$viewValue || false;
-			var input = value ? trueInput : falseInput;
-			input.attr('checked', true);
-		};
+    scope.$render_editable = function () {
+      var value = model.$viewValue || false;
+      var input = value ? trueInput : falseInput;
+      input.attr('checked', true);
+    };
 
-		element.on('change', 'input', function (e) {
-			var value = $(this).data('value') === true;
-			scope.setValue(value, true);
-			scope.$applyAsync();
-		});
-	},
-	template_editable: "<span></span>"
+    element.on('change', 'input', function (e) {
+      var value = $(this).data('value') === true;
+      scope.setValue(value, true);
+      scope.$applyAsync();
+    });
+  },
+  template_editable: "<span></span>"
 });
 
 ui.formInput('BooleanSwitch', 'Boolean', {
-	css: 'form-item',
-	metaWidget: true,
-	template_readonly: null,
-	template_editable:
-		"<label class='iswitch'>" +
-			"<input type='checkbox' ng-model='$value' ng-disabled='isReadonly()'>" +
-			"<span class='box'></span>" +
-		"</label>"
+  css: 'form-item',
+  metaWidget: true,
+  template_readonly: null,
+  template_editable:
+    "<label class='iswitch'>" +
+      "<input type='checkbox' ng-model='$value' ng-disabled='isReadonly()'>" +
+      "<span class='box'></span>" +
+    "</label>"
 });
 
 })();

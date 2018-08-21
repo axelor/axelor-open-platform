@@ -17,9 +17,13 @@
  */
 package com.axelor.quartz;
 
+import com.axelor.app.AppSettings;
+import com.axelor.db.Query;
+import com.axelor.i18n.I18n;
+import com.axelor.meta.db.MetaSchedule;
+import com.axelor.meta.db.MetaScheduleParam;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
 import org.quartz.CronScheduleBuilder;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
@@ -32,174 +36,157 @@ import org.quartz.TriggerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axelor.app.AppSettings;
-import com.axelor.db.Query;
-import com.axelor.i18n.I18n;
-import com.axelor.meta.db.MetaSchedule;
-import com.axelor.meta.db.MetaScheduleParam;
-
 /**
  * The {@link JobRunner} controls the scheduler.<br>
  * <br>
- * It configures the {@link Scheduler} from the job configuration provided from
- * the database. It also provides some public methods to start/restart/stop the
- * scheduler.
- * 
+ * It configures the {@link Scheduler} from the job configuration provided from the database. It
+ * also provides some public methods to start/restart/stop the scheduler.
  */
 @Singleton
 public class JobRunner {
 
-	private static Logger log = LoggerFactory.getLogger(JobRunner.class);
-	private static final String CONFIG_QUARTZ_ENABLE = "quartz.enable";
+  private static Logger log = LoggerFactory.getLogger(JobRunner.class);
+  private static final String CONFIG_QUARTZ_ENABLE = "quartz.enable";
 
-	private Scheduler scheduler;
-	
-	private int total;
-	
-	@Inject
-	public JobRunner(Scheduler scheduler) {
-		this.scheduler = scheduler;
-	}
-	
-	public boolean isEnabled() {
-		return AppSettings.get().getBoolean(CONFIG_QUARTZ_ENABLE, false);
-	}
+  private Scheduler scheduler;
 
-	private void configure() {
-		if (total > 0) {
-			return;
-		}
-		total = 0;
-		log.info("Configuring scheduled jobs...");
-		for (MetaSchedule meta : Query.of(MetaSchedule.class).fetch()) {
-			configure(meta);
-		}
-		log.info("Configured total jobs: {}", total);
-	}
-	
-	private void configure(MetaSchedule meta) {
+  private int total;
 
-		if (meta == null || meta.getActive() != Boolean.TRUE) {
-			return;
-		}
-		
-		final String name = meta.getName();
-		final String cron = meta.getCron();
-		final String jobClass = meta.getJob();
+  @Inject
+  public JobRunner(Scheduler scheduler) {
+    this.scheduler = scheduler;
+  }
 
-		log.info("Configuring job: {}, {}", name, cron);
-		Class<?> klass;
-		try {
-			klass = Class.forName(jobClass);
-		} catch (ClassNotFoundException e1) {
-			log.error("No such job class found: {}", jobClass);
-			return;
-		}
-		if (klass == null || !Job.class.isAssignableFrom(klass)) {
-			log.error("Invalid job class: {}", jobClass);
-			return;
-		}
+  public boolean isEnabled() {
+    return AppSettings.get().getBoolean(CONFIG_QUARTZ_ENABLE, false);
+  }
 
-		final CronScheduleBuilder cronSchedule;
-		try {
-			cronSchedule = CronScheduleBuilder.cronSchedule(cron);
-		} catch (Exception e) {
-			log.error("Invalid cron string: {}", cron);
-			return;
-		}
-		
-		final JobDataMap data = new JobDataMap();
-		if (meta.getParams() != null) {
-			for (MetaScheduleParam param : meta.getParams()) {
-				data.put(param.getName(), param.getValue());
-			}
-		}
+  private void configure() {
+    if (total > 0) {
+      return;
+    }
+    total = 0;
+    log.info("Configuring scheduled jobs...");
+    for (MetaSchedule meta : Query.of(MetaSchedule.class).fetch()) {
+      configure(meta);
+    }
+    log.info("Configured total jobs: {}", total);
+  }
 
-		@SuppressWarnings("unchecked")
-		final JobDetail detail = JobBuilder
-			.newJob((Class<? extends Job>) klass)
-			.withIdentity(name)
-			.withDescription(meta.getDescription())
-			.usingJobData(data)
-			.build();
+  private void configure(MetaSchedule meta) {
 
-		final Trigger trigger = TriggerBuilder
-				.newTrigger()
-				.withIdentity(name)
-				.withDescription(meta.getDescription())
-				.withSchedule(cronSchedule)
-				.build();
+    if (meta == null || meta.getActive() != Boolean.TRUE) {
+      return;
+    }
 
-		try {
-			scheduler.scheduleJob(detail, trigger);
-		} catch (SchedulerException e) {
-			log.error("Unable to configure scheduled job: {}", name, e);
-		}
+    final String name = meta.getName();
+    final String cron = meta.getCron();
+    final String jobClass = meta.getJob();
 
-		total += 1;
-	}
+    log.info("Configuring job: {}, {}", name, cron);
+    Class<?> klass;
+    try {
+      klass = Class.forName(jobClass);
+    } catch (ClassNotFoundException e1) {
+      log.error("No such job class found: {}", jobClass);
+      return;
+    }
+    if (klass == null || !Job.class.isAssignableFrom(klass)) {
+      log.error("Invalid job class: {}", jobClass);
+      return;
+    }
 
-	/**
-	 * Validate the given cron string.
-	 * 
-	 * @param cron the cron string to validate
-	 */
-	public void validate(String cron) {
-		try {
-			CronScheduleBuilder.cronSchedule(cron);
-		} catch (Exception e) {
-			throw new IllegalArgumentException(I18n.get("Invalid cron:") + " " + cron);
-		}
-	}
+    final CronScheduleBuilder cronSchedule;
+    try {
+      cronSchedule = CronScheduleBuilder.cronSchedule(cron);
+    } catch (Exception e) {
+      log.error("Invalid cron string: {}", cron);
+      return;
+    }
 
-	/**
-	 * Start the scheduler.
-	 * 
-	 */
-	public void start() {
-		if (!isEnabled()) {
-			throw new IllegalStateException(I18n.get("The scheduler service is disabled."));
-		}
-		this.configure();
-		log.info("Starting scheduler...");
-		try {
-			scheduler.start();
-		} catch (SchedulerException e) {
-			log.error("Unable to start the scheduler...");
-			log.trace("Scheduler error: {}", e.getMessage(), e);
-			throw new RuntimeException(e);
-		}
-		log.info("Job scheduler is running...");
-	}
+    final JobDataMap data = new JobDataMap();
+    if (meta.getParams() != null) {
+      for (MetaScheduleParam param : meta.getParams()) {
+        data.put(param.getName(), param.getValue());
+      }
+    }
 
-	/**
-	 * Stop the scheduler.
-	 * 
-	 */
-	public void stop() {
-		log.info("Stopping scheduler...");
-		try {
-			scheduler.shutdown(true);
-		} catch (SchedulerException e) {
-			log.error("Unable to stop the scheduler...");
-			log.trace("Scheduler error: {}", e.getMessage(), e);
-		}
-		log.info("The job scheduler stopped.");
-	}
+    @SuppressWarnings("unchecked")
+    final JobDetail detail =
+        JobBuilder.newJob((Class<? extends Job>) klass)
+            .withIdentity(name)
+            .withDescription(meta.getDescription())
+            .usingJobData(data)
+            .build();
 
-	/**
-	 * Reconfigure the scheduler and restart.
-	 * 
-	 */
-	public void restart() {
-		try {
-			scheduler.clear();
-		} catch (SchedulerException e) {
-			log.error("Unable to clear existing jobs...");
-			log.trace("Scheduler error: {}", e.getMessage(), e);
-			throw new RuntimeException(e);
-		}
-		total = 0;
-		this.start();
-	}
+    final Trigger trigger =
+        TriggerBuilder.newTrigger()
+            .withIdentity(name)
+            .withDescription(meta.getDescription())
+            .withSchedule(cronSchedule)
+            .build();
+
+    try {
+      scheduler.scheduleJob(detail, trigger);
+    } catch (SchedulerException e) {
+      log.error("Unable to configure scheduled job: {}", name, e);
+    }
+
+    total += 1;
+  }
+
+  /**
+   * Validate the given cron string.
+   *
+   * @param cron the cron string to validate
+   */
+  public void validate(String cron) {
+    try {
+      CronScheduleBuilder.cronSchedule(cron);
+    } catch (Exception e) {
+      throw new IllegalArgumentException(I18n.get("Invalid cron:") + " " + cron);
+    }
+  }
+
+  /** Start the scheduler. */
+  public void start() {
+    if (!isEnabled()) {
+      throw new IllegalStateException(I18n.get("The scheduler service is disabled."));
+    }
+    this.configure();
+    log.info("Starting scheduler...");
+    try {
+      scheduler.start();
+    } catch (SchedulerException e) {
+      log.error("Unable to start the scheduler...");
+      log.trace("Scheduler error: {}", e.getMessage(), e);
+      throw new RuntimeException(e);
+    }
+    log.info("Job scheduler is running...");
+  }
+
+  /** Stop the scheduler. */
+  public void stop() {
+    log.info("Stopping scheduler...");
+    try {
+      scheduler.shutdown(true);
+    } catch (SchedulerException e) {
+      log.error("Unable to stop the scheduler...");
+      log.trace("Scheduler error: {}", e.getMessage(), e);
+    }
+    log.info("The job scheduler stopped.");
+  }
+
+  /** Reconfigure the scheduler and restart. */
+  public void restart() {
+    try {
+      scheduler.clear();
+    } catch (SchedulerException e) {
+      log.error("Unable to clear existing jobs...");
+      log.trace("Scheduler error: {}", e.getMessage(), e);
+      throw new RuntimeException(e);
+    }
+    total = 0;
+    this.start();
+  }
 }

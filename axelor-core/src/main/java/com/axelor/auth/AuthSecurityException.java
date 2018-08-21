@@ -21,55 +21,58 @@ import com.axelor.db.JpaSecurity.AccessType;
 
 public class AuthSecurityException extends RuntimeException {
 
-	private static final long serialVersionUID = -794508889899422879L;
+  private static final long serialVersionUID = -794508889899422879L;
 
-	private AccessType type;
+  private AccessType type;
 
-	private Class<?> model;
+  private Class<?> model;
 
-	private Long[] ids;
-	
-	public AuthSecurityException(AccessType type) {
-		this(type, null);
-	}
+  private Long[] ids;
 
-	public AuthSecurityException(AccessType type, Class<?> model, Long... ids) {
-		this.type = type;
-		this.model = model;
-		this.ids = ids;
-	}
+  public AuthSecurityException(AccessType type) {
+    this(type, null);
+  }
 
-	public AccessType getType() {
-		return type;
-	}
+  public AuthSecurityException(AccessType type, Class<?> model, Long... ids) {
+    this.type = type;
+    this.model = model;
+    this.ids = ids;
+  }
 
-	public Class<?> getModel() {
-		return model;
-	}
+  public AccessType getType() {
+    return type;
+  }
 
-	public Long[] getIds() {
-		return ids;
-	}
-	
-	@Override
-	public String getMessage() {
-		if (model == null || AuthUtils.getUser() == null || !AuthUtils.isTechnicalStaff(AuthUtils.getUser())) {
-			return type.getMessage();
-		}
-		final StringBuilder builder = new StringBuilder(type.getMessage()).append("[").append(model.getName());
-		if (ids.length > 0) {
-			builder.append("#");
-			for (int i = 0, n = Math.min(5, ids.length); i < n; i++) {
-				builder.append(ids[i]);
-				if (i < n - 1) {
-					builder.append(",");
-				}
-			}
-			if (ids.length > 5) {
-				builder.append(",...");
-			}
-		}
-		builder.append("]");
-		return builder.toString();
-	}
+  public Class<?> getModel() {
+    return model;
+  }
+
+  public Long[] getIds() {
+    return ids;
+  }
+
+  @Override
+  public String getMessage() {
+    if (model == null
+        || AuthUtils.getUser() == null
+        || !AuthUtils.isTechnicalStaff(AuthUtils.getUser())) {
+      return type.getMessage();
+    }
+    final StringBuilder builder =
+        new StringBuilder(type.getMessage()).append("[").append(model.getName());
+    if (ids.length > 0) {
+      builder.append("#");
+      for (int i = 0, n = Math.min(5, ids.length); i < n; i++) {
+        builder.append(ids[i]);
+        if (i < n - 1) {
+          builder.append(",");
+        }
+      }
+      if (ids.length > 5) {
+        builder.append(",...");
+      }
+    }
+    builder.append("]");
+    return builder.toString();
+  }
 }

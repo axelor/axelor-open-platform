@@ -17,44 +17,43 @@
  */
 package com.axelor.common;
 
+import com.axelor.common.VersionUtils.Version;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.axelor.common.VersionUtils.Version;
-
 public class TestVersionUtils {
 
-	@Test
-	public void test() {
+  @Test
+  public void test() {
 
-		Version v1 = new Version("3.0.1");
-		Version v2 = new Version("3.0.1-rc1");
-		Version v3 = new Version("3.0.1-SNAPSHOT");
+    Version v1 = new Version("3.0.1");
+    Version v2 = new Version("3.0.1-rc1");
+    Version v3 = new Version("3.0.1-SNAPSHOT");
 
-		Assert.assertEquals("3.0", v1.feature);
-		Assert.assertEquals("3.0", v2.feature);
-		Assert.assertEquals("3.0", v3.feature);
+    Assert.assertEquals("3.0", v1.feature);
+    Assert.assertEquals("3.0", v2.feature);
+    Assert.assertEquals("3.0", v3.feature);
 
-		Assert.assertEquals(3, v1.major);
-		Assert.assertEquals(0, v1.minor);
-		Assert.assertEquals(1, v1.patch);
-		Assert.assertEquals(0, v1.rc);
+    Assert.assertEquals(3, v1.major);
+    Assert.assertEquals(0, v1.minor);
+    Assert.assertEquals(1, v1.patch);
+    Assert.assertEquals(0, v1.rc);
 
-		Assert.assertEquals(3, v2.major);
-		Assert.assertEquals(0, v2.minor);
-		Assert.assertEquals(1, v2.patch);
-		Assert.assertEquals(1, v2.rc);
+    Assert.assertEquals(3, v2.major);
+    Assert.assertEquals(0, v2.minor);
+    Assert.assertEquals(1, v2.patch);
+    Assert.assertEquals(1, v2.rc);
 
-		Assert.assertEquals(3, v3.major);
-		Assert.assertEquals(0, v3.minor);
-		Assert.assertEquals(1, v3.patch);
-		Assert.assertEquals(0, v3.rc);
+    Assert.assertEquals(3, v3.major);
+    Assert.assertEquals(0, v3.minor);
+    Assert.assertEquals(1, v3.patch);
+    Assert.assertEquals(0, v3.rc);
 
-		Assert.assertTrue(v1.matches("3.0.1"));
-		Assert.assertFalse(v1.matches("3.0.0"));
-		Assert.assertFalse(v1.matches("3.0.2"));
-		Assert.assertTrue(v1.matches("~3.0.0"));
-		Assert.assertTrue(v1.matches("~3.0.1"));
-		Assert.assertFalse(v1.matches("~3.0.2"));
-	}
+    Assert.assertTrue(v1.matches("3.0.1"));
+    Assert.assertFalse(v1.matches("3.0.0"));
+    Assert.assertFalse(v1.matches("3.0.2"));
+    Assert.assertTrue(v1.matches("~3.0.0"));
+    Assert.assertTrue(v1.matches("~3.0.1"));
+    Assert.assertFalse(v1.matches("~3.0.2"));
+  }
 }

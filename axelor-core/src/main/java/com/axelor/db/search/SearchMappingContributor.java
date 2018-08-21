@@ -17,23 +17,17 @@
  */
 package com.axelor.db.search;
 
+import com.google.inject.ImplementedBy;
 import org.hibernate.search.cfg.SearchMapping;
 
-import com.google.inject.ImplementedBy;
-
-/**
- * Allows to configure search mapping programmatically.
- * 
- */
+/** Allows to configure search mapping programmatically. */
 @ImplementedBy(SearchMappingContributorImpl.class)
 public interface SearchMappingContributor {
 
-	/**
-	 * Configure indexed entities with the given {@link SearchMapping}
-	 * programmatically.
-	 * 
-	 * @param mapping
-	 *            the {@link SearchMapping} to use to configure entities
-	 */
-	void contribute(SearchMapping mapping);
+  /**
+   * Configure indexed entities with the given {@link SearchMapping} programmatically.
+   *
+   * @param mapping the {@link SearchMapping} to use to configure entities
+   */
+  void contribute(SearchMapping mapping);
 }

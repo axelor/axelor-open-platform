@@ -22,13 +22,8 @@ import com.google.inject.Guice;
 
 /**
  * The entry-point of application module.
- * <p>
- * Application module can provide an implementation of {@link AxelorModule} to
- * configure {@link Guice} bindings and do some initialization when application
- * starts.
- * </p>
- * 
+ *
+ * <p>Application module can provide an implementation of {@link AxelorModule} to configure {@link
+ * Guice} bindings and do some initialization when application starts.
  */
-public abstract class AxelorModule extends AbstractModule {
-
-}
+public abstract class AxelorModule extends AbstractModule {}

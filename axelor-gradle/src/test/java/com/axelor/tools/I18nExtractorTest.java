@@ -17,20 +17,18 @@
  */
 package com.axelor.tools;
 
+import com.axelor.tools.i18n.I18nExtractor;
 import java.nio.file.Paths;
-
 import org.junit.Test;
 
-import com.axelor.tools.i18n.I18nExtractor;
-
 public class I18nExtractorTest {
-	
-	static final String BASE = "..";
-	static final String MODULE = "axelor-core";
-	
-	@Test
-	public void test() {
-		I18nExtractor tools = new I18nExtractor();
-		tools.extract(Paths.get(BASE, MODULE), true, true);
-	}
+
+  static final String BASE = "..";
+  static final String MODULE = "axelor-core";
+
+  @Test
+  public void test() {
+    I18nExtractor tools = new I18nExtractor();
+    tools.extract(Paths.get(BASE, MODULE), true, true);
+  }
 }

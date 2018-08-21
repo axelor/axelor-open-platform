@@ -17,27 +17,26 @@
  */
 package com.axelor.test.db.repo;
 
-import java.util.Map;
-
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.test.db.Contact;
+import java.util.Map;
 
 public class ContactRepository extends JpaRepository<Contact> {
 
-	public ContactRepository() {
-		super(Contact.class);
-	}
+  public ContactRepository() {
+    super(Contact.class);
+  }
 
-	public Contact findByEmail(String email) {
-		return all().filter("self.email = ?", email).fetchOne();
-	}
+  public Contact findByEmail(String email) {
+    return all().filter("self.email = ?", email).fetchOne();
+  }
 
-	public Contact edit(Map<String, Object> values) {
-		return JPA.edit(Contact.class, values);
-	}
+  public Contact edit(Map<String, Object> values) {
+    return JPA.edit(Contact.class, values);
+  }
 
-	public Contact manage(Contact contact) {
-		return JPA.manage(contact);
-	}
+  public Contact manage(Contact contact) {
+    return JPA.manage(contact);
+  }
 }

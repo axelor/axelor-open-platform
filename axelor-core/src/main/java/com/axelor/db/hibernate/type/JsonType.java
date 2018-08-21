@@ -22,13 +22,13 @@ import org.hibernate.type.descriptor.java.StringTypeDescriptor;
 
 public class JsonType extends AbstractSingleColumnStandardBasicType<String> {
 
-	private static final long serialVersionUID = -2510546264526737635L;
-	
-	public JsonType(JsonSqlTypeDescriptor descriptor) {
-		super(descriptor, StringTypeDescriptor.INSTANCE);
-	}
+  private static final long serialVersionUID = -2510546264526737635L;
 
-	public String getName() {
-		return "json";
-	}
+  public JsonType(JsonSqlTypeDescriptor descriptor) {
+    super(descriptor, StringTypeDescriptor.INSTANCE);
+  }
+
+  public String getName() {
+    return "json";
+  }
 }

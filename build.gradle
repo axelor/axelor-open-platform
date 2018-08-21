@@ -1,5 +1,5 @@
 buildscript {
-	apply from: "gradle/repos.gradle"
+  apply from: "gradle/repos.gradle"
 }
 
 apply plugin: "eclipse"
@@ -8,48 +8,48 @@ apply plugin: "idea"
 apply from: "version.gradle"
 
 subprojects {
-	apply from: "${rootDir}/gradle/libs.gradle"
-	apply from: "${rootDir}/gradle/common.gradle"
+  apply from: "${rootDir}/gradle/libs.gradle"
+  apply from: "${rootDir}/gradle/common.gradle"
 
-	apply plugin: com.axelor.gradle.support.JavaSupport
-	apply plugin: com.axelor.gradle.support.EclipseSupport
-	apply plugin: com.axelor.gradle.support.LicenseSupport
-	apply plugin: com.axelor.gradle.support.PublishSupport
+  apply plugin: com.axelor.gradle.support.JavaSupport
+  apply plugin: com.axelor.gradle.support.EclipseSupport
+  apply plugin: com.axelor.gradle.support.LicenseSupport
+  apply plugin: com.axelor.gradle.support.PublishSupport
 
-	group = "com.axelor"
-	version = rootProject.version
+  group = "com.axelor"
+  version = rootProject.version
 
-	sourceCompatibility = 1.8
-	targetCompatibility = 1.8
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
 
-	afterEvaluate {
-		test {
-			forkEvery 1
-			maxParallelForks 4
+  afterEvaluate {
+    test {
+      forkEvery 1
+      maxParallelForks 4
 
-			beforeTest { descriptor ->
-				logger.lifecycle("Running: " + descriptor)
-			}
-		}
-	}
+      beforeTest { descriptor ->
+        logger.lifecycle("Running: " + descriptor)
+      }
+    }
+  }
 }
 
 task updateVersion(type: com.axelor.gradle.tasks.UpdateVersion) {
-	description "Update version text in source files."
-	group "Axelor"
-	processFiles = fileTree(projectDir) {
-		include '**/resources/**/*.xml'
-		include '**/resources/domain-models.xsd'
-		include '**/resources/object-views.xsd'
-		include '**/resources/data-import.xsd'
-		include '**/resources/templates/**/*.tmpl'
-		include '**/data/**/*config.xml'
-		include '**/webapp/package.json'
-	}
+  description "Update version text in source files."
+  group "Axelor"
+  processFiles = fileTree(projectDir) {
+    include '**/resources/**/*.xml'
+    include '**/resources/domain-models.xsd'
+    include '**/resources/object-views.xsd'
+    include '**/resources/data-import.xsd'
+    include '**/resources/templates/**/*.tmpl'
+    include '**/data/**/*config.xml'
+    include '**/webapp/package.json'
+  }
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = "4.4.1"
+  gradleVersion = "4.4.1"
 }
 
 apply from: "gradle/javadoc.gradle"

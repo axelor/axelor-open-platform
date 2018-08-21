@@ -17,19 +17,6 @@
  */
 package com.axelor.dms.db.repo;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.persistence.PersistenceException;
-
-import org.apache.shiro.authz.UnauthorizedException;
-
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
@@ -59,378 +46,404 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.primitives.Longs;
 import com.google.inject.persist.Transactional;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.inject.Inject;
+import javax.persistence.PersistenceException;
+import org.apache.shiro.authz.UnauthorizedException;
 
 public class DMSFileRepository extends JpaRepository<DMSFile> {
 
-	@Inject
-	private MetaFiles metaFiles;
+  @Inject private MetaFiles metaFiles;
 
-	@Inject
-	private JpaSecurity security;
+  @Inject private JpaSecurity security;
 
-	@Inject
-	private DMSPermissionRepository dmsPermissions;
+  @Inject private DMSPermissionRepository dmsPermissions;
 
-	@Inject
-	private MetaAttachmentRepository attachments;
+  @Inject private MetaAttachmentRepository attachments;
 
-	public DMSFileRepository() {
-		super(DMSFile.class);
-	}
+  public DMSFileRepository() {
+    super(DMSFile.class);
+  }
 
-	@SuppressWarnings("all")
-	private Model findRelated(DMSFile file) {
-		if (file.getRelatedId() == null ||
-			file.getRelatedModel() == null) {
-			return null;
-		}
-		Class<? extends Model> klass = null;
-		try {
-			klass = (Class) Class.forName(file.getRelatedModel());
-		} catch (Exception e) {
-			return null;
-		}
-		final Model entity = JpaRepository.of(klass).find(file.getRelatedId());
-		return EntityHelper.getEntity(entity);
-	}
+  @SuppressWarnings("all")
+  private Model findRelated(DMSFile file) {
+    if (file.getRelatedId() == null || file.getRelatedModel() == null) {
+      return null;
+    }
+    Class<? extends Model> klass = null;
+    try {
+      klass = (Class) Class.forName(file.getRelatedModel());
+    } catch (Exception e) {
+      return null;
+    }
+    final Model entity = JpaRepository.of(klass).find(file.getRelatedId());
+    return EntityHelper.getEntity(entity);
+  }
 
-	private void createMessage(DMSFile file, boolean delete) {
-		final Model related = findRelated(file);
-		if (related == null || related.getId() == null || file.getMetaFile() == null) {
-			return;
-		}
-		final Class<?> klass = EntityHelper.getEntityClass(related);
-		final Track track = klass.getAnnotation(Track.class);
-		if (track == null || !track.files()) {
-			return;
-		}
-		final ObjectMapper objectMapper = Beans.get(ObjectMapper.class);
-		final MailMessageRepository messages = Beans.get(MailMessageRepository.class);
-		final MailMessage message = new MailMessage();
-		
-		message.setRelatedId(related.getId());
-		message.setRelatedModel(klass.getName());
-		message.setAuthor(AuthUtils.getUser());
+  private void createMessage(DMSFile file, boolean delete) {
+    final Model related = findRelated(file);
+    if (related == null || related.getId() == null || file.getMetaFile() == null) {
+      return;
+    }
+    final Class<?> klass = EntityHelper.getEntityClass(related);
+    final Track track = klass.getAnnotation(Track.class);
+    if (track == null || !track.files()) {
+      return;
+    }
+    final ObjectMapper objectMapper = Beans.get(ObjectMapper.class);
+    final MailMessageRepository messages = Beans.get(MailMessageRepository.class);
+    final MailMessage message = new MailMessage();
 
-		message.setSubject(delete
-				? I18n.get("File removed")
-				: I18n.get("File added"));
-		
-		final Map<String, Object> json = new HashMap<>();
-		final Map<String, Object> attrs = new HashMap<>();
-		
-		attrs.put("id", file.getMetaFile().getId());
-		attrs.put("fileName", file.getFileName());
-		attrs.put("fileIcon", metaFiles.fileTypeIcon(file.getMetaFile()));
+    message.setRelatedId(related.getId());
+    message.setRelatedModel(klass.getName());
+    message.setAuthor(AuthUtils.getUser());
 
-		json.put("files", Arrays.asList(attrs));
-		try {
-			message.setBody(objectMapper.writeValueAsString(json));
-		} catch (JsonProcessingException e) {
-		}
+    message.setSubject(delete ? I18n.get("File removed") : I18n.get("File added"));
 
-		messages.save(message);
-	}
+    final Map<String, Object> json = new HashMap<>();
+    final Map<String, Object> attrs = new HashMap<>();
 
-	@Override
-	public DMSFile save(DMSFile entity) {
-		DMSFile parent = entity.getParent();
-		Model related = findRelated(entity);
-		if (related == null && parent != null) {
-			related = findRelated(parent);
-		}
+    attrs.put("id", file.getMetaFile().getId());
+    attrs.put("fileName", file.getFileName());
+    attrs.put("fileIcon", metaFiles.fileTypeIcon(file.getMetaFile()));
 
-		final boolean isAttachment = related != null && entity.getMetaFile() != null;
-		
-		if (related != null) {
-			entity.setRelatedId(related.getId());
-			entity.setRelatedModel(related.getClass().getName());
-		}
+    json.put("files", Arrays.asList(attrs));
+    try {
+      message.setBody(objectMapper.writeValueAsString(json));
+    } catch (JsonProcessingException e) {
+    }
 
-		// if new attachment, save attachment reference
-		if (isAttachment) {
-			// remove old attachment if file is moved
-			MetaAttachment attachmentOld = attachments.all()
-					.filter("self.metaFile.id = ?", entity.getMetaFile().getId())
-					.fetchOne();
-			if (attachmentOld != null) {
-				attachments.remove(attachmentOld);
-			}
+    messages.save(message);
+  }
 
-			MetaAttachment attachment = attachments.all()
-					.filter("self.metaFile.id = ? AND self.objectId = ? AND self.objectName = ?",
-							entity.getMetaFile().getId(),
-							related.getId(),
-							related.getClass().getName())
-					.fetchOne();
-			if (attachment == null) {
-				attachment = metaFiles.attach(entity.getMetaFile(), related);
-				attachments.save(attachment);
-			}
+  @Override
+  public DMSFile save(DMSFile entity) {
+    DMSFile parent = entity.getParent();
+    Model related = findRelated(entity);
+    if (related == null && parent != null) {
+      related = findRelated(parent);
+    }
 
-			// generate track message
-			createMessage(entity, false);
-		}
-		
-		// if not an attachment or has parent, do nothing
-		if (parent != null || related == null) {
-			return super.save(entity);
-		}
+    final boolean isAttachment = related != null && entity.getMetaFile() != null;
 
-		// create parent folders
+    if (related != null) {
+      entity.setRelatedId(related.getId());
+      entity.setRelatedModel(related.getClass().getName());
+    }
 
-		Mapper mapper = Mapper.of(related.getClass());
-		String homeName = null;
-		try {
-			homeName = mapper.getNameField().get(related).toString();
-		} catch (Exception e) {
-		}
-		if (homeName == null) {
-			homeName = Strings.padStart(""+related.getId(), 5, '0');
-		}
+    // if new attachment, save attachment reference
+    if (isAttachment) {
+      // remove old attachment if file is moved
+      MetaAttachment attachmentOld =
+          attachments.all().filter("self.metaFile.id = ?", entity.getMetaFile().getId()).fetchOne();
+      if (attachmentOld != null) {
+        attachments.remove(attachmentOld);
+      }
 
-		DMSFile dmsRoot = all().filter(
-				"(self.relatedId is null OR self.relatedId = 0) AND self.relatedModel = ? and self.isDirectory = true",
-				entity.getRelatedModel()).fetchOne();
+      MetaAttachment attachment =
+          attachments
+              .all()
+              .filter(
+                  "self.metaFile.id = ? AND self.objectId = ? AND self.objectName = ?",
+                  entity.getMetaFile().getId(),
+                  related.getId(),
+                  related.getClass().getName())
+              .fetchOne();
+      if (attachment == null) {
+        attachment = metaFiles.attach(entity.getMetaFile(), related);
+        attachments.save(attachment);
+      }
 
-		final Inflector inflector = Inflector.getInstance();
+      // generate track message
+      createMessage(entity, false);
+    }
 
-		if (dmsRoot == null) {
-			dmsRoot = new DMSFile();
-			dmsRoot.setFileName(inflector.pluralize(inflector.humanize(related.getClass().getSimpleName())));
-			dmsRoot.setRelatedModel(entity.getRelatedModel());
-			dmsRoot.setIsDirectory(true);
-			dmsRoot = super.save(dmsRoot); // should get id before it's child
-		}
+    // if not an attachment or has parent, do nothing
+    if (parent != null || related == null) {
+      return super.save(entity);
+    }
 
-		DMSFile dmsHome = all().filter(""
-						+ "self.relatedId = :id AND self.relatedModel = :model AND self.isDirectory = true AND "
-						+ "self.parent.relatedModel = :model AND "
-						+ "(self.parent.relatedId is null OR self.parent.relatedId = 0)")
-				.bind("id", entity.getRelatedId())
-				.bind("model", entity.getRelatedModel())
-				.fetchOne();
+    // create parent folders
 
-		if (dmsHome == null) {
-			dmsHome = new DMSFile();
-			dmsHome.setFileName(homeName);
-			dmsHome.setRelatedId(entity.getRelatedId());
-			dmsHome.setRelatedModel(entity.getRelatedModel());
-			dmsHome.setParent(dmsRoot);
-			dmsHome.setIsDirectory(true);
-			dmsHome = super.save(dmsHome); // should get id before it's child
-		}
+    Mapper mapper = Mapper.of(related.getClass());
+    String homeName = null;
+    try {
+      homeName = mapper.getNameField().get(related).toString();
+    } catch (Exception e) {
+    }
+    if (homeName == null) {
+      homeName = Strings.padStart("" + related.getId(), 5, '0');
+    }
 
-		entity.setParent(dmsHome);
+    DMSFile dmsRoot =
+        all()
+            .filter(
+                "(self.relatedId is null OR self.relatedId = 0) AND self.relatedModel = ? and self.isDirectory = true",
+                entity.getRelatedModel())
+            .fetchOne();
 
-		return super.save(entity);
-	}
+    final Inflector inflector = Inflector.getInstance();
 
-	@Override
-	public void remove(DMSFile entity) {
-		// remove all children
-		if (entity.getIsDirectory() == Boolean.TRUE) {
-			final List<DMSFile> children = all().filter("self.parent.id = ?", entity.getId()).fetch();
-			for (DMSFile child : children) {
-				if (child != entity) {
-					remove(child);;
-				}
-			}
-		}
+    if (dmsRoot == null) {
+      dmsRoot = new DMSFile();
+      dmsRoot.setFileName(
+          inflector.pluralize(inflector.humanize(related.getClass().getSimpleName())));
+      dmsRoot.setRelatedModel(entity.getRelatedModel());
+      dmsRoot.setIsDirectory(true);
+      dmsRoot = super.save(dmsRoot); // should get id before it's child
+    }
 
-		// remove attached file
-		if (entity.getMetaFile() != null) {
-			final MetaFile metaFile = entity.getMetaFile();
-			long count = attachments.all()
-					.filter("self.metaFile = ?", metaFile)
-					.count();
-			if (count == 1) {
-				final MetaAttachment attachment = attachments.all()
-						.filter("self.metaFile = ?", metaFile)
-						.fetchOne();
-				attachments.remove(attachment);
+    DMSFile dmsHome =
+        all()
+            .filter(
+                ""
+                    + "self.relatedId = :id AND self.relatedModel = :model AND self.isDirectory = true AND "
+                    + "self.parent.relatedModel = :model AND "
+                    + "(self.parent.relatedId is null OR self.parent.relatedId = 0)")
+            .bind("id", entity.getRelatedId())
+            .bind("model", entity.getRelatedModel())
+            .fetchOne();
 
-				// generate track message
-				createMessage(entity, true);
-			}
-			count = all()
-					.filter("self.metaFile = ?", metaFile)
-					.count();
-			if (count == 1) {
-				entity.setMetaFile(null);
-				try {
-					metaFiles.delete(metaFile);
-				} catch (IOException e) {
-					throw new PersistenceException(e);
-				}
-			}
-		}
+    if (dmsHome == null) {
+      dmsHome = new DMSFile();
+      dmsHome.setFileName(homeName);
+      dmsHome.setRelatedId(entity.getRelatedId());
+      dmsHome.setRelatedModel(entity.getRelatedModel());
+      dmsHome.setParent(dmsRoot);
+      dmsHome.setIsDirectory(true);
+      dmsHome = super.save(dmsHome); // should get id before it's child
+    }
 
-		super.remove(entity);
-	}
+    entity.setParent(dmsHome);
 
-	private DMSFile findFrom(Map<String, Object> json) {
-		if (json == null || json.get("id") == null) {
-			return null;
-		}
-		final Long id = Longs.tryParse(json.get("id").toString());
-		return find(id);
-	}
+    return super.save(entity);
+  }
 
-	private boolean canCreate(DMSFile parent) {
-		final User user = AuthUtils.getUser();
-		final Group group = user.getGroup();
-		if (parent.getCreatedBy() == user ||
-			security.hasRole("role.super") ||
-			security.hasRole("role.admin")) {
-			return true;
-		}
-		return dmsPermissions.all()
-			.filter("self.file = :file AND self.permission.canWrite = true AND "
-					+ "(self.user = :user OR self.group = :group)")
-			.bind("file", parent)
-			.bind("user", user)
-			.bind("group", group)
-			.autoFlush(false)
-			.count() > 0;
-	}
+  @Override
+  public void remove(DMSFile entity) {
+    // remove all children
+    if (entity.getIsDirectory() == Boolean.TRUE) {
+      final List<DMSFile> children = all().filter("self.parent.id = ?", entity.getId()).fetch();
+      for (DMSFile child : children) {
+        if (child != entity) {
+          remove(child);
+          ;
+        }
+      }
+    }
 
-	private boolean canOffline(DMSFile file, User user) {
-		return file.getIsDirectory() != Boolean.TRUE && file.getMetaFile() != null && dmsPermissions.all()
-				.filter("self.file = ? AND self.value = 'OFFLINE' AND self.user = ?", file, user).count() > 0;
-	}
+    // remove attached file
+    if (entity.getMetaFile() != null) {
+      final MetaFile metaFile = entity.getMetaFile();
+      long count = attachments.all().filter("self.metaFile = ?", metaFile).count();
+      if (count == 1) {
+        final MetaAttachment attachment =
+            attachments.all().filter("self.metaFile = ?", metaFile).fetchOne();
+        attachments.remove(attachment);
 
-	@Transactional
-	public DMSFile setOffline(DMSFile file, boolean offline) {
-		Preconditions.checkNotNull(file, "file can't be null");
+        // generate track message
+        createMessage(entity, true);
+      }
+      count = all().filter("self.metaFile = ?", metaFile).count();
+      if (count == 1) {
+        entity.setMetaFile(null);
+        try {
+          metaFiles.delete(metaFile);
+        } catch (IOException e) {
+          throw new PersistenceException(e);
+        }
+      }
+    }
 
-		// directory can't be marked as offline
-		if (file.getIsDirectory() == Boolean.TRUE) {
-			return file;
-		}
+    super.remove(entity);
+  }
 
-		final User user = AuthUtils.getUser();
-		boolean canOffline = canOffline(file, user);
+  private DMSFile findFrom(Map<String, Object> json) {
+    if (json == null || json.get("id") == null) {
+      return null;
+    }
+    final Long id = Longs.tryParse(json.get("id").toString());
+    return find(id);
+  }
 
-		if (offline == canOffline) {
-			return file;
-		}
+  private boolean canCreate(DMSFile parent) {
+    final User user = AuthUtils.getUser();
+    final Group group = user.getGroup();
+    if (parent.getCreatedBy() == user
+        || security.hasRole("role.super")
+        || security.hasRole("role.admin")) {
+      return true;
+    }
+    return dmsPermissions
+            .all()
+            .filter(
+                "self.file = :file AND self.permission.canWrite = true AND "
+                    + "(self.user = :user OR self.group = :group)")
+            .bind("file", parent)
+            .bind("user", user)
+            .bind("group", group)
+            .autoFlush(false)
+            .count()
+        > 0;
+  }
 
-		DMSPermission permission;
+  private boolean canOffline(DMSFile file, User user) {
+    return file.getIsDirectory() != Boolean.TRUE
+        && file.getMetaFile() != null
+        && dmsPermissions
+                .all()
+                .filter("self.file = ? AND self.value = 'OFFLINE' AND self.user = ?", file, user)
+                .count()
+            > 0;
+  }
 
-		if (offline) {
-			permission = new DMSPermission();
-			permission.setValue("OFFLINE");
-			permission.setFile(file);
-			permission.setUser(user);
-			file.addPermission(permission);
-		} else {
-			permission = dmsPermissions.all()
-					.filter("self.file = ? AND self.value = 'OFFLINE' AND self.user = ?", file, user).fetchOne();
-			file.removePermission(permission);
-			dmsPermissions.remove(permission);
-		}
+  @Transactional
+  public DMSFile setOffline(DMSFile file, boolean offline) {
+    Preconditions.checkNotNull(file, "file can't be null");
 
-		return this.save(file);
-	}
+    // directory can't be marked as offline
+    if (file.getIsDirectory() == Boolean.TRUE) {
+      return file;
+    }
 
-	public List<DMSFile> findOffline(int limit, int offset) {
-		return all()
-		.filter("self.permissions[].value = 'OFFLINE' AND self.permissions[].user = :user")
-		.bind("user", AuthUtils.getUser())
-		.fetch(limit, offset);
-	}
+    final User user = AuthUtils.getUser();
+    boolean canOffline = canOffline(file, user);
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public Map<String, Object> validate(Map<String, Object> json, Map<String, Object> context) {
-		final DMSFile file = findFrom(json);
-		final DMSFile parent = findFrom((Map<String, Object>) json.get("parent"));
-		if (parent == null) {
-			return json;
-		}
-		if (file != null && file.getParent() == parent) {
-			return json;
-		}
+    if (offline == canOffline) {
+      return file;
+    }
 
-		// check whether user can create/move document here
-		if (file == null  && !canCreate(parent)) {
-			throw new UnauthorizedException(I18n.get("You can't create document here."));
-		}
-		if (file != null && file.getParent() != parent && !canCreate(parent)) {
-			throw new UnauthorizedException(I18n.get("You can't move document here."));
-		}
+    DMSPermission permission;
 
-		return json;
-	}
+    if (offline) {
+      permission = new DMSPermission();
+      permission.setValue("OFFLINE");
+      permission.setFile(file);
+      permission.setUser(user);
+      file.addPermission(permission);
+    } else {
+      permission =
+          dmsPermissions
+              .all()
+              .filter("self.file = ? AND self.value = 'OFFLINE' AND self.user = ?", file, user)
+              .fetchOne();
+      file.removePermission(permission);
+      dmsPermissions.remove(permission);
+    }
 
-	@Override
-	public Map<String, Object> populate(Map<String, Object> json, Map<String, Object> context) {
-		final DMSFile file = findFrom(json);
-		if (file == null) {
-			return json;
-		}
+    return this.save(file);
+  }
 
-		boolean isFile = file.getIsDirectory() != Boolean.TRUE;
-		LocalDateTime dt = file.getUpdatedOn();
-		if (dt == null) {
-			dt = file.getCreatedOn();
-		}
+  public List<DMSFile> findOffline(int limit, int offset) {
+    return all()
+        .filter("self.permissions[].value = 'OFFLINE' AND self.permissions[].user = :user")
+        .bind("user", AuthUtils.getUser())
+        .fetch(limit, offset);
+  }
 
-		final User user = AuthUtils.getUser();
-		final MetaFile metaFile = file.getMetaFile();
+  @Override
+  @SuppressWarnings("unchecked")
+  public Map<String, Object> validate(Map<String, Object> json, Map<String, Object> context) {
+    final DMSFile file = findFrom(json);
+    final DMSFile parent = findFrom((Map<String, Object>) json.get("parent"));
+    if (parent == null) {
+      return json;
+    }
+    if (file != null && file.getParent() == parent) {
+      return json;
+    }
 
-		boolean canShare = file.getCreatedBy() == user ||
-				security.isPermitted(AccessType.CREATE, DMSFile.class, file.getId()) ||
-				dmsPermissions.all().filter(
-					"self.file = ? AND self.value = 'FULL' AND (self.user = ? OR self.group = ?)",
-					file, user, user.getGroup()).count() > 0;
+    // check whether user can create/move document here
+    if (file == null && !canCreate(parent)) {
+      throw new UnauthorizedException(I18n.get("You can't create document here."));
+    }
+    if (file != null && file.getParent() != parent && !canCreate(parent)) {
+      throw new UnauthorizedException(I18n.get("You can't move document here."));
+    }
 
-		json.put("typeIcon", isFile ? "fa fa-file" : "fa fa-folder");
-		json.put("downloadIcon", "fa fa-download");
-		json.put("detailsIcon", "fa fa-info-circle");
+    return json;
+  }
 
-		json.put("canShare", canShare);
-		json.put("canWrite", canCreate(file));
+  @Override
+  public Map<String, Object> populate(Map<String, Object> json, Map<String, Object> context) {
+    final DMSFile file = findFrom(json);
+    if (file == null) {
+      return json;
+    }
 
-		if (canOffline(file, user)) {
-			json.put("offline", true);
-		}
+    boolean isFile = file.getIsDirectory() != Boolean.TRUE;
+    LocalDateTime dt = file.getUpdatedOn();
+    if (dt == null) {
+      dt = file.getCreatedOn();
+    }
 
-		json.put("createdBy", Resource.toMapCompact(file.getCreatedBy()));
-		json.put("createdOn", file.getCreatedOn());
-		json.put("updatedBy", Resource.toMapCompact(file.getUpdatedBy()));
-		json.put("updatedOn", dt);
+    final User user = AuthUtils.getUser();
+    final MetaFile metaFile = file.getMetaFile();
 
-		if ("html".equals(file.getContentType())) {
-			json.put("fileType", "text/html");
-			json.put("contentType", "html");
-			json.put("typeIcon", "fa fa-file-text-o");
-			json.remove("downloadIcon");
-		}
-		if ("spreadsheet".equals(file.getContentType())) {
-			json.put("fileType", "text/json");
-			json.put("contentType", "spreadsheet");
-			json.put("typeIcon", "fa fa-file-excel-o");
-			json.remove("downloadIcon");
-		}
+    boolean canShare =
+        file.getCreatedBy() == user
+            || security.isPermitted(AccessType.CREATE, DMSFile.class, file.getId())
+            || dmsPermissions
+                    .all()
+                    .filter(
+                        "self.file = ? AND self.value = 'FULL' AND (self.user = ? OR self.group = ?)",
+                        file,
+                        user,
+                        user.getGroup())
+                    .count()
+                > 0;
 
-		if (metaFile != null) {
-			String fileType = metaFile.getFileType();
-			String fileIcon = metaFiles.fileTypeIcon(metaFile);
-			json.put("fileType", fileType);
-			json.put("typeIcon", "fa fa-colored " + fileIcon);
-			json.put("metaFile.sizeText", metaFile.getSizeText());
-		}
+    json.put("typeIcon", isFile ? "fa fa-file" : "fa fa-folder");
+    json.put("downloadIcon", "fa fa-download");
+    json.put("detailsIcon", "fa fa-info-circle");
 
-		if (file.getTags() != null) {
-			final List<Object> tags = new ArrayList<>();
-			for (DMSFileTag tag : file.getTags()) {
-				tags.add(Resource.toMap(tag, "id", "code", "name", "style"));
-			}
-			json.put("tags", tags);
-		}
+    json.put("canShare", canShare);
+    json.put("canWrite", canCreate(file));
 
-		return json;
-	}
+    if (canOffline(file, user)) {
+      json.put("offline", true);
+    }
+
+    json.put("createdBy", Resource.toMapCompact(file.getCreatedBy()));
+    json.put("createdOn", file.getCreatedOn());
+    json.put("updatedBy", Resource.toMapCompact(file.getUpdatedBy()));
+    json.put("updatedOn", dt);
+
+    if ("html".equals(file.getContentType())) {
+      json.put("fileType", "text/html");
+      json.put("contentType", "html");
+      json.put("typeIcon", "fa fa-file-text-o");
+      json.remove("downloadIcon");
+    }
+    if ("spreadsheet".equals(file.getContentType())) {
+      json.put("fileType", "text/json");
+      json.put("contentType", "spreadsheet");
+      json.put("typeIcon", "fa fa-file-excel-o");
+      json.remove("downloadIcon");
+    }
+
+    if (metaFile != null) {
+      String fileType = metaFile.getFileType();
+      String fileIcon = metaFiles.fileTypeIcon(metaFile);
+      json.put("fileType", fileType);
+      json.put("typeIcon", "fa fa-colored " + fileIcon);
+      json.put("metaFile.sizeText", metaFile.getSizeText());
+    }
+
+    if (file.getTags() != null) {
+      final List<Object> tags = new ArrayList<>();
+      for (DMSFileTag tag : file.getTags()) {
+        tags.add(Resource.toMap(tag, "id", "code", "name", "style"));
+      }
+      json.put("tags", tags);
+    }
+
+    return json;
+  }
 }

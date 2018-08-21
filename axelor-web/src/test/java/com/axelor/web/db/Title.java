@@ -17,44 +17,42 @@
  */
 package com.axelor.web.db;
 
+import com.axelor.db.JpaModel;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.axelor.db.JpaModel;
-
 @Entity
 public class Title extends JpaModel {
 
-	@NotNull
-	@Size( min = 2 )
-	private String code;
-	
-	@NotNull
-	@Size( min = 2 )
-	private String name;
-	
-	public Title() {
-	}
+  @NotNull
+  @Size(min = 2)
+  private String code;
 
-	public Title(String code, String name) {
-		this.code = code;
-		this.name = name;
-	}
+  @NotNull
+  @Size(min = 2)
+  private String name;
 
-	public String getCode() {
-		return code;
-	}
+  public Title() {}
 
-	public void setCode(String code) {
-		this.code = code;
-	}
+  public Title(String code, String name) {
+    this.code = code;
+    this.name = name;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public String getCode() {
+    return code;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public void setCode(String code) {
+    this.code = code;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
 }

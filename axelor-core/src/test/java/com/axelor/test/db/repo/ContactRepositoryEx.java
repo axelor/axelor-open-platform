@@ -21,7 +21,7 @@ import com.axelor.test.db.Contact;
 
 public class ContactRepositoryEx extends ContactRepository {
 
-	public Contact findByEmail(String email) {
-		return all().filter("self.email = ?", email).fetchOne();
-	}
+  public Contact findByEmail(String email) {
+    return all().filter("self.email = ?", email).fetchOne();
+  }
 }

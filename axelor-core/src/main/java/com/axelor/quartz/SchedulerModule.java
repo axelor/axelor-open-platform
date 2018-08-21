@@ -17,21 +17,17 @@
  */
 package com.axelor.quartz;
 
+import com.google.inject.AbstractModule;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.StdSchedulerFactory;
 
-import com.google.inject.AbstractModule;
-
-/**
- * The default guice module for quartz scheduler.
- * 
- */
+/** The default guice module for quartz scheduler. */
 public class SchedulerModule extends AbstractModule {
 
-	@Override
-	protected void configure() {
-		bind(SchedulerFactory.class).to(StdSchedulerFactory.class);
-		bind(Scheduler.class).toProvider(SchedulerProvider.class);
-	}
+  @Override
+  protected void configure() {
+    bind(SchedulerFactory.class).to(StdSchedulerFactory.class);
+    bind(Scheduler.class).toProvider(SchedulerProvider.class);
+  }
 }

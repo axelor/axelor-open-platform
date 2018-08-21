@@ -17,11 +17,12 @@
  */
 package com.axelor.db.tenants;
 
+import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -32,109 +33,104 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.axelor.auth.AuthUtils;
-import com.axelor.auth.db.User;
-
-/**
- * The {@link AbstractTenantFilter} provides common code for all tenant filters.
- *
- */
+/** The {@link AbstractTenantFilter} provides common code for all tenant filters. */
 public abstract class AbstractTenantFilter implements Filter {
 
-	protected static final String TENANT_COOKIE_NAME = "TENANTID";
-	protected static final String TENANT_LOGIN_PARAM = "tenantId";
+  protected static final String TENANT_COOKIE_NAME = "TENANTID";
+  protected static final String TENANT_LOGIN_PARAM = "tenantId";
 
-	protected static final String SESSION_KEY_TENANT_MAP = "tenantMap";
-	protected static final String SESSION_KEY_TENANT_ID = TENANT_LOGIN_PARAM;
+  protected static final String SESSION_KEY_TENANT_MAP = "tenantMap";
+  protected static final String SESSION_KEY_TENANT_ID = TENANT_LOGIN_PARAM;
 
-	protected static final String SESSION_KEY_PREFIX_SHIRO = "org.apache.shiro";
+  protected static final String SESSION_KEY_PREFIX_SHIRO = "org.apache.shiro";
 
-	private boolean enabled;
-	private AtomicBoolean cleared = new AtomicBoolean();
+  private boolean enabled;
+  private AtomicBoolean cleared = new AtomicBoolean();
 
-	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-		enabled = TenantModule.isEnabled();
-	}
+  @Override
+  public void init(FilterConfig filterConfig) throws ServletException {
+    enabled = TenantModule.isEnabled();
+  }
 
-	@Override
-	public void destroy() {
-	}
+  @Override
+  public void destroy() {}
 
-	@Override
-	public final void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
-		if (enabled) {
-			doFilterInternal(request, response, chain);
-		} else {
-			if (!cleared.getAndSet(true)) {
-				((HttpServletRequest) request).removeAttribute(SESSION_KEY_TENANT_MAP);
-			}
-			chain.doFilter(request, response);
-		}
-	}
+  @Override
+  public final void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+      throws IOException, ServletException {
+    if (enabled) {
+      doFilterInternal(request, response, chain);
+    } else {
+      if (!cleared.getAndSet(true)) {
+        ((HttpServletRequest) request).removeAttribute(SESSION_KEY_TENANT_MAP);
+      }
+      chain.doFilter(request, response);
+    }
+  }
 
-	protected abstract void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException;
+  protected abstract void doFilterInternal(
+      ServletRequest request, ServletResponse response, FilterChain chain)
+      throws IOException, ServletException;
 
-	private boolean canAccess(TenantConfig config) {
-		final User user;
-		try {
-			user = AuthUtils.getUser();
-		} catch (TenantNotFoundException e) {
-			return false;
-		}
-		final TenantConfigProvider provider = TenantSupport.get().getConfigProvider();
-		return provider.hasAccess(user, config);
-	}
+  private boolean canAccess(TenantConfig config) {
+    final User user;
+    try {
+      user = AuthUtils.getUser();
+    } catch (TenantNotFoundException e) {
+      return false;
+    }
+    final TenantConfigProvider provider = TenantSupport.get().getConfigProvider();
+    return provider.hasAccess(user, config);
+  }
 
-	protected Map<String, String> getTenants(boolean all) {
-		final TenantConfigProvider provider = TenantSupport.get().getConfigProvider();
-		final Map<String, String> map = new LinkedHashMap<>();
-		String first = null;
-		for (TenantConfig config : provider.findAll(TenantResolver.CURRENT_HOST.get())) {
-			if (config.getActive() == Boolean.FALSE || config.getVisible() == Boolean.FALSE) {
-				continue;
-			}
-			if (!all && !canAccess(config)) {
-				continue;
-			}
-			if (first == null) {
-				first = config.getTenantId();
-			}
-			map.put(config.getTenantId(), config.getTenantName());
-		}
-		return map;
-	}
+  protected Map<String, String> getTenants(boolean all) {
+    final TenantConfigProvider provider = TenantSupport.get().getConfigProvider();
+    final Map<String, String> map = new LinkedHashMap<>();
+    String first = null;
+    for (TenantConfig config : provider.findAll(TenantResolver.CURRENT_HOST.get())) {
+      if (config.getActive() == Boolean.FALSE || config.getVisible() == Boolean.FALSE) {
+        continue;
+      }
+      if (!all && !canAccess(config)) {
+        continue;
+      }
+      if (first == null) {
+        first = config.getTenantId();
+      }
+      map.put(config.getTenantId(), config.getTenantName());
+    }
+    return map;
+  }
 
-	protected Cookie getCookie(HttpServletRequest request, String name) {
-		final Cookie[] cookies = request.getCookies();
-		if (cookies != null) {
-			for (Cookie cookie : cookies) {
-				if (name.equals(cookie.getName())) {
-					return cookie;
-				}
-			}
-		}
-		return null;
-	}
+  protected Cookie getCookie(HttpServletRequest request, String name) {
+    final Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if (name.equals(cookie.getName())) {
+          return cookie;
+        }
+      }
+    }
+    return null;
+  }
 
-	protected void setCookie(HttpServletRequest request, HttpServletResponse response, String name, String value) {
-		Cookie cookie = getCookie(request, name);
-		if (cookie == null) {
-			cookie = new Cookie(name, value);
-		} else {
-			cookie.setValue(value);
-		}
-		cookie.setHttpOnly(true);
-		cookie.setMaxAge(60 * 60 * 24 * 7);
-		response.addCookie(cookie);
-	}
+  protected void setCookie(
+      HttpServletRequest request, HttpServletResponse response, String name, String value) {
+    Cookie cookie = getCookie(request, name);
+    if (cookie == null) {
+      cookie = new Cookie(name, value);
+    } else {
+      cookie.setValue(value);
+    }
+    cookie.setHttpOnly(true);
+    cookie.setMaxAge(60 * 60 * 24 * 7);
+    response.addCookie(cookie);
+  }
 
-	protected static boolean isXHR(ServletRequest request) {
-		final HttpServletRequest req = (HttpServletRequest) request;
-		return "XMLHttpRequest".equals(req.getHeader("X-Requested-With"))
-				|| "application/json".equals(req.getHeader("Accept"))
-				|| "application/json".equals(req.getHeader("Content-Type"));
-	}
+  protected static boolean isXHR(ServletRequest request) {
+    final HttpServletRequest req = (HttpServletRequest) request;
+    return "XMLHttpRequest".equals(req.getHeader("X-Requested-With"))
+        || "application/json".equals(req.getHeader("Accept"))
+        || "application/json".equals(req.getHeader("Content-Type"));
+  }
 }

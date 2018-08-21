@@ -17,76 +17,70 @@
  */
 package com.axelor.report;
 
+import com.axelor.JpaTest;
+import com.axelor.test.GuiceModules;
+import com.axelor.test.db.Contact;
+import com.axelor.test.db.repo.ContactRepository;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.inject.Inject;
-
 import org.eclipse.birt.report.engine.api.IReportEngine;
 import org.eclipse.birt.report.model.api.IResourceLocator;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.axelor.JpaTest;
-import com.axelor.test.GuiceModules;
-import com.axelor.test.db.Contact;
-import com.axelor.test.db.repo.ContactRepository;
-
 @GuiceModules(MyModule.class)
 public class ReportTest extends JpaTest {
 
-	private static final String DESIGN = "contacts.rptdesign";
+  private static final String DESIGN = "contacts.rptdesign";
 
-	@Inject
-	private IReportEngine engine;
+  @Inject private IReportEngine engine;
 
-	@Inject
-	private ReportGenerator generator;
+  @Inject private ReportGenerator generator;
 
-	@Inject
-	private ContactRepository contacts;
+  @Inject private ContactRepository contacts;
 
-	@Test
-	public void testEngine() {
-		Assert.assertNotNull(engine);
-		Assert.assertNotNull(generator);
-	}
+  @Test
+  public void testEngine() {
+    Assert.assertNotNull(engine);
+    Assert.assertNotNull(generator);
+  }
 
-	@Test
-	public void testResourceLocator() {
-		IResourceLocator locator = engine.getConfig().getResourceLocator();
-		URL found = locator.findResource(null, DESIGN, IResourceLocator.OTHERS);
-		Assert.assertNotNull(found);
-	}
+  @Test
+  public void testResourceLocator() {
+    IResourceLocator locator = engine.getConfig().getResourceLocator();
+    URL found = locator.findResource(null, DESIGN, IResourceLocator.OTHERS);
+    Assert.assertNotNull(found);
+  }
 
-	@Test
-	public void testRender() {
+  @Test
+  public void testRender() {
 
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		Map<String, Object> params = new HashMap<>();
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
+    Map<String, Object> params = new HashMap<>();
 
-		try {
-			try {
-				generator.generate(output, DESIGN, "html", params);
-			} finally {
-				output.close();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail(e.getMessage());
-		}
+    try {
+      try {
+        generator.generate(output, DESIGN, "html", params);
+      } finally {
+        output.close();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      Assert.fail(e.getMessage());
+    }
 
-		byte[] bytes = output.toByteArray();
+    byte[] bytes = output.toByteArray();
 
-		Assert.assertNotNull(bytes);
-		Assert.assertTrue(bytes.length > 0);
+    Assert.assertNotNull(bytes);
+    Assert.assertTrue(bytes.length > 0);
 
-		String html = new String(bytes);
+    String html = new String(bytes);
 
-		for (Contact contact : contacts.all().fetch()) {
-			Assert.assertTrue(html.contains(contact.getFullName()));
-		}
-	}
+    for (Contact contact : contacts.all().fetch()) {
+      Assert.assertTrue(html.contains(contact.getFullName()));
+    }
+  }
 }

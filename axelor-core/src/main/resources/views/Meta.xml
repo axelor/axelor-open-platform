@@ -41,7 +41,7 @@
     <option value="inverse">Inverse</option>
     <option value="info">Information</option>
   </selection>
-  
+
   <selection name="help.type.selection">
     <option value="tooltip">Tooltip</option>
     <option value="placeholder">Placeholder</option>
@@ -59,7 +59,7 @@
     <field name="pending" width="100"/>
     <button name="btnInstall" icon="fa-download" help="Install module" onClick="com.axelor.meta.web.ModuleController:validInstall(name),com.axelor.meta.web.ModuleController:install(name)" readonlyIf="installed || pending"/>
   </grid>
-  
+
   <form name="meta-module-form" title="Module" model="com.axelor.meta.db.MetaModule"
     canAttach="false" canCopy="false" canNew="false" canDelete="false" canEdit="false">
     <panel title="Module">
@@ -82,14 +82,14 @@
       <field name="description" showTitle="false" colSpan="12"/>
     </panel>
   </form>
-  
+
   <grid title="Views" name="simple-meta-view-grid" model="com.axelor.meta.db.MetaView" orderBy="priority,name">
     <field name="name"/>
     <field name="title"/>
     <field name="type"/>
     <field name="priority" width="75"/>
   </grid>
-  
+
   <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView" orderBy="priority,name">
     <toolbar>
       <button name="restoreAll" icon="fa-undo" help="Restore all..." prompt="All the customizations will be lost. Are you sure ?" onClick="action-meta-restore-all"/>
@@ -101,7 +101,7 @@
     <field name="module"/>
     <field name="priority" width="75"/>
   </grid>
-  
+
   <grid title="All Charts" name="meta-view-chart-grid" model="com.axelor.meta.db.MetaView" orderBy="priority,name">
     <field name="name"/>
     <field name="title"/>
@@ -113,7 +113,7 @@
     <attribute for="type" name="value" expr="#{defaultType}"/>
   </action-attrs>
 
-  <form name="meta-view-form" title="View" model="com.axelor.meta.db.MetaView" 
+  <form name="meta-view-form" title="View" model="com.axelor.meta.db.MetaView"
     onNew="action-view-defaults"
     onSave="action-view-validate,com.axelor.meta.web.MetaController:clearCache" width="large" >
     <panel title="Overview">
@@ -179,9 +179,9 @@
       <field name="xml" showTitle="false" widget="CodeEditor" height="500" x-code-syntax="xml" colSpan="12"/>
     </panel>
   </form>
-  
+
   <grid title="Menu Items" name="simple-meta-menu-grid" model="com.axelor.meta.db.MetaMenu">
-  	<field name="name"/>
+    <field name="name"/>
     <field name="title"/>
     <field name="priority" width="75"/>
   </grid>
@@ -205,7 +205,7 @@
     <field name="link"/>
     <field name="priority" width="100"/>
   </grid>
-  
+
   <form name="meta-menu-fav-form" title="Favorite" model="com.axelor.meta.db.MetaMenu" canNew="false">
     <panel title="Overview">
       <field name="title"/>
@@ -213,7 +213,7 @@
       <field name="link" colSpan="12" />
     </panel>
   </form>
-  
+
   <action-view name="menus.fav" model="com.axelor.meta.db.MetaMenu" title="Favorites">
     <view name="meta-menu-fav-grid" type="grid"/>
     <view name="meta-menu-fav-form" type="form"/>
@@ -319,16 +319,16 @@
   <action-method name="action-meta-restore-all">
     <call class="com.axelor.meta.web.MetaController" method="restoreAll"/>
   </action-method>
-  
-  <grid name="meta-model-grid" title="Models" model="com.axelor.meta.db.MetaModel" 
-  	canNew="false" canEdit="false" canDelete="false" edit-icon="false">
+
+  <grid name="meta-model-grid" title="Models" model="com.axelor.meta.db.MetaModel"
+    canNew="false" canEdit="false" canDelete="false" edit-icon="false">
     <field name="packageName"/>
     <field name="name"/>
     <field name="tableName"/>
   </grid>
 
   <form name="meta-model-form" title="Model" model="com.axelor.meta.db.MetaModel"
-  	canAttach="false" canCopy="false" canNew="false" canDelete="false" canEdit="false">
+    canAttach="false" canCopy="false" canNew="false" canDelete="false" canEdit="false">
     <panel title="Overview">
       <field name="name"/>
       <field name="tableName"/>
@@ -379,7 +379,7 @@
     <field name="message"/>
     <field name="language"/>
   </grid>
-  
+
   <form title="Translation" name="meta-translations-form" model="com.axelor.meta.db.MetaTranslation">
     <panel title="Translation" itemSpan="12">
       <field name="key"/>
@@ -418,7 +418,7 @@
       <field name="help" showTitle="false" colSpan="12" />
     </panel>
   </form>
-  
+
   <grid title="All Menu Help" name="meta-help-menu-grid" model="com.axelor.meta.db.MetaHelp">
     <field name="menu" />
     <field name="language" />

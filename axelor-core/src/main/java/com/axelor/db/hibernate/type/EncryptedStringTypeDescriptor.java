@@ -17,28 +17,27 @@
  */
 package com.axelor.db.hibernate.type;
 
+import com.axelor.db.converters.EncryptedStringConverter;
 import org.hibernate.type.descriptor.WrapperOptions;
 import org.hibernate.type.descriptor.java.StringTypeDescriptor;
 
-import com.axelor.db.converters.EncryptedStringConverter;
-
 public class EncryptedStringTypeDescriptor extends StringTypeDescriptor {
 
-	private static final long serialVersionUID = -6042582999686819489L;
+  private static final long serialVersionUID = -6042582999686819489L;
 
-	public static final EncryptedStringTypeDescriptor INSTANCE = new EncryptedStringTypeDescriptor();
+  public static final EncryptedStringTypeDescriptor INSTANCE = new EncryptedStringTypeDescriptor();
 
-	private static final EncryptedStringConverter CONVERTER = new EncryptedStringConverter();
+  private static final EncryptedStringConverter CONVERTER = new EncryptedStringConverter();
 
-	@Override
-	public <X> X unwrap(String value, Class<X> type, WrapperOptions options) {
-		String encrypted = CONVERTER.convertToDatabaseColumn(value);
-		return super.unwrap(encrypted, type, options);
-	}
+  @Override
+  public <X> X unwrap(String value, Class<X> type, WrapperOptions options) {
+    String encrypted = CONVERTER.convertToDatabaseColumn(value);
+    return super.unwrap(encrypted, type, options);
+  }
 
-	@Override
-	public <X> String wrap(X value, WrapperOptions options) {
-		String encrypted = super.wrap(value, options);
-		return CONVERTER.convertToEntityAttribute(encrypted);
-	}
+  @Override
+  public <X> String wrap(X value, WrapperOptions options) {
+    String encrypted = super.wrap(value, options);
+    return CONVERTER.convertToEntityAttribute(encrypted);
+  }
 }

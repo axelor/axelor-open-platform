@@ -17,36 +17,36 @@
  */
 package com.axelor.web;
 
+import com.axelor.test.WebServer;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import com.axelor.test.WebServer;
-
 public abstract class AbstractTest {
 
-	private static WebServer server;
+  private static WebServer server;
 
-	@BeforeClass
-	public static void setUp() {
-		if (server == null) {
-			server = WebServer.create(new WebTestModule());
-		}
-		server.start();
-	}
+  @BeforeClass
+  public static void setUp() {
+    if (server == null) {
+      server = WebServer.create(new WebTestModule());
+    }
+    server.start();
+  }
 
-	@AfterClass
-	public static void tearDown(){
-		if (server != null) {
-			server.stop();
-		}
-	}
-	
-	protected Invocation.Builder jsonPath(String path) {
-		return server.target().path(path)
-				.request(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON);
-	}
+  @AfterClass
+  public static void tearDown() {
+    if (server != null) {
+      server.stop();
+    }
+  }
+
+  protected Invocation.Builder jsonPath(String path) {
+    return server
+        .target()
+        .path(path)
+        .request(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON);
+  }
 }

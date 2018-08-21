@@ -17,83 +17,81 @@
  */
 package com.axelor.web.tags;
 
+import com.axelor.app.AppSettings;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 
-import com.axelor.app.AppSettings;
-
 public abstract class AbstractTag extends SimpleTagSupport {
 
-	private String src;
+  private String src;
 
-	private boolean production = AppSettings.get().isProduction();
+  private boolean production = AppSettings.get().isProduction();
 
-	public String getSrc() {
-		return src;
-	}
+  public String getSrc() {
+    return src;
+  }
 
-	public void setSrc(String src) {
-		this.src = src;
-	}
+  public void setSrc(String src) {
+    this.src = src;
+  }
 
-	private boolean exists(String path) {
-		try {
-			return getResource(path) != null;
-		} catch (MalformedURLException e) {
-			return false;
-		}
-	}
+  private boolean exists(String path) {
+    try {
+      return getResource(path) != null;
+    } catch (MalformedURLException e) {
+      return false;
+    }
+  }
 
-	protected URL getResource(String path) throws MalformedURLException {
-		final String resource = path.startsWith("/") ? path : "/" + path;
-		final PageContext ctx = (PageContext) getJspContext();
-		return ctx.getServletContext().getResource(resource);
-	}
+  protected URL getResource(String path) throws MalformedURLException {
+    final String resource = path.startsWith("/") ? path : "/" + path;
+    final PageContext ctx = (PageContext) getJspContext();
+    return ctx.getServletContext().getResource(resource);
+  }
 
-	protected List<String> getScripts() throws IOException {
-		return Arrays.asList(src);
-	}
+  protected List<String> getScripts() throws IOException {
+    return Arrays.asList(src);
+  }
 
-	protected abstract void doTag(String src) throws IOException;
+  protected abstract void doTag(String src) throws IOException;
 
-	private boolean gzipSupported() {
-		final PageContext context = (PageContext) getJspContext();
-		final HttpServletRequest req = (HttpServletRequest) context.getRequest();
-		final String encodings = req.getHeader("Accept-Encoding");
-		return encodings != null && encodings.toLowerCase().contains("gzip");
-	}
+  private boolean gzipSupported() {
+    final PageContext context = (PageContext) getJspContext();
+    final HttpServletRequest req = (HttpServletRequest) context.getRequest();
+    final String encodings = req.getHeader("Accept-Encoding");
+    return encodings != null && encodings.toLowerCase().contains("gzip");
+  }
 
-	@Override
-	public void doTag() throws JspException, IOException {
+  @Override
+  public void doTag() throws JspException, IOException {
 
-		if (production) {
-			final String gzipped = src.replaceAll("^(js|css)\\/(.*)\\.(js|css)$", "dist/$2.gzip.$3");
-			if (exists(gzipped) && gzipSupported()) {
-				doTag(gzipped);
-				return;
-			}
-			final String minified = src.replaceAll("^(js|css)\\/(.*)\\.(js|css)$", "dist/$2.min.$3");
-			if (exists(minified)) {
-				doTag(minified);
-				return;
-			}
-		}
+    if (production) {
+      final String gzipped = src.replaceAll("^(js|css)\\/(.*)\\.(js|css)$", "dist/$2.gzip.$3");
+      if (exists(gzipped) && gzipSupported()) {
+        doTag(gzipped);
+        return;
+      }
+      final String minified = src.replaceAll("^(js|css)\\/(.*)\\.(js|css)$", "dist/$2.min.$3");
+      if (exists(minified)) {
+        doTag(minified);
+        return;
+      }
+    }
 
-		final List<String> scripts = getScripts();
-		if (scripts == null || scripts.isEmpty()) {
-			return;
-		}
+    final List<String> scripts = getScripts();
+    if (scripts == null || scripts.isEmpty()) {
+      return;
+    }
 
-		for (String script : scripts) {
-			doTag(script);
-		}
-	}
+    for (String script : scripts) {
+      doTag(script);
+    }
+  }
 }

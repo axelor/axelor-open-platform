@@ -2,7 +2,7 @@
 <object-views xmlns="http://axelor.com/xml/ns/object-views"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
-  
+
   <dashboard name="welcome" title="Welcome!">
     <dashlet title="All Contact" action="contact.all"/>
     <dashlet title="Business Contacts" action="contacts.business"/>

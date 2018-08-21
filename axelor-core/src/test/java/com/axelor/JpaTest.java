@@ -17,37 +17,34 @@
  */
 package com.axelor;
 
-import javax.inject.Inject;
-
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
-
 import com.axelor.db.JpaFixture;
 import com.axelor.db.JpaSupport;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.GuiceRunner;
 import com.axelor.test.db.Contact;
 import com.google.inject.persist.Transactional;
+import javax.inject.Inject;
+import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 
 @RunWith(GuiceRunner.class)
-@GuiceModules({ JpaTestModule.class })
+@GuiceModules({JpaTestModule.class})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class JpaTest extends JpaSupport {
 
-	@Inject
-	private JpaFixture fixture;
+  @Inject private JpaFixture fixture;
 
-	@Before
-	@Transactional
-	public void setUp() {
-		if (all(Contact.class).count() == 0) {
-			fixture.load("demo-data.yml");
-		}
-	}
+  @Before
+  @Transactional
+  public void setUp() {
+    if (all(Contact.class).count() == 0) {
+      fixture.load("demo-data.yml");
+    }
+  }
 
-	protected void fixture(String name) {
-		fixture.load(name);
-	}
+  protected void fixture(String name) {
+    fixture.load(name);
+  }
 }

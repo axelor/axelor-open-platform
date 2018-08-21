@@ -17,13 +17,6 @@
  */
 package com.axelor.meta.schema.views;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
-
 import com.axelor.i18n.I18n;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -31,92 +24,92 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("search-filters")
 public class SearchFilters extends AbstractView {
 
-	@XmlElement(name = "field", type = Field.class)
-	private List<AbstractWidget> items;
+  @XmlElement(name = "field", type = Field.class)
+  private List<AbstractWidget> items;
 
-	@XmlElement(name = "filter")
-	private List<SearchFilter> filters;
+  @XmlElement(name = "filter")
+  private List<SearchFilter> filters;
 
-	public List<AbstractWidget> getItems() {
-		return items;
-	}
+  public List<AbstractWidget> getItems() {
+    return items;
+  }
 
-	public List<SearchFilter> getFilters() {
-		if(filters != null) {
-			for (SearchFilter searchFilter : filters) {
-				searchFilter.setModel(super.getModel());
-			}
-		}
-		return filters;
-	}
+  public List<SearchFilter> getFilters() {
+    if (filters != null) {
+      for (SearchFilter searchFilter : filters) {
+        searchFilter.setModel(super.getModel());
+      }
+    }
+    return filters;
+  }
 
-	@XmlType
-	@JsonInclude(Include.NON_NULL)
-	public static class SearchFilter {
+  @XmlType
+  @JsonInclude(Include.NON_NULL)
+  public static class SearchFilter {
 
-		@XmlAttribute
-		private String title;
+    @XmlAttribute private String title;
 
-		@XmlElement
-		private String domain;
+    @XmlElement private String domain;
 
-		@JsonIgnore
-		private String model;
+    @JsonIgnore private String model;
 
-		@JsonIgnore
-		@XmlElement(name = "context")
-		private List<SearchContext> contexts;
+    @JsonIgnore
+    @XmlElement(name = "context")
+    private List<SearchContext> contexts;
 
-		@JsonGetter("title")
-		public String getLocalizedTitle() {
-			return I18n.get(title);
-		}
+    @JsonGetter("title")
+    public String getLocalizedTitle() {
+      return I18n.get(title);
+    }
 
-		@JsonIgnore
-		public String getTitle() {
-			return title;
-		}
+    @JsonIgnore
+    public String getTitle() {
+      return title;
+    }
 
-		public String getDomain() {
-			return domain;
-		}
+    public String getDomain() {
+      return domain;
+    }
 
-		public void setModel(String model) {
-			this.model = model;
-		}
+    public void setModel(String model) {
+      this.model = model;
+    }
 
-		public Map<String, Object> getContext() {
-			if (contexts == null || contexts.isEmpty()) {
-				return null;
-			}
-			Map<String, Object> context = Maps.newHashMap();
-			for(SearchContext ctx : contexts) {
-				context.put(ctx.getName(), ctx.getValue());
-			}
-			return context;
-		}
-	}
+    public Map<String, Object> getContext() {
+      if (contexts == null || contexts.isEmpty()) {
+        return null;
+      }
+      Map<String, Object> context = Maps.newHashMap();
+      for (SearchContext ctx : contexts) {
+        context.put(ctx.getName(), ctx.getValue());
+      }
+      return context;
+    }
+  }
 
-	@XmlType
-	public static class SearchContext {
+  @XmlType
+  public static class SearchContext {
 
-		@XmlAttribute
-		private String name;
+    @XmlAttribute private String name;
 
-		@XmlAttribute
-		private String value;
+    @XmlAttribute private String value;
 
-		public String getName() {
-			return name;
-		}
+    public String getName() {
+      return name;
+    }
 
-		public String getValue() {
-			return value;
-		}
-	}
+    public String getValue() {
+      return value;
+    }
+  }
 }

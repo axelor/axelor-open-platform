@@ -22,6 +22,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
+import com.axelor.inject.Beans;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,241 +45,243 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axelor.inject.Beans;
-
 public final class ViewWatcher {
-	
-	private static final Logger log = LoggerFactory.getLogger(ViewWatcher.class);
 
-	private static ViewWatcher instance;
+  private static final Logger log = LoggerFactory.getLogger(ViewWatcher.class);
 
-	private WatchService watcher;
-	private final Map<WatchKey, Path> keys = new HashMap<>();
-	private final List<ViewChangeEvent> pending = new ArrayList<>();
+  private static ViewWatcher instance;
 
-	private Thread runner;
-	private boolean running;
+  private WatchService watcher;
+  private final Map<WatchKey, Path> keys = new HashMap<>();
+  private final List<ViewChangeEvent> pending = new ArrayList<>();
 
-	private ViewWatcher() {
-	}
+  private Thread runner;
+  private boolean running;
 
-	public static ViewWatcher getInstance() {
-		if (instance == null) {
-			instance = new ViewWatcher();
-			instance.start();
-		}
-		return instance;
-	}
+  private ViewWatcher() {}
 
-	synchronized static void process() {
-		final ViewWatcher watcher = getInstance();
-		if (watcher.pending.isEmpty()) {
-			return;
-		}
-		final ViewLoader loader = Beans.get(ViewLoader.class);
-		try {
-			watcher.pending.forEach(event -> {
-				if (event.isDelete()) {
-					// complete re-import is required
-					log.warn("File deleted: {}", event.getFile());
-				} else {
-					log.info("Updating views from: {}", event.getFile());
-					try {
-						loader.updateFrom(event.getFile(), event.getModule());
-					} catch (Exception e) {
-						log.error("Unable to update views from: {}", event.getFile(), e);
-					}
-				}
-			});
-		} finally {
-			watcher.pending.clear();
-		}
-	}
+  public static ViewWatcher getInstance() {
+    if (instance == null) {
+      instance = new ViewWatcher();
+      instance.start();
+    }
+    return instance;
+  }
 
-	private synchronized void addPending(ViewChangeEvent event) {
-		if (pending.contains(event)) {
-			pending.remove(event);
-		}
-		pending.add(0, event);
-	}
+  static synchronized void process() {
+    final ViewWatcher watcher = getInstance();
+    if (watcher.pending.isEmpty()) {
+      return;
+    }
+    final ViewLoader loader = Beans.get(ViewLoader.class);
+    try {
+      watcher.pending.forEach(
+          event -> {
+            if (event.isDelete()) {
+              // complete re-import is required
+              log.warn("File deleted: {}", event.getFile());
+            } else {
+              log.info("Updating views from: {}", event.getFile());
+              try {
+                loader.updateFrom(event.getFile(), event.getModule());
+              } catch (Exception e) {
+                log.error("Unable to update views from: {}", event.getFile(), e);
+              }
+            }
+          });
+    } finally {
+      watcher.pending.clear();
+    }
+  }
 
-	private boolean handleEvents() {
-	    // wait for key to be signaled
-		final WatchKey key;
-		try {
-			key = watcher.take();
-		} catch (InterruptedException e) {
-			return false;
-		}
+  private synchronized void addPending(ViewChangeEvent event) {
+    if (pending.contains(event)) {
+      pending.remove(event);
+    }
+    pending.add(0, event);
+  }
 
-		final Path dir = keys.get(key);
-		if (dir == null) {
-			return false;
-		}
+  private boolean handleEvents() {
+    // wait for key to be signaled
+    final WatchKey key;
+    try {
+      key = watcher.take();
+    } catch (InterruptedException e) {
+      return false;
+    }
 
-		for (WatchEvent<?> event : key.pollEvents()) {
-			final WatchEvent.Kind<?> kind = event.kind();
-			if (kind == OVERFLOW) {
-				continue;
-			}
-			final Path file = dir.resolve((Path) event.context());
-			final Path module = dir.resolve(Paths.get("..", "..", "..", "..")).normalize();
-			addPending(new ViewChangeEvent(kind, file, module.toFile().getName()));
-		}
+    final Path dir = keys.get(key);
+    if (dir == null) {
+      return false;
+    }
 
-		boolean valid = key.reset();
-		if (!valid) {
-			keys.remove(key);
-			if (keys.isEmpty()) {
-				return false;
-			}
-		}
+    for (WatchEvent<?> event : key.pollEvents()) {
+      final WatchEvent.Kind<?> kind = event.kind();
+      if (kind == OVERFLOW) {
+        continue;
+      }
+      final Path file = dir.resolve((Path) event.context());
+      final Path module = dir.resolve(Paths.get("..", "..", "..", "..")).normalize();
+      addPending(new ViewChangeEvent(kind, file, module.toFile().getName()));
+    }
 
-		return true;
-	}
+    boolean valid = key.reset();
+    if (!valid) {
+      keys.remove(key);
+      if (keys.isEmpty()) {
+        return false;
+      }
+    }
 
-	private synchronized void registerAll() throws Exception {
-		final Pattern pattern = Pattern.compile(".*propertiesFilePath=([^,]+).*");
-		final Set<Path> paths = ManagementFactory.getRuntimeMXBean().getInputArguments().stream()
-			.filter(s -> s.startsWith("-javaagent"))
-			.map(s -> pattern.matcher(s))
-			.filter(m -> m.matches())
-			.map(m -> m.group(1).trim())
-			.map(Paths::get)
-			.flatMap(file -> {
-				final Properties props = new Properties();
-				try (InputStream is = new FileInputStream(file.toFile())) {
-					props.load(is);
-				} catch (IOException e) {
-					log.error("unable to read: {}", file, e);
-					throw new UncheckedIOException(e);
-				}
-				final String resources = props.getProperty("watchResources", "");
-				return Stream.of(resources.split(","));
-			})
-			.map(String::trim)
-			.map(Paths::get)
-			.map(p -> p.resolve("views"))
-			.filter(Files::exists)
-			.filter(Files::isDirectory)
-			.collect(Collectors.toSet());
+    return true;
+  }
 
-		if (paths.isEmpty()) {
-			return;
-		}
+  private synchronized void registerAll() throws Exception {
+    final Pattern pattern = Pattern.compile(".*propertiesFilePath=([^,]+).*");
+    final Set<Path> paths =
+        ManagementFactory.getRuntimeMXBean()
+            .getInputArguments()
+            .stream()
+            .filter(s -> s.startsWith("-javaagent"))
+            .map(s -> pattern.matcher(s))
+            .filter(m -> m.matches())
+            .map(m -> m.group(1).trim())
+            .map(Paths::get)
+            .flatMap(
+                file -> {
+                  final Properties props = new Properties();
+                  try (InputStream is = new FileInputStream(file.toFile())) {
+                    props.load(is);
+                  } catch (IOException e) {
+                    log.error("unable to read: {}", file, e);
+                    throw new UncheckedIOException(e);
+                  }
+                  final String resources = props.getProperty("watchResources", "");
+                  return Stream.of(resources.split(","));
+                })
+            .map(String::trim)
+            .map(Paths::get)
+            .map(p -> p.resolve("views"))
+            .filter(Files::exists)
+            .filter(Files::isDirectory)
+            .collect(Collectors.toSet());
 
-		if (watcher == null) {
-			watcher = FileSystems.getDefault().newWatchService();
-		}
+    if (paths.isEmpty()) {
+      return;
+    }
 
-		log.info("Starting view watch...");
+    if (watcher == null) {
+      watcher = FileSystems.getDefault().newWatchService();
+    }
 
-		paths.forEach(p -> {
-			try {
-				keys.put(p.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY), p);
-				log.info("Watching: {}", p);
-			} catch (IOException e) {
-				log.warn("Unable to watch: {}", p);
-			}
-		});
-	}
+    log.info("Starting view watch...");
 
-	public void start() {
-		if (running) {
-			return;
-		}
-		try {
-			registerAll();
-		} catch (Exception e) {
-			log.error("Unable to start view watch.", e);
-			return;
-		}
-		if (keys.isEmpty()) {
-			return;
-		}
+    paths.forEach(
+        p -> {
+          try {
+            keys.put(p.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY), p);
+            log.info("Watching: {}", p);
+          } catch (IOException e) {
+            log.warn("Unable to watch: {}", p);
+          }
+        });
+  }
 
-		runner = new Thread(() -> {
-			for (;;) {
-				if (!running || !handleEvents()) {
-					break;
-				}
-			}
-		});
+  public void start() {
+    if (running) {
+      return;
+    }
+    try {
+      registerAll();
+    } catch (Exception e) {
+      log.error("Unable to start view watch.", e);
+      return;
+    }
+    if (keys.isEmpty()) {
+      return;
+    }
 
-		Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
+    runner =
+        new Thread(
+            () -> {
+              for (; ; ) {
+                if (!running || !handleEvents()) {
+                  break;
+                }
+              }
+            });
 
-		running = true;
-		runner.setDaemon(true);
-		runner.start();
-	}
+    Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
 
-	public void stop() {
-		if (running) {
-			running = false;
-			log.info("Stopping view watch....");
-			keys.keySet().forEach(WatchKey::cancel);
-			keys.clear();
-		}
-	}
+    running = true;
+    runner.setDaemon(true);
+    runner.start();
+  }
 
-	static final class ViewChangeEvent {
+  public void stop() {
+    if (running) {
+      running = false;
+      log.info("Stopping view watch....");
+      keys.keySet().forEach(WatchKey::cancel);
+      keys.clear();
+    }
+  }
 
-		private final WatchEvent.Kind<?> kind;
-		private final Path file;
-		private final String module;
+  static final class ViewChangeEvent {
 
-		public ViewChangeEvent(WatchEvent.Kind<?> kind, Path file, String module) {
-			this.kind = kind;
-			this.file = file;
-			this.module = module;
-		}
+    private final WatchEvent.Kind<?> kind;
+    private final Path file;
+    private final String module;
 
-		public boolean isCreate() {
-			return kind == ENTRY_CREATE;
-		}
+    public ViewChangeEvent(WatchEvent.Kind<?> kind, Path file, String module) {
+      this.kind = kind;
+      this.file = file;
+      this.module = module;
+    }
 
-		public boolean isDelete() {
-			return kind == ENTRY_DELETE;
-		}
+    public boolean isCreate() {
+      return kind == ENTRY_CREATE;
+    }
 
-		public boolean isModify() {
-			return kind == ENTRY_MODIFY;
-		}
+    public boolean isDelete() {
+      return kind == ENTRY_DELETE;
+    }
 
-		public WatchEvent.Kind<?> getKind() {
-			return kind;
-		}
+    public boolean isModify() {
+      return kind == ENTRY_MODIFY;
+    }
 
-		public Path getFile() {
-			return file;
-		}
+    public WatchEvent.Kind<?> getKind() {
+      return kind;
+    }
 
-		public String getModule() {
-			return module;
-		}
+    public Path getFile() {
+      return file;
+    }
 
-		@Override
-		public int hashCode() {
-			return Objects.hash(0, file);
-		}
+    public String getModule() {
+      return module;
+    }
 
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (!(obj instanceof ViewChangeEvent))
-				return false;
-			final ViewChangeEvent other = (ViewChangeEvent) obj;
-			return this.file.equals(other.file);
-		}
+    @Override
+    public int hashCode() {
+      return Objects.hash(0, file);
+    }
 
-		@Override
-		public String toString() {
-			return "[" + kind + ", " + file + "]";
-		}
-	}
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) return true;
+      if (!(obj instanceof ViewChangeEvent)) return false;
+      final ViewChangeEvent other = (ViewChangeEvent) obj;
+      return this.file.equals(other.file);
+    }
+
+    @Override
+    public String toString() {
+      return "[" + kind + ", " + file + "]";
+    }
+  }
 }

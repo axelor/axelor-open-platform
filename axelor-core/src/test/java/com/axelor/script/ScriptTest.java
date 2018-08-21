@@ -17,17 +17,6 @@
  */
 package com.axelor.script;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.junit.Before;
-
 import com.axelor.JpaTest;
 import com.axelor.rpc.Context;
 import com.axelor.test.db.Contact;
@@ -35,85 +24,91 @@ import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
 import com.axelor.test.db.repo.TitleRepository;
 import com.google.inject.persist.Transactional;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.inject.Inject;
+import org.junit.Before;
 
 public abstract class ScriptTest extends JpaTest {
 
-	@Inject
-	private ContactRepository contacts;
-	
-	@Inject
-	private TitleRepository titles;
-	
-	private Contact contact;
-	private Title title;
+  @Inject private ContactRepository contacts;
 
-	@Before
-	@Transactional
-	public void prepare() {
-		if (titles.all().count() == 0) {
-			Title t = new Title();
-			t.setCode("mr");
-			t.setName("Mr.");
-			titles.save(t);
-		}
-		if (contacts.all().count() == 0) {
-			Contact c = new Contact();
-			c.setFirstName("John");
-			c.setLastName("Smith");
-			c.setEmail("jsmith@gmail.com");
-			c.setTitle(titles.findByCode("mr"));
-			contacts.save(c);
-		}
-		
-		if (contact == null) {
-			contact = contacts.findByEmail("jsmith@gmail.com");
-		}
-		if (title == null) {
-			title = titles.findByCode("mrs");
-		}
-	}
+  @Inject private TitleRepository titles;
 
-	protected Context context() {
-		return new Context(contextMap(), Contact.class);
-	}
+  private Contact contact;
+  private Title title;
 
-	protected Map<String, Object> contextMap() {
+  @Before
+  @Transactional
+  public void prepare() {
+    if (titles.all().count() == 0) {
+      Title t = new Title();
+      t.setCode("mr");
+      t.setName("Mr.");
+      titles.save(t);
+    }
+    if (contacts.all().count() == 0) {
+      Contact c = new Contact();
+      c.setFirstName("John");
+      c.setLastName("Smith");
+      c.setEmail("jsmith@gmail.com");
+      c.setTitle(titles.findByCode("mr"));
+      contacts.save(c);
+    }
 
-		final Map<String, Object> values = new HashMap<>();
-		values.put("lastName", "NAME");
-		values.put("id", contact.getId());
-		values.put("_model", Contact.class.getName());
+    if (contact == null) {
+      contact = contacts.findByEmail("jsmith@gmail.com");
+    }
+    if (title == null) {
+      title = titles.findByCode("mrs");
+    }
+  }
 
-		final Map<String, Object> t = new HashMap<>();
-		t.put("id", title.getId());
-		values.put("title", t);
+  protected Context context() {
+    return new Context(contextMap(), Contact.class);
+  }
 
-		final List<Map<String, Object>> addresses = new ArrayList<>();
-		final Map<String, Object> a1 = new HashMap<>();
-		a1.put("street", "My");
-		a1.put("area", "Home");
-		a1.put("city", "Paris");
-		a1.put("zip", "1212");
-		final Map<String, Object> a2 = new HashMap<>();
-		a2.put("street", "My");
-		a2.put("area", "Office");
-		a2.put("city", "London");
-		a2.put("zip", "1111");
-		a2.put("selected", true);
-		
-		addresses.add(a1);
-		addresses.add(a2);
+  protected Map<String, Object> contextMap() {
 
-		values.put("addresses", addresses);
-		
-		final Map<String, Object> parent = new HashMap<>();
-		parent.put("_model", Contact.class.getName());
-		parent.put("id", contact.getId());
-		parent.put("date", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+    final Map<String, Object> values = new HashMap<>();
+    values.put("lastName", "NAME");
+    values.put("id", contact.getId());
+    values.put("_model", Contact.class.getName());
 
-		values.put("_parent", parent);
-		values.put("_ref", parent);
+    final Map<String, Object> t = new HashMap<>();
+    t.put("id", title.getId());
+    values.put("title", t);
 
-		return values;
-	}
+    final List<Map<String, Object>> addresses = new ArrayList<>();
+    final Map<String, Object> a1 = new HashMap<>();
+    a1.put("street", "My");
+    a1.put("area", "Home");
+    a1.put("city", "Paris");
+    a1.put("zip", "1212");
+    final Map<String, Object> a2 = new HashMap<>();
+    a2.put("street", "My");
+    a2.put("area", "Office");
+    a2.put("city", "London");
+    a2.put("zip", "1111");
+    a2.put("selected", true);
+
+    addresses.add(a1);
+    addresses.add(a2);
+
+    values.put("addresses", addresses);
+
+    final Map<String, Object> parent = new HashMap<>();
+    parent.put("_model", Contact.class.getName());
+    parent.put("id", contact.getId());
+    parent.put("date", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+
+    values.put("_parent", parent);
+    values.put("_ref", parent);
+
+    return values;
+  }
 }

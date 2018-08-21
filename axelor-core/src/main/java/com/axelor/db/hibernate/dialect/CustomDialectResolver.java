@@ -25,39 +25,39 @@ import org.slf4j.LoggerFactory;
 
 public class CustomDialectResolver extends StandardDialectResolver {
 
-	private static final long serialVersionUID = 8211296180497513187L;
-	
-	private static final Logger log = LoggerFactory.getLogger(CustomDialectResolver.class);
+  private static final long serialVersionUID = 8211296180497513187L;
 
-	public static final CustomDialectResolver INSTANCE = new CustomDialectResolver();
+  private static final Logger log = LoggerFactory.getLogger(CustomDialectResolver.class);
 
-	@Override
-	public Dialect resolveDialect(DialectResolutionInfo info) {
-		final String databaseName = info.getDatabaseName();
-		final int majorVersion = info.getDatabaseMajorVersion();
-		final int minorVersion = info.getDatabaseMinorVersion();
-		if ("HSQL Database Engine".equals(databaseName)) {
-			return new HSQLDialect();
-		}
-		if ("PostgreSQL".equals(databaseName)) {
-			if ((majorVersion >= 9 && minorVersion >= 4) || majorVersion >= 10) {
-				return new PostgreSQLDialect();
-			}
-			log.error("PostgreSQL 9.4 or later is required.");
-		}
-		if ("Oracle".equals(databaseName)) {
-			if (majorVersion > 11) {
-				return new OracleDialect();
-			}
-			log.error("Oracle 12c or later is required.");
-		}
-		if ("MySQL".equals(databaseName)) {
-			if (majorVersion >= 5 && minorVersion >= 7) {
-				return new MySQLDialect();
-			}
-			log.error("MySQL 5.7 or later is required.");
-		}
-		log.error("{} {}.{} is not suppported.", databaseName, majorVersion, minorVersion);
-		return null;
-	}
+  public static final CustomDialectResolver INSTANCE = new CustomDialectResolver();
+
+  @Override
+  public Dialect resolveDialect(DialectResolutionInfo info) {
+    final String databaseName = info.getDatabaseName();
+    final int majorVersion = info.getDatabaseMajorVersion();
+    final int minorVersion = info.getDatabaseMinorVersion();
+    if ("HSQL Database Engine".equals(databaseName)) {
+      return new HSQLDialect();
+    }
+    if ("PostgreSQL".equals(databaseName)) {
+      if ((majorVersion >= 9 && minorVersion >= 4) || majorVersion >= 10) {
+        return new PostgreSQLDialect();
+      }
+      log.error("PostgreSQL 9.4 or later is required.");
+    }
+    if ("Oracle".equals(databaseName)) {
+      if (majorVersion > 11) {
+        return new OracleDialect();
+      }
+      log.error("Oracle 12c or later is required.");
+    }
+    if ("MySQL".equals(databaseName)) {
+      if (majorVersion >= 5 && minorVersion >= 7) {
+        return new MySQLDialect();
+      }
+      log.error("MySQL 5.7 or later is required.");
+    }
+    log.error("{} {}.{} is not suppported.", databaseName, majorVersion, minorVersion);
+    return null;
+  }
 }

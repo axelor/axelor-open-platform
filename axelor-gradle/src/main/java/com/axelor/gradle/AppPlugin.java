@@ -17,26 +17,25 @@
  */
 package com.axelor.gradle;
 
-import org.gradle.api.Plugin;
-import org.gradle.api.Project;
-import org.gradle.api.publish.maven.tasks.PublishToMavenRepository;
-
 import com.axelor.gradle.support.HotswapSupport;
 import com.axelor.gradle.support.ScriptsSupport;
 import com.axelor.gradle.support.TomcatSupport;
 import com.axelor.gradle.support.WarSupport;
+import org.gradle.api.Plugin;
+import org.gradle.api.Project;
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository;
 
 public class AppPlugin implements Plugin<Project> {
 
-	@Override
-	public void apply(Project project) {
-		project.getPlugins().apply(ModulePlugin.class);
-		project.getPlugins().apply(WarSupport.class);
-		project.getPlugins().apply(ScriptsSupport.class);
-		project.getPlugins().apply(TomcatSupport.class);
-		project.getPlugins().apply(HotswapSupport.class);
+  @Override
+  public void apply(Project project) {
+    project.getPlugins().apply(ModulePlugin.class);
+    project.getPlugins().apply(WarSupport.class);
+    project.getPlugins().apply(ScriptsSupport.class);
+    project.getPlugins().apply(TomcatSupport.class);
+    project.getPlugins().apply(HotswapSupport.class);
 
-		// disable publishing apps by default
-		project.getTasks().withType(PublishToMavenRepository.class).all(task -> task.setEnabled(false));
-	}
+    // disable publishing apps by default
+    project.getTasks().withType(PublishToMavenRepository.class).all(task -> task.setEnabled(false));
+  }
 }

@@ -17,136 +17,133 @@
  */
 package com.axelor.tools.x2j;
 
+import com.axelor.tools.x2j.pojo.Entity;
+import com.axelor.tools.x2j.pojo.EnumType;
+import com.axelor.tools.x2j.pojo.Repository;
+import com.google.common.collect.Maps;
+import groovy.text.GStringTemplateEngine;
+import groovy.text.Template;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Map;
-
 import org.codehaus.groovy.control.CompilationFailedException;
-
-import com.axelor.tools.x2j.pojo.Entity;
-import com.axelor.tools.x2j.pojo.EnumType;
-import com.axelor.tools.x2j.pojo.Repository;
-import com.google.common.collect.Maps;
-
-import groovy.text.GStringTemplateEngine;
-import groovy.text.Template;
 
 final class Expander {
 
-	private static final GStringTemplateEngine engine = new GStringTemplateEngine();
+  private static final GStringTemplateEngine engine = new GStringTemplateEngine();
 
-	private Template pojoTemplate;
+  private Template pojoTemplate;
 
-	private Template bodyTemplate;
+  private Template bodyTemplate;
 
-	private Template headTemplate;
+  private Template headTemplate;
 
-	private Template enumTemplate;
+  private Template enumTemplate;
 
-	private Template enumBodyTemplate;
+  private Template enumBodyTemplate;
 
-	private Template enumHeadTemplate;
+  private Template enumHeadTemplate;
 
-	private Template repoTemplate;
+  private Template repoTemplate;
 
-	private Template repoBodyTemplate;
+  private Template repoBodyTemplate;
 
-	private Template repoHeadTemplate;
+  private Template repoHeadTemplate;
 
-	private static Expander instance;
+  private static Expander instance;
 
-	private Expander() {
-		pojoTemplate = template("templates/pojo.template");
-		headTemplate = template("templates/head.template");
-		bodyTemplate = template("templates/body.template");
-		enumTemplate = template("templates/enum.template");
-		enumHeadTemplate = template("templates/enum-head.template");
-		enumBodyTemplate = template("templates/enum-body.template");
-		repoTemplate = template("templates/repo.template");
-		repoHeadTemplate = template("templates/repo-head.template");
-		repoBodyTemplate = template("templates/repo-body.template");
-	}
+  private Expander() {
+    pojoTemplate = template("templates/pojo.template");
+    headTemplate = template("templates/head.template");
+    bodyTemplate = template("templates/body.template");
+    enumTemplate = template("templates/enum.template");
+    enumHeadTemplate = template("templates/enum-head.template");
+    enumBodyTemplate = template("templates/enum-body.template");
+    repoTemplate = template("templates/repo.template");
+    repoHeadTemplate = template("templates/repo-head.template");
+    repoBodyTemplate = template("templates/repo-body.template");
+  }
 
-	public static Expander getInstance() {
-		if (instance == null) {
-			instance = new Expander();
-		}
-		return instance;
-	}
+  public static Expander getInstance() {
+    if (instance == null) {
+      instance = new Expander();
+    }
+    return instance;
+  }
 
-	public static String expand(Entity entity, boolean repo) {
-		if (repo) {
-			return Expander.getInstance().toRepositoryString(entity);
-		}
-		return Expander.getInstance().toEntityString(entity);
-	}
-	
-	public static String expand(EnumType entity) {
-		return Expander.getInstance().toEnumString(entity);
-	}
+  public static String expand(Entity entity, boolean repo) {
+    if (repo) {
+      return Expander.getInstance().toRepositoryString(entity);
+    }
+    return Expander.getInstance().toEntityString(entity);
+  }
 
-	private Reader read(String resource) {
-		InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
-		return new BufferedReader(new InputStreamReader(stream));
-	}
+  public static String expand(EnumType entity) {
+    return Expander.getInstance().toEnumString(entity);
+  }
 
-	private Template template(String resource) {
-		try {
-			return engine.createTemplate(read(resource));
-		} catch (CompilationFailedException | ClassNotFoundException
-				| IOException e) {
-			throw new IllegalArgumentException(e);
-		}
-	}
-	
-	private String toEnumString(EnumType entity) {
+  private Reader read(String resource) {
+    InputStream stream =
+        Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
+    return new BufferedReader(new InputStreamReader(stream));
+  }
 
-		final Map<String, Object> binding = Maps.newHashMap();
+  private Template template(String resource) {
+    try {
+      return engine.createTemplate(read(resource));
+    } catch (CompilationFailedException | ClassNotFoundException | IOException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
 
-		binding.put("pojo", entity);
-		
-		final String body = enumBodyTemplate.make(binding).toString();
-		final String imports = enumHeadTemplate.make(binding).toString();
-		
-		binding.put("namespace", entity.getNamespace());
-		binding.put("body", body);
-		binding.put("imports", imports);
+  private String toEnumString(EnumType entity) {
 
-		return enumTemplate.make(binding).toString();
-	}
+    final Map<String, Object> binding = Maps.newHashMap();
 
-	private String toEntityString(Entity entity) {
+    binding.put("pojo", entity);
 
-		final Map<String, Object> binding = Maps.newHashMap();
+    final String body = enumBodyTemplate.make(binding).toString();
+    final String imports = enumHeadTemplate.make(binding).toString();
 
-		binding.put("pojo", entity);
+    binding.put("namespace", entity.getNamespace());
+    binding.put("body", body);
+    binding.put("imports", imports);
 
-		final String body = bodyTemplate.make(binding).toString();
-		final String imports = headTemplate.make(binding).toString();
+    return enumTemplate.make(binding).toString();
+  }
 
-		binding.put("namespace", entity.getNamespace());
-		binding.put("body", body);
-		binding.put("imports", imports);
+  private String toEntityString(Entity entity) {
 
-		return pojoTemplate.make(binding).toString();
-	}
+    final Map<String, Object> binding = Maps.newHashMap();
 
-	private String toRepositoryString(Entity entity) {
+    binding.put("pojo", entity);
 
-		final Map<String, Object> binding = Maps.newHashMap();
-		final Repository repo = entity.getRepository();
+    final String body = bodyTemplate.make(binding).toString();
+    final String imports = headTemplate.make(binding).toString();
 
-		binding.put("repo", repo);
+    binding.put("namespace", entity.getNamespace());
+    binding.put("body", body);
+    binding.put("imports", imports);
 
-		final String body = repoBodyTemplate.make(binding).toString();
-		final String imports = repoHeadTemplate.make(binding).toString();
+    return pojoTemplate.make(binding).toString();
+  }
 
-		binding.put("body", body);
-		binding.put("imports", imports);
+  private String toRepositoryString(Entity entity) {
 
-		return repoTemplate.make(binding).toString();
-	}
+    final Map<String, Object> binding = Maps.newHashMap();
+    final Repository repo = entity.getRepository();
+
+    binding.put("repo", repo);
+
+    final String body = repoBodyTemplate.make(binding).toString();
+    final String imports = repoHeadTemplate.make(binding).toString();
+
+    binding.put("body", body);
+    binding.put("imports", imports);
+
+    return repoTemplate.make(binding).toString();
+  }
 }

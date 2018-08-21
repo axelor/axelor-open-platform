@@ -17,32 +17,31 @@
  */
 package com.axelor.db;
 
+import com.axelor.JpaTest;
+import com.axelor.meta.db.MetaSequence;
+import com.google.inject.persist.Transactional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.axelor.JpaTest;
-import com.axelor.meta.db.MetaSequence;
-import com.google.inject.persist.Transactional;
-
 public class SequenceTest extends JpaTest {
-	
-	@Before
-	public void setUp() {
-		if (Query.of(MetaSequence.class).count() == 0) {
-			fixture("sequence-data.yml");
-		}
-	}
 
-	@Test
-	@Transactional
-	public void test() {
-		Assert.assertEquals("EMP_00001_ID", JpaSequence.nextValue("seq.emp.id"));
-		Assert.assertEquals("EMP_00002_ID", JpaSequence.nextValue("seq.emp.id"));
-		Assert.assertEquals("EMP_00003_ID", JpaSequence.nextValue("seq.emp.id"));
-		
-		JpaSequence.nextValue("seq.emp.id", 100);
+  @Before
+  public void setUp() {
+    if (Query.of(MetaSequence.class).count() == 0) {
+      fixture("sequence-data.yml");
+    }
+  }
 
-		Assert.assertEquals("EMP_00100_ID", JpaSequence.nextValue("seq.emp.id"));
-	}
+  @Test
+  @Transactional
+  public void test() {
+    Assert.assertEquals("EMP_00001_ID", JpaSequence.nextValue("seq.emp.id"));
+    Assert.assertEquals("EMP_00002_ID", JpaSequence.nextValue("seq.emp.id"));
+    Assert.assertEquals("EMP_00003_ID", JpaSequence.nextValue("seq.emp.id"));
+
+    JpaSequence.nextValue("seq.emp.id", 100);
+
+    Assert.assertEquals("EMP_00100_ID", JpaSequence.nextValue("seq.emp.id"));
+  }
 }

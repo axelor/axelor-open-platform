@@ -27,51 +27,51 @@ var ui = angular.module('axelor.ui');
  */
 ui.formWidget('Form', {
 
-	priority: 100,
-	
-	css: "dynamic-form",
-	
-	scope: false,
-	
-	compile: function(element, attrs) {
+  priority: 100,
 
-		element.hide();
-		element.find('[x-field],[data-field]').each(function(){
+  css: "dynamic-form",
 
-			var elem = $(this),
-				name = elem.attr('x-field') || elem.attr('data-field');
+  scope: false,
 
-			if (name && elem.attr('ui-button') === undefined) {
-				if (!elem.attr('ng-model')) {
-					elem.attr('ng-model', 'record.' + name);
-				}
-				if (!elem.attr('ng-required')) {
-					// always attache a required validator to make
-					// dynamic `required` attribute change effective
-					elem.attr('ng-required', false);
-				}
-			}
-		});
+  compile: function(element, attrs) {
 
-		return ui.formCompile.apply(this, arguments);
-	},
-	
-	link: function(scope, element, attrs, controller) {
-		
-		element.on('submit', function(e) {
-			e.preventDefault();
-		});
+    element.hide();
+    element.find('[x-field],[data-field]').each(function(){
 
-		scope.$watch('record', function formRecordWatch(rec, old) {
-			if (element.is(':visible')) {
-				return;
-			}
-			scope.ajaxStop(function() {
-				element.show();
-				axelor.$adjustSize();
-			});
-		});
-	}
+      var elem = $(this),
+        name = elem.attr('x-field') || elem.attr('data-field');
+
+      if (name && elem.attr('ui-button') === undefined) {
+        if (!elem.attr('ng-model')) {
+          elem.attr('ng-model', 'record.' + name);
+        }
+        if (!elem.attr('ng-required')) {
+          // always attache a required validator to make
+          // dynamic `required` attribute change effective
+          elem.attr('ng-required', false);
+        }
+      }
+    });
+
+    return ui.formCompile.apply(this, arguments);
+  },
+
+  link: function(scope, element, attrs, controller) {
+
+    element.on('submit', function(e) {
+      e.preventDefault();
+    });
+
+    scope.$watch('record', function formRecordWatch(rec, old) {
+      if (element.is(':visible')) {
+        return;
+      }
+      scope.ajaxStop(function() {
+        element.show();
+        axelor.$adjustSize();
+      });
+    });
+  }
 });
 
 /**
@@ -80,22 +80,22 @@ ui.formWidget('Form', {
  */
 ui.directive('uiTabGate', function() {
 
-	return {
-		
-		compile: function compile(tElement, tAttrs) {
-			
-			return {
-				pre: function preLink(scope, element, attrs) {
-					scope.$watchChecker(function(current) {
-						if (current.tabSelected === undefined) {
-							return !scope.tab || scope.tab.selected === undefined || scope.tab.selected;
-						}
-						return current.tabSelected;
-					});
-				}
-			};
-		}
-	};
+  return {
+
+    compile: function compile(tElement, tAttrs) {
+
+      return {
+        pre: function preLink(scope, element, attrs) {
+          scope.$watchChecker(function(current) {
+            if (current.tabSelected === undefined) {
+              return !scope.tab || scope.tab.selected === undefined || scope.tab.selected;
+            }
+            return current.tabSelected;
+          });
+        }
+      };
+    }
+  };
 });
 
 /**
@@ -104,29 +104,29 @@ ui.directive('uiTabGate', function() {
  */
 ui.directive('uiFormGate', function() {
 
-	return {
-		compile: function compile(tElement, tAttrs) {
+  return {
+    compile: function compile(tElement, tAttrs) {
 
-			return {
-				pre: function preLink(scope, element, attrs) {
-					var parent = null;
-					scope.$watchChecker(function(current) {
-						if (scope.tabSelected === false) {
-							return false;
-						}
-						if (parent === null) {
-							parent = element.parents('[ui-show]:first');
-						}
-						// hack for hidden nested editors (#2173)
-						if (scope.$$forceWatch) {
-							return true;
-						}
-						return !(parent.hasClass('ui-hide') || parent.hasClass('ui-hide'));
-					});
-				}
-			};
-		}
-	};
+      return {
+        pre: function preLink(scope, element, attrs) {
+          var parent = null;
+          scope.$watchChecker(function(current) {
+            if (scope.tabSelected === false) {
+              return false;
+            }
+            if (parent === null) {
+              parent = element.parents('[ui-show]:first');
+            }
+            // hack for hidden nested editors (#2173)
+            if (scope.$$forceWatch) {
+              return true;
+            }
+            return !(parent.hasClass('ui-hide') || parent.hasClass('ui-hide'));
+          });
+        }
+      };
+    }
+  };
 });
 
 /**
@@ -134,34 +134,34 @@ ui.directive('uiFormGate', function() {
  *
  */
 ui.directive('uiWatchIf', ['$parse', function($parse) {
-	
-	return {
-		compile: function compile(tElement, tAttrs) {
-			return {
-				pre: function preLink(scope, element, attrs) {
-					var value = false,
-						expression = $parse(attrs.uiWatchIf);
-					
-					scope.$watchChecker(function (current) {
-						if (current === scope) {
-							return value = expression(scope);
-						}
-						return value;
-					});
-				}
-			};
-		}
-	};
+
+  return {
+    compile: function compile(tElement, tAttrs) {
+      return {
+        pre: function preLink(scope, element, attrs) {
+          var value = false,
+            expression = $parse(attrs.uiWatchIf);
+
+          scope.$watchChecker(function (current) {
+            if (current === scope) {
+              return value = expression(scope);
+            }
+            return value;
+          });
+        }
+      };
+    }
+  };
 }]);
 
 function toBoolean(value) {
-	if (value && value.length !== 0) {
-		var v = angular.lowercase("" + value);
-		value = !(v == 'f' || v == '0' || v == 'false' || v == 'no' || v == 'n' || v == '[]');
-	} else {
-		value = false;
-	}
-	return value;
+  if (value && value.length !== 0) {
+    var v = angular.lowercase("" + value);
+    value = !(v == 'f' || v == '0' || v == 'false' || v == 'no' || v == 'n' || v == '[]');
+  } else {
+    value = false;
+  }
+  return value;
 }
 
 /**
@@ -169,297 +169,297 @@ function toBoolean(value) {
  */
 ui.directive('uiShow', function() {
 
-	return {
-		scope: true, // create new scope to always watch the expression
-		link: function link(scope, element, attrs) {
-			scope.$$shouldWatch = true;
-			scope.$watch(attrs.uiShow, function uiShowWatchAction(value){
-				var val = toBoolean(value);
-				element.css({ display: val ? '' : 'none', opacity: 0 }).toggleClass('ui-hide', !val);
-				if (val) {
-					element.animate({ opacity: 1 }, 300);
-				}
-			});
-		}
-	};
+  return {
+    scope: true, // create new scope to always watch the expression
+    link: function link(scope, element, attrs) {
+      scope.$$shouldWatch = true;
+      scope.$watch(attrs.uiShow, function uiShowWatchAction(value){
+        var val = toBoolean(value);
+        element.css({ display: val ? '' : 'none', opacity: 0 }).toggleClass('ui-hide', !val);
+        if (val) {
+          element.animate({ opacity: 1 }, 300);
+        }
+      });
+    }
+  };
 });
 
 /**
  * This directive is used by view-pane to attach/detach element from DOM tree
  */
 ui.directive('uiAttach', function () {
-	return function (scope, element, attrs) {
-		var parent = null;
-		var uiAttachWatch = function uiAttachWatch(attach) {
-			var result = toBoolean(attach);
-			if (result) {
-				if (parent) {
-					element.appendTo(parent);
-					parent = null;
-					scope.$broadcast('dom:attach');
-				}
-			} else {
-				parent = element.parent();
-				scope.$broadcast('dom:detach');
-				element.detach();
-			}
-		};
+  return function (scope, element, attrs) {
+    var parent = null;
+    var uiAttachWatch = function uiAttachWatch(attach) {
+      var result = toBoolean(attach);
+      if (result) {
+        if (parent) {
+          element.appendTo(parent);
+          parent = null;
+          scope.$broadcast('dom:attach');
+        }
+      } else {
+        parent = element.parent();
+        scope.$broadcast('dom:detach');
+        element.detach();
+      }
+    };
 
-		uiAttachWatch.uiAttachWatch = true;
+    uiAttachWatch.uiAttachWatch = true;
 
-		scope.$watch(attrs.uiAttach, uiAttachWatch, true);
-		scope.$on('$destroy', function () {
-			if (parent) {
-				parent = null;
-				element.remove();
-			}
-		});
-	};
+    scope.$watch(attrs.uiAttach, uiAttachWatch, true);
+    scope.$on('$destroy', function () {
+      if (parent) {
+        parent = null;
+        element.remove();
+      }
+    });
+  };
 });
 
 /**
  * This directive can be used by widget to restore scroll when element is re-attached to DOM tree.
  */
 ui.directive('uiAttachScroll', function () {
-	return function (scope, element, attrs) {
-		setTimeout(function () {
-			var elem = element;
-			var scrollTop = 0;
-	
-			if (attrs.uiAttachScroll) {
-				elem = element.find(attrs.uiAttachScroll);
-			}
+  return function (scope, element, attrs) {
+    setTimeout(function () {
+      var elem = element;
+      var scrollTop = 0;
 
-			elem.on('scroll', function () {
-				scrollTop = this.scrollTop;
-			});
+      if (attrs.uiAttachScroll) {
+        elem = element.find(attrs.uiAttachScroll);
+      }
 
-			function resetScroll() {
-				elem.scrollTop(scrollTop);
-			};
+      elem.on('scroll', function () {
+        scrollTop = this.scrollTop;
+      });
 
-			scope.$on('dom:attach', resetScroll);
-			scope.$on('tab:select', resetScroll);
-		}, 300);
-	};
+      function resetScroll() {
+        elem.scrollTop(scrollTop);
+      };
+
+      scope.$on('dom:attach', resetScroll);
+      scope.$on('tab:select', resetScroll);
+    }, 300);
+  };
 });
 
 ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $interpolate) {
 
-	function isValid(scope, name) {
-		if (!name) return scope.isValid();
-		var ctrl = scope.form;
-		if (ctrl) {
-			ctrl = ctrl[name];
-		}
-		if (ctrl) {
-			return ctrl.$valid;
-		}
-	}
-	
-	function withContext(scope, record) {
-		var values = _.extend({}, scope._context, scope._jsonContext, record);
-		return _.extend(values, {
-			$user: axelor.config['user.login'],
-			$group: axelor.config['user.group'],
-			$userId: axelor.config['user.id'],
-		});
-	}
-	
-	function handleCondition(scope, field, attr, condition, negative) {
+  function isValid(scope, name) {
+    if (!name) return scope.isValid();
+    var ctrl = scope.form;
+    if (ctrl) {
+      ctrl = ctrl[name];
+    }
+    if (ctrl) {
+      return ctrl.$valid;
+    }
+  }
 
-		if (!condition || _.isBoolean(condition)) {
-			return;
-		}
+  function withContext(scope, record) {
+    var values = _.extend({}, scope._context, scope._jsonContext, record);
+    return _.extend(values, {
+      $user: axelor.config['user.login'],
+      $group: axelor.config['user.group'],
+      $userId: axelor.config['user.id'],
+    });
+  }
 
-		scope.$on("on:record-change", function(e, rec, force) {
-			if (field && field.jsonField) {
-				handle(scope.record);
-			} else if (rec === scope.record || force) {
-				handle(rec);
-			}
-		});
-		scope.$on("on:grid-selection-change", function(e, context) {
-			if (!scope._isDetailsForm) {
-				handle(context);
-			}
-		});
+  function handleCondition(scope, field, attr, condition, negative) {
 
-		scope.$watch("isReadonly()", watcher);
-		scope.$watch("isRequired()", watcher);
-		scope.$watch("isValid()", watcher);
-		
-		var expr = $parse(condition);
+    if (!condition || _.isBoolean(condition)) {
+      return;
+    }
 
-		function watcher(current, old) {
-			var rec = scope.record;
-			if (rec === undefined && current === old) return;
-			if (rec === undefined && scope.getContext) {
-				rec = scope.getContext();
-			}
-			handle(rec);
-		}
+    scope.$on("on:record-change", function(e, rec, force) {
+      if (field && field.jsonField) {
+        handle(scope.record);
+      } else if (rec === scope.record || force) {
+        handle(rec);
+      }
+    });
+    scope.$on("on:grid-selection-change", function(e, context) {
+      if (!scope._isDetailsForm) {
+        handle(context);
+      }
+    });
 
-		function handle(rec) {
-			var value;
-			try {
-				value = !!axelor.$eval(scope, expr, withContext(scope, rec));
-			} catch (e) {
-				console.error('FAILED:', condition, e);
-			}
-			scope.attr(attr, negative ? !value : value);
-		}
-	}
-	
-	function handleHilites(scope, field) {
-		if (!field || _.isEmpty(field.hilites)) {
-			return;
-		}
-		
-		var hilites = field.hilites || [];
-		var exprs = _.map(_.pluck(hilites, 'condition'), $parse);
+    scope.$watch("isReadonly()", watcher);
+    scope.$watch("isRequired()", watcher);
+    scope.$watch("isValid()", watcher);
 
-		function handle(rec) {
-			for (var i = 0; i < hilites.length; i++) {
-				var hilite = hilites[i];
-				var expr = exprs[i];
-				var value = false;
-				try {
-					value = axelor.$eval(scope, expr, withContext(scope, rec));
-				} catch (e) {
-					console.error('FAILED:', hilite, e);
-				}
-				if (value) {
-					return scope.attr('highlight', {
-						hilite: hilite,
-						passed: value
-					});
-				}
-			}
-			return scope.attr('highlight', {});
-		}
-		
-		scope.$on("on:record-change", function(e, rec) {
-			if (rec === scope.record) {
-				handle(rec);
-			}
-		});
-	}
-	
-	function handleBind(scope, field) {
-		
-		if (!field.bind || !field.name) {
-			return;
-		}
-		
-		var expr = $interpolate(field.bind);
-		var last = null;
+    var expr = $parse(condition);
 
-		function handle(rec) {
-			var value;
-			try {
-				value = expr(withContext(scope, rec));
-				if (value.length === 0) {
-					value = null;
-				}
-			} catch (e) {
-				console.error('FAILED:', field.bind, e);
-			}
+    function watcher(current, old) {
+      var rec = scope.record;
+      if (rec === undefined && current === old) return;
+      if (rec === undefined && scope.getContext) {
+        rec = scope.getContext();
+      }
+      handle(rec);
+    }
 
-			if (scope.setValue && scope.record && last !== value) {
-				scope.setValue(last = value);
-			}
-		}
-		
-		scope.$on("on:record-change", function(e, rec) {
-			if (field && field.jsonField) {
-				handle(scope.record);
-			} else if (rec && rec === scope.record) {
-				handle(rec);
-			}
-		});
-	}
-	
-	function handleValueExpr(scope, field) {
-		
-		if (!field.valueExpr || !field.name) {
-			return;
-		}
+    function handle(rec) {
+      var value;
+      try {
+        value = !!axelor.$eval(scope, expr, withContext(scope, rec));
+      } catch (e) {
+        console.error('FAILED:', condition, e);
+      }
+      scope.attr(attr, negative ? !value : value);
+    }
+  }
 
-		var expr = $parse(field.valueExpr);
+  function handleHilites(scope, field) {
+    if (!field || _.isEmpty(field.hilites)) {
+      return;
+    }
 
-		function handle(rec) {
-			var value;
-			try {
-				value = axelor.$eval(scope, expr, withContext(scope, rec));
-				if (value && value.length === 0) {
-					value = null;
-				}
-			} catch (e) {
-				console.error('FAILED:', field.valueExpr, e);
-			}
+    var hilites = field.hilites || [];
+    var exprs = _.map(_.pluck(hilites, 'condition'), $parse);
 
-			if (scope.setValue && scope.record) {
-				scope.setValue(value, false);
-			}
-		}
-		
-		scope.$on("on:record-change", function(e, rec) {
-			scope.$timeout(function () {
-				if (field && field.jsonField) {
-					handle(scope.record);
-				} else if (rec && rec === scope.record) {
-					handle(rec);
-				}
-			});
-		});
-	}
-	
-	function handleFor(scope, field, attr, conditional, negative) {
-		if (field[conditional]) {
-			handleCondition(scope, field, attr, field[conditional], negative);
-		}
-	}
-	
-	function handleForField(scope) {
-		var field = scope.field;
-		if (!field) return;
-		handleFor(scope, field, "valid", "validIf");
-		handleFor(scope, field, "hidden", "hideIf");
-		handleFor(scope, field, "hidden", "showIf", true);
-		handleFor(scope, field, "readonly", "readonlyIf");
-		handleFor(scope, field, "required", "requiredIf");
-		handleFor(scope, field, "collapse", "collapseIf");
-		handleFor(scope, field, "canNew", "canNew");
-		handleFor(scope, field, "canView", "canView");
-		handleFor(scope, field, "canEdit", "canEdit");
-		handleFor(scope, field, "canRemove", "canRemove");
-		handleFor(scope, field, "canSelect", "canSelect");
-		handleHilites(scope, field);
-		handleBind(scope, field);
-		handleValueExpr(scope, field);
-	}
-	
-	function handleForView(scope) {
-		var field = scope.schema;
-		if (!field) return;
-		handleFor(scope, field, "canNew", "canNew");
-		handleFor(scope, field, "canEdit", "canEdit");
-		handleFor(scope, field, "canSave", "canSave");
-		handleFor(scope, field, "canCopy", "canCopy");
-		handleFor(scope, field, "canDelete", "canDelete");
-		handleFor(scope, field, "canArchive", "canArchive");
-		handleFor(scope, field, "canAttach", "canAttach");
-	}
-	
-	return function(scope, element, attrs) {
-		scope.$evalAsync(function() {
-			if (element.is('[ui-form]')) {
-				return handleForView(scope);
-			}
-			handleForField(scope);
-		});
-	};
+    function handle(rec) {
+      for (var i = 0; i < hilites.length; i++) {
+        var hilite = hilites[i];
+        var expr = exprs[i];
+        var value = false;
+        try {
+          value = axelor.$eval(scope, expr, withContext(scope, rec));
+        } catch (e) {
+          console.error('FAILED:', hilite, e);
+        }
+        if (value) {
+          return scope.attr('highlight', {
+            hilite: hilite,
+            passed: value
+          });
+        }
+      }
+      return scope.attr('highlight', {});
+    }
+
+    scope.$on("on:record-change", function(e, rec) {
+      if (rec === scope.record) {
+        handle(rec);
+      }
+    });
+  }
+
+  function handleBind(scope, field) {
+
+    if (!field.bind || !field.name) {
+      return;
+    }
+
+    var expr = $interpolate(field.bind);
+    var last = null;
+
+    function handle(rec) {
+      var value;
+      try {
+        value = expr(withContext(scope, rec));
+        if (value.length === 0) {
+          value = null;
+        }
+      } catch (e) {
+        console.error('FAILED:', field.bind, e);
+      }
+
+      if (scope.setValue && scope.record && last !== value) {
+        scope.setValue(last = value);
+      }
+    }
+
+    scope.$on("on:record-change", function(e, rec) {
+      if (field && field.jsonField) {
+        handle(scope.record);
+      } else if (rec && rec === scope.record) {
+        handle(rec);
+      }
+    });
+  }
+
+  function handleValueExpr(scope, field) {
+
+    if (!field.valueExpr || !field.name) {
+      return;
+    }
+
+    var expr = $parse(field.valueExpr);
+
+    function handle(rec) {
+      var value;
+      try {
+        value = axelor.$eval(scope, expr, withContext(scope, rec));
+        if (value && value.length === 0) {
+          value = null;
+        }
+      } catch (e) {
+        console.error('FAILED:', field.valueExpr, e);
+      }
+
+      if (scope.setValue && scope.record) {
+        scope.setValue(value, false);
+      }
+    }
+
+    scope.$on("on:record-change", function(e, rec) {
+      scope.$timeout(function () {
+        if (field && field.jsonField) {
+          handle(scope.record);
+        } else if (rec && rec === scope.record) {
+          handle(rec);
+        }
+      });
+    });
+  }
+
+  function handleFor(scope, field, attr, conditional, negative) {
+    if (field[conditional]) {
+      handleCondition(scope, field, attr, field[conditional], negative);
+    }
+  }
+
+  function handleForField(scope) {
+    var field = scope.field;
+    if (!field) return;
+    handleFor(scope, field, "valid", "validIf");
+    handleFor(scope, field, "hidden", "hideIf");
+    handleFor(scope, field, "hidden", "showIf", true);
+    handleFor(scope, field, "readonly", "readonlyIf");
+    handleFor(scope, field, "required", "requiredIf");
+    handleFor(scope, field, "collapse", "collapseIf");
+    handleFor(scope, field, "canNew", "canNew");
+    handleFor(scope, field, "canView", "canView");
+    handleFor(scope, field, "canEdit", "canEdit");
+    handleFor(scope, field, "canRemove", "canRemove");
+    handleFor(scope, field, "canSelect", "canSelect");
+    handleHilites(scope, field);
+    handleBind(scope, field);
+    handleValueExpr(scope, field);
+  }
+
+  function handleForView(scope) {
+    var field = scope.schema;
+    if (!field) return;
+    handleFor(scope, field, "canNew", "canNew");
+    handleFor(scope, field, "canEdit", "canEdit");
+    handleFor(scope, field, "canSave", "canSave");
+    handleFor(scope, field, "canCopy", "canCopy");
+    handleFor(scope, field, "canDelete", "canDelete");
+    handleFor(scope, field, "canArchive", "canArchive");
+    handleFor(scope, field, "canAttach", "canAttach");
+  }
+
+  return function(scope, element, attrs) {
+    scope.$evalAsync(function() {
+      if (element.is('[ui-form]')) {
+        return handleForView(scope);
+      }
+      handleForField(scope);
+    });
+  };
 }]);
 
 })();

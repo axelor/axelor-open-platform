@@ -22,89 +22,89 @@
 var ui = angular.module("axelor.ui");
 
 function UserCtrl($scope, $element, $location, DataSource, ViewService) {
-	
-	$scope._viewParams = {
-		model: 'com.axelor.auth.db.User',
-		views: [{name: 'user-preferences-form', type: 'form'}],
-		recordId: axelor.config['user.id']
-	};
-	
-	ui.ViewCtrl($scope, DataSource, ViewService);
-	ui.FormViewCtrl($scope, $element);
-	
-	$scope.onClose = function() {
-		$scope.confirmDirty(doClose);
-	};
-	
-	var __version = null;
-	
-	$scope.$watch('record.version', function recordVersionWatch(value) {
-		if (value === null || value === undefined) return;
-		if (__version !== null) return;
-		__version = value;
-	});
-	
-	function doClose() {
-		if (!$scope.isDirty()) {
-			var rec = $scope.record || {};
-			axelor.config["user.action"] = rec.homeAction;
-		}
-		
-		window.history.back();
-		
-		if (__version === ($scope.record || {}).version) {
-			return;
-		}
 
-		setTimeout(function() {
-			window.location.reload();
-		}, 100);
-	}
+  $scope._viewParams = {
+    model: 'com.axelor.auth.db.User',
+    views: [{name: 'user-preferences-form', type: 'form'}],
+    recordId: axelor.config['user.id']
+  };
 
-	$scope.setEditable();
-	$scope.show();
-	
-	$scope.ajaxStop(function () {
-		$scope.$applyAsync();
-	});
+  ui.ViewCtrl($scope, DataSource, ViewService);
+  ui.FormViewCtrl($scope, $element);
+
+  $scope.onClose = function() {
+    $scope.confirmDirty(doClose);
+  };
+
+  var __version = null;
+
+  $scope.$watch('record.version', function recordVersionWatch(value) {
+    if (value === null || value === undefined) return;
+    if (__version !== null) return;
+    __version = value;
+  });
+
+  function doClose() {
+    if (!$scope.isDirty()) {
+      var rec = $scope.record || {};
+      axelor.config["user.action"] = rec.homeAction;
+    }
+
+    window.history.back();
+
+    if (__version === ($scope.record || {}).version) {
+      return;
+    }
+
+    setTimeout(function() {
+      window.location.reload();
+    }, 100);
+  }
+
+  $scope.setEditable();
+  $scope.show();
+
+  $scope.ajaxStop(function () {
+    $scope.$applyAsync();
+  });
 }
 
 function AboutCtrl($scope) {
-	$scope.appName = axelor.config["application.name"];
-	$scope.appDescription = axelor.config["application.description"];
-	$scope.appVersion = axelor.config["application.version"];
-	$scope.appCopyright = axelor.config["application.copyright"];
-	$scope.appSdk = axelor.config["application.sdk"];
-	$scope.appHome = axelor.config["application.home"];
-	$scope.appHelp = axelor.config["application.help"];
-	$scope.appYear = moment().year();
+  $scope.appName = axelor.config["application.name"];
+  $scope.appDescription = axelor.config["application.description"];
+  $scope.appVersion = axelor.config["application.version"];
+  $scope.appCopyright = axelor.config["application.copyright"];
+  $scope.appSdk = axelor.config["application.sdk"];
+  $scope.appHome = axelor.config["application.home"];
+  $scope.appHelp = axelor.config["application.help"];
+  $scope.appYear = moment().year();
 }
 
 function SystemCtrl($scope, $element, $location, $http) {
 
-	var promise = null;
+  var promise = null;
 
-	$scope.onRefresh = function () {
-		if (promise) {
-			return;
-		}
-		promise = $http.get("ws/app/sysinfo").then(function (res) {
-			var info = res.data;
-			_.each(info.users, function (item) {
-				item.loginTime = moment(item.loginTime).format('L LT');
-				item.accessTime = moment(item.accessTime).format('L LT');
-			});
-			$scope.info = info;
-			promise = null;
-		});
-		return promise;
-	};
+  $scope.onRefresh = function () {
+    if (promise) {
+      return;
+    }
+    promise = $http.get("ws/app/sysinfo").then(function (res) {
+      var info = res.data;
+      _.each(info.users, function (item) {
+        item.loginTime = moment(item.loginTime).format('L LT');
+        item.accessTime = moment(item.accessTime).format('L LT');
+      });
+      $scope.info = info;
+      promise = null;
+    });
+    return promise;
+  };
 
-	$scope.onClose = function () {
-		window.history.back();
-	};
+  $scope.onClose = function () {
+    window.history.back();
+  };
 
-	$scope.onRefresh();
+  $scope.onRefresh();
 }
 
 ui.controller("UserCtrl", ['$scope', '$element', '$location', 'DataSource', 'ViewService', UserCtrl]);

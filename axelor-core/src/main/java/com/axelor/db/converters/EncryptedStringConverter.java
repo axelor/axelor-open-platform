@@ -17,17 +17,16 @@
  */
 package com.axelor.db.converters;
 
-import javax.persistence.Converter;
-
 import com.axelor.common.crypto.StringEncryptor;
+import javax.persistence.Converter;
 
 @Converter
 public class EncryptedStringConverter extends AbstractEncryptedConverter<String, String> {
 
-	@Override
-	protected StringEncryptor getEncryptor(String algorithm, String password) {
-		return "GCM".equalsIgnoreCase(algorithm)
-				? StringEncryptor.gcm(password)
-				: StringEncryptor.cbc(password);
-	}
+  @Override
+  protected StringEncryptor getEncryptor(String algorithm, String password) {
+    return "GCM".equalsIgnoreCase(algorithm)
+        ? StringEncryptor.gcm(password)
+        : StringEncryptor.cbc(password);
+  }
 }

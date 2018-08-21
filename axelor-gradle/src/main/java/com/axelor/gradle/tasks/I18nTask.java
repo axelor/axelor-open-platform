@@ -17,31 +17,29 @@
  */
 package com.axelor.gradle.tasks;
 
+import com.axelor.gradle.AxelorPlugin;
+import com.axelor.tools.i18n.I18nExtractor;
 import java.nio.file.Paths;
-
 import org.gradle.api.DefaultTask;
 import org.gradle.api.internal.tasks.options.Option;
 import org.gradle.api.tasks.TaskAction;
 
-import com.axelor.gradle.AxelorPlugin;
-import com.axelor.tools.i18n.I18nExtractor;
-
 public class I18nTask extends DefaultTask {
 
-	public static final String TASK_NAME = "i18n";
-	public static final String TASK_DESCRIPTION = "Update i18n messages from source files.";
-	public static final String TASK_GROUP = AxelorPlugin.AXELOR_BUILD_GROUP;
+  public static final String TASK_NAME = "i18n";
+  public static final String TASK_DESCRIPTION = "Update i18n messages from source files.";
+  public static final String TASK_GROUP = AxelorPlugin.AXELOR_BUILD_GROUP;
 
-	private boolean withContext;
+  private boolean withContext;
 
-	@Option(option = "with-context", description = "Specify whether to include context details.")
-	public void setWithContext(boolean withContext) {
-		this.withContext = withContext;
-	}
+  @Option(option = "with-context", description = "Specify whether to include context details.")
+  public void setWithContext(boolean withContext) {
+    this.withContext = withContext;
+  }
 
-	@TaskAction
-	public void extract() {
-		final I18nExtractor extractor = new I18nExtractor();
-		extractor.extract(Paths.get(getProject().getProjectDir().getPath()), true, withContext);
-	}
+  @TaskAction
+  public void extract() {
+    final I18nExtractor extractor = new I18nExtractor();
+    extractor.extract(Paths.get(getProject().getProjectDir().getPath()), true, withContext);
+  }
 }

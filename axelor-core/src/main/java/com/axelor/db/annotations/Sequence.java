@@ -23,19 +23,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Mark the field to use a specified custom sequence.
- * 
- */
+/** Mark the field to use a specified custom sequence. */
 @Documented
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Sequence {
 
-	/**
-	 * The custom sequence name.
-	 * 
-	 * @return the sequence name
-	 */
-	String value();
+  /**
+   * The custom sequence name.
+   *
+   * @return the sequence name
+   */
+  String value();
 }

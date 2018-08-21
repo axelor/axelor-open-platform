@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 angular.module('axelor.ui', [
-	'ngRoute',
-	'ngSanitize',
-	'ngAnimate',
-	'ui.sortable',
-	'axelor.ds'
+  'ngRoute',
+  'ngSanitize',
+  'ngAnimate',
+  'ui.sortable',
+  'axelor.ds'
 ]);

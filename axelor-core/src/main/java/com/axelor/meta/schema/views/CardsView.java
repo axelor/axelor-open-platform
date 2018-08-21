@@ -17,90 +17,82 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
-
-import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("cards")
 public class CardsView extends AbstractView {
 
-	@XmlAttribute
-	private String orderBy;
+  @XmlAttribute private String orderBy;
 
-	@XmlAttribute
-	private Boolean customSearch;
+  @XmlAttribute private Boolean customSearch;
 
-	@XmlAttribute
-	private String freeSearch;
+  @XmlAttribute private String freeSearch;
 
-	@XmlElement(name = "field", type = Field.class)
-	private List<AbstractWidget> items;
+  @XmlElement(name = "field", type = Field.class)
+  private List<AbstractWidget> items;
 
-	@XmlElement(name = "hilite", type = Hilite.class)
-	private List<Hilite> hilites;
+  @XmlElement(name = "hilite", type = Hilite.class)
+  private List<Hilite> hilites;
 
-	@XmlCDATA
-	@XmlElement
-	private String template;
+  @XmlCDATA @XmlElement private String template;
 
-	public String getOrderBy() {
-		return orderBy;
-	}
+  public String getOrderBy() {
+    return orderBy;
+  }
 
-	public void setOrderBy(String orderBy) {
-		this.orderBy = orderBy;
-	}
+  public void setOrderBy(String orderBy) {
+    this.orderBy = orderBy;
+  }
 
-	public Boolean getCustomSearch() {
-		return customSearch;
-	}
+  public Boolean getCustomSearch() {
+    return customSearch;
+  }
 
-	public void setCustomSearch(Boolean customSearch) {
-		this.customSearch = customSearch;
-	}
+  public void setCustomSearch(Boolean customSearch) {
+    this.customSearch = customSearch;
+  }
 
-	public String getFreeSearch() {
-		return freeSearch;
-	}
+  public String getFreeSearch() {
+    return freeSearch;
+  }
 
-	public void setFreeSearch(String freeSearch) {
-		this.freeSearch = freeSearch;
-	}
+  public void setFreeSearch(String freeSearch) {
+    this.freeSearch = freeSearch;
+  }
 
-	public List<AbstractWidget> getItems() {
-		if (items == null) {
-			return items;
-		}
-		for (AbstractWidget item : items) {
-			item.setModel(getModel());
-		}
-		return items;
-	}
+  public List<AbstractWidget> getItems() {
+    if (items == null) {
+      return items;
+    }
+    for (AbstractWidget item : items) {
+      item.setModel(getModel());
+    }
+    return items;
+  }
 
-	public void setItems(List<AbstractWidget> items) {
-		this.items = items;
-	}
+  public void setItems(List<AbstractWidget> items) {
+    this.items = items;
+  }
 
-	public List<Hilite> getHilites() {
-		return hilites;
-	}
+  public List<Hilite> getHilites() {
+    return hilites;
+  }
 
-	public void setHilites(List<Hilite> hilites) {
-		this.hilites = hilites;
-	}
+  public void setHilites(List<Hilite> hilites) {
+    this.hilites = hilites;
+  }
 
-	public String getTemplate() {
-		return template;
-	}
+  public String getTemplate() {
+    return template;
+  }
 
-	public void setTemplate(String template) {
-		this.template = template;
-	}
+  public void setTemplate(String template) {
+    this.template = template;
+  }
 }

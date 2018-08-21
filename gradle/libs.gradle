@@ -31,21 +31,21 @@ libs.slf4j_base = [
 ]
 
 libs.slf4j_log4j = libs.slf4j_base + [
-	"org.apache.logging.log4j:log4j-slf4j-impl:2.7",
-	"org.apache.logging.log4j:log4j-api:2.7",
-	"org.apache.logging.log4j:log4j-core:2.7"
+  "org.apache.logging.log4j:log4j-slf4j-impl:2.7",
+  "org.apache.logging.log4j:log4j-api:2.7",
+  "org.apache.logging.log4j:log4j-core:2.7"
 ]
 
 libs.slf4j_log4j_web = "org.apache.logging.log4j:log4j-web:2.7"
 
 libs.slf4j_simple = libs.slf4j_base + [
-	"org.slf4j:slf4j-simple:${versions.slf4j}"
+  "org.slf4j:slf4j-simple:${versions.slf4j}"
 ]
 
 libs.slf4j_logback = libs.slf4j_base + [
-	"ch.qos.logback:logback-core:1.2.3",
-	"ch.qos.logback:logback-classic:1.2.3",
-	"org.fusesource.jansi:jansi:1.15"
+  "ch.qos.logback:logback-core:1.2.3",
+  "ch.qos.logback:logback-classic:1.2.3",
+  "org.fusesource.jansi:jansi:1.15"
 ]
 
 // Guava
@@ -85,10 +85,10 @@ libs.jdbc_mysql = "mysql:mysql-connector-java:5.1.41"
 // Hibernate
 libs.hibernate = [
     "org.hibernate:hibernate-core:${versions.hibernate}",
-	"org.hibernate:hibernate-hikaricp:${versions.hibernate}",
+  "org.hibernate:hibernate-hikaricp:${versions.hibernate}",
     "org.hibernate:hibernate-validator:${versions.hibernate_validator}",
-	"org.hibernate:hibernate-ehcache:${versions.hibernate}",
-	"org.hibernate:hibernate-jcache:${versions.hibernate}",
+  "org.hibernate:hibernate-ehcache:${versions.hibernate}",
+  "org.hibernate:hibernate-jcache:${versions.hibernate}",
 ]
 
 // Hibernate search
@@ -99,18 +99,18 @@ libs.apache_tika_core = "org.apache.tika:tika-core:1.4"
 
 // minimal set of tika-parsers
 libs.apache_tika_parsers = dependencies.create("org.apache.tika:tika-parsers:1.4") {
-	exclude group: 'org.gagravarr', module: 'vorbis-java-tika'
-	exclude group: 'edu.ucar', module: 'netcdf'
-	exclude group: 'org.apache.james', module: 'apache-mime4j-core'
-	exclude group: 'org.apache.james', module: 'apache-mime4j-dom'
-	exclude group: 'org.bouncycastle', module: 'bcmail-jdk15'
-	exclude group: 'org.bouncycastle', module: 'bcprov-jdk15'
-	exclude group: 'org.ow2.asm', module: 'asm-debug-all'
-	exclude group: 'com.googlecode.mp4parser', module: 'isoparser'
-	exclude group: 'xerces', module: 'xercesImpl'
-	exclude group: 'rome', module: 'rome'
-	exclude group: 'org.gagravarr', module: 'vorbis-java-core'
-	exclude group: 'org.apache.geronimo.specs', module: 'geronimo-stax-api_1.0_spec'
+  exclude group: 'org.gagravarr', module: 'vorbis-java-tika'
+  exclude group: 'edu.ucar', module: 'netcdf'
+  exclude group: 'org.apache.james', module: 'apache-mime4j-core'
+  exclude group: 'org.apache.james', module: 'apache-mime4j-dom'
+  exclude group: 'org.bouncycastle', module: 'bcmail-jdk15'
+  exclude group: 'org.bouncycastle', module: 'bcprov-jdk15'
+  exclude group: 'org.ow2.asm', module: 'asm-debug-all'
+  exclude group: 'com.googlecode.mp4parser', module: 'isoparser'
+  exclude group: 'xerces', module: 'xercesImpl'
+  exclude group: 'rome', module: 'rome'
+  exclude group: 'org.gagravarr', module: 'vorbis-java-core'
+  exclude group: 'org.apache.geronimo.specs', module: 'geronimo-stax-api_1.0_spec'
 }
 
 // flyway
@@ -125,53 +125,53 @@ libs.groovy_wslite = dependencies.create("com.github.groovy-wslite:groovy-wslite
 
 // jax-rs
 libs.resteasy = [
-	"org.jboss.resteasy:resteasy-jaxrs:${versions.resteasy}",
-	"org.jboss.resteasy:resteasy-jackson2-provider:${versions.resteasy}",
-	"org.jboss.resteasy:resteasy-servlet-initializer:${versions.resteasy}",
+  "org.jboss.resteasy:resteasy-jaxrs:${versions.resteasy}",
+  "org.jboss.resteasy:resteasy-jackson2-provider:${versions.resteasy}",
+  "org.jboss.resteasy:resteasy-servlet-initializer:${versions.resteasy}",
 ]
 
 libs.resteasy_multipart = dependencies.create("org.jboss.resteasy:resteasy-multipart-provider:${versions.resteasy}") {
-	exclude module: "resteasy-jaxb-provider"
-	exclude module: "mail", group: "javax.mail"
+  exclude module: "resteasy-jaxb-provider"
+  exclude module: "mail", group: "javax.mail"
 }
 
 libs.resteasy_guice = "org.jboss.resteasy:resteasy-guice:${versions.resteasy}"
 libs.resteasy_client = "org.jboss.resteasy:resteasy-client:${versions.resteasy}"
 libs.resteasy_server = [
-	"org.jboss.resteasy:resteasy-undertow:${versions.resteasy}",
-	"io.undertow:undertow-core:1.4.4.Final",
-	"io.undertow:undertow-servlet:1.4.4.Final"]
+  "org.jboss.resteasy:resteasy-undertow:${versions.resteasy}",
+  "io.undertow:undertow-core:1.4.4.Final",
+  "io.undertow:undertow-servlet:1.4.4.Final"]
 
 // jackson
 libs.jackson_libs = [
-	"com.fasterxml.jackson.core:jackson-core:${versions.jackson}",
-	"com.fasterxml.jackson.core:jackson-databind:${versions.jackson}",
-	"com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}",
-	"com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:${versions.jackson}",
-	"com.fasterxml.jackson.datatype:jackson-datatype-guava:${versions.jackson}",
-	"com.fasterxml.jackson.module:jackson-module-parameter-names:${versions.jackson}",
-	"com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${versions.jackson}",
-	"com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${versions.jackson}"]
+  "com.fasterxml.jackson.core:jackson-core:${versions.jackson}",
+  "com.fasterxml.jackson.core:jackson-databind:${versions.jackson}",
+  "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}",
+  "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:${versions.jackson}",
+  "com.fasterxml.jackson.datatype:jackson-datatype-guava:${versions.jackson}",
+  "com.fasterxml.jackson.module:jackson-module-parameter-names:${versions.jackson}",
+  "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${versions.jackson}",
+  "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${versions.jackson}"]
 
 // Apache Shiro
 libs.apache_shiro = [
-	"org.apache.shiro:shiro-core:${versions.shiro}",
-	"org.apache.shiro:shiro-web:${versions.shiro}",
-	"org.apache.shiro:shiro-guice:${versions.shiro}"]
+  "org.apache.shiro:shiro-core:${versions.shiro}",
+  "org.apache.shiro:shiro-web:${versions.shiro}",
+  "org.apache.shiro:shiro-guice:${versions.shiro}"]
 
 // Apache Shiro CAS
 libs.apache_shiro_cas = [
-	"org.apache.shiro:shiro-cas:${versions.shiro}",
-	"commons-codec:commons-codec:1.10",
-	"org.opensaml:opensaml:1.1",
-	"org.apache.santuario:xmlsec:1.4.3"]
+  "org.apache.shiro:shiro-cas:${versions.shiro}",
+  "commons-codec:commons-codec:1.10",
+  "org.opensaml:opensaml:1.1",
+  "org.apache.santuario:xmlsec:1.4.3"]
 
 // Apache DS (for testing only)
 libs.apache_ds = [
-	"org.apache.directory.jdbm:apacheds-jdbm1:2.0.0-M3",
-	dependencies.create("org.apache.directory.server:apacheds-test-framework:2.0.0-M15") {
-		exclude group: "org.apache.directory.jdbm"
-	}
+  "org.apache.directory.jdbm:apacheds-jdbm1:2.0.0-M3",
+  dependencies.create("org.apache.directory.server:apacheds-test-framework:2.0.0-M15") {
+    exclude group: "org.apache.directory.jdbm"
+  }
 ]
 
 // commons
@@ -180,9 +180,9 @@ libs.commons_jxpath = "commons-jxpath:commons-jxpath:1.3"
 
 // BIRT Runtime
 libs.birt_runtime = dependencies.create("org.eclipse.birt.runtime:org.eclipse.birt.runtime:4.4.2") {
-	exclude module: "derby"
-	exclude module: "org.apache.batik.pdf" // causing issue with commons-io
-	exclude module: "commons-cli"
+  exclude module: "derby"
+  exclude module: "org.apache.batik.pdf" // causing issue with commons-io
+  exclude module: "commons-cli"
 }
 
 // jcommander
@@ -211,8 +211,8 @@ libs.plugin_license = "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-p
 
 // embeded tomcat
 libs.tomcat_embed = [
-	"org.apache.tomcat.embed:tomcat-embed-core:${versions.tomcat_embed}",
-	"org.apache.tomcat.embed:tomcat-embed-jasper:${versions.tomcat_embed}",
+  "org.apache.tomcat.embed:tomcat-embed-core:${versions.tomcat_embed}",
+  "org.apache.tomcat.embed:tomcat-embed-jasper:${versions.tomcat_embed}",
 ]
 
 // currently deployed on axelor repo

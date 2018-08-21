@@ -17,11 +17,8 @@
  */
 package com.axelor.common.foo;
 
+import com.axelor.common.bar.MyBase;
 import org.junit.Ignore;
 
-import com.axelor.common.bar.MyBase;
-
 @Ignore
-public abstract class MyClass2 extends MyBase {
-
-}
+public abstract class MyClass2 extends MyBase {}

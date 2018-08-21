@@ -18,17 +18,16 @@
 package com.axelor.db.hibernate.type;
 
 import java.sql.Types;
-
 import org.hibernate.type.descriptor.sql.LongVarcharTypeDescriptor;
 
 public class JsonSqlTypeDescriptor extends LongVarcharTypeDescriptor {
 
-	private static final long serialVersionUID = -8979157616088702827L;
+  private static final long serialVersionUID = -8979157616088702827L;
 
-	public static final JsonSqlTypeDescriptor INSTANCE = new JsonSqlTypeDescriptor();
+  public static final JsonSqlTypeDescriptor INSTANCE = new JsonSqlTypeDescriptor();
 
-	@Override
-	public int getSqlType() {
-		return Types.OTHER;
-	}
+  @Override
+  public int getSqlType() {
+    return Types.OTHER;
+  }
 }

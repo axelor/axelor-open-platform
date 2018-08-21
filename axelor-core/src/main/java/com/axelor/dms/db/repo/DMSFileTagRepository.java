@@ -22,7 +22,7 @@ import com.axelor.dms.db.DMSFileTag;
 
 public class DMSFileTagRepository extends JpaRepository<DMSFileTag> {
 
-	public DMSFileTagRepository() {
-		super(DMSFileTag.class);
-	}
+  public DMSFileTagRepository() {
+    super(DMSFileTag.class);
+  }
 }

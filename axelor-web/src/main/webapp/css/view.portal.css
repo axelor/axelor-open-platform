@@ -20,229 +20,229 @@
 .portal-view .portlet-body,
 .portal-view .portlet-header,
 .portal-view .portlet-content {
-	overflow: hidden;
-	-webkit-box-sizing: border-box;
-	   -moz-box-sizing: border-box;
-	        box-sizing: border-box;
+  overflow: hidden;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 .form-view .portlet,
 .form-view .portlet-body,
 .form-view .portlet-header,
 .form-view .portlet-content {
-	overflow: hidden;
-	-webkit-box-sizing: border-box;
-	   -moz-box-sizing: border-box;
-	        box-sizing: border-box;
+  overflow: hidden;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 .portal-view .portal {
-	padding: 4px;
+  padding: 4px;
 }
 
 .portal > .portal-tabs,
 .portal > .portlet {
-	position: relative;
-	float: left;
+  position: relative;
+  float: left;
 }
 
 .portlet-header.navbar i {
-	padding: 4px;
-	margin: 0;
+  padding: 4px;
+  margin: 0;
 }
 
 .portlet-header.navbar .portlet-pager i.disabled {
-	color: gray;
-	cursor: default;
+  color: gray;
+  cursor: default;
 }
 
 .portlet-header.navbar .divider-vertical {
-	height: 28px;
+  height: 28px;
 }
 
 .portlet .portlet-body,
 .portlet .portlet-content {
-	position: absolute !important;
+  position: absolute !important;
 }
 
 .portlet .portlet-body {
-	top: 0px;
-	right: 2px;
-	bottom: 4px;
-	left: 2px;
+  top: 0px;
+  right: 2px;
+  bottom: 4px;
+  left: 2px;
 
-	-webkit-border-radius: 4px;
-	   -moz-border-radius: 4px;
-			border-radius: 4px;
-				
-	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-	   -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+      border-radius: 4px;
+
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+     -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .portlet .portlet-content {
-	top: 30px;
-	left: 0px;
-	right: 0px;
-	bottom: 0px;
-	
-	border: 1px solid #d4d4d4;
-	border-top: none;
-	border-bottom-left-radius: 4px;
-	border-bottom-right-radius: 4px;
+  top: 30px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+
+  border: 1px solid #d4d4d4;
+  border-top: none;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 
 .portlet .portlet-content > div,
 .portlet .portlet-content > div > .slickgrid {
-	top: -1px !important;
-	height: 100%;
-	-webkit-box-sizing: border-box;
-	   -moz-box-sizing: border-box;
-	        box-sizing: border-box;
-	        
-	border: none;
+  top: -1px !important;
+  height: 100%;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+
+  border: none;
 }
 
 .portal-tabs {
-	margin-bottom: 4px;
+  margin-bottom: 4px;
 }
 
 .portal-tabs > .nav-tabs {
-	margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .portal-tabs > .tab-content {
-	position: relative;
-	border: 1px solid #DDD;
-	border-top: 0;
-	background-color: #fff;
+  position: relative;
+  border: 1px solid #DDD;
+  border-top: 0;
+  background-color: #fff;
 }
 
 .portlet .portlet-content > .nvtooltip {
-	height: auto;
+  height: auto;
 }
 
 .portlet.portlet-minimized {
-	height: 34px !important;
+  height: 34px !important;
 }
 
 .portlet.portlet-minimized .portlet-content {
-	display: none !important;
+  display: none !important;
 }
 
 .portal-view .ui-sortable-placeholder {
-	border: 2px dashed #c9c9c9;
-	visibility: visible !important;
-	
-	margin-bottom: 4px;
-	
-	-webkit-border-radius: 4px;
-	   -moz-border-radius: 4px;
-			border-radius: 4px;
+  border: 2px dashed #c9c9c9;
+  visibility: visible !important;
+
+  margin-bottom: 4px;
+
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+      border-radius: 4px;
 }
 
 /** dashboard */
 
 .dashboard {
-	margin: auto;
-	padding: 14px;
+  margin: auto;
+  padding: 14px;
 }
 
 .dashboard.attached {
-	margin-top: -16px;
+  margin-top: -16px;
 }
 
 .dashboard,
 .dashboard .dashlet {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .dashboard .ui-sortable-placeholder {
-	border: 1px dashed #cecece !important;
-	visibility: visible !important;
-	background: #e7eaec !important;
+  border: 1px dashed #cecece !important;
+  visibility: visible !important;
+  background: #e7eaec !important;
 }
 .dashboard .ui-sortable-helper {
-	box-shadow: 0 5px 10px rgba(0,0,0,.3);
+  box-shadow: 0 5px 10px rgba(0,0,0,.3);
 }
 
 .dashboard .dashlet {
-	background-color: #fff;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .dashboard .dashlet-header {
-	border-top: 4px solid #e7e7e7;
-	padding: 11px 15px 14px;
-	margin-top: -1px;
-	cursor: move;
+  border-top: 4px solid #e7e7e7;
+  padding: 11px 15px 14px;
+  margin-top: -1px;
+  cursor: move;
 }
 
 .bar-layout .dashlet {
-	height: 100%;
+  height: 100%;
 }
 .bar-layout .dashlet-header {
-	cursor: default;
+  cursor: default;
 }
 .bar-layout .panel .dashboard {
-	margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .dashboard .dashlet-title {
-	font-size: 14px;
-	font-weight: 600;
-	max-width: 60%;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dashboard .dashlet-body {
-	border-top: 1px solid #e7e7e7;
-	height: 250px;
-	overflow: auto;
+  border-top: 1px solid #e7e7e7;
+  height: 250px;
+  overflow: auto;
 }
 
 .dashboard .dashlet-body > * {
-	height: calc(100% - 1px);
+  height: calc(100% - 1px);
 }
 
 .dashboard .dashlet-body .slickgrid {
-	height: 100%;
-	border: 0;
+  height: 100%;
+  border: 0;
 }
 .dashboard .dashlet-body .slickgrid .slick-header {
     border-top: 0;
 }
 
 .dashboard .dashlet-pager {
-	margin-right: 8px;
+  margin-right: 8px;
 }
 
 .dashboard ul.dashlet-buttons {
-	list-style: none;
-	margin: 0;
+  list-style: none;
+  margin: 0;
 }
 
 .dashboard ul.dashlet-buttons > li {
-	list-style: none;
-	float: left;
-	margin: 0 4px;
+  list-style: none;
+  float: left;
+  margin: 0 4px;
 }
 
 .dashboard ul.dashlet-buttons > li > a {
-	color: #333;
+  color: #333;
 }
 
 .dashboard .dashlet-buttons > a,
 .dashboard .dashlet-pager > a {
-	color: #333;
-	padding-left: 8px;
+  color: #333;
+  padding-left: 8px;
 }
 
 .dashboard .dashlet-pager > a.disabled {
-	color: gray;
-	cursor: default;
+  color: gray;
+  cursor: default;
 }
 
 .dashlet .chart-controls {
@@ -250,41 +250,41 @@
 }
 
 .dashlet .chart-controls form {
-	margin: 0;
-	padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .dashlet .chart-controls .panel {
-	border: 0;
-	box-shadow: none;
-	margin: 0;
+  border: 0;
+  box-shadow: none;
+  margin: 0;
 }
 .dashlet .chart-controls .panel-body {
-	padding: 4px;
+  padding: 4px;
 }
 
 .dashboard .dashlet {
-	margin: 10px !important;
+  margin: 10px !important;
 }
 
 .form-item .dashboard {
-	padding: 0 !important;
+  padding: 0 !important;
 }
 .form-item .dashlet {
-	margin: 0 !important;
-	border: 1px solid #e7e7e7;
+  margin: 0 !important;
+  border: 1px solid #e7e7e7;
 }
 .form-item .dashlet .dashlet-body > * {
-	height: 100%;
+  height: 100%;
 }
 .form-item .dashlet .dashlet-body {
-	padding: 0;
+  padding: 0;
 }
 .form-item .dashlet .dashlet-body .portlet-grid .slickgrid {
-	border: 0;
+  border: 0;
 }
 .form-item .dashlet .dashlet-body .portlet-grid .slick-header {
-	border-top: 0;
+  border-top: 0;
 }
 
 /** responsive dashlet classes */
@@ -295,98 +295,98 @@
 }
 
 .dashlet-cs12 {
-	width: calc(100% - 24px);
+  width: calc(100% - 24px);
 }
 
 .dashlet-cs11 {
-	width: calc(91.666666667% - 24px);
+  width: calc(91.666666667% - 24px);
 }
 
 .dashlet-cs10 {
-	width: calc(83.333333333% - 24px);
+  width: calc(83.333333333% - 24px);
 }
 
 .dashlet-cs9 {
-	width: calc(75% - 24px);
+  width: calc(75% - 24px);
 }
 
 .dashlet-cs8 {
-	width: calc(66.666666667% - 24px);
+  width: calc(66.666666667% - 24px);
 }
 
 .dashlet-cs7 {
-	width: calc(58.333333333% - 24px);
+  width: calc(58.333333333% - 24px);
 }
 
 .dashlet-cs6 {
-	width: calc(50% - 24px);
+  width: calc(50% - 24px);
 }
 
 .dashlet-cs5 {
-	width: calc(41.666666667% - 24px);
+  width: calc(41.666666667% - 24px);
 }
 
 .dashlet-cs4 {
-	width: calc(33.333333333% - 24px);
+  width: calc(33.333333333% - 24px);
 }
 
 .dashlet-cs3 {
-	width: calc(25% - 24px);
+  width: calc(25% - 24px);
 }
 
 .dashlet-cs2 {
-	width: calc(16.666666667% - 24px);
+  width: calc(16.666666667% - 24px);
 }
 
 .dashlet-cs1 {
-	width: calc(8.333333333% - 24px);
+  width: calc(8.333333333% - 24px);
 }
 
 @media (max-width: 768px) {
-	[class*="dashlet-cs"] {
-		width: calc(100% - 24px);
-	}
+  [class*="dashlet-cs"] {
+    width: calc(100% - 24px);
+  }
 }
 
 .chart-controls .span6 {
-	width: calc(50% - 12px) !important;
-	margin: 0 12px !important;
-	float: left !important;
+  width: calc(50% - 12px) !important;
+  margin: 0 12px !important;
+  float: left !important;
 }
 
 .chart-controls .span6:first-child {
-	margin-left: 0 !important;
+  margin-left: 0 !important;
 }
 
 .chart-controls .span6:last-child {
-	margin-right: 0 !important;
+  margin-right: 0 !important;
 }
 
 .report-box {
-	position: relative;
+  position: relative;
 }
 
 .report-box .dashlet-body {
-	height: 60px;
-	padding: 15px 20px 20px 20px;
-	overflow: hidden;
+  height: 60px;
+  padding: 15px 20px 20px 20px;
+  overflow: hidden;
 }
 
 .report-box .dashlet-body h1 {
-	margin: 0;
-	font-size: 30px;
-	font-weight: 100;
+  margin: 0;
+  font-size: 30px;
+  font-weight: 100;
 }
 
 .report-box .report-tags {
-	position: absolute;
+  position: absolute;
     top: 12px;
     right: 36px;
 }
 
 .report-table tfoot td {
-	border-top: 1px solid #ccc;
-	font-weight: 600;
+  border-top: 1px solid #ccc;
+  font-weight: 600;
 }
 
 @media (max-width: 480px) {

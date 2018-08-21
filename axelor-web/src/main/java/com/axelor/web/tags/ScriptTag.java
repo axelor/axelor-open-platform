@@ -17,54 +17,55 @@
  */
 package com.axelor.web.tags;
 
+import com.google.common.io.CharStreams;
+import com.google.common.io.LineProcessor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.servlet.jsp.JspWriter;
 
-import com.google.common.io.CharStreams;
-import com.google.common.io.LineProcessor;
-
 public class ScriptTag extends AbstractTag {
-	
-	private List<String> files(final String manifest) throws IOException {
 
-		final List<String> files = new ArrayList<>();
-		final URL resource = this.getResource(manifest);
-		if (resource == null) {
-			return files;
-		}
+  private List<String> files(final String manifest) throws IOException {
 
-		try (final InputStream is = resource.openStream()) {
-			return CharStreams.readLines(new InputStreamReader(is), new LineProcessor<List<String>>() {
-				@Override
-				public boolean processLine(String line) throws IOException {
-					if (line.startsWith("//= ")) {
-						line = line.substring(3).trim();
-						files.add(line);
-					}
-					return true;
-				}
-				@Override
-				public List<String> getResult() {
-					return files;
-				}
-			});
-		}
-	}
+    final List<String> files = new ArrayList<>();
+    final URL resource = this.getResource(manifest);
+    if (resource == null) {
+      return files;
+    }
 
-	@Override
-	protected List<String> getScripts() throws IOException {
-		return files(getSrc());
-	}
+    try (final InputStream is = resource.openStream()) {
+      return CharStreams.readLines(
+          new InputStreamReader(is),
+          new LineProcessor<List<String>>() {
+            @Override
+            public boolean processLine(String line) throws IOException {
+              if (line.startsWith("//= ")) {
+                line = line.substring(3).trim();
+                files.add(line);
+              }
+              return true;
+            }
 
-	@Override
-	protected void doTag(String src) throws IOException {
-		final JspWriter writer = getJspContext().getOut();
-		writer.println("<script src=\"" + src + "\"></script>");
-	}
+            @Override
+            public List<String> getResult() {
+              return files;
+            }
+          });
+    }
+  }
+
+  @Override
+  protected List<String> getScripts() throws IOException {
+    return files(getSrc());
+  }
+
+  @Override
+  protected void doTag(String src) throws IOException {
+    final JspWriter writer = getJspContext().getOut();
+    writer.println("<script src=\"" + src + "\"></script>");
+  }
 }

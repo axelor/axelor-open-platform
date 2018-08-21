@@ -17,9 +17,9 @@
  */
 package com.axelor.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Map;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.FilterChain;
@@ -28,7 +28,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -36,109 +35,109 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class AuthFilter extends FormAuthenticationFilter {
 
-	@Inject
-	@Named("app.loginUrl")
-	private String loginUrl;
+  @Inject
+  @Named("app.loginUrl")
+  private String loginUrl;
 
-	@Override
-	public String getLoginUrl() {
-		if (loginUrl != null) {
-			return loginUrl;
-		}
-		return super.getLoginUrl();
-	}
+  @Override
+  public String getLoginUrl() {
+    if (loginUrl != null) {
+      return loginUrl;
+    }
+    return super.getLoginUrl();
+  }
 
-	private boolean isRootWithoutSlash(ServletRequest request) {
-		final HttpServletRequest req = (HttpServletRequest) request;
-		final String ctx = WebUtils.getContextPath(req);
-		final String uri = WebUtils.getRequestUri(req);
-		return ctx != null && uri != null && !uri.endsWith("/") && ctx.length() == uri.length();
-	}
+  private boolean isRootWithoutSlash(ServletRequest request) {
+    final HttpServletRequest req = (HttpServletRequest) request;
+    final String ctx = WebUtils.getContextPath(req);
+    final String uri = WebUtils.getRequestUri(req);
+    return ctx != null && uri != null && !uri.endsWith("/") && ctx.length() == uri.length();
+  }
 
-	@Override
-	public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws ServletException, IOException {
+  @Override
+  public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)
+      throws ServletException, IOException {
 
-		// tomcat 7.0.67 doesn't redirect with / if root request is sent without slash
-		// see RM-4500 for more details
-		if (!SecurityUtils.getSubject().isAuthenticated() && isRootWithoutSlash(request)) {
-			WebUtils.issueRedirect(request, response, "/");
-			return;
-		}
+    // tomcat 7.0.67 doesn't redirect with / if root request is sent without slash
+    // see RM-4500 for more details
+    if (!SecurityUtils.getSubject().isAuthenticated() && isRootWithoutSlash(request)) {
+      WebUtils.issueRedirect(request, response, "/");
+      return;
+    }
 
-		if (isLoginRequest(request, response) && SecurityUtils.getSubject().isAuthenticated()) {
-			// in case of login submission with ajax
-			if (isXHR(request) && isLoginSubmission(request, response)) {
-				WebUtils.toHttp(response).setStatus(200);
-				return;
-			}
-			WebUtils.issueRedirect(request, response, "/");
-		}
-		super.doFilterInternal(request, response, chain);
-	}
+    if (isLoginRequest(request, response) && SecurityUtils.getSubject().isAuthenticated()) {
+      // in case of login submission with ajax
+      if (isXHR(request) && isLoginSubmission(request, response)) {
+        WebUtils.toHttp(response).setStatus(200);
+        return;
+      }
+      WebUtils.issueRedirect(request, response, "/");
+    }
+    super.doFilterInternal(request, response, chain);
+  }
 
-	@Override
-	protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-		
-		// set encoding to UTF-8 (see RM-4304)
-		request.setCharacterEncoding("UTF-8");
+  @Override
+  protected boolean onAccessDenied(ServletRequest request, ServletResponse response)
+      throws Exception {
 
-		if (isXHR(request)) {
-			
-			int status = 401;
-			if (isLoginRequest(request, response) && isLoginSubmission(request, response)) {
-				if (doLogin(request, response)) {
-					status = 200;
-				}
-			}
+    // set encoding to UTF-8 (see RM-4304)
+    request.setCharacterEncoding("UTF-8");
 
-			// set HTTP status for ajax requests
-			((HttpServletResponse) response).setStatus(status);
+    if (isXHR(request)) {
 
-			// don't process further, otherwise login.jsp will be rendered as response data
-			return false;
-		}
+      int status = 401;
+      if (isLoginRequest(request, response) && isLoginSubmission(request, response)) {
+        if (doLogin(request, response)) {
+          status = 200;
+        }
+      }
 
-		return super.onAccessDenied(request, response);
-	}
-	
-	@Override
-	protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,
-			ServletResponse response) throws Exception {
-		// change session id to prevent session fixation
-		((HttpServletRequest) request).changeSessionId();
-		return super.onLoginSuccess(token, subject, request, response);
-	}
+      // set HTTP status for ajax requests
+      ((HttpServletResponse) response).setStatus(status);
 
-	@SuppressWarnings("unchecked")
-	private boolean doLogin(ServletRequest request, ServletResponse response) throws Exception {
+      // don't process further, otherwise login.jsp will be rendered as response data
+      return false;
+    }
 
-		final ObjectMapper mapper = new ObjectMapper();
-		final Map<String, String> data = mapper.readValue(request.getInputStream(), Map.class);
+    return super.onAccessDenied(request, response);
+  }
 
-		final String username = data.get("username");
-		final String password = data.get("password");
+  @Override
+  protected boolean onLoginSuccess(
+      AuthenticationToken token, Subject subject, ServletRequest request, ServletResponse response)
+      throws Exception {
+    // change session id to prevent session fixation
+    ((HttpServletRequest) request).changeSessionId();
+    return super.onLoginSuccess(token, subject, request, response);
+  }
 
-		final AuthenticationToken token = createToken(username, password, request, response);
-		final Subject subject = getSubject(request, response);
+  @SuppressWarnings("unchecked")
+  private boolean doLogin(ServletRequest request, ServletResponse response) throws Exception {
 
-		try {
-			subject.login(token);
-		} catch (AuthenticationException e) {
-			return false;
-		}
+    final ObjectMapper mapper = new ObjectMapper();
+    final Map<String, String> data = mapper.readValue(request.getInputStream(), Map.class);
 
-		return true;
-	}
+    final String username = data.get("username");
+    final String password = data.get("password");
 
-	private boolean isXHR(ServletRequest request) {
-		final HttpServletRequest req = (HttpServletRequest) request;
-		return "XMLHttpRequest".equals(req.getHeader("X-Requested-With"))
-				|| "application/json".equals(req.getHeader("Accept"))
-				|| "application/json".equals(req.getHeader("Content-Type"));
-	}
+    final AuthenticationToken token = createToken(username, password, request, response);
+    final Subject subject = getSubject(request, response);
+
+    try {
+      subject.login(token);
+    } catch (AuthenticationException e) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private boolean isXHR(ServletRequest request) {
+    final HttpServletRequest req = (HttpServletRequest) request;
+    return "XMLHttpRequest".equals(req.getHeader("X-Requested-With"))
+        || "application/json".equals(req.getHeader("Accept"))
+        || "application/json".equals(req.getHeader("Content-Type"));
+  }
 }

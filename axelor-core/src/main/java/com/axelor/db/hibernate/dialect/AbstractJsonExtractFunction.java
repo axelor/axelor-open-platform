@@ -20,7 +20,6 @@ package com.axelor.db.hibernate.dialect;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.hibernate.QueryException;
 import org.hibernate.dialect.function.SQLFunction;
 import org.hibernate.engine.spi.Mapping;
@@ -29,66 +28,66 @@ import org.hibernate.type.Type;
 
 public abstract class AbstractJsonExtractFunction implements SQLFunction {
 
-	private Type type;
+  private Type type;
 
-	private String name;
+  private String name;
 
-	private String cast;
+  private String cast;
 
-	public AbstractJsonExtractFunction(String name, Type type, String cast) {
-		this.type = type;
-		this.name = name;
-		this.cast = cast;
-	}
+  public AbstractJsonExtractFunction(String name, Type type, String cast) {
+    this.type = type;
+    this.name = name;
+    this.cast = cast;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public String getCast() {
-		return cast;
-	}
+  public String getCast() {
+    return cast;
+  }
 
-	public Type getType() {
-		return type;
-	}
+  public Type getType() {
+    return type;
+  }
 
-	@Override
-	public boolean hasArguments() {
-		return true;
-	}
+  @Override
+  public boolean hasArguments() {
+    return true;
+  }
 
-	@Override
-	public boolean hasParenthesesIfNoArguments() {
-		return true;
-	}
+  @Override
+  public boolean hasParenthesesIfNoArguments() {
+    return true;
+  }
 
-	@Override
-	public Type getReturnType(Type firstArgumentType, Mapping mapping) throws QueryException {
-		return type == null ? firstArgumentType : type;
-	}
+  @Override
+  public Type getReturnType(Type firstArgumentType, Mapping mapping) throws QueryException {
+    return type == null ? firstArgumentType : type;
+  }
 
-	protected abstract String transformPath(List<String> path);
+  protected abstract String transformPath(List<String> path);
 
-	protected String transformFunction(String func) {
-		return func;
-	}
+  protected String transformFunction(String func) {
+    return func;
+  }
 
-	@Override
-	@SuppressWarnings("rawtypes")
-	public String render(Type firstArgumentType, List arguments, SessionFactoryImplementor factory) {
-		final StringBuilder buf = new StringBuilder();
-		final Iterator iter = arguments.iterator();
-		final List<String> path = new ArrayList<>();
-		buf.append(getName()).append("(");
-		buf.append(iter.next());
-		while (iter.hasNext()) {
-			path.add((String) iter.next());
-		}
-		buf.append(", ");
-		buf.append(transformPath(path));
-		buf.append(")");
-		final String func = transformFunction(buf.toString());
-		return cast == null ? func : String.format("cast(%s as %s)", func, cast);
-	}
+  @Override
+  @SuppressWarnings("rawtypes")
+  public String render(Type firstArgumentType, List arguments, SessionFactoryImplementor factory) {
+    final StringBuilder buf = new StringBuilder();
+    final Iterator iter = arguments.iterator();
+    final List<String> path = new ArrayList<>();
+    buf.append(getName()).append("(");
+    buf.append(iter.next());
+    while (iter.hasNext()) {
+      path.add((String) iter.next());
+    }
+    buf.append(", ");
+    buf.append(transformPath(path));
+    buf.append(")");
+    final String func = transformFunction(buf.toString());
+    return cast == null ? func : String.format("cast(%s as %s)", func, cast);
+  }
 }

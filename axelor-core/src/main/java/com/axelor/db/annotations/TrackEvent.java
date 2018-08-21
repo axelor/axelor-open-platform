@@ -17,12 +17,9 @@
  */
 package com.axelor.db.annotations;
 
-/**
- * The change track event types.
- *
- */
+/** The change track event types. */
 public enum TrackEvent {
-	ALWAYS,
-	CREATE,
-	UPDATE
+  ALWAYS,
+  CREATE,
+  UPDATE
 }

@@ -17,221 +17,221 @@
  */
 (function() {
 
-	"use strict";
+  "use strict";
 
-	var dialogs = {
+  var dialogs = {
 
-		config: {
-			yesNo: false
-		},
-		
-		say: function(str) {
-			return this.box(str, {
-				title: _t('Information')
-			});
-		},
+    config: {
+      yesNo: false
+    },
 
-		warn: function(str, callback) {
-			return this.box(str, {
-				title: _t('Warning'),
-				onClose: callback
-			});
-		},
+    say: function(str) {
+      return this.box(str, {
+        title: _t('Information')
+      });
+    },
 
-		error: function(str, callback) {
-			return this.box(str, {
-				title: _t('Error'),
-				onClose: callback
-			});
-		},
+    warn: function(str, callback) {
+      return this.box(str, {
+        title: _t('Warning'),
+        onClose: callback
+      });
+    },
 
-		confirm: function(str, callback, options) {
-			var element = null,
-				opts = null,
-				cb = angular.noop,
-				doCall = true;
+    error: function(str, callback) {
+      return this.box(str, {
+        title: _t('Error'),
+        onClose: callback
+      });
+    },
 
-			for (var i = 1; i < 3; i++) {
-				var arg = arguments[i];
-				if (_.isFunction(arg)) cb = arg;
-				if (_.isObject(arg)) opts = arg;
-			}
+    confirm: function(str, callback, options) {
+      var element = null,
+        opts = null,
+        cb = angular.noop,
+        doCall = true;
 
-			opts = _.extend({
-				title: _t('Question')
-			}, this.config, opts);
+      for (var i = 1; i < 3; i++) {
+        var arg = arguments[i];
+        if (_.isFunction(arg)) cb = arg;
+        if (_.isObject(arg)) opts = arg;
+      }
 
-			var titleOK = opts.yesNo ? _t('Yes') : _t('OK');
-			var titleCancel = opts.yesNo ? _t('No') : _t('Cancel');
+      opts = _.extend({
+        title: _t('Question')
+      }, this.config, opts);
 
-			element = this.box(str, {
-				title: opts.title,
-				onClose: function() {
-					if (doCall) cb(false);
-				},
-				buttons: [
-					{
-						text: titleCancel,
-						'class': 'btn',
-						click: function() {
-							cb(false);
-							doCall = false;
-							element.dialog('close');
-						}
-					},
-					{
-						text: titleOK,
-						'class': 'btn btn-primary',
-						click: function() {
-							cb(true);
-							doCall = false;
-							element.dialog('close');
-						}
-					}
-				]
-			});
+      var titleOK = opts.yesNo ? _t('Yes') : _t('OK');
+      var titleCancel = opts.yesNo ? _t('No') : _t('Cancel');
 
-			return element;
-		},
-		
-		box: function(str, options) {
-		
-			var opts = $.extend({}, options);
-			var title = opts.title || _t('Information');
-			var onClose = opts.onClose || $.noop;
-			var buttons = opts.buttons || [
-				{
-					'text'	: _t('OK'),
-					'class'	: 'btn btn-primary',
-					'click'	: function() {
-						element.dialog('close');
-					}
-				}
-			];
+      element = this.box(str, {
+        title: opts.title,
+        onClose: function() {
+          if (doCall) cb(false);
+        },
+        buttons: [
+          {
+            text: titleCancel,
+            'class': 'btn',
+            click: function() {
+              cb(false);
+              doCall = false;
+              element.dialog('close');
+            }
+          },
+          {
+            text: titleOK,
+            'class': 'btn btn-primary',
+            click: function() {
+              cb(true);
+              doCall = false;
+              element.dialog('close');
+            }
+          }
+        ]
+      });
 
-			var element = $('<div class="message-box" style="padding: 15px;"></div>').attr('title', title).html(str);
-			var dialog = element.dialog({
-				dialogClass: 'ui-dialog-responsive ui-dialog-small ui-dialog-dragged',
-				resizable: false,
-				draggable: true,
-				autoOpen: false,
-				closeOnEscape: true,
-				modal: true,
-				zIndex: 1100,
-				close: function(e) {
-					onClose(e);
-					element.dialog('destroy');
-					element.remove();
-				},
-				show: {
-					effect: 'fade',
-					duration: 300
-				},
-				buttons: buttons
-			});
+      return element;
+    },
 
-			// maintain overlay opacity
-			var opacity = null;
-			dialog.on('dialogopen dialogclose', function(e, ui){
-				var overlay = $('body .ui-widget-overlay');
-				if (opacity === null) {
-					opacity = overlay.last().css('opacity');
-				}
-				$('body .ui-widget-overlay')
-					.css('opacity', 0).last()
-					.css('opacity', opacity);
-			});
-			
-			dialog.dialog('open');
-			
-			return dialog;
-		}
-	};
+    box: function(str, options) {
 
-	var elemNotifyStack = null;
-	var elemNotifyText = '<div class="alert alert-block fade in">'+
-						 '  <button type="button" class="close" data-dismiss="alert">×</button>'+
-						 '  <h4 class="alert-heading">#title#</h4>'+
-						 '  <p>#message#</p>'+
-						 '</div>';
-	var elemNotifyText2 = '<div class="alert alert-block fade in">'+
-						 '  <button type="button" class="close" data-dismiss="alert">×</button>'+
-						 '  <strong>#title#</strong> #message#'+
-						 '</div>';
+      var opts = $.extend({}, options);
+      var title = opts.title || _t('Information');
+      var onClose = opts.onClose || $.noop;
+      var buttons = opts.buttons || [
+        {
+          'text'	: _t('OK'),
+          'class'	: 'btn btn-primary',
+          'click'	: function() {
+            element.dialog('close');
+          }
+        }
+      ];
 
-	function doNotify(message, options) {
-		if (elemNotifyStack === null) {
-			elemNotifyStack = $('<div class="notify-stack"></div>')
-				.css('position', 'fixed')
-				.css('bottom', 0)
-				.css('right', 10)
-				.zIndex(9999999)
-				.appendTo("body");
-		}
-		
-		var opts = _.extend({
-			timeout: 5000
-		}, options);
-		var tmpl, elem;
-		
-		tmpl = opts.alt ? elemNotifyText2 : elemNotifyText;
-		tmpl = tmpl.replace("#title#", opts.title || '').replace("#message#", message);
-		tmpl = axelor.sanitize(tmpl);
+      var element = $('<div class="message-box" style="padding: 15px;"></div>').attr('title', title).html(str);
+      var dialog = element.dialog({
+        dialogClass: 'ui-dialog-responsive ui-dialog-small ui-dialog-dragged',
+        resizable: false,
+        draggable: true,
+        autoOpen: false,
+        closeOnEscape: true,
+        modal: true,
+        zIndex: 1100,
+        close: function(e) {
+          onClose(e);
+          element.dialog('destroy');
+          element.remove();
+        },
+        show: {
+          effect: 'fade',
+          duration: 300
+        },
+        buttons: buttons
+      });
 
-		elem = $(tmpl)
-			.css('margin-bottom', 7)
-			.appendTo(elemNotifyStack);
-		
-		if (opts.css) {
-			elem.addClass(opts.css);
-		}
-		
-		_.delay(function () {
-			if (elem) {
-				elem.alert("close");
-				elem = null;
-			}
-		}, opts.timeout);
+      // maintain overlay opacity
+      var opacity = null;
+      dialog.on('dialogopen dialogclose', function(e, ui){
+        var overlay = $('body .ui-widget-overlay');
+        if (opacity === null) {
+          opacity = overlay.last().css('opacity');
+        }
+        $('body .ui-widget-overlay')
+          .css('opacity', 0).last()
+          .css('opacity', opacity);
+      });
 
-		elem.alert();
-	}
-	
-	var notify = {
-		
-		info: function(message, options) {
-			var opts = _.extend({
-				title: _t('Information'),
-				css: 'alert-info'
-			}, options);
-			return doNotify(message, opts);
-		},
+      dialog.dialog('open');
 
-		alert: function(message, options) {
-			var opts = _.extend({
-				title: _t('Alert')
-			}, options);
-			return doNotify(message, opts);
-		},
-		
-		success: function(message, options) {
-			var opts = _.extend({
-				title: _t('Success'),
-				css: 'alert-primary'
-			}, options);
-			return doNotify(message, opts);
-		},
+      return dialog;
+    }
+  };
 
-		error: function(message, options) {
-			var opts = _.extend({
-				title: _t('Error'),
-				css: 'alert-error'
-			}, options);
-			return doNotify(message, opts);
-		}
-	};
+  var elemNotifyStack = null;
+  var elemNotifyText = '<div class="alert alert-block fade in">'+
+             '  <button type="button" class="close" data-dismiss="alert">×</button>'+
+             '  <h4 class="alert-heading">#title#</h4>'+
+             '  <p>#message#</p>'+
+             '</div>';
+  var elemNotifyText2 = '<div class="alert alert-block fade in">'+
+             '  <button type="button" class="close" data-dismiss="alert">×</button>'+
+             '  <strong>#title#</strong> #message#'+
+             '</div>';
 
-	this.axelor = this.axelor || {};
-	this.axelor.dialogs = dialogs;
-	this.axelor.notify = notify;
+  function doNotify(message, options) {
+    if (elemNotifyStack === null) {
+      elemNotifyStack = $('<div class="notify-stack"></div>')
+        .css('position', 'fixed')
+        .css('bottom', 0)
+        .css('right', 10)
+        .zIndex(9999999)
+        .appendTo("body");
+    }
+
+    var opts = _.extend({
+      timeout: 5000
+    }, options);
+    var tmpl, elem;
+
+    tmpl = opts.alt ? elemNotifyText2 : elemNotifyText;
+    tmpl = tmpl.replace("#title#", opts.title || '').replace("#message#", message);
+    tmpl = axelor.sanitize(tmpl);
+
+    elem = $(tmpl)
+      .css('margin-bottom', 7)
+      .appendTo(elemNotifyStack);
+
+    if (opts.css) {
+      elem.addClass(opts.css);
+    }
+
+    _.delay(function () {
+      if (elem) {
+        elem.alert("close");
+        elem = null;
+      }
+    }, opts.timeout);
+
+    elem.alert();
+  }
+
+  var notify = {
+
+    info: function(message, options) {
+      var opts = _.extend({
+        title: _t('Information'),
+        css: 'alert-info'
+      }, options);
+      return doNotify(message, opts);
+    },
+
+    alert: function(message, options) {
+      var opts = _.extend({
+        title: _t('Alert')
+      }, options);
+      return doNotify(message, opts);
+    },
+
+    success: function(message, options) {
+      var opts = _.extend({
+        title: _t('Success'),
+        css: 'alert-primary'
+      }, options);
+      return doNotify(message, opts);
+    },
+
+    error: function(message, options) {
+      var opts = _.extend({
+        title: _t('Error'),
+        css: 'alert-error'
+      }, options);
+      return doNotify(message, opts);
+    }
+  };
+
+  this.axelor = this.axelor || {};
+  this.axelor.dialogs = dialogs;
+  this.axelor.notify = notify;
 
 }).call(this);

@@ -17,6 +17,17 @@
  */
 package com.axelor.meta.schema.actions;
 
+import com.axelor.app.AppSettings;
+import com.axelor.common.FileUtils;
+import com.axelor.common.ResourceUtils;
+import com.axelor.i18n.I18n;
+import com.axelor.meta.ActionHandler;
+import com.axelor.text.GroovyTemplates;
+import com.axelor.text.StringTemplates;
+import com.axelor.text.Templates;
+import com.google.common.base.Charsets;
+import com.google.common.base.MoreObjects;
+import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -30,171 +41,157 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-import com.axelor.app.AppSettings;
-import com.axelor.common.FileUtils;
-import com.axelor.common.ResourceUtils;
-import com.axelor.i18n.I18n;
-import com.axelor.meta.ActionHandler;
-import com.axelor.text.GroovyTemplates;
-import com.axelor.text.StringTemplates;
-import com.axelor.text.Templates;
-import com.google.common.base.Charsets;
-import com.google.common.base.MoreObjects;
-import com.google.common.io.Files;
-
 @XmlType
 public class ActionExport extends Action {
-	
-	private static final String DEFAULT_EXPORT_DIR = "{java.io.tmpdir}/axelor/data-export";
-	private static final String DEFAULT_DIR = "${date}/${name}";
 
-	@XmlAttribute(name = "output")
-	private String output;
+  private static final String DEFAULT_EXPORT_DIR = "{java.io.tmpdir}/axelor/data-export";
+  private static final String DEFAULT_DIR = "${date}/${name}";
 
-	@XmlAttribute(name = "download")
-	private Boolean download;
+  @XmlAttribute(name = "output")
+  private String output;
 
-	@XmlElement(name = "export")
-	private List<Export> exports;
+  @XmlAttribute(name = "download")
+  private Boolean download;
 
-	public String getOutput() {
-		return output;
-	}
+  @XmlElement(name = "export")
+  private List<Export> exports;
 
-	public Boolean getDownload() {
-		return download;
-	}
+  public String getOutput() {
+    return output;
+  }
 
-	public List<Export> getExports() {
-		return exports;
-	}
-	
-	public static File getExportPath() {
-		final String path = AppSettings.get().getPath("data.export.dir", DEFAULT_EXPORT_DIR);
-		return new File(path);
-	}
+  public Boolean getDownload() {
+    return download;
+  }
 
-	protected String doExport(String dir, Export export, ActionHandler handler) throws IOException {
-		String templatePath = handler.evaluate(export.template).toString();
+  public List<Export> getExports() {
+    return exports;
+  }
 
-		Reader reader = null;
-		File template = new File(templatePath);
-		if (template.isFile()) {
-			reader = new FileReader(template);
-		}
+  public static File getExportPath() {
+    final String path = AppSettings.get().getPath("data.export.dir", DEFAULT_EXPORT_DIR);
+    return new File(path);
+  }
 
-		if (reader == null) {
-			InputStream is = ResourceUtils.getResourceStream(templatePath);
-			if (is == null) {
-				throw new FileNotFoundException("No such template: " + templatePath);
-			}
-			reader = new InputStreamReader(is);
-		}
+  protected String doExport(String dir, Export export, ActionHandler handler) throws IOException {
+    String templatePath = handler.evaluate(export.template).toString();
 
-		String name = export.getName();
-		if (name.indexOf("$") > -1 || (name.startsWith("#{") && name.endsWith("}"))) {
-			name = handler.evaluate(toExpression(name, true)).toString();
-		}
+    Reader reader = null;
+    File template = new File(templatePath);
+    if (template.isFile()) {
+      reader = new FileReader(template);
+    }
 
-		log.info("export {} as {}", templatePath, name);
+    if (reader == null) {
+      InputStream is = ResourceUtils.getResourceStream(templatePath);
+      if (is == null) {
+        throw new FileNotFoundException("No such template: " + templatePath);
+      }
+      reader = new InputStreamReader(is);
+    }
 
-		Templates engine = new StringTemplates('$', '$');
-		if ("groovy".equals(export.engine)) {
-			engine = new GroovyTemplates();
-		}
+    String name = export.getName();
+    if (name.indexOf("$") > -1 || (name.startsWith("#{") && name.endsWith("}"))) {
+      name = handler.evaluate(toExpression(name, true)).toString();
+    }
 
-		File output = getExportPath();
-		output = FileUtils.getFile(output, dir, name);
+    log.info("export {} as {}", templatePath, name);
 
-		String contents = null;
-		try {
-			contents = handler.template(engine, reader);
-		} finally {
-			reader.close();
-		}
+    Templates engine = new StringTemplates('$', '$');
+    if ("groovy".equals(export.engine)) {
+      engine = new GroovyTemplates();
+    }
 
-		Files.createParentDirs(output);
-		Files.asCharSink(output, Charsets.UTF_8).write(contents);
+    File output = getExportPath();
+    output = FileUtils.getFile(output, dir, name);
 
-		log.info("file saved: {}", output);
+    String contents = null;
+    try {
+      contents = handler.template(engine, reader);
+    } finally {
+      reader.close();
+    }
 
-		return FileUtils.getFile(dir, name).toString();
-	}
+    Files.createParentDirs(output);
+    Files.asCharSink(output, Charsets.UTF_8).write(contents);
 
-	@Override
-	public Object evaluate(ActionHandler handler) {
-		log.info("action-export: {}", getName());
+    log.info("file saved: {}", output);
 
-		String dir = output == null ? DEFAULT_DIR : output;
+    return FileUtils.getFile(dir, name).toString();
+  }
 
-		dir = dir.replace("${name}", getName())
-				 .replace("${date}", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
-				 .replace("${time}", LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss")));
-		dir = handler.evaluate(dir).toString();
+  @Override
+  public Object evaluate(ActionHandler handler) {
+    log.info("action-export: {}", getName());
 
-		for(Export export : exports) {
-			if(!export.test(handler)){
-				continue;
-			}
-			final Map<String, Object> result = new HashMap<>();
-			try {
-				String file = doExport(dir, export, handler);
-				if (getDownload() == Boolean.TRUE) {
-					result.put("exportFile", file);
-					result.put("notify", I18n.get("Export complete."));
-					return result;
-				}
-				result.put("notify", I18n.get("Export complete."));
-				return result;
-			} catch (Exception e) {
-				log.error("error while exporting: ", e);
-				result.put("error", e.getMessage());
-				return result;
-			}
-		}
-		return null;
-	}
+    String dir = output == null ? DEFAULT_DIR : output;
 
-	@Override
-	public Object wrap(ActionHandler handler) {
-		return evaluate(handler);
-	}
+    dir =
+        dir.replace("${name}", getName())
+            .replace("${date}", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
+            .replace("${time}", LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss")));
+    dir = handler.evaluate(dir).toString();
 
-	@XmlType
-	public static class Export extends Element {
+    for (Export export : exports) {
+      if (!export.test(handler)) {
+        continue;
+      }
+      final Map<String, Object> result = new HashMap<>();
+      try {
+        String file = doExport(dir, export, handler);
+        if (getDownload() == Boolean.TRUE) {
+          result.put("exportFile", file);
+          result.put("notify", I18n.get("Export complete."));
+          return result;
+        }
+        result.put("notify", I18n.get("Export complete."));
+        return result;
+      } catch (Exception e) {
+        log.error("error while exporting: ", e);
+        result.put("error", e.getMessage());
+        return result;
+      }
+    }
+    return null;
+  }
 
-		@XmlAttribute
-		private String template;
+  @Override
+  public Object wrap(ActionHandler handler) {
+    return evaluate(handler);
+  }
 
-		@XmlAttribute
-		private String engine;
+  @XmlType
+  public static class Export extends Element {
 
-		@XmlAttribute(name = "processor")
-		private String processor;
+    @XmlAttribute private String template;
 
-		public String getTemplate() {
-			return template;
-		}
+    @XmlAttribute private String engine;
 
-		public String getEngine() {
-			return engine;
-		}
+    @XmlAttribute(name = "processor")
+    private String processor;
 
-		public String getProcessor() {
-			return processor;
-		}
+    public String getTemplate() {
+      return template;
+    }
 
-		@Override
-		public String toString() {
-			return MoreObjects.toStringHelper(getClass())
-					.add("name", getName())
-					.add("template", template)
-					.toString();
-		}
-	}
+    public String getEngine() {
+      return engine;
+    }
+
+    public String getProcessor() {
+      return processor;
+    }
+
+    @Override
+    public String toString() {
+      return MoreObjects.toStringHelper(getClass())
+          .add("name", getName())
+          .add("template", template)
+          .toString();
+    }
+  }
 }

@@ -19,41 +19,38 @@ package com.axelor.meta.schema.views;
 
 import static com.axelor.common.StringUtils.isBlank;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-
-import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("field")
 public class PanelField extends Field {
 
-	@XmlElement
-	private PanelViewer viewer;
+  @XmlElement private PanelViewer viewer;
 
-	@XmlElement
-	private PanelEditor editor;
+  @XmlElement private PanelEditor editor;
 
-	public PanelViewer getViewer() {
-		if (viewer != null) {
-			viewer.forField = this;
-		}
-		return viewer;
-	}
+  public PanelViewer getViewer() {
+    if (viewer != null) {
+      viewer.forField = this;
+    }
+    return viewer;
+  }
 
-	public void setViewer(PanelViewer viewer) {
-		this.viewer = viewer;
-	}
+  public void setViewer(PanelViewer viewer) {
+    this.viewer = viewer;
+  }
 
-	public PanelEditor getEditor() {
-		if (editor != null) {
-			editor.forField = this;
-			editor.setModel(isBlank(getTarget()) ? getModel() : getTarget());
-		}
-		return editor;
-	}
+  public PanelEditor getEditor() {
+    if (editor != null) {
+      editor.forField = this;
+      editor.setModel(isBlank(getTarget()) ? getModel() : getTarget());
+    }
+    return editor;
+  }
 
-	public void setEditor(PanelEditor editor) {
-		this.editor = editor;
-	}
+  public void setEditor(PanelEditor editor) {
+    this.editor = editor;
+  }
 }

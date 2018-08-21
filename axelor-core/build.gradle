@@ -1,65 +1,65 @@
 apply plugin: com.axelor.gradle.AxelorPlugin
 
 axelor {
-	title = "Axelor Core"
+  title = "Axelor Core"
 }
 
 dependencies {
 
-	testCompile project(":axelor-test")
-	compile project(":axelor-common")
+  testCompile project(":axelor-test")
+  compile project(":axelor-common")
 
-	compile libs.groovy
-	compile libs.groovy_wslite
+  compile libs.groovy
+  compile libs.groovy_wslite
 
-	compile libs.guava
-	compile	libs.guice
-	compile libs.guice_servlet
-	compile libs.guice_persist
-	compile libs.guice_multibindings
-	
-	compile libs.byte_buddy
+  compile libs.guava
+  compile	libs.guice
+  compile libs.guice_servlet
+  compile libs.guice_persist
+  compile libs.guice_multibindings
 
-	testCompile libs.jdbc_hsqldb
-	compile libs.jdbc_postgres
-	compile libs.jdbc_mysql
-	compile libs.hibernate
-	compile libs.hibernate_search
+  compile libs.byte_buddy
 
-	compile libs.apache_tika_core
-	runtime libs.apache_tika_parsers
+  testCompile libs.jdbc_hsqldb
+  compile libs.jdbc_postgres
+  compile libs.jdbc_mysql
+  compile libs.hibernate
+  compile libs.hibernate_search
 
-	compile libs.flywaydb
+  compile libs.apache_tika_core
+  runtime libs.apache_tika_parsers
 
-	compile libs.resteasy
-	compile libs.resteasy_guice
-	compile libs.jackson_libs
+  compile libs.flywaydb
 
-	compile libs.ST4
-	compile libs.apache_shiro
-	compile libs.snakeyaml
-	compile libs.xstream
-	compile libs.opencsv
+  compile libs.resteasy
+  compile libs.resteasy_guice
+  compile libs.jackson_libs
 
-	compile libs.javax_servlet
-	compile libs.javax_mail
+  compile libs.ST4
+  compile libs.apache_shiro
+  compile libs.snakeyaml
+  compile libs.xstream
+  compile libs.opencsv
 
-	compile libs.axelor_el
-	compile libs.jsoup
+  compile libs.javax_servlet
+  compile libs.javax_mail
 
-	compile libs.quartz
+  compile libs.axelor_el
+  compile libs.jsoup
 
-	compile libs.eclipselink_moxy
+  compile libs.quartz
 
-	// CAS
-	compile libs.apache_shiro_cas
+  compile libs.eclipselink_moxy
 
-	// BIRT
-	compile libs.birt_runtime
+  // CAS
+  compile libs.apache_shiro_cas
 
-	compile libs.commons_jxpath
-	compile libs.jcommander
+  // BIRT
+  compile libs.birt_runtime
 
-	testCompile libs.greenmail
-	testCompile libs.apache_ds
+  compile libs.commons_jxpath
+  compile libs.jcommander
+
+  testCompile libs.greenmail
+  testCompile libs.apache_ds
 }

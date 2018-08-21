@@ -20,61 +20,60 @@ package com.axelor.rpc.filter;
 import com.google.common.base.CaseFormat;
 
 public enum Operator {
+  AND("AND"),
 
-	AND("AND"),
+  OR("OR"),
 
-	OR("OR"),
+  NOT("NOT"),
 
-	NOT("NOT"),
+  EQUALS("="),
 
-	EQUALS("="),
+  NOT_EQUAL("!="),
 
-	NOT_EQUAL("!="),
+  LESS_THAN("<"),
 
-	LESS_THAN("<"),
+  GREATER_THAN(">"),
 
-	GREATER_THAN(">"),
+  LESS_OR_EQUAL("<="),
 
-	LESS_OR_EQUAL("<="),
+  GREATER_OR_EQUAL(">="),
 
-	GREATER_OR_EQUAL(">="),
+  LIKE("LIKE"),
 
-	LIKE("LIKE"),
+  NOT_LIKE("NOT LIKE"),
 
-	NOT_LIKE("NOT LIKE"),
+  IS_NULL("IS NULL"),
 
-	IS_NULL("IS NULL"),
+  NOT_NULL("IS NOT NULL"),
 
-	NOT_NULL("IS NOT NULL"),
+  IN("IN"),
 
-	IN("IN"),
+  NOT_IN("NOT IN"),
 
-	NOT_IN("NOT IN"),
+  BETWEEN("BETWEEN"),
 
-	BETWEEN("BETWEEN"),
+  NOT_BETWEEN("NOT BETWEEN");
 
-	NOT_BETWEEN("NOT BETWEEN");
+  private String value;
 
-	private String value;
-	
-	private String id;
+  private String id;
 
-	private Operator(String value) {
-		this.value = value;
-		this.id = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, this.name());
-	}
+  private Operator(String value) {
+    this.value = value;
+    this.id = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, this.name());
+  }
 
-	public static Operator get(String name) {
-		for (Operator operator : Operator.values()) {
-			if (operator.value.equals(name) || operator.id.equals(name)) {
-				return operator;
-			}
-		}
-		throw new IllegalArgumentException("No such operator: " + name);
-	}
+  public static Operator get(String name) {
+    for (Operator operator : Operator.values()) {
+      if (operator.value.equals(name) || operator.id.equals(name)) {
+        return operator;
+      }
+    }
+    throw new IllegalArgumentException("No such operator: " + name);
+  }
 
-	@Override
-	public String toString() {
-		return value;
-	}
+  @Override
+  public String toString() {
+    return value;
+  }
 }

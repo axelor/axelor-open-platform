@@ -17,6 +17,9 @@
  */
 package com.axelor.db;
 
+import com.axelor.common.reflections.ClassFinder;
+import com.axelor.meta.MetaScanner;
+import com.axelor.rpc.ContextHandlerFactory;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -24,11 +27,9 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
-
 import org.hibernate.boot.archive.internal.StandardArchiveDescriptorFactory;
 import org.hibernate.boot.archive.scan.internal.ClassDescriptorImpl;
 import org.hibernate.boot.archive.scan.internal.ScanResultImpl;
@@ -42,208 +43,213 @@ import org.hibernate.boot.archive.scan.spi.ScanResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axelor.common.reflections.ClassFinder;
-import com.axelor.meta.MetaScanner;
-import com.axelor.rpc.ContextHandlerFactory;
-
 /**
- * A custom Hibernate scanner that scans all the classpath entries for all the
- * {@link Model} classes annotated with {@link Entity}.
- *
+ * A custom Hibernate scanner that scans all the classpath entries for all the {@link Model} classes
+ * annotated with {@link Entity}.
  */
 public class JpaScanner extends AbstractScannerImpl {
 
-	private static Logger log = LoggerFactory.getLogger(JpaScanner.class);
+  private static Logger log = LoggerFactory.getLogger(JpaScanner.class);
 
-	private static final Object lock = new Object();
+  private static final Object lock = new Object();
 
-	private static Map<String, Class<?>> modelCache = new HashMap<>();
-	private static Map<String, Class<?>> repoCache = new HashMap<>();
-	private static Map<String, Class<?>> enumCache = new HashMap<>();
+  private static Map<String, Class<?>> modelCache = new HashMap<>();
+  private static Map<String, Class<?>> repoCache = new HashMap<>();
+  private static Map<String, Class<?>> enumCache = new HashMap<>();
 
-	private static Map<String, String> modelNames = new HashMap<>();
-	private static Map<String, String> repoNames = new HashMap<>();
-	private static Map<String, String> enumNames = new HashMap<>();
+  private static Map<String, String> modelNames = new HashMap<>();
+  private static Map<String, String> repoNames = new HashMap<>();
+  private static Map<String, String> enumNames = new HashMap<>();
 
-	private static Set<String> excludes = new HashSet<>();
-	private static Set<String> includes = new HashSet<>();
+  private static Set<String> excludes = new HashSet<>();
+  private static Set<String> includes = new HashSet<>();
 
-	public static ClassLoader loader = new JpaClassLoader();
+  public static ClassLoader loader = new JpaClassLoader();
 
-	public JpaScanner() {
-		super(StandardArchiveDescriptorFactory.INSTANCE);
-	}
+  public JpaScanner() {
+    super(StandardArchiveDescriptorFactory.INSTANCE);
+  }
 
-	/**
-	 * Exclude classes from the given package.
-	 *
-	 * @param pkg the package name
-	 */
-	public static void exclude(String pkg) {
-		includes.remove(pkg);
-		excludes.add(pkg);
-	}
+  /**
+   * Exclude classes from the given package.
+   *
+   * @param pkg the package name
+   */
+  public static void exclude(String pkg) {
+    includes.remove(pkg);
+    excludes.add(pkg);
+  }
 
-	/**
-	 * Include classes from the given package.
-	 *
-	 * @param pkg the package name
-	 */
-	public static void include(String pkg) {
-		excludes.remove(pkg);
-		includes.add(pkg);
-	}
+  /**
+   * Include classes from the given package.
+   *
+   * @param pkg the package name
+   */
+  public static void include(String pkg) {
+    excludes.remove(pkg);
+    includes.add(pkg);
+  }
 
-	@Override
-	public ScanResult scan(ScanEnvironment environment, ScanOptions options, ScanParameters params) {
-		final ScanResult found = super.scan(environment, options, params);
-		final Set<Class<?>> models = findClasses();
-		final Set<ClassDescriptor> descriptors = new HashSet<>();
+  @Override
+  public ScanResult scan(ScanEnvironment environment, ScanOptions options, ScanParameters params) {
+    final ScanResult found = super.scan(environment, options, params);
+    final Set<Class<?>> models = findClasses();
+    final Set<ClassDescriptor> descriptors = new HashSet<>();
 
-		if (found.getLocatedClasses() != null) {
-			descriptors.addAll(found.getLocatedClasses());
-		}
+    if (found.getLocatedClasses() != null) {
+      descriptors.addAll(found.getLocatedClasses());
+    }
 
-		for (Class<?> model : models) {
-			ClassDescriptor descriptor = new ClassDescriptorImpl(model.getName(), Categorization.MODEL, null);
-			descriptors.add(descriptor);
-		}
+    for (Class<?> model : models) {
+      ClassDescriptor descriptor =
+          new ClassDescriptorImpl(model.getName(), Categorization.MODEL, null);
+      descriptors.add(descriptor);
+    }
 
-		return new ScanResultImpl(found.getLocatedPackages(), descriptors, found.getLocatedMappingFiles());
-	}
+    return new ScanResultImpl(
+        found.getLocatedPackages(), descriptors, found.getLocatedMappingFiles());
+  }
 
-	private static Set<Class<?>> findClasses() {
-		synchronized (lock) {
-			final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-			final Future<?> models = executor.submit(() -> {
-				log.debug("Searching for entity classes...");
-				modelCache.clear();
-				modelNames.clear();
-				
-				register(Model.class);
-	
-				ClassFinder<Model> finder = MetaScanner.findSubTypesOf(Model.class)
-						.having(Entity.class)
-						.having(Embeddable.class)
-						.having(MappedSuperclass.class);
-	
-				for (String pkg : includes) {
-					finder = finder.within(pkg);
-				}
-	
-				for (Class<?> klass : finder.any().find()) {
-					if (modelCache.containsKey(klass.getName()) ||
-						excludes.contains(klass.getPackage().getName())) {
-						continue;
-					}
-					log.trace("Found entity: {}", klass.getName());
-					register(klass);
-				}
+  private static Set<Class<?>> findClasses() {
+    synchronized (lock) {
+      final ExecutorService executor =
+          Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+      final Future<?> models =
+          executor.submit(
+              () -> {
+                log.debug("Searching for entity classes...");
+                modelCache.clear();
+                modelNames.clear();
 
-				// pre-initialize context handler proxies
-				ContextHandlerFactory.refresh(modelCache.values());
+                register(Model.class);
 
-				log.debug("Entity classes found: {}", modelCache.size());
-			});
-			final Future<?> repos = executor.submit(() -> {
-				log.debug("Searching for repository classes...");
-				repoCache.clear();
-				repoNames.clear();
-	
-				ClassFinder<?> finder = MetaScanner.findSubTypesOf(JpaRepository.class);
-	
-				for (String pkg : includes) {
-					finder = finder.within(pkg);
-				}
-	
-				for (Class<?> klass : finder.any().find()) {
-					if (repoCache.containsKey(klass.getName()) ||
-						excludes.contains(klass.getPackage().getName())) {
-						continue;
-					}
-					log.trace("Found repository: {}", klass.getName());
-					repoCache.put(klass.getName(), klass);
-					repoNames.put(klass.getSimpleName(), klass.getName());
-				}
-				log.debug("Repository classes found: {}", repoCache.size());
-			});
-			final Future<?> enums = executor.submit(() -> {
-				log.debug("Searching for value enum classes...");
-				enumCache.clear();
-				enumNames.clear();
-	
-				ClassFinder<?> finder = MetaScanner.findSubTypesOf(ValueEnum.class);
-	
-				for (String pkg : includes) {
-					finder = finder.within(pkg);
-				}
-	
-				for (Class<?> klass : finder.any().find()) {
-					if (enumCache.containsKey(klass.getName()) ||
-						excludes.contains(klass.getPackage().getName())) {
-						continue;
-					}
-					log.trace("Found value enum: {}", klass.getName());
-					enumCache.put(klass.getName(), klass);
-					enumNames.put(klass.getSimpleName(), klass.getName());
-				}
-				log.debug("Value enum classes found: {}", enumCache.size());
-			});
-			try {
-				models.get();
-				repos.get();
-				enums.get();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			} finally {
-				executor.shutdown();
-			}
-		}
-		return new HashSet<Class<?>>(modelCache.values());
-	}
+                ClassFinder<Model> finder =
+                    MetaScanner.findSubTypesOf(Model.class)
+                        .having(Entity.class)
+                        .having(Embeddable.class)
+                        .having(MappedSuperclass.class);
 
-	private static void register(Class<?> model) {
-		modelCache.put(model.getName(), model);
-		modelNames.put(model.getSimpleName(), model.getName());
-	}
+                for (String pkg : includes) {
+                  finder = finder.within(pkg);
+                }
 
-	public static Set<Class<?>> findModels() {
-		synchronized (lock) {
-			if (modelCache.isEmpty()) {
-				return findClasses();
-			}
-		}
-		return new HashSet<>(modelCache.values());
-	}
+                for (Class<?> klass : finder.any().find()) {
+                  if (modelCache.containsKey(klass.getName())
+                      || excludes.contains(klass.getPackage().getName())) {
+                    continue;
+                  }
+                  log.trace("Found entity: {}", klass.getName());
+                  register(klass);
+                }
 
-	public static ClassLoader getClassLoader() {
-		return loader;
-	}
+                // pre-initialize context handler proxies
+                ContextHandlerFactory.refresh(modelCache.values());
 
-	public static Class<?> findModel(String name) {
-		synchronized (lock) {
-			if (modelCache.isEmpty()) {
-				findClasses();
-			}
-		}
-		return modelCache.get(modelNames.getOrDefault(name, name));
-	}
+                log.debug("Entity classes found: {}", modelCache.size());
+              });
+      final Future<?> repos =
+          executor.submit(
+              () -> {
+                log.debug("Searching for repository classes...");
+                repoCache.clear();
+                repoNames.clear();
 
-	public static Class<?> findRepository(String name) {
-		synchronized (lock) {
-			if (modelCache.isEmpty()) {
-				findClasses();
-			}
-		}
-		return repoCache.get(repoNames.getOrDefault(name, name));
-	}
-	
-	public static Class<?> findEnum(String name) {
-		synchronized (lock) {
-			if (modelCache.isEmpty()) {
-				findClasses();
-			}
-		}
-		return enumCache.get(enumNames.getOrDefault(name, name));
-	}
+                ClassFinder<?> finder = MetaScanner.findSubTypesOf(JpaRepository.class);
+
+                for (String pkg : includes) {
+                  finder = finder.within(pkg);
+                }
+
+                for (Class<?> klass : finder.any().find()) {
+                  if (repoCache.containsKey(klass.getName())
+                      || excludes.contains(klass.getPackage().getName())) {
+                    continue;
+                  }
+                  log.trace("Found repository: {}", klass.getName());
+                  repoCache.put(klass.getName(), klass);
+                  repoNames.put(klass.getSimpleName(), klass.getName());
+                }
+                log.debug("Repository classes found: {}", repoCache.size());
+              });
+      final Future<?> enums =
+          executor.submit(
+              () -> {
+                log.debug("Searching for value enum classes...");
+                enumCache.clear();
+                enumNames.clear();
+
+                ClassFinder<?> finder = MetaScanner.findSubTypesOf(ValueEnum.class);
+
+                for (String pkg : includes) {
+                  finder = finder.within(pkg);
+                }
+
+                for (Class<?> klass : finder.any().find()) {
+                  if (enumCache.containsKey(klass.getName())
+                      || excludes.contains(klass.getPackage().getName())) {
+                    continue;
+                  }
+                  log.trace("Found value enum: {}", klass.getName());
+                  enumCache.put(klass.getName(), klass);
+                  enumNames.put(klass.getSimpleName(), klass.getName());
+                }
+                log.debug("Value enum classes found: {}", enumCache.size());
+              });
+      try {
+        models.get();
+        repos.get();
+        enums.get();
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      } finally {
+        executor.shutdown();
+      }
+    }
+    return new HashSet<Class<?>>(modelCache.values());
+  }
+
+  private static void register(Class<?> model) {
+    modelCache.put(model.getName(), model);
+    modelNames.put(model.getSimpleName(), model.getName());
+  }
+
+  public static Set<Class<?>> findModels() {
+    synchronized (lock) {
+      if (modelCache.isEmpty()) {
+        return findClasses();
+      }
+    }
+    return new HashSet<>(modelCache.values());
+  }
+
+  public static ClassLoader getClassLoader() {
+    return loader;
+  }
+
+  public static Class<?> findModel(String name) {
+    synchronized (lock) {
+      if (modelCache.isEmpty()) {
+        findClasses();
+      }
+    }
+    return modelCache.get(modelNames.getOrDefault(name, name));
+  }
+
+  public static Class<?> findRepository(String name) {
+    synchronized (lock) {
+      if (modelCache.isEmpty()) {
+        findClasses();
+      }
+    }
+    return repoCache.get(repoNames.getOrDefault(name, name));
+  }
+
+  public static Class<?> findEnum(String name) {
+    synchronized (lock) {
+      if (modelCache.isEmpty()) {
+        findClasses();
+      }
+    }
+    return enumCache.get(enumNames.getOrDefault(name, name));
+  }
 }

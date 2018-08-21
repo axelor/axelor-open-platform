@@ -17,70 +17,77 @@
  */
 package com.axelor.test.db;
 
+import com.axelor.db.JpaModel;
 import java.time.LocalDate;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.axelor.db.JpaModel;
-
 @Entity
 @Table(name = "TEST_INVOICE")
 public class Invoice extends JpaModel {
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-	private Move move;
-	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-	private Move oldMove;
-	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-	private MoveLine rejectMoveLine;
-	
-	private LocalDate date;
+  @ManyToOne(
+    fetch = FetchType.LAZY,
+    cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+  )
+  private Move move;
 
-	private LocalDate dueDate;
+  @ManyToOne(
+    fetch = FetchType.LAZY,
+    cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+  )
+  private Move oldMove;
 
-	public Move getMove() {
-		return move;
-	}
-	
-	public void setMove(Move move) {
-		this.move = move;
-	}
-	
-	public Move getOldMove() {
-		return oldMove;
-	}
-	
-	public void setOldMove(Move oldMove) {
-		this.oldMove = oldMove;
-	}
-	
-	public MoveLine getRejectMoveLine() {
-		return rejectMoveLine;
-	}
-	
-	public void setRejectMoveLine(MoveLine rejectMoveLine) {
-		this.rejectMoveLine = rejectMoveLine;
-	}
-	
-	public LocalDate getDate() {
-		return date;
-	}
-	
-	public void setDate(LocalDate date) {
-		this.date = date;
-	}
-	
-	public LocalDate getDueDate() {
-		return dueDate;
-	}
-	
-	public void setDueDate(LocalDate dueDate) {
-		this.dueDate = dueDate;
-	}
+  @ManyToOne(
+    fetch = FetchType.LAZY,
+    cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+  )
+  private MoveLine rejectMoveLine;
+
+  private LocalDate date;
+
+  private LocalDate dueDate;
+
+  public Move getMove() {
+    return move;
+  }
+
+  public void setMove(Move move) {
+    this.move = move;
+  }
+
+  public Move getOldMove() {
+    return oldMove;
+  }
+
+  public void setOldMove(Move oldMove) {
+    this.oldMove = oldMove;
+  }
+
+  public MoveLine getRejectMoveLine() {
+    return rejectMoveLine;
+  }
+
+  public void setRejectMoveLine(MoveLine rejectMoveLine) {
+    this.rejectMoveLine = rejectMoveLine;
+  }
+
+  public LocalDate getDate() {
+    return date;
+  }
+
+  public void setDate(LocalDate date) {
+    this.date = date;
+  }
+
+  public LocalDate getDueDate() {
+    return dueDate;
+  }
+
+  public void setDueDate(LocalDate dueDate) {
+    this.dueDate = dueDate;
+  }
 }

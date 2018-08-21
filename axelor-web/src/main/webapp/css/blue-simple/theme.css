@@ -18,20 +18,20 @@
 header .navbar .nav > li > a:focus,
 header .navbar .nav > li > a:hover,
 header .navbar .nav > li.dropdown.open > a.dropdown-toggle {
-	color: #2185D0;
+  color: #2185D0;
 }
 
 header .navbar .nav .dropdown-menu > li > a:hover,
 header .navbar .nav .dropdown-menu > li > a:focus,
 header .navbar .nav .dropdown-submenu:hover > a,
 header .navbar .nav .dropdown-submenu:focus > a {
-	background-color: #2185D0;
+  background-color: #2185D0;
 }
 
 header .navbar .nav > li > a:focus,
 header .navbar .nav > li > a:hover,
 header .navbar .nav > li.dropdown.open > a.dropdown-toggle {
-	color: #2185D0;
+  color: #2185D0;
 }
 
 textarea:focus, input[type="text"]:focus,
@@ -49,56 +49,56 @@ input[type="search"]:focus,
 input[type="tel"]:focus,
 input[type="color"]:focus,
 .uneditable-input:focus {
-	border-color: #2185D0;
+  border-color: #2185D0;
 }
 
 .ui-datepicker .ui-slider-handle.ui-state-focus,
 .ui-datepicker .ui-slider-handle.ui-state-hover,
 .ui-datepicker .ui-state-highlight {
-	border-color: #2185D0 !important;
+  border-color: #2185D0 !important;
 }
 
 .ui-datepicker .ui-state-active,
 .ui-datepicker .ui-slider-handle.ui-state-hover {
-	background-color: #2185D0 !important;
+  background-color: #2185D0 !important;
 }
 
 /* navs */
 .nav-tree > li.open {
-	border-left-color: #2185D0;
+  border-left-color: #2185D0;
 }
 
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
-	border-top-color: #2185D0 !important;
+  border-top-color: #2185D0 !important;
 }
 
 /* selects */
 .tag-select:focus,
 .tag-select.focus {
-	border-color: #2185D0;
+  border-color: #2185D0;
 }
 
 .nav-select li.active a.nav-label,
 .nav-select li.active a.nav-label:after {
-	background: #2185D0;
+  background: #2185D0;
 }
 
 /* boxes */
 .ibox input:focus + .box:before {
-	border-color: #2185D0;
+  border-color: #2185D0;
 }
 .ibox:hover .box:before,
 .ibox:hover input:focus + .box:before {
-	border-color: #2185D0;
+  border-color: #2185D0;
 }
 .ibox input:checked + .box:before {
-	border-color: #2185D0;
-	background-color: #2185D0;
+  border-color: #2185D0;
+  background-color: #2185D0;
 }
 .ibox:hover input:disabled:checked + .box:before {
-	border-color: 1px solid #2185D0;
+  border-color: 1px solid #2185D0;
 }
 .iswitch {
     background-color: #2185D0;

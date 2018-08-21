@@ -7,26 +7,26 @@ apply from: "../gradle/libs.gradle"
 apply from: "../gradle/common.gradle"
 
 sourceSets {
-	main {
-		java {
-			srcDirs '../axelor-common/src/main/java'
-		}
-		groovy {
-			srcDirs '../axelor-gradle/src/main/java'
-			srcDirs '../axelor-gradle/src/main/groovy'
-		}
-		resources {
-			srcDirs '../axelor-common/src/main/resources'
-			srcDirs '../axelor-gradle/src/main/resources'
-		}
-	}
+  main {
+    java {
+      srcDirs '../axelor-common/src/main/java'
+    }
+    groovy {
+      srcDirs '../axelor-gradle/src/main/java'
+      srcDirs '../axelor-gradle/src/main/groovy'
+    }
+    resources {
+      srcDirs '../axelor-common/src/main/resources'
+      srcDirs '../axelor-gradle/src/main/resources'
+    }
+  }
 }
 
 dependencies {
-	compile libs.guava
-	compile libs.axelor_asm
-	compile libs.opencsv
-	compile libs.plugin_license
+  compile libs.guava
+  compile libs.axelor_asm
+  compile libs.opencsv
+  compile libs.plugin_license
 }
 
 test.enabled = false

@@ -21,55 +21,52 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-
-import org.junit.Test;
-
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
 import com.google.common.collect.ImmutableMap;
+import java.util.List;
+import java.util.Map;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import org.junit.Test;
 
 public class ResourceTest extends AbstractTest {
 
-	protected String model = "com.axelor.web.db.Contact";
+  protected String model = "com.axelor.web.db.Contact";
 
-	protected Invocation.Builder crud(String action) {
-		String path = "/rest/" + model;
-		if (action != null) {
-			path = path + "/" + action;
-		}
-		return jsonPath(path);
-	}
+  protected Invocation.Builder crud(String action) {
+    String path = "/rest/" + model;
+    if (action != null) {
+      path = path + "/" + action;
+    }
+    return jsonPath(path);
+  }
 
-	@Test
-	public void testFields() {
+  @Test
+  public void testFields() {
 
-		Response response = jsonPath("/meta/fields/" + model).get(Response.class);
+    Response response = jsonPath("/meta/fields/" + model).get(Response.class);
 
-		assertNotNull(response);
-		assertNotNull(response.getData());
+    assertNotNull(response);
+    assertNotNull(response.getData());
 
-		assertTrue(response.getData() instanceof Map);
+    assertTrue(response.getData() instanceof Map);
 
-		assertEquals(((Map<?,?>) response.getData()).get("model"), model);
-	}
+    assertEquals(((Map<?, ?>) response.getData()).get("model"), model);
+  }
 
-	@Test
-	public void testSearch() {
+  @Test
+  public void testSearch() {
 
-		Request request = new Request();
-		request.setData(ImmutableMap.of("firstName", (Object) "John", "lastName", "Teen"));
+    Request request = new Request();
+    request.setData(ImmutableMap.of("firstName", (Object) "John", "lastName", "Teen"));
 
-		Response response = crud("search").post(Entity.json(request), Response.class);
+    Response response = crud("search").post(Entity.json(request), Response.class);
 
-		assertNotNull(response);
-		assertNotNull(response.getData());
+    assertNotNull(response);
+    assertNotNull(response.getData());
 
-		assertTrue(response.getData() instanceof List);
-		assertTrue(((List<?>) response.getData()).size() > 0);
-	}
+    assertTrue(response.getData() instanceof List);
+    assertTrue(((List<?>) response.getData()).size() > 0);
+  }
 }

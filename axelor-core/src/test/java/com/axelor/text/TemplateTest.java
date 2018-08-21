@@ -20,89 +20,89 @@ package com.axelor.text;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import com.axelor.AbstractTest;
+import com.axelor.common.ResourceUtils;
+import com.google.common.collect.Maps;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.axelor.AbstractTest;
-import com.axelor.common.ResourceUtils;
-import com.google.common.collect.Maps;
-
 public class TemplateTest extends AbstractTest {
 
-	private static final String GROOVY_SPECIAL = "<?mso-application progid=\"Word.Document\"?> \\@ ${firstName} \\\"${lastName}\\\" = \\* ${nested.message}";
-	
-	private static final String GROOVY_TEMPLATE = "Hello: ${firstName} ${lastName} = ${nested.message}";
+  private static final String GROOVY_SPECIAL =
+      "<?mso-application progid=\"Word.Document\"?> \\@ ${firstName} \\\"${lastName}\\\" = \\* ${nested.message}";
 
-	private static final String STRING_TEMPLATE = "Hello: <firstName> <lastName> = <nested.message>";
+  private static final String GROOVY_TEMPLATE =
+      "Hello: ${firstName} ${lastName} = ${nested.message}";
 
-	private static final String OUTPUT = "Hello: John Smith = Hello World!!!";
+  private static final String STRING_TEMPLATE = "Hello: <firstName> <lastName> = <nested.message>";
 
-	private Map<String, Object> vars;
+  private static final String OUTPUT = "Hello: John Smith = Hello World!!!";
 
-	@Before
-	public void setUp() {
-		vars = Maps.newHashMap();
-		vars.put("message", "Hello World!!!");
-		
-		vars.put("firstName", "John");
-		vars.put("lastName", "Smith");
-		
-		vars.put("nested", Maps.newHashMap(vars));
-	}
-	
-	@Test
-	public void testGroovyInclude() throws Exception {
-	
-		InputStream stream = ResourceUtils.getResourceStream("com/axelor/text/include-test.tmpl");
-		Reader reader = new InputStreamReader(stream);
-		
-		Templates templates = new GroovyTemplates();
-		Template template = templates.from(reader);
+  private Map<String, Object> vars;
 
-		String output = template.make(vars).render();
+  @Before
+  public void setUp() {
+    vars = Maps.newHashMap();
+    vars.put("message", "Hello World!!!");
 
-		assertNotNull(output);
-		assertTrue(output.indexOf("{{<") == -1);
-		assertTrue(output.contains("This is nested 1"));
-		assertTrue(output.contains("This is nested 2"));
-	}
+    vars.put("firstName", "John");
+    vars.put("lastName", "Smith");
 
-	@Test
-	public void testGroovySpecial() {
+    vars.put("nested", Maps.newHashMap(vars));
+  }
 
-		Templates templates = new GroovyTemplates();
-		Template template = templates.fromText(GROOVY_SPECIAL);
-		
-		try {
-			template.make(vars).render();
-		} catch (Exception e) {
-			Assert.fail();
-		}
-	}
+  @Test
+  public void testGroovyInclude() throws Exception {
 
-	@Test
-	public void testGroovyTemplate() {
+    InputStream stream = ResourceUtils.getResourceStream("com/axelor/text/include-test.tmpl");
+    Reader reader = new InputStreamReader(stream);
 
-		Templates templates = new GroovyTemplates();
-		Template template = templates.fromText(GROOVY_TEMPLATE);
+    Templates templates = new GroovyTemplates();
+    Template template = templates.from(reader);
 
-		String text = template.make(vars).render();
-		Assert.assertEquals(OUTPUT, text);
-	}
-	
-	@Test
-	public void testStringTemplate() {
+    String output = template.make(vars).render();
 
-		Templates templates = new StringTemplates();
-		Template template = templates.fromText(STRING_TEMPLATE);
+    assertNotNull(output);
+    assertTrue(output.indexOf("{{<") == -1);
+    assertTrue(output.contains("This is nested 1"));
+    assertTrue(output.contains("This is nested 2"));
+  }
 
-		String text = template.make(vars).render();
-		Assert.assertEquals(OUTPUT, text);
-	}
+  @Test
+  public void testGroovySpecial() {
+
+    Templates templates = new GroovyTemplates();
+    Template template = templates.fromText(GROOVY_SPECIAL);
+
+    try {
+      template.make(vars).render();
+    } catch (Exception e) {
+      Assert.fail();
+    }
+  }
+
+  @Test
+  public void testGroovyTemplate() {
+
+    Templates templates = new GroovyTemplates();
+    Template template = templates.fromText(GROOVY_TEMPLATE);
+
+    String text = template.make(vars).render();
+    Assert.assertEquals(OUTPUT, text);
+  }
+
+  @Test
+  public void testStringTemplate() {
+
+    Templates templates = new StringTemplates();
+    Template template = templates.fromText(STRING_TEMPLATE);
+
+    String text = template.make(vars).render();
+    Assert.assertEquals(OUTPUT, text);
+  }
 }

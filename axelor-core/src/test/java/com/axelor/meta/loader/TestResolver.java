@@ -17,50 +17,48 @@
  */
 package com.axelor.meta.loader;
 
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.google.common.collect.Lists;
-
 public class TestResolver {
 
-	private Resolver resolver = new Resolver();
+  private Resolver resolver = new Resolver();
 
-	@Test
-	public void test() {
-		
-		resolver.add("axelor-auth", 	"axelor-core");
-		resolver.add("axelor-meta", 	"axelor-data");
-		
-		resolver.add("axelor-x");
-		
-		resolver.add("axelor-sale", 	"axelor-contact" );
-		resolver.add("axelor-data", 	"axelor-auth", "axelor-core");
-		resolver.add("axelor-contact", 	"axelor-auth", "axelor-core","axelor-meta");
-		resolver.add("axelor-project", 	"axelor-sale");
+  @Test
+  public void test() {
 
-		List<String> expected = Lists.newArrayList(
-				"axelor-core",
-				"axelor-auth",
-				"axelor-data",
-				"axelor-meta",
-				"axelor-contact",
-				"axelor-sale");
+    resolver.add("axelor-auth", "axelor-core");
+    resolver.add("axelor-meta", "axelor-data");
 
-		List<String> actual = new ArrayList<>();
-		for (Module module : resolver.resolve("axelor-sale")) {
-			actual.add(module.getName());
-		}
+    resolver.add("axelor-x");
 
-		Assert.assertEquals(expected, actual);
+    resolver.add("axelor-sale", "axelor-contact");
+    resolver.add("axelor-data", "axelor-auth", "axelor-core");
+    resolver.add("axelor-contact", "axelor-auth", "axelor-core", "axelor-meta");
+    resolver.add("axelor-project", "axelor-sale");
 
-		List<String> all = resolver.names();
-		
-		Assert.assertEquals("axelor-core", all.get(0));
-		Assert.assertEquals("axelor-project", all.get(all.size() - 1));
-		
-	}
+    List<String> expected =
+        Lists.newArrayList(
+            "axelor-core",
+            "axelor-auth",
+            "axelor-data",
+            "axelor-meta",
+            "axelor-contact",
+            "axelor-sale");
+
+    List<String> actual = new ArrayList<>();
+    for (Module module : resolver.resolve("axelor-sale")) {
+      actual.add(module.getName());
+    }
+
+    Assert.assertEquals(expected, actual);
+
+    List<String> all = resolver.names();
+
+    Assert.assertEquals("axelor-core", all.get(0));
+    Assert.assertEquals("axelor-project", all.get(all.size() - 1));
+  }
 }

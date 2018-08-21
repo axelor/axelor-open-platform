@@ -19,13 +19,9 @@ package com.axelor.common.crypto;
 
 import javax.crypto.Cipher;
 
-/**
- * {@link Cipher} operation modes.
- *
- */
+/** {@link Cipher} operation modes. */
 public enum OperationMode {
+  CBC,
 
-	CBC,
-
-	GCM
+  GCM
 }

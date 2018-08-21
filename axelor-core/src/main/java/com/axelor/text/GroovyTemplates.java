@@ -17,22 +17,6 @@
  */
 package com.axelor.text;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axelor.app.AppSettings;
 import com.axelor.common.FileUtils;
 import com.axelor.common.ResourceUtils;
@@ -46,219 +30,235 @@ import com.axelor.script.ScriptBindings;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.io.CharStreams;
-
 import groovy.text.GStringTemplateEngine;
 import groovy.text.StreamingTemplateEngine;
 import groovy.text.TemplateEngine;
 import groovy.xml.XmlUtil;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * The implementation of {@link Templates} for groovy string template support.
- * 
- */
+/** The implementation of {@link Templates} for groovy string template support. */
 public class GroovyTemplates implements Templates {
 
-	private static final TemplateEngine GSTRING_ENGINE = new GStringTemplateEngine();
-	private static final TemplateEngine STREAMING_ENGINE = new StreamingTemplateEngine();
+  private static final TemplateEngine GSTRING_ENGINE = new GStringTemplateEngine();
+  private static final TemplateEngine STREAMING_ENGINE = new StreamingTemplateEngine();
 
-	private static final String DEFAULT_TEMPLATE_DIR = "{java.io.tmpdir}/axelor/templates";
-	private static final String TEMPLATE_DIR = AppSettings.get().getPath("template.search.dir", DEFAULT_TEMPLATE_DIR);
-	private static final Pattern INCLUDE_PAT = Pattern.compile("\\{\\{\\<\\s*(.*?)\\s*\\>\\}\\}");
-	
-	class GroovyTemplate implements Template {
+  private static final String DEFAULT_TEMPLATE_DIR = "{java.io.tmpdir}/axelor/templates";
+  private static final String TEMPLATE_DIR =
+      AppSettings.get().getPath("template.search.dir", DEFAULT_TEMPLATE_DIR);
+  private static final Pattern INCLUDE_PAT = Pattern.compile("\\{\\{\\<\\s*(.*?)\\s*\\>\\}\\}");
 
-		private String text;
+  class GroovyTemplate implements Template {
 
-		public GroovyTemplate(String text) {
-			this.text = text;
-		}
+    private String text;
 
-		private boolean isWordTemplate(String text) {
-			if (StringUtils.isBlank(text)) return false;
-			return text.indexOf("<?mso-application") > -1;
-		}
-		
-		private String read(String included) throws IOException {
+    public GroovyTemplate(String text) {
+      this.text = text;
+    }
 
-			Reader reader = null;
-			File file = FileUtils.getFile(TEMPLATE_DIR, included);
-			if (file.isFile()) {
-				reader = new FileReader(file);
-			} else {
-				InputStream stream = ResourceUtils.getResourceStream(included);
-				if (stream != null) {
-					reader = new InputStreamReader(stream);
-				}
-			}
-			
-			if (reader == null) {
-				return "";
-			}
-			
-			try {
-				return CharStreams.toString(reader);
-			} finally {
-				reader.close();
-			}
-		}
+    private boolean isWordTemplate(String text) {
+      if (StringUtils.isBlank(text)) return false;
+      return text.indexOf("<?mso-application") > -1;
+    }
 
-		private String process(String text) {
-			if (StringUtils.isBlank(text)) {
-				return "";
-			}
-			text = text.replaceAll("\\$\\{\\s*(\\w+)(\\?)?\\.([^}]*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text($1, '$3')}");
-			text = text.replaceAll("\\$\\{\\s*([^}]*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text(it, '$1')}");
-			text = text.replaceAll("\\$\\{\\s*([^}]*?)\\s*\\|\\s*e\\s*\\}", "\\${($1) ?: ''}");
-			if (text.trim().startsWith("<?xml ")) {
-				text = text.replaceAll("\\$\\{(.*?)\\}", "\\${__fmt__.escape($1)}");
-			}
+    private String read(String included) throws IOException {
 
-			StringBuilder builder = new StringBuilder();
-			Matcher matcher = INCLUDE_PAT.matcher(text);
-			int position = 0;
-			while (matcher.find()) {
-				builder.append(text.substring(position, matcher.start()));
-				position = matcher.end();
-				try {
-					String include = read(matcher.group(1));
-					builder.append(process(include));
-				} catch (IOException e) {
-				}
-			}
-			builder.append(text.substring(position));
-			return builder.toString();
-		}
-		
-		@Override
-		public Renderer make(final Map<String, Object> context) {
-			final ScriptBindings bindings = new ScriptBindings(context);
-			final String text = process(this.text);
-			final TemplateEngine engine = isWordTemplate(text) ? STREAMING_ENGINE : GSTRING_ENGINE;
-			
-			bindings.put("__fmt__", new FormatHelper());
-			
-			try {
-				final groovy.text.Template template = engine.createTemplate(text);
-				return new Renderer() {
-					
-					@Override
-					public void render(Writer out) throws IOException {
-						template.make(bindings).writeTo(out);
-					}
-				};
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
+      Reader reader = null;
+      File file = FileUtils.getFile(TEMPLATE_DIR, included);
+      if (file.isFile()) {
+        reader = new FileReader(file);
+      } else {
+        InputStream stream = ResourceUtils.getResourceStream(included);
+        if (stream != null) {
+          reader = new InputStreamReader(stream);
+        }
+      }
 
-		@Override
-		@SuppressWarnings("serial")
-		public <T extends Model> Renderer make(final T context) {
-			final Mapper mapper = context == null ? null : Mapper.of(EntityHelper.getEntityClass(context));
-			final Map<String, Object> ctx = new HashMap<String, Object>() {
-				
-				@Override
-				public boolean containsKey(Object key) {
-					return mapper != null && mapper.getProperty((String) key) != null;
-				}
-				
-				@Override
-				public Object get(Object key) {
-					return mapper == null ? null : mapper.get(context, (String) key);
-				}
-			};
-			return make(ctx);
-		}
-	}
-	
-	class FormatHelper {
+      if (reader == null) {
+        return "";
+      }
 
-		private final Logger log = LoggerFactory.getLogger(FormatHelper.class);
+      try {
+        return CharStreams.toString(reader);
+      } finally {
+        reader.close();
+      }
+    }
 
-		public Object escape(Object value) {
-			if (value == null) {
-				return "";
-			}
-			return XmlUtil.escapeXml(value.toString());
-		}
-		
-		public String text(Object bean, String expr) {
-			if (bean == null) {
-				return "";
-			}
-			expr = expr.replaceAll("\\?", "");
-			return getTitle(EntityHelper.getEntityClass(bean), expr, getValue(bean, expr));
-		}
+    private String process(String text) {
+      if (StringUtils.isBlank(text)) {
+        return "";
+      }
+      text =
+          text.replaceAll(
+              "\\$\\{\\s*(\\w+)(\\?)?\\.([^}]*?)\\s*\\|\\s*text\\s*\\}",
+              "\\${__fmt__.text($1, '$3')}");
+      text =
+          text.replaceAll(
+              "\\$\\{\\s*([^}]*?)\\s*\\|\\s*text\\s*\\}", "\\${__fmt__.text(it, '$1')}");
+      text = text.replaceAll("\\$\\{\\s*([^}]*?)\\s*\\|\\s*e\\s*\\}", "\\${($1) ?: ''}");
+      if (text.trim().startsWith("<?xml ")) {
+        text = text.replaceAll("\\$\\{(.*?)\\}", "\\${__fmt__.escape($1)}");
+      }
 
-		private String getTitle(Class<?> klass, String expr, Object value) {
-			if (value == null) {
-				return "";
-			}
-			final Property property = this.getProperty(klass, expr);
-			final String val = value == null ? "" : value.toString();
-			try {
-				return MetaStore
-						.getSelectionItem(property.getSelection(), val)
-						.getLocalizedTitle();
-			} catch (Exception e) {
-			}
-			return val;
-		}
+      StringBuilder builder = new StringBuilder();
+      Matcher matcher = INCLUDE_PAT.matcher(text);
+      int position = 0;
+      while (matcher.find()) {
+        builder.append(text.substring(position, matcher.start()));
+        position = matcher.end();
+        try {
+          String include = read(matcher.group(1));
+          builder.append(process(include));
+        } catch (IOException e) {
+        }
+      }
+      builder.append(text.substring(position));
+      return builder.toString();
+    }
 
-		private Property getProperty(Class<?> beanClass, String name) {
-			Iterator<String> iter = Splitter.on(".").split(name).iterator();
-			Property p = Mapper.of(beanClass).getProperty(iter.next());
-			while(iter.hasNext() && p != null) {
-				p = Mapper.of(p.getTarget()).getProperty(iter.next());
-			}
-			return p;
-		}
+    @Override
+    public Renderer make(final Map<String, Object> context) {
+      final ScriptBindings bindings = new ScriptBindings(context);
+      final String text = process(this.text);
+      final TemplateEngine engine = isWordTemplate(text) ? STREAMING_ENGINE : GSTRING_ENGINE;
 
-		@SuppressWarnings("all")
-		private Object getValue(Object bean, String expr) {
-			if (bean == null) return null;
-			Iterator<String> iter = Splitter.on(".").split(expr).iterator();
-			Object obj = null;
-			if (bean instanceof Map) {
-				obj = ((Map) bean).get(iter.next());
-			} else {
-				obj = Mapper.of(EntityHelper.getEntityClass(bean)).get(bean, iter.next());
-			}
-			if(iter.hasNext() && obj != null) {
-				return getValue(obj, Joiner.on(".").join(iter));
-			}
-			return obj;
-		}
+      bindings.put("__fmt__", new FormatHelper());
 
-		public void info(String text,  Object... params) {
-			log.info(text, params);
-		}
+      try {
+        final groovy.text.Template template = engine.createTemplate(text);
+        return new Renderer() {
 
-		public void debug(String text,  Object... params) {
-			log.debug(text, params);
-		}
+          @Override
+          public void render(Writer out) throws IOException {
+            template.make(bindings).writeTo(out);
+          }
+        };
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
 
-		public void error(String text,  Object... params) {
-			log.error(text, params);
-		}
+    @Override
+    @SuppressWarnings("serial")
+    public <T extends Model> Renderer make(final T context) {
+      final Mapper mapper =
+          context == null ? null : Mapper.of(EntityHelper.getEntityClass(context));
+      final Map<String, Object> ctx =
+          new HashMap<String, Object>() {
 
-		public void trace(String text,  Object... params) {
-			log.trace(text, params);
-		}
-	}
-	
-	@Override
-	public Template fromText(String text) {
-		return new GroovyTemplate(text);
-	}
-	
-	@Override
-	public Template from(File file) throws IOException {
-		return from(new FileReader(file));
-	}
-	
-	@Override
-	public Template from(Reader reader) throws IOException {
-		return fromText(CharStreams.toString(reader));
-	}
+            @Override
+            public boolean containsKey(Object key) {
+              return mapper != null && mapper.getProperty((String) key) != null;
+            }
+
+            @Override
+            public Object get(Object key) {
+              return mapper == null ? null : mapper.get(context, (String) key);
+            }
+          };
+      return make(ctx);
+    }
+  }
+
+  class FormatHelper {
+
+    private final Logger log = LoggerFactory.getLogger(FormatHelper.class);
+
+    public Object escape(Object value) {
+      if (value == null) {
+        return "";
+      }
+      return XmlUtil.escapeXml(value.toString());
+    }
+
+    public String text(Object bean, String expr) {
+      if (bean == null) {
+        return "";
+      }
+      expr = expr.replaceAll("\\?", "");
+      return getTitle(EntityHelper.getEntityClass(bean), expr, getValue(bean, expr));
+    }
+
+    private String getTitle(Class<?> klass, String expr, Object value) {
+      if (value == null) {
+        return "";
+      }
+      final Property property = this.getProperty(klass, expr);
+      final String val = value == null ? "" : value.toString();
+      try {
+        return MetaStore.getSelectionItem(property.getSelection(), val).getLocalizedTitle();
+      } catch (Exception e) {
+      }
+      return val;
+    }
+
+    private Property getProperty(Class<?> beanClass, String name) {
+      Iterator<String> iter = Splitter.on(".").split(name).iterator();
+      Property p = Mapper.of(beanClass).getProperty(iter.next());
+      while (iter.hasNext() && p != null) {
+        p = Mapper.of(p.getTarget()).getProperty(iter.next());
+      }
+      return p;
+    }
+
+    @SuppressWarnings("all")
+    private Object getValue(Object bean, String expr) {
+      if (bean == null) return null;
+      Iterator<String> iter = Splitter.on(".").split(expr).iterator();
+      Object obj = null;
+      if (bean instanceof Map) {
+        obj = ((Map) bean).get(iter.next());
+      } else {
+        obj = Mapper.of(EntityHelper.getEntityClass(bean)).get(bean, iter.next());
+      }
+      if (iter.hasNext() && obj != null) {
+        return getValue(obj, Joiner.on(".").join(iter));
+      }
+      return obj;
+    }
+
+    public void info(String text, Object... params) {
+      log.info(text, params);
+    }
+
+    public void debug(String text, Object... params) {
+      log.debug(text, params);
+    }
+
+    public void error(String text, Object... params) {
+      log.error(text, params);
+    }
+
+    public void trace(String text, Object... params) {
+      log.trace(text, params);
+    }
+  }
+
+  @Override
+  public Template fromText(String text) {
+    return new GroovyTemplate(text);
+  }
+
+  @Override
+  public Template from(File file) throws IOException {
+    return from(new FileReader(file));
+  }
+
+  @Override
+  public Template from(Reader reader) throws IOException {
+    return fromText(CharStreams.toString(reader));
+  }
 }

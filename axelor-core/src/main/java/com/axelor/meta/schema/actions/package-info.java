@@ -15,14 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@javax.xml.bind.annotation.XmlAccessorType(
-	javax.xml.bind.annotation.XmlAccessType.FIELD
-)
+@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)
 @javax.xml.bind.annotation.XmlSchema(
-	namespace = com.axelor.meta.schema.ObjectViews.NAMESPACE,
-	xmlns = {
-		@javax.xml.bind.annotation.XmlNs(namespaceURI=com.axelor.meta.schema.ObjectViews.NAMESPACE, prefix=""),
-	},
-	elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED
+  namespace = com.axelor.meta.schema.ObjectViews.NAMESPACE,
+  xmlns = {
+    @javax.xml.bind.annotation.XmlNs(
+      namespaceURI = com.axelor.meta.schema.ObjectViews.NAMESPACE,
+      prefix = ""
+    ),
+  },
+  elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED
 )
 package com.axelor.meta.schema.actions;

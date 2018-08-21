@@ -17,28 +17,26 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
-
-import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("dashboard")
 public class Dashboard extends AbstractView {
 
-	@XmlElements({
-		@XmlElement(name = "dashlet", type = Dashlet.class),
-	})
-	private List<AbstractWidget> items;
+  @XmlElements({
+    @XmlElement(name = "dashlet", type = Dashlet.class),
+  })
+  private List<AbstractWidget> items;
 
-	public List<AbstractWidget> getItems() {
-		return items;
-	}
+  public List<AbstractWidget> getItems() {
+    return items;
+  }
 
-	public void setItems(List<AbstractWidget> items) {
-		this.items = items;
-	}
+  public void setItems(List<AbstractWidget> items) {
+    this.items = items;
+  }
 }

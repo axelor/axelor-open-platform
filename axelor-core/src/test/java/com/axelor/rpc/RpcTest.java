@@ -17,46 +17,42 @@
  */
 package com.axelor.rpc;
 
-import java.io.InputStreamReader;
-
-import javax.inject.Inject;
-
 import com.axelor.JpaTest;
 import com.axelor.common.ResourceUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.InputStreamReader;
+import javax.inject.Inject;
 
 abstract class RpcTest extends JpaTest {
 
-	@Inject
-	protected ObjectMapper mapper;
+  @Inject protected ObjectMapper mapper;
 
-	protected InputStreamReader read(String json) {
-		return new InputStreamReader(ResourceUtils.getResourceStream("json/" + json));
-	}
+  protected InputStreamReader read(String json) {
+    return new InputStreamReader(ResourceUtils.getResourceStream("json/" + json));
+  }
 
-	protected String toJson(Object value) {
-		try {
-			return mapper.writeValueAsString(value);
-		} catch (Exception e){
-			throw new IllegalArgumentException(e);
-		}
-	}
-	
-	protected <T> T fromJson(InputStreamReader reader, Class<T> klass) {
-		try {
-			return mapper.readValue(reader, klass);
-		} catch (Exception e) {
-			throw new IllegalArgumentException(e);
-		}
-	}
-	
-	protected <T> T fromJson(String json, Class<T> klass) {
-		if (json.endsWith(".json"))
-			return fromJson(read(json), klass);
-		try {
-			return mapper.readValue(json, klass);
-		} catch (Exception e) {
-			throw new IllegalArgumentException(e);
-		}
-	}
+  protected String toJson(Object value) {
+    try {
+      return mapper.writeValueAsString(value);
+    } catch (Exception e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  protected <T> T fromJson(InputStreamReader reader, Class<T> klass) {
+    try {
+      return mapper.readValue(reader, klass);
+    } catch (Exception e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  protected <T> T fromJson(String json, Class<T> klass) {
+    if (json.endsWith(".json")) return fromJson(read(json), klass);
+    try {
+      return mapper.readValue(json, klass);
+    } catch (Exception e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
 }

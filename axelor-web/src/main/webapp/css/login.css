@@ -16,149 +16,149 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 body {
-	height: 100%;
-	display: block;
-	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  height: 100%;
+  display: block;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
-	display: block;
-	background-color: #2f4050;
-	padding-top: 60px;
+  display: block;
+  background-color: #2f4050;
+  padding-top: 60px;
 }
 
 @media (max-width: 979px) {
-	body {
-  		padding-top: 20px;
-	}
+  body {
+      padding-top: 20px;
+  }
 }
 
 header .navbar .brand-logo {
-	float: left;
+  float: left;
 }
 
 header .navbar .brand-logo img {
-	height: 32px;
-	margin-top: 4px;
+  height: 32px;
+  margin-top: 4px;
 }
 
 .panel {
-	border: 1px solid #d4d4d4;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
-	background-color: #fff;
+  border: 1px solid #d4d4d4;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  background-color: #fff;
 }
 
 .panel .panel-header {
-	background-color: #dadada;
-	padding: 10px;
-	text-align: center;
+  background-color: #dadada;
+  padding: 10px;
+  text-align: center;
 }
 
 .panel .panel-title {
-	font-size: 18px;
-	font-weight: 600;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .panel .panel-body {
-	padding: 14px;
-	overflow: hidden;
+  padding: 14px;
+  overflow: hidden;
 }
 
 .panel {
-	margin-bottom: 18px;
+  margin-bottom: 18px;
 }
 
 .login-panel {
-	float: inherit !important;
-	margin: auto !important;
-	width: 420px;
-	border: 0;
-	box-shadow: none;
-	background-color: transparent;
+  float: inherit !important;
+  margin: auto !important;
+  width: 420px;
+  border: 0;
+  box-shadow: none;
+  background-color: transparent;
 }
 
 .alert {
-	width: 420px;
+  width: 420px;
 }
 
 @media (min-width: 1200px) {
-	.alert,
-	.login-panel {
-		width: 420px;
-	}
+  .alert,
+  .login-panel {
+    width: 420px;
+  }
 }
 
 @media (max-width: 767px) {
-	.alert,
-	.login-panel {
-		width: 100%;
-	}
+  .alert,
+  .login-panel {
+    width: 100%;
+  }
 }
 
 .login-panel .panel-header {
-	padding: 22px;
+  padding: 22px;
 }
 
 .login-panel .panel-body {
-	padding: 0;
+  padding: 0;
 }
 
 .login-panel .form-fields,
 .login-panel .form-footer {
-	padding: 22px;
+  padding: 22px;
 }
 
 .login-panel .form-fields {
-	margin-top: 8px;
-	background-color: #eaeaea;
+  margin-top: 8px;
+  background-color: #eaeaea;
 }
 
 .login-panel .form-footer {
-	background-color: #fff;
+  background-color: #fff;
 }
 
 .login-panel .form-footer button {
-	width: 100%;
-	padding: 8px 16px;
-	font-weight: 600;
+  width: 100%;
+  padding: 8px 16px;
+  font-weight: 600;
 }
 
 #login-form {
-	margin: 0;
+  margin: 0;
 }
 
 #login-form input[type="text"],
 #login-form input[type="password"],
 #login-form .add-on {
-	border-radius: 0 !important;
-	padding: 6px 10px;
-	font-size: 14px;
-	line-height: 20px;
-	height: 20px;
+  border-radius: 0 !important;
+  padding: 6px 10px;
+  font-size: 14px;
+  line-height: 20px;
+  height: 20px;
 }
 
 #login-form .input-prepend {
-	width: 100%;
-	margin-bottom: 16px;
+  width: 100%;
+  margin-bottom: 16px;
 }
 
 #login-form .input-prepend input {
-	width: calc(100% - 60px);
+  width: calc(100% - 60px);
 }
 
 #login-form .input-prepend select {
-	height: 34px;
-	width: calc(100% - 38px);
+  height: 34px;
+  width: calc(100% - 38px);
 }
 
 body > footer {
-	position: relative;
-	margin-top: 28px;
-	height: 28px;
-	text-align: center;
+  position: relative;
+  margin-top: 28px;
+  height: 28px;
+  text-align: center;
 }
 
 body > footer > p {
-	margin: 0;
-	padding: 6px 10px;
+  margin: 0;
+  padding: 6px 10px;
 }
 
 body > footer > p,
@@ -166,16 +166,16 @@ body > footer > p a,
 body > footer > p a:hover,
 body > footer > p a:active,
 body > footer > p a:visited {
-	color: #f2f2f2;
+  color: #f2f2f2;
 }
 
 .alert {
-	box-sizing: border-box;
-	margin: auto;
-	margin-top: 8px;
-	border-radius: 0;
+  box-sizing: border-box;
+  margin: auto;
+  margin-top: 8px;
+  border-radius: 0;
 }
 
 .alert h4 {
-	margin-bottom: 8px;
+  margin-bottom: 8px;
 }

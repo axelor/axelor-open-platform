@@ -17,35 +17,33 @@
  */
 package com.axelor.tools;
 
+import com.axelor.tools.x2j.Generator;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
 import org.junit.Test;
-
-import com.axelor.tools.x2j.Generator;
 
 public class X2JTest {
 
-	InputStream read(String resource) {
-		return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
-	}
+  InputStream read(String resource) {
+    return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
+  }
 
-	@Test
-	public void testDomains() throws IOException {
+  @Test
+  public void testDomains() throws IOException {
 
-		File domainPath = new File("src/test/resources/domains");
-		File outputPath = new File("build/src-gen");
+    File domainPath = new File("src/test/resources/domains");
+    File outputPath = new File("build/src-gen");
 
-		Generator gen = new Generator(domainPath, outputPath);
-		
-		// add lookup source
-		domainPath = new File("src/test/resources/search");
-		Generator lookup = new Generator(domainPath, outputPath);
-		
-		gen.addLookupSource(lookup);
+    Generator gen = new Generator(domainPath, outputPath);
 
-		gen.clean();
-		gen.start();
-	}
+    // add lookup source
+    domainPath = new File("src/test/resources/search");
+    Generator lookup = new Generator(domainPath, outputPath);
+
+    gen.addLookupSource(lookup);
+
+    gen.clean();
+    gen.start();
+  }
 }

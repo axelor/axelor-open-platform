@@ -17,18 +17,6 @@
  */
 package com.axelor.meta;
 
-import java.io.Reader;
-import java.io.StringReader;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
@@ -44,109 +32,123 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
+import java.io.Reader;
+import java.io.StringReader;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
 @Ignore
 public class TestWS extends MetaTest {
-	
-	private ActionHandler createHandler(String actions, Map<String, Object> context) {
-		
-		ActionRequest request = new ActionRequest();
-		
-		Map<String, Object> data = Maps.newHashMap();
-		request.setData(data);
-		request.setModel("com.axelor.test.db.Contact");
-		
-		data.put("action", actions);
-		data.put("context", context);
-		
-		return new ActionHandler(request);
-	}
-	
-	@Test
-	public void test1() throws Exception {
-		ObjectViews views = this.unmarshal("com/axelor/meta/WSTest.xml", ObjectViews.class);
-		List<Action> actions = views.getActions();
 
-		Assert.assertNotNull(actions);
-		Assert.assertEquals(4, actions.size());
-		
-		MetaStore.resister(views);
-		
-		Action action = MetaStore.getAction("data.import.1");
-		Map<String, Object> context = Maps.newHashMap();
-		
-		ZonedDateTime dt = ZonedDateTime.now();
-		dt = dt.plus(Period.ofDays(20));
-		
-		context.put("dt", dt);
+  private ActionHandler createHandler(String actions, Map<String, Object> context) {
 
-		ActionHandler handler = createHandler("data.import.1", context);
-		action.evaluate(handler);
-	}
-	
-	@Test
-	public void test2() throws Exception {
-		ObjectViews views = this.unmarshal("com/axelor/meta/WSTest.xml", ObjectViews.class);
+    ActionRequest request = new ActionRequest();
 
-		MetaStore.resister(views);
-		
-		Action action = MetaStore.getAction("export.sale.order");
-		Map<String, Object> context = Maps.newHashMap();
-		
-		context.put("name", "SO001");
-		context.put("orderDate", LocalDate.now());
-		context.put("customer", ImmutableMap.of("name", "John Smith"));
+    Map<String, Object> data = Maps.newHashMap();
+    request.setData(data);
+    request.setModel("com.axelor.test.db.Contact");
 
-		List<Object> items = Lists.newArrayList();
-		context.put("items", items);
-		
-		items.add(ImmutableMap.of("product", ImmutableMap.of("name", "PC1"), "price", 250, "quantity", 1));
-		items.add(ImmutableMap.of("product", ImmutableMap.of("name", "PC2"), "price", 550, "quantity", 1));
-		items.add(ImmutableMap.of("product", ImmutableMap.of("name", "Laptop"), "price", 690, "quantity", 1));
+    data.put("action", actions);
+    data.put("context", context);
 
-		ActionHandler handler = createHandler("export.sale.order", context);
-		action.evaluate(handler);
-	}
-	
-	@Transactional
-	public void prepareTest3() {
-		final MetaSelect select = new MetaSelect();
-		final MetaSelectItem item = new MetaSelectItem();
-		
-		final MetaSelectRepository selects = Beans.get(MetaSelectRepository.class);
-		final ContactRepository contacts = Beans.get(ContactRepository.class);
-		
-		item.setValue("pizza");
-		item.setTitle("Pizza");
-		select.addItem(item);
-		select.setName("food.selection");
+    return new ActionHandler(request);
+  }
 
-		selects.save(select);
-		
-		Contact c = new Contact();
-		c.setFirstName("John");
-		c.setLastName("Smith");
-		c.setEmail("john.smith@gmail.com");
-		c.setFood("pizza");
-		
-		contacts.save(c);
-	}
+  @Test
+  public void test1() throws Exception {
+    ObjectViews views = this.unmarshal("com/axelor/meta/WSTest.xml", ObjectViews.class);
+    List<Action> actions = views.getActions();
 
-	@Test
-	public void test3() throws Exception {
-		prepareTest3();
-		Contact c = all(Contact.class).filter("self.email = ?", "john.smith@gmail.com").fetchOne();
-		Map<String, Object> context = ImmutableMap.<String, Object>of("person", c);
-		
-		ActionHandler actionHandler = createHandler("dummy", context);
-		Templates engine = new GroovyTemplates();
-		Reader template = new StringReader("<%__fmt__.debug('Person food : {}', person.food)%>${person.food}");
-		
-		String text = actionHandler.template(engine, template);
-		Assert.assertEquals("pizza", text);
-		
-		template = new StringReader("${ person.food | text}");
-		text = actionHandler.template(engine, template);
-		Assert.assertEquals("Pizza", text);
-	}
+    Assert.assertNotNull(actions);
+    Assert.assertEquals(4, actions.size());
+
+    MetaStore.resister(views);
+
+    Action action = MetaStore.getAction("data.import.1");
+    Map<String, Object> context = Maps.newHashMap();
+
+    ZonedDateTime dt = ZonedDateTime.now();
+    dt = dt.plus(Period.ofDays(20));
+
+    context.put("dt", dt);
+
+    ActionHandler handler = createHandler("data.import.1", context);
+    action.evaluate(handler);
+  }
+
+  @Test
+  public void test2() throws Exception {
+    ObjectViews views = this.unmarshal("com/axelor/meta/WSTest.xml", ObjectViews.class);
+
+    MetaStore.resister(views);
+
+    Action action = MetaStore.getAction("export.sale.order");
+    Map<String, Object> context = Maps.newHashMap();
+
+    context.put("name", "SO001");
+    context.put("orderDate", LocalDate.now());
+    context.put("customer", ImmutableMap.of("name", "John Smith"));
+
+    List<Object> items = Lists.newArrayList();
+    context.put("items", items);
+
+    items.add(
+        ImmutableMap.of("product", ImmutableMap.of("name", "PC1"), "price", 250, "quantity", 1));
+    items.add(
+        ImmutableMap.of("product", ImmutableMap.of("name", "PC2"), "price", 550, "quantity", 1));
+    items.add(
+        ImmutableMap.of("product", ImmutableMap.of("name", "Laptop"), "price", 690, "quantity", 1));
+
+    ActionHandler handler = createHandler("export.sale.order", context);
+    action.evaluate(handler);
+  }
+
+  @Transactional
+  public void prepareTest3() {
+    final MetaSelect select = new MetaSelect();
+    final MetaSelectItem item = new MetaSelectItem();
+
+    final MetaSelectRepository selects = Beans.get(MetaSelectRepository.class);
+    final ContactRepository contacts = Beans.get(ContactRepository.class);
+
+    item.setValue("pizza");
+    item.setTitle("Pizza");
+    select.addItem(item);
+    select.setName("food.selection");
+
+    selects.save(select);
+
+    Contact c = new Contact();
+    c.setFirstName("John");
+    c.setLastName("Smith");
+    c.setEmail("john.smith@gmail.com");
+    c.setFood("pizza");
+
+    contacts.save(c);
+  }
+
+  @Test
+  public void test3() throws Exception {
+    prepareTest3();
+    Contact c = all(Contact.class).filter("self.email = ?", "john.smith@gmail.com").fetchOne();
+    Map<String, Object> context = ImmutableMap.<String, Object>of("person", c);
+
+    ActionHandler actionHandler = createHandler("dummy", context);
+    Templates engine = new GroovyTemplates();
+    Reader template =
+        new StringReader("<%__fmt__.debug('Person food : {}', person.food)%>${person.food}");
+
+    String text = actionHandler.template(engine, template);
+    Assert.assertEquals("pizza", text);
+
+    template = new StringReader("${ person.food | text}");
+    text = actionHandler.template(engine, template);
+    Assert.assertEquals("Pizza", text);
+  }
 }

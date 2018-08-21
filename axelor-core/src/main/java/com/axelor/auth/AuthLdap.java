@@ -17,11 +17,19 @@
  */
 package com.axelor.auth;
 
+import com.axelor.auth.db.Group;
+import com.axelor.auth.db.User;
+import com.axelor.auth.db.repo.GroupRepository;
+import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.common.StringUtils;
+import com.axelor.db.Query;
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.Sets;
+import com.google.inject.persist.Transactional;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -34,277 +42,264 @@ import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
-
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.realm.ldap.JndiLdapContextFactory;
 import org.apache.shiro.realm.ldap.LdapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axelor.auth.db.Group;
-import com.axelor.auth.db.User;
-import com.axelor.auth.db.repo.GroupRepository;
-import com.axelor.auth.db.repo.UserRepository;
-import com.axelor.common.StringUtils;
-import com.axelor.db.Query;
-import com.google.common.base.MoreObjects;
-import com.google.common.collect.Sets;
-import com.google.inject.persist.Transactional;
-
 @Singleton
 public class AuthLdap {
 
-	private final Logger log = LoggerFactory.getLogger(getClass());
+  private final Logger log = LoggerFactory.getLogger(getClass());
 
-	public static final String LDAP_SERVER_URL = "ldap.server.url";
-	public static final String LDAP_AUTH_TYPE = "ldap.auth.type";
+  public static final String LDAP_SERVER_URL = "ldap.server.url";
+  public static final String LDAP_AUTH_TYPE = "ldap.auth.type";
 
-	public static final String LDAP_SYSTEM_USER = "ldap.system.user";
-	public static final String LDAP_SYSTEM_PASSWORD = "ldap.system.password";
+  public static final String LDAP_SYSTEM_USER = "ldap.system.user";
+  public static final String LDAP_SYSTEM_PASSWORD = "ldap.system.password";
 
-	public static final String LDAP_GROUP_BASE = "ldap.group.base";
-	public static final String LDAP_GROUP_OBJECT_CLASS = "ldap.group.object.class";
-	public static final String LDAP_GROUP_FILTER = "ldap.group.filter";
+  public static final String LDAP_GROUP_BASE = "ldap.group.base";
+  public static final String LDAP_GROUP_OBJECT_CLASS = "ldap.group.object.class";
+  public static final String LDAP_GROUP_FILTER = "ldap.group.filter";
 
-	public static final String LDAP_USER_BASE = "ldap.user.base";
-	public static final String LDAP_USER_FILTER = "ldap.user.filter";
+  public static final String LDAP_USER_BASE = "ldap.user.base";
+  public static final String LDAP_USER_FILTER = "ldap.user.filter";
 
-	public static final String DEFAULT_AUTH_TYPE = "simple";
+  public static final String DEFAULT_AUTH_TYPE = "simple";
 
-	private String ldapServerUrl;
+  private String ldapServerUrl;
 
-	private String ldapAuthType;
+  private String ldapAuthType;
 
-	private String ldapSysUser;
+  private String ldapSysUser;
 
-	private String ldapSysPassword;
+  private String ldapSysPassword;
 
-	private String ldapGroupsDn;
+  private String ldapGroupsDn;
 
-	private String ldapUsersDn;
+  private String ldapUsersDn;
 
-	private String ldapGroupFilter;
+  private String ldapGroupFilter;
 
-	private String ldapUserFilter;
+  private String ldapUserFilter;
 
-	private String ldapGroupObjectClass;
+  private String ldapGroupObjectClass;
 
-	private JndiLdapContextFactory factory = new JndiLdapContextFactory();
+  private JndiLdapContextFactory factory = new JndiLdapContextFactory();
 
-	private AuthService authService;
-	
-	@Inject
-	private UserRepository users;
-	
-	@Inject
-	private GroupRepository groups;
+  private AuthService authService;
 
-	@Inject
-	public AuthLdap(@Named("auth.ldap.config") Properties properties, AuthService authService) {
-		ldapServerUrl = properties.getProperty(LDAP_SERVER_URL);
-		ldapAuthType = properties.getProperty(LDAP_AUTH_TYPE, DEFAULT_AUTH_TYPE);
-		ldapSysUser = properties.getProperty(LDAP_SYSTEM_USER);
-		ldapSysPassword = properties.getProperty(LDAP_SYSTEM_PASSWORD);
-		ldapGroupsDn = properties.getProperty(LDAP_GROUP_BASE);
-		ldapUsersDn = properties.getProperty(LDAP_USER_BASE);
-		ldapGroupFilter = properties.getProperty(LDAP_GROUP_FILTER);
-		ldapUserFilter = properties.getProperty(LDAP_USER_FILTER);
-		ldapGroupObjectClass = properties.getProperty(LDAP_GROUP_OBJECT_CLASS);
+  @Inject private UserRepository users;
 
-		factory.setUrl(ldapServerUrl);
-		factory.setSystemUsername(ldapSysUser);
-		factory.setSystemPassword(ldapSysPassword);
-		factory.setAuthenticationMechanism(ldapAuthType);
+  @Inject private GroupRepository groups;
 
-		this.authService = authService;
-	}
+  @Inject
+  public AuthLdap(@Named("auth.ldap.config") Properties properties, AuthService authService) {
+    ldapServerUrl = properties.getProperty(LDAP_SERVER_URL);
+    ldapAuthType = properties.getProperty(LDAP_AUTH_TYPE, DEFAULT_AUTH_TYPE);
+    ldapSysUser = properties.getProperty(LDAP_SYSTEM_USER);
+    ldapSysPassword = properties.getProperty(LDAP_SYSTEM_PASSWORD);
+    ldapGroupsDn = properties.getProperty(LDAP_GROUP_BASE);
+    ldapUsersDn = properties.getProperty(LDAP_USER_BASE);
+    ldapGroupFilter = properties.getProperty(LDAP_GROUP_FILTER);
+    ldapUserFilter = properties.getProperty(LDAP_USER_FILTER);
+    ldapGroupObjectClass = properties.getProperty(LDAP_GROUP_OBJECT_CLASS);
 
-	public boolean isEnabled() {
-		return ldapServerUrl != null && !"".equals(ldapServerUrl.trim());
-	}
+    factory.setUrl(ldapServerUrl);
+    factory.setSystemUsername(ldapSysUser);
+    factory.setSystemPassword(ldapSysPassword);
+    factory.setAuthenticationMechanism(ldapAuthType);
 
-	public boolean ldapUserExists(String filter, String code) {
-		try {
-			return search(ldapUsersDn, filter, code).hasMore();
-		} catch (NamingException e) {
-		}
-		return false;
-	}
+    this.authService = authService;
+  }
 
-	public boolean ldapGroupExists(String filter, String code) {
-		try {
-			return search(ldapGroupsDn, filter, code).hasMore();
-		} catch (NamingException e) {
-		}
-		return false;
-	}
+  public boolean isEnabled() {
+    return ldapServerUrl != null && !"".equals(ldapServerUrl.trim());
+  }
 
-	@Transactional
-	public boolean login(String user, String password) throws AuthenticationException {
-		if (!this.isEnabled()) {
-			throw new IllegalStateException("LDAP is not enabled.");
-		}
-		try {
-			return doLogin(user, password);
-		} catch (NamingException e) {
-			throw new AuthenticationException(e);
-		}
-	}
+  public boolean ldapUserExists(String filter, String code) {
+    try {
+      return search(ldapUsersDn, filter, code).hasMore();
+    } catch (NamingException e) {
+    }
+    return false;
+  }
 
-	private boolean doLogin(final String user, final String password) throws NamingException {
-		final NamingEnumeration<?> all = search(ldapUsersDn, ldapUserFilter, user);
-		if (!all.hasMore()) {
-			throw new NamingException("LDAP user does not exist: " + user);
-		}
-		while (all.hasMore()) {
-			final SearchResult result = (SearchResult) all.next();
-			final String dn = result.getNameInNamespace();
-			LdapContext context = null;
-			try {
-				context = factory.getLdapContext((Object) dn, password);
-			} finally {
-				LdapUtils.closeContext(context);
-			}
-			findOrCreateUser(user, result);
-			return true;
-		}
-		return false;
-	}
+  public boolean ldapGroupExists(String filter, String code) {
+    try {
+      return search(ldapGroupsDn, filter, code).hasMore();
+    } catch (NamingException e) {
+    }
+    return false;
+  }
 
-	private NamingEnumeration<?> search(String where, String filter, String user)
-			throws NamingException {
+  @Transactional
+  public boolean login(String user, String password) throws AuthenticationException {
+    if (!this.isEnabled()) {
+      throw new IllegalStateException("LDAP is not enabled.");
+    }
+    try {
+      return doLogin(user, password);
+    } catch (NamingException e) {
+      throw new AuthenticationException(e);
+    }
+  }
 
-		final SearchControls controls = new SearchControls();
-		controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+  private boolean doLogin(final String user, final String password) throws NamingException {
+    final NamingEnumeration<?> all = search(ldapUsersDn, ldapUserFilter, user);
+    if (!all.hasMore()) {
+      throw new NamingException("LDAP user does not exist: " + user);
+    }
+    while (all.hasMore()) {
+      final SearchResult result = (SearchResult) all.next();
+      final String dn = result.getNameInNamespace();
+      LdapContext context = null;
+      try {
+        context = factory.getLdapContext((Object) dn, password);
+      } finally {
+        LdapUtils.closeContext(context);
+      }
+      findOrCreateUser(user, result);
+      return true;
+    }
+    return false;
+  }
 
-		String filterString = filter.replaceAll("\\{0\\}", user);
+  private NamingEnumeration<?> search(String where, String filter, String user)
+      throws NamingException {
 
-		LdapContext context = factory.getSystemLdapContext();
-		try {
-			return context.search(where, filterString, controls);
-		} finally {
-			LdapUtils.closeContext(context);
-		}
-	}
+    final SearchControls controls = new SearchControls();
+    controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-	private User findOrCreateUser(String code, SearchResult result)
-			throws NamingException {
+    String filterString = filter.replaceAll("\\{0\\}", user);
 
-		User user = users.findByCode(code);
-		if (user != null) {
-			return user;
-		}
+    LdapContext context = factory.getSystemLdapContext();
+    try {
+      return context.search(where, filterString, controls);
+    } finally {
+      LdapUtils.closeContext(context);
+    }
+  }
 
-		Attributes attributes = result.getAttributes();
-		Attribute cn = attributes.get("cn");
-		String name = code;
-		try {
-			name = (String) cn.get();
-		} catch (NamingException e) {};
+  private User findOrCreateUser(String code, SearchResult result) throws NamingException {
 
-		user = new User(code, name);
-		user.setPassword(UUID.randomUUID().toString());
+    User user = users.findByCode(code);
+    if (user != null) {
+      return user;
+    }
 
-		authService.encrypt(user);
+    Attributes attributes = result.getAttributes();
+    Attribute cn = attributes.get("cn");
+    String name = code;
+    try {
+      name = (String) cn.get();
+    } catch (NamingException e) {
+    }
+    ;
 
-		try {
-			Group group = findOrCreateGroup(user);
-			user.setGroup(group);
-		} catch (Exception e) {
-		}
+    user = new User(code, name);
+    user.setPassword(UUID.randomUUID().toString());
 
-		try {
-			createLdapGroups();
-		} catch (Exception e) {
-			log.warn("unable to create ldap groups", e);
-		}
+    authService.encrypt(user);
 
-		return users.save(user);
-	}
+    try {
+      Group group = findOrCreateGroup(user);
+      user.setGroup(group);
+    } catch (Exception e) {
+    }
 
-	private Group findOrCreateGroup(User user) throws NamingException {
-		Group group = user.getGroup();
-		if (group != null) {
-			return group;
-		}
+    try {
+      createLdapGroups();
+    } catch (Exception e) {
+      log.warn("unable to create ldap groups", e);
+    }
 
-		final NamingEnumeration<?> all = search(ldapGroupsDn, ldapGroupFilter, user.getCode());
-		while (all.hasMore()) {
-			SearchResult result = (SearchResult) all.next();
-			Attributes attributes = result.getAttributes();
-			String name = (String) attributes.get("cn").get();
-			group = groups.findByCode(name);
-			if (group == null) {
-				group = new Group(name, name.substring(0, 1).toUpperCase() + name.substring(1));
-			}
-			break;
-		}
+    return users.save(user);
+  }
 
-		if (all.hasMore()) {
-			log.warn("more then one groups defined.");
-		}
+  private Group findOrCreateGroup(User user) throws NamingException {
+    Group group = user.getGroup();
+    if (group != null) {
+      return group;
+    }
 
-		return group;
-	}
+    final NamingEnumeration<?> all = search(ldapGroupsDn, ldapGroupFilter, user.getCode());
+    while (all.hasMore()) {
+      SearchResult result = (SearchResult) all.next();
+      Attributes attributes = result.getAttributes();
+      String name = (String) attributes.get("cn").get();
+      group = groups.findByCode(name);
+      if (group == null) {
+        group = new Group(name, name.substring(0, 1).toUpperCase() + name.substring(1));
+      }
+      break;
+    }
 
-	private void uploadGroup(Group group) throws NamingException {
+    if (all.hasMore()) {
+      log.warn("more then one groups defined.");
+    }
 
-		Attributes attrs = new BasicAttributes();
+    return group;
+  }
 
-		Attribute objClass = new BasicAttribute("objectClass");
-		objClass.add("top");
-		objClass.add(ldapGroupObjectClass);
+  private void uploadGroup(Group group) throws NamingException {
 
-		Attribute cn = new BasicAttribute("cn");
-		cn.add(group.getCode());
+    Attributes attrs = new BasicAttributes();
 
-		Attribute uniqueMember = new BasicAttribute("uniqueMember");
-		uniqueMember.add("uid=admin");
+    Attribute objClass = new BasicAttribute("objectClass");
+    objClass.add("top");
+    objClass.add(ldapGroupObjectClass);
 
-		attrs.put(objClass);
-		attrs.put(cn);
-		attrs.put(uniqueMember);
+    Attribute cn = new BasicAttribute("cn");
+    cn.add(group.getCode());
 
-		LdapContext context =  factory.getSystemLdapContext();
-		try {
-			context.createSubcontext("cn=" + group.getCode() + "," + ldapGroupsDn, attrs);
-		} finally {
-			LdapUtils.closeContext(context);
-		}
-	}
+    Attribute uniqueMember = new BasicAttribute("uniqueMember");
+    uniqueMember.add("uid=admin");
 
-	private void createLdapGroups() throws NamingException {
+    attrs.put(objClass);
+    attrs.put(cn);
+    attrs.put(uniqueMember);
 
-		if (ldapGroupObjectClass == null || "".equals(ldapGroupObjectClass.trim())) {
-			return;
-		}
+    LdapContext context = factory.getSystemLdapContext();
+    try {
+      context.createSubcontext("cn=" + group.getCode() + "," + ldapGroupsDn, attrs);
+    } finally {
+      LdapUtils.closeContext(context);
+    }
+  }
 
-		final Set<String> found = Sets.newHashSet();
-		final NamingEnumeration<?> all = search(ldapGroupsDn, ldapGroupFilter, "*");
+  private void createLdapGroups() throws NamingException {
 
-		while (all.hasMore()) {
-			SearchResult result = (SearchResult) all.next();
-			Attributes attributes = result.getAttributes();
-			String name = (String) attributes.get("cn").get();
-			if (StringUtils.notBlank(name)) {
-				found.add(name);
-			}
-		}
+    if (ldapGroupObjectClass == null || "".equals(ldapGroupObjectClass.trim())) {
+      return;
+    }
 
-		if (found.isEmpty()) {
-			return;
-		}
+    final Set<String> found = Sets.newHashSet();
+    final NamingEnumeration<?> all = search(ldapGroupsDn, ldapGroupFilter, "*");
 
-		final List<Group> groups = Query.of(Group.class).filter("self.code not in (:names)").bind("names", found).fetch();
-		for (Group group : groups) {
-			uploadGroup(group);
-		}
-	}
+    while (all.hasMore()) {
+      SearchResult result = (SearchResult) all.next();
+      Attributes attributes = result.getAttributes();
+      String name = (String) attributes.get("cn").get();
+      if (StringUtils.notBlank(name)) {
+        found.add(name);
+      }
+    }
 
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(getClass())
-				.add("url", ldapServerUrl)
-				.toString();
-	}
+    if (found.isEmpty()) {
+      return;
+    }
+
+    final List<Group> groups =
+        Query.of(Group.class).filter("self.code not in (:names)").bind("names", found).fetch();
+    for (Group group : groups) {
+      uploadGroup(group);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(getClass()).add("url", ldapServerUrl).toString();
+  }
 }

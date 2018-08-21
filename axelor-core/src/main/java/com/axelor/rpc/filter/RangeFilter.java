@@ -22,47 +22,44 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-
 class RangeFilter extends SimpleFilter {
 
-	private Collection<?> values;
+  private Collection<?> values;
 
-	public RangeFilter(Operator operator, String fieldName, Object value) {
-		super(operator, fieldName, value);
+  public RangeFilter(Operator operator, String fieldName, Object value) {
+    super(operator, fieldName, value);
 
-		if (!(value instanceof Collection<?>)) {
-			throw new IllegalArgumentException();
-		}
+    if (!(value instanceof Collection<?>)) {
+      throw new IllegalArgumentException();
+    }
 
-		values = (Collection<?>) value;
-	}
+    values = (Collection<?>) value;
+  }
 
-	@Override
-	public String getQuery() {
+  @Override
+  public String getQuery() {
 
-		if (getOperator() == Operator.BETWEEN
-				|| getOperator() == Operator.NOT_BETWEEN) {
-			return String.format("(%s %s ? AND ?)", getOperand(),
-					getOperator());
-		}
+    if (getOperator() == Operator.BETWEEN || getOperator() == Operator.NOT_BETWEEN) {
+      return String.format("(%s %s ? AND ?)", getOperand(), getOperator());
+    }
 
-		StringBuilder sb = new StringBuilder(getOperand());
-		sb.append(" ").append(getOperator()).append(" (");
+    StringBuilder sb = new StringBuilder(getOperand());
+    sb.append(" ").append(getOperator()).append(" (");
 
-		Iterator<?> iter = values.iterator();
-		iter.next();
-		sb.append("?");
-		while (iter.hasNext()) {
-			sb.append(", ").append("?");
-			iter.next();
-		}
+    Iterator<?> iter = values.iterator();
+    iter.next();
+    sb.append("?");
+    while (iter.hasNext()) {
+      sb.append(", ").append("?");
+      iter.next();
+    }
 
-		sb.append(")");
-		return sb.toString();
-	}
+    sb.append(")");
+    return sb.toString();
+  }
 
-	@Override
-	public List<Object> getParams() {
-		return new ArrayList<Object>(values);
-	}
+  @Override
+  public List<Object> getParams() {
+    return new ArrayList<Object>(values);
+  }
 }

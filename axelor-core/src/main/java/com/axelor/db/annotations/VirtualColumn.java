@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 /**
  * This annotation should be used to mark computed fields.
  *
- * For example:
+ * <p>For example:
  *
  * <pre>
  * &#064;Entity
@@ -43,11 +43,8 @@ import java.lang.annotation.Target;
  * 	...
  * }
  * </pre>
- *
  */
 @Documented
-@Target({ ElementType.FIELD, ElementType.METHOD })
+@Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface VirtualColumn {
-
-}
+public @interface VirtualColumn {}

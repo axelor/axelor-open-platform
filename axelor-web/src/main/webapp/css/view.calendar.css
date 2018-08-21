@@ -16,66 +16,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 .view-container .calendar-view > div:last-child {
-	position: absolute;
-	top: 40px;
-	bottom: 0; left: 0; right: 0;
-	background-color: #fff;
+  position: absolute;
+  top: 40px;
+  bottom: 0; left: 0; right: 0;
+  background-color: #fff;
 }
 
 .calendar-main {
-	position: absolute;
-	top: 0; left: 0; bottom: 0;
-	right: 250px;
-	overflow: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  right: 250px;
+  overflow: auto;
 }
 
 .calendar-side {
-	position: absolute;
-	top: 0; right: 0; bottom: 0;
-	width: auto;
-	overflow: hidden;
-	padding: 0 4px;
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: auto;
+  overflow: hidden;
+  padding: 0 4px;
 }
 
 .calendar-side .ui-datepicker {
-	box-shadow: none;
-	border-radius: 0;
+  box-shadow: none;
+  border-radius: 0;
 }
 
 .calendar-legend {
-	padding-left: 4px;
-	margin-top: 8px;
-	margin-bottom: 0;
-	overflow: auto;
+  padding-left: 4px;
+  margin-top: 8px;
+  margin-bottom: 0;
+  overflow: auto;
 }
 
 .calendar-legend label {
-	line-height: 20px;
+  line-height: 20px;
 }
 
 .calendar-view .record-pager > span {
-	font-weight: 600;
-	padding: 10px 4px 0;
+  font-weight: 600;
+  padding: 10px 4px 0;
 }
 
 .calendar-view .fc-month-view .calendar-event-day * {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .calendar-view .fc-event .fc-bg {
-	opacity: .1;
+  opacity: .1;
 }
 
 .calendar-bubble-content {
-	overflow: hidden;
+  overflow: hidden;
 }
 
 .calendar-bubble-content hr {
-	margin: 8px 0;
+  margin: 8px 0;
 }
 
 .calendar-view .fc-widget-header {
-	font-weight: 600;
+  font-weight: 600;
 }

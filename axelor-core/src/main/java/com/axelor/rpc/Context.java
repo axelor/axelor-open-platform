@@ -17,14 +17,6 @@
  */
 package com.axelor.rpc;
 
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
-import javax.script.SimpleBindings;
-
 import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -35,17 +27,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import javax.script.SimpleBindings;
 
 /**
  * The Context class represents an {@link ActionRequest} context.
- * 
- * <p>
- * The request context is mapped to a proxy instance of the bean class on which
- * the action is being performed. The proxy instance can be accessed via
- * {@link #asType(Class)} method.
- * 
- * <p>
- * Example (Java):
+ *
+ * <p>The request context is mapped to a proxy instance of the bean class on which the action is
+ * being performed. The proxy instance can be accessed via {@link #asType(Class)} method.
+ *
+ * <p>Example (Java):
  *
  * <pre>
  * Context context = request.getContext();
@@ -61,281 +56,272 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * def so = context.parentContext as SaleOrder
  * </pre>
  *
- * The instance returned from the context is a detached proxy object and should
- * not be used with JPA/Hibernate session. It's only for convenience to get the
- * context values using the bean methods.
- *
+ * The instance returned from the context is a detached proxy object and should not be used with
+ * JPA/Hibernate session. It's only for convenience to get the context values using the bean
+ * methods.
  */
 @JsonSerialize(using = Context.Serializer.class)
 public class Context extends SimpleBindings {
 
-	static class Serializer extends JsonSerializer<Context> {
+  static class Serializer extends JsonSerializer<Context> {
 
-		@Override
-		public void serialize(Context value, JsonGenerator jgen, SerializerProvider provider)
-				throws IOException, JsonProcessingException {
-			if (value != null) {
-				final JsonSerializer<Object> serializer = provider.findValueSerializer(Map.class, null);
-				final Map<String, Object> map = new HashMap<>();
-				value.entrySet().stream()
-						.filter(e -> !(e.getValue() instanceof JsonContext))
-						.filter(e -> !KEY_PARENT_CONTEXT.equals(e.getKey()))
-						.forEach(e -> map.put(e.getKey(), e.getValue()));
-				serializer.serialize(map, jgen, provider);
-			}
-		}
-	}
+    @Override
+    public void serialize(Context value, JsonGenerator jgen, SerializerProvider provider)
+        throws IOException, JsonProcessingException {
+      if (value != null) {
+        final JsonSerializer<Object> serializer = provider.findValueSerializer(Map.class, null);
+        final Map<String, Object> map = new HashMap<>();
+        value
+            .entrySet()
+            .stream()
+            .filter(e -> !(e.getValue() instanceof JsonContext))
+            .filter(e -> !KEY_PARENT_CONTEXT.equals(e.getKey()))
+            .forEach(e -> map.put(e.getKey(), e.getValue()));
+        serializer.serialize(map, jgen, provider);
+      }
+    }
+  }
 
-	private static final String KEY_MODEL = "_model";
-	private static final String KEY_PARENT = "_parent";
-	private static final String KEY_PARENT_CONTEXT = "parentContext";
+  private static final String KEY_MODEL = "_model";
+  private static final String KEY_PARENT = "_parent";
+  private static final String KEY_PARENT_CONTEXT = "parentContext";
 
-	static final String KEY_ID = "id";
-	static final String KEY_JSON_ATTRS = "attrs";
-	static final String KEY_JSON_MODEL = "jsonModel";
-	static final String KEY_JSON_PREFIX = "$";
+  static final String KEY_ID = "id";
+  static final String KEY_JSON_ATTRS = "attrs";
+  static final String KEY_JSON_MODEL = "jsonModel";
+  static final String KEY_JSON_PREFIX = "$";
 
-	private final Map<String, Object> values;
+  private final Map<String, Object> values;
 
-	private final Mapper mapper;
+  private final Mapper mapper;
 
-	private final Class<?> beanClass;
+  private final Class<?> beanClass;
 
-	private ContextHandler<?> handler;
-	
-	private Context parent;
-	
-	private Map<String, Object> jsonFields;
+  private ContextHandler<?> handler;
 
-	/**
-	 * Create a new {@link Context} for the given bean class using the given
-	 * context values.
-	 * 
-	 * @param values
-	 *            the context values
-	 * @param beanClass
-	 *            the context bean class
-	 */
-	public Context(Map<String, Object> values, Class<?> beanClass) {
-		super(values);
-		this.values = Objects.requireNonNull(values);
-		this.beanClass = Objects.requireNonNull(beanClass);
-		this.mapper = Mapper.of(beanClass);
-	}
+  private Context parent;
 
-	/**
-	 * Create a new {@link Context} for the given bean class.
-	 * 
-	 * @param beanClass
-	 *            the context bean class
-	 */
-	public Context(Class<?> beanClass) {
-		this(new HashMap<>(), beanClass);
-	}
+  private Map<String, Object> jsonFields;
 
-	/**
-	 * Create a new {@link Context} for a record by given id.
-	 * 
-	 * <p>
-	 * This is useful when we have to use custom fields defined for an entity from
-	 * bussiness code.
-	 * </p>
-	 * 
-	 * @param id
-	 *            the record id
-	 * @param beanClass
-	 *            the record entity class
-	 */
-	public Context(Long id, Class<?> beanClass) {
-		this(beanClass);
-		this.values.put("id", id);
-	}
+  /**
+   * Create a new {@link Context} for the given bean class using the given context values.
+   *
+   * @param values the context values
+   * @param beanClass the context bean class
+   */
+  public Context(Map<String, Object> values, Class<?> beanClass) {
+    super(values);
+    this.values = Objects.requireNonNull(values);
+    this.beanClass = Objects.requireNonNull(beanClass);
+    this.mapper = Mapper.of(beanClass);
+  }
 
-	public void addChangeListener(PropertyChangeListener listener) {
-		getContextHandler().addChangeListener(listener);
-	}
-	
-	private Map<String, Object> jsonFields() {
-		if (jsonFields == null) {
-			jsonFields = MetaJsonRecord.class.isAssignableFrom(beanClass)
-				? MetaStore.findJsonFields((String) values.get(KEY_JSON_MODEL))
-				: MetaStore.findJsonFields(beanClass.getName(), KEY_JSON_ATTRS);
-		}
-		return jsonFields;
-	}
+  /**
+   * Create a new {@link Context} for the given bean class.
+   *
+   * @param beanClass the context bean class
+   */
+  public Context(Class<?> beanClass) {
+    this(new HashMap<>(), beanClass);
+  }
 
-	private ContextHandler<?> getContextHandler() {
-		if (handler == null) {
-			handler = ContextHandlerFactory.newHandler(beanClass, values);
-		}
-		return handler;
-	}
+  /**
+   * Create a new {@link Context} for a record by given id.
+   *
+   * <p>This is useful when we have to use custom fields defined for an entity from bussiness code.
+   *
+   * @param id the record id
+   * @param beanClass the record entity class
+   */
+  public Context(Long id, Class<?> beanClass) {
+    this(beanClass);
+    this.values.put("id", id);
+  }
 
-	private Object getProxy() {
-		return getContextHandler().getProxy();
-	}
+  public void addChangeListener(PropertyChangeListener listener) {
+    getContextHandler().addChangeListener(listener);
+  }
 
-	/**
-	 * Get parent context.
-	 * 
-	 * @return the parent context if exist
-	 */
-	@SuppressWarnings("unchecked")
-	public Context getParent() {
-		if (parent != null) {
-			return parent;
-		}
-		final Object value = values.get(KEY_PARENT);
-		if (value == null) {
-			return null;
-		}
-		try {
-			Map<String, Object> valueMap = (Map<String, Object>) value;
-			Class<?> parentClass = Class.forName((String) valueMap.get(KEY_MODEL));
-			parent = new Context(valueMap, parentClass);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return parent;
-	}
+  private Map<String, Object> jsonFields() {
+    if (jsonFields == null) {
+      jsonFields =
+          MetaJsonRecord.class.isAssignableFrom(beanClass)
+              ? MetaStore.findJsonFields((String) values.get(KEY_JSON_MODEL))
+              : MetaStore.findJsonFields(beanClass.getName(), KEY_JSON_ATTRS);
+    }
+    return jsonFields;
+  }
 
-	/**
-	 * @see #getParent()
-	 */
-	@Deprecated
-	public Context getParentContext() {
-		return getParent();
-	}
+  private ContextHandler<?> getContextHandler() {
+    if (handler == null) {
+      handler = ContextHandlerFactory.newHandler(beanClass, values);
+    }
+    return handler;
+  }
 
-	public Class<?> getContextClass() {
-		return beanClass;
-	}
+  private Object getProxy() {
+    return getContextHandler().getProxy();
+  }
 
-	/**
-	 * Convert the context as lazy entity of the given type.
-	 * 
-	 * @param type
-	 *            the expected type
-	 * @return lazy initialized entity
-	 */
-	@SuppressWarnings("unchecked")
-	public <T> T asType(Class<T> type) {
-		final T bean = (T) getProxy();
-		if (!type.isInstance(bean)) {
-			throw new IllegalArgumentException(
-					String.format("Invalid type {}, should be {}", type.getName(), beanClass.getName()));
-		}
-		return bean;
-	}
+  /**
+   * Get parent context.
+   *
+   * @return the parent context if exist
+   */
+  @SuppressWarnings("unchecked")
+  public Context getParent() {
+    if (parent != null) {
+      return parent;
+    }
+    final Object value = values.get(KEY_PARENT);
+    if (value == null) {
+      return null;
+    }
+    try {
+      Map<String, Object> valueMap = (Map<String, Object>) value;
+      Class<?> parentClass = Class.forName((String) valueMap.get(KEY_MODEL));
+      parent = new Context(valueMap, parentClass);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return parent;
+  }
 
-	private String checkKey(Object key) {
-		if (key == null) {
-			throw new NullPointerException("key can not be null");
-		}
-		if (!(key instanceof String)) {
-			throw new ClassCastException("key should be a String");
-		}
-		if (StringUtils.isEmpty((String) key)) {
-			throw new IllegalArgumentException("key can not be empty");
-		}
-		return (String) key;
-	}
+  /** @see #getParent() */
+  @Deprecated
+  public Context getParentContext() {
+    return getParent();
+  }
 
-	private boolean isJsonName(String name) {
-		return isJsonRecord() && "name".equals(name);
-	}
+  public Class<?> getContextClass() {
+    return beanClass;
+  }
 
-	private boolean isJsonRecord() {
-		return MetaJsonRecord.class.isAssignableFrom(getContextClass());
-	}
+  /**
+   * Convert the context as lazy entity of the given type.
+   *
+   * @param type the expected type
+   * @return lazy initialized entity
+   */
+  @SuppressWarnings("unchecked")
+  public <T> T asType(Class<T> type) {
+    final T bean = (T) getProxy();
+    if (!type.isInstance(bean)) {
+      throw new IllegalArgumentException(
+          String.format("Invalid type {}, should be {}", type.getName(), beanClass.getName()));
+    }
+    return bean;
+  }
 
-	private boolean hasJsonField(String name) {
-		return !KEY_JSON_MODEL.equals(name)
-				&& !KEY_JSON_ATTRS.equals(name)
-				&& jsonFields() != null
-				&& jsonFields().containsKey(name);
-	}
+  private String checkKey(Object key) {
+    if (key == null) {
+      throw new NullPointerException("key can not be null");
+    }
+    if (!(key instanceof String)) {
+      throw new ClassCastException("key should be a String");
+    }
+    if (StringUtils.isEmpty((String) key)) {
+      throw new IllegalArgumentException("key can not be empty");
+    }
+    return (String) key;
+  }
 
-	private boolean isJsonField(String name) {
-		return name.startsWith(KEY_JSON_PREFIX)
-				&& mapper.getProperty(name.substring(KEY_JSON_PREFIX.length())) != null
-				&& mapper.getProperty(name.substring(KEY_JSON_PREFIX.length())).isJson();
-	}
-	
-	private JsonContext getJsonContext(Property property, Object value) {
-		final String name = property.getName();
-		return (JsonContext) values.computeIfAbsent(KEY_JSON_PREFIX + name,
-				k -> new JsonContext(this, property, (String) value));
-	}
+  private boolean isJsonName(String name) {
+    return isJsonRecord() && "name".equals(name);
+  }
 
-	private JsonContext getJsonContext() {
-		final Property property = mapper.getProperty(KEY_JSON_ATTRS);
-		return getJsonContext(property, property.get(getProxy()));
-	}
+  private boolean isJsonRecord() {
+    return MetaJsonRecord.class.isAssignableFrom(getContextClass());
+  }
 
-	private Object tryJsonGet(String name) {
-		if (hasJsonField(name)) {
-			return getJsonContext().get(name);
-		}
-		return super.get(name);
-	}
+  private boolean hasJsonField(String name) {
+    return !KEY_JSON_MODEL.equals(name)
+        && !KEY_JSON_ATTRS.equals(name)
+        && jsonFields() != null
+        && jsonFields().containsKey(name);
+  }
 
-	private Object tryJsonPut(String name, Object value) {
-		if (hasJsonField(name)) {
-			return getJsonContext().put(name, value);
-		}
-		return super.put(name, value);
-	}
+  private boolean isJsonField(String name) {
+    return name.startsWith(KEY_JSON_PREFIX)
+        && mapper.getProperty(name.substring(KEY_JSON_PREFIX.length())) != null
+        && mapper.getProperty(name.substring(KEY_JSON_PREFIX.length())).isJson();
+  }
 
-	@Override
-	public boolean containsKey(Object key) {
-		final String name = checkKey(key);
-		return super.containsKey(name)
-				|| KEY_PARENT_CONTEXT.equals(name)
-				|| isJsonField(name)
-				|| hasJsonField(name)
-				|| mapper.getProperty((String) key) != null;
-	}
+  private JsonContext getJsonContext(Property property, Object value) {
+    final String name = property.getName();
+    return (JsonContext)
+        values.computeIfAbsent(
+            KEY_JSON_PREFIX + name, k -> new JsonContext(this, property, (String) value));
+  }
 
-	@Override
-	public Object get(Object key) {
-		checkKey(key);
-		if (KEY_PARENT_CONTEXT.equals(key)) {
-			return getParent();
-		}
-		final String name = (String) key;
-		final Object value = super.get(name);
+  private JsonContext getJsonContext() {
+    final Property property = mapper.getProperty(KEY_JSON_ATTRS);
+    return getJsonContext(property, property.get(getProxy()));
+  }
 
-		// if cached json context
-		if (value instanceof JsonContext) {
-			return value;
-		}
+  private Object tryJsonGet(String name) {
+    if (hasJsonField(name)) {
+      return getJsonContext().get(name);
+    }
+    return super.get(name);
+  }
 
-		final Property property = mapper.getProperty(name);
+  private Object tryJsonPut(String name, Object value) {
+    if (hasJsonField(name)) {
+      return getJsonContext().put(name, value);
+    }
+    return super.put(name, value);
+  }
 
-		// if real field access
-		if (property != null && !isJsonName(name)) {
-			return property.get(getProxy());
-		}
+  @Override
+  public boolean containsKey(Object key) {
+    final String name = checkKey(key);
+    return super.containsKey(name)
+        || KEY_PARENT_CONTEXT.equals(name)
+        || isJsonField(name)
+        || hasJsonField(name)
+        || mapper.getProperty((String) key) != null;
+  }
 
-		// try json context
-		if (isJsonField(name)) {
-			final Property jsonProperty = mapper.getProperty(name.substring(KEY_JSON_PREFIX.length()));
-			return getJsonContext(jsonProperty, jsonProperty.get(getProxy()));
-		}
+  @Override
+  public Object get(Object key) {
+    checkKey(key);
+    if (KEY_PARENT_CONTEXT.equals(key)) {
+      return getParent();
+    }
+    final String name = (String) key;
+    final Object value = super.get(name);
 
-		// else try json fields
-		return tryJsonGet((String) key);
-	}
+    // if cached json context
+    if (value instanceof JsonContext) {
+      return value;
+    }
 
-	@Override
-	public Object put(String name, Object value) {
-		if (mapper.getSetter(name) == null || (isJsonRecord() && hasJsonField(name))) {
-			if (isJsonName(name)) {
-				mapper.set(getProxy(), name, value);
-			}
-			return tryJsonPut(name, value);
-		}
-		return mapper.set(getProxy(), name, handler.validate(mapper.getProperty(name), value));
-	}
+    final Property property = mapper.getProperty(name);
+
+    // if real field access
+    if (property != null && !isJsonName(name)) {
+      return property.get(getProxy());
+    }
+
+    // try json context
+    if (isJsonField(name)) {
+      final Property jsonProperty = mapper.getProperty(name.substring(KEY_JSON_PREFIX.length()));
+      return getJsonContext(jsonProperty, jsonProperty.get(getProxy()));
+    }
+
+    // else try json fields
+    return tryJsonGet((String) key);
+  }
+
+  @Override
+  public Object put(String name, Object value) {
+    if (mapper.getSetter(name) == null || (isJsonRecord() && hasJsonField(name))) {
+      if (isJsonName(name)) {
+        mapper.set(getProxy(), name, value);
+      }
+      return tryJsonPut(name, value);
+    }
+    return mapper.set(getProxy(), name, handler.validate(mapper.getProperty(name), value));
+  }
 }

@@ -44,7 +44,7 @@
       <content if="true" fields="description">#{description}</content>
     </track>
   </entity>
-  
+
   <entity name="TeamTopic" table="TEAM_TOPIC">
     <string name="name" required="true" />
     <string name="description" large="true" />

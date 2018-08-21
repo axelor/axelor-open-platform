@@ -23,8 +23,8 @@ import com.google.inject.AbstractModule;
 
 public class TestModule extends AbstractModule {
 
-	@Override
-	protected void configure() {
-		bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
-	}
+  @Override
+  protected void configure() {
+    bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
+  }
 }

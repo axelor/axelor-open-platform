@@ -17,6 +17,8 @@
  */
 package com.axelor.test.db;
 
+import com.axelor.db.EntityHelper;
+import com.axelor.db.JpaModel;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -24,90 +26,89 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.axelor.db.EntityHelper;
-import com.axelor.db.JpaModel;
-
 @Entity
 @Table(name = "CONTACT_ADDRESS")
 public class Address extends JpaModel {
 
-	@NotNull
-	private String street;
+  @NotNull private String street;
 
-	private String area;
+  private String area;
 
-	@NotNull
-	private String city;
+  @NotNull private String city;
 
-	@NotNull
-	private String zip;
+  @NotNull private String zip;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-	private Country country;
+  @ManyToOne(
+    fetch = FetchType.LAZY,
+    cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+  )
+  private Country country;
 
-	@NotNull
-	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-	private Contact contact;
+  @NotNull
+  @ManyToOne(
+    fetch = FetchType.LAZY,
+    cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+  )
+  private Contact contact;
 
-	public Address() {
-	}
+  public Address() {}
 
-	public Address(String street, String area, String city) {
-		this.street = street;
-		this.area = area;
-		this.city = city;
-	}
+  public Address(String street, String area, String city) {
+    this.street = street;
+    this.area = area;
+    this.city = city;
+  }
 
-	public String getStreet() {
-		return street;
-	}
+  public String getStreet() {
+    return street;
+  }
 
-	public void setStreet(String street) {
-		this.street = street;
-	}
+  public void setStreet(String street) {
+    this.street = street;
+  }
 
-	public String getArea() {
-		return area;
-	}
+  public String getArea() {
+    return area;
+  }
 
-	public void setArea(String area) {
-		this.area = area;
-	}
+  public void setArea(String area) {
+    this.area = area;
+  }
 
-	public String getCity() {
-		return city;
-	}
+  public String getCity() {
+    return city;
+  }
 
-	public void setCity(String city) {
-		this.city = city;
-	}
+  public void setCity(String city) {
+    this.city = city;
+  }
 
-	public String getZip() {
-		return zip;
-	}
+  public String getZip() {
+    return zip;
+  }
 
-	public void setZip(String zip) {
-		this.zip = zip;
-	}
+  public void setZip(String zip) {
+    this.zip = zip;
+  }
 
-	public Country getCountry() {
-		return country;
-	}
+  public Country getCountry() {
+    return country;
+  }
 
-	public void setCountry(Country country) {
-		this.country = country;
-	}
+  public void setCountry(Country country) {
+    this.country = country;
+  }
 
-	public Contact getContact() {
-		return contact;
-	}
+  public Contact getContact() {
+    return contact;
+  }
 
-	public void setContact(Contact contact) {
-		this.contact = contact;
-	}
-	
-	@Override
-	public String toString() {
-		return EntityHelper.toString(this);
-	}
+  public void setContact(Contact contact) {
+    this.contact = contact;
+  }
+
+  @Override
+  public String toString() {
+    return EntityHelper.toString(this);
+  }
 }

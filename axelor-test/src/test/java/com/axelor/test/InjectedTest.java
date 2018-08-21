@@ -19,27 +19,24 @@ package com.axelor.test;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Test;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import org.junit.Test;
 
 @GuiceModules(InjectedTest.Module.class)
 public class InjectedTest extends GuiceTest {
 
-	static class Module extends AbstractModule {
-		
-		@Override
-		protected void configure() {
-		}
-	}
-	
-	@Inject
-	Injector injector;
-	
-	@Test
-	public void test() {
-		assertNotNull(injector);
-	}
+  static class Module extends AbstractModule {
+
+    @Override
+    protected void configure() {}
+  }
+
+  @Inject Injector injector;
+
+  @Test
+  public void test() {
+    assertNotNull(injector);
+  }
 }

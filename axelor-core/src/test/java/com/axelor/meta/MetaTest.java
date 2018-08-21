@@ -17,44 +17,39 @@
  */
 package com.axelor.meta;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.inject.Inject;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
 import com.axelor.JpaTest;
 import com.axelor.common.ResourceUtils;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.InputStream;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 public abstract class MetaTest extends JpaTest {
 
-	@Inject
-	private ObjectMapper mapper;
+  @Inject private ObjectMapper mapper;
 
-	protected InputStream read(String resource) {
-		return ResourceUtils.getResourceStream(resource);
-	}
+  protected InputStream read(String resource) {
+    return ResourceUtils.getResourceStream(resource);
+  }
 
-	protected ObjectMapper getObjectMapper() {
-		return mapper;
-	}
+  protected ObjectMapper getObjectMapper() {
+    return mapper;
+  }
 
-	@SuppressWarnings("unchecked")
-	protected <T> T unmarshal(String resource, Class<T> type) throws JAXBException {
-		JAXBContext context = JAXBContext.newInstance(type);
-		Unmarshaller unmarshaller = context.createUnmarshaller();
-		return (T) unmarshaller.unmarshal(read(resource));
-	}
+  @SuppressWarnings("unchecked")
+  protected <T> T unmarshal(String resource, Class<T> type) throws JAXBException {
+    JAXBContext context = JAXBContext.newInstance(type);
+    Unmarshaller unmarshaller = context.createUnmarshaller();
+    return (T) unmarshaller.unmarshal(read(resource));
+  }
 
-	protected String toJson(Object object) throws JsonGenerationException,
-			JsonMappingException, IOException {
-		return getObjectMapper()
-				.writerWithDefaultPrettyPrinter()
-				.writeValueAsString(object);
-	}
+  protected String toJson(Object object)
+      throws JsonGenerationException, JsonMappingException, IOException {
+    return getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(object);
+  }
 }

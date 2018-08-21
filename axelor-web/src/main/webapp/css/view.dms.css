@@ -16,298 +16,298 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 .dms-file-list {
-	position: relative;
-	overflow: hidden;
-	-webkit-user-select: none;
-	   -moz-user-select: none;
-	    -ms-user-select: none;
-			user-select: none;
+  position: relative;
+  overflow: hidden;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
 }
 
 .dms-file-list .record-toolbar .breadcrumb {
-	margin: 0;
-	padding: 11px 8px;
-	font-weight: 600;
-	white-space: nowrap;
-	overflow: hidden;
-	background-color: #fff;
+  margin: 0;
+  padding: 11px 8px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  background-color: #fff;
 }
 
 .dms-file-list .record-toolbar .breadcrumb a {
-	color: #0088cc;
+  color: #0088cc;
 }
 
 .dms-file-list .record-toolbar .btn {
-	outline: none;
+  outline: none;
 }
 
 .dms-file-list > .slickgrid,
 .dms-file-list .dms-folder-tree,
 .dms-file-list .dms-details {
-	transition: all 0.25s;
+  transition: all 0.25s;
 }
 
 .dms-file-list .dms-folder-tree {
-	position: absolute;
-	overflow: auto;
-	width: 250px;
-	top: 41px;
-	bottom: 0;
-	left: 0;
-	border-right: 1px solid #d3d3d3;
-	background-color: #fff;
+  position: absolute;
+  overflow: auto;
+  width: 250px;
+  top: 41px;
+  bottom: 0;
+  left: 0;
+  border-right: 1px solid #d3d3d3;
+  background-color: #fff;
 }
 
 .dms-file-list .dms-details {
-	position: absolute;
-	right: -1px;
-	top: 41px;
-	bottom: 0;
-	width: 249px;
-	margin: 0;
-	border-bottom: 0;
-	background-color: white;
-	box-shadow: 0 6px 12px rgba(0,0,0,.175);
-	z-index: 2;
+  position: absolute;
+  right: -1px;
+  top: 41px;
+  bottom: 0;
+  width: 249px;
+  margin: 0;
+  border-bottom: 0;
+  background-color: white;
+  box-shadow: 0 6px 12px rgba(0,0,0,.175);
+  z-index: 2;
 }
 
 .dms-file-list .dms-details.ng-hide {
-	right: -261px;
+  right: -261px;
 }
 
 .dms-file-list .dms-details > .panel-body {
-	position: absolute;
-	top: 48px;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	overflow: auto;
+  position: absolute;
+  top: 48px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: auto;
 }
 
 .dms-file-list .dms-details > .panel-header .panel-title {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	max-width: calc(100% - 20px);
-	box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 20px);
+  box-sizing: border-box;
 }
 
 .dms-file-list .dms-details input.not-readonly {
-	background: inherit !important;
-	border: 0;
-	box-shadow: none;
-	margin-bottom: 5px;
+  background: inherit !important;
+  border: 0;
+  box-shadow: none;
+  margin-bottom: 5px;
 }
 
 .dms-file-list .dms-details label {
-	cursor: default;
-	font-weight: 600;
+  cursor: default;
+  font-weight: 600;
 }
 
 .dms-file-list .dms-details .tags > .label {
-	float: left;
-	margin-right: 5px;
-	margin-bottom: 5px;
-	padding: 4px 6px;
-	border-radius: 0;
+  float: left;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  padding: 4px 6px;
+  border-radius: 0;
 }
 
 .dms-file-list .dms-details .tags form {
-	margin: 0;
-	padding: 0;
-	width: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 
 .dms-file-list .dms-details .tags .panel {
-	margin: 0;
+  margin: 0;
 }
 
 .dms-file-list .dms-details .tags a {
-	color: #222;
-	float: left;
-	margin-right: 5px;
+  color: #222;
+  float: left;
+  margin-right: 5px;
 }
 
 .dms-file-list > .slickgrid {
-	left: 250px;
+  left: 250px;
 }
 
 .dms-file-list.has-no-tree .dms-folder-tree {
-	left: -251px;
+  left: -251px;
 }
 
 .dms-file-list.has-no-tree > .slickgrid {
-	left: 0 !important;
+  left: 0 !important;
 }
 
 .dms-file-list .slick-icon.fa-file-text {
-	color: #337ab7;
+  color: #337ab7;
 }
 
 .dms-file-list .slick-icon.fa-table {
-	color: #0275d8;
+  color: #0275d8;
 }
 
 .dms-folder-dialog input {
-	box-sizing: border-box;
-	width: 100%;
-	height: 28px;
-	margin: 0;
+  box-sizing: border-box;
+  width: 100%;
+  height: 28px;
+  margin: 0;
 }
 
 .dms-file-upload .upload-list,
 .dms-file-upload .upload-dropzone {
-	position: absolute;
-	z-index: 10000;
-	background: white;
+  position: absolute;
+  z-index: 10000;
+  background: white;
 }
 
 .dms-file-upload .upload-dropzone {
-	border: 1px solid #d4d4d4;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
-	width: 250px;
-	height: 250px;
-	border-radius: 125px;
-	text-align: center;
-	top: calc(50% - 125px);
-	left: calc(50% - 125px);
-	z-index: 10001;
-	display: none;
+  border: 1px solid #d4d4d4;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  width: 250px;
+  height: 250px;
+  border-radius: 125px;
+  text-align: center;
+  top: calc(50% - 125px);
+  left: calc(50% - 125px);
+  z-index: 10001;
+  display: none;
 }
 
 .dms-file-upload .upload-dropzone .drop-image {
-	margin-top: 36%;
-	margin-bottom: 12px;
+  margin-top: 36%;
+  margin-bottom: 12px;
 }
 
 .dms-file-upload .upload-dropzone .drop-image i {
-	font-size: 32px !important;
+  font-size: 32px !important;
 }
 
 .dms-file-list .dms-details .panel-header,
 .dms-file-upload .panel-header {
-	overflow: hidden;
+  overflow: hidden;
 }
 
 .dms-file-list .dms-details .panel-header a,
 .dms-file-upload .panel-header a {
-	color: #222;
+  color: #222;
 }
 
 .dms-file-upload .panel-body {
-	padding: 0;
+  padding: 0;
 }
 
 .dms-file-upload .upload-list * {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .dms-file-upload .upload-list {
-	bottom: 0;
-	right: 10px;
-	width: 480px;
-	font-size: 12px;
+  bottom: 0;
+  right: 10px;
+  width: 480px;
+  font-size: 12px;
 }
 
 .dms-file-upload .upload-list-item {
-	border-bottom: 1px solid #d4d4d4;
-	padding: 2px;
-	position: relative;
-	overflow: hidden;
+  border-bottom: 1px solid #d4d4d4;
+  padding: 2px;
+  position: relative;
+  overflow: hidden;
 }
 
 .dms-file-upload .upload-list .panel-body {
-	max-height: 420px;
-	overflow: auto;
+  max-height: 420px;
+  overflow: auto;
 }
 
 .dms-file-upload .upload-list-item:last-child {
-	border-bottom: 0;
+  border-bottom: 0;
 }
 
 .dms-file-upload .upload-list-item > div {
-	padding: 2px;
-	margin: 0;
-	min-height: inherit;
-	float: left;
+  padding: 2px;
+  margin: 0;
+  min-height: inherit;
+  float: left;
 }
 
 .dms-file-upload .upload-list .file-name {
-	width: 35%;
+  width: 35%;
 }
 
 .dms-file-upload .upload-list .file-complete {
-	width: 25%;
-	white-space: nowrap;
-	text-overflow: clip;
-	text-align: right;
+  width: 25%;
+  white-space: nowrap;
+  text-overflow: clip;
+  text-align: right;
 }
 
 .dms-file-upload .upload-list .file-progress {
-	width: 25%;
+  width: 25%;
 }
 
 .dms-file-upload .upload-list .file-op {
-	width: 15%;
+  width: 15%;
 }
 
 .dms-file-upload .upload-list .progress {
-	margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .dms-file-upload .upload-list .progress,
 .dms-file-upload .upload-list .progress .bar {
-	-webkit-transition: inherit;
-	        transition: inherit;
+  -webkit-transition: inherit;
+          transition: inherit;
 }
 
 @media (max-width: 767px) {
-	.dms-file-upload .upload-list {
-		left: 8px;
-		right: 8px;
-		width: auto;
-	}
-	.dms-file-upload .upload-list-item > div {
-		width: 100% !important;
-	}
+  .dms-file-upload .upload-list {
+    left: 8px;
+    right: 8px;
+    width: auto;
+  }
+  .dms-file-upload .upload-list-item > div {
+    width: 100% !important;
+  }
 }
 
 .dms-file-upload .upload-overlay {
-	opacity: 0.3;
-	with: 100%;
-	height: 100%;
-	overflow: hidden;
-	z-index: 10000;
-	position: absolute;
-	top: 0px;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: gray;
-	display: none;
+  opacity: 0.3;
+  with: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 10000;
+  position: absolute;
+  top: 0px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: gray;
+  display: none;
 }
 
 .dms-file-list.dropping .upload-overlay,
 .dms-file-list.dropping .upload-dropzone {
-	display: block;
+  display: block;
 }
 
 .dms-folder-tree {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .dms-folder-tree * {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .dms-folder-tree ul {
-	margin: 0 0 0px 15px;
+  margin: 0 0 0px 15px;
 }
 
 .dms-folder-tree ul,
 .dms-folder-tree li {
-	list-style: none;
-	white-space: nowrap;
+  list-style: none;
+  white-space: nowrap;
 }
 
 .dms-folder-tree li {
@@ -316,105 +316,105 @@
 }
 
 .dms-folder-tree > ul {
-	margin: 1px 4px;
+  margin: 1px 4px;
 }
 
 .dms-folder-tree li > a {
-	color: #333;
-	text-decoration: none;
-	line-height: 2em;
-	padding: 4px;
-	outline: none;
+  color: #333;
+  text-decoration: none;
+  line-height: 2em;
+  padding: 4px;
+  outline: none;
 }
 
 .dms-folder-tree li > a * {
-	position: relative;
+  position: relative;
 }
 
 .dms-folder-tree li > a span.highlight {
-	position: absolute;
-	box-sizing: border-box;
-	width: 100%;
-	height: 2em;
-	left: 0;
+  position: absolute;
+  box-sizing: border-box;
+  width: 100%;
+  height: 2em;
+  left: 0;
 }
 
 .dms-folder-tree li > a i.handle {
-	width: 16px;
-	display: inline-block;
-	text-align: center;
+  width: 16px;
+  display: inline-block;
+  text-align: center;
 }
 
 .dms-folder-tree li.empty i.handle {
-	visibility: hidden;
+  visibility: hidden;
 }
 
 .dms-folder-tree li > a:hover span.highlight {
-	background-color: rgba(0, 0, 0, .05);
+  background-color: rgba(0, 0, 0, .05);
 }
 
 .dms-folder-tree li > a.active span.highlight {
-	background-color: rgba(0, 0, 0, .1);
+  background-color: rgba(0, 0, 0, .1);
 }
 
 .dms-folder-tree li > a.dropping span.highlight {
-	border: 1px solid rgba(82, 168, 236, 0.8);
+  border: 1px solid rgba(82, 168, 236, 0.8);
 }
 
 .dms-folder-tree li > a.active {
-	color: #222;
-	font-weight: 600;
+  color: #222;
+  font-weight: 600;
 }
 
 .dms-folder-tree li.dms-tree-more > a > span.title {
-	padding-left: 20px;
-	font-style: oblique;
+  padding-left: 20px;
+  font-style: oblique;
 }
 
 .grid-dnd-proxy {
-	position: absolute;
-	display: inline-block;
-	padding: 6px 12px;
-	background: #fff;
-	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-	border: 1px solid rgba(0, 0, 0, 0.2);
-	border-radius: 4px;
-	z-index: 100000;
+  position: absolute;
+  display: inline-block;
+  padding: 6px 12px;
+  background: #fff;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  z-index: 100000;
 }
 
 .grid-dnd-proxy .badge {
-	position: absolute;
-	bottom: calc(100% - 6px);
-	left: calc(100% - 6px);
+  position: absolute;
+  bottom: calc(100% - 6px);
+  left: calc(100% - 6px);
 }
 
 .dms-popup {
-	margin-top: -1px;
-	padding: 1px 0 0 !important;
+  margin-top: -1px;
+  padding: 1px 0 0 !important;
 }
 
 .ui-dialog .ui-dialog-content.dms-popup {
-	height: 450px !important;
-	overflow: inherit !important;
+  height: 450px !important;
+  overflow: inherit !important;
 }
 .ui-dialog.maximized .ui-dialog-content.dms-popup {
-	height: 100% !important;
+  height: 100% !important;
     max-height: 100% !important;
 }
 
 .dms-popup > div,
 .dms-popup > div > .grid-view {
-	height: 100%;
-	box-sizing: border-box;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .dms-popup > div > .grid-view {
-	position: absolute;
-	top: 2px;
-	right: 0;
-	bottom: -4px;
-	left: 0;
-	border: 0;
+  position: absolute;
+  top: 2px;
+  right: 0;
+  bottom: -4px;
+  left: 0;
+  border: 0;
 }
 
 .dms-permission-popup {
@@ -423,71 +423,71 @@
 
 .dms-permission-popup [x-field="user"] input,
 .dms-permission-popup [x-field="group"] input {
-	border-right: none;
+  border-right: none;
 }
 
 .dms-permission-popup .picker-input i.fa-times {
-	font-size: 11px;
-	position: relative;
-	top: -1px;
-	color: #d4d4d4;
+  font-size: 11px;
+  position: relative;
+  top: -1px;
+  color: #d4d4d4;
 }
 
 .dms-permission-popup .picker-input i.fa-times:hover {
-	color: #222;
+  color: #222;
 }
 
 .spreadsheet-item {
-	border: 1px solid #e7e7e7;
+  border: 1px solid #e7e7e7;
 }
 .spreadsheet-item .ui-resizable-s {
-	background-color: #e7e7e7;
-	border-color: #e7e7e7;
+  background-color: #e7e7e7;
+  border-color: #e7e7e7;
 }
 
 .dms-folder-tree i.fa-folder {
-	font-size: 18px;
-	vertical-align: middle;
+  font-size: 18px;
+  vertical-align: middle;
     margin-right: 4px;
     margin-top: -1px;
 }
 
 i.fa-colored.fa-folder {
-	color: #FFA726;
+  color: #FFA726;
 }
 
 i.fa-colored.fa-file-o {
-	color: #767676;
+  color: #767676;
 }
 
 i.fa-colored.fa-file-text-o {
-	color: #2185D0;
+  color: #2185D0;
 }
 
 i.fa-colored.fa-file-word-o {
-	color: #2185D0;
+  color: #2185D0;
 }
 
 i.fa-colored.fa-file-excel-o {
-	color: #21BA45;
+  color: #21BA45;
 }
 
 i.fa-colored.fa-file-powerpoint-o {
-	color: #a33e03;
+  color: #a33e03;
 }
 
 i.fa-colored.fa-file-pdf-o {
-	color: #DB2828;
+  color: #DB2828;
 }
 
 i.fa-colored.fa-file-image-o {
-	color: #6435C9;
+  color: #6435C9;
 }
 
 i.fa-colored.fa-file-video-o {
-	color: #DB2828;
+  color: #DB2828;
 }
 
 i.fa-colored.fa-file-archive-o {
-	color: #A5673F;
+  color: #A5673F;
 }

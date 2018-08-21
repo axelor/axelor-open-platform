@@ -19,80 +19,44 @@ package com.axelor.db.tenants;
 
 /**
  * The contract to provide tenant connection settings.
- * 
- * <p>
- * The config should provide either JNDI data-source name or JDBC connection
- * properties for the database connection.
- * </p>
  *
+ * <p>The config should provide either JNDI data-source name or JDBC connection properties for the
+ * database connection.
  */
 public interface TenantConfig {
 
-	static final String DEFAULT_TENANT_ID = "default";
+  static final String DEFAULT_TENANT_ID = "default";
 
-	/**
-	 * Whether the tenant is active.
-	 * 
-	 */
-	Boolean getActive();
+  /** Whether the tenant is active. */
+  Boolean getActive();
 
-	/**
-	 * Whether the tenant is visible in tenant selection box.
-	 * 
-	 */
-	Boolean getVisible();
+  /** Whether the tenant is visible in tenant selection box. */
+  Boolean getVisible();
 
-	/**
-	 * The unique tenant identifier.
-	 * 
-	 */
-	String getTenantId();
+  /** The unique tenant identifier. */
+  String getTenantId();
 
-	/**
-	 * The display name.
-	 * 
-	 */
-	String getTenantName();
+  /** The display name. */
+  String getTenantName();
 
-	/**
-	 * Comma separated list of hostnames for which this tenant is valid.
-	 * 
-	 */
-	String getTenantHosts();
-	
-	/**
-	 * Comma separated list of roles allowed to use this tenant.
-	 * 
-	 */
-	String getTenantRoles();
+  /** Comma separated list of hostnames for which this tenant is valid. */
+  String getTenantHosts();
 
-	/**
-	 * JNDI data source name.
-	 * 
-	 */
-	String getJndiDataSource();
+  /** Comma separated list of roles allowed to use this tenant. */
+  String getTenantRoles();
 
-	/**
-	 * The JDBC driver for the tenant.
-	 * 
-	 */
-	String getJdbcDriver();
+  /** JNDI data source name. */
+  String getJndiDataSource();
 
-	/**
-	 * The JDBC connection url for the tenant.
-	 * 
-	 */
-	String getJdbcUrl();
+  /** The JDBC driver for the tenant. */
+  String getJdbcDriver();
 
-	/**
-	 * The JDBC user for the tenant.
-	 * 
-	 */
-	String getJdbcUser();
+  /** The JDBC connection url for the tenant. */
+  String getJdbcUrl();
 
-	/**
-	 * The JDBC password for the tenant.
-	 * 
-	 */
-	String getJdbcPassword();
+  /** The JDBC user for the tenant. */
+  String getJdbcUser();
+
+  /** The JDBC password for the tenant. */
+  String getJdbcPassword();
 }

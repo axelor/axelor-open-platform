@@ -17,85 +17,78 @@
  */
 package com.axelor.meta.schema.views;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
-
 import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("button")
 public class Button extends SimpleWidget {
 
-	@XmlAttribute
-	private String icon;
+  @XmlAttribute private String icon;
 
-	@XmlAttribute
-	private String iconHover;
+  @XmlAttribute private String iconHover;
 
-	@XmlAttribute
-	private String link;
+  @XmlAttribute private String link;
 
-	@XmlAttribute
-	private String prompt;
+  @XmlAttribute private String prompt;
 
-	@XmlAttribute
-	private String onClick;
+  @XmlAttribute private String onClick;
 
-	@XmlAttribute
-	private String widget;
+  @XmlAttribute private String widget;
 
-	@JsonGetter("title")
-	public String getLocalizedTitle() {
-		String title = getTitle();
-		if (StringUtils.isBlank(title)) {
-			return null;
-		}
-		return I18n.get(title);
-	}
+  @JsonGetter("title")
+  public String getLocalizedTitle() {
+    String title = getTitle();
+    if (StringUtils.isBlank(title)) {
+      return null;
+    }
+    return I18n.get(title);
+  }
 
-	public String getIcon() {
-		return icon;
-	}
+  public String getIcon() {
+    return icon;
+  }
 
-	public String getIconHover() {
-		return iconHover;
-	}
+  public String getIconHover() {
+    return iconHover;
+  }
 
-	public String getLink() {
-		return link;
-	}
+  public String getLink() {
+    return link;
+  }
 
-	@JsonGetter("prompt")
-	public String getLocalizedPrompt() {
-		return I18n.get(prompt);
-	}
+  @JsonGetter("prompt")
+  public String getLocalizedPrompt() {
+    return I18n.get(prompt);
+  }
 
-	@JsonIgnore
-	public String getPrompt() {
-		return prompt;
-	}
+  @JsonIgnore
+  public String getPrompt() {
+    return prompt;
+  }
 
-	public void setPrompt(String prompt) {
-		this.prompt = prompt;
-	}
+  public void setPrompt(String prompt) {
+    this.prompt = prompt;
+  }
 
-	public String getOnClick() {
-		return onClick;
-	}
+  public String getOnClick() {
+    return onClick;
+  }
 
-	public void setOnClick(String onClick) {
-		this.onClick = onClick;
-	}
+  public void setOnClick(String onClick) {
+    this.onClick = onClick;
+  }
 
-	public String getWidget() {
-		return widget;
-	}
+  public String getWidget() {
+    return widget;
+  }
 
-	public void setWidget(String widget) {
-		this.widget = widget;
-	}
+  public void setWidget(String widget) {
+    this.widget = widget;
+  }
 }

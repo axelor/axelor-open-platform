@@ -17,55 +17,58 @@
  */
 package com.axelor.db.hibernate.dialect;
 
+import com.axelor.db.hibernate.type.EncryptedTextType;
+import com.axelor.db.hibernate.type.JsonSqlTypeDescriptor;
+import com.axelor.db.hibernate.type.JsonType;
 import java.sql.Types;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.hibernate.boot.model.TypeContributions;
 import org.hibernate.dialect.MySQL57Dialect;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
-import com.axelor.db.hibernate.type.EncryptedTextType;
-import com.axelor.db.hibernate.type.JsonSqlTypeDescriptor;
-import com.axelor.db.hibernate.type.JsonType;
-
 public class MySQLDialect extends MySQL57Dialect {
 
-	static class JsonExtractFunction extends AbstractJsonExtractFunction {
+  static class JsonExtractFunction extends AbstractJsonExtractFunction {
 
-		public JsonExtractFunction(Type type, String cast) {
-			super("json_extract", type, cast);
-		}
+    public JsonExtractFunction(Type type, String cast) {
+      super("json_extract", type, cast);
+    }
 
-		@Override
-		public String transformPath(List<String> path) {
-			return path.stream()
-					.map(item -> item.substring(1, item.length() - 1))
-					.collect(Collectors.joining(".", "'$.", "'"));
-		}
-		
-		@Override
-		protected String transformFunction(String func) {
-			return String.format("json_unquote(%s)", func);
-		}
-	}
+    @Override
+    public String transformPath(List<String> path) {
+      return path.stream()
+          .map(item -> item.substring(1, item.length() - 1))
+          .collect(Collectors.joining(".", "'$.", "'"));
+    }
 
-	public MySQLDialect() {
-		super();
-		registerColumnType(Types.OTHER, "json");
-		registerFunction("json_extract", new JsonExtractFunction(StandardBasicTypes.STRING, null));
-		registerFunction("json_extract_text", new JsonExtractFunction(StandardBasicTypes.STRING, null));
-		registerFunction("json_extract_boolean", new JsonExtractFunction(StandardBasicTypes.BOOLEAN, null));
-		registerFunction("json_extract_integer", new JsonExtractFunction(StandardBasicTypes.INTEGER, "signed"));
-		registerFunction("json_extract_decimal", new JsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "decimal(64,4)"));
-	}
-	
-	@Override
-	public void contributeTypes(TypeContributions typeContributions, ServiceRegistry serviceRegistry) {
-		super.contributeTypes(typeContributions, serviceRegistry);
-		typeContributions.contributeType(new JsonType(JsonSqlTypeDescriptor.INSTANCE));
-		typeContributions.contributeType(EncryptedTextType.INSTANCE);
-	}
+    @Override
+    protected String transformFunction(String func) {
+      return String.format("json_unquote(%s)", func);
+    }
+  }
+
+  public MySQLDialect() {
+    super();
+    registerColumnType(Types.OTHER, "json");
+    registerFunction("json_extract", new JsonExtractFunction(StandardBasicTypes.STRING, null));
+    registerFunction("json_extract_text", new JsonExtractFunction(StandardBasicTypes.STRING, null));
+    registerFunction(
+        "json_extract_boolean", new JsonExtractFunction(StandardBasicTypes.BOOLEAN, null));
+    registerFunction(
+        "json_extract_integer", new JsonExtractFunction(StandardBasicTypes.INTEGER, "signed"));
+    registerFunction(
+        "json_extract_decimal",
+        new JsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "decimal(64,4)"));
+  }
+
+  @Override
+  public void contributeTypes(
+      TypeContributions typeContributions, ServiceRegistry serviceRegistry) {
+    super.contributeTypes(typeContributions, serviceRegistry);
+    typeContributions.contributeType(new JsonType(JsonSqlTypeDescriptor.INSTANCE));
+    typeContributions.contributeType(EncryptedTextType.INSTANCE);
+  }
 }

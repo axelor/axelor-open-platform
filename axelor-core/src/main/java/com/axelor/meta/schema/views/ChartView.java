@@ -17,182 +17,164 @@
  */
 package com.axelor.meta.schema.views;
 
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlType;
-
 import com.axelor.i18n.I18n;
 import com.axelor.meta.schema.views.Search.SearchField;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("chart")
 public class ChartView extends AbstractView {
 
-	@XmlAttribute
-	private Boolean stacked;
-	
-	@XmlAttribute
-	private String onInit;
+  @XmlAttribute private Boolean stacked;
 
-	@XmlElement(name = "field", type = SearchField.class)
-	@XmlElementWrapper(name = "search-fields")
-	private List<SearchField> searchFields;
+  @XmlAttribute private String onInit;
 
-	@JsonIgnore
-	@XmlElement(name = "dataset")
-	private DataSet dataSet;
+  @XmlElement(name = "field", type = SearchField.class)
+  @XmlElementWrapper(name = "search-fields")
+  private List<SearchField> searchFields;
 
-	@XmlElement
-	private ChartCategory category;
+  @JsonIgnore
+  @XmlElement(name = "dataset")
+  private DataSet dataSet;
 
-	@XmlElement
-	private List<ChartSeries> series;
+  @XmlElement private ChartCategory category;
 
-	@XmlElement
-	private List<ChartConfig> config;
+  @XmlElement private List<ChartSeries> series;
 
-	public Boolean getStacked() {
-		return stacked;
-	}
-	
-	public String getOnInit() {
-		return onInit;
-	}
+  @XmlElement private List<ChartConfig> config;
 
-	public List<SearchField> getSearchFields() {
-		return searchFields;
-	}
+  public Boolean getStacked() {
+    return stacked;
+  }
 
-	public DataSet getDataSet() {
-		return dataSet;
-	}
+  public String getOnInit() {
+    return onInit;
+  }
 
-	public ChartCategory getCategory() {
-		return category;
-	}
+  public List<SearchField> getSearchFields() {
+    return searchFields;
+  }
 
-	public List<ChartSeries> getSeries() {
-		return series;
-	}
+  public DataSet getDataSet() {
+    return dataSet;
+  }
 
-	public List<ChartConfig> getConfig() {
-		return config;
-	}
+  public ChartCategory getCategory() {
+    return category;
+  }
 
-	@XmlType
-	@JsonTypeName("category")
-	public static class ChartCategory {
+  public List<ChartSeries> getSeries() {
+    return series;
+  }
 
-		@XmlAttribute
-		private String key;
+  public List<ChartConfig> getConfig() {
+    return config;
+  }
 
-		@XmlAttribute
-		private String type;
+  @XmlType
+  @JsonTypeName("category")
+  public static class ChartCategory {
 
-		@XmlAttribute
-		private String title;
+    @XmlAttribute private String key;
 
-		public String getKey() {
-			return key;
-		}
+    @XmlAttribute private String type;
 
-		public String getType() {
-			return type;
-		}
+    @XmlAttribute private String title;
 
-		@JsonGetter("title")
-		public String getLocalizedTitle() {
-			return I18n.get(title);
-		}
+    public String getKey() {
+      return key;
+    }
 
-		@JsonIgnore
-		public String getTitle() {
-			return title;
-		}
-	}
+    public String getType() {
+      return type;
+    }
 
-	@XmlType
-	@JsonTypeName("series")
-	public static class ChartSeries {
+    @JsonGetter("title")
+    public String getLocalizedTitle() {
+      return I18n.get(title);
+    }
 
-		@XmlAttribute
-		private String key;
+    @JsonIgnore
+    public String getTitle() {
+      return title;
+    }
+  }
 
-		@XmlAttribute
-		private String groupBy;
+  @XmlType
+  @JsonTypeName("series")
+  public static class ChartSeries {
 
-		@XmlAttribute
-		private String type;
+    @XmlAttribute private String key;
 
-		@XmlAttribute
-		private String side;
+    @XmlAttribute private String groupBy;
 
-		@XmlAttribute
-		private String title;
+    @XmlAttribute private String type;
 
-		@XmlAttribute
-		private String aggregate;
+    @XmlAttribute private String side;
 
-		public String getKey() {
-			return key;
-		}
+    @XmlAttribute private String title;
 
-		public String getGroupBy() {
-			return groupBy;
-		}
+    @XmlAttribute private String aggregate;
 
-		public String getType() {
-			return type;
-		}
+    public String getKey() {
+      return key;
+    }
 
-		public String getSide() {
-			return side;
-		}
+    public String getGroupBy() {
+      return groupBy;
+    }
 
-		@JsonGetter("title")
-		public String getLocalizedTitle() {
-			return I18n.get(title);
-		}
+    public String getType() {
+      return type;
+    }
 
-		@JsonIgnore
-		public String getTitle() {
-			return title;
-		}
+    public String getSide() {
+      return side;
+    }
 
-		public String getAggregate() {
-			return aggregate;
-		}
-	}
+    @JsonGetter("title")
+    public String getLocalizedTitle() {
+      return I18n.get(title);
+    }
 
-	@XmlType
-	public static class ChartConfig {
+    @JsonIgnore
+    public String getTitle() {
+      return title;
+    }
 
-		@XmlAttribute
-		private String name;
+    public String getAggregate() {
+      return aggregate;
+    }
+  }
 
-		@XmlAttribute
-		private String value;
+  @XmlType
+  public static class ChartConfig {
 
-		public String getName() {
-			return name;
-		}
+    @XmlAttribute private String name;
 
-		public void setName(String name) {
-			this.name = name;
-		}
+    @XmlAttribute private String value;
 
-		public void setValue(String value) {
-			this.value = value;
-		}
+    public String getName() {
+      return name;
+    }
 
-		public String getValue() {
-			return value;
-		}
-	}
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    public void setValue(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+  }
 }

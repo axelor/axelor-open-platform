@@ -17,15 +17,14 @@
  */
 package com.axelor.report;
 
-import org.eclipse.birt.report.engine.api.IReportEngine;
-
 import com.axelor.JpaTestModule;
+import org.eclipse.birt.report.engine.api.IReportEngine;
 
 public class MyModule extends JpaTestModule {
 
-	@Override
-	protected void configure() {
-		super.configure();
-		bind(IReportEngine.class).toProvider(ReportEngineProvider.class);
-	}
+  @Override
+  protected void configure() {
+    super.configure();
+    bind(IReportEngine.class).toProvider(ReportEngineProvider.class);
+  }
 }

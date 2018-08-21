@@ -22,16 +22,13 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 
-/**
- * Custom {@link Control} class to create {@link I18nBundle} instances.
- * 
- */
+/** Custom {@link Control} class to create {@link I18nBundle} instances. */
 public class I18nControl extends Control {
 
-	@Override
-	public ResourceBundle newBundle(String baseName, Locale locale,
-			String format, ClassLoader loader, boolean reload)
-			throws IllegalAccessException, InstantiationException, IOException {
-		return new I18nBundle(locale);
-	}
+  @Override
+  public ResourceBundle newBundle(
+      String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
+      throws IllegalAccessException, InstantiationException, IOException {
+    return new I18nBundle(locale);
+  }
 }

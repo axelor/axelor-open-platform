@@ -25,14 +25,13 @@ import javax.xml.bind.annotation.XmlType;
 @XmlTransient
 public abstract class AbstractContainer extends SimpleWidget {
 
-	@XmlAttribute
-	private Integer rowSpan;
+  @XmlAttribute private Integer rowSpan;
 
-	public Integer getRowSpan() {
-		return rowSpan;
-	}
+  public Integer getRowSpan() {
+    return rowSpan;
+  }
 
-	public void setRowSpan(Integer rowSpan) {
-		this.rowSpan = rowSpan;
-	}
+  public void setRowSpan(Integer rowSpan) {
+    this.rowSpan = rowSpan;
+  }
 }

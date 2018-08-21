@@ -21,12 +21,12 @@ import java.sql.Types;
 
 public class JsonTextSqlTypeDescriptor extends JsonSqlTypeDescriptor {
 
-	private static final long serialVersionUID = 4607469096983456015L;
+  private static final long serialVersionUID = 4607469096983456015L;
 
-	public static final JsonTextSqlTypeDescriptor INSTANCE = new JsonTextSqlTypeDescriptor();
+  public static final JsonTextSqlTypeDescriptor INSTANCE = new JsonTextSqlTypeDescriptor();
 
-	@Override
-	public int getSqlType() {
-		return Types.LONGVARCHAR;
-	}
+  @Override
+  public int getSqlType() {
+    return Types.LONGVARCHAR;
+  }
 }

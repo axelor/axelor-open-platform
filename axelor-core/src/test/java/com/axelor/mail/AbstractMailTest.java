@@ -17,46 +17,46 @@
  */
 package com.axelor.mail;
 
-import java.security.Security;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-
 import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.DummySSLSocketFactory;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import java.security.Security;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 
 public abstract class AbstractMailTest {
 
-	protected static final String SERVER_HOST = "127.0.0.1";
+  protected static final String SERVER_HOST = "127.0.0.1";
 
-	protected static final String SMTP_PORT = "" + ServerSetupTest.SMTP.getPort();
-	protected static final String IMAP_PORT = "" + ServerSetupTest.IMAP.getPort();
-	protected static final String POP3_PORT = "" + ServerSetupTest.POP3.getPort();
+  protected static final String SMTP_PORT = "" + ServerSetupTest.SMTP.getPort();
+  protected static final String IMAP_PORT = "" + ServerSetupTest.IMAP.getPort();
+  protected static final String POP3_PORT = "" + ServerSetupTest.POP3.getPort();
 
-	protected static final String USER_NAME = "test";
-	protected static final String USER_PASS = "test";
+  protected static final String USER_NAME = "test";
+  protected static final String USER_PASS = "test";
 
-	@Rule
-	public final GreenMailRule server = new GreenMailRule(ServerSetupTest.SMTP_POP3_IMAP);
+  @Rule public final GreenMailRule server = new GreenMailRule(ServerSetupTest.SMTP_POP3_IMAP);
 
-	protected final SmtpAccount SMTP_ACCOUNT = new SmtpAccount(SERVER_HOST, SMTP_PORT, USER_NAME, USER_PASS);
-	protected final ImapAccount IMAP_ACCOUNT = new ImapAccount(SERVER_HOST, IMAP_PORT, USER_NAME, USER_PASS);
-	protected final Pop3Account POP3_ACCOUNT = new Pop3Account(SERVER_HOST, POP3_PORT, USER_NAME, USER_PASS);
+  protected final SmtpAccount SMTP_ACCOUNT =
+      new SmtpAccount(SERVER_HOST, SMTP_PORT, USER_NAME, USER_PASS);
+  protected final ImapAccount IMAP_ACCOUNT =
+      new ImapAccount(SERVER_HOST, IMAP_PORT, USER_NAME, USER_PASS);
+  protected final Pop3Account POP3_ACCOUNT =
+      new Pop3Account(SERVER_HOST, POP3_PORT, USER_NAME, USER_PASS);
 
-	protected GreenMailUser user;
+  protected GreenMailUser user;
 
-	@Before
-	public void startServer() {
-		Security.setProperty("ssl.SocketFactory.provider", DummySSLSocketFactory.class.getName());
-		user = server.setUser(USER_NAME, USER_PASS);
-		server.start();
-	}
+  @Before
+  public void startServer() {
+    Security.setProperty("ssl.SocketFactory.provider", DummySSLSocketFactory.class.getName());
+    user = server.setUser(USER_NAME, USER_PASS);
+    server.start();
+  }
 
-	@After
-	public void stopServer() {
-		server.stop();
-	}
+  @After
+  public void stopServer() {
+    server.stop();
+  }
 }

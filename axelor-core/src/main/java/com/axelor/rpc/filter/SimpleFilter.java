@@ -17,59 +17,57 @@
  */
 package com.axelor.rpc.filter;
 
+import com.axelor.db.hibernate.type.JsonFunction;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.axelor.db.hibernate.type.JsonFunction;
-
-
 class SimpleFilter extends Filter {
 
-	private String fieldName;
+  private String fieldName;
 
-	private Operator operator;
+  private Operator operator;
 
-	private Object value;
+  private Object value;
 
-	public SimpleFilter(Operator operator, String fieldName, Object value) {
-		this.fieldName = fieldName;
-		this.operator = operator;
-		this.value = value;
-	}
+  public SimpleFilter(Operator operator, String fieldName, Object value) {
+    this.fieldName = fieldName;
+    this.operator = operator;
+    this.value = value;
+  }
 
-	public String getFieldName() {
-		return fieldName;
-	}
+  public String getFieldName() {
+    return fieldName;
+  }
 
-	public void setFieldName(String fieldName) {
-		this.fieldName = fieldName;
-	}
+  public void setFieldName(String fieldName) {
+    this.fieldName = fieldName;
+  }
 
-	public Operator getOperator() {
-		return operator;
-	}
+  public Operator getOperator() {
+    return operator;
+  }
 
-	public void setOperator(Operator operator) {
-		this.operator = operator;
-	}
+  public void setOperator(Operator operator) {
+    this.operator = operator;
+  }
 
-	protected String getOperand() {
-		final String name = getFieldName();
-		if (name.indexOf("::") > -1) {
-			return JsonFunction.fromPath(name).toString();
-		}
-		return "self." + name;
-	}
+  protected String getOperand() {
+    final String name = getFieldName();
+    if (name.indexOf("::") > -1) {
+      return JsonFunction.fromPath(name).toString();
+    }
+    return "self." + name;
+  }
 
-	@Override
-	public String getQuery() {
-		return String.format("(%s %s ?)", getOperand(), operator);
-	}
+  @Override
+  public String getQuery() {
+    return String.format("(%s %s ?)", getOperand(), operator);
+  }
 
-	@Override
-	public List<Object> getParams() {
-		List<Object> params = new ArrayList<Object>();
-		params.add(value);
-		return params;
-	}
+  @Override
+  public List<Object> getParams() {
+    List<Object> params = new ArrayList<Object>();
+    params.add(value);
+    return params;
+  }
 }

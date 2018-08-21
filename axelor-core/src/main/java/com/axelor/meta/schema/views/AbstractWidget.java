@@ -17,14 +17,6 @@
  */
 package com.axelor.meta.schema.views;
 
-import java.util.Map;
-
-import javax.xml.bind.annotation.XmlAnyAttribute;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.namespace.QName;
-
 import com.axelor.db.mapper.Mapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -36,98 +28,100 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Maps;
+import java.util.Map;
+import javax.xml.bind.annotation.XmlAnyAttribute;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.namespace.QName;
 
 @XmlType
 @JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type", defaultImpl = Field.class)
 @JsonInclude(Include.NON_NULL)
 @JsonSubTypes({
-	@Type(Field.class),
-	@Type(Button.class),
-	@Type(Break.class),
-	@Type(Spacer.class),
-	@Type(Separator.class),
-	@Type(Label.class),
-	@Type(Static.class),
-	@Type(Help.class),
-	@Type(Group.class),
-	@Type(Notebook.class),
-	@Type(Page.class),
-	@Type(Portlet.class),
-	@Type(Dashlet.class)
+  @Type(Field.class),
+  @Type(Button.class),
+  @Type(Break.class),
+  @Type(Spacer.class),
+  @Type(Separator.class),
+  @Type(Label.class),
+  @Type(Static.class),
+  @Type(Help.class),
+  @Type(Group.class),
+  @Type(Notebook.class),
+  @Type(Page.class),
+  @Type(Portlet.class),
+  @Type(Dashlet.class)
 })
 public abstract class AbstractWidget {
-	
-	@JsonIgnore
-	@XmlAttribute(name = "if")
-	private String conditionToCheck;
 
-	@JsonIgnore
-	@XmlAttribute(name = "if-module")
-	private String moduleToCheck;
-	
-	@JsonIgnore
-	@XmlAnyAttribute
-	private Map<QName, String> otherAttributes;
-	
-	@XmlTransient
-	@JsonIgnore
-	private String model;
-	
-	public String getConditionToCheck() {
-		return conditionToCheck;
-	}
+  @JsonIgnore
+  @XmlAttribute(name = "if")
+  private String conditionToCheck;
 
-	public void setConditionToCheck(String conditionToCheck) {
-		this.conditionToCheck = conditionToCheck;
-	}
+  @JsonIgnore
+  @XmlAttribute(name = "if-module")
+  private String moduleToCheck;
 
-	public String getModuleToCheck() {
-		return moduleToCheck;
-	}
+  @JsonIgnore @XmlAnyAttribute private Map<QName, String> otherAttributes;
 
-	public void setModuleToCheck(String moduleToCheck) {
-		this.moduleToCheck = moduleToCheck;
-	}
-	
-	public Map<QName, String> getOtherAttributes() {
-		return otherAttributes;
-	}
-	
-	public void setOtherAttributes(Map<QName, String> otherAttributes) {
-		this.otherAttributes = otherAttributes;
-	}
+  @XmlTransient @JsonIgnore private String model;
 
-	@XmlTransient
-	public Map<String, Object> getWidgetAttrs() {
-		if (otherAttributes == null || otherAttributes.isEmpty()) {
-			return null;
-		}
-		final Map<String, Object> attrs = Maps.newHashMap();
-		for (QName qn : otherAttributes.keySet()) {
-			String name = qn.getLocalPart();
-			String value = otherAttributes.get(qn);
-			if (name.startsWith("x-") || name.startsWith("data-")) {
-				name = name.replaceFirst("^(x|data)-", "");
-				name = CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, name);
-				attrs.put(name, value);
-			}
-		}
-		if (attrs.containsKey("target") && !attrs.containsKey("targetName")) {
-			try {
-				Class<?> target = Class.forName(attrs.get("target").toString());
-				String targetName = Mapper.of(target).getNameField().getName();
-				attrs.put("targetName", targetName);
-			} catch (Exception e) {
-			}
-		}
-		return attrs;
-	}
-	
-	public String getModel() {
-		return model;
-	}
+  public String getConditionToCheck() {
+    return conditionToCheck;
+  }
 
-	public void setModel(String model) {
-		this.model = model;
-	}
+  public void setConditionToCheck(String conditionToCheck) {
+    this.conditionToCheck = conditionToCheck;
+  }
+
+  public String getModuleToCheck() {
+    return moduleToCheck;
+  }
+
+  public void setModuleToCheck(String moduleToCheck) {
+    this.moduleToCheck = moduleToCheck;
+  }
+
+  public Map<QName, String> getOtherAttributes() {
+    return otherAttributes;
+  }
+
+  public void setOtherAttributes(Map<QName, String> otherAttributes) {
+    this.otherAttributes = otherAttributes;
+  }
+
+  @XmlTransient
+  public Map<String, Object> getWidgetAttrs() {
+    if (otherAttributes == null || otherAttributes.isEmpty()) {
+      return null;
+    }
+    final Map<String, Object> attrs = Maps.newHashMap();
+    for (QName qn : otherAttributes.keySet()) {
+      String name = qn.getLocalPart();
+      String value = otherAttributes.get(qn);
+      if (name.startsWith("x-") || name.startsWith("data-")) {
+        name = name.replaceFirst("^(x|data)-", "");
+        name = CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, name);
+        attrs.put(name, value);
+      }
+    }
+    if (attrs.containsKey("target") && !attrs.containsKey("targetName")) {
+      try {
+        Class<?> target = Class.forName(attrs.get("target").toString());
+        String targetName = Mapper.of(target).getNameField().getName();
+        attrs.put("targetName", targetName);
+      } catch (Exception e) {
+      }
+    }
+    return attrs;
+  }
+
+  public String getModel() {
+    return model;
+  }
+
+  public void setModel(String model) {
+    this.model = model;
+  }
 }

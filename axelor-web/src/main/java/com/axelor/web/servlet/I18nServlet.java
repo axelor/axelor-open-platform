@@ -17,6 +17,10 @@
  */
 package com.axelor.web.servlet;
 
+import com.axelor.app.internal.AppFilter;
+import com.axelor.i18n.I18n;
+import com.axelor.inject.Beans;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -26,73 +30,68 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.zip.GZIPOutputStream;
-
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.axelor.app.internal.AppFilter;
-import com.axelor.i18n.I18n;
-import com.axelor.inject.Beans;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Singleton
 public class I18nServlet extends HttpServlet {
 
-	private static final long serialVersionUID = -6879530734799286544L;
+  private static final long serialVersionUID = -6879530734799286544L;
 
-	private static final String CONTENT_ENCODING = "Content-Encoding";
-	private static final String ACCEPT_ENCODING = "Accept-Encoding";
-	private static final String GZIP_ENCODING = "gzip";
-	private static final String CONTENT_TYPE = "application/javascript; charset=utf8";
+  private static final String CONTENT_ENCODING = "Content-Encoding";
+  private static final String ACCEPT_ENCODING = "Accept-Encoding";
+  private static final String GZIP_ENCODING = "gzip";
+  private static final String CONTENT_TYPE = "application/javascript; charset=utf8";
 
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  @Override
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+      throws ServletException, IOException {
 
-		Locale locale = AppFilter.getLocale();
-		if (locale == null) {
-			locale = req.getLocale();
-		}
+    Locale locale = AppFilter.getLocale();
+    if (locale == null) {
+      locale = req.getLocale();
+    }
 
-		final ResourceBundle bundle = I18n.getBundle(locale);
-		if (bundle == null) {
-			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-			return;
-		}
+    final ResourceBundle bundle = I18n.getBundle(locale);
+    if (bundle == null) {
+      resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      return;
+    }
 
-		resp.setContentType(CONTENT_TYPE);
+    resp.setContentType(CONTENT_TYPE);
 
-		OutputStream out = resp.getOutputStream();
-		if (req.getHeader(ACCEPT_ENCODING) != null &&
-			req.getHeader(ACCEPT_ENCODING).toLowerCase().indexOf(GZIP_ENCODING) > -1) {
-			resp.setHeader(CONTENT_ENCODING, GZIP_ENCODING);
-			out = new GZIPOutputStream(out);
-		}
+    OutputStream out = resp.getOutputStream();
+    if (req.getHeader(ACCEPT_ENCODING) != null
+        && req.getHeader(ACCEPT_ENCODING).toLowerCase().indexOf(GZIP_ENCODING) > -1) {
+      resp.setHeader(CONTENT_ENCODING, GZIP_ENCODING);
+      out = new GZIPOutputStream(out);
+    }
 
-		final StringBuilder builder = new StringBuilder();
-		builder.append("(function() {");
-		builder.append("this._t={};_t.bundle=");
+    final StringBuilder builder = new StringBuilder();
+    builder.append("(function() {");
+    builder.append("this._t={};_t.bundle=");
 
-		Enumeration<String> keys = bundle.getKeys();
-		Map<String, String> messages = new HashMap<>();
+    Enumeration<String> keys = bundle.getKeys();
+    Map<String, String> messages = new HashMap<>();
 
-		while (keys.hasMoreElements()) {
-			String key = keys.nextElement();
-			messages.put(key, bundle.getString(key));
-		}
+    while (keys.hasMoreElements()) {
+      String key = keys.nextElement();
+      messages.put(key, bundle.getString(key));
+    }
 
-		try {
-			final ObjectMapper mapper = Beans.get(ObjectMapper.class);
-			builder.append(mapper.writeValueAsString(messages)).append(";");
-			builder.append("}(this));");
-		} catch (Exception e) {
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			return;
-		}
+    try {
+      final ObjectMapper mapper = Beans.get(ObjectMapper.class);
+      builder.append(mapper.writeValueAsString(messages)).append(";");
+      builder.append("}(this));");
+    } catch (Exception e) {
+      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      return;
+    }
 
-		out.write(builder.toString().getBytes(Charset.forName("UTF-8")));
-		out.close();
-	}
+    out.write(builder.toString().getBytes(Charset.forName("UTF-8")));
+    out.close();
+  }
 }

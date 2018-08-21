@@ -17,6 +17,8 @@
  */
 package com.axelor.test.db;
 
+import com.axelor.db.EntityHelper;
+import com.axelor.db.Model;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -25,58 +27,56 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.axelor.db.EntityHelper;
-import com.axelor.db.Model;
-
 @Entity
 @Table(name = "CONTACT_CIRCLE")
 public class Circle extends Model {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CONTACT_CIRCLE_SEQ")
-	@SequenceGenerator(name = "CONTACT_CIRCLE_SEQ", sequenceName = "CONTACT_CIRCLE_SEQ", allocationSize = 1)
-	private Long id;
-	
-	@NotNull
-	private String code;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CONTACT_CIRCLE_SEQ")
+  @SequenceGenerator(
+    name = "CONTACT_CIRCLE_SEQ",
+    sequenceName = "CONTACT_CIRCLE_SEQ",
+    allocationSize = 1
+  )
+  private Long id;
 
-	@NotNull
-	private String name;
+  @NotNull private String code;
 
-	public Circle() {
-	}
-	
-	public Long getId() {
-		return id;
-	}
-	
-	public void setId(Long id) {
-		this.id = id;
-	}
+  @NotNull private String name;
 
-	public Circle(String name, String title) {
-		this.code = name;
-		this.name = title;
-	}
+  public Circle() {}
 
-	public String getCode() {
-		return code;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public void setCode(String name) {
-		this.code = name;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public Circle(String name, String title) {
+    this.code = name;
+    this.name = title;
+  }
 
-	public void setName(String title) {
-		this.name = title;
-	}
-	
-	@Override
-	public String toString() {
-		return EntityHelper.toString(this);
-	}
+  public String getCode() {
+    return code;
+  }
+
+  public void setCode(String name) {
+    this.code = name;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String title) {
+    this.name = title;
+  }
+
+  @Override
+  public String toString() {
+    return EntityHelper.toString(this);
+  }
 }

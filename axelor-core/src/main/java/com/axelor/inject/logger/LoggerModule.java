@@ -17,20 +17,16 @@
  */
 package com.axelor.inject.logger;
 
-import org.slf4j.Logger;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;
+import org.slf4j.Logger;
 
-/**
- * Provides support for SLF4J Logger injection.
- *
- */
+/** Provides support for SLF4J Logger injection. */
 public final class LoggerModule extends AbstractModule {
 
-	@Override
-	protected void configure() {
-		bindListener(Matchers.any(), new LoggerProvisionListener());
-		bind(Logger.class).toProvider(new LoggerProvider());
-	}
+  @Override
+  protected void configure() {
+    bindListener(Matchers.any(), new LoggerProvisionListener());
+    bind(Logger.class).toProvider(new LoggerProvider());
+  }
 }

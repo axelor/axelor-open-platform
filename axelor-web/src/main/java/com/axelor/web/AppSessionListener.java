@@ -17,58 +17,52 @@
  */
 package com.axelor.web;
 
+import com.axelor.app.AppSettings;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import com.axelor.app.AppSettings;
-
-/**
- * The {@link AppSessionListener} configures the session timeout.
- *
- */
+/** The {@link AppSessionListener} configures the session timeout. */
 @Singleton
 public final class AppSessionListener implements HttpSessionListener {
 
-	private final int timeout;
+  private final int timeout;
 
-	private static final Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
+  private static final Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
 
-	/**
-	 * Create a new {@link AppSessionListener} with the given app settings.
-	 *
-	 * @param settings
-	 *            application settings
-	 */
-	@Inject
-	public AppSessionListener(AppSettings settings) {
-		this.timeout = settings.getInt("session.timeout", 60);
-	}
+  /**
+   * Create a new {@link AppSessionListener} with the given app settings.
+   *
+   * @param settings application settings
+   */
+  @Inject
+  public AppSessionListener(AppSettings settings) {
+    this.timeout = settings.getInt("session.timeout", 60);
+  }
 
-	@Override
-	public void sessionCreated(HttpSessionEvent event) {
-		final HttpSession session = event.getSession();
-		sessions.put(session.getId(), session);
-		session.setMaxInactiveInterval(timeout * 60);
-	}
+  @Override
+  public void sessionCreated(HttpSessionEvent event) {
+    final HttpSession session = event.getSession();
+    sessions.put(session.getId(), session);
+    session.setMaxInactiveInterval(timeout * 60);
+  }
 
-	@Override
-	public void sessionDestroyed(HttpSessionEvent event) {
-		final HttpSession session = event.getSession();
-		sessions.remove(session.getId());
-	}
+  @Override
+  public void sessionDestroyed(HttpSessionEvent event) {
+    final HttpSession session = event.getSession();
+    sessions.remove(session.getId());
+  }
 
-	public static Set<String> getActiveSessions() {
-		return sessions.keySet();
-	}
+  public static Set<String> getActiveSessions() {
+    return sessions.keySet();
+  }
 
-	public static HttpSession getSession(String id) {
-		return sessions.get(id);
-	}
+  public static HttpSession getSession(String id) {
+    return sessions.get(id);
+  }
 }

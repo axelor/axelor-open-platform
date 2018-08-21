@@ -1,25 +1,25 @@
 apply plugin: com.axelor.gradle.AxelorPlugin
 
 axelor {
-	title = "Axelor Web"
+  title = "Axelor Web"
 }
 
 dependencies {
 
-	testCompile project(":axelor-test")
-	compile project(":axelor-core")
+  testCompile project(":axelor-test")
+  compile project(":axelor-core")
 
-	compileOnly libs.javax_servlet
-	compileOnly libs.javax_servlet_jsp
+  compileOnly libs.javax_servlet
+  compileOnly libs.javax_servlet_jsp
 
-	compile libs.resteasy
-	compile libs.resteasy_guice
-	compile libs.resteasy_multipart
-	compile libs.jackson_libs
+  compile libs.resteasy
+  compile libs.resteasy_guice
+  compile libs.resteasy_multipart
+  compile libs.jackson_libs
 }
 
 jar {
-	into("webapp") {
-		from("src/main/webapp")
-	}
+  into("webapp") {
+    from("src/main/webapp")
+  }
 }

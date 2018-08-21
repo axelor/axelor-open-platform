@@ -17,201 +17,189 @@
  */
 package com.axelor.meta.schema.views;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
-
 import com.axelor.i18n.I18n;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 public class MenuItem extends SimpleWidget {
 
-	@XmlAttribute(name = "id")
-	private String xmlId;
+  @XmlAttribute(name = "id")
+  private String xmlId;
 
-	@XmlAttribute
-	private String parent;
+  @XmlAttribute private String parent;
 
-	@XmlAttribute
-	private String icon;
+  @XmlAttribute private String icon;
 
-	@XmlAttribute(name = "icon-background")
-	private String iconBackground;
+  @XmlAttribute(name = "icon-background")
+  private String iconBackground;
 
-	@XmlAttribute
-	private String action;
+  @XmlAttribute private String action;
 
-	@XmlAttribute
-	private String prompt;
+  @XmlAttribute private String prompt;
 
-	@XmlAttribute
-	private Integer order;
+  @XmlAttribute private Integer order;
 
-	@XmlAttribute
-	private String groups;
+  @XmlAttribute private String groups;
 
-	@XmlAttribute
-	private Boolean top;
+  @XmlAttribute private Boolean top;
 
-	@XmlAttribute
-	private Boolean left;
+  @XmlAttribute private Boolean left;
 
-	@XmlAttribute
-	private Boolean mobile;
+  @XmlAttribute private Boolean mobile;
 
-	@XmlAttribute
-	private String category;
+  @XmlAttribute private String category;
 
-	@XmlAttribute
-	private String tag;
+  @XmlAttribute private String tag;
 
-	@XmlAttribute(name = "tag-get")
-	private String tagGet;
+  @XmlAttribute(name = "tag-get")
+  private String tagGet;
 
-	@XmlAttribute(name = "tag-count")
-	private Boolean tagCount;
+  @XmlAttribute(name = "tag-count")
+  private Boolean tagCount;
 
-	@XmlAttribute(name = "tag-style")
-	private String tagStyle;
+  @XmlAttribute(name = "tag-style")
+  private String tagStyle;
 
-	public String getXmlId() {
-		return xmlId;
-	}
+  public String getXmlId() {
+    return xmlId;
+  }
 
-	public void setXmlId(String xmlId) {
-		this.xmlId = xmlId;
-	}
+  public void setXmlId(String xmlId) {
+    this.xmlId = xmlId;
+  }
 
-	public String getParent() {
-		return parent;
-	}
+  public String getParent() {
+    return parent;
+  }
 
-	public void setParent(String parent) {
-		this.parent = parent;
-	}
+  public void setParent(String parent) {
+    this.parent = parent;
+  }
 
-	public Integer getOrder() {
-		return order;
-	}
+  public Integer getOrder() {
+    return order;
+  }
 
-	public void setOrder(Integer order) {
-		this.order = order;
-	}
+  public void setOrder(Integer order) {
+    this.order = order;
+  }
 
-	public String getGroups() {
-		return groups;
-	}
+  public String getGroups() {
+    return groups;
+  }
 
-	public void setGroups(String groups) {
-		this.groups = groups;
-	}
+  public void setGroups(String groups) {
+    this.groups = groups;
+  }
 
-	public Boolean getTop() {
-		return top;
-	}
+  public Boolean getTop() {
+    return top;
+  }
 
-	public void setTop(Boolean top) {
-		this.top = top;
-	}
+  public void setTop(Boolean top) {
+    this.top = top;
+  }
 
-	public Boolean getLeft() {
-		return left;
-	}
+  public Boolean getLeft() {
+    return left;
+  }
 
-	public void setLeft(Boolean left) {
-		this.left = left;
-	}
+  public void setLeft(Boolean left) {
+    this.left = left;
+  }
 
-	public Boolean getMobile() {
-		return mobile;
-	}
+  public Boolean getMobile() {
+    return mobile;
+  }
 
-	public void setMobile(Boolean mobile) {
-		this.mobile = mobile;
-	}
+  public void setMobile(Boolean mobile) {
+    this.mobile = mobile;
+  }
 
-	public String getCategory() {
-		return category;
-	}
+  public String getCategory() {
+    return category;
+  }
 
-	public void setCategory(String category) {
-		this.category = category;
-	}
+  public void setCategory(String category) {
+    this.category = category;
+  }
 
-	public String getIcon() {
-		return icon;
-	}
+  public String getIcon() {
+    return icon;
+  }
 
-	public void setIcon(String icon) {
-		this.icon = icon;
-	}
+  public void setIcon(String icon) {
+    this.icon = icon;
+  }
 
-	public String getIconBackground() {
-		return iconBackground;
-	}
+  public String getIconBackground() {
+    return iconBackground;
+  }
 
-	public void setIconBackground(String iconBackground) {
-		this.iconBackground = iconBackground;
-	}
+  public void setIconBackground(String iconBackground) {
+    this.iconBackground = iconBackground;
+  }
 
-	public String getAction() {
-		return action;
-	}
+  public String getAction() {
+    return action;
+  }
 
-	public void setAction(String action) {
-		this.action = action;
-	}
-	
-	@JsonGetter("prompt")
-	public String getLocalizedPrompt() {
-		return I18n.get(prompt);
-	}
+  public void setAction(String action) {
+    this.action = action;
+  }
 
-	@JsonIgnore
-	public String getPrompt() {
-		return prompt;
-	}
+  @JsonGetter("prompt")
+  public String getLocalizedPrompt() {
+    return I18n.get(prompt);
+  }
 
-	public void setPrompt(String prompt) {
-		this.prompt = prompt;
-	}
+  @JsonIgnore
+  public String getPrompt() {
+    return prompt;
+  }
 
-	@JsonIgnore
-	public String getTag() {
-		return tag;
-	}
+  public void setPrompt(String prompt) {
+    this.prompt = prompt;
+  }
 
-	@JsonGetter("tag")
-	public String getLocalizedTag() {
-		return I18n.get(tag);
-	}
+  @JsonIgnore
+  public String getTag() {
+    return tag;
+  }
 
-	public void setTag(String tag) {
-		this.tag = tag;
-	}
+  @JsonGetter("tag")
+  public String getLocalizedTag() {
+    return I18n.get(tag);
+  }
 
-	public String getTagGet() {
-		return tagGet;
-	}
+  public void setTag(String tag) {
+    this.tag = tag;
+  }
 
-	public void setTagGet(String tagGet) {
-		this.tagGet = tagGet;
-	}
+  public String getTagGet() {
+    return tagGet;
+  }
 
-	public Boolean getTagCount() {
-		return tagCount;
-	}
+  public void setTagGet(String tagGet) {
+    this.tagGet = tagGet;
+  }
 
-	public void setTagCount(Boolean tagCount) {
-		this.tagCount = tagCount;
-	}
+  public Boolean getTagCount() {
+    return tagCount;
+  }
 
-	public String getTagStyle() {
-		return tagStyle;
-	}
+  public void setTagCount(Boolean tagCount) {
+    this.tagCount = tagCount;
+  }
 
-	public void setTagStyle(String tagStyle) {
-		this.tagStyle = tagStyle;
-	}
+  public String getTagStyle() {
+    return tagStyle;
+  }
+
+  public void setTagStyle(String tagStyle) {
+    this.tagStyle = tagStyle;
+  }
 }

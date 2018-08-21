@@ -17,17 +17,16 @@
  */
 package com.axelor.db.converters;
 
-import javax.persistence.Converter;
-
 import com.axelor.common.crypto.BytesEncryptor;
+import javax.persistence.Converter;
 
 @Converter
 public class EncryptedBytesConverter extends AbstractEncryptedConverter<byte[], byte[]> {
 
-	@Override
-	protected BytesEncryptor getEncryptor(String algorithm, String password) {
-		return "GCM".equalsIgnoreCase(algorithm)
-				? BytesEncryptor.gcm(password)
-				: BytesEncryptor.cbc(password);
-	}
+  @Override
+  protected BytesEncryptor getEncryptor(String algorithm, String password) {
+    return "GCM".equalsIgnoreCase(algorithm)
+        ? BytesEncryptor.gcm(password)
+        : BytesEncryptor.cbc(password);
+  }
 }

@@ -19,12 +19,13 @@ package com.axelor.db.internal;
 
 import static com.axelor.common.StringUtils.isBlank;
 
+import com.axelor.app.AppSettings;
+import com.axelor.common.ResourceUtils;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
@@ -32,274 +33,247 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
-
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.w3c.dom.Document;
 
-import com.axelor.app.AppSettings;
-import com.axelor.common.ResourceUtils;
-
-/**
- * This class provides some database helper methods (for internal use only).
- *
- */
+/** This class provides some database helper methods (for internal use only). */
 public class DBHelper {
 
-	private static Boolean unaccentSupport = null;
-	
-	private static final int DEFAULT_BATCH_SIZE = 20;
-	private static final int DEFAULT_FETCH_SIZE = 20;
+  private static Boolean unaccentSupport = null;
 
-	private static final String UNACCENT_CHECK = "SELECT unaccent('text')";
-	private static final String UNACCENT_CREATE = "CREATE EXTENSION IF NOT EXISTS unaccent";
+  private static final int DEFAULT_BATCH_SIZE = 20;
+  private static final int DEFAULT_FETCH_SIZE = 20;
 
-	private static final String XPATH_ROOT = "/persistence/persistence-unit[@name='persistenceUnit']";
-	private static final String XPATH_ROOT_TEST = "/persistence/persistence-unit[@name='testUnit']";
+  private static final String UNACCENT_CHECK = "SELECT unaccent('text')";
+  private static final String UNACCENT_CREATE = "CREATE EXTENSION IF NOT EXISTS unaccent";
 
-	private static final String XPATH_NON_JTA_DATA_SOURCE 	= "non-jta-data-source";
-	private static final String XPATH_SHARED_CACHE_MODE 	= "shared-cache-mode";
+  private static final String XPATH_ROOT = "/persistence/persistence-unit[@name='persistenceUnit']";
+  private static final String XPATH_ROOT_TEST = "/persistence/persistence-unit[@name='testUnit']";
 
-	private static final String XPATH_PERSISTENCE_DRIVER 	= "properties/property[@name='javax.persistence.jdbc.driver']/@value";
-	private static final String XPATH_PERSISTENCE_URL 		= "properties/property[@name='javax.persistence.jdbc.url']/@value";
-	private static final String XPATH_PERSISTENCE_USER 		= "properties/property[@name='javax.persistence.jdbc.user']/@value";
-	private static final String XPATH_PERSISTENCE_PASSWORD 	= "properties/property[@name='javax.persistence.jdbc.password']/@value";
-	
-	private static final String XPATH_BATCH_SIZE 	= "properties/property[@name='hibernate.jdbc.batch_size']/@value";
-	private static final String XPATH_FETCH_SIZE 	= "properties/property[@name='hibernate.jdbc.fetch_size']/@value";
+  private static final String XPATH_NON_JTA_DATA_SOURCE = "non-jta-data-source";
+  private static final String XPATH_SHARED_CACHE_MODE = "shared-cache-mode";
 
-	private static final String CONFIG_DATASOURCE	= "db.default.datasource";
-	private static final String CONFIG_DRIVER 		= "db.default.driver";
-	private static final String CONFIG_URL 			= "db.default.url";
-	private static final String CONFIG_USER 		= "db.default.user";
-	private static final String CONFIG_PASSWORD 	= "db.default.password";
-	
-	private static final String CONFIG_BATCH_SIZE 	= "hibernate.jdbc.batch_size";
-	private static final String CONFIG_FETCH_SIZE 	= "hibernate.jdbc.fetch_size";
+  private static final String XPATH_PERSISTENCE_DRIVER =
+      "properties/property[@name='javax.persistence.jdbc.driver']/@value";
+  private static final String XPATH_PERSISTENCE_URL =
+      "properties/property[@name='javax.persistence.jdbc.url']/@value";
+  private static final String XPATH_PERSISTENCE_USER =
+      "properties/property[@name='javax.persistence.jdbc.user']/@value";
+  private static final String XPATH_PERSISTENCE_PASSWORD =
+      "properties/property[@name='javax.persistence.jdbc.password']/@value";
 
-	private static String jndiName;
-	private static String cacheMode;
+  private static final String XPATH_BATCH_SIZE =
+      "properties/property[@name='hibernate.jdbc.batch_size']/@value";
+  private static final String XPATH_FETCH_SIZE =
+      "properties/property[@name='hibernate.jdbc.fetch_size']/@value";
 
-	private static String jdbcDriver;
-	private static String jdbcUrl;
-	private static String jdbcUser;
-	private static String jdbcPassword;
+  private static final String CONFIG_DATASOURCE = "db.default.datasource";
+  private static final String CONFIG_DRIVER = "db.default.driver";
+  private static final String CONFIG_URL = "db.default.url";
+  private static final String CONFIG_USER = "db.default.user";
+  private static final String CONFIG_PASSWORD = "db.default.password";
 
-	private static int jdbcBatchSize;
-	private static int jdbcFetchSize;
+  private static final String CONFIG_BATCH_SIZE = "hibernate.jdbc.batch_size";
+  private static final String CONFIG_FETCH_SIZE = "hibernate.jdbc.fetch_size";
 
-	static {
-		initialize();
-	}
+  private static String jndiName;
+  private static String cacheMode;
 
-	private DBHelper() {
-	}
+  private static String jdbcDriver;
+  private static String jdbcUrl;
+  private static String jdbcUser;
+  private static String jdbcPassword;
 
-	private static String evaluate(XPath xpath, String base, String path, Document document) {
-		try {
-			return xpath.evaluate(base + "/" + path, document).trim();
-		} catch (Exception e) {
-		}
-		return null;
-	}
+  private static int jdbcBatchSize;
+  private static int jdbcFetchSize;
 
-	private static void initialize() {
+  static {
+    initialize();
+  }
 
-		final AppSettings settings = AppSettings.get();
+  private DBHelper() {}
 
-		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		final XPathFactory xpf = XPathFactory.newInstance();
-		final XPath xpath = xpf.newXPath();
+  private static String evaluate(XPath xpath, String base, String path, Document document) {
+    try {
+      return xpath.evaluate(base + "/" + path, document).trim();
+    } catch (Exception e) {
+    }
+    return null;
+  }
 
-		jndiName		= settings.get(CONFIG_DATASOURCE);
-		jdbcDriver 		= settings.get(CONFIG_DRIVER);
-		jdbcUrl 		= settings.get(CONFIG_URL);
-		jdbcUser 		= settings.get(CONFIG_USER);
-		jdbcPassword 	= settings.get(CONFIG_PASSWORD);
-		
-		jdbcBatchSize	= settings.getInt(CONFIG_BATCH_SIZE, DEFAULT_BATCH_SIZE);
-		jdbcFetchSize	= settings.getInt(CONFIG_FETCH_SIZE, DEFAULT_FETCH_SIZE);
+  private static void initialize() {
 
-		try (
-			final InputStream res = ResourceUtils.getResourceStream("META-INF/persistence.xml")) {
-			final DocumentBuilder db = dbf.newDocumentBuilder();
-			final Document document = db.parse(res);
+    final AppSettings settings = AppSettings.get();
 
-			cacheMode = evaluate(xpath, XPATH_ROOT, XPATH_SHARED_CACHE_MODE, document);
-			
-			if (isBlank(jndiName)) {
-				try {
-					jdbcBatchSize = Integer.parseInt(evaluate(xpath, XPATH_ROOT, XPATH_BATCH_SIZE, document));
-				} catch (Exception e) {
-				}
-				try {
-					jdbcFetchSize = Integer.parseInt(evaluate(xpath, XPATH_ROOT, XPATH_FETCH_SIZE, document));
-				} catch (Exception e) {
-				}
-			}
+    final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    final XPathFactory xpf = XPathFactory.newInstance();
+    final XPath xpath = xpf.newXPath();
 
-			if (isBlank(jndiName)) {
-				jndiName = evaluate(xpath, XPATH_ROOT, XPATH_NON_JTA_DATA_SOURCE, document);
-			}
+    jndiName = settings.get(CONFIG_DATASOURCE);
+    jdbcDriver = settings.get(CONFIG_DRIVER);
+    jdbcUrl = settings.get(CONFIG_URL);
+    jdbcUser = settings.get(CONFIG_USER);
+    jdbcPassword = settings.get(CONFIG_PASSWORD);
 
-			if (isBlank(jndiName) && isBlank(jdbcDriver)) {
-				jdbcDriver		= evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_DRIVER, document);
-				jdbcUrl 		= evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_URL, document);
-				jdbcUser 		= evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_USER, document);
-				jdbcPassword 	= evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_PASSWORD, document);
-			}
-			if (isBlank(jndiName) && isBlank(jdbcDriver)) {
-				jdbcDriver		= evaluate(xpath, XPATH_ROOT_TEST, XPATH_PERSISTENCE_DRIVER, document);
-				jdbcUrl 		= evaluate(xpath, XPATH_ROOT_TEST, XPATH_PERSISTENCE_URL, document);
-				jdbcUser 		= evaluate(xpath, XPATH_ROOT_TEST, XPATH_PERSISTENCE_USER, document);
-				jdbcPassword 	= evaluate(xpath, XPATH_ROOT_TEST, XPATH_PERSISTENCE_PASSWORD, document);
-			}
+    jdbcBatchSize = settings.getInt(CONFIG_BATCH_SIZE, DEFAULT_BATCH_SIZE);
+    jdbcFetchSize = settings.getInt(CONFIG_FETCH_SIZE, DEFAULT_FETCH_SIZE);
 
-		} catch (Exception e) {
-		}
-	}
+    try (final InputStream res = ResourceUtils.getResourceStream("META-INF/persistence.xml")) {
+      final DocumentBuilder db = dbf.newDocumentBuilder();
+      final Document document = db.parse(res);
 
-	/**
-	 * Get the JDBC connection configured for the application.
-	 * <p>
-	 * The connection is independent of JPA connection, so use carefully. It
-	 * should be used only when JPA context is not available.
-	 * </p>
-	 *
-	 * @return a {@link Connection}
-	 * @throws NamingException
-	 *             if configured JNDI name can't be resolved
-	 * @throws SQLException
-	 *             if connection can't be obtained
-	 * @throws ClassNotFoundException
-	 *             if JDBC driver is not found
-	 */
-	public static Connection getConnection() throws NamingException, SQLException {
+      cacheMode = evaluate(xpath, XPATH_ROOT, XPATH_SHARED_CACHE_MODE, document);
 
-		if (!isBlank(jndiName)) {
-			final DataSource ds = (DataSource) InitialContext.doLookup(jndiName);
-			return ds.getConnection();
-		}
+      if (isBlank(jndiName)) {
+        try {
+          jdbcBatchSize = Integer.parseInt(evaluate(xpath, XPATH_ROOT, XPATH_BATCH_SIZE, document));
+        } catch (Exception e) {
+        }
+        try {
+          jdbcFetchSize = Integer.parseInt(evaluate(xpath, XPATH_ROOT, XPATH_FETCH_SIZE, document));
+        } catch (Exception e) {
+        }
+      }
 
-		try {
-			Class.forName(jdbcDriver);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+      if (isBlank(jndiName)) {
+        jndiName = evaluate(xpath, XPATH_ROOT, XPATH_NON_JTA_DATA_SOURCE, document);
+      }
 
-		return DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPassword);
-	}
+      if (isBlank(jndiName) && isBlank(jdbcDriver)) {
+        jdbcDriver = evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_DRIVER, document);
+        jdbcUrl = evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_URL, document);
+        jdbcUser = evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_USER, document);
+        jdbcPassword = evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_PASSWORD, document);
+      }
+      if (isBlank(jndiName) && isBlank(jdbcDriver)) {
+        jdbcDriver = evaluate(xpath, XPATH_ROOT_TEST, XPATH_PERSISTENCE_DRIVER, document);
+        jdbcUrl = evaluate(xpath, XPATH_ROOT_TEST, XPATH_PERSISTENCE_URL, document);
+        jdbcUser = evaluate(xpath, XPATH_ROOT_TEST, XPATH_PERSISTENCE_USER, document);
+        jdbcPassword = evaluate(xpath, XPATH_ROOT_TEST, XPATH_PERSISTENCE_PASSWORD, document);
+      }
 
-	/**
-	 * Run database migration scripts using flyway migration engine.
-	 * 
-	 */
-	public static void migrate() {
-		final Flyway flyway = new Flyway();
-		if (!isBlank(jndiName)) {
-			try {
-				flyway.setDataSource((DataSource) InitialContext.doLookup(jndiName));
-			} catch (NamingException e) {
-				throw new FlywayException(e);
-			}
-		} else {
-			flyway.setDataSource(jdbcUrl, jdbcUser, jdbcPassword);
-		}
-		flyway.migrate();
-	}
-	
-	public static String getDataSourceName() {
-		return jndiName;
-	}
+    } catch (Exception e) {
+    }
+  }
 
-	/**
-	 * Check whether non-jta data source is used.
-	 *
-	 */
-	public static boolean isDataSourceUsed() {
-		return !isBlank(jndiName);
-	}
+  /**
+   * Get the JDBC connection configured for the application.
+   *
+   * <p>The connection is independent of JPA connection, so use carefully. It should be used only
+   * when JPA context is not available.
+   *
+   * @return a {@link Connection}
+   * @throws NamingException if configured JNDI name can't be resolved
+   * @throws SQLException if connection can't be obtained
+   * @throws ClassNotFoundException if JDBC driver is not found
+   */
+  public static Connection getConnection() throws NamingException, SQLException {
 
-	/**
-	 * Check whether shared cache is enabled.
-	 *
-	 */
-	public static boolean isCacheEnabled() {
-		if (isBlank(cacheMode)) return false;
-		if (cacheMode.equals("ALL")) return true;
-		if (cacheMode.equals("ENABLE_SELECTIVE")) return true;
-		return false;
-	}
-	
-	/**
-	 * Whether using oracle database.
-	 * 
-	 */
-	public static boolean isOracle() {
-		return jdbcDriver != null && jdbcDriver.contains("Oracle");
-	}
+    if (!isBlank(jndiName)) {
+      final DataSource ds = (DataSource) InitialContext.doLookup(jndiName);
+      return ds.getConnection();
+    }
 
-	/**
-	 * Whether using MySQL database.
-	 *
-	 */
-	public static boolean isMySQL() {
-		return jdbcDriver != null && jdbcDriver.contains("mysql");
-	}
+    try {
+      Class.forName(jdbcDriver);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
 
-	/**
-	 * Get the jdbc batch size configured with
-	 * <code>hibernate.jdbc.batch_size</code> property.
-	 * 
-	 * @return batch size
-	 */
-	public static int getJdbcBatchSize() {
-		return jdbcBatchSize;
-	}
+    return DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPassword);
+  }
 
-	/**
-	 * Get the jdbc fetch size configured with
-	 * <code>hibernate.jdbc.fetch_size</code> property.
-	 * 
-	 * @return batch size
-	 */
-	public static int getJdbcFetchSize() {
-		return jdbcFetchSize;
-	}
+  /** Run database migration scripts using flyway migration engine. */
+  public static void migrate() {
+    final Flyway flyway = new Flyway();
+    if (!isBlank(jndiName)) {
+      try {
+        flyway.setDataSource((DataSource) InitialContext.doLookup(jndiName));
+      } catch (NamingException e) {
+        throw new FlywayException(e);
+      }
+    } else {
+      flyway.setDataSource(jdbcUrl, jdbcUser, jdbcPassword);
+    }
+    flyway.migrate();
+  }
 
-	/**
-	 * Check whether the database has unaccent support.
-	 *
-	 */
-	public static boolean isUnaccentEnabled() {
-		if (unaccentSupport == null) {
-			try {
-				unaccentSupport = testUnaccent();
-			} catch (Exception e) {
-				unaccentSupport = Boolean.FALSE;
-			}
-		}
-		return unaccentSupport == Boolean.TRUE;
-	}
+  public static String getDataSourceName() {
+    return jndiName;
+  }
 
-	private static boolean testUnaccent() throws Exception {
-		Connection connection = getConnection();
-		Statement stmt = connection.createStatement();
-		try {
-			try {
-				stmt.executeQuery(UNACCENT_CHECK);
-				return true;
-			} catch (Exception e) {
-			}
-			try {
-				stmt.executeUpdate(UNACCENT_CREATE);
-				return true;
-			} catch (Exception e) {
-			}
-		} finally {
-			stmt.close();
-			connection.close();
-		}
-		return false;
-	}
+  /** Check whether non-jta data source is used. */
+  public static boolean isDataSourceUsed() {
+    return !isBlank(jndiName);
+  }
+
+  /** Check whether shared cache is enabled. */
+  public static boolean isCacheEnabled() {
+    if (isBlank(cacheMode)) return false;
+    if (cacheMode.equals("ALL")) return true;
+    if (cacheMode.equals("ENABLE_SELECTIVE")) return true;
+    return false;
+  }
+
+  /** Whether using oracle database. */
+  public static boolean isOracle() {
+    return jdbcDriver != null && jdbcDriver.contains("Oracle");
+  }
+
+  /** Whether using MySQL database. */
+  public static boolean isMySQL() {
+    return jdbcDriver != null && jdbcDriver.contains("mysql");
+  }
+
+  /**
+   * Get the jdbc batch size configured with <code>hibernate.jdbc.batch_size</code> property.
+   *
+   * @return batch size
+   */
+  public static int getJdbcBatchSize() {
+    return jdbcBatchSize;
+  }
+
+  /**
+   * Get the jdbc fetch size configured with <code>hibernate.jdbc.fetch_size</code> property.
+   *
+   * @return batch size
+   */
+  public static int getJdbcFetchSize() {
+    return jdbcFetchSize;
+  }
+
+  /** Check whether the database has unaccent support. */
+  public static boolean isUnaccentEnabled() {
+    if (unaccentSupport == null) {
+      try {
+        unaccentSupport = testUnaccent();
+      } catch (Exception e) {
+        unaccentSupport = Boolean.FALSE;
+      }
+    }
+    return unaccentSupport == Boolean.TRUE;
+  }
+
+  private static boolean testUnaccent() throws Exception {
+    Connection connection = getConnection();
+    Statement stmt = connection.createStatement();
+    try {
+      try {
+        stmt.executeQuery(UNACCENT_CHECK);
+        return true;
+      } catch (Exception e) {
+      }
+      try {
+        stmt.executeUpdate(UNACCENT_CREATE);
+        return true;
+      } catch (Exception e) {
+      }
+    } finally {
+      stmt.close();
+      connection.close();
+    }
+    return false;
+  }
 }

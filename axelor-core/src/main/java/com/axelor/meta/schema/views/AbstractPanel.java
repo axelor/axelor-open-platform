@@ -19,66 +19,59 @@ package com.axelor.meta.schema.views;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 public abstract class AbstractPanel extends AbstractContainer {
 
-	@XmlAttribute
-	private Integer itemSpan;
+  @XmlAttribute private Integer itemSpan;
 
-	@XmlAttribute
-	private Boolean showFrame;
+  @XmlAttribute private Boolean showFrame;
 
-	@XmlAttribute
-	private Boolean sidebar;
+  @XmlAttribute private Boolean sidebar;
 
-	@XmlAttribute
-	private Boolean stacked;
+  @XmlAttribute private Boolean stacked;
 
-	@XmlAttribute
-	private Boolean attached;
+  @XmlAttribute private Boolean attached;
 
-	@XmlAttribute
-	private String onTabSelect;
+  @XmlAttribute private String onTabSelect;
 
-	public Integer getItemSpan() {
-		return itemSpan;
-	}
+  public Integer getItemSpan() {
+    return itemSpan;
+  }
 
-	public Boolean getShowFrame() {
-		return showFrame;
-	}
+  public Boolean getShowFrame() {
+    return showFrame;
+  }
 
-	public Boolean getSidebar() {
-		return sidebar;
-	}
+  public Boolean getSidebar() {
+    return sidebar;
+  }
 
-	public void setSidebar(Boolean sidebar){
-		this.sidebar = sidebar;
-	}
+  public void setSidebar(Boolean sidebar) {
+    this.sidebar = sidebar;
+  }
 
-	public Boolean getStacked() {
-		return stacked;
-	}
+  public Boolean getStacked() {
+    return stacked;
+  }
 
-	public Boolean getAttached() {
-		return attached;
-	}
+  public Boolean getAttached() {
+    return attached;
+  }
 
-	public String getOnTabSelect() {
-		return onTabSelect;
-	}
+  public String getOnTabSelect() {
+    return onTabSelect;
+  }
 
-	protected List<AbstractWidget> process(List<AbstractWidget> items) {
-		if (items == null) {
-			items = new ArrayList<>();
-		}
-		for (AbstractWidget item : items) {
-			item.setModel(getModel());
-		}
-		return items;
-	}
+  protected List<AbstractWidget> process(List<AbstractWidget> items) {
+    if (items == null) {
+      items = new ArrayList<>();
+    }
+    for (AbstractWidget item : items) {
+      item.setModel(getModel());
+    }
+    return items;
+  }
 }

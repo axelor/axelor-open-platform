@@ -16,83 +16,83 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 .nav-tabs-wrap {
-	position: relative;
+  position: relative;
 }
 
 .nav-tabs-wrap a {
-	outline: none;
+  outline: none;
 }
 
 .nav-tabs-menu,
 .nav-tabs-scroll-l,
 .nav-tabs-scroll-r {
-	position: absolute;
-	width: 16px;
-	top: 0px;
-	bottom: 0px;
-	margin-top: .8em;
-	border-bottom: 1px solid #DDD;
-	display: none;
+  position: absolute;
+  width: 16px;
+  top: 0px;
+  bottom: 0px;
+  margin-top: .8em;
+  border-bottom: 1px solid #DDD;
+  display: none;
 }
 
 .nav-tabs-scroll-r {
-	right: 0px;
+  right: 0px;
 }
 
 .nav-tabs-scroll-l a,
 .nav-tabs-scroll-r a {
-	margin: auto;
-	display: block;
-	width: 6px;
-	text-decoration: none;
+  margin: auto;
+  display: block;
+  width: 6px;
+  text-decoration: none;
 }
 
 .nav-tabs-menu {
-	right: 0;
+  right: 0;
 }
 
 .nav-tabs-scroll-l.disabled a,
 .nav-tabs-scroll-r.disabled a {
-	color: #999999;
-	cursor: default;
+  color: #999999;
+  cursor: default;
 }
 
 .nav-tabs-strip {
-	position: relative;
-	overflow: hidden;
-	height: 36px;
+  position: relative;
+  overflow: hidden;
+  height: 36px;
 }
 
 .nav-tabs-strip .nav-tabs {
-	display: block;
-	position: absolute !important;
-	width: 100000px;
+  display: block;
+  position: absolute !important;
+  width: 100000px;
 }
 
 .nav-tabs-closable li {
-	position: relative;
+  position: relative;
 }
 
 .nav-tabs-scrollable li > a,
 .nav-tabs-closable li > a {
-	border: 1px solid #EEE;
-	border-bottom: 1px solid #DDD;
+  border: 1px solid #EEE;
+  border-bottom: 1px solid #DDD;
 }
 
 .nav-tabs-closable li > a {
-	padding-right: 18px;
+  padding-right: 18px;
 }
 
 .nav-tabs-closable li > i {
-	position: absolute;
-	top: 5px;
-	right: 6px;
-	color: #ccc;
-	cursor: pointer;
-	font-size: 11px;
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 11px;
 }
 
 .nav-tabs-closable .active > i,
 .nav-tabs-closable li > i:hover {
-	color: #555;
+  color: #555;
 }

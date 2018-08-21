@@ -2,7 +2,7 @@
 <object-views xmlns="http://axelor.com/xml/ns/object-views"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
-  
+
     <grid name="contact-grid" title="Contacts" model="com.axelor.contact.test.db.Contact">
         <hilite background="warning" if="$contains(email, 'gmeil.com')"/>
         <field name="fullName"/>
@@ -13,10 +13,10 @@
         <field name="company"/>
         <field name="dateOfBirth"/>
     </grid>
-    
+
     <form name="contact-form" title="Contact" model="com.axelor.contact.test.db.Contact" cols="2" colWidths="*,200"
-    	onLoad="action-contact-defaults,action-contact-attrs"
-    	onSave="action-contact-validate">
+      onLoad="action-contact-defaults,action-contact-attrs"
+      onSave="action-contact-validate">
         <group title="Personal Information" colSpan="1" cols="4">
             <field name="title"/>
             <break/>
@@ -59,65 +59,65 @@
             </page>
         </notebook>
     </form>
-    
+
     <action-attrs name="action-contact-attrs">
-    	<attribute name="title" for="notes" expr="eval: String.format('About %s', 'Me')"/>
-    	<attribute name="readonly" for="lastName" expr="eval: 1"/>
-    	<attribute name="hidden" for="lastName" expr="eval: 1"/>
-    	<attribute name="domain" for="title" expr="self.code IN ?1"/>
+      <attribute name="title" for="notes" expr="eval: String.format('About %s', 'Me')"/>
+      <attribute name="readonly" for="lastName" expr="eval: 1"/>
+      <attribute name="hidden" for="lastName" expr="eval: 1"/>
+      <attribute name="domain" for="title" expr="self.code IN ?1"/>
     </action-attrs>
-    
+
     <action-attrs name="action-contact-attrs-multi">
-    	<attribute name="title" for="notes" expr="eval: String.format('About %s', 'Me')"/>
-    	<attribute name="readonly" for="lastName,firstName" expr="eval: 1"/>
-    	<attribute name="hidden" for="lastName,firstNa" expr="eval: 1"/>
-    	<attribute name="hidden" for="notes,phone,dateOfBirth" expr="true"/>
-    	<attribute name="domain" for="title" expr="self.code IN ?1"/>
+      <attribute name="title" for="notes" expr="eval: String.format('About %s', 'Me')"/>
+      <attribute name="readonly" for="lastName,firstName" expr="eval: 1"/>
+      <attribute name="hidden" for="lastName,firstNa" expr="eval: 1"/>
+      <attribute name="hidden" for="notes,phone,dateOfBirth" expr="true"/>
+      <attribute name="domain" for="title" expr="self.code IN ?1"/>
     </action-attrs>
 
     <action-record name="action-contact-defaults"
-    	model="com.axelor.test.db.Contact">
-    	<field name="title" expr="action:action-default-title"/>
-    	<field name="firstName" expr="John"/>
-    	<field name="lastName" expr="Smith"/>
-    	<field name="email" expr="john.smith@gmail.com"/>
-    	<field name="birthDate" expr="eval: __date__"/>
+      model="com.axelor.test.db.Contact">
+      <field name="title" expr="action:action-default-title"/>
+      <field name="firstName" expr="John"/>
+      <field name="lastName" expr="Smith"/>
+      <field name="email" expr="john.smith@gmail.com"/>
+      <field name="birthDate" expr="eval: __date__"/>
     </action-record>
-    
+
     <action-record name="action-contact-defaults-multi"
-    	model="com.axelor.test.db.Contact">
-    	<field name="title" expr="action:action-default-title"/>
-    	<field name="firstName,lastName" expr="Smith"/>
-    	<field name="email,proEmail" expr="john.smith@gmail.com"/>
+      model="com.axelor.test.db.Contact">
+      <field name="title" expr="action:action-default-title"/>
+      <field name="firstName,lastName" expr="Smith"/>
+      <field name="email,proEmail" expr="john.smith@gmail.com"/>
     </action-record>
-    
+
     <action-record name="action-default-title"
-    	model="com.axelor.test.db.Title" search="('self.code = ?1', 'MR')">
-    	<field name="code" expr="MR"/>
-    	<field name="name" expr="Mr."/>
+      model="com.axelor.test.db.Title" search="('self.code = ?1', 'MR')">
+      <field name="code" expr="MR"/>
+      <field name="name" expr="Mr."/>
     </action-record>
-    
+
     <action-validate name="action-contact-validate">
-    	<error message="Name is too short." if="eval: firstName.length() &lt;= 2"/>
-    	<alert message="Last name is too short. Would you like to continue?"
-    		if="eval: lastName.length() &lt;= 2"/>
+      <error message="Name is too short." if="eval: firstName.length() &lt;= 2"/>
+      <alert message="Last name is too short. Would you like to continue?"
+        if="eval: lastName.length() &lt;= 2"/>
     </action-validate>
-    
+
     <action-method name="action-contact-greetings">
-    	<call class="com.axelor.meta.web.Hello" method="say"/>
+      <call class="com.axelor.meta.web.Hello" method="say"/>
     </action-method>
-    
+
     <action-method name="action-contact-greetings-rpc">
       <call class="com.axelor.meta.web.Hello" method="say(fullName)"/>
     </action-method>
 
     <action-view name="action-view-contact" model="com.axelor.test.db.Contact" title="Contacts">
-    	<view name="contact-form" type="form"/>
-    	<view name="contact-tree" type="grid"/>
+      <view name="contact-form" type="form"/>
+      <view name="contact-tree" type="grid"/>
         <domain>self.group.code = :groupCode</domain>
-    	<context name="groupCode" expr="falimy"/>
+      <context name="groupCode" expr="falimy"/>
     </action-view>
-    
+
     <action-condition name="check.date.is.required">
       <check if="state == 'draft'"/>
     </action-condition>
@@ -127,7 +127,7 @@
       <check field="createDate"/>
       <check field="createDate" if="orderDate &lt; createDate" error="Order create date is in future."/>
     </action-condition>
-    
+
     <action-group name="action.group.test">
       <action name="action-contact-attrs"/>
       <action name="action-contact-validate"/>

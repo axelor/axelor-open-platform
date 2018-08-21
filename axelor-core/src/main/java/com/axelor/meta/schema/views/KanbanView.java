@@ -17,78 +17,71 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
-
-import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("kanban")
 public class KanbanView extends CardsView {
 
-	@XmlAttribute
-	private String columnBy;
+  @XmlAttribute private String columnBy;
 
-	@XmlAttribute
-	private String sequenceBy;
+  @XmlAttribute private String sequenceBy;
 
-	@XmlAttribute
-	private Boolean draggable = Boolean.TRUE;
+  @XmlAttribute private Boolean draggable = Boolean.TRUE;
 
-	@XmlAttribute
-	private String onNew;
+  @XmlAttribute private String onNew;
 
-	@XmlAttribute
-	private String onMove;
+  @XmlAttribute private String onMove;
 
-	@XmlAttribute
-	private Integer limit;
+  @XmlAttribute private Integer limit;
 
-	public String getColumnBy() {
-		return columnBy;
-	}
+  public String getColumnBy() {
+    return columnBy;
+  }
 
-	public void setColumnBy(String columnBy) {
-		this.columnBy = columnBy;
-	}
+  public void setColumnBy(String columnBy) {
+    this.columnBy = columnBy;
+  }
 
-	public String getSequenceBy() {
-		return sequenceBy;
-	}
+  public String getSequenceBy() {
+    return sequenceBy;
+  }
 
-	public void setSequenceBy(String sequenceBy) {
-		this.sequenceBy = sequenceBy;
-	}
+  public void setSequenceBy(String sequenceBy) {
+    this.sequenceBy = sequenceBy;
+  }
 
-	public Boolean getDraggable() {
-		return draggable;
-	}
+  public Boolean getDraggable() {
+    return draggable;
+  }
 
-	public void setDraggable(Boolean draggable) {
-		this.draggable = draggable;
-	}
+  public void setDraggable(Boolean draggable) {
+    this.draggable = draggable;
+  }
 
-	public String getOnNew() {
-		return onNew;
-	}
+  public String getOnNew() {
+    return onNew;
+  }
 
-	public void setOnNew(String onNew) {
-		this.onNew = onNew;
-	}
+  public void setOnNew(String onNew) {
+    this.onNew = onNew;
+  }
 
-	public String getOnMove() {
-		return onMove;
-	}
+  public String getOnMove() {
+    return onMove;
+  }
 
-	public void setOnMove(String onMove) {
-		this.onMove = onMove;
-	}
+  public void setOnMove(String onMove) {
+    this.onMove = onMove;
+  }
 
-	public Integer getLimit() {
-		return limit;
-	}
+  public Integer getLimit() {
+    return limit;
+  }
 
-	public void setLimit(Integer limit) {
-		this.limit = limit;
-	}
+  public void setLimit(Integer limit) {
+    this.limit = limit;
+  }
 }

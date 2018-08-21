@@ -17,49 +17,42 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
-
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @XmlType
 public class DataSet {
 
-	@XmlAttribute
-	public String type;
+  @XmlAttribute public String type;
 
-	@XmlAttribute
-	public Integer limit;
+  @XmlAttribute public Integer limit;
 
-	@JsonIgnore
-	@XmlCDATA
-	@XmlValue
-	public String text;
+  @JsonIgnore @XmlCDATA @XmlValue public String text;
 
-	public String getType() {
-		return type;
-	}
+  public String getType() {
+    return type;
+  }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+  public void setType(String type) {
+    this.type = type;
+  }
 
-	public Integer getLimit() {
-		return limit;
-	}
+  public Integer getLimit() {
+    return limit;
+  }
 
-	public void setLimit(Integer limit) {
-		this.limit = limit;
-	}
+  public void setLimit(Integer limit) {
+    this.limit = limit;
+  }
 
-	public String getText() {
-		return text;
-	}
+  public String getText() {
+    return text;
+  }
 
-	public void setText(String text) {
-		this.text = text;
-	}
+  public void setText(String text) {
+    this.text = text;
+  }
 }

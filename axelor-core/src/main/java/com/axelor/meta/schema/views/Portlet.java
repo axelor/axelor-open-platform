@@ -17,34 +17,31 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
-
-import com.fasterxml.jackson.annotation.JsonTypeName;
 
 @XmlType
 @JsonTypeName("portlet")
 public class Portlet extends AbstractPanel {
 
-	@XmlAttribute
-	private String action;
+  @XmlAttribute private String action;
 
-	@XmlAttribute
-	private Boolean canSearch;
+  @XmlAttribute private Boolean canSearch;
 
-	public String getAction() {
-		return action;
-	}
+  public String getAction() {
+    return action;
+  }
 
-	public void setAction(String action) {
-		this.action = action;
-	}
+  public void setAction(String action) {
+    this.action = action;
+  }
 
-	public Boolean getCanSearch() {
-		return canSearch;
-	}
+  public Boolean getCanSearch() {
+    return canSearch;
+  }
 
-	public void setCanSearch(Boolean canSearch) {
-		this.canSearch = canSearch;
-	}
+  public void setCanSearch(Boolean canSearch) {
+    this.canSearch = canSearch;
+  }
 }

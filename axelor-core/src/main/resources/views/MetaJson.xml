@@ -90,7 +90,7 @@
         <field name="includeIf" help="Server expression to check whether to use this field."/>
       </panel>
       <panel title="Value Expression">
-        <field name="valueExpr" showTitle="false" colSpan="12" 
+        <field name="valueExpr" showTitle="false" colSpan="12"
           widget="code-editor" x-height="100" x-mode="javascript"/>
       </panel>
       <panel-related field="roles">
@@ -161,7 +161,7 @@
       <field name="menuTop" title="Show in top menu"/>
     </panel>
     <panel-tabs>
-  	  <panel-related field="fields" form-view="json-field-form-2" orderBy="sequence" canMove="true">
+      <panel-related field="fields" form-view="json-field-form-2" orderBy="sequence" canMove="true">
         <field name="name"/>
         <field name="type"/>
       </panel-related>

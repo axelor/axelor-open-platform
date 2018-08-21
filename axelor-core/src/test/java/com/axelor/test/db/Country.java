@@ -17,6 +17,8 @@
  */
 package com.axelor.test.db;
 
+import com.axelor.db.Model;
+import com.google.common.base.MoreObjects;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -25,62 +27,61 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.axelor.db.Model;
-import com.google.common.base.MoreObjects;
-
 @Entity
 @Table(name = "CONTACT_COUNTRY")
 public class Country extends Model {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CONTACT_COUNTRY_SEQ")
-	@SequenceGenerator(name = "CONTACT_COUNTRY_SEQ", sequenceName = "CONTACT_COUNTRY_SEQ", allocationSize = 1)
-	private Long id;
-	
-	@NotNull
-	private String code;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CONTACT_COUNTRY_SEQ")
+  @SequenceGenerator(
+    name = "CONTACT_COUNTRY_SEQ",
+    sequenceName = "CONTACT_COUNTRY_SEQ",
+    allocationSize = 1
+  )
+  private Long id;
 
-	@NotNull
-	private String name;
+  @NotNull private String code;
 
-	public Country() {
-	}
+  @NotNull private String name;
 
-	public Country(String name, String code) {
-		this.name = name;
-		this.code = code;
-	}
-	
-	public Long getId() {
-		return id;
-	}
-	
-	public void setId(Long id) {
-		this.id = id;
-	}
+  public Country() {}
 
-	public String getName() {
-		return name;
-	}
+  public Country(String name, String code) {
+    this.name = name;
+    this.code = code;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public String getCode() {
-		return code;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public void setCode(String code) {
-		this.code = code;
-	}
-	
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(getClass())
-				.add("id", getId())
-				.add("code", code)
-				.add("name", name)
-				.omitNullValues().toString();
-	}
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getCode() {
+    return code;
+  }
+
+  public void setCode(String code) {
+    this.code = code;
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(getClass())
+        .add("id", getId())
+        .add("code", code)
+        .add("name", name)
+        .omitNullValues()
+        .toString();
+  }
 }

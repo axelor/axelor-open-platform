@@ -23,13 +23,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Mark the field as hash code candidate.
- *
- */
+/** Mark the field as hash code candidate. */
 @Documented
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HashKey {
-
-}
+public @interface HashKey {}

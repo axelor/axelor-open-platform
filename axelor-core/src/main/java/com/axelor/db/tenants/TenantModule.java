@@ -20,20 +20,17 @@ package com.axelor.db.tenants;
 import com.axelor.app.AppSettings;
 import com.google.inject.AbstractModule;
 
-/**
- * A Guice module to provide multi-tenancy support.
- *
- */
+/** A Guice module to provide multi-tenancy support. */
 public class TenantModule extends AbstractModule {
 
-	public static final String CONFIG_MULTI_TENANCY = "application.multi_tenancy";
-	
-	public static boolean isEnabled() {
-		return AppSettings.get().getBoolean(CONFIG_MULTI_TENANCY, false);
-	}
+  public static final String CONFIG_MULTI_TENANCY = "application.multi_tenancy";
 
-	@Override
-	protected void configure() {
-		bind(TenantSupport.class).asEagerSingleton();
-	}
+  public static boolean isEnabled() {
+    return AppSettings.get().getBoolean(CONFIG_MULTI_TENANCY, false);
+  }
+
+  @Override
+  protected void configure() {
+    bind(TenantSupport.class).asEagerSingleton();
+  }
 }

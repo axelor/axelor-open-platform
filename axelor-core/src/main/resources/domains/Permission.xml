@@ -9,7 +9,7 @@
     <![CDATA[
     This object store the permissions.
     ]]>
-    
+
     <string name="name" required="true" unique="true" help="An unique permission name."/>
     <string name="object" required="true" help="Fully qualified object name or wild card package name." />
     <boolean name="canRead" title="Read" help="Whether to grant read access." />

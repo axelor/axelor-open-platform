@@ -17,261 +17,244 @@
  */
 package com.axelor.db;
 
-import java.util.Map;
-
-import javax.persistence.FlushModeType;
-import javax.persistence.Parameter;
-
 import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Adapter;
 import com.axelor.rpc.ContextEntity;
 import com.axelor.script.ScriptBindings;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
+import java.util.Map;
+import javax.persistence.FlushModeType;
+import javax.persistence.Parameter;
 
 /**
- * The query binder class provides the helper methods to bind query parameters
- * and mark the query cacheable.
- *
+ * The query binder class provides the helper methods to bind query parameters and mark the query
+ * cacheable.
  */
 public class QueryBinder {
 
-	private final javax.persistence.Query query;
-	
-	/**
-	 * Create a new query binder for the given query instance.
-	 *
-	 * @param query
-	 *            the query instance
-	 */
-	private QueryBinder(javax.persistence.Query query) {
-		this.query = query;
-	}
+  private final javax.persistence.Query query;
 
-	/**
-	 * Create a new query binder for the given query instance.
-	 *
-	 * @param query
-	 *            the query instance
-	 *
-	 * @return a new query binder instance
-	 */
-	public static QueryBinder of(javax.persistence.Query query) {
-		return new QueryBinder(query);
-	}
+  /**
+   * Create a new query binder for the given query instance.
+   *
+   * @param query the query instance
+   */
+  private QueryBinder(javax.persistence.Query query) {
+    this.query = query;
+  }
 
-	/**
-	 * Set the query cacheable.
-	 *
-	 * @return the same query binder instance
-	 */
-	public QueryBinder setCacheable() {
-		return this.setCacheable(true);
-	}
+  /**
+   * Create a new query binder for the given query instance.
+   *
+   * @param query the query instance
+   * @return a new query binder instance
+   */
+  public static QueryBinder of(javax.persistence.Query query) {
+    return new QueryBinder(query);
+  }
 
-	/**
-	 * Set whether to set the query cacheable or not.
-	 *
-	 * @param cacheable
-	 *            whether to set cacheable or not
-	 * @return the same query binder instance
-	 */
-	public QueryBinder setCacheable(boolean cacheable) {
-		query.setHint("org.hibernate.cacheable", "" + cacheable);
-		return this;
-	}
-	
-	/**
-	 * Set the query readOnly.
-	 *
-	 * @return the same query binder instance
-	 */
-	public QueryBinder setReadOnly() {
-		return setReadOnly(true);
-	}
+  /**
+   * Set the query cacheable.
+   *
+   * @return the same query binder instance
+   */
+  public QueryBinder setCacheable() {
+    return this.setCacheable(true);
+  }
 
-	/**
-	 * Set the query readOnly.
-	 * 
-	 * <p>
-	 * This will give better performance if the result is not meant for updates.
-	 * For example, REST api data fetching can benefit from this.
-	 * </p>
-	 * 
-	 * @return the same query binder instance
-	 */
-	public QueryBinder setReadOnly(boolean readOnly) {
-		query.unwrap(org.hibernate.query.Query.class).setReadOnly(readOnly);
-		return this;
-	}
+  /**
+   * Set whether to set the query cacheable or not.
+   *
+   * @param cacheable whether to set cacheable or not
+   * @return the same query binder instance
+   */
+  public QueryBinder setCacheable(boolean cacheable) {
+    query.setHint("org.hibernate.cacheable", "" + cacheable);
+    return this;
+  }
 
-	/**
-	 * Set query flush mode.
-	 *
-	 * @param mode
-	 *            flush mode
-	 * @return the same query binder instance
-	 */
-	public QueryBinder setFlushMode(FlushModeType mode) {
-		query.setFlushMode(mode);
-		return this;
-	}
+  /**
+   * Set the query readOnly.
+   *
+   * @return the same query binder instance
+   */
+  public QueryBinder setReadOnly() {
+    return setReadOnly(true);
+  }
 
-	/**
-	 * Shortcut to the {@link #setCacheable()} and
-	 * {@link #setFlushMode(FlushModeType)} methods.
-	 *
-	 * @param cacheable
-	 *            whether to mark the query cacheable
-	 * @param type
-	 *            the {@link FlushModeType}, only set if type is not null
-	 * @return the same query binder instance
-	 */
-	public QueryBinder opts(boolean cacheable, FlushModeType type) {
-		this.setCacheable(cacheable);
-		if (type != null) {
-			this.setFlushMode(type);
-		}
-		return this;
-	}
+  /**
+   * Set the query readOnly.
+   *
+   * <p>This will give better performance if the result is not meant for updates. For example, REST
+   * api data fetching can benefit from this.
+   *
+   * @return the same query binder instance
+   */
+  public QueryBinder setReadOnly(boolean readOnly) {
+    query.unwrap(org.hibernate.query.Query.class).setReadOnly(readOnly);
+    return this;
+  }
 
-	/**
-	 * Bind the query with the given named and/or positional parameters.
-	 *
-	 * The parameter values will be automatically adapted to correct data type
-	 * of the query parameter.
-	 *
-	 * @param namedParams
-	 *            the named parameters
-	 * @param params
-	 *            the positional parameters
-	 *
-	 * @return the same query binder instance
-	 */
-	public QueryBinder bind(Map<String, Object> namedParams, Object... params) {
+  /**
+   * Set query flush mode.
+   *
+   * @param mode flush mode
+   * @return the same query binder instance
+   */
+  public QueryBinder setFlushMode(FlushModeType mode) {
+    query.setFlushMode(mode);
+    return this;
+  }
 
-		ScriptBindings bindings = null;
+  /**
+   * Shortcut to the {@link #setCacheable()} and {@link #setFlushMode(FlushModeType)} methods.
+   *
+   * @param cacheable whether to mark the query cacheable
+   * @param type the {@link FlushModeType}, only set if type is not null
+   * @return the same query binder instance
+   */
+  public QueryBinder opts(boolean cacheable, FlushModeType type) {
+    this.setCacheable(cacheable);
+    if (type != null) {
+      this.setFlushMode(type);
+    }
+    return this;
+  }
 
-		if (namedParams instanceof ScriptBindings) {
-			bindings = (ScriptBindings) namedParams;
-		} else {
-			Map<String, Object> variables = Maps.newHashMap();
-			if (namedParams != null) {
-				variables.putAll(namedParams);
-			}
-			bindings = new ScriptBindings(variables);
-		}
+  /**
+   * Bind the query with the given named and/or positional parameters.
+   *
+   * <p>The parameter values will be automatically adapted to correct data type of the query
+   * parameter.
+   *
+   * @param namedParams the named parameters
+   * @param params the positional parameters
+   * @return the same query binder instance
+   */
+  public QueryBinder bind(Map<String, Object> namedParams, Object... params) {
 
-		if (namedParams != null) {
-			for (Parameter<?> p : query.getParameters()) {
-				if (p.getName() != null && Ints.tryParse(p.getName()) == null) {
-					this.bind(p.getName(), bindings.get(p.getName()));
-				}
-			}
-		}
-		
-		if (params == null) {
-			return this;
-		}
+    ScriptBindings bindings = null;
 
-		// check if we have 1 based positional params
-		int offset = 0;
-		try {
-			query.getParameter(0);
-			// TODO: enforce JPA style positional params
-		} catch (Exception e) {
-			offset = 1;
-		}
+    if (namedParams instanceof ScriptBindings) {
+      bindings = (ScriptBindings) namedParams;
+    } else {
+      Map<String, Object> variables = Maps.newHashMap();
+      if (namedParams != null) {
+        variables.putAll(namedParams);
+      }
+      bindings = new ScriptBindings(variables);
+    }
 
-		for (int i = 0; i < params.length; i++) {
-			Parameter<?> param;
-			Object value = params[i];
-			if (value instanceof ContextEntity) {
-				value = ((ContextEntity) value).getContextId();
-			} else if (value instanceof Model) {
-				value = ((Model) value).getId();
-			} else if (value instanceof String
-					&& !StringUtils.isBlank((String) value)
-					&& bindings.containsKey(value)) {
-				value = bindings.get(value);
-			}
-			try {
-				param = query.getParameter(i + offset);
-			} catch (Exception e) {
-				continue;
-			}
-			try {
-				query.setParameter(i + offset, value);
-			} catch (IllegalArgumentException e) {
-				query.setParameter(i + offset, adapt(value, param));
-			}
-		}
+    if (namedParams != null) {
+      for (Parameter<?> p : query.getParameters()) {
+        if (p.getName() != null && Ints.tryParse(p.getName()) == null) {
+          this.bind(p.getName(), bindings.get(p.getName()));
+        }
+      }
+    }
 
-		return this;
-	}
+    if (params == null) {
+      return this;
+    }
 
-	/**
-	 * Bind the given named parameter with the given value.
-	 *
-	 * @param name
-	 *            the named parameter
-	 * @param value
-	 *            the parameter value
-	 * @return the same query binder instance
-	 */
-	public QueryBinder bind(String name, Object value) {
-		Parameter<?> parameter = null;
-		try {
-			parameter = query.getParameter(name);
-		} catch (Exception e) {}
+    // check if we have 1 based positional params
+    int offset = 0;
+    try {
+      query.getParameter(0);
+      // TODO: enforce JPA style positional params
+    } catch (Exception e) {
+      offset = 1;
+    }
 
-		if (parameter == null) {
-			return this;
-		}
+    for (int i = 0; i < params.length; i++) {
+      Parameter<?> param;
+      Object value = params[i];
+      if (value instanceof ContextEntity) {
+        value = ((ContextEntity) value).getContextId();
+      } else if (value instanceof Model) {
+        value = ((Model) value).getId();
+      } else if (value instanceof String
+          && !StringUtils.isBlank((String) value)
+          && bindings.containsKey(value)) {
+        value = bindings.get(value);
+      }
+      try {
+        param = query.getParameter(i + offset);
+      } catch (Exception e) {
+        continue;
+      }
+      try {
+        query.setParameter(i + offset, value);
+      } catch (IllegalArgumentException e) {
+        query.setParameter(i + offset, adapt(value, param));
+      }
+    }
 
-		if (value instanceof ContextEntity) {
-			value = ((ContextEntity) value).getContextId();
-		} else if (value instanceof Model) {
-			value = ((Model) value).getId();
-		} else if (value == null || value instanceof String && "".equals(((String) value).trim())) {
-			value = adapt(value, parameter);
-		}
+    return this;
+  }
 
-		try {
-			query.setParameter(name, value);
-		} catch (IllegalArgumentException e) {
-			query.setParameter(name, adapt(value, parameter));
-		}
+  /**
+   * Bind the given named parameter with the given value.
+   *
+   * @param name the named parameter
+   * @param value the parameter value
+   * @return the same query binder instance
+   */
+  public QueryBinder bind(String name, Object value) {
+    Parameter<?> parameter = null;
+    try {
+      parameter = query.getParameter(name);
+    } catch (Exception e) {
+    }
 
-		return this;
-	}
+    if (parameter == null) {
+      return this;
+    }
 
-	/**
-	 * Get the underlying query instance.
-	 *
-	 * @return the query instance
-	 */
-	public javax.persistence.Query getQuery() {
-		return query;
-	}
-	
-	private Object adapt(Object value, Parameter<?> param) {
-		final Class<?> type = param.getParameterType();
-		if (type == null) {
-			return value;
-		}
+    if (value instanceof ContextEntity) {
+      value = ((ContextEntity) value).getContextId();
+    } else if (value instanceof Model) {
+      value = ((Model) value).getId();
+    } else if (value == null || value instanceof String && "".equals(((String) value).trim())) {
+      value = adapt(value, parameter);
+    }
 
-		value = Adapter.adapt(value, type, type, null);
+    try {
+      query.setParameter(name, value);
+    } catch (IllegalArgumentException e) {
+      query.setParameter(name, adapt(value, parameter));
+    }
 
-		if (value instanceof Number && Model.class.isAssignableFrom(type)) {
-			value = JPA.em().find(type, value);
-		} else if (value instanceof Model && type.isInstance(value)) {
-			Model bean = (Model) value;
-			if (bean.getId() != null) {
-				value = JPA.find(bean.getClass(), bean.getId());
-			}
-		}
+    return this;
+  }
 
-		return value;
-	}
+  /**
+   * Get the underlying query instance.
+   *
+   * @return the query instance
+   */
+  public javax.persistence.Query getQuery() {
+    return query;
+  }
+
+  private Object adapt(Object value, Parameter<?> param) {
+    final Class<?> type = param.getParameterType();
+    if (type == null) {
+      return value;
+    }
+
+    value = Adapter.adapt(value, type, type, null);
+
+    if (value instanceof Number && Model.class.isAssignableFrom(type)) {
+      value = JPA.em().find(type, value);
+    } else if (value instanceof Model && type.isInstance(value)) {
+      Model bean = (Model) value;
+      if (bean.getId() != null) {
+        value = JPA.find(bean.getClass(), bean.getId());
+      }
+    }
+
+    return value;
+  }
 }

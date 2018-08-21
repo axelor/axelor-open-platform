@@ -17,30 +17,31 @@
  */
 package com.axelor;
 
-import java.util.Properties;
-
 import com.axelor.app.AppModule;
 import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
 import com.axelor.rpc.ObjectMapperProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
+import java.util.Properties;
 
 public class JpaTestModule extends AbstractModule {
-	
-	protected Properties properties = new Properties();
-	
-	@Override
-	protected void configure() {
-		
-		bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
 
-		install(new JpaModule("testUnit")
-				.scan("com.axelor.auth.db")
-				.scan("com.axelor.meta.db")
-				.scan("com.axelor.dms.db")
-				.scan("com.axelor.test.db").properties(properties));
-		install(new AuthModule().properties(properties));
-		install(new AppModule());
-	}
+  protected Properties properties = new Properties();
+
+  @Override
+  protected void configure() {
+
+    bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
+
+    install(
+        new JpaModule("testUnit")
+            .scan("com.axelor.auth.db")
+            .scan("com.axelor.meta.db")
+            .scan("com.axelor.dms.db")
+            .scan("com.axelor.test.db")
+            .properties(properties));
+    install(new AuthModule().properties(properties));
+    install(new AppModule());
+  }
 }

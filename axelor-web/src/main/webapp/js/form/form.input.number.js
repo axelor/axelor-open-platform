@@ -28,216 +28,216 @@ var ui = angular.module('axelor.ui');
  */
 ui.formInput('Number', {
 
-	css: 'integer-item',
-	
-	widgets: ['Integer', 'Long', 'Decimal'],
-	
-	template_readonly: '<span class="display-text">{{localeValue()}}</span>',
-	
-	link: function(scope, element, attrs, model) {
-		
-		var props = scope.field,
-			minSize = +props.minSize,
-			maxSize = +props.maxSize;
+  css: 'integer-item',
 
-		var isDecimal = props.serverType === "decimal" || props.widget === "decimal",
-			pattern = isDecimal ? /^(-)?\d+(\.\d+)?$/ : /^\s*-?[0-9]*\s*$/;
-		
-		function scale() {
-			var value = scope.attr('scale');
-			if (value) {
-				return value;
-			}
-			if ((props.widgetAttrs||{}).scale) {
-				return props.widgetAttrs.scale;
-			}
-			return props.scale || 2;
-		}
+  widgets: ['Integer', 'Long', 'Decimal'],
 
-		function precision() {
-			var value = scope.attr('precision');
-			if (value) {
-				return value;
-			}
-			if ((props.widgetAttrs||{}).precision) {
-				return props.widgetAttrs.precision;
-			}
-			return props.precision || 18;
-		}
+  template_readonly: '<span class="display-text">{{localeValue()}}</span>',
 
-		scope.isNumber = function(value) {
-			return _.isEmpty(value) || _.isNumber(value) || pattern.test(value);
-		};
+  link: function(scope, element, attrs, model) {
 
-		scope.validate = scope.isValid = function(value) {
-			var valid = scope.isNumber(value);
+    var props = scope.field,
+      minSize = +props.minSize,
+      maxSize = +props.maxSize;
+
+    var isDecimal = props.serverType === "decimal" || props.widget === "decimal",
+      pattern = isDecimal ? /^(-)?\d+(\.\d+)?$/ : /^\s*-?[0-9]*\s*$/;
+
+    function scale() {
+      var value = scope.attr('scale');
+      if (value) {
+        return value;
+      }
+      if ((props.widgetAttrs||{}).scale) {
+        return props.widgetAttrs.scale;
+      }
+      return props.scale || 2;
+    }
+
+    function precision() {
+      var value = scope.attr('precision');
+      if (value) {
+        return value;
+      }
+      if ((props.widgetAttrs||{}).precision) {
+        return props.widgetAttrs.precision;
+      }
+      return props.precision || 18;
+    }
+
+    scope.isNumber = function(value) {
+      return _.isEmpty(value) || _.isNumber(value) || pattern.test(value);
+    };
+
+    scope.validate = scope.isValid = function(value) {
+      var valid = scope.isNumber(value);
             if (valid && isDecimal && _.isString(value)) {
-            	value = scope.format(value);
-            	valid = _.string.trim(value, '-').length - 1 <= precision();
-            	value = +value;
+              value = scope.format(value);
+              valid = _.string.trim(value, '-').length - 1 <= precision();
+              value = +value;
             }
 
             if (valid && (minSize || minSize === 0)) {
-				valid = value >= minSize;
-			}
-			if (valid && (maxSize || maxSize === 0)) {
-				valid = value <= maxSize;
-			}
+        valid = value >= minSize;
+      }
+      if (valid && (maxSize || maxSize === 0)) {
+        valid = value <= maxSize;
+      }
 
-        	return valid;
-		};
+          return valid;
+    };
 
-		scope.localeValue = function localeValue() {
-			var value = scope.getValue();
-			var field = isDecimal ? _.extend({}, scope.field, {
-				scale: scale(),
-				precision: precision()
-			}) : scope.field;
-			return isDecimal
-				? ui.formatters.decimal(field, value)
-				: ui.formatters.integer(field, value);
-		};
+    scope.localeValue = function localeValue() {
+      var value = scope.getValue();
+      var field = isDecimal ? _.extend({}, scope.field, {
+        scale: scale(),
+        precision: precision()
+      }) : scope.field;
+      return isDecimal
+        ? ui.formatters.decimal(field, value)
+        : ui.formatters.integer(field, value);
+    };
 
-		scope.format = function format(value) {
-			if (isDecimal && _.isString(value) && value.trim().length > 0) {
-				return parseFloat(value).toFixed(scale());
-			}
-			return value;
-		};
+    scope.format = function format(value) {
+      if (isDecimal && _.isString(value) && value.trim().length > 0) {
+        return parseFloat(value).toFixed(scale());
+      }
+      return value;
+    };
 
-		scope.parse = function(value) {
-			if (isDecimal) return value;
-			if (value && _.isString(value)) return +value;
-			return value;
-		};
+    scope.parse = function(value) {
+      if (isDecimal) return value;
+      if (value && _.isString(value)) return +value;
+      return value;
+    };
 
-		scope.$on("on:attrs-changed", function (e, attr) {
-			if (attr.name === 'scale' || attr.name === 'precision') {
-				model.$render();
-			}
-		});
-	},
-	
-	link_editable: function(scope, element, attrs, model) {
+    scope.$on("on:attrs-changed", function (e, attr) {
+      if (attr.name === 'scale' || attr.name === 'precision') {
+        model.$render();
+      }
+    });
+  },
 
-		var props = scope.field;
-		
-		var options = {
-			step: 1
-		};
+  link_editable: function(scope, element, attrs, model) {
 
-		element.on("spin", onSpin);
-		element.on("spinchange", function(e, row) {
-			updateModel(element.val());
-		});
-		element.on("grid:check", function(e, row) {
-			updateModel(element.val());
-		});
-		
-		var pendingChange = false;
-		
-		function handleChange(changed) {
-			var onChange = scope.$events.onChange;
-			if (onChange && (changed || pendingChange)) {
-				pendingChange = false;
-				setTimeout(onChange);
-			}
-		}
-		
-		function equals(a, b) {
-			if (a === b) return true;
-			if (angular.equals(a, b)) return true;
-			if (a === "" && b === undefined) return true;
-			if (b === "" && a === undefined) return true;
-			if (a === undefined || b === undefined) return false;
-			if (a === null || b === null) return false;
-			if (!scope.isNumber(a) || !scope.isNumber(b)) return false;
-			a = a === "" ? a : ((+a) || 0);
-			b = b === "" ? b : ((+b) || 0);
-			return a === b;
-		}
+    var props = scope.field;
 
-		function updateModel(value, handle) {
-			if (!scope.isNumber(value)) {
-				return model.$setViewValue(value); // force validation
+    var options = {
+      step: 1
+    };
+
+    element.on("spin", onSpin);
+    element.on("spinchange", function(e, row) {
+      updateModel(element.val());
+    });
+    element.on("grid:check", function(e, row) {
+      updateModel(element.val());
+    });
+
+    var pendingChange = false;
+
+    function handleChange(changed) {
+      var onChange = scope.$events.onChange;
+      if (onChange && (changed || pendingChange)) {
+        pendingChange = false;
+        setTimeout(onChange);
+      }
+    }
+
+    function equals(a, b) {
+      if (a === b) return true;
+      if (angular.equals(a, b)) return true;
+      if (a === "" && b === undefined) return true;
+      if (b === "" && a === undefined) return true;
+      if (a === undefined || b === undefined) return false;
+      if (a === null || b === null) return false;
+      if (!scope.isNumber(a) || !scope.isNumber(b)) return false;
+      a = a === "" ? a : ((+a) || 0);
+      b = b === "" ? b : ((+b) || 0);
+      return a === b;
+    }
+
+    function updateModel(value, handle) {
+      if (!scope.isNumber(value)) {
+        return model.$setViewValue(value); // force validation
             }
-			var val = scope.parse(value);
-			var old = scope.getValue();
-			var text = scope.format(value);
+      var val = scope.parse(value);
+      var old = scope.getValue();
+      var text = scope.format(value);
 
-			element.val(text);
+      element.val(text);
 
-			if (equals(val, old)) {
-				return handleChange();
-			}
+      if (equals(val, old)) {
+        return handleChange();
+      }
 
-			scope.setValue(val);
-			scope.$applyAsync();
-			
-			pendingChange = true;
-			
-			if (handle !== false) {
-				handleChange();
-			}
-		}
-		
-		function onSpin(event, ui) {
-			
-			var text = this.value,
-				value = ui.value,
-				orig = element.spinner('value'),
-				parts, integer, decimal, min, max, dir = 0;
+      scope.setValue(val);
+      scope.$applyAsync();
 
-			event.preventDefault();
-			
-			if (!scope.isNumber(text)) {
-				return false;
-			}
+      pendingChange = true;
 
-			if (value < orig)
-				dir = -1;
-			if (value > orig)
-				dir = 1;
+      if (handle !== false) {
+        handleChange();
+      }
+    }
 
-			parts = text.split(/\./);
-			integer = +parts[0];
-			decimal = parts[1];
+    function onSpin(event, ui) {
 
-			integer += dir;
-			if (parts.length > 1) {
-				value = integer + '.' + decimal;
-			}
+      var text = this.value,
+        value = ui.value,
+        orig = element.spinner('value'),
+        parts, integer, decimal, min, max, dir = 0;
 
-			min = options.min;
-			max = options.max;
+      event.preventDefault();
 
-			if (_.isNumber(min) && value < min)
-				value = min;
-			if (_.isNumber(max) && value > max)
-				value = max;
+      if (!scope.isNumber(text)) {
+        return false;
+      }
 
-			updateModel(value, false);
-		}
-		
-		if (props.minSize !== undefined)
-			options.min = +props.minSize;
-		if (props.maxSize !== undefined)
-			options.max = +props.maxSize;
+      if (value < orig)
+        dir = -1;
+      if (value > orig)
+        dir = 1;
 
-		setTimeout(function(){
-			element.spinner(options);
-			scope.$elem_editable = element.parent();
-			model.$render = function() {
-				var value = model.$viewValue;
-				if (value) {
-					value = scope.format(value);
-				}
-				element.val(value);
-				scope.initValue(value);
-			};
-			model.$render();
-		});
-	}
+      parts = text.split(/\./);
+      integer = +parts[0];
+      decimal = parts[1];
+
+      integer += dir;
+      if (parts.length > 1) {
+        value = integer + '.' + decimal;
+      }
+
+      min = options.min;
+      max = options.max;
+
+      if (_.isNumber(min) && value < min)
+        value = min;
+      if (_.isNumber(max) && value > max)
+        value = max;
+
+      updateModel(value, false);
+    }
+
+    if (props.minSize !== undefined)
+      options.min = +props.minSize;
+    if (props.maxSize !== undefined)
+      options.max = +props.maxSize;
+
+    setTimeout(function(){
+      element.spinner(options);
+      scope.$elem_editable = element.parent();
+      model.$render = function() {
+        var value = model.$viewValue;
+        if (value) {
+          value = scope.format(value);
+        }
+        element.val(value);
+        scope.initValue(value);
+      };
+      model.$render();
+    });
+  }
 });
 
 })();

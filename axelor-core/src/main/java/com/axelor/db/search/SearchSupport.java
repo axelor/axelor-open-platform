@@ -19,30 +19,29 @@ package com.axelor.db.search;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-
 import org.hibernate.search.cfg.SearchMapping;
 
 @Singleton
 class SearchSupport {
 
-	private static SearchSupport instance;
+  private static SearchSupport instance;
 
-	private SearchMappingContributor contributor;
+  private SearchMappingContributor contributor;
 
-	@Inject
-	public SearchSupport(SearchMappingContributor contributor) {
-		instance = this;
-		this.contributor = contributor;
-	}
+  @Inject
+  public SearchSupport(SearchMappingContributor contributor) {
+    instance = this;
+    this.contributor = contributor;
+  }
 
-	public static SearchSupport get() {
-		if (instance == null) {
-			throw new RuntimeException("Full-text search support is not configured properly.");
-		}
-		return instance;
-	}
-	
-	public void contribute(SearchMapping mapping) {
-		contributor.contribute(mapping);
-	}
+  public static SearchSupport get() {
+    if (instance == null) {
+      throw new RuntimeException("Full-text search support is not configured properly.");
+    }
+    return instance;
+  }
+
+  public void contribute(SearchMapping mapping) {
+    contributor.contribute(mapping);
+  }
 }

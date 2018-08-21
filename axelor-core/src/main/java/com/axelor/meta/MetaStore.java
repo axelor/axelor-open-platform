@@ -17,22 +17,6 @@
  */
 package com.axelor.meta;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
@@ -66,454 +50,480 @@ import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class MetaStore {
 
-	private static final Logger log = LoggerFactory.getLogger(MetaStore.class);
+  private static final Logger log = LoggerFactory.getLogger(MetaStore.class);
 
-	private static final Cache<String, Action> ACTIONS = CacheBuilder.newBuilder()
-			.maximumSize(1000)
-			.weakValues()
-			.build();
+  private static final Cache<String, Action> ACTIONS =
+      CacheBuilder.newBuilder().maximumSize(1000).weakValues().build();
 
-	private MetaStore() {
-	}
+  private MetaStore() {}
 
-	/**
-	 * Used for unit testing.
-	 * 
-	 */
-	static void resister(ObjectViews views) {
-		try {
-			for (Action item : views.getActions()) {
-				ACTIONS.put(item.getName(), item);
-			}
-		} catch (NullPointerException e) {
-		}
-	}
+  /** Used for unit testing. */
+  static void resister(ObjectViews views) {
+    try {
+      for (Action item : views.getActions()) {
+        ACTIONS.put(item.getName(), item);
+      }
+    } catch (NullPointerException e) {
+    }
+  }
 
-	public static Action getAction(String name) {
-		Action action = ACTIONS.getIfPresent(name);
-		if (action == null) {
-			action = XMLViews.findAction(name);
-			if (action != null) {
-				ACTIONS.put(name, action);
-			}
-		}
-		if (action == null) {
-			return null;
-		}
-		final String module = action.getModuleToCheck();
-		if (StringUtils.isBlank(module) || ModuleManager.isInstalled(module)) {
-			return action;
-		}
-		return null;
-	}
+  public static Action getAction(String name) {
+    Action action = ACTIONS.getIfPresent(name);
+    if (action == null) {
+      action = XMLViews.findAction(name);
+      if (action != null) {
+        ACTIONS.put(name, action);
+      }
+    }
+    if (action == null) {
+      return null;
+    }
+    final String module = action.getModuleToCheck();
+    if (StringUtils.isBlank(module) || ModuleManager.isInstalled(module)) {
+      return action;
+    }
+    return null;
+  }
 
-	public static Map<String, Object> getPermissions(Class<?> model) {
-		final User user = AuthUtils.getUser();
-		if (user == null || AuthUtils.isAdmin(user) || !Model.class.isAssignableFrom(model)) {
-			return null;
-		}
+  public static Map<String, Object> getPermissions(Class<?> model) {
+    final User user = AuthUtils.getUser();
+    if (user == null || AuthUtils.isAdmin(user) || !Model.class.isAssignableFrom(model)) {
+      return null;
+    }
 
-		@SuppressWarnings("unchecked")
-		final Class<? extends Model> klass = (Class<? extends Model>) model;
-		final Map<String, Object> map = new HashMap<>();
-		final JpaSecurity security = Beans.get(JpaSecurity.class);
+    @SuppressWarnings("unchecked")
+    final Class<? extends Model> klass = (Class<? extends Model>) model;
+    final Map<String, Object> map = new HashMap<>();
+    final JpaSecurity security = Beans.get(JpaSecurity.class);
 
-		map.put("read", security.isPermitted(AccessType.READ, klass));
-		map.put("write", security.isPermitted(AccessType.WRITE, klass));
-		map.put("create", security.isPermitted(AccessType.CREATE, klass));
-		map.put("remove", security.isPermitted(AccessType.REMOVE, klass));
-		map.put("export", security.isPermitted(AccessType.EXPORT, klass));
+    map.put("read", security.isPermitted(AccessType.READ, klass));
+    map.put("write", security.isPermitted(AccessType.WRITE, klass));
+    map.put("create", security.isPermitted(AccessType.CREATE, klass));
+    map.put("remove", security.isPermitted(AccessType.REMOVE, klass));
+    map.put("export", security.isPermitted(AccessType.EXPORT, klass));
 
-		return map;
-	}
+    return map;
+  }
 
-	private static Property findField(final Mapper mapper, String name) {
-		final Iterator<String> iter = Splitter.on(".").split(name).iterator();
-		Mapper current = mapper;
-		Property property = current.getProperty(iter.next());
+  private static Property findField(final Mapper mapper, String name) {
+    final Iterator<String> iter = Splitter.on(".").split(name).iterator();
+    Mapper current = mapper;
+    Property property = current.getProperty(iter.next());
 
-		if (property == null || (property.isJson() && iter.hasNext())) {
-			return null;
-		}
+    if (property == null || (property.isJson() && iter.hasNext())) {
+      return null;
+    }
 
-		while(property != null && property.getTarget() != null && iter.hasNext()) {
-			current = Mapper.of(property.getTarget());
-			property = current.getProperty(iter.next());
-		}
+    while (property != null && property.getTarget() != null && iter.hasNext()) {
+      current = Mapper.of(property.getTarget());
+      property = current.getProperty(iter.next());
+    }
 
-		return property;
-	}
-	
-	public static Map<String, Object> findFields(final Class<?> modelClass, final Collection<String> names) {
-		final Map<String, Object> data = new HashMap<>();
-		final Mapper mapper = Mapper.of(modelClass);
-		final Map<String, Property> fieldsMap = new LinkedHashMap<>();
-		final List<Object> fields = new ArrayList<>();
+    return property;
+  }
 
-		boolean massUpdate = false;
-		Object bean = null;
-		try {
-			bean = modelClass.newInstance();
-		} catch (Exception e) {}
+  public static Map<String, Object> findFields(
+      final Class<?> modelClass, final Collection<String> names) {
+    final Map<String, Object> data = new HashMap<>();
+    final Mapper mapper = Mapper.of(modelClass);
+    final Map<String, Property> fieldsMap = new LinkedHashMap<>();
+    final List<Object> fields = new ArrayList<>();
 
-		for(final String name : names) {
-			final Property property = findField(mapper, name);
-			if (property == null) continue;
-			final Map<String, Object> map = property.toMap();
-			map.put("name", name);
-			if (property.getSelection() != null && !"".equals(property.getSelection().trim())) {
-				map.put("selection", property.getSelection());
-				map.put("selectionList", getSelectionList(property.getSelection()));
-			}
-			if (property.isEnum()) {
-				map.put("selectionList", getSelectionList(property.getEnumType()));
-			}
-			if (property.getTarget() != null) {
-				map.put("perms", getPermissions(property.getTarget()));
-			}
-			if (property.isMassUpdate()) {
-				massUpdate = true;
-			}
-			// find the default value
-			if (!property.isTransient() && !property.isVirtual()) {
-				Object obj = null;
-				if (name.contains(".")) {
-					try {
-						obj = property.getEntity().newInstance();
-					} catch (Exception e) {}
-				} else {
-					obj = bean;
-				}
-				if (obj != null) {
-					Object defaultValue = property.get(obj);
-					if (defaultValue != null) {
-						map.put("defaultValue", defaultValue);
-					}
-				}
-			}
-			if (name.contains(".")) {
-				map.put("readonly", true);
-			}
-			fieldsMap.put(name, property);
-			fields.add(map);
-		}
+    boolean massUpdate = false;
+    Object bean = null;
+    try {
+      bean = modelClass.newInstance();
+    } catch (Exception e) {
+    }
 
-		Map<String, Object> perms = getPermissions(modelClass);
-		if (massUpdate) {
-			if (perms == null) {
-				perms = new HashMap<>();
-			}
-			perms.put("massUpdate", massUpdate);
-		}
+    for (final String name : names) {
+      final Property property = findField(mapper, name);
+      if (property == null) continue;
+      final Map<String, Object> map = property.toMap();
+      map.put("name", name);
+      if (property.getSelection() != null && !"".equals(property.getSelection().trim())) {
+        map.put("selection", property.getSelection());
+        map.put("selectionList", getSelectionList(property.getSelection()));
+      }
+      if (property.isEnum()) {
+        map.put("selectionList", getSelectionList(property.getEnumType()));
+      }
+      if (property.getTarget() != null) {
+        map.put("perms", getPermissions(property.getTarget()));
+      }
+      if (property.isMassUpdate()) {
+        massUpdate = true;
+      }
+      // find the default value
+      if (!property.isTransient() && !property.isVirtual()) {
+        Object obj = null;
+        if (name.contains(".")) {
+          try {
+            obj = property.getEntity().newInstance();
+          } catch (Exception e) {
+          }
+        } else {
+          obj = bean;
+        }
+        if (obj != null) {
+          Object defaultValue = property.get(obj);
+          if (defaultValue != null) {
+            map.put("defaultValue", defaultValue);
+          }
+        }
+      }
+      if (name.contains(".")) {
+        map.put("readonly", true);
+      }
+      fieldsMap.put(name, property);
+      fields.add(map);
+    }
 
-		// find dotted json fields
-		final Map<String, Map<String, Object>> jsonFields = new HashMap<>();
-		for (String name : names) {
-			if (fieldsMap.containsKey(name) || name.indexOf('.') == -1) { continue; }
-			final String first = name.substring(0, name.indexOf('.'));
-			final String field = name.substring(name.indexOf('.') + 1);
-			final Property property = findField(mapper, first);
-			if (property == null || !property.isJson()) { continue; }
-			if (!jsonFields.containsKey(first)) {
-				jsonFields.put(first, findJsonFields(modelClass.getName(), first));
-			}
-			final Map<String, Object> jsonField = jsonFields.get(first);
-			if (jsonField != null && jsonField.containsKey(field)) {
-				@SuppressWarnings("all")
-				final Map<String, Object> attrs = new HashMap<>((Map) jsonField.get(field));
-				if (attrs != null) {
-					attrs.put("name", name);
-					fields.add(attrs);
-				}
-			}
-		}
+    Map<String, Object> perms = getPermissions(modelClass);
+    if (massUpdate) {
+      if (perms == null) {
+        perms = new HashMap<>();
+      }
+      perms.put("massUpdate", massUpdate);
+    }
 
-		data.put("perms", perms);
-		data.put("fields", fields);
+    // find dotted json fields
+    final Map<String, Map<String, Object>> jsonFields = new HashMap<>();
+    for (String name : names) {
+      if (fieldsMap.containsKey(name) || name.indexOf('.') == -1) {
+        continue;
+      }
+      final String first = name.substring(0, name.indexOf('.'));
+      final String field = name.substring(name.indexOf('.') + 1);
+      final Property property = findField(mapper, first);
+      if (property == null || !property.isJson()) {
+        continue;
+      }
+      if (!jsonFields.containsKey(first)) {
+        jsonFields.put(first, findJsonFields(modelClass.getName(), first));
+      }
+      final Map<String, Object> jsonField = jsonFields.get(first);
+      if (jsonField != null && jsonField.containsKey(field)) {
+        @SuppressWarnings("all")
+        final Map<String, Object> attrs = new HashMap<>((Map) jsonField.get(field));
+        if (attrs != null) {
+          attrs.put("name", name);
+          fields.add(attrs);
+        }
+      }
+    }
 
-		return data;
-	}
+    data.put("perms", perms);
+    data.put("fields", fields);
 
-	public static Map<String, Object> findJsonFields(String modelName, String fieldName) {
-		try {
-			if (!Mapper.of(Class.forName(modelName)).getProperty(fieldName).isJson()) {
-				return null;
-			}
-		} catch (Exception e) {
-			return null;
-		}
-		final List<MetaJsonField> fields = Query.of(MetaJsonField.class)
-				.filter("self.model = :model AND self.modelField = :field")
-				.bind("model", modelName)
-				.bind("field", fieldName)
-				.order("id").fetch(); 
-		return updateJsonFields(fields, fieldName);
-	}
+    return data;
+  }
 
-	public static Map<String, Object> findJsonFields(String jsonModel) {
-		final MetaJsonModelRepository forms = Beans.get(MetaJsonModelRepository.class);
-		final MetaJsonModel found = forms.findByName(jsonModel);
-		return found == null ? null : updateJsonFields(found.getFields(), "attrs");
-	}
+  public static Map<String, Object> findJsonFields(String modelName, String fieldName) {
+    try {
+      if (!Mapper.of(Class.forName(modelName)).getProperty(fieldName).isJson()) {
+        return null;
+      }
+    } catch (Exception e) {
+      return null;
+    }
+    final List<MetaJsonField> fields =
+        Query.of(MetaJsonField.class)
+            .filter("self.model = :model AND self.modelField = :field")
+            .bind("model", modelName)
+            .bind("field", fieldName)
+            .order("id")
+            .fetch();
+    return updateJsonFields(fields, fieldName);
+  }
 
-	private static Map<String, Object> updateJsonFields(List<MetaJsonField> records, String fieldName) {
-		final java.lang.reflect.Field[] declaredFields = MetaJsonField.class.getDeclaredFields();
-		final Mapper mapper = Mapper.of(MetaJsonField.class);
-		final Map<String, Object> fields = new LinkedHashMap<>();
-		final List<MetaJsonField> jsonFields = new ArrayList<>(records);
-		final User user = AuthUtils.getUser();
+  public static Map<String, Object> findJsonFields(String jsonModel) {
+    final MetaJsonModelRepository forms = Beans.get(MetaJsonModelRepository.class);
+    final MetaJsonModel found = forms.findByName(jsonModel);
+    return found == null ? null : updateJsonFields(found.getFields(), "attrs");
+  }
 
-		ScriptHelper scriptHelper = null;
+  private static Map<String, Object> updateJsonFields(
+      List<MetaJsonField> records, String fieldName) {
+    final java.lang.reflect.Field[] declaredFields = MetaJsonField.class.getDeclaredFields();
+    final Mapper mapper = Mapper.of(MetaJsonField.class);
+    final Map<String, Object> fields = new LinkedHashMap<>();
+    final List<MetaJsonField> jsonFields = new ArrayList<>(records);
+    final User user = AuthUtils.getUser();
 
-		jsonFields.sort((a, b) -> {
-			int x = a.getSequence() == null ? 0 : a.getSequence();
-			int y = b.getSequence() == null ? 0 : b.getSequence();
-			return Integer.compare(x, y);
-		});
+    ScriptHelper scriptHelper = null;
 
-		for (MetaJsonField record : jsonFields) {
-			final Map<String, Object> attrs = new HashMap<>();
-			final String name = record.getName();
-			
-			// check permissions
-			if (record.getRoles() != null && !record.getRoles().isEmpty()) {
-				final Set<Role> roles = new HashSet<>();
-				if (user.getRoles() != null) {
-					roles.addAll(user.getRoles());
-				}
-				if (user.getGroup() != null && user.getGroup().getRoles() != null) {
-					roles.addAll(user.getGroup().getRoles());
-				}
-				if (Collections.disjoint(roles, record.getRoles())) {
-					continue;
-				}
-			}
+    jsonFields.sort(
+        (a, b) -> {
+          int x = a.getSequence() == null ? 0 : a.getSequence();
+          int y = b.getSequence() == null ? 0 : b.getSequence();
+          return Integer.compare(x, y);
+        });
 
-			// check server condition
-			if (StringUtils.notBlank(record.getIncludeIf())) {
-				if (scriptHelper == null) {
-					scriptHelper = new CompositeScriptHelper(null);
-				}
-				if (scriptHelper == null || !scriptHelper.test(record.getIncludeIf())) {
-					continue;
-				}
-			}
+    for (MetaJsonField record : jsonFields) {
+      final Map<String, Object> attrs = new HashMap<>();
+      final String name = record.getName();
 
-			for (java.lang.reflect.Field field : declaredFields) {
-				final Property prop = mapper.getProperty(field.getName());
-				if (prop == null || prop.isPrimary() || prop.isReference() || prop.isCollection()) {
-					continue;
-				}
-				final Object value = prop.get(record);
-				if (value == null || value == Boolean.FALSE) continue;
-				attrs.put(prop.getName(), value);
-			}
+      // check permissions
+      if (record.getRoles() != null && !record.getRoles().isEmpty()) {
+        final Set<Role> roles = new HashSet<>();
+        if (user.getRoles() != null) {
+          roles.addAll(user.getRoles());
+        }
+        if (user.getGroup() != null && user.getGroup().getRoles() != null) {
+          roles.addAll(user.getGroup().getRoles());
+        }
+        if (Collections.disjoint(roles, record.getRoles())) {
+          continue;
+        }
+      }
 
-			String title = record.getTitle();
+      // check server condition
+      if (StringUtils.notBlank(record.getIncludeIf())) {
+        if (scriptHelper == null) {
+          scriptHelper = new CompositeScriptHelper(null);
+        }
+        if (scriptHelper == null || !scriptHelper.test(record.getIncludeIf())) {
+          continue;
+        }
+      }
 
-			// localized title
-			attrs.put("title", I18n.get(title));
+      for (java.lang.reflect.Field field : declaredFields) {
+        final Property prop = mapper.getProperty(field.getName());
+        if (prop == null || prop.isPrimary() || prop.isReference() || prop.isCollection()) {
+          continue;
+        }
+        final Object value = prop.get(record);
+        if (value == null || value == Boolean.FALSE) continue;
+        attrs.put(prop.getName(), value);
+      }
 
-			// auto title
-			if (StringUtils.isBlank(title)) {
-				String last = name.substring(name.lastIndexOf('.') + 1);
-				title = I18n.get(Inflector.getInstance().humanize(last));
-				attrs.put("autoTitle", title);
-			}
+      String title = record.getTitle();
 
-			String type = record.getType() == null ? "" : record.getType();
-			int min = record.getMinSize() == null ? 0 : record.getMinSize();
-			int max = record.getMaxSize() == null ? 0 : record.getMaxSize();
-			if (max <= min) {
-				attrs.remove("maxSize");
-			}
-			if ((min == 0 && max == 0) || type.matches("date|time|datetime|boolean")) {
-				attrs.remove("maxSize");
-				attrs.remove("minSize");
-			}
+      // localized title
+      attrs.put("title", I18n.get(title));
 
-			if ("ref-select".equalsIgnoreCase(record.getType()) ||
-				"ref-select".equalsIgnoreCase(record.getWidget()) ||
-				"RefSelect".equalsIgnoreCase(record.getWidget())) {
-				attrs.put("widget", "json-ref-select");
-			}
-			
-			if (!StringUtils.isBlank(record.getTargetModel())) {
-				attrs.put("target", record.getTargetModel());
-				attrs.remove("targetModel");
-				try {
-					attrs.put("targetName", Mapper.of(Class.forName(record.getTargetModel())).getNameField().getName());
-				} catch (ClassNotFoundException e) {
-				}
-			}
+      // auto title
+      if (StringUtils.isBlank(title)) {
+        String last = name.substring(name.lastIndexOf('.') + 1);
+        title = I18n.get(Inflector.getInstance().humanize(last));
+        attrs.put("autoTitle", title);
+      }
 
-			if (type.startsWith("json-")) {
-				type = type.substring(5);
-				attrs.put("type", type);
-				attrs.put("target", MetaJsonRecord.class.getName());
-				if (record.getTargetJsonModel() != null) {
-					final MetaJsonModel targetModel = record.getTargetJsonModel();
-					String domain = String.format("self.jsonModel = '%s'", targetModel.getName());
-					if (!StringUtils.isBlank(record.getDomain())) {
-						domain = String.format("(%s) AND (%s)", domain, record.getDomain()); 
-					}
-					attrs.put("domain", domain);
-					attrs.put("gridView", targetModel.getGridView().getName());
-					attrs.put("formView", targetModel.getFormView().getName());
-					attrs.put("targetName", "name");
-					attrs.put("jsonTarget", targetModel.getName());
-				}
-			}
+      String type = record.getType() == null ? "" : record.getType();
+      int min = record.getMinSize() == null ? 0 : record.getMinSize();
+      int max = record.getMaxSize() == null ? 0 : record.getMaxSize();
+      if (max <= min) {
+        attrs.remove("maxSize");
+      }
+      if ((min == 0 && max == 0) || type.matches("date|time|datetime|boolean")) {
+        attrs.remove("maxSize");
+        attrs.remove("minSize");
+      }
 
-			if (StringUtils.notBlank(record.getSelection())) {
-				attrs.put("selectionList", getSelectionList(record.getSelection()));
-			}
-			
-			if (StringUtils.notBlank(record.getEnumType())) {
-				try {
-					attrs.put("selectionList", getSelectionList(Class.forName(record.getEnumType())));
-				} catch (ClassNotFoundException e) {
-					log.error("No such enum type found: {}", record.getEnumType());
-				}
-			}
+      if ("ref-select".equalsIgnoreCase(record.getType())
+          || "ref-select".equalsIgnoreCase(record.getWidget())
+          || "RefSelect".equalsIgnoreCase(record.getWidget())) {
+        attrs.put("widget", "json-ref-select");
+      }
 
-			attrs.put("jsonField", fieldName);
-			attrs.put("jsonPath", record.getName());
-			if (type.matches("integer|decimal|boolean")) {
-				attrs.put("jsonType", type);
-			}
+      if (!StringUtils.isBlank(record.getTargetModel())) {
+        attrs.put("target", record.getTargetModel());
+        attrs.remove("targetModel");
+        try {
+          attrs.put(
+              "targetName",
+              Mapper.of(Class.forName(record.getTargetModel())).getNameField().getName());
+        } catch (ClassNotFoundException e) {
+        }
+      }
 
-			fields.put(record.getName(), attrs);
-		}
-		return fields;
-	}
-	
-	public static List<Selection.Option> getSelectionList(Class<?> enumType) {
-		if (enumType == null || !enumType.isEnum()) {
-			return null;
-		}
-		final List<Selection.Option> all = new ArrayList<>();
-		for (Enum<?> item : enumType.asSubclass(Enum.class).getEnumConstants()) {
-			final Selection.Option option = new Selection.Option();
-			final String name = item.name();
-			
-			option.setValue(name);
+      if (type.startsWith("json-")) {
+        type = type.substring(5);
+        attrs.put("type", type);
+        attrs.put("target", MetaJsonRecord.class.getName());
+        if (record.getTargetJsonModel() != null) {
+          final MetaJsonModel targetModel = record.getTargetJsonModel();
+          String domain = String.format("self.jsonModel = '%s'", targetModel.getName());
+          if (!StringUtils.isBlank(record.getDomain())) {
+            domain = String.format("(%s) AND (%s)", domain, record.getDomain());
+          }
+          attrs.put("domain", domain);
+          attrs.put("gridView", targetModel.getGridView().getName());
+          attrs.put("formView", targetModel.getFormView().getName());
+          attrs.put("targetName", "name");
+          attrs.put("jsonTarget", targetModel.getName());
+        }
+      }
 
-			if (item instanceof ValueEnum<?>) {
-				Object value = ((ValueEnum<?>) item).getValue();
-				if (!Objects.equal(name, value)) {
-					Map<String, Object> data = new HashMap<>();
-					data.put("value", value);
-					option.setData(data);
-				}
-			}
+      if (StringUtils.notBlank(record.getSelection())) {
+        attrs.put("selectionList", getSelectionList(record.getSelection()));
+      }
 
-			try {
-				final Field field = enumType.getDeclaredField(name);
-				final Widget widget = field.getAnnotation(Widget.class);
-				if (StringUtils.notBlank(widget.title())) {
-					option.setTitle(widget.title());;
-				}
-			} catch (Exception e) {
-			}
+      if (StringUtils.notBlank(record.getEnumType())) {
+        try {
+          attrs.put("selectionList", getSelectionList(Class.forName(record.getEnumType())));
+        } catch (ClassNotFoundException e) {
+          log.error("No such enum type found: {}", record.getEnumType());
+        }
+      }
 
-			if (option.getTitle() == null) {
-				option.setTitle(Inflector.getInstance().humanize(name));
-			}
+      attrs.put("jsonField", fieldName);
+      attrs.put("jsonPath", record.getName());
+      if (type.matches("integer|decimal|boolean")) {
+        attrs.put("jsonType", type);
+      }
 
-			all.add(option);
-		}
-		return all;
-	}
+      fields.put(record.getName(), attrs);
+    }
+    return fields;
+  }
 
-	public static List<Selection.Option> getSelectionList(String selection) {
-		if (StringUtils.isBlank(selection)) {
-			return null;
-		}
+  public static List<Selection.Option> getSelectionList(Class<?> enumType) {
+    if (enumType == null || !enumType.isEnum()) {
+      return null;
+    }
+    final List<Selection.Option> all = new ArrayList<>();
+    for (Enum<?> item : enumType.asSubclass(Enum.class).getEnumConstants()) {
+      final Selection.Option option = new Selection.Option();
+      final String name = item.name();
 
-		final Map<String, Selection.Option> all = buildSelectionMap(selection);
-		if(all == null) {
-			return null;
-		}
+      option.setValue(name);
 
-		final List<Selection.Option> values = new ArrayList<>(all.values());
-		Collections.sort(values, new Comparator<Selection.Option>() {
-			@Override
-			public int compare(Selection.Option o1, Selection.Option o2) {
-				Integer n = o1.getOrder();
-				Integer m = o2.getOrder();
+      if (item instanceof ValueEnum<?>) {
+        Object value = ((ValueEnum<?>) item).getValue();
+        if (!Objects.equal(name, value)) {
+          Map<String, Object> data = new HashMap<>();
+          data.put("value", value);
+          option.setData(data);
+        }
+      }
 
-				if (n == null) n = 0;
-				if (m == null) m = 0;
+      try {
+        final Field field = enumType.getDeclaredField(name);
+        final Widget widget = field.getAnnotation(Widget.class);
+        if (StringUtils.notBlank(widget.title())) {
+          option.setTitle(widget.title());
+          ;
+        }
+      } catch (Exception e) {
+      }
 
-				return Integer.compare(n, m);
-			}
-		});
+      if (option.getTitle() == null) {
+        option.setTitle(Inflector.getInstance().humanize(name));
+      }
 
-		return values;
-	}
+      all.add(option);
+    }
+    return all;
+  }
 
-	public static Selection.Option getSelectionItem(String selection, String value) {
-		if (StringUtils.isBlank(selection)) {
-			return null;
-		}
+  public static List<Selection.Option> getSelectionList(String selection) {
+    if (StringUtils.isBlank(selection)) {
+      return null;
+    }
 
-		final Map<String, Selection.Option> all = buildSelectionMap(selection);
-		if(all == null) {
-			return null;
-		}
+    final Map<String, Selection.Option> all = buildSelectionMap(selection);
+    if (all == null) {
+      return null;
+    }
 
-		return all.get(value);
-	}
+    final List<Selection.Option> values = new ArrayList<>(all.values());
+    Collections.sort(
+        values,
+        new Comparator<Selection.Option>() {
+          @Override
+          public int compare(Selection.Option o1, Selection.Option o2) {
+            Integer n = o1.getOrder();
+            Integer m = o2.getOrder();
 
-	private static Map<String, Selection.Option> buildSelectionMap(String selection) {
-		final List<MetaSelectItem> items = Query.of(MetaSelectItem.class)
-				.filter("self.select.name = ?", selection)
-				.order("select.priority")
-				.order("order")
-				.fetch();
+            if (n == null) n = 0;
+            if (m == null) m = 0;
 
-		if (items.isEmpty()) {
-			return null;
-		}
+            return Integer.compare(n, m);
+          }
+        });
 
-		final Map<String, Selection.Option> all = new LinkedHashMap<>();
+    return values;
+  }
 
-		for (MetaSelectItem item : items) {
-			if (item.getHidden() == Boolean.TRUE) {
-				all.remove(item.getValue());
-			} else {
-				all.put(item.getValue(), getSelectionItem(item));
-			}
-		}
+  public static Selection.Option getSelectionItem(String selection, String value) {
+    if (StringUtils.isBlank(selection)) {
+      return null;
+    }
 
-		return all;
-	}
+    final Map<String, Selection.Option> all = buildSelectionMap(selection);
+    if (all == null) {
+      return null;
+    }
 
-	private static Selection.Option getSelectionItem(MetaSelectItem item) {
-		final ObjectMapper objectMapper = Beans.get(ObjectMapper.class);
-		final Selection.Option option = new Selection.Option();
-		option.setValue(item.getValue());
-		option.setTitle(item.getTitle());
-		option.setIcon(item.getIcon());
-		option.setOrder(item.getOrder());
-		option.setHidden(item.getHidden());
-		try {
-			option.setData(objectMapper.readValue(item.getData(), new TypeReference<Map<String,Object>>() {}));
-		} catch (Exception e) {
-			// this should never happen, ignore
-		}
-		return option;
-	}
+    return all.get(value);
+  }
 
-	public static void clear() {
-		ACTIONS.invalidateAll();
-	}
+  private static Map<String, Selection.Option> buildSelectionMap(String selection) {
+    final List<MetaSelectItem> items =
+        Query.of(MetaSelectItem.class)
+            .filter("self.select.name = ?", selection)
+            .order("select.priority")
+            .order("order")
+            .fetch();
 
-	public static void invalidate(String name) {
-		ACTIONS.invalidate(name);
-	}
+    if (items.isEmpty()) {
+      return null;
+    }
+
+    final Map<String, Selection.Option> all = new LinkedHashMap<>();
+
+    for (MetaSelectItem item : items) {
+      if (item.getHidden() == Boolean.TRUE) {
+        all.remove(item.getValue());
+      } else {
+        all.put(item.getValue(), getSelectionItem(item));
+      }
+    }
+
+    return all;
+  }
+
+  private static Selection.Option getSelectionItem(MetaSelectItem item) {
+    final ObjectMapper objectMapper = Beans.get(ObjectMapper.class);
+    final Selection.Option option = new Selection.Option();
+    option.setValue(item.getValue());
+    option.setTitle(item.getTitle());
+    option.setIcon(item.getIcon());
+    option.setOrder(item.getOrder());
+    option.setHidden(item.getHidden());
+    try {
+      option.setData(
+          objectMapper.readValue(item.getData(), new TypeReference<Map<String, Object>>() {}));
+    } catch (Exception e) {
+      // this should never happen, ignore
+    }
+    return option;
+  }
+
+  public static void clear() {
+    ACTIONS.invalidateAll();
+  }
+
+  public static void invalidate(String name) {
+    ACTIONS.invalidate(name);
+  }
 }

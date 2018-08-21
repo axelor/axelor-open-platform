@@ -27,7 +27,7 @@
       <field name="value"/>
     </panel-related>
   </form>
-  
+
   <form name="meta-schedule-param-form" title="MetaScheduleParam" model="com.axelor.meta.db.MetaScheduleParam" css="mini-form">
     <panel title="Overview">
       <field name="name"/>

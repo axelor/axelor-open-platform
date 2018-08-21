@@ -17,6 +17,7 @@
  */
 package com.axelor.db.mapper.types;
 
+import com.axelor.db.mapper.TypeAdapter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
@@ -29,109 +30,113 @@ import java.time.temporal.Temporal;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.axelor.db.mapper.TypeAdapter;
-
 public class JavaTimeAdapter implements TypeAdapter<Object> {
 
-	private DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
-	private LocalDateAdapter localDateAdapter = new LocalDateAdapter();
-	private LocalTimeAdapter localTimeAdapter = new LocalTimeAdapter();
-	private LocalDateTimeAdapter localDateTimeAdapter = new LocalDateTimeAdapter();
+  private DateTimeAdapter dateTimeAdapter = new DateTimeAdapter();
+  private LocalDateAdapter localDateAdapter = new LocalDateAdapter();
+  private LocalTimeAdapter localTimeAdapter = new LocalTimeAdapter();
+  private LocalDateTimeAdapter localDateTimeAdapter = new LocalDateTimeAdapter();
 
-	@Override
-	public Object adapt(Object value, Class<?> actualType, Type genericType,
-			Annotation[] annotations) {
+  @Override
+  public Object adapt(
+      Object value, Class<?> actualType, Type genericType, Annotation[] annotations) {
 
-		//TODO: check for annotation to return current date if value is null
-		if (value == null || (value instanceof String && "".equals(((String) value).trim()))) {
-			return null;
-		}
+    // TODO: check for annotation to return current date if value is null
+    if (value == null || (value instanceof String && "".equals(((String) value).trim()))) {
+      return null;
+    }
 
-		if (ZonedDateTime.class.isAssignableFrom(actualType))
-			return dateTimeAdapter.adapt(value, actualType, genericType, annotations);
+    if (ZonedDateTime.class.isAssignableFrom(actualType))
+      return dateTimeAdapter.adapt(value, actualType, genericType, annotations);
 
-		if (LocalDate.class.isAssignableFrom(actualType))
-			return localDateAdapter.adapt(value, actualType, genericType, annotations);
+    if (LocalDate.class.isAssignableFrom(actualType))
+      return localDateAdapter.adapt(value, actualType, genericType, annotations);
 
-		if (LocalTime.class.isAssignableFrom(actualType))
-			return localTimeAdapter.adapt(value, actualType, genericType, annotations);
+    if (LocalTime.class.isAssignableFrom(actualType))
+      return localTimeAdapter.adapt(value, actualType, genericType, annotations);
 
-		if (LocalDateTime.class.isAssignableFrom(actualType))
-			return localDateTimeAdapter.adapt(value, actualType, genericType, annotations);
+    if (LocalDateTime.class.isAssignableFrom(actualType))
+      return localDateTimeAdapter.adapt(value, actualType, genericType, annotations);
 
-		return value;
-	}
+    return value;
+  }
 
-	public boolean isJavaTimeObject(Class<?> actualType) {
-		return ZonedDateTime.class.isAssignableFrom(actualType)
-				|| LocalDate.class.isAssignableFrom(actualType)
-				|| LocalTime.class.isAssignableFrom(actualType)
-				|| LocalDateTime.class.isAssignableFrom(actualType);
-	}
-	
-	private ZonedDateTime toZonedDateTime(Object value) {
-		if (value == null) {
-			return ZonedDateTime.now();
-		}
-		if (value instanceof Temporal) {
-			return ZonedDateTime.from((Temporal) value);
-		}
-		if (value instanceof Date) {
-			return ((Date) value).toInstant().atZone(ZoneId.systemDefault());
-		}
-		if (value instanceof Calendar) {
-			return ((Calendar) value).toInstant().atZone(ZoneId.systemDefault());
-		}
-		try {
-			return OffsetDateTime.parse(value.toString()).atZoneSameInstant(ZoneId.systemDefault());
-		} catch (Exception e) {
-		}
-		try {
-			return LocalDateTime.parse(value.toString()).atZone(ZoneId.systemDefault());
-		} catch (Exception e) {
-		}
-		try {
-			return LocalDate.parse(value.toString()).atStartOfDay().atZone(ZoneId.systemDefault());
-		} catch (Exception e) {
-		}
-		throw new IllegalArgumentException("Unable to convert value: " + value);
-	}
+  public boolean isJavaTimeObject(Class<?> actualType) {
+    return ZonedDateTime.class.isAssignableFrom(actualType)
+        || LocalDate.class.isAssignableFrom(actualType)
+        || LocalTime.class.isAssignableFrom(actualType)
+        || LocalDateTime.class.isAssignableFrom(actualType);
+  }
 
-	class DateTimeAdapter implements TypeAdapter<ZonedDateTime> {
+  private ZonedDateTime toZonedDateTime(Object value) {
+    if (value == null) {
+      return ZonedDateTime.now();
+    }
+    if (value instanceof Temporal) {
+      return ZonedDateTime.from((Temporal) value);
+    }
+    if (value instanceof Date) {
+      return ((Date) value).toInstant().atZone(ZoneId.systemDefault());
+    }
+    if (value instanceof Calendar) {
+      return ((Calendar) value).toInstant().atZone(ZoneId.systemDefault());
+    }
+    try {
+      return OffsetDateTime.parse(value.toString()).atZoneSameInstant(ZoneId.systemDefault());
+    } catch (Exception e) {
+    }
+    try {
+      return LocalDateTime.parse(value.toString()).atZone(ZoneId.systemDefault());
+    } catch (Exception e) {
+    }
+    try {
+      return LocalDate.parse(value.toString()).atStartOfDay().atZone(ZoneId.systemDefault());
+    } catch (Exception e) {
+    }
+    throw new IllegalArgumentException("Unable to convert value: " + value);
+  }
 
-		@Override
-		public Object adapt(Object value, Class<?> actualType, Type genericType, Annotation[] annotations) {
-			return value instanceof ZonedDateTime ? value : toZonedDateTime(value);
-		}
-	}
+  class DateTimeAdapter implements TypeAdapter<ZonedDateTime> {
 
-	class LocalDateAdapter implements TypeAdapter<LocalDate> {
+    @Override
+    public Object adapt(
+        Object value, Class<?> actualType, Type genericType, Annotation[] annotations) {
+      return value instanceof ZonedDateTime ? value : toZonedDateTime(value);
+    }
+  }
 
-		@Override
-		public Object adapt(Object value, Class<?> actualType, Type genericType, Annotation[] annotations) {
-			return value instanceof LocalDate ? value : toZonedDateTime(value).toLocalDate();
-		}
-	}
+  class LocalDateAdapter implements TypeAdapter<LocalDate> {
 
-	class LocalTimeAdapter implements TypeAdapter<LocalTime> {
+    @Override
+    public Object adapt(
+        Object value, Class<?> actualType, Type genericType, Annotation[] annotations) {
+      return value instanceof LocalDate ? value : toZonedDateTime(value).toLocalDate();
+    }
+  }
 
-		@Override
-		public Object adapt(Object value, Class<?> actualType, Type genericType, Annotation[] annotations) {
-			try {
-				return value instanceof LocalTime ? value : toZonedDateTime(value).toLocalTime();
-			} catch (Exception e) {
-				final ZonedDateTime dt = ZonedDateTime.now();
-				final String val = String.format("%d-%02d-%02dT%s", dt.getYear(), dt.getMonthValue(), dt.getDayOfMonth(), value);
-				return toZonedDateTime(val).toLocalTime();
-			}
-		}
-	}
+  class LocalTimeAdapter implements TypeAdapter<LocalTime> {
 
-	class LocalDateTimeAdapter implements TypeAdapter<LocalDateTime> {
+    @Override
+    public Object adapt(
+        Object value, Class<?> actualType, Type genericType, Annotation[] annotations) {
+      try {
+        return value instanceof LocalTime ? value : toZonedDateTime(value).toLocalTime();
+      } catch (Exception e) {
+        final ZonedDateTime dt = ZonedDateTime.now();
+        final String val =
+            String.format(
+                "%d-%02d-%02dT%s", dt.getYear(), dt.getMonthValue(), dt.getDayOfMonth(), value);
+        return toZonedDateTime(val).toLocalTime();
+      }
+    }
+  }
 
-		@Override
-		public Object adapt(Object value, Class<?> actualType, Type genericType, Annotation[] annotations) {
-			return value instanceof LocalDateTime ? value : toZonedDateTime(value).toLocalDateTime();
-		}
-	}
+  class LocalDateTimeAdapter implements TypeAdapter<LocalDateTime> {
+
+    @Override
+    public Object adapt(
+        Object value, Class<?> actualType, Type genericType, Annotation[] annotations) {
+      return value instanceof LocalDateTime ? value : toZonedDateTime(value).toLocalDateTime();
+    }
+  }
 }

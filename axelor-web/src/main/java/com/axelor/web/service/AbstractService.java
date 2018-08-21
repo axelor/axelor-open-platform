@@ -17,30 +17,26 @@
  */
 package com.axelor.web.service;
 
+import com.google.inject.Injector;
 import javax.inject.Inject;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Injector;
-
 public abstract class AbstractService {
 
-	protected Logger LOG = LoggerFactory.getLogger(getClass());
+  protected Logger LOG = LoggerFactory.getLogger(getClass());
 
-	@Context
-	private UriInfo uriInfo;
+  @Context private UriInfo uriInfo;
 
-	@Inject
-	private Injector injector;
+  @Inject private Injector injector;
 
-	protected final UriInfo getUriInfo() {
-		return uriInfo;
-	}
-	
-	protected final Injector getInjector() {
-		return injector;
-	}
+  protected final UriInfo getUriInfo() {
+    return uriInfo;
+  }
+
+  protected final Injector getInjector() {
+    return injector;
+  }
 }

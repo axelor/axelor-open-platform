@@ -22,11 +22,11 @@ import com.axelor.test.db.Title;
 
 public class TitleRepository extends JpaRepository<Title> {
 
-	public TitleRepository() {
-		super(Title.class);
-	}
+  public TitleRepository() {
+    super(Title.class);
+  }
 
-	public Title findByCode(String code) {
-		return all().filter("self.code = ?", code).fetchOne();
-	}
+  public Title findByCode(String code) {
+    return all().filter("self.code = ?", code).fetchOne();
+  }
 }

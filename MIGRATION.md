@@ -21,21 +21,21 @@ The application build script now looks like this:
 
 ```gradle
 buildscript {
-	ext.repos = {
-		jcenter()
-		mavenCentral()
-		mavenLocal()
-		maven { url 'https://plugins.gradle.org/m2/' }
-		maven { url 'https://repository.axelor.com/nexus/public/' }
-	}
-	repositories repos
-	dependencies {
-		classpath "com.axelor:axelor-gradle:5.0.0-SNAPSHOT"
-	}
+  ext.repos = {
+    jcenter()
+    mavenCentral()
+    mavenLocal()
+    maven { url 'https://plugins.gradle.org/m2/' }
+    maven { url 'https://repository.axelor.com/nexus/public/' }
+  }
+  repositories repos
+  dependencies {
+    classpath "com.axelor:axelor-gradle:5.0.0-SNAPSHOT"
+  }
 }
 
 allprojects {
-	repositories repos
+  repositories repos
 }
 
 apply plugin: 'idea'
@@ -43,24 +43,24 @@ apply plugin: 'eclipse'
 apply plugin: "com.axelor.app"
 
 axelor {
-	title = "My App"
+  title = "My App"
 }
 
 allprojects {
-	apply plugin: 'idea'
-	apply plugin: 'eclipse'
+  apply plugin: 'idea'
+  apply plugin: 'eclipse'
 
-	group = "com.axelor"
-	version = "1.0.0"
+  group = "com.axelor"
+  version = "1.0.0"
 
-	sourceCompatibility = 1.8
-	targetCompatibility = 1.8
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
 }
 
 dependencies {
-	// add module dependencies
-	compile project(":modules:my-module-1")
-	compile project(":modules:my-module-2")
+  // add module dependencies
+  compile project(":modules:my-module-1")
+  compile project(":modules:my-module-2")
 }
 ```
 
@@ -85,11 +85,11 @@ The module build scripts now looks like this:
 apply plugin: 'com.axelor.app-module'
 
 axelor {
-	title = "My Module 1"
+  title = "My Module 1"
 }
 
 dependencies {
-	compile project(":modules:my-module-2")
+  compile project(":modules:my-module-2")
 }
 ```
 

@@ -25,89 +25,89 @@ import java.util.stream.Collectors;
 
 public class TomcatOptions {
 
-	private int port = 8080;
+  private int port = 8080;
 
-	private String contextPath = "/";
+  private String contextPath = "/";
 
-	private Path baseDir;
+  private Path baseDir;
 
-	private List<Path> roots = new ArrayList<>();
+  private List<Path> roots = new ArrayList<>();
 
-	private List<Path> classes = new ArrayList<>();
+  private List<Path> classes = new ArrayList<>();
 
-	private List<Path> libs = new ArrayList<>();
+  private List<Path> libs = new ArrayList<>();
 
-	public TomcatOptions(Path webapp) {
-		this.roots.add(webapp);
-	}
+  public TomcatOptions(Path webapp) {
+    this.roots.add(webapp);
+  }
 
-	public TomcatOptions(List<Path> webapps) {
-		this.roots.addAll(webapps);
-	}
+  public TomcatOptions(List<Path> webapps) {
+    this.roots.addAll(webapps);
+  }
 
-	public TomcatOptions addWebapp(Path path) {
-		roots.add(path);
-		return this;
-	}
+  public TomcatOptions addWebapp(Path path) {
+    roots.add(path);
+    return this;
+  }
 
-	public TomcatOptions addClasses(Path path) {
-		classes.add(path);
-		return this;
-	}
+  public TomcatOptions addClasses(Path path) {
+    classes.add(path);
+    return this;
+  }
 
-	public TomcatOptions addLib(Path path) {
-		libs.add(path);
-		return this;
-	}
+  public TomcatOptions addLib(Path path) {
+    libs.add(path);
+    return this;
+  }
 
-	public int getPort() {
-		return port;
-	}
+  public int getPort() {
+    return port;
+  }
 
-	public void setPort(int port) {
-		this.port = port;
-	}
+  public void setPort(int port) {
+    this.port = port;
+  }
 
-	public String getContextPath() {
-		return contextPath;
-	}
+  public String getContextPath() {
+    return contextPath;
+  }
 
-	public void setContextPath(String contextPath) {
-		String context = contextPath == null ? "" : contextPath.trim();
-		if (context.isEmpty()) {
-			context = "/";
-		}
-		if (context.charAt(0) != '/') {
-			context = "/" + context;
-		}
-		this.contextPath = context;
-	}
+  public void setContextPath(String contextPath) {
+    String context = contextPath == null ? "" : contextPath.trim();
+    if (context.isEmpty()) {
+      context = "/";
+    }
+    if (context.charAt(0) != '/') {
+      context = "/" + context;
+    }
+    this.contextPath = context;
+  }
 
-	public Path getBaseDir() {
-		return baseDir == null ? Paths.get("build/tomcat") : baseDir;
-	}
+  public Path getBaseDir() {
+    return baseDir == null ? Paths.get("build/tomcat") : baseDir;
+  }
 
-	public void setBaseDir(Path baseDir) {
-		this.baseDir = baseDir;
-	}
+  public void setBaseDir(Path baseDir) {
+    this.baseDir = baseDir;
+  }
 
-	public List<Path> getRoots() {
-		return roots;
-	}
+  public List<Path> getRoots() {
+    return roots;
+  }
 
-	public List<Path> getClasses() {
-		return classes;
-	}
+  public List<Path> getClasses() {
+    return classes;
+  }
 
-	public List<Path> getLibs() {
-		return libs;
-	}
+  public List<Path> getLibs() {
+    return libs;
+  }
 
-	public Path getDocBase() {
-		return roots.isEmpty() ? Paths.get("src/main/webapp") : roots.get(0);
-	}
+  public Path getDocBase() {
+    return roots.isEmpty() ? Paths.get("src/main/webapp") : roots.get(0);
+  }
 
-	public List<Path> getExtraResources() {
-		return roots.isEmpty() ? roots : roots.stream().skip(1).collect(Collectors.toList());
-	}
+  public List<Path> getExtraResources() {
+    return roots.isEmpty() ? roots : roots.stream().skip(1).collect(Collectors.toList());
+  }
 }

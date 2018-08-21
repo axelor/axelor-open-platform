@@ -17,30 +17,33 @@
  */
 package com.axelor.inject.logger;
 
-import org.slf4j.Logger;
-
 import com.google.inject.spi.Dependency;
 import com.google.inject.spi.ProvisionListener;
+import org.slf4j.Logger;
 
 final class LoggerProvisionListener implements ProvisionListener {
-	
-	private boolean isLoggerDependency(Dependency<?> dependency) {
-		return dependency != null && dependency.getKey().getTypeLiteral().getRawType().isAssignableFrom(Logger.class);
-	}
 
-	@Override
-	public <T> void onProvision(ProvisionInvocation<T> provision) {
-		provision.getDependencyChain().stream()
-			.map(d -> d.getDependency())
-			.filter(this::isLoggerDependency)
-			.map(d -> d.getInjectionPoint().getDeclaringType().getRawType())
-			.forEach(type -> {
-				LoggerProvider.NAME.set(type.getName());
-				try {
-					provision.provision();
-				} finally {
-					LoggerProvider.NAME.remove();
-				}
-			});
-	}
+  private boolean isLoggerDependency(Dependency<?> dependency) {
+    return dependency != null
+        && dependency.getKey().getTypeLiteral().getRawType().isAssignableFrom(Logger.class);
+  }
+
+  @Override
+  public <T> void onProvision(ProvisionInvocation<T> provision) {
+    provision
+        .getDependencyChain()
+        .stream()
+        .map(d -> d.getDependency())
+        .filter(this::isLoggerDependency)
+        .map(d -> d.getInjectionPoint().getDeclaringType().getRawType())
+        .forEach(
+            type -> {
+              LoggerProvider.NAME.set(type.getName());
+              try {
+                provision.provision();
+              } finally {
+                LoggerProvider.NAME.remove();
+              }
+            });
+  }
 }

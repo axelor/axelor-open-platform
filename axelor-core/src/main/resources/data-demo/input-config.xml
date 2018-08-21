@@ -4,17 +4,17 @@
 
   <input file="auth.xml" root="auth">
 
- 	<bind node="group" type="com.axelor.auth.db.Group" search="self.code = :code" update="false">
- 	  <bind node="@code" to="code" />
- 	  <bind node="@name" to="name" />
- 	</bind>
+   <bind node="group" type="com.axelor.auth.db.Group" search="self.code = :code" update="false">
+     <bind node="@code" to="code" />
+     <bind node="@name" to="name" />
+   </bind>
 
-  	<bind node="user" type="com.axelor.auth.db.User" search="self.code = :code" update="false" call="com.axelor.auth.AuthService:encrypt">
-  	  <bind node="@code" to="code" />
- 	  <bind node="@name" to="name" />
+    <bind node="user" type="com.axelor.auth.db.User" search="self.code = :code" update="false" call="com.axelor.auth.AuthService:encrypt">
+      <bind node="@code" to="code" />
+     <bind node="@name" to="name" />
       <bind node="@password" to="password" />
-  	  <bind node="@group" to="group" search="self.code = :group" update="false" />
-  	</bind>
+      <bind node="@group" to="group" search="self.code = :group" update="false" />
+    </bind>
 
     <bind node="permission" type="com.axelor.auth.db.Permission" search="self.name = :name" update="false">
       <bind node="@name" to="name" />
@@ -27,7 +27,7 @@
       <bind node="domain/text()" to="condition"/>
       <bind node="domain-params/text()" to="conditionParams"/>
     </bind>
-    
+
     <bind node="role" type="com.axelor.auth.db.Role" search="self.name = :name" update="false">
       <bind node="@name" to="name"/>
       <bind node="@title" to="description"/>

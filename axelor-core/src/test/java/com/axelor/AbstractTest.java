@@ -17,16 +17,13 @@
  */
 package com.axelor;
 
+import com.axelor.test.GuiceModules;
+import com.axelor.test.GuiceRunner;
 import org.junit.FixMethodOrder;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 
-import com.axelor.test.GuiceModules;
-import com.axelor.test.GuiceRunner;
-
 @RunWith(GuiceRunner.class)
-@GuiceModules({ TestModule.class })
+@GuiceModules({TestModule.class})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public abstract class AbstractTest {
-
-}
+public abstract class AbstractTest {}

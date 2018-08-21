@@ -19,6 +19,8 @@ package com.axelor.test;
 
 import static org.junit.Assert.assertEquals;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.servlet.RequestScoped;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -27,108 +29,106 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.servlet.RequestScoped;
-
 public class BoundTest {
 
-	static class MyModule extends AbstractModule {
+  static class MyModule extends AbstractModule {
 
-		@Override
-		protected void configure() {
-			bind(BoundPerRequestResource.class);
-			bind(BoundNoScopeResource.class);
-			bind(BoundSingletonResource.class);
-		}
-	}
-
-	@Path("/bound/perrequest")
-    @RequestScoped
-    public static class BoundPerRequestResource {
-
-        @Context UriInfo ui;
-        
-        @QueryParam("x") String x;
-        
-        @GET
-        @Produces("text/plain")
-        public String getIt() {
-            assertEquals("/bound/perrequest", ui.getPath());
-            assertEquals("x", x);
-            
-            return "OK";
-        }
+    @Override
+    protected void configure() {
+      bind(BoundPerRequestResource.class);
+      bind(BoundNoScopeResource.class);
+      bind(BoundSingletonResource.class);
     }
-	
-	@Path("/bound/noscope")
-    public static class BoundNoScopeResource {
+  }
 
-        @Context UriInfo ui;
+  @Path("/bound/perrequest")
+  @RequestScoped
+  public static class BoundPerRequestResource {
 
-        @QueryParam("x") String x;
+    @Context UriInfo ui;
 
-        @GET
-        @Produces("text/plain")
-        public String getIt() {
-            assertEquals("/bound/noscope", ui.getPath());
-            assertEquals("x", x);
+    @QueryParam("x")
+    String x;
 
-            return "OK";
-        }
+    @GET
+    @Produces("text/plain")
+    public String getIt() {
+      assertEquals("/bound/perrequest", ui.getPath());
+      assertEquals("x", x);
+
+      return "OK";
     }
+  }
 
-    @Path("/bound/singleton")
-    @Singleton
-    public static class BoundSingletonResource {
+  @Path("/bound/noscope")
+  public static class BoundNoScopeResource {
 
-        @Context UriInfo ui;
+    @Context UriInfo ui;
 
-        @GET
-        @Produces("text/plain")
-        public String getIt() {
-            assertEquals("/bound/singleton", ui.getPath());
-            String x = ui.getQueryParameters().getFirst("x");
-            assertEquals("x", x);
+    @QueryParam("x")
+    String x;
 
-            return "OK";
-        }
+    @GET
+    @Produces("text/plain")
+    public String getIt() {
+      assertEquals("/bound/noscope", ui.getPath());
+      assertEquals("x", x);
+
+      return "OK";
     }
-    
-    private static WebServer server = WebServer.create(new MyModule());
+  }
 
-    @BeforeClass
-    public static void beforeClass() {
-    	server.start();
-    }
+  @Path("/bound/singleton")
+  @Singleton
+  public static class BoundSingletonResource {
 
-    @AfterClass
-    public static void afterClass() {
-    	server.stop();
-    }
+    @Context UriInfo ui;
 
-    @Test
-	public void testBoundPerRequestScope() {
-		WebTarget r = server.target().path("/bound/perrequest").queryParam("x", "x");
-        String s = r.request().get(String.class);
-        assertEquals(s, "OK");
-	}
-	
-	@Test
-	public void testBoundNoScopeResource() {
-		WebTarget r = server.target().path("/bound/noscope").queryParam("x", "x");
-        String s = r.request().get(String.class);
-        assertEquals(s, "OK");
-    }
+    @GET
+    @Produces("text/plain")
+    public String getIt() {
+      assertEquals("/bound/singleton", ui.getPath());
+      String x = ui.getQueryParameters().getFirst("x");
+      assertEquals("x", x);
 
-	@Test
-    public void testBoundSingletonResourcee() {
-        WebTarget r =server.target().path("/bound/singleton").queryParam("x", "x");
-        String s = r.request().get(String.class);
-        assertEquals(s, "OK");
+      return "OK";
     }
+  }
+
+  private static WebServer server = WebServer.create(new MyModule());
+
+  @BeforeClass
+  public static void beforeClass() {
+    server.start();
+  }
+
+  @AfterClass
+  public static void afterClass() {
+    server.stop();
+  }
+
+  @Test
+  public void testBoundPerRequestScope() {
+    WebTarget r = server.target().path("/bound/perrequest").queryParam("x", "x");
+    String s = r.request().get(String.class);
+    assertEquals(s, "OK");
+  }
+
+  @Test
+  public void testBoundNoScopeResource() {
+    WebTarget r = server.target().path("/bound/noscope").queryParam("x", "x");
+    String s = r.request().get(String.class);
+    assertEquals(s, "OK");
+  }
+
+  @Test
+  public void testBoundSingletonResourcee() {
+    WebTarget r = server.target().path("/bound/singleton").queryParam("x", "x");
+    String s = r.request().get(String.class);
+    assertEquals(s, "OK");
+  }
 }

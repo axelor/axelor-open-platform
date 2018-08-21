@@ -16,356 +16,356 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 .ui-dialog {
-	padding: 0;
-	border: 0;
-	top: 30px !important;
-	left: 0 !important;
-	right: 0 !important;
-	display: flex;
-	flex-flow: column nowrap;
+  padding: 0;
+  border: 0;
+  top: 30px !important;
+  left: 0 !important;
+  right: 0 !important;
+  display: flex;
+  flex-flow: column nowrap;
 }
 
 .ui-dialog .ui-dialog-titlebar {
-	border: none;
-	border-bottom: 1px solid #EEE;
-	border-radius: 0;
-	background: none;
+  border: none;
+  border-bottom: 1px solid #EEE;
+  border-radius: 0;
+  background: none;
 
-	padding: 9px 15px;
-	font-size: 20.5px;
-	font-weight: 600;
-	line-height: 26px;
-	flex: 0 0 auto;
+  padding: 9px 15px;
+  font-size: 20.5px;
+  font-weight: 600;
+  line-height: 26px;
+  flex: 0 0 auto;
 }
 
 .ui-dialog .ui-dialog-title {
-	margin: 0;
+  margin: 0;
 }
 
 .ui-dialog,
 .ui-dialog .ui-dialog-title {
-	border-radius: 0;
+  border-radius: 0;
 }
 
 .ui-dialog .ui-dialog-titlebar-close.ui-state-hover {
-	background: none;
-	border: 0;
+  background: none;
+  border: 0;
 }
 
 .ui-dialog .ui-dialog-titlebar-close:hover,
 .ui-dialog .ui-dialog-titlebar-close:focus {
-	padding: 1px;
+  padding: 1px;
 }
 
 .ui-dialog .ui-dialog-titlebar-close .ui-icon,
 .ui-dialog .ui-dialog-titlebar-close .ui-icon.ui-state-hover {
-	background: none !important;
+  background: none !important;
 }
 
 .ui-dialog .ui-dialog-titlebar-close {
-	top: 20px;
-  	right: .5em;
-	height: auto;
-	width: auto;
-	opacity: 0.2;
+  top: 20px;
+    right: .5em;
+  height: auto;
+  width: auto;
+  opacity: 0.2;
 }
 
 .ui-dialog .ui-dialog-titlebar-close.ui-state-hover {
-	border: 0;
-	background: transparent;
-	font-weight: 600;
-	opacity: 0.4;
+  border: 0;
+  background: transparent;
+  font-weight: 600;
+  opacity: 0.4;
 }
 
 .ui-dialog .ui-dialog-titlebar-close span::before {
-	content: "\00D7";
-	display: inline-block;
+  content: "\00D7";
+  display: inline-block;
 }
 
 .ui-dialog .ui-dialog-titlebar-close .ui-icon {
-	text-indent: 0px !important;
-	line-height: 20px;
-	font-size: 20px;
-	height: 20px;
-	width: 12px;
+  text-indent: 0px !important;
+  line-height: 20px;
+  font-size: 20px;
+  height: 20px;
+  width: 12px;
 }
 
 .ui-dialog .ui-dialog-titlebar-close.ui-state-focus {
-	background: inherit;
-	border: inherit;
-	font-weight: inherit;
+  background: inherit;
+  border: inherit;
+  font-weight: inherit;
 }
 
 .ui-dialog .ui-dialog-titlebar-max,
 .ui-dialog .ui-dialog-titlebar-collapse {
-	position: absolute;
-	right: 1.6em;
-	top: 7px;
-	opacity: 0.2;
+  position: absolute;
+  right: 1.6em;
+  top: 7px;
+  opacity: 0.2;
 }
 .ui-dialog .ui-dialog-titlebar-max:hover,
 .ui-dialog .ui-dialog-titlebar-collapse:hover {
-	font-weight: bold;
-	color: #212121;
-	opacity: 0.4;
+  font-weight: bold;
+  color: #212121;
+  opacity: 0.4;
 }
 
 .ui-dialog .ui-dialog-titlebar-collapse {
-    right: 2.6em;  
+    right: 2.6em;
 }
 
 .ui-dialog .ui-dialog-titlebar-close span::before {
-	font-size: 24px;
+  font-size: 24px;
 }
 
 .ui-dialog-buttonpane {
-	border-top: 1px solid #DDD;
+  border-top: 1px solid #DDD;
 }
 
 .ui-dialog-buttonpane .btn {
-	padding: 16px auto;
+  padding: 16px auto;
 }
 
 .ui-dialog-buttonpane .btn[disabled] {
-	cursor: inherit;
+  cursor: inherit;
 }
 
 .ui-dialog .ui-dialog-content {
-	padding: 4px;
-	min-height: 50px;
-	max-height: calc(100% - 45px - 52px) !important;
-	height: inherit !important;
+  padding: 4px;
+  min-height: 50px;
+  max-height: calc(100% - 45px - 52px) !important;
+  height: inherit !important;
 }
 
 .ui-dialog .ui-dialog-content[ui-editor-popup] {
-	min-height: 200px !important;
+  min-height: 200px !important;
 }
 
 .ui-dialog .ui-dialog-content[ui-selector-popup] {
-	overflow: hidden;
-	height: 450px !important;
+  overflow: hidden;
+  height: 450px !important;
 }
 
 .ui-widget-overlay {
-	background: none;
-	background-color: black;
+  background: none;
+  background-color: black;
 }
 
 .ui-dialog .ui-dialog-buttonpane {
-	margin-top: 0;
-	padding: .3em .5em .5em .5em;
-	flex: 0 0 auto;
+  margin-top: 0;
+  padding: .3em .5em .5em .5em;
+  flex: 0 0 auto;
 }
 
 .ui-dialog.collapsed .ui-dialog-content,
 .ui-dialog.collapsed .ui-dialog-buttonpane {
-    display: none !important; 
+    display: none !important;
 }
 
 .ui-dialog-buttonpane .btn-group > .btn {
-	margin: 0;
+  margin: 0;
 }
 
 .ui-dialog-buttonpane .btn-group > .btn:first-child {
-	margin-left: 0;
+  margin-left: 0;
 }
 
 .ui-dialog-buttonpane .btn-group > .btn:last-child {
-	margin-left: -1px;
+  margin-left: -1px;
 }
 
 .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset-left button {
-	margin-left: 0.4em;
+  margin-left: 0.4em;
 }
 
 .ui-dialog-titlebar .record-pager {
-	position: absolute;
-	right: 76px;
+  position: absolute;
+  right: 76px;
     top: 8px;
     line-height: 25px;
 }
 
 .ui-dialog-titlebar .record-pager-text {
-	margin-top: 0;
+  margin-top: 0;
 }
 
 .no-close .ui-dialog-titlebar-close {
-	display: none;
+  display: none;
 }
 
 .ui-dialog .message-box a {
-	color: #0088cc;
-	outline: none;
+  color: #0088cc;
+  outline: none;
 }
 
 .ui-dialog form[ui-bar-layout] {
-	padding-bottom: 0px;
+  padding-bottom: 0px;
 }
 
 .ui-dialog-content > [ui-view-form],
 .ui-dialog-content > [ui-view-form] > form {
-	box-sizing: border-box;
-	width: 100%;
-	min-width: 100%;
-	max-width: 100%;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
 }
 
 .ui-dialog-responsive {
-	position: absolute;
-	width: 100% !important;
-	margin: 0 auto !important;
-	max-width: calc(100% - 16px) !important;
-	max-height: calc(100% - 64px) !important;
-	border: none;
+  position: absolute;
+  width: 100% !important;
+  margin: 0 auto !important;
+  max-width: calc(100% - 16px) !important;
+  max-height: calc(100% - 64px) !important;
+  border: none;
 }
 
 .ui-dialog-small .ui-dialog-content {
-	height: auto !important;
-	overflow: inherit;
+  height: auto !important;
+  overflow: inherit;
 }
 
 .ui-dialog-small .ui-dialog-buttonpane {
-	position: relative;
+  position: relative;
 }
 
 @media screen and (min-width: 768px) {
-	.ui-dialog-responsive {
-		width: 740px !important;
-	}
-	.ui-dialog-small {
-		width: 480px !important;
-	}
+  .ui-dialog-responsive {
+    width: 740px !important;
+  }
+  .ui-dialog-small {
+    width: 480px !important;
+  }
 }
 @media screen and (min-width: 1024px) {
-	.ui-dialog-responsive {
-		width: 900px !important;
-	}
-	.ui-dialog-small {
-		width: 480px !important;
-	}
+  .ui-dialog-responsive {
+    width: 900px !important;
+  }
+  .ui-dialog-small {
+    width: 480px !important;
+  }
 }
 
 @media screen and (max-width: 768px) {
-	.ui-dialog .ui-dialog-titlebar,
-	.ui-dialog .ui-dialog-buttonpane {
-		position: absolute;
-		left: 0;
-		right: 0;
-	}
-	.ui-dialog {
-		position: absolute;
-		margin: 8px !important;
-		top: 0 !important;
-		left: 0 !important;
-		width: calc(100% - 16px) !important;
-		height: calc(100% - 16px) !important;
-		max-height: calc(100% - 16px) !important;
-	}
-	.ui-dialog .ui-dialog-title {
-		top: 0;
-	}
-	.ui-dialog .ui-dialog-buttonpane {
-		bottom: 0;
-	}
-	.ui-dialog .ui-dialog-content {
-  		box-sizing: border-box;
-		width: 100% !important;
-		height: calc(100% - 45px - 52px) !important;
-		overflow: auto;
-		margin-top: 45px;
-	}
-	.ui-dialog .ui-dialog-content[ui-selector-popup] {
-		min-height: inherit !important;
-	}
-	.ui-dialog-small {
-		height: auto !important;
-	}
-	.ui-dialog-small .ui-dialog-content {
-		height: auto !important;
-	}
-	.ui-dialog-small .ui-dialog-buttonpane {
-		position: relative;
-	}
+  .ui-dialog .ui-dialog-titlebar,
+  .ui-dialog .ui-dialog-buttonpane {
+    position: absolute;
+    left: 0;
+    right: 0;
+  }
+  .ui-dialog {
+    position: absolute;
+    margin: 8px !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: calc(100% - 16px) !important;
+    height: calc(100% - 16px) !important;
+    max-height: calc(100% - 16px) !important;
+  }
+  .ui-dialog .ui-dialog-title {
+    top: 0;
+  }
+  .ui-dialog .ui-dialog-buttonpane {
+    bottom: 0;
+  }
+  .ui-dialog .ui-dialog-content {
+      box-sizing: border-box;
+    width: 100% !important;
+    height: calc(100% - 45px - 52px) !important;
+    overflow: auto;
+    margin-top: 45px;
+  }
+  .ui-dialog .ui-dialog-content[ui-selector-popup] {
+    min-height: inherit !important;
+  }
+  .ui-dialog-small {
+    height: auto !important;
+  }
+  .ui-dialog-small .ui-dialog-content {
+    height: auto !important;
+  }
+  .ui-dialog-small .ui-dialog-buttonpane {
+    position: relative;
+  }
 }
 
 .ui-dialog.maximized {
-	top: 0 !important;
-	left: 0 !important;
-	margin: 8px !important;
-	width: calc(100% - 16px) !important;
-	height: calc(100% - 16px) !important;
-	max-height: calc(100% - 16px) !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 8px !important;
+  width: calc(100% - 16px) !important;
+  height: calc(100% - 16px) !important;
+  max-height: calc(100% - 16px) !important;
 }
 .ui-dialog.maximized .ui-dialog-buttonpane {
-	bottom: 0;
+  bottom: 0;
 }
 .ui-dialog.maximized .ui-dialog-content {
-	width: auto !important;
-	height: calc(100% - 45px - 52px) !important;
+  width: auto !important;
+  height: calc(100% - 45px - 52px) !important;
 }
 .ui-dialog.maximized.collapsed {
-	height: auto !important;
+  height: auto !important;
 }
 
 .ui-dialog .translation-form {
-	overflow: auto;
+  overflow: auto;
 }
 .ui-dialog .translation-form i {
-	cursor: pointer;
+  cursor: pointer;
 }
 .ui-dialog .translation-form i.fa-times {
-	line-height: 28px;
-	margin-right: -12px;
-	float: right;
+  line-height: 28px;
+  margin-right: -12px;
+  float: right;
 }
 .ui-dialog .translation-form i.fa-plus {
-	margin-right: 4px;
+  margin-right: 4px;
 }
 .ui-dialog .translation-form form {
-	margin: 0;
-	margin-right: 8px;
+  margin: 0;
+  margin-right: 8px;
 }
 .ui-dialog .translation-form form label {
-	font-weight: 600;
-	min-height: 0;
-	margin-left: 6px;
+  font-weight: 600;
+  min-height: 0;
+  margin-left: 6px;
 }
 .ui-dialog .translation-form form input {
-	margin-left: 6px;
+  margin-left: 6px;
 }
 .ui-dialog .translation-form form hr {
-	margin: 8px 0;
+  margin: 8px 0;
 }
 
 #loginWindow * {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 #loginWindow {
-	padding: 16px;
+  padding: 16px;
 }
 
 #loginWindow form {
-	margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 #loginWindow input {
-	width: 100%;
-	height: 33px;
+  width: 100%;
+  height: 33px;
 }
 
 #errorWindow .errorMessage,
 #errorWindow .errorDetails {
-	margin: 8px;
+  margin: 8px;
 }
 
 #errorWindow .errorDetails .nav-tabs,
 #errorWindow .errorDetails pre {
-	margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 #errorWindow .errorDetails .tab-contents {
-	padding: 4px;
-	border: 1px solid #d4d4d4;
-	border-top: none;
+  padding: 4px;
+  border: 1px solid #d4d4d4;
+  border-top: none;
 }

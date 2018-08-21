@@ -22,7 +22,7 @@
       <mail-messages limit="10"/>
     </panel-mail>
   </form>
-  
+
   <form name="mail-thread-important" title="Important" model="com.axelor.mail.db.MailMessage" width="100%"
         css="mail-thread-view">
     <panel showIf="__empty" hidden="true" x-item-span="12">

@@ -17,10 +17,11 @@
  */
 package com.axelor.db.tenants;
 
+import com.axelor.common.StringUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Map;
-
 import javax.inject.Singleton;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -31,102 +32,99 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.axelor.common.StringUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
- * The {@link PreSessionTenantFilter} is responsible to set current tenant
- * before database connection is created.
- *
+ * The {@link PreSessionTenantFilter} is responsible to set current tenant before database
+ * connection is created.
  */
 @Singleton
 public class PreSessionTenantFilter extends AbstractTenantFilter {
 
-	private static final String LOGIN_PAGE = "/login.jsp";
+  private static final String LOGIN_PAGE = "/login.jsp";
 
-	private boolean isLoginRequest(HttpServletRequest request) {
-		return LOGIN_PAGE.equals(request.getServletPath());
-	}
+  private boolean isLoginRequest(HttpServletRequest request) {
+    return LOGIN_PAGE.equals(request.getServletPath());
+  }
 
-	private boolean isLoginSubmit(HttpServletRequest request) {
-		return isLoginRequest(request) && "POST".equalsIgnoreCase(request.getMethod());
-	}
+  private boolean isLoginSubmit(HttpServletRequest request) {
+    return isLoginRequest(request) && "POST".equalsIgnoreCase(request.getMethod());
+  }
 
-	private static String getLoginParam(ServletRequest request, String param) {
-		if (!isXHR(request)) {
-			return request.getParameter(param);
-		}
-		try {
-			return (String) new ObjectMapper().readValue(request.getInputStream(), Map.class).get(param);
-		} catch (Exception e) {
-			return null;
-		}
-	}
+  private static String getLoginParam(ServletRequest request, String param) {
+    if (!isXHR(request)) {
+      return request.getParameter(param);
+    }
+    try {
+      return (String) new ObjectMapper().readValue(request.getInputStream(), Map.class).get(param);
+    } catch (Exception e) {
+      return null;
+    }
+  }
 
-	private String currentTenant(ServletRequest request, ServletResponse response) {
-		final HttpServletRequest req = (HttpServletRequest) request;
-		final HttpServletResponse res = (HttpServletResponse) response;
+  private String currentTenant(ServletRequest request, ServletResponse response) {
+    final HttpServletRequest req = (HttpServletRequest) request;
+    final HttpServletResponse res = (HttpServletResponse) response;
 
-		String tenantId = isLoginSubmit(req) ? getLoginParam(request, TENANT_LOGIN_PARAM) : null;
-		Cookie tenantCookie = getCookie(req, TENANT_COOKIE_NAME);
+    String tenantId = isLoginSubmit(req) ? getLoginParam(request, TENANT_LOGIN_PARAM) : null;
+    Cookie tenantCookie = getCookie(req, TENANT_COOKIE_NAME);
 
-		if (StringUtils.isBlank(tenantId) && tenantCookie != null) {
-			tenantId = tenantCookie.getValue();
-		}
+    if (StringUtils.isBlank(tenantId) && tenantCookie != null) {
+      tenantId = tenantCookie.getValue();
+    }
 
-		if (isLoginRequest(req)) {
-			final HttpSession session = req.getSession();
-			final Map<String, String> tenants = getTenants(true);
-			final String switchTo = !isLoginSubmit(req) ? req.getParameter("tenant") : null;
+    if (isLoginRequest(req)) {
+      final HttpSession session = req.getSession();
+      final Map<String, String> tenants = getTenants(true);
+      final String switchTo = !isLoginSubmit(req) ? req.getParameter("tenant") : null;
 
-			if (tenants.containsKey(switchTo)) {
-				tenantId = switchTo;
-			}
+      if (tenants.containsKey(switchTo)) {
+        tenantId = switchTo;
+      }
 
-			if (!tenants.containsKey(tenantId)) {
-				tenantId = tenants.isEmpty() ? null : tenants.keySet().iterator().next();
-			}
+      if (!tenants.containsKey(tenantId)) {
+        tenantId = tenants.isEmpty() ? null : tenants.keySet().iterator().next();
+      }
 
-			// update cookie on login attempt or change tenant request
-			if (isLoginSubmit(req) || !StringUtils.isBlank(switchTo)) {
-				if (switchTo != null) {
-					// remove all session attribute except shiro attrs
-					final Enumeration<String> attrs = session.getAttributeNames();
-					while (attrs.hasMoreElements()) {
-						final String attr = attrs.nextElement();
-						if (!attr.startsWith(SESSION_KEY_PREFIX_SHIRO)) {
-							session.removeAttribute(attr);
-						}
-					}
-				}
-				setCookie(req, res, TENANT_COOKIE_NAME, tenantId);
-			}
+      // update cookie on login attempt or change tenant request
+      if (isLoginSubmit(req) || !StringUtils.isBlank(switchTo)) {
+        if (switchTo != null) {
+          // remove all session attribute except shiro attrs
+          final Enumeration<String> attrs = session.getAttributeNames();
+          while (attrs.hasMoreElements()) {
+            final String attr = attrs.nextElement();
+            if (!attr.startsWith(SESSION_KEY_PREFIX_SHIRO)) {
+              session.removeAttribute(attr);
+            }
+          }
+        }
+        setCookie(req, res, TENANT_COOKIE_NAME, tenantId);
+      }
 
-			session.setAttribute(SESSION_KEY_TENANT_MAP, tenants);
-			session.setAttribute(SESSION_KEY_TENANT_ID, tenantId);
-		}
+      session.setAttribute(SESSION_KEY_TENANT_MAP, tenants);
+      session.setAttribute(SESSION_KEY_TENANT_ID, tenantId);
+    }
 
-		return StringUtils.isBlank(tenantId) ? null : tenantId;
-	}
+    return StringUtils.isBlank(tenantId) ? null : tenantId;
+  }
 
-	@Override
-	protected void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
-		final HttpServletRequest req = (HttpServletRequest) request;
+  @Override
+  protected void doFilterInternal(
+      ServletRequest request, ServletResponse response, FilterChain chain)
+      throws IOException, ServletException {
+    final HttpServletRequest req = (HttpServletRequest) request;
 
-		TenantResolver.CURRENT_HOST.set(req.getHeader("Host"));
-		TenantResolver.CURRENT_TENANT.set(currentTenant(request, response));
-		try {
-			chain.doFilter(request, response);
-		} finally {
-			TenantResolver.CURRENT_HOST.remove();
-			TenantResolver.CURRENT_TENANT.remove();
-		}
-	}
+    TenantResolver.CURRENT_HOST.set(req.getHeader("Host"));
+    TenantResolver.CURRENT_TENANT.set(currentTenant(request, response));
+    try {
+      chain.doFilter(request, response);
+    } finally {
+      TenantResolver.CURRENT_HOST.remove();
+      TenantResolver.CURRENT_TENANT.remove();
+    }
+  }
 
-	@Override
-	public void destroy() {
-		TenantResolver.CURRENT_HOST.remove();
-		TenantResolver.CURRENT_TENANT.remove();
-	}
+  @Override
+  public void destroy() {
+    TenantResolver.CURRENT_HOST.remove();
+    TenantResolver.CURRENT_TENANT.remove();
+  }
 }

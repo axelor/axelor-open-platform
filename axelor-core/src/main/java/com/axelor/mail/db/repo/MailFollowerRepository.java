@@ -17,11 +17,6 @@
  */
 package com.axelor.mail.db.repo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.axelor.auth.db.User;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaRepository;
@@ -39,267 +34,295 @@ import com.axelor.rpc.Resource;
 import com.axelor.team.db.Team;
 import com.axelor.team.db.TeamTask;
 import com.google.inject.persist.Transactional;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MailFollowerRepository extends JpaRepository<MailFollower> {
 
-	public MailFollowerRepository() {
-		super(MailFollower.class);
-	}
+  public MailFollowerRepository() {
+    super(MailFollower.class);
+  }
 
-	public List<MailFollower> findAll(Model entity) {
-		return findAll(entity, -1);
-	}
+  public List<MailFollower> findAll(Model entity) {
+    return findAll(entity, -1);
+  }
 
-	public List<MailFollower> findAll(Model entity, int limit) {
-		if (entity == null) {
-			return new ArrayList<>();
-		}
+  public List<MailFollower> findAll(Model entity, int limit) {
+    if (entity == null) {
+      return new ArrayList<>();
+    }
 
-		final Long relatedId;
-		final String relatedModel;
+    final Long relatedId;
+    final String relatedModel;
 
-		if (entity instanceof MailMessage) {
-			relatedId = ((MailMessage) entity).getRelatedId();
-			relatedModel = ((MailMessage) entity).getRelatedModel();
-		} else {
-			relatedId = entity.getId();
-			relatedModel = EntityHelper.getEntityClass(entity).getName();
-		}
+    if (entity instanceof MailMessage) {
+      relatedId = ((MailMessage) entity).getRelatedId();
+      relatedModel = ((MailMessage) entity).getRelatedModel();
+    } else {
+      relatedId = entity.getId();
+      relatedModel = EntityHelper.getEntityClass(entity).getName();
+    }
 
-		if (relatedId == null || relatedModel == null) {
-			return new ArrayList<>();
-		}
+    if (relatedId == null || relatedModel == null) {
+      return new ArrayList<>();
+    }
 
-		return all().filter("self.relatedModel = ? AND self.relatedId = ?",
-				relatedModel, relatedId).fetch(limit);
-	}
+    return all()
+        .filter("self.relatedModel = ? AND self.relatedId = ?", relatedModel, relatedId)
+        .fetch(limit);
+  }
 
-	public MailFollower findOne(Model entity, User user) {
-		if (entity == null || user == null) {
-			return null;
-		}
+  public MailFollower findOne(Model entity, User user) {
+    if (entity == null || user == null) {
+      return null;
+    }
 
-		final Long relatedId;
-		final String relatedModel;
+    final Long relatedId;
+    final String relatedModel;
 
-		if (entity instanceof MailMessage) {
-			relatedId = ((MailMessage) entity).getRelatedId();
-			relatedModel = ((MailMessage) entity).getRelatedModel();
-		} else {
-			relatedId = entity.getId();
-			relatedModel = EntityHelper.getEntityClass(entity).getName();
-		}
+    if (entity instanceof MailMessage) {
+      relatedId = ((MailMessage) entity).getRelatedId();
+      relatedModel = ((MailMessage) entity).getRelatedModel();
+    } else {
+      relatedId = entity.getId();
+      relatedModel = EntityHelper.getEntityClass(entity).getName();
+    }
 
-		if (relatedId == null || relatedModel == null) {
-			return null;
-		}
+    if (relatedId == null || relatedModel == null) {
+      return null;
+    }
 
-		return all().filter("self.relatedId = ? AND self.relatedModel = ? AND self.user.id = ?", relatedId,
-				relatedModel, user.getId()).fetchOne();
-	}
+    return all()
+        .filter(
+            "self.relatedId = ? AND self.relatedModel = ? AND self.user.id = ?",
+            relatedId,
+            relatedModel,
+            user.getId())
+        .fetchOne();
+  }
 
-	public MailFollower findOne(Model entity, MailAddress address) {
-		if (entity == null || address == null) {
-			return null;
-		}
+  public MailFollower findOne(Model entity, MailAddress address) {
+    if (entity == null || address == null) {
+      return null;
+    }
 
-		final Long relatedId;
-		final String relatedModel;
+    final Long relatedId;
+    final String relatedModel;
 
-		if (entity instanceof MailMessage) {
-			relatedId = ((MailMessage) entity).getRelatedId();
-			relatedModel = ((MailMessage) entity).getRelatedModel();
-		} else {
-			relatedId = entity.getId();
-			relatedModel = EntityHelper.getEntityClass(entity).getName();
-		}
+    if (entity instanceof MailMessage) {
+      relatedId = ((MailMessage) entity).getRelatedId();
+      relatedModel = ((MailMessage) entity).getRelatedModel();
+    } else {
+      relatedId = entity.getId();
+      relatedModel = EntityHelper.getEntityClass(entity).getName();
+    }
 
-		if (relatedId == null || relatedModel == null) {
-			return null;
-		}
+    if (relatedId == null || relatedModel == null) {
+      return null;
+    }
 
-		return all().filter("self.relatedId = ? AND self.relatedModel = ? AND self.email.address = ?", relatedId,
-				relatedModel, address.getAddress()).fetchOne();
-	}
+    return all()
+        .filter(
+            "self.relatedId = ? AND self.relatedModel = ? AND self.email.address = ?",
+            relatedId,
+            relatedModel,
+            address.getAddress())
+        .fetchOne();
+  }
 
-	public List<Map<String, Object>> findFollowers(Model entity) {
-		if (entity == null || entity.getId() == null) {
-			return null;
-		}
+  public List<Map<String, Object>> findFollowers(Model entity) {
+    if (entity == null || entity.getId() == null) {
+      return null;
+    }
 
-		final List<MailFollower> followers = findAll(entity);
-		if (followers == null || followers.isEmpty()) {
-			return null;
-		}
+    final List<MailFollower> followers = findAll(entity);
+    if (followers == null || followers.isEmpty()) {
+      return null;
+    }
 
-		final List<Map<String, Object>> all = new ArrayList<>();
-		final MailService mailService = Beans.get(MailService.class);
-		final MetaActionRepository actionRepo = Beans.get(MetaActionRepository.class);
+    final List<Map<String, Object>> all = new ArrayList<>();
+    final MailService mailService = Beans.get(MailService.class);
+    final MetaActionRepository actionRepo = Beans.get(MetaActionRepository.class);
 
-		for (MailFollower follower : followers) {
-			if (follower.getArchived() == Boolean.TRUE) {
-				continue;
-			}
-			final MailAddress email = follower.getEmail();
-			final User user = follower.getUser();
-			final Model author = (user == null && email != null) ? mailService.resolve(email.getAddress()) : user;
-			if (author == null) {
-				continue;
-			}
-			final Map<String, Object> details = new HashMap<>();
-			final String authorModel = EntityHelper.getEntityClass(author).getName();
-			final MetaAction authorAction = actionRepo.all()
-					.filter("self.type = 'action-view' and self.model = ?", authorModel).fetchOne();
-			if (authorAction != null) {
-				details.put("$authorAction", authorAction.getName());
-			}
-			details.put("$authorModel", authorModel);
-			details.put("id", follower.getId());
-			details.put("$author", Resource.toMapCompact(author));
-			details.put("email", email);
-			all.add(details);
-		}
+    for (MailFollower follower : followers) {
+      if (follower.getArchived() == Boolean.TRUE) {
+        continue;
+      }
+      final MailAddress email = follower.getEmail();
+      final User user = follower.getUser();
+      final Model author =
+          (user == null && email != null) ? mailService.resolve(email.getAddress()) : user;
+      if (author == null) {
+        continue;
+      }
+      final Map<String, Object> details = new HashMap<>();
+      final String authorModel = EntityHelper.getEntityClass(author).getName();
+      final MetaAction authorAction =
+          actionRepo
+              .all()
+              .filter("self.type = 'action-view' and self.model = ?", authorModel)
+              .fetchOne();
+      if (authorAction != null) {
+        details.put("$authorAction", authorAction.getName());
+      }
+      details.put("$authorModel", authorModel);
+      details.put("id", follower.getId());
+      details.put("$author", Resource.toMapCompact(author));
+      details.put("email", email);
+      all.add(details);
+    }
 
-		return all;
-	}
+    return all;
+  }
 
-	private void createOrDeleteMenu(Team team, User user, boolean delete) {
-		final MetaActionRepository actionRepo = Beans.get(MetaActionRepository.class);
-		final MetaMenuRepository menuRepo = Beans.get(MetaMenuRepository.class);
-		final MetaMenu parent = menuRepo.findByName("menu-team");
+  private void createOrDeleteMenu(Team team, User user, boolean delete) {
+    final MetaActionRepository actionRepo = Beans.get(MetaActionRepository.class);
+    final MetaMenuRepository menuRepo = Beans.get(MetaMenuRepository.class);
+    final MetaMenu parent = menuRepo.findByName("menu-team");
 
-		if (parent == null) {
-			return;
-		}
+    if (parent == null) {
+      return;
+    }
 
-		final String name = "menu-team-" + team.getId();
-		final String actionName = "team." + team.getId();
-		final String actionModel = TeamTask.class.getName();
-		final String actionTitle = team.getName();
+    final String name = "menu-team-" + team.getId();
+    final String actionName = "team." + team.getId();
+    final String actionModel = TeamTask.class.getName();
+    final String actionTitle = team.getName();
 
-		MetaMenu menu = menuRepo.all().filter("self.name = ? AND self.user = ?", name, user).fetchOne();
-		MetaAction action = actionRepo.findByName(actionName);
+    MetaMenu menu = menuRepo.all().filter("self.name = ? AND self.user = ?", name, user).fetchOne();
+    MetaAction action = actionRepo.findByName(actionName);
 
-		if (delete) {
-			if (menu != null) {
-				menuRepo.remove(menu);
-			}
-			if (action != null) {
-				// check if action is referenced by other users
-				if (menuRepo.all().filter("self.action.name = ?", actionName).count() == 0) {
-					actionRepo.remove(action);
-				}
-			}
-			return;
-		}
+    if (delete) {
+      if (menu != null) {
+        menuRepo.remove(menu);
+      }
+      if (action != null) {
+        // check if action is referenced by other users
+        if (menuRepo.all().filter("self.action.name = ?", actionName).count() == 0) {
+          actionRepo.remove(action);
+        }
+      }
+      return;
+    }
 
-		if (action == null) {
-			action = new MetaAction(actionName);
-			action.setType("action-view");
-			action.setModel(actionModel);
-			action.setXml(""
-					+ "<action-view title='"+ actionTitle + "' name='" + actionName + "' model='"+ actionModel +"'>\n"
-					+ "  <view name='team-task-grid' type='grid'/>\n"
-					+ "  <view name='team-task-calendar' type='calendar'/>\n"
-					+ "  <view name='team-task-form' type='form'/>\n"
-					+ "  <view-param name='details-view' value='true'/>\n"
-					+ "  <view-param name='forceTitle' value='true'/>\n"
-					+ "  <domain>self.team.id = :teamId AND self.status NOT IN :closed_status</domain>\n"
-					+ "  <context name='closed_status' expr='#{[\"closed\", \"canceled\"]}'/>\n"
-					+ "  <context name='teamId' expr='#{"+ team.getId() +"}'/>\n"
-					+ "</action-view>");
-		}
+    if (action == null) {
+      action = new MetaAction(actionName);
+      action.setType("action-view");
+      action.setModel(actionModel);
+      action.setXml(
+          ""
+              + "<action-view title='"
+              + actionTitle
+              + "' name='"
+              + actionName
+              + "' model='"
+              + actionModel
+              + "'>\n"
+              + "  <view name='team-task-grid' type='grid'/>\n"
+              + "  <view name='team-task-calendar' type='calendar'/>\n"
+              + "  <view name='team-task-form' type='form'/>\n"
+              + "  <view-param name='details-view' value='true'/>\n"
+              + "  <view-param name='forceTitle' value='true'/>\n"
+              + "  <domain>self.team.id = :teamId AND self.status NOT IN :closed_status</domain>\n"
+              + "  <context name='closed_status' expr='#{[\"closed\", \"canceled\"]}'/>\n"
+              + "  <context name='teamId' expr='#{"
+              + team.getId()
+              + "}'/>\n"
+              + "</action-view>");
+    }
 
-		if (menu == null) {
-			menu = new MetaMenu();
-			menu.setName(name);
-			menu.setTitle(team.getName());
-			menu.setParent(parent);
-			menu.setAction(action);
-			menu.setUser(user);
-		}
+    if (menu == null) {
+      menu = new MetaMenu();
+      menu.setName(name);
+      menu.setTitle(team.getName());
+      menu.setParent(parent);
+      menu.setAction(action);
+      menu.setUser(user);
+    }
 
-		menuRepo.save(menu);
-	}
+    menuRepo.save(menu);
+  }
 
-	@Transactional
-	public void follow(Model entity, User user) {
+  @Transactional
+  public void follow(Model entity, User user) {
 
-		MailFollower follower = findOne(entity, user);
-		if (follower != null && follower.getArchived() == Boolean.FALSE) {
-			return;
-		}
+    MailFollower follower = findOne(entity, user);
+    if (follower != null && follower.getArchived() == Boolean.FALSE) {
+      return;
+    }
 
-		if (follower == null) {
-			follower = new MailFollower();
-		}
+    if (follower == null) {
+      follower = new MailFollower();
+    }
 
-		follower.setArchived(false);
-		follower.setRelatedId(entity.getId());
-		follower.setRelatedModel(entity.getClass().getName());
-		follower.setUser(user);
+    follower.setArchived(false);
+    follower.setRelatedId(entity.getId());
+    follower.setRelatedModel(entity.getClass().getName());
+    follower.setUser(user);
 
-		// create menu
-		if (entity instanceof Team) {
-			((Team) entity).addMember(user);
-			createOrDeleteMenu((Team) entity, user, false);
-		}
+    // create menu
+    if (entity instanceof Team) {
+      ((Team) entity).addMember(user);
+      createOrDeleteMenu((Team) entity, user, false);
+    }
 
-		save(follower);
-	}
+    save(follower);
+  }
 
-	@Transactional
-	public void follow(Model entity, MailAddress address) {
-		MailFollower follower = findOne(entity, address);
-		if (follower != null && follower.getArchived() == Boolean.FALSE) {
-			return;
-		}
+  @Transactional
+  public void follow(Model entity, MailAddress address) {
+    MailFollower follower = findOne(entity, address);
+    if (follower != null && follower.getArchived() == Boolean.FALSE) {
+      return;
+    }
 
-		if (follower == null) {
-			follower = new MailFollower();
-		}
+    if (follower == null) {
+      follower = new MailFollower();
+    }
 
-		final MailAddressRepository addresses = Beans.get(MailAddressRepository.class);
-		final MailAddress managed = addresses.findOrCreate(address.getAddress(), address.getPersonal());
+    final MailAddressRepository addresses = Beans.get(MailAddressRepository.class);
+    final MailAddress managed = addresses.findOrCreate(address.getAddress(), address.getPersonal());
 
-		follower.setArchived(false);
-		follower.setRelatedId(entity.getId());
-		follower.setRelatedModel(entity.getClass().getName());
-		follower.setEmail(managed);
+    follower.setArchived(false);
+    follower.setRelatedId(entity.getId());
+    follower.setRelatedModel(entity.getClass().getName());
+    follower.setEmail(managed);
 
-		save(follower);
-	}
+    save(follower);
+  }
 
-	@Transactional
-	public void unfollow(Model entity, User user) {
+  @Transactional
+  public void unfollow(Model entity, User user) {
 
-		if (!isFollowing(entity, user)) {
-			return;
-		}
+    if (!isFollowing(entity, user)) {
+      return;
+    }
 
-		MailFollower follower = findOne(entity, user);
-		if (follower != null) {
-			follower.setArchived(true);
-			save(follower);
-		}
+    MailFollower follower = findOne(entity, user);
+    if (follower != null) {
+      follower.setArchived(true);
+      save(follower);
+    }
 
-		// remove menu
-		if (entity instanceof Team) {
-			((Team) entity).removeMember(user);
-			createOrDeleteMenu((Team) entity, user, true);
-		}
-	}
+    // remove menu
+    if (entity instanceof Team) {
+      ((Team) entity).removeMember(user);
+      createOrDeleteMenu((Team) entity, user, true);
+    }
+  }
 
-	@Transactional
-	public void unfollow(MailFollower follower) {
-		if (follower != null) {
-			follower.setArchived(true);
-			save(follower);
-		}
-	}
+  @Transactional
+  public void unfollow(MailFollower follower) {
+    if (follower != null) {
+      follower.setArchived(true);
+      save(follower);
+    }
+  }
 
-	public boolean isFollowing(Model entity, User user) {
-		final MailFollower found = findOne(entity, user);
-		return found != null && found.getArchived() == Boolean.FALSE;
-	}
+  public boolean isFollowing(Model entity, User user) {
+    final MailFollower found = findOne(entity, user);
+    return found != null && found.getArchived() == Boolean.FALSE;
+  }
 }

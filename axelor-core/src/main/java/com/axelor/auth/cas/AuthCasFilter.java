@@ -19,14 +19,13 @@ package com.axelor.auth.cas;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.apache.shiro.cas.CasFilter;
 
 public class AuthCasFilter extends CasFilter {
 
-	@Inject
-	@Override
-	public void setFailureUrl(@Named("shiro.cas.failure.url") String failureUrl) {
-		super.setFailureUrl(failureUrl);
-	}
+  @Inject
+  @Override
+  public void setFailureUrl(@Named("shiro.cas.failure.url") String failureUrl) {
+    super.setFailureUrl(failureUrl);
+  }
 }

@@ -17,631 +17,631 @@
  */
 /**
  * Application Module
- * 
+ *
  */
 (function() {
 
-	"use strict";
-	
-	var loadingElem = null,
-		loadingTimer = null,
-		loadingCounter = 0;
-	
-	function updateLoadingCounter(val) {
-		loadingCounter += val;
-		loadingCounter = Math.max(0, loadingCounter);
-	}
-	
-	function hideLoading() {
-		if (loadingTimer) {
-			clearTimeout(loadingTimer);
-			loadingTimer = null;
-		}
-		if (loadingCounter > 0) {
-			loadingTimer = _.delay(hideLoading, 500);
-			return;
-		}
-		loadingTimer = _.delay(function () {
-			loadingTimer = null;
-			if (loadingElem) {
-				loadingElem.fadeOut(100);
-			}
-		}, 500);
-	}
+  "use strict";
 
-	function onHttpStart(data, headersGetter) {
-	
-		updateLoadingCounter(1);
-		
-		if (loadingTimer) {
-			clearTimeout(loadingTimer);
-			loadingTimer = null;
-		}
-		
-		if (loadingElem === null) {
-			loadingElem = $('<div><span class="label label-important loading-counter">' + _t('Loading') + '...</span></div>')
-				.css({
-					position: 'fixed',
-					top: 0,
-					width: '100%',
-					'text-align': 'center',
-					'z-index': 2000
-				}).appendTo('body');
-		}
-		loadingElem.show();
-		return data;
-	}
-	
-	function onHttpStop() {
-		updateLoadingCounter(-1);
-		hideLoading();
-	}
+  var loadingElem = null,
+    loadingTimer = null,
+    loadingCounter = 0;
 
-	axelor.$evalScope = function (scope) {
+  function updateLoadingCounter(val) {
+    loadingCounter += val;
+    loadingCounter = Math.max(0, loadingCounter);
+  }
 
-		var evalScope = scope.$new(true);
-		
-		function isValid(name) {
-			if (!name) {
-				if (_.isFunction(scope.isValid)) {
-					return scope.isValid();
-				}
-				return scope.isValid === undefined || scope.isValid;
-			}
-		
-			var ctrl = scope.form;
-			if (ctrl) {
-				ctrl = ctrl[name];
-			}
-			if (ctrl) {
-				return ctrl.$valid;
-			}
-			return true;
-		}
+  function hideLoading() {
+    if (loadingTimer) {
+      clearTimeout(loadingTimer);
+      loadingTimer = null;
+    }
+    if (loadingCounter > 0) {
+      loadingTimer = _.delay(hideLoading, 500);
+      return;
+    }
+    loadingTimer = _.delay(function () {
+      loadingTimer = null;
+      if (loadingElem) {
+        loadingElem.fadeOut(100);
+      }
+    }, 500);
+  }
 
-		evalScope.$get = function(n) {
-			var context = this.$context || this.record || {};
-			if (context.hasOwnProperty(n)) {
-				return context[n];
-			}
-			return evalScope.$eval(n, context);
-		};
-		evalScope.$moment = function(d) { return moment(d); };		// moment.js helper
-		evalScope.$number = function(d) { return +d; };				// number helper
-		evalScope.$popup = function() { return scope._isPopup; };	// popup detect
-		evalScope.$iif = function(c, t, f) {
-			console.warn('Use ternary operator instead of $iif() helper.');
-			return c ? t : f;
-		};
+  function onHttpStart(data, headersGetter) {
 
-		evalScope.$sum = function (items, field, operation, field2) {
-			var total = 0;
-			if (items && items.length) {
-				items.forEach(function (item) {
-					var value = 0;
-					var value2 = 0;
-					if (field in item) {
-						value = +(item[field] || 0);
-					}
-					if (operation && field2 && field2 in item) {
-						value2 = +(item[field2] || 0);
-						switch (operation) {
-						case '*':
-							value = value * value2;
-							break;
-						case '/':
-							value = value2 ? value / value2 : value;
-							break;
-						case '+':
-							value = value + value2;
-							break;
-						case '-':
-							value = value - value2;
-							break;
-						}
-					}
-					if (value) {
-						total += value;
-					}
-				});
-			}
-			return total;
-		};
+    updateLoadingCounter(1);
 
-		// current user and group
-		evalScope.$user = axelor.config['user.login'];
-		evalScope.$group = axelor.config['user.group'];
-		evalScope.$userId = axelor.config['user.id'];
+    if (loadingTimer) {
+      clearTimeout(loadingTimer);
+      loadingTimer = null;
+    }
 
-		evalScope.$contains = function(iter, item) {
-			if (iter && iter.indexOf)
-				return iter.indexOf(item) > -1;
-			return false;
-		};
+    if (loadingElem === null) {
+      loadingElem = $('<div><span class="label label-important loading-counter">' + _t('Loading') + '...</span></div>')
+        .css({
+          position: 'fixed',
+          top: 0,
+          width: '100%',
+          'text-align': 'center',
+          'z-index': 2000
+        }).appendTo('body');
+    }
+    loadingElem.show();
+    return data;
+  }
 
-		// access json field values
-		evalScope.$json = function (name) {
-			var value = (scope.record || {})[name];
-			if (value) {
-				return angular.fromJson(value);
-			}
-		}
+  function onHttpStop() {
+    updateLoadingCounter(-1);
+    hideLoading();
+  }
 
-		evalScope.$readonly = scope.isReadonly ? _.bind(scope.isReadonly, scope) : angular.noop;
-		evalScope.$required = scope.isRequired ? _.bind(scope.isRequired, scope) : angular.noop;
+  axelor.$evalScope = function (scope) {
 
-		evalScope.$valid = function(name) {
-			return isValid(scope, name);
-		};
+    var evalScope = scope.$new(true);
 
-		evalScope.$invalid = function(name) {
-			return !isValid(scope, name);
-		};
+    function isValid(name) {
+      if (!name) {
+        if (_.isFunction(scope.isValid)) {
+          return scope.isValid();
+        }
+        return scope.isValid === undefined || scope.isValid;
+      }
 
-		return evalScope;
-	};
+      var ctrl = scope.form;
+      if (ctrl) {
+        ctrl = ctrl[name];
+      }
+      if (ctrl) {
+        return ctrl.$valid;
+      }
+      return true;
+    }
 
-	axelor.$eval = function (scope, expr, context) {
-		if (!scope || !expr) {
-			return null;
-		}
+    evalScope.$get = function(n) {
+      var context = this.$context || this.record || {};
+      if (context.hasOwnProperty(n)) {
+        return context[n];
+      }
+      return evalScope.$eval(n, context);
+    };
+    evalScope.$moment = function(d) { return moment(d); };		// moment.js helper
+    evalScope.$number = function(d) { return +d; };				// number helper
+    evalScope.$popup = function() { return scope._isPopup; };	// popup detect
+    evalScope.$iif = function(c, t, f) {
+      console.warn('Use ternary operator instead of $iif() helper.');
+      return c ? t : f;
+    };
 
-		var evalScope = axelor.$evalScope(scope);
-		evalScope.$context = context;
-		try {
-			return evalScope.$eval(expr, context);
-		} finally {
-			evalScope.$destroy();
-			evalScope = null;
-		}
-	};
+    evalScope.$sum = function (items, field, operation, field2) {
+      var total = 0;
+      if (items && items.length) {
+        items.forEach(function (item) {
+          var value = 0;
+          var value2 = 0;
+          if (field in item) {
+            value = +(item[field] || 0);
+          }
+          if (operation && field2 && field2 in item) {
+            value2 = +(item[field2] || 0);
+            switch (operation) {
+            case '*':
+              value = value * value2;
+              break;
+            case '/':
+              value = value2 ? value / value2 : value;
+              break;
+            case '+':
+              value = value + value2;
+              break;
+            case '-':
+              value = value - value2;
+              break;
+            }
+          }
+          if (value) {
+            total += value;
+          }
+        });
+      }
+      return total;
+    };
 
-	axelor.$adjustSize = _.debounce(function () {
-		$(document).trigger('adjust:size');
-	}, 100);
+    // current user and group
+    evalScope.$user = axelor.config['user.login'];
+    evalScope.$group = axelor.config['user.group'];
+    evalScope.$userId = axelor.config['user.id'];
 
-	var module = angular.module('axelor.app', ['axelor.ng', 'axelor.ds', 'axelor.ui', 'axelor.auth']);
-	
-	module.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
-		var tabResource = {
-			action: 'main.tab',
-			controller: 'TabCtrl',
-			template: "<span><!-- dummy template --></span>"
-		};
-		
-		$routeProvider
-		
-		.when('/preferences', { action: 'preferences' })
-		.when('/about', { action: 'about' })
-		.when('/system', { action: 'system' })
-		.when('/', { action: 'main' })
+    evalScope.$contains = function(iter, item) {
+      if (iter && iter.indexOf)
+        return iter.indexOf(item) > -1;
+      return false;
+    };
 
-		.when('/ds/:resource', tabResource)
-		.when('/ds/:resource/:mode', tabResource)
-		.when('/ds/:resource/:mode/:state', tabResource)
+    // access json field values
+    evalScope.$json = function (name) {
+      var value = (scope.record || {})[name];
+      if (value) {
+        return angular.fromJson(value);
+      }
+    }
 
-		.otherwise({ redirectTo: '/' });
-	}]);
-	
-	module.config(['$httpProvider', function(provider) {
+    evalScope.$readonly = scope.isReadonly ? _.bind(scope.isReadonly, scope) : angular.noop;
+    evalScope.$required = scope.isRequired ? _.bind(scope.isRequired, scope) : angular.noop;
 
-		provider.useApplyAsync(true);
+    evalScope.$valid = function(name) {
+      return isValid(scope, name);
+    };
 
-		var toString = Object.prototype.toString;
+    evalScope.$invalid = function(name) {
+      return !isValid(scope, name);
+    };
 
-		function isFile(obj) {
-			return toString.call(obj) === '[object File]';
-		}
+    return evalScope;
+  };
 
-		function isFormData(obj) {
-			return toString.call(obj) === '[object FormData]';
-		}
+  axelor.$eval = function (scope, expr, context) {
+    if (!scope || !expr) {
+      return null;
+    }
 
-		function isBlob(obj) {
-			return toString.call(obj) === '[object Blob]';
-		}
+    var evalScope = axelor.$evalScope(scope);
+    evalScope.$context = context;
+    try {
+      return evalScope.$eval(expr, context);
+    } finally {
+      evalScope.$destroy();
+      evalScope = null;
+    }
+  };
 
-		// restore old behavior
-		// breaking change (https://github.com/angular/angular.js/commit/c054288c9722875e3595e6e6162193e0fb67a251)
-		function jsonReplacer(key, value) {
-			if (typeof key === 'string' && key.charAt(0) === '$') {
-				return undefined;
-			}
-			return value;
-		}
+  axelor.$adjustSize = _.debounce(function () {
+    $(document).trigger('adjust:size');
+  }, 100);
 
-		function transformRequest(d) {
-			return angular.isObject(d) && !isFile(d) && !isBlob(d) && !isFormData(d) ? JSON.stringify(d, jsonReplacer) : d;
-	    }
+  var module = angular.module('axelor.app', ['axelor.ng', 'axelor.ds', 'axelor.ui', 'axelor.auth']);
 
-		provider.interceptors.push('httpIndicator');
-		provider.defaults.transformRequest.push(onHttpStart);
-		provider.defaults.transformRequest.unshift(transformRequest);
-		provider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
-		provider.useApplyAsync(true);
-	}]);
+  module.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
+    var tabResource = {
+      action: 'main.tab',
+      controller: 'TabCtrl',
+      template: "<span><!-- dummy template --></span>"
+    };
 
-	// only enable animation on element with ng-animate css class
-	module.config(['$animateProvider', function($animateProvider) {
+    $routeProvider
+
+    .when('/preferences', { action: 'preferences' })
+    .when('/about', { action: 'about' })
+    .when('/system', { action: 'system' })
+    .when('/', { action: 'main' })
+
+    .when('/ds/:resource', tabResource)
+    .when('/ds/:resource/:mode', tabResource)
+    .when('/ds/:resource/:mode/:state', tabResource)
+
+    .otherwise({ redirectTo: '/' });
+  }]);
+
+  module.config(['$httpProvider', function(provider) {
+
+    provider.useApplyAsync(true);
+
+    var toString = Object.prototype.toString;
+
+    function isFile(obj) {
+      return toString.call(obj) === '[object File]';
+    }
+
+    function isFormData(obj) {
+      return toString.call(obj) === '[object FormData]';
+    }
+
+    function isBlob(obj) {
+      return toString.call(obj) === '[object Blob]';
+    }
+
+    // restore old behavior
+    // breaking change (https://github.com/angular/angular.js/commit/c054288c9722875e3595e6e6162193e0fb67a251)
+    function jsonReplacer(key, value) {
+      if (typeof key === 'string' && key.charAt(0) === '$') {
+        return undefined;
+      }
+      return value;
+    }
+
+    function transformRequest(d) {
+      return angular.isObject(d) && !isFile(d) && !isBlob(d) && !isFormData(d) ? JSON.stringify(d, jsonReplacer) : d;
+      }
+
+    provider.interceptors.push('httpIndicator');
+    provider.defaults.transformRequest.push(onHttpStart);
+    provider.defaults.transformRequest.unshift(transformRequest);
+    provider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
+    provider.useApplyAsync(true);
+  }]);
+
+  // only enable animation on element with ng-animate css class
+  module.config(['$animateProvider', function($animateProvider) {
         $animateProvider.classNameFilter(/x-animate/);
     }]);
 
-	module.factory('httpIndicator', ['$rootScope', '$q', function($rootScope, $q){
-		
-		var doc = $(document);
-		var body = $('body');
-		var blocker = $('<div class="blocker-overlay"></div>')
-			.appendTo('body')
-			.hide()
-			.css({
-				position: 'absolute',
-				zIndex: 100000,
-				width: '100%', height: '100%'
-			});
-		
-		var spinner = $('<div class="blocker-wait"></div>')
-			.append('<div class="blocker-spinner"><i class="fa fa-spinner fa-spin"></div>')
-			.append('<div class="blocker-message">' + _t('Please wait...') + '</div>')
-			.appendTo(blocker);
+  module.factory('httpIndicator', ['$rootScope', '$q', function($rootScope, $q){
 
-		var blocked = false;
-		var blockedCounter = 0;
-		var blockedTimer = null;
-		var spinnerTime = 0;
+    var doc = $(document);
+    var body = $('body');
+    var blocker = $('<div class="blocker-overlay"></div>')
+      .appendTo('body')
+      .hide()
+      .css({
+        position: 'absolute',
+        zIndex: 100000,
+        width: '100%', height: '100%'
+      });
 
-		function block(callback) {
-			if (blocked) return true;
-			if (blockedTimer) { clearTimeout(blockedTimer); blockedTimer = null; }
-			if (loadingCounter > 0 || blockedCounter > 0) {
-				blocked = true;
-				doc.on("keydown.blockui mousedown.blockui", function(e) {
-					if ($('#loginWindow').is(':visible')) {
-						return;
-					}
-					e.preventDefault();
-					e.stopPropagation();
-				});
-				body.css("cursor", "wait");
-				blocker.show();
-			}
-			unblock(callback);
-			return blocked;
-		}
+    var spinner = $('<div class="blocker-wait"></div>')
+      .append('<div class="blocker-spinner"><i class="fa fa-spinner fa-spin"></div>')
+      .append('<div class="blocker-message">' + _t('Please wait...') + '</div>')
+      .appendTo(blocker);
 
-		function unblock(callback) {
-			if (blockedTimer) { clearTimeout(blockedTimer); blockedTimer = null; }
-			if (loadingCounter > 0 || blockedCounter > 0 || loadingTimer) {
-				if (spinnerTime === 0) {
-					spinnerTime = moment();
-				}
-				// show spinner after 5 seconds
-				if (moment().diff(spinnerTime, "seconds") > 5) {
-					blocker.addClass('wait');
-				}
-				if (blockedCounter > 0) {
-					blockedCounter = blockedCounter - 10;
-				}
-				blockedTimer = _.delay(unblock, 200, callback);
-				return;
-			}
-			doc.off("keydown.blockui mousedown.blockui");
-			body.css("cursor", "");
-			blocker.removeClass('wait').hide();
-			spinnerTime = 0;
-			if (callback) {
-				callback(blocked);
-			}
-			blocked = false;
-		}
+    var blocked = false;
+    var blockedCounter = 0;
+    var blockedTimer = null;
+    var spinnerTime = 0;
 
-		axelor.blockUI = function(callback, minimum) {
-			if (minimum && minimum > blockedCounter) {
-				blockedCounter = Math.max(0, blockedCounter);
-				blockedCounter = Math.max(minimum, blockedCounter);
-			}
-			return block(callback);
-		};
+    function block(callback) {
+      if (blocked) return true;
+      if (blockedTimer) { clearTimeout(blockedTimer); blockedTimer = null; }
+      if (loadingCounter > 0 || blockedCounter > 0) {
+        blocked = true;
+        doc.on("keydown.blockui mousedown.blockui", function(e) {
+          if ($('#loginWindow').is(':visible')) {
+            return;
+          }
+          e.preventDefault();
+          e.stopPropagation();
+        });
+        body.css("cursor", "wait");
+        blocker.show();
+      }
+      unblock(callback);
+      return blocked;
+    }
 
-		axelor.unblockUI = function() {
-			return unblock();
-		};
+    function unblock(callback) {
+      if (blockedTimer) { clearTimeout(blockedTimer); blockedTimer = null; }
+      if (loadingCounter > 0 || blockedCounter > 0 || loadingTimer) {
+        if (spinnerTime === 0) {
+          spinnerTime = moment();
+        }
+        // show spinner after 5 seconds
+        if (moment().diff(spinnerTime, "seconds") > 5) {
+          blocker.addClass('wait');
+        }
+        if (blockedCounter > 0) {
+          blockedCounter = blockedCounter - 10;
+        }
+        blockedTimer = _.delay(unblock, 200, callback);
+        return;
+      }
+      doc.off("keydown.blockui mousedown.blockui");
+      body.css("cursor", "");
+      blocker.removeClass('wait').hide();
+      spinnerTime = 0;
+      if (callback) {
+        callback(blocked);
+      }
+      blocked = false;
+    }
 
-		return {
-			response: function(response) {
-				if (!response.config || !response.config.silent) {
-					onHttpStop();
-				}
-				if (response.data && response.data.status === -1) {
-					$rootScope.$broadcast('event:http-error', response.data);
-					return $q.reject(response);
-				}
-				return response;
-			},
-			responseError: function(error) {
-				onHttpStop();
-				$rootScope.$broadcast('event:http-error', error);
-				return $q.reject(error);
-			}
-		};
-	}]);
+    axelor.blockUI = function(callback, minimum) {
+      if (minimum && minimum > blockedCounter) {
+        blockedCounter = Math.max(0, blockedCounter);
+        blockedCounter = Math.max(minimum, blockedCounter);
+      }
+      return block(callback);
+    };
 
-	module.filter('unaccent', function() {
-		var source = 'ąàáäâãåæăćčĉęèéëêĝĥìíïîĵłľńňòóöőôõðøśșşšŝťțţŭùúüűûñÿýçżźž';
-		var target = 'aaaaaaaaaccceeeeeghiiiijllnnoooooooossssstttuuuuuunyyczzz';
+    axelor.unblockUI = function() {
+      return unblock();
+    };
 
-		source += source.toUpperCase();
-		target += target.toUpperCase();
+    return {
+      response: function(response) {
+        if (!response.config || !response.config.silent) {
+          onHttpStop();
+        }
+        if (response.data && response.data.status === -1) {
+          $rootScope.$broadcast('event:http-error', response.data);
+          return $q.reject(response);
+        }
+        return response;
+      },
+      responseError: function(error) {
+        onHttpStop();
+        $rootScope.$broadcast('event:http-error', error);
+        return $q.reject(error);
+      }
+    };
+  }]);
 
-		var unaccent = function (text) {
-			return typeof(text) !== 'string' ? text : text.replace(/.{1}/g, function(c) {
-				var i = source.indexOf(c);
-				return i === -1 ? c : target[i];
-			});
-		};
-		return function(input) {
-			return unaccent(input);
-		};
-	});
+  module.filter('unaccent', function() {
+    var source = 'ąàáäâãåæăćčĉęèéëêĝĥìíïîĵłľńňòóöőôõðøśșşšŝťțţŭùúüűûñÿýçżźž';
+    var target = 'aaaaaaaaaccceeeeeghiiiijllnnoooooooossssstttuuuuuunyyczzz';
 
-	module.filter('t', function(){
-		return function(input) {
-			var t = _t || angular.nop;
-			return t(input);
-		};
-	});
-	
-	module.directive('translate', function(){
-		return function(scope, element, attrs) {
-			var t = _t || angular.nop;
-			setTimeout(function(){
-				element.text(t(element.text()));
-			});
-		};
-	});
-	
-	module.controller('AppCtrl', AppCtrl);
-	
-	AppCtrl.$inject = ['$rootScope', '$exceptionHandler', '$scope', '$http', '$route', 'authService', 'MessageService', 'NavService'];
-	function AppCtrl($rootScope, $exceptionHandler, $scope, $http, $route, authService, MessageService, NavService) {
+    source += source.toUpperCase();
+    target += target.toUpperCase();
 
-		function fetchConfig() {
-			return $http.get('ws/app/info').then(function(response) {
-				var config = _.extend(axelor.config, response.data);
-				$scope.$user.id = config["user.id"];
-				$scope.$user.name = config["user.name"];
-				$scope.$user.image = config["user.image"];
-				config.DEV = config['application.mode'] == 'dev';
-				config.PROD = config['application.mode'] == 'prod'
-			});
-		}
+    var unaccent = function (text) {
+      return typeof(text) !== 'string' ? text : text.replace(/.{1}/g, function(c) {
+        var i = source.indexOf(c);
+        return i === -1 ? c : target[i];
+      });
+    };
+    return function(input) {
+      return unaccent(input);
+    };
+  });
 
-		function openHomeTab() {
-			var path = $scope.routePath;
-			var homeAction = axelor.config["user.action"];
-			if (!homeAction || _.last(path) !== "main") {
-				return;
-			}
-			NavService.openTabByName(homeAction, {
-				__tab_prepend: true,
-				__tab_closable: false
-			});
-		}
+  module.filter('t', function(){
+    return function(input) {
+      var t = _t || angular.nop;
+      return t(input);
+    };
+  });
 
-		// load app config
-		fetchConfig().then(function () {
-			openHomeTab();
-		});
+  module.directive('translate', function(){
+    return function(scope, element, attrs) {
+      var t = _t || angular.nop;
+      setTimeout(function(){
+        element.text(t(element.text()));
+      });
+    };
+  });
 
-		$scope.$user = {};
-		$scope.$year = moment().year();
-		$scope.openHomeTab = openHomeTab;
-		$scope.$unreadMailCount = function () {
-			return MessageService.unreadCount();
-		};
+  module.controller('AppCtrl', AppCtrl);
 
-		$scope.showMailBox = function() {
-			NavService.openTabByName('mail.unread');
-			$scope.$timeout(function () {
-				$scope.$broadcast("on:nav-click", NavService.getSelected());
-			});
-		};
+  AppCtrl.$inject = ['$rootScope', '$exceptionHandler', '$scope', '$http', '$route', 'authService', 'MessageService', 'NavService'];
+  function AppCtrl($rootScope, $exceptionHandler, $scope, $http, $route, authService, MessageService, NavService) {
 
-		var loginAttempts = 0;
-		var loginWindow = null;
-		var errorWindow = null;
-		
-		function showLogin(hide) {
-			
-			if (loginWindow === null) {
-				loginWindow = $('#loginWindow')
-				.attr('title', _t('Log in'))
-				.dialog({
-					dialogClass: 'no-close ui-dialog-responsive ui-dialog-small',
-					autoOpen: false,
-					modal: true,
-					position: "center",
-					width: "auto",
-					resizable: false,
-					closeOnEscape: false,
-					zIndex: 100001,
-					show: {
-						effect: 'fade',
-						duration: 300
-					},
-					buttons: [{
-						text: _t("Log in"),
-						'class': 'btn btn-primary',
-						click: function(){
-							$scope.doLogin();
-						}
-					}]
-				});
-		
-				$('#loginWindow input').keypress(function(event){
-					if (event.keyCode === 13)
-						$scope.doLogin();
-				});
-			}
-			return loginWindow.dialog(hide ? 'close' : 'open').height('auto');
-		}
-	
-		function showError(hide) {
-			if (errorWindow === null) {
-				errorWindow = $('#errorWindow')
-				.attr('title', _t('Error'))
-				.dialog({
-					dialogClass: 'ui-dialog-error ui-dialog-responsive',
-					draggable: true,
-					resizable: false,
-					closeOnEscape: true,
-					modal: true,
-					zIndex: 1100,
-					width: 420,
-					close: function() {
-						$scope.httpError = {};
-						$scope.$applyAsync();
-					},
-					show: {
-						effect: 'fade',
-						duration: 300
-					},
-					buttons: [{
-						text: _t("Show Details"),
-						'class': 'btn',
-						click: function(){
-							var elem = $(this);
-							$scope.onErrorWindowShow('stacktrace');
-							$scope.$applyAsync(function () {
-								setTimeout(function () {
-									var maxHeight = $(document).height() - 132;
-									var height = maxHeight;
-									if (height > elem[0].scrollHeight) {
-										height = elem[0].scrollHeight + 8;
-									}
-									elem.height(height);
-									elem.dialog('option', 'position', 'center');
-									elem.dialog('widget').height(elem.dialog('widget').height());
-								}, 100);
-							});
-						}
-					}, {
-						text: _t("Close"),
-						'class': 'btn btn-primary',
-						click: function() {
-							errorWindow.dialog('close');
-						}
-					}]
-				});
-			}
-			
-			return errorWindow
-				.dialog(hide ? 'close' : 'open')
-				.dialog('widget').css('top', 6)
-				.height('auto');
-		}
+    function fetchConfig() {
+      return $http.get('ws/app/info').then(function(response) {
+        var config = _.extend(axelor.config, response.data);
+        $scope.$user.id = config["user.id"];
+        $scope.$user.name = config["user.name"];
+        $scope.$user.image = config["user.image"];
+        config.DEV = config['application.mode'] == 'dev';
+        config.PROD = config['application.mode'] == 'prod'
+      });
+    }
 
-		function showNotification(options) {
-			axelor.notify.error('<p>' + options.message.replace('\n', '<br>') + '</p>', {
-				title: options.title || options.type || _t('Error')
-			});
-		}
-	
-		$scope.doLogin = function() {
-			
-			var data = {
-				username: $('#loginWindow form input:first').val(),
-				password: $('#loginWindow form input:last').val()
-			};
+    function openHomeTab() {
+      var path = $scope.routePath;
+      var homeAction = axelor.config["user.action"];
+      if (!homeAction || _.last(path) !== "main") {
+        return;
+      }
+      NavService.openTabByName(homeAction, {
+        __tab_prepend: true,
+        __tab_closable: false
+      });
+    }
 
-			var last = axelor.config["user.login"];
+    // load app config
+    fetchConfig().then(function () {
+      openHomeTab();
+    });
 
-			$http.post('login.jsp', data).then(function(response){
-				authService.loginConfirmed();
-				$('#loginWindow form input').val('');
-				$('#loginWindow .alert').hide();
-				if (last !== data.username) {
-					window.location.reload();
-				}
-			});
-		};
-		
-		$scope.$on('event:auth-loginRequired', function(event, status) {
-			$('#loginWindow .alert').hide();
-			showLogin();
-			if (loginAttempts++ > 0)
-				$('#loginWindow .alert.login-failed').show();
-			if (status === 0 || status === 502)
-		       $('#loginWindow .alert.login-offline').show();
-			setTimeout(function(){
-				$('#loginWindow input:first').focus();
-			}, 300);
-		});
-		$scope.$on('event:auth-loginConfirmed', function() {
-			showLogin(true);
-			loginAttempts = 0;
-			fetchConfig();
-		});
-		
-		$scope.httpError = {};
-		$scope.$on('event:http-error', function(event, data) {
-			var message = _t("Internal Server Error"),
-				report = data.data || data, stacktrace = null, cause = null, exception;
-			
-			if (report.popup && report.message) {
-				return axelor.dialogs.box(report.message, {
-					title: report.title
-				});
-			} else if (report.stacktrace) {
-				message = report.message || report.string;
-				exception = report['class'] || '';
-				
-				if (exception.match(/(OptimisticLockException|StaleObjectStateException)/)) {
-					message = "<b>" + _t('Concurrent updates error') + '</b><br>' + message;
-				}
-	
-				stacktrace = report.stacktrace;
-				cause = report.cause;
-			} else if (report.message) {
-				return showNotification(report);
-			} else if (_.isString(report)) {
-				stacktrace = report.replace(/.*<body>|<\/body>.*/g, '');
-			} else {
-				return; // no error report, so ignore
-			}
-			_.extend($scope.httpError, {
-				message: message,
-				stacktrace: stacktrace,
-				cause: cause
-			});
-			showError();
-		});
-		$scope.onErrorWindowShow = function(what) {
-			$scope.httpError.show = what;
-		};
-		
-		$scope.$on('$routeChangeSuccess', function(event, current, prev) {
-	
-			var route = current.$$route,
-				path = route && route.action ? route.action.split('.') : null;
-	
-			if (path) {
-				$scope.routePath = path;
-			}
-		});
-		
-		$scope.routePath = ["main"];
-		$route.reload();
-	}
+    $scope.$user = {};
+    $scope.$year = moment().year();
+    $scope.openHomeTab = openHomeTab;
+    $scope.$unreadMailCount = function () {
+      return MessageService.unreadCount();
+    };
+
+    $scope.showMailBox = function() {
+      NavService.openTabByName('mail.unread');
+      $scope.$timeout(function () {
+        $scope.$broadcast("on:nav-click", NavService.getSelected());
+      });
+    };
+
+    var loginAttempts = 0;
+    var loginWindow = null;
+    var errorWindow = null;
+
+    function showLogin(hide) {
+
+      if (loginWindow === null) {
+        loginWindow = $('#loginWindow')
+        .attr('title', _t('Log in'))
+        .dialog({
+          dialogClass: 'no-close ui-dialog-responsive ui-dialog-small',
+          autoOpen: false,
+          modal: true,
+          position: "center",
+          width: "auto",
+          resizable: false,
+          closeOnEscape: false,
+          zIndex: 100001,
+          show: {
+            effect: 'fade',
+            duration: 300
+          },
+          buttons: [{
+            text: _t("Log in"),
+            'class': 'btn btn-primary',
+            click: function(){
+              $scope.doLogin();
+            }
+          }]
+        });
+
+        $('#loginWindow input').keypress(function(event){
+          if (event.keyCode === 13)
+            $scope.doLogin();
+        });
+      }
+      return loginWindow.dialog(hide ? 'close' : 'open').height('auto');
+    }
+
+    function showError(hide) {
+      if (errorWindow === null) {
+        errorWindow = $('#errorWindow')
+        .attr('title', _t('Error'))
+        .dialog({
+          dialogClass: 'ui-dialog-error ui-dialog-responsive',
+          draggable: true,
+          resizable: false,
+          closeOnEscape: true,
+          modal: true,
+          zIndex: 1100,
+          width: 420,
+          close: function() {
+            $scope.httpError = {};
+            $scope.$applyAsync();
+          },
+          show: {
+            effect: 'fade',
+            duration: 300
+          },
+          buttons: [{
+            text: _t("Show Details"),
+            'class': 'btn',
+            click: function(){
+              var elem = $(this);
+              $scope.onErrorWindowShow('stacktrace');
+              $scope.$applyAsync(function () {
+                setTimeout(function () {
+                  var maxHeight = $(document).height() - 132;
+                  var height = maxHeight;
+                  if (height > elem[0].scrollHeight) {
+                    height = elem[0].scrollHeight + 8;
+                  }
+                  elem.height(height);
+                  elem.dialog('option', 'position', 'center');
+                  elem.dialog('widget').height(elem.dialog('widget').height());
+                }, 100);
+              });
+            }
+          }, {
+            text: _t("Close"),
+            'class': 'btn btn-primary',
+            click: function() {
+              errorWindow.dialog('close');
+            }
+          }]
+        });
+      }
+
+      return errorWindow
+        .dialog(hide ? 'close' : 'open')
+        .dialog('widget').css('top', 6)
+        .height('auto');
+    }
+
+    function showNotification(options) {
+      axelor.notify.error('<p>' + options.message.replace('\n', '<br>') + '</p>', {
+        title: options.title || options.type || _t('Error')
+      });
+    }
+
+    $scope.doLogin = function() {
+
+      var data = {
+        username: $('#loginWindow form input:first').val(),
+        password: $('#loginWindow form input:last').val()
+      };
+
+      var last = axelor.config["user.login"];
+
+      $http.post('login.jsp', data).then(function(response){
+        authService.loginConfirmed();
+        $('#loginWindow form input').val('');
+        $('#loginWindow .alert').hide();
+        if (last !== data.username) {
+          window.location.reload();
+        }
+      });
+    };
+
+    $scope.$on('event:auth-loginRequired', function(event, status) {
+      $('#loginWindow .alert').hide();
+      showLogin();
+      if (loginAttempts++ > 0)
+        $('#loginWindow .alert.login-failed').show();
+      if (status === 0 || status === 502)
+           $('#loginWindow .alert.login-offline').show();
+      setTimeout(function(){
+        $('#loginWindow input:first').focus();
+      }, 300);
+    });
+    $scope.$on('event:auth-loginConfirmed', function() {
+      showLogin(true);
+      loginAttempts = 0;
+      fetchConfig();
+    });
+
+    $scope.httpError = {};
+    $scope.$on('event:http-error', function(event, data) {
+      var message = _t("Internal Server Error"),
+        report = data.data || data, stacktrace = null, cause = null, exception;
+
+      if (report.popup && report.message) {
+        return axelor.dialogs.box(report.message, {
+          title: report.title
+        });
+      } else if (report.stacktrace) {
+        message = report.message || report.string;
+        exception = report['class'] || '';
+
+        if (exception.match(/(OptimisticLockException|StaleObjectStateException)/)) {
+          message = "<b>" + _t('Concurrent updates error') + '</b><br>' + message;
+        }
+
+        stacktrace = report.stacktrace;
+        cause = report.cause;
+      } else if (report.message) {
+        return showNotification(report);
+      } else if (_.isString(report)) {
+        stacktrace = report.replace(/.*<body>|<\/body>.*/g, '');
+      } else {
+        return; // no error report, so ignore
+      }
+      _.extend($scope.httpError, {
+        message: message,
+        stacktrace: stacktrace,
+        cause: cause
+      });
+      showError();
+    });
+    $scope.onErrorWindowShow = function(what) {
+      $scope.httpError.show = what;
+    };
+
+    $scope.$on('$routeChangeSuccess', function(event, current, prev) {
+
+      var route = current.$$route,
+        path = route && route.action ? route.action.split('.') : null;
+
+      if (path) {
+        $scope.routePath = path;
+      }
+    });
+
+    $scope.routePath = ["main"];
+    $route.reload();
+  }
 
     //trigger adjustSize event on window resize -->
-	$(function(){
-		$(window).resize(function(event){
-			if (!event.isTrigger) {
-				$(document).trigger('adjust:size');
-			}
-			$('body').toggleClass('device-small', axelor.device.small);
-			$('body').toggleClass('device-mobile', axelor.device.mobile);
-		});
-	});
+  $(function(){
+    $(window).resize(function(event){
+      if (!event.isTrigger) {
+        $(document).trigger('adjust:size');
+      }
+      $('body').toggleClass('device-small', axelor.device.small);
+      $('body').toggleClass('device-mobile', axelor.device.mobile);
+    });
+  });
 
 })();

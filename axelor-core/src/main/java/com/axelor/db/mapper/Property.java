@@ -17,6 +17,17 @@
  */
 package com.axelor.db.mapper;
 
+import com.axelor.common.Inflector;
+import com.axelor.db.Model;
+import com.axelor.db.annotations.HashKey;
+import com.axelor.db.annotations.NameColumn;
+import com.axelor.db.annotations.Sequence;
+import com.axelor.db.annotations.VirtualColumn;
+import com.axelor.db.annotations.Widget;
+import com.axelor.db.converters.AbstractEncryptedConverter;
+import com.axelor.i18n.I18n;
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -32,7 +43,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Id;
@@ -51,746 +61,712 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.axelor.common.Inflector;
-import com.axelor.db.Model;
-import com.axelor.db.annotations.HashKey;
-import com.axelor.db.annotations.NameColumn;
-import com.axelor.db.annotations.Sequence;
-import com.axelor.db.annotations.VirtualColumn;
-import com.axelor.db.annotations.Widget;
-import com.axelor.db.converters.AbstractEncryptedConverter;
-import com.axelor.i18n.I18n;
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-
 public class Property {
 
-	private transient Class<?> entity;
+  private transient Class<?> entity;
 
-	private String name;
+  private String name;
 
-	private PropertyType type;
+  private PropertyType type;
 
-	private transient Class<?> javaType;
+  private transient Class<?> javaType;
 
-	private transient Type genericType;
+  private transient Type genericType;
 
-	private String mappedBy;
+  private String mappedBy;
 
-	private Class<?> target;
+  private Class<?> target;
 
-	private String targetName;
+  private String targetName;
 
-	private List<String> targetSearch;
-	
-	private Class<?> enumType;
-	
-	private boolean primary;
+  private List<String> targetSearch;
 
-	private boolean required;
+  private Class<?> enumType;
 
-	private boolean unique;
+  private boolean primary;
 
-	private boolean orphan;
+  private boolean required;
 
-	private transient boolean hashKey;
+  private boolean unique;
 
-	private transient boolean copyable;
+  private boolean orphan;
 
-	private Object maxSize;
+  private transient boolean hashKey;
 
-	private Object minSize;
+  private transient boolean copyable;
 
-	private int precision;
+  private Object maxSize;
 
-	private int scale;
+  private Object minSize;
 
-	private String title;
+  private int precision;
 
-	private String help;
+  private int scale;
 
-	private boolean image;
+  private String title;
 
-	private boolean nullable;
+  private String help;
 
-	private boolean readonly;
+  private boolean image;
 
-	private boolean hidden;
+  private boolean nullable;
 
-	private boolean virtual;
-	
-	private boolean transient_;
-	
-	private boolean json;
+  private boolean readonly;
 
-	private boolean password;
+  private boolean hidden;
 
-	private boolean massUpdate;
+  private boolean virtual;
 
-	private boolean nameColumn;
+  private boolean transient_;
 
-	private boolean sequence;
+  private boolean json;
 
-	private boolean translatable;
+  private boolean password;
 
-	private boolean encrypted;
+  private boolean massUpdate;
 
-	private boolean defaultNow;
+  private boolean nameColumn;
 
-	private transient String sequenceName;
+  private boolean sequence;
 
-	private String[] nameSearch;
+  private boolean translatable;
 
-	private String selection;
+  private boolean encrypted;
 
-	@SuppressWarnings("unchecked")
-	Property(Class<?> entity, String name, Class<?> javaType, Type genericType,
-			Annotation[] annotations) {
-		this.entity = entity;
-		this.name = name;
-		this.javaType = javaType;
-		this.genericType = genericType;
-		this.copyable = true;
+  private boolean defaultNow;
 
-		try {
-			this.type = PropertyType
-					.get(javaType.getSimpleName().toUpperCase());
-		} catch (Exception e) {
-		}
-		
-		if (javaType.isEnum()) {
-			type = PropertyType.ENUM;
-			enumType = javaType;
-		}
-
-		for (Annotation annotation : annotations) {
-
-			if (annotation instanceof Lob) {
-				if (type == PropertyType.STRING)
-					type = PropertyType.TEXT;
-				else if (type != PropertyType.TEXT)
-					type = PropertyType.BINARY;
-			}
-
-			if (javaType == BigDecimal.class) {
-				type = PropertyType.DECIMAL;
-			}
-
-			if (annotation instanceof OneToOne) {
-				type = PropertyType.ONE_TO_ONE;
-				target = (Class<? extends Model>) javaType;
-				mappedBy = ((OneToOne) annotation).mappedBy();
-			}
-
-			if (annotation instanceof ManyToOne) {
-				type = PropertyType.MANY_TO_ONE;
-				target = (Class<? extends Model>) javaType;
-			}
-
-			if (annotation instanceof OneToMany) {
-				type = PropertyType.ONE_TO_MANY;
-				target = (Class<? extends Model>) ((ParameterizedType) genericType)
-						.getActualTypeArguments()[0];
-				mappedBy = ((OneToMany) annotation).mappedBy();
-				orphan = !((OneToMany) annotation).orphanRemoval();
-			}
-
-			if (annotation instanceof ManyToMany) {
-				type = PropertyType.MANY_TO_MANY;
-				target = (Class<? extends Model>) ((ParameterizedType) genericType)
-						.getActualTypeArguments()[0];
-				mappedBy = ((ManyToMany) annotation).mappedBy();
-			}
-
-			if (annotation instanceof Id) {
-				primary = true;
-				readonly = true;
-				hidden = true;
-			}
-
-			if (annotation instanceof Version) {
-				readonly = true;
-				hidden = true;
-			}
-
-			if (annotation instanceof Column) {
-				unique = ((Column) annotation).unique();
-				nullable = ((Column) annotation).nullable();
-			}
-
-			// Give javax.validators precedence
-			if (annotation instanceof NotNull) {
-				required = true;
-			}
-			if (annotation instanceof Size) {
-				Size s = (Size) annotation;
-				maxSize = s.max();
-				minSize = s.min();
-			}
-			if (annotation instanceof Digits) {
-				Digits d = (Digits) annotation;
-				scale = d.fraction();
-				precision = d.integer() + scale;
-			}
-			if (annotation instanceof Min) {
-				Min m = (Min) annotation;
-				minSize = m.value();
-			}
-			if (annotation instanceof Max) {
-				Max m = (Max) annotation;
-				maxSize = m.value();
-			}
-			if (annotation instanceof DecimalMin) {
-				DecimalMin m = (DecimalMin) annotation;
-				minSize = m.value();
-			}
-			if (annotation instanceof DecimalMax) {
-				DecimalMax m = (DecimalMax) annotation;
-				maxSize = m.value();
-			}
-
-			if (annotation instanceof VirtualColumn) {
-				readonly = true;
-				virtual = true;
-			}
-
-			if (annotation instanceof NameColumn) {
-				nameColumn = true;
-			}
-			
-			if (annotation instanceof Transient) {
-				transient_ = true;
-			}
-			
-			if (annotation instanceof HashKey) {
-				hashKey = true;
-			}
-			
-			if (annotation instanceof Sequence) {
-				sequence = true;
-				sequenceName = ((Sequence) annotation).value();
-			}
-
-			if (annotation instanceof org.hibernate.annotations.Type) {
-				json = "json".equalsIgnoreCase(((org.hibernate.annotations.Type) annotation).type());
-				encrypted = "encrypted_text".equalsIgnoreCase(((org.hibernate.annotations.Type) annotation).type());
-			}
-			
-			// encrypted
-			if (annotation instanceof Convert) {
-				Class<?> converter = ((Convert) annotation).converter();
-				if (AbstractEncryptedConverter.class.isAssignableFrom(converter)) {
-					encrypted = true;
-				}
-			}
-
-			// Widget attributes
-			if (annotation instanceof Widget) {
-				Widget w = (Widget) annotation;
-				title = w.title();
-				help = w.help();
-				readonly = w.readonly();
-				hidden = w.hidden();
-				nameSearch = w.search();
-				selection = w.selection();
-				password = w.password();
-				massUpdate = w.massUpdate();
-				copyable = w.copyable();
-				translatable = w.translatable();
-				defaultNow = w.defaultNow();
-
-				if (w.multiline() && type == PropertyType.STRING) {
-					type = PropertyType.TEXT;
-				}
-
-				if (type == PropertyType.BINARY) {
-					image = w.image();
-				}
-			}
-		}
-
-		if (type == null) {
-			throw new IllegalArgumentException(String.format(
-					"Invalid property of type '%s': %s", javaType.getName(),
-					name));
-		}
-	}
-
-	public Class<?> getEntity() {
-		return entity;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public PropertyType getType() {
-		return type;
-	}
-
-	public Class<?> getJavaType() {
-		return javaType;
-	}
-
-	public Type getGenericType() {
-		return genericType;
-	}
-
-	public String getMappedBy() {
-		return mappedBy;
-	}
-
-	public Class<?> getTarget() {
-		return target;
-	}
-
-	public String getTargetName() {
-		if (targetName == null) {
-			findTargetName();
-		}
-		return targetName;
-	}
-
-	public List<String> getTargetSearch() {
-		if (targetName == null) {
-			findTargetName();
-		}
-		return targetSearch;
-	}
-	
-	public Class<?> getEnumType() {
-		return enumType;
-	}
-
-	private void findTargetName() {
-
-		if (target == null) {
-			return;
-		}
-
-		Mapper mapper = Mapper.of(target);
-		Property nameField = mapper.getNameField();
-		Property codeField = mapper.getProperty("code");
-
-		String targetName = null;
-		Set<String> targetSearch = new LinkedHashSet<>();
-
-		if (nameField != null) {
-			targetName = nameField.getName();
-			targetSearch.add(targetName);
-			if (nameField.getNameSearch() != null) {
-				targetSearch.addAll(Arrays.asList(nameField.getNameSearch()));
-			}
-		}
-		if (codeField != null && codeField.getType() == PropertyType.STRING) {
-			targetSearch.add(codeField.getName());
-		}
-
-		this.targetName = targetName;
-		this.targetSearch = new ArrayList<>(targetSearch);
-	}
-
-	public boolean isPrimary() {
-		return primary;
-	}
-
-	public boolean isVersion() {
-		return "version".equals(name);
-	}
-
-	public boolean isRequired() {
-		return required;
-	}
-
-	public boolean isUnique() {
-		return unique;
-	}
-
-	public boolean isOrphan() {
-		return orphan;
-	}
-
-	public boolean isHashKey() {
-		return hashKey;
-	}
-
-	public boolean isCopyable() {
-		return copyable;
-	}
-
-	public boolean isVirtual() {
-		return virtual;
-	}
-	
-	public boolean isTransient() {
-		return transient_;
-	}
-
-	public boolean isJson() {
-		return json;
-	}
-	
-	public boolean isEnum() {
-		return type == PropertyType.ENUM;
-	}
-
-	public boolean isPassword() {
-		return password;
-	}
-
-	public boolean isMassUpdate() {
-		if (isCollection() || isUnique()) {
-			return false;
-		}
-		return massUpdate;
-	}
-
-	public boolean isReference() {
-		return type == PropertyType.MANY_TO_ONE
-				|| type == PropertyType.ONE_TO_ONE;
-	}
-
-	public boolean isCollection() {
-		return type == PropertyType.ONE_TO_MANY
-				|| type == PropertyType.MANY_TO_MANY;
-	}
-
-	public Object getMaxSize() {
-		return maxSize;
-	}
-
-	public Object getMinSize() {
-		return minSize;
-	}
-
-	public int getPrecision() {
-		return precision;
-	}
-
-	public int getScale() {
-		return scale;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public String getHelp() {
-		return help;
-	}
-
-	public boolean isImage() {
-		return image;
-	}
-
-	public boolean isNullable() {
-		return nullable;
-	}
-
-	public boolean isReadonly() {
-		return readonly;
-	}
-
-	public boolean isHidden() {
-		return hidden;
-	}
-	
-	public boolean isSequence() {
-		return sequence;
-	}
-
-	public boolean isTranslatable() {
-		return translatable;
-	}
-
-	public boolean isEncrypted() {
-		return encrypted;
-	}
-
-	public boolean isDefaultNow() {
-		return defaultNow;
-	}
-
-	public String getSequenceName() {
-		return sequenceName;
-	}
-
-	public boolean isNameColumn() {
-		return nameColumn;
-	}
-
-	public String[] getNameSearch() {
-		return nameSearch;
-	}
-
-	public String getSelection() {
-		return selection;
-	}
-
-	/**
-	 * Get the value of this property from the given bean instance.
-	 *
-	 * @param bean
-	 *            the instance
-	 * @return value of the current property
-	 */
-	public Object get(Object bean) {
-		return Mapper.of(entity).get(bean, name);
-	}
-
-	/**
-	 * Set the value for this property to the given bean instance.
-	 *
-	 * If the property is a collection, ensure the proper parent-child
-	 * relationship marked with <i>mappedBy</i> attribute.
-	 *
-	 * @param bean
-	 *            the bean instance
-	 * @param value
-	 *            the value for the property
-	 * @return old value of the property
-	 */
-	public Object set(Object bean, Object value) {
-
-		Object old = this.get(bean);
-
-		if (old == value) {
-			return value;
-		}
-
-		if (this.isCollection()) {
-			this.clear(bean);
-			if (value instanceof Collection<?>) {
-				this.addAll(bean, (Collection<?>) value);
-			} else {
-				this.add(bean, value);
-			}
-		} else {
-			// ignore readonly fields
-			if (Mapper.of(entity).getSetter(name) != null) {
-				Mapper.of(entity).set(bean, name, setAssociation(value, bean));
-			}
-		}
-
-		return old;
-	}
-
-	/**
-	 * If this is a multi-valued field (one-to-many, many-to-many), add the
-	 * specified item to the collection.
-	 *
-	 * @param bean
-	 *            the bean instance
-	 * @param item
-	 *            collection item
-	 * @return the same bean instance
-	 */
-	public Object add(Object bean, Object item) {
-		return add(bean, item, true);
-	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private Object add(Object bean, Object item, boolean associate) {
-		Preconditions.checkNotNull(bean);
-		Preconditions.checkArgument(entity.isInstance(bean));
-		Preconditions.checkState(isCollection());
-
-		if (item == null) {
-			return this.clear(bean);
-		}
-
-		Preconditions.checkArgument(target.isInstance(item));
-
-		Collection items = (Collection) get(bean);
-
-		if (items == null) {
-			items = Set.class.isAssignableFrom(javaType) ? new HashSet() : new ArrayList();
-			Mapper.of(entity).set(bean, name, items);
-			// The type adapter creates new instance of collection so grab the new reference
-			items = (Collection) get(bean);
-		}
-		
-		if (associate) {
-			items.add(setAssociation(item, bean));
-		} else {
-			items.add(item);
-		}
-		return bean;
-	}
-
-	/**
-	 * If this is a multi-valued field (one-to-many, many-to-many), add all the
-	 * specified items to the collection.
-	 *
-	 * @param bean
-	 *            the bean instance
-	 * @param items
-	 *            the items to add
-	 * @return the same bean instance
-	 */
-	public Object addAll(Object bean, Collection<?> items) {
-		if (items != null) {
-			for (Object item : items) {
-				add(bean, item);
-			}
-		}
-		return bean;
-	}
-
-	/**
-	 * If this is a multi-valued field, ensure the proper parent-child
-	 * relationship if association is bidirectional (marked with mappedBy
-	 * attribute).
-	 *
-	 * @param <T>
-	 *            the type of the parent
-	 * @param <U>
-	 *            the type of the child
-	 * @param child
-	 *            the child item
-	 * @param bean
-	 *            the parent bean instance
-	 * @return the updated child instance
-	 */
-	public <T, U> U setAssociation(U child, T bean) {
-
-		if (mappedBy == null || child == null) {
-			return child;
-		}
-
-		Property mapped = Mapper.of(target).getProperty(mappedBy);
-		if (mapped == null) {
-			return child;
-		}
-
-		// handle bidirectional m2m
-		if (mapped.isCollection()) { // m2m -> m2m
-			//XXX: `mapped.add(child, bean)` here may add an unmanaged object
-			// to a managed collection.
-			mapped.add(child, bean, false);
-			return child;
-		}
-
-		if (mapped.get(child) != bean) { // o2m -> m2o
-			mapped.set(child, bean);
-		}
-
-		return child;
-	}
-
-	/**
-	 * If this is a multi-valued field, clear the collection values.
-	 *
-	 * @param bean
-	 *            the bean instance
-	 * @return the same bean instance
-	 */
-	public Object clear(Object bean) {
-		Preconditions.checkNotNull(bean);
-		Preconditions.checkArgument(entity.isInstance(bean));
-		Preconditions.checkState(this.isCollection());
-		
-		Collection<?> items = (Collection<?>) get(bean);
-		if (items == null || items.isEmpty()) {
-			return bean;
-		}
-
-		// handle bidirectional m2m
-		Property mapped = Mapper.of(target).getProperty(mappedBy);
-		if (mapped != null && mapped.isCollection()) { // m2m -> m2m
-			for (Object item : items) {
-				Collection<?> inverse = (Collection<?>) mapped.get(item);
-				if (inverse != null) {
-					inverse.remove(bean);
-				}
-			}
-		}
-
-		try {
-			((Collection<?>) get(bean)).clear();
-		} catch (NullPointerException e) {
-		} catch (Exception e) {
-			throw new IllegalArgumentException(e);
-		}
-		return bean;
-	}
-
-	/**
-	 * Check whether the property value in the given bean is changed.
-	 * 
-	 * @param bean
-	 *            the bean instance to check
-	 * @param oldValue
-	 *            the old value to check against
-	 * 
-	 * @return true if changed false otherwise
-	 */
-	public boolean valueChanged(Object bean, Object oldValue) {
-		Object current = get(bean);
-		if (current instanceof BigDecimal && oldValue instanceof BigDecimal) {
-			return ((BigDecimal)current).compareTo((BigDecimal)oldValue) != 0;
-		}
-		return !Objects.equal(current, oldValue);
-	}
-
-	/**
-	 * Create a {@link Map} of property attributes. Transient and null valued
-	 * attributes with be omitted.
-	 *
-	 * This method should be used to convert property to JSON format.
-	 *
-	 * @return map of property attributes
-	 */
-	public Map<String, Object> toMap() {
-
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		for (Field field : this.getClass().getDeclaredFields()) {
-
-			Object value = null;
-
-			try {
-				value = field.get(this);
-			} catch (IllegalAccessException e) {
-				continue;
-			}
-
-			if ((value == null)
-					|| Modifier.isTransient(field.getModifiers())
-					|| (value instanceof String && ((String) value).equals(""))
-					|| (value instanceof Boolean && !((Boolean) value))
-					|| (value instanceof Integer && ((Integer) value) == 0)
-					|| (value instanceof Object[] && ((Object[]) value).length == 0)) {
-				continue;
-			}
-
-			String key = field.getName().replaceAll("_+$", "");
-
-			if ("help".equals(key) &&
-				"true".equals(value)) {
-				value = "help:" + entity.getSimpleName() + "." + name;
-			}
-			if (value != null && key.matches("help|title")) {
-				value = I18n.get(value.toString());
-			}
-
-			map.put(key, value);
-		}
-		
-		if (!map.containsKey("title")) {
-			map.put("title", I18n.get(Inflector.getInstance().humanize(getName())));
-		}
-
-		if (target != null) {
-			map.put("targetName", getTargetName());
-			map.put("targetSearch", getTargetSearch());
-		}
-		
-		return map;
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "(" + toMap() + ")";
-	}
+  private transient String sequenceName;
+
+  private String[] nameSearch;
+
+  private String selection;
+
+  @SuppressWarnings("unchecked")
+  Property(
+      Class<?> entity, String name, Class<?> javaType, Type genericType, Annotation[] annotations) {
+    this.entity = entity;
+    this.name = name;
+    this.javaType = javaType;
+    this.genericType = genericType;
+    this.copyable = true;
+
+    try {
+      this.type = PropertyType.get(javaType.getSimpleName().toUpperCase());
+    } catch (Exception e) {
+    }
+
+    if (javaType.isEnum()) {
+      type = PropertyType.ENUM;
+      enumType = javaType;
+    }
+
+    for (Annotation annotation : annotations) {
+
+      if (annotation instanceof Lob) {
+        if (type == PropertyType.STRING) type = PropertyType.TEXT;
+        else if (type != PropertyType.TEXT) type = PropertyType.BINARY;
+      }
+
+      if (javaType == BigDecimal.class) {
+        type = PropertyType.DECIMAL;
+      }
+
+      if (annotation instanceof OneToOne) {
+        type = PropertyType.ONE_TO_ONE;
+        target = (Class<? extends Model>) javaType;
+        mappedBy = ((OneToOne) annotation).mappedBy();
+      }
+
+      if (annotation instanceof ManyToOne) {
+        type = PropertyType.MANY_TO_ONE;
+        target = (Class<? extends Model>) javaType;
+      }
+
+      if (annotation instanceof OneToMany) {
+        type = PropertyType.ONE_TO_MANY;
+        target =
+            (Class<? extends Model>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
+        mappedBy = ((OneToMany) annotation).mappedBy();
+        orphan = !((OneToMany) annotation).orphanRemoval();
+      }
+
+      if (annotation instanceof ManyToMany) {
+        type = PropertyType.MANY_TO_MANY;
+        target =
+            (Class<? extends Model>) ((ParameterizedType) genericType).getActualTypeArguments()[0];
+        mappedBy = ((ManyToMany) annotation).mappedBy();
+      }
+
+      if (annotation instanceof Id) {
+        primary = true;
+        readonly = true;
+        hidden = true;
+      }
+
+      if (annotation instanceof Version) {
+        readonly = true;
+        hidden = true;
+      }
+
+      if (annotation instanceof Column) {
+        unique = ((Column) annotation).unique();
+        nullable = ((Column) annotation).nullable();
+      }
+
+      // Give javax.validators precedence
+      if (annotation instanceof NotNull) {
+        required = true;
+      }
+      if (annotation instanceof Size) {
+        Size s = (Size) annotation;
+        maxSize = s.max();
+        minSize = s.min();
+      }
+      if (annotation instanceof Digits) {
+        Digits d = (Digits) annotation;
+        scale = d.fraction();
+        precision = d.integer() + scale;
+      }
+      if (annotation instanceof Min) {
+        Min m = (Min) annotation;
+        minSize = m.value();
+      }
+      if (annotation instanceof Max) {
+        Max m = (Max) annotation;
+        maxSize = m.value();
+      }
+      if (annotation instanceof DecimalMin) {
+        DecimalMin m = (DecimalMin) annotation;
+        minSize = m.value();
+      }
+      if (annotation instanceof DecimalMax) {
+        DecimalMax m = (DecimalMax) annotation;
+        maxSize = m.value();
+      }
+
+      if (annotation instanceof VirtualColumn) {
+        readonly = true;
+        virtual = true;
+      }
+
+      if (annotation instanceof NameColumn) {
+        nameColumn = true;
+      }
+
+      if (annotation instanceof Transient) {
+        transient_ = true;
+      }
+
+      if (annotation instanceof HashKey) {
+        hashKey = true;
+      }
+
+      if (annotation instanceof Sequence) {
+        sequence = true;
+        sequenceName = ((Sequence) annotation).value();
+      }
+
+      if (annotation instanceof org.hibernate.annotations.Type) {
+        json = "json".equalsIgnoreCase(((org.hibernate.annotations.Type) annotation).type());
+        encrypted =
+            "encrypted_text".equalsIgnoreCase(((org.hibernate.annotations.Type) annotation).type());
+      }
+
+      // encrypted
+      if (annotation instanceof Convert) {
+        Class<?> converter = ((Convert) annotation).converter();
+        if (AbstractEncryptedConverter.class.isAssignableFrom(converter)) {
+          encrypted = true;
+        }
+      }
+
+      // Widget attributes
+      if (annotation instanceof Widget) {
+        Widget w = (Widget) annotation;
+        title = w.title();
+        help = w.help();
+        readonly = w.readonly();
+        hidden = w.hidden();
+        nameSearch = w.search();
+        selection = w.selection();
+        password = w.password();
+        massUpdate = w.massUpdate();
+        copyable = w.copyable();
+        translatable = w.translatable();
+        defaultNow = w.defaultNow();
+
+        if (w.multiline() && type == PropertyType.STRING) {
+          type = PropertyType.TEXT;
+        }
+
+        if (type == PropertyType.BINARY) {
+          image = w.image();
+        }
+      }
+    }
+
+    if (type == null) {
+      throw new IllegalArgumentException(
+          String.format("Invalid property of type '%s': %s", javaType.getName(), name));
+    }
+  }
+
+  public Class<?> getEntity() {
+    return entity;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public PropertyType getType() {
+    return type;
+  }
+
+  public Class<?> getJavaType() {
+    return javaType;
+  }
+
+  public Type getGenericType() {
+    return genericType;
+  }
+
+  public String getMappedBy() {
+    return mappedBy;
+  }
+
+  public Class<?> getTarget() {
+    return target;
+  }
+
+  public String getTargetName() {
+    if (targetName == null) {
+      findTargetName();
+    }
+    return targetName;
+  }
+
+  public List<String> getTargetSearch() {
+    if (targetName == null) {
+      findTargetName();
+    }
+    return targetSearch;
+  }
+
+  public Class<?> getEnumType() {
+    return enumType;
+  }
+
+  private void findTargetName() {
+
+    if (target == null) {
+      return;
+    }
+
+    Mapper mapper = Mapper.of(target);
+    Property nameField = mapper.getNameField();
+    Property codeField = mapper.getProperty("code");
+
+    String targetName = null;
+    Set<String> targetSearch = new LinkedHashSet<>();
+
+    if (nameField != null) {
+      targetName = nameField.getName();
+      targetSearch.add(targetName);
+      if (nameField.getNameSearch() != null) {
+        targetSearch.addAll(Arrays.asList(nameField.getNameSearch()));
+      }
+    }
+    if (codeField != null && codeField.getType() == PropertyType.STRING) {
+      targetSearch.add(codeField.getName());
+    }
+
+    this.targetName = targetName;
+    this.targetSearch = new ArrayList<>(targetSearch);
+  }
+
+  public boolean isPrimary() {
+    return primary;
+  }
+
+  public boolean isVersion() {
+    return "version".equals(name);
+  }
+
+  public boolean isRequired() {
+    return required;
+  }
+
+  public boolean isUnique() {
+    return unique;
+  }
+
+  public boolean isOrphan() {
+    return orphan;
+  }
+
+  public boolean isHashKey() {
+    return hashKey;
+  }
+
+  public boolean isCopyable() {
+    return copyable;
+  }
+
+  public boolean isVirtual() {
+    return virtual;
+  }
+
+  public boolean isTransient() {
+    return transient_;
+  }
+
+  public boolean isJson() {
+    return json;
+  }
+
+  public boolean isEnum() {
+    return type == PropertyType.ENUM;
+  }
+
+  public boolean isPassword() {
+    return password;
+  }
+
+  public boolean isMassUpdate() {
+    if (isCollection() || isUnique()) {
+      return false;
+    }
+    return massUpdate;
+  }
+
+  public boolean isReference() {
+    return type == PropertyType.MANY_TO_ONE || type == PropertyType.ONE_TO_ONE;
+  }
+
+  public boolean isCollection() {
+    return type == PropertyType.ONE_TO_MANY || type == PropertyType.MANY_TO_MANY;
+  }
+
+  public Object getMaxSize() {
+    return maxSize;
+  }
+
+  public Object getMinSize() {
+    return minSize;
+  }
+
+  public int getPrecision() {
+    return precision;
+  }
+
+  public int getScale() {
+    return scale;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public String getHelp() {
+    return help;
+  }
+
+  public boolean isImage() {
+    return image;
+  }
+
+  public boolean isNullable() {
+    return nullable;
+  }
+
+  public boolean isReadonly() {
+    return readonly;
+  }
+
+  public boolean isHidden() {
+    return hidden;
+  }
+
+  public boolean isSequence() {
+    return sequence;
+  }
+
+  public boolean isTranslatable() {
+    return translatable;
+  }
+
+  public boolean isEncrypted() {
+    return encrypted;
+  }
+
+  public boolean isDefaultNow() {
+    return defaultNow;
+  }
+
+  public String getSequenceName() {
+    return sequenceName;
+  }
+
+  public boolean isNameColumn() {
+    return nameColumn;
+  }
+
+  public String[] getNameSearch() {
+    return nameSearch;
+  }
+
+  public String getSelection() {
+    return selection;
+  }
+
+  /**
+   * Get the value of this property from the given bean instance.
+   *
+   * @param bean the instance
+   * @return value of the current property
+   */
+  public Object get(Object bean) {
+    return Mapper.of(entity).get(bean, name);
+  }
+
+  /**
+   * Set the value for this property to the given bean instance.
+   *
+   * <p>If the property is a collection, ensure the proper parent-child relationship marked with
+   * <i>mappedBy</i> attribute.
+   *
+   * @param bean the bean instance
+   * @param value the value for the property
+   * @return old value of the property
+   */
+  public Object set(Object bean, Object value) {
+
+    Object old = this.get(bean);
+
+    if (old == value) {
+      return value;
+    }
+
+    if (this.isCollection()) {
+      this.clear(bean);
+      if (value instanceof Collection<?>) {
+        this.addAll(bean, (Collection<?>) value);
+      } else {
+        this.add(bean, value);
+      }
+    } else {
+      // ignore readonly fields
+      if (Mapper.of(entity).getSetter(name) != null) {
+        Mapper.of(entity).set(bean, name, setAssociation(value, bean));
+      }
+    }
+
+    return old;
+  }
+
+  /**
+   * If this is a multi-valued field (one-to-many, many-to-many), add the specified item to the
+   * collection.
+   *
+   * @param bean the bean instance
+   * @param item collection item
+   * @return the same bean instance
+   */
+  public Object add(Object bean, Object item) {
+    return add(bean, item, true);
+  }
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private Object add(Object bean, Object item, boolean associate) {
+    Preconditions.checkNotNull(bean);
+    Preconditions.checkArgument(entity.isInstance(bean));
+    Preconditions.checkState(isCollection());
+
+    if (item == null) {
+      return this.clear(bean);
+    }
+
+    Preconditions.checkArgument(target.isInstance(item));
+
+    Collection items = (Collection) get(bean);
+
+    if (items == null) {
+      items = Set.class.isAssignableFrom(javaType) ? new HashSet() : new ArrayList();
+      Mapper.of(entity).set(bean, name, items);
+      // The type adapter creates new instance of collection so grab the new reference
+      items = (Collection) get(bean);
+    }
+
+    if (associate) {
+      items.add(setAssociation(item, bean));
+    } else {
+      items.add(item);
+    }
+    return bean;
+  }
+
+  /**
+   * If this is a multi-valued field (one-to-many, many-to-many), add all the specified items to the
+   * collection.
+   *
+   * @param bean the bean instance
+   * @param items the items to add
+   * @return the same bean instance
+   */
+  public Object addAll(Object bean, Collection<?> items) {
+    if (items != null) {
+      for (Object item : items) {
+        add(bean, item);
+      }
+    }
+    return bean;
+  }
+
+  /**
+   * If this is a multi-valued field, ensure the proper parent-child relationship if association is
+   * bidirectional (marked with mappedBy attribute).
+   *
+   * @param <T> the type of the parent
+   * @param <U> the type of the child
+   * @param child the child item
+   * @param bean the parent bean instance
+   * @return the updated child instance
+   */
+  public <T, U> U setAssociation(U child, T bean) {
+
+    if (mappedBy == null || child == null) {
+      return child;
+    }
+
+    Property mapped = Mapper.of(target).getProperty(mappedBy);
+    if (mapped == null) {
+      return child;
+    }
+
+    // handle bidirectional m2m
+    if (mapped.isCollection()) { // m2m -> m2m
+      // XXX: `mapped.add(child, bean)` here may add an unmanaged object
+      // to a managed collection.
+      mapped.add(child, bean, false);
+      return child;
+    }
+
+    if (mapped.get(child) != bean) { // o2m -> m2o
+      mapped.set(child, bean);
+    }
+
+    return child;
+  }
+
+  /**
+   * If this is a multi-valued field, clear the collection values.
+   *
+   * @param bean the bean instance
+   * @return the same bean instance
+   */
+  public Object clear(Object bean) {
+    Preconditions.checkNotNull(bean);
+    Preconditions.checkArgument(entity.isInstance(bean));
+    Preconditions.checkState(this.isCollection());
+
+    Collection<?> items = (Collection<?>) get(bean);
+    if (items == null || items.isEmpty()) {
+      return bean;
+    }
+
+    // handle bidirectional m2m
+    Property mapped = Mapper.of(target).getProperty(mappedBy);
+    if (mapped != null && mapped.isCollection()) { // m2m -> m2m
+      for (Object item : items) {
+        Collection<?> inverse = (Collection<?>) mapped.get(item);
+        if (inverse != null) {
+          inverse.remove(bean);
+        }
+      }
+    }
+
+    try {
+      ((Collection<?>) get(bean)).clear();
+    } catch (NullPointerException e) {
+    } catch (Exception e) {
+      throw new IllegalArgumentException(e);
+    }
+    return bean;
+  }
+
+  /**
+   * Check whether the property value in the given bean is changed.
+   *
+   * @param bean the bean instance to check
+   * @param oldValue the old value to check against
+   * @return true if changed false otherwise
+   */
+  public boolean valueChanged(Object bean, Object oldValue) {
+    Object current = get(bean);
+    if (current instanceof BigDecimal && oldValue instanceof BigDecimal) {
+      return ((BigDecimal) current).compareTo((BigDecimal) oldValue) != 0;
+    }
+    return !Objects.equal(current, oldValue);
+  }
+
+  /**
+   * Create a {@link Map} of property attributes. Transient and null valued attributes with be
+   * omitted.
+   *
+   * <p>This method should be used to convert property to JSON format.
+   *
+   * @return map of property attributes
+   */
+  public Map<String, Object> toMap() {
+
+    Map<String, Object> map = new HashMap<String, Object>();
+
+    for (Field field : this.getClass().getDeclaredFields()) {
+
+      Object value = null;
+
+      try {
+        value = field.get(this);
+      } catch (IllegalAccessException e) {
+        continue;
+      }
+
+      if ((value == null)
+          || Modifier.isTransient(field.getModifiers())
+          || (value instanceof String && ((String) value).equals(""))
+          || (value instanceof Boolean && !((Boolean) value))
+          || (value instanceof Integer && ((Integer) value) == 0)
+          || (value instanceof Object[] && ((Object[]) value).length == 0)) {
+        continue;
+      }
+
+      String key = field.getName().replaceAll("_+$", "");
+
+      if ("help".equals(key) && "true".equals(value)) {
+        value = "help:" + entity.getSimpleName() + "." + name;
+      }
+      if (value != null && key.matches("help|title")) {
+        value = I18n.get(value.toString());
+      }
+
+      map.put(key, value);
+    }
+
+    if (!map.containsKey("title")) {
+      map.put("title", I18n.get(Inflector.getInstance().humanize(getName())));
+    }
+
+    if (target != null) {
+      map.put("targetName", getTargetName());
+      map.put("targetSearch", getTargetSearch());
+    }
+
+    return map;
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "(" + toMap() + ")";
+  }
 }

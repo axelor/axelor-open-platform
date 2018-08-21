@@ -17,84 +17,83 @@
  */
 package com.axelor.gradle;
 
+import com.axelor.common.StringUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.axelor.common.StringUtils;
-
 public class HotswapExtension {
 
-	public static final String EXTENSION_NAME = "hotswapAgent";
+  public static final String EXTENSION_NAME = "hotswapAgent";
 
-	private File logFile;
+  private File logFile;
 
-	private Boolean logAppend;
+  private Boolean logAppend;
 
-	private Map<String, String> loggers = new LinkedHashMap<>();
+  private Map<String, String> loggers = new LinkedHashMap<>();
 
-	private List<String> disabledPlugins = new ArrayList<>();
+  private List<String> disabledPlugins = new ArrayList<>();
 
-	private List<File> extraClasspath = new ArrayList<>();
+  private List<File> extraClasspath = new ArrayList<>();
 
-	private List<File> watchResources = new ArrayList<>();
+  private List<File> watchResources = new ArrayList<>();
 
-	public Map<String, String> getLoggers() {
-		return loggers;
-	}
+  public Map<String, String> getLoggers() {
+    return loggers;
+  }
 
-	public void setLoggers(Map<String, String> loggers) {
-		this.loggers = loggers;
-	}
+  public void setLoggers(Map<String, String> loggers) {
+    this.loggers = loggers;
+  }
 
-	public File getLogFile() {
-		return logFile;
-	}
+  public File getLogFile() {
+    return logFile;
+  }
 
-	public void setLogFile(File logFile) {
-		this.logFile = logFile;
-	}
+  public void setLogFile(File logFile) {
+    this.logFile = logFile;
+  }
 
-	public Boolean getLogAppend() {
-		return logAppend;
-	}
+  public Boolean getLogAppend() {
+    return logAppend;
+  }
 
-	public void setLogAppend(Boolean logAppend) {
-		this.logAppend = logAppend;
-	}
+  public void setLogAppend(Boolean logAppend) {
+    this.logAppend = logAppend;
+  }
 
-	public List<String> getDisabledPlugins() {
-		return disabledPlugins;
-	}
+  public List<String> getDisabledPlugins() {
+    return disabledPlugins;
+  }
 
-	public void setDisabledPlugins(List<String> disabledPlugins) {
-		this.disabledPlugins = disabledPlugins;
-	}
+  public void setDisabledPlugins(List<String> disabledPlugins) {
+    this.disabledPlugins = disabledPlugins;
+  }
 
-	public List<File> getExtraClasspath() {
-		return extraClasspath;
-	}
+  public List<File> getExtraClasspath() {
+    return extraClasspath;
+  }
 
-	public void setExtraClasspath(List<File> extraClasspath) {
-		this.extraClasspath = extraClasspath;
-	}
+  public void setExtraClasspath(List<File> extraClasspath) {
+    this.extraClasspath = extraClasspath;
+  }
 
-	public List<File> getWatchResources() {
-		return watchResources;
-	}
+  public List<File> getWatchResources() {
+    return watchResources;
+  }
 
-	public void setWatchResources(List<File> watchResources) {
-		this.watchResources = watchResources;
-	}
+  public void setWatchResources(List<File> watchResources) {
+    this.watchResources = watchResources;
+  }
 
-	public void disablePlugin(String plugin) {
-		disabledPlugins.add(plugin);
-	}
+  public void disablePlugin(String plugin) {
+    disabledPlugins.add(plugin);
+  }
 
-	public void logger(String name, String level) {
-		final String logger = StringUtils.isBlank(name) ? "LOGGER" : "LOGGER." + name;
-		loggers.put(logger, level);
-	}
+  public void logger(String name, String level) {
+    final String logger = StringUtils.isBlank(name) ? "LOGGER" : "LOGGER." + name;
+    loggers.put(logger, level);
+  }
 }

@@ -18,11 +18,11 @@
 @import url('../blue-simple/theme.css');
 
 [data-name="menu-admin"] .nav-icon {
-	background-color: #E03997;
+  background-color: #E03997;
 }
 
 .panel, .dashlet {
-	border: 1px solid #2185D0;
+  border: 1px solid #2185D0;
 }
 .panel .panel-header,
 .dashlet .dashlet-header {
@@ -41,11 +41,11 @@
 
 .panel .panel-title, .dashlet .dashlet-title,
 .dashboard .dashlet-pager, .dashboard .dashlet-buttons > a, .dashboard .dashlet-pager > a {
-	color: #F9FAFB;
+  color: #F9FAFB;
 }
 .dashboard .dashlet-pager > a.disabled {
-	color: #F9FAFB;
-	opacity: .65;
+  color: #F9FAFB;
+  opacity: .65;
 }
 
 .panel-red .panel,

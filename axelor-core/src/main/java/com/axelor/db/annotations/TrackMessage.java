@@ -22,54 +22,51 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * This annotation can be used to specify custom change tracking messages.
- *
- */
+/** This annotation can be used to specify custom change tracking messages. */
 @Documented
 @Target({})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TrackMessage {
 
-	/**
-	 * The track message to generate if the given condition is true.
-	 *
-	 * @return the message
-	 */
-	String message();
+  /**
+   * The track message to generate if the given condition is true.
+   *
+   * @return the message
+   */
+  String message();
 
-	/**
-	 * The condition to check.
-	 *
-	 * @return the condition
-	 */
-	String condition();
+  /**
+   * The condition to check.
+   *
+   * @return the condition
+   */
+  String condition();
 
-	/**
-	 * Specify the events on which to use this message.
-	 * 
-	 * @return the events
-	 */
-	TrackEvent[] on() default {};
+  /**
+   * Specify the events on which to use this message.
+   *
+   * @return the events
+   */
+  TrackEvent[] on() default {};
 
-	/**
-	 * Provide tag style if this message is a tag.
-	 *
-	 * <ul>
-	 *   <li>success</li>
-	 *   <li>warning</li>
-	 *   <li>important</li>
-	 *   <li>info</li>
-	 * </ul>
-	 *
-	 * @return the tag style name
-	 */
-	String tag() default "";
+  /**
+   * Provide tag style if this message is a tag.
+   *
+   * <ul>
+   *   <li>success
+   *   <li>warning
+   *   <li>important
+   *   <li>info
+   * </ul>
+   *
+   * @return the tag style name
+   */
+  String tag() default "";
 
-	/**
-	 * Only use the message if these fields are changed.
-	 * 
-	 * @return the field names
-	 */
-	String[] fields() default "";
+  /**
+   * Only use the message if these fields are changed.
+   *
+   * @return the field names
+   */
+  String[] fields() default "";
 }

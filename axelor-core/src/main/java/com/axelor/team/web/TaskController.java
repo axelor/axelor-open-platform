@@ -17,55 +17,55 @@
  */
 package com.axelor.team.web;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.persistence.TypedQuery;
-
 import com.axelor.auth.AuthUtils;
 import com.axelor.db.JpaSupport;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import javax.persistence.TypedQuery;
 
 public class TaskController extends JpaSupport {
 
-	private static final String SQL_TASKS_DUE = ""
-			+ "SELECT tt FROM TeamTask tt "
-			+ "LEFT JOIN tt.assignedTo u "
-			+ "WHERE "
-			+ "	(tt.status NOT IN :closed_status AND u.id = :uid) AND "
-			+ " (tt.taskDeadline <= current_date)";
+  private static final String SQL_TASKS_DUE =
+      ""
+          + "SELECT tt FROM TeamTask tt "
+          + "LEFT JOIN tt.assignedTo u "
+          + "WHERE "
+          + "	(tt.status NOT IN :closed_status AND u.id = :uid) AND "
+          + " (tt.taskDeadline <= current_date)";
 
-	private static final String SQL_TASKS_TODO = ""
-			+ "SELECT tt FROM TeamTask tt "
-			+ "LEFT JOIN tt.assignedTo u "
-			+ "WHERE "
-			+ "	(tt.status NOT IN :closed_status AND u.id = :uid) AND "
-			+ "	(tt.taskDeadline <= current_date OR tt.taskDate <= current_date)";
+  private static final String SQL_TASKS_TODO =
+      ""
+          + "SELECT tt FROM TeamTask tt "
+          + "LEFT JOIN tt.assignedTo u "
+          + "WHERE "
+          + "	(tt.status NOT IN :closed_status AND u.id = :uid) AND "
+          + "	(tt.taskDeadline <= current_date OR tt.taskDate <= current_date)";
 
-	public void countTasks(ActionRequest request, ActionResponse response) {
-		final Map<String, Object> value = new HashMap<>();
-		value.put("pending", countTasks(SQL_TASKS_DUE));
-		value.put("current", countTasks(SQL_TASKS_TODO));
-		response.setValue("tasks", value);
-		response.setStatus(Response.STATUS_SUCCESS);
-	}
+  public void countTasks(ActionRequest request, ActionResponse response) {
+    final Map<String, Object> value = new HashMap<>();
+    value.put("pending", countTasks(SQL_TASKS_DUE));
+    value.put("current", countTasks(SQL_TASKS_TODO));
+    response.setValue("tasks", value);
+    response.setStatus(Response.STATUS_SUCCESS);
+  }
 
-	private Long countTasks(String queryString) {
+  private Long countTasks(String queryString) {
 
-		final String countString = queryString
-				.replace("SELECT tt FROM TeamTask tt", "SELECT COUNT(tt.id) FROM TeamTask tt");
+    final String countString =
+        queryString.replace("SELECT tt FROM TeamTask tt", "SELECT COUNT(tt.id) FROM TeamTask tt");
 
-		final TypedQuery<Long> query = getEntityManager().createQuery(countString, Long.class);
+    final TypedQuery<Long> query = getEntityManager().createQuery(countString, Long.class);
 
-		query.setParameter("uid", AuthUtils.getUser().getId());
-		query.setParameter("closed_status", Arrays.asList("closed", "canceled"));
-		try {
-			return query.getSingleResult();
-		} catch (Exception e) {
-		}
-		return 0L;
-	}
+    query.setParameter("uid", AuthUtils.getUser().getId());
+    query.setParameter("closed_status", Arrays.asList("closed", "canceled"));
+    try {
+      return query.getSingleResult();
+    } catch (Exception e) {
+    }
+    return 0L;
+  }
 }

@@ -17,181 +17,181 @@
  */
 (function () {
 
-	"use strict";
+  "use strict";
 
-	var ui = angular.module('axelor.ui');
-	
-	var currencySymbols = {
-		en: '\u0024',
-		fr: '\u20AC'
-	};
-	
-	var thousandSeparator = {
-		en: ',',
-		fr: ' '
-	};
+  var ui = angular.module('axelor.ui');
 
-	function addCurrency(value, symbol) {
-		if (value && symbol) {
-			var val = '' + value;
-			if (axelor.config['user.lang'] === 'fr' ) {
-				return val.endsWith(symbol) ? val : val + ' ' + symbol;
-			}
-			return val.startsWith(symbol) ? val : symbol + val;
-		}
-		return value;
-	}
+  var currencySymbols = {
+    en: '\u0024',
+    fr: '\u20AC'
+  };
 
-	function findNested(record, name) {
-		if (record && name && name in record) {
-			return record[name];
-		}
-		if (name) {
-			var path = name.split('.');
-			var val = record || {};
-			var idx = 0;
-			while (val && idx < path.length) {
-				val = val[path[idx++]];
-			}
-			if (idx === path.length) {
-				return val;
-			}
-		}
-		return null;
-	}
+  var thousandSeparator = {
+    en: ',',
+    fr: ' '
+  };
 
-	// override angular.js currency filter
-	ui.filter('currency', function () {
-		return addCurrency;
-	});
+  function addCurrency(value, symbol) {
+    if (value && symbol) {
+      var val = '' + value;
+      if (axelor.config['user.lang'] === 'fr' ) {
+        return val.endsWith(symbol) ? val : val + ' ' + symbol;
+      }
+      return val.startsWith(symbol) ? val : symbol + val;
+    }
+    return value;
+  }
 
-	function formatNumber(field, value, scale) {
-		var num = +(value);
-		if ((value === null || value === undefined) && !field.defaultValue) {
-			return value;
-		}
-		if (num === 0 || num) {
-			var lang = axelor.config['user.lang'];
-			var tsep = thousandSeparator[lang] || thousandSeparator.en;
-			return _.numberFormat(num, scale, '.', tsep);
-		}
-		return value;
-	}
+  function findNested(record, name) {
+    if (record && name && name in record) {
+      return record[name];
+    }
+    if (name) {
+      var path = name.split('.');
+      var val = record || {};
+      var idx = 0;
+      while (val && idx < path.length) {
+        val = val[path[idx++]];
+      }
+      if (idx === path.length) {
+        return val;
+      }
+    }
+    return null;
+  }
 
-	ui.formatters = {
-			
-		"string": function(field, value, context) {
-			if (field.translatable && value && context) {
-				var key = '$t:' + field.name;
-				return context[key] || value;
-			}
-			return value;
-		},
+  // override angular.js currency filter
+  ui.filter('currency', function () {
+    return addCurrency;
+  });
 
-		"integer": function(field, value) {
-			return formatNumber(field, value);
-		},
+  function formatNumber(field, value, scale) {
+    var num = +(value);
+    if ((value === null || value === undefined) && !field.defaultValue) {
+      return value;
+    }
+    if (num === 0 || num) {
+      var lang = axelor.config['user.lang'];
+      var tsep = thousandSeparator[lang] || thousandSeparator.en;
+      return _.numberFormat(num, scale, '.', tsep);
+    }
+    return value;
+  }
 
-		"decimal": function(field, value, context) {
-			var scale = (field.widgetAttrs||{}).scale || field.scale || 2;
-			var currency = (field.widgetAttrs||{}).currency || field.currency;
+  ui.formatters = {
 
-			var text = formatNumber(field, value, scale);
-			if (text && currency) {
-				text = addCurrency(text, findNested(context, currency));
-			}
-			return text;
-		},
+    "string": function(field, value, context) {
+      if (field.translatable && value && context) {
+        var key = '$t:' + field.name;
+        return context[key] || value;
+      }
+      return value;
+    },
 
-		"boolean": function(field, value) {
-			return value;
-		},
+    "integer": function(field, value) {
+      return formatNumber(field, value);
+    },
 
-		"duration": function(field, value) {
-			return ui.formatDuration(field, value);
-		},
+    "decimal": function(field, value, context) {
+      var scale = (field.widgetAttrs||{}).scale || field.scale || 2;
+      var currency = (field.widgetAttrs||{}).currency || field.currency;
 
-		"date": function(field, value) {
-			return value ? moment(value).format('DD/MM/YYYY') : "";
-		},
+      var text = formatNumber(field, value, scale);
+      if (text && currency) {
+        text = addCurrency(text, findNested(context, currency));
+      }
+      return text;
+    },
 
-		"time": function(field, value) {
-			return value ? value : "";
-		},
+    "boolean": function(field, value) {
+      return value;
+    },
 
-		"datetime": function(field, value) {
-			return value ? moment(value).format('DD/MM/YYYY HH:mm') : "";
-		},
+    "duration": function(field, value) {
+      return ui.formatDuration(field, value);
+    },
 
-		"many-to-one": function(field, value) {
-			return value
-				? (field.targetName ? value[field.targetName] : (value.name || value.code || value.id || ""))
-				: "";
-		},
+    "date": function(field, value) {
+      return value ? moment(value).format('DD/MM/YYYY') : "";
+    },
 
-		"one-to-many": function(field, value) {
-			return value ? '(' + value.length + ')' : "";
-		},
+    "time": function(field, value) {
+      return value ? value : "";
+    },
 
-		"many-to-many": function(field, value) {
-			return value ? '(' + value.length + ')' : "";
-		},
+    "datetime": function(field, value) {
+      return value ? moment(value).format('DD/MM/YYYY HH:mm') : "";
+    },
 
-		"selection": function(field, value) {
-			var cmp = field.type === "integer" ? function(a, b) { return a == b ; } : _.isEqual;
-			var res = _.find(field.selectionList, function(item){
-				return cmp(item.value, value);
-			}) || {};
-			return res.title;
-		}
-	};
+    "many-to-one": function(field, value) {
+      return value
+        ? (field.targetName ? value[field.targetName] : (value.name || value.code || value.id || ""))
+        : "";
+    },
 
-	ui.formatters["enum"] = ui.formatters.selection;
-	
-	function findField(scope, name) {
-		if (scope.field && scope.field.target) {
-			return ((scope.field.viewer||{}).fields||{})[name]
-				|| ((scope.field.editor||{}).fields||{})[name];
-		}
-		return (scope.viewItems || scope.fields || {})[name];
-	}
+    "one-to-many": function(field, value) {
+      return value ? '(' + value.length + ')' : "";
+    },
 
-	ui.formatters.$image = function (scope, fieldName, imageName) {
-		var record = scope.record || {};
-		var model = scope._model;
+    "many-to-many": function(field, value) {
+      return value ? '(' + value.length + ')' : "";
+    },
 
-		if (fieldName) {
-			var field = (scope.fields||{})[fieldName];
-			if (field && field.target) {
-				record = record[fieldName] || {};
-				model = field.target;
-			}
-		}
+    "selection": function(field, value) {
+      var cmp = field.type === "integer" ? function(a, b) { return a == b ; } : _.isEqual;
+      var res = _.find(field.selectionList, function(item){
+        return cmp(item.value, value);
+      }) || {};
+      return res.title;
+    }
+  };
 
-		var v = record.version || record.$version || 0;
-		var n = record.id;
-		if (n > 0) {
-			return "ws/rest/" + model + "/" + n + "/" + imageName + "/download?image=true&v=" + v;
-		}
-		return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-	};
+  ui.formatters["enum"] = ui.formatters.selection;
 
-	ui.formatters.$fmt = function (scope, fieldName, fieldValue, record) {
-		var context = record || scope.record || {};
-		var value = arguments.length === 2 ? context[fieldName] : fieldValue;
-		if (value === undefined || value === null) {
-			return "";
-		}
-		var field = findField(scope, fieldName);
-		if (!field) {
-			return value;
-		}
-		var type = field.selection ? "selection" : field.type;
-		var formatter = ui.formatters[type];
-		if (formatter) {
-			return formatter(field, value, context);
-		}
-		return value;
-	};
+  function findField(scope, name) {
+    if (scope.field && scope.field.target) {
+      return ((scope.field.viewer||{}).fields||{})[name]
+        || ((scope.field.editor||{}).fields||{})[name];
+    }
+    return (scope.viewItems || scope.fields || {})[name];
+  }
+
+  ui.formatters.$image = function (scope, fieldName, imageName) {
+    var record = scope.record || {};
+    var model = scope._model;
+
+    if (fieldName) {
+      var field = (scope.fields||{})[fieldName];
+      if (field && field.target) {
+        record = record[fieldName] || {};
+        model = field.target;
+      }
+    }
+
+    var v = record.version || record.$version || 0;
+    var n = record.id;
+    if (n > 0) {
+      return "ws/rest/" + model + "/" + n + "/" + imageName + "/download?image=true&v=" + v;
+    }
+    return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+  };
+
+  ui.formatters.$fmt = function (scope, fieldName, fieldValue, record) {
+    var context = record || scope.record || {};
+    var value = arguments.length === 2 ? context[fieldName] : fieldValue;
+    if (value === undefined || value === null) {
+      return "";
+    }
+    var field = findField(scope, fieldName);
+    if (!field) {
+      return value;
+    }
+    var type = field.selection ? "selection" : field.type;
+    var formatter = ui.formatters[type];
+    if (formatter) {
+      return formatter(field, value, context);
+    }
+    return value;
+  };
 
 })();

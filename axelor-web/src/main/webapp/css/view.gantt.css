@@ -16,73 +16,72 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 .view-container .gantt-view > div:last-child {
-	position: absolute;
-	top: 46px;
-	bottom: 0; left: 4px; right: 0;
+  position: absolute;
+  top: 46px;
+  bottom: 0; left: 4px; right: 0;
 }
 
 .gantt_grid_head_cell {
-	font-weight: bold;
+  font-weight: bold;
 }
 
 .gantt-main {
-	position: absolute;
-	top: 0; left: 0; bottom: 0; right: 0;
-	overflow: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  overflow: auto;
 }
 
 .gantt_time_selects > select {
-	width: auto;
+  width: auto;
 }
 
 .child_preview {
-	box-sizing: border-box;
-	margin-top: 2px;
-	position: absolute;
-	z-index: 1;
-	color: white;
-	text-align: center;
-	font-size: 12px;
+  box-sizing: border-box;
+  margin-top: 2px;
+  position: absolute;
+  z-index: 1;
+  color: white;
+  text-align: center;
+  font-size: 12px;
 }
 
 .gantt_task_line.task-collapsed {
-	height: 4px;
-	opacity: 0.25;
+  height: 4px;
+  opacity: 0.25;
 }
 
 .gantt_task_line.gantt_project.task-collapsed .gantt_task_content {
-	display: none;
+  display: none;
 }
 
 .gantt_row.task-parent {
-	font-weight: bold;
+  font-weight: bold;
 }
 
 .gantt_task_progress{
-	text-align:left;
-	padding-left:10px;
+  text-align:left;
+  padding-left:10px;
     box-sizing: border-box;
-	color:white;
-	font-weight: bold;
+  color:white;
+  font-weight: bold;
 }
 
 .gantt_task_line.gantt_project{
-			color:white;
+      color:white;
 }
 
 .gantt_side_content{
-	color:#333;
+  color:#333;
 }
 
 .summary-bar{
-	font-weight: bold;
+  font-weight: bold;
 }
 
 .gantt_resource_task .gantt_task_content{
-	color:inherit;
+  color:inherit;
 }
 
 .gantt_resource_task .gantt_task_progress{
-	background-color:rgba(33,33,33,0.3);
+  background-color:rgba(33,33,33,0.3);
 }
-

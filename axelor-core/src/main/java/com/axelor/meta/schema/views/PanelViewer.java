@@ -17,17 +17,6 @@
  */
 package com.axelor.meta.schema.views;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
-
-import org.eclipse.persistence.oxm.annotations.XmlCDATA;
-
 import com.axelor.common.StringUtils;
 import com.axelor.meta.MetaStore;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -37,6 +26,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
+import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 
 @XmlType
 @JsonTypeName("viewer")
@@ -44,50 +41,47 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonInclude(Include.NON_NULL)
 public class PanelViewer {
 
-	transient PanelField forField;
+  transient PanelField forField;
 
-	@XmlAttribute
-	private String depends;
+  @XmlAttribute private String depends;
 
-	@XmlValue
-	@XmlCDATA
-	private String template;
+  @XmlValue @XmlCDATA private String template;
 
-	public String getDepends() {
-		return depends;
-	}
+  public String getDepends() {
+    return depends;
+  }
 
-	public void setDepends(String depends) {
-		this.depends = depends;
-	}
+  public void setDepends(String depends) {
+    this.depends = depends;
+  }
 
-	public String getTemplate() {
-		return template;
-	}
+  public String getTemplate() {
+    return template;
+  }
 
-	public void setTemplate(String template) {
-		this.template = template;
-	}
+  public void setTemplate(String template) {
+    this.template = template;
+  }
 
-	@JsonGetter("fields")
-	public Collection<?> getTargetFields() {
-		if (forField == null || forField.getTarget() == null) {
-			return null;
-		}
+  @JsonGetter("fields")
+  public Collection<?> getTargetFields() {
+    if (forField == null || forField.getTarget() == null) {
+      return null;
+    }
 
-		final Set<String> names = new HashSet<>();
-		if (StringUtils.notBlank(depends)) {
-			Collections.addAll(names, depends.trim().split("\\s*,\\s*"));
-		}
-		if (names.isEmpty()) {
-			return null;
-		}
-		final Class<?> target;
-		try {
-			target = Class.forName(forField.getTarget());
-		} catch (ClassNotFoundException e) {
-			return null;
-		}
-		return (Collection<?>) MetaStore.findFields(target, names).get("fields");
-	}
+    final Set<String> names = new HashSet<>();
+    if (StringUtils.notBlank(depends)) {
+      Collections.addAll(names, depends.trim().split("\\s*,\\s*"));
+    }
+    if (names.isEmpty()) {
+      return null;
+    }
+    final Class<?> target;
+    try {
+      target = Class.forName(forField.getTarget());
+    } catch (ClassNotFoundException e) {
+      return null;
+    }
+    return (Collection<?>) MetaStore.findFields(target, names).get("fields");
+  }
 }

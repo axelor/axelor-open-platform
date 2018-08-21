@@ -25,30 +25,30 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 public class JavaTimeAdapter extends Adapter {
-	
-	protected String DEFAULT_FORMAT = "yyyy-MM-ddTHH:mm:ss";
 
-	@Override
-	public Object adapt(Object value, Map<String, Object> context) {
-		if (value == null || !(value instanceof String)) {
-			return value;
-		}
+  protected String DEFAULT_FORMAT = "yyyy-MM-ddTHH:mm:ss";
 
-		final String type = this.get("type", null);
-		final String text = (String) value;
+  @Override
+  public Object adapt(Object value, Map<String, Object> context) {
+    if (value == null || !(value instanceof String)) {
+      return value;
+    }
 
-		final String format = this.get("format", DEFAULT_FORMAT);
-		final DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
+    final String type = this.get("type", null);
+    final String text = (String) value;
 
-		switch (type) {
-		case "LocalDate":
-			return fmt.parse(text, LocalDate::from);
-		case "LocalTime":
-			return fmt.parse(text, LocalTime::from);
-		case "LocalDateTime":
-			return fmt.parse(text, LocalDateTime::from);
-		default:
-			return fmt.parse((String) value, ZonedDateTime::from);
-		}
-	}
+    final String format = this.get("format", DEFAULT_FORMAT);
+    final DateTimeFormatter fmt = DateTimeFormatter.ofPattern(format);
+
+    switch (type) {
+      case "LocalDate":
+        return fmt.parse(text, LocalDate::from);
+      case "LocalTime":
+        return fmt.parse(text, LocalTime::from);
+      case "LocalDateTime":
+        return fmt.parse(text, LocalDateTime::from);
+      default:
+        return fmt.parse((String) value, ZonedDateTime::from);
+    }
+  }
 }

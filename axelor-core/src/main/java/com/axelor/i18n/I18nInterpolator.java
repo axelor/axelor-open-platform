@@ -17,31 +17,27 @@
  */
 package com.axelor.i18n;
 
+import com.axelor.app.internal.AppFilter;
 import java.util.Locale;
-
 import javax.validation.MessageInterpolator;
-
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 
-import com.axelor.app.internal.AppFilter;
-
 /**
- * This {@link MessageInterpolator} uses current user locale to translate
- * hibernate validation messages.
- *
+ * This {@link MessageInterpolator} uses current user locale to translate hibernate validation
+ * messages.
  */
 public class I18nInterpolator extends ResourceBundleMessageInterpolator {
 
-	private Locale getLocale() {
-		Locale locale = AppFilter.getLocale();
-		if (locale == null) {
-			locale = Locale.getDefault();
-		}
-		return locale;
-	}
+  private Locale getLocale() {
+    Locale locale = AppFilter.getLocale();
+    if (locale == null) {
+      locale = Locale.getDefault();
+    }
+    return locale;
+  }
 
-	@Override
-	public String interpolate(String message, Context context) {
-		return super.interpolate(message, context, getLocale());
-	}
+  @Override
+  public String interpolate(String message, Context context) {
+    return super.interpolate(message, context, getLocale());
+  }
 }

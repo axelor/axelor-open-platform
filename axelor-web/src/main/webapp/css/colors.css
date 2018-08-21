@@ -16,35 +16,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 header {
-	font-weight: 600;
+  font-weight: 600;
 }
 
 header .navbar-inner {
-	background-color: #fff;
-	box-shadow: none !important;
+  background-color: #fff;
+  box-shadow: none !important;
 }
 
 header .navbar .nav .dropdown-menu {
-	border: 1px solid #d3d3d3;
-	border-top: 1px solid #e7e7e7;
+  border: 1px solid #d3d3d3;
+  border-top: 1px solid #e7e7e7;
 }
 
 header .navbar .nav .dropdown-submenu > .dropdown-menu {
-	margin-left: 0;
-	border-top: 1px solid #d3d3d3;
+  margin-left: 0;
+  border-top: 1px solid #d3d3d3;
 }
 
 header .navbar .nav .dropdown-menu > li > a {
-	padding: 6px 25px 6px 20px;
-	line-height: 20px;
+  padding: 6px 25px 6px 20px;
+  line-height: 20px;
 }
 
 header .navbar .nav .dropdown-submenu > a:after {
-	margin-right: -15px;
+  margin-right: -15px;
 }
 
 header .navbar .nav .dropdown-submenu:hover > a:after {
-	border-left-color: #fff;
+  border-left-color: #fff;
 }
 
 header .navbar .nav .fa-bars,
@@ -77,88 +77,88 @@ header .dropdown-submenu:focus > a {
 }
 
 .slick-header-menuitem:hover {
-	color: #fff;
-	background-color: #5377b1;
-	background-image: none;
+  color: #fff;
+  background-color: #5377b1;
+  background-image: none;
 }
 .ui-datepicker .ui-state-active,
 .ui-datepicker .ui-slider-handle.ui-state-hover {
-	color: #fff !important;
-	background-color: #0275d8 !important;
-	background-image: none !important;
+  color: #fff !important;
+  background-color: #0275d8 !important;
+  background-image: none !important;
 }
 .ui-datepicker .ui-slider-handle.ui-state-focus,
 .ui-datepicker .ui-slider-handle.ui-state-hover,
 .ui-datepicker .ui-state-highlight {
-	border: 1px solid #0275d8 !important
+  border: 1px solid #0275d8 !important
 }
 .ui-menu .ui-menu-item a.ui-state-focus {
-	color: #262626;
-	text-decoration: none;
-	border-color: #f5f5f5;
-	background-color: #f5f5f5;
-	background-image: none;
+  color: #262626;
+  text-decoration: none;
+  border-color: #f5f5f5;
+  background-color: #f5f5f5;
+  background-image: none;
 }
 
 .sidebar {
-	background-color: #2f4050;
+  background-color: #2f4050;
 }
 
 .view-tabs {
-	background-color: #f3f3f4;
+  background-color: #f3f3f4;
 }
 
 .nav-tabs-wrap {
-	height: 38px;
-	background-color: #fff;
-	border-bottom: 1px solid #e7e7e7;
+  height: 38px;
+  background-color: #fff;
+  border-bottom: 1px solid #e7e7e7;
 }
 
 .nav-tabs-wrap.empty {
-	display: none;
+  display: none;
 }
 
 .nav-tabs > li {
-	margin-right: -1px;
-	margin-bottom: -1px;
+  margin-right: -1px;
+  margin-bottom: -1px;
 }
 
 .nav-tabs > li > a {
-	color: #555;
-	background-color: #fff;
-	padding-top: 6px;
-	padding-bottom: 6px;
+  color: #555;
+  background-color: #fff;
+  padding-top: 6px;
+  padding-bottom: 6px;
 }
 
 .nav-tabs > li.active > a {
-	color: #333;
+  color: #333;
 }
 
 .nav-tabs > li > a,
 .nav-tabs > li.active > a {
-	margin: 0;
-	border-radius: 0;
-	border: 1px solid #e7e7e7;
+  margin: 0;
+  border-radius: 0;
+  border: 1px solid #e7e7e7;
 }
 
 .nav-tabs > li > a:hover,
 .nav-tabs > li > a:focus,
 .nav-tabs > li:hover > a {
-	color: #333;
-	border: 1px solid #e7e7e7;
-	background-color: #fff;
+  color: #333;
+  border: 1px solid #e7e7e7;
+  background-color: #fff;
 }
 
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus {
-	border: 1px solid #e7e7e7;
-	border-top: 3px solid #0275d8;
-	border-bottom: 1px solid transparent;
-	background-color: #fff;
-	padding-top: 4px;
+  border: 1px solid #e7e7e7;
+  border-top: 3px solid #0275d8;
+  border-bottom: 1px solid transparent;
+  background-color: #fff;
+  padding-top: 4px;
     border-top-left-radius: 3px;
-	border-top-right-radius: 3px;
+  border-top-right-radius: 3px;
 }
 
 .nav-tabs-main > li:not(.active) > a {
@@ -170,45 +170,45 @@ header .dropdown-submenu:focus > a {
 }
 
 .nav-tabs-strip {
-	height: 32px;
-	background-color: #f3f3f4;
+  height: 32px;
+  background-color: #f3f3f4;
 }
 
 .nav-tabs-strip .nav-tabs {
-	padding: 0 8px;
-	border-bottom-color: #e7e7e7;
+  padding: 0 8px;
+  border-bottom-color: #e7e7e7;
 }
 
 .nav-tabs-overflow .nav-tabs {
-	padding: 0;
+  padding: 0;
 }
 
 .nav-tabs-scroll-l,
 .nav-tabs-scroll-r {
-	bottom: 6px;
-	margin-top: 0;
-	padding-top: 8px;
-	background-color: #f3f3f4;
-	border-bottom: 1px solid #e7e7e7;
+  bottom: 6px;
+  margin-top: 0;
+  padding-top: 8px;
+  background-color: #f3f3f4;
+  border-bottom: 1px solid #e7e7e7;
 }
 
 .nav-tabs-scroll-l a,
 .nav-tabs-scroll-r a {
-	width: 100%;
-	padding-left: 3px;
+  width: 100%;
+  padding-left: 3px;
 }
 
 table.form-layout .tabbable-tabs .tab-content {
-	border-color: #e7e7e7;
+  border-color: #e7e7e7;
 }
 
 .bordered,
 .bordered-box {
-	border-color: #e7e7e7;
+  border-color: #e7e7e7;
 }
 
 .view-container .form-view > div[ui-view-form].has-width {
-	background-color: #f3f3f4;
+  background-color: #f3f3f4;
 }
 
 /** remove corners */
@@ -217,63 +217,63 @@ table.form-layout .tabbable-tabs .tab-content {
 .dropdown-menu,
 .slick-header-menu,
 [class*="ui-corner"] {
-	border-radius: 0 !important;
+  border-radius: 0 !important;
 }
 .portlet,
 .portlet-header .navbar-inner,
 .portlet-body,
 .portlet-content {
-	border-radius: 0 !important;
+  border-radius: 0 !important;
 }
 input, button, textarea, select, fieldset, pre {
-	border-radius: 0 !important;
+  border-radius: 0 !important;
 }
 .tag-select,
 .tag-select .label {
-	border-radius: 0;
+  border-radius: 0;
 }
 .tag-select .picker-icons > i.fa {
-	padding-top: 3px;
+  padding-top: 3px;
 }
 .tag-select .label {
     background-color: #0275d8;
 }
 
 .select-item .picker-icons i.fa-times {
-	font-size: 12px;
-	color: #ccc;
+  font-size: 12px;
+  color: #ccc;
 }
 
 .select-item .picker-icons i.fa-times:hover {
-	color: #333;
+  color: #333;
 }
 
 .m2o-editor-controls i.fa,
 .picker-icons i.fa {
-	color: #ccc;
+  color: #ccc;
 }
 .m2o-editor-controls i.fa:hover,
 .picker-icons i.fa:hover {
-	color: #333;
+  color: #333;
 }
 
 .progress,
 .progress .bar {
-	border-radius: 0 !important;
-	box-shadow: none;
+  border-radius: 0 !important;
+  box-shadow: none;
 }
 
 .nvd3.nv-noData {
-	font-weight: 400;
-	fill: #333333;
+  font-weight: 400;
+  fill: #333333;
 }
 
 /* jquery fixes */
 .ui-widget-header a {
-	color: #0088cc;
+  color: #0088cc;
 }
 .ui-dialog .ui-dialog-titlebar a {
-	color: #222;
+  color: #222;
 }
 
 /* == v5 == */
@@ -285,7 +285,7 @@ input, button, textarea, select, fieldset, pre {
 
 .record-toolbar .button-menu a.btn:hover,
 .record-toolbar .button-menu a.btn:focus {
-  background-color: #eee;  
+  background-color: #eee;
 }
 
 .tag-select {

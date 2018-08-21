@@ -20,31 +20,28 @@ package com.axelor.db.tenants;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-/**
- * Provides configured {@link TenantConfigProvider}.
- *
- */
+/** Provides configured {@link TenantConfigProvider}. */
 @Singleton
 class TenantSupport {
-	
-	private static TenantSupport INSTANCE;
 
-	private TenantConfigProvider confixProvider;
+  private static TenantSupport INSTANCE;
 
-	@Inject
-	private TenantSupport(TenantConfigProvider configProvider) {
-		this.confixProvider = configProvider;
-		TenantSupport.INSTANCE = this;
-	}
+  private TenantConfigProvider confixProvider;
 
-	public static TenantSupport get() {
-		if (INSTANCE == null) {
-			throw new RuntimeException("Multi-tenant support is not configured properly.");
-		}
-		return INSTANCE;
-	}
+  @Inject
+  private TenantSupport(TenantConfigProvider configProvider) {
+    this.confixProvider = configProvider;
+    TenantSupport.INSTANCE = this;
+  }
 
-	public TenantConfigProvider getConfigProvider() {
-		return confixProvider;
-	}
+  public static TenantSupport get() {
+    if (INSTANCE == null) {
+      throw new RuntimeException("Multi-tenant support is not configured properly.");
+    }
+    return INSTANCE;
+  }
+
+  public TenantConfigProvider getConfigProvider() {
+    return confixProvider;
+  }
 }

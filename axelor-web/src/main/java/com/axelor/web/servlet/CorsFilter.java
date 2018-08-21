@@ -19,10 +19,10 @@ package com.axelor.web.servlet;
 
 import static com.axelor.common.StringUtils.isBlank;
 
+import com.axelor.app.AppSettings;
 import java.io.IOException;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
 import javax.inject.Singleton;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -33,151 +33,147 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.axelor.app.AppSettings;
-
 /**
- * Simple CORS filter that checks <code>Origin</code> header of the requests
- * with the allowed origin pattern.
- * 
- * <p>
- * If the <code>Origin</code> header matches the configured allowed pattern, it
- * will set other configured CORS headers.
- * </p>
- * 
+ * Simple CORS filter that checks <code>Origin</code> header of the requests with the allowed origin
+ * pattern.
+ *
+ * <p>If the <code>Origin</code> header matches the configured allowed pattern, it will set other
+ * configured CORS headers.
  */
 @Singleton
 public class CorsFilter implements Filter {
 
-	private static final String CONTENT_TYPE_JSON = "application/json";
-	
-	private static final String DEFAULT_CORS_ALLOW_ORIGIN = "*";
-	private static final String DEFAULT_CORS_ALLOW_CREDENTIALS = "true";
-	private static final String DEFAULT_CORS_ALLOW_METHODS = "GET,PUT,POST,DELETE,HEAD,OPTIONS";
-	private static final String DEFAULT_CORS_ALLOW_HEADERS = "Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers";
-	private static final String DEFAULT_EXPOSE_HEADERS = "";
-	private static final String DEFAULT_CORS_MAX_AGE = "1728000";
+  private static final String CONTENT_TYPE_JSON = "application/json";
 
-	private static Pattern corsOriginPattern;
+  private static final String DEFAULT_CORS_ALLOW_ORIGIN = "*";
+  private static final String DEFAULT_CORS_ALLOW_CREDENTIALS = "true";
+  private static final String DEFAULT_CORS_ALLOW_METHODS = "GET,PUT,POST,DELETE,HEAD,OPTIONS";
+  private static final String DEFAULT_CORS_ALLOW_HEADERS =
+      "Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers";
+  private static final String DEFAULT_EXPOSE_HEADERS = "";
+  private static final String DEFAULT_CORS_MAX_AGE = "1728000";
 
-	private static String corsAllowOrigin;
-	private static String corsAllowCredentials;
-	private static String corsAllowMethods;
-	private static String corsAllowHeaders;
-	private static String corsExposeHeaders;
-	private static String corsMaxAge;
+  private static Pattern corsOriginPattern;
 
-	private Logger log = LoggerFactory.getLogger(CorsFilter.class);
+  private static String corsAllowOrigin;
+  private static String corsAllowCredentials;
+  private static String corsAllowMethods;
+  private static String corsAllowHeaders;
+  private static String corsExposeHeaders;
+  private static String corsMaxAge;
 
-	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
+  private Logger log = LoggerFactory.getLogger(CorsFilter.class);
 
-		final AppSettings settings = AppSettings.get();
+  @Override
+  public void init(FilterConfig filterConfig) throws ServletException {
 
-		corsAllowOrigin = settings.get("cors.allow.origin");
-		corsAllowCredentials = settings.get("cors.allow.credentials", DEFAULT_CORS_ALLOW_CREDENTIALS);
-		corsAllowMethods = settings.get("cors.allow.methods", DEFAULT_CORS_ALLOW_METHODS);
-		corsAllowHeaders = settings.get("cors.allow.headers", DEFAULT_CORS_ALLOW_HEADERS);
-		corsExposeHeaders = settings.get("cors.expose.headers", DEFAULT_EXPOSE_HEADERS);
-		corsMaxAge = settings.get("cors.max.age", DEFAULT_CORS_MAX_AGE);
+    final AppSettings settings = AppSettings.get();
 
-		if (isBlank(corsAllowOrigin)) {
-			return;
-		}
+    corsAllowOrigin = settings.get("cors.allow.origin");
+    corsAllowCredentials = settings.get("cors.allow.credentials", DEFAULT_CORS_ALLOW_CREDENTIALS);
+    corsAllowMethods = settings.get("cors.allow.methods", DEFAULT_CORS_ALLOW_METHODS);
+    corsAllowHeaders = settings.get("cors.allow.headers", DEFAULT_CORS_ALLOW_HEADERS);
+    corsExposeHeaders = settings.get("cors.expose.headers", DEFAULT_EXPOSE_HEADERS);
+    corsMaxAge = settings.get("cors.max.age", DEFAULT_CORS_MAX_AGE);
 
-		log.debug("CORS origin: {}", corsAllowOrigin);
+    if (isBlank(corsAllowOrigin)) {
+      return;
+    }
 
-		if (DEFAULT_CORS_ALLOW_ORIGIN.equals(corsAllowOrigin)) {
-			corsOriginPattern = Pattern.compile(".*");
-			return;
-		}
-		try {
-			corsOriginPattern = Pattern.compile(corsAllowOrigin);
-		} catch (PatternSyntaxException e) {
-			log.error("CORS origin pattern is invalid", e);
-			corsAllowOrigin = null;
-		}
-	}
+    log.debug("CORS origin: {}", corsAllowOrigin);
 
-	@Override
-	public void destroy() {
-	}
+    if (DEFAULT_CORS_ALLOW_ORIGIN.equals(corsAllowOrigin)) {
+      corsOriginPattern = Pattern.compile(".*");
+      return;
+    }
+    try {
+      corsOriginPattern = Pattern.compile(corsAllowOrigin);
+    } catch (PatternSyntaxException e) {
+      log.error("CORS origin pattern is invalid", e);
+      corsAllowOrigin = null;
+    }
+  }
 
-	private boolean isCrossOrigin(String origin, String host) {
-		return !isBlank(origin) && !origin.endsWith("//" + host);
-	}
+  @Override
+  public void destroy() {}
 
-	private boolean isOriginAllowed(String origin) {
-		return DEFAULT_CORS_ALLOW_ORIGIN.equals(corsAllowOrigin) || corsOriginPattern.matcher(origin).matches();
-	}
-	
-	private boolean isPreflight(HttpServletRequest req) {
-		return req.getMethod().equals("OPTIONS") && !isBlank(req.getHeader("Access-Control-Request-Method"));
-	}
+  private boolean isCrossOrigin(String origin, String host) {
+    return !isBlank(origin) && !origin.endsWith("//" + host);
+  }
 
-	private boolean isTextPlain(HttpServletRequest req) {
-		final String contentType = req.getContentType();
-		return contentType != null && "text/plain".equals(contentType.split(";")[0]);
-	}
+  private boolean isOriginAllowed(String origin) {
+    return DEFAULT_CORS_ALLOW_ORIGIN.equals(corsAllowOrigin)
+        || corsOriginPattern.matcher(origin).matches();
+  }
 
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
+  private boolean isPreflight(HttpServletRequest req) {
+    return req.getMethod().equals("OPTIONS")
+        && !isBlank(req.getHeader("Access-Control-Request-Method"));
+  }
 
-		final HttpServletRequest req = (HttpServletRequest) request;
-		final HttpServletResponse res = (HttpServletResponse) response;
-		final String origin = req.getHeader("Origin");
-		final String host = req.getHeader("Host");
+  private boolean isTextPlain(HttpServletRequest req) {
+    final String contentType = req.getContentType();
+    return contentType != null && "text/plain".equals(contentType.split(";")[0]);
+  }
 
-		if (corsOriginPattern == null || !isCrossOrigin(origin, host)) {
-			chain.doFilter(request, response);
-			return;
-		}
-		if (!isOriginAllowed(origin)) {
-			res.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			return;
-		}
+  @Override
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+      throws IOException, ServletException {
 
-		res.addHeader("Access-Control-Allow-Origin", origin);
-		res.addHeader("Access-Control-Allow-Credentials", corsAllowCredentials);
+    final HttpServletRequest req = (HttpServletRequest) request;
+    final HttpServletResponse res = (HttpServletResponse) response;
+    final String origin = req.getHeader("Origin");
+    final String host = req.getHeader("Host");
 
-		// Handle preflight request
-		if (isPreflight(req)) {
-			res.addHeader("Access-Control-Allow-Methods", corsAllowMethods);
-			res.addHeader("Access-Control-Allow-Headers", corsAllowHeaders);
-			res.addHeader("Access-Control-Max-Age", corsMaxAge);
-            res.setStatus(HttpServletResponse.SC_OK);
-            return;
-        }
+    if (corsOriginPattern == null || !isCrossOrigin(origin, host)) {
+      chain.doFilter(request, response);
+      return;
+    }
+    if (!isOriginAllowed(origin)) {
+      res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+      return;
+    }
 
-		if (!isBlank(corsExposeHeaders)) {
-			res.addHeader("Access-Control-Expose-Headers", corsExposeHeaders);
-		}
+    res.addHeader("Access-Control-Allow-Origin", origin);
+    res.addHeader("Access-Control-Allow-Credentials", corsAllowCredentials);
 
-		// Force "application/json" if content-type is "text/plain"
-		final ServletRequest wrapper = isTextPlain(req) ? new JsonRequest(req) : req;
+    // Handle preflight request
+    if (isPreflight(req)) {
+      res.addHeader("Access-Control-Allow-Methods", corsAllowMethods);
+      res.addHeader("Access-Control-Allow-Headers", corsAllowHeaders);
+      res.addHeader("Access-Control-Max-Age", corsMaxAge);
+      res.setStatus(HttpServletResponse.SC_OK);
+      return;
+    }
 
-		chain.doFilter(wrapper, response);
-	}
+    if (!isBlank(corsExposeHeaders)) {
+      res.addHeader("Access-Control-Expose-Headers", corsExposeHeaders);
+    }
 
-	// wrapper class to force content type to be "application/json"
-	private static class JsonRequest extends HttpServletRequestWrapper {
+    // Force "application/json" if content-type is "text/plain"
+    final ServletRequest wrapper = isTextPlain(req) ? new JsonRequest(req) : req;
 
-		public JsonRequest(HttpServletRequest request) {
-			super(request);
-		}
+    chain.doFilter(wrapper, response);
+  }
 
-		@Override
-		public String getContentType() {
-			return CONTENT_TYPE_JSON;
-		}
+  // wrapper class to force content type to be "application/json"
+  private static class JsonRequest extends HttpServletRequestWrapper {
 
-		@Override
-		public String getHeader(String name) {
-			return "content-type".equals(name.toLowerCase()) ? CONTENT_TYPE_JSON : super.getHeader(name);
-		}
-	}
+    public JsonRequest(HttpServletRequest request) {
+      super(request);
+    }
+
+    @Override
+    public String getContentType() {
+      return CONTENT_TYPE_JSON;
+    }
+
+    @Override
+    public String getHeader(String name) {
+      return "content-type".equals(name.toLowerCase()) ? CONTENT_TYPE_JSON : super.getHeader(name);
+    }
+  }
 }

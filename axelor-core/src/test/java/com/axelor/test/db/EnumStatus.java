@@ -20,11 +20,10 @@ package com.axelor.test.db;
 import com.axelor.db.annotations.Widget;
 
 public enum EnumStatus {
+  DRAFT,
 
-	DRAFT,
-	
-	OPEN,
+  OPEN,
 
-	@Widget(title = "Close")
-	CLOSED
+  @Widget(title = "Close")
+  CLOSED
 }

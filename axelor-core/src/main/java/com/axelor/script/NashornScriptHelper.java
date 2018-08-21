@@ -17,30 +17,29 @@
  */
 package com.axelor.script;
 
+import com.axelor.rpc.Context;
 import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import com.axelor.rpc.Context;
-
 public class NashornScriptHelper extends AbstractScriptHelper {
 
-	private final ScriptEngine engine;
-	
-	public NashornScriptHelper(Bindings bindings) {
-		this.setBindings(bindings);
-		engine = new ScriptEngineManager().getEngineByName("nashorn");
-		engine.setBindings(new NashornGlobals(engine), ScriptContext.GLOBAL_SCOPE);
-	}
+  private final ScriptEngine engine;
 
-	public NashornScriptHelper(Context context) {
-		this(new ScriptBindings(context));
-	}
+  public NashornScriptHelper(Bindings bindings) {
+    this.setBindings(bindings);
+    engine = new ScriptEngineManager().getEngineByName("nashorn");
+    engine.setBindings(new NashornGlobals(engine), ScriptContext.GLOBAL_SCOPE);
+  }
 
-	@Override
-	public Object eval(String expr, Bindings bindings) throws ScriptException {
-		return engine.eval(expr, bindings);
-	}
+  public NashornScriptHelper(Context context) {
+    this(new ScriptBindings(context));
+  }
+
+  @Override
+  public Object eval(String expr, Bindings bindings) throws ScriptException {
+    return engine.eval(expr, bindings);
+  }
 }

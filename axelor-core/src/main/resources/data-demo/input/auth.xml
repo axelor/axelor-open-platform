@@ -7,7 +7,7 @@
   <permission name="perm.auth.all" object="com.axelor.auth.db.*">
     <can create="true" read="true" write="true" remove="true" export="true"/>
   </permission>
-  
+
   <permission name="perm.auth.create" object="com.axelor.auth.db.*">
     <can create="true"/>
   </permission>
@@ -17,7 +17,7 @@
     <domain>self.createdBy = ?</domain>
     <domain-params>__user__</domain-params>
   </permission>
-  
+
   <permission name="perm.auth.my" object="com.axelor.auth.db.User">
     <can read="true" write="true"/>
     <domain>self.code = ?</domain>
@@ -37,5 +37,5 @@
   <role name="role.user" title="User">
     <permission name="perm.auth.my"/>
   </role>
-  
+
 </auth>

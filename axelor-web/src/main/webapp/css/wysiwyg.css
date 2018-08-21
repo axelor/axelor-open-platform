@@ -16,35 +16,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 .wysiwyg-container {
-	border-radius: 0;
+  border-radius: 0;
 }
 
 .wysiwyg-editor {
-	min-height: 100px;
+  min-height: 100px;
 }
 
 .wysiwyg-browse {
-	padding: 0;
+  padding: 0;
 }
 
 .wysiwyg-popup {
-	border-radius: 0;
-	background: #fff;
-	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-	background-clip: padding-box;
-	width: auto !important;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  background-clip: padding-box;
+  width: auto !important;
 }
 
 .wysiwyg-toolbar-icon {
-	padding: 6px 8px;
-	font-size: 14px;
+  padding: 6px 8px;
+  font-size: 14px;
 }
 
 .wysiwyg-toolbar a,
 .wysiwyg-toolbar a:hover,
 .wysiwyg-toolbar a:link,
 .wysiwyg-toolbar a:visited {
-	text-decoration: none;
+  text-decoration: none;
 }
 
 .wysiwyg-plugin-list {
@@ -68,72 +68,72 @@
 }
 
 .wysiwyg-toolbar-icon.disabled {
-	opacity: 0.3;
-	color: inherit;
-	background-color: inherit;
-	cursor: default;
+  opacity: 0.3;
+  color: inherit;
+  background-color: inherit;
+  cursor: default;
 }
 
 .wysiwyg-popup.wysiwyg-popuphover {
-	width: auto;
+  width: auto;
 }
 
 input.wysiwyg-input {
-	margin: 0;
+  margin: 0;
 }
 
 .wysiwyg-toolbar-divider {
-	background-color: #ddd;
-	display: inline-block;
-	height: 26px;
-	margin-left: 0px;
-	margin-right: 0px;
-	vertical-align: middle;
-	width: 1px;
+  background-color: #ddd;
+  display: inline-block;
+  height: 26px;
+  margin-left: 0px;
+  margin-right: 0px;
+  vertical-align: middle;
+  width: 1px;
 }
 
 /** normalize bootstrap css for content */
 .html-item .html-content blockquote {
-	margin: 0 0 9px 40px;
-	border: none;
-	padding: 0px;
+  margin: 0 0 9px 40px;
+  border: none;
+  padding: 0px;
 }
 
 /** force same style on chrome */
 .html-item .html-content blockquote[style*='margin: 0 0 0 40px'] {
-	margin: 0 0 9px 40px !important;
+  margin: 0 0 9px 40px !important;
 }
 
 .html-item .html-content blockquote p {
-	font-size: 13.25px;
-	font-weight: inherit;
-	line-height: 18px;
+  font-size: 13.25px;
+  font-weight: inherit;
+  line-height: 18px;
 }
 
 .wysiwyg-plugin-list h1, h2, h3, h4, h5, h6,
 .html-item .html-content h1, h2, h3, h4, h5, h6 {
-	font-weight: 600;
+  font-weight: 600;
 }
 
 .wysiwyg-plugin-list h1,
 .html-item .html-content h1 {
-	font-size: 24.75px;
+  font-size: 24.75px;
 }
 
 .wysiwyg-plugin-list h2,
 .html-item .html-content h2 {
-	font-size: 22.25px;
+  font-size: 22.25px;
 }
 
 .wysiwyg-plugin-list h3,
 .html-item .html-content h3 {
-	font-size: 18.75px;
+  font-size: 18.75px;
 }
 
 .html-item textarea.html-content {
-	border: none;
-	width: 100%;
-	margin: 0;
+  border: none;
+  width: 100%;
+  margin: 0;
 }
 
 .wysiwyg-plugin-list h1,
@@ -145,42 +145,42 @@ input.wysiwyg-input {
 .wysiwyg-plugin-list p,
 .wysiwyg-plugin-list pre,
 .wysiwyg-plugin-list blockquote {
-	margin: 0;
+  margin: 0;
 }
 
 .wysiwyg-plugin-list pre {
-	padding: 2px 4px 0;
+  padding: 2px 4px 0;
 }
 
 .html-item textarea.html-content {
-	border: none;
-	width: 100%;
-	margin: 0;
+  border: none;
+  width: 100%;
+  margin: 0;
 }
 
 .wysiwyg-container.ui-resizable {
-	min-height: 100px;
+  min-height: 100px;
 }
 
 .wysiwyg-container.ui-resizable .wysiwyg-editor {
-	min-height: auto;
+  min-height: auto;
 }
 
 .wysiwyg-container.ui-resizable textarea {
-	resize: none;
+  resize: none;
 }
 
 .wysiwyg-container.ui-resizable .html-content {
-	position: absolute;
-	top: 27px;
-	left: 0;
-	bottom: 4px;
-	right: 0;
+  position: absolute;
+  top: 27px;
+  left: 0;
+  bottom: 4px;
+  right: 0;
 }
 
 .wysiwyg-container.ui-resizable .ui-resizable-handle.ui-resizable-s {
-	background-color: #cccccc;
-	position: absolute;
+  background-color: #cccccc;
+  position: absolute;
     right: 0;
     bottom: 0;
     left: 0;
@@ -188,19 +188,19 @@ input.wysiwyg-input {
 }
 
 .slick-external-editor.html-item {
-	background-color: white;
-	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-	min-width: 380px;
+  background-color: white;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  min-width: 380px;
 }
 
 .slick-external-editor.html-item input.wysiwyg-input {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .slick-external-editor .wysiwyg-editor {
-	max-height: 200px;
+  max-height: 200px;
 }
 
 .slick-external-editor .wysiwyg-container textarea {
-	resize: none;
+  resize: none;
 }

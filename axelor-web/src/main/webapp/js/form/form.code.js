@@ -26,109 +26,109 @@ var ui = angular.module('axelor.ui');
 
 ui.formInput('CodeEditor', {
 
-	css: "code-editor",
+  css: "code-editor",
 
-	metaWidget: true,
+  metaWidget: true,
 
-	link: function(scope, element, attrs, model) {
-		
-		var editor = null;
-		var loading = false;
+  link: function(scope, element, attrs, model) {
 
-		var field = scope.field;
-		var props = {
-			autofocus: true,
-			lineNumbers: true,
-			tabSize : 2,
-			indentUnit : 2,
-			indentWithTabs: false,
-			theme: field.codeTheme || "default",
-			extraKeys: {
-				'Ctrl-F': function () {}
-			}
-		};
+    var editor = null;
+    var loading = false;
 
-		if (field.mode || field.codeSyntax) {
-			props.mode = field.mode || field.codeSyntax;
-		}
+    var field = scope.field;
+    var props = {
+      autofocus: true,
+      lineNumbers: true,
+      tabSize : 2,
+      indentUnit : 2,
+      indentWithTabs: false,
+      theme: field.codeTheme || "default",
+      extraKeys: {
+        'Ctrl-F': function () {}
+      }
+    };
 
-		if (props.mode === "xml") {
-			props = _.extend(props, {
-				foldGutter : true,
-				gutters : ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-				autoCloseBrackets : true,
-				autoCloseTags : true
-			});
-		}
+    if (field.mode || field.codeSyntax) {
+      props.mode = field.mode || field.codeSyntax;
+    }
 
-		if (field.height) {
-			element.height(field.height);
-		}
+    if (props.mode === "xml") {
+      props = _.extend(props, {
+        foldGutter : true,
+        gutters : ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+        autoCloseBrackets : true,
+        autoCloseTags : true
+      });
+    }
 
-		setTimeout(function () {
-			props.readOnly = scope.$$readonly;
-			editor = CodeMirror(element.get(0), props);
-			model.$render();
-			readonlySet(props.readOnly);
-			editor.on("change", changed);
-		});
-		
-		scope.$watch('$$readonly', readonlySet);
+    if (field.height) {
+      element.height(field.height);
+    }
 
-		model.$render = function() {
-			loading = true;
-			var val = model.$modelValue;
-			if (editor) {
-				editor.setValue(val || "");
-				editor.clearHistory();
-			}
-			loading = false;
-		};
+    setTimeout(function () {
+      props.readOnly = scope.$$readonly;
+      editor = CodeMirror(element.get(0), props);
+      model.$render();
+      readonlySet(props.readOnly);
+      editor.on("change", changed);
+    });
 
-		model.$formatters.push(function (value) {
-			return value || '';
-		});
+    scope.$watch('$$readonly', readonlySet);
 
-		function readonlySet(readonly) {
-			if (editor) {
-				editor.setOption('readOnly', _.toBoolean(readonly));
-			}
-		}
+    model.$render = function() {
+      loading = true;
+      var val = model.$modelValue;
+      if (editor) {
+        editor.setValue(val || "");
+        editor.clearHistory();
+      }
+      loading = false;
+    };
 
-		function changed(instance, changedObj) {
-			if (loading || !editor) return;
-			var value = editor.getValue();
-			if (value !== model.$viewValue) {
-				model.$setViewValue(value);
-			}
-			scope.$applyAsync();
-		}
+    model.$formatters.push(function (value) {
+      return value || '';
+    });
 
-		function resize() {
-			if (element[0].offsetHeight === 0) return; // is hidden?
-			if (editor) {
-				editor.refresh();
-			}
-			element.width('');
-		}
-		
-		element.resizable({
-			handles: 's',
-			resize: resize
-		});
-		
-		scope.$onAdjust(resize);
-	},
+    function readonlySet(readonly) {
+      if (editor) {
+        editor.setOption('readOnly', _.toBoolean(readonly));
+      }
+    }
 
-	replace: true,
+    function changed(instance, changedObj) {
+      if (loading || !editor) return;
+      var value = editor.getValue();
+      if (value !== model.$viewValue) {
+        model.$setViewValue(value);
+      }
+      scope.$applyAsync();
+    }
 
-	transclude: true,
-	
-	template_editable: null,
-	
-	template_readonly: null,
-	
-	template: '<div ng-transclude></div>'
+    function resize() {
+      if (element[0].offsetHeight === 0) return; // is hidden?
+      if (editor) {
+        editor.refresh();
+      }
+      element.width('');
+    }
+
+    element.resizable({
+      handles: 's',
+      resize: resize
+    });
+
+    scope.$onAdjust(resize);
+  },
+
+  replace: true,
+
+  transclude: true,
+
+  template_editable: null,
+
+  template_readonly: null,
+
+  template: '<div ng-transclude></div>'
 });
 
 })();

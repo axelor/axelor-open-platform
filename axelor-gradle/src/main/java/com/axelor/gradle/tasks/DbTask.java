@@ -17,113 +17,113 @@
  */
 package com.axelor.gradle.tasks;
 
+import com.axelor.common.StringUtils;
+import com.axelor.gradle.AxelorPlugin;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.gradle.api.GradleException;
 import org.gradle.api.internal.tasks.options.Option;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.TaskAction;
 
-import com.axelor.common.StringUtils;
-import com.axelor.gradle.AxelorPlugin;
-
 public class DbTask extends JavaExec {
 
-	public static final String TASK_NAME = "database";
-	public static final String TASK_DESCRIPTION = "Manage application database.";
-	public static final String TASK_GROUP = AxelorPlugin.AXELOR_APP_GROUP;
+  public static final String TASK_NAME = "database";
+  public static final String TASK_DESCRIPTION = "Manage application database.";
+  public static final String TASK_GROUP = AxelorPlugin.AXELOR_APP_GROUP;
 
-	private static final String MAIN_CLASS_NAME = "com.axelor.app.internal.AppCli";
+  private static final String MAIN_CLASS_NAME = "com.axelor.app.internal.AppCli";
 
-	private String config;
+  private String config;
 
-	private String modules;
+  private String modules;
 
-	private boolean update;
+  private boolean update;
 
-	private boolean migrate;
+  private boolean migrate;
 
-	private boolean encrypt;
+  private boolean encrypt;
 
-	private boolean verbose;
+  private boolean verbose;
 
-	@Option(option = "config", description = "specify appliction config file path")
-	public void setConfig(String config) {
-		this.config = config;
-	}
+  @Option(option = "config", description = "specify appliction config file path")
+  public void setConfig(String config) {
+    this.config = config;
+  }
 
-	@Option(option = "modules", description = "comma separate list of modules to update")
-	public void setModules(String modules) {
-		this.modules = modules;
-	}
+  @Option(option = "modules", description = "comma separate list of modules to update")
+  public void setModules(String modules) {
+    this.modules = modules;
+  }
 
-	@Option(option = "update", description = "update the installed modules")
-	public void setUpdate(boolean update) {
-		this.update = update;
-	}
+  @Option(option = "update", description = "update the installed modules")
+  public void setUpdate(boolean update) {
+    this.update = update;
+  }
 
-	@Option(option = "migrate", description = "run migration scripts")
-	public void setMigrate(boolean migrate) {
-		this.migrate = migrate;
-	}
-	
-	@Option(option = "encrypt", description = "update encrypted values")
-	public void setEncrypt(boolean encrypt) {
-		this.encrypt = encrypt;
-	}
+  @Option(option = "migrate", description = "run migration scripts")
+  public void setMigrate(boolean migrate) {
+    this.migrate = migrate;
+  }
 
-	@Option(option = "verbose", description = "verbose ouput")
-	public void setVerbose(boolean verbose) {
-		this.verbose = verbose;
-	}
+  @Option(option = "encrypt", description = "update encrypted values")
+  public void setEncrypt(boolean encrypt) {
+    this.encrypt = encrypt;
+  }
 
-	@Override
-	public String getMain() {
-		return MAIN_CLASS_NAME;
-	}
+  @Option(option = "verbose", description = "verbose ouput")
+  public void setVerbose(boolean verbose) {
+    this.verbose = verbose;
+  }
 
-	@TaskAction
-	@Override
-	public void exec() {
-		final List<String> args = new ArrayList<>();
-		final List<String> jvmArgs = new ArrayList<>();
+  @Override
+  public String getMain() {
+    return MAIN_CLASS_NAME;
+  }
 
-		if (migrate) {
-			args.add("-M");
-		} else if (encrypt) {
-			args.add("-E");
-		} else if (update) {
-			args.add("-u");
-		} else {
-			args.add("-i");
-		}
+  @TaskAction
+  @Override
+  public void exec() {
+    final List<String> args = new ArrayList<>();
+    final List<String> jvmArgs = new ArrayList<>();
 
-		if (verbose) {
-			args.add("--verbose");
-		}
+    if (migrate) {
+      args.add("-M");
+    } else if (encrypt) {
+      args.add("-E");
+    } else if (update) {
+      args.add("-u");
+    } else {
+      args.add("-i");
+    }
 
-		if (StringUtils.notBlank(modules)) {
-			args.add("-m");
-			args.add(modules);
-		}
+    if (verbose) {
+      args.add("--verbose");
+    }
 
-		final String configPath = StringUtils.notBlank(config) ? config
-				: System.getProperty("axelor.config", "src/main/resources/application.properties");
+    if (StringUtils.notBlank(modules)) {
+      args.add("-m");
+      args.add(modules);
+    }
 
-		final Path configFile = Paths.get(configPath);
-		if (Files.notExists(configFile)) {
-			throw new GradleException("Unable to find application config.");
-		}
+    final String configPath =
+        StringUtils.notBlank(config)
+            ? config
+            : System.getProperty("axelor.config", "src/main/resources/application.properties");
 
-		jvmArgs.add("-Daxelor.config=" + configFile.toFile().getAbsolutePath());
+    final Path configFile = Paths.get(configPath);
+    if (Files.notExists(configFile)) {
+      throw new GradleException("Unable to find application config.");
+    }
 
-		setArgs(args);
-		setJvmArgs(jvmArgs);
+    jvmArgs.add("-Daxelor.config=" + configFile.toFile().getAbsolutePath());
 
-		super.exec();
-	}
+    setArgs(args);
+    setJvmArgs(jvmArgs);
+
+    super.exec();
+  }
 }

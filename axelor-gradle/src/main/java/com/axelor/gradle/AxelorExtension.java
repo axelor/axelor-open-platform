@@ -22,64 +22,64 @@ import java.util.Set;
 
 public class AxelorExtension {
 
-	public static final String EXTENSION_NAME = "axelor";
+  public static final String EXTENSION_NAME = "axelor";
 
-	private String title;
+  private String title;
 
-	private String description;
+  private String description;
 
-	private Boolean removable;
+  private Boolean removable;
 
-	private Set<String> install;
+  private Set<String> install;
 
-	public String getTitle() {
-		return title;
-	}
+  public String getTitle() {
+    return title;
+  }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+  public void setTitle(String title) {
+    this.title = title;
+  }
 
-	public String getDescription() {
-		return description;
-	}
+  public String getDescription() {
+    return description;
+  }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-	public Boolean getRemovable() {
-		return removable;
-	}
+  public Boolean getRemovable() {
+    return removable;
+  }
 
-	public void setRemovable(Boolean removable) {
-		this.removable = removable;
-	}
+  public void setRemovable(Boolean removable) {
+    this.removable = removable;
+  }
 
-	public Set<String> getInstall() {
-		return install;
-	}
+  public Set<String> getInstall() {
+    return install;
+  }
 
-	public void setInstall(Set<String> install) {
-		this.install = install;
-	}
+  public void setInstall(Set<String> install) {
+    this.install = install;
+  }
 
-	public void title(String title) {
-		this.title = title;
-	}
+  public void title(String title) {
+    this.title = title;
+  }
 
-	public void description(String description) {
-		this.description = description;
-	}
+  public void description(String description) {
+    this.description = description;
+  }
 
-	public void removable(Boolean removable) {
-		this.removable = removable;
-	}
+  public void removable(Boolean removable) {
+    this.removable = removable;
+  }
 
-	public void install(String module) {
-		if (install == null) {
-			install = new LinkedHashSet<>();
-		}
-		install.add(module);
-	}
+  public void install(String module) {
+    if (install == null) {
+      install = new LinkedHashSet<>();
+    }
+    install.add(module);
+  }
 }

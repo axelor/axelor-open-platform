@@ -23,77 +23,69 @@ import com.axelor.meta.db.MetaSequence;
 import com.axelor.meta.db.repo.MetaSequenceRepository;
 import com.google.common.base.Strings;
 
-/**
- * This class provides some helper static methods to deal with custom sequences.
- * 
- */
+/** This class provides some helper static methods to deal with custom sequences. */
 public final class JpaSequence {
 
-	private JpaSequence() {
-	}
+  private JpaSequence() {}
 
-	private static MetaSequence find(String name) {
-		final MetaSequenceRepository repo = Beans.get(MetaSequenceRepository.class);
-		final MetaSequence sequence =  repo.findByName(name);
-		if (sequence == null) {
-			throw new IllegalArgumentException("No such sequence: " + name);
-		}
-		return sequence;
-	}
+  private static MetaSequence find(String name) {
+    final MetaSequenceRepository repo = Beans.get(MetaSequenceRepository.class);
+    final MetaSequence sequence = repo.findByName(name);
+    if (sequence == null) {
+      throw new IllegalArgumentException("No such sequence: " + name);
+    }
+    return sequence;
+  }
 
-	/**
-	 * Get the next sequence value of the given sequence.<br>
-	 * <br>
-	 * This method must be called inside a running transaction as it updates the
-	 * sequence details in database.
-	 * 
-	 * @param name
-	 *            the name of the sequence
-	 * @return next sequence value
-	 */
-	public static String nextValue(String name) {
-		final MetaSequence sequence = find(name);
-		final Long next = sequence.getNext();
-		final String prefix = sequence.getPrefix();
-		final String suffix = sequence.getSuffix();
-		final Integer padding = sequence.getPadding();
+  /**
+   * Get the next sequence value of the given sequence.<br>
+   * <br>
+   * This method must be called inside a running transaction as it updates the sequence details in
+   * database.
+   *
+   * @param name the name of the sequence
+   * @return next sequence value
+   */
+  public static String nextValue(String name) {
+    final MetaSequence sequence = find(name);
+    final Long next = sequence.getNext();
+    final String prefix = sequence.getPrefix();
+    final String suffix = sequence.getSuffix();
+    final Integer padding = sequence.getPadding();
 
-		String value = "" + next;
-		if (padding > 0) {
-			value = Strings.padStart(value, padding, '0');
-		}
-		if (!StringUtils.isBlank(prefix)) {
-			value = prefix + value;
-		}
-		if (!StringUtils.isBlank(suffix)) {
-			value = value + suffix;
-		}
-		
-		sequence.setNext(next + sequence.getIncrement());
+    String value = "" + next;
+    if (padding > 0) {
+      value = Strings.padStart(value, padding, '0');
+    }
+    if (!StringUtils.isBlank(prefix)) {
+      value = prefix + value;
+    }
+    if (!StringUtils.isBlank(suffix)) {
+      value = value + suffix;
+    }
 
-		JPA.em().persist(sequence);
+    sequence.setNext(next + sequence.getIncrement());
 
-		return value;
-	}
-	
-	/**
-	 * Set the next numeric value for the given sequence.<br>
-	 * <br>
-	 * This method must be called inside a running transaction as it updates the
-	 * sequence details in the database. <br>
-	 * <br>
-	 * This method is generally used to reset the sequence. It may cause
-	 * duplicates if given next number is less then the last next value of the
-	 * sequence.
-	 * 
-	 * @param name
-	 *            the name of the sequence
-	 * @param next
-	 *            the next sequence number
-	 */
-	public static void nextValue(final String name, final long next) {
-		final MetaSequence sequence = find(name);
-		sequence.setNext(next);
-		JPA.em().persist(sequence);
-	}
+    JPA.em().persist(sequence);
+
+    return value;
+  }
+
+  /**
+   * Set the next numeric value for the given sequence.<br>
+   * <br>
+   * This method must be called inside a running transaction as it updates the sequence details in
+   * the database. <br>
+   * <br>
+   * This method is generally used to reset the sequence. It may cause duplicates if given next
+   * number is less then the last next value of the sequence.
+   *
+   * @param name the name of the sequence
+   * @param next the next sequence number
+   */
+  public static void nextValue(final String name, final long next) {
+    final MetaSequence sequence = find(name);
+    sequence.setNext(next);
+    JPA.em().persist(sequence);
+  }
 }

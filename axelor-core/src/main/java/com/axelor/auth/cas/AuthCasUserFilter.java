@@ -23,47 +23,47 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.shiro.web.filter.authc.UserFilter;
 import org.apache.shiro.web.util.WebUtils;
 
 public class AuthCasUserFilter extends UserFilter {
 
-	@Inject
-	@Override
-	public void setLoginUrl(@Named("shiro.cas.login.url") String loginUrl) {
-		super.setLoginUrl(loginUrl);
-	}
+  @Inject
+  @Override
+  public void setLoginUrl(@Named("shiro.cas.login.url") String loginUrl) {
+    super.setLoginUrl(loginUrl);
+  }
 
-	@Override
-	protected boolean isAccessAllowed(ServletRequest request,
-			ServletResponse response, Object mappedValue) {
-		return super.isAccessAllowed(request, response, mappedValue);
-	}
+  @Override
+  protected boolean isAccessAllowed(
+      ServletRequest request, ServletResponse response, Object mappedValue) {
+    return super.isAccessAllowed(request, response, mappedValue);
+  }
 
-	@Override
-	protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-		if (isXHR(request)) {
-			if (isLogin(request)) {
-				return doLogin(request, response);
-			}
-			HttpServletResponse res = (HttpServletResponse) response;
-			res.setStatus(302);
-			return false;
-		}
-		return super.onAccessDenied(request, response);
-	}
+  @Override
+  protected boolean onAccessDenied(ServletRequest request, ServletResponse response)
+      throws Exception {
+    if (isXHR(request)) {
+      if (isLogin(request)) {
+        return doLogin(request, response);
+      }
+      HttpServletResponse res = (HttpServletResponse) response;
+      res.setStatus(302);
+      return false;
+    }
+    return super.onAccessDenied(request, response);
+  }
 
-	private boolean doLogin(ServletRequest request, ServletResponse response) throws Exception {
-		return false;
-	}
+  private boolean doLogin(ServletRequest request, ServletResponse response) throws Exception {
+    return false;
+  }
 
-	private boolean isXHR(ServletRequest request) {
-		return "XMLHttpRequest".equals(((HttpServletRequest) request).getHeader("X-Requested-With"));
-	}
+  private boolean isXHR(ServletRequest request) {
+    return "XMLHttpRequest".equals(((HttpServletRequest) request).getHeader("X-Requested-With"));
+  }
 
-	private boolean isLogin(ServletRequest request) {
-		return pathsMatch("/login.jsp", request)
-				&& WebUtils.toHttp(request).getMethod().toUpperCase().equals(POST_METHOD);
-	}
+  private boolean isLogin(ServletRequest request) {
+    return pathsMatch("/login.jsp", request)
+        && WebUtils.toHttp(request).getMethod().toUpperCase().equals(POST_METHOD);
+  }
 }

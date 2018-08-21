@@ -19,7 +19,6 @@ package com.axelor.gradle.support;
 
 import java.net.URI;
 import java.nio.file.Path;
-
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginConvention;
@@ -31,50 +30,67 @@ import org.gradle.jvm.tasks.Jar;
 
 public class PublishSupport extends AbstractSupport {
 
-	@Override
-	public void apply(Project project) {
-		project.getPlugins().apply(MavenPublishPlugin.class);
-		project.afterEvaluate(this::configure);
-	}
+  @Override
+  public void apply(Project project) {
+    project.getPlugins().apply(MavenPublishPlugin.class);
+    project.afterEvaluate(this::configure);
+  }
 
-	private void configure(Project project) {
-		final JavaPluginConvention convention = project.getConvention().getPlugin(JavaPluginConvention.class);
-		final SourceSet main = convention.getSourceSets().findByName(SourceSet.MAIN_SOURCE_SET_NAME);
-		final Jar jar = (Jar) project.getTasks().findByName(JavaPlugin.JAR_TASK_NAME);
-		final Jar sourcesJar = project.getTasks().create("sourcesJar", Jar.class, task -> {
-			task.dependsOn(JavaPlugin.COMPILE_JAVA_TASK_NAME);
-			task.from(main.getAllSource());
-			task.setManifest(jar.getManifest());
-			task.setClassifier("sources");
-		});
+  private void configure(Project project) {
+    final JavaPluginConvention convention =
+        project.getConvention().getPlugin(JavaPluginConvention.class);
+    final SourceSet main = convention.getSourceSets().findByName(SourceSet.MAIN_SOURCE_SET_NAME);
+    final Jar jar = (Jar) project.getTasks().findByName(JavaPlugin.JAR_TASK_NAME);
+    final Jar sourcesJar =
+        project
+            .getTasks()
+            .create(
+                "sourcesJar",
+                Jar.class,
+                task -> {
+                  task.dependsOn(JavaPlugin.COMPILE_JAVA_TASK_NAME);
+                  task.from(main.getAllSource());
+                  task.setManifest(jar.getManifest());
+                  task.setClassifier("sources");
+                });
 
-		final PublishingExtension publishing = project.getExtensions().findByType(PublishingExtension.class);
+    final PublishingExtension publishing =
+        project.getExtensions().findByType(PublishingExtension.class);
 
-		publishing.getPublications().create("mavenJava", MavenPublication.class, publication -> {
-			publication.from(project.getComponents().getByName("java"));
-			publication.artifact(sourcesJar);
-		});
+    publishing
+        .getPublications()
+        .create(
+            "mavenJava",
+            MavenPublication.class,
+            publication -> {
+              publication.from(project.getComponents().getByName("java"));
+              publication.artifact(sourcesJar);
+            });
 
-		final Object mavenUser = project.findProperty("mavenUsername");
-		final Object mavenPass = project.findProperty("mavenPassword");
-		final Object mavenRepo = project.findProperty("mavenRepository");
+    final Object mavenUser = project.findProperty("mavenUsername");
+    final Object mavenPass = project.findProperty("mavenPassword");
+    final Object mavenRepo = project.findProperty("mavenRepository");
 
-		if (mavenRepo == null) {
-			return;
-		}
+    if (mavenRepo == null) {
+      return;
+    }
 
-		final Path rootPath = project.getRootDir().toPath().toAbsolutePath();
-		final boolean isRemote = URI.create(mavenRepo.toString()).isAbsolute();
-		final Object mavenUrl = isRemote ? mavenRepo : rootPath.resolve(mavenRepo.toString()).toUri();
+    final Path rootPath = project.getRootDir().toPath().toAbsolutePath();
+    final boolean isRemote = URI.create(mavenRepo.toString()).isAbsolute();
+    final Object mavenUrl = isRemote ? mavenRepo : rootPath.resolve(mavenRepo.toString()).toUri();
 
-		publishing.getRepositories().maven(maven -> {
-			maven.setUrl(mavenUrl);
-			if (isRemote && mavenUser != null && mavenPass != null) {
-				maven.credentials(auth -> {
-					auth.setUsername(mavenUser.toString());
-					auth.setPassword(mavenPass.toString());
-				});
-			}
-		});
-	}
+    publishing
+        .getRepositories()
+        .maven(
+            maven -> {
+              maven.setUrl(mavenUrl);
+              if (isRemote && mavenUser != null && mavenPass != null) {
+                maven.credentials(
+                    auth -> {
+                      auth.setUsername(mavenUser.toString());
+                      auth.setPassword(mavenPass.toString());
+                    });
+              }
+            });
+  }
 }

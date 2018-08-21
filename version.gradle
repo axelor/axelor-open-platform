@@ -6,9 +6,9 @@ ext.baseVersion = rootProject.file(versionFile).text.trim()
 version baseVersion
 
 if (finalRelease) {
-	// use base version
+  // use base version
 } else if (rcNumber != null) {
-	version += "-rc${rcNumber}"
+  version += "-rc${rcNumber}"
 } else {
-	version += "-SNAPSHOT"
+  version += "-SNAPSHOT"
 }

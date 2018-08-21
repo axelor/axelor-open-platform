@@ -16,20 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 .view-container .tree-view > .tree-view-container {
-	position: absolute;
-	top: 40px;
-	bottom: 0; left: 0; right: 0;
-	border-top: 1px solid #e7e7e7;
-  	background-color: #fff;
+  position: absolute;
+  top: 40px;
+  bottom: 0; left: 0; right: 0;
+  border-top: 1px solid #e7e7e7;
+    background-color: #fff;
 }
 
 table.treetable {
-  	border: 0;
-  	margin: 0;
+    border: 0;
+    margin: 0;
 }
 
 table.treetable tr {
-	line-height: 18px;
+  line-height: 18px;
 }
 
 table.treetable tbody tr.branch {
@@ -37,16 +37,16 @@ table.treetable tbody tr.branch {
 }
 
 table.treetable tbody tr.selected {
-	background-color: #337ab7;
+  background-color: #337ab7;
 }
 
 table.treetable tbody tr.selected a {
-	color: #fff;
+  color: #fff;
 }
 
 table.treetable .tree-button i,
 table.treetable .tree-button img {
-	margin-right: 4px;
+  margin-right: 4px;
 }
 
 table.treetable tbody tr.accept {
@@ -55,55 +55,55 @@ table.treetable tbody tr.accept {
 }
 
 .tree-view-container .tree-header {
-	height: 24px;
-	color: #333;
-	background-color: #fff;
+  height: 24px;
+  color: #333;
+  background-color: #fff;
 }
 
 .tree-view-container .tree-header {
-	width: 100%;
-	white-space: nowrap;
-	border-bottom: 1px solid #e7e7e7;
-	-webkit-user-select: none;
-	   -moz-user-select: none;
-	    -ms-user-select: none;
-	        user-select: none;
+  width: 100%;
+  white-space: nowrap;
+  border-bottom: 1px solid #e7e7e7;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 .tree-view-container .tree-header th {
-	display: inline-block;
-	height: 100%;
-	padding: 4px;
-	padding-left: 6px;
-	border-left: 1px solid #e7e7e7;
-	text-align: left;
-	text-overflow: ellipsis;
-	overflow: hidden;
-	font-weight: 600;
+  display: inline-block;
+  height: 100%;
+  padding: 4px;
+  padding-left: 6px;
+  border-left: 1px solid #e7e7e7;
+  text-align: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-weight: 600;
 }
 
 .tree-view-container .tree-header th:first-of-type {
-	border-left: none;
+  border-left: none;
 }
 
 .tree-view-container .tree-table {
-	overflow: auto;
-	position: absolute;
-	top: 27px; left: 0; right: 0; bottom: 0;
+  overflow: auto;
+  position: absolute;
+  top: 27px; left: 0; right: 0; bottom: 0;
 }
 
 .tree-header th,
 .tree-table td,
 .tree-table td span {
-	box-sizing: content-box;
+  box-sizing: content-box;
 }
 
 .dashlet .tree-view-container {
-	position: relative;
-	height: 100%;
-	border: 1px solid #d4d4d4;
+  position: relative;
+  height: 100%;
+  border: 1px solid #d4d4d4;
 }
 
 .form-item .dashlet .tree-view-container {
-	border: 0;
+  border: 0;
 }

@@ -2,64 +2,64 @@ apply plugin: 'groovy'
 apply plugin: 'java-gradle-plugin'
 
 configurations {
-	tomcat
-	tomcat.transitive false
-	provided
-	provided.transitive false
+  tomcat
+  tomcat.transitive false
+  provided
+  provided.transitive false
 }
 
 dependencies {
-	testCompile	libs.junit
-	
-	compile project(':axelor-common')
+  testCompile	libs.junit
 
-	compile	libs.guava
-	compile libs.opencsv
-	compile libs.plugin_license
+  compile project(':axelor-common')
 
-	tomcat libs.hotswap_agent
-	tomcat project(":axelor-tomcat")
+  compile	libs.guava
+  compile libs.opencsv
+  compile libs.plugin_license
 
-	runtime project(":axelor-tomcat")
+  tomcat libs.hotswap_agent
+  tomcat project(":axelor-tomcat")
 
-	provided libs.javax_servlet
-	provided libs.javax_servlet_jsp
+  runtime project(":axelor-tomcat")
+
+  provided libs.javax_servlet
+  provided libs.javax_servlet_jsp
 }
 
 sourceSets {
-	main {
-		java.srcDirs = []
-		groovy.srcDirs = ['src/main/java', 'src/main/groovy']
-	}
+  main {
+    java.srcDirs = []
+    groovy.srcDirs = ['src/main/java', 'src/main/groovy']
+  }
 }
 
 gradlePlugin {
-	plugins {
-		appPlugin {
-			id = "com.axelor.app"
-			implementationClass = "com.axelor.gradle.AppPlugin"
-		}
-		appModulePlugin {
-			id = "com.axelor.app-module"
-			implementationClass = "com.axelor.gradle.ModulePlugin"
-		}
-	}
+  plugins {
+    appPlugin {
+      id = "com.axelor.app"
+      implementationClass = "com.axelor.gradle.AppPlugin"
+    }
+    appModulePlugin {
+      id = "com.axelor.app-module"
+      implementationClass = "com.axelor.gradle.ModulePlugin"
+    }
+  }
 }
 
 def generateLibsList(config) {
-	def outDir = new File(project.buildDir, "resources/main/com/axelor/gradle")
-	def outFile = new File(outDir, "${config}-libs.txt");
-	outDir.mkdirs()
-	outFile.text = ""
-	configurations.getByName(config).dependencies.each { outFile << "${it.group}:${it.name}:${it.version}\n" }
+  def outDir = new File(project.buildDir, "resources/main/com/axelor/gradle")
+  def outFile = new File(outDir, "${config}-libs.txt");
+  outDir.mkdirs()
+  outFile.text = ""
+  configurations.getByName(config).dependencies.each { outFile << "${it.group}:${it.name}:${it.version}\n" }
 }
 
 classes.doLast {
-	generateLibsList "tomcat"
-	generateLibsList "provided"
+  generateLibsList "tomcat"
+  generateLibsList "provided"
 }
 
 // prevent double publish
 tasks.withType(PublishToMavenRepository).all {
-	enabled =  name != 'publishMavenJavaPublicationToMavenRepository'
+  enabled =  name != 'publishMavenJavaPublicationToMavenRepository'
 }

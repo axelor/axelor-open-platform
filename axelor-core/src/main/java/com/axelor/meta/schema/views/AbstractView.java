@@ -17,14 +17,6 @@
  */
 package com.axelor.meta.schema.views;
 
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
-
 import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.db.Query;
@@ -45,269 +37,263 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Strings;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
 @JsonInclude(Include.NON_NULL)
 @JsonSubTypes({
-	@Type(GridView.class),
-	@Type(FormView.class),
-	@Type(TreeView.class),
-	@Type(ChartView.class),
-	@Type(CalendarView.class),
-	@Type(GanttView.class),
-	@Type(CardsView.class),
-	@Type(KanbanView.class),
-	@Type(CustomView.class),
-	@Type(Dashboard.class),
-	@Type(Search.class),
-	@Type(SearchFilters.class)
+  @Type(GridView.class),
+  @Type(FormView.class),
+  @Type(TreeView.class),
+  @Type(ChartView.class),
+  @Type(CalendarView.class),
+  @Type(GanttView.class),
+  @Type(CardsView.class),
+  @Type(KanbanView.class),
+  @Type(CustomView.class),
+  @Type(Dashboard.class),
+  @Type(Search.class),
+  @Type(SearchFilters.class)
 })
 public abstract class AbstractView {
 
-	@XmlAttribute(name = "id")
-	private String xmlId;
+  @XmlAttribute(name = "id")
+  private String xmlId;
 
-	@XmlTransient
-	@JsonProperty
-	private Long viewId;
+  @XmlTransient @JsonProperty private Long viewId;
 
-	@XmlTransient
-	@JsonProperty
-	private Long modelId;
+  @XmlTransient @JsonProperty private Long modelId;
 
-	@XmlAttribute
-	private String name;
+  @XmlAttribute private String name;
 
-	@XmlAttribute
-	private String title;
+  @XmlAttribute private String title;
 
-	@XmlAttribute
-	private String css;
+  @XmlAttribute private String css;
 
-	@XmlAttribute
-	private String model;
+  @XmlAttribute private String model;
 
-	@XmlAttribute
-	private Boolean editable;
+  @XmlAttribute private Boolean editable;
 
-	@XmlAttribute
-	private String groups;
+  @XmlAttribute private String groups;
 
-	@XmlAttribute
-	private String helpLink;
+  @XmlAttribute private String helpLink;
 
-	@XmlAttribute
-	private Boolean extension;
+  @XmlAttribute private Boolean extension;
 
-	@JsonIgnore
-	@XmlAttribute( name = "width")
-	private String widthSpec;
+  @JsonIgnore
+  @XmlAttribute(name = "width")
+  private String widthSpec;
 
-	@XmlElementWrapper
-	@XmlElement(name = "button")
-	private List<Button> toolbar;
+  @XmlElementWrapper
+  @XmlElement(name = "button")
+  private List<Button> toolbar;
 
-	@XmlElementWrapper
-	@XmlElement(name = "menu")
-	private List<Menu> menubar;
+  @XmlElementWrapper
+  @XmlElement(name = "menu")
+  private List<Menu> menubar;
 
-	@XmlTransient
-	@JsonIgnore
-	private transient AbstractView owner;
+  @XmlTransient @JsonIgnore private transient AbstractView owner;
 
-	public String getXmlId() {
-		return xmlId;
-	}
+  public String getXmlId() {
+    return xmlId;
+  }
 
-	public void setXmlId(String xmlId) {
-		this.xmlId = xmlId;
-	}
+  public void setXmlId(String xmlId) {
+    this.xmlId = xmlId;
+  }
 
-	public Long getViewId() {
-		return viewId;
-	}
+  public Long getViewId() {
+    return viewId;
+  }
 
-	public void setViewId(Long viewId) {
-		this.viewId = viewId;
-	}
+  public void setViewId(Long viewId) {
+    this.viewId = viewId;
+  }
 
-	public Long getModelId() {
-		return modelId;
-	}
+  public Long getModelId() {
+    return modelId;
+  }
 
-	public void setModelId(Long modelId) {
-		this.modelId = modelId;
-	}
+  public void setModelId(Long modelId) {
+    this.modelId = modelId;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	@JsonGetter("title")
-	public String getLocalizedTitle() {
-		return I18n.get(title);
-	}
+  @JsonGetter("title")
+  public String getLocalizedTitle() {
+    return I18n.get(title);
+  }
 
-	@JsonIgnore
-	public String getTitle() {
-		return title;
-	}
+  @JsonIgnore
+  public String getTitle() {
+    return title;
+  }
 
-	@JsonSetter
-	public void setTitle(String title) {
-		this.title = title;
-	}
+  @JsonSetter
+  public void setTitle(String title) {
+    this.title = title;
+  }
 
-	public String getCss() {
-		return css;
-	}
+  public String getCss() {
+    return css;
+  }
 
-	public void setCss(String css) {
-		this.css = css;
-	}
-	
-	public void setWidthSpec(String widthSpec) {
-		this.widthSpec = widthSpec;
-	}
+  public void setCss(String css) {
+    this.css = css;
+  }
 
-	public String getModel() {
-		if(model != null)
-			return model;
+  public void setWidthSpec(String widthSpec) {
+    this.widthSpec = widthSpec;
+  }
 
-		MetaView view = Query.of(MetaView.class).filter("self.name = ?1", name).fetchOne();
-		if(view != null && view.getModel() != null){
-			model = view.getModel();
-		}
+  public String getModel() {
+    if (model != null) return model;
 
-		return model;
-	}
+    MetaView view = Query.of(MetaView.class).filter("self.name = ?1", name).fetchOne();
+    if (view != null && view.getModel() != null) {
+      model = view.getModel();
+    }
 
-	public void setModel(String model) {
-		this.model = model;
-	}
+    return model;
+  }
 
-	public Boolean getEditable() {
-		return editable;
-	}
+  public void setModel(String model) {
+    this.model = model;
+  }
 
-	public void setEditable(Boolean editable) {
-		this.editable = editable;
-	}
+  public Boolean getEditable() {
+    return editable;
+  }
 
-	public String getGroups() {
-		return groups;
-	}
+  public void setEditable(Boolean editable) {
+    this.editable = editable;
+  }
 
-	public void setGroups(String groups) {
-		this.groups = groups;
-	}
+  public String getGroups() {
+    return groups;
+  }
 
-	public String getHelpLink() {
-		return helpLink;
-	}
+  public void setGroups(String groups) {
+    this.groups = groups;
+  }
 
-	public void setHelpLink(String helpLink) {
-		this.helpLink = helpLink;
-	}
+  public String getHelpLink() {
+    return helpLink;
+  }
 
-	public Boolean getExtension() {
-		return extension;
-	}
+  public void setHelpLink(String helpLink) {
+    this.helpLink = helpLink;
+  }
 
-	public void setExtension(Boolean extension) {
-		this.extension = extension;
-	}
+  public Boolean getExtension() {
+    return extension;
+  }
 
-	private String widthPart(int which) {
-		if (Strings.isNullOrEmpty(widthSpec)) {
-			return null;
-		}
-		String[] parts = widthSpec.split(":");
-		if (which >= parts.length) {
-			return null;
-		}
-		String part = parts[which];
-		if (part.matches("\\d+")) {
-			part += "px";
-		}
-		return part;
-	}
+  public void setExtension(Boolean extension) {
+    this.extension = extension;
+  }
 
-	public String getWidth() {
-		return widthPart(0);
-	}
+  private String widthPart(int which) {
+    if (Strings.isNullOrEmpty(widthSpec)) {
+      return null;
+    }
+    String[] parts = widthSpec.split(":");
+    if (which >= parts.length) {
+      return null;
+    }
+    String part = parts[which];
+    if (part.matches("\\d+")) {
+      part += "px";
+    }
+    return part;
+  }
 
-	public String getMinWidth() {
-		return widthPart(1);
-	}
+  public String getWidth() {
+    return widthPart(0);
+  }
 
-	public String getMaxWidth() {
-		return widthPart(2);
-	}
+  public String getMinWidth() {
+    return widthPart(1);
+  }
 
-	public List<Button> getToolbar() {
-		if(toolbar != null) {
-			for (Button button : toolbar) {
-				button.setModel(this.getModel());
-			}
-		}
-		return toolbar;
-	}
+  public String getMaxWidth() {
+    return widthPart(2);
+  }
 
-	public void setToolbar(List<Button> toolbar) {
-		this.toolbar = toolbar;
-	}
+  public List<Button> getToolbar() {
+    if (toolbar != null) {
+      for (Button button : toolbar) {
+        button.setModel(this.getModel());
+      }
+    }
+    return toolbar;
+  }
 
-	public List<Menu> getMenubar() {
-		if(menubar != null) {
-			for (Menu menu : menubar) {
-				menu.setModel(this.getModel());
-			}
-		}
-		return menubar;
-	}
+  public void setToolbar(List<Button> toolbar) {
+    this.toolbar = toolbar;
+  }
 
-	public void setMenubar(List<Menu> menubar) {
-		this.menubar = menubar;
-	}
+  public List<Menu> getMenubar() {
+    if (menubar != null) {
+      for (Menu menu : menubar) {
+        menu.setModel(this.getModel());
+      }
+    }
+    return menubar;
+  }
 
-	public AbstractView getOwner() {
-		return owner;
-	}
+  public void setMenubar(List<Menu> menubar) {
+    this.menubar = menubar;
+  }
 
-	public void setOwner(AbstractView owner) {
-		this.owner = owner;
-	}
+  public AbstractView getOwner() {
+    return owner;
+  }
 
-	@XmlTransient
-	public String getType() {
-		try {
-			return getClass().getAnnotation(JsonTypeName.class).value();
-		} catch(Exception e){}
-		return "unknown";
-	}
-	
-	@XmlTransient
-	@JsonProperty("helpOverride")
-	public List<?> getHelpOverride() {
-		if (AuthUtils.getUser() != null && AuthUtils.getUser().getNoHelp() == Boolean.TRUE) {
-			return null;
-		}
-		final MetaHelpRepository repo = Beans.get(MetaHelpRepository.class);
-		final String lang = AppFilter.getLocale() == null ? "en" : AppFilter.getLocale().getLanguage();
-		List<?> found = repo.all()
-			.filter("self.model = :model AND self.language = :lang and (self.view = :view OR self.view IS NULL)")
-			.bind("model", getModel())
-			.bind("lang", lang)
-			.bind("view", getName())
-			.order("-view")
-			.select("field", "type", "help", "style")
-			.fetch(-1, 0);
-		return found.isEmpty() ? null : found;
-	}
+  public void setOwner(AbstractView owner) {
+    this.owner = owner;
+  }
+
+  @XmlTransient
+  public String getType() {
+    try {
+      return getClass().getAnnotation(JsonTypeName.class).value();
+    } catch (Exception e) {
+    }
+    return "unknown";
+  }
+
+  @XmlTransient
+  @JsonProperty("helpOverride")
+  public List<?> getHelpOverride() {
+    if (AuthUtils.getUser() != null && AuthUtils.getUser().getNoHelp() == Boolean.TRUE) {
+      return null;
+    }
+    final MetaHelpRepository repo = Beans.get(MetaHelpRepository.class);
+    final String lang = AppFilter.getLocale() == null ? "en" : AppFilter.getLocale().getLanguage();
+    List<?> found =
+        repo.all()
+            .filter(
+                "self.model = :model AND self.language = :lang and (self.view = :view OR self.view IS NULL)")
+            .bind("model", getModel())
+            .bind("lang", lang)
+            .bind("view", getName())
+            .order("-view")
+            .select("field", "type", "help", "style")
+            .fetch(-1, 0);
+    return found.isEmpty() ? null : found;
+  }
 }

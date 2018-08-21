@@ -17,12 +17,9 @@
  */
 package com.axelor.meta.schema.views;
 
-import javax.xml.bind.annotation.XmlType;
-
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("dashlet")
-public class Dashlet extends Portlet {
-
-}
+public class Dashlet extends Portlet {}

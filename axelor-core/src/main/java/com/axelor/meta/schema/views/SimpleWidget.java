@@ -17,203 +17,187 @@
  */
 package com.axelor.meta.schema.views;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
-
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @XmlTransient
 public abstract class SimpleWidget extends AbstractWidget {
 
-	@XmlAttribute
-	private String name;
+  @XmlAttribute private String name;
 
-	@XmlAttribute
-	private String title;
+  @XmlAttribute private String title;
 
-	@XmlAttribute
-	private String help;
+  @XmlAttribute private String help;
 
-	@XmlAttribute
-	private Boolean showTitle;
+  @XmlAttribute private Boolean showTitle;
 
-	@XmlAttribute
-	private Boolean hidden;
+  @XmlAttribute private Boolean hidden;
 
-	@XmlAttribute
-	private Boolean readonly;
+  @XmlAttribute private Boolean readonly;
 
-	@XmlAttribute
-	private String showIf;
+  @XmlAttribute private String showIf;
 
-	@XmlAttribute
-	private String hideIf;
+  @XmlAttribute private String hideIf;
 
-	@XmlAttribute
-	private String readonlyIf;
+  @XmlAttribute private String readonlyIf;
 
-	@XmlAttribute
-	private String depends;
+  @XmlAttribute private String depends;
 
-	@XmlAttribute
-	private Integer colSpan;
+  @XmlAttribute private Integer colSpan;
 
-	@XmlAttribute
-	private Integer colOffset;
+  @XmlAttribute private Integer colOffset;
 
-	@XmlAttribute
-	private String css;
+  @XmlAttribute private String css;
 
-	@XmlAttribute
-	private String height;
+  @XmlAttribute private String height;
 
-	@XmlAttribute
-	private String width;
+  @XmlAttribute private String width;
 
-	public String getName() {
-		return name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	@JsonGetter("autoTitle")
-	public String getAutoTitle() {
-		if (StringUtils.isBlank(title) && !StringUtils.isBlank(name)) {
-			String last = name.substring(name.lastIndexOf('.') + 1);
-			return I18n.get(Inflector.getInstance().humanize(last));
-		}
-		return null;
-	}
-	
-	@JsonGetter("title")
-	public String getLocalizedTitle() {
-		return I18n.get(title);
-	}
+  @JsonGetter("autoTitle")
+  public String getAutoTitle() {
+    if (StringUtils.isBlank(title) && !StringUtils.isBlank(name)) {
+      String last = name.substring(name.lastIndexOf('.') + 1);
+      return I18n.get(Inflector.getInstance().humanize(last));
+    }
+    return null;
+  }
 
-	@JsonIgnore
-	public String getTitle() {
-		return title;
-	}
+  @JsonGetter("title")
+  public String getLocalizedTitle() {
+    return I18n.get(title);
+  }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+  @JsonIgnore
+  public String getTitle() {
+    return title;
+  }
 
-	@JsonGetter("help")
-	public String getLocalizedHelp(){
-		return I18n.get(help);
-	}
+  public void setTitle(String title) {
+    this.title = title;
+  }
 
-	@JsonIgnore
-	public String getHelp() {
-		return help;
-	}
+  @JsonGetter("help")
+  public String getLocalizedHelp() {
+    return I18n.get(help);
+  }
 
-	public void setHelp(String help) {
-		this.help = help;
-	}
+  @JsonIgnore
+  public String getHelp() {
+    return help;
+  }
 
-	public Boolean getShowTitle() {
-		return showTitle;
-	}
+  public void setHelp(String help) {
+    this.help = help;
+  }
 
-	public void setShowTitle(Boolean showTitle) {
-		this.showTitle = showTitle;
-	}
+  public Boolean getShowTitle() {
+    return showTitle;
+  }
 
-	public Boolean getHidden() {
-		return hidden;
-	}
+  public void setShowTitle(Boolean showTitle) {
+    this.showTitle = showTitle;
+  }
 
-	public void setHidden(Boolean hidden) {
-		this.hidden = hidden;
-	}
+  public Boolean getHidden() {
+    return hidden;
+  }
 
-	public Boolean getReadonly() {
-		return readonly;
-	}
+  public void setHidden(Boolean hidden) {
+    this.hidden = hidden;
+  }
 
-	public void setReadonly(Boolean readonly) {
-		this.readonly = readonly;
-	}
+  public Boolean getReadonly() {
+    return readonly;
+  }
 
-	public String getShowIf() {
-		return showIf;
-	}
+  public void setReadonly(Boolean readonly) {
+    this.readonly = readonly;
+  }
 
-	public void setShowIf(String showIf) {
-		this.showIf = showIf;
-	}
+  public String getShowIf() {
+    return showIf;
+  }
 
-	public String getHideIf() {
-		return hideIf;
-	}
+  public void setShowIf(String showIf) {
+    this.showIf = showIf;
+  }
 
-	public void setHideIf(String hiddenIf) {
-		this.hideIf = hiddenIf;
-	}
+  public String getHideIf() {
+    return hideIf;
+  }
 
-	public String getReadonlyIf() {
-		return readonlyIf;
-	}
+  public void setHideIf(String hiddenIf) {
+    this.hideIf = hiddenIf;
+  }
 
-	public void setReadonlyIf(String readonlyIf) {
-		this.readonlyIf = readonlyIf;
-	}
+  public String getReadonlyIf() {
+    return readonlyIf;
+  }
 
-	public String getDepends() {
-		return depends;
-	}
+  public void setReadonlyIf(String readonlyIf) {
+    this.readonlyIf = readonlyIf;
+  }
 
-	public void setDepends(String depends) {
-		this.depends = depends;
-	}
+  public String getDepends() {
+    return depends;
+  }
 
-	public Integer getColSpan() {
-		return colSpan;
-	}
+  public void setDepends(String depends) {
+    this.depends = depends;
+  }
 
-	public void setColSpan(Integer colSpan) {
-		this.colSpan = colSpan;
-	}
+  public Integer getColSpan() {
+    return colSpan;
+  }
 
-	public Integer getColOffset() {
-		return colOffset;
-	}
+  public void setColSpan(Integer colSpan) {
+    this.colSpan = colSpan;
+  }
 
-	public void setColOffset(Integer colOffset) {
-		this.colOffset = colOffset;
-	}
+  public Integer getColOffset() {
+    return colOffset;
+  }
 
-	public String getCss() {
-		return css;
-	}
+  public void setColOffset(Integer colOffset) {
+    this.colOffset = colOffset;
+  }
 
-	public void setCss(String css) {
-		this.css = css;
-	}
+  public String getCss() {
+    return css;
+  }
 
-	public String getHeight() {
-		return height;
-	}
+  public void setCss(String css) {
+    this.css = css;
+  }
 
-	public void setHeight(String height) {
-		this.height = height;
-	}
+  public String getHeight() {
+    return height;
+  }
 
-	public String getWidth() {
-		return width;
-	}
+  public void setHeight(String height) {
+    this.height = height;
+  }
 
-	public void setWidth(String width) {
-		this.width = width;
-	}
+  public String getWidth() {
+    return width;
+  }
+
+  public void setWidth(String width) {
+    this.width = width;
+  }
 }

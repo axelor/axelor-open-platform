@@ -22,24 +22,24 @@ import org.junit.Test;
 
 public class TestClassUtils {
 
-	@Test
-	public void testClassLoaderUtils() {
-		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		Assert.assertEquals(cl, ClassUtils.getContextClassLoader());
-		Assert.assertEquals(cl, ClassUtils.getDefaultClassLoader());
-		try {
-			ClassUtils.setContextClassLoader(cl.getParent());
-			Assert.assertNotEquals(cl, ClassUtils.getContextClassLoader());
-		} finally {
-			ClassUtils.setContextClassLoader(cl);
-		}
-	}
-	
-	@Test
-	public void testNames() {
-		String resourceName = "com/axelor/common/TestClassUtils.class";
-		String className = "com.axelor.common.TestClassUtils";
-		Assert.assertEquals(resourceName, ClassUtils.classToResourceName(className));
-		Assert.assertEquals(className, ClassUtils.resourceToClassName(resourceName));
-	}
+  @Test
+  public void testClassLoaderUtils() {
+    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    Assert.assertEquals(cl, ClassUtils.getContextClassLoader());
+    Assert.assertEquals(cl, ClassUtils.getDefaultClassLoader());
+    try {
+      ClassUtils.setContextClassLoader(cl.getParent());
+      Assert.assertNotEquals(cl, ClassUtils.getContextClassLoader());
+    } finally {
+      ClassUtils.setContextClassLoader(cl);
+    }
+  }
+
+  @Test
+  public void testNames() {
+    String resourceName = "com/axelor/common/TestClassUtils.class";
+    String className = "com.axelor.common.TestClassUtils";
+    Assert.assertEquals(resourceName, ClassUtils.classToResourceName(className));
+    Assert.assertEquals(className, ClassUtils.resourceToClassName(resourceName));
+  }
 }

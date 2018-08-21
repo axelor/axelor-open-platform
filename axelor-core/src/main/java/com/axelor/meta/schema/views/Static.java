@@ -17,38 +17,33 @@
  */
 package com.axelor.meta.schema.views;
 
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
-
-import org.eclipse.persistence.oxm.annotations.XmlCDATA;
-import org.eclipse.persistence.oxm.annotations.XmlValueExtension;
-
 import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
+import org.eclipse.persistence.oxm.annotations.XmlCDATA;
+import org.eclipse.persistence.oxm.annotations.XmlValueExtension;
 
 @XmlType
 @JsonTypeName("static")
 public class Static extends SimpleWidget {
 
-	@XmlCDATA
-	@XmlValue
-	@XmlValueExtension
-	private String text;
+  @XmlCDATA @XmlValue @XmlValueExtension private String text;
 
-	@JsonGetter("text")
-	public String getLocaleText() {
-		return text == null ? text : I18n.get(StringUtils.stripIndent(text).trim());
-	}
+  @JsonGetter("text")
+  public String getLocaleText() {
+    return text == null ? text : I18n.get(StringUtils.stripIndent(text).trim());
+  }
 
-	@JsonIgnore
-	public String getText() {
-		return text;
-	}
+  @JsonIgnore
+  public String getText() {
+    return text;
+  }
 
-	public void setText(String text) {
-		this.text = text;
-	}
+  public void setText(String text) {
+    this.text = text;
+  }
 }

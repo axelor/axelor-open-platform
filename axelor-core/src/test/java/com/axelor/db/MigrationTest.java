@@ -17,14 +17,13 @@
  */
 package com.axelor.db;
 
-import org.junit.Test;
-
 import com.axelor.db.internal.DBHelper;
+import org.junit.Test;
 
 public class MigrationTest {
 
-	@Test
-	public void test() {
-		DBHelper.migrate();
-	}
+  @Test
+  public void test() {
+    DBHelper.migrate();
+  }
 }

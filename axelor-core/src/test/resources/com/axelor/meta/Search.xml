@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <object-views xmlns="http://axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.0.xsd">
-  
+
   <search title="Partner Search" name="partners-n-sale-orders" limit="100">
-  
-  	<search-fields>
-   		<field name="customer" type="string" />
-   		<field name="partner" type="reference" target="com.axelor.test.db.Contact"/>
-   		<field name="country" type="string" />
-   		<field name="date" type="date" />
-   		<field name="value" type="decimal" />
-   	</search-fields>
-   	
-   	<result-fields>
-   		<field name="customer" type="string" />
-   		<field name="country" type="string" />
-   		<field name="date" type="date" />
-   		<field name="value" type="decimal" />
-   	</result-fields>
-   	
-   	<select model="com.axelor.test.db.Contact" orderBy="customer,-date">
-   		<field name="fullName" as="customer"/>
-   		<field name="dateOfBirth" as="date"/>
-   		<where match="all">
-   			<input name="customer" field="fullName" matchStyle="contains"/>
-   			<input name="date" field="dateOfBirth"/>
-   			<input name="value" field="credit"/>
-   			<input name="title" field="title"/>
-   			<input name="customer" field="title.name"/>
-   			<input name="country" field="addresses[].country.name" matchStyle="contains"/>
-   			<input name="title.name" field="addresses[].contact.title.name" matchStyle="contains"/>
-   		</where>
-   	</select>
-   	
-   	<select model="com.axelor.test.db.Contact" if="value &lt; 100.0">
-   		<field name="fullName" as="customer"/>
-   		<where match="all">
-   			<input name="customer" field="fullName" matchStyle="contains"/>
-   			<input name="date" field="dateOfBirth"/>
-   			<input name="value" field="credit"/>
-   		</where>
-   	</select>
-   	
-   	<select model="com.axelor.test.db.Contact" >
-   		<field name="fullName" as="customer"/>
-   		<where match="all">
-   			<input name="customer" field="fullName" matchStyle="contains"/>
-   			<input name="date" field="dateOfBirth"/>
-   			<input name="value" field="credit" if="value &lt; 100.0"/>
-   		</where>
-   	</select>
-  	
+
+    <search-fields>
+       <field name="customer" type="string" />
+       <field name="partner" type="reference" target="com.axelor.test.db.Contact"/>
+       <field name="country" type="string" />
+       <field name="date" type="date" />
+       <field name="value" type="decimal" />
+     </search-fields>
+
+     <result-fields>
+       <field name="customer" type="string" />
+       <field name="country" type="string" />
+       <field name="date" type="date" />
+       <field name="value" type="decimal" />
+     </result-fields>
+
+     <select model="com.axelor.test.db.Contact" orderBy="customer,-date">
+       <field name="fullName" as="customer"/>
+       <field name="dateOfBirth" as="date"/>
+       <where match="all">
+         <input name="customer" field="fullName" matchStyle="contains"/>
+         <input name="date" field="dateOfBirth"/>
+         <input name="value" field="credit"/>
+         <input name="title" field="title"/>
+         <input name="customer" field="title.name"/>
+         <input name="country" field="addresses[].country.name" matchStyle="contains"/>
+         <input name="title.name" field="addresses[].contact.title.name" matchStyle="contains"/>
+       </where>
+     </select>
+
+     <select model="com.axelor.test.db.Contact" if="value &lt; 100.0">
+       <field name="fullName" as="customer"/>
+       <where match="all">
+         <input name="customer" field="fullName" matchStyle="contains"/>
+         <input name="date" field="dateOfBirth"/>
+         <input name="value" field="credit"/>
+       </where>
+     </select>
+
+     <select model="com.axelor.test.db.Contact" >
+       <field name="fullName" as="customer"/>
+       <where match="all">
+         <input name="customer" field="fullName" matchStyle="contains"/>
+         <input name="date" field="dateOfBirth"/>
+         <input name="value" field="credit" if="value &lt; 100.0"/>
+       </where>
+     </select>
+
   </search>
-  
+
 </object-views>

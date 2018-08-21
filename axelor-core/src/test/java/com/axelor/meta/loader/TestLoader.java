@@ -17,49 +17,46 @@
  */
 package com.axelor.meta.loader;
 
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.xml.bind.JAXBException;
-
-import org.junit.Assert;
-import org.junit.Test;
-
 import com.axelor.AbstractTest;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.test.db.Contact;
+import java.util.List;
+import javax.inject.Inject;
+import javax.xml.bind.JAXBException;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class TestLoader extends AbstractTest {
 
-	@Inject
-	private ViewLoader loader;
+  @Inject private ViewLoader loader;
 
-	@Test
-	public void testValidate() {
-		String xml = "<form name=\"some-name\" title=\"Some Name\" model=\"com.axelor.test.db.Contact\">" +
-				"<field name=\"some\"/>" +
-				"<group title=\"Group\" colSpan=\"4\" cols=\"3\" colWidths=\"33%,33%,33%\">" +
-				"<button name=\"button1\" title=\"Click 1\"/>" +
-				"<button name=\"button2\" title=\"Click 2\"/>" +
-				"</group>" +
-				"<field name=\"other\"/>" +
-				"</form>";
-		try {
-			XMLViews.fromXML(xml);
-		} catch (JAXBException e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+  @Test
+  public void testValidate() {
+    String xml =
+        "<form name=\"some-name\" title=\"Some Name\" model=\"com.axelor.test.db.Contact\">"
+            + "<field name=\"some\"/>"
+            + "<group title=\"Group\" colSpan=\"4\" cols=\"3\" colWidths=\"33%,33%,33%\">"
+            + "<button name=\"button1\" title=\"Click 1\"/>"
+            + "<button name=\"button2\" title=\"Click 2\"/>"
+            + "</group>"
+            + "<field name=\"other\"/>"
+            + "</form>";
+    try {
+      XMLViews.fromXML(xml);
+    } catch (JAXBException e) {
+      Assert.fail(e.getMessage());
+    }
+  }
 
-	@Test
-	public void testDefault() {
-		List<AbstractView> views = loader.createDefaults(Contact.class);
-		Assert.assertNotNull(views);
-		Assert.assertEquals(2, views.size());
+  @Test
+  public void testDefault() {
+    List<AbstractView> views = loader.createDefaults(Contact.class);
+    Assert.assertNotNull(views);
+    Assert.assertEquals(2, views.size());
 
-		for (AbstractView view : views) {
-			String text = XMLViews.toXml(view, true);
-			Assert.assertNotNull(text);
-		}
-	}
+    for (AbstractView view : views) {
+      String text = XMLViews.toXml(view, true);
+      Assert.assertNotNull(text);
+    }
+  }
 }

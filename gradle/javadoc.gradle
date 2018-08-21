@@ -1,71 +1,71 @@
 task generateDocs(type: Javadoc) {
 
-	description "Generate API docs."
-	group "Axelor"
+  description "Generate API docs."
+  group "Axelor"
 
-	destinationDir = file("${buildDir}/docs")
-	failOnError = false
+  destinationDir = file("${buildDir}/docs")
+  failOnError = false
 
-	source = subprojects.sourceSets.main.allJava
-	classpath = files(subprojects.sourceSets.main.compileClasspath)
+  source = subprojects.sourceSets.main.allJava
+  classpath = files(subprojects.sourceSets.main.compileClasspath)
 
-	exclude '**/internal/**'
-	exclude '**/*Impl.java'
+  exclude '**/internal/**'
+  exclude '**/*Impl.java'
 
-	include '**/com/axelor/common/**'
-	include '**/com/axelor/app/**'
+  include '**/com/axelor/common/**'
+  include '**/com/axelor/app/**'
 
-	include '**/com/axelor/auth/AuditableRunner.java'
-	include '**/com/axelor/auth/AuthModule.java'
-	include '**/com/axelor/auth/AuthService.java'
-	include '**/com/axelor/auth/AuthUtils.java'
-	include '**/com/axelor/auth/db/**'
+  include '**/com/axelor/auth/AuditableRunner.java'
+  include '**/com/axelor/auth/AuthModule.java'
+  include '**/com/axelor/auth/AuthService.java'
+  include '**/com/axelor/auth/AuthUtils.java'
+  include '**/com/axelor/auth/db/**'
 
-	include '**/com/axelor/data/**'
-	include '**/com/axelor/data/adapter/Adapter.java'
-	exclude '**/com/axelor/data/AuditHelper.java'
-	exclude '**/com/axelor/data/DataScriptHelper.java'
-	exclude '**/com/axelor/data/**/ElementConverter.java'
+  include '**/com/axelor/data/**'
+  include '**/com/axelor/data/adapter/Adapter.java'
+  exclude '**/com/axelor/data/AuditHelper.java'
+  exclude '**/com/axelor/data/DataScriptHelper.java'
+  exclude '**/com/axelor/data/**/ElementConverter.java'
 
-	include '**/com/axelor/db/**'
-	exclude '**/com/axelor/db/JPA.java'
-	exclude '**/com/axelor/db/JpaClassLoader.java'
+  include '**/com/axelor/db/**'
+  exclude '**/com/axelor/db/JPA.java'
+  exclude '**/com/axelor/db/JpaClassLoader.java'
 
-	include '**/com/axelor/dms/**'
-	include '**/com/axelor/i18n/**'
-	exclude '**/com/axelor/i18n/I18nInterpolator.java'
-	include '**/com/axelor/inject/**'
+  include '**/com/axelor/dms/**'
+  include '**/com/axelor/i18n/**'
+  exclude '**/com/axelor/i18n/I18nInterpolator.java'
+  include '**/com/axelor/inject/**'
 
-	include '**/com/axelor/mail/**'
-	exclude '**/com/axelor/mail/web/**'
+  include '**/com/axelor/mail/**'
+  exclude '**/com/axelor/mail/web/**'
 
-	include '**/com/axelor/meta/MetaFiles.java'
-	include '**/com/axelor/meta/db/**'
+  include '**/com/axelor/meta/MetaFiles.java'
+  include '**/com/axelor/meta/db/**'
 
-	include '**/com/axelor/quartz/**'
-	include '**/com/axelor/report/**'
+  include '**/com/axelor/quartz/**'
+  include '**/com/axelor/report/**'
 
-	include '**/com/axelor/rpc/**'
-	exclude '**/com/axelor/rpc/Resource.java'
-	exclude '**/com/axelor/rpc/RequestFilter.java'
-	exclude '**/com/axelor/rpc/ObjectMapperProvider.java'
-	exclude '**/com/axelor/rpc/ResponseInterceptor.java'
+  include '**/com/axelor/rpc/**'
+  exclude '**/com/axelor/rpc/Resource.java'
+  exclude '**/com/axelor/rpc/RequestFilter.java'
+  exclude '**/com/axelor/rpc/ObjectMapperProvider.java'
+  exclude '**/com/axelor/rpc/ResponseInterceptor.java'
 
-	include '**/com/axelor/script/**'
-	include '**/com/axelor/text/**'
+  include '**/com/axelor/script/**'
+  include '**/com/axelor/text/**'
 
-	options.links = [
-		'https://docs.oracle.com/javaee/7/api',
-		'https://docs.oracle.com/javase/7/docs/api',
-		'http://google.github.io/guice/api-docs/4.0/javadoc',
-		'http://google.github.io/guava/releases/18.0/api/docs/',
-		'http://docs.jboss.org/hibernate/orm/4.2/javadocs',
-		'https://www.quartz-scheduler.org/api/2.2.1',
-		'http://help.eclipse.org/mars/topic/org.eclipse.birt.doc.isv/model/api',
-		'http://help.eclipse.org/mars/topic/org.eclipse.birt.doc.isv/engine/api'
-	]
+  options.links = [
+    'https://docs.oracle.com/javaee/7/api',
+    'https://docs.oracle.com/javase/7/docs/api',
+    'http://google.github.io/guice/api-docs/4.0/javadoc',
+    'http://google.github.io/guava/releases/18.0/api/docs/',
+    'http://docs.jboss.org/hibernate/orm/4.2/javadocs',
+    'https://www.quartz-scheduler.org/api/2.2.1',
+    'http://help.eclipse.org/mars/topic/org.eclipse.birt.doc.isv/model/api',
+    'http://help.eclipse.org/mars/topic/org.eclipse.birt.doc.isv/engine/api'
+  ]
 
-	doFirst {
-		title = "Axelor Development Kit $version API"
-	}
+  doFirst {
+    title = "Axelor Development Kit $version API"
+  }
 }

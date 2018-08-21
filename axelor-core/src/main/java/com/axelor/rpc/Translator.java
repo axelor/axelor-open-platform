@@ -17,66 +17,64 @@
  */
 package com.axelor.rpc;
 
-import java.util.Collection;
-import java.util.Map;
-
 import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
+import java.util.Collection;
+import java.util.Map;
 
 final class Translator {
 
-	private Translator() {
-	}
+  private Translator() {}
 
-	private static String getTranslation(Property property, String value) {
-		if (property.isTranslatable() && StringUtils.notBlank(value)) {
-			String key = "value:" + value;
-			String val = I18n.get(key);
-			if (val != key) {
-				return val;
-			}
-		}
-		return value;
-	}
+  private static String getTranslation(Property property, String value) {
+    if (property.isTranslatable() && StringUtils.notBlank(value)) {
+      String key = "value:" + value;
+      String val = I18n.get(key);
+      if (val != key) {
+        return val;
+      }
+    }
+    return value;
+  }
 
-	private static String toKey(String name) {
-		return String.format("$t:%s", name);
-	}
+  private static String toKey(String name) {
+    return String.format("$t:%s", name);
+  }
 
-	static Map<String, Object> translate(Map<String, Object> values, Property property) {
-		String name = property.getName();
-		Object value = values.get(name);
-		if (value instanceof String) {
-			Object val = getTranslation(property, (String) value);
-			if (val != value) {
-				values.put(toKey(name), val);
-			}
-		}
-		return values;
-	}
+  static Map<String, Object> translate(Map<String, Object> values, Property property) {
+    String name = property.getName();
+    Object value = values.get(name);
+    if (value instanceof String) {
+      Object val = getTranslation(property, (String) value);
+      if (val != value) {
+        values.put(toKey(name), val);
+      }
+    }
+    return values;
+  }
 
-	@SuppressWarnings("all")
-	static void applyTranslatables(Map<String, Object> values, Class<?> model) {
-		if (values == null || values.isEmpty()) return;
-		final Mapper mapper = Mapper.of(model);
-		for (Property property : mapper.getProperties()) {
-			final String name = property.getName();
-			final Object value = values.get(name);
-			if (property.isTranslatable() && value instanceof String) {
-				translate(values, property);
-			}
-			if (property.getTarget() != null && value instanceof Map) {
-				applyTranslatables((Map) value, property.getTarget());
-			}
-			if (property.getTarget() != null && value instanceof Collection) {
-				for (Object item : (Collection) value) {
-					if (item instanceof Map) {
-						applyTranslatables((Map) item, property.getTarget());
-					}
-				}
-			}
-		}
-	}
+  @SuppressWarnings("all")
+  static void applyTranslatables(Map<String, Object> values, Class<?> model) {
+    if (values == null || values.isEmpty()) return;
+    final Mapper mapper = Mapper.of(model);
+    for (Property property : mapper.getProperties()) {
+      final String name = property.getName();
+      final Object value = values.get(name);
+      if (property.isTranslatable() && value instanceof String) {
+        translate(values, property);
+      }
+      if (property.getTarget() != null && value instanceof Map) {
+        applyTranslatables((Map) value, property.getTarget());
+      }
+      if (property.getTarget() != null && value instanceof Collection) {
+        for (Object item : (Collection) value) {
+          if (item instanceof Map) {
+            applyTranslatables((Map) item, property.getTarget());
+          }
+        }
+      }
+    }
+  }
 }

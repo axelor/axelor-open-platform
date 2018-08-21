@@ -18,15 +18,13 @@
 package com.axelor.inject.logger;
 
 import javax.inject.Inject;
-
 import org.slf4j.Logger;
 
 public class TestLoggerService {
 
-	@Inject
-	private Logger log;
-	
-	public Logger getLog() {
-		return log;
-	}
+  @Inject private Logger log;
+
+  public Logger getLog() {
+    return log;
+  }
 }

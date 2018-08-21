@@ -49,7 +49,7 @@
       <trim-directive-whitespaces>true</trim-directive-whitespaces>
     </jsp-property-group>
   </jsp-config>
-  
+
   <mime-mapping>
     <extension>woff</extension>
     <mime-type>application/font-woff</mime-type>

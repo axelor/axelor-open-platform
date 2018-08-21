@@ -17,26 +17,24 @@
  */
 package com.axelor.test.db;
 
+import com.axelor.db.ValueEnum;
 import java.util.Objects;
 
-import com.axelor.db.ValueEnum;
-
 public enum EnumStatusNumber implements ValueEnum<Integer> {
+  ONE(1),
 
-	ONE(1),
+  TWO(2),
 
-	TWO(2),
+  THREE(3);
 
-	THREE(3);
+  private final Integer value;
 
-	private final Integer value;
+  private EnumStatusNumber(Integer value) {
+    this.value = Objects.requireNonNull(value);
+  }
 
-	private EnumStatusNumber(Integer value) {
-		this.value = Objects.requireNonNull(value);
-	}
-
-	@Override
-	public Integer getValue() {
-		return value;
-	}
+  @Override
+  public Integer getValue() {
+    return value;
+  }
 }

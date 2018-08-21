@@ -17,75 +17,53 @@
  */
 package com.axelor.common;
 
+import com.axelor.common.bar.MyBase;
+import com.axelor.common.reflections.Reflections;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.axelor.common.bar.MyBase;
-import com.axelor.common.reflections.Reflections;
-
 @SuppressWarnings("all")
 public class TestReflections implements Serializable {
 
-	@Test
-	public void testClassFinder() {
+  @Test
+  public void testClassFinder() {
 
-		Set<?> all;
+    Set<?> all;
 
-		// scan by sub type
-		all = Reflections
-				.findSubTypesOf(Map.class)
-				.find();
+    // scan by sub type
+    all = Reflections.findSubTypesOf(Map.class).find();
 
-		Assert.assertNotNull(all);
-		Assert.assertTrue(all.size() > 2);
+    Assert.assertNotNull(all);
+    Assert.assertTrue(all.size() > 2);
 
-		// scan by annotation within a package
-		all = Reflections
-				.findTypes()
-				.having(Ignore.class)
-				.within("com.axelor.common")
-				.find();
+    // scan by annotation within a package
+    all = Reflections.findTypes().having(Ignore.class).within("com.axelor.common").find();
 
-		Assert.assertNotNull(all);
-		Assert.assertEquals(2, all.size());
+    Assert.assertNotNull(all);
+    Assert.assertEquals(2, all.size());
 
-		// scan by annotation within a package
-		all = Reflections
-				.findTypes()
-				.having(Ignore.class)
-				.within("com.axelor.common.foo")
-				.find();
+    // scan by annotation within a package
+    all = Reflections.findTypes().having(Ignore.class).within("com.axelor.common.foo").find();
 
-		Assert.assertNotNull(all);
-		Assert.assertEquals(1, all.size());
+    Assert.assertNotNull(all);
+    Assert.assertEquals(1, all.size());
 
-		// scan by sub type and annotation
-		all = Reflections
-				.findSubTypesOf(MyBase.class)
-				.having(Ignore.class)
-				.within("com.axelor")
-				.find();
+    // scan by sub type and annotation
+    all = Reflections.findSubTypesOf(MyBase.class).having(Ignore.class).within("com.axelor").find();
 
-		// scan by url pattern
-		all = Reflections
-				.findSubTypesOf(Map.class)
-				.byURL(".*/axelor-common/.*")
-				.find();
+    // scan by url pattern
+    all = Reflections.findSubTypesOf(Map.class).byURL(".*/axelor-common/.*").find();
 
-		Assert.assertNotNull(all);
-		Assert.assertEquals(4, all.size());
-	}
-	
-	@Test
-	public void testResourceFinder() {
-		Assert.assertNotNull(Reflections
-				.findResources()
-				.byName("(.*)\\.java")
-				.find());
-	}
+    Assert.assertNotNull(all);
+    Assert.assertEquals(4, all.size());
+  }
+
+  @Test
+  public void testResourceFinder() {
+    Assert.assertNotNull(Reflections.findResources().byName("(.*)\\.java").find());
+  }
 }

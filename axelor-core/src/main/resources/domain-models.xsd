@@ -340,23 +340,23 @@
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="table" type="xsd:string">
-        	<xsd:annotation>
-        		<xsd:documentation>
-        		Specify the join table name.
-        		</xsd:documentation>
-        	</xsd:annotation>
+          <xsd:annotation>
+            <xsd:documentation>
+            Specify the join table name.
+            </xsd:documentation>
+          </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="column2" type="xsd:string">
-        	<xsd:annotation>
-        		<xsd:documentation>
-        		Name of the foreign key column in the underlying database table referring the non-owing table.
-        		</xsd:documentation>
-        	</xsd:annotation>
+          <xsd:annotation>
+            <xsd:documentation>
+            Name of the foreign key column in the underlying database table referring the non-owing table.
+            </xsd:documentation>
+          </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:complexType name="OneToOneColumn">
     <xsd:annotation>
       <xsd:documentation>OneToOne Type.</xsd:documentation>
@@ -367,7 +367,7 @@
       </xsd:restriction>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:complexType name="ManyToOneColumn">
     <xsd:annotation>
       <xsd:documentation>ManyToOne Type.</xsd:documentation>
@@ -393,7 +393,7 @@
       </xsd:restriction>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:complexType name="ManyToManyColumn">
     <xsd:annotation>
       <xsd:documentation>ManyToMany Type.</xsd:documentation>
@@ -509,7 +509,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  
+
   <xsd:complexType name="Binary">
     <xsd:annotation>
       <xsd:documentation>Binary Type.</xsd:documentation>
@@ -576,7 +576,7 @@
       </xsd:simpleType>
     </xsd:attribute>
   </xsd:complexType>
-  
+
   <xsd:complexType name="Finder">
     <xsd:attribute name="name" type="xsd:string" use="required">
       <xsd:annotation>
@@ -929,18 +929,18 @@
         </xsd:annotation>
       </xsd:element>
       <xsd:element name="extra-imports" minOccurs="0" type="xsd:string">
-      	<xsd:annotation>
-      		<xsd:documentation>
-      		Provide extra import statements.
-      		</xsd:documentation>
-      	</xsd:annotation>
+        <xsd:annotation>
+          <xsd:documentation>
+          Provide extra import statements.
+          </xsd:documentation>
+        </xsd:annotation>
       </xsd:element>
       <xsd:element name="extra-code" minOccurs="0" type="xsd:string">
-      	<xsd:annotation>
-      		<xsd:documentation>
+        <xsd:annotation>
+          <xsd:documentation>
             Provide extra code.
-      		</xsd:documentation>
-      	</xsd:annotation>
+          </xsd:documentation>
+        </xsd:annotation>
       </xsd:element>
       <xsd:element name="track" type="dm:Track" minOccurs="0">
         <xsd:annotation>
@@ -1037,11 +1037,11 @@
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="implements" type="xsd:string">
-	<xsd:annotation>
-		<xsd:documentation>
-		Specify the list of interfaces to implement.
-		</xsd:documentation>
-	</xsd:annotation>
+  <xsd:annotation>
+    <xsd:documentation>
+    Specify the list of interfaces to implement.
+    </xsd:documentation>
+  </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="extends"  type="xsd:string">
       <xsd:annotation>

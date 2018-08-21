@@ -18,47 +18,41 @@
 package com.axelor.mail;
 
 import java.util.Properties;
-
 import javax.mail.Session;
 
 /**
- * The {@link MailAccount} provides a single definition {@link #getSession()} to
- * create account specific {@link Session} instance.
- * 
+ * The {@link MailAccount} provides a single definition {@link #getSession()} to create account
+ * specific {@link Session} instance.
  */
 public interface MailAccount {
 
-	/**
-	 * Socket connection timeout value in milliseconds.
-	 *
-	 * @param connectionTimeout
-	 *            timeout value
-	 */
-	void setConnectionTimeout(int connectionTimeout);
+  /**
+   * Socket connection timeout value in milliseconds.
+   *
+   * @param connectionTimeout timeout value
+   */
+  void setConnectionTimeout(int connectionTimeout);
 
-	/**
-	 * Socket read timeout value in milliseconds.
-	 *
-	 * @param timeout
-	 *            timeout value
-	 */
-	void setTimeout(int timeout);
+  /**
+   * Socket read timeout value in milliseconds.
+   *
+   * @param timeout timeout value
+   */
+  void setTimeout(int timeout);
 
-	/**
-	 * Set additional properties.
-	 * 
-	 * @param properties
-	 *            the properties to set
-	 */
-	void setProperties(Properties properties);
+  /**
+   * Set additional properties.
+   *
+   * @param properties the properties to set
+   */
+  void setProperties(Properties properties);
 
-	/**
-	 * Get a {@link Session} for this account.<br>
-	 * <br>
-	 * The account implementation can decide whether to cache the session
-	 * instance or not.
-	 * 
-	 * @return a {@link Session} instance.
-	 */
-	Session getSession();
+  /**
+   * Get a {@link Session} for this account.<br>
+   * <br>
+   * The account implementation can decide whether to cache the session instance or not.
+   *
+   * @return a {@link Session} instance.
+   */
+  Session getSession();
 }

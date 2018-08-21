@@ -25,404 +25,404 @@ var BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABA
 var META_FILE = "com.axelor.meta.db.MetaFile";
 
 function makeURL(model, field, recordOrId, version) {
-	var value = recordOrId;
-	if (!value) return null;
-	var id = value.id ? value.id : value;
-	var ver = version;
-	if (ver === undefined || ver === null) ver = value.version;
-	if (ver === undefined || ver === null) ver = value.$version;
-	if (ver === undefined || ver === null) ver = (new Date()).getTime();
-	if (!id || id <= 0) return null;
-	return "ws/rest/" + model + "/" + id + "/" + field + "/download?v=" + ver;
+  var value = recordOrId;
+  if (!value) return null;
+  var id = value.id ? value.id : value;
+  var ver = version;
+  if (ver === undefined || ver === null) ver = value.version;
+  if (ver === undefined || ver === null) ver = value.$version;
+  if (ver === undefined || ver === null) ver = (new Date()).getTime();
+  if (!id || id <= 0) return null;
+  return "ws/rest/" + model + "/" + id + "/" + field + "/download?v=" + ver;
 }
 
 ui.makeImageURL = makeURL;
 
 ui.formInput('ImageLink', {
-	css: 'image-item',
-	cssClass: 'from-item image-item',
-	metaWidget: true,
-	controller: ['$scope', '$element', '$interpolate', function($scope, $element, $interpolate) {
+  css: 'image-item',
+  cssClass: 'from-item image-item',
+  metaWidget: true,
+  controller: ['$scope', '$element', '$interpolate', function($scope, $element, $interpolate) {
 
-		$scope.parseText = function(text) {
-			if (!text) return BLANK;
-			if (!text.match(/{{.*?}}/)) {
-				return text;
-			}
-			return $interpolate(text)($scope.record);
-		};
-	}],
+    $scope.parseText = function(text) {
+      if (!text) return BLANK;
+      if (!text.match(/{{.*?}}/)) {
+        return text;
+      }
+      return $interpolate(text)($scope.record);
+    };
+  }],
 
-	init: function(scope) {
-		var field = scope.field;
+  init: function(scope) {
+    var field = scope.field;
 
-		var width = field.width || 140;
-		var height = field.height || '100%';
-		
-		scope.styles = [{
-			'width': width,
-			'max-width': '100%',
-			'max-height': '100%'
-		}, {
-			'width': width,
-			'height': height,
-			'max-width': '100%',
-			'max-height': '100%'
-		}];
+    var width = field.width || 140;
+    var height = field.height || '100%';
 
-		if (field.noframe) {
-			_.extend(scope.styles[1], {
-				border: 0,
-				padding: 0,
-				background: 'none',
-				boxShadow: 'none'
-			});
-		}
-	},
+    scope.styles = [{
+      'width': width,
+      'max-width': '100%',
+      'max-height': '100%'
+    }, {
+      'width': width,
+      'height': height,
+      'max-width': '100%',
+      'max-height': '100%'
+    }];
 
-	link_readonly: function(scope, element, attrs, model) {
+    if (field.noframe) {
+      _.extend(scope.styles[1], {
+        border: 0,
+        padding: 0,
+        background: 'none',
+        boxShadow: 'none'
+      });
+    }
+  },
 
-		var image = element.children('img:first');
-		var update = scope.$render_readonly = function () {
-			if (scope.isReadonly()) {
-				image.get(0).src = scope.parseText(model.$viewValue) || BLANK;
-			}
-		}
+  link_readonly: function(scope, element, attrs, model) {
 
-		scope.$watch("record.id", update);
-		scope.$watch("isReadonly()", update);
-	},
-	template_editable: '<input type="text">',
-	template_readonly:
-		'<div ng-style="styles[0]">'+
-			'<img class="img-polaroid" ng-style="styles[1]">'+
-		'</div>'
+    var image = element.children('img:first');
+    var update = scope.$render_readonly = function () {
+      if (scope.isReadonly()) {
+        image.get(0).src = scope.parseText(model.$viewValue) || BLANK;
+      }
+    }
+
+    scope.$watch("record.id", update);
+    scope.$watch("isReadonly()", update);
+  },
+  template_editable: '<input type="text">',
+  template_readonly:
+    '<div ng-style="styles[0]">'+
+      '<img class="img-polaroid" ng-style="styles[1]">'+
+    '</div>'
 });
 
 ui.formInput('Image', 'ImageLink', {
 
-	init: function(scope) {
-		this._super.apply(this, arguments);
+  init: function(scope) {
+    this._super.apply(this, arguments);
 
-		var field = scope.field;
-		var isBinary = field.serverType === 'binary';
-		
-		if (!isBinary && field.target !== META_FILE) {
-			throw new Error("Invalid field type for Image widget.");
-		}
+    var field = scope.field;
+    var isBinary = field.serverType === 'binary';
 
-		scope.parseText = function (value) {
-			return scope.getLink(value);
-		};
+    if (!isBinary && field.target !== META_FILE) {
+      throw new Error("Invalid field type for Image widget.");
+    }
 
-		scope.getLink = function (value) {
-			var record = scope.record || {};
-			var model = scope._model;
-			if (value === null) return BLANK;
-			if (isBinary) {
-				if (value) {
-					return value;
-				}
-				if (record.id) {
-					return makeURL(model, field.name, record) + "&image=true";
-				}
-				return BLANK;
-			}
-			return value ? makeURL(META_FILE, "content", (value.id || value), value.version || value.$version) : BLANK;
-		};
-	},
+    scope.parseText = function (value) {
+      return scope.getLink(value);
+    };
 
-	link_editable: function(scope, element, attrs, model) {
+    scope.getLink = function (value) {
+      var record = scope.record || {};
+      var model = scope._model;
+      if (value === null) return BLANK;
+      if (isBinary) {
+        if (value) {
+          return value;
+        }
+        if (record.id) {
+          return makeURL(model, field.name, record) + "&image=true";
+        }
+        return BLANK;
+      }
+      return value ? makeURL(META_FILE, "content", (value.id || value), value.version || value.$version) : BLANK;
+    };
+  },
 
-		var field = scope.field;
-		var input = element.children('input:first');
-		var image = element.children('img:first');
-		var buttons = element.children('.btn-group');
-		
-		var isBinary = field.serverType === 'binary';
-		var timer = null;
+  link_editable: function(scope, element, attrs, model) {
 
-		input.add(buttons).hide();
-		element.on('mouseenter', function (e) {
-			if (timer) clearTimeout(timer);
-			timer = setTimeout(function () {
-				buttons.slideDown();
-			}, 500);
-		});
-		element.on('mouseleave', function (e) {
-			if (timer) {
-				clearTimeout(timer);
-				timer = null;
-			}
-			buttons.slideUp();
-		});
+    var field = scope.field;
+    var input = element.children('input:first');
+    var image = element.children('img:first');
+    var buttons = element.children('.btn-group');
 
-		scope.doSelect = function() {
-			input.click();
-		};
+    var isBinary = field.serverType === 'binary';
+    var timer = null;
 
-		scope.doSave = function() {
-			var content = image.get(0).src;
-			if (content) {
-				window.open(content);
-			}
-		};
+    input.add(buttons).hide();
+    element.on('mouseenter', function (e) {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(function () {
+        buttons.slideDown();
+      }, 500);
+    });
+    element.on('mouseleave', function (e) {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      buttons.slideUp();
+    });
 
-		scope.doRemove = function() {
-			image.get(0).src = "";
-			input.val(null);
-			update(null);
-		};
+    scope.doSelect = function() {
+      input.click();
+    };
 
-		input.change(function(e, ui) {
-			var file = input.get(0).files[0];
-			var uploadSize = +(axelor.config["file.upload.size"]) || 0;
+    scope.doSave = function() {
+      var content = image.get(0).src;
+      if (content) {
+        window.open(content);
+      }
+    };
 
-			// reset file selection
-			input.get(0).value = null;
+    scope.doRemove = function() {
+      image.get(0).src = "";
+      input.val(null);
+      update(null);
+    };
 
-			if (!file) {
-				return;
-			}
+    input.change(function(e, ui) {
+      var file = input.get(0).files[0];
+      var uploadSize = +(axelor.config["file.upload.size"]) || 0;
 
-			if(uploadSize > 0 && file.size > 1048576 * uploadSize) {
-				return axelor.dialogs.say(_t("You are not allow to upload a file bigger than") + ' ' + uploadSize + 'MB');
-			}
-			
-			if (!isBinary) {
-				return doUpload(file);
-			}
+      // reset file selection
+      input.get(0).value = null;
 
-			var reader = new FileReader();
-			reader.onload = function(e) {
-				update(e.target.result, file.name);
-			};
+      if (!file) {
+        return;
+      }
 
-			reader.readAsDataURL(file);
-		});
-		
-		function doUpload(file) {
-			var ds = scope._dataSource._new(META_FILE);
-			var value = field.target === META_FILE ? (scope.getValue()||{}) : {};
-			var record = {
-				fileName: file.name,
-				fileType: file.type,
-				fileSize: file.size,
-				id: value.id,
-				version: value.version || value.$version
-		    };
+      if(uploadSize > 0 && file.size > 1048576 * uploadSize) {
+        return axelor.dialogs.say(_t("You are not allow to upload a file bigger than") + ' ' + uploadSize + 'MB');
+      }
 
-			record.$upload = {
-			    file: file
-		    };
+      if (!isBinary) {
+        return doUpload(file);
+      }
 
-			ds.save(record).success(function (saved) {
-				update(saved);
-			});
-		}
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        update(e.target.result, file.name);
+      };
 
-		function doUpdate(value) {
-			image.get(0).src = scope.getLink(value);
-			model.$setViewValue(getData(value));			
-		}
+      reader.readAsDataURL(file);
+    });
 
-		function update(value) {
-			scope.$applyAsync(function() {
-				doUpdate(value);
-			});
-		}
-		
-		function getData(value) {
-			if (!value || isBinary) {
-				return value;
-			}
-			return {
-				id: value.id
-			};
-		}
+    function doUpload(file) {
+      var ds = scope._dataSource._new(META_FILE);
+      var value = field.target === META_FILE ? (scope.getValue()||{}) : {};
+      var record = {
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size,
+        id: value.id,
+        version: value.version || value.$version
+        };
 
-		scope.$render_editable = function() {
-			image.get(0).src = scope.getLink(model.$viewValue);
-		};
+      record.$upload = {
+          file: file
+        };
 
-		scope.$watch("record.id", function imageRecordIdWatch(id, old) {
-			if (!scope.isReadonly()) {
-				scope.$render_editable();
-			}
-		});
-	},
-	template_editable:
-	'<div ng-style="styles[0]" class="image-wrapper">' +
-		'<input type="file" accept="image/*">' +
-		'<img class="img-polaroid" ng-style="styles[1]" style="display: inline-block;">' +
-		'<div class="btn-group">' +
-			'<button ng-click="doSelect()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
-			'<button ng-click="doRemove()" class="btn" type="button"><i class="fa fa-times"></i></button>' +
-		'</div>' +
-	'</div>'
+      ds.save(record).success(function (saved) {
+        update(saved);
+      });
+    }
+
+    function doUpdate(value) {
+      image.get(0).src = scope.getLink(value);
+      model.$setViewValue(getData(value));
+    }
+
+    function update(value) {
+      scope.$applyAsync(function() {
+        doUpdate(value);
+      });
+    }
+
+    function getData(value) {
+      if (!value || isBinary) {
+        return value;
+      }
+      return {
+        id: value.id
+      };
+    }
+
+    scope.$render_editable = function() {
+      image.get(0).src = scope.getLink(model.$viewValue);
+    };
+
+    scope.$watch("record.id", function imageRecordIdWatch(id, old) {
+      if (!scope.isReadonly()) {
+        scope.$render_editable();
+      }
+    });
+  },
+  template_editable:
+  '<div ng-style="styles[0]" class="image-wrapper">' +
+    '<input type="file" accept="image/*">' +
+    '<img class="img-polaroid" ng-style="styles[1]" style="display: inline-block;">' +
+    '<div class="btn-group">' +
+      '<button ng-click="doSelect()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
+      '<button ng-click="doRemove()" class="btn" type="button"><i class="fa fa-times"></i></button>' +
+    '</div>' +
+  '</div>'
 });
 
 ui.formInput('Binary', {
 
-	css: 'file-item',
-	cellCss: 'form-item file-item',
+  css: 'file-item',
+  cellCss: 'form-item file-item',
 
-	link: function(scope, element, attrs, model) {
+  link: function(scope, element, attrs, model) {
 
-		var field = scope.field;
-		var input = element.children('input:first').hide();
+    var field = scope.field;
+    var input = element.children('input:first').hide();
 
-		scope.doSelect = function() {
-			input.click();
-		};
+    scope.doSelect = function() {
+      input.click();
+    };
 
-		scope.doSave = function() {
-			var record = scope.record;
-			var model = scope._model;
-			var url = makeURL(model, field.name, record);
-			ui.download(url, record.fileName || field.name);
-		};
+    scope.doSave = function() {
+      var record = scope.record;
+      var model = scope._model;
+      var url = makeURL(model, field.name, record);
+      ui.download(url, record.fileName || field.name);
+    };
 
-		scope.doRemove = function() {
-			var record = scope.record;
-			input.val(null);
-			model.$setViewValue(null);
-			record.$upload = null;
-			if(scope._model === META_FILE) {
-				record.fileName = null;
-				record.fileType = null;
-			}
-			record.fileSize = null;
-		};
+    scope.doRemove = function() {
+      var record = scope.record;
+      input.val(null);
+      model.$setViewValue(null);
+      record.$upload = null;
+      if(scope._model === META_FILE) {
+        record.fileName = null;
+        record.fileType = null;
+      }
+      record.fileSize = null;
+    };
 
-		scope.canDownload = function() {
-			var record = scope.record || {};
-			if (!record.id) return false;
-			if (scope._model === META_FILE) {
-				return !!record.fileName;
-			}
-			return true;
-		};
+    scope.canDownload = function() {
+      var record = scope.record || {};
+      if (!record.id) return false;
+      if (scope._model === META_FILE) {
+        return !!record.fileName;
+      }
+      return true;
+    };
 
-		input.change(function(e) {
-			var file = input.get(0).files[0];
-			var record = scope.record;
+    input.change(function(e) {
+      var file = input.get(0).files[0];
+      var record = scope.record;
 
-			// reset file selection
-			input.get(0).value = null;
+      // reset file selection
+      input.get(0).value = null;
 
-			if (file) {
-				record.$upload = {
-					field: field.name,
-					file: file
-				};
-				if(scope._model === META_FILE) {
-					record.fileName = file.name;
-				}
-				scope.$applyAsync(function() {
-					record.fileType = file.type;
-					record.fileSize = file.size;
-				});
-			}
-		});
-	},
-	template_readonly: null,
-	template_editable: null,
-	template:
-	'<div>' +
-		'<input type="file">' +
-		'<div class="btn-group">' +
-			'<button ng-click="doSelect()" ng-show="!isReadonly()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
-			'<button ng-click="doSave()" ng-show="canDownload()" class="btn" type="button"><i class="fa fa-arrow-circle-down"></i></button>' +
-			'<button ng-click="doRemove()" ng-show="!isReadonly()" class="btn" type="button"><i class="fa fa-times"></i></button>' +
-		'</div>' +
-	'</div>'
+      if (file) {
+        record.$upload = {
+          field: field.name,
+          file: file
+        };
+        if(scope._model === META_FILE) {
+          record.fileName = file.name;
+        }
+        scope.$applyAsync(function() {
+          record.fileType = file.type;
+          record.fileSize = file.size;
+        });
+      }
+    });
+  },
+  template_readonly: null,
+  template_editable: null,
+  template:
+  '<div>' +
+    '<input type="file">' +
+    '<div class="btn-group">' +
+      '<button ng-click="doSelect()" ng-show="!isReadonly()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
+      '<button ng-click="doSave()" ng-show="canDownload()" class="btn" type="button"><i class="fa fa-arrow-circle-down"></i></button>' +
+      '<button ng-click="doRemove()" ng-show="!isReadonly()" class="btn" type="button"><i class="fa fa-times"></i></button>' +
+    '</div>' +
+  '</div>'
 });
 
 ui.formInput('BinaryLink', {
 
-	css: 'file-item',
-	cellCss: 'form-item file-item',
-	metaWidget: true,
+  css: 'file-item',
+  cellCss: 'form-item file-item',
+  metaWidget: true,
 
-	link: function(scope, element, attrs, model) {
+  link: function(scope, element, attrs, model) {
 
-		var field = scope.field;
-		var input = element.children('input:first').hide();
+    var field = scope.field;
+    var input = element.children('input:first').hide();
 
-		if (field.target !== META_FILE) {
-			throw new Error("BinaryLink widget can be used with MetaFile field only.");
-		}
+    if (field.target !== META_FILE) {
+      throw new Error("BinaryLink widget can be used with MetaFile field only.");
+    }
 
-		scope.doSelect = function() {
-			input.click();
-		};
+    scope.doSelect = function() {
+      input.click();
+    };
 
-		scope.doRemove = function() {
-			input.val(null);
-			scope.setValue(null, true);
-		};
+    scope.doRemove = function() {
+      input.val(null);
+      scope.setValue(null, true);
+    };
 
-		scope.canDownload = function() {
-			var value = model.$viewValue;
-			return value && value.id > 0;
-		};
+    scope.canDownload = function() {
+      var value = model.$viewValue;
+      return value && value.id > 0;
+    };
 
-		scope.format = function (value) {
-			if (value) {
-				return value.fileName;
-			}
-			return value;
-		};
+    scope.format = function (value) {
+      if (value) {
+        return value.fileName;
+      }
+      return value;
+    };
 
-		scope.doSave = function() {
-			var value = model.$viewValue;
-			var version = value ? (value.version || value.$version) : undefined;
-			var url = makeURL(META_FILE, "content", value, version);
-			ui.download(url, scope.text);
-		};
+    scope.doSave = function() {
+      var value = model.$viewValue;
+      var version = value ? (value.version || value.$version) : undefined;
+      var url = makeURL(META_FILE, "content", value, version);
+      ui.download(url, scope.text);
+    };
 
-		input.change(function(e) {
-			var file = input.get(0).files[0];
+    input.change(function(e) {
+      var file = input.get(0).files[0];
 
-			// reset file selection
-			input.get(0).value = null;
+      // reset file selection
+      input.get(0).value = null;
 
-			if (!file) {
-				return;
-			}
+      if (!file) {
+        return;
+      }
 
-			var ds = scope._dataSource._new(META_FILE);
-			var value = scope.getValue() || {};
-			var record = _.extend({
-				fileName: file.name,
-				fileType: file.type,
-				fileSize: file.size
-			}, {
-				id: value.id,
-				version: value.version || value.$version
-			});
+      var ds = scope._dataSource._new(META_FILE);
+      var value = scope.getValue() || {};
+      var record = _.extend({
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size
+      }, {
+        id: value.id,
+        version: value.version || value.$version
+      });
 
-			record.$upload = {
-				file: file
-			};
+      record.$upload = {
+        file: file
+      };
 
-			ds.save(record).success(function (rec) {
-				scope.setValue(rec, true);
-			});
-		});
-	},
-	template_readonly: null,
-	template_editable: null,
-	template:
-	'<div>' +
-		'<input type="file">' +
-		'<div class="btn-group">' +
-			'<button ng-click="doSelect()" ng-show="!isReadonly()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
-			'<button ng-click="doRemove()" ng-show="canDownload() && !isReadonly()" class="btn" type="button"><i class="fa fa-times"></i></button>' +
-		'</div> ' +
-		'<a ng-show="text" href="javascript:" ng-click="doSave()">{{text}}</a>' +
-	'</div>'
+      ds.save(record).success(function (rec) {
+        scope.setValue(rec, true);
+      });
+    });
+  },
+  template_readonly: null,
+  template_editable: null,
+  template:
+  '<div>' +
+    '<input type="file">' +
+    '<div class="btn-group">' +
+      '<button ng-click="doSelect()" ng-show="!isReadonly()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
+      '<button ng-click="doRemove()" ng-show="canDownload() && !isReadonly()" class="btn" type="button"><i class="fa fa-times"></i></button>' +
+    '</div> ' +
+    '<a ng-show="text" href="javascript:" ng-click="doSave()">{{text}}</a>' +
+  '</div>'
 });
 
 })();

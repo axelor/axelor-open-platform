@@ -17,18 +17,6 @@
  */
 package com.axelor.rpc;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import javax.script.SimpleBindings;
-
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.Model;
@@ -42,183 +30,195 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import javax.script.SimpleBindings;
 
 public class JsonContext extends SimpleBindings {
-	
-	static class ModelSerializer extends JsonSerializer<Model> {
 
-		@Override
-		public void serialize(Model value, JsonGenerator jgen, SerializerProvider provider)
-				throws IOException, JsonProcessingException {
-			if (value != null) {
-				final JsonSerializer<Object> serializer = provider.findValueSerializer(Map.class, null);
-				final Map<String, Object> map = Resource.toMapCompact(value);
-				map.remove("$version");
-				serializer.serialize(map, jgen, provider);
-			}
-		}
-	}
+  static class ModelSerializer extends JsonSerializer<Model> {
 
-	private static final ObjectMapper jsonMapper = ObjectMapperProvider.createObjectMapper(new ModelSerializer());
+    @Override
+    public void serialize(Model value, JsonGenerator jgen, SerializerProvider provider)
+        throws IOException, JsonProcessingException {
+      if (value != null) {
+        final JsonSerializer<Object> serializer = provider.findValueSerializer(Map.class, null);
+        final Map<String, Object> map = Resource.toMapCompact(value);
+        map.remove("$version");
+        serializer.serialize(map, jgen, provider);
+      }
+    }
+  }
 
-	static {
-		jsonMapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
-	}
+  private static final ObjectMapper jsonMapper =
+      ObjectMapperProvider.createObjectMapper(new ModelSerializer());
 
-	private final String jsonField;
-	private final Map<String, Object> fields;
-	private final Context context;
+  static {
+    jsonMapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
+  }
 
-	public JsonContext(Context context, Property property, String jsonValue) {
-		super(fromJson(jsonValue));
-		this.context = context;
-		this.jsonField = property.getName();
-		this.fields = findFields();
-	}
+  private final String jsonField;
+  private final Map<String, Object> fields;
+  private final Context context;
 
-	public JsonContext(MetaJsonRecord record) {
-		super(fromJson(Objects.requireNonNull(record).getAttrs()));
-		this.context = new Context(MetaJsonRecord.class);
-		this.context.put(Context.KEY_ID, record.getId());
-		this.context.put(Context.KEY_JSON_MODEL, record.getJsonModel());
-		this.jsonField = Context.KEY_JSON_ATTRS;
-		this.fields = findFields();
-	}
+  public JsonContext(Context context, Property property, String jsonValue) {
+    super(fromJson(jsonValue));
+    this.context = context;
+    this.jsonField = property.getName();
+    this.fields = findFields();
+  }
 
-	private Map<String, Object> findFields() {
-		String jsonModel = (String) context.get(Context.KEY_JSON_MODEL);
-		if (jsonModel == null) {
-			jsonModel = (String) super.get(Context.KEY_JSON_MODEL);
-		}
-		if (!StringUtils.isBlank(jsonModel) && MetaJsonRecord.class.isAssignableFrom(context.getContextClass())) {
-			return MetaStore.findJsonFields(jsonModel);
-		}
-		return MetaStore.findJsonFields(context.getContextClass().getName(), jsonField);
-	}
+  public JsonContext(MetaJsonRecord record) {
+    super(fromJson(Objects.requireNonNull(record).getAttrs()));
+    this.context = new Context(MetaJsonRecord.class);
+    this.context.put(Context.KEY_ID, record.getId());
+    this.context.put(Context.KEY_JSON_MODEL, record.getJsonModel());
+    this.jsonField = Context.KEY_JSON_ATTRS;
+    this.fields = findFields();
+  }
 
-	@SuppressWarnings("unchecked")
-	private static Map<String, Object> fromJson(String text) {
-		try {
-			return jsonMapper.readValue(text, Map.class);
-		} catch (Exception e) {
-			return new HashMap<>();
-		}
-	}
+  private Map<String, Object> findFields() {
+    String jsonModel = (String) context.get(Context.KEY_JSON_MODEL);
+    if (jsonModel == null) {
+      jsonModel = (String) super.get(Context.KEY_JSON_MODEL);
+    }
+    if (!StringUtils.isBlank(jsonModel)
+        && MetaJsonRecord.class.isAssignableFrom(context.getContextClass())) {
+      return MetaStore.findJsonFields(jsonModel);
+    }
+    return MetaStore.findJsonFields(context.getContextClass().getName(), jsonField);
+  }
 
-	private static String toJson(Map<String, Object> value) {
-		try {
-			return jsonMapper.writeValueAsString(value);
-		} catch (Exception e) {
-			return null;
-		}
-	}
+  @SuppressWarnings("unchecked")
+  private static Map<String, Object> fromJson(String text) {
+    try {
+      return jsonMapper.readValue(text, Map.class);
+    } catch (Exception e) {
+      return new HashMap<>();
+    }
+  }
 
-	private void ensureManaged(Object value) {
-		if (value instanceof Model) {
-			final Model bean = (Model) value;
-			if (bean.getId() == null || bean.getId() <= 0) {
-				throw new IllegalArgumentException();
-			}
-		}
-		if (value instanceof Collection) {
-			((Collection<?>) value).forEach(this::ensureManaged);
-		}
-	}
+  private static String toJson(Map<String, Object> value) {
+    try {
+      return jsonMapper.writeValueAsString(value);
+    } catch (Exception e) {
+      return null;
+    }
+  }
 
-	private void propagate() {
-		context.put(jsonField, toJson(this));
-	}
+  private void ensureManaged(Object value) {
+    if (value instanceof Model) {
+      final Model bean = (Model) value;
+      if (bean.getId() == null || bean.getId() <= 0) {
+        throw new IllegalArgumentException();
+      }
+    }
+    if (value instanceof Collection) {
+      ((Collection<?>) value).forEach(this::ensureManaged);
+    }
+  }
 
-	public Long getId() {
-		return context == null ? null : (Long) context.get(Context.KEY_ID);
-	}
+  private void propagate() {
+    context.put(jsonField, toJson(this));
+  }
 
-	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Object get(Object key) {
-		final Map<String, Object> field = (Map<String, Object>) fields.get(key);
-		if (field == null) {
-			return super.get(key);
-		}
+  public Long getId() {
+    return context == null ? null : (Long) context.get(Context.KEY_ID);
+  }
 
-		final String type = (String) field.getOrDefault("type", "");
-		final Object value = super.get(key);
-		
-		if (value == null || ObjectUtils.isEmpty(value)) {
-			return value;
-		}
+  @Override
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public Object get(Object key) {
+    final Map<String, Object> field = (Map<String, Object>) fields.get(key);
+    if (field == null) {
+      return super.get(key);
+    }
 
-		String target = null;
+    final String type = (String) field.getOrDefault("type", "");
+    final Object value = super.get(key);
 
-		switch (type) {
-		case "many-to-one":
-		case "one-to-many":
-		case "many-to-many":
-			target = (String) field.get("target");
-			break;
-		case "json-many-to-one":
-		case "json-one-to-many":
-		case "json-many-to-many":
-			target = (String) field.get("jsonTarget");
-			break;
-		case "datetime":
-			return Adapter.adapt(value, LocalDateTime.class, null, null);
-		case "date":
-			return Adapter.adapt(value, LocalDate.class, null, null);
-		case "decimal":
-			return Adapter.adapt(value, BigDecimal.class, null, null);
-		case "integer":
-			return Adapter.adapt(value, Integer.class, null, null);
-		case "boolean":
-			return Adapter.adapt(value, Boolean.class, null, null);
-		}
+    if (value == null || ObjectUtils.isEmpty(value)) {
+      return value;
+    }
 
-		if (target == null) {
-			return super.get(key);
-		}
+    String target = null;
 
-		Class<?> targetClass;
-		try {
-			targetClass = Class.forName(target);
-		} catch (ClassNotFoundException e) {
-			return super.get(key);
-		}
-		
-		if (value instanceof Map) {
-			return ContextHandlerFactory.newHandler(targetClass, (Map) value).getProxy();
-		}
+    switch (type) {
+      case "many-to-one":
+      case "one-to-many":
+      case "many-to-many":
+        target = (String) field.get("target");
+        break;
+      case "json-many-to-one":
+      case "json-one-to-many":
+      case "json-many-to-many":
+        target = (String) field.get("jsonTarget");
+        break;
+      case "datetime":
+        return Adapter.adapt(value, LocalDateTime.class, null, null);
+      case "date":
+        return Adapter.adapt(value, LocalDate.class, null, null);
+      case "decimal":
+        return Adapter.adapt(value, BigDecimal.class, null, null);
+      case "integer":
+        return Adapter.adapt(value, Integer.class, null, null);
+      case "boolean":
+        return Adapter.adapt(value, Boolean.class, null, null);
+    }
 
-		if (value instanceof Collection) {
-			return ((Collection<?>) value)
-				.stream()
-				.map(item -> (Map<String, Object>) item)
-				.map(item -> ContextHandlerFactory.newHandler(targetClass, item).getProxy())
-				.collect(Collectors.toList());
-		}
+    if (target == null) {
+      return super.get(key);
+    }
 
-		return super.get(key);
-	}
+    Class<?> targetClass;
+    try {
+      targetClass = Class.forName(target);
+    } catch (ClassNotFoundException e) {
+      return super.get(key);
+    }
 
-	@Override
-	public Object put(String name, Object value) {
-		try {
-			ensureManaged(value);
-		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException("cannot set unsaved values to field: " + name);
-		}
-		try {
-			return super.put(name, value);
-		} finally {
-			propagate();
-		}
-	}
+    if (value instanceof Map) {
+      return ContextHandlerFactory.newHandler(targetClass, (Map) value).getProxy();
+    }
 
-	@Override
-	public Object remove(Object key) {
-		try {
-			return super.remove(key);
-		} finally {
-			propagate();
-		}
-	}
+    if (value instanceof Collection) {
+      return ((Collection<?>) value)
+          .stream()
+          .map(item -> (Map<String, Object>) item)
+          .map(item -> ContextHandlerFactory.newHandler(targetClass, item).getProxy())
+          .collect(Collectors.toList());
+    }
+
+    return super.get(key);
+  }
+
+  @Override
+  public Object put(String name, Object value) {
+    try {
+      ensureManaged(value);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("cannot set unsaved values to field: " + name);
+    }
+    try {
+      return super.put(name, value);
+    } finally {
+      propagate();
+    }
+  }
+
+  @Override
+  public Object remove(Object key) {
+    try {
+      return super.remove(key);
+    } finally {
+      propagate();
+    }
+  }
 }

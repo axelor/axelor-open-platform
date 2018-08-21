@@ -17,205 +17,201 @@
  */
 package com.axelor.rpc;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Request {
 
-	static final ThreadLocal<Request> CURRENT = new ThreadLocal<Request>();
+  static final ThreadLocal<Request> CURRENT = new ThreadLocal<Request>();
 
-	private int limit;
+  private int limit;
 
-	private int offset;
+  private int offset;
 
-	private List<String> sortBy;
+  private List<String> sortBy;
 
-	private Map<String, Object> data;
+  private Map<String, Object> data;
 
-	private List<Object> records;
+  private List<Object> records;
 
-	private Criteria criteria;
-	
-	private List<String> fields;
+  private Criteria criteria;
 
-	private Map<String, List<String>> related;
+  private List<String> fields;
 
-	private String model;
-	
-	private Context context;
+  private Map<String, List<String>> related;
 
-	private ScriptHelper scriptHelper;
+  private String model;
 
-	public static Request current() {
-		return CURRENT.get();
-	}
+  private Context context;
 
-	public String getModel() {
-		return model;
-	}
+  private ScriptHelper scriptHelper;
 
-	/**
-	 * Set the model class that represents the request {@link #data}.
-	 * 
-	 * @param model
-	 *            the model class
-	 */
-	public void setModel(String model) {
-		this.model = model;
-	}
-	
-	/**
-	 * Get the entity class on which the operation is being performed.
-	 * 
-	 * @return bean class
-	 */
-	@JsonIgnore
-	public Class<?> getBeanClass() {
-		try {
-			return Class.forName(model);
-		} catch (NullPointerException e) {
-		} catch (ClassNotFoundException e) {
-		}
-		return null;
-	}
+  public static Request current() {
+    return CURRENT.get();
+  }
 
-	public int getLimit() {
-		return limit;
-	}
-	
-	public void setLimit(int limit) {
-		this.limit = limit;
-	}
-	
-	public int getOffset() {
-		return offset;
-	}
-	
-	public void setOffset(int offset) {
-		this.offset = offset;
-	}
-	
-	public List<String> getSortBy() {
-		return sortBy;
-	}
-	
-	public void setSortBy(List<String> sortBy) {
-		this.sortBy = sortBy;
-	}
+  public String getModel() {
+    return model;
+  }
 
-	public Map<String, Object> getData() {
-		return data;
-	}
+  /**
+   * Set the model class that represents the request {@link #data}.
+   *
+   * @param model the model class
+   */
+  public void setModel(String model) {
+    this.model = model;
+  }
 
-	public void setData(Map<String, Object> data) {
-		this.data = data;
-	}
-	
-	public List<Object> getRecords() {
-		return records;
-	}
-	
-	public void setRecords(List<Object> records) {
-		this.records = records;
-	}
-	
-	public List<String> getFields() {
-		return fields;
-	}
-	
-	public void setFields(List<String> fields) {
-		this.fields = fields;
-	}
+  /**
+   * Get the entity class on which the operation is being performed.
+   *
+   * @return bean class
+   */
+  @JsonIgnore
+  public Class<?> getBeanClass() {
+    try {
+      return Class.forName(model);
+    } catch (NullPointerException e) {
+    } catch (ClassNotFoundException e) {
+    }
+    return null;
+  }
 
-	public Map<String, List<String>> getRelated() {
-		return related;
-	}
+  public int getLimit() {
+    return limit;
+  }
 
-	public void setRelated(Map<String, List<String>> related) {
-		this.related = related;
-	}
+  public void setLimit(int limit) {
+    this.limit = limit;
+  }
 
-	@JsonIgnore
-	public Criteria getCriteria() {
-		if (criteria == null && getData() != null) {
-			criteria = Criteria.parse(this);
-		}
-		return criteria;
-	}
+  public int getOffset() {
+    return offset;
+  }
 
-	/**
-	 * Get the raw context.
-	 * 
-	 * <p>
-	 * The returned map is mutable so updating this map may cause some
-	 * unexpected results. So use this method with care.
-	 * </p>
-	 * 
-	 * @return map of context values
-	 */
-	@SuppressWarnings("all")
-	public Map<String, Object> getRawContext() {
+  public void setOffset(int offset) {
+    this.offset = offset;
+  }
 
-		final Map<String, Object> data = getData();
-		final Map<String, Object> ctx = new HashMap<>();
+  public List<String> getSortBy() {
+    return sortBy;
+  }
 
-		if (data == null) {
-			return ctx;
-		}
+  public void setSortBy(List<String> sortBy) {
+    this.sortBy = sortBy;
+  }
 
-		if (data.get("context") != null) {
-			ctx.putAll((Map) data.get("context"));
-		}
-		if (data.get("_domainContext") != null) {
-			ctx.putAll((Map) data.get("_domainContext"));
-		}
+  public Map<String, Object> getData() {
+    return data;
+  }
 
-		return ctx;
-	}
+  public void setData(Map<String, Object> data) {
+    this.data = data;
+  }
 
-	/**
-	 * Get a {@link ScriptHelper} to evaluate expressions with current context.
-	 * 
-	 * @return an instance of {@link ScriptHelper} for current context
-	 */
-	@JsonIgnore
-	public ScriptHelper getScriptHelper() {
-		if (scriptHelper != null) {
-			return scriptHelper;
-		}
-		Map<String, Object> ctx = getContext();
-		if (ctx == null) {
-			ctx = getRawContext();
-		}
-		return scriptHelper = new CompositeScriptHelper(new ScriptBindings(ctx));
-	}
+  public List<Object> getRecords() {
+    return records;
+  }
 
-	/**
-	 * Get the domain object context.
-	 *
-	 * @return an instance of {@link Context}
-	 */
-	@JsonIgnore
-	public Context getContext() {
-		if (context != null) {
-			return context;
-		}
-		final Map<String, Object> vars = getRawContext();
-		Class<?> klass;
-		try {
-			klass = Class.forName(vars.get("_model").toString());
-		} catch (Exception e) {
-			klass = getBeanClass();
-		}
-		if (klass == null) {
-			return null;
-		}
-		return context = new Context(vars, klass);
-	}
+  public void setRecords(List<Object> records) {
+    this.records = records;
+  }
+
+  public List<String> getFields() {
+    return fields;
+  }
+
+  public void setFields(List<String> fields) {
+    this.fields = fields;
+  }
+
+  public Map<String, List<String>> getRelated() {
+    return related;
+  }
+
+  public void setRelated(Map<String, List<String>> related) {
+    this.related = related;
+  }
+
+  @JsonIgnore
+  public Criteria getCriteria() {
+    if (criteria == null && getData() != null) {
+      criteria = Criteria.parse(this);
+    }
+    return criteria;
+  }
+
+  /**
+   * Get the raw context.
+   *
+   * <p>The returned map is mutable so updating this map may cause some unexpected results. So use
+   * this method with care.
+   *
+   * @return map of context values
+   */
+  @SuppressWarnings("all")
+  public Map<String, Object> getRawContext() {
+
+    final Map<String, Object> data = getData();
+    final Map<String, Object> ctx = new HashMap<>();
+
+    if (data == null) {
+      return ctx;
+    }
+
+    if (data.get("context") != null) {
+      ctx.putAll((Map) data.get("context"));
+    }
+    if (data.get("_domainContext") != null) {
+      ctx.putAll((Map) data.get("_domainContext"));
+    }
+
+    return ctx;
+  }
+
+  /**
+   * Get a {@link ScriptHelper} to evaluate expressions with current context.
+   *
+   * @return an instance of {@link ScriptHelper} for current context
+   */
+  @JsonIgnore
+  public ScriptHelper getScriptHelper() {
+    if (scriptHelper != null) {
+      return scriptHelper;
+    }
+    Map<String, Object> ctx = getContext();
+    if (ctx == null) {
+      ctx = getRawContext();
+    }
+    return scriptHelper = new CompositeScriptHelper(new ScriptBindings(ctx));
+  }
+
+  /**
+   * Get the domain object context.
+   *
+   * @return an instance of {@link Context}
+   */
+  @JsonIgnore
+  public Context getContext() {
+    if (context != null) {
+      return context;
+    }
+    final Map<String, Object> vars = getRawContext();
+    Class<?> klass;
+    try {
+      klass = Class.forName(vars.get("_model").toString());
+    } catch (Exception e) {
+      klass = getBeanClass();
+    }
+    if (klass == null) {
+      return null;
+    }
+    return context = new Context(vars, klass);
+  }
 }

@@ -17,27 +17,6 @@
  */
 package com.axelor.data.xml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.FlushModeType;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import com.axelor.data.ImportException;
 import com.axelor.data.ImportTask;
 import com.axelor.data.Importer;
@@ -51,278 +30,295 @@ import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.FlushModeType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
- * XML data importer.
+ * XML data importer. <br>
  * <br>
- * <br>
- * This class also provides {@link #run(ImportTask)} method to import data programmatically.
- * <br>
+ * This class also provides {@link #run(ImportTask)} method to import data programmatically. <br>
  * <br>
  * For example:
- * <pre> 
+ *
+ * <pre>
  * XMLImporter importer = new XMLImporter(&quot;path/to/xml-config.xml&quot;);
- * 
+ *
  * importer.runTask(new ImportTask(){
- * 	
+ *
  * 	public void configure() throws IOException {
  * 		input(&quot;contacts.xml&quot;, new File(&quot;data/xml/contacts.xml&quot;));
  * 		input(&quot;contacts.xml&quot;, new File(&quot;data/xml/contacts2.xml&quot;));
  * 	}
- * 
+ *
  * 	public boolean handle(ImportException e) {
  * 		System.err.println("Import error: " + e);
  * 		return true;
  * 	}
  * }
  * </pre>
- * 
  */
 public class XMLImporter implements Importer {
 
-	private Logger log = LoggerFactory.getLogger(getClass());
-	
-	private File dataDir;
-	
-	private XMLConfig config;
-	
-	private Map<String, Object> context;
+  private Logger log = LoggerFactory.getLogger(getClass());
 
-	private List<Listener> listeners = Lists.newArrayList();
+  private File dataDir;
 
-	private boolean canClear = true;
+  private XMLConfig config;
 
-	@Inject
-	public XMLImporter(
-			@Named("axelor.data.config") String configFile,
-			@Named("axelor.data.dir") String dataDir) {
+  private Map<String, Object> context;
 
-		Preconditions.checkNotNull(configFile);
+  private List<Listener> listeners = Lists.newArrayList();
 
-		File file = new File(configFile);
+  private boolean canClear = true;
 
-		Preconditions.checkArgument(file.isFile(), "No such file: " + configFile);
-		
-		if (dataDir != null) {
-			File _data = new File(dataDir);
-			Preconditions.checkArgument(_data.isDirectory());
-			this.dataDir = _data;
-		}
+  @Inject
+  public XMLImporter(
+      @Named("axelor.data.config") String configFile, @Named("axelor.data.dir") String dataDir) {
 
-		this.config = XMLConfig.parse(file);
-	}
+    Preconditions.checkNotNull(configFile);
 
-	public XMLImporter(String configFile) {
-		this(configFile, null);
-	}
-	
-	public void setContext(Map<String, Object> context) {
-		this.context = context;
-	}
+    File file = new File(configFile);
 
-	private List<File> getFiles(String... names) {
-		List<File> all = Lists.newArrayList();
-		for (String name : names)
-			all.add(dataDir != null ? new File(dataDir, name) : new File(name));
-		return all;
-	}
-	
-	public void addListener(Listener listener) {
-		this.listeners.add(listener);
-	}
+    Preconditions.checkArgument(file.isFile(), "No such file: " + configFile);
 
-	public void clearListener() {
-		this.listeners.clear();
-	}
+    if (dataDir != null) {
+      File _data = new File(dataDir);
+      Preconditions.checkArgument(_data.isDirectory());
+      this.dataDir = _data;
+    }
 
-	public void setCanClear(boolean canClear) {
-		this.canClear = canClear;
-	}
+    this.config = XMLConfig.parse(file);
+  }
 
-	@Override
-	public void run() {
+  public XMLImporter(String configFile) {
+    this(configFile, null);
+  }
 
-		for (XMLInput input : config.getInputs()) {
+  public void setContext(Map<String, Object> context) {
+    this.context = context;
+  }
 
-			String fileName = input.getFileName();
-			List<File> files = this.getFiles(fileName);
+  private List<File> getFiles(String... names) {
+    List<File> all = Lists.newArrayList();
+    for (String name : names) all.add(dataDir != null ? new File(dataDir, name) : new File(name));
+    return all;
+  }
 
-			for(File file : files) {
-				try {
-					this.process(input, file);
-				} catch (Exception e) {
-					log.error("Error while importing {}.", file, e);
-				}
-			}
-		}
-	}
-	
-	public void run(ImportTask task) {
-		try {
-			if (task.readers.isEmpty()) {
-				task.configure();
-			}
-			for (XMLInput input : config.getInputs()) {
-				for(Reader reader : task.readers.get(input.getFileName())) {
-					try {
-						process(input, reader);
-					} catch(ImportException e) {
-						if (!task.handle(e)) {
-							break;
-						}
-					}
-				}
-			}
-		} catch(IOException e) {
-			throw new IllegalArgumentException(e);
-		} finally {
-			task.readers.clear();
-		}
-	}
+  public void addListener(Listener listener) {
+    this.listeners.add(listener);
+  }
 
-	/**
-	 * Process the data file with the given input binding.
-	 * 
-	 * @param input input binding configuration
-	 * @param file data file
-	 * @throws ImportException
-	 */
-	private void process(XMLInput input, File file) throws ImportException {
-		try {
-			log.info("Importing: {}", file.getName());
-			this.process(input, new InputStreamReader(new FileInputStream(file), Charset.forName("UTF-8")));
-		} catch (IOException e) {
-			throw new ImportException(e);
-		}
-	}
-	
-	private void process(XMLInput input, Reader reader) throws ImportException {
+  public void clearListener() {
+    this.listeners.clear();
+  }
 
-		final int batchSize = DBHelper.getJdbcBatchSize();
+  public void setCanClear(boolean canClear) {
+    this.canClear = canClear;
+  }
 
-		final XStream stream = new XStream(new StaxDriver()) {
+  @Override
+  public void run() {
 
-			private String root = null;
+    for (XMLInput input : config.getInputs()) {
 
-			@Override
-			@SuppressWarnings("all")
-			protected MapperWrapper wrapMapper(MapperWrapper next) {
-				
-				return new MapperWrapper(next) {
-					
-					@Override
-					public Class realClass(String elementName) {
-						if (root == null) {
-							root = elementName;
-							return Document.class;
-						}
-						return Element.class;
-					}
-				};
-			}
-		};
+      String fileName = input.getFileName();
+      List<File> files = this.getFiles(fileName);
 
-		final Map<String, Object> context = new HashMap<>();
+      for (File file : files) {
+        try {
+          this.process(input, file);
+        } catch (Exception e) {
+          log.error("Error while importing {}.", file, e);
+        }
+      }
+    }
+  }
 
-		// Put global context
-		if (this.context != null) {
-			context.putAll(this.context);
-		}
+  public void run(ImportTask task) {
+    try {
+      if (task.readers.isEmpty()) {
+        task.configure();
+      }
+      for (XMLInput input : config.getInputs()) {
+        for (Reader reader : task.readers.get(input.getFileName())) {
+          try {
+            process(input, reader);
+          } catch (ImportException e) {
+            if (!task.handle(e)) {
+              break;
+            }
+          }
+        }
+      }
+    } catch (IOException e) {
+      throw new IllegalArgumentException(e);
+    } finally {
+      task.readers.clear();
+    }
+  }
 
-		// Put data path in context
-		if (dataDir != null) {
-			context.put("__path__", dataDir.toPath());
-		}
+  /**
+   * Process the data file with the given input binding.
+   *
+   * @param input input binding configuration
+   * @param file data file
+   * @throws ImportException
+   */
+  private void process(XMLInput input, File file) throws ImportException {
+    try {
+      log.info("Importing: {}", file.getName());
+      this.process(
+          input, new InputStreamReader(new FileInputStream(file), Charset.forName("UTF-8")));
+    } catch (IOException e) {
+      throw new ImportException(e);
+    }
+  }
 
-		final XMLBinder binder = new XMLBinder(input, context) {
-			
-			int count = 0;
-			int total = 0;
-			
-			@Override
-			protected void handle(Object bean, XMLBind binding, Map<String, Object> ctx) {
-				if (bean == null) {
-					return;
-				}
-				try {
-					bean = binding.call(bean, ctx);
-					if (bean != null) {
-						bean = JPA.manage((Model) bean);
-						count++;
-						for(Listener listener : listeners) {
-							listener.imported((Model) bean);
-						}
-					}
-				} catch (Exception e) {
-					log.error("Unable to import object {}.", bean);
-					log.error("With binding {}.", binding);
-					log.error("With exception:", e);
-					
-					// Recover the transaction
-					if (JPA.em().getTransaction().getRollbackOnly()) {
-						JPA.em().getTransaction().rollback();
-					}
-					if (!JPA.em().getTransaction().isActive()) {
-						JPA.em().getTransaction().begin();
-					}
-					
-					for(Listener listener : listeners) {
-						listener.handle((Model) bean, e);
-					}
-				}
-				if (++total % batchSize == 0) {
-					JPA.flush();
-					JPA.clear();
-				}
-			}
-			
-			@Override
-			protected void finish() {
-				for(Listener listener : listeners) {
-					listener.imported(total, count);
-				}
-			}
-		};
+  private void process(XMLInput input, Reader reader) throws ImportException {
 
-		// register type adapters
-		for(DataAdapter adapter : defaultAdapters) {
-			binder.registerAdapter(adapter);
-		}
-		for(DataAdapter adapter : config.getAdapters()) {
-			binder.registerAdapter(adapter);
-		}
-		for(DataAdapter adapter : input.getAdapters()) {
-			binder.registerAdapter(adapter);
-		}
+    final int batchSize = DBHelper.getJdbcBatchSize();
 
-		stream.setMode(XStream.NO_REFERENCES);
-		stream.registerConverter(new ElementConverter(binder));
-		
-		final EntityManager em = JPA.em();
-		final EntityTransaction txn = em.getTransaction();
-		final boolean started = !txn.isActive();
+    final XStream stream =
+        new XStream(new StaxDriver()) {
 
-		if (canClear) {
-			em.setFlushMode(FlushModeType.COMMIT);
-		}
-		if (started) {
-			txn.begin();
-		}
+          private String root = null;
 
-		try {
-			stream.fromXML(reader);
-			binder.finish();
-			if (txn.isActive() && started) {
-				txn.commit();
-				if (canClear) {
-					em.clear();
-				}
-			}
-		} catch (Exception e) {
-			if (txn.isActive() && started) {
-				txn.rollback();
-			}
-			throw new ImportException(e);
-		}
-	}
+          @Override
+          @SuppressWarnings("all")
+          protected MapperWrapper wrapMapper(MapperWrapper next) {
+
+            return new MapperWrapper(next) {
+
+              @Override
+              public Class realClass(String elementName) {
+                if (root == null) {
+                  root = elementName;
+                  return Document.class;
+                }
+                return Element.class;
+              }
+            };
+          }
+        };
+
+    final Map<String, Object> context = new HashMap<>();
+
+    // Put global context
+    if (this.context != null) {
+      context.putAll(this.context);
+    }
+
+    // Put data path in context
+    if (dataDir != null) {
+      context.put("__path__", dataDir.toPath());
+    }
+
+    final XMLBinder binder =
+        new XMLBinder(input, context) {
+
+          int count = 0;
+          int total = 0;
+
+          @Override
+          protected void handle(Object bean, XMLBind binding, Map<String, Object> ctx) {
+            if (bean == null) {
+              return;
+            }
+            try {
+              bean = binding.call(bean, ctx);
+              if (bean != null) {
+                bean = JPA.manage((Model) bean);
+                count++;
+                for (Listener listener : listeners) {
+                  listener.imported((Model) bean);
+                }
+              }
+            } catch (Exception e) {
+              log.error("Unable to import object {}.", bean);
+              log.error("With binding {}.", binding);
+              log.error("With exception:", e);
+
+              // Recover the transaction
+              if (JPA.em().getTransaction().getRollbackOnly()) {
+                JPA.em().getTransaction().rollback();
+              }
+              if (!JPA.em().getTransaction().isActive()) {
+                JPA.em().getTransaction().begin();
+              }
+
+              for (Listener listener : listeners) {
+                listener.handle((Model) bean, e);
+              }
+            }
+            if (++total % batchSize == 0) {
+              JPA.flush();
+              JPA.clear();
+            }
+          }
+
+          @Override
+          protected void finish() {
+            for (Listener listener : listeners) {
+              listener.imported(total, count);
+            }
+          }
+        };
+
+    // register type adapters
+    for (DataAdapter adapter : defaultAdapters) {
+      binder.registerAdapter(adapter);
+    }
+    for (DataAdapter adapter : config.getAdapters()) {
+      binder.registerAdapter(adapter);
+    }
+    for (DataAdapter adapter : input.getAdapters()) {
+      binder.registerAdapter(adapter);
+    }
+
+    stream.setMode(XStream.NO_REFERENCES);
+    stream.registerConverter(new ElementConverter(binder));
+
+    final EntityManager em = JPA.em();
+    final EntityTransaction txn = em.getTransaction();
+    final boolean started = !txn.isActive();
+
+    if (canClear) {
+      em.setFlushMode(FlushModeType.COMMIT);
+    }
+    if (started) {
+      txn.begin();
+    }
+
+    try {
+      stream.fromXML(reader);
+      binder.finish();
+      if (txn.isActive() && started) {
+        txn.commit();
+        if (canClear) {
+          em.clear();
+        }
+      }
+    } catch (Exception e) {
+      if (txn.isActive() && started) {
+        txn.rollback();
+      }
+      throw new ImportException(e);
+    }
+  }
 }

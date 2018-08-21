@@ -17,12 +17,9 @@
  */
 package com.axelor.meta.schema.views;
 
-import javax.xml.bind.annotation.XmlType;
-
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("spacer")
-public class Spacer extends SimpleWidget {
-
-}
+public class Spacer extends SimpleWidget {}

@@ -17,129 +17,127 @@
  */
 package com.axelor.script;
 
+import com.axelor.rpc.Context;
+import com.axelor.test.db.Contact;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import com.axelor.rpc.Context;
-import com.axelor.test.db.Contact;
-
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TestNashorn extends ScriptTest {
 
-	private static final int COUNT = 1000;
+  private static final int COUNT = 1000;
 
-	private static final String EXPR_INTERPOLATION = "'(${title.name}) = ${firstName} ${lastName} (${fullName}) = (${__user__})'";
+  private static final String EXPR_INTERPOLATION =
+      "'(${title.name}) = ${firstName} ${lastName} (${fullName}) = (${__user__})'";
 
-	private static final String EXPR_CONCAT = "'(' + title.name + ') = ' + firstName + ' ' + lastName + ' (' + fullName + ') = (' + __user__ + ')' ";
+  private static final String EXPR_CONCAT =
+      "'(' + title.name + ') = ' + firstName + ' ' + lastName + ' (' + fullName + ') = (' + __user__ + ')' ";
 
-	// false all, to evaluate all conditions
-	private static final String EXPR_CONDITION = "(title instanceof Contact || fullName == 'foo') || (__ref__ instanceof Title) || (__parent__ == 0.102) || (__self__ == __this__)";
+  // false all, to evaluate all conditions
+  private static final String EXPR_CONDITION =
+      "(title instanceof Contact || fullName == 'foo') || (__ref__ instanceof Title) || (__parent__ == 0.102) || (__self__ == __this__)";
 
-	private void doTestSpeed(String expr) {
-		final ScriptHelper helper = new NashornScriptHelper(context());
-		for (int i = 0; i < COUNT; i++) {
-			Object result = helper.eval(expr);
-			Assert.assertNotNull(result);
-		}
-	}
+  private void doTestSpeed(String expr) {
+    final ScriptHelper helper = new NashornScriptHelper(context());
+    for (int i = 0; i < COUNT; i++) {
+      Object result = helper.eval(expr);
+      Assert.assertNotNull(result);
+    }
+  }
 
-	private void doCastTest(int counter) {
-		final ScriptHelper helper = new NashornScriptHelper(context());
+  private void doCastTest(int counter) {
+    final ScriptHelper helper = new NashornScriptHelper(context());
 
-		Object actual = helper.eval("__parent__");
-		Assert.assertTrue(actual instanceof Context);
+    Object actual = helper.eval("__parent__");
+    Assert.assertTrue(actual instanceof Context);
 
-		actual = helper.eval("__ref__");
-		Assert.assertTrue(actual instanceof Contact);
+    actual = helper.eval("__ref__");
+    Assert.assertTrue(actual instanceof Contact);
 
-		actual = helper.eval("__parent__.asType(Contact.class)");
-		Assert.assertTrue(actual instanceof Contact);
+    actual = helper.eval("__parent__.asType(Contact.class)");
+    Assert.assertTrue(actual instanceof Contact);
 
-		actual = helper.eval("__ref__.fullName");
-		Assert.assertTrue(actual instanceof String);
+    actual = helper.eval("__ref__.fullName");
+    Assert.assertTrue(actual instanceof String);
 
-		actual = helper.eval("__ref__.fullName + ' (" + counter
-				+ ")'");
-	}
-	
-	@Test
-	public void doCollectionTest() {
-		final ScriptHelper helper = new NashornScriptHelper(context());
-		
-		Object list = helper.eval("listOf([1, 2, 3, 4])");
-		Assert.assertNotNull(list);
-		Assert.assertTrue(list instanceof List);
-		Assert.assertEquals(4, ((List<?>) list).size());
-		
-		list = helper.eval("listOf(1, 2, 3, 4)");
-		Assert.assertNotNull(list);
-		Assert.assertTrue(list instanceof List);
-		Assert.assertEquals(4, ((List<?>) list).size());
+    actual = helper.eval("__ref__.fullName + ' (" + counter + ")'");
+  }
 
-		Object set = helper.eval("setOf([1, 2, 3, 4])");
-		Assert.assertNotNull(set);
-		Assert.assertTrue(set instanceof Set);
-		Assert.assertEquals(4, ((Set<?>) set).size());
+  @Test
+  public void doCollectionTest() {
+    final ScriptHelper helper = new NashornScriptHelper(context());
 
-		set = helper.eval("setOf(1, 2, 3, 4)");
-		Assert.assertNotNull(set);
-		Assert.assertTrue(set instanceof Set);
-		Assert.assertEquals(4, ((Set<?>) set).size());
+    Object list = helper.eval("listOf([1, 2, 3, 4])");
+    Assert.assertNotNull(list);
+    Assert.assertTrue(list instanceof List);
+    Assert.assertEquals(4, ((List<?>) list).size());
 
-		final Object map = helper.eval("mapOf({a: 1, b: 2})");
-		Assert.assertNotNull(map);
-		Assert.assertTrue(map instanceof Map);
-		Assert.assertEquals(2, ((Map<?, ?>) map).size());
-	}
-	
-	@Test
-	public void doJpaTest() {
-		final ScriptHelper helper = new NashornScriptHelper(context());
-		final Object bean = helper.eval(""
-				+ "doInJPA(function (em) {"
-				+ "	return em.find(Contact.class, id);"
-				+ "})");
+    list = helper.eval("listOf(1, 2, 3, 4)");
+    Assert.assertNotNull(list);
+    Assert.assertTrue(list instanceof List);
+    Assert.assertEquals(4, ((List<?>) list).size());
 
-		Assert.assertNotNull(bean);
-		Assert.assertTrue(bean instanceof Contact);
-	}
+    Object set = helper.eval("setOf([1, 2, 3, 4])");
+    Assert.assertNotNull(set);
+    Assert.assertTrue(set instanceof Set);
+    Assert.assertEquals(4, ((Set<?>) set).size());
 
-	@Test
-	public void test01_casts() {
-		doCastTest(0);
-	}
+    set = helper.eval("setOf(1, 2, 3, 4)");
+    Assert.assertNotNull(set);
+    Assert.assertTrue(set instanceof Set);
+    Assert.assertEquals(4, ((Set<?>) set).size());
 
-	// @Test
-	public void test02_permgen() {
-		int counter = 0;
-		while (counter++ < 5000) {
-			doCastTest(counter);
-		}
-	}
+    final Object map = helper.eval("mapOf({a: 1, b: 2})");
+    Assert.assertNotNull(map);
+    Assert.assertTrue(map instanceof Map);
+    Assert.assertEquals(2, ((Map<?, ?>) map).size());
+  }
 
-	@Test
-	public void test10_warmup() {
-		doTestSpeed(EXPR_INTERPOLATION);
-	}
+  @Test
+  public void doJpaTest() {
+    final ScriptHelper helper = new NashornScriptHelper(context());
+    final Object bean =
+        helper.eval("" + "doInJPA(function (em) {" + "	return em.find(Contact.class, id);" + "})");
 
-	@Test
-	public void test11_interpolation() {
-		doTestSpeed(EXPR_INTERPOLATION);
-	}
+    Assert.assertNotNull(bean);
+    Assert.assertTrue(bean instanceof Contact);
+  }
 
-	@Test
-	public void test12_concat() {
-		doTestSpeed(EXPR_CONCAT);
-	}
+  @Test
+  public void test01_casts() {
+    doCastTest(0);
+  }
 
-	@Test
-	public void test13_condition() {
-		doTestSpeed(EXPR_CONDITION);
-	}
+  // @Test
+  public void test02_permgen() {
+    int counter = 0;
+    while (counter++ < 5000) {
+      doCastTest(counter);
+    }
+  }
+
+  @Test
+  public void test10_warmup() {
+    doTestSpeed(EXPR_INTERPOLATION);
+  }
+
+  @Test
+  public void test11_interpolation() {
+    doTestSpeed(EXPR_INTERPOLATION);
+  }
+
+  @Test
+  public void test12_concat() {
+    doTestSpeed(EXPR_CONCAT);
+  }
+
+  @Test
+  public void test13_condition() {
+    doTestSpeed(EXPR_CONDITION);
+  }
 }

@@ -19,31 +19,31 @@ package com.axelor.mail;
 
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
-
 import org.junit.Assert;
 import org.junit.Test;
 
 public class MailParserTest {
 
-	private String html = "<div>This is a test..</div><br><br><p>"
-			+ "This is a link: <a href=\"http://example.com/link.html\">Some Link</a></p><br>"
-			+ "Regards <br>--<div>John Smith</div>";
+  private String html =
+      "<div>This is a test..</div><br><br><p>"
+          + "This is a link: <a href=\"http://example.com/link.html\">Some Link</a></p><br>"
+          + "Regards <br>--<div>John Smith</div>";
 
-	@Test
-	public void testPlainText() throws Exception {
+  @Test
+  public void testPlainText() throws Exception {
 
-		final MimeMessage message = new MimeMessage((Session) null);
-		message.setText(html, "UTF-8", "html");
-		message.saveChanges();
+    final MimeMessage message = new MimeMessage((Session) null);
+    message.setText(html, "UTF-8", "html");
+    message.saveChanges();
 
-		final MailParser parser = new MailParser(message).parse();
+    final MailParser parser = new MailParser(message).parse();
 
-		Assert.assertEquals(html, parser.getHtml());
-		Assert.assertNotNull(parser.getText());
-		Assert.assertNotNull(parser.getSummary());
+    Assert.assertEquals(html, parser.getHtml());
+    Assert.assertNotNull(parser.getText());
+    Assert.assertNotNull(parser.getSummary());
 
-		Assert.assertTrue(parser.getText().startsWith("This is a test.."));
-		Assert.assertTrue(parser.getText().endsWith("John Smith"));
-		Assert.assertTrue(parser.getSummary().equals("This is a test.."));
-	}
+    Assert.assertTrue(parser.getText().startsWith("This is a test.."));
+    Assert.assertTrue(parser.getText().endsWith("John Smith"));
+    Assert.assertTrue(parser.getSummary().equals("This is a test.."));
+  }
 }

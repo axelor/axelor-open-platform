@@ -22,16 +22,16 @@ import org.hibernate.type.descriptor.sql.LongVarcharTypeDescriptor;
 
 public class EncryptedTextType extends AbstractSingleColumnStandardBasicType<String> {
 
-	private static final long serialVersionUID = 9188706701624913239L;
+  private static final long serialVersionUID = 9188706701624913239L;
 
-	public static final EncryptedTextType INSTANCE = new EncryptedTextType();
+  public static final EncryptedTextType INSTANCE = new EncryptedTextType();
 
-	public EncryptedTextType() {
-		super(LongVarcharTypeDescriptor.INSTANCE, EncryptedStringTypeDescriptor.INSTANCE);
-	}
+  public EncryptedTextType() {
+    super(LongVarcharTypeDescriptor.INSTANCE, EncryptedStringTypeDescriptor.INSTANCE);
+  }
 
-	@Override
-	public String getName() {
-		return "encrypted_text";
-	}
+  @Override
+  public String getName() {
+    return "encrypted_text";
+  }
 }

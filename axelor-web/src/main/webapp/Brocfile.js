@@ -103,4 +103,3 @@ module.exports = gzip(merge([
   minifyJs('application'),
   minifyJs('application.login'),
 ]));
-

@@ -22,7 +22,7 @@ import com.axelor.test.db.Move;
 
 public class MoveRepository extends JpaRepository<Move> {
 
-	public MoveRepository() {
-		super(Move.class);
-	}
+  public MoveRepository() {
+    super(Move.class);
+  }
 }

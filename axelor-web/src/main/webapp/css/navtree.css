@@ -17,13 +17,13 @@
  */
 .nav-tree,
 .nav-tree * {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 [ui-nav-tree] .nav-search {
-	margin: 0;
-	padding: 8px;
-	padding-bottom: 0;
+  margin: 0;
+  padding: 8px;
+  padding-bottom: 0;
 }
 
 [ui-nav-tree] .nav-search input {
@@ -34,212 +34,212 @@
 }
 
 [ui-nav-tree] .nav-search-toggle {
-	text-align: center;
-	color: #fff;
-	line-height: 0;
+  text-align: center;
+  color: #fff;
+  line-height: 0;
 }
 
 [ui-nav-tree] .nav-search-toggle i {
-	cursor: pointer;
-	width: 32px;
-	color: #f3f3f3;
-	font-weight: 600;
-	margin-top: -1px;
+  cursor: pointer;
+  width: 32px;
+  color: #f3f3f3;
+  font-weight: 600;
+  margin-top: -1px;
 }
 
 [ui-nav-tree] .nav-search-toggle i:hover {
-	color: #fff;
+  color: #fff;
 }
 
 .sidebar .ui-autocomplete {
-	border: 0;
-	box-sizing: border-box;
-	min-width: 232px !important;
-	max-width: 232px !important;
-	max-height: inherit !important;
-	background: #2f4050;
-	bottom: 10px;
-	box-shadow: none;
+  border: 0;
+  box-sizing: border-box;
+  min-width: 232px !important;
+  max-width: 232px !important;
+  max-height: inherit !important;
+  background: #2f4050;
+  bottom: 10px;
+  box-shadow: none;
 }
 
 .sidebar .ui-menu-category {
-	font-weight: 600;
-	padding: 2px 0;
-	color: #f3f3f3;
+  font-weight: 600;
+  padding: 2px 0;
+  color: #f3f3f3;
 }
 
 .sidebar .ui-menu-item a {
-	color: #a7b1c2;
+  color: #a7b1c2;
 }
 
 .sidebar .ui-menu .ui-menu-item a.ui-state-focus {
-	color: #fff;
-	border-color: #293846;
-	background-color: #293846;
+  color: #fff;
+  border-color: #293846;
+  background-color: #293846;
 }
 
 .nav-tree ul,
 .nav-tree li {
-	list-style: none;
+  list-style: none;
 }
 
 .nav-tree li > ul {
-	display: none;
-	margin: 0;
+  display: none;
+  margin: 0;
 }
 
 .nav-tree li.open > ul {
-	display: block;
+  display: block;
 }
 
 .nav-tree li.animate > ul  {
-	display: block;
-	height: 0;
-	position: relative;
-	overflow: hidden;
-	transition: all .35s ease;
+  display: block;
+  height: 0;
+  position: relative;
+  overflow: hidden;
+  transition: all .35s ease;
 }
 
 .nav-tree li > a {
-	color: #a7b1c2;
-	text-decoration: none;
-	outline: none;
-	text-shadow: 0 -1px 0 rgba(0, 0, 0, 1);
-	font-weight: 600;
+  color: #a7b1c2;
+  text-decoration: none;
+  outline: none;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 1);
+  font-weight: 600;
 }
 
 .nav-tree li > a,
 .nav-tree li > a:focus {
-	background: transparent;
+  background: transparent;
 }
 
 .nav-tree li > a > .nav-image,
 .nav-tree li > a > .nav-icon {
-	margin-right: 6px;
-	width: 28px;
-	height: 28px;
-	float: left;
-	display: inline-block;
-	margin-top: -4px;
-	border-radius: 4px;
+  margin-right: 6px;
+  width: 28px;
+  height: 28px;
+  float: left;
+  display: inline-block;
+  margin-top: -4px;
+  border-radius: 4px;
 }
 
 .nav-tree li > a > .nav-icon {
-	padding: 4px 7px;
-	text-shadow: -1px 1px 5px rgba(0, 0, 0, 0.15);
-	text-align: center;
+  padding: 4px 7px;
+  text-shadow: -1px 1px 5px rgba(0, 0, 0, 0.15);
+  text-align: center;
 }
 
 .nav-tree ul li > a > .nav-image,
 .nav-tree ul li > a > .nav-icon {
-	width: 16px;
-	height: 16px;
-	margin-top: 2px;
-	margin-right: 4px;
-	margin-left: -20px;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  margin-right: 4px;
+  margin-left: -20px;
 }
 
 .nav-tree ul li > a > .nav-icon {
-	padding: 0;
-	margin-top: 1px;
+  padding: 0;
+  margin-top: 1px;
 }
 
 .nav-tree li > a * {
-	position: relative;
+  position: relative;
 }
 
 .nav-tree li > a:hover,
 .nav-tree li.active > a {
-	color: #fff;
-	background-color: #293846;
+  color: #fff;
+  background-color: #293846;
 }
 
 .nav-tree > li {
-	overflow: hidden;
-	border-left: 0;
+  overflow: hidden;
+  border-left: 0;
 }
 
 .nav-tree > li.open,
 .nav-tree > li.active {
-	background-color: #293846;
+  background-color: #293846;
 }
 
 .nav-tree > li.open {
-	border-left: 4px solid #0275d8;
-	transition: all .35s ease;
+  border-left: 4px solid #0275d8;
+  transition: all .35s ease;
 }
 
 .nav-tree li.folder > a::after {
-	font-family: "FontAwesome";
-	font-size: 10px;
-	content: "\f053";
-	position: absolute;
-	right: 16px;
-	z-index: 2;
+  font-family: "FontAwesome";
+  font-size: 10px;
+  content: "\f053";
+  position: absolute;
+  right: 16px;
+  z-index: 2;
 }
 
 .nav-tree li.folder.animate > a::after {
-	-webkit-transform: rotate(-90deg);
-	   -moz-transform: rotate(-90deg);
-	    -ms-transform: rotate(-90deg);
-	        transform: rotate(-90deg);
-	transition: all .35s ease;
+  -webkit-transform: rotate(-90deg);
+     -moz-transform: rotate(-90deg);
+      -ms-transform: rotate(-90deg);
+          transform: rotate(-90deg);
+  transition: all .35s ease;
 }
 
 .nav-tree li.folder.open.animate > a::after {
-	-webkit-transform: rotate(0deg);
-	   -moz-transform: rotate(0deg);
-	    -ms-transform: rotate(0deg);
-	        transform: rotate(0deg);
-	transition: all .35s ease;
+  -webkit-transform: rotate(0deg);
+     -moz-transform: rotate(0deg);
+      -ms-transform: rotate(0deg);
+          transform: rotate(0deg);
+  transition: all .35s ease;
 }
 
 .nav-tree li.folder.open > a::after {
-	-webkit-transform: rotate(-90deg);
-	   -moz-transform: rotate(-90deg);
-	    -ms-transform: rotate(-90deg);
-	        transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+     -moz-transform: rotate(-90deg);
+      -ms-transform: rotate(-90deg);
+          transform: rotate(-90deg);
 }
 
 .nav-tree li.tagged > a::after {
-	content: none;
+  content: none;
 }
 
 .nav-tree span.nav-tag {
-	float: right;
-	text-transform: uppercase;
-	text-shadow: none;
-	line-height: 1;
-	font-size: 10px;
-	padding: 3px 8px;
-	border-radius: .25em;
-	margin-left: 3px;
+  float: right;
+  text-transform: uppercase;
+  text-shadow: none;
+  line-height: 1;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: .25em;
+  margin-left: 3px;
 }
 
 .nav-tree > li > ul > li:last-child {
-	margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .nav-tree li > a {
-	padding: 7px 8px;
+  padding: 7px 8px;
 }
 
 /* 1st level */
 .nav-tree > li > a {
-	padding: 11px 8px;
+  padding: 11px 8px;
 }
 
 /* 2nd level */
 .nav-tree > li > ul > li > a {
-	padding-left: 42px;
+  padding-left: 42px;
 }
 
 /* 3rd level */
 .nav-tree > li > ul > li > ul > li > a {
-	padding-left: 52px;
+  padding-left: 52px;
 }
 
 /* 4th level and beyond */
 .nav-tree > li > ul > li > ul > li > ul li > a {
-	padding-left: 62px;
+  padding-left: 62px;
 }

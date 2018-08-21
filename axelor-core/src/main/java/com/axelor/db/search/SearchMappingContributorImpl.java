@@ -18,17 +18,12 @@
 package com.axelor.db.search;
 
 import javax.inject.Singleton;
-
 import org.hibernate.search.cfg.SearchMapping;
 
-/**
- * Default {@link SearchMappingContributor} implementation, does nothing.
- *
- */
+/** Default {@link SearchMappingContributor} implementation, does nothing. */
 @Singleton
 public class SearchMappingContributorImpl implements SearchMappingContributor {
 
-	@Override
-	public void contribute(SearchMapping mapping) {
-	}
+  @Override
+  public void contribute(SearchMapping mapping) {}
 }
