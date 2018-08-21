@@ -37,6 +37,7 @@ Please make sure you don’t post any sensitive information while reporting issu
 
 * [Fork](https://help.github.com/articles/fork-a-repo/) the repo.
 * Code!
+* Make sure to format code with `./gradlew formatCode` command.
 * Push your changes to the topic branch in your fork of the repository.
 * Initiate a [pull request](http://help.github.com/send-pull-requests/)
 * Update the issue, adding a comment including a link to the created pull request
