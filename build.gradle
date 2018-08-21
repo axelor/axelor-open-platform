@@ -53,3 +53,4 @@ task wrapper(type: Wrapper) {
 }
 
 apply from: "gradle/javadoc.gradle"
+apply from: "gradle/style.gradle"

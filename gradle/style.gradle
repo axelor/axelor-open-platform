@@ -1,0 +1,45 @@
+buildscript {
+  repositories repos
+  dependencies {
+    classpath "com.diffplug.spotless:spotless-plugin-gradle:3.14.0"
+  }
+}
+
+apply plugin: com.diffplug.gradle.spotless.SpotlessPlugin
+
+spotless {
+  format 'misc', {
+    target fileTree(projectDir) {
+      include '**/.gitignore'
+      include '**/*.gradle'
+      include '**/*.adoc'
+      include '**/*.sh'
+      include '**/*.html'
+      include '**/*.js'
+      include '**/*.css'
+      include '**/*.xml'
+      include '**/*.xsd'
+      exclude '**/webapp/lib/*'
+    }
+    indentWithSpaces(2)
+    trimTrailingWhitespace()
+    endWithNewline()
+  }
+  format 'markdown', {
+    target '**/*.md'
+    indentWithSpaces(2)
+    endWithNewline()
+  }
+}
+
+subprojects {
+  apply plugin: com.diffplug.gradle.spotless.SpotlessPlugin
+  spotless {
+    java {
+      googleJavaFormat()
+    }
+  }
+  task formatCode(dependsOn: ['licenseFormat', 'spotlessApply'])
+}
+
+task formatCode(dependsOn: 'spotlessApply')
