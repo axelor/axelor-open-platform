@@ -236,6 +236,12 @@ function FormViewCtrl($scope, $element) {
     editable = arguments.length === 1 ? _.first(arguments) : true;
   };
 
+  $scope.$$resetForm = function $$resetForm() {
+    routeId = null;
+    $scope.setEditable(false);
+    $scope.editRecord(null);
+  };
+
   var locationChangeOff = null;
 
   function locationChangeCheck() {
@@ -260,16 +266,10 @@ function FormViewCtrl($scope, $element) {
 
       var $location = $scope.$location;
 
-      function resetForm() {
-        routeId = null;
-        $scope.setEditable(false);
-        $scope.editRecord(null);
-      }
-
       if (!$location || tab !== params || tab.$viewScope != $scope || !$scope.isDirty()) {
         $scope.$timeout(function () {
           if (params && params.viewType !== 'form') {
-            resetForm();
+            $scope.$$resetForm();
           }
         });
         return;
@@ -285,7 +285,7 @@ function FormViewCtrl($scope, $element) {
 
       event.preventDefault();
       $scope.confirmDirty(function() {
-        resetForm();
+        $scope.$$resetForm();
         $scope.$locationChangeOff();
         $location.path(path).search(search);
       }, function () {

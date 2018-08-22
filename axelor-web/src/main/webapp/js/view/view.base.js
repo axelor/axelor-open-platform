@@ -398,6 +398,10 @@ ui.directive('uiViewPane', function() {
         if (view && $scope.viewList.indexOf(type) === -1) {
           $scope.viewList.push(type);
         }
+        var viewScope = $scope.selectedTab && $scope.selectedTab.$viewScope;
+        if (viewScope && viewScope.viewType === 'form' && viewScope.viewType !== type) {
+          viewScope.$$resetForm();
+        }
         $scope.viewType = type;
         return switchTo(type, callback);
       };
