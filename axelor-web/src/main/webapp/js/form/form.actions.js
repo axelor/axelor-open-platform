@@ -225,6 +225,7 @@ function ActionHandler($scope, ViewService, options) {
 
   this.scope = $scope;
   this.ws = ViewService;
+  this.viewType = $scope.viewType;
 }
 
 ActionHandler.prototype = {
@@ -542,6 +543,10 @@ ActionHandler.prototype = {
     }
   },
 
+  _isSameViewType: function () {
+    return this.viewType === this.scope.viewType;
+  },
+
   _handleAction: function(action) {
 
     this._blockUI();
@@ -550,6 +555,11 @@ ActionHandler.prototype = {
       scope = this.scope,
       context = this._getContext(),
       deferred = this.ws.defer();
+
+    if (!this._isSameViewType()) {
+      deferred.reject();
+      return deferred.promise;
+    }
 
     function resolveLater() {
       deferred.resolve();
@@ -667,6 +677,11 @@ ActionHandler.prototype = {
 
     if (!data || data.length === 0) {
       deferred.resolve();
+      return deferred.promise;
+    }
+
+    if (!this._isSameViewType()) {
+      deferred.reject();
       return deferred.promise;
     }
 
