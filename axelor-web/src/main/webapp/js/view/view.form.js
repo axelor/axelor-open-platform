@@ -145,7 +145,7 @@ function FormViewCtrl($scope, $element) {
 
   function doEdit(id, dummy, fireOnLoad) {
     return $scope.doRead(id).success(function(record){
-      if ($scope.viewType !== 'form') {
+      if ($scope.viewType && $scope.viewType !== 'form') {
         $scope.edit(null);
         return;
       }
