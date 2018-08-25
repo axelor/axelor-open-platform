@@ -60,6 +60,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -71,6 +72,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +83,7 @@ import javax.persistence.TypedQuery;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
-public class ViewLoader extends AbstractLoader {
+public class ViewLoader extends AbstractParallelLoader {
 
   @Inject private ObjectMapper objectMapper;
 
@@ -100,28 +102,34 @@ public class ViewLoader extends AbstractLoader {
   @Inject private XMLViews.FinalViewGenerator finalViewGenerator;
 
   @Override
-  @Transactional
-  protected void doLoad(Module module, boolean update) {
-    for (URL file : MetaScanner.findAll(module.getName(), "views", "(.*?)\\.xml")) {
-      log.debug("importing: {}", file.getFile());
-      try {
-        process(file, module, update);
-      } catch (IOException | JAXBException e) {
-        throw new RuntimeException(e);
-      }
+  protected void doLoad(URL file, Module module, boolean update) {
+    log.debug("Importing: {}", file.getFile());
+
+    try {
+      process(file, module, update);
+    } catch (IOException | JAXBException e) {
+      log.error("Error while loading {}", file);
+      throw new RuntimeException(e);
     }
   }
 
   @Override
+  protected List<List<URL>> findFileLists(Module module) {
+    return ImmutableList.of(MetaScanner.findAll(module.getName(), "views", "(.*?)\\.xml"));
+  }
+
+  @Override
   @Transactional
-  void doLast(Module module, boolean update) {
+  protected void doLast(Module module, boolean update) {
     // generate default views
     importDefault(module);
 
+    runResolveTasks();
+
     Set<?> unresolved = this.unresolvedKeys();
     if (!unresolved.isEmpty()) {
-      log.error("unresolved items: {}", unresolved);
-      throw new PersistenceException("There are some unresolve items, check the log.");
+      log.error("Unresolved items: {}", unresolved);
+      throw new PersistenceException("There are some unresolve items; check the log.");
     }
 
     generateFinalViews(module, update);
@@ -133,10 +141,7 @@ public class ViewLoader extends AbstractLoader {
   }
 
   private static <T> List<T> getList(List<T> list) {
-    if (list == null) {
-      return Lists.newArrayList();
-    }
-    return list;
+    return list != null ? list : Collections.emptyList();
   }
 
   @Transactional
@@ -156,26 +161,20 @@ public class ViewLoader extends AbstractLoader {
       all = XMLViews.unmarshal(stream);
     }
 
-    for (AbstractView view : getList(all.getViews())) {
-      importView(view, module, update, getFileName(url));
-    }
+    getList(all.getViews()).forEach(view -> importView(view, module, update, getFileName(url)));
 
-    for (Selection selection : getList(all.getSelections())) {
-      importSelection(selection, module, update);
-    }
+    getList(all.getSelections()).forEach(selection -> importSelection(selection, module, update));
 
-    for (Action action : getList(all.getActions())) {
-      importAction(action, module, update);
-      MetaStore.invalidate(action.getName());
-    }
+    getList(all.getActions())
+        .forEach(
+            action -> {
+              importAction(action, module, update);
+              MetaStore.invalidate(action.getName());
+            });
 
-    for (MenuItem item : getList(all.getMenus())) {
-      importMenu(item, module, update);
-    }
+    getList(all.getMenus()).forEach(item -> importMenu(item, module, update));
 
-    for (MenuItem item : getList(all.getActionMenus())) {
-      importActionMenu(item, module, update);
-    }
+    getList(all.getActionMenus()).forEach(item -> importActionMenu(item, module, update));
   }
 
   private static String getFileName(URL url) {
@@ -209,14 +208,13 @@ public class ViewLoader extends AbstractLoader {
 
       if (!Boolean.TRUE.equals(view.getExtension())
           && ObjectUtils.notEmpty(extendableView.getExtends())) {
-        log.error("View with extensions must have extension=\"true\": {}(id={})", name, xmlId);
+        log.error("View with extensions must have extension=\"true\": {}", getName(name, xmlId));
         return;
       }
     }
 
-    log.debug("Loading view: {}(id={})", name, xmlId);
-
-    String xml = XMLViews.toXml(view, true);
+    log.debug("Loading view: {}", getName(name, xmlId));
+    final String xml = XMLViews.toXml(view, true);
 
     if (type.matches("tree|chart|portal|dashboard|search|custom")) {
       modelName = null;
@@ -302,7 +300,12 @@ public class ViewLoader extends AbstractLoader {
     entity = views.save(entity);
   }
 
-  private void importSelection(Selection selection, Module module, boolean update) {
+  private static String getName(String name, String xmlId) {
+    return xmlId == null ? name : String.format("%s(id=%s)", name, xmlId);
+  }
+
+  @Transactional
+  protected void importSelection(Selection selection, Module module, boolean update) {
 
     String name = selection.getName();
     String xmlId = selection.getXmlId();
@@ -408,7 +411,8 @@ public class ViewLoader extends AbstractLoader {
     return all;
   }
 
-  private void importAction(Action action, Module module, boolean update) {
+  @Transactional
+  protected void importAction(Action action, Module module, boolean update) {
 
     String name = action.getName();
     String xmlId = action.getXmlId();
@@ -479,21 +483,29 @@ public class ViewLoader extends AbstractLoader {
     }
 
     entity = actions.save(entity);
+    Long entityId = entity.getId();
 
-    for (MetaMenu pending : this.resolve(MetaMenu.class, entity.getName())) {
-      log.debug("Resolved menu: {}", pending.getName());
-      pending.setAction(entity);
-      pending = menus.save(pending);
-    }
+    addResolveTask(MetaMenu.class, name, entityId, this::resolveActionOnMenu);
 
-    for (MetaActionMenu pending : this.resolve(MetaActionMenu.class, entity.getName())) {
-      log.debug("Resolved action menu: {}", pending.getName());
-      pending.setAction(entity);
-      pending = actionMenus.save(pending);
-    }
+    addResolveTask(MetaActionMenu.class, name, entityId, this::resolveActionOnActionMenu);
   }
 
-  private void importMenu(MenuItem menuItem, Module module, boolean update) {
+  private void resolveActionOnMenu(Long menuId, Long actionId) {
+    MetaMenu pending = menus.find(menuId);
+    log.debug("Resolved menu: {}", pending.getName());
+    MetaAction actionEntity = actions.find(actionId);
+    pending.setAction(actionEntity);
+  }
+
+  private void resolveActionOnActionMenu(Long menuId, Long actionId) {
+    MetaActionMenu pending = actionMenus.find(menuId);
+    log.debug("Resolved action menu: {}", pending.getName());
+    MetaAction actionEntity = actions.find(actionId);
+    pending.setAction(actionEntity);
+  }
+
+  @Transactional
+  protected void importMenu(MenuItem menuItem, Module module, boolean update) {
 
     String name = menuItem.getName();
     String xmlId = menuItem.getXmlId();
@@ -558,11 +570,13 @@ public class ViewLoader extends AbstractLoader {
       entity.setOrder(menuItem.getOrder());
     }
 
+    entity = menus.save(entity);
+
     if (!Strings.isNullOrEmpty(menuItem.getParent())) {
       MetaMenu parent = menus.findByName(menuItem.getParent());
       if (parent == null) {
         log.debug("Unresolved parent: {}", menuItem.getParent());
-        this.setUnresolved(MetaMenu.class, menuItem.getParent(), entity);
+        this.setUnresolved(MetaMenu.class, menuItem.getParent(), entity.getId());
       } else {
         entity.setParent(parent);
       }
@@ -572,22 +586,26 @@ public class ViewLoader extends AbstractLoader {
       MetaAction action = actions.findByName(menuItem.getAction());
       if (action == null) {
         log.debug("Unresolved action: {}", menuItem.getAction());
-        setUnresolved(MetaMenu.class, menuItem.getAction(), entity);
+        setUnresolved(MetaMenu.class, menuItem.getAction(), entity.getId());
       } else {
         entity.setAction(action);
       }
     }
 
-    entity = menus.save(entity);
+    Long entityId = entity.getId();
 
-    for (MetaMenu pending : this.resolve(MetaMenu.class, name)) {
-      log.debug("Resolved menu: {}", pending.getName());
-      pending.setParent(entity);
-      pending = menus.save(pending);
-    }
+    addResolveTask(MetaMenu.class, name, entityId, this::resolveParentOnMenu);
   }
 
-  private void importActionMenu(MenuItem menuItem, Module module, boolean update) {
+  private void resolveParentOnMenu(Long menuId, Long parentMenuId) {
+    MetaMenu pending = menus.find(menuId);
+    log.debug("Resolved menu: {}", pending.getName());
+    MetaMenu metaMenuEntity = menus.find(parentMenuId);
+    pending.setParent(metaMenuEntity);
+  }
+
+  @Transactional
+  protected void importActionMenu(MenuItem menuItem, Module module, boolean update) {
     String name = menuItem.getName();
     String xmlId = menuItem.getXmlId();
 
@@ -638,11 +656,13 @@ public class ViewLoader extends AbstractLoader {
       entity.setOrder(menuItem.getOrder());
     }
 
+    entity = actionMenus.save(entity);
+
     if (!Strings.isNullOrEmpty(menuItem.getParent())) {
       MetaActionMenu parent = actionMenus.findByName(menuItem.getParent());
       if (parent == null) {
         log.debug("Unresolved parent: {}", menuItem.getParent());
-        this.setUnresolved(MetaActionMenu.class, menuItem.getParent(), entity);
+        this.setUnresolved(MetaActionMenu.class, menuItem.getParent(), entity.getId());
       } else {
         entity.setParent(parent);
       }
@@ -652,19 +672,22 @@ public class ViewLoader extends AbstractLoader {
       MetaAction action = actions.findByName(menuItem.getAction());
       if (action == null) {
         log.debug("Unresolved action: {}", menuItem.getAction());
-        setUnresolved(MetaActionMenu.class, menuItem.getAction(), entity);
+        setUnresolved(MetaActionMenu.class, menuItem.getAction(), entity.getId());
       } else {
         entity.setAction(action);
       }
     }
 
-    entity = actionMenus.save(entity);
+    Long entityId = entity.getId();
 
-    for (MetaActionMenu pending : this.resolve(MetaActionMenu.class, name)) {
-      log.debug("Resolved action menu: {}", pending.getName());
-      pending.setParent(entity);
-      pending = actionMenus.save(pending);
-    }
+    addResolveTask(MetaActionMenu.class, name, entityId, this::resolveParentOnActionMenu);
+  }
+
+  private void resolveParentOnActionMenu(Long actionMenuId, Long parentActionMenuId) {
+    MetaActionMenu pending = actionMenus.find(actionMenuId);
+    log.debug("Resolved action menu: {}", pending.getName());
+    MetaActionMenu metaActionMenuEntity = actionMenus.find(parentActionMenuId);
+    pending.setParent(metaActionMenuEntity);
   }
 
   private static final File outputDir =

@@ -25,6 +25,7 @@ import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.repo.MetaTranslationRepository;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 import com.opencsv.CSVParser;
@@ -46,47 +47,46 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class I18nLoader extends AbstractLoader {
+public class I18nLoader extends AbstractParallelLoader {
 
   private Logger log = LoggerFactory.getLogger(I18nLoader.class);
 
   @Inject private MetaTranslationRepository translations;
 
-  /** Move custom csv files at the end of the list. */
-  private <T> List<T> orderFiles(List<T> files) {
+  /** Separate custom csv files from the rest. */
+  private <T> List<List<T>> separateFiles(List<T> files) {
 
-    final List<T> all = new ArrayList<>();
+    final List<T> main = new ArrayList<>();
     final List<T> custom = new ArrayList<>();
-    final Pattern pattern = Pattern.compile(".*(?:custom_)([a-zA-Z_]+)\\.csv$");
+    final Pattern pattern = Pattern.compile(".*(?:custom_)(\\w+)\\.csv$");
 
-    for (T file : files) {
-      String name = file.toString();
+    for (final T file : files) {
+      final String name = file.toString();
       if (pattern.matcher(name).matches()) {
         custom.add(file);
       } else {
-        all.add(file);
+        main.add(file);
       }
     }
 
-    all.addAll(custom);
-
-    return all;
+    return ImmutableList.of(main, custom);
   }
 
   @Override
-  protected void doLoad(Module module, boolean update) {
+  protected void doLoad(URL file, Module module, boolean update) {
+    log.debug("Load translation: {}", file.getFile());
 
-    final List<URL> files = MetaScanner.findAll(module.getName(), "i18n", "(.*?)\\.csv");
-    final List<URL> sorted = orderFiles(files);
-
-    for (final URL resource : sorted) {
-      try (InputStream is = resource.openStream()) {
-        log.debug("Load translation: {}", resource.getFile());
-        process(is, resource.getFile(), module.getName());
-      } catch (IOException e) {
-        log.error("Unable to import file: {}", resource.getFile());
-      }
+    try (InputStream is = file.openStream()) {
+      process(is, file.getFile());
+    } catch (IOException e) {
+      log.error("Unable to import file: {}", file.getFile());
     }
+  }
+
+  @Override
+  protected List<List<URL>> findFileLists(Module module) {
+    final List<URL> files = MetaScanner.findAll(module.getName(), "i18n", "(.*?)\\.csv");
+    return separateFiles(files);
   }
 
   @Transactional
@@ -110,35 +110,37 @@ public class I18nLoader extends AbstractLoader {
 
     log.debug("Load {} translations", module.getName());
 
-    final List<File> files = orderFiles(Arrays.asList(moduleDir.listFiles()));
-    for (File file : files) {
-      try {
-        log.debug("Load {} translations", file.getPath());
-        process(new FileInputStream(file), file.getPath(), module.getName());
-      } catch (IOException e) {
-        log.error("Unable to import file: {}", file.getName());
-      }
-    }
+    final List<List<File>> fileLists = separateFiles(Arrays.asList(moduleDir.listFiles()));
+
+    fileLists.forEach(
+        files ->
+            files.forEach(
+                file -> {
+                  try (InputStream is = new FileInputStream(file)) {
+                    process(is, file.getPath());
+                  } catch (IOException e) {
+                    log.error("Unable to import file: {}", file.getName());
+                  }
+                }));
   }
 
-  private void process(final InputStream stream, String fileName, String moduleName)
-      throws IOException {
-
+  private void process(InputStream stream, String fileName) throws IOException {
     // Get language name from the file name
     String language = "";
     Pattern pattern = Pattern.compile(".*(?:messages_|custom_)([a-zA-Z_]+)\\.csv$");
     Matcher matcher = pattern.matcher(fileName);
+
     if (!matcher.matches()) {
       return;
     }
 
     language = matcher.group(1);
 
-    Reader reader = new InputStreamReader(stream, Charsets.UTF_8);
-    CSVReader csvReader =
-        new CSVReader(reader, CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, '\0');
+    try (Reader reader = new InputStreamReader(stream, Charsets.UTF_8);
+        CSVReader csvReader =
+            new CSVReader(
+                reader, CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, '\0')) {
 
-    try {
       String[] fields = csvReader.readNext();
       String[] values = null;
 
@@ -174,8 +176,6 @@ public class I18nLoader extends AbstractLoader {
           JPA.em().clear();
         }
       }
-    } finally {
-      csvReader.close();
     }
   }
 

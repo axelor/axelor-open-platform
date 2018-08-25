@@ -117,8 +117,8 @@ class DataLoader extends AbstractLoader {
     for (URL file : files) {
       String name = file.toString();
       name = name.substring(name.lastIndexOf(dirName));
-      try {
-        copy(file.openStream(), tmp, name);
+      try (final InputStream is = file.openStream()) {
+        copy(is, tmp, name);
       } catch (IOException e) {
         log.error(e.getMessage(), e);
         throw new RuntimeException(e);

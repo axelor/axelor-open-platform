@@ -98,10 +98,10 @@
     This object stores the menus.
     ]]>
 
-  <integer name="priority" />
+    <integer name="priority" />
     <integer name="order" column="order_seq" title="Menu order"/>
     <string name="xmlId" unique="true" />
-  <string name="name" required="true"/>
+    <string name="name" required="true"/>
     <string name="title" required="true" namecolumn="true"/>
     <string name="icon"/>
     <string name="iconBackground" />
@@ -141,7 +141,7 @@
     <integer name="priority" />
     <integer name="order" column="order_seq" />
     <string name="xmlId" unique="true" />
-  <string name="name" required="true"/>
+    <string name="name" required="true"/>
     <string name="title" required="true" namecolumn="true"/>
     <string name="category" help="Category name to group action menus."/>
     <string name="module"/>
@@ -161,7 +161,7 @@
 
     <integer name="priority" />
     <string name="xmlId" unique="true" />
-  <string name="name" required="true"/>
+    <string name="name" required="true"/>
     <string name="type" required="true" selection="action.type.selection"/>
     <boolean name="home" title="Used as home action" help="Specify whether this action can be used as home action."/>
     <string name="model" />

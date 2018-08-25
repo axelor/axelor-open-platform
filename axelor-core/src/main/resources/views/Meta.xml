@@ -92,7 +92,7 @@
 
   <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView" orderBy="priority,name">
     <toolbar>
-      <button name="restoreAll" icon="fa-undo" help="Restore all..." prompt="All the customizations will be lost. Are you sure ?" onClick="action-meta-restore-all"/>
+      <button name="restoreAll" icon="fa-undo" help="Restore all…" prompt="All the customizations will be lost. Are you sure?" onClick="action-meta-restore-all"/>
     </toolbar>
     <hilite if="extension" color="warning"/>
     <hilite if="computed" color="info"/>

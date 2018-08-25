@@ -24,26 +24,26 @@ import com.axelor.meta.db.MetaSequence;
 import com.axelor.meta.db.repo.MetaEnumRepository;
 import com.axelor.meta.db.repo.MetaSequenceRepository;
 import com.axelor.meta.service.MetaModelService;
+import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
-public class ModelLoader extends AbstractLoader {
-
-  private static Logger log = LoggerFactory.getLogger(ModelLoader.class);
+public class ModelLoader extends AbstractParallelLoader {
 
   @Inject private MetaModelService service;
 
@@ -51,36 +51,48 @@ public class ModelLoader extends AbstractLoader {
 
   @Inject private MetaEnumRepository enums;
 
+  private static final DocumentBuilderFactory documentBuilderFactory =
+      DocumentBuilderFactory.newInstance();
+  private static final ThreadLocal<DocumentBuilder> documentBuilder =
+      ThreadLocal.withInitial(
+          () -> {
+            try {
+              return documentBuilderFactory.newDocumentBuilder();
+            } catch (ParserConfigurationException e) {
+              throw new RuntimeException(e);
+            }
+          });
+
   @Override
-  protected void doLoad(Module module, boolean update) {
+  protected void doLoad(URL url, Module module, boolean update) {
+    log.debug("Importing: {}", url.getFile());
 
-    final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    final DocumentBuilder db;
-    try {
-      db = dbf.newDocumentBuilder();
-    } catch (ParserConfigurationException e) {
-      return;
+    try (InputStream is = url.openStream()) {
+      process(is, update);
+    } catch (IOException | SAXException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    for (URL file : MetaScanner.findAll(module.getName(), "(domains|objects)", "(.*?)\\.xml$")) {
-      log.debug("importing: {}", file.getFile());
-      try (InputStream is = file.openStream()) {
-        final Document doc = db.parse(is);
-        final NodeList elements = doc.getDocumentElement().getChildNodes();
-        for (int i = 0; i < elements.getLength(); i++) {
-          final Node node = elements.item(i);
-          if (node instanceof Element) {
-            final Element element = (Element) elements.item(i);
-            final String name = element.getTagName();
-            if ("enum".equals(name)) importEnums(element, update);
-            if ("entity".equals(name)) importModels(element, update);
-            if ("sequence".equals(name)) importSequences(element, update);
-          }
-        }
-      } catch (Exception e) {
-        throw new RuntimeException(e);
+  private void process(InputStream stream, boolean update) throws IOException, SAXException {
+    final Document doc = documentBuilder.get().parse(stream);
+    final NodeList elements = doc.getDocumentElement().getChildNodes();
+    for (int i = 0; i < elements.getLength(); i++) {
+      final Node node = elements.item(i);
+      if (node instanceof Element) {
+        final Element element = (Element) elements.item(i);
+        final String name = element.getTagName();
+        if ("enum".equals(name)) importEnums(element, update);
+        if ("entity".equals(name)) importModels(element, update);
+        if ("sequence".equals(name)) importSequences(element, update);
       }
     }
+  }
+
+  @Override
+  protected List<List<URL>> findFileLists(Module module) {
+    return ImmutableList.of(
+        MetaScanner.findAll(module.getName(), "(domains|objects)", "(.*?)\\.xml$"));
   }
 
   static Set<String> findEntities(Module module) {
@@ -95,8 +107,9 @@ public class ModelLoader extends AbstractLoader {
       return names;
     }
 
-    for (URL file : MetaScanner.findAll(module.getName(), "(domains|objects)", "(.*?)\\.xml$")) {
-      try (InputStream is = file.openStream()) {
+    for (final URL file :
+        MetaScanner.findAll(module.getName(), "(domains|objects)", "(.*?)\\.xml$")) {
+      try (final InputStream is = file.openStream()) {
         final Document doc = db.parse(is);
         final NodeList elements = doc.getElementsByTagName("entity");
         for (int i = 0; i < elements.getLength(); i++) {

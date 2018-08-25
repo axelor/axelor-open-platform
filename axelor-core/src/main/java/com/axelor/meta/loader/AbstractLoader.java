@@ -17,12 +17,19 @@
  */
 package com.axelor.meta.loader;
 
+import com.axelor.db.JPA;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,9 +37,9 @@ abstract class AbstractLoader {
 
   protected Logger log = LoggerFactory.getLogger(getClass().getSuperclass());
 
-  private static final ThreadLocal<Set<String>> visited = new ThreadLocal<>();
-  private static final ThreadLocal<Map<Class<?>, Multimap<String, Object>>> unresolved =
-      new ThreadLocal<>();
+  private static final Set<Entry<Class<?>, String>> visited = new HashSet<>();
+  private static final Map<Class<?>, Multimap<String, Long>> unresolved = new HashMap<>();
+  private static final List<Runnable> resolveTasks = new ArrayList<>();
 
   /**
    * Check whether the given name is already visited.
@@ -42,15 +49,15 @@ abstract class AbstractLoader {
    * @return true if the name is already visited false otherwise
    */
   protected boolean isVisited(Class<?> type, String name) {
-    if (visited.get() == null) {
-      visited.set(Sets.<String>newHashSet());
+    synchronized (visited) {
+      Entry<Class<?>, String> key = new SimpleImmutableEntry<>(type, name);
+      if (visited.contains(key)) {
+        log.error("duplicate {} found: {}", type.getSimpleName(), name);
+        return true;
+      }
+      visited.add(key);
+      return false;
     }
-    if (visited.get().contains(type + name)) {
-      log.error("duplicate found: {}", name);
-      return true;
-    }
-    visited.get().add(type + name);
-    return false;
   }
 
   /**
@@ -60,20 +67,14 @@ abstract class AbstractLoader {
    *
    * @param type
    * @param unresolvedKey
-   * @param value
+   * @param entityId
    */
-  protected <T> void setUnresolved(Class<T> type, String unresolvedKey, T value) {
-    Map<Class<?>, Multimap<String, Object>> map = unresolved.get();
-    if (map == null) {
-      map = Maps.newHashMap();
-      unresolved.set(map);
+  protected <T> void setUnresolved(Class<T> type, String unresolvedKey, Long entityId) {
+    synchronized (unresolved) {
+      final Multimap<String, Long> mm =
+          unresolved.computeIfAbsent(type, key -> HashMultimap.create());
+      mm.put(unresolvedKey, entityId);
     }
-    Multimap<String, Object> mm = map.get(type);
-    if (mm == null) {
-      mm = HashMultimap.create();
-      map.put(value.getClass(), mm);
-    }
-    mm.put(unresolvedKey, value);
   }
 
   /**
@@ -86,22 +87,38 @@ abstract class AbstractLoader {
    * @param unresolvedKey the unresolved key
    * @return a set of all the pending objects
    */
-  @SuppressWarnings("unchecked")
-  protected <T> Set<T> resolve(Class<T> type, String unresolvedKey) {
-    Set<T> values = Sets.newHashSet();
-    Map<Class<?>, Multimap<String, Object>> map = unresolved.get();
-    if (map == null) {
-      return values;
+  protected <T> Set<Long> resolve(Class<T> type, String unresolvedKey) {
+    synchronized (unresolved) {
+      Set<Long> entityIds = Sets.newHashSet();
+      Multimap<String, Long> mm = unresolved.get(type);
+      if (mm == null) {
+        return entityIds;
+      }
+      for (Long item : mm.get(unresolvedKey)) {
+        entityIds.add((Long) item);
+      }
+      mm.removeAll(unresolvedKey);
+      return entityIds;
     }
-    Multimap<String, Object> mm = map.get(type);
-    if (mm == null) {
-      return values;
+  }
+
+  protected void addResolveTask(
+      Class<?> type, String name, Long entityId, BiConsumer<Long, Long> consumer) {
+    Runnable task = () -> resolve(type, name).forEach(id -> consumer.accept(id, entityId));
+    synchronized (resolveTasks) {
+      resolveTasks.add(task);
     }
-    for (Object item : mm.get(unresolvedKey)) {
-      values.add((T) item);
+  }
+
+  protected void runResolveTasks() {
+    if (resolveTasks.isEmpty()) {
+      return;
     }
-    mm.removeAll(unresolvedKey);
-    return values;
+
+    synchronized (resolveTasks) {
+      resolveTasks.parallelStream().forEach(task -> JPA.runInTransaction(task::run));
+      resolveTasks.clear();
+    }
   }
 
   /**
@@ -110,15 +127,13 @@ abstract class AbstractLoader {
    * @return set of unresolved keys
    */
   protected Set<String> unresolvedKeys() {
-    Set<String> names = Sets.newHashSet();
-    Map<Class<?>, Multimap<String, Object>> map = unresolved.get();
-    if (map == null) {
+    synchronized (unresolved) {
+      Set<String> names = Sets.newHashSet();
+      for (Multimap<String, Long> mm : unresolved.values()) {
+        names.addAll(mm.keySet());
+      }
       return names;
     }
-    for (Multimap<String, Object> mm : map.values()) {
-      names.addAll(mm.keySet());
-    }
-    return names;
   }
 
   /**
@@ -139,8 +154,15 @@ abstract class AbstractLoader {
   void doLast(Module module, boolean update) {}
 
   static void doCleanUp() {
-    visited.remove();
-    unresolved.remove();
+    synchronized (visited) {
+      visited.clear();
+    }
+    synchronized (unresolved) {
+      unresolved.clear();
+    }
+    synchronized (resolveTasks) {
+      resolveTasks.clear();
+    }
   }
 
   public final void load(Module module, boolean update) {

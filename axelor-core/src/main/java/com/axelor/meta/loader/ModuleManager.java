@@ -25,6 +25,7 @@ import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.common.StringUtils;
+import com.axelor.db.ParallelTransactionExecutor;
 import com.axelor.db.internal.DBHelper;
 import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
@@ -38,6 +39,7 @@ import com.axelor.meta.db.repo.MetaMenuRepository;
 import com.axelor.meta.db.repo.MetaModuleRepository;
 import com.axelor.meta.db.repo.MetaSelectRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.persist.Transactional;
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -64,19 +66,17 @@ public class ModuleManager {
 
   private boolean loadData = true;
 
-  @Inject private AuthService authService;
+  private final AuthService authService;
 
-  @Inject private MetaModuleRepository modules;
+  private final MetaModuleRepository modules;
 
-  @Inject private ViewLoader viewLoader;
+  private final ViewLoader viewLoader;
 
-  @Inject private ModelLoader modelLoader;
+  private final DataLoader dataLoader;
 
-  @Inject private I18nLoader i18nLoader;
+  private final DemoLoader demoLoader;
 
-  @Inject private DataLoader dataLoader;
-
-  @Inject private DemoLoader demoLoader;
+  private final List<AbstractParallelLoader> metaLoaders;
 
   @Inject private Event<ModuleChanged> moduleChangedEvent;
 
@@ -88,7 +88,22 @@ public class ModuleManager {
     SKIP.add("axelor-test");
   }
 
-  public ModuleManager() {}
+  @Inject
+  public ModuleManager(
+      AuthService authService,
+      MetaModuleRepository modules,
+      ViewLoader viewLoader,
+      ModelLoader modelLoader,
+      I18nLoader i18nLoader,
+      DataLoader dataLoader,
+      DemoLoader demoLoader) {
+    this.authService = authService;
+    this.modules = modules;
+    this.viewLoader = viewLoader;
+    this.dataLoader = dataLoader;
+    this.demoLoader = demoLoader;
+    metaLoaders = ImmutableList.of(modelLoader, viewLoader, i18nLoader);
+  }
 
   public void initialize(final boolean update, final boolean withDemo) {
     try {
@@ -138,6 +153,7 @@ public class ModuleManager {
     if (moduleNames != null) {
       Collections.addAll(names, moduleNames);
     }
+
     try {
       this.createUsers();
       this.resolve(true);
@@ -273,16 +289,11 @@ public class ModuleManager {
     updateState(module);
   }
 
-  @Transactional
-  void installMeta(Module module, boolean update) {
-    // load model info
-    modelLoader.load(module, update);
-
-    // load views
-    viewLoader.load(module, update);
-
-    // load i18n
-    i18nLoader.load(module, update);
+  private void installMeta(Module module, boolean update) {
+    final ParallelTransactionExecutor transactionExecutor = new ParallelTransactionExecutor();
+    metaLoaders.forEach(
+        metaLoader -> metaLoader.feedTransactionExecutor(transactionExecutor, module, update));
+    transactionExecutor.run();
   }
 
   @Transactional

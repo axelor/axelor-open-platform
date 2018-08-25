@@ -53,17 +53,24 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MetaController {
 
   @Inject private ModuleManager moduleManager;
 
   @Inject private MetaTranslationRepository translations;
+
+  private static final Logger log = LoggerFactory.getLogger(MetaController.class);
 
   private ObjectViews validateXML(String xml) {
     try {
@@ -178,13 +185,17 @@ public class MetaController {
 
   public void restoreAll(ActionRequest request, ActionResponse response) {
     try {
+      final Instant startInstant = Instant.now();
       moduleManager.restoreMeta();
       MetaStore.clear();
       I18nBundle.invalidate();
+      final Duration duration = Duration.between(startInstant, Instant.now());
+      final LocalTime durationTime = LocalTime.MIN.plusSeconds(duration.getSeconds());
       response.setNotify(
-          I18n.get("All views have been restored.")
+          String.format(I18n.get("All views have been restored (%s)."), durationTime)
               + "<br>"
               + I18n.get("Please refresh your browser to see updated views."));
+      log.info("Restore meta time: {}", LocalTime.MIN.plusSeconds(duration.getSeconds()));
     } catch (Exception e) {
       response.setException(e);
     }
