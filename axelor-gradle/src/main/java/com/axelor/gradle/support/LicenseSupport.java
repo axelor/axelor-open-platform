@@ -113,10 +113,14 @@ public class LicenseSupport extends AbstractSupport {
     license.exclude("**/*.txt");
     license.exclude("**/*.json");
 
+    license.exclude("**/src-gen/**");
     license.exclude("**/data-init/**");
     license.exclude("**/data-demo/**");
     license.exclude("**/resources/**");
     license.exclude("**/webapp/lib/**");
+    license.exclude("**/webapp/lib/**");
+    license.exclude("**/webapp/dist/**");
+    license.exclude("**/webapp/node_modules/**");
     license.exclude("**/webapp/WEB-INF/web.xml");
 
     final File webapp = FileUtils.getFile(project.getProjectDir(), "src", "main", "webapp");
@@ -134,6 +138,8 @@ public class LicenseSupport extends AbstractSupport {
                             webapp,
                             tree -> {
                               tree.exclude("lib/**");
+                              tree.exclude("dist/**");
+                              tree.exclude("node_modules/**");
                               tree.exclude("WEB-INF/web.xml");
                             }));
                   });
