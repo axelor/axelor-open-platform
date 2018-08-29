@@ -20,6 +20,8 @@ spotless {
       include '**/*.xml'
       include '**/*.xsd'
       exclude '**/webapp/lib/*'
+      exclude '**/webapp/dist/*'
+      exclude '**/webapp/node_modules/*'
     }
     indentWithSpaces(2)
     trimTrailingWhitespace()
@@ -43,3 +45,7 @@ subprojects {
 }
 
 task formatCode(dependsOn: 'spotlessApply')
+
+allprojects {
+  build.dependsOn 'spotlessApply'
+}
