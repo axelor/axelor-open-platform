@@ -536,6 +536,7 @@ function FormViewCtrl($scope, $element) {
         if (promise && promise.then) {
           promise.then(reset, reset);
           promise = promise.then(function () {
+            if ($scope.record && $scope.record.id > 0) return; // record may have been saved, see RM-13558
             if ($scope.isDirty()) {
               var rec = _.extend({}, defaults, $scope.record);
               var old = $scope.$$original;
