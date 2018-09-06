@@ -303,7 +303,7 @@ table.form-layout fieldset {
 .form-item .ui-spinner {
   box-sizing: border-box;
   position: relative;
-  display: flex;
+  display: inline-flex;
 }
 
 .picker-input > input {
