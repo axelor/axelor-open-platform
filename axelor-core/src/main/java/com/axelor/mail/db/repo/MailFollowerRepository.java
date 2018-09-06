@@ -21,6 +21,7 @@ import com.axelor.auth.db.User;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
+import com.axelor.db.mapper.Mapper;
 import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailAddress;
 import com.axelor.mail.db.MailFollower;
@@ -70,6 +71,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
     }
 
     return all()
+        .order("user." + Mapper.of(User.class).getNameField().getName())
         .filter("self.relatedModel = ? AND self.relatedId = ?", relatedModel, relatedId)
         .fetch(limit);
   }
