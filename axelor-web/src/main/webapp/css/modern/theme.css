@@ -62,25 +62,12 @@ input[type="color"],
 .bar-side .ui-spinner {
   background: none;
 }
-table.form-layout .tabbable-tabs .tab-content{
+
+table.form-layout .tabbable-tabs .tab-content {
   border: 2px solid #E7E7E7;
 }
 
-.form-item-container,
-.form-item-container > span.display-text {
-  min-height: 21px;
-}
-
-.form-item-container > .translate-icon {
-  line-height: 21px;
-}
-
-.picker-input > .picker-icons {
-  top: -1px;
-}
-
 .picker-input > .picker-icons > i.fa {
-  padding-top: 1px;
   color: #9F9F9F;
 }
 
@@ -102,15 +89,6 @@ label,
 
 .panel .panel-title {
   color: #3A3A3A;
-}
-
-.form-item-container > span.display-text {
-  padding-top: 1px;
-}
-
-.form-item-container input {
-  padding: 0px 6px;
-  height: 21px;
 }
 
 .icons-bar .fa,
@@ -483,6 +461,51 @@ header .dropdown-submenu:focus > a {
 [ui-view-form] select,
 [ui-view-form] .tag-select {
   border-color: #c0c0c0;
+}
+
+[ui-view-form] .form-item-container,
+[ui-view-form] .form-item-container > span.display-text,
+[ui-view-form] .form-item-container input {	
+  min-height: 21px;
+  line-height: 21px;
+}
+
+[ui-view-form] .form-item-container input {
+	height: 21px;
+}
+
+[ui-view-form] .tag-select li.tag-selector input {
+	min-height: 18px;
+	height: 18px;
+}
+
+[ui-view-form] .tag-select,
+[ui-view-form] .tag-select > ul {
+  min-height: 20px;
+}
+
+[ui-view-form] .tag-select {
+	margin-top: -3px !important;
+}
+
+[ui-view-form] .tag-select .tag-text,
+[ui-view-form] .tag-select .tag-link,
+[ui-view-form] .tag-select-single .tag-link {
+	height: 14px;
+  line-height: 12px;
+}
+
+[ui-view-form] .tag-select .label,
+[ui-view-form] .tag-select .tag-selector {
+	height: 17px;
+}
+
+[ui-view-form] .tag-select .label {
+  padding: .2em .4em .3em;
+}
+
+[ui-view-form] .form-item-container > span.display-text {
+	padding: 0;
 }
 
 .ng-invalid > input,
