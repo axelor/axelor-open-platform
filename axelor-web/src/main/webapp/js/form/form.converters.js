@@ -78,6 +78,8 @@
     return value;
   }
 
+  ui.findNested = findNested;
+
   ui.formatters = {
 
     "string": function(field, value, context) {

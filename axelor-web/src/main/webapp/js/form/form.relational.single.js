@@ -90,7 +90,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
     var related = {};
     var relatives = fields || $scope.findRelativeFields();
     var missing = _.filter(relatives, function (name) {
-      return !value || value[name] === undefined;
+      return !value || ui.findNested(value, name) === undefined;
     });
     _.each(relatives, function(name) {
       var prefix = name.split('.')[0];
