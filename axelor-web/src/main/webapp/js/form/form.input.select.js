@@ -575,12 +575,8 @@ ui.formInput('MultiSelect', 'Select', {
 
       width = element.innerWidth() - left;
 
-      elem.height(input.height() + 2);
       elem.width(50);
 
-      input.css('position', 'absolute');
-      input.css('top', top + 5);
-      input.css('left', left);
       input.css('width', width - 24);
     }
 

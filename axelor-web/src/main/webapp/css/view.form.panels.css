@@ -300,13 +300,13 @@
 
 .panel-layout .tag-select,
 .panel-layout .tag-select > ul {
-  min-height: 26px;
+  min-height: 27px;
 }
 .panel-layout .tag-select .tag-text,
 .panel-layout .tag-select .tag-link,
 .panel-layout .tag-select-single .tag-link {
-  height: 17px;
-  line-height: 17px;
+  height: 16px;
+  line-height: 16px;
   font-size: 11px;
 }
 

@@ -303,7 +303,7 @@ table.form-layout fieldset {
 .form-item .ui-spinner {
   box-sizing: border-box;
   position: relative;
-  display: inline-block;
+  display: flex;
 }
 
 .picker-input > input {
@@ -313,7 +313,8 @@ table.form-layout fieldset {
 
 .picker-input > .picker-icons {
   position: absolute;
-  display: inline-block;
+  display: flex;
+  align-items: center;
   white-space: nowrap;
 
   top: 0;
@@ -325,8 +326,8 @@ table.form-layout fieldset {
   cursor: pointer;
   margin-right: 1px;
   padding: 2px;
-  padding-top: 4px;
-  display: inline-block;
+  display: flex;
+  align-items: center;
   line-height: 20px;
   height: 100%;
 }
@@ -975,6 +976,8 @@ label.has-help > span:after,
   border-radius: 4px;
   transition: border linear .2s, box-shadow linear .2s;
   min-height: 26px;
+  display: flex;
+  flex-wrap: wrap;
   height: 100%;
 }
 
@@ -1017,26 +1020,20 @@ label.has-help > span:after,
   padding-bottom: 2px;
 }
 
-.tag-select li {
+.tag-select .label {
   float: left;
   display: inline-block;
-  margin: 0;
-  margin-top: 2px;
-  margin-right: 2px;
+  margin: 2px 2px 0 0;
 }
 
-.tag-select span.label {
-  display: inline-block;
-  margin: 2px;
-  margin-right: 0;
+.tag-select .label,
+.tag-select .tag-selector {
+  height: 21px;
 }
 
-.tag-select span.label:first-child {
-  margin-left: 0;
-}
-
-.tag-select li.tag-item {
-
+.tag-select ul,
+.readonly > .tag-select {
+	padding-top: 2px;
 }
 
 .tag-select li.tag-item i,
@@ -1075,7 +1072,7 @@ label.has-help > span:after,
   margin: 0;
   padding: 0 !important;
   margin-left: 0;
-  margin-top: -1px;
+  margin-top: -3px;
   line-height: 16px;
   height: auto !important;
 }
