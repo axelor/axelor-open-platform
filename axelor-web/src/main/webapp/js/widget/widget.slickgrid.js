@@ -664,6 +664,7 @@ Grid.prototype.parse = function(view) {
 
     var sortable = true;
     switch (field.type) {
+    case 'field': // dummy field
     case 'icon':
     case 'button':
     case 'one-to-many':
