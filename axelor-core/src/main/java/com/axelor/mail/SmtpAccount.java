@@ -140,7 +140,7 @@ public class SmtpAccount implements MailAccount {
 
   @Override
   public void setProperties(Properties properties) {
-    this.properties = new Properties(properties);
+    this.properties = properties;
   }
 
   @Override
