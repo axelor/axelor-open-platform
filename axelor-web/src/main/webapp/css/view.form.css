@@ -1020,6 +1020,7 @@ label.has-help > span:after,
   padding-bottom: 2px;
 }
 
+.tag-select li,
 .tag-select .label {
   float: left;
   display: inline-block;
