@@ -379,7 +379,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     }
 
     details.put("$from", Resource.toMap(email, "address", "personal"));
-    details.put("$author", author);
+    details.put("$author", Resource.toMapCompact(author));
     details.put("$files", files);
     details.put("$eventType", eventType);
     details.put("$eventText", eventText);
