@@ -440,7 +440,7 @@
     };
 
     $scope.showMailBox = function() {
-      NavService.openTabByName('mail.unread');
+      NavService.openTabByName('mail.inbox');
       $scope.$timeout(function () {
         $scope.$broadcast("on:nav-click", NavService.getSelected());
       });
