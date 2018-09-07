@@ -164,7 +164,7 @@ table.form-layout td.form-item.v-align-top {
 .form-item-container,
 .form-item-container > span.display-text {
   min-height: 26px;
-  display: block;
+  display: flex;
 }
 
 .form-item-container {
