@@ -1178,6 +1178,11 @@ label.has-help > span:after,
 
 /* filter menu */
 
+.filter-box,
+.filter-box * {
+	box-sizing: border-box;
+}
+
 .filter-box {
   position: relative;
   display: inline-block;
