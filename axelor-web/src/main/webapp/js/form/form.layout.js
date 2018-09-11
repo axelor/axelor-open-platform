@@ -433,12 +433,46 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
       }
 
       if (field.target) {
+        scope.getDummyValues = function() {
+          if (!scope.record) return {};
+          var fields = _.keys(scope.fields);
+          var extra = _.chain(scope.fields_view)
+                  .filter(function(f) { return f.name && !_.contains(fields, f.name); })
+                  .filter(function(f) { return ['$changed', '$editorModel', '$version'].indexOf(f) === -1; })
+                  .pluck('name')
+                  .compact()
+                  .value();
+
+          if (scope._model === 'com.axelor.auth.db.User') {
+            extra = extra.filter(function (n) {
+              return ['change', 'oldPassword', 'newPassword', 'chkPassword'].indexOf(n) === -1;
+            });
+          }
+
+          return _.pick(scope.record, extra);
+        };
+
         scope.getContext = function () {
           var context = _.extend({}, scope.record);
+          var dummy = scope.getDummyValues();
           context._model = scope._model;
           context._parent = scope.$parent.getContext();
-          return ui.prepareContext(scope._model, context);
+          return ui.prepareContext(scope._model, context, dummy);
         };
+
+        scope.$on('on:before-save', function watchParentRecord() {
+          var dummyValues = scope.getDummyValues();
+          var watcher = scope.$watch('$parent.record', function (record, old) {
+            if (record === old) return;
+            var value = (record||{})[field.name];
+            if (value && dummyValues) {
+              value = _.extend(value, dummyValues);
+            }
+            dummyValues = null;
+            watcher();
+          });
+        });
+
         // make sure to fetch missing values
         var fetchMissing = function (value) {
           var ds = scope._dataSource;
