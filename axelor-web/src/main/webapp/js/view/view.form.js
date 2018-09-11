@@ -24,15 +24,28 @@ var ui = angular.module('axelor.ui');
 ui.prepareContext = function(model, values, dummyValues, parentContext) {
 
   var context = _.extend({}, values);
+  var IGNORE = ['$changed', '$editorModel', '$version', '$fetched', '$fetchedRelated'];
+
+  function findDummy(item) {
+    var dummy = {};
+    if (item) {
+      _.each(item, function (v, k) {
+        if (k[0] === '$' && IGNORE.indexOf(k) === -1) {
+          dummy[k.substring(1)] = v;
+        }
+      });
+    }
+    return dummy;
+  }
 
   function compact(item) {
     if (!item || _.isNumber(item)) return item;
     if (item.id > 0 && item.version === undefined && !item.$dirty) {
-      return {
+      return _.extend({
         id: item.id,
         selected: item.selected,
         $version: item.$version
-      };
+      }, findDummy(item));
     }
     item = _.extend({}, item);
     if (item.id <= 0) {
@@ -81,7 +94,8 @@ ui.prepareContext = function(model, values, dummyValues, parentContext) {
     }
     // make sure to have proper selected flags in nested o2m/m2m values, see uiPanelEditor
     if (value && value.$editorModel) {
-      context[name] = ui.prepareContext(value.$editorModel, value);
+
+      context[name] = ui.prepareContext(value.$editorModel, value, findDummy(value));
     }
   });
 

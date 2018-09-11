@@ -438,7 +438,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
           var fields = _.keys(scope.fields);
           var extra = _.chain(scope.fields_view)
                   .filter(function(f) { return f.name && !_.contains(fields, f.name); })
-                  .filter(function(f) { return ['$changed', '$editorModel', '$version'].indexOf(f) === -1; })
+                  .filter(function(f) { return ['$changed', '$editorModel', '$version', '$fetched', '$fetchedRelated'].indexOf(f) === -1; })
                   .pluck('name')
                   .compact()
                   .value();
@@ -471,6 +471,12 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
             dummyValues = null;
             watcher();
           });
+        });
+
+        scope.$watch('record', function (record, old) {
+          if (record && !record.$editorModel) {
+            record.$editorModel = scope._model;
+          }
         });
 
         // make sure to fetch missing values
