@@ -728,18 +728,6 @@ public class Resource<T extends Model> {
         request.getFields() == null ? null : request.getFields().toArray(new String[] {});
     final Map<String, Object> values = mergeRelated(request, entity, toMap(entity, fields));
 
-    // special case for User/Group objects
-    if (values.get("homeAction") != null) {
-      MetaAction act =
-          JpaRepository.of(MetaAction.class)
-              .all()
-              .filter("self.name = ?", values.get("homeAction"))
-              .fetchOne();
-      if (act != null) {
-        values.put("__actionSelect", toMapCompact(act));
-      }
-    }
-
     data.add(repository.populate(values, request.getContext()));
     response.setData(data);
     return response;
@@ -1257,6 +1245,18 @@ public class Resource<T extends Model> {
         Object enumValue = ((ValueEnum<?>) value).getValue();
         if (!Objects.equal(enumName, enumValue)) {
           result.put(name + "$value", ((ValueEnum<?>) value).getValue());
+        }
+      }
+
+      // special case for User/Group objects
+      if (result.get("homeAction") != null) {
+        MetaAction act =
+            JpaRepository.of(MetaAction.class)
+                .all()
+                .filter("self.name = ?", result.get("homeAction"))
+                .fetchOne();
+        if (act != null) {
+          result.put("__actionSelect", toMapCompact(act));
         }
       }
     }
