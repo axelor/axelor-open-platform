@@ -348,9 +348,10 @@ public final class MetaStore {
         attrs.put("target", record.getTargetModel());
         attrs.remove("targetModel");
         try {
-          attrs.put(
-              "targetName",
-              Mapper.of(Class.forName(record.getTargetModel())).getNameField().getName());
+          Property nameField = Mapper.of(Class.forName(record.getTargetModel())).getNameField();
+          if (nameField != null) {
+            attrs.put("targetName", nameField.getName());
+          }
         } catch (ClassNotFoundException e) {
         }
       }
