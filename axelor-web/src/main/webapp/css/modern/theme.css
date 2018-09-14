@@ -229,6 +229,10 @@ label,
   background-color: #fff;
 }
 
+.panel .bar-wrap {
+	background-color: inherit;
+}
+
 [ui-view-form], .cards-view, .kanban-view {
   background: #fafafa;
 }
