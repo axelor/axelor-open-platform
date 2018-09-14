@@ -94,7 +94,7 @@ public class EncryptedFieldService {
 
     StringBuilder sb =
         new StringBuilder("SELECT ")
-            .append("new Map(")
+            .append("new Map(self.id as id,")
             .append(
                 names.stream().map(n -> "self." + n + " as " + n).collect(Collectors.joining(", ")))
             .append(") FROM ")
@@ -108,7 +108,8 @@ public class EncryptedFieldService {
     QueryBinder.of(selectQuery).setFlushMode(FlushModeType.COMMIT);
     QueryBinder.of(countQuery).setFlushMode(FlushModeType.COMMIT);
 
-    Query<?> updater = Query.of(model.asSubclass(Model.class)).autoFlush(false);
+    Query<?> updater =
+        Query.of(model.asSubclass(Model.class)).filter("self.id = :id").autoFlush(false);
 
     long count = (Long) countQuery.getSingleResult();
     long offset = 0;
@@ -123,7 +124,7 @@ public class EncryptedFieldService {
       List<Map> values = selectQuery.getResultList();
       LOG.info("Records from: {} to {}", offset, Math.min(count, (offset + limit)));
       offset += limit;
-      values.forEach(map -> updater.update(map));
+      values.forEach(map -> updater.bind("id", map.remove("id")).update(map));
     }
   }
 }
