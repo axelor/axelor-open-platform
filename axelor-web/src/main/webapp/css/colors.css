@@ -354,4 +354,8 @@ input, button, textarea, select, fieldset, pre {
   margin-left: 16px;
 }
 
+.navbar .btn-group .btn:not(:active):focus {
+  background: inherit;
+}
+
 /* == v5 == */

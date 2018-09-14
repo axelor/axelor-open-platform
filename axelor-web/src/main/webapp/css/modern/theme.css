@@ -538,10 +538,6 @@ header .dropdown-submenu:focus > a {
   border-radius: 3px !important;
 }
 
-.btn:focus {
-  outline: none !important;
-}
-
 .btn-danger {
   border-color: #d43f3a;
 }
@@ -550,7 +546,7 @@ header .dropdown-submenu:focus > a {
   margin-left: -3px;
 }
 
-.navbar .btn-group .btn:not(:disabled):hover, .navbar .btn-group .btn:focus, .navbar .btn-group .btn:active {
+.navbar .btn-group .btn:not(:disabled):hover {
   background: #2185D0;
   color: #fff;
 }
