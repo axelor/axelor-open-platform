@@ -48,7 +48,7 @@ public class JavaTimeAdapter extends Adapter {
       case "LocalDateTime":
         return fmt.parse(text, LocalDateTime::from);
       default:
-        return fmt.parse((String) value, ZonedDateTime::from);
+        return fmt.parseBest((String) value, ZonedDateTime::from, LocalDateTime::from);
     }
   }
 }

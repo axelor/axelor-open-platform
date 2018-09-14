@@ -72,14 +72,18 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
     if (value == null) {
       return ZonedDateTime.now();
     }
-    if (value instanceof Temporal) {
-      return ZonedDateTime.from((Temporal) value);
+    if (value instanceof ZonedDateTime) {
+      return (ZonedDateTime) value;
     }
     if (value instanceof Date) {
       return ((Date) value).toInstant().atZone(ZoneId.systemDefault());
     }
     if (value instanceof Calendar) {
       return ((Calendar) value).toInstant().atZone(ZoneId.systemDefault());
+    }
+    try {
+      return ZonedDateTime.from(((Temporal) value));
+    } catch (Exception e) {
     }
     try {
       return OffsetDateTime.parse(value.toString()).atZoneSameInstant(ZoneId.systemDefault());
