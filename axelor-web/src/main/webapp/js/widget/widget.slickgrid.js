@@ -1310,6 +1310,9 @@ Grid.prototype.adjustSize = function() {
     return;
   }
   this.doInit();
+  if (this.grid.getCanvasNode() && !this.grid.getCanvasNode().hasChildNodes()) {
+    this.grid.invalidate();
+  }
   this.adjustToScreen();
   this.grid.resizeCanvas();
 };
