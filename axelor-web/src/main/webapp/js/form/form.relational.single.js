@@ -128,12 +128,25 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
     if (value && value.id) {
       record = _.extend({}, {
         id: value.id,
-        $version: value.version || value.$version
+        $version: value.version === undefined ? value.$version : value.version
       });
-      record[nameField] = value[nameField];
-      if (nameField && _.isUndefined(value[nameField])) {
-        return ds.details(value.id, nameField).success(function(rec){
-          $scope.setValue(_.extend({}, rec), true);
+
+      var missing = $scope.findRelativeFields().filter(function (name) {
+        return !value || ui.findNested(value, name) === undefined;
+      });
+
+      if (value[nameField] !== undefined) {
+        record[nameField] = value[nameField];
+      } else {
+        missing.push(nameField);
+      }
+
+      if (missing.length) {
+        return ds.read(value.id, {fields: missing}).success(function(rec) {
+          record = _.extend(record, _.omit(rec, 'version'));
+          record.$version = rec.version === undefined ? record.$version : rec.version;
+          console.log(rec, record)
+          $scope.setValue(record, true);
         });
       }
       if (value.code) {
