@@ -1,3 +1,39 @@
+## 5.0.6 (2018-09-14)
+
+#### Bugs
+
+* Fix ZonedDateTime adapter
+* Fix encrypted field migration
+* Fix dummy values from field editor missing in context
+* Fix dummy fields issues in relational field editor
+* Fix homeAction field in User m2o editor
+* Fix full send in message details
+* Fix dotted fields in field editor causing form dirty
+* Fix onNew with save action
+* Fix sidebar style conflict issue with field editor
+* Fix contextual custom field with hidden=true
+* Fix xml view hot reload
+* Fix onSave/onLoad actions on custom models
+* Fix view toolbar visibility on side change
+* Fix translation popup for multiline text fields
+* Fix unnecessary fetch request for dummy fields
+* Fix scroll position issue on grid view when switching views
+
+#### Enhancements
+
+* Order followers with their namecolum
+* Open the Inbox mail view instead of the unread mail view
+* Prevent sorting on dummy fields
+* Improve modern theme
+* Terminate pending actions if view is switched
+* Reset form view when switched over with browser back action
+* Do not load record in form view if view is switched
+* Do not add grid/form views when opening view with action
+
+#### Others
+
+* Adopt new style guide (google java format, two spaces for indentation)
+
 ## 5.0.5 (2018-08-03)
 
 #### Bugs
