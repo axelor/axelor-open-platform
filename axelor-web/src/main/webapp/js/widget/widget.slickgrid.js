@@ -1243,9 +1243,9 @@ Grid.prototype._doInit = function(view) {
     return false;
   });
 
-  this.zIndexFix();
 
   scope.$timeout(function () {
+    that.zIndexFix();
     grid.invalidate();
     grid.autosizeColumns();
     // focus first filter input
