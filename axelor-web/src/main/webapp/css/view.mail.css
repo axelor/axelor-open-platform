@@ -18,8 +18,9 @@
 /* thread view */
 
 .mail-thread-view {
+  width: inherit !important;
   max-width: 720px;
-  margin: 0 4px 0 !important;
+  margin: 0 16px 0 4px !important;
   padding: 0;
 }
 
