@@ -80,7 +80,9 @@ function updateValues(source, target, itemScope, formScope) {
 
     // onNew or onSave from main form
     var current = target && target.attrs ? JSON.parse(target.attrs) : {};
-    source.attrs = JSON.stringify(_.extend({}, current, values));
+    if (source.attrs || !source.jsonModel) {
+      source.attrs = JSON.stringify(_.extend({}, current, values));
+    }
 
   } else if (itemScope && itemScope.updateJsonValues) {
     return itemScope.updateJsonValues(source);
