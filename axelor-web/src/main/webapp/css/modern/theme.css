@@ -230,7 +230,7 @@ label,
 }
 
 .panel .bar-wrap {
-	background-color: inherit;
+  background-color: inherit;
 }
 
 [ui-view-form], .cards-view, .kanban-view {
@@ -469,18 +469,18 @@ header .dropdown-submenu:focus > a {
 
 [ui-view-form] .form-item-container,
 [ui-view-form] .form-item-container > span.display-text,
-[ui-view-form] .form-item-container input {	
+[ui-view-form] .form-item-container input {
   min-height: 21px;
   line-height: 21px;
 }
 
 [ui-view-form] .form-item-container input {
-	height: 21px;
+  height: 21px;
 }
 
 [ui-view-form] .tag-select li.tag-selector input {
-	min-height: 18px;
-	height: 18px;
+  min-height: 18px;
+  height: 18px;
 }
 
 [ui-view-form] .tag-select,
@@ -489,19 +489,19 @@ header .dropdown-submenu:focus > a {
 }
 
 [ui-view-form] .tag-select {
-	margin-top: -3px !important;
+  margin-top: -3px !important;
 }
 
 [ui-view-form] .tag-select .tag-text,
 [ui-view-form] .tag-select .tag-link,
 [ui-view-form] .tag-select-single .tag-link {
-	height: 14px;
+  height: 14px;
   line-height: 12px;
 }
 
 [ui-view-form] .tag-select .label,
 [ui-view-form] .tag-select .tag-selector {
-	height: 17px;
+  height: 17px;
 }
 
 [ui-view-form] .tag-select .label {
@@ -509,7 +509,7 @@ header .dropdown-submenu:focus > a {
 }
 
 [ui-view-form] .form-item-container > span.display-text {
-	padding: 0;
+  padding: 0;
 }
 
 .ng-invalid > input,

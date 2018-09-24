@@ -1034,7 +1034,7 @@ label.has-help > span:after,
 
 .tag-select ul,
 .readonly > .tag-select {
-	padding-top: 2px;
+  padding-top: 2px;
 }
 
 .tag-select li.tag-item i,
@@ -1180,7 +1180,7 @@ label.has-help > span:after,
 
 .filter-box,
 .filter-box * {
-	box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .filter-box {

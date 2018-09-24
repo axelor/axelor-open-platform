@@ -113,6 +113,11 @@
   background: transparent;
 }
 
+.nav-tree li > a > .nav-title {
+  display: inline-block;
+  max-width: 160px;
+}
+
 .nav-tree li > a > .nav-image,
 .nav-tree li > a > .nav-icon {
   margin-right: 6px;
