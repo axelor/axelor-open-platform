@@ -1087,7 +1087,7 @@ ui.formWidget('PanelMail', {
         action: act || _.uniqueId('$act'),
         model: model,
         viewType: "form",
-        views: [{ type: "form" }]
+        views: [{ type: "form", name: "user-info-form" }]
       }, {
         mode: "edit",
         state: author.id
