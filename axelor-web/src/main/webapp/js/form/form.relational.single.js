@@ -145,7 +145,6 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
         return ds.read(value.id, {fields: missing}).success(function(rec) {
           record = _.extend(record, _.omit(rec, 'version'));
           record.$version = rec.version === undefined ? record.$version : rec.version;
-          console.log(rec, record)
           $scope.setValue(record, true);
         });
       }
@@ -249,15 +248,12 @@ ui.directive('uiCanSuggest', function () {
     // jquery-ui doesn't allow keyboard navigation on autocomplete list
     element.on('keydown', function (e) {
       var inst = element.data('autocomplete');
-      console.log(e.keyCode);
       switch (e.keyCode) {
       case 38: // up
         inst._keyEvent('previous', e);
-        console.log('up');
         break;
       case 40: // down
         inst._keyEvent('next', e);
-        console.log('down');
         break;
       case  9: // tab
         if (inst.menu.active) {
