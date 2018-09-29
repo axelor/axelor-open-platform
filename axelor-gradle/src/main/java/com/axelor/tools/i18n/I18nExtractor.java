@@ -66,7 +66,7 @@ public class I18nExtractor {
   private static final Pattern PATTERN_XML =
       Pattern.compile("\\" + File.separator + "(domains|objects|views)\\" + File.separator);
   private static final Pattern PATTERN_I18N =
-      Pattern.compile("((_t\\s*\\()|(I18n.get\\s*\\()|(/\\*\\$\\$\\(\\*/))\\s*");
+      Pattern.compile("((_t\\s*\\()|(I18n.get\\s*\\()|(T.apply\\s*\\()|(/\\*\\$\\$\\(\\*/))\\s*");
   private static final Pattern PATTERN_HTML =
       Pattern.compile("((\\{\\{(.*?)\\|\\s*t\\s*\\}\\})|(x-translate.*?\\>(.*?)\\<))");
   private static final Pattern PATTERN_EXCLUDE =
