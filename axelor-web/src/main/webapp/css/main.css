@@ -645,7 +645,7 @@ header .navbar .nav-link-user-sub {
 }
 
 .record-pager-change {
-  display: none;
+  display: inline-flex;
 }
 
 .record-pager-change {
