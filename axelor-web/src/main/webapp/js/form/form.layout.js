@@ -437,7 +437,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
           if (!scope.record) return {};
           var fields = _.keys(scope.fields);
           var extra = _.chain(scope.fields_view)
-                  .filter(function(f) { return f.name && !_.contains(fields, f.name); })
+                  .filter(function(f) { return f.name && f.name[0] === '$' && !_.contains(fields, f.name); })
                   .filter(function(f) { return ['$changed', '$editorModel', '$version', '$fetched', '$fetchedRelated'].indexOf(f) === -1; })
                   .pluck('name')
                   .compact()
