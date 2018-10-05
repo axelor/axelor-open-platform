@@ -942,7 +942,7 @@ ActionHandler.prototype = {
 
         if ((attr === "value" || attr.indexOf('value:') === 0)) {
           hasValues = true;
-          if (itemScope.$setForceWatch) {
+          if (itemScope && itemScope.$setForceWatch) {
             itemScope.$setForceWatch(true);
           }
           if (isDotted()) return;
