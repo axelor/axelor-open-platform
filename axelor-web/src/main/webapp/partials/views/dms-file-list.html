@@ -104,8 +104,7 @@
       <div class="panel-body">
         <div class="upload-list-item" ng-repeat="info in uploads.items">
             <div class="file-name">{{info.file.name}}</div>
-            <div class="file-complete hidden-phone">{{info.transfer}}</div>
-            <div class="file-progress" ng-hide="info.failed">
+            <div class="file-progress">
               <div class="progress progress-striped" ng-class="{ active: info.active }"><div class="bar" ng-style="{width: info.progress}"></div></div>
             </div>
             <div class="file-op" ng-show="!info.loaded">

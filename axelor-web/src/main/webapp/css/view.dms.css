@@ -230,17 +230,14 @@
   margin: 0;
   min-height: inherit;
   float: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: right;
+  overflow: hidden;
 }
 
 .dms-file-upload .upload-list .file-name {
-  width: 35%;
-}
-
-.dms-file-upload .upload-list .file-complete {
-  width: 25%;
-  white-space: nowrap;
-  text-overflow: clip;
-  text-align: right;
+  width: 60%;
 }
 
 .dms-file-upload .upload-list .file-progress {
