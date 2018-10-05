@@ -117,10 +117,15 @@ function CalendarViewCtrl($scope, $element) {
     }
 
     // consider stored filter
-    if (ds._filter && ds._filter.criteria) {
-      criteria = {
-        operator: "and",
-        criteria: [criteria].concat(ds._filter.criteria)
+    if (ds._filter) {
+      if (ds._filter.criteria) {
+        criteria = {
+          operator: "and",
+          criteria: [criteria].concat(ds._filter.criteria)
+        }
+      }
+      if (_.size(ds._filter._domains) > 0) {
+        criteria._domains = ds._filter._domains;
       }
     }
 
