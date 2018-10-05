@@ -71,20 +71,20 @@ ui.formInput('Number', {
 
     scope.validate = scope.isValid = function(value) {
       var valid = scope.isNumber(value);
-            if (valid && isDecimal && _.isString(value)) {
-              value = scope.format(value);
-              valid = _.string.trim(value, '-').length - 1 <= precision();
-              value = +value;
-            }
+      if (valid && isDecimal && _.isString(value)) {
+        value = scope.format(value);
+        valid = _.string.trim(value, '-').length - 1 <= precision();
+        value = +value;
+      }
 
-            if (valid && (minSize || minSize === 0)) {
+      if (valid && (minSize || minSize === 0)) {
         valid = value >= minSize;
       }
       if (valid && (maxSize || maxSize === 0)) {
         valid = value <= maxSize;
       }
 
-          return valid;
+      return valid;
     };
 
     scope.localeValue = function localeValue() {
@@ -239,5 +239,14 @@ ui.formInput('Number', {
     });
   }
 });
+
+// fix spinner repeat issue
+var oldRepeat = $.ui.spinner.prototype._repeat;
+$.ui.spinner.prototype._repeat = function () {
+  if (this.element.scope().isReadonly()) {
+    return this._stop();
+  }
+  return oldRepeat.apply(this, arguments);
+};
 
 })();
