@@ -1,6 +1,8 @@
-## 5.0.7 (current)
+## 5.0.7 (2018-10-05)
 
-TBD
+#### Bugs
+
+* Fix regression caused by RM-13705
 
 ## 5.0.6 (2018-09-14)
 
