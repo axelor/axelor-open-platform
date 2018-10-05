@@ -214,6 +214,8 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
           _.extend(item, _.pick(ds.get(item.id), "version", view.sequenceBy));
         });
         _.extend(record, rec);
+      }).error(function () {
+        $scope.onRefresh();
       });
     }
 
