@@ -283,8 +283,8 @@ input, button, textarea, select, fieldset, pre {
   border: 0;
 }
 
-.record-toolbar .button-menu a.btn:hover,
-.record-toolbar .button-menu a.btn:focus {
+.record-toolbar .button-menu.open a.btn,
+.record-toolbar .button-menu a.btn:hover {
   background-color: #eee;
 }
 
@@ -353,9 +353,4 @@ input, button, textarea, select, fieldset, pre {
 .many2many-item .navbar .icons-bar > a {
   margin-left: 16px;
 }
-
-.navbar .btn-group .btn:not(:active):focus {
-  background: inherit;
-}
-
 /* == v5 == */
