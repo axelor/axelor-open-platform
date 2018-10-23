@@ -186,8 +186,9 @@ ui.directive('uiMailMessage', function () {
         }
         if (/^\d+(\.\d+)?$/.test(value)) {
           var dot = value.indexOf('.');
-          var props = dot > -1 ? { scale: Math.min(4, value.length - dot - 1) } : {};
-          return ui.formatters.decimal(props, value);
+          return dot > -1
+            ? ui.formatters.decimal({ scale: Math.min(4, value.length - dot - 1) }, value)
+            : ui.formatters.integer({}, value);
         }
         return value;
       }
