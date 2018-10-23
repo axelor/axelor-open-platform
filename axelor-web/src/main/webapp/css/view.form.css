@@ -1105,6 +1105,43 @@ label.has-help > span:after,
   padding-left: 12px;
 }
 
+.slick-cell .tag-select {
+  height: 25px !important;
+}
+
+.slick-cell .tag-select .label {
+  margin: 0 2px 0 0;
+  display: flex;
+  align-items: center;
+}
+
+.slick-cell .tag-select .tag-text {
+  line-height: 15px;
+}
+
+.slick-cell .tag-select .label .fa {
+  margin-left: 2px;
+}
+
+.slick-cell .tag-select.picker-input {
+  background-color: inherit;
+}
+
+.slick-cell .tag-select.picker-input .tag-item {
+  margin-top: 1px;
+}
+.slick-cell .tag-select.picker-input ul {
+  margin-left: 3px;
+}
+.slick-cell .tag-select .label, .slick-cell .tag-select .tag-selector {
+  height: 20px;
+}
+
+.slick-cell .tag-select li.tag-selector input {
+  height: 20px !important;
+  min-height: inherit;
+}
+
 .image-select > img {
   position: absolute;
   top: 5px;

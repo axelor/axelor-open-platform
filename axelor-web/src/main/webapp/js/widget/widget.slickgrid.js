@@ -375,12 +375,26 @@ var Formatters = {
 
   "selection": function(field, value) {
     var cmp = field.type === "integer" ? function(a, b) { return a == b ; } : _.isEqual;
-    var val = field.type === "integer" ? value : _.unescapeHTML(value);
-    var res = _.find(field.selectionList, function(item){
-      return cmp(item.value, val);
-    }) || {};
+    var findSelect = function (v) {
+      var val = field.type === "integer" ? v : _.unescapeHTML(v);
+      var res = _.extend({}, _.find(field.selectionList, function(item) {
+        return cmp(item.value, val);
+      }));
+      if (_.isString(res.title)) {
+        res.title = _.escapeHTML(res.title);
+      }
+      return res;
+    };
 
-    var text = _.isString(res.title) ? _.escapeHTML(res.title) : res.title;
+    if (value && field.widget === 'MultiSelect') {
+      var items = value.split(/\s*,\s*/).map(findSelect).map(function (res) {
+        return '<span class="label label-primary"><span class="tag-text">'+res.title+'</span></span>';
+      });
+      return '<span class="tag-select">' + items.join(' ') + '</span>';
+    }
+
+    var res = findSelect(value);
+    var text = res.title;
     if (field.widget === 'ImageSelect' && res.icon) {
       var image = "<img style='max-height: 24px;' src='" + (res.icon || res.value) + "'>";
       return field.labels === false ? image : image + " " + text;
