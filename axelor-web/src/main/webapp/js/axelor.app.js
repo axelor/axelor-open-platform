@@ -411,7 +411,13 @@
         $scope.$user.name = config["user.name"];
         $scope.$user.image = config["user.image"];
         config.DEV = config['application.mode'] == 'dev';
-        config.PROD = config['application.mode'] == 'prod'
+        config.PROD = config['application.mode'] == 'prod';
+
+        if (config['view.confirm.yes-no'] === true) {
+          _.extend(axelor.dialogs.config, {
+            yesNo: true
+          });
+        }
       });
     }
 
