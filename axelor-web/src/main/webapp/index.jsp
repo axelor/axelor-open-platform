@@ -85,6 +85,14 @@ String tenantId = (String) session.getAttribute("tenantId");
     <%= appStyle %>
     </style>
     <% } %>
+
+    <style>
+    header .nav > li {
+      /* fix wierd dots in MS-Edge */
+      list-style:none !important;
+    }
+    </style>
+
     <!-- Le fav and touch icons -->
     <link rel="shortcut icon" href="ico/favicon.ico">
     <% if (extraHead != null) { %> <jsp:include page="<%= extraHead %>" /> <% } %>
