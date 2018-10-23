@@ -411,7 +411,7 @@ ui.formInput('ManyToOne', 'Select', {
     var validateSearch = _.debounce(function () {
       if (input.length === 0 || input.is(':hidden')) return;
       var my = String(input.val() || '');
-      var text = String(scope.text || '');
+      var text = String(scope.text || '').replace(/\n/g, '');
       var invalid = my !== text;
       scope.$applyAsync(function () {
         scope.setValidity('search', !invalid);
