@@ -698,12 +698,14 @@ function FormViewCtrl($scope, $element) {
   $scope.onCopy = function() {
     var record = $scope.record;
     ds.copy(record.id).success(function(record){
+      $scope.$locationChangeOff();
       routeId = null;
       $scope.edit(record);
       $scope.setEditable();
       $scope.$timeout(function () {
         record._dirty = true;
         $scope.$$original = {};
+        locationChangeCheck();
       });
     });
   };
