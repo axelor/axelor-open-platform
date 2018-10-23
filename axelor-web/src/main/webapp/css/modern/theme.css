@@ -203,11 +203,11 @@ label,
 
 .slick-cell.edit-icon {
   padding: 2px;
-  text-align: center;
 }
 .slick-cell.edit-icon i {
   width: 100%;
   height: 100%;
+  text-align: center;
 }
 
 .slick-cell .picker-icons i.fa:hover {
