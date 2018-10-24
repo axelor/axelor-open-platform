@@ -972,6 +972,12 @@ ui.directive('uiPortletGrid', function(){
         if (!opts._sortBy && !ds._sortBy && view.orderBy) {
           opts._sortBy = view.orderBy.split(',');
         }
+        if ($scope._context && $scope.formPath && $scope.getContext) {
+          opts._context = _.extend({id: null}, _.pick($scope.getContext(), _.keys($scope._context)));
+          if ($scope._context._id) {
+            opts._context._id = opts._context.id;
+          }
+        }
         return _filter.call($scope, opts);
       };
 
