@@ -398,7 +398,7 @@ ui.directive('uiViewPane', function() {
         if (view && $scope.viewList.indexOf(type) === -1) {
           $scope.viewList.push(type);
         }
-        var viewScope = $scope.selectedTab && $scope.selectedTab.$viewScope;
+        var viewScope = !$scope._isPopup && $scope.selectedTab && $scope.selectedTab.$viewScope;
         if (viewScope && viewScope.viewType === 'form' && viewScope.viewType !== type) {
           viewScope.$$resetForm();
         }
