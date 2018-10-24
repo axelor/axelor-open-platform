@@ -71,9 +71,14 @@ public class AboutService extends AbstractService {
 
     for (String id : sessions) {
       HttpSession session = AppSessionListener.getSession(id);
-      if (session == null
-          || session.getAttribute(PRINCIPALS_SESSION_KEY) == null
-          || session.getAttribute(AUTHENTICATED_SESSION_KEY) != TRUE) {
+      try {
+        if (session == null
+            || session.getAttribute(PRINCIPALS_SESSION_KEY) == null
+            || session.getAttribute(AUTHENTICATED_SESSION_KEY) != TRUE) {
+          continue;
+        }
+      } catch (IllegalStateException e) {
+        // invalid session
         continue;
       }
       String login = session.getAttribute(PRINCIPALS_SESSION_KEY).toString();
