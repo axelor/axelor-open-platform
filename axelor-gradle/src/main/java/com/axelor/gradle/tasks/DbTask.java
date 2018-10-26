@@ -17,8 +17,11 @@
  */
 package com.axelor.gradle.tasks;
 
+import static java.util.regex.Matcher.quoteReplacement;
+
 import com.axelor.common.StringUtils;
 import com.axelor.gradle.AxelorPlugin;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -114,7 +117,7 @@ public class DbTask extends JavaExec {
             ? config
             : System.getProperty("axelor.config", "src/main/resources/application.properties");
 
-    final Path configFile = Paths.get(configPath);
+    final Path configFile = Paths.get(configPath.replaceAll("/", quoteReplacement(File.separator)));
     if (Files.notExists(configFile)) {
       throw new GradleException("Unable to find application config.");
     }
