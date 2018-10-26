@@ -75,8 +75,13 @@ public class FileService extends AbstractService {
     }
 
     MediaType type = MediaType.APPLICATION_OCTET_STREAM_TYPE;
-    if (name.endsWith("pdf")) type = new MediaType("application", "pdf");
-    if (name.endsWith("html")) type = new MediaType("text", "html");
+    if (name.endsWith(".pdf")) type = new MediaType("application", "pdf");
+    if (name.endsWith(".html")) type = new MediaType("text", "html");
+    if (name.endsWith(".png")) type = new MediaType("image", "png");
+    if (name.endsWith(".jpg")) type = new MediaType("image", "jpg");
+    if (name.endsWith(".svg")) type = new MediaType("image", "svg+xml");
+    if (name.endsWith(".gif")) type = new MediaType("image", "gif");
+    if (name.endsWith(".webp")) type = new MediaType("image", "webp");
 
     final String fileName = name == null ? file.toFile().getName() : name;
     final ResponseBuilder builder = javax.ws.rs.core.Response.ok(file.toFile(), type);
