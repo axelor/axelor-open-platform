@@ -59,7 +59,7 @@ public class TypeCheck extends JpaModel {
   private LocalDate localDate2;
 
   public Boolean getBoolValue() {
-    return boolValue;
+    return boolValue == null ? Boolean.FALSE : boolValue;
   }
 
   public void setBoolValue(Boolean boolValue) {
@@ -75,7 +75,7 @@ public class TypeCheck extends JpaModel {
   }
 
   public Integer getIntValue() {
-    return intValue;
+    return intValue == null ? 0 : intValue;
   }
 
   public void setIntValue(Integer intValue) {

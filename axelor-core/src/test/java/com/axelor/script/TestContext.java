@@ -21,8 +21,11 @@ import com.axelor.inject.Beans;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.ContextEntity;
 import com.axelor.test.db.Contact;
+import com.axelor.test.db.TypeCheck;
 import com.axelor.test.db.repo.ContactRepository;
 import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -84,6 +87,14 @@ public class TestContext extends ScriptTest {
     Assert.assertTrue(proxy instanceof ContextEntity);
     Assert.assertNotNull(((ContextEntity) proxy).getContextEntity());
     Assert.assertNotNull(((ContextEntity) proxy).getContextMap());
+  }
+
+  @Test
+  public void testBooleanAndIntegerFields() {
+    Map<String, Object> data = new HashMap<>();
+    Context context = new Context(data, TypeCheck.class);
+    Assert.assertEquals(Boolean.FALSE, context.get("boolValue"));
+    Assert.assertEquals(0, context.get("intValue"));
   }
 
   @Test

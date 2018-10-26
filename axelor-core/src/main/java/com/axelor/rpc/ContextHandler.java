@@ -271,6 +271,7 @@ public class ContextHandler<T> {
     }
 
     final String fieldName = property.getName();
+    final Object unmanaged = getUnmanagedEntity();
 
     // in case of setter, update context map
     final Object oldValue = args.length == 1 ? values.put(fieldName, args[0]) : null;
@@ -279,7 +280,7 @@ public class ContextHandler<T> {
     if (args.length == 1 || values.containsKey(fieldName) || property.isTransient()) {
       validate(property);
       try {
-        return method.invoke(getUnmanagedEntity(), args);
+        return method.invoke(unmanaged, args);
       } finally {
         if (args.length == 1 && changeListeners.hasListeners(fieldName)) {
           changeListeners.firePropertyChange(fieldName, oldValue, values.get(fieldName));
@@ -288,8 +289,10 @@ public class ContextHandler<T> {
     }
     // else get value from managed instance
     final Object managed = getManagedEntity();
+
+    // if managed entity not found, get default value from unmanaged entity
     if (managed == null) {
-      return null;
+      return method.invoke(unmanaged, args);
     }
 
     return method.invoke(managed, args);
