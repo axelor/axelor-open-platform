@@ -2188,6 +2188,14 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 };
 
 Grid.prototype.onSelectionChanged = function(event, args) {
+  var grid = this.grid;
+  var activeCell = grid.getActiveCell();
+  var selectedRows = args.rows || [];
+
+  if (activeCell && selectedRows.indexOf(activeCell.row) === -1) {
+    grid.resetActiveCell();
+  }
+
   if (this.handler.onSelectionChanged) {
     this.handler.onSelectionChanged(event, args);
   }
