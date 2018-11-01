@@ -503,6 +503,13 @@
           modal: true,
           zIndex: 1100,
           width: 420,
+          open: function(e, ui) {
+            setTimeout(function () {
+              if (errorWindow.dialog('isOpen')) {
+                errorWindow.dialog('moveToTop', true);
+              }
+            }, 300);
+          },
           close: function() {
             $scope.httpError = {};
             $scope.$applyAsync();
