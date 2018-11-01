@@ -305,6 +305,9 @@ ui.directive('uiDialogSize', function() {
         $(this).children('i').toggleClass('fa-expand fa-compress');
         elemDialog.toggleClass('maximized');
         axelor.$adjustSize();
+        setTimeout(function () {
+          scope.$broadcast('grid:adjust-columns');
+        }, 350);
         return false;
       }).insertAfter(elemTitle);
 
