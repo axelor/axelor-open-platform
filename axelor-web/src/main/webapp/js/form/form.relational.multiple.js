@@ -1018,6 +1018,10 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
         scope.items = (showOnNew && canAdd() && !readonly) ? [{}] : items;
       }
     });
+    
+    scope.$copy = function (record) {
+      return angular.copy(record);
+    };
 
     scope.addItem = function () {
       var items = scope.items || (scope.items = []);
@@ -1070,13 +1074,13 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
     }
     tmpl = tmpl || '{{record.id}}';
     return "<div class='o2m-list'>" +
-    "<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items'>" + tmpl + "</div>" +
+    "<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items' ng-init='$$original = $copy(record)'>" + tmpl + "</div>" +
     "</div>";
   },
 
   template_editable: function (scope) {
     return "<div class='o2m-list'>" +
-      "<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items'>" +
+      "<div class='o2m-list-row' ng-class-even=\"'even'\" ng-repeat='record in items' ng-init='$$original = $copy(record)'>" +
         "<div class='o2m-editor-form' ui-panel-editor></div>" +
         "<span class='o2m-list-remove' ng-show='hasPermission(\"remove\") && !isDisabled() && canRemove()'>" +
           "<a tabindex='-1' href='' ng-click='removeItem($index)' title='{{\"Remove\" | t}}'><i class='fa fa-times'></i></a>" +
