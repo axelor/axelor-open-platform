@@ -525,6 +525,7 @@ ui.directive('uiViewPopup', function() {
           var viewScope = scope._viewParams.$viewScope;
           var viewPromise = viewScope._viewPromise;
           scope.viewTitle = scope.tabTitle(scope._viewParams);
+          scope.$broadcast('grid:adjust-size', viewScope);
           scope._doShow(viewPromise);
         });
       });

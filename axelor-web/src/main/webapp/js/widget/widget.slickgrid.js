@@ -890,13 +890,17 @@ Grid.prototype.parse = function(view) {
   // set dummy columns to apply attrs if grid is not initialized yet
   setDummyCols(element, this.cols);
 
-  function adjustSize() {
+  function adjustSize(event, force) {
     scope.ajaxStop(function () {
-      if (element.is(':visible')) {
-        that.adjustSize();
+      if (force || element.is(':visible')) {
+        that.adjustSize(force);
       }
     });
   }
+
+  scope.$on('grid:adjust-size', function (e, viewScope) {
+    adjustSize(e, viewScope === handler);
+  });
 
   scope.$onAdjust(adjustSize, 100); // handle global events
 
@@ -1319,8 +1323,8 @@ Grid.prototype.zIndexFix = function() {
   }
 };
 
-Grid.prototype.adjustSize = function() {
-  if (!this.grid || this.element.is(':hidden') || this.grid.getEditorLock().isActive()) {
+Grid.prototype.adjustSize = function(force) {
+  if (!this.grid || (!force && this.element.is(':hidden')) || this.grid.getEditorLock().isActive()) {
     return;
   }
   this.doInit();
