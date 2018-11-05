@@ -301,14 +301,15 @@ ui.directive('uiDialogSize', function() {
     var addMaximizeButton = _.once(function () {
       var elemDialog = element.parent();
       var elemTitle = elemDialog.find('.ui-dialog-title');
-      $('<a href="#" class="ui-dialog-titlebar-max"><i class="fa fa-expand"></i></a>').click(function (e) {
-        $(this).children('i').toggleClass('fa-expand fa-compress');
-        elemDialog.toggleClass('maximized');
-        axelor.$adjustSize();
-        setTimeout(function () {
-          scope.$broadcast('grid:adjust-columns');
-        }, 350);
-        return false;
+      var elemButton = $('<a href="#" class="ui-dialog-titlebar-max"><i class="fa fa-expand"></i></a>')
+        .click(function (e) {
+          $(this).children('i').toggleClass('fa-expand fa-compress');
+          elemDialog.toggleClass('maximized');
+          axelor.$adjustSize();
+          setTimeout(function () {
+            scope.$broadcast('grid:adjust-columns');
+          }, 350);
+          return false;
       }).insertAfter(elemTitle);
 
       // remove maximized state on close
@@ -316,6 +317,11 @@ ui.directive('uiDialogSize', function() {
         elemTitle.parent().find('i.fa-compress').toggleClass('fa-expand fa-compress');
         elemDialog.removeClass('maximized');
       });
+      
+      var params = (scope._viewParams || {}).params || {};
+      if (params['popup.maximized']) {
+        elemButton.click();
+      }
     });
     var addCollapseButton = _.once(function () {
       var elemDialog = element.parent();
