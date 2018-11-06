@@ -894,6 +894,9 @@ Grid.prototype.parse = function(view) {
     scope.ajaxStop(function () {
       if (force || element.is(':visible')) {
         that.adjustSize(force);
+        if (force) {
+          setTimeout(grid.autosizeColumns, 100);
+        }
       }
     });
   }
