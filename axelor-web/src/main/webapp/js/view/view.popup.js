@@ -317,7 +317,7 @@ ui.directive('uiDialogSize', function() {
         elemTitle.parent().find('i.fa-compress').toggleClass('fa-expand fa-compress');
         elemDialog.removeClass('maximized');
       });
-      
+
       var params = (scope._viewParams || {}).params || {};
       if (params['popup.maximized']) {
         elemButton.click();

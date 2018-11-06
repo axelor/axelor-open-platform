@@ -1018,7 +1018,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
         scope.items = (showOnNew && canAdd() && !readonly) ? [{}] : items;
       }
     });
-    
+
     scope.$copy = function (record) {
       return angular.copy(record);
     };
