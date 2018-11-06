@@ -1,6 +1,38 @@
-## 5.0.8 (current)
+## 5.0.8 (2018-11-06)
 
-TBD
+#### Bugs
+
+* Fix view popup is now opening if first view is grid
+* Fix technical info popup doesn't show value of m2o fields on o2m editor
+* Fix grid column size issue in popup
+* Fix server error dialog from popup is not visible
+* Fix grid widget row selection issue
+* Fix context update issue with panel-dashlet
+* Fix invalid session error on system info page
+* Fix MS-Edge issue
+* Fix integer value formatting in track messages
+* Fix grouped grid alignment issue in modern theme
+* Fix m2o field validation issue
+* Fix dirty record issue on copy
+* Fix number widget increment issue
+* Fix button focus style issues
+* Fix calendar view doesn't use predefined filters
+* Fix page size input/button alignment
+* Fix translation extract issue
+* Fix default values on custom models
+* Fix default values in custom forms
+* Fix unnecessary scrollbar in mailbox view
+* Fix filter input focus issue in grid dashlet
+
+#### Enhancements
+
+* Allow to open popup in maximized state (use `popup.maximized` view param)
+* Bring back `view.confirm.yes-no` config
+* Add MultiSelect widget support in grid view
+* Refresh kanban view when moving card fails
+* Use special user form view from message link (user-info-form)
+* Improve upload progress popup
+* Improve sidebar menu UX
 
 ## 5.0.7 (2018-10-05)
 
