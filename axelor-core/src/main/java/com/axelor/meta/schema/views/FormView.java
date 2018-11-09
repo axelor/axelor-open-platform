@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -32,7 +33,7 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("form")
-public class FormView extends AbstractView {
+public class FormView extends AbstractView implements ExtendableView {
 
   @XmlAttribute private Integer cols;
 
@@ -81,6 +82,9 @@ public class FormView extends AbstractView {
     @XmlElement(name = "panel-mail", type = PanelMail.class)
   })
   private List<AbstractWidget> items;
+
+  @XmlElement(name = "extend")
+  private List<Extend> extendItems;
 
   public Integer getCols() {
     return cols;
@@ -189,7 +193,7 @@ public class FormView extends AbstractView {
   @JsonIgnore
   public List<AbstractWidget> getItems() {
     if (items == null) {
-      return items;
+      return Collections.emptyList();
     }
     for (AbstractWidget item : items) {
       item.setModel(super.getModel());
@@ -230,5 +234,14 @@ public class FormView extends AbstractView {
       }
     }
     return all.isEmpty() ? null : all;
+  }
+
+  @Override
+  public List<Extend> getExtends() {
+    return extendItems;
+  }
+
+  public void setExtends(List<Extend> extendItems) {
+    this.extendItems = extendItems;
   }
 }

@@ -977,15 +977,7 @@
   <xsd:complexType name="AbstractGridView" abstract="true">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractView">
-        <xsd:sequence>
-          <xsd:element name="help" type="tns:Help" minOccurs="0" />
-          <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0" />
-          <xsd:element name="menubar" type="tns:Menubar" minOccurs="0" />
-          <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" maxOccurs="unbounded" />
-          <xsd:choice maxOccurs="unbounded">
-            <xsd:group ref="tns:GridWidgets" />
-          </xsd:choice>
-        </xsd:sequence>
+        <xsd:group ref="tns:GridItems" />
         <xsd:attribute name="expandable" type="xsd:boolean" />
         <xsd:attribute name="sortable" type="xsd:boolean" />
         <xsd:attribute name="orderBy" type="xsd:string">
@@ -1064,8 +1056,12 @@
   <xsd:complexType name="GridView">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractGridView">
+        <xsd:sequence>
+          <xsd:element name="extend" type="tns:ExtendGrid" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+        </xsd:sequence>
         <xsd:attributeGroup ref="tns:ObjectViewAttributes" />
         <xsd:attributeGroup ref="tns:AdvanceSearchAttributes" />
+        <xsd:attribute name="extension" type="xsd:boolean"></xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1358,25 +1354,7 @@
   <xsd:complexType name="AbstractFormView" abstract="true">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractView">
-        <xsd:sequence>
-          <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0" />
-          <xsd:element name="menubar" type="tns:Menubar" minOccurs="0" />
-            <xsd:choice minOccurs="0" maxOccurs="1">
-              <xsd:choice maxOccurs="unbounded">
-                <xsd:element name="help" type="tns:Help" />
-                <xsd:element name="panel" type="tns:Panel" />
-                <xsd:element name="panel-include" type="tns:FormInclude" />
-                <xsd:element name="panel-dashlet" type="tns:Dashlet" />
-                <xsd:element name="panel-related" type="tns:PanelRelated" />
-                <xsd:element name="panel-stack" type="tns:PanelTabs" />
-                <xsd:element name="panel-tabs" type="tns:PanelTabs" />
-              </xsd:choice>
-              <xsd:choice maxOccurs="unbounded">
-                <xsd:group ref="tns:FormWidgets" />
-              </xsd:choice>
-            </xsd:choice>
-          <xsd:element name="panel-mail" type="tns:PanelMail" minOccurs="0" />
-        </xsd:sequence>
+        <xsd:group ref="tns:FormItems" />
         <xsd:attribute name="cols" type="xsd:int">
           <xsd:annotation>
             <xsd:documentation>Number of initial column for the form.</xsd:documentation>
@@ -1445,6 +1423,9 @@
   <xsd:complexType name="FormView">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractFormView">
+        <xsd:sequence>
+          <xsd:element name="extend" type="tns:ExtendForm" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+        </xsd:sequence>
         <xsd:attributeGroup ref="tns:ObjectViewAttributes" />
         <xsd:attribute name="extension" type="xsd:boolean" />
       </xsd:extension>
@@ -3226,5 +3207,115 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
+
+  <xsd:complexType name="ExtendForm">
+    <xsd:choice>
+      <xsd:element name="insert" type="tns:ExtendItemFormInsert" minOccurs="1"
+        maxOccurs="unbounded">
+      </xsd:element>
+      <xsd:element name="replace" type="tns:ExtendItemFormReplace" minOccurs="1" maxOccurs="1"></xsd:element>
+      <xsd:element name="move" type="tns:ExtendItemMove" minOccurs="1" maxOccurs="unbounded"></xsd:element>
+      <xsd:element name="attribute" type="tns:ExtendItemAttribute" minOccurs="1"
+        maxOccurs="unbounded">
+      </xsd:element>
+    </xsd:choice>
+    <xsd:attribute name="target" type="xsd:string"></xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="ExtendGrid">
+    <xsd:choice>
+      <xsd:element name="insert" type="tns:ExtendItemGridInsert" minOccurs="1"
+        maxOccurs="unbounded">
+      </xsd:element>
+      <xsd:element name="replace" type="tns:ExtendItemGridReplace" minOccurs="1" maxOccurs="1"></xsd:element>
+      <xsd:element name="move" type="tns:ExtendItemMove" minOccurs="1" maxOccurs="unbounded"></xsd:element>
+      <xsd:element name="attribute" type="tns:ExtendItemAttribute" minOccurs="1"
+        maxOccurs="unbounded">
+      </xsd:element>
+    </xsd:choice>
+    <xsd:attribute name="target" type="xsd:string"></xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="ExtendItemFormInsert">
+    <xsd:choice>
+      <xsd:group ref="tns:FormItems"/>
+      <xsd:element name="menu" type="tns:MenubarMenu" minOccurs="1" maxOccurs="unbounded" />
+    </xsd:choice>
+    <xsd:attribute name="position" type="tns:PositionType" default="inside" />
+  </xsd:complexType>
+
+  <xsd:complexType name="ExtendItemGridInsert">
+    <xsd:choice>
+      <xsd:group ref="tns:GridItems"/>
+      <xsd:element name="menu" type="tns:MenubarMenu" minOccurs="1" maxOccurs="unbounded" />
+    </xsd:choice>
+    <xsd:attribute name="position" type="tns:PositionType" default="inside" />
+  </xsd:complexType>
+
+  <xsd:complexType name="ExtendItemFormReplace">
+    <xsd:choice>
+      <xsd:group ref="tns:FormItems"/>
+      <xsd:element name="menu" type="tns:MenubarMenu" minOccurs="1" maxOccurs="unbounded" />
+    </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:complexType name="ExtendItemGridReplace">
+    <xsd:choice>
+      <xsd:group ref="tns:GridItems"/>
+      <xsd:element name="menu" type="tns:MenubarMenu" minOccurs="1" maxOccurs="unbounded" />
+    </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:complexType name="ExtendItemMove">
+    <xsd:attribute name="source" type="xsd:string" />
+    <xsd:attribute name="position" type="tns:PositionType" default="inside" />
+  </xsd:complexType>
+
+  <xsd:complexType name="ExtendItemAttribute">
+    <xsd:attribute name="name" type="xsd:string" />
+    <xsd:attribute name="value" type="xsd:string" />
+  </xsd:complexType>
+
+  <xsd:group name="GridItems">
+    <xsd:sequence>
+      <xsd:element name="help" type="tns:Help" minOccurs="0" />
+      <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0" />
+      <xsd:element name="menubar" type="tns:Menubar" minOccurs="0" />
+      <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" maxOccurs="unbounded" />
+      <xsd:choice maxOccurs="unbounded" minOccurs="0">
+        <xsd:group ref="tns:GridWidgets" />
+      </xsd:choice>
+    </xsd:sequence>
+  </xsd:group>
+
+  <xsd:group name="FormItems">
+    <xsd:sequence>
+      <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0" />
+      <xsd:element name="menubar" type="tns:Menubar" minOccurs="0" />
+      <xsd:choice minOccurs="0" maxOccurs="1">
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="help" type="tns:Help" />
+          <xsd:element name="panel" type="tns:Panel" />
+          <xsd:element name="panel-include" type="tns:FormInclude" />
+          <xsd:element name="panel-dashlet" type="tns:Dashlet" />
+          <xsd:element name="panel-related" type="tns:PanelRelated" />
+          <xsd:element name="panel-stack" type="tns:PanelTabs" />
+          <xsd:element name="panel-tabs" type="tns:PanelTabs" />
+        </xsd:choice>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:group ref="tns:FormWidgets" />
+        </xsd:choice>
+      </xsd:choice>
+      <xsd:element name="panel-mail" type="tns:PanelMail" minOccurs="0" />
+    </xsd:sequence>
+  </xsd:group>
+
+  <xsd:simpleType name="PositionType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="inside"></xsd:enumeration>
+      <xsd:enumeration value="after"></xsd:enumeration>
+      <xsd:enumeration value="before"></xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
 
 </xsd:schema>

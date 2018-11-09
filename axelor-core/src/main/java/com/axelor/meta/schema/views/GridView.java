@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("grid")
-public class GridView extends AbstractView {
+public class GridView extends AbstractView implements ExtendableView {
 
   @XmlAttribute private Boolean expandable;
 
@@ -74,6 +74,9 @@ public class GridView extends AbstractView {
     @XmlElement(name = "button", type = Button.class)
   })
   private List<AbstractWidget> items;
+
+  @XmlElement(name = "extend")
+  private List<Extend> extendItems;
 
   public Boolean getExpandable() {
     return expandable;
@@ -230,5 +233,14 @@ public class GridView extends AbstractView {
 
   public void setItems(List<AbstractWidget> items) {
     this.items = items;
+  }
+
+  @Override
+  public List<Extend> getExtends() {
+    return extendItems;
+  }
+
+  public void setExtends(List<Extend> extendItems) {
+    this.extendItems = extendItems;
   }
 }

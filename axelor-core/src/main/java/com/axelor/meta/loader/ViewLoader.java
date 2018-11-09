@@ -45,6 +45,7 @@ import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.AbstractWidget;
+import com.axelor.meta.schema.views.ExtendableView;
 import com.axelor.meta.schema.views.Field;
 import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.GridView;
@@ -183,6 +184,16 @@ public class ViewLoader extends AbstractLoader {
       }
     } else if (isVisited(view.getClass(), xmlId)) {
       return;
+    }
+
+    if (view instanceof ExtendableView) {
+      ExtendableView extendableView = (ExtendableView) view;
+
+      if (!Boolean.TRUE.equals(view.getExtension())
+          && ObjectUtils.notEmpty(extendableView.getExtends())) {
+        log.error("View with extensions must have extension=\"true\": {}({})", name, xmlId);
+        return;
+      }
     }
 
     log.debug("Loading view: {}", name);
