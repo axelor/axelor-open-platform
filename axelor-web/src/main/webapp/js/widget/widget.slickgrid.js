@@ -892,9 +892,10 @@ Grid.prototype.parse = function(view) {
 
   function adjustSize(event, force) {
     scope.ajaxStop(function () {
-      if (force || element.is(':visible')) {
-        that.adjustSize(force);
-        if (force) {
+      var forceAdjust = force || handler._isPopup;
+      if (forceAdjust || element.is(':visible')) {
+        that.adjustSize(forceAdjust);
+        if (forceAdjust) {
           setTimeout(grid.autosizeColumns, 100);
         }
       }
