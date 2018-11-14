@@ -73,6 +73,7 @@ function AboutCtrl($scope) {
   $scope.appName = axelor.config["application.name"];
   $scope.appDescription = axelor.config["application.description"];
   $scope.appVersion = axelor.config["application.version"];
+  $scope.appVersionShort = $scope.appVersion.substring(0, $scope.appVersion.lastIndexOf('.'));
   $scope.appCopyright = axelor.config["application.copyright"];
   $scope.appSdk = axelor.config["application.sdk"];
   $scope.appHome = axelor.config["application.home"];
