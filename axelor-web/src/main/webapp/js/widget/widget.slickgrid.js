@@ -265,20 +265,25 @@ var Editor = function(args) {
     element.find('.ui-spinner-input').trigger('grid:check', args.item);
     element.find('.ui-mask').trigger('grid:check');
 
-    var record = scope.record || {},
-      current = args.item || { id: 0 };
+    var record = scope.record || {};
+    var current = args.item || { id: 0 };
 
-    var v1 = record[column.field],
-      v2 = current[column.field];
+    var v1 = record[column.field];
+    var v2 = current[column.field];
 
-    return !angular.equals(v1, v2);
+    var changed = !angular.equals(v1, v2);
+    if (changed && element.scope().isRequired() && !v1) {
+      current[column.field] = v1;
+    }
+
+    return changed;
   };
 
   this.validate = function() {
     return {
       valid: !element.hasClass('ng-invalid'),
       msg: null
-        };
+    };
   };
 
   this.init();
