@@ -73,24 +73,6 @@ ui.directive('uiDialog', function() {
         buttons: buttons
       });
 
-      // maintain overlay opacity
-      var opacity = null;
-      dialog.on('dialogopen dialogclose', function(e, ui){
-        var overlay = $('body .ui-widget-overlay');
-        if (opacity === null) {
-          opacity = overlay.last().css('opacity');
-        }
-        $('body .ui-widget-overlay')
-          .css('opacity', 0).last()
-          .css('opacity', opacity);
-
-        $('body')
-          .children('.ui-dialog')
-          .removeClass('active')
-          .filter(':visible').last()
-          .addClass('active');
-      });
-
       // focus the previous visible dialog
       dialog.on('dialogclose', function(e, ui){
         var target = element.data('$target');

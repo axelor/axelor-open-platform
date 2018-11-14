@@ -130,23 +130,22 @@
         buttons: buttons
       });
 
-      // maintain overlay opacity
-      var opacity = null;
-      dialog.on('dialogopen dialogclose', function(e, ui){
-        var overlay = $('body .ui-widget-overlay');
-        if (opacity === null) {
-          opacity = overlay.last().css('opacity');
-        }
-        $('body .ui-widget-overlay')
-          .css('opacity', 0).last()
-          .css('opacity', opacity);
-      });
-
       dialog.dialog('open');
 
       return dialog;
     }
   };
+
+  // patch ui.dialog to maintain overlay opacity
+  ['open', 'close', 'moveToTop'].forEach(function (name) {
+    var func = $.ui.dialog.prototype[name];
+    $.ui.dialog.prototype[name] = function () {
+      func.apply(this, arguments);
+      var all = $('body > .ui-widget-overlay').css('opacity', 0);
+      var last = name === 'close' ? all.last() : $(this.overlay.$el);
+      last.css('opacity', 0.3);
+    };
+  });
 
   var elemNotifyStack = null;
   var elemNotifyText = '<div class="alert alert-block fade in">'+
