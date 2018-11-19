@@ -1342,6 +1342,7 @@ Grid.prototype.adjustSize = function(force) {
   }
   this.adjustToScreen();
   this.grid.resizeCanvas();
+  this.zIndexFix();
 };
 
 Grid.prototype.adjustToScreen = function() {
