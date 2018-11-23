@@ -233,7 +233,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
     }
     if (item && item.id > 0) {
       ds.copy(item.id).success(doSelect);
-    } else {
+    } else if (item) {
       item = angular.copy(item);
       item.id = undefined;
       item.$id = undefined;
