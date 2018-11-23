@@ -307,7 +307,10 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
       } catch (e) {
         console.error('FAILED:', condition, e);
       }
-      scope.attr(attr, negative ? !value : value);
+      // defer attr change to allow field init, see RM-14998
+      scope.$applyAsync(function () {
+        scope.attr(attr, negative ? !value : value);
+      });
     }
   }
 
