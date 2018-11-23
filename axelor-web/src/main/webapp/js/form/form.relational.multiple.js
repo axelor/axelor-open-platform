@@ -218,20 +218,26 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
     if (!$scope.canNew()) return false;
     if (!$scope.selection || $scope.selection.length !== 1) return false;
     var record = $scope.dataView.getItem(_.first($scope.selection));
-    return record && record.id > -1;
+    return !!record;
   };
 
   $scope.onCopy = function() {
     var ds = $scope._dataSource;
     var index = _.first($scope.selection);
     var item = $scope.dataView.getItem(index);
+    var doSelect = function (record) {
+      $scope.select([record]);
+      $scope.$timeout(function () {
+        $scope.dataView.$setSelection([$scope.dataView.getLength() - 1], true);
+      }, 100);
+    }
     if (item && item.id > 0) {
-      ds.copy(item.id).success(function(record) {
-        $scope.select([record]);
-        $scope.$timeout(function () {
-          $scope.dataView.$setSelection([$scope.dataView.getLength() - 1], true);
-        }, 100);
-      });
+      ds.copy(item.id).success(doSelect);
+    } else {
+      item = angular.copy(item);
+      item.id = undefined;
+      item.$id = undefined;
+      doSelect(item);
     }
   };
 
