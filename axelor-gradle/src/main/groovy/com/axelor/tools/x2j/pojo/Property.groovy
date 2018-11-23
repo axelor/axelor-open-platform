@@ -565,7 +565,13 @@ class Property {
 		def scale = attrs['scale']
 
 		if (precision == null && scale == null)
-			return null
+          return null
+        
+        if (precision == null)
+          throw new IllegalArgumentException("invalid use of 'scale' without 'precision'");
+
+        if (scale == null)
+          throw new IllegalArgumentException("invalid use of 'precision' without 'scale'");
 
 		precision = precision as Integer
 		scale = scale as Integer

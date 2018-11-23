@@ -43,7 +43,6 @@ public class X2JTest {
 
     gen.addLookupSource(lookup);
 
-    gen.clean();
     gen.start();
   }
 }
