@@ -95,6 +95,8 @@ public class Field extends SimpleWidget {
 
   @XmlAttribute private Boolean massUpdate;
 
+  @XmlAttribute private Boolean sortable;
+
   @XmlAttribute(name = "edit-window")
   private String editWindow;
 
@@ -363,6 +365,14 @@ public class Field extends SimpleWidget {
 
   public void setMassUpdate(Boolean massUpdate) {
     this.massUpdate = massUpdate;
+  }
+
+  public Boolean getSortable() {
+    return sortable;
+  }
+
+  public void setSortable(Boolean sortable) {
+    this.sortable = sortable;
   }
 
   public String getBind() {

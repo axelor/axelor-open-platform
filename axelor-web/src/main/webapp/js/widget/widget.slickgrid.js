@@ -681,7 +681,7 @@ Grid.prototype.parse = function(view) {
       allColsHasWidth = false;
     }
 
-    var sortable = true;
+    var sortable = field.sortable !== false;
     switch (field.type) {
     case 'field': // dummy field
     case 'icon':
@@ -690,8 +690,6 @@ Grid.prototype.parse = function(view) {
     case 'many-to-many':
       sortable = false;
       break;
-    default:
-      sortable = true;
     }
 
     if (field.transient || field.json || field.encrypted) {
