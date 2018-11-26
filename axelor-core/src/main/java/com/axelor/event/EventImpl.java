@@ -37,6 +37,10 @@ class EventImpl<T> implements Event<T> {
     this.eventBus = eventBus;
   }
 
+  public Type getEventType() {
+    return eventType;
+  }
+
   public void setEventType(Type eventType) {
     this.eventType = eventType;
   }

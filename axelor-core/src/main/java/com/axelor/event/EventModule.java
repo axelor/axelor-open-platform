@@ -18,17 +18,23 @@
 package com.axelor.event;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.ConfigurationException;
+import com.google.inject.Key;
 import com.google.inject.MembersInjector;
 import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.Matchers;
+import com.google.inject.spi.Dependency;
 import com.google.inject.spi.InjectionPoint;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
+import javax.inject.Inject;
 import javax.inject.Qualifier;
 
 public class EventModule extends AbstractModule {
@@ -49,22 +55,36 @@ public class EventModule extends AbstractModule {
         });
   }
 
-  private static Set<InjectionPoint> findInjectionPoints(TypeLiteral<?> type) {
-    return InjectionPoint.forInstanceMethodsAndFields(type)
+  private static boolean checkDependencies(InjectionPoint injectionPoint) {
+    return injectionPoint
+        .getDependencies()
         .stream()
-        .filter(ip -> ip.getMember() instanceof Field)
-        .filter(
-            ip ->
-                ip.getDependencies()
-                    .stream()
-                    .map(d -> d.getKey())
-                    .map(k -> k.getTypeLiteral())
-                    .map(t -> t.getRawType())
-                    .anyMatch(t -> t == Event.class))
-        .collect(Collectors.toSet());
+        .map(Dependency::getKey)
+        .map(Key::getTypeLiteral)
+        .map(TypeLiteral::getRawType)
+        .anyMatch(t -> t == Event.class);
   }
 
-  static class EventTypeInjector<T> implements MembersInjector<T> {
+  private static Set<InjectionPoint> findInjectionPoints(TypeLiteral<?> type) {
+    Set<InjectionPoint> injectionPoints = new HashSet<>();
+    InjectionPoint.forInstanceMethodsAndFields(type)
+        .stream()
+        .filter(ip -> ip.getMember() instanceof Field && checkDependencies(ip))
+        .forEach(injectionPoints::add);
+
+    try {
+      InjectionPoint constructorInjectionPoint = InjectionPoint.forConstructorOf(type);
+      if (checkDependencies(constructorInjectionPoint)) {
+        injectionPoints.add(constructorInjectionPoint);
+      }
+    } catch (ConfigurationException e) {
+      // ignore
+    }
+
+    return injectionPoints;
+  }
+
+  private static class EventTypeInjector<T> implements MembersInjector<T> {
 
     private Set<InjectionPoint> injectionPoints;
 
@@ -77,8 +97,7 @@ public class EventModule extends AbstractModule {
       injectionPoints.forEach(ip -> injectMembers(instance, ip));
     }
 
-    private void injectMembers(T instance, InjectionPoint ip) {
-      Field field = (Field) ip.getMember();
+    private void injectMembers(T instance, Field field) {
       field.setAccessible(true);
       EventImpl<?> event;
 
@@ -95,6 +114,19 @@ public class EventModule extends AbstractModule {
         if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
           event.addQualifier(annotation);
         }
+      }
+    }
+
+    private void injectMembers(T instance, InjectionPoint ip) {
+      if (ip.getMember() instanceof Field) {
+        injectMembers(instance, (Field) ip.getMember());
+      } else if (ip.getMember() instanceof Constructor) {
+        Arrays.stream(instance.getClass().getDeclaredFields())
+            .filter(field -> field.getAnnotation(Inject.class) == null)
+            .filter(field -> field.getType() == Event.class)
+            .forEach(field -> injectMembers(instance, field));
+      } else {
+        throw new IllegalArgumentException("Unexpected injection point member type");
       }
     }
   }

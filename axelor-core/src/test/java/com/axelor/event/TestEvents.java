@@ -79,11 +79,16 @@ public class TestEvents {
     result.add("SaveEvent<Invoice> before after");
   }
 
-  @Inject private Event<SaveEvent<Contact>> contactEvent;
+  private Event<SaveEvent<Contact>> contactEvent;
   @Inject private Event<SaveEvent<Invoice>> invoiceEvent;
 
   @Inject private Event<SaveEvent<? extends Model>> modelEvent;
   @Inject private Event<SaveEvent<?>> anyEvent;
+
+  @Inject
+  public TestEvents(Event<SaveEvent<Contact>> contactEvent) {
+    this.contactEvent = contactEvent;
+  }
 
   @Test
   public void test() {
