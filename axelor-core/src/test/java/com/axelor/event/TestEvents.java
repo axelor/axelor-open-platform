@@ -75,6 +75,10 @@ public class TestEvents {
     result.add("SaveEvent<Invoice> after");
   }
 
+  public void onSaveInvoiceBeforeAndAfter(@Observes @After @Before SaveEvent<Invoice> event) {
+    result.add("SaveEvent<Invoice> before after");
+  }
+
   @Inject private Event<SaveEvent<Contact>> contactEvent;
   @Inject private Event<SaveEvent<Invoice>> invoiceEvent;
 
@@ -110,5 +114,13 @@ public class TestEvents {
         "SaveEvent<? extends Model>",
         "SaveEvent<Invoice>",
         "SaveEvent<Invoice> after");
+
+    invoiceEvent.select(new BeforeImpl(), new AfterImpl()).fire(new SaveEvent<>(invoice));
+    assertResult(
+        "SaveEvent<?>",
+        "SaveEvent<? extends Model>",
+        "SaveEvent<Invoice>",
+        "SaveEvent<Invoice> after",
+        "SaveEvent<Invoice> before after");
   }
 }

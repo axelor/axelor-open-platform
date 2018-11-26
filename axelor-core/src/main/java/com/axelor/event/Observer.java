@@ -75,10 +75,8 @@ class Observer implements Comparable<Observer> {
   private boolean isUnbounded(Type type) {
     if (type instanceof ParameterizedType) {
       for (Type t : ((ParameterizedType) type).getActualTypeArguments()) {
-        if (t instanceof WildcardType) {
-          if (t.getTypeName().equals("?")) {
-            return true;
-          }
+        if (t instanceof WildcardType && t.getTypeName().equals("?")) {
+          return true;
         }
       }
     }
@@ -90,7 +88,7 @@ class Observer implements Comparable<Observer> {
     // always match observers with no qualifiers
     if (this.qualifiers.isEmpty()) return true;
     if (qualifiers.isEmpty()) return false;
-    return qualifiers.stream().allMatch(o -> this.qualifiers.stream().anyMatch(x -> o.equals(x)));
+    return this.qualifiers.stream().allMatch(o -> qualifiers.stream().anyMatch(o::equals));
   }
 
   public static boolean isObserver(Method method) {
@@ -124,11 +122,10 @@ class Observer implements Comparable<Observer> {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null || !(obj instanceof Observer)) return false;
+    if (!(obj instanceof Observer)) return false;
     if (this == obj) return true;
     final Observer other = (Observer) obj;
-    if (!Objects.equals(method, other.method)) return false;
-    return true;
+    return Objects.equals(method, other.method);
   }
 
   @Override
