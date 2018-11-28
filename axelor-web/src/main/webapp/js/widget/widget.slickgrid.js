@@ -681,7 +681,10 @@ Grid.prototype.parse = function(view) {
       allColsHasWidth = false;
     }
 
-    var sortable = field.sortable !== false;
+    var sortable = view.sortable !== undefined && field.sortable === undefined
+      ? view.sortable !== false
+      : field.sortable !== false;
+
     switch (field.type) {
     case 'field': // dummy field
     case 'icon':

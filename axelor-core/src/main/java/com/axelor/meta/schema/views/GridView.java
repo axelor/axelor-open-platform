@@ -30,6 +30,8 @@ public class GridView extends AbstractView {
 
   @XmlAttribute private Boolean expandable;
 
+  @XmlAttribute private Boolean sortable;
+
   @XmlAttribute private String orderBy;
 
   @XmlAttribute private String groupBy;
@@ -79,6 +81,14 @@ public class GridView extends AbstractView {
 
   public void setExpandable(Boolean expandable) {
     this.expandable = expandable;
+  }
+
+  public Boolean getSortable() {
+    return sortable;
+  }
+
+  public void setSortable(Boolean sortable) {
+    this.sortable = sortable;
   }
 
   public String getOrderBy() {
