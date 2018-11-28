@@ -20,8 +20,6 @@ package com.axelor.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -36,18 +34,6 @@ import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 
 public class AuthFilter extends FormAuthenticationFilter {
-
-  @Inject
-  @Named("app.loginUrl")
-  private String loginUrl;
-
-  @Override
-  public String getLoginUrl() {
-    if (loginUrl != null) {
-      return loginUrl;
-    }
-    return super.getLoginUrl();
-  }
 
   private boolean isRootWithoutSlash(ServletRequest request) {
     final HttpServletRequest req = (HttpServletRequest) request;

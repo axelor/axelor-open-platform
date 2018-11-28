@@ -19,6 +19,7 @@ package com.axelor.auth;
 
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
+import com.axelor.inject.Beans;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -46,13 +47,14 @@ public class AuthRealm extends AuthorizingRealm {
       Object plain = getSubmittedPassword(token);
       Object saved = getStoredPassword(info);
       AuthService service = AuthService.getInstance();
+      AuthLdap ldap = Beans.get(AuthLdap.class);
 
       if (plain instanceof char[]) {
         plain = new String((char[]) plain);
       }
 
       try {
-        return service.ldapLogin((String) token.getPrincipal(), (String) plain);
+        return ldap.login((String) token.getPrincipal(), (String) plain);
       } catch (IllegalStateException e) {
       } catch (AuthenticationException e) {
         log.error("Password authentication failed for user: {}", token.getPrincipal());
@@ -82,10 +84,11 @@ public class AuthRealm extends AuthorizingRealm {
     final String code = ((UsernamePasswordToken) token).getUsername();
     final String passwd = new String(((UsernamePasswordToken) token).getPassword());
 
-    final AuthService service = AuthService.getInstance();
-    if (service.ldapEnabled()) {
+    final AuthLdap ldap = Beans.get(AuthLdap.class);
+
+    if (ldap.isEnabled()) {
       try {
-        service.ldapLogin(code, passwd);
+        ldap.login(code, passwd);
       } catch (IllegalStateException e) {
       } catch (AuthenticationException e) {
         log.error("LDAP authentication failed for user: {}", code);

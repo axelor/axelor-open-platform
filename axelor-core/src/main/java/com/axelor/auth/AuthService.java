@@ -20,14 +20,13 @@ package com.axelor.auth;
 import com.axelor.auth.db.User;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.inject.Beans;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import java.util.Map;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
-import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.credential.DefaultPasswordService;
 import org.apache.shiro.crypto.hash.DefaultHashService;
 import org.apache.shiro.crypto.hash.format.ParsableHashFormat;
@@ -43,31 +42,22 @@ import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 @Singleton
 public class AuthService {
 
+  private final String HASH_ALGORITHM = "SHA-512";
+  private final int HASH_ITERATIONS = 500000;
+
   private final DefaultPasswordService passwordService = new DefaultPasswordService();
 
   private final DefaultHashService hashService = new DefaultHashService();
 
   private final ParsableHashFormat hashFormat = new Shiro1CryptFormat();
 
-  public static AuthService instance;
-
   @Inject
-  public AuthService(
-      @Named("auth.hash.algorithm") String hashAlgorihm,
-      @Named("auth.hash.iterations") int hashIterations) {
-    super();
-
-    this.hashService.setHashAlgorithmName(hashAlgorihm);
-    this.hashService.setHashIterations(hashIterations);
+  public AuthService() {
+    this.hashService.setHashAlgorithmName(HASH_ALGORITHM);
+    this.hashService.setHashIterations(HASH_ITERATIONS);
     this.hashService.setGeneratePublicSalt(true);
-
     this.passwordService.setHashService(hashService);
     this.passwordService.setHashFormat(hashFormat);
-
-    if (instance != null) {
-      throw new RuntimeException("AuthService initialized twice.");
-    }
-    instance = this;
   }
 
   /**
@@ -77,34 +67,12 @@ public class AuthService {
    * @return the {@link AuthService} instance
    */
   public static AuthService getInstance() {
-    if (instance == null) {
+    try {
+      return Beans.get(AuthService.class);
+    } catch (Exception e) {
       throw new IllegalStateException(
           "AuthService is not initialized, did you forget to bind the AuthService?");
     }
-    return instance;
-  }
-
-  @Inject private AuthLdap authLdap;
-
-  /**
-   * Perform LDAP authentication.
-   *
-   * <p>The user/group objects are created in the database when user logins first time via ldap
-   * server. The user object created has a random password generated so the user can not logged in
-   * against the local database object as password is unknown.
-   *
-   * @param subject the user login name
-   * @param password the user submitted password
-   * @throws IllegalStateException if ldap is not enabled
-   * @throws AuthenticationException if ldap authentication failed
-   * @return true if login success else false
-   */
-  boolean ldapLogin(String subject, String password) throws AuthenticationException {
-    return authLdap.login(subject, password);
-  }
-
-  boolean ldapEnabled() {
-    return authLdap.isEnabled();
   }
 
   /**

@@ -49,10 +49,6 @@ public class AuthModule extends AbstractModule {
 
   @Override
   protected final void configure() {
-
-    this.bindConstant().annotatedWith(Names.named("app.loginUrl")).to("/login.jsp");
-    this.bindConstant().annotatedWith(Names.named("auth.hash.algorithm")).to("SHA-512");
-    this.bindConstant().annotatedWith(Names.named("auth.hash.iterations")).to(500000);
     this.bind(Properties.class)
         .annotatedWith(Names.named("auth.ldap.config"))
         .toInstance(properties);
