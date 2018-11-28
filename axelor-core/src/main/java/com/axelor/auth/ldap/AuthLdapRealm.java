@@ -15,27 +15,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.auth;
+package com.axelor.auth.ldap;
 
-import com.axelor.auth.db.Group;
-import com.axelor.auth.db.User;
+import com.axelor.auth.AuthRealm;
+import com.axelor.inject.Beans;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.PasswordMatcher;
-import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.realm.AuthorizingRealm;
-import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AuthRealm extends AuthorizingRealm {
+public class AuthLdapRealm extends AuthRealm {
 
-  private static Logger log = LoggerFactory.getLogger(AuthRealm.class);
+  private static Logger log = LoggerFactory.getLogger(AuthLdapRealm.class);
 
   public static class AuthMatcher extends PasswordMatcher {
 
@@ -43,19 +38,18 @@ public class AuthRealm extends AuthorizingRealm {
     public boolean doCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) {
 
       Object plain = getSubmittedPassword(token);
-      Object saved = getStoredPassword(info);
-      AuthService service = AuthService.getInstance();
+      AuthLdapService service = Beans.get(AuthLdapService.class);
 
       if (plain instanceof char[]) {
         plain = new String((char[]) plain);
       }
 
-      if (service.match((String) plain, (String) saved) || super.doCredentialsMatch(token, info)) {
-        return true;
+      try {
+        return service.login((String) token.getPrincipal(), (String) plain);
+      } catch (Exception e) {
+        log.error("Authentication failed for user: {}", token.getPrincipal());
+        return false;
       }
-
-      log.error("Password authentication failed for user: {}", token.getPrincipal());
-      return false;
     }
   }
 
@@ -71,30 +65,16 @@ public class AuthRealm extends AuthorizingRealm {
       throws AuthenticationException {
 
     final String code = ((UsernamePasswordToken) token).getUsername();
-    final User user = AuthUtils.getUser(code);
-    if (user == null || !AuthUtils.isActive(user)) {
-      return null;
+    final String passwd = new String(((UsernamePasswordToken) token).getPassword());
+    final AuthLdapService service = Beans.get(AuthLdapService.class);
+
+    try {
+      service.login(code, passwd);
+    } catch (IllegalStateException e) {
+    } catch (AuthenticationException e) {
+      log.error("LDAP authentication failed for user: {}", code);
     }
 
-    return new SimpleAuthenticationInfo(code, user.getPassword(), getName());
-  }
-
-  @Override
-  protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-
-    final String code = (String) principals.fromRealm(getName()).iterator().next();
-    final User user = AuthUtils.getUser(code);
-
-    if (user == null) {
-      return null;
-    }
-
-    final SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-    final Group group = user.getGroup();
-    if (group != null) {
-      info.addRole(group.getCode());
-    }
-
-    return info;
+    return super.doGetAuthenticationInfo(token);
   }
 }

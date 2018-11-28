@@ -22,6 +22,7 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.auth.ldap.AuthLdapService;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.persist.Transactional;
@@ -61,19 +62,19 @@ public class LdapTest extends AbstractLdapTestUnit {
 
       Properties properties = new Properties();
 
-      properties.put(AuthLdap.LDAP_SERVER_URL, "ldap://localhost:" + ldapServer.getPort());
-      properties.put(AuthLdap.LDAP_SYSTEM_USER, "uid=admin,ou=system");
-      properties.put(AuthLdap.LDAP_SYSTEM_PASSWORD, "secret");
+      properties.put(AuthLdapService.LDAP_SERVER_URL, "ldap://localhost:" + ldapServer.getPort());
+      properties.put(AuthLdapService.LDAP_SYSTEM_USER, "uid=admin,ou=system");
+      properties.put(AuthLdapService.LDAP_SYSTEM_PASSWORD, "secret");
 
-      properties.put(AuthLdap.LDAP_GROUP_BASE, "ou=groups,dc=test,dc=com");
-      properties.put(AuthLdap.LDAP_USER_BASE, "ou=users,dc=test,dc=com");
-      properties.put(AuthLdap.LDAP_GROUP_OBJECT_CLASS, "groupOfUniqueNames");
+      properties.put(AuthLdapService.LDAP_GROUP_BASE, "ou=groups,dc=test,dc=com");
+      properties.put(AuthLdapService.LDAP_USER_BASE, "ou=users,dc=test,dc=com");
+      properties.put(AuthLdapService.LDAP_GROUP_OBJECT_CLASS, "groupOfUniqueNames");
 
-      properties.put(AuthLdap.LDAP_GROUP_FILTER, "(uniqueMember=uid={0})");
-      properties.put(AuthLdap.LDAP_USER_FILTER, "(uid={0})");
+      properties.put(AuthLdapService.LDAP_GROUP_FILTER, "(uniqueMember=uid={0})");
+      properties.put(AuthLdapService.LDAP_USER_FILTER, "(uid={0})");
 
-      AuthLdap ldap = new AuthLdap(properties);
-      bind(AuthLdap.class).toInstance(ldap);
+      AuthLdapService ldap = new AuthLdapService(properties);
+      bind(AuthLdapService.class).toInstance(ldap);
 
       super.configure();
     }
@@ -82,7 +83,7 @@ public class LdapTest extends AbstractLdapTestUnit {
   @Transactional
   public static class LdapTestRunner {
 
-    @Inject private AuthLdap authLdap;
+    @Inject private AuthLdapService authLdap;
 
     @Inject private UserRepository users;
 

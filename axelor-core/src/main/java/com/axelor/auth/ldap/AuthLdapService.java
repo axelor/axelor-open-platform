@@ -15,9 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.auth;
+package com.axelor.auth.ldap;
 
 import com.axelor.app.AppSettings;
+import com.axelor.auth.AuthService;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
@@ -49,7 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public class AuthLdap {
+public class AuthLdapService {
 
   private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -95,11 +96,11 @@ public class AuthLdap {
   @Inject private GroupRepository groups;
 
   @Inject
-  public AuthLdap() {
+  public AuthLdapService() {
     this(AppSettings.get().getProperties());
   }
 
-  public AuthLdap(Properties properties) {
+  public AuthLdapService(Properties properties) {
     ldapServerUrl = properties.getProperty(LDAP_SERVER_URL);
     ldapAuthType = properties.getProperty(LDAP_AUTH_TYPE, DEFAULT_AUTH_TYPE);
     ldapSysUser = properties.getProperty(LDAP_SYSTEM_USER);
