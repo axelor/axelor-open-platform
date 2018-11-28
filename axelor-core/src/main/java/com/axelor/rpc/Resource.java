@@ -1001,6 +1001,19 @@ public class Resource<T extends Model> {
     return response;
   }
 
+  private void fixLinks(Object bean) {
+    if (bean == null) return;
+    final Mapper mapper = Mapper.of(EntityHelper.getEntityClass(bean));
+    for (Property prop : mapper.getProperties()) {
+      if (prop.getType() == PropertyType.ONE_TO_MANY && prop.get(bean) != null) {
+        for (Object item : (Collection<?>) prop.get(bean)) {
+          prop.setAssociation(item, null);
+          fixLinks(item);
+        }
+      }
+    }
+  }
+
   @SuppressWarnings("all")
   public Response copy(long id) {
     security.get().check(JpaSecurity.CAN_CREATE, model, id);
@@ -1013,6 +1026,9 @@ public class Resource<T extends Model> {
     } else {
       bean = repository.copy(bean, true);
     }
+
+    // break bi-directional links
+    fixLinks(bean);
 
     response.setData(ImmutableList.of(bean));
     response.setStatus(Response.STATUS_SUCCESS);

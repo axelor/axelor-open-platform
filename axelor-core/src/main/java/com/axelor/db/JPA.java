@@ -587,12 +587,7 @@ public final class JPA {
         value = ((String) value) + " Copy (" + random + ")";
       }
 
-      if (p.getType() == PropertyType.ONE_TO_MANY) {
-        // prevent auto bi-directional association
-        mapper.set(obj, p.getName(), value);
-      } else {
-        p.set(obj, value);
-      }
+      p.set(obj, value);
     }
 
     return obj;
