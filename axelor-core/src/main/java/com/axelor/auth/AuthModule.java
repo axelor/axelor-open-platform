@@ -22,8 +22,6 @@ import com.axelor.db.JpaSecurity;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import com.google.inject.name.Names;
-import java.util.Properties;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import org.apache.shiro.SecurityUtils;
@@ -31,8 +29,6 @@ import org.apache.shiro.guice.ShiroModule;
 import org.apache.shiro.mgt.SecurityManager;
 
 public class AuthModule extends AbstractModule {
-
-  private Properties properties = new Properties();
 
   private ServletContext context;
 
@@ -42,18 +38,11 @@ public class AuthModule extends AbstractModule {
     this.context = context;
   }
 
-  public AuthModule properties(Properties properties) {
-    this.properties = properties;
-    return this;
-  }
-
   @Override
   protected final void configure() {
-    this.bind(Properties.class)
-        .annotatedWith(Names.named("auth.ldap.config"))
-        .toInstance(properties);
 
-    this.bind(JpaSecurity.class).toProvider(AuthSecurity.class);
+    // bind security service
+    bind(JpaSecurity.class).toProvider(AuthSecurity.class);
 
     // non-web environment (cli or unit tests)
     if (context == null) {

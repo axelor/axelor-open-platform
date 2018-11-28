@@ -32,7 +32,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import java.util.List;
-import java.util.Properties;
 
 public class AppCli {
 
@@ -88,8 +87,6 @@ public class AppCli {
 
   static class MyModule extends AbstractModule {
 
-    protected Properties properties = new Properties();
-
     private String jpaUnit;
 
     public MyModule(String jpaUnit) {
@@ -101,8 +98,8 @@ public class AppCli {
 
       bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
 
-      install(new JpaModule(jpaUnit).properties(properties));
-      install(new AuthModule().properties(properties));
+      install(new JpaModule(jpaUnit));
+      install(new AuthModule());
       install(new AppModule());
     }
   }

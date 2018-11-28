@@ -58,8 +58,6 @@ public class JpaModule extends AbstractModule {
   private boolean autoscan;
   private boolean autostart;
 
-  private Properties properties;
-
   static {
     JpaScanner.exclude("com.axelor.test.db");
     JpaScanner.exclude("com.axelor.web.db");
@@ -98,18 +96,6 @@ public class JpaModule extends AbstractModule {
     return this;
   }
 
-  /**
-   * Configures the JPA persistence provider with a set of properties.
-   *
-   * @param properties A set of name value pairs that configure a JPA persistence provider as per
-   *     the specification.
-   * @return this instance itself
-   */
-  public JpaModule properties(final Properties properties) {
-    this.properties = properties;
-    return this;
-  }
-
   @Override
   protected void configure() {
     log.debug("Configuring database...");
@@ -117,9 +103,6 @@ public class JpaModule extends AbstractModule {
     final AppSettings settings = AppSettings.get();
     final Properties properties = new Properties();
 
-    if (this.properties != null) {
-      properties.putAll(this.properties);
-    }
     if (this.autoscan) {
       properties.put(Environment.SCANNER, JpaScanner.class.getName());
     }

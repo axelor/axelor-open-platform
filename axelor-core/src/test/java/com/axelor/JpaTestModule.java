@@ -23,11 +23,8 @@ import com.axelor.db.JpaModule;
 import com.axelor.rpc.ObjectMapperProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
-import java.util.Properties;
 
 public class JpaTestModule extends AbstractModule {
-
-  protected Properties properties = new Properties();
 
   @Override
   protected void configure() {
@@ -39,9 +36,8 @@ public class JpaTestModule extends AbstractModule {
             .scan("com.axelor.auth.db")
             .scan("com.axelor.meta.db")
             .scan("com.axelor.dms.db")
-            .scan("com.axelor.test.db")
-            .properties(properties));
-    install(new AuthModule().properties(properties));
+            .scan("com.axelor.test.db"));
+    install(new AuthModule());
     install(new AppModule());
   }
 }

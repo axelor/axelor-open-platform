@@ -63,9 +63,7 @@ public class AppServletModule extends ServletModule {
   }
 
   protected List<? extends Module> getModules() {
-    final AppSettings settings = AppSettings.get();
-    final AuthModule authModule =
-        new AuthModule(getServletContext()).properties(settings.getProperties());
+    final AuthModule authModule = new AuthModule(getServletContext());
     final AppModule appModule = new AppModule();
     final SchedulerModule schedulerModule = new SchedulerModule();
     return Arrays.asList(authModule, appModule, schedulerModule);

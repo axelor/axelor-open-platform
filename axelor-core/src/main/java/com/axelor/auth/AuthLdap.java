@@ -17,6 +17,7 @@
  */
 package com.axelor.auth;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
@@ -31,7 +32,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -88,14 +88,18 @@ public class AuthLdap {
 
   private JndiLdapContextFactory factory = new JndiLdapContextFactory();
 
-  private AuthService authService;
+  @Inject private AuthService authService;
 
   @Inject private UserRepository users;
 
   @Inject private GroupRepository groups;
 
   @Inject
-  public AuthLdap(@Named("auth.ldap.config") Properties properties, AuthService authService) {
+  public AuthLdap() {
+    this(AppSettings.get().getProperties());
+  }
+
+  public AuthLdap(Properties properties) {
     ldapServerUrl = properties.getProperty(LDAP_SERVER_URL);
     ldapAuthType = properties.getProperty(LDAP_AUTH_TYPE, DEFAULT_AUTH_TYPE);
     ldapSysUser = properties.getProperty(LDAP_SYSTEM_USER);
@@ -110,8 +114,6 @@ public class AuthLdap {
     factory.setSystemUsername(ldapSysUser);
     factory.setSystemPassword(ldapSysPassword);
     factory.setAuthenticationMechanism(ldapAuthType);
-
-    this.authService = authService;
   }
 
   public boolean isEnabled() {
