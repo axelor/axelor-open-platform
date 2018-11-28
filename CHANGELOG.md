@@ -1,6 +1,19 @@
-## 5.0.9 (current)
+## 5.0.9 (2018-11-28)
 
-TBD
+#### Bugs
+
+* Fix record copy api
+* Fix `requiredIf` is not applied if used with `showIf`
+* Fix filter input focus issue in grid dashlet
+* Fix required field clear issue in editable grid
+* Fix dialog overlay opacity
+* Fix column sizing issue in popup
+
+#### Enhancements
+
+* Allow duplicating unsaved row in o2m/m2m
+* Support for `sortable` attribute on grid view
+* Support for `sortable` attribute on grid view fields
 
 ## 5.0.8 (2018-11-06)
 
