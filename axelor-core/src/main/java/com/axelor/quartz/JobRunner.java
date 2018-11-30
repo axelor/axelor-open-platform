@@ -18,7 +18,7 @@
 package com.axelor.quartz;
 
 import com.axelor.app.AppSettings;
-import com.axelor.db.Query;
+import com.axelor.db.JPA;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.db.MetaSchedule;
 import com.axelor.meta.db.MetaScheduleParam;
@@ -47,6 +47,8 @@ public class JobRunner {
 
   private static Logger log = LoggerFactory.getLogger(JobRunner.class);
   private static final String CONFIG_QUARTZ_ENABLE = "quartz.enable";
+  private static final String META_SCHEDULE_QUERY =
+      "SELECT DISTINCT self FROM MetaSchedule self LEFT JOIN FETCH self.params";
 
   private Scheduler scheduler;
 
@@ -67,9 +69,13 @@ public class JobRunner {
     }
     total = 0;
     log.info("Configuring scheduled jobs...");
-    for (MetaSchedule meta : Query.of(MetaSchedule.class).fetch()) {
-      configure(meta);
-    }
+
+    JPA.em()
+        .createQuery(META_SCHEDULE_QUERY, MetaSchedule.class)
+        .getResultList()
+        .stream()
+        .forEach(this::configure);
+
     log.info("Configured total jobs: {}", total);
   }
 
