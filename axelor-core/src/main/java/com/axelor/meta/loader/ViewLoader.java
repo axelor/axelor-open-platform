@@ -453,6 +453,12 @@ public class ViewLoader extends AbstractLoader {
       pending.setAction(entity);
       pending = menus.save(pending);
     }
+
+    for (MetaActionMenu pending : this.resolve(MetaActionMenu.class, entity.getName())) {
+      log.debug("Resolved action menu: {}", pending.getName());
+      pending.setAction(entity);
+      pending = actionMenus.save(pending);
+    }
   }
 
   private void importMenu(MenuItem menuItem, Module module, boolean update) {
