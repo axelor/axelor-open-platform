@@ -17,11 +17,45 @@
  */
 package com.axelor.auth.cas;
 
+import com.axelor.auth.AuthUtils;
+import com.axelor.event.Event;
+import com.axelor.events.PostLogin;
+import com.axelor.events.PreLogin;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.cas.CasFilter;
+import org.apache.shiro.subject.Subject;
 
 public class AuthCasFilter extends CasFilter {
+
+  @Inject private Event<PreLogin> preLogin;
+  @Inject private Event<PostLogin> postLogin;
+
+  @Override
+  protected boolean executeLogin(ServletRequest request, ServletResponse response)
+      throws Exception {
+    AuthenticationToken token = createToken(request, response);
+    if (token == null) {
+      String msg =
+          "createToken method implementation returned null. A valid non-null AuthenticationToken "
+              + "must be created in order to execute a login attempt.";
+      throw new IllegalStateException(msg);
+    }
+    try {
+      preLogin.fire(new PreLogin(token));
+      Subject subject = getSubject(request, response);
+      subject.login(token);
+      postLogin.fire(new PostLogin(token, AuthUtils.getUser(), null));
+      return onLoginSuccess(token, subject, request, response);
+    } catch (AuthenticationException e) {
+      postLogin.fire(new PostLogin(token, null, e));
+      return onLoginFailure(token, e, request, response);
+    }
+  }
 
   @Inject
   @Override

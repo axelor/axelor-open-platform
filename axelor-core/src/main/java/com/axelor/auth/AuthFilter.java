@@ -17,9 +17,13 @@
  */
 package com.axelor.auth;
 
+import com.axelor.event.Event;
+import com.axelor.events.PostLogin;
+import com.axelor.events.PreLogin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Map;
+import javax.inject.Inject;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -34,6 +38,31 @@ import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 
 public class AuthFilter extends FormAuthenticationFilter {
+
+  @Inject private Event<PreLogin> preLogin;
+  @Inject private Event<PostLogin> postLogin;
+
+  @Override
+  protected boolean executeLogin(ServletRequest request, ServletResponse response)
+      throws Exception {
+    AuthenticationToken token = createToken(request, response);
+    if (token == null) {
+      String msg =
+          "createToken method implementation returned null. A valid non-null AuthenticationToken "
+              + "must be created in order to execute a login attempt.";
+      throw new IllegalStateException(msg);
+    }
+    try {
+      preLogin.fire(new PreLogin(token));
+      Subject subject = getSubject(request, response);
+      subject.login(token);
+      postLogin.fire(new PostLogin(token, AuthUtils.getUser(), null));
+      return onLoginSuccess(token, subject, request, response);
+    } catch (AuthenticationException e) {
+      postLogin.fire(new PostLogin(token, null, e));
+      return onLoginFailure(token, e, request, response);
+    }
+  }
 
   private boolean isRootWithoutSlash(ServletRequest request) {
     final HttpServletRequest req = (HttpServletRequest) request;
@@ -112,8 +141,11 @@ public class AuthFilter extends FormAuthenticationFilter {
     final Subject subject = getSubject(request, response);
 
     try {
+      preLogin.fire(new PreLogin(token));
       subject.login(token);
+      postLogin.fire(new PostLogin(token, AuthUtils.getUser(), null));
     } catch (AuthenticationException e) {
+      postLogin.fire(new PostLogin(token, null, e));
       return false;
     }
 
