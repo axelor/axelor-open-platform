@@ -146,9 +146,4 @@ public class ActionReport extends Action {
       throw new RuntimeException(e);
     }
   }
-
-  @Override
-  public Object wrap(ActionHandler handler) {
-    return evaluate(handler);
-  }
 }

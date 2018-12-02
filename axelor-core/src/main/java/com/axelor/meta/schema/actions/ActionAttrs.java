@@ -58,7 +58,7 @@ public class ActionAttrs extends Action {
 
   @Override
   @SuppressWarnings("all")
-  public Object evaluate(ActionHandler handler) {
+  protected Object evaluate(ActionHandler handler) {
 
     Map<String, Object> map = Maps.newHashMap();
     for (Attribute attribute : attributes) {
@@ -88,8 +88,7 @@ public class ActionAttrs extends Action {
   }
 
   @Override
-  public Object wrap(ActionHandler handler) {
-    final Object value = evaluate(handler);
+  protected Object wrapper(Object value) {
     if (value == null) {
       return null;
     }

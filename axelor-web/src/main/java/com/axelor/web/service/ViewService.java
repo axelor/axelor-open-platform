@@ -25,6 +25,7 @@ import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
+import com.axelor.meta.ActionExecutor;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonRecord;
@@ -418,7 +419,10 @@ public class ViewService extends AbstractService {
     actRequest.setAction(action);
     actRequest.setData(actData);
 
-    Object res = act.evaluate(new ActionHandler(actRequest));
+    ActionExecutor executor = Beans.get(ActionExecutor.class);
+    ActionHandler handler = executor.newActionHandler(actRequest);
+
+    Object res = act.execute(handler);
 
     if (res instanceof ActionResponse) {
       res = ((ActionResponse) res).getItem(0);

@@ -21,6 +21,10 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
+import com.axelor.event.Event;
+import com.axelor.event.NamedLiteral;
+import com.axelor.events.PostAction;
+import com.axelor.events.PreAction;
 import com.axelor.inject.Beans;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.actions.ActionGroup;
@@ -61,27 +65,38 @@ public class ActionHandler {
 
   private final Logger log = LoggerFactory.getLogger(ActionHandler.class);
 
-  private ActionRequest request;
+  private final ActionRequest request;
 
-  private Context context;
+  private final Event<PreAction> preActionEvent;
 
-  private Bindings bindings;
+  private final Event<PostAction> postActionEvent;
 
-  private ScriptHelper scriptHelper;
+  private final Context context;
 
-  private Pattern pattern = Pattern.compile("^\\s*(select\\[\\]|select|action|call|eval):\\s*(.*)");
+  private final Bindings bindings;
 
-  public ActionHandler(ActionRequest request) {
+  private final ScriptHelper scriptHelper;
 
-    final Context context = request.getContext();
+  private final Pattern pattern =
+      Pattern.compile("^\\s*(select\\[\\]|select|action|call|eval):\\s*(.*)");
 
+  public ActionHandler(
+      ActionRequest request, Event<PreAction> preActionEvent, Event<PostAction> postActionEvent) {
     this.request = request;
-
-    this.context = context;
-
+    this.preActionEvent = preActionEvent;
+    this.postActionEvent = postActionEvent;
+    this.context = request.getContext();
     this.scriptHelper = new CompositeScriptHelper(this.context);
     this.bindings = this.scriptHelper.getBindings();
     this.bindings.put("__me__", this);
+  }
+
+  public void firePreEvent(String name) {
+    preActionEvent.select(NamedLiteral.of(name)).fire(new PreAction(name, context));
+  }
+
+  public void firePostEvent(String name, Object result) {
+    postActionEvent.select(NamedLiteral.of(name)).fire(new PostAction(name, context, result));
   }
 
   public Context getContext() {
@@ -266,7 +281,7 @@ public class ActionHandler {
       return null;
     }
 
-    return action.evaluate(this);
+    return action.execute(this);
   }
 
   private Object handleCall(String expression) {
@@ -285,8 +300,9 @@ public class ActionHandler {
     call.setController(parts[0]);
     call.setMethod(parts[1]);
     action.setCall(call);
+    action.setName(expression);
 
-    return action.evaluate(this);
+    return action.execute(this);
   }
 
   private static final String KEY_VALUES = "values";
@@ -368,6 +384,9 @@ public class ActionHandler {
 
     String[] names = name.split(",");
     ActionGroup action = new ActionGroup();
+
+    action.setName(name);
+
     for (String item : names) {
       action.addAction(item);
     }

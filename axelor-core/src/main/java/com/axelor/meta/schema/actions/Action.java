@@ -85,9 +85,22 @@ public abstract class Action {
     this.moduleToCheck = moduleToCheck;
   }
 
-  public abstract Object wrap(ActionHandler handler);
+  public Object execute(ActionHandler handler) {
+    handler.firePreEvent(getName());
+    Object result = evaluate(handler);
+    handler.firePostEvent(getName(), result);
+    return result;
+  }
 
-  public abstract Object evaluate(ActionHandler handler);
+  public Object wrap(ActionHandler handler) {
+    return wrapper(execute(handler));
+  }
+
+  protected Object wrapper(Object value) {
+    return value;
+  }
+
+  protected abstract Object evaluate(ActionHandler handler);
 
   @Override
   public String toString() {

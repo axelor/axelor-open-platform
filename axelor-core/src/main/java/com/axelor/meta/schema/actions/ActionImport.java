@@ -165,9 +165,9 @@ public class ActionImport extends Action {
   }
 
   @Override
-  public Object wrap(ActionHandler handler) {
+  protected Object wrapper(Object value) {
     final Map<String, Object> result = new HashMap<>();
-    result.put("values", evaluate(handler));
+    result.put("values", value);
     return result;
   }
 

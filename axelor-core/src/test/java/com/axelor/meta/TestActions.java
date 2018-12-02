@@ -45,6 +45,8 @@ public class TestActions extends MetaTest {
 
   @Inject private ContactRepository contacts;
 
+  @Inject private ActionExecutor executor;
+
   @Before
   public void setUp() {
     try {
@@ -82,7 +84,7 @@ public class TestActions extends MetaTest {
 
     data.put("context", context);
 
-    return new ActionHandler(request);
+    return executor.newActionHandler(request);
   }
 
   private ActionHandler createHandler(Action action, Map<String, Object> context) {
@@ -96,7 +98,7 @@ public class TestActions extends MetaTest {
     Action action = MetaStore.getAction("action-contact-defaults");
     ActionHandler handler = createHandler(action, null);
 
-    Object value = action.evaluate(handler);
+    Object value = action.execute(handler);
     assertTrue(value instanceof Contact);
 
     Contact c = (Contact) value;
@@ -111,7 +113,7 @@ public class TestActions extends MetaTest {
     Action action = MetaStore.getAction("action-contact-defaults-multi");
     ActionHandler handler = createHandler(action, null);
 
-    Object value = action.evaluate(handler);
+    Object value = action.execute(handler);
     assertTrue(value instanceof Contact);
 
     Contact c = (Contact) value;
@@ -133,7 +135,7 @@ public class TestActions extends MetaTest {
     Action action = MetaStore.getAction("action-contact-attrs");
     ActionHandler handler = createHandler(action, null);
 
-    Object value = action.evaluate(handler);
+    Object value = action.execute(handler);
     assertTrue(value instanceof Map);
 
     Map<?, ?> map = (Map<?, ?>) value;
@@ -153,7 +155,7 @@ public class TestActions extends MetaTest {
     Action action = MetaStore.getAction("action-contact-attrs-multi");
     ActionHandler handler = createHandler(action, null);
 
-    Object value = action.evaluate(handler);
+    Object value = action.execute(handler);
     assertTrue(value instanceof Map);
 
     Map<?, ?> map = (Map<?, ?>) value;
@@ -197,7 +199,7 @@ public class TestActions extends MetaTest {
     context.put("lastName", "Sm");
 
     ActionHandler handler = createHandler(action, context);
-    Object value = action.evaluate(handler);
+    Object value = action.execute(handler);
 
     assertNotNull(value);
   }
@@ -212,7 +214,7 @@ public class TestActions extends MetaTest {
     context.put("createDate", LocalDate.parse("2012-12-11"));
 
     ActionHandler handler = createHandler(action, context);
-    Object value = action.evaluate(handler);
+    Object value = action.execute(handler);
 
     assertNotNull(value);
     assertTrue(value instanceof Map);
@@ -230,7 +232,7 @@ public class TestActions extends MetaTest {
     context.put("lastName", "Smith");
 
     ActionHandler handler = createHandler(action, context);
-    Object value = action.evaluate(handler);
+    Object value = action.execute(handler);
 
     assertNotNull(value);
     assertEquals(
@@ -250,7 +252,7 @@ public class TestActions extends MetaTest {
     context.put("fullName", "John Smith");
 
     ActionHandler handler = createHandler(action, context);
-    Object value = action.evaluate(handler);
+    Object value = action.execute(handler);
 
     assertNotNull(value);
     assertEquals("Say: John Smith", value);
@@ -295,7 +297,7 @@ public class TestActions extends MetaTest {
     context.put("lastName", "Smith");
 
     ActionHandler handler = createHandler(action, context);
-    Object value = action.evaluate(handler);
+    Object value = action.execute(handler);
 
     assertNotNull(value);
   }
@@ -310,7 +312,7 @@ public class TestActions extends MetaTest {
     context.put("lastName", "Smith");
 
     ActionHandler handler = createHandler(action, context);
-    Object value = action.evaluate(handler);
+    Object value = action.execute(handler);
 
     Assert.assertNotNull(value);
     Assert.assertTrue(value instanceof List);
@@ -321,7 +323,7 @@ public class TestActions extends MetaTest {
     handler.getContext().put("firstName", "J");
     handler.getContext().put("email", "j.smith@gmail.com");
 
-    value = action.evaluate(handler);
+    value = action.execute(handler);
 
     Assert.assertNotNull(value);
     Assert.assertTrue(value instanceof List);

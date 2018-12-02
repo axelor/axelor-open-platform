@@ -18,7 +18,7 @@
 package com.axelor.web.service;
 
 import com.axelor.mail.web.MailController;
-import com.axelor.meta.ActionHandler;
+import com.axelor.meta.ActionExecutor;
 import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
@@ -50,6 +50,8 @@ public class ActionService extends AbstractService {
   @Inject private TaskController teamController;
 
   @Inject private MailController mailController;
+
+  @Inject private ActionExecutor actionExecutor;
 
   @GET
   @Path("menu/all")
@@ -91,13 +93,13 @@ public class ActionService extends AbstractService {
 
   @POST
   public Response execute(ActionRequest request) {
-    return new ActionHandler(request).execute();
+    return actionExecutor.execute(request);
   }
 
   @POST
   @Path("{action}")
   public Response execute(@PathParam("action") String action, ActionRequest request) {
     request.setAction(action);
-    return new ActionHandler(request).execute();
+    return actionExecutor.execute(request);
   }
 }

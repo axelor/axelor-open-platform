@@ -24,8 +24,6 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.ActionHandler;
 import com.axelor.rpc.Resource;
-import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,12 +107,27 @@ public class ActionRecord extends Action {
   }
 
   @Override
-  public Object evaluate(ActionHandler handler) {
-    Map<String, Object> map = Maps.newHashMap();
-    return _evaluate(handler, map);
+  public Object wrap(ActionHandler handler) {
+    handler.firePreEvent(getName());
+    Map<String, Object> map = new HashMap<>();
+    Object value = evaluate(handler, map);
+    handler.firePostEvent(getName(), value);
+    return value == null ? null : wrapper(map);
   }
 
-  private Object _evaluate(final ActionHandler handler, final Map<String, Object> map) {
+  @Override
+  protected Object evaluate(ActionHandler handler) {
+    return evaluate(handler, new HashMap<>());
+  }
+
+  @Override
+  protected Object wrapper(Object value) {
+    Map<String, Object> result = new HashMap<>();
+    result.put("values", value);
+    return result;
+  }
+
+  private Object evaluate(final ActionHandler handler, final Map<String, Object> map) {
 
     final Class<?> entityClass = findClass(getModel());
     if (ref != null) {
@@ -132,7 +145,7 @@ public class ActionRecord extends Action {
 
     for (RecordField recordField : fields) {
 
-      if (!recordField.test(handler) || Strings.isNullOrEmpty(recordField.getName())) {
+      if (!recordField.test(handler) || StringUtils.isBlank(recordField.getName())) {
         continue;
       }
 
@@ -204,17 +217,5 @@ public class ActionRecord extends Action {
     if (bean == null || StringUtils.isBlank(saveIf)) return false;
     if (bean.getId() != null && bean.getVersion() == null) return false;
     return Action.test(handler, saveIf);
-  }
-
-  @Override
-  public Object wrap(ActionHandler handler) {
-    final Map<String, Object> map = new HashMap<>();
-    Object value = _evaluate(handler, map);
-    if (value == null) {
-      return null;
-    }
-    final Map<String, Object> result = new HashMap<>();
-    result.put("values", map);
-    return result;
   }
 }

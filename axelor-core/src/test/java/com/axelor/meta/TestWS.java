@@ -39,12 +39,15 @@ import java.time.Period;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
 @Ignore
 public class TestWS extends MetaTest {
+
+  @Inject private ActionExecutor executor;
 
   private ActionHandler createHandler(String actions, Map<String, Object> context) {
 
@@ -57,7 +60,7 @@ public class TestWS extends MetaTest {
     data.put("action", actions);
     data.put("context", context);
 
-    return new ActionHandler(request);
+    return executor.newActionHandler(request);
   }
 
   @Test
@@ -79,7 +82,7 @@ public class TestWS extends MetaTest {
     context.put("dt", dt);
 
     ActionHandler handler = createHandler("data.import.1", context);
-    action.evaluate(handler);
+    action.execute(handler);
   }
 
   @Test
@@ -106,7 +109,7 @@ public class TestWS extends MetaTest {
         ImmutableMap.of("product", ImmutableMap.of("name", "Laptop"), "price", 690, "quantity", 1));
 
     ActionHandler handler = createHandler("export.sale.order", context);
-    action.evaluate(handler);
+    action.execute(handler);
   }
 
   @Transactional

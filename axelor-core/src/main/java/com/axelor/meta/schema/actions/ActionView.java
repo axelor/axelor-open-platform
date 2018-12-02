@@ -240,8 +240,8 @@ public class ActionView extends Action {
   }
 
   @Override
-  public Object wrap(ActionHandler handler) {
-    return ImmutableMap.of("view", evaluate(handler));
+  protected Object wrapper(Object value) {
+    return ImmutableMap.of("view", value);
   }
 
   /**

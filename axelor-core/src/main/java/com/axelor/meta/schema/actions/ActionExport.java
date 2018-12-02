@@ -159,11 +159,6 @@ public class ActionExport extends Action {
     return null;
   }
 
-  @Override
-  public Object wrap(ActionHandler handler) {
-    return evaluate(handler);
-  }
-
   @XmlType
   public static class Export extends Element {
 

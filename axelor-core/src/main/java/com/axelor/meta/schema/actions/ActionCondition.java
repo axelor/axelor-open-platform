@@ -72,8 +72,7 @@ public class ActionCondition extends Action {
   }
 
   @Override
-  public Object wrap(ActionHandler handler) {
-    final Object value = evaluate(handler);
+  protected Object wrapper(Object value) {
     final Map<String, Object> result = new HashMap<>();
     if (value instanceof Map) {
       result.put("errors", value);

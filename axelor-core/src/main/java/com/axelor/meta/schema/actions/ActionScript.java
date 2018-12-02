@@ -98,11 +98,6 @@ public class ActionScript extends Action {
         : run(handler);
   }
 
-  @Override
-  public Object wrap(ActionHandler handler) {
-    return evaluate(handler);
-  }
-
   public static class ActRunner {
 
     @Transactional

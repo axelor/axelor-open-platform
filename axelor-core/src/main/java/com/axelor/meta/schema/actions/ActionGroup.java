@@ -115,6 +115,7 @@ public class ActionGroup extends ActionResumable {
         view.setName(parts[1]);
 
         actionView.setViews(ImmutableList.of(view));
+        actionView.setName(actionName);
 
         if (parts.length == 3) {
           Class<?> model;
@@ -139,6 +140,7 @@ public class ActionGroup extends ActionResumable {
       method.setMethod(parts[1]);
       ActionMethod action = new ActionMethod();
       action.setCall(method);
+      action.setName(actionName);
       return action;
     }
 
@@ -376,11 +378,6 @@ public class ActionGroup extends ActionResumable {
           .getContext()
           .putAll(Mapper.toMap(Mapper.toBean(handler.getContext().getContextClass(), map)));
     }
-  }
-
-  @Override
-  public Object wrap(ActionHandler handler) {
-    return evaluate(handler);
   }
 
   public static class ActionItem extends Element {}

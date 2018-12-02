@@ -171,11 +171,6 @@ public class ActionWS extends Action {
     return result;
   }
 
-  @Override
-  public Object wrap(ActionHandler handler) {
-    return evaluate(handler);
-  }
-
   @XmlType
   public static class WSAction extends Element {
 

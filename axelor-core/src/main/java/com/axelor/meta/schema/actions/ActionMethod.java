@@ -67,17 +67,12 @@ public class ActionMethod extends Action {
   }
 
   @Override
-  public Object evaluate(ActionHandler handler) {
+  protected Object evaluate(ActionHandler handler) {
     if (!call.test(handler)) {
       log.debug("action '{}' doesn't meet the condition: {}", getName(), call.getCondition());
       return null;
     }
     if (isRpc(call.getMethod())) return handler.rpc(call.getController(), call.getMethod());
     return handler.call(call.getController(), call.getMethod());
-  }
-
-  @Override
-  public Object wrap(ActionHandler handler) {
-    return evaluate(handler);
   }
 }

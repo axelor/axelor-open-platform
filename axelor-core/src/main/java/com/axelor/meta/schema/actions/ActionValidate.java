@@ -157,9 +157,4 @@ public class ActionValidate extends ActionResumable {
 
     return result.isEmpty() ? null : result;
   }
-
-  @Override
-  public Object wrap(ActionHandler handler) {
-    return evaluate(handler);
-  }
 }

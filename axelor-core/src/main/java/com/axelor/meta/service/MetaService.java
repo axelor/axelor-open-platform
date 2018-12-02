@@ -31,7 +31,7 @@ import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.inject.Beans;
-import com.axelor.meta.ActionHandler;
+import com.axelor.meta.ActionExecutor;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
@@ -95,6 +95,8 @@ public class MetaService {
   @Inject private MetaFileRepository files;
 
   @Inject private MetaFiles metaFiles;
+
+  @Inject private ActionExecutor actionExecutor;
 
   private boolean canShow(
       MenuItem item, Map<String, MenuItem> map, Set<String> visited, ScriptHelper helper) {
@@ -189,10 +191,9 @@ public class MetaService {
     }
     if (call != null) {
       final ActionRequest request = new ActionRequest();
-      final ActionHandler handler = new ActionHandler(request);
       request.setAction(call);
       try {
-        return (String) handler.execute().getItem(0);
+        return (String) actionExecutor.execute(request).getItem(0);
       } catch (Exception e) {
         LOG.error("Unable to read tag for menu: {}", item.getName());
         LOG.trace("Error", e);
@@ -214,9 +215,9 @@ public class MetaService {
       request.setAction(action.getName());
       request.setModel(action.getModel());
       request.setData(new HashMap<String, Object>());
-      final ActionHandler handler = new ActionHandler(request);
       try {
-        final Map<String, Object> data = (Map) ((Map) handler.execute().getItem(0)).get("view");
+        final Map<String, Object> data =
+            (Map) ((Map) actionExecutor.execute(request).getItem(0)).get("view");
         final Map<String, Object> context = (Map) data.get("context");
         final String domain = (String) data.get("domain");
         final JpaRepository<?> repo = JpaRepository.of((Class) request.getBeanClass());
@@ -683,7 +684,7 @@ public class MetaService {
           req.setModel(ScriptBindings.class.getName());
         }
 
-        res = new ActionHandler(req).execute();
+        res = actionExecutor.execute(req);
 
         data.put("dataset", res.getData());
 
@@ -788,7 +789,7 @@ public class MetaService {
         req.setModel(ScriptBindings.class.getName());
       }
 
-      res = new ActionHandler(req).execute();
+      res = actionExecutor.execute(req);
 
       data.put("dataset", res.getData());
     } else {
