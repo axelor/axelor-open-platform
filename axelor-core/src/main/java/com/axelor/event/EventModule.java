@@ -121,7 +121,7 @@ public class EventModule extends AbstractModule {
       if (ip.getMember() instanceof Field) {
         injectMembers(instance, (Field) ip.getMember());
       } else if (ip.getMember() instanceof Constructor) {
-        Arrays.stream(instance.getClass().getDeclaredFields())
+        Arrays.stream(ip.getMember().getDeclaringClass().getDeclaredFields())
             .filter(field -> field.getAnnotation(Inject.class) == null)
             .filter(field -> field.getType() == Event.class)
             .forEach(field -> injectMembers(instance, field));
