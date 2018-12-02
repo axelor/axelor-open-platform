@@ -17,6 +17,7 @@
  */
 package com.axelor.app;
 
+import com.axelor.event.EventModule;
 import com.axelor.inject.Beans;
 import com.axelor.inject.logger.LoggerModule;
 import com.axelor.meta.MetaScanner;
@@ -48,6 +49,9 @@ public class AppModule extends AbstractModule {
 
     // Logger injection support
     install(new LoggerModule());
+
+    // events support
+    install(new EventModule());
 
     final List<Class<? extends AxelorModule>> moduleClasses =
         ModuleManager.findInstalled()
