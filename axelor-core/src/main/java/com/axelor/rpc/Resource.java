@@ -39,6 +39,10 @@ import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
 import com.axelor.db.search.SearchService;
+import com.axelor.event.Event;
+import com.axelor.event.NamedLiteral;
+import com.axelor.events.PostRequest;
+import com.axelor.events.PreRequest;
 import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.i18n.L10n;
@@ -56,6 +60,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
@@ -80,6 +85,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.persistence.EntityTransaction;
@@ -92,21 +98,26 @@ import org.slf4j.LoggerFactory;
 /** This class defines CRUD like interface. */
 public class Resource<T extends Model> {
 
-  private Class<T> model;
+  private final Class<T> model;
 
-  private Provider<JpaSecurity> security;
+  private final Provider<JpaSecurity> security;
 
-  private Logger LOG = LoggerFactory.getLogger(Resource.class);
+  private final Logger LOG = LoggerFactory.getLogger(Resource.class);
 
-  private Resource(Class<T> model, Provider<JpaSecurity> security) {
-    this.model = model;
-    this.security = security;
-  }
+  private final Event<PreRequest> preRequest;
+  private final Event<PostRequest> postRequest;
 
   @Inject
   @SuppressWarnings("unchecked")
-  public Resource(TypeLiteral<T> typeLiteral, Provider<JpaSecurity> security) {
-    this((Class<T>) typeLiteral.getRawType(), security);
+  public Resource(
+      TypeLiteral<T> typeLiteral,
+      Provider<JpaSecurity> security,
+      Event<PreRequest> preRequest,
+      Event<PostRequest> postRequest) {
+    this.model = (Class<T>) typeLiteral.getRawType();
+    this.security = security;
+    this.preRequest = preRequest;
+    this.postRequest = postRequest;
   }
 
   /** Returns the resource class. */
@@ -120,6 +131,35 @@ public class Resource<T extends Model> {
     } catch (Exception e) {
     }
     return null;
+  }
+
+  private void firePreRequestEvent(String source, Request request) {
+    preRequest.select(NamedLiteral.of(source)).fire(new PreRequest(source, request));
+  }
+
+  private void firePostRequestEvent(String source, Request request, Response response) {
+    postRequest.select(NamedLiteral.of(source)).fire(new PostRequest(source, request, response));
+  }
+
+  private Request newRequest(Request from, Long... records) {
+
+    Request request = new Request();
+    request.setModel(model.getName());
+
+    List<Object> items =
+        Stream.of(records).map(item -> ImmutableMap.of("id", item)).collect(Collectors.toList());
+
+    request.setRecords(items);
+
+    if (from != null) {
+      request.setData(from.getData());
+      request.setFields(from.getFields());
+      if (items.isEmpty()) {
+        request.setRecords(from.getRecords());
+      }
+    }
+
+    return request;
   }
 
   public Response fields() {
@@ -353,6 +393,8 @@ public class Resource<T extends Model> {
 
     LOG.debug("Searching '{}' with {}", model.getCanonicalName(), request.getData());
 
+    firePreRequestEvent("search", request);
+
     Response response = new Response();
 
     int offset = request.getOffset();
@@ -418,6 +460,8 @@ public class Resource<T extends Model> {
     response.setData(jsonData);
     response.setOffset(offset);
     response.setStatus(Response.STATUS_SUCCESS);
+
+    firePostRequestEvent("search", request, response);
 
     return response;
   }
@@ -489,6 +533,8 @@ public class Resource<T extends Model> {
     security.get().check(JpaSecurity.CAN_READ, model);
     security.get().check(JpaSecurity.CAN_EXPORT, model);
     LOG.debug("Exporting '{}' with {}", model.getName(), request.getData());
+
+    firePreRequestEvent("export", request);
 
     List<String> fields = request.getFields();
     List<String> header = new ArrayList<>();
@@ -688,6 +734,11 @@ public class Resource<T extends Model> {
       data = selector.values(nextLimit, offset);
     }
 
+    Response response = new Response();
+    response.setTotal(count);
+
+    firePostRequestEvent("export", request, response);
+
     return count;
   }
 
@@ -699,19 +750,29 @@ public class Resource<T extends Model> {
 
   public Response read(long id) {
     security.get().check(JpaSecurity.CAN_READ, model, id);
+
+    Request request = newRequest(null, id);
     Response response = new Response();
     List<Object> data = Lists.newArrayList();
+
+    firePreRequestEvent("read", request);
 
     Model entity = JPA.find(model, id);
     if (entity != null) data.add(entity);
     response.setData(data);
     response.setStatus(Response.STATUS_SUCCESS);
 
+    firePostRequestEvent("read", request, response);
+
     return response;
   }
 
   public Response fetch(long id, Request request) {
     security.get().check(JpaSecurity.CAN_READ, model, id);
+
+    Request req = newRequest(request, id);
+
+    firePreRequestEvent("fetch", req);
 
     final Response response = new Response();
     final Repository<?> repository = JpaRepository.of(model);
@@ -730,6 +791,9 @@ public class Resource<T extends Model> {
 
     data.add(repository.populate(values, request.getContext()));
     response.setData(data);
+
+    firePostRequestEvent("fetch", req, response);
+
     return response;
   }
 
@@ -833,8 +897,11 @@ public class Resource<T extends Model> {
     List<Object> records = request.getRecords();
     List<Object> data = Lists.newArrayList();
 
+    firePreRequestEvent("save", request);
+
     if ((records == null || records.isEmpty()) && request.getData() == null) {
       response.setStatus(Response.STATUS_FAILURE);
+      firePostRequestEvent("save", request, response);
       return response;
     }
 
@@ -898,6 +965,8 @@ public class Resource<T extends Model> {
     response.setData(data);
     response.setStatus(Response.STATUS_SUCCESS);
 
+    firePostRequestEvent("save", request, response);
+
     return response;
   }
 
@@ -907,6 +976,8 @@ public class Resource<T extends Model> {
     security.get().check(JpaSecurity.CAN_WRITE, model);
 
     LOG.debug("Mass update '{}' with {}", model.getCanonicalName(), request.getData());
+
+    firePreRequestEvent("mass-update", request);
 
     Response response = new Response();
 
@@ -923,6 +994,8 @@ public class Resource<T extends Model> {
 
     response.setStatus(Response.STATUS_SUCCESS);
 
+    firePostRequestEvent("mass-update", request, response);
+
     return response;
   }
 
@@ -938,6 +1011,10 @@ public class Resource<T extends Model> {
     data.put("id", id);
     data.put("version", request.getData().get("version"));
 
+    Request req = newRequest(request, id);
+
+    firePreRequestEvent("remove", request);
+
     Model bean = JPA.edit(model, data);
     if (bean.getId() != null) {
       if (repository == null) {
@@ -949,6 +1026,8 @@ public class Resource<T extends Model> {
 
     response.setData(ImmutableList.of(toMapCompact(bean)));
     response.setStatus(Response.STATUS_SUCCESS);
+
+    firePostRequestEvent("remove", req, response);
 
     return response;
   }
@@ -964,6 +1043,8 @@ public class Resource<T extends Model> {
     if (records == null || records.isEmpty()) {
       return response.fail("No records provides.");
     }
+
+    firePreRequestEvent("remove", request);
 
     final List<Model> entities = Lists.newArrayList();
 
@@ -998,6 +1079,8 @@ public class Resource<T extends Model> {
     response.setData(records);
     response.setStatus(Response.STATUS_SUCCESS);
 
+    firePostRequestEvent("remove", request, response);
+
     return response;
   }
 
@@ -1017,8 +1100,14 @@ public class Resource<T extends Model> {
   @SuppressWarnings("all")
   public Response copy(long id) {
     security.get().check(JpaSecurity.CAN_CREATE, model, id);
+
+    final Request request = newRequest(null, id);
     final Response response = new Response();
     final Repository repository = JpaRepository.of(model);
+
+    request.setRecords(Lists.newArrayList(id));
+
+    firePreRequestEvent("copy", request);
 
     Model bean = JPA.find(model, id);
     if (repository == null) {
@@ -1032,6 +1121,8 @@ public class Resource<T extends Model> {
 
     response.setData(ImmutableList.of(bean));
     response.setStatus(Response.STATUS_SUCCESS);
+
+    firePostRequestEvent("copy", request, response);
 
     return response;
   }
@@ -1110,6 +1201,12 @@ public class Resource<T extends Model> {
       name = property.getName();
     }
 
+    Request req = newRequest(null);
+    req.setFields(Lists.newArrayList(selectName));
+    req.setRecords(Lists.newArrayList(data));
+
+    firePreRequestEvent("fetch:name", req);
+
     if (selectName != null) {
       String qs =
           String.format(
@@ -1124,6 +1221,8 @@ public class Resource<T extends Model> {
 
     response.setData(ImmutableList.of(data));
     response.setStatus(Response.STATUS_SUCCESS);
+
+    firePostRequestEvent("fetch:name", req, response);
 
     return response;
   }
