@@ -35,6 +35,8 @@ public class I18nBundle extends ResourceBundle {
   private final Locale locale;
   private final Map<String, String> messages = new ConcurrentHashMap<>();
 
+  private boolean loaded;
+
   public I18nBundle(Locale locale) {
     this.locale = locale;
   }
@@ -61,11 +63,17 @@ public class I18nBundle extends ResourceBundle {
     return Collections.enumeration(load().keySet());
   }
 
-  private Map<String, String> load() {
+  @Override
+  public boolean containsKey(String key) {
+    return handleKeySet().contains(key);
+  }
 
-    if (!messages.isEmpty()) {
-      return messages;
-    }
+  private Map<String, String> load() {
+    return loaded ? messages : doLoad();
+  }
+
+  private synchronized Map<String, String> doLoad() {
+    this.loaded = true;
 
     try {
       JPA.em();
@@ -73,18 +81,16 @@ public class I18nBundle extends ResourceBundle {
       return messages;
     }
 
-    String lang = locale.getLanguage();
-    Query<MetaTranslation> query =
+    final String lang = locale.getLanguage();
+    final Query<MetaTranslation> query =
         Query.of(MetaTranslation.class)
-            .filter("self.language = ?1", lang)
+            .filter("self.language = :lang AND self.message IS NOT NULL")
             .order("id")
+            .bind("lang", lang)
             .autoFlush(false);
 
     if (query.count() == 0 && lang.length() > 2) {
-      query =
-          Query.of(MetaTranslation.class)
-              .filter("self.language = ?1", lang.substring(0, 2))
-              .order("id");
+      query.bind("lang", lang.substring(0, 2));
     }
 
     long total = query.count();
@@ -93,12 +99,11 @@ public class I18nBundle extends ResourceBundle {
 
     while (offset < total) {
       for (MetaTranslation tr : query.fetch(limit, offset)) {
-        if (tr.getMessage() != null) {
-          messages.put(tr.getKey(), tr.getMessage());
-        }
+        messages.put(tr.getKey(), tr.getMessage());
       }
       offset += limit;
     }
+
     return messages;
   }
 
