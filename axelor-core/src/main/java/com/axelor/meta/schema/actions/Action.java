@@ -17,7 +17,9 @@
  */
 package com.axelor.meta.schema.actions;
 
+import com.axelor.events.PostAction;
 import com.axelor.meta.ActionHandler;
+import com.axelor.rpc.ActionResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
@@ -88,12 +90,13 @@ public abstract class Action {
   public Object execute(ActionHandler handler) {
     handler.firePreEvent(getName());
     Object result = evaluate(handler);
-    handler.firePostEvent(getName(), result);
-    return result;
+    PostAction event = handler.firePostEvent(getName(), result);
+    return event.getResult();
   }
 
   public Object wrap(ActionHandler handler) {
-    return wrapper(execute(handler));
+    Object result = execute(handler);
+    return result instanceof ActionResponse ? result : wrapper(result);
   }
 
   protected Object wrapper(Object value) {

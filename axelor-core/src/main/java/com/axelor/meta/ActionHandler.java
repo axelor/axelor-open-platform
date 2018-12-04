@@ -95,8 +95,10 @@ public class ActionHandler {
     preActionEvent.select(NamedLiteral.of(name)).fire(new PreAction(name, context));
   }
 
-  public void firePostEvent(String name, Object result) {
-    postActionEvent.select(NamedLiteral.of(name)).fire(new PostAction(name, context, result));
+  public PostAction firePostEvent(String name, Object result) {
+    PostAction event = new PostAction(name, context, result);
+    postActionEvent.select(NamedLiteral.of(name)).fire(event);
+    return event;
   }
 
   public Context getContext() {

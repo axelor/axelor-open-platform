@@ -22,7 +22,9 @@ import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.events.PostAction;
 import com.axelor.meta.ActionHandler;
+import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Resource;
 import java.util.HashMap;
 import java.util.List;
@@ -111,8 +113,9 @@ public class ActionRecord extends Action {
     handler.firePreEvent(getName());
     Map<String, Object> map = new HashMap<>();
     Object value = evaluate(handler, map);
-    handler.firePostEvent(getName(), value);
-    return value == null ? null : wrapper(map);
+    PostAction event = handler.firePostEvent(getName(), value);
+    Object result = event.getResult();
+    return result == null || result instanceof ActionResponse ? result : wrapper(map);
   }
 
   @Override
