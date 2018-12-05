@@ -18,6 +18,8 @@
 package com.axelor.auth;
 
 import com.axelor.event.Event;
+import com.axelor.event.NamedLiteral;
+import com.axelor.events.LoginRedirectException;
 import com.axelor.events.PostLogin;
 import com.axelor.events.PreLogin;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,14 +55,21 @@ public class AuthFilter extends FormAuthenticationFilter {
       throw new IllegalStateException(msg);
     }
     try {
-      preLogin.fire(new PreLogin(token));
-      Subject subject = getSubject(request, response);
-      subject.login(token);
-      postLogin.fire(new PostLogin(token, AuthUtils.getUser(), null));
-      return onLoginSuccess(token, subject, request, response);
-    } catch (AuthenticationException e) {
-      postLogin.fire(new PostLogin(token, null, e));
-      return onLoginFailure(token, e, request, response);
+      try {
+        preLogin.fire(new PreLogin(token));
+        Subject subject = getSubject(request, response);
+        subject.login(token);
+        postLogin
+            .select(NamedLiteral.of(PostLogin.SUCCESS))
+            .fire(new PostLogin(token, AuthUtils.getUser(), null));
+        return onLoginSuccess(token, subject, request, response);
+      } catch (AuthenticationException e) {
+        postLogin.select(NamedLiteral.of(PostLogin.FAILURE)).fire(new PostLogin(token, null, e));
+        return onLoginFailure(token, e, request, response);
+      }
+    } catch (LoginRedirectException e) {
+      WebUtils.issueRedirect(request, response, e.getLocation());
+      return false;
     }
   }
 

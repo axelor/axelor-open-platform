@@ -17,37 +17,23 @@
  */
 package com.axelor.events;
 
-import com.axelor.auth.db.User;
-import org.apache.shiro.authc.AuthenticationToken;
+public class LoginRedirectException extends RuntimeException {
 
-public class PostLogin extends LoginEvent {
+  private static final long serialVersionUID = 4965839924701991583L;
 
-  public static final String SUCCESS = "success";
-  public static final String FAILURE = "failure";
+  private final String location;
 
-  private final User user;
-
-  private final Throwable error;
-
-  public PostLogin(AuthenticationToken token, User user, Throwable error) {
-    super(token);
-    this.user = user;
-    this.error = error;
+  public LoginRedirectException(String location) {
+    super(String.format("Redirect: %s", location));
+    this.location = location;
   }
 
-  public User getUser() {
-    return user;
+  public String getLocation() {
+    return location;
   }
 
-  public Throwable getError() {
-    return error;
-  }
-
-  public boolean isSuccess() {
-    return user != null && error == null;
-  }
-
-  public boolean isFailure() {
-    return !isSuccess();
+  @Override
+  public String toString() {
+    return super.toString();
   }
 }

@@ -19,6 +19,8 @@ package com.axelor.auth.cas;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.event.Event;
+import com.axelor.event.NamedLiteral;
+import com.axelor.events.LoginRedirectException;
 import com.axelor.events.PostLogin;
 import com.axelor.events.PreLogin;
 import javax.inject.Inject;
@@ -29,6 +31,7 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.cas.CasFilter;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.util.WebUtils;
 
 public class AuthCasFilter extends CasFilter {
 
@@ -46,14 +49,21 @@ public class AuthCasFilter extends CasFilter {
       throw new IllegalStateException(msg);
     }
     try {
-      preLogin.fire(new PreLogin(token));
-      Subject subject = getSubject(request, response);
-      subject.login(token);
-      postLogin.fire(new PostLogin(token, AuthUtils.getUser(), null));
-      return onLoginSuccess(token, subject, request, response);
-    } catch (AuthenticationException e) {
-      postLogin.fire(new PostLogin(token, null, e));
-      return onLoginFailure(token, e, request, response);
+      try {
+        preLogin.fire(new PreLogin(token));
+        Subject subject = getSubject(request, response);
+        subject.login(token);
+        postLogin
+            .select(NamedLiteral.of(PostLogin.SUCCESS))
+            .fire(new PostLogin(token, AuthUtils.getUser(), null));
+        return onLoginSuccess(token, subject, request, response);
+      } catch (AuthenticationException e) {
+        postLogin.select(NamedLiteral.of(PostLogin.FAILURE)).fire(new PostLogin(token, null, e));
+        return onLoginFailure(token, e, request, response);
+      }
+    } catch (LoginRedirectException e) {
+      WebUtils.issueRedirect(request, response, e.getLocation());
+      return false;
     }
   }
 
