@@ -43,6 +43,7 @@ import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
 import com.axelor.events.PostRequest;
 import com.axelor.events.PreRequest;
+import com.axelor.events.qualifiers.EntityTypes;
 import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.i18n.L10n;
@@ -134,11 +135,15 @@ public class Resource<T extends Model> {
   }
 
   private void firePreRequestEvent(String source, Request request) {
-    preRequest.select(NamedLiteral.of(source)).fire(new PreRequest(source, request));
+    preRequest
+        .select(NamedLiteral.of(source), EntityTypes.type(model))
+        .fire(new PreRequest(source, request));
   }
 
   private void firePostRequestEvent(String source, Request request, Response response) {
-    postRequest.select(NamedLiteral.of(source)).fire(new PostRequest(source, request, response));
+    postRequest
+        .select(NamedLiteral.of(source), EntityTypes.type(model))
+        .fire(new PostRequest(source, request, response));
   }
 
   private Request newRequest(Request from, Long... records) {
