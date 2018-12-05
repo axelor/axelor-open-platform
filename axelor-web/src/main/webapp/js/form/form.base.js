@@ -180,7 +180,7 @@ ui.formCompile = function(element, attrs, linkerFn) {
     };
 
     scope.isHidden = function() {
-      return this.attr("hidden") || false;
+      return this.attr("hidden") || (this.$parent && this.$parent.isHidden && this.$parent.isHidden()) || false;
     };
 
     scope.fireAction = function(name, success, error) {
