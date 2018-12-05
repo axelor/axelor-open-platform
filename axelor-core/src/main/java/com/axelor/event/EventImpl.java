@@ -20,7 +20,9 @@ package com.axelor.event;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 
@@ -65,7 +67,8 @@ class EventImpl<T> implements Event<T> {
 
     EventImpl<T> copy = new EventImpl<>(eventBus);
     copy.eventType = eventType;
-    copy.qualifiers = new HashSet<>();
+    copy.qualifiers =
+        new HashSet<>(Optional.ofNullable(this.qualifiers).orElse(Collections.emptySet()));
 
     Arrays.stream(qualifiers).forEach(copy.qualifiers::add);
 
