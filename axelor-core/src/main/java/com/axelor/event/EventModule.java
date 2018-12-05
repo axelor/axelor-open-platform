@@ -18,10 +18,10 @@
 package com.axelor.event;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.ConfigurationException;
 import com.google.inject.Key;
 import com.google.inject.MembersInjector;
 import com.google.inject.TypeLiteral;
+import com.google.inject.internal.MoreTypes;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.Dependency;
 import com.google.inject.spi.InjectionPoint;
@@ -72,16 +72,34 @@ public class EventModule extends AbstractModule {
         .filter(ip -> ip.getMember() instanceof Field && checkDependencies(ip))
         .forEach(injectionPoints::add);
 
-    try {
+    if (hasInjectableConstructor(type)) {
       InjectionPoint constructorInjectionPoint = InjectionPoint.forConstructorOf(type);
       if (checkDependencies(constructorInjectionPoint)) {
         injectionPoints.add(constructorInjectionPoint);
       }
-    } catch (ConfigurationException e) {
-      // ignore
     }
 
     return injectionPoints;
+  }
+
+  public static boolean hasInjectableConstructor(TypeLiteral<?> type) {
+    boolean found = false;
+
+    for (Constructor<?> ctor : MoreTypes.getRawType(type.getType()).getDeclaredConstructors()) {
+      if (ctor.getAnnotation(com.google.inject.Inject.class) == null
+          && ctor.getAnnotation(Inject.class) == null) {
+        continue;
+      }
+
+      // too many constructors?
+      if (found) {
+        return false;
+      }
+
+      found = true;
+    }
+
+    return found;
   }
 
   private static class EventTypeInjector<T> implements MembersInjector<T> {
