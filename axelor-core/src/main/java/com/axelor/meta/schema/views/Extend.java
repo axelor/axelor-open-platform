@@ -27,6 +27,12 @@ public class Extend {
 
   @XmlAttribute private String target;
 
+  @XmlAttribute(name = "if-feature")
+  private String featureToCheck;
+
+  @XmlAttribute(name = "if-module")
+  private String moduleToCheck;
+
   @XmlElement(name = "insert")
   private List<ExtendItemInsert> inserts;
 
@@ -45,6 +51,22 @@ public class Extend {
 
   public void setTarget(String target) {
     this.target = target;
+  }
+
+  public String getFeatureToCheck() {
+    return featureToCheck;
+  }
+
+  public void setFeatureToCheck(String featureToCheck) {
+    this.featureToCheck = featureToCheck;
+  }
+
+  public String getModuleToCheck() {
+    return moduleToCheck;
+  }
+
+  public void setModuleToCheck(String moduleToCheck) {
+    this.moduleToCheck = moduleToCheck;
   }
 
   public List<ExtendItemInsert> getInserts() {

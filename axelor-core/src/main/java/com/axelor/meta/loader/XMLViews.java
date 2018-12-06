@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.loader;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
@@ -60,6 +61,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -132,6 +134,9 @@ public class XMLViews {
                 }
               });
 
+  private static final String APP_CONFIG_PROVIDER_KEY = "application.config.provider";
+  private static Predicate<String> appConfigProvider;
+
   static {
     try {
       init();
@@ -199,6 +204,24 @@ public class XMLViews {
             throw new UnsupportedOperationException();
           }
         };
+
+    final String appConfigProdiverName = AppSettings.get().get(APP_CONFIG_PROVIDER_KEY);
+
+    if (StringUtils.notBlank(appConfigProdiverName)) {
+      try {
+        @SuppressWarnings("unchecked")
+        final Class<Predicate<String>> cls =
+            (Class<Predicate<String>>) Class.forName(appConfigProdiverName);
+        appConfigProvider = Beans.get(cls);
+      } catch (ClassNotFoundException e) {
+        log.error(
+            "Can't find class {} specified by {}", appConfigProdiverName, APP_CONFIG_PROVIDER_KEY);
+      }
+    }
+
+    if (appConfigProvider == null) {
+      appConfigProvider = feature -> false;
+    }
   }
 
   public static ObjectViews unmarshal(InputStream stream) throws JAXBException {
@@ -509,6 +532,18 @@ public class XMLViews {
 
       for (Node extendNode : nodeListToList(extendNodeList)) {
         final NamedNodeMap extendAttributes = extendNode.getAttributes();
+        final String feature = getNodeAttributeValue(extendAttributes, "if-feature");
+
+        if (StringUtils.notBlank(feature) && !appConfigProvider.test(feature)) {
+          continue;
+        }
+
+        final String module = getNodeAttributeValue(extendAttributes, "if-module");
+
+        if (StringUtils.notBlank(module) && !ModuleManager.isInstalled(module)) {
+          continue;
+        }
+
         final String target = getNodeAttributeValue(extendAttributes, "target");
         final Node targetNode =
             (Node) evaluateXPath(target, viewName, viewType, document, XPathConstants.NODE);

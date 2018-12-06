@@ -2666,8 +2666,10 @@
       </xsd:element>
     </xsd:choice>
     <xsd:attribute name="target" type="xsd:string" use="required" />
+    <xsd:attribute name="if-feature" type="xsd:string"></xsd:attribute>
+    <xsd:attribute name="if-module" type="xsd:string"></xsd:attribute>
   </xsd:complexType>
-  
+
   <xsd:group name="ExtendGridItems">
     <xsd:choice>
       <xsd:group ref="tns:GridWidgets" />
@@ -2707,6 +2709,8 @@
       </xsd:element>
     </xsd:choice>
     <xsd:attribute name="target" type="xsd:string" use="required" />
+    <xsd:attribute name="if-feature" type="xsd:string"></xsd:attribute>
+    <xsd:attribute name="if-module" type="xsd:string"></xsd:attribute>
   </xsd:complexType>
 
   <xsd:simpleType name="Position">
