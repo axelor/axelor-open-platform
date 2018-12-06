@@ -532,6 +532,7 @@ public class XMLViews {
         }
 
         final Element targetElement = (Element) targetNode;
+        final String targetTagName = targetElement.getTagName();
         final Collection<Node> extendItemNodes =
             nodeListToStream(extendNode.getChildNodes())
                 .filter(extendItemNode -> extendItemNode instanceof Element)
@@ -543,7 +544,7 @@ public class XMLViews {
               {
                 final NamedNodeMap attributes = extendItemNode.getAttributes();
                 final String positionValue = getNodeAttributeValue(attributes, "position");
-                final PositionType position = PositionType.valueOf(positionValue.toUpperCase());
+                final PositionType position = PositionType.get(positionValue, targetTagName);
                 final Node refNode = position.getRefNodeFunc().apply(targetElement);
                 final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
 
@@ -582,7 +583,7 @@ public class XMLViews {
                 }
 
                 final String positionValue = getNodeAttributeValue(attributes, "position");
-                final PositionType position = PositionType.valueOf(positionValue.toUpperCase());
+                final PositionType position = PositionType.get(positionValue, targetTagName);
                 final Node refNode = position.getRefNodeFunc().apply(targetElement);
                 final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
 
