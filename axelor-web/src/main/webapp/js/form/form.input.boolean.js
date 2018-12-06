@@ -192,7 +192,7 @@ ui.formInput('BooleanRadio', 'BooleanSelect', {
     scope.$render_editable = function () {
       var value = model.$viewValue || false;
       var input = value ? trueInput : falseInput;
-      input.attr('checked', true);
+      input.prop('checked', true);
     };
 
     element.on('change', 'input', function (e) {
