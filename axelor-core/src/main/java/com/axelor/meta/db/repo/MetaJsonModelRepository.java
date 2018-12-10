@@ -71,7 +71,7 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
     // if name field is changed, update or records with new name field value
     if (!Objects.equal(lastName, jsonModel.getNameField())) {
       MetaJsonRecordRepository records = Beans.get(MetaJsonRecordRepository.class);
-      records.all(jsonModel.getName()).fetchSteam().forEach(records::save);
+      records.all(jsonModel.getName()).fetchStream().forEach(records::save);
     }
 
     MetaMenu menu = jsonModel.getMenu();

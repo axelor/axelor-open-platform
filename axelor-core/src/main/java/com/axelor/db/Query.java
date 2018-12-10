@@ -242,11 +242,19 @@ public class Query<T extends Model> {
    * size.
    *
    * @return stream of matched records.
-   * @see #fetchSteam(int)
-   * @see #fetchSteam(int, int)
+   * @see #fetchStream(int)
+   * @see #fetchStream(int, int)
    */
+  public Stream<T> fetchStream() {
+    return fetchStream(0, 0);
+  }
+
+  /**
+   * @deprecated Use {@link #fetchStream()}.
+   */
+  @Deprecated
   public Stream<T> fetchSteam() {
-    return fetchSteam(0, 0);
+    return fetchStream();
   }
 
   /**
@@ -260,10 +268,18 @@ public class Query<T extends Model> {
    *
    * @param limit the limit
    * @return stream of matched records within the limit
-   * @see #fetchSteam(int, int)
+   * @see #fetchStream(int, int)
    */
+  public Stream<T> fetchStream(int limit) {
+    return fetchStream(limit, 0);
+  }
+
+  /**
+   * @deprecated Use {@link #fetchStream(int)}.
+   */
+  @Deprecated
   public Stream<T> fetchSteam(int limit) {
-    return fetchSteam(limit, 0);
+    return fetchStream(limit);
   }
 
   /**
@@ -279,13 +295,21 @@ public class Query<T extends Model> {
    * @param offset the offset
    * @return stream of matched records within the range
    */
-  public Stream<T> fetchSteam(int limit, int offset) {
+  public Stream<T> fetchStream(int limit, int offset) {
     final org.hibernate.query.Query<T> query =
         (org.hibernate.query.Query<T>) fetchQuery(limit, offset);
     if (limit <= 0) {
       query.setFetchSize(DBHelper.getJdbcFetchSize());
     }
     return query.stream();
+  }
+
+  /**
+   * @deprecated Use {@link #fetchStream(int, int)}.
+   */
+  @Deprecated
+  public Stream<T> fetchSteam(int limit, int offset) {
+    return fetchStream(limit, offset);
   }
 
   /**
@@ -564,7 +588,7 @@ public class Query<T extends Model> {
    * @return total number of records removed.
    */
   public long remove() {
-    return fetchSteam().peek(JPA::remove).count();
+    return fetchStream().peek(JPA::remove).count();
   }
 
   protected String selectQuery() {

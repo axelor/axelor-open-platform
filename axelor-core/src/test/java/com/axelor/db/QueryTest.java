@@ -86,7 +86,7 @@ public class QueryTest extends JpaTest {
   public void testStream() {
     final Query<Contact> q = all(Contact.class);
     final List<?> first = q.fetch();
-    final List<?> second = q.fetchSteam().collect(Collectors.toList());
+    final List<?> second = q.fetchStream().collect(Collectors.toList());
     Assert.assertEquals(first.size(), second.size());
   }
 
