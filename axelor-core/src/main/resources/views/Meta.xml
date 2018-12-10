@@ -131,9 +131,14 @@
         <field name="extension" showIf="type === 'form'"/>
       </panel>
     </panel>
-    <panel title="Schema">
-      <field name="xml" showTitle="false" widget="CodeEditor" height="500" x-code-syntax="xml" colSpan="12"/>
-    </panel>
+    <panel-tabs>
+      <panel title="Schema">
+        <field name="xml" showTitle="false" widget="CodeEditor" height="500" x-code-syntax="xml" colSpan="12"/>
+      </panel>
+      <panel title="Final schema" showIf="finalXml">
+        <field name="finalXml" showTitle="false" widget="CodeEditor" height="500" x-code-syntax="xml" colSpan="12"/>
+      </panel>
+    </panel-tabs>
   </form>
 
   <grid title="Personalized Views" name="meta-view-custom-grid" model="com.axelor.meta.db.MetaViewCustom">

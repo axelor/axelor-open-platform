@@ -22,13 +22,18 @@ import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
+import com.axelor.db.JPA;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaAction;
+import com.axelor.meta.db.MetaFeature;
 import com.axelor.meta.db.MetaModel;
+import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.MetaViewCustom;
 import com.axelor.meta.db.repo.MetaActionRepository;
+import com.axelor.meta.db.repo.MetaFeatureRepository;
 import com.axelor.meta.db.repo.MetaModelRepository;
+import com.axelor.meta.db.repo.MetaModuleRepository;
 import com.axelor.meta.db.repo.MetaViewCustomRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.schema.ObjectViews;
@@ -62,7 +67,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -145,6 +149,8 @@ public class XMLViews {
       throw new RuntimeException(e);
     }
   }
+
+  private XMLViews() {}
 
   private static void init() throws JAXBException, SAXException {
     if (unmarshaller != null) {
@@ -470,25 +476,25 @@ public class XMLViews {
     final AbstractView xmlView;
     final MetaModel metaModel;
     try {
-      final String xml;
+      final String finalXml;
 
       if (custom == null) {
         if (view == null) {
           return null;
         }
 
-        xml = view.getXml();
+        finalXml = view.getFinalXml();
       } else {
-        xml = custom.getXml();
+        finalXml = custom.getXml();
       }
 
       final ObjectViews objectViews;
-      final List<MetaView> extensionMetaViews = findExtensionMetaViews(name, model, type, module);
 
-      if (extensionMetaViews.isEmpty()) {
-        objectViews = unmarshal(xml);
+      if (finalXml != null) {
+        objectViews = unmarshal(finalXml);
       } else {
-        objectViews = unmarshallWithExtensions(xml, extensionMetaViews, name, type);
+        final List<MetaView> extensionMetaViews = findExtensionMetaViews(name, model, type, module);
+        objectViews = updateViewAndUnmarshal(view, extensionMetaViews);
       }
 
       xmlView = objectViews.getViews().get(0);
@@ -516,32 +522,63 @@ public class XMLViews {
     return xmlView;
   }
 
-  private static ObjectViews unmarshallWithExtensions(
-      final String xml,
-      final Collection<MetaView> extensionMetaViews,
-      final String viewName,
-      final String viewType)
+  private static ObjectViews updateViewAndUnmarshal(MetaView view) throws JAXBException {
+    final String finalXml = view.getXml();
+    setFinalXml(view, finalXml);
+    return unmarshal(finalXml);
+  }
+
+  private static ObjectViews updateViewAndUnmarshal(
+      final MetaView view, final Collection<MetaView> extensionMetaViews)
       throws ParserConfigurationException, SAXException, IOException, XPathExpressionException,
           JAXBException {
 
+    if (extensionMetaViews.isEmpty()) {
+      return updateViewAndUnmarshal(view);
+    }
+
+    final String xml = view.getXml();
+    final String viewName = view.getName();
+    final String viewType = view.getType();
     final Document document = parseXml(xml);
 
-    for (MetaView extensionMetaView : extensionMetaViews) {
+    final MetaFeatureRepository metaFeatureRepo = Beans.get(MetaFeatureRepository.class);
+    final MetaModuleRepository metaModuleRepo = Beans.get(MetaModuleRepository.class);
+
+    for (final MetaView extensionMetaView : extensionMetaViews) {
       final Document extensionDocument = parseXml(extensionMetaView.getXml());
       final NodeList extendNodeList = extensionDocument.getElementsByTagName("extend");
 
-      for (Node extendNode : nodeListToList(extendNodeList)) {
+      for (final Node extendNode : nodeListToList(extendNodeList)) {
         final NamedNodeMap extendAttributes = extendNode.getAttributes();
         final String feature = getNodeAttributeValue(extendAttributes, "if-feature");
 
-        if (StringUtils.notBlank(feature) && !appConfigProvider.hasFeature(feature)) {
-          continue;
+        if (StringUtils.notBlank(feature)) {
+          MetaFeature metaFeature = metaFeatureRepo.findByName(feature);
+
+          if (metaFeature == null) {
+            metaFeature = new MetaFeature(feature);
+          }
+
+          view.addDependentFeature(metaFeature);
+
+          if (!appConfigProvider.hasFeature(feature)) {
+            continue;
+          }
         }
 
         final String module = getNodeAttributeValue(extendAttributes, "if-module");
 
-        if (StringUtils.notBlank(module) && !ModuleManager.isInstalled(module)) {
-          continue;
+        if (StringUtils.notBlank(module)) {
+          final MetaModule metaModule = metaModuleRepo.findByName(module);
+
+          if (metaModule != null) {
+            view.addDependentModule(metaModule);
+          }
+
+          if (!ModuleManager.isInstalled(module)) {
+            continue;
+          }
         }
 
         final String target = getNodeAttributeValue(extendAttributes, "target");
@@ -572,7 +609,7 @@ public class XMLViews {
                 .filter(extendItemNode -> extendItemNode instanceof Element)
                 .collect(Collectors.toList());
 
-        for (Node extendItemNode : extendItemNodes) {
+        for (final Node extendItemNode : extendItemNodes) {
           switch (extendItemNode.getNodeName()) {
             case "insert":
               {
@@ -643,7 +680,15 @@ public class XMLViews {
       }
     }
 
-    return unmarshal(document);
+    final ObjectViews objectViews = unmarshal(document);
+    final String finalXml = toXml(objectViews.getViews().get(0), true);
+    setFinalXml(view, finalXml);
+
+    return objectViews;
+  }
+
+  private static void setFinalXml(MetaView view, String finalXml) {
+    JPA.runInTransaction(() -> view.setFinalXml(finalXml));
   }
 
   private static String getNodeAttributeValue(NamedNodeMap attributes, String name) {

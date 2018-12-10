@@ -22,13 +22,17 @@
     <boolean name="pending" />
   </entity>
 
+  <entity name="MetaFeature" table="META_FEATURE" cachable="true">
+    <string name="name" required="true" unique="true"/>
+  </entity>
+
   <entity name="MetaView" table="META_VIEW" cachable="true">
     <![CDATA[
     This object store the xml views.
     ]]>
 
     <string name="name" required="true"/>
-  <string name="title" required="true" namecolumn="true"/>
+    <string name="title" required="true" namecolumn="true"/>
     <string name="type" required="true" selection="view.type.selection"/>
     <integer name="priority" required="true" default="20"/>
     <string name="model"/>
@@ -39,9 +43,18 @@
     <boolean name="extension" />
     <many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
 
+    <string name="finalXml" large="true"/>
+    <many-to-many name="dependentModules" ref="MetaModule"/>
+    <many-to-many name="dependentFeatures" ref="MetaFeature"/>
+
     <finder-method name="findByID" using="xmlId" />
     <finder-method name="findByName" using="name" orderBy="-priority" cacheable="true"/>
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
+    <finder-method name="findByDependentModule" using="String:moduleName" all="true" orderBy="id"
+      filter="(SELECT module FROM MetaModule module WHERE module.name = :moduleName) MEMBER OF self.dependentModules" />
+    <finder-method name="findByDependentFeature" using="String:featureName" all="true" orderBy="id"
+      filter="(SELECT feature FROM MetaFeature feature WHERE feature.name = :featureName) MEMBER OF self.dependentFeatures" />
+    <finder-method name="findAllByName" using="name" all="true" orderBy="id"/>
   </entity>
 
   <entity name="MetaViewCustom" table="META_VIEW_CUSTOM" cachable="true">

@@ -26,6 +26,9 @@ import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.common.StringUtils;
 import com.axelor.db.internal.DBHelper;
+import com.axelor.event.Event;
+import com.axelor.event.NamedLiteral;
+import com.axelor.events.ModuleChanged;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaModule;
@@ -74,6 +77,8 @@ public class ModuleManager {
   @Inject private DataLoader dataLoader;
 
   @Inject private DemoLoader demoLoader;
+
+  @Inject private Event<ModuleChanged> moduleChangedEvent;
 
   private static final Set<String> SKIP = new HashSet<>();
 
@@ -191,27 +196,35 @@ public class ModuleManager {
     } finally {
       this.doCleanUp();
     }
+
+    moduleChangedEvent
+        .select(NamedLiteral.of(moduleName))
+        .fire(new ModuleChanged(moduleName, true));
   }
 
   @Transactional
-  public void uninstall(String module) {
-    log.info("Removing package " + module + "...");
+  public void uninstall(String moduleName) {
+    log.info("Removing package {}...", moduleName);
 
-    final MetaModule entity = modules.findByName(module);
+    final MetaModule entity = modules.findByName(moduleName);
 
-    Beans.get(MetaViewRepository.class).findByModule(module).remove();
-    Beans.get(MetaSelectRepository.class).findByModule(module).remove();
-    Beans.get(MetaMenuRepository.class).findByModule(module).remove();
-    Beans.get(MetaActionRepository.class).findByModule(module).remove();
-    Beans.get(MetaActionMenuRepository.class).findByModule(module).remove();
+    Beans.get(MetaViewRepository.class).findByModule(moduleName).remove();
+    Beans.get(MetaSelectRepository.class).findByModule(moduleName).remove();
+    Beans.get(MetaMenuRepository.class).findByModule(moduleName).remove();
+    Beans.get(MetaActionRepository.class).findByModule(moduleName).remove();
+    Beans.get(MetaActionMenuRepository.class).findByModule(moduleName).remove();
 
     entity.setInstalled(false);
     entity.setPending(false);
 
     modules.save(entity);
 
-    resolver.get(module).setInstalled(false);
-    resolver.get(module).setPending(false);
+    resolver.get(moduleName).setInstalled(false);
+    resolver.get(moduleName).setPending(false);
+
+    moduleChangedEvent
+        .select(NamedLiteral.of(moduleName))
+        .fire(new ModuleChanged(moduleName, false));
   }
 
   private void doCleanUp() {

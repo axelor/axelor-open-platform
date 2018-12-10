@@ -118,7 +118,7 @@ public class ViewLoader extends AbstractLoader {
     importDefault(module);
 
     Set<?> unresolved = this.unresolvedKeys();
-    if (unresolved.size() > 0) {
+    if (!unresolved.isEmpty()) {
       log.error("unresolved items: {}", unresolved);
       throw new PersistenceException("There are some unresolve items, check the log.");
     }
@@ -191,12 +191,12 @@ public class ViewLoader extends AbstractLoader {
 
       if (!Boolean.TRUE.equals(view.getExtension())
           && ObjectUtils.notEmpty(extendableView.getExtends())) {
-        log.error("View with extensions must have extension=\"true\": {}({})", name, xmlId);
+        log.error("View with extensions must have extension=\"true\": {}(id={})", name, xmlId);
         return;
       }
     }
 
-    log.debug("Loading view: {}", name);
+    log.debug("Loading view: {}(id={})", name, xmlId);
 
     String xml = XMLViews.toXml(view, true);
 
@@ -267,6 +267,9 @@ public class ViewLoader extends AbstractLoader {
     entity.setModel(modelName);
     entity.setModule(module.getName());
     entity.setXml(xml);
+    entity.setFinalXml(null);
+    entity.clearDependentModules();
+    entity.clearDependentFeatures();
     entity.setGroups(this.findGroups(view.getGroups(), entity.getGroups()));
     entity.setExtension(view.getExtension());
 

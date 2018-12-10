@@ -22,6 +22,7 @@ import com.axelor.inject.Beans;
 import com.axelor.inject.logger.LoggerModule;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.loader.ModuleManager;
+import com.axelor.meta.loader.ViewObserver;
 import com.axelor.report.ReportEngineProvider;
 import com.google.inject.AbstractModule;
 import java.util.List;
@@ -46,6 +47,9 @@ public class AppModule extends AbstractModule {
 
     // report engine
     bind(IReportEngine.class).toProvider(ReportEngineProvider.class);
+
+    // Observe changes for views
+    bind(ViewObserver.class);
 
     // Logger injection support
     install(new LoggerModule());
