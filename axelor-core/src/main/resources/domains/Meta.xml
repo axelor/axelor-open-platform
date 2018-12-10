@@ -48,13 +48,25 @@
     <many-to-many name="dependentFeatures" ref="MetaFeature"/>
 
     <finder-method name="findByID" using="xmlId" />
-    <finder-method name="findByName" using="name" orderBy="-priority" cacheable="true"/>
+    <finder-method name="findByName" using="name" orderBy="-priority,-extension" cacheable="true"/>
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
-    <finder-method name="findByDependentModule" using="String:moduleName" all="true" orderBy="id"
-      filter="(SELECT module FROM MetaModule module WHERE module.name = :moduleName) MEMBER OF self.dependentModules" />
-    <finder-method name="findByDependentFeature" using="String:featureName" all="true" orderBy="id"
-      filter="(SELECT feature FROM MetaFeature feature WHERE feature.name = :featureName) MEMBER OF self.dependentFeatures" />
-    <finder-method name="findAllByName" using="name" all="true" orderBy="id"/>
+
+    <finder-method name="findByDependentModule" using="module" all="true" orderBy="id"
+      filter="COALESCE(self.extension, FALSE) = FALSE
+      AND (SELECT module FROM MetaModule module WHERE module.name = :module)
+      MEMBER OF self.dependentModules" />
+    <finder-method name="findByDependentFeature" using="String:feature" all="true" orderBy="id"
+      filter="COALESCE(self.extension, FALSE) = FALSE
+      AND (SELECT feature FROM MetaFeature feature WHERE feature.name = :feature)
+      MEMBER OF self.dependentFeatures" />
+    <finder-method name="findHavingExtensionsByModule" using="module,boolean:update" all="true" orderBy="id"
+      filter="(:module IS NULL OR self.module = :module)
+      AND (:update = TRUE OR self.finalXml IS NULL)
+      AND COALESCE(self.extension, FALSE) = FALSE
+      AND (self.name, self.priority)
+      IN (SELECT other.name, MAX(other.priority) FROM MetaView other GROUP BY name)
+      AND EXISTS (SELECT extensionView FROM MetaView extensionView
+      WHERE extensionView.name = self.name AND extensionView.extension = TRUE)"/>
   </entity>
 
   <entity name="MetaViewCustom" table="META_VIEW_CUSTOM" cachable="true">

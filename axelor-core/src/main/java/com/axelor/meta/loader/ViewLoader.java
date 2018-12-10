@@ -98,6 +98,8 @@ public class ViewLoader extends AbstractLoader {
 
   @Inject private GroupRepository groups;
 
+  @Inject private XMLViews.FinalXmlGenerator finalXmlGenerator;
+
   @Override
   @Transactional
   protected void doLoad(Module module, boolean update) {
@@ -122,6 +124,13 @@ public class ViewLoader extends AbstractLoader {
       log.error("unresolved items: {}", unresolved);
       throw new PersistenceException("There are some unresolve items, check the log.");
     }
+
+    generateFinalXml(module, update);
+  }
+
+  private void generateFinalXml(Module module, boolean update) {
+    finalXmlGenerator.parallelGenerate(
+        views.findHavingExtensionsByModule(module.getName(), update));
   }
 
   private static <T> List<T> getList(List<T> list) {
@@ -257,7 +266,7 @@ public class ViewLoader extends AbstractLoader {
     if ("dashboard".equals(type) && !xml.equals(entity.getXml())) {
       int deleted = Beans.get(MetaService.class).removeCustomViews(entity);
       if (deleted > 0) {
-        log.info(deleted + " custom views are deleted : " + entity.getName());
+        log.info("{} custom views are deleted: {}", deleted, entity.getName());
       }
     }
 
@@ -298,7 +307,7 @@ public class ViewLoader extends AbstractLoader {
       return;
     }
 
-    log.debug("Loading selection : {}", name);
+    log.debug("Loading selection: {}", name);
 
     MetaSelect entity = selects.findByID(xmlId);
     MetaSelect other = selects.findByName(selection.getName());
@@ -404,7 +413,7 @@ public class ViewLoader extends AbstractLoader {
       return;
     }
 
-    log.debug("Loading action : {}", name);
+    log.debug("Loading action: {}", name);
 
     MetaAction entity = actions.findByID(xmlId);
     MetaAction other = actions.findByName(name);
@@ -489,7 +498,7 @@ public class ViewLoader extends AbstractLoader {
       return;
     }
 
-    log.debug("Loading menu : {}", name);
+    log.debug("Loading menu: {}", name);
 
     MetaMenu entity = menus.findByID(xmlId);
     MetaMenu other = menus.findByName(name);
@@ -543,7 +552,7 @@ public class ViewLoader extends AbstractLoader {
     if (!Strings.isNullOrEmpty(menuItem.getParent())) {
       MetaMenu parent = menus.findByName(menuItem.getParent());
       if (parent == null) {
-        log.debug("Unresolved parent : {}", menuItem.getParent());
+        log.debug("Unresolved parent: {}", menuItem.getParent());
         this.setUnresolved(MetaMenu.class, menuItem.getParent(), entity);
       } else {
         entity.setParent(parent);
@@ -563,7 +572,7 @@ public class ViewLoader extends AbstractLoader {
     entity = menus.save(entity);
 
     for (MetaMenu pending : this.resolve(MetaMenu.class, name)) {
-      log.debug("Resolved menu : {}", pending.getName());
+      log.debug("Resolved menu: {}", pending.getName());
       pending.setParent(entity);
       pending = menus.save(pending);
     }
@@ -582,7 +591,7 @@ public class ViewLoader extends AbstractLoader {
       return;
     }
 
-    log.debug("Loading action menu : {}", name);
+    log.debug("Loading action menu: {}", name);
 
     MetaActionMenu entity = actionMenus.findByID(xmlId);
     MetaActionMenu other = actionMenus.findByName(name);
@@ -623,7 +632,7 @@ public class ViewLoader extends AbstractLoader {
     if (!Strings.isNullOrEmpty(menuItem.getParent())) {
       MetaActionMenu parent = actionMenus.findByName(menuItem.getParent());
       if (parent == null) {
-        log.debug("Unresolved parent : {}", menuItem.getParent());
+        log.debug("Unresolved parent: {}", menuItem.getParent());
         this.setUnresolved(MetaActionMenu.class, menuItem.getParent(), entity);
       } else {
         entity.setParent(parent);
@@ -643,7 +652,7 @@ public class ViewLoader extends AbstractLoader {
     entity = actionMenus.save(entity);
 
     for (MetaActionMenu pending : this.resolve(MetaActionMenu.class, name)) {
-      log.debug("Resolved action menu : {}", pending.getName());
+      log.debug("Resolved action menu: {}", pending.getName());
       pending.setParent(entity);
       pending = actionMenus.save(pending);
     }

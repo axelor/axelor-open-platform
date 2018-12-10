@@ -17,8 +17,7 @@
  */
 package com.axelor.meta.loader;
 
-import com.axelor.db.JPA;
-import com.axelor.db.Query;
+import com.axelor.common.ObjectUtils;
 import com.axelor.event.Observes;
 import com.axelor.events.FeatureChanged;
 import com.axelor.events.ModuleChanged;
@@ -26,10 +25,15 @@ import com.axelor.events.PostRequest;
 import com.axelor.events.qualifiers.EntityType;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.repo.MetaViewRepository;
+import com.axelor.rpc.Request;
+import com.axelor.rpc.Response;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Singleton;
-import com.google.inject.persist.Transactional;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -38,39 +42,68 @@ public class ViewObserver {
 
   private final MetaViewRepository metaViewRepo;
 
-  private static final int FETCH_LIMT = 2_000;
+  private final XMLViews.FinalXmlGenerator finalXmlGenerator;
 
   @Inject
-  public ViewObserver(MetaViewRepository metaViewRepo) {
+  ViewObserver(MetaViewRepository metaViewRepo, XMLViews.FinalXmlGenerator finalXmlGenerator) {
     this.metaViewRepo = metaViewRepo;
+    this.finalXmlGenerator = finalXmlGenerator;
   }
 
   void onModuleChanged(@Observes ModuleChanged event) {
-    clearFinalXml(metaViewRepo.findByDependentModule(event.getModuleName()));
+    finalXmlGenerator.parallelGenerate(metaViewRepo.findByDependentModule(event.getModuleName()));
   }
 
   void onFeatureChanged(@Observes FeatureChanged event) {
-    clearFinalXml(metaViewRepo.findByDependentFeature(event.getFeatureName()));
+    finalXmlGenerator.parallelGenerate(metaViewRepo.findByDependentFeature(event.getFeatureName()));
   }
 
-  void onViewChanged(@Observes @Named("save") @EntityType(MetaView.class) PostRequest event) {
-    final Map<String, Object> data = event.getRequest().getData();
-    final MetaView view = JPA.edit(MetaView.class, data);
-    clearFinalXml(metaViewRepo.findAllByName(view.getName()));
+  void onPostSave(@Observes @Named("save") @EntityType(MetaView.class) PostRequest event) {
+    processResponse(
+        event.getResponse(),
+        values ->
+            Optional.ofNullable((String) values.get("name"))
+                .map(metaViewRepo::findByName)
+                .ifPresent(finalXmlGenerator::generate));
   }
 
-  private void clearFinalXml(Query<MetaView> query) {
-    int offset = 0;
-    List<MetaView> views;
+  private void processRequest(Request request, Consumer<Map<String, Object>> consumer) {
+    final Collection<Object> records = getRecords(request.getRecords(), request.getData());
+    processRecords(records, consumer);
+  }
 
-    while (!(views = query.fetch(FETCH_LIMT, offset)).isEmpty()) {
-      clearFinalXml(views);
-      offset += views.size();
+  private void processResponse(Response response, Consumer<Map<String, Object>> consumer) {
+    final Collection<Object> records = getRecords(Collections.emptyList(), response.getData());
+    processRecords(records, consumer);
+  }
+
+  private Collection<Object> getRecords(Collection<Object> records, Object data) {
+    final Collection<Object> allRecords;
+
+    if (ObjectUtils.notEmpty(records)) {
+      allRecords = records;
+    } else if (data instanceof Collection) {
+      @SuppressWarnings("unchecked")
+      final Collection<Object> dataAsCollection = (Collection<Object>) data;
+      allRecords = dataAsCollection;
+    } else if (data != null) {
+      allRecords = ImmutableList.of(data);
+    } else {
+      allRecords = Collections.emptyList();
     }
+
+    return allRecords;
   }
 
-  @Transactional
-  void clearFinalXml(List<MetaView> views) {
-    views.forEach(view -> view.setFinalXml(null));
+  private void processRecords(Collection<Object> records, Consumer<Map<String, Object>> consumer) {
+    records
+        .parallelStream()
+        .filter(record -> record instanceof Map)
+        .forEach(
+            record -> {
+              @SuppressWarnings("unchecked")
+              final Map<String, Object> values = (Map<String, Object>) record;
+              consumer.accept(values);
+            });
   }
 }

@@ -22,7 +22,7 @@ import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
-import com.axelor.db.JPA;
+import com.axelor.db.Query;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaFeature;
@@ -51,6 +51,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
+import com.google.inject.persist.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -67,9 +68,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.inject.Inject;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -117,8 +122,25 @@ public class XMLViews {
   private static Marshaller marshaller;
   private static Unmarshaller unmarshaller;
   private static DocumentBuilderFactory documentBuilderFactory;
-  private static XPathFactory xPathFactory;
-  private static NamespaceContext nsContext;
+
+  private static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
+  private static final NamespaceContext NS_CONTEXT =
+      new NamespaceContext() {
+        @Override
+        public String getNamespaceURI(String prefix) {
+          return ObjectViews.NAMESPACE;
+        }
+
+        @Override
+        public String getPrefix(String namespaceURI) {
+          throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Iterator<Object> getPrefixes(String namespaceURI) {
+          throw new UnsupportedOperationException();
+        }
+      };
 
   private static final Pattern NS_PATTERN = Pattern.compile("/(\\w)");
 
@@ -130,11 +152,11 @@ public class XMLViews {
                 public XPathExpression load(String key) throws Exception {
                   XPath xPath;
 
-                  synchronized (xPathFactory) {
-                    xPath = xPathFactory.newXPath();
+                  synchronized (XPATH_FACTORY) {
+                    xPath = XPATH_FACTORY.newXPath();
                   }
 
-                  xPath.setNamespaceContext(nsContext);
+                  xPath.setNamespaceContext(NS_CONTEXT);
                   return xPath.compile(NS_PATTERN.matcher(key).replaceAll("/:$1"));
                 }
               });
@@ -191,26 +213,8 @@ public class XMLViews {
 
     documentBuilderFactory = DocumentBuilderFactory.newInstance();
     documentBuilderFactory.setNamespaceAware(true);
-    documentBuilderFactory.setSchema(schema);
-
-    xPathFactory = XPathFactory.newInstance();
-    nsContext =
-        new NamespaceContext() {
-          @Override
-          public String getNamespaceURI(String prefix) {
-            return ObjectViews.NAMESPACE;
-          }
-
-          @Override
-          public String getPrefix(String namespaceURI) {
-            throw new UnsupportedOperationException();
-          }
-
-          @Override
-          public Iterator<Object> getPrefixes(String namespaceURI) {
-            throw new UnsupportedOperationException();
-          }
-        };
+    // This adds default attributes to generated XML
+    // documentBuilderFactory.setSchema(schema);
 
     final String appConfigProdiverName = AppSettings.get().get(APP_CONFIG_PROVIDER_KEY);
 
@@ -226,7 +230,7 @@ public class XMLViews {
     }
 
     if (appConfigProvider == null) {
-      appConfigProvider = feature -> false;
+      appConfigProvider = featureName -> false;
     }
   }
 
@@ -260,30 +264,11 @@ public class XMLViews {
     }
   }
 
-  public static Document parseXml(final String xml)
+  public static Document parseXml(String xml)
       throws ParserConfigurationException, SAXException, IOException {
     final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
     final InputSource is = new InputSource(new StringReader(prepareXML(xml)));
     return documentBuilder.parse(is);
-  }
-
-  private static Stream<Node> nodeListToStream(final NodeList nodeList) {
-    return nodeListToList(nodeList).stream();
-  }
-
-  private static List<Node> nodeListToList(final NodeList nodeList) {
-    return new AbstractList<Node>() {
-      @Override
-      public int size() {
-        return nodeList.getLength();
-      }
-
-      @Override
-      public Node get(final int index) {
-        return Optional.ofNullable(nodeList.item(index))
-            .orElseThrow(IndexOutOfBoundsException::new);
-      }
-    };
   }
 
   public static boolean isViewType(String type) {
@@ -476,27 +461,19 @@ public class XMLViews {
     final AbstractView xmlView;
     final MetaModel metaModel;
     try {
-      final String finalXml;
+      final String xml;
 
       if (custom == null) {
         if (view == null) {
           return null;
         }
 
-        finalXml = view.getFinalXml();
+        xml = view.getFinalXml() != null ? view.getFinalXml() : view.getXml();
       } else {
-        finalXml = custom.getXml();
+        xml = custom.getXml();
       }
 
-      final ObjectViews objectViews;
-
-      if (finalXml != null) {
-        objectViews = unmarshal(finalXml);
-      } else {
-        final List<MetaView> extensionMetaViews = findExtensionMetaViews(name, model, type, module);
-        objectViews = updateViewAndUnmarshal(view, extensionMetaViews);
-      }
-
+      final ObjectViews objectViews = unmarshal(xml);
       xmlView = objectViews.getViews().get(0);
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -520,204 +497,6 @@ public class XMLViews {
       }
     }
     return xmlView;
-  }
-
-  private static ObjectViews updateViewAndUnmarshal(MetaView view) throws JAXBException {
-    final String finalXml = view.getXml();
-    setFinalXml(view, finalXml);
-    return unmarshal(finalXml);
-  }
-
-  private static ObjectViews updateViewAndUnmarshal(
-      final MetaView view, final Collection<MetaView> extensionMetaViews)
-      throws ParserConfigurationException, SAXException, IOException, XPathExpressionException,
-          JAXBException {
-
-    if (extensionMetaViews.isEmpty()) {
-      return updateViewAndUnmarshal(view);
-    }
-
-    final String xml = view.getXml();
-    final String viewName = view.getName();
-    final String viewType = view.getType();
-    final Document document = parseXml(xml);
-
-    final MetaFeatureRepository metaFeatureRepo = Beans.get(MetaFeatureRepository.class);
-    final MetaModuleRepository metaModuleRepo = Beans.get(MetaModuleRepository.class);
-
-    for (final MetaView extensionMetaView : extensionMetaViews) {
-      final Document extensionDocument = parseXml(extensionMetaView.getXml());
-      final NodeList extendNodeList = extensionDocument.getElementsByTagName("extend");
-
-      for (final Node extendNode : nodeListToList(extendNodeList)) {
-        final NamedNodeMap extendAttributes = extendNode.getAttributes();
-        final String feature = getNodeAttributeValue(extendAttributes, "if-feature");
-
-        if (StringUtils.notBlank(feature)) {
-          MetaFeature metaFeature = metaFeatureRepo.findByName(feature);
-
-          if (metaFeature == null) {
-            metaFeature = new MetaFeature(feature);
-          }
-
-          view.addDependentFeature(metaFeature);
-
-          if (!appConfigProvider.hasFeature(feature)) {
-            continue;
-          }
-        }
-
-        final String module = getNodeAttributeValue(extendAttributes, "if-module");
-
-        if (StringUtils.notBlank(module)) {
-          final MetaModule metaModule = metaModuleRepo.findByName(module);
-
-          if (metaModule != null) {
-            view.addDependentModule(metaModule);
-          }
-
-          if (!ModuleManager.isInstalled(module)) {
-            continue;
-          }
-        }
-
-        final String target = getNodeAttributeValue(extendAttributes, "target");
-        final Node targetNode =
-            (Node) evaluateXPath(target, viewName, viewType, document, XPathConstants.NODE);
-
-        if (targetNode == null) {
-          log.error(
-              "View {}({}): extend target not found: {}",
-              extensionMetaView.getName(),
-              extensionMetaView.getXmlId(),
-              target);
-          continue;
-        }
-
-        if (!(targetNode instanceof Element)) {
-          log.error(
-              "View {}({}): node is not an element: {}",
-              extensionMetaView.getName(),
-              extensionMetaView.getXmlId(),
-              target);
-          continue;
-        }
-
-        final Element targetElement = (Element) targetNode;
-        final Collection<Node> extendItemNodes =
-            nodeListToStream(extendNode.getChildNodes())
-                .filter(extendItemNode -> extendItemNode instanceof Element)
-                .collect(Collectors.toList());
-
-        for (final Node extendItemNode : extendItemNodes) {
-          switch (extendItemNode.getNodeName()) {
-            case "insert":
-              {
-                final NamedNodeMap attributes = extendItemNode.getAttributes();
-                final String positionValue = getNodeAttributeValue(attributes, "position");
-                final Position position = Position.get(positionValue);
-                final Node refNode = position.getRefNodeFunc().apply(targetElement);
-                final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
-
-                nodeListToStream(extendItemNode.getChildNodes())
-                    .filter(node -> node instanceof Element)
-                    .map(node -> document.importNode(node, true))
-                    .forEach(node -> parentNode.insertBefore(node, refNode));
-              }
-              break;
-            case "replace":
-              {
-                final Node refNode = Position.AFTER.getRefNodeFunc().apply(targetElement);
-                final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
-
-                nodeListToStream(extendItemNode.getChildNodes())
-                    .filter(node -> node instanceof Element)
-                    .map(node -> document.importNode(node, true))
-                    .forEach(node -> parentNode.insertBefore(node, refNode));
-                parentNode.removeChild(targetElement);
-              }
-              break;
-            case "move":
-              {
-                final NamedNodeMap attributes = extendItemNode.getAttributes();
-                final String source = getNodeAttributeValue(attributes, "source");
-                final Node sourceNode =
-                    (Node) evaluateXPath(source, viewName, viewType, document, XPathConstants.NODE);
-
-                if (sourceNode == null) {
-                  log.error(
-                      "View {}({}): move source not found: {}",
-                      extensionMetaView.getName(),
-                      extensionMetaView.getXmlId(),
-                      sourceNode);
-                  continue;
-                }
-
-                final String positionValue = getNodeAttributeValue(attributes, "position");
-                final Position position = Position.get(positionValue);
-                final Node refNode = position.getRefNodeFunc().apply(targetElement);
-                final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
-
-                parentNode.insertBefore(sourceNode, refNode);
-              }
-              break;
-            case "attribute":
-              {
-                final NamedNodeMap attributes = extendItemNode.getAttributes();
-                final String name = getNodeAttributeValue(attributes, "name");
-                final String value = getNodeAttributeValue(attributes, "value");
-                targetElement.setAttribute(name, value);
-              }
-              break;
-            default:
-              log.error(
-                  "View {}({}): unknown extension tag: {}",
-                  extensionMetaView.getName(),
-                  extensionMetaView.getXmlId(),
-                  extendItemNode.getNodeName());
-          }
-        }
-      }
-    }
-
-    final ObjectViews objectViews = unmarshal(document);
-    final String finalXml = toXml(objectViews.getViews().get(0), true);
-    setFinalXml(view, finalXml);
-
-    return objectViews;
-  }
-
-  private static void setFinalXml(MetaView view, String finalXml) {
-    JPA.runInTransaction(() -> view.setFinalXml(finalXml));
-  }
-
-  private static String getNodeAttributeValue(NamedNodeMap attributes, String name) {
-    final Node item = attributes.getNamedItem(name);
-    return item != null ? item.getNodeValue() : "";
-  }
-
-  private static Object evaluateXPath(
-      String subExpression, String name, String type, Object item, QName returnType)
-      throws XPathExpressionException {
-    return evaluateXPath(prepareXPathExpression(subExpression, name, type), item, returnType);
-  }
-
-  private static Object evaluateXPath(String expression, Object item, QName returnType)
-      throws XPathExpressionException {
-    XPathExpression xPathExpression = XPATH_EXPRESSION_CACHE.getUnchecked(expression);
-
-    synchronized (xPathExpression) {
-      return xPathExpression.evaluate(item, returnType);
-    }
-  }
-
-  private static String prepareXPathExpression(String subExpression, String name, String type) {
-    final String rootExpr = "/:object-views/:%s[@name='%s']";
-    return String.format(
-        subExpression.isEmpty() ? rootExpr : rootExpr + "/" + subExpression,
-        type,
-        name,
-        subExpression);
   }
 
   private static List<MetaView> findExtensionMetaViews(
@@ -785,6 +564,306 @@ public class XMLViews {
       return action;
     } catch (Exception e) {
       return null;
+    }
+  }
+
+  static class FinalXmlGenerator {
+
+    private static final int NUM_WORKERS = Runtime.getRuntime().availableProcessors();
+    private static final int FETCH_LIMIT = 100;
+    private static final int FETCH_INCREMENT = NUM_WORKERS * FETCH_LIMIT;
+
+    private final MetaFeatureRepository metaFeatureRepo;
+    private final MetaModuleRepository metaModuleRepo;
+
+    @Inject
+    FinalXmlGenerator(MetaFeatureRepository metaFeatureRepo, MetaModuleRepository metaModuleRepo) {
+      this.metaFeatureRepo = metaFeatureRepo;
+      this.metaModuleRepo = metaModuleRepo;
+    }
+
+    public void generate(MetaView view) {
+      try {
+        generateChecked(view);
+      } catch (XPathExpressionException
+          | ParserConfigurationException
+          | SAXException
+          | IOException
+          | JAXBException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    @Transactional
+    public void generateChecked(MetaView view)
+        throws ParserConfigurationException, SAXException, IOException, XPathExpressionException,
+            JAXBException {
+
+      final List<MetaView> extensionViews =
+          findExtensionMetaViews(view.getName(), view.getModel(), view.getType(), view.getModule());
+
+      if (extensionViews.isEmpty()) {
+        view.setFinalXml(null);
+        return;
+      }
+
+      final String xml = view.getXml();
+      final String viewName = view.getName();
+      final String viewType = view.getType();
+      final Document document = parseXml(xml);
+
+      final MetaFeatureRepository metaFeatureRepo = Beans.get(MetaFeatureRepository.class);
+      final MetaModuleRepository metaModuleRepo = Beans.get(MetaModuleRepository.class);
+
+      for (final MetaView extensionView : extensionViews) {
+        final Document extensionDocument = parseXml(extensionView.getXml());
+        final NodeList extendNodeList = extensionDocument.getElementsByTagName("extend");
+
+        for (final Node extendNode : nodeListToList(extendNodeList)) {
+          final NamedNodeMap extendAttributes = extendNode.getAttributes();
+          final String feature = getNodeAttributeValue(extendAttributes, "if-feature");
+
+          if (StringUtils.notBlank(feature)) {
+            MetaFeature metaFeature = metaFeatureRepo.findByName(feature);
+
+            if (metaFeature == null) {
+              metaFeature = new MetaFeature(feature);
+            }
+
+            view.addDependentFeature(metaFeature);
+
+            if (!appConfigProvider.hasFeature(feature)) {
+              continue;
+            }
+          }
+
+          final String module = getNodeAttributeValue(extendAttributes, "if-module");
+
+          if (StringUtils.notBlank(module)) {
+            final MetaModule metaModule = metaModuleRepo.findByName(module);
+
+            if (metaModule != null) {
+              view.addDependentModule(metaModule);
+            }
+
+            if (!ModuleManager.isInstalled(module)) {
+              continue;
+            }
+          }
+
+          final String target = getNodeAttributeValue(extendAttributes, "target");
+          final Node targetNode =
+              (Node) evaluateXPath(target, viewName, viewType, document, XPathConstants.NODE);
+
+          if (targetNode == null) {
+            log.error(
+                "View {}({}): extend target not found: {}",
+                extensionView.getName(),
+                extensionView.getXmlId(),
+                target);
+            continue;
+          }
+
+          if (!(targetNode instanceof Element)) {
+            log.error(
+                "View {}({}): node is not an element: {}",
+                extensionView.getName(),
+                extensionView.getXmlId(),
+                target);
+            continue;
+          }
+
+          final Element targetElement = (Element) targetNode;
+          final Collection<Node> extendItemNodes =
+              nodeListToStream(extendNode.getChildNodes())
+                  .filter(extendItemNode -> extendItemNode instanceof Element)
+                  .collect(Collectors.toList());
+
+          for (final Node extendItemNode : extendItemNodes) {
+            switch (extendItemNode.getNodeName()) {
+              case "insert":
+                {
+                  final NamedNodeMap attributes = extendItemNode.getAttributes();
+                  final String positionValue = getNodeAttributeValue(attributes, "position");
+                  final Position position = Position.get(positionValue);
+                  final Node refNode = position.getRefNodeFunc().apply(targetElement);
+                  final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
+
+                  nodeListToStream(extendItemNode.getChildNodes())
+                      .filter(node -> node instanceof Element)
+                      .map(node -> document.importNode(node, true))
+                      .forEach(node -> parentNode.insertBefore(node, refNode));
+                }
+                break;
+              case "replace":
+                {
+                  final Node refNode = Position.AFTER.getRefNodeFunc().apply(targetElement);
+                  final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
+
+                  nodeListToStream(extendItemNode.getChildNodes())
+                      .filter(node -> node instanceof Element)
+                      .map(node -> document.importNode(node, true))
+                      .forEach(node -> parentNode.insertBefore(node, refNode));
+                  parentNode.removeChild(targetElement);
+                }
+                break;
+              case "move":
+                {
+                  final NamedNodeMap attributes = extendItemNode.getAttributes();
+                  final String source = getNodeAttributeValue(attributes, "source");
+                  final Node sourceNode =
+                      (Node)
+                          evaluateXPath(source, viewName, viewType, document, XPathConstants.NODE);
+
+                  if (sourceNode == null) {
+                    log.error(
+                        "View {}({}): move source not found: {}",
+                        extensionView.getName(),
+                        extensionView.getXmlId(),
+                        sourceNode);
+                    continue;
+                  }
+
+                  final String positionValue = getNodeAttributeValue(attributes, "position");
+                  final Position position = Position.get(positionValue);
+                  final Node refNode = position.getRefNodeFunc().apply(targetElement);
+                  final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
+
+                  parentNode.insertBefore(sourceNode, refNode);
+                }
+                break;
+              case "attribute":
+                {
+                  final NamedNodeMap attributes = extendItemNode.getAttributes();
+                  final String name = getNodeAttributeValue(attributes, "name");
+                  final String value = getNodeAttributeValue(attributes, "value");
+                  targetElement.setAttribute(name, value);
+                }
+                break;
+              default:
+                log.error(
+                    "View {}({}): unknown extension tag: {}",
+                    extensionView.getName(),
+                    extensionView.getXmlId(),
+                    extendItemNode.getNodeName());
+            }
+          }
+        }
+      }
+
+      final ObjectViews objectViews = unmarshal(document);
+      final String finalXml = toXml(objectViews.getViews().get(0), true);
+      view.setFinalXml(finalXml);
+    }
+
+    public void parallelGenerate(Query<MetaView> query) {
+      final ExecutorService pool = Executors.newFixedThreadPool(NUM_WORKERS);
+
+      for (int i = 0; i < NUM_WORKERS; ++i) {
+        final int startOffset = i * FETCH_LIMIT;
+        pool.execute(
+            () -> {
+              try {
+                generate(query, startOffset, FETCH_INCREMENT);
+              } catch (XPathExpressionException
+                  | ParserConfigurationException
+                  | SAXException
+                  | IOException
+                  | JAXBException e) {
+                throw new RuntimeException(e);
+              }
+            });
+      }
+
+      shutdownAndAwaitTermination(pool);
+    }
+
+    public void generate(Query<MetaView> query)
+        throws XPathExpressionException, ParserConfigurationException, SAXException, IOException,
+            JAXBException {
+      generate(query, 0, FETCH_LIMIT);
+    }
+
+    private void generate(Query<MetaView> query, int startOffset, int increment)
+        throws XPathExpressionException, ParserConfigurationException, SAXException, IOException,
+            JAXBException {
+      List<MetaView> views;
+      int offset = startOffset;
+
+      while (!(views = query.fetch(FETCH_LIMIT, offset)).isEmpty()) {
+        generate(views);
+        offset += increment;
+      }
+    }
+
+    @Transactional
+    public void generate(List<MetaView> views)
+        throws XPathExpressionException, ParserConfigurationException, SAXException, IOException,
+            JAXBException {
+      for (final MetaView view : views) {
+        generate(view);
+      }
+    }
+
+    private static void shutdownAndAwaitTermination(ExecutorService pool) {
+      pool.shutdown();
+
+      try {
+        while (!pool.awaitTermination(1, TimeUnit.HOURS)) {
+          log.warn("Pool {} takes too long to terminate.", pool);
+        }
+      } catch (InterruptedException e) {
+        pool.shutdownNow();
+        Thread.currentThread().interrupt();
+      }
+    }
+
+    private static String getNodeAttributeValue(NamedNodeMap attributes, String name) {
+      final Node item = attributes.getNamedItem(name);
+      return item != null ? item.getNodeValue() : "";
+    }
+
+    private static Object evaluateXPath(
+        String subExpression, String name, String type, Object item, QName returnType)
+        throws XPathExpressionException {
+      return evaluateXPath(prepareXPathExpression(subExpression, name, type), item, returnType);
+    }
+
+    private static Object evaluateXPath(String expression, Object item, QName returnType)
+        throws XPathExpressionException {
+      XPathExpression xPathExpression = XPATH_EXPRESSION_CACHE.getUnchecked(expression);
+
+      synchronized (xPathExpression) {
+        return xPathExpression.evaluate(item, returnType);
+      }
+    }
+
+    private static String prepareXPathExpression(String subExpression, String name, String type) {
+      final String rootExpr = "/:object-views/:%s[@name='%s']";
+      return String.format(
+          subExpression.isEmpty() ? rootExpr : rootExpr + "/" + subExpression,
+          type,
+          name,
+          subExpression);
+    }
+
+    private static Stream<Node> nodeListToStream(NodeList nodeList) {
+      return nodeListToList(nodeList).stream();
+    }
+
+    private static List<Node> nodeListToList(NodeList nodeList) {
+      return new AbstractList<Node>() {
+        @Override
+        public int size() {
+          return nodeList.getLength();
+        }
+
+        @Override
+        public Node get(int index) {
+          return Optional.ofNullable(nodeList.item(index))
+              .orElseThrow(IndexOutOfBoundsException::new);
+        }
+      };
     }
   }
 }

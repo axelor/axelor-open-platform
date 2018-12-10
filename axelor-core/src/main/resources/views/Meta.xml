@@ -99,6 +99,7 @@
     <field name="type"/>
     <field name="model"/>
     <field name="module"/>
+    <field name="extension" width="90"/>
     <field name="priority" width="75"/>
   </grid>
 
@@ -135,8 +136,8 @@
       <panel title="Schema">
         <field name="xml" showTitle="false" widget="CodeEditor" height="500" x-code-syntax="xml" colSpan="12"/>
       </panel>
-      <panel title="Final schema" showIf="finalXml">
-        <field name="finalXml" showTitle="false" widget="CodeEditor" height="500" x-code-syntax="xml" colSpan="12"/>
+      <panel title="Final schema" showIf="finalXml &amp;&amp; finalXml != xml">
+        <field name="finalXml" showTitle="false" widget="CodeEditor" height="500" x-code-syntax="xml" colSpan="12" readonly="true"/>
       </panel>
     </panel-tabs>
   </form>
