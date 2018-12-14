@@ -42,4 +42,12 @@ public class ActionExecutor {
   public ActionResponse execute(ActionRequest request) {
     return newActionHandler(request).execute();
   }
+
+  Event<PreAction> getPreActionEvent() {
+    return preActionEvent;
+  }
+
+  Event<PostAction> getPostActionEvent() {
+    return postActionEvent;
+  }
 }

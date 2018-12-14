@@ -80,7 +80,17 @@ public class ActionHandler {
   private final Pattern pattern =
       Pattern.compile("^\\s*(select\\[\\]|select|action|call|eval):\\s*(.*)");
 
-  public ActionHandler(
+  /** @deprecated Use {@link ActionExecutor#newActionHandler(ActionRequest)} instead. */
+  @Deprecated
+  public ActionHandler(ActionRequest request) {
+    this(request, Beans.get(ActionExecutor.class));
+  }
+
+  private ActionHandler(ActionRequest request, ActionExecutor actionExecutor) {
+    this(request, actionExecutor.getPreActionEvent(), actionExecutor.getPostActionEvent());
+  }
+
+  ActionHandler(
       ActionRequest request, Event<PreAction> preActionEvent, Event<PostAction> postActionEvent) {
     this.request = request;
     this.preActionEvent = preActionEvent;
