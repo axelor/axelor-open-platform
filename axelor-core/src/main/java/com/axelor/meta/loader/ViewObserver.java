@@ -17,7 +17,6 @@
  */
 package com.axelor.meta.loader;
 
-import com.axelor.common.ObjectUtils;
 import com.axelor.event.Observes;
 import com.axelor.events.FeatureChanged;
 import com.axelor.events.ModuleChanged;
@@ -25,15 +24,9 @@ import com.axelor.events.PostRequest;
 import com.axelor.events.qualifiers.EntityType;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.repo.MetaViewRepository;
-import com.axelor.rpc.Request;
-import com.axelor.rpc.Response;
-import com.google.common.collect.ImmutableList;
+import com.axelor.rpc.RequestUtils;
 import com.google.inject.Singleton;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -59,51 +52,11 @@ public class ViewObserver {
   }
 
   void onPostSave(@Observes @Named("save") @EntityType(MetaView.class) PostRequest event) {
-    processResponse(
+    RequestUtils.processResponse(
         event.getResponse(),
         values ->
             Optional.ofNullable((String) values.get("name"))
                 .map(metaViewRepo::findByName)
                 .ifPresent(finalXmlGenerator::generate));
-  }
-
-  private void processRequest(Request request, Consumer<Map<String, Object>> consumer) {
-    final Collection<Object> records = getRecords(request.getRecords(), request.getData());
-    processRecords(records, consumer);
-  }
-
-  private void processResponse(Response response, Consumer<Map<String, Object>> consumer) {
-    final Collection<Object> records = getRecords(Collections.emptyList(), response.getData());
-    processRecords(records, consumer);
-  }
-
-  private Collection<Object> getRecords(Collection<Object> records, Object data) {
-    final Collection<Object> allRecords;
-
-    if (ObjectUtils.notEmpty(records)) {
-      allRecords = records;
-    } else if (data instanceof Collection) {
-      @SuppressWarnings("unchecked")
-      final Collection<Object> dataAsCollection = (Collection<Object>) data;
-      allRecords = dataAsCollection;
-    } else if (data != null) {
-      allRecords = ImmutableList.of(data);
-    } else {
-      allRecords = Collections.emptyList();
-    }
-
-    return allRecords;
-  }
-
-  private void processRecords(Collection<Object> records, Consumer<Map<String, Object>> consumer) {
-    records
-        .parallelStream()
-        .filter(record -> record instanceof Map)
-        .forEach(
-            record -> {
-              @SuppressWarnings("unchecked")
-              final Map<String, Object> values = (Map<String, Object>) record;
-              consumer.accept(values);
-            });
   }
 }

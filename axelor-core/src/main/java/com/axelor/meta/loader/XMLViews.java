@@ -23,6 +23,7 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
 import com.axelor.db.Query;
+import com.axelor.db.internal.DBHelper;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaFeature;
@@ -60,12 +61,12 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -570,8 +571,8 @@ public class XMLViews {
   static class FinalXmlGenerator {
 
     private static final int NUM_WORKERS = Runtime.getRuntime().availableProcessors();
-    private static final int FETCH_LIMIT = 100;
-    private static final int FETCH_INCREMENT = NUM_WORKERS * FETCH_LIMIT;
+    private static final int FETCH_INCREMENT = NUM_WORKERS * DBHelper.getJdbcFetchSize();
+    private static final String STRING_DELIMITER = ",";
 
     private final MetaFeatureRepository metaFeatureRepo;
     private final MetaModuleRepository metaModuleRepo;
@@ -594,7 +595,7 @@ public class XMLViews {
       }
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     public void generateChecked(MetaView view)
         throws ParserConfigurationException, SAXException, IOException, XPathExpressionException,
             JAXBException {
@@ -608,145 +609,22 @@ public class XMLViews {
       }
 
       final String xml = view.getXml();
-      final String viewName = view.getName();
-      final String viewType = view.getType();
       final Document document = parseXml(xml);
-
-      final MetaFeatureRepository metaFeatureRepo = Beans.get(MetaFeatureRepository.class);
-      final MetaModuleRepository metaModuleRepo = Beans.get(MetaModuleRepository.class);
+      final Node viewNode = findViewNode(document);
 
       for (final MetaView extensionView : extensionViews) {
         final Document extensionDocument = parseXml(extensionView.getXml());
-        final NodeList extendNodeList = extensionDocument.getElementsByTagName("extend");
+        final Node extensionViewNode = findViewNode(extensionDocument);
 
-        for (final Node extendNode : nodeListToList(extendNodeList)) {
-          final NamedNodeMap extendAttributes = extendNode.getAttributes();
-          final String feature = getNodeAttributeValue(extendAttributes, "if-feature");
-
-          if (StringUtils.notBlank(feature)) {
-            MetaFeature metaFeature = metaFeatureRepo.findByName(feature);
-
-            if (metaFeature == null) {
-              metaFeature = new MetaFeature(feature);
-            }
-
-            view.addDependentFeature(metaFeature);
-
-            if (!appConfigProvider.hasFeature(feature)) {
-              continue;
-            }
-          }
-
-          final String module = getNodeAttributeValue(extendAttributes, "if-module");
-
-          if (StringUtils.notBlank(module)) {
-            final MetaModule metaModule = metaModuleRepo.findByName(module);
-
-            if (metaModule != null) {
-              view.addDependentModule(metaModule);
-            }
-
-            if (!ModuleManager.isInstalled(module)) {
-              continue;
-            }
-          }
-
-          final String target = getNodeAttributeValue(extendAttributes, "target");
-          final Node targetNode =
-              (Node) evaluateXPath(target, viewName, viewType, document, XPathConstants.NODE);
-
-          if (targetNode == null) {
-            log.error(
-                "View {}({}): extend target not found: {}",
-                extensionView.getName(),
-                extensionView.getXmlId(),
-                target);
+        for (final Node node : nodeListToList(extensionViewNode.getChildNodes())) {
+          if (!(node instanceof Element)) {
             continue;
           }
 
-          if (!(targetNode instanceof Element)) {
-            log.error(
-                "View {}({}): node is not an element: {}",
-                extensionView.getName(),
-                extensionView.getXmlId(),
-                target);
-            continue;
-          }
-
-          final Element targetElement = (Element) targetNode;
-          final Collection<Node> extendItemNodes =
-              nodeListToStream(extendNode.getChildNodes())
-                  .filter(extendItemNode -> extendItemNode instanceof Element)
-                  .collect(Collectors.toList());
-
-          for (final Node extendItemNode : extendItemNodes) {
-            switch (extendItemNode.getNodeName()) {
-              case "insert":
-                {
-                  final NamedNodeMap attributes = extendItemNode.getAttributes();
-                  final String positionValue = getNodeAttributeValue(attributes, "position");
-                  final Position position = Position.get(positionValue);
-                  final Node refNode = position.getRefNodeFunc().apply(targetElement);
-                  final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
-
-                  nodeListToStream(extendItemNode.getChildNodes())
-                      .filter(node -> node instanceof Element)
-                      .map(node -> document.importNode(node, true))
-                      .forEach(node -> parentNode.insertBefore(node, refNode));
-                }
-                break;
-              case "replace":
-                {
-                  final Node refNode = Position.AFTER.getRefNodeFunc().apply(targetElement);
-                  final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
-
-                  nodeListToStream(extendItemNode.getChildNodes())
-                      .filter(node -> node instanceof Element)
-                      .map(node -> document.importNode(node, true))
-                      .forEach(node -> parentNode.insertBefore(node, refNode));
-                  parentNode.removeChild(targetElement);
-                }
-                break;
-              case "move":
-                {
-                  final NamedNodeMap attributes = extendItemNode.getAttributes();
-                  final String source = getNodeAttributeValue(attributes, "source");
-                  final Node sourceNode =
-                      (Node)
-                          evaluateXPath(source, viewName, viewType, document, XPathConstants.NODE);
-
-                  if (sourceNode == null) {
-                    log.error(
-                        "View {}({}): move source not found: {}",
-                        extensionView.getName(),
-                        extensionView.getXmlId(),
-                        sourceNode);
-                    continue;
-                  }
-
-                  final String positionValue = getNodeAttributeValue(attributes, "position");
-                  final Position position = Position.get(positionValue);
-                  final Node refNode = position.getRefNodeFunc().apply(targetElement);
-                  final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
-
-                  parentNode.insertBefore(sourceNode, refNode);
-                }
-                break;
-              case "attribute":
-                {
-                  final NamedNodeMap attributes = extendItemNode.getAttributes();
-                  final String name = getNodeAttributeValue(attributes, "name");
-                  final String value = getNodeAttributeValue(attributes, "value");
-                  targetElement.setAttribute(name, value);
-                }
-                break;
-              default:
-                log.error(
-                    "View {}({}): unknown extension tag: {}",
-                    extensionView.getName(),
-                    extensionView.getXmlId(),
-                    extendItemNode.getNodeName());
-            }
+          if ("extend".equals(node.getNodeName())) {
+            processExtend(document, node, view, extensionView);
+          } else {
+            processAppend(document, node, viewNode);
           }
         }
       }
@@ -756,53 +634,195 @@ public class XMLViews {
       view.setFinalXml(finalXml);
     }
 
+    private static Node findViewNode(Document document) {
+      return nodeListToStream(document.getFirstChild().getChildNodes())
+          .filter(node -> node instanceof Element)
+          .findFirst()
+          .orElseThrow(NoSuchElementException::new);
+    }
+
+    private void processExtend(
+        Document document, Node extensionNode, MetaView view, MetaView extensionView)
+        throws XPathExpressionException {
+
+      final NamedNodeMap extendAttributes = extensionNode.getAttributes();
+      final String feature = getNodeAttributeValue(extendAttributes, "if-feature");
+
+      if (StringUtils.notBlank(feature)) {
+        MetaFeature metaFeature = metaFeatureRepo.findByName(feature);
+
+        if (metaFeature == null) {
+          metaFeature = new MetaFeature(feature);
+        }
+
+        view.addDependentFeature(metaFeature);
+
+        if (!appConfigProvider.hasFeature(feature)) {
+          return;
+        }
+      }
+
+      final String module = getNodeAttributeValue(extendAttributes, "if-module");
+
+      if (StringUtils.notBlank(module)) {
+        final MetaModule metaModule = metaModuleRepo.findByName(module);
+
+        if (metaModule != null) {
+          view.addDependentModule(metaModule);
+        }
+
+        if (!ModuleManager.isInstalled(module)) {
+          return;
+        }
+      }
+
+      final String target = getNodeAttributeValue(extendAttributes, "target");
+      final Node targetNode =
+          (Node)
+              evaluateXPath(target, view.getName(), view.getType(), document, XPathConstants.NODE);
+
+      if (targetNode == null) {
+        log.error(
+            "View {}(id={}): extend target not found: {}",
+            extensionView.getName(),
+            extensionView.getXmlId(),
+            target);
+        return;
+      }
+
+      if (!(targetNode instanceof Element)) {
+        log.error(
+            "View {}(id={}): node is not an element: {}",
+            extensionView.getName(),
+            extensionView.getXmlId(),
+            target);
+        return;
+      }
+
+      final Element targetElement = (Element) targetNode;
+      final List<Node> extendItemNodes =
+          nodeListToStream(extensionNode.getChildNodes())
+              .filter(extendItemNode -> extendItemNode instanceof Element)
+              .collect(Collectors.toList());
+
+      for (final Node extendItemNode : extendItemNodes) {
+        switch (extendItemNode.getNodeName()) {
+          case "insert":
+            doInsert(extendItemNode, targetElement, document);
+            break;
+          case "replace":
+            doReplace(extendItemNode, targetElement, document);
+            break;
+          case "move":
+            doMove(extendItemNode, targetElement, document, view, extensionView);
+            break;
+          case "attribute":
+            doAttribute(extendItemNode, targetElement);
+            break;
+          default:
+            log.error(
+                "View {}(id={}): unknown extension tag: {}",
+                extensionView.getName(),
+                extensionView.getXmlId(),
+                extendItemNode.getNodeName());
+        }
+      }
+    }
+
+    private static void processAppend(Document document, Node extensionNode, Node viewNode) {
+      final Node node = document.importNode(extensionNode, true);
+      viewNode.appendChild(node);
+    }
+
+    private static void doInsert(Node extendItemNode, Element targetElement, Document document) {
+      final NamedNodeMap attributes = extendItemNode.getAttributes();
+      final String positionValue = getNodeAttributeValue(attributes, "position");
+      final Position position = Position.get(positionValue);
+      final Node refNode = position.getRefNodeFunc().apply(targetElement);
+      final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
+
+      nodeListToStream(extendItemNode.getChildNodes())
+          .filter(node -> node instanceof Element)
+          .map(node -> document.importNode(node, true))
+          .forEach(node -> parentNode.insertBefore(node, refNode));
+    }
+
+    private static void doReplace(Node extendItemNode, Element targetElement, Document document) {
+      final Node refNode = Position.AFTER.getRefNodeFunc().apply(targetElement);
+      final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
+
+      nodeListToStream(extendItemNode.getChildNodes())
+          .filter(node -> node instanceof Element)
+          .map(node -> document.importNode(node, true))
+          .forEach(node -> parentNode.insertBefore(node, refNode));
+      parentNode.removeChild(targetElement);
+    }
+
+    private static void doMove(
+        Node extendItemNode,
+        Element targetElement,
+        Document document,
+        MetaView view,
+        MetaView extensionView)
+        throws XPathExpressionException {
+      final NamedNodeMap attributes = extendItemNode.getAttributes();
+      final String source = getNodeAttributeValue(attributes, "source");
+      final Node sourceNode =
+          (Node)
+              evaluateXPath(source, view.getName(), view.getType(), document, XPathConstants.NODE);
+
+      if (sourceNode == null) {
+        log.error(
+            "View {}(id={}): move source not found: {}",
+            extensionView.getName(),
+            extensionView.getXmlId(),
+            sourceNode);
+        return;
+      }
+
+      final String positionValue = getNodeAttributeValue(attributes, "position");
+      final Position position = Position.get(positionValue);
+      final Node refNode = position.getRefNodeFunc().apply(targetElement);
+      final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
+
+      parentNode.insertBefore(sourceNode, refNode);
+    }
+
+    private static void doAttribute(Node extendItemNode, Element targetElement) {
+      final NamedNodeMap attributes = extendItemNode.getAttributes();
+      final String name = getNodeAttributeValue(attributes, "name");
+      final String value = getNodeAttributeValue(attributes, "value");
+      targetElement.setAttribute(name, value);
+    }
+
     public void parallelGenerate(Query<MetaView> query) {
       final ExecutorService pool = Executors.newFixedThreadPool(NUM_WORKERS);
 
       for (int i = 0; i < NUM_WORKERS; ++i) {
-        final int startOffset = i * FETCH_LIMIT;
-        pool.execute(
-            () -> {
-              try {
-                generate(query, startOffset, FETCH_INCREMENT);
-              } catch (XPathExpressionException
-                  | ParserConfigurationException
-                  | SAXException
-                  | IOException
-                  | JAXBException e) {
-                throw new RuntimeException(e);
-              }
-            });
+        final int startOffset = i * DBHelper.getJdbcFetchSize();
+        pool.execute(() -> generate(query, startOffset, FETCH_INCREMENT));
       }
 
       shutdownAndAwaitTermination(pool);
     }
 
-    public void generate(Query<MetaView> query)
-        throws XPathExpressionException, ParserConfigurationException, SAXException, IOException,
-            JAXBException {
-      generate(query, 0, FETCH_LIMIT);
+    public void generate(Query<MetaView> query) {
+      generate(query, 0, DBHelper.getJdbcFetchSize());
     }
 
-    private void generate(Query<MetaView> query, int startOffset, int increment)
-        throws XPathExpressionException, ParserConfigurationException, SAXException, IOException,
-            JAXBException {
+    private void generate(Query<MetaView> query, int startOffset, int increment) {
       List<MetaView> views;
       int offset = startOffset;
 
-      while (!(views = query.fetch(FETCH_LIMIT, offset)).isEmpty()) {
+      while (!(views = query.fetch(DBHelper.getJdbcFetchSize(), offset)).isEmpty()) {
         generate(views);
         offset += increment;
       }
     }
 
     @Transactional
-    public void generate(List<MetaView> views)
-        throws XPathExpressionException, ParserConfigurationException, SAXException, IOException,
-            JAXBException {
-      for (final MetaView view : views) {
-        generate(view);
-      }
+    public void generate(List<MetaView> views) {
+      views.forEach(this::generate);
     }
 
     private static void shutdownAndAwaitTermination(ExecutorService pool) {

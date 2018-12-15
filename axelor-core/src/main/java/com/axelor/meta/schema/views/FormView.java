@@ -17,18 +17,13 @@
  */
 package com.axelor.meta.schema.views;
 
-import com.axelor.meta.loader.XMLViews;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
@@ -190,7 +185,7 @@ public class FormView extends AbstractView implements ExtendableView {
     this.canAttach = canAttach;
   }
 
-  @JsonIgnore
+  @JsonProperty("items")
   public List<AbstractWidget> getItems() {
     if (items == null) {
       return Collections.emptyList();
@@ -206,34 +201,6 @@ public class FormView extends AbstractView implements ExtendableView {
 
   public void setItems(List<AbstractWidget> items) {
     this.items = items;
-  }
-
-  @XmlTransient
-  @JsonProperty("items")
-  public List<AbstractWidget> getItemsWithExtensions() {
-    // check if this view is included in another view with same name
-    // in that case, don't use extension view as owner will already use it.
-    AbstractView owner = this.getOwner();
-    while (owner != null) {
-      if (Objects.equals(getName(), owner.getName())) {
-        return getItems();
-      }
-      owner = owner.getOwner();
-    }
-
-    final List<AbstractWidget> items = getItems();
-    final List<AbstractWidget> all = new ArrayList<>();
-    if (items != null) {
-      all.addAll(items);
-    }
-    final List<AbstractView> extensions =
-        XMLViews.findExtensions(getName(), getModel(), "form", null);
-    for (AbstractView extension : extensions) {
-      if (extension instanceof FormView) {
-        all.addAll(((FormView) extension).getItems());
-      }
-    }
-    return all.isEmpty() ? null : all;
   }
 
   @Override

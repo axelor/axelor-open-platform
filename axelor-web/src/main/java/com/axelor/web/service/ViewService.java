@@ -235,7 +235,7 @@ public class ViewService extends AbstractService {
         all -> Optional.ofNullable(all).ifPresent(items::addAll);
     if (view instanceof FormView) {
       FormView form = (FormView) view;
-      collect.accept(form.getItemsWithExtensions());
+      collect.accept(form.getItems());
       if (form.getToolbar() != null) {
         items.addAll(form.getToolbar());
       }
