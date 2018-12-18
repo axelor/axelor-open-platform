@@ -44,11 +44,11 @@ public class ViewObserver {
   }
 
   void onModuleChanged(@Observes ModuleChanged event) {
-    finalXmlGenerator.parallelGenerate(metaViewRepo.findByDependentModule(event.getModuleName()));
+    finalXmlGenerator.generate(metaViewRepo.findByDependentModule(event.getModuleName()));
   }
 
   void onFeatureChanged(@Observes FeatureChanged event) {
-    finalXmlGenerator.parallelGenerate(metaViewRepo.findByDependentFeature(event.getFeatureName()));
+    finalXmlGenerator.generate(metaViewRepo.findByDependentFeature(event.getFeatureName()));
   }
 
   void onPostSave(@Observes @Named("save") @EntityType(MetaView.class) PostRequest event) {

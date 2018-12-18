@@ -59,7 +59,7 @@ public class RequestUtils {
   private static void processRecords(
       Collection<Object> records, Consumer<Map<String, Object>> consumer) {
     records
-        .parallelStream()
+        .stream()
         .filter(record -> record instanceof Map)
         .forEach(
             record -> {

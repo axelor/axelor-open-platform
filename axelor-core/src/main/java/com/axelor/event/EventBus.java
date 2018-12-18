@@ -17,16 +17,26 @@
  */
 package com.axelor.event;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -34,43 +44,46 @@ import javax.inject.Singleton;
 @Singleton
 class EventBus {
 
-  private Injector injector;
+  private final Injector injector;
 
-  private Map<Class<?>, List<Observer>> observers;
+  private final AtomicReference<Map<Class<?>, List<Observer>>> observersRef =
+      new AtomicReference<>();
 
-  private Object lock = new Object();
+  private final LoadingCache<Class<?>, Map<Entry<Type, Set<Annotation>>, List<Observer>>>
+      observersCache =
+          CacheBuilder.newBuilder()
+              .weakKeys()
+              .build(CacheLoader.from(k -> new ConcurrentHashMap<>()));
 
   @Inject
   public EventBus(Injector injector) {
     this.injector = injector;
   }
 
-  private List<Observer> find(Class<?> runtimeType, Type eventType, Set<Annotation> qualifiers) {
-    if (observers == null) {
-      synchronized (lock) {
-        observers = new ConcurrentHashMap<>();
-        injector
-            .getAllBindings()
-            .entrySet()
-            .stream()
-            .map(e -> e.getKey())
-            .map(k -> k.getTypeLiteral())
-            .map(t -> t.getRawType())
-            .flatMap(t -> Arrays.stream(t.getDeclaredMethods()))
-            .filter(m -> Observer.isObserver(m))
-            .map(m -> new Observer(m))
-            .forEach(
-                o -> {
-                  List<Observer> items =
-                      observers.computeIfAbsent(o.eventRawType, k -> new ArrayList<>());
-                  items.add(o);
-                });
-        observers.values().forEach(items -> Collections.sort(items, Observer::compareTo));
-      }
-    }
+  private Map<Class<?>, List<Observer>> findObservers() {
+    final Map<Class<?>, List<Observer>> observers = new HashMap<>();
+    injector
+        .getAllBindings()
+        .entrySet()
+        .stream()
+        .map(Entry::getKey)
+        .map(Key::getTypeLiteral)
+        .map(TypeLiteral::getRawType)
+        .flatMap(t -> Arrays.stream(t.getDeclaredMethods()))
+        .filter(Observer::isObserver)
+        .map(Observer::new)
+        .forEach(o -> observers.computeIfAbsent(o.eventRawType, k -> new ArrayList<>()).add(o));
+    observers.values().forEach(items -> Collections.sort(items, Observer::compareTo));
+    return observers;
+  }
 
-    final List<Observer> found = observers.getOrDefault(runtimeType, Collections.emptyList());
-    final Set<Annotation> annotations = qualifiers == null ? Collections.emptySet() : qualifiers;
+  private List<Observer> find(Class<?> runtimeType, Type eventType, Set<Annotation> qualifiers) {
+    final List<Observer> found =
+        observersRef
+            .updateAndGet(observers -> observers != null ? observers : findObservers())
+            .getOrDefault(runtimeType, Collections.emptyList());
+    final Set<Annotation> annotations =
+        Optional.ofNullable(qualifiers).orElse(Collections.emptySet());
 
     return found
         .stream()
@@ -79,7 +92,13 @@ class EventBus {
   }
 
   public void fire(Object event, Type eventType, Set<Annotation> qualifiers) {
-    Class<?> t = event.getClass();
-    this.find(t, eventType, qualifiers).forEach(o -> o.invoke(event));
+    final Class<?> eventClass = event.getClass();
+    final Map<Entry<Type, Set<Annotation>>, List<Observer>> observersByTypeAndQualifiers =
+        observersCache.getUnchecked(eventClass);
+    final List<Observer> foundObservers =
+        observersByTypeAndQualifiers.computeIfAbsent(
+            new SimpleImmutableEntry<>(eventType, qualifiers),
+            k -> find(eventClass, k.getKey(), k.getValue()));
+    foundObservers.forEach(o -> o.invoke(event));
   }
 }
