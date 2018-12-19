@@ -25,7 +25,7 @@ public class ExtendItemMove {
 
   @XmlAttribute private String source;
 
-  @XmlAttribute private PositionType position;
+  @XmlAttribute private Position position;
 
   public String getSource() {
     return source;
@@ -35,11 +35,11 @@ public class ExtendItemMove {
     this.source = source;
   }
 
-  public PositionType getPosition() {
+  public Position getPosition() {
     return position;
   }
 
-  public void setPosition(PositionType position) {
+  public void setPosition(Position position) {
     this.position = position;
   }
 }

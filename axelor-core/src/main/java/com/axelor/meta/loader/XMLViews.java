@@ -33,7 +33,7 @@ import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
-import com.axelor.meta.schema.views.PositionType;
+import com.axelor.meta.schema.views.Position;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Joiner;
@@ -567,7 +567,6 @@ public class XMLViews {
         }
 
         final Element targetElement = (Element) targetNode;
-        final String targetTagName = targetElement.getTagName();
         final Collection<Node> extendItemNodes =
             nodeListToStream(extendNode.getChildNodes())
                 .filter(extendItemNode -> extendItemNode instanceof Element)
@@ -579,7 +578,7 @@ public class XMLViews {
               {
                 final NamedNodeMap attributes = extendItemNode.getAttributes();
                 final String positionValue = getNodeAttributeValue(attributes, "position");
-                final PositionType position = PositionType.get(positionValue, targetTagName);
+                final Position position = Position.get(positionValue);
                 final Node refNode = position.getRefNodeFunc().apply(targetElement);
                 final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
 
@@ -591,7 +590,7 @@ public class XMLViews {
               break;
             case "replace":
               {
-                final Node refNode = PositionType.AFTER.getRefNodeFunc().apply(targetElement);
+                final Node refNode = Position.AFTER.getRefNodeFunc().apply(targetElement);
                 final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
 
                 nodeListToStream(extendItemNode.getChildNodes())
@@ -618,7 +617,7 @@ public class XMLViews {
                 }
 
                 final String positionValue = getNodeAttributeValue(attributes, "position");
-                final PositionType position = PositionType.get(positionValue, targetTagName);
+                final Position position = Position.get(positionValue);
                 final Node refNode = position.getRefNodeFunc().apply(targetElement);
                 final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
 

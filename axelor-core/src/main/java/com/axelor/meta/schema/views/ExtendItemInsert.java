@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType
 public class ExtendItemInsert {
 
-  @XmlAttribute private PositionType position;
+  @XmlAttribute private Position position;
 
   @XmlElements({
     @XmlElement(name = "include", type = FormInclude.class),
@@ -52,11 +52,11 @@ public class ExtendItemInsert {
   })
   private List<AbstractWidget> items;
 
-  public PositionType getPosition() {
+  public Position getPosition() {
     return position;
   }
 
-  public void setPosition(PositionType position) {
+  public void setPosition(Position position) {
     this.position = position;
   }
 

@@ -17,11 +17,8 @@
  */
 package com.axelor.meta.schema.views;
 
-import com.google.common.collect.Sets;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.xml.bind.annotation.XmlEnum;
@@ -31,9 +28,7 @@ import org.w3c.dom.Node;
 
 @XmlType
 @XmlEnum
-public enum PositionType {
-  @XmlEnumValue("inside")
-  INSIDE(node -> null),
+public enum Position {
   @XmlEnumValue("after")
   AFTER(node -> node != null ? node.getNextSibling() : node),
   @XmlEnumValue("before")
@@ -42,23 +37,20 @@ public enum PositionType {
   private final String value;
   private final Function<Node, Node> refNodeFunc;
 
-  private static final Map<String, PositionType> POSITION_TYPES =
-      Arrays.stream(PositionType.class.getFields())
+  private static final Map<String, Position> POSITION_TYPES =
+      Arrays.stream(Position.class.getFields())
           .collect(
               Collectors.toMap(
                   field -> field.getAnnotation(XmlEnumValue.class).value(),
                   field -> {
                     try {
-                      return (PositionType) field.get(PositionType.class);
+                      return (Position) field.get(Position.class);
                     } catch (IllegalAccessException e) {
                       throw new RuntimeException(e);
                     }
                   }));
-  private static final Set<String> DEFAULT_TO_AFTER_TAGS =
-      Sets.newHashSet(
-          "button", "field", "help", "hilite", "label", "static", "spacer", "separator");
 
-  private PositionType(Function<Node, Node> refNodeFunc) {
+  private Position(Function<Node, Node> refNodeFunc) {
     value = name().toLowerCase();
     this.refNodeFunc = refNodeFunc;
   }
@@ -71,19 +63,7 @@ public enum PositionType {
     return refNodeFunc;
   }
 
-  public static PositionType get(String name) {
-    return POSITION_TYPES.computeIfAbsent(
-        name,
-        key -> {
-          throw new NoSuchElementException(name);
-        });
-  }
-
-  public static PositionType get(String name, String tagName) {
-    if (name.isEmpty()) {
-      return DEFAULT_TO_AFTER_TAGS.contains(tagName) ? AFTER : INSIDE;
-    }
-
-    return get(name);
+  public static Position get(String name) {
+    return POSITION_TYPES.getOrDefault(name, AFTER);
   }
 }
