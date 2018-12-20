@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.loader;
 
+import com.axelor.app.AppConfig;
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
@@ -135,7 +136,7 @@ public class XMLViews {
               });
 
   private static final String APP_CONFIG_PROVIDER_KEY = "application.config.provider";
-  private static Predicate<String> appConfigProvider;
+  private static AppConfig appConfigProvider;
 
   static {
     try {
@@ -210,8 +211,7 @@ public class XMLViews {
     if (StringUtils.notBlank(appConfigProdiverName)) {
       try {
         @SuppressWarnings("unchecked")
-        final Class<Predicate<String>> cls =
-            (Class<Predicate<String>>) Class.forName(appConfigProdiverName);
+        final Class<AppConfig> cls = (Class<AppConfig>) Class.forName(appConfigProdiverName);
         appConfigProvider = Beans.get(cls);
       } catch (ClassNotFoundException e) {
         log.error(
@@ -534,7 +534,7 @@ public class XMLViews {
         final NamedNodeMap extendAttributes = extendNode.getAttributes();
         final String feature = getNodeAttributeValue(extendAttributes, "if-feature");
 
-        if (StringUtils.notBlank(feature) && !appConfigProvider.test(feature)) {
+        if (StringUtils.notBlank(feature) && !appConfigProvider.hasFeature(feature)) {
           continue;
         }
 
