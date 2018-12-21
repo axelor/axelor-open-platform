@@ -1,6 +1,13 @@
-## 5.0.10 (current)
+## 5.0.10 (2018-12-21)
 
-TBD
+#### Bugs
+
+* Fix typo in Query#fetchStream methods
+* Fix boolean-radio widget issue
+* Check for parent to determine if a widget is hidden (#33)
+* Fix I18nBundle initialization issues
+* Fix idle in transaction when using quartz
+* Fix pending data import of action menus not resolved 
 
 ## 5.0.9 (2018-11-28)
 
