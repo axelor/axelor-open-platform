@@ -277,8 +277,6 @@ public class ViewLoader extends AbstractLoader {
     entity.setModule(module.getName());
     entity.setXml(xml);
     entity.setFinalXml(null);
-    entity.clearDependentModules();
-    entity.clearDependentFeatures();
     entity.setGroups(this.findGroups(view.getGroups(), entity.getGroups()));
     entity.setExtension(view.getExtension());
 

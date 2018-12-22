@@ -22,10 +22,6 @@
     <boolean name="pending" />
   </entity>
 
-  <entity name="MetaFeature" table="META_FEATURE" cachable="true">
-    <string name="name" required="true" unique="true"/>
-  </entity>
-
   <entity name="MetaView" table="META_VIEW" cachable="true">
     <![CDATA[
     This object store the xml views.
@@ -44,21 +40,25 @@
     <many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
 
     <string name="finalXml" large="true"/>
-    <many-to-many name="dependentModules" ref="MetaModule"/>
-    <many-to-many name="dependentFeatures" ref="MetaFeature"/>
+    <string name="dependentModules"/>
+    <string name="dependentFeatures"/>
 
     <finder-method name="findByID" using="xmlId" />
     <finder-method name="findByName" using="name" orderBy="-priority,-extension" cacheable="true"/>
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
 
-    <finder-method name="findByDependentModule" using="module" all="true" orderBy="id"
+    <finder-method name="findByDependentModule" using="String:module" all="true" orderBy="id"
       filter="COALESCE(self.extension, FALSE) = FALSE
-      AND (SELECT module FROM MetaModule module WHERE module.name = :module)
-      MEMBER OF self.dependentModules" />
+      AND (self.dependentModules LIKE :module
+      OR self.dependentModules LIKE CONCAT('%,', :module, ',%')
+      OR self.dependentModules LIKE CONCAT(:module, ',%')
+      OR self.dependentModules LIKE CONCAT('%,', :module))" />
     <finder-method name="findByDependentFeature" using="String:feature" all="true" orderBy="id"
       filter="COALESCE(self.extension, FALSE) = FALSE
-      AND (SELECT feature FROM MetaFeature feature WHERE feature.name = :feature)
-      MEMBER OF self.dependentFeatures" />
+      AND (self.dependentFeatures LIKE :feature
+      OR self.dependentFeatures LIKE CONCAT('%,', :feature, ',%')
+      OR self.dependentFeatures LIKE CONCAT(:feature, ',%')
+      OR self.dependentFeatures LIKE CONCAT('%,', :feature))" />
     <finder-method name="findHavingExtensionsByModule" using="module,boolean:update" all="true" orderBy="id"
       filter="(:module IS NULL OR self.module = :module)
       AND (:update = TRUE OR self.finalXml IS NULL)

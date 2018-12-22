@@ -26,15 +26,11 @@ import com.axelor.db.Query;
 import com.axelor.db.internal.DBHelper;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaAction;
-import com.axelor.meta.db.MetaFeature;
 import com.axelor.meta.db.MetaModel;
-import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.MetaViewCustom;
 import com.axelor.meta.db.repo.MetaActionRepository;
-import com.axelor.meta.db.repo.MetaFeatureRepository;
 import com.axelor.meta.db.repo.MetaModelRepository;
-import com.axelor.meta.db.repo.MetaModuleRepository;
 import com.axelor.meta.db.repo.MetaViewCustomRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.meta.schema.ObjectViews;
@@ -51,6 +47,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
 import com.google.inject.persist.Transactional;
 import java.io.IOException;
@@ -75,7 +72,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.inject.Inject;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -574,15 +570,6 @@ public class XMLViews {
     private static final int FETCH_INCREMENT = NUM_WORKERS * DBHelper.getJdbcFetchSize();
     private static final String STRING_DELIMITER = ",";
 
-    private final MetaFeatureRepository metaFeatureRepo;
-    private final MetaModuleRepository metaModuleRepo;
-
-    @Inject
-    FinalXmlGenerator(MetaFeatureRepository metaFeatureRepo, MetaModuleRepository metaModuleRepo) {
-      this.metaFeatureRepo = metaFeatureRepo;
-      this.metaModuleRepo = metaModuleRepo;
-    }
-
     public void generate(MetaView view) {
       try {
         generateChecked(view);
@@ -611,6 +598,9 @@ public class XMLViews {
       final String xml = view.getXml();
       final Document document = parseXml(xml);
       final Node viewNode = findViewNode(document);
+
+      view.setDependentModules(null);
+      view.setDependentFeatures(null);
 
       for (final MetaView extensionView : extensionViews) {
         final Document extensionDocument = parseXml(extensionView.getXml());
@@ -649,13 +639,7 @@ public class XMLViews {
       final String feature = getNodeAttributeValue(extendAttributes, "if-feature");
 
       if (StringUtils.notBlank(feature)) {
-        MetaFeature metaFeature = metaFeatureRepo.findByName(feature);
-
-        if (metaFeature == null) {
-          metaFeature = new MetaFeature(feature);
-        }
-
-        view.addDependentFeature(metaFeature);
+        addDependentFeature(view, feature);
 
         if (!appConfigProvider.hasFeature(feature)) {
           return;
@@ -665,11 +649,7 @@ public class XMLViews {
       final String module = getNodeAttributeValue(extendAttributes, "if-module");
 
       if (StringUtils.notBlank(module)) {
-        final MetaModule metaModule = metaModuleRepo.findByName(module);
-
-        if (metaModule != null) {
-          view.addDependentModule(metaModule);
-        }
+        addDependentModule(view, module);
 
         if (!ModuleManager.isInstalled(module)) {
           return;
@@ -884,6 +864,28 @@ public class XMLViews {
               .orElseThrow(IndexOutOfBoundsException::new);
         }
       };
+    }
+
+    private static void addDependentFeature(MetaView view, String featureName) {
+      final Set<String> dependentFeatures = stringToSet(view.getDependentFeatures());
+      dependentFeatures.add(featureName);
+      view.setDependentFeatures(iterableToString(dependentFeatures));
+    }
+
+    private static void addDependentModule(MetaView view, String moduleName) {
+      final Set<String> dependentModules = stringToSet(view.getDependentModules());
+      dependentModules.add(moduleName);
+      view.setDependentModules(iterableToString(dependentModules));
+    }
+
+    private static Set<String> stringToSet(String text) {
+      return StringUtils.isBlank(text)
+          ? Sets.newHashSet()
+          : Sets.newHashSet(text.split(STRING_DELIMITER));
+    }
+
+    private static String iterableToString(Iterable<? extends CharSequence> elements) {
+      return String.join(STRING_DELIMITER, elements);
     }
   }
 }
