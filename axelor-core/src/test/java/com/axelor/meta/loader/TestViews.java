@@ -32,7 +32,7 @@ import com.axelor.script.ScriptHelper;
 import com.axelor.test.db.Title;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
-import java.io.InputStream;
+import java.net.URL;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.persistence.Query;
@@ -115,19 +115,18 @@ public class TestViews extends MetaTest {
   @Transactional
   public void testInclude() throws Exception {
 
-    try (InputStream is = ResourceUtils.getResourceStream("com/axelor/meta/Include.xml")) {
-      loader.process(is, new Module("test"), false);
+    final URL url = ResourceUtils.getResource("com/axelor/meta/Include.xml");
+    loader.process(url, new Module("test"), false);
 
-      final AbstractView form1 = XMLViews.findView("contact-form1", null, null, "test");
-      final AbstractView form2 = XMLViews.findView("contact-form2", null, null, "test");
+    final AbstractView form1 = XMLViews.findView("contact-form1", null, null, "test");
+    final AbstractView form2 = XMLViews.findView("contact-form2", null, null, "test");
 
-      assertTrue(form1 instanceof FormView);
-      assertTrue(form2 instanceof FormView);
+    assertTrue(form1 instanceof FormView);
+    assertTrue(form2 instanceof FormView);
 
-      final FormInclude include = (FormInclude) ((FormView) form2).getItems().get(0);
-      final AbstractView included = include.getView();
+    final FormInclude include = (FormInclude) ((FormView) form2).getItems().get(0);
+    final AbstractView included = include.getView();
 
-      assertEquals(form1.getName(), included.getName());
-    }
+    assertEquals(form1.getName(), included.getName());
   }
 }

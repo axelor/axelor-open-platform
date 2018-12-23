@@ -34,17 +34,19 @@
     <string name="model"/>
     <string name="module"/>
     <string name="xml" required="true" large="true"/>
+    <boolean name="computed"/>
     <string name="xmlId" unique="true" />
     <string name="helpLink" />
     <boolean name="extension" />
     <many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
 
-    <string name="finalXml" large="true"/>
+    <string name="sourceFile"/>
     <string name="dependentModules"/>
     <string name="dependentFeatures"/>
 
     <finder-method name="findByID" using="xmlId" />
-    <finder-method name="findByName" using="name" orderBy="-priority,-extension" cacheable="true"/>
+    <finder-method name="findByName" using="name" orderBy="-priority" cacheable="true"
+      filter="self.name = :name AND COALESCE(self.extension, FALSE) = FALSE" />
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
 
     <finder-method name="findByDependentModule" using="String:module" all="true" orderBy="id"
@@ -61,7 +63,7 @@
       OR self.dependentFeatures LIKE CONCAT('%,', :feature))" />
     <finder-method name="findHavingExtensionsByModule" using="module,boolean:update" all="true" orderBy="id"
       filter="(:module IS NULL OR self.module = :module)
-      AND (:update = TRUE OR self.finalXml IS NULL)
+      AND (:update = TRUE OR COALESCE(self.computed, FALSE) = FALSE)
       AND COALESCE(self.extension, FALSE) = FALSE
       AND (self.name, self.priority)
       IN (SELECT other.name, MAX(other.priority) FROM MetaView other GROUP BY name)

@@ -25,6 +25,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.Query;
 import com.axelor.db.internal.DBHelper;
 import com.axelor.inject.Beans;
+import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.MetaView;
@@ -56,14 +57,17 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.URL;
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -465,7 +469,7 @@ public class XMLViews {
           return null;
         }
 
-        xml = view.getFinalXml() != null ? view.getFinalXml() : view.getXml();
+        xml = view.getXml();
       } else {
         xml = custom.getXml();
       }
@@ -591,11 +595,10 @@ public class XMLViews {
           findExtensionMetaViews(view.getName(), view.getModel(), view.getType(), view.getModule());
 
       if (extensionViews.isEmpty()) {
-        view.setFinalXml(null);
         return;
       }
 
-      final String xml = view.getXml();
+      final String xml = view.getComputed() ? getOriginalXml(view) : view.getXml();
       final Document document = parseXml(xml);
       final Node viewNode = findViewNode(document);
 
@@ -621,7 +624,47 @@ public class XMLViews {
 
       final ObjectViews objectViews = unmarshal(document);
       final String finalXml = toXml(objectViews.getViews().get(0), true);
-      view.setFinalXml(finalXml);
+      view.setXml(finalXml);
+      view.setComputed(true);
+    }
+
+    private static String getOriginalXml(MetaView view) throws IOException, JAXBException {
+      if (StringUtils.isBlank(view.getSourceFile())) {
+        throw new UnsupportedOperationException(
+            String.format("Extending default views is not supported: %s", view.getName()));
+      }
+
+      final List<URL> urls = MetaScanner.findAll(view.getModule(), "views", view.getSourceFile());
+
+      if (urls.size() != 1) {
+        throw new IllegalStateException(
+            String.format(
+                "Expected only one source file in %s for %s",
+                view.getModule(), view.getSourceFile()));
+      }
+
+      final URL url = urls.iterator().next();
+      final ObjectViews objectViews;
+
+      try (final InputStream stream = url.openStream()) {
+        objectViews = unmarshal(stream);
+      }
+
+      final AbstractView sourceView =
+          Optional.ofNullable(objectViews.getViews())
+              .orElse(Collections.emptyList())
+              .stream()
+              .filter(abstractView -> Objects.equals(view.getName(), abstractView.getName()))
+              .filter(abstractView -> Objects.equals(view.getXmlId(), abstractView.getXmlId()))
+              .findFirst()
+              .orElseThrow(
+                  () ->
+                      new NoSuchElementException(
+                          String.format(
+                              "View not found in %s: %s(id=%s)",
+                              view.getModule(), view.getName(), view.getXmlId())));
+
+      return toXml(sourceView, true);
     }
 
     private static Node findViewNode(Document document) {

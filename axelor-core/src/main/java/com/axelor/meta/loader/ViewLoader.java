@@ -66,7 +66,6 @@ import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.inject.persist.Transactional;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -106,7 +105,7 @@ public class ViewLoader extends AbstractLoader {
     for (URL file : MetaScanner.findAll(module.getName(), "views", "(.*?)\\.xml")) {
       log.debug("importing: {}", file.getFile());
       try {
-        process(file.openStream(), module, update);
+        process(file, module, update);
       } catch (IOException | JAXBException e) {
         throw new RuntimeException(e);
       }
@@ -143,18 +142,22 @@ public class ViewLoader extends AbstractLoader {
   @Transactional
   void updateFrom(Path file, String moduleName) throws IOException, JAXBException {
     final Module module = ModuleManager.getModule(moduleName);
-    try (FileInputStream stream = new FileInputStream(file.toFile())) {
-      process(stream, module, true);
+    try {
+      process(file.toUri().toURL(), module, true);
     } finally {
       doCleanUp();
     }
   }
 
-  void process(InputStream stream, Module module, boolean update) throws JAXBException {
-    final ObjectViews all = XMLViews.unmarshal(stream);
+  void process(URL url, Module module, boolean update) throws IOException, JAXBException {
+    final ObjectViews all;
+
+    try (InputStream stream = url.openStream()) {
+      all = XMLViews.unmarshal(stream);
+    }
 
     for (AbstractView view : getList(all.getViews())) {
-      importView(view, module, update);
+      importView(view, module, update, getFileName(url));
     }
 
     for (Selection selection : getList(all.getSelections())) {
@@ -175,11 +178,17 @@ public class ViewLoader extends AbstractLoader {
     }
   }
 
-  private void importView(AbstractView view, Module module, boolean update) {
-    importView(view, module, update, -1);
+  private static String getFileName(URL url) {
+    final String urlStr = url.getFile();
+    return urlStr.substring(urlStr.lastIndexOf('/') + 1);
   }
 
-  private void importView(AbstractView view, Module module, boolean update, int priority) {
+  private void importView(AbstractView view, Module module, boolean update, String sourceFile) {
+    importView(view, module, update, sourceFile, -1);
+  }
+
+  private void importView(
+      AbstractView view, Module module, boolean update, String sourceFile, int priority) {
 
     String xmlId = view.getXmlId();
     String name = view.getName();
@@ -276,7 +285,8 @@ public class ViewLoader extends AbstractLoader {
     entity.setModel(modelName);
     entity.setModule(module.getName());
     entity.setXml(xml);
-    entity.setFinalXml(null);
+    entity.setComputed(null);
+    entity.setSourceFile(sourceFile);
     entity.setGroups(this.findGroups(view.getGroups(), entity.getGroups()));
     entity.setExtension(view.getExtension());
 
@@ -692,7 +702,7 @@ public class ViewLoader extends AbstractLoader {
   private String createDefaults(Module module, final Class<?> klass) {
     List<AbstractView> views = createDefaults(klass);
     for (AbstractView view : views) {
-      importView(view, module, false, 10);
+      importView(view, module, false, null, 10);
     }
     return XMLViews.toXml(views, false);
   }

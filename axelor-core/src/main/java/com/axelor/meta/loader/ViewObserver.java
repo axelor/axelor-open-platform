@@ -57,6 +57,7 @@ public class ViewObserver {
         values ->
             Optional.ofNullable((String) values.get("name"))
                 .map(metaViewRepo::findByName)
+                .filter(view -> !view.getId().equals(values.get("id")))
                 .ifPresent(finalXmlGenerator::generate));
   }
 }
