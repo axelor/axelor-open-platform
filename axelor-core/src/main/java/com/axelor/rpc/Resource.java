@@ -43,6 +43,7 @@ import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
 import com.axelor.events.PostRequest;
 import com.axelor.events.PreRequest;
+import com.axelor.events.RequestEvent;
 import com.axelor.events.qualifiers.EntityTypes;
 import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
@@ -398,7 +399,7 @@ public class Resource<T extends Model> {
 
     LOG.debug("Searching '{}' with {}", model.getCanonicalName(), request.getData());
 
-    firePreRequestEvent("search", request);
+    firePreRequestEvent(RequestEvent.SEARCH, request);
 
     Response response = new Response();
 
@@ -466,7 +467,7 @@ public class Resource<T extends Model> {
     response.setOffset(offset);
     response.setStatus(Response.STATUS_SUCCESS);
 
-    firePostRequestEvent("search", request, response);
+    firePostRequestEvent(RequestEvent.SEARCH, request, response);
 
     return response;
   }
@@ -539,7 +540,7 @@ public class Resource<T extends Model> {
     security.get().check(JpaSecurity.CAN_EXPORT, model);
     LOG.debug("Exporting '{}' with {}", model.getName(), request.getData());
 
-    firePreRequestEvent("export", request);
+    firePreRequestEvent(RequestEvent.EXPORT, request);
 
     List<String> fields = request.getFields();
     List<String> header = new ArrayList<>();
@@ -742,7 +743,7 @@ public class Resource<T extends Model> {
     Response response = new Response();
     response.setTotal(count);
 
-    firePostRequestEvent("export", request, response);
+    firePostRequestEvent(RequestEvent.EXPORT, request, response);
 
     return count;
   }
@@ -760,14 +761,14 @@ public class Resource<T extends Model> {
     Response response = new Response();
     List<Object> data = Lists.newArrayList();
 
-    firePreRequestEvent("read", request);
+    firePreRequestEvent(RequestEvent.READ, request);
 
     Model entity = JPA.find(model, id);
     if (entity != null) data.add(entity);
     response.setData(data);
     response.setStatus(Response.STATUS_SUCCESS);
 
-    firePostRequestEvent("read", request, response);
+    firePostRequestEvent(RequestEvent.READ, request, response);
 
     return response;
   }
@@ -777,7 +778,7 @@ public class Resource<T extends Model> {
 
     Request req = newRequest(request, id);
 
-    firePreRequestEvent("fetch", req);
+    firePreRequestEvent(RequestEvent.FETCH, req);
 
     final Response response = new Response();
     final Repository<?> repository = JpaRepository.of(model);
@@ -797,7 +798,7 @@ public class Resource<T extends Model> {
     data.add(repository.populate(values, request.getContext()));
     response.setData(data);
 
-    firePostRequestEvent("fetch", req, response);
+    firePostRequestEvent(RequestEvent.FETCH, req, response);
 
     return response;
   }
@@ -902,11 +903,11 @@ public class Resource<T extends Model> {
     List<Object> records = request.getRecords();
     List<Object> data = Lists.newArrayList();
 
-    firePreRequestEvent("save", request);
+    firePreRequestEvent(RequestEvent.SAVE, request);
 
     if ((records == null || records.isEmpty()) && request.getData() == null) {
       response.setStatus(Response.STATUS_FAILURE);
-      firePostRequestEvent("save", request, response);
+      firePostRequestEvent(RequestEvent.SAVE, request, response);
       return response;
     }
 
@@ -970,7 +971,7 @@ public class Resource<T extends Model> {
     response.setData(data);
     response.setStatus(Response.STATUS_SUCCESS);
 
-    firePostRequestEvent("save", request, response);
+    firePostRequestEvent(RequestEvent.SAVE, request, response);
 
     return response;
   }
@@ -982,7 +983,7 @@ public class Resource<T extends Model> {
 
     LOG.debug("Mass update '{}' with {}", model.getCanonicalName(), request.getData());
 
-    firePreRequestEvent("mass-update", request);
+    firePreRequestEvent(RequestEvent.MASS_UPDATE, request);
 
     Response response = new Response();
 
@@ -999,7 +1000,7 @@ public class Resource<T extends Model> {
 
     response.setStatus(Response.STATUS_SUCCESS);
 
-    firePostRequestEvent("mass-update", request, response);
+    firePostRequestEvent(RequestEvent.MASS_UPDATE, request, response);
 
     return response;
   }
@@ -1018,7 +1019,7 @@ public class Resource<T extends Model> {
 
     Request req = newRequest(request, id);
 
-    firePreRequestEvent("remove", request);
+    firePreRequestEvent(RequestEvent.REMOVE, request);
 
     Model bean = JPA.edit(model, data);
     if (bean.getId() != null) {
@@ -1032,7 +1033,7 @@ public class Resource<T extends Model> {
     response.setData(ImmutableList.of(toMapCompact(bean)));
     response.setStatus(Response.STATUS_SUCCESS);
 
-    firePostRequestEvent("remove", req, response);
+    firePostRequestEvent(RequestEvent.REMOVE, req, response);
 
     return response;
   }
@@ -1049,7 +1050,7 @@ public class Resource<T extends Model> {
       return response.fail("No records provides.");
     }
 
-    firePreRequestEvent("remove", request);
+    firePreRequestEvent(RequestEvent.REMOVE, request);
 
     final List<Model> entities = Lists.newArrayList();
 
@@ -1084,7 +1085,7 @@ public class Resource<T extends Model> {
     response.setData(records);
     response.setStatus(Response.STATUS_SUCCESS);
 
-    firePostRequestEvent("remove", request, response);
+    firePostRequestEvent(RequestEvent.REMOVE, request, response);
 
     return response;
   }
@@ -1112,7 +1113,7 @@ public class Resource<T extends Model> {
 
     request.setRecords(Lists.newArrayList(id));
 
-    firePreRequestEvent("copy", request);
+    firePreRequestEvent(RequestEvent.COPY, request);
 
     Model bean = JPA.find(model, id);
     if (repository == null) {
@@ -1127,7 +1128,7 @@ public class Resource<T extends Model> {
     response.setData(ImmutableList.of(bean));
     response.setStatus(Response.STATUS_SUCCESS);
 
-    firePostRequestEvent("copy", request, response);
+    firePostRequestEvent(RequestEvent.COPY, request, response);
 
     return response;
   }
@@ -1210,7 +1211,7 @@ public class Resource<T extends Model> {
     req.setFields(Lists.newArrayList(selectName));
     req.setRecords(Lists.newArrayList(data));
 
-    firePreRequestEvent("fetch:name", req);
+    firePreRequestEvent(RequestEvent.FETCH_NAME, req);
 
     if (selectName != null) {
       String qs =
@@ -1227,7 +1228,7 @@ public class Resource<T extends Model> {
     response.setData(ImmutableList.of(data));
     response.setStatus(Response.STATUS_SUCCESS);
 
-    firePostRequestEvent("fetch:name", req, response);
+    firePostRequestEvent(RequestEvent.FETCH_NAME, req, response);
 
     return response;
   }

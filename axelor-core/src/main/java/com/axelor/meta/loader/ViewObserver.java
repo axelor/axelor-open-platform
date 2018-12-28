@@ -21,6 +21,7 @@ import com.axelor.event.Observes;
 import com.axelor.events.FeatureChanged;
 import com.axelor.events.ModuleChanged;
 import com.axelor.events.PostRequest;
+import com.axelor.events.RequestEvent;
 import com.axelor.events.qualifiers.EntityType;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.repo.MetaViewRepository;
@@ -51,7 +52,8 @@ public class ViewObserver {
     finalXmlGenerator.generate(metaViewRepo.findByDependentFeature(event.getFeatureName()));
   }
 
-  void onPostSave(@Observes @Named("save") @EntityType(MetaView.class) PostRequest event) {
+  void onPostSave(
+      @Observes @Named(RequestEvent.SAVE) @EntityType(MetaView.class) PostRequest event) {
     RequestUtils.processResponse(
         event.getResponse(),
         values ->

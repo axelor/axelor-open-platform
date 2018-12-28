@@ -20,6 +20,15 @@ package com.axelor.events;
 import com.axelor.rpc.Request;
 
 public class RequestEvent {
+  public static final String SEARCH = "search";
+  public static final String EXPORT = "export";
+  public static final String READ = "read";
+  public static final String FETCH = "fetch";
+  public static final String SAVE = "save";
+  public static final String MASS_UPDATE = "mass-update";
+  public static final String REMOVE = "remove";
+  public static final String COPY = "copy";
+  public static final String FETCH_NAME = "fetch:name";
 
   private final Object source;
   private final Request request;
