@@ -500,8 +500,7 @@ public class XMLViews {
     return xmlView;
   }
 
-  private static List<MetaView> findExtensionMetaViews(
-      String name, String model, String type, String module) {
+  private static List<MetaView> findExtensionMetaViews(String name, String model, String type) {
 
     final MetaViewRepository repo = Beans.get(MetaViewRepository.class);
     final User user = AuthUtils.getUser();
@@ -524,35 +523,10 @@ public class XMLViews {
         .bind("name", name)
         .bind("model", model)
         .bind("type", type)
-        .bind("module", module)
         .bind("group", group)
         .cacheable()
         .order("-priority")
         .fetch();
-  }
-
-  /**
-   * Find view extensions.
-   *
-   * @param name name of the form extension
-   * @param model the form extension model
-   * @param type extension view type
-   * @param module the module
-   * @return list of the form extensions
-   */
-  public static List<AbstractView> findExtensions(
-      String name, String model, String type, String module) {
-    final List<MetaView> metaViews = findExtensionMetaViews(name, model, type, module);
-    final List<AbstractView> all = new ArrayList<>();
-    for (MetaView view : metaViews) {
-      try {
-        final AbstractView xmlView = XMLViews.unmarshal(view.getXml()).getViews().get(0);
-        all.add(xmlView);
-      } catch (Exception e) {
-        log.error(e.getMessage(), e);
-      }
-    }
-    return all;
   }
 
   public static Action findAction(String name) {
@@ -590,9 +564,7 @@ public class XMLViews {
     public void generateChecked(MetaView view)
         throws ParserConfigurationException, SAXException, IOException, XPathExpressionException,
             JAXBException {
-
-      final List<MetaView> extensionViews =
-          findExtensionMetaViews(view.getName(), view.getModel(), view.getType(), view.getModule());
+      final List<MetaView> extensionViews = findExtensionMetaViewsByModuleOrder(view);
 
       if (extensionViews.isEmpty()) {
         return;
@@ -626,6 +598,22 @@ public class XMLViews {
       final String finalXml = toXml(objectViews.getViews().get(0), true);
       view.setXml(finalXml);
       view.setComputed(true);
+    }
+
+    private static List<MetaView> findExtensionMetaViewsByModuleOrder(MetaView view) {
+      final List<MetaView> views =
+          findExtensionMetaViews(view.getName(), view.getModel(), view.getType());
+      final Map<String, List<MetaView>> viewsByModuleName =
+          views.parallelStream().collect(Collectors.groupingBy(MetaView::getModule));
+      final List<MetaView> result = new ArrayList<>(views.size());
+
+      ModuleManager.getResolution()
+          .forEach(
+              moduleName ->
+                  result.addAll(
+                      viewsByModuleName.getOrDefault(moduleName, Collections.emptyList())));
+
+      return result;
     }
 
     private static String getOriginalXml(MetaView view) throws IOException, JAXBException {
