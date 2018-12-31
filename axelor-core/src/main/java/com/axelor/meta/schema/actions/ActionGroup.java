@@ -85,7 +85,7 @@ public class ActionGroup extends ActionResumable {
     final List<String> pending = Lists.newArrayList(prepend);
     if ((index + 1) < actions.size()) {
       String name = getName();
-      if (name == null) { // dummy group
+      if (StringUtils.isBlank(name)) { // dummy group
         for (int i = index + 1; i < actions.size(); i++) {
           pending.add(actions.get(i).getName());
         }
@@ -181,7 +181,7 @@ public class ActionGroup extends ActionResumable {
     List<Object> result = Lists.newArrayList();
     Iterator<ActionItem> iter = actions.iterator();
 
-    if (getName() != null && !getName().endsWith("MenuTag()")) {
+    if (StringUtils.notBlank(getName()) && !getName().endsWith("MenuTag()")) {
       log.debug("action-group: {}", getName());
     }
 

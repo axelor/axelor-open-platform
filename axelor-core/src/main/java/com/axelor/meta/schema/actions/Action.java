@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.schema.actions;
 
+import com.axelor.common.StringUtils;
 import com.axelor.events.PostAction;
 import com.axelor.meta.ActionHandler;
 import com.axelor.rpc.ActionResponse;
@@ -88,10 +89,18 @@ public abstract class Action {
   }
 
   public Object execute(ActionHandler handler) {
-    handler.firePreEvent(getName());
-    Object result = evaluate(handler);
-    PostAction event = handler.firePostEvent(getName(), result);
-    return event.getResult();
+    final Object result;
+
+    if (StringUtils.isBlank(getName())) {
+      result = evaluate(handler);
+    } else {
+      handler.firePreEvent(getName());
+      final Object value = evaluate(handler);
+      PostAction event = handler.firePostEvent(getName(), value);
+      result = event.getResult();
+    }
+
+    return result;
   }
 
   public Object wrap(ActionHandler handler) {

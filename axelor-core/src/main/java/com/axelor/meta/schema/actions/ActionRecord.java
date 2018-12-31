@@ -110,11 +110,18 @@ public class ActionRecord extends Action {
 
   @Override
   public Object wrap(ActionHandler handler) {
-    handler.firePreEvent(getName());
-    Map<String, Object> map = new HashMap<>();
-    Object value = evaluate(handler, map);
-    PostAction event = handler.firePostEvent(getName(), value);
-    Object result = event.getResult();
+    final Object result;
+    final Map<String, Object> map = new HashMap<>();
+
+    if (StringUtils.isBlank(getName())) {
+      result = evaluate(handler, map);
+    } else {
+      handler.firePreEvent(getName());
+      final Object value = evaluate(handler, map);
+      final PostAction event = handler.firePostEvent(getName(), value);
+      result = event.getResult();
+    }
+
     return result == null || result instanceof ActionResponse ? result : wrapper(map);
   }
 

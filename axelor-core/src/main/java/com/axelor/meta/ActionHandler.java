@@ -397,7 +397,7 @@ public class ActionHandler {
     String[] names = name.split(",");
     ActionGroup action = new ActionGroup();
 
-    action.setName(name);
+    action.setName(names.length > 1 ? null : name);
 
     for (String item : names) {
       action.addAction(item);
