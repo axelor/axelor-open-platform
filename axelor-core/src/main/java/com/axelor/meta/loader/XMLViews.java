@@ -604,25 +604,39 @@ public class XMLViews {
       final List<MetaView> views =
           findExtensionMetaViews(view.getName(), view.getModel(), view.getType());
       final Map<String, List<MetaView>> viewsByModuleName =
-          views.parallelStream().collect(Collectors.groupingBy(MetaView::getModule));
+          views
+              .parallelStream()
+              .collect(Collectors.groupingBy(v -> Optional.ofNullable(v.getModule()).orElse("")));
       final List<MetaView> result = new ArrayList<>(views.size());
 
-      ModuleManager.getResolution()
-          .forEach(
-              moduleName ->
-                  result.addAll(
-                      viewsByModuleName.getOrDefault(moduleName, Collections.emptyList())));
+      // Add views by module resolution order.
+      for (final String moduleName : ModuleManager.getResolution()) {
+        result.addAll(viewsByModuleName.getOrDefault(moduleName, Collections.emptyList()));
+        viewsByModuleName.remove(moduleName);
+      }
+
+      // Add remaining views not found in module resolution.
+      for (final List<MetaView> metaViews : viewsByModuleName.values()) {
+        result.addAll(metaViews);
+      }
 
       return result;
     }
 
     private static String getOriginalXml(MetaView view) throws IOException, JAXBException {
       if (StringUtils.isBlank(view.getSourceFile())) {
-        throw new UnsupportedOperationException(
-            String.format("Extending default views is not supported: %s", view.getName()));
+        log.warn("Source file is missing for view {}", view.getName());
+        return view.getXml();
       }
 
-      final List<URL> urls = MetaScanner.findAll(view.getModule(), "views", view.getSourceFile());
+      final List<URL> urls;
+
+      if (StringUtils.isBlank(view.getModule())) {
+        log.warn("Module is missing for view {}", view.getName());
+        urls = MetaScanner.findAll("views" + "(/|\\\\)" + view.getSourceFile());
+      } else {
+        urls = MetaScanner.findAll(view.getModule(), "views", view.getSourceFile());
+      }
 
       if (urls.size() != 1) {
         throw new IllegalStateException(
