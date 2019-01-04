@@ -73,6 +73,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -715,16 +716,6 @@ public class XMLViews {
         return;
       }
 
-      if (!(targetNode instanceof Element)) {
-        log.error(
-            "View {}(id={}): node is not an element: {}",
-            extensionView.getName(),
-            extensionView.getXmlId(),
-            target);
-        return;
-      }
-
-      final Element targetElement = (Element) targetNode;
       final List<Node> extendItemNodes =
           nodeListToStream(extensionNode.getChildNodes())
               .filter(extendItemNode -> extendItemNode instanceof Element)
@@ -733,16 +724,16 @@ public class XMLViews {
       for (final Node extendItemNode : extendItemNodes) {
         switch (extendItemNode.getNodeName()) {
           case "insert":
-            doInsert(extendItemNode, targetElement, document);
+            doInsert(extendItemNode, targetNode, document);
             break;
           case "replace":
-            doReplace(extendItemNode, targetElement, document);
+            doReplace(extendItemNode, targetNode, document);
             break;
           case "move":
-            doMove(extendItemNode, targetElement, document, view, extensionView);
+            doMove(extendItemNode, targetNode, document, view, extensionView);
             break;
           case "attribute":
-            doAttribute(extendItemNode, targetElement);
+            doAttribute(extendItemNode, targetNode);
             break;
           default:
             log.error(
@@ -759,33 +750,25 @@ public class XMLViews {
       viewNode.appendChild(node);
     }
 
-    private static void doInsert(Node extendItemNode, Element targetElement, Document document) {
+    private static void doInsert(Node extendItemNode, Node targetNode, Document document) {
       final NamedNodeMap attributes = extendItemNode.getAttributes();
       final String positionValue = getNodeAttributeValue(attributes, "position");
-      final Position position = Position.get(positionValue);
-      final Node refNode = position.getRefNodeFunc().apply(targetElement);
-      final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
+      final Position position = Position.get(positionValue, targetNode);
 
-      nodeListToStream(extendItemNode.getChildNodes())
-          .filter(node -> node instanceof Element)
-          .map(node -> document.importNode(node, true))
-          .forEach(node -> parentNode.insertBefore(node, refNode));
+      processExtendItemNodeChildren(
+          extendItemNode, document, node -> position.insert(targetNode, node));
     }
 
-    private static void doReplace(Node extendItemNode, Element targetElement, Document document) {
-      final Node refNode = Position.AFTER.getRefNodeFunc().apply(targetElement);
-      final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
-
-      nodeListToStream(extendItemNode.getChildNodes())
-          .filter(node -> node instanceof Element)
-          .map(node -> document.importNode(node, true))
-          .forEach(node -> parentNode.insertBefore(node, refNode));
-      parentNode.removeChild(targetElement);
+    private static void doReplace(Node extendItemNode, Node targetNode, Document document) {
+      processExtendItemNodeChildren(
+          extendItemNode,
+          document,
+          node -> targetNode.getParentNode().replaceChild(node, targetNode));
     }
 
     private static void doMove(
         Node extendItemNode,
-        Element targetElement,
+        Node targetNode,
         Document document,
         MetaView view,
         MetaView extensionView)
@@ -806,18 +789,28 @@ public class XMLViews {
       }
 
       final String positionValue = getNodeAttributeValue(attributes, "position");
-      final Position position = Position.get(positionValue);
-      final Node refNode = position.getRefNodeFunc().apply(targetElement);
-      final Node parentNode = refNode != null ? refNode.getParentNode() : targetElement;
-
-      parentNode.insertBefore(sourceNode, refNode);
+      Position.get(positionValue, targetNode).insert(targetNode, sourceNode);
     }
 
-    private static void doAttribute(Node extendItemNode, Element targetElement) {
+    private static void doAttribute(Node extendItemNode, Node targetNode) {
       final NamedNodeMap attributes = extendItemNode.getAttributes();
       final String name = getNodeAttributeValue(attributes, "name");
       final String value = getNodeAttributeValue(attributes, "value");
-      targetElement.setAttribute(name, value);
+
+      if (!(targetNode instanceof Element)) {
+        log.error("Can change attributes only on elements: {}", targetNode);
+        return;
+      }
+
+      ((Element) targetNode).setAttribute(name, value);
+    }
+
+    private static void processExtendItemNodeChildren(
+        Node extendItemNode, Document document, Consumer<Node> nodeProcessor) {
+      nodeListToStream(extendItemNode.getChildNodes())
+          .filter(node -> node instanceof Element)
+          .map(node -> document.importNode(node, true))
+          .forEach(nodeProcessor);
     }
 
     public void parallelGenerate(Query<MetaView> query) {
@@ -885,11 +878,9 @@ public class XMLViews {
 
     private static String prepareXPathExpression(String subExpression, String name, String type) {
       final String rootExpr = "/:object-views/:%s[@name='%s']";
-      return String.format(
-          subExpression.isEmpty() ? rootExpr : rootExpr + "/" + subExpression,
-          type,
-          name,
-          subExpression);
+      final String expr =
+          subExpression.startsWith("/") ? subExpression.substring(1) : subExpression;
+      return String.format(expr.isEmpty() ? rootExpr : rootExpr + "/" + expr, type, name, expr);
     }
 
     private static Stream<Node> nodeListToStream(NodeList nodeList) {
