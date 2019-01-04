@@ -52,6 +52,10 @@ public class ExtendItemInsert {
   })
   private List<AbstractWidget> items;
 
+  @XmlElement private PanelViewer viewer;
+
+  @XmlElement private PanelEditor editor;
+
   public Position getPosition() {
     return position;
   }
@@ -66,5 +70,21 @@ public class ExtendItemInsert {
 
   public void setItems(List<AbstractWidget> items) {
     this.items = items;
+  }
+
+  public PanelViewer getViewer() {
+    return viewer;
+  }
+
+  public void setViewer(PanelViewer viewer) {
+    this.viewer = viewer;
+  }
+
+  public PanelEditor getEditor() {
+    return editor;
+  }
+
+  public void setEditor(PanelEditor editor) {
+    this.editor = editor;
   }
 }

@@ -49,11 +49,31 @@ public class ExtendItemReplace {
   })
   private List<AbstractWidget> items;
 
+  @XmlElement private PanelViewer viewer;
+
+  @XmlElement private PanelEditor editor;
+
   public List<AbstractWidget> getItems() {
     return items;
   }
 
   public void setItems(List<AbstractWidget> items) {
     this.items = items;
+  }
+
+  public PanelViewer getViewer() {
+    return viewer;
+  }
+
+  public void setViewer(PanelViewer viewer) {
+    this.viewer = viewer;
+  }
+
+  public PanelEditor getEditor() {
+    return editor;
+  }
+
+  public void setEditor(PanelEditor editor) {
+    this.editor = editor;
   }
 }

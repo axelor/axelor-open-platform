@@ -2637,6 +2637,8 @@
       <xsd:element name="menu" type="tns:MenubarMenu" />
       <xsd:element name="item" type="tns:MenubarMenuItem" />
       <xsd:element name="divider" type="tns:MenubarMenuDivider" />
+      <xsd:element name="viewer" type="tns:PanelViewer"></xsd:element>
+      <xsd:element name="editor" type="tns:PanelEditor"></xsd:element>
     </xsd:choice>
   </xsd:group>
 
