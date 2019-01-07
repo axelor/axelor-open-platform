@@ -18,20 +18,8 @@
 package com.axelor.meta.schema.views;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.lang.invoke.MethodHandles;
 import javax.xml.bind.annotation.XmlType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-@Deprecated
 @XmlType
 @JsonTypeName("include")
-public class PanelInclude extends FormInclude {
-
-  private static final Logger logger =
-      LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-  public PanelInclude() {
-    logger.warn("Usage of \"panel-include\" tag is deprecated. Use view extensions instead.");
-  }
-}
+public class PanelInclude extends FormInclude {}
