@@ -94,12 +94,15 @@
     <toolbar>
       <button name="restoreAll" icon="fa-undo" help="Restore all..." prompt="All the customizations will be lost. Are you sure ?" onClick="action-meta-restore-all"/>
     </toolbar>
+    <hilite if="extension" color="warning"/>
+    <hilite if="computed" color="info"/>
     <field name="name"/>
     <field name="title"/>
     <field name="type"/>
     <field name="model"/>
     <field name="module"/>
-    <field name="extension" width="90"/>
+    <field name="extension" hidden="true"/>
+    <field name="computed" hidden="true"/>
     <field name="priority" width="75"/>
   </grid>
 
@@ -129,7 +132,10 @@
         <field name="model"/>
         <field name="module"/>
         <field name="groups" widget="TagSelect" x-create="code,name"/>
-        <field name="extension" showIf="type === 'form'"/>
+        <panel showIf="['form', 'grid'].indexOf(type) >= 0">
+          <field name="extension"/>
+          <field name="computed"/>
+        </panel>
       </panel>
     </panel>
     <panel title="Schema">

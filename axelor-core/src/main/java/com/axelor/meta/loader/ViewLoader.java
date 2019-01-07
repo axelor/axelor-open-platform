@@ -97,7 +97,7 @@ public class ViewLoader extends AbstractLoader {
 
   @Inject private GroupRepository groups;
 
-  @Inject private XMLViews.FinalXmlGenerator finalXmlGenerator;
+  @Inject private XMLViews.FinalViewGenerator finalViewGenerator;
 
   @Override
   @Transactional
@@ -124,11 +124,11 @@ public class ViewLoader extends AbstractLoader {
       throw new PersistenceException("There are some unresolve items, check the log.");
     }
 
-    generateFinalXml(module, update);
+    generateFinalViews(module, update);
   }
 
-  private void generateFinalXml(Module module, boolean update) {
-    finalXmlGenerator.parallelGenerate(
+  private void generateFinalViews(Module module, boolean update) {
+    finalViewGenerator.parallelGenerate(
         views.findHavingExtensionsByModule(module.getName(), update));
   }
 
@@ -235,13 +235,15 @@ public class ViewLoader extends AbstractLoader {
     }
 
     MetaView entity = views.findByID(xmlId);
-    MetaView other = views.findByName(name);
+    MetaView other = views.findByNameAndComputed(name, false);
     if (entity == null && StringUtils.isBlank(xmlId)) {
       entity =
           views
               .all()
               .filter(
-                  "self.name = ? AND self.module = ? AND self.xmlId is null",
+                  "self.name = ? AND self.module = ? "
+                      + "AND self.xmlId IS NULL "
+                      + "AND COALESCE(self.computed, FALSE) = FALSE",
                   name,
                   module.getName())
               .fetchOne();
@@ -286,7 +288,6 @@ public class ViewLoader extends AbstractLoader {
     entity.setModule(module.getName());
     entity.setXml(xml);
     entity.setComputed(null);
-    entity.setSourceFile(sourceFile);
     entity.setGroups(this.findGroups(view.getGroups(), entity.getGroups()));
     entity.setExtension(view.getExtension());
 

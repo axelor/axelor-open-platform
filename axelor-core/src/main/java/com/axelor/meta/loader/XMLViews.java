@@ -25,7 +25,6 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.Query;
 import com.axelor.db.internal.DBHelper;
 import com.axelor.inject.Beans;
-import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.MetaView;
@@ -57,7 +56,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.URL;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,7 +65,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -77,6 +74,7 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.inject.Inject;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -543,11 +541,13 @@ public class XMLViews {
     }
   }
 
-  static class FinalXmlGenerator {
+  static class FinalViewGenerator {
 
     private static final int NUM_WORKERS = Runtime.getRuntime().availableProcessors();
     private static final int FETCH_INCREMENT = NUM_WORKERS * DBHelper.getJdbcFetchSize();
     private static final String STRING_DELIMITER = ",";
+
+    @Inject private MetaViewRepository metaViewRepo;
 
     public void generate(MetaView view) {
       try {
@@ -565,18 +565,33 @@ public class XMLViews {
     public void generateChecked(MetaView view)
         throws ParserConfigurationException, SAXException, IOException, XPathExpressionException,
             JAXBException {
-      final List<MetaView> extensionViews = findExtensionMetaViewsByModuleOrder(view);
+
+      final MetaView originalView = getOriginalView(view);
+      final List<MetaView> extensionViews = findExtensionMetaViewsByModuleOrder(originalView);
 
       if (extensionViews.isEmpty()) {
+        Optional.ofNullable(metaViewRepo.findByNameAndComputed(originalView.getName(), true))
+            .ifPresent(metaViewRepo::remove);
         return;
       }
 
-      final String xml = view.getComputed() ? getOriginalXml(view) : view.getXml();
+      final String xml = originalView.getXml();
       final Document document = parseXml(xml);
       final Node viewNode = findViewNode(document);
 
-      view.setDependentModules(null);
-      view.setDependentFeatures(null);
+      final MetaView computedView =
+          Optional.ofNullable(metaViewRepo.findByNameAndComputed(originalView.getName(), true))
+              .orElseGet(
+                  () -> {
+                    final MetaView copy = metaViewRepo.copy(originalView, false);
+                    copy.setComputed(true);
+                    metaViewRepo.persist(copy);
+                    return copy;
+                  });
+      computedView.setPriority(originalView.getPriority() + 1);
+
+      originalView.setDependentModules(null);
+      originalView.setDependentFeatures(null);
 
       for (final MetaView extensionView : extensionViews) {
         final Document extensionDocument = parseXml(extensionView.getXml());
@@ -588,7 +603,7 @@ public class XMLViews {
           }
 
           if ("extend".equals(node.getNodeName())) {
-            processExtend(document, node, view, extensionView);
+            processExtend(document, node, originalView, extensionView);
           } else {
             processAppend(document, node, viewNode);
           }
@@ -597,8 +612,7 @@ public class XMLViews {
 
       final ObjectViews objectViews = unmarshal(document);
       final String finalXml = toXml(objectViews.getViews().get(0), true);
-      view.setXml(finalXml);
-      view.setComputed(true);
+      computedView.setXml(finalXml);
     }
 
     private static List<MetaView> findExtensionMetaViewsByModuleOrder(MetaView view) {
@@ -624,50 +638,14 @@ public class XMLViews {
       return result;
     }
 
-    private static String getOriginalXml(MetaView view) throws IOException, JAXBException {
-      if (StringUtils.isBlank(view.getSourceFile())) {
-        log.warn("Source file is missing for view {}", view.getName());
-        return view.getXml();
+    private MetaView getOriginalView(MetaView view) {
+      if (view.getComputed()) {
+        log.warn("View is computed: {}", view.getName());
+        return Optional.ofNullable(metaViewRepo.findByNameAndComputed(view.getName(), false))
+            .orElseThrow(NoSuchElementException::new);
       }
 
-      final List<URL> urls;
-
-      if (StringUtils.isBlank(view.getModule())) {
-        log.warn("Module is missing for view {}", view.getName());
-        urls = MetaScanner.findAll("views" + "(/|\\\\)" + view.getSourceFile());
-      } else {
-        urls = MetaScanner.findAll(view.getModule(), "views", view.getSourceFile());
-      }
-
-      if (urls.size() != 1) {
-        throw new IllegalStateException(
-            String.format(
-                "Expected only one source file in %s for %s",
-                view.getModule(), view.getSourceFile()));
-      }
-
-      final URL url = urls.iterator().next();
-      final ObjectViews objectViews;
-
-      try (final InputStream stream = url.openStream()) {
-        objectViews = unmarshal(stream);
-      }
-
-      final AbstractView sourceView =
-          Optional.ofNullable(objectViews.getViews())
-              .orElse(Collections.emptyList())
-              .stream()
-              .filter(abstractView -> Objects.equals(view.getName(), abstractView.getName()))
-              .filter(abstractView -> Objects.equals(view.getXmlId(), abstractView.getXmlId()))
-              .findFirst()
-              .orElseThrow(
-                  () ->
-                      new NoSuchElementException(
-                          String.format(
-                              "View not found in %s: %s(id=%s)",
-                              view.getModule(), view.getName(), view.getXmlId())));
-
-      return toXml(sourceView, true);
+      return view;
     }
 
     private static Node findViewNode(Document document) {

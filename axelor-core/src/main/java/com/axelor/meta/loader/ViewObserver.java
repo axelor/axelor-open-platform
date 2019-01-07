@@ -27,7 +27,9 @@ import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.rpc.RequestUtils;
 import com.google.inject.Singleton;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -36,20 +38,22 @@ public class ViewObserver {
 
   private final MetaViewRepository metaViewRepo;
 
-  private final XMLViews.FinalXmlGenerator finalXmlGenerator;
+  private final XMLViews.FinalViewGenerator finalViewGenerator;
+
+  private final Set<String> toRegenerate = new HashSet<>();
 
   @Inject
-  ViewObserver(MetaViewRepository metaViewRepo, XMLViews.FinalXmlGenerator finalXmlGenerator) {
+  ViewObserver(MetaViewRepository metaViewRepo, XMLViews.FinalViewGenerator finalViewGenerator) {
     this.metaViewRepo = metaViewRepo;
-    this.finalXmlGenerator = finalXmlGenerator;
+    this.finalViewGenerator = finalViewGenerator;
   }
 
   void onModuleChanged(@Observes ModuleChanged event) {
-    finalXmlGenerator.generate(metaViewRepo.findByDependentModule(event.getModuleName()));
+    finalViewGenerator.generate(metaViewRepo.findByDependentModule(event.getModuleName()));
   }
 
   void onFeatureChanged(@Observes FeatureChanged event) {
-    finalXmlGenerator.generate(metaViewRepo.findByDependentFeature(event.getFeatureName()));
+    finalViewGenerator.generate(metaViewRepo.findByDependentFeature(event.getFeatureName()));
   }
 
   void onPostSave(
@@ -58,8 +62,10 @@ public class ViewObserver {
         event.getResponse(),
         values ->
             Optional.ofNullable((String) values.get("name"))
-                .map(metaViewRepo::findByName)
-                .filter(view -> !view.getId().equals(values.get("id")))
-                .ifPresent(finalXmlGenerator::generate));
+                .map(name -> metaViewRepo.findByNameAndComputed(name, false))
+                .filter(view -> !(Boolean) values.getOrDefault("computed", false))
+                .ifPresent(finalViewGenerator::generate));
+  }
+
   }
 }
