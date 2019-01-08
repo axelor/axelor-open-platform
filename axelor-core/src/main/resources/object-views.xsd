@@ -2719,6 +2719,8 @@
     <xsd:restriction base="xsd:string">
       <xsd:enumeration value="after" />
       <xsd:enumeration value="before" />
+      <xsd:enumeration value="inside-last" />
+      <xsd:enumeration value="inside-first" />
     </xsd:restriction>
   </xsd:simpleType>
 
