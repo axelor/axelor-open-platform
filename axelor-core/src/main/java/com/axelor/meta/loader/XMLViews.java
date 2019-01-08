@@ -659,6 +659,14 @@ public class XMLViews {
         Document document, Node extensionNode, MetaView view, MetaView extensionView)
         throws XPathExpressionException {
 
+      Optional.ofNullable(ModuleManager.getModule(extensionView.getModule()))
+          .map(Module::isRemovable)
+          .filter(removable -> removable)
+          .ifPresent(
+              removable -> {
+                addDependentModule(view, extensionView.getModule());
+              });
+
       final NamedNodeMap extendAttributes = extensionNode.getAttributes();
       final String feature = getNodeAttributeValue(extendAttributes, "if-feature");
 
