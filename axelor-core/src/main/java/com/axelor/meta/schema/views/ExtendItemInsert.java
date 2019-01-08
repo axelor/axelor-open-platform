@@ -17,9 +17,12 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.axelor.meta.schema.views.Menu.Devider;
+import com.axelor.meta.schema.views.Menu.Item;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
@@ -27,6 +30,14 @@ import javax.xml.bind.annotation.XmlType;
 public class ExtendItemInsert {
 
   @XmlAttribute private Position position;
+
+  @XmlElementWrapper
+  @XmlElement(name = "button")
+  private List<Button> toolbar;
+
+  @XmlElementWrapper
+  @XmlElement(name = "menu")
+  private List<Menu> menubar;
 
   @XmlElements({
     @XmlElement(name = "include", type = FormInclude.class),
@@ -48,7 +59,10 @@ public class ExtendItemInsert {
     @XmlElement(name = "panel-tabs", type = PanelTabs.class),
     @XmlElement(name = "panel-mail", type = PanelMail.class),
     @XmlElement(name = "menu", type = Menu.class),
-    @XmlElement(name = "hilite", type = Hilite.class)
+    @XmlElement(name = "hilite", type = Hilite.class),
+    @XmlElement(name = "item", type = Item.class),
+    @XmlElement(name = "menu", type = Menu.class),
+    @XmlElement(name = "divider", type = Devider.class)
   })
   private List<AbstractWidget> items;
 
