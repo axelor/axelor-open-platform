@@ -81,6 +81,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -546,6 +547,11 @@ public class XMLViews {
     private static final int NUM_WORKERS = Runtime.getRuntime().availableProcessors();
     private static final int FETCH_INCREMENT = NUM_WORKERS * DBHelper.getJdbcFetchSize();
     private static final String STRING_DELIMITER = ",";
+    private static final String TOOL_BAR = "toolbar";
+    private static final String MENU_BAR = "menubar";
+    private static final Map<Position, Position> ROOT_NODE_POSITION_MAP =
+        ImmutableMap.of(
+            Position.AFTER, Position.INSIDE_LAST, Position.BEFORE, Position.INSIDE_FIRST);
 
     @Inject private MetaViewRepository metaViewRepo;
 
@@ -702,31 +708,26 @@ public class XMLViews {
         return;
       }
 
-      final List<Node> extendItemNodes =
-          nodeListToStream(extensionNode.getChildNodes())
-              .filter(extendItemNode -> extendItemNode instanceof Element)
-              .collect(Collectors.toList());
-
-      for (final Node extendItemNode : extendItemNodes) {
-        switch (extendItemNode.getNodeName()) {
+      for (final Element extendItemElement : findElements(extensionNode.getChildNodes())) {
+        switch (extendItemElement.getNodeName()) {
           case "insert":
-            doInsert(extendItemNode, targetNode, document);
+            doInsert(extendItemElement, targetNode, document, view);
             break;
           case "replace":
-            doReplace(extendItemNode, targetNode, document);
+            doReplace(extendItemElement, targetNode, document, view);
             break;
           case "move":
-            doMove(extendItemNode, targetNode, document, view, extensionView);
+            doMove(extendItemElement, targetNode, document, view, extensionView);
             break;
           case "attribute":
-            doAttribute(extendItemNode, targetNode);
+            doAttribute(extendItemElement, targetNode);
             break;
           default:
             log.error(
                 "View {}(id={}): unknown extension tag: {}",
                 extensionView.getName(),
                 extensionView.getXmlId(),
-                extendItemNode.getNodeName());
+                extendItemElement.getNodeName());
         }
       }
     }
@@ -736,20 +737,216 @@ public class XMLViews {
       viewNode.appendChild(node);
     }
 
-    private static void doInsert(Node extendItemNode, Node targetNode, Document document) {
+    private static void doInsert(
+        Node extendItemNode, Node targetNode, Document document, MetaView view)
+        throws XPathExpressionException {
+      final List<Element> elements = findElements(extendItemNode.getChildNodes());
+
+      final List<Element> toolBarElements = filterElements(elements, TOOL_BAR);
+      for (final Element element : toolBarElements) {
+        doInsertToolBar(element, document, view);
+      }
+      elements.removeAll(toolBarElements);
+
+      final List<Element> menuBarElements = filterElements(elements, MENU_BAR);
+      for (final Element element : menuBarElements) {
+        doInsertMenuBar(element, document, view);
+      }
+      elements.removeAll(menuBarElements);
+
       final NamedNodeMap attributes = extendItemNode.getAttributes();
       final String positionValue = getNodeAttributeValue(attributes, "position");
-      final Position position = Position.get(positionValue, targetNode);
+      Position position = Position.get(positionValue);
 
-      processExtendItemNodeChildren(
-          extendItemNode, document, node -> position.insert(targetNode, node));
+      if (isRootNode(targetNode)) {
+        switch (position) {
+          case BEFORE:
+          case INSIDE_FIRST:
+            final Node menuBarNode =
+                (Node)
+                    evaluateXPath(
+                        MENU_BAR, view.getName(), view.getType(), document, XPathConstants.NODE);
+
+            if (menuBarNode != null) {
+              targetNode = menuBarNode;
+              position = Position.AFTER;
+            } else {
+              final Node toolBarNode =
+                  (Node)
+                      evaluateXPath(
+                          TOOL_BAR, view.getName(), view.getType(), document, XPathConstants.NODE);
+              if (toolBarNode != null) {
+                targetNode = toolBarNode;
+                position = Position.AFTER;
+              } else {
+                position = Position.INSIDE_FIRST;
+              }
+            }
+
+            break;
+          case AFTER:
+          case INSIDE_LAST:
+            final Node panelMailNode =
+                (Node)
+                    evaluateXPath(
+                        PANEL_MAIL, view.getName(), view.getType(), document, XPathConstants.NODE);
+
+            if (panelMailNode != null) {
+              targetNode = panelMailNode;
+              position = Position.BEFORE;
+            } else {
+              position = Position.INSIDE_LAST;
+            }
+
+            break;
+          default:
+            throw new IllegalArgumentException(position.toString());
+        }
+      }
+
+      doInsert(elements, position, targetNode, document);
     }
 
-    private static void doReplace(Node extendItemNode, Node targetNode, Document document) {
+    private static void doInsert(
+        List<Element> elements, Position position, Node targetNode, Document document) {
+      processExtendItemNodeChildren(elements, document, node -> position.insert(targetNode, node));
+    }
+
+    private static void doInsertToolBar(Element element, Document document, MetaView view)
+        throws XPathExpressionException {
+      final List<Element> elements;
+      final Node targetNode;
+      final Position position;
+      final Node toolBarNode =
+          (Node)
+              evaluateXPath(
+                  TOOL_BAR, view.getName(), view.getType(), document, XPathConstants.NODE);
+
+      if (toolBarNode != null) {
+        elements = findElements(element.getChildNodes());
+        targetNode = toolBarNode;
+        position = Position.INSIDE_LAST;
+      } else {
+        elements = ImmutableList.of(element);
+        targetNode =
+            (Node)
+                evaluateXPath("/", view.getName(), view.getType(), document, XPathConstants.NODE);
+        position = Position.INSIDE_FIRST;
+      }
+
+      processExtendItemNodeChildren(elements, document, node -> position.insert(targetNode, node));
+    }
+
+    private static void doInsertMenuBar(Element element, Document document, MetaView view)
+        throws XPathExpressionException {
+      final List<Element> elements;
+      final Node targetNode;
+      final Position position;
+      final Node menuBarNode =
+          (Node)
+              evaluateXPath(
+                  MENU_BAR, view.getName(), view.getType(), document, XPathConstants.NODE);
+
+      if (menuBarNode != null) {
+        elements = findElements(element.getChildNodes());
+        targetNode = menuBarNode;
+        position = Position.INSIDE_LAST;
+      } else {
+        elements = ImmutableList.of(element);
+        final Node toolBarNode =
+            (Node)
+                evaluateXPath(
+                    TOOL_BAR, view.getName(), view.getType(), document, XPathConstants.NODE);
+
+        if (toolBarNode != null) {
+          targetNode = toolBarNode;
+          position = Position.AFTER;
+        } else {
+          targetNode =
+              (Node)
+                  evaluateXPath("/", view.getName(), view.getType(), document, XPathConstants.NODE);
+          position = Position.INSIDE_FIRST;
+        }
+      }
+
+      processExtendItemNodeChildren(elements, document, node -> position.insert(targetNode, node));
+    }
+
+    private static void doReplace(
+        Node extendItemNode, Node targetNode, Document document, MetaView view)
+        throws XPathExpressionException {
+      final List<Element> elements = findElements(extendItemNode.getChildNodes());
+
+      final List<Element> toolBarElements = filterElements(elements, TOOL_BAR);
+      for (final Element element : toolBarElements) {
+        doReplaceToolBar(element, document, view);
+      }
+      elements.removeAll(toolBarElements);
+
+      final List<Element> menuBarElements = filterElements(elements, MENU_BAR);
+      for (final Element element : menuBarElements) {
+        doReplaceMenuBar(element, document, view);
+      }
+      elements.removeAll(menuBarElements);
+
+      doReplace(elements, targetNode, document);
+    }
+
+    private static void doReplace(List<Element> elements, Node targetNode, Document document) {
       processExtendItemNodeChildren(
-          extendItemNode,
-          document,
-          node -> targetNode.getParentNode().replaceChild(node, targetNode));
+          elements, document, node -> targetNode.getParentNode().replaceChild(node, targetNode));
+    }
+
+    private static void doReplaceToolBar(Element element, Document document, MetaView view)
+        throws XPathExpressionException {
+      final List<Element> elements = ImmutableList.of(element);
+      final Node toolBarNode =
+          (Node)
+              evaluateXPath(
+                  TOOL_BAR, view.getName(), view.getType(), document, XPathConstants.NODE);
+
+      if (toolBarNode != null) {
+        doReplace(elements, toolBarNode, document);
+        return;
+      }
+
+      final Node targetNode =
+          (Node) evaluateXPath("/", view.getName(), view.getType(), document, XPathConstants.NODE);
+      final Position position = Position.INSIDE_FIRST;
+      doInsert(elements, position, targetNode, document);
+    }
+
+    private static void doReplaceMenuBar(Element element, Document document, MetaView view)
+        throws XPathExpressionException {
+      final List<Element> elements = ImmutableList.of(element);
+      final Node menuBarNode =
+          (Node)
+              evaluateXPath(
+                  MENU_BAR, view.getName(), view.getType(), document, XPathConstants.NODE);
+
+      if (menuBarNode != null) {
+        doReplace(elements, menuBarNode, document);
+        return;
+      }
+
+      final Node targetNode;
+      final Position position;
+      final Node toolBarNode =
+          (Node)
+              evaluateXPath(
+                  TOOL_BAR, view.getName(), view.getType(), document, XPathConstants.NODE);
+
+      if (toolBarNode != null) {
+        targetNode = toolBarNode;
+        position = Position.AFTER;
+      } else {
+        targetNode =
+            (Node)
+                evaluateXPath("/", view.getName(), view.getType(), document, XPathConstants.NODE);
+        position = Position.INSIDE_FIRST;
+      }
+
+      doInsert(elements, position, targetNode, document);
     }
 
     private static void doMove(
@@ -775,7 +972,21 @@ public class XMLViews {
       }
 
       final String positionValue = getNodeAttributeValue(attributes, "position");
-      Position.get(positionValue, targetNode).insert(targetNode, sourceNode);
+      Position position = Position.get(positionValue);
+
+      if (isRootNode(targetNode)) {
+        position = ROOT_NODE_POSITION_MAP.getOrDefault(position, Position.INSIDE_LAST);
+      }
+
+      position.insert(targetNode, sourceNode);
+    }
+
+    private static boolean isRootNode(Node node) {
+      return Optional.ofNullable(node)
+          .map(Node::getParentNode)
+          .map(Node::getNodeName)
+          .orElse("")
+          .equals(ObjectViews.class.getAnnotation(XmlRootElement.class).name());
     }
 
     private static void doAttribute(Node extendItemNode, Node targetNode) {
@@ -791,12 +1002,23 @@ public class XMLViews {
       ((Element) targetNode).setAttribute(name, value);
     }
 
-    private static void processExtendItemNodeChildren(
-        Node extendItemNode, Document document, Consumer<Node> nodeProcessor) {
-      nodeListToStream(extendItemNode.getChildNodes())
+    private static List<Element> findElements(NodeList nodeList) {
+      return nodeListToStream(nodeList)
           .filter(node -> node instanceof Element)
-          .map(node -> document.importNode(node, true))
-          .forEach(nodeProcessor);
+          .map(node -> (Element) node)
+          .collect(Collectors.toList());
+    }
+
+    private static List<Element> filterElements(List<Element> elements, String nodeName) {
+      return elements
+          .stream()
+          .filter(element -> nodeName.equals(element.getNodeName()))
+          .collect(Collectors.toList());
+    }
+
+    private static void processExtendItemNodeChildren(
+        List<Element> elements, Document document, Consumer<Node> nodeProcessor) {
+      elements.stream().map(element -> document.importNode(element, true)).forEach(nodeProcessor);
     }
 
     public void parallelGenerate(Query<MetaView> query) {
