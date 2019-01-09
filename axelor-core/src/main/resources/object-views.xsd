@@ -2639,6 +2639,7 @@
       <xsd:element name="divider" type="tns:MenubarMenuDivider" />
       <xsd:element name="viewer" type="tns:PanelViewer"></xsd:element>
       <xsd:element name="editor" type="tns:PanelEditor"></xsd:element>
+      <xsd:element name="panel-mail" type="tns:PanelMail"></xsd:element>
     </xsd:choice>
   </xsd:group>
 

@@ -549,6 +549,7 @@ public class XMLViews {
     private static final String STRING_DELIMITER = ",";
     private static final String TOOL_BAR = "toolbar";
     private static final String MENU_BAR = "menubar";
+    private static final String PANEL_MAIL = "panel-mail";
     private static final Map<Position, Position> ROOT_NODE_POSITION_MAP =
         ImmutableMap.of(
             Position.AFTER, Position.INSIDE_LAST, Position.BEFORE, Position.INSIDE_FIRST);
@@ -754,6 +755,12 @@ public class XMLViews {
       }
       elements.removeAll(menuBarElements);
 
+      final List<Element> panelMailElements = filterElements(elements, PANEL_MAIL);
+      for (final Element element : panelMailElements) {
+        doInsertPanelMail(element, document, view);
+      }
+      elements.removeAll(panelMailElements);
+
       final NamedNodeMap attributes = extendItemNode.getAttributes();
       final String positionValue = getNodeAttributeValue(attributes, "position");
       Position position = Position.get(positionValue);
@@ -872,6 +879,27 @@ public class XMLViews {
       processExtendItemNodeChildren(elements, document, node -> position.insert(targetNode, node));
     }
 
+    private static void doInsertPanelMail(Element element, Document document, MetaView view)
+        throws XPathExpressionException {
+      final List<Element> elements = ImmutableList.of(element);
+      final Node targetNode;
+      final Position position;
+      final Node panelMailNode =
+          (Node)
+              evaluateXPath(
+                  PANEL_MAIL, view.getName(), view.getType(), document, XPathConstants.NODE);
+
+      if (panelMailNode != null) {
+        doReplace(elements, panelMailNode, document);
+        return;
+      }
+
+      targetNode =
+          (Node) evaluateXPath("/", view.getName(), view.getType(), document, XPathConstants.NODE);
+      position = Position.INSIDE_LAST;
+      processExtendItemNodeChildren(elements, document, node -> position.insert(targetNode, node));
+    }
+
     private static void doReplace(
         Node extendItemNode, Node targetNode, Document document, MetaView view)
         throws XPathExpressionException {
@@ -888,6 +916,12 @@ public class XMLViews {
         doReplaceMenuBar(element, document, view);
       }
       elements.removeAll(menuBarElements);
+
+      final List<Element> panelMailElements = filterElements(elements, PANEL_MAIL);
+      for (final Element element : panelMailElements) {
+        doReplacePanelMail(element, document, view);
+      }
+      elements.removeAll(panelMailElements);
 
       doReplace(elements, targetNode, document);
     }
@@ -946,6 +980,25 @@ public class XMLViews {
         position = Position.INSIDE_FIRST;
       }
 
+      doInsert(elements, position, targetNode, document);
+    }
+
+    private static void doReplacePanelMail(Element element, Document document, MetaView view)
+        throws XPathExpressionException {
+      final List<Element> elements = ImmutableList.of(element);
+      final Node panelMailNode =
+          (Node)
+              evaluateXPath(
+                  PANEL_MAIL, view.getName(), view.getType(), document, XPathConstants.NODE);
+
+      if (panelMailNode != null) {
+        doReplace(elements, panelMailNode, document);
+        return;
+      }
+
+      final Node targetNode =
+          (Node) evaluateXPath("/", view.getName(), view.getType(), document, XPathConstants.NODE);
+      final Position position = Position.INSIDE_LAST;
       doInsert(elements, position, targetNode, document);
     }
 
