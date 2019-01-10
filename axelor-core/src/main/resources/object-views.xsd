@@ -2651,7 +2651,7 @@
           <xsd:choice maxOccurs="unbounded">
             <xsd:group ref="tns:ExtendFormItems" />
           </xsd:choice>
-          <xsd:attribute name="position" type="tns:Position" />
+          <xsd:attribute name="position" type="tns:Position" use="required"/>
         </xsd:complexType>
       </xsd:element>
       <xsd:element name="replace">
@@ -2694,7 +2694,7 @@
           <xsd:choice maxOccurs="unbounded">
             <xsd:group ref="tns:ExtendGridItems" />
           </xsd:choice>
-          <xsd:attribute name="position" type="tns:Position" />
+          <xsd:attribute name="position" type="tns:Position" use="required"/>
         </xsd:complexType>
       </xsd:element>
       <xsd:element name="replace">
