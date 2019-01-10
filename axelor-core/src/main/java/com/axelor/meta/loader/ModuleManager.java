@@ -196,10 +196,6 @@ public class ModuleManager {
     } finally {
       this.doCleanUp();
     }
-
-    moduleChangedEvent
-        .select(NamedLiteral.of(moduleName))
-        .fire(new ModuleChanged(moduleName, true));
   }
 
   @Transactional
@@ -224,7 +220,7 @@ public class ModuleManager {
 
     moduleChangedEvent
         .select(NamedLiteral.of(moduleName))
-        .fire(new ModuleChanged(moduleName, false));
+        .fire(new ModuleChanged(moduleName, entity.getInstalled()));
   }
 
   private void doCleanUp() {
@@ -244,6 +240,10 @@ public class ModuleManager {
       return;
     }
     install(module, update, withDemo);
+
+    moduleChangedEvent
+        .select(NamedLiteral.of(moduleName))
+        .fire(new ModuleChanged(moduleName, module.isInstalled()));
   }
 
   private void install(Module module, boolean update, boolean withDemo) {
