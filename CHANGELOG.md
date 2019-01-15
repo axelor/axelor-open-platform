@@ -1,6 +1,10 @@
-## 5.0.11 (current)
+## 5.0.11 (2019-01-15)
 
-TBD
+#### Bugs
+
+* Fix panel-tabs visibility issue
+* Fix selected row flag reset issue
+* Fix pagination issue in dms view
 
 ## 5.0.10 (2018-12-21)
 
