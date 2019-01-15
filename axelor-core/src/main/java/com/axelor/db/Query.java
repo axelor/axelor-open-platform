@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -249,9 +249,7 @@ public class Query<T extends Model> {
     return fetchStream(0, 0);
   }
 
-  /**
-   * @deprecated Use {@link #fetchStream()}.
-   */
+  /** @deprecated Use {@link #fetchStream()}. */
   @Deprecated
   public Stream<T> fetchSteam() {
     return fetchStream();
@@ -274,9 +272,7 @@ public class Query<T extends Model> {
     return fetchStream(limit, 0);
   }
 
-  /**
-   * @deprecated Use {@link #fetchStream(int)}.
-   */
+  /** @deprecated Use {@link #fetchStream(int)}. */
   @Deprecated
   public Stream<T> fetchSteam(int limit) {
     return fetchStream(limit);
@@ -304,9 +300,7 @@ public class Query<T extends Model> {
     return query.stream();
   }
 
-  /**
-   * @deprecated Use {@link #fetchStream(int, int)}.
-   */
+  /** @deprecated Use {@link #fetchStream(int, int)}. */
   @Deprecated
   public Stream<T> fetchSteam(int limit, int offset) {
     return fetchStream(limit, offset);
