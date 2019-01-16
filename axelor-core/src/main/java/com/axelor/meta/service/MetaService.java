@@ -242,6 +242,11 @@ public class MetaService {
     }
 
     final User user = AuthUtils.getUser();
+
+    if (user == null) {
+      return Collections.emptyList();
+    }
+
     final Map<Long, Set<String>> menuGroups = new HashMap<>();
     final Map<Long, Set<String>> menuRoles = new HashMap<>();
 

@@ -18,6 +18,7 @@
 package com.axelor.team.web;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.db.JpaSupport;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
@@ -54,13 +55,18 @@ public class TaskController extends JpaSupport {
   }
 
   private Long countTasks(String queryString) {
+    final User user = AuthUtils.getUser();
+
+    if (user == null) {
+      return 0L;
+    }
 
     final String countString =
         queryString.replace("SELECT tt FROM TeamTask tt", "SELECT COUNT(tt.id) FROM TeamTask tt");
 
     final TypedQuery<Long> query = getEntityManager().createQuery(countString, Long.class);
 
-    query.setParameter("uid", AuthUtils.getUser().getId());
+    query.setParameter("uid", user.getId());
     query.setParameter("closed_status", Arrays.asList("closed", "canceled"));
     try {
       return query.getSingleResult();

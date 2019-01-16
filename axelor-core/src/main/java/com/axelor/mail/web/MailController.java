@@ -34,6 +34,7 @@ import com.axelor.rpc.Response;
 import com.axelor.team.db.Team;
 import com.axelor.team.db.repo.TeamRepository;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -267,6 +268,11 @@ public class MailController extends JpaSupport {
   }
 
   private Long countMessages(String queryString) {
+    final User user = AuthUtils.getUser();
+
+    if (user == null) {
+      return 0L;
+    }
 
     final String countString =
         queryString
@@ -275,7 +281,7 @@ public class MailController extends JpaSupport {
 
     final TypedQuery<Long> query = getEntityManager().createQuery(countString, Long.class);
 
-    query.setParameter("uid", AuthUtils.getUser().getId());
+    query.setParameter("uid", user.getId());
 
     try {
       return query.getSingleResult();
@@ -286,11 +292,17 @@ public class MailController extends JpaSupport {
 
   private List<Object> find(String queryString, int offset, int limit) {
 
+    final User user = AuthUtils.getUser();
+
+    if (user == null) {
+      return Collections.emptyList();
+    }
+
     final TypedQuery<MailMessage> query =
         getEntityManager().createQuery(queryString, MailMessage.class);
     final MailFlagsRepository flagsRepo = Beans.get(MailFlagsRepository.class);
 
-    query.setParameter("uid", AuthUtils.getUser().getId());
+    query.setParameter("uid", user.getId());
 
     if (offset > 0) query.setFirstResult(offset);
     if (limit > 0) query.setMaxResults(limit);
