@@ -39,8 +39,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Strings;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
@@ -90,13 +88,9 @@ public abstract class AbstractView {
   @XmlAttribute(name = "width")
   private String widthSpec;
 
-  @XmlElementWrapper
-  @XmlElement(name = "button")
-  private List<Button> toolbar;
+  protected transient List<Button> toolbar;
 
-  @XmlElementWrapper
-  @XmlElement(name = "menu")
-  private List<Menu> menubar;
+  protected transient List<Menu> menubar;
 
   @XmlTransient @JsonIgnore private transient AbstractView owner;
 

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 
@@ -33,6 +34,10 @@ public class CardsView extends AbstractView {
   @XmlAttribute private Boolean customSearch;
 
   @XmlAttribute private String freeSearch;
+
+  @XmlElementWrapper
+  @XmlElement(name = "button")
+  protected List<Button> toolbar;
 
   @XmlElement(name = "field", type = Field.class)
   private List<AbstractWidget> items;

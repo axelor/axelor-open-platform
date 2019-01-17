@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
@@ -59,6 +60,14 @@ public class FormView extends AbstractView {
   @XmlAttribute private String canCopy;
 
   @XmlAttribute private String canAttach;
+
+  @XmlElementWrapper
+  @XmlElement(name = "button")
+  protected List<Button> toolbar;
+
+  @XmlElementWrapper
+  @XmlElement(name = "menu")
+  protected List<Menu> menubar;
 
   @XmlElements({
     @XmlElement(name = "include", type = FormInclude.class),

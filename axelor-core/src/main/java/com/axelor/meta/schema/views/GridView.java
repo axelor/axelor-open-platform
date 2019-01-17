@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
@@ -65,6 +66,14 @@ public class GridView extends AbstractView {
 
   @XmlElement(name = "help")
   private Help inlineHelp;
+
+  @XmlElementWrapper
+  @XmlElement(name = "button")
+  protected List<Button> toolbar;
+
+  @XmlElementWrapper
+  @XmlElement(name = "menu")
+  protected List<Menu> menubar;
 
   @XmlElement(name = "hilite")
   private List<Hilite> hilites;
