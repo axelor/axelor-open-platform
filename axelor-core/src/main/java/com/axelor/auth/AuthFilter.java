@@ -152,9 +152,11 @@ public class AuthFilter extends FormAuthenticationFilter {
     try {
       preLogin.fire(new PreLogin(token));
       subject.login(token);
-      postLogin.fire(new PostLogin(token, AuthUtils.getUser(), null));
+      postLogin
+          .select(NamedLiteral.of(PostLogin.SUCCESS))
+          .fire(new PostLogin(token, AuthUtils.getUser(), null));
     } catch (AuthenticationException e) {
-      postLogin.fire(new PostLogin(token, null, e));
+      postLogin.select(NamedLiteral.of(PostLogin.FAILURE)).fire(new PostLogin(token, null, e));
       return false;
     }
 
