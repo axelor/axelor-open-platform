@@ -88,10 +88,6 @@ public abstract class AbstractView {
   @XmlAttribute(name = "width")
   private String widthSpec;
 
-  protected transient List<Button> toolbar;
-
-  protected transient List<Menu> menubar;
-
   @XmlTransient @JsonIgnore private transient AbstractView owner;
 
   public String getXmlId() {
@@ -225,32 +221,6 @@ public abstract class AbstractView {
 
   public String getMaxWidth() {
     return widthPart(2);
-  }
-
-  public List<Button> getToolbar() {
-    if (toolbar != null) {
-      for (Button button : toolbar) {
-        button.setModel(this.getModel());
-      }
-    }
-    return toolbar;
-  }
-
-  public void setToolbar(List<Button> toolbar) {
-    this.toolbar = toolbar;
-  }
-
-  public List<Menu> getMenubar() {
-    if (menubar != null) {
-      for (Menu menu : menubar) {
-        menu.setModel(this.getModel());
-      }
-    }
-    return menubar;
-  }
-
-  public void setMenubar(List<Menu> menubar) {
-    this.menubar = menubar;
   }
 
   public AbstractView getOwner() {

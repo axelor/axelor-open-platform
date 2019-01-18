@@ -63,11 +63,11 @@ public class FormView extends AbstractView {
 
   @XmlElementWrapper
   @XmlElement(name = "button")
-  protected List<Button> toolbar;
+  private List<Button> toolbar;
 
   @XmlElementWrapper
   @XmlElement(name = "menu")
-  protected List<Menu> menubar;
+  private List<Menu> menubar;
 
   @XmlElements({
     @XmlElement(name = "include", type = FormInclude.class),
@@ -193,6 +193,32 @@ public class FormView extends AbstractView {
 
   public void setCanAttach(String canAttach) {
     this.canAttach = canAttach;
+  }
+
+  public List<Button> getToolbar() {
+    if (toolbar != null) {
+      for (Button button : toolbar) {
+        button.setModel(this.getModel());
+      }
+    }
+    return toolbar;
+  }
+
+  public void setToolbar(List<Button> toolbar) {
+    this.toolbar = toolbar;
+  }
+
+  public List<Menu> getMenubar() {
+    if (menubar != null) {
+      for (Menu menu : menubar) {
+        menu.setModel(this.getModel());
+      }
+    }
+    return menubar;
+  }
+
+  public void setMenubar(List<Menu> menubar) {
+    this.menubar = menubar;
   }
 
   @JsonIgnore

@@ -37,7 +37,7 @@ public class CardsView extends AbstractView {
 
   @XmlElementWrapper
   @XmlElement(name = "button")
-  protected List<Button> toolbar;
+  private List<Button> toolbar;
 
   @XmlElement(name = "field", type = Field.class)
   private List<AbstractWidget> items;
@@ -69,6 +69,19 @@ public class CardsView extends AbstractView {
 
   public void setFreeSearch(String freeSearch) {
     this.freeSearch = freeSearch;
+  }
+
+  public List<Button> getToolbar() {
+    if (toolbar != null) {
+      for (Button button : toolbar) {
+        button.setModel(this.getModel());
+      }
+    }
+    return toolbar;
+  }
+
+  public void setToolbar(List<Button> toolbar) {
+    this.toolbar = toolbar;
   }
 
   public List<AbstractWidget> getItems() {
