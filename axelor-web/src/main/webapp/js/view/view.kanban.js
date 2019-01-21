@@ -169,8 +169,6 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
       return item;
     });
 
-    columns = _.first(columns, 6);
-
     var first = _.first(columns);
     if (view.onNew) {
       first.canCreate = true;
