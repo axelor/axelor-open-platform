@@ -837,7 +837,7 @@ ui.formInput('RefItem', 'ManyToOne', {
   controller: ['$scope', '$element', 'DataSource', 'ViewService', function ($scope, $element, DataSource, ViewService) {
 
     var target = $element.attr('x-target');
-    var data = (_.findWhere($scope.$parent.field.selectionList, { value: target})||{}).data || {};
+    var data = (_.findWhere($scope.$parent.selectionList || $scope.$parent.field.selectionList, { value: target})||{}).data || {};
 
     var getViewDef = $scope.getViewDef;
     $scope.getViewDef = function (elem) {
