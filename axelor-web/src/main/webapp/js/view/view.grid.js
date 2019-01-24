@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2018 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -967,7 +967,7 @@ ui.directive('uiPortletGrid', function(){
       var _filter = $scope.filter;
       var _action = $scope._viewAction;
       var _field = $scope.field || {};
-      
+
       if (_field.readonly || _field.readonlyIf !== undefined) {
         $scope.onGridInit = function (grid, inst) {
           var editCol = _.findWhere(inst.cols, {id: '_edit_column'}) || {};
