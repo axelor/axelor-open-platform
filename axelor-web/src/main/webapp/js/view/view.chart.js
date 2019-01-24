@@ -33,6 +33,7 @@ function ChartCtrl($scope, $element, $http, ActionService) {
 
   var viewChart = null;
   var searchScope = null;
+  var clickHandler = null;
   var actionHandler = null;
 
   var loading = false;
@@ -72,9 +73,17 @@ function ChartCtrl($scope, $element, $http, ActionService) {
       if (viewChart === null) {
         viewChart = data;
         if (data.config && data.config.onClick) {
-          actionHandler = ActionService.handler($scope, $element, {
+          clickHandler = ActionService.handler($scope, $element, {
             action: data.config.onClick
           });
+        }
+        if (data.config && data.config.onAction) {
+          actionHandler = ActionService.handler($scope, $element, {
+            action: data.config.onAction
+          });
+        }
+        if (data.config && data.config.onActionTitle) {
+          $scope.actionTitle = data.config.onActionTitle;
         }
       } else {
         data = _.extend({}, viewChart, data);
@@ -99,13 +108,32 @@ function ChartCtrl($scope, $element, $http, ActionService) {
   $scope.setSearchScope = function (formScope) {
     searchScope = formScope;
   };
+  
+  $scope.hasAction = function () {
+    return !!actionHandler;
+  };
 
-  $scope.handleClick = function (e) {
+  $scope.handleAction = function (data) {
     if (actionHandler) {
       actionHandler._getContext = function () {
-        return _.extend({}, e.data.raw, { _model: $scope._model || 'com.axelor.meta.db.MetaView' });
+        return _.extend({}, { _data: data }, {
+          _model: $scope._model || 'com.axelor.meta.db.MetaView',
+          _chart: view.name
+        });
       };
       actionHandler.handle();
+    }
+  };
+
+  $scope.handleClick = function (e) {
+    if (clickHandler) {
+      clickHandler._getContext = function () {
+        return _.extend({}, e.data.raw, {
+          _model: $scope._model || 'com.axelor.meta.db.MetaView',
+          _chart: view.name
+        });
+      };
+      clickHandler.handle();
     }
   };
 
@@ -887,6 +915,9 @@ var directiveFn = function(){
           };
           scope.onExport = function () {
             doExport(data);
+          }
+          scope.onAction = function () {
+            scope.handleAction(data && data.dataset);
           }
           return;
         });

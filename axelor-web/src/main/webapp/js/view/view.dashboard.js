@@ -302,7 +302,7 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
     template:
       "<div class='dashlet hidden'>" +
         "<div class='dashlet-header'>" +
-          "<ul class='dashlet-buttons pull-right' ng-if='showRefresh || canExport()'>" +
+          "<ul class='dashlet-buttons pull-right' ng-if='showRefresh || canExport() || hasAction()'>" +
             "<li class='dropdown'>" +
               "<a href='' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-gear'></i></a>" +
               "<ul class='dropdown-menu pull-right'>" +
@@ -311,6 +311,10 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
                 "</li>" +
                 "<li ng-if='canExport()'>" +
                   "<a href='' ng-click='onExport()' x-translate>Export</a>" +
+                "</li>" +
+                "<li ng-if='hasAction()' class='divider'></li>" +
+                "<li ng-if='hasAction()'>" +
+                  "<a href='' ng-click='onAction()'>{{ (actionTitle || _t('Action')) }}</a>" +
                 "</li>" +
               "</ul>" +
             "</li>" +
