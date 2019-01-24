@@ -888,8 +888,9 @@ ui.directive('uiPortletGrid', function(){
         tab.viewType = "form";
         tab.recordId = record.id;
         tab.action = _.uniqueId('$act');
+        tab.forceReadonly = $scope.isReadonly();
 
-        if ($scope._isPopup || (($scope._viewParams || {}).params || {}).popup) {
+        if (tab.forceReadonly || $scope._isPopup || (($scope._viewParams || {}).params || {}).popup) {
           tab.$popupParent = $scope;
           tab.params = tab.params || {};
           _.defaults(tab.params, {
@@ -965,6 +966,21 @@ ui.directive('uiPortletGrid', function(){
       var _onShow = $scope.onShow;
       var _filter = $scope.filter;
       var _action = $scope._viewAction;
+      var _field = $scope.field || {};
+      
+      if (_field.readonly || _field.readonlyIf !== undefined) {
+        $scope.onGridInit = function (grid, inst) {
+          var editCol = _.findWhere(inst.cols, {id: '_edit_column'}) || {};
+          editCol.descriptor = { hidden : true };
+          $scope.$parent.$watch("attr('readonly')", function (readonly) {
+            if (inst.editable) {
+              grid.setOptions({ editable: readonly });
+            }
+            inst.showColumn('_edit_column', !readonly);
+            editCol.descriptor = { hidden : readonly };
+          });
+        };
+      }
 
       $scope.filter = function (searchFilter) {
         var opts = _.extend({}, searchFilter, {
@@ -995,7 +1011,7 @@ ui.directive('uiPortletGrid', function(){
     replace: true,
     template:
     '<div class="portlet-grid">'+
-      '<div ui-view-grid x-view="schema" x-data-view="dataView" x-editable="false" x-no-filter="{{noFilter}}" x-handler="this"></div>'+
+      '<div ui-view-grid x-view="schema" x-on-init="onGridInit" x-data-view="dataView" x-editable="false" x-no-filter="{{noFilter}}" x-handler="this"></div>'+
     '</div>'
   };
 });

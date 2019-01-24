@@ -242,8 +242,13 @@ function FormViewCtrl($scope, $element) {
     return params.forceEdit || (params.params && params.params.forceEdit);
   }
 
+  $scope.isForceReadonly = function () {
+    var params = this._viewParams || {};
+    return params.forceReadonly || (params.params && params.params.forceReadonly);
+  }
+
   $scope.isEditable = function() {
-    return $scope.isForceEdit() || editable;
+    return $scope.isForceEdit() || (editable && !$scope.isForceReadonly());
   };
 
   $scope.setEditable = function() {
