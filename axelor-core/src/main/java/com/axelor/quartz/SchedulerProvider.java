@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
-import org.quartz.impl.StdSchedulerFactory;
 
 /**
  * The {@link Provider} for {@link Scheduler} that uses {@link GuiceJobFactory} so that services can
@@ -50,7 +49,7 @@ class SchedulerProvider implements Provider<Scheduler> {
     Scheduler scheduler;
     SchedulerFactory schedulerFactory;
     try {
-      schedulerFactory = new StdSchedulerFactory(cfg);
+      schedulerFactory = new GuiceSchedulerFactory(cfg);
       scheduler = schedulerFactory.getScheduler();
       scheduler.setJobFactory(jobFactory);
     } catch (SchedulerException e) {
