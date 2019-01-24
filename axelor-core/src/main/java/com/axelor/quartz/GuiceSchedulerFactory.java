@@ -17,14 +17,23 @@
  */
 package com.axelor.quartz;
 
-import com.google.inject.AbstractModule;
+import java.util.Properties;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.core.QuartzScheduler;
+import org.quartz.core.QuartzSchedulerResources;
+import org.quartz.impl.StdSchedulerFactory;
 
-/** The default guice module for quartz scheduler. */
-public class SchedulerModule extends AbstractModule {
+/** Custom {@link StdSchedulerFactory} to use {@link GuiceJobRunShellFactory}. */
+public class GuiceSchedulerFactory extends StdSchedulerFactory {
+
+  public GuiceSchedulerFactory(Properties props) throws SchedulerException {
+    super(props);
+  }
 
   @Override
-  protected void configure() {
-    bind(Scheduler.class).toProvider(SchedulerProvider.class);
+  protected Scheduler instantiate(QuartzSchedulerResources rsrcs, QuartzScheduler qs) {
+    rsrcs.setJobRunShellFactory(new GuiceJobRunShellFactory(rsrcs));
+    return super.instantiate(rsrcs, qs);
   }
 }
