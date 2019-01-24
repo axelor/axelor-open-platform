@@ -322,7 +322,7 @@ function GridViewCtrl($scope, $element) {
 
     criteria.criteria = _.map(filter, function(value, key) {
 
-      var field = $scope.fields[key] || {};
+      var field = $scope.fields[key] || _.findWhere(($scope.schema||{}).items, { name: key }) || {};
       var type = field.type || 'string';
       var operator = 'like';
       var origValue = value;
@@ -383,9 +383,15 @@ function GridViewCtrl($scope, $element) {
         case 'date':
           operator = '=';
           value = stripOperator(value);
-          value = toMoment(value);
-          if (value) value = value.startOf('day').toDate().toISOString();
-          value2 = toDate(value2);
+          if (value)
+            value = toMoment(value).toISOString();
+          if (value2)
+            value2 = toMoment(value2).toISOString();
+          if (field.jsonField) {
+            operator = 'between';
+            value2 = value2 || moment(value).endOf('day').toISOString();
+            value = moment(value).startOf('day').toISOString();
+          }
           break;
         case 'time':
           operator = '=';

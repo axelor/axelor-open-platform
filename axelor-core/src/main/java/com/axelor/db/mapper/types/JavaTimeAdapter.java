@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
 import java.util.Calendar;
@@ -94,7 +95,9 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
     } catch (Exception e) {
     }
     try {
-      return LocalDate.parse(value.toString()).atStartOfDay().atZone(ZoneId.systemDefault());
+      return LocalDate.parse(value.toString())
+          .atStartOfDay(ZoneOffset.UTC)
+          .withZoneSameInstant(ZoneId.systemDefault());
     } catch (Exception e) {
     }
     throw new IllegalArgumentException("Unable to convert value: " + value);
