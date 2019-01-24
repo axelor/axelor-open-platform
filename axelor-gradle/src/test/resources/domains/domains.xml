@@ -5,7 +5,7 @@
 
   <module name="contact" package="com.axelor.contact.db"/>
 
-  <entity name="Title" cachable="true" implements="java.io.Serializable" repository="abstract">
+  <entity name="Title" cacheable="true" implements="java.io.Serializable" repository="abstract">
     <![CDATA[
     This class represents the name initial like Mr., Mrs. etc.
 
@@ -77,7 +77,7 @@
     <!-- should have 'attrs' json field as well -->
   </entity>
 
-  <entity name="Contact" sequential="true" hashAll="true" cachable="false">
+  <entity name="Contact" sequential="true" hashAll="true" cacheable="false">
     <string name="empId" sequence="emp.seq"/>
     <many-to-one name="title" ref="Title" unique="true" />
     <string name="firstName" required="true" initParam="true"/>

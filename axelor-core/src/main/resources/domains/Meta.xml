@@ -5,7 +5,7 @@
 
   <module name="meta" package="com.axelor.meta.db" />
 
-  <entity name="MetaModule" table="META_MODULE" cachable="true">
+  <entity name="MetaModule" table="META_MODULE" cacheable="true">
     <![CDATA[
     This object store the modules.
     ]]>
@@ -22,7 +22,7 @@
     <boolean name="pending" />
   </entity>
 
-  <entity name="MetaView" table="META_VIEW" cachable="true">
+  <entity name="MetaView" table="META_VIEW" cacheable="true">
     <![CDATA[
     This object store the xml views.
     ]]>
@@ -80,7 +80,7 @@
       WHERE extensionView.name = self.name AND extensionView.extension = TRUE)"/>
   </entity>
 
-  <entity name="MetaViewCustom" table="META_VIEW_CUSTOM" cachable="true">
+  <entity name="MetaViewCustom" table="META_VIEW_CUSTOM" cacheable="true">
     <string name="name" required="true" />
     <string name="title" required="true" namecolumn="true" />
     <string name="type" required="true" selection="view.type.selection"/>
@@ -93,7 +93,7 @@
 
   </entity>
 
-  <entity name="MetaMenu" table="META_MENU" cachable="true">
+  <entity name="MetaMenu" table="META_MENU" cacheable="true">
     <![CDATA[
     This object store the menus.
     ]]>
@@ -133,7 +133,7 @@
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
 
-  <entity name="MetaActionMenu" table="META_ACTION_MENU" cachable="true">
+  <entity name="MetaActionMenu" table="META_ACTION_MENU" cacheable="true">
     <![CDATA[
     This object store the actions menu.
     ]]>
@@ -154,7 +154,7 @@
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
 
-  <entity name="MetaAction" table="META_ACTION" cachable="true">
+  <entity name="MetaAction" table="META_ACTION" cacheable="true">
     <![CDATA[
     This object store the xml actions.
     ]]>
@@ -173,14 +173,14 @@
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
 
-  <entity name="MetaEnum" table="META_ENUM" cachable="true">
+  <entity name="MetaEnum" table="META_ENUM" cacheable="true">
     <![CDATA[
     This object store the enum types.
     ]]>
     <string name="name" required="true" unique="true" />
   </entity>
 
-  <entity name="MetaSelect" table="META_SELECT" cachable="true">
+  <entity name="MetaSelect" table="META_SELECT" cacheable="true">
     <![CDATA[
     This object store the selects.
     ]]>
@@ -195,7 +195,7 @@
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
   </entity>
 
-  <entity name="MetaSelectItem" table="META_SELECT_ITEM" cachable="true">
+  <entity name="MetaSelectItem" table="META_SELECT_ITEM" cacheable="true">
     <![CDATA[
     This object store the select items.
     ]]>
@@ -209,7 +209,7 @@
     <many-to-one name="select" ref="MetaSelect" column="select_id" required="true"/>
   </entity>
 
-  <entity name="MetaModel" table="META_MODEL" cachable="true">
+  <entity name="MetaModel" table="META_MODEL" cacheable="true">
     <![CDATA[
     This object store the models.
     ]]>
@@ -221,7 +221,7 @@
     <string name="fullName" title="Fullname" />
   </entity>
 
-  <entity name="MetaField" table="META_FIELD" cachable="true">
+  <entity name="MetaField" table="META_FIELD" cacheable="true">
     <![CDATA[
     This object store the fields.
     ]]>

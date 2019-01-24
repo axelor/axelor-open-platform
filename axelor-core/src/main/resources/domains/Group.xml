@@ -5,7 +5,7 @@
 
   <module name="auth" package="com.axelor.auth.db"/>
 
-  <entity name="Group" cachable="true">
+  <entity name="Group" cacheable="true">
     <![CDATA[
     This object store the groups.
     ]]>

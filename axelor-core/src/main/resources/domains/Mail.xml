@@ -5,7 +5,7 @@
 
   <module name="mail" package="com.axelor.mail.db"/>
 
-  <entity name="MailAddress" table="MAIL_ADDRESS" cachable="true" repository="none">
+  <entity name="MailAddress" table="MAIL_ADDRESS" cacheable="true" repository="none">
     <![CDATA[
     The model to store email addresses.
     ]]>
@@ -13,7 +13,7 @@
     <string name="personal" column="personal_name" />
   </entity>
 
-  <entity name="MailMessage" table="MAIL_MESSAGE" cachable="true" repository="none">
+  <entity name="MailMessage" table="MAIL_MESSAGE" cacheable="true" repository="none">
     <![CDATA[
     The model to store different kind of messages like system notifications,
     comments, email messages etc.
@@ -47,7 +47,7 @@
 
   </entity>
 
-  <entity name="MailFlags" table="MAIL_FLAGS" cachable="true" repository="none">
+  <entity name="MailFlags" table="MAIL_FLAGS" cacheable="true" repository="none">
     <![CDATA[
     The model to store message flags like unread, starred, voted etc.
     ]]>
@@ -58,7 +58,7 @@
     <boolean name="isArchived" />
   </entity>
 
-  <entity name="MailFollower" table="MAIL_FOLLOWER" cachable="true" repository="none">
+  <entity name="MailFollower" table="MAIL_FOLLOWER" cacheable="true" repository="none">
     <![CDATA[
     The model to store followers details of a document.
     ]]>
