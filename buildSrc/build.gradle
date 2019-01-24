@@ -30,3 +30,9 @@ dependencies {
 }
 
 test.enabled = false
+
+jar {
+  manifest {
+    attributes('Implementation-Version': project.version)
+  }
+}

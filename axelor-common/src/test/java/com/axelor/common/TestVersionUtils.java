@@ -48,12 +48,5 @@ public class TestVersionUtils {
     Assert.assertEquals(0, v3.minor);
     Assert.assertEquals(1, v3.patch);
     Assert.assertEquals(0, v3.rc);
-
-    Assert.assertTrue(v1.matches("3.0.1"));
-    Assert.assertFalse(v1.matches("3.0.0"));
-    Assert.assertFalse(v1.matches("3.0.2"));
-    Assert.assertTrue(v1.matches("~3.0.0"));
-    Assert.assertTrue(v1.matches("~3.0.1"));
-    Assert.assertFalse(v1.matches("~3.0.2"));
   }
 }

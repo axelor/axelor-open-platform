@@ -12,25 +12,28 @@ configurations {
   runtime.exclude module: 'jsr305'
 }
 
-task updateVersion() {
-  def versionFile = file("${projectDir}/src/main/resources/axelor-version.txt")
-  onlyIf { versionFile.text.trim() != project.version }
-  doLast { versionFile.text = project.version + "\n" }
+void writeManifest(File dir, boolean force) {
+  if (force || dir.exists()) {
+    jar.manifest.writeTo(file("${dir}/META-INF/MANIFEST.MF"))
+  }
 }
 
 afterEvaluate {
-  tasks.withType(JavaCompile)*.dependsOn updateVersion
+  writeManifest(file("${project.buildDir}/resources/main"), true)
+  writeManifest(file("${projectDir}/bin/main"), false) // to eclipse output dir
+  writeManifest(file("${projectDir}/out/production/resources"), false) // to intelij output dir
 }
 
 jar {
   manifest {
-    attributes('Implementation-Title': project.name,
-           'Implementation-Version': project.version,
-           'Implementation-Vendor': 'Axelor',
-           'Implementation-Vendor-Id': 'com.axelor',
-           'Implementation-Vendor-Url': 'http://axelor.com',
-           'Specification-Title': project.name,
-           'Specification-Version': project.version,
-           'Specification-Vendor': 'Axelor')
+    attributes(
+      'Implementation-Title': project.name,
+      'Implementation-Version': project.version,
+      'Implementation-Vendor': 'Axelor',
+      'Implementation-Vendor-Id': 'com.axelor',
+      'Implementation-Vendor-Url': 'http://axelor.com',
+      'Specification-Title': project.name,
+      'Specification-Version': project.version,
+      'Specification-Vendor': 'Axelor')
   }
 }

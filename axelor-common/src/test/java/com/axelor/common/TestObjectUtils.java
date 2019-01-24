@@ -45,13 +45,13 @@ public class TestObjectUtils {
 
   @Test
   public void testGetResource() {
-    URL url = ResourceUtils.getResource("axelor-version.txt");
+    URL url = ResourceUtils.getResource("test.txt");
     Assert.assertNotNull(url);
   }
 
   @Test
   public void testGetResourceStream() {
-    InputStream stream = ResourceUtils.getResourceStream("axelor-version.txt");
+    InputStream stream = ResourceUtils.getResourceStream("test.txt");
     Assert.assertNotNull(stream);
   }
 }
