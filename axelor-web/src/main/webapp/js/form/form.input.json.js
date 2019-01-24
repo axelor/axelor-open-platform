@@ -61,14 +61,6 @@ ui.formInput('JsonField', 'String', {
           return v;
         }
       }
-      if (item.type === 'date') {
-        jsonFix[item.name] = function(v) {
-          if (/\d{4}-\d{2}-\d{2}/.test(v)) {
-            return moment(v);
-          }
-          return v;
-        };
-      }
       if (item.contextField && item.contextFieldValue) {
         if (item.showIf === undefined && item.hideIf === undefined && item.hidden) {
           return;

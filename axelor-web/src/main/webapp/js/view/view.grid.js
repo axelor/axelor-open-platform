@@ -367,6 +367,10 @@ function GridViewCtrl($scope, $element) {
         return val ? toMoment(val).format('YYYY-MM-DD') : val;
       }
 
+      function toDateString(val) {
+          return moment.utc(val, 'DD/MM/YYYY').toDate().toISOString().split("T")[0];
+      }
+
       switch(type) {
         case 'integer':
         case 'long':
@@ -383,15 +387,8 @@ function GridViewCtrl($scope, $element) {
         case 'date':
           operator = '=';
           value = stripOperator(value);
-          if (value)
-            value = toMoment(value).toISOString();
-          if (value2)
-            value2 = toMoment(value2).toISOString();
-          if (field.jsonField) {
-            operator = 'between';
-            value2 = value2 || moment(value).endOf('day').toISOString();
-            value = moment(value).startOf('day').toISOString();
-          }
+          if (value) value = toDateString(value);
+          if (value2) value2 = toDateString(value2);
           break;
         case 'time':
           operator = '=';

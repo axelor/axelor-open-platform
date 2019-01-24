@@ -19,7 +19,6 @@ package com.axelor.rpc;
 
 import static com.axelor.common.StringUtils.isBlank;
 import static com.axelor.meta.loader.ModuleManager.isInstalled;
-
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.db.Model;
@@ -49,8 +48,6 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import groovy.lang.GString;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -113,24 +110,6 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
             value
                 .atZone(ZoneOffset.systemDefault())
                 .withZoneSameInstant(ZoneOffset.UTC)
-                .toString());
-      }
-    }
-  }
-
-  static class LocalDateSerializer extends JsonSerializer<java.time.LocalDate> {
-
-    @Override
-    public void serialize(
-        java.time.LocalDate value, JsonGenerator jgen, SerializerProvider provider)
-        throws IOException, JsonProcessingException {
-      if (value != null) {
-        jgen.writeString(
-            value
-                .atTime(LocalTime.now())
-                .atZone(ZoneId.systemDefault())
-                .withZoneSameInstant(ZoneOffset.UTC)
-                .toLocalDate()
                 .toString());
       }
     }
@@ -288,7 +267,6 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 
     javaTimeModule.addSerializer(java.time.ZonedDateTime.class, new ZonedDateTimeSerializer());
     javaTimeModule.addSerializer(java.time.LocalDateTime.class, new LocalDateTimeSerializer());
-    javaTimeModule.addSerializer(java.time.LocalDate.class, new LocalDateSerializer());
     javaTimeModule.addSerializer(java.time.LocalTime.class, new LocalTimeSerializer());
 
     mapper.registerModule(module);
