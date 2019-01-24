@@ -18,7 +18,7 @@
 package com.axelor.tools.x2j.pojo
 
 import groovy.util.slurpersupport.NodeChild
-
+import org.slf4j.LoggerFactory
 import com.axelor.common.Inflector
 import com.axelor.tools.x2j.Utils
 
@@ -63,7 +63,7 @@ class Entity {
 
 	boolean hasExtends
 
-	String cachable
+	String cacheable
 
 	String documentation
 
@@ -104,7 +104,7 @@ class Entity {
 		sequential = !(node.'@sequential' == "false")
 		groovy = node.'@lang' == "groovy"
 		hashAll = node.'@hashAll' == "true"
-		cachable = node.'@cachable'
+		cacheable = node.'@cachable' || node.'@cacheable'
 		interfaces = node.'@implements'
 		baseClass = node.'@extends'
 		strategy = node.'@strategy'
@@ -126,6 +126,10 @@ class Entity {
 
 		if (!repoNamespace) {
 			repoNamespace = "${namespace}.repo"
+		}
+
+		if (node.attributes().containsKey('cachable')) {
+			LoggerFactory.getLogger(Entity.class).warn("Attribute 'cachable' on ${name} is deprecated, use 'cacheable' instead.")
 		}
 
 		if (!tablePrefix) {
@@ -475,7 +479,7 @@ class Entity {
 		def all = []
 
 		if (!mappedSuper) {
-			all += [new Annotation(this, "javax.persistence.Entity", true), $cachable()]
+			all += [new Annotation(this, "javax.persistence.Entity", true), $cacheable()]
 		}
 
 		if (!mappedSuper && dynamicUpdate) {
@@ -537,11 +541,11 @@ class Entity {
 		return a1
 	}
 
-	Annotation $cachable() {
-		if (cachable == "true") {
+	Annotation $cacheable() {
+		if (cacheable == "true") {
 			return new Annotation(this, "javax.persistence.Cacheable", true)
 		}
-		if (cachable == "false") {
+		if (cacheable == "false") {
 			return new Annotation(this, "javax.persistence.Cacheable", false).add("false", false)
 		}
 		return null

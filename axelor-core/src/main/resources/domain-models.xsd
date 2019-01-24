@@ -1023,6 +1023,13 @@
     <xsd:attribute name="cachable" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>
+        Specifies whether the entity should be cached if caching is enabled (DEPRECATED, use cacheable).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="cacheable" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
         Specifies whether the entity should be cached if caching is enabled.
         </xsd:documentation>
       </xsd:annotation>
