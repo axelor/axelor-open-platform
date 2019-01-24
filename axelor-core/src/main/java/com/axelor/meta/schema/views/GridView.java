@@ -64,6 +64,9 @@ public class GridView extends AbstractView {
   @XmlAttribute(name = "x-col-width")
   private Integer colWidth;
 
+  @XmlAttribute(name = "x-no-fetch")
+  private Boolean noFetch;
+
   @XmlElement(name = "help")
   private Help inlineHelp;
 
@@ -210,6 +213,14 @@ public class GridView extends AbstractView {
 
   public void setColWidth(Integer colWidth) {
     this.colWidth = colWidth;
+  }
+
+  public Boolean getNoFetch() {
+    return noFetch;
+  }
+
+  public void setNoFetch(Boolean noFetch) {
+    this.noFetch = noFetch;
   }
 
   public Help getInlineHelp() {
