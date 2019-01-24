@@ -66,6 +66,9 @@ function GridViewCtrl($scope, $element) {
         reloadDotted = params.params && params.params['reload-dotted'];
 
         $scope.view = view;
+
+        if (view.noFetch) return;
+
         $scope.filter({
           _sortBy: sortBy,
           _pageNum: pageNum
