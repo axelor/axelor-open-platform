@@ -2884,7 +2884,7 @@
   <xsd:complexType name="ActView">
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractAct">
-        <xsd:attribute name="type" type="xsd:string" use="required">
+        <xsd:attribute name="type" type="tns:ViewType" use="required">
           <xsd:annotation>
             <xsd:documentation>View type. For exemple: form, grid, calendar, ...</xsd:documentation>
           </xsd:annotation>
@@ -3347,5 +3347,23 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
+
+  <xsd:simpleType name="ViewType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="form"/>
+      <xsd:enumeration value="grid"/>
+      <xsd:enumeration value="tree"/>
+      <xsd:enumeration value="chart"/>
+      <xsd:enumeration value="dashboard"/>
+      <xsd:enumeration value="search"/>
+      <xsd:enumeration value="calendar"/>
+      <xsd:enumeration value="gantt"/>
+      <xsd:enumeration value="cards"/>
+      <xsd:enumeration value="kanban"/>
+      <xsd:enumeration value="custom"/>
+      <xsd:enumeration value="search-filters"/>
+      <xsd:enumeration value="html"/>
+    </xsd:restriction>
+  </xsd:simpleType>
 
 </xsd:schema>
