@@ -780,12 +780,22 @@ img.prefix-icon {
   font-size: 14px;
 }
 
+.user-preferences > .form-view {
+  max-width: 1200px;
+  margin: auto;
+}
+
 .user-preferences form {
   padding: 0;
 }
 
+.user-preferences-header h3 {
+  margin: 0;
+}
+
 .user-preferences-header {
-  text-align: center;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #e7e7e7;
 }
 
 .btn-toolbar .nav {
