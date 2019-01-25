@@ -165,6 +165,10 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
     if (parent.canEditTarget && !parent.canEditTarget()) {
       return false;
     }
+    // disable edit icon
+    if ($scope.attr('canEdit') === undefined) {
+      return false;
+    }
     return $scope.attr('canEdit') !== false && $scope.canView() && $scope.getValue();
   };
 
