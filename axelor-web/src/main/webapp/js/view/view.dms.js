@@ -32,7 +32,7 @@ function inputDialog(options, callback) {
 
   var html = "" +
   "<div>" +
-    "<input type='text' value='" + opts.value +"'>" +
+    "<input type='text'>" +
   "</div>";
 
   var dialog;
@@ -54,7 +54,10 @@ function inputDialog(options, callback) {
       'text': opts.titleOK,
       'class': 'btn btn-primary',
       'click': submit
-    }]
+    }],
+    onOpen: function(e) {
+      $(e.target).find('input').val(opts.value);
+    }
   })
   .on("keypress", "input", function (e) {
     if (e.keyCode === 13) {
