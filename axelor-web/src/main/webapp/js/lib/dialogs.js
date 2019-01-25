@@ -99,6 +99,7 @@
       var opts = $.extend({}, options);
       var title = opts.title || _t('Information');
       var onClose = opts.onClose || $.noop;
+      var onOpen = opts.onOpen || $.noop;
       var buttons = opts.buttons || [
         {
           'text'	: _t('OK'),
@@ -118,6 +119,9 @@
         closeOnEscape: true,
         modal: true,
         zIndex: 1100,
+        open: function(e) {
+          onOpen(e);
+        },
         close: function(e) {
           onClose(e);
           element.dialog('destroy');
