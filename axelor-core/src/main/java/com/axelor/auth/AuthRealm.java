@@ -51,15 +51,15 @@ public class AuthRealm extends AuthorizingRealm {
         plain = new String((char[]) plain);
       }
 
+      boolean ldapLogin = false;
       try {
-        return service.ldapLogin((String) token.getPrincipal(), (String) plain);
+        ldapLogin = service.ldapLogin((String) token.getPrincipal(), (String) plain);
       } catch (IllegalStateException e) {
       } catch (AuthenticationException e) {
         log.error("Password authentication failed for user: {}", token.getPrincipal());
-        return false;
       }
 
-      if (service.match((String) plain, (String) saved) || super.doCredentialsMatch(token, info)) {
+      if (!ldapLogin && (service.match((String) plain, (String) saved) || super.doCredentialsMatch(token, info))) {
         return true;
       }
 
