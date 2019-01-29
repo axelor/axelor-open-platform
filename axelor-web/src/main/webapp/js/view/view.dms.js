@@ -160,7 +160,7 @@ function DMSFileListCtrl($scope, $element) {
   $scope.sync = function () {
   };
 
-  function doReload() {
+  $scope.reload = function () {
     var fields = _.pluck($scope.fields, 'name');
     var ds = $scope._dataSource;
     var context = $scope.getContext();
@@ -170,18 +170,11 @@ function DMSFileListCtrl($scope, $element) {
       domain: $scope._domain,
       context: context
     });
-  }
-
-  $scope.reload = function () {
-    var promise = doReload();
-    promise.then(function () {
-      return $scope.sync();
-    });
   };
 
-  $scope.reloadNoSync = function () {
-    return doReload();
-  };
+  $scope._dataSource.on("change", function (e, records) {
+    $scope.$broadcast('on:accept-folders', records);
+  });
 
   function resetFilter() {
     $scope.currentFilter = null;
@@ -244,7 +237,7 @@ function DMSFileListCtrl($scope, $element) {
     $scope.currentFolder = folder;
     $scope.currentPaths = paths;
 
-    return $scope.reloadNoSync();
+    return $scope.reload();
   };
 
   $scope.onItemClick = function(event, args) {
@@ -320,7 +313,7 @@ function DMSFileListCtrl($scope, $element) {
       var promise = $scope._dataSource.save(record);
       promise.then(done, done);
       promise.success(function (record) {
-        $scope.reloadNoSync();
+        $scope.reload();
         callback(record);
       });
     });
@@ -334,7 +327,7 @@ function DMSFileListCtrl($scope, $element) {
         isDirectory: true
       }
     }, function (record) {
-      $scope.$broadcast('on:change-folders', [record]);
+      $scope.$broadcast('on:accept-folders', [record]);
     });
   };
 
@@ -399,7 +392,7 @@ function DMSFileListCtrl($scope, $element) {
           folder.fileName = record.fileName;
         }
         if ($scope._dataSource === ds) {
-          $scope.reloadNoSync();
+          $scope.reload();
         }
       });
     }
@@ -453,7 +446,7 @@ function DMSFileListCtrl($scope, $element) {
     $scope._dataSource.saveAll(items).success(function (records) {
       $scope.$broadcast('on:change-folders', folders);
       setTimeout(function () {
-        $scope.reloadNoSync();
+        $scope.reload();
       });
     });
   };
@@ -1008,7 +1001,9 @@ function DmsFolderTreeCtrl($scope, DataSource) {
     }
     domain += "self.isDirectory = true";
     if (home && home.id > 0) {
-      domain += " AND self.id != " + home.id;
+      domain += " AND self.id != " + home.id + " AND self.parent.id = " + home.id;
+    } else {
+      domain += " AND self.parent is NULL";
     }
     if (home && home.relatedModel) {
       domain += " AND self.relatedModel = '" + home.relatedModel + "'";
@@ -1167,7 +1162,21 @@ ui.directive("uiDmsFolders", function () {
           });
       });
 
-      scope.$on('on:change-folders', function (e, folders) {
+      scope.$on('on:accept-folders', function (e, records) {
+        var parent = scope.getActiveFolder() || _.first(scope.rootFolders);
+        var folders = records.filter(function (record) {
+          return record.isDirectory && !scope.folders[record.id];
+        });
+        folders.forEach(function (folder) {
+          folder.nodes = [];
+          folder.parent = parent;
+          scope.folders[folder.id] = folder;
+          parent.nodes.push(folder);
+        });
+      });
+
+      scope.$on('on:change-folders', function (e, records) {
+        var folders = records.filter(function (record) { return record.isDirectory; });
         // first remove from old parent
         folders.forEach(function (record) {
           var found = scope.folders[record.id];
@@ -1240,7 +1249,7 @@ ui.directive("uiDmsTreeNode", function () {
     },
     replace: true,
     template: "" +
-    "<a href='javascript:' ng-click='onClick($event, node)' ng-class='{active: node.active}'>" +
+    "<a href='' ng-click='onClick($event, node)' ng-class='{active: node.active}'>" +
       "<span class='highlight'></span>" +
       "<i class='fa fa-caret-down handle' ng-show='node.open'></i> " +
       "<i class='fa fa-caret-right handle' ng-show='!node.open'></i> " +
@@ -1253,7 +1262,7 @@ ui.directive("uiDmsTreeNode", function () {
 ui.directive("uiDmsTree", ['$compile', function ($compile) {
 
   var template = "" +
-  "<li ng-repeat='node in nodes | limitTo: limit as items track by node.id' ng-class='{empty: !node.nodes.length}' class='dms-tree-folder'>" +
+  "<li ng-repeat='node in nodes track by node.id' ng-class='{empty: !node.nodes.length}' class='dms-tree-folder'>" +
     "<a x-node='node' ui-dms-tree-node></a>" +
     "<ul ng-if='node.open' x-handler='handler' x-nodes='node.nodes' ui-dms-tree></ul>" +
   "</li>";
@@ -1264,40 +1273,6 @@ ui.directive("uiDmsTree", ['$compile', function ($compile) {
       handler: "="
     },
     link: function (scope, element, attrs) {
-
-      var maxNodes = 40;
-      var elemMore = null;
-
-      scope.limit = maxNodes;
-
-      function loadMore() {
-        scope.$applyAsync(function () {
-          scope.limit = Math.min(scope.nodes.length, scope.limit + maxNodes);
-          showMore();
-        });
-      }
-
-      function showMore() {
-        var hasMore = scope.limit < scope.nodes.length;
-        if (elemMore === null) {
-          var a = $("<a href='javascript:'></a>").append($("<span class='title'>").text(_t('load more') + '...'));
-          elemMore = $("<li class='dms-tree-more'>").append(a).appendTo(element);
-          elemMore.on('click', 'a', loadMore);
-        }
-        if (!hasMore) {
-          elemMore.remove();
-          elemMore = null;
-        }
-      }
-
-      var unwatch = scope.$watch('nodes.length', function (n) {
-        if (n === 0) {
-          return;
-        }
-        unwatch();
-        showMore();
-      });
-
       var handler = scope.handler;
 
       scope.onClick = function (e, node) {
