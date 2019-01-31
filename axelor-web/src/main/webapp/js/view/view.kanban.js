@@ -571,6 +571,59 @@ ui.directive('uiCard', ["$compile", function ($compile) {
       });
 
       element.fadeIn("slow");
+
+      var summaryHandler;
+      var summary = body.find('.card-summary.popover');
+
+      var configureSummary = _.once(function configureSummary() {
+        element.popover({
+          placement: 'top',
+          container: 'body',
+          trigger: 'manual',
+          title: summary.attr('title'),
+          content: summary.html(),
+          html: true
+        });
+      });
+
+      function showSummary() {
+        configureSummary();
+        summaryHandler = setTimeout(function () {
+          summaryHandler = null;
+          element.popover('show');
+        }, 500);
+      }
+
+      function hideSummary() {
+        if (summaryHandler) {
+          clearTimeout(summaryHandler);
+          summaryHandler = null;
+        }
+        element.popover('hide');
+      }
+
+      if (summary.length > 0) {
+        element.on('mouseenter.summary', showSummary);
+        element.on('mouseleave.summary', hideSummary);
+        element.on('mousedown.summary', hideSummary);
+      }
+
+      function destroy() {
+        if (summaryHandler) {
+          clearTimeout(summaryHandler);
+          summaryHandler = null;
+        }
+        if (element) {
+          element.off('mouseenter.summary');
+          element.off('mouseleave.summary');
+          element.off('mousedown.summary');
+          element.popover('destroy');
+          element = null;
+        }
+      }
+
+      element.on('$destroy', destroy);
+      scope.$on('$destroy', destroy);
     }
   };
 }]);
