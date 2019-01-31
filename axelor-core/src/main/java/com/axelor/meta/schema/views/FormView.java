@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
@@ -55,6 +56,14 @@ public class FormView extends AbstractView implements ExtendableView {
   @XmlAttribute private String canCopy;
 
   @XmlAttribute private String canAttach;
+
+  @XmlElementWrapper
+  @XmlElement(name = "button")
+  private List<Button> toolbar;
+
+  @XmlElementWrapper
+  @XmlElement(name = "menu")
+  private List<Menu> menubar;
 
   @XmlElements({
     @XmlElement(name = "include", type = FormInclude.class),
@@ -183,6 +192,32 @@ public class FormView extends AbstractView implements ExtendableView {
 
   public void setCanAttach(String canAttach) {
     this.canAttach = canAttach;
+  }
+
+  public List<Button> getToolbar() {
+    if (toolbar != null) {
+      for (Button button : toolbar) {
+        button.setModel(this.getModel());
+      }
+    }
+    return toolbar;
+  }
+
+  public void setToolbar(List<Button> toolbar) {
+    this.toolbar = toolbar;
+  }
+
+  public List<Menu> getMenubar() {
+    if (menubar != null) {
+      for (Menu menu : menubar) {
+        menu.setModel(this.getModel());
+      }
+    }
+    return menubar;
+  }
+
+  public void setMenubar(List<Menu> menubar) {
+    this.menubar = menubar;
   }
 
   @JsonProperty("items")

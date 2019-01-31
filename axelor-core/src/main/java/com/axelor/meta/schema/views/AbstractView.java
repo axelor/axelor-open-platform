@@ -39,8 +39,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Strings;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
@@ -89,14 +87,6 @@ public abstract class AbstractView {
   @JsonIgnore
   @XmlAttribute(name = "width")
   private String widthSpec;
-
-  @XmlElementWrapper
-  @XmlElement(name = "button")
-  private List<Button> toolbar;
-
-  @XmlElementWrapper
-  @XmlElement(name = "menu")
-  private List<Menu> menubar;
 
   @XmlTransient @JsonIgnore private transient AbstractView owner;
 
@@ -231,32 +221,6 @@ public abstract class AbstractView {
 
   public String getMaxWidth() {
     return widthPart(2);
-  }
-
-  public List<Button> getToolbar() {
-    if (toolbar != null) {
-      for (Button button : toolbar) {
-        button.setModel(this.getModel());
-      }
-    }
-    return toolbar;
-  }
-
-  public void setToolbar(List<Button> toolbar) {
-    this.toolbar = toolbar;
-  }
-
-  public List<Menu> getMenubar() {
-    if (menubar != null) {
-      for (Menu menu : menubar) {
-        menu.setModel(this.getModel());
-      }
-    }
-    return menubar;
-  }
-
-  public void setMenubar(List<Menu> menubar) {
-    this.menubar = menubar;
   }
 
   public AbstractView getOwner() {

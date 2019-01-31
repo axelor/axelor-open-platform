@@ -187,6 +187,7 @@ function DMSFileListCtrl($scope, $element) {
     $scope.currentFilter = null;
     $scope._dataSource._filter = null;
     $scope._dataSource._domain = null;
+    $scope._dataSource._page.from = 0;
     $scope.$broadcast("on:clear-filter-silent");
   }
 

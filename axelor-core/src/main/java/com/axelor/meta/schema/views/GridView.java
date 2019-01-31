@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
@@ -68,6 +69,14 @@ public class GridView extends AbstractView implements ExtendableView {
 
   @XmlElement(name = "help")
   private Help inlineHelp;
+
+  @XmlElementWrapper
+  @XmlElement(name = "button")
+  private List<Button> toolbar;
+
+  @XmlElementWrapper
+  @XmlElement(name = "menu")
+  private List<Menu> menubar;
 
   @XmlElement(name = "hilite")
   private List<Hilite> hilites;
@@ -231,6 +240,32 @@ public class GridView extends AbstractView implements ExtendableView {
 
   public void setHilites(List<Hilite> hilites) {
     this.hilites = hilites;
+  }
+
+  public List<Button> getToolbar() {
+    if (toolbar != null) {
+      for (Button button : toolbar) {
+        button.setModel(this.getModel());
+      }
+    }
+    return toolbar;
+  }
+
+  public void setToolbar(List<Button> toolbar) {
+    this.toolbar = toolbar;
+  }
+
+  public List<Menu> getMenubar() {
+    if (menubar != null) {
+      for (Menu menu : menubar) {
+        menu.setModel(this.getModel());
+      }
+    }
+    return menubar;
+  }
+
+  public void setMenubar(List<Menu> menubar) {
+    this.menubar = menubar;
   }
 
   public List<AbstractWidget> getItems() {

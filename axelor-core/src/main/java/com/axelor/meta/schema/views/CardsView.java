@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 
@@ -33,6 +34,10 @@ public class CardsView extends AbstractView {
   @XmlAttribute private Boolean customSearch;
 
   @XmlAttribute private String freeSearch;
+
+  @XmlElementWrapper
+  @XmlElement(name = "button")
+  private List<Button> toolbar;
 
   @XmlElement(name = "field", type = Field.class)
   private List<AbstractWidget> items;
@@ -64,6 +69,19 @@ public class CardsView extends AbstractView {
 
   public void setFreeSearch(String freeSearch) {
     this.freeSearch = freeSearch;
+  }
+
+  public List<Button> getToolbar() {
+    if (toolbar != null) {
+      for (Button button : toolbar) {
+        button.setModel(this.getModel());
+      }
+    }
+    return toolbar;
+  }
+
+  public void setToolbar(List<Button> toolbar) {
+    this.toolbar = toolbar;
   }
 
   public List<AbstractWidget> getItems() {

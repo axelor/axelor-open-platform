@@ -767,6 +767,16 @@ ui.formWidget('PanelTabs', {
         scope.ajaxStop(doOnSelect, 100);
       }
     });
+
+    scope.$watch("attr('hidden')", function tabsHiddenWatch(hidden, old) {
+      if (hidden) return;
+      // show selected tab only
+      scope.$evalAsync(function () {
+        scope.tabs.forEach(function (tab) {
+          if (!tab.selected) tab.elem.hide();
+        });
+      });
+    });
   },
 
   transclude: true,

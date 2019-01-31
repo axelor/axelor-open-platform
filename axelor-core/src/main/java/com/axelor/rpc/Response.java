@@ -140,21 +140,21 @@ public class Response {
 
     final Map<String, Object> report = new HashMap<>();
 
+    Throwable cause = Throwables.getRootCause(throwable);
+    if (cause instanceof BatchUpdateException) {
+      cause = ((BatchUpdateException) cause).getNextException();
+    }
+
+    String message = throwable.getMessage();
+    if (message == null || message.startsWith(cause.getClass().getName())) {
+      message = cause.getMessage();
+    }
+
     if (AppSettings.get().isProduction()) {
       report.put("title", I18n.get("Internal Server Error"));
-      report.put("message", I18n.get("A server error occurred. Please contact the administrator."));
+      report.put("message", message);
       report.put("popup", true);
     } else {
-      Throwable cause = Throwables.getRootCause(throwable);
-      if (cause instanceof BatchUpdateException) {
-        cause = ((BatchUpdateException) cause).getNextException();
-      }
-
-      String message = throwable.getMessage();
-      if (message == null || message.startsWith(cause.getClass().getName())) {
-        message = cause.getMessage();
-      }
-
       report.put("class", throwable.getClass());
       report.put("message", message);
       report.put("string", cause.toString());

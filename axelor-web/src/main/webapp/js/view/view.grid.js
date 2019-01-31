@@ -149,10 +149,17 @@ function GridViewCtrl($scope, $element) {
   $scope.setItems = function(items, pageInfo) {
 
     var dataView = $scope.dataView;
+    var selection = $scope.selection || [];
+    var selectionIds = dataView.mapRowsToIds(selection);
+    var hasSelected = _.some(items, function (item) { return item.selected; });
     var syncSelection = function () {
       if (dataView.$syncSelection) {
         setTimeout(function(){
-          dataView.$syncSelection();
+          if (hasSelected) {
+            dataView.$syncSelection();
+          } else {
+            dataView.$syncSelection(selection, selectionIds);
+          }
         });
       }
     };
