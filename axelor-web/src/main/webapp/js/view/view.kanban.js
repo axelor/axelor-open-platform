@@ -254,6 +254,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
     connectWith: ".kanban-card-list",
     items: ".kanban-card",
     tolerance: "pointer",
+    helper: "clone",
     stop: function (event, ui) {
       $scope.$broadcast('on:re-attach-click');
       var item = ui.item;
@@ -410,6 +411,10 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
         var record = $(this).scope().record;
         scope.onEdit(record, true);
         scope.$applyAsync();
+      });
+      
+      setTimeout(function () {
+        element.find('[ui-sortable]').sortable("option", "appendTo", element.parent());
       });
 
       fetch();
