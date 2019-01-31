@@ -1,6 +1,18 @@
-## 5.0.12 (current)
+## 5.0.12 (2019-01-31)
 
-TBD
+#### Enhancements
+
+* Show exception message in prod mode (but no stacktrace)
+* Add support for summary popup on kanban cards
+* Add support for preventing initial data fetch in grid view (x-no-fetch="false")
+* Remove kanban view restriction of max 6 columns
+
+#### Bugs
+
+* Fix DMS file rename issue when file name contains single quote
+* Fix RefSelect sometime doesn't use configured views
+* Fix kanban view scrolling
+* Fix xml view validation issue
 
 ## 5.0.11 (2019-01-15)
 
