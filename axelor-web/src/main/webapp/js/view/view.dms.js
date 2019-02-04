@@ -960,7 +960,7 @@ function DmsFolderTreeCtrl($scope, DataSource) {
     };
 
     home.open = true;
-    home.nodes = _.filter(folders, function (item) {
+    home.nodes = _.filter(records, function (item) {
       return !item.parent;
     });
 
