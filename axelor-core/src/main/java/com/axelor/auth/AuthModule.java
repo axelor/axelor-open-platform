@@ -65,6 +65,9 @@ public class AuthModule extends AbstractModule {
 
     // default
     install(new AuthWebModule(context));
+
+    // observe authentication-related events
+    bind(AuthObserver.class);
   }
 
   static final class MyShiroModule extends ShiroModule {

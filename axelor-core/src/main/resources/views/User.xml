@@ -35,6 +35,7 @@
       <field name="activateOn" validIf="!activateOn || (activateOn &amp;&amp; !expiresOn) || (activateOn &amp;&amp; expiresOn &amp;&amp; $moment(expiresOn) >= $moment(activateOn))"/>
       <field name="expiresOn" validIf="!expiresOn || (!activateOn &amp;&amp; expiresOn) || (activateOn &amp;&amp; expiresOn &amp;&amp; $moment(expiresOn) >= $moment(activateOn))"/>
       <field name="blocked"/>
+      <field name="changePasswordAtNextLogin"/>
       <field name="change" title="Change password?" showIf="id &amp;&amp; !$readonly()" widget="boolean"/>
       <panel showIf="change || !id" colSpan="12" itemSpan="12">
         <field name="oldPassword" title="Your password" placeholder="your password" widget="password" requiredIf="change || !id"/>
@@ -65,6 +66,28 @@
       </panel>
     </panel>
   </form>
+
+  <form name="user-change-password-form" title="User" model="com.axelor.auth.db.User"
+    canSave="false" canNew="false" canArchive="false" canAttach="false" canCopy="false"
+    canDelete="false">
+    <panel name="passwordPanel" itemSpan="12" title="Please change your password.">
+      <field name="oldPassword" title="Current password" placeholder="current password"
+        widget="password" required="true" />
+      <field name="newPassword" title="New password" placeholder="new password"
+        widget="password" required="true" validIf="oldPassword != newPassword" />
+      <field name="chkPassword" title="Confirm password" placeholder="confirm password"
+        widget="password" required="true" validIf="chkPassword === newPassword" />
+    </panel>
+    <panel sidebar="true">
+      <button name="confirmBtn" title="Confirm"
+        onClick="action-record-user-password-changed,save,close" />
+    </panel>
+  </form>
+
+  <action-record name="action-record-user-password-changed"
+    model="com.axelor.auth.db.User">
+    <field name="changePasswordAtNextLogin" expr="false" />
+  </action-record>
 
   <action-condition name="action-condition-user-validCode">
     <check error="Code length should be greater than 2." field="code" if="code?.length() &lt; 2"/>

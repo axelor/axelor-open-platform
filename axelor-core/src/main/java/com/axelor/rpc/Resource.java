@@ -461,7 +461,6 @@ public class Resource<T extends Model> {
       doChildCount(request, jsonData);
     } catch (NullPointerException | ClassCastException e) {
     }
-    ;
 
     response.setData(jsonData);
     response.setOffset(offset);
