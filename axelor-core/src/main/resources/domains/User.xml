@@ -23,7 +23,7 @@
     <boolean name="singleTab" help="Whether to use tabbed ui."/>
     <boolean name="noHelp" help="Whether to show help messages." />
 
-    <boolean name="blocked" default="false" help="Specify whether to block the user for an indeterminate times."/>
+    <boolean name="blocked" default="false" title="Block the user" help="Block the user for an indefinite period."/>
     <date name="activateOn" help="Activate the user from the specified date."/>
     <date name="expiresOn" help="Disable the user from the specified date."/>
 
