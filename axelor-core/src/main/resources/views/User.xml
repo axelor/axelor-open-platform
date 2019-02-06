@@ -35,7 +35,7 @@
       <field name="activateOn" validIf="!activateOn || (activateOn &amp;&amp; !expiresOn) || (activateOn &amp;&amp; expiresOn &amp;&amp; $moment(expiresOn) >= $moment(activateOn))"/>
       <field name="expiresOn" validIf="!expiresOn || (!activateOn &amp;&amp; expiresOn) || (activateOn &amp;&amp; expiresOn &amp;&amp; $moment(expiresOn) >= $moment(activateOn))"/>
       <field name="blocked"/>
-      <field name="changePasswordAtNextLogin"/>
+      <field name="forcePasswordChange"/>
       <field name="change" title="Change password?" showIf="id &amp;&amp; !$readonly()" widget="boolean"/>
       <panel showIf="change || !id" colSpan="12" itemSpan="12">
         <field name="oldPassword" title="Your password" placeholder="your password" widget="password" requiredIf="change || !id"/>
@@ -86,7 +86,7 @@
 
   <action-record name="action-record-user-password-changed"
     model="com.axelor.auth.db.User">
-    <field name="changePasswordAtNextLogin" expr="false" />
+    <field name="forcePasswordChange" expr="false" />
   </action-record>
 
   <action-condition name="action-condition-user-validCode">

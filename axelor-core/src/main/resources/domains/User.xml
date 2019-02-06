@@ -13,7 +13,7 @@
     <string name="code" required="true" unique="true" min="2" title="Login"/>
     <string name="name" required="true" min="2"/>
     <string name="password" password="true" required="true" min="4"/>
-    <boolean name="changePasswordAtNextLogin" help="Require the user to change their password at next login."/>
+    <boolean name="forcePasswordChange" help="Force the user to change their password at next login."/>
 
     <binary name="image" title="Photo" help="Max size 4MB." image="true"/>
     <string name="email"/>

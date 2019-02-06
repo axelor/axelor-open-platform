@@ -35,7 +35,7 @@ public class AuthObserver {
   void onPostLogin(@Observes @Named(PostLogin.SUCCESS) PostLogin event) {
     final User user = event.getUser();
 
-    if (user.getChangePasswordAtNextLogin()) {
+    if (user.getForcePasswordChange()) {
       final String url =
           String.format("#/ds/action-auth-users-change-password/edit/%d", user.getId());
       throw new LoginRedirectException(url);
