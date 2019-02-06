@@ -36,9 +36,7 @@ public class AuthObserver {
     final User user = event.getUser();
 
     if (user.getForcePasswordChange()) {
-      final String url =
-          String.format("#/ds/action-auth-users-change-password/edit/%d", user.getId());
-      throw new LoginRedirectException(url);
+      throw new LoginRedirectException("#/change-password");
     }
   }
 }

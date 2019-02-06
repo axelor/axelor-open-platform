@@ -68,8 +68,7 @@
   </form>
 
   <form name="user-change-password-form" title="User" model="com.axelor.auth.db.User"
-    canSave="false" canNew="false" canArchive="false" canAttach="false" canCopy="false"
-    canDelete="false">
+    onSave="action-record-user-password-changed">
     <panel name="passwordPanel" itemSpan="12" title="Please change your password.">
       <field name="oldPassword" title="Current password" placeholder="current password"
         widget="password" required="true" />
@@ -77,10 +76,6 @@
         widget="password" required="true" validIf="oldPassword != newPassword" />
       <field name="chkPassword" title="Confirm password" placeholder="confirm password"
         widget="password" required="true" validIf="chkPassword === newPassword" />
-    </panel>
-    <panel sidebar="true">
-      <button name="confirmBtn" title="Confirm"
-        onClick="action-record-user-password-changed,save,close" />
     </panel>
   </form>
 
