@@ -73,7 +73,6 @@ public class I18nBundle extends ResourceBundle {
   }
 
   private synchronized Map<String, String> doLoad() {
-    this.loaded = true;
 
     try {
       JPA.em();
@@ -104,6 +103,7 @@ public class I18nBundle extends ResourceBundle {
       offset += limit;
     }
 
+    this.loaded = true;
     return messages;
   }
 
