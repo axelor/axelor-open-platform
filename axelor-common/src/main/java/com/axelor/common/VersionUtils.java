@@ -31,6 +31,8 @@ public final class VersionUtils {
   /** This class stores version details of axelor modules. */
   public static class Version {
 
+    public static Version UNKNOWN = new Version("0.0.0");
+
     public final String version;
 
     // feature version (major.minor)
@@ -81,7 +83,7 @@ public final class VersionUtils {
   private static Version createVersion() {
     String version = VersionUtils.class.getPackage().getImplementationVersion();
     if (version == null) {
-      throw new RuntimeException("Unable to read version details.");
+      return Version.UNKNOWN;
     }
     return new Version(version);
   }
