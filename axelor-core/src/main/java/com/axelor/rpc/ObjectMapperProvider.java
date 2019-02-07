@@ -19,6 +19,7 @@ package com.axelor.rpc;
 
 import static com.axelor.common.StringUtils.isBlank;
 import static com.axelor.meta.loader.ModuleManager.isInstalled;
+
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.db.Model;

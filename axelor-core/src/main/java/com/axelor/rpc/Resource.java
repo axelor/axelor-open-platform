@@ -869,6 +869,11 @@ public class Resource<T extends Model> {
 
     // no password change
     if (StringUtils.isBlank(newPassword)) {
+      // Still update password date if blocked field has changed so that user gets logged out.
+      if (values.get("blocked") != null) {
+        user.setPasswordUpdatedOn(LocalDateTime.now());
+      }
+
       return user;
     }
 
@@ -887,7 +892,7 @@ public class Resource<T extends Model> {
       throw new ValidationException("Current user password is wrong.");
     }
 
-    user.setPassword(authService.encrypt(newPassword));
+    authService.changePassword(user, newPassword);
 
     return user;
   }

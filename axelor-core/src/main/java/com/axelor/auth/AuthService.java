@@ -24,6 +24,7 @@ import com.axelor.inject.Beans;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
+import java.time.LocalDateTime;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -159,5 +160,23 @@ public class AuthService {
     response.setValue("nameField", name.getName());
     response.setValue("login", user.getCode());
     response.setValue("lang", user.getLanguage());
+  }
+
+  /**
+   * Changes user password.
+   *
+   * @param user
+   * @param newPassword
+   */
+  public void changePassword(User user, String password) {
+    user.setPassword(encrypt(password));
+    user.setPasswordUpdatedOn(LocalDateTime.now());
+
+    final User authUser = AuthUtils.getUser();
+
+    // Update login date in session so that user changing own password doesn't get logged out.
+    if (authUser != null && authUser.getId().equals(user.getId())) {
+      Beans.get(AuthSessionService.class).updateLoginDate();
+    }
   }
 }
