@@ -77,7 +77,7 @@ public final class ObjectUtils {
    * Check whether the given value is not empty.
    *
    * @param value the object value to check
-   * @return true if empty false otherwise
+   * @return true if not empty false otherwise
    * @see #isEmpty(Object)
    */
   public static boolean notEmpty(Object value) {
