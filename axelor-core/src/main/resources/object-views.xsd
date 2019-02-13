@@ -951,7 +951,7 @@
     <xsd:attribute name="freeSearch" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-        Specify the free search mode, 'name', 'all', 'none' or comma separated list of field names.
+        Specify the free-search mode: 'all' (default), 'none', or comma-separated list of field names.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -1085,7 +1085,7 @@
         </xsd:attribute>
         <xsd:attribute name="showFrame" type="xsd:boolean" default="true">
           <xsd:annotation>
-            <xsd:documentation>Specify whether to show frame arround the panel.</xsd:documentation>
+            <xsd:documentation>Specify whether to show frame around the panel.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="sidebar" type="xsd:boolean">

@@ -488,7 +488,6 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
       var items = {};
       var nameField = null;
-      var nameFields = [];
 
       _.each(fields, function(field, name) {
         if (field.name === 'id' || field.name === 'version' ||
@@ -496,8 +495,6 @@ function FilterFormCtrl($scope, $element, ViewService) {
         if (field.type === 'binary' || field.large || field.encrypted) return;
         if (field.nameColumn) {
           nameField = name;
-        } else if (name === "name" || name === "code") {
-          nameFields.push(name);
         }
         items[name] = field;
       });
@@ -519,7 +516,9 @@ function FilterFormCtrl($scope, $element, ViewService) {
         delete items[prefix];
       });
 
-      nameField = nameField || _.first(nameFields);
+      if (!nameField) {
+        nameField = (fields.name || {}).name;
+      }
 
       _.each(viewItems, function (item) {
         if (item.hidden) {
@@ -1289,79 +1288,63 @@ ui.directive('uiFilterBox', function() {
 
         var filters = [],
           fields = {},
-          nameField = this.nameField,
           text = this.custTerm,
           number = +(text);
 
         var freeSearch = handler.schema && handler.schema.freeSearch;
-        var freeCols = freeSearch ? freeSearch.split(/\s*,\s*/) : [];
+        var freeCols = freeSearch && freeSearch !== 'all' ? freeSearch.split(/\s*,\s*/) : [];
         var cols = freeCols.length === 0 ? $scope.findCols() : freeCols;
 
         text = text ? text.trim() : null;
+        fields = _.pick(this.$parent.fields, cols);
 
-        if (freeSearch !== 'name') {
-          fields = _.pick(this.$parent.fields, cols);
-        }
+        if (text) {
+          for(var name in fields) {
 
-        if (!nameField) {
-          nameField = (_.extend({}, this.$parent.fields, this.fields).name || {}).name;
-        }
+            var fieldName = null,
+              operator = "like",
+              value = text;
 
-        if (nameField && text) {
-          filters.push({
-            fieldName: nameField,
-            operator: 'like',
-            value: text
-          });
-        }
+            var field = fields[name];
 
-        for(var name in fields) {
-
-          if (name === nameField || !text) continue;
-
-          var fieldName = null,
-            operator = "like",
-            value = text;
-
-          var field = fields[name];
-
-          switch (field.type) {
-          case 'integer':
-          case 'decimal':
-            if (_.isNaN(number) || !text || !_.isNumber(number)) continue;
-            if (field.type === 'integer' && (number > 2147483647 || number < -2147483648)) continue;
-            fieldName = name;
-            operator = '=';
-            value = number;
-            break;
-          case 'text':
-          case 'string':
-            fieldName = name;
-            break;
-          case 'one-to-one':
-          case 'many-to-one':
-            if (field.jsonField) {
-              fieldName = name;
-            } else if (field.targetName) {
-              fieldName = name + '.' + field.targetName;
-            }
-            break;
-          case 'boolean':
-            if (/^(t|f|y|n|true|false|yes|no)$/.test(text)) {
+            switch (field.type) {
+            case 'integer':
+            case 'decimal':
+              if (_.isNaN(number) || !_.isNumber(number)) continue;
+              if (field.type === 'integer' && (number > 2147483647 || number < -2147483648)) continue;
               fieldName = name;
               operator = '=';
-              value = /^(t|y|true|yes)$/.test(text);
+              value = number;
+              break;
+            case 'text':
+            case 'string':
+              fieldName = name;
+              break;
+            case 'one-to-one':
+            case 'many-to-one':
+              if (field.jsonField) {
+                fieldName = name;
+              } else if (field.targetName) {
+                fieldName = name + '.' + field.targetName;
+              }
+              break;
+            case 'boolean':
+              if (/^(t|f|y|n|true|false|yes|no)$/.test(text)) {
+                fieldName = name;
+                operator = '=';
+                value = /^(t|y|true|yes)$/.test(text);
+              }
+              break;
             }
-            break;
-          }
 
-          if (!fieldName) continue;
+            if (!fieldName) continue;
 
-          filters.push({
-            fieldName: fieldName,
-            operator: operator,
-            value: value
-          });
+            filters.push({
+              fieldName: fieldName,
+              operator: operator,
+              value: value
+            });
+          }          
         }
 
         var criteria = {
