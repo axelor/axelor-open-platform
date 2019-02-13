@@ -1288,15 +1288,18 @@ ui.directive('uiFilterBox', function() {
       $scope.onFreeSearch = function() {
 
         var filters = [],
-          cols = $scope.findCols(),
           fields = {},
           nameField = this.nameField,
           text = this.custTerm,
           number = +(text);
 
+        var freeSearch = handler.schema && handler.schema.freeSearch;
+        var freeCols = freeSearch ? freeSearch.split(/\s*,\s*/) : [];
+        var cols = freeCols.length === 0 ? $scope.findCols() : freeCols;
+
         text = text ? text.trim() : null;
 
-        if (cols && (handler.schema || {}).freeSearch !== 'name') {
+        if (freeSearch !== 'name') {
           fields = _.pick(this.$parent.fields, cols);
         }
 
