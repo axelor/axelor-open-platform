@@ -24,6 +24,7 @@ import com.axelor.common.Inflector;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
+import com.axelor.db.Query;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
@@ -61,6 +62,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -72,6 +74,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -100,6 +103,8 @@ public class ViewLoader extends AbstractParallelLoader {
   @Inject private GroupRepository groups;
 
   @Inject private XMLViews.FinalViewGenerator finalViewGenerator;
+
+  private final Set<String> viewsToGenerate = new HashSet<>();
 
   @Override
   protected void doLoad(URL file, Module module, boolean update) {
@@ -136,8 +141,29 @@ public class ViewLoader extends AbstractParallelLoader {
   }
 
   private void generateFinalViews(Module module, boolean update) {
-    finalViewGenerator.parallelGenerate(
-        views.findHavingExtensionsByModule(module.getName(), update));
+    finalViewGenerator.parallelGenerate(findForCompute(module.getName(), update, viewsToGenerate));
+    viewsToGenerate.clear();
+  }
+
+  private Query<MetaView> findForCompute(String module, boolean update, Collection<String> names) {
+    return Query.of(MetaView.class)
+        .filter(
+            "(self.name IN :names OR (:module IS NULL OR self.module = :module) "
+                + "AND (:update = TRUE OR NOT EXISTS ("
+                + "SELECT computedView FROM MetaView computedView "
+                + "WHERE computedView.name = self.name AND self.computed = TRUE))) "
+                + "AND COALESCE(self.extension, FALSE) = FALSE "
+                + "AND COALESCE(self.computed, FALSE) = FALSE "
+                + "AND (self.name, self.priority) "
+                + "IN (SELECT other.name, MAX(other.priority) FROM MetaView other "
+                + "WHERE COALESCE(self.extension, FALSE) = FALSE AND COALESCE(other.computed, FALSE) = FALSE "
+                + "GROUP BY name) "
+                + "AND EXISTS (SELECT extensionView FROM MetaView extensionView "
+                + "WHERE extensionView.name = self.name AND extensionView.extension = TRUE)")
+        .bind("module", module)
+        .bind("update", update)
+        .bind("names", names.isEmpty() ? ImmutableSet.of("") : names)
+        .order("id");
   }
 
   private static <T> List<T> getList(List<T> list) {
@@ -204,10 +230,11 @@ public class ViewLoader extends AbstractParallelLoader {
     }
 
     if (view instanceof ExtendableView) {
-      ExtendableView extendableView = (ExtendableView) view;
+      final ExtendableView extendableView = (ExtendableView) view;
 
-      if (!Boolean.TRUE.equals(view.getExtension())
-          && ObjectUtils.notEmpty(extendableView.getExtends())) {
+      if (Boolean.TRUE.equals(view.getExtension())) {
+        viewsToGenerate.add(view.getName());
+      } else if (ObjectUtils.notEmpty(extendableView.getExtends())) {
         log.error("View with extensions must have extension=\"true\": {}", getName(name, xmlId));
         return;
       }

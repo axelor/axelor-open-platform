@@ -42,6 +42,7 @@ import com.axelor.meta.db.repo.MetaViewRepository;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.persist.Transactional;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -54,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +83,9 @@ public class ModuleManager {
   @Inject private Event<ModuleChanged> moduleChangedEvent;
 
   private static final Set<String> SKIP = new HashSet<>();
+
+  private static long lastRestored;
+  private final Set<Path> pathsToRestore = new HashSet<>();
 
   static {
     SKIP.add("axelor-common");
@@ -142,6 +147,7 @@ public class ModuleManager {
       this.encryptPasswords();
       this.doCleanUp();
     }
+    ViewWatcher.getInstance().start();
   }
 
   public void updateAll(boolean withDemo) {
@@ -180,6 +186,24 @@ public class ModuleManager {
     }
   }
 
+  public void update(Set<String> moduleNames, Set<Path> paths) {
+    final List<Module> moduleList =
+        resolver
+            .all()
+            .stream()
+            .filter(m -> moduleNames.contains(m.getName()))
+            .collect(Collectors.toList());
+
+    try {
+      pathsToRestore.addAll(paths);
+      moduleList.forEach(m -> install(m, true, false));
+      moduleList.forEach(m -> viewLoader.doLast(m, true));
+    } finally {
+      pathsToRestore.clear();
+      doCleanUp();
+    }
+  }
+
   public void restoreMeta() {
     try {
       loadData = false;
@@ -187,6 +211,22 @@ public class ModuleManager {
     } finally {
       loadData = true;
     }
+  }
+
+  public boolean isLoadData() {
+    return loadData;
+  }
+
+  public void setLoadData(boolean loadData) {
+    this.loadData = loadData;
+  }
+
+  static long getLastRestored() {
+    return lastRestored;
+  }
+
+  private static void updateLastRestored() {
+    lastRestored = System.currentTimeMillis();
   }
 
   public static List<String> getResolution() {
@@ -241,6 +281,7 @@ public class ModuleManager {
 
   private void doCleanUp() {
     AbstractLoader.doCleanUp();
+    updateLastRestored();
   }
 
   private void install(String moduleName, boolean update, boolean withDemo, boolean force) {
@@ -292,7 +333,9 @@ public class ModuleManager {
   private void installMeta(Module module, boolean update) {
     final ParallelTransactionExecutor transactionExecutor = new ParallelTransactionExecutor();
     metaLoaders.forEach(
-        metaLoader -> metaLoader.feedTransactionExecutor(transactionExecutor, module, update));
+        metaLoader ->
+            metaLoader.feedTransactionExecutor(
+                transactionExecutor, module, update, pathsToRestore));
     transactionExecutor.run();
   }
 

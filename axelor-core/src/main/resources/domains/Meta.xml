@@ -65,19 +65,6 @@
       OR self.dependentFeatures LIKE CONCAT('%,', :feature, ',%')
       OR self.dependentFeatures LIKE CONCAT(:feature, ',%')
       OR self.dependentFeatures LIKE CONCAT('%,', :feature))" />
-    <finder-method name="findHavingExtensionsByModule" using="module,boolean:update" all="true" orderBy="id"
-      filter="(:module IS NULL OR self.module = :module)
-      AND (:update = TRUE OR NOT EXISTS (
-      SELECT computedView FROM MetaView computedView
-      WHERE computedView.name = self.name AND self.computed = TRUE))
-      AND COALESCE(self.extension, FALSE) = FALSE
-      AND COALESCE(self.computed, FALSE) = FALSE
-      AND (self.name, self.priority)
-      IN (SELECT other.name, MAX(other.priority) FROM MetaView other
-      WHERE COALESCE(self.extension, FALSE) = FALSE AND COALESCE(other.computed, FALSE) = FALSE
-      GROUP BY name)
-      AND EXISTS (SELECT extensionView FROM MetaView extensionView
-      WHERE extensionView.name = self.name AND extensionView.extension = TRUE)"/>
   </entity>
 
   <entity name="MetaViewCustom" table="META_VIEW_CUSTOM" cacheable="true">
