@@ -14,19 +14,30 @@
   </grid>
 
   <form name="dms-file-form" title="Document" model="com.axelor.dms.db.DMSFile">
-    <panel title="Overview">
+    <toolbar>
+      <button name="downloadBtn" title="Download" icon="fa-download"
+        onClick="action-dms-file-download" />
+    </toolbar>
+    <panel name="mainPanel" title="Overview" itemSpan="12">
       <field name="fileName" title="Name" />
-      <field name="parent" domain="self.isDirectory = true" form-view="dms-folder-form" grid-view="dms-folder-grid" />
-      <field name="metaFile"/>
+      <panel name="detailsPanel" readonly="true">
+        <panel stacked="true">
+          <panel name="fileTypePanel" showIf="fileType">
+            <field name="fileType" title="Type" />
+          </panel>
+          <panel name="directoryPanel" showIf="isDirectory">
+            <field name="isDirectory" title="Directory" />
+          </panel>
+        </panel>
+        <field name="createdBy" title="Owner" />
+        <field name="createdOn" title="Created" />
+        <field name="updatedOn" title="Modified" />
+      </panel>
     </panel>
-    <panel-tabs>
-      <panel-related field="groups" target="com.axelor.auth.db.Group">
-        <field name="name"/>
-      </panel-related>
-      <panel-related field="users" target="com.axelor.auth.db.User">
-        <field name="name"/>
-      </panel-related>
-    </panel-tabs>
+    <panel name="tagsPanel" title="Tags" itemSpan="12">
+      <field name="tags" form-view="dms-tag-form" widget="TagSelect" x-create="code,name"
+        showTitle="false" />
+    </panel>
   </form>
 
   <grid name="dms-folder-grid" title="Directories" model="com.axelor.dms.db.DMSFile" edit-icon="false">
@@ -131,6 +142,7 @@
   <!-- actions -->
   <action-view name="dms.all" model="com.axelor.dms.db.DMSFile" title="All Documents">
     <view name="dms-file-grid" type="grid" />
+    <view name="dms-file-form" type="form" />
     <view-param name="ui-template:grid" value="dms-file-list"/>
     <view-param name="search-filters" value="dms-file-filters"/>
   </action-view>
@@ -145,6 +157,11 @@
   <action-view name="dms.tags" model="com.axelor.dms.db.DMSFileTag" title="Tags">
     <view name="dms-tag-grid" type="grid" />
     <view name="dms-tag-form" type="form" />
+  </action-view>
+
+  <action-view name="action-dms-file-download" title="Document">
+    <view type="html" name="#{'ws/dms/download/' += id}"/>
+    <view-param name="download" value="true"/>
   </action-view>
 
   <!-- menu -->

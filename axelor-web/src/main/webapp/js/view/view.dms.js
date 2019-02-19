@@ -151,9 +151,24 @@ function DMSFileListCtrl($scope, $element) {
   };
 
   $scope.onEdit = function() {
-    var rec = getSelected();
-    if (rec && rec.typeIcon === "fa fa-folder") {
-      return $scope.onFolder(rec);
+    var record = getSelected();
+
+    if (!record) {
+      var records = _.map($scope.selection, function(i) {
+        return $scope.dataView.getItem(i);
+      });
+      if (records.length) {
+        record = records[0];
+      } else {
+        record = $scope.currentFolder;
+      }
+    }
+
+    if (record) {
+      $scope.switchTo('form', function (formScope) {
+        formScope.__canForceEdit = true;
+        formScope.edit(record);
+      });
     }
   };
 
@@ -244,11 +259,20 @@ function DMSFileListCtrl($scope, $element) {
     var elem = $(event.target);
     $scope.$timeout(function () {
       var record = getSelected();
+      if (elem.is('.fa-file')) {
+        $scope.onEdit();
+        $scope.$applyAsync();
+        return;
+      }
       if (elem.is('.fa-folder')) return $scope.onFolder(record);
       if (elem.is('.fa-download')) return $scope.onDownload(record);
       if (elem.is('.fa-info-circle')) return $scope.onDetails(record);
-      if (elem.is('.fa') && record && (record.contentType === "html" || record.contentType === "spreadsheet")) {
-        return $scope.onEditFile(record);
+      if (elem.is('.fa') && record) {
+        if (record.contentType === "html" || record.contentType === "spreadsheet") {
+          return $scope.onEditFile(record);
+        }
+        $scope.onEdit();
+        $scope.$applyAsync();
       }
     });
   };
@@ -256,10 +280,15 @@ function DMSFileListCtrl($scope, $element) {
   $scope.onItemDblClick = function(event, args) {
     var elem = $(event.target);
     if (elem.hasClass("fa")) return;
+    var record = getSelected();
+    if (record.typeIcon === "fa fa-folder") {
+      return $scope.onFolder(record);
+    }
     setTimeout(function () {
-      var record = getSelected();
-      if (record && (record.contentType === "html" || record.contentType === "spreadsheet")) {
-        return $scope.onEditFile(record);
+      if (record) {
+        if (record.contentType === "html" || record.contentType === "spreadsheet") {
+          return $scope.onEditFile(record);
+        }
       }
       $scope.onEdit();
       $scope.$applyAsync();
@@ -1311,7 +1340,7 @@ ui.directive("uiDmsDetails", function () {
           info.id = record.id;
           info.version = record.version;
           info.name = record.fileName;
-          info.type = record.fileType || _t("Unknown");
+          info.type = record.isDirectory ? _t("Directory") : record.fileType || _t("Unknown");
           info.tags = record.tags;
           info.owner = getUserName(record.createdBy);
           info.created = moment(record.createdOn).format('DD/MM/YYYY HH:mm');
