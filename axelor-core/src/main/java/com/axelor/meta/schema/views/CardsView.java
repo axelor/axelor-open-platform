@@ -39,6 +39,10 @@ public class CardsView extends AbstractView {
   @XmlElement(name = "button")
   private List<Button> toolbar;
 
+  @XmlElementWrapper
+  @XmlElement(name = "menu")
+  private List<Menu> menubar;
+
   @XmlElement(name = "field", type = Field.class)
   private List<AbstractWidget> items;
 
@@ -82,6 +86,19 @@ public class CardsView extends AbstractView {
 
   public void setToolbar(List<Button> toolbar) {
     this.toolbar = toolbar;
+  }
+
+  public List<Menu> getMenubar() {
+    if (menubar != null) {
+      for (Menu menu : menubar) {
+        menu.setModel(this.getModel());
+      }
+    }
+    return menubar;
+  }
+
+  public void setMenubar(List<Menu> menubar) {
+    this.menubar = menubar;
   }
 
   public List<AbstractWidget> getItems() {

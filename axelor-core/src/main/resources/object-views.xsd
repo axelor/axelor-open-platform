@@ -1750,6 +1750,7 @@
       <xsd:extension base="tns:SimpleView">
         <xsd:sequence>
           <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0" />
+          <xsd:element name="menubar" type="tns:Menubar" minOccurs="0" />
           <xsd:element name="field" type="tns:CardField" maxOccurs="unbounded">
             <xsd:annotation>
               <xsd:documentation>Specify a field to show as card content.</xsd:documentation>
