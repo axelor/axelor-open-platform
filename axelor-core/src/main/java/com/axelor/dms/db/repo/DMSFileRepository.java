@@ -419,13 +419,11 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
       json.put("fileType", "text/html");
       json.put("contentType", "html");
       json.put("typeIcon", "fa fa-file-text-o");
-      json.remove("downloadIcon");
     }
     if ("spreadsheet".equals(file.getContentType())) {
       json.put("fileType", "text/json");
       json.put("contentType", "spreadsheet");
       json.put("typeIcon", "fa fa-file-excel-o");
-      json.remove("downloadIcon");
     }
 
     if (metaFile != null) {

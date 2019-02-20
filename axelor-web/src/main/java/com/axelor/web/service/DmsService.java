@@ -32,13 +32,19 @@ import com.axelor.meta.db.repo.MetaFileRepository;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Resource;
 import com.axelor.rpc.Response;
+import com.axelor.script.NashornScriptHelper;
+import com.axelor.script.ScriptHelper;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Longs;
 import com.google.inject.servlet.RequestScoped;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.UncheckedIOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -66,6 +72,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import jdk.nashorn.api.scripting.ScriptUtils;
 import org.eclipse.persistence.annotations.Transformation;
 
 @Consumes(MediaType.APPLICATION_JSON)
@@ -77,6 +85,9 @@ public class DmsService {
   @Context private HttpServletRequest httpRequest;
 
   @Inject private DMSFileRepository repository;
+
+  private static final Map<String, String> EXTS =
+      ImmutableMap.of("html", ".html", "spreadsheet", ".csv");
 
   @GET
   @Path("files")
@@ -356,9 +367,12 @@ public class DmsService {
     }
 
     // if file
-    if (records.size() == 1 && records.get(0).getMetaFile() != null) {
-      MetaFile file = records.get(0).getMetaFile();
-      return stream(MetaFiles.getPath(file).toFile(), file.getFileName());
+    if (records.size() == 1) {
+      final DMSFile record = records.get(0);
+      File file = getFile(record);
+      if (file != null) {
+        return stream(file, getFileName(record));
+      }
     }
 
     final StreamingOutput so =
@@ -380,6 +394,58 @@ public class DmsService {
     return stream(so, batchName);
   }
 
+  private File getFile(DMSFile record) {
+    if (record.getMetaFile() != null) {
+      MetaFile file = record.getMetaFile();
+      return MetaFiles.getPath(file).toFile();
+    }
+
+    if (StringUtils.isBlank(record.getContentType())) {
+      return null;
+    }
+
+    try {
+      switch (record.getContentType()) {
+        case "html":
+          {
+            final java.nio.file.Path path = MetaFiles.createTempFile(record.getFileName(), ".html");
+            final File file = path.toFile();
+            if (StringUtils.notBlank(record.getContent())) {
+              try (final FileWriter writer = new FileWriter(file)) {
+                writer.append(record.getContent());
+              }
+            }
+            return file;
+          }
+        case "spreadsheet":
+          {
+            final java.nio.file.Path path = MetaFiles.createTempFile(record.getFileName(), ".csv");
+            final File file = path.toFile();
+            final ScriptHelper scriptHelper = new NashornScriptHelper(null);
+            try (final PrintStream writer = new PrintStream(file)) {
+              final ScriptObjectMirror content =
+                  (ScriptObjectMirror) scriptHelper.eval(record.getContent());
+              if (content != null) {
+                for (final Object value : content.values()) {
+                  final Object line = ScriptUtils.convert(value, String.class);
+                  writer.println(line != null ? line.toString() : "");
+                }
+              }
+            }
+            return file;
+          }
+        default:
+          throw new IllegalArgumentException("Unsupported content type");
+      }
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
+  private String getFileName(DMSFile record) {
+    return record.getFileName() + EXTS.getOrDefault(record.getContentType(), "");
+  }
+
   private Map<String, File> findFiles(DMSFile file, String base) {
     final Map<String, File> files = new LinkedHashMap<>();
     if (file.getIsDirectory() == Boolean.TRUE) {
@@ -391,8 +457,9 @@ public class DmsService {
       }
       return files;
     }
-    if (file.getMetaFile() != null) {
-      files.put(base + "/" + file.getFileName(), MetaFiles.getPath(file.getMetaFile()).toFile());
+    final File relatedFile = getFile(file);
+    if (relatedFile != null) {
+      files.put(base + "/" + getFileName(file), relatedFile);
     }
     return files;
   }

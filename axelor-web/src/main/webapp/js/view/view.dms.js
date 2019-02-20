@@ -572,11 +572,20 @@ function DMSFileListCtrl($scope, $element) {
         items: [{
           type: "panel",
           items: [{
-            type: "button",
-            width: "100px",
-            title: _t("Save"),
-            onClick: "save"
-          }, {
+            type: "panel",
+            items: [{
+              type: "button",
+              title: _t("Save"),
+              icon: "fa-save",
+              onClick: "save",
+              colSpan: "3"
+            }, {
+              type: "button",
+              title: _t("Download"),
+              icon: "fa-download",
+              onClick: "save,action-dms-file-download",
+              colSpan: "3"
+            }]}, {
             type: "field",
             name: "content",
             showTitle: false,
