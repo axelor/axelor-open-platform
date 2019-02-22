@@ -39,8 +39,9 @@
       <field name="change" title="Change password?" showIf="id &amp;&amp; !$readonly()" widget="boolean"/>
       <panel showIf="change || !id" colSpan="12" itemSpan="12">
         <field name="oldPassword" title="Your password" placeholder="your password" widget="password" requiredIf="change || !id"/>
-        <field name="newPassword" title="New password" placeholder="new password" widget="password" requiredIf="!id" validIf="(!change &amp;&amp; id) || (newPassword.length >= 4 &amp;&amp; chkPassword === newPassword)"/>
-        <field name="chkPassword" title="Confirm password" placeholder="confirm password" widget="password"/>
+        <field name="newPassword" title="New password" placeholder="new password" widget="password" requiredIf="change || !id" validIf="(!change &amp;&amp; id) || newPassword.length >= 4"
+          onChange="action-condition-user-password"/>
+        <field name="chkPassword" title="Confirm password" placeholder="confirm password" widget="password" requiredIf="change || !id" validIf="chkPassword === newPassword"/>
       </panel>
     </panel>
     <panel-tabs>
@@ -61,28 +62,12 @@
       <field name="change" title="Change password?" widget="inline-checkbox"/>
       <panel showIf="change" itemSpan="12">
           <field name="oldPassword" title="Current password" placeholder="current password" widget="password" requiredIf="change" />
-          <field name="newPassword" title="New password" placeholder="new password" widget="password" requiredIf="change" validIf="(!change) || (newPassword.length >= 4 &amp;&amp; chkPassword === newPassword)"/>
-          <field name="chkPassword" title="Confirm password" placeholder="confirm password" widget="password"/>
+          <field name="newPassword" title="New password" placeholder="new password" widget="password" requiredIf="change" validIf="!change || newPassword.length >= 4"
+            onChange="action-condition-user-password"/>
+          <field name="chkPassword" title="Confirm password" placeholder="confirm password" widget="password" requiredIf="change" validIf="chkPassword === newPassword"/>
       </panel>
     </panel>
   </form>
-
-  <form name="user-change-password-form" title="User" model="com.axelor.auth.db.User"
-    onSave="action-record-user-password-changed">
-    <panel name="passwordPanel" itemSpan="12" title="Please change your password.">
-      <field name="oldPassword" title="Current password" placeholder="current password"
-        widget="password" required="true" />
-      <field name="newPassword" title="New password" placeholder="new password"
-        widget="password" required="true" validIf="oldPassword != newPassword" />
-      <field name="chkPassword" title="Confirm password" placeholder="confirm password"
-        widget="password" required="true" validIf="chkPassword === newPassword" />
-    </panel>
-  </form>
-
-  <action-record name="action-record-user-password-changed"
-    model="com.axelor.auth.db.User">
-    <field name="forcePasswordChange" expr="false" />
-  </action-record>
 
   <action-condition name="action-condition-user-validCode">
     <check error="Code length should be greater than 2." field="code" if="code?.length() &lt; 2"/>
@@ -90,6 +75,11 @@
 
   <action-condition name="action-condition-user-validName">
     <check error="Name length should be greater than 2." field="name" if="name?.length() &lt; 2"/>
+  </action-condition>
+
+  <action-condition name="action-condition-user-password">
+    <check error="Password doesn't match configured pattern." field="newPassword"
+      if="!com.axelor.auth.AuthService.getInstance().passwordMatchesPattern(newPassword)" />
   </action-condition>
 
 </object-views>

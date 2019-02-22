@@ -26,6 +26,7 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.function.Function"%>
 <%@ page import="com.axelor.i18n.I18n" %>
+<%@ page import="com.axelor.auth.AuthService" %>
 <%
 
 Function<String, String> T = new Function<String, String>() {
@@ -33,19 +34,30 @@ Function<String, String> T = new Function<String, String>() {
     try {
       return I18n.get(t);
     } catch (Exception e) {
-      return t; 
+      return t;
     }
   }
 };
 
+AuthService authService = AuthService.getInstance();
+
+String passwordPattern = authService.getPasswordPattern();
+String passwordPatternTitle = authService.getPasswordPatternTitle();
+String newPasswordMustBeDifferent = T.apply("New password must be different.");
+String confirmPasswordMismatch = T.apply("Confirm password doesn't match.");
+
 String errorMsg = T.apply(request.getParameter("errorMsg"));
 
-String loginTitle = T.apply("Please sign in");
-String loginRemember = T.apply("Remember me");
-String loginSubmit = T.apply("Log in");
+if (errorMsg == null) {
+  errorMsg = T.apply("Please change your password.");
+}
+
+String confirmSubmit = T.apply("Change password");
 
 String loginUserName = T.apply("Username");
-String loginPassword = T.apply("Password");
+String loginPassword = T.apply("Current password");
+String newPassword = T.apply("New password");
+String confirmPassword = T.apply("Confirm password");
 
 String warningBrowser = T.apply("Update your browser!");
 String warningAdblock = T.apply("Adblocker detected!");
@@ -86,20 +98,35 @@ String tenantId = (String) session.getAttribute("tenantId");
           <img src="img/axelor.png" width="192px">
         </div>
 
-        <div class="alert alert-block alert-error text-center" <%= errorMsg != null ? "" : "hidden" %>>
-          <h4><%= errorMsg %></h4>
-        </div>
+        <div class="alert alert-block alert-error text-center">
+					<h4><%= errorMsg %></h4>
+				</div>
 
-        <div class="panel-body">
+			  <div class="panel-body">
           <form id="login-form" action="" method="POST">
             <div class="form-fields">
               <div class="input-prepend">
                 <span class="add-on"><i class="fa fa-envelope"></i></span>
-                <input type="text" id="usernameId" name="username" placeholder="<%= loginUserName %>" autofocus="autofocus">
+                <input type="text" id="usernameId" name="username" placeholder="<%= loginUserName %>"
+                  required="required" value="<%= request.getParameter("username") %>" readonly="readonly">
               </div>
               <div class="input-prepend">
                 <span class="add-on"><i class="fa fa-lock"></i></span>
-                <input type="password" id="passwordId" name="password" placeholder="<%= loginPassword %>">
+                <input type="password" id="passwordId" name="password" placeholder="<%= loginPassword %>"
+                  required="required" autofocus="autofocus"
+                  oninput="checkPasswordInputs()">
+              </div>
+              <div class="input-prepend">
+                <span class="add-on"><i class="fa fa-lock"></i></span>
+                <input type="password" id="newPasswordId" name="newPassword" placeholder="<%= newPassword %>"
+                  required="required" pattern="<%= passwordPattern %>" title="<%= passwordPatternTitle %>"
+                  oninput="checkPasswordInputs()">
+              </div>
+              <div class="input-prepend">
+                <span class="add-on"><i class="fa fa-lock"></i></span>
+                <input type="password" id="confirmPasswordId" name="confirmPassword" placeholder="<%= confirmPassword %>"
+                  required="required"
+                  oninput="checkPasswordInputs()">
               </div>
               <% if (tenants != null && tenants.size() > 1) { %>
               <div class="input-prepend">
@@ -111,14 +138,9 @@ String tenantId = (String) session.getAttribute("tenantId");
                 </select>
               </div>
               <% } %>
-              <label class="ibox">
-                <input type="checkbox" value="rememberMe" name="rememberMe">
-                <span class="box"></span>
-                <span class="title"><%= loginRemember %></span>
-              </label>
             </div>
             <div class="form-footer">
-              <button class="btn btn-primary" type="submit"><%= loginSubmit %></button>
+              <button class="btn btn-primary" type="submit"><%= confirmSubmit %></button>
             </div>
           </form>
         </div>
@@ -141,7 +163,7 @@ String tenantId = (String) session.getAttribute("tenantId");
     <footer class="container-fluid">
       <p class="credit small"><%= copyright %></p>
     </footer>
-    
+
     <div id="adblock"></div>
 
     <script type="text/javascript">
@@ -152,6 +174,20 @@ String tenantId = (String) session.getAttribute("tenantId");
 	    if ($('#adblock') === undefined || $('#adblock').is(':hidden')) {
 	    	$('#ad-warning').removeClass('hidden');
 	    }
+    });
+
+    function checkPasswordInputs() {
+      var passwordElem = document.getElementById("passwordId");
+      var newPasswordElem = document.getElementById("newPasswordId");
+      var confirmPasswordElem = document.getElementById("confirmPasswordId");
+      newPasswordElem.setCustomValidity(passwordElem.value === newPasswordElem.value
+          ? "<%= newPasswordMustBeDifferent %>" : "");
+      confirmPasswordElem.setCustomValidity(newPasswordElem.value !== confirmPasswordElem.value
+          ? "<%= confirmPasswordMismatch %>" : "");
+    }
+
+    $("#confirmPasswordId").bind("copy paste", function(e) {
+      e.preventDefault();
     });
     </script>
   </body>

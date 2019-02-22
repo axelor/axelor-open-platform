@@ -73,36 +73,6 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
   });
 }
 
-function ChangePasswordCtrl($scope, $element, $location, DataSource, ViewService) {
-
-  $scope._viewParams = {
-    model: 'com.axelor.auth.db.User',
-    views: [{name: 'user-change-password-form', type: 'form'}],
-    recordId: axelor.config['user.id']
-  };
-
-  ui.ViewCtrl($scope, DataSource, ViewService);
-  ui.FormViewCtrl($scope, $element);
-
-  var onSave = $scope.onSave;
-  $scope.onSave = function() {
-    onSave().then(function() {
-      window.location.href = "./#";
-    });
-  };
-
-  $scope.isMidForm = function (elem) {
-    return $element.find('form.mid-form').size();
-  }
-
-  $scope.setEditable();
-  $scope.show();
-
-  $scope.ajaxStop(function () {
-    $scope.$applyAsync();
-  });
-}
-
 function AboutCtrl($scope) {
   $scope.appName = axelor.config["application.name"];
   $scope.appDescription = axelor.config["application.description"];
@@ -144,7 +114,6 @@ function SystemCtrl($scope, $element, $location, $http) {
 }
 
 ui.controller("UserCtrl", ['$scope', '$element', '$location', 'DataSource', 'ViewService', UserCtrl]);
-ui.controller("ChangePasswordCtrl", ['$scope', '$element', '$location', 'DataSource', 'ViewService', ChangePasswordCtrl]);
 ui.controller("SystemCtrl", ['$scope', '$element', '$location', '$http', SystemCtrl]);
 ui.controller("AboutCtrl", ['$scope', AboutCtrl]);
 

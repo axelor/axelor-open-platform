@@ -780,12 +780,12 @@ img.prefix-icon {
   font-size: 14px;
 }
 
-.user-preferences > .form-view, .user-change-password > .form-view {
+.user-preferences > .form-view > .form-view {
   max-width: 1200px;
   margin: auto;
 }
 
-.user-preferences form, .user-change-password form {
+.user-preferences form, form {
   padding: 0;
 }
 
@@ -864,8 +864,7 @@ img.prefix-icon {
 }
 
 .about-page,
-.user-preferences,
-.user-change-password {
+.user-preferences {
   position: absolute;
   top: 0; left: 0; bottom: 0; right: 0;
   overflow: auto;

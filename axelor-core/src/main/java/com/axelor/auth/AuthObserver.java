@@ -19,7 +19,6 @@ package com.axelor.auth;
 
 import com.axelor.auth.db.User;
 import com.axelor.event.Observes;
-import com.axelor.events.LoginRedirectException;
 import com.axelor.events.PostLogin;
 import com.axelor.events.PreRequest;
 import com.axelor.i18n.I18n;
@@ -43,12 +42,6 @@ public class AuthObserver {
    */
   void onPostLogin(@Observes @Named(PostLogin.SUCCESS) PostLogin event) {
     authSessionService.updateLoginDate();
-
-    final User user = event.getUser();
-
-    if (user.getForcePasswordChange()) {
-      throw new LoginRedirectException("#/change-password");
-    }
   }
 
   /**

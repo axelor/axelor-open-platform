@@ -192,7 +192,6 @@ String tenantId = (String) session.getAttribute("tenantId");
       <div ng-switch-when="system"><div ng-include x-src="'partials/system.html'"></div></div>
       <div ng-switch-when="welcome"><div ng-include x-src="'partials/welcome.html'"></div></div>
       <div ng-switch-when="preferences"><div ng-include x-src="'partials/preferences.html'"></div></div>
-      <div ng-switch-when="change-password"><div ng-include x-src="'partials/change-password.html'"></div></div>
     </section>
 
     <!-- JavaScript at the bottom for fast page loading -->

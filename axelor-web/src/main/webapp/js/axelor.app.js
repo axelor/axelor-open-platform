@@ -212,7 +212,6 @@
     $routeProvider
 
     .when('/preferences', { action: 'preferences' })
-    .when('/change-password', { action: 'change-password' })
     .when('/about', { action: 'about' })
     .when('/system', { action: 'system' })
     .when('/', { action: 'main' })

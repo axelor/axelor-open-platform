@@ -17,15 +17,19 @@
  */
 package com.axelor.auth;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.db.User;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
+import com.google.common.base.Preconditions;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.shiro.authc.credential.DefaultPasswordService;
@@ -43,14 +47,20 @@ import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 @Singleton
 public class AuthService {
 
-  private final String HASH_ALGORITHM = "SHA-512";
-  private final int HASH_ITERATIONS = 500000;
+  private static final String HASH_ALGORITHM = "SHA-512";
+  private static final int HASH_ITERATIONS = 500000;
 
   private final DefaultPasswordService passwordService = new DefaultPasswordService();
 
   private final DefaultHashService hashService = new DefaultHashService();
 
   private final ParsableHashFormat hashFormat = new Shiro1CryptFormat();
+
+  private static final String PASSWORD_PATTERN =
+      AppSettings.get().get("user.password.pattern", ".{4,}");
+  private static final Pattern passwordPattern = Pattern.compile(PASSWORD_PATTERN);
+
+  private static final String EMPTY_STRING = "";
 
   @Inject
   public AuthService() {
@@ -169,6 +179,9 @@ public class AuthService {
    * @param newPassword
    */
   public void changePassword(User user, String password) {
+    Preconditions.checkArgument(
+        passwordMatchesPattern(password), I18n.get("Password doesn't match configured pattern."));
+
     user.setPassword(encrypt(password));
     user.setPasswordUpdatedOn(LocalDateTime.now());
 
@@ -178,5 +191,33 @@ public class AuthService {
     if (authUser != null && authUser.getId().equals(user.getId())) {
       Beans.get(AuthSessionService.class).updateLoginDate();
     }
+  }
+
+  /**
+   * Checks whether the password matches the configured pattern.
+   *
+   * @param password
+   * @return
+   */
+  public boolean passwordMatchesPattern(String password) {
+    return passwordPattern.matcher(password).matches();
+  }
+
+  /**
+   * Gets configured user password pattern.
+   *
+   * @return
+   */
+  public String getPasswordPattern() {
+    return PASSWORD_PATTERN;
+  }
+
+  /**
+   * Gets configured user password pattern description.
+   *
+   * @return
+   */
+  public String getPasswordPatternTitle() {
+    return EMPTY_STRING;
   }
 }

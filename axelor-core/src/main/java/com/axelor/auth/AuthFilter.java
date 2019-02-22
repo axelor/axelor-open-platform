@@ -17,6 +17,8 @@
  */
 package com.axelor.auth;
 
+import com.axelor.auth.AuthRealm.UserExpiredCredentialsException;
+import com.axelor.common.StringUtils;
 import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
 import com.axelor.events.LoginRedirectException;
@@ -24,6 +26,7 @@ import com.axelor.events.PostLogin;
 import com.axelor.events.PreLogin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.servlet.FilterChain;
@@ -32,9 +35,12 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.UriBuilder;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
@@ -71,6 +77,14 @@ public class AuthFilter extends FormAuthenticationFilter {
       WebUtils.issueRedirect(request, response, e.getLocation());
       return false;
     }
+  }
+
+  @Override
+  protected AuthenticationToken createToken(
+      String username, String password, ServletRequest request, ServletResponse response) {
+    boolean rememberMe = isRememberMe(request);
+    String host = getHost(request);
+    return new UsernamePasswordTokenWithParams(username, password, rememberMe, host, request);
   }
 
   private boolean isRootWithoutSlash(ServletRequest request) {
@@ -137,6 +151,48 @@ public class AuthFilter extends FormAuthenticationFilter {
     return super.onLoginSuccess(token, subject, request, response);
   }
 
+  @Override
+  protected boolean onLoginFailure(
+      AuthenticationToken token,
+      AuthenticationException e,
+      ServletRequest request,
+      ServletResponse response) {
+
+    if (e instanceof IncorrectCredentialsException) {
+      final UriBuilder builder = UriBuilder.fromPath("login.jsp");
+
+      if (StringUtils.notBlank(e.getMessage())) {
+        builder.queryParam("errorMsg", e.getMessage());
+      }
+
+      final String path = builder.build().toString();
+      forward(path, request, response);
+    } else if (e instanceof UserExpiredCredentialsException) {
+      final String username = ((UserExpiredCredentialsException) e).getUser().getCode();
+      final UriBuilder builder =
+          UriBuilder.fromPath("change-password.jsp").queryParam("username", username);
+
+      if (StringUtils.notBlank(e.getMessage())) {
+        builder.queryParam("errorMsg", e.getMessage());
+      }
+
+      final String path = builder.build().toString();
+      forward(path, request, response);
+    }
+
+    return super.onLoginFailure(token, e, request, response);
+  }
+
+  private void forward(String path, ServletRequest request, ServletResponse response) {
+    try {
+      ((HttpServletRequest) request).getRequestDispatcher(path).forward(request, response);
+    } catch (ServletException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+  }
+
   @SuppressWarnings("unchecked")
   private boolean doLogin(ServletRequest request, ServletResponse response) throws Exception {
 
@@ -168,5 +224,20 @@ public class AuthFilter extends FormAuthenticationFilter {
     return "XMLHttpRequest".equals(req.getHeader("X-Requested-With"))
         || "application/json".equals(req.getHeader("Accept"))
         || "application/json".equals(req.getHeader("Content-Type"));
+  }
+
+  static class UsernamePasswordTokenWithParams extends UsernamePasswordToken {
+    private static final long serialVersionUID = -1003682418365507707L;
+    private final transient ServletRequest request;
+
+    public UsernamePasswordTokenWithParams(
+        String username, String password, boolean rememberMe, String host, ServletRequest request) {
+      super(username, password, rememberMe, host);
+      this.request = request;
+    }
+
+    public String getCleanParam(String paramName) {
+      return WebUtils.getCleanParam(request, paramName);
+    }
   }
 }
