@@ -927,8 +927,12 @@ public class XMLViews {
     }
 
     private static void doReplace(List<Element> elements, Node targetNode, Document document) {
-      processExtendItemNodeChildren(
-          elements, document, node -> targetNode.getParentNode().replaceChild(node, targetNode));
+      if (elements.isEmpty()) {
+        targetNode.getParentNode().removeChild(targetNode);
+      } else {
+        processExtendItemNodeChildren(
+            elements, document, node -> targetNode.getParentNode().replaceChild(node, targetNode));
+      }
     }
 
     private static void doReplaceToolBar(Element element, Document document, MetaView view)
@@ -1052,7 +1056,13 @@ public class XMLViews {
         return;
       }
 
-      ((Element) targetNode).setAttribute(name, value);
+      final Element targetElement = ((Element) targetNode);
+
+      if (StringUtils.isEmpty(value)) {
+        targetElement.removeAttribute(name);
+      } else {
+        targetElement.setAttribute(name, value);
+      }
     }
 
     private static List<Element> findElements(NodeList nodeList) {

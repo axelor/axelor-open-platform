@@ -1059,6 +1059,7 @@
       <xsd:extension base="tns:AbstractGridView">
         <xsd:attributeGroup ref="tns:ObjectViewAttributes" />
         <xsd:attributeGroup ref="tns:AdvanceSearchAttributes" />
+        <xsd:attribute name="extension" type="xsd:boolean" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -2645,7 +2646,7 @@
       </xsd:element>
       <xsd:element name="replace">
         <xsd:complexType>
-          <xsd:choice maxOccurs="unbounded">
+          <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:group ref="tns:ExtendFormItems" />
           </xsd:choice>
         </xsd:complexType>
@@ -2657,7 +2658,7 @@
         </xsd:complexType>
       </xsd:element>
     </xsd:choice>
-    <xsd:attribute name="target" type="xsd:string" use="optional" default="/"/>
+    <xsd:attribute name="target" type="xsd:string" use="required" />
     <xsd:attribute name="if-feature" type="xsd:string"></xsd:attribute>
     <xsd:attribute name="if-module" type="xsd:string"></xsd:attribute>
   </xsd:complexType>
@@ -2688,7 +2689,7 @@
       </xsd:element>
       <xsd:element name="replace">
         <xsd:complexType>
-          <xsd:choice maxOccurs="unbounded">
+          <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:group ref="tns:ExtendGridItems" />
           </xsd:choice>
         </xsd:complexType>
