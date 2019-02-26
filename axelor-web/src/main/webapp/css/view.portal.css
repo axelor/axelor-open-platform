@@ -197,6 +197,10 @@
   white-space: nowrap;
 }
 
+.dashlet-title {
+  min-height: 14px;
+}
+
 .dashboard .dashlet-body {
   border-top: 1px solid #e7e7e7;
   height: 250px;
