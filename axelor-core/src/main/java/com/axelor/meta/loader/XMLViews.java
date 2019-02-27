@@ -70,7 +70,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -816,7 +815,13 @@ public class XMLViews {
 
     private static void doInsert(
         List<Element> elements, Position position, Node targetNode, Document document) {
-      processExtendItemNodeChildren(elements, document, node -> position.insert(targetNode, node));
+      Node currentNode = targetNode;
+
+      for (final Element element : elements) {
+        final Node node = document.importNode(element, true);
+        position.insert(currentNode, node);
+        currentNode = node;
+      }
     }
 
     private static void doInsertToolBar(Element element, Document document, MetaView view)
@@ -841,7 +846,7 @@ public class XMLViews {
         position = Position.INSIDE_FIRST;
       }
 
-      processExtendItemNodeChildren(elements, document, node -> position.insert(targetNode, node));
+      doInsert(elements, position, targetNode, document);
     }
 
     private static void doInsertMenuBar(Element element, Document document, MetaView view)
@@ -876,7 +881,7 @@ public class XMLViews {
         }
       }
 
-      processExtendItemNodeChildren(elements, document, node -> position.insert(targetNode, node));
+      doInsert(elements, position, targetNode, document);
     }
 
     private static void doInsertPanelMail(Element element, Document document, MetaView view)
@@ -897,7 +902,7 @@ public class XMLViews {
       targetNode =
           (Node) evaluateXPath("/", view.getName(), view.getType(), document, XPathConstants.NODE);
       position = Position.INSIDE_LAST;
-      processExtendItemNodeChildren(elements, document, node -> position.insert(targetNode, node));
+      doInsert(elements, position, targetNode, document);
     }
 
     private static void doReplace(
@@ -930,8 +935,9 @@ public class XMLViews {
       if (elements.isEmpty()) {
         targetNode.getParentNode().removeChild(targetNode);
       } else {
-        processExtendItemNodeChildren(
-            elements, document, node -> targetNode.getParentNode().replaceChild(node, targetNode));
+        final Node node = document.importNode(elements.get(0), true);
+        targetNode.getParentNode().replaceChild(node, targetNode);
+        doInsert(elements.subList(1, elements.size()), Position.AFTER, node, document);
       }
     }
 
@@ -1077,11 +1083,6 @@ public class XMLViews {
           .stream()
           .filter(element -> nodeName.equals(element.getNodeName()))
           .collect(Collectors.toList());
-    }
-
-    private static void processExtendItemNodeChildren(
-        List<Element> elements, Document document, Consumer<Node> nodeProcessor) {
-      elements.stream().map(element -> document.importNode(element, true)).forEach(nodeProcessor);
     }
 
     public void parallelGenerate(Query<MetaView> query) {
