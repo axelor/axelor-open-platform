@@ -806,6 +806,9 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
     };
 
     scope.formatItem = function(item) {
+      if (item && scope._items && item.id in scope._items) {
+        item = scope._items[item.id];
+      }
       return item ? item[nameField] : item;
     };
 
@@ -824,8 +827,33 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
       if (scope.field['tag-edit'] && scope.onTagEdit && !scope.isReadonly()) {
         return scope.onTagEdit(e, item);
       }
-          scope.showEditor(item);
-        };
+      scope.showEditor(item);
+    };
+  },
+
+  link: function(scope, element, attrs, model) {
+    this._super.apply(this, arguments);
+    var field = scope.field;
+    // special case for json fields
+    if (field.jsonField) {
+      var nameField = scope.field.targetName;
+      var ds = scope._dataSource._new(scope._dataSource._model);
+      scope.$watch(attrs.ngModel, function m2mValueWatch(value, old) {
+        scope._items = null;
+        if (value && value.length && value[0][nameField] === undefined) {
+          ds.search({
+            fields: ['id', nameField],
+            domain: "id in :ids",
+            context: { ids: _.pluck(value, 'id') }
+          }).success(function (records) {
+            scope._items = _.reduce(records, function(memo, item) {
+              memo[item.id] = item;
+              return memo;
+            }, {});
+          });
+        }
+      }, true);
+    }
   },
 
   link_editable: function(scope, element, attrs, model) {
@@ -834,7 +862,7 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
     var input = this.findInput(element);
     var field = scope.field;
 
-        function create(term, popup) {
+    function create(term, popup) {
       scope.createOnTheFly(term, popup, function (record) {
         scope.select(record);
         setTimeout(function() {
@@ -843,7 +871,7 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
       });
     }
 
-        scope.loadSelection = function(request, response) {
+    scope.loadSelection = function(request, response) {
 
       if (!scope.canSelect()) {
         return response([]);
