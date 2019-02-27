@@ -713,6 +713,10 @@ function FilterFormCtrl($scope, $element, ViewService) {
         value: filter.value
       };
 
+      if (filter.operator == 'like' || filter.operator == 'notLike') {
+        criterion.value = criterion.value || '';
+      }
+
       if (filter.operator == 'in' ||
         filter.operator == 'notIn') {
         if (_.isEmpty(filter.value)) {
