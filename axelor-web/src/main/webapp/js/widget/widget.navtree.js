@@ -244,10 +244,10 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
           scope.menus.forEach(function (menu) {
             var found = all[menu.name];
             if (found) {
-              ul.append("<li class='ui-menu-category'>").html(menu.title);
-                    found.forEach(function (item) {
-                      that._renderItemData(ul, item);
-                    });
+              ul.append($("<li class='ui-menu-category'>").html(menu.title));
+              found.forEach(function (item) {
+                that._renderItemData(ul, item);
+              });
             }
           });
         };
