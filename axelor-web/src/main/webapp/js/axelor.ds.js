@@ -292,6 +292,9 @@
               if (field.widgetAttrs.showTitle !== undefined) {
                 field.showTitle = field.widgetAttrs.showTitle;
               }
+              if (field.widgetAttrs.multiline) {
+                field.type = 'text';
+              }
             }
             if (field.type === 'panel' || field.type === 'separator') {
               field.visibleInGrid = false;
