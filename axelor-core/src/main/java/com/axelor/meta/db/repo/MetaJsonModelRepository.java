@@ -74,37 +74,11 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
       records.all(jsonModel.getName()).fetchStream().forEach(records::save);
     }
 
-    MetaMenu menu = jsonModel.getMenu();
-    if (menu == null) {
-      menu = new MetaMenu();
-    }
-
-    menu.setName("menu-json-model-" + jsonModel.getName());
-    menu.setTitle(
-        jsonModel.getMenuTitle() == null ? jsonModel.getTitle() : jsonModel.getMenuTitle());
-    menu.setParent(jsonModel.getMenuParent());
-    menu.setIcon(jsonModel.getMenuIcon());
-    menu.setIconBackground(jsonModel.getMenuBackground());
-    menu.setOrder(jsonModel.getMenuOrder());
-    menu.setTop(jsonModel.getMenuTop());
-
-    if (jsonModel.getRoles() != null) {
-      jsonModel.getRoles().forEach(menu::addRole);
-    }
-
-    MetaAction action = jsonModel.getAction();
-    if (action == null) {
-      action = new MetaAction();
-      action.setType("action-view");
-      action.setModel(MetaJsonRecord.class.getName());
-    }
-    action.setName("all.json." + jsonModel.getName());
-
     MetaView gridView = jsonModel.getGridView();
     if (gridView == null) {
       gridView = new MetaView();
       gridView.setType("grid");
-      gridView.setModel(action.getModel());
+      gridView.setModel(MetaJsonRecord.class.getName());
     }
     gridView.setName("custom-model-" + jsonModel.getName() + "-grid");
     gridView.setTitle(jsonModel.getTitle());
@@ -140,7 +114,7 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
     if (formView == null) {
       formView = new MetaView();
       formView.setType("form");
-      formView.setModel(action.getModel());
+      formView.setModel(MetaJsonRecord.class.getName());
     }
     formView.setName("custom-model-" + jsonModel.getName() + "-form");
     formView.setTitle(jsonModel.getTitle());
@@ -176,38 +150,67 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 
     formView.setXml(xml.toString());
 
-    action.setXml(
-        new StringBuilder()
-            .append("<action-view")
-            .append(" name=")
-            .append('"')
-            .append(action.getName())
-            .append('"')
-            .append(" title=")
-            .append('"')
-            .append(menu.getTitle())
-            .append('"')
-            .append(" model=")
-            .append('"')
-            .append(action.getModel())
-            .append('"')
-            .append(">\n")
-            .append("  <view type=\"grid\" name=\"")
-            .append(gridView.getName())
-            .append("\" />\n")
-            .append("  <view type=\"form\" name=\"")
-            .append(formView.getName())
-            .append("\" />\n")
-            .append("  <domain>self.jsonModel = :jsonModel</domain>\n")
-            .append("  <context name=\"jsonModel\" expr=\"" + jsonModel.getName() + "\" />\n")
-            .append("</action-view>\n")
-            .toString());
-    menu.setAction(action);
+    if (StringUtils.notBlank(jsonModel.getMenuTitle())) {
+      MetaMenu menu = jsonModel.getMenu();
+      if (menu == null) {
+        menu = new MetaMenu();
+      }
 
-    MetaStore.invalidate(action.getName());
+      menu.setName("menu-json-model-" + jsonModel.getName());
+      menu.setTitle(
+          jsonModel.getMenuTitle() == null ? jsonModel.getTitle() : jsonModel.getMenuTitle());
+      menu.setParent(jsonModel.getMenuParent());
+      menu.setIcon(jsonModel.getMenuIcon());
+      menu.setIconBackground(jsonModel.getMenuBackground());
+      menu.setOrder(jsonModel.getMenuOrder());
+      menu.setTop(jsonModel.getMenuTop());
 
-    jsonModel.setMenu(menu);
-    jsonModel.setAction(action);
+      if (jsonModel.getRoles() != null) {
+        jsonModel.getRoles().forEach(menu::addRole);
+      }
+
+      MetaAction action = jsonModel.getAction();
+      if (action == null) {
+        action = new MetaAction();
+        action.setType("action-view");
+        action.setModel(MetaJsonRecord.class.getName());
+      }
+      action.setName("all.json." + jsonModel.getName());
+
+      action.setXml(
+          new StringBuilder()
+              .append("<action-view")
+              .append(" name=")
+              .append('"')
+              .append(action.getName())
+              .append('"')
+              .append(" title=")
+              .append('"')
+              .append(menu.getTitle())
+              .append('"')
+              .append(" model=")
+              .append('"')
+              .append(action.getModel())
+              .append('"')
+              .append(">\n")
+              .append("  <view type=\"grid\" name=\"")
+              .append(gridView.getName())
+              .append("\" />\n")
+              .append("  <view type=\"form\" name=\"")
+              .append(formView.getName())
+              .append("\" />\n")
+              .append("  <domain>self.jsonModel = :jsonModel</domain>\n")
+              .append("  <context name=\"jsonModel\" expr=\"" + jsonModel.getName() + "\" />\n")
+              .append("</action-view>\n")
+              .toString());
+      menu.setAction(action);
+
+      MetaStore.invalidate(action.getName());
+
+      jsonModel.setMenu(menu);
+      jsonModel.setAction(action);
+    }
+
     jsonModel.setGridView(gridView);
     jsonModel.setFormView(formView);
   }
