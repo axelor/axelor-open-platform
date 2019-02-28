@@ -1013,10 +1013,12 @@
         var domain = this._lastDomain || this._domain;
         var context = this._lastContext;
         var filter = this._filter;
+        var action = this._lastAction;
 
         var query = extend({
           _domain: domain,
           _domainContext: context,
+          _domainAction: action || undefined,
           _archived: this._showArchived
         }, filter);
 
