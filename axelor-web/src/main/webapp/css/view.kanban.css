@@ -42,8 +42,7 @@
 .kanban-column {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-width: 20em;
+  width: 24em;
   background-color: #e7eaec;
   margin: 12px 6px 0;
   border-top-left-radius: 6px;

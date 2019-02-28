@@ -183,7 +183,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
 
     $scope.sortableOptions.disabled = !view.draggable || !$scope.hasPermission('write');
     $scope.columns = columns;
-    $scope.colSpan = "kanban-cs-" + columns.length;
+    $scope.colWidth = params['kanban-column-width'];
   };
 
   $scope.move = function (record, to, next, prev) {
@@ -414,7 +414,11 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
         scope.onEdit(record, true);
         scope.$applyAsync();
       });
-      
+
+      if (scope.colWidth) {
+        element.width(scope.colWidth);
+      }
+
       setTimeout(function () {
         element.find('[ui-sortable]').sortable("option", "appendTo", element.parent());
       });
