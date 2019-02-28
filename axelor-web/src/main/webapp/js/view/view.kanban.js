@@ -164,9 +164,11 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
   BaseCardsCtrl.call(this, 'kanban', $scope, $element);
 
   $scope.parse = function (fields, view) {
+    var params = $scope._viewParams.params || {};
+    var hideCols = (params['kanban-hide-columns'] || '').split(',');
     var columnBy = fields[view.columnBy] || {};
-    var columns = _.map(columnBy.selectionList, function (item) {
-      return item;
+    var columns = _.filter(columnBy.selectionList, function (item) {
+      return hideCols.indexOf(item.value) === -1;
     });
 
     var first = _.first(columns);
