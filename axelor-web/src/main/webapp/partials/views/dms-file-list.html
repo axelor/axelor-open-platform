@@ -28,7 +28,7 @@
             <li ng-show="canShowRelated()"><a href="javascript:" ng-click="onShowRelated()" x-translate>Attached to...</a></li>
             <li class="divider"></li>
             <li><a href="javascript:" ng-click="onDownload()" x-translate>Download</a></li>
-            <li><a href="javascript:" ng-click="onEdit()" x-translate>Open details</a></li>
+            <li><a href="javascript:" ng-click="onOpenDetails()" x-translate>Open details...</a></li>
             <li class="divider" ng-if="hasButton('delete')"></li>
             <li ng-if="hasButton('delete')" ng-disabled="!canDelete()">
               <a href="javascript:" ng-click="onDelete()" x-translate>Delete...</a>

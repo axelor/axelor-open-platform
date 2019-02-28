@@ -150,6 +150,12 @@ function DMSFileListCtrl($scope, $element) {
     return record;
   };
 
+  $scope.onOpenDetails = function () {
+    $scope.$timeout(function () {
+      $scope.onEdit();
+    }, 100);
+  };
+
   $scope.onEdit = function() {
     var record = getSelected();
 
@@ -166,7 +172,6 @@ function DMSFileListCtrl($scope, $element) {
 
     if (record) {
       $scope.switchTo('form', function (formScope) {
-        formScope.__canForceEdit = true;
         formScope.edit(record);
       });
     }
