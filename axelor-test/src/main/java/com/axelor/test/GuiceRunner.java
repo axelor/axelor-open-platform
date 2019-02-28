@@ -17,11 +17,17 @@
  */
 package com.axelor.test;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.servlet.RequestScoped;
+import com.google.inject.servlet.RequestScoper;
+import com.google.inject.servlet.ServletScopes;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.InitializationError;
 
@@ -72,7 +78,24 @@ public class GuiceRunner extends BlockJUnit4ClassRunner {
         throw new InitializationError(e);
       }
     }
+
+    modules.add(
+        new AbstractModule() {
+          @Override
+          protected void configure() {
+            bindScope(RequestScoped.class, ServletScopes.REQUEST);
+          }
+        });
+
     return modules;
+  }
+
+  @Override
+  public void run(RunNotifier notifier) {
+    final RequestScoper scope = ServletScopes.scopeRequest(Collections.emptyMap());
+    try (RequestScoper.CloseableScope ignored = scope.open()) {
+      super.run(notifier);
+    }
   }
 
   @Override
