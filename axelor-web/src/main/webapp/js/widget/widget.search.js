@@ -1344,7 +1344,7 @@ ui.directive('uiFilterBox', function() {
               operator: operator,
               value: value
             });
-          }          
+          }
         }
 
         var criteria = {

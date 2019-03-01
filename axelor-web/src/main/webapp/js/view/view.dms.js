@@ -151,24 +151,8 @@ function DMSFileListCtrl($scope, $element, NavService) {
   };
 
   $scope.onOpenDetails = function () {
-    $scope.$timeout(function () {
-      if (!$scope._isPopup) {
-        return $scope.onEdit();
-      }
-      var record = getSelected();
-      NavService.openTab({
-        model: "com.axelor.dms.db.DMSFile",
-        viewType: "form",
-        views: [{
-          type: "form",
-          name: "dms-file-form"
-        }],
-        recordId: record.id,
-        params: {
-          'show-toolbar': false,
-        },
-        $popupParent: $scope
-      });
+    $scope.$timeout(function() {
+     $scope.onEdit();
     }, 100);
   };
 
@@ -187,8 +171,12 @@ function DMSFileListCtrl($scope, $element, NavService) {
     }
 
     if (record) {
-      $scope.switchTo('form', function (formScope) {
-        formScope.edit(record);
+      if ($scope._isPopup) {
+        $scope.onClose();
+      }
+      NavService.openTabByName("dms.file", {
+        mode: "edit",
+        state: record.id
       });
     }
   };
@@ -581,6 +569,9 @@ function DMSFileListCtrl($scope, $element, NavService) {
   };
 
   $scope.onEditFile = function (record) {
+    if ($scope._isPopup) {
+      $scope.onClose();
+    }
     record = record || getSelected();
     var view = {
       action: "$act:dms" + record.id,

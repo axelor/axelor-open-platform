@@ -143,7 +143,6 @@
   <!-- actions -->
   <action-view name="dms.all" model="com.axelor.dms.db.DMSFile" title="All Documents">
     <view name="dms-file-grid" type="grid" />
-    <view name="dms-file-form" type="form" />
     <view-param name="ui-template:grid" value="dms-file-list"/>
     <view-param name="search-filters" value="dms-file-filters"/>
   </action-view>
@@ -153,6 +152,10 @@
     <view-param name="ui-template:grid" value="dms-file-list"/>
     <view-param name="search-filters" value="dms-file-filters"/>
     <domain>self.createdBy = :__user__</domain>
+  </action-view>
+
+  <action-view name="dms.file" model="com.axelor.dms.db.DMSFile" title="Document">
+    <view name="dms-file-form" type="form"/>
   </action-view>
 
   <action-view name="dms.tags" model="com.axelor.dms.db.DMSFileTag" title="Tags">
