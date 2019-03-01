@@ -423,12 +423,14 @@ public class DmsService {
             final File file = path.toFile();
             final ScriptHelper scriptHelper = new NashornScriptHelper(null);
             try (final PrintStream writer = new PrintStream(file)) {
-              final ScriptObjectMirror content =
-                  (ScriptObjectMirror) scriptHelper.eval(record.getContent());
-              if (content != null) {
-                for (final Object value : content.values()) {
-                  final Object line = ScriptUtils.convert(value, String.class);
-                  writer.println(line != null ? line.toString() : "");
+              if (StringUtils.notBlank(record.getContent())) {
+                final ScriptObjectMirror content =
+                    (ScriptObjectMirror) scriptHelper.eval(record.getContent());
+                if (content != null) {
+                  for (final Object value : content.values()) {
+                    final Object line = ScriptUtils.convert(value, String.class);
+                    writer.println(line != null ? line.toString() : "");
+                  }
                 }
               }
             }
