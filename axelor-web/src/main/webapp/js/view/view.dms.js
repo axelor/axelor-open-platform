@@ -80,8 +80,8 @@ function inputDialog(options, callback) {
 }
 
 ui.controller("DMSFileListCtrl", DMSFileListCtrl);
-DMSFileListCtrl.$inject = ['$scope', '$element'];
-function DMSFileListCtrl($scope, $element) {
+DMSFileListCtrl.$inject = ['$scope', '$element', 'NavService'];
+function DMSFileListCtrl($scope, $element, NavService) {
   ui.GridViewCtrl.call(this, $scope, $element);
 
   var _params = $scope._viewParams;
@@ -152,7 +152,23 @@ function DMSFileListCtrl($scope, $element) {
 
   $scope.onOpenDetails = function () {
     $scope.$timeout(function () {
-      $scope.onEdit();
+      if (!$scope._isPopup) {
+        return $scope.onEdit();
+      }
+      var record = getSelected();
+      NavService.openTab({
+        model: "com.axelor.dms.db.DMSFile",
+        viewType: "form",
+        views: [{
+          type: "form",
+          name: "dms-file-form"
+        }],
+        recordId: record.id,
+        params: {
+          'show-toolbar': false,
+        },
+        $popupParent: $scope
+      });
     }, 100);
   };
 
