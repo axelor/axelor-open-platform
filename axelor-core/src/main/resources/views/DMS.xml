@@ -13,7 +13,8 @@
     <field name="metaFile.sizeText" title="Size" width="80"/>
   </grid>
 
-  <form name="dms-file-form" title="Document" model="com.axelor.dms.db.DMSFile">
+  <form name="dms-file-form" title="Document" model="com.axelor.dms.db.DMSFile" canNew="false"
+    canAttach="false" canArchive="false">
     <toolbar>
       <button name="downloadBtn" title="Download" icon="fa-download"
         onClick="action-dms-file-download" />
