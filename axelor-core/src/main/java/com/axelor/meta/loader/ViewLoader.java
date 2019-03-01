@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.loader;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.common.FileUtils;
@@ -80,6 +81,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+
 
 public class ViewLoader extends AbstractLoader {
 
@@ -635,9 +637,11 @@ public class ViewLoader extends AbstractLoader {
     }
   }
 
-  private static final File outputDir =
-      FileUtils.getFile(System.getProperty("java.io.tmpdir"), "axelor", "generated");
-
+  private static final String DEFAULT_GENERATED_PATH = "{java.io.tmpdir}/axelor/generated";
+  private static final String GENERATED_PATH =
+      AppSettings.get().getPath("file.generated.dir", DEFAULT_GENERATED_PATH);
+  private static final File outputDir = FileUtils.getFile(GENERATED_PATH);
+  
   private void importDefault(Module module) {
     final List<String> names = new ArrayList<>();
     for (String name : ModelLoader.findEntities(module)) {
