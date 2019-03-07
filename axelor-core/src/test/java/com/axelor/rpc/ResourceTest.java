@@ -128,6 +128,6 @@ public class ResourceTest extends RpcTest {
     Assert.assertEquals(c.getAddresses().size(), n.getAddresses().size());
 
     Assert.assertSame(c, c.getAddresses().get(0).getContact());
-    Assert.assertNull(n.getAddresses().get(0).getContact());
+    Assert.assertSame(n, n.getAddresses().get(0).getContact());
   }
 }
