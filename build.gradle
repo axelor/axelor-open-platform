@@ -10,6 +10,7 @@ apply from: "version.gradle"
 subprojects {
   apply from: "${rootDir}/gradle/libs.gradle"
   apply from: "${rootDir}/gradle/common.gradle"
+  apply from: "${rootDir}/gradle/jacoco.gradle"
 
   apply plugin: com.axelor.gradle.support.JavaSupport
   apply plugin: com.axelor.gradle.support.EclipseSupport
