@@ -50,8 +50,10 @@
       var path = name.split('.');
       var val = record || {};
       var idx = 0;
+      var next;
       while (val && idx < path.length) {
-        val = findNested(val, path[idx++]);
+        next = path[idx++];
+        val = val[next] === undefined ? null : val[next];
       }
       if (idx === path.length) {
         return val;
