@@ -43,6 +43,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -489,15 +490,19 @@ public class I18nExtractor {
       throw e;
     }
 
+    final List<String[]> myLines = new ArrayList<>();
     for (String[] line : lines) {
       Map<String, String> current = values.get(line[0]);
+      String[] copy = line;
       if (current != null) {
-        line[1] = current.get("message");
-        line[2] = current.get("comment");
+        copy = Arrays.copyOf(line, line.length);
+        copy[1] = current.get("message");
+        copy[2] = current.get("comment");
       }
+      myLines.add(copy);
     }
 
-    save(file, lines);
+    save(file, myLines);
   }
 
   private void save(Path file, List<String[]> values) throws IOException {
