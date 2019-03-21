@@ -2399,10 +2399,12 @@ Grid.prototype.onItemClick = function(event, args) {
   var that = this;
   var waitCallback = function (done) {
     setTimeout(function () {
-      that.__onItemClick(event, args);
-      if (done) {
-        done();
-      }
+      that.handler.waitForActions(function () {
+        that.__onItemClick(event, args);
+        if (done) {
+          done();
+        }
+      }, 100)
     }, 100);
   };
 
