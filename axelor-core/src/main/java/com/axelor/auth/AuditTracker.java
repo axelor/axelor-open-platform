@@ -24,6 +24,7 @@ import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
+import com.axelor.db.Model;
 import com.axelor.db.annotations.Track;
 import com.axelor.db.annotations.TrackEvent;
 import com.axelor.db.annotations.TrackField;
@@ -36,6 +37,7 @@ import com.axelor.mail.db.MailFollower;
 import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
+import com.axelor.meta.MetaFiles;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
@@ -53,6 +55,7 @@ import org.hibernate.Transaction;
 final class AuditTracker {
 
   private static final ThreadLocal<Map<String, EntityState>> STORE = new ThreadLocal<>();
+  private static final ThreadLocal<Set<Model>> DELETED = new ThreadLocal<>();
 
   private static class EntityState {
 
@@ -174,6 +177,13 @@ final class AuditTracker {
     }
 
     EntityState.create(entity, values, oldValues);
+  }
+
+  public void delete(Model entity) {
+    if (DELETED.get() == null) {
+      DELETED.set(new HashSet<>());
+    }
+    DELETED.get().add(entity);
   }
 
   private String findMessage(
@@ -345,6 +355,31 @@ final class AuditTracker {
     }
   }
 
+  private void processTracks(Transaction tx, User user) {
+    final Map<String, EntityState> store = STORE.get();
+    if (store == null) {
+      return;
+    }
+    // prevent concurrent update
+    STORE.remove();
+    for (EntityState state : store.values()) {
+      process(state, user);
+    }
+  }
+
+  private void processDelete(Transaction tx, User user) {
+    final Set<Model> deleted = DELETED.get();
+    if (deleted == null) {
+      return;
+    }
+    final MetaFiles files = Beans.get(MetaFiles.class);
+    // prevent concurrent delete
+    DELETED.remove();
+    for (Model entity : deleted) {
+      files.deleteAttachments(entity);
+    }
+  }
+
   /**
    * This method should be called from {@link
    * AuditInterceptor#beforeTransactionCompletion(Transaction)} method to finish change recording.
@@ -353,18 +388,12 @@ final class AuditTracker {
    * @param user the session user
    */
   public void onComplete(Transaction tx, User user) {
-
-    final Map<String, EntityState> store = STORE.get();
-    if (store == null) {
-      return;
-    }
-    // prevent concurrent update
-    STORE.remove();
     try {
-      for (EntityState state : store.values()) {
-        process(state, user);
-      }
+      this.processTracks(tx, user);
+      this.processDelete(tx, user);
     } finally {
+      STORE.remove();
+      DELETED.remove();
       JPA.em().flush();
     }
   }

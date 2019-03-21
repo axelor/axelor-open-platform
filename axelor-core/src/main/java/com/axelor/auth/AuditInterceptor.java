@@ -212,5 +212,8 @@ public class AuditInterceptor extends EmptyInterceptor {
       throw new PersistenceException(
           String.format("You can't delete: %s#%s", entity.getClass().getName(), id));
     }
+    if (tracker.get() != null && entity instanceof Model) {
+      tracker.get().delete((Model) entity);
+    }
   }
 }

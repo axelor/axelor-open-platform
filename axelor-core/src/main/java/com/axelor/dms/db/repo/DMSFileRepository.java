@@ -75,9 +75,24 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
     super(DMSFile.class);
   }
 
+  @Nullable
+  public DMSFile findHomeByRelated(Model related) {
+    return all()
+        .filter(
+            ""
+                + "self.isDirectory = TRUE "
+                + "AND self.relatedId = :id "
+                + "AND self.relatedModel = :model "
+                + "AND self.parent.relatedModel = :model "
+                + "AND COALESCE(self.parent.relatedId, 0) = 0")
+        .bind("id", related.getId())
+        .bind("model", related.getClass().getName())
+        .fetchOne();
+  }
+
   @SuppressWarnings("all")
   private Model findRelated(DMSFile file) {
-    if (file.getRelatedId() == null || file.getRelatedModel() == null) {
+    if (file == null || file.getRelatedId() == null || file.getRelatedModel() == null) {
       return null;
     }
     Class<? extends Model> klass = null;
@@ -216,18 +231,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
       dmsRoot = super.save(dmsRoot); // Should get id before its child.
     }
 
-    DMSFile dmsHome =
-        all()
-            .filter(
-                ""
-                    + "self.isDirectory = TRUE "
-                    + "AND self.relatedId = :id "
-                    + "AND self.relatedModel = :model "
-                    + "AND self.parent.relatedModel = :model "
-                    + "AND COALESCE(self.parent.relatedId, 0) = 0")
-            .bind("id", related.getId())
-            .bind("model", related.getClass().getName())
-            .fetchOne();
+    DMSFile dmsHome = findHomeByRelated(related);
 
     if (dmsHome == null) {
       String homeName = null;

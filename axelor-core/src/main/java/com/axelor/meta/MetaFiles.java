@@ -49,6 +49,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
@@ -658,7 +659,6 @@ public class MetaFiles {
     Preconditions.checkNotNull(attachment.getMetaFile());
 
     MetaAttachmentRepository attachments = Beans.get(MetaAttachmentRepository.class);
-    MetaFileRepository files = Beans.get(MetaFileRepository.class);
     DMSFileRepository dms = Beans.get(DMSFileRepository.class);
 
     attachments.remove(attachment);
@@ -673,15 +673,12 @@ public class MetaFiles {
               .count();
     }
 
-    // only delete real file if not reference anywhere else
+    // only delete real file if not referenced anywhere else
     if (count > 0) {
       return;
     }
 
-    files.remove(metaFile);
-
-    Path target = getUploadPath(metaFile.getFilePath());
-    Files.deleteIfExists(target);
+    this.delete(metaFile);
   }
 
   /**
@@ -693,13 +690,31 @@ public class MetaFiles {
   @Transactional
   public void delete(MetaFile metaFile) throws IOException {
     Preconditions.checkNotNull(metaFile);
-    MetaFileRepository files = Beans.get(MetaFileRepository.class);
 
     Path target = getUploadPath(metaFile.getFilePath());
+    Path tmp = createTempFile(null, null);
 
-    files.remove(metaFile);
+    filesRepo.remove(metaFile);
 
-    Files.deleteIfExists(target);
+    Files.move(target, tmp, MOVE_OPTIONS);
+    try {
+      Files.deleteIfExists(tmp);
+    } catch (IOException e) {
+      Files.move(tmp, target);
+      throw e;
+    }
+  }
+
+  /**
+   * Deletes all attachments and related records (MetaFile, DMSFile, MetaAttachment). Finally,
+   * deletes all real files.
+   *
+   * @param entity
+   */
+  @Transactional
+  public void deleteAttachments(Model entity) {
+    final DMSFileRepository dmsFileRepo = Beans.get(DMSFileRepository.class);
+    Optional.ofNullable(dmsFileRepo.findHomeByRelated(entity)).ifPresent(dmsFileRepo::remove);
   }
 
   public String fileTypeIcon(MetaFile file) {
