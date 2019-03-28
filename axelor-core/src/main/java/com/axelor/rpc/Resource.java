@@ -1077,12 +1077,10 @@ public class Resource<T extends Model> {
     }
 
     for (Model entity : entities) {
-      if (JPA.em().contains(entity)) {
-        if (repository == null) {
-          JPA.remove(entity);
-        } else {
-          repository.remove(entity);
-        }
+      if (repository == null) {
+        JPA.remove(entity);
+      } else {
+        repository.remove(entity);
       }
     }
 

@@ -27,6 +27,7 @@
     <string name="content" large="true" />
     <string name="contentType" />
 
+    <entity-listener class="com.axelor.dms.db.repo.DMSFileListener"/>
   </entity>
 
   <entity name="DMSFileTag" table="DMS_FILE_TAG" repository="none">
