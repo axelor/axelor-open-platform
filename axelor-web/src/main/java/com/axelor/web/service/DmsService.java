@@ -18,6 +18,7 @@
 package com.axelor.web.service;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
@@ -49,6 +50,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -449,13 +451,37 @@ public class DmsService {
   }
 
   private Map<String, File> findFiles(DMSFile file, String base) {
+    final User user = AuthUtils.getUser();
+
+    if (user == null) {
+      return Collections.emptyMap();
+    }
+
+    String childrenQlString = "self.parent = :parent";
+
+    if (!AuthUtils.isAdmin(user)) {
+      childrenQlString += " AND (self.permissions.user = :user OR self.permissions.group = :group)";
+    }
+
+    return findFiles(file, base, childrenQlString, user);
+  }
+
+  private Map<String, File> findFiles(
+      DMSFile file, String base, String childrenQlString, User user) {
     final Map<String, File> files = new LinkedHashMap<>();
     if (file.getIsDirectory() == Boolean.TRUE) {
-      final List<DMSFile> children = repository.all().filter("self.parent = ?", file).fetch();
+      final List<DMSFile> children =
+          repository
+              .all()
+              .filter(childrenQlString, file, user, user.getGroup())
+              .bind("parent", file)
+              .bind("user", user)
+              .bind("group", user.getGroup())
+              .fetch();
       final String path = base + "/" + file.getFileName();
       files.put(path + "/", null);
       for (DMSFile child : children) {
-        files.putAll(findFiles(child, path));
+        files.putAll(findFiles(child, path, childrenQlString, user));
       }
       return files;
     }
