@@ -28,7 +28,6 @@
             <li ng-show="canShowRelated()"><a href="javascript:" ng-click="onShowRelated()" x-translate>Attached to...</a></li>
             <li class="divider"></li>
             <li><a href="javascript:" ng-click="onDownload()" x-translate>Download</a></li>
-            <li><a href="javascript:" ng-click="onOpenDetails()" x-translate>Open details...</a></li>
             <li class="divider" ng-if="hasButton('delete')"></li>
             <li ng-if="hasButton('delete')" ng-disabled="!canDelete()">
               <a href="javascript:" ng-click="onDelete()" x-translate>Delete...</a>
@@ -73,6 +72,10 @@
           <span class="title">Use offline...</span>
         </label>
       </form>
+      <hr>
+      <div>
+        <a href="#/ds/dms.file/edit/{{details.id}}" x-translate>Details</a>
+      </div>
       <hr>
       <div class="tags" ng-show="!showTagEditor">
         <span ng-repeat="tag in details.tags" ng-class="tag.style" class="label">{{tag.name}}</span>

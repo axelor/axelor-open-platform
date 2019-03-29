@@ -150,12 +150,6 @@ function DMSFileListCtrl($scope, $element, NavService) {
     return record;
   };
 
-  $scope.onOpenDetails = function () {
-    $scope.$timeout(function() {
-     $scope.onEdit();
-    }, 100);
-  };
-
   $scope.onEdit = function() {
     var record = getSelected();
 
