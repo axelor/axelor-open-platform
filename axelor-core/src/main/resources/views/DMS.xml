@@ -14,30 +14,41 @@
   </grid>
 
   <form name="dms-file-form" title="Document" model="com.axelor.dms.db.DMSFile" canNew="false"
-    canAttach="false" canArchive="false">
+    canAttach="false" canArchive="false" width="large">
     <toolbar>
       <button name="downloadBtn" title="Download" icon="fa-download"
         onClick="action-dms-file-download" />
     </toolbar>
-    <panel name="mainPanel" title="Overview" itemSpan="12">
+    <panel name="mainPanel" itemSpan="12">
       <field name="fileName" title="Name" />
-      <panel name="detailsPanel" readonly="true">
-        <panel stacked="true">
-          <panel name="fileTypePanel" showIf="fileType">
-            <field name="fileType" title="Type" />
-          </panel>
-          <panel name="directoryPanel" showIf="isDirectory">
-            <field name="isDirectory" title="Directory" />
-          </panel>
-        </panel>
-        <field name="createdBy" title="Owner" />
-        <field name="createdOn" title="Created" />
-        <field name="updatedOn" title="Modified" />
-      </panel>
     </panel>
-    <panel name="tagsPanel" title="Tags" itemSpan="12">
+    <panel name="detailsPanel" title="Details" sidebar="true" readonly="true">
+      <panel stacked="true">
+        <panel name="fileTypePanel" showIf="fileType">
+          <field name="fileType" title="Type" />
+        </panel>
+        <panel name="directoryPanel" showIf="isDirectory">
+          <field name="isDirectory" title="Directory" />
+        </panel>
+      </panel>
+      <field name="createdBy" title="Owner" />
+      <field name="createdOn" title="Created" />
+      <field name="updatedOn" title="Modified" />
+    </panel>
+    <panel name="tagsPanel" title="Tags" itemSpan="12" sidebar="true">
       <field name="tags" form-view="dms-tag-form" widget="TagSelect" x-create="code,name"
         showTitle="false" />
+    </panel>
+    <panel itemSpan="12" showIf="fileType == 'application/pdf'">
+      <field name="$pdf" showTitle="false" readonly="true">
+        <viewer depends="inlineUrl"><![CDATA[
+          <object data="{{record.inlineUrl}}" type="application/pdf" width="100%" height="1200px">
+              <embed ng-src="{{record.inlineUrl}}" type="application/pdf">
+                  <p>This browser does not support PDFs.</p>
+              </embed>
+          </object>
+        ]]></viewer>
+      </field>
     </panel>
   </form>
 

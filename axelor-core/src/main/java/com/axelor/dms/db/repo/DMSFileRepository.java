@@ -476,6 +476,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
       json.put("fileType", fileType);
       json.put("typeIcon", "fa fa-colored " + fileIcon);
       json.put("metaFile.sizeText", metaFile.getSizeText());
+      json.put("inlineUrl", String.format("ws/dms/inline/%d", file.getId()));
     }
 
     if (file.getTags() != null) {

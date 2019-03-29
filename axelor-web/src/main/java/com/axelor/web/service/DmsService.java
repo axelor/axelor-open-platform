@@ -72,6 +72,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
@@ -294,7 +295,7 @@ public class DmsService {
           }
         };
 
-    return stream(so, file.getFileName());
+    return stream(so, file.getFileName(), false);
   }
 
   @POST
@@ -355,7 +356,16 @@ public class DmsService {
   @Path("download/{id}")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   public javax.ws.rs.core.Response doDownload(@PathParam("id") String batchOrId) {
+    return getAttachmentResponse(batchOrId, false);
+  }
 
+  @GET
+  @Path("inline/{id}")
+  public javax.ws.rs.core.Response doInline(@PathParam("id") String batchOrId) {
+    return getAttachmentResponse(batchOrId, true);
+  }
+
+  private javax.ws.rs.core.Response getAttachmentResponse(String batchOrId, boolean inline) {
     final List<?> ids = findBatchIds(batchOrId);
     if (ids == null) {
       return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
@@ -373,7 +383,7 @@ public class DmsService {
       final DMSFile record = records.get(0);
       File file = getFile(record);
       if (file != null) {
-        return stream(file, getFileName(record));
+        return stream(file, getFileName(record), inline);
       }
     }
 
@@ -393,7 +403,7 @@ public class DmsService {
         };
 
     final String batchName = "documents-" + LocalDate.now() + ".zip";
-    return stream(so, batchName);
+    return stream(so, batchName, inline);
   }
 
   private File getFile(DMSFile record) {
@@ -519,8 +529,26 @@ public class DmsService {
     }
   }
 
-  private javax.ws.rs.core.Response stream(Object content, String fileName) {
-    return javax.ws.rs.core.Response.ok(content, MediaType.APPLICATION_OCTET_STREAM_TYPE)
+  private javax.ws.rs.core.Response stream(Object content, String fileName, boolean inline) {
+    MediaType type = MediaType.APPLICATION_OCTET_STREAM_TYPE;
+
+    if (inline) {
+      if (fileName.endsWith(".pdf")) type = new MediaType("application", "pdf");
+      if (fileName.endsWith(".html")) type = new MediaType("text", "html");
+      if (fileName.endsWith(".png")) type = new MediaType("image", "png");
+      if (fileName.endsWith(".jpg")) type = new MediaType("image", "jpg");
+      if (fileName.endsWith(".svg")) type = new MediaType("image", "svg+xml");
+      if (fileName.endsWith(".gif")) type = new MediaType("image", "gif");
+      if (fileName.endsWith(".webp")) type = new MediaType("image", "webp");
+    }
+
+    final ResponseBuilder builder = javax.ws.rs.core.Response.ok(content, type);
+
+    if (inline && type != MediaType.APPLICATION_OCTET_STREAM_TYPE) {
+      return builder.header("Content-Disposition", "inline; filename=\"" + fileName + "\"").build();
+    }
+
+    return builder
         .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
         .header("Content-Transfer-Encoding", "binary")
         .build();
