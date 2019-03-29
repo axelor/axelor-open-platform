@@ -86,7 +86,7 @@ String tenantId = (String) session.getAttribute("tenantId");
           <img src="img/axelor.png" width="192px">
         </div>
 
-        <div class="alert alert-block alert-error text-center" <%= errorMsg != null ? "" : "hidden" %>>
+        <div id="error-msg" class="alert alert-block alert-error text-center <%= errorMsg == null ? "hidden" : "" %>">
           <h4><%= errorMsg %></h4>
         </div>
 
