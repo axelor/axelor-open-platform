@@ -895,6 +895,14 @@ ui.directive('uiPortletGrid', function(){
         var index = $scope.pagerIndex(true);
         var record = ds.at(index);
 
+        if ($scope._viewAction === "dms.file.children") {
+          NavService.openTabByName("dms.file", {
+            mode: "edit",
+            state: record.id
+          });
+          return;
+        }
+
         tab.viewType = "form";
         tab.recordId = record.id;
         tab.action = _.uniqueId('$act');

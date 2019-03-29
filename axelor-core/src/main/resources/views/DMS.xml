@@ -39,6 +39,7 @@
       <field name="tags" form-view="dms-tag-form" widget="TagSelect" x-create="code,name"
         showTitle="false" />
     </panel>
+    <panel-dashlet action="dms.file.children" showIf="isDirectory" height="400"/>
     <panel itemSpan="12" showIf="fileType == 'application/pdf'">
       <field name="$pdf" showTitle="false" readonly="true">
         <viewer depends="inlineUrl"><![CDATA[
@@ -171,6 +172,12 @@
 
   <action-view name="dms.file" model="com.axelor.dms.db.DMSFile" title="Document">
     <view name="dms-file-form" type="form"/>
+  </action-view>
+
+  <action-view name="dms.file.children" model="com.axelor.dms.db.DMSFile" title="Content">
+    <view name="dms-file-grid" type="grid"/>
+    <view name="dms-file-form" type="form"/>
+    <domain>self.parent.id = :id</domain>
   </action-view>
 
   <action-view name="dms.tags" model="com.axelor.dms.db.DMSFileTag" title="Tags">
