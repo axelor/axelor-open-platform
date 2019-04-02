@@ -40,10 +40,13 @@ import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.rpc.Resource;
+import com.axelor.rpc.filter.Filter;
+import com.axelor.rpc.filter.JPQLFilter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import com.google.inject.persist.Transactional;
 import java.io.IOException;
@@ -53,6 +56,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 import org.apache.shiro.authz.UnauthorizedException;
@@ -165,64 +169,101 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
     }
 
     // if not an attachment or has parent, do nothing
-    if (parent != null || related == null) {
-      return super.save(entity);
+    if (parent == null && related != null) {
+      // create parent folders
+      final DMSFile dmsHome = findOrCreateHome(related);
+      entity.setParent(dmsHome);
     }
 
-    // create parent folders
+    return super.save(entity);
+  }
 
-    Mapper mapper = Mapper.of(related.getClass());
-    String homeName = null;
-    try {
-      homeName = mapper.getNameField().get(related).toString();
-    } catch (Exception e) {
-    }
-    if (homeName == null) {
-      homeName = Strings.padStart("" + related.getId(), 5, '0');
+  /**
+   * Finds or creates parent folders.
+   *
+   * @param related model
+   * @return home parent
+   */
+  protected DMSFile findOrCreateHome(Model related) {
+    final DMSFile dmsRootParent = getRootParent(related);
+    final List<Filter> dmsRootFilters =
+        Lists.newArrayList(
+            new JPQLFilter(
+                ""
+                    + "self.isDirectory = TRUE "
+                    + "AND self.relatedModel = :model "
+                    + "AND COALESCE(self.relatedId, 0) = 0"));
+
+    if (dmsRootParent != null) {
+      dmsRootFilters.add(new JPQLFilter("self.parent = :rootParent"));
     }
 
     DMSFile dmsRoot =
-        all()
-            .filter(
-                "(self.relatedId is null OR self.relatedId = 0) AND self.relatedModel = ? and self.isDirectory = true",
-                entity.getRelatedModel())
+        Filter.and(dmsRootFilters)
+            .build(DMSFile.class)
+            .bind("model", related.getClass().getName())
+            .bind("rootParent", dmsRootParent)
             .fetchOne();
 
-    final Inflector inflector = Inflector.getInstance();
-
     if (dmsRoot == null) {
+      final Inflector inflector = Inflector.getInstance();
       dmsRoot = new DMSFile();
       dmsRoot.setFileName(
           inflector.pluralize(inflector.humanize(related.getClass().getSimpleName())));
-      dmsRoot.setRelatedModel(entity.getRelatedModel());
+      dmsRoot.setRelatedModel(related.getClass().getName());
       dmsRoot.setIsDirectory(true);
-      dmsRoot = super.save(dmsRoot); // should get id before it's child
+      dmsRoot.setParent(dmsRootParent);
+      dmsRoot = super.save(dmsRoot); // Should get id before its child.
     }
 
     DMSFile dmsHome =
         all()
             .filter(
                 ""
-                    + "self.relatedId = :id AND self.relatedModel = :model AND self.isDirectory = true AND "
-                    + "self.parent.relatedModel = :model AND "
-                    + "(self.parent.relatedId is null OR self.parent.relatedId = 0)")
-            .bind("id", entity.getRelatedId())
-            .bind("model", entity.getRelatedModel())
+                    + "self.isDirectory = TRUE "
+                    + "AND self.relatedId = :id "
+                    + "AND self.relatedModel = :model "
+                    + "AND self.parent.relatedModel = :model "
+                    + "AND COALESCE(self.parent.relatedId, 0) = 0")
+            .bind("id", related.getId())
+            .bind("model", related.getClass().getName())
             .fetchOne();
 
     if (dmsHome == null) {
+      String homeName = null;
+
+      try {
+        final Mapper mapper = Mapper.of(related.getClass());
+        homeName = mapper.getNameField().get(related).toString();
+      } catch (Exception e) {
+        // Ignore
+      }
+
+      if (homeName == null) {
+        homeName = Strings.padStart("" + related.getId(), 5, '0');
+      }
+
       dmsHome = new DMSFile();
       dmsHome.setFileName(homeName);
-      dmsHome.setRelatedId(entity.getRelatedId());
-      dmsHome.setRelatedModel(entity.getRelatedModel());
+      dmsHome.setRelatedId(related.getId());
+      dmsHome.setRelatedModel(related.getClass().getName());
       dmsHome.setParent(dmsRoot);
       dmsHome.setIsDirectory(true);
-      dmsHome = super.save(dmsHome); // should get id before it's child
+      dmsHome = super.save(dmsHome); // Should get id before its child.
     }
 
-    entity.setParent(dmsHome);
+    return dmsHome;
+  }
 
-    return super.save(entity);
+  /**
+   * Gets root parent folder
+   *
+   * @param related model
+   * @return root parent folder
+   */
+  @Nullable
+  protected DMSFile getRootParent(Model related) {
+    return null;
   }
 
   @Override
@@ -233,7 +274,6 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
       for (DMSFile child : children) {
         if (child != entity) {
           remove(child);
-          ;
         }
       }
     }
