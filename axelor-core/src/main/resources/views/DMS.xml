@@ -51,6 +51,14 @@
         ]]></viewer>
       </field>
     </panel>
+    <panel itemSpan="12" showIf="fileType.indexOf('image') == 0">
+      <field name="$img" showTitle="false" readonly="true">
+        <viewer depends="inlineUrl,fileName"><![CDATA[
+          <img ng-src="{{record.inlineUrl}}" alt="{{record.fileName}}"
+            style="width:100%; height:100%; object-fit: contain;"/>
+        ]]></viewer>
+      </field>
+    </panel>
   </form>
 
   <grid name="dms-folder-grid" title="Directories" model="com.axelor.dms.db.DMSFile" edit-icon="false">
