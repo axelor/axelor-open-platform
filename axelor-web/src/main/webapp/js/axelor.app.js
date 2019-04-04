@@ -394,7 +394,7 @@
     return function(scope, element, attrs) {
       var t = _t || angular.nop;
       setTimeout(function(){
-        element.text(t(element.text()));
+        element.html(t(element.text()));
       });
     };
   });
