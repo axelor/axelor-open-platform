@@ -50,10 +50,8 @@
       var path = name.split('.');
       var val = record || {};
       var idx = 0;
-      var next;
       while (val && idx < path.length) {
-        next = path[idx++];
-        val = val[next] === undefined ? null : val[next];
+        val = val[path[idx++]];
       }
       if (idx === path.length) {
         return val;
