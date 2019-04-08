@@ -320,7 +320,7 @@ public class Resource<T extends Model> {
   private Query<?> getSearchQuery(Request request, Filter filter) {
     final SearchService searchService = Beans.get(SearchService.class);
     if (request.getData() == null || !searchService.isEnabled()) {
-      return filter == null ? getQuery(request) : getQuery(request, filter);
+      return getQuery(request, filter);
     }
 
     final Map<String, Object> data = request.getData();
