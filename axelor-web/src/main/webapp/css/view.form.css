@@ -751,10 +751,14 @@ table.field-details .help-text hr {
   font-weight: 600;
 }
 
+.popover-content {
+  display: flex;
+}
+
 .popover-inner {
   width: inherit;
   min-width: 280px;
-  max-width: 480px;
+  max-width: inherit;
   display: table;
   overflow: hidden;
 }
