@@ -1075,11 +1075,13 @@ Grid.prototype._doInit = function(view) {
         return;
       }
       filters[$(this).data('columnId')] = $(this).val().trim();
+      handler._simpleFilters = filters;
     }
 
     function clearFilters() {
       filters = {};
       filtersRow.find(":input").val("");
+      handler._simpleFilters = null;
     }
 
     handler.clearFilters = clearFilters;
@@ -1096,7 +1098,7 @@ Grid.prototype._doInit = function(view) {
       _.each(cols, function(col){
         if (!col.xpath || col.descriptor.type === 'button' || col.descriptor.json || col.descriptor.encrypted) return;
         var header = grid.getHeaderRowColumn(col.id),
-          input = $('<input type="text">').data("columnId", col.id).appendTo(header),
+          input = $('<input type="text">').data("columnId", col.id).val(filters[col.id]).appendTo(header),
           field = col.descriptor || {};
         input.on("change", function () {
           input.attr('placeholder', input.is(':focus') ? _t('Search...') : null);

@@ -1286,7 +1286,9 @@ ui.directive('uiFilterBox', function() {
           $scope.tagItems = [tag];
         }
 
-        return handler.filter(search);
+        return handler._simpleFilters
+          ? handler.filter(handler._simpleFilters, search)
+          : handler.filter(search);
       };
 
       $scope.onFreeSearch = function() {
