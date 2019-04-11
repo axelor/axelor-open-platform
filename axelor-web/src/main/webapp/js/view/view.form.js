@@ -366,16 +366,21 @@ function FormViewCtrl($scope, $element) {
   };
 
   $scope.edit = function(record, fireOnLoad) {
-    $scope.editRecord(record);
-    $scope.updateRoute();
-    if (fireOnLoad === false) return;
-    $scope._viewPromise.then(function(){
-      $scope.ajaxStop(function(){
-        var handler = $scope.$events.onLoad,
-          record = $scope.record;
-        if (handler && !ds.equals({}, record)) {
-          setTimeout(handler);
-        }
+    $scope.record = null;
+    $scope.$$original = null;
+    $scope.$$dirty = false;
+    $scope.$applyAsync(function () {
+      $scope.editRecord(record);
+      $scope.updateRoute();
+      if (fireOnLoad === false) return;
+      $scope._viewPromise.then(function(){
+        $scope.ajaxStop(function(){
+          var handler = $scope.$events.onLoad,
+            record = $scope.record;
+          if (handler && !ds.equals({}, record)) {
+            setTimeout(handler);
+          }
+        });
       });
     });
   };
