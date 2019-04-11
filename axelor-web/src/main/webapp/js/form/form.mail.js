@@ -877,6 +877,10 @@ ui.formWidget('uiMailComposer', {
       scope.$applyAsync();
     });
 
+    scope.$on("on:edit", function (e) {
+      textarea.val('');
+    });
+
     scope.$on('on:message-add', function () {
       if (scope.canShow()) {
         scope.post = null;
