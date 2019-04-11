@@ -366,12 +366,11 @@ function FormViewCtrl($scope, $element) {
   };
 
   $scope.edit = function(record, fireOnLoad) {
-    $scope.record = null;
-    $scope.$$original = null;
-    $scope.$$dirty = false;
+    $scope.$$disableDirtyCheck = true;
+    $scope.editRecord(record);
+    $scope.updateRoute();
     $scope.$applyAsync(function () {
-      $scope.editRecord(record);
-      $scope.updateRoute();
+      $scope.$$disableDirtyCheck = false;
       if (fireOnLoad === false) return;
       $scope._viewPromise.then(function(){
         $scope.ajaxStop(function(){
@@ -437,7 +436,7 @@ function FormViewCtrl($scope, $element) {
   };
 
   $scope.isDirty = function() {
-    $scope.$$dirty = $scope.$$dirtyGrids.length > 0 || !ds.equals($scope.record, $scope.$$original);
+    $scope.$$dirty = $scope.$$disableDirtyCheck ? false : $scope.$$dirtyGrids.length > 0 || !ds.equals($scope.record, $scope.$$original);
     return $scope.$$dirty;
   };
 
