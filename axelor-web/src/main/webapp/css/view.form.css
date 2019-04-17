@@ -734,7 +734,7 @@ table.field-details .help-text hr {
 
 .popover {
   width: auto;
-  max-width: 480px;
+  max-width: inherit;
   min-width: 220px;
   z-index: 2147483647;
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -751,10 +751,14 @@ table.field-details .help-text hr {
   font-weight: 600;
 }
 
+.popover-content {
+  display: flex;
+}
+
 .popover-inner {
   width: inherit;
   min-width: 280px;
-  max-width: 480px;
+  max-width: inherit;
   display: table;
   overflow: hidden;
 }

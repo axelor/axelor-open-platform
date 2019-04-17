@@ -164,9 +164,11 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
   BaseCardsCtrl.call(this, 'kanban', $scope, $element);
 
   $scope.parse = function (fields, view) {
+    var params = $scope._viewParams.params || {};
+    var hideCols = (params['kanban-hide-columns'] || '').split(',');
     var columnBy = fields[view.columnBy] || {};
-    var columns = _.map(columnBy.selectionList, function (item) {
-      return item;
+    var columns = _.filter(columnBy.selectionList, function (item) {
+      return hideCols.indexOf(item.value) === -1;
     });
 
     var first = _.first(columns);
@@ -181,7 +183,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
 
     $scope.sortableOptions.disabled = !view.draggable || !$scope.hasPermission('write');
     $scope.columns = columns;
-    $scope.colSpan = "kanban-cs-" + columns.length;
+    $scope.colWidth = params['kanban-column-width'];
   };
 
   $scope.move = function (record, to, next, prev) {
@@ -412,6 +414,10 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
         scope.onEdit(record, true);
         scope.$applyAsync();
       });
+
+      if (scope.colWidth) {
+        element.width(scope.colWidth);
+      }
 
       setTimeout(function () {
         element.find('[ui-sortable]').sortable("option", "appendTo", element.parent());

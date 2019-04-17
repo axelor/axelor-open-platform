@@ -408,7 +408,7 @@ ui.directive('uiViewPane', function() {
 
       $scope.$watch('selectedTab.viewType', function viewTypeWatch(type) {
         var params = $scope._viewParams;
-        if (params && params.$viewScope !== $scope.selectedTab.$viewScope) {
+        if (params && params.$viewScope !== ($scope.selectedTab || {}).$viewScope) {
           return;
         }
         if ($scope.viewType !== type && type) {
@@ -605,25 +605,25 @@ ui.directive('uiViewCustomize', ['NavService', function(NavService) {
         if (!axelor.config['user.technical']) {
           return false;
         }
-        var viewScope = scope.selectedTab.$viewScope;
+        var viewScope = (scope.selectedTab || {}).$viewScope;
         var view = viewScope && viewScope.schema;
         return view && (view.viewId || view.modelId);
       };
 
       scope.hasViewID = function () {
-        var viewScope = scope.selectedTab.$viewScope;
+        var viewScope = (scope.selectedTab || {}).$viewScope;
         var view = viewScope && viewScope.schema;
         return view && view.viewId;
       };
 
       scope.hasModelID = function () {
-        var viewScope = scope.selectedTab.$viewScope;
+        var viewScope = (scope.selectedTab || {}).$viewScope;
         var view = viewScope && viewScope.schema;
         return view && view.modelId;
       }
 
       scope.hasActionID = function () {
-        return scope.selectedTab.actionId;
+        return (scope.selectedTab || {}).actionId;
       }
 
       scope.onShowView = function () {
@@ -633,7 +633,7 @@ ui.directive('uiViewCustomize', ['NavService', function(NavService) {
           state: id
         });
         scope.waitForActions(function () {
-          var vs = scope.selectedTab.$viewScope;
+          var vs = (scope.selectedTab || {}).$viewScope;
           if (vs && vs.setEditable) {
             vs.setEditable();
           }
@@ -688,7 +688,7 @@ function viewSwitcher(scope, element, attrs) {
       return;
     }
     var type = $(this).attr("x-view-type");
-    var vs = params.$viewScope || scope.selectedTab.$viewScope;
+    var vs = params.$viewScope || (scope.selectedTab || {}).$viewScope;
     var ds = vs._dataSource;
     var page = ds && ds._page;
 
@@ -696,7 +696,7 @@ function viewSwitcher(scope, element, attrs) {
       if (page.index === -1) page.index = 0;
     }
 
-    if (scope.selectedTab.viewType === 'grid') {
+    if ((scope.selectedTab || {}).viewType === 'grid') {
       var items = vs.getItems() || [];
       var index = _.first(vs.selection || []);
       if (index === undefined && items.length === 0 && vs.schema.canNew === false) {

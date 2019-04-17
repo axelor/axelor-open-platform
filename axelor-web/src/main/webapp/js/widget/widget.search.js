@@ -712,6 +712,10 @@ function FilterFormCtrl($scope, $element, ViewService) {
         value: filter.value
       };
 
+      if (filter.operator == 'like' || filter.operator == 'notLike') {
+        criterion.value = criterion.value || '';
+      }
+
       if (filter.operator == 'in' ||
         filter.operator == 'notIn') {
         if (_.isEmpty(filter.value)) {
@@ -1281,7 +1285,9 @@ ui.directive('uiFilterBox', function() {
           $scope.tagItems = [tag];
         }
 
-        return handler.filter(search);
+        return handler._simpleFilters
+          ? handler.filter(handler._simpleFilters, search)
+          : handler.filter(search);
       };
 
       $scope.onFreeSearch = function() {

@@ -157,7 +157,9 @@ ui.formInput('JsonField', 'String', {
         scope.record = angular.fromJson(value);
       } else {
         scope.record = getDefaultValues();
-        record[field.name] = angular.toJson(scope.record);
+        if (!_.isEmpty(scope.record)) {
+          record[field.name] = angular.toJson(scope.record);
+        }
         onUpdate();
       }
       scope._jsonContext = { '$record': record };

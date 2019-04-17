@@ -321,6 +321,10 @@ ui.formInput('Html', {
 
       var value = shellActive ? shell.getHTML() : textElement.val();
 
+      if (value && value.trim() === '<br>') {
+        value = null;
+      }
+
       var old = scope.getValue() || null;
       var txt = scope.parse(value) || null;
 

@@ -715,8 +715,13 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
         task.progress = rec[schema.taskProgress]/100;
       }
 
-      if(schema.taskParent && rec[schema.taskParent] && rec[schema.taskParent].id != task.id){
+      if(schema.taskParent){
+        if(rec[schema.taskParent] && rec[schema.taskParent].id != task.id){
         task.parent = rec[schema.taskParent].id;
+        }
+        else{
+          task.parent = 0;
+        }
       }
 
       if(schema.taskSequence){
@@ -784,6 +789,15 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 
       var popup = editor.isolateScope();
       popup.setEditable(true);
+      
+        if(isNew && schema.taskParent && task.parent && !record[schema.taskParent]){
+          var parentTask = gantt.getTask(task.parent);
+          var parentRecord = parentTask.record;
+          if(parentRecord){
+            record[schema.taskParent] = parentRecord;
+          }
+        }
+           
       popup.show(record, function(result) {
         task.isNew = isNew;
         task = updateTask(task, result);

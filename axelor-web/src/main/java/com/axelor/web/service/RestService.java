@@ -121,22 +121,11 @@ public class RestService extends ResourceService {
     return getResource().search(request);
   }
 
-  @POST
-  @Path("search")
   @SuppressWarnings("all")
-  public Response find(Request request) {
-
-    if (request == null) {
-      request = new Request();
-      request.setOffset(0);
-      request.setLimit(40);
-    }
-
-    request.setModel(getModel());
-
+  private void updateContext(Request request) {
     final Map<String, Object> data = request.getData();
     if (data == null || !data.containsKey("_domainAction")) {
-      return getResource().search(request);
+      return;
     }
 
     // domain actions are used by portlets to evaluate view context
@@ -145,6 +134,19 @@ public class RestService extends ResourceService {
     final Map<String, Object> old = (Map) data.get("_domainContext");
 
     ViewService.updateContext(action, old);
+  }
+
+  @POST
+  @Path("search")
+  public Response find(Request request) {
+    if (request == null) {
+      request = new Request();
+      request.setOffset(0);
+      request.setLimit(40);
+    }
+
+    request.setModel(getModel());
+    updateContext(request);
 
     return getResource().search(request);
   }
@@ -275,7 +277,9 @@ public class RestService extends ResourceService {
     while ((read = in.read(bytes)) != -1) {
       out.write(bytes, 0, read);
     }
+    out.flush();
     out.close();
+    in.close();
   }
 
   private String getFileName(MultivaluedMap<String, String> headers) {
@@ -525,9 +529,13 @@ public class RestService extends ResourceService {
     if (request == null || request.getFields() == null) {
       return fail();
     }
+
     final Response response = new Response();
     final Map<String, Object> data = new HashMap<>();
+
     request.setModel(getModel());
+    updateContext(request);
+
     try {
       final java.nio.file.Path tempFile = MetaFiles.createTempFile(null, ".csv");
       try (final OutputStream os = new FileOutputStream(tempFile.toFile())) {
@@ -535,7 +543,6 @@ public class RestService extends ResourceService {
           data.put("exportSize", getResource().export(request, writer));
         }
       }
-      ;
       data.put("fileName", tempFile.toFile().getName());
       response.setData(data);
     } catch (IOException e) {

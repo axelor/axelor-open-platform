@@ -44,7 +44,7 @@
 
   function findNested(record, name) {
     if (record && name && name in record) {
-      return record[name];
+      return record[name] === undefined ? null : record[name];
     }
     if (name) {
       var path = name.split('.');
@@ -57,7 +57,7 @@
         return val;
       }
     }
-    return null;
+    return undefined;
   }
 
   // override angular.js currency filter

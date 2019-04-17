@@ -247,16 +247,21 @@ ui.formWidget('BaseSelect', {
 });
 
 function filterSelection(scope, field, selection, current) {
+  var selectionIn = scope.attr('selection-in') || field.selectionIn;
   if (_.isEmpty(selection)) return selection;
-  if (_.isEmpty(field.selectionIn)) return selection;
+  if (_.isEmpty(selectionIn)) return selection;
 
   var context = (scope.getContext || angular.noop)() || {};
-  var expr = field.selectionIn.trim();
-  if (expr.indexOf('[') !== 0) {
-    expr = '[' + expr + ']';
+  var list = selectionIn;
+
+  if (_.isString(selectionIn)) {
+    var expr = selectionIn.trim();
+    if (expr.indexOf('[') !== 0) {
+      expr = '[' + expr + ']';
+    }
+    list = axelor.$eval(scope, expr, context);
   }
 
-  var list = axelor.$eval(scope, expr, context);
   var value = acceptNumber(current);
 
   if (_.isEmpty(list)) {

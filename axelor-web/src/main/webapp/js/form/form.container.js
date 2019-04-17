@@ -768,13 +768,12 @@ ui.formWidget('PanelTabs', {
       }
     });
 
-    scope.$watch("attr('hidden')", function tabsHiddenWatch(hidden, old) {
+    scope.$watch(function tabsWatch() {
+      var hidden = scope.attr('hidden');
       if (hidden) return;
       // show selected tab only
-      scope.$evalAsync(function () {
-        scope.tabs.forEach(function (tab) {
-          if (!tab.selected) tab.elem.hide();
-        });
+      scope.tabs.forEach(function (tab) {
+        if (!tab.selected) tab.elem.hide();
       });
     });
   },

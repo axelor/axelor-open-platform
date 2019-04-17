@@ -2,6 +2,47 @@
 
 TBD
 
+## 5.0.14 (2019-04-17)
+
+#### Enhancements
+
+* Add support for changing selection-in attribute with action-attrs
+* Hide attachment icon when we can't attach a file
+
+#### Bugs
+
+* Fix panel-tabs visibility issue
+* Fix auto fill parent field on new record on gantt view
+* Fix track message textbox not clearing on new record
+* Fix Column filters not applied with advance search
+* Fix unexpected dirty record warning when navigating form records
+* Fix popover width
+* Fix o2m permission issues
+* Fix onLoad issue caused by json fields
+* Fix empty value in html widget with firefox
+* Fix dotted field not loading
+* Fix translated text gets escaped
+
+## 5.0.13 (2019-03-22)
+
+#### Enhancements
+
+* Use fixed width columns in kanban view
+* Add support to hide kanban columns using view-param
+* Add support for multiline widget attribute to custom fields
+
+#### Bugs
+
+* Fix editable grid updating wrong record
+* Fix i18n message extractor updating catelogs with wrong translations
+* Fix required field in editor causing infinite fetch requests
+* Fix NPE when using quartz job context
+* Fix @RequestScoped services in unit tests
+* Fix @RequestScoped services when used with quartz scheduler
+* Fix data export issue from panel-dashlet
+* Fix menu search
+* Fix advance search issue with contains/not contains filter
+
 ## 5.0.12 (2019-01-31)
 
 #### Enhancements

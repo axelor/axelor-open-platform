@@ -964,6 +964,7 @@ ActionHandler.prototype = {
         case 'prompt':
         case 'css':
         case 'icon':
+        case 'selection-in':
           itemScope.attr(attr, value);
           break;
         case 'title':
