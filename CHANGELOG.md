@@ -1,6 +1,23 @@
-## 5.0.14 (current)
+## 5.0.14 (2019-04-17)
 
-TBD
+#### Enhancements
+
+* Add support for changing selection-in attribute with action-attrs
+* Hide attachment icon when we can't attach a file
+
+#### Bugs
+
+* Fix panel-tabs visibility issue
+* Fix auto fill parent field on new record on gantt view
+* Fix track message textbox not clearing on new record
+* Fix Column filters not applied with advance search
+* Fix unexpected dirty record warning when navigating form records
+* Fix popover width
+* Fix o2m permission issues
+* Fix onLoad issue caused by json fields
+* Fix empty value in html widget with firefox
+* Fix dotted field not loading
+* Fix translated text gets escaped
 
 ## 5.0.13 (2019-03-22)
 
