@@ -66,6 +66,7 @@
     <string name="onNew" />
     <string name="onSave" />
     <string name="nameField" />
+    <string name="formWidth" />
     <many-to-one name="menu" ref="MetaMenu" copy="false" />
     <many-to-one name="menuParent" ref="MetaMenu" />
     <string name="menuIcon" />

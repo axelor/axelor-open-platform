@@ -104,6 +104,7 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 
     String onNew = jsonModel.getOnNew();
     String onSave = jsonModel.getOnSave();
+    String width = jsonModel.getFormWidth();
 
     onNew =
         StringUtils.isBlank(onNew)
@@ -140,6 +141,10 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 
     if (!StringUtils.isBlank(onSave)) {
       xml.append(" onSave=").append('"').append(onSave).append('"');
+    }
+
+    if (!StringUtils.isBlank(width)) {
+      xml.append(" width=").append('"').append(width).append('"');
     }
 
     xml.append(">\n")
