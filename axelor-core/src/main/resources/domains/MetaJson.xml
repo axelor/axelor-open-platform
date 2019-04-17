@@ -41,6 +41,7 @@
     <integer name="precision" default="6" column="decimal_precision" />
     <integer name="scale" default="2" column="decimal_scale" />
     <integer name="sequence" />
+    <integer name="columnSequence" />
 
     <string name="regex" />
     <string name="valueExpr" large="true" title="Value Expression" />

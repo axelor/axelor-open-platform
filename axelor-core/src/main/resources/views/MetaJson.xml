@@ -116,6 +116,7 @@
       <field name="defaultValue" />
       <field name="help" />
       <field name="sequence" />
+      <field name="columnSequence" />
       <field name="model" widget="ref-text"
         x-target-name="fullName"
         x-target="com.axelor.meta.db.MetaModel"
@@ -134,8 +135,9 @@
       <field name="type" />
       <field name="title" />
       <field name="defaultValue" />
-      <field name="help" />
+      <field name="help" colSpan="12"/>
       <field name="sequence" />
+      <field name="columnSequence" />
     </panel>
     <panel-include view="json-field-form-base" />
   </form>

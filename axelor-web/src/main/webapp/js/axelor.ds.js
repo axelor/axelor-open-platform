@@ -359,6 +359,7 @@
             items.push(item);
           }
         });
+        items = items.sort(function (x, y) { return x.columnSequence - y.columnSequence; });
         view.items = items;
       }
     };
