@@ -21,6 +21,7 @@ import static com.axelor.common.StringUtils.isBlank;
 
 import com.axelor.app.AppSettings;
 import com.axelor.common.ResourceUtils;
+import com.axelor.common.StringUtils;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -48,8 +49,7 @@ public class DBHelper {
   private static final String UNACCENT_CHECK = "SELECT unaccent('text')";
   private static final String UNACCENT_CREATE = "CREATE EXTENSION IF NOT EXISTS unaccent";
 
-  private static final String XPATH_ROOT = "/persistence/persistence-unit[@name='persistenceUnit']";
-  private static final String XPATH_ROOT_TEST = "/persistence/persistence-unit[@name='testUnit']";
+  private static final String XPATH_ROOT = "/persistence/persistence-unit";
 
   private static final String XPATH_NON_JTA_DATA_SOURCE = "non-jta-data-source";
   private static final String XPATH_SHARED_CACHE_MODE = "shared-cache-mode";
@@ -67,12 +67,6 @@ public class DBHelper {
       "properties/property[@name='hibernate.jdbc.batch_size']/@value";
   private static final String XPATH_FETCH_SIZE =
       "properties/property[@name='hibernate.jdbc.fetch_size']/@value";
-
-  private static final String CONFIG_DATASOURCE = "db.default.datasource";
-  private static final String CONFIG_DRIVER = "db.default.driver";
-  private static final String CONFIG_URL = "db.default.url";
-  private static final String CONFIG_USER = "db.default.user";
-  private static final String CONFIG_PASSWORD = "db.default.password";
 
   private static final String CONFIG_BATCH_SIZE = "hibernate.jdbc.batch_size";
   private static final String CONFIG_FETCH_SIZE = "hibernate.jdbc.fetch_size";
@@ -110,18 +104,31 @@ public class DBHelper {
     final XPathFactory xpf = XPathFactory.newInstance();
     final XPath xpath = xpf.newXPath();
 
-    jndiName = settings.get(CONFIG_DATASOURCE);
-    jdbcDriver = settings.get(CONFIG_DRIVER);
-    jdbcUrl = settings.get(CONFIG_URL);
-    jdbcUser = settings.get(CONFIG_USER);
-    jdbcPassword = settings.get(CONFIG_PASSWORD);
-
-    jdbcBatchSize = settings.getInt(CONFIG_BATCH_SIZE, DEFAULT_BATCH_SIZE);
-    jdbcFetchSize = settings.getInt(CONFIG_FETCH_SIZE, DEFAULT_FETCH_SIZE);
-
     try (final InputStream res = ResourceUtils.getResourceStream("META-INF/persistence.xml")) {
       final DocumentBuilder db = dbf.newDocumentBuilder();
       final Document document = db.parse(res);
+
+      final String jpaUnit = evaluate(xpath, XPATH_ROOT, "@name", document);
+      final String pu = jpaUnit.replaceAll("(PU|Unit)$", "").replaceAll("^persistence$", "default");
+
+      if (StringUtils.isBlank(pu)) {
+        throw new RuntimeException("Invalid persistence.xml, missing persistence unit name.");
+      }
+
+      final String configDataSource = String.format("db.%s.datasource", pu);
+      final String configDriver = String.format("db.%s.driver", pu);
+      final String configUrl = String.format("db.%s.url", pu);
+      final String configUser = String.format("db.%s.user", pu);
+      final String configPassword = String.format("db.%s.password", pu);
+
+      jndiName = settings.get(configDataSource);
+      jdbcDriver = settings.get(configDriver);
+      jdbcUrl = settings.get(configUrl);
+      jdbcUser = settings.get(configUser);
+      jdbcPassword = settings.get(configPassword);
+
+      jdbcBatchSize = settings.getInt(CONFIG_BATCH_SIZE, DEFAULT_BATCH_SIZE);
+      jdbcFetchSize = settings.getInt(CONFIG_FETCH_SIZE, DEFAULT_FETCH_SIZE);
 
       cacheMode = evaluate(xpath, XPATH_ROOT, XPATH_SHARED_CACHE_MODE, document);
 
@@ -146,13 +153,6 @@ public class DBHelper {
         jdbcUser = evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_USER, document);
         jdbcPassword = evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_PASSWORD, document);
       }
-      if (isBlank(jndiName) && isBlank(jdbcDriver)) {
-        jdbcDriver = evaluate(xpath, XPATH_ROOT_TEST, XPATH_PERSISTENCE_DRIVER, document);
-        jdbcUrl = evaluate(xpath, XPATH_ROOT_TEST, XPATH_PERSISTENCE_URL, document);
-        jdbcUser = evaluate(xpath, XPATH_ROOT_TEST, XPATH_PERSISTENCE_USER, document);
-        jdbcPassword = evaluate(xpath, XPATH_ROOT_TEST, XPATH_PERSISTENCE_PASSWORD, document);
-      }
-
     } catch (Exception e) {
     }
   }
