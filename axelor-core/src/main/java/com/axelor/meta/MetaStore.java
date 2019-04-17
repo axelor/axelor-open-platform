@@ -17,6 +17,8 @@
  */
 package com.axelor.meta;
 
+import static com.axelor.common.StringUtils.isBlank;
+
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
@@ -35,6 +37,7 @@ import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonModel;
 import com.axelor.meta.db.MetaJsonRecord;
+import com.axelor.meta.db.MetaPermissionRule;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.db.repo.MetaJsonModelRepository;
 import com.axelor.meta.loader.ModuleManager;
@@ -236,6 +239,48 @@ public final class MetaStore {
     return data;
   }
 
+  private static Map<String, Object> checkPermissions(
+      Map<String, Object> fields, String object, String jsonField) {
+    final User user = AuthUtils.getUser();
+    final MetaPermissions perms = Beans.get(MetaPermissions.class);
+    final Map<String, Object> result = new HashMap<>();
+
+    for (Map.Entry<String, Object> item : fields.entrySet()) {
+      String name = jsonField == null ? item.getKey() : jsonField + "." + item.getKey();
+      MetaPermissionRule rule = perms.findRule(user, object, name);
+      @SuppressWarnings("unchecked")
+      Map<String, Object> attrs = (Map<String, Object>) item.getValue();
+
+      if (rule == null) {
+        result.put(item.getKey(), attrs);
+        continue;
+      }
+
+      if (rule.getCanRead() != Boolean.TRUE) {
+        continue;
+      }
+
+      if (!attrs.containsKey("readonlyIf") && rule.getReadonlyIf() != null) {
+        attrs.put("readonlyIf", rule.getReadonlyIf());
+      }
+
+      if (!attrs.containsKey("hideIf") && rule.getHideIf() != null) {
+        attrs.put("hideIf", rule.getHideIf());
+      }
+
+      if (rule.getCanWrite() != Boolean.TRUE) {
+        attrs.put("readonly", true);
+        if (isBlank(rule.getReadonlyIf())) {
+          attrs.remove("readonlyIf");
+        }
+      }
+
+      result.put(item.getKey(), attrs);
+    }
+
+    return result;
+  }
+
   public static Map<String, Object> findJsonFields(String modelName, String fieldName) {
     try {
       if (!Mapper.of(Class.forName(modelName)).getProperty(fieldName).isJson()) {
@@ -251,13 +296,17 @@ public final class MetaStore {
             .bind("field", fieldName)
             .order("id")
             .fetch();
-    return updateJsonFields(fields, fieldName);
+
+    final Map<String, Object> result = updateJsonFields(fields, fieldName);
+    return checkPermissions(result, modelName, fieldName);
   }
 
   public static Map<String, Object> findJsonFields(String jsonModel) {
     final MetaJsonModelRepository forms = Beans.get(MetaJsonModelRepository.class);
     final MetaJsonModel found = forms.findByName(jsonModel);
-    return found == null ? null : updateJsonFields(found.getFields(), "attrs");
+    if (found == null) return null;
+    final Map<String, Object> result = updateJsonFields(found.getFields(), "attrs");
+    return checkPermissions(result, jsonModel, null);
   }
 
   private static Map<String, Object> updateJsonFields(
