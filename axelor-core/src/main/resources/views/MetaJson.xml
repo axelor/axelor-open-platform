@@ -154,6 +154,7 @@
       <field name="onNew" />
       <field name="onSave" />
       <field name="formWidth" />
+      <field name="orderBy" />
     </panel>
     <panel title="Menu">
       <field name="menuTitle" title="Title"/>

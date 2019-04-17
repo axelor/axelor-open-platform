@@ -30,6 +30,8 @@ import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaView;
 import com.google.common.base.Objects;
 import com.google.inject.persist.Transactional;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 
 public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
@@ -75,14 +77,15 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
     }
 
     MetaView gridView = jsonModel.getGridView();
+    String orderBy = jsonModel.getOrderBy();
+
     if (gridView == null) {
       gridView = new MetaView();
       gridView.setType("grid");
       gridView.setModel(MetaJsonRecord.class.getName());
     }
-    gridView.setName("custom-model-" + jsonModel.getName() + "-grid");
-    gridView.setTitle(jsonModel.getTitle());
-    gridView.setXml(
+
+    StringBuilder gridXml =
         new StringBuilder()
             .append("<grid")
             .append(" name=")
@@ -96,11 +99,30 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
             .append(" model=")
             .append('"')
             .append(gridView.getModel())
-            .append('"')
-            .append(">\n")
-            .append("  <field name=\"attrs\" x-json-model=\"" + jsonModel.getName() + "\"/>\n")
-            .append("</grid>\n")
-            .toString());
+            .append('"');
+
+    if (!StringUtils.isBlank(orderBy)) {
+      String names =
+          Arrays.stream(orderBy.split(","))
+              .map(s -> s.trim())
+              .map(
+                  s -> {
+                    if (s.startsWith("-attrs.") || s.startsWith("attrs.")) return s;
+                    if (s.startsWith("-")) return "-attrs." + s.substring(1);
+                    return "attrs." + s;
+                  })
+              .collect(Collectors.joining(","));
+      gridXml.append(" orderBy=").append('"').append(names).append('"');
+    }
+
+    gridXml
+        .append(">\n")
+        .append("  <field name=\"attrs\" x-json-model=\"" + jsonModel.getName() + "\"/>\n")
+        .append("</grid>\n");
+
+    gridView.setName("custom-model-" + jsonModel.getName() + "-grid");
+    gridView.setTitle(jsonModel.getTitle());
+    gridView.setXml(gridXml.toString());
 
     String onNew = jsonModel.getOnNew();
     String onSave = jsonModel.getOnSave();
