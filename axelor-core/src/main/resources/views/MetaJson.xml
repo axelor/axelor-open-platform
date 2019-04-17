@@ -14,6 +14,7 @@
     <option value="panel">Panel</option>
     <option value="enum">Enum</option>
     <option value="button">Button</option>
+    <option value="label">Label</option>
     <option value="separator">Separator</option>
     <option value="many-to-one">ManyToOne</option>
     <option value="many-to-many">ManyToMany</option>
