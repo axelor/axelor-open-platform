@@ -277,7 +277,9 @@ public class RestService extends ResourceService {
     while ((read = in.read(bytes)) != -1) {
       out.write(bytes, 0, read);
     }
+    out.flush();
     out.close();
+    in.close();
   }
 
   private String getFileName(MultivaluedMap<String, String> headers) {
