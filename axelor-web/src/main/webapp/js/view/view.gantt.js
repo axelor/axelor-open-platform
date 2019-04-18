@@ -789,7 +789,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 
       var popup = editor.isolateScope();
       popup.setEditable(true);
-      
+
         if(isNew && schema.taskParent && task.parent && !record[schema.taskParent]){
           var parentTask = gantt.getTask(task.parent);
           var parentRecord = parentTask.record;
@@ -797,7 +797,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
             record[schema.taskParent] = parentRecord;
           }
         }
-           
+
       popup.show(record, function(result) {
         task.isNew = isNew;
         task = updateTask(task, result);
