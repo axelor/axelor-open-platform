@@ -1146,26 +1146,43 @@ label.has-help > span:after,
   min-height: inherit;
 }
 
-.image-select > img {
-  position: absolute;
-  top: 5px;
-  left: 8px;
+.image-select {
+  display: flex;
+  align-items: center;
 }
 
-.image-select.readonly > img {
+.image-select > img,
+.image-select > i.fa {
+  position: absolute;
+  max-height: 18px;
+  height: 18px;
+  width: 18px;
+}
+
+.image-select.readonly > img,
+.image-select.readonly > i.fa {
   position: initial;
 }
 
 .image-select input {
-  padding-left: 28px;
+  padding-left: 18px !important;
 }
 
 .empty > .image-select input {
   padding-left: 8px;
 }
 
-.image-select-item img {
-  margin-right: 8px;
+.image-select-item img,
+.image-select-item i.fa {
+  margin-right: 6px;
+  max-height: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.image-select-item > a {
+  display: flex;
+  align-items: center;
 }
 
 .multi-object-select fieldset,

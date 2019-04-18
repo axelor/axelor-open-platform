@@ -446,6 +446,7 @@ ui.formInput('ImageSelect', 'Select', {
 
     scope.$watch('getValue()', function selectFieldValueWatch(value, old) {
       scope.image = scope.findImage(value);
+      scope.isIcon = scope.image && scope.image.indexOf('fa-') === 0;
       element.toggleClass('empty', !value);
     }.bind(this));
   },
@@ -459,8 +460,15 @@ ui.formInput('ImageSelect', 'Select', {
     });
 
     scope.renderSelectItem = function(ul, item) {
-      var a = $("<a>").append($("<img>").attr("src", scope.findImage(item.value)));
+      var a = $("<a>");
       var el = $("<li>").addClass("image-select-item").append(a).appendTo(ul);
+      var image = scope.findImage(item.value);
+
+      if (image && image.indexOf('fa-') === 0) {
+        a.append($("<i>").addClass("fa").addClass(image));
+      } else {
+        a.append($("<img>").attr("src", image));
+      }
 
       if (scope.canShowText()) {
         a.append($("<span></span>").html(item.label));
@@ -471,12 +479,14 @@ ui.formInput('ImageSelect', 'Select', {
   },
   template_readonly:
     '<span class="image-select readonly">'+
-      '<img ng-src="{{image}}"></img> <span ng-show="canShowText()">{{text}}</span>' +
+      '<i ng-if="isIcon" class="fa" ng-class="image"></i>'+
+      '<img ng-if="!isIcon" ng-src="{{image}}"></img> <span ng-show="canShowText()">{{text}}</span>' +
     '</span>',
 
   template_editable:
     '<span class="picker-input image-select">'+
-      '<img ng-src="{{image}}"></img>' +
+      '<i ng-if="isIcon" class="fa" ng-class="image"></i>'+
+      '<img ng-if="!isIcon" ng-src="{{image}}"></img>' +
       '<input type="text" autocomplete="off">'+
       '<span class="picker-icons">'+
         '<i class="fa fa-caret-down" ng-click="showSelection()"></i>'+
