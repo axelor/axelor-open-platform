@@ -986,19 +986,17 @@ ui.directive('uiPortletGrid', function(){
       var _action = $scope._viewAction;
       var _field = $scope.field || {};
 
-      if (_field.readonly || _field.readonlyIf !== undefined) {
-        $scope.onGridInit = function (grid, inst) {
-          var editCol = _.findWhere(inst.cols, {id: '_edit_column'}) || {};
-          editCol.descriptor = { hidden : true };
-          $scope.$parent.$watch("attr('readonly')", function (readonly) {
-            if (inst.editable) {
-              grid.setOptions({ editable: readonly });
-            }
-            inst.showColumn('_edit_column', !readonly);
-            editCol.descriptor = { hidden : readonly };
-          });
-        };
-      }
+      $scope.onGridInit = function (grid, inst) {
+        var editCol = _.findWhere(inst.cols, {id: '_edit_column'}) || {};
+        editCol.descriptor = { hidden : true };
+        $scope.$parent.$watch("isReadonly()", function (readonly) {
+          if (inst.editable) {
+            grid.setOptions({ editable: readonly });
+          }
+          inst.showColumn('_edit_column', !readonly);
+          editCol.descriptor = { hidden : readonly };
+        });
+      };
 
       $scope.filter = function (searchFilter) {
         var opts = _.extend({}, searchFilter, {
