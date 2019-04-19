@@ -341,6 +341,7 @@
           if (!item.viewer) {
             item.editor.viewer = true;
           }
+          editor.items.sort(function (x, y) { return x.sequence - y.sequence; });
         }
       });
 
