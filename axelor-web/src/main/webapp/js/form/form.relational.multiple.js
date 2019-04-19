@@ -850,6 +850,7 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
               memo[item.id] = item;
               return memo;
             }, {});
+            model.$render();
           });
         }
       }, true);
