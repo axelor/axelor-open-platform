@@ -321,7 +321,7 @@
               field.type = 'many-to-many';
               field.canSelect = false;
             }
-            if (field.type == 'separator' || field.type == 'many-to-many') {
+            if (field.type == 'separator' || (field.type == 'many-to-many' && !field.widget)) {
               field.showTitle = false;
               field.colSpan = colSpan || 12;
             }
