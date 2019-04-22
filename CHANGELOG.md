@@ -1,6 +1,44 @@
-## 5.1.0 (current)
+## 5.1.0-rc1 (22-04-2019)
 
-TBD
+#### New Features
+
+* New event system similar to CDI 2.0 event api
+* Support for JPA event listeners
+* Complete re-write of view extensions
+
+#### Enhancements
+
+* Major refactoring in auth api
+* Improved xml view handling
+* Prevent initial data fetch in grid view with `x-no-fetch="true"`
+* Support for custom action on chart dashlet with `onAction` attribute
+* Improved user preferences view
+* Add support for forcing user to change password
+* Logout user if password is changed
+* Add ability to specify free search fields
+* Improve DMS loading performance
+* Add menubar to cards view
+* Support for sharable DMS file URLs
+* Delete attachments when record is deleted
+* Check for DMS permissions when making zip
+* Give and remove DMS permissions recursively
+* Add image and pdf preview into DMS file form
+* Only generate menu for custom models if menu title is provided
+* Support for settings form width for custom model
+* Support for setting column sequence for custom model
+* Support for 'orderBy' on custom models
+* Support for label fields in custom model
+* Support for field permission on custom model and custom fields
+* Support for font-awesome icons in image-select widget
+
+#### Bugs
+
+* Fix tag-select widget issue with custom fields
+* Fix @RequestScoped services in unit tests
+* Fix date search in grid view when user is in different time zone
+* Fix I18n message bundle cache causing wrong bundle update
+* Fix DMS file rename issue
+* Fix @RequestScoped services when used with quartz scheduler
 
 ## 5.0.14 (2019-04-17)
 
