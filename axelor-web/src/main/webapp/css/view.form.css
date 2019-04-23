@@ -709,10 +709,11 @@ form.readonly .form-item-container:hover .hot-edit-icon {
 
 table.field-details {
   margin-bottom: 0;
+  max-width: 480px;
 }
 
 table.field-details th {
-  width: 5%;
+  width: 1px;
   text-align: right;
   font-weight: 600;
 }
