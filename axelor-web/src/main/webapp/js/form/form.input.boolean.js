@@ -33,7 +33,9 @@ ui.formInput('Boolean', {
   link: function (scope, element, attrs, model) {
 
     element.on('click', 'input:not(.no-toggle)', function (e) {
-      scope.setValue(e.target.checked, true);
+      var value = $(e.target).data('value');
+      var checked = value === undefined ? e.target.checked : value;
+      scope.setValue(checked, true);
     });
 
     Object.defineProperty(scope, '$value', {
