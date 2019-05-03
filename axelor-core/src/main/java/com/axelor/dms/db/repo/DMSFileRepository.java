@@ -81,7 +81,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
     return all()
         .filter(
             ""
-                + "self.isDirectory = TRUE "
+                + "COALESCE(self.isDirectory, FALSE) = TRUE "
                 + "AND self.relatedId = :id "
                 + "AND self.relatedModel = :model "
                 + "AND self.parent.relatedModel = :model "
@@ -214,14 +214,14 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
    * @return home parent
    */
   protected DMSFile findOrCreateHome(Model related) {
-    final DMSFile dmsRootParent = getRootParent(related);
     final List<Filter> dmsRootFilters =
         Lists.newArrayList(
             new JPQLFilter(
                 ""
-                    + "self.isDirectory = TRUE "
+                    + "COALESCE(self.isDirectory, FALSE) = TRUE "
                     + "AND self.relatedModel = :model "
                     + "AND COALESCE(self.relatedId, 0) = 0"));
+    final DMSFile dmsRootParent = getRootParent(related);
 
     if (dmsRootParent != null) {
       dmsRootFilters.add(new JPQLFilter("self.parent = :rootParent"));

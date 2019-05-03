@@ -29,6 +29,7 @@ import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaSecurity;
+import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.QueryBinder;
@@ -1233,6 +1234,10 @@ public class Resource<T extends Model> {
     firePostRequestEvent(RequestEvent.FETCH_NAME, req, response);
 
     return response;
+  }
+
+  public boolean isPermitted(AccessType accessType, Long id) {
+    return security.get().isPermitted(accessType, model, id);
   }
 
   public static Map<String, Object> toMap(Object bean, String... names) {

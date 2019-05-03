@@ -21,14 +21,17 @@ import static com.axelor.common.ObjectUtils.isEmpty;
 
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
+import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.Repository;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.dms.db.DMSFile;
 import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailAddress;
 import com.axelor.mail.db.MailFollower;
@@ -38,7 +41,6 @@ import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.mail.service.MailService;
 import com.axelor.mail.web.MailController;
 import com.axelor.meta.MetaFiles;
-import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaFileRepository;
 import com.axelor.meta.service.MetaService;
@@ -54,6 +56,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import com.google.inject.servlet.RequestScoped;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,6 +68,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -174,14 +181,28 @@ public class RestService extends ResourceService {
   @POST
   @Path("{id}/fetch")
   public Response fetch(@PathParam("id") long id, Request request) {
-    if (request == null) {
+    final User user = AuthUtils.getUser();
+
+    if (request == null || user == null) {
       return fail();
     }
+
     request.setModel(getModel());
     Response response = getResource().fetch(id, request);
+
     long attachments =
-        Query.of(MetaAttachment.class)
-            .filter("self.objectId = ?1 AND self.objectName = ?2", id, getModel())
+        Query.of(DMSFile.class)
+            .filter(
+                "self.relatedId = :id AND self.relatedModel = :model "
+                    + "AND COALESCE(self.isDirectory, FALSE) = FALSE "
+                    + "AND (self.permissions.group = :group "
+                    + "OR self.permissions.user = :user "
+                    + "OR :isAdmin = TRUE)")
+            .bind("id", id)
+            .bind("model", getModel())
+            .bind("group", user.getGroup())
+            .bind("user", user)
+            .bind("isAdmin", AuthUtils.isAdmin(user))
             .cacheable()
             .count();
 
@@ -384,10 +405,72 @@ public class RestService extends ResourceService {
   public javax.ws.rs.core.Response download(
       @PathParam("id") Long id,
       @PathParam("field") String field,
-      @QueryParam("image") boolean isImage)
+      @QueryParam("image") boolean isImage,
+      @QueryParam("parentId") Long parentId,
+      @QueryParam("parentModel") String parentModel)
       throws IOException {
 
     final Class klass = getResource().getModel();
+    boolean permittedByParent = false;
+
+    if (MetaFile.class.isAssignableFrom(klass)) {
+      // Check for permission on parent record.
+      if (parentId != null && StringUtils.notBlank(parentModel)) {
+        try {
+          final Class<? extends Model> parentClass =
+              (Class<? extends Model>) Class.forName(parentModel);
+          final Model parent = JpaRepository.of(parentClass).find(parentId);
+          if (parent != null) {
+            for (final PropertyDescriptor propertyDescriptor :
+                Introspector.getBeanInfo(parentClass).getPropertyDescriptors()) {
+              final Method readMethod = propertyDescriptor.getReadMethod();
+              if (readMethod != null && klass.isAssignableFrom(readMethod.getReturnType())) {
+                final Model bean = (Model) readMethod.invoke(parent);
+                if (bean != null && bean.getId().equals(id)) {
+                  permittedByParent =
+                      Beans.get(JpaSecurity.class)
+                          .isPermitted(JpaSecurity.CAN_READ, parentClass, parentId);
+                  break;
+                }
+              }
+            }
+          }
+        } catch (ClassNotFoundException
+            | IntrospectionException
+            | IllegalAccessException
+            | IllegalArgumentException
+            | InvocationTargetException e) {
+          // Ignore
+        }
+      }
+
+      // Check for permission on DMS file.
+      if (!permittedByParent) {
+        final User user = AuthUtils.getUser();
+
+        if (user != null) {
+          if (JpaRepository.of(DMSFile.class)
+                  .all()
+                  .filter(
+                      ""
+                          + "self.metaFile.id = :id "
+                          + "AND (self.permissions.group = :group "
+                          + "OR self.permissions.user = :user)")
+                  .bind("id", id)
+                  .bind("group", user.getGroup())
+                  .bind("user", user)
+                  .fetchOne()
+              != null) {
+            permittedByParent = true;
+          }
+        }
+      }
+    }
+
+    if (!permittedByParent && !getResource().isPermitted(JpaSecurity.CAN_READ, id)) {
+      return javax.ws.rs.core.Response.status(Status.FORBIDDEN).build();
+    }
+
     final Mapper mapper = Mapper.of(klass);
     final Model bean = JPA.find(klass, id);
 

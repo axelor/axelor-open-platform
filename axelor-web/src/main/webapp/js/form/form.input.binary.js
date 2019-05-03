@@ -24,7 +24,7 @@ var ui = angular.module('axelor.ui');
 var BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 var META_FILE = "com.axelor.meta.db.MetaFile";
 
-function makeURL(model, field, recordOrId, version) {
+function makeURL(model, field, recordOrId, version, scope) {
   var value = recordOrId;
   if (!value) return null;
   var id = value.id ? value.id : value;
@@ -33,7 +33,11 @@ function makeURL(model, field, recordOrId, version) {
   if (ver === undefined || ver === null) ver = value.$version;
   if (ver === undefined || ver === null) ver = (new Date()).getTime();
   if (!id || id <= 0) return null;
-  return "ws/rest/" + model + "/" + id + "/" + field + "/download?v=" + ver;
+  var url = "ws/rest/" + model + "/" + id + "/" + field + "/download?v=" + ver;
+  if (scope && scope.record) {
+    url += "&parentId=" + scope.record.id + "&parentModel=" + scope._model;
+  }
+  return url;
 }
 
 ui.makeImageURL = makeURL;
@@ -124,11 +128,11 @@ ui.formInput('Image', 'ImageLink', {
           return value;
         }
         if (record.id) {
-          return makeURL(model, field.name, record) + "&image=true";
+          return makeURL(model, field.name, record, undefined, scope) + "&image=true";
         }
         return BLANK;
       }
-      return value ? makeURL(META_FILE, "content", (value.id || value), value.version || value.$version) : BLANK;
+      return value ? makeURL(META_FILE, "content", (value.id || value), value.version || value.$version, scope) : BLANK;
     };
   },
 
@@ -279,7 +283,7 @@ ui.formInput('Binary', {
     scope.doSave = function() {
       var record = scope.record;
       var model = scope._model;
-      var url = makeURL(model, field.name, record);
+      var url = makeURL(model, field.name, record, undefined, scope);
       ui.download(url, record.fileName || field.name);
     };
 
@@ -378,7 +382,7 @@ ui.formInput('BinaryLink', {
     scope.doSave = function() {
       var value = model.$viewValue;
       var version = value ? (value.version || value.$version) : undefined;
-      var url = makeURL(META_FILE, "content", value, version);
+      var url = makeURL(META_FILE, "content", value, version, scope);
       ui.download(url, scope.text);
     };
 

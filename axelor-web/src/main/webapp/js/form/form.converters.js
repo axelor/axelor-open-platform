@@ -173,7 +173,8 @@
     var v = record.version || record.$version || 0;
     var n = record.id;
     if (n > 0) {
-      return "ws/rest/" + model + "/" + n + "/" + imageName + "/download?image=true&v=" + v;
+      return "ws/rest/" + model + "/" + n + "/" + imageName + "/download?image=true&v=" + v
+        + "&parentId=" + scope.record.id + "&parentModel=" + scope._model;
     }
     return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
   };

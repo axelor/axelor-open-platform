@@ -22,6 +22,7 @@ import com.axelor.auth.db.User;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
+import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.dms.db.DMSFile;
@@ -369,6 +370,17 @@ public class DmsService {
     final List<?> ids = findBatchIds(batchOrId);
     if (ids == null) {
       return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+    }
+
+    final Long[] idArray =
+        ids.stream()
+            .map(
+                id ->
+                    id instanceof Number ? ((Number) id).longValue() : Long.valueOf(id.toString()))
+            .toArray(Long[]::new);
+
+    if (!Beans.get(JpaSecurity.class).isPermitted(JpaSecurity.CAN_READ, DMSFile.class, idArray)) {
+      return javax.ws.rs.core.Response.status(Status.FORBIDDEN).build();
     }
 
     final List<DMSFile> records =

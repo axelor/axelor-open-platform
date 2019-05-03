@@ -1646,9 +1646,10 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
       };
 
       $scope.countAttachments = function (forScope, done) {
-        var ds = DataSource.create("com.axelor.meta.db.MetaAttachment");
+        var ds = DataSource.create("com.axelor.dms.db.DMSFile");
         var record = forScope.record;
-        var domain = "self.objectName = :name AND self.objectId = :id";
+        var domain = "self.relatedModel = :name AND self.relatedId = :id " +
+            "AND COALESCE(self.isDirectory, FALSE) = FALSE";
         var context = {name: forScope._model, id: record.id };
         var promise = ds.search({
           fields: ['id'],

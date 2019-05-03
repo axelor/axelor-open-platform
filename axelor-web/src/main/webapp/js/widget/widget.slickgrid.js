@@ -539,13 +539,13 @@ _.extend(Factory.prototype, {
       var url = null;
       if (field.target === "com.axelor.meta.db.MetaFile") {
         if (value) {
-          url = ui.makeImageURL("com.axelor.meta.db.MetaFile", "content", (value.id || value));
+          url = ui.makeImageURL("com.axelor.meta.db.MetaFile", "content", (value.id || value), undefined, this.grid.handler);
         }
         if (url && widget.toLowerCase() === "binary-link") {
           return '<a href="' + url + '" download="' + value.fileName + '">' + value.fileName + '</a>';
         }
       } else {
-        url = ui.makeImageURL(this.grid.handler._model, field.name, dataContext) + "&image=true";
+        url = ui.makeImageURL(this.grid.handler._model, field.name, dataContext, undefined, this.grid.handler) + "&image=true";
       }
       return url ? '<img src="' + url + '" style="height: 21px;margin-top: -2px;">' : '';
     }
