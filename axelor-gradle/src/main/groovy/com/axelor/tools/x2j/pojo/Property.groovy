@@ -568,13 +568,16 @@ class Property {
           return null
         
         if (precision == null)
-          throw new IllegalArgumentException("invalid use of 'scale' without 'precision'");
+          throw new IllegalArgumentException("${entity.name}.$name: invalid use of 'scale' without 'precision'");
 
         if (scale == null)
-          throw new IllegalArgumentException("invalid use of 'precision' without 'scale'");
+          throw new IllegalArgumentException("${entity.name}.$name: invalid use of 'precision' without 'scale'");
 
 		precision = precision as Integer
 		scale = scale as Integer
+
+        if (scale > precision)
+          throw new IllegalArgumentException("${entity.name}.$name: 'scale' ($scale) must be less than or equal to the 'precision' ($precision)");
 
 		annon("javax.validation.constraints.Digits", false)
 				.add("integer", (precision - scale) as String, false)
