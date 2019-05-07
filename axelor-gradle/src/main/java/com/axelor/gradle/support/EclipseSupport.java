@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
-import org.gradle.composite.internal.IncludedBuildInternal;
+import org.gradle.composite.internal.DefaultIncludedBuild;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin;
 import org.gradle.plugins.ide.eclipse.model.AccessRule;
@@ -82,7 +82,7 @@ public class EclipseSupport extends AbstractSupport {
                 .getGradle()
                 .getIncludedBuilds()
                 .stream()
-                .map(ib -> ((IncludedBuildInternal) ib).getConfiguredBuild().getRootProject())
+                .map(ib -> ((DefaultIncludedBuild) ib).getConfiguredBuild().getRootProject())
                 .flatMap(
                     ib -> Stream.concat(Arrays.asList(ib).stream(), ib.getSubprojects().stream()))
                 .filter(ip -> ip.getPlugins().hasPlugin(EclipseWtpPlugin.class))

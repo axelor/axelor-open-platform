@@ -72,8 +72,8 @@ task generateChangeLog(type: com.axelor.gradle.tasks.GenerateChangeLog) {
   }
 }
 
-task wrapper(type: Wrapper) {
-  gradleVersion = "4.4.1"
+wrapper {
+  gradleVersion = "5.4.1"
 }
 
 apply from: "gradle/javadoc.gradle"

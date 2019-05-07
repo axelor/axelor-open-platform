@@ -46,6 +46,7 @@ public class AxelorPlugin implements Plugin<Project> {
 
   public static final boolean GRADLE_VERSION_3_X = GRADLE_VERSION.startsWith("3");
   public static final boolean GRADLE_VERSION_4_X = GRADLE_VERSION.startsWith("4");
+  public static final boolean GRADLE_VERSION_5_X = GRADLE_VERSION.startsWith("5");
 
   public static File getClassOutputDir(Project project, String sourceType) {
     return GRADLE_VERSION_3_X

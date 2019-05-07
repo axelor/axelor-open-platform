@@ -28,9 +28,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import org.gradle.api.GradleException;
-import org.gradle.api.internal.tasks.options.Option;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.options.Option;
 
 public class DbTask extends JavaExec {
 

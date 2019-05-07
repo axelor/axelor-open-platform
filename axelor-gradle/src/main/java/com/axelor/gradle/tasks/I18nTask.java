@@ -21,8 +21,8 @@ import com.axelor.gradle.AxelorPlugin;
 import com.axelor.tools.i18n.I18nExtractor;
 import java.nio.file.Paths;
 import org.gradle.api.DefaultTask;
-import org.gradle.api.internal.tasks.options.Option;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.options.Option;
 
 public class I18nTask extends DefaultTask {
 

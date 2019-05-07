@@ -38,7 +38,7 @@ import java.util.stream.Stream;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.invocation.Gradle;
-import org.gradle.composite.internal.IncludedBuildInternal;
+import org.gradle.composite.internal.DefaultIncludedBuild;
 
 public class HotswapSupport extends AbstractSupport {
 
@@ -151,7 +151,7 @@ public class HotswapSupport extends AbstractSupport {
         .getIncludedBuilds()
         .forEach(
             b -> {
-              Gradle included = ((IncludedBuildInternal) b).getConfiguredBuild();
+              Gradle included = ((DefaultIncludedBuild) b).getConfiguredBuild();
               included
                   .getRootProject()
                   .getAllprojects()
@@ -187,7 +187,7 @@ public class HotswapSupport extends AbstractSupport {
         .getIncludedBuilds()
         .forEach(
             b -> {
-              Gradle included = ((IncludedBuildInternal) b).getConfiguredBuild();
+              Gradle included = ((DefaultIncludedBuild) b).getConfiguredBuild();
               included
                   .getRootProject()
                   .getAllprojects()

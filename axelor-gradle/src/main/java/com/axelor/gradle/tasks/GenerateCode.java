@@ -47,7 +47,7 @@ import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectories;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.util.PatternSet;
-import org.gradle.composite.internal.IncludedBuildInternal;
+import org.gradle.composite.internal.DefaultIncludedBuild;
 
 public class GenerateCode extends DefaultTask {
 
@@ -185,7 +185,7 @@ public class GenerateCode extends DefaultTask {
                 .getGradle()
                 .getIncludedBuilds()
                 .stream()
-                .map(b -> ((IncludedBuildInternal) b).getConfiguredBuild().getRootProject())
+                .map(b -> ((DefaultIncludedBuild) b).getConfiguredBuild().getRootProject())
                 .map(p -> p.findProject(path))
                 .findFirst()
                 .orElse(null);

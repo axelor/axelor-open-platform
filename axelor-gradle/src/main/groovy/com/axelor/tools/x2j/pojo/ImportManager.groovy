@@ -32,7 +32,14 @@ class ImportManager {
 	ImportManager(String base, boolean groovy) {
 		this.base = base
 		this.groovy = groovy
-	}
+
+        // Add List#removeLast if it doesn't exist.
+        // Behavior of List#pop has changed since Groovy 2.5:
+        // http://docs.groovy-lang.org/latest/html/groovy-jdk/java/util/List.html#pop()
+        if (!List.metaClass.getMetaMethod("removeLast")) {
+            List.metaClass.removeLast { -> delegate.remove(delegate.size() - 1) }
+        }
+    }
 
 	String importType(String fqn) {
 
@@ -40,14 +47,14 @@ class ImportManager {
 		if (parts.size() == 1)
 			return fqn
 
-		String simpleName = parts.pop()
+		String simpleName = parts.removeLast()
 		def name = simpleName
 		
 		if (name == 'class') {
-			simpleName = parts.pop()
+			simpleName = parts.removeLast()
 			name = simpleName
 		} else if (name ==~ /[A-Z_]+/ && parts.last() ==~ /[A-Z_].*/) {
-			simpleName = parts.pop()
+			simpleName = parts.removeLast()
 			name = simpleName + "." + name
 		}
 
@@ -116,7 +123,7 @@ class ImportManager {
 			return all
 		}
 
-		all.pop()
+		all.removeLast()
 
 		return all.collect {
 			it == null ? "" : "import " + it + ";"

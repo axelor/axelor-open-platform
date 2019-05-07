@@ -32,11 +32,11 @@ import java.util.stream.Collectors;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.internal.tasks.options.Option;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.options.Option;
 
 public class TomcatRun extends JavaExec {
 
