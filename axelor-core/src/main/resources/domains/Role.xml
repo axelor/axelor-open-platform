@@ -7,7 +7,7 @@
 
   <entity name="Role">
     <![CDATA[
-    This object store the roles.
+    This object stores the roles.
     ]]>
     <string name="name" required="true" unique="true" />
     <string name="description" />

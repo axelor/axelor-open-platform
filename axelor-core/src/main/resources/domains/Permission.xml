@@ -7,7 +7,7 @@
 
   <entity name="Permission" cacheable="true">
     <![CDATA[
-    This object store the permissions.
+    This object stores the permissions.
     ]]>
 
     <string name="name" required="true" unique="true" help="An unique permission name."/>

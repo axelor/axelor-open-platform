@@ -7,7 +7,7 @@
 
   <entity name="User" cacheable="true">
     <![CDATA[
-    This object store the users.
+    This object stores the users.
     ]]>
 
     <string name="code" required="true" unique="true" min="2" title="Login"/>

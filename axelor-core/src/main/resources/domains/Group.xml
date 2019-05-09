@@ -7,7 +7,7 @@
 
   <entity name="Group" cacheable="true">
     <![CDATA[
-    This object store the groups.
+    This object stores the groups.
     ]]>
 
     <string name="code" required="true" unique="true" min="2"/>

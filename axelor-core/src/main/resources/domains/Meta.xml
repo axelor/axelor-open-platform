@@ -7,7 +7,7 @@
 
   <entity name="MetaModule" table="META_MODULE" cacheable="true">
     <![CDATA[
-    This object store the modules.
+    This object stores the modules.
     ]]>
 
     <string name="name" required="true" unique="true"/>
@@ -24,7 +24,7 @@
 
   <entity name="MetaView" table="META_VIEW" cacheable="true">
     <![CDATA[
-    This object store the xml views.
+    This object stores the xml views.
     ]]>
 
     <string name="name" required="true"/>
@@ -95,7 +95,7 @@
 
   <entity name="MetaMenu" table="META_MENU" cacheable="true">
     <![CDATA[
-    This object store the menus.
+    This object stores the menus.
     ]]>
 
   <integer name="priority" />
@@ -135,7 +135,7 @@
 
   <entity name="MetaActionMenu" table="META_ACTION_MENU" cacheable="true">
     <![CDATA[
-    This object store the actions menu.
+    This object stores the actions menu.
     ]]>
 
     <integer name="priority" />
@@ -156,7 +156,7 @@
 
   <entity name="MetaAction" table="META_ACTION" cacheable="true">
     <![CDATA[
-    This object store the xml actions.
+    This object stores the xml actions.
     ]]>
 
     <integer name="priority" />
@@ -175,14 +175,14 @@
 
   <entity name="MetaEnum" table="META_ENUM" cacheable="true">
     <![CDATA[
-    This object store the enum types.
+    This object stores the enum types.
     ]]>
     <string name="name" required="true" unique="true" />
   </entity>
 
   <entity name="MetaSelect" table="META_SELECT" cacheable="true">
     <![CDATA[
-    This object store the selects.
+    This object stores the selects.
     ]]>
     <string name="xmlId" unique="true" />
     <string name="name" required="true"/>
@@ -197,7 +197,7 @@
 
   <entity name="MetaSelectItem" table="META_SELECT_ITEM" cacheable="true">
     <![CDATA[
-    This object store the select items.
+    This object stores the select items.
     ]]>
 
     <string name="title" required="true" namecolumn="true" help="The select item title" />
@@ -211,7 +211,7 @@
 
   <entity name="MetaModel" table="META_MODEL" cacheable="true">
     <![CDATA[
-    This object store the models.
+    This object stores the models.
     ]]>
 
     <string name="name" title="Name" required="true"/>
@@ -223,7 +223,7 @@
 
   <entity name="MetaField" table="META_FIELD" cacheable="true">
     <![CDATA[
-    This object store the fields.
+    This object stores the fields.
     ]]>
 
     <many-to-one name="metaModel" ref="MetaModel" />
@@ -258,7 +258,7 @@
 
   <entity name="MetaFile" table="META_FILE">
     <![CDATA[
-    This object store the files.
+    This object stores the files.
     ]]>
     <string name="fileName" required="true" namecolumn="true"/>
     <string name="filePath" required="true"/>

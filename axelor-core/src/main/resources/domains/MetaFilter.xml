@@ -8,7 +8,7 @@
 
   <entity name="MetaFilter" table="META_FILTER">
     <![CDATA[
-    This object store the custom filters.
+    This object stores the custom filters.
     ]]>
 
     <string name="name" required="true" />

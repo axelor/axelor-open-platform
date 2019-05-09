@@ -7,7 +7,7 @@
 
   <entity name="MetaSequence" table="META_SEQUENCE" sequential="false">
     <![CDATA[
-    This object store custom sequences.
+    This object stores custom sequences.
     ]]>
     <string name="name" required="true" unique="true" min="2" />
     <string name="prefix" />
