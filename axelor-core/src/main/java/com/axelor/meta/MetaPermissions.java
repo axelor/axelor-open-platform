@@ -58,6 +58,10 @@ public class MetaPermissions {
   }
 
   private MetaPermission find(User user, String object, String field) {
+    if (user == null) {
+      return null;
+    }
+
     MetaPermission permission = find(user.getMetaPermissions(), object, field);
     if (permission == null && user.getGroup() != null) {
       permission = find(user.getGroup().getMetaPermissions(), object, field);

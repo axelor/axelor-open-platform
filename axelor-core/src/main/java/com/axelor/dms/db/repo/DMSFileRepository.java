@@ -56,6 +56,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
@@ -190,7 +191,20 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
       entity.setParent(dmsHome);
     }
 
+    copyParentPermissions(entity);
+
     return super.save(entity);
+  }
+
+  private void copyParentPermissions(DMSFile entity) {
+    Optional.ofNullable(entity.getParent())
+        .map(DMSFile::getPermissions)
+        .ifPresent(
+            permissions ->
+                permissions
+                    .stream()
+                    .map(permission -> dmsPermissions.copy(permission, false))
+                    .forEach(entity::addPermission));
   }
 
   /**
@@ -228,7 +242,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
       dmsRoot.setRelatedModel(related.getClass().getName());
       dmsRoot.setIsDirectory(true);
       dmsRoot.setParent(dmsRootParent);
-      dmsRoot = super.save(dmsRoot); // Should get id before its child.
+      dmsRoot = save(dmsRoot); // Should get id before its child.
     }
 
     DMSFile dmsHome = findHomeByRelated(related);
@@ -253,7 +267,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
       dmsHome.setRelatedModel(related.getClass().getName());
       dmsHome.setParent(dmsRoot);
       dmsHome.setIsDirectory(true);
-      dmsHome = super.save(dmsHome); // Should get id before its child.
+      dmsHome = save(dmsHome); // Should get id before its child.
     }
 
     return dmsHome;
