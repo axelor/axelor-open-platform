@@ -1543,4 +1543,5 @@ label.has-help > span:after,
 
 :-ms-input-placeholder {
   font-size: 12px;
+  color: #777 !important;
 }
