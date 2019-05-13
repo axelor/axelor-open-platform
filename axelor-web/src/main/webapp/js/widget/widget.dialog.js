@@ -73,6 +73,33 @@ ui.directive('uiDialog', function() {
         buttons: buttons
       });
 
+      // fix IE11 issue
+      if (axelor.browser.msie && axelor.browser.rv) {
+        var headerHeight = 46;
+        var footerHeight = 52;
+        var dialogMargin = 64;
+
+        function onResize() {
+          var availableHeight = $(window).height() - headerHeight - footerHeight - dialogMargin - 8;
+          var contentHeight = element.children().height();
+          var myHeight = Math.min(availableHeight, contentHeight);
+          element.height(myHeight);
+        }
+
+        dialog.on('dialogopen', function (e, ui) {
+          $(window).on('resize', onResize);
+          setTimeout(onResize);
+        });
+        dialog.on('dialogclose', function (e, ui) {
+          $(window).off('resize', onResize);
+        });
+        scope.$on('$destroy', function() {
+          $(window).off('resize', onResize);
+        });
+        
+        element.addClass('ui-dialog-ie11');
+      }
+
       // focus the previous visible dialog
       dialog.on('dialogclose', function(e, ui){
         var target = element.data('$target');
