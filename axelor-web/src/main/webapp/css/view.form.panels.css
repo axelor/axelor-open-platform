@@ -439,6 +439,7 @@
 
 .panel-layout .editable > .o2m-list {
   display: table;
+  table-layout: fixed;
   width: 100%;
 }
 
@@ -450,6 +451,11 @@
 .panel-layout .editable > .o2m-list .o2m-list-row > span {
   display: table-cell;
   padding: 2px 0;
+  width: 100%;
+}
+
+.panel-layout .editable > .o2m-list table.form-layout {
+  table-layout: fixed;
 }
 
 .panel-layout .editable > .o2m-list .o2m-list-row > span.o2m-list-remove {
