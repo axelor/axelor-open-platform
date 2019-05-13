@@ -96,7 +96,7 @@ ui.directive('uiDialog', function() {
         scope.$on('$destroy', function() {
           $(window).off('resize', onResize);
         });
-        
+
         element.addClass('ui-dialog-ie11');
       }
 
