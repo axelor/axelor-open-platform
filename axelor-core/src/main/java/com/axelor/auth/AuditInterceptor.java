@@ -57,6 +57,7 @@ public class AuditInterceptor extends EmptyInterceptor {
 
   @Override
   public void afterTransactionCompletion(Transaction tx) {
+    tracker.get().clear();
     tracker.remove();
     currentUser.remove();
   }
