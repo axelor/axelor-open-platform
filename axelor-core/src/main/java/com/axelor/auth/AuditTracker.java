@@ -382,6 +382,14 @@ final class AuditTracker {
 
   /**
    * This method should be called from {@link
+   * AuditInterceptor#afterTransactionCompletion(Transaction)} method to clear the change recording.
+   */
+  public void clear() {
+    STORE.remove();
+  }
+
+  /**
+   * This method should be called from {@link
    * AuditInterceptor#beforeTransactionCompletion(Transaction)} method to finish change recording.
    *
    * @param tx the transaction in which the change tracking is being done
