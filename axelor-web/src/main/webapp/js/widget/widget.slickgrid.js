@@ -2385,9 +2385,18 @@ Grid.prototype.onButtonClick = function(event, args) {
       }
       return context;
     };
+
+    var old = _.extend({}, record);
+
     field.handler.onClick().then(function(res){
       delete that._buttonClickRunning;
-      delete field.handler.scope.record;
+
+      var current = field.handler.scope.record;
+      if (handlerScope.setValue && !handlerScope._dataSource.equals(old, current)) {
+        current.version = current.version === undefined ? current.$version : current.version;
+        handlerScope.setValue(data.getItems(), true);
+      }
+
       grid.invalidateRows([args.row]);
       grid.render();
     }, function () {
