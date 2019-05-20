@@ -30,7 +30,7 @@ public class ModulePlugin implements Plugin<Project> {
     project.getPlugins().apply(AxelorPlugin.class);
 
     // add core dependencies
-    project.getDependencies().add("compile", "com.axelor:axelor-core:" + version);
-    project.getDependencies().add("testCompile", "com.axelor:axelor-test:" + version);
+    project.getDependencies().add("implementation", "com.axelor:axelor-core:" + version);
+    project.getDependencies().add("testImplementation", "com.axelor:axelor-test:" + version);
   }
 }

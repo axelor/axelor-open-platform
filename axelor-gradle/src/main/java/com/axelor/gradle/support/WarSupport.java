@@ -45,7 +45,7 @@ public class WarSupport extends AbstractSupport {
     applyConfigurationLibs(project, "provided", "compileOnly");
 
     // add dependency to axelor-web
-    project.getDependencies().add("compile", "com.axelor:axelor-web:" + version);
+    project.getDependencies().add("implementation", "com.axelor:axelor-web:" + version);
     project.getDependencies().add("axelorWeb", "com.axelor:axelor-web:" + version);
 
     // copy webapp to root build dir

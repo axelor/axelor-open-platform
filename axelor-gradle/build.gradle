@@ -9,14 +9,14 @@ configurations {
 }
 
 dependencies {
-  testCompile	libs.junit
+  testImplementation libs.junit
 
-  compile project(':axelor-common')
+  implementation project(':axelor-common')
 
-  compile libs.guava
-  compile libs.opencsv
-  compile libs.plugin_license
-  compile libs.snakeyaml
+  implementation libs.guava
+  implementation libs.opencsv
+  implementation libs.plugin_license
+  implementation libs.snakeyaml
 
   tomcat libs.hotswap_agent
   tomcat project(":axelor-tomcat")

@@ -3,9 +3,9 @@ apply plugin: "eclipse"
 apply plugin: "idea"
 
 dependencies {
-  testCompile	libs.junit
+  testImplementation libs.junit
   if (project.name != "axelor-tomcat") {
-    compile libs.slf4j_logback
+    implementation libs.slf4j_logback
   }
 }
 

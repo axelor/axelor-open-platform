@@ -23,11 +23,11 @@ sourceSets {
 }
 
 dependencies {
-  compile libs.guava
-  compile libs.axelor_asm
-  compile libs.opencsv
-  compile libs.plugin_license
-  compile libs.snakeyaml
+  implementation libs.guava
+  implementation libs.axelor_asm
+  implementation libs.opencsv
+  implementation libs.plugin_license
+  implementation libs.snakeyaml
 }
 
 test.enabled = false

@@ -2,10 +2,10 @@ apply plugin: 'java'
 
 dependencies {
 
-  testCompile libs.junit
+  testImplementation libs.junit
 
-  compile libs.guava
-  compile libs.axelor_asm
+  implementation libs.guava
+  implementation libs.axelor_asm
 }
 
 configurations {

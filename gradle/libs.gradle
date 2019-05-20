@@ -7,6 +7,7 @@ versions.guava = "28.0-jre"
 versions.hibernate = "5.2.10.Final"
 versions.hibernate_validator = "5.4.1.Final"
 versions.hibernate_search = "5.7.0.Final"
+versions.hibernate_persistence = "1.0.2.Final"
 
 versions.groovy = "2.4.10"
 versions.resteasy = "3.1.2.Final"
@@ -91,6 +92,7 @@ libs.hibernate = [
     "org.hibernate:hibernate-validator:${versions.hibernate_validator}",
   "org.hibernate:hibernate-ehcache:${versions.hibernate}",
   "org.hibernate:hibernate-jcache:${versions.hibernate}",
+  "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:${versions.hibernate_persistence}"
 ]
 
 // Hibernate search
@@ -170,6 +172,10 @@ libs.pac4j = [
   "org.pac4j:pac4j-saml:${versions.pac4j}",
   "org.pac4j:pac4j-cas:${versions.pac4j}",
   "org.pac4j:pac4j-http:${versions.pac4j}"
+]
+
+libs.pac4j_core = [
+  "org.pac4j:pac4j-core:${versions.pac4j}"
 ]
 
 // Apache DS (for testing only)

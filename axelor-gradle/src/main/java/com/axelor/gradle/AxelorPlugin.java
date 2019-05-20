@@ -29,7 +29,7 @@ import java.io.File;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileTree;
-import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.plugins.JavaLibraryPlugin;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.compile.AbstractCompile;
@@ -57,7 +57,7 @@ public class AxelorPlugin implements Plugin<Project> {
   @Override
   public void apply(Project project) {
 
-    project.getPlugins().apply(JavaPlugin.class);
+    project.getPlugins().apply(JavaLibraryPlugin.class);
     project.getExtensions().create(AxelorExtension.EXTENSION_NAME, AxelorExtension.class);
 
     project.getPlugins().apply(JavaSupport.class);

@@ -2,22 +2,22 @@ apply plugin: "java"
 
 dependencies {
 
-  compile libs.junit
+  implementation libs.junit
 
-  compile	libs.guice
-  compile libs.guice_servlet
-  compile libs.guice_persist
+  implementation	libs.guice
+  implementation libs.guice_servlet
+  implementation libs.guice_persist
 
-  compile libs.jdbc_hsqldb
-  compile libs.jdbc_postgres
-  compile libs.hibernate
+  implementation libs.jdbc_hsqldb
+  implementation libs.jdbc_postgres
+  implementation libs.hibernate
 
   compileOnly libs.javax_el
   compileOnly libs.javax_servlet
 
-  compile libs.resteasy
-  compile libs.resteasy_guice
-  compile libs.resteasy_client
-  compile libs.resteasy_server
-  compile libs.jackson_libs
+  implementation libs.resteasy
+  implementation libs.resteasy_guice
+  implementation libs.resteasy_client
+  implementation libs.resteasy_server
+  implementation libs.jackson_libs
 }

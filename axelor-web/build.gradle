@@ -6,16 +6,20 @@ axelor {
 
 dependencies {
 
-  testCompile project(":axelor-test")
-  compile project(":axelor-core")
+  testImplementation project(":axelor-test")
+  implementation project(":axelor-core")
 
   compileOnly libs.javax_servlet
   compileOnly libs.javax_servlet_jsp
 
-  compile libs.resteasy
-  compile libs.resteasy_guice
-  compile libs.resteasy_multipart
-  compile libs.jackson_libs
+  implementation libs.resteasy
+  implementation libs.resteasy_guice
+  implementation libs.resteasy_multipart
+  implementation libs.jackson_libs
+
+  implementation libs.apache_shiro
+  implementation libs.eclipselink_moxy
+  implementation libs.pac4j_core
 }
 
 jar {

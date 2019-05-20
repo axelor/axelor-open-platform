@@ -413,7 +413,7 @@ public class ModuleManager {
         final MetaModule depending = modules.findByName(name);
         if (depending == null) {
           throw new RuntimeException(
-              "No such depemodule found: " + name + ", required by: " + stored.getName());
+              "No such depmodule found: " + name + ", required by: " + stored.getName());
         }
         depends.add(depending);
       }
