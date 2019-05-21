@@ -216,4 +216,4 @@ libs.tomcat_embed = [
 ]
 
 // currently deployed on axelor repo
-libs.hotswap_agent = "org.hotswap.agent:hotswap-agent:1.1.0-SNAPSHOT"
+libs.hotswap_agent = "org.hotswap.agent:hotswap-agent:1.3.0"
