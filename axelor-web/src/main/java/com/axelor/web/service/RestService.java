@@ -819,4 +819,20 @@ public class RestService extends ResourceService {
 
     return response;
   }
+
+  /**
+   * Gets download link for given entity. Permissions can be checked from given parent entity.
+   *
+   * @param entity
+   * @param parentEntity
+   * @return download link
+   */
+  public String getDownloadLink(Model entity, Model parentEntity) {
+    return String.format(
+        "ws/rest/%s/%d/content/download?parentModel=%s&parentId=%d",
+        EntityHelper.getEntityClass(entity).getName(),
+        entity.getId(),
+        EntityHelper.getEntityClass(parentEntity).getName(),
+        parentEntity.getId());
+  }
 }
