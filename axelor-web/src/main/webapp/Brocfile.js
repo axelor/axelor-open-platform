@@ -18,7 +18,7 @@
 const fs = require('fs');
 
 const postcss = require('broccoli-postcss');
-const cssnext = require('postcss-cssnext');
+const presetenv = require('postcss-preset-env');
 const cssimport = require('postcss-import');
 const cssurl = require('postcss-url');
 
@@ -61,7 +61,7 @@ function minifyCss(name) {
         ],
       },
       {
-        module: cssnext,
+        module: presetenv,
         options: {
           browsers: ['last 3 version', 'ie 11'],
         },

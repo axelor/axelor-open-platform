@@ -2,7 +2,7 @@
   "name": "axelor-web",
   "private": true,
   "engines": {
-  	"node": ">= 4.0.0"
+    "node": ">= 4.0.0"
   },
   "scripts": {
     "clean": "rimraf dist",
@@ -10,19 +10,18 @@
     "build": "broccoli build dist"
   },
   "devDependencies": {
-    "broccoli": "^1.1.1",
+    "broccoli": "^3.0.0",
     "broccoli-cli": "^1.0.0",
     "broccoli-concat": "^3.2.2",
-    "broccoli-funnel": "^1.1.0",
+    "broccoli-funnel": "^2.0.2",
     "broccoli-gzip": "^0.3.0",
     "broccoli-merge-trees": "^2.0.0",
-    "broccoli-postcss": "^3.3.0",
+    "broccoli-postcss": "^5.0.0",
     "broccoli-uglify-sourcemap": "^1.5.2",
     "heimdalljs-logger": "^0.1.9",
-    "postcss-cssnext": "^2.10.0",
     "postcss-import": "^9.1.0",
+    "postcss-preset-env": "^6.5.0",
     "postcss-url": "^6.0.4",
     "rimraf": "^2.6.1"
   }
 }
-
