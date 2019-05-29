@@ -278,13 +278,13 @@ ui.directive('uiCanSuggest', function () {
 });
 
 var m2oTemplateReadonly = "" +
-  "<span class='display-text' ng-show='text'>" +
+  "<span class='display-text' ng-show='text && !isHiddenSelf()'>" +
     "<a href='' ng-show='canView()' ng-click='onEdit()'>{{text}}</a>" +
     "<span ng-show='!canView()'>{{text}}</span>" +
   "</span>";
 
 var m2oTemplateEditable = '' +
-'<div class="picker-input picker-icons-3 tag-select-single">'+
+'<div class="picker-input picker-icons-3 tag-select-single" ng-hide="isHiddenSelf()">'+
 '<input type="text" autocomplete="off" ui-can-suggest>'+
 '<span class="tag-item label label-info" ng-if="canShowTag" ng-show="text">'+
   '<span class="tag-link tag-text" ng-click="onTagSelect($event)">{{text}}</span> '+
@@ -345,15 +345,14 @@ ui.formInput('ManyToOne', 'Select', {
 
     if (field.widget === 'NestedEditor') {
 
-      var isHidden = scope.isHidden;
-      scope.isHidden = function() {
+      scope.isHiddenSelf = function() {
         if (!scope.canSelect()) {
           return true;
         }
         if (scope.canToggle() === 'both' && scope._isNestedOpen) {
           return true;
         }
-        return isHidden.call(scope);
+        return scope.isHidden();
       };
 
       var hiddenSet = false;
