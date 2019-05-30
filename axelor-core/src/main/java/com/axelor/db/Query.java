@@ -964,7 +964,7 @@ public class Query<T extends Model> {
                       "No such field '%s' in object '%s'",
                       variable, currentMapper.getBeanClass().getName()));
             }
-            if (property != null && property.getTarget() != null) {
+            if (property != null && property.isReference()) {
               joinOn = prefix + "." + variable;
               prefix = prefix + "_" + variable;
               joins.put(joinOn, prefix);
