@@ -521,6 +521,18 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
       allDayText: _t('All Day')
     };
 
+    if (lang.indexOf('fr') === 0) {
+      options.views = {
+        week: {
+          titleFormat: 'D MMM YYYY',
+          columnFormat: 'ddd DD/MM'
+        },
+        day: {
+          titleFormat: 'D MMM YYYY'
+        }
+      };
+    }
+
     main.fullCalendar(options);
 
     var editor = null;
