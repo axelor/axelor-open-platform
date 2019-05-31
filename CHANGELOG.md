@@ -1,6 +1,23 @@
-## 5.0.15 (current)
+## 5.0.15 (2019-05-31)
 
-TBD
+#### Enhancements
+
+* Upgrade to hotswap-agent 1.3.0
+* Improve help popover
+
+#### Bugs
+
+* Fix deprecated nested editor issue (for legacy use cases)
+* Fix tracking message formatting issue
+* Fix lost changes issue with child grid
+* Fix change tracking clean up issue (transaction rollback should discard tracking)
+* Fix o2m list editor layout (IE11 issue)
+* Fix placeholder color (IE11 issue)
+* Fix no scrollbar in popup editor (IE11 issue)
+* Patch jquery for possible XSS vulnerability (jquery/jquery#2432)
+* Patch jquery for CVE-2019-11358
+* Fix boolean-radio widget on chrome
+* Fix file handle not closed issues
 
 ## 5.0.14 (2019-04-17)
 
