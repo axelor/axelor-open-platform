@@ -580,7 +580,7 @@ ui.formInput('OneToMany', {
 
     scope.onGridInit = function(grid, inst) {
       var editIcon = scope.canView() || (!scope.isReadonly() && scope.canEdit());
-      var editable = grid.getOptions().editable && !axelor.device.mobile;
+      var editable = inst.editable && !axelor.device.mobile;
 
       adjustHeight = true;
 
@@ -594,10 +594,7 @@ ui.formInput('OneToMany', {
           }
         });
         scope.$watch("isReadonly()", function o2mReadonlyWatch(readonly) {
-          grid.setOptions({
-            editable: !readonly && scope.canEdit()
-          });
-
+          inst.readonly = readonly || !scope.canEdit()
           var _editIcon = scope.canView() || (!readonly && scope.canEdit());
           if (_editIcon != editIcon) {
             inst.showColumn('_edit_column', editIcon = _editIcon);

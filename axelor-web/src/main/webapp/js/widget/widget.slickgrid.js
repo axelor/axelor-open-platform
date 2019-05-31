@@ -866,8 +866,8 @@ Grid.prototype.parse = function(view) {
 
   var options = {
     rowHeight: Math.max(view.rowHeight || 26, 26),
-    editable: view.editable && !axelor.device.mobile,
     editorFactory:  factory,
+    editable: false,
     formatterFactory: factory,
     enableCellNavigation: true,
     enableColumnReorder: false,
@@ -1174,6 +1174,7 @@ Grid.prototype._doInit = function(view) {
     that.$oldValues = null;
     that.clearDirty();
     that.resetColumns();
+    that.cancelEdit();
   });
 
   scope.$on("on:edit", function(e, record) {
@@ -1181,6 +1182,7 @@ Grid.prototype._doInit = function(view) {
       that.$oldValues = null;
       that.clearDirty();
       that.resetColumns();
+      that.cancelEdit();
     }
   });
 
@@ -1810,20 +1812,9 @@ Grid.prototype.saveChanges = function(args, callback) {
 
   var that = this;
   var grid = this.grid;
-  var lock = grid.getEditorLock();
-  var force = arguments[2];
-
-  if (!force &&
-      ((lock.isActive() && !lock.commitCurrentEdit()) ||
-       (this.editorScope && !this.editorScope.isValid()))) {
-    return false;
-  }
+  var params = arguments;
 
   this._saveChangesRunning = true;
-  if (this.editorScope) {
-    this.editorScope.$emit("on:before-save", this.editorScope.record);
-  }
-  var params = arguments;
   this.scope.waitForActions(function () {
     that.__saveChanges.apply(that, params);
     that._saveChangesRunning = false;
@@ -1832,7 +1823,7 @@ Grid.prototype.saveChanges = function(args, callback) {
   return true;
 };
 
-Grid.prototype.__saveChanges = function(args, callback) {
+Grid.prototype.__saveChanges = function(args, callback, errback) {
 
   var that = this;
   var grid = this.grid;
@@ -1894,8 +1885,9 @@ Grid.prototype.__saveChanges = function(args, callback) {
   }
 
   var fields = handler.selectFields ? handler.selectFields() : undefined;
+  var promise = saveDS.saveAll(records, fields);
 
-  return saveDS.saveAll(records, fields).success(function(records, page) {
+  promise.success(function(records, page) {
     if (data.getItemById(0)) {
       data.deleteItem(0);
     }
@@ -1904,6 +1896,12 @@ Grid.prototype.__saveChanges = function(args, callback) {
     }
     setTimeout(focus);
   });
+
+  if (errback) {
+    promise.error(errback);
+  };
+
+  return promise;
 };
 
 Grid.prototype.canSave = function() {
@@ -2073,7 +2071,7 @@ Grid.prototype.addNewRow = function (args) {
 
 Grid.prototype.canEdit = function () {
   var handler = this.handler || {};
-  if (!this.editable) return false;
+  if (!this.editable || this.readonly) return false;
   if (handler.canEdit && !handler.canEdit()) return false;
   if (handler.isReadonly && handler.isReadonly()) return false;
   return true;
@@ -2087,19 +2085,12 @@ Grid.prototype.canAdd = function () {
 };
 
 Grid.prototype.setEditors = function(form, formScope, forEdit) {
-  var grid = this.grid,
-    data = this.scope.dataView,
-    element = this.element;
+  var grid = this.grid;
+  var data = this.scope.dataView;
 
   this.editable = forEdit = forEdit === undefined ? true : forEdit;
 
-  grid.setOptions({
-    editable: !axelor.device.mobile,
-    asyncEditorLoading: false,
-    editorLock: new Slick.EditorLock()
-  });
-
-  form.prependTo(element).hide();
+  form.prependTo(grid.getCanvasNode()).hide();
   formScope.onChangeNotify = function(scope, values) {
     var item, editor, cell = grid.getActiveCell();
     if (!cell || formScope.record !== scope.record) {
@@ -2209,9 +2200,158 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
     formScope.setEditable(false);
   }
 
+  this.subscribe(grid.onColumnsResized, function (e, args) {
+    that.adjustEditor();
+  });
+
   this.editorForm = form;
   this.editorScope = formScope;
   this.editorForEdit = forEdit;
+};
+
+Grid.prototype.isEditActive = function () {
+  return this.editorForm && this._editorVisible;
+};
+
+Grid.prototype.adjustEditor = function () {
+
+  if (!this.isEditActive()) return;
+
+  var form = this.editorForm;
+  var grid = this.grid;
+  var formScope = this.editorScope;
+
+  if (this._editorPrepared === undefined) {
+    this._editorPrepared = true;
+    this._editorOverlay = this.element.find('.slickgrid-edit-overlay').keydown(function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    });
+
+    if (this._editorOverlay.size() === 0) {
+      this._editorOverlay = $("<div class='slickgrid-edit-overlay'>").appendTo(this.element);
+    }
+
+    var editor = form.find('form:first');
+    var widgets = editor.find("td.form-item > .form-item-container");
+
+    form.addClass('slick-form');
+    editor.addClass('slick-editor');
+    editor.children().hide();
+    editor.append(widgets);
+
+    var confirm = $("<button class='btn'>").html(_t('Confirm'));
+    var cancel = $("<button class='btn'>").html(_t('Cancel'));
+
+    confirm.click(this.commitEdit.bind(this));
+    cancel.click(this.cancelEdit.bind(this));
+
+    $("<div class='slick-form-buttons'>")
+      .append([confirm, cancel])
+      .appendTo($("<div class='slick-form-buttons-wrapper'>").appendTo(form));
+  }
+
+  form.find('.form-item-container').hide();
+
+  this._editorOverlay.show();
+
+  var activeCell = grid.getActiveCell();
+  var leftPadding = 0;
+  var left = true;
+
+  grid.getColumns().forEach(function (col, n) {
+    var box = grid.getCellNodeBox(activeCell.row, n);
+    var node = grid.getCellNode(activeCell.row, n);
+    var width = box.right - box.left;
+    var field = col.descriptor;
+    if (field && field.name) {
+      var widget = form.find("[x-field=" + field.name + "]");
+      widget.show().width(width - 2);
+      left = false;
+      setTimeout(function () {
+        if (activeCell.cell === n) {
+          widget.find('input,:focusable').first().focus().select();
+        }
+      }, 100)
+    } else if (left) {
+      leftPadding += width;
+    }
+  });
+
+  form.css('padding-left', leftPadding);
+}
+
+Grid.prototype.showEditor = function (activeCell) {
+
+  if (this.isEditActive() || !this.canEdit()) return;
+
+  var form = this.editorForm;
+  var formScope = this.editorScope;
+
+  var grid = this.grid;
+  var args = activeCell || grid.getActiveCell();
+  var box = grid.getCellNodeBox(args.row, 0);
+
+  form.show().css('display', '').css('top', box.top);
+
+  this._editorVisible = grid._editorVisible = true;
+  this.adjustEditor(args);
+
+  var item = grid.getDataItem(args.row) || {};
+  var record = _.extend({}, item, { version: item.version === undefined ? item.$version : item.version });
+  formScope.editRecord(record);
+};
+
+Grid.prototype.cancelEdit = function () {
+  if (!this.isEditActive()) return;
+  this.editorForm.hide();
+  this.editorScope.edit(null);
+  this._editorOverlay.hide();
+  this._editorVisible = this.grid._editorVisible = false;
+  this.grid.focus();
+};
+
+Grid.prototype.commitEdit = function () {
+
+  var defer = this.handler._defer();
+  var promise = defer.promise;
+
+  if (!this.isEditActive()) {
+    defer.resolve();
+    return promise;
+  }
+
+  var scope = this.editorScope;
+  var that = this;
+  var data = this.scope.dataView;
+
+  if (!scope || !scope.isValid()) {
+    defer.reject();
+    return promise;
+    return;
+  }
+
+  if (!scope.isDirty()) {
+    this.cancelEdit();
+    defer.resolve();
+    return promise;
+  }
+
+  scope.$emit("on:before-save", scope.record);
+
+  var row = this.grid.getActiveCell().row;
+  var item = data.getItemByIdx(row);
+  var record = _.extend({}, item, scope.record, { $dirty: true });
+
+  data.updateItem(item.id, record);
+
+  this.saveChanges(null, function () {
+    that.cancelEdit();
+    defer.resolve();
+  }, defer.reject);
+
+  return promise;
 };
 
 Grid.prototype.onSelectionChanged = function(event, args) {
@@ -2482,10 +2622,14 @@ Grid.prototype.__onItemClick = function(event, args) {
     }
   }
 
+  this.grid.setActiveCell(args.row, args.cell);
+  this.grid.setSelectedRows([args.row]);
+
   if (!this.scope.selector && this.canEdit()) {
-    return this.grid.setActiveCell();
-  }
-  if (this.handler.onItemClick) {
+    var col = this.grid.getColumns()[args.cell];
+    if (col && col.id === "_edit_column") return;
+    this.showEditor(args);
+  } else if (this.handler.onItemClick) {
     this.handler.onItemClick(event, args);
   }
 };
@@ -2799,10 +2943,6 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         if (canEdit) {
           formScope = scope.$new();
           form = makeForm(formScope, handler._model, schema.items, handler.fields, forEdit, schema.onNew);
-        }
-
-        if (forEdit) {
-          element.addClass('slickgrid-editable');
         }
 
         grid = new Grid(scope, element, attrs, ViewService, ActionService);

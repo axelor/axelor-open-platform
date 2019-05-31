@@ -991,7 +991,7 @@ ui.directive('uiPortletGrid', function(){
         editCol.descriptor = { hidden : true };
         $scope.$parent.$watch("isReadonly()", function (readonly) {
           if (inst.editable) {
-            grid.setOptions({ editable: readonly });
+            inst.readonly = readonly;
           }
           inst.showColumn('_edit_column', !readonly);
           editCol.descriptor = { hidden : readonly };

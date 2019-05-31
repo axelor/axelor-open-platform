@@ -268,26 +268,26 @@
   padding-left: 0;
 }
 
-.panel-layout .slick-cell .form-item-container.editable input[type="text"],
-.panel-layout .slick-cell .form-item-container.editable input[type="password"],
-.panel-layout .slick-cell .form-item-container.editable input[type="number"],
-.panel-layout .slick-cell .form-item-container.editable input[type="email"],
-.panel-layout .slick-cell .form-item-container.editable input[type="url"],
-.panel-layout .slick-cell .form-item-container.editable .tag-select {
+.panel-layout .slick-editor .form-item-container.editable input[type="text"],
+.panel-layout .slick-editor .form-item-container.editable input[type="password"],
+.panel-layout .slick-editor .form-item-container.editable input[type="number"],
+.panel-layout .slick-editor .form-item-container.editable input[type="email"],
+.panel-layout .slick-editor .form-item-container.editable input[type="url"],
+.panel-layout .slick-editor .form-item-container.editable .tag-select {
   border-top-width: 1px;
   border-left-width: 1px;
   border-right-width: 1px;
   padding-left: 6px;
 }
-.panel-layout .slick-cell .form-item-container.editable .tag-select {
+.panel-layout .slick-editor .form-item-container.editable .tag-select {
   padding-left: 0;
 }
 
-.panel-layout .slick-cell .form-item-container,
-.panel-layout .slick-cell .form-item-container > span.display-text {
+.panel-layout .slick-editor .form-item-container,
+.panel-layout .slick-editor .form-item-container > span.display-text {
   min-height: auto;
 }
-.panel-layout .slick-cell .form-item-container > span.display-text {
+.panel-layout .slick-editor .form-item-container > span.display-text {
   padding: 2px 8px;
 }
 
