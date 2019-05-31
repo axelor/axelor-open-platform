@@ -456,9 +456,9 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 
       header: false,
 
-      timeFormat: lang === 'fr' ? 'H:mm' : 'h(:mm)t',
+      timeFormat: 'h(:mm)t',
 
-      axisFormat: lang === 'fr' ? 'H:mm' : 'h(:mm)t',
+      axisFormat: 'h(:mm)t',
 
       timezone: 'local',
 
@@ -522,15 +522,22 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
     };
 
     if (lang.indexOf('fr') === 0) {
-      options.views = {
-        week: {
-          titleFormat: 'D MMM YYYY',
-          columnFormat: 'ddd DD/MM'
-        },
-        day: {
-          titleFormat: 'D MMM YYYY'
+      _.extend(options, {
+        timeFormat: 'H:mm',
+        axisFormat: 'H:mm',
+        firstDay: 1,
+
+        views: {
+          week: {
+            titleFormat: 'D MMM YYYY',
+            columnFormat: 'ddd DD/MM'
+          },
+
+          day: {
+            titleFormat: 'D MMM YYYY'
+          }
         }
-      };
+      });
     }
 
     main.fullCalendar(options);
