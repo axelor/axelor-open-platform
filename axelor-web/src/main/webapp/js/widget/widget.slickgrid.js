@@ -1198,17 +1198,16 @@ Grid.prototype._doInit = function(view) {
     that.resetColumns();
   });
 
-  scope.$on("on:before-save", function(e) {
+  scope.$on("on:before-save", function(e, record) {
 
     // only for editable grid
-    if (!that.editable) {
+    if (!that.editable || !that.isEditActive()) {
       return;
     }
 
     var row = null;
-    var lock = grid.getEditorLock();
-    if (lock.isActive()) {
-      lock.commitCurrentEdit();
+    if (that.isEditActive() && that.editorScope.record !== record) {
+      that.commitEdit();
       row = grid.getDataItem(grid.getDataLength() - 1); // to check if adding new row
     }
     if (grid.getActiveCell() && that.focusInvalidCell(grid.getActiveCell())) {
@@ -1242,13 +1241,9 @@ Grid.prototype._doInit = function(view) {
       });
     }
 
-    var node = that.element.find('.slick-cell-required:empty,.slick-cell > .ng-invalid').first();
-    if (node.parent().is('.slick-cell')) {
-      node = node.parent();
-    }
+    var node = that.element.find('.slick-editor .ng-invalid').first();
     if (node.length) {
-      that.grid.setActiveNode(node[0]);
-      that.showEditor();
+      node.focus();
       e.preventDefault();
       showErrorNotice();
       return false;
@@ -1996,6 +1991,7 @@ Grid.prototype.focusInvalidCell = function(args) {
       if (cell > -1) {
         grid.setActiveCell(args.row, cell);
         that.showEditor();
+        that.adjustEditor();
         return true;
       }
     }
@@ -2159,6 +2155,7 @@ Grid.prototype.adjustEditor = function () {
 
   if (!this.isEditActive()) return;
 
+  var that = this;
   var form = this.editorForm;
   var grid = this.grid;
   var formScope = this.editorScope;
@@ -2186,8 +2183,12 @@ Grid.prototype.adjustEditor = function () {
     var confirm = $("<button class='btn'>").html(_t('Confirm'));
     var cancel = $("<button class='btn'>").html(_t('Cancel'));
 
-    confirm.click(this.commitEdit.bind(this));
     cancel.click(this.cancelEdit.bind(this));
+    confirm.click(function () {
+      that.commitEdit().then(angular.noop, function () {
+        that.focusInvalidCell(grid.getActiveCell());
+      });
+    });
 
     $("<div class='slick-form-buttons'>")
       .append([confirm, cancel])
