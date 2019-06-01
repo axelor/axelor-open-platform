@@ -1248,7 +1248,7 @@ Grid.prototype._doInit = function(view) {
     }
     if (node.length) {
       that.grid.setActiveNode(node[0]);
-      that.grid.editActiveCell();
+      that.showEditor();
       e.preventDefault();
       showErrorNotice();
       return false;
@@ -1644,7 +1644,7 @@ Grid.prototype.onKeyDown = function(e, args) {
                     : that.findNextEditable(args.row, args.cell);
         if (cell) {
           grid.setActiveCell(cell.row, cell.cell);
-          grid.editActiveCell();
+          that.showEditor();
         }
       });
     }
@@ -1670,7 +1670,7 @@ Grid.prototype.onKeyDown = function(e, args) {
     grid.setActiveCell(row, cell);
     // make sure cell has focus RM-3938
     setTimeout(function () {
-      grid.editActiveCell();
+      that.showEditor();
     });
   }
 
@@ -1695,7 +1695,7 @@ Grid.prototype.onKeyDown = function(e, args) {
       args.item = null;
       this.scope.waitForActions(function () {
         that.scope.waitForActions(function () {
-          that.addNewRow(args);
+          that.addNewRow();
         });
       });
     } else if (cell) {
@@ -1979,7 +1979,8 @@ Grid.prototype.clearDirty = function(row) {
 };
 
 Grid.prototype.focusInvalidCell = function(args) {
-  var grid = this.grid,
+  var that = this,
+    grid = this.grid,
     formCtrl = this.editorForm.children('form').data('$formController'),
     error = formCtrl.$error || {};
 
@@ -1994,7 +1995,7 @@ Grid.prototype.focusInvalidCell = function(args) {
       var cell = grid.getColumnIndex(name);
       if (cell > -1) {
         grid.setActiveCell(args.row, cell);
-        grid.editActiveCell();
+        that.showEditor();
         return true;
       }
     }
@@ -2003,70 +2004,28 @@ Grid.prototype.focusInvalidCell = function(args) {
   return false;
 };
 
-Grid.prototype.addNewRow = function (args) {
-  var self = this,
-    scope = this.scope,
-    grid = this.grid,
-    dataView = scope.dataView,
-    lock = grid.getEditorLock();
+Grid.prototype.addNewRow = function () {
+  var that = this;
+  var scope = this.scope;
+  var grid = this.grid;
+  var data = scope.dataView;
 
-  if (lock.isActive()) {
-    lock.commitCurrentEdit();
-  }
-
-  args.row = Math.max(0, args.row);
-  args.cell = Math.max(0, args.cell);
-
-  var cell = self.findNextEditable(args.row, 0);
-
-  function addRow(defaults) {
+  function doAddRow () {
+    var defaults = that.editorScope.record;
     var args = { row: grid.getDataLength(), cell: 0 };
     var item = _.extend({ id: 0 }, defaults);
+    var cell = that.findNextEditable(args.row, args.cell);
 
-    grid.invalidateRow(dataView.length);
-    dataView.addItem(item);
-
-    self.scope.waitForActions(function () {
-      cell = self.findNextEditable(args.row, args.cell);
-      if (cell) {
-        grid.focus();
-        grid.setActiveCell(cell.row, cell.cell);
-        setTimeout(function () {
-          grid.editActiveCell();
-        }, 200);
-      }
-    }, 100);
-  }
-
-  function focus() {
+    data.addItem(item);
+    grid.invalidateRow(data.length);
     grid.focus();
     grid.setActiveCell(cell.row, cell.cell);
-
-    if (grid.getDataLength() > cell.row) {
-      return grid.editActiveCell();
-    }
-    if (!self.canAdd()) {
-      return;
-    }
-
-    self.editorScope.doOnNew();
-    self.scope.waitForActions(function () {
-      self.scope.waitForActions(function () {
-        addRow(self.editorScope.record);
-      });
-    }, 100);
+    that.showEditor();
   }
 
-  if (args.item || grid.getDataLength() === 0) {
-    return focus();
-  }
-  var saved = self.saveChanges(args, function () {
-    cell.row += 1;
-    focus();
-  });
-  if (!saved) {
-    self.focusInvalidCell(args);
-  }
+  return this.isEditActive()
+    ? this.commitEdit().then(doAddRow)
+    : doAddRow();
 };
 
 Grid.prototype.canEdit = function () {
@@ -2087,6 +2046,7 @@ Grid.prototype.canAdd = function () {
 Grid.prototype.setEditors = function(form, formScope, forEdit) {
   var grid = this.grid;
   var data = this.scope.dataView;
+  var that = this;
 
   this.editable = forEdit = forEdit === undefined ? true : forEdit;
 
@@ -2157,15 +2117,9 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
     }
 
     var handler = formScope.$events.onNew;
-    var lock = grid.getEditorLock();
-    if (lock.isActive()) {
-      lock.commitCurrentEdit();
-    }
-
     var promise = handler();
     promise.then(function () {
       grid.focus();
-      grid.editActiveCell();
     });
   };
 
@@ -2177,20 +2131,8 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
   var onNew = this.handler.onNew;
   if (onNew) {
     this.handler.onNew = function () {
-      var lock = that.grid.getEditorLock();
-
       if (that.editable) {
-        if (lock.isActive()) {
-          lock.commitCurrentEdit();
-        }
-
-        var cell = that.findNextEditable(that.grid.getDataLength() - 1, 0) || { row: that.grid.getDataLength(), cell: 0 };
-        that.grid.focus();
-        that.grid.setActiveCell(cell.row, cell.cell);
-        that.grid.editActiveCell();
-        return that.scope.$timeout(function () {
-          return that.addNewRow(cell);
-        });
+        return that.addNewRow();
       }
       return onNew.apply(that.handler, arguments);
     };
@@ -2313,6 +2255,13 @@ Grid.prototype.cancelEdit = function () {
   this.editorScope.edit(null);
   this._editorOverlay.hide();
   this._editorVisible = this.grid._editorVisible = false;
+  if (this.handler.dataView.getItemById(0)) {
+    this.handler.dataView.deleteItem(0);
+  }
+  var activeCell = this.grid.getActiveCell()
+    || this.findNextEditable(this.grid.getDataLength() - 1 , 0)
+    || { row: 0, cell: 0 };
+  this.grid.setActiveCell(activeCell.row, activeCell.cell);
   this.grid.focus();
 };
 
@@ -2619,7 +2568,7 @@ Grid.prototype.__onItemClick = function(event, args) {
     if (col.forEdit !== false &&
         (field.type === 'one-to-many' || field.type === 'many-to-many' || this.scope.selector === 'checkbox')) {
       this.grid.setActiveCell(args.row, args.cell);
-      this.grid.editActiveCell();
+      this.showEditor();
       event.preventDefault();
       event.stopImmediatePropagation();
       return false;
