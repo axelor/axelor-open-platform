@@ -484,6 +484,10 @@
   z-index: 3;
 }
 
+.slick-form.slick-form-flip {
+  flex-direction: column-reverse;
+}
+
 .slick-editor {
   position: relative;
   display: flex;
@@ -520,4 +524,16 @@
 
 .slick-form-buttons button {
   margin: 0 2px;
+}
+
+.slick-form.slick-form-flip .slick-form-buttons-wrapper {
+  margin-top: -38px;
+}
+
+.slick-form.slick-form-flip .slick-form-buttons {
+  padding: 6px 4px 4px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }

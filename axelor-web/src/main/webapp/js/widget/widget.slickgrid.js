@@ -2292,8 +2292,12 @@ Grid.prototype.showEditor = function (activeCell) {
   var grid = this.grid;
   var args = activeCell || grid.getActiveCell();
   var box = grid.getCellNodeBox(args.row, 0);
+  var viewPort = $(grid.getCanvasNode()).parent();
 
-  form.show().css('display', '').css('top', box.top);
+  form.show()
+    .css('display', '')
+    .css('top', box.top)
+    .toggleClass('slick-form-flip', box.bottom > viewPort.height());
 
   this._editorVisible = grid._editorVisible = true;
   this.adjustEditor(args);
