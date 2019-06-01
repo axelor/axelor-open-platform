@@ -1029,7 +1029,6 @@ Grid.prototype._doInit = function(view) {
   this.subscribe(grid.onClick, this.onItemClick);
   this.subscribe(grid.onDblClick, this.onItemDblClick);
 
-  this.subscribe(grid.onKeyDown, this.onKeyDown);
   this.subscribe(grid.onCellChange, this.onCellChange);
   this.subscribe(grid.onBeforeEditCell, this.onBeforeEditCell);
 
@@ -1614,117 +1613,6 @@ Grid.prototype.onBeforeEditCell = function(event, args) {
   }
 };
 
-Grid.prototype.onKeyDown = function(e, args) {
-  var that = this,
-    grid = this.grid,
-    lock = grid.getEditorLock();
-
-  if (e.which === $.ui.keyCode.ENTER && $(e.target).is('textarea,[contenteditable]')) {
-    return;
-  }
-
-  if (e.isDefaultPrevented()){
-    e.stopImmediatePropagation();
-    return false;
-  }
-
-  if (!e.isBlocked && (blocked() || !lock.isActive())) {
-    return false;
-  }
-
-  function blockCallback(blocked) {
-    if (blocked && e.which === $.ui.keyCode.TAB) {
-      setTimeout(function(){
-        var cell = e.shiftKey ? that.findPrevEditable(args.row, args.cell)
-                    : that.findNextEditable(args.row, args.cell);
-        if (cell) {
-          grid.setActiveCell(cell.row, cell.cell);
-          that.showEditor();
-        }
-      });
-    }
-  }
-
-  function blocked() {
-    if (that.isDirty() && axelor.blockUI(blockCallback)) {
-      grid.focus();
-      e.stopImmediatePropagation();
-      return true;
-    }
-    return false;
-  }
-
-  function commitChanges() {
-    if (lock.commitCurrentEdit() && !blocked()) {
-      return true;
-    }
-    return false;
-  }
-
-  function focusCell(row, cell) {
-    grid.setActiveCell(row, cell);
-    // make sure cell has focus RM-3938
-    setTimeout(function () {
-      that.showEditor();
-    });
-  }
-
-  // firefox & IE fails to trigger onChange
-  if ((axelor.browser.mozilla || axelor.browser.msie) &&
-      (e.which === $.ui.keyCode.TAB || e.which === $.ui.keyCode.ENTER)) {
-    var editor = grid.getCellEditor(),
-      target = $(e.target);
-    if (editor.isValueChanged()) {
-      target.change();
-    }
-    setTimeout(function(){
-      target.blur();
-    });
-  }
-  var handled = false;
-  if (e.which === $.ui.keyCode.TAB) {
-    var cell = e.shiftKey ? this.findPrevEditable(args.row, args.cell) :
-                this.findNextEditable(args.row, args.cell);
-
-    if (commitChanges() && cell && cell.row > args.row && this.isDirty()) {
-      args.item = null;
-      this.scope.waitForActions(function () {
-        that.scope.waitForActions(function () {
-          that.addNewRow();
-        });
-      });
-    } else if (cell) {
-      focusCell(cell.row, cell.cell);
-    }
-
-    handled = true;
-  }
-
-  if (e.which === $.ui.keyCode.ENTER) {
-    if (e.ctrlKey) {
-      if (!this.saveChanges(args)) {
-        this.focusInvalidCell(args);
-      }
-    } else {
-      if (!lock.commitCurrentEdit()) {
-        this.focusInvalidCell(args);
-      }
-      grid.focus();
-    }
-    grid.focus();
-    handled = true;
-  }
-
-  if (e.which === $.ui.keyCode.ESCAPE) {
-    grid.focus();
-  }
-
-  if (handled) {
-    e.stopImmediatePropagation();
-    return false;
-  }
-};
-
 Grid.prototype.isCellEditable = function(row, cell) {
   var cols = this.grid.getColumns(),
     col = cols[cell];
@@ -2183,16 +2071,46 @@ Grid.prototype.adjustEditor = function () {
     var confirm = $("<button class='btn'>").html(_t('Confirm'));
     var cancel = $("<button class='btn'>").html(_t('Cancel'));
 
-    cancel.click(this.cancelEdit.bind(this));
-    confirm.click(function () {
-      that.commitEdit().then(angular.noop, function () {
+    function doCancel() {
+      that.cancelEdit();
+    }
+
+    function doCommit() {
+      var promise = that.commitEdit();
+      promise.then(angular.noop, function () {
         that.focusInvalidCell(grid.getActiveCell());
       });
-    });
+      return promise;
+    }
+
+    cancel.click(doCancel);
+    confirm.click(doCommit);
+    confirm.keydown(function (e) {
+      if (e.keyCode === 13) {
+        e.preventDefault();
+        doCommit().then(function () {
+          var args = grid.getActiveCell();
+          if (args.row === grid.getDataLength() - 1) {
+            that.addNewRow();
+          }
+        });
+      }
+    })
 
     $("<div class='slick-form-buttons'>")
       .append([confirm, cancel])
       .appendTo($("<div class='slick-form-buttons-wrapper'>").appendTo(form));
+
+    this.subscribe(grid.onKeyDown, function (e) {
+      if (e.isDefaultPrevented()) return;
+      if (e.keyCode === 13) {
+        if (that.isEditActive() && e.ctrlKey) {
+          doCommit();
+        } else {
+          that.showEditor();
+        }
+      }
+    });
   }
 
   form.find('.form-item-container').hide();
