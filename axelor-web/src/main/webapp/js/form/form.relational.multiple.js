@@ -1149,8 +1149,9 @@ ui.formInput('OneToManyInline', 'OneToMany', {
     };
 
     var field = scope.field;
-    var input = element.children('input');
-    var grid = element.children('[ui-slick-grid]');
+    var picker = element.children('.picker-input');
+    var input = picker.children('input');
+    var grid = picker.children('[ui-slick-grid]');
 
     var container = null;
     var wrapper = $('<div class="slick-editor-dropdown"></div>')
@@ -1185,7 +1186,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
       wrapper.position({
         my: "left top",
         at: "left bottom",
-        of: element,
+        of: picker,
         within: container
       })
       .zIndex(element.zIndex() + 1)
@@ -1242,10 +1243,10 @@ ui.formInput('OneToManyInline', 'OneToMany', {
       var all = element.add(wrapper);
       var elem = $(e.target);
       if (all.is(elem) || all.has(elem).length > 0) return;
-      if (elem.zIndex() > element.parents('.slickgrid:first').zIndex()) return;
+      if (elem.zIndex() > element.parents('.slick-form:first,.slickgrid:first').zIndex()) return;
       if (elem.parents(".ui-dialog:first").zIndex() > element.parents('.slickgrid:first').zIndex()) return;
 
-      element.trigger('close:slick-editor');
+      element.trigger('hide:slick-editor');
     }
 
     $(document).on('mousedown.mini-grid', hidePopup);
@@ -1283,6 +1284,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
   template_readonly: null,
 
   template:
+  '<span class="form-item-container">'+
   '<span class="picker-input picker-icons-2" style="position: absolute;">'+
     '<input type="text" readonly>'+
     '<span class="picker-icons">'+
@@ -1299,6 +1301,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
       'x-on-before-save="onGridBeforeSave" '+
       'x-on-after-save="onGridAfterSave" '+
       '></div>'+
+  '</span>'+
   '</span>'
 });
 
