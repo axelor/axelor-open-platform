@@ -776,22 +776,22 @@ Grid.prototype._doInit = function(view) {
     }
     selection = _.unique(selection);
     grid.setSelectedRows(selection);
-    if (selection.length === 0 && !grid.getEditorLock().isActive()) {
+    if (selection.length === 0) {
       grid.setActiveCell(null);
-        } else if (focus) {
-          grid.setActiveCell(_.first(selection), 1);
-          grid.focus();
-        }
+    } else if (focus) {
+      grid.setActiveCell(_.first(selection), 1);
+      grid.focus();
+    }
   };
   dataView.$setSelection = function(selection, focus) {
     var rows = selection || [];
     grid.setSelectedRows(rows);
-    if (selection.length === 0 && !grid.getEditorLock().isActive()) {
+    if (selection.length === 0) {
       grid.setActiveCell(null);
-        } else if (focus) {
-          grid.setActiveCell(_.first(selection), 1);
-          grid.focus();
-        }
+    } else if (focus) {
+      grid.setActiveCell(_.first(selection), 1);
+      grid.focus();
+    }
   };
 
   if (this._canMove) {
