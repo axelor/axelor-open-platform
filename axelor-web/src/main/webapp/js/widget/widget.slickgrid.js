@@ -2507,7 +2507,7 @@ Grid.prototype.__onItemClick = function(event, args) {
 };
 
 Grid.prototype.onItemDblClick = function(event, args) {
-
+  if (this.isEditActive()) return;
   if ($(event.srcElement || event.target).is('img.slick-img-button,i.slick-icon-button')) {
     return this.onButtonClick(event, args);
   }
