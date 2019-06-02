@@ -210,7 +210,7 @@ function GridViewCtrl($scope, $element) {
   };
 
   $scope.canEdit = function() {
-    return $scope.hasButton('edit') && $scope.selection.length > 0;
+    return $scope.hasButton('edit') && ($scope.selection.length > 0 || $scope.dataView.getItemById(0));
   };
 
   $scope.canShowDetailsView = function () {
