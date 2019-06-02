@@ -2043,10 +2043,51 @@ Grid.prototype.adjustEditor = function () {
 
   if (!this.isEditActive()) return;
 
-  var that = this;
   var form = this.editorForm;
   var grid = this.grid;
+
+  form.find('.form-item-container').hide();
+
+  this._editorOverlay.show();
+
+  var activeCell = grid.getActiveCell();
+  var leftPadding = 0;
+  var left = true;
+
+  grid.getColumns().forEach(function (col, n) {
+    var box = grid.getCellNodeBox(activeCell.row, n);
+    var node = grid.getCellNode(activeCell.row, n);
+    var width = box.right - box.left;
+    var field = col.descriptor;
+    if (field && field.name) {
+      var widget = form.find("[x-field=" + field.name + "]");
+      widget.show().width(width - 2);
+      left = false;
+      setTimeout(function () {
+        if (activeCell.cell === n) {
+          widget.find('input,:focusable').first().focus().select();
+        }
+      }, 100)
+    } else if (left) {
+      leftPadding += width;
+    }
+  });
+
+  form.css('padding-left', leftPadding);
+}
+
+Grid.prototype.showEditor = function (activeCell) {
+
+  if (this.isEditActive() || !this.canEdit()) return;
+
+  var that = this;
+  var form = this.editorForm;
   var formScope = this.editorScope;
+
+  var grid = this.grid;
+  var args = activeCell || grid.getActiveCell();
+  var box = grid.getCellNodeBox(args.row, 0);
+  var viewPort = $(grid.getCanvasNode()).parent();
 
   if (this._editorPrepared === undefined) {
     this._editorPrepared = true;
@@ -2113,52 +2154,14 @@ Grid.prototype.adjustEditor = function () {
     });
   }
 
-  form.find('.form-item-container').hide();
+  var buttons = form.find('.slick-form-buttons-wrapper');
 
-  this._editorOverlay.show();
-
-  var activeCell = grid.getActiveCell();
-  var leftPadding = 0;
-  var left = true;
-
-  grid.getColumns().forEach(function (col, n) {
-    var box = grid.getCellNodeBox(activeCell.row, n);
-    var node = grid.getCellNode(activeCell.row, n);
-    var width = box.right - box.left;
-    var field = col.descriptor;
-    if (field && field.name) {
-      var widget = form.find("[x-field=" + field.name + "]");
-      widget.show().width(width - 2);
-      left = false;
-      setTimeout(function () {
-        if (activeCell.cell === n) {
-          widget.find('input,:focusable').first().focus().select();
-        }
-      }, 100)
-    } else if (left) {
-      leftPadding += width;
-    }
-  });
-
-  form.css('padding-left', leftPadding);
-}
-
-Grid.prototype.showEditor = function (activeCell) {
-
-  if (this.isEditActive() || !this.canEdit()) return;
-
-  var form = this.editorForm;
-  var formScope = this.editorScope;
-
-  var grid = this.grid;
-  var args = activeCell || grid.getActiveCell();
-  var box = grid.getCellNodeBox(args.row, 0);
-  var viewPort = $(grid.getCanvasNode()).parent();
-
-  form.show()
-    .css('display', '')
-    .css('top', box.top)
-    .toggleClass('slick-form-flip', box.bottom > viewPort.height());
+  buttons.css('visibility', 'hidden');
+  form.removeClass('slick-form-flip').fadeIn(300).css('display', '').css('top', box.top);
+  setTimeout(function () {
+    form.toggleClass('slick-form-flip', box.bottom + buttons.height() > viewPort.height());
+    buttons.hide().css('visibility', '').fadeIn(200);
+  }, 300);
 
   this._editorVisible = grid._editorVisible = true;
   this.adjustEditor(args);
@@ -2170,9 +2173,9 @@ Grid.prototype.showEditor = function (activeCell) {
 
 Grid.prototype.cancelEdit = function () {
   if (!this.isEditActive()) return;
-  this.editorForm.hide();
+  this.editorForm.fadeOut(200);
   this.editorScope.edit(null);
-  this._editorOverlay.hide();
+  this._editorOverlay.fadeOut(200);
   this._editorVisible = this.grid._editorVisible = false;
   if (this.handler.dataView.getItemById(0)) {
     this.handler.dataView.deleteItem(0);
