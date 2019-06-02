@@ -804,9 +804,6 @@ Grid.prototype._doInit = function(view) {
   this.subscribe(grid.onClick, this.onItemClick);
   this.subscribe(grid.onDblClick, this.onItemDblClick);
 
-  this.subscribe(grid.onCellChange, this.onCellChange);
-  this.subscribe(grid.onBeforeEditCell, this.onBeforeEditCell);
-
   // register dataView event handlers
   this.subscribe(dataView.onRowCountChanged, this.onRowCountChanged);
   this.subscribe(dataView.onRowsChanged, this.onRowsChanged);
@@ -833,11 +830,6 @@ Grid.prototype._doInit = function(view) {
     }
     return meta || my;
   };
-  this.subscribe(grid.onCellChange, function (e, args) {
-    that.hilite(args.row);
-    grid.invalidateRow(args.row);
-    grid.render();
-  });
 
   function setFilterCols() {
 
@@ -1369,22 +1361,6 @@ Grid.prototype.onMenuCommand = function(event, args) {
 
   if (args.command === 'show') {
     return this.showColumn(args.item.field, true);
-  }
-};
-
-Grid.prototype.onBeforeEditCell = function(event, args) {
-  if (this.$oldValues === null) {
-    this.$oldValues = [];
-    var n = 0;
-    while (n < this.grid.getDataLength()) {
-      var item = this.grid.getDataItem(n++);
-      if (item && item.id) {
-        this.$oldValues.push(_.clone(item));
-      }
-    }
-  }
-  if (args.item && args.item._original === undefined) {
-    args.item._original = _.clone(args.item);
   }
 };
 
@@ -1943,6 +1919,7 @@ Grid.prototype.showEditor = function (activeCell) {
 
   var item = grid.getDataItem(args.row) || {};
   var record = _.extend({}, item, { version: item.version === undefined ? item.$version : item.version });
+
   formScope.editRecord(record);
 };
 
@@ -1992,9 +1969,17 @@ Grid.prototype.commitEdit = function () {
 
   var row = this.grid.getActiveCell().row;
   var item = data.getItemByIdx(row);
-  var record = _.extend({}, item, scope.record, { $dirty: true });
+
+  var record = _.extend({}, item, scope.record, { $dirty: true, _orignal: scope.$$original });
 
   data.updateItem(item.id, record);
+
+  var diff = scope._dataSource.diff(scope.$$original, scope.record);
+  that.cols.forEach(function (col) {
+    if (col.descriptor && diff[col.id] !== undefined) {
+      that.markDirty(row, col.id);
+    }
+  });
 
   this.saveChanges(null, function () {
     that.cancelEdit();
@@ -2026,20 +2011,6 @@ Grid.prototype.onSelectionChanged = function(event, args) {
 
   // cancel edit
   this.cancelEdit();
-};
-
-Grid.prototype.onCellChange = function(event, args) {
-  var grid = this.grid,
-    cols = grid.getColumns(),
-    name = cols[args.cell].field;
-
-  var es = this.editorScope;
-  if (es.record && es.record.version === undefined) {
-    es.record.version = es.record.$version;
-  }
-  if (es.isDirty()) {
-    this.markDirty(args.row, name);
-  }
 };
 
 Grid.prototype.onSort = function(event, args) {
