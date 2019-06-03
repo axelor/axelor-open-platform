@@ -1938,7 +1938,7 @@ Grid.prototype.showEditor = function (activeCell) {
 
   setTimeout(function () {
     form.toggleClass('slick-form-flip', box.bottom + 38 > viewPort.height());
-    buttons.fadeIn(200);
+    buttons.fadeIn(300);
   }, 300);
 
   this._editorVisible = grid._editorVisible = true;

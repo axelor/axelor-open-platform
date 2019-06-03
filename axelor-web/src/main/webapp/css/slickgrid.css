@@ -549,8 +549,14 @@
 
 .slick-form-buttons-wrapper {
   display: flex;
+  opacity: 0;
   flex-direction: column;
   align-items: center;
+  transition: opacity .3s ease-in-out;
+}
+
+.slick-form:hover .slick-form-buttons-wrapper {
+  opacity: 1;
 }
 
 .slick-form-buttons {
