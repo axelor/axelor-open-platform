@@ -677,7 +677,7 @@ Grid.prototype.parse = function(view) {
   var factory = new Factory(this);
 
   var options = {
-    rowHeight: Math.max(view.rowHeight || 26, 26),
+    rowHeight: Math.max(view.rowHeight || 29, 29),
     editable: false,
     formatterFactory: factory,
     enableCellNavigation: true,
@@ -1818,7 +1818,7 @@ Grid.prototype.adjustEditor = function () {
     var field = col.descriptor;
     if (field && field.name) {
       var widget = form.find("[x-field='" + field.name + "']");
-      widget.show().width(width - 2);
+      widget.show().width(width - 1);
       left = false;
       setTimeout(function () {
         if (activeCell.cell === n) {
@@ -1863,8 +1863,8 @@ Grid.prototype.showEditor = function (activeCell) {
     editor.children().hide();
     editor.append(widgets);
 
-    var confirm = $("<button class='btn'>").html(_t('Confirm'));
-    var cancel = $("<button class='btn'>").html(_t('Cancel'));
+    var confirm = $("<button class='btn btn-success'>").html(_t('Confirm'));
+    var cancel = $("<button class='btn btn-danger'>").html(_t('Cancel'));
 
     function doCancel() {
       that.cancelEdit();

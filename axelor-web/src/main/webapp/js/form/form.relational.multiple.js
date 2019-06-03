@@ -1285,7 +1285,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
 
   template:
   '<span class="form-item-container">'+
-  '<span class="picker-input picker-icons-2" style="position: absolute;">'+
+  '<span class="picker-input picker-icons-2">'+
     '<input type="text" readonly>'+
     '<span class="picker-icons">'+
       '<i class="fa fa-plus" ng-click="onSelect()" ng-show="canShowAdd()" title="{{\'Select\' | t}}"></i>'+
