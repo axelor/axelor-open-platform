@@ -238,11 +238,20 @@
   margin-top: 0 !important;
 }
 
+.slick-editor .form-item-container.boolean-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #ddd;
+}
+
 .slick-editor .form-item-container > .ibox {
-  width: auto;
-  margin-top: 2px !important;
+  width: 22px;
+  min-width: 22px;
+  margin: 2px 3px !important;
   padding: 0;
   float: inherit !important;
+  flex: 0;
 }
 
 .slick-editor-dropdown {
