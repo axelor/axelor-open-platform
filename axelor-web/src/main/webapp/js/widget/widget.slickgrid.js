@@ -1671,18 +1671,32 @@ Grid.prototype.addNewRow = function () {
   var scope = this.scope;
   var grid = this.grid;
   var data = scope.dataView;
+  var formScope = this.editorScope;
 
   function doAddRow () {
-    var defaults = that.editorScope.record;
     var args = { row: grid.getDataLength(), cell: 0 };
-    var item = _.extend({ id: 0 }, defaults);
     var cell = that.findNextEditable(args.row, args.cell);
+
+    if (formScope.defaultValues === null) {
+      formScope.defaultValues = {};
+      _.each(formScope.fields, function (field, name) {
+        if (field.defaultValue !== undefined) {
+          formScope.defaultValues[name] = field.defaultValue;
+        }
+      });
+    }
+
+    var item = _.extend({ id: 0 }, formScope.defaultValues);
 
     data.addItem(item);
     grid.invalidateRow(data.length);
     grid.focus();
     grid.setActiveCell(cell.row, cell.cell);
     that.showEditor();
+
+    if (formScope.$events.onNew) {
+      formScope.$events.onNew();
+    }
   }
 
   return this.isEditActive()
@@ -1738,34 +1752,6 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 
   formScope.onNewHandler = function (event) {
 
-  };
-
-  formScope.doOnNew = function () {
-
-    if (formScope.defaultValues === null) {
-      formScope.defaultValues = {};
-      _.each(formScope.fields, function (field, name) {
-        if (field.defaultValue !== undefined) {
-          formScope.defaultValues[name] = field.defaultValue;
-        }
-      });
-    }
-
-    var values = angular.copy(formScope.defaultValues);
-    var args = grid.getActiveCell();
-
-    formScope.editRecord(values);
-    formScope.$applyAsync();
-
-    if (!formScope.$events.onNew) {
-      return;
-    }
-
-    var handler = formScope.$events.onNew;
-    var promise = handler();
-    promise.then(function () {
-      grid.focus();
-    });
   };
 
   // delegate isDirty to the dataView
