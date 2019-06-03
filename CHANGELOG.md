@@ -1,3 +1,20 @@
+## 5.1.0-rc2 (03-06-2019)
+
+#### Bugs
+
+* Fix lost changes issue with child grid
+* Fix use of "member of" in domain expression
+* Fix duplicate DMS file results when several DMS permissions are matched
+* Fix hiding of error message div with IE
+
+#### Enhancements
+
+* Upgrade to hotswap-agent 1.3.0
+* Set Monday as first day of week for French locale
+* Improve date formatting in calendar view with locale fr
+* Check for permission when downloading files
+* Validate decimal's scale and precision attributes
+
 ## 5.1.0-rc1 (22-04-2019)
 
 #### New Features
