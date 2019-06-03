@@ -1832,9 +1832,6 @@ Grid.prototype.showEditor = function (activeCell) {
   var formScope = this.editorScope;
 
   var grid = this.grid;
-  var args = activeCell || grid.getActiveCell();
-  var box = grid.getCellNodeBox(args.row, 0);
-  var viewPort = $(grid.getCanvasNode()).parent();
 
   if (this._editorPrepared === undefined) {
     this._editorPrepared = true;
@@ -1901,13 +1898,25 @@ Grid.prototype.showEditor = function (activeCell) {
     });
   }
 
+  var args = activeCell || grid.getActiveCell();
+  var box = grid.getCellNodeBox(args.row, 0);
+  var node = grid.getCellNode(args.row, 0);
+  var viewPort = $(grid.getCanvasNode()).parent();
   var buttons = form.find('.slick-form-buttons-wrapper');
 
-  buttons.css('visibility', 'hidden');
+  buttons.hide();
   form.removeClass('slick-form-flip').fadeIn(300).css('display', '').css('top', box.top);
+
+  form.position({
+    my: 'left top',
+    at: 'left top',
+    of: node,
+    within: viewPort
+  });
+
   setTimeout(function () {
-    form.toggleClass('slick-form-flip', box.bottom + buttons.height() > viewPort.height());
-    buttons.hide().css('visibility', '').fadeIn(200);
+    form.toggleClass('slick-form-flip', box.bottom + 38 > viewPort.height());
+    buttons.fadeIn(200);
   }, 300);
 
   this._editorVisible = grid._editorVisible = true;
