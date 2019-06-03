@@ -498,10 +498,15 @@
   background: #abb9d3;
 }
 
-.slick-editor .form-item-container {
+.slick-editor .form-item-container,
+.slick-editor .form-item-container > span.display-text {
   background: white;
   margin: 1px;
   min-height: inherit !important;
+}
+
+.slick-editor .form-item-container > span.display-text {
+  padding: 2px;
 }
 
 .slick-editor .form-item-container > * {

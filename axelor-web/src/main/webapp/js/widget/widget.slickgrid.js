@@ -79,6 +79,33 @@ function makeFilterCombo(input, selection, callback) {
   });
 }
 
+function dotToNested(record, name) {
+  var value = record[name];
+  var names = name.split('.');
+  var first = names.shift();
+  var last = names.pop();
+  var obj = record[first] || (record[first] = {});
+  while (names.length) {
+    var next = names.shift();
+    obj = obj[next] || (obj[next] = {});
+  }
+  obj[last] = value;
+  return record;
+}
+
+function nestedToDot(record, name) {
+  var names = name.split('.');
+  var val = record || {};
+  var idx = 0;
+  while (val && idx < names.length) {
+    val = val[names[idx++]];
+  }
+  if (idx === names.length && val !== undefined) {
+    record[name] = val;
+  }
+  return record;
+}
+
 var Formatters = {
 
   "string": function(field, value, context) {
@@ -1687,42 +1714,25 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 
   form.prependTo(grid.getCanvasNode()).hide();
   formScope.onChangeNotify = function(scope, values) {
-    var item, editor, cell = grid.getActiveCell();
-    if (!cell || formScope.record !== scope.record) {
+    var cell = grid.getActiveCell();
+    if (that.isEditActive() || !cell || formScope.record !== scope.record) {
       return;
     }
-    item = grid.getDataItem(cell.row);
+
+    var item = grid.getDataItem(cell.row);
     if (item) {
-      editor = grid.getCellEditor();
-      if (grid.getEditorLock().isActive()) {
-        grid.getEditorLock().commitCurrentEdit();
-      }
       item = _.extend(item, values);
 
       // update dotted fields
       _.filter(grid.getColumns(), function (col) {
         return col.field && col.field.indexOf('.') > -1;
-      }).forEach(function (col) {
-        var path = col.field.split('.');
-        var val = item || {};
-        var idx = 0;
-        while (val && idx < path.length) {
-          val = val[path[idx++]];
-        }
-        if (idx === path.length && val !== undefined) {
-          item[col.field] = val;
-        }
-      });
+      }).forEach(function (col) { nestedToDot(item, col.id); });
 
       grid.updateRowCount();
       grid.invalidateRow(cell.row);
       grid.render();
 
       grid.setActiveCell(cell.row, cell.cell);
-
-      if (editor) {
-        grid.focus();
-      }
     }
   };
 
@@ -1811,7 +1821,7 @@ Grid.prototype.adjustEditor = function () {
     var width = box.right - box.left;
     var field = col.descriptor;
     if (field && field.name) {
-      var widget = form.find("[x-field=" + field.name + "]");
+      var widget = form.find("[x-field='" + field.name + "']");
       widget.show().width(width - 2);
       left = false;
       setTimeout(function () {
@@ -1919,6 +1929,12 @@ Grid.prototype.showEditor = function (activeCell) {
 
   var item = grid.getDataItem(args.row) || {};
   var record = _.extend({}, item, { version: item.version === undefined ? item.$version : item.version });
+
+  // convert dotted values
+  this.cols
+    .map(function (col) { return col.descriptor; })
+    .filter(function (field) { return field && field.name && field.name.indexOf('.') > -1; })
+    .forEach(function (field) { dotToNested(record, field.name); });
 
   formScope.editRecord(record);
 };
