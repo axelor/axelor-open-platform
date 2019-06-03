@@ -1852,7 +1852,7 @@ Grid.prototype.showEditor = function (activeCell) {
     });
 
     if (this._editorOverlay.size() === 0) {
-      this._editorOverlay = $("<div class='slickgrid-edit-overlay'>").appendTo(this.element);
+      this._editorOverlay = $("<div class='slickgrid-edit-overlay'>").hide().appendTo(this.element);
     }
 
     var editor = form.find('form:first');
@@ -1914,18 +1914,19 @@ Grid.prototype.showEditor = function (activeCell) {
   }
 
   var args = activeCell || grid.getActiveCell();
-  var box = grid.getCellNodeBox(args.row, 0);
-  var node = grid.getCellNode(args.row, 0);
-  var viewPort = $(grid.getCanvasNode()).parent();
-  var buttons = form.find('.slick-form-buttons-wrapper');
-
+  
   if (!this.isCellEditable(args.row, args.cell)) {
     args = this.findNextEditable(args.row, 0);
     grid.setActiveCell(args.row, args.cell);
   }
 
+  var box = grid.getCellNodeBox(args.row, 0);
+  var node = grid.getCellNode(args.row, 0);
+  var viewPort = $(grid.getCanvasNode()).parent();
+  var buttons = form.find('.slick-form-buttons-wrapper');
+
   buttons.hide();
-  form.removeClass('slick-form-flip').fadeIn(300).css('display', '').css('top', box.top);
+  form.removeClass('slick-form-flip').fadeIn(300).css('display', '');
 
   form.position({
     my: 'left top',
@@ -2272,24 +2273,10 @@ Grid.prototype.__onItemClick = function(event, args) {
     return false;
   }
 
-  //XXX: hack to show popup grid (selector and editable in conflict?)
-  if (this.scope.selector && this.editable) {
-    var col = this.grid.getColumns()[args.cell] || {},
-      field = col.descriptor || {};
-    if (col.forEdit !== false &&
-        (field.type === 'one-to-many' || field.type === 'many-to-many' || this.scope.selector === 'checkbox')) {
-      this.grid.setActiveCell(args.row, args.cell);
-      this.showEditor();
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      return false;
-    }
-  }
-
   this.grid.setActiveCell(args.row, args.cell);
   this.grid.setSelectedRows([args.row]);
 
-  if (!this.scope.selector && this.canEdit()) {
+  if (this.canEdit()) {
     var col = this.grid.getColumns()[args.cell];
     if (col && col.id === "_edit_column") return;
     this.showEditor(args);
@@ -2580,7 +2567,8 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         scope.selector = attrs.selector;
         scope.noFilter = attrs.noFilter;
 
-        if (axelor.config["view.grid.selection"] === "checkbox" && !scope.selector) {
+        if (!scope.selector && (axelor.config["view.grid.selection"] === undefined
+            || axelor.config["view.grid.selection"] === "checkbox")) {
           scope.selector = "checkbox";
         }
 
