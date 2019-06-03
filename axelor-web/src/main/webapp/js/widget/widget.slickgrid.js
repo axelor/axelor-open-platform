@@ -646,7 +646,8 @@ Grid.prototype.parse = function(view) {
   if (scope.selector) {
     selectColumn = new Slick.CheckboxSelectColumn({
       cssClass: "slick-cell-checkboxsel",
-      multiSelect: scope.selector !== "single"
+      multiSelect: scope.selector !== "single",
+      width: 30
     });
 
     cols.unshift(_.extend(selectColumn.getColumnDefinition(), {

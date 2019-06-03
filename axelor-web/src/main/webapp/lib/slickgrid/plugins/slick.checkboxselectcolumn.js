@@ -55,9 +55,9 @@
       
       if (_options.multiSelect) {
         if (selectedRows.length && selectedRows.length == _grid.getDataLength()) {
-          _grid.updateColumnHeader(_options.columnId, "<input type='checkbox' checked='checked'>", _options.toolTip);
+          _grid.updateColumnHeader(_options.columnId, "<label class='ibox'><input type='checkbox' checked='checked'><span class='box'></span></label>", _options.toolTip);
         } else {
-          _grid.updateColumnHeader(_options.columnId, "<input type='checkbox'>", _options.toolTip);
+          _grid.updateColumnHeader(_options.columnId, "<label class='ibox'><input type='checkbox'><span class='box'></span></label>", _options.toolTip);
         }
       }
     }
@@ -129,7 +129,7 @@
     function getColumnDefinition() {
       return {
         id: _options.columnId,
-        name: _options.multiSelect ? "<input type='checkbox'>" : "<span class='slick-column-name'>&nbsp;</span>",
+        name: _options.multiSelect ? "<label class='ibox'><input type='checkbox'><span class='box'></span></label>" : "<span class='slick-column-name'>&nbsp;</span>",
         toolTip: _options.toolTip,
         field: "sel",
         width: _options.width,
@@ -144,8 +144,8 @@
       if (dataContext) {
     	var type = _options.multiSelect ? "checkbox" : "radio";
         return _selectedRowsLookup[row]
-            ? "<input type='" + type + "' checked='checked'>"
-            : "<input type='" + type + "'>";
+            ? "<label class='ibox'><input type='" + type + "' checked='checked'><span class='box'></span></label>"
+            : "<label class='ibox'><input type='" + type + "'><span class='box'></span></label>";
       }
       return null;
     }

@@ -179,6 +179,28 @@
   padding: 0px;
 }
 
+.slick-cell-checkboxsel .ibox .box {
+  width: 18px;
+  height: 18px;
+}
+
+.slick-cell-checkboxsel .ibox input:checked + .box:after {
+  top: 4px;
+  left: 3px;
+}
+
+.slick-cell.slick-cell-checkboxsel {
+  padding: 5px;
+}
+
+.slick-cell-checkboxsel .ibox {
+  float: left;
+}
+
+.slick-header-column.slick-cell-checkboxsel .ibox {
+  margin-left: -3px;
+}
+
 .slick-cell.editable {
   background: white;
   padding: 0;
