@@ -63,7 +63,7 @@
 }
 
 .slick-row {
-  background: #f9f9f9;
+  background: #fff;
   border-bottom: 1px solid #e7eaec !important;
 }
 .slick-row.odd {
@@ -89,13 +89,13 @@
 .slick-row.active,
 .slick-row.selected,
 .slick-row .slick-cell.selected {
-    background-color: #abb9d3;
+    background-color: #e7e7e7;
 }
 
 .slick-row .slick-cell.text,
 .slick-row .slick-cell.html {
   white-space: pre-wrap;
-    word-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .slick-row .slick-cell.selected.active::after {
@@ -466,7 +466,6 @@
   right: 0;
   bottom: 0;
   left: 0;
-  background: #ddd;
   opacity: 0.25;
   z-index: 2;
 }
@@ -492,7 +491,7 @@
   background: #fff;
   padding: 0;
   margin: 0;
-  background: #abb9d3;
+  background: #e7e7e7;
 }
 
 .slick-editor .form-item-container,
@@ -512,6 +511,11 @@
   flex: 1;
 }
 
+.slick-editor input,
+.slick-editor textarea {
+  border-color: #ddd;
+}
+
 .slick-form-buttons-wrapper {
   display: flex;
   flex-direction: column;
@@ -519,7 +523,7 @@
 }
 
 .slick-form-buttons {
-  background: #abb9d3;
+  background: #e7e7e7;
   padding: 4px 4px 6px;
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
