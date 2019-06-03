@@ -1904,6 +1904,11 @@ Grid.prototype.showEditor = function (activeCell) {
   var viewPort = $(grid.getCanvasNode()).parent();
   var buttons = form.find('.slick-form-buttons-wrapper');
 
+  if (!this.isCellEditable(args.row, args.cell)) {
+    args = this.findNextEditable(args.row, 0);
+    grid.setActiveCell(args.row, args.cell);
+  }
+
   buttons.hide();
   form.removeClass('slick-form-flip').fadeIn(300).css('display', '').css('top', box.top);
 
@@ -1934,7 +1939,7 @@ Grid.prototype.showEditor = function (activeCell) {
   formScope.editRecord(record);
 };
 
-Grid.prototype.cancelEdit = function () {
+Grid.prototype.cancelEdit = function (focus) {
   if (!this.isEditActive()) return;
   this.editorForm.fadeOut(200);
   this.editorScope.edit(null);
@@ -1943,11 +1948,14 @@ Grid.prototype.cancelEdit = function () {
   if (this.handler.dataView.getItemById(0)) {
     this.handler.dataView.deleteItem(0);
   }
-  var activeCell = this.grid.getActiveCell()
-    || this.findNextEditable(this.grid.getDataLength() - 1 , 0)
-    || { row: 0, cell: 0 };
-  this.grid.setActiveCell(activeCell.row, activeCell.cell);
-  this.grid.focus();
+
+  if (focus === undefined || focus) {
+    var activeCell = this.grid.getActiveCell()
+      || this.findNextEditable(this.grid.getDataLength() - 1 , 0)
+      || { row: 0, cell: 0 };
+    this.grid.setActiveCell(activeCell.row, activeCell.cell);
+    this.grid.focus();
+  }
 };
 
 Grid.prototype.commitEdit = function () {
@@ -2019,9 +2027,6 @@ Grid.prototype.onSelectionChanged = function(event, args) {
     .each(function () {
       $(this).addClass('selected');
     });
-
-  // cancel edit
-  this.cancelEdit();
 };
 
 Grid.prototype.onSort = function(event, args) {
@@ -2309,6 +2314,9 @@ Grid.prototype.onRowsChanged = function(event, args) {
   }
   grid.invalidateRows(args.rows);
   grid.render();
+
+  // cancel edit
+  this.cancelEdit(false);
 };
 
 Grid.prototype.groupBy = function(names) {

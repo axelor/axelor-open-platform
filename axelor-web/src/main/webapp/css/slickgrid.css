@@ -507,6 +507,7 @@
 
 .slick-editor .form-item-container > span.display-text {
   padding: 2px;
+  min-height: 24px !important;
 }
 
 .slick-editor .form-item-container > * {
