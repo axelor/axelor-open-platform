@@ -1917,7 +1917,7 @@ Grid.prototype.showEditor = function (activeCell) {
     at: 'left top',
     of: node,
     within: viewPort
-  });
+  }).css('left', 0);
 
   setTimeout(function () {
     form.toggleClass('slick-form-flip', box.bottom + 38 > viewPort.height());
