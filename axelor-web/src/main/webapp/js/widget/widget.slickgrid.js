@@ -79,7 +79,16 @@ function makeFilterCombo(input, selection, callback) {
   });
 }
 
-function dotToNested(record, name) {
+function dotToNested(record, field) {
+  if (field.jsonField) {
+    var json = record[field.jsonField];
+    if (_.isString(json)) {
+      record[field.jsonField] = angular.fromJson(json);
+    }
+    return;
+  }
+
+  var name = field.name;
   var value = record[name];
   var names = name.split('.');
   var first = names.shift();
@@ -1935,7 +1944,7 @@ Grid.prototype.showEditor = function (activeCell) {
   this.cols
     .map(function (col) { return col.descriptor; })
     .filter(function (field) { return field && field.name && field.name.indexOf('.') > -1; })
-    .forEach(function (field) { dotToNested(record, field.name); });
+    .forEach(function (field) { dotToNested(record, field); });
 
   formScope.editRecord(record);
 };
@@ -1991,6 +2000,15 @@ Grid.prototype.commitEdit = function () {
   var item = data.getItemByIdx(row);
 
   var record = _.extend({}, item, scope.record, { $dirty: true, _orignal: scope.$$original });
+
+  that.cols.forEach(function (col) {
+    if (col.descriptor && col.descriptor.jsonField) {
+      var json = record[col.descriptor.jsonField];
+      if (_.isObject(json)) {
+        record[col.descriptor.jsonField] = angular.toJson(record[col.descriptor.jsonField]);
+      }
+    }
+  });
 
   data.updateItem(item.id, record);
 
