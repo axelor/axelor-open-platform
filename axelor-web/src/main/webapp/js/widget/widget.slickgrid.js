@@ -1934,13 +1934,22 @@ Grid.prototype.showEditor = function (activeCell) {
 
     this._editorOverlay.click(function (e) {
       if (that._commitPromise) return;
-      var top = $(grid.getCanvasNode()).parent().position().top;
+      var viewport = $(grid.getCanvasNode()).parent();
+      var top = viewport.position().top - viewport.scrollTop();
       var args = grid.getCellFromPoint(e.offsetX, e.offsetY - top);
       if (args.row > -1 && args.row < grid.getDataLength()) {
         doCommit().then(function () { grid.onClick.notify(args, e, grid); });
       }
     });
+    
+    $(grid.getCanvasNode()).parent().scroll(function (e) {
+      if (that.isEditActive()) {
+        e.target.scrollTop = that._lastScrollTop;
+      }
+    });
   }
+
+  this._lastScrollTop = $(grid.getCanvasNode()).parent().scrollTop();
 
   var args = activeCell || grid.getActiveCell();
 
