@@ -1919,6 +1919,18 @@ Grid.prototype.showEditor = function (activeCell) {
     $("<div class='slick-form-buttons'>")
       .append([confirm, cancel])
       .appendTo($("<div class='slick-form-buttons-wrapper'>").appendTo(form));
+
+    form.on('focus', ':input', function (e) {
+      var elem = $(e.target);
+      var elemScope = elem.scope();
+      if (elemScope && elemScope.field && elemScope.field.name) {
+        var args = grid.getActiveCell();
+        var cell = grid.getColumnIndex(elemScope.field.name);
+        if (cell >= 0) {
+          grid.setActiveCell(args.row, cell);
+        }
+      }
+    });
   }
 
   var args = activeCell || grid.getActiveCell();
