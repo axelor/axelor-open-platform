@@ -747,4 +747,20 @@ public class MetaFiles {
     }
     return "fa-file-o";
   }
+
+  /**
+   * Gets download link for given meta file. Permissions can be checked from given parent record.
+   *
+   * @param metaFile
+   * @param parentModel
+   * @return download link
+   */
+  public String getDownloadLink(MetaFile metaFile, Model parentModel) {
+    return String.format(
+        "ws/rest/%s/%d/content/download?parentModel=%s&parentId=%d",
+        MetaFile.class.getName(),
+        metaFile.getId(),
+        EntityHelper.getEntityClass(parentModel).getName(),
+        parentModel.getId());
+  }
 }
