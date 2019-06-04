@@ -529,8 +529,13 @@
 }
 
 .slick-editor .form-item-container > span.display-text {
-  padding: 2px;
+  padding: 1px;
   min-height: 25px !important;
+  white-space: nowrap;
+}
+
+.slick-editor .form-item-container > span.display-text > * {
+  overflow: hidden;
 }
 
 .slick-editor .form-item-container > * {
