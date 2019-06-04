@@ -842,6 +842,7 @@ Grid.prototype._doInit = function(view) {
   this.subscribe(grid.onSelectedRowsChanged, this.onSelectionChanged);
   this.subscribe(grid.onClick, this.onItemClick);
   this.subscribe(grid.onDblClick, this.onItemDblClick);
+  this.subscribe(grid.onKeyDown, this.onKeyDown);
 
   // register dataView event handlers
   this.subscribe(dataView.onRowCountChanged, this.onRowCountChanged);
@@ -1403,6 +1404,28 @@ Grid.prototype.onMenuCommand = function(event, args) {
   }
 };
 
+Grid.prototype.onKeyDown = function (e) {
+  var that = this;
+  var grid = this.grid;
+  var args = grid.getActiveCell();
+
+  if (e.isDefaultPrevented()) return;
+  if (e.keyCode === 13) {
+    if (this.isEditActive() && e.ctrlKey) {
+      var promise = that.commitEdit();
+      promise.then(function () {
+        if (args.row === grid.getDataLength() - 1) {
+          that.addNewRow();
+        }
+      }, function () {
+        that.focusInvalidCell(grid.getActiveCell());
+      });
+    } else if (this.isCellEditable(args.row, args.cell)){
+      that.showEditor();
+    }
+  }
+};
+
 Grid.prototype.isCellEditable = function(row, cell) {
   var cols = this.grid.getColumns(),
     col = cols[cell];
@@ -1896,22 +1919,6 @@ Grid.prototype.showEditor = function (activeCell) {
     $("<div class='slick-form-buttons'>")
       .append([confirm, cancel])
       .appendTo($("<div class='slick-form-buttons-wrapper'>").appendTo(form));
-
-    this.subscribe(grid.onKeyDown, function (e) {
-      if (e.isDefaultPrevented()) return;
-      if (e.keyCode === 13) {
-        if (that.isEditActive() && e.ctrlKey) {
-          doCommit().then(function () {
-            var args = grid.getActiveCell();
-            if (args.row === grid.getDataLength() - 1) {
-              that.addNewRow();
-            }
-          });
-        } else {
-          that.showEditor();
-        }
-      }
-    });
   }
 
   var args = activeCell || grid.getActiveCell();
