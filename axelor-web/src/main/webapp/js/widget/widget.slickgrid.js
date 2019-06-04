@@ -1829,7 +1829,7 @@ Grid.prototype.adjustEditor = function () {
 
   form.find('.form-item-container').hide();
 
-  this._editorOverlay.show();
+  this._editorOverlay.fadeIn(300);
 
   var activeCell = grid.getActiveCell();
   var leftPadding = 0;
@@ -1931,6 +1931,15 @@ Grid.prototype.showEditor = function (activeCell) {
         }
       }
     });
+
+    this._editorOverlay.click(function (e) {
+      if (that._commitPromise) return;
+      var top = $(grid.getCanvasNode()).parent().position().top;
+      var args = grid.getCellFromPoint(e.offsetX, e.offsetY - top);
+      if (args.row > -1 && args.row < grid.getDataLength()) {
+        doCommit().then(function () { grid.onClick.notify(args, e, grid); });
+      }
+    });
   }
 
   var args = activeCell || grid.getActiveCell();
@@ -1996,8 +2005,16 @@ Grid.prototype.cancelEdit = function (focus) {
 
 Grid.prototype.commitEdit = function () {
 
+  var that = this;
   var defer = this.handler._defer();
   var promise = defer.promise;
+
+  var cleanUp = function () {
+    that._commitPromise = null;
+  }
+
+  this._commitPromise = promise;
+  promise.then(cleanUp, cleanUp);
 
   if (!this.isEditActive()) {
     defer.resolve();
@@ -2005,7 +2022,6 @@ Grid.prototype.commitEdit = function () {
   }
 
   var scope = this.editorScope;
-  var that = this;
   var data = this.scope.dataView;
 
   if (!scope || !scope.isValid()) {
