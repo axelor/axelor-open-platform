@@ -1435,7 +1435,7 @@ Grid.prototype.isCellEditable = function(row, cell) {
   var field = col.descriptor || {};
   var form = this.editorForm;
 
-  if (field.type === 'button' || (field.name && field.name.indexOf('.') > -1)) {
+  if (field.type === 'button' || (!field.jsonField && field.name && field.name.indexOf('.') > -1)) {
     return false;
   }
   if (!form) {
@@ -1444,7 +1444,7 @@ Grid.prototype.isCellEditable = function(row, cell) {
 
   var current = this.grid.getActiveCell();
   if (current && current.row === row) {
-    var item = this.element.find('[x-field=' + field.name + ']:first');
+    var item = this.element.find('[x-field="' + field.name + '"]:first');
     if (item.length) {
       return !item.scope().isReadonly();
     }
