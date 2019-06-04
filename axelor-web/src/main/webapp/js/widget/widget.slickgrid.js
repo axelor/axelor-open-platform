@@ -1915,7 +1915,7 @@ Grid.prototype.showEditor = function (activeCell) {
   }
 
   var args = activeCell || grid.getActiveCell();
-  
+
   if (!this.isCellEditable(args.row, args.cell)) {
     args = this.findNextEditable(args.row, 0);
     grid.setActiveCell(args.row, args.cell);
@@ -2227,38 +2227,6 @@ Grid.prototype.onButtonClick = function(event, args) {
 
 Grid.prototype.onItemClick = function(event, args) {
 
-  var that = this;
-  var waitCallback = function (done) {
-    setTimeout(function () {
-      that.handler.waitForActions(function () {
-        that.__onItemClick(event, args);
-        if (done) {
-          done();
-        }
-      }, 100)
-    }, 100);
-  };
-
-  var lock = this.grid.getEditorLock();
-  if (lock.isActive()) {
-    lock.commitCurrentEdit();
-    if (this.editorScope &&
-      this.editorScope.$lastEditor &&
-      this.editorScope.$lastEditor.shouldWait()) {
-      return waitCallback;
-    }
-  }
-
-  // prevent edit if some action is still in progress
-  if (this.isDirty() && axelor.blockUI()) {
-    return waitCallback;
-  }
-
-  return this.__onItemClick(event, args);
-}
-
-Grid.prototype.__onItemClick = function(event, args) {
-
   // prevent edit if some action is still in progress
   if (this.isDirty() && axelor.blockUI()) {
     return;
@@ -2275,11 +2243,8 @@ Grid.prototype.__onItemClick = function(event, args) {
   }
 
   this.grid.setActiveCell(args.row, args.cell);
-  this.grid.setSelectedRows([args.row]);
 
-  if (this.canEdit()) {
-    var col = this.grid.getColumns()[args.cell];
-    if (col && col.id === "_edit_column") return;
+  if (this.canEdit() && this.isCellEditable(args.row, args.cell)) {
     this.showEditor(args);
   } else if (this.handler.onItemClick) {
     this.handler.onItemClick(event, args);
