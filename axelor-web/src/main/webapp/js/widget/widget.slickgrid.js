@@ -1977,9 +1977,9 @@ Grid.prototype.showEditor = function (activeCell) {
 
 Grid.prototype.cancelEdit = function (focus) {
   if (!this.isEditActive()) return;
-  this.editorForm.fadeOut(200);
+  this.editorForm.hide();
   this.editorScope.edit(null);
-  this._editorOverlay.fadeOut(200);
+  this._editorOverlay.hide();
   this._editorVisible = this.grid._editorVisible = false;
   if (this.handler.dataView.getItemById(0)) {
     this.handler.dataView.deleteItem(0);
