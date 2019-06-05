@@ -1916,11 +1916,28 @@ Grid.prototype.showEditor = function (activeCell) {
       }
     })
 
-    $("<div class='slick-form-buttons'>")
+    var buttons = $("<div class='slick-form-buttons'>")
       .append([confirm, cancel])
       .appendTo($("<div class='slick-form-buttons-wrapper'>").appendTo(form));
 
-    form.on('focus', ':input', function (e) {
+    var buttonsAdjusted = false;
+
+    function adjustButtons(e) {
+      if (buttonsAdjusted) return;
+      if (that.isEditActive()) {
+        buttonsAdjusted = true;
+        buttonsWrapper.show();
+        var elem = $(e.target).parents('.form-item-container');
+        var left = (elem.offset().left - form.offset().left)
+                 + (elem.width() / 2 - buttons.width() / 2);
+        buttons.css('left', left);
+        setTimeout(function () {
+          buttonsAdjusted = false;
+        }, 100);
+      }
+    }
+
+    form.on('focus', '.form-item-container :input', function (e) {
       var elem = $(e.target);
       var elemScope = elem.scope();
       if (elemScope && elemScope.field && elemScope.field.name) {
@@ -1928,9 +1945,12 @@ Grid.prototype.showEditor = function (activeCell) {
         var cell = grid.getColumnIndex(elemScope.field.name);
         if (cell >= 0) {
           grid.setActiveCell(args.row, cell);
+          adjustButtons(e);
         }
       }
     });
+
+    form.on('mouseover', '.form-item-container', adjustButtons);
 
     this._editorOverlay.click(function (e) {
       if (that._commitPromise) return;
@@ -1961,11 +1981,9 @@ Grid.prototype.showEditor = function (activeCell) {
   var box = grid.getCellNodeBox(args.row, 0);
   var node = grid.getCellNode(args.row, 0);
   var viewPort = $(grid.getCanvasNode()).parent();
-  var buttons = form.find('.slick-form-buttons-wrapper');
+  var buttonsWrapper = form.find('.slick-form-buttons-wrapper');
 
-  buttons.hide();
-  form.removeClass('slick-form-flip').fadeIn(300).css('display', '');
-
+  form.removeClass('slick-form-flip').show().css('visibility', 'hidden').css('display', '');
   form.position({
     my: 'left top',
     at: 'left top',
@@ -1973,10 +1991,10 @@ Grid.prototype.showEditor = function (activeCell) {
     within: viewPort
   }).css('left', 0);
 
+  form.toggleClass('slick-form-flip', box.bottom + 48 > viewPort.height());
   setTimeout(function () {
-    form.toggleClass('slick-form-flip', box.bottom + 38 > viewPort.height());
-    buttons.fadeIn(300);
-  }, 300);
+    form.css('visibility', '');
+  }, 100)
 
   this._editorVisible = grid._editorVisible = true;
   this.adjustEditor(args);
