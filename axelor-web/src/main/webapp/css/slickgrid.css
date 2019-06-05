@@ -325,6 +325,15 @@
   margin-top: -2px;
 }
 
+.slick-cell .progress {
+  margin: 3px 0 0;
+}
+
+.slick-editor .progress-item {
+  padding: 3px;
+  margin-top: 2px !important;
+}
+
 .slick-group > .slick-cell-checkboxsel {
    text-align: inherit;
 }
@@ -521,6 +530,11 @@
   background: #e7e7e7;
 }
 
+.slick-editor .form-item-container {
+  display: flex;
+  align-items: center;
+}
+
 .slick-editor .form-item-container,
 .slick-editor .form-item-container > span.display-text {
   background: white;
@@ -539,7 +553,7 @@
 }
 
 .slick-editor .form-item-container > * {
-  width: auto;
+  width: inherit;
   flex: 1;
 }
 

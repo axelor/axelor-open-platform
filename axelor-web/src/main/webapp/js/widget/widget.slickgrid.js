@@ -199,7 +199,7 @@ var Formatters = {
 
   "progress": function(field, value) {
     var props = ui.ProgressMixin.compute(field, value);
-    return '<div class="progress ' + props.css + '" style="height: 18px; margin: 0; margin-top: 1px;">'+
+    return '<div class="progress ' + props.css + '">'+
       '<div class="bar" style="width: ' + props.width +'%;"></div>'+
     '</div>';
   },
