@@ -1914,7 +1914,23 @@ Grid.prototype.showEditor = function (activeCell) {
           }
         });
       }
-    })
+    });
+    cancel.keydown(function (e) {
+      if (e.keyCode === 9 && !e.shiftKey) {
+        form.find('.form-item-container :input').first().focus().select();
+        e.stopPropagation();
+        e.preventDefault();
+        return false;
+      }
+    });
+    form.on('keydown', '.form-item-container :input:first', function (e) {
+      if (e.keyCode === 9 && e.shiftKey) {
+        cancel.focus();
+        e.stopPropagation();
+        e.preventDefault();
+        return false;
+      }
+    });
 
     var buttons = $("<div class='slick-form-buttons'>")
       .append([confirm, cancel])
