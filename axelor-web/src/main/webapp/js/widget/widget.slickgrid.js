@@ -2007,7 +2007,7 @@ Grid.prototype.showEditor = function (activeCell) {
     within: viewPort
   }).css('left', 0);
 
-  form.toggleClass('slick-form-flip', box.bottom + 48 > viewPort.height());
+  form.toggleClass('slick-form-flip', box.bottom + 48 > (viewPort.height() + viewPort.scrollTop()));
   setTimeout(function () {
     form.css('visibility', '');
   }, 100)
