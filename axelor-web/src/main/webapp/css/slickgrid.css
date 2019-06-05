@@ -555,6 +555,7 @@
   border-bottom-right-radius: 4px;
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
   position: absolute;
+  white-space: nowrap;
 }
 
 .slick-form-buttons button {

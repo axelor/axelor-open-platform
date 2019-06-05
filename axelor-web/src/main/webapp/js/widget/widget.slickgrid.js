@@ -1943,10 +1943,13 @@ Grid.prototype.showEditor = function (activeCell) {
       if (that.isEditActive()) {
         buttonsAdjusted = true;
         buttonsWrapper.show();
-        var elem = $(e.target).parents('.form-item-container');
-        var left = (elem.offset().left - form.offset().left)
-                 + (elem.width() / 2 - buttons.width() / 2);
-        buttons.css('left', left);
+        var elem = $(e.target).is('.form-item-container') ? $(e.target) : $(e.target).parents('.form-item-container');
+        buttons.position({
+          my: 'center top',
+          at: 'center bottom',
+          of: elem,
+          within: $(grid.getCanvasNode).parent()
+        });
         setTimeout(function () {
           buttonsAdjusted = false;
         }, 100);
