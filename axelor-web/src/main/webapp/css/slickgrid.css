@@ -540,12 +540,14 @@
   background: white;
   margin: 1px 1px 1px 0;
   min-height: inherit !important;
+  line-height: 18px;
 }
 
 .slick-editor .form-item-container > span.display-text {
   padding: 1px;
-  min-height: 25px !important;
+  min-height: 26px !important;
   white-space: nowrap;
+  border: 1px solid #ddd;
 }
 
 .slick-editor .form-item-container > span.display-text > * {
