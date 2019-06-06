@@ -1948,7 +1948,10 @@ Grid.prototype.showEditor = function (activeCell) {
           my: 'center top',
           at: 'center bottom',
           of: elem,
-          within: $(grid.getCanvasNode).parent()
+          within: $(grid.getCanvasNode).parent(),
+          using: function (position) {
+            buttons.css('left', position.left);
+          }
         });
         setTimeout(function () {
           buttonsAdjusted = false;

@@ -574,12 +574,12 @@
   white-space: nowrap;
 }
 
-.slick-form-buttons button {
-  margin: 0 2px;
+.slick-form-flip .slick-form-buttons {
+  top: -38px !important;
 }
 
-.slick-form.slick-form-flip .slick-form-buttons {
-  margin-top: -38px;
+.slick-form-buttons button {
+  margin: 0 2px;
 }
 
 .slick-form.slick-form-flip .slick-form-buttons {
