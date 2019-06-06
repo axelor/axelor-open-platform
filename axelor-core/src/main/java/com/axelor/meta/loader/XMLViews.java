@@ -62,6 +62,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
@@ -73,6 +74,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -619,6 +621,21 @@ public class XMLViews {
       final ObjectViews objectViews = unmarshal(document);
       final String finalXml = toXml(objectViews.getViews().get(0), true);
       computedView.setXml(finalXml);
+      computedView.setModule(getLastModule(extensionViews));
+    }
+
+    @Nullable
+    private static String getLastModule(List<MetaView> metaViews) {
+      for (final ListIterator<MetaView> it = metaViews.listIterator(metaViews.size());
+          it.hasPrevious(); ) {
+        final String module = it.previous().getModule();
+
+        if (StringUtils.notBlank(module)) {
+          return module;
+        }
+      }
+
+      return null;
     }
 
     private static List<MetaView> findExtensionMetaViewsByModuleOrder(MetaView view) {

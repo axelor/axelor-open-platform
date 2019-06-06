@@ -2620,8 +2620,7 @@
 
   <xsd:group name="ExtendFormItems">
     <xsd:choice>
-      <xsd:group ref="tns:FormPanels" />
-      <xsd:group ref="tns:FormWidgets" />
+      <xsd:group ref="tns:PanelItems" />
       <xsd:element name="toolbar" type="tns:Toolbar" />
       <xsd:element name="menubar" type="tns:Menubar" />
       <xsd:element name="menu" type="tns:MenubarMenu" />
@@ -2629,6 +2628,8 @@
       <xsd:element name="divider" type="tns:MenubarMenuDivider" />
       <xsd:element name="viewer" type="tns:PanelViewer"></xsd:element>
       <xsd:element name="editor" type="tns:PanelEditor"></xsd:element>
+      <xsd:element name="panel-stack" type="tns:PanelTabs"></xsd:element>
+      <xsd:element name="panel-tabs" type="tns:PanelTabs"></xsd:element>
       <xsd:element name="panel-mail" type="tns:PanelMail"></xsd:element>
     </xsd:choice>
   </xsd:group>
