@@ -193,11 +193,14 @@ public class RestService extends ResourceService {
     long attachments =
         Query.of(DMSFile.class)
             .filter(
-                "self.relatedId = :id AND self.relatedModel = :model "
-                    + "AND COALESCE(self.isDirectory, FALSE) = FALSE "
-                    + "AND (self.permissions.group = :group "
-                    + "OR self.permissions.user = :user "
-                    + "OR :isAdmin = TRUE)")
+                "self.id IN (SELECT x.id FROM DMSFile x "
+                    + "LEFT JOIN x.permissions x_permissions "
+                    + "LEFT JOIN x_permissions.group x_permissions_group "
+                    + "LEFT JOIN x_permissions.user x_permissions_user "
+                    + "WHERE x.relatedId = :id AND x.relatedModel = :model "
+                    + "AND COALESCE(x.isDirectory, FALSE) = FALSE "
+                    + "AND (x_permissions_group = :group OR x_permissions_user = :user "
+                    + "OR :isAdmin = TRUE))")
             .bind("id", id)
             .bind("model", getModel())
             .bind("group", user.getGroup())
