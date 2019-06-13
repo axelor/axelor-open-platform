@@ -18,7 +18,6 @@
 package com.axelor.auth;
 
 import com.google.inject.Key;
-import javax.servlet.Filter;
 import javax.servlet.ServletContext;
 import org.apache.shiro.guice.web.ShiroWebModule;
 
@@ -32,11 +31,6 @@ public class AuthWebModule extends ShiroWebModule {
   protected final void configureShiroWeb() {
     this.configureAnon();
     this.configureAuth();
-  }
-
-  @SuppressWarnings("unchecked")
-  protected void addFilterChain(String pattern, Key<? extends Filter> key) {
-    super.addFilterChain(pattern, key);
   }
 
   protected void configureAnon() {

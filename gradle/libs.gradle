@@ -2,8 +2,8 @@ def libs = ext.libs = [:]
 def versions = [:]
 
 // versions
-versions.guice = "4.1.0"
-versions.guava = "23.0"
+versions.guice = "4.2.2"
+versions.guava = "28.0-jre"
 versions.hibernate = "5.2.10.Final"
 versions.hibernate_validator = "5.4.1.Final"
 versions.hibernate_search = "5.7.0.Final"
@@ -11,7 +11,7 @@ versions.hibernate_search = "5.7.0.Final"
 versions.groovy = "2.4.10"
 versions.resteasy = "3.1.2.Final"
 versions.jackson = "2.8.8"
-versions.shiro = "1.2.6"
+versions.shiro = "1.4.1"
 
 versions.junit = "4.12"
 versions.slf4j = "1.7.25"
@@ -49,7 +49,7 @@ libs.slf4j_logback = libs.slf4j_base + [
 ]
 
 // Guava
-libs.guava = ["com.google.guava:guava:${versions.guava}", "com.google.code.findbugs:jsr305:3.0.1"]
+libs.guava = ["com.google.guava:guava:${versions.guava}", "com.google.code.findbugs:jsr305:3.0.2"]
 
 // yaml
 libs.snakeyaml = "org.yaml:snakeyaml:1.17"
@@ -162,7 +162,7 @@ libs.apache_shiro = [
 // Apache Shiro CAS
 libs.apache_shiro_cas = [
   "org.apache.shiro:shiro-cas:${versions.shiro}",
-  "commons-codec:commons-codec:1.10",
+  "commons-codec:commons-codec:1.12",
   "org.opensaml:opensaml:1.1",
   "org.apache.santuario:xmlsec:1.4.3"]
 
