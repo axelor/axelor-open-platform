@@ -20,6 +20,9 @@ package com.axelor.web;
 import com.axelor.app.AppSettings;
 import com.axelor.db.search.SearchService;
 import com.axelor.db.tenants.TenantModule;
+import com.axelor.event.Event;
+import com.axelor.events.ShutdownEvent;
+import com.axelor.events.StartupEvent;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.quartz.JobRunner;
 import javax.inject.Inject;
@@ -41,6 +44,10 @@ public class AppInitializer extends HttpServlet {
   @Inject private JobRunner jobRunner;
 
   @Inject private SearchService searchService;
+
+  @Inject private Event<StartupEvent> startupEvent;
+
+  @Inject private Event<ShutdownEvent> shutdownEvent;
 
   @Override
   public void init() throws ServletException {
@@ -73,12 +80,14 @@ public class AppInitializer extends HttpServlet {
       LOGGER.error(e.getMessage(), e);
     }
 
+    startupEvent.fire(new StartupEvent());
     LOGGER.info("Ready to serve...");
   }
 
   @Override
   public void destroy() {
     try {
+      shutdownEvent.fire(new ShutdownEvent());
       jobRunner.stop();
     } catch (Exception e) {
       LOGGER.error(e.getMessage(), e);
