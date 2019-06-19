@@ -49,14 +49,20 @@ import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.persistence.Query;
 import javax.script.Bindings;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.implementation.InvocationHandlerAdapter;
+import net.bytebuddy.matcher.ElementMatchers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -187,15 +193,64 @@ public class ActionHandler {
 
   public Object rpc(String className, String methodCall) {
 
-    Pattern p = Pattern.compile("(\\w+)\\((.*?)\\)");
-    Matcher m = p.matcher(methodCall);
+    Pattern pattern = Pattern.compile("(\\w+)\\((.*?)\\)");
+    Matcher matcher = pattern.matcher(methodCall);
 
-    if (!m.matches()) {
+    if (!matcher.matches()) {
       return null;
     }
 
+    String methodName = matcher.group(1);
+    String methodArgs = matcher.group(2);
+
     try {
       final Class<?> klass = Class.forName(className);
+      final List<Method> methods =
+          Arrays.stream(klass.getMethods())
+              .filter(m -> m.getName().equals(methodName))
+              .collect(Collectors.toList());
+
+      // method not found
+      if (methods.size() == 0) {
+        throw new IllegalArgumentException(
+            new NoSuchMethodException(String.format("%s.%s()", className, methodName)));
+      }
+
+      // validate no-args or only matched method
+      if (methods.size() == 1 || StringUtils.isBlank(methodArgs)) {
+        Method method = methods.get(0);
+        if (method.getAnnotation(CallMethod.class) == null) {
+          throw new IllegalArgumentException(
+              String.format("Action call not allowed: %s", method.toString()));
+        }
+      } else { // validate exact matched method with arguments
+        final Object validator =
+            new ByteBuddy()
+                .subclass(klass)
+                .method(ElementMatchers.named(methodName))
+                .intercept(
+                    InvocationHandlerAdapter.of(
+                        (proxy, method, args) -> {
+                          if (method.getAnnotation(CallMethod.class) == null) {
+                            throw new IllegalArgumentException(
+                                String.format("Action not allowed: %s:%s", className, methodCall));
+                          }
+                          return null;
+                        }))
+                .make()
+                .load(klass.getClassLoader())
+                .getLoaded()
+                .newInstance();
+
+        String key = "__proxy" + Math.abs(UUID.randomUUID().getMostSignificantBits());
+        scriptHelper.getBindings().put(key, validator);
+        try {
+          scriptHelper.eval(key + "." + methodCall, scriptHelper.getBindings());
+        } finally {
+          scriptHelper.getBindings().remove(key);
+        }
+      }
+
       final Object object = Beans.get(klass);
       return scriptHelper.call(object, methodCall);
     } catch (Exception e) {
