@@ -221,7 +221,7 @@ public class ActionHandler {
         Method method = methods.get(0);
         if (method.getAnnotation(CallMethod.class) == null) {
           throw new IllegalArgumentException(
-              String.format("Action call not allowed: %s", method.toString()));
+              String.format("Action not allowed: %s:%s", className, methodCall));
         }
       } else { // validate exact matched method with arguments
         final Object validator =
