@@ -75,6 +75,9 @@ public class ELScriptHelper extends AbstractScriptHelper {
       context.setPropertyResolved(true);
       return cls;
     }
+
+    @Override
+    public void setValue(ELContext context, Object base, Object property, Object value) {}
   }
 
   class ContextResolver extends MapELResolver {
