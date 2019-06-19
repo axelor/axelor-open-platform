@@ -20,6 +20,7 @@ package com.axelor.quartz;
 import com.axelor.app.AppSettings;
 import com.axelor.db.JPA;
 import com.axelor.i18n.I18n;
+import com.axelor.meta.CallMethod;
 import com.axelor.meta.db.MetaSchedule;
 import com.axelor.meta.db.MetaScheduleParam;
 import javax.inject.Inject;
@@ -146,6 +147,7 @@ public class JobRunner {
    *
    * @param cron the cron string to validate
    */
+  @CallMethod
   public void validate(String cron) {
     try {
       CronScheduleBuilder.cronSchedule(cron);
@@ -155,6 +157,7 @@ public class JobRunner {
   }
 
   /** Start the scheduler. */
+  @CallMethod
   public void start() {
     if (!isEnabled()) {
       throw new IllegalStateException(I18n.get("The scheduler service is disabled."));
@@ -172,6 +175,7 @@ public class JobRunner {
   }
 
   /** Stop the scheduler. */
+  @CallMethod
   public void stop() {
     log.info("Stopping scheduler...");
     try {
@@ -184,6 +188,7 @@ public class JobRunner {
   }
 
   /** Reconfigure the scheduler and restart. */
+  @CallMethod
   public void restart() {
     try {
       scheduler.clear();

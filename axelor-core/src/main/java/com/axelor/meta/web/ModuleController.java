@@ -18,6 +18,7 @@
 package com.axelor.meta.web;
 
 import com.axelor.i18n.I18n;
+import com.axelor.meta.CallMethod;
 import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.repo.MetaModuleRepository;
 import com.axelor.meta.loader.ModuleManager;
@@ -121,6 +122,7 @@ public class ModuleController {
     return all;
   }
 
+  @CallMethod
   public Response install(String name) {
     final ActionResponse response = new ActionResponse();
     try {
@@ -133,6 +135,7 @@ public class ModuleController {
     return response;
   }
 
+  @CallMethod
   @Transactional
   public Response uninstall(String name) {
     final ActionResponse response = new ActionResponse();
@@ -146,6 +149,7 @@ public class ModuleController {
     return response;
   }
 
+  @CallMethod
   public Response validInstall(String name) {
     final ActionResponse response = new ActionResponse();
     Map<String, String> data = Maps.newHashMap();
@@ -169,6 +173,7 @@ public class ModuleController {
     return response;
   }
 
+  @CallMethod
   public Response validUninstall(String name) {
     final ActionResponse response = new ActionResponse();
     Map<String, String> data = Maps.newHashMap();

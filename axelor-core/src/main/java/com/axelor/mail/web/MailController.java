@@ -27,6 +27,7 @@ import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.db.repo.MailFlagsRepository;
 import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
+import com.axelor.meta.CallMethod;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
@@ -242,6 +243,7 @@ public class MailController extends JpaSupport {
     response.setStatus(ActionResponse.STATUS_SUCCESS);
   }
 
+  @CallMethod
   public String inboxMenuTag() {
     Long total = countMessages(SQL_INBOX);
     Long unread = countMessages(SQL_UNREAD);
