@@ -30,6 +30,7 @@ import com.axelor.internal.javax.el.ImportHandler;
 import com.axelor.internal.javax.el.MapELResolver;
 import com.axelor.internal.javax.el.MethodNotFoundException;
 import com.axelor.rpc.Context;
+import com.axelor.rpc.ContextEntity;
 import com.google.common.primitives.Ints;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -106,7 +107,9 @@ public class ELScriptHelper extends AbstractScriptHelper {
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
-      if (base instanceof Map<?, ?> && ((Map<?, ?>) base).containsKey(property)) {
+      if (base instanceof Map<?, ?>
+          && !(base instanceof ContextEntity)
+          && ((Map<?, ?>) base).containsKey(property)) {
         context.setPropertyResolved(true);
         return ((Map<?, ?>) base).get(property);
       }
