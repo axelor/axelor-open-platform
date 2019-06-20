@@ -226,6 +226,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
     var index = _.first($scope.selection);
     var item = $scope.dataView.getItem(index);
     var doSelect = function (record) {
+      if (!record.id) $scope.$$ensureIds([record]);
       $scope.select([record]);
       $scope.$timeout(function () {
         $scope.dataView.$setSelection([$scope.dataView.getLength() - 1], true);
