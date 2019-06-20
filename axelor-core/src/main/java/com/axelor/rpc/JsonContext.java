@@ -133,6 +133,10 @@ public class JsonContext extends SimpleBindings {
     return context == null ? null : (Long) context.get(Context.KEY_ID);
   }
 
+  public boolean hasField(String name) {
+    return fields.containsKey(name);
+  }
+
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public Object get(Object key) {

@@ -82,9 +82,16 @@ public abstract class AbstractScriptHelper implements ScriptHelper {
   public Object eval(String expr) {
     try {
       return eval(expr, getBindings());
-    } catch (Exception e) {
-      log.error("Script error: {}", expr, e);
+    } catch (NoSuchFieldException e) {
+      log.warn("No such field in: {} -- ({})", expr, e.getMessage());
       return null;
+    } catch (Exception e) {
+      if (e.getCause() instanceof NoSuchFieldException) {
+        log.warn("No such field in: {} -- ({})", expr, e.getMessage());
+        return null;
+      }
+      log.error("Script error: {}", expr, e);
+      throw new IllegalArgumentException(e);
     }
   }
 }

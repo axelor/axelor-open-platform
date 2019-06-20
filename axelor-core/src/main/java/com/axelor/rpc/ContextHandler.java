@@ -231,20 +231,20 @@ public class ContextHandler<T> {
   }
 
   public Object interceptJsonAccess(Method method, Object[] args) throws Exception {
-    switch (method.getName()) {
-      case "get":
-        if ("class".equals(args[0])) {
-          return proxy.getClass();
-        }
-      case "put":
-        final String name = (String) args[0];
-        final Method found =
-            args.length == 2 ? beanMapper.getSetter(name) : beanMapper.getGetter(name);
-        if (found == null) {
-          return method.invoke(getJsonContext(), args);
-        }
-        final Object[] params = args.length == 2 ? new Object[] {args[1]} : new Object[] {};
-        return found.invoke(proxy, params);
+    final String name = (String) args[0];
+    if ("class".equals(name)) return method.invoke(proxy, args);
+    if ("get".equals(method.getName()) || "set".equals(method.getName())) {
+      Method accessor = args.length == 1 ? beanMapper.getGetter(name) : beanMapper.getSetter(name);
+      Object[] params = args.length == 1 ? new Object[] {} : new Object[] {args[1]};
+      if (accessor != null) {
+        return accessor.invoke(proxy, params);
+      }
+      JsonContext ctx = getJsonContext();
+      if (args.length == 1) {
+        if (ctx.containsKey(name) || ctx.hasField(name)) return ctx.get(name);
+        throw new NoSuchFieldException(name);
+      }
+      return ctx.put(name, args[1]);
     }
     throw new UnsupportedOperationException("cannot call '" + method + "' on proxy object");
   }
