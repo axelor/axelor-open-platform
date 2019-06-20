@@ -54,7 +54,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -242,13 +241,8 @@ public class ActionHandler {
                 .getLoaded()
                 .newInstance();
 
-        String key = "__proxy" + Math.abs(UUID.randomUUID().getMostSignificantBits());
-        scriptHelper.getBindings().put(key, validator);
-        try {
-          scriptHelper.eval(key + "." + methodCall, scriptHelper.getBindings());
-        } finally {
-          scriptHelper.getBindings().remove(key);
-        }
+        // validate method
+        scriptHelper.call(validator, methodCall);
       }
 
       final Object object = Beans.get(klass);
