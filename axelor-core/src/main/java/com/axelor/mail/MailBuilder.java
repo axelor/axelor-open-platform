@@ -34,6 +34,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 import javax.activation.FileTypeMap;
@@ -49,12 +52,18 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimePart;
+import javax.mail.internet.PreencodedMimeBodyPart;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 /**
  * The {@link MailBuilder} defines fluent API to build {@link MimeMessage} and if required can send
  * the built message directly.
  */
 public final class MailBuilder {
+
+  private static final Pattern IMAGE_DATA_PATTERN = Pattern.compile("data:([^;]+);base64");
 
   private Session session;
 
@@ -84,6 +93,8 @@ public final class MailBuilder {
     String text;
     String name;
     String file;
+    String imageData;
+    String imageType;
     boolean inline;
     boolean html;
 
@@ -155,8 +166,26 @@ public final class MailBuilder {
   }
 
   public MailBuilder html(String text) {
+    final Document doc = Jsoup.parse(text);
+    final Elements images = doc.getElementsByAttributeValueMatching("src", IMAGE_DATA_PATTERN);
+    images.forEach(
+        img -> {
+          String src = img.attr("src");
+          Matcher matcher = IMAGE_DATA_PATTERN.matcher(src);
+          if (matcher.find()) {
+            Content content = new Content();
+            String cid = "image" + UUID.randomUUID().toString();
+            content.cid = "<" + cid + ">";
+            content.name = img.attr("title");
+            content.imageData = src.split(",")[1];
+            content.imageType = matcher.group(1);
+            img.attr("src", "cid:" + cid);
+            contents.add(content);
+          }
+        });
+
     hasHtml = true;
-    return text(text, true);
+    return text(doc.body().html(), true);
   }
 
   private MailBuilder text(String text, boolean html) {
@@ -312,7 +341,7 @@ public final class MailBuilder {
     final StringBuilder html = new StringBuilder();
 
     for (Content content : contents) {
-      if (content.text == null) {
+      if (content.file != null) {
         final MimeBodyPart part = new MimeBodyPart();
         try {
           final URL link = new URL(content.file);
@@ -334,6 +363,13 @@ public final class MailBuilder {
           part.setDisposition(Part.ATTACHMENT);
           rootContainer.addBodyPart(part);
         }
+      } else if (content.imageData != null) {
+        final PreencodedMimeBodyPart part = new PreencodedMimeBodyPart("base64");
+        part.setContentID(content.cid);
+        part.setContent(content.imageData, content.imageType);
+        part.setFileName(content.name);
+        part.setDisposition(Part.INLINE);
+        inlineContainer.addBodyPart(part);
       } else if (content.html) {
         html.append(content.text);
       } else {
