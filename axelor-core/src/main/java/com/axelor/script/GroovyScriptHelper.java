@@ -130,7 +130,11 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
             try {
               return super.getVariable(name);
             } catch (MissingPropertyException e) {
-              throw new IllegalArgumentException(new NoSuchFieldException(name));
+              if (name.startsWith("_") || name.startsWith("$")) {
+                return null;
+              }
+              log.warn("No such field in: {} -- ({})", expr, name);
+              return null;
             }
           }
         });

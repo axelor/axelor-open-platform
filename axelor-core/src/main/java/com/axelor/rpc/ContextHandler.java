@@ -246,6 +246,9 @@ public class ContextHandler<T> {
       JsonContext ctx = getJsonContext();
       if (args.length == 1) {
         if (ctx.containsKey(name) || ctx.hasField(name)) return ctx.get(name);
+        if (name.startsWith("_") || name.startsWith("$")) {
+          return null;
+        }
         // TODO: to easy the migration, we log the error as warning but ultimately,
         //       we should throw NoSuchFieldException here
         log.warn("No such field: {}.{}", beanClass.getName(), name);
