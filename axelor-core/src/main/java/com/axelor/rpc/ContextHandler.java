@@ -43,6 +43,8 @@ import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link ContextHandler} provides seamless way to access context values using proxy.
@@ -59,6 +61,8 @@ public class ContextHandler<T> {
   private static final String FIELD_ID = "id";
   private static final String FIELD_VERSION = "version";
   private static final String FIELD_SELECTED = "selected";
+
+  private static final Logger log = LoggerFactory.getLogger(ContextHandler.class);
 
   private final PropertyChangeSupport changeListeners;
 
@@ -242,7 +246,10 @@ public class ContextHandler<T> {
       JsonContext ctx = getJsonContext();
       if (args.length == 1) {
         if (ctx.containsKey(name) || ctx.hasField(name)) return ctx.get(name);
-        throw new NoSuchFieldException(name);
+        // TODO: to easy the migration, we log the error as warning but ultimately,
+        //       we should throw NoSuchFieldException here
+        log.warn("No such field: {}.{}", beanClass.getName(), name);
+        return null;
       }
       return ctx.put(name, args[1]);
     }
