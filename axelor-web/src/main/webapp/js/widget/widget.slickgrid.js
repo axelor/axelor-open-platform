@@ -1295,6 +1295,10 @@ Grid.prototype._doInit = function(view) {
     if (scrollTop) {
       setTimeout(function () {
         that.element.children('.slick-viewport').scrollTop(scrollTop);
+        setTimeout(function() {
+          grid.invalidateAllRows();
+          grid.render();
+        }, 100);
       });
     }
   }
