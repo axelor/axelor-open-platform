@@ -292,7 +292,7 @@ var Editor = function(args) {
 var Formatters = {
 
   "string": function(field, value, context) {
-    return ui.formatters.string(field, value, context);
+    return _.escapeHTML(ui.formatters.string(field, value, context));
   },
 
   "integer": function(field, value) {
@@ -450,6 +450,8 @@ var Formatters = {
   }
 };
 
+Formatters.text = Formatters.string;
+
 function totalsFormatter(totals, columnDef) {
 
   var field = columnDef.descriptor;
@@ -524,7 +526,7 @@ _.extend(Factory.prototype, {
     }
 
     if (typeof value === 'string') {
-      value = axelor.sanitize(value);
+      value = axelor.sanitize(value).replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&');
     }
 
     if (type === "button" || type === "progress") {
