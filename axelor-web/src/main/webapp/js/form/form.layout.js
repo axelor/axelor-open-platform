@@ -430,6 +430,9 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
         scope.$$setEditorValue = function (value, fireOnChange) {
           scope.setValue(value, fireOnChange === undefined ? true: fireOnChange);
         };
+        scope.$broadcastRecordChange = function () {
+          scope.$broadcast("on:record-change", scope.record);
+        };
       }
 
       if (field.target) {
