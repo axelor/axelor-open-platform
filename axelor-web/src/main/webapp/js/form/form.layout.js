@@ -430,9 +430,6 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
         scope.$$setEditorValue = function (value, fireOnChange) {
           scope.setValue(value, fireOnChange === undefined ? true: fireOnChange);
         };
-        scope.$broadcastRecordChange = function () {
-          scope.$broadcast("on:record-change", scope.record);
-        };
       }
 
       if (field.target) {
@@ -461,6 +458,10 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
           context._model = scope._model;
           context._parent = scope.$parent.getContext();
           return ui.prepareContext(scope._model, context, dummy);
+        };
+
+        scope.$broadcastRecordChange = function () {
+          scope.$broadcast("on:record-change", scope.record);
         };
 
         scope.$on('on:before-save', function watchParentRecord() {
