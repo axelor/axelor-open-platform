@@ -191,7 +191,9 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
       entity.setParent(dmsHome);
     }
 
-    copyParentPermissions(entity);
+    if (entity.getVersion() == null || entity.getVersion() == 0) {
+      copyParentPermissions(entity);
+    }
 
     return super.save(entity);
   }
