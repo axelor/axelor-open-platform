@@ -54,7 +54,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -753,7 +752,11 @@ public class Resource<T extends Model> {
               Object old = values.get(name);
               Object value = mapper.get(entity, name);
               if (value instanceof Collection<?>) {
-                value = Collections2.transform((Collection<?>) value, input -> toMap(input, names));
+                value =
+                    ((Collection<?>) value)
+                        .stream()
+                        .map(input -> toMap(input, names))
+                        .collect(Collectors.toList());
               } else if (value instanceof Model) {
                 value = toMap(value, names);
                 if (old instanceof Map) {
