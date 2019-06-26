@@ -76,8 +76,8 @@
     <panel itemSpan="12" showFrame="false">
       <field name="permissions" showTitle="false">
         <editor layout="table" x-viewer="true" x-show-titles="false">
-          <field name="user" widget="SuggestBox" />
-          <field name="group" widget="SuggestBox" />
+          <field name="user" widget="SuggestBox" canEdit="false"/>
+          <field name="group" widget="SuggestBox" canEdit="false"/>
           <field name="value" width="120px" placeholder="Permission"/>
         </editor>
       </field>
