@@ -988,6 +988,10 @@ Grid.prototype._doInit = function(view) {
 
   dataView.$syncSelection = function(old, oldIds, focus) {
     var selection = dataView.mapIdsToRows(oldIds || []);
+    // if saving o2m items, we may get negative oldIds, consider reselecting old selection
+    if (old && oldIds && old.length === 1 && oldIds.length === 1 && oldIds[0] < 0) {
+      dataView.getItem(old[0]).selected = true;
+    }
     if (!focus) {
       _.each(dataView.getItems(), function (item, i) {
         if (item.selected) {
@@ -2383,11 +2387,15 @@ Grid.prototype.onButtonClick = function(event, args) {
       var context = _.extend({
         _model: model
       }, record);
+      var current = handlerScope.dataView.getItem(_.first(handlerScope.selection));
       if (handlerScope.field && handlerScope.field.target) {
         context._parent = handlerScope.getContext();
       }
       if (context.id === 0) {
         context.id = null;
+      }
+      if (current && current.id > 0 && (!context.id || context.id < 0)) {
+        context.id = current.id;
       }
       return context;
     };
@@ -2656,11 +2664,15 @@ ui.directive('uiSlickEditors', function() {
       $scope.getContext = function() {
         var context = _getContext();
         var handler = $scope.handler || {};
+        var current = handler.dataView.getItem(_.first(handler.selection));
         if (context && handler.field && handler.field.target) {
           context._parent = handler.getContext();
         }
         if (context.id === 0) {
           context.id = null;
+        }
+        if (current && current.id > 0 && (!context.id || context.id < 0)) {
+          context.id = current.id;
         }
         return context;
       };
