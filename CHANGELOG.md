@@ -1,6 +1,25 @@
-## 5.0.16 (current)
+## 5.0.16 (2019-06-28)
 
-TBD
+#### Enhancements
+
+* Add support for base64 encoded images with mail builder api
+* Set Monday as first day of week in calendar view for French locale
+* Improve date formatting in calendar view for French locale
+
+#### Bugs
+
+* Fix calendar view layout issues
+* Fix dms permissions preventing attachments
+* Fix grid row selection issue when deleting o2m/m2m items
+* Fix wrong context with grid button after 'save' action
+* Fix fetch request data serialization issue caused by rollbacked transaction
+* Fix js expressions with dummy not evaluated inside field editors
+* Fix named width styles not working
+* Fix double escaping of html chars in grid widget
+* Fix grid rendering issue caused by page change from form view
+* Do not fetch archived records in tree view
+* Fix x-can-copy issue (unable to copy if parent is now saved)
+* Fix NestedEditor issue when name field is missing
 
 ## 5.0.15 (2019-05-31)
 
