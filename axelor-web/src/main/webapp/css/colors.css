@@ -49,7 +49,7 @@ header .navbar .nav .dropdown-submenu:hover > a:after {
 
 header .navbar .nav .fa-bars,
 header .navbar .dropdown-toggle .caret {
-    color: #16a765;
+    color: #3ad08f;
 }
 
 .navbar .nav li.dropdown.open > .dropdown-toggle,
@@ -60,7 +60,7 @@ header .navbar .dropdown-toggle .caret {
 
 header .navbar .nav > li > a:focus,
 header .navbar .nav > li > a:hover {
-    color: #16a765;
+    color: #3ad08f;
 }
 
 header .navbar .nav .fa-bars:hover,
@@ -73,7 +73,7 @@ header .dropdown-menu > li > a:focus,
 header .dropdown-submenu:hover > a,
 header .dropdown-submenu:focus > a {
     color: #fff;
-    background-color: #16a765;
+    background-color: #3ad08f;
 }
 
 .slick-header-menuitem:hover {

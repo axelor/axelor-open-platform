@@ -140,7 +140,7 @@ public class AppInfo {
   }
 
   public String getLogo() throws JspException, IOException {
-    final String logo = SETTINGS.get("application.logo", "img/axelor-logo.png");
+    final String logo = SETTINGS.get("application.logo", "img/axelor.png");
     if (SETTINGS.get("context.appLogo") != null) {
       final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
       final ScriptHelper helper = new CompositeScriptHelper(bindings);
