@@ -727,6 +727,9 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
       hideBubble();
       main.fullCalendar('render');
       main.fullCalendar('option', 'height', element.height());
+      legend.css("max-height", legend.parent().height() - mini.height()
+          - (parseInt(legend.css('marginTop')) || 0)
+          - (parseInt(legend.css('marginBottom')) || 0));
     }
 
     scope.$onAdjust(adjustSize, 100);
