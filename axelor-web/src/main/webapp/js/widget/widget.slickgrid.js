@@ -292,7 +292,7 @@ var Editor = function(args) {
 var Formatters = {
 
   "string": function(field, value, context) {
-    return ui.formatters.string(field, value, context);
+    return _.escapeHTML(ui.formatters.string(field, value, context));
   },
 
   "integer": function(field, value) {
@@ -450,6 +450,8 @@ var Formatters = {
   }
 };
 
+Formatters.text = Formatters.string;
+
 function totalsFormatter(totals, columnDef) {
 
   var field = columnDef.descriptor;
@@ -524,7 +526,7 @@ _.extend(Factory.prototype, {
     }
 
     if (typeof value === 'string') {
-      value = axelor.sanitize(value);
+      value = axelor.sanitize(value).replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&');
     }
 
     if (type === "button" || type === "progress") {
@@ -986,6 +988,10 @@ Grid.prototype._doInit = function(view) {
 
   dataView.$syncSelection = function(old, oldIds, focus) {
     var selection = dataView.mapIdsToRows(oldIds || []);
+    // if saving o2m items, we may get negative oldIds, consider reselecting old selection
+    if (old && oldIds && old.length === 1 && oldIds.length === 1 && oldIds[0] < 0) {
+      dataView.getItem(old[0]).selected = true;
+    }
     if (!focus) {
       _.each(dataView.getItems(), function (item, i) {
         if (item.selected) {
@@ -1295,6 +1301,10 @@ Grid.prototype._doInit = function(view) {
     if (scrollTop) {
       setTimeout(function () {
         that.element.children('.slick-viewport').scrollTop(scrollTop);
+        setTimeout(function() {
+          grid.invalidateAllRows();
+          grid.render();
+        }, 100);
       });
     }
   }
@@ -2377,11 +2387,15 @@ Grid.prototype.onButtonClick = function(event, args) {
       var context = _.extend({
         _model: model
       }, record);
+      var current = handlerScope.dataView.getItem(_.first(handlerScope.selection));
       if (handlerScope.field && handlerScope.field.target) {
         context._parent = handlerScope.getContext();
       }
       if (context.id === 0) {
         context.id = null;
+      }
+      if (current && current.id > 0 && (!context.id || context.id < 0)) {
+        context.id = current.id;
       }
       return context;
     };
@@ -2650,11 +2664,15 @@ ui.directive('uiSlickEditors', function() {
       $scope.getContext = function() {
         var context = _getContext();
         var handler = $scope.handler || {};
+        var current = handler.dataView.getItem(_.first(handler.selection));
         if (context && handler.field && handler.field.target) {
           context._parent = handler.getContext();
         }
         if (context.id === 0) {
           context.id = null;
+        }
+        if (current && current.id > 0 && (!context.id || context.id < 0)) {
+          context.id = current.id;
         }
         return context;
       };

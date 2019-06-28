@@ -15,26 +15,31 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+.view-container .calendar-view {
+  display: flex;
+  flex-direction: column;
+}
+
 .view-container .calendar-view > div:last-child {
-  position: absolute;
-  top: 40px;
-  bottom: 0; left: 0; right: 0;
+  display: flex;
+  padding: 4px;
   background-color: #fff;
+  max-height: 100%;
+  flex: 1;
 }
 
 .calendar-main {
-  position: absolute;
-  top: 0; left: 0; bottom: 0;
-  right: 250px;
-  overflow: auto;
+  flex: 1;
+  height: 100%;
 }
 
 .calendar-side {
-  position: absolute;
-  top: 0; right: 0; bottom: 0;
-  width: auto;
   overflow: hidden;
-  padding: 0 4px;
+  margin-left: 4px;
+  max-width: 228px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .calendar-side .ui-datepicker {
@@ -47,6 +52,7 @@
   margin-top: 8px;
   margin-bottom: 0;
   overflow: auto;
+  flex: 1;
 }
 
 .calendar-legend label {

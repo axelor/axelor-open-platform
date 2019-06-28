@@ -725,12 +725,11 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
         return;
       }
       hideBubble();
-      main.css('right', mini.parent().outerWidth(true));
       main.fullCalendar('render');
       main.fullCalendar('option', 'height', element.height());
       legend.css("max-height", legend.parent().height() - mini.height()
-            - (parseInt(legend.css('marginTop')) || 0)
-            - (parseInt(legend.css('marginBottom')) || 0));
+          - (parseInt(legend.css('marginTop')) || 0)
+          - (parseInt(legend.css('marginBottom')) || 0));
     }
 
     scope.$onAdjust(adjustSize, 100);
@@ -738,6 +737,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
     scope.$callWhen(function () {
       return main.is(':visible');
     }, function() {
+      element.parents('.view-container:first').css('overflow', 'inherit');
       scope.onMode(mode);
       adjustSize();
     }, 100);

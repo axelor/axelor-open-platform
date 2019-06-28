@@ -340,6 +340,12 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
         || security.hasRole("role.admin")) {
       return true;
     }
+
+    // allow if the parent folder has no specific dms permissions
+    if (dmsPermissions.all().filter("self.file = :file").bind("file", parent).count() == 0) {
+      return true;
+    }
+
     return dmsPermissions
             .all()
             .filter(

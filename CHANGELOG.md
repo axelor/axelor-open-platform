@@ -1,3 +1,51 @@
+## 5.1.0 (current)
+
+TBD
+
+## 5.0.16 (2019-06-28)
+
+#### Enhancements
+
+* Add support for base64 encoded images with mail builder api
+* Set Monday as first day of week in calendar view for French locale
+* Improve date formatting in calendar view for French locale
+
+#### Bugs
+
+* Fix calendar view layout issues
+* Fix dms permissions preventing attachments
+* Fix grid row selection issue when deleting o2m/m2m items
+* Fix wrong context with grid button after 'save' action
+* Fix fetch request data serialization issue caused by rollbacked transaction
+* Fix js expressions with dummy not evaluated inside field editors
+* Fix named width styles not working
+* Fix double escaping of html chars in grid widget
+* Fix grid rendering issue caused by page change from form view
+* Do not fetch archived records in tree view
+* Fix x-can-copy issue (unable to copy if parent is now saved)
+* Fix NestedEditor issue when name field is missing
+
+## 5.0.15 (2019-05-31)
+
+#### Enhancements
+
+* Upgrade to hotswap-agent 1.3.0
+* Improve help popover
+
+#### Bugs
+
+* Fix deprecated nested editor issue (for legacy use cases)
+* Fix tracking message formatting issue
+* Fix lost changes issue with child grid
+* Fix change tracking clean up issue (transaction rollback should discard tracking)
+* Fix o2m list editor layout (IE11 issue)
+* Fix placeholder color (IE11 issue)
+* Fix no scrollbar in popup editor (IE11 issue)
+* Patch jquery for possible XSS vulnerability (jquery/jquery#2432)
+* Patch jquery for CVE-2019-11358
+* Fix boolean-radio widget on chrome
+* Fix file handle not closed issues
+
 ## 5.1.0-rc2 (03-06-2019)
 
 #### Bugs

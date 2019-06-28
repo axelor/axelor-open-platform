@@ -543,7 +543,7 @@ header .dropdown-submenu:focus > a {
 }
 
 .btn-group > .btn + .btn {
-  margin-left: -3px;
+  margin-left: 0;
 }
 
 .navbar .btn-group .btn:not(:disabled):hover {

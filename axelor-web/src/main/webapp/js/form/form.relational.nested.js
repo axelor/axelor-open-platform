@@ -364,7 +364,7 @@ var NestedEditor = {
         return nested.doRead(value.id).success(function(record){
           record.$fetched = true;
           value.$fetched = true;
-          return nestedEdit(record);
+          return nestedEdit(_.extend({}, value, record));
         });
       }
 

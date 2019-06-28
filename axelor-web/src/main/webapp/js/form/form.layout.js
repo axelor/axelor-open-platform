@@ -460,6 +460,10 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
           return ui.prepareContext(scope._model, context, dummy);
         };
 
+        scope.$broadcastRecordChange = function () {
+          scope.$broadcast("on:record-change", scope.record);
+        };
+
         scope.$on('on:before-save', function watchParentRecord() {
           var dummyValues = scope.getDummyValues();
           var watcher = scope.$watch('$parent.record', function (record, old) {

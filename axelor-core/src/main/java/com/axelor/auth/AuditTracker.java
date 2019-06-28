@@ -43,6 +43,7 @@ import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -144,6 +145,9 @@ final class AuditTracker {
         return "N/A";
       default:
         break;
+    }
+    if (value instanceof BigDecimal) {
+      return ((BigDecimal) value).toPlainString();
     }
     return value.toString();
   }

@@ -184,6 +184,7 @@ ui.directive('uiMailMessage', function () {
         if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
           return moment(value).format("DD/MM/YYYY");
         }
+        if (value === '0E-10') value = '0.000000000000';
         if (/^\d+(\.\d+)?$/.test(value)) {
           var dot = value.indexOf('.');
           return dot > -1
