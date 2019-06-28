@@ -1,6 +1,59 @@
-## 5.1.0 (current)
+## 5.1.0 (2019-06-28)
 
-TBD
+Check the `5.1.0-rc1` and `5.1.0-rc2` Changelog for complete list of changes.
+
+#### Enhancements
+
+* Only log when non-existing field is referenced in expressions (breaking change)
+* Properly handle expression errors
+* Prevent calling arbitrary methods with action (breaking change)
+* Add app startup/shutdown events
+
+#### Bugs
+
+* Fix value assignment in EL expression
+* Fix duplicate results in number of attachments
+
+#### Breaking Changes
+
+* Calling arbitrary methods from action-method or with `call:` is not allowed.
+
+  All such methods should be annotated with `@CallMethod` annotation (`com.axelor.meta.CallMethod`).
+  Use following shell commend to find all the method calls in your code base:
+
+  ```
+  $ grep -P "(expr)(\s*=\s*)(\"call:([^\"]+\([^\"]+)\")" -r * -oh --include="*.xml" \
+    | cut -d\" -f2 \
+    | sed -E 's|call:\s*||g' | cut -d\( -f1 | sort -u
+  ```
+
+* Scripting expressions in xml actions are now not silent on errors.
+
+  All errors during expression evaluation except missing attribute error are propagated to the user
+  so evaluation of such expressions will fail and ultimately actions too.
+
+* DMS permissions (requires manual intervention)
+
+  DMS permissions are created and removed recursively for all children documents/folders.
+  The `perm.dms.file.__parent__` permission is no longer used. Also, DMS permissions are readonly
+  once created, but can be removed.
+
+  Remove DMS file related permissions (permissions with a name starting with `perm.dms.file`).
+  Those permissions will be recreated and updated after adding new DMS permissions.
+  Remove and add back DMS permissions on your documents from the DMS view.
+
+* The `context.appLogo` method should now use helper `MetaFiles#getDownloadLink` instead of
+  returning `MetaFile`.
+
+* On ManyToOne fields, `canEdit` attribute is `false` by default now.
+
+* The `freeSearch="name"` to search on name field should be changed to `freeSearch="actualNameField"`
+
+* The `cachable` attribute on `entity` definition is now deprecated and replaced with `cacheable`.
+
+  ```
+  $ find -iregex ".*domains.*.xml" | xargs -l sed -i 's|cachable="|cacheable="|g'
+  ```
 
 ## 5.0.16 (2019-06-28)
 
