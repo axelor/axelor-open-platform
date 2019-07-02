@@ -12,6 +12,8 @@ versions.groovy = "2.4.10"
 versions.resteasy = "3.1.2.Final"
 versions.jackson = "2.8.8"
 versions.shiro = "1.4.1"
+versions.buji_pac4j = "4.1.0"
+versions.pac4j = "3.7.0"
 
 versions.junit = "4.12"
 versions.slf4j = "1.7.25"
@@ -165,6 +167,11 @@ libs.apache_shiro_cas = [
   "commons-codec:commons-codec:1.12",
   "org.opensaml:opensaml:1.1",
   "org.apache.santuario:xmlsec:1.4.3"]
+
+libs.pac4j = [
+  "io.buji:buji-pac4j:${versions.buji_pac4j}",
+  "org.pac4j:pac4j-saml:${versions.pac4j}",
+]
 
 // Apache DS (for testing only)
 libs.apache_ds = [

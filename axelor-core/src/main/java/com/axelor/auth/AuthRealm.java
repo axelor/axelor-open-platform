@@ -28,7 +28,6 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExpiredCredentialsException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.PasswordMatcher;
@@ -156,31 +155,6 @@ public class AuthRealm extends AuthorizingRealm {
 
     public User getUser() {
       return user;
-    }
-  }
-
-  static class UserAuthenticationInfo extends SimpleAuthenticationInfo {
-    private static final long serialVersionUID = 2404918058754102269L;
-    private final transient User user;
-
-    public UserAuthenticationInfo(
-        Object principal, Object credentials, String realmName, User user) {
-      super(principal, credentials, realmName);
-      this.user = user;
-    }
-
-    public User getUser() {
-      return user;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-      return super.hashCode();
     }
   }
 }

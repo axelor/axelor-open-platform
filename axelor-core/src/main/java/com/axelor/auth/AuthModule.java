@@ -19,6 +19,7 @@ package com.axelor.auth;
 
 import com.axelor.auth.cas.AuthCasModule;
 import com.axelor.auth.ldap.AuthLdapModule;
+import com.axelor.auth.pac4j.AuthPac4jModuleSaml2;
 import com.axelor.db.JpaSecurity;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -45,6 +46,9 @@ public class AuthModule extends AbstractModule {
     // bind security service
     bind(JpaSecurity.class).toProvider(AuthSecurity.class);
 
+    // observe authentication-related events
+    bind(AuthObserver.class);
+
     // non-web environment (cli or unit tests)
     if (context == null) {
       install(new MyShiroModule());
@@ -63,11 +67,13 @@ public class AuthModule extends AbstractModule {
       return;
     }
 
+    if (AuthPac4jModuleSaml2.isEnabled()) {
+      install(new AuthPac4jModuleSaml2(context));
+      return;
+    }
+
     // default
     install(new AuthWebModule(context));
-
-    // observe authentication-related events
-    bind(AuthObserver.class);
   }
 
   static final class MyShiroModule extends ShiroModule {

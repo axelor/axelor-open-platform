@@ -54,6 +54,9 @@ dependencies {
   // CAS
   compile libs.apache_shiro_cas
 
+  // pac4j
+  compile libs.pac4j
+
   // BIRT
   compile libs.birt_runtime
 

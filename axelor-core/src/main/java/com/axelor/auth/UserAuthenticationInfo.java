@@ -15,30 +15,31 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.events;
+package com.axelor.auth;
 
-import org.apache.shiro.authc.AuthenticationToken;
+import com.axelor.auth.db.User;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
 
-public abstract class LoginEvent {
+public class UserAuthenticationInfo extends SimpleAuthenticationInfo {
+  private static final long serialVersionUID = 2404918058754102269L;
+  private final transient User user;
 
-  private final Object principal;
-
-  private final Object credentials;
-
-  public LoginEvent(AuthenticationToken token) {
-    Object credentials = token.getCredentials();
-    if (credentials instanceof char[]) {
-      credentials = new String((char[]) credentials);
-    }
-    this.principal = token.getPrincipal();
-    this.credentials = credentials;
+  public UserAuthenticationInfo(Object principal, Object credentials, String realmName, User user) {
+    super(principal, credentials, realmName);
+    this.user = user;
   }
 
-  public Object getPrincipal() {
-    return principal;
+  public User getUser() {
+    return user;
   }
 
-  public Object getCredentials() {
-    return credentials;
+  @Override
+  public boolean equals(Object o) {
+    return super.equals(o);
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
   }
 }
