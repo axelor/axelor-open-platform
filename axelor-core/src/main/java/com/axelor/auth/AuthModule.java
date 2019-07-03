@@ -19,6 +19,7 @@ package com.axelor.auth;
 
 import com.axelor.auth.cas.AuthCasModule;
 import com.axelor.auth.ldap.AuthLdapModule;
+import com.axelor.auth.pac4j.AuthPac4jModuleOidc;
 import com.axelor.auth.pac4j.AuthPac4jModuleSaml2;
 import com.axelor.db.JpaSecurity;
 import com.google.inject.AbstractModule;
@@ -64,6 +65,11 @@ public class AuthModule extends AbstractModule {
     // LDAP
     if (AuthLdapModule.isEnabled()) {
       install(new AuthLdapModule(context));
+      return;
+    }
+
+    if (AuthPac4jModuleOidc.isEnabled()) {
+      install(new AuthPac4jModuleOidc(context));
       return;
     }
 
