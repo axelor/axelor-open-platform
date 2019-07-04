@@ -22,6 +22,7 @@ import com.axelor.auth.db.User;
 import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
 import com.axelor.events.PostLogin;
+import java.lang.invoke.MethodHandles;
 import javax.inject.Inject;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -29,10 +30,15 @@ import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AuthPac4jListener implements AuthenticationListener {
 
   @Inject private Event<PostLogin> postLogin;
+
+  private static final Logger logger =
+      LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   @Override
   public void onSuccess(AuthenticationToken token, AuthenticationInfo info) {
@@ -45,11 +51,13 @@ public class AuthPac4jListener implements AuthenticationListener {
       }
     }
 
+    logger.error("No user found for principal: {}", token.getPrincipal());
     firePostLoginFailure(token, new UnknownAccountException(info.toString()));
   }
 
   @Override
   public void onFailure(AuthenticationToken token, AuthenticationException ae) {
+    logger.error("Authentication failed for principal: {}", token.getPrincipal());
     firePostLoginFailure(token, ae);
   }
 
