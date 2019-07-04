@@ -18,6 +18,7 @@
 package com.axelor.rpc.filter;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -25,10 +26,11 @@ import java.util.regex.Pattern;
 public class JPQLFilter extends Filter {
 
   private static final Pattern BLACKLIST_PATTERN =
-      AppSettings.get().get("domain.blacklist.pattern", null) == null
+      AppSettings.get().get(AvailableAppSettings.DOMAIN_BLACKLIST_PATTERN, null) == null
           ? null
           : Pattern.compile(
-              AppSettings.get().get("domain.blacklist.pattern").trim(), Pattern.CASE_INSENSITIVE);
+              AppSettings.get().get(AvailableAppSettings.DOMAIN_BLACKLIST_PATTERN).trim(),
+              Pattern.CASE_INSENSITIVE);
 
   private String jpql;
 

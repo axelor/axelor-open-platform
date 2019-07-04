@@ -18,6 +18,7 @@
 package com.axelor.text;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.FileUtils;
 import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
@@ -57,7 +58,7 @@ public class GroovyTemplates implements Templates {
 
   private static final String DEFAULT_TEMPLATE_DIR = "{java.io.tmpdir}/axelor/templates";
   private static final String TEMPLATE_DIR =
-      AppSettings.get().getPath("template.search.dir", DEFAULT_TEMPLATE_DIR);
+      AppSettings.get().getPath(AvailableAppSettings.TEMPLATE_SEARCH_DIR, DEFAULT_TEMPLATE_DIR);
   private static final Pattern INCLUDE_PAT = Pattern.compile("\\{\\{\\<\\s*(.*?)\\s*\\>\\}\\}");
 
   class GroovyTemplate implements Template {

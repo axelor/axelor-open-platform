@@ -18,19 +18,22 @@
 package com.axelor.db.converters;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.StringUtils;
 import com.axelor.common.crypto.Encryptor;
 import javax.persistence.AttributeConverter;
 
 public abstract class AbstractEncryptedConverter<T, R> implements AttributeConverter<T, R> {
 
-  private static final String ENCRYPTION_ALGORITHM = AppSettings.get().get("encryption.algorithm");
-  private static final String ENCRYPTION_PASSWORD = AppSettings.get().get("encryption.password");
+  private static final String ENCRYPTION_ALGORITHM =
+      AppSettings.get().get(AvailableAppSettings.ENCRYPTION_ALGORITHM);
+  private static final String ENCRYPTION_PASSWORD =
+      AppSettings.get().get(AvailableAppSettings.ENCRYPTION_PASSWORD);
 
   private static final String OLD_ENCRYPTION_ALGORITHM =
-      AppSettings.get().get("encryption.algorithm.old");
+      AppSettings.get().get(AvailableAppSettings.ENCRYPTION_ALGORITHM_OLD);
   private static final String OLD_ENCRYPTION_PASSWORD =
-      AppSettings.get().get("encryption.password.old");
+      AppSettings.get().get(AvailableAppSettings.ENCRYPTION_PASSWORD_OLD);
 
   private Encryptor<T, R> encryptor;
   private Encryptor<T, R> oldEncryptor;

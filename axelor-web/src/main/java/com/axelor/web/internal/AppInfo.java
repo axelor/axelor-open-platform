@@ -18,6 +18,7 @@
 package com.axelor.web.internal;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
@@ -50,7 +51,8 @@ import org.pac4j.core.profile.ProfileManager;
 public class AppInfo {
 
   private static final AppSettings SETTINGS = AppSettings.get();
-  private static final String APP_THEME = SETTINGS.get("application.theme", null);
+  private static final String APP_THEME =
+      SETTINGS.get(AvailableAppSettings.APPLICATION_THEME, null);
 
   public Map<String, Object> info(final ServletContext context) {
 
@@ -89,16 +91,16 @@ public class AppInfo {
       map.put("user.action", group.getHomeAction());
     }
 
-    map.put("application.name", SETTINGS.get("application.name"));
-    map.put("application.description", SETTINGS.get("application.description"));
-    map.put("application.version", SETTINGS.get("application.version"));
-    map.put("application.author", SETTINGS.get("application.author"));
-    map.put("application.copyright", SETTINGS.get("application.copyright"));
-    map.put("application.home", SETTINGS.get("application.home"));
-    map.put("application.help", SETTINGS.get("application.help"));
-    map.put("application.mode", SETTINGS.get("application.mode", "dev"));
+    map.put("application.name", SETTINGS.get(AvailableAppSettings.APPLICATION_NAME));
+    map.put("application.description", SETTINGS.get(AvailableAppSettings.APPLICATION_DESCRIPTION));
+    map.put("application.version", SETTINGS.get(AvailableAppSettings.APPLICATION_VERSION));
+    map.put("application.author", SETTINGS.get(AvailableAppSettings.APPLICATION_AUTHOR));
+    map.put("application.copyright", SETTINGS.get(AvailableAppSettings.APPLICATION_COPYRIGHT));
+    map.put("application.home", SETTINGS.get(AvailableAppSettings.APPLICATION_HOME));
+    map.put("application.help", SETTINGS.get(AvailableAppSettings.APPLICATION_HELP));
+    map.put("application.mode", SETTINGS.get(AvailableAppSettings.APPLICATION_MODE, "dev"));
 
-    map.put("file.upload.size", SETTINGS.get("file.upload.size", "5"));
+    map.put("file.upload.size", SETTINGS.get(AvailableAppSettings.FILE_UPLOAD_SIZE, "5"));
     map.put("application.sdk", VersionUtils.getVersion().version);
 
     for (String key : SETTINGS.getProperties().stringPropertyNames()) {
@@ -143,7 +145,7 @@ public class AppInfo {
   }
 
   public String getStyle() {
-    if (SETTINGS.get("context.appStyle") != null) {
+    if (SETTINGS.get(AvailableAppSettings.CONTEXT_APP_STYLE) != null) {
       final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
       final ScriptHelper helper = new CompositeScriptHelper(bindings);
       try {
@@ -158,8 +160,8 @@ public class AppInfo {
   }
 
   public String getLogo() throws JspException, IOException {
-    final String logo = SETTINGS.get("application.logo", "img/axelor.png");
-    if (SETTINGS.get("context.appLogo") != null) {
+    final String logo = SETTINGS.get(AvailableAppSettings.APPLICATION_LOGO, "img/axelor.png");
+    if (SETTINGS.get(AvailableAppSettings.CONTEXT_APP_LOGO) != null) {
       final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
       final ScriptHelper helper = new CompositeScriptHelper(bindings);
       try {

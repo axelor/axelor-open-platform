@@ -18,6 +18,7 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.StringUtils;
 import com.google.common.collect.ImmutableMap;
 import java.util.List;
@@ -42,46 +43,6 @@ import org.pac4j.saml.logout.impl.SAML2LogoutValidator;
 
 public class AuthPac4jModuleSaml extends AuthPac4jModule {
 
-  // Basic configuration
-  public static final String CONFIG_SAML_KEYSTORE_PATH = "auth.saml.keystore.path";
-  public static final String CONFIG_SAML_KEYSTORE_PASSWORD = "auth.saml.keystore.password";
-  public static final String CONFIG_SAML_PRIVATE_KEY_PASSWORD = "auth.saml.private.key.password";
-  public static final String CONFIG_SAML_IDENTITY_PROVIDER_METADATA_PATH =
-      "auth.saml.identity.provider.metadata.path";
-
-  // Additional configuration
-  public static final String CONFIG_SAML_MAXIMUM_AUTHENTICATION_LIFETIME =
-      "auth.saml.maximum.authentication.lifetime";
-  public static final String CONFIG_SAML_SERVICE_PROVIDER_ENTITY_ID =
-      "auth.saml.service.provider.entity.id";
-  public static final String CONFIG_SAML_SERVICE_PROVIDER_METADATA_PATH =
-      "auth.saml.service.provider.metadata.path";
-
-  // Advanced configuration
-  public static final String CONFIG_SAML_FORCE_AUTH = "auth.saml.force.auth";
-  public static final String CONFIG_SAML_PASSIVE = "auth.saml.passive";
-
-  public static final String CONFIG_SAML_AUTHN_REQUEST_BINDING_TYPE =
-      "auth.saml.authn.request.binding.type";
-  public static final String CONFIG_SAML_USE_NAME_QUALIFIER = "auth.saml.use.name.qualifier";
-
-  public static final String CONFIG_SAML_ATTRIBUTE_CONSUMING_SERVICE_INDEX =
-      "auth.saml.attribute.consuming.service.index";
-  public static final String CONFIG_SAML_ASSERTION_CONSUMER_SERVICE_INDEX =
-      "auth.saml.assertion.consumer.service.index";
-
-  public static final String CONFIG_SAML_BLACKLISTED_SIGNATURE_SIGNING_ALGORITHMS =
-      "auth.saml.blacklisted.signature.signing.algorithms";
-  public static final String CONFIG_SAML_SIGNATURE_ALGORITHMS = "auth.saml.signature.algorithms";
-  public static final String CONFIG_SAML_SIGNATURE_REFERENCE_DIGEST_METHODS =
-      "auth.saml.signature.reference.digest.methods";
-  public static final String CONFIG_SAML_SIGNATURE_CANONICALIZATION_ALGORITHM =
-      "auth.saml.signature.canonicalization.algorithm";
-
-  public static final String CONFIG_SAML_WANTS_ASSERTIONS_SIGNED =
-      "auth.saml.wants.assertions.signed";
-  public static final String CONFIG_SAML_AUTHN_REQUEST_SIGNED = "auth.saml.authn.request.signed";
-
   private static final Map<String, String> authnRequestBindingTypes =
       ImmutableMap.of(
           "SAML2_POST_BINDING_URI",
@@ -99,42 +60,46 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
   protected void configureClients() {
     final AppSettings settings = AppSettings.get();
 
-    final String keystorePath = settings.get(CONFIG_SAML_KEYSTORE_PATH);
-    final String keystorePassword = settings.get(CONFIG_SAML_KEYSTORE_PASSWORD);
-    final String privateKeyPassword = settings.get(CONFIG_SAML_PRIVATE_KEY_PASSWORD);
+    final String keystorePath = settings.get(AvailableAppSettings.AUTH_SAML_KEYSTORE_PATH);
+    final String keystorePassword = settings.get(AvailableAppSettings.AUTH_SAML_KEYSTORE_PASSWORD);
+    final String privateKeyPassword =
+        settings.get(AvailableAppSettings.AUTH_SAML_PRIVATE_KEY_PASSWORD);
     final String identityProviderMetadataPath =
-        settings.get(CONFIG_SAML_IDENTITY_PROVIDER_METADATA_PATH);
+        settings.get(AvailableAppSettings.AUTH_SAML_IDENTITY_PROVIDER_METADATA_PATH);
 
     final int maximumAuthenticationLifetime =
-        settings.getInt(CONFIG_SAML_MAXIMUM_AUTHENTICATION_LIFETIME, -1);
+        settings.getInt(AvailableAppSettings.AUTH_SAML_MAXIMUM_AUTHENTICATION_LIFETIME, -1);
     final String serviceProviderEntityId =
-        settings.get(CONFIG_SAML_SERVICE_PROVIDER_ENTITY_ID, null);
+        settings.get(AvailableAppSettings.AUTH_SAML_SERVICE_PROVIDER_ENTITY_ID, null);
     final String serviceProviderMetadataPath =
-        settings.get(CONFIG_SAML_SERVICE_PROVIDER_METADATA_PATH, null);
+        settings.get(AvailableAppSettings.AUTH_SAML_SERVICE_PROVIDER_METADATA_PATH, null);
 
-    final boolean forceAuth = settings.getBoolean(CONFIG_SAML_FORCE_AUTH, false);
-    final boolean passive = settings.getBoolean(CONFIG_SAML_PASSIVE, false);
+    final boolean forceAuth = settings.getBoolean(AvailableAppSettings.AUTH_SAML_FORCE_AUTH, false);
+    final boolean passive = settings.getBoolean(AvailableAppSettings.AUTH_SAML_PASSIVE, false);
 
     final String authnRequestBindingType =
-        settings.get(CONFIG_SAML_AUTHN_REQUEST_BINDING_TYPE, null);
-    final boolean useNameQualifier = settings.getBoolean(CONFIG_SAML_USE_NAME_QUALIFIER, false);
+        settings.get(AvailableAppSettings.AUTH_SAML_AUTHN_REQUEST_BINDING_TYPE, null);
+    final boolean useNameQualifier =
+        settings.getBoolean(AvailableAppSettings.AUTH_SAML_USE_NAME_QUALIFIER, false);
 
     final int attributeConsumingServiceIndex =
-        settings.getInt(CONFIG_SAML_ATTRIBUTE_CONSUMING_SERVICE_INDEX, -1);
+        settings.getInt(AvailableAppSettings.AUTH_SAML_ATTRIBUTE_CONSUMING_SERVICE_INDEX, -1);
     final int assertionConsumerServiceIndex =
-        settings.getInt(CONFIG_SAML_ASSERTION_CONSUMER_SERVICE_INDEX, -1);
+        settings.getInt(AvailableAppSettings.AUTH_SAML_ASSERTION_CONSUMER_SERVICE_INDEX, -1);
 
     final List<String> blackListedSignatureSigningAlgorithms =
-        settings.getList(CONFIG_SAML_BLACKLISTED_SIGNATURE_SIGNING_ALGORITHMS);
-    final List<String> signatureAlgorithms = settings.getList(CONFIG_SAML_SIGNATURE_ALGORITHMS);
+        settings.getList(AvailableAppSettings.AUTH_SAML_BLACKLISTED_SIGNATURE_SIGNING_ALGORITHMS);
+    final List<String> signatureAlgorithms =
+        settings.getList(AvailableAppSettings.AUTH_SAML_SIGNATURE_ALGORITHMS);
     final List<String> signatureReferenceDigestMethods =
-        settings.getList(CONFIG_SAML_SIGNATURE_REFERENCE_DIGEST_METHODS);
+        settings.getList(AvailableAppSettings.AUTH_SAML_SIGNATURE_REFERENCE_DIGEST_METHODS);
     final String signatureCanonicalizationAlgorithm =
-        settings.get(CONFIG_SAML_SIGNATURE_CANONICALIZATION_ALGORITHM, null);
+        settings.get(AvailableAppSettings.AUTH_SAML_SIGNATURE_CANONICALIZATION_ALGORITHM, null);
 
     final boolean wantsAssertionsSigned =
-        settings.getBoolean(CONFIG_SAML_WANTS_ASSERTIONS_SIGNED, false);
-    final boolean authnRequestSigned = settings.getBoolean(CONFIG_SAML_AUTHN_REQUEST_SIGNED, false);
+        settings.getBoolean(AvailableAppSettings.AUTH_SAML_WANTS_ASSERTIONS_SIGNED, false);
+    final boolean authnRequestSigned =
+        settings.getBoolean(AvailableAppSettings.AUTH_SAML_AUTHN_REQUEST_SIGNED, false);
 
     final SAML2Configuration saml2Config =
         new SAML2Configuration(
@@ -223,7 +188,7 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
 
   public static boolean isEnabled() {
     final AppSettings settings = AppSettings.get();
-    return settings.get(CONFIG_SAML_KEYSTORE_PATH, null) != null;
+    return settings.get(AvailableAppSettings.AUTH_SAML_KEYSTORE_PATH, null) != null;
   }
 
   private static class AxelorSAML2Client extends SAML2Client {

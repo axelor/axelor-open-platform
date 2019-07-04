@@ -18,6 +18,7 @@
 package com.axelor.auth.ldap;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
@@ -52,22 +53,9 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class AuthLdapService {
 
-  private final Logger log = LoggerFactory.getLogger(getClass());
-
-  public static final String LDAP_SERVER_URL = "ldap.server.url";
-  public static final String LDAP_AUTH_TYPE = "ldap.auth.type";
-
-  public static final String LDAP_SYSTEM_USER = "ldap.system.user";
-  public static final String LDAP_SYSTEM_PASSWORD = "ldap.system.password";
-
-  public static final String LDAP_GROUP_BASE = "ldap.group.base";
-  public static final String LDAP_GROUP_OBJECT_CLASS = "ldap.group.object.class";
-  public static final String LDAP_GROUP_FILTER = "ldap.group.filter";
-
-  public static final String LDAP_USER_BASE = "ldap.user.base";
-  public static final String LDAP_USER_FILTER = "ldap.user.filter";
-
   public static final String DEFAULT_AUTH_TYPE = "simple";
+
+  private final Logger log = LoggerFactory.getLogger(getClass());
 
   private String ldapServerUrl;
 
@@ -101,15 +89,15 @@ public class AuthLdapService {
   }
 
   public AuthLdapService(Properties properties) {
-    ldapServerUrl = properties.getProperty(LDAP_SERVER_URL);
-    ldapAuthType = properties.getProperty(LDAP_AUTH_TYPE, DEFAULT_AUTH_TYPE);
-    ldapSysUser = properties.getProperty(LDAP_SYSTEM_USER);
-    ldapSysPassword = properties.getProperty(LDAP_SYSTEM_PASSWORD);
-    ldapGroupsDn = properties.getProperty(LDAP_GROUP_BASE);
-    ldapUsersDn = properties.getProperty(LDAP_USER_BASE);
-    ldapGroupFilter = properties.getProperty(LDAP_GROUP_FILTER);
-    ldapUserFilter = properties.getProperty(LDAP_USER_FILTER);
-    ldapGroupObjectClass = properties.getProperty(LDAP_GROUP_OBJECT_CLASS);
+    ldapServerUrl = properties.getProperty(AvailableAppSettings.LDAP_SERVER_URL);
+    ldapAuthType = properties.getProperty(AvailableAppSettings.LDAP_AUTH_TYPE, DEFAULT_AUTH_TYPE);
+    ldapSysUser = properties.getProperty(AvailableAppSettings.LDAP_SYSTEM_USER);
+    ldapSysPassword = properties.getProperty(AvailableAppSettings.LDAP_SYSTEM_PASSWORD);
+    ldapGroupsDn = properties.getProperty(AvailableAppSettings.LDAP_GROUP_BASE);
+    ldapUsersDn = properties.getProperty(AvailableAppSettings.LDAP_USER_BASE);
+    ldapGroupFilter = properties.getProperty(AvailableAppSettings.LDAP_GROUP_FILTER);
+    ldapUserFilter = properties.getProperty(AvailableAppSettings.LDAP_USER_FILTER);
+    ldapGroupObjectClass = properties.getProperty(AvailableAppSettings.LDAP_GROUP_OBJECT_CLASS);
 
     factory.setUrl(ldapServerUrl);
     factory.setSystemUsername(ldapSysUser);

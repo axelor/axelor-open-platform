@@ -18,6 +18,7 @@
 package com.axelor.auth;
 
 import com.axelor.JpaTestModule;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
@@ -60,16 +61,17 @@ public class LdapTest extends AbstractLdapTestUnit {
 
       Properties properties = new Properties();
 
-      properties.put(AuthLdapService.LDAP_SERVER_URL, "ldap://localhost:" + ldapServer.getPort());
-      properties.put(AuthLdapService.LDAP_SYSTEM_USER, "uid=admin,ou=system");
-      properties.put(AuthLdapService.LDAP_SYSTEM_PASSWORD, "secret");
+      properties.put(
+          AvailableAppSettings.LDAP_SERVER_URL, "ldap://localhost:" + ldapServer.getPort());
+      properties.put(AvailableAppSettings.LDAP_SYSTEM_USER, "uid=admin,ou=system");
+      properties.put(AvailableAppSettings.LDAP_SYSTEM_PASSWORD, "secret");
 
-      properties.put(AuthLdapService.LDAP_GROUP_BASE, "ou=groups,dc=test,dc=com");
-      properties.put(AuthLdapService.LDAP_USER_BASE, "ou=users,dc=test,dc=com");
-      properties.put(AuthLdapService.LDAP_GROUP_OBJECT_CLASS, "groupOfUniqueNames");
+      properties.put(AvailableAppSettings.LDAP_GROUP_BASE, "ou=groups,dc=test,dc=com");
+      properties.put(AvailableAppSettings.LDAP_USER_BASE, "ou=users,dc=test,dc=com");
+      properties.put(AvailableAppSettings.LDAP_GROUP_OBJECT_CLASS, "groupOfUniqueNames");
 
-      properties.put(AuthLdapService.LDAP_GROUP_FILTER, "(uniqueMember=uid={0})");
-      properties.put(AuthLdapService.LDAP_USER_FILTER, "(uid={0})");
+      properties.put(AvailableAppSettings.LDAP_GROUP_FILTER, "(uniqueMember=uid={0})");
+      properties.put(AvailableAppSettings.LDAP_USER_FILTER, "(uid={0})");
 
       AuthLdapService ldap = new AuthLdapService(properties);
       bind(AuthLdapService.class).toInstance(ldap);

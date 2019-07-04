@@ -18,6 +18,7 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthWebModule;
 import com.axelor.common.StringUtils;
 import com.google.common.base.Preconditions;
@@ -83,16 +84,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AuthPac4jModule extends AuthWebModule {
-
-  public static final String CONFIG_AUTH_CALLBACK_URL = "auth.callback.url";
-  public static final String CONFIG_AUTH_USER_PROVISIONING = "auth.user.provisioning";
-  public static final String CONFIG_AUTH_USER_DEFAULT_GROUP = "auth.user.default.group";
-  public static final String CONFIG_AUTH_USER_PRINCIPAL_ATTRIBUTE = "auth.user.principal.attribute";
-
-  public static final String CONFIG_AUTH_LOGOUT_URL = "auth.logout.url";
-  public static final String CONFIG_AUTH_LOGOUT_URL_PATTERN = "auth.logout.url.pattern";
-  public static final String CONFIG_AUTH_LOGOUT_LOCAL = "auth.logout.local";
-  public static final String CONFIG_AUTH_LOGOUT_CENTRAL = "auth.logout.central";
 
   protected static final String ROLE_HAS_USER = "_ROLE_HAS_USER";
 
@@ -168,11 +159,11 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     if (callbackUrl == null) {
       if (isEnabled()) {
         final AppSettings settings = AppSettings.get();
-        callbackUrl = settings.get(CONFIG_AUTH_CALLBACK_URL, null);
+        callbackUrl = settings.get(AvailableAppSettings.AUTH_CALLBACK_URL, null);
 
         // Backward-compatible CAS configuration
         if (StringUtils.isBlank(callbackUrl) && AuthPac4jModuleCas.isEnabled()) {
-          callbackUrl = settings.get(AuthPac4jModuleCas.CONFIG_CAS_SERVICE, null);
+          callbackUrl = settings.get(AvailableAppSettings.AUTH_CAS_SERVICE, null);
         }
 
         if (StringUtils.isBlank(callbackUrl)) {
@@ -194,11 +185,11 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     if (logoutUrl == null) {
       // Backward-compatible CAS configuration
       final AppSettings settings = AppSettings.get();
-      logoutUrl = settings.get(CONFIG_AUTH_LOGOUT_URL, null);
+      logoutUrl = settings.get(AvailableAppSettings.AUTH_LOGOUT_URL, null);
       if (StringUtils.isBlank(logoutUrl)) {
         logoutUrl =
             AuthPac4jModuleCas.isEnabled()
-                ? settings.get(AuthPac4jModuleCas.CONFIG_CAS_LOGOUT_URL, settings.getBaseURL())
+                ? settings.get(AvailableAppSettings.AUTH_CAS_LOGOUT_URL, settings.getBaseURL())
                 : settings.getBaseURL();
       }
       if (StringUtils.isBlank(logoutUrl)) {
@@ -270,9 +261,11 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     @Inject
     public AxelorLogoutFilter(ConfigSupplier configSupplier) {
       final AppSettings settings = AppSettings.get();
-      final String logoutUrlPattern = settings.get(CONFIG_AUTH_LOGOUT_URL_PATTERN, null);
-      final boolean localLogout = settings.getBoolean(CONFIG_AUTH_LOGOUT_LOCAL, true);
-      final boolean centralLogout = settings.getBoolean(CONFIG_AUTH_LOGOUT_CENTRAL, false);
+      final String logoutUrlPattern =
+          settings.get(AvailableAppSettings.AUTH_LOGOUT_URL_PATTERN, null);
+      final boolean localLogout = settings.getBoolean(AvailableAppSettings.AUTH_LOGOUT_LOCAL, true);
+      final boolean centralLogout =
+          settings.getBoolean(AvailableAppSettings.AUTH_LOGOUT_CENTRAL, false);
       final Config config = configSupplier.get();
 
       setConfig(config);

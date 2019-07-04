@@ -17,6 +17,7 @@
  */
 package com.axelor.script;
 
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
@@ -75,11 +76,13 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
     config.addCompilationCustomizers(importCustomizer);
 
     try {
-      cacheSize = Integer.parseInt(System.getProperty("axelor.ScriptCacheSize"));
+      cacheSize =
+          Integer.parseInt(System.getProperty(AvailableAppSettings.AXELOR_SCRIPT_CACHE_SIZE));
     } catch (Exception e) {
     }
     try {
-      cacheExpireTime = Integer.parseInt(System.getProperty("axelor.ScriptCacheExpireTime"));
+      cacheExpireTime =
+          Integer.parseInt(System.getProperty(AvailableAppSettings.AXELOR_SCRIPT_CACHE_EXPIRETIME));
     } catch (Exception e) {
     }
 

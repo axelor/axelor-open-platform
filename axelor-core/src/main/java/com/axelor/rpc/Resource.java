@@ -20,6 +20,7 @@ package com.axelor.rpc;
 import static com.axelor.common.StringUtils.isBlank;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
@@ -529,9 +530,10 @@ public class Resource<T extends Model> {
   private static final int DEFAULT_EXPORT_FETCH_SIZE = 500;
 
   private static final int EXPORT_MAX_SIZE =
-      AppSettings.get().getInt("data.export.max-size", DEFAULT_EXPORT_MAX_SIZE);
+      AppSettings.get().getInt(AvailableAppSettings.DATA_EXPORT_MAX_SIZE, DEFAULT_EXPORT_MAX_SIZE);
   private static final int EXPORT_FETCH_SIZE =
-      AppSettings.get().getInt("data.export.fetch-size", DEFAULT_EXPORT_FETCH_SIZE);
+      AppSettings.get()
+          .getInt(AvailableAppSettings.DATA_EXPORT_FETCH_SIZE, DEFAULT_EXPORT_FETCH_SIZE);
 
   @SuppressWarnings("all")
   public int export(Request request, Writer writer) throws IOException {

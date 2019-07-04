@@ -18,6 +18,7 @@
 package com.axelor.app.internal;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
@@ -43,7 +44,7 @@ public class AppFilter implements Filter {
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
     try {
-      final String appLocale = AppSettings.get().get("application.locale", null);
+      final String appLocale = AppSettings.get().get(AvailableAppSettings.APPLICATION_LOCALE, null);
       APP_LOCALE = appLocale == null ? null : new Locale(appLocale);
     } catch (Exception e) {
     }

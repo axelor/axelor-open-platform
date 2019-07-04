@@ -18,6 +18,7 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
@@ -48,7 +49,7 @@ public class AuthPac4jUserService {
 
   static {
     final AppSettings settings = AppSettings.get();
-    DEFAULT_GROUP_CODE = settings.get(AuthPac4jModule.CONFIG_AUTH_USER_DEFAULT_GROUP, "users");
+    DEFAULT_GROUP_CODE = settings.get(AvailableAppSettings.AUTH_USER_DEFAULT_GROUP, "users");
   }
 
   private static final Logger logger =

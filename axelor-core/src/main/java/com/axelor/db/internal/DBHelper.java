@@ -20,6 +20,7 @@ package com.axelor.db.internal;
 import static com.axelor.common.StringUtils.isBlank;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
 import java.io.InputStream;
@@ -67,9 +68,6 @@ public class DBHelper {
       "properties/property[@name='hibernate.jdbc.batch_size']/@value";
   private static final String XPATH_FETCH_SIZE =
       "properties/property[@name='hibernate.jdbc.fetch_size']/@value";
-
-  private static final String CONFIG_BATCH_SIZE = "hibernate.jdbc.batch_size";
-  private static final String CONFIG_FETCH_SIZE = "hibernate.jdbc.fetch_size";
 
   private static String jndiName;
   private static String cacheMode;
@@ -127,8 +125,10 @@ public class DBHelper {
       jdbcUser = settings.get(configUser);
       jdbcPassword = settings.get(configPassword);
 
-      jdbcBatchSize = settings.getInt(CONFIG_BATCH_SIZE, DEFAULT_BATCH_SIZE);
-      jdbcFetchSize = settings.getInt(CONFIG_FETCH_SIZE, DEFAULT_FETCH_SIZE);
+      jdbcBatchSize =
+          settings.getInt(AvailableAppSettings.HIBERNATE_JDBC_BATCH_SIZE, DEFAULT_BATCH_SIZE);
+      jdbcFetchSize =
+          settings.getInt(AvailableAppSettings.HIBERNATE_JDBC_FETCH_SIZE, DEFAULT_FETCH_SIZE);
 
       cacheMode = evaluate(xpath, XPATH_ROOT, XPATH_SHARED_CACHE_MODE, document);
 

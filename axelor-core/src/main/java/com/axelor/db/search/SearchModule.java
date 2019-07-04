@@ -18,21 +18,20 @@
 package com.axelor.db.search;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.google.inject.AbstractModule;
 
 /** A Guice module to configure full-text search feature. */
 public class SearchModule extends AbstractModule {
-
-  public static final String CONFIG_DIRECTORY_PROVIDER =
-      "hibernate.search.default.directory_provider";
-  public static final String CONFIG_INDEX_BASE = "hibernate.search.default.indexBase";
 
   public static final String DEFAULT_DIRECTORY_PROVIDER = "filesystem";
   public static final String DEFAULT_INDEX_BASE = "{user.home}/.axelor/indexes";
 
   public static boolean isEnabled() {
     return !"none"
-        .equalsIgnoreCase(AppSettings.get().get(SearchModule.CONFIG_DIRECTORY_PROVIDER, "none"));
+        .equalsIgnoreCase(
+            AppSettings.get()
+                .get(AvailableAppSettings.HIBERNATE_SEARCH_DEFAULT_DIRECTORY_PROVIDER, "none"));
   }
 
   @Override

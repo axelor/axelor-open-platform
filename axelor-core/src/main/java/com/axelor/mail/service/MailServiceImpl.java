@@ -20,6 +20,7 @@ package com.axelor.mail.service;
 import static com.axelor.common.StringUtils.isBlank;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuditableRunner;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.UserRepository;
@@ -135,14 +136,15 @@ public class MailServiceImpl implements MailService, MailConstants {
 
     final AppSettings settings = AppSettings.get();
 
-    final String host = settings.get(CONFIG_SMTP_HOST);
-    final String port = settings.get(CONFIG_SMTP_PORT);
-    final String user = settings.get(CONFIG_SMTP_USER);
-    final String pass = settings.get(CONFIG_SMTP_PASS);
-    final String channel = settings.get(CONFIG_SMTP_CHANNEL);
+    final String host = settings.get(AvailableAppSettings.MAIL_SMTP_HOST);
+    final String port = settings.get(AvailableAppSettings.MAIL_SMTP_PORT);
+    final String user = settings.get(AvailableAppSettings.MAIL_SMTP_USER);
+    final String pass = settings.get(AvailableAppSettings.MAIL_SMTP_PASS);
+    final String channel = settings.get(AvailableAppSettings.MAIL_SMTP_CHANNEL);
 
-    final int timeout = settings.getInt(CONFIG_SMTP_TIMEOUT, DEFAULT_TIMEOUT);
-    final int connectionTimeout = settings.getInt(CONFIG_SMTP_CONNECTION_TIMEOUT, DEFAULT_TIMEOUT);
+    final int timeout = settings.getInt(AvailableAppSettings.MAIL_SMTP_TIMEOUT, DEFAULT_TIMEOUT);
+    final int connectionTimeout =
+        settings.getInt(AvailableAppSettings.MAIL_SMTP_CONNECTION_TIMEOUT, DEFAULT_TIMEOUT);
 
     if (isBlank(host)) {
       return null;
@@ -181,14 +183,15 @@ public class MailServiceImpl implements MailService, MailConstants {
 
     final AppSettings settings = AppSettings.get();
 
-    final String host = settings.get(CONFIG_IMAP_HOST);
-    final String port = settings.get(CONFIG_IMAP_PORT);
-    final String user = settings.get(CONFIG_IMAP_USER);
-    final String pass = settings.get(CONFIG_IMAP_PASS);
-    final String channel = settings.get(CONFIG_IMAP_CHANNEL);
+    final String host = settings.get(AvailableAppSettings.MAIL_IMAP_HOST);
+    final String port = settings.get(AvailableAppSettings.MAIL_IMAP_PORT);
+    final String user = settings.get(AvailableAppSettings.MAIL_IMAP_USER);
+    final String pass = settings.get(AvailableAppSettings.MAIL_IMAP_PASS);
+    final String channel = settings.get(AvailableAppSettings.MAIL_IMAP_CHANNEL);
 
-    final int timeout = settings.getInt(CONFIG_IMAP_TIMEOUT, DEFAULT_TIMEOUT);
-    final int connectionTimeout = settings.getInt(CONFIG_IMAP_CONNECTION_TIMEOUT, DEFAULT_TIMEOUT);
+    final int timeout = settings.getInt(AvailableAppSettings.MAIL_IMAP_TIMEOUT, DEFAULT_TIMEOUT);
+    final int connectionTimeout =
+        settings.getInt(AvailableAppSettings.MAIL_IMAP_CONNECTION_TIMEOUT, DEFAULT_TIMEOUT);
 
     if (isBlank(host)) {
       return null;

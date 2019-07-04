@@ -20,6 +20,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page language="java" session="true" %>
 <%@ taglib prefix="x" uri="WEB-INF/axelor.tld" %>
+<%@ page import="com.axelor.app.AvailableAppSettings" %>
 <%@ page import="com.axelor.app.AppSettings" %>
 <%@ page import="com.axelor.web.internal.AppInfo" %>
 <%@ page import="java.util.ArrayList" %>
@@ -31,14 +32,14 @@
 AppSettings settings = AppSettings.get();
 AppInfo info = new AppInfo();
 
-String appName = settings.get("application.name", "My App");
-String appDesc = settings.get("application.description", null);
-String appHome = settings.get("application.home", "#/");
+String appName = settings.get(AvailableAppSettings.APPLICATION_NAME, "My App");
+String appDesc = settings.get(AvailableAppSettings.APPLICATION_DESCRIPTION, null);
+String appHome = settings.get(AvailableAppSettings.APPLICATION_HOME, "#/");
 String appLogo = info.getLogo();
 String appStyle = info.getStyle();
-String appAuthor = settings.get("application.author", "");
+String appAuthor = settings.get(AvailableAppSettings.APPLICATION_AUTHOR, "");
 String appTheme = info.getTheme();
-String appMenu = settings.get("view.menubar.location", "both");
+String appMenu = settings.get(AvailableAppSettings.VIEW_MENUBAR_LOCATION, "both");
 
 String appTitle =  appName;
 

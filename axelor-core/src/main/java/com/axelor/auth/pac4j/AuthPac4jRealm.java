@@ -18,6 +18,7 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.UserAuthenticationInfo;
 import com.axelor.auth.db.User;
@@ -40,7 +41,7 @@ public class AuthPac4jRealm extends Pac4jRealm {
   public AuthPac4jRealm() {
     final AppSettings settings = AppSettings.get();
     setPrincipalNameAttribute(
-        settings.get(AuthPac4jModule.CONFIG_AUTH_USER_PRINCIPAL_ATTRIBUTE, "email"));
+        settings.get(AvailableAppSettings.AUTH_USER_PRINCIPAL_ATTRIBUTE, "email"));
   }
 
   @Override

@@ -18,6 +18,7 @@
 package com.axelor.meta.schema.actions;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.FileUtils;
 import com.axelor.common.ResourceUtils;
 import com.axelor.i18n.I18n;
@@ -73,7 +74,8 @@ public class ActionExport extends Action {
   }
 
   public static File getExportPath() {
-    final String path = AppSettings.get().getPath("data.export.dir", DEFAULT_EXPORT_DIR);
+    final String path =
+        AppSettings.get().getPath(AvailableAppSettings.DATA_EXPORT_DIR, DEFAULT_EXPORT_DIR);
     return new File(path);
   }
 

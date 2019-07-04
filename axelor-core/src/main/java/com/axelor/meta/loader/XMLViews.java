@@ -19,6 +19,7 @@ package com.axelor.meta.loader;
 
 import com.axelor.app.AppConfig;
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
@@ -163,7 +164,6 @@ public class XMLViews {
                 }
               });
 
-  private static final String APP_CONFIG_PROVIDER_KEY = "application.config.provider";
   private static AppConfig appConfigProvider;
 
   static {
@@ -218,7 +218,8 @@ public class XMLViews {
     // This adds default attributes to generated XML
     // documentBuilderFactory.setSchema(schema);
 
-    final String appConfigProdiverName = AppSettings.get().get(APP_CONFIG_PROVIDER_KEY);
+    final String appConfigProdiverName =
+        AppSettings.get().get(AvailableAppSettings.APPLICATION_CONFIG_PROVIDER);
 
     if (StringUtils.notBlank(appConfigProdiverName)) {
       try {
@@ -227,7 +228,9 @@ public class XMLViews {
         appConfigProvider = Beans.get(cls);
       } catch (ClassNotFoundException e) {
         log.error(
-            "Can't find class {} specified by {}", appConfigProdiverName, APP_CONFIG_PROVIDER_KEY);
+            "Can't find class {} specified by {}",
+            appConfigProdiverName,
+            AvailableAppSettings.APPLICATION_CONFIG_PROVIDER);
       }
     }
 

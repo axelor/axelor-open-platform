@@ -18,6 +18,7 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.Role;
@@ -66,7 +67,7 @@ public class AuthPac4jProfileService {
     if (AuthPac4jModuleCas.isEnabled()) {
       final Optional<String> name =
           Optional.ofNullable(
-                  AppSettings.get().get(AuthPac4jModuleCas.CONFIG_CAS_ATTRS_USER_NAME, null))
+                  AppSettings.get().get(AvailableAppSettings.AUTH_CAS_ATTRS_USER_NAME, null))
               .map(profile::getAttribute)
               .map(Object::toString)
               .filter(StringUtils::notBlank);
@@ -88,7 +89,7 @@ public class AuthPac4jProfileService {
     if (AuthPac4jModuleCas.isEnabled()) {
       final Optional<String> email =
           Optional.ofNullable(
-                  AppSettings.get().get(AuthPac4jModuleCas.CONFIG_CAS_ATTRS_USER_EMAIL, null))
+                  AppSettings.get().get(AvailableAppSettings.AUTH_CAS_ATTRS_USER_EMAIL, null))
               .map(profile::getAttribute)
               .map(Object::toString)
               .filter(StringUtils::notBlank);

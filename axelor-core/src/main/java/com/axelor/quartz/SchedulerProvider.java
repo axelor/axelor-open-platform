@@ -18,6 +18,7 @@
 package com.axelor.quartz;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import java.util.Properties;
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -35,7 +36,6 @@ class SchedulerProvider implements Provider<Scheduler> {
 
   private static final String DEFAULT_THREAD_COUNT = "3";
 
-  private static final String THREAD_COUNT_GET = "quartz.threadCount";
   private static final String THREAD_COUNT_SET = "org.quartz.threadPool.threadCount";
 
   @Inject private GuiceJobFactory jobFactory;
@@ -46,7 +46,9 @@ class SchedulerProvider implements Provider<Scheduler> {
   public Scheduler get() {
 
     Properties cfg = new Properties();
-    cfg.put(THREAD_COUNT_SET, AppSettings.get().get(THREAD_COUNT_GET, DEFAULT_THREAD_COUNT));
+    cfg.put(
+        THREAD_COUNT_SET,
+        AppSettings.get().get(AvailableAppSettings.QUARTZ_THREAD_COUNT, DEFAULT_THREAD_COUNT));
 
     Scheduler scheduler;
     SchedulerFactory schedulerFactory;

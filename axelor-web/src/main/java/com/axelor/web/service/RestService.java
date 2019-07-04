@@ -20,6 +20,7 @@ package com.axelor.web.service;
 import static com.axelor.common.ObjectUtils.isEmpty;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
@@ -589,7 +590,8 @@ public class RestService extends ResourceService {
 
   static {
     try {
-      csvCharset = Charset.forName(AppSettings.get().get("data.export.encoding"));
+      csvCharset =
+          Charset.forName(AppSettings.get().get(AvailableAppSettings.DATA_EXPORT_ENCODING));
     } catch (Exception e) {
     }
   }

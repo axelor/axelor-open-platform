@@ -36,14 +36,13 @@ import java.util.stream.Collectors;
 public final class AppSettings {
 
   private static final String DEFAULT_CONFIG_LOCATION = "application.properties";
-  private static final String CUSTOM_CONFIG_LOCATION = "axelor.config";
 
   private Properties properties;
 
   private static AppSettings instance;
 
   private AppSettings() {
-    String config = System.getProperty(CUSTOM_CONFIG_LOCATION);
+    String config = System.getProperty("axelor.config");
     InputStream stream = null;
     try {
       if (StringUtils.isBlank(config)) {
@@ -140,13 +139,13 @@ public final class AppSettings {
   public String getBaseURL() {
     String url = AppFilter.getBaseURL();
     if (url == null) {
-      url = get("application.baseUrl");
+      url = get(AvailableAppSettings.APPLICATION_BASE_URL);
     }
     return url;
   }
 
   public boolean isProduction() {
-    return !"dev".equals(get("application.mode", "dev"));
+    return !"dev".equals(get(AvailableAppSettings.APPLICATION_MODE, "dev"));
   }
 
   /**

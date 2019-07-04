@@ -18,6 +18,7 @@
 package com.axelor.i18n;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -33,7 +34,7 @@ public final class L10n {
   private static final String DEFAULT_TIME_FORMAT = "HH:mm";
 
   private static final String DATE_FORMAT =
-      AppSettings.get().get("date.format", DEFAULT_DATE_FORMAT);
+      AppSettings.get().get(AvailableAppSettings.DATE_FORMAT, DEFAULT_DATE_FORMAT);
   private static final String TIME_FORMAT = DEFAULT_TIME_FORMAT;
   private static final String DATE_TIME_FORMAT = DATE_FORMAT + " " + TIME_FORMAT;
 

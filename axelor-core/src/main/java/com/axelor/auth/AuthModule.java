@@ -18,6 +18,7 @@
 package com.axelor.auth;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.ldap.AuthLdapModule;
 import com.axelor.auth.pac4j.AuthPac4jModule;
 import com.axelor.auth.pac4j.AuthPac4jModuleCas;
@@ -72,7 +73,7 @@ public class AuthModule extends AbstractModule {
     if (AuthPac4jModule.isEnabled()) {
       final AppSettings settings = AppSettings.get();
       final String userProvisioning =
-          settings.get(AuthPac4jModule.CONFIG_AUTH_USER_PROVISIONING, "create");
+          settings.get(AvailableAppSettings.AUTH_USER_PROVISIONING, "create");
 
       // User provisioning
       switch (userProvisioning) {

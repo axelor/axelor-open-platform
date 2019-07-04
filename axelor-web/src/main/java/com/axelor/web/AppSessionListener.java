@@ -18,6 +18,7 @@
 package com.axelor.web;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,7 +43,7 @@ public final class AppSessionListener implements HttpSessionListener {
    */
   @Inject
   public AppSessionListener(AppSettings settings) {
-    this.timeout = settings.getInt("session.timeout", 60);
+    this.timeout = settings.getInt(AvailableAppSettings.SESSION_TIMEOUT, 60);
   }
 
   @Override

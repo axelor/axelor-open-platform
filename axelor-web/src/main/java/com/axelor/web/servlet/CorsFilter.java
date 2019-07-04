@@ -20,6 +20,7 @@ package com.axelor.web.servlet;
 import static com.axelor.common.StringUtils.isBlank;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import java.io.IOException;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -72,12 +73,16 @@ public class CorsFilter implements Filter {
 
     final AppSettings settings = AppSettings.get();
 
-    corsAllowOrigin = settings.get("cors.allow.origin");
-    corsAllowCredentials = settings.get("cors.allow.credentials", DEFAULT_CORS_ALLOW_CREDENTIALS);
-    corsAllowMethods = settings.get("cors.allow.methods", DEFAULT_CORS_ALLOW_METHODS);
-    corsAllowHeaders = settings.get("cors.allow.headers", DEFAULT_CORS_ALLOW_HEADERS);
-    corsExposeHeaders = settings.get("cors.expose.headers", DEFAULT_EXPOSE_HEADERS);
-    corsMaxAge = settings.get("cors.max.age", DEFAULT_CORS_MAX_AGE);
+    corsAllowOrigin = settings.get(AvailableAppSettings.CORS_ALLOW_ORIGIN);
+    corsAllowCredentials =
+        settings.get(AvailableAppSettings.CORS_ALLOW_CREDENTIALS, DEFAULT_CORS_ALLOW_CREDENTIALS);
+    corsAllowMethods =
+        settings.get(AvailableAppSettings.CORS_ALLOW_METHODS, DEFAULT_CORS_ALLOW_METHODS);
+    corsAllowHeaders =
+        settings.get(AvailableAppSettings.CORS_ALLOW_HEADERS, DEFAULT_CORS_ALLOW_HEADERS);
+    corsExposeHeaders =
+        settings.get(AvailableAppSettings.CORS_EXPOSE_HEADERS, DEFAULT_EXPOSE_HEADERS);
+    corsMaxAge = settings.get(AvailableAppSettings.CORS_MAX_AGE, DEFAULT_CORS_MAX_AGE);
 
     if (isBlank(corsAllowOrigin)) {
       return;

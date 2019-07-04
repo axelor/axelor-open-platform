@@ -18,6 +18,7 @@
 package com.axelor.app.internal;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.logging.LoggerConfiguration;
 import java.util.Properties;
 import java.util.function.Predicate;
@@ -39,8 +40,10 @@ public final class AppLogger {
             n -> {
               loggingConfig.setProperty(n, settings.get(n));
             });
-    if (loggingConfig.containsKey("logging.path")) {
-      loggingConfig.setProperty("logging.path", settings.getPath("logging.path", null));
+    if (loggingConfig.containsKey(AvailableAppSettings.LOGGING_PATH)) {
+      loggingConfig.setProperty(
+          AvailableAppSettings.LOGGING_PATH,
+          settings.getPath(AvailableAppSettings.LOGGING_PATH, null));
     }
     return new LoggerConfiguration(loggingConfig);
   }

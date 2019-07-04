@@ -18,6 +18,7 @@
 package com.axelor.report;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.FileUtils;
 import com.axelor.common.ResourceUtils;
 import com.axelor.db.internal.DBHelper;
@@ -38,7 +39,6 @@ import org.eclipse.datatools.connectivity.oda.flatfile.ResourceLocator;
  */
 public class ReportResourceLocator implements IResourceLocator {
 
-  public static final String CONFIG_REPORT_DIR = "axelor.report.dir";
   public static final String DEFAULT_REPORT_DIR = "{user.home}/axelor/reports";
 
   private static final Pattern URL_PATTERN = Pattern.compile("^(file|jar|http|https|ftp):/.*");
@@ -46,7 +46,8 @@ public class ReportResourceLocator implements IResourceLocator {
   private Path searchPath;
 
   public ReportResourceLocator() {
-    final String dir = AppSettings.get().getPath(CONFIG_REPORT_DIR, DEFAULT_REPORT_DIR);
+    final String dir =
+        AppSettings.get().getPath(AvailableAppSettings.AXELOR_REPORT_DIR, DEFAULT_REPORT_DIR);
     this.searchPath = Paths.get(dir);
   }
 

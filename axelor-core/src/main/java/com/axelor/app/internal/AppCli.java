@@ -19,6 +19,7 @@ package com.axelor.app.internal;
 
 import com.axelor.app.AppModule;
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
 import com.axelor.db.converters.EncryptedFieldService;
@@ -162,7 +163,7 @@ public class AppCli {
 
     ModuleManager manager = injector.getInstance(ModuleManager.class);
 
-    boolean demo = AppSettings.get().getBoolean("data.import.demo-data", true);
+    boolean demo = AppSettings.get().getBoolean(AvailableAppSettings.DATA_IMPORT_DEMO_DATA, true);
 
     if (opts.init == Boolean.TRUE) {
       manager.initialize(opts.update == Boolean.TRUE, demo);

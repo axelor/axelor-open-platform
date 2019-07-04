@@ -22,22 +22,6 @@ import com.axelor.mail.db.MailMessage;
 /** Defines constants for mail server configuration settings. */
 public interface MailConstants {
 
-  public static final String CONFIG_SMTP_HOST = "mail.smtp.host";
-  public static final String CONFIG_SMTP_PORT = "mail.smtp.port";
-  public static final String CONFIG_SMTP_USER = "mail.smtp.user";
-  public static final String CONFIG_SMTP_PASS = "mail.smtp.pass";
-  public static final String CONFIG_SMTP_CHANNEL = "mail.smtp.channel";
-  public static final String CONFIG_SMTP_TIMEOUT = "mail.smtp.timeout";
-  public static final String CONFIG_SMTP_CONNECTION_TIMEOUT = "mail.smtp.connectionTimeout";
-
-  public static final String CONFIG_IMAP_HOST = "mail.imap.host";
-  public static final String CONFIG_IMAP_PORT = "mail.imap.port";
-  public static final String CONFIG_IMAP_USER = "mail.imap.user";
-  public static final String CONFIG_IMAP_PASS = "mail.imap.pass";
-  public static final String CONFIG_IMAP_CHANNEL = "mail.imap.channel";
-  public static final String CONFIG_IMAP_TIMEOUT = "mail.imap.timeout";
-  public static final String CONFIG_IMAP_CONNECTION_TIMEOUT = "mail.imap.connectionTimeout";
-
   public static final String PROTOCOL_IMAP = "imap";
   public static final String PROTOCOL_IMAPS = "imaps";
   public static final String PROTOCOL_POP3 = "pop3";

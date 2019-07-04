@@ -18,6 +18,7 @@
 package com.axelor.web;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.db.search.SearchService;
 import com.axelor.db.tenants.TenantModule;
 import com.axelor.event.Event;
@@ -54,7 +55,8 @@ public class AppInitializer extends HttpServlet {
     LOGGER.info("Initializing...");
 
     try {
-      moduleManager.initialize(false, AppSettings.get().getBoolean("data.import.demo-data", true));
+      moduleManager.initialize(
+          false, AppSettings.get().getBoolean(AvailableAppSettings.DATA_IMPORT_DEMO_DATA, true));
     } catch (Exception e) {
       LOGGER.error(e.getMessage(), e);
     }

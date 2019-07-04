@@ -18,6 +18,7 @@
 package com.axelor.auth;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.db.User;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -57,7 +58,7 @@ public class AuthService {
   private final ParsableHashFormat hashFormat = new Shiro1CryptFormat();
 
   private static final String PASSWORD_PATTERN =
-      AppSettings.get().get("user.password.pattern", ".{4,}");
+      AppSettings.get().get(AvailableAppSettings.USER_PASSWORD_PATTERN, ".{4,}");
   private static final Pattern passwordPattern = Pattern.compile(PASSWORD_PATTERN);
 
   private static final String EMPTY_STRING = "";

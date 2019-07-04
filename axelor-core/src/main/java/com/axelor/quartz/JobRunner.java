@@ -18,6 +18,7 @@
 package com.axelor.quartz;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.db.JPA;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.CallMethod;
@@ -49,7 +50,6 @@ import org.slf4j.LoggerFactory;
 public class JobRunner {
 
   private static Logger log = LoggerFactory.getLogger(JobRunner.class);
-  private static final String CONFIG_QUARTZ_ENABLE = "quartz.enable";
   private static final String META_SCHEDULE_QUERY =
       "SELECT DISTINCT self FROM MetaSchedule self LEFT JOIN FETCH self.params";
 
@@ -64,7 +64,7 @@ public class JobRunner {
 
   @CallMethod
   public boolean isEnabled() {
-    return AppSettings.get().getBoolean(CONFIG_QUARTZ_ENABLE, false);
+    return AppSettings.get().getBoolean(AvailableAppSettings.QUARTZ_ENABLE, false);
   }
 
   /** Configure all schedulers. */

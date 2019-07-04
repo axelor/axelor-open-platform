@@ -20,6 +20,7 @@ package com.axelor.meta;
 import static com.axelor.common.StringUtils.isBlank;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
@@ -63,11 +64,12 @@ public class MetaFiles {
   private static final String DEFAULT_UPLOAD_PATH = "{java.io.tmpdir}/axelor/attachments";
 
   private static final Path UPLOAD_PATH =
-      Paths.get(AppSettings.get().get("file.upload.dir", DEFAULT_UPLOAD_PATH));
+      Paths.get(AppSettings.get().get(AvailableAppSettings.FILE_UPLOAD_DIR, DEFAULT_UPLOAD_PATH));
 
-  private static final String UPLOAD_NAME_PATTERN =
-      AppSettings.get().get("file.upload.filename.pattern", "auto");
   private static final String UPLOAD_NAME_PATTERN_AUTO = "auto";
+  private static final String UPLOAD_NAME_PATTERN =
+      AppSettings.get()
+          .get(AvailableAppSettings.FILE_UPLOAD_FILENAME_PATTERN, UPLOAD_NAME_PATTERN_AUTO);
 
   private static final CopyOption[] COPY_OPTIONS = {
     StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES
@@ -81,11 +83,15 @@ public class MetaFiles {
   private static final Object lock = new Object();
 
   private static final List<Pattern> WHITELIST_PATTERNS =
-      AppSettings.get().getList("file.upload.whitelist.pattern", Pattern::compile);
+      AppSettings.get()
+          .getList(AvailableAppSettings.FILE_UPLOAD_WHITELIST_PATTERN, Pattern::compile);
   private static final List<Pattern> BLACKLIST_PATTERNS =
-      AppSettings.get().getList("file.upload.blacklist.pattern", Pattern::compile);
-  private static final List<MimeType> WHITELIST_TYPES = getMimeTypes("file.upload.whitelist.types");
-  private static final List<MimeType> BLACKLIST_TYPES = getMimeTypes("file.upload.blacklist.types");
+      AppSettings.get()
+          .getList(AvailableAppSettings.FILE_UPLOAD_BLACKLIST_PATTERN, Pattern::compile);
+  private static final List<MimeType> WHITELIST_TYPES =
+      getMimeTypes(AvailableAppSettings.FILE_UPLOAD_WHITELIST_TYPES);
+  private static final List<MimeType> BLACKLIST_TYPES =
+      getMimeTypes(AvailableAppSettings.FILE_UPLOAD_BLACKLIST_TYPES);
 
   private static final Tika TIKA = new Tika();
 

@@ -18,6 +18,7 @@
 package com.axelor.auth.ldap;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthFilter;
 import com.axelor.auth.AuthWebModule;
 import com.google.inject.Key;
@@ -31,7 +32,7 @@ public class AuthLdapModule extends AuthWebModule {
 
   public static boolean isEnabled() {
     AppSettings settings = AppSettings.get();
-    String ldapServerUrl = settings.get(AuthLdapService.LDAP_SERVER_URL, null);
+    String ldapServerUrl = settings.get(AvailableAppSettings.LDAP_SERVER_URL, null);
     return ldapServerUrl != null;
   }
 

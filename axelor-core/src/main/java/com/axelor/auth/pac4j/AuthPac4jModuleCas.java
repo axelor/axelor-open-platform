@@ -18,6 +18,7 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import java.lang.invoke.MethodHandles;
 import javax.servlet.ServletContext;
 import org.jasig.cas.client.validation.TicketValidator;
@@ -38,45 +39,6 @@ import org.slf4j.LoggerFactory;
 
 public class AuthPac4jModuleCas extends AuthPac4jModule {
 
-  // Application configuration
-  public static final String CONFIG_CAS_LOGIN_URL = "auth.cas.login.url";
-  public static final String CONFIG_CAS_PREFIX_URL = "auth.cas.prefix.url";
-  public static final String CONFIG_CAS_PROTOCOL = "auth.cas.protocol";
-
-  // Various parameters
-  public static final String CONFIG_CAS_ENCODING = "auth.cas.encoding";
-  public static final String CONFIG_CAS_RENEW = "auth.cas.renew";
-  public static final String CONFIG_CAS_GATEWAY = "auth.cas.gateway";
-  public static final String CONFIG_CAS_TIME_TOLERANCE = "auth.cas.time.tolerance";
-  public static final String CONFIG_CAS_URL_RESOLVER_CLASS = "auth.cas.url.resolver.class";
-  public static final String CONFIG_CAS_DEFAULT_TICKET_VALIDATOR_CLASS =
-      "auth.cas.default.ticket.validator.class";
-
-  public static final String CONFIG_CAS_PROXY_SUPPORT = "auth.cas.proxy.support";
-  public static final String CONFIG_CAS_LOGOUT_HANDLER_CLASS = "auth.cas.logout.handler.class";
-
-  // client type: indirect / direct / direct-proxy / rest-form / rest-basic-auth
-  public static final String CONFIG_CAS_CLIENT_TYPE = "auth.cas.client.type";
-
-  // DirectCasProxyClient configuration
-  public static final String CONFIG_CAS_SERVICE_URL = "auth.cas.service.url";
-
-  // CasRestFormClient configuration
-  public static final String CONFIG_CAS_USERNAME_PARAMETER = "auth.cas.username.parameter";
-  public static final String CONFIG_CAS_PASSWORD_PARAMETER = "auth.cas.password.parameter";
-
-  // CasRestBasicAuthClient configuration
-  public static final String CONFIG_CAS_HEADER_NAME = "auth.cas.header.name";
-  public static final String CONFIG_CAS_PREFIX_HEADER = "auth.cas.prefix.header";
-
-  // Backward-compatible CAS configuration
-  public static final String CONFIG_CAS_SERVER_PREFIX_URL = "auth.cas.server.url.prefix";
-  public static final String CONFIG_CAS_SERVICE = "auth.cas.service";
-  public static final String CONFIG_CAS_LOGOUT_URL = "auth.cas.logout.url";
-
-  public static final String CONFIG_CAS_ATTRS_USER_NAME = "auth.cas.attrs.user.name";
-  public static final String CONFIG_CAS_ATTRS_USER_EMAIL = "auth.cas.attrs.user.email";
-
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -87,22 +49,27 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
   @Override
   protected void configureClients() {
     final AppSettings settings = AppSettings.get();
-    final String loginUrl = settings.get(CONFIG_CAS_LOGIN_URL);
+    final String loginUrl = settings.get(AvailableAppSettings.AUTH_CAS_LOGIN_URL);
     final String prefixUrl =
-        settings.get(CONFIG_CAS_PREFIX_URL, settings.get(CONFIG_CAS_SERVER_PREFIX_URL, null));
-    final String protocol = settings.get(CONFIG_CAS_PROTOCOL, null);
+        settings.get(
+            AvailableAppSettings.AUTH_CAS_PREFIX_URL,
+            settings.get(AvailableAppSettings.AUTH_CAS_SERVER_PREFIX_URL, null));
+    final String protocol = settings.get(AvailableAppSettings.AUTH_CAS_PROTOCOL, null);
 
-    final String encoding = settings.get(CONFIG_CAS_ENCODING, null);
-    final boolean renew = settings.getBoolean(CONFIG_CAS_RENEW, false);
-    final boolean gateway = settings.getBoolean(CONFIG_CAS_GATEWAY, false);
-    final long timeTolerance = settings.getInt(CONFIG_CAS_TIME_TOLERANCE, 1000);
-    final String urlResolverClass = settings.get(CONFIG_CAS_URL_RESOLVER_CLASS, null);
+    final String encoding = settings.get(AvailableAppSettings.AUTH_CAS_ENCODING, null);
+    final boolean renew = settings.getBoolean(AvailableAppSettings.AUTH_CAS_RENEW, false);
+    final boolean gateway = settings.getBoolean(AvailableAppSettings.AUTH_CAS_GATEWAY, false);
+    final long timeTolerance = settings.getInt(AvailableAppSettings.AUTH_CAS_TIME_TOLERANCE, 1000);
+    final String urlResolverClass =
+        settings.get(AvailableAppSettings.AUTH_CAS_URL_RESOLVER_CLASS, null);
     final String defaultTicketValidatorClass =
-        settings.get(CONFIG_CAS_DEFAULT_TICKET_VALIDATOR_CLASS, null);
+        settings.get(AvailableAppSettings.AUTH_CAS_DEFAULT_TICKET_VALIDATOR_CLASS, null);
 
-    final boolean proxySupport = settings.getBoolean(CONFIG_CAS_PROXY_SUPPORT, false);
-    final String logoutHandlerClass = settings.get(CONFIG_CAS_LOGOUT_HANDLER_CLASS, null);
-    final String clientType = settings.get(CONFIG_CAS_CLIENT_TYPE, "indirect");
+    final boolean proxySupport =
+        settings.getBoolean(AvailableAppSettings.AUTH_CAS_PROXY_SUPPORT, false);
+    final String logoutHandlerClass =
+        settings.get(AvailableAppSettings.AUTH_CAS_LOGOUT_HANDLER_CLASS, null);
+    final String clientType = settings.get(AvailableAppSettings.AUTH_CAS_CLIENT_TYPE, "indirect");
 
     final CasConfiguration casConfig = new CasConfiguration(loginUrl);
 
@@ -163,17 +130,21 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
         client = new DirectCasClient(casConfig);
         break;
       case "direct-proxy":
-        final String serviceUrl = settings.get(CONFIG_CAS_SERVICE_URL, null);
+        final String serviceUrl = settings.get(AvailableAppSettings.AUTH_CAS_SERVICE_URL, null);
         client = new DirectCasProxyClient(casConfig, serviceUrl);
         break;
       case "rest-form":
-        final String usernameParameter = settings.get(CONFIG_CAS_USERNAME_PARAMETER, "username");
-        final String passwordParameter = settings.get(CONFIG_CAS_PASSWORD_PARAMETER, "password");
+        final String usernameParameter =
+            settings.get(AvailableAppSettings.AUTH_CAS_USERNAME_PARAMETER, "username");
+        final String passwordParameter =
+            settings.get(AvailableAppSettings.AUTH_CAS_PASSWORD_PARAMETER, "password");
         client = new CasRestFormClient(casConfig, usernameParameter, passwordParameter);
         break;
       case "rest-basic-auth":
-        final String headerName = settings.get(CONFIG_CAS_HEADER_NAME, "Authorization");
-        final String prefixHeader = settings.get(CONFIG_CAS_PREFIX_HEADER, "Basic");
+        final String headerName =
+            settings.get(AvailableAppSettings.AUTH_CAS_HEADER_NAME, "Authorization");
+        final String prefixHeader =
+            settings.get(AvailableAppSettings.AUTH_CAS_PREFIX_HEADER, "Basic");
         client = new CasRestBasicAuthClient(casConfig, headerName, prefixHeader.trim() + " ");
         break;
       case "indirect":
@@ -186,6 +157,6 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
 
   public static boolean isEnabled() {
     final AppSettings settings = AppSettings.get();
-    return settings.get(CONFIG_CAS_LOGIN_URL, null) != null;
+    return settings.get(AvailableAppSettings.AUTH_CAS_LOGIN_URL, null) != null;
   }
 }

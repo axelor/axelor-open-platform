@@ -18,6 +18,7 @@
 package com.axelor.web;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppLogger;
 import com.axelor.meta.loader.ViewWatcher;
 import com.google.inject.Binding;
@@ -54,7 +55,8 @@ public class AppContextListener extends GuiceServletContextListener {
     final SessionCookieConfig cookieConfig = context.getSessionCookieConfig();
 
     cookieConfig.setHttpOnly(true);
-    cookieConfig.setSecure(AppSettings.get().getBoolean("session.cookie.secure", false));
+    cookieConfig.setSecure(
+        AppSettings.get().getBoolean(AvailableAppSettings.SESSION_COOKIE_SECURE, false));
 
     deployment = config.createDeployment();
 

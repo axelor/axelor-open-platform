@@ -18,6 +18,7 @@
 package com.axelor.meta.web;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -203,7 +204,7 @@ public class MetaController {
 
   private static final String DEFAULT_EXPORT_DIR = "{java.io.tmpdir}/axelor/data-export";
   private static final String EXPORT_DIR =
-      AppSettings.get().getPath("data.export.dir", DEFAULT_EXPORT_DIR);
+      AppSettings.get().getPath(AvailableAppSettings.DATA_EXPORT_DIR, DEFAULT_EXPORT_DIR);
 
   private void exportI18n(String module, URL file) throws IOException {
 
