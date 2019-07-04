@@ -39,14 +39,14 @@ import org.apache.shiro.cas.CasRealm;
 
 public class AuthCasRealm extends CasRealm {
 
-  public static final String CONFIG_CAS_SERVER_PREFIX_URL = "cas.server.url.prefix";
-  public static final String CONFIG_CAS_SERVICE = "cas.service";
-  public static final String CONFIG_CAS_LOGIN_URL = "cas.login.url";
-  public static final String CONFIG_CAS_LOGOUT_URL = "cas.logout.url";
-  public static final String CONFIG_CAS_PROTOCOL = "cas.protocol";
+  public static final String CONFIG_CAS_SERVER_PREFIX_URL = "auth.cas.server.url.prefix";
+  public static final String CONFIG_CAS_SERVICE = "auth.cas.service";
+  public static final String CONFIG_CAS_LOGIN_URL = "auth.cas.login.url";
+  public static final String CONFIG_CAS_LOGOUT_URL = "auth.cas.logout.url";
+  public static final String CONFIG_CAS_PROTOCOL = "auth.cas.protocol";
 
-  public static final String CONFIG_CAS_ATTRS_USER_NAME = "cas.attrs.user.name";
-  public static final String CONFIG_CAS_ATTRS_USER_EMAIL = "cas.attrs.user.email";
+  public static final String CONFIG_CAS_ATTRS_USER_NAME = "auth.cas.attrs.user.name";
+  public static final String CONFIG_CAS_ATTRS_USER_EMAIL = "auth.cas.attrs.user.email";
 
   @Inject
   @Override

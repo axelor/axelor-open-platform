@@ -35,25 +35,25 @@ import org.pac4j.oidc.credentials.authenticator.UserInfoOidcAuthenticator;
 
 public class AuthPac4jModuleOidc extends AuthPac4jModule {
 
-  // Base client configuration
-  protected static final String CONFIG_OIDC_CLIENT_ID = "oidc.client.id";
-  protected static final String CONFIG_OIDC_SECRET = "oidc.secret";
-  protected static final String CONFIG_OIDC_PROVIDER = "oidc.provider";
+  // Basic configuration
+  protected static final String CONFIG_OIDC_CLIENT_ID = "auth.oidc.client.id";
+  protected static final String CONFIG_OIDC_SECRET = "auth.oidc.secret";
+  protected static final String CONFIG_OIDC_PROVIDER = "auth.oidc.provider";
 
   // Additional configuration
-  protected static final String CONFIG_OIDC_DISCOVERY_URI = "oidc.discovery.uri";
-  protected static final String CONFIG_OIDC_USE_NONCE = "oidc.use.nonce";
-  protected static final String CONFIG_OIDC_RESPONSE_TYPE = "oidc.response.type";
-  protected static final String CONFIG_OIDC_RESPONSE_MODE = "oidc.response.mode";
-  protected static final String CONFIG_OIDC_SCOPE = "oidc.scope";
+  protected static final String CONFIG_OIDC_DISCOVERY_URI = "auth.oidc.discovery.uri";
+  protected static final String CONFIG_OIDC_USE_NONCE = "auth.oidc.use.nonce";
+  protected static final String CONFIG_OIDC_RESPONSE_TYPE = "auth.oidc.response.type";
+  protected static final String CONFIG_OIDC_RESPONSE_MODE = "auth.oidc.response.mode";
+  protected static final String CONFIG_OIDC_SCOPE = "auth.oidc.scope";
 
   // Keycloak client configuration
-  protected static final String CONFIG_OIDC_REALM = "oidc.realm";
-  protected static final String CONFIG_OIDC_BASE_URI = "oidc.base.uri";
+  protected static final String CONFIG_OIDC_REALM = "auth.oidc.realm";
+  protected static final String CONFIG_OIDC_BASE_URI = "auth.oidc.base.uri";
 
   // Direct client configuration
-  protected static final String CONFIG_OIDC_HEADER_NAME = "oidc.header.name";
-  protected static final String CONFIG_OIDC_PREFIX_HEADER = "oidc.prefix.header";
+  protected static final String CONFIG_OIDC_HEADER_NAME = "auth.oidc.header.name";
+  protected static final String CONFIG_OIDC_PREFIX_HEADER = "auth.oidc.prefix.header";
 
   private static final Map<String, Supplier<OidcClientSupplier>> providers =
       ImmutableMap.of(

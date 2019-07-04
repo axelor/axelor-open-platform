@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AuthPac4jModule extends AuthWebModule {
 
   protected static final String ROLE_AUTH = "ROLE_AUTH";
-  protected static final String CONFIG_PAC4J_CALLBACK_URL = "pac4j.callback.url";
+  protected static final String CONFIG_AUTH_CALLBACK_URL = "auth.callback.url";
 
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -72,7 +72,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     listenerMultibinder.addBinding().to(AuthPac4jListener.class);
 
     final AppSettings settings = AppSettings.get();
-    final String callbackUrl = settings.get(CONFIG_PAC4J_CALLBACK_URL, null);
+    final String callbackUrl = settings.get(CONFIG_AUTH_CALLBACK_URL, null);
     final Clients clients = new Clients(callbackUrl, clientList);
     final Authorizer<CommonProfile> authorizer = new RequireAnyRoleAuthorizer<>(ROLE_AUTH);
     final Config config = new Config(clients, ImmutableMap.of("auth", authorizer));

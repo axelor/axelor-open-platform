@@ -28,44 +28,48 @@ import org.pac4j.saml.config.SAML2Configuration;
 
 public class AuthPac4jModuleSaml2 extends AuthPac4jModule {
 
-  // Required configuration
-  protected static final String CONFIG_SAML2_KEYSTORE_PATH = "saml2.keystore.path";
-  protected static final String CONFIG_SAML2_KEYSTORE_PASSWORD = "saml2.keystore.password";
-  protected static final String CONFIG_SAML2_PRIVATE_KEY_PASSWORD = "saml2.private.key.password";
+  // Basic configuration
+  protected static final String CONFIG_SAML2_KEYSTORE_PATH = "auth.saml2.keystore.path";
+  protected static final String CONFIG_SAML2_KEYSTORE_PASSWORD = "auth.saml2.keystore.password";
+  protected static final String CONFIG_SAML2_PRIVATE_KEY_PASSWORD =
+      "auth.saml2.private.key.password";
   protected static final String CONFIG_SAML2_IDENTITY_PROVIDER_METADATA_PATH =
-      "saml2.identity.provider.metadata.path";
+      "auth.saml2.identity.provider.metadata.path";
 
   // Additional configuration
   protected static final String CONFIG_SAML2_MAXIMUM_AUTHENTICATION_LIFETIME =
-      "saml2.maximum.authentication.lifetime";
+      "auth.saml2.maximum.authentication.lifetime";
   protected static final String CONFIG_SAML2_SERVICE_PROVIDER_ENTITY_ID =
-      "saml2.service.provider.entity.id";
+      "auth.saml2.service.provider.entity.id";
   protected static final String CONFIG_SAML2_SERVICE_PROVIDER_METADATA_PATH =
-      "saml2.service.provider.metadata.path";
+      "auth.saml2.service.provider.metadata.path";
 
-  protected static final String CONFIG_SAML2_FORCE_AUTH = "saml2.force.auth";
-  protected static final String CONFIG_SAML2_PASSIVE = "saml2.passive";
+  // Advanced configuration
+  protected static final String CONFIG_SAML2_FORCE_AUTH = "auth.saml2.force.auth";
+  protected static final String CONFIG_SAML2_PASSIVE = "auth.saml2.passive";
 
   protected static final String CONFIG_SAML2_AUTHN_REQUEST_BINDING_TYPE =
-      "saml2.authn.request.binding.type";
-  protected static final String CONFIG_SAML2_USE_NAME_QUALIFIER = "saml2.use.name.qualifier";
+      "auth.saml2.authn.request.binding.type";
+  protected static final String CONFIG_SAML2_USE_NAME_QUALIFIER = "auth.saml2.use.name.qualifier";
 
   protected static final String CONFIG_SAML2_ATTRIBUTE_CONSUMING_SERVICE_INDEX =
-      "saml2.attribute.consuming.service.index";
+      "auth.saml2.attribute.consuming.service.index";
   protected static final String CONFIG_SAML2_ASSERTION_CONSUMER_SERVICE_INDEX =
-      "saml2.assertion.consumer.service.index";
+      "auth.saml2.assertion.consumer.service.index";
 
   protected static final String CONFIG_SAML2_BLACKLISTED_SIGNATURE_SIGNING_ALGORITHMS =
-      "saml2.blacklisted.signature.signing.algorithms";
-  protected static final String CONFIG_SAML2_SIGNATURE_ALGORITHMS = "saml2.signature.algorithms";
+      "auth.saml2.blacklisted.signature.signing.algorithms";
+  protected static final String CONFIG_SAML2_SIGNATURE_ALGORITHMS =
+      "auth.saml2.signature.algorithms";
   protected static final String CONFIG_SAML2_SIGNATURE_REFERENCE_DIGEST_METHODS =
-      "saml2.signature.reference.digest.methods";
+      "auth.saml2.signature.reference.digest.methods";
   protected static final String CONFIG_SAML2_SIGNATURE_CANONICALIZATION_ALGORITHM =
-      "saml2.signature.canonicalization.algorithm";
+      "auth.saml2.signature.canonicalization.algorithm";
 
   protected static final String CONFIG_SAML2_WANTS_ASSERTIONS_SIGNED =
-      "saml2.wants.assertions.signed";
-  protected static final String CONFIG_SAML2_AUTHN_REQUEST_SIGNED = "saml2.authn.request.signed";
+      "auth.saml2.wants.assertions.signed";
+  protected static final String CONFIG_SAML2_AUTHN_REQUEST_SIGNED =
+      "auth.saml2.authn.request.signed";
 
   private static final Map<String, String> authnRequestBindingTypes =
       ImmutableMap.of(
