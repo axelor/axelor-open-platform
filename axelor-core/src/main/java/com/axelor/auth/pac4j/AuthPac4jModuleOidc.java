@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 import javax.servlet.ServletContext;
 import org.pac4j.core.client.Client;
+import org.pac4j.core.credentials.Credentials;
+import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.http.client.direct.HeaderClient;
 import org.pac4j.oidc.client.AzureAdClient;
 import org.pac4j.oidc.client.GoogleOidcClient;
@@ -36,24 +38,24 @@ import org.pac4j.oidc.credentials.authenticator.UserInfoOidcAuthenticator;
 public class AuthPac4jModuleOidc extends AuthPac4jModule {
 
   // Basic configuration
-  protected static final String CONFIG_OIDC_CLIENT_ID = "auth.oidc.client.id";
-  protected static final String CONFIG_OIDC_SECRET = "auth.oidc.secret";
-  protected static final String CONFIG_OIDC_PROVIDER = "auth.oidc.provider";
+  public static final String CONFIG_OIDC_CLIENT_ID = "auth.oidc.client.id";
+  public static final String CONFIG_OIDC_SECRET = "auth.oidc.secret";
+  public static final String CONFIG_OIDC_PROVIDER = "auth.oidc.provider";
 
   // Additional configuration
-  protected static final String CONFIG_OIDC_DISCOVERY_URI = "auth.oidc.discovery.uri";
-  protected static final String CONFIG_OIDC_USE_NONCE = "auth.oidc.use.nonce";
-  protected static final String CONFIG_OIDC_RESPONSE_TYPE = "auth.oidc.response.type";
-  protected static final String CONFIG_OIDC_RESPONSE_MODE = "auth.oidc.response.mode";
-  protected static final String CONFIG_OIDC_SCOPE = "auth.oidc.scope";
+  public static final String CONFIG_OIDC_DISCOVERY_URI = "auth.oidc.discovery.uri";
+  public static final String CONFIG_OIDC_USE_NONCE = "auth.oidc.use.nonce";
+  public static final String CONFIG_OIDC_RESPONSE_TYPE = "auth.oidc.response.type";
+  public static final String CONFIG_OIDC_RESPONSE_MODE = "auth.oidc.response.mode";
+  public static final String CONFIG_OIDC_SCOPE = "auth.oidc.scope";
 
   // Keycloak client configuration
-  protected static final String CONFIG_OIDC_REALM = "auth.oidc.realm";
-  protected static final String CONFIG_OIDC_BASE_URI = "auth.oidc.base.uri";
+  public static final String CONFIG_OIDC_REALM = "auth.oidc.realm";
+  public static final String CONFIG_OIDC_BASE_URI = "auth.oidc.base.uri";
 
   // Direct client configuration
-  protected static final String CONFIG_OIDC_HEADER_NAME = "auth.oidc.header.name";
-  protected static final String CONFIG_OIDC_PREFIX_HEADER = "auth.oidc.prefix.header";
+  public static final String CONFIG_OIDC_HEADER_NAME = "auth.oidc.header.name";
+  public static final String CONFIG_OIDC_PREFIX_HEADER = "auth.oidc.prefix.header";
 
   private static final Map<String, Supplier<OidcClientSupplier>> providers =
       ImmutableMap.of(
@@ -66,7 +68,7 @@ public class AuthPac4jModuleOidc extends AuthPac4jModule {
           "keycloak",
           KeycloakOidcClientSupplier::new,
           "direct",
-          DirectClientSupplier::new);
+          HeaderClientSupplier::new);
 
   public AuthPac4jModuleOidc(ServletContext servletContext) {
     super(servletContext);
@@ -86,21 +88,26 @@ public class AuthPac4jModuleOidc extends AuthPac4jModule {
     return settings.get(CONFIG_OIDC_CLIENT_ID, null) != null;
   }
 
-  @SuppressWarnings("rawtypes")
-  private static class OidcClientSupplier implements Supplier<Client> {
+  private static class OidcClientSupplier
+      implements Supplier<Client<? extends Credentials, ? extends CommonProfile>> {
+
+    protected final OidcConfiguration config;
+
+    public OidcClientSupplier() {
+      config = getConfiguration();
+      configure();
+    }
 
     @Override
-    public Client get() {
-      final OidcConfiguration config = getConfiguration();
-      configure(config);
-      return getClient(config);
+    public Client<? extends Credentials, ? extends CommonProfile> get() {
+      return new OidcClient<>(config);
     }
 
     protected OidcConfiguration getConfiguration() {
       return new OidcConfiguration();
     }
 
-    protected void configure(OidcConfiguration config) {
+    protected void configure() {
       final AppSettings settings = AppSettings.get();
       final String clientId = settings.get(CONFIG_OIDC_CLIENT_ID);
       final String secret = settings.get(CONFIG_OIDC_SECRET);
@@ -131,18 +138,12 @@ public class AuthPac4jModuleOidc extends AuthPac4jModule {
         config.setScope(scope);
       }
     }
-
-    @SuppressWarnings("unchecked")
-    protected Client getClient(OidcConfiguration config) {
-      return new OidcClient(config);
-    }
   }
 
   private static class GoogleOidcClientSupplier extends OidcClientSupplier {
 
     @Override
-    @SuppressWarnings("rawtypes")
-    protected Client getClient(OidcConfiguration config) {
+    public Client<? extends Credentials, ? extends CommonProfile> get() {
       return new GoogleOidcClient(config);
     }
   }
@@ -150,8 +151,7 @@ public class AuthPac4jModuleOidc extends AuthPac4jModule {
   private static class AzureAdClientSupplier extends OidcClientSupplier {
 
     @Override
-    @SuppressWarnings("rawtypes")
-    protected Client getClient(OidcConfiguration config) {
+    public Client<? extends Credentials, ? extends CommonProfile> get() {
       return new AzureAdClient(new AzureAdOidcConfiguration(config));
     }
   }
@@ -159,13 +159,18 @@ public class AuthPac4jModuleOidc extends AuthPac4jModule {
   private static class KeycloakOidcClientSupplier extends OidcClientSupplier {
 
     @Override
+    public Client<? extends Credentials, ? extends CommonProfile> get() {
+      return new KeycloakOidcClient((KeycloakOidcConfiguration) config);
+    }
+
+    @Override
     protected OidcConfiguration getConfiguration() {
       return new KeycloakOidcConfiguration();
     }
 
     @Override
-    protected void configure(OidcConfiguration config) {
-      super.configure(config);
+    protected void configure() {
+      super.configure();
 
       final KeycloakOidcConfiguration keycloakOidcConfig = (KeycloakOidcConfiguration) config;
       final AppSettings settings = AppSettings.get();
@@ -175,19 +180,12 @@ public class AuthPac4jModuleOidc extends AuthPac4jModule {
       keycloakOidcConfig.setRealm(realm);
       keycloakOidcConfig.setBaseUri(baseUri);
     }
-
-    @Override
-    @SuppressWarnings("rawtypes")
-    public Client getClient(OidcConfiguration config) {
-      return new KeycloakOidcClient((KeycloakOidcConfiguration) config);
-    }
   }
 
-  private static class DirectClientSupplier extends OidcClientSupplier {
+  private static class HeaderClientSupplier extends OidcClientSupplier {
 
     @Override
-    @SuppressWarnings("rawtypes")
-    protected Client getClient(OidcConfiguration config) {
+    public Client<? extends Credentials, ? extends CommonProfile> get() {
       final AppSettings settings = AppSettings.get();
       final String headerName = settings.get(CONFIG_OIDC_HEADER_NAME, "Authorization");
       final String prefixHeader = settings.get(CONFIG_OIDC_PREFIX_HEADER, "Bearer ");

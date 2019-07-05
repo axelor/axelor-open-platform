@@ -36,6 +36,8 @@
     <finder-method name="findByGroup" using="Long:groupId" filter="self.group[].id = :groupId" cacheable="true" all="false"/>
     <finder-method name="findByGroup" using="String:groupCode" filter="self.group[].code = :groupCode" cacheable="true" all="false"/>
     <finder-method name="findByEmail" using="email" cacheable="true" />
+    <finder-method name="findByCodeOrEmail" using="String:codeOrEmail"
+        filter="self.code = :codeOrEmail OR self.email = :codeOrEmail" cacheable="true" />
   </entity>
 
 </domain-models>

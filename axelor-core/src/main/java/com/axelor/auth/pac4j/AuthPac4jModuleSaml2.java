@@ -29,47 +29,44 @@ import org.pac4j.saml.config.SAML2Configuration;
 public class AuthPac4jModuleSaml2 extends AuthPac4jModule {
 
   // Basic configuration
-  protected static final String CONFIG_SAML2_KEYSTORE_PATH = "auth.saml2.keystore.path";
-  protected static final String CONFIG_SAML2_KEYSTORE_PASSWORD = "auth.saml2.keystore.password";
-  protected static final String CONFIG_SAML2_PRIVATE_KEY_PASSWORD =
-      "auth.saml2.private.key.password";
-  protected static final String CONFIG_SAML2_IDENTITY_PROVIDER_METADATA_PATH =
+  public static final String CONFIG_SAML2_KEYSTORE_PATH = "auth.saml2.keystore.path";
+  public static final String CONFIG_SAML2_KEYSTORE_PASSWORD = "auth.saml2.keystore.password";
+  public static final String CONFIG_SAML2_PRIVATE_KEY_PASSWORD = "auth.saml2.private.key.password";
+  public static final String CONFIG_SAML2_IDENTITY_PROVIDER_METADATA_PATH =
       "auth.saml2.identity.provider.metadata.path";
 
   // Additional configuration
-  protected static final String CONFIG_SAML2_MAXIMUM_AUTHENTICATION_LIFETIME =
+  public static final String CONFIG_SAML2_MAXIMUM_AUTHENTICATION_LIFETIME =
       "auth.saml2.maximum.authentication.lifetime";
-  protected static final String CONFIG_SAML2_SERVICE_PROVIDER_ENTITY_ID =
+  public static final String CONFIG_SAML2_SERVICE_PROVIDER_ENTITY_ID =
       "auth.saml2.service.provider.entity.id";
-  protected static final String CONFIG_SAML2_SERVICE_PROVIDER_METADATA_PATH =
+  public static final String CONFIG_SAML2_SERVICE_PROVIDER_METADATA_PATH =
       "auth.saml2.service.provider.metadata.path";
 
   // Advanced configuration
-  protected static final String CONFIG_SAML2_FORCE_AUTH = "auth.saml2.force.auth";
-  protected static final String CONFIG_SAML2_PASSIVE = "auth.saml2.passive";
+  public static final String CONFIG_SAML2_FORCE_AUTH = "auth.saml2.force.auth";
+  public static final String CONFIG_SAML2_PASSIVE = "auth.saml2.passive";
 
-  protected static final String CONFIG_SAML2_AUTHN_REQUEST_BINDING_TYPE =
+  public static final String CONFIG_SAML2_AUTHN_REQUEST_BINDING_TYPE =
       "auth.saml2.authn.request.binding.type";
-  protected static final String CONFIG_SAML2_USE_NAME_QUALIFIER = "auth.saml2.use.name.qualifier";
+  public static final String CONFIG_SAML2_USE_NAME_QUALIFIER = "auth.saml2.use.name.qualifier";
 
-  protected static final String CONFIG_SAML2_ATTRIBUTE_CONSUMING_SERVICE_INDEX =
+  public static final String CONFIG_SAML2_ATTRIBUTE_CONSUMING_SERVICE_INDEX =
       "auth.saml2.attribute.consuming.service.index";
-  protected static final String CONFIG_SAML2_ASSERTION_CONSUMER_SERVICE_INDEX =
+  public static final String CONFIG_SAML2_ASSERTION_CONSUMER_SERVICE_INDEX =
       "auth.saml2.assertion.consumer.service.index";
 
-  protected static final String CONFIG_SAML2_BLACKLISTED_SIGNATURE_SIGNING_ALGORITHMS =
+  public static final String CONFIG_SAML2_BLACKLISTED_SIGNATURE_SIGNING_ALGORITHMS =
       "auth.saml2.blacklisted.signature.signing.algorithms";
-  protected static final String CONFIG_SAML2_SIGNATURE_ALGORITHMS =
-      "auth.saml2.signature.algorithms";
-  protected static final String CONFIG_SAML2_SIGNATURE_REFERENCE_DIGEST_METHODS =
+  public static final String CONFIG_SAML2_SIGNATURE_ALGORITHMS = "auth.saml2.signature.algorithms";
+  public static final String CONFIG_SAML2_SIGNATURE_REFERENCE_DIGEST_METHODS =
       "auth.saml2.signature.reference.digest.methods";
-  protected static final String CONFIG_SAML2_SIGNATURE_CANONICALIZATION_ALGORITHM =
+  public static final String CONFIG_SAML2_SIGNATURE_CANONICALIZATION_ALGORITHM =
       "auth.saml2.signature.canonicalization.algorithm";
 
-  protected static final String CONFIG_SAML2_WANTS_ASSERTIONS_SIGNED =
+  public static final String CONFIG_SAML2_WANTS_ASSERTIONS_SIGNED =
       "auth.saml2.wants.assertions.signed";
-  protected static final String CONFIG_SAML2_AUTHN_REQUEST_SIGNED =
-      "auth.saml2.authn.request.signed";
+  public static final String CONFIG_SAML2_AUTHN_REQUEST_SIGNED = "auth.saml2.authn.request.signed";
 
   private static final Map<String, String> authnRequestBindingTypes =
       ImmutableMap.of(

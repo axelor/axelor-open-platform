@@ -43,14 +43,18 @@ import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.profile.CommonProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AuthPac4jModule extends AuthWebModule {
 
-  protected static final String ROLE_AUTH = "ROLE_AUTH";
-  protected static final String CONFIG_AUTH_CALLBACK_URL = "auth.callback.url";
+  public static final String CONFIG_AUTH_CALLBACK_URL = "auth.callback.url";
+  public static final String CONFIG_AUTH_SAVE_USERS_FROM_CENTRAL = "auth.save.users.from.central";
+  public static final String CONFIG_AUTH_PRINCIPAL_ATTRIBUTE = "auth.principal.attribute";
+
+  protected static final String ROLE_HAS_USER = "_ROLE_HAS_USER";
 
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -73,8 +77,9 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
     final AppSettings settings = AppSettings.get();
     final String callbackUrl = settings.get(CONFIG_AUTH_CALLBACK_URL, null);
+
     final Clients clients = new Clients(callbackUrl, clientList);
-    final Authorizer<CommonProfile> authorizer = new RequireAnyRoleAuthorizer<>(ROLE_AUTH);
+    final Authorizer<CommonProfile> authorizer = new RequireAnyRoleAuthorizer<>(ROLE_HAS_USER);
     final Config config = new Config(clients, ImmutableMap.of("auth", authorizer));
 
     bind(Config.class).toInstance(config);
@@ -86,7 +91,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
   protected abstract void configureClients();
 
-  protected void addClient(@SuppressWarnings("rawtypes") Client client) {
+  protected void addClient(Client<? extends Credentials, ? extends CommonProfile> client) {
     clientList.add(client);
   }
 

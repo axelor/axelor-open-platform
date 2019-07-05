@@ -17,10 +17,13 @@
  */
 package com.axelor.auth;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.cas.AuthCasModule;
 import com.axelor.auth.ldap.AuthLdapModule;
+import com.axelor.auth.pac4j.AuthPac4jModule;
 import com.axelor.auth.pac4j.AuthPac4jModuleOidc;
 import com.axelor.auth.pac4j.AuthPac4jModuleSaml2;
+import com.axelor.auth.pac4j.AuthPac4jObserver;
 import com.axelor.db.JpaSecurity;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -68,11 +71,21 @@ public class AuthModule extends AbstractModule {
       return;
     }
 
+    final AppSettings settings = AppSettings.get();
+    final boolean saveUsersFromCentral =
+        settings.getBoolean(AuthPac4jModule.CONFIG_AUTH_SAVE_USERS_FROM_CENTRAL, false);
+
+    if (saveUsersFromCentral) {
+      bind(AuthPac4jObserver.class);
+    }
+
+    // OpenID Connect
     if (AuthPac4jModuleOidc.isEnabled()) {
       install(new AuthPac4jModuleOidc(context));
       return;
     }
 
+    // SAML2
     if (AuthPac4jModuleSaml2.isEnabled()) {
       install(new AuthPac4jModuleSaml2(context));
       return;

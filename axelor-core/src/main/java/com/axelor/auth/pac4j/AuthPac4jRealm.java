@@ -17,15 +17,15 @@
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.UserAuthenticationInfo;
 import com.axelor.auth.db.User;
-import com.axelor.auth.db.repo.UserRepository;
-import com.axelor.common.StringUtils;
 import com.axelor.event.Event;
 import com.axelor.events.PreLogin;
 import io.buji.pac4j.realm.Pac4jRealm;
 import io.buji.pac4j.token.Pac4jToken;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -33,32 +33,31 @@ import org.pac4j.core.profile.CommonProfile;
 
 public class AuthPac4jRealm extends Pac4jRealm {
 
-  @Inject private UserRepository userRepo;
   @Inject private Event<PreLogin> preLogin;
+  @Inject private AuthPac4jUserService userService;
 
   public AuthPac4jRealm() {
-    setPrincipalNameAttribute("email");
+    final AppSettings settings = AppSettings.get();
+    setPrincipalNameAttribute(
+        settings.get(AuthPac4jModule.CONFIG_AUTH_PRINCIPAL_ATTRIBUTE, "email"));
   }
 
   @Override
   protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) {
     preLogin.fire(new PreLogin(authenticationToken));
+
     final Pac4jToken token = (Pac4jToken) authenticationToken;
     final List<CommonProfile> profiles = token.getProfiles();
 
-    for (final CommonProfile profile : profiles) {
-      User user = null;
+    @SuppressWarnings("unchecked")
+    final Optional<CommonProfile> profileOpt = (Optional<CommonProfile>) token.getPrincipal();
 
-      if (StringUtils.notBlank(profile.getUsername())) {
-        user = userRepo.findByCode(profile.getUsername());
-      }
-
-      if (user == null && StringUtils.notBlank(profile.getEmail())) {
-        user = userRepo.findByEmail(profile.getEmail());
-      }
+    if (profileOpt.isPresent()) {
+      final CommonProfile profile = profileOpt.get();
+      final User user = userService.getUser(profile);
 
       if (user != null) {
-        profile.addRole(AuthPac4jModule.ROLE_AUTH);
+        profile.addRole(AuthPac4jModule.ROLE_HAS_USER);
         profile.clearSensitiveData();
         profile.setRemembered(true);
         return new UserAuthenticationInfo(user.getCode(), profiles.hashCode(), getName(), user);
