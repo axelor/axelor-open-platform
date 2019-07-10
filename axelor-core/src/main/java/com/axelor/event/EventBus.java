@@ -23,6 +23,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
+import com.google.inject.spi.LinkedKeyBinding;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -66,6 +67,7 @@ class EventBus {
         .getAllBindings()
         .entrySet()
         .stream()
+        .filter(entry -> !(entry.getValue() instanceof LinkedKeyBinding))
         .map(Entry::getKey)
         .map(Key::getTypeLiteral)
         .map(TypeLiteral::getRawType)
