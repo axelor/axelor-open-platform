@@ -25,6 +25,7 @@ import com.google.inject.Provides;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
 import io.buji.pac4j.filter.CallbackFilter;
+import io.buji.pac4j.filter.LogoutFilter;
 import io.buji.pac4j.filter.SecurityFilter;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -53,6 +54,11 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   public static final String CONFIG_AUTH_CALLBACK_URL = "auth.callback.url";
   public static final String CONFIG_AUTH_SAVE_USERS_FROM_CENTRAL = "auth.save.users.from.central";
   public static final String CONFIG_AUTH_PRINCIPAL_ATTRIBUTE = "auth.principal.attribute";
+
+  public static final String CONFIG_AUTH_LOGOUT_DEFAULT_URL = "auth.logout.default.url";
+  public static final String CONFIG_AUTH_LOGOUT_URL_PATTERN = "auth.logout.url.pattern";
+  public static final String CONFIG_AUTH_LOGOUT_LOCAL = "auth.logout.local";
+  public static final String CONFIG_AUTH_LOGOUT_CENTRAL = "auth.logout.central";
 
   protected static final String ROLE_HAS_USER = "_ROLE_HAS_USER";
 
@@ -84,7 +90,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
     bind(Config.class).toInstance(config);
     bindRealm().to(AuthPac4jRealm.class);
-    addFilterChain("/logout", LOGOUT);
+    addFilterChain("/logout", Key.get(Pac4jLogoutFilter.class));
     addFilterChain("/callback", Key.get(Pac4jCallbackFilter.class));
     addFilterChain("/**", Key.get(Pac4jSecurityFilter.class));
   }
@@ -109,6 +115,25 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     authenticator.setAuthenticationListeners(authenticationListeners);
     securityManager.setAuthenticator(authenticator);
     return securityManager;
+  }
+
+  private static class Pac4jLogoutFilter extends LogoutFilter {
+
+    @Inject
+    public Pac4jLogoutFilter(Config config) {
+      setConfig(config);
+
+      final AppSettings settings = AppSettings.get();
+      final String defaultUrl = settings.get(CONFIG_AUTH_LOGOUT_DEFAULT_URL, ".");
+      final String logoutUrlPattern = settings.get(CONFIG_AUTH_LOGOUT_URL_PATTERN, null);
+      final boolean localLogout = settings.getBoolean(CONFIG_AUTH_LOGOUT_LOCAL, true);
+      final boolean centralLogout = settings.getBoolean(CONFIG_AUTH_LOGOUT_CENTRAL, false);
+
+      setDefaultUrl(defaultUrl);
+      setLogoutUrlPattern(logoutUrlPattern);
+      setLocalLogout(localLogout);
+      setCentralLogout(centralLogout);
+    }
   }
 
   private static class Pac4jCallbackFilter extends CallbackFilter {
