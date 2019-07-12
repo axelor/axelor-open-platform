@@ -182,6 +182,7 @@ libs.apache_ds = [
   "org.apache.directory.jdbm:apacheds-jdbm1:2.0.0-M3",
   dependencies.create("org.apache.directory.server:apacheds-test-framework:2.0.0-M15") {
     exclude group: "org.apache.directory.jdbm"
+    exclude group: "bouncycastle"
   }
 ]
 
