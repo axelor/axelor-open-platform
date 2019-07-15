@@ -285,6 +285,7 @@
           };
           var panel = null;
           var panelTab = null;
+          item.jsonFields.sort(function (x, y) { return x.sequence - y.sequence; });
           item.jsonFields.forEach(function (field) {
             if (field.widgetAttrs) {
               field.widgetAttrs = angular.fromJson(field.widgetAttrs);
@@ -341,7 +342,6 @@
           if (!item.viewer) {
             item.editor.viewer = true;
           }
-          editor.items.sort(function (x, y) { return x.sequence - y.sequence; });
         }
       });
 
