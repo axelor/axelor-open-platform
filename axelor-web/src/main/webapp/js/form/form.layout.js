@@ -205,12 +205,6 @@ function PanelLayout(items, attrs, $scope, $compile) {
       span = 0;
     }
 
-    if (item.is('.spacer-item')) {
-      curCol += (span + offset);
-      item.remove();
-      return;
-    }
-
     if (curCol + (span + offset) >= numCols + 1 && canAddRow) {
       curCol = 0, row = $('<div>').addClass(rowClass);
       layout.push(row);
