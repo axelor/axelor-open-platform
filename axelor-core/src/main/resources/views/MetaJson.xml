@@ -15,6 +15,7 @@
     <option value="enum">Enum</option>
     <option value="button">Button</option>
     <option value="label">Label</option>
+    <option value="spacer">Spacer</option>
     <option value="separator">Separator</option>
     <option value="many-to-one">ManyToOne</option>
     <option value="many-to-many">ManyToMany</option>
@@ -98,7 +99,7 @@
         <field name="name" />
       </panel-related>
     </panel-tabs>
-    <panel title="Options" sidebar="true" itemSpan="6">
+    <panel title="Options" sidebar="true" itemSpan="12">
       <field name="required" widget="inline-checkbox" />
       <field name="readonly" widget="inline-checkbox" />
       <field name="nameField" widget="inline-checkbox" showIf="type === 'string'" />
@@ -115,7 +116,7 @@
       <field name="type" />
       <field name="title" />
       <field name="defaultValue" />
-      <field name="help" />
+      <field name="help" colSpan="12" />
       <field name="sequence" />
       <field name="columnSequence" />
       <field name="model" widget="ref-text"
