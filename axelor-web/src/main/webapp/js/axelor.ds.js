@@ -162,7 +162,7 @@
       return $compile(template);
     };
 
-    ViewService.prototype.process = function(meta, view) {
+    ViewService.prototype.process = function(meta, view, parent) {
 
       var fields = {};
 
@@ -272,7 +272,7 @@
         });
 
         if (item.items || item.pages) {
-          ViewService.prototype.process(meta, item);
+          ViewService.prototype.process(meta, item, view);
         }
         if (item.password) {
           item.widget = "password";
@@ -302,6 +302,10 @@
             }
             if (field.type === 'panel') {
               panel = _.extend({}, field, { items: [] });
+              if ((field.widgetAttrs || {}).sidebar && parent) {
+                panel.sidebar = true;
+                parent.width = 'large';
+              }
               if ((field.widgetAttrs || {}).tab) {
                 panelTab = panelTab || {
                   type: 'panel-tabs',
