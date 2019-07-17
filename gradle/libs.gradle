@@ -161,13 +161,6 @@ libs.apache_shiro = [
   "org.apache.shiro:shiro-web:${versions.shiro}",
   "org.apache.shiro:shiro-guice:${versions.shiro}"]
 
-// Apache Shiro CAS
-libs.apache_shiro_cas = [
-  "org.apache.shiro:shiro-cas:${versions.shiro}",
-  "commons-codec:commons-codec:1.12",
-  "org.opensaml:opensaml:1.1",
-  "org.apache.santuario:xmlsec:1.4.3"]
-
 libs.pac4j = [
   "io.buji:buji-pac4j:${versions.buji_pac4j}",
   "org.pac4j:pac4j-saml:${versions.pac4j}",

@@ -51,9 +51,6 @@ dependencies {
 
   compile libs.eclipselink_moxy
 
-  // CAS
-  compile libs.apache_shiro_cas
-
   // pac4j
   compile libs.pac4j
 

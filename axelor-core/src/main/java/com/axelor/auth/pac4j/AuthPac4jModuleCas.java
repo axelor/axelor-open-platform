@@ -74,7 +74,8 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
   protected void configureClients() {
     final AppSettings settings = AppSettings.get();
     final String loginUrl = settings.get(CONFIG_CAS_LOGIN_URL);
-    final String prefixUrl = settings.get(CONFIG_CAS_PREFIX_URL, settings.get(CONFIG_CAS_SERVER_PREFIX_URL, null));
+    final String prefixUrl =
+        settings.get(CONFIG_CAS_PREFIX_URL, settings.get(CONFIG_CAS_SERVER_PREFIX_URL, null));
     final String protocol = settings.get(CONFIG_CAS_PROTOCOL, null);
 
     final String encoding = settings.get(CONFIG_CAS_ENCODING, null);
