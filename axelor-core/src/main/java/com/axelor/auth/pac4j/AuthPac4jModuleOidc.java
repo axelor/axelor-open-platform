@@ -57,6 +57,9 @@ public class AuthPac4jModuleOidc extends AuthPac4jModule {
   public static final String CONFIG_OIDC_HEADER_NAME = "auth.oidc.header.name";
   public static final String CONFIG_OIDC_PREFIX_HEADER = "auth.oidc.prefix.header";
 
+  // TODO: add Advanced configuration
+  // http://www.pac4j.org/docs/clients/openid-connect.html#3-advanced-configuration
+
   private static final Map<String, Supplier<OidcClientSupplier>> providers =
       ImmutableMap.of(
           "generic",
@@ -190,7 +193,7 @@ public class AuthPac4jModuleOidc extends AuthPac4jModule {
       final String headerName = settings.get(CONFIG_OIDC_HEADER_NAME, "Authorization");
       final String prefixHeader = settings.get(CONFIG_OIDC_PREFIX_HEADER, "Bearer ");
 
-      UserInfoOidcAuthenticator authenticator = new UserInfoOidcAuthenticator(config);
+      final UserInfoOidcAuthenticator authenticator = new UserInfoOidcAuthenticator(config);
       return new HeaderClient(headerName, prefixHeader, authenticator);
     }
   }

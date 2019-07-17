@@ -82,7 +82,12 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     listenerMultibinder.addBinding().to(AuthPac4jListener.class);
 
     final AppSettings settings = AppSettings.get();
-    final String callbackUrl = settings.get(CONFIG_AUTH_CALLBACK_URL, null);
+    String callbackUrl = settings.get(CONFIG_AUTH_CALLBACK_URL, null);
+
+    // Backward-compatible CAS configuration
+    if (callbackUrl == null && AuthPac4jModuleCas.isEnabled()) {
+      callbackUrl = settings.get(AuthPac4jModuleCas.CONFIG_CAS_SERVICE, null);
+    }
 
     final Clients clients = new Clients(callbackUrl, clientList);
     final Authorizer<CommonProfile> authorizer = new RequireAnyRoleAuthorizer<>(ROLE_HAS_USER);
@@ -124,7 +129,16 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       setConfig(config);
 
       final AppSettings settings = AppSettings.get();
-      final String defaultUrl = settings.get(CONFIG_AUTH_LOGOUT_DEFAULT_URL, ".");
+
+      // Backward-compatible CAS configuration
+      String defaultUrl = settings.get(CONFIG_AUTH_LOGOUT_DEFAULT_URL, null);
+      if (defaultUrl == null) {
+        defaultUrl =
+            AuthPac4jModuleCas.isEnabled()
+                ? settings.get(AuthPac4jModuleCas.CONFIG_CAS_LOGOUT_URL, ".")
+                : ".";
+      }
+
       final String logoutUrlPattern = settings.get(CONFIG_AUTH_LOGOUT_URL_PATTERN, null);
       final boolean localLogout = settings.getBoolean(CONFIG_AUTH_LOGOUT_LOCAL, true);
       final boolean centralLogout = settings.getBoolean(CONFIG_AUTH_LOGOUT_CENTRAL, false);

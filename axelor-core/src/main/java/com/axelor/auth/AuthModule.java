@@ -18,9 +18,9 @@
 package com.axelor.auth;
 
 import com.axelor.app.AppSettings;
-import com.axelor.auth.cas.AuthCasModule;
 import com.axelor.auth.ldap.AuthLdapModule;
 import com.axelor.auth.pac4j.AuthPac4jModule;
+import com.axelor.auth.pac4j.AuthPac4jModuleCas;
 import com.axelor.auth.pac4j.AuthPac4jModuleOidc;
 import com.axelor.auth.pac4j.AuthPac4jModuleSaml2;
 import com.axelor.auth.pac4j.AuthPac4jObserver;
@@ -59,12 +59,6 @@ public class AuthModule extends AbstractModule {
       return;
     }
 
-    // CAS
-    if (AuthCasModule.isEnabled()) {
-      install(new AuthCasModule(context));
-      return;
-    }
-
     // LDAP
     if (AuthLdapModule.isEnabled()) {
       install(new AuthLdapModule(context));
@@ -77,6 +71,12 @@ public class AuthModule extends AbstractModule {
 
     if (saveUsersFromCentral) {
       bind(AuthPac4jObserver.class);
+    }
+
+    // CAS
+    if (AuthPac4jModuleCas.isEnabled()) {
+      install(new AuthPac4jModuleCas(context));
+      return;
     }
 
     // OpenID Connect
