@@ -24,6 +24,9 @@ import org.jasig.cas.client.validation.TicketValidator;
 import org.pac4j.cas.client.CasClient;
 import org.pac4j.cas.client.CasProxyReceptor;
 import org.pac4j.cas.client.direct.DirectCasClient;
+import org.pac4j.cas.client.direct.DirectCasProxyClient;
+import org.pac4j.cas.client.rest.CasRestBasicAuthClient;
+import org.pac4j.cas.client.rest.CasRestFormClient;
 import org.pac4j.cas.config.CasConfiguration;
 import org.pac4j.cas.config.CasProtocol;
 import org.pac4j.core.client.Client;
@@ -53,7 +56,20 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
 
   public static final String CONFIG_CAS_PROXY_SUPPORT = "auth.cas.proxy.support";
   public static final String CONFIG_CAS_LOGOUT_HANDLER_CLASS = "auth.cas.logout.handler.class";
-  public static final String CONFIG_CAS_CLIENT_TYPE = "auth.cas.client.type";
+
+  // CasClient / DirectCasClient / DirectCasProxyClient / CasRestFormClient / CasRestBasicAuthClient
+  public static final String CONFIG_CAS_CLIENT_NAME = "auth.cas.client.name";
+
+  // Configuration for DirectCasProxyClient
+  public static final String CONFIG_CAS_SERVICE_URL = "auth.cas.service.url";
+
+  // Configuration for CasRestFormClient
+  public static final String CONFIG_CAS_USERNAME_PARAMETER = "auth.cas.username.parameter";
+  public static final String CONFIG_CAS_PASSWORD_PARAMETER = "auth.cas.password.parameter";
+
+  // Configuration for CasRestBasicAuthClient
+  public static final String CONFIG_CAS_HEADER_NAME = "auth.cas.header.name";
+  public static final String CONFIG_CAS_PREFIX_HEADER = "auth.cas.prefix.header";
 
   // Backward-compatible CAS configuration
   public static final String CONFIG_CAS_SERVER_PREFIX_URL = "auth.cas.server.url.prefix";
@@ -88,7 +104,14 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
 
     final boolean proxySupport = settings.getBoolean(CONFIG_CAS_PROXY_SUPPORT, false);
     final String logoutHandlerClass = settings.get(CONFIG_CAS_LOGOUT_HANDLER_CLASS, null);
-    final String clientType = settings.get(CONFIG_CAS_CLIENT_TYPE, "indirect");
+    final String serviceUrl = settings.get(CONFIG_CAS_SERVICE_URL, null);
+    final String clientName = settings.get(CONFIG_CAS_CLIENT_NAME, "CasClient");
+
+    final String usernameParameter = settings.get(CONFIG_CAS_USERNAME_PARAMETER, "username");
+    final String passwordParameter = settings.get(CONFIG_CAS_PASSWORD_PARAMETER, "password");
+
+    final String headerName = settings.get(CONFIG_CAS_HEADER_NAME, "Authorization");
+    final String prefixHeader = settings.get(CONFIG_CAS_PREFIX_HEADER, "Basic ");
 
     final CasConfiguration casConfig = new CasConfiguration(loginUrl);
 
@@ -144,11 +167,20 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
     }
 
     final Client<? extends Credentials, ? extends CommonProfile> client;
-    switch (clientType) {
-      case "direct":
+    switch (clientName) {
+      case "DirectCasClient":
         client = new DirectCasClient(casConfig);
         break;
-      case "indirect":
+      case "DirectCasProxyClient":
+        client = new DirectCasProxyClient(casConfig, serviceUrl);
+        break;
+      case "CasRestFormClient":
+        client = new CasRestFormClient(casConfig, usernameParameter, passwordParameter);
+        break;
+      case "CasRestBasicAuthClient":
+        client = new CasRestBasicAuthClient(casConfig, headerName, prefixHeader);
+        break;
+      case "CasClient":
       default:
         client = new CasClient(casConfig);
     }
