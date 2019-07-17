@@ -38,7 +38,7 @@ String appLogo = info.getLogo();
 String appStyle = info.getStyle();
 String appAuthor = settings.get("application.author", "");
 String appTheme = info.getTheme();
-String appMenu = settings.get("application.menu", "both");
+String appMenu = settings.get("view.menubar.location", "both");
 
 String appTitle =  appName;
 
