@@ -128,9 +128,10 @@ class Property {
 	String getValue() {
 
 		String value = attrs['default']
-
-		if (value == null || "" == value.trim()) {
+		if (value == null) {
 			return this.getEmptyValue()
+		} else if ("".equals(value.trim())) {
+			return null;
 		}
 
 		switch(type) {
@@ -196,7 +197,9 @@ class Property {
 		}
 
 		def result = []
-		def empty = this.getEmptyValue()
+		def empty = attrs["default"] == null
+			? this.getEmptyValue()
+			: null
 
 		if (empty != null) {
 			return "return $name == null ? $empty : $name;"
@@ -473,7 +476,7 @@ class Property {
 
 		def column = attrs.column
 		def unique = attrs.unique
-		def nullable = attrs.nullable
+		def nullable = attrs.required == "true" ? null : attrs.nullable
 
 		if (Naming.isReserved(name)) {
 			throw new IllegalArgumentException(
