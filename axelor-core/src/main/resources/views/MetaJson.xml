@@ -25,7 +25,7 @@
     <option value="json-one-to-many">Custom-OneToMany</option>
   </selection>
 
-  <grid name="json-field-grid" title="Custom fields" model="com.axelor.meta.db.MetaJsonField">
+  <grid name="json-field-grid" title="Custom fields" model="com.axelor.meta.db.MetaJsonField" groupBy="model">
     <field name="name" />
     <field name="type" />
     <field name="model" />
@@ -170,6 +170,7 @@
       <panel-related field="fields" form-view="json-field-form-2" orderBy="sequence" canMove="true">
         <field name="name"/>
         <field name="type"/>
+        <field name="title"/>
       </panel-related>
       <panel-related field="roles">
         <field name="name" />
