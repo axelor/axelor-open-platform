@@ -906,7 +906,7 @@ ui.directive('uiPortletGrid', function(){
         tab.viewType = "form";
         tab.recordId = record.id;
         tab.action = _.uniqueId('$act');
-        tab.forceReadonly = $scope.isReadonly();
+        tab.forceReadonly = $scope.isReadonly && $scope.isReadonly();
 
         if (tab.forceReadonly || $scope._isPopup || (($scope._viewParams || {}).params || {}).popup) {
           tab.$popupParent = $scope;
