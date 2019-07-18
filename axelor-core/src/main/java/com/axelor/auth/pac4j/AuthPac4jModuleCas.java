@@ -45,11 +45,11 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
   public static final String CONFIG_CAS_PREFIX_URL = "auth.cas.prefix.url";
   public static final String CONFIG_CAS_PROTOCOL = "auth.cas.protocol";
 
+  // Various parameters
   public static final String CONFIG_CAS_ENCODING = "auth.cas.encoding";
   public static final String CONFIG_CAS_RENEW = "auth.cas.renew";
   public static final String CONFIG_CAS_GATEWAY = "auth.cas.gateway";
   public static final String CONFIG_CAS_TIME_TOLERANCE = "auth.cas.time.tolerance";
-  public static final String CONFIG_CAS_TIME_TICKET_VALIDATOR = "auth.cas.ticket.validator";
   public static final String CONFIG_CAS_URL_RESOLVER_CLASS = "auth.cas.url.resolver.class";
   public static final String CONFIG_CAS_DEFAULT_TICKET_VALIDATOR_CLASS =
       "auth.cas.default.ticket.validator.class";
@@ -57,17 +57,17 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
   public static final String CONFIG_CAS_PROXY_SUPPORT = "auth.cas.proxy.support";
   public static final String CONFIG_CAS_LOGOUT_HANDLER_CLASS = "auth.cas.logout.handler.class";
 
-  // CasClient / DirectCasClient / DirectCasProxyClient / CasRestFormClient / CasRestBasicAuthClient
-  public static final String CONFIG_CAS_CLIENT_NAME = "auth.cas.client.name";
+  // client type: indirect / direct / direct-proxy / rest-form / rest-basic-auth
+  public static final String CONFIG_CAS_CLIENT_TYPE = "auth.cas.client.type";
 
-  // Configuration for DirectCasProxyClient
+  // DirectCasProxyClient configuration
   public static final String CONFIG_CAS_SERVICE_URL = "auth.cas.service.url";
 
-  // Configuration for CasRestFormClient
+  // CasRestFormClient configuration
   public static final String CONFIG_CAS_USERNAME_PARAMETER = "auth.cas.username.parameter";
   public static final String CONFIG_CAS_PASSWORD_PARAMETER = "auth.cas.password.parameter";
 
-  // Configuration for CasRestBasicAuthClient
+  // CasRestBasicAuthClient configuration
   public static final String CONFIG_CAS_HEADER_NAME = "auth.cas.header.name";
   public static final String CONFIG_CAS_PREFIX_HEADER = "auth.cas.prefix.header";
 
@@ -104,14 +104,7 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
 
     final boolean proxySupport = settings.getBoolean(CONFIG_CAS_PROXY_SUPPORT, false);
     final String logoutHandlerClass = settings.get(CONFIG_CAS_LOGOUT_HANDLER_CLASS, null);
-    final String serviceUrl = settings.get(CONFIG_CAS_SERVICE_URL, null);
-    final String clientName = settings.get(CONFIG_CAS_CLIENT_NAME, "CasClient");
-
-    final String usernameParameter = settings.get(CONFIG_CAS_USERNAME_PARAMETER, "username");
-    final String passwordParameter = settings.get(CONFIG_CAS_PASSWORD_PARAMETER, "password");
-
-    final String headerName = settings.get(CONFIG_CAS_HEADER_NAME, "Authorization");
-    final String prefixHeader = settings.get(CONFIG_CAS_PREFIX_HEADER, "Basic ");
+    final String clientType = settings.get(CONFIG_CAS_CLIENT_TYPE, "indirect");
 
     final CasConfiguration casConfig = new CasConfiguration(loginUrl);
 
@@ -167,20 +160,25 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
     }
 
     final Client<? extends Credentials, ? extends CommonProfile> client;
-    switch (clientName) {
-      case "DirectCasClient":
+    switch (clientType) {
+      case "direct":
         client = new DirectCasClient(casConfig);
         break;
-      case "DirectCasProxyClient":
+      case "direct-proxy":
+        final String serviceUrl = settings.get(CONFIG_CAS_SERVICE_URL, null);
         client = new DirectCasProxyClient(casConfig, serviceUrl);
         break;
-      case "CasRestFormClient":
+      case "rest-form":
+        final String usernameParameter = settings.get(CONFIG_CAS_USERNAME_PARAMETER, "username");
+        final String passwordParameter = settings.get(CONFIG_CAS_PASSWORD_PARAMETER, "password");
         client = new CasRestFormClient(casConfig, usernameParameter, passwordParameter);
         break;
-      case "CasRestBasicAuthClient":
+      case "rest-basic-auth":
+        final String headerName = settings.get(CONFIG_CAS_HEADER_NAME, "Authorization");
+        final String prefixHeader = settings.get(CONFIG_CAS_PREFIX_HEADER, "Basic ");
         client = new CasRestBasicAuthClient(casConfig, headerName, prefixHeader);
         break;
-      case "CasClient":
+      case "indirect":
       default:
         client = new CasClient(casConfig);
     }
