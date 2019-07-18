@@ -139,7 +139,9 @@ function CalendarViewCtrl($scope, $element) {
     };
 
     ds.search(opts).success(function(records) {
-      updateColors(records, true);
+      var items = _.clone(records);
+      items.sort(function (x, y) { return x.id - y.id; });
+      updateColors(items, true);
       callback(records);
     });
   };
