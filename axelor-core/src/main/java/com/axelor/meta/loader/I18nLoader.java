@@ -161,7 +161,7 @@ public class I18nLoader extends AbstractLoader {
         if (entity == null) {
           entity = new MetaTranslation();
           entity.setKey(key);
-          entity.setLanguage(language);
+          entity.setLanguage(language.toLowerCase());
           entity.setMessage(message);
         } else if (!StringUtils.isBlank(message)) {
           entity.setMessage(message);
