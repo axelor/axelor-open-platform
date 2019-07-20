@@ -80,7 +80,7 @@ public class I18nBundle extends ResourceBundle {
       return messages;
     }
 
-    final String lang = locale.getLanguage();
+    final String lang = locale.toString().toLowerCase();
     final Query<MetaTranslation> query =
         Query.of(MetaTranslation.class)
             .filter("self.language = :lang AND self.message IS NOT NULL")
