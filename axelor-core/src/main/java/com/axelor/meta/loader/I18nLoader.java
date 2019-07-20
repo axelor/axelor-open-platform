@@ -132,7 +132,7 @@ public class I18nLoader extends AbstractLoader {
       return;
     }
 
-    language = matcher.group(1);
+    language = matcher.group(1).toLowerCase();
 
     Reader reader = new InputStreamReader(stream, Charsets.UTF_8);
     CSVReader csvReader =
@@ -161,7 +161,7 @@ public class I18nLoader extends AbstractLoader {
         if (entity == null) {
           entity = new MetaTranslation();
           entity.setKey(key);
-          entity.setLanguage(language.toLowerCase());
+          entity.setLanguage(language);
           entity.setMessage(message);
         } else if (!StringUtils.isBlank(message)) {
           entity.setMessage(message);
