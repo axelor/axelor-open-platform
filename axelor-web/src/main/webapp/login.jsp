@@ -23,9 +23,16 @@
 <%@ page language="java" session="true" %>
 <%@ page import="java.util.Calendar" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="java.util.Map.Entry"%>
 <%@ page import="java.util.function.Function"%>
+<%@ page import="org.pac4j.http.client.indirect.FormClient" %>
 <%@ page import="com.axelor.i18n.I18n" %>
+<%@ page import="com.axelor.app.AppSettings" %>
+<%@ page import="com.axelor.auth.pac4j.AuthPac4jModule" %>
+<%@ page import="com.axelor.auth.pac4j.AuthPac4jModule" %>
+<%@ page import="com.axelor.web.internal.AuthCentral" %>
 <%
 
 Function<String, String> T = new Function<String, String>() {
@@ -38,7 +45,7 @@ Function<String, String> T = new Function<String, String>() {
   }
 };
 
-String errorMsg = T.apply(request.getParameter("errorMsg"));
+String errorMsg = T.apply(request.getParameter(FormClient.ERROR_PARAMETER));
 
 String loginTitle = T.apply("Please sign in");
 String loginRemember = T.apply("Remember me");
@@ -50,6 +57,8 @@ String loginPassword = T.apply("Password");
 String warningBrowser = T.apply("Update your browser!");
 String warningAdblock = T.apply("Adblocker detected!");
 String warningAdblock2 = T.apply("Please disable the adblocker as it may slow down the application.");
+
+String loginWith = T.apply("Log in with");
 
 int year = Calendar.getInstance().get(Calendar.YEAR);
 String copyright = String.format("&copy; 2005 - %s Axelor. All Rights Reserved.", year);
@@ -63,6 +72,10 @@ if (pageContext.getServletContext().getResource(loginHeader) == null) {
 Map<String, String> tenants = (Map) session.getAttribute("tenantMap");
 String tenantId = (String) session.getAttribute("tenantId");
 
+AppSettings settings = AppSettings.get();
+String callbackUrl = settings.get(AuthPac4jModule.CONFIG_AUTH_CALLBACK_URL, "");
+
+List<String> centralClients = AuthPac4jModule.getCentralClients();
 %>
 <!DOCTYPE html>
 <html>
@@ -90,8 +103,24 @@ String tenantId = (String) session.getAttribute("tenantId");
           <h4><%= errorMsg %></h4>
         </div>
 
+        <% if (!centralClients.isEmpty()) { %>
+	      <div id="sso" class="form-fields text-center">
+	        <span class="title"><%= loginWith %></span>
+            <% for (String client : centralClients) { %>
+                <%
+                  Entry<String, String> entry = AuthCentral.getInfo(client);
+                  String name = entry.getKey();
+                  String logoPath = "img/signin/" + entry.getValue();
+                %>
+                <a class="sso-link" href="./?client_name=<%= client %>">
+                  <img class="sso-logo <%= client %>" src="<%= logoPath %>" alt="<%= name %>" title="<%= name %>"/>
+                </a>
+            <% } %>
+          </div>
+        <% } %>
+
         <div class="panel-body">
-          <form id="login-form" action="" method="POST">
+          <form id="login-form" action="<%=callbackUrl%>" method="POST">
             <div class="form-fields">
               <div class="input-prepend">
                 <span class="add-on"><i class="fa fa-envelope"></i></span>

@@ -27,6 +27,9 @@
 <%@ page import="java.util.function.Function"%>
 <%@ page import="com.axelor.i18n.I18n" %>
 <%@ page import="com.axelor.auth.AuthService" %>
+<%@ page import="com.axelor.app.AppSettings" %>
+<%@ page import="com.axelor.auth.pac4j.AuthPac4jModule" %>
+<%@ page import="org.pac4j.http.client.indirect.FormClient" %>
 <%
 
 Function<String, String> T = new Function<String, String>() {
@@ -46,7 +49,7 @@ String passwordPatternTitle = authService.getPasswordPatternTitle();
 String newPasswordMustBeDifferent = T.apply("New password must be different.");
 String confirmPasswordMismatch = T.apply("Confirm password doesn't match.");
 
-String errorMsg = T.apply(request.getParameter("errorMsg"));
+String errorMsg = T.apply(request.getParameter(FormClient.ERROR_PARAMETER));
 
 if (errorMsg == null) {
   errorMsg = T.apply("Please change your password.");
@@ -74,6 +77,9 @@ if (pageContext.getServletContext().getResource(loginHeader) == null) {
 @SuppressWarnings("all")
 Map<String, String> tenants = (Map) session.getAttribute("tenantMap");
 String tenantId = (String) session.getAttribute("tenantId");
+
+AppSettings settings = AppSettings.get();
+String callbackUrl = settings.get(AuthPac4jModule.CONFIG_AUTH_CALLBACK_URL, "");
 
 %>
 <!DOCTYPE html>
@@ -103,7 +109,7 @@ String tenantId = (String) session.getAttribute("tenantId");
 				</div>
 
 			  <div class="panel-body">
-          <form id="login-form" action="" method="POST">
+          <form id="login-form" action="<%=callbackUrl%>" method="POST">
             <div class="form-fields">
               <div class="input-prepend">
                 <span class="add-on"><i class="fa fa-envelope"></i></span>

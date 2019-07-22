@@ -21,6 +21,7 @@ import com.axelor.app.AppSettings;
 import com.axelor.auth.ldap.AuthLdapModule;
 import com.axelor.auth.pac4j.AuthPac4jModule;
 import com.axelor.auth.pac4j.AuthPac4jModuleCas;
+import com.axelor.auth.pac4j.AuthPac4jModuleForm;
 import com.axelor.auth.pac4j.AuthPac4jModuleOidc;
 import com.axelor.auth.pac4j.AuthPac4jModuleSaml2;
 import com.axelor.auth.pac4j.AuthPac4jObserver;
@@ -65,18 +66,12 @@ public class AuthModule extends AbstractModule {
       return;
     }
 
+    // Pac4j
     final AppSettings settings = AppSettings.get();
     final boolean saveUsersFromCentral =
         settings.getBoolean(AuthPac4jModule.CONFIG_AUTH_SAVE_USERS_FROM_CENTRAL, false);
-
     if (saveUsersFromCentral) {
       bind(AuthPac4jObserver.class);
-    }
-
-    // CAS
-    if (AuthPac4jModuleCas.isEnabled()) {
-      install(new AuthPac4jModuleCas(context));
-      return;
     }
 
     // OpenID Connect
@@ -91,8 +86,14 @@ public class AuthModule extends AbstractModule {
       return;
     }
 
-    // default
-    install(new AuthWebModule(context));
+    // CAS
+    if (AuthPac4jModuleCas.isEnabled()) {
+      install(new AuthPac4jModuleCas(context));
+      return;
+    }
+
+    // Form
+    install(new AuthPac4jModuleForm(context));
   }
 
   static final class MyShiroModule extends ShiroModule {

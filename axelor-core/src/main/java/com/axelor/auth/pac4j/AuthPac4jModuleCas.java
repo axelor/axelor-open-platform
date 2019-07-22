@@ -175,8 +175,8 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
         break;
       case "rest-basic-auth":
         final String headerName = settings.get(CONFIG_CAS_HEADER_NAME, "Authorization");
-        final String prefixHeader = settings.get(CONFIG_CAS_PREFIX_HEADER, "Basic ");
-        client = new CasRestBasicAuthClient(casConfig, headerName, prefixHeader);
+        final String prefixHeader = settings.get(CONFIG_CAS_PREFIX_HEADER, "Basic");
+        client = new CasRestBasicAuthClient(casConfig, headerName, prefixHeader.trim() + " ");
         break;
       case "indirect":
       default:

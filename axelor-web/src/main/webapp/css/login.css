@@ -179,3 +179,12 @@ body > footer > p a:visited {
 .alert h4 {
   margin-bottom: 8px;
 }
+
+.sso-link {
+  text-decoration: none !important;
+}
+
+.sso-logo {
+  width: 32px;
+  padding: 8px;
+}

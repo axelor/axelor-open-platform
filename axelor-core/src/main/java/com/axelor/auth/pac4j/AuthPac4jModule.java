@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import org.apache.shiro.authc.AuthenticationListener;
@@ -46,12 +47,14 @@ import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.http.client.indirect.FormClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AuthPac4jModule extends AuthWebModule {
 
   public static final String CONFIG_AUTH_CALLBACK_URL = "auth.callback.url";
+  public static final String CONFIG_AUTH_DEFAULT_URL = "auth.default.url";
   public static final String CONFIG_AUTH_SAVE_USERS_FROM_CENTRAL = "auth.save.users.from.central";
   public static final String CONFIG_AUTH_PRINCIPAL_ATTRIBUTE = "auth.principal.attribute";
 
@@ -67,6 +70,8 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
   @SuppressWarnings("rawtypes")
   private List<Client> clientList = new ArrayList<>();
+
+  private static final List<String> centralClientNames = new ArrayList<>();
 
   public AuthPac4jModule(ServletContext servletContext) {
     super(servletContext);
@@ -102,8 +107,19 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
   protected abstract void configureClients();
 
+  protected void addClient(FormClient client) {
+    clientList.add(client);
+    logger.info("Added form client");
+  }
+
   protected void addClient(Client<? extends Credentials, ? extends CommonProfile> client) {
     clientList.add(client);
+    centralClientNames.add(client.getName());
+    logger.info("Added central client: {}", client.getName());
+  }
+
+  public static List<String> getCentralClients() {
+    return centralClientNames;
   }
 
   @Override
@@ -155,6 +171,15 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     @Inject
     public Pac4jCallbackFilter(Config config) {
       setConfig(config);
+
+      final AppSettings settings = AppSettings.get();
+      final String defaultUrl = settings.get(CONFIG_AUTH_DEFAULT_URL, null);
+
+      if (defaultUrl != null) {
+        setDefaultUrl(defaultUrl);
+      }
+
+      setDefaultClient(config.getClients().getClients().get(0).getName());
     }
   }
 
@@ -164,6 +189,15 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     public Pac4jSecurityFilter(Config config) {
       setConfig(config);
       setAuthorizers("auth");
+
+      final String clientNames =
+          config
+              .getClients()
+              .getClients()
+              .stream()
+              .map(Client::getName)
+              .collect(Collectors.joining(","));
+      setClients(clientNames);
     }
   }
 }

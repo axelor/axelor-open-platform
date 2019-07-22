@@ -162,7 +162,7 @@ public class AuthFilter extends FormAuthenticationFilter {
       final UriBuilder builder = UriBuilder.fromPath("login.jsp");
 
       if (StringUtils.notBlank(e.getMessage())) {
-        builder.queryParam("errorMsg", e.getMessage());
+        builder.queryParam("error", e.getMessage());
       }
 
       final String path = builder.build().toString();
@@ -173,7 +173,7 @@ public class AuthFilter extends FormAuthenticationFilter {
           UriBuilder.fromPath("change-password.jsp").queryParam("username", username);
 
       if (StringUtils.notBlank(e.getMessage())) {
-        builder.queryParam("errorMsg", e.getMessage());
+        builder.queryParam("error", e.getMessage());
       }
 
       final String path = builder.build().toString();
