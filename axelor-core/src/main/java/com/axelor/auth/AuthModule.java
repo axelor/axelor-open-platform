@@ -23,7 +23,7 @@ import com.axelor.auth.pac4j.AuthPac4jModule;
 import com.axelor.auth.pac4j.AuthPac4jModuleCas;
 import com.axelor.auth.pac4j.AuthPac4jModuleForm;
 import com.axelor.auth.pac4j.AuthPac4jModuleOidc;
-import com.axelor.auth.pac4j.AuthPac4jModuleSaml2;
+import com.axelor.auth.pac4j.AuthPac4jModuleSaml;
 import com.axelor.auth.pac4j.AuthPac4jObserver;
 import com.axelor.db.JpaSecurity;
 import com.google.inject.AbstractModule;
@@ -80,9 +80,9 @@ public class AuthModule extends AbstractModule {
       return;
     }
 
-    // SAML2
-    if (AuthPac4jModuleSaml2.isEnabled()) {
-      install(new AuthPac4jModuleSaml2(context));
+    // SAML
+    if (AuthPac4jModuleSaml.isEnabled()) {
+      install(new AuthPac4jModuleSaml(context));
       return;
     }
 
