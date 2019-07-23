@@ -37,7 +37,7 @@ import org.pac4j.http.client.indirect.FormClient;
 
 public class AuthPac4jModuleForm extends AuthPac4jModule {
 
-  public static final String CONFIG_HTTP_FORM_ENABLED = "auth.http.form.enabled";
+  public static final String CONFIG_LOCAL_FORM_ENABLED = "auth.local.form.enabled";
 
   private static final String INCORRECT_CREDENTIALS = /*$$(*/ "Wrong username or password"; /*)*/;
   private static final String WRONG_CURRENT_PASSWORD = /*$$(*/ "Wrong current password"; /*)*/;
@@ -52,7 +52,7 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
   @Override
   protected final void configureClients() {
     final AppSettings settings = AppSettings.get();
-    final boolean httpFormEnabled = settings.getBoolean(CONFIG_HTTP_FORM_ENABLED, true);
+    final boolean httpFormEnabled = settings.getBoolean(CONFIG_LOCAL_FORM_ENABLED, true);
 
     if (httpFormEnabled) {
       final FormClient formClient = new Pac4jFormClient();

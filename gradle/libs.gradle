@@ -163,12 +163,13 @@ libs.apache_shiro = [
 
 libs.pac4j = [
   "io.buji:buji-pac4j:${versions.buji_pac4j}",
-  "org.pac4j:pac4j-saml:${versions.pac4j}",
   dependencies.create("org.pac4j:pac4j-oidc:${versions.pac4j}") {
     exclude group: 'org.mockito', module: 'mockito-core'
   },
-  "org.pac4j:pac4j-http:${versions.pac4j}",
-  "org.pac4j:pac4j-cas:${versions.pac4j}"
+  "org.pac4j:pac4j-oauth:${versions.pac4j}",
+  "org.pac4j:pac4j-saml:${versions.pac4j}",
+  "org.pac4j:pac4j-cas:${versions.pac4j}",
+  "org.pac4j:pac4j-http:${versions.pac4j}"
 ]
 
 // Apache DS (for testing only)

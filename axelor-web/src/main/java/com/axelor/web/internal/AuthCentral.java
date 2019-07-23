@@ -25,21 +25,30 @@ import java.util.Map.Entry;
 public class AuthCentral {
 
   private static final Map<String, Entry<String, String>> info =
-      ImmutableMap.of(
-          "OidcClient",
-          new SimpleImmutableEntry<>("OpenID Connect", "openid.png"),
-          "HeaderClient",
-          new SimpleImmutableEntry<>("OpenID Connect", "openid.png"),
-          "GoogleOidcClient",
-          new SimpleImmutableEntry<>("Google", "google.svg"),
-          "AzureAdClient",
-          new SimpleImmutableEntry<>("Azure AD", "microsoft.svg"),
-          "KeycloakOidcClient",
-          new SimpleImmutableEntry<>("Keycloak", "keycloak.svg"));
+      ImmutableMap.<String, Entry<String, String>>builder()
+          // OpenID Connect
+          .put("OidcClient", new SimpleImmutableEntry<>("OpenID Connect", "openid.png"))
+          .put("HeaderClient", new SimpleImmutableEntry<>("OpenID Connect", "openid.png"))
+          .put("GoogleOidcClient", new SimpleImmutableEntry<>("Google", "google.svg"))
+          .put("AzureAdClient", new SimpleImmutableEntry<>("Azure AD", "microsoft.svg"))
+          .put("KeycloakOidcClient", new SimpleImmutableEntry<>("Keycloak", "keycloak.svg"))
+
+          // OAuth
+          .put("GenericOAuth20Client", new SimpleImmutableEntry<>("OAuth 2.0", "oauth2.png"))
+          .put("Google2Client", new SimpleImmutableEntry<>("Google", "google.svg"))
+          .put("FacebookClient", new SimpleImmutableEntry<>("Facebook", "facebook.svg"))
+          .put("TwitterClient", new SimpleImmutableEntry<>("Twitter", "twitter.svg"))
+          .put("YahooClient", new SimpleImmutableEntry<>("Yahoo!", "yahoo.svg"))
+          .put("LinkedIn2Client", new SimpleImmutableEntry<>("LinkedIn", "linkedin.svg"))
+          .put("WindowsLiveClient", new SimpleImmutableEntry<>("Windows Live", "microsoft.svg"))
+          .put("WechatClient", new SimpleImmutableEntry<>("WeChat", "wechat.svg"))
+          .put("GitHubClient", new SimpleImmutableEntry<>("GitHub", "github.svg"))
+          .build();
 
   private AuthCentral() {}
 
   public static Entry<String, String> getInfo(String clientName) {
+
     return info.get(clientName);
   }
 }

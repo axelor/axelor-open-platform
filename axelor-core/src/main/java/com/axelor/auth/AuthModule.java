@@ -22,6 +22,7 @@ import com.axelor.auth.ldap.AuthLdapModule;
 import com.axelor.auth.pac4j.AuthPac4jModule;
 import com.axelor.auth.pac4j.AuthPac4jModuleCas;
 import com.axelor.auth.pac4j.AuthPac4jModuleForm;
+import com.axelor.auth.pac4j.AuthPac4jModuleOAuth;
 import com.axelor.auth.pac4j.AuthPac4jModuleOidc;
 import com.axelor.auth.pac4j.AuthPac4jModuleSaml;
 import com.axelor.auth.pac4j.AuthPac4jObserver;
@@ -77,6 +78,12 @@ public class AuthModule extends AbstractModule {
     // OpenID Connect
     if (AuthPac4jModuleOidc.isEnabled()) {
       install(new AuthPac4jModuleOidc(context));
+      return;
+    }
+
+    // OAuth
+    if (AuthPac4jModuleOAuth.isEnabled()) {
+      install(new AuthPac4jModuleOAuth(context));
       return;
     }
 
