@@ -24,9 +24,17 @@ import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.inject.Beans;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import javax.servlet.ServletContext;
+import org.pac4j.core.client.Client;
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.context.WebContext;
+import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.exception.CredentialsException;
@@ -36,8 +44,6 @@ import org.pac4j.core.util.CommonHelper;
 import org.pac4j.http.client.indirect.FormClient;
 
 public class AuthPac4jModuleForm extends AuthPac4jModule {
-
-  public static final String CONFIG_LOCAL_FORM_ENABLED = "auth.local.form.enabled";
 
   private static final String INCORRECT_CREDENTIALS = /*$$(*/ "Wrong username or password"; /*)*/;
   private static final String WRONG_CURRENT_PASSWORD = /*$$(*/ "Wrong current password"; /*)*/;
@@ -50,20 +56,13 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
   }
 
   @Override
-  protected final void configureClients() {
-    final AppSettings settings = AppSettings.get();
-    final boolean httpFormEnabled = settings.getBoolean(CONFIG_LOCAL_FORM_ENABLED, true);
-
-    if (httpFormEnabled) {
-      final FormClient formClient = new Pac4jFormClient();
-      addClient(formClient);
-    }
-
-    configureCentralClients();
+  protected void configureClients() {
+    addFormClient();
   }
 
-  protected void configureCentralClients() {
-    // Nothing by default
+  protected void addFormClient() {
+    final FormClient formClient = new AxelorFormClient();
+    addClient(formClient);
   }
 
   @Override
@@ -73,10 +72,10 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
     addFilterChain("/change-password.jsp", ANON);
   }
 
-  private static class Pac4jFormClient extends FormClient {
+  private static class AxelorFormClient extends FormClient {
 
-    public Pac4jFormClient() {
-      super("login.jsp", new Pac4jFormAuthenticator());
+    public AxelorFormClient() {
+      super("login.jsp", new AxelorFormAuthenticator());
     }
 
     @Override
@@ -101,7 +100,7 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
     }
   }
 
-  private static class Pac4jFormAuthenticator
+  private static class AxelorFormAuthenticator
       implements Authenticator<UsernamePasswordCredentials> {
 
     @Override
@@ -151,5 +150,63 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
       profile.addAttribute(Pac4jConstants.USERNAME, username);
       credentials.setUserProfile(profile);
     }
+  }
+
+  protected void addFormClientIfNotExclusive(Map<String, Map<String, String>> allSettings) {
+    if (allSettings.size() == 1) {
+      final Map<String, String> settings = allSettings.values().iterator().next();
+      if (!settings.getOrDefault("exclusive", "true").equals("true")) {
+        addFormClient();
+      }
+    } else {
+      addFormClient();
+    }
+  }
+
+  protected void addCentralClients(
+      Map<String, Map<String, String>> allSettings,
+      Map<
+              String,
+              Function<Map<String, String>, Client<? extends Credentials, ? extends CommonProfile>>>
+          providers,
+      BiFunction<
+              Map<String, String>, String, Client<? extends Credentials, ? extends CommonProfile>>
+          defaultProvider) {
+
+    for (final Entry<String, Map<String, String>> entry : allSettings.entrySet()) {
+      final String providerName = entry.getKey();
+      final Map<String, String> settings = entry.getValue();
+      final Function<Map<String, String>, Client<? extends Credentials, ? extends CommonProfile>>
+          clientFunc = providers.get(providerName);
+      final Client<? extends Credentials, ? extends CommonProfile> client =
+          clientFunc != null
+              ? clientFunc.apply(settings)
+              : defaultProvider.apply(settings, providerName);
+
+      addClient(client);
+    }
+  }
+
+  protected static Map<String, Map<String, String>> getAllSettings(String prefix) {
+    final Map<String, Map<String, String>> allSettings = new LinkedHashMap<>();
+    final AppSettings settings = AppSettings.get();
+
+    for (final Object key : settings.getProperties().keySet()) {
+      final String keyName = key.toString();
+
+      if (keyName.startsWith(prefix)) {
+        final String[] paramItems = keyName.substring(prefix.length()).split("\\.", 2);
+        final String providerName = paramItems[0];
+        final String configName = paramItems[1];
+        final String property = settings.get(keyName);
+
+        if (StringUtils.notBlank(property)) {
+          Map<String, String> map = allSettings.computeIfAbsent(providerName, k -> new HashMap<>());
+          map.put(configName, property);
+        }
+      }
+    }
+
+    return allSettings;
   }
 }

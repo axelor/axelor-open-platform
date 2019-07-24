@@ -180,11 +180,17 @@ body > footer > p a:visited {
   margin-bottom: 8px;
 }
 
+.sso-title {
+  padding-right: 16px;
+}
+
 .sso-link {
   text-decoration: none !important;
 }
 
 .sso-logo {
   width: 32px;
-  padding: 8px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }

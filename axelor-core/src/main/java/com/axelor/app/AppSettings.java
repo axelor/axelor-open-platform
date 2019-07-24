@@ -24,8 +24,11 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -48,7 +51,7 @@ public final class AppSettings {
         stream = new FileInputStream(config);
       }
       try {
-        properties = new Properties();
+        properties = new LinkedProperties();
         properties.load(stream);
       } finally {
         stream.close();
@@ -152,5 +155,56 @@ public final class AppSettings {
    */
   public Properties getProperties() {
     return properties;
+  }
+
+  /** Properties with keys in order of insertion */
+  public static class LinkedProperties extends Properties {
+
+    private static final long serialVersionUID = -1869328576799427860L;
+    private final Set<Object> keys = new LinkedHashSet<>();
+
+    @Override
+    public synchronized Object put(Object key, Object value) {
+      keys.add(key);
+      return super.put(key, value);
+    }
+
+    @Override
+    public synchronized void putAll(Map<? extends Object, ? extends Object> t) {
+      keys.addAll(t.keySet());
+      super.putAll(t);
+    }
+
+    @Override
+    public synchronized Object remove(Object key) {
+      keys.remove(key);
+      return super.remove(key);
+    }
+
+    @Override
+    public synchronized boolean remove(Object key, Object value) {
+      boolean removed = super.remove(key, value);
+
+      if (removed) {
+        keys.remove(key);
+      }
+
+      return removed;
+    }
+
+    @Override
+    public Set<Object> keySet() {
+      return keys;
+    }
+
+    @Override
+    public synchronized boolean equals(Object o) {
+      return super.equals(o);
+    }
+
+    @Override
+    public synchronized int hashCode() {
+      return super.hashCode();
+    }
   }
 }

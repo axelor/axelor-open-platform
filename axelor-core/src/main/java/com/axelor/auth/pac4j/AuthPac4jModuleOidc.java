@@ -17,8 +17,12 @@
  */
 package com.axelor.auth.pac4j;
 
-import com.axelor.app.AppSettings;
+import com.axelor.common.StringUtils;
+import com.google.common.collect.ImmutableMap;
+import java.util.Map;
+import java.util.function.Function;
 import javax.servlet.ServletContext;
+import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.profile.CommonProfile;
@@ -34,139 +38,147 @@ import org.pac4j.oidc.credentials.authenticator.UserInfoOidcAuthenticator;
 
 public class AuthPac4jModuleOidc extends AuthPac4jModuleForm {
 
-  // Basic configuration
-  public static final String CONFIG_OIDC_GENERIC_CLIENT_ID = "auth.oidc.generic.client.id";
-  public static final String CONFIG_OIDC_GENERIC_SECRET = "auth.oidc.generic.secret";
+  private static final String CONFIG_PREFIX = "auth.oidc.";
+  private static Map<String, Map<String, String>> allSettings;
 
-  // Additional configuration
-  public static final String CONFIG_OIDC_GENERIC_DISCOVERY_URI = "auth.oidc.generic.discovery.uri";
-  public static final String CONFIG_OIDC_GENERIC_USE_NONCE = "auth.oidc.use.generic.nonce";
-  public static final String CONFIG_OIDC_GENERIC_RESPONSE_TYPE = "auth.oidc.generic.response.type";
-  public static final String CONFIG_OIDC_GENERIC_RESPONSE_MODE = "auth.oidc.generic.response.mode";
-  public static final String CONFIG_OIDC_GENERIC_SCOPE = "auth.oidc.generic.scope";
-
-  // Direct client configuration
-  public static final String CONFIG_OIDC_GENERIC_HEADER_NAME = "auth.oidc.generic.header.name";
-  public static final String CONFIG_OIDC_GENERIC_PREFIX_HEADER = "auth.oidc.generic.prefix.header";
-
-  // TODO: add Advanced configuration
-  // http://www.pac4j.org/docs/clients/openid-connect.html#3-advanced-configuration
-
-  // Google
-  public static final String CONFIG_OIDC_GOOGLE_CLIENT_ID = "auth.oidc.google.client.id";
-  public static final String CONFIG_OIDC_GOOGLE_SECRET = "auth.oidc.google.secret";
-
-  // Azure AD
-  public static final String CONFIG_OIDC_AZUREAD_CLIENT_ID = "auth.oidc.azuread.client.id";
-  public static final String CONFIG_OIDC_AZUREAD_SECRET = "auth.oidc.azuread.secret";
-  public static final String CONFIG_OIDC_AZUREAD_TENANT = "auth.oidc.azuread.tenant";
-
-  // Keycloak
-  public static final String CONFIG_OIDC_KEYCLOAK_CLIENT_ID = "auth.oidc.keycloak.client.id";
-  public static final String CONFIG_OIDC_KEYCLOAK_SECRET = "auth.oidc.keycloak.secret";
-  public static final String CONFIG_OIDC_KEYCLOAK_REALM = "auth.oidc.keycloak.realm";
-  public static final String CONFIG_OIDC_KEYCLOAK_BASE_URI = "auth.oidc.keycloak.base.uri";
+  private static final Map<
+          String,
+          Function<Map<String, String>, Client<? extends Credentials, ? extends CommonProfile>>>
+      providers =
+          ImmutableMap
+              .<String,
+                  Function<
+                      Map<String, String>, Client<? extends Credentials, ? extends CommonProfile>>>
+                  builder()
+              .put("google", AuthPac4jModuleOidc::setupGoogle)
+              .put("azuread", AuthPac4jModuleOidc::setupAzureAd)
+              .put("keycloak", AuthPac4jModuleOidc::setupKeycloak)
+              .build();
 
   public AuthPac4jModuleOidc(ServletContext servletContext) {
     super(servletContext);
   }
 
   @Override
-  protected void configureCentralClients() {
-    final AppSettings settings = AppSettings.get();
+  protected void configureClients() {
+    addFormClientIfNotExclusive(allSettings);
+    addCentralClients(allSettings, providers, AuthPac4jModuleOidc::setupGeneric);
+  }
 
-    final String genericClientId = settings.get(CONFIG_OIDC_GENERIC_CLIENT_ID, null);
-    if (genericClientId != null) {
-      final String secret = settings.get(CONFIG_OIDC_GENERIC_SECRET, null);
-      final String discoveryURI = settings.get(CONFIG_OIDC_GENERIC_DISCOVERY_URI, null);
-      final boolean useNonce = settings.getBoolean(CONFIG_OIDC_GENERIC_USE_NONCE, false);
-      final String responseType = settings.get(CONFIG_OIDC_GENERIC_RESPONSE_TYPE, null);
-      final String responseMode = settings.get(CONFIG_OIDC_GENERIC_RESPONSE_MODE, null);
-      final String scope = settings.get(CONFIG_OIDC_GENERIC_SCOPE, null);
-      final String headerName = settings.get(CONFIG_OIDC_GENERIC_HEADER_NAME, null);
-      final String prefixHeader = settings.get(CONFIG_OIDC_GENERIC_PREFIX_HEADER, null);
+  private static Client<? extends Credentials, ? extends CommonProfile> setupGeneric(
+      Map<String, String> settings, String providerName) {
 
-      final OidcConfiguration config = new OidcConfiguration();
-      config.setClientId(genericClientId);
-      config.setSecret(secret);
-      config.setUseNonce(useNonce);
+    final String clientId = settings.get("client.id");
+    final String secret = settings.get("secret");
+    final String discoveryURI = settings.get("discovery.uri");
+    final boolean useNonce = settings.getOrDefault("use.nonce", "false").equals("true");
+    final String responseType = settings.get("response.type");
+    final String responseMode = settings.get("response.mode");
+    final String scope = settings.get("scope");
+    final String headerName = settings.get("header.name");
+    final String prefixHeader = settings.get("prefix.header");
 
-      if (discoveryURI != null) {
-        config.setDiscoveryURI(discoveryURI);
-      }
+    final String name = settings.getOrDefault("name", providerName);
+    final String title = settings.getOrDefault("title", "OpenID Connect");
+    final String icon = settings.getOrDefault("icon", "img/signin/openid.png");
 
-      if (responseType != null) {
-        config.setResponseType(responseType);
-      }
+    final OidcConfiguration config = new OidcConfiguration();
+    config.setClientId(clientId);
+    config.setSecret(secret);
+    config.setUseNonce(useNonce);
 
-      if (responseMode != null) {
-        config.setResponseMode(responseMode);
-      }
-
-      if (scope != null) {
-        config.setScope(scope);
-      }
-
-      final Client<? extends Credentials, ? extends CommonProfile> client;
-
-      if (headerName != null && prefixHeader != null) {
-        final UserInfoOidcAuthenticator authenticator = new UserInfoOidcAuthenticator(config);
-        client = new HeaderClient(headerName, prefixHeader.trim() + " ", authenticator);
-      } else {
-        client = new OidcClient<>(config);
-      }
-
-      addClient(client);
+    if (StringUtils.notBlank(discoveryURI)) {
+      config.setDiscoveryURI(discoveryURI);
     }
 
-    final String googleClientId = settings.get(CONFIG_OIDC_GOOGLE_CLIENT_ID, null);
-    if (googleClientId != null) {
-      final String googleSecret = settings.get(CONFIG_OIDC_GOOGLE_SECRET, null);
-
-      final OidcConfiguration config = new OidcConfiguration();
-      config.setClientId(googleClientId);
-      config.setSecret(googleSecret);
-
-      final GoogleOidcClient client = new GoogleOidcClient(config);
-      addClient(client);
+    if (StringUtils.notBlank(responseType)) {
+      config.setResponseType(responseType);
     }
 
-    final String azureAdClientId = settings.get(CONFIG_OIDC_AZUREAD_CLIENT_ID, null);
-    if (azureAdClientId != null) {
-      final String azureAdSecret = settings.get(CONFIG_OIDC_AZUREAD_SECRET, null);
-      final String azureAdTenant = settings.get(CONFIG_OIDC_AZUREAD_TENANT, null);
-
-      final AzureAdOidcConfiguration config = new AzureAdOidcConfiguration();
-      config.setClientId(azureAdClientId);
-      config.setSecret(azureAdSecret);
-      config.setTenant(azureAdTenant);
-
-      final AzureAdClient client = new AzureAdClient(config);
-      addClient(client);
+    if (StringUtils.notBlank(responseMode)) {
+      config.setResponseMode(responseMode);
     }
 
-    final String keycloakClientId = settings.get(CONFIG_OIDC_KEYCLOAK_CLIENT_ID, null);
-    if (keycloakClientId != null) {
-      final String keycloakSecret = settings.get(CONFIG_OIDC_KEYCLOAK_SECRET, null);
-      final String keycloakRealm = settings.get(CONFIG_OIDC_KEYCLOAK_REALM, null);
-      final String keycloakBaseUri = settings.get(CONFIG_OIDC_KEYCLOAK_BASE_URI, null);
-
-      final KeycloakOidcConfiguration config = new KeycloakOidcConfiguration();
-      config.setClientId(keycloakClientId);
-      config.setSecret(keycloakSecret);
-      config.setRealm(keycloakRealm);
-      config.setBaseUri(keycloakBaseUri);
-
-      final KeycloakOidcClient client = new KeycloakOidcClient(config);
-      addClient(client);
+    if (StringUtils.notBlank(scope)) {
+      config.setScope(scope);
     }
+
+    final BaseClient<? extends Credentials, ? extends CommonProfile> client;
+
+    if (StringUtils.notBlank(headerName) && StringUtils.notBlank(prefixHeader)) {
+      final UserInfoOidcAuthenticator authenticator = new UserInfoOidcAuthenticator(config);
+      client = new HeaderClient(headerName, prefixHeader.trim() + " ", authenticator);
+    } else {
+      client = new OidcClient<>(config);
+    }
+
+    client.setName(name);
+    setClientInfo(client.getName(), ImmutableMap.of("title", title, "icon", icon));
+    return client;
+  }
+
+  private static Client<? extends Credentials, ? extends CommonProfile> setupGoogle(
+      Map<String, String> settings) {
+    final String clientId = settings.get("client.id");
+    final String secret = settings.get("secret");
+
+    final String title = settings.getOrDefault("title", "Google");
+    final String icon = settings.getOrDefault("icon", "img/signin/google.svg");
+
+    final OidcConfiguration config = new OidcConfiguration();
+    config.setClientId(clientId);
+    config.setSecret(secret);
+
+    final GoogleOidcClient client = new GoogleOidcClient(config);
+    setClientInfo(client.getName(), ImmutableMap.of("title", title, "icon", icon));
+    return client;
+  }
+
+  private static Client<? extends Credentials, ? extends CommonProfile> setupAzureAd(
+      Map<String, String> settings) {
+    final String clientId = settings.get("client.id");
+    final String secret = settings.get("secret");
+    final String tenant = settings.get("tenant");
+
+    final String title = settings.getOrDefault("title", "Azure AD");
+    final String icon = settings.getOrDefault("icon", "img/signin/microsoft.svg");
+
+    final AzureAdOidcConfiguration config = new AzureAdOidcConfiguration();
+    config.setClientId(clientId);
+    config.setSecret(secret);
+    config.setTenant(tenant);
+
+    final AzureAdClient client = new AzureAdClient(config);
+    setClientInfo(client.getName(), ImmutableMap.of("title", title, "icon", icon));
+    return client;
+  }
+
+  private static Client<? extends Credentials, ? extends CommonProfile> setupKeycloak(
+      Map<String, String> settings) {
+    final String clientId = settings.get("client.id");
+    final String secret = settings.get("secret");
+    final String realm = settings.get("realm");
+    final String baseUri = settings.get("base.uri");
+
+    final String title = settings.getOrDefault("title", "Keycloak");
+    final String icon = settings.getOrDefault("icon", "img/signin/keycloak.svg");
+
+    final KeycloakOidcConfiguration config = new KeycloakOidcConfiguration();
+    config.setClientId(clientId);
+    config.setSecret(secret);
+    config.setRealm(realm);
+    config.setBaseUri(baseUri);
+
+    final KeycloakOidcClient client = new KeycloakOidcClient(config);
+    setClientInfo(client.getName(), ImmutableMap.of("title", title, "icon", icon));
+    return client;
   }
 
   public static boolean isEnabled() {
-    final AppSettings settings = AppSettings.get();
-    return settings.get(CONFIG_OIDC_GENERIC_CLIENT_ID, null) != null
-        || settings.get(CONFIG_OIDC_GOOGLE_CLIENT_ID, null) != null
-        || settings.get(CONFIG_OIDC_AZUREAD_CLIENT_ID, null) != null
-        || settings.get(CONFIG_OIDC_KEYCLOAK_CLIENT_ID, null) != null;
+    if (allSettings == null) {
+      allSettings = getAllSettings(CONFIG_PREFIX);
+    }
+
+    return !allSettings.isEmpty();
   }
 }

@@ -30,9 +30,12 @@ import io.buji.pac4j.filter.SecurityFilter;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import org.apache.shiro.authc.AuthenticationListener;
@@ -65,17 +68,28 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
   protected static final String ROLE_HAS_USER = "_ROLE_HAS_USER";
 
-  private static final Logger logger =
-      LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
   @SuppressWarnings("rawtypes")
   private List<Client> clientList = new ArrayList<>();
 
   private static final List<String> centralClientNames = new ArrayList<>();
 
+  private static final Map<String, Map<String, String>> clientInfo = new HashMap<>();
+
+  private static final Logger logger =
+      LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
   public AuthPac4jModule(ServletContext servletContext) {
     super(servletContext);
     logger.info("Loading pac4j: {}", getClass().getSimpleName());
+  }
+
+  @Nullable
+  public static Map<String, String> getClientInfo(String clientName) {
+    return clientInfo.get(clientName);
+  }
+
+  protected static void setClientInfo(String clientName, Map<String, String> info) {
+    clientInfo.put(clientName, info);
   }
 
   @Override
@@ -108,8 +122,8 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   protected abstract void configureClients();
 
   protected void addClient(FormClient client) {
-    clientList.add(client);
-    logger.info("Added form client");
+    clientList.add(0, client);
+    logger.info("Added local client: {}", client.getName());
   }
 
   protected void addClient(Client<? extends Credentials, ? extends CommonProfile> client) {
@@ -173,7 +187,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       setConfig(config);
 
       final AppSettings settings = AppSettings.get();
-      final String defaultUrl = settings.get(CONFIG_AUTH_DEFAULT_URL, null);
+      final String defaultUrl = settings.get(CONFIG_AUTH_DEFAULT_URL, settings.getBaseURL());
 
       if (defaultUrl != null) {
         setDefaultUrl(defaultUrl);

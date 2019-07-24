@@ -31,8 +31,6 @@
 <%@ page import="com.axelor.i18n.I18n" %>
 <%@ page import="com.axelor.app.AppSettings" %>
 <%@ page import="com.axelor.auth.pac4j.AuthPac4jModule" %>
-<%@ page import="com.axelor.auth.pac4j.AuthPac4jModule" %>
-<%@ page import="com.axelor.web.internal.AuthCentral" %>
 <%
 
 Function<String, String> T = new Function<String, String>() {
@@ -105,15 +103,15 @@ List<String> centralClients = AuthPac4jModule.getCentralClients();
 
         <% if (!centralClients.isEmpty()) { %>
 	      <div id="sso" class="form-fields text-center">
-	        <span class="title"><%= loginWith %></span>
+	        <span class="title sso-title"><%= loginWith %></span>
             <% for (String client : centralClients) { %>
                 <%
-                  Entry<String, String> entry = AuthCentral.getInfo(client);
-                  String name = entry.getKey();
-                  String logoPath = "img/signin/" + entry.getValue();
+                  Map<String, String> info = AuthPac4jModule.getClientInfo(client);
+                  String title = info.get("title");
+                  String icon = info.get("icon");
                 %>
                 <a class="sso-link" href="./?client_name=<%= client %>">
-                  <img class="sso-logo <%= client %>" src="<%= logoPath %>" alt="<%= name %>" title="<%= name %>"/>
+                  <img class="sso-logo <%= client %>" src="<%= icon %>" alt="<%= title %>" title="<%= title %>"/>
                 </a>
             <% } %>
           </div>
