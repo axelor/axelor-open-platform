@@ -136,6 +136,11 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     return centralClientNames;
   }
 
+  public static boolean isEnabled() {
+    final AppSettings settings = AppSettings.get();
+    return settings.get(CONFIG_AUTH_CALLBACK_URL, null) != null;
+  }
+
   @Override
   protected void bindWebSecurityManager(AnnotatedBindingBuilder<? super WebSecurityManager> bind) {
     bind.to(DefaultWebSecurityManager.class);

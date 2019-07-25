@@ -68,39 +68,46 @@ public class AuthModule extends AbstractModule {
     }
 
     // Pac4j
-    final AppSettings settings = AppSettings.get();
-    final boolean saveUsersFromCentral =
-        settings.getBoolean(AuthPac4jModule.CONFIG_AUTH_SAVE_USERS_FROM_CENTRAL, false);
-    if (saveUsersFromCentral) {
-      bind(AuthPac4jObserver.class);
-    }
+    if (AuthPac4jModule.isEnabled()) {
+      final AppSettings settings = AppSettings.get();
+      final boolean saveUsersFromCentral =
+          settings.getBoolean(AuthPac4jModule.CONFIG_AUTH_SAVE_USERS_FROM_CENTRAL, false);
 
-    // OpenID Connect
-    if (AuthPac4jModuleOidc.isEnabled()) {
-      install(new AuthPac4jModuleOidc(context));
+      if (saveUsersFromCentral) {
+        bind(AuthPac4jObserver.class);
+      }
+
+      // OpenID Connect
+      if (AuthPac4jModuleOidc.isEnabled()) {
+        install(new AuthPac4jModuleOidc(context));
+        return;
+      }
+
+      // OAuth
+      if (AuthPac4jModuleOAuth.isEnabled()) {
+        install(new AuthPac4jModuleOAuth(context));
+        return;
+      }
+
+      // SAML
+      if (AuthPac4jModuleSaml.isEnabled()) {
+        install(new AuthPac4jModuleSaml(context));
+        return;
+      }
+
+      // CAS
+      if (AuthPac4jModuleCas.isEnabled()) {
+        install(new AuthPac4jModuleCas(context));
+        return;
+      }
+
+      // Form
+      install(new AuthPac4jModuleForm(context));
       return;
     }
 
-    // OAuth
-    if (AuthPac4jModuleOAuth.isEnabled()) {
-      install(new AuthPac4jModuleOAuth(context));
-      return;
-    }
-
-    // SAML
-    if (AuthPac4jModuleSaml.isEnabled()) {
-      install(new AuthPac4jModuleSaml(context));
-      return;
-    }
-
-    // CAS
-    if (AuthPac4jModuleCas.isEnabled()) {
-      install(new AuthPac4jModuleCas(context));
-      return;
-    }
-
-    // Form
-    install(new AuthPac4jModuleForm(context));
+    // Default
+    install(new AuthWebModule(context));
   }
 
   static final class MyShiroModule extends ShiroModule {
