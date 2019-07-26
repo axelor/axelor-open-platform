@@ -96,11 +96,13 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleForm {
 
     if (StringUtils.notBlank(profileAttrsSetting)) {
       final Map<String, String> profileAttrsMap = new HashMap<>();
-      for (final String item : profileAttrsSetting.split("\\s,\\s")) {
-        final String[] entry = item.split("\\s:\\s");
-        final String attr = entry[0];
-        final String value = entry[1];
-        profileAttrsMap.put(attr, value);
+      for (final String item : profileAttrsSetting.split("\\s*,\\s*")) {
+        final String[] entry = item.split("\\s*:\\s*");
+        if (entry.length > 1) {
+          final String attr = entry[0];
+          final String value = entry[1];
+          profileAttrsMap.put(attr, value);
+        }
       }
       client.setProfileAttrs(profileAttrsMap);
     }

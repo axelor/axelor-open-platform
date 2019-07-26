@@ -196,13 +196,16 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
 
       if (keyName.startsWith(prefix)) {
         final String[] paramItems = keyName.substring(prefix.length()).split("\\.", 2);
-        final String providerName = paramItems[0];
-        final String configName = paramItems[1];
-        final String property = settings.get(keyName);
+        if (paramItems.length > 1) {
+          final String providerName = paramItems[0];
+          final String configName = paramItems[1];
+          final String property = settings.get(keyName);
 
-        if (StringUtils.notBlank(property)) {
-          Map<String, String> map = allSettings.computeIfAbsent(providerName, k -> new HashMap<>());
-          map.put(configName, property);
+          if (StringUtils.notBlank(property)) {
+            Map<String, String> map =
+                allSettings.computeIfAbsent(providerName, k -> new HashMap<>());
+            map.put(configName, property);
+          }
         }
       }
     }
