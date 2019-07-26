@@ -296,6 +296,9 @@
               if (field.widgetAttrs.multiline) {
                 field.type = 'text';
               }
+              if (field.widgetAttrs.targetName) {
+                field.targetName = field.widgetAttrs.targetName;
+              }
             }
             if (field.type === 'panel' || field.type === 'separator') {
               field.visibleInGrid = false;
