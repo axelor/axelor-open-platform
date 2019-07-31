@@ -1328,6 +1328,8 @@ ui.directive('uiFilterBox', function() {
 
           var field = fields[name];
 
+          if (field.transient) continue;
+
           switch (field.type) {
           case 'integer':
           case 'decimal':
