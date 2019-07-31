@@ -343,8 +343,9 @@ var Formatters = {
 
   "button": function(field, value, context, grid) {
     var elem;
-    var isIcon = field.icon && field.icon.indexOf('fa-') === 0;
-    var css = isIcon ? "slick-icon-button fa " + field.icon : "slick-img-button";
+    var icon = field.icon || (field.widgetAttrs || {}).icon;
+    var isIcon = icon && icon.indexOf('fa-') === 0;
+    var css = isIcon ? "slick-icon-button fa " + icon : "slick-img-button";
     var help = field.help || field.title;
     var handler = grid.scope.handler;
 
@@ -358,8 +359,8 @@ var Formatters = {
         elem += ' title="' + _.escapeHTML(help) + '"';
       }
       elem += '><i class="' + css + '"></i></a>';
-    } else if (field.icon) {
-      elem = '<img class="' + css + '" src="' + field.icon + '"';
+    } else if (icon) {
+      elem = '<img class="' + css + '" src="' + icon + '"';
       if (help) {
         elem += ' title="' + _.escapeHTML(help) + '"';
       }
