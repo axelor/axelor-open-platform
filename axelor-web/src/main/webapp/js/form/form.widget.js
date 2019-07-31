@@ -280,6 +280,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
       }
     });
     scope.$on("on:grid-selection-change", function(e, context) {
+      if (field && field.jsonField) return;
       if (!scope._isDetailsForm) {
         handle(context);
       }
