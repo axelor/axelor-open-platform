@@ -155,7 +155,7 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
   protected void addFormClientIfNotExclusive(Map<String, Map<String, String>> allSettings) {
     if (allSettings.size() == 1) {
       final Map<String, String> settings = allSettings.values().iterator().next();
-      if (!settings.getOrDefault("exclusive", "true").equals("true")) {
+      if (!settings.getOrDefault("exclusive", "false").equals("true")) {
         addFormClient();
       }
     } else {
