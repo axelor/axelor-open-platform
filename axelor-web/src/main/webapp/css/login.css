@@ -180,17 +180,25 @@ body > footer > p a:visited {
   margin-bottom: 8px;
 }
 
-.sso-title {
-  padding-right: 16px;
+#social-buttons {
+  display: flex;
+  flex-direction: column;
+  padding: 18px 22px;
 }
 
-.sso-link {
-  text-decoration: none !important;
+#social-buttons button {
+  display: flex;
+  flex: 1;
+  padding: 8px 10px;
+  font-weight: 600;
+  margin: 4px 0;
 }
 
-.sso-logo {
-  width: 32px;
-  padding-right: 16px;
-  padding-top: 8px;
-  padding-bottom: 8px;
+#social-buttons .social-logo {
+  height: 18px;
+  width: 18px;
+}
+
+#social-buttons .social-title {
+  padding-left: 8px;
 }

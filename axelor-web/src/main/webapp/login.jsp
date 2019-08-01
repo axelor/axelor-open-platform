@@ -102,17 +102,17 @@ List<String> centralClients = AuthPac4jModule.getCentralClients();
         </div>
 
         <% if (!centralClients.isEmpty()) { %>
-	      <div id="sso" class="form-fields text-center">
-	        <span class="title sso-title"><%= loginWith %></span>
-            <% for (String client : centralClients) { %>
-                <%
-                  Map<String, String> info = AuthPac4jModule.getClientInfo(client);
-                  String title = info.get("title");
-                  String icon = info.get("icon");
-                %>
-                <a class="sso-link" href="./?client_name=<%= client %>">
-                  <img class="sso-logo <%= client %>" src="<%= icon %>" alt="<%= title %>" title="<%= title %>"/>
-                </a>
+	      <div id="social-buttons" class="form-fields text-center">
+          <% for (String client : centralClients) { %>
+            <%
+            Map<String, String> info = AuthPac4jModule.getClientInfo(client);
+            String title = info.get("title");
+            String icon = info.get("icon");
+            %>
+            <button class="btn" type="button" data-provider="<%= client %>">
+              <img class="social-logo <%= client %>" src="<%= icon %>" alt="<%= title %>" title="<%= title %>">
+              <div class="social-title"><%= loginWith + " " + title %></div>
+            </button>
             <% } %>
           </div>
         <% } %>
@@ -174,11 +174,16 @@ List<String> centralClients = AuthPac4jModule.getCentralClients();
     <script type="text/javascript">
     $(function () {
 	    if (axelor.browser.msie && !axelor.browser.rv) {
-	    	$('#br-warning').removeClass('hidden');
+	     	$('#br-warning').removeClass('hidden');
 	    }
 	    if ($('#adblock') === undefined || $('#adblock').is(':hidden')) {
-	    	$('#ad-warning').removeClass('hidden');
+	     	$('#ad-warning').removeClass('hidden');
 	    }
+	    
+	    $("#social-buttons").on('click', 'button', function (e) {
+	     var client = $(e.currentTarget).data('provider');
+	     window.location.href = './?client_name=' + client;
+	    });
     });
     </script>
   </body>
