@@ -22,10 +22,12 @@ import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
+import com.axelor.auth.pac4j.AuthPac4jModuleOAuth;
 import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
@@ -38,7 +40,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
+import org.pac4j.core.context.J2EContext;
+import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.profile.ProfileManager;
 
 public class AppInfo {
 
@@ -120,6 +127,23 @@ public class AppInfo {
     Collections.sort(themes);
 
     map.put("application.themes", themes);
+
+    // find OAuth client name
+    if (AuthPac4jModuleOAuth.isEnabled()) {
+      final ProfileManager<CommonProfile> profileManager =
+          new ProfileManager<>(
+              new J2EContext(
+                  Beans.get(HttpServletRequest.class), Beans.get(HttpServletResponse.class)));
+
+      final CommonProfile profile = profileManager.get(true).orElse(null);
+      if (profile != null) {
+        List<String> clients = AuthPac4jModuleOAuth.getCentralClients();
+        String current = profile.getClientName();
+        if (clients.contains(current)) {
+          map.put("oauth.client", profile.getClientName());
+        }
+      }
+    }
 
     return map;
   }

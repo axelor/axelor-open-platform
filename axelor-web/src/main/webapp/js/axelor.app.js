@@ -600,6 +600,11 @@
       var message = _t("Internal Server Error"),
         report = data.data || data, stacktrace = null, cause = null, exception;
 
+      // unauthorized errors are handled separately
+      if (data.status === 401) {
+        return;
+      }
+
       if (report.popup && report.message) {
         return axelor.dialogs.box(report.message, {
           title: report.title

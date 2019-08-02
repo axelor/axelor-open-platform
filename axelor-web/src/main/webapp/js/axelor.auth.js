@@ -75,6 +75,11 @@ angular.module('axelor.auth', []).provider('authService', function() {
   $httpProvider.interceptors.push(['$rootScope', '$q', function($rootScope, $q) {
     return {
       responseError: function error(response) {
+        // redirect to OAuth login page
+        if (response.status === 401 && axelor.config['oauth.client']) {
+          window.location.href = './?client_name=' + axelor.config['oauth.client'];
+          return;
+        }
         if (response.status === 401 || response.status === 502 || (response.status === 0 && !response.data)) {
           var deferred = $q.defer();
           authServiceProvider.pushToBuffer(response.config, deferred);
