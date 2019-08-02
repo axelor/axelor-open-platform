@@ -27,6 +27,7 @@ import com.google.inject.multibindings.Multibinder;
 import io.buji.pac4j.filter.CallbackFilter;
 import io.buji.pac4j.filter.LogoutFilter;
 import io.buji.pac4j.filter.SecurityFilter;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,12 +38,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
+import org.apache.shiro.web.util.WebUtils;
 import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Client;
@@ -217,6 +225,22 @@ public abstract class AuthPac4jModule extends AuthWebModule {
               .map(Client::getName)
               .collect(Collectors.joining(","));
       setClients(clientNames);
+    }
+
+    @Override
+    public void doFilter(
+        ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
+        throws IOException, ServletException {
+      super.doFilter(servletRequest, servletResponse, filterChain);
+
+      // remove client_name query param after oauth login
+      final HttpServletRequest req = (HttpServletRequest) servletRequest;
+      if (AuthPac4jModuleOAuth.isEnabled()
+          && req.getPathInfo() == null
+          && SecurityUtils.getSubject().isAuthenticated()
+          && ("client_name=" + req.getParameter("client_name")).equals(req.getQueryString())) {
+        WebUtils.issueRedirect(servletRequest, servletResponse, "/");
+      }
     }
   }
 }
