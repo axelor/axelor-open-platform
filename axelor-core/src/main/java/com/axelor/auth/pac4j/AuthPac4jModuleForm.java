@@ -24,6 +24,8 @@ import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.inject.Beans;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -37,6 +39,7 @@ import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
+import org.pac4j.core.credentials.extractor.FormExtractor;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
@@ -72,10 +75,46 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
     addFilterChain("/change-password.jsp", ANON);
   }
 
+  private static class JsonExtractor extends FormExtractor {
+
+    public JsonExtractor() {
+      super(Pac4jConstants.USERNAME, Pac4jConstants.PASSWORD);
+    }
+
+    @Override
+    public UsernamePasswordCredentials extract(WebContext context) {
+      return isXHR(context) ? extractJson(context) : super.extract(context);
+    }
+
+    private UsernamePasswordCredentials extractJson(WebContext context) {
+      final Map<?, ?> data;
+      try {
+        data = new ObjectMapper().readValue(context.getRequestContent(), Map.class);
+      } catch (IOException e) {
+        return null;
+      }
+
+      final String username = (String) data.get("username");
+      final String password = (String) data.get("password");
+      if (username == null || password == null) {
+        return null;
+      }
+
+      return new UsernamePasswordCredentials(username, password);
+    }
+
+    private boolean isXHR(WebContext context) {
+      return "XMLHttpRequest".equals(context.getRequestHeader("X-Requested-With"))
+          || "application/json".equals(context.getRequestHeader("Accept"))
+          || "application/json".equals(context.getRequestHeader("Content-Type"));
+    }
+  }
+
   private static class AxelorFormClient extends FormClient {
 
     public AxelorFormClient() {
       super("login.jsp", new AxelorFormAuthenticator());
+      this.setCredentialsExtractor(new JsonExtractor());
     }
 
     @Override

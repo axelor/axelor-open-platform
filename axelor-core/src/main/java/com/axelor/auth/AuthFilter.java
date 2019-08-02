@@ -95,6 +95,11 @@ public class AuthFilter extends FormAuthenticationFilter {
   }
 
   @Override
+  protected boolean isLoginRequest(ServletRequest request, ServletResponse response) {
+    return super.isLoginRequest(request, response) || pathsMatch("/callback", request);
+  }
+
+  @Override
   public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)
       throws ServletException, IOException {
 

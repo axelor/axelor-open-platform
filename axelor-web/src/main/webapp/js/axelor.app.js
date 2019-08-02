@@ -568,7 +568,7 @@
 
       var last = axelor.config["user.login"];
 
-      $http.post('login.jsp', data).then(function(response){
+      $http.post('callback', data).then(function(response){
         authService.loginConfirmed();
         $('#loginWindow form input').val('');
         $('#loginWindow .alert').hide();
