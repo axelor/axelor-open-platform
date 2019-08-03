@@ -24,6 +24,7 @@ import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
+import io.buji.pac4j.engine.ShiroCallbackLogic;
 import io.buji.pac4j.filter.CallbackFilter;
 import io.buji.pac4j.filter.LogoutFilter;
 import io.buji.pac4j.filter.SecurityFilter;
@@ -56,7 +57,11 @@ import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.context.HttpConstants;
+import org.pac4j.core.context.J2EContext;
+import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.Credentials;
+import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.http.client.indirect.FormClient;
 import org.slf4j.Logger;
@@ -165,6 +170,16 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     return securityManager;
   }
 
+  protected static boolean isXHR(WebContext context) {
+    return context instanceof J2EContext && isXHR(((J2EContext) context).getRequest());
+  }
+
+  protected static boolean isXHR(HttpServletRequest request) {
+    return "XMLHttpRequest".equals(request.getHeader("X-Requested-With"))
+        || "application/json".equals(request.getHeader("Accept"))
+        || "application/json".equals(request.getHeader("Content-Type"));
+  }
+
   private static class Pac4jLogoutFilter extends LogoutFilter {
 
     @Inject
@@ -207,6 +222,17 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       }
 
       setDefaultClient(config.getClients().getClients().get(0).getName());
+      setCallbackLogic(
+          new ShiroCallbackLogic<Object, J2EContext>() {
+
+            @Override
+            protected HttpAction redirectToOriginallyRequestedUrl(
+                J2EContext context, String defaultUrl) {
+              return isXHR(context)
+                  ? HttpAction.status(HttpConstants.OK, context)
+                  : super.redirectToOriginallyRequestedUrl(context, defaultUrl);
+            }
+          });
     }
   }
 

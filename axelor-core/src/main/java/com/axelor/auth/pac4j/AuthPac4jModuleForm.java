@@ -34,7 +34,9 @@ import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.credentials.extractor.FormExtractor;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.exception.HttpAction;
+import org.pac4j.core.http.ajax.DefaultAjaxRequestResolver;
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.redirect.RedirectAction;
 import org.pac4j.core.util.CommonHelper;
 import org.pac4j.http.client.indirect.FormClient;
 
@@ -66,6 +68,22 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
     addClient(new AxelorFormClient());
   }
 
+  private static class Pac4jAjaxRequestResolver extends DefaultAjaxRequestResolver {
+
+    @Override
+    public boolean isAjax(WebContext context) {
+      return super.isAjax(context) || isXHR(context);
+    }
+
+    @Override
+    public RedirectAction buildAjaxResponse(String url, WebContext context) {
+      if (isAjax(context) && StringUtils.notBlank(url) && url.equals("login.jsp")) {
+        throw HttpAction.unauthorized(context);
+      }
+      return super.buildAjaxResponse(url, context);
+    }
+  }
+
   private static class JsonExtractor extends FormExtractor {
 
     public JsonExtractor() {
@@ -93,12 +111,6 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
 
       return new UsernamePasswordCredentials(username, password);
     }
-
-    private boolean isXHR(WebContext context) {
-      return "XMLHttpRequest".equals(context.getRequestHeader("X-Requested-With"))
-          || "application/json".equals(context.getRequestHeader("Accept"))
-          || "application/json".equals(context.getRequestHeader("Content-Type"));
-    }
   }
 
   private static class AxelorFormClient extends FormClient {
@@ -106,6 +118,7 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
     public AxelorFormClient() {
       super("login.jsp", new AxelorFormAuthenticator());
       this.setCredentialsExtractor(new JsonExtractor());
+      this.setAjaxRequestResolver(new Pac4jAjaxRequestResolver());
     }
 
     @Override
