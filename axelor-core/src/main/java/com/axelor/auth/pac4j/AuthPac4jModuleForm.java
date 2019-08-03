@@ -17,7 +17,6 @@
  */
 package com.axelor.auth.pac4j;
 
-import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
@@ -26,17 +25,10 @@ import com.axelor.db.JPA;
 import com.axelor.inject.Beans;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import javax.servlet.ServletContext;
-import org.pac4j.core.client.Client;
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.credentials.extractor.FormExtractor;
@@ -63,16 +55,15 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
     addFormClient();
   }
 
-  protected void addFormClient() {
-    final FormClient formClient = new AxelorFormClient();
-    addClient(formClient);
-  }
-
   @Override
   protected void configureAnon() {
     super.configureAnon();
     addFilterChain("/login.jsp", ANON);
     addFilterChain("/change-password.jsp", ANON);
+  }
+
+  protected void addFormClient() {
+    addClient(new AxelorFormClient());
   }
 
   private static class JsonExtractor extends FormExtractor {
@@ -189,66 +180,5 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
       profile.addAttribute(Pac4jConstants.USERNAME, username);
       credentials.setUserProfile(profile);
     }
-  }
-
-  protected void addFormClientIfNotExclusive(Map<String, Map<String, String>> allSettings) {
-    if (allSettings.size() == 1) {
-      final Map<String, String> settings = allSettings.values().iterator().next();
-      if (!settings.getOrDefault("exclusive", "false").equals("true")) {
-        addFormClient();
-      }
-    } else {
-      addFormClient();
-    }
-  }
-
-  protected void addCentralClients(
-      Map<String, Map<String, String>> allSettings,
-      Map<
-              String,
-              Function<Map<String, String>, Client<? extends Credentials, ? extends CommonProfile>>>
-          providers,
-      BiFunction<
-              Map<String, String>, String, Client<? extends Credentials, ? extends CommonProfile>>
-          defaultProvider) {
-
-    for (final Entry<String, Map<String, String>> entry : allSettings.entrySet()) {
-      final String providerName = entry.getKey();
-      final Map<String, String> settings = entry.getValue();
-      final Function<Map<String, String>, Client<? extends Credentials, ? extends CommonProfile>>
-          clientFunc = providers.get(providerName);
-      final Client<? extends Credentials, ? extends CommonProfile> client =
-          clientFunc != null
-              ? clientFunc.apply(settings)
-              : defaultProvider.apply(settings, providerName);
-
-      addClient(client);
-    }
-  }
-
-  protected static Map<String, Map<String, String>> getAllSettings(String prefix) {
-    final Map<String, Map<String, String>> allSettings = new LinkedHashMap<>();
-    final AppSettings settings = AppSettings.get();
-
-    for (final Object key : settings.getProperties().keySet()) {
-      final String keyName = key.toString();
-
-      if (keyName.startsWith(prefix)) {
-        final String[] paramItems = keyName.substring(prefix.length()).split("\\.", 2);
-        if (paramItems.length > 1) {
-          final String providerName = paramItems[0];
-          final String configName = paramItems[1];
-          final String property = settings.get(keyName);
-
-          if (StringUtils.notBlank(property)) {
-            Map<String, String> map =
-                allSettings.computeIfAbsent(providerName, k -> new HashMap<>());
-            map.put(configName, property);
-          }
-        }
-      }
-    }
-
-    return allSettings;
   }
 }

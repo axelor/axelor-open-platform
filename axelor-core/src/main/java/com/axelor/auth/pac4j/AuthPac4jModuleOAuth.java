@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.function.Function;
 import javax.servlet.ServletContext;
 import org.pac4j.core.client.Client;
-import org.pac4j.core.credentials.Credentials;
-import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.GenericOAuth20Client;
 import org.pac4j.oauth.client.GitHubClient;
@@ -36,29 +34,21 @@ import org.pac4j.oauth.client.WechatClient;
 import org.pac4j.oauth.client.WindowsLiveClient;
 import org.pac4j.oauth.client.YahooClient;
 
-public class AuthPac4jModuleOAuth extends AuthPac4jModuleForm {
+public class AuthPac4jModuleOAuth extends AuthPac4jModuleOidc {
 
-  private static final String CONFIG_PREFIX = "auth.oauth.";
-  private static Map<String, Map<String, String>> allSettings;
+  private static Map<String, Map<String, String>> allSettings = getAuthSettings("auth.oauth.");
 
-  private static final Map<
-          String,
-          Function<Map<String, String>, Client<? extends Credentials, ? extends CommonProfile>>>
-      providers =
-          ImmutableMap
-              .<String,
-                  Function<
-                      Map<String, String>, Client<? extends Credentials, ? extends CommonProfile>>>
-                  builder()
-              .put("google", AuthPac4jModuleOAuth::setupGoogle)
-              .put("facebook", AuthPac4jModuleOAuth::setupFacebook)
-              .put("twitter", AuthPac4jModuleOAuth::setupTwitter)
-              .put("yahoo", AuthPac4jModuleOAuth::setupYahoo)
-              .put("linkedin", AuthPac4jModuleOAuth::setupLinkedIn)
-              .put("windowslive", AuthPac4jModuleOAuth::setupWindowsLive)
-              .put("wechat", AuthPac4jModuleOAuth::setupWeChat)
-              .put("github", AuthPac4jModuleOAuth::setupGitHub)
-              .build();
+  private final Map<String, Function<Map<String, String>, Client<?, ?>>> providers =
+      ImmutableMap.<String, Function<Map<String, String>, Client<?, ?>>>builder()
+          .put("google", this::setupGoogle)
+          .put("facebook", this::setupFacebook)
+          .put("twitter", this::setupTwitter)
+          .put("yahoo", this::setupYahoo)
+          .put("linkedin", this::setupLinkedIn)
+          .put("windowslive", this::setupWindowsLive)
+          .put("wechat", this::setupWeChat)
+          .put("github", this::setupGitHub)
+          .build();
 
   public AuthPac4jModuleOAuth(ServletContext servletContext) {
     super(servletContext);
@@ -67,11 +57,11 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleForm {
   @Override
   protected void configureClients() {
     addFormClientIfNotExclusive(allSettings);
-    addCentralClients(allSettings, providers, AuthPac4jModuleOAuth::setupGeneric);
+    addCentralClients(allSettings, providers);
   }
 
-  private static Client<? extends Credentials, ? extends CommonProfile> setupGeneric(
-      Map<String, String> settings, String providerName) {
+  @Override
+  protected Client<?, ?> setupGeneric(Map<String, String> settings, String providerName) {
     final String key = settings.get("key");
     final String secret = settings.get("secret");
     final String authUrl = settings.get("auth.url");
@@ -80,7 +70,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleForm {
 
     final String name = settings.getOrDefault("name", providerName);
     final String title = settings.getOrDefault("title", "OAuth 2.0");
-    final String icon = settings.getOrDefault("icon", "img/signin/oauth2.png");
+    final String icon = settings.getOrDefault("icon", "img/signin/oauth.svg");
 
     final GenericOAuth20Client client = new GenericOAuth20Client();
     client.setName(name);
@@ -111,8 +101,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleForm {
     return client;
   }
 
-  private static Client<? extends Credentials, ? extends CommonProfile> setupGoogle(
-      Map<String, String> settings) {
+  private Client<?, ?> setupGoogle(Map<String, String> settings) {
     final String key = settings.get("key");
     final String secret = settings.get("secret");
     final String title = settings.getOrDefault("title", "Google");
@@ -123,8 +112,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleForm {
     return client;
   }
 
-  private static Client<? extends Credentials, ? extends CommonProfile> setupFacebook(
-      Map<String, String> settings) {
+  private Client<?, ?> setupFacebook(Map<String, String> settings) {
     final String key = settings.get("key");
     final String secret = settings.get("secret");
     final String title = settings.getOrDefault("title", "Facebook");
@@ -135,8 +123,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleForm {
     return client;
   }
 
-  private static Client<? extends Credentials, ? extends CommonProfile> setupTwitter(
-      Map<String, String> settings) {
+  private Client<?, ?> setupTwitter(Map<String, String> settings) {
     final String key = settings.get("key");
     final String secret = settings.get("secret");
     final String title = settings.getOrDefault("title", "Twitter");
@@ -148,8 +135,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleForm {
     return client;
   }
 
-  private static Client<? extends Credentials, ? extends CommonProfile> setupYahoo(
-      Map<String, String> settings) {
+  private Client<?, ?> setupYahoo(Map<String, String> settings) {
     final String key = settings.get("key");
     final String secret = settings.get("secret");
     final String title = settings.getOrDefault("title", "Yahoo!");
@@ -160,8 +146,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleForm {
     return client;
   }
 
-  private static Client<? extends Credentials, ? extends CommonProfile> setupLinkedIn(
-      Map<String, String> settings) {
+  private Client<?, ?> setupLinkedIn(Map<String, String> settings) {
     final String key = settings.get("key");
     final String secret = settings.get("secret");
     final String title = settings.getOrDefault("title", "LinkedIn");
@@ -172,8 +157,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleForm {
     return client;
   }
 
-  private static Client<? extends Credentials, ? extends CommonProfile> setupWindowsLive(
-      Map<String, String> settings) {
+  private Client<?, ?> setupWindowsLive(Map<String, String> settings) {
     final String key = settings.get("key");
     final String secret = settings.get("secret");
     final String title = settings.getOrDefault("title", "Windows Live");
@@ -184,8 +168,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleForm {
     return client;
   }
 
-  private static Client<? extends Credentials, ? extends CommonProfile> setupWeChat(
-      Map<String, String> settings) {
+  private Client<?, ?> setupWeChat(Map<String, String> settings) {
     final String key = settings.get("key");
     final String secret = settings.get("secret");
     final String title = settings.getOrDefault("title", "WeChat");
@@ -196,8 +179,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleForm {
     return client;
   }
 
-  private static Client<? extends Credentials, ? extends CommonProfile> setupGitHub(
-      Map<String, String> settings) {
+  private Client<?, ?> setupGitHub(Map<String, String> settings) {
     final String key = settings.get("key");
     final String secret = settings.get("secret");
     final String title = settings.getOrDefault("title", "GitHub");
@@ -209,10 +191,6 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleForm {
   }
 
   public static boolean isEnabled() {
-    if (allSettings == null) {
-      allSettings = getAllSettings(CONFIG_PREFIX);
-    }
-
     return !allSettings.isEmpty();
   }
 }

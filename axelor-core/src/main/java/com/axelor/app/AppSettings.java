@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -183,28 +184,20 @@ public final class AppSettings {
 
     @Override
     public synchronized boolean remove(Object key, Object value) {
-      boolean removed = super.remove(key, value);
-
-      if (removed) {
-        keys.remove(key);
-      }
-
-      return removed;
+      keys.remove(key);
+      return super.remove(key, value);
     }
 
     @Override
     public Set<Object> keySet() {
-      return keys;
+      return Collections.unmodifiableSet(keys);
     }
 
     @Override
-    public synchronized boolean equals(Object o) {
-      return super.equals(o);
-    }
-
-    @Override
-    public synchronized int hashCode() {
-      return super.hashCode();
+    public Set<String> stringPropertyNames() {
+      return keys.stream()
+          .map(Object::toString)
+          .collect(Collectors.toCollection(LinkedHashSet::new));
     }
   }
 }

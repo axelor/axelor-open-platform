@@ -17,15 +17,17 @@
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.app.AppSettings;
 import com.axelor.common.StringUtils;
 import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import javax.servlet.ServletContext;
 import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.client.Client;
-import org.pac4j.core.credentials.Credentials;
-import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.http.client.direct.HeaderClient;
 import org.pac4j.oidc.client.AzureAdClient;
 import org.pac4j.oidc.client.GoogleOidcClient;
@@ -38,22 +40,14 @@ import org.pac4j.oidc.credentials.authenticator.UserInfoOidcAuthenticator;
 
 public class AuthPac4jModuleOidc extends AuthPac4jModuleForm {
 
-  private static final String CONFIG_PREFIX = "auth.oidc.";
-  private static Map<String, Map<String, String>> allSettings;
+  private static Map<String, Map<String, String>> allSettings = getAuthSettings("auth.oidc.");
 
-  private static final Map<
-          String,
-          Function<Map<String, String>, Client<? extends Credentials, ? extends CommonProfile>>>
-      providers =
-          ImmutableMap
-              .<String,
-                  Function<
-                      Map<String, String>, Client<? extends Credentials, ? extends CommonProfile>>>
-                  builder()
-              .put("google", AuthPac4jModuleOidc::setupGoogle)
-              .put("azuread", AuthPac4jModuleOidc::setupAzureAd)
-              .put("keycloak", AuthPac4jModuleOidc::setupKeycloak)
-              .build();
+  private final Map<String, Function<Map<String, String>, Client<?, ?>>> providers =
+      ImmutableMap.<String, Function<Map<String, String>, Client<?, ?>>>builder()
+          .put("google", this::setupGoogle)
+          .put("azuread", this::setupAzureAd)
+          .put("keycloak", this::setupKeycloak)
+          .build();
 
   public AuthPac4jModuleOidc(ServletContext servletContext) {
     super(servletContext);
@@ -62,12 +56,58 @@ public class AuthPac4jModuleOidc extends AuthPac4jModuleForm {
   @Override
   protected void configureClients() {
     addFormClientIfNotExclusive(allSettings);
-    addCentralClients(allSettings, providers, AuthPac4jModuleOidc::setupGeneric);
+    addCentralClients(allSettings, providers);
   }
 
-  private static Client<? extends Credentials, ? extends CommonProfile> setupGeneric(
-      Map<String, String> settings, String providerName) {
+  protected static Map<String, Map<String, String>> getAuthSettings(String prefix) {
+    final Map<String, Map<String, String>> all = new LinkedHashMap<>();
+    final AppSettings settings = AppSettings.get();
 
+    for (String key : settings.getProperties().stringPropertyNames()) {
+      if (key.startsWith(prefix)) {
+        final String[] parts = key.substring(prefix.length()).split("\\.", 2);
+        if (parts.length > 1) {
+          final String provider = parts[0];
+          final String config = parts[1];
+          final String value = settings.get(key);
+          if (StringUtils.notBlank(value)) {
+            Map<String, String> map = all.computeIfAbsent(provider, k -> new HashMap<>());
+            map.put(config, value);
+          }
+        }
+      }
+    }
+
+    return all;
+  }
+
+  protected void addFormClientIfNotExclusive(Map<String, Map<String, String>> allSettings) {
+    if (allSettings.size() == 1
+        && allSettings
+            .values()
+            .iterator()
+            .next()
+            .getOrDefault("exclusive", "false")
+            .equals("true")) {
+      return;
+    }
+    addFormClient();
+  }
+
+  protected void addCentralClients(
+      Map<String, Map<String, String>> allSettings,
+      Map<String, Function<Map<String, String>, Client<?, ?>>> providers) {
+    for (final Entry<String, Map<String, String>> entry : allSettings.entrySet()) {
+      final String provider = entry.getKey();
+      final Map<String, String> settings = entry.getValue();
+      final Function<Map<String, String>, Client<?, ?>> setup = providers.get(provider);
+      final Client<?, ?> client =
+          setup != null ? setup.apply(settings) : setupGeneric(settings, provider);
+      addClient(client);
+    }
+  }
+
+  protected Client<?, ?> setupGeneric(Map<String, String> settings, String providerName) {
     final String clientId = settings.get("client.id");
     final String secret = settings.get("secret");
     final String discoveryURI = settings.get("discovery.uri");
@@ -80,7 +120,7 @@ public class AuthPac4jModuleOidc extends AuthPac4jModuleForm {
 
     final String name = settings.getOrDefault("name", providerName);
     final String title = settings.getOrDefault("title", "OpenID Connect");
-    final String icon = settings.getOrDefault("icon", "img/signin/openid.png");
+    final String icon = settings.getOrDefault("icon", "img/signin/openid.svg");
 
     final OidcConfiguration config = new OidcConfiguration();
     config.setClientId(clientId);
@@ -103,7 +143,7 @@ public class AuthPac4jModuleOidc extends AuthPac4jModuleForm {
       config.setScope(scope);
     }
 
-    final BaseClient<? extends Credentials, ? extends CommonProfile> client;
+    final BaseClient<?, ?> client;
 
     if (StringUtils.notBlank(headerName) && StringUtils.notBlank(prefixHeader)) {
       final UserInfoOidcAuthenticator authenticator = new UserInfoOidcAuthenticator(config);
@@ -117,8 +157,7 @@ public class AuthPac4jModuleOidc extends AuthPac4jModuleForm {
     return client;
   }
 
-  private static Client<? extends Credentials, ? extends CommonProfile> setupGoogle(
-      Map<String, String> settings) {
+  private Client<?, ?> setupGoogle(Map<String, String> settings) {
     final String clientId = settings.get("client.id");
     final String secret = settings.get("secret");
 
@@ -134,8 +173,7 @@ public class AuthPac4jModuleOidc extends AuthPac4jModuleForm {
     return client;
   }
 
-  private static Client<? extends Credentials, ? extends CommonProfile> setupAzureAd(
-      Map<String, String> settings) {
+  private Client<?, ?> setupAzureAd(Map<String, String> settings) {
     final String clientId = settings.get("client.id");
     final String secret = settings.get("secret");
     final String tenant = settings.get("tenant");
@@ -153,8 +191,7 @@ public class AuthPac4jModuleOidc extends AuthPac4jModuleForm {
     return client;
   }
 
-  private static Client<? extends Credentials, ? extends CommonProfile> setupKeycloak(
-      Map<String, String> settings) {
+  private Client<?, ?> setupKeycloak(Map<String, String> settings) {
     final String clientId = settings.get("client.id");
     final String secret = settings.get("secret");
     final String realm = settings.get("realm");
@@ -175,10 +212,6 @@ public class AuthPac4jModuleOidc extends AuthPac4jModuleForm {
   }
 
   public static boolean isEnabled() {
-    if (allSettings == null) {
-      allSettings = getAllSettings(CONFIG_PREFIX);
-    }
-
     return !allSettings.isEmpty();
   }
 }
