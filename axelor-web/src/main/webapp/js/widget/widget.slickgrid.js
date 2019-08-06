@@ -349,7 +349,11 @@ var Formatters = {
     var help = field.help || field.title;
     var handler = grid.scope.handler;
 
-    if (field.readonlyIf && axelor.$eval(grid.scope, field.readonlyIf, _.extend({}, handler._context, context))) {
+    var rec = context;
+    if (field.jsonField && rec) {
+      rec = angular.fromJson(rec[field.jsonField]);
+    }
+    if (field.readonlyIf && axelor.$eval(grid.scope, field.readonlyIf, _.extend({}, handler._context, rec))) {
       css += " readonly disabled";
     }
 
