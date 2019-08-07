@@ -34,9 +34,10 @@ import org.pac4j.oauth.client.WechatClient;
 import org.pac4j.oauth.client.WindowsLiveClient;
 import org.pac4j.oauth.client.YahooClient;
 
-public class AuthPac4jModuleOAuth extends AuthPac4jModuleOidc {
+public class AuthPac4jModuleOAuth extends AuthPac4jModuleMultiClient {
 
-  private static Map<String, Map<String, String>> allSettings = getAuthSettings("auth.oauth.");
+  private static final Map<String, Map<String, String>> allSettings =
+      getAuthSettings("auth.oauth.");
 
   private final Map<String, Function<Map<String, String>, Client<?, ?>>> providers =
       ImmutableMap.<String, Function<Map<String, String>, Client<?, ?>>>builder()

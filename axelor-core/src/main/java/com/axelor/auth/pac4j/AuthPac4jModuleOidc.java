@@ -17,13 +17,9 @@
  */
 package com.axelor.auth.pac4j;
 
-import com.axelor.app.AppSettings;
 import com.axelor.common.StringUtils;
 import com.google.common.collect.ImmutableMap;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Function;
 import javax.servlet.ServletContext;
 import org.pac4j.core.client.BaseClient;
@@ -38,9 +34,9 @@ import org.pac4j.oidc.config.KeycloakOidcConfiguration;
 import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.oidc.credentials.authenticator.UserInfoOidcAuthenticator;
 
-public class AuthPac4jModuleOidc extends AuthPac4jModuleForm {
+public class AuthPac4jModuleOidc extends AuthPac4jModuleMultiClient {
 
-  private static Map<String, Map<String, String>> allSettings = getAuthSettings("auth.oidc.");
+  private static final Map<String, Map<String, String>> allSettings = getAuthSettings("auth.oidc.");
 
   private final Map<String, Function<Map<String, String>, Client<?, ?>>> providers =
       ImmutableMap.<String, Function<Map<String, String>, Client<?, ?>>>builder()
@@ -59,54 +55,7 @@ public class AuthPac4jModuleOidc extends AuthPac4jModuleForm {
     addCentralClients(allSettings, providers);
   }
 
-  protected static Map<String, Map<String, String>> getAuthSettings(String prefix) {
-    final Map<String, Map<String, String>> all = new LinkedHashMap<>();
-    final AppSettings settings = AppSettings.get();
-
-    for (String key : settings.getProperties().stringPropertyNames()) {
-      if (key.startsWith(prefix)) {
-        final String[] parts = key.substring(prefix.length()).split("\\.", 2);
-        if (parts.length > 1) {
-          final String provider = parts[0];
-          final String config = parts[1];
-          final String value = settings.get(key);
-          if (StringUtils.notBlank(value)) {
-            Map<String, String> map = all.computeIfAbsent(provider, k -> new HashMap<>());
-            map.put(config, value);
-          }
-        }
-      }
-    }
-
-    return all;
-  }
-
-  protected void addFormClientIfNotExclusive(Map<String, Map<String, String>> allSettings) {
-    if (allSettings.size() == 1
-        && allSettings
-            .values()
-            .iterator()
-            .next()
-            .getOrDefault("exclusive", "false")
-            .equals("true")) {
-      return;
-    }
-    addFormClient();
-  }
-
-  protected void addCentralClients(
-      Map<String, Map<String, String>> allSettings,
-      Map<String, Function<Map<String, String>, Client<?, ?>>> providers) {
-    for (final Entry<String, Map<String, String>> entry : allSettings.entrySet()) {
-      final String provider = entry.getKey();
-      final Map<String, String> settings = entry.getValue();
-      final Function<Map<String, String>, Client<?, ?>> setup = providers.get(provider);
-      final Client<?, ?> client =
-          setup != null ? setup.apply(settings) : setupGeneric(settings, provider);
-      addClient(client);
-    }
-  }
-
+  @Override
   protected Client<?, ?> setupGeneric(Map<String, String> settings, String providerName) {
     final String clientId = settings.get("client.id");
     final String secret = settings.get("secret");
@@ -178,7 +127,7 @@ public class AuthPac4jModuleOidc extends AuthPac4jModuleForm {
     final String secret = settings.get("secret");
     final String tenant = settings.get("tenant");
 
-    final String title = settings.getOrDefault("title", "Azure AD");
+    final String title = settings.getOrDefault("title", "Azure Active Directory");
     final String icon = settings.getOrDefault("icon", "img/signin/microsoft.svg");
 
     final AzureAdOidcConfiguration config = new AzureAdOidcConfiguration();

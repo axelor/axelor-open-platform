@@ -351,9 +351,21 @@
         if (!response.config || !response.config.silent) {
           onHttpStop();
         }
-        if (response.data && response.data.status === -1) {
-          $rootScope.$broadcast('event:http-error', response.data);
-          return $q.reject(response);
+        if (response.data) {
+          if (response.data.status === -1) { // STATUS_FAILURE
+            $rootScope.$broadcast('event:http-error', response.data);
+            return $q.reject(response);
+          }
+          if (response.data.status === -7) { // STATUS_LOGIN_REQUIRED
+            if (axelor.config['auth.central.client']) {
+              // redirect to central login page
+              window.location.href = './?client_name=' + axelor.config['auth.central.client'];
+            } else if (!response.config || !response.config.silent) {
+              // ajax login
+              $rootScope.$broadcast('event:auth-loginRequired', response.data);
+            }
+            return $q.reject(response);
+          }
         }
         return response;
       },

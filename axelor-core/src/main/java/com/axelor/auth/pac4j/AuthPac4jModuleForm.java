@@ -42,8 +42,8 @@ import org.pac4j.http.client.indirect.FormClient;
 
 public class AuthPac4jModuleForm extends AuthPac4jModule {
 
-  private static final String INCORRECT_CREDENTIALS = /*$$(*/ "Wrong username or password"; /*)*/;
-  private static final String WRONG_CURRENT_PASSWORD = /*$$(*/ "Wrong current password"; /*)*/;
+  private static final String INCORRECT_CREDENTIALS = /*$$(*/ "Wrong username or password" /*)*/;
+  private static final String WRONG_CURRENT_PASSWORD = /*$$(*/ "Wrong current password" /*)*/;
   private static final String CHANGE_PASSWORD = /*$$(*/ "Please change your password." /*)*/;
 
   private static final String NEW_PASSWORD_PARAMETER = "newPassword";
@@ -68,57 +68,47 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
     addClient(new AxelorFormClient());
   }
 
-  private static class Pac4jAjaxRequestResolver extends DefaultAjaxRequestResolver {
-
-    @Override
-    public boolean isAjax(WebContext context) {
-      return super.isAjax(context) || isXHR(context);
-    }
-
-    @Override
-    public RedirectAction buildAjaxResponse(String url, WebContext context) {
-      if (isAjax(context) && StringUtils.notBlank(url) && url.equals("login.jsp")) {
-        throw HttpAction.unauthorized(context);
-      }
-      return super.buildAjaxResponse(url, context);
-    }
-  }
-
-  private static class JsonExtractor extends FormExtractor {
-
-    public JsonExtractor() {
-      super(Pac4jConstants.USERNAME, Pac4jConstants.PASSWORD);
-    }
-
-    @Override
-    public UsernamePasswordCredentials extract(WebContext context) {
-      return isXHR(context) ? extractJson(context) : super.extract(context);
-    }
-
-    private UsernamePasswordCredentials extractJson(WebContext context) {
-      final Map<?, ?> data;
-      try {
-        data = new ObjectMapper().readValue(context.getRequestContent(), Map.class);
-      } catch (IOException e) {
-        return null;
-      }
-
-      final String username = (String) data.get("username");
-      final String password = (String) data.get("password");
-      if (username == null || password == null) {
-        return null;
-      }
-
-      return new UsernamePasswordCredentials(username, password);
-    }
-  }
-
   private static class AxelorFormClient extends FormClient {
 
     public AxelorFormClient() {
       super("login.jsp", new AxelorFormAuthenticator());
       this.setCredentialsExtractor(new JsonExtractor());
       this.setAjaxRequestResolver(new Pac4jAjaxRequestResolver());
+    }
+
+    @Override
+    protected UsernamePasswordCredentials retrieveCredentials(final WebContext context) {
+      CommonHelper.assertNotNull("credentialsExtractor", getCredentialsExtractor());
+      CommonHelper.assertNotNull("authenticator", getAuthenticator());
+
+      String username = context.getRequestParameter(getUsernameParameter());
+      final UsernamePasswordCredentials credentials;
+      try {
+        // retrieve credentials
+        credentials = getCredentialsExtractor().extract(context);
+        logger.debug("usernamePasswordCredentials: {}", credentials);
+        if (credentials == null) {
+          throw handleInvalidCredentials(
+              context,
+              username,
+              "Username and password cannot be blank -> return to the form with error",
+              MISSING_FIELD_ERROR);
+        }
+        // username in AJAX request
+        if (username == null) {
+          username = credentials.getUsername();
+        }
+        // validate credentials
+        getAuthenticator().validate(credentials, context);
+      } catch (final CredentialsException e) {
+        throw handleInvalidCredentials(
+            context,
+            username,
+            "Credentials validation fails -> return to the form with error",
+            computeErrorMessage(e));
+      }
+
+      return credentials;
     }
 
     @Override
@@ -192,6 +182,51 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
       profile.setId(username);
       profile.addAttribute(Pac4jConstants.USERNAME, username);
       credentials.setUserProfile(profile);
+    }
+  }
+
+  private static class Pac4jAjaxRequestResolver extends DefaultAjaxRequestResolver {
+
+    @Override
+    public boolean isAjax(WebContext context) {
+      return super.isAjax(context) || isXHR(context);
+    }
+
+    @Override
+    public RedirectAction buildAjaxResponse(String url, WebContext context) {
+      if (isAjax(context) && StringUtils.notBlank(url) && url.equals("login.jsp")) {
+        throw HttpAction.unauthorized(context);
+      }
+      return super.buildAjaxResponse(url, context);
+    }
+  }
+
+  private static class JsonExtractor extends FormExtractor {
+
+    public JsonExtractor() {
+      super(Pac4jConstants.USERNAME, Pac4jConstants.PASSWORD);
+    }
+
+    @Override
+    public UsernamePasswordCredentials extract(WebContext context) {
+      return isXHR(context) ? extractJson(context) : super.extract(context);
+    }
+
+    private UsernamePasswordCredentials extractJson(WebContext context) {
+      final Map<?, ?> data;
+      try {
+        data = new ObjectMapper().readValue(context.getRequestContent(), Map.class);
+      } catch (IOException e) {
+        return null;
+      }
+
+      final String username = (String) data.get("username");
+      final String password = (String) data.get("password");
+      if (username == null || password == null) {
+        return null;
+      }
+
+      return new UsernamePasswordCredentials(username, password);
     }
   }
 }

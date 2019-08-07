@@ -23,9 +23,9 @@
 <%@ page language="java" session="true" %>
 <%@ page import="java.util.Calendar" %>
 <%@ page import="java.util.Date" %>
-<%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Map.Entry"%>
+<%@ page import="java.util.Set" %>
 <%@ page import="java.util.function.Function"%>
 <%@ page import="org.pac4j.http.client.indirect.FormClient" %>
 <%@ page import="com.axelor.i18n.I18n" %>
@@ -73,7 +73,7 @@ String tenantId = (String) session.getAttribute("tenantId");
 AppSettings settings = AppSettings.get();
 String callbackUrl = settings.get(AuthPac4jModule.CONFIG_AUTH_CALLBACK_URL, "");
 
-List<String> centralClients = AuthPac4jModule.getCentralClients();
+Set<String> centralClients = AuthPac4jModule.getCentralClients();
 %>
 <!DOCTYPE html>
 <html>

@@ -31,10 +31,8 @@ import org.pac4j.cas.config.CasConfiguration;
 import org.pac4j.cas.config.CasProtocol;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.http.url.UrlResolver;
 import org.pac4j.core.logout.handler.LogoutHandler;
-import org.pac4j.core.profile.CommonProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,7 +157,7 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
       }
     }
 
-    final Client<? extends Credentials, ? extends CommonProfile> client;
+    final Client<?, ?> client;
     switch (clientType) {
       case "direct":
         client = new DirectCasClient(casConfig);

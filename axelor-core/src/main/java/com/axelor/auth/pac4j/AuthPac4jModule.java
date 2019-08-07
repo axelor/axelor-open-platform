@@ -33,6 +33,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +61,6 @@ import org.pac4j.core.config.Config;
 import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.http.client.indirect.FormClient;
@@ -84,7 +84,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   @SuppressWarnings("rawtypes")
   private List<Client> clientList = new ArrayList<>();
 
-  private static final List<String> centralClientNames = new ArrayList<>();
+  private static final Set<String> centralClientNames = new LinkedHashSet<>();
 
   private static final Map<String, Map<String, String>> clientInfo = new HashMap<>();
 
@@ -139,13 +139,13 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     logger.info("Added local client: {}", client.getName());
   }
 
-  protected void addClient(Client<? extends Credentials, ? extends CommonProfile> client) {
+  protected void addClient(Client<?, ?> client) {
     clientList.add(client);
     centralClientNames.add(client.getName());
     logger.info("Added central client: {}", client.getName());
   }
 
-  public static List<String> getCentralClients() {
+  public static Set<String> getCentralClients() {
     return centralClientNames;
   }
 
@@ -234,6 +234,20 @@ public abstract class AuthPac4jModule extends AuthWebModule {
             }
           });
     }
+
+    @Override
+    public void doFilter(
+        ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
+        throws IOException, ServletException {
+      super.doFilter(servletRequest, servletResponse, filterChain);
+
+      // remove client_name query param after central login
+      final HttpServletRequest req = (HttpServletRequest) servletRequest;
+
+      if (SecurityUtils.getSubject().isAuthenticated() && req.getParameter("client_name") != null) {
+        WebUtils.issueRedirect(servletRequest, servletResponse, "/");
+      }
+    }
   }
 
   private static class Pac4jSecurityFilter extends SecurityFilter {
@@ -251,22 +265,6 @@ public abstract class AuthPac4jModule extends AuthWebModule {
               .map(Client::getName)
               .collect(Collectors.joining(","));
       setClients(clientNames);
-    }
-
-    @Override
-    public void doFilter(
-        ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
-        throws IOException, ServletException {
-      super.doFilter(servletRequest, servletResponse, filterChain);
-
-      // remove client_name query param after oauth login
-      final HttpServletRequest req = (HttpServletRequest) servletRequest;
-      if (AuthPac4jModuleOAuth.isEnabled()
-          && req.getPathInfo() == null
-          && SecurityUtils.getSubject().isAuthenticated()
-          && ("client_name=" + req.getParameter("client_name")).equals(req.getQueryString())) {
-        WebUtils.issueRedirect(servletRequest, servletResponse, "/");
-      }
     }
   }
 }

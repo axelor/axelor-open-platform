@@ -38,6 +38,7 @@ import javax.validation.ConstraintViolationException;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.authz.UnauthenticatedException;
 import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,7 +128,12 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     report.put("message", message);
 
     response.setData(report);
-    response.setStatus(Response.STATUS_FAILURE);
+
+    if (e instanceof UnauthenticatedException) {
+      response.setStatus(Response.STATUS_LOGIN_REQUIRED);
+    } else {
+      response.setStatus(Response.STATUS_FAILURE);
+    }
 
     log.error("Authorization Error: {}", e.getMessage());
     return response;

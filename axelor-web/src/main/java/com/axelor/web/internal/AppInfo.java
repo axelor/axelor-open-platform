@@ -22,7 +22,7 @@ import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
-import com.axelor.auth.pac4j.AuthPac4jModuleOAuth;
+import com.axelor.auth.pac4j.AuthPac4jModule;
 import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
 import com.axelor.db.mapper.Mapper;
@@ -128,21 +128,17 @@ public class AppInfo {
 
     map.put("application.themes", themes);
 
-    // find OAuth client name
-    if (AuthPac4jModuleOAuth.isEnabled()) {
+    // find central client name
+    if (AuthPac4jModule.isEnabled()) {
       final ProfileManager<CommonProfile> profileManager =
           new ProfileManager<>(
               new J2EContext(
                   Beans.get(HttpServletRequest.class), Beans.get(HttpServletResponse.class)));
 
-      final CommonProfile profile = profileManager.get(true).orElse(null);
-      if (profile != null) {
-        List<String> clients = AuthPac4jModuleOAuth.getCentralClients();
-        String current = profile.getClientName();
-        if (clients.contains(current)) {
-          map.put("oauth.client", profile.getClientName());
-        }
-      }
+      profileManager
+          .get(true)
+          .filter(profile -> AuthPac4jModule.getCentralClients().contains(profile.getClientName()))
+          .ifPresent(profile -> map.put("auth.central.client", profile.getClientName()));
     }
 
     return map;
