@@ -56,7 +56,7 @@ String warningBrowser = T.apply("Update your browser!");
 String warningAdblock = T.apply("Adblocker detected!");
 String warningAdblock2 = T.apply("Please disable the adblocker as it may slow down the application.");
 
-String loginWith = T.apply("Log in with");
+String loginWith = T.apply("Log in with %s");
 
 int year = Calendar.getInstance().get(Calendar.YEAR);
 String copyright = String.format("&copy; 2005 - %s Axelor. All Rights Reserved.", year);
@@ -111,7 +111,7 @@ List<String> centralClients = AuthPac4jModule.getCentralClients();
             %>
             <button class="btn" type="button" data-provider="<%= client %>">
               <img class="social-logo <%= client %>" src="<%= icon %>" alt="<%= title %>" title="<%= title %>">
-              <div class="social-title"><%= loginWith + " " + title %></div>
+              <div class="social-title"><%= String.format(loginWith, title) %></div>
             </button>
             <% } %>
           </div>
