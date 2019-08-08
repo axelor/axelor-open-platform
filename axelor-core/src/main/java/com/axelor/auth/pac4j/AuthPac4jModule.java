@@ -19,9 +19,11 @@ package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthWebModule;
+import com.axelor.common.StringUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Key;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
 import io.buji.pac4j.engine.ShiroCallbackLogic;
@@ -36,7 +38,9 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -88,6 +92,8 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
   private static final Map<String, Map<String, String>> clientInfo = new HashMap<>();
 
+  private static String callbackUrl;
+
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -113,19 +119,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
         Multibinder.newSetBinder(binder(), AuthenticationListener.class);
     listenerMultibinder.addBinding().to(AuthPac4jListener.class);
 
-    final AppSettings settings = AppSettings.get();
-    String callbackUrl = settings.get(CONFIG_AUTH_CALLBACK_URL, null);
-
-    // Backward-compatible CAS configuration
-    if (callbackUrl == null && AuthPac4jModuleCas.isEnabled()) {
-      callbackUrl = settings.get(AuthPac4jModuleCas.CONFIG_CAS_SERVICE, null);
-    }
-
-    final Clients clients = new Clients(callbackUrl, clientList);
-    final Authorizer<CommonProfile> authorizer = new RequireAnyRoleAuthorizer<>(ROLE_HAS_USER);
-    final Config config = new Config(clients, ImmutableMap.of("auth", authorizer));
-
-    bind(Config.class).toInstance(config);
+    bind(ConfigSupplier.class);
     bindRealm().to(AuthPac4jRealm.class);
     addFilterChain("/logout", Key.get(Pac4jLogoutFilter.class));
     addFilterChain("/callback", Key.get(Pac4jCallbackFilter.class));
@@ -149,9 +143,43 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     return centralClientNames;
   }
 
+  @Provides
+  @SuppressWarnings("rawtypes")
+  public List<Client> getClientList() {
+    return clientList;
+  }
+
+  public static String getCallbackUrl() {
+    if (callbackUrl == null) {
+      if (isEnabled()) {
+        final AppSettings settings = AppSettings.get();
+        callbackUrl = settings.get(CONFIG_AUTH_CALLBACK_URL, null);
+
+        // Backward-compatible CAS configuration
+        if (StringUtils.isBlank(callbackUrl) && AuthPac4jModuleCas.isEnabled()) {
+          callbackUrl = settings.get(AuthPac4jModuleCas.CONFIG_CAS_SERVICE, null);
+        }
+
+        if (StringUtils.isBlank(callbackUrl)) {
+          final String baseUrl =
+              Optional.ofNullable(settings.getBaseURL())
+                  .orElseThrow(IllegalStateException::new)
+                  .replaceAll("/+$", "");
+          callbackUrl = baseUrl + "/callback";
+        }
+      } else {
+        callbackUrl = "";
+      }
+    }
+
+    return callbackUrl;
+  }
+
   public static boolean isEnabled() {
-    final AppSettings settings = AppSettings.get();
-    return settings.get(CONFIG_AUTH_CALLBACK_URL, null) != null;
+    return AuthPac4jModuleOidc.isEnabled()
+        || AuthPac4jModuleOAuth.isEnabled()
+        || AuthPac4jModuleSaml.isEnabled()
+        || AuthPac4jModuleCas.isEnabled();
   }
 
   @Override
@@ -180,17 +208,54 @@ public abstract class AuthPac4jModule extends AuthWebModule {
         || "application/json".equals(request.getHeader("Content-Type"));
   }
 
+  @Singleton
+  private static class ConfigSupplier implements Supplier<Config> {
+    private static Config config;
+
+    @Inject
+    public ConfigSupplier(@SuppressWarnings("rawtypes") List<Client> clientList) {
+      if (config != null) {
+        return;
+      }
+
+      final AppSettings settings = AppSettings.get();
+      String callbackUrl = settings.get(CONFIG_AUTH_CALLBACK_URL, null);
+
+      // Backward-compatible CAS configuration
+      if (StringUtils.isBlank(callbackUrl) && AuthPac4jModuleCas.isEnabled()) {
+        callbackUrl = settings.get(AuthPac4jModuleCas.CONFIG_CAS_SERVICE, null);
+      }
+
+      if (StringUtils.isBlank(callbackUrl)) {
+        final String baseUrl =
+            Optional.ofNullable(settings.getBaseURL()).orElse("").replaceAll("/+$", "");
+        callbackUrl = baseUrl + "/callback";
+      }
+
+      final Clients clients = new Clients(callbackUrl, clientList);
+      final Authorizer<CommonProfile> authorizer = new RequireAnyRoleAuthorizer<>(ROLE_HAS_USER);
+
+      config = new Config(clients, ImmutableMap.of("auth", authorizer));
+    }
+
+    @Override
+    public Config get() {
+      return config;
+    }
+  }
+
   private static class Pac4jLogoutFilter extends LogoutFilter {
 
     @Inject
-    public Pac4jLogoutFilter(Config config) {
+    public Pac4jLogoutFilter(ConfigSupplier configSupplier) {
+      final Config config = configSupplier.get();
       setConfig(config);
 
       final AppSettings settings = AppSettings.get();
 
       // Backward-compatible CAS configuration
       String defaultUrl = settings.get(CONFIG_AUTH_LOGOUT_URL, null);
-      if (defaultUrl == null) {
+      if (StringUtils.isBlank(defaultUrl)) {
         defaultUrl =
             AuthPac4jModuleCas.isEnabled()
                 ? settings.get(AuthPac4jModuleCas.CONFIG_CAS_LOGOUT_URL, ".")
@@ -211,13 +276,14 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   private static class Pac4jCallbackFilter extends CallbackFilter {
 
     @Inject
-    public Pac4jCallbackFilter(Config config) {
+    public Pac4jCallbackFilter(ConfigSupplier configSupplier) {
+      final Config config = configSupplier.get();
       setConfig(config);
 
       final AppSettings settings = AppSettings.get();
       final String defaultUrl = settings.getBaseURL();
 
-      if (defaultUrl != null) {
+      if (StringUtils.notBlank(defaultUrl)) {
         setDefaultUrl(defaultUrl);
       }
 
@@ -253,7 +319,8 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   private static class Pac4jSecurityFilter extends SecurityFilter {
 
     @Inject
-    public Pac4jSecurityFilter(Config config) {
+    public Pac4jSecurityFilter(ConfigSupplier configSupplier) {
+      final Config config = configSupplier.get();
       setConfig(config);
       setAuthorizers("auth");
 
