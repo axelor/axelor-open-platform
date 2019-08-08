@@ -40,7 +40,7 @@ public class AuthPac4jRealm extends Pac4jRealm {
   public AuthPac4jRealm() {
     final AppSettings settings = AppSettings.get();
     setPrincipalNameAttribute(
-        settings.get(AuthPac4jModule.CONFIG_AUTH_PRINCIPAL_ATTRIBUTE, "email"));
+        settings.get(AuthPac4jModule.CONFIG_AUTH_USER_PRINCIPAL_ATTRIBUTE, "email"));
   }
 
   @Override
