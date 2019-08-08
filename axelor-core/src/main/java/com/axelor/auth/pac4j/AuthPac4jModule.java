@@ -72,6 +72,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   public static final String CONFIG_AUTH_CALLBACK_URL = "auth.callback.url";
   public static final String CONFIG_AUTH_DEFAULT_URL = "auth.default.url";
   public static final String CONFIG_AUTH_SAVE_USERS_FROM_CENTRAL = "auth.save.users.from.central";
+  public static final String CONFIG_AUTH_USER_DEFAULT_GROUP = "auth.user.default.group";
   public static final String CONFIG_AUTH_USER_PRINCIPAL_ATTRIBUTE = "auth.user.principal.attribute";
 
   public static final String CONFIG_AUTH_LOGOUT_URL = "auth.logout.url";

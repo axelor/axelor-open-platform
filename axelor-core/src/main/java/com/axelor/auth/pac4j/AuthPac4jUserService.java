@@ -17,6 +17,7 @@
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
@@ -42,6 +43,13 @@ public class AuthPac4jUserService {
   @Inject protected AuthPac4jProfileService profileService;
 
   @Inject protected UserRepository userRepo;
+
+  private static final String DEFAULT_GROUP_CODE;
+
+  static {
+    final AppSettings settings = AppSettings.get();
+    DEFAULT_GROUP_CODE = settings.get(AuthPac4jModule.CONFIG_AUTH_USER_DEFAULT_GROUP, "users");
+  }
 
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -79,7 +87,7 @@ public class AuthPac4jUserService {
     user.setPassword(UUID.randomUUID().toString());
     user.setEmail(profileService.getEmail(profile));
     user.setLanguage(profileService.getLanguage(profile, "en"));
-    user.setGroup(profileService.getGroup(profile, "users"));
+    user.setGroup(profileService.getGroup(profile, getDefaultGroupCode()));
     profileService.getRoles(profile).forEach(user::addRole);
     profileService.getPermissions(profile).forEach(user::addPermission);
 
@@ -134,5 +142,9 @@ public class AuthPac4jUserService {
     } catch (IOException e) {
       logger.error(e.getMessage(), e);
     }
+  }
+
+  protected String getDefaultGroupCode() {
+    return DEFAULT_GROUP_CODE;
   }
 }
