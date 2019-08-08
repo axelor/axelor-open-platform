@@ -74,7 +74,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   public static final String CONFIG_AUTH_SAVE_USERS_FROM_CENTRAL = "auth.save.users.from.central";
   public static final String CONFIG_AUTH_PRINCIPAL_ATTRIBUTE = "auth.principal.attribute";
 
-  public static final String CONFIG_AUTH_LOGOUT_DEFAULT_URL = "auth.logout.default.url";
+  public static final String CONFIG_AUTH_LOGOUT_URL = "auth.logout.url";
   public static final String CONFIG_AUTH_LOGOUT_URL_PATTERN = "auth.logout.url.pattern";
   public static final String CONFIG_AUTH_LOGOUT_LOCAL = "auth.logout.local";
   public static final String CONFIG_AUTH_LOGOUT_CENTRAL = "auth.logout.central";
@@ -189,7 +189,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       final AppSettings settings = AppSettings.get();
 
       // Backward-compatible CAS configuration
-      String defaultUrl = settings.get(CONFIG_AUTH_LOGOUT_DEFAULT_URL, null);
+      String defaultUrl = settings.get(CONFIG_AUTH_LOGOUT_URL, null);
       if (defaultUrl == null) {
         defaultUrl =
             AuthPac4jModuleCas.isEnabled()
