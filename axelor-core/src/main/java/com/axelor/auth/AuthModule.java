@@ -25,7 +25,8 @@ import com.axelor.auth.pac4j.AuthPac4jModuleForm;
 import com.axelor.auth.pac4j.AuthPac4jModuleOAuth;
 import com.axelor.auth.pac4j.AuthPac4jModuleOidc;
 import com.axelor.auth.pac4j.AuthPac4jModuleSaml;
-import com.axelor.auth.pac4j.AuthPac4jObserver;
+import com.axelor.auth.pac4j.AuthPac4jObserverCreate;
+import com.axelor.auth.pac4j.AuthPac4jObserverLink;
 import com.axelor.db.JpaSecurity;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -70,11 +71,20 @@ public class AuthModule extends AbstractModule {
     // Pac4j
     if (AuthPac4jModule.isEnabled()) {
       final AppSettings settings = AppSettings.get();
-      final boolean saveUsersFromCentral =
-          settings.getBoolean(AuthPac4jModule.CONFIG_AUTH_SAVE_USERS_FROM_CENTRAL, false);
+      final String userProvisioning =
+          settings.get(AuthPac4jModule.CONFIG_AUTH_USER_PROVISIONING, "create");
 
-      if (saveUsersFromCentral) {
-        bind(AuthPac4jObserver.class);
+      // User provisioning
+      switch (userProvisioning) {
+        case "create":
+          // Create and update users
+          bind(AuthPac4jObserverCreate.class);
+          break;
+        case "link":
+          // Update users (must exist locally beforehand)
+          bind(AuthPac4jObserverLink.class);
+          break;
+        default:
       }
 
       // OpenID Connect

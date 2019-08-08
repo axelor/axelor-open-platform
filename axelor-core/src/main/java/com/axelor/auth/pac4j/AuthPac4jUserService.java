@@ -81,6 +81,20 @@ public class AuthPac4jUserService {
     }
   }
 
+  public void updateUser(CommonProfile profile) {
+    final String codeOrEmail = profileService.getCodeOrEmail(profile);
+
+    if (codeOrEmail == null) {
+      return;
+    }
+
+    final User user = userRepo.findByCodeOrEmail(codeOrEmail);
+
+    if (user != null) {
+      updateUser(user, profile);
+    }
+  }
+
   @Transactional
   protected void persistUser(String code, CommonProfile profile) {
     final User user = new User(code, profileService.getName(profile));

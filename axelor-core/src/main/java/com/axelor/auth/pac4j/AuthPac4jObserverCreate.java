@@ -25,10 +25,15 @@ import javax.inject.Inject;
 import org.pac4j.core.profile.CommonProfile;
 
 @Singleton
-public class AuthPac4jObserver {
+public class AuthPac4jObserverCreate {
 
   @Inject protected AuthPac4jUserService userService;
 
+  /**
+   * Observes pre-login events in order to create and update users.
+   *
+   * @param event
+   */
   public void onPreLogin(@Observes PreLogin event) {
     @SuppressWarnings("unchecked")
     final Optional<CommonProfile> profile = (Optional<CommonProfile>) event.getPrincipal();
