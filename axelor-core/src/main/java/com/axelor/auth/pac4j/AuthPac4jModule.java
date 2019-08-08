@@ -70,7 +70,6 @@ import org.slf4j.LoggerFactory;
 public abstract class AuthPac4jModule extends AuthWebModule {
 
   public static final String CONFIG_AUTH_CALLBACK_URL = "auth.callback.url";
-  public static final String CONFIG_AUTH_DEFAULT_URL = "auth.default.url";
   public static final String CONFIG_AUTH_USER_PROVISIONING = "auth.user.provisioning";
   public static final String CONFIG_AUTH_USER_DEFAULT_GROUP = "auth.user.default.group";
   public static final String CONFIG_AUTH_USER_PRINCIPAL_ATTRIBUTE = "auth.user.principal.attribute";
@@ -216,7 +215,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       setConfig(config);
 
       final AppSettings settings = AppSettings.get();
-      final String defaultUrl = settings.get(CONFIG_AUTH_DEFAULT_URL, settings.getBaseURL());
+      final String defaultUrl = settings.getBaseURL();
 
       if (defaultUrl != null) {
         setDefaultUrl(defaultUrl);
