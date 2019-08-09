@@ -35,8 +35,12 @@ function makeURL(model, field, recordOrId, version, scope) {
   if (ver === undefined || ver === null) ver = (new Date()).getTime();
   if (!id || id <= 0) return null;
   var url = "ws/rest/" + model + "/" + id + "/" + field + "/download?v=" + ver;
-  if (scope && scope.record && scope._model !== META_JSON_RECORD) {
-    url += "&parentId=" + scope.record.id + "&parentModel=" + scope._model;
+  if (scope && scope.record) {
+    var parentId = scope.record.id;
+    if (!parentId && scope.field && scope._jsonContext && scope._jsonContext.$record) {
+      parentId = scope._jsonContext.$record.id;
+    }
+    url += "&parentId=" + parentId + "&parentModel=" + scope._model;
   }
   return url;
 }

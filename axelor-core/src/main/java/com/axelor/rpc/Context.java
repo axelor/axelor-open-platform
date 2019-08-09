@@ -128,7 +128,7 @@ public class Context extends SimpleBindings {
   /**
    * Create a new {@link Context} for a record by given id.
    *
-   * <p>This is useful when we have to use custom fields defined for an entity from bussiness code.
+   * <p>This is useful when we have to use custom fields defined for an entity from business code.
    *
    * @param id the record id
    * @param beanClass the record entity class

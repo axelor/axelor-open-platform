@@ -31,6 +31,7 @@ import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.Repository;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
 import com.axelor.dms.db.DMSFile;
 import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailAddress;
@@ -41,6 +42,7 @@ import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.mail.service.MailService;
 import com.axelor.mail.web.MailController;
 import com.axelor.meta.MetaFiles;
+import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaFileRepository;
 import com.axelor.meta.service.MetaService;
@@ -56,9 +58,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import com.google.inject.servlet.RequestScoped;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,8 +67,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -77,6 +74,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -423,13 +422,34 @@ public class RestService extends ResourceService {
           final Class<? extends Model> parentClass =
               (Class<? extends Model>) Class.forName(parentModel);
           final Model parent = JpaRepository.of(parentClass).find(parentId);
+
           if (parent != null) {
-            for (final PropertyDescriptor propertyDescriptor :
-                Introspector.getBeanInfo(parentClass).getPropertyDescriptors()) {
-              final Method readMethod = propertyDescriptor.getReadMethod();
-              if (readMethod != null && klass.isAssignableFrom(readMethod.getReturnType())) {
-                final Model bean = (Model) readMethod.invoke(parent);
-                if (bean != null && bean.getId().equals(id)) {
+            final Mapper mapper = Mapper.of(parentClass);
+            final Context context = new Context(Mapper.toMap(parent), parentClass);
+
+            for (final Property property : mapper.getProperties()) {
+              if (property.isJson()) {
+                final Map<String, Object> jsonFields =
+                    MetaStore.findJsonFields(parentModel, property.getName());
+                for (final Entry<String, Object> entry : jsonFields.entrySet()) {
+                  final Map<String, Object> value = (Map<String, Object>) entry.getValue();
+                  if (value != null) {
+                    final String target = (String) value.get("target");
+                    if (target != null && MetaFile.class.isAssignableFrom(Class.forName(target))) {
+                      final MetaFile metaFile = (MetaFile) context.get(entry.getKey());
+                      if (metaFile != null && Objects.equals(metaFile.getId(), id)) {
+                        permittedByParent =
+                            Beans.get(JpaSecurity.class)
+                                .isPermitted(JpaSecurity.CAN_READ, parentClass, parentId);
+                        break;
+                      }
+                    }
+                  }
+                }
+              } else if (property.getTarget() != null
+                  && MetaFile.class.isAssignableFrom(property.getTarget())) {
+                final MetaFile metaFile = (MetaFile) context.get(property.getName());
+                if (metaFile != null && Objects.equals(metaFile.getId(), id)) {
                   permittedByParent =
                       Beans.get(JpaSecurity.class)
                           .isPermitted(JpaSecurity.CAN_READ, parentClass, parentId);
@@ -438,11 +458,7 @@ public class RestService extends ResourceService {
               }
             }
           }
-        } catch (ClassNotFoundException
-            | IntrospectionException
-            | IllegalAccessException
-            | IllegalArgumentException
-            | InvocationTargetException e) {
+        } catch (ClassNotFoundException e) {
           // Ignore
         }
       }
