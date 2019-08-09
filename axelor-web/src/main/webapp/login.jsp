@@ -143,6 +143,7 @@ Set<String> centralClients = AuthPac4jModule.getCentralClients();
                 <span class="box"></span>
                 <span class="title"><%= loginRemember %></span>
               </label>
+              <input type="hidden" name="hash_location" id="hash-location">
             </div>
             <div class="form-footer">
               <button class="btn btn-primary" type="submit"><%= loginSubmit %></button>
@@ -182,9 +183,14 @@ Set<String> centralClients = AuthPac4jModule.getCentralClients();
 	    
 	    $("#social-buttons").on('click', 'button', function (e) {
 	     var client = $(e.currentTarget).data('provider');
-	     window.location.href = './?client_name=' + client;
+	     window.location.href = './?client_name=' + client
+	         + "&hash_location=" + encodeURIComponent(window.location.hash);
 	    });
+
+        $('#login-form').submit(function(e) {
+          document.getElementById("hash-location").value = window.location.hash;
+        });
     });
-    </script>
+        </script>
   </body>
 </html>

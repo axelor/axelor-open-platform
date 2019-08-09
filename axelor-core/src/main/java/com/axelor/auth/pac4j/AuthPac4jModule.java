@@ -30,11 +30,17 @@ import io.buji.pac4j.engine.ShiroCallbackLogic;
 import io.buji.pac4j.filter.CallbackFilter;
 import io.buji.pac4j.filter.LogoutFilter;
 import io.buji.pac4j.filter.SecurityFilter;
-import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,19 +50,13 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
-import org.apache.shiro.web.util.WebUtils;
 import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Client;
@@ -64,6 +64,7 @@ import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.J2EContext;
+import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
@@ -121,9 +122,9 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
     bind(ConfigSupplier.class);
     bindRealm().to(AuthPac4jRealm.class);
-    addFilterChain("/logout", Key.get(Pac4jLogoutFilter.class));
-    addFilterChain("/callback", Key.get(Pac4jCallbackFilter.class));
-    addFilterChain("/**", Key.get(Pac4jSecurityFilter.class));
+    addFilterChain("/logout", Key.get(AxelorLogoutFilter.class));
+    addFilterChain("/callback", Key.get(AxelorCallbackFilter.class));
+    addFilterChain("/**", Key.get(AxelorSecurityFilter.class));
   }
 
   protected abstract void configureClients();
@@ -230,10 +231,10 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     }
   }
 
-  private static class Pac4jLogoutFilter extends LogoutFilter {
+  private static class AxelorLogoutFilter extends LogoutFilter {
 
     @Inject
-    public Pac4jLogoutFilter(ConfigSupplier configSupplier) {
+    public AxelorLogoutFilter(ConfigSupplier configSupplier) {
       final Config config = configSupplier.get();
       setConfig(config);
 
@@ -259,10 +260,10 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     }
   }
 
-  private static class Pac4jCallbackFilter extends CallbackFilter {
+  private static class AxelorCallbackFilter extends CallbackFilter {
 
     @Inject
-    public Pac4jCallbackFilter(ConfigSupplier configSupplier) {
+    public AxelorCallbackFilter(ConfigSupplier configSupplier) {
       final Config config = configSupplier.get();
       setConfig(config);
 
@@ -285,27 +286,92 @@ public abstract class AuthPac4jModule extends AuthWebModule {
                   : super.redirectToOriginallyRequestedUrl(context, defaultUrl);
             }
           });
-    }
 
-    @Override
-    public void doFilter(
-        ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
-        throws IOException, ServletException {
-      super.doFilter(servletRequest, servletResponse, filterChain);
-
-      // remove client_name query param after central login
-      final HttpServletRequest req = (HttpServletRequest) servletRequest;
-
-      if (SecurityUtils.getSubject().isAuthenticated() && req.getParameter("client_name") != null) {
-        WebUtils.issueRedirect(servletRequest, servletResponse, "/");
-      }
+      setCallbackLogic(new AxelorCallbackLogic());
     }
   }
 
-  private static class Pac4jSecurityFilter extends SecurityFilter {
+  private static class AxelorCallbackLogic extends ShiroCallbackLogic<Object, J2EContext> {
+
+    private final AppSettings appSettings = AppSettings.get();
+
+    /** Redirects to base URL with hash location. */
+    @Override
+    @SuppressWarnings("unchecked")
+    protected HttpAction redirectToOriginallyRequestedUrl(J2EContext context, String defaultUrl) {
+      final String pac4jRequestedUrl =
+          (String) context.getSessionStore().get(context, Pac4jConstants.REQUESTED_URL);
+      final String baseUrl =
+          Optional.ofNullable(appSettings.getBaseURL())
+              .orElseGet(() -> getBareUrl(pac4jRequestedUrl));
+      final String hashLocation =
+          Optional.ofNullable(context.getRequestParameter("hash_location"))
+              .orElseGet(() -> parseQuery(pac4jRequestedUrl).getOrDefault("hash_location", ""));
+      final String requestedUrl = baseUrl + hashLocation;
+      final String redirectUrl;
+
+      if (StringUtils.notBlank(requestedUrl)) {
+        context.getSessionStore().set(context, Pac4jConstants.REQUESTED_URL, null);
+        redirectUrl = requestedUrl;
+      } else {
+        redirectUrl = defaultUrl;
+      }
+
+      logger.debug("redirectUrl: {}", redirectUrl);
+      return HttpAction.redirect(context, redirectUrl);
+    }
+
+    /**
+     * Gets URL without query parameters.
+     *
+     * @param url
+     * @return
+     */
+    private String getBareUrl(String url) {
+      try {
+        final URI uri = new URI(url);
+        return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, uri.getFragment())
+            .toString();
+      } catch (URISyntaxException e) {
+        logger.error(e.getMessage(), e);
+      }
+
+      return "";
+    }
+
+    /**
+     * Parses URL query parameters.
+     *
+     * @param url
+     * @return
+     */
+    private Map<String, String> parseQuery(String url) {
+      final Map<String, String> queryPairs = new LinkedHashMap<>();
+
+      try {
+        final String query = new URL(url).getQuery();
+        if (query != null) {
+          final String[] pairs = query.split("&");
+
+          for (final String pair : pairs) {
+            final int idx = pair.indexOf('=');
+            queryPairs.put(
+                URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
+                URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+          }
+        }
+      } catch (UnsupportedEncodingException | MalformedURLException e) {
+        logger.error(e.getMessage(), e);
+      }
+
+      return queryPairs;
+    }
+  }
+
+  private static class AxelorSecurityFilter extends SecurityFilter {
 
     @Inject
-    public Pac4jSecurityFilter(ConfigSupplier configSupplier) {
+    public AxelorSecurityFilter(ConfigSupplier configSupplier) {
       final Config config = configSupplier.get();
       setConfig(config);
       setAuthorizers("auth");

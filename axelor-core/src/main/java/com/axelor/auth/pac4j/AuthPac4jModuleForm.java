@@ -73,7 +73,7 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
     public AxelorFormClient() {
       super("login.jsp", new AxelorFormAuthenticator());
       this.setCredentialsExtractor(new JsonExtractor());
-      this.setAjaxRequestResolver(new Pac4jAjaxRequestResolver());
+      this.setAjaxRequestResolver(new AxelorAjaxRequestResolver());
     }
 
     @Override
@@ -185,7 +185,7 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
     }
   }
 
-  private static class Pac4jAjaxRequestResolver extends DefaultAjaxRequestResolver {
+  private static class AxelorAjaxRequestResolver extends DefaultAjaxRequestResolver {
 
     @Override
     public boolean isAjax(WebContext context) {
