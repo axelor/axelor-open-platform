@@ -218,21 +218,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
         return;
       }
 
-      final AppSettings settings = AppSettings.get();
-      String callbackUrl = settings.get(CONFIG_AUTH_CALLBACK_URL, null);
-
-      // Backward-compatible CAS configuration
-      if (StringUtils.isBlank(callbackUrl) && AuthPac4jModuleCas.isEnabled()) {
-        callbackUrl = settings.get(AuthPac4jModuleCas.CONFIG_CAS_SERVICE, null);
-      }
-
-      if (StringUtils.isBlank(callbackUrl)) {
-        final String baseUrl =
-            Optional.ofNullable(settings.getBaseURL()).orElse("").replaceAll("/+$", "");
-        callbackUrl = baseUrl + "/callback";
-      }
-
-      final Clients clients = new Clients(callbackUrl, clientList);
+      final Clients clients = new Clients(getCallbackUrl(), clientList);
       final Authorizer<CommonProfile> authorizer = new RequireAnyRoleAuthorizer<>(ROLE_HAS_USER);
 
       config = new Config(clients, ImmutableMap.of("auth", authorizer));

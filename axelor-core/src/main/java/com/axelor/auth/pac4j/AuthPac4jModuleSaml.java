@@ -170,12 +170,30 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
     saml2Config.setWantsAssertionsSigned(wantsAssertionsSigned);
     saml2Config.setAuthnRequestSigned(authnRequestSigned);
 
-    SAML2Client client = new SAML2Client(saml2Config);
+    final SAML2Client client = new AxelorSAML2Client(saml2Config);
     addClient(client);
   }
 
   public static boolean isEnabled() {
     final AppSettings settings = AppSettings.get();
     return settings.get(CONFIG_SAML_KEYSTORE_PATH, null) != null;
+  }
+
+  private static class AxelorSAML2Client extends SAML2Client {
+    public AxelorSAML2Client(SAML2Configuration configuration) {
+      super(configuration);
+      setName(getClass().getSuperclass().getSimpleName());
+    }
+
+    @Override
+    protected void clientInit() {
+      // Default service provider entity ID to "callback URL" + "?client_name=SAML2Client"
+      if (configuration.getServiceProviderEntityId() == null) {
+        final String serviceProviderEntityId =
+            String.format("%s?client_name=%s", AuthPac4jModule.getCallbackUrl(), getName());
+        configuration.setServiceProviderEntityId(serviceProviderEntityId);
+      }
+      super.clientInit();
+    }
   }
 }
