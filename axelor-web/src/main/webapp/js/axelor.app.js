@@ -359,7 +359,8 @@
           if (response.data.status === -7) { // STATUS_LOGIN_REQUIRED
             if (axelor.config['auth.central.client']) {
               // redirect to central login page
-              window.location.href = './?client_name=' + axelor.config['auth.central.client'];
+              window.location.href = './?client_name=' + axelor.config['auth.central.client']
+                + "&hash_location=" + encodeURIComponent(window.location.hash);
             } else if (!response.config || !response.config.silent) {
               // ajax login
               $rootScope.$broadcast('event:auth-loginRequired', response.data);
