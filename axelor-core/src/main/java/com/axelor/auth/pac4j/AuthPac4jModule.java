@@ -26,10 +26,12 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
+import io.buji.pac4j.context.ShiroSessionStore;
 import io.buji.pac4j.engine.ShiroCallbackLogic;
 import io.buji.pac4j.filter.CallbackFilter;
 import io.buji.pac4j.filter.LogoutFilter;
 import io.buji.pac4j.filter.SecurityFilter;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.net.MalformedURLException;
@@ -50,8 +52,13 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.realm.Realm;
@@ -66,8 +73,11 @@ import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.context.WebContext;
+import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.exception.HttpAction;
+import org.pac4j.core.http.adapter.J2ENopHttpActionAdapter;
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.util.CommonHelper;
 import org.pac4j.http.client.indirect.FormClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,6 +104,8 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   private static final Map<String, Map<String, String>> clientInfo = new HashMap<>();
 
   private static String callbackUrl;
+
+  private static String logoutUrl;
 
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -176,6 +188,25 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     return callbackUrl;
   }
 
+  public static String getLogoutUrl() {
+    if (logoutUrl == null) {
+      // Backward-compatible CAS configuration
+      final AppSettings settings = AppSettings.get();
+      logoutUrl = settings.get(CONFIG_AUTH_LOGOUT_URL, null);
+      if (StringUtils.isBlank(logoutUrl)) {
+        logoutUrl =
+            AuthPac4jModuleCas.isEnabled()
+                ? settings.get(AuthPac4jModuleCas.CONFIG_CAS_LOGOUT_URL, settings.getBaseURL())
+                : settings.getBaseURL();
+      }
+      if (StringUtils.isBlank(logoutUrl)) {
+        logoutUrl = ".";
+      }
+    }
+
+    return logoutUrl;
+  }
+
   public static boolean isEnabled() {
     return AuthPac4jModuleOidc.isEnabled()
         || AuthPac4jModuleOAuth.isEnabled()
@@ -235,28 +266,48 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
     @Inject
     public AxelorLogoutFilter(ConfigSupplier configSupplier) {
-      final Config config = configSupplier.get();
-      setConfig(config);
-
       final AppSettings settings = AppSettings.get();
-
-      // Backward-compatible CAS configuration
-      String defaultUrl = settings.get(CONFIG_AUTH_LOGOUT_URL, null);
-      if (StringUtils.isBlank(defaultUrl)) {
-        defaultUrl =
-            AuthPac4jModuleCas.isEnabled()
-                ? settings.get(AuthPac4jModuleCas.CONFIG_CAS_LOGOUT_URL, ".")
-                : ".";
-      }
-
       final String logoutUrlPattern = settings.get(CONFIG_AUTH_LOGOUT_URL_PATTERN, null);
       final boolean localLogout = settings.getBoolean(CONFIG_AUTH_LOGOUT_LOCAL, true);
       final boolean centralLogout = settings.getBoolean(CONFIG_AUTH_LOGOUT_CENTRAL, false);
+      final Config config = configSupplier.get();
 
-      setDefaultUrl(defaultUrl);
+      setConfig(config);
+      setDefaultUrl(getLogoutUrl());
       setLogoutUrlPattern(logoutUrlPattern);
       setLocalLogout(localLogout);
       setCentralLogout(centralLogout);
+    }
+
+    @Override
+    public void doFilter(
+        final ServletRequest servletRequest,
+        final ServletResponse servletResponse,
+        final FilterChain filterChain)
+        throws IOException, ServletException {
+
+      CommonHelper.assertNotNull("logoutLogic", getLogoutLogic());
+      CommonHelper.assertNotNull("config", getConfig());
+
+      final HttpServletRequest request = (HttpServletRequest) servletRequest;
+      final HttpServletResponse response = (HttpServletResponse) servletResponse;
+      @SuppressWarnings("unchecked")
+      final SessionStore<J2EContext> sessionStore = getConfig().getSessionStore();
+      final J2EContext context =
+          new J2EContext(
+              request, response, sessionStore != null ? sessionStore : ShiroSessionStore.INSTANCE);
+
+      // Destroy web session.
+      getLogoutLogic()
+          .perform(
+              context,
+              getConfig(),
+              J2ENopHttpActionAdapter.INSTANCE,
+              getDefaultUrl(),
+              getLogoutUrlPattern(),
+              getLocalLogout(),
+              true,
+              getCentralLogout());
     }
   }
 
