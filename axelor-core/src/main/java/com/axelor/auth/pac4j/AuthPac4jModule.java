@@ -277,94 +277,79 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       setDefaultClient(config.getClients().getClients().get(0).getName());
       setCallbackLogic(
           new ShiroCallbackLogic<Object, J2EContext>() {
+            private final AppSettings appSettings = AppSettings.get();
 
             @Override
             protected HttpAction redirectToOriginallyRequestedUrl(
                 J2EContext context, String defaultUrl) {
               return isXHR(context)
                   ? HttpAction.status(HttpConstants.OK, context)
-                  : super.redirectToOriginallyRequestedUrl(context, defaultUrl);
+                  : redirectToBaseUrl(context, defaultUrl);
+            }
+
+            /** Redirects to base URL with hash location. */
+            @SuppressWarnings("unchecked")
+            private HttpAction redirectToBaseUrl(J2EContext context, String defaultUrl) {
+              final String pac4jRequestedUrl =
+                  (String) context.getSessionStore().get(context, Pac4jConstants.REQUESTED_URL);
+              final String baseUrl =
+                  Optional.ofNullable(appSettings.getBaseURL())
+                      .orElseGet(() -> getBareUrl(pac4jRequestedUrl));
+              final String hashLocation =
+                  Optional.ofNullable(context.getRequestParameter("hash_location"))
+                      .orElseGet(
+                          () -> parseQuery(pac4jRequestedUrl).getOrDefault("hash_location", ""));
+              final String requestedUrl = baseUrl + hashLocation;
+              final String redirectUrl;
+
+              if (StringUtils.notBlank(requestedUrl)) {
+                context.getSessionStore().set(context, Pac4jConstants.REQUESTED_URL, null);
+                redirectUrl = requestedUrl;
+              } else {
+                redirectUrl = defaultUrl;
+              }
+
+              logger.debug("redirectUrl: {}", redirectUrl);
+              return HttpAction.redirect(context, redirectUrl);
+            }
+
+            /** Gets URL without query parameters. */
+            private String getBareUrl(String url) {
+              try {
+                final URI uri = new URI(url);
+                return new URI(
+                        uri.getScheme(), uri.getAuthority(), uri.getPath(), null, uri.getFragment())
+                    .toString();
+              } catch (URISyntaxException e) {
+                logger.error(e.getMessage(), e);
+              }
+
+              return "";
+            }
+
+            /** Parses URL query parameters. */
+            private Map<String, String> parseQuery(String url) {
+              final Map<String, String> queryPairs = new LinkedHashMap<>();
+
+              try {
+                final String query = new URL(url).getQuery();
+                if (query != null) {
+                  final String[] pairs = query.split("&");
+
+                  for (final String pair : pairs) {
+                    final int idx = pair.indexOf('=');
+                    queryPairs.put(
+                        URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
+                        URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+                  }
+                }
+              } catch (UnsupportedEncodingException | MalformedURLException e) {
+                logger.error(e.getMessage(), e);
+              }
+
+              return queryPairs;
             }
           });
-
-      setCallbackLogic(new AxelorCallbackLogic());
-    }
-  }
-
-  private static class AxelorCallbackLogic extends ShiroCallbackLogic<Object, J2EContext> {
-
-    private final AppSettings appSettings = AppSettings.get();
-
-    /** Redirects to base URL with hash location. */
-    @Override
-    @SuppressWarnings("unchecked")
-    protected HttpAction redirectToOriginallyRequestedUrl(J2EContext context, String defaultUrl) {
-      final String pac4jRequestedUrl =
-          (String) context.getSessionStore().get(context, Pac4jConstants.REQUESTED_URL);
-      final String baseUrl =
-          Optional.ofNullable(appSettings.getBaseURL())
-              .orElseGet(() -> getBareUrl(pac4jRequestedUrl));
-      final String hashLocation =
-          Optional.ofNullable(context.getRequestParameter("hash_location"))
-              .orElseGet(() -> parseQuery(pac4jRequestedUrl).getOrDefault("hash_location", ""));
-      final String requestedUrl = baseUrl + hashLocation;
-      final String redirectUrl;
-
-      if (StringUtils.notBlank(requestedUrl)) {
-        context.getSessionStore().set(context, Pac4jConstants.REQUESTED_URL, null);
-        redirectUrl = requestedUrl;
-      } else {
-        redirectUrl = defaultUrl;
-      }
-
-      logger.debug("redirectUrl: {}", redirectUrl);
-      return HttpAction.redirect(context, redirectUrl);
-    }
-
-    /**
-     * Gets URL without query parameters.
-     *
-     * @param url
-     * @return
-     */
-    private String getBareUrl(String url) {
-      try {
-        final URI uri = new URI(url);
-        return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, uri.getFragment())
-            .toString();
-      } catch (URISyntaxException e) {
-        logger.error(e.getMessage(), e);
-      }
-
-      return "";
-    }
-
-    /**
-     * Parses URL query parameters.
-     *
-     * @param url
-     * @return
-     */
-    private Map<String, String> parseQuery(String url) {
-      final Map<String, String> queryPairs = new LinkedHashMap<>();
-
-      try {
-        final String query = new URL(url).getQuery();
-        if (query != null) {
-          final String[] pairs = query.split("&");
-
-          for (final String pair : pairs) {
-            final int idx = pair.indexOf('=');
-            queryPairs.put(
-                URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
-                URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
-          }
-        }
-      } catch (UnsupportedEncodingException | MalformedURLException e) {
-        logger.error(e.getMessage(), e);
-      }
-
-      return queryPairs;
     }
   }
 
