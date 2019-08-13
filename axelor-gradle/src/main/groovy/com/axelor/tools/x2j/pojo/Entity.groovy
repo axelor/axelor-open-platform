@@ -430,7 +430,7 @@ class Entity {
 			return "return EntityHelper.hashCode(this);"
 		}
 		importType("java.util.Objects")
-		def data = getHashables()collect { "this.${it.getter}()" }.join(", ")
+		def data = getHashables().collect { "this.${it.getter}()" }.join(", ")
 		if (data.size()) {
 			def hash = name.hashCode()
 			return "return Objects.hash(${hash}, ${data});"
