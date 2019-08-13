@@ -245,11 +245,11 @@ function CalendarViewCtrl($scope, $element) {
   };
 
   function isAllDay(event) {
-    var start = moment(event.start);
-    var end = moment(event.end);
-    if (!start.hasTime()) {
+    if($scope.fields[view.start] && $scope.fields[view.start].type === 'date') {
       return true;
     }
+    var start = moment(event.start);
+    var end = moment(event.end);
     if (start.format("HH:mm") !== "00:00") {
       return false;
     }
