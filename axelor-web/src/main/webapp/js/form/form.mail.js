@@ -172,9 +172,24 @@ ui.directive('uiMailMessage', function () {
         scope.body = null;
       }
 
-      function format(value) {
+      function findField(name) {
+        if (scope.field && scope.field.target) {
+          return ((scope.field.viewer||{}).fields||{})[name]
+              || ((scope.field.editor||{}).fields||{})[name];
+        }
+        return (scope.viewItems || scope.fields || {})[name];
+      }
+
+      function format(item, value) {
         if (!value) {
           return value;
+        }
+        var field = findField(item.name);
+        if(field && ["many-to-many", "one-to-many", "many-to-one"].indexOf(field.type) === -1) {
+          var formatter = ui.formatters[field.type];
+          if (formatter) {
+            return formatter(field, value);
+          }
         }
         if (value === 'True') return _t('True');
         if (value === 'False') return _t('False');
@@ -185,19 +200,13 @@ ui.directive('uiMailMessage', function () {
           return moment(value).format("DD/MM/YYYY");
         }
         if (value === '0E-10') value = '0.000000000000';
-        if (/^\d+(\.\d+)?$/.test(value)) {
-          var dot = value.indexOf('.');
-          return dot > -1
-            ? ui.formatters.decimal({ scale: Math.min(4, value.length - dot - 1) }, value)
-            : ui.formatters.integer({}, value);
-        }
         return value;
       }
 
       if (body && body.tracks) {
         _.each(body.tracks, function (item) {
-          item.displayValue = item.displayValue || format(item.value);
-          item.oldDisplayValue = item.oldDisplayValue || format(item.oldValue);
+          item.displayValue = item.displayValue || format(item, item.value);
+          item.oldDisplayValue = item.oldDisplayValue || format(item, item.oldValue);
           if (item.oldDisplayValue !== undefined) {
             item.displayValue = item.oldDisplayValue + " &raquo; " + item.displayValue;
           }
