@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.web;
 
+import com.axelor.meta.CallMethod;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 
@@ -26,7 +27,12 @@ public class Hello {
     response.setFlash("Hello World!!!");
   }
 
+  @CallMethod
   public String say(String what) {
     return "Say: " + what;
+  }
+
+  public String unauthorizedCallMethod(String what) {
+    return "Call unauthorizedCallMethod: " + what;
   }
 }
