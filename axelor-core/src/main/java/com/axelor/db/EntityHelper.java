@@ -84,18 +84,18 @@ public final class EntityHelper {
    */
   public static <T extends Model> int hashCode(T entity) {
     if (entity == null) {
-      return 0;
+      return 31;
     }
     final Mapper mapper = Mapper.of(entity.getClass());
     final List<Object> values = new ArrayList<>();
 
     for (Property p : mapper.getProperties()) {
-      if (isSimple(p) && p.isHashKey()) {
+      if (isSimple(p) && (p.isHashKey() || p.isUnique())) {
         values.add(p.get(entity));
       }
     }
 
-    return values.isEmpty() ? 0 : Arrays.hashCode(values.toArray());
+    return values.isEmpty() ? 31 : Arrays.hashCode(values.toArray());
   }
 
   /**
