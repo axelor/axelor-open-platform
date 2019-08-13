@@ -625,7 +625,7 @@ function GridViewCtrl($scope, $element) {
     });
     _.each(args.rows, function(index) {
       var item = args.grid.getDataItem(index);
-      if (item && item.id !== 0) {
+      if (item && item.id && item.id !== 0) {
         item.selected = true;
         selection.push(index);
       }
