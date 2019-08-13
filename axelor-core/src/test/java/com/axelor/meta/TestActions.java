@@ -20,6 +20,7 @@ package com.axelor.meta;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
@@ -261,6 +262,14 @@ public class TestActions extends MetaTest {
 
     assertNotNull(value);
     assertEquals("Say: John Smith", value);
+
+    try {
+      handler.evaluate("call: com.axelor.meta.web.Hello:unauthorizedCallMethod(fullName)");
+      fail("Calling non rpc methods without @CallMethod annotation are not allowed");
+    } catch (Exception e) {
+      assertTrue(e instanceof IllegalArgumentException);
+    }
+
   }
 
   @Test
