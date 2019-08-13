@@ -201,7 +201,9 @@ ui.directive('uiAttach', function () {
       } else {
         parent = element.parent();
         scope.$broadcast('dom:detach');
-        element.detach();
+        setTimeout(function () {
+          element.detach();
+        }, 100);
       }
     };
 
