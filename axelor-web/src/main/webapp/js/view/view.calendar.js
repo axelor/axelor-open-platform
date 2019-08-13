@@ -122,7 +122,7 @@ function CalendarViewCtrl($scope, $element) {
         criteria = {
           operator: "and",
           criteria: [criteria].concat(ds._filter.criteria)
-        }
+        };
       }
       if (_.size(ds._filter._domains) > 0) {
         criteria._domains = ds._filter._domains;

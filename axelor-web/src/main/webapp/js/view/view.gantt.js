@@ -298,7 +298,8 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 
        if (schema.taskUser) {
          columns.push({name: "users", label: fields[schema.taskUser].title, align: "center", template: function (item) {
-          return byId(gantt.serverList("users"), item.user_id)}});
+          return byId(gantt.serverList("users"), item.user_id);
+         }});
        }
 
        var isTree = true;
@@ -311,7 +312,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
               return moment(item[fname], moment.ISO_8601, true).format("MM/DD/YYYY h:mm:ss");
             }
             return item.text;
-             }})
+             }});
          }
          else {
            columns.push({ name:field.name, label:field.title, tree:isTree,
@@ -324,7 +325,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
                }
                return "";
              }
-           })
+           });
          }
          isTree = false;
        });

@@ -63,7 +63,7 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 
   $scope.isMidForm = function (elem) {
     return $element.find('form.mid-form').size();
-  }
+  };
 
   $scope.setEditable();
   $scope.show();

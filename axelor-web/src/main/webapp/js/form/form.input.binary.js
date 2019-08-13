@@ -23,7 +23,7 @@ var ui = angular.module('axelor.ui');
 
 var BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 var META_FILE = "com.axelor.meta.db.MetaFile";
-var META_JSON_RECORD = "com.axelor.meta.db.MetaJsonRecord"
+var META_JSON_RECORD = "com.axelor.meta.db.MetaJsonRecord";
 
 function makeURL(model, field, recordOrId, version, scope) {
   var value = recordOrId;
@@ -96,7 +96,7 @@ ui.formInput('ImageLink', {
       if (scope.isReadonly()) {
         image.get(0).src = scope.parseText(model.$viewValue) || BLANK;
       }
-    }
+    };
 
     scope.$watch("record.id", update);
     scope.$watch("isReadonly()", update);

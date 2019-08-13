@@ -59,7 +59,7 @@ ui.formInput('JsonField', 'String', {
             v[item.targetName.substring(6)] = v[item.targetName];
           }
           return v;
-        }
+        };
       }
       if (item.contextField && item.contextFieldValue) {
         if (item.showIf === undefined && item.hideIf === undefined && item.hidden) {
@@ -187,7 +187,7 @@ ui.formInput('JsonField', 'String', {
       if (rec) {
         scope.record = _.extend({}, scope.record, rec);
       }
-    }
+    };
 
     watchParent();
 
@@ -409,7 +409,7 @@ ui.formInput('JsonRefItem', 'ManyToOne', {
 
     scope.getValue = function () {
       return scope.record[name];
-    }
+    };
 
     var __setValue = scope.setValue;
 
@@ -417,7 +417,7 @@ ui.formInput('JsonRefItem', 'ManyToOne', {
       var val = _.pick(scope.record[name], 'model');
       val = _.extend(val, value);
       __setValue.call(scope, val);
-    }
+    };
 
     function doSelect() {
       var value = (scope.record || {})[name];

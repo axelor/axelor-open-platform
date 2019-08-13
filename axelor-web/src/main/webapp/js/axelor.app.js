@@ -165,7 +165,7 @@
       if (value) {
         return angular.fromJson(value);
       }
-    }
+    };
 
     evalScope.$readonly = scope.isReadonly ? _.bind(scope.isReadonly, scope) : angular.noop;
     evalScope.$required = scope.isRequired ? _.bind(scope.isRequired, scope) : angular.noop;

@@ -2434,7 +2434,7 @@ Grid.prototype.onItemClick = function(event, args) {
         if (done) {
           done();
         }
-      }, 100)
+      }, 100);
     }, 100);
   };
 
@@ -2454,7 +2454,7 @@ Grid.prototype.onItemClick = function(event, args) {
   }
 
   return this.__onItemClick(event, args);
-}
+};
 
 Grid.prototype.__onItemClick = function(event, args) {
 

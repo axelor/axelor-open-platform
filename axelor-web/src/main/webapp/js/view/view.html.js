@@ -34,7 +34,7 @@ function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
   $scope.getContext = function () {
     var params = $scope._viewParams || {};
     var parent = $scope.$parent;
-    return _.extend({}, params.context, parent.getContext ? parent.getContext() : {})
+    return _.extend({}, params.context, parent.getContext ? parent.getContext() : {});
   };
 
   $scope.getURL = function getURL() {

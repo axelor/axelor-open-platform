@@ -240,12 +240,12 @@ function FormViewCtrl($scope, $element) {
   $scope.isForceEdit = function () {
     var params = this._viewParams || {};
     return params.forceEdit || (params.params && params.params.forceEdit);
-  }
+  };
 
   $scope.isForceReadonly = function () {
     var params = this._viewParams || {};
     return params.forceReadonly || (params.params && params.params.forceReadonly);
-  }
+  };
 
   $scope.isEditable = function() {
     return $scope.isForceEdit() || (editable && !$scope.isForceReadonly());
@@ -319,7 +319,7 @@ function FormViewCtrl($scope, $element) {
       locationChangeOff();
       locationChangeOff = null;
     }
-  }
+  };
 
   $scope.$locationChangeCheck = function () {
     $scope._viewPromise.then(function () {
@@ -842,7 +842,7 @@ function FormViewCtrl($scope, $element) {
       ds.removeAll([record]).success(function(records, page){
         if ($scope.switchBack() === false) {
           $scope.onNew();
-        };
+        }
       });
     });
   };

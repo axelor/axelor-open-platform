@@ -587,7 +587,7 @@ ui.directive('uiMailFiles', [function () {
 
       scope.fileIcon = function (file) {
         return file.fileIcon || 'fa-paperclip';
-      }
+      };
     },
     replace: true,
     template:
@@ -724,7 +724,7 @@ ui.formInput('uiMailSelect', 'MultiSelect', {
 
   init: function (scope) {
     this._super.apply(this, arguments);
-    scope.isReadonly = function () { return false; }
+    scope.isReadonly = function () { return false; };
   },
 
   link_editable: function (scope, element, attrs, model) {
@@ -953,7 +953,7 @@ ui.formWidget('uiMailFollowers', {
     $scope.updateStatus = function() {
       var followers = $scope.followers || [];
       var found = _.find(followers, function (item) {
-        return item.$author && item.$author.code === axelor.config["user.login"]
+        return item.$author && item.$author.code === axelor.config["user.login"];
       });
       $scope.following = !!found;
     };
@@ -970,7 +970,7 @@ ui.formWidget('uiMailFollowers', {
         $scope.followers = res.data || [];
         $scope.updateStatus();
       });
-    };
+    }
 
     function findName() {
       var record = $scope.record || {};

@@ -305,7 +305,7 @@ ui.directive('uiFilterTags', function() {
     }],
     template:
       "<div ui-view-form x-handler='true'></div>"
-  }
+  };
 });
 
 ui.directive('uiFilterInput', function() {
@@ -1395,11 +1395,11 @@ ui.directive('uiFilterBox', function() {
         };
         if (element.hasClass('pull-right')) {
           opts.my = "right top";
-          opts.at = "right bottom"
+          opts.at = "right bottom";
         }
         return function() {
           menu.position(opts);
-        }
+        };
       }());
 
       scope.onClearFilter = function () {

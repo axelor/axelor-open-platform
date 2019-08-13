@@ -223,7 +223,7 @@ function GridViewCtrl($scope, $element) {
       return true;
     }
     return $scope.hasButton('save') && $scope.canEditInline();
-  }
+  };
 
   $scope.canSave = function() {
     if ($scope.$details && $scope.$details.canSave()) {
@@ -555,7 +555,7 @@ function GridViewCtrl($scope, $element) {
         $scope.onRefresh();
       });
     });
-  }
+  };
 
   $scope.onArchive = function() {
     $scope._doArchive($scope.$confirmArchiveMessage, true);
@@ -867,7 +867,7 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
     },
     replace: true,
     templateUrl: "partials/views/details-form.html"
-  }
+  };
 }]);
 
 ui.directive('uiPortletGrid', function(){

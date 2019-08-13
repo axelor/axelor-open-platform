@@ -135,9 +135,9 @@
             listeners.splice(i, 1);
           }
           return listener;
-        }
+        };
       }
-    }
+    };
   }]);
 
   ds.factory('ViewService', ['$http', '$q', '$cacheFactory', '$compile', function($http, $q, $cacheFactory, $compile) {
@@ -564,7 +564,7 @@
     function createStore(prefix) {
       var toKey = function (name) {
         return prefix + ':' + axelor.config['user.id'] + ':' + name;
-      }
+      };
       return {
         get: function (name) {
           return new $q(function (resolve) {
@@ -580,7 +580,7 @@
           }
           return $q.resolve(value);
         }
-      }
+      };
     }
 
     var PENDING_REQUESTS = {};

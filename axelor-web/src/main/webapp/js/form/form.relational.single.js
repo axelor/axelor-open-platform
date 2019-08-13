@@ -852,7 +852,7 @@ ui.formInput('RefItem', 'ManyToOne', {
         });
       }
       return getViewDef.call($scope, elem);
-    }
+    };
 
     ManyToOneCtrl.apply(this, arguments);
   }],

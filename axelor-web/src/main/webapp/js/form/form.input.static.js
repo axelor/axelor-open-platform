@@ -711,7 +711,7 @@ ui.formItem('Button', {
         var t = element.data('tooltip');
         if (t) {
           t.destroy();
-          t = null
+          t = null;
         }
       });
     });
