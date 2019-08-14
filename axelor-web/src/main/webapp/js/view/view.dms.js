@@ -889,7 +889,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
           xhr.setRequestHeader("X-File-Id", info.uuid);
         }
 
-        xhr.setRequestHeader("X-File-Name", file.name);
+        xhr.setRequestHeader("X-File-Name", encodeURIComponent(file.name));
         xhr.setRequestHeader("X-File-Type", file.type);
         xhr.setRequestHeader("X-File-Size", file.size);
         xhr.setRequestHeader("X-File-Offset", info._start);
