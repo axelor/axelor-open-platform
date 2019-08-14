@@ -452,6 +452,10 @@ public class XMLViews {
       // without group
       view = view == null ? findMetaView(views, name, null, model, module, null) : view;
       view = view == null ? findMetaView(views, name, null, null, module, null) : view;
+
+      if (view == null) {
+        throw new IllegalArgumentException("No such view found: " + name);
+      }
     }
 
     // next find by type
