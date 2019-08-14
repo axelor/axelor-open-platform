@@ -902,7 +902,7 @@ ui.formInput('NavSelect', {
         elemMenu.show();
         elemMenuTitle.html(selected && selected.title);
         setActive(selected);
-      }
+      };
     }());
 
     function adjust() {

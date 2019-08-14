@@ -232,7 +232,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
       $scope.$timeout(function () {
         $scope.dataView.$setSelection([$scope.dataView.getLength() - 1], true);
       }, 100);
-    }
+    };
     if (item && item.id > 0) {
       ds.copy(item.id).success(doSelect);
     } else if (item) {
@@ -461,7 +461,7 @@ ui.formInput('OneToMany', {
     var doRenderUnwatch = null;
     var doViewPromised = false;
 
-    var validate = model.$validators.valid || function () { return true; }
+    var validate = model.$validators.valid || function () { return true; };
     model.$validators.valid = function(modelValue, viewValue) {
       if (scope.isRequired() && _.isEmpty(viewValue)) return false;
       return validate.call(model.$validators, viewValue);
@@ -536,7 +536,7 @@ ui.formInput('OneToMany', {
           unwatch = null;
           if (schema.rowHeight && schema.rowHeight !== rowSize) {
             rowSize = schema.rowHeight;
-            maxSize = (rowSize * height) + minSize
+            maxSize = (rowSize * height) + minSize;
           }
         }
       });
@@ -1043,7 +1043,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
           model.$setViewValue(values);
         }
       }
-    };
+    }
 
     scope.$watch('items', itemsChanged, true);
     scope.$itemsChanged = itemsChanged;
@@ -1085,7 +1085,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
 
     scope.canRemove = function () {
       return scope.attr('canRemove') !== false;
-    }
+    };
 
     scope.setValidity = function (key, value) {
       model.$setValidity(key, value);

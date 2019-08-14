@@ -94,7 +94,7 @@ function DMSFileListCtrl($scope, $element, NavService) {
   $scope.$confirmMessage = function() {
     var strong = function (text, quote) {
       return "<strong>" + (quote ? "<em>\"" + text + "\"</em>" : text) + "</strong>";
-    }
+    };
     var all = getSelectedAll();
     if (all.length === 1 || $scope.currentFolder) {
       var doc = _.first(all) || $scope.currentFolder;
@@ -1193,7 +1193,7 @@ ui.directive("uiDmsFolders", function () {
       scope._dataSource.on("on:remove", function (e, records) {
         var ids = _.pluck(records, 'id');
         records
-          .filter(function (record) { return record.id in scope.folders })
+          .filter(function (record) { return record.id in scope.folders; })
           .forEach(function (record) {
             var found = scope.folders[record.id];
             var parent = scope.folders[(found.parent||{}).id] || _.first(scope.rootFolders);

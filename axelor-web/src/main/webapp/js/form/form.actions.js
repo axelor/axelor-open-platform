@@ -67,7 +67,7 @@ function updateValues(source, target, itemScope, formScope) {
         if (!rec.selected) delete rec.selected;
       }
       return rec;
-    }
+    };
 
     _.each(values, function (v, k) {
       values[k] = fix(v);

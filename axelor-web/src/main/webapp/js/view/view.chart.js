@@ -915,10 +915,10 @@ var directiveFn = function(){
           };
           scope.onExport = function () {
             doExport(data);
-          }
+          };
           scope.onAction = function () {
             scope.handleAction(data && data.dataset);
-          }
+          };
           return;
         });
       };

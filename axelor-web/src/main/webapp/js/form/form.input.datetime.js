@@ -251,7 +251,7 @@ ui.formInput('DateTime', {
         return isDate ? moment(value).startOf('day').format('YYYY-MM-DD') : value.toISOString();
       }
       return value;
-    },
+    };
 
     scope.format = function(value) {
       if (value) {
@@ -471,7 +471,7 @@ ui.formInput('Time', 'DateTime', {
 
     scope.parse = function(value) {
       return value;
-    },
+    };
 
     scope.format = function(value) {
       return value;

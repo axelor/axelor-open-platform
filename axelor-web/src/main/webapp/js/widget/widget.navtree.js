@@ -153,7 +153,7 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
             tab.color = null;
           }
         }
-      };
+      }
 
       MenuService.updateTabStyle = function (tab) {
         deferred.promise.then(function () {
@@ -169,13 +169,13 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
         if (!axelor.device.mobile) {
           scope.showSearch = show === undefined ? !scope.showSearch : show;
         }
-      }
+      };
       scope.onShowSearch = function () {
         scope.showSearch = true;
         setTimeout(function () {
           input.val('').focus();
         });
-      }
+      };
 
       input.attr('placeholder', _t('Search...'));
       input.blur(function (e) {
@@ -318,7 +318,7 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
           element.hover(function () {
             icon.css(cssName, bright);
           }, function () {
-            icon.css(cssName, color)
+            icon.css(cssName, color);
           });
 
           // use same color for vertical line

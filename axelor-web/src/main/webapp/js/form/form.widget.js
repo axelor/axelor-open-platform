@@ -238,7 +238,7 @@ ui.directive('uiAttachScroll', function () {
 
       function resetScroll() {
         elem.scrollTop(scrollTop);
-      };
+      }
 
       scope.$on('dom:attach', resetScroll);
       scope.$on('tab:select', resetScroll);
