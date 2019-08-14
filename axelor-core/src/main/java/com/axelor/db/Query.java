@@ -337,7 +337,7 @@ public class Query<T extends Model> {
   }
 
   private TypedQuery<T> fetchQuery(int limit, int offset) {
-    final TypedQuery<T> query = em().createQuery(selectQuery(), beanClass);
+    final TypedQuery<T> query = em().createQuery(joinHelper.fixSelect(selectQuery()), beanClass);
     if (limit > 0) {
       query.setMaxResults(limit);
     }
@@ -385,7 +385,7 @@ public class Query<T extends Model> {
    * @return total number
    */
   public long count() {
-    final TypedQuery<Long> query = em().createQuery(countQuery(), Long.class);
+    final TypedQuery<Long> query = em().createQuery(joinHelper.fixSelect(countQuery()), Long.class);
     this.bind(query).setCacheable(cacheable).setFlushMode(flushMode).setReadOnly();
     return query.getSingleResult();
   }
@@ -766,7 +766,7 @@ public class Query<T extends Model> {
 
     @SuppressWarnings("all")
     public List<List> values(int limit, int offset) {
-      javax.persistence.Query q = em().createQuery(query);
+      javax.persistence.Query q = em().createQuery(joinHelper.fixSelect(query));
       if (limit > 0) {
         q.setMaxResults(limit);
       }
@@ -873,6 +873,11 @@ public class Query<T extends Model> {
 
     private Map<String, String> joins = Maps.newLinkedHashMap();
 
+    private boolean hasCollection;
+
+    private static final Pattern selectPattern =
+        Pattern.compile("^SELECT\\s+(COUNT\\s*\\()?", Pattern.CASE_INSENSITIVE);
+
     private static final Pattern pathPattern = Pattern.compile("self\\." + NAME_PATTERN);
 
     public JoinHelper(Class<?> beanClass) {
@@ -954,6 +959,9 @@ public class Query<T extends Model> {
 
           if (property.getTarget() != null) {
             currentMapper = Mapper.of(property.getTarget());
+            if (property.isCollection()) {
+              this.hasCollection = true;
+            }
           }
 
           if (i == path.length - 2) {
@@ -989,6 +997,10 @@ public class Query<T extends Model> {
       }
 
       return prefix + "." + variable;
+    }
+
+    public String fixSelect(String query) {
+      return hasCollection ? selectPattern.matcher(query).replaceFirst("$0 DISTINCT ") : query;
     }
 
     @Override

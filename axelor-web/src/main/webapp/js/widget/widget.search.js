@@ -58,7 +58,7 @@ _.each(["long", "decimal", "date", "time", "datetime"], function(type) {
 });
 
 _.each(["one-to-many"], function(type) {
-  OPERATORS_BY_TYPE[type] = OPERATORS_BY_TYPE.text;
+  OPERATORS_BY_TYPE[type] = ["isNull", "notNull"];
 });
 
 _.each(["one-to-one", "many-to-one", "many-to-many"], function(type) {
