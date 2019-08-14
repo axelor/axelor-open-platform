@@ -323,7 +323,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
     }
 
     var hilites = field.hilites || [];
-    var exprs = _.map(_.pluck(hilites, 'condition'), $parse);
+    var exprs = _.map(_.pluck(hilites, 'condition'), function (s) { return $parse(s); });
 
     function handle(rec) {
       for (var i = 0; i < hilites.length; i++) {
