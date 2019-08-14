@@ -444,7 +444,7 @@ public class XMLViews {
     applyHotUpdates();
 
     // first find by name
-    if (name != null) {
+    if (StringUtils.notBlank(name)) {
       // with group
       view = findMetaView(views, name, null, model, module, group);
       view = view == null ? findMetaView(views, name, null, null, module, group) : view;
