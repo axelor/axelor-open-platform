@@ -106,7 +106,7 @@ class Entity {
 		sequential = !(node.'@sequential' == "false")
 		groovy = node.'@lang' == "groovy"
 		hashAll = node.'@hashAll' == "true"
-		cacheable = node.'@cachable' || node.'@cacheable'
+		cacheable = node.'@cacheable'.text().size() > 0 ? node.'@cacheable' : node.'@cachable';
 		interfaces = node.'@implements'
 		baseClass = node.'@extends'
 		strategy = node.'@strategy'
