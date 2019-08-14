@@ -357,7 +357,7 @@ public class Resource<T extends Model> {
     int offset = request.getOffset();
     int limit = request.getLimit();
 
-    Query<?> query = getSearchQuery(request, check ? filter : null).cacheable().readOnly();
+    Query<?> query = getSearchQuery(request, check ? filter : null).readOnly();
     List<?> data = null;
     try {
       if (limit > 0) {
@@ -463,7 +463,7 @@ public class Resource<T extends Model> {
     javax.persistence.Query q = JPA.em().createQuery(builder.toString());
     q.setParameter("ids", ids);
 
-    QueryBinder.of(q).setCacheable().setReadOnly();
+    QueryBinder.of(q).setReadOnly();
 
     Map counts = Maps.newHashMap();
     for (Object item : q.getResultList()) {
