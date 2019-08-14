@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
@@ -132,6 +133,8 @@ public class FileService extends AbstractService {
 
     final Map<String, Object> data = new HashMap<>();
     try {
+      fileName = URLDecoder.decode(fileName, "UTF-8");
+
       // check if file name is valid
       MetaFiles.checkPath(fileName);
       MetaFiles.checkType(fileType);
