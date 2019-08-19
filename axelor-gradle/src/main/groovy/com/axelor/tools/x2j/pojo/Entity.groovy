@@ -263,8 +263,12 @@ class Entity {
 			if (isCompatible(existing, prop)) {
 				prop.ownEntity = prop.entity
 				prop.entity = this
+				prop.initParam = false // can't be a constructor param
 				if (existing != null) {
 					properties.remove(existing)
+					if (!existing.ownEntity && existing.initParam) {
+						prop.initParam = true // unless existing is a constructor param
+					}
 				}
 				properties.add(prop)
 				propertyMap[prop.name] = prop

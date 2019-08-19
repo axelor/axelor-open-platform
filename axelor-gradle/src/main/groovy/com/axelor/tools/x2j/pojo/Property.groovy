@@ -282,7 +282,7 @@ class Property {
 	}
 
 	boolean isInitParam() {
-		return !ownEntity && initParam
+		return initParam
 	}
 
 	boolean isNullable() {
