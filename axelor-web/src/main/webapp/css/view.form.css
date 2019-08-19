@@ -1212,11 +1212,14 @@ label.has-help > span:after,
 }
 
 .button-item.img-button {
-  background: #fff !important;
   width: auto !important;
+  height: inherit !important;
+}
+
+.button-item.img-button:not([class*=btn-]) {
+  background: inherit !important;
   border: none  !important;
   padding: 2px !important;
-  height: inherit !important;
 }
 
 .button-item.img-button img {
