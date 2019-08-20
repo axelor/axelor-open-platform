@@ -20,6 +20,7 @@ package com.axelor.auth.pac4j;
 import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthWebModule;
 import com.axelor.common.StringUtils;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Key;
 import com.google.inject.Provides;
@@ -78,7 +79,6 @@ import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.http.adapter.J2ENopHttpActionAdapter;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.util.CommonHelper;
-import org.pac4j.http.client.indirect.FormClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,12 +141,14 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
   protected abstract void configureClients();
 
-  protected void addClient(FormClient client) {
-    clientList.add(0, client);
+  protected void addLocalClient(Client<?, ?> client) {
+    Preconditions.checkState(
+        centralClientNames.isEmpty(), "Local clients must be added before central clients.");
+    clientList.add(client);
     logger.info("Added local client: {}", client.getName());
   }
 
-  protected void addClient(Client<?, ?> client) {
+  protected void addCentralClient(Client<?, ?> client) {
     clientList.add(client);
     centralClientNames.add(client.getName());
     logger.info("Added central client: {}", client.getName());
@@ -208,7 +210,8 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   }
 
   public static boolean isEnabled() {
-    return AuthPac4jModuleOidc.isEnabled()
+    return AuthPac4jModuleLocal.isBasicAuthEnabled()
+        || AuthPac4jModuleOidc.isEnabled()
         || AuthPac4jModuleOAuth.isEnabled()
         || AuthPac4jModuleSaml.isEnabled()
         || AuthPac4jModuleCas.isEnabled();

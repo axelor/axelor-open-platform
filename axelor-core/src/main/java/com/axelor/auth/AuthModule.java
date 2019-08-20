@@ -21,7 +21,7 @@ import com.axelor.app.AppSettings;
 import com.axelor.auth.ldap.AuthLdapModule;
 import com.axelor.auth.pac4j.AuthPac4jModule;
 import com.axelor.auth.pac4j.AuthPac4jModuleCas;
-import com.axelor.auth.pac4j.AuthPac4jModuleForm;
+import com.axelor.auth.pac4j.AuthPac4jModuleLocal;
 import com.axelor.auth.pac4j.AuthPac4jModuleOAuth;
 import com.axelor.auth.pac4j.AuthPac4jModuleOidc;
 import com.axelor.auth.pac4j.AuthPac4jModuleSaml;
@@ -111,8 +111,8 @@ public class AuthModule extends AbstractModule {
         return;
       }
 
-      // Form
-      install(new AuthPac4jModuleForm(context));
+      // Local
+      install(new AuthPac4jModuleLocal(context));
       return;
     }
 

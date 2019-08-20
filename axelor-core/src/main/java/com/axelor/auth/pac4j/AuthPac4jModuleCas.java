@@ -181,7 +181,7 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
         client = new CasClient(casConfig);
     }
 
-    addClient(client);
+    addCentralClient(client);
   }
 
   public static boolean isEnabled() {

@@ -27,12 +27,12 @@ import java.util.function.Function;
 import javax.servlet.ServletContext;
 import org.pac4j.core.client.Client;
 
-public abstract class AuthPac4jModuleMultiClient extends AuthPac4jModuleForm {
+public abstract class AuthPac4jModuleMultiClient extends AuthPac4jModuleLocal {
   public AuthPac4jModuleMultiClient(ServletContext servletContext) {
     super(servletContext);
   }
 
-  protected void addFormClientIfNotExclusive(Map<String, Map<String, String>> allSettings) {
+  protected void addLocalClientsIfNotExclusive(Map<String, Map<String, String>> allSettings) {
     if (allSettings.size() == 1
         && allSettings
             .values()
@@ -42,7 +42,7 @@ public abstract class AuthPac4jModuleMultiClient extends AuthPac4jModuleForm {
             .equals("true")) {
       return;
     }
-    addFormClient();
+    addLocalClients();
   }
 
   protected void addCentralClients(
@@ -54,7 +54,7 @@ public abstract class AuthPac4jModuleMultiClient extends AuthPac4jModuleForm {
       final Function<Map<String, String>, Client<?, ?>> setup = providers.get(provider);
       final Client<?, ?> client =
           setup != null ? setup.apply(settings) : setupGeneric(settings, provider);
-      addClient(client);
+      addCentralClient(client);
     }
   }
 

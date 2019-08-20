@@ -218,7 +218,7 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
         });
 
     final SAML2Client client = new AxelorSAML2Client(saml2Config);
-    addClient(client);
+    addCentralClient(client);
   }
 
   public static boolean isEnabled() {

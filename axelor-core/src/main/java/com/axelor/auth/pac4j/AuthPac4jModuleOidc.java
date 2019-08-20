@@ -51,7 +51,7 @@ public class AuthPac4jModuleOidc extends AuthPac4jModuleMultiClient {
 
   @Override
   protected void configureClients() {
-    addFormClientIfNotExclusive(allSettings);
+    addLocalClientsIfNotExclusive(allSettings);
     addCentralClients(allSettings, providers);
   }
 

@@ -40,9 +40,12 @@ import org.pac4j.core.http.ajax.DefaultAjaxRequestResolver;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.redirect.RedirectAction;
 import org.pac4j.core.util.CommonHelper;
+import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.indirect.FormClient;
 
-public class AuthPac4jModuleForm extends AuthPac4jModule {
+public class AuthPac4jModuleLocal extends AuthPac4jModule {
+
+  public static final String CONFIG_BASIC_AUTH_ENABLED = "auth.local.basic.auth.enabled";
 
   private static final String INCORRECT_CREDENTIALS = /*$$(*/ "Wrong username or password" /*)*/;
   private static final String WRONG_CURRENT_PASSWORD = /*$$(*/ "Wrong current password" /*)*/;
@@ -50,13 +53,13 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
 
   private static final String NEW_PASSWORD_PARAMETER = "newPassword";
 
-  public AuthPac4jModuleForm(ServletContext servletContext) {
+  public AuthPac4jModuleLocal(ServletContext servletContext) {
     super(servletContext);
   }
 
   @Override
   protected void configureClients() {
-    addFormClient();
+    addLocalClients();
   }
 
   @Override
@@ -66,16 +69,27 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
     addFilterChain("/change-password.jsp", ANON);
   }
 
-  protected void addFormClient() {
-    addClient(new AxelorFormClient());
+  protected void addLocalClients() {
+    final Authenticator<UsernamePasswordCredentials> authenticator = new AxelorAuthenticator();
+    addLocalClient(new AxelorFormClient(authenticator));
+
+    if (isBasicAuthEnabled()) {
+      addLocalClient(new DirectBasicAuthClient(authenticator));
+    }
+  }
+
+  public static boolean isBasicAuthEnabled() {
+    final AppSettings settings = AppSettings.get();
+    return settings.getBoolean(CONFIG_BASIC_AUTH_ENABLED, false);
   }
 
   private static class AxelorFormClient extends FormClient {
 
-    public AxelorFormClient() {
-      defaultAuthenticator(new AxelorFormAuthenticator());
-      this.setCredentialsExtractor(new JsonExtractor());
-      this.setAjaxRequestResolver(new AxelorAjaxRequestResolver());
+    public AxelorFormClient(Authenticator<UsernamePasswordCredentials> authenticator) {
+      defaultAuthenticator(authenticator);
+      setName(getClass().getSuperclass().getSimpleName());
+      setCredentialsExtractor(new JsonExtractor());
+      setAjaxRequestResolver(new AxelorAjaxRequestResolver());
     }
 
     @Override
@@ -147,8 +161,7 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
     }
   }
 
-  private static class AxelorFormAuthenticator
-      implements Authenticator<UsernamePasswordCredentials> {
+  private static class AxelorAuthenticator implements Authenticator<UsernamePasswordCredentials> {
 
     @Override
     public void validate(UsernamePasswordCredentials credentials, WebContext context) {
