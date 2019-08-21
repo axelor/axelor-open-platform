@@ -950,10 +950,23 @@ ui.formInput('RefItem', 'ManyToOne', {
 
     var doSelect = _.debounce(function () {
       scope.$timeout(function() {
+        var ds = scope._dataSource;
         var value = (scope.record || {})[ref];
         var v = scope.getValue();
         if (v && v.id === value) return;
-        scope.select(value ? { id: value } : null);
+        var nameField = scope.field.targetName;
+        var fields = nameField ? [nameField] : undefined;
+        var promise = ds._request('fetch', value).post({ fields: fields }, { silent: true });
+        promise.success(function (response) {
+          var record = _.first(response.data) || (value ? { id: value } : null);
+          scope.select(record);
+        }).error(function () {
+          var record = value ? { id: value } : null;
+          if (record) {
+            record[nameField] = value;
+          }
+          scope.setValue(record, false);
+        });
       });
     }, 100);
 
