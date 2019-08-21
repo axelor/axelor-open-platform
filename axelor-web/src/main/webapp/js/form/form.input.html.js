@@ -320,8 +320,9 @@ ui.formInput('Html', {
     function onChange(e) {
 
       var value = shellActive ? shell.getHTML() : textElement.val();
+      var text = (value || '').trim()
 
-      if (value && value.trim() === '<br>') {
+      if (text === '<p><br></p>' || text === '<br>') {
         value = null;
       }
 
