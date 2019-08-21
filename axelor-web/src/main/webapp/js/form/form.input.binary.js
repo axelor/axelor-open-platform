@@ -99,6 +99,7 @@ ui.formInput('ImageLink', {
     };
 
     scope.$watch("record.id", update);
+    scope.$watch("record.version", update);
     scope.$watch("isReadonly()", update);
   },
   template_editable: '<input type="text">',
@@ -250,15 +251,12 @@ ui.formInput('Image', 'ImageLink', {
       };
     }
 
-    scope.$render_editable = function() {
+    var update = scope.$render_editable = function() {
       image.get(0).src = scope.getLink(model.$viewValue);
     };
 
-    scope.$watch("record.id", function imageRecordIdWatch(id, old) {
-      if (!scope.isReadonly()) {
-        scope.$render_editable();
-      }
-    });
+    scope.$watch("record.id", update);
+    scope.$watch("record.version", update);
   },
   template_editable:
   '<div ng-style="styles[0]" class="image-wrapper">' +
