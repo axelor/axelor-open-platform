@@ -348,12 +348,10 @@
 
     return {
       response: function(response) {
-        if (!response.config || !response.config.silent) {
-          onHttpStop();
-        }
+        onHttpStop();
         if (response.data) {
           if (response.data.status === -1) { // STATUS_FAILURE
-            $rootScope.$broadcast('event:http-error', response.data);
+            if (!response.config.silent) $rootScope.$broadcast('event:http-error', response.data);
             return $q.reject(response);
           }
           if (response.data.status === -7) { // STATUS_LOGIN_REQUIRED
