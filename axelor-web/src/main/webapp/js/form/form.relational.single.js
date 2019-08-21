@@ -108,8 +108,9 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
           record[nameField] = rec[nameField];
         }
         _.each(missing, function(name) {
-          var prefix = name.split('.')[0];
-          record[prefix] = rec[prefix];
+          var value = ui.findNested(rec, name);
+          if (value === undefined) value = null;
+          ui.setNested(record, name, value);
         });
         $scope.setValue(record, false);
       });
