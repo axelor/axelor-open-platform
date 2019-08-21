@@ -60,6 +60,22 @@
     return undefined;
   }
 
+  function setNested(record, name, value) {
+    if (!record || !name) return record;
+    var path = name.split('.');
+    var nested = record;
+    var idx = -1;
+    while (++idx < path.length) {
+      var key = path[idx];
+      if (idx !== path.length - 1) {
+        nested = nested[key] || (nested[key] = {});
+      } else {
+        nested[key] = value;
+      }
+    }
+    return record;
+  }
+
   // override angular.js currency filter
   ui.filter('currency', function () {
     return addCurrency;
@@ -79,6 +95,7 @@
   }
 
   ui.findNested = findNested;
+  ui.setNested = setNested;
 
   ui.formatters = {
 
