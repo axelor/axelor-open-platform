@@ -26,7 +26,6 @@ import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
-import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
@@ -60,6 +59,8 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
+import com.axelor.rpc.filter.Filter;
+import com.axelor.rpc.filter.JPQLFilter;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
@@ -220,11 +221,13 @@ public class MetaService {
             (Map) ((Map) actionExecutor.execute(request).getItem(0)).get("view");
         final Map<String, Object> context = (Map) data.get("context");
         final String domain = (String) data.get("domain");
-        final JpaRepository<?> repo = JpaRepository.of((Class) request.getBeanClass());
-        return ""
-            + (domain == null
-                ? repo.all().count()
-                : repo.all().filter(domain).bind(context).count());
+        final List<Filter> filters =
+            Lists.newArrayList(new JPQLFilter("self.archived IS NULL OR self.archived = FALSE"));
+        if (StringUtils.notBlank(domain)) {
+          filters.add(JPQLFilter.forDomain(domain));
+        }
+        final Filter filter = Filter.and(filters);
+        return String.valueOf(filter.build((Class) request.getBeanClass()).bind(context).count());
       } catch (Exception e) {
         LOG.error("Unable to read tag for menu: {}", item.getName());
         LOG.trace("Error", e);

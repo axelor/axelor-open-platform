@@ -269,7 +269,6 @@ public class TestActions extends MetaTest {
     } catch (Exception e) {
       assertTrue(e instanceof IllegalArgumentException);
     }
-
   }
 
   @Test
