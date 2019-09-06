@@ -197,6 +197,10 @@ public class I18nExtractor {
                 viewType = qName;
               }
 
+              if (StringUtils.isBlank(title) && "attribute".equals(qName) && "title".equals(name)) {
+                title = attributes.getValue("value");
+              }
+
               if (name != null
                   && StringUtils.isBlank(title)
                   && (FIELD_NODES.contains(qName)
