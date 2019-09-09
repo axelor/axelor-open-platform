@@ -1309,6 +1309,9 @@
             <xsd:documentation>Specify whether to show editor on new record (o2m/m2m fields)</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="depends" use="prohibited" />
+        <xsd:attribute name="onTabSelect" use="prohibited" />
+        <xsd:attribute name="sidebar" use="prohibited" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
