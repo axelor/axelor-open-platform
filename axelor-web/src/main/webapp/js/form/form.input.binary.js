@@ -251,12 +251,12 @@ ui.formInput('Image', 'ImageLink', {
       };
     }
 
-    var update = scope.$render_editable = function() {
+    var updateLink = scope.$render_editable = function() {
       image.get(0).src = scope.getLink(model.$viewValue);
     };
 
-    scope.$watch("record.id", update);
-    scope.$watch("record.version", update);
+    scope.$watch("record.id", updateLink);
+    scope.$watch("record.version", updateLink);
   },
   template_editable:
   '<div ng-style="styles[0]" class="image-wrapper">' +
