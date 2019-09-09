@@ -31,11 +31,11 @@ final class Naming {
 	}
 
 	/**
-	 * Check whether the given name is Java reserved keyword.
+	 * Check whether the given name is a reserved keyword.
 	 * 
 	 */
 	public static boolean isReserved(String name) {
-		return RESERVED_JAVA.contains(name);
+		return RESERVED_JAVA.contains(name) || RESERVED_EXTRA.contains(name);
 	}
 
 	/**
@@ -55,6 +55,14 @@ final class Naming {
 	public static String quoteColumn(String name) {
 		return "`" + name + "`"
 	}
+
+	// Internal Reserved
+	private static final Set<String> RESERVED_EXTRA = new LinkedHashSet<>([
+		"version",
+		"archived",
+		"selected",
+		"constructor"
+	])
 
 	// Java Keywords
 	private static final Set<String> RESERVED_JAVA = new LinkedHashSet<>([

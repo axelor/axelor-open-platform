@@ -480,7 +480,7 @@ class Property {
 
 		if (Naming.isReserved(name)) {
 			throw new IllegalArgumentException(
-				"Invalid use of a Java keyword '${name}' in domain object: ${entity.name}")
+				"Invalid use of a reserved name '${name}' in domain object: ${entity.name}")
 		}
 
 		if (collection) {
