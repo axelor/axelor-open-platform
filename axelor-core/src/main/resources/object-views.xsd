@@ -787,6 +787,14 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-big" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Allow duration of more than 100 hours in a duration widget</xsd:documentation>
+      </xsd:annotation></xsd:attribute>
+    <xsd:attribute name="x-seconds" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Show seconds in a duration widget</xsd:documentation>
+      </xsd:annotation></xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:attributeGroup name="RelationalAttributes">
