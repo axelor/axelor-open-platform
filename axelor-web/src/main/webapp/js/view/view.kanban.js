@@ -579,11 +579,28 @@ ui.directive('uiCard', ["$compile", function ($compile) {
       element.fadeIn("slow");
 
       var summaryHandler;
+      var summaryPlacement;
       var summary = body.find('.card-summary.popover');
 
       var configureSummary = _.once(function configureSummary() {
         element.popover({
-          placement: 'top',
+          placement: function (tip, el) {
+            summaryPlacement = setTimeout(function () {
+              $(tip).css('visibility', 'hidden').css('max-width', 400).position({
+                my: 'left',
+                at: 'right',
+                of: el,
+                using: function (pos, feedback) {
+                  $(feedback.element.element)
+                    .css(pos)
+                    .css('visibility', '')
+                    .removeClass('left right')
+                    .addClass(feedback.horizontal === 'left' ? 'right' : 'left');
+                  summaryPlacement = null;
+                }
+              });
+            });
+          },
           container: 'body',
           trigger: 'manual',
           title: summary.attr('title'),
@@ -594,6 +611,10 @@ ui.directive('uiCard', ["$compile", function ($compile) {
 
       function showSummary() {
         configureSummary();
+        if (summaryPlacement) {
+          clearTimeout(summaryPlacement);
+          summaryPlacement = null;
+        }
         summaryHandler = setTimeout(function () {
           summaryHandler = null;
           element.popover('show');
@@ -601,6 +622,10 @@ ui.directive('uiCard', ["$compile", function ($compile) {
       }
 
       function hideSummary() {
+        if (summaryPlacement) {
+          clearTimeout(summaryPlacement);
+          summaryPlacement = null;
+        }
         if (summaryHandler) {
           clearTimeout(summaryHandler);
           summaryHandler = null;
