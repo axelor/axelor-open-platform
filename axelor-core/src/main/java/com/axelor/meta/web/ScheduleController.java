@@ -26,10 +26,10 @@ public class ScheduleController {
     try {
       CronExpression.validateExpression(cronExpression);
 
-      response.setNotify(I18n.get("Valid cron. Next execution dates are : ") + "<br/>"
+      response.setNotify(I18n.get("Valid cron. Next execution dates are :") + "<br/>"
           + getNextSchedule(cronExpression).stream().map(this::format).collect(Collectors.joining("<br/>")));
     } catch(Exception e) {
-      response.setError(I18n.get("Invalid cron : ") + " " + cronExpression);
+      response.setError(I18n.get("Invalid cron :") + " " + cronExpression);
     }
   }
 
