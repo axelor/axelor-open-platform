@@ -18,7 +18,9 @@
 package com.axelor.web.servlet;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.internal.AppFilter;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Calendar;
 import java.util.Date;
 import javax.inject.Singleton;
@@ -77,7 +79,8 @@ public class NoCacheFilter implements Filter {
     }
 
     if (production && !busted) {
-      res.sendRedirect(uri + "?" + CACHE_BUSTER_PARAM);
+      res.sendRedirect(
+          URI.create(AppFilter.getBaseURL()).resolve(uri + "?" + CACHE_BUSTER_PARAM).toString());
       return;
     }
 
