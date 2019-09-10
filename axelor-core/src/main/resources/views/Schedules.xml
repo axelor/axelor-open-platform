@@ -4,6 +4,10 @@
   xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.1.xsd">
 
   <grid name="meta-schedule-grid" title="Schedules" model="com.axelor.meta.db.MetaSchedule" editable="true">
+    <toolbar>
+      <button name="btnRestart" showIf="isServiceEnable" title="Restart jobs" prompt="This may terminate any running jobs. Are sure to continue ?" onClick="save,com.axelor.meta.web.ScheduleController:restart"/>
+      <button name="btnStop" showIf="isServiceEnable" title="Stop service" prompt="This may terminate any running jobs. Are sure to continue ?" onClick="com.axelor.meta.web.ScheduleController:stop"/>
+    </toolbar>
     <field name="name" />
     <field name="job" />
     <field name="cron" />
@@ -11,6 +15,11 @@
   </grid>
 
   <form name="meta-schedule-form" title="Schedule" model="com.axelor.meta.db.MetaSchedule">
+    <help css="alert-error" if="!isServiceEnable" >
+      <![CDATA[
+      The scheduler service is disabled.
+      ]]>
+    </help>
     <panel title="Overview">
       <field name="name"/>
       <field name="active"/>
@@ -18,8 +27,8 @@
       <field name="job" colSpan="12"/>
       <field name="cron" colSpan="12"/>
       <button-group colSpan="4">
-        <button name="btnValidate" title="Validate" onClick="com.axelor.quartz.JobRunner:validate(cron)"/>
-        <button name="btnRestart" title="Restart jobs..." prompt="This may terminate any running jobs. Are sure to continue?" onClick="com.axelor.quartz.JobRunner:restart()"/>
+        <button name="btnValidate" title="Validate" onClick="com.axelor.meta.web.ScheduleController:validate"/>
+        <button name="btnUpdate" title="Update" showIf="isServiceEnable" prompt="This will update job with current settings. Are sure to continue ?" onClick="save,com.axelor.meta.web.ScheduleController:update"/>
       </button-group>
     </panel>
     <panel-related field="params" editable="true">

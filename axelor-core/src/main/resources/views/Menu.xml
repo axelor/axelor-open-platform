@@ -164,6 +164,7 @@
   <action-view name="meta.jobs" title="All Schedules" model="com.axelor.meta.db.MetaSchedule">
     <view type="grid" name="meta-schedule-grid"/>
     <view type="form" name="meta-schedule-form"/>
+    <context name="isServiceEnable" expr="call: com.axelor.quartz.JobRunner:isEnabled()"/>
   </action-view>
 
 </object-views>

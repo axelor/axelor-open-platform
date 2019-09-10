@@ -23,6 +23,7 @@ import com.axelor.i18n.I18n;
 import com.axelor.meta.CallMethod;
 import com.axelor.meta.db.MetaSchedule;
 import com.axelor.meta.db.MetaScheduleParam;
+import com.google.common.base.Preconditions;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.quartz.CronScheduleBuilder;
@@ -30,6 +31,7 @@ import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -60,10 +62,14 @@ public class JobRunner {
     this.scheduler = scheduler;
   }
 
+  @CallMethod
   public boolean isEnabled() {
     return AppSettings.get().getBoolean(CONFIG_QUARTZ_ENABLE, false);
   }
 
+  /**
+   * Configure all schedulers.
+   */
   private void configure() {
     if (total > 0) {
       return;
@@ -80,6 +86,11 @@ public class JobRunner {
     log.info("Configured total jobs: {}", total);
   }
 
+  /**
+   * Configure the given scheduler
+   *
+   * @param meta
+   */
   private void configure(MetaSchedule meta) {
 
     if (meta == null || meta.getActive() != Boolean.TRUE) {
@@ -143,21 +154,35 @@ public class JobRunner {
   }
 
   /**
-   * Validate the given cron string.
+   * Update the given scheduler.
    *
-   * @param cron the cron string to validate
+   * @param meta
+   * @throws SchedulerException
    */
-  @CallMethod
-  public void validate(String cron) {
-    try {
-      CronScheduleBuilder.cronSchedule(cron);
-    } catch (Exception e) {
-      throw new IllegalArgumentException(I18n.get("Invalid cron:") + " " + cron);
+  public void update(MetaSchedule meta) throws SchedulerException {
+    if (!isEnabled()) {
+      throw new IllegalStateException(I18n.get("The scheduler service is disabled."));
     }
+
+    Preconditions.checkNotNull(meta);
+
+    JobKey jobKey = new JobKey(meta.getName());
+    if(scheduler.checkExists(jobKey)) {
+      log.info("Deleting job: {}", meta.getName());
+      scheduler.deleteJob(jobKey);
+      total -= 1;
+    }
+
+    if(meta.getActive() != Boolean.TRUE) {
+      return;
+    }
+
+    configure(meta);
   }
 
-  /** Start the scheduler. */
-  @CallMethod
+  /**
+   * Start the scheduler.
+   */
   public void start() {
     if (!isEnabled()) {
       throw new IllegalStateException(I18n.get("The scheduler service is disabled."));
@@ -174,8 +199,9 @@ public class JobRunner {
     log.info("Job scheduler is running...");
   }
 
-  /** Stop the scheduler. */
-  @CallMethod
+  /**
+   * Stop the scheduler.
+   */
   public void stop() {
     log.info("Stopping scheduler...");
     try {
@@ -187,8 +213,9 @@ public class JobRunner {
     log.info("The job scheduler stopped.");
   }
 
-  /** Reconfigure the scheduler and restart. */
-  @CallMethod
+  /**
+   * Reconfigure the scheduler and restart.
+   */
   public void restart() {
     try {
       scheduler.clear();
