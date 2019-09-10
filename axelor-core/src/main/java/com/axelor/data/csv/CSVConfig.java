@@ -18,6 +18,7 @@
 package com.axelor.data.csv;
 
 import com.axelor.common.VersionUtils;
+import com.axelor.data.XStreamUtils;
 import com.axelor.data.adapter.DataAdapter;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
@@ -76,7 +77,7 @@ public class CSVConfig {
    * @return an instance of {@link CSVConfig} for the given file
    */
   public static CSVConfig parse(File input) {
-    XStream stream = new XStream();
+    XStream stream = XStreamUtils.createXStream();
     stream.processAnnotations(CSVConfig.class);
     return (CSVConfig) stream.fromXML(input);
   }

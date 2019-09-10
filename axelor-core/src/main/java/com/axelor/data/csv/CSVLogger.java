@@ -17,6 +17,7 @@
  */
 package com.axelor.data.csv;
 
+import com.axelor.data.XStreamUtils;
 import com.axelor.data.adapter.DataAdapter;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
@@ -219,7 +220,7 @@ public class CSVLogger {
   private void computeBindings() throws IOException {
     List<String> lines = Lists.newArrayList();
     StringBuilder sb = new StringBuilder();
-    XStream xStream = new XStream();
+    XStream xStream = XStreamUtils.createXStream();
     xStream.processAnnotations(CSVConfig.class);
     String originalFileName = this.csvInput.getFileName();
 

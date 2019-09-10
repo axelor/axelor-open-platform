@@ -21,6 +21,7 @@ import com.axelor.data.ImportException;
 import com.axelor.data.ImportTask;
 import com.axelor.data.Importer;
 import com.axelor.data.Listener;
+import com.axelor.data.XStreamUtils;
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
@@ -302,6 +303,7 @@ public class XMLImporter implements Importer {
       binder.registerAdapter(adapter);
     }
 
+    XStreamUtils.setupSecurity(stream);
     stream.setMode(XStream.NO_REFERENCES);
     stream.registerConverter(new ElementConverter(binder));
 

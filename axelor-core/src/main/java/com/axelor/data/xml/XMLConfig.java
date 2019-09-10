@@ -17,6 +17,7 @@
  */
 package com.axelor.data.xml;
 
+import com.axelor.data.XStreamUtils;
 import com.axelor.data.adapter.DataAdapter;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
@@ -46,7 +47,7 @@ public class XMLConfig {
   }
 
   public static XMLConfig parse(File input) {
-    XStream stream = new XStream();
+    XStream stream = XStreamUtils.createXStream();
     stream.setMode(XStream.NO_REFERENCES);
     stream.processAnnotations(XMLConfig.class);
     return (XMLConfig) stream.fromXML(input);
