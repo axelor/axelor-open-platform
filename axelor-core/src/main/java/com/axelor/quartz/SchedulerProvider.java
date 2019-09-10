@@ -40,6 +40,8 @@ class SchedulerProvider implements Provider<Scheduler> {
 
   @Inject private GuiceJobFactory jobFactory;
 
+  @Inject private JobCleaner jobCleaner;
+
   @Override
   public Scheduler get() {
 
@@ -52,6 +54,7 @@ class SchedulerProvider implements Provider<Scheduler> {
       schedulerFactory = new GuiceSchedulerFactory(cfg);
       scheduler = schedulerFactory.getScheduler();
       scheduler.setJobFactory(jobFactory);
+      scheduler.getListenerManager().addJobListener(jobCleaner);
     } catch (SchedulerException e) {
       throw new RuntimeException(e);
     }
