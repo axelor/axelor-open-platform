@@ -734,6 +734,7 @@ public class MetaService {
       map.put("groupBy", cs.getGroupBy());
       map.put("aggregate", cs.getAggregate());
       map.put("title", cs.getLocalizedTitle());
+      map.put("scale", cs.getScale());
       series.add(map);
     }
 

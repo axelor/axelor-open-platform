@@ -767,6 +767,22 @@ function Chart(scope, element, data) {
       return;
     }
 
+    // series scale attribute
+    var series = _.first(data.series);
+    var scale = series && series.scale;
+
+    // format as integer if no scale is specified
+    // and data has integer series values
+    if (!isInteger(scale) && hasIntegerValues(data)) {
+      scale = 0;
+    }
+
+    if (isInteger(scale)) {
+      var format = '.' + scale + 'f';
+      chart.yAxis && chart.yAxis.tickFormat(d3.format(format));
+      chart.valueFormat && chart.valueFormat(d3.format(format));
+    }
+
     if (chart.color) {
       chart.color(colors(config.colors, config.shades, type));
     }
@@ -864,6 +880,16 @@ function Chart(scope, element, data) {
 
     return chart;
   });
+}
+
+function hasIntegerValues(data) {
+  var series = _.first(data.series);
+  var dataset = _.first(data.dataset);
+  return series && dataset && isInteger(dataset[series.key]);
+}
+
+function isInteger(n) {
+  return (n ^ 0) === n;
 }
 
 var directiveFn = function(){

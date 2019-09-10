@@ -123,6 +123,8 @@ public class ChartView extends AbstractView {
 
     @XmlAttribute private String aggregate;
 
+    @XmlAttribute private Integer scale;
+
     public String getKey() {
       return key;
     }
@@ -151,6 +153,10 @@ public class ChartView extends AbstractView {
 
     public String getAggregate() {
       return aggregate;
+    }
+
+    public Integer getScale() {
+      return scale;
     }
   }
 

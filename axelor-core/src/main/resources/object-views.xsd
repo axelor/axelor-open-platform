@@ -1986,6 +1986,10 @@
                   </xsd:restriction>
                 </xsd:simpleType>
               </xsd:attribute>
+              <xsd:attribute name="scale" type="xsd:int">
+                <xsd:annotation>
+                  <xsd:documentation>Scale of the values (number of digits in decimal part)</xsd:documentation>
+                </xsd:annotation></xsd:attribute>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="config" maxOccurs="unbounded" minOccurs="0">
