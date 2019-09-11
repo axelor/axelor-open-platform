@@ -124,6 +124,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
     }
 
     var nameField = $scope.field.targetName || 'id';
+    var trKey = '$t:' + nameField;
     var record = value;
 
     if (value && value.id) {
@@ -135,6 +136,10 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
       var missing = $scope.findRelativeFields().filter(function (name) {
         return !value || ui.findNested(value, name) === undefined;
       });
+      
+      if (value[trKey] !== undefined) {
+        record[trKey] = value[trKey];
+      }
 
       if (value[nameField] !== undefined) {
         record[nameField] = value[nameField];
@@ -314,8 +319,9 @@ ui.formInput('ManyToOne', 'Select', {
     scope.canShowTag = scope.field['tag-edit'];
 
     scope.formatItem = function(item) {
+      var trKey = "$t:" + scope.field.targetName;
       if (item) {
-        return item[(scope.field.targetName || "id")];
+        return item[trKey] || item[(scope.field.targetName || "id")];
       }
       return "";
     };
