@@ -78,8 +78,6 @@ public class AppInfo {
 
     if (user.getImage() != null) {
       map.put("user.image", getLink(user, null));
-    } else {
-      map.put("user.image", "img/user.png");
     }
 
     if (group != null) {
