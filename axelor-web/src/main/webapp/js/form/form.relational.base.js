@@ -376,9 +376,10 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
     }
 
     fetchDS().search(params).success(function(records, page){
+      var trKey = '$t:' + nameField;
       var items = _.map(records, function(record) {
         return {
-          label: record[nameField],
+          label: record[trKey] || record[nameField],
           value: record
         };
       });
