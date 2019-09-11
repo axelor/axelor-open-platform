@@ -15,11 +15,13 @@
   </grid>
 
   <form name="meta-schedule-form" title="Schedule" model="com.axelor.meta.db.MetaSchedule">
-    <help css="alert-error" if="!isServiceEnable" >
-      <![CDATA[
-      The scheduler service is disabled.
-      ]]>
-    </help>
+    <panel showIf="!isServiceEnable" hidden="true">
+      <static css="text-error">
+        <![CDATA[
+        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> The scheduler service is disabled.
+        ]]>
+      </static>
+    </panel>
     <panel title="Overview">
       <field name="name"/>
       <field name="active"/>

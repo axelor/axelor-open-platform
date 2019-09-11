@@ -1,4 +1,5 @@
 "key","message","comment","context"
+"<i class=""fa fa-exclamation-triangle"" aria-hidden=""true""></i> The scheduler service is disabled.","<i class=""fa fa-exclamation-triangle"" aria-hidden=""true""></i> Le service de planificateur est désactivé.",,
 "Access error","Erreur d'accès",,
 "Action","Action",,
 "Action Menu","Action de menu",,
@@ -399,7 +400,6 @@
 "The record(s) are referenced by other records, please remove all the references first.","Cet enregistrement est déjà utilisé dans d'autres enregistrements, veuillez d’abord supprimer ces références.",,
 "The record(s) can't be updated as it violates unique constraint.","L'enregistrement ne peut pas être mis à jour car il enfreint la contrainte d'unicité.",,
 "The scheduler service has been stopped.","Le service de planificateur est arrêté.",,
-"The scheduler service is disabled.","Le service de planificateur est désactivé.",,
 "The select item title","Titre de la sélection",,
 "The select item value","Valeur de la sélection",,
 "Theme","Thème",,
