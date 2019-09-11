@@ -476,7 +476,7 @@ ui.formInput('ImageSelect', 'Select', {
 
       return el;
     };
-    
+
     var $render_editable = scope.$render_editable;
     scope.$render_editable = function () {
       $render_editable.apply(scope, arguments);

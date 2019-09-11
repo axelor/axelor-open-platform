@@ -136,7 +136,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
       var missing = $scope.findRelativeFields().filter(function (name) {
         return !value || ui.findNested(value, name) === undefined;
       });
-      
+
       if (value[trKey] !== undefined) {
         record[trKey] = value[trKey];
       }
