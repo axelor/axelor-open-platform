@@ -717,10 +717,18 @@
         <xsd:documentation>Specify whether to allow export to csv from o2m/m2m.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="x-direction" type="xsd:string">
+    <xsd:attribute name="x-direction">
       <xsd:annotation>
-        <xsd:documentation>Specify the layout direction (horizontal, vertical) of some widgets(e.g. RadioSelect)</xsd:documentation>
+        <xsd:documentation>
+          Specify the layout direction (horizontal, vertical) of some widgets(e.g. RadioSelect)
+        </xsd:documentation>
       </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="horizontal"></xsd:enumeration>
+          <xsd:enumeration value="vertical"></xsd:enumeration>
+        </xsd:restriction>
+      </xsd:simpleType>
     </xsd:attribute>
     <xsd:attribute name="x-code-syntax" type="xsd:string">
       <xsd:annotation>
