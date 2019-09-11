@@ -1,4 +1,4 @@
-## 5.1.1 (current)
+## 5.2.0 (current)
 
 #### Enhancements
 
