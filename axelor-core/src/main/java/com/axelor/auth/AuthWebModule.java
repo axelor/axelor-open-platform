@@ -34,6 +34,7 @@ public class AuthWebModule extends ShiroWebModule {
   }
 
   protected void configureAnon() {
+    this.addFilterChain("/ws/public/**", ANON);
     this.addFilterChain("/public/**", ANON);
     this.addFilterChain("/dist/**", ANON);
     this.addFilterChain("/lib/**", ANON);
