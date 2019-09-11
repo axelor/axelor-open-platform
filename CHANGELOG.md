@@ -1,6 +1,29 @@
 ## 5.0.17 (current)
 
-TBD
+#### Enhancements
+
+- Improve tracking message formatting
+- Clear the persistence context after job is executed
+
+#### Bugs
+
+- Fix calendar view color issue
+- Fix advance search on transient fields
+- Fix showIf expression on custom o2m field issue
+- Fix toolbar buttons remains highlighted on view switch
+- Center mail message avast image
+- Fix grid selected rows (exclude group rows)
+- Fix display time on calendar
+- Fix hilite expression parsing issue
+- Fix pagination issue caused by use of query cache
+- Fix file name encoding when upload DMSFile
+- Fix dotted fields issue
+- Exclude archived records from tag-count
+- Fix empty PDF tab with Chrome
+- Do not show concurrent updates error on missing reference
+- Fix kanban view tooltip placement issue
+- Fix nested editor issue with canSelect=false
+- Fix translation value of translatable m2o name field is not reflected
 
 ## 5.0.16 (2019-06-28)
 
