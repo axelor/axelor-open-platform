@@ -1,6 +1,68 @@
 ## 5.1.1 (current)
 
-TBD
+#### Enhancements
+
+- Upgrade to Shiro 1.4.1
+- Add support for SAML2
+- Add support for OpenID Connect
+- Log authentication failure
+- Add support for sidebar panels with custom models
+- Add support for customer field type spacer
+- Add "auth." prefix to authentication-related configurations
+- Implement CAS via pac4j
+- Use view.menubar.location instead of application.menu
+- Add support for more CAS client types
+- Improved custom field views
+- Do not generate default value if default="" is given
+- Add support for OAuth
+- Allow to set target-name attribute on custom model fields
+- Use woodstox StAX API for data import
+- Improve tracking message formatting
+- Add support for toolbar and menubar in kanban view
+- Prohibited usage of some unsupported editor attributes
+- Add domain field name validation for few more reserved names
+- Add x-big and x-seconds attributes
+- Configure XStream security framework
+- Add scale attribute to chart series
+- Clear the persistence context after job is executed
+- Add /ws/public/** as anonymous rest endpoints
+- Use icon if user profile image is not set
+
+#### Bugs
+
+- Skip linked bindings when finding observers
+- Fix json field ordering issue
+- Fix unable to open form from grid dashlet
+- Fix calendar view color issue
+- Fix BinaryLink & Image widgets with custom json models
+- Fix advance search on transient fields
+- Fix showIf expression on custom o2m field issue
+- Fix button in custom model grid
+- Fix downloading of meta files in JSON fields
+- Fix EntityHelper#hashCode inconsistent with generated entities
+- Fix toolbar buttons remains highlighted on view switch
+- Center mail message avast image
+- Fix grid selected rows (exclude group rows)
+- Fix display time on calendar
+- Fix hilite expression parsing issue
+- Fix pagination issue caused by use of query cache
+- Fix pagination issue when searching on collection fields
+- Fix file name encoding when upload DMSFile
+- Fix random view if view by name not found
+- Fix initParam with field override
+- Fix img-button css
+- Fix dotted fields issue
+- Fix image widget reload issue
+- Do not show concurrent updates error on missing reference
+- Fix html widget empty value issue
+- Exclude archived records from tag-count
+- Log non-existing view error instead of throwing exception
+- Fix empty PDF tab with Chrome
+- Extract title attribute in extensions for i18n
+- Fix kanban view tooltip placement issue
+- Fix redirect issue with https proxy
+- Fix nested editor issue with canSelect=false
+- Fix translation value of translatable m2o name field is not reflected
 
 ## 5.1.0 (2019-06-28)
 
