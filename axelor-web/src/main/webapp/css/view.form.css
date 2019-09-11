@@ -1156,17 +1156,11 @@ label.has-help > span:after,
 .image-select > i.fa {
   position: absolute;
   max-height: 18px;
-  height: 18px;
-  width: 18px;
 }
 
 .image-select.readonly > img,
 .image-select.readonly > i.fa {
   position: initial;
-}
-
-.image-select input {
-  padding-left: 18px !important;
 }
 
 .empty > .image-select input {
@@ -1177,8 +1171,6 @@ label.has-help > span:after,
 .image-select-item i.fa {
   margin-right: 6px;
   max-height: 18px;
-  width: 18px;
-  height: 18px;
 }
 
 .image-select-item > a {

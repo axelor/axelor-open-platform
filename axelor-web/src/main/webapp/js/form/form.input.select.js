@@ -476,6 +476,14 @@ ui.formInput('ImageSelect', 'Select', {
 
       return el;
     };
+    
+    var $render_editable = scope.$render_editable;
+    scope.$render_editable = function () {
+      $render_editable.apply(scope, arguments);
+      setTimeout(function () {
+        element.find('input').css('padding-left', element.find('i.image,img').width());
+      });
+    };
   },
   template_readonly:
     '<span class="image-select readonly">'+
