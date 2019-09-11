@@ -348,6 +348,10 @@ ui.formInput('ManyToOne', 'Select', {
       }
     });
 
+    scope.isHiddenSelf = function() {
+      return scope.isHidden();
+    };
+
     if (field.widget === 'NestedEditor') {
 
       scope.isHiddenSelf = function() {
