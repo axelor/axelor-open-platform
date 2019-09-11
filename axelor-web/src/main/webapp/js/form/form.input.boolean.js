@@ -173,6 +173,11 @@ ui.formInput('BooleanRadio', 'BooleanSelect', {
   css: 'form-item boolean-radio-item',
   metaWidget: true,
   link_editable: function (scope, element, attrs, model) {
+    var field = scope.field;
+
+    if (field.direction === "vertical") {
+      element.addClass("boolean-radio-vertical");
+    }
 
     var inputName = _.uniqueId('boolean-radio');
     var trueInput = $('<input type="radio" data-value="true" name="' + inputName + '">');
@@ -180,16 +185,19 @@ ui.formInput('BooleanRadio', 'BooleanSelect', {
 
     var items = scope.$items;
 
-    $('<label class="ibox round">')
+    $('<li>').append(
+      $('<label class="ibox round">')
       .append(trueInput)
       .append($('<i class="box">'))
       .append($('<span class="title">').text(items[0]))
-      .appendTo(element);
-    $('<label class="ibox round">')
+    ).appendTo(element);
+
+    $('<li>').append(
+      $('<label class="ibox round">')
       .append(falseInput)
       .append($('<i class="box">'))
       .append($('<span class="title">').text(items[1]))
-      .appendTo(element);
+    ).appendTo(element);
 
     scope.$render_editable = function () {
       var value = model.$viewValue || false;
@@ -203,7 +211,7 @@ ui.formInput('BooleanRadio', 'BooleanSelect', {
       scope.$applyAsync();
     });
   },
-  template_editable: "<span></span>"
+  template_editable: "<ul class='boolean-radio'></ul>"
 });
 
 ui.formInput('BooleanSwitch', 'Boolean', {

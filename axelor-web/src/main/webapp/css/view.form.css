@@ -661,7 +661,8 @@ td.form-item > * {
 }
 
 .form-item ul.radio-select,
-.form-item ul.checkbox-select  {
+.form-item ul.checkbox-select,
+.form-item-container ul.boolean-radio {
   list-style-type: none;
   overflow: hidden;
   padding-top: 3px;
@@ -669,13 +670,15 @@ td.form-item > * {
 }
 
 .form-item ul.radio-select > li,
-.form-item ul.checkbox-select > li {
+.form-item ul.checkbox-select > li,
+.form-item-container ul.boolean-radio > li {
   float: left;
   margin: 0 4px;
 }
 
 .form-item ul.radio-select-vertical > li,
-.form-item ul.checkbox-select-vertical > li {
+.form-item ul.checkbox-select-vertical > li,
+.form-item-container ul.boolean-radio-vertical > li {
   float: none;
 }
 
