@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.quartz.CronExpression;
 
-public class ScheduleController {
+public class JobController {
 
   @Inject
   private JobRunner jobRunner;
