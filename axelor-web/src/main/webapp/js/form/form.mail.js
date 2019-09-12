@@ -1098,14 +1098,27 @@ ui.formWidget('PanelMail', {
       if (!author || !author.id) {
         return;
       }
-      NavService.openTab({
-        action: act || _.uniqueId('$act'),
-        model: model,
-        viewType: "form",
-        views: [{ type: "form", name: "user-info-form" }]
-      }, {
-        mode: "edit",
-        state: author.id
+
+      function openUserForm(name) {
+        NavService.openTab({
+          title: _t('User'),
+          action: act || _.uniqueId('$act'),
+          model: model,
+          viewType: "form",
+          views: [{ type: "form", name: name }]
+        }, {
+          mode: "edit",
+          state: author.id
+        });
+      };
+
+      ViewService.getMetaDef(model, {
+        type: 'form',
+        name: 'user-info-form'
+      }).then(function (meta) {
+        openUserForm('user-info-form');
+      },function () {
+        openUserForm('user-form');
       });
     };
 
