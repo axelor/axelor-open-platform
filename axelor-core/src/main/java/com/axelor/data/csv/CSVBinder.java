@@ -392,7 +392,7 @@ public class CSVBinder {
     localContext.putAll(map);
     for (CSVBind cb : flatten(this.bindings)) {
       String field = cb.getColumn();
-      if (Strings.isNullOrEmpty(field) || !map.containsKey(field)) continue;
+      if (Strings.isNullOrEmpty(field)) continue;
       localContext.put(field, cb.evaluate(map));
       if (field.contains("."))
         localContext.put(field.replace(".", "_") + "_", localContext.get(field));
