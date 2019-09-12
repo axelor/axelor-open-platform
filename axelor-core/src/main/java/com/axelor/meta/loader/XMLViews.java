@@ -618,7 +618,7 @@ public class XMLViews {
           if ("extend".equals(node.getNodeName())) {
             processExtend(document, node, originalView, extensionView);
           } else {
-            processAppend(document, node, viewNode);
+            processAppend(document, node, viewNode, originalView);
           }
         }
       }
@@ -690,10 +690,7 @@ public class XMLViews {
       Optional.ofNullable(ModuleManager.getModule(extensionView.getModule()))
           .map(Module::isRemovable)
           .filter(removable -> removable)
-          .ifPresent(
-              removable -> {
-                addDependentModule(view, extensionView.getModule());
-              });
+          .ifPresent(removable -> addDependentModule(view, extensionView.getModule()));
 
       final NamedNodeMap extendAttributes = extensionNode.getAttributes();
       final String feature = getNodeAttributeValue(extendAttributes, "if-feature");
@@ -754,9 +751,19 @@ public class XMLViews {
       }
     }
 
-    private static void processAppend(Document document, Node extensionNode, Node viewNode) {
+    private static void processAppend(
+        Document document, Node extensionNode, Node viewNode, MetaView view)
+        throws XPathExpressionException {
       final Node node = document.importNode(extensionNode, true);
-      viewNode.appendChild(node);
+      final Node panelMailNode =
+          (Node)
+              evaluateXPath(
+                  PANEL_MAIL, view.getName(), view.getType(), document, XPathConstants.NODE);
+      if (panelMailNode == null) {
+        viewNode.appendChild(node);
+      } else {
+        viewNode.insertBefore(node, panelMailNode);
+      }
     }
 
     private static void doInsert(
