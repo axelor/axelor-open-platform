@@ -67,9 +67,7 @@ public class JobRunner {
     return AppSettings.get().getBoolean(CONFIG_QUARTZ_ENABLE, false);
   }
 
-  /**
-   * Configure all schedulers.
-   */
+  /** Configure all schedulers. */
   private void configure() {
     if (total > 0) {
       return;
@@ -167,22 +165,20 @@ public class JobRunner {
     Preconditions.checkNotNull(meta);
 
     JobKey jobKey = new JobKey(meta.getName());
-    if(scheduler.checkExists(jobKey)) {
+    if (scheduler.checkExists(jobKey)) {
       log.info("Deleting job: {}", meta.getName());
       scheduler.deleteJob(jobKey);
       total -= 1;
     }
 
-    if(meta.getActive() != Boolean.TRUE) {
+    if (meta.getActive() != Boolean.TRUE) {
       return;
     }
 
     configure(meta);
   }
 
-  /**
-   * Start the scheduler.
-   */
+  /** Start the scheduler. */
   public void start() {
     if (!isEnabled()) {
       throw new IllegalStateException(I18n.get("The scheduler service is disabled."));
@@ -199,9 +195,7 @@ public class JobRunner {
     log.info("Job scheduler is running...");
   }
 
-  /**
-   * Stop the scheduler.
-   */
+  /** Stop the scheduler. */
   public void stop() {
     log.info("Stopping scheduler...");
     try {
@@ -213,9 +207,7 @@ public class JobRunner {
     log.info("The job scheduler stopped.");
   }
 
-  /**
-   * Reconfigure the scheduler and restart.
-   */
+  /** Reconfigure the scheduler and restart. */
   public void restart() {
     try {
       scheduler.clear();

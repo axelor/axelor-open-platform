@@ -1,3 +1,20 @@
+/*
+ * Axelor Business Solutions
+ *
+ * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ *
+ * This program is free software: you can redistribute it and/or  modify
+ * it under the terms of the GNU Affero General Public License, version 3,
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.axelor.meta.web;
 
 import com.axelor.app.internal.AppFilter;
@@ -18,17 +35,21 @@ import org.quartz.CronExpression;
 
 public class JobController {
 
-  @Inject
-  private JobRunner jobRunner;
+  @Inject private JobRunner jobRunner;
 
   public void validate(ActionRequest request, ActionResponse response) {
     String cronExpression = request.getContext().asType(MetaSchedule.class).getCron();
     try {
       CronExpression.validateExpression(cronExpression);
 
-      response.setNotify(I18n.get("Valid cron. Next execution dates are :") + "<br/>"
-          + getNextSchedule(cronExpression).stream().map(this::format).collect(Collectors.joining("<br/>")));
-    } catch(Exception e) {
+      response.setNotify(
+          I18n.get("Valid cron. Next execution dates are :")
+              + "<br/>"
+              + getNextSchedule(cronExpression)
+                  .stream()
+                  .map(this::format)
+                  .collect(Collectors.joining("<br/>")));
+    } catch (Exception e) {
       response.setError(I18n.get("Invalid cron :") + " " + cronExpression);
     }
   }
@@ -46,7 +67,7 @@ public class JobController {
     try {
       jobRunner.restart();
       response.setNotify(I18n.get("All jobs have been restarted."));
-    } catch(Exception e) {
+    } catch (Exception e) {
       response.setError(e.getMessage());
     }
   }
@@ -55,13 +76,15 @@ public class JobController {
     try {
       jobRunner.stop();
       response.setNotify(I18n.get("The scheduler service has been stopped."));
-    } catch(Exception e) {
+    } catch (Exception e) {
       response.setError(e.getMessage());
     }
   }
 
   private String format(Date date) {
-    DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, AppFilter.getLocale());
+    DateFormat dateFormat =
+        SimpleDateFormat.getDateTimeInstance(
+            DateFormat.DEFAULT, DateFormat.DEFAULT, AppFilter.getLocale());
     return dateFormat.format(date);
   }
 
@@ -76,5 +99,4 @@ public class JobController {
     }
     return nextTriggerDates;
   }
-
 }
