@@ -190,20 +190,27 @@ ui.directive('uiShow', function() {
 ui.directive('uiAttach', function () {
   return function (scope, element, attrs) {
     var parent = null;
+    var detachTimer = null;
     var uiAttachWatch = function uiAttachWatch(attach) {
       var result = toBoolean(attach);
       if (result) {
         if (parent) {
-          element.appendTo(parent);
+          if (detachTimer) {
+            clearTimeout(detachTimer);
+            detachTimer = null;
+          } else {
+            element.appendTo(parent);
+          }
           parent = null;
           scope.$broadcast('dom:attach');
         }
       } else {
         parent = element.parent();
         scope.$broadcast('dom:detach');
-        setTimeout(function () {
+        detachTimer = setTimeout(function () {
+          detachTimer = null;
           element.detach();
-        }, 100);
+        }, 200);
       }
     };
 
@@ -211,6 +218,10 @@ ui.directive('uiAttach', function () {
 
     scope.$watch(attrs.uiAttach, uiAttachWatch, true);
     scope.$on('$destroy', function () {
+      if (detachTimer) {
+        clearTimeout(detachTimer);
+        detachTimer = null;
+      }
       if (parent) {
         parent = null;
         element.remove();
