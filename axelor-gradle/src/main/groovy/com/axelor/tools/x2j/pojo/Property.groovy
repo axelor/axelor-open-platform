@@ -197,7 +197,7 @@ class Property {
 		}
 
 		def result = []
-		def empty = attrs["default"] == null
+		def empty = attrs["default"] != ""
 			? this.getEmptyValue()
 			: null
 
