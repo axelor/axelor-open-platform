@@ -17,6 +17,10 @@
  */
 package com.axelor.meta.schema.views;
 
+import static com.axelor.common.StringUtils.isBlank;
+
+import com.axelor.rpc.Request;
+import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -227,7 +231,18 @@ public class GridView extends AbstractView implements ExtendableView {
   }
 
   public Help getInlineHelp() {
-    return inlineHelp;
+    if (inlineHelp == null || isBlank(inlineHelp.getConditionToCheck())) {
+      return null;
+    }
+
+    final String condition = inlineHelp.getConditionToCheck();
+    final Request request = Request.current();
+    if (request == null) {
+      return inlineHelp;
+    }
+
+    final ScriptHelper helper = request.getScriptHelper();
+    return helper.test(condition) ? inlineHelp : null;
   }
 
   public void setInlineHelp(Help inlineHelp) {
