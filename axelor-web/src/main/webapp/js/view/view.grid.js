@@ -69,10 +69,12 @@ function GridViewCtrl($scope, $element) {
 
         if (view.noFetch) return;
 
-        $scope.filter({
+        var opts = ds._filter ? ds._filter : {
           _sortBy: sortBy,
           _pageNum: pageNum
-        }).then(function(){
+        };
+
+        $scope.filter(opts).then(function(){
           $scope.$broadcast('on:grid-selection-change', $scope.getContext());
           $scope.updateRoute();
         });
