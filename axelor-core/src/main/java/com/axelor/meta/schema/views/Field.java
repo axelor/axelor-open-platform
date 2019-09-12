@@ -166,6 +166,9 @@ public class Field extends SimpleWidget {
   @XmlAttribute(name = "x-search-limit")
   private Integer searchLimit;
 
+  @XmlAttribute(name = "x-accept")
+  private String accept;
+
   @XmlAttribute(name = "x-json-model")
   private String jsonModel;
 
@@ -514,6 +517,14 @@ public class Field extends SimpleWidget {
 
   public void setSearchLimit(Integer searchLimit) {
     this.searchLimit = searchLimit;
+  }
+
+  public String getAccept() {
+    return accept;
+  }
+
+  public void setAccept(String accept) {
+    this.accept = accept;
   }
 
   public String getJsonModel() {

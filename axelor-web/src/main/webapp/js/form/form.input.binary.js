@@ -257,6 +257,10 @@ ui.formInput('Image', 'ImageLink', {
 
     scope.$watch("record.id", updateLink);
     scope.$watch("record.version", updateLink);
+
+    if (field.accept) {
+      input.attr('accept', field.accept);
+    }
   },
   template_editable:
   '<div ng-style="styles[0]" class="image-wrapper">' +
@@ -332,6 +336,10 @@ ui.formInput('Binary', {
         });
       }
     });
+
+    if (field.accept) {
+      input.attr('accept', field.accept);
+    }
   },
   template_readonly: null,
   template_editable: null,
@@ -418,6 +426,10 @@ ui.formInput('BinaryLink', {
         scope.setValue(rec, true);
       });
     });
+
+    if (field.accept) {
+      input.attr('accept', field.accept);
+    }
   },
   template_readonly: null,
   template_editable: null,

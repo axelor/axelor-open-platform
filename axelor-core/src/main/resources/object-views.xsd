@@ -802,7 +802,15 @@
     <xsd:attribute name="x-seconds" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>Show seconds in a duration widget</xsd:documentation>
-      </xsd:annotation></xsd:attribute>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-accept" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify the file types the file input should accept.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:attributeGroup name="RelationalAttributes">
