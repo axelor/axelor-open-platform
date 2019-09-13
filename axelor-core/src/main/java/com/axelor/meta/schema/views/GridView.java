@@ -231,8 +231,12 @@ public class GridView extends AbstractView implements ExtendableView {
   }
 
   public Help getInlineHelp() {
-    if (inlineHelp == null || isBlank(inlineHelp.getConditionToCheck())) {
+    if (inlineHelp == null) {
       return null;
+    }
+
+    if (isBlank(inlineHelp.getConditionToCheck())) {
+      return inlineHelp;
     }
 
     final String condition = inlineHelp.getConditionToCheck();
