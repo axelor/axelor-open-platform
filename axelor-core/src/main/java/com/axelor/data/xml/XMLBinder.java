@@ -27,6 +27,7 @@ import com.axelor.db.mapper.PropertyType;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -189,7 +190,14 @@ public abstract class XMLBinder {
       LOG.trace("set value: {} = {}", property.getName(), value);
       isNull = false;
 
-      if (!AuditHelper.update(bean, field, value)) {
+      if (property.isCollection()) {
+        if (value == null) {
+        } else if (value instanceof Collection<?>) {
+          property.addAll(bean, (Collection<?>) value);
+        } else {
+          property.add(bean, value);
+        }
+      } else if (!AuditHelper.update(bean, field, value)) {
         property.set(bean, value);
       }
     }
