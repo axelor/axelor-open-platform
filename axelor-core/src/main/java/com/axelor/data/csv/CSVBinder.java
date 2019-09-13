@@ -336,8 +336,12 @@ public class CSVBinder {
       }
 
       if (p.isCollection()) {
-        if (value instanceof Collection<?>) p.addAll(bean, (Collection<?>) value);
-        else p.add(bean, value);
+        if (value == null) {
+        } else if (value instanceof Collection<?>) {
+          p.addAll(bean, (Collection<?>) value);
+        } else {
+          p.add(bean, value);
+        }
       } else if (!AuditHelper.update(bean, field, value)) {
         p.set(bean, value);
       }
