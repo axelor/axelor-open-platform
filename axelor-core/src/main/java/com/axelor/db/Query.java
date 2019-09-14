@@ -877,7 +877,7 @@ public class Query<T extends Model> {
    *
    * So that all the records are matched even if <code>title</code> field is null.
    */
-  static class JoinHelper {
+  private static class JoinHelper {
 
     private Class<?> beanClass;
 
@@ -903,7 +903,7 @@ public class Query<T extends Model> {
      * @param filter the filter expression
      * @return the transformed filter expression
      */
-    public String parse(String filter) {
+    private String parse(String filter) {
 
       String result = "";
       Matcher matcher = pathPattern.matcher(filter);
@@ -982,7 +982,7 @@ public class Query<T extends Model> {
                       "No such field '%s' in object '%s'",
                       variable, currentMapper.getBeanClass().getName()));
             }
-            if (property != null && property.isReference()) {
+            if (property.isReference()) {
               joinOn = prefix + "." + variable;
               prefix = prefix + "_" + variable;
               joins.put(joinOn, prefix);
@@ -992,10 +992,14 @@ public class Query<T extends Model> {
         }
       } else {
         Property property = mapper.getProperty(name);
-        if (property != null && property.getTarget() != null) {
-          if (property.isCollection()) {
-            return null;
-          }
+        if (property == null) {
+          throw new IllegalArgumentException(
+              String.format("No such field '%s' in object '%s'", variable, beanClass.getName()));
+        }
+        if (property.isCollection()) {
+          return null;
+        }
+        if (property.getTarget() != null) {
           prefix = "_" + name;
           joins.put("self." + name, prefix);
           return prefix;
