@@ -18,10 +18,16 @@
 package com.axelor.db.hibernate.type;
 
 import com.google.common.base.Preconditions;
+import java.util.regex.Pattern;
+import javax.persistence.PersistenceException;
 
 public final class JsonFunction {
 
   public static final String DEFAULT_TYPE = "text";
+
+  private static final Pattern NAME_PATTERN = Pattern.compile("\\w+");
+  private static final Pattern TYPE_PATTERN =
+      Pattern.compile("(text|boolean|integer|decimal)", Pattern.CASE_INSENSITIVE);
 
   private String field;
 
@@ -37,6 +43,20 @@ public final class JsonFunction {
 
   public JsonFunction(String field, String attribute) {
     this(field, attribute, DEFAULT_TYPE);
+  }
+
+  private static String validateField(String name) {
+    if (NAME_PATTERN.matcher(name).matches()) {
+      return name;
+    }
+    throw new PersistenceException("Invalid field name: " + name);
+  }
+
+  private static String validateType(String name) {
+    if (TYPE_PATTERN.matcher(name).matches()) {
+      return name;
+    }
+    throw new PersistenceException("Invalid json type: " + name);
   }
 
   public static JsonFunction fromPath(String path) {
@@ -73,12 +93,12 @@ public final class JsonFunction {
     final StringBuilder builder =
         new StringBuilder()
             .append("json_extract_")
-            .append(type)
+            .append(validateType(type))
             .append("(")
             .append("self.")
-            .append(field);
+            .append(validateField(field));
     for (String item : attribute.split("\\.")) {
-      builder.append(", ").append("'").append(item).append("'");
+      builder.append(", ").append("'").append(validateField(item)).append("'");
     }
     return builder.append(")").toString();
   }
