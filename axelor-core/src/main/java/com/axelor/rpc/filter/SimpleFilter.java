@@ -20,8 +20,12 @@ package com.axelor.rpc.filter;
 import com.axelor.db.hibernate.type.JsonFunction;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+import javax.persistence.PersistenceException;
 
 class SimpleFilter extends Filter {
+
+  private static Pattern NAME_PATTERN = Pattern.compile("\\w+(\\.\\w+)*");
 
   private String fieldName;
 
@@ -56,6 +60,11 @@ class SimpleFilter extends Filter {
     if (name.indexOf("::") > -1) {
       return JsonFunction.fromPath(name).toString();
     }
+
+    if (!NAME_PATTERN.matcher(name).matches()) {
+      throw new PersistenceException("Invalid field name: " + name);
+    }
+
     return "self." + name;
   }
 
