@@ -13,9 +13,10 @@ dependencies {
 
   compile project(':axelor-common')
 
-  compile	libs.guava
+  compile libs.guava
   compile libs.opencsv
   compile libs.plugin_license
+  compile libs.snakeyaml
 
   tomcat libs.hotswap_agent
   tomcat project(":axelor-tomcat")

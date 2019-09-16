@@ -27,6 +27,7 @@ dependencies {
   compile libs.axelor_asm
   compile libs.opencsv
   compile libs.plugin_license
+  compile libs.snakeyaml
 }
 
 test.enabled = false

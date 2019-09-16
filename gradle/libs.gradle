@@ -54,7 +54,7 @@ libs.slf4j_logback = libs.slf4j_base + [
 libs.guava = ["com.google.guava:guava:${versions.guava}", "com.google.code.findbugs:jsr305:3.0.2"]
 
 // yaml
-libs.snakeyaml = "org.yaml:snakeyaml:1.17"
+libs.snakeyaml = "org.yaml:snakeyaml:1.25"
 
 // Guice
 libs.guice = "com.google.inject:guice:${versions.guice}"
