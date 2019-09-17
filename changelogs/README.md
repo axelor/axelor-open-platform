@@ -36,6 +36,8 @@ To generate the `CHANGELOG.md` with unreleased entries, run following gradle tas
 
 The unreleased entries are also automatically removed from `changelogs/unreleased`.
 
+`--preview` arguments can also be used to preview the generated change log without deleting/updating files.
+
 #### Source
 
 * [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)

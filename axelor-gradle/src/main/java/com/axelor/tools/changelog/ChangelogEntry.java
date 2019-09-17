@@ -26,15 +26,20 @@ public class ChangelogEntry {
     this.title = title;
   }
 
-  public EntryType getType() {
-    return type;
-  }
-
   public String getTitle() {
     return title;
   }
 
   public void setType(EntryType type) {
     this.type = type;
+  }
+
+  public EntryType getType() {
+    return type;
+  }
+
+  @Override
+  public String toString() {
+    return "ChangelogEntry [title=" + getTitle() + ", type=" + getType() + "]";
   }
 }

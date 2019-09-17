@@ -17,6 +17,7 @@
  */
 package com.axelor.tools.changelog;
 
+import com.axelor.common.ObjectUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,7 +28,11 @@ import org.yaml.snakeyaml.Yaml;
 public class ChangelogEntryParser {
 
   public ChangelogEntry parse(File file) throws IOException {
-    return createEntry(loadYaml(file));
+    Map<String, Object> values = loadYaml(file);
+    if (ObjectUtils.isEmpty(values)) {
+      throw new IllegalStateException(file + " content is empty");
+    }
+    return createEntry(values);
   }
 
   @SuppressWarnings("unchecked")
@@ -42,12 +47,14 @@ public class ChangelogEntryParser {
     ChangelogEntry changelogEntry = new ChangelogEntry();
     for (Map.Entry<String, Object> item : entries.entrySet()) {
       String value = item.getValue().toString();
+      if(value == null) continue;
       if ("title".equalsIgnoreCase(item.getKey())) {
-        changelogEntry.setTitle(value);
+        changelogEntry.setTitle(value.trim());
       } else if ("type".equalsIgnoreCase(item.getKey())) {
         changelogEntry.setType(EntryType.valueOf(value.toUpperCase()));
       }
     }
     return changelogEntry;
   }
+
 }

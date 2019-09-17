@@ -24,16 +24,6 @@ import com.axelor.tools.changelog.ChangelogEntryParser;
 import com.axelor.tools.changelog.Release;
 import com.axelor.tools.changelog.ReleaseGenerator;
 import com.axelor.tools.changelog.ReleaseProcessor;
-import org.gradle.api.DefaultTask;
-import org.gradle.api.GradleException;
-import org.gradle.api.file.FileTree;
-import org.gradle.api.internal.tasks.options.Option;
-import org.gradle.api.tasks.InputFiles;
-import org.gradle.api.tasks.SkipWhenEmpty;
-import org.gradle.api.tasks.TaskAction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,18 +32,23 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import org.gradle.api.DefaultTask;
+import org.gradle.api.GradleException;
+import org.gradle.api.file.FileTree;
+import org.gradle.api.internal.tasks.options.Option;
+import org.gradle.api.tasks.InputFiles;
+import org.gradle.api.tasks.SkipWhenEmpty;
+import org.gradle.api.tasks.TaskAction;
 
 public class GenerateChangeLog extends DefaultTask {
 
-  private final Logger LOG = LoggerFactory.getLogger(this.getClass());
-
-  private static final String CHANGELOG_FILENAME = "CHANGELOG.md";
+  private static final String CHANGELOG_PATH = "CHANGELOG.md";
 
   private String version = VersionUtils.getVersion().version.replace("-SNAPSHOT", "");
 
   private boolean preview;
 
-  @Option(option = "preview", description = "Preview mode.")
+  @Option(option = "preview", description = "Don’t actually write/delete anything, just print")
   public void setPreview(boolean preview) {
     this.preview = preview;
   }
@@ -71,18 +66,19 @@ public class GenerateChangeLog extends DefaultTask {
   @TaskAction
   public void generate() throws IOException {
     List<ChangelogEntry> entries = getChangelogEntries();
-    if(ObjectUtils.isEmpty(entries)) {
-      getLogger().info("No change log entries to process. Skipping.");
+
+    if (ObjectUtils.isEmpty(entries)) {
+      getLogger().lifecycle("No unreleased change log entries to process");
       return;
     }
 
     String newChangelog = generate(entries);
 
-    if(preview) {
-      System.out.println("Generated change log : ");
-      System.out.println("--------------------");
-      System.out.println(newChangelog);
-      System.out.println("--------------------");
+    if (preview) {
+      getLogger().lifecycle("Generated change log : ");
+      getLogger().lifecycle("--------------------");
+      getLogger().lifecycle(newChangelog);
+      getLogger().lifecycle("--------------------");
       return;
     }
 
@@ -91,9 +87,11 @@ public class GenerateChangeLog extends DefaultTask {
   }
 
   private List<ChangelogEntry> getChangelogEntries() throws IOException {
+    getLogger().lifecycle("Processing unreleased change log entries");
     ChangelogEntryParser parser = new ChangelogEntryParser();
     List<ChangelogEntry> entries = new ArrayList<>();
     for (File file : getFiles()) {
+      getLogger().debug("Processing {}", file);
       entries.add(parser.parse(file));
     }
     return entries;
@@ -108,10 +106,12 @@ public class GenerateChangeLog extends DefaultTask {
   }
 
   private void write(String newChangelog) throws IOException {
-    File mFile = new File(CHANGELOG_FILENAME);
+    getLogger().lifecycle("Generating new CHANGELOG.md file");
+
+    File changelogFile = new File(CHANGELOG_PATH);
 
     StringBuilder contentBuilder = new StringBuilder();
-    try (BufferedReader br = new BufferedReader(new FileReader(mFile))) {
+    try (BufferedReader br = new BufferedReader(new FileReader(changelogFile))) {
 
       String sCurrentLine;
       while ((sCurrentLine = br.readLine()) != null) {
@@ -119,17 +119,19 @@ public class GenerateChangeLog extends DefaultTask {
       }
     }
 
-    mFile.delete();
+    changelogFile.delete();
 
-    try (FileOutputStream fos = new FileOutputStream(mFile)) {
+    try (FileOutputStream fos = new FileOutputStream(changelogFile)) {
       fos.write((newChangelog + contentBuilder.toString()).getBytes());
       fos.flush();
     }
   }
 
   private void clean() {
+    getLogger().lifecycle("Clean up unreleased change log entries");
     for (File file : getFiles()) {
       try {
+        getLogger().lifecycle("Deleteting {}", file);
         Files.delete(file.toPath());
       } catch (IOException ex) {
         throw new GradleException("Could not delete file: " + file, ex);
