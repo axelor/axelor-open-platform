@@ -1,7 +1,3 @@
-## 5.2.1 (current)
-
-TBD
-
 ## 5.2.0 (2019-09-16)
 
 #### Enhancements
