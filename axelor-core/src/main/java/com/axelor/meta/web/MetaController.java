@@ -178,9 +178,9 @@ public class MetaController {
 
   public void restoreAll(ActionRequest request, ActionResponse response) {
     try {
+      moduleManager.restoreMeta();
       MetaStore.clear();
       I18nBundle.invalidate();
-      moduleManager.restoreMeta();
       response.setNotify(
           I18n.get("All views have been restored.")
               + "<br>"
