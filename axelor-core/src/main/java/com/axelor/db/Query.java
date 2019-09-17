@@ -64,6 +64,8 @@ public class Query<T extends Model> {
 
   private String orderBy;
 
+  private List<String> orderNames;
+
   private JoinHelper joinHelper;
 
   private boolean cacheable;
@@ -85,6 +87,7 @@ public class Query<T extends Model> {
   public Query(Class<T> beanClass) {
     this.beanClass = beanClass;
     this.orderBy = "";
+    this.orderNames = new ArrayList<>();
     this.joinHelper = new JoinHelper(beanClass);
   }
 
@@ -198,11 +201,14 @@ public class Query<T extends Model> {
     }
 
     if (name.charAt(0) == '-') {
-      name = name.substring(1);
-      orderBy += this.joinHelper.joinName(name) + " DESC";
+      name = this.joinHelper.joinName(name.substring(1));
+      orderBy += name + " DESC";
     } else {
-      orderBy += this.joinHelper.joinName(name);
+      name = this.joinHelper.joinName(name);
+      orderBy += name;
     }
+
+    orderNames.add(name);
 
     return this;
   }
@@ -734,6 +740,10 @@ public class Query<T extends Model> {
             selects.add(func.toString());
           }
         }
+      }
+
+      if (joinHelper.hasCollection) {
+        orderNames.stream().filter(n -> !selects.contains(n)).forEach(selects::add);
       }
 
       StringBuilder sb =
