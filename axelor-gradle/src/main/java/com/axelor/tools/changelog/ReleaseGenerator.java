@@ -19,6 +19,7 @@ package com.axelor.tools.changelog;
 
 import com.axelor.common.StringUtils;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -61,11 +62,14 @@ public class ReleaseGenerator {
     for (ChangelogEntry entry : entries) {
       content.append(MessageFormat.format("* {0}", entry.getTitle())).append(NEW_LINE);
       if (!StringUtils.isEmpty(entry.getDescription())) {
-        content
-            .append(NEW_LINE)
-            .append(MessageFormat.format("<details>{0}{1}{2}</details>", NEW_LINE, entry.getDescription(), NEW_LINE))
-            .append(NEW_LINE)
-            .append(NEW_LINE);
+        List<String> lines = new ArrayList<>();
+        lines.add("  <details>");
+        for (String line : entry.getDescription().trim().split("\n")) {
+          lines.add(StringUtils.isBlank(line) ? "" : "  " + line);
+        }
+        lines.add("  </details>");
+        String details = String.join(NEW_LINE, lines);
+        content.append(NEW_LINE).append(details).append(NEW_LINE).append(NEW_LINE);
       }
     }
     content.append(NEW_LINE);
