@@ -35,11 +35,10 @@ public class ChangelogEntryParser {
     return createEntry(values);
   }
 
-  @SuppressWarnings("unchecked")
   private Map<String, Object> loadYaml(File file) throws IOException {
     Yaml yaml = new Yaml();
     try (InputStream ios = new FileInputStream(file)) {
-      return (Map<String, Object>) yaml.load(ios);
+      return yaml.load(ios);
     }
   }
 
