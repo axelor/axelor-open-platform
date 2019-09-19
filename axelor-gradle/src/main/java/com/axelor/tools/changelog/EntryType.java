@@ -18,8 +18,8 @@
 package com.axelor.tools.changelog;
 
 public enum EntryType {
-  ADDED("Added"),
-  CHANGED("Changed"),
+  FEATURE("Feature"),
+  CHANGE("Change"),
   DEPRECATED("Deprecated"),
   REMOVED("Removed"),
   FIXED("Fixed"),
