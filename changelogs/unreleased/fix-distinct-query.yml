@@ -1,0 +1,3 @@
+---
+title: Fix distinct query issue when search is done on o2m/m2m
+type: fix

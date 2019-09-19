@@ -1,0 +1,3 @@
+---
+title: Fix security issue in criteria filter, Query and json function
+type: security
