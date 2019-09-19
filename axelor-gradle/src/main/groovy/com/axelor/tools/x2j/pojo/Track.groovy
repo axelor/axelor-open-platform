@@ -24,6 +24,7 @@ class Track {
 	private List<Annotation> fields = []
 	private List<Annotation> messages = []
 	private List<Annotation> contents = []
+    private List<Annotation> names = []
 
 	private Set<String> imports = []
 
@@ -69,6 +70,7 @@ class Track {
 		String condition = node.'@if'
 
 		imports += ['com.axelor.db.annotations.TrackField']
+        names += name
 
 		def annon = new Annotation(this.entity, "TrackField")
 			.add("name", name)
@@ -138,4 +140,8 @@ class Track {
 		track.merge(this);
 		return track;
 	}
+
+    List<String> getNames() {
+        return names;
+    }
 }

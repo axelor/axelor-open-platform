@@ -596,4 +596,8 @@ class Entity {
 		def names = fields.collect { it.name }
 		return "Entity(name: $name, fields: $names)"
 	}
+
+    public Track getTrack() {
+        return track;
+    }
 }

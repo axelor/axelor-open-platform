@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import org.slf4j.Logger;
@@ -172,6 +173,17 @@ public class Generator {
     for (Entity it : all) {
       entity.merge(it);
     }
+
+    Optional.ofNullable(entity.getTrack())
+        .ifPresent(
+            track ->
+                track
+                    .getNames()
+                    .stream()
+                    .filter(trackName -> !entity.getPropertyMap().keySet().contains(trackName))
+                    .forEach(
+                        trackName ->
+                            log.error("{}: track unknown field: {}", entity.getName(), trackName)));
 
     entityFile.getParentFile().mkdirs();
     if (repoFile != null) {
