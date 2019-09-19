@@ -47,14 +47,15 @@ public class ChangelogEntryParser {
     ChangelogEntry changelogEntry = new ChangelogEntry();
     for (Map.Entry<String, Object> item : entries.entrySet()) {
       String value = item.getValue().toString();
-      if(value == null) continue;
+      if (value == null) continue;
       if ("title".equalsIgnoreCase(item.getKey())) {
         changelogEntry.setTitle(value.trim());
+      } else if ("description".equalsIgnoreCase(item.getKey())) {
+        changelogEntry.setDescription(value.trim());
       } else if ("type".equalsIgnoreCase(item.getKey())) {
         changelogEntry.setType(EntryType.valueOf(value.toUpperCase()));
       }
     }
     return changelogEntry;
   }
-
 }

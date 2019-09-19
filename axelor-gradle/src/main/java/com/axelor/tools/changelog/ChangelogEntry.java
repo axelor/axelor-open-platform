@@ -20,6 +20,7 @@ package com.axelor.tools.changelog;
 public class ChangelogEntry {
 
   private String title;
+  private String description;
   private EntryType type;
 
   public void setTitle(String title) {
@@ -28,6 +29,14 @@ public class ChangelogEntry {
 
   public String getTitle() {
     return title;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public String getDescription() {
+    return description;
   }
 
   public void setType(EntryType type) {
