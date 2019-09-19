@@ -1,6 +1,8 @@
-## 5.0.18 (current)
+## 5.0.18 (2019-09-19)
 
-TBD
+#### Security
+
+* Fix security issue in criteria filter, Query and json function
 
 ## 5.0.17 (2019-09-16)
 
