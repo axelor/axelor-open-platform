@@ -353,6 +353,12 @@ var Formatters = {
     if (field.jsonField && rec) {
       rec = angular.fromJson(rec[field.jsonField]);
     }
+    if (field.hideIf && axelor.$eval(grid.scope, field.hideIf, _.extend({}, handler._context, rec))) {
+      return "";
+    }
+    if (field.showIf && !axelor.$eval(grid.scope, field.showIf, _.extend({}, handler._context, rec))) {
+      return "";
+    }
     if (field.readonlyIf && axelor.$eval(grid.scope, field.readonlyIf, _.extend({}, handler._context, rec))) {
       css += " readonly disabled";
     }
