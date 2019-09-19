@@ -1,3 +1,0 @@
----
-title: Add `generateChangelog` gradle task to generate final CHANGELOG from unreleased entries.
-type: feature

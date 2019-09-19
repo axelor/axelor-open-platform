@@ -1,3 +1,20 @@
+## 5.2.1 (2019-09-19)
+
+#### Features
+
+* Add `generateChangelog` gradle task to generate final CHANGELOG from unreleased entries.
+* Log tracking of unknown fields during code generation
+
+#### Fixed
+
+* Fix distinct query issue when search is done on o2m/m2m
+* Prohibited usage of unsupported xml attributes in grid fields.
+* Invalid meta and translations when restore is done
+
+#### Security
+
+* Fix security issue in criteria filter, Query and json function
+
 ## 5.2.0 (2019-09-16)
 
 #### Enhancements
