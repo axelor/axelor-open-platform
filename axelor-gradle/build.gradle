@@ -38,6 +38,9 @@ spotless {
   groovy {
     excludeJava()
     greclipse()
+    indentWithSpaces(2)
+    trimTrailingWhitespace()
+    endWithNewline()
   }
 }
 
