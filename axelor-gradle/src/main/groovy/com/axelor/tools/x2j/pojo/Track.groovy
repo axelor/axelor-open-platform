@@ -21,137 +21,137 @@ import groovy.util.slurpersupport.NodeChild;
 
 class Track {
 
-	private List<Annotation> fields = []
-	private List<Annotation> messages = []
-	private List<Annotation> contents = []
-	private List<Annotation> names = []
+  private List<Annotation> fields = []
+  private List<Annotation> messages = []
+  private List<Annotation> contents = []
+  private List<Annotation> names = []
 
-	private Set<String> imports = []
+  private Set<String> imports = []
 
-	private Entity entity
+  private Entity entity
 
-	private boolean subscribe;
+  private boolean subscribe;
 
-	private boolean replace;
+  private boolean replace;
 
-	private boolean files;
+  private boolean files;
 
-	private String on;
+  private String on;
 
-	private Track(Entity entity) {
-		this.entity = entity;
-	}
+  private Track(Entity entity) {
+    this.entity = entity;
+  }
 
-	Track(Entity entity, NodeChild node) {
-		this.entity = entity
-		node."*".each {
-			if (it.name() == "field") fields += $field(it)
-			if (it.name() == "message") messages += $message(it)
-			if (it.name() == "content") contents += $message(it)
-		}
+  Track(Entity entity, NodeChild node) {
+    this.entity = entity
+    node."*".each {
+      if (it.name() == "field") fields += $field(it)
+      if (it.name() == "message") messages += $message(it)
+      if (it.name() == "content") contents += $message(it)
+    }
 
-		fields = fields.grep { it != null }
-		messages = messages.grep { it != null }
-		contents = contents.grep { it != null }
-		subscribe = node.'@subscribe' == "true"
-		replace = node.'@replace' == "true"
-		files = node.'@files' == "true"
-		on = node.'@on'
+    fields = fields.grep { it != null }
+    messages = messages.grep { it != null }
+    contents = contents.grep { it != null }
+    subscribe = node.'@subscribe' == "true"
+    replace = node.'@replace' == "true"
+    files = node.'@files' == "true"
+    on = node.'@on'
 
-		if (on) {
-			imports += [
-				'com.axelor.db.annotations.TrackEvent'
-			]
-		}
-	}
+    if (on) {
+      imports += [
+        'com.axelor.db.annotations.TrackEvent'
+      ]
+    }
+  }
 
-	private Annotation $field(NodeChild node) {
+  private Annotation $field(NodeChild node) {
 
-		String name = node.'@name'
-		String on = node.'@on'
-		String condition = node.'@if'
+    String name = node.'@name'
+    String on = node.'@on'
+    String condition = node.'@if'
 
-		imports += [
-			'com.axelor.db.annotations.TrackField'
-		]
-		names += name
+    imports += [
+      'com.axelor.db.annotations.TrackField'
+    ]
+    names += name
 
-		def annon = new Annotation(this.entity, "TrackField")
-				.add("name", name)
+    def annon = new Annotation(this.entity, "TrackField")
+        .add("name", name)
 
-		if (condition) annon.add("condition", condition)
-		if (on) {
-			imports += [
-				'com.axelor.db.annotations.TrackEvent'
-			]
-			annon.add("on", "com.axelor.db.annotations.TrackEvent.${on}", false)
-		}
+    if (condition) annon.add("condition", condition)
+    if (on) {
+      imports += [
+        'com.axelor.db.annotations.TrackEvent'
+      ]
+      annon.add("on", "com.axelor.db.annotations.TrackEvent.${on}", false)
+    }
 
-		return annon
-	}
+    return annon
+  }
 
-	private Annotation $message(NodeChild node) {
+  private Annotation $message(NodeChild node) {
 
-		String on = node.'@on'
-		String tag = node.'@tag'
-		String message = node.text()
-		String condition = node.'@if'
-		String fields = node.'@fields'
+    String on = node.'@on'
+    String tag = node.'@tag'
+    String message = node.text()
+    String condition = node.'@if'
+    String fields = node.'@fields'
 
-		imports += [
-			'com.axelor.db.annotations.TrackMessage'
-		]
+    imports += [
+      'com.axelor.db.annotations.TrackMessage'
+    ]
 
-		def annon = new Annotation(this.entity, "TrackMessage")
-				.add("message", message)
-				.add("condition", condition)
+    def annon = new Annotation(this.entity, "TrackMessage")
+        .add("message", message)
+        .add("condition", condition)
 
-		if (tag) annon.add("tag", tag)
-		if (on) {
-			imports += [
-				'com.axelor.db.annotations.TrackEvent'
-			]
-			annon.add("on", "com.axelor.db.annotations.TrackEvent.${on}", false)
-		}
+    if (tag) annon.add("tag", tag)
+    if (on) {
+      imports += [
+        'com.axelor.db.annotations.TrackEvent'
+      ]
+      annon.add("on", "com.axelor.db.annotations.TrackEvent.${on}", false)
+    }
 
-		if (fields) {
-			List<String> names = fields.trim().split(/\s*,\s*/) as List;
-			annon.add("fields", names, true, true);
-		}
+    if (fields) {
+      List<String> names = fields.trim().split(/\s*,\s*/) as List;
+      annon.add("fields", names, true, true);
+    }
 
-		return annon
-	}
+    return annon
+  }
 
-	def $track() {
-		def annon = new Annotation(this.entity, "com.axelor.db.annotations.Track")
-		imports.each { name -> this.entity.importType(name) }
-		if (on) annon.add("on", "com.axelor.db.annotations.TrackEvent.${on}", false)
-		if (!fields.empty) annon.add("fields", fields, false, false)
-		if (!messages.empty) annon.add("messages", messages, false, false)
-		if (!contents.empty) annon.add("contents", contents, false, false)
-		if (subscribe) annon.add("subscribe", "true", false, false)
-		if (files) annon.add("files", "true", false, false)
-		return annon
-	}
+  def $track() {
+    def annon = new Annotation(this.entity, "com.axelor.db.annotations.Track")
+    imports.each { name -> this.entity.importType(name) }
+    if (on) annon.add("on", "com.axelor.db.annotations.TrackEvent.${on}", false)
+    if (!fields.empty) annon.add("fields", fields, false, false)
+    if (!messages.empty) annon.add("messages", messages, false, false)
+    if (!contents.empty) annon.add("contents", contents, false, false)
+    if (subscribe) annon.add("subscribe", "true", false, false)
+    if (files) annon.add("files", "true", false, false)
+    return annon
+  }
 
-	def merge(Track other) {
-		fields.addAll(other.fields);
-		messages.addAll(other.messages);
-		contents.addAll(other.contents);
-		imports.addAll(other.imports);
-		if (other.replace) {
-			subscribe = other.subscribe;
-		}
-		return this;
-	}
+  def merge(Track other) {
+    fields.addAll(other.fields);
+    messages.addAll(other.messages);
+    contents.addAll(other.contents);
+    imports.addAll(other.imports);
+    if (other.replace) {
+      subscribe = other.subscribe;
+    }
+    return this;
+  }
 
-	def copyFor(Entity base) {
-		Track track = new Track(base);
-		track.merge(this);
-		return track;
-	}
+  def copyFor(Entity base) {
+    Track track = new Track(base);
+    track.merge(this);
+    return track;
+  }
 
-	List<String> getNames() {
-		return names;
-	}
+  List<String> getNames() {
+    return names;
+  }
 }

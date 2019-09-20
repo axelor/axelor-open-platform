@@ -24,151 +24,151 @@ import groovy.util.slurpersupport.NodeChild
 
 class EnumType {
 
-	String name
+  String name
 
-	String module
+  String module
 
-	String namespace
+  String namespace
 
-	String documentation
+  String documentation
 
-	Boolean numeric
+  Boolean numeric
 
-	Boolean valueEnum
+  Boolean valueEnum
 
-	List<EnumItem> items
+  List<EnumItem> items
 
-	Map<String, Property> itemsMap
+  Map<String, Property> itemsMap
 
-	EnumType baseType
+  EnumType baseType
 
-	private ImportManager importManager
+  private ImportManager importManager
 
-	transient long lastModified
+  transient long lastModified
 
-	EnumType(NodeChild node) {
-		name = node.@name
-		numeric = node.@numeric == 'true'
-		module = node.parent().module.'@name'
-		namespace = node.parent().module."@package"
-		importManager = new ImportManager(namespace, false)
-		documentation = findDocs(node)
+  EnumType(NodeChild node) {
+    name = node.@name
+    numeric = node.@numeric == 'true'
+    module = node.parent().module.'@name'
+    namespace = node.parent().module."@package"
+    importManager = new ImportManager(namespace, false)
+    documentation = findDocs(node)
 
-		itemsMap = [:]
-		items = []
+    itemsMap = [:]
+    items = []
 
-		node."item".each {
-			EnumItem item = new EnumItem(this, it)
-			itemsMap[item.name] = item
-			items.add(item)
-			if (item.value) {
-				valueEnum = true
-			}
-		}
-	}
+    node."item".each {
+      EnumItem item = new EnumItem(this, it)
+      itemsMap[item.name] = item
+      items.add(item)
+      if (item.value) {
+        valueEnum = true
+      }
+    }
+  }
 
-	private boolean isCompatible(EnumItem existing, EnumItem item) {
-		if (existing == null) return true
-		if (existing.name != item.name) return false
-		return true
-	}
+  private boolean isCompatible(EnumItem existing, EnumItem item) {
+    if (existing == null) return true
+    if (existing.name != item.name) return false
+    return true
+  }
 
-	void merge(EnumType other) {
-		for (EnumItem item : other.items) {
-			EnumItem existing = itemsMap.get(item.name)
-			if (isCompatible(existing, item)) {
-				item.entity = this
-				if (existing != null) {
-					items.remove(existing)
-				}
-				items.add(item)
-				itemsMap[item.name] = item
-			}
-		}
-		other.baseType = this
-	}
+  void merge(EnumType other) {
+    for (EnumItem item : other.items) {
+      EnumItem existing = itemsMap.get(item.name)
+      if (isCompatible(existing, item)) {
+        item.entity = this
+        if (existing != null) {
+          items.remove(existing)
+        }
+        items.add(item)
+        itemsMap[item.name] = item
+      }
+    }
+    other.baseType = this
+  }
 
-	void validate() {
-		def map = [:]
-		def dup = [] as Set
-		for (int i = 0; i < items.size(); i++) {
-			def item = items[i];
-			def key = item.value?:null
-			if (valueEnum || numeric) {
-				if (key == null) {
-					throw new RuntimeException("Invalid enum '${name}', expects item '${item.name}' with a value.")
-				}
-				if (numeric && Ints.tryParse(key) == null) {
-					throw new IllegalArgumentException("Invalid enum '${name}', expects item '${item.name}' with numeric value.")
-				}
-			}
-			if (key == null) {
-				key = item.name
-			}
-			if (key == null) {
-				throw new IllegalArgumentException("Invalid enum '${name}', expects item")
-			}
-			if (map.containsKey(key)) {
-				dup.add(map.get(key))
-				dup.add(item)
-			} else {
-				map.put(key, item)
-			}
-		}
-		if (!dup.empty) {
-			def names = dup.collect { it.name }
-			throw new IllegalArgumentException("Invalid enum '${name}', duplicate items: ${names}")
-		}
-	}
+  void validate() {
+    def map = [:]
+    def dup = [] as Set
+    for (int i = 0; i < items.size(); i++) {
+      def item = items[i];
+      def key = item.value?:null
+      if (valueEnum || numeric) {
+        if (key == null) {
+          throw new RuntimeException("Invalid enum '${name}', expects item '${item.name}' with a value.")
+        }
+        if (numeric && Ints.tryParse(key) == null) {
+          throw new IllegalArgumentException("Invalid enum '${name}', expects item '${item.name}' with numeric value.")
+        }
+      }
+      if (key == null) {
+        key = item.name
+      }
+      if (key == null) {
+        throw new IllegalArgumentException("Invalid enum '${name}', expects item")
+      }
+      if (map.containsKey(key)) {
+        dup.add(map.get(key))
+        dup.add(item)
+      } else {
+        map.put(key, item)
+      }
+    }
+    if (!dup.empty) {
+      def names = dup.collect { it.name }
+      throw new IllegalArgumentException("Invalid enum '${name}', duplicate items: ${names}")
+    }
+  }
 
-	String findDocs(parent) {
-		def children = parent.getAt(0).children
-		for (child in children) {
-			if (!(child instanceof groovy.util.slurpersupport.Node)) {
-				return child
-			}
-		}
-	}
+  String findDocs(parent) {
+    def children = parent.getAt(0).children
+    for (child in children) {
+      if (!(child instanceof groovy.util.slurpersupport.Node)) {
+        return child
+      }
+    }
+  }
 
-	String getDocumentation() {
-		String text = Utils.stripCode(documentation, '\n * ')
-		if (text == "") {
-			return ""
-		}
-		return """
+  String getDocumentation() {
+    String text = Utils.stripCode(documentation, '\n * ')
+    if (text == "") {
+      return ""
+    }
+    return """
 /**
  * """ + text + """
  */"""
-	}
+  }
 
-	List<String> getImportStatements() {
-		return importManager.getImportStatements()
-	}
+  List<String> getImportStatements() {
+    return importManager.getImportStatements()
+  }
 
-	String getFile() {
-		namespace.replace(".", "/") + "/" + name + ".java";
-	}
+  String getFile() {
+    namespace.replace(".", "/") + "/" + name + ".java";
+  }
 
-	String getType() {
-		return numeric ? 'Integer' : 'String';
-	}
+  String getType() {
+    return numeric ? 'Integer' : 'String';
+  }
 
-	String getImplementsCode() {
-		if (numeric || valueEnum) {
-			importManager.importType("java.util.Objects")
-		}
-		importManager.importType("com.axelor.db.ValueEnum")
-		return "implements ValueEnum<${type}> "
-	}
+  String getImplementsCode() {
+    if (numeric || valueEnum) {
+      importManager.importType("java.util.Objects")
+    }
+    importManager.importType("com.axelor.db.ValueEnum")
+    return "implements ValueEnum<${type}> "
+  }
 
-	public List<EnumItem> getItems() {
-		validate()
-		return items;
-	}
+  public List<EnumItem> getItems() {
+    validate()
+    return items;
+  }
 
-	@Override
-	String toString() {
-		def names = items.collect { it.name }
-		return "Enum(name: $name, items: $names)"
-	}
+  @Override
+  String toString() {
+    def names = items.collect { it.name }
+    return "Enum(name: $name, items: $names)"
+  }
 }
