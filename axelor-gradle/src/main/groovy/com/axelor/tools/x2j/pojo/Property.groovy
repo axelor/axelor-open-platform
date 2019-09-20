@@ -31,7 +31,7 @@ class Property {
 	String code
 
 	String target
-	
+
 	String targetFqn
 
 	Entity entity
@@ -141,7 +141,11 @@ class Property {
 				return "\"${value}\""
 			case "long":
 				return value.endsWith("L") ? value : "${value}L"
-			case [ "integer", "double", "boolean" ]:
+			case [
+				"integer",
+				"double",
+				"boolean"
+			]:
 				return value
 			case "decimal":
 				return "new BigDecimal(\"${value}\")"
@@ -198,8 +202,8 @@ class Property {
 
 		def result = []
 		def empty = attrs["default"] != ""
-			? this.getEmptyValue()
-			: null
+				? this.getEmptyValue()
+				: null
 
 		if (empty != null) {
 			return "return $name == null ? $empty : $name;"
@@ -271,9 +275,9 @@ class Property {
 		final StringBuilder buf = new StringBuilder(name.replace('.', '_'));
 		for (int i = 1; i < buf.length() - 1; i++) {
 			if (
-				Character.isLowerCase(buf.charAt(i-1)) &&
-				Character.isUpperCase(buf.charAt(i) ) &&
-				Character.isLowerCase(buf.charAt(i+1))
+			Character.isLowerCase(buf.charAt(i-1)) &&
+			Character.isUpperCase(buf.charAt(i) ) &&
+			Character.isLowerCase(buf.charAt(i+1))
 			) {
 				buf.insert(i++, '_');
 			}
@@ -299,7 +303,7 @@ class Property {
 		}
 		return type == "one-to-many" && attrs["mappedBy"] != null
 	}
-	
+
 	boolean isEnum() {
 		return type == 'enum'
 	}
@@ -307,7 +311,7 @@ class Property {
 	boolean isJson() {
 		return attrs["json"] == "true"
 	}
-	
+
 	boolean isEncrypted() {
 		return attrs["encrypted"] == "true"
 	}
@@ -319,7 +323,7 @@ class Property {
 	boolean isUnique() {
 		return attrs["unique"] == "true"
 	}
-	
+
 	boolean isSequence() {
 		return attrs["sequence"]
 	}
@@ -419,15 +423,15 @@ class Property {
 			return false
 		String index = attrs['index'] as String
 		return index =~ /true|^idx_/ ||
-			attrs['namecolumn'] == 'true' ||
-			name in ['name', 'code'] ||
-			this.isReference() && !attrs['mappedBy']
+				attrs['namecolumn'] == 'true' ||
+				name in ['name', 'code']||
+				this.isReference() && !attrs['mappedBy']
 	}
 
 	static Property idProperty(Entity entity) {
 		new Property(entity, "id", "long")
 	}
-	
+
 	static Property attrsProperty(Entity entity) {
 		def prop = new Property(entity, 'attrs', 'string')
 		prop.attrs.put('json', 'true')
@@ -480,7 +484,7 @@ class Property {
 
 		if (Naming.isReserved(name)) {
 			throw new IllegalArgumentException(
-				"Invalid use of a reserved name '${name}' in domain object: ${entity.name}")
+			"Invalid use of a reserved name '${name}' in domain object: ${entity.name}")
 		}
 
 		if (collection) {
@@ -490,25 +494,25 @@ class Property {
 		def col = getColumnAuto()
 		if (Naming.isKeyword(col)) {
 			throw new IllegalArgumentException(
-				"Invalid use of an SQL keyword '${col}' in domain object: ${entity.name}")
+			"Invalid use of an SQL keyword '${col}' in domain object: ${entity.name}")
 		}
 
 		if (column == null && unique == null && nullable == null)
 			return null
 
 		def res = annon(reference ? "javax.persistence.JoinColumn" : "javax.persistence.Column")
-			.add("name", column)
-			.add("unique", unique, false)
-			
+				.add("name", column)
+				.add("unique", unique, false)
+
 		if (nullable) {
 			res.add("nullable", nullable, false)
 		}
 
 		return res
 	}
-	
+
 	private Annotation $joinTable() {
-		
+
 		def joinTable = attrs.table
 		def fk1 = attrs.column
 		def fk2 = attrs.column2
@@ -568,19 +572,19 @@ class Property {
 		def scale = attrs['scale']
 
 		if (precision == null && scale == null)
-          return null
-        
-        if (precision == null)
-          throw new IllegalArgumentException("${entity.name}.$name: invalid use of 'scale' without 'precision'");
+			return null
 
-        if (scale == null)
-          throw new IllegalArgumentException("${entity.name}.$name: invalid use of 'precision' without 'scale'");
+		if (precision == null)
+			throw new IllegalArgumentException("${entity.name}.$name: invalid use of 'scale' without 'precision'");
+
+		if (scale == null)
+			throw new IllegalArgumentException("${entity.name}.$name: invalid use of 'precision' without 'scale'");
 
 		precision = precision as Integer
 		scale = scale as Integer
 
-        if (scale > precision)
-          throw new IllegalArgumentException("${entity.name}.$name: 'scale' ($scale) must be less than or equal to the 'precision' ($precision)");
+		if (scale > precision)
+			throw new IllegalArgumentException("${entity.name}.$name: 'scale' ($scale) must be less than or equal to the 'precision' ($precision)");
 
 		annon("javax.validation.constraints.Digits", false)
 				.add("integer", (precision - scale) as String, false)
@@ -596,17 +600,23 @@ class Property {
 		if (!this.isVirtual()) {
 			return null
 		}
-		def all = [annon("com.axelor.db.annotations.VirtualColumn", true)]
+		def all = [
+			annon("com.axelor.db.annotations.VirtualColumn", true)
+		]
 		if (this.isTransient()) {
 			return all
 		}
 
 		if (this.isFormula()) {
-			all += [annon(reference ? "org.hibernate.annotations.JoinFormula" : "org.hibernate.annotations.Formula")
-							.add(this.getFormula(), false)]
+			all += [
+				annon(reference ? "org.hibernate.annotations.JoinFormula" : "org.hibernate.annotations.Formula")
+				.add(this.getFormula(), false)
+			]
 		} else {
-			all += [annon("javax.persistence.Access").add(
-						entity.importType("javax.persistence.AccessType.PROPERTY"), false)]
+			all += [
+				annon("javax.persistence.Access").add(
+				entity.importType("javax.persistence.AccessType.PROPERTY"), false)
+			]
 		}
 		return all
 	}
@@ -643,25 +653,25 @@ class Property {
 		}
 
 		if (title || help || readonly || hidden || multiline || selection ||
-			image || isPassword() || massUpdate || search || translatable || copyable || defaultNow)
+		image || isPassword() || massUpdate || search || translatable || copyable || defaultNow)
 			annon("com.axelor.db.annotations.Widget")
-				.add("image", image, false)
-				.add("title", title)
-				.add("help", help)
-				.add("readonly", readonly, false)
-				.add("hidden", hidden, false)
-				.add("multiline", multiline, false)
-				.add("search", search, true, true)
-				.add("selection", selection)
-				.add("password", password, false)
-				.add("massUpdate", massUpdate, false)
-				.add("translatable", translatable, false)
-				.add("copyable", copyable, false)
-				.add("defaultNow", defaultNow ? "true" : null, false)
+					.add("image", image, false)
+					.add("title", title)
+					.add("help", help)
+					.add("readonly", readonly, false)
+					.add("hidden", hidden, false)
+					.add("multiline", multiline, false)
+					.add("search", search, true, true)
+					.add("selection", selection)
+					.add("password", password, false)
+					.add("massUpdate", massUpdate, false)
+					.add("translatable", translatable, false)
+					.add("copyable", copyable, false)
+					.add("defaultNow", defaultNow ? "true" : null, false)
 	}
 
 	private List<Annotation> $binary() {
-		
+
 		if (isJson() && type == 'string') {
 			if (isEncrypted()) {
 				throw new IllegalArgumentException("Encryption is not supported on json field: ${entity.name}.${name}")
@@ -671,7 +681,7 @@ class Property {
 				annon("org.hibernate.annotations.Type").add("type", "json")
 			]
 		}
-		
+
 		if (isEnum()) {
 			return [
 				annon("javax.persistence.Basic", true),
@@ -712,7 +722,7 @@ class Property {
 			return [
 				annon("javax.persistence.Id", true),
 				annon("javax.persistence.GeneratedValue")
-					.add("strategy", "javax.persistence.GenerationType.AUTO", false)
+				.add("strategy", "javax.persistence.GenerationType.AUTO", false)
 			]
 		}
 
@@ -721,12 +731,12 @@ class Property {
 		[
 			annon("javax.persistence.Id", true),
 			annon("javax.persistence.GeneratedValue")
-				.add("strategy", "javax.persistence.GenerationType.SEQUENCE", false)
-				.add("generator", name),
+			.add("strategy", "javax.persistence.GenerationType.SEQUENCE", false)
+			.add("generator", name),
 			annon("javax.persistence.SequenceGenerator")
-				.add("name", name)
-				.add("sequenceName", name)
-				.add("allocationSize", "1", false)
+			.add("name", name)
+			.add("sequenceName", name)
+			.add("allocationSize", "1", false)
 		]
 	}
 
@@ -737,14 +747,17 @@ class Property {
 		def orphanRemoval = this.isOrphanRemoval()
 
 		def a = annon("javax.persistence.OneToOne")
-			.add("fetch", "javax.persistence.FetchType.LAZY", false)
-			.add("mappedBy", mapped)
+				.add("fetch", "javax.persistence.FetchType.LAZY", false)
+				.add("mappedBy", mapped)
 
 		if (orphanRemoval) {
 			a.add("cascade", "javax.persistence.CascadeType.ALL", false)
 			a.add("orphanRemoval", "true", false)
 		} else {
-			a.add("cascade", ["javax.persistence.CascadeType.PERSIST","javax.persistence.CascadeType.MERGE"], false)
+			a.add("cascade", [
+				"javax.persistence.CascadeType.PERSIST",
+				"javax.persistence.CascadeType.MERGE"
+			], false)
 		}
 		return a
 	}
@@ -753,8 +766,11 @@ class Property {
 		if (type != "many-to-one") return null
 
 		annon("javax.persistence.ManyToOne")
-			.add("fetch", "javax.persistence.FetchType.LAZY", false)
-			.add("cascade", ["javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"], false)
+				.add("fetch", "javax.persistence.FetchType.LAZY", false)
+				.add("cascade", [
+					"javax.persistence.CascadeType.PERSIST",
+					"javax.persistence.CascadeType.MERGE"
+				], false)
 	}
 
 	private Annotation $one2many() {
@@ -765,14 +781,17 @@ class Property {
 		def orphanRemoval = this.isOrphanRemoval()
 
 		def a = annon("javax.persistence.OneToMany")
-			.add("fetch", "javax.persistence.FetchType.LAZY", false)
-			.add("mappedBy", mapped)
+				.add("fetch", "javax.persistence.FetchType.LAZY", false)
+				.add("mappedBy", mapped)
 
 		if (orphanRemoval) {
 			a.add("cascade", "javax.persistence.CascadeType.ALL", false)
 			a.add("orphanRemoval", "true", false)
 		} else {
-			a.add("cascade", ["javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"], false)
+			a.add("cascade", [
+				"javax.persistence.CascadeType.PERSIST",
+				"javax.persistence.CascadeType.MERGE"
+			], false)
 		}
 		return a
 	}
@@ -781,9 +800,12 @@ class Property {
 		def mapped = attrs.get('mappedBy')
 		if (type == "many-to-many")
 			annon("javax.persistence.ManyToMany")
-				.add("fetch", "javax.persistence.FetchType.LAZY", false)
-				.add("mappedBy", mapped)
-				.add("cascade", ["javax.persistence.CascadeType.PERSIST", "javax.persistence.CascadeType.MERGE"], false)
+					.add("fetch", "javax.persistence.FetchType.LAZY", false)
+					.add("mappedBy", mapped)
+					.add("cascade", [
+						"javax.persistence.CascadeType.PERSIST",
+						"javax.persistence.CascadeType.MERGE"
+					], false)
 	}
 
 	private Annotation $orderBy() {
@@ -796,7 +818,7 @@ class Property {
 
 		return annon("javax.persistence.OrderBy").add(orderBy)
 	}
-	
+
 	private Annotation $sequence() {
 		def sequence = attrs.get('sequence')?.trim()
 		if (!sequence) return null
@@ -807,12 +829,12 @@ class Property {
 		if (!hashKey) return null
 		return annon("com.axelor.db.annotations.HashKey", true)
 	}
-	
+
 	private Annotation $converter() {
 		if (!encrypted || isLarge()) return null
 		def converter = type == 'binary'
-			? importName("com.axelor.db.converters.EncryptedBytesConverter")
-			: importName("com.axelor.db.converters.EncryptedStringConverter")
+				? importName("com.axelor.db.converters.EncryptedBytesConverter")
+				: importName("com.axelor.db.converters.EncryptedStringConverter")
 		return annon("javax.persistence.Convert").add("converter", "${converter}.class", false)
 	}
 }

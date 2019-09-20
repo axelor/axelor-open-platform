@@ -24,7 +24,7 @@ class Track {
 	private List<Annotation> fields = []
 	private List<Annotation> messages = []
 	private List<Annotation> contents = []
-    private List<Annotation> names = []
+	private List<Annotation> names = []
 
 	private Set<String> imports = []
 
@@ -35,7 +35,7 @@ class Track {
 	private boolean replace;
 
 	private boolean files;
-	
+
 	private String on;
 
 	private Track(Entity entity) {
@@ -59,7 +59,9 @@ class Track {
 		on = node.'@on'
 
 		if (on) {
-			imports += ['com.axelor.db.annotations.TrackEvent']
+			imports += [
+				'com.axelor.db.annotations.TrackEvent'
+			]
 		}
 	}
 
@@ -69,15 +71,19 @@ class Track {
 		String on = node.'@on'
 		String condition = node.'@if'
 
-		imports += ['com.axelor.db.annotations.TrackField']
-        names += name
+		imports += [
+			'com.axelor.db.annotations.TrackField'
+		]
+		names += name
 
 		def annon = new Annotation(this.entity, "TrackField")
-			.add("name", name)
+				.add("name", name)
 
 		if (condition) annon.add("condition", condition)
 		if (on) {
-			imports += ['com.axelor.db.annotations.TrackEvent']
+			imports += [
+				'com.axelor.db.annotations.TrackEvent'
+			]
 			annon.add("on", "com.axelor.db.annotations.TrackEvent.${on}", false)
 		}
 
@@ -92,15 +98,19 @@ class Track {
 		String condition = node.'@if'
 		String fields = node.'@fields'
 
-		imports += ['com.axelor.db.annotations.TrackMessage']
+		imports += [
+			'com.axelor.db.annotations.TrackMessage'
+		]
 
 		def annon = new Annotation(this.entity, "TrackMessage")
-			.add("message", message)
-			.add("condition", condition)
+				.add("message", message)
+				.add("condition", condition)
 
 		if (tag) annon.add("tag", tag)
 		if (on) {
-			imports += ['com.axelor.db.annotations.TrackEvent']
+			imports += [
+				'com.axelor.db.annotations.TrackEvent'
+			]
 			annon.add("on", "com.axelor.db.annotations.TrackEvent.${on}", false)
 		}
 
@@ -141,7 +151,7 @@ class Track {
 		return track;
 	}
 
-    List<String> getNames() {
-        return names;
-    }
+	List<String> getNames() {
+		return names;
+	}
 }

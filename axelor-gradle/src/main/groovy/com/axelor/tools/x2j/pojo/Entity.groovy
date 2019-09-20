@@ -23,7 +23,7 @@ import com.axelor.common.Inflector
 import com.axelor.tools.x2j.Utils
 
 class Entity {
-	
+
 	private static Set<String> INTERNAL_PACKAGES = [
 		'com.axelor.auth.db',
 		'com.axelor.meta.db',
@@ -38,7 +38,7 @@ class Entity {
 	String module
 
 	String namespace
-	
+
 	String repoNamespace
 
 	String tablePrefix
@@ -84,9 +84,9 @@ class Entity {
 	private Repository repository
 
 	private ImportManager importManager
-	
+
 	private String extraImports
-	
+
 	private String extraCode
 
 	private Track track
@@ -155,7 +155,7 @@ class Entity {
 			repository = new Repository(this)
 			repository.concrete = node.@repository != "abstract"
 		}
-		
+
 		properties = []
 		propertyMap = [:]
 		constraints = []
@@ -191,49 +191,49 @@ class Entity {
 
 		node."*".each {
 			switch (it.name()) {
-			case "index":
-				indexes += new Index(this, it)
-				break
-			case "unique-constraint":
-				constraints += new Constraint(this, it)
-				break
-			case "finder-method":
-				finders += new Finder(this, it)
-				break
-			case "extra-imports":
-				extraImports = it.text()
-				break
-			case "extra-code":
-				extraCode = it.text()
-				break
-			case "track":
-				track = new Track(this, it)
-				break
-			case "entity-listener":
-				listeners += it.'@class'.text()
-				break
-			default:
-				Property field = new Property(this, it)
-				if (modelClass && !field.simple) {
-					throw new IllegalArgumentException("Only simple fields can be added to Model class.")
-				}
-				properties += field
-				propertyMap[field.name] = field
-				if (field.isVirtual() && !field.isTransient()) {
-					dynamicUpdate = true
-				}
-				if (field.isNameField()) {
-					nameField = field
-				}
-				if (field.indexable) {
-					indexes += field.index
-				}
-				if (field.json || field.name == 'attrs') {
-					jsonAttrsAdd = false
-				}
-				if (field.name == 'attrs') {
-					jsonAttrs = 'false'
-				}
+				case "index":
+					indexes += new Index(this, it)
+					break
+				case "unique-constraint":
+					constraints += new Constraint(this, it)
+					break
+				case "finder-method":
+					finders += new Finder(this, it)
+					break
+				case "extra-imports":
+					extraImports = it.text()
+					break
+				case "extra-code":
+					extraCode = it.text()
+					break
+				case "track":
+					track = new Track(this, it)
+					break
+				case "entity-listener":
+					listeners += it.'@class'.text()
+					break
+				default:
+					Property field = new Property(this, it)
+					if (modelClass && !field.simple) {
+						throw new IllegalArgumentException("Only simple fields can be added to Model class.")
+					}
+					properties += field
+					propertyMap[field.name] = field
+					if (field.isVirtual() && !field.isTransient()) {
+						dynamicUpdate = true
+					}
+					if (field.isNameField()) {
+						nameField = field
+					}
+					if (field.indexable) {
+						indexes += field.index
+					}
+					if (field.json || field.name == 'attrs') {
+						jsonAttrsAdd = false
+					}
+					if (field.name == 'attrs') {
+						jsonAttrs = 'false'
+					}
 			}
 		}
 
@@ -242,7 +242,7 @@ class Entity {
 			properties.add(propertyMap.get("attrs"));
 		}
 	}
-	
+
 	Repository getRepository() {
 		return this.repository
 	}
@@ -257,7 +257,7 @@ class Entity {
 	}
 
 	void merge(Entity other) {
-		
+
 		for (Property prop : other.properties) {
 			Property existing = propertyMap.get(prop.name)
 			if (isCompatible(existing, prop)) {
@@ -277,7 +277,7 @@ class Entity {
 				}
 			}
 		}
-		
+
 		indexes.addAll(other.indexes)
 		constraints.addAll(other.constraints)
 		finders.addAll(other.finders)
@@ -324,7 +324,7 @@ class Entity {
 		if (!interfaces || interfaces.trim() == "") return ""
 		return " implements " + interfaces
 	}
-	
+
 	String getExtendsImplementStmt() {
 		if (modelClass) {
 			importType('javax.persistence.Transient')
@@ -334,7 +334,7 @@ class Entity {
 		}
 		return " extends " + getBaseClass() + getImplementStmt()
 	}
-	
+
 	String getAbstractStmt() {
 		return modelClass ? "abstract " : ""
 	}
@@ -395,7 +395,7 @@ class Entity {
 	String getExtraCode() {
 		return stripCode(extraCode, "\n\t");
 	}
-	
+
 	String getExtraImports() {
 		if (!extraImports || extraImports.trim().isEmpty()) return "";
 		return "\n" + Utils.stripCode(extraImports, "\n") + "\n"
@@ -404,7 +404,7 @@ class Entity {
 	private List<Property> getHashables() {
 		return properties.findAll { p -> p.hashKey }
 	}
-	
+
 	boolean isModelClass() {
 		return modelClass;
 	}
@@ -416,7 +416,9 @@ class Entity {
 		}
 
 		def hashables = getHashables()
-		def code = ["if (obj == null) return false;"]
+		def code = [
+			"if (obj == null) return false;"
+		]
 
 		importType("java.util.Objects")
 
@@ -467,7 +469,7 @@ class Entity {
 		int count = 0
 		for(Property p : properties) {
 			if (p.virtual || p.password || p.json || !p.simple || p.name == "id" || p.name == "version") continue
-			code += "\t\t\t.add(\"${p.name}\", ${p.getter}())\n"
+				code += "\t\t\t.add(\"${p.name}\", ${p.getter}())\n"
 			if (count++ == 10) break
 		}
 		return code + "\t\t\t.omitNullValues()\n\t\t\t.toString();"
@@ -490,7 +492,10 @@ class Entity {
 		def all = []
 
 		if (!mappedSuper) {
-			all += [new Annotation(this, "javax.persistence.Entity", true), $cacheable()]
+			all += [
+				new Annotation(this, "javax.persistence.Entity", true),
+				$cacheable()
+			]
 		}
 
 		if (!mappedSuper && dynamicUpdate) {
@@ -505,7 +510,7 @@ class Entity {
 		all += $listeners()
 
 		return all.grep { it != null }.flatten()
-				  .grep { Annotation a -> !a.empty }
+		.grep { Annotation a -> !a.empty }
 	}
 
 	List<Finder> getFinderMethods() {
@@ -597,7 +602,7 @@ class Entity {
 		return "Entity(name: $name, fields: $names)"
 	}
 
-    public Track getTrack() {
-        return track;
-    }
+	public Track getTrack() {
+		return track;
+	}
 }

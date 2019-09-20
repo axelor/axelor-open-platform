@@ -26,7 +26,7 @@ class Annotation {
 	boolean empty
 
 	Entity entity
-	
+
 	ImportManager importManager
 
 	Annotation(Entity entity, String name) {
@@ -37,7 +37,7 @@ class Annotation {
 		this(entity.importManager, name, empty)
 		this.entity = entity
 	}
-	
+
 	Annotation(ImportManager importer, String name, boolean empty) {
 		this.importManager = importer
 		this.name = "@" + importer.importType(name)
@@ -76,13 +76,13 @@ class Annotation {
 	Annotation add(String param, String value, boolean quote) {
 		if (value == null)
 			return this
-		this.add(param, [ value ], quote, true)
+		this.add(param, [value], quote, true)
 	}
 
 	Annotation add(String param, String value, boolean quote, boolean array) {
 		if (value == null)
 			return this
-		def values = array ? value.split(/,/) as List : [ value ]
+		def values = array ? value.split(/,/) as List : [value]
 		this.add(param, values, quote, ! array)
 	}
 

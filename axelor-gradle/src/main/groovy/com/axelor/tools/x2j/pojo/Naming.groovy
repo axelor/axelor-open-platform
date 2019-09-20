@@ -44,8 +44,8 @@ final class Naming {
 	 */
 	public static boolean isKeyword(String name) {
 		return RESERVED_POSTGRESQL.contains(name) ||
-			RESERVED_MYSQL.contains(name) ||
-			RESERVED_ORACLE.contains(name);
+				RESERVED_MYSQL.contains(name) ||
+				RESERVED_ORACLE.contains(name);
 	}
 
 	/**

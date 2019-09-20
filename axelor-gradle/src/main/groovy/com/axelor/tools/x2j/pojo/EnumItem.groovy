@@ -31,9 +31,9 @@ class EnumItem {
 	String name
 
 	String value
-	
+
 	String title
-	
+
 	String help
 
 	EnumItem(EnumType entity, NodeChild node) {
@@ -43,7 +43,7 @@ class EnumItem {
 		this.title = node.@title
 		this.help = node.@help
 	}
-	
+
 	String getDocumentation() {
 		String text = Utils.stripCode(help, "\n * ")
 		if (text == "") {
@@ -65,7 +65,7 @@ class EnumItem {
 	private Annotation $widget() {
 		if (title) {
 			return new Annotation(entity.importManager, "com.axelor.db.annotations.Widget", false)
-				.add("title", title);
+					.add("title", title);
 		}
 		return null
 	}
@@ -73,7 +73,9 @@ class EnumItem {
 	String getItemCode() {
 		def args = []
 		if (value) {
-			args = [entity.numeric ? value : quote(value)]
+			args = [
+				entity.numeric ? value : quote(value)
+			]
 		}
 		String code = name
 		if (args.size() > 0) {

@@ -164,7 +164,7 @@ class Finder {
 		return "\n\t" + Utils.stripCode(lines.join("\n"), "\n\t") + "\n";
 	}
 
-		@Override
+	@Override
 	String toString() {
 		return "Finder(" + name + ")";
 	}

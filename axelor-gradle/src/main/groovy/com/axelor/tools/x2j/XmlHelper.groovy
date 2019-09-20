@@ -50,7 +50,7 @@ class XmlHelper {
 			return (String) it.@name
 		}
 	}
-	
+
 	/**
 	 * Parse the given input xml and return {@link EnumType} mapping
 	 * to each entity elements.

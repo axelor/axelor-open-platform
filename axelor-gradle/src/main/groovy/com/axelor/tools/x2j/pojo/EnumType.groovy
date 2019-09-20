@@ -29,21 +29,21 @@ class EnumType {
 	String module
 
 	String namespace
-	
+
 	String documentation
-	
+
 	Boolean numeric
-	
+
 	Boolean valueEnum
 
 	List<EnumItem> items
-	
+
 	Map<String, Property> itemsMap
 
 	EnumType baseType
-	
+
 	private ImportManager importManager
-	
+
 	transient long lastModified
 
 	EnumType(NodeChild node) {
@@ -53,10 +53,10 @@ class EnumType {
 		namespace = node.parent().module."@package"
 		importManager = new ImportManager(namespace, false)
 		documentation = findDocs(node)
-		
+
 		itemsMap = [:]
 		items = []
-		
+
 		node."item".each {
 			EnumItem item = new EnumItem(this, it)
 			itemsMap[item.name] = item
@@ -87,7 +87,7 @@ class EnumType {
 		}
 		other.baseType = this
 	}
-	
+
 	void validate() {
 		def map = [:]
 		def dup = [] as Set
@@ -140,19 +140,19 @@ class EnumType {
  * """ + text + """
  */"""
 	}
-	
+
 	List<String> getImportStatements() {
 		return importManager.getImportStatements()
 	}
-	
+
 	String getFile() {
 		namespace.replace(".", "/") + "/" + name + ".java";
 	}
-	
+
 	String getType() {
 		return numeric ? 'Integer' : 'String';
 	}
-	
+
 	String getImplementsCode() {
 		if (numeric || valueEnum) {
 			importManager.importType("java.util.Objects")

@@ -49,7 +49,7 @@ class ImportManager {
 
 		String simpleName = parts.removeLast()
 		def name = simpleName
-		
+
 		if (name == 'class') {
 			simpleName = parts.removeLast()
 			name = simpleName
