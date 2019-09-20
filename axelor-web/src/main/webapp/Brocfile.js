@@ -15,6 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+/*jshint esversion: 6 */
+'use strict';
+
 const fs = require('fs');
 
 const postcss = require('broccoli-postcss');
@@ -82,10 +85,11 @@ function minifyJs(name) {
     outputFile: name + '.min.js',
   });
   return uglify(tree, {
-    compress: false,
-    sourceMapConfig: {
-      enabled: false,
+    uglify: {
+      compress: false,
+      sourceMap: false,
     },
+    hiddenSourceMap: false
   });
 }
 
