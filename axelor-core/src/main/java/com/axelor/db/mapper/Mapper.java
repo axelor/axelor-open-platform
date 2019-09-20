@@ -277,22 +277,22 @@ public class Mapper {
 
     return ((List<?>) node.methods)
         .stream()
-        .map(m -> (MethodNode) m)
-        .filter(m -> Modifier.isProtected(m.access))
-        .filter(m -> m.name.startsWith(PREFIX_COMPUTE))
-        .filter(m -> methods.containsKey(m.name))
-        .collect(
-            Collectors.toMap(
-                m -> methods.get(m.name),
-                m -> {
-                  return Arrays.stream(m.instructions.toArray())
-                      .filter(n -> n.getOpcode() == Opcodes.GETFIELD)
-                      .filter(n -> n instanceof FieldInsnNode)
-                      .map(n -> (FieldInsnNode) n)
-                      .filter(n -> !n.name.equals(methods.get(m.name)))
-                      .map(n -> n.name)
-                      .collect(Collectors.toSet());
-                }));
+            .map(m -> (MethodNode) m)
+            .filter(m -> Modifier.isProtected(m.access))
+            .filter(m -> m.name.startsWith(PREFIX_COMPUTE))
+            .filter(m -> methods.containsKey(m.name))
+            .collect(
+                Collectors.toMap(
+                    m -> methods.get(m.name),
+                    m -> {
+                      return Arrays.stream(m.instructions.toArray())
+                          .filter(n -> n.getOpcode() == Opcodes.GETFIELD)
+                          .filter(n -> n instanceof FieldInsnNode)
+                          .map(n -> (FieldInsnNode) n)
+                          .filter(n -> !n.name.equals(methods.get(m.name)))
+                          .map(n -> n.name)
+                          .collect(Collectors.toSet());
+                    }));
   }
 
   /**
@@ -395,9 +395,7 @@ public class Mapper {
       return bean;
     }
     final Mapper mapper = Mapper.of(klass);
-    values
-        .entrySet()
-        .stream()
+    values.entrySet().stream()
         .filter(e -> mapper.setters.containsKey(e.getKey()))
         .forEach(e -> mapper.set(bean, e.getKey(), e.getValue()));
     return bean;

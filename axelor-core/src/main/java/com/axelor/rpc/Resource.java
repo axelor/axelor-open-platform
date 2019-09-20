@@ -810,9 +810,7 @@ public class Resource<T extends Model> {
       return values;
     }
     final Mapper mapper = Mapper.of(model);
-    related
-        .entrySet()
-        .stream()
+    related.entrySet().stream()
         .filter(e -> e.getValue() != null)
         .filter(e -> e.getValue().size() > 0)
         .forEach(
@@ -824,9 +822,7 @@ public class Resource<T extends Model> {
               if (value instanceof Collection<?>) {
                 value =
                     ((Collection<?>) value)
-                        .stream()
-                        .map(input -> toMap(input, names))
-                        .collect(Collectors.toList());
+                        .stream().map(input -> toMap(input, names)).collect(Collectors.toList());
               } else if (value instanceof Model) {
                 value = toMap(value, names);
                 if (old instanceof Map) {

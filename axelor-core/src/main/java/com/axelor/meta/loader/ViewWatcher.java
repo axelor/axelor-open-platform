@@ -262,9 +262,7 @@ public final class ViewWatcher {
   private synchronized void registerAll() throws Exception {
     final Pattern pattern = Pattern.compile(".*propertiesFilePath=([^,]+).*");
     final Set<Path> paths =
-        ManagementFactory.getRuntimeMXBean()
-            .getInputArguments()
-            .stream()
+        ManagementFactory.getRuntimeMXBean().getInputArguments().stream()
             .filter(s -> s.startsWith("-javaagent"))
             .map(s -> pattern.matcher(s))
             .filter(m -> m.matches())

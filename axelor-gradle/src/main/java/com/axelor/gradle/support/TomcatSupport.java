@@ -111,9 +111,7 @@ public class TomcatSupport extends AbstractSupport {
               manifest.put("Main-Class", TOMCAT_RUNNER_CLASS);
               manifest.put(
                   "Class-Path",
-                  tomcat
-                      .getFiles()
-                      .stream()
+                  tomcat.getFiles().stream()
                       .filter(f -> !f.getName().contains("hotswap-agent"))
                       .map(f -> f.getAbsolutePath())
                       .collect(Collectors.joining(" ")));
@@ -141,10 +139,7 @@ public class TomcatSupport extends AbstractSupport {
     }
 
     // try to use linked axelor-web's webapp dir
-    project
-        .getGradle()
-        .getIncludedBuilds()
-        .stream()
+    project.getGradle().getIncludedBuilds().stream()
         .map(it -> new File(it.getProjectDir(), "axelor-web/src/main/webapp"))
         .filter(it -> it.exists())
         .findFirst()
@@ -178,24 +173,21 @@ public class TomcatSupport extends AbstractSupport {
 
     props.setProperty(
         "extraClasses",
-        extraClasses
-            .stream()
+        extraClasses.stream()
             .filter(File::exists)
             .map(File::getAbsolutePath)
             .collect(Collectors.joining(",")));
 
     props.setProperty(
         "extraLibs",
-        extraLibs
-            .stream()
+        extraLibs.stream()
             .filter(File::exists)
             .map(File::getAbsolutePath)
             .collect(Collectors.joining(",")));
 
     props.setProperty(
         "webapps",
-        findWebapps(project)
-            .stream()
+        findWebapps(project).stream()
             .filter(File::exists)
             .map(File::getAbsolutePath)
             .collect(Collectors.joining(",")));

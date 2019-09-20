@@ -240,8 +240,7 @@ public class ViewService extends AbstractService {
         items.addAll(form.getToolbar());
       }
       if (form.getMenubar() != null) {
-        form.getMenubar()
-            .stream()
+        form.getMenubar().stream()
             .filter(m -> m.getItems() != null)
             .forEach(m -> collect.accept(m.getItems()));
       }
@@ -290,8 +289,7 @@ public class ViewService extends AbstractService {
       if (view instanceof FormView || view instanceof GridView) {
         Mapper mapper = Mapper.of(modelClass);
         boolean hasJson =
-            names
-                .stream()
+            names.stream()
                 .map(mapper::getProperty)
                 .filter(Objects::nonNull)
                 .anyMatch(Property::isJson);

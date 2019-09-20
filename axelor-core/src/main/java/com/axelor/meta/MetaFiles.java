@@ -171,8 +171,7 @@ public class MetaFiles {
     boolean blocked =
         BLACKLIST_PATTERNS.isEmpty()
             ? false
-            : BLACKLIST_PATTERNS
-                .stream()
+            : BLACKLIST_PATTERNS.stream()
                 .map(p -> p.matcher(filePath))
                 .filter(m -> m.find())
                 .findFirst()
@@ -185,8 +184,7 @@ public class MetaFiles {
     boolean allowed =
         WHITELIST_PATTERNS.isEmpty()
             ? true
-            : WHITELIST_PATTERNS
-                .stream()
+            : WHITELIST_PATTERNS.stream()
                 .map(p -> p.matcher(filePath))
                 .filter(m -> m.find())
                 .findFirst()

@@ -83,8 +83,7 @@ public class ViewObserver {
 
   void onPostRemove(
       @Observes @Named(RequestEvent.REMOVE) @EntityType(MetaView.class) PostRequest event) {
-    toRegenerate
-        .stream()
+    toRegenerate.stream()
         .map(name -> metaViewRepo.findByNameAndComputed(name, false))
         .filter(Objects::nonNull)
         .forEach(finalViewGenerator::generate);

@@ -101,9 +101,7 @@ public class TomcatRun extends JavaExec {
     attributes.put(Attributes.Name.MAIN_CLASS, MAIN_CLASS);
     attributes.put(
         Attributes.Name.CLASS_PATH,
-        classpath
-            .getFiles()
-            .stream()
+        classpath.getFiles().stream()
             .map(File::toURI)
             .map(Object::toString)
             .collect(Collectors.joining(" ")));

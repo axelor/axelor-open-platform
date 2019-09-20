@@ -63,9 +63,7 @@ public class ImplicitNamingStrategyImpl extends ImplicitNamingStrategyLegacyHbmI
     }
     final Identifier tableName = source.getTableName();
     final List<Identifier> columns =
-        source
-            .getColumnNames()
-            .stream()
+        source.getColumnNames().stream()
             .map(PhysicalNamingStrategyImpl::addUnderscores)
             .collect(Collectors.toList());
 

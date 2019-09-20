@@ -28,10 +28,7 @@ public class MailFetchJob implements Job {
 
   private boolean isRunning(JobExecutionContext context) {
     try {
-      return context
-          .getScheduler()
-          .getCurrentlyExecutingJobs()
-          .stream()
+      return context.getScheduler().getCurrentlyExecutingJobs().stream()
           .filter(j -> j.getTrigger().equals(context.getTrigger()))
           .filter(j -> !j.getFireInstanceId().equals(context.getFireInstanceId()))
           .findFirst()

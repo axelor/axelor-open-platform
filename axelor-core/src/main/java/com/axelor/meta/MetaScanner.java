@@ -129,8 +129,7 @@ public final class MetaScanner {
     }
 
     final Path base =
-        BUILD_OUTPUT_PATHS
-            .stream()
+        BUILD_OUTPUT_PATHS.stream()
             .filter(p -> file.endsWith(p))
             .findFirst()
             .map(p -> p.replaceAll("[^/]+", ".."))
@@ -156,8 +155,7 @@ public final class MetaScanner {
         }
       }
     } else {
-      BUILD_OUTPUT_PATHS
-          .stream()
+      BUILD_OUTPUT_PATHS.stream()
           .map(base::resolve)
           .filter(Files::exists)
           .forEach(
@@ -179,8 +177,7 @@ public final class MetaScanner {
    * @return list of class path entry urls of the modules.
    */
   private static List<URL> findClassPath() {
-    return findModuleFiles()
-        .stream()
+    return findModuleFiles().stream()
         .flatMap(file -> findClassPath(file).stream())
         .collect(Collectors.toList());
   }
@@ -239,8 +236,7 @@ public final class MetaScanner {
    * @return list of module properties
    */
   public static List<Properties> findModuleProperties() {
-    return findModuleFiles()
-        .stream()
+    return findModuleFiles().stream()
         .map(file -> findProperties(file))
         .filter(p -> StringUtils.notBlank(p.getProperty("name")))
         .collect(Collectors.toList());

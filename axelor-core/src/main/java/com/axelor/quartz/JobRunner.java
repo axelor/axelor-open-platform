@@ -75,10 +75,7 @@ public class JobRunner {
     total = 0;
     log.info("Configuring scheduled jobs...");
 
-    JPA.em()
-        .createQuery(META_SCHEDULE_QUERY, MetaSchedule.class)
-        .getResultList()
-        .stream()
+    JPA.em().createQuery(META_SCHEDULE_QUERY, MetaSchedule.class).getResultList().stream()
         .forEach(this::configure);
 
     log.info("Configured total jobs: {}", total);

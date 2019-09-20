@@ -30,9 +30,7 @@ final class LoggerProvisionListener implements ProvisionListener {
 
   @Override
   public <T> void onProvision(ProvisionInvocation<T> provision) {
-    provision
-        .getDependencyChain()
-        .stream()
+    provision.getDependencyChain().stream()
         .map(d -> d.getDependency())
         .filter(this::isLoggerDependency)
         .map(d -> d.getInjectionPoint().getDeclaringType().getRawType())

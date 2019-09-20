@@ -50,9 +50,7 @@ public class DMSPermissionController {
     final DMSFile file = request.getContext().getParent().asType(DMSFile.class);
     final Model current = getter.apply(permission);
     final String idListString =
-        Optional.ofNullable(file.getPermissions())
-            .orElse(Collections.emptyList())
-            .stream()
+        Optional.ofNullable(file.getPermissions()).orElse(Collections.emptyList()).stream()
             .map(getter)
             .filter(Objects::nonNull)
             .filter(model -> current == null || !current.equals(model))

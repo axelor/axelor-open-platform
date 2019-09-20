@@ -85,8 +85,7 @@ public class EncryptedFieldService {
     }
 
     boolean hasLarge =
-        encrypted
-            .stream()
+        encrypted.stream()
             .map(Property::getType)
             .anyMatch(t -> t == PropertyType.BINARY || t == PropertyType.TEXT);
 

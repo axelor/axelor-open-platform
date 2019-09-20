@@ -416,10 +416,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       setAuthorizers("auth");
 
       final String clientNames =
-          config
-              .getClients()
-              .getClients()
-              .stream()
+          config.getClients().getClients().stream()
               .map(Client::getName)
               .collect(Collectors.joining(","));
       setClients(clientNames);

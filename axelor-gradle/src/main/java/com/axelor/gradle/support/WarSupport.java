@@ -60,9 +60,7 @@ public class WarSupport extends AbstractSupport {
               task.dependsOn(GenerateCode.TASK_NAME);
               task.dependsOn(JavaPlugin.PROCESS_RESOURCES_TASK_NAME);
               task.dependsOn(axelorWeb);
-              axelorWeb
-                  .getFiles()
-                  .stream()
+              axelorWeb.getFiles().stream()
                   .filter(file -> file.getName().startsWith("axelor-web"))
                   .forEach(
                       file -> {

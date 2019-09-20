@@ -87,8 +87,7 @@ public class ModuleController {
       return all;
     }
 
-    depends
-        .stream()
+    depends.stream()
         .filter(m -> m.getInstalled() != Boolean.TRUE)
         .map(MetaModule::getName)
         .forEach(all::add);
@@ -185,8 +184,7 @@ public class ModuleController {
       }
 
       String text =
-          resolveLink(module, getMainModule())
-              .stream()
+          resolveLink(module, getMainModule()).stream()
               .map(n -> "<li>" + n + "</li>")
               .collect(Collectors.joining());
 

@@ -168,18 +168,14 @@ public class AuthPac4jProfileService {
   }
 
   public Set<Role> getRoles(CommonProfile profile) {
-    return profile
-        .getRoles()
-        .stream()
+    return profile.getRoles().stream()
         .map(roleRepo::findByName)
         .filter(Objects::nonNull)
         .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   public Set<Permission> getPermissions(CommonProfile profile) {
-    return profile
-        .getPermissions()
-        .stream()
+    return profile.getPermissions().stream()
         .map(permissionRepo::findByName)
         .filter(Objects::nonNull)
         .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -192,9 +188,7 @@ public class AuthPac4jProfileService {
       return Collections.emptySet();
     }
 
-    return Optional.ofNullable(languageSelect.getItems())
-        .orElse(Collections.emptyList())
-        .stream()
+    return Optional.ofNullable(languageSelect.getItems()).orElse(Collections.emptyList()).stream()
         .map(MetaSelectItem::getValue)
         .collect(Collectors.toCollection(LinkedHashSet::new));
   }

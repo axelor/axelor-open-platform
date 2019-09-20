@@ -39,16 +39,14 @@ public class Address extends JpaModel {
   @NotNull private String zip;
 
   @ManyToOne(
-    fetch = FetchType.LAZY,
-    cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-  )
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private Country country;
 
   @NotNull
   @ManyToOne(
-    fetch = FetchType.LAZY,
-    cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-  )
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private Contact contact;
 
   public Address() {}

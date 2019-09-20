@@ -345,8 +345,7 @@ public class PanelRelated extends AbstractPanel {
 
     List<Object> targetFields = new ArrayList<>();
     List<String> names =
-        getItems()
-            .stream()
+        getItems().stream()
             .filter(x -> x instanceof SimpleWidget)
             .map(x -> ((SimpleWidget) x).getName())
             .filter(n -> !StringUtils.isBlank(n))

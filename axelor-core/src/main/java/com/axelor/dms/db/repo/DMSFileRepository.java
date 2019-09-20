@@ -203,8 +203,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
         .map(DMSFile::getPermissions)
         .ifPresent(
             permissions ->
-                permissions
-                    .stream()
+                permissions.stream()
                     .map(permission -> dmsPermissions.copy(permission, false))
                     .forEach(entity::addPermission));
   }

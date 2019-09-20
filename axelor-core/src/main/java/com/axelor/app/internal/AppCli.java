@@ -41,47 +41,40 @@ public class AppCli {
   static class MyOptions {
 
     @Parameter(
-      names = {"-h", "--help"},
-      description = "show this help message",
-      help = true
-    )
+        names = {"-h", "--help"},
+        description = "show this help message",
+        help = true)
     public Boolean showHelp;
 
     @Parameter(
-      names = {"-i", "--init"},
-      description = "initialize the database"
-    )
+        names = {"-i", "--init"},
+        description = "initialize the database")
     public Boolean init;
 
     @Parameter(
-      names = {"-u", "--update"},
-      description = "update the installed modules"
-    )
+        names = {"-u", "--update"},
+        description = "update the installed modules")
     public Boolean update;
 
     @Parameter(
-      names = {"-M", "--migrate"},
-      description = "run the db migration scripts"
-    )
+        names = {"-M", "--migrate"},
+        description = "run the db migration scripts")
     public Boolean migrate;
 
     @Parameter(
-      names = {"-E", "--encrypt"},
-      description = "update encrypted values"
-    )
+        names = {"-E", "--encrypt"},
+        description = "update encrypted values")
     public Boolean encrypt;
 
     @Parameter(
-      names = {"--verbose"},
-      description = "verbose ouput"
-    )
+        names = {"--verbose"},
+        description = "verbose ouput")
     public Boolean verbose;
 
     @Parameter(
-      names = {"-m", "--modules"},
-      description = "list of modules to update",
-      variableArity = true
-    )
+        names = {"-m", "--modules"},
+        description = "list of modules to update",
+        variableArity = true)
     public List<String> modules;
   }
 

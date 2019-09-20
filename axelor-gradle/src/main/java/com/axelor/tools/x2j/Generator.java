@@ -177,9 +177,7 @@ public class Generator {
     Optional.ofNullable(entity.getTrack())
         .ifPresent(
             track ->
-                track
-                    .getNames()
-                    .stream()
+                track.getNames().stream()
                     .filter(trackName -> !entity.getPropertyMap().keySet().contains(trackName))
                     .forEach(
                         trackName ->

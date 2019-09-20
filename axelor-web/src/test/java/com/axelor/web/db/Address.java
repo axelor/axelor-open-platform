@@ -28,9 +28,8 @@ import javax.validation.constraints.NotNull;
 public class Address extends JpaModel {
 
   @ManyToOne(
-    fetch = FetchType.LAZY,
-    cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-  )
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private Contact contact;
 
   @NotNull private String street;

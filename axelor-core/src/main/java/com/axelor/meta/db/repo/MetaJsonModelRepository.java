@@ -37,16 +37,12 @@ import javax.persistence.EntityManager;
 public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 
   public MetaJsonField findNameField(MetaJsonModel jsonModel) {
-    return jsonModel
-        .getFields()
-        .stream()
+    return jsonModel.getFields().stream()
         .filter(f -> f.getNameField() == Boolean.TRUE)
         .findFirst()
         .orElseGet(
             () -> {
-              return jsonModel
-                  .getFields()
-                  .stream()
+              return jsonModel.getFields().stream()
                   .filter(
                       f ->
                           "name".equalsIgnoreCase(f.getName())

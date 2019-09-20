@@ -47,7 +47,7 @@ import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectories;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.util.PatternSet;
-import org.gradle.composite.internal.DefaultIncludedBuild;
+import org.gradle.composite.internal.IncludedBuildInternal;
 
 public class GenerateCode extends DefaultTask {
 
@@ -71,7 +71,7 @@ public class GenerateCode extends DefaultTask {
 
   private List<ResolvedArtifact> artifacts() {
     if (artifacts == null) {
-      artifacts = findArtifacts(getProject().getConfigurations().getByName("runtimeClasspath"));
+      artifacts = findArtifacts(getProject().getConfigurations().getByName("compile"));
     }
     return artifacts;
   }

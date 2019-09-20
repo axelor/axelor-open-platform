@@ -71,9 +71,7 @@ public class Context extends SimpleBindings {
       if (value != null) {
         final JsonSerializer<Object> serializer = provider.findValueSerializer(Map.class, null);
         final Map<String, Object> map = new HashMap<>();
-        value
-            .entrySet()
-            .stream()
+        value.entrySet().stream()
             .filter(e -> !(e.getValue() instanceof JsonContext))
             .filter(e -> !KEY_PARENT_CONTEXT.equals(e.getKey()))
             .forEach(e -> map.put(e.getKey(), e.getValue()));

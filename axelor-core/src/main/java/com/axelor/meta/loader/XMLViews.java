@@ -1108,8 +1108,7 @@ public class XMLViews {
     }
 
     private static List<Element> filterElements(List<Element> elements, String nodeName) {
-      return elements
-          .stream()
+      return elements.stream()
           .filter(element -> nodeName.equals(element.getNodeName()))
           .collect(Collectors.toList());
     }

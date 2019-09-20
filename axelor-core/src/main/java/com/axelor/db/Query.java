@@ -614,9 +614,7 @@ public class Query<T extends Model> {
 
   protected String updateQuery(Map<String, Object> values, boolean versioned, String filter) {
     final String items =
-        values
-            .keySet()
-            .stream()
+        values.keySet().stream()
             .map(key -> String.format("self.%s = :%s", key, key))
             .collect(Collectors.joining(", "));
 

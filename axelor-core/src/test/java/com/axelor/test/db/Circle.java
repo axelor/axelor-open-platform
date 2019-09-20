@@ -34,10 +34,9 @@ public class Circle extends Model {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CONTACT_CIRCLE_SEQ")
   @SequenceGenerator(
-    name = "CONTACT_CIRCLE_SEQ",
-    sequenceName = "CONTACT_CIRCLE_SEQ",
-    allocationSize = 1
-  )
+      name = "CONTACT_CIRCLE_SEQ",
+      sequenceName = "CONTACT_CIRCLE_SEQ",
+      allocationSize = 1)
   private Long id;
 
   @NotNull private String code;

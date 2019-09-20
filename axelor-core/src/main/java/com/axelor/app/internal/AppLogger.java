@@ -33,10 +33,7 @@ public final class AppLogger {
     final AppSettings settings = AppSettings.get();
     final Properties loggingConfig = new Properties();
     final Predicate<String> isLogging = (n) -> n.startsWith("logging.");
-    settings
-        .getProperties()
-        .stringPropertyNames()
-        .stream()
+    settings.getProperties().stringPropertyNames().stream()
         .filter(isLogging)
         .forEach(
             n -> {

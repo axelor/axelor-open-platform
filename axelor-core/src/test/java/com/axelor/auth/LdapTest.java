@@ -44,13 +44,11 @@ import org.junit.runner.RunWith;
 
 @RunWith(FrameworkRunner.class)
 @CreateLdapServer(
-  transports = {@CreateTransport(protocol = "LDAP"), @CreateTransport(protocol = "LDAPS")}
-)
+    transports = {@CreateTransport(protocol = "LDAP"), @CreateTransport(protocol = "LDAPS")})
 @CreateDS(
-  allowAnonAccess = true,
-  name = "axelor",
-  partitions = {@CreatePartition(name = "test", suffix = "dc=test,dc=com")}
-)
+    allowAnonAccess = true,
+    name = "axelor",
+    partitions = {@CreatePartition(name = "test", suffix = "dc=test,dc=com")})
 public class LdapTest extends AbstractLdapTestUnit {
 
   private static LdapServer ldapServer = getLdapServer();

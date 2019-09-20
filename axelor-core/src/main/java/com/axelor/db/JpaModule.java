@@ -126,10 +126,7 @@ public class JpaModule extends AbstractModule {
     properties.put("hibernate.hikari.idleTimeout", "300000");
 
     // update properties with all hibernate.* settings from app configuration
-    settings
-        .getProperties()
-        .stringPropertyNames()
-        .stream()
+    settings.getProperties().stringPropertyNames().stream()
         .filter(n -> n.startsWith("hibernate."))
         .forEach(n -> properties.put(n, settings.get(n)));
 

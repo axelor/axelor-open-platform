@@ -58,8 +58,7 @@ public class AppModule extends AbstractModule {
     install(new EventModule());
 
     final List<Class<? extends AxelorModule>> moduleClasses =
-        ModuleManager.findInstalled()
-            .stream()
+        ModuleManager.findInstalled().stream()
             .flatMap(name -> MetaScanner.findSubTypesOf(name, AxelorModule.class).find().stream())
             .collect(Collectors.toList());
 

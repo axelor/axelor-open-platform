@@ -486,8 +486,7 @@ public final class JPA {
    * @return Set of model classes
    */
   public static Set<Class<?>> models() {
-    return JpaScanner.findModels()
-        .stream()
+    return JpaScanner.findModels().stream()
         .filter(c -> !Modifier.isAbstract(c.getModifiers()))
         .collect(Collectors.toSet());
   }

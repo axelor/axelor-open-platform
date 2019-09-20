@@ -94,8 +94,7 @@ public class QueryTest extends JpaTest {
   @Transactional
   public void testBulkRemove() {
     final List<String> names = Arrays.asList("Bulk Remove 1", "Bulk Remove 2");
-    names
-        .stream()
+    names.stream()
         .forEach(
             name -> {
               Contact c = new Contact();

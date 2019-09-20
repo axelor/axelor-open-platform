@@ -56,9 +56,7 @@ public class EventModule extends AbstractModule {
   }
 
   private static boolean checkDependencies(InjectionPoint injectionPoint) {
-    return injectionPoint
-        .getDependencies()
-        .stream()
+    return injectionPoint.getDependencies().stream()
         .map(Dependency::getKey)
         .map(Key::getTypeLiteral)
         .map(TypeLiteral::getRawType)
@@ -67,8 +65,7 @@ public class EventModule extends AbstractModule {
 
   private static Set<InjectionPoint> findInjectionPoints(TypeLiteral<?> type) {
     Set<InjectionPoint> injectionPoints = new HashSet<>();
-    InjectionPoint.forInstanceMethodsAndFields(type)
-        .stream()
+    InjectionPoint.forInstanceMethodsAndFields(type).stream()
         .filter(ip -> ip.getMember() instanceof Field && checkDependencies(ip))
         .forEach(injectionPoints::add);
 

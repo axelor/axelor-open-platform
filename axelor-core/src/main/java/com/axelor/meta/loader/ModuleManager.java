@@ -118,25 +118,19 @@ public class ModuleManager {
           .run(
               () -> {
                 // install modules
-                resolver
-                    .all()
-                    .stream()
+                resolver.all().stream()
                     .filter(m -> !m.isRemovable() || m.isInstalled())
                     .peek(m -> log.info("Loading package " + m.getName() + "..."))
                     .filter(m -> !m.isRemovable() || m.isPending())
                     .forEach(m -> install(m.getName(), update, withDemo, false));
 
                 // second iteration ensures proper view sequence
-                resolver
-                    .all()
-                    .stream()
+                resolver.all().stream()
                     .filter(Module::isInstalled)
                     .forEach(m -> viewLoader.doLast(m, update));
 
                 // uninstall pending modules
-                resolver
-                    .all()
-                    .stream()
+                resolver.all().stream()
                     .filter(Module::isRemovable)
                     .filter(Module::isPending)
                     .filter(m -> !m.isInstalled())
@@ -164,21 +158,15 @@ public class ModuleManager {
       this.createUsers();
       this.resolve(true);
       if (names.isEmpty()) {
-        resolver
-            .all()
-            .stream()
+        resolver.all().stream()
             .filter(Module::isInstalled)
             .map(Module::getName)
             .forEach(names::add);
       }
-      resolver
-          .all()
-          .stream()
+      resolver.all().stream()
           .filter(m -> names.contains(m.getName()))
           .forEach(m -> install(m, true, withDemo));
-      resolver
-          .all()
-          .stream()
+      resolver.all().stream()
           .filter(m -> names.contains(m.getName()))
           .forEach(m -> viewLoader.doLast(m, true));
     } finally {
@@ -243,9 +231,7 @@ public class ModuleManager {
 
   public void install(String moduleName, boolean update, boolean withDemo) {
     try {
-      resolver
-          .resolve(moduleName)
-          .stream()
+      resolver.resolve(moduleName).stream()
           .map(Module::getName)
           .forEach(name -> install(name, update, withDemo, true));
       resolver.resolve(moduleName).stream().forEach(m -> viewLoader.doLast(m, update));
