@@ -22,7 +22,6 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
-import com.axelor.app.AppSettings;
 import com.axelor.common.reflections.Reflections;
 import com.axelor.inject.Beans;
 import java.io.FileInputStream;
@@ -342,8 +341,19 @@ public final class ViewWatcher {
         });
   }
 
+  private static boolean isEnabled() {
+    return Boolean.parseBoolean(System.getProperty("axelor.view.watch")) || isDebug();
+  }
+
+  private static boolean isDebug() {
+    return java.lang.management.ManagementFactory.getRuntimeMXBean()
+        .getInputArguments()
+        .toString()
+        .contains("-agentlib:jdwp");
+  }
+
   public void start() {
-    if (running || AppSettings.get().isProduction()) {
+    if (running || !isEnabled()) {
       return;
     }
     try {

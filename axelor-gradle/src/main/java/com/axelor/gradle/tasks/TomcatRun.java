@@ -78,6 +78,7 @@ public class TomcatRun extends JavaExec {
       } else {
         project.getLogger().info("Cannot enable hot-swaping as DCEVM is not installed.");
       }
+      jvmArgs.add("-Daxelor.view.watch=true");
     }
     return jvmArgs;
   }
