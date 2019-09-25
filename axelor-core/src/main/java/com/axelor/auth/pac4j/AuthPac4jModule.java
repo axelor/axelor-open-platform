@@ -360,11 +360,14 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   }
 
   private static class AxelorCallbackFilter extends CallbackFilter {
+    private final CsrfTokenGeneratorAuthorizer csrfTokenGeneratorAuthorizer;
 
     @Inject
     public AxelorCallbackFilter(ConfigSupplier configSupplier) {
       final Config config = configSupplier.get();
       setConfig(config);
+      csrfTokenGeneratorAuthorizer =
+          (CsrfTokenGeneratorAuthorizer) config.getAuthorizers().get(CSRF_TOKEN_AUTHORIZER_NAME);
 
       final AppSettings settings = AppSettings.get();
       final String defaultUrl = settings.getBaseURL();
@@ -381,6 +384,12 @@ public abstract class AuthPac4jModule extends AuthWebModule {
             @Override
             protected HttpAction redirectToOriginallyRequestedUrl(
                 J2EContext context, String defaultUrl) {
+
+              // Add CSRF token cookie
+              if (csrfTokenGeneratorAuthorizer != null) {
+                csrfTokenGeneratorAuthorizer.isAuthorized(context, null);
+              }
+
               return isXHR(context)
                   ? HttpAction.status(HttpConstants.OK, context)
                   : redirectToBaseUrl(context, defaultUrl);
@@ -430,20 +439,22 @@ public abstract class AuthPac4jModule extends AuthWebModule {
             private Map<String, String> parseQuery(String url) {
               final Map<String, String> queryPairs = new LinkedHashMap<>();
 
-              try {
-                final String query = new URL(url).getQuery();
-                if (query != null) {
-                  final String[] pairs = query.split("&");
+              if (StringUtils.notBlank(url)) {
+                try {
+                  final String query = new URL(url).getQuery();
+                  if (query != null) {
+                    final String[] pairs = query.split("&");
 
-                  for (final String pair : pairs) {
-                    final int idx = pair.indexOf('=');
-                    queryPairs.put(
-                        URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
-                        URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+                    for (final String pair : pairs) {
+                      final int idx = pair.indexOf('=');
+                      queryPairs.put(
+                          URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
+                          URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
+                    }
                   }
+                } catch (UnsupportedEncodingException | MalformedURLException e) {
+                  logger.error(e.getMessage(), e);
                 }
-              } catch (UnsupportedEncodingException | MalformedURLException e) {
-                logger.error(e.getMessage(), e);
               }
 
               return queryPairs;
