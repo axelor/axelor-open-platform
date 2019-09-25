@@ -256,6 +256,8 @@
     provider.interceptors.push('httpIndicator');
     provider.defaults.transformRequest.unshift(transformRequest);
     provider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
+    provider.defaults.xsrfCookieName = 'pac4jCsrfToken';
+    provider.defaults.xsrfHeaderName = 'pac4jCsrfToken';
     provider.useApplyAsync(true);
   }]);
 

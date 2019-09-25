@@ -22,7 +22,6 @@ import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthWebModule;
 import com.axelor.common.StringUtils;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -43,6 +42,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -68,9 +68,14 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
+import org.pac4j.core.authorization.authorizer.csrf.CsrfAuthorizer;
+import org.pac4j.core.authorization.authorizer.csrf.CsrfTokenGeneratorAuthorizer;
+import org.pac4j.core.authorization.authorizer.csrf.DefaultCsrfTokenGenerator;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
+import org.pac4j.core.client.DirectClient;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.context.ContextHelper;
 import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.Pac4jConstants;
@@ -88,15 +93,17 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   protected static final String ROLE_HAS_USER = "_ROLE_HAS_USER";
 
   @SuppressWarnings("rawtypes")
-  private List<Client> clientList = new ArrayList<>();
-
-  private static final Set<String> centralClientNames = new LinkedHashSet<>();
+  private static final List<Client> clientList = new ArrayList<>();
 
   private static final Map<String, Map<String, String>> clientInfo = new HashMap<>();
+  private static final Set<String> centralClientNames = new LinkedHashSet<>();
+  private static final Set<String> directClientNames = new LinkedHashSet<>();
 
   private static String callbackUrl;
-
   private static String logoutUrl;
+
+  private static final String CSRF_TOKEN_AUTHORIZER_NAME = "axelorCsrfToken";
+  private static final String CSRF_AUTHORIZER_NAME = "axelorCsrf";
 
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -135,14 +142,21 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   protected void addLocalClient(Client<?, ?> client) {
     Preconditions.checkState(
         centralClientNames.isEmpty(), "Local clients must be added before central clients.");
-    clientList.add(client);
+    addClient(client);
     logger.info("Added local client: {}", client.getName());
   }
 
   protected void addCentralClient(Client<?, ?> client) {
-    clientList.add(client);
+    addClient(client);
     centralClientNames.add(client.getName());
     logger.info("Added central client: {}", client.getName());
+  }
+
+  private void addClient(Client<?, ?> client) {
+    clientList.add(client);
+    if (client instanceof DirectClient) {
+      directClientNames.add(client.getName());
+    }
   }
 
   public static Set<String> getCentralClients() {
@@ -245,14 +259,52 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       }
 
       final Clients clients = new Clients(getCallbackUrl(), clientList);
-      final Authorizer<CommonProfile> authorizer = new RequireAnyRoleAuthorizer<>(ROLE_HAS_USER);
 
-      config = new Config(clients, ImmutableMap.of("auth", authorizer));
+      @SuppressWarnings("rawtypes")
+      final Map<String, Authorizer> authorizers = new LinkedHashMap<>();
+      authorizers.put("auth", new RequireAnyRoleAuthorizer<>(ROLE_HAS_USER));
+      authorizers.put(
+          CSRF_TOKEN_AUTHORIZER_NAME,
+          new CsrfTokenGeneratorAuthorizer(new DefaultCsrfTokenGenerator()));
+      authorizers.put(CSRF_AUTHORIZER_NAME, new AxelorCsrfAuthorizer());
+
+      setConfig(new Config(clients, Collections.unmodifiableMap(authorizers)));
+    }
+
+    private static void setConfig(Config config) {
+      ConfigSupplier.config = config;
     }
 
     @Override
     public Config get() {
       return config;
+    }
+  }
+
+  private static class AxelorCsrfAuthorizer extends CsrfAuthorizer {
+
+    @Override
+    public boolean isAuthorized(WebContext context, List<CommonProfile> profiles) {
+      // No CSRF check if authenticated by direct client.
+      if (profiles.stream()
+          .anyMatch(profile -> directClientNames.contains(profile.getClientName()))) {
+        return true;
+      }
+
+      final boolean checkRequest = !isOnlyCheckPostRequest() || ContextHelper.isPost(context);
+      if (checkRequest) {
+        final String parameterToken = context.getRequestParameter(getParameterName());
+        final String headerToken = context.getRequestHeader(getHeaderName());
+        @SuppressWarnings("unchecked")
+        SessionStore<WebContext> sessionStore =
+            (SessionStore<WebContext>) context.getSessionStore();
+
+        final String sessionToken = (String) sessionStore.get(context, Pac4jConstants.CSRF_TOKEN);
+        return sessionToken != null
+            && (sessionToken.equals(parameterToken) || sessionToken.equals(headerToken));
+      } else {
+        return true;
+      }
     }
   }
 
@@ -406,7 +458,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     public AxelorSecurityFilter(ConfigSupplier configSupplier) {
       final Config config = configSupplier.get();
       setConfig(config);
-      setAuthorizers("auth");
+      setAuthorizers(config.getAuthorizers().keySet().stream().collect(Collectors.joining(",")));
 
       final String clientNames =
           config.getClients().getClients().stream()
