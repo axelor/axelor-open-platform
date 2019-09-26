@@ -89,9 +89,9 @@ public class TomcatSupport extends AbstractSupport {
             Jar.class,
             task -> {
               task.dependsOn(TOMCAT_RUNNER_CONFIG_TASK);
-              task.setArchiveName(TOMCAT_RUNNER_JAR);
-              task.setDestinationDir(baseDir);
-              task.onlyIf(t -> !task.getArchivePath().exists());
+              task.getArchiveFileName().set(TOMCAT_RUNNER_JAR);
+              task.getDestinationDirectory().set(baseDir);
+              task.onlyIf(t -> !task.getArchiveFile().get().getAsFile().exists());
 
               final Map<String, String> manifest = new HashMap<>();
 
@@ -191,7 +191,8 @@ public class TomcatSupport extends AbstractSupport {
         "baseDir", FileUtils.getFile(project.getBuildDir(), "tomcat").getAbsolutePath());
     props.setProperty("port", "8080");
     props.setProperty(
-        "contextPath", "/" + ((War) project.getTasks().getByName("war")).getBaseName());
+        "contextPath",
+        "/" + ((War) project.getTasks().getByName("war")).getArchiveBaseName().get());
 
     final File target = FileUtils.getFile(project.getBuildDir(), "tomcat", TOMCAT_RUNNER_CONFIG);
 

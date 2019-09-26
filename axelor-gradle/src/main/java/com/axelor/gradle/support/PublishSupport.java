@@ -51,7 +51,7 @@ public class PublishSupport extends AbstractSupport {
                   task.dependsOn(JavaPlugin.COMPILE_JAVA_TASK_NAME);
                   task.from(main.getAllSource());
                   task.setManifest(jar.getManifest());
-                  task.setClassifier("sources");
+                  task.getArchiveClassifier().set("sources");
                 });
 
     final PublishingExtension publishing =
