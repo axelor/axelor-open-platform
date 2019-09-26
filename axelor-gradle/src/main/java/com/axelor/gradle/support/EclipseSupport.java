@@ -50,6 +50,9 @@ public class EclipseSupport extends AbstractSupport {
 
   @Override
   public void apply(Project project) {
+    final EclipseModel eclipse = project.getExtensions().getByType(EclipseModel.class);
+    final EclipseClasspath ecp = eclipse.getClasspath();
+
     project.getPlugins().apply(EclipsePlugin.class);
     project.getPlugins().apply(EclipseWtpPlugin.class);
 
@@ -60,6 +63,7 @@ public class EclipseSupport extends AbstractSupport {
                 .getTasks()
                 .getByName(EclipsePlugin.ECLIPSE_CP_TASK_NAME)
                 .dependsOn(GenerateCode.TASK_NAME);
+            eclipse.synchronizationTasks(GenerateCode.TASK_NAME);
           }
           if (project.getPlugins().hasPlugin(AppPlugin.class)) {
             project
@@ -88,11 +92,11 @@ public class EclipseSupport extends AbstractSupport {
                 .filter(ip -> ip.getPlugins().hasPlugin(EclipseWtpPlugin.class))
                 .map(ip -> ip.getTasks().getByName("eclipseWtp"))
                 .forEach(it -> project.getTasks().getByName("eclipseWtp").dependsOn(it));
+
+            // generate run launcher
+            eclipse.synchronizationTasks("generateLauncher");
           }
         });
-
-    final EclipseModel eclipse = project.getExtensions().getByType(EclipseModel.class);
-    final EclipseClasspath ecp = eclipse.getClasspath();
 
     ecp.setDefaultOutputDir(project.file("bin/main"));
     ecp.getFile()
