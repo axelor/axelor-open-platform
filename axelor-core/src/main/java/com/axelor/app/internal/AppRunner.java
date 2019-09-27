@@ -17,7 +17,11 @@
  */
 package com.axelor.app.internal;
 
+import com.axelor.common.FileUtils;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -145,6 +149,29 @@ public final class AppRunner {
     return false;
   }
 
+  private static Properties appConfig(ClassLoader loader) {
+    Properties props = new Properties();
+
+    try (InputStream is = loader.getResourceAsStream("application.properties")) {
+      props.load(is);
+      return props;
+    } catch (NullPointerException | IOException e) {
+      // ignore
+    }
+
+    // else try from source
+    File config = FileUtils.getFile("src", "main", "resources", "application.properties");
+    if (config.exists()) {
+      try (InputStream is = new FileInputStream(config)) {
+        props.load(is);
+      } catch (IOException e) {
+        // ignore
+      }
+    }
+
+    return props;
+  }
+
   public static void main(String[] args) {
 
     final URLClassLoader systemLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
@@ -155,9 +182,7 @@ public final class AppRunner {
 
     try (URLClassLoader loader = new URLClassLoader(urls.toArray(new URL[] {}), null)) {
       Thread.currentThread().setContextClassLoader(loader);
-      Properties props = new Properties();
-
-      props.load(loader.getResourceAsStream("application.properties"));
+      Properties props = appConfig(loader);
       Class<?> loggerClass = loader.loadClass("com.axelor.common.logging.LoggerConfiguration");
       Object logger = loggerClass.getConstructor(Properties.class).newInstance(props);
       Method install = loggerClass.getDeclaredMethod("install");
