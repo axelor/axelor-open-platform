@@ -1,10 +1,10 @@
-apply plugin: "java"
+apply plugin: "java-library"
 
 dependencies {
 
-  implementation libs.junit
+  api libs.junit
 
-  implementation	libs.guice
+  implementation libs.guice
   implementation libs.guice_servlet
   implementation libs.guice_persist
 
