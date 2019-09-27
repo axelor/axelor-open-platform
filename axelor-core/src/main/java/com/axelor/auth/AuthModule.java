@@ -54,14 +54,14 @@ public class AuthModule extends AbstractModule {
     // bind security service
     bind(JpaSecurity.class).toProvider(AuthSecurity.class);
 
-    // observe authentication-related events
-    bind(AuthObserver.class);
-
     // non-web environment (cli or unit tests)
     if (context == null) {
       install(new MyShiroModule());
       return;
     }
+
+    // observe authentication-related events
+    bind(AuthObserver.class);
 
     // LDAP
     if (AuthLdapModule.isEnabled()) {
