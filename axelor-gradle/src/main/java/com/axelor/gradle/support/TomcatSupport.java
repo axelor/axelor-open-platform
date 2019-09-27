@@ -29,11 +29,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.plugins.WarPlugin;
+import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.bundling.War;
 
@@ -75,7 +77,18 @@ public class TomcatSupport extends AbstractSupport {
         .create(
             TOMCAT_RUNNER_CONFIG_TASK,
             task -> {
-              task.dependsOn(JavaPlugin.CLASSES_TASK_NAME);
+              task.dependsOn(
+                  new Callable<Object>() {
+                    @Override
+                    public Object call() throws Exception {
+                      return project
+                          .getConvention()
+                          .getPlugin(JavaPluginConvention.class)
+                          .getSourceSets()
+                          .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
+                          .getRuntimeClasspath();
+                    }
+                  });
               task.dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
               task.dependsOn(HotswapSupport.GENERATE_HOTSWAP_CONFIG_TASK);
               task.setDescription("Generate axelor-tomcat.properties.");
