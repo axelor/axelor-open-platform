@@ -132,8 +132,8 @@ public class HotswapSupport extends AbstractSupport {
       findClasses =
           p ->
               Stream.of(
-                  FileUtils.getFile(p.getProjectDir(), "build", "main", "classes"),
-                  FileUtils.getFile(p.getProjectDir(), "build", "main", "resources"));
+                  FileUtils.getFile(p.getProjectDir(), "build", "classes", "java", "main"),
+                  FileUtils.getFile(p.getProjectDir(), "build", "resources", "main"));
     }
 
     final List<File> extraClasses = new ArrayList<>();
