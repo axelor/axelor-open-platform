@@ -348,7 +348,9 @@
 
     return {
       response: function(response) {
-        onHttpStop();
+        if (!response.config || !response.config.silent) {
+          onHttpStop();
+        }
         if (response.data && response.data.status === -1) {
           if (!response.config.silent) $rootScope.$broadcast('event:http-error', response.data);
           return $q.reject(response);
