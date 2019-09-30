@@ -71,9 +71,7 @@ public class HotswapSupport extends AbstractSupport {
     final Configuration tomcat =
         project.getConfigurations().getByName(TomcatSupport.TOMCAT_CONFIGURATION);
     final List<String> args = new ArrayList<>();
-    tomcat
-        .getFiles()
-        .stream()
+    tomcat.getFiles().stream()
         .filter(f -> f.getName().endsWith(".jar"))
         .filter(f -> f.getName().startsWith("hotswap-agent"))
         .findFirst()
@@ -138,9 +136,7 @@ public class HotswapSupport extends AbstractSupport {
 
     final List<File> extraClasses = new ArrayList<>();
 
-    project
-        .getAllprojects()
-        .stream()
+    project.getAllprojects().stream()
         .filter(p -> FileUtils.getFile(p.getProjectDir(), "build.gradle").exists())
         .flatMap(findClasses::apply)
         .filter(File::exists)
@@ -152,10 +148,7 @@ public class HotswapSupport extends AbstractSupport {
         .forEach(
             b -> {
               Gradle included = ((DefaultIncludedBuild) b).getConfiguredBuild();
-              included
-                  .getRootProject()
-                  .getAllprojects()
-                  .stream()
+              included.getRootProject().getAllprojects().stream()
                   .filter(p -> !p.getName().equals("axelor-gradle"))
                   .filter(p -> !p.getName().equals("axelor-tomcat"))
                   .filter(p -> !p.getName().equals("axelor-test"))
@@ -174,9 +167,7 @@ public class HotswapSupport extends AbstractSupport {
     final Function<Project, File> findResourcesDir =
         p -> FileUtils.getFile(p.getProjectDir(), "src", "main", "resources");
 
-    project
-        .getAllprojects()
-        .stream()
+    project.getAllprojects().stream()
         .filter(p -> FileUtils.getFile(p.getProjectDir(), "build.gradle").exists())
         .map(findResourcesDir::apply)
         .filter(File::exists)
@@ -188,10 +179,7 @@ public class HotswapSupport extends AbstractSupport {
         .forEach(
             b -> {
               Gradle included = ((DefaultIncludedBuild) b).getConfiguredBuild();
-              included
-                  .getRootProject()
-                  .getAllprojects()
-                  .stream()
+              included.getRootProject().getAllprojects().stream()
                   .filter(p -> !p.getName().equals("axelor-gradle"))
                   .filter(p -> !p.getName().equals("axelor-tomcat"))
                   .filter(p -> !p.getName().equals("axelor-test"))
@@ -240,16 +228,13 @@ public class HotswapSupport extends AbstractSupport {
 
     hotswapProps.setProperty(
         "extraClasspath",
-        extraClasspath
-            .stream()
+        extraClasspath.stream()
             .filter(File::exists)
             .map(File::getPath)
             .collect(Collectors.joining(",")));
 
     if (extension.getWatchResources() != null) {
-      extension
-          .getWatchResources()
-          .stream()
+      extension.getWatchResources().stream()
           .filter(File::exists)
           .filter(f -> !watchResources.contains(f))
           .forEach(watchResources::add);

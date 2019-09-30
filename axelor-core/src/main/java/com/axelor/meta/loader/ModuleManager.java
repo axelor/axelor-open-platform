@@ -176,9 +176,7 @@ public class ModuleManager {
 
   public void update(Set<String> moduleNames, Set<Path> paths) {
     final List<Module> moduleList =
-        resolver
-            .all()
-            .stream()
+        resolver.all().stream()
             .filter(m -> moduleNames.contains(m.getName()))
             .collect(Collectors.toList());
 

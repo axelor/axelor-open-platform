@@ -82,10 +82,7 @@ public class EclipseSupport extends AbstractSupport {
                     });
             // Fix wtp issue in included builds (with buildship)
             // see: https://discuss.gradle.org/t/gradle-composite-builds-and-eclipse-wtp/23503
-            project
-                .getGradle()
-                .getIncludedBuilds()
-                .stream()
+            project.getGradle().getIncludedBuilds().stream()
                 .map(ib -> ((DefaultIncludedBuild) ib).getConfiguredBuild().getRootProject())
                 .flatMap(
                     ib -> Stream.concat(Arrays.asList(ib).stream(), ib.getSubprojects().stream()))
@@ -103,8 +100,7 @@ public class EclipseSupport extends AbstractSupport {
         .whenMerged(
             (Classpath cp) -> {
               // separate output for main & test sources
-              cp.getEntries()
-                  .stream()
+              cp.getEntries().stream()
                   .filter(it -> it instanceof SourceFolder)
                   .map(it -> (SourceFolder) it)
                   .filter(
@@ -112,8 +108,7 @@ public class EclipseSupport extends AbstractSupport {
                           it.getPath().startsWith("src/main/") || it.getPath().contains("src-gen/"))
                   .forEach(it -> it.setOutput("bin/main"));
 
-              cp.getEntries()
-                  .stream()
+              cp.getEntries().stream()
                   .filter(it -> it instanceof SourceFolder)
                   .map(it -> (SourceFolder) it)
                   .filter(it -> it.getPath().startsWith("src/test/"))
@@ -132,8 +127,7 @@ public class EclipseSupport extends AbstractSupport {
                               && ((Library) it).getPath().contains(project.getName() + "/build"));
 
               // add access rule for nashorn api
-              cp.getEntries()
-                  .stream()
+              cp.getEntries().stream()
                   .filter(it -> it instanceof Container)
                   .map(it -> (Container) it)
                   .filter(it -> it.getPath().contains("org.eclipse.jdt.launching.JRE_CONTAINER"))
@@ -170,10 +164,7 @@ public class EclipseSupport extends AbstractSupport {
   private void configureWtp(Project project, EclipseModel eclipse) {
     // try to link axelor-web's webapp dir
     final File dir =
-        project
-            .getGradle()
-            .getIncludedBuilds()
-            .stream()
+        project.getGradle().getIncludedBuilds().stream()
             .map(it -> new File(it.getProjectDir(), "axelor-web/src/main/webapp"))
             .filter(it -> it.exists())
             .findFirst()
