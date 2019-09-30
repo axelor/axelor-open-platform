@@ -28,8 +28,10 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
@@ -66,9 +68,9 @@ public class QueryTest extends JpaTest {
     String filter =
         "(self.addresses[].country.code = ?1 AND self.title.code = ?2) OR self.firstName = ?3";
     String expected =
-        "SELECT self FROM Contact self "
-            + "LEFT JOIN self.addresses _addresses "
-            + "LEFT JOIN _addresses.country _addresses_country "
+        "SELECT DISTINCT self FROM Contact self "
+            + "LEFT JOIN FETCH self.addresses _addresses "
+            + "LEFT JOIN FETCH _addresses.country _addresses_country "
             + "LEFT JOIN self.title _title "
             + "WHERE (_addresses_country.code = ?1 AND _title.code = ?2) OR self.firstName = ?3 "
             + "ORDER BY _addresses_country.name DESC";
@@ -80,6 +82,45 @@ public class QueryTest extends JpaTest {
     List<?> result = q.fetch();
     Assert.assertNotNull(result);
     Assert.assertTrue(result.size() > 0);
+  }
+
+  @Test
+  public void testDistinct() {
+    final String filter =
+        "self.addresses.country.code IS NOT NULL "
+            + "AND self.title.code IS NOT NULL "
+            + "OR self.firstName IS NOT NULL";
+    final List<Contact> resultList = all(Contact.class).filter(filter).fetch();
+    final Set<Contact> resultSet = new HashSet<>(resultList);
+    Assert.assertEquals("Results should be unique.", resultSet.size(), resultList.size());
+
+    final List<Contact> orderedResultList =
+        all(Contact.class).filter(filter).order("-addresses.country.name").fetch();
+    final Set<Contact> orderedResultSet = new HashSet<>(orderedResultList);
+    Assert.assertEquals(
+        "Ordered results should be unique.", orderedResultSet.size(), orderedResultList.size());
+
+    Assert.assertEquals(
+        "Ordering should not change number of results.",
+        resultList.size(),
+        orderedResultList.size());
+
+    final long count = all(Contact.class).filter(filter).count();
+    Assert.assertEquals(
+        "Counting should be consistent with number of results.", resultList.size(), count);
+
+    @SuppressWarnings("rawtypes")
+    final List<Map> selectResults =
+        all(Contact.class)
+            .filter(filter)
+            .order("-addresses.country.name")
+            .select("fullName", "email")
+            .fetch(0, 0);
+
+    Assert.assertEquals(
+        "Selecting fields should be consistent with number of results.",
+        resultList.size(),
+        selectResults.size());
   }
 
   @Test
