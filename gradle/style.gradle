@@ -1,7 +1,7 @@
 buildscript {
   repositories repos
   dependencies {
-    classpath "com.diffplug.spotless:spotless-plugin-gradle:3.24.2"
+    classpath "com.diffplug.spotless:spotless-plugin-gradle:3.24.3"
   }
 }
 
