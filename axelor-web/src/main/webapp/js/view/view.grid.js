@@ -458,8 +458,8 @@ function GridViewCtrl($scope, $element) {
         criteria.operator = "and";
       }
     }
-    if (advance && criteria.archived === undefined) {
-      criteria.archived = advance.archived;
+    if (advance && advance.archived !== undefined) {
+      options.archived = advance.archived;
     }
     return ds.search(options).then(fixPage);
   };
