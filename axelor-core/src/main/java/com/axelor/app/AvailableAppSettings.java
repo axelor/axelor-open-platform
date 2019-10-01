@@ -146,6 +146,8 @@ public interface AvailableAppSettings {
   String LDAP_USER_BASE = "ldap.user.base";
   String LDAP_USER_FILTER = "ldap.user.filter";
 
+  String AUTH_LOCAL_BASIC_AUTH_ENABLED = "auth.local.basic.auth.enabled";
+
   String AUTH_CAS_LOGIN_URL = "auth.cas.login.url";
   String AUTH_CAS_PREFIX_URL = "auth.cas.prefix.url";
   String AUTH_CAS_PROTOCOL = "auth.cas.protocol";

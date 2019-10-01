@@ -18,6 +18,7 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
@@ -44,8 +45,6 @@ import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.indirect.FormClient;
 
 public class AuthPac4jModuleLocal extends AuthPac4jModule {
-
-  public static final String CONFIG_BASIC_AUTH_ENABLED = "auth.local.basic.auth.enabled";
 
   private static final String INCORRECT_CREDENTIALS = /*$$(*/ "Wrong username or password" /*)*/;
   private static final String WRONG_CURRENT_PASSWORD = /*$$(*/ "Wrong current password" /*)*/;
@@ -80,7 +79,7 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
 
   public static boolean isBasicAuthEnabled() {
     final AppSettings settings = AppSettings.get();
-    return settings.getBoolean(CONFIG_BASIC_AUTH_ENABLED, false);
+    return settings.getBoolean(AvailableAppSettings.AUTH_LOCAL_BASIC_AUTH_ENABLED, false);
   }
 
   private static class AxelorFormClient extends FormClient {
