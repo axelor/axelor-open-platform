@@ -71,7 +71,7 @@ public class GenerateCode extends DefaultTask {
 
   private List<ResolvedArtifact> artifacts() {
     if (artifacts == null) {
-      artifacts = findArtifacts(getProject().getConfigurations().getByName("compile"));
+      artifacts = findArtifacts(getProject().getConfigurations().getByName("runtimeClasspath"));
     }
     return artifacts;
   }
