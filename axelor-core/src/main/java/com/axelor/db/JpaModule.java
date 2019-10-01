@@ -116,14 +116,16 @@ public class JpaModule extends AbstractModule {
     properties.put(Environment.DIALECT_RESOLVERS, CustomDialectResolver.class.getName());
 
     properties.put(Environment.AUTOCOMMIT, "false");
-    properties.put(Environment.CONNECTION_PROVIDER_DISABLES_AUTOCOMMIT, "true");
     properties.put(Environment.MAX_FETCH_DEPTH, "3");
 
-    // Use HikariCP as default pool provider
-    properties.put(Environment.CONNECTION_PROVIDER, HikariCPConnectionProvider.class.getName());
-    properties.put("hibernate.hikari.minimumIdle", "5");
-    properties.put("hibernate.hikari.maximumPoolSize", "20");
-    properties.put("hibernate.hikari.idleTimeout", "300000");
+    if (!DBHelper.isDataSourceUsed()) {
+      // Use HikariCP as default pool provider
+      properties.put(Environment.CONNECTION_PROVIDER, HikariCPConnectionProvider.class.getName());
+      properties.put(Environment.CONNECTION_PROVIDER_DISABLES_AUTOCOMMIT, "true");
+      properties.put("hibernate.hikari.minimumIdle", "5");
+      properties.put("hibernate.hikari.maximumPoolSize", "20");
+      properties.put("hibernate.hikari.idleTimeout", "300000");
+    }
 
     // update properties with all hibernate.* settings from app configuration
     settings
