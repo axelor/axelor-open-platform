@@ -126,6 +126,10 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   protected void configureAuth() {
     configureClients();
 
+    if (isCsrfAuthorizerEnabled()) {
+      logger.info("CSRF authorizer enabled");
+    }
+
     final Multibinder<AuthenticationListener> listenerMultibinder =
         Multibinder.newSetBinder(binder(), AuthenticationListener.class);
     listenerMultibinder.addBinding().to(AuthPac4jListener.class);
@@ -215,11 +219,17 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   }
 
   public static boolean isEnabled() {
-    return AuthPac4jModuleLocal.isBasicAuthEnabled()
+    return isCsrfAuthorizerEnabled()
+        || AuthPac4jModuleLocal.isBasicAuthEnabled()
         || AuthPac4jModuleOidc.isEnabled()
         || AuthPac4jModuleOAuth.isEnabled()
         || AuthPac4jModuleSaml.isEnabled()
         || AuthPac4jModuleCas.isEnabled();
+  }
+
+  public static boolean isCsrfAuthorizerEnabled() {
+    final AppSettings settings = AppSettings.get();
+    return settings.getBoolean(AvailableAppSettings.AUTH_CSRF_AUTHORIZER_ENABLED, false);
   }
 
   @Override
@@ -262,11 +272,15 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
       @SuppressWarnings("rawtypes")
       final Map<String, Authorizer> authorizers = new LinkedHashMap<>();
+
       authorizers.put("auth", new RequireAnyRoleAuthorizer<>(ROLE_HAS_USER));
-      authorizers.put(
-          CSRF_TOKEN_AUTHORIZER_NAME,
-          new CsrfTokenGeneratorAuthorizer(new DefaultCsrfTokenGenerator()));
-      authorizers.put(CSRF_AUTHORIZER_NAME, new AxelorCsrfAuthorizer());
+
+      if (isCsrfAuthorizerEnabled()) {
+        authorizers.put(
+            CSRF_TOKEN_AUTHORIZER_NAME,
+            new CsrfTokenGeneratorAuthorizer(new DefaultCsrfTokenGenerator()));
+        authorizers.put(CSRF_AUTHORIZER_NAME, new AxelorCsrfAuthorizer());
+      }
 
       setConfig(new Config(clients, Collections.unmodifiableMap(authorizers)));
     }
