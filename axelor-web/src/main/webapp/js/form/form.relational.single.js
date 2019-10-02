@@ -962,6 +962,7 @@ ui.formInput('RefItem', 'ManyToOne', {
       scope.$timeout(function() {
         var ds = scope._dataSource;
         var value = (scope.record || {})[ref];
+        if (!value) return;
         var v = scope.getValue();
         if (v && v.id === value) return;
         var nameField = scope.field.targetName;

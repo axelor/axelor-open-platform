@@ -49,7 +49,7 @@
     }, 500);
   }
 
-  function onHttpStart(data, headersGetter) {
+  function onHttpStart() {
 
     updateLoadingCounter(1);
 
@@ -69,7 +69,6 @@
         }).appendTo('body');
     }
     loadingElem.show();
-    return data;
   }
 
   function onHttpStop() {
@@ -255,7 +254,6 @@
       }
 
     provider.interceptors.push('httpIndicator');
-    provider.defaults.transformRequest.push(onHttpStart);
     provider.defaults.transformRequest.unshift(transformRequest);
     provider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
     provider.useApplyAsync(true);
@@ -345,21 +343,33 @@
     axelor.unblockUI = function() {
       return unblock();
     };
+    
+    function notSilent(config) {
+      return config && !config.silent;
+    }
 
     return {
+      request: function(config) {
+        if (notSilent(config)) {
+          onHttpStart();
+        }
+        return config;
+      },
       response: function(response) {
-        if (!response.config || !response.config.silent) {
+        if (notSilent(response.config)) {
           onHttpStop();
         }
         if (response.data && response.data.status === -1) {
-          if (!response.config.silent) $rootScope.$broadcast('event:http-error', response.data);
+          if (notSilent(response.config)) $rootScope.$broadcast('event:http-error', response.data);
           return $q.reject(response);
         }
         return response;
       },
       responseError: function(error) {
-        onHttpStop();
-        $rootScope.$broadcast('event:http-error', error);
+        if (notSilent(error.config)) {
+          onHttpStop();
+          $rootScope.$broadcast('event:http-error', error);          
+        }
         return $q.reject(error);
       }
     };
