@@ -49,7 +49,7 @@
     }, 500);
   }
 
-  function onHttpStart(data, headersGetter) {
+  function onHttpStart() {
 
     updateLoadingCounter(1);
 
@@ -69,7 +69,6 @@
         }).appendTo('body');
     }
     loadingElem.show();
-    return data;
   }
 
   function onHttpStop() {
@@ -255,7 +254,6 @@
       }
 
     provider.interceptors.push('httpIndicator');
-    provider.defaults.transformRequest.push(onHttpStart);
     provider.defaults.transformRequest.unshift(transformRequest);
     provider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
     provider.useApplyAsync(true);
@@ -346,12 +344,24 @@
       return unblock();
     };
 
+    function notSilent(config) {
+      return config && !config.silent;
+    }
+
     return {
+      request: function(config) {
+        if (notSilent(config)) {
+          onHttpStart();
+        }
+        return config;
+      },
       response: function(response) {
-        onHttpStop();
+        if (notSilent(response.config)) {
+          onHttpStop();
+        }
         if (response.data) {
           if (response.data.status === -1) { // STATUS_FAILURE
-            if (!response.config.silent) $rootScope.$broadcast('event:http-error', response.data);
+            if (notSilent(response.config)) $rootScope.$broadcast('event:http-error', response.data);
             return $q.reject(response);
           }
           if (response.data.status === -7) { // STATUS_LOGIN_REQUIRED
@@ -359,7 +369,7 @@
               // redirect to central login page
               window.location.href = './?client_name=' + axelor.config['auth.central.client']
                 + "&hash_location=" + encodeURIComponent(window.location.hash);
-            } else if (!response.config || !response.config.silent) {
+            } else if (notSilent(response.config)) {
               // ajax login
               $rootScope.$broadcast('event:auth-loginRequired', response.data);
             }
@@ -369,8 +379,10 @@
         return response;
       },
       responseError: function(error) {
-        onHttpStop();
-        $rootScope.$broadcast('event:http-error', error);
+        if (notSilent(error.config)) {
+          onHttpStart();
+          $rootScope.$broadcast('event:http-error', error);
+        }
         return $q.reject(error);
       }
     };
