@@ -67,7 +67,6 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.pac4j.core.authorization.authorizer.Authorizer;
-import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.authorization.authorizer.csrf.CsrfAuthorizer;
 import org.pac4j.core.authorization.authorizer.csrf.CsrfTokenGeneratorAuthorizer;
 import org.pac4j.core.authorization.authorizer.csrf.DefaultCsrfTokenGenerator;
@@ -89,8 +88,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AuthPac4jModule extends AuthWebModule {
-
-  protected static final String ROLE_HAS_USER = "_ROLE_HAS_USER";
 
   @SuppressWarnings("rawtypes")
   private static final List<Client> clientList = new ArrayList<>();
@@ -272,8 +269,6 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
       @SuppressWarnings("rawtypes")
       final Map<String, Authorizer> authorizers = new LinkedHashMap<>();
-
-      authorizers.put("auth", new RequireAnyRoleAuthorizer<>(ROLE_HAS_USER));
 
       if (isCsrfAuthorizerEnabled()) {
         authorizers.put(

@@ -24,6 +24,7 @@ import com.axelor.event.NamedLiteral;
 import com.axelor.events.PostLogin;
 import java.lang.invoke.MethodHandles;
 import javax.inject.Inject;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationListener;
@@ -53,6 +54,7 @@ public class AuthPac4jListener implements AuthenticationListener {
 
     logger.error("No user found for principal: {}", token.getPrincipal());
     firePostLoginFailure(token, new UnknownAccountException(info.toString()));
+    SecurityUtils.getSubject().logout();
   }
 
   @Override

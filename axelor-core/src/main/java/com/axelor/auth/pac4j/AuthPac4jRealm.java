@@ -59,7 +59,6 @@ public class AuthPac4jRealm extends Pac4jRealm {
       final User user = userService.getUser(profile);
 
       if (user != null && AuthUtils.isActive(user)) {
-        profile.addRole(AuthPac4jModule.ROLE_HAS_USER);
         profile.clearSensitiveData();
         profile.setRemembered(true);
         return new UserAuthenticationInfo(user.getCode(), profiles.hashCode(), getName(), user);
