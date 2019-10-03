@@ -24,11 +24,11 @@ import com.axelor.db.mapper.Adapter;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonRecord;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -61,7 +61,11 @@ public class JsonContext extends SimpleBindings {
       ObjectMapperProvider.createObjectMapper(new ModelSerializer());
 
   static {
-    jsonMapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
+    jsonMapper
+        .configOverride(Map.class)
+        .setInclude(
+            JsonInclude.Value.construct(
+                JsonInclude.Include.NON_EMPTY, JsonInclude.Include.NON_NULL));
   }
 
   private final String jsonField;
