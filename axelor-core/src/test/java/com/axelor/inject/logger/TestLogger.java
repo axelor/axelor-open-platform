@@ -35,11 +35,18 @@ public class TestLogger {
 
   @Inject private Logger log2;
 
+  private Logger log3;
+
   @Inject private TestLoggerService service;
 
   @Inject
   public TestLogger(Logger log1) {
     this.log1 = log1;
+  }
+
+  @Inject
+  public void setLog3(Logger log3) {
+    this.log3 = log3;
   }
 
   @Test
@@ -52,6 +59,12 @@ public class TestLogger {
   public void testMemberInject() {
     assertNotNull(log2);
     assertEquals(TestLogger.class.getName(), log2.getName());
+  }
+
+  @Test
+  public void testSetterInject() {
+    assertNotNull(log3);
+    assertEquals(TestLogger.class.getName(), log3.getName());
   }
 
   @Test
