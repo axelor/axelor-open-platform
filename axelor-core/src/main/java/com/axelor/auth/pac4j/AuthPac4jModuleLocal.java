@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import javax.servlet.ServletContext;
+import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
@@ -73,7 +74,7 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
     addLocalClient(new AxelorFormClient(authenticator));
 
     if (isBasicAuthEnabled()) {
-      addLocalClient(new DirectBasicAuthClient(authenticator));
+      addLocalClient(new AxelorDirectBasicAuthClient(authenticator));
     }
   }
 
@@ -157,6 +158,22 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
 
       logger.error("Password authentication failed for user: {}", username);
       return super.handleInvalidCredentials(context, username, message, errorMessage);
+    }
+  }
+
+  private static class AxelorDirectBasicAuthClient extends DirectBasicAuthClient {
+    public AxelorDirectBasicAuthClient(
+        Authenticator<UsernamePasswordCredentials> usernamePasswordAuthenticator) {
+      super(usernamePasswordAuthenticator);
+      setName(getClass().getSuperclass().getSimpleName());
+    }
+
+    @Override
+    protected UsernamePasswordCredentials retrieveCredentials(final WebContext context) {
+      if (StringUtils.isBlank(context.getRequestHeader(HttpConstants.AUTHORIZATION_HEADER))) {
+        return null;
+      }
+      return super.retrieveCredentials(context);
     }
   }
 

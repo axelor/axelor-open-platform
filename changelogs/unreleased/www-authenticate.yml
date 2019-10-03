@@ -1,0 +1,4 @@
+---
+title: Do not set WWW-Authenticate response header when request has no basic auth header
+type: fix
+
