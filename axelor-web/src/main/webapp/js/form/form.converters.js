@@ -41,6 +41,22 @@
     }
     return value;
   }
+  
+  function canSetNested(record, name) {
+    if (record && name && name in record) {
+      return true;
+    }
+    if (name) {
+      var path = name.split('.');
+      var val = record || {};
+      var idx = 0;
+      while (idx < path.length - 1) {
+        val = val[path[idx++]];
+        if (!val) return false;
+      }
+    }
+    return true;
+  }
 
   function findNested(record, name) {
     if (record && name && name in record) {
@@ -96,6 +112,7 @@
 
   ui.findNested = findNested;
   ui.setNested = setNested;
+  ui.canSetNested = canSetNested;
 
   ui.formatters = {
 
