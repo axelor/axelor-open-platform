@@ -123,10 +123,6 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   protected void configureAuth() {
     configureClients();
 
-    if (isCsrfAuthorizerEnabled()) {
-      logger.info("CSRF authorizer enabled");
-    }
-
     final Multibinder<AuthenticationListener> listenerMultibinder =
         Multibinder.newSetBinder(binder(), AuthenticationListener.class);
     listenerMultibinder.addBinding().to(AuthPac4jListener.class);
@@ -172,24 +168,20 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
   public static String getCallbackUrl() {
     if (callbackUrl == null) {
-      if (isEnabled()) {
-        final AppSettings settings = AppSettings.get();
-        callbackUrl = settings.get(AvailableAppSettings.AUTH_CALLBACK_URL, null);
+      final AppSettings settings = AppSettings.get();
+      callbackUrl = settings.get(AvailableAppSettings.AUTH_CALLBACK_URL, null);
 
-        // Backward-compatible CAS configuration
-        if (StringUtils.isBlank(callbackUrl) && AuthPac4jModuleCas.isEnabled()) {
-          callbackUrl = settings.get(AvailableAppSettings.AUTH_CAS_SERVICE, null);
-        }
+      // Backward-compatible CAS configuration
+      if (StringUtils.isBlank(callbackUrl) && AuthPac4jModuleCas.isEnabled()) {
+        callbackUrl = settings.get(AvailableAppSettings.AUTH_CAS_SERVICE, null);
+      }
 
-        if (StringUtils.isBlank(callbackUrl)) {
-          final String baseUrl =
-              Optional.ofNullable(settings.getBaseURL())
-                  .orElseThrow(IllegalStateException::new)
-                  .replaceAll("/+$", "");
-          callbackUrl = baseUrl + "/callback";
-        }
-      } else {
-        callbackUrl = "";
+      if (StringUtils.isBlank(callbackUrl)) {
+        final String baseUrl =
+            Optional.ofNullable(settings.getBaseURL())
+                .orElseThrow(IllegalStateException::new)
+                .replaceAll("/+$", "");
+        callbackUrl = baseUrl + "/callback";
       }
     }
 
@@ -213,20 +205,6 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     }
 
     return logoutUrl;
-  }
-
-  public static boolean isEnabled() {
-    return isCsrfAuthorizerEnabled()
-        || AuthPac4jModuleLocal.isBasicAuthEnabled()
-        || AuthPac4jModuleOidc.isEnabled()
-        || AuthPac4jModuleOAuth.isEnabled()
-        || AuthPac4jModuleSaml.isEnabled()
-        || AuthPac4jModuleCas.isEnabled();
-  }
-
-  public static boolean isCsrfAuthorizerEnabled() {
-    final AppSettings settings = AppSettings.get();
-    return settings.getBoolean(AvailableAppSettings.AUTH_CSRF_AUTHORIZER_ENABLED, false);
   }
 
   @Override
@@ -270,12 +248,10 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       @SuppressWarnings("rawtypes")
       final Map<String, Authorizer> authorizers = new LinkedHashMap<>();
 
-      if (isCsrfAuthorizerEnabled()) {
-        authorizers.put(
-            CSRF_TOKEN_AUTHORIZER_NAME,
-            new CsrfTokenGeneratorAuthorizer(new DefaultCsrfTokenGenerator()));
-        authorizers.put(CSRF_AUTHORIZER_NAME, new AxelorCsrfAuthorizer());
-      }
+      authorizers.put(
+          CSRF_TOKEN_AUTHORIZER_NAME,
+          new CsrfTokenGeneratorAuthorizer(new DefaultCsrfTokenGenerator()));
+      authorizers.put(CSRF_AUTHORIZER_NAME, new AxelorCsrfAuthorizer());
 
       setConfig(new Config(clients, Collections.unmodifiableMap(authorizers)));
     }

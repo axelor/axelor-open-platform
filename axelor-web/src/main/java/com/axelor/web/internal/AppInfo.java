@@ -129,17 +129,15 @@ public class AppInfo {
     map.put("application.themes", themes);
 
     // find central client name
-    if (AuthPac4jModule.isEnabled()) {
-      final ProfileManager<CommonProfile> profileManager =
-          new ProfileManager<>(
-              new J2EContext(
-                  Beans.get(HttpServletRequest.class), Beans.get(HttpServletResponse.class)));
+    final ProfileManager<CommonProfile> profileManager =
+        new ProfileManager<>(
+            new J2EContext(
+                Beans.get(HttpServletRequest.class), Beans.get(HttpServletResponse.class)));
 
-      profileManager
-          .get(true)
-          .filter(profile -> AuthPac4jModule.getCentralClients().contains(profile.getClientName()))
-          .ifPresent(profile -> map.put("auth.central.client", profile.getClientName()));
-    }
+    profileManager
+        .get(true)
+        .filter(profile -> AuthPac4jModule.getCentralClients().contains(profile.getClientName()))
+        .ifPresent(profile -> map.put("auth.central.client", profile.getClientName()));
 
     return map;
   }
