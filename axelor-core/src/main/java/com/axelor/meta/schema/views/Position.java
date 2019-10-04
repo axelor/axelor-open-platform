@@ -35,7 +35,7 @@ public enum Position {
   @XmlEnumValue("before")
   BEFORE(Node::getParentNode, Function.identity()),
 
-  @XmlEnumValue("inside-last")
+  @XmlEnumValue("inside")
   INSIDE_LAST(Function.identity(), node -> null),
 
   @XmlEnumValue("inside-first")
