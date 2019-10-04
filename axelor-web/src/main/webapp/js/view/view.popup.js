@@ -433,10 +433,12 @@ ui.directive('uiEditorPopup', function() {
           isOpen = false;
           scope.waitForActions(function () {
             scope.isPopupOpen = isOpen;
+            scope.$$popupStack.pop(1);
           }, 2000); // delay couple of seconds to that popup can cleanup
         });
         element.on('dialogopen', function (e) {
           scope.isPopupOpen = isOpen = true;
+          scope.$$popupStack.push(1);
           scope.$applyAsync();
         });
       });
