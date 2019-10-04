@@ -138,6 +138,7 @@
         inst.$$watchInitialized = false;
         inst.$$childCanWatch = true;
         inst.$$shouldWatch = false;
+        inst.$$popupStack = this.$$popupStack || (this.$$popupStack = []);
         return inst;
       };
 

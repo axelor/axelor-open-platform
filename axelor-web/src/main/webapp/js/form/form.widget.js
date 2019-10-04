@@ -87,6 +87,7 @@ ui.directive('uiTabGate', function() {
       return {
         pre: function preLink(scope, element, attrs) {
           scope.$watchChecker(function(current) {
+            if (current.$$popupStack.length) return true;
             if (current.tabSelected === undefined) {
               return !scope.tab || scope.tab.selected === undefined || scope.tab.selected;
             }
