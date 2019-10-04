@@ -1141,38 +1141,40 @@
     </xsd:complexContent>
   </xsd:complexType>
   <xsd:group name="PanelItems">
-    <xsd:choice>
-      <xsd:element name="field" type="tns:PanelField" />
-      <xsd:element name="label" type="tns:Label" />
-      <xsd:element name="help" type="tns:Help" />
-      <xsd:element name="static" type="tns:Static" />
-      <xsd:element name="spacer" type="tns:Spacer" />
-      <xsd:element name="separator" type="tns:Separator" />
-      <xsd:element name="button" type="tns:Button" />
-      <xsd:element name="button-group">
-        <xsd:complexType>
-          <xsd:complexContent>
-            <xsd:extension base="tns:AbstractContainer">
-              <xsd:sequence>
-                <xsd:element name="button" type="tns:Button" maxOccurs="unbounded"/>
-              </xsd:sequence>
-            </xsd:extension>
-          </xsd:complexContent>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="panel">
-        <xsd:complexType>
-          <xsd:complexContent>
-            <xsd:extension base="tns:AbstractPanel">
-              <xsd:group ref="tns:PanelItems" maxOccurs="unbounded"/>
-            </xsd:extension>
-          </xsd:complexContent>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="panel-related" type="tns:PanelRelated"/>
-      <xsd:element name="panel-dashlet" type="tns:Dashlet"/>
-      <xsd:element name="panel-include" type="tns:FormInclude"/>
-    </xsd:choice>
+   <xsd:sequence>
+     <xsd:choice minOccurs="0">
+        <xsd:element name="field" type="tns:PanelField" />
+        <xsd:element name="label" type="tns:Label" />
+        <xsd:element name="help" type="tns:Help" />
+        <xsd:element name="static" type="tns:Static" />
+        <xsd:element name="spacer" type="tns:Spacer" />
+        <xsd:element name="separator" type="tns:Separator" />
+        <xsd:element name="button" type="tns:Button" />
+        <xsd:element name="button-group">
+          <xsd:complexType>
+            <xsd:complexContent>
+              <xsd:extension base="tns:AbstractContainer">
+                <xsd:sequence>
+                  <xsd:element name="button" type="tns:Button" maxOccurs="unbounded"/>
+                </xsd:sequence>
+              </xsd:extension>
+            </xsd:complexContent>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="panel">
+          <xsd:complexType>
+            <xsd:complexContent>
+              <xsd:extension base="tns:AbstractPanel">
+                <xsd:group ref="tns:PanelItems" maxOccurs="unbounded"/>
+              </xsd:extension>
+            </xsd:complexContent>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="panel-related" type="tns:PanelRelated"/>
+        <xsd:element name="panel-dashlet" type="tns:Dashlet"/>
+        <xsd:element name="panel-include" type="tns:FormInclude"/>
+      </xsd:choice>
+    </xsd:sequence>
   </xsd:group>
   <xsd:complexType name="Panel">
     <xsd:complexContent>
