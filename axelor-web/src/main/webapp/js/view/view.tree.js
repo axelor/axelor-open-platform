@@ -234,7 +234,7 @@ function Column(scope, col) {
         return cmp(item.value, value);
       }) || {};
 
-      if (col.widget === 'ImageSelect' && res.icon) {
+      if (col.widget === 'image-select' && res.icon) {
         var image = "<img style='max-height: 24px;' src='" + (res.icon || res.value) + "'>";
         if (col.labels === false) {
           return image;

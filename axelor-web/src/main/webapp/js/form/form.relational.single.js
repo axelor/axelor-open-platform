@@ -358,7 +358,7 @@ ui.formInput('ManyToOne', 'Select', {
       return scope.isHidden();
     };
 
-    if (field.widget === 'NestedEditor') {
+    if (field.widget === 'nested-editor') {
 
       scope.isHiddenSelf = function() {
         if (!scope.canSelect()) {

@@ -621,7 +621,7 @@ ui.formInput('OneToMany', {
         adjustSize();
       });
 
-      if (!(scope._viewParams || {}).summaryView || scope.field.widget === "MasterDetail") {
+      if (!(scope._viewParams || {}).summaryView || scope.field.widget === "master-detail") {
         return;
       }
       var col = {
@@ -671,7 +671,7 @@ ui.formInput('OneToMany', {
     };
 
     var field = scope.field;
-    if (field.widget === 'MasterDetail') {
+    if (field.widget === 'master-detail') {
       setTimeout(function(){
         scope.showDetailView();
       });

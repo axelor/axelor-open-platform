@@ -402,7 +402,7 @@ var Formatters = {
       return res;
     };
 
-    if (value && field.widget === 'MultiSelect') {
+    if (value && field.widget === 'multi-select') {
       var items = value.split(/\s*,\s*/).map(findSelect).map(function (res) {
         return '<span class="label label-primary"><span class="tag-text">'+res.title+'</span></span>';
       });
@@ -411,7 +411,7 @@ var Formatters = {
 
     var res = findSelect(value);
     var text = res.title;
-    if (field.widget === 'ImageSelect' && res.icon) {
+    if (field.widget === 'image-select' && res.icon) {
       var image = "<img style='max-height: 24px;' src='" + (res.icon || res.value) + "'>";
       return field.labels === false ? image : image + " " + text;
     }
@@ -529,10 +529,10 @@ _.extend(Factory.prototype, {
       }
     }
 
-    if (widget === "Progress" || widget === "progress" || widget === "SelectProgress") {
+    if (widget === "progress" || widget === "select-progress") {
       type = "progress";
     }
-    if (_.isArray(field.selectionList) && widget !== "SelectProgress") {
+    if (_.isArray(field.selectionList) && widget !== "select-progress") {
       type = "selection";
     }
 
@@ -544,17 +544,17 @@ _.extend(Factory.prototype, {
       return Formatters[type](field, value, dataContext, this.grid);
     }
 
-    if (["Url", "url", "duration"].indexOf(widget) > 0) {
+    if (["url", "duration"].indexOf(widget) > 0) {
       type = widget.toLowerCase();
     }
 
-    if (widget.toLowerCase() === "image" || widget.toLowerCase() === "binary-link" || (type === "binary" && field.name === "image")) {
+    if (widget === "image" || widget === "binary-link" || (type === "binary" && field.name === "image")) {
       var url = null;
       if (field.target === "com.axelor.meta.db.MetaFile") {
         if (value) {
           url = ui.makeImageURL("com.axelor.meta.db.MetaFile", "content", (value.id || value), undefined, this.grid.handler);
         }
-        if (url && widget.toLowerCase() === "binary-link") {
+        if (url && widget === "binary-link") {
           return '<a href="' + url + '" download="' + value.fileName + '">' + value.fileName + '</a>';
         }
       } else {
@@ -563,7 +563,7 @@ _.extend(Factory.prototype, {
       return url ? '<img src="' + url + '" style="height: 21px;margin-top: -2px;">' : '';
     }
 
-    if (widget.toLowerCase() === "html") {
+    if (widget === "html") {
       return value ? '<span>' + value + '</span>' : '';
     }
 
@@ -2718,7 +2718,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         type = types[field.type];
 
       // force lite html widget
-      if (item.widget && item.widget.toLowerCase() === 'html') {
+      if (item.widget === 'html') {
         item.lite = true;
       }
 

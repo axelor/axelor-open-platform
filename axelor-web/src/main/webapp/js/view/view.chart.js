@@ -209,7 +209,7 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
             placeholder: item.title || item.autoTitle
           });
           if (item.multiple && (item.target || item.selection)) {
-            item.widget = item.target ? "TagSelect" : "MultiSelect";
+            item.widget = item.target ? "tag-select" : "multi-select";
           }
           return props;
         })
