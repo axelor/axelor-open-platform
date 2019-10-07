@@ -157,6 +157,7 @@
       <field name="onSave" />
       <field name="formWidth" />
       <field name="orderBy" />
+      <field name="groupBy" />
     </panel>
     <panel title="Menu">
       <field name="menuTitle" title="Title"/>

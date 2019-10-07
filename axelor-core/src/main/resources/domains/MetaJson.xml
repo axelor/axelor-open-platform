@@ -69,6 +69,7 @@
     <string name="nameField" />
     <string name="formWidth" />
     <string name="orderBy" />
+    <string name="groupBy" />
     <many-to-one name="menu" ref="MetaMenu" copy="false" />
     <many-to-one name="menuParent" ref="MetaMenu" />
     <string name="menuIcon" />

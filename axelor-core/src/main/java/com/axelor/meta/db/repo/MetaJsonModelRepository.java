@@ -30,8 +30,9 @@ import com.axelor.meta.db.MetaMenu;
 import com.axelor.meta.db.MetaView;
 import com.google.common.base.Objects;
 import com.google.inject.persist.Transactional;
-import java.util.Arrays;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 
 public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
@@ -74,6 +75,7 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 
     MetaView gridView = jsonModel.getGridView();
     String orderBy = jsonModel.getOrderBy();
+    String groupBy = jsonModel.getGroupBy();
 
     if (gridView == null) {
       gridView = new MetaView();
@@ -97,18 +99,24 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
             .append(gridView.getModel())
             .append('"');
 
-    if (!StringUtils.isBlank(orderBy)) {
-      String names =
-          Arrays.stream(orderBy.split(","))
-              .map(s -> s.trim())
-              .map(
-                  s -> {
-                    if (s.startsWith("-attrs.") || s.startsWith("attrs.")) return s;
-                    if (s.startsWith("-")) return "-attrs." + s.substring(1);
-                    return "attrs." + s;
-                  })
-              .collect(Collectors.joining(","));
-      gridXml.append(" orderBy=").append('"').append(names).append('"');
+    Function<String, String> fixCommaList =
+        value ->
+            Stream.of(value.split(","))
+                .map(String::trim)
+                .map(
+                    s -> {
+                      if (s.startsWith("-attrs.") || s.startsWith("attrs.")) return s;
+                      if (s.startsWith("-")) return "-attrs." + s.substring(1);
+                      return "attrs." + s;
+                    })
+                .collect(Collectors.joining(","));
+
+    if (StringUtils.notBlank(orderBy)) {
+      gridXml.append(" orderBy=").append('"').append(fixCommaList.apply(orderBy)).append('"');
+    }
+
+    if (StringUtils.notBlank(groupBy)) {
+      gridXml.append(" groupBy=").append('"').append(fixCommaList.apply(groupBy)).append('"');
     }
 
     gridXml
