@@ -2022,7 +2022,9 @@ Grid.prototype.showEditor = function (activeCell) {
     at: 'left top',
     of: node,
     within: viewPort
-  }).css('left', 0);
+  })
+  .css('left', 0)
+  .zIndex(viewPort.zIndex() + 1);
 
   form.toggleClass('slick-form-flip', box.bottom + 48 > (viewPort.height() + viewPort.scrollTop()));
   setTimeout(function () {
