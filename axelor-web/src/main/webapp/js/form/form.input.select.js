@@ -859,6 +859,8 @@ ui.formInput('NavSelect', {
 
     var field = scope.field;
     var selection = field.selectionList || [];
+    var isReference = field.target;
+    var targetName = field.targetName;
 
     scope.getSelection = function () {
       return filterSelection(scope, field, selection, scope.getValue()) || [];
@@ -872,7 +874,20 @@ ui.formInput('NavSelect', {
       if (scope.attr('readonly')) {
         return;
       }
+
       var val = parseNumber(scope.field, select.value);
+
+      if (isReference) {
+        val = { id: parseInt(val) };
+        // using translated value?
+        if (select.data && targetName in select.data) {
+          val[targetName] = select.data[targetName];
+          val['$t:' + targetName] = select.title;
+        } else {
+          val[targetName] = select.title;
+        }
+      }
+
       this.setValue(val, true);
 
       elemNavs.removeClass('open');
@@ -884,7 +899,12 @@ ui.formInput('NavSelect', {
     };
 
     scope.isSelected = function (select) {
-      return select && scope.getValue() == select.value;
+      var value = select ? (isReference ? parseInt(select.value) : select.value) : null;
+      var current = scope.getValue();
+      if (current && isReference) {
+        current = current.id;
+      }
+      return select && value === current;
     };
 
     var lastWidth = 0;

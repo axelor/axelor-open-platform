@@ -18,6 +18,7 @@
 package com.axelor.meta.schema.views;
 
 import com.axelor.common.StringUtils;
+import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.MetaStore;
@@ -347,7 +348,23 @@ public class Field extends SimpleWidget {
         throw new RuntimeException("No such enum type found: " + typeName, e);
       }
     }
-    return MetaStore.getSelectionList(getSelection());
+
+    String selection = getSelection();
+    if (StringUtils.notBlank(selection)) {
+      return MetaStore.getSelectionList(getSelection());
+    }
+
+    String widget = getWidget();
+    if ("NavSelect".equals(widget) || "nav-select".equals(widget)) {
+      Class<?> targetClass = getTargetClass();
+      Integer limit = getLimit();
+      if (targetClass != null) {
+        return MetaStore.getSelectionList(
+            targetClass.asSubclass(Model.class), getOrderBy(), limit == null ? 40 : limit);
+      }
+    }
+
+    return null;
   }
 
   public void setSelection(String selection) {
@@ -628,16 +645,21 @@ public class Field extends SimpleWidget {
     this.summaryView = summaryView;
   }
 
-  private String getTargetModel() {
-    Mapper mapper = null;
+  private Class<?> getTargetClass() {
     try {
-      mapper = Mapper.of(Class.forName(this.getModel()));
-      return mapper.getProperty(getName()).getTarget().getName();
-    } catch (ClassNotFoundException e) {
+      Mapper mapper = Mapper.of(Class.forName(this.getModel()));
+      return mapper.getProperty(getName()).getTarget();
+    } catch (ClassNotFoundException | NullPointerException e) {
       return null;
-    } catch (NullPointerException e) {
     }
-    return null;
+  }
+
+  private String getTargetModel() {
+    try {
+      return getTargetClass().getName();
+    } catch (NullPointerException e) {
+      return null;
+    }
   }
 
   @XmlTransient
