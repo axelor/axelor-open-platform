@@ -525,7 +525,7 @@ Grid.prototype.parse = function(view) {
     }
 
     if (field.type == "button") {
-      if (scope.selector) return;
+      if (scope.selectorAttr) return;
       field.image = field.title;
       field.handler = that.newActionHandler(buttonScope(scope), element, {
         action: field.onClick
@@ -2638,6 +2638,8 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         if (!scope.selector && (axelor.config["view.grid.selection"] === undefined
             || axelor.config["view.grid.selection"] === "checkbox")) {
           scope.selector = "checkbox";
+        } else {
+          scope.selectorAttr = scope.selector;
         }
 
         var forEdit = schema.editable || false,
