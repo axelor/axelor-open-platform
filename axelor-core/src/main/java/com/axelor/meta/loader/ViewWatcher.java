@@ -23,7 +23,9 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 import com.axelor.common.reflections.Reflections;
+import com.axelor.i18n.I18nBundle;
 import com.axelor.inject.Beans;
+import com.axelor.meta.MetaStore;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -225,6 +227,8 @@ public final class ViewWatcher {
                 synchronized (pendingModules) {
                   try {
                     moduleManager.update(pendingModules, pendingPaths);
+                    MetaStore.clear();
+                    I18nBundle.invalidate();
                   } catch (Exception e) {
                     log.error(e.getMessage(), e);
                   } finally {
