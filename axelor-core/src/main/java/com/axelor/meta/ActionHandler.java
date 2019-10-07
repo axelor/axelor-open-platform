@@ -129,7 +129,7 @@ public class ActionHandler {
    *
    * @param expression the expression to evaluate prefixed with action type followed by a <code>:
    *     </code>
-   * @param references
+   * @param expression
    * @return expression result
    */
   public Object evaluate(String expression) {

@@ -254,7 +254,7 @@ public class CSVLogger {
   }
 
   /**
-   * Create the config file using {@link DEFAULT_CONFIG_NAME} as file name
+   * Create the config file using {@link #DEFAULT_CONFIG_NAME} as file name
    *
    * @throws IOException if unable to create file
    */

@@ -164,8 +164,6 @@ public class MailServiceImpl implements MailService, MailConstants {
    * <p>Can be overridden to provide {@link MailReader} configured differently (e.g. from database
    * config).
    *
-   * @param message the message to send with the sender
-   * @param entity the related entity, can be null if there is no related record
    * @return a {@link MailSender}, null if not configured
    */
   protected MailReader getMailReader() {
@@ -526,7 +524,7 @@ public class MailServiceImpl implements MailService, MailConstants {
   /**
    * Fetch email messages from the given mail store.
    *
-   * @param store the mail store to fetch message from
+   * @param reader the mail reader to fetch message from
    * @throws MessagingException if unable to parse message
    * @throws IOException if unable to load message content
    */

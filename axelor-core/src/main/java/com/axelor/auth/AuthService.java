@@ -177,7 +177,7 @@ public class AuthService {
    * Changes user password.
    *
    * @param user
-   * @param newPassword
+   * @param password
    */
   public void changePassword(User user, String password) {
     Preconditions.checkArgument(
