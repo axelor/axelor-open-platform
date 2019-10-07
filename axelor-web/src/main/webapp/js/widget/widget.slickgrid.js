@@ -2017,6 +2017,7 @@ Grid.prototype.showEditor = function (activeCell) {
   var node = grid.getCellNode(args.row, 0);
   var viewPort = $(grid.getCanvasNode()).parent();
   var buttonsWrapper = form.find('.slick-form-buttons-wrapper');
+  var zIndex = this.element.parents('.ui-dialog:first').zIndex();
 
   form.removeClass('slick-form-flip').show().css('visibility', 'hidden').css('display', '');
   form.position({
@@ -2024,9 +2025,11 @@ Grid.prototype.showEditor = function (activeCell) {
     at: 'left top',
     of: node,
     within: viewPort
-  })
-  .css('left', 0)
-  .zIndex(viewPort.zIndex() + 1);
+  }).css('left', 0);
+
+  if (zIndex) {
+    form.zIndex(viewPort.zIndex() + 1);
+  }
 
   form.toggleClass('slick-form-flip', box.bottom + 48 > (viewPort.height() + viewPort.scrollTop()));
   setTimeout(function () {
