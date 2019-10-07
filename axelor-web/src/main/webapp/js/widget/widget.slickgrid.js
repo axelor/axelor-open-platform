@@ -1955,11 +1955,13 @@ Grid.prototype.showEditor = function (activeCell) {
         buttonsAdjusted = true;
         buttonsWrapper.show();
         var elem = $(e.target).is('.form-item-container') ? $(e.target) : $(e.target).parents('.form-item-container');
+        var viewPort = $(grid.getCanvasNode()).parent();
         buttons.position({
           my: 'center top',
           at: 'center bottom',
           of: elem,
-          within: $(grid.getCanvasNode).parent(),
+          within: viewPort,
+          collision: 'flipfit',
           using: function (position) {
             buttons.css('left', position.left);
           }
