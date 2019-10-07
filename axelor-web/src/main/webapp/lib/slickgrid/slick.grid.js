@@ -2161,6 +2161,10 @@ if (typeof Slick === "undefined") {
 
     function handleKeyDown(e) {
       trigger(self.onKeyDown, {row: activeRow, cell: activeCell}, e);
+
+      //XXX: patched to support row editors
+      if (self._editorVisible) return;
+
       var handled = e.isImmediatePropagationStopped();
 
       if (!handled) {

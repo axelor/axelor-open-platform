@@ -63,7 +63,7 @@
 }
 
 .slick-row {
-  background: #f9f9f9;
+  background: #fff;
   border-bottom: 1px solid #e7eaec !important;
 }
 .slick-row.odd {
@@ -81,19 +81,21 @@
 
 .slick-row .slick-cell {
   box-sizing: border-box;
-  line-height: 20px;
+  line-height: 24px;
   height: 100% !important;
 }
 
+
+.slick-row.active,
 .slick-row.selected,
 .slick-row .slick-cell.selected {
-    background-color: #abb9d3;
+    background-color: #e7e7e7;
 }
 
 .slick-row .slick-cell.text,
 .slick-row .slick-cell.html {
   white-space: pre-wrap;
-    word-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .slick-row .slick-cell.selected.active::after {
@@ -120,7 +122,7 @@
 }
 
 .slick-headerrow {
-  height: 24px;
+  height: 26px;
   border: 0 !important;
   border-bottom: 1px solid #ddd !important;
   background: #fff !important;
@@ -132,7 +134,7 @@
 }
 
 .slick-headerrow-column {
-  height: 24px;
+  height: 26px;
   border: none !important;
   border-right: 1px solid #ddd !important;
   background: #f5f5f5;
@@ -169,7 +171,7 @@
 .slick-header-column.ui-state-default {
   height: inherit;
   line-height: inherit;
-  padding: 4px 8px;
+  padding: 5px 8px;
   font-weight: 600;
 }
 
@@ -177,15 +179,43 @@
   padding: 0px;
 }
 
+.slick-cell-checkboxsel .ibox .box {
+  width: 18px;
+  height: 18px;
+}
+
+.slick-cell-checkboxsel .ibox input:checked + .box:after {
+  top: 4px;
+  left: 3px;
+}
+
+.slick-cell.slick-cell-checkboxsel {
+  padding: 5px;
+}
+
+.slick-cell-checkboxsel .ibox {
+  float: left;
+}
+
+.slick-header-column.slick-cell-checkboxsel .ibox {
+  margin-left: -3px;
+}
+
 .slick-cell.editable {
   background: white;
   padding: 0;
 }
 
-.slick-cell input,
-.slick-cell .picker-input,
-.slick-cell .ui-spinner,
-.slick-cell [x-field] {
+.slick-editor {
+  box-sizing: border-box;
+  line-height: 24px;
+  height: 100% !important;
+}
+
+.slick-editor input,
+.slick-editor .picker-input,
+.slick-editor .ui-spinner,
+.slick-editor [x-field] {
   outline: 0;
   margin: 0;
   padding: 0;
@@ -194,47 +224,51 @@
   width: 100%;
   height: 100% !important;
   min-width: inherit !important;
-  min-height: 23px;
+  min-height: 26px;
 }
 
-.slick-cell .picker-input {
+.slick-editor .picker-input {
   width: 100% !important;
 }
 
-.slick-cell .ui-spinner {
+.slick-editor .ui-spinner {
   border: none;
 }
 
-.slick-cell input {
+.slick-editor input {
   padding-left: 6px !important;
 }
 
-.slick-cell textarea {
+.slick-editor textarea {
   border-radius: 0;
   margin: 0;
   outline: 0;
 }
 
-.slick-cell .text-item {
+.slick-editor .text-item {
   height: auto !important;
 }
 
-.slick-cell .picker-input > .picker-icons > i.fa {
+.slick-editor .picker-input > .picker-icons > i.fa {
   padding-top: 2px !important;
 }
 
-.slick-cell input[type=checkbox],
-.slick-cell .form-item-container input[type=checkbox] {
+.slick-editor input[type=checkbox],
+.slick-editor .form-item-container input[type=checkbox] {
   width: auto;
   height: auto;
   margin-top: 0 !important;
 }
 
-.slick-cell .form-item-container > .ibox {
-  width: auto;
-  margin-top: 2px !important;
-  padding: 0;
-  float: inherit !important;
+.slick-editor .form-item-container.boolean-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #ddd;
+}
+
+.slick-editor .form-item-container > .ibox {
+  margin: 2px 3px !important;
 }
 
 .slick-editor-dropdown {
@@ -260,11 +294,11 @@
   background-repeat: no-repeat;
 }
 
-.slick-cell .input-append > button {
+.slick-editor .input-append > button {
   display: none;
 }
 
-.slick-cell.editable * {
+.slick-editor * {
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
       -ms-box-sizing: border-box;
@@ -288,10 +322,16 @@
 
 .slick-cell-checkboxsel input {
   width: inherit;
+  margin-top: -2px;
 }
 
-.slick-header-column.slick-cell-checkboxsel {
-  padding-top: 2px;
+.slick-cell .progress {
+  margin: 3px 0 0;
+}
+
+.slick-editor .progress-item {
+  padding: 3px;
+  margin-top: 2px !important;
 }
 
 .slick-group > .slick-cell-checkboxsel {
@@ -454,13 +494,99 @@
   box-sizing: border-box;
 }
 
-.slickgrid-overlay {
+.slickgrid-overlay,
+.slickgrid-edit-overlay {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  background: #ddd;
+  background-color: #ddd;
   opacity: 0.25;
   z-index: 2;
+}
+
+.slick-form {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: inherit !important;
+  left: 0;
+  width: 100%;
+  z-index: 3;
+}
+
+.slick-form.slick-form-flip {
+  flex-direction: column-reverse;
+}
+
+.slick-editor {
+  position: relative;
+  display: flex;
+  flex: 1;
+  background: #fff;
+  padding: 0;
+  margin: 0;
+  background: #e7e7e7;
+}
+
+.slick-editor .form-item-container {
+  display: flex;
+  align-items: center;
+}
+
+.slick-editor .form-item-container,
+.slick-editor .form-item-container > span.display-text {
+  background: white;
+  margin: 1px 1px 1px 0;
+  min-height: inherit !important;
+  line-height: 18px;
+}
+
+.slick-editor .form-item-container > span.display-text {
+  padding: 1px;
+  min-height: 26px !important;
+  white-space: nowrap;
+  border: 1px solid #ddd;
+}
+
+.slick-editor .form-item-container > span.display-text > * {
+  overflow: hidden;
+}
+
+.slick-editor .form-item-container > * {
+  width: inherit;
+  flex: 1;
+}
+
+.slick-editor input,
+.slick-editor textarea {
+  border-color: #ddd;
+}
+
+.slick-form-buttons {
+  background: #e7e7e7;
+  padding: 4px 4px 6px;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  white-space: nowrap;
+}
+
+.slick-form-flip .slick-form-buttons {
+  top: -38px !important;
+}
+
+.slick-form-buttons button {
+  margin: 0 2px;
+}
+
+.slick-form.slick-form-flip .slick-form-buttons {
+  padding: 6px 4px 4px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  box-shadow: 1px -1px 2px rgba(0, 0, 0, 0.2);
 }

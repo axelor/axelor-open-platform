@@ -79,215 +79,41 @@ function makeFilterCombo(input, selection, callback) {
   });
 }
 
-var Editor = function(args) {
-
-  var element;
-  var column = args.column;
-  var scope;
-  var external;
-
-  var form = $(args.container)
-    .parents('[ui-slick-grid]:first')
-    .find('[ui-slick-editors]:first');
-
-  element = form.find('[x-field="'+ column.field +'"]');
-  scope = form.data('$scope');
-
-  if (!element.parent().is('td.form-item'))
-    element = element.parent();
-  element.data('$parent', element.parent());
-  element.data('$editorForm', form);
-
-  external = element.is('.text-item,.html-item');
-
-  this.init = function() {
-
-    var container = $(args.container);
-    if (external) {
-      container = container.parents('.ui-dialog-content:first,.view-container:first').first();
-      $(document).on('mousedown.slick-external', function (e) {
-        if (element.is(e.target) || element.find(e.target).length > 0) {
-          return;
-        }
-        args.grid.getEditorLock().commitCurrentEdit();
-      });
+function dotToNested(record, field) {
+  if (field.jsonField) {
+    var json = record[field.jsonField];
+    if (_.isString(json)) {
+      record[field.jsonField] = angular.fromJson(json);
     }
-
-    element.css('display', 'inline-block')
-      .addClass('slick-external-editor')
-      .appendTo(container)
-      .hide();
-
-    if (!element.data('keydown.nav')) {
-      element.data('keydown.nav', true);
-      element.bind("keydown.nav", function (e) {
-        switch (e.keyCode) {
-        case 37: // LEFT
-        case 39: // RIGHT
-        case 38: // UP
-        case 40: // DOWN
-          e.stopImmediatePropagation();
-          break;
-        case 9: // TAB
-          if (external) {
-            args.grid.onKeyDown.notify(args.grid.getActiveCell(), e);
-            return false;
-          }
-        }
-      });
-
-      element.bind('close:slick-editor', function(e) {
-        var grid = args.grid;
-        var lock = grid.getEditorLock();
-        if (lock.isActive()) {
-          lock.commitCurrentEdit();
-        }
-      });
-    }
-  };
-
-  this.shouldWait = function () {
-    var es = element.scope();
-    if (es && es.field && es.field.onChange) {
-      return true;
-    }
-    return false;
-  };
-
-  this.destroy = function() {
-    scope.$lastEditor = this;
-    element.appendTo(element.data('$parent') || form)
-         .removeData('$parent')
-         .removeData('$editorForm');
-    element.trigger("hide:slick-editor");
-    element.parent().zIndex('');
-    $(document).off('mousedown.slick-external');
-  };
-
-  this.position = function(pos) {
-    //XXX: ui-dialog issue
-    var zIndex = element.parents('.slickgrid:first').zIndex();
-    if (zIndex) {
-      element.parent().zIndex(zIndex);
-    }
-    if (external) {
-      setTimeout(adjustExternal);
-    }
-  };
-
-  function adjustExternal() {
-
-    var container = $(args.container);
-    var parent = element.data('$parent') || element;
-    var zIndex = (parent.parents('.slickgrid:first').zIndex() || 0) + container.zIndex();
-    element.css({
-      border: 0,
-      width: container.width(),
-      zIndex: zIndex + 1
-    });
-    element.css('position', 'absolute');
-    element.position({
-      my: 'left top',
-      at: 'left top',
-      of: args.container
-    });
-
-    // focus html editor
-    if (element.is('.html-item')) {
-      element.find('[contenteditable]').focus();
-    }
+    return;
   }
 
-  function focus() {
-    // Firefox throws exception if element is hidden
-    if (element.is(':hidden')) return;
-    if (element.is(':input')) {
-      element.focus().select();
-    } else {
-      element.find(':input:first').focus().select();
-    }
-    if (element.is('[x-cell-css*=select-item]') && element.scope().showSelection) {
-      element.scope().showSelection(300);
-    }
+  var name = field.name;
+  var value = record[name];
+  var names = name.split('.');
+  var first = names.shift();
+  var last = names.pop();
+  var obj = record[first] || (record[first] = {});
+  while (names.length) {
+    var next = names.shift();
+    obj = obj[next] || (obj[next] = {});
   }
+  obj[last] = value;
+  return record;
+}
 
-  this.focus = function() {
-    _.delay(focus);
-  };
-
-  this.loadValue = function(item) {
-    var that = this,
-      record = scope.record || {},
-      current = item || { id: 0 },
-      updated = false;
-
-    if ((!current.id || current.id < 0) && (current[column.field] === undefined)) {
-      var defaults = scope.$events.onNew ? scope.record : scope.defaultValues;
-      current[column.field] = (defaults||{})[column.field] || null;
-    }
-
-    var changed = (record.id !== item.id || record.version !== current.version);
-    if (changed) {
-      scope.editRecord(current);
-    } else {
-      record[column.field] = current[column.field];
-      updated = true;
-    }
-    setTimeout(function(){
-      if (updated) {
-        scope.$applyAsync();
-      }
-      element.show();
-      that.focus();
-    });
-  };
-
-  this.serializeValue = function() {
-    var record = scope.record || {};
-    var value = record[column.field];
-    return value === undefined ? "" : value;
-  };
-
-  this.applyValue = function(item, state) {
-    if (item.id === undefined) {
-      item = _.extend(item, scope.record);
-    }
-    item[column.field] = state;
-    item.$dirty = true;
-    if (item.id === undefined) {
-      args.grid.onCellChange.notify(args.grid.getActiveCell());
-    }
-  };
-
-  this.isValueChanged = function() {
-
-    // force change event on spinner widget
-    element.find('.ui-spinner-input').trigger('grid:check', args.item);
-    element.find('.ui-mask').trigger('grid:check');
-
-    var record = scope.record || {};
-    var current = args.item || { id: 0 };
-
-    var v1 = record[column.field];
-    var v2 = current[column.field];
-
-    var changed = !angular.equals(v1, v2);
-    if (changed && element.scope().isRequired() && !v1) {
-      current[column.field] = v1;
-    }
-
-    return changed;
-  };
-
-  this.validate = function() {
-    return {
-      valid: !element.hasClass('ng-invalid'),
-      msg: null
-    };
-  };
-
-  this.init();
-};
+function nestedToDot(record, name) {
+  var names = name.split('.');
+  var val = record || {};
+  var idx = 0;
+  while (val && idx < names.length) {
+    val = val[names[idx++]];
+  }
+  if (idx === names.length && val !== undefined) {
+    record[name] = val;
+  }
+  return record;
+}
 
 var Formatters = {
 
@@ -384,7 +210,7 @@ var Formatters = {
 
   "progress": function(field, value) {
     var props = ui.ProgressMixin.compute(field, value);
-    return '<div class="progress ' + props.css + '" style="height: 18px; margin: 0; margin-top: 1px;">'+
+    return '<div class="progress ' + props.css + '">'+
       '<div class="bar" style="width: ' + props.width +'%;"></div>'+
     '</div>';
   },
@@ -486,20 +312,6 @@ function Factory(grid) {
 }
 
 _.extend(Factory.prototype, {
-
-  getEditor : function(col) {
-    var field = col.descriptor;
-    if (!field || field.readonly || col.forEdit === false) {
-      return null;
-    }
-    if (field.type == 'binary') {
-      return null;
-    }
-    if (!col.editor) {
-      col.editor = Editor;
-    }
-    return col.editor;
-  },
 
   getFormatter: function(col) {
     return _.bind(this.formatter, this);
@@ -845,7 +657,8 @@ Grid.prototype.parse = function(view) {
   if (scope.selector) {
     selectColumn = new Slick.CheckboxSelectColumn({
       cssClass: "slick-cell-checkboxsel",
-      multiSelect: scope.selector !== "single"
+      multiSelect: scope.selector !== "single",
+      width: 30
     });
 
     cols.unshift(_.extend(selectColumn.getColumnDefinition(), {
@@ -876,9 +689,8 @@ Grid.prototype.parse = function(view) {
   var factory = new Factory(this);
 
   var options = {
-    rowHeight: Math.max(view.rowHeight || 26, 26),
-    editable: view.editable && !axelor.device.mobile,
-    editorFactory:  factory,
+    rowHeight: Math.max(view.rowHeight || 29, 29),
+    editable: false,
     formatterFactory: factory,
     enableCellNavigation: true,
     enableColumnReorder: false,
@@ -998,6 +810,8 @@ Grid.prototype._doInit = function(view) {
   // end performance tweaks
 
   dataView.$syncSelection = function(old, oldIds, focus) {
+    // cancel edit
+    that.cancelEdit(false);
     var selection = dataView.mapIdsToRows(oldIds || []);
     // if saving o2m items, we may get negative oldIds, consider reselecting old selection
     if (old && oldIds && old.length === 1 && oldIds.length === 1 && oldIds[0] < 0) {
@@ -1012,22 +826,22 @@ Grid.prototype._doInit = function(view) {
     }
     selection = _.unique(selection);
     grid.setSelectedRows(selection);
-    if (selection.length === 0 && !grid.getEditorLock().isActive()) {
+    if (selection.length === 0) {
       grid.setActiveCell(null);
-        } else if (focus) {
-          grid.setActiveCell(_.first(selection), 1);
-          grid.focus();
-        }
+    } else if (focus) {
+      grid.setActiveCell(_.first(selection), 1);
+      grid.focus();
+    }
   };
   dataView.$setSelection = function(selection, focus) {
     var rows = selection || [];
     grid.setSelectedRows(rows);
-    if (selection.length === 0 && !grid.getEditorLock().isActive()) {
+    if (selection.length === 0) {
       grid.setActiveCell(null);
-        } else if (focus) {
-          grid.setActiveCell(_.first(selection), 1);
-          grid.focus();
-        }
+    } else if (focus) {
+      grid.setActiveCell(_.first(selection), 1);
+      grid.focus();
+    }
   };
 
   if (this._canMove) {
@@ -1039,10 +853,7 @@ Grid.prototype._doInit = function(view) {
   this.subscribe(grid.onSelectedRowsChanged, this.onSelectionChanged);
   this.subscribe(grid.onClick, this.onItemClick);
   this.subscribe(grid.onDblClick, this.onItemDblClick);
-
   this.subscribe(grid.onKeyDown, this.onKeyDown);
-  this.subscribe(grid.onCellChange, this.onCellChange);
-  this.subscribe(grid.onBeforeEditCell, this.onBeforeEditCell);
 
   // register dataView event handlers
   this.subscribe(dataView.onRowCountChanged, this.onRowCountChanged);
@@ -1070,11 +881,6 @@ Grid.prototype._doInit = function(view) {
     }
     return meta || my;
   };
-  this.subscribe(grid.onCellChange, function (e, args) {
-    that.hilite(args.row);
-    grid.invalidateRow(args.row);
-    grid.render();
-  });
 
   function setFilterCols() {
 
@@ -1185,6 +991,7 @@ Grid.prototype._doInit = function(view) {
     that.$oldValues = null;
     that.clearDirty();
     that.resetColumns();
+    that.cancelEdit();
   });
 
   scope.$on("on:edit", function(e, record) {
@@ -1192,6 +999,7 @@ Grid.prototype._doInit = function(view) {
       that.$oldValues = null;
       that.clearDirty();
       that.resetColumns();
+      that.cancelEdit();
     }
   });
 
@@ -1207,17 +1015,16 @@ Grid.prototype._doInit = function(view) {
     that.resetColumns();
   });
 
-  scope.$on("on:before-save", function(e) {
+  scope.$on("on:before-save", function(e, record) {
 
     // only for editable grid
-    if (!that.editable) {
+    if (!that.editable || !that.isEditActive()) {
       return;
     }
 
     var row = null;
-    var lock = grid.getEditorLock();
-    if (lock.isActive()) {
-      lock.commitCurrentEdit();
+    if (that.isEditActive() && that.editorScope.record !== record) {
+      that.commitEdit();
       row = grid.getDataItem(grid.getDataLength() - 1); // to check if adding new row
     }
     if (grid.getActiveCell() && that.focusInvalidCell(grid.getActiveCell())) {
@@ -1251,13 +1058,9 @@ Grid.prototype._doInit = function(view) {
       });
     }
 
-    var node = that.element.find('.slick-cell-required:empty,.slick-cell > .ng-invalid').first();
-    if (node.parent().is('.slick-cell')) {
-      node = node.parent();
-    }
+    var node = that.element.find('.slick-editor .ng-invalid').first();
     if (node.length) {
-      that.grid.setActiveNode(node[0]);
-      that.grid.editActiveCell();
+      node.focus();
       e.preventDefault();
       showErrorNotice();
       return false;
@@ -1612,130 +1415,25 @@ Grid.prototype.onMenuCommand = function(event, args) {
   }
 };
 
-Grid.prototype.onBeforeEditCell = function(event, args) {
-  if (this.$oldValues === null) {
-    this.$oldValues = [];
-    var n = 0;
-    while (n < this.grid.getDataLength()) {
-      var item = this.grid.getDataItem(n++);
-      if (item && item.id) {
-        this.$oldValues.push(_.clone(item));
-      }
-    }
-  }
-  if (args.item && args.item._original === undefined) {
-    args.item._original = _.clone(args.item);
-  }
-};
+Grid.prototype.onKeyDown = function (e) {
+  var that = this;
+  var grid = this.grid;
+  var args = grid.getActiveCell();
 
-Grid.prototype.onKeyDown = function(e, args) {
-  var that = this,
-    grid = this.grid,
-    lock = grid.getEditorLock();
-
-  if (e.which === $.ui.keyCode.ENTER && $(e.target).is('textarea,[contenteditable]')) {
-    return;
-  }
-
-  if (e.isDefaultPrevented()){
-    e.stopImmediatePropagation();
-    return false;
-  }
-
-  if (!e.isBlocked && (blocked() || !lock.isActive())) {
-    return false;
-  }
-
-  function blockCallback(blocked) {
-    if (blocked && e.which === $.ui.keyCode.TAB) {
-      setTimeout(function(){
-        var cell = e.shiftKey ? that.findPrevEditable(args.row, args.cell)
-                    : that.findNextEditable(args.row, args.cell);
-        if (cell) {
-          grid.setActiveCell(cell.row, cell.cell);
-          grid.editActiveCell();
+  if (e.isDefaultPrevented()) return;
+  if (e.keyCode === 13) {
+    if (this.isEditActive() && e.ctrlKey) {
+      var promise = that.commitEdit();
+      promise.then(function () {
+        if (args.row === grid.getDataLength() - 1) {
+          that.addNewRow();
         }
+      }, function () {
+        that.focusInvalidCell(grid.getActiveCell());
       });
+    } else if (this.isCellEditable(args.row, args.cell)){
+      that.showEditor();
     }
-  }
-
-  function blocked() {
-    if (that.isDirty() && axelor.blockUI(blockCallback)) {
-      grid.focus();
-      e.stopImmediatePropagation();
-      return true;
-    }
-    return false;
-  }
-
-  function commitChanges() {
-    if (lock.commitCurrentEdit() && !blocked()) {
-      return true;
-    }
-    return false;
-  }
-
-  function focusCell(row, cell) {
-    grid.setActiveCell(row, cell);
-    // make sure cell has focus RM-3938
-    setTimeout(function () {
-      grid.editActiveCell();
-    });
-  }
-
-  // firefox & IE fails to trigger onChange
-  if ((axelor.browser.mozilla || axelor.browser.msie) &&
-      (e.which === $.ui.keyCode.TAB || e.which === $.ui.keyCode.ENTER)) {
-    var editor = grid.getCellEditor(),
-      target = $(e.target);
-    if (editor.isValueChanged()) {
-      target.change();
-    }
-    setTimeout(function(){
-      target.blur();
-    });
-  }
-  var handled = false;
-  if (e.which === $.ui.keyCode.TAB) {
-    var cell = e.shiftKey ? this.findPrevEditable(args.row, args.cell) :
-                this.findNextEditable(args.row, args.cell);
-
-    if (commitChanges() && cell && cell.row > args.row && this.isDirty()) {
-      args.item = null;
-      this.scope.waitForActions(function () {
-        that.scope.waitForActions(function () {
-          that.addNewRow(args);
-        });
-      });
-    } else if (cell) {
-      focusCell(cell.row, cell.cell);
-    }
-
-    handled = true;
-  }
-
-  if (e.which === $.ui.keyCode.ENTER) {
-    if (e.ctrlKey) {
-      if (!this.saveChanges(args)) {
-        this.focusInvalidCell(args);
-      }
-    } else {
-      if (!lock.commitCurrentEdit()) {
-        this.focusInvalidCell(args);
-      }
-      grid.focus();
-    }
-    grid.focus();
-    handled = true;
-  }
-
-  if (e.which === $.ui.keyCode.ESCAPE) {
-    grid.focus();
-  }
-
-  if (handled) {
-    e.stopImmediatePropagation();
-    return false;
   }
 };
 
@@ -1748,7 +1446,7 @@ Grid.prototype.isCellEditable = function(row, cell) {
   var field = col.descriptor || {};
   var form = this.editorForm;
 
-  if (field.type === 'button' || (field.name && field.name.indexOf('.') > -1)) {
+  if (field.type === 'button' || (!field.jsonField && field.name && field.name.indexOf('.') > -1)) {
     return false;
   }
   if (!form) {
@@ -1757,7 +1455,7 @@ Grid.prototype.isCellEditable = function(row, cell) {
 
   var current = this.grid.getActiveCell();
   if (current && current.row === row) {
-    var item = this.element.find('[x-field=' + field.name + ']:first');
+    var item = this.element.find('[x-field="' + field.name + '"]:first');
     if (item.length) {
       return !item.scope().isReadonly();
     }
@@ -1821,20 +1519,9 @@ Grid.prototype.saveChanges = function(args, callback) {
 
   var that = this;
   var grid = this.grid;
-  var lock = grid.getEditorLock();
-  var force = arguments[2];
-
-  if (!force &&
-      ((lock.isActive() && !lock.commitCurrentEdit()) ||
-       (this.editorScope && !this.editorScope.isValid()))) {
-    return false;
-  }
+  var params = arguments;
 
   this._saveChangesRunning = true;
-  if (this.editorScope) {
-    this.editorScope.$emit("on:before-save", this.editorScope.record);
-  }
-  var params = arguments;
   this.scope.waitForActions(function () {
     that.__saveChanges.apply(that, params);
     that._saveChangesRunning = false;
@@ -1843,7 +1530,7 @@ Grid.prototype.saveChanges = function(args, callback) {
   return true;
 };
 
-Grid.prototype.__saveChanges = function(args, callback) {
+Grid.prototype.__saveChanges = function(args, callback, errback) {
 
   var that = this;
   var grid = this.grid;
@@ -1905,8 +1592,9 @@ Grid.prototype.__saveChanges = function(args, callback) {
   }
 
   var fields = handler.selectFields ? handler.selectFields() : undefined;
+  var promise = saveDS.saveAll(records, fields);
 
-  return saveDS.saveAll(records, fields).success(function(records, page) {
+  promise.success(function(records, page) {
     if (data.getItemById(0)) {
       data.deleteItem(0);
     }
@@ -1915,6 +1603,12 @@ Grid.prototype.__saveChanges = function(args, callback) {
     }
     setTimeout(focus);
   });
+
+  if (errback) {
+    promise.error(errback);
+  };
+
+  return promise;
 };
 
 Grid.prototype.canSave = function() {
@@ -1970,7 +1664,6 @@ Grid.prototype.markDirty = function(row, field) {
   grid.render();
 
   this.__markHandlerDirty();
-  this.__beforeSavePending = true;
 };
 
 Grid.prototype.clearDirty = function(row) {
@@ -1992,7 +1685,8 @@ Grid.prototype.clearDirty = function(row) {
 };
 
 Grid.prototype.focusInvalidCell = function(args) {
-  var grid = this.grid,
+  var that = this,
+    grid = this.grid,
     formCtrl = this.editorForm.children('form').data('$formController'),
     error = formCtrl.$error || {};
 
@@ -2007,7 +1701,8 @@ Grid.prototype.focusInvalidCell = function(args) {
       var cell = grid.getColumnIndex(name);
       if (cell > -1) {
         grid.setActiveCell(args.row, cell);
-        grid.editActiveCell();
+        that.showEditor();
+        that.adjustEditor();
         return true;
       }
     }
@@ -2016,75 +1711,47 @@ Grid.prototype.focusInvalidCell = function(args) {
   return false;
 };
 
-Grid.prototype.addNewRow = function (args) {
-  var self = this,
-    scope = this.scope,
-    grid = this.grid,
-    dataView = scope.dataView,
-    lock = grid.getEditorLock();
+Grid.prototype.addNewRow = function () {
+  var that = this;
+  var scope = this.scope;
+  var grid = this.grid;
+  var data = scope.dataView;
+  var formScope = this.editorScope;
 
-  if (lock.isActive()) {
-    lock.commitCurrentEdit();
-  }
-
-  args.row = Math.max(0, args.row);
-  args.cell = Math.max(0, args.cell);
-
-  var cell = self.findNextEditable(args.row, 0);
-
-  function addRow(defaults) {
+  function doAddRow () {
     var args = { row: grid.getDataLength(), cell: 0 };
-    var item = _.extend({ id: 0 }, defaults);
+    var cell = that.findNextEditable(args.row, args.cell);
 
-    grid.invalidateRow(dataView.length);
-    dataView.addItem(item);
+    if (formScope.defaultValues === null) {
+      formScope.defaultValues = {};
+      _.each(formScope.fields, function (field, name) {
+        if (field.defaultValue !== undefined) {
+          formScope.defaultValues[name] = field.defaultValue;
+        }
+      });
+    }
 
-    self.scope.waitForActions(function () {
-      cell = self.findNextEditable(args.row, args.cell);
-      if (cell) {
-        grid.focus();
-        grid.setActiveCell(cell.row, cell.cell);
-        setTimeout(function () {
-          grid.editActiveCell();
-        }, 200);
-      }
-    }, 100);
-  }
+    var item = _.extend({ id: 0 }, formScope.defaultValues);
 
-  function focus() {
+    data.addItem(item);
+    grid.invalidateRow(data.length);
     grid.focus();
     grid.setActiveCell(cell.row, cell.cell);
+    that.showEditor();
 
-    if (grid.getDataLength() > cell.row) {
-      return grid.editActiveCell();
+    if (formScope.$events.onNew) {
+      formScope.$events.onNew();
     }
-    if (!self.canAdd()) {
-      return;
-    }
-
-    self.editorScope.doOnNew();
-    self.scope.waitForActions(function () {
-      self.scope.waitForActions(function () {
-        addRow(self.editorScope.record);
-      });
-    }, 100);
   }
 
-  if (args.item || grid.getDataLength() === 0) {
-    return focus();
-  }
-  var saved = self.saveChanges(args, function () {
-    cell.row += 1;
-    focus();
-  });
-  if (!saved) {
-    self.focusInvalidCell(args);
-  }
+  return this.isEditActive()
+    ? this.commitEdit().then(doAddRow)
+    : doAddRow();
 };
 
 Grid.prototype.canEdit = function () {
   var handler = this.handler || {};
-  if (!this.editable) return false;
+  if (!this.editable || this.readonly) return false;
   if (handler.canEdit && !handler.canEdit()) return false;
   if (handler.isReadonly && handler.isReadonly()) return false;
   return true;
@@ -2098,95 +1765,38 @@ Grid.prototype.canAdd = function () {
 };
 
 Grid.prototype.setEditors = function(form, formScope, forEdit) {
-  var grid = this.grid,
-    data = this.scope.dataView,
-    element = this.element;
+  var grid = this.grid;
+  var data = this.scope.dataView;
+  var that = this;
 
   this.editable = forEdit = forEdit === undefined ? true : forEdit;
 
-  grid.setOptions({
-    editable: !axelor.device.mobile,
-    asyncEditorLoading: false,
-    editorLock: new Slick.EditorLock()
-  });
-
-  form.prependTo(element).hide();
+  form.prependTo(grid.getCanvasNode()).hide();
   formScope.onChangeNotify = function(scope, values) {
-    var item, editor, cell = grid.getActiveCell();
-    if (!cell || formScope.record !== scope.record) {
+    var cell = grid.getActiveCell();
+    if (that.isEditActive() || !cell || formScope.record !== scope.record) {
       return;
     }
-    item = grid.getDataItem(cell.row);
+
+    var item = grid.getDataItem(cell.row);
     if (item) {
-      editor = grid.getCellEditor();
-      if (grid.getEditorLock().isActive()) {
-        grid.getEditorLock().commitCurrentEdit();
-      }
       item = _.extend(item, values);
 
       // update dotted fields
       _.filter(grid.getColumns(), function (col) {
         return col.field && col.field.indexOf('.') > -1;
-      }).forEach(function (col) {
-        var path = col.field.split('.');
-        var val = item || {};
-        var idx = 0;
-        while (val && idx < path.length) {
-          val = val[path[idx++]];
-        }
-        if (idx === path.length && val !== undefined) {
-          item[col.field] = val;
-        }
-      });
+      }).forEach(function (col) { nestedToDot(item, col.id); });
 
       grid.updateRowCount();
       grid.invalidateRow(cell.row);
       grid.render();
 
       grid.setActiveCell(cell.row, cell.cell);
-
-      if (editor) {
-        grid.focus();
-      }
     }
   };
 
   formScope.onNewHandler = function (event) {
 
-  };
-
-  formScope.doOnNew = function () {
-
-    if (formScope.defaultValues === null) {
-      formScope.defaultValues = {};
-      _.each(formScope.fields, function (field, name) {
-        if (field.defaultValue !== undefined) {
-          formScope.defaultValues[name] = field.defaultValue;
-        }
-      });
-    }
-
-    var values = angular.copy(formScope.defaultValues);
-    var args = grid.getActiveCell();
-
-    formScope.editRecord(values);
-    formScope.$applyAsync();
-
-    if (!formScope.$events.onNew) {
-      return;
-    }
-
-    var handler = formScope.$events.onNew;
-    var lock = grid.getEditorLock();
-    if (lock.isActive()) {
-      lock.commitCurrentEdit();
-    }
-
-    var promise = handler();
-    promise.then(function () {
-      grid.focus();
-      grid.editActiveCell();
-    });
   };
 
   // delegate isDirty to the dataView
@@ -2197,20 +1807,8 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
   var onNew = this.handler.onNew;
   if (onNew) {
     this.handler.onNew = function () {
-      var lock = that.grid.getEditorLock();
-
       if (that.editable) {
-        if (lock.isActive()) {
-          lock.commitCurrentEdit();
-        }
-
-        var cell = that.findNextEditable(that.grid.getDataLength() - 1, 0) || { row: that.grid.getDataLength(), cell: 0 };
-        that.grid.focus();
-        that.grid.setActiveCell(cell.row, cell.cell);
-        that.grid.editActiveCell();
-        return that.scope.$timeout(function () {
-          return that.addNewRow(cell);
-        });
+        return that.addNewRow();
       }
       return onNew.apply(that.handler, arguments);
     };
@@ -2220,9 +1818,315 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
     formScope.setEditable(false);
   }
 
+  this.subscribe(grid.onColumnsResized, function (e, args) {
+    that.adjustEditor();
+  });
+
   this.editorForm = form;
   this.editorScope = formScope;
   this.editorForEdit = forEdit;
+};
+
+Grid.prototype.isEditActive = function () {
+  return this.editorForm && this._editorVisible;
+};
+
+Grid.prototype.adjustEditor = function () {
+
+  if (!this.isEditActive()) return;
+
+  var form = this.editorForm;
+  var grid = this.grid;
+
+  form.find('.form-item-container').hide();
+
+  this._editorOverlay.fadeIn(300);
+
+  var activeCell = grid.getActiveCell();
+  var leftPadding = 0;
+  var left = true;
+
+  grid.getColumns().forEach(function (col, n) {
+    var box = grid.getCellNodeBox(activeCell.row, n);
+    var node = grid.getCellNode(activeCell.row, n);
+    var width = box.right - box.left;
+    var field = col.descriptor;
+    if (field && field.name) {
+      var widget = form.find("[x-field='" + field.name + "']");
+      widget.show().width(width - 1);
+      left = false;
+      setTimeout(function () {
+        if (activeCell.cell === n) {
+          widget.find('input,:focusable').first().focus().select();
+        }
+      }, 100)
+    } else if (left) {
+      leftPadding += width;
+    }
+  });
+
+  form.css('padding-left', leftPadding);
+}
+
+Grid.prototype.showEditor = function (activeCell) {
+
+  if (this.isEditActive() || !this.canEdit()) return;
+
+  var that = this;
+  var form = this.editorForm;
+  var formScope = this.editorScope;
+
+  var grid = this.grid;
+
+  if (this._editorPrepared === undefined) {
+    this._editorPrepared = true;
+    this._editorOverlay = this.element.find('.slickgrid-edit-overlay').keydown(function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    });
+
+    if (this._editorOverlay.size() === 0) {
+      this._editorOverlay = $("<div class='slickgrid-edit-overlay'>").hide().appendTo(this.element);
+    }
+
+    var editor = form.find('form:first');
+    var widgets = editor.find("td.form-item > .form-item-container");
+
+    form.addClass('slick-form');
+    editor.addClass('slick-editor');
+    editor.children().hide();
+    editor.append(widgets);
+
+    var confirm = $("<button class='btn btn-success'>").html(_t('Confirm'));
+    var cancel = $("<button class='btn btn-danger'>").html(_t('Cancel'));
+
+    function doCancel() {
+      that.cancelEdit();
+    }
+
+    function doCommit() {
+      var promise = that.commitEdit();
+      promise.then(angular.noop, function () {
+        that.focusInvalidCell(grid.getActiveCell());
+      });
+      return promise;
+    }
+
+    cancel.click(doCancel);
+    confirm.click(doCommit);
+    confirm.keydown(function (e) {
+      if (e.keyCode === 13) {
+        e.preventDefault();
+        doCommit().then(function () {
+          var args = grid.getActiveCell();
+          if (args.row === grid.getDataLength() - 1) {
+            that.addNewRow();
+          }
+        });
+      }
+    });
+    cancel.keydown(function (e) {
+      if (e.keyCode === 9 && !e.shiftKey) {
+        form.find('.form-item-container :input').first().focus().select();
+        e.stopPropagation();
+        e.preventDefault();
+        return false;
+      }
+    });
+    form.on('keydown', '.form-item-container :input:first', function (e) {
+      if (e.keyCode === 9 && e.shiftKey) {
+        cancel.focus();
+        e.stopPropagation();
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    var buttons = $("<div class='slick-form-buttons'>")
+      .append([confirm, cancel])
+      .appendTo($("<div class='slick-form-buttons-wrapper'>").appendTo(form));
+
+    var buttonsAdjusted = false;
+
+    function adjustButtons(e) {
+      if (buttonsAdjusted) return;
+      if (that.isEditActive()) {
+        buttonsAdjusted = true;
+        buttonsWrapper.show();
+        var elem = $(e.target).is('.form-item-container') ? $(e.target) : $(e.target).parents('.form-item-container');
+        buttons.position({
+          my: 'center top',
+          at: 'center bottom',
+          of: elem,
+          within: $(grid.getCanvasNode).parent(),
+          using: function (position) {
+            buttons.css('left', position.left);
+          }
+        });
+        setTimeout(function () {
+          buttonsAdjusted = false;
+        }, 100);
+      }
+    }
+
+    form.on('focus', '.form-item-container :input', function (e) {
+      var elem = $(e.target);
+      var elemScope = elem.scope();
+      if (elemScope && elemScope.field && elemScope.field.name) {
+        var args = grid.getActiveCell();
+        var cell = grid.getColumnIndex(elemScope.field.name);
+        if (cell >= 0) {
+          grid.setActiveCell(args.row, cell);
+          adjustButtons(e);
+        }
+      }
+    });
+
+    form.on('mouseover', '.form-item-container', adjustButtons);
+
+    this._editorOverlay.click(function (e) {
+      if (that._commitPromise) return;
+      var viewport = $(grid.getCanvasNode()).parent();
+      var top = viewport.position().top - viewport.scrollTop();
+      var args = grid.getCellFromPoint(e.offsetX, e.offsetY - top);
+      if (args.row > -1 && args.row < grid.getDataLength()) {
+        doCommit().then(function () { grid.onClick.notify(args, e, grid); });
+      }
+    });
+    
+    $(grid.getCanvasNode()).parent().scroll(function (e) {
+      if (that.isEditActive()) {
+        e.target.scrollTop = that._lastScrollTop;
+      }
+    });
+  }
+
+  this._lastScrollTop = $(grid.getCanvasNode()).parent().scrollTop();
+
+  var args = activeCell || grid.getActiveCell();
+
+  if (!this.isCellEditable(args.row, args.cell)) {
+    args = this.findNextEditable(args.row, 0);
+    grid.setActiveCell(args.row, args.cell);
+  }
+
+  var box = grid.getCellNodeBox(args.row, 0);
+  var node = grid.getCellNode(args.row, 0);
+  var viewPort = $(grid.getCanvasNode()).parent();
+  var buttonsWrapper = form.find('.slick-form-buttons-wrapper');
+
+  form.removeClass('slick-form-flip').show().css('visibility', 'hidden').css('display', '');
+  form.position({
+    my: 'left top',
+    at: 'left top',
+    of: node,
+    within: viewPort
+  }).css('left', 0);
+
+  form.toggleClass('slick-form-flip', box.bottom + 48 > (viewPort.height() + viewPort.scrollTop()));
+  setTimeout(function () {
+    form.css('visibility', '');
+  }, 100)
+
+  this._editorVisible = grid._editorVisible = true;
+  this.adjustEditor(args);
+
+  var item = grid.getDataItem(args.row) || {};
+  var record = _.extend({}, item, { version: item.version === undefined ? item.$version : item.version });
+
+  // convert dotted values
+  this.cols
+    .map(function (col) { return col.descriptor; })
+    .filter(function (field) { return field && field.name && field.name.indexOf('.') > -1; })
+    .forEach(function (field) { dotToNested(record, field); });
+
+  formScope.editRecord(record);
+};
+
+Grid.prototype.cancelEdit = function (focus) {
+  if (!this.isEditActive()) return;
+  this.editorForm.hide();
+  this.editorScope.edit(null);
+  this._editorOverlay.hide();
+  this._editorVisible = this.grid._editorVisible = false;
+  if (this.handler.dataView.getItemById(0)) {
+    this.handler.dataView.deleteItem(0);
+  }
+
+  if (focus === undefined || focus) {
+    var activeCell = this.grid.getActiveCell()
+      || this.findNextEditable(this.grid.getDataLength() - 1 , 0)
+      || { row: 0, cell: 0 };
+    this.grid.setActiveCell(activeCell.row, activeCell.cell);
+    this.grid.focus();
+  }
+};
+
+Grid.prototype.commitEdit = function () {
+
+  var that = this;
+  var defer = this.handler._defer();
+  var promise = defer.promise;
+
+  var cleanUp = function () {
+    that._commitPromise = null;
+  }
+
+  this._commitPromise = promise;
+  promise.then(cleanUp, cleanUp);
+
+  if (!this.isEditActive()) {
+    defer.resolve();
+    return promise;
+  }
+
+  var scope = this.editorScope;
+  var data = this.scope.dataView;
+
+  if (!scope || !scope.isValid()) {
+    defer.reject();
+    return promise;
+    return;
+  }
+
+  if (!scope.isDirty()) {
+    this.cancelEdit();
+    defer.resolve();
+    return promise;
+  }
+
+  scope.$emit("on:before-save", scope.record);
+
+  var row = this.grid.getActiveCell().row;
+  var item = data.getItemByIdx(row);
+
+  var record = _.extend({}, item, scope.record, { $dirty: true, _orignal: scope.$$original });
+
+  that.cols.forEach(function (col) {
+    if (col.descriptor && col.descriptor.jsonField) {
+      var json = record[col.descriptor.jsonField];
+      if (_.isObject(json)) {
+        record[col.descriptor.jsonField] = angular.toJson(record[col.descriptor.jsonField]);
+      }
+    }
+  });
+
+  data.updateItem(item.id, record);
+
+  var diff = scope._dataSource.diff(scope.$$original, scope.record);
+  that.cols.forEach(function (col) {
+    if (col.descriptor && diff[col.id] !== undefined) {
+      that.markDirty(row, col.id);
+    }
+  });
+
+  this.saveChanges(null, function () {
+    that.cancelEdit();
+    defer.resolve();
+  }, defer.reject);
+
+  return promise;
 };
 
 Grid.prototype.onSelectionChanged = function(event, args) {
@@ -2244,20 +2148,6 @@ Grid.prototype.onSelectionChanged = function(event, args) {
     .each(function () {
       $(this).addClass('selected');
     });
-};
-
-Grid.prototype.onCellChange = function(event, args) {
-  var grid = this.grid,
-    cols = grid.getColumns(),
-    name = cols[args.cell].field;
-
-  var es = this.editorScope;
-  if (es.record && es.record.version === undefined) {
-    es.record.version = es.record.$version;
-  }
-  if (es.isDirty()) {
-    this.markDirty(args.row, name);
-  }
 };
 
 Grid.prototype.onSort = function(event, args) {
@@ -2432,38 +2322,6 @@ Grid.prototype.onButtonClick = function(event, args) {
 
 Grid.prototype.onItemClick = function(event, args) {
 
-  var that = this;
-  var waitCallback = function (done) {
-    setTimeout(function () {
-      that.handler.waitForActions(function () {
-        that.__onItemClick(event, args);
-        if (done) {
-          done();
-        }
-      }, 100);
-    }, 100);
-  };
-
-  var lock = this.grid.getEditorLock();
-  if (lock.isActive()) {
-    lock.commitCurrentEdit();
-    if (this.editorScope &&
-      this.editorScope.$lastEditor &&
-      this.editorScope.$lastEditor.shouldWait()) {
-      return waitCallback;
-    }
-  }
-
-  // prevent edit if some action is still in progress
-  if (this.isDirty() && axelor.blockUI()) {
-    return waitCallback;
-  }
-
-  return this.__onItemClick(event, args);
-};
-
-Grid.prototype.__onItemClick = function(event, args) {
-
   // prevent edit if some action is still in progress
   if (this.isDirty() && axelor.blockUI()) {
     return;
@@ -2479,30 +2337,17 @@ Grid.prototype.__onItemClick = function(event, args) {
     return false;
   }
 
-  //XXX: hack to show popup grid (selector and editable in conflict?)
-  if (this.scope.selector && this.editable) {
-    var col = this.grid.getColumns()[args.cell] || {},
-      field = col.descriptor || {};
-    if (col.forEdit !== false &&
-        (field.type === 'one-to-many' || field.type === 'many-to-many' || this.scope.selector === 'checkbox')) {
-      this.grid.setActiveCell(args.row, args.cell);
-      this.grid.editActiveCell();
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      return false;
-    }
-  }
+  this.grid.setActiveCell(args.row, args.cell);
 
-  if (!this.scope.selector && this.canEdit()) {
-    return this.grid.setActiveCell();
-  }
-  if (this.handler.onItemClick) {
+  if (this.canEdit() && this.isCellEditable(args.row, args.cell)) {
+    this.showEditor(args);
+  } else if (this.handler.onItemClick) {
     this.handler.onItemClick(event, args);
   }
 };
 
 Grid.prototype.onItemDblClick = function(event, args) {
-
+  if (this.isEditActive()) return;
   if ($(event.srcElement || event.target).is('img.slick-img-button,i.slick-icon-button')) {
     return this.onButtonClick(event, args);
   }
@@ -2783,7 +2628,8 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         scope.selector = attrs.selector;
         scope.noFilter = attrs.noFilter;
 
-        if (axelor.config["view.grid.selection"] === "checkbox" && !scope.selector) {
+        if (!scope.selector && (axelor.config["view.grid.selection"] === undefined
+            || axelor.config["view.grid.selection"] === "checkbox")) {
           scope.selector = "checkbox";
         }
 
@@ -2810,10 +2656,6 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         if (canEdit) {
           formScope = scope.$new();
           form = makeForm(formScope, handler._model, schema.items, handler.fields, forEdit, schema.onNew);
-        }
-
-        if (forEdit) {
-          element.addClass('slickgrid-editable');
         }
 
         grid = new Grid(scope, element, attrs, ViewService, ActionService);

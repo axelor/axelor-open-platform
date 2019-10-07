@@ -441,7 +441,7 @@ function FormViewCtrl($scope, $element) {
   };
 
   $scope.isDirty = function() {
-    $scope.$$dirty = $scope.$$disableDirtyCheck ? false : $scope.$$dirtyGrids.length > 0 || !ds.equals($scope.record, $scope.$$original);
+    $scope.$$dirty = $scope.$$disableDirtyCheck ? false : !ds.equals($scope.record, $scope.$$original);
     return $scope.$$dirty;
   };
 

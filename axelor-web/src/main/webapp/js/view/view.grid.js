@@ -212,7 +212,7 @@ function GridViewCtrl($scope, $element) {
   };
 
   $scope.canEdit = function() {
-    return $scope.hasButton('edit') && $scope.selection.length > 0;
+    return $scope.hasButton('edit') && ($scope.selection.length > 0 || $scope.dataView.getItemById(0));
   };
 
   $scope.canShowDetailsView = function () {
@@ -993,7 +993,7 @@ ui.directive('uiPortletGrid', function(){
         editCol.descriptor = { hidden : true };
         $scope.$parent.$watch("isReadonly()", function (readonly) {
           if (inst.editable) {
-            grid.setOptions({ editable: readonly });
+            inst.readonly = readonly;
           }
           inst.showColumn('_edit_column', !readonly);
           editCol.descriptor = { hidden : readonly };

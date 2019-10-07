@@ -523,6 +523,16 @@ td.form-item > * {
   background: inherit !important;
 }
 
+.one2many-inline input,
+.many2many-inline input {
+  background: #fff !important;
+}
+
+.one2many-inline.readonly input,
+.many2many-inline.readonly input {
+  background: #eeeeee !important;
+}
+
 .ng-invalid > input,
 .ng-invalid > textarea,
 .ng-invalid > .picker-input input,
