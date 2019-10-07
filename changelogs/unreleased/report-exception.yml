@@ -1,0 +1,4 @@
+---
+title: Re-throw exception on Birt report generation exception
+type: fix
+
