@@ -127,7 +127,7 @@ public class ReportGenerator {
               try {
                 task.run();
               } catch (EngineException e) {
-                new RuntimeException(e);
+                throw new RuntimeException(e);
               } finally {
                 task.close();
               }
