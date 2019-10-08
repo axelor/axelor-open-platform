@@ -24,6 +24,7 @@ const postcss = require('broccoli-postcss');
 const presetenv = require('postcss-preset-env');
 const cssimport = require('postcss-import');
 const cssurl = require('postcss-url');
+const cssnano = require('cssnano');
 
 const concat = require('broccoli-concat');
 const merge = require('broccoli-merge-trees');
@@ -69,6 +70,12 @@ function minifyCss(name) {
           browsers: ['last 3 version', 'ie 11'],
         },
       },
+      {
+        module: cssnano,
+        options: {
+          preset: ['default', { "discardComments": { "removeAll": true } }]
+        }
+      }
     ],
   });
   return new Funnel(tree, {
