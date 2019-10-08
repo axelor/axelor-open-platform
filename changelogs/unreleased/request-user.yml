@@ -1,0 +1,3 @@
+---
+title: Add Request#getUser() method that returns current session user
+type: feature

@@ -17,6 +17,8 @@
  */
 package com.axelor.rpc;
 
+import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
@@ -81,6 +83,16 @@ public class Request {
     } catch (ClassNotFoundException e) {
     }
     return null;
+  }
+
+  /**
+   * Get the current session user.
+   *
+   * @return current session {@link User}
+   */
+  @JsonIgnore
+  public User getUser() {
+    return AuthUtils.getUser();
   }
 
   public int getLimit() {
