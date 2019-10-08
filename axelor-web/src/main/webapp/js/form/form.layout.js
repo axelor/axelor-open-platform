@@ -377,15 +377,22 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
       }
 
       var items = editor.items || [];
+      var hasColSpan = false;
       var widths = _.map(items, function (item) {
         applyAttrs(item);
+        if (item.colSpan) {
+          hasColSpan = true;
+        }
         var width = item.width || (item.widgetAttrs||{}).width;
         return width ? width : (item.widget === 'toggle' ? 24 : '*');
       });
 
-      var schema = {
+      var schema = hasColSpan ? {
+        cols: 12,
+        items: items
+      } : {
         cols: items.length,
-        colWidths: widths.join(','),
+        colWidths: widths,
         items: items
       };
 
