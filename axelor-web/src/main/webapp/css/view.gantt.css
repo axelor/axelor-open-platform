@@ -15,8 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+.gantt .view-container {
+  overflow: inherit;
+}
+
 .view-container .gantt-view > div:last-child {
   position: absolute;
+  overflow: auto;
   top: 46px;
   bottom: 0; left: 4px; right: 0;
 }
