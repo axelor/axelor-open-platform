@@ -695,6 +695,18 @@
   }
 }
 
+.panel.field-append > .panel-body > .panel-layout > .row-fluid {
+  display: flex;
+}
+.panel.field-append > .panel-body > .panel-layout > .row-fluid > .form-item[class*="span"] {
+  margin: 0;
+  width: auto;
+  float: inherit;
+}
+.panel.field-append > .panel-body > .panel-layout > .row-fluid > .form-item:first-child {
+  flex: 1;
+}
+
 .panel-flex {
   display: flex;
   flex-wrap: wrap;
