@@ -589,7 +589,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
           valid = !errors.valid;
         }
         if (scope.setValidity) {
-          scope.setValidity('valid', valid);
+          scope.setValidity('valid', valid, scope.record);
           element.toggleClass('nested-not-required', valid);
         } else {
           scope.$parent.form.$setValidity('valid', valid, scope.form);
