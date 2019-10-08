@@ -1084,7 +1084,11 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
       return scope.attr('canRemove') !== false;
     };
 
-    scope.setValidity = function (key, value) {
+    scope.setValidity = function (key, value, record) {
+      if (arguments.length === 3) {
+        record.$valid = value;
+        value = _.all(scope.items, function (x) { return x.$valid; });
+      }
       model.$setValidity(key, value);
     };
 
