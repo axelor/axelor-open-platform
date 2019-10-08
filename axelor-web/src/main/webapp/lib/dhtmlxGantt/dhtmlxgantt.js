@@ -7,5 +7,17684 @@
  * (c) Dinamenta, UAB.
  * 
  */
-!function(t){function e(n){if(i[n])return i[n].exports;var r=i[n]={i:n,l:!1,exports:{}};return t[n].call(r.exports,r,r.exports,e),r.l=!0,r.exports}var i={};e.m=t,e.c=i,e.d=function(t,i,n){e.o(t,i)||Object.defineProperty(t,i,{configurable:!1,enumerable:!0,get:n})},e.n=function(t){var i=t&&t.__esModule?function(){return t.default}:function(){return t};return e.d(i,"a",i),i},e.o=function(t,e){return Object.prototype.hasOwnProperty.call(t,e)},e.p="",e(e.s=20)}([function(t,e,i){function n(t){var e,i,r;if(t&&"object"==typeof t){for(r={},i=[Array,Number,String,Boolean],e=0;e<i.length;e++)t instanceof i[e]&&(r=e?new i[e](t):new i[e]);h.isDate(t)&&(r=new Date(t));for(e in t)Object.prototype.hasOwnProperty.apply(t,[e])&&(r[e]=n(t[e]))}return r||t}function r(t,e,i){for(var n in e)(void 0===t[n]||i)&&(t[n]=e[n]);return t}function a(t){return void 0!==t}function s(){return c||(c=(new Date).valueOf()),++c}function o(t,e){return t.bind?t.bind(e):function(){return t.apply(e,arguments)}}function l(t,e,i,n){t.addEventListener?t.addEventListener(e,i,void 0!==n&&n):t.attachEvent&&t.attachEvent("on"+e,i)}function d(t,e,i,n){t.removeEventListener?t.removeEventListener(e,i,void 0!==n&&n):t.detachEvent&&t.detachEvent("on"+e,i)}var c,h=i(3);t.exports={copy:n,defined:a,mixin:r,uid:s,bind:o,event:l,eventRemove:d}},function(t,e){function i(t){var e=0,i=0,n=0,r=0;if(t.getBoundingClientRect){var a=t.getBoundingClientRect(),s=document.body,o=document.documentElement||document.body.parentNode||document.body,l=window.pageYOffset||o.scrollTop||s.scrollTop,d=window.pageXOffset||o.scrollLeft||s.scrollLeft,c=o.clientTop||s.clientTop||0,h=o.clientLeft||s.clientLeft||0;e=a.top+l-c,i=a.left+d-h,n=document.body.offsetWidth-a.right,r=document.body.offsetHeight-a.bottom}else{for(;t;)e+=parseInt(t.offsetTop,10),i+=parseInt(t.offsetLeft,10),t=t.offsetParent;n=document.body.offsetWidth-t.offsetWidth-i,r=document.body.offsetHeight-t.offsetHeight-e}return{y:Math.round(e),x:Math.round(i),width:t.offsetWidth,height:t.offsetHeight,right:Math.round(n),bottom:Math.round(r)}}function n(t){var e=!1,i=!1;if(window.getComputedStyle){var n=window.getComputedStyle(t,null);e=n.display,i=n.visibility}else t.currentStyle&&(e=t.currentStyle.display,i=t.currentStyle.visibility);return"none"!=e&&"hidden"!=i}function r(t){return!isNaN(t.getAttribute("tabindex"))&&1*t.getAttribute("tabindex")>=0}function a(t){return!{a:!0,area:!0}[t.nodeName.loLowerCase()]||!!t.getAttribute("href")}function s(t){return!{input:!0,select:!0,textarea:!0,button:!0,object:!0}[t.nodeName.toLowerCase()]||!t.hasAttribute("disabled")}function o(t){for(var e=t.querySelectorAll(["a[href]","area[href]","input","select","textarea","button","iframe","object","embed","[tabindex]","[contenteditable]"].join(", ")),i=Array.prototype.slice.call(e,0),o=0;o<i.length;o++){var l=i[o];(r(l)||s(l)||a(l))&&n(l)||(i.splice(o,1),o--)}return i}function l(){var t=document.createElement("div");t.style.cssText="visibility:hidden;position:absolute;left:-1000px;width:100px;padding:0px;margin:0px;height:110px;min-height:100px;overflow-y:scroll;",document.body.appendChild(t);var e=t.offsetWidth-t.clientWidth;return document.body.removeChild(t),e}function d(t){if(!t)return"";var e=t.className||"";return e.baseVal&&(e=e.baseVal),e.indexOf||(e=""),m(e)}function c(t,e){e&&-1===t.className.indexOf(e)&&(t.className+=" "+e)}function h(t,e){e=e.split(" ");for(var i=0;i<e.length;i++){var n=new RegExp("\\s?\\b"+e[i]+"\\b(?![-_.])","");t.className=t.className.replace(n,"")}}function u(t){return"string"==typeof t?document.getElementById(t)||document.querySelector(t)||document.body:t||document.body}function _(t,e){$.innerHTML=e;var i=$.firstChild;return t.appendChild(i),i}function g(t){t&&t.parentNode&&t.parentNode.removeChild(t)}function f(t,e){for(var i=t.childNodes,n=i.length,r=[],a=0;a<n;a++){var s=i[a];s.className&&-1!==s.className.indexOf(e)&&r.push(s)}return r}function p(t){var e;return t.tagName?e=t:(t=t||window.event,e=t.target||t.srcElement),e}function v(t,e){if(e){for(var i=p(t);i;){if(i.getAttribute){if(i.getAttribute(e))return i}i=i.parentNode}return null}}function m(t){return(String.prototype.trim||function(){return this.replace(/^\s+|\s+$/g,"")}).apply(t)}function k(t,e,i){void 0===i&&(i=!0);for(var n=p(t),r="";n;){if(r=d(n)){var a=r.indexOf(e);if(a>=0){if(!i)return n;var s=0===a||!m(r.charAt(a-1)),o=a+e.length>=r.length||!m(r.charAt(a+e.length));if(s&&o)return n}}n=n.parentNode}return null}function y(t,e){if(t.pageX||t.pageY)var n={x:t.pageX,y:t.pageY};var r=document.documentElement,n={x:t.clientX+r.scrollLeft-r.clientLeft,y:t.clientY+r.scrollTop-r.clientTop},a=i(e);return n.x=n.x-a.x+e.scrollLeft,n.y=n.y-a.y+e.scrollTop,n}function b(t,e){for(;t&&t!=e;)t=t.parentNode;return t==e}var $=document.createElement("div");t.exports={getNodePosition:i,getFocusableNodes:o,getScrollSize:l,getClassName:d,addClassName:c,removeClassName:h,insertNode:_,removeNode:g,getChildNodes:f,toNode:u,locateClassName:k,locateAttribute:v,getTargetNode:p,getRelativeEventPosition:y,isChildOf:b}},function(t,e){function i(t){var e=new n;t.attachEvent=function(t,i,n){return t="ev_"+t.toLowerCase(),e[t]||(e[t]=r(n||this)),t+":"+e[t].addEvent(i)},t.attachAll=function(t,e){this.attachEvent("listen_all",t,e)},t.callEvent=function(t,i,n){if(e._silent_mode)return!0;var r="ev_"+t.toLowerCase();return e.ev_listen_all&&e.ev_listen_all.apply(n||this,[t].concat(i)),!e[r]||e[r].apply(n||this,i)},t.checkEvent=function(t){return!!e["ev_"+t.toLowerCase()]},t.detachEvent=function(t){if(t){var i=t.split(":");e[i[0]].removeEvent(i[1])}},t.detachAllEvents=function(){for(var t in e)0===t.indexOf("ev_")&&delete e[t]}}var n=function(){this._connected=[],this._silent_mode=!1};n.prototype={_silentStart:function(){this._silent_mode=!0},_silentEnd:function(){this._silent_mode=!1}};var r=function(t){var e=[],i=function(){for(var i=!0,n=0;n<e.length;n++)if(e[n]){var r=e[n].apply(t,arguments);i=i&&r}return i};return i.addEvent=function(t){return"function"==typeof t&&e.push(t)-1},i.removeEvent=function(t){e[t]=null},i};t.exports=i},function(t,e){function i(t){var e=["getFullYear","getMonth","getDate"];if(!t||"object"!=typeof t)return!1;for(var i=0;i<e.length;i++)if(!t[e[i]])return!1;return!0}t.exports={isDate:i}},function(t,e,i){var n=i(0),r=(i(10),i(2)),a=i(1),s=function(){"use strict";function t(t,e,i,s){t&&(this.$container=a.toNode(t),this.$parent=t),this.$config=n.mixin(e,{headerHeight:33}),this.$gantt=s,this.$domEvents=s._createDomEventScope(),this.$id=e.id||"c"+n.uid(),this.$name="cell",this.$factory=i,r(this)}return t.prototype.destructor=function(){this.$parent=this.$container=this.$view=null,this.$gantt.$services.getService("mouseEvents").detach("click","gantt_header_arrow",this._headerClickHandler),this.$domEvents.detachAll(),this.callEvent("onDestroy",[]),this.detachAllEvents()},t.prototype.cell=function(t){return null},t.prototype.scrollTo=function(t,e){1*t==t&&(this.$view.scrollLeft=t),1*e==e&&(this.$view.scrollTop=e)},t.prototype.clear=function(){this.getNode().innerHTML="",this.getNode().className="gantt_layout_content",this.getNode().style.padding="0"},t.prototype.resize=function(t){if(this.$parent)return this.$parent.resize(t);!1===t&&(this.$preResize=!0);var e=this.$container,i=e.offsetWidth,n=e.offsetHeight,r=this.getSize();e===document.body&&(i=document.body.offsetWidth,n=document.body.offsetHeight),i<r.minWidth&&(i=r.minWidth),i>r.maxWidth&&(i=r.maxWidth),n<r.minHeight&&(n=r.minHeight),n>r.maxHeight&&(n=r.maxHeight),this.setSize(i,n);this.$preResize,this.$preResize=!1},t.prototype.hide=function(){this._hide(!0),this.resize()},t.prototype.show=function(t){this._hide(!1),t&&this.$parent&&this.$parent.show(),this.resize()},t.prototype._hide=function(t){if(!0===t&&this.$view.parentNode)this.$view.parentNode.removeChild(this.$view);else if(!1===t&&!this.$view.parentNode){var e=this.$parent.cellIndex(this.$id);this.$parent.moveView(this,e)}this.$config.hidden=t},t.prototype.$toHTML=function(t,e){void 0===t&&(t=""),e=[e||"",this.$config.css||""].join(" ");var i=this.$config,n="";if(i.raw)t="string"==typeof i.raw?i.raw:"";else if(t||(t="<div class='gantt_layout_content' "+(e?" class='"+e+"' ":"")+" >"+(i.html||"")+"</div>"),i.header){var r=i.canCollapse?"<div class='gantt_layout_header_arrow'></div>":"";n="<div class='gantt_layout_header'>"+r+"<div class='gantt_layout_header_content'>"+i.header+"</div></div>"}return"<div class='gantt_layout_cell "+e+"' data-cell-id='"+this.$id+"'>"+n+t+"</div>"},t.prototype.$fill=function(t,e){this.$view=t,this.$parent=e,this.init()},t.prototype.getNode=function(){return this.$view.querySelector("gantt_layout_cell")||this.$view},t.prototype.init=function(){var t=this;this._headerClickHandler=function(e){a.locateAttribute(e,"data-cell-id")==t.$id&&t.toggle()},this.$gantt.$services.getService("mouseEvents").delegate("click","gantt_header_arrow",this._headerClickHandler),this.callEvent("onReady",[])},t.prototype.toggle=function(){this.$config.collapsed=!this.$config.collapsed,this.resize()},t.prototype.getSize=function(){var t={height:this.$config.height||0,width:this.$config.width||0,gravity:this.$config.gravity||1,minHeight:this.$config.minHeight||0,minWidth:this.$config.minWidth||0,maxHeight:this.$config.maxHeight||1e5,maxWidth:this.$config.maxWidth||1e5};if(this.$config.collapsed){var e="x"===this.$config.mode;t[e?"width":"height"]=t[e?"maxWidth":"maxHeight"]=this.$config.headerHeight}return t},t.prototype.getContentSize=function(){var t=this.$lastSize.contentX;t!==1*t&&(t=this.$lastSize.width);var e=this.$lastSize.contentY;return e!==1*e&&(e=this.$lastSize.height),{width:t,height:e}},t.prototype._getBorderSizes=function(){var t={top:0,right:0,bottom:0,left:0,horizontal:0,vertical:0};return this._currentBorders&&(this._currentBorders[this._borders.left]&&(t.left=1,t.horizontal++),this._currentBorders[this._borders.right]&&(t.right=1,t.horizontal++),this._currentBorders[this._borders.top]&&(t.top=1,t.vertical++),this._currentBorders[this._borders.bottom]&&(t.bottom=1,t.vertical++)),t},t.prototype.setSize=function(t,e){this.$view.style.width=t+"px",this.$view.style.height=e+"px";var i=this._getBorderSizes(),n=e-i.vertical,r=t-i.horizontal;this.$lastSize={x:t,y:e,contentX:r,contentY:n},this.$config.header?this._sizeHeader():this._sizeContent()},t.prototype._borders={left:"gantt_layout_cell_border_left",right:"gantt_layout_cell_border_right",top:"gantt_layout_cell_border_top",bottom:"gantt_layout_cell_border_bottom"},t.prototype._setBorders=function(t,e){e||(e=this);var i=e.$view;for(var n in this._borders)a.removeClassName(i,this._borders[n]);"string"==typeof t&&(t=[t]);for(var r={},n=0;n<t.length;n++)a.addClassName(i,t[n]),r[t[n]]=!0;e._currentBorders=r},t.prototype._sizeContent=function(){var t=this.$view.childNodes[0];"gantt_layout_content"==t.className&&(t.style.height=this.$lastSize.contentY+"px")},t.prototype._sizeHeader=function(){var t=this.$lastSize;t.contentY-=this.$config.headerHeight;var e=this.$view.childNodes[0],i=this.$view.childNodes[1],n="x"===this.$config.mode;if(this.$config.collapsed)if(i.style.display="none",n){e.className="gantt_layout_header collapsed_x",e.style.width=t.y+"px";var r=Math.floor(t.y/2-t.x/2);e.style.transform="rotate(90deg) translate("+r+"px, "+r+"px)",i.style.display="none"}else e.className="gantt_layout_header collapsed_y";else e.className=n?"gantt_layout_header":"gantt_layout_header vertical",e.style.width="auto",e.style.transform="",i.style.display="",i.style.height=t.contentY+"px";e.style.height=this.$config.headerHeight+"px"},t}();t.exports=s},function(t,e){t.exports=function(t,e){function i(){this.constructor=t}for(var n in e)e.hasOwnProperty(n)&&(t[n]=e[n]);t.prototype=null===e?Object.create(e):(i.prototype=e.prototype,new i)}},function(t,e){function i(t){return a[t]||t.hour}function n(t,e){for(var i=t.slice(),n=0;n<i.length;n++)e(i[n],n)}function r(t,e){for(var i=t.slice(),n=[],r=0;r<i.length;r++)n.push(e(i[r],r));return n}var a={second:1,minute:60,hour:3600,day:86400,week:604800,month:2592e3,quarter:7776e3,year:31536e3};t.exports={getSecondsInUnit:i,forEach:n,arrayMap:r}},function(t,e){var i={isIE:navigator.userAgent.indexOf("MSIE")>=0||navigator.userAgent.indexOf("Trident")>=0,isIE6:!window.XMLHttpRequest&&navigator.userAgent.indexOf("MSIE")>=0,isIE7:navigator.userAgent.indexOf("MSIE 7.0")>=0&&navigator.userAgent.indexOf("Trident")<0,isIE8:navigator.userAgent.indexOf("MSIE 8.0")>=0&&navigator.userAgent.indexOf("Trident")>=0,isOpera:navigator.userAgent.indexOf("Opera")>=0,isChrome:navigator.userAgent.indexOf("Chrome")>=0,isKHTML:navigator.userAgent.indexOf("Safari")>=0||navigator.userAgent.indexOf("Konqueror")>=0,isFF:navigator.userAgent.indexOf("Firefox")>=0,isIPad:navigator.userAgent.search(/iPad/gi)>=0,isEdge:-1!=navigator.userAgent.indexOf("Edge")};t.exports=i},function(t,e){function i(t){var e=[];return{delegate:function(i,n,r,a){e.push([i,n,r,a]),t.$services.getService("mouseEvents").delegate(i,n,r,a)},destructor:function(){for(var i=t.$services.getService("mouseEvents"),n=0;n<e.length;n++){var r=e[n];i.detach(r[0],r[1],r[2],r[3])}e=[]}}}t.exports=i},function(t,e){function i(t,e){if(!e)return!0;if(t._on_timeout)return!1;var i=Math.ceil(1e3/e);return i<2||(setTimeout(function(){delete t._on_timeout},i),t._on_timeout=!0,!0)}t.exports=i},function(t,e,i){function n(t,e){t=t||r.event,e=e||r.eventRemove;var i=[];return{attach:function(e,n,r,a){i.push({element:e,event:n,callback:r,capture:a}),t(e,n,r,a)},detach:function(t,n,r,a){e(t,n,r,a);for(var s=0;s<i.length;s++){var r=i[s];r.element===t&&r.event===n&&r.callback===r&&r.capture===a&&(i.splice(s,1),s--)}},detachAll:function(){for(var t=0;t<i.length;t++)e(i[t].element,i[t].event,i[t].callback,i[t].capture),e(i[t].element,i[t].event,i[t].callback,void 0),e(i[t].element,i[t].event,i[t].callback,!1),e(i[t].element,i[t].event,i[t].callback,!0);i=[]},extend:function(){return n(this.event,this.eventRemove)}}}var r=i(0);t.exports=n},function(t,e,i){var n=i(5),r=i(1),a=(i(0),i(4)),s=function(t){"use strict";function e(e,i,n){var r=t.apply(this,arguments)||this;return e&&(r.$root=!0),r._parseConfig(i),r.$name="layout",r}return n(e,t),e.prototype.destructor=function(){this.$container&&this.$view&&r.removeNode(this.$view);for(var e=0;e<this.$cells.length;e++){this.$cells[e].destructor()}this.$cells=[],t.prototype.destructor.call(this)},e.prototype._resizeScrollbars=function(t,e){function i(t){t.$parent.show(),a=!0,s.push(t)}function n(t){t.$parent.hide(),a=!0,o.push(t)}for(var r,a=!1,s=[],o=[],l=0;l<e.length;l++)r=e[l],t[r.$config.scroll]?n(r):r.shouldHide()?n(r):r.shouldShow()?i(r):r.isVisible()?s.push(r):o.push(r);for(var d={},l=0;l<s.length;l++)s[l].$config.group&&(d[s[l].$config.group]=!0);for(var l=0;l<o.length;l++)r=o[l],r.$config.group&&d[r.$config.group]&&i(r);return a},e.prototype._syncCellSizes=function(t,e){if(t){var i={};return this._eachChild(function(t){t.$config.group&&"scrollbar"!=t.$name&&"resizer"!=t.$name&&(i[t.$config.group]||(i[t.$config.group]=[]),i[t.$config.group].push(t))}),i[t]&&this._syncGroupSize(i[t],e),i[t]}},e.prototype._syncGroupSize=function(t,e){if(t.length)for(var i=t[0].$parent._xLayout?"width":"height",n=t[0].$parent.getNextSibling(t[0].$id)?1:-1,r=0;r<t.length;r++){var a=t[r].getSize(),s=n>0?t[r].$parent.getNextSibling(t[r].$id):t[r].$parent.getPrevSibling(t[r].$id);"resizer"==s.$name&&(s=n>0?s.$parent.getNextSibling(s.$id):s.$parent.getPrevSibling(s.$id));var o=s.getSize();if(s[i]){var l=a.gravity+o.gravity,d=a[i]+o[i],c=l/d;t[r].$config.gravity=c*e,s.$config[i]=d-e,s.$config.gravity=l-c*e}else t[r].$config[i]=e;var h=this.$gantt.$ui.getView("grid");h&&t[r].$content===h&&!h.$config.scrollable&&(this.$gantt.config.grid_width=e)}},e.prototype.resize=function(e){var i=!1;if(this.$root&&!this._resizeInProgress&&(this.callEvent("onBeforeResize",[]),i=!0,this._resizeInProgress=!0),t.prototype.resize.call(this,!0),t.prototype.resize.call(this,!1),i){var n=[];n=n.concat(this.getCellsByType("viewCell")),n=n.concat(this.getCellsByType("viewLayout")),n=n.concat(this.getCellsByType("hostCell"));for(var r=this.getCellsByType("scroller"),a=0;a<n.length;a++)n[a].$config.hidden||n[a].setContentSize();var s=this._getAutosizeMode(this.$config.autosize),o=this._resizeScrollbars(s,r);if(this.$config.autosize&&(this.autosize(this.$config.autosize),o=!0),o){this.resize();for(var a=0;a<n.length;a++)n[a].$config.hidden||n[a].setContentSize()}this.callEvent("onResize",[])}i&&(this._resizeInProgress=!1)},e.prototype._eachChild=function(t,e){if(e=e||this,t(e),e.$cells)for(var i=0;i<e.$cells.length;i++)this._eachChild(t,e.$cells[i])},e.prototype.getCellsByType=function(t){var i=[];if(t===this.$name&&i.push(this),this.$content&&this.$content.$name==t&&i.push(this.$content),this.$cells)for(var n=0;n<this.$cells.length;n++){var r=e.prototype.getCellsByType.call(this.$cells[n],t);r.length&&i.push.apply(i,r)}return i},e.prototype.getNextSibling=function(t){var e=this.cellIndex(t);return e>=0&&this.$cells[e+1]?this.$cells[e+1]:null},e.prototype.getPrevSibling=function(t){var e=this.cellIndex(t);return e>=0&&this.$cells[e-1]?this.$cells[e-1]:null},e.prototype.cell=function(t){for(var e=0;e<this.$cells.length;e++){var i=this.$cells[e];if(i.$id===t)return i;var n=i.cell(t);if(n)return n}},e.prototype.cellIndex=function(t){for(var e=0;e<this.$cells.length;e++)if(this.$cells[e].$id===t)return e;return-1},e.prototype.moveView=function(t,e){if(this.$cells[e]!==t)return window.alert("Not implemented");e+=this.$config.header?1:0;var i=this.$view;e>=i.childNodes.length?i.appendChild(t.$view):i.insertBefore(t.$view,i.childNodes[e])},e.prototype._parseConfig=function(t){this.$cells=[],this._xLayout=!t.rows;for(var e=t.rows||t.cols||t.views,i=0;i<e.length;i++){var n=e[i];n.mode=this._xLayout?"x":"y";var r=this.$factory.initUI(n,this);r?(r.$parent=this,this.$cells.push(r)):(e.splice(i,1),i--)}},e.prototype.getCells=function(){return this.$cells},e.prototype.render=function(){var t=r.insertNode(this.$container,this.$toHTML());this.$fill(t,null),this.callEvent("onReady",[]),this.resize(),this.render=this.resize},e.prototype.$fill=function(t,e){this.$view=t,this.$parent=e;for(var i=r.getChildNodes(t,"gantt_layout_cell"),n=i.length-1;n>=0;n--){var a=this.$cells[n];a.$fill(i[n],this),a.$config.hidden&&a.$view.parentNode.removeChild(a.$view)}},e.prototype.$toHTML=function(){for(var e=this._xLayout?"x":"y",i=[],n=0;n<this.$cells.length;n++)i.push(this.$cells[n].$toHTML());return t.prototype.$toHTML.call(this,i.join(""),(this.$root?"gantt_layout_root ":"")+"gantt_layout gantt_layout_"+e)},e.prototype.getContentSize=function(t){for(var e,i,n,r=0,a=0,s=0;s<this.$cells.length;s++)i=this.$cells[s],i.$config.hidden||(e=i.getContentSize(t),"scrollbar"===i.$config.view&&t[i.$config.scroll]&&(e.height=0,e.width=0),i.$config.resizer&&(this._xLayout?e.height=0:e.width=0),n=i._getBorderSizes(),this._xLayout?(r+=e.width+n.horizontal,a=Math.max(a,e.height+n.vertical)):(r=Math.max(r,e.width+n.horizontal),a+=e.height+n.vertical));return n=this._getBorderSizes(),r+=n.horizontal,a+=n.vertical,this.$root&&(r+=1,a+=1),{width:r,height:a}},e.prototype._cleanElSize=function(t){return 1*(t||"").toString().replace("px","")||0},e.prototype._getBoxStyles=function(t){var e=null;e=window.getComputedStyle?window.getComputedStyle(t,null):{width:t.clientWidth,height:t.clientHeight};var i=["width","height","paddingTop","paddingBottom","paddingLeft","paddingRight","borderLeftWidth","borderRightWidth","borderTopWidth","borderBottomWidth"],n={boxSizing:"border-box"==e.boxSizing};e.MozBoxSizing&&(n.boxSizing="border-box"==e.MozBoxSizing);for(var r=0;r<i.length;r++)n[i[r]]=e[i[r]]?this._cleanElSize(e[i[r]]):0;var a={horPaddings:n.paddingLeft+n.paddingRight+n.borderLeftWidth+n.borderRightWidth,vertPaddings:n.paddingTop+n.paddingBottom+n.borderTopWidth+n.borderBottomWidth,borderBox:n.boxSizing,innerWidth:n.width,innerHeight:n.height,outerWidth:n.width,outerHeight:n.height};return a.borderBox?(a.innerWidth-=a.horPaddings,a.innerHeight-=a.vertPaddings):(a.outerWidth+=a.horPaddings,a.outerHeight+=a.vertPaddings),a},e.prototype._getAutosizeMode=function(t){var e={x:!1,y:!1};return"xy"===t?e.x=e.y=!0:"y"===t||!0===t?e.y=!0:"x"===t&&(e.x=!0),e},e.prototype.autosize=function(t){var e=this._getAutosizeMode(t),i=this._getBoxStyles(this.$container),n=this.getContentSize(t),r=this.$container;e.x&&(i.borderBox&&(n.width+=i.horPaddings),r.style.width=n.width+"px"),e.y&&(i.borderBox&&(n.height+=i.vertPaddings),r.style.height=n.height+"px")},e.prototype.getSize=function(){this._sizes=[];for(var e=0,i=0,n=1e5,r=0,a=1e5,s=0,o=0;o<this.$cells.length;o++){var l=this._sizes[o]=this.$cells[o].getSize();this.$cells[o].$config.hidden||(this._xLayout?(!l.width&&l.minWidth?e+=l.minWidth:e+=l.width,n+=l.maxWidth,i+=l.minWidth,r=Math.max(r,l.height),a=Math.min(a,l.maxHeight),s=Math.max(s,l.minHeight)):(!l.height&&l.minHeight?r+=l.minHeight:r+=l.height,a+=l.maxHeight,s+=l.minHeight,e=Math.max(e,l.width),n=Math.min(n,l.maxWidth),i=Math.max(i,l.minWidth)))}var d=t.prototype.getSize.call(this);return d.maxWidth>=1e5&&(d.maxWidth=n),d.maxHeight>=1e5&&(d.maxHeight=a),d.minWidth=d.minWidth!==d.minWidth?0:d.minWidth,d.minHeight=d.minHeight!==d.minHeight?0:d.minHeight,this._xLayout?(d.minWidth+=this.$config.margin*this.$cells.length||0,d.minWidth+=2*this.$config.padding||0,d.minHeight+=2*this.$config.padding||0):(d.minHeight+=this.$config.margin*this.$cells.length||0,d.minHeight+=2*this.$config.padding||0),d},e.prototype._calcFreeSpace=function(t,e,i){var n=i?e.minWidth:e.minHeight,r=e.maxWidth,a=t;return a?(a>r&&(a=r),a<n&&(a=n),this._free-=a):(a=Math.floor(this._free/this._gravity*e.gravity),a>r&&(a=r,this._free-=a,this._gravity-=e.gravity),a<n&&(a=n,this._free-=a,this._gravity-=e.gravity)),a},e.prototype._calcSize=function(t,e,i){var n=t,r=i?e.minWidth:e.minHeight,a=i?e.maxWidth:e.maxHeight;return n||(n=Math.floor(this._free/this._gravity*e.gravity)),n>a&&(n=a),n<r&&(n=r),n},e.prototype._configureBorders=function(){this.$root&&this._setBorders([this._borders.left,this._borders.top,this._borders.right,this._borders.bottom],this);for(var t=this._xLayout?this._borders.right:this._borders.bottom,e=this.$cells,i=e.length-1,n=i;n>=0;n--)if(!e[n].$config.hidden){i=n;break}for(var n=0;n<e.length;n++)if(!e[n].$config.hidden){var r=n>=i,a="";!r&&e[n+1]&&"scrollbar"==e[n+1].$config.view&&(this._xLayout?r=!0:a="gantt_layout_cell_border_transparent"),this._setBorders(r?[]:[t,a],e[n])}},e.prototype._updateCellVisibility=function(){for(var t,e=this._visibleCells||{},i=!this._visibleCells,n={},r=0;r<this._sizes.length;r++)t=this.$cells[r],!i&&t.$config.hidden&&e[t.$id]?t._hide(!0):t.$config.hidden||e[t.$id]||t._hide(!1),t.$config.hidden||(n[t.$id]=!0);this._visibleCells=n},e.prototype.setSize=function(e,i){this._configureBorders(),t.prototype.setSize.call(this,e,i),i=this.$lastSize.contentY,e=this.$lastSize.contentX;var n=this.$config.padding||0;this.$view.style.padding=n+"px",this._gravity=0,this._free=this._xLayout?e:i,this._free-=2*n;var r,a;this._updateCellVisibility();for(var s=0;s<this._sizes.length;s++)if(r=this.$cells[s],!r.$config.hidden){var o=this.$config.margin||0;"resizer"!=r.$name||o||(o=-1);var l=r.$view,d=this._xLayout?"marginRight":"marginBottom";s!==this.$cells.length-1&&(l.style[d]=o+"px",this._free-=o),a=this._sizes[s],this._xLayout?a.width||(this._gravity+=a.gravity):a.height||(this._gravity+=a.gravity)}for(var s=0;s<this._sizes.length;s++)if(r=this.$cells[s],!r.$config.hidden){a=this._sizes[s];var c=a.width,h=a.height;this._xLayout?this._calcFreeSpace(c,a,!0):this._calcFreeSpace(h,a,!1)}for(var s=0;s<this.$cells.length;s++)if(r=this.$cells[s],!r.$config.hidden){a=this._sizes[s];var u=void 0,_=void 0;this._xLayout?(u=this._calcSize(a.width,a,!0),_=i-2*n):(u=e-2*n,_=this._calcSize(a.height,a,!1)),r.setSize(u,_)}},e}(a);t.exports=s},function(t,e,i){function n(t,e){for(var i,n,r,a=0,s=t.length-1;a<=s;)if(i=Math.floor((a+s)/2),n=+t[i],r=+t[i-1],n<e)a=i+1;else{if(!(n>e)){for(;+t[i]==+t[i+1];)i++;return i}if(!isNaN(r)&&r<e)return i-1;s=i-1}return t.length-1}var r=i(13),a=i(2),s=i(0),o=i(43),l=function(t,e,i,n){this.$config=s.mixin({},e||{}),this.$scaleHelper=new r(n),this.$gantt=n,a(this)};l.prototype={init:function(t){t.innerHTML+="<div class='gantt_task' style='width:inherit;height:inherit;'></div>",this.$task=t.childNodes[0],this.$task.innerHTML="<div class='gantt_task_scale'></div><div class='gantt_data_area'></div>",this.$task_scale=this.$task.childNodes[0],this.$task_data=this.$task.childNodes[1],this.$task_data.innerHTML="<div class='gantt_task_bg'></div><div class='gantt_links_area'></div><div class='gantt_bars_area'></div>",this.$task_bg=this.$task_data.childNodes[0],this.$task_links=this.$task_data.childNodes[1],this.$task_bars=this.$task_data.childNodes[2],this._tasks={col_width:0,width:[],full_width:0,trace_x:[],rendered:{}};var e=this.$getConfig(),i=e[this.$config.bind+"_attribute"],n=e[this.$config.bindLinks+"_attribute"];!i&&this.$config.bind&&(i=this.$config.bind+"_id"),!n&&this.$config.bindLinks&&(n=this.$config.bindLinks+"_id"),this.$config.item_attribute=i||null,this.$config.link_attribute=n||null;var r=this._createLayerConfig();this.$config.layers||(this.$config.layers=r.tasks),this.$config.linkLayers||(this.$config.linkLayers=r.links),this._attachLayers(this.$gantt),this.callEvent("onReady",[])},setSize:function(t,e){var i=this.$getConfig();if(1*t===t&&(this.$config.width=t),1*e===e){this.$config.height=e;var n=Math.max(this.$config.height-i.scale_height);this.$task_data.style.height=n+"px"}if(this.refresh(),this.$task_bg.style.backgroundImage="",i.smart_rendering&&this.$config.rowStore){var r=this.$config.rowStore;this.$task_bg.style.height=i.row_height*r.countVisible()+"px"}else this.$task_bg.style.height="";for(var a=this._tasks,s=this.$task_data.childNodes,o=0,l=s.length;o<l;o++){var d=s[o];d.hasAttribute("data-layer")&&d.style&&(d.style.width=a.full_width+"px")}},isVisible:function(){return this.$parent&&this.$parent.$config?!this.$parent.$config.hidden:this.$task.offsetWidth},getSize:function(){var t=this.$getConfig(),e=this.$config.rowStore,i=e?t.row_height*e.countVisible():0,n=this._tasks.full_width;return{x:this.$config.width,y:this.$config.height,contentX:this.isVisible()?n:0,contentY:this.isVisible()?t.scale_height+i:0,scrollHeight:this.isVisible()?i:0,scrollWidth:this.isVisible()?n:0}},scrollTo:function(t,e){this.isVisible()&&(1*e===e&&(this.$config.scrollTop=e,this.$task_data.scrollTop=this.$config.scrollTop),1*t===t&&(this.$task.scrollLeft=t,this.$config.scrollLeft=this.$task.scrollLeft,this._refreshScales()))},_refreshScales:function(){if(this.isVisible()){if(this.$getConfig().smart_scales){var t=this.$config.scrollLeft,e=this.$config.width,i=this._scales;this.$task_scale.innerHTML=this._getScaleChunkHtml(i,t,t+e)}}},_createLayerConfig:function(){var t=this,e=function(){return t.isVisible()};return{tasks:[{expose:!0,renderer:this.$gantt.$ui.layers.taskBar,container:this.$task_bars,filter:[e]},{renderer:this.$gantt.$ui.layers.taskBg,container:this.$task_bg,filter:[function(){return!t.$getConfig().static_background},e]}],links:[{expose:!0,renderer:this.$gantt.$ui.layers.link,container:this.$task_links,filter:[e]}]}},_attachLayers:function(t){this._taskLayers=[],this._linkLayers=[];var e=this,i=this.$gantt.$services.getService("layers");if(this.$config.bind){e.$config.rowStore=e.$gantt.getDatastore(e.$config.bind);var n=i.getDataRender(this.$config.bind);n||(n=i.createDataRender({name:this.$config.bind,defaultContainer:function(){return e.$task_data}})),n.container=function(){return e.$task_data};for(var r=this.$config.layers,a=0;r&&a<r.length;a++){var s=r[a];"string"==typeof s&&(s=this.$gantt.$ui.layers[s]),"function"==typeof s&&(s={renderer:s}),s.host=this;var o=n.addLayer(s);this._taskLayers.push(o),s.expose&&(this._taskRenderer=n.getLayer(o))}this._initStaticBackgroundRender()}if(this.$config.bindLinks){e.$config.linkStore=e.$gantt.getDatastore(e.$config.bindLinks);var l=i.getDataRender(this.$config.bindLinks);l||(l=i.createDataRender({name:this.$config.bindLinks,defaultContainer:function(){return e.$task_data}}));for(var d=this.$config.linkLayers,a=0;d&&a<d.length;a++){"string"==typeof s&&(s=this.$gantt.$ui.layers[s]);var s=d[a];s.host=this;var c=l.addLayer(s);this._taskLayers.push(c),d[a].expose&&(this._linkRenderer=l.getLayer(c))}}},_initStaticBackgroundRender:function(){var t=this,e=o.create(),i=t.$config.rowStore;i&&(this._staticBgHandler=i.attachEvent("onStoreUpdated",function(i,n,r){if(null===i&&t.isVisible()){var a=t.$getConfig();if(a.static_background){var s=t.$gantt.getDatastore(t.$config.bind);s&&e.render(t.$task_bg,a,t.getScale(),a.row_height*s.countVisible())}}}),this._initStaticBackgroundRender=function(){})},_clearLayers:function(t){for(var e=this.$gantt.$services.getService("layers"),i=e.getDataRender(this.$config.bind),n=e.getDataRender(this.$config.bindLinks),r=0;r<this._taskLayers.length;r++)i.removeLayer(this._taskLayers[r]);for(var r=0;r<this._linkLayers.length;r++)n.removeLayer(this._linkLayers[r]);this._linkLayers=[],this._taskLayers=[]},_render_tasks_scales:function(){var t=this.$getConfig(),e="",i=0,n=0,r=this.$gantt.getState();if(this.isVisible()){var a=this.$scaleHelper,s=this._getScales();n=t.scale_height;var o=this.$config.width;"x"!=t.autosize&&"xy"!=t.autosize||(o=Math.max(t.autosize_min_width,0));var l=a.prepareConfigs(s,t.min_column_width,o,n-1,r.min_date,r.max_date,t.rtl),d=this._tasks=l[l.length-1];this._scales=l,e=this._getScaleChunkHtml(l,0,this.$config.width),i=d.full_width+"px",n+="px"}this.$task_scale.style.height=n,this.$task_data.style.width=this.$task_scale.style.width=i,this.$task_scale.innerHTML=e},_getScaleChunkHtml:function(t,e,i){for(var n=this.$gantt.$services.templates(),r=[],a=n.scale_row_class,s=0;s<t.length;s++){var o="gantt_scale_line",l=a(t[s]);l&&(o+=" "+l),r.push('<div class="'+o+'" style="height:'+t[s].height+"px;position:relative;line-height:"+t[s].height+'px">'+this._prepareScaleHtml(t[s],e,i)+"</div>")}return r.join("")},_prepareScaleHtml:function(t,e,i){var r=this.$getConfig(),a=this.$gantt.$services.templates(),s=[],o=null,l=null,d=null;(t.template||t.date)&&(l=t.template||this.$gantt.date.date_to_str(t.date));var c=0,h=t.count;!r.smart_scales||isNaN(e)||isNaN(i)||(c=n(t.left,e),h=n(t.left,i)+1),d=t.css||function(){},!t.css&&r.inherit_scale_class&&(d=a.scale_cell_class);for(var u=c;u<h&&t.trace_x[u];u++){o=new Date(t.trace_x[u]);var _=l.call(this,o),g=t.width[u],f=t.height,p=t.left[u],v="",m="",k="";if(g){v="width:"+g+"px;height:"+f+"px;"+(r.smart_scales?"position:absolute;left:"+p+"px":""),k="gantt_scale_cell"+(u==t.count-1?" gantt_last_cell":""),m=d.call(this,o),m&&(k+=" "+m);var y=this.$gantt._waiAria.getTimelineCellAttr(_),b="<div class='"+k+"'"+y+" style='"+v+"'>"+_+"</div>";s.push(b)}}return s.join("")},dateFromPos:function(t){var e=this._tasks;if(t<0||t>e.full_width||!e.full_width)return null;var i=n(this._tasks.left,t),r=this._tasks.left[i],a=e.width[i]||e.col_width,s=0;a&&(s=(t-r)/a,e.rtl&&(s=1-s));var o=0;return s&&(o=this._getColumnDuration(e,e.trace_x[i])),new Date(e.trace_x[i].valueOf()+Math.round(s*o))},posFromDate:function(t){if(!this.isVisible())return 0;var e=this.columnIndexByDate(t);this.$gantt.assert(e>=0,"Invalid day index");var i=Math.floor(e),n=e%1,r=this._tasks.left[Math.min(i,this._tasks.width.length-1)];return i==this._tasks.width.length&&(r+=this._tasks.width[this._tasks.width.length-1]),n&&(i<this._tasks.width.length?r+=this._tasks.width[i]*(n%1):r+=1),Math.round(r)},columnIndexByDate:function(t){var e=new Date(t).valueOf(),i=this._tasks.trace_x_ascending,r=this._tasks.ignore_x,a=this.$gantt.getState();if(e<=a.min_date)return this._tasks.rtl?i.length:0;if(e>=a.max_date)return this._tasks.rtl?0:i.length;for(var s=n(i,e),o=+i[s];r[o];)o=i[++s];var l=this._tasks.trace_index_transition,d=s;if(!o)return l?l[0]:0;var c=(t-i[s])/this._getColumnDuration(this._tasks,i[s]);return l?l[d]+(1-c):d+c},getItemPosition:function(t,e,i){var n,r,a;return this._tasks.rtl?(r=this.posFromDate(e||t.start_date),n=this.posFromDate(i||t.end_date)):(n=this.posFromDate(e||t.start_date),r=this.posFromDate(i||t.end_date)),a=Math.max(r-n,0),{left:n,top:this.getItemTop(t.id),height:this.getItemHeight(),width:a}},getItemHeight:function(){var t=this.$getConfig(),e=t.task_height;if("full"==e){var i=t.task_height_offset||5;e=t.row_height-i}return e=Math.min(e,t.row_height),Math.max(e,0)},getRowTop:function(t){return t*this.$getConfig().row_height},getItemTop:function(t){if(this.$config.rowStore){var e=this.$config.rowStore;return e?e.getIndexById(t)*this.$getConfig().row_height:0}return 0},getScale:function(){return this._tasks},_getScales:function(){var t=this.$getConfig(),e=this.$scaleHelper,i=[e.primaryScale()].concat(t.subscales);return e.sortScales(i),i},_getColumnDuration:function(t,e){return this.$gantt.date.add(e,t.step,t.unit)-e},refresh:function(){this.$config.bind&&(this.$config.rowStore=this.$gantt.getDatastore(this.$config.bind)),this.$config.bindLinks&&(this.$config.linkStore=this.$gantt.getDatastore(this.$config.bindLinks)),this._initStaticBackgroundRender(),this._render_tasks_scales()},destructor:function(){var t=this.$gantt;this._clearLayers(t),this.$task=null,this.$task_scale=null,this.$task_data=null,this.$task_bg=null,this.$task_links=null,this.$task_bars=null,this.$gantt=null,this.$config.rowStore&&(this.$config.rowStore.detachEvent(this._staticBgHandler),this.$config.rowStore=null),this.$config.linkStore&&(this.$config.linkStore=null),this.callEvent("onDestroy",[]),this.detachAllEvents()}},t.exports=l},function(t,e,i){function n(t){var e=t.date,i=t.$services;return{getSum:function(t,e,i){void 0===i&&(i=t.length-1),void 0===e&&(e=0);for(var n=0,r=e;r<=i;r++)n+=t[r];return n},setSumWidth:function(t,e,i,n){var r=e.width;void 0===n&&(n=r.length-1),void 0===i&&(i=0);var a=n-i+1;if(!(i>r.length-1||a<=0||n>r.length-1)){var s=this.getSum(r,i,n),o=t-s;this.adjustSize(o,r,i,n),this.adjustSize(-o,r,n+1),e.full_width=this.getSum(r)}},splitSize:function(t,e){for(var i=[],n=0;n<e;n++)i[n]=0;return this.adjustSize(t,i),i},adjustSize:function(t,e,i,n){i||(i=0),void 0===n&&(n=e.length-1);for(var r=n-i+1,a=this.getSum(e,i,n),s=0,o=i;o<=n;o++){var l=Math.floor(t*(a?e[o]/a:1/r));a-=e[o],t-=l,r--,e[o]+=l,s+=l}e[e.length-1]+=t},sortScales:function(t){function i(t,i){var n=new Date(1970,0,1);return e.add(n,i,t)-n}t.sort(function(t,e){return i(t.unit,t.step)<i(e.unit,e.step)?1:i(t.unit,t.step)>i(e.unit,e.step)?-1:0});for(var n=0;n<t.length;n++)t[n].index=n},primaryScale:function(){return i.getService("templateLoader").initTemplate("date_scale",void 0,void 0,i.config(),i.templates()),{unit:i.config().scale_unit,step:i.config().step,template:i.templates().date_scale,date:i.config().date_scale,css:i.templates().scale_cell_class}},prepareConfigs:function(t,e,i,n,r,a,s){for(var o=this.splitSize(n,t.length),l=i,d=[],c=t.length-1;c>=0;c--){var h=c==t.length-1,u=this.initScaleConfig(t[c],r,a);h&&this.processIgnores(u),this.initColSizes(u,e,l,o[c]),this.limitVisibleRange(u),h&&(l=u.full_width),d.unshift(u)}for(var c=0;c<d.length-1;c++)this.alineScaleColumns(d[d.length-1],d[c]);for(var c=0;c<d.length;c++)s&&this.reverseScale(d[c]),this.setPosSettings(d[c]);return d},reverseScale:function(t){t.width=t.width.reverse(),t.trace_x=t.trace_x.reverse();var e=t.trace_indexes;t.trace_indexes={},t.trace_index_transition={},t.rtl=!0;for(var i=0;i<t.trace_x.length;i++)t.trace_indexes[t.trace_x[i].valueOf()]=i,t.trace_index_transition[e[t.trace_x[i].valueOf()]]=i;return t},setPosSettings:function(t){for(var e=0,i=t.trace_x.length;e<i;e++)t.left.push((t.width[e-1]||0)+(t.left[e-1]||0))},_ignore_time_config:function(t,n){if(i.config().skip_off_time){for(var r=!0,a=t,s=0;s<n.step;s++)s&&(a=e.add(t,s,n.unit)),r=r&&!this.isWorkTime(a,n.unit);return r}return!1},processIgnores:function(t){t.ignore_x={},t.display_count=t.count},initColSizes:function(t,i,n,r){var a=n;t.height=r;var s=void 0===t.display_count?t.count:t.display_count;s||(s=1),t.col_width=Math.floor(a/s),i&&t.col_width<i&&(t.col_width=i,a=t.col_width*s),t.width=[];for(var o=t.ignore_x||{},l=0;l<t.trace_x.length;l++)if(o[t.trace_x[l].valueOf()]||t.display_count==t.count)t.width[l]=0;else{var d=1;if("month"==t.unit){var c=Math.round((e.add(t.trace_x[l],t.step,t.unit)-t.trace_x[l])/864e5);d=c}t.width[l]=d}this.adjustSize(a-this.getSum(t.width),t.width),t.full_width=this.getSum(t.width)},initScaleConfig:function(t,e,i){var n=r.mixin({count:0,col_width:0,full_width:0,height:0,width:[],left:[],trace_x:[],trace_indexes:{},min_date:new Date(e),max_date:new Date(i)},t);return this.eachColumn(t.unit,t.step,e,i,function(t){n.count++,n.trace_x.push(new Date(t)),n.trace_indexes[t.valueOf()]=n.trace_x.length-1}),n.trace_x_ascending=n.trace_x.slice(),n},iterateScales:function(t,e,i,n,r){for(var a=e.trace_x,s=t.trace_x,o=i||0,l=n||s.length-1,d=0,c=1;c<a.length;c++){var h=t.trace_indexes[+a[c]];void 0!==h&&h<=l&&(r&&r.apply(this,[d,c,o,h]),o=h,d=c)}},alineScaleColumns:function(t,e,i,n){this.iterateScales(t,e,i,n,function(i,n,r,a){var s=this.getSum(t.width,r,a-1);this.getSum(e.width,i,n-1)!=s&&this.setSumWidth(s,e,i,n-1)})},eachColumn:function(i,n,r,a,s){var o=new Date(r),l=new Date(a);e[i+"_start"]&&(o=e[i+"_start"](o));var d=new Date(o);for(+d>=+l&&(l=e.add(d,n,i));+d<+l;){s.call(this,new Date(d));var c=d.getTimezoneOffset();d=e.add(d,n,i),d=t._correct_dst_change(d,c,n,i),e[i+"_start"]&&(d=e[i+"_start"](d))}},limitVisibleRange:function(t){var i=t.trace_x,n=t.width.length-1,r=0;if(+i[0]<+t.min_date&&0!=n){var a=Math.floor(t.width[0]*((i[1]-t.min_date)/(i[1]-i[0])));r+=t.width[0]-a,t.width[0]=a,i[0]=new Date(t.min_date)}var s=i.length-1,o=i[s],l=e.add(o,t.step,t.unit);if(+l>+t.max_date&&s>0){var a=t.width[s]-Math.floor(t.width[s]*((l-t.max_date)/(l-o)));r+=t.width[s]-a,t.width[s]=a}if(r){for(var d=this.getSum(t.width),c=0,h=0;h<t.width.length;h++){var u=Math.floor(r*(t.width[h]/d));t.width[h]+=u,c+=u}this.adjustSize(r-c,t.width)}}}}var r=i(0);t.exports=n},function(t,e,i){var n=i(1),r=i(0),a=i(2),s=i(44),o=function(t,e,i,n){this.$config=r.mixin({},e||{}),this.$gantt=n,this.$parent=t,a(this),this.$state={}};o.prototype={init:function(t){var e=this.$gantt,n=e._waiAria.gridAttrString(),r=e._waiAria.gridDataAttrString();t.innerHTML="<div class='gantt_grid' style='height:inherit;width:inherit;' "+n+"></div>",this.$grid=t.childNodes[0],this.$grid.innerHTML="<div class='gantt_grid_scale' "+e._waiAria.gridScaleRowAttrString()+"></div><div class='gantt_grid_data' "+r+"></div>",this.$grid_scale=this.$grid.childNodes[0],this.$grid_data=this.$grid.childNodes[1];var a=this.$getConfig()[this.$config.bind+"_attribute"];if(!a&&this.$config.bind&&(a=this.$config.bind+"_id"),this.$config.item_attribute=a||null,!this.$config.layers){var o=this._createLayerConfig();this.$config.layers=o}var l=s(e,this);l.init(),this._renderHeaderResizers=l.doOnRender,this._mouseDelegates=i(8)(e),this._addLayers(this.$gantt),this._initEvents(),this.callEvent("onReady",[])},setSize:function(t,e){this.$config.width=this.$state.width=t,this.$state.height=e;for(var i=this.getGridColumns(),n=0,r=0,a=i.length;r<a;r++)n+=1*i[r].width;var s;!isNaN(n)&&this.$config.scrollable||(s=this._setColumnsWidth(t+1),n=s),this.$config.scrollable?(this.$grid_scale.style.width=n+"px",this.$grid_data.style.width=n+"px"):(this.$grid_scale.style.width="inherit",this.$grid_data.style.width="inherit"),this.$config.width-=1;var o=this.$getConfig();s!==t&&(o.grid_width=s,this.$config.width=s-1);var l=Math.max(this.$state.height-o.scale_height,0);this.$grid_data.style.height=l+"px",this.refresh()},getSize:function(){var t=this.$getConfig(),e=this.$config.rowStore,i=e?t.row_height*e.countVisible():0,n=this._getGridWidth();return{x:this.$state.width,y:this.$state.height,contentX:this.isVisible()?n:0,contentY:this.isVisible()?t.scale_height+i:0,scrollHeight:this.isVisible()?i:0,scrollWidth:this.isVisible()?n:0}},refresh:function(){this.$config.bind&&(this.$config.rowStore=this.$gantt.getDatastore(this.$config.bind)),this._initSmartRenderingPlaceholder(),this._calculateGridWidth(),this._renderGridHeader()},scrollTo:function(t,e){this.isVisible()&&(1*t==t&&(this.$state.scrollLeft=this.$grid.scrollLeft=t),1*e==e&&(this.$state.scrollTop=this.$grid_data.scrollTop=e))},getGridColumns:function(){return this.$getConfig().columns.slice()},isVisible:function(){return this.$parent&&this.$parent.$config?!this.$parent.$config.hidden:this.$grid.offsetWidth},getItemTop:function(t){if(this.$config.rowStore){var e=this.$config.rowStore;return e?e.getIndexById(t)*this.$getConfig().row_height:0}return 0},_createLayerConfig:function(){var t=this;return[{renderer:this.$gantt.$ui.layers.gridLine,container:this.$grid_data,filter:[function(){return t.isVisible()}]}]},_addLayers:function(t){if(this.$config.bind){this._taskLayers=[];var e=this,i=this.$gantt.$services.getService("layers"),n=i.getDataRender(this.$config.bind);n||(n=i.createDataRender({name:this.$config.bind,defaultContainer:function(){return e.$grid_data}}));for(var r=this.$config.layers,a=0;r&&a<r.length;a++){var s=r[a];s.host=this;var o=n.addLayer(s);this._taskLayers.push(o)}this.$config.bind&&(this.$config.rowStore=this.$gantt.getDatastore(this.$config.bind)),this._initSmartRenderingPlaceholder()}},_initSmartRenderingPlaceholder:function(){var t=this,e=this.$config.rowStore;e&&(this._initSmartRenderingPlaceholder=function(){},this._staticBgHandler=e.attachEvent("onStoreUpdated",function(i,n,r){if(null===i&&t.isVisible()){var a=t.$getConfig();if(a.smart_rendering){var s=e?a.row_height*e.countVisible():0;if(s){t.$rowsPlaceholder&&t.$rowsPlaceholder.parentNode&&t.$rowsPlaceholder.parentNode.removeChild(t.$rowsPlaceholder);var o=t.$rowsPlaceholder=document.createElement("div");o.style.visibility="hidden",o.style.height=s+"px",o.style.width="1px",t.$grid_data.appendChild(o)}}}}))},_initEvents:function(){this._mouseDelegates.delegate("click","gantt_close",gantt.bind(function(t,e,i){var r=this.$config.rowStore;if(!r)return!0;var a=n.locateAttribute(t,this.$config.item_attribute);return a&&r.close(a.getAttribute(this.$config.item_attribute)),!1},this),this.$grid),this._mouseDelegates.delegate("click","gantt_open",gantt.bind(function(t,e,i){var r=this.$config.rowStore;if(!r)return!0;var a=n.locateAttribute(t,this.$config.item_attribute);return a&&r.open(a.getAttribute(this.$config.item_attribute)),!1},this),this.$grid)},_clearLayers:function(t){for(var e=this.$gantt.$services.getService("layers"),i=e.getDataRender(this.$config.bind),n=0;n<this._taskLayers.length;n++)i.removeLayer(this._taskLayers[n]);this._taskLayers=[]},_getColumnWidth:function(t,e,i){var n=t.min_width||e.min_grid_column_width,r=Math.max(i,n||10);return t.max_width&&(r=Math.min(r,t.max_width)),r},_getGridWidthLimits:function(){for(var t=this.$getConfig(),e=this.getGridColumns(),i=0,n=0,r=0;r<e.length;r++)i+=e[r].min_width?e[r].min_width:t.min_grid_column_width,void 0!==n&&(n=e[r].max_width?n+e[r].max_width:void 0);return[i,n]},_setColumnsWidth:function(t,e){var i=this.$getConfig(),n=this.getGridColumns(),r=0,a=t;e=window.isNaN(e)?-1:e;for(var s=0,o=n.length;s<o;s++)r+=1*n[s].width;if(window.isNaN(r)){this._calculateGridWidth(),r=0;for(var s=0,o=n.length;s<o;s++)r+=1*n[s].width}for(var l=a-r,d=0,s=0;s<e+1;s++)d+=n[s].width;r-=d;for(var s=e+1;s<n.length;s++){var c=n[s],h=Math.round(l*(c.width/r));l<0?c.min_width&&c.width+h<c.min_width?h=c.min_width-c.width:!c.min_width&&i.min_grid_column_width&&c.width+h<i.min_grid_column_width&&(h=i.min_grid_column_width-c.width):c.max_width&&c.width+h>c.max_width&&(h=c.max_width-c.width),r-=c.width,c.width+=h,l-=h}for(var u=l>0?1:-1;l>0&&1===u||l<0&&-1===u;){var _=l;for(s=e+1;s<n.length;s++){var g=n[s].width+u;if(g==this._getColumnWidth(n[s],i,g)&&(l-=u,n[s].width=g),!l)break}if(_==l)break}if(l&&e>-1){var g=n[e].width+l;g==this._getColumnWidth(n[e],i,g)&&(n[e].width=g)}return this._getColsTotalWidth()},_getColsTotalWidth:function(){for(var t=this.getGridColumns(),e=0,i=0;i<t.length;i++){var n=parseFloat(t[i].width);if(window.isNaN(n))return!1;e+=n}return e},_calculateGridWidth:function(){for(var t=this.$getConfig(),e=this.getGridColumns(),i=0,n=[],r=[],a=0;a<e.length;a++){var s=parseFloat(e[a].width);window.isNaN(s)&&(s=t.min_grid_column_width||10,n.push(a)),r[a]=s,i+=s}var o=this._getGridWidth()+1;if(t.autofit||n.length){var l=o-i;if(t.autofit)for(var a=0;a<r.length;a++){var d=Math.round(l/(r.length-a));r[a]+=d;var c=this._getColumnWidth(e[a],t,r[a]);c!=r[a]&&(d=c-r[a],r[a]=c),l-=d}else if(n.length)for(var a=0;a<n.length;a++){var d=Math.round(l/(n.length-a)),h=n[a];r[h]+=d;var c=this._getColumnWidth(e[h],t,r[h]);c!=r[h]&&(d=c-r[h],r[h]=c),l-=d}for(var a=0;a<r.length;a++)e[a].width=r[a]}else{var u=o!=i;this.$config.width=i-1,t.grid_width=i,u&&this.$parent._setContentSize(this.$config.width,this.$config.height)}},_renderGridHeader:function(){var t=this.$gantt,e=this.$getConfig(),i=this.$gantt.locale,n=this.$gantt.templates,r=this.getGridColumns();e.rtl&&(r=r.reverse());for(var a=[],s=0,o=i.labels,l=e.scale_height-1,d=0;d<r.length;d++){var c=d==r.length-1,h=r[d];h.name||(h.name=t.uid()+"");var u=1*h.width,_=this._getGridWidth();c&&_>s+u&&(h.width=u=_-s),s+=u;var g=t._sort&&h.name==t._sort.name?"<div class='gantt_sort gantt_"+t._sort.direction+"'></div>":"",f=["gantt_grid_head_cell","gantt_grid_head_"+h.name,c?"gantt_last_cell":"",n.grid_header_class(h.name,h)].join(" "),p="width:"+(u-(c?1:0))+"px;",v=h.label||o["column_"+h.name];v=v||"";var m=t._waiAria.gridScaleCellAttrString(h,v),k="<div class='"+f+"' style='"+p+"' "+m+" column_id='"+h.name+"'>"+v+g+"</div>";a.push(k)}this.$grid_scale.style.height=e.scale_height+"px",this.$grid_scale.style.lineHeight=l+"px",this.$grid_scale.innerHTML=a.join(""),this._renderHeaderResizers&&this._renderHeaderResizers()},_getGridWidth:function(){return this.$config.width},destructor:function(){this._clearLayers(this.$gantt),this._mouseDelegates.destructor(),this._mouseDelegates=null,this.$grid=null,this.$grid_scale=null,this.$grid_data=null,this.$gantt=null,this.$config.rowStore&&(this.$config.rowStore.detachEvent(this._staticBgHandler),this.$config.rowStore=null),this.callEvent("onDestroy",[]),this.detachAllEvents()}},t.exports=o},function(t,e,i){var n=i(16),r=i(0),a=i(2),s=function(t){return this.pull={},this.$initItem=t.initItem,this.visibleOrder=n.$create(),this.fullOrder=n.$create(),this._skip_refresh=!1,this._filterRule=null,this._searchVisibleOrder={},a(this),this};s.prototype={_parseInner:function(t){for(var e=null,i=[],n=0,r=t.length;n<r;n++)e=t[n],this.$initItem&&(e=this.$initItem(e)),this.callEvent("onItemLoading",[e])&&(this.pull.hasOwnProperty(e.id)||(this.fullOrder.push(e.id),i.push(e)),this.pull[e.id]=e);return i},parse:function(t){this.callEvent("onBeforeParse",[t]);var e=this._parseInner(t);this.refresh(),this.callEvent("onParse",[e])},getItem:function(t){return this.pull[t]},_updateOrder:function(t){t.call(this.visibleOrder),t.call(this.fullOrder)},updateItem:function(t,e){if(r.defined(e)||(e=this.getItem(t)),!this._skip_refresh&&!1===this.callEvent("onBeforeUpdate",[e.id,e]))return!1;this.pull[t]=e,this._skip_refresh||(this.callEvent("onAfterUpdate",[e.id,e]),this.callEvent("onStoreUpdated",[e.id,e,"update"]))},_removeItemInner:function(t){this._updateOrder(function(){this.$remove(t)}),delete this.pull[t]},removeItem:function(t){var e=this.getItem(t);if(!this._skip_refresh&&!1===this.callEvent("onBeforeDelete",[e.id,e]))return!1;this._removeItemInner(t),this._skip_refresh||(this.filter(),this.callEvent("onAfterDelete",[e.id,e]),this.callEvent("onStoreUpdated",[e.id,e,"delete"]))},_addItemInner:function(t,e){if(this.exists(t.id))this.silent(function(){this.updateItem(t.id,t)});else{var i=this.visibleOrder,n=i.length;(!r.defined(e)||e<0)&&(e=n),e>n&&(e=Math.min(i.length,e))}this.pull[t.id]=t,this._skip_refresh||this._updateOrder(function(){this.$insertAt(t.id,e)})},isVisible:function(t){return this.visibleOrder.$find(t)>-1},getVisibleItems:function(){return this.getIndexRange()},addItem:function(t,e){return r.defined(t.id)||(t.id=r.uid()),this.$initItem&&(t=this.$initItem(t)),!(!this._skip_refresh&&!1===this.callEvent("onBeforeAdd",[t.id,t]))&&(this._addItemInner(t,e),this._skip_refresh||(this.callEvent("onAfterAdd",[t.id,t]),this.callEvent("onStoreUpdated",[t.id,t,"add"])),t.id)},_changeIdInner:function(t,e){this.pull[t]&&(this.pull[e]=this.pull[t]),this.pull[e].id=e,this._updateOrder(function(){this[this.$find(t)]=e}),this._searchVisibleOrder[e]=this._searchVisibleOrder[t],delete this._searchVisibleOrder[t],delete this.pull[t]},changeId:function(t,e){this._changeIdInner(t,e),this.callEvent("onIdChange",[t,e])},exists:function(t){return!!this.pull[t]},_moveInner:function(t,e){var i=this.getIdByIndex(t);this._updateOrder(function(){this.$removeAt(t),this.$insertAt(i,Math.min(this.length,e))})},move:function(t,e){var i=this.getIdByIndex(t),n=this.getItem(i);this._moveInner(t,e),this._skip_refresh||this.callEvent("onStoreUpdated",[n.id,n,"move"])},clearAll:function(){this.pull={},this.visibleOrder=n.$create(),this.fullOrder=n.$create(),this._skip_refresh||(this.callEvent("onClearAll",[]),this.refresh())},silent:function(t,e){this._skip_refresh=!0,t.call(e||this),this._skip_refresh=!1},arraysEqual:function(t,e){if(t.length!==e.length)return!1;for(var i=0;i<t.length;i++)if(t[i]!==e[i])return!1;return!0},refresh:function(t,e){if(!this._skip_refresh){if(t){if(!e){var i=this.visibleOrder;this.filter(),this.arraysEqual(i,this.visibleOrder)||(t=void 0)}}else this.filter();t?this.callEvent("onStoreUpdated",[t,this.pull[t],"paint"]):this.callEvent("onStoreUpdated",[null,null,null])}},count:function(){return this.fullOrder.length},countVisible:function(){return this.visibleOrder.length},sort:function(t){},serialize:function(){},eachItem:function(t){for(var e=0;e<this.fullOrder.length;e++){var i=this.pull[this.fullOrder[e]];t.call(this,i)}},filter:function(t){var e=n.$create();this.eachItem(function(t){this.callEvent("onFilterItem",[t.id,t])&&e.push(t.id)}),this.visibleOrder=e,this._searchVisibleOrder={};for(var i=0;i<this.visibleOrder.length;i++)this._searchVisibleOrder[this.visibleOrder[i]]=i},getIndexRange:function(t,e){e=Math.min(e||1/0,this.countVisible()-1);for(var i=[],n=t||0;n<=e;n++)i.push(this.getItem(this.visibleOrder[n]));return i},getItems:function(){var t=[];for(var e in this.pull)t.push(this.pull[e]);return t},getIdByIndex:function(t){return this.visibleOrder[t]},getIndexById:function(t){var e=this._searchVisibleOrder[t];return void 0===e&&(e=-1),e},_getNullIfUndefined:function(t){return void 0===t?null:t},getFirst:function(){return this._getNullIfUndefined(this.visibleOrder[0])},getLast:function(){return this._getNullIfUndefined(this.visibleOrder[this.visibleOrder.length-1])},getNext:function(t){return this._getNullIfUndefined(this.visibleOrder[this.getIndexById(t)+1])},getPrev:function(t){return this._getNullIfUndefined(this.visibleOrder[this.getIndexById(t)-1])},destructor:function(){this.detachAllEvents(),this.pull=null,this.$initItem=null,this.visibleOrder=null,this.fullOrder=null,this._skip_refresh=null,this._filterRule=null,this._searchVisibleOrder=null}},t.exports=s},function(t,e,i){var n=i(0),r={$create:function(t){return n.mixin(t||[],this)},$removeAt:function(t,e){t>=0&&this.splice(t,e||1)},$remove:function(t){this.$removeAt(this.$find(t))},$insertAt:function(t,e){if(e||0===e){var i=this.splice(e,this.length-e);this[e]=t,this.push.apply(this,i)}else this.push(t)},$find:function(t){for(var e=0;e<this.length;e++)if(t==this[e])return e;return-1},$each:function(t,e){for(var i=0;i<this.length;i++)t.call(e||this,this[i])},$map:function(t,e){for(var i=0;i<this.length;i++)this[i]=t.call(e||this,this[i]);return this},$filter:function(t,e){for(var i=0;i<this.length;i++)t.call(e||this,this[i])||(this.splice(i,1),i--);return this}};t.exports=r},function(t,e,i){function n(t){return t.getSubtaskDates()}function r(){return{start_date:new Date,end_date:new Date}}function a(t,e){var i={start_date:null,end_date:null};if(e.config.start_date&&e.config.end_date){i.start_date=e.date[t+"_start"](new Date(e.config.start_date));var n=new Date(e.config.end_date),r=e.date[t+"_start"](new Date(n));n=+n!=+r?e.date.add(r,1,t):r,i.end_date=n}return i}function s(t){var e=t.config.scale_unit,i=t.config.step;if(t.config.scale_offset_minimal){var n=new d(t),r=[n.primaryScale()].concat(t.config.subscales);n.sortScales(r),e=r[r.length-1].unit,i=r[r.length-1].step||1}return{unit:e,step:i}}function o(t){var e=s(t),i=e.unit,o=e.step,l=a(i,t);l.start_date&&l.end_date||(l=n(t),l.start_date&&l.end_date||(l=r(t)),l.start_date=t.date[i+"_start"](l.start_date),l.start_date=t.calculateEndDate({start_date:t.date[i+"_start"](l.start_date),duration:-1,unit:i,step:o}),l.end_date=t.date[i+"_start"](l.end_date),l.end_date=t.calculateEndDate({start_date:l.end_date,duration:2,unit:i,step:o})),t._min_date=l.start_date,t._max_date=l.end_date}function l(t){if(t.config.fit_tasks){var e=+t._min_date,i=+t._max_date;if(+t._min_date!=e||+t._max_date!=i)return t.render(),t.callEvent("onScaleAdjusted",[]),!0}return!1}var d=i(13);t.exports=function(t){o(t),l(t)}},function(t,e){function i(t,e,i){for(var n=0;n<e.length;n++)t.isLinkExists(e[n])&&(i[e[n]]=t.getLink(e[n]))}function n(t,e,n){i(t,e.$source,n),i(t,e.$target,n)}function r(t,e){var i={};return t.isTaskExists(e)&&n(t,t.getTask(e),i),t.eachTask(function(e){n(t,e,i)},e),i}function a(t,e){var i={};return t.eachTask(function(t){i[t.id]=t},e),i}t.exports={getSubtreeLinks:r,getSubtreeTasks:a}},function(t,e,i){var n=i(0),r=i(3),a=function(t){return{getWorkHoursArguments:function(){var t=arguments[0];return t=r.isDate(t)?{date:t}:n.mixin({},t)},setWorkTimeArguments:function(){return arguments[0]},unsetWorkTimeArguments:function(){return arguments[0]},isWorkTimeArguments:function(){var e=arguments[0];return e.date?(e=n.mixin({},e),e.unit=e.unit||t.config.duration_unit,e.task=e.task||null,e.calendar=e.calendar||null):(e={},e.date=arguments[0],e.unit=arguments[1],e.task=arguments[2],e.calendar=arguments[3]),e.unit=e.unit||t.config.duration_unit,e},getClosestWorkTimeArguments:function(e){return e=arguments[0],e=r.isDate(e)?{date:e}:n.mixin({},e),e.dir=e.dir||"any",e.unit=e.unit||t.config.duration_unit,e},getDurationConfig:function(t,e,i,n){return this.start_date=t,this.end_date=e,this.task=i,this.calendar=n,this.unit=null,this.step=null,this},_getStartEndConfig:function(e){var i,n=this.getDurationConfig;return e instanceof n?e:(r.isDate(e)?i=new n(arguments[0],arguments[1],arguments[2],arguments[3]):(i=new n(e.start_date,e.end_date,e.task),e.id&&(i.task=e)),i.unit=i.unit||t.config.duration_unit,i.step=i.step||t.config.duration_step,i.start_date=i.start_date||i.start||i.date,i)},getDurationArguments:function(t,e,i,n){return this._getStartEndConfig.apply(this,arguments)},hasDurationArguments:function(t,e,i,n){return this._getStartEndConfig.apply(this,arguments)},calculateEndDateArguments:function(e,i,a,s){var o=arguments[0];return o=r.isDate(o)?{start_date:arguments[0],duration:arguments[1],unit:arguments[2],task:arguments[3],calendar:arguments[4]}:n.mixin({},o),o.unit=o.unit||t.config.duration_unit,o.step=o.step||t.config.duration_step,o}}};t.exports=a},function(t,e,i){t.exports=i(21)},function(t,e,i){window.gantt=i(22)(),i(103)(window.gantt)},function(t,e,i){function n(){this.version="5.1.0",this.templates={},this.keys={edit_save:13,edit_cancel:27}}t.exports=function(){var t=new n;i(23)(t),t.$services=t.$inject(i(24)),t.config=t.$inject(i(25)),t.ajax=i(26)(t),t.date=i(27)(t);var e=i(28)(t);t.$services.setService("dnd",function(){return e}),t.$services.setService("config",function(){return t.config}),t.$services.setService("date",function(){return t.date}),t.$services.setService("locale",function(){return t.locale}),t.$services.setService("templates",function(){return t.templates});var r=i(29)(t);t.$services.setService("templateLoader",function(){return r}),i(2)(t);var a=i(30),s=new a;s.registerProvider("global",function(){return{min_date:t._min_date,max_date:t._max_date,selected_task:t.$data.tasksStore.getSelectedId()}}),t.getState=s.getState,t.$services.setService("state",function(){return s});var o=i(0);o.mixin(t,o),t.env=i(7);var l=i(10)();t.event=l.attach,t.eventRemove=l.detach,t._eventRemoveAll=l.detachAll,t._createDomEventScope=l.extend,o.mixin(t,i(31)(t));var d=i(32).init(t);return t.$ui=d.factory,t.$ui.layers=d.render,t.$mouseEvents=d.mouseEvents,t.$services.setService("mouseEvents",function(){return t.$mouseEvents}),t.mixin(t,d.layersApi),i(55)(t),t.$services.setService("layers",function(){return d.layersService}),i(56)(t),i(63)(t),i(66)(t),i(73)(t),i(74)(t),i(75)(t),i(76)(t),i(77)(t),i(78)(t),i(85)(t),i(86)(t),i(87)(t),i(88)(t),i(89)(t),i(90)(t),i(91)(t),i(92)(t),i(93)(t),i(94)(t),i(95)(t),i(96)(t),i(97)(t),i(98)(t),i(99)(t),i(100)(t),i(102)(t),t}},function(t,e){t.exports=function(t){t.$inject=function(t){return t(this.$services)}}},function(t,e){t.exports=function(){function t(t,e){i[t]=e}function e(t){return i[t]?i[t]():null}var i={};return{services:{config:"config",templates:"templates",locale:"locale"},setService:t,getService:e,config:function(){return this.getService("config")},templates:function(){return this.getService("templates")},locale:function(){return this.getService("locale")},destructor:function(){for(var t in i)if(i[t]){var e=i[t];e&&e.destructor&&e.destructor()}i=null}}}},function(t,e){t.exports=function(){return{layout:{css:"gantt_container",rows:[{cols:[{view:"grid",scrollX:"scrollHor",scrollY:"scrollVer"},{resizer:!0,width:1},{view:"timeline",scrollX:"scrollHor",scrollY:"scrollVer"},{view:"scrollbar",id:"scrollVer"}]},{view:"scrollbar",id:"scrollHor",height:20}]},links:{finish_to_start:"0",start_to_start:"1",finish_to_finish:"2",start_to_finish:"3"},types:{task:"task",project:"project",milestone:"milestone"},duration_unit:"day",work_time:!1,correct_work_time:!1,skip_off_time:!1,cascade_delete:!0,autosize:!1,autosize_min_width:0,autoscroll:!0,autoscroll_speed:30,show_links:!0,show_task_cells:!0,static_background:!1,branch_loading:!1,branch_loading_property:"$has_child",show_loading:!1,show_chart:!0,show_grid:!0,min_duration:36e5,xml_date:"%d-%m-%Y %H:%i",api_date:"%d-%m-%Y %H:%i",start_on_monday:!0,server_utc:!1,show_progress:!0,fit_tasks:!1,select_task:!0,scroll_on_click:!0,preserve_scroll:!0,readonly:!1,date_grid:"%Y-%m-%d",drag_links:!0,drag_progress:!0,drag_resize:!0,drag_project:!1,drag_move:!0,drag_mode:{resize:"resize",progress:"progress",move:"move",ignore:"ignore"},round_dnd_dates:!0,link_wrapper_width:20,root_id:0,autofit:!1,columns:[{name:"text",tree:!0,width:"*",resize:!0},{name:"start_date",align:"center",resize:!0},{name:"duration",align:"center"},{name:"add",width:44}],step:1,scale_unit:"day",scale_offset_minimal:!0,subscales:[],inherit_scale_class:!1,time_step:60,duration_step:1,date_scale:"%d %M",task_date:"%d %F %Y",time_picker:"%H:%i",task_attribute:"task_id",link_attribute:"link_id",layer_attribute:"data-layer",buttons_left:["gantt_save_btn","gantt_cancel_btn"],_migrate_buttons:{dhx_save_btn:"gantt_save_btn",dhx_cancel_btn:"gantt_cancel_btn",dhx_delete_btn:"gantt_delete_btn"},buttons_right:["gantt_delete_btn"],lightbox:{sections:[{name:"description",height:70,map_to:"text",type:"textarea",focus:!0},{name:"time",type:"duration",map_to:"auto"}],project_sections:[{name:"description",height:70,map_to:"text",type:"textarea",focus:!0},{name:"type",type:"typeselect",map_to:"type"},{name:"time",type:"duration",readonly:!0,map_to:"auto"}],milestone_sections:[{name:"description",height:70,map_to:"text",type:"textarea",focus:!0},{name:"type",type:"typeselect",map_to:"type"},{name:"time",type:"duration",single_date:!0,map_to:"auto"}]},drag_lightbox:!0,sort:!1,details_on_create:!0,details_on_dblclick:!0,initial_scroll:!0,task_scroll_offset:100,order_branch:!1,order_branch_free:!1,task_height:"full",min_column_width:70,min_grid_column_width:70,grid_resizer_column_attribute:"column_index",grid_resizer_attribute:"grid_resizer",keep_grid_width:!1,grid_resize:!1,show_unscheduled:!0,readonly_property:"readonly",editable_property:"editable",calendar_property:"calendar_id",resource_calendars:{},type_renderers:{},open_tree_initially:!1,optimize_render:!0,prevent_default_scroll:!1,show_errors:!0,wai_aria_attributes:!0,smart_scales:!0,rtl:!1}}},function(t,e,i){var n=i(7);t.exports=function(t){return{cache:!0,method:"get",parse:function(t){if("string"!=typeof t)return t;var e;return t=t.replace(/^[\s]+/,""),window.DOMParser&&!n.isIE?e=(new window.DOMParser).parseFromString(t,"text/xml"):window.ActiveXObject!==window.undefined&&(e=new window.ActiveXObject("Microsoft.XMLDOM"),e.async="false",e.loadXML(t)),e},xmltop:function(e,i,n){if(void 0===i.status||i.status<400){var r=i.responseXML?i.responseXML||i:this.parse(i.responseText||i);if(r&&null!==r.documentElement&&!r.getElementsByTagName("parsererror").length)return r.getElementsByTagName(e)[0]}return-1!==n&&t.callEvent("onLoadXMLError",["Incorrect XML",arguments[1],n]),document.createElement("DIV")},xpath:function(t,e){if(e.nodeName||(e=e.responseXML||e),n.isIE)return e.selectNodes(t)||[];for(var i,r=[],a=(e.ownerDocument||e).evaluate(t,e,null,XPathResult.ANY_TYPE,null);;){if(!(i=a.iterateNext()))break;r.push(i)}return r},query:function(t){this._call(t.method||"GET",t.url,t.data||"",t.async||!0,t.callback,null,t.headers)},get:function(t,e){this._call("GET",t,null,!0,e)},getSync:function(t){return this._call("GET",t,null,!1)},put:function(t,e,i){this._call("PUT",t,e,!0,i)},del:function(t,e,i){this._call("DELETE",t,e,!0,i)},post:function(t,e,i){1==arguments.length?e="":2!=arguments.length||"function"!=typeof e&&"function"!=typeof window[e]?e=String(e):(i=e,e=""),this._call("POST",t,e,!0,i)},postSync:function(t,e){return e=null===e?"":String(e),this._call("POST",t,e,!1)},getLong:function(t,e){this._call("GET",t,null,!0,e,{url:t})},postLong:function(t,e,i){2!=arguments.length||"function"!=typeof e&&(window[e],0)||(i=e,e=""),this._call("POST",t,e,!0,i,{url:t,postData:e})},_call:function(e,i,r,a,s,o,l){var d=window.XMLHttpRequest&&!n.isIE?new XMLHttpRequest:new ActiveXObject("Microsoft.XMLHTTP"),c=null!==navigator.userAgent.match(/AppleWebKit/)&&null!==navigator.userAgent.match(/Qt/)&&null!==navigator.userAgent.match(/Safari/);if(a&&(d.onreadystatechange=function(){if(4==d.readyState||c&&3==d.readyState){if((200!=d.status||""===d.responseText)&&!t.callEvent("onAjaxError",[d]))return;window.setTimeout(function(){"function"==typeof s&&s.apply(window,[{xmlDoc:d,filePath:i}]),o&&(void 0!==o.postData?this.postLong(o.url,o.postData,s):this.getLong(o.url,s)),s=null,d=null},1)}}),"GET"!=e||this.cache||(i+=(i.indexOf("?")>=0?"&":"?")+"dhxr"+(new Date).getTime()+"=1"),d.open(e,i,a),l)for(var h in l)d.setRequestHeader(h,l[h]);else"POST"==e.toUpperCase()||"PUT"==e||"DELETE"==e?d.setRequestHeader("Content-Type","application/x-www-form-urlencoded"):"GET"==e&&(r=null);if(d.setRequestHeader("X-Requested-With","XMLHttpRequest"),d.send(r),!a)return{xmlDoc:d,filePath:i}},urlSeparator:function(t){return-1!=t.indexOf("?")?"&":"?"}}}},function(t,e){t.exports=function(t){var e={init:function(){for(var e=t.locale,i=e.date.month_short,n=e.date.month_short_hash={},r=0;r<i.length;r++)n[i[r]]=r;for(var i=e.date.month_full,n=e.date.month_full_hash={},r=0;r<i.length;r++)n[i[r]]=r},date_part:function(t){var e=new Date(t);return t.setHours(0),this.hour_start(t),t.getHours()&&(t.getDate()<e.getDate()||t.getMonth()<e.getMonth()||t.getFullYear()<e.getFullYear())&&t.setTime(t.getTime()+36e5*(24-t.getHours())),t},time_part:function(t){return(t.valueOf()/1e3-60*t.getTimezoneOffset())%86400},week_start:function(e){var i=e.getDay();return t.config.start_on_monday&&(0===i?i=6:i--),this.date_part(this.add(e,-1*i,"day"))},month_start:function(t){return t.setDate(1),this.date_part(t)},quarter_start:function(t){this.month_start(t);var e,i=t.getMonth();return e=i>=9?9:i>=6?6:i>=3?3:0,t.setMonth(e),t},year_start:function(t){return t.setMonth(0),this.month_start(t)},day_start:function(t){return this.date_part(t)},hour_start:function(t){return t.getMinutes()&&t.setMinutes(0),this.minute_start(t),t},minute_start:function(t){return t.getSeconds()&&t.setSeconds(0),t.getMilliseconds()&&t.setMilliseconds(0),t},_add_days:function(t,e){var i=new Date(t.valueOf());return i.setDate(i.getDate()+e),e>=0&&!t.getHours()&&i.getHours()&&(i.getDate()<=t.getDate()||i.getMonth()<t.getMonth()||i.getFullYear()<t.getFullYear())&&i.setTime(i.getTime()+36e5*(24-i.getHours())),i},add:function(t,e,i){var n=new Date(t.valueOf());switch(i){case"day":n=this._add_days(n,e);break;case"week":n=this._add_days(n,7*e);break;case"month":n.setMonth(n.getMonth()+e);break;case"year":n.setYear(n.getFullYear()+e);break;case"hour":n.setTime(n.getTime()+60*e*60*1e3);break;case"minute":n.setTime(n.getTime()+60*e*1e3);break;default:return this["add_"+i](t,e,i)}return n},add_quarter:function(t,e){return this.add(t,3*e,"month")},to_fixed:function(t){return t<10?"0"+t:t},copy:function(t){return new Date(t.valueOf())},date_to_str:function(i,n){i=i.replace(/%[a-zA-Z]/g,function(t){switch(t){case"%d":return'"+to_fixed(date.getDate())+"';case"%m":return'"+to_fixed((date.getMonth()+1))+"';case"%j":return'"+date.getDate()+"';case"%n":return'"+(date.getMonth()+1)+"';case"%y":return'"+to_fixed(date.getFullYear()%100)+"';case"%Y":return'"+date.getFullYear()+"';case"%D":return'"+locale.date.day_short[date.getDay()]+"';case"%l":return'"+locale.date.day_full[date.getDay()]+"';case"%M":return'"+locale.date.month_short[date.getMonth()]+"';case"%F":return'"+locale.date.month_full[date.getMonth()]+"';case"%h":return'"+to_fixed((date.getHours()+11)%12+1)+"';case"%g":return'"+((date.getHours()+11)%12+1)+"';case"%G":return'"+date.getHours()+"';case"%H":return'"+to_fixed(date.getHours())+"';case"%i":return'"+to_fixed(date.getMinutes())+"';case"%a":return'"+(date.getHours()>11?"pm":"am")+"';case"%A":return'"+(date.getHours()>11?"PM":"AM")+"';case"%s":return'"+to_fixed(date.getSeconds())+"';case"%W":return'"+to_fixed(getISOWeek(date))+"';default:return t}}),n&&(i=i.replace(/date\.get/g,"date.getUTC"));var r=new Function("date","to_fixed","locale","getISOWeek",'return "'+i+'";');return function(i){return r(i,e.to_fixed,t.locale,e.getISOWeek)}},str_to_date:function(e,i){for(var n="var temp=date.match(/[a-zA-Z]+|[0-9]+/g);",r=e.match(/%[a-zA-Z]/g),a=0;a<r.length;a++)switch(r[a]){case"%j":case"%d":n+="set[2]=temp["+a+"]||1;";break;case"%n":case"%m":n+="set[1]=(temp["+a+"]||1)-1;";break;case"%y":n+="set[0]=temp["+a+"]*1+(temp["+a+"]>50?1900:2000);";break;case"%g":case"%G":case"%h":case"%H":n+="set[3]=temp["+a+"]||0;";break;case"%i":n+="set[4]=temp["+a+"]||0;";break;case"%Y":n+="set[0]=temp["+a+"]||0;";break;case"%a":case"%A":n+="set[3]=set[3]%12+((temp["+a+"]||'').toLowerCase()=='am'?0:12);";break;case"%s":n+="set[5]=temp["+a+"]||0;";break;case"%M":n+="set[1]=locale.date.month_short_hash[temp["+a+"]]||0;";break;case"%F":n+="set[1]=locale.date.month_full_hash[temp["+a+"]]||0;"}var s="set[0],set[1],set[2],set[3],set[4],set[5]";i&&(s=" Date.UTC("+s+")");var o=new Function("date","locale","var set=[0,0,1,0,0,0]; "+n+" return new Date("+s+");");return function(e){return o(e,t.locale)}},getISOWeek:function(t){if(!t)return!1;var e=t.getDay();0===e&&(e=7);var i=new Date(t.valueOf());i.setDate(t.getDate()+(4-e));var n=i.getFullYear(),r=Math.round((i.getTime()-new Date(n,0,1).getTime())/864e5);return 1+Math.floor(r/7)},getUTCISOWeek:function(t){return this.getISOWeek(t)},convert_to_utc:function(t){return new Date(t.getUTCFullYear(),t.getUTCMonth(),t.getUTCDate(),t.getUTCHours(),t.getUTCMinutes(),t.getUTCSeconds())},parseDate:function(e,i){return e&&!e.getFullYear&&(t.defined(i)&&(i="string"==typeof i?t.defined(t.templates[i])?t.templates[i]:t.date.str_to_date(i):t.templates.xml_date),e=e?i(e):null),e}};return e}},function(t,e,i){var n=i(2),r=i(0),a=i(9);t.exports=function(t){function e(t){return{target:t.target||t.srcElement,pageX:t.pageX,pageY:t.pageY,clientX:t.clientX,clientY:t.clientY,metaKey:t.metaKey,shiftKey:t.shiftKey,ctrlKey:t.ctrlKey,altKey:t.altKey}}function i(i,a){this._obj=i,this._settings=a||{},n(this);var s=this.getInputMethods();this._drag_start_timer=null,t.attachEvent("onGanttScroll",r.bind(function(t,e){this.clearDragTimer()},this));for(var o=0;o<s.length;o++)r.bind(function(n){t.event(i,n.down,r.bind(function(a){n.accessor(a)&&(this._settings.original_target=e(a),t.config.touch?(this.clearDragTimer(),this._drag_start_timer=setTimeout(r.bind(function(){this.dragStart(i,a,n)},this),t.config.touch_drag)):this.dragStart(i,a,n))},this)),t.event(document.body,n.up,r.bind(function(t){n.accessor(t)&&this.clearDragTimer()},this))},this)(s[o])}return i.prototype={traceDragEvents:function(e,i){var n=r.bind(function(t){return this.dragMove(e,t,i.accessor)},this),s=(r.bind(function(t){return this.dragScroll(e,t)},this),r.bind(function(t){return t&&t.preventDefault&&t.preventDefault(),(t||event).cancelBubble=!0,!(!r.defined(this.config.updates_per_second)||a(this,this.config.updates_per_second))||n(t)},this)),o=r.bind(function(n){return t.eventRemove(document.body,i.move,s),t.eventRemove(document.body,i.up,o),this.dragEnd(e)},this);t.event(document.body,i.move,s),t.event(document.body,i.up,o)},checkPositionChange:function(t){var e=t.x-this.config.pos.x,i=t.y-this.config.pos.y;return Math.sqrt(Math.pow(Math.abs(e),2)+Math.pow(Math.abs(i),2))>this.config.sensitivity},initDnDMarker:function(){var t=this.config.marker=document.createElement("div");t.className="gantt_drag_marker",t.innerHTML="Dragging object",document.body.appendChild(t)},backupEventTarget:function(i,n){if(t.config.touch){var r=n(i),a=r.target||r.srcElement,s=a.cloneNode(!0);this.config.original_target=e(r),this.config.original_target.target=s,this.config.backup_element=a,a.parentNode.appendChild(s),a.style.display="none",document.body.appendChild(a)}},getInputMethods:function(){var e=[];if(e.push({move:"mousemove",down:"mousedown",up:"mouseup",accessor:function(t){return t}}),t.config.touch){var i=!0;try{document.createEvent("TouchEvent")}catch(t){i=!1}i?e.push({move:"touchmove",down:"touchstart",up:"touchend",accessor:function(t){return t.touches&&t.touches.length>1?null:t.touches[0]?{target:document.elementFromPoint(t.touches[0].clientX,t.touches[0].clientY),pageX:t.touches[0].pageX,pageY:t.touches[0].pageY,clientX:t.touches[0].clientX,clientY:t.touches[0].clientY}:t}}):window.navigator.pointerEnabled?e.push({move:"pointermove",down:"pointerdown",up:"pointerup",accessor:function(t){return"mouse"==t.pointerType?null:t}}):window.navigator.msPointerEnabled&&e.push({move:"MSPointerMove",down:"MSPointerDown",up:"MSPointerUp",accessor:function(t){return t.pointerType==t.MSPOINTER_TYPE_MOUSE?null:t}})}return e},clearDragTimer:function(){this._drag_start_timer&&(clearTimeout(this._drag_start_timer),this._drag_start_timer=null)},dragStart:function(e,i,n){this.config={obj:e,marker:null,started:!1,pos:this.getPosition(i),sensitivity:4},this._settings&&r.mixin(this.config,this._settings,!0),this.traceDragEvents(e,n),t._prevent_touch_scroll=!0,document.body.className+=" gantt_noselect",t.config.touch&&this.dragMove(e,i,n.accessor)},dragMove:function(e,i,n){var r=n(i);if(r){if(!this.config.marker&&!this.config.started){var a=this.getPosition(r);if(t.config.touch||this.checkPositionChange(a)){if(this.config.started=!0,this.config.ignore=!1,!1===this.callEvent("onBeforeDragStart",[e,this.config.original_target]))return this.config.ignore=!0,!0;this.backupEventTarget(i,n),this.initDnDMarker(),t._touch_feedback(),this.callEvent("onAfterDragStart",[e,this.config.original_target])}else this.config.ignore=!0}return this.config.ignore?void 0:(r.pos=this.getPosition(r),this.config.marker.style.left=r.pos.x+"px",this.config.marker.style.top=r.pos.y+"px",this.callEvent("onDragMove",[e,r]),!1)}},dragEnd:function(e){var i=this.config.backup_element;i&&i.parentNode&&i.parentNode.removeChild(i),t._prevent_touch_scroll=!1,this.config.marker&&(this.config.marker.parentNode.removeChild(this.config.marker),this.config.marker=null,this.callEvent("onDragEnd",[])),document.body.className=document.body.className.replace(" gantt_noselect","")},getPosition:function(t){var e=0,i=0;return t=t||window.event,t.pageX||t.pageY?(e=t.pageX,i=t.pageY):(t.clientX||t.clientY)&&(e=t.clientX+document.body.scrollLeft+document.documentElement.scrollLeft,i=t.clientY+document.body.scrollTop+document.documentElement.scrollTop),{x:e,y:i}}},i}},function(t,e){t.exports=function(t){function e(e,i,r){r=r||e;var a=t.config,s=t.templates;t.config[e]&&n[r]!=a[e]&&(i&&s[r]||(s[r]=t.date.date_to_str(a[e]),n[r]=a[e]))}function i(){var i=t.locale.labels;i.gantt_save_btn=i.icon_save,i.gantt_cancel_btn=i.icon_cancel,i.gantt_delete_btn=i.icon_delete;var n=t.date,r=n.date_to_str,a=t.config;e("date_scale",!0,void 0,t.config,t.templates),e("date_grid",!0,"grid_date_format",t.config,t.templates),e("task_date",!0,void 0,t.config,t.templates),t.mixin(t.templates,{xml_date:n.str_to_date(a.xml_date,a.server_utc),xml_format:r(a.xml_date,a.server_utc),api_date:n.str_to_date(a.api_date),progress_text:function(t,e,i){return""},grid_header_class:function(t,e){return""},task_text:function(t,e,i){return i.text},task_class:function(t,e,i){return""},grid_row_class:function(t,e,i){return""},task_row_class:function(t,e,i){return""},task_cell_class:function(t,e){return""},scale_cell_class:function(t){return""},scale_row_class:function(t){return""},grid_indent:function(t){return"<div class='gantt_tree_indent'></div>"},grid_folder:function(t){return"<div class='gantt_tree_icon gantt_folder_"+(t.$open?"open":"closed")+"'></div>"},grid_file:function(t){return"<div class='gantt_tree_icon gantt_file'></div>"},grid_open:function(t){return"<div class='gantt_tree_icon gantt_"+(t.$open?"close":"open")+"'></div>"},grid_blank:function(t){return"<div class='gantt_tree_icon gantt_blank'></div>"},date_grid:function(e,i){return i&&t.isUnscheduledTask(i)&&t.config.show_unscheduled?t.templates.task_unscheduled_time(i):t.templates.grid_date_format(e)},task_time:function(e,i,n){return t.isUnscheduledTask(n)&&t.config.show_unscheduled?t.templates.task_unscheduled_time(n):t.templates.task_date(e)+" - "+t.templates.task_date(i)},task_unscheduled_time:function(t){return""},time_picker:r(a.time_picker),link_class:function(t){return""},link_description:function(e){var i=t.getTask(e.source),n=t.getTask(e.target);return"<b>"+i.text+"</b> &ndash;  <b>"+n.text+"</b>"},drag_link:function(e,i,n,r){e=t.getTask(e);var a=t.locale.labels,s="<b>"+e.text+"</b> "+(i?a.link_start:a.link_end)+"<br/>";return n&&(n=t.getTask(n),s+="<b> "+n.text+"</b> "+(r?a.link_start:a.link_end)+"<br/>"),s},drag_link_class:function(e,i,n,r){var a="";if(e&&n){a=" "+(t.isLinkAllowed(e,n,i,r)?"gantt_link_allow":"gantt_link_deny")}return"gantt_link_tooltip"+a},tooltip_date_format:n.date_to_str("%Y-%m-%d"),tooltip_text:function(e,i,n){return"<b>Task:</b> "+n.text+"<br/><b>Start date:</b> "+t.templates.tooltip_date_format(e)+"<br/><b>End date:</b> "+t.templates.tooltip_date_format(i)}})}var n={};return{initTemplates:i,initTemplate:e}}},function(t,e,i){var n=i(0),r=function(){function t(t){if(t)return r[t].method();var e={};for(var i in r)r[i].internal||n.mixin(e,r[i].method(),!0);return e}function e(t,e,i){r[t]={method:e,internal:i}}function i(t){delete r[t]}var r={};return{getState:t,registerProvider:e,unregisterProvider:i}};t.exports=r},function(t,e,i){var n=i(0);i(1);t.exports=function(t){function e(t,e){var i=t.callback;k.hide(t.box),p=t.box=null,i&&i(e)}function r(t){if(p){t=t||event;var i=t.which||event.keyCode,n=!1;if(b.keyboard){if(13==i||32==i){var r=t.target||t.srcElement;y.getClassName(r).indexOf("gantt_popup_button")>-1&&r.click?r.click():(e(p,!0),n=!0)}27==i&&(e(p,!1),n=!0)}if(n)return t.preventDefault&&t.preventDefault(),!(t.cancelBubble=!0)}else;}function a(t){a.cover||(a.cover=document.createElement("DIV"),a.cover.onkeydown=r,a.cover.className="dhx_modal_cover",document.body.appendChild(a.cover));document.body.scrollHeight;a.cover.style.display=t?"inline-block":"none"}function s(e,i,n){var r=t._waiAria.messageButtonAttrString(e),a=i.toLowerCase().replace(/ /g,"_");return"<div "+r+" class='gantt_popup_button dhtmlx_popup_button gantt_"+a+"_button dhtmlx_"+a+"_button' result='"+n+"' ><div>"+e+"</div></div>"}function o(e){b.area||(b.area=document.createElement("DIV"),b.area.className="gantt_message_area dhtmlx_message_area",b.area.style[b.position]="5px",document.body.appendChild(b.area)),b.hide(e.id);var i=document.createElement("DIV");return i.innerHTML="<div>"+e.text+"</div>",i.className="gantt-info dhtmlx-info gantt-"+e.type+" dhtmlx-"+e.type,i.onclick=function(){b.hide(e.id),e=null},t._waiAria.messageInfoAttr(i),"bottom"==b.position&&b.area.firstChild?b.area.insertBefore(i,b.area.firstChild):b.area.appendChild(i),e.expire>0&&(b.timers[e.id]=window.setTimeout(function(){b.hide(e.id)},e.expire)),b.pull[e.id]=i,i=null,e.id}function l(){for(var t=[].slice.apply(arguments,[0]),e=0;e<t.length;e++)if(t[e])return t[e]}function d(i,r,a){var o=document.createElement("DIV"),d=(t.locale,n.uid());t._waiAria.messageModalAttr(o,d),o.className=" gantt_modal_box dhtmlx_modal_box gantt-"+i.type+" dhtmlx-"+i.type,o.setAttribute("dhxbox",1);var c="";if(i.width&&(o.style.width=i.width),i.height&&(o.style.height=i.height),i.title&&(c+='<div class="gantt_popup_title dhtmlx_popup_title">'+i.title+"</div>"),c+='<div class="gantt_popup_text dhtmlx_popup_text" id="'+d+'"><span>'+(i.content?"":i.text)+'</span></div><div  class="gantt_popup_controls dhtmlx_popup_controls">',r&&(c+=s(l(i.ok,t.locale.labels.message_ok,"OK"),"ok",!0)),a&&(c+=s(l(i.cancel,t.locale.labels.message_cancel,"Cancel"),"cancel",!1)),i.buttons)for(var h=0;h<i.buttons.length;h++){var u=i.buttons[h];if("object"==typeof u){var _=u.label,g=u.css||"gantt_"+u.label.toLowerCase()+"_button dhtmlx_"+u.label.toLowerCase()+"_button",f=u.value||h;c+=s(_,g,f)}else c+=s(u,u,h)}if(c+="</div>",o.innerHTML=c,i.content){var v=i.content;"string"==typeof v&&(v=document.getElementById(v)),"none"==v.style.display&&(v.style.display=""),o.childNodes[i.title?1:0].appendChild(v)}return o.onclick=function(t){t=t||event;var n=t.target||t.srcElement;if(n.className||(n=n.parentNode),"gantt_popup_button"==n.className.split(" ")[0]){var r=n.getAttribute("result");r="true"==r||"false"!=r&&r,e(i,r)}},i.box=o,(r||a)&&(p=i),o}function c(e,i,n){var s=e.tagName?e:d(e,i,n);e.hidden||a(!0),document.body.appendChild(s);var o=Math.abs(Math.floor(((window.innerWidth||document.documentElement.offsetWidth)-s.offsetWidth)/2)),l=Math.abs(Math.floor(((window.innerHeight||document.documentElement.offsetHeight)-s.offsetHeight)/2));return"top"==e.position?s.style.top="-3px":s.style.top=l+"px",s.style.left=o+"px",s.onkeydown=r,k.focus(s),e.hidden&&k.hide(s),t.callEvent("onMessagePopup",[s]),s}function h(t){return c(t,!0,!1)}function u(t){return c(t,!0,!0)}function _(t){return c(t)}function g(t,e,i){return"object"!=typeof t&&("function"==typeof e&&(i=e,e=""),t={text:t,type:e,callback:i}),t}function f(t,e,i,r){return"object"!=typeof t&&(t={text:t,type:e,expire:i,id:r}),t.id=t.id||n.uid(),t.expire=t.expire||b.expire,t}var p=null;t.event(document,"keydown",r,!0);var v=function(){var t=g.apply(this,arguments);return t.type=t.type||"confirm",h(t)},m=function(){var t=g.apply(this,arguments);return t.type=t.type||"alert",u(t)},k=function(){var t=g.apply(this,arguments);return t.type=t.type||"alert",_(t)};k.hide=function(e){for(;e&&e.getAttribute&&!e.getAttribute("dhxbox");)e=e.parentNode;e&&(e.parentNode.removeChild(e),a(!1),t.callEvent("onAfterMessagePopup",[e]))};var y=i(1);k.focus=function(t){setTimeout(function(){var e=y.getFocusableNodes(t);e.length&&e[0].focus&&e[0].focus()},1)};var b=function(t,e,i,n){switch(t=f.apply(this,arguments),t.type=t.type||"info",t.type.split("-")[0]){case"alert":return h(t);case"confirm":return u(t);case"modalbox":return _(t);default:return o(t)}};b.seed=(new Date).valueOf(),b.uid=n.uid,b.expire=4e3,b.keyboard=!0,b.position="top",b.pull={},b.timers={},b.hideAll=function(){for(var t in b.pull)b.hide(t)},b.hide=function(t){var e=b.pull[t];e&&e.parentNode&&(window.setTimeout(function(){e.parentNode.removeChild(e),e=null},2e3),e.className+=" hidden",b.timers[t]&&window.clearTimeout(b.timers[t]),delete b.pull[t])};var $=[];return t.attachEvent("onMessagePopup",function(t){$.push(t)}),t.attachEvent("onAfterMessagePopup",function(t){for(var e=0;e<$.length;e++)$[e]===t&&($.splice(e,1),e--)}),t.attachEvent("onDestroy",function(){a.cover&&a.cover.parentNode&&a.cover.parentNode.removeChild(a.cover);for(var t=0;t<$.length;t++)$[t].parentNode&&$[t].parentNode.removeChild($[t]);$=null,b.area&&b.area.parentNode&&b.area.parentNode.removeChild(b.area),b=null}),{alert:v,confirm:m,message:b,modalbox:k}}},function(t,e,i){function n(t){function e(e,i){var n=i(t);n.onCreated&&n.onCreated(e),e.attachEvent("onReady",function(){n.onInitialized&&n.onInitialized(e)}),e.attachEvent("onDestroy",function(){n.onDestroyed&&n.onDestroyed(e)})}var i=r.createFactory(t);i.registerView("cell",o),i.registerView("resizer",h),i.registerView("scrollbar",u),i.registerView("layout",l,function(t){"main"===(t.$config?t.$config.id:null)&&e(t,x)}),i.registerView("viewcell",c),i.registerView("multiview",d),i.registerView("timeline",_,function(t){"timeline"!==(t.$config?t.$config.id:null)&&"task"!=t.$config.bind||e(t,$)}),i.registerView("grid",g,function(t){"grid"!==(t.$config?t.$config.id:null)&&"task"!=t.$config.bind||e(t,b)}),i.registerView("resourceGrid",f),i.registerView("resourceTimeline",p);var n=s(t);return{factory:i,mouseEvents:a.init(t),layersApi:n.init(),render:{gridLine:y(t),taskBg:m(t),taskBar:v(t),link:k(t)},layersService:{getDataRender:function(e){return n.getDataRender(e,t)},createDataRender:function(e){return n.createDataRender(e,t)}}}}var r=i(33),a=i(35),s=i(36),o=i(4),l=i(11),d=i(39),c=i(40),h=i(41),u=i(42),_=i(12),g=i(14),f=i(14),p=i(12),v=i(45),m=i(46),k=i(47),y=i(48),b=i(49),$=i(51),x=i(54);t.exports={init:n}},function(t,e,i){var n=i(0),r=i(34),a=function(t){function e(t,e){var n="cell";return t.view?n="viewcell":t.resizer?n="resizer":t.rows||t.cols?n="layout":t.views&&(n="multiview"),i.call(this,n,null,t,e)}function i(e,i,a,s){var o=l[e];if(!o||!o.create)return!1;"resizer"!=e||a.mode||(s.$config.cols?a.mode="x":a.mode="y"),"viewcell"!=e||"scrollbar"!=a.view||a.scroll||(s.$config.cols?a.scroll="y":a.scroll="x");var a=n.copy(a);a.id||d[a.view]||(a.id=a.view),a.id&&!a.css&&(a.css=a.id+"_cell");var c=new o.create(i,a,this,t);return o.configure&&o.configure(c),r(c,s),c.$id||(c.$id=a.id||t.uid()),c.$parent||"object"!=typeof i||(c.$parent=i),c.$config||(c.$config=a),d[c.$id]&&(c.$id=t.uid()),d[c.$id]=c,c}function a(){d={}}function s(t,e,i){l[t]={create:e,configure:i}}function o(t){return d[t]}var l={},d={};return{initUI:e,reset:a,registerView:s,createView:i,getView:o}};t.exports={createFactory:a}},function(t,e,i){function n(t){a.mixin(this,t,!0)}function r(t,e){var i=this.$config[t];return i?i instanceof n?i:(n.prototype=e,this.$config[t]=new n(i),this.$config[t]):e}var a=i(0),s=function(t){var e,i;return{$getConfig:function(){return e||(e=t?t.$getConfig():this.$gantt.config),r.call(this,"config",e)},$getTemplates:function(){return i||(i=t?t.$getTemplates():this.$gantt.templates),r.call(this,"templates",i)}}};t.exports=function(t,e){a.mixin(t,s(e))}},function(t,e,i){var n=i(1),r=function(t){return function(e){function i(t,e,i,n){u[t][e]||(u[t][e]=[]),u[t][e].push({handler:i,root:n})}function n(t,e,i,n){var r=u[t][e];if(r)for(var a=0;a<r.length;a++)(i||r[a].root)&&r[a].root!==i||r[a].handler.apply(this,n)}function r(t){t=t||window.event;var i=(t.target||t.srcElement,e.locate(t)),n=s(t,u.click),r=!0;if(null!==i?r=!e.checkEvent("onTaskClick")||e.callEvent("onTaskClick",[i,t]):e.callEvent("onEmptyClick",[t]),r){if(!o(n,t,i))return;i&&e.getTask(i)&&e.config.select_task&&!e.config.multiselect&&e.selectTask(i)}}function a(t){t=t||window.event;var i=t.target||t.srcElement,n=e.locate(i),r=e.locate(i,e.config.link_attribute),a=!e.checkEvent("onContextMenu")||e.callEvent("onContextMenu",[n,r,t]);return a||(t.preventDefault?t.preventDefault():t.returnValue=!1),a}function s(e,i){for(var n=e.target||e.srcElement,r=[];n;){var a=t.getClassName(n);if(a){a=a.split(" ");for(var s=0;s<a.length;s++)if(a[s]&&i[a[s]])for(var o=i[a[s]],l=0;l<o.length;l++)o[l].root&&!t.isChildOf(n,o[l].root)||r.push(o[l].handler)}n=n.parentNode}return r}function o(t,i,n){for(var r=!0,a=0;a<t.length;a++){var s=t[a].call(e,i,n,i.target||i.srcElement);r=r&&!(void 0!==s&&!0!==s)}return r}function l(t){t=t||window.event;var i=(t.target||t.srcElement,e.locate(t)),n=s(t,u.doubleclick),r=!e.checkEvent("onTaskDblClick")||e.callEvent("onTaskDblClick",[i,t]);if(r){if(!o(n,t,i))return;null!==i&&e.getTask(i)&&r&&e.config.details_on_dblclick&&e.showLightbox(i)}}function d(t){if(e.checkEvent("onMouseMove")){var i=e.locate(t);e._last_move_event=t,e.callEvent("onMouseMove",[i,t])}}function c(t,e,i,n){if(u[t])for(var r=0;r<u[t].length;r++)u[t][r].root==n&&(u[t].splice(r,1),r--)}function h(t){_.detachAll(),t&&(_.attach(t,"click",r),_.attach(t,"dblclick",l),_.attach(t,"mousemove",d),_.attach(t,"contextmenu",a))}var u={click:{},doubleclick:{},contextMenu:{}},_=e._createDomEventScope();return{reset:h,global:function(t,e,n){i(t,e,n,null)},delegate:i,detach:c,callHandler:n,onDoubleClick:l,onMouseMove:d,onContextMenu:a,onClick:r,destructor:function(){h(),u=null,_=null}}}}(n);t.exports={init:r}},function(t,e,i){var n=i(37),r=function(t){var e=n(t);return{getDataRender:function(e){return t.$services.getService("layer:"+e)||null},createDataRender:function(i){var n=i.name,r=i.defaultContainer,a=i.defaultContainerSibling,s=e.createGroup(r,a,function(t,e){if(!s.filters)return!0;for(var i=0;i<s.filters.length;i++)if(!1===s.filters[i](t,e))return!1});return t.$services.setService("layer:"+n,function(){return s}),t.attachEvent("onGanttReady",function(){s.addLayer()}),s},init:function(){var e=this.createDataRender({name:"task",defaultContainer:function(){return t.$task_data?t.$task_data:t.$ui.getView("timeline")?t.$ui.getView("timeline").$task_data:void 0},defaultContainerSibling:function(){return t.$task_links?t.$task_links:t.$ui.getView("timeline")?t.$ui.getView("timeline").$task_links:void 0},filter:function(t){}},t),i=this.createDataRender({name:"link",defaultContainer:function(){return t.$task_data?t.$task_data:t.$ui.getView("timeline")?t.$ui.getView("timeline").$task_data:void 0}},t);return{addTaskLayer:function(t){return e.addLayer(t)},_getTaskLayers:function(){return e.getLayers()},removeTaskLayer:function(t){e.removeLayer(t)},_clearTaskLayers:function(){e.clear()},addLinkLayer:function(t){return i.addLayer(t)},_getLinkLayers:function(){return i.getLayers()},removeLinkLayer:function(t){i.removeLayer(t)},_clearLinkLayers:function(){i.clear()}}}}};t.exports=r},function(t,e,i){function n(t){return t instanceof Array||(t=Array.prototype.slice.call(arguments,0)),function(e){for(var i=!0,n=0,r=t.length;n<r;n++){var a=t[n];a&&(i=i&&!1!==a(e.id,e))}return i}}var r=i(38),a=i(0),s=function(t){var e=r(t);return{createGroup:function(i,r,s){var o={tempCollection:[],renderers:{},container:i,filters:[],getLayers:function(){var t=[];for(var e in this.renderers)t.push(this.renderers[e]);return t},getLayer:function(t){return this.renderers[t]},_add:function(t){if(t&&(t.id=t.id||a.uid(),this.tempCollection.push(t)),this.container())for(var i=this.container(),n=this.tempCollection,s=0;s<n.length;s++){t=n[s];var o=t.container,l=t.id,d=t.topmost;if(!o.parentNode)if(d)i.appendChild(o);else{var c=r?r():i.firstChild;c?i.insertBefore(o,c):i.appendChild(o)}this.renderers[l]=e.getRenderer(l,t,o),this.tempCollection.splice(s,1),s--}},addLayer:function(t){return t&&("function"==typeof t&&(t={renderer:t}),void 0===t.filter?t.filter=n(s||[]):t.filter instanceof Array&&(t.filter.push(s),t.filter=n(t.filter)),t.container||(t.container=document.createElement("div"))),this._add(t),t?t.id:void 0},eachLayer:function(t){for(var e in this.renderers)t(this.renderers[e])},removeLayer:function(t){this.renderers[t]&&(this.renderers[t].destructor(),delete this.renderers[t])},clear:function(){for(var t in this.renderers)this.renderers[t].destructor();this.renderers={}}};return t.attachEvent("onDestroy",function(){o.clear(),o=null}),o}}};t.exports=s},function(t,e){var i=function(t){function e(e,i,s){if(a[e])return a[e];i.renderer||t.assert(!1,"Invalid renderer call");var o=function(t){return i.renderer.call(this,t,i.host)},l=i.filter;return s&&s.setAttribute(n.config().layer_attribute,!0),a[e]={render_item:function(e,i){if(i=i||s,l&&!l(e))return void this.remove_item(e.id);var n=o.call(t,e);this.append(e,n,i)},clear:function(t){this.rendered=r[e]={},this.clear_container(t)},clear_container:function(t){(t=t||s)&&(t.innerHTML="")},render_items:function(t,e){e=e||s;var i=document.createDocumentFragment();this.clear(e);for(var n=0,r=t.length;n<r;n++)this.render_item(t[n],i);e.appendChild(i)},append:function(t,e,i){if(!e)return void(this.rendered[t.id]&&this.remove_item(t.id));this.rendered[t.id]&&this.rendered[t.id].parentNode?this.replace_item(t.id,e):i.appendChild(e),this.rendered[t.id]=e},replace_item:function(t,e){var i=this.rendered[t];i&&i.parentNode&&i.parentNode.replaceChild(e,i),this.rendered[t]=e},remove_item:function(t){this.hide(t),delete this.rendered[t]},hide:function(t){var e=this.rendered[t];e&&e.parentNode&&e.parentNode.removeChild(e)},restore:function(t){var e=this.rendered[t.id];e?e.parentNode||this.append(t,e,s):this.render_item(t,s)},change_id:function(t,e){this.rendered[e]=this.rendered[t],delete this.rendered[t]},rendered:r[e],node:s,destructor:function(){this.clear(),delete a[e],delete r[e]}},a[e]}function i(){for(var t in a)e(t).destructor()}var n=t.$services,r={},a={};return{getRenderer:e,clearRenderers:i}};t.exports=i},function(t,e,i){var n=i(5),r=i(11),a=i(4),s=function(t){"use strict";function e(e,i,n){for(var r=t.apply(this,arguments)||this,a=0;a<r.$cells.length;a++)r.$cells[a].$config.hidden=0!==a;return r.$cell=r.$cells[0],r.$name="viewLayout",r}return n(e,t),e.prototype.cell=function(e){var i=t.prototype.cell.call(this,e);return i.$view||this.$fill(null,this),i},e.prototype.moveView=function(t){var e=this.$view;this.$cell&&(this.$cell.$config.hidden=!0,e.removeChild(this.$cell.$view)),this.$cell=t,e.appendChild(t.$view)},e.prototype.setSize=function(t,e){a.prototype.setSize.call(this,t,e)},e.prototype.setContentSize=function(){var t=this.$lastSize;this.$cell.setSize(t.contentX,t.contentY)},e.prototype.getSize=function(){var e=t.prototype.getSize.call(this);if(this.$cell){var i=this.$cell.getSize();if(this.$config.byMaxSize)for(var n=0;n<this.$cells.length;n++){var r=this.$cells[n].getSize();for(var a in i)i[a]=Math.max(i[a],r[a])}for(var s in e)e[s]=e[s]||i[s];e.gravity=Math.max(e.gravity,i.gravity)}return e},e}(r);t.exports=s},function(t,e,i){var n=i(5),r=i(0),a=i(4),s=function(t){"use strict";function e(e,i,n){var a=t.apply(this,arguments)||this;if(i.view){i.id&&(this.$id=r.uid());var s=r.copy(i);if(delete s.config,delete s.templates,this.$content=this.$factory.createView(i.view,this,s,this),!this.$content)return!1}return a.$name="viewCell",a}return n(e,t),e.prototype.destructor=function(){this.clear(),t.prototype.destructor.call(this)},e.prototype.clear=function(){if(this.$initialized=!1,this.$content){var e=this.$content.unload||this.$content.destructor;e&&e.call(this.$content)}t.prototype.clear.call(this)},e.prototype.scrollTo=function(e,i){this.$content&&this.$content.scrollTo?this.$content.scrollTo(e,i):t.prototype.scrollTo.call(this,e,i)},e.prototype._setContentSize=function(t,e){var i=this._getBorderSizes(),n=t+i.horizontal,r=e+i.vertical;this.$config.width=n,this.$config.height=r},e.prototype.setSize=function(e,i){if(t.prototype.setSize.call(this,e,i),!this.$preResize&&this.$content&&!this.$initialized){this.$initialized=!0;var n=this.$view.childNodes[0],r=this.$view.childNodes[1];r||(r=n),this.$content.init(r)}},e.prototype.setContentSize=function(){!this.$preResize&&this.$content&&this.$initialized&&this.$content.setSize(this.$lastSize.contentX,this.$lastSize.contentY)},e.prototype.getContentSize=function(){var e=t.prototype.getContentSize.call(this);if(this.$content&&this.$initialized){var i=this.$content.getSize();e.width=void 0===i.contentX?i.width:i.contentX,e.height=void 0===i.contentY?i.height:i.contentY}var n=this._getBorderSizes();return e.width+=n.horizontal,e.height+=n.vertical,e},e}(a);t.exports=s},function(t,e){t.exports=null},function(t,e,i){var n=i(5),r=i(1),a=i(0),s=i(7),o=(i(2),i(4)),l=function(t){"use strict";function e(e,i,n,r){var s=t.apply(this,arguments)||this;this.$config=a.mixin(i,{scroll:"x"}),s._scrollHorizontalHandler=a.bind(s._scrollHorizontalHandler,s),s._scrollVerticalHandler=a.bind(s._scrollVerticalHandler,s),s._outerScrollVerticalHandler=a.bind(s._outerScrollVerticalHandler,s),s._outerScrollHorizontalHandler=a.bind(s._outerScrollHorizontalHandler,s),s._mouseWheelHandler=a.bind(s._mouseWheelHandler,s),this.$config.hidden=!0;var o=r.config.scroll_size;return r.env.isIE&&(o+=1),this._isHorizontal()?(s.$config.height=o,s.$parent.$config.height=o):(s.$config.width=o,s.$parent.$config.width=o),this.$config.scrollPosition=0,s.$name="scroller",s}function i(t,e){if(e.push(t),t.$cells)for(var n=0;n<t.$cells.length;n++)i(t.$cells[n],e)}return n(e,t),e.prototype.init=function(t){t.innerHTML=this.$toHTML(),this.$view=t.firstChild,this.$view||this.init(),this._isVertical()?this._initVertical():this._initHorizontal(),this._initMouseWheel(),this._initLinkedViews()},e.prototype.$toHTML=function(){return"<div class='gantt_layout_cell "+(this._isHorizontal()?"gantt_hor_scroll":"gantt_ver_scroll")+"'><div style='"+(this._isHorizontal()?"width:2000px":"height:2000px")+"'></div></div>"},e.prototype._getRootParent=function(){for(var t=this.$parent;t&&t.$parent;)t=t.$parent;if(t)return t},e.prototype._eachView=function(){var t=[];return i(this._getRootParent(),t),t},e.prototype._getLinkedViews=function(){for(var t=this._eachView(),e=[],i=0;i<t.length;i++)t[i].$config&&(this._isVertical()&&t[i].$config.scrollY==this.$id||this._isHorizontal()&&t[i].$config.scrollX==this.$id)&&e.push(t[i]);return e},e.prototype._initHorizontal=function(){this.$scroll_hor=this.$view,this.$domEvents.attach(this.$view,"scroll",this._scrollHorizontalHandler)},e.prototype._initLinkedViews=function(){for(var t=this._getLinkedViews(),e=this._isVertical()?"gantt_layout_outer_scroll gantt_layout_outer_scroll_vertical":"gantt_layout_outer_scroll gantt_layout_outer_scroll_horizontal",i=0;i<t.length;i++)r.addClassName(t[i].$view||t[i].getNode(),e)},e.prototype._initVertical=function(){this.$scroll_ver=this.$view,this.$domEvents.attach(this.$view,"scroll",this._scrollVerticalHandler)},e.prototype._updateLinkedViews=function(){this._getRootParent()},e.prototype._initMouseWheel=function(){s.isFF?this.$domEvents.attach(this._getRootParent().$view,"wheel",this._mouseWheelHandler):this.$domEvents.attach(this._getRootParent().$view,"mousewheel",this._mouseWheelHandler)},e.prototype.scrollHorizontally=function(t){if(!this._scrolling){this._scrolling=!0,this.$scroll_hor.scrollLeft=t,this.$config.codeScrollLeft=t,t=this.$scroll_hor.scrollLeft;for(var e=this._getLinkedViews(),i=0;i<e.length;i++)e[i].scrollTo&&e[i].scrollTo(t,void 0);var n=this.$config.scrollPosition;this.$config.scrollPosition=t,this.callEvent("onScroll",[n,t,this.$config.scroll]),this._scrolling=!1}},e.prototype.scrollVertically=function(t){if(!this._scrolling){this._scrolling=!0,this.$scroll_ver.scrollTop=t,t=this.$scroll_ver.scrollTop;for(var e=this._getLinkedViews(),i=0;i<e.length;i++)e[i].scrollTo&&e[i].scrollTo(void 0,t);var n=this.$config.scrollPosition;this.$config.scrollPosition=t,this.callEvent("onScroll",[n,t,this.$config.scroll]),this._scrolling=!1}},e.prototype._isVertical=function(){return"y"==this.$config.scroll},e.prototype._isHorizontal=function(){return"x"==this.$config.scroll},e.prototype._scrollHorizontalHandler=function(t){if(!this._isVertical()&&!this._scrolling){if(new Date-(this._wheel_time||0)<100)return!0;if(!this.$gantt._touch_scroll_active){var e=this.$scroll_hor.scrollLeft;this.scrollHorizontally(e),this._oldLeft=this.$scroll_hor.scrollLeft}}},e.prototype._outerScrollHorizontalHandler=function(t){this._isVertical()},e.prototype.show=function(){this.$parent.show()},e.prototype.hide=function(){this.$parent.hide()},e.prototype._getScrollSize=function(){for(var t,e=0,i=0,n=this._isHorizontal(),r=this._getLinkedViews(),a=n?"scrollWidth":"scrollHeight",s=n?"contentX":"contentY",o=n?"x":"y",l=this._getScrollOffset(),d=0;d<r.length;d++)if((t=r[d])&&t.$content&&t.$content.getSize){var c,h=t.$content.getSize();if(c=h.hasOwnProperty(a)?h[a]:h[s],l)h[s]>h[o]&&h[s]>e&&c>h[o]-l+2&&(e=c+(n?0:2),i=h[o]);else{var u=Math.max(h[s]-c,0),_=Math.max(h[o]-u,0);c+=u,c>_&&c>e&&(e=c,i=h[o])}}return{outerScroll:i,innerScroll:e}},e.prototype.scroll=function(t){this._isHorizontal()?this.scrollHorizontally(t):this.scrollVertically(t)},e.prototype.getScrollState=function(){return{visible:this.isVisible(),direction:this.$config.scroll,size:this.$config.outerSize,scrollSize:this.$config.scrollSize||0,position:this.$config.scrollPosition||0}},e.prototype.setSize=function(e,i){t.prototype.setSize.apply(this,arguments);var n=this._getScrollSize(),r=(this._isVertical()?i:e)-this._getScrollOffset()+(this._isHorizontal()?1:0);n.innerScroll&&r>n.outerScroll&&(n.innerScroll+=r-n.outerScroll),this.$config.scrollSize=n.innerScroll,this.$config.width=e,this.$config.height=i,this._setScrollSize(n.innerScroll)},e.prototype.isVisible=function(){return!(!this.$parent||!this.$parent.$view.parentNode)},e.prototype.shouldShow=function(){var t=this._getScrollSize();return!(!t.innerScroll&&this.$parent&&this.$parent.$view.parentNode)&&!(!t.innerScroll||this.$parent&&this.$parent.$view.parentNode)},e.prototype.shouldHide=function(){return!(this._getScrollSize().innerScroll||!this.$parent||!this.$parent.$view.parentNode)},e.prototype.toggleVisibility=function(){this.shouldHide()?this.hide():this.shouldShow()&&this.show()},e.prototype._getScaleOffset=function(t){var e=0;return!t||"timeline"!=t.$config.view&&"grid"!=t.$config.view||(e=t.$content.$getConfig().scale_height),e},e.prototype._getScrollOffset=function(){var t=0;if(this._isVertical()){var e=this.$parent.$parent;t=Math.max(this._getScaleOffset(e.getPrevSibling(this.$parent.$id)),this._getScaleOffset(e.getNextSibling(this.$parent.$id)))}else for(var i=this._getLinkedViews(),n=0;n<i.length;n++){var r=i[n],a=r.$parent,s=a.$cells,o=s[s.length-1];if(o&&"scrollbar"==o.$config.view&&!1===o.$config.hidden){t=o.$config.width;break}}return t||0},e.prototype._setScrollSize=function(t){var e=this._isHorizontal()?"width":"height",i=this._isHorizontal()?this.$scroll_hor:this.$scroll_ver,n=this._getScrollOffset(),a=i.firstChild;n?this._isVertical()?(this.$config.outerSize=this.$config.height-n+3,i.style.height=this.$config.outerSize+"px",i.style.top=n-1+"px",r.addClassName(i,this.$parent._borders.top),r.addClassName(i.parentNode,"gantt_task_vscroll")):(this.$config.outerSize=this.$config.width-n+1,i.style.width=this.$config.outerSize+"px"):(i.style.top="auto",r.removeClassName(i,this.$parent._borders.top),r.removeClassName(i.parentNode,"gantt_task_vscroll")),a.style[e]=t+"px"},e.prototype._scrollVerticalHandler=function(t){if(!this._scrollHorizontalHandler()&&!this._scrolling&&!this.$gantt._touch_scroll_active){var e=this.$scroll_ver.scrollTop;e!=this._oldTop&&(this.scrollVertically(e),this._oldTop=this.$scroll_ver.scrollTop)}},e.prototype._outerScrollVerticalHandler=function(t){this._scrollHorizontalHandler()},e.prototype._checkWheelTarget=function(t){for(var e=this._getLinkedViews().concat(this),i=0;i<e.length;i++){var n=e[i].$view;if(r.isChildOf(t,n))return!0}return!1},e.prototype._mouseWheelHandler=function(t){var e=t.target||t.srcElement;if(this._checkWheelTarget(e)){this._wheel_time=new Date;var i={},n=s.isFF,r=n?-20*t.deltaX:2*t.wheelDeltaX,a=n?-40*t.deltaY:t.wheelDelta;if(!t.shiftKey||t.deltaX||t.wheelDeltaX||(r=2*a,a=0),r&&Math.abs(r)>Math.abs(a)){if(this._isVertical())return;if(i.x)return!0;if(!this.$scroll_hor||!this.$scroll_hor.offsetWidth)return!0;var o=r/-40,l=this._oldLeft,d=l+30*o;if(this.scrollHorizontally(d),this.$scroll_hor.scrollLeft=d,l==this.$scroll_hor.scrollLeft)return!0;this._oldLeft=this.$scroll_hor.scrollLeft}else{if(this._isHorizontal())return;if(i.y)return!0;if(!this.$scroll_ver||!this.$scroll_ver.offsetHeight)return!0;var o=a/-40;void 0===a&&(o=t.detail);var c=this._oldTop,h=this.$scroll_ver.scrollTop+30*o;if(this.scrollVertically(h),this.$scroll_ver.scrollTop=h,c==this.$scroll_ver.scrollTop)return!0;this._oldTop=this.$scroll_ver.scrollTop}return t.preventDefault&&t.preventDefault(),t.cancelBubble=!0,!1}},e}(o);t.exports=l},function(t,e){var i=function(){return{render:function(){}}};t.exports={create:function(){return i()}}},function(t,e){function i(t,e){return{init:function(){},doOnRender:function(){}}}t.exports=i},function(t,e){function i(t){function e(e,n){var r=n.$getConfig(),a=r.type_renderers,s=a[t.getTaskType(e.type)],o=i;return s?s.call(t,e,function(e){return o.call(t,e,n)},n):o.call(t,e,n)}function i(e,i){if(!t._isAllowedUnscheduledTask(e)){var n=i.getItemPosition(e),s=i.$getConfig(),d=i.$getTemplates(),u=i.getItemHeight(),_=t.getTaskType(e.type),g=Math.floor((t.config.row_height-u)/2);_==s.types.milestone&&s.link_line_width>1&&(g+=1),_==s.types.milestone&&(n.left-=Math.round(u/2),n.width=u);var f=document.createElement("div"),p=Math.round(n.width);i.$config.item_attribute&&f.setAttribute(i.$config.item_attribute,e.id),s.show_progress&&_!=s.types.milestone&&l(e,f,p,s,d);var v=o(e,p,d);e.textColor&&(v.style.color=e.textColor),f.appendChild(v);var m=c("gantt_task_line",d.task_class(e.start_date,e.end_date,e),e.id,i);(e.color||e.progressColor||e.textColor)&&(m+=" gantt_task_inline_color"),f.className=m;var k=["left:"+n.left+"px","top:"+(g+n.top)+"px","height:"+u+"px","line-height:"+Math.max(u<30?u-2:u,0)+"px","width:"+p+"px"];e.color&&k.push("background-color:"+e.color),e.textColor&&k.push("color:"+e.textColor),f.style.cssText=k.join(";");var y=r(e,s,d);y&&f.appendChild(y),y=a(e,s,d),y&&f.appendChild(y),t._waiAria.setTaskBarAttr(e,f);var b=t.getState();return t.isReadonly(e)||(s.drag_resize&&!t.isSummaryTask(e)&&_!=s.types.milestone&&h(f,"gantt_task_drag",e,function(t){var e=document.createElement("div");return e.className=t,e},s),s.drag_links&&s.show_links&&h(f,"gantt_link_control",e,function(t){var e=document.createElement("div");e.className=t,e.style.cssText=["height:"+u+"px","line-height:"+u+"px"].join(";");var i=document.createElement("div");i.className="gantt_link_point";var n=!1;return b.link_source_id&&s.touch&&(n=!0),i.style.display=n?"block":"",e.appendChild(i),e},s)),f}}function n(t,e,i){if(!e)return null;var n=e(t.start_date,t.end_date,t);if(!n)return null;var r=document.createElement("div");return r.className="gantt_side_content "+i,r.innerHTML=n,r}function r(t,e,i){var r="gantt_left "+s(!e.rtl,t);return n(t,i.leftside_text,r)}function a(t,e,i){var r="gantt_right "+s(!!e.rtl,t);return n(t,i.rightside_text,r)}function s(e,i){var n=d(e);for(var r in n)for(var a=i[r],s=0;s<a.length;s++)for(var o=t.getLink(a[s]),l=0;l<n[r].length;l++)if(o.type==n[r][l])return"gantt_link_crossing";return""}function o(e,i,n){var r=document.createElement("div");return t.getTaskType(e.type)!=t.config.types.milestone&&(r.innerHTML=n.task_text(e.start_date,e.end_date,e)),r.className="gantt_task_content",r}function l(e,i,n,r,a){var s=1*e.progress||0;n=Math.max(n-2,0);var o=document.createElement("div"),l=Math.round(n*s);l=Math.min(n,l),e.progressColor&&(o.style.backgroundColor=e.progressColor,o.style.opacity=1),o.style.width=l+"px",o.className="gantt_task_progress",o.innerHTML=a.progress_text(e.start_date,e.end_date,e),r.rtl&&(o.style.position="absolute",o.style.right="0px");var d=document.createElement("div");if(d.className="gantt_task_progress_wrapper",d.appendChild(o),i.appendChild(d),t.config.drag_progress&&!t.isReadonly(e)){var c=document.createElement("div"),h=l;r.rtl&&(h=n-l),c.style.left=h+"px",c.className="gantt_task_progress_drag",o.appendChild(c),i.appendChild(c)}}function d(e){return e?{$source:[t.config.links.start_to_start],$target:[t.config.links.start_to_start,t.config.links.finish_to_start]}:{$source:[t.config.links.finish_to_start,t.config.links.finish_to_finish],$target:[t.config.links.finish_to_finish]}}function c(e,i,n,r){var a=r.$getConfig(),s=[e];i&&s.push(i);var o=t.getState(),l=t.getTask(n);if(t.getTaskType(l.type)==a.types.milestone&&s.push("gantt_milestone"),t.getTaskType(l.type)==a.types.project&&s.push("gantt_project"),t.isSummaryTask(l)&&s.push("gantt_dependent_task"),a.select_task&&n==o.selected_task&&s.push("gantt_selected"),n==o.drag_id&&(s.push("gantt_drag_"+o.drag_mode),o.touch_drag&&s.push("gantt_touch_"+o.drag_mode)),o.link_source_id==n&&s.push("gantt_link_source"),o.link_target_id==n&&s.push("gantt_link_target"),a.highlight_critical_path&&t.isCriticalTask&&t.isCriticalTask(l)&&s.push("gantt_critical_task"),o.link_landing_area&&o.link_target_id&&o.link_source_id&&o.link_target_id!=o.link_source_id){var d=o.link_source_id,c=o.link_from_start,h=o.link_to_start,u=t.isLinkAllowed(d,n,c,h),_="";_=u?h?"link_start_allow":"link_finish_allow":h?"link_start_deny":"link_finish_deny",s.push(_)}return s.join(" ")}function h(e,i,n,r,a){var s,o,l=t.getState();+n.start_date>=+l.min_date&&(s=[i,a.rtl?"task_right":"task_left","task_start_date"],o=r(s.join(" ")),o.setAttribute("data-bind-property","start_date"),e.appendChild(o)),+n.end_date<=+l.max_date&&(s=[i,a.rtl?"task_left":"task_right","task_end_date"],o=r(s.join(" ")),o.setAttribute("data-bind-property","end_date"),e.appendChild(o))}return e}t.exports=i},function(t,e){function i(t){function e(e,i){var n=i.$getConfig(),r=i.$getTemplates(),a=i.getScale(),s=a.count,o=document.createElement("div");if(n.show_task_cells)for(var l=0;l<s;l++){var d=a.width[l],c="";if(d>0){var h=document.createElement("div");h.style.width=d+"px",c="gantt_task_cell"+(l==s-1?" gantt_last_cell":""),_=r.task_cell_class(e,a.trace_x[l]),_&&(c+=" "+_),h.className=c,o.appendChild(h)}}var u=t.getGlobalTaskIndex(e.id)%2!=0,_=r.task_row_class(e.start_date,e.end_date,e),g="gantt_task_row"+(u?" odd":"")+(_?" "+_:"");return i.$config.rowStore.getSelectedId()==e.id&&(g+=" gantt_selected"),o.className=g,n.smart_rendering&&(o.style.position="absolute",o.style.top=i.getItemTop(e.id)+"px",o.style.width="100%"),o.style.height=n.row_height+"px",i.$config.item_attribute&&o.setAttribute(i.$config.item_attribute,e.id),o}return e}t.exports=i},function(t,e){function i(t){function e(e,n){var s=n.$getConfig(),o=a.get_points(e,n),l=r.get_lines(o,n),d=document.createElement("div"),c="gantt_task_link";e.color&&(c+=" gantt_link_inline_color");var h=t.templates.link_class?t.templates.link_class(e):"";h&&(c+=" "+h),s.highlight_critical_path&&t.isCriticalLink&&t.isCriticalLink(e)&&(c+=" gantt_critical_link"),d.className=c,n.$config.link_attribute&&d.setAttribute(n.$config.link_attribute,e.id);for(var u=0;u<l.length;u++){u==l.length-1&&(l[u].size-=s.link_arrow_size);var _=r.render_line(l[u],l[u+1],n);e.color&&(_.firstChild.style.backgroundColor=e.color),d.appendChild(_)}var g=l[l.length-1].direction,f=i(o[o.length-1],g,n);return e.color&&(f.style.borderColor=e.color),d.appendChild(f),t._waiAria.linkAttr(e,d),d}function i(t,e,i){var n=i.$getConfig(),a=document.createElement("div"),s=t.y,o=t.x,l=n.link_arrow_size,d=n.row_height,c="gantt_link_arrow gantt_link_arrow_"+e;switch(e){case r.dirs.right:s-=(l-d)/2,o-=l;break;case r.dirs.left:s-=(l-d)/2;break;case r.dirs.up:o-=l;break;case r.dirs.down:s+=2*l,o-=l}return a.style.cssText=["top:"+s+"px","left:"+o+"px"].join(";"),a.className=c,a}function n(e,i){var n=i.$getConfig(),r=i.getItemPosition(e);if(t.getTaskType(e.type)==n.types.milestone){var a=t.getTaskHeight(),s=Math.sqrt(2*a*a);r.left-=s/2,r.width=s}return r}var r={current_pos:null,dirs:{left:"left",right:"right",up:"up",down:"down"},path:[],clear:function(){this.current_pos=null,this.path=[]},point:function(e){this.current_pos=t.copy(e)},get_lines:function(t){this.clear(),this.point(t[0]);for(var e=1;e<t.length;e++)this.line_to(t[e]);return this.get_path()},line_to:function(e){var i=t.copy(e),n=this.current_pos,r=this._get_line(n,i);this.path.push(r),this.current_pos=i},get_path:function(){return this.path},get_wrapper_sizes:function(t,e){var i,n=e.$getConfig(),r=n.link_wrapper_width,a=(n.link_line_width,t.y+(n.row_height-r)/2);switch(t.direction){case this.dirs.left:i={top:a,height:r,lineHeight:r,left:t.x-t.size-r/2,width:t.size+r};break;case this.dirs.right:i={top:a,lineHeight:r,height:r,left:t.x-r/2,width:t.size+r};break;case this.dirs.up:i={top:a-t.size,lineHeight:t.size+r,height:t.size+r,left:t.x-r/2,width:r};break;case this.dirs.down:i={top:a,lineHeight:t.size+r,height:t.size+r,left:t.x-r/2,width:r}}return i},get_line_sizes:function(t,e){var i,n=e.$getConfig(),r=n.link_line_width,a=n.link_wrapper_width,s=t.size+r;switch(t.direction){case this.dirs.left:case this.dirs.right:i={height:r,width:s,marginTop:(a-r)/2,marginLeft:(a-r)/2};break;case this.dirs.up:case this.dirs.down:i={height:s,width:r,marginTop:(a-r)/2,marginLeft:(a-r)/2}}return i},render_line:function(t,e,i){var n=this.get_wrapper_sizes(t,i),r=document.createElement("div");r.style.cssText=["top:"+n.top+"px","left:"+n.left+"px","height:"+n.height+"px","width:"+n.width+"px"].join(";"),r.className="gantt_line_wrapper";var a=this.get_line_sizes(t,i),s=document.createElement("div");return s.style.cssText=["height:"+a.height+"px","width:"+a.width+"px","margin-top:"+a.marginTop+"px","margin-left:"+a.marginLeft+"px"].join(";"),s.className="gantt_link_line_"+t.direction,r.appendChild(s),r},_get_line:function(t,e){var i=this.get_direction(t,e),n={x:t.x,y:t.y,direction:this.get_direction(t,e)};return i==this.dirs.left||i==this.dirs.right?n.size=Math.abs(t.x-e.x):n.size=Math.abs(t.y-e.y),n},get_direction:function(t,e){return e.x<t.x?this.dirs.left:e.x>t.x?this.dirs.right:e.y>t.y?this.dirs.down:this.dirs.up}},a={path:[],clear:function(){this.path=[]},current:function(){return this.path[this.path.length-1]},point:function(e){return e?(this.path.push(t.copy(e)),e):this.current()},point_to:function(e,i,n){n=n?{x:n.x,y:n.y}:t.copy(this.point());var a=r.dirs;switch(e){case a.left:n.x-=i;break;case a.right:n.x+=i;break;case a.up:n.y-=i;break;case a.down:n.y+=i}return this.point(n)},get_points:function(e,i){var n=this.get_endpoint(e,i),a=t.config,s=n.e_y-n.y,o=n.e_x-n.x,l=r.dirs;this.clear(),this.point({x:n.x,y:n.y});var d=2*a.link_arrow_size,c=this.get_line_type(e,i.$getConfig()),h=n.e_x>n.x;if(c.from_start&&c.to_start)this.point_to(l.left,d),h?(this.point_to(l.down,s),this.point_to(l.right,o)):(this.point_to(l.right,o),this.point_to(l.down,s)),this.point_to(l.right,d);else if(!c.from_start&&c.to_start)if(h=n.e_x>n.x+2*d,this.point_to(l.right,d),h)o-=d,this.point_to(l.down,s),this.point_to(l.right,o);else{o-=2*d;var u=s>0?1:-1;this.point_to(l.down,u*(a.row_height/2)),this.point_to(l.right,o),this.point_to(l.down,u*(Math.abs(s)-a.row_height/2)),this.point_to(l.right,d)}else if(c.from_start||c.to_start){if(c.from_start&&!c.to_start)if(h=n.e_x>n.x-2*d,this.point_to(l.left,d),h){o+=2*d;var u=s>0?1:-1;this.point_to(l.down,u*(a.row_height/2)),this.point_to(l.right,o),this.point_to(l.down,u*(Math.abs(s)-a.row_height/2)),this.point_to(l.left,d)}else o+=d,this.point_to(l.down,s),this.point_to(l.right,o)}else this.point_to(l.right,d),h?(this.point_to(l.right,o),this.point_to(l.down,s)):(this.point_to(l.down,s),this.point_to(l.right,o)),this.point_to(l.left,d);return this.path},get_line_type:function(e,i){var n=i.links,r=!1,a=!1;return e.type==n.start_to_start?r=a=!0:e.type==n.finish_to_finish?r=a=!1:e.type==n.finish_to_start?(r=!1,a=!0):e.type==n.start_to_finish?(r=!0,a=!1):t.assert(!1,"Invalid link type"),i.rtl&&(r=!r,a=!a),{from_start:r,to_start:a}},get_endpoint:function(e,i){var r=i.$getConfig(),a=(r.links,this.get_line_type(e,r)),s=a.from_start,o=a.to_start,l=t.getTask(e.source),d=t.getTask(e.target),c=n(l,i),h=n(d,i);return{x:s?c.left:c.left+c.width,e_x:o?h.left:h.left+h.width,y:c.top,e_y:h.top}}};return e}t.exports=i},function(t,e,i){function n(t){function e(e,i){var n=i.getGridColumns(),a=i.$getConfig(),s=i.$getTemplates(),o=i.$config.rowStore;a.rtl&&(n=n.reverse());for(var l,d=[],c=0;c<n.length;c++){var h,u,_,g=c==n.length-1,f=n[c];if("add"==f.name){var p=t._waiAria.gridAddButtonAttrString(f);u="<div "+p+" class='gantt_add'></div>",_=""}else u=f.template?f.template(e):e[f.name],r.isDate(u)&&(u=s.date_grid(u,e)),_=u,u="<div class='gantt_tree_content'>"+u+"</div>";var v="gantt_cell"+(g?" gantt_last_cell":""),m=[];if(f.tree){for(var k=0;k<e.$level;k++)m.push(s.grid_indent(e));l=o.hasChild(e.id),l?(m.push(s.grid_open(e)),m.push(s.grid_folder(e))):(m.push(s.grid_blank(e)),m.push(s.grid_file(e)))}var y="width:"+(f.width-(g?1:0))+"px;";this.defined(f.align)&&(y+="text-align:"+f.align+";");var p=t._waiAria.gridCellAttrString(f,_);m.push(u),a.rtl&&(m=m.reverse()),h="<div class='"+v+"' style='"+y+"' "+p+">"+m.join("")+"</div>",d.push(h)}var v=t.getGlobalTaskIndex(e.id)%2==0?"":" odd";if(v+=e.$transparent?" gantt_transparent":"",v+=e.$dataprocessor_class?" "+e.$dataprocessor_class:"",s.grid_row_class){var b=s.grid_row_class.call(t,e.start_date,e.end_date,e);b&&(v+=" "+b)}o.getSelectedId()==e.id&&(v+=" gantt_selected");var $=document.createElement("div");return $.className="gantt_row"+v,$.style.height=a.row_height+"px",$.style.lineHeight=a.row_height+"px",a.smart_rendering&&($.style.position="absolute",$.style.left="0px",$.style.top=i.getItemTop(e.id)+"px"),i.$config.item_attribute&&$.setAttribute(i.$config.item_attribute,e.id),t._waiAria.taskRowAttr(e,$),$.innerHTML=d.join(""),$}return e}var r=i(3);t.exports=n},function(t,e,i){var n=i(0),r=i(50),a=function(){return function(t){return{onCreated:function(e){e.$config=n.mixin(e.$config,{bind:"task"}),"grid"==e.$config.id&&this.extendGantt(e),this._mouseDelegates=i(8)(t)},onInitialized:function(e){e.$getConfig().order_branch&&r.init(e.$gantt,e),this.initEvents(e,t),"grid"==e.$config.id&&this.extendDom(e)},onDestroyed:function(e){this.clearEvents(e,t)},initEvents:function(t,e){this._mouseDelegates.delegate("click","gantt_row",e.bind(function(i,n,r){var a=t.$getConfig();if(null!==n){var s=this.getTask(n);a.scroll_on_click&&!e._is_icon_open_click(i)&&this.showDate(s.start_date),e.callEvent("onTaskRowClick",[n,r])}},e),t.$grid),this._mouseDelegates.delegate("click","gantt_grid_head_cell",e.bind(function(i,n,r){var a=r.getAttribute("column_id");if(e.callEvent("onGridHeaderClick",[a,i])){var s=t.$getConfig();if("add"==a){return void e.$services.getService("mouseEvents").callHandler("click","gantt_add",t.$grid,[i,s.root_id])}if(s.sort){for(var o,l=a,d=0;d<s.columns.length;d++)if(s.columns[d].name==a){o=s.columns[d];break}if(o&&void 0!==o.sort&&!0!==o.sort&&!(l=o.sort))return;var c=this._sort&&this._sort.direction&&this._sort.name==a?this._sort.direction:"desc";c="desc"==c?"asc":"desc",this._sort={name:a,direction:c},this.sort(l,"desc"==c)}}},e),t.$grid),this._mouseDelegates.delegate("click","gantt_add",e.bind(function(i,n,r){if(!t.$getConfig().readonly){var a={};return this.createTask(a,n||e.config.root_id),!1}},e),t.$grid)},clearEvents:function(t,e){this._mouseDelegates.destructor(),this._mouseDelegates=null},extendDom:function(e){t.$grid=e.$grid,t.$grid_scale=e.$grid_scale,t.$grid_data=e.$grid_data},extendGantt:function(e){t.getGridColumns=t.bind(e.getGridColumns,e),e.attachEvent("onColumnResizeStart",function(){return t.callEvent("onColumnResizeStart",arguments)}),e.attachEvent("onColumnResize",function(){return t.callEvent("onColumnResize",arguments)}),e.attachEvent("onColumnResizeEnd",function(){return t.callEvent("onColumnResizeEnd",arguments)}),e.attachEvent("onColumnResizeComplete",function(e,i){t.config.grid_width=i})}}}}();t.exports=a},function(t,e,i){function n(t,e){function i(t){return r.locateAttribute(t,e.$config.item_attribute)}function n(){return t.getDatastore(e.$config.bind)}var a=t.$services.getService("dnd");if(e.$config.bind&&t.getDatastore(e.$config.bind)){var s=new a(e.$grid_data,{updates_per_second:60});t.defined(e.$getConfig().dnd_sensitivity)&&(s.config.sensitivity=e.$getConfig().dnd_sensitivity),s.attachEvent("onBeforeDragStart",t.bind(function(r,a){var o=i(a);if(!o)return!1;t.hideQuickInfo&&t._hideQuickInfo();var l=o.getAttribute(e.$config.item_attribute),d=n(),c=d.getItem(l);return!t.isReadonly(c)&&(s.config.initial_open_state=c.$open,!!t.callEvent("onRowDragStart",[l,a.target||a.srcElement,a])&&void 0)},t)),s.attachEvent("onAfterDragStart",t.bind(function(t,r){var a=i(r);s.config.marker.innerHTML=a.outerHTML;var o=s.config.marker.firstChild;o&&(o.style.position="static"),s.config.id=a.getAttribute(e.$config.item_attribute);var l=n(),d=l.getItem(s.config.id);s.config.index=l.getBranchIndex(s.config.id),s.config.parent=d.parent,d.$open=!1,d.$transparent=!0,this.refreshData()},t)),s.lastTaskOfLevel=function(t){for(var e=null,i=n(),r=i.getItems(),a=0,s=r.length;a<s;a++)r[a].$level==t&&(e=r[a]);return e?e.id:null},s._getGridPos=t.bind(function(t){var i=r.getNodePosition(e.$grid_data),a=n(),s=i.x,o=t.pos.y-10,l=e.$getConfig();o<i.y&&(o=i.y);var d=a.countVisible()*l.row_height;return o>i.y+d-l.row_height&&(o=i.y+d-l.row_height),i.x=s,i.y=o,i},t),s._getTargetY=t.bind(function(t){var i=r.getNodePosition(e.$grid_data),n=t.pageY-i.y+(e.$state.scrollTop||0);return n<0&&(n=0),n},t),s._getTaskByY=t.bind(function(t,i){var r=e.$getConfig(),a=n();t=t||0;var s=Math.floor(t/r.row_height);return s=i<s?s-1:s,s>a.countVisible()-1?null:a.getIdByIndex(s)},t),s.attachEvent("onDragMove",t.bind(function(t,i){function r(t,e){return!d.isChildOf(_.id,e.id)&&(t.$level==e.$level||l.order_branch_free)}var a=s.config,o=s._getGridPos(i),l=e.$getConfig(),d=n();a.marker.style.left=o.x+10+"px",a.marker.style.top=o.y+"px";var c=d.getItem(s.config.id),h=s._getTargetY(i),u=s._getTaskByY(h,d.getIndexById(c.id));if(d.exists(u)||(u=s.lastTaskOfLevel(l.order_branch_free?c.$level:0))==s.config.id&&(u=null),d.exists(u)){var _=d.getItem(u);if(d.getIndexById(_.id)*l.row_height+l.row_height/2<h){var g=d.getIndexById(_.id),f=d.getNext(_.id),p=d.getItem(f);if(p){if(p.id==c.id)return l.order_branch_free&&d.isChildOf(c.id,_.id)&&1==d.getChildren(_.id).length?void d.move(c.id,d.getBranchIndex(_.id)+1,d.getParent(_.id)):void 0;_=p}else if(f=d.getIdByIndex(g),p=d.getItem(f),r(p,c)&&p.id!=c.id)return void d.move(c.id,-1,d.getParent(p.id))}else if(l.order_branch_free&&_.id!=c.id&&r(_,c)){if(!d.hasChild(_.id))return _.$open=!0,void d.move(c.id,-1,_.id);if(d.getIndexById(_.id)||l.row_height/3<h)return}for(var g=d.getIndexById(_.id),v=d.getIdByIndex(g-1),m=d.getItem(v),k=1;(!m||m.id==_.id)&&g-k>=0;)v=d.getIdByIndex(g-k),m=d.getItem(v),k++;if(c.id==_.id)return;r(_,c)&&c.id!=_.id?d.move(c.id,0,0,_.id):_.$level!=c.$level-1||d.getChildren(_.id).length?m&&r(m,c)&&c.id!=m.id&&d.move(c.id,-1,d.getParent(m.id)):d.move(c.id,0,_.id)}return!0},t)),s.attachEvent("onDragEnd",t.bind(function(){var t=n(),e=t.getItem(s.config.id);e.$transparent=!1,e.$open=s.config.initial_open_state,!1===this.callEvent("onBeforeRowDragEnd",[s.config.id,s.config.parent,s.config.index])?(t.move(s.config.id,s.config.index,s.config.parent),e.$drop_target=null):this.callEvent("onRowDragEnd",[s.config.id,e.$drop_target]),t.refresh(e.id)},t))}}var r=i(1);t.exports={init:n}},function(t,e,i){var n=i(0),r=i(52),a=i(53),s=i(1),o=function(){return function(t){var e=t.$services;return{onCreated:function(e){var s=e.$config;s.bind=n.defined(s.bind)?s.bind:"task",s.bindLinks=n.defined(s.bindLinks)?s.bindLinks:"link",e._linksDnD=a.createLinkDND(),e._tasksDnD=r.createTaskDND(),e._tasksDnD.extend(e),"timeline"==e.$config.id&&this.extendGantt(e),this._mouseDelegates=i(8)(t)},onInitialized:function(e){this._attachDomEvents(t),this._attachStateProvider(t,e),e._tasksDnD.init(e,t),e._linksDnD.init(e,t),"timeline"==e.$config.id&&this.extendDom(e)},onDestroyed:function(e){this._clearDomEvents(t),this._clearStateProvider(t)},extendDom:function(e){t.$task=e.$task,t.$task_scale=e.$task_scale,t.$task_data=e.$task_data,t.$task_bg=e.$task_bg,t.$task_links=e.$task_links,t.$task_bars=e.$task_bars},extendGantt:function(e){t.dateFromPos=t.bind(e.dateFromPos,e),t.posFromDate=t.bind(e.posFromDate,e),t.getRowTop=t.bind(e.getRowTop,e),t.getTaskTop=t.bind(e.getItemTop,e),t.getTaskPosition=t.bind(e.getItemPosition,e),t.getTaskHeight=t.bind(e.getItemHeight,e),t.columnIndexByDate=t.bind(e.columnIndexByDate,e),t.roundTaskDates=t.bind(e.roundTaskDates,e),t.getScale=t.bind(e.getScale,e),t.getTaskNode=function(t){return e._taskRenderer.rendered[t]},t.getLinkNode=function(t){return e._linkRenderer.rendered[t]}},_clearDomEvents:function(){this._mouseDelegates.destructor(),this._mouseDelegates=null},_attachDomEvents:function(t){function e(e,i){if(e&&this.callEvent("onLinkDblClick",[e,i])){var n=this.getLink(e);if(this.isReadonly(n))return;var r=this.locale.labels.link+" "+this.templates.link_description(this.getLink(e))+" "+this.locale.labels.confirm_link_deleting;window.setTimeout(function(){t._dhtmlx_confirm(r,"",function(){t.deleteLink(e)})},this.config.touch?300:1)}}this._mouseDelegates.delegate("click","gantt_task_link",t.bind(function(t,e){var i=this.locate(t,this.config.link_attribute);i&&this.callEvent("onLinkClick",[i,t])},t),this.$task),this._mouseDelegates.delegate("click","gantt_scale_cell",t.bind(function(e,i){var n=s.getRelativeEventPosition(e,t.$task_data),r=t.dateFromPos(n.x),a=Math.floor(t.columnIndexByDate(r)),o=t.getScale().trace_x[a];t.callEvent("onScaleClick",[e,o])},t),this.$task),this._mouseDelegates.delegate("doubleclick","gantt_task_link",t.bind(function(i,n,r){var n=this.locate(i,t.config.link_attribute);e.call(this,n,i)},t),this.$task),this._mouseDelegates.delegate("doubleclick","gantt_link_point",t.bind(function(t,i,n){var i=this.locate(t),r=this.getTask(i),a=null;return n.parentNode&&s.getClassName(n.parentNode)&&(a=s.getClassName(n.parentNode).indexOf("_left")>-1?r.$target[0]:r.$source[0]),a&&e.call(this,a,t),!1},t),this.$task)},_attachStateProvider:function(t,i){var n=i;e.getService("state").registerProvider("tasksTimeline",function(){return{scale_unit:n._tasks?n._tasks.unit:void 0,scale_step:n._tasks?n._tasks.step:void 0}})},_clearStateProvider:function(){e.getService("state").unregisterProvider("tasksTimeline")}}}}();t.exports=o},function(t,e,i){function n(t,e){var i=e.$services;return{drag:null,dragMultiple:{},_events:{before_start:{},before_finish:{},after_finish:{}},_handlers:{},init:function(){this._domEvents=e._createDomEventScope(),this.clear_drag_state();var t=e.config.drag_mode;this.set_actions(),i.getService("state").registerProvider("tasksDnd",s.bind(function(){return{drag_id:this.drag?this.drag.id:void 0,drag_mode:this.drag?this.drag.mode:void 0,drag_from_start:this.drag?this.drag.left:void 0}},this));var n={before_start:"onBeforeTaskDrag",before_finish:"onBeforeTaskChanged",after_finish:"onAfterTaskDrag"};for(var r in this._events)for(var a in t)this._events[r][a]=n[r];this._handlers[t.move]=this._move,this._handlers[t.resize]=this._resize,this._handlers[t.progress]=this._resize_progress},set_actions:function(){var i=t.$task_data;this._domEvents.attach(i,"mousemove",e.bind(function(t){this.on_mouse_move(t||event)},this)),this._domEvents.attach(i,"mousedown",e.bind(function(t){this.on_mouse_down(t||event)},this)),this._domEvents.attach(i,"mouseup",e.bind(function(t){this.on_mouse_up(t||event)},this))},clear_drag_state:function(){this.drag={id:null,mode:null,pos:null,start_x:null,start_y:null,obj:null,left:null},this.dragMultiple={}},_resize:function(i,n,r){var a=t.$getConfig(),s=this._drag_task_coords(i,r);r.left?(i.start_date=e.dateFromPos(s.start+n),i.start_date||(i.start_date=new Date(e.getState().min_date))):(i.end_date=e.dateFromPos(s.end+n),i.end_date||(i.end_date=new Date(e.getState().max_date))),i.end_date-i.start_date<a.min_duration&&(r.left?i.start_date=e.calculateEndDate({start_date:i.end_date,duration:-1,task:i}):i.end_date=e.calculateEndDate({start_date:i.start_date,duration:1,task:i})),e._init_task_timing(i)},_resize_progress:function(e,i,n){var r=this._drag_task_coords(e,n),a=t.$getConfig(),s=a.rtl?r.start-n.pos.x:n.pos.x-r.start,o=Math.max(0,s);e.progress=Math.min(1,o/Math.abs(r.end-r.start))},_find_max_shift:function(t,i){var n;for(var r in t){var a=t[r],s=e.getTask(a.id),o=this._drag_task_coords(s,a),l=e.posFromDate(new Date(e.getState().min_date)),d=e.posFromDate(new Date(e.getState().max_date));if(o.end+i>d){var c=d-o.end;(c<n||void 0===n)&&(n=c)}else if(o.start+i<l){var h=l-o.start;(h<n||void 0===n)&&(n=h)}}return n},_move:function(t,i,n){var r=this._drag_task_coords(t,n),a=e.dateFromPos(r.start+i),s=e.dateFromPos(r.end+i);a?s?(t.start_date=a,t.end_date=s):(t.end_date=new Date(e.getState().max_date),t.start_date=e.dateFromPos(e.posFromDate(t.end_date)-(r.end-r.start))):(t.start_date=new Date(e.getState().min_date),t.end_date=e.dateFromPos(e.posFromDate(t.start_date)+(r.end-r.start)))},_drag_task_coords:function(t,i){return{start:i.obj_s_x=i.obj_s_x||e.posFromDate(t.start_date),end:i.obj_e_x=i.obj_e_x||e.posFromDate(t.end_date)}},_mouse_position_change:function(t,e){var i=t.x-e.x,n=t.y-e.y;return Math.sqrt(i*i+n*n)},_is_number:function(t){return!isNaN(parseFloat(t))&&isFinite(t)},on_mouse_move:function(t){if(this.drag.start_drag){var i=a.getRelativeEventPosition(t,e.$task_data),n=this.drag.start_drag.start_x,r=this.drag.start_drag.start_y;(Date.now()-this.drag.timestamp>50||this._is_number(n)&&this._is_number(r)&&this._mouse_position_change({x:n,y:r},i)>20)&&this._start_dnd(t)}if(this.drag.mode){if(!o(this,40))return;this._update_on_move(t)}},_update_item_on_move:function(t,i,n,r,a){var s=e.getTask(i),o=e.mixin({},s),l=e.mixin({},s);this._handlers[n].apply(this,[l,t,r]),e.mixin(s,l,!0),e.callEvent("onTaskDrag",[s.id,n,l,o,a]),e.mixin(s,l,!0),e.refreshTask(i)},_update_on_move:function(i){var n=this.drag,r=t.$getConfig();if(n.mode){var o=a.getRelativeEventPosition(i,t.$task_data);if(n.pos&&n.pos.x==o.x)return;n.pos=o;var l=e.dateFromPos(o.x);if(!l||isNaN(l.getTime()))return;var d=o.x-n.start_x,c=e.getTask(n.id);if(this._handlers[n.mode]){if(e.isSummaryTask(c)&&e.config.drag_project&&n.mode==r.drag_mode.move){var h={};h[n.id]=s.copy(n);var u=this._find_max_shift(s.mixin(h,this.dragMultiple),d);void 0!==u&&(d=u),this._update_item_on_move(d,n.id,n.mode,n,i);for(var _ in this.dragMultiple){var g=this.dragMultiple[_];this._update_item_on_move(d,g.id,g.mode,g,i)}}else this._update_item_on_move(d,n.id,n.mode,n,i);e._update_parents(n.id)}}},on_mouse_down:function(i,n){if(2!=i.button||void 0===i.button){var r=t.$getConfig(),s=e.locate(i),o=null;if(e.isTaskExists(s)&&(o=e.getTask(s)),!e.isReadonly(o)&&!this.drag.mode){this.clear_drag_state(),n=n||i.target||i.srcElement;var l=a.getClassName(n),d=this._get_drag_mode(l,n);if(!l||!d)return n.parentNode?this.on_mouse_down(i,n.parentNode):void 0;if(d)if(d.mode&&d.mode!=r.drag_mode.ignore&&r["drag_"+d.mode]){if(s=e.locate(n),o=e.copy(e.getTask(s)||{}),e.isReadonly(o))return this.clear_drag_state(),!1;if(e.isSummaryTask(o)&&!r.drag_project&&d.mode!=r.drag_mode.progress)return void this.clear_drag_state();d.id=s;var c=a.getRelativeEventPosition(i,e.$task_data);d.start_x=c.x,d.start_y=c.y,d.obj=o,this.drag.start_drag=d,this.drag.timestamp=Date.now()}else this.clear_drag_state();else if(e.checkEvent("onMouseDown")&&e.callEvent("onMouseDown",[l.split(" ")[0]])&&n.parentNode)return this.on_mouse_down(i,n.parentNode)}}},_fix_dnd_scale_time:function(i,n){function r(i){if(e.config.correct_work_time){var n=t.$getConfig();e.isWorkTime(i.start_date,void 0,i)||(i.start_date=e.calculateEndDate({start_date:i.start_date,duration:-1,unit:n.duration_unit,task:i}))}}var a=t.$getConfig(),s=e.getScale().unit,o=e.getScale().step;a.round_dnd_dates||(s="minute",o=a.time_step),n.mode==a.drag_mode.resize?n.left?(i.start_date=e.roundDate({date:i.start_date,unit:s,step:o}),r(i)):(i.end_date=e.roundDate({date:i.end_date,unit:s,step:o}),function(i){if(e.config.correct_work_time){var n=t.$getConfig();e.isWorkTime(new Date(i.end_date-1),void 0,i)||(i.end_date=e.calculateEndDate({start_date:i.end_date,duration:1,unit:n.duration_unit,task:i}))}}(i)):n.mode==a.drag_mode.move&&(i.start_date=e.roundDate({date:i.start_date,unit:s,step:o}),r(i),i.end_date=e.calculateEndDate(i))},_fix_working_times:function(i,n){var r=t.$getConfig(),n=n||{mode:r.drag_mode.move};n.mode==r.drag_mode.resize?n.left?i.start_date=e.getClosestWorkTime({date:i.start_date,dir:"future",task:i}):i.end_date=e.getClosestWorkTime({date:i.end_date,dir:"past",task:i}):n.mode==r.drag_mode.move&&e.correctTaskWorkTime(i)},_finalize_mouse_up:function(t,i,n,r){var a=e.getTask(t);if(i.work_time&&i.correct_work_time&&this._fix_working_times(a,n),this._fix_dnd_scale_time(a,n),this._fireEvent("before_finish",n.mode,[t,n.mode,e.copy(n.obj),r])){var s=t;e._init_task_timing(a),this.clear_drag_state(),e.updateTask(a.id),this._fireEvent("after_finish",n.mode,[s,n.mode,r])}else this.clear_drag_state(),t==n.id&&(n.obj._dhx_changed=!1,e.mixin(a,n.obj,!0)),e.refreshTask(a.id)},on_mouse_up:function(i){var n=this.drag;if(n.mode&&n.id){var r=t.$getConfig(),a=e.getTask(n.id),s=this.dragMultiple;if(this._finalize_mouse_up(n.id,r,n,i),e.isSummaryTask(a)&&r.drag_project&&n.mode==r.drag_mode.move)for(var o in s)this._finalize_mouse_up(s[o].id,r,s[o],i)}this.clear_drag_state()},_get_drag_mode:function(e,i){var n=t.$getConfig(),r=n.drag_mode,a=(e||"").split(" "),s=a[0],o={mode:null,left:null};switch(s){case"gantt_task_line":case"gantt_task_content":o.mode=r.move;break;case"gantt_task_drag":o.mode=r.resize;var l=i.getAttribute("data-bind-property");o.left="start_date"==l;break;case"gantt_task_progress_drag":o.mode=r.progress;break;case"gantt_link_control":case"gantt_link_point":o.mode=r.ignore;break;default:o=null}return o},_start_dnd:function(i){var n=this.drag=this.drag.start_drag;delete n.start_drag;var r=t.$getConfig(),a=n.id;if(r["drag_"+n.mode]&&e.callEvent("onBeforeDrag",[a,n.mode,i])&&this._fireEvent("before_start",n.mode,[a,n.mode,i])){delete n.start_drag;var s=e.getTask(a);e.isSummaryTask(s)&&e.config.drag_project&&n.mode==r.drag_mode.move&&e.eachTask(function(t){this.dragMultiple[t.id]=e.mixin({id:t.id,obj:t},this.drag)},s.id,this),e.callEvent("onTaskDragStart",[])}else this.clear_drag_state()},_fireEvent:function(t,i,n){e.assert(this._events[t],"Invalid stage:{"+t+"}");var r=this._events[t][i];return e.assert(r,"Unknown after drop mode:{"+i+"}"),e.assert(n,"Invalid event arguments"),!e.checkEvent(r)||e.callEvent(r,n)},round_task_dates:function(e){var i=this.drag,n=t.$getConfig();i||(i={mode:n.drag_mode.move}),this._fix_dnd_scale_time(e,i)},destructor:function(){this._domEvents.detachAll()}}}function r(){var t;return{extend:function(e){e.roundTaskDates=function(e){t.round_task_dates(e)}},init:function(e,i){return t=n(e,i),e._tasks_dnd=t,t.init(i)},destructor:function(){t.destructor(),t=null}}}var a=i(1),s=i(0),o=i(9);t.exports={createTaskDND:r}},function(t,e,i){var n=i(1),r=function(t,e){function i(){var e=t.getItemHeight();return Math.round(Math.sqrt(2*e*e))-2}function r(t){return e.getTaskType(t.type)==e.config.types.milestone}function a(){return{link_source_id:k,link_target_id:v,link_from_start:y,link_to_start:m,link_landing_area:p}}function s(t,i,n,a,s){var l=o(t,function(t){return e.getTaskPosition(t)},a),d={x:l.x,y:l.y};i||(d.x=l.xEnd),d.y+=e.config.row_height/2;var c=r(t)&&s?2:0;return n=n||0,a.rtl&&(n*=-1),d.x+=(i?-1:1)*n-c,d}function o(t,n,r){var a=n(t),s={x:a.left,y:a.top,width:a.width,height:a.height};if(r.rtl?(s.xEnd=s.x,s.x=s.xEnd+s.width):s.xEnd=s.x+s.width,s.yEnd=s.y+s.height,e.getTaskType(t.type)==e.config.types.milestone){var o=i();s.x+=(r.rtl?1:-1)*(o/2),s.xEnd+=(r.rtl?-1:1)*(o/2),s.width=a.xEnd-a.x}return s}function l(t){var i=a(),n=["gantt_link_tooltip"];i.link_source_id&&i.link_target_id&&(e.isLinkAllowed(i.link_source_id,i.link_target_id,i.link_from_start,i.link_to_start)?n.push("gantt_allowed_link"):n.push("gantt_invalid_link"));var r=e.templates.drag_link_class(i.link_source_id,i.link_from_start,i.link_target_id,i.link_to_start);r&&n.push(r);var s="<div class='"+r+"'>"+e.templates.drag_link(i.link_source_id,i.link_from_start,i.link_target_id,i.link_to_start)+"</div>";t.innerHTML=s}function d(t,e){t.style.left=e.x+5+"px",t.style.top=e.y+5+"px"}function c(){k=y=v=null,m=!0}function h(t,i,n,r){var s=g(),o=a(),l=["gantt_link_direction"];e.templates.link_direction_class&&l.push(e.templates.link_direction_class(o.link_source_id,o.link_from_start,o.link_target_id,o.link_to_start));var d=Math.sqrt(Math.pow(n-t,2)+Math.pow(r-i,2));if(d=Math.max(0,d-3)){s.className=l.join(" ");var c=(r-i)/(n-t),h=Math.atan(c);2==_(t,n,i,r)?h+=Math.PI:3==_(t,n,i,r)&&(h-=Math.PI);var f=Math.sin(h),p=Math.cos(h),v=Math.round(i),m=Math.round(t),k=["-webkit-transform: rotate("+h+"rad)","-moz-transform: rotate("+h+"rad)","-ms-transform: rotate("+h+"rad)","-o-transform: rotate("+h+"rad)","transform: rotate("+h+"rad)","width:"+Math.round(d)+"px"];if(-1!=window.navigator.userAgent.indexOf("MSIE 8.0")){k.push('-ms-filter: "'+u(f,p)+'"');var y=Math.abs(Math.round(t-n)),b=Math.abs(Math.round(r-i));switch(_(t,n,i,r)){case 1:v-=b;break;case 2:m-=y,v-=b;break;case 3:m-=y}}k.push("top:"+v+"px"),k.push("left:"+m+"px"),s.style.cssText=k.join(";")}}function u(t,e){return"progid:DXImageTransform.Microsoft.Matrix(M11 = "+e+",M12 = -"+t+",M21 = "+t+",M22 = "+e+",SizingMethod = 'auto expand')"}function _(t,e,i,n){return e>=t?n<=i?1:4:n<=i?2:3}function g(){return w._direction||(w._direction=document.createElement("div"),t.$task_links.appendChild(w._direction)),w._direction}function f(){w._direction&&(w._direction.parentNode&&w._direction.parentNode.removeChild(w._direction),w._direction=null)}var p,v,m,k,y,b=e.$services,$=b.getService("state"),x=b.getService("dnd");$.registerProvider("linksDnD",a);var w=new x(t.$task_bars,{sensitivity:0,updates_per_second:60});w.attachEvent("onBeforeDragStart",e.bind(function(i,r){var a=r.target||r.srcElement;if(c(),e.getState().drag_id)return!1;if(n.locateClassName(a,"gantt_link_point")){n.locateClassName(a,"task_start_date")&&(y=!0);var o=e.locate(r);k=o;var l=e.getTask(o);if(e.isReadonly(l))return c(),!1;return this._dir_start=s(l,!!y,0,t.$getConfig(),!0),!0}return!1},this)),w.attachEvent("onAfterDragStart",e.bind(function(t,i){e.config.touch&&e.refreshData(),l(w.config.marker)},this)),w.attachEvent("onDragMove",e.bind(function(i,r){var a=w.config,o=w.getPosition(r);d(a.marker,o);var c=!!n.locateClassName(r,"gantt_link_control"),u=v,_=p,g=m,f=e.locate(r),k=!0;if(c&&(k=!n.locateClassName(r,"task_end_date"),c=!!f),v=f,p=c,m=k,c){var y=e.getTask(f),b=t.$getConfig(),$=n.locateClassName(r,"gantt_link_control"),x=0;$&&(x=Math.floor($.offsetWidth/2)),this._dir_end=s(y,!!m,x,b)}else this._dir_end=n.getRelativeEventPosition(r,t.$task_data);var S=!(_==c&&u==f&&g==k);return S&&(u&&e.refreshTask(u,!1),f&&e.refreshTask(f,!1)),S&&l(a.marker),h(this._dir_start.x,this._dir_start.y,this._dir_end.x,this._dir_end.y),!0},this)),w.attachEvent("onDragEnd",e.bind(function(){var t=a();if(t.link_source_id&&t.link_target_id&&t.link_source_id!=t.link_target_id){var i=e._get_link_type(t.link_from_start,t.link_to_start),n={source:t.link_source_id,target:t.link_target_id,type:i};n.type&&e.isLinkAllowed(n)&&e.addLink(n)}c(),e.config.touch?e.refreshData():(t.link_source_id&&e.refreshTask(t.link_source_id,!1),t.link_target_id&&e.refreshTask(t.link_target_id,!1)),f()},this))};t.exports={createLinkDND:function(){return{init:r}}}},function(t,e){var i=function(){return function(t){return{getVerticalScrollbar:function(){return t.$ui.getView("scrollVer")},getHorizontalScrollbar:function(){return t.$ui.getView("scrollHor")},_legacyGridResizerClass:function(t){for(var e=t.getCellsByType("resizer"),i=0;i<e.length;i++){var n=e[i],r=!1,a=n.$parent.getPrevSibling(n.$id);if(a&&a.$config&&"grid"===a.$config.id)r=!0;else{var s=n.$parent.getNextSibling(n.$id);s&&s.$config&&"grid"===s.$config.id&&(r=!0)}r&&(n.$config.css=(n.$config.css?n.$config.css+" ":"")+"gantt_grid_resize_wrap")}},onCreated:function(e){var i=!0;this._legacyGridResizerClass(e),e.attachEvent("onBeforeResize",function(){var e=t.$ui.getView("timeline");e&&(e.$config.hidden=e.$parent.$config.hidden=!t.config.show_chart);var n=t.$ui.getView("grid");if(n){var r=t.config.show_grid;if(i){var a=n._getColsTotalWidth();!1!==a&&(t.config.grid_width=a),r=r&&!!t.config.grid_width,t.config.show_grid=r}if(n.$config.hidden=n.$parent.$config.hidden=!r,!n.$config.hidden){var s=n._getGridWidthLimits();s[0]&&t.config.grid_width<s[0]&&(t.config.grid_width=s[0]),s[1]&&t.config.grid_width>s[1]&&(t.config.grid_width=s[1]),n.$config.width=t.config.grid_width-1,i?(n.$parent.$config.width=t.config.grid_width,n.$parent.$config.group&&t.$layout._syncCellSizes(n.$parent.$config.group,n.$parent.$config.width)):n.$parent._setContentSize(n.$config.width,n.$config.height)}i=!1}}),t._getVerticalScrollbar=this.getVerticalScrollbar,t._getHorizontalScrollbar=this.getHorizontalScrollbar;var n=this.getVerticalScrollbar(),r=this.getHorizontalScrollbar();n&&n.attachEvent("onScroll",function(e,i,n){var r=t.getScrollState();t.callEvent("onGanttScroll",[r.x,e,r.x,i])}),r&&r.attachEvent("onScroll",function(e,i,n){var r=t.getScrollState();t.callEvent("onGanttScroll",[e,r.y,i,r.y])}),e.attachEvent("onResize",function(){n&&!t.$scroll_ver&&(t.$scroll_ver=n.$scroll_ver),r&&!t.$scroll_hor&&(t.$scroll_hor=r.$scroll_hor)})},onInitialized:function(e){var i=t.$ui.getView("grid");if(i&&i.$parent&&i.$parent.$parent&&i.$parent.$parent._xLayout){var n=i.$parent.$parent,r=n.getNextSibling(i.$parent.$id),a=!0;if(r&&"resizer"==r.$name||(r=n.getPrevSibling(i.$parent.$id),a=!1),r&&"resizer"==r.$name){var s;r.attachEvent("onResizeStart",function(e,i){var n=t.$ui.getView("grid"),r=n?n.$parent:null;if(r){var o=n._getGridWidthLimits();n.$config.scrollable||(r.$config.minWidth=o[0]),r.$config.maxWidth=o[1]}return s=a?e:i,t.callEvent("onGridResizeStart",[s])}),r.attachEvent("onResize",function(e,i){var n=a?e:i;return t.callEvent("onGridResize",[s,n])}),r.attachEvent("onResizeEnd",function(e,i,n,r){var s=a?e:i,o=a?n:r,l=t.$ui.getView("grid"),d=l?l.$parent:null;d&&(d.$config.minWidth=void 0);var c=t.callEvent("onGridResizeEnd",[s,o]);return c&&(t.config.grid_width=o),c})}}},onDestroyed:function(t){}}}}();t.exports=i},function(t,e){t.exports=function(t){delete t.addTaskLayer,delete t.addLinkLayer}},function(t,e,i){function n(t){function e(e){if(t.isTaskExists(e.source)){var i=t.getTask(e.source);i.$source=i.$source||[],i.$source.push(e.id)}if(t.isTaskExists(e.target)){var n=t.getTask(e.target);n.$target=n.$target||[],n.$target.push(e.id)}}function n(e){if(t.isTaskExists(e.source))for(var i=t.getTask(e.source),n=0;n<i.$source.length;n++)if(i.$source[n]==e.id){i.$source.splice(n,1);break}if(t.isTaskExists(e.target))for(var r=t.getTask(e.target),n=0;n<r.$target.length;n++)if(r.$target[n]==e.id){r.$target.splice(n,1);break}}function o(){for(var i=null,n=t.$data.tasksStore.getItems(),r=0,a=n.length;r<a;r++)i=n[r],i.$source=[],i.$target=[];for(var s=t.$data.linksStore.getItems(),r=0,a=s.length;r<a;r++){e(s[r])}}function l(t){var e=t.source,i=t.target;for(var n in t.events)!function(t,n){e.attachEvent(t,function(){return i.callEvent(n,Array.prototype.slice.call(arguments))},n)}(n,t.events[n])}function d(e){this.defined(e.id)||(e.id=this.uid()),e.start_date&&(e.start_date=t.date.parseDate(e.start_date,"xml_date")),e.end_date&&(e.end_date=t.date.parseDate(e.end_date,"xml_date"));var i=null;return(e.duration||0===e.duration)&&(e.duration=i=1*e.duration),i&&(e.start_date&&!e.end_date?e.end_date=this.calculateEndDate(e):!e.start_date&&e.end_date&&(e.start_date=this.calculateEndDate({start_date:e.end_date,duration:-e.duration,task:e}))),this._isAllowedUnscheduledTask(e)&&this._set_default_task_timing(e),this._init_task_timing(e),e.start_date&&e.end_date&&this.correctTaskWorkTime(e),e.$source=[],e.$target=[],void 0===e.parent&&this.setParent(e,this.config.root_id),e}function c(t){return this.defined(t.id)||(t.id=this.uid()),t}var h=a.create();r.mixin(t,h);var u=t.createDatastore({name:"task",type:"treeDatastore",rootId:function(){return t.config.root_id},initItem:r.bind(d,t)}),_=t.createDatastore({name:"link",initItem:r.bind(c,t)});u.attachEvent("onBeforeRefreshAll",function(){for(var e=u.getVisibleItems(),i=0;i<e.length;i++){var n=e[i];n.$index=i,t.resetProjectDates(n)}}),u.attachEvent("onFilterItem",function(e,i){var n=null,r=null;if(t.config.start_date&&t.config.end_date){if(t._isAllowedUnscheduledTask(i))return!0;if(n=t.config.start_date.valueOf(),r=t.config.end_date.valueOf(),+i.start_date>r||+i.end_date<+n)return!1}return!0}),u.attachEvent("onIdChange",function(e,i){t._update_flags(e,i)}),u.attachEvent("onAfterUpdate",function(e){t._update_parents(e)}),u.attachEvent("onAfterItemMove",function(e,i,n){var r=t.getTask(e);return null!==this.getNextSibling(e)?r.$drop_target=this.getNextSibling(e):null!==this.getPrevSibling(e)?r.$drop_target="next:"+this.getPrevSibling(e):r.$drop_target="next:null",!0}),u.attachEvent("onStoreUpdated",function(e,i,n){if("delete"==n&&t._update_flags(e,null),!t.$services.getService("state").getState("batchUpdate").batch_update){if(t.config.fit_tasks&&"paint"!==n){var r=t.getState();s(t);var a=t.getState();if(+r.min_date!=+a.min_date||+r.max_date!=+a.max_date)return t.render(),t.callEvent("onScaleAdjusted",[]),!0}"add"==n||"move"==n||"delete"==n?t.$layout.resize():e||_.refresh()}}),_.attachEvent("onAfterAdd",function(t,i){e(i)}),_.attachEvent("onAfterUpdate",function(t,e){o()}),_.attachEvent("onAfterDelete",function(t,e){n(e)}),_.attachEvent("onIdChange",function(i,r){n(t.mixin({id:i},t.$data.linksStore.getItem(r))),e(t.$data.linksStore.getItem(r))}),_.attachEvent("onFilterItem",function(e,i){return!!t.config.show_links&&(!(!t.isTaskVisible(i.source)||!t.isTaskVisible(i.target)||t._isAllowedUnscheduledTask(t.getTask(i.source))||t._isAllowedUnscheduledTask(t.getTask(i.target)))&&t.callEvent("onBeforeLinkDisplay",[e,i]))}),function(){var e=i(18),r={};t.attachEvent("onBeforeTaskDelete",function(i,n){return r[i]=e.getSubtreeLinks(t,i),!0}),t.attachEvent("onAfterTaskDelete",function(e,i){r[e]&&t.$data.linksStore.silent(function(){for(var i in r[e])t.$data.linksStore.removeItem(i),n(r[e][i]);r[e]=null})})}(),t.attachEvent("onAfterLinkDelete",function(e,i){t.refreshTask(i.source),t.refreshTask(i.target)}),t.attachEvent("onParse",o),l({source:_,target:t,events:{onItemLoading:"onLinkLoading",onBeforeAdd:"onBeforeLinkAdd",onAfterAdd:"onAfterLinkAdd",onBeforeUpdate:"onBeforeLinkUpdate",onAfterUpdate:"onAfterLinkUpdate",onBeforeDelete:"onBeforeLinkDelete",onAfterDelete:"onAfterLinkDelete",onIdChange:"onLinkIdChange"}}),l({source:u,target:t,events:{onItemLoading:"onTaskLoading",onBeforeAdd:"onBeforeTaskAdd",onAfterAdd:"onAfterTaskAdd",onBeforeUpdate:"onBeforeTaskUpdate",onAfterUpdate:"onAfterTaskUpdate",onBeforeDelete:"onBeforeTaskDelete",onAfterDelete:"onAfterTaskDelete",onIdChange:"onTaskIdChange",onBeforeItemMove:"onBeforeTaskMove",onAfterItemMove:"onAfterTaskMove",onFilterItem:"onBeforeTaskDisplay",onItemOpen:"onTaskOpened",onItemClose:"onTaskClosed",onBeforeSelect:"onBeforeTaskSelected",onAfterSelect:"onTaskSelected",onAfterUnselect:"onTaskUnselected"}}),t.$data={tasksStore:u,linksStore:_}}var r=i(0),a=i(57),s=i(17);t.exports=n},function(t,e,i){function n(){for(var t=this.$services.getService("datastores"),e=[],i=0;i<t.length;i++)e.push(this.getDatastore(t[i]));return e}function r(){var t=a.mixin({},u());return a.mixin(t,s()),a.mixin(t,o()),t}var a=i(0),s=i(58),o=i(59),l=i(15),d=i(60),c=i(61),h=i(62),u=function(){return{createDatastore:function(t){var e="treedatastore"==(t.type||"").toLowerCase()?d:l;if(t){var i=this;t.openInitially=function(){return i.config.open_tree_initially}}var n=new e(t);if(this.mixin(n,c()),t.name){this.$services.setService("datastore:"+t.name,function(){return n});var r=this.$services.getService("datastores");r||(r=[],this.$services.setService("datastores",function(){return r})),r.push(t.name),h.bindDataStore(t.name,this)}return n},getDatastore:function(t){return this.$services.getService("datastore:"+t)},refreshData:function(){var t=this.getScrollState();this.callEvent("onBeforeDataRender",[]);for(var e=n.call(this),i=0;i<e.length;i++)e[i].refresh();(t.x||t.y)&&this.scrollTo(t.x,t.y),this.callEvent("onDataRender",[])},isChildOf:function(t,e){return this.$data.tasksStore.isChildOf(t,e)},refreshTask:function(t,e){var i=this.getTask(t);if(i&&this.isTaskVisible(t)){if(this.$data.tasksStore.refresh(t,!!this.getState().drag_id),void 0!==e&&!e)return;for(var n=0;n<i.$source.length;n++)this.refreshLink(i.$source[n]);for(var n=0;n<i.$target.length;n++)this.refreshLink(i.$target[n])}},refreshLink:function(t){this.$data.linksStore.refresh(t)},silent:function(t){var e=this;e.$data.tasksStore.silent(function(){e.$data.linksStore.silent(function(){t()})})},clearAll:function(){for(var t=n.call(this),e=0;e<t.length;e++)t[e].clearAll();this._update_flags(),this.userdata={},this.callEvent("onClear",[]),this.render()},_clear_data:function(){this.$data.tasksStore.clearAll(),this.$data.linksStore.clearAll(),this._update_flags(),this.userdata={}},selectTask:function(t){var e=this.$data.tasksStore;return!!this.config.select_task&&(t&&e.select(t),e.getSelectedId())},unselectTask:function(t){this.$data.tasksStore.unselect(t)},getSelectedId:function(){return this.$data.tasksStore.getSelectedId()}}};t.exports={create:r}},function(t,e,i){var n=i(0),r=function(){return{getTask:function(t){this.assert(t,"Invalid argument for gantt.getTask");var e=this.$data.tasksStore.getItem(t);return this.assert(e,"Task not found id="+t),e},getTaskByTime:function(t,e){var i=this.$data.tasksStore.getItems(),n=[];if(t||e){t=+t||-1/0,e=+e||1/0;for(var r=0;r<i.length;r++){var a=i[r];+a.start_date<e&&+a.end_date>t&&n.push(a)}}else n=i;return n},isTaskExists:function(t){return this.$data.tasksStore.exists(t)},updateTask:function(t,e){n.defined(e)||(e=this.getTask(t)),this.$data.tasksStore.updateItem(t,e),this.refreshTask(t)},addTask:function(t,e,i){return n.defined(t.id)||(t.id=n.uid()),n.defined(e)||(e=this.getParent(t)||0),this.isTaskExists(e)||(e=0),this.setParent(t,e),this.$data.tasksStore.addItem(t,i,e)},deleteTask:function(t){return this.$data.tasksStore.removeItem(t)},getTaskCount:function(){return this.$data.tasksStore.count()},getVisibleTaskCount:function(){return this.$data.tasksStore.countVisible()},getTaskIndex:function(t){return this.$data.tasksStore.getBranchIndex(t)},getGlobalTaskIndex:function(t){return this.assert(t,"Invalid argument"),this.$data.tasksStore.getIndexById(t)},eachTask:function(t,e,i){return this.$data.tasksStore.eachItem(n.bind(t,i||this),e)},eachParent:function(t,e,i){return this.$data.tasksStore.eachParent(n.bind(t,i||this),e)},changeTaskId:function(t,e){this.$data.tasksStore.changeId(t,e);var i=this.$data.tasksStore.getItem(e),n=[];i.$source&&(n=n.concat(i.$source)),i.$target&&(n=n.concat(i.$target));for(var r=0;r<n.length;r++){var a=this.getLink(n[r]);a.source==t&&(a.source=e),a.target==t&&(a.target=e)}},calculateTaskLevel:function(t){return this.$data.tasksStore.calculateItemLevel(t)},getNext:function(t){return this.$data.tasksStore.getNext(t)},getPrev:function(t){return this.$data.tasksStore.getPrev(t)},getParent:function(t){return this.$data.tasksStore.getParent(t)},setParent:function(t,e,i){return this.$data.tasksStore.setParent(t,e,i)},getSiblings:function(t){return this.$data.tasksStore.getSiblings(t).slice()},getNextSibling:function(t){return this.$data.tasksStore.getNextSibling(t)},getPrevSibling:function(t){return this.$data.tasksStore.getPrevSibling(t)},getTaskByIndex:function(t){var e=this.$data.tasksStore.getIdByIndex(t);return this.isTaskExists(e)?this.getTask(e):null},getChildren:function(t){return this.$data.tasksStore.getChildren(t).slice()},hasChild:function(t){return this.$data.tasksStore.hasChild(t)},open:function(t){this.$data.tasksStore.open(t)},close:function(t){this.$data.tasksStore.close(t)},moveTask:function(t,e,i){this.$data.tasksStore.move.apply(this.$data.tasksStore,arguments)},sort:function(t,e,i,n){var r=!n;this.$data.tasksStore.sort(t,e,i),r&&this.render()}}};t.exports=r},function(t,e,i){var n=i(0),r=function(){return{getLinkCount:function(){return this.$data.linksStore.count()},getLink:function(t){return this.$data.linksStore.getItem(t)},getLinks:function(){return this.$data.linksStore.getItems()},isLinkExists:function(t){return this.$data.linksStore.exists(t)},addLink:function(t){return this.$data.linksStore.addItem(t)},updateLink:function(t,e){n.defined(e)||(e=this.getLink(t)),this.$data.linksStore.updateItem(t,e)},deleteLink:function(t){return this.$data.linksStore.removeItem(t)},changeLinkId:function(t,e){return this.$data.linksStore.changeId(t,e)}}};t.exports=r},function(t,e,i){var n=i(16),r=i(0),a=i(2),s=i(15),o=function(t){return this._branches={},this.pull={},this.$initItem=t.initItem,this.$parentProperty=t.parentProperty||"parent","function"!=typeof t.rootId?this.$getRootId=function(t){return function(){return t}}(t.rootId||0):this.$getRootId=t.rootId,this.$openInitially=t.openInitially,this.visibleOrder=n.$create(),this.fullOrder=n.$create(),this._searchVisibleOrder={},this._skip_refresh=!1,a(this),this.attachEvent("onFilterItem",function(t,e){var i=!0;return this.eachParent(function(t){i=i&&t.$open},e),!!i}),this};o.prototype=r.mixin({_buildTree:function(t){for(var e=null,i=this.$getRootId(),n=0,a=t.length;n<a;n++)e=t[n],this.setParent(e,this.getParent(e)||i);for(var n=0,a=t.length;n<a;n++)e=t[n],this._add_branch(e),e.$level=this.calculateItemLevel(e),r.defined(e.$open)||(e.$open=r.defined(e.open)?e.open:this.$openInitially());this._updateOrder()},parse:function(t){this.callEvent("onBeforeParse",[t]);var e=this._parseInner(t);this._buildTree(e),this.filter(),this.callEvent("onParse",[e])},_addItemInner:function(t,e){var i=this.getParent(t);r.defined(i)||(i=this.$getRootId(),this.setParent(t,i));var n=this.getIndexById(i),a=n+Math.min(Math.max(e,0),this.visibleOrder.length);1*a!==a&&(a=void 0),s.prototype._addItemInner.call(this,t,a),this.setParent(t,i),t.hasOwnProperty("$rendered_parent")&&this._move_branch(t,t.$rendered_parent),this._add_branch(t,e)},_changeIdInner:function(t,e){var i=this.getChildren(e);s.prototype._changeIdInner.call(this,t,e);var n=this.getParent(e);this._replace_branch_child(n,t,e);for(var r=0;r<i.length;r++)this.setParent(this.getItem[i[r]],e)},_traverseBranches:function(t,e){e=e||this.$getRootId();var i=this._branches[e];if(i)for(var n=0;n<i.length;n++){var r=i[n];t.call(this,r),this._branches[r]&&this._traverseBranches(t,r)}},_updateOrder:function(t){t&&s.prototype._updateOrder.call(this,t),this.fullOrder=n.$create(),this._traverseBranches(function(t){this.fullOrder.push(t)})},_removeItemInner:function(t){var e=[];this.eachItem(function(t){e.push(t)},t),e.push(this.getItem(t));for(var i=0;i<e.length;i++)this._move_branch(e[i],this.getParent(e[i]),null),s.prototype._removeItemInner.call(this,e[i].id),this._move_branch(e[i],this.getParent(e[i].id),null)},move:function(t,e,i){var n=arguments[3];if(n){if(n===t)return;i=this.getParent(n),e=this.getBranchIndex(n)}if(t!=i){i=i||this.$getRootId();var r=this.getItem(t),a=this.getParent(r.id),s=(this.getChildren(this.getParent(r.id)),this.getChildren(i));if(-1==e&&(e=s.length+1),a==i){if(this.getBranchIndex(t)==e)return}if(!1!==this.callEvent("onBeforeItemMove",[t,i,e])){this._replace_branch_child(a,t),s=this.getChildren(i);s[e]?s=s.slice(0,e).concat([t]).concat(s.slice(e)):s.push(t),this.setParent(r,i),this._branches[i]=s;var o=this.calculateItemLevel(r)-r.$level;r.$level+=o,this.eachItem(function(t){t.$level+=o},r.id,this),this._moveInner(this.getIndexById(t),this.getIndexById(i)+e),this.callEvent("onAfterItemMove",[t,i,e])&&this.refresh()}}},getBranchIndex:function(t){for(var e=this.getChildren(this.getParent(t)),i=0;i<e.length;i++)if(e[i]==t)return i;return-1},hasChild:function(t){return r.defined(this._branches[t])&&this._branches[t].length},getChildren:function(t){return r.defined(this._branches[t])?this._branches[t]:n.$create()},isChildOf:function(t,e){if(!this.exists(t))return!1;if(e===this.$getRootId())return!0;for(var i=this.getItem(t),n=this.getParent(t);i&&this.exists(n);){if((i=this.getItem(n))&&i.id==e)return!0;n=this.getParent(i)}return!1},getSiblings:function(t){if(!this.exists(t))return n.$create();var e=this.getParent(t);return this.getChildren(e)},getNextSibling:function(t){for(var e=this.getSiblings(t),i=0,n=e.length;i<n;i++)if(e[i]==t)return e[i+1]||null;return null},getPrevSibling:function(t){for(var e=this.getSiblings(t),i=0,n=e.length;i<n;i++)if(e[i]==t)return e[i-1]||null;return null},getParent:function(t){var e=null;e=void 0!==t.id?t:this.getItem(t);var i=this.$getRootId();return e&&(i=e[this.$parentProperty]),i},clearAll:function(){this._branches={},s.prototype.clearAll.call(this)},calculateItemLevel:function(t){var e=0;return this.eachParent(function(){e++},t),e},_setParentInner:function(t,e,i){i||(t.hasOwnProperty("$rendered_parent")?this._move_branch(t,t.$rendered_parent,e):this._move_branch(t,t[this.$parentProperty],e))},setParent:function(t,e,i){this._setParentInner(t,e,i),t[this.$parentProperty]=e},eachItem:function(t,e){e=e||this.$getRootId();var i=this.getChildren(e);if(i)for(var n=0;n<i.length;n++){var r=this.pull[i[n]];t.call(this,r),this.hasChild(r.id)&&this.eachItem(t,r.id)}},eachParent:function(t,e){for(var i=e;this.getParent(i)&&this.exists(this.getParent(i));)i=this.getItem(this.getParent(i)),t.call(this,i)},_add_branch:function(t,e,i){var r=void 0===i?this.getParent(t):i;this.hasChild(r)||(this._branches[r]=n.$create());for(var a=this.getChildren(r),s=!1,o=0,l=a.length;o<l;o++)if(a[o]==t.id){s=!0;break}s||(1*e==e?a.splice(e,0,t.id):a.push(t.id),t.$rendered_parent=r)},_move_branch:function(t,e,i){this._replace_branch_child(e,t.id),this.exists(i)||i==this.$getRootId()?this._add_branch(t,void 0,i):delete this._branches[t.id],t.$level=this.calculateItemLevel(t),this.eachItem(function(t){t.$level=this.calculateItemLevel(t)},t.id)},_replace_branch_child:function(t,e,i){var r=this.getChildren(t);if(r){for(var a=n.$create(),s=0;s<r.length;s++)r[s]!=e?a.push(r[s]):i&&a.push(i);this._branches[t]=a}},sort:function(t,e,i){this.exists(i)||(i=this.$getRootId()),t||(t="order");var n="string"==typeof t?function(e,i){return e[t]==i[t]?0:e[t]>i[t]?1:-1}:t;if(e){var r=n;n=function(t,e){return r(e,t)}}var a=this.getChildren(i);if(a){for(var s=[],o=a.length-1;o>=0;o--)s[o]=this.getItem(a[o]);s.sort(n);for(var o=0;o<s.length;o++)a[o]=s[o].id,this.sort(t,e,a[o])}},filter:function(t){for(var e in this.pull)this.pull[e].$rendered_parent!==this.getParent(this.pull[e])&&this._move_branch(this.pull[e],this.pull[e].$rendered_parent,this.getParent(this.pull[e]));return s.prototype.filter.apply(this,arguments)},open:function(t){this.exists(t)&&(this.getItem(t).$open=!0,this.callEvent("onItemOpen",[t]))},close:function(t){this.exists(t)&&(this.getItem(t).$open=!1,this.callEvent("onItemClose",[t]))},destructor:function(){s.prototype.destructor.call(this),this._branches=null}},s.prototype),t.exports=o},function(t,e){function i(){var t=null;return{select:function(e){if(e){if(t==e)return t;if(!this._skip_refresh&&!this.callEvent("onBeforeSelect",[e]))return!1;this.unselect(),t=e,this._skip_refresh||(this.refresh(e),this.callEvent("onAfterSelect",[e]))}return t},getSelectedId:function(){return t},unselect:function(e){var e=e||t;e&&(t=null,this._skip_refresh||(this.refresh(e),this.callEvent("onAfterUnselect",[e])))}}}t.exports=i},function(t,e){var i=function(t,e){function i(t){return!!t.$services.getService("state").getState("batchUpdate").batch_update}function n(t,e,i,n){for(var r=0;r<t.length;r++)t[r].change_id(e,i)}var r=e.getDatastore(t),a={renderItem:function(t,e){var i=e.getLayers(),n=r.getItem(t);if(n&&r.isVisible(t))for(var a=0;a<i.length;a++)i[a].render_item(n)},renderItems:function(t){for(var e=t.getLayers(),i=0;i<e.length;i++)e[i].clear();for(var n=r.getVisibleItems(),i=0;i<e.length;i++)e[i].render_items(n)}};r.attachEvent("onStoreUpdated",function(n,s,o){if(!i(e)){var l=e.$services.getService("layers").getDataRender(t);l&&(n&&"move"!=o&&"delete"!=o?(r.callEvent("onBeforeRefreshItem",[s.id]),a.renderItem(s.id,l),r.callEvent("onAfterRefreshItem",[s.id])):(r.callEvent("onBeforeRefreshAll",[]),a.renderItems(l),r.callEvent("onAfterRefreshAll",[])))}}),r.attachEvent("onItemOpen",function(){e.render()}),r.attachEvent("onItemClose",function(){e.render()}),r.attachEvent("onIdChange",function(a,s){if(!i(e)){n(e.$services.getService("layers").getDataRender(t).getLayers(),a,s,r.getItem(s))}})};t.exports={bindDataStore:i}},function(t,e,i){function n(t){function e(t,e){delete e.$gantt,delete e.setGanttMode,delete e._getRowData,e.afterUpdate=d,delete t._dp,delete t._change_id,delete t._row_style,delete t._delete_task,delete t._sendTaskOrder,s.forEach(c,function(e){t.detachEvent(e)}),c=[]}function n(t,e){e.setGanttMode=function(t){var i=e.modes||{};e._ganttMode&&(i[e._ganttMode]={_in_progress:e._in_progress,_invalid:e._invalid,updatedRows:e.updatedRows});var n=i[t];n||(n=i[t]={_in_progress:{},_invalid:{},updatedRows:[]}),e._in_progress=n._in_progress,e._invalid=n._invalid,e.updatedRows=n.updatedRows,e.modes=i,e._ganttMode=t},d=e.afterUpdate,e.afterUpdate=function(){var t;t=3==arguments.length?arguments[1]:arguments[4];var i=e._ganttMode,n=t.filePath;i="REST"!=this._tMode?-1!=n.indexOf("gantt_mode=links")?"links":"tasks":n.indexOf("/link")>n.indexOf("/task")?"links":"tasks",e.setGanttMode(i);var r=d.apply(e,arguments);return e.setGanttMode(i),r},e._getRowData=t.bind(function(i,n){var r;r="tasks"==e._ganttMode?this.isTaskExists(i)?this.getTask(i):{id:i}:this.isLinkExists(i)?this.getLink(i):{id:i},r=t.copy(r);var s={};for(var o in r)if("$"!=o.substr(0,1)){var l=r[o];a.isDate(l)?s[o]=this.templates.xml_format(l):s[o]=null===l?"":l}var d=this._get_task_timing_mode(r);return d.$no_start&&(r.start_date="",r.duration=""),d.$no_end&&(r.end_date="",r.duration=""),s[e.action_param]=this.getUserData(i,e.action_param),s},t)}function o(t,e){t._change_id=t.bind(function(t,i){"tasks"!=e._ganttMode?this.changeLinkId(t,i):this.changeTaskId(t,i)},this),t._row_style=function(i,n){if("tasks"==e._ganttMode&&t.isTaskExists(i)){t.getTask(i).$dataprocessor_class=n,t.refreshTask(i)}},t._delete_task=function(t,e){},t._sendTaskOrder=function(t,i){i.$drop_target&&(e.setGanttMode("tasks"),this.getTask(t).target=i.$drop_target,e.setUpdated(t,!0,"order"),delete this.getTask(t).$drop_target)},this._dp=e}function l(t,e){function n(i){for(var n=e.updatedRows.slice(),r=!1,a=0;a<n.length&&!e._in_progress[i];a++)n[a]==i&&("inserted"==t.getUserData(i,"!nativeeditor_status")&&(r=!0),e.setUpdated(i,!1));return r}function r(t){var e=[];return t.$source&&(e=e.concat(t.$source)),t.$target&&(e=e.concat(t.$target)),e}c.push(this.attachEvent("onAfterTaskAdd",function(t,i){e.setGanttMode("tasks"),e.setUpdated(t,!0,"inserted")})),c.push(this.attachEvent("onAfterTaskUpdate",function(i,n){e.setGanttMode("tasks"),e.setUpdated(i,!0),t._sendTaskOrder(i,n)}));var a=i(18),s={};c.push(this.attachEvent("onBeforeTaskDelete",function(e,i){return!t.config.cascade_delete||(s[e]={tasks:a.getSubtreeTasks(t,e),links:a.getSubtreeLinks(t,e)},!0)})),c.push(this.attachEvent("onAfterTaskDelete",function(i,r){if(e.setGanttMode("tasks"),!n(i)){if(t.config.cascade_delete&&s[i]){var a=e.updateMode;e.setUpdateMode("off");var o=s[i];for(var l in o.tasks)n(l)||e.setUpdated(l,!0,"deleted");e.setGanttMode("links");for(var l in o.links)n(l)||e.setUpdated(l,!0,"deleted");s[i]=null,"off"!=a&&e.sendAllData(),e.setGanttMode("tasks"),e.setUpdateMode(a)}e.setUpdated(i,!0,"deleted"),"off"==e.updateMode||e._tSend||e.sendAllData()}})),c.push(this.attachEvent("onAfterLinkUpdate",function(t,i){e.setGanttMode("links"),e.setUpdated(t,!0)})),c.push(this.attachEvent("onAfterLinkAdd",function(t,i){e.setGanttMode("links"),e.setUpdated(t,!0,"inserted")})),c.push(this.attachEvent("onAfterLinkDelete",function(t,i){e.setGanttMode("links"),!n(t)&&e.setUpdated(t,!0,"deleted")})),c.push(this.attachEvent("onRowDragEnd",function(e,i){t._sendTaskOrder(e,t.getTask(e))}));var o=null,l=null;c.push(this.attachEvent("onTaskIdChange",function(i,n){if(e._waitMode){var a=t.getChildren(n);if(a.length){o=o||{};for(var s=0;s<a.length;s++){var d=this.getTask(a[s]);o[d.id]=d}}var c=this.getTask(n),h=r(c);if(h.length){l=l||{};for(var s=0;s<h.length;s++){var u=this.getLink(h[s]);l[u.id]=u}}}})),e.attachEvent("onAfterUpdateFinish",function(){(o||l)&&(t.batchUpdate(function(){for(var e in o)t.updateTask(o[e].id);for(var e in l)t.updateLink(l[e].id);o=null,l=null}),o?t._dp.setGanttMode("tasks"):t._dp.setGanttMode("links"))}),e.attachEvent("onBeforeDataSending",function(){var e=this._serverProcessor;if("REST"==this._tMode){var i=this._ganttMode.substr(0,this._ganttMode.length-1);e=e.substring(0,e.indexOf("?")>-1?e.indexOf("?"):e.length),this.serverProcessor=e+("/"==e.slice(-1)?"":"/")+i}else this.serverProcessor=e+t.ajax.urlSeparator(e)+"gantt_mode="+this._ganttMode;return!0})}t.dataProcessor=i(65);var d,c=[];t._dp_init=function(i){t.assert(!this._dp,"The dataProcessor is already attached to this gantt instance"),i.setTransactionMode("POST",!0),i.serverProcessor+=(-1!=i.serverProcessor.indexOf("?")?"&":"?")+"editing=true",i._serverProcessor=i.serverProcessor,i.$gantt=this,i.styles={updated:"gantt_updated",order:"gantt_updated",inserted:"gantt_inserted",deleted:"gantt_deleted",invalid:"gantt_invalid",error:"gantt_error",clear:""},i._methods=["_row_style","setCellTextStyle","_change_id","_delete_task"],n.call(this,t,i),o.call(this,t,i),l.call(this,t,i),i.attachEvent("onDestroy",function(){e(t,i)}),r(t,i)},t.getUserData=function(t,e){return this.userdata||(this.userdata={}),this.userdata[t]&&this.userdata[t][e]?this.userdata[t][e]:""},t.setUserData=function(t,e,i){this.userdata||(this.userdata={}),this.userdata[t]||(this.userdata[t]={}),this.userdata[t][e]=i}}var r=i(64),a=i(3),s=i(6);t.exports=n},function(t,e,i){function n(t,e,i,n){var r=t.data||this.xml._xmlNodeToJSON(t.firstChild),a={add:this.addTask,isExist:this.isTaskExists};"links"==n&&(a.add=this.addLink,a.isExist=this.isLinkExists),a.isExist.call(this,e)||(r.id=e,a.add.call(this,r))}function r(t,e,i,n){var r={delete:this.deleteTask,isExist:this.isTaskExists};"links"==n&&(r.delete=this.deleteLink,r.isExist=this.isLinkExists),r.isExist.call(this,e)&&r.delete.call(this,e)}function a(t,e){e.attachEvent("insertCallback",s.bind(n,t)),e.attachEvent("updateCallback",s.bind(r,t)),e.attachEvent("deleteCallback",s.bind(r,t))}var s=i(0);t.exports=a},function(t,e,i){var n=i(0),r=i(2),a=function(t){return this.serverProcessor=t,this.action_param="!nativeeditor_status",this.object=null,this.updatedRows=[],this.autoUpdate=!0,this.updateMode="cell",this._tMode="GET",this._headers=null,this._payload=null,this.post_delim="_",this._waitMode=0,this._in_progress={},this._invalid={},this.mandatoryFields=[],this.messages=[],this.styles={updated:"font-weight:bold;",inserted:"font-weight:bold;",deleted:"text-decoration : line-through;",invalid:"background-color:FFE0E0;",invalid_cell:"border-bottom:2px solid red;",error:"color:red;",clear:"font-weight:normal;text-decoration:none;"},this.enableUTFencoding(!0),r(this),this};a.prototype={setTransactionMode:function(t,e){"object"==typeof t?(this._tMode=t.mode||this._tMode,n.defined(t.headers)&&(this._headers=t.headers),n.defined(t.payload)&&(this._payload=t.payload)):(this._tMode=t,this._tSend=e),"REST"==this._tMode&&(this._tSend=!1,this._endnm=!0),"JSON"==this._tMode&&(this._tSend=!1,this._endnm=!0,this._headers=this._headers||{},this._headers["Content-type"]="application/json")},escape:function(t){return this._utf?encodeURIComponent(t):escape(t)},enableUTFencoding:function(t){this._utf=!!t},setDataColumns:function(t){this._columns="string"==typeof t?t.split(","):t},getSyncState:function(){return!this.updatedRows.length},enableDataNames:function(t){this._endnm=!!t},enablePartialDataSend:function(t){this._changed=!!t},setUpdateMode:function(t,e){this.autoUpdate="cell"==t,this.updateMode=t,this.dnd=e},ignore:function(t,e){this._silent_mode=!0,t.call(e||window),this._silent_mode=!1},setUpdated:function(t,e,i){if(!this._silent_mode){var n=this.findRow(t);i=i||"updated";var r=this.obj.getUserData(t,this.action_param);r&&"updated"==i&&(i=r),e?(this.set_invalid(t,!1),this.updatedRows[n]=t,this.obj.setUserData(t,this.action_param,i),this._in_progress[t]&&(this._in_progress[t]="wait")):this.is_invalid(t)||(this.updatedRows.splice(n,1),this.obj.setUserData(t,this.action_param,"")),e||this._clearUpdateFlag(t),this.markRow(t,e,i),e&&this.autoUpdate&&this.sendData(t)}},_clearUpdateFlag:function(t){},markRow:function(t,e,i){var n="",r=this.is_invalid(t);if(r&&(n=this.styles[r],e=!0),this.callEvent("onRowMark",[t,e,i,r])&&(n=this.styles[e?i:"clear"]+n,this.obj[this._methods[0]](t,n),r&&r.details)){n+=this.styles[r+"_cell"];for(var a=0;a<r.details.length;a++)r.details[a]&&this.obj[this._methods[1]](t,a,n)}},getState:function(t){return this.obj.getUserData(t,this.action_param)},is_invalid:function(t){return this._invalid[t]},set_invalid:function(t,e,i){i&&(e={value:e,details:i,toString:function(){return this.value.toString()}}),this._invalid[t]=e},checkBeforeUpdate:function(t){return!0},sendData:function(t){if(!this._waitMode||"tree"!=this.obj.mytype&&!this.obj._h2){if(this.obj.editStop&&this.obj.editStop(),void 0===t||this._tSend)return this.sendAllData();if(this._in_progress[t])return!1;if(this.messages=[],!this.checkBeforeUpdate(t)&&this.callEvent("onValidationError",[t,this.messages]))return!1;this._beforeSendData(this._getRowData(t),t)}},_beforeSendData:function(t,e){if(!this.callEvent("onBeforeUpdate",[e,this.getState(e),t]))return!1;this._sendData(t,e)},serialize:function(t,e){if("string"==typeof t)return t;if(void 0!==e)return this.serialize_one(t,"");var i=[],n=[];for(var r in t)t.hasOwnProperty(r)&&(i.push(this.serialize_one(t[r],r+this.post_delim)),n.push(r));return i.push("ids="+this.escape(n.join(","))),this.$gantt.security_key&&i.push("dhx_security="+this.$gantt.security_key),i.join("&")},serialize_one:function(t,e){if("string"==typeof t)return t;var i=[];for(var n in t)if(t.hasOwnProperty(n)){if(("id"==n||n==this.action_param)&&"REST"==this._tMode)continue;i.push(this.escape((e||"")+n)+"="+this.escape(t[n]))}return i.join("&")},_applyPayload:function(t){var e=this.$gantt.ajax;if(this._payload)for(var i in this._payload)t=t+e.urlSeparator(t)+this.escape(i)+"="+this.escape(this._payload[i]);return t},_sendData:function(t,e){if(t){if(!this.callEvent("onBeforeDataSending",e?[e,this.getState(e),t]:[null,null,t]))return!1;e&&(this._in_progress[e]=(new Date).valueOf());var i=this,n=function(n){var r=[];if(e)r.push(e);else if(t)for(var a in t)r.push(a);return i.afterUpdate(i,n,r)},r=this.$gantt.ajax,a=this.serverProcessor+(this._user?r.urlSeparator(this.serverProcessor)+["dhx_user="+this._user,"dhx_version="+this.obj.getUserData(0,"version")].join("&"):""),s=this._applyPayload(a);if("GET"==this._tMode)r.query({url:s+r.urlSeparator(s)+this.serialize(t,e),method:"GET",callback:n,headers:this._headers});else if("POST"==this._tMode)r.query({url:s,method:"POST",headers:this._headers,data:this.serialize(t,e),callback:n});else if("JSON"==this._tMode){var o=t[this.action_param],l={};for(var d in t)l[d]=t[d];delete l[this.action_param],delete l.id,delete l.gr_id,r.query({url:s,method:"POST",headers:this._headers,callback:n,data:JSON.stringify({id:e,action:o,data:l})})}else if("REST"==this._tMode){var c=this.getState(e),h=a.replace(/(\&|\?)editing\=true/,""),l="",u="post";"inserted"==c?l=this.serialize(t,e):"deleted"==c?(u="DELETE",h=h+("/"==h.slice(-1)?"":"/")+e):(u="PUT",l=this.serialize(t,e),h=h+("/"==h.slice(-1)?"":"/")+e),h=this._applyPayload(h),r.query({url:h,method:u,headers:this._headers,data:l,callback:n})}this._waitMode++}},sendAllData:function(){if(this.updatedRows.length){this.messages=[];for(var t=!0,e=0;e<this.updatedRows.length;e++)t&=this.checkBeforeUpdate(this.updatedRows[e]);if(!t&&!this.callEvent("onValidationError",["",this.messages]))return!1;if(this._tSend)this._sendData(this._getAllData());else for(var e=0;e<this.updatedRows.length;e++)if(!this._in_progress[this.updatedRows[e]]){if(this.is_invalid(this.updatedRows[e]))continue;if(this._beforeSendData(this._getRowData(this.updatedRows[e]),this.updatedRows[e]),this._waitMode&&("tree"==this.obj.mytype||this.obj._h2))return}}},_getAllData:function(t){for(var e={},i=!1,n=0;n<this.updatedRows.length;n++){var r=this.updatedRows[n];if(!this._in_progress[r]&&!this.is_invalid(r)){var a=this._getRowData(r);this.callEvent("onBeforeUpdate",[r,this.getState(r),a])&&(e[r]=a,i=!0,this._in_progress[r]=(new Date).valueOf())}}return i?e:null},setVerificator:function(t,e){this.mandatoryFields[t]=e||function(t){return""!==t}},clearVerificator:function(t){this.mandatoryFields[t]=!1},findRow:function(t){var e=0;for(e=0;e<this.updatedRows.length&&t!=this.updatedRows[e];e++);return e},defineAction:function(t,e){this._uActions||(this._uActions=[]),this._uActions[t]=e},afterUpdateCallback:function(t,e,i,n){var r=t,a="error"!=i&&"invalid"!=i;if(a||this.set_invalid(t,i),this._uActions&&this._uActions[i]&&!this._uActions[i](n))return delete this._in_progress[r];"wait"!=this._in_progress[r]&&this.setUpdated(t,!1);var s=t;switch(i){case"inserted":case"insert":e!=t&&(this.setUpdated(t,!1),this.obj[this._methods[2]](t,e),t=e);break;case"delete":case"deleted":return this.obj.setUserData(t,this.action_param,"true_deleted"),this.obj[this._methods[3]](t),delete this._in_progress[r],this.callEvent("onAfterUpdate",[t,i,e,n])}"wait"!=this._in_progress[r]?(a&&this.obj.setUserData(t,this.action_param,""),delete this._in_progress[r]):(delete this._in_progress[r],this.setUpdated(e,!0,this.obj.getUserData(t,this.action_param))),this.callEvent("onAfterUpdate",[s,i,e,n])},afterUpdate:function(t,e,i){var n=this.$gantt.ajax;if(window.JSON){var r;try{r=JSON.parse(e.xmlDoc.responseText)}catch(t){e.xmlDoc.responseText.length||(r={})}if(r){var a=r.action||this.getState(i)||"updated",s=r.sid||i[0],o=r.tid||i[0];return t.afterUpdateCallback(s,o,a,r),void t.finalizeUpdate()}}var l=n.xmltop("data",e.xmlDoc);if(!l)return this.cleanUpdate(i);var d=n.xpath("//data/action",l);if(!d.length)return this.cleanUpdate(i);for(var c=0;c<d.length;c++){var h=d[c],a=h.getAttribute("type"),s=h.getAttribute("sid"),o=h.getAttribute("tid");t.afterUpdateCallback(s,o,a,h)}t.finalizeUpdate()},cleanUpdate:function(t){if(t)for(var e=0;e<t.length;e++)delete this._in_progress[t[e]]},finalizeUpdate:function(){this._waitMode&&this._waitMode--,("tree"==this.obj.mytype||this.obj._h2)&&this.updatedRows.length&&this.sendData(),this.callEvent("onAfterUpdateFinish",[]),this.updatedRows.length||this.callEvent("onFullSync",[])},init:function(t){this.obj=t,this.obj._dp_init&&this.obj._dp_init(this)},setOnAfterUpdate:function(t){this.attachEvent("onAfterUpdate",t)},enableDebug:function(t){},setOnBeforeUpdateHandler:function(t){this.attachEvent("onBeforeDataSending",t)},setAutoUpdate:function(t,e){t=t||2e3,this._user=e||(new Date).valueOf(),this._need_update=!1,this._update_busy=!1,this.attachEvent("onAfterUpdate",function(t,e,i,n){this.afterAutoUpdate(t,e,i,n)}),this.attachEvent("onFullSync",function(){this.fullSync()});var i=this;window.setInterval(function(){i.loadUpdate()},t)},afterAutoUpdate:function(t,e,i,n){return"collision"!=e||(this._need_update=!0,!1)},fullSync:function(){return this._need_update&&(this._need_update=!1,this.loadUpdate()),!0},getUpdates:function(t,e){var i=this.$gantt.ajax;if(this._update_busy)return!1;this._update_busy=!0,i.get(t,e)},_v:function(t){return t.firstChild?t.firstChild.nodeValue:""},_a:function(t){for(var e=[],i=0;i<t.length;i++)e[i]=this._v(t[i]);return e},loadUpdate:function(){var t=this.$gantt.ajax,e=this,i=this.obj.getUserData(0,"version"),n=this.serverProcessor+t.urlSeparator(this.serverProcessor)+["dhx_user="+this._user,"dhx_version="+i].join("&");n=n.replace("editing=true&",""),this.getUpdates(n,function(i){var n=t.xpath("//userdata",i);e.obj.setUserData(0,"version",e._v(n[0]));var r=t.xpath("//update",i);if(r.length){e._silent_mode=!0;for(var a=0;a<r.length;a++){var s=r[a].getAttribute("status"),o=r[a].getAttribute("id"),l=r[a].getAttribute("parent");switch(s){case"inserted":e.callEvent("insertCallback",[r[a],o,l]);break;case"updated":e.callEvent("updateCallback",[r[a],o,l]);break;case"deleted":e.callEvent("deleteCallback",[r[a],o,l])}}e._silent_mode=!1}e._update_busy=!1,e=null})},destructor:function(){this.callEvent("onDestroy",[]),this.detachAllEvents(),this.updatedRows=[],this._in_progress={},this._invalid={},this._headers=null,this._payload=null,this.obj=null}},t.exports=a},function(t,e,i){t.exports=function(t){for(var e=[i(67),i(68),i(69),i(70),i(71),i(72)],n=0;n<e.length;n++)e[n]&&e[n](t)}},function(t,e,i){var n=i(1);t.exports=function(t){function e(){var e=!!document.querySelector(".gantt_drag_marker"),i=!!document.querySelector(".gantt_drag_marker.gantt_grid_resize_area"),n=!!document.querySelector(".gantt_link_direction");return g=e&&!i&&!n,!(!t.getState().drag_mode&&!e||i)}function i(e){if(f&&(clearTimeout(f),f=null),e){var i=t.config.autoscroll_speed;i&&i<10&&(i=10),f=setTimeout(function(){_=setInterval(s,i||u),p=n.getNodePosition(t.$task)},t.config.autoscroll_delay||h)}}function r(t){t?(i(!0),v.started||(v.x=m.x,v.y=m.y,v.started=!0)):(_&&(clearInterval(_),_=null),i(!1),v.started=!1)}function a(i){var n=e();if(!_&&!f||n||r(!1),!t.config.autoscroll||!n)return!1;m={x:i.clientX,y:i.clientY},!_&&n&&r(!0)}function s(){if(!e())return r(!1),!1;var i=n.getNodePosition(t.$task),a=m.x-i.x,s=m.y-i.y,d=g?0:o(a,i.width,v.x-i.x),h=o(s,i.height,v.y-i.y),u=t.getScrollState(),_=u.y,f=u.inner_height,p=u.height,k=u.x,y=u.inner_width,b=u.width;h&&!f?h=0:h<0&&!_?h=0:h>0&&_+f>=p+2&&(h=0),d&&!y?d=0:d<0&&!k?d=0:d>0&&k+y>=b&&(d=0);var $=t.config.autoscroll_step;$&&$<2&&($=2),d*=$||c,h*=$||c,(d||h)&&l(d,h)}function o(t,e,i){return t-d<0&&t<i?-1:t>e-d&&t>i?1:0}function l(e,i){var n=t.getScrollState(),r=null,a=null;e&&(r=n.x+e,r=Math.min(n.width,r),r=Math.max(0,r)),i&&(a=n.y+i,a=Math.min(n.height,a),a=Math.max(0,a)),t.scrollTo(r,a)}var d=50,c=30,h=10,u=50,_=null,g=!1,f=null,p={},v={started:!1},m={};t.attachEvent("onGanttReady",function(){t.eventRemove(document.body,"mousemove",a),t.event(document.body,"mousemove",a)})}},function(t,e){function i(t){function e(t,e){e="function"==typeof e?e:function(){},s[t]||(s[t]=this[t],this[t]=e)}function i(t){s[t]&&(this[t]=s[t],s[t]=null)}function n(t){for(var i in t)e.call(this,i,t[i])}function r(){for(var t in s)i.call(this,t)}function a(t){try{t()}catch(t){window.console.error(t)}}var s={},o=!1;return t.$services.getService("state").registerProvider("batchUpdate",function(){return{batch_update:o}},!0),function(t,e){if(o)return void a(t);var i,s=this._dp&&"off"!=this._dp.updateMode;s&&(i=this._dp.updateMode,this._dp.setUpdateMode("off"));var l={},d={render:!0,refreshData:!0,refreshTask:!0,refreshLink:!0,resetProjectDates:function(t){l[t.id]=t}};n.call(this,d),o=!0,this.callEvent("onBeforeBatchUpdate",[]),a(t),this.callEvent("onAfterBatchUpdate",[]),r.call(this);for(var c in l)this.resetProjectDates(l[c]);o=!1,e||this.render(),s&&(this._dp.setUpdateMode(i),this._dp.setGanttMode("tasks"),this._dp.sendData(),this._dp.setGanttMode("links"),this._dp.sendData())}}t.exports=function(t){t.batchUpdate=i(t)}},function(t,e){var i=function(t){return{_needRecalc:!0,reset:function(){this._needRecalc=!0},_isRecalcNeeded:function(){return!this._isGroupSort()&&this._needRecalc},_isGroupSort:function(){return!(!t._groups||!t._groups.is_active())},_getWBSCode:function(t){return t?(this._isRecalcNeeded()&&this._calcWBS(),t.$virtual?"":this._isGroupSort()?t.$wbs||"":(t.$wbs||(this.reset(),this._calcWBS()),t.$wbs)):""},_setWBSCode:function(t,e){t.$wbs=e},getWBSCode:function(t){return this._getWBSCode(t)},_calcWBS:function(){if(this._isRecalcNeeded()){var e=!0;t.eachTask(function(i){if(e)return e=!1,void this._setWBSCode(i,"1");var n=t.getPrevSibling(i.id);if(null!==n){var r=t.getTask(n).$wbs;r&&(r=r.split("."),r[r.length-1]++,this._setWBSCode(i,r.join(".")))}else{var a=t.getParent(i.id);this._setWBSCode(i,t.getTask(a).$wbs+".1")}},t.config.root_id,this),this._needRecalc=!1}}}};t.exports=function(t){var e=i(t);t.getWBSCode=function(t){return e.getWBSCode(t)},t.attachEvent("onAfterTaskMove",function(){return e.reset(),!0}),t.attachEvent("onBeforeParse",function(){return e.reset(),!0}),t.attachEvent("onAfterTaskDelete",function(){return e.reset(),!0}),t.attachEvent("onAfterTaskAdd",function(){return e.reset(),!0})}},function(t,e){window.jQuery&&function(t){var e=[];t.fn.dhx_gantt=function(i){if("string"!=typeof(i=i||{})){var n=[];return this.each(function(){if(this&&this.getAttribute)if(this.gantt||window.gantt.$root==this)n.push("object"==typeof this.gantt?this.gantt:window.gantt);else{var t=window.gantt.$container&&window.Gantt?window.Gantt.getGanttInstance():window.gantt;for(var e in i)"data"!=e&&(t.config[e]=i[e]);t.init(this),i.data&&t.parse(i.data),n.push(t)}}),1===n.length?n[0]:n}if(e[i])return e[i].apply(this,[]);t.error("Method "+i+" does not exist on jQuery.dhx_gantt")}}(jQuery),t.exports=null},function(t,e){window.dhtmlx&&(dhtmlx.attaches||(dhtmlx.attaches={}),dhtmlx.attaches.attachGantt=function(t,e,i){var n=document.createElement("DIV");i=i||window.gantt,n.id="gantt_"+i.uid(),n.style.width="100%",n.style.height="100%",n.cmp="grid",document.body.appendChild(n),this.attachObject(n.id),this.dataType="gantt",this.dataObj=i;var r=this.vs[this.av];r.grid=i,i.init(n.id,t,e),n.firstChild.style.border="none",r.gridId=n.id,r.gridObj=n;return this.vs[this._viewRestore()].grid}),void 0!==window.dhtmlXCellObject&&(dhtmlXCellObject.prototype.attachGantt=function(t,e,i){i=i||window.gantt;var n=document.createElement("DIV");n.id="gantt_"+i.uid(),n.style.width="100%",n.style.height="100%",n.cmp="grid",document.body.appendChild(n),this.attachObject(n.id),this.dataType="gantt",this.dataObj=i,i.init(n.id,t,e),n.firstChild.style.border="none";return n=null,this.callEvent("_onContentAttach",[]),this.dataObj}),t.exports=null},function(t,e){function i(t){function e(t,e){return"function"==typeof t?i(t):e instanceof Array?n(t,e):n(t,[e])}function i(e){var i=[];return t.eachTask(function(t){e(t)&&i.push(t)}),i}function n(e,i){for(var n,r=i.join("_")+"_"+e,a={},s=0;s<i.length;s++)a[i[s]]=!0;return o[r]?n=o[r]:(n=o[r]=[],t.eachTask(function(i){a[i[e]]&&i.type!=t.config.types.project&&n.push(i)})),n}function r(t,e,i){var n=[t,e,i.unit,i.step].join("_");return o[n]?o[n]:o[n]=a(t,e,i)}function a(i,n,r){for(var a=e(i,n),s=r.unit,o={},l=0;l<a.length;l++)for(var d=a[l],c=t.date[s+"_start"](new Date(d.start_date));c<d.end_date;){var h=c;if(c=t.date.add(c,1,s),t.isWorkTime({date:h,task:d})){var u=h.valueOf();o[u]||(o[u]={tasks:[]}),o[u].tasks.push(d)}}var _,g,f=[];for(var l in o)_=new Date(1*l),g=t.date.add(_,1,s),f.push({start_date:_,end_date:g,tasks:o[l].tasks});return f}function s(t,e){for(var i=e.$getConfig(),n=e.$getTemplates(),a=r(i.resource_property,t.id,e.getScale()),s=[],o=0;o<a.length;o++){var l=a[o],d=n.resource_cell_class(l.start_date,l.end_date,t,l.tasks),c=n.resource_cell_value(l.start_date,l.end_date,t,l.tasks);if(d||c){var h=e.getItemPosition(t,l.start_date,l.end_date),u=document.createElement("div");u.className=["gantt_resource_marker",d].join(" "),u.style.cssText=["left:"+h.left+"px","width:"+h.width+"px","height:"+(i.row_height-1)+"px","line-height:"+(i.row_height-1)+"px","top:"+h.top+"px"].join(";"),c&&(u.innerHTML=c),s.push(u)}}var _=null;if(s.length){_=document.createElement("div");for(var o=0;o<s.length;o++)_.appendChild(s[o])}return _}var o={},l={};return t.$data.tasksStore.attachEvent("onStoreUpdated",function(){o={},l={}}),{renderLine:s,filterTasks:e}}t.exports=function(t){var e=i(t);t.getTaskBy=e.filterTasks,t.$ui.layers.resourceRow=e.renderLine,t.config.resource_property="owner_id",t.config.resource_store="resource",t.templates.resource_cell_class=function(t,e,i,n){return n.length<=1?"gantt_resource_marker_ok":"gantt_resource_marker_overtime"},t.templates.resource_cell_value=function(t,e,i,n){return 8*n.length}}},function(t,e){t.exports=function(t){}},function(t,e){t.exports=function(t){t.getGridColumn=function(e){for(var i=t.config.columns,n=0;n<i.length;n++)if(i[n].name==e)return i[n];return null}}},function(t,e){t.exports=function(t){function e(t){return(t+"").replace(r," ").replace(a," ")}function i(t){return(t+"").replace(s,"&#39;")}function n(){return!t.config.wai_aria_attributes}var r=new RegExp("<(?:.|\n)*?>","gm"),a=new RegExp(" +","gm"),s=new RegExp("'","gm");t._waiAria={getAttributeString:function(t){var n=[" "];for(var r in t){var a=i(e(t[r]));n.push(r+"='"+a+"'")}return n.push(" "),n.join(" ")},getTimelineCellAttr:function(e){return t._waiAria.getAttributeString({"aria-label":e})},_taskCommonAttr:function(i,n){i.start_date&&i.end_date&&(n.setAttribute("aria-label",e(t.templates.tooltip_text(i.start_date,i.end_date,i))),t.isReadonly(i)&&n.setAttribute("aria-readonly",!0),i.$dataprocessor_class&&n.setAttribute("aria-busy",!0),n.setAttribute("aria-selected",t.getState().selected_task==i.id||t.isSelectedTask&&t.isSelectedTask(i.id)?"true":"false"))},setTaskBarAttr:function(e,i){this._taskCommonAttr(e,i),!t.isReadonly(e)&&t.config.drag_move&&(e.id!=t.getState().drag_id?i.setAttribute("aria-grabbed",!1):i.setAttribute("aria-grabbed",!0))},taskRowAttr:function(e,i){this._taskCommonAttr(e,i),!t.isReadonly(e)&&t.config.order_branch&&i.setAttribute("aria-grabbed",!1),i.setAttribute("role","row"),i.setAttribute("aria-level",e.$level),t.hasChild(e.id)&&i.setAttribute("aria-expanded",e.$open?"true":"false")},linkAttr:function(i,n){var r=t.config.links,a=i.type==r.finish_to_start||i.type==r.start_to_start,s=i.type==r.start_to_start||i.type==r.start_to_finish,o=t.locale.labels.link+" "+t.templates.drag_link(i.source,s,i.target,a);n.setAttribute("aria-label",e(o)),t.isReadonly(i)&&n.setAttribute("aria-readonly",!0)},gridSeparatorAttr:function(t){t.setAttribute("role","separator")},lightboxHiddenAttr:function(t){t.setAttribute("aria-hidden","true")},lightboxVisibleAttr:function(t){t.setAttribute("aria-hidden","false")},lightboxAttr:function(t){t.setAttribute("role","dialog"),t.setAttribute("aria-hidden","true"),t.firstChild.setAttribute("role","heading")},lightboxButtonAttrString:function(e){return this.getAttributeString({role:"button","aria-label":t.locale.labels[e],tabindex:"0"})},lightboxHeader:function(t,e){t.setAttribute("aria-label",e)},lightboxSelectAttrString:function(e){var i="";switch(e){case"%Y":i=t.locale.labels.years;break;case"%m":i=t.locale.labels.months;break;case"%d":i=t.locale.labels.days;break;case"%H:%i":i=t.locale.labels.hours+t.locale.labels.minutes}return t._waiAria.getAttributeString({"aria-label":i})},lightboxDurationInputAttrString:function(e){return this.getAttributeString({"aria-label":t.locale.labels.column_duration,"aria-valuemin":"0"})},gridAttrString:function(){return[" role='treegrid'",t.config.multiselect?"aria-multiselectable='true'":"aria-multiselectable='false'"," "].join(" ")},gridScaleRowAttrString:function(){return"role='row'"},gridScaleCellAttrString:function(e,i){var n="";if("add"==e.name)n=this.getAttributeString({role:"button","aria-label":t.locale.labels.new_task});else{var r={role:"columnheader","aria-label":i};t._sort&&t._sort.name==e.name&&("asc"==t._sort.direction?r["aria-sort"]="ascending":r["aria-sort"]="descending"),n=this.getAttributeString(r)}return n},gridDataAttrString:function(){return"role='rowgroup'"},gridCellAttrString:function(t,e){return this.getAttributeString({role:"gridcell","aria-label":e})},gridAddButtonAttrString:function(e){return this.getAttributeString({role:"button","aria-label":t.locale.labels.new_task})},messageButtonAttrString:function(t){return"tabindex='0' role='button' aria-label='"+t+"'"},messageInfoAttr:function(t){t.setAttribute("role","alert")},messageModalAttr:function(t,e){t.setAttribute("role","dialog"),e&&t.setAttribute("aria-labelledby",e)},quickInfoAttr:function(t){t.setAttribute("role","dialog")},quickInfoHeaderAttrString:function(){return" role='heading' "},quickInfoHeader:function(t,e){t.setAttribute("aria-label",e)},quickInfoButtonAttrString:function(e){return t._waiAria.getAttributeString({role:"button","aria-label":e,tabindex:"0"})},tooltipAttr:function(t){t.setAttribute("role","tooltip")},tooltipVisibleAttr:function(t){t.setAttribute("aria-hidden","false")},tooltipHiddenAttr:function(t){t.setAttribute("aria-hidden","true")}};for(var o in t._waiAria)t._waiAria[o]=function(t){return function(){return n()?"":t.apply(this,arguments)}}(t._waiAria[o])}},function(t,e){t.exports=function(t){t.isReadonly=function(t){return(!t||!t[this.config.editable_property])&&(t&&t[this.config.readonly_property]||this.config.readonly)}}},function(t,e,i){var n=(i(0),i(3));t.exports=function(t){t.load=function(e,i,n){this._load_url=e,this.assert(arguments.length,"Invalid load arguments");var r="json",a=null;arguments.length>=3?(r=i,a=n):"string"==typeof arguments[1]?r=arguments[1]:"function"==typeof arguments[1]&&(a=arguments[1]),this._load_type=r,this.callEvent("onLoadStart",[e,r]),this.ajax.get(e,t.bind(function(t){this.on_load(t,r),this.callEvent("onLoadEnd",[e,r]),"function"==typeof a&&a.call(this)},this))},t.parse=function(t,e){this.on_load({xmlDoc:{responseText:t}},e)},t.serialize=function(t){return t=t||"json",this[t].serialize()},t.on_load=function(t,e){this.callEvent("onBeforeParse",[]),e||(e="json"),this.assert(this[e],"Invalid data type:'"+e+"'");var i=t.xmlDoc.responseText,n=this[e].parse(i,t);this._process_loading(n)},t._process_loading=function(t){t.collections&&this._load_collections(t.collections),this.$data.tasksStore.parse(t.data);var e=t.links||(t.collections?t.collections.links:[]);if(this.$data.linksStore.parse(e),this.callEvent("onParse",[]),this.render(),this.config.initial_scroll){var i=this.getTaskByIndex(0),n=i?i.id:this.config.root_id;this.isTaskExists(n)&&this.showTask(n)}},t._load_collections=function(t){var e=!1;for(var i in t)if(t.hasOwnProperty(i)){e=!0;var n=t[i],r=this.serverList[i];if(!r)continue;r.splice(0,r.length);for(var a=0;a<n.length;a++){var s=n[a],o=this.copy(s);o.key=o.value;for(var l in s)if(s.hasOwnProperty(l)){if("value"==l||"label"==l)continue;o[l]=s[l]}r.push(o)}}e&&this.callEvent("onOptionsLoad",[])},t.attachEvent("onBeforeTaskDisplay",function(t,e){return!e.$ignore}),t.json={parse:function(e){return t.assert(e,"Invalid data"),"string"==typeof e&&(window.JSON?e=JSON.parse(e):t.assert(!1,"JSON is not supported")),e.dhx_security&&(t.security_key=e.dhx_security),e},serializeTask:function(t){return this._copyObject(t)},serializeLink:function(t){return this._copyLink(t)},_copyLink:function(t){var e={};for(var i in t)e[i]=t[i];return e},_copyObject:function(e){var i={};for(var r in e)"$"!=r.charAt(0)&&(i[r]=e[r],n.isDate(i[r])&&(i[r]=t.templates.xml_format(i[r])));return i},serialize:function(){var e=[],i=[];t.eachTask(function(i){t.resetProjectDates(i),e.push(this.serializeTask(i))},t.config.root_id,this);for(var n=t.getLinks(),r=0;r<n.length;r++)i.push(this.serializeLink(n[r]));return{data:e,links:i}}},t.xml={_xmlNodeToJSON:function(t,e){for(var i={},n=0;n<t.attributes.length;n++)i[t.attributes[n].name]=t.attributes[n].value;if(!e){for(var n=0;n<t.childNodes.length;n++){var r=t.childNodes[n];1==r.nodeType&&(i[r.tagName]=r.firstChild?r.firstChild.nodeValue:"")}i.text||(i.text=t.firstChild?t.firstChild.nodeValue:"")}return i},_getCollections:function(e){for(var i={},n=t.ajax.xpath("//coll_options",e),r=0;r<n.length;r++)for(var a=n[r].getAttribute("for"),s=i[a]=[],o=t.ajax.xpath(".//item",n[r]),l=0;l<o.length;l++){for(var d=o[l],c=d.attributes,h={key:o[l].getAttribute("value"),label:o[l].getAttribute("label")},u=0;u<c.length;u++){var _=c[u];"value"!=_.nodeName&&"label"!=_.nodeName&&(h[_.nodeName]=_.nodeValue)}s.push(h)}return i},_getXML:function(e,i,n){n=n||"data",i.getXMLTopNode||(i=t.ajax.parse(i));var r=t.ajax.xmltop(n,i.xmlDoc);if(!r||r.tagName!=n)throw"Invalid XML data";var a=r.getAttribute("dhx_security");return a&&(t.security_key=a),r},parse:function(e,i){i=this._getXML(e,i);for(var n={},r=n.data=[],a=t.ajax.xpath("//task",i),s=0;s<a.length;s++)r[s]=this._xmlNodeToJSON(a[s]);return n.collections=this._getCollections(i),n},_copyLink:function(t){return"<item id='"+t.id+"' source='"+t.source+"' target='"+t.target+"' type='"+t.type+"' />"},_copyObject:function(t){return"<task id='"+t.id+"' parent='"+(t.parent||"")+"' start_date='"+t.start_date+"' duration='"+t.duration+"' open='"+!!t.open+"' progress='"+t.progress+"' end_date='"+t.end_date+"'><![CDATA["+t.text+"]]></task>"},serialize:function(){for(var e=[],i=[],n=t.json.serialize(),r=0,a=n.data.length;r<a;r++)e.push(this._copyObject(n.data[r]));for(var r=0,a=n.links.length;r<a;r++)i.push(this._copyLink(n.links[r]));return"<data>"+e.join("")+"<coll_options for='links'>"+i.join("")+"</coll_options></data>"}},t.oldxml={parse:function(e,i){i=t.xml._getXML(e,i,"projects");for(var n={collections:{links:[]}},r=n.data=[],a=t.ajax.xpath("//task",i),s=0;s<a.length;s++){r[s]=t.xml._xmlNodeToJSON(a[s]);var o=a[s].parentNode;"project"==o.tagName?r[s].parent="project-"+o.getAttribute("id"):r[s].parent=o.parentNode.getAttribute("id")}a=t.ajax.xpath("//project",i);for(var s=0;s<a.length;s++){var l=t.xml._xmlNodeToJSON(a[s],!0);l.id="project-"+l.id,r.push(l)}for(var s=0;s<r.length;s++){var l=r[s];l.start_date=l.startdate||l.est,l.end_date=l.enddate,l.text=l.name,l.duration=l.duration/8,l.open=1,l.duration||l.end_date||(l.duration=1),l.predecessortasks&&n.collections.links.push({target:l.id,source:l.predecessortasks,type:t.config.links.finish_to_start})}return n},serialize:function(){t.message("Serialization to 'old XML' is not implemented")}},t.serverList=function(t,e){return e?this.serverList[t]=e.slice(0):this.serverList[t]||(this.serverList[t]=[]),this.serverList[t]}}},function(t,e,i){var n=i(79),r=i(82),a=i(84),s=i(0);t.exports=function(t){var e=new n(t),i=new r(e),o=a.create(e,i);s.mixin(t,o)}},function(t,e,i){function n(t){this.$gantt=t,this._calendars={}}var r=i(0),a=i(19),s=i(80);n.prototype={_calendars:{},_getDayHoursForMultiple:function(t,e){for(var i=[],n=!0,r=0,a=!1,s=this.$gantt.date.day_start(new Date(e)),o=0;o<24;o++)a=t.reduce(function(t,e){return t&&e._is_work_hour(s)},!0),a?(n?(i[r]=o,i[r+1]=o+1,r+=2):i[r-1]+=1,n=!1):n||(n=!0),s=this.$gantt.date.add(s,1,"hour");return i.length||(i=!1),i},mergeCalendars:function(){var t,e=this.createCalendar(),i=[],n=Array.prototype.slice.call(arguments,0);e.worktime.hours=[0,24],e.worktime.dates={};var r=this.$gantt.date.day_start(new Date(2592e5));for(t=0;t<7;t++)i=this._getDayHoursForMultiple(n,r),e.worktime.dates[t]=i,r=this.$gantt.date.add(r,1,"day");for(var a=0;a<n.length;a++)for(var s in n[a].worktime.dates)+s>1e4&&(i=this._getDayHoursForMultiple(n,new Date(+s)),e.worktime.dates[s]=i);return e},_convertWorktimeSettings:function(t){var e=t.days;if(e){t.dates=t.dates||{};for(var i=0;i<e.length;i++)t.dates[i]=e[i],e[i]instanceof Array||(t.dates[i]=!!e[i]);delete t.days}return t},createCalendar:function(t){var e;t||(t={}),e=t.worktime?r.copy(t.worktime):r.copy(t);var i=r.copy(this.defaults.fulltime.worktime);r.mixin(e,i);var n=r.uid(),o={id:n+"",worktime:this._convertWorktimeSettings(e)},l=new s(this.$gantt,a(this.$gantt));return r.mixin(l,o),l._tryChangeCalendarSettings(function(){})?l:null},getCalendar:function(t){return t=t||"global",this.createDefaultCalendars(),this._calendars[t]},getCalendars:function(){var t=[];for(var e in this._calendars)t.push(this.getCalendar(e));return t},getTaskCalendar:function(t){var e=this.$gantt.$services.config();if(!t)return this.getCalendar();if(t[e.calendar_property])return this.getCalendar(t[e.calendar_property]);if(e.resource_calendars)for(var i in e.resource_calendars){var n=e.resource_calendars[i];if(t[i]){var r=n[t[i]];if(r)return this.getCalendar(r)}}return this.getCalendar()},addCalendar:function(t){if(!(t instanceof s)){var e=t.id;t=this.createCalendar(t),t.id=e}var i=this.$gantt.$services.config();return t.id=t.id||r.uid(),this._calendars[t.id]=t,i.worktimes||(i.worktimes={}),i.worktimes[t.id]=t.worktime,t.id},deleteCalendar:function(t){var e=this.$gantt.$services.config();return!!t&&(!!this._calendars[t]&&(delete this._calendars[t],e.worktimes&&e.worktimes[t]&&delete e.worktimes[t],!0))},restoreConfigCalendars:function(t){for(var e in t)if(!this._calendars[e]){var i=t[e],n=this.createCalendar(i);n.id=e,this.addCalendar(n)}},defaults:{global:{id:"global",worktime:{hours:[8,17],days:[0,1,1,1,1,1,0]}},fulltime:{id:"fulltime",worktime:{hours:[0,24],days:[1,1,1,1,1,1,1]}}},createDefaultCalendars:function(){var t=this.$gantt.$services.config();this.restoreConfigCalendars(this.defaults),this.restoreConfigCalendars(t.worktimes)}},t.exports=n},function(t,e,i){function n(t,e){this.argumentsHelper=e,this.$gantt=t,this._workingUnitsCache=new r}var r=i(81),a=i(0);n.prototype={units:["year","month","week","day","hour","minute"],_getUnitOrder:function(t){for(var e=0,i=this.units.length;e<i;e++)if(this.units[e]==t)return e},_timestamp:function(t){var e=null;return t.day||0===t.day?e=t.day:t.date&&(e=Date.UTC(t.date.getFullYear(),t.date.getMonth(),t.date.getDate())),e},_checkIfWorkingUnit:function(t,e,i){return void 0===i&&(i=this._getUnitOrder(e)),void 0===i||!(i&&!this._isWorkTime(t,this.units[i-1],i-1))&&(!this["_is_work_"+e]||this["_is_work_"+e](t))},_is_work_day:function(t){var e=this._getWorkHours(t);return e instanceof Array&&e.length>0},_is_work_hour:function(t){for(var e=this._getWorkHours(t),i=t.getHours(),n=0;n<e.length;n+=2){if(void 0===e[n+1])return e[n]==i;if(i>=e[n]&&i<e[n+1])return!0}return!1},_internDatesPull:{},_nextDate:function(t,e,i){return this.$gantt.date.add(t,i,e)},_getWorkUnitsBetweenGeneric:function(t,e,i,n){var r=this.$gantt.date,a=new Date(t),s=new Date(e);n=n||1;var o,l,d=0,c=null,h=!1;o=r[i+"_start"](new Date(a)),o.valueOf()!=a.valueOf()&&(h=!0);var u=!1;l=r[i+"_start"](new Date(e)),l.valueOf()!=e.valueOf()&&(u=!0);for(var _=!1;a.valueOf()<s.valueOf();)c=this._nextDate(a,i,n),_=c.valueOf()>s.valueOf(),this._isWorkTime(a,i)&&((h||u&&_)&&(o=r[i+"_start"](new Date(a)),l=r.add(o,n,i)),h?(h=!1,c=this._nextDate(o,i,n),d+=(l.valueOf()-a.valueOf())/(l.valueOf()-o.valueOf())):u&&_?(u=!1,d+=(s.valueOf()-a.valueOf())/(l.valueOf()-o.valueOf())):d++),a=c;return d},_getHoursPerDay:function(t){for(var e=this._getWorkHours(t),i=0,n=0;n<e.length;n+=2)i+=e[n+1]-e[n]||0;return i},_getWorkHoursForRange:function(t,e){for(var i=0,n=new Date(t),r=new Date(e);n.valueOf()<r.valueOf();)this._isWorkTime(n,"day")&&(i+=this._getHoursPerDay(n)),n=this._nextDate(n,"day",1);return i},_getWorkUnitsBetweenHours:function(t,e,i,n){var r=new Date(t),a=new Date(e);n=n||1;var s=new Date(r),o=this.$gantt.date.add(this.$gantt.date.day_start(new Date(r)),1,"day");if(a.valueOf()<=o.valueOf())return this._getWorkUnitsBetweenGeneric(t,e,i,n);var l=this.$gantt.date.day_start(new Date(a)),d=a,c=this._getWorkUnitsBetweenGeneric(s,o,i,n),h=this._getWorkUnitsBetweenGeneric(l,d,i,n),u=this._getWorkHoursForRange(o,l);return u=u/n+c+h},_getCalendar:function(){return this.worktime},_setCalendar:function(t){this.worktime=t},_tryChangeCalendarSettings:function(t){var e=JSON.stringify(this._getCalendar());return t(),!this._isEmptyCalendar(this._getCalendar())||(this.$gantt.assert(!1,"Invalid calendar settings, no worktime available"),this._setCalendar(JSON.parse(e)),this._workingUnitsCache.clear(),!1)},_isEmptyCalendar:function(t){var e=!1,i=[],n=!0;for(var r in t.dates)e|=!!t.dates[r],i.push(r);for(var a=[],r=0;r<i.length;r++)i[r]<10&&a.push(i[r]);a.sort();for(var r=0;r<7;r++)a[r]!=r&&(n=!1);return n?!e:!(e||t.hours)},getWorkHours:function(){var t=this.argumentsHelper.getWorkHoursArguments.apply(this.argumentsHelper,arguments);return this._getWorkHours(t.date)},_getWorkHours:function(t){var e=this._timestamp({date:t}),i=!0,n=this._getCalendar();return void 0!==n.dates[e]?i=n.dates[e]:void 0!==n.dates[t.getDay()]&&(i=n.dates[t.getDay()]),!0===i?n.hours:i||[]},setWorkTime:function(t){return this._tryChangeCalendarSettings(a.bind(function(){var e=void 0===t.hours||t.hours,i=this._timestamp(t);null!==i?this._getCalendar().dates[i]=e:this._getCalendar().hours=e,this._workingUnitsCache.clear()},this))},unsetWorkTime:function(t){return this._tryChangeCalendarSettings(a.bind(function(){if(t){var e=this._timestamp(t);null!==e&&delete this._getCalendar().dates[e]}else this.reset_calendar();this._workingUnitsCache.clear()},this))},_isWorkTime:function(t,e,i){var n=this._workingUnitsCache.get(e,t);return-1==n&&(n=this._checkIfWorkingUnit(t,e,i),this._workingUnitsCache.put(e,t,n)),n},isWorkTime:function(){var t=this.argumentsHelper.isWorkTimeArguments.apply(this.argumentsHelper,arguments);return this._isWorkTime(t.date,t.unit)},calculateDuration:function(){var t=this.argumentsHelper.getDurationArguments.apply(this.argumentsHelper,arguments);if(!t.unit)return!1;var e=0;return e="hour"==t.unit?this._getWorkUnitsBetweenHours(t.start_date,t.end_date,t.unit,t.step):this._getWorkUnitsBetweenGeneric(t.start_date,t.end_date,t.unit,t.step),Math.round(e)},hasDuration:function(){var t=this.argumentsHelper.getDurationArguments.apply(this.argumentsHelper,arguments),e=t.start_date,i=t.end_date,n=t.unit,r=t.step;if(!n)return!1;var a=new Date(e),s=new Date(i);for(r=r||1;a.valueOf()<s.valueOf();){if(this._isWorkTime(a,n))return!0;a=this._nextDate(a,n,r)}return!1},calculateEndDate:function(){var t=this.argumentsHelper.calculateEndDateArguments.apply(this.argumentsHelper,arguments),e=t.start_date,i=t.duration,n=t.unit,r=t.step,a=t.duration>=0?1:-1;return this._calculateEndDate(e,i,n,r*a)},_calculateEndDate:function(t,e,i,n){if(!i)return!1;var r=new Date(t),a=0;for(n=n||1,e=Math.abs(1*e);a<e;){var s=this._nextDate(r,i,n);this._isWorkTime(n>0?new Date(s.valueOf()-1):new Date(s.valueOf()+1),i)&&a++,r=s}return r},getClosestWorkTime:function(){var t=this.argumentsHelper.getClosestWorkTimeArguments.apply(this.argumentsHelper,arguments);return this._getClosestWorkTime(t)},_getClosestWorkTime:function(t){if(this._isWorkTime(t.date,t.unit))return t.date;var e=t.unit,i=this.$gantt.date[e+"_start"](t.date),n=new Date(i),r=new Date(i),a=!0,s=0,o="any"==t.dir||!t.dir,l=1;for("past"==t.dir&&(l=-1);!this._isWorkTime(i,e);){o&&(i=a?n:r,l*=-1);var d=i.getTimezoneOffset();if(i=this.$gantt.date.add(i,l,e),i=this.$gantt._correct_dst_change(i,d,l,e),this.$gantt.date[e+"_start"]&&(i=this.$gantt.date[e+"_start"](i)),o&&(a?n=i:r=i),a=!a,++s>3e3)return this.$gantt.assert(!1,"Invalid working time check"),!1}return i!=r&&"past"!=t.dir||(i=this.$gantt.date.add(i,1,e)),i}},t.exports=n},function(t,e){function i(){this._cache={}}i.prototype={get:function(t,e){var i=-1,n=this._cache;if(n&&n[t]){var r=n[t],a=e.getTime();void 0!==r[a]&&(i=r[a])}return i},put:function(t,e,i){if(!t||!e)return!1;var n=this._cache,r=e.getTime();return i=!!i,!!n&&(n[t]||(n[t]={}),n[t][r]=i,!0)},clear:function(){this._cache={}}},t.exports=i},function(t,e,i){function n(t){this.$gantt=t.$gantt,this.argumentsHelper=r(this.$gantt),this.calendarManager=t,this.$disabledCalendar=new a(this.$gantt,this.argumentsHelper)}var r=i(19),a=i(83);n.prototype={_getCalendar:function(t){var e;if(this.$gantt.$services.config().work_time){var i=this.calendarManager;t.task?e=i.getTaskCalendar(t.task):t.id?e=i.getTaskCalendar(t):t.calendar&&(e=t.calendar),e||(e=i.getTaskCalendar())}else e=this.$disabledCalendar;return e},getWorkHours:function(t){return t=this.argumentsHelper.getWorkHoursArguments.apply(this.argumentsHelper,arguments),this._getCalendar(t).getWorkHours(t.date)},setWorkTime:function(t,e){return t=this.argumentsHelper.setWorkTimeArguments.apply(this.argumentsHelper,arguments),e||(e=this.calendarManager.getCalendar()),e.setWorkTime(t)},unsetWorkTime:function(t,e){return t=this.argumentsHelper.unsetWorkTimeArguments.apply(this.argumentsHelper,arguments),e||(e=this.calendarManager.getCalendar()),e.unsetWorkTime(t)},isWorkTime:function(t,e,i,n){var r=this.argumentsHelper.isWorkTimeArguments.apply(this.argumentsHelper,arguments);return n=this._getCalendar(r),n.isWorkTime(r)},getClosestWorkTime:function(t){return t=this.argumentsHelper.getClosestWorkTimeArguments.apply(this.argumentsHelper,arguments),this._getCalendar(t).getClosestWorkTime(t)},calculateDuration:function(){var t=this.argumentsHelper.getDurationArguments.apply(this.argumentsHelper,arguments);return this._getCalendar(t).calculateDuration(t)},hasDuration:function(){var t=this.argumentsHelper.hasDurationArguments.apply(this.argumentsHelper,arguments);return this._getCalendar(t).hasDuration(t)},calculateEndDate:function(t){var t=this.argumentsHelper.calculateEndDateArguments.apply(this.argumentsHelper,arguments);return this._getCalendar(t).calculateEndDate(t)}},t.exports=n},function(t,e){function i(t,e){this.argumentsHelper=e,this.$gantt=t}i.prototype={getWorkHours:function(){return[0,24]},setWorkTime:function(){return!0},unsetWorkTime:function(){return!0},isWorkTime:function(){return!0},getClosestWorkTime:function(t){return this.argumentsHelper.getClosestWorkTimeArguments.apply(this.argumentsHelper,arguments).date},calculateDuration:function(){var t=this.argumentsHelper.getDurationArguments.apply(this.argumentsHelper,arguments),e=t.start_date,i=t.end_date,n=t.unit,r=t.step;return this._calculateDuration(e,i,n,r)},_calculateDuration:function(t,e,i,n){var r=this.$gantt.date,a={week:6048e5,day:864e5,hour:36e5,minute:6e4},s=0;if(a[i])s=Math.round((e-t)/(n*a[i]));else{for(var o=new Date(t),l=new Date(e);o.valueOf()<l.valueOf();)s+=1,o=r.add(o,n,i);o.valueOf()!=e.valueOf()&&(s+=(l-o)/(r.add(o,n,i)-o))}return Math.round(s)},hasDuration:function(){var t=this.argumentsHelper.getDurationArguments.apply(this.argumentsHelper,arguments),e=t.start_date,i=t.end_date,n=t.unit;t.step;return!!n&&(e=new Date(e),i=new Date(i),e.valueOf()<i.valueOf())},calculateEndDate:function(){var t=this.argumentsHelper.calculateEndDateArguments.apply(this.argumentsHelper,arguments),e=t.start_date,i=t.duration,n=t.unit,r=t.step;return this.$gantt.date.add(e,r*i,n)}},t.exports=i},function(t,e,i){var n=i(0),r=function(t,e){return{getWorkHours:function(t){return e.getWorkHours(t)},setWorkTime:function(t){return e.setWorkTime(t)},unsetWorkTime:function(t){e.unsetWorkTime(t)},isWorkTime:function(t,i,n){return e.isWorkTime(t,i,n)},getClosestWorkTime:function(t){return e.getClosestWorkTime(t)},calculateDuration:function(t,i,n){return e.calculateDuration(t,i,n)},_hasDuration:function(t,i,n){return e.hasDuration(t,i,n)},calculateEndDate:function(t,i,n,r){return e.calculateEndDate(t,i,n,r)},createCalendar:n.bind(t.createCalendar,t),addCalendar:n.bind(t.addCalendar,t),getCalendar:n.bind(t.getCalendar,t),getCalendars:n.bind(t.getCalendars,t),getTaskCalendar:n.bind(t.getTaskCalendar,t),deleteCalendar:n.bind(t.deleteCalendar,t)}};t.exports={create:r}},function(t,e,i){var n=i(3);i(6);t.exports=function(t){t.isUnscheduledTask=function(t){return!!t.unscheduled||!t.start_date},t._isAllowedUnscheduledTask=function(e){return!(!e.unscheduled||!t.config.show_unscheduled)},t.isTaskVisible=function(e){if(!this.isTaskExists(e))return!1;var i=this.getTask(e);this.getTaskType(i.type);return!!(+i.start_date<=+this._max_date&&+i.end_date>=+this._min_date||t._isAllowedUnscheduledTask(i))&&!!(t.getGlobalTaskIndex(e)>=0)},t._defaultTaskDate=function(e,i){var n=!(!i||i==this.config.root_id)&&this.getTask(i),r="";if(n)r=n.start_date;else{var a=this.getTaskByIndex(0);r=a?a.start_date?a.start_date:a.end_date?this.calculateEndDate({start_date:a.end_date,duration:-this.config.duration_step}):"":this.config.start_date||this.getState().min_date}return t.assert(r,"Invalid dates"),new Date(r)},t._set_default_task_timing=function(e){e.start_date=e.start_date||t._defaultTaskDate(e,this.getParent(e)),e.duration=e.duration||this.config.duration_step,e.end_date=e.end_date||this.calculateEndDate(e)},t.createTask=function(e,i,n){if(e=e||{},t.defined(e.id)||(e.id=t.uid()),e.start_date||(e.start_date=t._defaultTaskDate(e,i)),void 0===e.text&&(e.text=t.locale.labels.new_task),void 0===e.duration&&(e.duration=1),i){this.setParent(e,i,!0);this.getTask(i).$open=!0}return this.callEvent("onTaskCreated",[e])?(this.config.details_on_create?(e.$new=!0,this.silent(function(){t.$data.tasksStore.addItem(e,n)}),this.selectTask(e.id),this.refreshData(),this.showLightbox(e.id)):this.addTask(e,i,n)&&(this.showTask(e.id),this.selectTask(e.id)),e.id):null},t._update_flags=function(e,i){var n=t.$data.tasksStore;void 0===e?(this._lightbox_id=null,n.silent(function(){n.unselect()}),this._tasks_dnd&&this._tasks_dnd.drag&&(this._tasks_dnd.drag.id=null)):(this._lightbox_id==e&&(this._lightbox_id=i),n.getSelectedId()==e&&n.silent(function(){n.unselect(e),n.select(i)}),this._tasks_dnd&&this._tasks_dnd.drag&&this._tasks_dnd.drag.id==e&&(this._tasks_dnd.drag.id=i))},t._get_task_timing_mode=function(t,e){var i=this.getTaskType(t.type),n={type:i,$no_start:!1,$no_end:!1};return e||i!=t.$rendered_type?(i==this.config.types.project?n.$no_end=n.$no_start=!0:i!=this.config.types.milestone&&(n.$no_end=!(t.end_date||t.duration),n.$no_start=!t.start_date,this._isAllowedUnscheduledTask(t)&&(n.$no_end=n.$no_start=!1)),n):(n.$no_start=t.$no_start,n.$no_end=t.$no_end,n)},t._init_task_timing=function(e){var i=t._get_task_timing_mode(e,!0),n=e.$rendered_type!=i.type,r=i.type;n&&(e.$no_start=i.$no_start,e.$no_end=i.$no_end,e.$rendered_type=i.type),n&&r!=this.config.types.milestone&&r==this.config.types.project&&this._set_default_task_timing(e),r==this.config.types.milestone&&(e.end_date=e.start_date),e.start_date&&e.end_date&&(e.duration=this.calculateDuration(e)),e.duration=e.duration||0},t.isSummaryTask=function(e){var i=t._get_task_timing_mode(e);return!(!i.$no_end&&!i.$no_start)},t.resetProjectDates=function(t){var e=this._get_task_timing_mode(t);if(e.$no_end||e.$no_start){var i=this.getSubtaskDates(t.id);this._assign_project_dates(t,i.start_date,i.end_date)}},t.getSubtaskDuration=function(e){var i=0,n=void 0!==e?e:t.config.root_id;return this.eachTask(function(e){this.getTaskType(e.type)==t.config.types.project||this.isUnscheduledTask(e)||(i+=e.duration)},n),i},t.getSubtaskDates=function(e){var i=null,n=null,r=void 0!==e?e:t.config.root_id;return this.eachTask(function(e){this.getTaskType(e.type)==t.config.types.project||this.isUnscheduledTask(e)||(e.start_date&&!e.$no_start&&(!i||i>e.start_date.valueOf())&&(i=e.start_date.valueOf()),e.end_date&&!e.$no_end&&(!n||n<e.end_date.valueOf())&&(n=e.end_date.valueOf()))},r),{start_date:i?new Date(i):null,end_date:n?new Date(n):null}},t._assign_project_dates=function(t,e,i){var n=this._get_task_timing_mode(t);n.$no_start&&(t.start_date=e&&e!=1/0?new Date(e):this._defaultTaskDate(t,this.getParent(t))),n.$no_end&&(t.end_date=i&&i!=-1/0?new Date(i):this.calculateEndDate({start_date:t.start_date,duration:this.config.duration_step,task:t})),(n.$no_start||n.$no_end)&&this._init_task_timing(t)},t._update_parents=function(e,i){if(e){var n=this.getTask(e),r=this.getParent(n),a=this._get_task_timing_mode(n),s=!0;if(a.$no_start||a.$no_end){var o=n.start_date.valueOf(),l=n.end_date.valueOf();t.resetProjectDates(n),o==n.start_date.valueOf()&&l==n.end_date.valueOf()&&(s=!1),s&&!i&&this.refreshTask(n.id,!0)}s&&r&&this.isTaskExists(r)&&this._update_parents(r,i)}},t.roundDate=function(e){n.isDate(e)&&(e={date:e,unit:t.getScale().unit,step:t.getScale().step});var i,r,a,s=e.date,o=e.step,l=e.unit,d=t.getScale();if(l==d.unit&&o==d.step&&+s>=+t._min_date&&+s<=+t._max_date)a=Math.floor(t.columnIndexByDate(s)),t.getScale().trace_x[a]||(a-=1,d.rtl&&(a=0)),r=new Date(t.getScale().trace_x[a]),i=t.date.add(r,o,l);else{for(a=Math.floor(t.columnIndexByDate(s)),i=t.date[l+"_start"](new Date(this._min_date)),d.trace_x[a]&&(i=t.date[l+"_start"](d.trace_x[a]));+i<+s;){i=t.date[l+"_start"](t.date.add(i,o,l));var c=i.getTimezoneOffset();i=t._correct_dst_change(i,c,i,l),t.date[l+"_start"]&&(i=t.date[l+"_start"](i))}r=t.date.add(i,-1*o,l)}return e.dir&&"future"==e.dir?i:e.dir&&"past"==e.dir?r:Math.abs(s-r)<Math.abs(i-s)?r:i},t.correctTaskWorkTime=function(e){t.config.work_time&&t.config.correct_work_time&&(this.isWorkTime(e.start_date,void 0,e)?this.isWorkTime(new Date(+e.end_date-1),void 0,e)||(e.end_date=this.calculateEndDate(e)):(e.start_date=this.getClosestWorkTime({date:e.start_date,dir:"future",task:e}),e.end_date=this.calculateEndDate(e)))},t.attachEvent("onBeforeTaskUpdate",function(e,i){return t._init_task_timing(i),!0}),t.attachEvent("onBeforeTaskAdd",function(e,i){return t._init_task_timing(i),!0})}},function(t,e,i){t.exports=function(t){function e(t){var e=t.$ui.getView("timeline");return!(!e||!e.isVisible())}function n(t){for(var e in this.config.types)if(this.config.types[e]==t)return e;return"task"}var r=i(1),a=i(6);t._lightbox_methods={},t._lightbox_template="<div class='gantt_cal_ltitle'><span class='gantt_mark'>&nbsp;</span><span class='gantt_time'></span><span class='gantt_title'></span></div><div class='gantt_cal_larea'></div>",t.$services.getService("state").registerProvider("lightbox",function(){return{lightbox:t._lightbox_id}}),t.showLightbox=function(e){if(e&&!t.isReadonly(this.getTask(e))&&this.callEvent("onBeforeLightbox",[e])){var i=this.getTask(e),n=this.getLightbox(this.getTaskType(i.type));this._center_lightbox(n),this.showCover(),this._fill_lightbox(e,n),this._waiAria.lightboxVisibleAttr(n),this.callEvent("onLightbox",[e])}},t._get_timepicker_step=function(){if(this.config.round_dnd_dates){var i=t.getScale(),n=a.getSecondsInUnit(i.unit)*i.step/60;return(n>=1440||!e(this))&&(n=this.config.time_step),n}return this.config.time_step},t.getLabel=function(t,e){for(var i=this._get_typed_lightbox_config(),n=0;n<i.length;n++)if(i[n].map_to==t)for(var r=i[n].options,a=0;a<r.length;a++)if(r[a].key==e)return r[a].label;return""},t.updateCollection=function(e,i){i=i.slice(0);var n=t.serverList(e);if(!n)return!1;n.splice(0,n.length),n.push.apply(n,i||[]),t.resetLightbox()},t.getLightboxType=function(){return this.getTaskType(this._lightbox_type)},t.getLightbox=function(e){if(void 0===e&&(e=this.getLightboxType()),!this._lightbox||this.getLightboxType()!=this.getTaskType(e)){this._lightbox_type=this.getTaskType(e);var i=document.createElement("DIV");i.className="gantt_cal_light";var n=this._is_lightbox_timepicker();(t.config.wide_form||n)&&(i.className+=" gantt_cal_light_wide"),n&&(t.config.wide_form=!0,i.className+=" gantt_cal_light_full"),i.style.visibility="hidden";for(var r,a=this._lightbox_template,s=this.config.buttons_left,o=0;o<s.length;o++){var l=this.config._migrate_buttons[s[o]]?this.config._migrate_buttons[s[o]]:s[o];r=this._waiAria.lightboxButtonAttrString(l),a+="<div "+r+" class='gantt_btn_set gantt_left_btn_set "+l+"_set'><div dhx_button='1' class='"+l+"'></div><div>"+this.locale.labels[l]+"</div></div>"}s=this.config.buttons_right;for(var o=0;o<s.length;o++){var l=this.config._migrate_buttons[s[o]]?this.config._migrate_buttons[s[o]]:s[o];r=this._waiAria.lightboxButtonAttrString(l),a+="<div "+r+" class='gantt_btn_set gantt_right_btn_set "+l+"_set' style='float:right;'><div dhx_button='1' class='"+l+"'></div><div>"+this.locale.labels[l]+"</div></div>"}a+="</div>",i.innerHTML=a,t._waiAria.lightboxAttr(i),t.config.drag_lightbox&&(i.firstChild.onmousedown=t._ready_to_dnd,i.firstChild.onselectstart=function(){return!1},i.firstChild.style.cursor="pointer",t._init_dnd_events()),document.body.insertBefore(i,document.body.firstChild),this._lightbox=i;var d=this._get_typed_lightbox_config(e);a=this._render_sections(d);for(var c=i.getElementsByTagName("div"),o=0;o<c.length;o++){var h=c[o];if("gantt_cal_larea"==h.className){h.innerHTML=a;break}}for(var o=0;o<d.length;o++){var u=d[o];if(u.id&&document.getElementById(u.id)){var _=document.getElementById(u.id),g=_.querySelector("label"),f=_.nextSibling;if(f){var p=f.querySelector("input, select, textarea");p&&(u.inputId=p.id||"input_"+t.uid(),p.id||(p.id=u.inputId),g.setAttribute("for",u.inputId))}}}this.resizeLightbox(),this._init_lightbox_events(this),i.style.display="none",i.style.visibility="visible"}return this._lightbox},t._render_sections=function(t){for(var e="",i=0;i<t.length;i++){var n=this.form_blocks[t[i].type];if(n){t[i].id="area_"+this.uid();var r=t[i].hidden?" style='display:none'":"",a="";t[i].button&&(a="<div class='gantt_custom_button' index='"+i+"'><div class='gantt_custom_button_"+t[i].button+"'></div><div class='gantt_custom_button_label'>"+this.locale.labels["button_"+t[i].button]+"</div></div>"),this.config.wide_form&&(e+="<div class='gantt_wrap_section' "+r+">"),e+="<div id='"+t[i].id+"' class='gantt_cal_lsection'><label>"+a+this.locale.labels["section_"+t[i].name]+"</label></div>"+n.render.call(this,t[i]),e+="</div>"}}return e},t.resizeLightbox=function(){var t=this._lightbox;if(t){var e=t.childNodes[1];e.style.height="0px",e.style.height=e.scrollHeight+"px",t.style.height=e.scrollHeight+this.config.lightbox_additional_height+"px",e.style.height=e.scrollHeight+"px"}},t._center_lightbox=function(t){if(t){t.style.display="block";var e=window.pageYOffset||document.body.scrollTop||document.documentElement.scrollTop,i=window.pageXOffset||document.body.scrollLeft||document.documentElement.scrollLeft,n=window.innerHeight||document.documentElement.clientHeight;t.style.top=e?Math.round(e+Math.max((n-t.offsetHeight)/2,0))+"px":Math.round(Math.max((n-t.offsetHeight)/2,0)+9)+"px",document.documentElement.scrollWidth>document.body.offsetWidth?t.style.left=Math.round(i+(document.body.offsetWidth-t.offsetWidth)/2)+"px":t.style.left=Math.round((document.body.offsetWidth-t.offsetWidth)/2)+"px"}},t.showCover=function(){if(!this._cover){this._cover=document.createElement("DIV"),this._cover.className="gantt_cal_cover";var t=void 0!==document.height?document.height:document.body.offsetHeight,e=document.documentElement?document.documentElement.scrollHeight:0;this._cover.style.height=Math.max(t,e)+"px",document.body.appendChild(this._cover)}},t._init_lightbox_events=function(){t.lightbox_events={},t.lightbox_events.gantt_save_btn=function(e){t._save_lightbox()},t.lightbox_events.gantt_delete_btn=function(e){t.callEvent("onLightboxDelete",[t._lightbox_id])&&(t.isTaskExists(t._lightbox_id)?t.$click.buttons.delete(t._lightbox_id):t.hideLightbox())},t.lightbox_events.gantt_cancel_btn=function(e){t._cancel_lightbox()},t.lightbox_events.default=function(e,i){if(i.getAttribute("dhx_button"))t.callEvent("onLightboxButton",[i.className,i,e]);else{var n,a,s,o=r.getClassName(i);if(-1!=o.indexOf("gantt_custom_button"))if(-1!=o.indexOf("gantt_custom_button_"))for(n=i.parentNode.getAttribute("index"),s=i;s&&-1==r.getClassName(s).indexOf("gantt_cal_lsection");)s=s.parentNode;else n=i.getAttribute("index"),s=i.parentNode,i=i.firstChild;var l=t._get_typed_lightbox_config();n&&(n*=1,a=t.form_blocks[l[1*n].type],a.button_click(n,i,s,s.nextSibling))}},this.event(t.getLightbox(),"click",function(e){e=e||window.event;var i=e.target?e.target:e.srcElement,n=r.getClassName(i);return n||(i=i.previousSibling,n=r.getClassName(i)),i&&n&&0===n.indexOf("gantt_btn_set")&&(i=i.firstChild,n=r.getClassName(i)),!(!i||!n)&&(t.defined(t.lightbox_events[i.className])?t.lightbox_events[i.className]:t.lightbox_events.default)(e,i)}),t.getLightbox().onkeydown=function(e){var i=e||window.event,n=e.target||e.srcElement,a=!!(r.getClassName(n).indexOf("gantt_btn_set")>-1);switch((e||i).keyCode){case 32:if((e||i).shiftKey)return;a&&n.click&&n.click();break;case t.keys.edit_save:if((e||i).shiftKey)return;a&&n.click?n.click():t._save_lightbox();break;case t.keys.edit_cancel:t._cancel_lightbox()}}},t._cancel_lightbox=function(){var e=this.getLightboxValues();this.callEvent("onLightboxCancel",[this._lightbox_id,e.$new]),t.isTaskExists(e.id)&&e.$new&&this.silent(function(){t.$data.tasksStore.removeItem(e.id),t._update_flags(e.id,null)}),this.refreshData(),this.hideLightbox()},t._save_lightbox=function(){var t=this.getLightboxValues();this.callEvent("onLightboxSave",[this._lightbox_id,t,!!t.$new])&&(t.$new?(delete t.$new,this.addTask(t)):this.isTaskExists(t.id)&&(this.mixin(this.getTask(t.id),t,!0),this.refreshTask(t.id),this.updateTask(t.id)),this.refreshData(),this.hideLightbox())},t._resolve_default_mapping=function(t){var e=t.map_to;return{time:!0,time_optional:!0,duration:!0,duration_optional:!0}[t.type]&&("auto"==t.map_to?e={start_date:"start_date",end_date:"end_date",duration:"duration"}:"string"==typeof t.map_to&&(e={start_date:t.map_to})),e},t.getLightboxValues=function(){var e={};t.isTaskExists(this._lightbox_id)&&(e=this.mixin({},this.getTask(this._lightbox_id)));for(var i=this._get_typed_lightbox_config(),n=0;n<i.length;n++){var r=document.getElementById(i[n].id);r=r?r.nextSibling:r;var a=this.form_blocks[i[n].type];if(a){var s=a.get_value.call(this,r,e,i[n]),o=t._resolve_default_mapping(i[n]);if("string"==typeof o&&"auto"!=o)e[o]=s;else if("object"==typeof o)for(var l in o)o[l]&&(e[o[l]]=s[l])}}return e},t.hideLightbox=function(){var t=this.getLightbox();t&&(t.style.display="none"),this._waiAria.lightboxHiddenAttr(t),this._lightbox_id=null,this.hideCover(),this.callEvent("onAfterLightbox",[])},t.hideCover=function(){this._cover&&this._cover.parentNode.removeChild(this._cover),this._cover=null},t.resetLightbox=function(){t._lightbox&&!t._custom_lightbox&&t._lightbox.parentNode.removeChild(t._lightbox),t._lightbox=null},t._set_lightbox_values=function(e,i){var n=e,r=i.getElementsByTagName("span"),a=[];t.templates.lightbox_header?(a.push(""),a.push(t.templates.lightbox_header(n.start_date,n.end_date,n)),r[1].innerHTML="",r[2].innerHTML=t.templates.lightbox_header(n.start_date,n.end_date,n)):(a.push(this.templates.task_time(n.start_date,n.end_date,n)),a.push((this.templates.task_text(n.start_date,n.end_date,n)||"").substr(0,70)),r[1].innerHTML=this.templates.task_time(n.start_date,n.end_date,n),r[2].innerHTML=(this.templates.task_text(n.start_date,n.end_date,n)||"").substr(0,70)),r[1].innerHTML=a[0],r[2].innerHTML=a[1],t._waiAria.lightboxHeader(i,a.join(" "));for(var s=this._get_typed_lightbox_config(this.getLightboxType()),o=0;o<s.length;o++){var l=s[o];if(this.form_blocks[l.type]){var d=document.getElementById(l.id).nextSibling,c=this.form_blocks[l.type],h=t._resolve_default_mapping(s[o]),u=this.defined(n[h])?n[h]:l.default_value;c.set_value.call(t,d,u,n,l),l.focus&&c.focus.call(t,d)}}e.id&&(t._lightbox_id=e.id)},t._fill_lightbox=function(t,e){var i=this.getTask(t);this._set_lightbox_values(i,e)},t.getLightboxSection=function(e){var i=this._get_typed_lightbox_config(),n=0;for(n;n<i.length&&i[n].name!=e;n++);var r=i[n];if(!r)return null;this._lightbox||this.getLightbox();var a=document.getElementById(r.id),s=a.nextSibling,o={section:r,header:a,node:s,getValue:function(e){return t.form_blocks[r.type].get_value.call(t,s,e||{},r)},setValue:function(e,i){return t.form_blocks[r.type].set_value.call(t,s,e,i||{},r)}},l=this._lightbox_methods["get_"+r.type+"_control"];return l?l(o):o},t._lightbox_methods.get_template_control=function(t){return t.control=t.node,t},t._lightbox_methods.get_select_control=function(t){return t.control=t.node.getElementsByTagName("select")[0],t},t._lightbox_methods.get_textarea_control=function(t){return t.control=t.node.getElementsByTagName("textarea")[0],t},t._lightbox_methods.get_time_control=function(t){return t.control=t.node.getElementsByTagName("select"),t},t._init_dnd_events=function(){this.event(document.body,"mousemove",t._move_while_dnd),this.event(document.body,"mouseup",t._finish_dnd),t._init_dnd_events=function(){}},t._move_while_dnd=function(e){if(t._dnd_start_lb){document.gantt_unselectable||(document.body.className+=" gantt_unselectable",document.gantt_unselectable=!0);var i=t.getLightbox(),n=e&&e.target?[e.pageX,e.pageY]:[event.clientX,event.clientY];i.style.top=t._lb_start[1]+n[1]-t._dnd_start_lb[1]+"px",i.style.left=t._lb_start[0]+n[0]-t._dnd_start_lb[0]+"px"}},t._ready_to_dnd=function(e){var i=t.getLightbox();t._lb_start=[parseInt(i.style.left,10),parseInt(i.style.top,10)],t._dnd_start_lb=e&&e.target?[e.pageX,e.pageY]:[event.clientX,event.clientY]},t._finish_dnd=function(){t._lb_start&&(t._lb_start=t._dnd_start_lb=!1,document.body.className=document.body.className.replace(" gantt_unselectable",""),document.gantt_unselectable=!1)},t._focus=function(e,i){if(e&&e.focus)if(t.config.touch);else try{i&&e.select&&e.select(),e.focus()}catch(t){}},t.form_blocks={getTimePicker:function(e,i){var n=e.time_format;if(!n){var n=["%d","%m","%Y"];a.getSecondsInUnit(t.getScale().unit)<a.getSecondsInUnit("day")&&n.push("%H:%i")}e._time_format_order={size:0};var r=this.config,s=this.date.date_part(new Date(t._min_date.valueOf())),o=1440,l=0;t.config.limit_time_select&&(o=60*r.last_hour+1,l=60*r.first_hour,s.setHours(r.first_hour));for(var d="",c=0;c<n.length;c++){var h=n[c];c>0&&(d+=" ");var u="";switch(h){case"%Y":e._time_format_order[2]=c,e._time_format_order.size++;var _,g,f,p;e.year_range&&(isNaN(e.year_range)?e.year_range.push&&(f=e.year_range[0],p=e.year_range[1]):_=e.year_range),_=_||10,g=g||Math.floor(_/2),f=f||s.getFullYear()-g,p=p||f+_;for(var v=f;v<p;v++)u+="<option value='"+v+"'>"+v+"</option>";break;case"%m":e._time_format_order[1]=c,e._time_format_order.size++;for(var v=0;v<12;v++)u+="<option value='"+v+"'>"+this.locale.date.month_full[v]+"</option>";break;case"%d":e._time_format_order[0]=c,e._time_format_order.size++;for(var v=1;v<32;v++)u+="<option value='"+v+"'>"+v+"</option>";break;case"%H:%i":e._time_format_order[3]=c,e._time_format_order.size++;var v=l,m=s.getDate();for(e._time_values=[];v<o;)u+="<option value='"+v+"'>"+this.templates.time_picker(s)+"</option>",e._time_values.push(v),s.setTime(s.valueOf()+60*this._get_timepicker_step()*1e3),v=24*(s.getDate()!=m?1:0)*60+60*s.getHours()+s.getMinutes()}if(u){var k=t._waiAria.lightboxSelectAttrString(h);d+="<select "+(e.readonly?"disabled='disabled'":"")+(i?" style='display:none' ":"")+k+">"+u+"</select>"}}return d},_fill_lightbox_select:function(e,i,n,r,a){if(e[i+r[0]].value=n.getDate(),e[i+r[1]].value=n.getMonth(),e[i+r[2]].value=n.getFullYear(),t.defined(r[3])){var s=60*n.getHours()+n.getMinutes();s=Math.round(s/t._get_timepicker_step())*t._get_timepicker_step();var o=e[i+r[3]];o.value=s,o.setAttribute("data-value",s)}},template:{render:function(t){return"<div class='gantt_cal_ltext gantt_cal_template' style='height:"+(t.height||"30")+"px;'></div>"},set_value:function(t,e,i,n){t.innerHTML=e||""},get_value:function(t,e,i){return t.innerHTML||""},focus:function(t){}},textarea:{render:function(t){return"<div class='gantt_cal_ltext' style='height:"+(t.height||"130")+"px;'><textarea></textarea></div>"},set_value:function(t,e,i){this.form_blocks.textarea._get_input(t).value=e||""},get_value:function(t,e){return this.form_blocks.textarea._get_input(t).value},focus:function(e){var i=this.form_blocks.textarea._get_input(e);t._focus(i,!0)},_get_input:function(t){return t.querySelector("textarea")}},select:{render:function(t){for(var e=(t.height||"23")+"px",i="<div class='gantt_cal_ltext' style='height:"+e+";'><select style='width:100%;'>",n=0;n<t.options.length;n++)i+="<option value='"+t.options[n].key+"'>"+t.options[n].label+"</option>";return i+="</select></div>"},set_value:function(t,e,i,n){var r=t.firstChild;!r._dhx_onchange&&n.onchange&&(r.onchange=n.onchange,r._dhx_onchange=!0),void 0===e&&(e=(r.options[0]||{}).value),r.value=e||""},get_value:function(t,e){return t.firstChild.value},focus:function(e){var i=e.firstChild;t._focus(i,!0)}},time:{render:function(t){var e=this.form_blocks.getTimePicker.call(this,t),i=["<div style='height:"+(t.height||30)+"px;padding-top:0px;font-size:inherit;text-align:center;' class='gantt_section_time'>"];return i.push(e),t.single_date?(e=this.form_blocks.getTimePicker.call(this,t,!0),i.push("<span></span>")):i.push("<span style='font-weight:normal; font-size:10pt;'> &nbsp;&ndash;&nbsp; </span>"),i.push(e),i.push("</div>"),i.join("")},set_value:function(e,i,n,r){var a=r,s=e.getElementsByTagName("select"),o=r._time_format_order;if(r._time_format_size,a.auto_end_date)for(var l=function(){h=new Date(s[o[2]].value,s[o[1]].value,s[o[0]].value,0,0),u=t.calculateEndDate({start_date:h,duration:1,task:n}),this.form_blocks._fill_lightbox_select(s,o.size,u,o,a)},d=0;d<4;d++)s[d].onchange=l;var c=t._resolve_default_mapping(r);"string"==typeof c&&(c={start_date:c});var h=n[c.start_date]||new Date,u=n[c.end_date]||t.calculateEndDate({start_date:h,duration:1,task:n});this.form_blocks._fill_lightbox_select(s,0,h,o,a),this.form_blocks._fill_lightbox_select(s,o.size,u,o,a)},get_value:function(e,i,n){var r=e.getElementsByTagName("select"),a=n._time_format_order,s=0,o=0;if(t.defined(a[3])){var l=parseInt(r[a[3]].value,10);s=Math.floor(l/60),o=l%60}var d=new Date(r[a[2]].value,r[a[1]].value,r[a[0]].value,s,o);if(s=o=0,t.defined(a[3])){var l=parseInt(r[a.size+a[3]].value,10);s=Math.floor(l/60),o=l%60}var c=new Date(r[a[2]+a.size].value,r[a[1]+a.size].value,r[a[0]+a.size].value,s,o);c<=d&&(c=t.date.add(d,t._get_timepicker_step(),"minute"));var h=t._resolve_default_mapping(n),u={start_date:new Date(d),end_date:new Date(c)};return"string"==typeof h?u.start_date:u},focus:function(e){t._focus(e.getElementsByTagName("select")[0])}},duration:{render:function(t){var e=this.form_blocks.getTimePicker.call(this,t);e="<div class='gantt_time_selects'>"+e+"</div>";var i=this.locale.labels[this.config.duration_unit+"s"],n=t.single_date?' style="display:none"':"",r=t.readonly?" disabled='disabled'":"",a=this._waiAria.lightboxDurationInputAttrString(t),s="<div class='gantt_duration' "+n+"><input type='button' class='gantt_duration_dec' value='−'"+r+"><input type='text' value='5' class='gantt_duration_value'"+r+" "+a+"><input type='button' class='gantt_duration_inc' value='+'"+r+"> "+i+" <span></span></div>";return"<div style='height:"+(t.height||30)+"px;padding-top:0px;font-size:inherit;' class='gantt_section_time'>"+e+" "+s+"</div>"},set_value:function(e,i,n,r){function a(){var i=t.form_blocks.duration._get_start_date.call(t,e,r),a=t.form_blocks.duration._get_duration.call(t,e,r),s=t.calculateEndDate({start_date:i,duration:a,task:n});u.innerHTML=t.templates.task_date(s)}function s(t){var e=c.value;e=parseInt(e,10),window.isNaN(e)&&(e=0),e+=t,e<1&&(e=1),c.value=e,a()}var o=r,l=e.getElementsByTagName("select"),d=e.getElementsByTagName("input"),c=d[1],h=[d[0],d[2]],u=e.getElementsByTagName("span")[0],_=r._time_format_order;h[0].onclick=t.bind(function(){s(-1*this.config.duration_step)},this),h[1].onclick=t.bind(function(){s(1*this.config.duration_step)},this),l[0].onchange=a,l[1].onchange=a,l[2].onchange=a,l[3]&&(l[3].onchange=a),c.onkeydown=t.bind(function(t){t=t||window.event;var e=t.charCode||t.keyCode||t.which;return 40==e?(s(-1*this.config.duration_step),!1):38==e?(s(1*this.config.duration_step),!1):void window.setTimeout(function(t){a()},1)},this),c.onchange=t.bind(function(t){a()},this);var g=t._resolve_default_mapping(r);"string"==typeof g&&(g={start_date:g});var f=n[g.start_date]||new Date,p=n[g.end_date]||t.calculateEndDate({start_date:f,duration:1,task:n}),v=Math.round(n[g.duration])||t.calculateDuration({start_date:f,end_date:p,task:n});t.form_blocks._fill_lightbox_select(l,0,f,_,o),c.value=v,a()},_get_start_date:function(e,i){var n=e.getElementsByTagName("select"),r=i._time_format_order,a=0,s=0;if(t.defined(r[3])){var o=n[r[3]],l=parseInt(o.value,10);isNaN(l)&&o.hasAttribute("data-value")&&(l=parseInt(o.getAttribute("data-value"),10)),a=Math.floor(l/60),s=l%60}return new Date(n[r[2]].value,n[r[1]].value,n[r[0]].value,a,s)},_get_duration:function(t,e){var i=t.getElementsByTagName("input")[1];return i=parseInt(i.value,10),i&&!window.isNaN(i)||(i=1),i<0&&(i*=-1),i},get_value:function(e,i,n){var r=t.form_blocks.duration._get_start_date(e,n),a=t.form_blocks.duration._get_duration(e,n),s=t.calculateEndDate({start_date:r,duration:a,task:i}),o=t._resolve_default_mapping(n),l={start_date:new Date(r),end_date:new Date(s),duration:a};return"string"==typeof o?l.start_date:l},focus:function(e){t._focus(e.getElementsByTagName("select")[0])}},parent:{_filter:function(e,i,n){var r=i.filter||function(){return!0};e=e.slice(0);for(var a=0;a<e.length;a++){var s=e[a];(s.id==n||t.isChildOf(s.id,n)||!1===r(s.id,s))&&(e.splice(a,1),a--)}return e},_display:function(e,i){var n=[],r=[];i&&(n=t.getTaskByTime(),e.allow_root&&n.unshift({id:t.config.root_id,text:e.root_label||""}),n=this._filter(n,e,i),e.sort&&n.sort(e.sort));for(var a=e.template||t.templates.task_text,s=0;s<n.length;s++){var o=a.apply(t,[n[s].start_date,n[s].end_date,n[s]]);void 0===o&&(o=""),r.push({key:n[s].id,label:o})}return e.options=r,e.map_to=e.map_to||"parent",t.form_blocks.select.render.apply(this,arguments)},render:function(e){return t.form_blocks.parent._display(e,!1)},set_value:function(e,i,n,r){var a=document.createElement("div");a.innerHTML=t.form_blocks.parent._display(r,n.id);var s=a.removeChild(a.firstChild);return e.onselect=null,e.parentNode.replaceChild(s,e),t.form_blocks.select.set_value.apply(t,[s,i,n,r])},get_value:function(){return t.form_blocks.select.get_value.apply(t,arguments)},focus:function(){return t.form_blocks.select.focus.apply(t,arguments)}}},t._is_lightbox_timepicker=function(){for(var t=this._get_typed_lightbox_config(),e=0;e<t.length;e++)if("time"==t[e].name&&"time"==t[e].type)return!0;return!1},t._dhtmlx_confirm=function(e,i,n,r){if(!e)return n();var a={text:e};i&&(a.title=i),r&&(a.ok=r),n&&(a.callback=function(t){t&&n()}),t.confirm(a)},t._get_typed_lightbox_config=function(e){void 0===e&&(e=this.getLightboxType());var i=n.call(this,e);return t.config.lightbox[i+"_sections"]?t.config.lightbox[i+"_sections"]:t.config.lightbox.sections},t._silent_redraw_lightbox=function(t){var e=this.getLightboxType();if(this.getState().lightbox){var i=this.getState().lightbox,n=this.getLightboxValues(),r=this.copy(this.getTask(i));this.resetLightbox();var a=this.mixin(r,n,!0),s=this.getLightbox(t||void 0);this._center_lightbox(this.getLightbox()),this._set_lightbox_values(a,s)}else this.resetLightbox(),this.getLightbox(t||void 0);this.callEvent("onLightboxChange",[e,this.getLightboxType()])}}},function(t,e){t.exports=function(t){t._extend_to_optional=function(e){var i=e,n={render:i.render,focus:i.focus,set_value:function(e,r,a,s){var o=t._resolve_default_mapping(s);if(!a[o.start_date]||"start_date"==o.start_date&&this._isAllowedUnscheduledTask(a)){n.disable(e,s);var l={};for(var d in o)l[o[d]]=a[d];return i.set_value.call(t,e,r,l,s)}return n.enable(e,s),i.set_value.call(t,e,r,a,s)},get_value:function(e,n,r){return r.disabled?{start_date:null}:i.get_value.call(t,e,n,r)},update_block:function(e,i){if(t.callEvent("onSectionToggle",[t._lightbox_id,i]),e.style.display=i.disabled?"none":"block",i.button){var n=e.previousSibling.querySelector(".gantt_custom_button_label"),r=t.locale.labels,a=i.disabled?r[i.name+"_enable_button"]:r[i.name+"_disable_button"];n.innerHTML=a}t.resizeLightbox()},disable:function(t,e){e.disabled=!0,n.update_block(t,e)},enable:function(t,e){e.disabled=!1,n.update_block(t,e)},button_click:function(e,i,r,a){if(!1!==t.callEvent("onSectionButton",[t._lightbox_id,r])){var s=t._get_typed_lightbox_config()[e];s.disabled?n.enable(a,s):n.disable(a,s)}}};return n},t.form_blocks.duration_optional=t._extend_to_optional(t.form_blocks.duration),t.form_blocks.time_optional=t._extend_to_optional(t.form_blocks.time)}},function(t,e){t.exports=function(t){t.getTaskType=function(t){return"task"}}},function(t,e){t.exports=function(t){function e(){return t._cached_functions.update_if_changed(t),t._cached_functions.active||t._cached_functions.activate(),!0}t._cached_functions={cache:{},mode:!1,critical_path_mode:!1,wrap_methods:function(t,e){if(e._prefetch_originals)for(var i in e._prefetch_originals)e[i]=e._prefetch_originals[i];e._prefetch_originals={};for(var i=0;i<t.length;i++)this.prefetch(t[i],e)},prefetch:function(t,e){var i=e[t];if(i){var n=this;e._prefetch_originals[t]=i,e[t]=function(){for(var e=new Array(arguments.length),r=0,a=arguments.length;r<a;r++)e[r]=arguments[r];if(n.active){var s=n.get_arguments_hash(Array.prototype.slice.call(e));n.cache[t]||(n.cache[t]={});var o=n.cache[t];if(n.has_cached_value(o,s))return n.get_cached_value(o,s);var l=i.apply(this,e);return n.cache_value(o,s,l),l}return i.apply(this,e)}}return i},cache_value:function(t,e,i){this.is_date(i)&&(i=new Date(i)),t[e]=i},has_cached_value:function(t,e){return t.hasOwnProperty(e)},get_cached_value:function(t,e){var i=t[e];return this.is_date(i)&&(i=new Date(i)),i},is_date:function(t){return t&&t.getUTCDate},get_arguments_hash:function(t){for(var e=[],i=0;i<t.length;i++)e.push(this.stringify_argument(t[i]));return"("+e.join(";")+")"},stringify_argument:function(t){return(t.id?t.id:this.is_date(t)?t.valueOf():t)+""},activate:function(){this.clear(),this.active=!0},deactivate:function(){this.clear(),this.active=!1},clear:function(){this.cache={}},setup:function(t){var e=[],i=["_isCriticalTask","isCriticalLink","_isProjectEnd","_getProjectEnd","_getSlack"];"auto"==this.mode?t.config.highlight_critical_path&&(e=i):!0===this.mode&&(e=i),this.wrap_methods(e,t)},update_if_changed:function(t){(this.critical_path_mode!=t.config.highlight_critical_path||this.mode!==t.config.optimize_render)&&(this.critical_path_mode=t.config.highlight_critical_path,this.mode=t.config.optimize_render,this.setup(t))}},t.attachEvent("onBeforeGanttRender",e),t.attachEvent("onBeforeDataRender",e),t.attachEvent("onBeforeSmartRender",function(){e()}),t.attachEvent("onBeforeParse",e),t.attachEvent("onDataRender",function(){t._cached_functions.deactivate()});var i=null;t.attachEvent("onSmartRender",function(){i&&clearTimeout(i),i=setTimeout(function(){t._cached_functions.deactivate()},1e3)}),t.attachEvent("onBeforeGanttReady",function(){return t._cached_functions.update_if_changed(t),!0})}},function(t,e){function i(t,e,i){for(var n in e)(void 0===t[n]||i)&&(t[n]=e[n])}function n(t,e){var n=e.skin;if(!n||t)for(var r=document.getElementsByTagName("link"),a=0;a<r.length;a++){var s=r[a].href.match("dhtmlxgantt_([a-z_]+).css");if(s&&(e.skins[s[1]]||!n)){n=s[1];break}}e.skin=n||"terrace";var o=e.skins[e.skin]||e.skins.terrace;i(e.config,o.config,t);var l=e.getGridColumns();l[1]&&!e.defined(l[1].width)&&(l[1].width=o._second_column_width),l[2]&&!e.defined(l[2].width)&&(l[2].width=o._third_column_width);for(var a=0;a<l.length;a++){var d=l[a];"add"==d.name&&(d.width||(d.width=44),e.defined(d.min_width)&&e.defined(d.max_width)||(d.min_width=d.min_width||d.width,d.max_width=d.max_width||d.width),d.min_width&&(d.min_width=+d.min_width),d.max_width&&(d.max_width=+d.max_width),d.width&&(d.width=+d.width,d.width=d.min_width&&d.min_width>d.width?d.min_width:d.width,d.width=d.max_width&&d.max_width<d.width?d.max_width:d.width))}o.config.task_height&&(e.config.task_height=o.config.task_height||"full"),o._lightbox_template&&(e._lightbox_template=o._lightbox_template),o._redefine_lightbox_buttons&&(e.config.buttons_right=o._redefine_lightbox_buttons.buttons_right,e.config.buttons_left=o._redefine_lightbox_buttons.buttons_left),e.resetLightbox()}t.exports=function(t){t.resetSkin||(t.resetSkin=function(){this.skin="",n(!0,this)},t.skins={},t.attachEvent("onGanttLayoutReady",function(){n(!1,this)}))}},function(t,e){t.exports=function(t){t.skins.skyblue={config:{grid_width:350,row_height:27,scale_height:27,link_line_width:1,link_arrow_size:8,lightbox_additional_height:75},_second_column_width:95,_third_column_width:80}}},function(t,e){t.exports=function(t){t.skins.meadow={config:{grid_width:350,row_height:27,scale_height:30,link_line_width:2,link_arrow_size:6,lightbox_additional_height:72},_second_column_width:95,_third_column_width:80}}},function(t,e){t.exports=function(t){t.skins.terrace={config:{grid_width:360,row_height:35,scale_height:35,link_line_width:2,link_arrow_size:6,lightbox_additional_height:75},_second_column_width:90,_third_column_width:70}}},function(t,e){t.exports=function(t){t.skins.broadway={config:{grid_width:360,row_height:35,scale_height:35,link_line_width:1,link_arrow_size:7,lightbox_additional_height:86},_second_column_width:90,_third_column_width:80,_lightbox_template:"<div class='gantt_cal_ltitle'><span class='gantt_mark'>&nbsp;</span><span class='gantt_time'></span><span class='gantt_title'></span><div class='gantt_cancel_btn'></div></div><div class='gantt_cal_larea'></div>",_config_buttons_left:{},_config_buttons_right:{gantt_delete_btn:"icon_delete",gantt_save_btn:"icon_save"}}}},function(t,e){t.exports=function(t){t.skins.material={config:{grid_width:411,row_height:34,task_height_offset:6,scale_height:36,link_line_width:2,link_arrow_size:6,lightbox_additional_height:80},_second_column_width:110,_third_column_width:75,_redefine_lightbox_buttons:{buttons_left:["dhx_delete_btn"],buttons_right:["dhx_save_btn","dhx_cancel_btn"]}},t.attachEvent("onAfterTaskDrag",function(e){var i=t.getTaskNode(e);i&&(i.className+=" gantt_drag_animation",setTimeout(function(){var t=i.className.indexOf(" gantt_drag_animation");t>-1&&(i.className=i.className.slice(0,t))},200))})}},function(t,e){t.exports=function(t){t.skins.contrast_black={config:{grid_width:360,row_height:35,scale_height:35,link_line_width:2,link_arrow_size:6,lightbox_additional_height:75},_second_column_width:100,_third_column_width:80}}},function(t,e){t.exports=function(t){t.skins.contrast_white={config:{grid_width:360,row_height:35,scale_height:35,link_line_width:2,link_arrow_size:6,lightbox_additional_height:75},_second_column_width:100,_third_column_width:80}}},function(t,e){t.exports=function(t){function e(){var e;return t.$ui.getView("timeline")&&(e=t.$ui.getView("timeline")._tasks_dnd),e}t.config.touch_drag=500,t.config.touch=!0,t.config.touch_feedback=!0,t.config.touch_feedback_duration=1,t._prevent_touch_scroll=!1,t._touch_feedback=function(){t.config.touch_feedback&&navigator.vibrate&&navigator.vibrate(t.config.touch_feedback_duration)},t.attachEvent("onGanttReady",t.bind(function(){if("force"!=this.config.touch&&(this.config.touch=this.config.touch&&(-1!=navigator.userAgent.indexOf("Mobile")||-1!=navigator.userAgent.indexOf("iPad")||-1!=navigator.userAgent.indexOf("Android")||-1!=navigator.userAgent.indexOf("Touch"))),this.config.touch){var t=!0;try{document.createEvent("TouchEvent")}catch(e){t=!1}t?this._touch_events(["touchmove","touchstart","touchend"],function(t){return t.touches&&t.touches.length>1?null:t.touches[0]?{target:t.target,pageX:t.touches[0].pageX,pageY:t.touches[0].pageY,clientX:t.touches[0].clientX,clientY:t.touches[0].clientY}:t},function(){return!1}):window.navigator.pointerEnabled?this._touch_events(["pointermove","pointerdown","pointerup"],function(t){return"mouse"==t.pointerType?null:t},function(t){return!t||"mouse"==t.pointerType}):window.navigator.msPointerEnabled&&this._touch_events(["MSPointerMove","MSPointerDown","MSPointerUp"],function(t){return t.pointerType==t.MSPOINTER_TYPE_MOUSE?null:t},function(t){return!t||t.pointerType==t.MSPOINTER_TYPE_MOUSE})}},t));var i=[];t._touch_events=function(n,r,a){function s(t){return t&&t.preventDefault&&t.preventDefault(),(t||event).cancelBubble=!0,!1}function o(e){var i=t._getTaskLayers(),n=t.getTask(e);if(n&&t.isTaskVisible(e))for(var r=0;r<i.length;r++)if((n=i[r].rendered[e])&&n.getAttribute("task_id")&&n.getAttribute("task_id")==e){var a=n.cloneNode(!0);g=n,i[r].rendered[e]=a,n.style.display="none",a.className+=" gantt_drag_move ",n.parentNode.appendChild(a)}}for(var l,d=0,c=!1,h=!1,u=null,_=null,g=null,f=0;f<i.length;f++)t.eventRemove(i[f][0],i[f][1],i[f][2]);i=[],i.push([t.$container,n[0],function(i){var n=e();if(!a(i)&&c){_&&clearTimeout(_);var o=r(i);if(n&&(n.drag.id||n.drag.start_drag))return n.on_mouse_move(o),i.preventDefault&&i.preventDefault(),i.cancelBubble=!0,!1;if(!t._prevent_touch_scroll){if(o&&u){var g=u.pageX-o.pageX,f=u.pageY-o.pageY;if(!h&&(Math.abs(g)>5||Math.abs(f)>5)&&(t._touch_scroll_active=h=!0,d=0,l=t.getScrollState()),h){t.scrollTo(l.x+g,l.y+f);var p=t.getScrollState();if(l.x!=p.x&&f>2*g||l.y!=p.y&&g>2*f)return s(i)}}return s(i)}return!0}}]),i.push([this.$container,"contextmenu",function(t){if(c)return s(t)}]),i.push([this.$container,n[1],function(i){if(!a(i)){if(i.touches&&i.touches.length>1)return void(c=!1);u=r(i),t._locate_css(u,"gantt_hor_scroll")||t._locate_css(u,"gantt_ver_scroll")||(c=!0);var n=e();_=setTimeout(function(){var e=t.locate(u);n&&e&&!t._locate_css(u,"gantt_link_control")&&!t._locate_css(u,"gantt_grid_data")&&(n.on_mouse_down(u),n.drag&&n.drag.start_drag&&(o(e),n._start_dnd(u),t._touch_drag=!0,t.refreshTask(e),t._touch_feedback())),_=null},t.config.touch_drag)}}]),i.push([this.$container,n[2],function(i){if(!a(i)){_&&clearTimeout(_),t._touch_drag=!1,c=!1;var n=r(i),o=e();if(o&&o.on_mouse_up(n),g&&(t.refreshTask(t.locate(g)),g.parentNode&&(g.parentNode.removeChild(g),t._touch_feedback())),t._touch_scroll_active=c=h=!1,g=null,u&&d){var l=new Date;if(l-d<500){t.$services.getService("mouseEvents").onDoubleClick(u),s(i)}else d=l}else d=new Date}}]);for(var f=0;f<i.length;f++)t.event(i[f][0],i[f][1],i[f][2])}}},function(t,e){t.exports=function(t){t.locale={date:{month_full:["January","February","March","April","May","June","July","August","September","October","November","December"],month_short:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],day_full:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],day_short:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]},labels:{new_task:"New task",icon_save:"Save",icon_cancel:"Cancel",icon_details:"Details",icon_edit:"Edit",icon_delete:"Delete",confirm_closing:"",confirm_deleting:"Task will be deleted permanently, are you sure?",section_description:"Description",section_time:"Time period",section_type:"Type",column_wbs:"WBS",column_text:"Task name",column_start_date:"Start time",column_duration:"Duration",column_add:"",link:"Link",confirm_link_deleting:"will be deleted",link_start:" (start)",link_end:" (end)",type_task:"Task",type_project:"Project",type_milestone:"Milestone",minutes:"Minutes",hours:"Hours",days:"Days",weeks:"Week",months:"Months",years:"Years",message_ok:"OK",message_cancel:"Cancel"}}}},function(t,e,i){var n=i(1),r=i(6);t.exports=function(t){var e=i(17);t.assert=i(101)(t),t.init=function(e,i,r){i&&r&&(this.config.start_date=this._min_date=new Date(i),this.config.end_date=this._max_date=new Date(r)),this.date.init(),this.config.scroll_size||(this.config.scroll_size=n.getScrollSize()||1);var a;t.event(window,"resize",function(){clearTimeout(a),a=setTimeout(function(){t.render()},300)}),this.init=function(t){this.$container&&this.$container.parentNode&&(this.$container.parentNode.removeChild(this.$container),this.$container=null),this.$layout&&this.$layout.clear(),this._reinit(t)},this._reinit(e)},t._reinit=function(i){this.callEvent("onBeforeGanttReady",[]),this.resetLightbox(),this._update_flags(),this.$services.getService("templateLoader").initTemplates(this),this._clearTaskLayers(),this._clearLinkLayers(),this.$layout&&(this.$layout.destructor(),this.$ui.reset()),this.$root=n.toNode(i),this.$root&&(this.$root.innerHTML=""),this.$root.gantt=this,e(this),this.config.layout.id="main",this.$layout=this.$ui.createView("layout",i,this.config.layout),this.$layout.attachEvent("onBeforeResize",function(){for(var e=t.$services.getService("datastores"),i=0;i<e.length;i++)t.getDatastore(e[i]).filter()}),this.$layout.attachEvent("onResize",function(){t.refreshData()}),this.callEvent("onGanttLayoutReady",[]),this.$layout.render(),t.$container=this.$layout.$container.firstChild,this.callEvent("onTemplatesReady",[]),this.$mouseEvents.reset(this.$root),this.callEvent("onGanttReady",[]),this.render()},t.$click={buttons:{edit:function(e){t.showLightbox(e)},delete:function(e){var i=t.locale.labels.confirm_deleting,n=t.locale.labels.confirm_deleting_title;t._dhtmlx_confirm(i,n,function(){if(!t.isTaskExists(e))return void t.hideLightbox();t.getTask(e).$new?(t.silent(function(){t.deleteTask(e,!0)}),t.refreshData()):t.deleteTask(e),t.hideLightbox()})}}},t.getScrollState=function(){var t=this._scroll_state();return{x:t.x_pos,y:t.y_pos,inner_width:t.x,inner_height:t.y,width:t.x_inner,height:t.y_inner}},t.scrollTo=function(t,e){var i=this._getVerticalScrollbar(),n=this._getHorizontalScrollbar(),r=i.getScrollState(),a=n.getScrollState();1*t==t&&n.scroll(t),1*e==e&&i.scroll(e);var s=i.getScrollState(),o=n.getScrollState();this.callEvent("onGanttScroll",[a.position,r.position,o.position,s.position])},t.showDate=function(t){var e=this.posFromDate(t),i=Math.max(e-this.config.task_scroll_offset,0);this.scrollTo(i)},t.showTask=function(t){var e,i=this.getTaskPosition(this.getTask(t)),n=Math.max(i.left-this.config.task_scroll_offset,0),r=this._scroll_state().y;e=r?i.top-(r-this.config.row_height)/2:i.top,this.scrollTo(n,e)},t.render=function(){this.callEvent("onBeforeGanttRender",[]);var i=this.getScrollState(),n=i?i.x:0;if(this._getHorizontalScrollbar()){n=this._getHorizontalScrollbar().$config.codeScrollLeft||n||0}var r=null;if(n&&(r=t.dateFromPos(n+this.config.task_scroll_offset)),e(this),this.$layout.$config.autosize=this.config.autosize,this.$layout.resize(),this.config.preserve_scroll&&i&&n){var a=t.getScrollState();+r==+t.dateFromPos(a.x)&&a.y==i.y||(r&&this.showDate(r),i.y&&t.scrollTo(void 0,i.y))}this.callEvent("onGanttRender",[])},t.setSizes=t.render,t._scroll_state=function(){var e={x:!1,y:!1,x_pos:0,y_pos:0,scroll_size:this.config.scroll_size+1,x_inner:0,y_inner:0},i=t._getVerticalScrollbar(),n=t._getHorizontalScrollbar();if(n){var r=n.getScrollState();r.visible&&(e.x=r.size,e.x_inner=r.scrollSize),e.x_pos=r.position||0}if(i){var a=i.getScrollState();a.visible&&(e.y=a.size,e.y_inner=a.scrollSize),e.y_pos=a.position||0}return e},t.locate=function(t){var e=n.getTargetNode(t);if((n.getClassName(e)||"").indexOf("gantt_task_cell")>=0)return null;var i=arguments[1]||this.config.task_attribute,r=n.locateAttribute(e,i);return r?r.getAttribute(i):null},t._locate_css=function(t,e,i){return n.locateClassName(t,e,i)},t._locateHTML=function(t,e){return n.locateAttribute(t,e||this.config.task_attribute)},t.getTaskRowNode=function(t){for(var e=this.$grid_data.childNodes,i=this.config.task_attribute,n=0;n<e.length;n++)if(e[n].getAttribute){var r=e[n].getAttribute(i);if(r==t)return e[n]}return null},t.changeLightboxType=function(e){if(this.getLightboxType()==e)return!0;t._silent_redraw_lightbox(e)},t._get_link_type=function(e,i){var n=null;return e&&i?n=t.config.links.start_to_start:!e&&i?n=t.config.links.finish_to_start:e||i?e&&!i&&(n=t.config.links.start_to_finish):n=t.config.links.finish_to_finish,n},t.isLinkAllowed=function(t,e,i,n){var r=null;if(!(r="object"==typeof t?t:{source:t,target:e,type:this._get_link_type(i,n)}))return!1;if(!(r.source&&r.target&&r.type))return!1;if(r.source==r.target)return!1;var a=!0;return this.checkEvent("onLinkValidation")&&(a=this.callEvent("onLinkValidation",[r])),a},t._correct_dst_change=function(e,i,n,a){var s=r.getSecondsInUnit(a)*n;if(s>3600&&s<86400){var o=e.getTimezoneOffset()-i;o&&(e=t.date.add(e,o,"minute"))}return e},t.getGridColumns=function(){return t.config.columns.slice()},t._is_icon_open_click=function(t){if(!t)return!1;var e=t.target||t.srcElement;if(!e||!e.className)return!1;var i=n.getClassName(e);return-1!==i.indexOf("gantt_tree_icon")&&(-1!==i.indexOf("gantt_close")||-1!==i.indexOf("gantt_open"))}}},function(t,e){t.exports=function(t){return function(e,i){e||t.config.show_errors&&!1!==t.callEvent("onError",[i])&&t.message({type:"error",text:i,expire:-1})}}},function(t,e){function i(t){t.destructor=function(){t.callEvent("onDestroy",[]),this.clearAll(),this.detachAllEvents(),this.$root&&delete this.$root.gantt,this._eventRemoveAll(),this.$layout&&this.$layout.destructor(),this.resetLightbox(),this._dp&&this._dp.destructor&&this._dp.destructor(),this.$services.destructor();for(var e in this)0===e.indexOf("$")&&delete this[e]}}t.exports=i},function(t,e){t.exports=function(t){function e(e,i){var n=t.env.isIE?"":"%c",r=[n,'"',e,'"',n," has been deprecated in dhtmlxGantt v4.0 and will stop working in v6.0. Use ",n,'"',i,'"',n," instead. \nSee more details at http://docs.dhtmlx.com/gantt/migrating.html "].join(""),a=window.console.warn||window.console.log,s=[r];t.env.isIE||(s=s.concat(["font-weight:bold","font-weight:normal","font-weight:bold","font-weight:normal"])),a.apply(window.console,s)}window.dhtmlx||(window.dhtmlx={});for(var i=["message","alert","confirm","modalbox","uid","copy","mixin","defined","bind","assert"],n=[],r=0;r<i.length;r++)window.dhtmlx[i[r]]||(n.push(i[r]),dhtmlx[i[r]]=function(i){return function(){return e("dhtmlx."+i,"gantt."+i),t[i].apply(t,arguments)}}(i[r]));t.attachEvent("onDestroy",function(){for(var t=0;t<n.length;t++)delete window.dhtmlx[n[t]];n=null}),window.dataProcessor||(window.dataProcessor=function(i){return e("new dataProcessor(url)","new gantt.dataProcessor(url)"),new t.dataProcessor(i)},t.attachEvent("onDestroy",function(){window.dataProcessor=null}))}}]);
-//# sourceMappingURL=dhtmlxgantt.js.map
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 20);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var dateHelper = __webpack_require__(3);
+
+function copy(object) {
+	var i, t, result; // iterator, types array, result
+
+	if (object && typeof object == "object") {
+		result = {};
+		t = [Array,Number,String,Boolean];
+		for (i=0; i<t.length; i++) {
+			if (object instanceof t[i])
+				result = i ? new t[i](object) : new t[i](); // first one is array
+		}
+
+		if (dateHelper.isDate(object)) {
+			result = new Date(object);
+		}
+
+		for (i in object) {
+			if (Object.prototype.hasOwnProperty.apply(object, [i]))
+				result[i] = copy(object[i]);
+		}
+	}
+	return result || object;
+}
+
+function mixin (target, source, force){
+	for (var f in source)
+		if (((target[f] === undefined) || force)) target[f]=source[f];
+	return target;
+}
+
+function defined(obj) {
+	return typeof(obj) != "undefined";
+}
+
+var seed;
+function uid() {
+	if (!seed)
+		seed = (new Date()).valueOf();
+
+	seed++;
+	return seed;
+}
+
+//creates function with specified "this" pointer
+function bind(functor, object){
+	if(functor.bind)
+		return functor.bind(object);
+	else
+		return function(){ return functor.apply(object,arguments); };
+}
+
+function event(el, event, handler, capture){
+	if (el.addEventListener)
+		el.addEventListener(event, handler, capture === undefined ? false : capture);
+
+	else if (el.attachEvent)
+		el.attachEvent("on"+event, handler);
+}
+
+function eventRemove(el, event, handler, capture){
+	if (el.removeEventListener)
+		el.removeEventListener(event, handler, capture === undefined ? false : capture);
+
+	else if (el.detachEvent)
+		el.detachEvent("on"+event, handler);
+}
+
+
+module.exports = {
+	copy: copy,
+	defined: defined,
+	mixin: mixin,
+	uid: uid,
+	bind: bind,
+	event: event,
+	eventRemove: eventRemove
+};
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
+//returns position of html element on the page
+function elementPosition(elem) {
+	var top=0, left=0, right=0, bottom=0;
+	if (elem.getBoundingClientRect) { //HTML5 method
+		var box = elem.getBoundingClientRect();
+		var body = document.body;
+		var docElem = (document.documentElement ||
+			document.body.parentNode ||
+			document.body);
+
+		var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop;
+		var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
+		var clientTop = docElem.clientTop || body.clientTop || 0;
+		var clientLeft = docElem.clientLeft || body.clientLeft || 0;
+		top  = box.top +  scrollTop - clientTop;
+		left = box.left + scrollLeft - clientLeft;
+
+		right = document.body.offsetWidth - box.right;
+		bottom = document.body.offsetHeight - box.bottom;
+	} else { //fallback to naive approach
+		while(elem) {
+			top = top + parseInt(elem.offsetTop,10);
+			left = left + parseInt(elem.offsetLeft,10);
+			elem = elem.offsetParent;
+		}
+
+		right = document.body.offsetWidth - elem.offsetWidth - left;
+		bottom = document.body.offsetHeight - elem.offsetHeight - top;
+	}
+	return { y: Math.round(top), x: Math.round(left), width:elem.offsetWidth, height:elem.offsetHeight, right: Math.round(right), bottom: Math.round(bottom) };
+}
+
+function isVisible(node){
+	var display = false,
+		visibility = false;
+	if(window.getComputedStyle){
+		var style = window.getComputedStyle(node, null);
+		display = style["display"];
+		visibility = style["visibility"];
+	}else if(node.currentStyle){
+		display = node.currentStyle["display"];
+		visibility = node.currentStyle["visibility"];
+	}
+	return (display != "none" && visibility != "hidden");
+}
+
+function hasNonNegativeTabIndex(node){
+	return !isNaN(node.getAttribute("tabindex")) && (node.getAttribute("tabindex")*1 >= 0);
+}
+
+function hasHref(node){
+	var canHaveHref = {"a": true, "area": true};
+	if(canHaveHref[node.nodeName.loLowerCase()]){
+		return !!node.getAttribute("href");
+	}
+	return true;
+}
+
+function isEnabled(node){
+	var canDisable = {"input":true, "select":true, "textarea":true, "button":true, "object":true};
+	if(canDisable[node.nodeName.toLowerCase()]){
+		return !node.hasAttribute("disabled");
+	}
+
+	return true;
+}
+
+function getFocusableNodes(root){
+	var nodes = root.querySelectorAll([
+		"a[href]",
+		"area[href]",
+		"input",
+		"select",
+		"textarea",
+		"button",
+		"iframe",
+		"object",
+		"embed",
+		"[tabindex]",
+		"[contenteditable]"
+	].join(", "));
+
+	var nodesArray = Array.prototype.slice.call(nodes, 0);
+	for(var i = 0; i < nodesArray.length; i++){
+		var node = nodesArray[i];
+		var isValid = (hasNonNegativeTabIndex(node)  || isEnabled(node) || hasHref(node)) && isVisible(node);
+		if(!isValid){
+			nodesArray.splice(i, 1);
+			i--;
+		}
+	}
+	return nodesArray;
+}
+
+function getScrollSize(){
+	var div = document.createElement("div");
+	div.style.cssText="visibility:hidden;position:absolute;left:-1000px;width:100px;padding:0px;margin:0px;height:110px;min-height:100px;overflow-y:scroll;";
+
+	document.body.appendChild(div);
+	var width = div.offsetWidth-div.clientWidth;
+	document.body.removeChild(div);
+
+	return width;
+}
+
+function getClassName(node){
+	if(!node) return "";
+
+	var className = node.className || "";
+	if(className.baseVal)//'className' exist but not a string - IE svg element in DOM
+		className = className.baseVal;
+
+	if(!className.indexOf)
+		className = '';
+
+	return _trimString(className);
+}
+
+function addClassName(node, className){
+	if (className && node.className.indexOf(className) === -1) {
+		node.className += " " + className;
+	}
+}
+
+function removeClassName(node, name) {
+	name = name.split(" ");
+	for (var i = 0; i < name.length; i++) {
+		var regEx = new RegExp('\\s?\\b' + name[i] + '\\b(?![-_\.])', "");
+		node.className = node.className.replace(regEx, "");
+	}
+}
+
+function toNode(node) {
+	if (typeof node === "string") {
+		return (document.getElementById(node) || document.querySelector(node) || document.body);
+	}
+	return node || document.body;
+}
+
+var _slave = document.createElement("div");
+function insert(node, newone) {
+	_slave.innerHTML = newone;
+	var child = _slave.firstChild;
+	node.appendChild(child);
+	return child;
+}
+
+function remove(node) {
+	if (node && node.parentNode) {
+		node.parentNode.removeChild(node);
+	}
+}
+
+function getChildren(node, css) {
+	var ch = node.childNodes;
+	var len = ch.length;
+	var out = [];
+	for (var i = 0; i < len; i++) {
+		var obj = ch[i];
+		if (obj.className && obj.className.indexOf(css) !== -1) {
+			out.push(obj);
+		}
+	}
+	return out;
+}
+
+function getTargetNode(e){
+	var trg;
+	if (e.tagName)
+		trg = e;
+	else {
+		e=e||window.event;
+		trg=e.target||e.srcElement;
+	}
+	return trg;
+}
+
+function locateAttribute(e, attribute) {
+	if(!attribute) return;
+
+	var trg = getTargetNode(e);
+
+	while (trg){
+		if (trg.getAttribute){	//text nodes has not getAttribute
+			var test = trg.getAttribute(attribute);
+			if (test) return trg;
+		}
+		trg=trg.parentNode;
+	}
+	return null;
+}
+
+function _trimString(str){
+	var func = String.prototype.trim || function(){ return this.replace(/^\s+|\s+$/g, ""); };
+	return func.apply(str);
+}
+
+function locateClassName(e, classname, strict){
+	if(strict === undefined)
+		strict = true;
+
+	var trg = getTargetNode(e);
+	var css = '';
+	var test = false;
+	while (trg){
+		css = getClassName(trg);
+
+		if(css){
+			var ind = css.indexOf(classname);
+			if (ind >= 0){
+				if (!strict)
+					return trg;
+
+				//check that we have exact match
+				var left = (ind === 0) || (!_trimString(css.charAt(ind - 1)));
+				var right = ((ind + classname.length >= css.length)) || (!_trimString(css.charAt(ind + classname.length)));
+
+				if (left && right)
+					return trg;
+			}
+		}
+
+		trg=trg.parentNode;
+	}
+	return null;
+}
+
+/*
+event position relatively to DOM element
+ */
+function getRelativeEventPosition(ev, node){
+	if (ev.pageX || ev.pageY)
+		var pos = {x: ev.pageX, y: ev.pageY};
+
+	var d = document.documentElement;
+	var pos = {
+		x: ev.clientX + d.scrollLeft - d.clientLeft,
+		y: ev.clientY + d.scrollTop - d.clientTop
+	};
+
+	var box = elementPosition(node);
+	pos.x = pos.x - box.x + node.scrollLeft;
+	pos.y = pos.y - box.y + node.scrollTop;
+	return pos;
+}
+
+
+function isChildOf(child, parent){
+	while(child && child != parent) {
+		child = child.parentNode;
+	}
+	return child == parent;
+}
+
+module.exports = {
+	getNodePosition: elementPosition,
+	getFocusableNodes: getFocusableNodes,
+	getScrollSize: getScrollSize,
+	getClassName: getClassName,
+	addClassName: addClassName,
+	removeClassName: removeClassName,
+	insertNode: insert,
+	removeNode: remove,
+	getChildNodes: getChildren,
+	toNode: toNode,
+	locateClassName:locateClassName,
+	locateAttribute: locateAttribute,
+	getTargetNode: getTargetNode,
+	getRelativeEventPosition: getRelativeEventPosition,
+	isChildOf: isChildOf,
+};
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+var EventHost = function(){
+	this._connected = [];
+	this._silent_mode = false;
+};
+
+EventHost.prototype = {
+	_silentStart: function() {
+		this._silent_mode = true;
+	},
+	_silentEnd: function() {
+		this._silent_mode = false;
+	}
+};
+
+var	createEventStorage = function(obj) {
+	var dhx_catch = [];
+	var z = function(){
+		var res = true;
+		for (var i = 0; i < dhx_catch.length; i++){
+			if (dhx_catch[i]){
+				var zr = dhx_catch[i].apply(obj, arguments);
+				res=res&&zr;
+			}
+		}
+		return res;
+	};
+	z.addEvent=function(ev){
+		if (typeof (ev) == "function")
+			return dhx_catch.push(ev)-1;
+		return false;
+	};
+	z.removeEvent=function(id){
+		dhx_catch[id]=null;
+	};
+	return z;
+};
+
+function makeEventable(obj){
+
+	var eventHost = new EventHost();
+	obj.attachEvent=function(name, catcher, callObj){
+		name='ev_'+name.toLowerCase();
+		if (!eventHost[name])
+			eventHost[name] = createEventStorage(callObj||this);
+
+		return(name+':'+eventHost[name].addEvent(catcher)); //return ID (event name & event ID)
+	};
+	obj.attachAll = function(callback, callObj){
+		this.attachEvent('listen_all', callback, callObj);
+	};
+
+	obj.callEvent=function(name, arg0, callObj){
+		if (eventHost._silent_mode) return true;
+
+		var handlerName = 'ev_'+name.toLowerCase();
+
+		if (eventHost['ev_listen_all']){
+			eventHost['ev_listen_all'].apply(callObj || this, [name].concat(arg0));
+		}
+
+		if (eventHost[handlerName])
+			return eventHost[handlerName].apply(callObj || this, arg0);
+		return true;
+	};
+	obj.checkEvent=function(name){
+		return (!!eventHost['ev_'+name.toLowerCase()]);
+	};
+	obj.detachEvent=function(id){
+		if (id){
+			var list = id.split(':');           //get EventName and ID
+			eventHost[list[0]].removeEvent(list[1]); //remove event
+		}
+	};
+	obj.detachAllEvents = function(){
+		for (var name in eventHost){
+			if (name.indexOf("ev_") === 0)
+				delete eventHost[name];
+		}
+	};
+
+}
+
+module.exports = makeEventable;
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+function isDate(obj) {
+	var fields = [
+		"getFullYear",
+		"getMonth",
+		"getDate"
+	];
+	
+	if (obj && typeof obj == "object") {
+		for (var i=0; i<fields.length; i++) {
+			if (!obj[fields[i]])
+				return false;
+		}
+	} else {
+		return false;
+	}
+
+	return true;
+}
+
+module.exports = {
+	isDate: isDate
+};
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0),
+	domEventsScope = __webpack_require__(10),
+	eventable = __webpack_require__(2),
+	domHelpers = __webpack_require__(1);
+
+var Cell = (function () {
+	"use strict";
+
+	function Cell(parent, config, factory, gantt) {
+		if (parent) {
+			this.$container = domHelpers.toNode(parent);
+			this.$parent = parent;
+		}
+		// save config
+		this.$config = utils.mixin(config, {
+			headerHeight: 33
+		});
+		this.$gantt = gantt;
+		this.$domEvents = gantt._createDomEventScope();
+		// set id
+		this.$id = config.id || "c" + utils.uid();
+
+		this.$name = "cell";
+		this.$factory = factory;
+
+		eventable(this);
+
+	}
+
+	Cell.prototype.destructor = function () {
+		this.$parent = this.$container = this.$view = null;
+		var mouse = this.$gantt.$services.getService("mouseEvents");
+		mouse.detach("click", "gantt_header_arrow", this._headerClickHandler);
+		this.$domEvents.detachAll();
+		this.callEvent("onDestroy", []);
+		this.detachAllEvents();
+	};
+	Cell.prototype.cell = function (id) {
+		return null;
+	};
+
+	Cell.prototype.scrollTo = function(left, top){
+
+		if (left*1 == left){
+			this.$view.scrollLeft = left;
+		}
+		if(top*1 == top){
+			this.$view.scrollTop = top;
+		}
+	};
+
+	Cell.prototype.clear = function(){
+		this.getNode().innerHTML = "";
+		this.getNode().className = "gantt_layout_content";
+		this.getNode().style.padding = "0";
+	};
+
+	Cell.prototype.resize = function (final) {
+		if (this.$parent) {
+			return this.$parent.resize(final);
+		}
+
+		if(final === false){
+			this.$preResize = true;
+		}
+
+		var topCont = this.$container;
+		var x = topCont.offsetWidth;
+		var y = topCont.offsetHeight;
+		var topSize = this.getSize();
+		if (topCont === document.body) {
+			x = document.body.offsetWidth;
+			y = document.body.offsetHeight;
+		}
+		if (x < topSize.minWidth) {
+			x = topSize.minWidth;
+		}
+		if (x > topSize.maxWidth) {
+			x = topSize.maxWidth;
+		}
+		if (y < topSize.minHeight) {
+			y = topSize.minHeight;
+		}
+		if (y > topSize.maxHeight) {
+			y = topSize.maxHeight;
+		}
+		this.setSize(x, y);
+
+		var self = this;
+
+		if(!this.$preResize){
+		//	self.callEvent("onResize", [x, y]);
+		}
+		this.$preResize = false;
+	};
+
+	Cell.prototype.hide = function () {
+		this._hide(true);
+		this.resize();
+	};
+	Cell.prototype.show = function (force) {
+		this._hide(false);
+		if (force && this.$parent) {
+			this.$parent.show();
+		}
+		this.resize();
+	};
+	Cell.prototype._hide = function (mode) {
+		if (mode === true && this.$view.parentNode) {
+			this.$view.parentNode.removeChild(this.$view);
+		}
+		else if (mode === false && !this.$view.parentNode) {
+			var index = this.$parent.cellIndex(this.$id);
+			this.$parent.moveView(this, index);
+		}
+		this.$config.hidden = mode;
+	};
+	Cell.prototype.$toHTML = function (content, css) {
+		if (content === void 0) { content = ""; }
+		css = [(css || ""), (this.$config.css || "")].join(" ");
+		var obj = this.$config;
+		var header = "";
+		if (obj.raw) {
+			content = typeof obj.raw === "string" ? obj.raw : "";
+		}
+		else {
+			if (!content) {
+				content = "<div class='gantt_layout_content' "+(css ? " class='"+css+"' " : "")+" >" + (obj.html || "") + "</div>";
+			}
+			if (obj.header) {
+				var collapseIcon = obj.canCollapse ? "<div class='gantt_layout_header_arrow'></div>" : "";
+				header = "<div class='gantt_layout_header'>" + collapseIcon + "<div class='gantt_layout_header_content'>" + obj.header + "</div></div>";
+			}
+		}
+		return "<div class='gantt_layout_cell " + css + "' data-cell-id='" + this.$id + "'>" + header + content + "</div>";
+	};
+	Cell.prototype.$fill = function (node, parent) {
+		this.$view = node;
+		this.$parent = parent;
+		this.init();
+	};
+	Cell.prototype.getNode = function () {
+		return (this.$view.querySelector("gantt_layout_cell") || this.$view);
+	};
+	Cell.prototype.init = function () {
+		// [NOT-GOOD] code is executed for each component, while it still has only one handler, it is no good
+
+		var self = this;
+
+		this._headerClickHandler = function(e){
+			var cellId = domHelpers.locateAttribute(e, "data-cell-id");
+			if(cellId == self.$id){
+				self.toggle();
+			}
+		};
+
+		var mouse = this.$gantt.$services.getService("mouseEvents");
+		mouse.delegate("click", "gantt_header_arrow", this._headerClickHandler);
+
+		this.callEvent("onReady", []);
+	};
+	Cell.prototype.toggle = function () {
+		this.$config.collapsed = !this.$config.collapsed;
+		this.resize();
+	};
+	Cell.prototype.getSize = function () {
+		var size = {
+			height: this.$config.height || 0,
+			width: this.$config.width || 0,
+			gravity: this.$config.gravity || 1,
+			minHeight: this.$config.minHeight || 0,
+			minWidth: this.$config.minWidth || 0,
+			maxHeight: this.$config.maxHeight || 100000,
+			maxWidth: this.$config.maxWidth || 100000
+		};
+		if (this.$config.collapsed) {
+			var mode = this.$config.mode === "x";
+			size[mode ? "width" : "height"] = size[mode ? "maxWidth" : "maxHeight"] = this.$config.headerHeight;
+		}
+		return size;
+	};
+
+	Cell.prototype.getContentSize = function(){
+
+		var width = this.$lastSize.contentX;
+		if(width !== width*1){
+			width = this.$lastSize.width;
+		}
+
+		var height = this.$lastSize.contentY;
+		if(height !== height*1){
+			height = this.$lastSize.height;
+		}
+
+		return {
+			width: width,
+			height: height
+		};
+	};
+
+	Cell.prototype._getBorderSizes = function(){
+		var borders = {
+			top: 0,
+			right: 0,
+			bottom: 0,
+			left: 0,
+			horizontal: 0,
+			vertical: 0
+		};
+		if(this._currentBorders){
+			if(this._currentBorders[this._borders.left]){
+				borders.left = 1;
+				borders.horizontal++;
+			}
+
+			if(this._currentBorders[this._borders.right]){
+				borders.right = 1;
+				borders.horizontal++;
+			}
+
+			if(this._currentBorders[this._borders.top]){
+				borders.top = 1;
+				borders.vertical++;
+			}
+
+			if(this._currentBorders[this._borders.bottom]){
+				borders.bottom = 1;
+				borders.vertical++;
+			}
+		}
+
+		return borders;
+
+	};
+
+	Cell.prototype.setSize = function (x, y) {
+		this.$view.style.width = x + "px";
+		this.$view.style.height = y + "px";
+
+		var borders = this._getBorderSizes();
+		var contentY = y - borders.vertical;
+		var contentX = x - borders.horizontal;
+
+		this.$lastSize = { x: x, y: y, contentX: contentX, contentY: contentY };
+		if (this.$config.header) {
+			this._sizeHeader();
+		}else{
+			this._sizeContent();
+		}
+	};
+
+	Cell.prototype._borders = {
+		"left":"gantt_layout_cell_border_left",
+		"right":"gantt_layout_cell_border_right",
+		"top":"gantt_layout_cell_border_top",
+		"bottom":"gantt_layout_cell_border_bottom"
+	};
+
+	Cell.prototype._setBorders = function(css, view){
+		if(!view) {
+			view = this;
+		}
+		var node = view.$view;
+
+		for( var i in this._borders){
+			domHelpers.removeClassName(node, this._borders[i]);
+		}
+
+		if(typeof css == "string"){
+			css = [css];
+		}
+
+		var cssHash = {};
+
+		for(var i = 0; i < css.length; i++){
+			domHelpers.addClassName(node, css[i]);
+			cssHash[css[i]] = true;
+		}
+
+		view._currentBorders = cssHash;
+	};
+
+
+	Cell.prototype._sizeContent = function(){
+		var content = this.$view.childNodes[0];
+		if(content.className == "gantt_layout_content"){
+			content.style.height = this.$lastSize.contentY + "px";
+		}
+	};
+
+	Cell.prototype._sizeHeader = function () {
+		var size = this.$lastSize;
+		size.contentY -= this.$config.headerHeight;
+		var header = this.$view.childNodes[0];
+		var content = this.$view.childNodes[1];
+		var xLayout = this.$config.mode === "x";
+		if (this.$config.collapsed) {
+			content.style.display = "none";
+			if (xLayout) {
+				header.className = "gantt_layout_header collapsed_x";
+				header.style.width = size.y + "px";
+				var d = Math.floor(size.y / 2 - size.x / 2);
+				header.style.transform = "rotate(90deg) translate(" + d + "px, " + d + "px)";
+				content.style.display = "none";
+			}
+			else {
+				header.className = "gantt_layout_header collapsed_y";
+			}
+		}
+		else {
+			if (xLayout) {
+				header.className = "gantt_layout_header";
+			}
+			else {
+				header.className = "gantt_layout_header vertical";
+			}
+			header.style.width = 'auto';
+			header.style.transform = '';
+			content.style.display = "";
+			content.style.height = size.contentY + "px";
+		}
+		header.style.height = this.$config.headerHeight + "px";
+	};
+	return Cell;
+}());
+
+module.exports = Cell;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+module.exports = function (d, b) {
+	for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	function __() { this.constructor = d; }
+	d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+var units = {
+	"second": 1,
+	"minute": 60,
+	"hour": 60 * 60,
+	"day": 60 * 60 * 24,
+	"week": 60 * 60 * 24 * 7,
+	"month": 60 * 60 * 24 * 30,
+	"quarter": 60 * 60 * 24 * 30 * 3,
+	"year": 60 * 60 * 24 * 365
+};
+function getSecondsInUnit(unit){
+	return units[unit] || unit.hour;
+}
+
+function forEach(arr, callback){
+	var workArray = arr.slice();
+	for(var i = 0; i < workArray.length; i++){
+		callback(workArray[i], i);
+	}
+}
+
+function arrayMap(arr, callback){
+	var workArray = arr.slice();
+	var resArray = [];
+
+	for(var i = 0; i < workArray.length; i++){
+		resArray.push(callback(workArray[i], i));
+	}
+
+	return resArray;
+}
+
+module.exports = {
+	getSecondsInUnit: getSecondsInUnit,
+	forEach: forEach,
+	arrayMap: arrayMap
+};
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports) {
+
+var env = {
+	isIE: (navigator.userAgent.indexOf("MSIE") >= 0 || navigator.userAgent.indexOf("Trident") >= 0),
+	isIE6: (!window.XMLHttpRequest && navigator.userAgent.indexOf("MSIE") >= 0),
+	isIE7: (navigator.userAgent.indexOf("MSIE 7.0") >= 0 && navigator.userAgent.indexOf("Trident") < 0),
+	isIE8: (navigator.userAgent.indexOf("MSIE 8.0") >= 0 && navigator.userAgent.indexOf("Trident") >= 0),
+	isOpera: (navigator.userAgent.indexOf("Opera") >= 0),
+	isChrome: (navigator.userAgent.indexOf("Chrome") >= 0),
+	isKHTML: (navigator.userAgent.indexOf("Safari") >= 0 || navigator.userAgent.indexOf("Konqueror") >= 0),
+	isFF: (navigator.userAgent.indexOf("Firefox") >= 0),
+	isIPad: (navigator.userAgent.search(/iPad/gi) >= 0),
+	isEdge: (navigator.userAgent.indexOf("Edge")!=-1)
+};
+
+module.exports = env;
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports) {
+
+function create(gantt){
+	var events = [];
+
+	return {
+		delegate:function(event, className, handler, root) {
+			events.push([event, className, handler, root]);
+
+			var helper = gantt.$services.getService("mouseEvents");
+			helper.delegate(event, className, handler, root);
+		},
+		destructor: function(){
+			var mouseEvents = gantt.$services.getService("mouseEvents");
+			for(var i = 0; i < events.length; i++){
+				var h = events[i];
+				mouseEvents.detach(h[0], h[1], h[2], h[3]);
+			}
+			events = [];
+		}
+	};
+}
+
+module.exports = create;
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
+function checkTimeout(host, updPerSecond){
+	if (!updPerSecond)
+		return true;
+	
+	if (host._on_timeout)
+		return false;
+	
+	var timeout = Math.ceil(1000/updPerSecond);
+	if (timeout < 2) return true;
+
+	setTimeout(function(){
+		delete host._on_timeout;
+	}, timeout);
+
+	host._on_timeout = true;
+	return true;
+}
+
+module.exports = checkTimeout;
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+
+function createScope(addEvent, removeEvent){
+	addEvent = addEvent || utils.event;
+	removeEvent = removeEvent || utils.eventRemove;
+
+	var handlers = [];
+
+	return {
+		attach: function(el, event, handler, capture){
+			handlers.push({element: el, event:event, callback: handler, capture: capture});
+			addEvent(el, event, handler, capture);
+		},
+		detach: function(el, event, handler, capture){
+			removeEvent(el, event, handler, capture);
+			for(var i = 0; i < handlers.length; i++){
+				var handler = handlers[i];
+				if(handler.element === el && handler.event === event && handler.callback === handler && handler.capture === capture){
+					handlers.splice(i, 1);
+					i--;
+				}
+			}
+		},
+		detachAll: function(){
+			for(var i = 0; i < handlers.length; i++){
+				removeEvent(handlers[i].element, handlers[i].event, handlers[i].callback, handlers[i].capture);
+				removeEvent(handlers[i].element, handlers[i].event, handlers[i].callback, undefined);
+				removeEvent(handlers[i].element, handlers[i].event, handlers[i].callback, false);
+				removeEvent(handlers[i].element, handlers[i].event, handlers[i].callback, true);
+			}
+			handlers = [];
+		},
+		extend: function(){
+			return createScope(this.event, this.eventRemove);
+		}
+	};
+}
+
+module.exports = createScope;
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __extends = __webpack_require__(5),
+	domHelpers = __webpack_require__(1),
+	utils = __webpack_require__(0),
+	Cell = __webpack_require__(4);
+
+var Layout = (function (_super) {
+	"use strict";
+
+	__extends(Layout, _super);
+	function Layout(parent, config, factory) {
+		var _this = _super.apply(this, arguments) || this;
+
+		if(parent)
+			_this.$root = true;
+
+		_this._parseConfig(config);
+		_this.$name = "layout";
+		return _this;
+	}
+
+	Layout.prototype.destructor = function () {
+		if (this.$container && this.$view) {
+			domHelpers.removeNode(this.$view);
+		}
+
+		for (var i = 0; i < this.$cells.length; i++) {
+			var child = this.$cells[i];
+			child.destructor();
+		}
+		this.$cells = [];
+
+		_super.prototype.destructor.call(this);
+	};
+
+	Layout.prototype._resizeScrollbars = function(autosize, scrollbars){
+		var scrollChanged = false;
+		var visibleScrollbars = [],
+			hiddenSrollbars = [];
+
+		function showScrollbar(scrollbar){
+			scrollbar.$parent.show();
+			scrollChanged = true;
+			visibleScrollbars.push(scrollbar);
+		}
+		function hideScrollbar(scrollbar){
+			scrollbar.$parent.hide();
+			scrollChanged = true;
+			hiddenSrollbars.push(scrollbar);
+		}
+
+		var scrollbar;
+		for(var i = 0; i < scrollbars.length; i++){
+			scrollbar = scrollbars[i];
+
+			if(autosize[scrollbar.$config.scroll]) {
+				hideScrollbar(scrollbar);
+			}else if(scrollbar.shouldHide()){
+				hideScrollbar(scrollbar);
+			}else if(scrollbar.shouldShow()){
+				showScrollbar(scrollbar);
+			}else{
+				if(scrollbar.isVisible()){
+					visibleScrollbars.push(scrollbar);
+				}else{
+					hiddenSrollbars.push(scrollbar);
+				}
+			}
+		}
+
+		var visibleGroups = {};
+		for(var i = 0; i < visibleScrollbars.length; i++){
+			if(visibleScrollbars[i].$config.group){
+				visibleGroups[visibleScrollbars[i].$config.group] = true;
+			}
+		}
+
+		for(var i = 0; i < hiddenSrollbars.length; i++){
+			scrollbar = hiddenSrollbars[i];
+
+			if(scrollbar.$config.group && visibleGroups[scrollbar.$config.group]){
+				showScrollbar(scrollbar);
+			}
+		}
+
+		return scrollChanged;
+	};
+
+	Layout.prototype._syncCellSizes = function(groupName, newSize){
+		if(!groupName)
+			return;
+
+		var groups = {};
+
+		this._eachChild(function(cell){
+			if(cell.$config.group && cell.$name != "scrollbar" && cell.$name != "resizer"){
+				if(!groups[cell.$config.group]){
+					groups[cell.$config.group] = [];
+				}
+				groups[cell.$config.group].push(cell);
+			}
+		});
+
+		if(groups[groupName]){
+			this._syncGroupSize(groups[groupName], newSize);
+		}
+		return groups[groupName];
+	};
+
+	Layout.prototype._syncGroupSize = function(cells, newSize){
+		if(!cells.length) return;
+
+		var property = cells[0].$parent._xLayout ? "width" : "height";
+		var direction = cells[0].$parent.getNextSibling(cells[0].$id) ? 1 : -1;
+
+		for(var i = 0; i < cells.length; i++){
+			var ownSize = cells[i].getSize();
+
+			var resizeSibling = direction > 0 ? cells[i].$parent.getNextSibling(cells[i].$id) : cells[i].$parent.getPrevSibling(cells[i].$id);
+			if(resizeSibling.$name == "resizer"){
+				resizeSibling = direction > 0 ? resizeSibling.$parent.getNextSibling(resizeSibling.$id) : resizeSibling.$parent.getPrevSibling(resizeSibling.$id);
+			}
+			var siblingSize = resizeSibling.getSize();
+
+			if(resizeSibling[property]){
+				var totalGravity = ownSize.gravity + siblingSize.gravity;
+				var totalSize = ownSize[property] + siblingSize[property];
+				var k = totalGravity / totalSize;
+				cells[i].$config.gravity = k * newSize;
+
+				resizeSibling.$config[property] = totalSize - newSize;
+				resizeSibling.$config.gravity = totalGravity - k * newSize;
+			}else{
+
+
+				cells[i].$config[property] = newSize;
+			}
+
+			var mainGrid = this.$gantt.$ui.getView("grid");
+			if(mainGrid && cells[i].$content === mainGrid && !mainGrid.$config.scrollable){
+				this.$gantt.config.grid_width = newSize;
+			}
+		}
+	};
+
+	Layout.prototype.resize = function(startStage){
+		var mainCall = false;
+		if(this.$root && !this._resizeInProgress){
+			this.callEvent("onBeforeResize", []);
+			mainCall = true;
+			this._resizeInProgress = true;
+		}
+
+		_super.prototype.resize.call(this, true);
+		_super.prototype.resize.call(this, false);
+
+		if(mainCall){
+
+			var contentViews = [];
+			contentViews = contentViews.concat(this.getCellsByType("viewCell"));
+			contentViews = contentViews.concat(this.getCellsByType("viewLayout"));
+			contentViews = contentViews.concat(this.getCellsByType("hostCell"));
+
+			var scrollbars = this.getCellsByType("scroller");
+
+			for(var i = 0; i < contentViews.length; i++){
+				if(!contentViews[i].$config.hidden)
+					contentViews[i].setContentSize();
+			}
+
+			var autosize = this._getAutosizeMode(this.$config.autosize);
+
+			var scrollChanged = this._resizeScrollbars(autosize, scrollbars);
+
+			if(this.$config.autosize){
+				this.autosize(this.$config.autosize);
+				scrollChanged = true;
+			}
+
+			if(scrollChanged){
+				this.resize();
+				for(var i = 0; i < contentViews.length; i++){
+					if(!contentViews[i].$config.hidden)
+						contentViews[i].setContentSize();
+				}
+			}
+
+			this.callEvent("onResize", []);
+		}
+		if(mainCall){
+			this._resizeInProgress = false;
+		}
+	};
+
+	Layout.prototype._eachChild = function(code, cell){
+		cell = cell || this;
+		code(cell);
+		if(cell.$cells){
+			for(var i = 0; i < cell.$cells.length; i++){
+				this._eachChild(code, cell.$cells[i]);
+			}
+		}
+	};
+
+	Layout.prototype.getCellsByType = function(type){
+		var res = [];
+		if(type === this.$name){
+			res.push(this);
+		}
+
+		if(this.$content && this.$content.$name == type){
+			res.push(this.$content);
+		}
+
+		if(this.$cells){
+			for(var i = 0; i < this.$cells.length; i++){
+				var children = Layout.prototype.getCellsByType.call(this.$cells[i], type);
+				if(children.length){
+					res.push.apply(res, children);
+				}
+			}
+		}
+		return res;
+	};
+
+	Layout.prototype.getNextSibling = function(cellId){
+		var index = this.cellIndex(cellId);
+		if(index >= 0 && this.$cells[index + 1]){
+			return this.$cells[index + 1];
+		}else{
+			return null;
+		}
+	};
+
+	Layout.prototype.getPrevSibling = function(cellId){
+		var index = this.cellIndex(cellId);
+		if(index >= 0 && this.$cells[index - 1]){
+			return this.$cells[index - 1];
+		}else{
+			return null;
+		}
+	};
+
+
+	Layout.prototype.cell = function (id) {
+		for (var i = 0; i < this.$cells.length; i++) {
+			var child = this.$cells[i];
+			if (child.$id === id) {
+				return child;
+			}
+			var sub = child.cell(id);
+			if (sub) {
+				return sub;
+			}
+		}
+	};
+	Layout.prototype.cellIndex = function (id) {
+		for (var i = 0; i < this.$cells.length; i++) {
+			if (this.$cells[i].$id === id) {
+				return i;
+			}
+		}
+		return -1;
+	};
+	Layout.prototype.moveView = function (view, ind) {
+		if (this.$cells[ind] !== view) {
+			return window.alert("Not implemented");
+		}
+		else {
+			ind += this.$config.header ? 1 : 0;
+			var node = this.$view;
+			if (ind >= node.childNodes.length) {
+				node.appendChild(view.$view);
+			}
+			else {
+				node.insertBefore(view.$view, node.childNodes[ind]);
+			}
+		}
+	};
+	Layout.prototype._parseConfig = function (config) {
+		this.$cells = [];
+		this._xLayout = !config.rows;
+		var cells = config.rows || config.cols || config.views;
+		for (var i = 0; i < cells.length; i++) {
+			var cell = cells[i];
+			cell.mode = this._xLayout ? "x" : "y";
+			var $content = this.$factory.initUI(cell, this);
+			if(!$content){
+				cells.splice(i, 1);
+				i--;
+			}else{
+				$content.$parent = this;
+				this.$cells.push($content);
+			}
+		}
+	};
+	Layout.prototype.getCells = function () {
+		return this.$cells;
+	};
+	Layout.prototype.render = function () {
+		var view = domHelpers.insertNode(this.$container, this.$toHTML());
+		this.$fill(view, null);
+		this.callEvent("onReady", []);
+		this.resize();
+
+		// do simple repaint after the first call
+		this.render = this.resize;
+	};
+	Layout.prototype.$fill = function (node, parent) {
+		this.$view = node;
+		this.$parent = parent;
+		var cells = domHelpers.getChildNodes(node, "gantt_layout_cell");
+		for (var i = cells.length - 1; i >= 0; i--) {
+			var sub = this.$cells[i];
+			sub.$fill(cells[i], this);
+			// initially hidden cell
+			if (sub.$config.hidden) {
+				sub.$view.parentNode.removeChild(sub.$view);
+			}
+		}
+	};
+	Layout.prototype.$toHTML = function () {
+		var mode = this._xLayout ? "x" : "y";
+		var html = [];
+		for (var i = 0; i < this.$cells.length; i++) {
+			html.push(this.$cells[i].$toHTML());
+		}
+		return _super.prototype.$toHTML.call(this, html.join(""), (this.$root ? "gantt_layout_root " : "") + "gantt_layout gantt_layout_" + mode);
+	};
+
+	Layout.prototype.getContentSize = function(mode){
+		var contentWidth = 0,
+			contentHeight = 0;
+
+		var cellSize, cell, borders;
+		for (var i = 0; i < this.$cells.length; i++) {
+			cell = this.$cells[i];
+			if(cell.$config.hidden)
+				continue;
+
+			cellSize = cell.getContentSize(mode);
+
+			if(cell.$config.view === "scrollbar" && mode[cell.$config.scroll]){
+				cellSize.height = 0;
+				cellSize.width = 0;
+			}
+
+			if(cell.$config.resizer){
+				if(this._xLayout){
+					cellSize.height = 0;
+				}else{
+					cellSize.width = 0;
+				}
+			}
+
+			borders = cell._getBorderSizes();
+
+			if(this._xLayout){
+				contentWidth += (cellSize.width + borders.horizontal);
+				contentHeight = Math.max(contentHeight, (cellSize.height + borders.vertical));
+			}else{
+				contentWidth = Math.max(contentWidth, cellSize.width + borders.horizontal);
+				contentHeight += cellSize.height + borders.vertical;
+			}
+		}
+
+		borders = this._getBorderSizes();
+		contentWidth += borders.horizontal;
+		contentHeight += borders.vertical;
+
+		if(this.$root){
+			contentWidth += 1;
+			contentHeight += 1;
+		}
+
+		return {
+			width: contentWidth,
+			height: contentHeight
+		};
+	};
+
+	Layout.prototype._cleanElSize = function(value){
+		return ((value || "").toString().replace("px", "") * 1 || 0);
+	};
+	Layout.prototype._getBoxStyles = function(div){
+		var computed = null;
+		if(window.getComputedStyle){
+			computed = window.getComputedStyle(div, null);
+		}else{
+			//IE with elem.currentStyle does not calculate sizes from %, so will use the default approach
+			computed = {
+				"width":div.clientWidth,
+				"height":div.clientHeight
+			};
+		}
+		var properties = [
+			"width",
+			"height",
+
+			"paddingTop",
+			"paddingBottom",
+			"paddingLeft",
+			"paddingRight",
+
+			"borderLeftWidth",
+			"borderRightWidth",
+			"borderTopWidth",
+			"borderBottomWidth"
+		];
+		var styles = {
+			boxSizing:(computed.boxSizing == "border-box")
+		};
+
+		if(computed.MozBoxSizing){
+			styles.boxSizing = (computed.MozBoxSizing == "border-box");
+		}
+		for(var i =0; i < properties.length; i++){
+			styles[properties[i]] = computed[properties[i]] ? this._cleanElSize(computed[properties[i]]) : 0;
+		}
+
+
+		var box = {
+			horPaddings : (styles.paddingLeft + styles.paddingRight + styles.borderLeftWidth + styles.borderRightWidth),
+			vertPaddings : (styles.paddingTop + styles.paddingBottom + styles.borderTopWidth + styles.borderBottomWidth),
+			borderBox: styles.boxSizing,
+			innerWidth : styles.width,
+			innerHeight : styles.height,
+			outerWidth : styles.width,
+			outerHeight : styles.height
+		};
+
+
+		if(box.borderBox){
+			box.innerWidth -= box.horPaddings;
+			box.innerHeight -= box.vertPaddings;
+		}else{
+			box.outerWidth += box.horPaddings;
+			box.outerHeight += box.vertPaddings;
+		}
+
+		return box;
+	};
+
+	Layout.prototype._getAutosizeMode = function(config){
+		var res = {x:false, y:false};
+		if(config === "xy"){
+			res.x = res.y = true;
+		}else if(config === "y" || config === true){
+			res.y = true;
+		}else if(config === "x"){
+			res.x = true;
+		}
+		return res;
+	};
+
+	Layout.prototype.autosize = function(mode) {
+		var res = this._getAutosizeMode(mode);
+		var boxSizes = this._getBoxStyles(this.$container);
+		var contentSizes = this.getContentSize(mode);
+
+		var node = this.$container;
+		if(res.x){
+			if(boxSizes.borderBox){
+				contentSizes.width += boxSizes.horPaddings;
+			}
+			node.style.width = contentSizes.width + "px";
+		}
+		if(res.y){
+			if(boxSizes.borderBox){
+				contentSizes.height += boxSizes.vertPaddings;
+			}
+			node.style.height = contentSizes.height + "px";
+		}
+	};
+
+	Layout.prototype.getSize = function () {
+		this._sizes = [];
+		var width = 0;
+		var minWidth = 0;
+		var maxWidth = 100000;
+		var height = 0;
+		var maxHeight = 100000;
+		var minHeight = 0;
+
+		for (var i = 0; i < this.$cells.length; i++) {
+
+			var size = this._sizes[i] = this.$cells[i].getSize();
+			if (this.$cells[i].$config.hidden) {
+				continue;
+			}
+			if (this._xLayout) {
+				if (!size.width && size.minWidth) {
+					width += size.minWidth;
+				}
+				else {
+					width += size.width;
+				}
+				maxWidth += size.maxWidth;
+				minWidth += size.minWidth;
+				height = Math.max(height, size.height);
+				maxHeight = Math.min(maxHeight, size.maxHeight); // min of maxHeight
+				minHeight = Math.max(minHeight, size.minHeight); // max of minHeight
+			}
+			else {
+				if (!size.height && size.minHeight) {
+					height += size.minHeight;
+				}
+				else {
+					height += size.height;
+				}
+				maxHeight += size.maxHeight;
+				minHeight += size.minHeight;
+				width = Math.max(width, size.width);
+				maxWidth = Math.min(maxWidth, size.maxWidth); // min of maxWidth
+				minWidth = Math.max(minWidth, size.minWidth); // max of minWidth
+			}
+		}
+		var self = _super.prototype.getSize.call(this);
+		// maxWidth
+		if (self.maxWidth >= 100000) {
+			self.maxWidth = maxWidth;
+		}
+		// maxHeight
+		if (self.maxHeight >= 100000) {
+			self.maxHeight = maxHeight;
+		}
+		// minWidth
+		self.minWidth = self.minWidth !== self.minWidth ? 0 : self.minWidth;// || self.width || Math.max(minWidth, width);
+		// minHeight
+		self.minHeight = self.minHeight !== self.minHeight ? 0 : self.minHeight;//self.minHeight || self.height || Math.max(minHeight, height);
+		// sizes with paddings and margins
+		if (this._xLayout) {
+			self.minWidth += this.$config.margin * (this.$cells.length) || 0;
+			self.minWidth += this.$config.padding * 2 || 0;
+			self.minHeight += (this.$config.padding * 2) || 0;
+		}
+		else {
+			self.minHeight += this.$config.margin * (this.$cells.length) || 0;
+			self.minHeight += (this.$config.padding * 2) || 0;
+		}
+		
+		return self;
+	};
+	// calc total gravity and free space
+	Layout.prototype._calcFreeSpace = function (s, cell, xLayout) {
+		var min = xLayout ? cell.minWidth : cell.minHeight;
+		var max = xLayout ? cell.maxWidth : cell.maxWidth;
+		var side = s;
+		if (!side) {
+			side = Math.floor(this._free / this._gravity * cell.gravity);
+			if (side > max) {
+				side = max;
+				this._free -= side;
+				this._gravity -= cell.gravity;
+			}
+			if (side < min) {
+				side = min;
+				this._free -= side;
+				this._gravity -= cell.gravity;
+			}
+		}
+		else {
+			if (side > max) {
+				side = max;
+			}
+			if (side < min) {
+				side = min;
+			}
+			this._free -= side;
+		}
+		return side;
+	};
+	Layout.prototype._calcSize = function (s, size, xLayout) {
+		var side = s;
+		var min = xLayout ? size.minWidth : size.minHeight;
+		var max = xLayout ? size.maxWidth : size.maxHeight;
+		if (!side) {
+			side = Math.floor(this._free / this._gravity * size.gravity);
+		}
+		if (side > max) {
+			side = max;
+		}
+		if (side < min) {
+			side = min;
+		}
+		return side;
+	};
+
+	Layout.prototype._configureBorders = function(){
+		if(this.$root){
+			this._setBorders([
+				this._borders.left,
+				this._borders.top,
+				this._borders.right,
+				this._borders.bottom
+			],
+			this);
+		}
+
+		var borderClass = this._xLayout ? this._borders.right : this._borders.bottom;
+
+		var cells = this.$cells;
+
+		var lastVisibleIndex = cells.length - 1;
+		for(var i = lastVisibleIndex; i >= 0; i--){
+			if (!cells[i].$config.hidden) {
+				lastVisibleIndex = i;
+				break;
+			}
+		}
+
+		for (var i = 0; i < cells.length; i++) {
+			if (cells[i].$config.hidden) {
+				continue;
+			}
+
+			var lastCell = i >= lastVisibleIndex;
+			var borderColorClass = "";
+			if(!lastCell && cells[i + 1]){
+				if(cells[i + 1].$config.view == "scrollbar"){
+					if(this._xLayout){
+						lastCell = true;
+					}else{
+						borderColorClass = "gantt_layout_cell_border_transparent";
+					}
+
+				}
+			}
+
+
+			this._setBorders(lastCell ? [] : [borderClass, borderColorClass], cells[i]);
+		}
+	};
+
+	Layout.prototype._updateCellVisibility = function(){
+		var oldVisibleCells = this._visibleCells || {};
+		var firstCall = !this._visibleCells;
+		var visibleCells = {};
+		var cell;
+		for (var i = 0; i < this._sizes.length; i++) {
+			cell = this.$cells[i];
+
+			if (!firstCall && cell.$config.hidden && oldVisibleCells[cell.$id]) {
+				cell._hide(true);
+			}else if(!cell.$config.hidden && !oldVisibleCells[cell.$id]){
+				cell._hide(false);
+			}
+
+			if(!cell.$config.hidden){
+				visibleCells[cell.$id] = true;
+			}
+		}
+		this._visibleCells = visibleCells;
+	};
+
+	Layout.prototype.setSize = function (x, y) {
+		this._configureBorders();
+		_super.prototype.setSize.call(this, x, y);
+		y = this.$lastSize.contentY;
+		x = this.$lastSize.contentX;
+
+		var padding = (this.$config.padding || 0);
+		this.$view.style.padding = padding + "px";
+		this._gravity = 0;
+		this._free = this._xLayout ? x : y;
+		this._free -= padding * 2;
+		// calc all gravity
+
+		var cell,
+			size;
+
+		this._updateCellVisibility();
+
+		for (var i = 0; i < this._sizes.length; i++) {
+			cell = this.$cells[i];
+
+			if (cell.$config.hidden) {
+				continue;
+			}
+			var margin = (this.$config.margin || 0);
+			if(cell.$name == "resizer" && !margin){
+				margin = -1;
+			}
+
+			// set margins to child cell
+			var cellView = cell.$view;
+
+			var marginSide = this._xLayout ? "marginRight" : "marginBottom";
+			if (i !== this.$cells.length - 1) {
+				cellView.style[marginSide] = margin + "px";
+				this._free -= margin; // calc free space without margin
+			}
+			size = this._sizes[i];
+			if (this._xLayout) {
+				if (!size.width) {
+					this._gravity += size.gravity;
+				}
+			}
+			else {
+				if (!size.height) {
+					this._gravity += size.gravity;
+				}
+			}
+		}
+		for (var i = 0; i < this._sizes.length; i++) {
+			cell = this.$cells[i];
+
+			if (cell.$config.hidden) {
+				continue;
+			}
+			size = this._sizes[i];
+			var width = size.width;
+			var height = size.height;
+			if (this._xLayout) {
+				this._calcFreeSpace(width, size, true);
+			}
+			else {
+				this._calcFreeSpace(height, size, false);
+			}
+		}
+		for (var i = 0; i < this.$cells.length; i++) {
+			cell = this.$cells[i];
+
+			if (cell.$config.hidden) {
+				continue;
+			}
+			size = this._sizes[i];
+			var dx = void 0;
+			var dy = void 0;
+			if (this._xLayout) {
+				dx = this._calcSize(size.width, size, true);
+				dy = y - padding * 2; // layout height without paddings
+			}
+			else {
+				dx = x - padding * 2; // layout width without paddings
+				dy = this._calcSize(size.height, size, false);
+			}
+
+			cell.setSize(dx, dy);
+		}
+
+		/*if(this.$root && !this._updatingScrollbars){
+			this._updatingScrollbars = true;
+			eachCell(function(cell){
+				if(cell.$content && cell.$content.$name == "scroller"){
+					cell.$content.toggleVisibility();
+				}
+			}, this);
+			this._updatingScrollbars = false;
+		}*/
+
+	};
+
+	function eachCell(code, root){
+		if(root.$cells){
+			for(var i = 0; i < root.$cells.length; i++){
+				code(root.$cells[i]);
+				eachCell(code, root.$cells[i]);
+			}
+		}
+	}
+
+
+	return Layout;
+}(Cell));
+
+module.exports = Layout;
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var ScaleHelper = __webpack_require__(13);
+var eventable = __webpack_require__(2);
+var utils = __webpack_require__(0);
+
+var canvasRender = __webpack_require__(43);
+
+var Timeline = function(parent, config, factory, gantt){
+	this.$config = utils.mixin({}, config || {});
+	this.$scaleHelper = new ScaleHelper(gantt);
+	this.$gantt = gantt;
+	eventable(this);
+};
+
+Timeline.prototype = {
+	init: function(container){
+		container.innerHTML += "<div class='gantt_task' style='width:inherit;height:inherit;'></div>";
+		this.$task = container.childNodes[0];
+
+		this.$task.innerHTML = "<div class='gantt_task_scale'></div><div class='gantt_data_area'></div>";
+		this.$task_scale = this.$task.childNodes[0];
+
+		this.$task_data = this.$task.childNodes[1];
+		this.$task_data.innerHTML = "<div class='gantt_task_bg'></div><div class='gantt_links_area'></div><div class='gantt_bars_area'></div>";
+		this.$task_bg = this.$task_data.childNodes[0];
+		this.$task_links = this.$task_data.childNodes[1];
+		this.$task_bars = this.$task_data.childNodes[2];
+
+		this._tasks = {
+			col_width: 0,
+			width: [], // width of each column
+			full_width: 0, // width of all columns
+			trace_x: [],
+			rendered: {}
+		};
+
+		var config = this.$getConfig();
+		var attr = config[this.$config.bind + "_attribute"];
+		var linksAttr = config[this.$config.bindLinks + "_attribute"];
+		if(!attr && this.$config.bind){
+			attr = this.$config.bind + "_id";
+		}
+		if(!linksAttr && this.$config.bindLinks){
+			linksAttr = this.$config.bindLinks + "_id";
+		}
+		this.$config.item_attribute = attr || null;
+		this.$config.link_attribute = linksAttr || null;
+
+		var layers = this._createLayerConfig();
+		if(!this.$config.layers){
+			this.$config.layers = layers.tasks;
+		}
+		if(!this.$config.linkLayers){
+			this.$config.linkLayers = layers.links;
+		}
+
+		this._attachLayers(this.$gantt);
+		this.callEvent("onReady", []);
+		//this.refresh();
+	},
+
+	setSize: function(width, height){
+		var config = this.$getConfig();
+
+		if(width*1 === width){
+			this.$config.width = width;
+		}
+		if(height*1 === height){
+
+			this.$config.height = height;
+			var dataHeight = Math.max(this.$config.height - config.scale_height);
+			this.$task_data.style.height = dataHeight + 'px';
+		}
+
+		this.refresh();
+		this.$task_bg.style.backgroundImage = "";
+
+		if(config.smart_rendering && this.$config.rowStore){
+			var store = this.$config.rowStore;
+			this.$task_bg.style.height = config.row_height * store.countVisible() +"px";
+		}else{
+			this.$task_bg.style.height = "";
+		}
+
+		var scale = this._tasks;
+		//timeline area layers
+		var data_els = this.$task_data.childNodes;
+		for(var i= 0, len = data_els.length; i < len; i++){
+			var el = data_els[i];
+			if(el.hasAttribute("data-layer") && el.style)
+				el.style.width = scale.full_width + "px";
+		}
+	},
+
+	isVisible: function(){
+		if(this.$parent && this.$parent.$config){
+			return !this.$parent.$config.hidden;
+		}else{
+			return this.$task.offsetWidth;
+		}
+	},
+
+	getSize: function(){
+		var config = this.$getConfig();
+		var store = this.$config.rowStore;
+
+		var contentHeight = store ? config.row_height * store.countVisible() : 0,
+			contentWidth = this._tasks.full_width;
+
+		return {
+			x: this.$config.width,
+			y: this.$config.height,
+			contentX: this.isVisible() ? contentWidth : 0,
+			contentY: this.isVisible() ? (config.scale_height + contentHeight) : 0,
+			scrollHeight: this.isVisible() ? contentHeight : 0,
+			scrollWidth: this.isVisible() ? contentWidth : 0
+		};
+	},
+
+	scrollTo: function(left, top){
+		if(!this.isVisible())
+			return;
+
+		if(top*1 === top){
+			this.$config.scrollTop = top;
+			this.$task_data.scrollTop = this.$config.scrollTop;
+		}
+		if (left*1 === left){
+			this.$task.scrollLeft = left;
+			this.$config.scrollLeft = this.$task.scrollLeft;
+			this._refreshScales();
+		}
+	},
+
+	_refreshScales: function _refreshScales() {
+		if(!this.isVisible())
+			return;
+
+		var config = this.$getConfig();
+		if (!config.smart_scales) return;
+
+		var x = this.$config.scrollLeft;
+		var width = this.$config.width;
+
+		var scales = this._scales;
+		this.$task_scale.innerHTML = this._getScaleChunkHtml(scales, x, x + width);
+	},
+	_createLayerConfig: function(){
+		var self = this;
+		var taskFilter = function(){
+			return self.isVisible();
+		};
+
+		var taskLayers = [
+			{
+				expose: true,
+				renderer: this.$gantt.$ui.layers.taskBar,
+				container: this.$task_bars,
+				filter: [taskFilter]
+			},
+			{
+				renderer: this.$gantt.$ui.layers.taskBg,
+				container: this.$task_bg,
+				filter: [
+					function(){
+						return !self.$getConfig().static_background;
+					},
+					taskFilter
+				]
+			}
+		];
+
+		var linkLayers = [
+			{
+				expose: true,
+				renderer: this.$gantt.$ui.layers.link,
+				container: this.$task_links,
+				filter: [taskFilter]
+			}
+		];
+
+		return {
+			tasks: taskLayers,
+			links: linkLayers
+		};
+
+	},
+
+	_attachLayers: function(gantt){
+		this._taskLayers = [];
+		this._linkLayers = [];
+
+		var self = this;
+
+		var layers = this.$gantt.$services.getService("layers");
+
+		if(this.$config.bind){
+
+			self.$config.rowStore = self.$gantt.getDatastore(self.$config.bind);
+
+			var taskRenderer = layers.getDataRender(this.$config.bind);
+
+			if(!taskRenderer){
+				taskRenderer = layers.createDataRender({
+					name: this.$config.bind,
+					defaultContainer: function(){ return self.$task_data;}
+				});
+			}
+
+			taskRenderer.container = function(){ return self.$task_data;};
+
+			var taskLayers = this.$config.layers;
+			for(var i = 0; taskLayers && i < taskLayers.length; i++){
+				var layer = taskLayers[i];
+
+				if(typeof layer == "string"){
+					layer = this.$gantt.$ui.layers[layer];
+				}
+
+				if(typeof layer == "function"){
+					layer = {renderer: layer};
+				}
+
+				layer.host = this;
+				var bar_layer = taskRenderer.addLayer(layer);
+				this._taskLayers.push(bar_layer);
+				if(layer.expose){
+					this._taskRenderer = taskRenderer.getLayer(bar_layer);
+				}
+			}
+
+			this._initStaticBackgroundRender();
+		}
+
+		if(this.$config.bindLinks){
+			self.$config.linkStore = self.$gantt.getDatastore(self.$config.bindLinks);
+
+			var linkRenderer = layers.getDataRender(this.$config.bindLinks);
+
+			if(!linkRenderer){
+				linkRenderer = layers.createDataRender({
+					name: this.$config.bindLinks,
+					defaultContainer: function(){ return self.$task_data;}
+				});
+			}
+			var linkLayers = this.$config.linkLayers;
+			for(var i = 0; linkLayers && i < linkLayers.length; i++){
+
+				if(typeof layer == "string"){
+					layer = this.$gantt.$ui.layers[layer];
+				}
+
+				var layer = linkLayers[i];
+				layer.host = this;
+				var linkLayer = linkRenderer.addLayer(layer);
+				this._taskLayers.push(linkLayer);
+				if(linkLayers[i].expose){
+					this._linkRenderer = linkRenderer.getLayer(linkLayer);
+				}
+			}
+		}
+	},
+
+	_initStaticBackgroundRender: function(){
+		var self = this;
+		var staticRender = canvasRender.create();
+		var store = self.$config.rowStore;
+		if(!store) return;
+
+		this._staticBgHandler = store.attachEvent("onStoreUpdated", function(id, item, mode){
+			if(id !== null) {
+				return;
+			}
+
+			if(!self.isVisible())
+				return;
+			var config = self.$getConfig();
+			if(config.static_background) {
+				var store = self.$gantt.getDatastore(self.$config.bind);
+				if (store) {
+					staticRender.render(self.$task_bg, config, self.getScale(), config.row_height * store.countVisible());
+				}
+			}
+		});
+
+		this._initStaticBackgroundRender = function(){};//init once
+	},
+
+	_clearLayers: function(gantt){
+		var layers = this.$gantt.$services.getService("layers");
+		var taskRenderer = layers.getDataRender(this.$config.bind);
+		var linkRenderer = layers.getDataRender(this.$config.bindLinks);
+
+		for(var i = 0; i < this._taskLayers.length; i++){
+			taskRenderer.removeLayer(this._taskLayers[i]);
+		}
+		for(var i = 0; i < this._linkLayers.length; i++){
+			linkRenderer.removeLayer(this._linkLayers[i]);
+		}
+
+		this._linkLayers = [];
+		this._taskLayers = [];
+	},
+
+	_render_tasks_scales: function _render_tasks_scales() {
+		var config = this.$getConfig();
+
+		var scales_html = "",
+			outer_width = 0,
+			scale_height = 0;
+
+		var state = this.$gantt.getState();
+
+		if (this.isVisible()) {
+			var helpers = this.$scaleHelper;
+			var scales = this._getScales();
+			scale_height = config.scale_height;
+
+			var availWidth = this.$config.width;
+			if(config.autosize == "x" || config.autosize == "xy"){
+				availWidth = Math.max(config.autosize_min_width, 0);
+			}
+
+			var cfgs = helpers.prepareConfigs(scales, config.min_column_width, availWidth, scale_height - 1, state.min_date, state.max_date, config.rtl);
+			var cfg = this._tasks = cfgs[cfgs.length - 1];
+			this._scales = cfgs;
+
+			scales_html = this._getScaleChunkHtml(cfgs, 0, this.$config.width);
+
+			outer_width = cfg.full_width + "px";//cfg.full_width + (this._scroll_sizes().y ? scrollSizes.scroll_size : 0) + "px";
+			scale_height += "px";
+		}
+
+		this.$task_scale.style.height = scale_height;
+
+		this.$task_data.style.width =
+			this.$task_scale.style.width = outer_width;
+
+		this.$task_scale.innerHTML = scales_html;
+
+	},
+
+	_getScaleChunkHtml: function _get_scale_chunk_html (scales, fromPos, toPos) {
+		var templates = this.$gantt.$services.templates();
+		var html = [];
+
+		var css = templates.scale_row_class;
+		for (var i = 0; i < scales.length; i++) {
+			var cssClass = "gantt_scale_line";
+			var tplClass = css(scales[i]);
+			if (tplClass) {
+				cssClass += " " + tplClass;
+			}
+
+			html.push("<div class=\"" + cssClass + "\" style=\"height:" + (scales[i].height) +
+				"px;position:relative;line-height:" + (scales[i].height) + "px\">" + this._prepareScaleHtml(scales[i], fromPos, toPos) + "</div>");
+		}
+
+		return html.join("");
+	},
+	_prepareScaleHtml: function _prepare_scale_html(config, fromPos, toPos) {
+		var globalConfig = this.$getConfig();
+		var globalTemplates = this.$gantt.$services.templates();
+
+		var cells = [];
+		var date = null, content = null, css = null;
+
+		if (config.template || config.date) {
+			content = config.template || this.$gantt.date.date_to_str(config.date);
+		}
+
+		var startIndex = 0,
+			endIndex = config.count;
+
+		if (globalConfig.smart_scales && (!isNaN(fromPos) && !isNaN(toPos))) {
+			startIndex = _findBinary(config.left, fromPos);
+			endIndex = _findBinary(config.left, toPos) + 1;
+		}
+
+		css = config.css || function () {
+			};
+		if (!config.css && globalConfig.inherit_scale_class) {
+			css = globalTemplates.scale_cell_class;
+		}
+
+		for (var i = startIndex; i < endIndex; i++) {
+			if (!config.trace_x[i]) break;
+
+			date = new Date(config.trace_x[i]);
+			var value = content.call(this, date),
+				width = config.width[i],
+				height = config.height,
+				left = config.left[i],
+				style = "",
+				template = "",
+				cssclass = "";
+
+			if (width) {
+				var position = globalConfig.smart_scales ? ("position:absolute;left:" + left + "px") : "";
+
+				style = "width:" + (width) + "px;height:" + height + "px;" + position;
+				cssclass = "gantt_scale_cell" + (i == config.count - 1 ? " gantt_last_cell" : "");
+
+				template = css.call(this, date);
+				if (template) cssclass += " " + template;
+
+				var ariaAttr = this.$gantt._waiAria.getTimelineCellAttr(value);
+				var cell = "<div class='" + cssclass + "'" + ariaAttr + " style='" + style + "'>" + value + "</div>";
+				cells.push(cell);
+			} else {
+				//do not render ignored cells
+			}
+
+		}
+		return cells.join("");
+	},
+	dateFromPos: function dateFromPos(x) {
+		var scale = this._tasks;
+		if (x < 0 || x > scale.full_width || !scale.full_width) {
+			return null;
+		}
+
+		var ind = _findBinary(this._tasks.left, x);
+		var summ = this._tasks.left[ind];
+
+		var col_width = scale.width[ind] || scale.col_width;
+		var part = 0;
+		if (col_width) {
+			part = (x - summ) / col_width;
+			if(scale.rtl){
+				part = 1 - part;
+			}
+
+		}
+
+		var unit = 0;
+		if (part) {
+			unit = this._getColumnDuration(scale, scale.trace_x[ind]);
+		}
+
+		var date = new Date(scale.trace_x[ind].valueOf() + Math.round(part * unit));
+		return date;
+	},
+	posFromDate: function posFromDate(date) {
+		if (!this.isVisible())
+			return 0;
+
+		var ind = this.columnIndexByDate(date);
+		this.$gantt.assert(ind >= 0, "Invalid day index");
+
+		var wholeCells = Math.floor(ind);
+		var partCell = ind % 1;
+
+		var pos = this._tasks.left[Math.min(wholeCells, this._tasks.width.length - 1)];
+		if (wholeCells == this._tasks.width.length)
+			pos += this._tasks.width[this._tasks.width.length - 1];
+		//for(var i=1; i <= wholeCells; i++)
+		//	pos += gantt._tasks.width[i-1];
+
+		if (partCell) {
+			if (wholeCells < this._tasks.width.length) {
+				pos += this._tasks.width[wholeCells] * (partCell % 1);
+			} else {
+				pos += 1;
+			}
+
+		}
+		return Math.round(pos);
+	},
+	columnIndexByDate: function columnIndexByDate(date) {
+		var pos = new Date(date).valueOf();
+		var days = this._tasks.trace_x_ascending,
+			ignores = this._tasks.ignore_x;
+
+		var state = this.$gantt.getState();
+
+		if (pos <= state.min_date) {
+			if(this._tasks.rtl){
+				return days.length;
+			}else{
+				return 0;
+			}
+
+		}
+
+		if (pos >= state.max_date) {
+			if(this._tasks.rtl){
+				return 0;
+			}else{
+				return days.length;
+			}
+		}
+
+		/*var day = null;
+		 for (var xind = 0, length = days.length-1; xind < length; xind++) {
+		 // | 8:00, 8:30 | 8:15 should be checked against 8:30
+		 // clicking at the most left part of the cell, say 8:30 should create event in that cell, not previous one
+		 day = +days[xind+1];
+		 if (pos < day && !ignores[day])
+		 break;
+		 }*/
+
+		var day_ind = _findBinary(days, pos);
+		var day = +days[day_ind];
+		while (ignores[day]) {
+			day = days[++day_ind];
+		}
+
+		var transition = this._tasks.trace_index_transition;
+		var index = day_ind;
+		if(!day){
+			if(transition){
+				return transition[0];
+			}else{
+				return 0;
+			}
+		}
+
+		var part = ((date - days[day_ind]) / this._getColumnDuration(this._tasks, days[day_ind]));
+		if(transition){
+			return transition[index] + (1 - part);
+		}else{
+			return index + part;
+		}
+
+		//return day_ind + ((date - days[day_ind]) / this._getColumnDuration(this._tasks, days[day_ind]));
+	},
+	getItemPosition:function (task, start_date, end_date) {
+		var xLeft, xRight, width;
+		if(this._tasks.rtl){
+			xRight = this.posFromDate(start_date || task.start_date);
+			xLeft = this.posFromDate(end_date || task.end_date);
+		}else{
+			xLeft = this.posFromDate(start_date || task.start_date);
+			xRight = this.posFromDate(end_date || task.end_date);
+		}
+		width =  Math.max((xRight - xLeft), 0);
+
+		var y = this.getItemTop(task.id);
+		var height = this.getItemHeight();
+		return {
+			left: xLeft,
+			top: y,
+			height: height,
+			width: width
+		};
+	},
+
+	getItemHeight: function(){
+		var config = this.$getConfig();
+
+		// height of the bar item
+		var height = config.task_height;
+
+		if (height == "full") {
+			var offset = config.task_height_offset || 5;
+			height = config.row_height - offset;
+		}
+		//item height cannot be bigger than row height
+		height = Math.min(height, config.row_height);
+		return Math.max(height, 0);
+	},
+
+	getRowTop: function(index){
+		return index * this.$getConfig().row_height;
+	},
+
+	getItemTop: function (task_id) {
+		if(this.$config.rowStore){
+			var store = this.$config.rowStore;
+			if(!store) return 0;
+
+			return store.getIndexById(task_id) * this.$getConfig().row_height;
+
+		}else{
+			return 0;
+		}
+
+	},
+
+	getScale: function(){
+		return this._tasks;
+	},
+
+	_getScales: function _get_scales() {
+		var config = this.$getConfig();
+		var helpers = this.$scaleHelper;
+		var scales = [helpers.primaryScale()].concat(config.subscales);
+
+		helpers.sortScales(scales);
+		return scales;
+	},
+
+	_getColumnDuration: function _get_coll_duration(scale, date) {
+		return this.$gantt.date.add(date, scale.step, scale.unit) - date;
+	},
+
+	refresh: function(){
+		if(this.$config.bind) {
+			this.$config.rowStore = this.$gantt.getDatastore(this.$config.bind);
+		}
+
+		if(this.$config.bindLinks) {
+			this.$config.linkStore = this.$gantt.getDatastore(this.$config.bindLinks);
+		}
+
+		this._initStaticBackgroundRender();
+		this._render_tasks_scales();
+	},
+
+	destructor: function(){
+		var gantt = this.$gantt;
+		this._clearLayers(gantt);
+
+		this.$task = null;
+		this.$task_scale = null;
+		this.$task_data = null;
+		this.$task_bg = null;
+		this.$task_links = null;
+		this.$task_bars = null;
+
+		this.$gantt = null;
+
+		if(this.$config.rowStore){
+			this.$config.rowStore.detachEvent(this._staticBgHandler);
+			this.$config.rowStore = null;
+		}
+		if(this.$config.linkStore){
+			this.$config.linkStore = null;
+		}
+
+		this.callEvent("onDestroy", []);
+		this.detachAllEvents();
+
+	}
+};
+
+module.exports = Timeline;
+
+function _findBinary(array, target) {
+	// modified binary search, target value not exactly match array elements, looking for closest one
+
+	var low = 0, high = array.length - 1, i, item, prev;
+	while (low <= high) {
+
+		i = Math.floor((low + high) / 2);
+		item = +array[i];
+		prev = +array[i - 1];
+		if (item < target) {
+			low = i + 1;
+			continue;
+		}
+		if (item > target) {
+			if (!(!isNaN(prev) && prev < target)) {
+				high = i - 1;
+				continue;
+			} else {
+				// if target is between 'i' and 'i-1' return 'i - 1'
+				return i - 1;
+			}
+
+		}
+		while (+array[i] == +array[i + 1]) i++;
+
+		return i;
+	}
+	return array.length - 1;
+}
+
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+
+function ScaleHelper(gantt){
+	var dateHelper = gantt.date;
+	var services = gantt.$services;
+
+	return {
+		getSum: function (sizes, from, to) {
+			if (to === undefined)
+				to = sizes.length - 1;
+			if (from === undefined)
+				from = 0;
+
+			var summ = 0;
+			for (var i = from; i <= to; i++)
+				summ += sizes[i];
+
+			return summ;
+		},
+		setSumWidth: function (sum_width, scale, from, to) {
+			var parts = scale.width;
+
+			if (to === undefined)
+				to = parts.length - 1;
+			if (from === undefined)
+				from = 0;
+			var length = to - from + 1;
+
+			if (from > parts.length - 1 || length <= 0 || to > parts.length - 1)
+				return;
+
+			var oldWidth = this.getSum(parts, from, to);
+
+			var diff = sum_width - oldWidth;
+
+			this.adjustSize(diff, parts, from, to);
+			this.adjustSize(-diff, parts, to + 1);
+
+			scale.full_width = this.getSum(parts);
+		},
+		splitSize: function (width, count) {
+			var arr = [];
+			for (var i = 0; i < count; i++) arr[i] = 0;
+
+			this.adjustSize(width, arr);
+			return arr;
+
+		},
+		adjustSize: function (width, parts, from, to) {
+			if (!from)
+				from = 0;
+			if (to === undefined)
+				to = parts.length - 1;
+
+			var length = to - from + 1;
+
+			var full = this.getSum(parts, from, to);
+
+			var shared = 0;
+
+			for (var i = from; i <= to; i++) {
+				var share = Math.floor(width * (full ? (parts[i] / full) : (1 / length)));
+
+				full -= parts[i];
+				width -= share;
+				length--;
+
+				parts[i] += share;
+				shared += share;
+			}
+			parts[parts.length - 1] += width;
+			//parts[parts.length - 1] += width - shared;
+		},
+		sortScales: function (scales) {
+			function cellSize(unit, step) {
+				var d = new Date(1970, 0, 1);
+				return dateHelper.add(d, step, unit) - d;
+			}
+
+			scales.sort(function (a, b) {
+				if (cellSize(a.unit, a.step) < cellSize(b.unit, b.step)) {
+					return 1;
+				} else if (cellSize(a.unit, a.step) > cellSize(b.unit, b.step)) {
+					return -1;
+				} else {
+					return 0;
+				}
+			});
+
+			for (var i = 0; i < scales.length; i++) {
+				scales[i].index = i;
+			}
+		},
+		primaryScale: function () {
+
+			var config = services.getService("templateLoader");
+			config.initTemplate("date_scale", undefined, undefined, services.config(), services.templates());
+
+			return {
+				unit: services.config().scale_unit,
+				step: services.config().step,
+				template: services.templates().date_scale,
+				date: services.config().date_scale,
+				css: services.templates().scale_cell_class
+			};
+		},
+
+		prepareConfigs: function (scales, min_coll_width, container_width, scale_height, minDate, maxDate, rtl) {
+			var heights = this.splitSize(scale_height, scales.length);
+			var full_width = container_width;
+
+			var configs = [];
+			for (var i = scales.length - 1; i >= 0; i--) {
+				var main_scale = (i == scales.length - 1);
+				var cfg = this.initScaleConfig(scales[i], minDate, maxDate);
+				if (main_scale) {
+					this.processIgnores(cfg);
+				}
+
+				this.initColSizes(cfg, min_coll_width, full_width, heights[i]);
+				this.limitVisibleRange(cfg);
+
+				if (main_scale) {
+					full_width = cfg.full_width;
+				}
+
+				configs.unshift(cfg);
+			}
+
+
+			for (var i = 0; i < configs.length - 1; i++) {
+				this.alineScaleColumns(configs[configs.length - 1], configs[i]);
+			}
+			for (var i = 0; i < configs.length; i++) {
+
+				if(rtl){
+					this.reverseScale(configs[i]);
+				}
+				this.setPosSettings(configs[i]);
+			}
+			return configs;
+
+		},
+
+		reverseScale: function(scale){
+			scale.width = scale.width.reverse();
+			scale.trace_x = scale.trace_x.reverse();
+
+			var indexes = scale.trace_indexes;
+			scale.trace_indexes = {};
+			scale.trace_index_transition = {};
+			scale.rtl = true;
+			for(var i = 0; i < scale.trace_x.length; i++){
+				scale.trace_indexes[scale.trace_x[i].valueOf()] = i;
+				scale.trace_index_transition[indexes[scale.trace_x[i].valueOf()]] = i;
+			}
+			return scale;
+		},
+
+		setPosSettings: function (config) {
+			for (var i = 0, len = config.trace_x.length; i < len; i++) {
+				config.left.push((config.width[i - 1] || 0) + (config.left[i - 1] || 0));
+			}
+		},
+
+		_ignore_time_config: function (date, scale) {
+
+			if (services.config().skip_off_time) {
+				var skip = true;
+				var probe = date;
+
+				// check dates in case custom scale unit, e.g. {unit: "month", step: 3}
+				for (var i = 0; i < scale.step; i++) {
+					if (i) {
+						probe = dateHelper.add(date, i, scale.unit);
+					}
+
+					skip = skip && !this.isWorkTime(probe, scale.unit);
+				}
+
+				return skip;
+			}
+			return false;
+		},
+		//defined in an extension
+		processIgnores: function (config) {
+			config.ignore_x = {};
+			config.display_count = config.count;
+		},
+		initColSizes: function (config, min_col_width, full_width, line_height) {
+			var cont_width = full_width;
+
+			config.height = line_height;
+
+			var column_count = config.display_count === undefined ? config.count : config.display_count;
+
+			if (!column_count)
+				column_count = 1;
+
+			config.col_width = Math.floor(cont_width / column_count);
+
+			if (min_col_width) {
+				if (config.col_width < min_col_width) {
+					config.col_width = min_col_width;
+					cont_width = config.col_width * column_count;
+				}
+			}
+			config.width = [];
+			var ignores = config.ignore_x || {};
+			for (var i = 0; i < config.trace_x.length; i++) {
+				if (ignores[config.trace_x[i].valueOf()] || (config.display_count == config.count)) {
+					config.width[i] = 0;
+				} else {
+					// width of month columns should be proportional month duration
+					var width = 1;
+					if (config.unit == "month") {
+						var days = Math.round((dateHelper.add(config.trace_x[i], config.step, config.unit) - config.trace_x[i]) / (1000 * 60 * 60 * 24));
+						width = days;
+					}
+					config.width[i] = width;
+				}
+			}
+
+			this.adjustSize(cont_width - this.getSum(config.width)/* 1 width per column from the code above */, config.width);
+			config.full_width = this.getSum(config.width);
+		},
+		initScaleConfig: function (config, min_date, max_date) {
+			var cfg = utils.mixin({
+				count: 0,
+				col_width: 0,
+				full_width: 0,
+				height: 0,
+				width: [],
+				left: [],
+				trace_x: [],
+				trace_indexes: {},
+				min_date: new Date(min_date),
+				max_date: new Date(max_date)
+			}, config);
+
+			this.eachColumn(config.unit, config.step, min_date, max_date, function (date) {
+				cfg.count++;
+				cfg.trace_x.push(new Date(date));
+				cfg.trace_indexes[date.valueOf()] = cfg.trace_x.length - 1;
+			});
+
+			cfg.trace_x_ascending = cfg.trace_x.slice();
+			return cfg;
+		},
+		iterateScales: function (lower_scale, upper_scale, from, to, callback) {
+			var upper_dates = upper_scale.trace_x;
+			var lower_dates = lower_scale.trace_x;
+
+			var prev = from || 0;
+			var end = to || (lower_dates.length - 1);
+			var prevUpper = 0;
+
+
+			for (var up = 1; up < upper_dates.length; up++) {
+				var target_index = (lower_scale.trace_indexes[+upper_dates[up]]);
+				if (target_index !== undefined && target_index <= end) {
+					if (callback) {
+						callback.apply(this, [prevUpper, up, prev, target_index]);
+					}
+					prev = target_index;
+					prevUpper = up;
+					continue;
+				}
+			}
+		},
+		alineScaleColumns: function (lower_scale, upper_scale, from, to) {
+			this.iterateScales(lower_scale, upper_scale, from, to, function (upper_start, upper_end, lower_start, lower_end) {
+				var targetWidth = this.getSum(lower_scale.width, lower_start, lower_end - 1);
+				var actualWidth = this.getSum(upper_scale.width, upper_start, upper_end - 1);
+				if (actualWidth != targetWidth) {
+					this.setSumWidth(targetWidth, upper_scale, upper_start, upper_end - 1);
+				}
+
+			});
+		},
+
+		eachColumn: function (unit, step, min_date, max_date, callback) {
+			var start = new Date(min_date),
+				end = new Date(max_date);
+			if (dateHelper[unit + "_start"]) {
+				start = dateHelper[unit + "_start"](start);
+			}
+
+			var curr = new Date(start);
+			if (+curr >= +end) {
+				end = dateHelper.add(curr, step, unit);
+			}
+			while (+curr < +end) {
+				callback.call(this, new Date(curr));
+				var tzOffset = curr.getTimezoneOffset();
+				curr = dateHelper.add(curr, step, unit);
+				curr = gantt._correct_dst_change(curr, tzOffset, step, unit);
+				if (dateHelper[unit + '_start'])
+					curr = dateHelper[unit + "_start"](curr);
+			}
+		},
+		limitVisibleRange: function (cfg) {
+			var dates = cfg.trace_x;
+
+			var left = 0, right = cfg.width.length - 1;
+			var diff = 0;
+			if (+dates[0] < +cfg.min_date && left != right) {
+				var width = Math.floor(cfg.width[0] * ((dates[1] - cfg.min_date) / (dates[1] - dates[0])));
+				diff += cfg.width[0] - width;
+				cfg.width[0] = width;
+
+				dates[0] = new Date(cfg.min_date);
+			}
+
+			var last = dates.length - 1;
+			var lastDate = dates[last];
+			var outDate = dateHelper.add(lastDate, cfg.step, cfg.unit);
+			if (+outDate > +cfg.max_date && last > 0) {
+				var width = cfg.width[last] - Math.floor(cfg.width[last] * ((outDate - cfg.max_date) / (outDate - lastDate)));
+				diff += cfg.width[last] - width;
+				cfg.width[last] = width;
+			}
+
+			if (diff) {
+				var full = this.getSum(cfg.width);
+				var shared = 0;
+				for (var i = 0; i < cfg.width.length; i++) {
+					var share = Math.floor(diff * (cfg.width[i] / full));
+					cfg.width[i] += share;
+					shared += share;
+				}
+				this.adjustSize(diff - shared, cfg.width);
+			}
+
+		}
+	};
+}
+
+module.exports = ScaleHelper;
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var domHelpers = __webpack_require__(1),
+	utils = __webpack_require__(0),
+	eventable = __webpack_require__(2),
+	gridResize = __webpack_require__(44);
+
+var Grid = function(parent, config, factory, gantt){
+	this.$config = utils.mixin({}, config || {});
+	this.$gantt = gantt;
+	this.$parent = parent;
+	eventable(this);
+	this.$state = {};
+};
+
+Grid.prototype = {
+	init: function(container){
+		var gantt = this.$gantt;
+		var gridAriaAttr = gantt._waiAria.gridAttrString();
+		var gridDataAriaAttr = gantt._waiAria.gridDataAttrString();
+
+		container.innerHTML = "<div class='gantt_grid' style='height:inherit;width:inherit;' "+gridAriaAttr+"></div>";
+		this.$grid = container.childNodes[0];
+
+		this.$grid.innerHTML = "<div class='gantt_grid_scale' "+
+			gantt._waiAria.gridScaleRowAttrString()+"></div><div class='gantt_grid_data' "+gridDataAriaAttr+"></div>";
+
+		this.$grid_scale = this.$grid.childNodes[0];
+		this.$grid_data = this.$grid.childNodes[1];
+
+		var attr = this.$getConfig()[this.$config.bind + "_attribute"];
+		if(!attr && this.$config.bind){
+			attr = this.$config.bind + "_id";
+		}
+		this.$config.item_attribute = attr || null;
+		
+		if(!this.$config.layers){
+			var layers = this._createLayerConfig();
+			this.$config.layers = layers;
+		}
+
+		var resizer = gridResize(gantt, this);
+		resizer.init();
+		this._renderHeaderResizers = resizer.doOnRender;
+		this._mouseDelegates = __webpack_require__(8)(gantt);
+
+		this._addLayers(this.$gantt);
+		this._initEvents();
+		this.callEvent("onReady", []);
+		//this.refresh();
+	},
+	setSize: function(width, height){
+		this.$config.width = this.$state.width = width;
+		this.$state.height = height;
+
+		// TODO: maybe inherit and override in a subclass instead of extending here
+
+		var columns = this.getGridColumns(),
+			innerWidth = 0;
+
+		for (var i = 0, l = columns.length; i < l; i++) {
+			innerWidth += columns[i].width*1;
+		}
+
+		var outerWidth;
+		if(isNaN(innerWidth) || !this.$config.scrollable){
+			outerWidth = this._setColumnsWidth(width + 1);
+			innerWidth = outerWidth;
+		}
+
+		if(this.$config.scrollable){
+			this.$grid_scale.style.width = innerWidth + "px";
+			this.$grid_data.style.width = innerWidth + "px";
+		}else{
+			this.$grid_scale.style.width = "inherit";
+			this.$grid_data.style.width = "inherit";
+		}
+		this.$config.width -= 1;
+
+		var config = this.$getConfig();
+		if(outerWidth !== width){
+			config.grid_width = outerWidth;
+			this.$config.width = outerWidth - 1;
+		}
+
+		var dataHeight = Math.max(this.$state.height - config.scale_height, 0);
+		this.$grid_data.style.height = dataHeight + "px";
+		this.refresh();
+	},
+	getSize: function(){
+
+		var config = this.$getConfig();
+
+		var store = this.$config.rowStore;
+
+		var contentHeight = store ? config.row_height * store.countVisible() : 0,
+			contentWidth = this._getGridWidth();
+
+		var size = {
+			x: this.$state.width,
+			y: this.$state.height,
+			contentX: this.isVisible() ? contentWidth: 0,
+			contentY: this.isVisible() ? (config.scale_height + contentHeight) : 0,
+			scrollHeight: this.isVisible() ? contentHeight: 0,
+			scrollWidth: this.isVisible() ? contentWidth : 0
+		};
+
+		return size;
+	},
+	refresh: function(){
+		if(this.$config.bind)
+			this.$config.rowStore = this.$gantt.getDatastore(this.$config.bind);
+
+		this._initSmartRenderingPlaceholder();
+
+		this._calculateGridWidth();
+		this._renderGridHeader();
+	},
+	scrollTo: function(left, top){
+		if(!this.isVisible())
+			return;
+
+		if (left*1 == left){
+			this.$state.scrollLeft = this.$grid.scrollLeft = left;
+		}
+
+		// var config = this.$getConfig();
+		if(top*1 == top){
+			this.$state.scrollTop = this.$grid_data.scrollTop = top;
+		}
+	},
+	getGridColumns: function(){
+		var config = this.$getConfig();
+		return config.columns.slice();
+	},
+	isVisible: function(){
+		if(this.$parent && this.$parent.$config){
+			return !this.$parent.$config.hidden;
+		}else{
+			return this.$grid.offsetWidth;
+		}
+	},
+
+	getItemTop: function(id){
+		if(this.$config.rowStore){
+			var store = this.$config.rowStore;
+			if(!store) return 0;
+
+			return store.getIndexById(id) * this.$getConfig().row_height;
+
+		}else{
+			return 0;
+		}
+	},
+
+	_createLayerConfig: function(){
+		var gantt = this.$gantt;
+		var self = this;
+		var layers = [
+			{
+				renderer: gantt.$ui.layers.gridLine,
+				container: this.$grid_data,
+				filter: [function(){
+					return self.isVisible();
+				}]
+			}
+		];
+		return layers;
+	},
+
+	_addLayers: function(gantt){
+		if(!this.$config.bind)
+			return;
+
+		this._taskLayers = [];
+
+		var self = this;
+
+		var layers = this.$gantt.$services.getService("layers");
+		var taskRenderer = layers.getDataRender(this.$config.bind);
+
+		if(!taskRenderer){
+			taskRenderer = layers.createDataRender({
+				name: this.$config.bind,
+				defaultContainer: function(){ return self.$grid_data;}
+			});
+		}
+
+		var taskLayers = this.$config.layers;
+		for(var i = 0; taskLayers && i < taskLayers.length; i++){
+			var layer = taskLayers[i];
+			layer.host = this;
+			var bar_layer = taskRenderer.addLayer(layer);
+			this._taskLayers.push(bar_layer);
+		}
+
+		if(this.$config.bind)
+			this.$config.rowStore = this.$gantt.getDatastore(this.$config.bind);
+
+		this._initSmartRenderingPlaceholder();
+	},
+
+	_initSmartRenderingPlaceholder: function(){
+		var self = this;
+		var store = this.$config.rowStore;
+		if(!store){
+			return;
+		}else{
+			this._initSmartRenderingPlaceholder = function(){};
+		}
+		this._staticBgHandler = store.attachEvent("onStoreUpdated", function(id, item, mode){
+			if(id !== null) {
+				return;
+			}
+
+			if(!self.isVisible())
+				return;
+			var config = self.$getConfig();
+			if(config.smart_rendering) {
+				var contentHeight = store ? config.row_height * store.countVisible() : 0;
+				if(contentHeight){
+					if(self.$rowsPlaceholder && self.$rowsPlaceholder.parentNode){
+						self.$rowsPlaceholder.parentNode.removeChild(self.$rowsPlaceholder);
+					}
+
+					var placeholder = self.$rowsPlaceholder = document.createElement("div");
+					placeholder.style.visibility = "hidden";
+					placeholder.style.height = contentHeight + "px";
+					placeholder.style.width = "1px";
+					self.$grid_data.appendChild(placeholder);
+				}
+			}
+		});
+	},
+
+	_initEvents: function(){
+		this._mouseDelegates.delegate("click", "gantt_close", gantt.bind(function (e, id, trg) {
+			var store = this.$config.rowStore;
+			if(!store) return true;
+
+			var target = domHelpers.locateAttribute(e, this.$config.item_attribute);
+			if(target){
+				store.close(target.getAttribute(this.$config.item_attribute));
+
+			}
+			return false;
+		}, this), this.$grid);
+
+		this._mouseDelegates.delegate("click", "gantt_open", gantt.bind(function (e, id, trg) {
+			var store = this.$config.rowStore;
+			if(!store) return true;
+
+			var target = domHelpers.locateAttribute(e, this.$config.item_attribute);
+			if(target){
+				store.open(target.getAttribute(this.$config.item_attribute));
+
+			}
+			return false;
+		}, this), this.$grid);
+	},
+
+	_clearLayers: function(gantt){
+		var layers = this.$gantt.$services.getService("layers");
+		var taskRenderer = layers.getDataRender(this.$config.bind);
+
+		for(var i = 0; i < this._taskLayers.length; i++){
+			taskRenderer.removeLayer(this._taskLayers[i]);
+		}
+
+		this._taskLayers = [];
+	},
+
+	_getColumnWidth: function(column, config, width) {
+		var min_width = column.min_width || config.min_grid_column_width;
+		var new_width = Math.max(width, min_width || 10);
+		if (column.max_width)
+			new_width = Math.min(new_width, column.max_width);
+		return new_width;
+	},
+	// return min and max possible grid width according to restricts
+	_getGridWidthLimits: function() {
+		var config = this.$getConfig(),
+			columns = this.getGridColumns(),
+			min_limit = 0,
+			max_limit = 0;
+
+			for (var i=0; i<columns.length; i++) {
+				min_limit += columns[i].min_width ? columns[i].min_width : config.min_grid_column_width;
+				if (max_limit !== undefined) {
+					max_limit = columns[i].max_width ? (max_limit + columns[i].max_width) : undefined;
+				}
+			}
+
+			return [min_limit, max_limit];
+	},
+	// resize columns to get total newWidth, starting from columns[start_index]  
+	_setColumnsWidth: function(newWidth, start_index) {
+		var config = this.$getConfig();
+		var columns = this.getGridColumns(),
+			columns_width = 0,
+			final_width = newWidth;
+
+		start_index = !window.isNaN(start_index) ? start_index : -1;
+
+		for (var i = 0, l = columns.length; i < l; i++) {
+			columns_width += columns[i].width*1;
+		}
+
+		if (window.isNaN(columns_width)) {
+			this._calculateGridWidth(); 
+			columns_width = 0;
+			for (var i = 0, l = columns.length; i < l; i++) {
+				columns_width += columns[i].width*1;
+			}
+		}
+
+		var extra_width = final_width - columns_width;
+
+		var start_width = 0;
+		for (var i=0; i<start_index+1; i++) {
+			start_width += columns[i].width;
+		}
+
+		columns_width -= start_width;
+
+		for (var i=start_index+1; i<columns.length; i++) {
+
+			var col = columns[i];
+			var	share = Math.round(extra_width * (col.width / columns_width));
+
+			// columns have 2 additional restrict fields - min_width & max_width that are set by user
+			if (extra_width < 0) {
+				if (col.min_width && col.width+share < col.min_width)
+					share = col.min_width - col.width;
+				else if (!col.min_width && config.min_grid_column_width && col.width+share < config.min_grid_column_width)
+					share = config.min_grid_column_width - col.width;
+			} else if (col.max_width && col.width+share > col.max_width)
+				share = col.max_width - col.width;
+
+			columns_width -= col.width;
+			col.width += share;
+			extra_width -= share;
+
+		}
+
+		var iterator = extra_width > 0 ? 1 : -1;
+		while ((extra_width > 0 && iterator === 1) || (extra_width < 0 && iterator === -1)) {
+			var curExtra = extra_width;
+			for (i = start_index+1; i<columns.length; i++) {
+				var new_width = columns[i].width + iterator;
+
+				if (new_width == this._getColumnWidth(columns[i], config, new_width)) {
+					extra_width -= iterator;
+					columns[i].width = new_width;
+				}
+
+				if (!extra_width)
+					break;
+
+			}
+
+			if (curExtra == extra_width)
+				break;
+		}
+
+		// if impossible to resize the right-side columns, resize the start column
+		if (extra_width && start_index > -1) {
+			var new_width = columns[start_index].width + extra_width;
+			if (new_width == this._getColumnWidth(columns[start_index], config, new_width))
+				columns[start_index].width = new_width;
+		}
+
+		//if (this.callEvent("onGridResizeEnd", [config.grid_width, final_width]) === false)
+		//	return;
+
+		return this._getColsTotalWidth();
+	},
+
+	_getColsTotalWidth: function(){
+		var columns = this.getGridColumns();
+		var cols_width = 0;
+
+		for (var i = 0; i < columns.length; i++) {
+			var v = parseFloat(columns[i].width);
+			if (window.isNaN(v)) {
+				return false;
+			}
+			cols_width += v;
+		}
+		return cols_width;
+	},
+	_calculateGridWidth: function() {
+		var config = this.$getConfig();
+		var columns = this.getGridColumns();
+		var cols_width = 0;
+		var unknown = [];
+		var width = [];
+
+		for (var i = 0; i < columns.length; i++) {
+			var v = parseFloat(columns[i].width);
+			if (window.isNaN(v)) {
+				v = config.min_grid_column_width || 10;
+				unknown.push(i);
+			}
+			width[i] = v;
+			cols_width += v;
+		}
+		var gridWidth = this._getGridWidth() + 1;
+		if (config.autofit || unknown.length) {
+			var diff = gridWidth - cols_width;
+			// TODO: logic may be improved for proportional changing of width
+			if (config.autofit) {
+				// delta must be added for all columns
+				for (var i = 0; i < width.length; i++) {
+					var delta = Math.round(diff / (width.length-i));
+					width[i] += delta;
+					var new_width = this._getColumnWidth(columns[i], config, width[i]);
+					
+					if (new_width != width[i]) {
+						delta = new_width - width[i];
+						width[i] = new_width;
+					}
+					diff -= delta;
+				}
+			} else if (unknown.length) {
+				// there are several columns with undefined width
+				for (var i = 0; i < unknown.length; i++) {
+					var delta = Math.round(diff / (unknown.length-i)); // no float values, just integer
+					var index = unknown[i];
+					width[index] += delta;
+					var new_width = this._getColumnWidth(columns[index], config, width[index]);
+					if (new_width != width[index]) {
+						delta = new_width - width[index];
+						width[index] = new_width;
+					}
+					diff -= delta;
+				}
+			}
+
+			for (var i = 0; i < width.length; i++) {
+				columns[i].width = width[i];
+			}
+		} else {
+			var changed = (gridWidth != cols_width);
+			this.$config.width = cols_width - 1;
+			config.grid_width = cols_width;
+			if(changed){
+				this.$parent._setContentSize(this.$config.width, this.$config.height);
+//				this.$parent.$config.width = cols_width;
+			}
+		}
+
+	},
+
+	_renderGridHeader: function(){
+		var gantt = this.$gantt;
+		var config = this.$getConfig();
+		var locale = this.$gantt.locale;
+		var templates = this.$gantt.templates;
+
+		var columns = this.getGridColumns();
+		if(config.rtl){
+			columns = columns.reverse();
+		}
+		var cells = [];
+		var width = 0,
+			labels = locale.labels;
+
+		var lineHeigth = config.scale_height - 1;
+
+		for (var i = 0; i < columns.length; i++) {
+			var last = i == columns.length - 1;
+			var col = columns[i];
+
+			// ensure columns have non-empty names
+			if (!col.name) {
+				col.name = gantt.uid() + "";
+			}
+
+			var colWidth = col.width * 1;
+
+			var gridWidth = this._getGridWidth();
+			if (last && gridWidth > width + colWidth)
+				col.width = colWidth = gridWidth - width;
+			width += colWidth;
+			var sort = (gantt._sort && col.name == gantt._sort.name) ? ("<div class='gantt_sort gantt_" + gantt._sort.direction + "'></div>") : "";
+			var cssClass = ["gantt_grid_head_cell",
+				("gantt_grid_head_" + col.name),
+				(last ? "gantt_last_cell" : ""),
+				templates.grid_header_class(col.name, col)].join(" ");
+
+			var style = "width:" + (colWidth - (last ? 1 : 0)) + "px;";
+			var label = (col.label || labels["column_" + col.name]);
+			label = label || "";
+
+			var ariaAttrs = gantt._waiAria.gridScaleCellAttrString(col, label);
+
+			var cell = "<div class='" + cssClass + "' style='" + style + "' " + ariaAttrs + " column_id='" + col.name + "'>" + label + sort + "</div>";
+			cells.push(cell);
+		}
+		this.$grid_scale.style.height = (config.scale_height) + "px";
+		this.$grid_scale.style.lineHeight = lineHeigth + "px";
+		//this.$grid_scale.style.width = "inherit";
+		this.$grid_scale.innerHTML = cells.join("");
+
+		if(this._renderHeaderResizers){
+			this._renderHeaderResizers();
+		}
+	},
+
+	_getGridWidth: function(){
+		// TODO: refactor/remove/comment some of _getGridWidth/this.$config.width/this.$state.width, it's not clear what they do
+		return this.$config.width;
+	},
+
+	destructor: function(){
+		this._clearLayers(this.$gantt);
+		this._mouseDelegates.destructor();
+		this._mouseDelegates = null;
+		this.$grid = null;
+		this.$grid_scale = null;
+		this.$grid_data = null;
+		this.$gantt = null;
+
+		if(this.$config.rowStore){
+			this.$config.rowStore.detachEvent(this._staticBgHandler);
+			this.$config.rowStore = null;
+		}
+
+		this.callEvent("onDestroy", []);
+		this.detachAllEvents();
+	}
+};
+
+module.exports = Grid;
+
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var powerArray = __webpack_require__(16);
+var utils = __webpack_require__(0);
+var eventable = __webpack_require__(2);
+
+var DataStore = function(config){
+	this.pull = {};
+	this.$initItem = config.initItem;
+	this.visibleOrder = powerArray.$create();
+	this.fullOrder = powerArray.$create();
+	this._skip_refresh = false;
+	this._filterRule = null;
+	this._searchVisibleOrder = {};
+	eventable(this);
+	return this;
+};
+DataStore.prototype = {
+
+	_parseInner: function(data){
+		var item = null,
+			loaded = [];
+		for(var i = 0, len = data.length; i< len; i++){
+			item = data[i];
+			if(this.$initItem){
+				item = this.$initItem(item);
+			}
+			if(this.callEvent("onItemLoading", [item])){
+				if (!this.pull.hasOwnProperty(item.id)) {
+					this.fullOrder.push(item.id);
+					loaded.push(item);
+				}
+				this.pull[item.id] = item;
+			}
+		}
+		return loaded;
+	},
+	parse: function(data){
+		this.callEvent("onBeforeParse", [data]);
+		var loaded = this._parseInner(data);
+		this.refresh();
+		this.callEvent("onParse", [loaded]);
+	},
+	getItem: function(id){
+		return this.pull[id];
+	},
+
+	_updateOrder: function(code){
+		code.call(this.visibleOrder);
+		code.call(this.fullOrder);
+	},
+	updateItem: function(id, item){
+		if (!utils.defined(item)) item = this.getItem(id);
+
+		if (!this._skip_refresh) {
+			if (this.callEvent("onBeforeUpdate", [item.id, item]) === false) return false;
+		}
+		this.pull[id]=item;
+		if (!this._skip_refresh) {
+			this.callEvent("onAfterUpdate", [item.id, item]);
+			this.callEvent("onStoreUpdated", [item.id, item, "update"]);
+		}
+	},
+
+	_removeItemInner: function(id){
+		//clear from collections
+		//this.visibleOrder.$remove(id);
+		this._updateOrder(function(){ this.$remove(id);});
+		delete this.pull[id];
+	},
+
+	removeItem: function(id){
+		//utils.assert(this.exists(id), "Not existing ID in remove command"+id);
+
+		var obj = this.getItem(id);	//save for later event
+		if (!this._skip_refresh) {
+			if (this.callEvent("onBeforeDelete", [obj.id, obj]) === false) return false;
+		}
+
+		this._removeItemInner(id);
+
+		if (!this._skip_refresh) {
+			this.filter();
+			this.callEvent("onAfterDelete", [obj.id, obj]);
+			//repaint signal
+			this.callEvent("onStoreUpdated", [obj.id, obj, "delete"]);
+		}
+	},
+
+	_addItemInner: function(item, index){
+		//in case of treetable order is sent as 3rd parameter
+		//var order = index;
+
+		if(this.exists(item.id)){
+			this.silent(function(){this.updateItem(item.id, item);});
+		}else{
+			var order = this.visibleOrder;
+
+			//by default item is added to the end of the list
+			var data_size = order.length;
+
+			if (!utils.defined(index) || index < 0)
+				index = data_size;
+			//check to prevent too big indexes
+			if (index > data_size){
+				//dhx.log("Warning","DataStore:add","Index of out of bounds");
+				index = Math.min(order.length,index);
+			}
+		}
+
+
+		//gantt.assert(!this.exists(id), "Not unique ID");
+
+		this.pull[item.id]=item;
+		if (!this._skip_refresh){
+			this._updateOrder(function(){ this.$insertAt(item.id,index);});
+		}
+
+		//order.$insertAt(item.id,index);
+	},
+
+
+	isVisible: function(id){
+		return this.visibleOrder.$find(id) > -1;
+	},
+	getVisibleItems: function(){
+		return this.getIndexRange();
+	},
+
+	addItem: function(item, index){
+		if (!utils.defined(item.id))
+			item.id = utils.uid();
+
+		if(this.$initItem){
+			item = this.$initItem(item);
+		}
+
+		if (!this._skip_refresh){
+			if (this.callEvent("onBeforeAdd", [item.id, item]) === false) return false;
+		}
+
+
+		this._addItemInner(item, index);
+
+		if (!this._skip_refresh){
+			this.callEvent("onAfterAdd",[item.id, item]);
+			//repaint signal
+			this.callEvent("onStoreUpdated",[item.id,item,"add"]);
+		}
+		return item.id;
+	},
+
+	_changeIdInner: function(oldId, newId){
+		if(this.pull[oldId])
+			this.pull[newId] = this.pull[oldId];
+
+		this.pull[newId].id = newId;
+		this._updateOrder(function(){
+			this[this.$find(oldId)] = newId;
+		});
+		this._searchVisibleOrder[newId] = this._searchVisibleOrder[oldId];
+		delete this._searchVisibleOrder[oldId];
+
+		//this.visibleOrder[this.visibleOrder.$find(oldId)]=newId;
+		delete this.pull[oldId];
+	},
+	changeId: function(oldId, newId){
+		this._changeIdInner(oldId, newId);
+
+		this.callEvent("onIdChange", [oldId, newId]);
+
+	},
+	exists: function(id){
+		return !!(this.pull[id]);
+	},
+
+	_moveInner: function(sindex, tindex){
+		var id = this.getIdByIndex(sindex);
+
+		this._updateOrder(function(){
+			this.$removeAt(sindex);
+			this.$insertAt(id,Math.min(this.length, tindex));
+		});
+		//this.visibleOrder.$removeAt(sindex);	//remove at old position
+		//if (sindex<tindex) tindex--;	//correct shift, caused by element removing
+		//this.visibleOrder.$insertAt(id,Math.min(this.visibleOrder.length, tindex));	//insert at new position
+	},
+
+	move: function(sindex, tindex){
+		//gantt.assert(sindex>=0 && tindex>=0, "DataStore::move","Incorrect indexes");
+
+		var id = this.getIdByIndex(sindex);
+		var obj = this.getItem(id);
+		this._moveInner(sindex, tindex);
+
+
+		if (!this._skip_refresh) {
+			//repaint signal
+			this.callEvent("onStoreUpdated", [obj.id, obj, "move"]);
+		}
+	},
+	clearAll: function(){
+		this.pull = {};
+		this.visibleOrder = powerArray.$create();
+		this.fullOrder = powerArray.$create();
+		if (this._skip_refresh) return;
+		this.callEvent("onClearAll",[]);
+		this.refresh();
+	},
+
+	silent:function(code, master){
+		this._skip_refresh = true;
+		code.call(master||this);
+		this._skip_refresh = false;
+	},
+
+	arraysEqual: function (arr1, arr2) {
+		if(arr1.length !== arr2.length)
+			return false;
+		for(var i = 0; i < arr1.length; i++) {
+			if(arr1[i] !== arr2[i])
+				return false;
+		}
+
+		return true;
+	},
+
+	refresh: function(id, quick){
+		if (this._skip_refresh) return;
+
+		if(id){
+			// if item changes visible order (e.g. expand-collapse branch) - do a complete repaint
+			if(!quick){
+				var oldOrder = this.visibleOrder;
+				this.filter();
+				if(!this.arraysEqual(oldOrder, this.visibleOrder)){
+					id = undefined;
+				}
+			}
+
+		}else{
+			this.filter();
+		}
+
+		if (id)
+			this.callEvent("onStoreUpdated",[id, this.pull[id], "paint"]);
+		else
+			this.callEvent("onStoreUpdated",[null,null,null]);
+	},
+
+	count: function(){
+		return this.fullOrder.length;
+	},
+	countVisible: function(){
+		return this.visibleOrder.length;
+	},
+
+	sort: function(sort){},
+
+	serialize: function(){},
+
+	eachItem: function(code){
+		for (var i=0; i<this.fullOrder.length; i++) {
+			var item = this.pull[this.fullOrder[i]];
+			code.call(this, item);
+		}
+	},
+	
+	filter: function(rule){
+		var filteredOrder = powerArray.$create();
+		this.eachItem(function(item){
+			if(this.callEvent("onFilterItem", [item.id, item])){
+				filteredOrder.push(item.id);
+			}
+		});
+
+		this.visibleOrder = filteredOrder;
+		this._searchVisibleOrder = {};
+		for(var i = 0; i < this.visibleOrder.length; i++){
+			this._searchVisibleOrder[this.visibleOrder[i]] = i;
+		}
+	},
+
+	getIndexRange: function(from, to){
+		to=Math.min((to||Infinity),this.countVisible()-1);
+
+		var ret= [];
+		for (var i=(from||0); i <= to; i++)
+			ret.push(this.getItem(this.visibleOrder[i]));
+		return ret;
+	},
+	getItems: function(){
+		var res = [];
+		for(var i in this.pull){
+			res.push(this.pull[i]);
+		}
+	/*	for(var i = 0; i < this.fullOrder.length; i++){
+
+		}*/
+		return res;
+	},
+
+	getIdByIndex: function(index){
+		return this.visibleOrder[index];
+	},
+	getIndexById: function(id){
+		var res = this._searchVisibleOrder[id];
+		if(res === undefined){
+			res = -1;
+		}
+		return res;
+	},
+	_getNullIfUndefined: function(value){
+		if(value === undefined){
+			return null;
+		}else{
+			return value;
+		}
+	},
+	getFirst: function(){
+		return this._getNullIfUndefined(this.visibleOrder[0]);
+	},
+	getLast: function(){
+		return this._getNullIfUndefined(this.visibleOrder[this.visibleOrder.length-1]);
+	},
+	getNext: function(id){
+		return this._getNullIfUndefined(this.visibleOrder[this.getIndexById(id) + 1]);
+	},
+	getPrev: function(id){
+		return this._getNullIfUndefined(this.visibleOrder[this.getIndexById(id) - 1]);
+	},
+	destructor: function(){
+		this.detachAllEvents();
+		this.pull = null;
+		this.$initItem = null;
+		this.visibleOrder = null;
+		this.fullOrder = null;
+		this._skip_refresh = null;
+		this._filterRule = null;
+		this._searchVisibleOrder = null;
+	}
+};
+
+module.exports = DataStore;
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+
+var $powerArray  = {
+	$create: function(array){
+		return utils.mixin(array || [], this);
+	},
+	//remove element at specified position
+	$removeAt:function(pos,len){
+		if (pos>=0) this.splice(pos,(len||1));
+	},
+	//find element in collection and remove it
+	$remove:function(value){
+		this.$removeAt(this.$find(value));
+	},
+	//add element to collection at specific position
+	$insertAt:function(data,pos){
+		if (!pos && pos!==0) 	//add to the end by default
+			this.push(data);
+		else {
+			var b = this.splice(pos,(this.length-pos));
+			this[pos] = data;
+			this.push.apply(this,b); //reconstruct array without loosing this pointer
+		}
+	},
+	//return index of element, -1 if it doesn't exists
+	$find:function(data){
+		for (var i=0; i<this.length; i++)
+			if (data==this[i]) return i;
+		return -1;
+	},
+	//execute some method for each element of array
+	$each:function(functor,master){
+		for (var i=0; i < this.length; i++)
+			functor.call((master||this),this[i]);
+	},
+	//create new array from source, by using results of functor
+	$map:function(functor,master){
+		for (var i=0; i < this.length; i++)
+			this[i]=functor.call((master||this),this[i]);
+		return this;
+	},
+	$filter:function(functor, master){
+		for (var i=0; i < this.length; i++)
+			if (!functor.call((master||this),this[i])){
+				this.splice(i,1);
+				i--;
+			}
+		return this;
+	}
+};
+
+module.exports = $powerArray;
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var ScaleHelper = __webpack_require__(13);
+
+
+function dateRangeResolver(gantt){
+	//reset project timing
+	//_get_tasks_data(gantt);
+	return gantt.getSubtaskDates();
+}
+
+function defaultRangeResolver(){
+	return {
+		start_date: new Date(),
+		end_date: new Date()
+	};
+}
+
+function resolveConfigRange(unit, gantt){
+	var range = {
+		start_date:null,
+		end_date:null
+	};
+
+	if (gantt.config.start_date && gantt.config.end_date) {
+		range.start_date = gantt.date[unit + "_start"](new Date(gantt.config.start_date));
+
+		var end = new Date(gantt.config.end_date);
+		var start_interval = gantt.date[unit + "_start"](new Date(end));
+		if (+end != +start_interval) {
+			end = gantt.date.add(start_interval, 1, unit);
+		} else {
+			end = start_interval;
+		}
+
+		range.end_date = end;
+	}
+	return range;
+}
+
+function _scale_range_unit(gantt) {
+	var unit = gantt.config.scale_unit;
+	var step = gantt.config.step;
+	if (gantt.config.scale_offset_minimal) {
+
+		var helper = new ScaleHelper(gantt);
+		var scales = [helper.primaryScale()].concat(gantt.config.subscales);
+
+		helper.sortScales(scales);
+		unit = scales[scales.length - 1].unit;
+		step = scales[scales.length - 1].step || 1;
+	}
+	return { unit:unit, step:step };
+}
+
+function _init_tasks_range(gantt) {
+	var cfg = _scale_range_unit(gantt);
+	var unit = cfg.unit,
+		step = cfg.step;
+	var range = resolveConfigRange(unit, gantt);
+
+	if(!(range.start_date && range.end_date)){
+		range = dateRangeResolver(gantt);
+		if(!range.start_date || !range.end_date){
+			range = defaultRangeResolver(gantt);
+		}
+
+		range.start_date = gantt.date[unit + "_start"](range.start_date);
+		range.start_date = gantt.calculateEndDate({
+			start_date: gantt.date[unit + "_start"](range.start_date),
+			duration: -1,
+			unit: unit,
+			step:step
+		});//one free column before first task
+
+		range.end_date = gantt.date[unit + "_start"](range.end_date);
+		range.end_date = gantt.calculateEndDate({start_date: range.end_date, duration: 2, unit: unit, step:step});//one free column after last task
+	}
+
+	gantt._min_date = range.start_date;
+	gantt._max_date = range.end_date;
+}
+
+function _adjust_scales(gantt) {
+	if (gantt.config.fit_tasks) {
+		var old_min = +gantt._min_date,
+			old_max = +gantt._max_date;
+		//this._init_tasks_range();
+		if (+gantt._min_date != old_min || +gantt._max_date != old_max) {
+			gantt.render();
+
+			gantt.callEvent("onScaleAdjusted", []);
+			return true;
+		}
+	}
+	return false;
+}
+
+module.exports = function updateTasksRange(gantt){
+	_init_tasks_range(gantt);
+	_adjust_scales(gantt);
+};
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports) {
+
+function copyLinkIdsArray(gantt, linkIds, targetHash){
+	for(var i = 0; i < linkIds.length; i++) {
+		if(gantt.isLinkExists(linkIds[i])){
+			targetHash[linkIds[i]] = gantt.getLink(linkIds[i]);
+		}
+	}
+}
+
+function copyLinkIds(gantt, task, targetHash){
+	copyLinkIdsArray(gantt, task.$source, targetHash);
+	copyLinkIdsArray(gantt, task.$target, targetHash);
+}
+
+function getSubtreeLinks(gantt, rootId){
+	var res = {};
+
+	if(gantt.isTaskExists(rootId)){
+		copyLinkIds(gantt, gantt.getTask(rootId), res);
+	}
+
+	gantt.eachTask(function(child){
+		copyLinkIds(gantt, child, res);
+	}, rootId);
+
+	return res;
+}
+
+function getSubtreeTasks(gantt, rootId){
+	var res = {};
+
+	gantt.eachTask(function(child){
+		res[child.id] = child;
+	}, rootId);
+
+	return res;
+}
+
+module.exports = {
+	getSubtreeLinks: getSubtreeLinks,
+	getSubtreeTasks: getSubtreeTasks
+};
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+var dateHelper = __webpack_require__(3);
+
+var calendarArgumentsHelper = function(gantt){
+	return {
+		getWorkHoursArguments: function () {
+			var config = arguments[0];
+			if (dateHelper.isDate(config)) {
+				config = {
+					date: config
+				};
+			} else {
+				config = utils.mixin({}, config);
+			}
+			return config;
+		},
+		setWorkTimeArguments: function () {
+			return arguments[0];
+		},
+		unsetWorkTimeArguments: function () {
+			return arguments[0];
+		},
+		isWorkTimeArguments: function () {
+			var config = arguments[0];
+			if (!config.date) {
+				config = {};
+				config.date = arguments[0];
+				config.unit = arguments[1];
+				config.task = arguments[2];
+				config.calendar = arguments[3];
+			} else {
+				config = utils.mixin({}, config);
+				config.unit = config.unit || gantt.config.duration_unit;
+				config.task = config.task || null;
+				config.calendar = config.calendar || null;
+			}
+
+			config.unit = config.unit || gantt.config.duration_unit;
+
+			return config;
+		},
+		getClosestWorkTimeArguments: function (config) {
+			config = arguments[0];
+			if (dateHelper.isDate(config)) {
+				config = {
+					date: config
+				};
+			} else {
+				config = utils.mixin({}, config);
+			}
+			config.dir = config.dir || 'any';
+			config.unit = config.unit || gantt.config.duration_unit;
+
+			return config;
+		},
+
+		getDurationConfig: function (start, end, task, calendar) {
+			this.start_date = start;
+			this.end_date = end;
+			this.task = task;
+			this.calendar = calendar;
+			this.unit = null;
+			this.step = null;
+			return this;
+		},
+		_getStartEndConfig: function (param) {
+			var argumentType = this.getDurationConfig;
+			var config;
+			if (param instanceof argumentType)
+				return param;
+
+			if (dateHelper.isDate(param)) {
+				config = new argumentType(arguments[0], arguments[1], arguments[2], arguments[3]);
+			} else {
+				config = new argumentType(param.start_date, param.end_date, param.task);
+				if (param.id) {
+					config.task = param;
+				}
+			}
+
+			config.unit = config.unit || gantt.config.duration_unit;
+			config.step = config.step || gantt.config.duration_step;
+			config.start_date = config.start_date || config.start || config.date;
+
+			return config;
+		},
+
+		getDurationArguments: function (start, end, unit, step) {
+			return this._getStartEndConfig.apply(this, arguments);
+		},
+
+		hasDurationArguments: function (start, end, unit, step) {
+			return this._getStartEndConfig.apply(this, arguments);
+		},
+
+		calculateEndDateArguments: function (start, duration, unit, step) {
+			var config = arguments[0];
+			if (dateHelper.isDate(config)) {
+				config = {
+					start_date: arguments[0],
+					duration: arguments[1],
+					unit: arguments[2],
+					task: arguments[3],
+					calendar: arguments[4]
+				};
+			} else {
+				config = utils.mixin({}, config);
+			}
+
+			config.unit = config.unit || gantt.config.duration_unit;
+			config.step = config.step || gantt.config.duration_step;
+
+			return config;
+		}
+	};
+};
+
+
+module.exports = calendarArgumentsHelper;
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(21);
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+window.gantt = __webpack_require__(22)();
+
+__webpack_require__(103)(window.gantt);
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+function DHXGantt(){
+	this.version = "5.1.0";
+	this.templates = {};
+	this.keys = {
+		edit_save: 13,
+		edit_cancel: 27
+	};
+}
+
+module.exports = function() {
+	// use a named constructor to make gantt instance discoverable in heap snapshots
+	var gantt = new DHXGantt();
+
+	__webpack_require__(23)(gantt);
+
+	gantt.$services = gantt.$inject(__webpack_require__(24));
+	gantt.config = gantt.$inject(__webpack_require__(25));
+	gantt.ajax =  __webpack_require__(26)(gantt);
+	gantt.date = __webpack_require__(27)(gantt);
+	var dnd = __webpack_require__(28)(gantt);
+	gantt.$services.setService("dnd", function(){return dnd;});
+
+	gantt.$services.setService("config", function () {
+		return gantt.config;
+	});
+	gantt.$services.setService("date", function () {
+		return gantt.date;
+	});
+	gantt.$services.setService("locale", function () {
+		return gantt.locale;
+	});
+	gantt.$services.setService("templates", function () {
+		return gantt.templates;
+	});
+
+	var templatesLoader = __webpack_require__(29)(gantt);
+	gantt.$services.setService("templateLoader", function () {
+		return templatesLoader;
+	});
+
+	var eventable = __webpack_require__(2);
+	eventable(gantt);
+
+	var StateService = __webpack_require__(30);
+	var stateService = new StateService();
+
+	stateService.registerProvider("global", function () {
+		return {
+			min_date: gantt._min_date,
+			max_date: gantt._max_date,
+			selected_task: gantt.$data.tasksStore.getSelectedId()
+		};
+	});
+	gantt.getState = stateService.getState;
+	gantt.$services.setService("state", function () {
+		return stateService;
+	});
+
+	var utils = __webpack_require__(0);
+	utils.mixin(gantt, utils);
+	gantt.env = __webpack_require__(7);
+
+	var domEvents = __webpack_require__(10)();
+	gantt.event = domEvents.attach;
+	gantt.eventRemove = domEvents.detach;
+	gantt._eventRemoveAll = domEvents.detachAll;
+	gantt._createDomEventScope = domEvents.extend;
+
+	utils.mixin(gantt, __webpack_require__(31)(gantt));
+	var uiApi = __webpack_require__(32).init(gantt);
+	gantt.$ui = uiApi.factory;
+	gantt.$ui.layers = uiApi.render;
+	gantt.$mouseEvents = uiApi.mouseEvents;
+	gantt.$services.setService("mouseEvents", function () {
+		return gantt.$mouseEvents;
+	});
+	gantt.mixin(gantt, uiApi.layersApi);
+
+	__webpack_require__(55)(gantt);
+
+	gantt.$services.setService("layers", function () {
+		return uiApi.layersService;
+	});
+
+	__webpack_require__(56)(gantt);
+
+	__webpack_require__(63)(gantt);
+	__webpack_require__(66)(gantt);
+
+	__webpack_require__(73)(gantt);
+	__webpack_require__(74)(gantt);
+	__webpack_require__(75)(gantt);
+	__webpack_require__(76)(gantt);
+	__webpack_require__(77)(gantt);
+	__webpack_require__(78)(gantt);
+	__webpack_require__(85)(gantt);
+	__webpack_require__(86)(gantt);
+	__webpack_require__(87)(gantt);
+	__webpack_require__(88)(gantt);
+	__webpack_require__(89)(gantt);
+	__webpack_require__(90)(gantt);
+	__webpack_require__(91)(gantt);
+	__webpack_require__(92)(gantt);
+	__webpack_require__(93)(gantt);
+	__webpack_require__(94)(gantt);
+	__webpack_require__(95)(gantt);
+	__webpack_require__(96)(gantt);
+	__webpack_require__(97)(gantt);
+	__webpack_require__(98)(gantt);
+	__webpack_require__(99)(gantt);
+	__webpack_require__(100)(gantt);
+	__webpack_require__(102)(gantt);
+
+	return gantt;
+};
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt){
+	gantt.$inject = function(module){
+		return module(this.$services);
+	};
+};
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports) {
+
+module.exports = function(){
+	var services = {};
+	function register (name, getter){
+		services[name] = getter;
+	}
+
+	function getService(name){
+		if(!services[name]){
+			return null;
+		}
+		return services[name]();
+	}
+
+	var servicesEnum = {
+		"config": "config",
+		"templates": "templates",
+		"locale": "locale"
+	};
+
+	return {
+		services: servicesEnum,
+		setService: register,
+		getService: getService,
+		config: function(){
+			return this.getService("config");
+		},
+		templates: function(){
+			return this.getService("templates");
+		},
+		locale: function(){
+			return this.getService("locale");
+		},
+		destructor: function(){
+			for(var i in services){
+				if(services[i]){
+					var service = services[i];
+					if(service && service.destructor){
+						service.destructor();
+					}
+				}
+			}
+			services = null;
+		}
+	};
+};
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports) {
+
+module.exports = function() {
+	return {
+		layout: {
+			css: "gantt_container",
+			rows: [
+				{
+					cols: [
+						{view: "grid", scrollX: "scrollHor", scrollY: "scrollVer"},
+						{resizer: true, width: 1},
+						{view: "timeline", scrollX: "scrollHor", scrollY: "scrollVer"},
+						{view: "scrollbar", id: "scrollVer"}
+					]
+
+				},
+				{view: "scrollbar", id: "scrollHor", height: 20}
+			]
+		},
+		links: {
+			"finish_to_start": "0",
+			"start_to_start": "1",
+			"finish_to_finish": "2",
+			"start_to_finish": "3"
+		},
+		types: {
+			'task': 'task',
+			'project': 'project',
+			'milestone': 'milestone'
+		},
+		duration_unit: "day",
+		work_time: false,
+		correct_work_time: false,
+		skip_off_time: false,
+
+		cascade_delete: true,
+
+		autosize: false,
+		autosize_min_width: 0,
+		autoscroll: true,
+		autoscroll_speed: 30,
+
+		show_links: true,
+		show_task_cells: true,
+		// replace backgroung of the task area with a canvas img
+		static_background: false,
+		branch_loading: false,
+		branch_loading_property: "$has_child",
+		show_loading: false,
+		show_chart: true,
+		show_grid: true,
+		min_duration: 60 * 60 * 1000,
+		xml_date: "%d-%m-%Y %H:%i",
+		api_date: "%d-%m-%Y %H:%i",
+		start_on_monday: true,
+		server_utc: false,
+		show_progress: true,
+		fit_tasks: false,
+		select_task: true,
+		scroll_on_click: true,
+		preserve_scroll: true,
+		readonly: false,
+
+		/*grid */
+		date_grid: "%Y-%m-%d",
+
+		drag_links: true,
+		drag_progress: true,
+		drag_resize: true,
+		drag_project: false,
+		drag_move: true,
+		drag_mode: {
+			"resize": "resize",
+			"progress": "progress",
+			"move": "move",
+			"ignore": "ignore"
+		},
+		round_dnd_dates: true,
+		link_wrapper_width: 20,
+		root_id: 0,
+
+		autofit: false, // grid column automatic fit grid_width config
+		columns: [
+			{name: "text", tree: true, width: '*', resize: true},
+			{name: "start_date", align: "center", resize: true},
+			{name: "duration", align: "center"},
+			{name: "add", width: 44}
+		],
+
+		/*scale*/
+		step: 1,
+		scale_unit: "day",
+		scale_offset_minimal: true,
+		subscales: [],
+
+		inherit_scale_class: false,
+
+		time_step: 60,
+		duration_step: 1,
+		date_scale: "%d %M",
+		task_date: "%d %F %Y",
+		time_picker: "%H:%i",
+		task_attribute: "task_id",
+		link_attribute: "link_id",
+		layer_attribute: "data-layer",
+		buttons_left: [
+			"gantt_save_btn",
+			"gantt_cancel_btn"
+		],
+		_migrate_buttons: {
+			"dhx_save_btn": "gantt_save_btn",
+			"dhx_cancel_btn": "gantt_cancel_btn",
+			"dhx_delete_btn": "gantt_delete_btn"
+		},
+		buttons_right: [
+			"gantt_delete_btn"
+		],
+		lightbox: {
+			sections: [
+				{name: "description", height: 70, map_to: "text", type: "textarea", focus: true},
+				{name: "time", type: "duration", map_to: "auto"}
+			],
+			project_sections: [
+				{name: "description", height: 70, map_to: "text", type: "textarea", focus: true},
+				{name: "type", type: "typeselect", map_to: "type"},
+				{name: "time", type: "duration", readonly: true, map_to: "auto"}
+			],
+			milestone_sections: [
+				{name: "description", height: 70, map_to: "text", type: "textarea", focus: true},
+				{name: "type", type: "typeselect", map_to: "type"},
+				{name: "time", type: "duration", single_date: true, map_to: "auto"}
+			]
+		},
+		drag_lightbox: true,
+		sort: false,
+		details_on_create: true,
+		details_on_dblclick: true,
+		initial_scroll: true,
+		task_scroll_offset: 100,
+
+		order_branch: false,
+		order_branch_free: false,
+
+		task_height: "full",//number px of 'full' for row height
+		min_column_width: 70,
+
+		// min width for grid column (when resizing)
+		min_grid_column_width: 70,
+		// name of the attribute with column index for resize element
+		grid_resizer_column_attribute: "column_index",
+		// name of the attribute with column index for resize element
+		grid_resizer_attribute: "grid_resizer",
+
+		// grid width can be increased after the column has been resized
+		keep_grid_width: false,
+
+		// grid width can be adjusted
+		grid_resize: false,
+
+		show_unscheduled: true,
+
+		//
+		readonly_property: "readonly",
+		editable_property: "editable",
+		calendar_property: "calendar_id",
+		resource_calendars: {},
+
+		type_renderers: {},
+
+		open_tree_initially: false,
+		optimize_render: true,
+		prevent_default_scroll: false,
+		show_errors: true,
+		wai_aria_attributes: true,
+		smart_scales: true,
+		rtl:false
+	};
+};
+
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var env = __webpack_require__(7);
+
+module.exports = function(gantt){
+	return {
+
+		// if false - dhxr param will added to prevent caching on client side (default),
+		// if true - do not add extra params
+		cache: true,
+
+		// default method for load/loadStruct, post/get allowed
+		// get - since 4.1.1, this should fix 412 error for macos safari
+		method: "get",
+
+		parse: function(data) {
+			if (typeof data !== "string") return data;
+
+			var obj;
+			data = data.replace(/^[\s]+/,"");
+			if (window.DOMParser && !env.isIE) { // ff,ie9
+				obj = (new window.DOMParser()).parseFromString(data, "text/xml");
+			} else if (window.ActiveXObject !== window.undefined) {
+				obj = new window.ActiveXObject("Microsoft.XMLDOM");
+				obj.async = "false";
+				obj.loadXML(data);
+			}
+			return obj;
+		},
+		xmltop: function(tagname, xhr, obj) {
+			if (typeof xhr.status == "undefined" || xhr.status < 400) {
+				var xml = (!xhr.responseXML) ? this.parse(xhr.responseText || xhr) : (xhr.responseXML || xhr);
+				if (xml && xml.documentElement !== null && !xml.getElementsByTagName("parsererror").length) {
+					return xml.getElementsByTagName(tagname)[0];
+				}
+			}
+			if (obj !== -1) gantt.callEvent("onLoadXMLError",["Incorrect XML", arguments[1], obj]);
+			return document.createElement("DIV");
+		},
+		xpath: function(xpathExp, docObj) {
+			if (!docObj.nodeName) docObj = docObj.responseXML || docObj;
+			if (env.isIE) {
+				return docObj.selectNodes(xpathExp)||[];
+			} else {
+				var rows = [];
+				var first;
+				var col = (docObj.ownerDocument||docObj).evaluate(xpathExp, docObj, null, XPathResult.ANY_TYPE, null);
+
+				while (true){
+					first = col.iterateNext();
+					if(first){
+						rows.push(first);
+					}else{
+						break;
+					}
+				}
+				return rows;
+			}
+		},
+		query: function(config) {
+			this._call(
+				(config.method || "GET"),
+				config.url,
+				config.data || "",
+				(config.async || true),
+				config.callback,
+				null,
+				config.headers
+			);
+		},
+		get: function(url, onLoad) {
+			this._call("GET", url, null, true, onLoad);
+		},
+		getSync: function(url) {
+			return this._call("GET", url, null, false);
+		},
+		put: function(url, postData, onLoad) {
+			this._call("PUT", url, postData, true, onLoad);
+		},
+		del: function(url, postData, onLoad) {
+			this._call("DELETE", url, postData, true, onLoad);
+		},
+		post: function(url, postData, onLoad) {
+			if (arguments.length == 1) {
+				postData = "";
+			} else if (arguments.length == 2 && (typeof(postData) == "function" || typeof(window[postData]) == "function")) {
+				onLoad = postData;
+				postData = "";
+			} else {
+				postData = String(postData);
+			}
+			this._call("POST", url, postData, true, onLoad);
+		},
+		postSync: function(url, postData) {
+			postData = (postData === null ? "" : String(postData));
+			return this._call("POST", url, postData, false);
+		},
+		getLong: function(url, onLoad) {
+			this._call("GET", url, null, true, onLoad, {url:url});
+		},
+		postLong: function(url, postData, onLoad) {
+			if (arguments.length == 2 && (typeof(postData) == "function" || typeof(window[postData]))) {
+				onLoad = postData;
+				postData = "";
+			}
+			this._call("POST", url, postData, true, onLoad, {url:url, postData:postData});
+		},
+		_call: function(method, url, postData, async, onLoad, longParams, headers) {
+
+			var t = (window.XMLHttpRequest && !env.isIE ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
+			var isQt = (navigator.userAgent.match(/AppleWebKit/) !== null && navigator.userAgent.match(/Qt/) !== null && navigator.userAgent.match(/Safari/) !== null);
+
+			if (!!async) {
+				t.onreadystatechange = function() {
+					if ((t.readyState == 4) || (isQt && t.readyState == 3)) { // what for long response and status 404?
+						if (t.status != 200 || t.responseText === "")
+							if (!gantt.callEvent("onAjaxError", [t])) return;
+
+						window.setTimeout(function(){
+							if (typeof(onLoad) == "function") {
+								onLoad.apply(window, [{xmlDoc:t, filePath:url}]); // dhtmlx-compat, response.xmlDoc.responseXML/responseText
+							}
+							if (longParams) {
+								if (typeof(longParams.postData) != "undefined") {
+									this.postLong(longParams.url, longParams.postData, onLoad);
+								} else {
+									this.getLong(longParams.url, onLoad);
+								}
+							}
+							onLoad = null;
+							t = null;
+						},1);
+					}
+				};
+			}
+
+			if (method == "GET" && !this.cache) {
+				url += (url.indexOf("?")>=0?"&":"?")+"dhxr"+new Date().getTime()+"=1";
+			}
+
+			t.open(method, url, async);
+
+			if (headers){
+				for (var key in headers)
+					t.setRequestHeader(key, headers[key]);
+			} else if (method.toUpperCase() == "POST" || method == "PUT" || method == "DELETE") {
+				t.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+			} else if (method == "GET") {
+				postData = null;
+			}
+
+			t.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+
+			t.send(postData);
+
+			if (!async) return {xmlDoc:t, filePath:url}; // dhtmlx-compat, response.xmlDoc.responseXML/responseText
+
+		},
+		urlSeparator: function(str){
+			if (str.indexOf("?") != -1)
+				return "&";
+			else
+				return "?";
+		}
+	};
+};
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports) {
+
+/*
+ %d - the day as a number with a leading zero ( 01 to 31 );
+ %j - the day as a number without a leading zero ( 1 to 31 );
+ %D - the day as an abbreviation ( Sun to Sat );
+ %l - the day as a full name ( Sunday to Saturday );
+ %W - the ISO-8601 week number of the year. Weeks start on Monday; 1)
+ %m - the month as a number without a leading zero ( 1 to 12 );
+ %n - the month as a number with a leading zero ( 01 to 12);
+ %M - the month as an abbreviation ( Jan to Dec );
+ %F - the month as a full name ( January to December );
+ %y - the year as a two-digit number ( 00 to 99 );
+ %Y - the year as a four-digit number ( 1900–9999 );
+ %h - the hour based on the 12-hour clock ( 00 to 11 );
+ %H - the hour based on the 24-hour clock ( 00 to 23 );
+ %i - the minute as a number with a leading zero ( 00 to 59 );
+ %s - the second as a number without a leading zero ( 00 to 59 ); 2)
+ %a - displays am (for times from midnight until noon) and pm (for times from noon until midnight);
+ %A - displays AM (for times from midnight until noon) and PM (for times from noon until midnight).
+*/
+
+module.exports = function(gantt) {
+	var dateHelper = {
+		init: function () {
+			var locale = gantt.locale;
+
+			var s = locale.date.month_short;
+			var t = locale.date.month_short_hash = {};
+			for (var i = 0; i < s.length; i++)
+				t[s[i]] = i;
+
+			var s = locale.date.month_full;
+			var t = locale.date.month_full_hash = {};
+			for (var i = 0; i < s.length; i++)
+				t[s[i]] = i;
+		},
+		date_part: function (date) {
+			var old = new Date(date);
+			date.setHours(0);
+			this.hour_start(date);
+			if (date.getHours() && //shift to yesterday on dst
+				(date.getDate() < old.getDate() || date.getMonth() < old.getMonth() || date.getFullYear() < old.getFullYear()))
+				date.setTime(date.getTime() + 60 * 60 * 1000 * (24 - date.getHours()));
+			return date;
+		},
+		time_part: function (date) {
+			return (date.valueOf() / 1000 - date.getTimezoneOffset() * 60) % 86400;
+		},
+		week_start: function (date) {
+			var shift = date.getDay();
+			if (gantt.config.start_on_monday) {
+				if (shift === 0) shift = 6;
+				else shift--;
+			}
+			return this.date_part(this.add(date, -1 * shift, "day"));
+		},
+		month_start: function (date) {
+			date.setDate(1);
+			return this.date_part(date);
+		},
+		quarter_start: function (date) {
+			this.month_start(date);
+			var m = date.getMonth(),
+				res_month;
+
+			if (m >= 9) {
+				res_month = 9;
+			} else if (m >= 6) {
+				res_month = 6;
+			} else if (m >= 3) {
+				res_month = 3;
+			} else {
+				res_month = 0;
+			}
+
+			date.setMonth(res_month);
+			return date;
+		},
+		year_start: function (date) {
+			date.setMonth(0);
+			return this.month_start(date);
+		},
+		day_start: function (date) {
+			return this.date_part(date);
+		},
+		hour_start: function (date) {
+			if (date.getMinutes())
+				date.setMinutes(0);
+			this.minute_start(date);
+
+			return date;
+		},
+		minute_start: function (date) {
+			if (date.getSeconds())
+				date.setSeconds(0);
+			if (date.getMilliseconds())
+				date.setMilliseconds(0);
+			return date;
+		},
+		_add_days: function (date, inc) {
+			var ndate = new Date(date.valueOf());
+
+			ndate.setDate(ndate.getDate() + inc);
+			if (inc >= 0 && (!date.getHours() && ndate.getHours()) &&//shift to yesterday on dst
+				(ndate.getDate() <= date.getDate() || ndate.getMonth() < date.getMonth() || ndate.getFullYear() < date.getFullYear()))
+				ndate.setTime(ndate.getTime() + 60 * 60 * 1000 * (24 - ndate.getHours()));
+			return ndate;
+		},
+
+		add: function (date, inc, mode) {
+			/*jsl:ignore*/
+			var ndate = new Date(date.valueOf());
+			switch (mode) {
+				case "day":
+					ndate = this._add_days(ndate, inc);
+					break;
+				case "week":
+					ndate = this._add_days(ndate, inc * 7);
+					break;
+				case "month":
+					ndate.setMonth(ndate.getMonth() + inc);
+					break;
+				case "year":
+					ndate.setYear(ndate.getFullYear() + inc);
+					break;
+				case "hour":
+					/*
+						adding hours/minutes via setHour(getHour() + inc) gives weird result when
+						adding one hour to the time before switch to a Daylight Saving time
+
+						example: //Sun Mar 30 2014 01:00:00 GMT+0100 (W. Europe Standard Time)
+						new Date(2014, 02, 30, 1).setHours(2)
+						>>Sun Mar 30 2014 01:00:00 GMT+0100 (W. Europe Standard Time)
+
+						setTime seems working as expected
+					 */
+					ndate.setTime(ndate.getTime() + inc * 60 * 60 * 1000);
+					break;
+				case "minute":
+
+					ndate.setTime(ndate.getTime() + inc * 60 * 1000);
+
+					break;
+				default:
+					return this["add_" + mode](date, inc, mode);
+			}
+			return ndate;
+			/*jsl:end*/
+		},
+		add_quarter: function (date, inc) {
+			return this.add(date, inc * 3, "month");
+		},
+
+		to_fixed: function (num) {
+			if (num < 10) return "0" + num;
+			return num;
+		},
+		copy: function (date) {
+			return new Date(date.valueOf());
+		},
+		date_to_str: function (format, utc) {
+			format = format.replace(/%[a-zA-Z]/g, function (a) {
+				switch (a) {
+					case "%d":
+						return "\"+to_fixed(date.getDate())+\"";
+					case "%m":
+						return "\"+to_fixed((date.getMonth()+1))+\"";
+					case "%j":
+						return "\"+date.getDate()+\"";
+					case "%n":
+						return "\"+(date.getMonth()+1)+\"";
+					case "%y":
+						return "\"+to_fixed(date.getFullYear()%100)+\"";
+					case "%Y":
+						return "\"+date.getFullYear()+\"";
+					case "%D":
+						return "\"+locale.date.day_short[date.getDay()]+\"";
+					case "%l":
+						return "\"+locale.date.day_full[date.getDay()]+\"";
+					case "%M":
+						return "\"+locale.date.month_short[date.getMonth()]+\"";
+					case "%F":
+						return "\"+locale.date.month_full[date.getMonth()]+\"";
+					case "%h":
+						return "\"+to_fixed((date.getHours()+11)%12+1)+\"";
+					case "%g":
+						return "\"+((date.getHours()+11)%12+1)+\"";
+					case "%G":
+						return "\"+date.getHours()+\"";
+					case "%H":
+						return "\"+to_fixed(date.getHours())+\"";
+					case "%i":
+						return "\"+to_fixed(date.getMinutes())+\"";
+					case "%a":
+						return "\"+(date.getHours()>11?\"pm\":\"am\")+\"";
+					case "%A":
+						return "\"+(date.getHours()>11?\"PM\":\"AM\")+\"";
+					case "%s":
+						return "\"+to_fixed(date.getSeconds())+\"";
+					case "%W":
+						return "\"+to_fixed(getISOWeek(date))+\"";
+					default:
+						return a;
+				}
+			});
+			if (utc) format = format.replace(/date\.get/g, "date.getUTC");
+			var dateToStr = new Function("date", "to_fixed", "locale", "getISOWeek", "return \"" + format + "\";");
+
+			return function (date) {
+				return dateToStr(date, dateHelper.to_fixed, gantt.locale, dateHelper.getISOWeek);
+			};
+		},
+		str_to_date: function (format, utc) {
+			var splt = "var temp=date.match(/[a-zA-Z]+|[0-9]+/g);";
+			var mask = format.match(/%[a-zA-Z]/g);
+			for (var i = 0; i < mask.length; i++) {
+				switch (mask[i]) {
+					case "%j":
+					case "%d":
+						splt += "set[2]=temp[" + i + "]||1;";
+						break;
+					case "%n":
+					case "%m":
+						splt += "set[1]=(temp[" + i + "]||1)-1;";
+						break;
+					case "%y":
+						splt += "set[0]=temp[" + i + "]*1+(temp[" + i + "]>50?1900:2000);";
+						break;
+					case "%g":
+					case "%G":
+					case "%h":
+					case "%H":
+						splt += "set[3]=temp[" + i + "]||0;";
+						break;
+					case "%i":
+						splt += "set[4]=temp[" + i + "]||0;";
+						break;
+					case "%Y":
+						splt += "set[0]=temp[" + i + "]||0;";
+						break;
+					case "%a":
+					case "%A":
+						splt += "set[3]=set[3]%12+((temp[" + i + "]||'').toLowerCase()=='am'?0:12);";
+						break;
+					case "%s":
+						splt += "set[5]=temp[" + i + "]||0;";
+						break;
+					case "%M":
+						splt += "set[1]=locale.date.month_short_hash[temp[" + i + "]]||0;";
+						break;
+					case "%F":
+						splt += "set[1]=locale.date.month_full_hash[temp[" + i + "]]||0;";
+						break;
+					default:
+						break;
+				}
+			}
+			var code = "set[0],set[1],set[2],set[3],set[4],set[5]";
+			if (utc) code = " Date.UTC(" + code + ")";
+			var strToDate = new Function("date", "locale", "var set=[0,0,1,0,0,0]; " + splt + " return new Date(" + code + ");");
+
+			return function (dateString) {
+				return strToDate(dateString, gantt.locale);
+			};
+		},
+		getISOWeek: function (ndate) {
+			if (!ndate) return false;
+			var nday = ndate.getDay();
+			if (nday === 0) {
+				nday = 7;
+			}
+			var first_thursday = new Date(ndate.valueOf());
+			first_thursday.setDate(ndate.getDate() + (4 - nday));
+			var year_number = first_thursday.getFullYear(); // year of the first Thursday
+			var ordinal_date = Math.round((first_thursday.getTime() - new Date(year_number, 0, 1).getTime()) / 86400000); //ordinal date of the first Thursday - 1 (so not really ordinal date)
+			var week_number = 1 + Math.floor(ordinal_date / 7);
+			return week_number;
+		},
+		getUTCISOWeek: function (ndate) {
+			return this.getISOWeek(ndate);
+		},
+		convert_to_utc: function (date) {
+			return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+		},
+		parseDate: function (date, format) {
+			// raw date may be of type string, number (timestamp) or something else
+			// do not check for instanceof Date explicitly, since we may swap native date with different date implementation at some point
+			if (date && !date.getFullYear) {
+				if (gantt.defined(format)) {
+					if (typeof(format) == "string")
+						format = gantt.defined(gantt.templates[format]) ? gantt.templates[format] : gantt.date.str_to_date(format);
+					else
+						format = gantt.templates.xml_date;
+				}
+				if (date)
+					date = format(date);
+				else
+					date = null;
+			}
+			return date;
+		}
+	};
+	return dateHelper;
+};
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var eventable = __webpack_require__(2);
+var utils = __webpack_require__(0);
+var timeout = __webpack_require__(9);
+
+module.exports = function(gantt){
+
+	function copyDomEvent(e){
+		return {
+			target: e.target || e.srcElement,
+			pageX: e.pageX,
+			pageY: e.pageY,
+			clientX: e.clientX,
+			clientY: e.clientY,
+			metaKey: e.metaKey,
+			shiftKey: e.shiftKey,
+			ctrlKey: e.ctrlKey,
+			altKey: e.altKey
+		};
+	}
+
+	function DnD(obj, config) {
+		this._obj = obj;
+		this._settings = config || {};
+		eventable(this);
+
+		var inputMethods = this.getInputMethods();
+
+		this._drag_start_timer = null;
+		gantt.attachEvent("onGanttScroll", utils.bind(function (left, top) {
+			this.clearDragTimer();
+		}, this));
+
+		for(var i = 0; i < inputMethods.length; i++){
+			(utils.bind(function(input){
+
+				gantt.event(obj, input.down, utils.bind(function (e) {
+					if(!input.accessor(e)){
+						return;
+					}
+
+					this._settings.original_target = copyDomEvent(e);
+
+					if (gantt.config.touch) {
+						this.clearDragTimer();
+
+						this._drag_start_timer = setTimeout(utils.bind(function () {
+							this.dragStart(obj, e, input);
+						}, this), gantt.config.touch_drag);
+					}
+					else {
+						this.dragStart(obj, e, input);
+					}
+				}, this));
+
+				gantt.event(document.body, input.up, utils.bind(function (e) {
+					if(!input.accessor(e)){
+						return;
+					}
+					this.clearDragTimer();
+				}, this));
+
+			}, this))(inputMethods[i]);
+		}
+	}
+
+	DnD.prototype = {
+		traceDragEvents: function (domElement, inputMethod) {
+			var mousemove = utils.bind(function (e) {
+				return this.dragMove(domElement, e, inputMethod.accessor);
+			}, this);
+			var scroll = utils.bind(function (e) {
+				return this.dragScroll(domElement, e);
+			}, this);
+
+			var limited_mousemove = utils.bind(function (e) {
+				if (e && e.preventDefault) //Cancel default action on DND
+					e.preventDefault();
+				(e || event).cancelBubble = true;
+				if (utils.defined(this.config.updates_per_second)) {
+					if (!timeout(this, this.config.updates_per_second))
+						return true;
+				}
+				return mousemove(e);
+			}, this);
+
+			var mouseup = utils.bind(function (e) {
+				gantt.eventRemove(document.body, inputMethod.move, limited_mousemove);
+				gantt.eventRemove(document.body, inputMethod.up, mouseup);
+				return this.dragEnd(domElement);
+			}, this);
+
+
+			gantt.event(document.body, inputMethod.move, limited_mousemove);
+			gantt.event(document.body, inputMethod.up, mouseup);
+		},
+		checkPositionChange: function (pos) {
+			var diff_x = pos.x - this.config.pos.x;
+			var diff_y = pos.y - this.config.pos.y;
+			var distance = Math.sqrt(Math.pow(Math.abs(diff_x), 2) + Math.pow(Math.abs(diff_y), 2));
+
+			if (distance > this.config.sensitivity) {
+				return true;
+			} else {
+				return false;
+			}
+		},
+		initDnDMarker: function () {
+			// create dnd placeholder and put it in dom
+			var marker = this.config.marker = document.createElement("div");
+			marker.className = "gantt_drag_marker";
+			marker.innerHTML = "Dragging object";
+			document.body.appendChild(marker);
+		},
+		backupEventTarget: function (domEvent, getEvent) {
+			if (!gantt.config.touch) {
+				return;
+			}
+
+			// keep original event target in DOM in order to keep dnd on touchmove event
+			var e = getEvent(domEvent);
+
+			var el = e.target || e.srcElement;
+			var copy = el.cloneNode(true);
+			//this.config.target.target = copy;
+			this.config.original_target = copyDomEvent(e);
+			this.config.original_target.target = copy;
+			this.config.backup_element = el;
+			el.parentNode.appendChild(copy);
+
+			el.style.display = "none";
+			document.body.appendChild(el);
+		},
+		getInputMethods: function () {
+			// bind actions to browser events
+			var inputMethods = [];
+
+			inputMethods.push({
+				"move": "mousemove",
+				"down": "mousedown",
+				"up": "mouseup",
+				"accessor": function (e) {
+					return e;
+				}
+			});
+
+			if (gantt.config.touch) {
+
+				var touchEventsSupported = true;
+				try{
+					document.createEvent("TouchEvent");
+				}catch (e){
+					touchEventsSupported = false;
+				}
+
+				if(touchEventsSupported){
+					inputMethods.push({
+						"move": "touchmove",
+						"down": "touchstart",
+						"up": "touchend",
+						"accessor": function (ev) {
+							if (ev.touches && ev.touches.length > 1) return null;
+							if (ev.touches[0])
+								return {
+									target: document.elementFromPoint(ev.touches[0].clientX, ev.touches[0].clientY),
+									pageX: ev.touches[0].pageX,
+									pageY: ev.touches[0].pageY,
+									clientX: ev.touches[0].clientX,
+									clientY: ev.touches[0].clientY
+								};
+							else
+								return ev;
+						}
+					});
+				}else if(window.navigator.pointerEnabled){
+					inputMethods.push({
+						"move": "pointermove",
+						"down": "pointerdown",
+						"up": "pointerup",
+						"accessor": function (ev) {
+							if (ev.pointerType == "mouse") return null;
+							return ev;
+						}
+					});
+
+				}else if (window.navigator.msPointerEnabled){
+					inputMethods.push({
+						"move": "MSPointerMove",
+						"down": "MSPointerDown",
+						"up": "MSPointerUp",
+						"accessor": function (ev) {
+							if (ev.pointerType == ev.MSPOINTER_TYPE_MOUSE) return null;
+							return ev;
+						}
+					});
+				}
+			}
+
+			return inputMethods;
+		},
+		clearDragTimer: function () {
+			if (this._drag_start_timer) {
+				clearTimeout(this._drag_start_timer);
+				this._drag_start_timer = null;
+			}
+		},
+		dragStart: function (obj, e, inputMethod) {
+			this.config = {
+				obj: obj,
+				marker: null,
+				started: false,
+				pos: this.getPosition(e),
+				sensitivity: 4
+			};
+			if (this._settings)
+				utils.mixin(this.config, this._settings, true);
+
+
+			this.traceDragEvents(obj, inputMethod);
+
+			gantt._prevent_touch_scroll = true;
+			document.body.className += " gantt_noselect";
+
+			if (gantt.config.touch) {
+				this.dragMove(obj, e, inputMethod.accessor);
+			}
+
+		},
+		dragMove: function (obj, e, getEvent) {
+			var source = getEvent(e);
+			if (!source) return;
+
+			if (!this.config.marker && !this.config.started) {
+				var pos = this.getPosition(source);
+
+				if (gantt.config.touch || this.checkPositionChange(pos)) {
+					// real drag starts here,
+					// when user moves mouse at first time after onmousedown
+					this.config.started = true;
+					this.config.ignore = false;
+					if (this.callEvent("onBeforeDragStart", [obj, this.config.original_target]) === false) {
+						this.config.ignore = true;
+						return true;
+					}
+					this.backupEventTarget(e, getEvent);
+					this.initDnDMarker();
+					gantt._touch_feedback();
+					this.callEvent("onAfterDragStart", [obj, this.config.original_target]);
+				} else {
+					this.config.ignore = true;
+				}
+			}
+
+
+			if (!this.config.ignore) {
+				source.pos = this.getPosition(source);
+				this.config.marker.style.left = source.pos.x + "px";
+				this.config.marker.style.top = source.pos.y + "px";
+				this.callEvent("onDragMove", [obj, source]);
+				return false;
+			}
+		},
+
+		dragEnd: function (obj) {
+			var target = this.config.backup_element;
+			if (target && target.parentNode) {
+				target.parentNode.removeChild(target);
+			}
+			gantt._prevent_touch_scroll = false;
+			if (this.config.marker) {
+				this.config.marker.parentNode.removeChild(this.config.marker);
+				this.config.marker = null;
+
+				this.callEvent("onDragEnd", []);
+			}
+			document.body.className = document.body.className.replace(" gantt_noselect", "");
+		},
+
+		getPosition: function (e) {
+			var x = 0, y = 0;
+			e = e || window.event;
+			if (e.pageX || e.pageY) {
+				x = e.pageX;
+				y = e.pageY;
+			} else if (e.clientX || e.clientY) {
+				x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+				y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+			}
+			return {x: x, y: y};
+		}
+	};
+
+	return DnD;
+};
+
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt) {
+
+	var regTemplates = {};
+
+	function initTemplate(name, initial, template_name) {
+		template_name = template_name || name;
+		var config = gantt.config,
+			templates = gantt.templates;
+
+		if (gantt.config[name] && regTemplates[template_name] != config[name]) {
+			if (!(initial && templates[template_name])) {
+				templates[template_name] = gantt.date.date_to_str(config[name]);
+				regTemplates[template_name] = config[name];
+			}
+		}
+	}
+
+	function initTemplates() {
+		var labels = gantt.locale.labels;
+		labels.gantt_save_btn = labels.icon_save;
+		labels.gantt_cancel_btn = labels.icon_cancel;
+		labels.gantt_delete_btn = labels.icon_delete;
+
+
+		var date = gantt.date;
+
+		//build configuration based templates
+		var d = date.date_to_str;
+		var c = gantt.config;
+		initTemplate("date_scale", true, undefined, gantt.config, gantt.templates);
+		initTemplate("date_grid", true, "grid_date_format", gantt.config, gantt.templates);
+		initTemplate("task_date", true, undefined, gantt.config, gantt.templates);
+
+		gantt.mixin(gantt.templates, {
+			xml_date: date.str_to_date(c.xml_date, c.server_utc),
+			xml_format: d(c.xml_date, c.server_utc),
+			api_date: date.str_to_date(c.api_date),
+			progress_text: function (start, end, task) {
+				return "";
+			},
+			grid_header_class: function (column, config) {
+				return "";
+			},
+
+			task_text: function (start, end, task) {
+				return task.text;
+			},
+			task_class: function (start, end, task) {
+				return "";
+			},
+			grid_row_class: function (start, end, task) {
+				return "";
+			},
+			task_row_class: function (start, end, task) {
+				return "";
+			},
+			task_cell_class: function (item, date) {
+				return "";
+			},
+			scale_cell_class: function (date) {
+				return "";
+			},
+			scale_row_class: function (date) {
+				return "";
+			},
+
+			grid_indent: function (item) {
+				return "<div class='gantt_tree_indent'></div>";
+			},
+			grid_folder: function (item) {
+				return "<div class='gantt_tree_icon gantt_folder_" + (item.$open ? "open" : "closed") + "'></div>";
+			},
+			grid_file: function (item) {
+				return "<div class='gantt_tree_icon gantt_file'></div>";
+			},
+			grid_open: function (item) {
+				return "<div class='gantt_tree_icon gantt_" + (item.$open ? "close" : "open") + "'></div>";
+			},
+			grid_blank: function (item) {
+				return "<div class='gantt_tree_icon gantt_blank'></div>";
+			},
+			date_grid: function (date, item) {
+				if (item && gantt.isUnscheduledTask(item) && gantt.config.show_unscheduled) {
+					return gantt.templates.task_unscheduled_time(item);
+				} else {
+					return gantt.templates.grid_date_format(date);
+				}
+			},
+
+			task_time: function (start, end, ev) {
+				if (gantt.isUnscheduledTask(ev) && gantt.config.show_unscheduled) {
+					return gantt.templates.task_unscheduled_time(ev);
+				} else {
+					return gantt.templates.task_date(start) + " - " + gantt.templates.task_date(end);
+				}
+			},
+
+			task_unscheduled_time: function (task) {
+				return "";
+			},
+
+			time_picker: d(c.time_picker),
+			link_class: function (link) {
+				return "";
+			},
+			link_description: function (link) {
+				var from = gantt.getTask(link.source),
+					to = gantt.getTask(link.target);
+
+				return "<b>" + from.text + "</b> &ndash;  <b>" + to.text + "</b>";
+			},
+
+			drag_link: function (from, from_start, to, to_start) {
+				from = gantt.getTask(from);
+				var labels = gantt.locale.labels;
+
+				var text = "<b>" + from.text + "</b> " + (from_start ? labels.link_start : labels.link_end) + "<br/>";
+				if (to) {
+					to = gantt.getTask(to);
+					text += "<b> " + to.text + "</b> " + (to_start ? labels.link_start : labels.link_end) + "<br/>";
+				}
+				return text;
+			},
+			drag_link_class: function (from, from_start, to, to_start) {
+				var add = "";
+
+				if (from && to) {
+					var allowed = gantt.isLinkAllowed(from, to, from_start, to_start);
+					add = " " + (allowed ? "gantt_link_allow" : "gantt_link_deny");
+				}
+
+				return "gantt_link_tooltip" + add;
+			},
+
+			/* used for aria-labels of bar elements and for tooltip.js */
+			tooltip_date_format: date.date_to_str("%Y-%m-%d"),
+			tooltip_text: function (start, end, event) {
+				return "<b>Task:</b> " + event.text + "<br/><b>Start date:</b> " + gantt.templates.tooltip_date_format(start) + "<br/><b>End date:</b> " + gantt.templates.tooltip_date_format(end);
+			}
+		});
+	}
+
+	return {
+		initTemplates: initTemplates,
+		initTemplate: initTemplate
+	};
+
+};
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+
+var StateService = (function(){
+	var stateProviders = {};
+
+	function getState(name){
+		if(name){
+			return stateProviders[name].method();
+		}else{
+			var res = {};
+			for(var i in stateProviders){
+				if(!stateProviders[i].internal)
+					utils.mixin(res, stateProviders[i].method(), true);
+			}
+			return res;
+		}
+	}
+
+	function registerProvider(name, provider, internal){
+		stateProviders[name] = { method: provider, internal: internal};
+	}
+
+	function unregisterProvider(name){
+		delete stateProviders[name];
+	}
+
+	return {
+		getState: getState,
+		registerProvider: registerProvider,
+		unregisterProvider: unregisterProvider
+	};
+});
+
+module.exports = StateService;
+
+
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+var domHelpers = __webpack_require__(1);
+
+module.exports = function(gantt) {
+
+	var _dhx_msg_cfg = null;
+
+	function callback(config, result) {
+		var usercall = config.callback;
+		modalBox.hide(config.box);
+
+		_dhx_msg_cfg = config.box = null;
+		if (usercall)
+			usercall(result);
+	}
+
+	function modal_key(e) {
+		if (_dhx_msg_cfg) {
+			e = e || event;
+			var code = e.which || event.keyCode;
+			var preventDefault = false;
+
+			if (messageBox.keyboard) {
+				if (code == 13 || code == 32) {
+					// default behavior is to confirm/submit popup on space/enter
+					// if browser focus is set on button element - do button click instead of default behavior
+					var target = e.target || e.srcElement;
+					if (domHelpers.getClassName(target).indexOf("gantt_popup_button") > -1 && target.click) {
+						target.click();
+					} else {
+						callback(_dhx_msg_cfg, true);
+						preventDefault = true;
+					}
+				}
+
+				if (code == 27) {
+					callback(_dhx_msg_cfg, false);
+					preventDefault = true;
+				}
+			}
+
+			if (preventDefault) {
+				if (e.preventDefault)
+					e.preventDefault();
+				return !(e.cancelBubble = true);
+			}
+			return;
+		}
+	}
+
+	gantt.event(document, "keydown", modal_key, true);
+
+	function modality(mode) {
+		if (!modality.cover) {
+			modality.cover = document.createElement("DIV");
+			//necessary for IE only
+			modality.cover.onkeydown = modal_key;
+			modality.cover.className = "dhx_modal_cover";
+			document.body.appendChild(modality.cover);
+		}
+		var height = document.body.scrollHeight;
+		modality.cover.style.display = mode ? "inline-block" : "none";
+	}
+
+	function button(text, className, result) {
+		var buttonAriaAttrs = gantt._waiAria.messageButtonAttrString(text);
+		var name = className.toLowerCase().replace(/ /g, "_");
+		var button_css = "gantt_" + name + "_button" + " dhtmlx_" + name + "_button"; // dhtmlx_ok_button, dhtmlx_click_me_button
+		return "<div " + buttonAriaAttrs + " class='gantt_popup_button dhtmlx_popup_button " + button_css + "' result='" + result + "' ><div>" + text + "</div></div>";
+	}
+
+	function info(text) {
+		if (!messageBox.area) {
+			messageBox.area = document.createElement("DIV");
+			messageBox.area.className = "gantt_message_area dhtmlx_message_area";
+			messageBox.area.style[messageBox.position] = "5px";
+			document.body.appendChild(messageBox.area);
+		}
+
+		messageBox.hide(text.id);
+		var message = document.createElement("DIV");
+		message.innerHTML = "<div>" + text.text + "</div>";
+		message.className = "gantt-info dhtmlx-info gantt-" + text.type + " dhtmlx-" + text.type;
+		message.onclick = function () {
+			messageBox.hide(text.id);
+			text = null;
+		};
+
+		gantt._waiAria.messageInfoAttr(message);
+
+		if (messageBox.position == "bottom" && messageBox.area.firstChild)
+			messageBox.area.insertBefore(message, messageBox.area.firstChild);
+		else
+			messageBox.area.appendChild(message);
+
+		if (text.expire > 0)
+			messageBox.timers[text.id] = window.setTimeout(function () {
+				messageBox.hide(text.id);
+			}, text.expire);
+
+		messageBox.pull[text.id] = message;
+		message = null;
+
+		return text.id;
+	}
+
+	function getFirstDefined() {
+		var values = [].slice.apply(arguments, [0]);
+
+		for (var i = 0; i < values.length; i++) {
+			if (values[i]) {
+				return values[i];
+			}
+		}
+
+	}
+
+	function _boxStructure(config, ok, cancel) {
+		var box = document.createElement("DIV");
+
+		var locale = gantt.locale;
+
+		var contentId = utils.uid();
+		gantt._waiAria.messageModalAttr(box, contentId);
+
+
+		box.className = " gantt_modal_box dhtmlx_modal_box gantt-" + config.type + " dhtmlx-" + config.type;
+		box.setAttribute("dhxbox", 1);
+
+		var inner = '';
+
+		if (config.width)
+			box.style.width = config.width;
+		if (config.height)
+			box.style.height = config.height;
+		if (config.title)
+			inner += '<div class="gantt_popup_title dhtmlx_popup_title">' + config.title + '</div>';
+		inner += '<div class="gantt_popup_text dhtmlx_popup_text" id="' + contentId + '"><span>' + (config.content ? '' : config.text) + '</span></div><div  class="gantt_popup_controls dhtmlx_popup_controls">';
+		if (ok)
+			inner += button(getFirstDefined(config.ok, gantt.locale.labels.message_ok, "OK"), "ok", true);
+		if (cancel)
+			inner += button(getFirstDefined(config.cancel, gantt.locale.labels.message_cancel, "Cancel"), "cancel", false);
+
+		if (config.buttons) {
+			for (var i = 0; i < config.buttons.length; i++) {
+				var btn = config.buttons[i];
+				if (typeof btn == "object") {
+					// Support { label:"Save", css:"main_button", value:"save" }
+					var label = btn.label;
+					var css = btn.css || ("gantt_" + btn.label.toLowerCase() + "_button dhtmlx_" + btn.label.toLowerCase() + "_button");
+					var value = btn.value || i;
+					inner += button(label, css, value);
+				} else {
+					inner += button(btn, btn, i);
+				}
+			}
+		}
+
+		inner += '</div>';
+		box.innerHTML = inner;
+
+		if (config.content) {
+			var node = config.content;
+			if (typeof node == "string")
+				node = document.getElementById(node);
+			if (node.style.display == 'none')
+				node.style.display = "";
+			box.childNodes[config.title ? 1 : 0].appendChild(node);
+		}
+
+		box.onclick = function (e) {
+			e = e || event;
+			var source = e.target || e.srcElement;
+			if (!source.className) source = source.parentNode;
+			if (source.className.split(" ")[0] == "gantt_popup_button") {
+				var result = source.getAttribute("result");
+				result = (result == "true") || (result == "false" ? false : result);
+				callback(config, result);
+			}
+		};
+		config.box = box;
+		if (ok || cancel)
+			_dhx_msg_cfg = config;
+
+		return box;
+	}
+
+	function _createBox(config, ok, cancel) {
+		var box = config.tagName ? config : _boxStructure(config, ok, cancel);
+
+		if (!config.hidden)
+			modality(true);
+		document.body.appendChild(box);
+		var x = Math.abs(Math.floor(((window.innerWidth || document.documentElement.offsetWidth) - box.offsetWidth) / 2));
+		var y = Math.abs(Math.floor(((window.innerHeight || document.documentElement.offsetHeight) - box.offsetHeight) / 2));
+		if (config.position == "top")
+			box.style.top = "-3px";
+		else
+			box.style.top = y + 'px';
+		box.style.left = x + 'px';
+		//necessary for IE only
+		box.onkeydown = modal_key;
+
+		modalBox.focus(box);
+
+		if (config.hidden)
+			modalBox.hide(box);
+
+		gantt.callEvent("onMessagePopup", [box]);
+		return box;
+	}
+
+	function alertPopup(config) {
+		return _createBox(config, true, false);
+	}
+
+	function confirmPopup(config) {
+		return _createBox(config, true, true);
+	}
+
+	function boxPopup(config) {
+		return _createBox(config);
+	}
+
+	function box_params(text, type, callback) {
+		if (typeof text != "object") {
+			if (typeof type == "function") {
+				callback = type;
+				type = "";
+			}
+			text = {text: text, type: type, callback: callback};
+		}
+		return text;
+	}
+
+	function params(text, type, expire, id) {
+		if (typeof text != "object")
+			text = {text: text, type: type, expire: expire, id: id};
+		text.id = text.id || utils.uid();
+		text.expire = text.expire || messageBox.expire;
+		return text;
+	}
+
+	var alertBox = function () {
+		var text = box_params.apply(this, arguments);
+		text.type = text.type || "confirm";
+		return alertPopup(text);
+	};
+	var confirmBox = function () {
+		var text = box_params.apply(this, arguments);
+		text.type = text.type || "alert";
+		return confirmPopup(text);
+	};
+	var modalBox = function () {
+		var text = box_params.apply(this, arguments);
+		text.type = text.type || "alert";
+		return boxPopup(text);
+	};
+	modalBox.hide = function (node) {
+		while (node && node.getAttribute && !node.getAttribute("dhxbox"))
+			node = node.parentNode;
+		if (node) {
+			node.parentNode.removeChild(node);
+			modality(false);
+
+			gantt.callEvent("onAfterMessagePopup", [node]);
+		}
+	};
+
+	var domHelpers = __webpack_require__(1);
+
+	modalBox.focus = function (node) {
+		setTimeout(function () {
+			var focusable = domHelpers.getFocusableNodes(node);
+			if (focusable.length) {
+				if (focusable[0].focus) focusable[0].focus();
+			}
+		}, 1);
+	};
+
+	var messageBox = function (text, type, expire, id) {
+		text = params.apply(this, arguments);
+		text.type = text.type || "info";
+
+		var subtype = text.type.split("-")[0];
+		switch (subtype) {
+			case "alert":
+				return alertPopup(text);
+			case "confirm":
+				return confirmPopup(text);
+			case "modalbox":
+				return boxPopup(text);
+			default:
+				return info(text);
+		}
+	};
+
+	messageBox.seed = (new Date()).valueOf();
+	messageBox.uid = utils.uid;
+	messageBox.expire = 4000;
+	messageBox.keyboard = true;
+	messageBox.position = "top";
+	messageBox.pull = {};
+	messageBox.timers = {};
+
+	messageBox.hideAll = function () {
+		for (var key in messageBox.pull)
+			messageBox.hide(key);
+	};
+	messageBox.hide = function (id) {
+		var obj = messageBox.pull[id];
+		if (obj && obj.parentNode) {
+			window.setTimeout(function () {
+				obj.parentNode.removeChild(obj);
+				obj = null;
+			}, 2000);
+			obj.className += " hidden";
+
+			if (messageBox.timers[id])
+				window.clearTimeout(messageBox.timers[id]);
+			delete messageBox.pull[id];
+		}
+	};
+
+	var popups = [];
+	gantt.attachEvent("onMessagePopup", function(box){
+		popups.push(box);
+	});
+	gantt.attachEvent("onAfterMessagePopup", function(box){
+		for(var i = 0; i < popups.length; i++){
+			if(popups[i] === box){
+				popups.splice(i, 1);
+				i--;
+			}
+		}
+	});
+
+	gantt.attachEvent("onDestroy", function(){
+		if(modality.cover && modality.cover.parentNode){
+			modality.cover.parentNode.removeChild(modality.cover);
+		}
+
+		for(var i = 0; i < popups.length; i++){
+			if(popups[i].parentNode){
+				popups[i].parentNode.removeChild(popups[i]);
+			}
+		}
+		popups = null;
+
+		if(messageBox.area && messageBox.area.parentNode){
+			messageBox.area.parentNode.removeChild(messageBox.area);
+		}
+		messageBox = null;
+	});
+
+	return {
+		alert: alertBox,
+		confirm: confirmBox,
+		message: messageBox,
+		modalbox: modalBox
+	};
+};
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var uiFactory = __webpack_require__(33),
+	mouseEvents = __webpack_require__(35),
+	createLayers = __webpack_require__(36),
+	Cell = __webpack_require__(4),
+	Layout = __webpack_require__(11),
+	ViewLayout = __webpack_require__(39),
+	ViewCell = __webpack_require__(40),
+	Resizer = __webpack_require__(41),
+	Scrollbar = __webpack_require__(42),
+	Timeline = __webpack_require__(12),
+	Grid = __webpack_require__(14),
+	ResourceGrid = __webpack_require__(14),
+	ResourceTimeline = __webpack_require__(12);
+
+var renderTaskBar = __webpack_require__(45),
+	renderTaskBg = __webpack_require__(46),
+	renderLink = __webpack_require__(47),
+	gridRenderer = __webpack_require__(48);
+
+var mainGridInitializer = __webpack_require__(49);
+var mainTimelineInitializer = __webpack_require__(51);
+var mainLayoutInitializer = __webpack_require__(54);
+
+function initUI(gantt){
+	function inheritGridConfig(id){
+		return {
+			//width: gantt.config.grid_width
+		};
+	}
+
+	function attachInitializer(view, initializer){
+		var ext = initializer(gantt);
+		if(ext.onCreated)
+			ext.onCreated(view);
+		view.attachEvent("onReady", function(){
+			if(ext.onInitialized)
+				ext.onInitialized(view);
+		});
+		view.attachEvent("onDestroy", function(){
+			if(ext.onDestroyed)
+				ext.onDestroyed(view);
+		});
+	}
+
+	var factory = uiFactory.createFactory(gantt);
+	factory.registerView("cell", Cell);
+	factory.registerView("resizer", Resizer);
+	factory.registerView("scrollbar", Scrollbar);
+	factory.registerView("layout", Layout, function(view){
+		var id = view.$config ? view.$config.id : null;
+		if(id === "main"){
+			attachInitializer(view, mainLayoutInitializer);
+		}
+	});
+	factory.registerView("viewcell", ViewCell);
+	factory.registerView("multiview", ViewLayout);
+	factory.registerView("timeline", Timeline, function(view){
+		var id = view.$config ? view.$config.id : null;
+		if(id === "timeline" || view.$config.bind == "task"){
+			attachInitializer(view, mainTimelineInitializer);
+		}
+	});
+	factory.registerView("grid", Grid, function(view){
+		var id = view.$config ? view.$config.id : null;
+		if(id === "grid" || view.$config.bind == "task"){
+			attachInitializer(view, mainGridInitializer);
+		}
+	});
+
+	factory.registerView("resourceGrid", ResourceGrid);
+	factory.registerView("resourceTimeline", ResourceTimeline);
+
+	var layersEngine = createLayers(gantt);
+
+	return {
+		factory:factory,
+		mouseEvents: mouseEvents.init(gantt),
+		layersApi: layersEngine.init(),
+		render:{
+			gridLine: gridRenderer(gantt),
+			taskBg: renderTaskBg(gantt),
+			taskBar: renderTaskBar(gantt),
+			link: renderLink(gantt)
+		},
+		layersService: {
+			getDataRender: function(name){
+				return layersEngine.getDataRender(name, gantt);
+			},
+			createDataRender: function(config){
+				return layersEngine.createDataRender(config, gantt);
+			}
+		}
+	};
+}
+
+module.exports = {
+	init: initUI
+};
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0),
+	configurable = __webpack_require__(34);
+
+var uiFactory = function createFactory(gantt){
+	var views = {};
+
+	function ui(cell, parentView) {
+		var content;
+		var view = "cell";
+		if (cell.view){
+			view = "viewcell";
+		}else if (cell.resizer) {
+			view = "resizer";
+		}
+		else if (cell.rows || cell.cols) {
+			view = "layout";
+		}
+		else if (cell.views) {
+			view = "multiview";
+		}
+
+		content = createView.call(this, view, null, cell, parentView);
+		return content;
+	}
+	
+	var createdViews = {};
+
+	function createView(name, parent, config, parentView) {
+		var creator = views[name];
+
+		if(!creator || !creator.create)
+			return false;
+
+		if(name == "resizer" && !config.mode){
+			if(parentView.$config.cols){
+				config.mode = "x";
+			}else{
+				config.mode = "y";
+			}
+		}
+
+		if(name == "viewcell" && config.view == "scrollbar" && !config.scroll){
+			if(parentView.$config.cols){
+				config.scroll = "y";
+			}else{
+				config.scroll = "x";
+			}
+		}
+
+		var config = utils.copy(config);
+
+		if(!config.id && !createdViews[config.view]){
+			config.id = config.view;
+		}
+
+		if(config.id && !config.css){
+			config.css = config.id+"_cell";
+		}
+
+		var view = new creator.create(parent, config, this, gantt);
+
+		if(creator.configure){
+			creator.configure(view);
+		}
+
+		configurable(view, parentView);
+		if(!view.$id){
+			view.$id = config.id || gantt.uid();
+		}
+
+		if(!view.$parent && typeof parent == "object"){
+			view.$parent = parent;
+		}
+		if(!view.$config){
+			view.$config = config;
+		}
+
+		if(createdViews[view.$id]){
+			view.$id = gantt.uid();
+		}
+
+		createdViews[view.$id] = view;
+
+		return view;
+	}
+
+	function reset(){
+		createdViews = {};
+	}
+
+	function register(name, viewConstructor, configure){
+		views[name] = {create: viewConstructor, configure: configure};
+	}
+
+	function getView(id){
+		return createdViews[id];
+	}
+
+	var factory = {
+		initUI:ui,
+		reset: reset,
+		registerView: register,
+		createView: createView,
+		getView: getView
+	};
+
+	return factory;
+};
+
+module.exports = {
+	createFactory: uiFactory
+};
+
+
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+
+function ViewSettings(config){
+	utils.mixin(this, config, true);
+}
+
+
+function extendSettings (store, parentSettings){
+	var own = this.$config[store];
+
+	if(own){
+		if(own instanceof ViewSettings){
+			return own;
+		}else{
+			ViewSettings.prototype = parentSettings;
+			this.$config[store] = new ViewSettings(own);
+			return this.$config[store];
+		}
+	}else{
+		return parentSettings;
+	}
+}
+
+var configurable = function(parentView){
+	var parentConfig,
+		parentTemplates;
+
+	return {
+		$getConfig: function(){
+			if(!parentConfig){
+				parentConfig = parentView ? parentView.$getConfig() : this.$gantt.config;
+			}
+
+			return extendSettings.call(this, "config", parentConfig);
+		},
+		$getTemplates: function(){
+			if(!parentTemplates){
+				parentTemplates = parentView ? parentView.$getTemplates() : this.$gantt.templates;
+			}
+
+			return extendSettings.call(this, "templates", parentTemplates);
+		}
+	};
+};
+
+module.exports = function(obj, parent){
+	utils.mixin(obj, configurable(parent));
+};
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var domHelpers = __webpack_require__(1);
+
+var createMouseHandler = (function(domHelpers) {
+	return function (gantt) {
+		var eventHandlers = {
+			"click": {},
+			"doubleclick": {},
+			"contextMenu": {}
+		};
+
+		function addEventTarget(event, className, handler, root) {
+			if(!eventHandlers[event][className]){
+				eventHandlers[event][className] = [];
+			}
+
+			eventHandlers[event][className].push({
+				handler: handler,
+				root: root
+			});
+		}
+
+		function callHandler(eventName, className, root, args) {
+			var handlers = eventHandlers[eventName][className];
+			if(handlers){
+				for(var i = 0; i < handlers.length; i++){
+					if(!(root || handlers[i].root) || handlers[i].root === root){
+						handlers[i].handler.apply(this, args);
+					}
+				}
+			}
+		}
+
+		function onClick(e) {
+			e = e || window.event;
+			var trg = e.target || e.srcElement;
+			var id = gantt.locate(e);
+
+			var handlers = findEventHandlers(e, eventHandlers.click);
+			var res = true;
+			if (id !== null) {
+				res = !gantt.checkEvent("onTaskClick") || gantt.callEvent("onTaskClick", [id, e]);
+			} else {
+				gantt.callEvent("onEmptyClick", [e]);
+			}
+
+			if (res) {
+				var default_action = callEventHandlers(handlers, e, id);
+				if (!default_action)
+					return;
+
+				if (id && gantt.getTask(id) && gantt.config.select_task && !gantt.config.multiselect) {
+					gantt.selectTask(id);
+				}
+			}
+		}
+
+		function onContextMenu(e) {
+			e = e || window.event;
+			var src = e.target || e.srcElement,
+				taskId = gantt.locate(src),
+				linkId = gantt.locate(src, gantt.config.link_attribute);
+
+			var res = !gantt.checkEvent("onContextMenu") || gantt.callEvent("onContextMenu", [taskId, linkId, e]);
+			if (!res) {
+				if (e.preventDefault)
+					e.preventDefault();
+				else
+					e.returnValue = false;
+			}
+			return res;
+		}
+
+		function findEventHandlers(e, hash){
+			var trg = e.target || e.srcElement;
+			var handlers = [];
+			while (trg) {
+				var css = domHelpers.getClassName(trg);
+				if (css) {
+					css = css.split(" ");
+					for (var i = 0; i < css.length; i++) {
+						if (!css[i]) continue;
+						if (hash[css[i]]) {
+							var delegateHandlers = hash[css[i]];
+
+							for(var h = 0; h < delegateHandlers.length; h++){
+								if(delegateHandlers[h].root){
+									if(!domHelpers.isChildOf(trg, delegateHandlers[h].root)){
+										continue;
+									}
+								}
+								handlers.push(delegateHandlers[h].handler);
+							}
+						}
+					}
+				}
+				trg = trg.parentNode;
+			}
+			return handlers;
+		}
+
+		function callEventHandlers(handlers, e, id){
+			var res = true;
+
+			for(var i = 0; i < handlers.length; i++){
+				var handlerResult =  handlers[i].call(gantt, e, id, e.target || e.srcElement);
+				res = res && !(typeof handlerResult != "undefined" && handlerResult !== true);
+			}
+
+			return res;
+		}
+
+
+		function onDoubleClick(e) {
+			e = e || window.event;
+			var trg = e.target || e.srcElement;
+			var id = gantt.locate(e);
+
+			var handlers = findEventHandlers(e, eventHandlers.doubleclick);
+			var res = !gantt.checkEvent("onTaskDblClick") || gantt.callEvent("onTaskDblClick", [id, e]);
+			if (res) {
+				var default_action = callEventHandlers(handlers, e, id);
+				if (!default_action)
+					return;
+
+				if (id !== null && gantt.getTask(id)) {
+					if (res && gantt.config.details_on_dblclick) {
+						gantt.showLightbox(id);
+					}
+				}
+			}
+		}
+
+		function onMouseMove(e) {
+			if (gantt.checkEvent("onMouseMove")) {
+				var id = gantt.locate(e);
+				gantt._last_move_event = e;
+				gantt.callEvent("onMouseMove", [id, e]);
+			}
+		}
+
+		function detach(eventName, className, handler, root) {
+			if (eventHandlers[eventName]) {
+				for(var i = 0; i < eventHandlers[eventName].length; i++){
+					if(eventHandlers[eventName][i].root == root){
+						eventHandlers[eventName].splice(i, 1);
+						i--;
+					}
+				}
+			}
+		}
+
+		var domEvents = gantt._createDomEventScope();
+
+		function reset(node){
+
+			domEvents.detachAll();
+
+			if(node){
+				domEvents.attach(node, "click", onClick);
+				domEvents.attach(node, "dblclick", onDoubleClick);
+				domEvents.attach(node, "mousemove", onMouseMove);
+				domEvents.attach(node, "contextmenu", onContextMenu);
+			}
+		}
+
+
+
+		return {
+			reset: reset,
+			global: function(event, classname, handler){
+				addEventTarget(event, classname, handler, null);
+			},
+			delegate: addEventTarget,
+			detach: detach,
+			callHandler: callHandler,
+			onDoubleClick: onDoubleClick,
+			onMouseMove: onMouseMove,
+			onContextMenu: onContextMenu,
+			onClick: onClick,
+			destructor: function(){
+				reset();
+				eventHandlers = null;
+				domEvents = null;
+			}
+
+		};
+	};
+
+})(domHelpers);
+
+
+module.exports = {
+	init:createMouseHandler
+};
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var createLayerFactory = __webpack_require__(37);
+
+var createLayerEngine = function(gantt){
+	var factory = createLayerFactory(gantt);
+	return {
+		getDataRender: function(name){
+			return gantt.$services.getService("layer:" + name) || null;
+		},
+		createDataRender: function(config){
+			var name = config.name,
+				defaultContainer = config.defaultContainer,
+				previusSiblingContainer = config.defaultContainerSibling;
+
+			var layers = factory.createGroup(
+				defaultContainer,
+				previusSiblingContainer,
+				function(itemId, item){
+					if(layers.filters){
+						for(var i = 0; i < layers.filters.length; i++){
+							if(layers.filters[i](itemId, item) === false){
+								return false;
+							}
+						}
+					}else{
+						return true;
+					}
+				}
+			);
+
+			gantt.$services.setService("layer:" + name, function(){
+				return layers;
+			});
+
+			gantt.attachEvent("onGanttReady", function () {
+				layers.addLayer();// init layers on start
+			});
+
+			return layers;
+		},
+		init: function(){
+			var taskLayers = this.createDataRender({
+				name: "task",
+				defaultContainer: function(){
+					if(gantt.$task_data){
+						return gantt.$task_data;
+					}else if(gantt.$ui.getView("timeline")){
+						return gantt.$ui.getView("timeline").$task_data;
+					}
+				},
+				defaultContainerSibling: function(){
+					if(gantt.$task_links){
+						return gantt.$task_links;
+					}else if(gantt.$ui.getView("timeline")){
+						return gantt.$ui.getView("timeline").$task_links;
+					}
+				},
+				filter: function(item){
+
+				}
+			}, gantt);
+
+			var linkLayers = this.createDataRender({
+				name: "link",
+				defaultContainer: function(){
+					if(gantt.$task_data){
+						return gantt.$task_data;
+					}else if(gantt.$ui.getView("timeline")){
+						return gantt.$ui.getView("timeline").$task_data;
+					}
+				}
+			}, gantt);
+
+			return {
+				addTaskLayer: function(config){
+					return taskLayers.addLayer(config);
+				},
+
+				/*getTaskLayer: function(id){
+					return taskLayers.getLayer(id);
+				},*/
+
+				_getTaskLayers: function(){
+					return taskLayers.getLayers();
+				},
+				removeTaskLayer: function(id){
+					taskLayers.removeLayer(id);
+				},
+				/*eachTaskLayer: function(code){
+					taskLayers.eachLayer(code);
+				},*/
+				_clearTaskLayers: function(){
+					taskLayers.clear();
+				},
+				addLinkLayer: function(config){
+					return linkLayers.addLayer(config);
+				},
+				/*getLinkLayer: function(id){
+					return linkLayers.getLayer(id);
+				},*/
+				_getLinkLayers: function(){
+					return linkLayers.getLayers();
+				},
+				removeLinkLayer: function(id){
+					linkLayers.removeLayer(id);
+				},
+				/*eachLinkLayer: function(code){
+					linkLayers.eachLayer(code);
+				},*/
+				_clearLinkLayers: function(){
+					linkLayers.clear();
+				}
+			};
+		}
+	};
+};
+
+module.exports = createLayerEngine;
+
+/***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var renderFactoryProvider = __webpack_require__(38);
+var utils = __webpack_require__(0);
+
+var layerFactory = function(gantt){
+
+	var renderFactory = renderFactoryProvider(gantt);
+	return {
+	createGroup: function (get_container, rel_root, defaultFilters) {
+
+		var renderGroup = {
+			tempCollection: [],
+			renderers: {},
+			container: get_container,
+			filters: [],
+			getLayers: function () {
+				var res = [];
+				for (var i in this.renderers) {
+					res.push(this.renderers[i]);
+				}
+				return res;
+			},
+			getLayer: function (id) {
+				return this.renderers[id];
+			},
+			_add: function (layer) {
+				if (layer) {
+					layer.id = layer.id || utils.uid();
+					this.tempCollection.push(layer);
+				}
+
+				if (!this.container()) return;
+
+				var container = this.container();
+
+				var pending = this.tempCollection;
+				for (var i = 0; i < pending.length; i++) {
+					layer = pending[i];
+
+
+					var node = layer.container,
+						id = layer.id,
+						topmost = layer.topmost;
+					if (!node.parentNode) {
+						//insert on top or below the tasks
+						if (topmost) {
+							container.appendChild(node);
+						} else {
+							var rel = rel_root ? rel_root() : container.firstChild;
+							if (rel)
+								container.insertBefore(node, rel);
+							else
+								container.appendChild(node);
+						}
+					}
+					this.renderers[id] = renderFactory.getRenderer(
+						id,
+						layer,
+						node
+					);
+					this.tempCollection.splice(i, 1);
+					i--;
+				}
+			},
+			addLayer: function (config) {
+				//config = prepareConfig(config);
+				if(config){
+					if(typeof config == "function"){
+						config = {renderer: config};
+					}
+
+					if(config.filter === undefined){
+						config.filter = mergeFilters(defaultFilters || []);
+					}else if(config.filter instanceof Array){
+						config.filter.push(defaultFilters);
+						config.filter = mergeFilters(config.filter);
+					}
+
+					if(!config.container){
+						config.container = document.createElement("div");
+					}
+				}
+				this._add(config);
+				return (config ? config.id : undefined);
+			},
+			eachLayer: function(code){
+				for (var i in this.renderers) {
+					code(this.renderers[i]);
+				}
+			},
+			removeLayer: function (id) {
+				if(!this.renderers[id])
+					return;
+				this.renderers[id].destructor();
+				delete this.renderers[id];
+			},
+			clear: function () {
+				for (var i in this.renderers) {
+					this.renderers[i].destructor();
+				}
+				this.renderers = {};
+			}//,
+			//prepareConfig: prepareConfig
+		};
+
+		gantt.attachEvent("onDestroy", function(){
+			renderGroup.clear();
+			renderGroup = null;
+		});
+
+		return renderGroup;
+	}
+};};
+
+
+function mergeFilters(filter_methods){
+	if(!(filter_methods instanceof Array)){
+		filter_methods = Array.prototype.slice.call(arguments, 0);
+	}
+
+	return function(obj){
+		var res = true;
+		for(var i = 0, len = filter_methods.length; i < len; i++){
+			var filter_method = filter_methods[i];
+			if(filter_method){
+				res = res && (filter_method(obj.id, obj) !== false);
+			}
+		}
+
+		return res;
+	};
+}
+
+
+module.exports = layerFactory;
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports) {
+
+var rendererFactory = function(gantt){
+	var services = gantt.$services;
+
+	//hash of dom elements is needed to redraw single bar/link
+	var task_area_pulls = {},
+		task_area_renderers = {};
+
+	function getRenderer(id, layer, node) {
+
+		if (task_area_renderers[id])
+			return task_area_renderers[id];
+
+		if (!layer.renderer)
+			gantt.assert(false, "Invalid renderer call");
+
+		var renderOne = function(item){
+			return layer.renderer.call(this, item, layer.host);
+		} ;
+
+		var filter = layer.filter;
+
+		if (node)
+			node.setAttribute(services.config().layer_attribute, true);
+
+		task_area_renderers[id] = {
+			render_item: function (item, container) {
+				container = container || node;
+
+				if (filter) {
+					if (!filter(item)) {
+						this.remove_item(item.id);
+						return;
+					}
+				}
+
+				var dom = renderOne.call(gantt, item);
+				this.append(item, dom, container);
+
+			},
+
+			clear: function (container) {
+				this.rendered = task_area_pulls[id] = {};
+				this.clear_container(container);
+			},
+			clear_container: function (container) {
+				container = container || node;
+				if (container)
+					container.innerHTML = "";
+			},
+			render_items: function (items, container) {
+				container = container || node;
+
+				var buffer = document.createDocumentFragment();
+				this.clear(container);
+				for (var i = 0, vis = items.length; i < vis; i++) {
+					this.render_item(items[i], buffer);
+				}
+
+				container.appendChild(buffer);
+			},
+			append: function (item, node, container) {
+				if (!node) {
+					if (this.rendered[item.id]) {
+						this.remove_item(item.id);
+					}
+					return;
+				}
+
+				if (this.rendered[item.id] && this.rendered[item.id].parentNode) {
+					this.replace_item(item.id, node);
+				} else {
+					container.appendChild(node);
+				}
+				this.rendered[item.id] = node;
+
+			},
+			replace_item: function (item_id, newNode) {
+				var item = this.rendered[item_id];
+				if (item && item.parentNode) {
+					item.parentNode.replaceChild(newNode, item);
+				}
+				this.rendered[item_id] = newNode;
+			},
+			remove_item: function (item_id) {
+				this.hide(item_id);
+				delete this.rendered[item_id];
+			},
+			hide: function (item_id) {
+				var item = this.rendered[item_id];
+				if (item && item.parentNode) {
+					item.parentNode.removeChild(item);
+				}
+			},
+			restore: function (item) {
+				var dom = this.rendered[item.id];
+				if (dom) {
+					if (!dom.parentNode) {
+						this.append(item, dom, node);
+					}
+				} else {
+					this.render_item(item, node);
+				}
+			},
+			change_id: function (oldid, newid) {
+				this.rendered[newid] = this.rendered[oldid];
+				delete this.rendered[oldid];
+			},
+			rendered: task_area_pulls[id],
+			node: node,
+			destructor: function () {
+				this.clear();
+				delete task_area_renderers[id];
+				delete task_area_pulls[id];
+			}
+		};
+
+		return task_area_renderers[id];
+	}
+
+
+	function clearRenderers() {
+		for (var i in task_area_renderers) {
+			getRenderer(i).destructor();
+		}
+	}
+
+	return {
+		getRenderer: getRenderer,
+		clearRenderers: clearRenderers
+	};
+
+};
+
+module.exports = rendererFactory;
+
+/***/ }),
+/* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __extends = __webpack_require__(5),
+	Layout = __webpack_require__(11),
+	Cell = __webpack_require__(4);
+
+var ViewLayout = (function (_super) {
+	"use strict";
+
+	__extends(ViewLayout, _super);
+	function ViewLayout(parent, config, factory) {
+		var _this = _super.apply(this, arguments) || this;
+		for (var i = 0; i < _this.$cells.length; i++) {
+			_this.$cells[i].$config.hidden = (i !== 0);
+		}
+		_this.$cell = _this.$cells[0];
+		_this.$name = "viewLayout";
+
+		return _this;
+	}
+	ViewLayout.prototype.cell = function (id) {
+		var cell = _super.prototype.cell.call(this, id);
+		if (!cell.$view) {
+			this.$fill(null, this);
+		}
+		return cell;
+	};
+	ViewLayout.prototype.moveView = function (view) {
+		var body = this.$view;
+		if (this.$cell) {
+			this.$cell.$config.hidden = true;
+			body.removeChild(this.$cell.$view);
+		}
+		this.$cell = view;
+		body.appendChild(view.$view);
+	};
+	ViewLayout.prototype.setSize = function (x, y) {
+		Cell.prototype.setSize.call(this, x, y);
+	};
+
+	ViewLayout.prototype.setContentSize = function(){
+		var size = this.$lastSize;
+		this.$cell.setSize(size.contentX, size.contentY);
+	};
+
+	ViewLayout.prototype.getSize = function () {
+		var sizes = _super.prototype.getSize.call(this);
+		if (this.$cell) {
+			var cellSize = this.$cell.getSize();
+			if (this.$config.byMaxSize) {
+				for (var i = 0; i < this.$cells.length; i++) {
+					var otherCell = this.$cells[i].getSize();
+					for (var cell in cellSize) {
+						cellSize[cell] = Math.max(cellSize[cell], otherCell[cell]);
+					}
+				}
+			}
+			for (var size in sizes) {
+				sizes[size] = sizes[size] || cellSize[size];
+			}
+			sizes.gravity = Math.max(sizes.gravity, cellSize.gravity);
+		}
+		return sizes;
+	};
+	return ViewLayout;
+}(Layout));
+
+module.exports = ViewLayout;
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __extends = __webpack_require__(5),
+	utils = __webpack_require__(0),
+	Cell = __webpack_require__(4);
+
+var ViewCell = (function (_super) {
+	"use strict";
+
+	__extends(ViewCell, _super);
+	function ViewCell(parent, config, factory) {
+
+		var _this = _super.apply(this, arguments) || this;
+
+		if(config.view){
+			if(config.id){
+				// pass id to the nested view
+				this.$id = utils.uid();
+			}
+			var childConfig = utils.copy(config);
+			delete childConfig.config;
+			delete childConfig.templates;
+
+			this.$content = this.$factory.createView(config.view, this, childConfig, this);
+			if(!this.$content)
+				return false;
+		}
+
+		_this.$name = "viewCell";
+		return _this;
+	}
+
+	ViewCell.prototype.destructor = function(){
+		this.clear();
+		_super.prototype.destructor.call(this);
+	};
+
+	ViewCell.prototype.clear = function(){
+
+		this.$initialized = false;
+
+		// call destructor
+		if (this.$content){
+			var method = this.$content.unload || this.$content.destructor;
+			if (method){
+				method.call(this.$content);
+			}
+		}
+
+		_super.prototype.clear.call(this);
+
+	};
+
+	ViewCell.prototype.scrollTo = function(left, top){
+
+		if(this.$content && this.$content.scrollTo){
+			this.$content.scrollTo(left, top);
+		}else{
+			_super.prototype.scrollTo.call(this, left, top);
+		}
+	};
+
+	ViewCell.prototype._setContentSize = function(x, y){
+		var borders = this._getBorderSizes();
+		var outerX = x + borders.horizontal;
+		var outerY = y + borders.vertical;
+		this.$config.width = outerX;
+		this.$config.height = outerY;
+	};
+
+	ViewCell.prototype.setSize = function(x, y){
+		_super.prototype.setSize.call(this, x, y);
+
+		if(!this.$preResize && this.$content) {
+			if (!this.$initialized) {
+				this.$initialized = true;
+				var header = this.$view.childNodes[0];
+				var content = this.$view.childNodes[1];
+				if(!content) content = header;
+
+				/*if(this.$content.$config){
+					this.$content.$config.width = this.$lastSize.contentX;
+					this.$content.$config.height = this.$lastSize.contentY;
+				}*/
+				this.$content.init(content);
+			}
+		}
+	};
+
+	ViewCell.prototype.setContentSize = function(){
+		if(!this.$preResize && this.$content) {
+			if (this.$initialized) {
+				this.$content.setSize(this.$lastSize.contentX, this.$lastSize.contentY);
+			}
+		}
+	};
+
+
+	ViewCell.prototype.getContentSize = function(){
+		var size = _super.prototype.getContentSize.call(this);
+
+		if(this.$content && this.$initialized){
+			var childSize = this.$content.getSize();
+			size.width = childSize.contentX === undefined ? childSize.width : childSize.contentX;
+			size.height = childSize.contentY === undefined ? childSize.height : childSize.contentY;
+		}
+
+		var borders = this._getBorderSizes();
+		size.width += borders.horizontal;
+		size.height += borders.vertical;
+
+		return size;
+	};
+
+	return ViewCell;
+}(Cell));
+
+module.exports = ViewCell;
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports) {
+
+module.exports = null;
+
+/***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __extends = __webpack_require__(5),
+	domHelpers = __webpack_require__(1),
+	utils = __webpack_require__(0),
+	env = __webpack_require__(7),
+	eventable = __webpack_require__(2),
+	Cell = __webpack_require__(4);
+
+var ScrollbarCell = (function (_super) {
+	"use strict";
+
+	__extends(ScrollbarCell, _super);
+	function ScrollbarCell(parent, config, factory, gantt) {
+
+		var _this = _super.apply(this, arguments) || this;
+		this.$config = utils.mixin(config, {scroll: "x"});
+		_this._scrollHorizontalHandler = utils.bind(_this._scrollHorizontalHandler, _this);
+		_this._scrollVerticalHandler = utils.bind(_this._scrollVerticalHandler, _this);
+		_this._outerScrollVerticalHandler = utils.bind(_this._outerScrollVerticalHandler, _this);
+		_this._outerScrollHorizontalHandler = utils.bind(_this._outerScrollHorizontalHandler, _this);
+		_this._mouseWheelHandler = utils.bind(_this._mouseWheelHandler, _this);
+
+		this.$config.hidden = true;
+		var size = gantt.config.scroll_size;
+
+		if(gantt.env.isIE){
+			// full element height/width must be bigger than just a browser scrollbar,
+			// otherwise the scrollbar element won't be scrolled on click
+			size += 1;
+		}
+
+		if(this._isHorizontal()){
+			_this.$config.height = size;
+			_this.$parent.$config.height = size;
+		}else{
+			_this.$config.width = size;
+			_this.$parent.$config.width = size;
+		}
+
+		this.$config.scrollPosition = 0;
+
+		_this.$name = "scroller";
+		return _this;
+	}
+
+	ScrollbarCell.prototype.init = function(container){
+		container.innerHTML = this.$toHTML();
+		this.$view = container.firstChild;
+
+		if(!this.$view){
+			this.init();
+		}
+		if(this._isVertical()){
+			this._initVertical();
+		}else{
+			this._initHorizontal();
+		}
+		this._initMouseWheel();
+		this._initLinkedViews();
+	};
+
+	ScrollbarCell.prototype.$toHTML = function () {
+		var className = this._isHorizontal() ? "gantt_hor_scroll" : "gantt_ver_scroll";
+		return "<div class='gantt_layout_cell "+className+"'><div style='"+(this._isHorizontal() ? "width:2000px" : "height:2000px")+"'></div></div>";
+	};
+
+	ScrollbarCell.prototype._getRootParent = function(){
+		var parent = this.$parent;
+		while(parent && parent.$parent){
+			parent = parent.$parent;
+		}
+		if(parent){
+			return parent;
+		}
+	};
+
+
+	function eachCell(root, res){
+		res.push(root);
+		if(root.$cells){
+			for(var i = 0; i < root.$cells.length; i++){
+				eachCell(root.$cells[i], res);
+			}
+		}
+	}
+	ScrollbarCell.prototype._eachView = function(){
+		var res = [];
+		eachCell(this._getRootParent(), res);
+		return res;
+	};
+
+	ScrollbarCell.prototype._getLinkedViews = function(){
+		var views = this._eachView();
+		var res = [];
+		for(var i = 0; i < views.length; i++){
+			if(views[i].$config && ((this._isVertical() && views[i].$config.scrollY == this.$id) || (this._isHorizontal() && views[i].$config.scrollX == this.$id)) ){
+				res.push(views[i]);
+			}
+		}
+		return res;
+	};
+
+
+	ScrollbarCell.prototype._initHorizontal = function(){
+		this.$scroll_hor = this.$view;
+		this.$domEvents.attach(this.$view, "scroll", this._scrollHorizontalHandler);
+
+	};
+
+	ScrollbarCell.prototype._initLinkedViews = function(){
+		var views = this._getLinkedViews();
+		var css = this._isVertical() ?"gantt_layout_outer_scroll gantt_layout_outer_scroll_vertical" : "gantt_layout_outer_scroll gantt_layout_outer_scroll_horizontal";
+		for(var i = 0; i < views.length; i++){
+			//views[i].$config.css = [views[i].$config.css || "", css].join(" ");
+			domHelpers.addClassName(views[i].$view || views[i].getNode(), css);
+		}
+	};
+
+	ScrollbarCell.prototype._initVertical = function(){
+		this.$scroll_ver = this.$view;
+		this.$domEvents.attach(this.$view, "scroll", this._scrollVerticalHandler);
+	};
+
+	ScrollbarCell.prototype._updateLinkedViews = function(){
+		var root = this._getRootParent();
+	};
+
+	ScrollbarCell.prototype._initMouseWheel = function(){
+		var ff = env.isFF;
+		if (ff)
+			this.$domEvents.attach(this._getRootParent().$view, "wheel", this._mouseWheelHandler);
+		else
+			this.$domEvents.attach(this._getRootParent().$view, "mousewheel", this._mouseWheelHandler);
+	};
+
+
+
+
+	ScrollbarCell.prototype.scrollHorizontally = function(left){
+		if(this._scrolling) return;
+		this._scrolling = true;
+
+		this.$scroll_hor.scrollLeft = left;
+		this.$config.codeScrollLeft = left;
+		left = this.$scroll_hor.scrollLeft;
+
+		var views = this._getLinkedViews();
+		for(var i = 0; i < views.length; i++){
+			if(views[i].scrollTo){
+				views[i].scrollTo(left, undefined);
+			}
+		}
+		var oldSize = this.$config.scrollPosition;
+		this.$config.scrollPosition = left;
+		this.callEvent("onScroll", [oldSize, left, this.$config.scroll]);
+		this._scrolling = false;
+	};
+	ScrollbarCell.prototype.scrollVertically = function(top){
+		if(this._scrolling) return;
+		this._scrolling = true;
+
+		this.$scroll_ver.scrollTop = top;
+		top = this.$scroll_ver.scrollTop;
+
+		var views = this._getLinkedViews();
+
+		for(var i = 0; i < views.length; i++){
+			if(views[i].scrollTo){
+				views[i].scrollTo(undefined, top);
+			}
+		}
+		var oldSize = this.$config.scrollPosition;
+		this.$config.scrollPosition = top;
+		this.callEvent("onScroll", [oldSize, top, this.$config.scroll]);
+		this._scrolling = false;
+	};
+
+	ScrollbarCell.prototype._isVertical = function(){
+		return this.$config.scroll == "y";
+	};
+	ScrollbarCell.prototype._isHorizontal = function(){
+		return this.$config.scroll == "x";
+	};
+	ScrollbarCell.prototype._scrollHorizontalHandler = function (e) {
+		if(this._isVertical() || this._scrolling){
+			return;
+		}
+
+		//in safari we can catch previous onscroll after setting new value from mouse-wheel event
+		//set delay to prevent value drifiting
+		if ((new Date()) - ( this._wheel_time || 0 ) < 100) return true;
+		if (this.$gantt._touch_scroll_active) return;
+		var left = this.$scroll_hor.scrollLeft;
+
+		this.scrollHorizontally(left);
+
+		this._oldLeft = this.$scroll_hor.scrollLeft;
+	};
+	ScrollbarCell.prototype._outerScrollHorizontalHandler = function(e){
+		if(this._isVertical()){
+			return;
+		}
+	};
+
+	ScrollbarCell.prototype.show = function(){
+		this.$parent.show();
+	};
+	ScrollbarCell.prototype.hide = function(){
+		this.$parent.hide();
+	};
+
+	ScrollbarCell.prototype._getScrollSize = function(){
+		var scrollSize = 0;
+		var outerSize = 0;
+		var isHorizontal = this._isHorizontal();
+
+		var linked = this._getLinkedViews();
+		var view;
+		var scrollProperty = isHorizontal ? "scrollWidth" : "scrollHeight",
+			innerSizeProperty = isHorizontal ? "contentX" : "contentY";
+		var outerProperty = isHorizontal ? "x" : "y";
+		var offset = this._getScrollOffset();
+
+		for(var i = 0; i < linked.length; i++){
+			view = linked[i];
+			if(!(view && view.$content && view.$content.getSize)) continue;
+
+			var sizes = view.$content.getSize();
+			var cellScrollSize;
+			if(sizes.hasOwnProperty(scrollProperty)){
+				cellScrollSize = sizes[scrollProperty];
+			}else{
+				cellScrollSize = sizes[innerSizeProperty];
+			}
+
+			if(offset){
+				// precalculated vertical/horizontal offsets of scrollbar to emulate 4.x look
+				if(sizes[innerSizeProperty] > sizes[outerProperty] && sizes[innerSizeProperty] > scrollSize && (cellScrollSize > (sizes[outerProperty] - offset + 2))){
+					scrollSize = cellScrollSize + (isHorizontal ? 0 : 2);
+					outerSize = sizes[outerProperty];
+				}
+			}else{
+				var nonScrollableSize = Math.max(sizes[innerSizeProperty] - cellScrollSize, 0);
+				var scrollableViewPortSize = Math.max(sizes[outerProperty] - nonScrollableSize, 0);
+				cellScrollSize = cellScrollSize + nonScrollableSize;
+
+				if(cellScrollSize > scrollableViewPortSize && (cellScrollSize > scrollSize) ){
+					//|| (cellScrollSize === scrollSize && sizes[outerProperty] < outerSize) // same scroll width but smaller scrollable view port
+
+					scrollSize = cellScrollSize;
+					outerSize = sizes[outerProperty];
+				}
+			}
+		}
+
+		return {
+			outerScroll: outerSize,
+			innerScroll: scrollSize
+		};
+	};
+
+	ScrollbarCell.prototype.scroll = function(position){
+		if(this._isHorizontal()){
+			this.scrollHorizontally(position);
+		}else{
+			this.scrollVertically(position);
+		}
+	};
+
+	ScrollbarCell.prototype.getScrollState = function(){
+		return {
+			visible: this.isVisible(),
+			direction: this.$config.scroll,
+			size: this.$config.outerSize,
+			scrollSize: this.$config.scrollSize || 0,
+			position: this.$config.scrollPosition || 0
+		};
+	};
+
+	ScrollbarCell.prototype.setSize = function(width, height){
+		_super.prototype.setSize.apply(this, arguments);
+
+		var scrollSizes = this._getScrollSize();
+
+		var ownSize = (this._isVertical() ? height : width) - this._getScrollOffset() + (this._isHorizontal() ? 1 : 0);
+
+		if(scrollSizes.innerScroll && ownSize > scrollSizes.outerScroll){
+			scrollSizes.innerScroll += (ownSize - scrollSizes.outerScroll);
+		}
+		this.$config.scrollSize = scrollSizes.innerScroll;
+
+		this.$config.width = width;
+		this.$config.height = height;
+		this._setScrollSize(scrollSizes.innerScroll);
+	};
+
+	ScrollbarCell.prototype.isVisible = function(){
+		return !!(this.$parent && this.$parent.$view.parentNode);
+	};
+
+	ScrollbarCell.prototype.shouldShow = function(){
+		var scrollSizes = this._getScrollSize();
+		if(!scrollSizes.innerScroll && (this.$parent && this.$parent.$view.parentNode)){
+			return false;
+		}else if(scrollSizes.innerScroll && !(this.$parent && this.$parent.$view.parentNode)){
+			return true;
+		}else{
+			return false;
+		}
+	};
+
+	ScrollbarCell.prototype.shouldHide = function(){
+		var scrollSizes = this._getScrollSize();
+		if(!scrollSizes.innerScroll && (this.$parent && this.$parent.$view.parentNode)){
+			return true;
+		}else{
+			return false;
+		}
+	};
+
+
+	ScrollbarCell.prototype.toggleVisibility = function(){
+		if(this.shouldHide()){
+			this.hide();
+		}else if(this.shouldShow()){
+			this.show();
+		}
+	};
+	
+	ScrollbarCell.prototype._getScaleOffset = function(view){
+		var offset = 0;
+		if(view && (view.$config.view == "timeline" || view.$config.view == "grid")){
+			offset = view.$content.$getConfig().scale_height;
+		}
+		return offset;
+	};
+
+	ScrollbarCell.prototype._getScrollOffset = function(){
+		var offset = 0;
+		if(this._isVertical()){
+			var parentLayout = this.$parent.$parent;
+			offset = Math.max(
+				this._getScaleOffset(parentLayout.getPrevSibling(this.$parent.$id)),
+				this._getScaleOffset(parentLayout.getNextSibling(this.$parent.$id))
+				);
+		}else{
+			var linked = this._getLinkedViews();
+
+			for (var i = 0; i < linked.length; i++) {
+				var view = linked[i],
+					vparent = view.$parent;
+				var cells = vparent.$cells;
+
+				var last = cells[cells.length - 1];
+
+				if (last && last.$config.view == "scrollbar" && last.$config.hidden === false) {
+					offset = last.$config.width;
+					break;
+				}
+
+			}
+		}
+		return offset || 0;
+	};
+
+	ScrollbarCell.prototype._setScrollSize = function(size){
+		var property = this._isHorizontal() ? "width" : "height";
+		var scrollbar = this._isHorizontal() ? this.$scroll_hor : this.$scroll_ver;
+
+		var offset = this._getScrollOffset();
+
+		var node = scrollbar.firstChild;
+
+		if(offset){
+			if(this._isVertical()){
+
+				this.$config.outerSize = (this.$config.height - offset + 3);
+				scrollbar.style.height = this.$config.outerSize + "px";
+				scrollbar.style.top = (offset-1) + "px";
+				domHelpers.addClassName(scrollbar, this.$parent._borders.top);
+				domHelpers.addClassName(scrollbar.parentNode, "gantt_task_vscroll");
+			}else{
+				this.$config.outerSize = (this.$config.width - offset + 1);
+				scrollbar.style.width = this.$config.outerSize + "px";
+				//domHelpers.addClassName(scrollbar, this.$parent._borders.right);
+			}
+		}else{
+			scrollbar.style.top = "auto";
+			domHelpers.removeClassName(scrollbar, this.$parent._borders.top);
+			domHelpers.removeClassName(scrollbar.parentNode, "gantt_task_vscroll");
+		}
+
+		node.style[property] = size + "px";
+	};
+
+	ScrollbarCell.prototype._scrollVerticalHandler = function (e) {
+		if(this._scrollHorizontalHandler() || this._scrolling){
+			return;
+		}
+
+		if (this.$gantt._touch_scroll_active) return;
+		var top = this.$scroll_ver.scrollTop;
+		var prev = this._oldTop;
+		if(top == prev) return;
+
+		this.scrollVertically(top);
+
+		this._oldTop = this.$scroll_ver.scrollTop;
+
+	};
+	ScrollbarCell.prototype._outerScrollVerticalHandler = function(e){
+		if(this._scrollHorizontalHandler()){
+			return;
+		}
+	};
+
+	ScrollbarCell.prototype._checkWheelTarget = function(targetNode){
+		var connectedViews = this._getLinkedViews().concat(this);
+
+		for(var i = 0; i < connectedViews.length; i++){
+			var node = connectedViews[i].$view;
+			if(domHelpers.isChildOf(targetNode, node)){
+				return true;
+			}
+		}
+
+		return false;
+	};
+
+	ScrollbarCell.prototype._mouseWheelHandler = function(e){
+		var target = e.target || e.srcElement;
+
+		if(!this._checkWheelTarget(target))
+			return;
+
+		this._wheel_time = new Date();
+
+		var res = {};
+		var ff = env.isFF;
+		var wx = ff ? (e.deltaX*-20) : e.wheelDeltaX*2;
+		var wy = ff ? (e.deltaY*-40) : e.wheelDelta;
+
+		if(e.shiftKey && !(e.deltaX || e.wheelDeltaX)){
+			// shift+mousewheel for horizontal scroll
+			wx = wy*2;
+			wy = 0;
+		}
+
+		if (wx && Math.abs(wx) > Math.abs(wy)){
+			if(this._isVertical()){
+				return;
+			}
+
+			if(res.x) return true;//no horisontal scroll, must not block scrolling
+			if(!this.$scroll_hor || !this.$scroll_hor.offsetWidth) return true;
+
+			var dir  = wx/-40;
+			var oldLeft = this._oldLeft;
+			var left = oldLeft+dir*30;
+			this.scrollHorizontally(left);
+			this.$scroll_hor.scrollLeft = left;
+			// not block scroll if position hasn't changed
+			if(oldLeft == this.$scroll_hor.scrollLeft){
+				return true;
+			}
+
+			this._oldLeft = this.$scroll_hor.scrollLeft;
+		} else {
+			if(this._isHorizontal()){
+				return;
+			}
+
+			if(res.y) return true;//no vertical scroll, must not block scrolling
+			if(!this.$scroll_ver || !this.$scroll_ver.offsetHeight) return true;
+
+			var dir  = wy/-40;
+			if (typeof wy == "undefined")
+				dir = e.detail;
+
+			var oldTop = this._oldTop;
+			var top = this.$scroll_ver.scrollTop+dir*30;
+
+			//if(!this.$gantt.config.prevent_default_scroll &&
+			//	(this.$gantt._cached_scroll_pos && ((this.$gantt._cached_scroll_pos.y == top) || (this.$gantt._cached_scroll_pos.y <= 0 && top <= 0)))) return true;
+
+
+			this.scrollVertically(top);
+			this.$scroll_ver.scrollTop = top;
+
+			// not block scroll if position hasn't changed
+			if(oldTop == this.$scroll_ver.scrollTop){
+				return true;
+			}
+			this._oldTop = this.$scroll_ver.scrollTop;
+		}
+
+		if (e.preventDefault)
+			e.preventDefault();
+		e.cancelBubble=true;
+		return false;
+	};
+
+	return ScrollbarCell;
+})(Cell);
+
+module.exports = ScrollbarCell;
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports) {
+
+var createStaticBgHelper = function(){
+	return {
+		render: function(){}
+	};
+};
+
+module.exports = {
+	create: function(){
+		return createStaticBgHelper();
+	}
+};
+
+
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports) {
+
+function createResizer(gantt, grid){
+	return {
+		init: function(){},
+		doOnRender: function(){}
+	};
+}
+
+module.exports = createResizer;
+
+/***/ }),
+/* 45 */
+/***/ (function(module, exports) {
+
+function createTaskRenderer(gantt){
+
+	function _render_task_element(task, view) {
+		var config = view.$getConfig();
+		var painters = config.type_renderers;
+		var renderer = painters[gantt.getTaskType(task.type)],
+			defaultRenderer = _task_default_render;
+
+		if (!renderer) {
+			return defaultRenderer.call(gantt, task, view);
+		}else{
+			return renderer.call(gantt, task, function(task){ return defaultRenderer.call(gantt, task, view);}, view);
+		}
+	}
+
+	function _task_default_render(task, view) {
+		if (gantt._isAllowedUnscheduledTask(task))
+			return;
+
+
+		var pos = view.getItemPosition(task);
+
+		var cfg = view.$getConfig(),
+			templates = view.$getTemplates();
+		var height = view.getItemHeight();
+
+		var taskType = gantt.getTaskType(task.type);
+
+		var padd = Math.floor((gantt.config.row_height - height) / 2);
+		if (taskType == cfg.types.milestone && cfg.link_line_width > 1) {
+			//little adjust milestone position, so horisontal corners would match link arrow when thickness of link line is more than 1px
+			padd += 1;
+		}
+
+		if (taskType == cfg.types.milestone){
+			pos.left -= Math.round(height / 2);
+			pos.width = height;
+		}
+
+		var div = document.createElement("div");
+
+		var width = Math.round(pos.width);
+
+		if(view.$config.item_attribute){
+			div.setAttribute(view.$config.item_attribute, task.id);
+		}
+
+		if (cfg.show_progress && taskType != cfg.types.milestone) {
+			_render_task_progress(task, div, width, cfg, templates);
+		}
+
+		//use separate div to display content above progress bar
+		var content = _render_task_content(task, width, templates);
+		if (task.textColor) {
+			content.style.color = task.textColor;
+		}
+		div.appendChild(content);
+
+		var css = _combine_item_class("gantt_task_line",
+			templates.task_class(task.start_date, task.end_date, task),
+			task.id,
+			view);
+		if (task.color || task.progressColor || task.textColor) {
+			css += " gantt_task_inline_color";
+		}
+		div.className = css;
+
+		var styles = [
+			"left:" + pos.left + "px",
+			"top:" + (padd + pos.top) + 'px',
+			"height:" + height + 'px',
+			"line-height:" + (Math.max(height < 30 ? height - 2 : height, 0)) + 'px',
+			"width:" + width + 'px'
+		];
+		if (task.color) {
+			styles.push("background-color:" + task.color);
+		}
+		if (task.textColor) {
+			styles.push("color:" + task.textColor);
+		}
+
+		div.style.cssText = styles.join(";");
+		var side = _render_leftside_content(task, cfg, templates);
+		if (side) div.appendChild(side);
+
+		side = _render_rightside_content(task, cfg, templates);
+		if (side) div.appendChild(side);
+
+		gantt._waiAria.setTaskBarAttr(task, div);
+
+		var state = gantt.getState();
+
+		if (!gantt.isReadonly(task)) {
+			if (cfg.drag_resize && !gantt.isSummaryTask(task) && taskType != cfg.types.milestone) {
+				_render_pair(div, "gantt_task_drag", task, function (css) {
+					var el = document.createElement("div");
+					el.className = css;
+					return el;
+				}, cfg);
+			}
+			if (cfg.drag_links && cfg.show_links) {
+				_render_pair(div, "gantt_link_control", task, function (css) {
+					var outer = document.createElement("div");
+					outer.className = css;
+					outer.style.cssText = [
+						"height:" + height + 'px',
+						"line-height:" + height + 'px'
+					].join(";");
+					var inner = document.createElement("div");
+					inner.className = "gantt_link_point";
+
+					var showLinkPoints = false;
+					if(state.link_source_id && cfg.touch){
+						showLinkPoints = true;
+					}
+
+					inner.style.display = showLinkPoints ? "block" : "";
+					outer.appendChild(inner);
+					return outer;
+				}, cfg);
+			}
+		}
+		return div;
+	}
+
+	function _render_side_content(task, template, cssClass) {
+		if (!template) return null;
+
+		var text = template(task.start_date, task.end_date, task);
+		if (!text) return null;
+		var content = document.createElement("div");
+		content.className = "gantt_side_content " + cssClass;
+		content.innerHTML = text;
+		return content;
+	}
+
+	function _render_leftside_content(task, cfg, templates) {
+		var css = "gantt_left " + _get_link_crossing_css(!cfg.rtl ? true : false, task, cfg);
+		return _render_side_content(task, templates.leftside_text, css);
+	}
+
+	function _render_rightside_content(task, cfg, templates) {
+		var css = "gantt_right " + _get_link_crossing_css(!cfg.rtl ? false : true, task, cfg);
+		return _render_side_content(task, templates.rightside_text, css);
+	}
+
+	function _get_link_crossing_css(left, task) {
+		var cond = _get_conditions(left);
+
+		for (var i in cond) {
+			var links = task[i];
+			for (var ln = 0; ln < links.length; ln++) {
+				var link = gantt.getLink(links[ln]);
+
+				for (var tp = 0; tp < cond[i].length; tp++) {
+					if (link.type == cond[i][tp]) {
+						return "gantt_link_crossing";
+					}
+				}
+			}
+		}
+		return "";
+	}
+
+
+	function _render_task_content(task, width, templates) {
+		var content = document.createElement("div");
+		if (gantt.getTaskType(task.type) != gantt.config.types.milestone)
+			content.innerHTML = templates.task_text(task.start_date, task.end_date, task);
+		content.className = "gantt_task_content";
+		//content.style.width = width + 'px';
+		return content;
+	}
+
+	function _render_task_progress(task, element, maxWidth, cfg, templates) {
+		var done = task.progress * 1 || 0;
+
+		maxWidth = Math.max(maxWidth - 2, 0);//2px for borders
+		var pr = document.createElement("div");
+		var width = Math.round(maxWidth * done);
+
+		width = Math.min(maxWidth, width);
+		if (task.progressColor) {
+			pr.style.backgroundColor = task.progressColor;
+			pr.style.opacity = 1;
+		}
+		pr.style.width = width + 'px';
+		pr.className = "gantt_task_progress";
+		pr.innerHTML = templates.progress_text(task.start_date, task.end_date, task);
+
+		if(cfg.rtl){
+			pr.style.position = "absolute";
+			pr.style.right = "0px";
+		}
+
+		var wrapper = document.createElement("div");
+		wrapper.className = "gantt_task_progress_wrapper";
+		wrapper.appendChild(pr);
+		element.appendChild(wrapper);
+
+		if (gantt.config.drag_progress && !gantt.isReadonly(task)) {
+			var drag = document.createElement("div");
+
+			var markerPos = width;
+			if(cfg.rtl){
+				markerPos = maxWidth - width;
+			}
+
+			drag.style.left = markerPos + 'px';
+			drag.className = "gantt_task_progress_drag";
+			pr.appendChild(drag);
+			element.appendChild(drag);
+		}
+	}
+
+	function _get_conditions(leftside) {
+		if (leftside) {
+			return {
+				$source: [
+					gantt.config.links.start_to_start
+				],
+				$target: [
+					gantt.config.links.start_to_start,
+					gantt.config.links.finish_to_start
+				]
+			};
+		} else {
+			return {
+				$source: [
+					gantt.config.links.finish_to_start,
+					gantt.config.links.finish_to_finish
+				],
+				$target: [
+					gantt.config.links.finish_to_finish
+				]
+			};
+		}
+	}
+
+	function _combine_item_class(basic, template, itemId, view) {
+		var cfg = view.$getConfig();
+		var css = [basic];
+		if (template)
+			css.push(template);
+
+		var state = gantt.getState();
+
+		var task = gantt.getTask(itemId);
+
+		if (gantt.getTaskType(task.type) == cfg.types.milestone) {
+			css.push("gantt_milestone");
+		}
+
+		if (gantt.getTaskType(task.type) == cfg.types.project) {
+			css.push("gantt_project");
+		}
+
+		if (gantt.isSummaryTask(task))
+			css.push("gantt_dependent_task");
+
+		if (cfg.select_task && itemId == state.selected_task)
+			css.push("gantt_selected");
+
+		if (itemId == state.drag_id) {
+			css.push("gantt_drag_" + state.drag_mode);
+			if (state.touch_drag) {
+				css.push("gantt_touch_" + state.drag_mode);
+			}
+		}
+
+		if (state.link_source_id == itemId)
+			css.push("gantt_link_source");
+
+		if (state.link_target_id == itemId)
+			css.push("gantt_link_target");
+
+
+		if (cfg.highlight_critical_path && gantt.isCriticalTask) {
+			if (gantt.isCriticalTask(task))
+				css.push("gantt_critical_task");
+		}
+
+		if (state.link_landing_area &&
+			(state.link_target_id && state.link_source_id) &&
+			(state.link_target_id != state.link_source_id)) {
+
+			var from_id = state.link_source_id;
+			var from_start = state.link_from_start;
+			var to_start = state.link_to_start;
+
+			var allowDrag = gantt.isLinkAllowed(from_id, itemId, from_start, to_start);
+
+			var dragClass = "";
+			if (allowDrag) {
+				if (to_start)
+					dragClass = "link_start_allow";
+				else
+					dragClass = "link_finish_allow";
+			} else {
+				if (to_start)
+					dragClass = "link_start_deny";
+				else
+					dragClass = "link_finish_deny";
+			}
+			css.push(dragClass);
+		}
+		return css.join(" ");
+	}
+
+	function _render_pair(parent, css, task, content, config) {
+		var state = gantt.getState();
+		var className, element;
+		if (+task.start_date >= +state.min_date) {
+			className = [css, config.rtl ? "task_right" : "task_left", "task_start_date"];
+			element = content(className.join(" "));
+			element.setAttribute("data-bind-property", "start_date");
+			parent.appendChild(element);
+		}
+
+		if (+task.end_date <= +state.max_date){
+			className = [css, config.rtl ? "task_left" : "task_right", "task_end_date"];
+			element = content(className.join(" "));
+			element.setAttribute("data-bind-property", "end_date");
+			parent.appendChild(element);
+		}
+
+	}
+
+	return _render_task_element;
+}
+
+module.exports = createTaskRenderer;
+
+/***/ }),
+/* 46 */
+/***/ (function(module, exports) {
+
+function createTaskBgRender(gantt){
+	//this.getTaskTop
+	function _render_bg_line(item, view) {
+		var config = view.$getConfig(),
+			templates = view.$getTemplates();
+		var cfg = view.getScale();
+		var count = cfg.count;
+		var row = document.createElement("div");
+		if (config.show_task_cells) {
+			for (var j = 0; j < count; j++) {
+				var width = cfg.width[j],
+					cssclass = "";
+
+				if (width > 0) {//do not render skipped columns
+					var cell = document.createElement("div");
+					cell.style.width = (width) + "px";
+
+					cssclass = "gantt_task_cell" + (j == count - 1 ? " gantt_last_cell" : "");
+					cssTemplate = templates.task_cell_class(item, cfg.trace_x[j]);
+					if (cssTemplate)
+						cssclass += " " + cssTemplate;
+					cell.className = cssclass;
+
+					row.appendChild(cell);
+				}
+
+			}
+		}
+		var odd = gantt.getGlobalTaskIndex(item.id) % 2 !== 0;
+		var cssTemplate = templates.task_row_class(item.start_date, item.end_date, item);
+		var css = "gantt_task_row" + (odd ? " odd" : "") + (cssTemplate ? ' ' + cssTemplate : '');
+
+		var store = view.$config.rowStore;
+		if(store.getSelectedId() == item.id) {
+			css += " gantt_selected";
+		}
+
+		//var row = "<div class='" + css + "' " + this.config.task_attribute + "='" + item.id + "'>" + cells.join("") + "</div>";
+
+		row.className = css;
+
+		if (config.smart_rendering) {
+			row.style.position = "absolute";
+			row.style.top = view.getItemTop(item.id) + "px";
+			row.style.width = "100%";
+		}
+		row.style.height = (config.row_height) + "px";
+
+		if(view.$config.item_attribute){
+			row.setAttribute(view.$config.item_attribute, item.id);
+		}
+
+		return row;
+	}
+
+	return _render_bg_line;
+}
+
+module.exports = createTaskBgRender;
+
+/***/ }),
+/* 47 */
+/***/ (function(module, exports) {
+
+
+function createLinkRender(gantt){
+
+function _render_link_element(link, view) {
+	var config = view.$getConfig();
+	var dots = path_builder.get_points(link, view);
+	var lines = drawer.get_lines(dots, view);
+
+	var div = document.createElement("div");
+
+	var css = "gantt_task_link";
+
+	if (link.color) {
+		css += " gantt_link_inline_color";
+	}
+	var cssTemplate = gantt.templates.link_class ? gantt.templates.link_class(link) : "";
+	if (cssTemplate) {
+		css += " " + cssTemplate;
+	}
+
+	if (config.highlight_critical_path && gantt.isCriticalLink) {
+		if (gantt.isCriticalLink(link))
+			css += " gantt_critical_link";
+	}
+
+	div.className = css;
+
+	if(view.$config.link_attribute){
+		div.setAttribute(view.$config.link_attribute, link.id);
+	}
+
+	for (var i = 0; i < lines.length; i++) {
+		if (i == lines.length - 1) {
+			lines[i].size -= config.link_arrow_size;
+		}
+		var el = drawer.render_line(lines[i], lines[i + 1], view);
+		if (link.color) {
+			el.firstChild.style.backgroundColor = link.color;
+		}
+		div.appendChild(el);
+	}
+
+	var direction = lines[lines.length - 1].direction;
+	var endpoint = _render_link_arrow(dots[dots.length - 1], direction, view);
+	if (link.color) {
+		endpoint.style.borderColor = link.color;
+	}
+	div.appendChild(endpoint);
+
+	gantt._waiAria.linkAttr(link, div);
+
+	return div;
+}
+
+function _render_link_arrow(point, direction, view) {
+	var config = view.$getConfig();
+	var div = document.createElement("div");
+	var top = point.y;
+	var left = point.x;
+
+	var size = config.link_arrow_size;
+	var line_width = config.row_height;
+	var className = "gantt_link_arrow gantt_link_arrow_" + direction;
+	switch (direction) {
+		case drawer.dirs.right:
+			top -= (size - line_width) / 2;
+			left -= size;
+			break;
+		case drawer.dirs.left:
+			top -= (size - line_width) / 2;
+			break;
+		case drawer.dirs.up:
+			left -= size;
+			break;
+		case drawer.dirs.down:
+			top += size * 2;
+			left -= size;
+			break;
+		default:
+			break;
+	}
+	div.style.cssText = [
+		"top:" + top + "px",
+		"left:" + left + 'px'].join(';');
+	div.className = className;
+
+	return div;
+}
+
+
+var drawer = {
+	current_pos: null,
+	dirs: {"left": 'left', "right": 'right', "up": 'up', "down": 'down'},
+	path: [],
+	clear: function () {
+		this.current_pos = null;
+		this.path = [];
+	},
+	point: function (pos) {
+		this.current_pos = gantt.copy(pos);
+	},
+	get_lines: function (dots) {
+		this.clear();
+		this.point(dots[0]);
+		for (var i = 1; i < dots.length; i++) {
+			this.line_to(dots[i]);
+		}
+		return this.get_path();
+	},
+	line_to: function (pos) {
+		var next = gantt.copy(pos);
+		var prev = this.current_pos;
+
+		var line = this._get_line(prev, next);
+		this.path.push(line);
+		this.current_pos = next;
+	},
+	get_path: function () {
+		return this.path;
+	},
+	get_wrapper_sizes: function (v, view) {
+		var config = view.$getConfig();
+		var res,
+			wrapper_size = config.link_wrapper_width,
+			line_size = config.link_line_width,
+			y = v.y + (config.row_height - wrapper_size) / 2;
+		switch (v.direction) {
+			case this.dirs.left:
+				res = {
+					top: y,
+					height: wrapper_size,
+					lineHeight: wrapper_size,
+					left: v.x - v.size - wrapper_size / 2,
+					width: v.size + wrapper_size
+				};
+				break;
+			case this.dirs.right:
+				res = {
+					top: y,
+					lineHeight: wrapper_size,
+					height: wrapper_size,
+					left: v.x - wrapper_size / 2,
+					width: v.size + wrapper_size
+				};
+				break;
+			case this.dirs.up:
+				res = {
+					top: y - v.size,
+					lineHeight: v.size + wrapper_size,
+					height: v.size + wrapper_size,
+					left: v.x - wrapper_size / 2,
+					width: wrapper_size
+				};
+				break;
+			case this.dirs.down:
+				res = {
+					top: y /*- wrapper_size/2*/,
+					lineHeight: v.size + wrapper_size,
+					height: v.size + wrapper_size,
+					left: v.x - wrapper_size / 2,
+					width: wrapper_size
+				};
+				break;
+			default:
+				break;
+		}
+
+		return res;
+	},
+	get_line_sizes: function (v, view) {
+		var config = view.$getConfig();
+		var res,
+			line_size = config.link_line_width,
+			wrapper_size = config.link_wrapper_width,
+			size = v.size + line_size;
+		switch (v.direction) {
+			case this.dirs.left:
+			case this.dirs.right:
+				res = {
+					height: line_size,
+					width: size,
+					marginTop: (wrapper_size - line_size) / 2,
+					marginLeft: (wrapper_size - line_size) / 2
+				};
+				break;
+			case this.dirs.up:
+			case this.dirs.down:
+				res = {
+					height: size,
+					width: line_size,
+					marginTop: (wrapper_size - line_size) / 2,
+					marginLeft: (wrapper_size - line_size) / 2
+				};
+				break;
+			default:
+				break;
+		}
+
+
+		return res;
+	},
+	render_line: function (v, end, view) {
+		var pos = this.get_wrapper_sizes(v, view);
+		var wrapper = document.createElement("div");
+		wrapper.style.cssText = [
+			"top:" + pos.top + "px",
+			"left:" + pos.left + "px",
+			"height:" + pos.height + "px",
+			"width:" + pos.width + "px"
+		].join(';');
+		wrapper.className = "gantt_line_wrapper";
+
+		var innerPos = this.get_line_sizes(v, view);
+		var inner = document.createElement("div");
+		inner.style.cssText = [
+			"height:" + innerPos.height + "px",
+			"width:" + innerPos.width + "px",
+			"margin-top:" + innerPos.marginTop + "px",
+			"margin-left:" + innerPos.marginLeft + "px"
+		].join(";");
+
+		inner.className = "gantt_link_line_" + v.direction;
+		wrapper.appendChild(inner);
+
+		return wrapper;
+	},
+	_get_line: function (from, to) {
+		var direction = this.get_direction(from, to);
+		var vect = {
+			x: from.x,
+			y: from.y,
+			direction: this.get_direction(from, to)
+		};
+		if (direction == this.dirs.left || direction == this.dirs.right) {
+			vect.size = Math.abs(from.x - to.x);
+		} else {
+			vect.size = Math.abs(from.y - to.y);
+		}
+		return vect;
+	},
+	get_direction: function (from, to) {
+		var direction = 0;
+		if (to.x < from.x) {
+			direction = this.dirs.left;
+		} else if (to.x > from.x) {
+			direction = this.dirs.right;
+		} else if (to.y > from.y) {
+			direction = this.dirs.down;
+		} else {
+			direction = this.dirs.up;
+		}
+		return direction;
+	}
+
+};
+
+var path_builder = {
+
+	path: [],
+	clear: function () {
+		this.path = [];
+	},
+	current: function () {
+		return this.path[this.path.length - 1];
+	},
+	point: function (next) {
+		if (!next)
+			return this.current();
+
+		this.path.push(gantt.copy(next));
+		return next;
+	},
+	point_to: function (direction, diff, point) {
+		if (!point)
+			point = gantt.copy(this.point());
+		else
+			point = {x: point.x, y: point.y};
+		var dir = drawer.dirs;
+		switch (direction) {
+			case (dir.left):
+				point.x -= diff;
+				break;
+			case (dir.right):
+				point.x += diff;
+				break;
+			case (dir.up):
+				point.y -= diff;
+				break;
+			case (dir.down):
+				point.y += diff;
+				break;
+			default:
+				break;
+		}
+		return this.point(point);
+	},
+	get_points: function (link, view) {
+		var pt = this.get_endpoint(link, view);
+		var xy = gantt.config;
+
+		var dy = pt.e_y - pt.y;
+		var dx = pt.e_x - pt.x;
+
+		var dir = drawer.dirs;
+
+		this.clear();
+		this.point({x: pt.x, y: pt.y});
+
+		var shiftX = 2 * xy.link_arrow_size;//just random size for first line
+		var lineType = this.get_line_type(link, view.$getConfig());
+
+		var forward = (pt.e_x > pt.x);
+		if (lineType.from_start && lineType.to_start) {
+			this.point_to(dir.left, shiftX);
+			if (forward) {
+				this.point_to(dir.down, dy);
+				this.point_to(dir.right, dx);
+			} else {
+				this.point_to(dir.right, dx);
+				this.point_to(dir.down, dy);
+			}
+			this.point_to(dir.right, shiftX);
+
+		} else if (!lineType.from_start && lineType.to_start) {
+			forward = (pt.e_x > (pt.x + 2 * shiftX));
+			this.point_to(dir.right, shiftX);
+			if (forward) {
+				dx -= shiftX;
+				this.point_to(dir.down, dy);
+				this.point_to(dir.right, dx);
+			} else {
+				dx -= 2 * shiftX;
+				var sign = dy > 0 ? 1 : -1;
+
+				this.point_to(dir.down, sign * (xy.row_height / 2));
+				this.point_to(dir.right, dx);
+				this.point_to(dir.down, sign * ( Math.abs(dy) - (xy.row_height / 2)));
+				this.point_to(dir.right, shiftX);
+			}
+
+		} else if (!lineType.from_start && !lineType.to_start) {
+			this.point_to(dir.right, shiftX);
+			if (forward) {
+				this.point_to(dir.right, dx);
+				this.point_to(dir.down, dy);
+			} else {
+				this.point_to(dir.down, dy);
+				this.point_to(dir.right, dx);
+			}
+			this.point_to(dir.left, shiftX);
+		} else if (lineType.from_start && !lineType.to_start) {
+
+			forward = (pt.e_x > (pt.x - 2 * shiftX));
+			this.point_to(dir.left, shiftX);
+
+			if (!forward) {
+				dx += shiftX;
+				this.point_to(dir.down, dy);
+				this.point_to(dir.right, dx);
+			} else {
+				dx += 2 * shiftX;
+				var sign = dy > 0 ? 1 : -1;
+				this.point_to(dir.down, sign * (xy.row_height / 2));
+				this.point_to(dir.right, dx);
+				this.point_to(dir.down, sign * ( Math.abs(dy) - (xy.row_height / 2)));
+				this.point_to(dir.left, shiftX);
+			}
+
+		}
+
+		return this.path;
+	},
+	get_line_type: function(link, config){
+		var types = config.links;
+		var from_start = false, to_start = false;
+		if (link.type == types.start_to_start) {
+			from_start = to_start = true;
+		} else if (link.type == types.finish_to_finish) {
+			from_start = to_start = false;
+		} else if (link.type == types.finish_to_start) {
+			from_start = false;
+			to_start = true;
+		} else if (link.type == types.start_to_finish) {
+			from_start = true;
+			to_start = false;
+		} else {
+			gantt.assert(false, "Invalid link type");
+		}
+
+		if(config.rtl){
+			from_start = !from_start;
+			to_start = !to_start;
+		}
+
+		return {from_start: from_start, to_start: to_start};
+	},
+
+	get_endpoint: function (link, view) {
+		var config = view.$getConfig();
+		var types = config.links;
+
+		var lineType = this.get_line_type(link, config);
+		var from_start = lineType.from_start,
+			to_start = lineType.to_start;
+
+		var source = gantt.getTask(link.source);
+		var target = gantt.getTask(link.target);
+
+		var from = getMilestonePosition(source, view),
+			to = getMilestonePosition(target, view);
+
+		return {
+			x: from_start ? from.left : (from.left + from.width),
+			e_x: to_start ? to.left : (to.left + to.width),
+			y: from.top,
+			e_y: to.top
+		};
+	}
+};
+
+function getMilestonePosition(task, view){
+	var config = view.$getConfig();
+	var pos = view.getItemPosition(task);
+	if(gantt.getTaskType(task.type) == config.types.milestone){
+		var milestoneHeight = gantt.getTaskHeight();
+		var milestoneWidth = Math.sqrt(2*milestoneHeight*milestoneHeight);
+		pos.left -= milestoneWidth / 2;
+		pos.width = milestoneWidth;
+	}
+	return pos;
+}
+
+return _render_link_element;
+
+}
+
+module.exports = createLinkRender;
+
+/***/ }),
+/* 48 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var dateHelper = __webpack_require__(3);
+
+function createGridLineRender(gantt){
+	function _render_grid_item(item, view) {
+		//if (!_is_grid_visible.call(this))
+		//	return null;
+
+		var columns = view.getGridColumns();
+		var config = view.$getConfig(),
+			templates = view.$getTemplates();
+
+		var store = view.$config.rowStore;
+
+		if(config.rtl){
+			columns = columns.reverse();
+		}
+
+		var cells = [];
+		var width = 0;
+		var has_child;
+		for (var i = 0; i < columns.length; i++) {
+			var last = i == columns.length - 1;
+			var col = columns[i];
+			var cell;
+
+			var value;
+			var textValue;
+			if (col.name == "add") {
+				var aria = gantt._waiAria.gridAddButtonAttrString(col);
+
+				value = "<div " + aria + " class='gantt_add'></div>";
+				textValue = "";
+			} else {
+				if (col.template)
+					value = col.template(item);
+				else
+					value = item[col.name];
+
+				if (dateHelper.isDate(value))
+					value = templates.date_grid(value, item);
+				textValue = value;
+				value = "<div class='gantt_tree_content'>" + value + "</div>";
+			}
+			var css = "gantt_cell" + (last ? " gantt_last_cell" : "");
+
+			var tree = [];
+			if (col.tree) {
+				for (var j = 0; j < item.$level; j++)
+					tree.push(templates.grid_indent(item));
+
+				has_child = store.hasChild(item.id);
+				if (has_child) {
+					tree.push(templates.grid_open(item));
+					tree.push(templates.grid_folder(item));
+				} else {
+					tree.push(templates.grid_blank(item));
+					tree.push(templates.grid_file(item));
+				}
+			}
+			var style = "width:" + (col.width - (last ? 1 : 0)) + "px;";
+			if (this.defined(col.align))
+				style += "text-align:" + col.align + ";";
+
+			var aria = gantt._waiAria.gridCellAttrString(col, textValue);
+
+			tree.push(value);
+			if(config.rtl){
+				tree = tree.reverse();
+			}
+			cell = "<div class='" + css + "' style='" + style + "' " + aria + ">" + tree.join("") + "</div>";
+			cells.push(cell);
+		}
+		var css = gantt.getGlobalTaskIndex(item.id) % 2 === 0 ? "" : " odd";
+		css += (item.$transparent) ? " gantt_transparent" : "";
+
+		css += (item.$dataprocessor_class ? " " + item.$dataprocessor_class : "");
+
+		if (templates.grid_row_class) {
+			var css_template = templates.grid_row_class.call(gantt, item.start_date, item.end_date, item);
+			if (css_template)
+				css += " " + css_template;
+		}
+
+		if(store.getSelectedId() == item.id) {
+			css += " gantt_selected";
+		}
+
+		var el = document.createElement("div");
+		el.className = "gantt_row" + css;
+		el.style.height = config.row_height + "px";
+		el.style.lineHeight = (config.row_height) + "px";
+
+		if(config.smart_rendering){
+			el.style.position = "absolute";
+			el.style.left = "0px";
+			el.style.top = view.getItemTop(item.id) + "px";
+		}
+
+		if(view.$config.item_attribute){
+			el.setAttribute(view.$config.item_attribute, item.id);
+		}
+
+		gantt._waiAria.taskRowAttr(item, el);
+
+		el.innerHTML = cells.join("");
+		return el;
+	}
+
+	return _render_grid_item;
+}
+
+module.exports = createGridLineRender;
+
+
+
+/***/ }),
+/* 49 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+var rowDnd = __webpack_require__(50);
+
+var initializer = (function(){
+	return function(gantt){
+		return {
+			onCreated: function (grid) {
+				grid.$config = utils.mixin(grid.$config, {
+					bind: "task"
+				});
+				if(grid.$config.id == "grid") {
+					this.extendGantt(grid);
+				}
+
+				this._mouseDelegates = __webpack_require__(8)(gantt);
+			},
+			onInitialized: function (grid) {
+				var config = grid.$getConfig();
+				if (config.order_branch) {
+					rowDnd.init(grid.$gantt, grid);
+				}
+
+				this.initEvents(grid, gantt);
+				if(grid.$config.id == "grid") {
+					this.extendDom(grid);
+				}
+			},
+			onDestroyed: function (grid) {
+				this.clearEvents(grid, gantt);
+			},
+
+			initEvents: function (grid, gantt) {
+				this._mouseDelegates.delegate("click", "gantt_row", gantt.bind(function (e, id, trg) {
+					var config = grid.$getConfig();
+					if (id !== null) {
+						var task = this.getTask(id);
+						if (config.scroll_on_click && !gantt._is_icon_open_click(e))
+							this.showDate(task.start_date);
+						gantt.callEvent("onTaskRowClick", [id, trg]);
+					}
+				}, gantt), grid.$grid);
+
+				this._mouseDelegates.delegate("click", "gantt_grid_head_cell", gantt.bind(function (e, id, trg) {
+					var column = trg.getAttribute("column_id");
+
+					if (!gantt.callEvent("onGridHeaderClick", [column, e]))
+						return;
+
+					var config = grid.$getConfig();
+
+					if (column == "add") {
+						var mouseEvents = gantt.$services.getService("mouseEvents");
+						mouseEvents.callHandler("click", "gantt_add", grid.$grid, [e, config.root_id]);
+						return;
+					}
+
+					if (config.sort) {
+						var sorting_method = column,
+							conf;
+
+						for (var i = 0; i < config.columns.length; i++) {
+							if (config.columns[i].name == column) {
+								conf = config.columns[i];
+								break;
+							}
+						}
+
+						if (conf && conf.sort !== undefined && conf.sort !== true) {
+							sorting_method = conf.sort;
+
+							if (!sorting_method) { // column sort property 'false', no sorting
+								return;
+							}
+						}
+
+						var sort = (this._sort && this._sort.direction && this._sort.name == column) ? this._sort.direction : "desc";
+						// invert sort direction
+						sort = (sort == "desc") ? "asc" : "desc";
+						this._sort = {
+							name: column,
+							direction: sort
+						};
+						this.sort(sorting_method, sort == "desc");
+					}
+				}, gantt), grid.$grid);
+
+				this._mouseDelegates.delegate("click", "gantt_add", gantt.bind(function (e, id, trg) {
+					var config = grid.$getConfig();
+					if (config.readonly) return;
+
+					var item = {};
+					this.createTask(item, id ? id : gantt.config.root_id);
+
+					return false;
+				}, gantt), grid.$grid);
+
+			},
+
+			clearEvents: function(grid, gantt){
+				this._mouseDelegates.destructor();
+				this._mouseDelegates = null;
+			},
+
+			extendDom: function(grid){
+				gantt.$grid = grid.$grid;
+				gantt.$grid_scale = grid.$grid_scale;
+				gantt.$grid_data = grid.$grid_data;
+			},
+			extendGantt: function(grid){
+
+				gantt.getGridColumns = gantt.bind(grid.getGridColumns, grid);
+
+				grid.attachEvent("onColumnResizeStart", function(){
+					return gantt.callEvent("onColumnResizeStart", arguments);
+				});
+				grid.attachEvent("onColumnResize", function(){
+					return gantt.callEvent("onColumnResize", arguments);
+				});
+				grid.attachEvent("onColumnResizeEnd", function(){
+					return gantt.callEvent("onColumnResizeEnd", arguments);
+				});
+
+				grid.attachEvent("onColumnResizeComplete", function(columns, totalWidth){
+					gantt.config.grid_width = totalWidth;
+				});
+			}
+		};
+	};
+})();
+
+module.exports = initializer;
+
+/***/ }),
+/* 50 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var domHelpers = __webpack_require__(1);
+
+function _init_dnd(gantt, grid) {
+	var DnD = gantt.$services.getService("dnd");
+
+	if(!grid.$config.bind || !gantt.getDatastore(grid.$config.bind)){
+		return;
+	}
+
+	function locate(e){
+		return domHelpers.locateAttribute(e, grid.$config.item_attribute);
+	}
+
+	function getStore(){
+		return gantt.getDatastore(grid.$config.bind);
+	}
+
+	var dnd = new DnD(grid.$grid_data, {updates_per_second: 60});
+	if (gantt.defined(grid.$getConfig().dnd_sensitivity))
+		dnd.config.sensitivity = grid.$getConfig().dnd_sensitivity;
+
+	dnd.attachEvent("onBeforeDragStart", gantt.bind(function (obj, e) {
+		var el = locate(e);
+		if (!el) return false;
+		if (gantt.hideQuickInfo) gantt._hideQuickInfo();
+
+		var id = el.getAttribute(grid.$config.item_attribute);
+
+		var datastore = getStore();
+
+		var task = datastore.getItem(id);
+
+		if (gantt.isReadonly(task))
+			return false;
+
+		dnd.config.initial_open_state = task.$open;
+		if (!gantt.callEvent("onRowDragStart", [id, e.target || e.srcElement, e])) {
+			return false;
+		}
+
+	}, gantt));
+
+	dnd.attachEvent("onAfterDragStart", gantt.bind(function (obj, e) {
+		var el = locate(e);
+		dnd.config.marker.innerHTML = el.outerHTML;
+		var element = dnd.config.marker.firstChild;
+		if(element){
+			element.style.position = "static";
+		}
+
+		dnd.config.id = el.getAttribute(grid.$config.item_attribute);
+
+		var store = getStore();
+
+		var task = store.getItem(dnd.config.id);
+		dnd.config.index = store.getBranchIndex(dnd.config.id);
+		dnd.config.parent = task.parent;
+		task.$open = false;
+		task.$transparent = true;
+		this.refreshData();
+	}, gantt));
+
+	dnd.lastTaskOfLevel = function (level) {
+		var last_item = null;
+		var store = getStore();
+		var tasks = store.getItems();
+		for (var i = 0, len = tasks.length; i < len; i++) {
+			if (tasks[i].$level == level) {
+				last_item = tasks[i];
+			}
+		}
+		return last_item ? last_item.id : null;
+	};
+	dnd._getGridPos = gantt.bind(function (e) {
+		var pos = domHelpers.getNodePosition(grid.$grid_data);
+		var store = getStore();
+		// row offset
+		var x = pos.x;
+		var y = e.pos.y - 10;
+
+		var config = grid.$getConfig();
+		// prevent moving row out of grid_data container
+		if (y < pos.y) y = pos.y;
+		var gridHeight = store.countVisible() * config.row_height;
+		if (y > pos.y + gridHeight - config.row_height) y = pos.y + gridHeight - config.row_height;
+
+		pos.x = x;
+		pos.y = y;
+		return pos;
+	}, gantt);
+	dnd._getTargetY = gantt.bind(function (e) {
+		var pos = domHelpers.getNodePosition(grid.$grid_data);
+
+		var y = e.pageY - pos.y + (grid.$state.scrollTop || 0);
+		if (y < 0)
+			y = 0;
+		return y;
+	}, gantt);
+	dnd._getTaskByY = gantt.bind(function (y, dropIndex) {
+
+		var config = grid.$getConfig(),
+			store = getStore();
+
+		y = y || 0;
+
+		var index = Math.floor(y / config.row_height);
+		index = dropIndex < index ? index - 1 : index;
+
+		if (index > store.countVisible() - 1)
+			return null;
+
+		return store.getIdByIndex(index);
+	}, gantt);
+	dnd.attachEvent("onDragMove", gantt.bind(function (obj, e) {
+		var dd = dnd.config;
+		var pos = dnd._getGridPos(e);
+
+		var config = grid.$getConfig(),
+			store = getStore();
+
+		// setting position of row
+		dd.marker.style.left = pos.x + 10 + "px";
+		dd.marker.style.top = pos.y + "px";
+
+		// highlight row when mouseover
+		var item = store.getItem(dnd.config.id);
+		var targetY = dnd._getTargetY(e);
+		var el = dnd._getTaskByY(targetY, store.getIndexById(item.id));
+
+		if (!store.exists(el)) {
+			el = dnd.lastTaskOfLevel(config.order_branch_free ? item.$level : 0);
+			if (el == dnd.config.id) {
+				el = null;
+			}
+		}
+
+		function allowedLevel(next, item) {
+			return (!(store.isChildOf(over.id, item.id)) && (next.$level == item.$level || config.order_branch_free));
+		}
+
+		if (store.exists(el)) {
+			var over = store.getItem(el);
+
+			if (store.getIndexById(over.id) * config.row_height + config.row_height / 2 < targetY) {
+				//hovering over bottom part of item, check can be drop to bottom
+				var index = store.getIndexById(over.id);
+				var nextId = store.getNext(over.id);//adds +1 when hovering over placeholder
+				var next = store.getItem(nextId);
+				if (next) {
+					if (next.id != item.id) {
+						over = next; //there is a valid target
+					}
+					else {
+						if (config.order_branch_free) {
+							if (!(store.isChildOf(item.id, over.id) && store.getChildren(over.id).length == 1))
+								return;
+							else {
+								store.move(item.id, store.getBranchIndex(over.id) + 1, store.getParent(over.id));
+								return;
+							}
+						}
+						else {
+							return;
+						}
+					}
+				} else {
+					//we at end of the list, check and drop at the end of list
+					nextId = store.getIdByIndex(index);
+					next = store.getItem(nextId);
+
+					if (allowedLevel(next, item) && next.id != item.id) {
+						store.move(item.id, -1, store.getParent(next.id));
+						return;
+					}
+				}
+			}
+			else if (config.order_branch_free) {
+				if (over.id != item.id && allowedLevel(over, item)) {
+					if (!store.hasChild(over.id)) {
+						over.$open = true;
+						store.move(item.id, -1, over.id);
+						return;
+					}
+					if (store.getIndexById(over.id) || config.row_height / 3 < targetY) return;
+				}
+			}
+			//if item is on different level, check the one before it
+			var index = store.getIndexById(over.id),
+				prevId = store.getIdByIndex(index - 1);
+
+			var prev = store.getItem(prevId);
+
+			var shift = 1;
+			while ((!prev || prev.id == over.id) && index - shift >= 0) {
+
+				prevId = store.getIdByIndex(index - shift);
+				prev = store.getItem(prevId);
+				shift++;
+			}
+
+			if (item.id == over.id) return;
+			//replacing item under cursor
+			if (allowedLevel(over, item) && item.id != over.id) {
+				store.move(item.id, 0, 0, over.id);
+
+			} else if (over.$level == item.$level - 1 && !store.getChildren(over.id).length) {
+				store.move(item.id, 0, over.id);
+
+			} else if (prev && (allowedLevel(prev, item)) && (item.id != prev.id)) {
+				store.move(item.id, -1, store.getParent(prev.id));
+
+			}
+		}
+		return true;
+	}, gantt));
+
+	dnd.attachEvent("onDragEnd", gantt.bind(function () {
+		var store = getStore();
+		var task = store.getItem(dnd.config.id);
+		task.$transparent = false;
+		task.$open = dnd.config.initial_open_state;
+
+		if (this.callEvent("onBeforeRowDragEnd", [dnd.config.id, dnd.config.parent, dnd.config.index]) === false) {
+			store.move(dnd.config.id, dnd.config.index, dnd.config.parent);
+			task.$drop_target = null;
+		} else {
+			this.callEvent("onRowDragEnd", [dnd.config.id, task.$drop_target]);
+		}
+
+		store.refresh(task.id);
+		//this.refreshData();
+	}, gantt));
+}
+
+module.exports = {
+	init: _init_dnd
+};
+
+/***/ }),
+/* 51 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0),
+	taskDnD = __webpack_require__(52),
+	linkDnD = __webpack_require__(53),
+	domHelpers = __webpack_require__(1);
+
+var initializer = (function(){
+	return function(gantt){
+		var services = gantt.$services;
+		return {
+			onCreated: function (timeline) {
+				var config = timeline.$config;
+				config.bind = utils.defined(config.bind) ? config.bind : "task";
+				config.bindLinks = utils.defined(config.bindLinks) ? config.bindLinks : "link";
+
+				timeline._linksDnD = linkDnD.createLinkDND();
+				timeline._tasksDnD = taskDnD.createTaskDND();
+				timeline._tasksDnD.extend(timeline);
+
+				if(timeline.$config.id == "timeline") {
+					this.extendGantt(timeline);
+				}
+
+				this._mouseDelegates = __webpack_require__(8)(gantt);
+			},
+			onInitialized: function (timeline) {
+				this._attachDomEvents(gantt);
+
+				this._attachStateProvider(gantt, timeline);
+
+				timeline._tasksDnD.init(timeline, gantt);
+				timeline._linksDnD.init(timeline, gantt);
+
+				if(timeline.$config.id == "timeline"){
+					this.extendDom(timeline);
+				}
+
+			},
+			onDestroyed: function (timeline) {
+				this._clearDomEvents(gantt);
+				this._clearStateProvider(gantt);
+			},
+			extendDom: function(timeline){
+				gantt.$task = timeline.$task;
+				gantt.$task_scale = timeline.$task_scale;
+				gantt.$task_data = timeline.$task_data;
+				gantt.$task_bg = timeline.$task_bg;
+				gantt.$task_links = timeline.$task_links;
+				gantt.$task_bars = timeline.$task_bars;
+			},
+
+			extendGantt: function(timeline){
+				gantt.dateFromPos = gantt.bind(timeline.dateFromPos, timeline);
+				gantt.posFromDate = gantt.bind(timeline.posFromDate, timeline);
+				gantt.getRowTop = gantt.bind(timeline.getRowTop, timeline);
+				gantt.getTaskTop = gantt.bind(timeline.getItemTop, timeline);
+				gantt.getTaskPosition = gantt.bind(timeline.getItemPosition, timeline);
+				gantt.getTaskHeight = gantt.bind(timeline.getItemHeight, timeline);
+				gantt.columnIndexByDate = gantt.bind(timeline.columnIndexByDate, timeline);
+				gantt.roundTaskDates = gantt.bind(timeline.roundTaskDates, timeline);
+				gantt.getScale = gantt.bind(timeline.getScale, timeline);
+				gantt.getTaskNode = function (id) {
+					return timeline._taskRenderer.rendered[id];
+				};
+				gantt.getLinkNode = function (id) {
+					return timeline._linkRenderer.rendered[id];
+				};
+
+			},
+
+			_clearDomEvents: function(){
+				this._mouseDelegates.destructor();
+				this._mouseDelegates = null;
+			},
+
+			_attachDomEvents: function(gantt){
+				function _delete_link_handler(id, e) {
+					if (id && this.callEvent("onLinkDblClick", [id, e])) {
+
+						var link = this.getLink(id);
+						if (this.isReadonly(link)) return;
+
+						var title = "";
+						var question = this.locale.labels.link + " " + this.templates.link_description(this.getLink(id)) + " " + this.locale.labels.confirm_link_deleting;
+
+						window.setTimeout(function () {
+							gantt._dhtmlx_confirm(question, title, function () {
+								gantt.deleteLink(id);
+							});
+						}, (this.config.touch ? 300 : 1));
+					}
+				}
+
+				this._mouseDelegates.delegate("click", "gantt_task_link", gantt.bind(function (e, trg) {
+					var id = this.locate(e, this.config.link_attribute);
+					if (id) {
+						this.callEvent("onLinkClick", [id, e]);
+					}
+				}, gantt), this.$task);
+
+				this._mouseDelegates.delegate("click", "gantt_scale_cell", gantt.bind(function (e, trg) {
+					var pos = domHelpers.getRelativeEventPosition(e, gantt.$task_data);
+					var date = gantt.dateFromPos(pos.x);
+					var coll = Math.floor(gantt.columnIndexByDate(date));
+
+					var coll_date = gantt.getScale().trace_x[coll];
+
+					gantt.callEvent("onScaleClick", [e, coll_date]);
+				}, gantt), this.$task);
+
+				this._mouseDelegates.delegate("doubleclick", "gantt_task_link", gantt.bind(function (e, id, trg) {
+					var id = this.locate(e, gantt.config.link_attribute);
+					_delete_link_handler.call(this, id, e);
+				}, gantt), this.$task);
+
+				this._mouseDelegates.delegate("doubleclick", "gantt_link_point", gantt.bind(function (e, id, trg) {
+					var id = this.locate(e),
+						task = this.getTask(id);
+
+					var link = null;
+					if (trg.parentNode && domHelpers.getClassName(trg.parentNode)) {
+						if (domHelpers.getClassName(trg.parentNode).indexOf("_left") > -1) {
+							link = task.$target[0];
+						} else {
+							link = task.$source[0];
+						}
+					}
+					if (link)
+						_delete_link_handler.call(this, link, e);
+					return false;
+				}, gantt), this.$task);
+			},
+
+			_attachStateProvider: function(gantt, timeline){
+				var self = timeline;
+				var state = services.getService("state");
+				state.registerProvider("tasksTimeline", function(){
+					return {
+						scale_unit: self._tasks ? self._tasks.unit : undefined,
+						scale_step:  self._tasks ? self._tasks.step  : undefined
+					};
+				});
+			},
+
+			_clearStateProvider: function(){
+				var state = services.getService("state");
+				state.unregisterProvider("tasksTimeline");
+			}
+		};
+	};
+
+})();
+
+module.exports = initializer;
+
+/***/ }),
+/* 52 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var domHelpers = __webpack_require__(1),
+	utils = __webpack_require__(0);
+var timeout = __webpack_require__(9);
+
+function createTaskDND(timeline, gantt){
+	var services = gantt.$services;
+	return {
+		drag: null,
+		dragMultiple: {},
+		_events: {
+			before_start: {},
+			before_finish: {},
+			after_finish: {}
+		},
+		_handlers: {},
+		init: function () {
+			this._domEvents = gantt._createDomEventScope();
+			this.clear_drag_state();
+			var drag = gantt.config.drag_mode;
+			this.set_actions();
+
+			var stateService = services.getService("state");
+			stateService.registerProvider("tasksDnd", utils.bind(function(){
+				return {
+					drag_id : this.drag ? this.drag.id : undefined,
+					drag_mode : this.drag ? this.drag.mode : undefined,
+					drag_from_start : this.drag ? this.drag.left : undefined
+				};
+			}, this));
+
+			var evs = {
+				"before_start": "onBeforeTaskDrag",
+				"before_finish": "onBeforeTaskChanged",
+				"after_finish": "onAfterTaskDrag"
+			};
+			//for now, all drag operations will trigger the same events
+			for (var stage in this._events) {
+				for (var mode in drag) {
+					this._events[stage][mode] = evs[stage];
+				}
+			}
+
+			this._handlers[drag.move] = this._move;
+			this._handlers[drag.resize] = this._resize;
+			this._handlers[drag.progress] = this._resize_progress;
+		},
+		set_actions: function () {
+			var data = timeline.$task_data;
+			this._domEvents.attach(data, "mousemove", gantt.bind(function (e) {
+				this.on_mouse_move(e || event);
+			}, this));
+			this._domEvents.attach(data, "mousedown", gantt.bind(function (e) {
+				this.on_mouse_down(e || event);
+			}, this));
+			this._domEvents.attach(data, "mouseup", gantt.bind(function (e) {
+				this.on_mouse_up(e || event);
+			}, this));
+		},
+
+		clear_drag_state: function () {
+			this.drag = {
+				id: null,
+				mode: null,
+				pos: null,
+				start_x: null,
+				start_y: null,
+				obj: null,
+				left: null
+			};
+			this.dragMultiple = {};
+		},
+		_resize: function (ev, shift, drag) {
+			var cfg = timeline.$getConfig();
+			var coords_x = this._drag_task_coords(ev, drag);
+			if (drag.left) {
+				ev.start_date = gantt.dateFromPos(coords_x.start + shift);
+				if (!ev.start_date) {
+					ev.start_date = new Date(gantt.getState().min_date);
+				}
+			} else {
+				ev.end_date = gantt.dateFromPos(coords_x.end + shift);
+				if (!ev.end_date) {
+					ev.end_date = new Date(gantt.getState().max_date);
+				}
+			}
+
+			if (ev.end_date - ev.start_date < cfg.min_duration) {
+				if (drag.left)
+					ev.start_date = gantt.calculateEndDate({start_date: ev.end_date, duration: -1, task: ev});
+				else
+					ev.end_date = gantt.calculateEndDate({start_date: ev.start_date, duration: 1, task: ev});
+			}
+			gantt._init_task_timing(ev);
+		},
+		_resize_progress: function (ev, shift, drag) {
+			var coords_x = this._drag_task_coords(ev, drag);
+
+			var config = timeline.$getConfig();
+			var diffValue = !config.rtl ? (drag.pos.x - coords_x.start) : (coords_x.start - drag.pos.x);
+
+			var diff = Math.max(0, diffValue);
+			ev.progress = Math.min(1, diff / Math.abs(coords_x.end - coords_x.start));
+		},
+
+		_find_max_shift: function(dragItems, shift){
+			var correctShift;
+			for(var i in dragItems){
+				var drag = dragItems[i];
+				var ev = gantt.getTask(drag.id);
+
+				var coords_x = this._drag_task_coords(ev, drag);
+				var minX = gantt.posFromDate( new Date(gantt.getState().min_date)),
+					maxX = gantt.posFromDate( new Date(gantt.getState().max_date));
+
+				if(coords_x.end + shift > maxX){
+					var maxShift = maxX - coords_x.end;
+					if(maxShift < correctShift || correctShift === undefined){
+						correctShift = maxShift;
+					}
+				}else if(coords_x.start + shift < minX){
+					var minShift = minX - coords_x.start;
+					if(minShift < correctShift || correctShift === undefined){
+						correctShift = minShift;
+					}
+				}
+			}
+			return correctShift;
+		},
+		_move: function (ev, shift, drag) {
+			var coords_x = this._drag_task_coords(ev, drag);
+			var new_start = gantt.dateFromPos(coords_x.start + shift),
+				new_end = gantt.dateFromPos(coords_x.end + shift);
+			if (!new_start) {
+				ev.start_date = new Date(gantt.getState().min_date);
+				ev.end_date = gantt.dateFromPos(gantt.posFromDate(ev.start_date) + (coords_x.end - coords_x.start));
+			} else if (!new_end) {
+				ev.end_date = new Date(gantt.getState().max_date);
+				ev.start_date = gantt.dateFromPos(gantt.posFromDate(ev.end_date) - (coords_x.end - coords_x.start));
+			} else {
+				ev.start_date = new_start;
+				ev.end_date = new_end;
+			}
+		},
+		_drag_task_coords: function (t, drag) {
+			var start = drag.obj_s_x = drag.obj_s_x || gantt.posFromDate(t.start_date);
+			var end = drag.obj_e_x = drag.obj_e_x || gantt.posFromDate(t.end_date);
+			return {
+				start: start,
+				end: end
+			};
+		},
+		_mouse_position_change: function (oldPos, newPos) {
+			var dx = oldPos.x - newPos.x,
+				dy = oldPos.y - newPos.y;
+			return Math.sqrt(dx * dx + dy * dy);
+		},
+		_is_number: function (n) {
+			return !isNaN(parseFloat(n)) && isFinite(n);
+		},
+
+		on_mouse_move: function (e) {
+			if (this.drag.start_drag) {
+				var pos = domHelpers.getRelativeEventPosition(e, gantt.$task_data);
+
+				var sX = this.drag.start_drag.start_x,
+					sY = this.drag.start_drag.start_y;
+
+				if ((Date.now() - this.drag.timestamp > 50) ||
+					(this._is_number(sX) && this._is_number(sY) && this._mouse_position_change({
+						x: sX,
+						y: sY
+					}, pos) > 20)) {
+					this._start_dnd(e);
+				}
+			}
+
+			var drag = this.drag;
+
+			if (drag.mode) {
+				if (!timeout(this, 40))//limit update frequency
+					return;
+
+				this._update_on_move(e);
+
+			}
+		},
+
+		_update_item_on_move: function(shift, id, mode, drag, e){
+			var ev = gantt.getTask(id);
+			var original = gantt.mixin({}, ev);
+			var copy = gantt.mixin({}, ev);
+			this._handlers[mode].apply(this, [copy, shift, drag]);
+			gantt.mixin(ev, copy, true);
+			//gantt._update_parents(drag.id, true);
+			gantt.callEvent("onTaskDrag", [ev.id, mode, copy, original, e]);
+			gantt.mixin(ev, copy, true);
+			gantt.refreshTask(id);
+		},
+
+		_update_on_move: function (e) {
+			var drag = this.drag;
+			var config = timeline.$getConfig();
+			if (drag.mode) {
+				var pos = domHelpers.getRelativeEventPosition(e, timeline.$task_data);
+				if (drag.pos && drag.pos.x == pos.x)
+					return;
+
+				drag.pos = pos;
+
+				var curr_date = gantt.dateFromPos(pos.x);
+				if (!curr_date || isNaN(curr_date.getTime()))
+					return;
+
+
+				var shift = pos.x - drag.start_x;
+				var ev = gantt.getTask(drag.id);
+
+				if (this._handlers[drag.mode]) {
+
+					if(gantt.isSummaryTask(ev) && gantt.config.drag_project && drag.mode == config.drag_mode.move){
+
+						var initialDrag = {};
+						initialDrag[drag.id] = utils.copy(drag);
+						var maxShift = this._find_max_shift(utils.mixin(initialDrag, this.dragMultiple), shift);
+						if(maxShift !== undefined){
+							shift = maxShift;
+						}
+
+						this._update_item_on_move(shift, drag.id, drag.mode, drag, e);
+						for(var i in this.dragMultiple){
+							var childDrag =  this.dragMultiple[i];
+							this._update_item_on_move(shift, childDrag.id, childDrag.mode, childDrag, e);
+						}
+					}else{
+						this._update_item_on_move(shift, drag.id, drag.mode, drag, e);
+					}
+					gantt._update_parents(drag.id);
+				}
+
+			}
+		},
+
+		on_mouse_down: function (e, src) {
+			// on Mac we do not get onmouseup event when clicking right mouse button leaving us in dnd state
+			// let's ignore right mouse button then
+			if (e.button == 2 && e.button !== undefined)
+				return;
+
+			var config = timeline.$getConfig();
+			var id = gantt.locate(e);
+			var task = null;
+			if (gantt.isTaskExists(id)) {
+				task = gantt.getTask(id);
+			}
+
+			if (gantt.isReadonly(task) || this.drag.mode) return;
+
+			this.clear_drag_state();
+
+			src = src || (e.target || e.srcElement);
+
+			var className = domHelpers.getClassName(src);
+			var drag = this._get_drag_mode(className, src);
+
+			if (!className || !drag) {
+				if (src.parentNode)
+					return this.on_mouse_down(e, src.parentNode);
+				else
+					return;
+			}
+
+			if (!drag) {
+				if (gantt.checkEvent("onMouseDown") && gantt.callEvent("onMouseDown", [className.split(" ")[0]])) {
+					if (src.parentNode)
+						return this.on_mouse_down(e, src.parentNode);
+
+				}
+			} else {
+				if (drag.mode && drag.mode != config.drag_mode.ignore && config["drag_" + drag.mode]) {
+					id = gantt.locate(src);
+					task = gantt.copy(gantt.getTask(id) || {});
+
+					if (gantt.isReadonly(task)) {
+						this.clear_drag_state();
+						return false;
+					}
+
+					if ((gantt.isSummaryTask(task) && !config.drag_project) && drag.mode != config.drag_mode.progress) {//only progress drag is allowed for tasks with flexible duration
+						this.clear_drag_state();
+						return;
+					}
+
+					drag.id = id;
+					var pos = domHelpers.getRelativeEventPosition(e, gantt.$task_data);
+
+					drag.start_x = pos.x;
+					drag.start_y = pos.y;
+					drag.obj = task;
+					this.drag.start_drag = drag;
+					this.drag.timestamp = Date.now();
+
+				} else
+					this.clear_drag_state();
+			}
+		},
+		_fix_dnd_scale_time: function (task, drag) {
+			var config = timeline.$getConfig();
+			var unit = gantt.getScale().unit,
+				step = gantt.getScale().step;
+			if (!config.round_dnd_dates) {
+				unit = 'minute';
+				step = config.time_step;
+			}
+
+			function fixStart(task) {
+				if (!gantt.config.correct_work_time)
+					return;
+				var config = timeline.$getConfig();
+				if (!gantt.isWorkTime(task.start_date, undefined, task))
+					task.start_date = gantt.calculateEndDate({
+						start_date: task.start_date,
+						duration: -1,
+						unit: config.duration_unit,
+						task: task
+					});
+			}
+
+			function fixEnd(task) {
+				if (!gantt.config.correct_work_time)
+					return;
+				var config = timeline.$getConfig();
+				if (!gantt.isWorkTime(new Date(task.end_date - 1), undefined, task))
+					task.end_date = gantt.calculateEndDate({
+						start_date: task.end_date,
+						duration: 1,
+						unit: config.duration_unit,
+						task: task
+					});
+			}
+
+			if (drag.mode == config.drag_mode.resize) {
+				if (drag.left) {
+					task.start_date = gantt.roundDate({date: task.start_date, unit: unit, step: step});
+					fixStart(task);
+				} else {
+					task.end_date = gantt.roundDate({date: task.end_date, unit: unit, step: step});
+					fixEnd(task);
+				}
+			} else if (drag.mode == config.drag_mode.move) {
+				task.start_date = gantt.roundDate({date: task.start_date, unit: unit, step: step});
+				fixStart(task);
+				task.end_date = gantt.calculateEndDate(task);				
+			}
+		},
+		_fix_working_times: function (task, drag) {
+			var config = timeline.$getConfig();
+			var drag = drag || {mode: config.drag_mode.move};
+			
+			if (drag.mode == config.drag_mode.resize) {
+				if (drag.left) {
+					task.start_date = gantt.getClosestWorkTime({date: task.start_date, dir: 'future', task: task});
+				} else {
+					task.end_date = gantt.getClosestWorkTime({date: task.end_date, dir: 'past', task: task});
+				}
+			} else if (drag.mode == config.drag_mode.move) {
+				gantt.correctTaskWorkTime(task);
+			}
+		},
+
+		_finalize_mouse_up: function(taskId, config, drag, e){
+			var ev = gantt.getTask(taskId);
+
+			if (config.work_time && config.correct_work_time) {
+				this._fix_working_times(ev, drag);
+			}
+
+			this._fix_dnd_scale_time(ev, drag);
+
+			if (!this._fireEvent("before_finish", drag.mode, [taskId, drag.mode, gantt.copy(drag.obj), e])) {
+				//drag.obj._dhx_changed = false;
+				this.clear_drag_state();
+				if(taskId == drag.id){
+					drag.obj._dhx_changed = false;
+					gantt.mixin(ev, drag.obj, true);
+				}
+
+
+				gantt.refreshTask(ev.id);
+			} else {
+				var drag_id = taskId;
+
+				gantt._init_task_timing(ev);
+
+				this.clear_drag_state();
+				gantt.updateTask(ev.id);
+				this._fireEvent("after_finish", drag.mode, [drag_id, drag.mode, e]);
+			}
+
+		},
+
+		on_mouse_up: function (e) {
+
+			var drag = this.drag;
+			if (drag.mode && drag.id) {
+				var config = timeline.$getConfig();
+				//drop
+				var ev = gantt.getTask(drag.id);
+
+				var dragMultiple = this.dragMultiple;
+				this._finalize_mouse_up(drag.id, config, drag, e);
+				if(gantt.isSummaryTask(ev) && config.drag_project && drag.mode == config.drag_mode.move){
+					for(var i in dragMultiple){
+						this._finalize_mouse_up(dragMultiple[i].id, config, dragMultiple[i], e);
+					}
+				}
+			}
+			this.clear_drag_state();
+		},
+		_get_drag_mode: function (className, el) {
+			var config = timeline.$getConfig();
+			var modes = config.drag_mode;
+			var classes = (className || "").split(" ");
+			var classname = classes[0];
+			var drag = {mode: null, left: null};
+			switch (classname) {
+				case "gantt_task_line":
+				case "gantt_task_content":
+					drag.mode = modes.move;
+					break;
+				case "gantt_task_drag":
+					drag.mode = modes.resize;
+
+					var dragProperty = el.getAttribute("data-bind-property");
+
+					if (dragProperty == "start_date") {
+						drag.left = true;
+					} else {
+						drag.left = false;
+					}
+					break;
+				case "gantt_task_progress_drag":
+					drag.mode = modes.progress;
+					break;
+				case "gantt_link_control":
+				case "gantt_link_point":
+					drag.mode = modes.ignore;
+					break;
+				default:
+					drag = null;
+					break;
+			}
+			return drag;
+
+		},
+
+		_start_dnd: function (e) {
+			var drag = this.drag = this.drag.start_drag;
+			delete drag.start_drag;
+
+			var cfg = timeline.$getConfig();
+			var id = drag.id;
+			if (!cfg["drag_" + drag.mode] || !gantt.callEvent("onBeforeDrag", [id, drag.mode, e]) || !this._fireEvent("before_start", drag.mode, [id, drag.mode, e])) {
+				this.clear_drag_state();
+			} else {
+				delete drag.start_drag;
+
+				var task = gantt.getTask(id);
+				if(gantt.isSummaryTask(task) && gantt.config.drag_project && drag.mode == cfg.drag_mode.move){
+					gantt.eachTask(function(child){
+						this.dragMultiple[child.id] = gantt.mixin({
+							id: child.id,
+							obj: child
+						}, this.drag);
+					}, task.id, this);
+				}
+
+				gantt.callEvent("onTaskDragStart", []);
+			}
+
+		},
+		_fireEvent: function (stage, mode, params) {
+			gantt.assert(this._events[stage], "Invalid stage:{" + stage + "}");
+
+			var trigger = this._events[stage][mode];
+
+			gantt.assert(trigger, "Unknown after drop mode:{" + mode + "}");
+			gantt.assert(params, "Invalid event arguments");
+
+
+			if (!gantt.checkEvent(trigger))
+				return true;
+
+			return gantt.callEvent(trigger, params);
+		},
+
+		round_task_dates: function(task){
+			var drag_state = this.drag;
+			var config = timeline.$getConfig();
+			if (!drag_state) {
+				drag_state = {mode: config.drag_mode.move};
+			}
+			this._fix_dnd_scale_time(task, drag_state);
+		},
+		destructor: function(){
+			this._domEvents.detachAll();
+		}
+	};
+}
+
+function initTaskDND() {
+	var _tasks_dnd;
+	return {
+		extend: function(timeline){
+			timeline.roundTaskDates = function (task) {
+				_tasks_dnd.round_task_dates(task);
+			};
+
+		},
+		init: function(timeline, gantt){
+			_tasks_dnd = createTaskDND(timeline, gantt);
+			// TODO: entry point for touch handlers, move touch to timeline
+			timeline._tasks_dnd = _tasks_dnd;
+			return _tasks_dnd.init(gantt);
+		},
+		destructor: function(){
+			_tasks_dnd.destructor();
+			_tasks_dnd = null;
+		}
+	};
+}
+
+module.exports = {
+	createTaskDND: initTaskDND
+};
+
+
+/***/ }),
+/* 53 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var domHelpers = __webpack_require__(1);
+
+var initLinksDND = function(timeline, gantt) {
+	var _link_landing,
+		_link_target_task,
+		_link_target_task_start,
+		_link_source_task,
+		_link_source_task_start;
+
+
+	function getVisibleMilestoneWidth() {
+		var origWidth = timeline.getItemHeight();//m-s have square shape
+		return Math.round(Math.sqrt(2 * origWidth * origWidth)) - 2;
+	}
+
+	function isMilestone(task) {
+		return gantt.getTaskType(task.type) == gantt.config.types.milestone;
+	}
+
+	function getDndState(){
+		return {
+			link_source_id : _link_source_task,
+			link_target_id : _link_target_task,
+			link_from_start : _link_source_task_start,
+			link_to_start : _link_target_task_start,
+			link_landing_area : _link_landing
+		};
+	}
+
+	var services = gantt.$services;
+
+	var state = services.getService("state");
+	var DnD = services.getService("dnd");
+
+	state.registerProvider("linksDnD", getDndState);
+
+	var dnd = new DnD(timeline.$task_bars, { sensitivity : 0, updates_per_second : 60 }),
+		start_marker = "task_start_date",
+		end_marker = "task_end_date",
+		link_edge_marker = "gantt_link_point",
+		link_landing_hover_area = "gantt_link_control";
+
+	dnd.attachEvent("onBeforeDragStart", gantt.bind(function(obj,e) {
+		var target = (e.target||e.srcElement);
+		resetDndState();
+		if(gantt.getState().drag_id)
+			return false;
+
+		if(domHelpers.locateClassName(target, link_edge_marker)){
+			if(domHelpers.locateClassName(target, start_marker))
+				_link_source_task_start = true;
+
+			var sid = gantt.locate(e);
+			_link_source_task = sid;
+
+			var t = gantt.getTask(sid);
+			if(gantt.isReadonly(t)){
+				resetDndState();
+				return false;
+			}
+
+			var shift = 0;
+
+			this._dir_start = getLinePos(t, !!_link_source_task_start, shift, timeline.$getConfig(), true);
+			return true;
+		}else{
+			return false;
+		}
+
+	}, this));
+
+	dnd.attachEvent("onAfterDragStart", gantt.bind(function(obj,e) {
+		if(gantt.config.touch) {
+			gantt.refreshData();
+		}
+		updateMarkedHtml(dnd.config.marker);
+	}, this));
+
+	function getLinePos(task, to_start, shift, cfg, isStart){
+		var taskPos = getMilestonePosition(task, function(task){ return gantt.getTaskPosition(task);}, cfg);
+
+		var pos = {x: taskPos.x, y: taskPos.y};
+		if(!to_start){
+			pos.x = taskPos.xEnd;
+		}
+
+		//var pos = gantt._get_task_pos(task, !!to_start);
+		pos.y += gantt.config.row_height/2;
+
+		var offset = isMilestone(task) && isStart ? 2 : 0;
+
+		shift = shift || 0;
+		if(cfg.rtl)
+			shift = shift * -1;
+
+		pos.x += (to_start ? -1 : 1)*shift  - offset;
+		return pos;
+	}
+
+	function getMilestonePosition(task, getTaskPosition, cfg){
+		var pos = getTaskPosition(task);
+
+		var res = {
+			x: pos.left,
+			y: pos.top,
+			width: pos.width,
+			height: pos.height
+		};
+
+		if(cfg.rtl){
+			res.xEnd = res.x;
+			res.x = res.xEnd + res.width;
+		}else{
+			res.xEnd = res.x + res.width;
+		}
+		res.yEnd = res.y + res.height;
+
+		if(gantt.getTaskType(task.type) == gantt.config.types.milestone){
+			var milestoneWidth = getVisibleMilestoneWidth();
+
+			res.x += (!cfg.rtl ? -1 : 1)*(milestoneWidth / 2);
+			res.xEnd += (!cfg.rtl ? 1 : -1)*(milestoneWidth / 2);
+
+			//pos.x -= milestoneWidth / 2;
+			//pos.xEnd += milestoneWidth / 2;
+			res.width = pos.xEnd - pos.x;
+		}
+
+
+		return res;
+	}
+
+	dnd.attachEvent("onDragMove", gantt.bind(function(obj,e) {
+		var dd = dnd.config;
+		var pos = dnd.getPosition(e);
+		advanceMarker(dd.marker, pos);
+		var landing = !!domHelpers.locateClassName(e, link_landing_hover_area);
+
+		var prevTarget = _link_target_task;
+		var prevLanding = _link_landing;
+		var prevToStart = _link_target_task_start;
+
+		var targ = gantt.locate(e),
+			to_start = true;
+		if(landing){
+			//refreshTask
+			to_start = !domHelpers.locateClassName(e, end_marker);
+			landing = !!targ;
+		}
+
+		_link_target_task = targ;
+		_link_landing = landing;
+		_link_target_task_start = to_start;
+
+		if(landing){
+			var t = gantt.getTask(targ);
+
+			var config = timeline.$getConfig();
+			var node = domHelpers.locateClassName(e, link_landing_hover_area);
+			var shift = 0;
+			if(node){
+				shift = Math.floor(node.offsetWidth  / 2);
+			}
+
+			this._dir_end = getLinePos(t, !!_link_target_task_start,shift, config);
+		}else{
+			this._dir_end = domHelpers.getRelativeEventPosition(e, timeline.$task_data);
+		}
+
+		var targetChanged = !(prevLanding == landing && prevTarget == targ && prevToStart == to_start);
+		if(targetChanged){
+			if(prevTarget)
+				gantt.refreshTask(prevTarget, false);
+			if(targ)
+				gantt.refreshTask(targ, false);
+		}
+
+		if(targetChanged){
+			updateMarkedHtml(dd.marker);
+		}
+
+		showDirectingLine(this._dir_start.x, this._dir_start.y, this._dir_end.x, this._dir_end.y);
+
+		return true;
+	}, this));
+
+
+	dnd.attachEvent("onDragEnd", gantt.bind(function() {
+		var drag = getDndState();
+
+		if(drag.link_source_id && drag.link_target_id && drag.link_source_id != drag.link_target_id){
+			var type = gantt._get_link_type(drag.link_from_start, drag.link_to_start);
+
+			var link = {source : drag.link_source_id, target: drag.link_target_id, type:type};
+			if(link.type && gantt.isLinkAllowed(link))
+				gantt.addLink(link);
+		}
+
+		resetDndState();
+
+		if(gantt.config.touch) {
+			gantt.refreshData();
+		}
+		else {
+			if (drag.link_source_id)
+				gantt.refreshTask(drag.link_source_id, false);
+			if (drag.link_target_id)
+				gantt.refreshTask(drag.link_target_id, false);
+		}
+		removeDirectionLine();
+	}, this));
+
+	function updateMarkedHtml(marker){
+		var link = getDndState();
+
+		var css = ["gantt_link_tooltip"];
+		if(link.link_source_id && link.link_target_id){
+			if(gantt.isLinkAllowed(link.link_source_id, link.link_target_id, link.link_from_start, link.link_to_start)){
+				css.push("gantt_allowed_link");
+			}else{
+				css.push("gantt_invalid_link");
+			}
+		}
+
+		var className = gantt.templates.drag_link_class(link.link_source_id, link.link_from_start, link.link_target_id, link.link_to_start);
+		if(className)
+			css.push(className);
+
+		var html = "<div class='"+className+ "'>" +
+			gantt.templates.drag_link(link.link_source_id, link.link_from_start, link.link_target_id, link.link_to_start) +
+			"</div>";
+		marker.innerHTML = html;
+	}
+
+	function advanceMarker(marker, pos){
+		marker.style.left = pos.x + 5 + "px";
+		marker.style.top = pos.y + 5 + "px";
+	}
+
+	function resetDndState(){
+		_link_source_task =
+			_link_source_task_start =
+				_link_target_task = null;
+		_link_target_task_start = true;
+	}
+	function showDirectingLine(s_x, s_y, e_x, e_y){
+		var div = getDirectionLine();
+
+		var link = getDndState();
+
+		var css = ["gantt_link_direction"];
+		if(gantt.templates.link_direction_class){
+			css.push(gantt.templates.link_direction_class(link.link_source_id, link.link_from_start, link.link_target_id, link.link_to_start));
+		}
+
+		var dist =Math.sqrt( (Math.pow(e_x - s_x, 2)) + (Math.pow(e_y - s_y, 2)) );
+		dist = Math.max(0, dist - 3);
+		if(!dist)
+			return;
+
+		div.className = css.join(" ");
+		var tan = (e_y - s_y)/(e_x - s_x),
+			angle = Math.atan(tan);
+
+		if(coordinateCircleQuarter(s_x, e_x, s_y, e_y) == 2){
+			angle += Math.PI;
+		}else if(coordinateCircleQuarter(s_x, e_x, s_y, e_y) == 3){
+			angle -= Math.PI;
+		}
+
+
+
+		var sin = Math.sin(angle),
+			cos = Math.cos(angle),
+			top = Math.round(s_y),
+			left = Math.round(s_x);
+
+
+		var style = [
+			"-webkit-transform: rotate("+angle+"rad)",
+			"-moz-transform: rotate("+angle+"rad)",
+			"-ms-transform: rotate("+angle+"rad)",
+			"-o-transform: rotate("+angle+"rad)",
+			"transform: rotate("+angle+"rad)",
+			"width:" + Math.round(dist) + "px"
+		];
+
+		if(window.navigator.userAgent.indexOf("MSIE 8.0") != -1){
+			//ms-filter breaks styles in ie9, so add it only for 8th
+			style.push("-ms-filter: \"" + ieTransform(sin, cos) + "\"");
+
+			var shiftLeft = Math.abs(Math.round(s_x - e_x)),
+				shiftTop = Math.abs(Math.round(e_y - s_y));
+			//fix rotation axis
+			switch(coordinateCircleQuarter(s_x, e_x, s_y, e_y)){
+				case 1:
+					top -= shiftTop;
+					break;
+				case 2:
+					left -= shiftLeft;
+					top -= shiftTop;
+					break;
+				case 3:
+					left -= shiftLeft;
+					break;
+				default:
+					break;
+			}
+
+		}
+
+		style.push("top:" +  top + "px");
+		style.push("left:" +  left + "px");
+
+		div.style.cssText = style.join(";");
+	}
+
+	function ieTransform(sin, cos){
+		return "progid:DXImageTransform.Microsoft.Matrix("+
+			"M11 = "+cos+","+
+			"M12 = -"+sin+","+
+			"M21 = "+sin+","+
+			"M22 = "+cos+","+
+			"SizingMethod = 'auto expand'"+
+		")";
+	}
+	function coordinateCircleQuarter(sX, eX, sY, eY){
+		if(eX >= sX){
+			if(eY <= sY){
+				return 1;
+			}else{
+				return 4;
+			}
+		}else{
+			if(eY <= sY){
+				return 2;
+			}else{
+				return 3;
+			}
+		}
+
+	}
+	function getDirectionLine(){
+		if(!dnd._direction){
+			dnd._direction = document.createElement("div");
+			timeline.$task_links.appendChild(dnd._direction);
+		}
+		return dnd._direction;
+	}
+	function removeDirectionLine(){
+		if(dnd._direction){
+			if (dnd._direction.parentNode)	//the event line can be detached because of data refresh
+				dnd._direction.parentNode.removeChild(dnd._direction);
+
+			dnd._direction = null;
+		}
+	}
+};
+
+module.exports = {
+	createLinkDND: function(){
+		return {
+			init: initLinksDND
+		};
+	}
+};
+
+/***/ }),
+/* 54 */
+/***/ (function(module, exports) {
+
+var initializer = (function() {
+	return function (gantt) {
+		return {
+
+			getVerticalScrollbar: function(){
+				return gantt.$ui.getView("scrollVer");
+			},
+			getHorizontalScrollbar: function(){
+				return gantt.$ui.getView("scrollHor");
+			},
+
+			_legacyGridResizerClass: function(layout){
+				var resizers = layout.getCellsByType("resizer");
+				for(var i = 0; i < resizers.length; i++){
+					var r = resizers[i];
+					var gridResizer = false;
+
+					var prev = r.$parent.getPrevSibling(r.$id);
+					if(prev && prev.$config && prev.$config.id === "grid"){
+						gridResizer= true;
+					}else{
+						var next = r.$parent.getNextSibling(r.$id);
+						if(next && next.$config && next.$config.id === "grid"){
+							gridResizer= true;
+						}
+					}
+
+					if(gridResizer){
+						r.$config.css = (r.$config.css ? r.$config.css + " " : "") + "gantt_grid_resize_wrap";
+					}
+				}
+			},
+
+			onCreated: function (layout) {
+				var first = true;
+
+				this._legacyGridResizerClass(layout);
+
+				layout.attachEvent("onBeforeResize", function(){
+					var mainTimeline = gantt.$ui.getView("timeline");
+					if(mainTimeline)
+						mainTimeline.$config.hidden = mainTimeline.$parent.$config.hidden = !gantt.config.show_chart;
+
+					var mainGrid = gantt.$ui.getView("grid");
+					if(!mainGrid)
+						return;
+
+					var showGrid = gantt.config.show_grid;
+					if(first) {
+						var colsWidth = mainGrid._getColsTotalWidth();
+						if(colsWidth !== false){
+							gantt.config.grid_width = colsWidth;
+						}
+						showGrid = showGrid && !!gantt.config.grid_width;
+						gantt.config.show_grid = showGrid;
+					}
+					mainGrid.$config.hidden = mainGrid.$parent.$config.hidden = !showGrid;
+
+					if(!mainGrid.$config.hidden){
+						/* restrict grid width due to min_width, max_width, min_grid_column_width */
+						var grid_limits = mainGrid._getGridWidthLimits();
+						if (grid_limits[0] && gantt.config.grid_width < grid_limits[0])
+							gantt.config.grid_width = grid_limits[0];
+						if (grid_limits[1] && gantt.config.grid_width > grid_limits[1])
+							gantt.config.grid_width = grid_limits[1];
+						
+						mainGrid.$config.width = gantt.config.grid_width - 1;
+						if(!first){
+							mainGrid.$parent._setContentSize(mainGrid.$config.width, mainGrid.$config.height);
+						}else{
+							mainGrid.$parent.$config.width = gantt.config.grid_width;
+
+							if(mainGrid.$parent.$config.group){
+								gantt.$layout._syncCellSizes(mainGrid.$parent.$config.group, mainGrid.$parent.$config.width);
+							}
+						}
+					}
+
+					first = false;
+
+				});
+
+				gantt._getVerticalScrollbar = this.getVerticalScrollbar;
+				gantt._getHorizontalScrollbar = this.getHorizontalScrollbar;
+
+				var vertical = this.getVerticalScrollbar();
+				var horizontal = this.getHorizontalScrollbar();
+				if(vertical){
+					vertical.attachEvent("onScroll", function(oldPos, newPos, dir){
+						var scrollState = gantt.getScrollState();
+						gantt.callEvent("onGanttScroll", [scrollState.x, oldPos, scrollState.x, newPos]);
+					});
+				}
+				if(horizontal){
+					horizontal.attachEvent("onScroll", function(oldPos, newPos, dir){
+						var scrollState = gantt.getScrollState();
+						gantt.callEvent("onGanttScroll", [oldPos, scrollState.y, newPos, scrollState.y]);
+					});
+				}
+
+				layout.attachEvent("onResize", function(){
+					if(vertical && !gantt.$scroll_ver){
+						gantt.$scroll_ver = vertical.$scroll_ver;
+					}
+
+					if(horizontal && !gantt.$scroll_hor){
+						gantt.$scroll_hor = horizontal.$scroll_hor;
+					}
+				});
+
+			},
+			onInitialized: function (layout) {
+				var grid = gantt.$ui.getView("grid");
+				if(!(grid && grid.$parent && grid.$parent.$parent && grid.$parent.$parent._xLayout)){
+					return;
+				}
+
+				var parent = grid.$parent.$parent;
+
+				//TODO: can't bind resizer to a grid in complex layouts
+				var next = parent.getNextSibling(grid.$parent.$id);
+				var gridFirst = true;
+				if(!(next && next.$name == "resizer")){
+					next = parent.getPrevSibling(grid.$parent.$id);
+					gridFirst = false;
+				}
+				// expose grid resize events
+				if(next && next.$name == "resizer"){
+					var initialWidth;
+					next.attachEvent("onResizeStart", function(prevCellWidth, nextCellWidth){
+
+						var grid = gantt.$ui.getView("grid");
+						var viewCell = grid ? grid.$parent : null;
+						if(viewCell){
+							var limits = grid._getGridWidthLimits();
+
+							// min grid width is defined by min widths of its columns, unless grid has horizontal scroll
+							if(!grid.$config.scrollable)
+								viewCell.$config.minWidth = limits[0];
+
+							viewCell.$config.maxWidth = limits[1];
+						}
+						initialWidth = gridFirst ? prevCellWidth : nextCellWidth;
+						return gantt.callEvent("onGridResizeStart", [initialWidth]);
+					});
+					next.attachEvent("onResize", function(newBehindSize, newFrontSize){
+						var newSize = gridFirst ? newBehindSize : newFrontSize;
+						return gantt.callEvent("onGridResize", [initialWidth, newSize]);
+					});
+					next.attachEvent("onResizeEnd", function(oldBackSize, oldFrontSize, newBackSize, newFrontSize){
+
+						var oldSize = gridFirst ? oldBackSize : oldFrontSize;
+						var newSize = gridFirst ? newBackSize : newFrontSize;
+						var grid = gantt.$ui.getView("grid");
+						var viewCell = grid ? grid.$parent : null;
+						if(viewCell){
+							viewCell.$config.minWidth = undefined;
+						}
+						var res = gantt.callEvent("onGridResizeEnd", [oldSize, newSize]);
+						if(res){
+							gantt.config.grid_width = newSize;
+						}
+
+						return res;
+					});
+				}
+
+			},
+			onDestroyed: function (timeline) {
+
+			}
+		};
+	};
+})();
+
+module.exports = initializer;
+
+/***/ }),
+/* 55 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt) {
+	delete gantt.addTaskLayer;
+	delete gantt.addLinkLayer;
+};
+
+/***/ }),
+/* 56 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+var facadeFactory = __webpack_require__(57);
+var calculateScaleRange = __webpack_require__(17);
+function initDataStores(gantt){
+
+	var facade = facadeFactory.create();
+	utils.mixin(gantt, facade);
+	var tasksStore = gantt.createDatastore({
+		name: "task",
+		type: "treeDatastore",
+		rootId: function(){return gantt.config.root_id;},
+		initItem: utils.bind(_init_task, gantt)
+	});
+
+	var linksStore = gantt.createDatastore({
+		name: "link",
+		initItem: utils.bind(_init_link, gantt)
+	});
+
+	tasksStore.attachEvent("onBeforeRefreshAll", function(){
+
+		var order = tasksStore.getVisibleItems();
+
+		for(var i=0; i < order.length; i++){
+			var item = order[i];
+			item.$index = i;
+			gantt.resetProjectDates(item);
+		}
+
+	});
+
+	tasksStore.attachEvent("onFilterItem", function(id, task){
+		var min = null, max = null;
+		if (gantt.config.start_date && gantt.config.end_date) {
+			if (gantt._isAllowedUnscheduledTask(task)) return true;
+			min = gantt.config.start_date.valueOf();
+			max = gantt.config.end_date.valueOf();
+
+			if (+task.start_date > max || +task.end_date < +min)
+				return false;
+		}
+		return true;
+	});
+
+	tasksStore.attachEvent("onIdChange", function(oldId, newId){
+		gantt._update_flags(oldId, newId);
+	});
+
+	tasksStore.attachEvent("onAfterUpdate", function(id){
+		gantt._update_parents(id);
+	});
+
+	tasksStore.attachEvent("onAfterItemMove", function(sid, parent, tindex){
+		var source = gantt.getTask(sid);
+
+		if(this.getNextSibling(sid) !== null){
+			source.$drop_target = this.getNextSibling(sid);
+		} else if(this.getPrevSibling(sid) !== null){
+			source.$drop_target = "next:" + this.getPrevSibling(sid);
+		}else{
+			source.$drop_target = "next:null";
+		}
+
+		return true;
+	});
+
+	tasksStore.attachEvent("onStoreUpdated", function(id, item, action){
+		if(action == "delete"){
+			gantt._update_flags(id, null);
+		}
+
+		var state = gantt.$services.getService("state");
+		if(state.getState("batchUpdate").batch_update){
+			return;
+		}
+
+		if(gantt.config.fit_tasks && action !== "paint"){
+			var oldState = gantt.getState();
+			calculateScaleRange(gantt);
+			var newState = gantt.getState();
+
+			//this._init_tasks_range();
+			if (+oldState.min_date != +newState.min_date || +oldState.max_date != +newState.max_date) {
+				gantt.render();
+
+				gantt.callEvent("onScaleAdjusted", []);
+				return true;
+			}
+
+		}
+
+		if(action == "add" || action == "move" || action == "delete"){
+			gantt.$layout.resize();
+		}else if(!id){
+			linksStore.refresh();
+		}
+
+	});
+
+	linksStore.attachEvent("onAfterAdd", function(id, link){
+		sync_link(link);
+	});
+	linksStore.attachEvent("onAfterUpdate", function(id, link){
+		sync_links();
+	});
+	linksStore.attachEvent("onAfterDelete", function(id, link){
+		sync_link_delete(link);
+	});
+	linksStore.attachEvent("onIdChange", function(oldId, newId){
+		sync_link_delete(gantt.mixin({id:oldId}, gantt.$data.linksStore.getItem(newId)));
+		sync_link(gantt.$data.linksStore.getItem(newId));
+	});
+
+	linksStore.attachEvent("onFilterItem", function(id, link){
+		if (!gantt.config.show_links) {
+			return false;
+		}
+
+		if (!(gantt.isTaskVisible(link.source) && gantt.isTaskVisible(link.target)) ||
+			gantt._isAllowedUnscheduledTask(gantt.getTask(link.source)) || gantt._isAllowedUnscheduledTask(gantt.getTask(link.target)))
+			return false;
+
+		return gantt.callEvent("onBeforeLinkDisplay", [id, link]);
+	});
+
+
+	(function(){
+		// delete all connected links after task is deleted
+		var treeHelper = __webpack_require__(18);
+		var deletedLinks = {};
+
+		gantt.attachEvent("onBeforeTaskDelete", function(id, item){
+ 			deletedLinks[id] = treeHelper.getSubtreeLinks(gantt, id);
+			return true;
+		});
+
+		gantt.attachEvent("onAfterTaskDelete", function(id, item) {
+			if(deletedLinks[id]){
+				gantt.$data.linksStore.silent(function(){
+					for(var i in deletedLinks[id]){
+						gantt.$data.linksStore.removeItem(i);
+						sync_link_delete(deletedLinks[id][i]);
+					}
+
+					deletedLinks[id] = null;
+				});
+			}
+		});
+	})();
+
+	gantt.attachEvent("onAfterLinkDelete", function(id, link) {
+		gantt.refreshTask(link.source);
+		gantt.refreshTask(link.target);
+	});
+
+	gantt.attachEvent("onParse", sync_links);
+
+	mapEvents({
+		source: linksStore,
+		target: gantt,
+		events:{
+			"onItemLoading":"onLinkLoading",
+			"onBeforeAdd":"onBeforeLinkAdd",
+			"onAfterAdd":"onAfterLinkAdd",
+			"onBeforeUpdate":"onBeforeLinkUpdate",
+			"onAfterUpdate":"onAfterLinkUpdate",
+			"onBeforeDelete":"onBeforeLinkDelete",
+			"onAfterDelete":"onAfterLinkDelete",
+			"onIdChange":"onLinkIdChange"
+		}
+	});
+
+	mapEvents({
+		source: tasksStore,
+		target: gantt,
+		events:{
+			"onItemLoading":"onTaskLoading",
+			"onBeforeAdd":"onBeforeTaskAdd",
+			"onAfterAdd":"onAfterTaskAdd",
+			"onBeforeUpdate":"onBeforeTaskUpdate",
+			"onAfterUpdate":"onAfterTaskUpdate",
+			"onBeforeDelete":"onBeforeTaskDelete",
+			"onAfterDelete":"onAfterTaskDelete",
+			"onIdChange":"onTaskIdChange",
+			"onBeforeItemMove":"onBeforeTaskMove",
+			"onAfterItemMove":"onAfterTaskMove",
+			"onFilterItem":"onBeforeTaskDisplay",
+			"onItemOpen":"onTaskOpened",
+			"onItemClose":"onTaskClosed",
+			"onBeforeSelect":"onBeforeTaskSelected",
+			"onAfterSelect":"onTaskSelected",
+			"onAfterUnselect":"onTaskUnselected"
+		}
+	});
+
+	gantt.$data = {
+		tasksStore: tasksStore,
+		linksStore: linksStore
+	};
+
+	function sync_link(link){
+		if(gantt.isTaskExists(link.source)){
+			var sourceTask = gantt.getTask(link.source);
+			sourceTask.$source = sourceTask.$source || [];
+			sourceTask.$source.push(link.id);
+		}
+		if(gantt.isTaskExists(link.target)){
+			var targetTask = gantt.getTask(link.target);
+			targetTask.$target = targetTask.$target || [];
+			targetTask.$target.push(link.id);
+		}
+	}
+
+	function sync_link_delete(link){
+		if(gantt.isTaskExists(link.source)){
+			var sourceTask = gantt.getTask(link.source);
+			for(var i = 0; i < sourceTask.$source.length; i++){
+				if(sourceTask.$source[i] == link.id){
+					sourceTask.$source.splice(i, 1);
+					break;
+				}
+			}
+		}
+		if(gantt.isTaskExists(link.target)){
+			var targetTask = gantt.getTask(link.target);
+			for(var i = 0; i < targetTask.$target.length; i++){
+				if(targetTask.$target[i] == link.id){
+					targetTask.$target.splice(i, 1);
+					break;
+				}
+			}
+		}
+	}
+
+	function sync_links() {
+		var task = null;
+		var tasks = gantt.$data.tasksStore.getItems();
+
+		for(var i = 0, len = tasks.length; i < len; i++){
+			task = tasks[i];
+			task.$source = [];
+			task.$target = [];
+		}
+
+		var links = gantt.$data.linksStore.getItems();
+		for (var i = 0, len = links.length; i < len; i++) {
+
+			var link = links[i];
+			sync_link(link);
+		}
+	}
+
+	function mapEvents(conf){
+		var mapFrom = conf.source;
+		var mapTo = conf.target;
+		for(var i in conf.events){
+			(function(sourceEvent, targetEvent){
+				mapFrom.attachEvent(sourceEvent, function(){
+					return mapTo.callEvent(targetEvent, Array.prototype.slice.call(arguments));
+				}, targetEvent);
+			})(i, conf.events[i]);
+		}
+	}
+
+	function _init_task(task) {
+		if (!this.defined(task.id))
+			task.id = this.uid();
+
+		if (task.start_date)
+			task.start_date = gantt.date.parseDate(task.start_date, "xml_date");
+		if (task.end_date)
+			task.end_date = gantt.date.parseDate(task.end_date, "xml_date");
+
+
+		var duration = null;
+		if (task.duration || task.duration === 0) {
+			task.duration = duration = task.duration * 1;
+		}
+
+		if (duration) {
+			if (task.start_date && !task.end_date) {
+				task.end_date = this.calculateEndDate(task);
+			} else if (!task.start_date && task.end_date) {
+				task.start_date = this.calculateEndDate({
+					start_date: task.end_date,
+					duration: -task.duration,
+					task: task
+				});
+			}
+		}
+
+
+		if (this._isAllowedUnscheduledTask(task)) {
+			this._set_default_task_timing(task);
+		}
+		this._init_task_timing(task);
+		if (task.start_date && task.end_date)
+			this.correctTaskWorkTime(task);
+
+		task.$source = [];
+		task.$target = [];
+		if (task.parent === undefined) {
+			this.setParent(task, this.config.root_id);
+		}
+
+		return task;
+	}
+
+	function _init_link(link) {
+		if (!this.defined(link.id))
+			link.id = this.uid();
+		return link;
+	}
+}
+
+
+module.exports = initDataStores;
+
+
+/***/ }),
+/* 57 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+var createTasksFacade = __webpack_require__(58),
+	createLinksFacade = __webpack_require__(59),
+	DataStore = __webpack_require__(15),
+	TreeDataStore = __webpack_require__(60),
+	createDatastoreSelect = __webpack_require__(61);
+var datastoreRender = __webpack_require__(62);
+
+function getDatastores(){
+	var storeNames = this.$services.getService("datastores");
+	var res = [];
+	for(var i = 0; i < storeNames.length; i++){
+		res.push(this.getDatastore(storeNames[i]));
+	}
+	return res;
+}
+
+var createDatastoreFacade = function(){
+	return {
+	createDatastore: function(config){
+
+		var $StoreType = (config.type || "").toLowerCase() == "treedatastore" ? TreeDataStore : DataStore;
+
+		if(config){
+			var self = this;
+			config.openInitially = function(){ return self.config.open_tree_initially; };
+		}
+
+		var store = new $StoreType(config);
+		this.mixin(store, createDatastoreSelect());
+
+		if(config.name){
+
+			this.$services.setService("datastore:" + config.name, function(){return store;});
+			var storeList = this.$services.getService("datastores");
+			if(!storeList){
+				storeList = [];
+				this.$services.setService("datastores", function(){return storeList;});
+			}
+			storeList.push(config.name);
+
+			datastoreRender.bindDataStore(config.name, this);
+		}
+
+		return store;
+	},
+	getDatastore: function(name){
+		return this.$services.getService("datastore:" + name);
+	},
+
+	refreshData: function () {
+		var scrollState = this.getScrollState();
+		this.callEvent("onBeforeDataRender", []);
+
+		var stores = getDatastores.call(this);
+		for(var i = 0; i < stores.length; i++){
+			stores[i].refresh();
+		}
+
+		if(scrollState.x || scrollState.y){
+			this.scrollTo(scrollState.x, scrollState.y);
+		}
+		this.callEvent("onDataRender", []);
+	},
+
+	isChildOf: function(childId, parentId){
+		return this.$data.tasksStore.isChildOf(childId, parentId);
+	},
+
+	refreshTask: function (taskId, refresh_links) {
+		var task = this.getTask(taskId);
+		if (task && this.isTaskVisible(taskId)) {
+
+			this.$data.tasksStore.refresh(taskId, !!this.getState().drag_id);// do quick refresh during drag and drop
+
+			if (refresh_links !== undefined && !refresh_links)
+				return;
+			for (var i = 0; i < task.$source.length; i++) {
+				this.refreshLink(task.$source[i]);
+			}
+			for (var i = 0; i < task.$target.length; i++) {
+				this.refreshLink(task.$target[i]);
+			}
+		}
+
+	},
+	refreshLink: function (linkId) {
+		this.$data.linksStore.refresh(linkId);
+	},
+
+	silent: function(code){
+		var gantt = this;
+		gantt.$data.tasksStore.silent(function(){
+			gantt.$data.linksStore.silent(function(){
+				code();
+			});
+		});
+	},
+
+	clearAll: function () {
+		var stores = getDatastores.call(this);
+		for(var i = 0; i < stores.length; i++){
+			stores[i].clearAll();
+		}
+
+		this._update_flags();
+		this.userdata = {};
+		this.callEvent("onClear", []);
+		this.render();
+	},
+	_clear_data: function () {
+		this.$data.tasksStore.clearAll();
+		this.$data.linksStore.clearAll();
+		this._update_flags();
+		this.userdata = {};
+	},
+
+	selectTask: function(id){
+		var store = this.$data.tasksStore;
+		if(!this.config.select_task)
+			return false;
+		if (id){
+
+			store.select(id);
+		}
+		return store.getSelectedId();
+	},
+	unselectTask: function(id){
+		var store = this.$data.tasksStore;
+		store.unselect(id);
+	},
+	getSelectedId: function() {
+		return this.$data.tasksStore.getSelectedId();
+	}
+};
+};
+
+function createFacade(){
+	var res = utils.mixin({}, createDatastoreFacade());
+	utils.mixin(res, createTasksFacade());
+	utils.mixin(res, createLinksFacade());
+	return res;
+}
+
+
+
+
+module.exports = {create: createFacade};
+
+/***/ }),
+/* 58 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+
+var createTasksDatastoreFacade = function(){
+	return {
+	getTask: function (id) {
+		this.assert(id, "Invalid argument for gantt.getTask");
+		var task = this.$data.tasksStore.getItem(id);
+		this.assert(task, "Task not found id=" + id);
+		return task;
+	},
+	getTaskByTime: function (from, to) {
+		var p = this.$data.tasksStore.getItems();
+
+		var res = [];
+
+		if (!(from || to)) {
+			res = p;
+		} else {
+			from = +from || -Infinity;
+			to = +to || Infinity;
+			for (var t = 0; t < p.length; t++){
+				var task = p[t];
+				if (+task.start_date < to && +task.end_date > from)
+					res.push(task);
+			}
+		}
+		return res;
+	},
+	isTaskExists: function (id) {
+		return this.$data.tasksStore.exists(id);
+	},
+	updateTask: function (id, item) {
+		if (!utils.defined(item)) item = this.getTask(id);
+		this.$data.tasksStore.updateItem(id, item);
+		this.refreshTask(id);
+	},
+	addTask: function (item, parent, index) {
+		if (!utils.defined(item.id))
+			item.id = utils.uid();
+
+		if (!utils.defined(parent)) parent = this.getParent(item) || 0;
+		if (!this.isTaskExists(parent)) parent = 0;
+		this.setParent(item, parent);
+
+		return this.$data.tasksStore.addItem(item, index, parent);
+	},
+	deleteTask: function (id) {
+		return this.$data.tasksStore.removeItem(id);
+	},
+	getTaskCount: function () {
+		return this.$data.tasksStore.count();
+	},
+	getVisibleTaskCount: function () {
+		return this.$data.tasksStore.countVisible();
+	},
+	getTaskIndex: function (id) {
+		return this.$data.tasksStore.getBranchIndex(id);
+	},
+	getGlobalTaskIndex: function (id) {
+		this.assert(id, "Invalid argument");
+		return this.$data.tasksStore.getIndexById(id);
+	},
+	eachTask: function (code, parent, master) {
+		return this.$data.tasksStore.eachItem(utils.bind(code, master||this), parent);
+	},
+	eachParent: function (callback, startTask, master) {
+		return this.$data.tasksStore.eachParent(utils.bind(callback, master || this), startTask);
+	},
+	changeTaskId: function (oldid, newid) {
+		this.$data.tasksStore.changeId(oldid, newid);
+		var task = this.$data.tasksStore.getItem(newid);
+
+		var links = [];
+
+		if (task.$source) {
+			links = links.concat(task.$source);
+		}
+		if (task.$target) {
+			links = links.concat(task.$target);
+		}
+
+		for (var i = 0; i < links.length; i++) {
+			var link = this.getLink(links[i]);
+			if (link.source == oldid) {
+				link.source = newid;
+			}
+			if (link.target == oldid) {
+				link.target = newid;
+			}
+		}
+	},
+	calculateTaskLevel: function (item) {
+		return this.$data.tasksStore.calculateItemLevel(item);
+	},
+	getNext: function (id) {
+		return this.$data.tasksStore.getNext(id);
+	},
+	getPrev: function (id) {
+		return this.$data.tasksStore.getPrev(id);
+	},
+	getParent: function (id) {
+		return this.$data.tasksStore.getParent(id);
+	},
+	setParent: function (task, new_pid, silent) {
+		return this.$data.tasksStore.setParent(task, new_pid, silent);
+	},
+	getSiblings: function (id) {
+		return this.$data.tasksStore.getSiblings(id).slice();
+	},
+	getNextSibling: function (id) {
+		return this.$data.tasksStore.getNextSibling(id);
+	},
+	getPrevSibling: function (id) {
+		return this.$data.tasksStore.getPrevSibling(id);
+	},
+	getTaskByIndex: function(index){
+		var id = this.$data.tasksStore.getIdByIndex(index);
+		if(this.isTaskExists(id)){
+			return this.getTask(id);
+		}else{
+			return null;
+		}
+	},
+	getChildren: function (id) {
+		return this.$data.tasksStore.getChildren(id).slice();
+	},
+	hasChild: function (id) {
+		return this.$data.tasksStore.hasChild(id);
+	},
+	open: function (id) {
+		this.$data.tasksStore.open(id);
+	},
+	close: function (id) {
+		this.$data.tasksStore.close(id);
+	},
+	moveTask: function (sid, tindex, parent) {
+		this.$data.tasksStore.move.apply(this.$data.tasksStore, arguments);
+	},
+	sort: function(field, desc, parent, silent) {
+		var render = !silent;//4th argument to cancel redraw after sorting
+		this.$data.tasksStore.sort(field, desc, parent);
+		if (render) {
+			this.render();
+		}
+	}
+};
+};
+
+module.exports = createTasksDatastoreFacade;
+
+
+
+
+/***/ }),
+/* 59 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+
+
+var createLinksStoreFacade = function(){
+	return {
+	getLinkCount: function () {
+		return this.$data.linksStore.count();
+	},
+
+	getLink : function (id) {
+		return this.$data.linksStore.getItem(id);
+	},
+
+	getLinks : function () {
+		return this.$data.linksStore.getItems();
+	},
+
+	isLinkExists : function (id) {
+		return this.$data.linksStore.exists(id);
+	},
+
+	addLink : function (link) {
+		return this.$data.linksStore.addItem(link);
+	},
+
+	updateLink : function (id, data) {
+		if (!utils.defined(data))
+			data = this.getLink(id);
+		this.$data.linksStore.updateItem(id, data);
+	},
+
+	deleteLink : function (id) {
+		return this.$data.linksStore.removeItem(id);
+	},
+
+	changeLinkId : function (oldid, newid) {
+		return this.$data.linksStore.changeId(oldid, newid);
+	}
+};
+};
+
+module.exports = createLinksStoreFacade;
+
+/***/ }),
+/* 60 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var powerArray = __webpack_require__(16);
+var utils = __webpack_require__(0);
+var eventable = __webpack_require__(2);
+var DataStore = __webpack_require__(15);
+
+var TreeDataStore = function(config){
+	this._branches = {};
+
+	this.pull = {};
+	this.$initItem = config.initItem;
+	this.$parentProperty = config.parentProperty || "parent";
+
+	if(typeof config.rootId !== "function"){
+		this.$getRootId = (function(val){
+			return function(){return val;};
+		})(config.rootId || 0);
+	}else{
+		this.$getRootId = config.rootId;
+	}
+
+	// TODO: replace with live reference to gantt config
+	this.$openInitially = config.openInitially;
+
+	this.visibleOrder = powerArray.$create();
+	this.fullOrder = powerArray.$create();
+	this._searchVisibleOrder = {};
+	this._skip_refresh = false;
+
+	eventable(this);
+
+	this.attachEvent("onFilterItem", function(id, item){
+		var open = true;
+		this.eachParent(function(parent){
+			open = open && parent.$open;
+		}, item);
+		return !!open;
+	});
+
+	return this;
+};
+
+TreeDataStore.prototype = utils.mixin({
+
+		_buildTree: function(data){
+			var item = null;
+			var rootId = this.$getRootId();
+			for (var i = 0, len = data.length; i < len; i++){
+				item = data[i];
+				this.setParent(item, this.getParent(item) || rootId);
+			}
+
+			// calculating $level for each item
+			for (var i = 0, len = data.length; i < len; i++){
+				item = data[i];
+				this._add_branch(item);
+				item.$level = this.calculateItemLevel(item);
+
+				if (!utils.defined(item.$open)) {
+					item.$open = utils.defined(item.open) ? item.open : this.$openInitially();
+				}
+
+			}
+			this._updateOrder();
+		},
+
+		parse: function(data){
+			this.callEvent("onBeforeParse", [data]);
+			var loaded = this._parseInner(data);
+			this._buildTree(loaded);
+			this.filter();
+			this.callEvent("onParse", [loaded]);
+		},
+
+		_addItemInner: function(item, index){
+
+			var parent = this.getParent(item);
+
+			if(!utils.defined(parent)){
+				parent = this.$getRootId();
+				this.setParent(item, parent);
+			}
+
+			var parentIndex = this.getIndexById(parent);
+			var targetIndex = parentIndex + Math.min(Math.max(index, 0), this.visibleOrder.length);
+
+			if(targetIndex*1 !== targetIndex){
+				targetIndex = undefined;
+			}
+			DataStore.prototype._addItemInner.call(this, item, targetIndex);
+			this.setParent(item, parent);
+
+			if(item.hasOwnProperty("$rendered_parent")){
+				this._move_branch(item, item.$rendered_parent);
+			}
+			this._add_branch(item, index);
+		},
+		_changeIdInner: function(oldId, newId){
+
+			var children = this.getChildren(newId);
+			DataStore.prototype._changeIdInner.call(this, oldId, newId);
+
+			var parent = this.getParent(newId);
+
+			this._replace_branch_child(parent, oldId, newId);
+			for(var i = 0; i < children.length; i++){
+				this.setParent(this.getItem[children[i]], newId);
+			}
+		},
+
+		_traverseBranches: function(code, parent){
+			parent = parent || this.$getRootId();
+			var branch = this._branches[parent];
+			if (branch) {
+				for (var i = 0; i < branch.length; i++) {
+					var itemId = branch[i];
+					code.call(this, itemId);
+					if (this._branches[itemId])
+						this._traverseBranches(code, itemId);
+				}
+			}
+		},
+
+		_updateOrder: function(code){
+			if(code)
+				DataStore.prototype._updateOrder.call(this, code);
+			this.fullOrder = powerArray.$create();
+			this._traverseBranches(function(taskId){
+				this.fullOrder.push(taskId);
+			});
+		},
+
+		_removeItemInner: function(id){
+
+			var items = [];
+			this.eachItem(function(child){
+				items.push(child);
+			}, id);
+
+			items.push(this.getItem(id));
+
+			for(var i = 0; i < items.length; i++){
+
+				this._move_branch(items[i], this.getParent(items[i]), null);
+				DataStore.prototype._removeItemInner.call(this, items[i].id);
+				this._move_branch(items[i], this.getParent(items[i].id), null);
+			}
+		},
+
+		move: function(sid, tindex, parent){
+			//target id as 4th parameter
+			var id = arguments[3];
+			if (id) {
+				if (id === sid) return;
+
+				parent = this.getParent(id);
+				tindex = this.getBranchIndex(id);
+			}
+			if(sid == parent){
+				return;
+			}
+			parent = parent || this.$getRootId();
+			var source = this.getItem(sid);
+			var source_pid = this.getParent(source.id);
+			var sbranch = this.getChildren(this.getParent(source.id));
+
+			var tbranch = this.getChildren(parent);
+			if (tindex == -1)
+				tindex = tbranch.length + 1;
+			if (source_pid == parent) {
+				var sindex = this.getBranchIndex(sid);
+				if (sindex == tindex) return;
+			}
+
+			if(this.callEvent("onBeforeItemMove", [sid, parent, tindex]) === false)
+				return;
+
+			this._replace_branch_child(source_pid, sid);
+			tbranch = this.getChildren(parent);
+
+			var tid = tbranch[tindex];
+			if (!tid) //adding as last element
+				tbranch.push(sid);
+			else
+				tbranch = tbranch.slice(0, tindex).concat([ sid ]).concat(tbranch.slice(tindex));
+
+			this.setParent(source, parent);
+			this._branches[parent] = tbranch;
+
+			var diff = this.calculateItemLevel(source) - source.$level;
+			source.$level += diff;
+			this.eachItem(function(item){
+				item.$level += diff;
+			}, source.id, this);
+
+
+			this._moveInner(this.getIndexById(sid), this.getIndexById(parent) + tindex);
+
+			if(!this.callEvent("onAfterItemMove", [sid, parent, tindex]))
+				return;
+			this.refresh();
+		},
+
+		getBranchIndex: function(id){
+			var branch = this.getChildren(this.getParent(id));
+			for (var i = 0; i < branch.length; i++)
+				if (branch[i] == id)
+					return i;
+
+			return -1;
+		},
+		hasChild: function(id){
+			return (utils.defined(this._branches[id]) && this._branches[id].length);
+		},
+		getChildren: function(id){
+			return utils.defined(this._branches[id]) ? this._branches[id] : powerArray.$create();
+		},
+
+		isChildOf: function(childId, parentId){
+			if (!this.exists(childId))
+				return false;
+			if (parentId === this.$getRootId())
+				return true;
+
+			var item = this.getItem(childId);
+			var pid = this.getParent(childId);
+
+			while (item && this.exists(pid)) {
+				item = this.getItem(pid);
+
+				if (item && item.id == parentId)
+					return true;
+				pid = this.getParent(item);
+			}
+			return false;
+		},
+
+		getSiblings: function(id){
+			if(!this.exists(id)){
+				return powerArray.$create();
+			}
+			var parent = this.getParent(id);
+			return this.getChildren(parent);
+
+		},
+		getNextSibling: function(id){
+			var siblings = this.getSiblings(id);
+			for(var i= 0, len = siblings.length; i < len; i++){
+				if(siblings[i] == id)
+					return siblings[i+1] || null;
+			}
+			return null;
+		},
+		getPrevSibling: function(id){
+			var siblings = this.getSiblings(id);
+			for(var i= 0, len = siblings.length; i < len; i++){
+				if(siblings[i] == id)
+					return siblings[i-1] || null;
+			}
+			return null;
+		},
+		getParent: function(id){
+			var item = null;
+			if(id.id !== undefined){
+				item = id;
+			}else{
+				item = this.getItem(id);
+			}
+
+			var parent = this.$getRootId();
+			if(item){
+				parent = item[this.$parentProperty];
+			}
+			return parent;
+
+		},
+
+		clearAll: function(){
+			this._branches = {};
+			DataStore.prototype.clearAll.call(this);
+		},
+
+		calculateItemLevel: function(item){
+			var level = 0;
+			this.eachParent(function(){
+				level++;
+			}, item);
+			return level;
+		},
+
+		_setParentInner: function(item, new_pid, silent){
+			if(!silent){
+				if(item.hasOwnProperty("$rendered_parent")){
+					this._move_branch(item, item.$rendered_parent, new_pid);
+				}else{
+					this._move_branch(item, item[this.$parentProperty], new_pid);
+				}
+			}
+		},
+		setParent: function(item, new_pid, silent){
+			this._setParentInner(item, new_pid, silent);
+
+			item[this.$parentProperty] = new_pid;
+		},
+		eachItem: function(code, parent){
+			parent = parent || this.$getRootId();
+
+
+			var branch = this.getChildren(parent);
+			if (branch)
+				for (var i=0; i<branch.length; i++){
+					var item = this.pull[branch[i]];
+					code.call(this, item);
+					if (this.hasChild(item.id))
+						this.eachItem(code, item.id);
+				}
+		},
+		eachParent: function(code, startItem){
+			var item = startItem;
+			while (this.getParent(item)) {
+				if (!this.exists(this.getParent(item))) break;
+				item = this.getItem(this.getParent(item));
+				code.call(this, item);
+			}
+		},
+		_add_branch: function(item, index, parent){
+			var pid = parent === undefined ? this.getParent(item) : parent;
+			if (!this.hasChild(pid))
+				this._branches[pid] = powerArray.$create();
+			var branch = this.getChildren(pid);
+			var added_already = false;
+			for(var i = 0, length = branch.length; i < length; i++){
+				if(branch[i] == item.id){
+					added_already = true;
+					break;
+				}
+			}
+			if(!added_already){
+				if(index*1 == index){
+
+					branch.splice(index, 0, item.id);
+				}else{
+					branch.push(item.id);
+				}
+
+				item.$rendered_parent = pid;
+			}
+		},
+		_move_branch: function(item, old_parent, new_parent){
+			//this.setParent(item, new_parent);
+			//this._sync_parent(task);
+			this._replace_branch_child(old_parent, item.id);
+			if(this.exists(new_parent) || new_parent == this.$getRootId()){
+
+				this._add_branch(item, undefined, new_parent);
+			}else{
+				delete this._branches[item.id];
+			}
+			item.$level =  this.calculateItemLevel(item);
+			this.eachItem(function(child){
+				child.$level = this.calculateItemLevel(child);
+			}, item.id);
+		},
+
+		_replace_branch_child: function(node, old_id, new_id){
+			var branch = this.getChildren(node);
+			if (branch){
+				var newbranch = powerArray.$create();
+				for (var i=0; i<branch.length; i++){
+					if (branch[i] != old_id)
+						newbranch.push(branch[i]);
+					else if (new_id)
+						newbranch.push(new_id);
+				}
+				this._branches[node] = newbranch;
+			}
+
+		},
+
+		sort: function(field, desc, parent){
+			if (!this.exists(parent)) {
+				parent = this.$getRootId();
+			}
+
+			if (!field) field = "order";
+			var criteria = (typeof(field) == "string") ? (function(a, b) {
+				if(a[field] == b[field]){
+					return 0;
+				}
+
+				var result = a[field] > b[field];
+				return result ? 1 : -1;
+			}) : field;
+
+			if (desc) {
+				var original_criteria = criteria;
+				criteria = function (a, b) {
+					return original_criteria(b, a);
+				};
+			}
+
+			var els = this.getChildren(parent);
+			if (els){
+				var temp = [];
+				for (var i = els.length - 1; i >= 0; i--)
+					temp[i] = this.getItem(els[i]);
+
+				temp.sort(criteria);
+
+				for (var i = 0; i < temp.length; i++) {
+					els[i] = temp[i].id;
+					this.sort(field, desc, els[i]);
+				}
+			}
+		},
+
+		filter: function(rule){
+			for(var i  in this.pull){
+				if(this.pull[i].$rendered_parent !== this.getParent(this.pull[i])){
+					this._move_branch(this.pull[i], this.pull[i].$rendered_parent, this.getParent(this.pull[i]));
+				}
+			}
+			return DataStore.prototype.filter.apply(this, arguments);
+		},
+
+		open: function(id){
+			if(this.exists(id)){
+				this.getItem(id).$open = true;
+				this.callEvent("onItemOpen", [id]);
+			}
+		},
+
+		close: function(id){
+			if(this.exists(id)){
+				this.getItem(id).$open = false;
+				this.callEvent("onItemClose", [id]);
+			}
+		},
+
+		destructor: function(){
+			DataStore.prototype.destructor.call(this);
+			this._branches = null;
+		}
+	},
+	DataStore.prototype
+);
+
+module.exports = TreeDataStore;
+
+/***/ }),
+/* 61 */
+/***/ (function(module, exports) {
+
+
+function createDataStoreSelectMixin(){
+	var selectedId = null;
+	return {
+		select: function(id){
+			if (id){
+
+				if(selectedId == id)
+					return selectedId;
+
+				if(!this._skip_refresh) {
+					if (!this.callEvent("onBeforeSelect", [id])) {
+						return false;
+					}
+				}
+
+				this.unselect();
+
+				selectedId = id;
+
+				if(!this._skip_refresh) {
+					this.refresh(id);
+					this.callEvent("onAfterSelect", [id]);
+				}
+			}
+			return selectedId;
+		},
+		getSelectedId: function(){
+			return selectedId;
+		},
+		unselect: function(id){
+			var id = id || selectedId;
+			if(!id)
+				return;
+			selectedId = null;
+			if(!this._skip_refresh){
+				this.refresh(id);
+				this.callEvent("onAfterUnselect", [id]);
+			}
+		}
+	};
+}
+
+module.exports = createDataStoreSelectMixin;
+
+/***/ }),
+/* 62 */
+/***/ (function(module, exports) {
+
+var storeRenderCreator = function(name, gantt){
+	var store = gantt.getDatastore(name);
+
+	var itemRepainter = {
+		renderItem: function(id, renderer){
+
+			var renders = renderer.getLayers();
+
+			var item = store.getItem(id);
+			if(item && store.isVisible(id)) {
+				for (var i = 0; i < renders.length; i++)
+					renders[i].render_item(item);
+			}
+		},
+		renderItems: function(renderer){
+			var renderers = renderer.getLayers();
+			for (var i = 0; i < renderers.length; i++) {
+				renderers[i].clear();
+			}
+
+			var data = store.getVisibleItems();
+
+			for (var i = 0; i < renderers.length; i++) {
+				renderers[i].render_items(data);
+			}
+		}
+	};
+
+	function skipRepaint(gantt){
+		var state = gantt.$services.getService("state");
+		if(state.getState("batchUpdate").batch_update){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	store.attachEvent("onStoreUpdated", function(id, item, action){
+		if(skipRepaint(gantt)){
+			return;
+		}
+
+		var renderer = gantt.$services.getService("layers").getDataRender(name);
+
+		if(renderer){
+			if(!id || action == "move" || action == "delete"){
+				store.callEvent("onBeforeRefreshAll", []);
+				itemRepainter.renderItems(renderer);
+				store.callEvent("onAfterRefreshAll", []);
+			}else{
+				store.callEvent("onBeforeRefreshItem", [item.id]);
+				itemRepainter.renderItem(item.id, renderer);
+				store.callEvent("onAfterRefreshItem", [item.id]);
+			}
+		}
+
+	});
+
+	store.attachEvent("onItemOpen", function(){
+		gantt.render();
+	});
+
+	store.attachEvent("onItemClose", function(){
+		gantt.render();
+	});
+
+	function refreshId(renders, oldId, newId, item) {
+		for (var i = 0; i < renders.length; i++) {
+			renders[i].change_id(oldId, newId);
+		}
+	}
+	store.attachEvent("onIdChange", function(oldId, newId){
+		if(skipRepaint(gantt)){
+			return;
+		}
+		var renderer = gantt.$services.getService("layers").getDataRender(name);
+		refreshId(renderer.getLayers(), oldId, newId, store.getItem(newId));
+	});
+
+};
+
+module.exports = {
+	bindDataStore: storeRenderCreator
+};
+
+/***/ }),
+/* 63 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var liveUpdateHooks = __webpack_require__(64);
+var dateHelper = __webpack_require__(3);
+var helpers = __webpack_require__(6);
+
+function addDataProcessorHooks(gantt) {
+
+	gantt.dataProcessor = __webpack_require__(65);
+
+	function detachDataProcessor(gantt, dp){
+		delete dp.$gantt;
+		delete dp.setGanttMode;
+		delete dp._getRowData;
+		dp.afterUpdate = oldAfterUpdate;
+
+		delete gantt._dp;
+		delete gantt._change_id;
+		delete gantt._row_style;
+		delete gantt._delete_task;
+		delete gantt._sendTaskOrder;
+
+		helpers.forEach(dataProcessorHandlers, function(e){
+			gantt.detachEvent(e);
+		});
+		dataProcessorHandlers = [];
+	}
+
+	var oldAfterUpdate;
+	function extendDataProcessor(gantt, dp){
+		dp.setGanttMode = function(mode){
+			var modes = dp.modes || {};
+			if(dp._ganttMode){
+				modes[dp._ganttMode] = {
+					_in_progress : dp._in_progress,
+					_invalid : dp._invalid,
+					updatedRows : dp.updatedRows
+				};
+			}
+
+			var newState = modes[mode];
+			if(!newState){
+				newState = modes[mode] = {
+					_in_progress : {},
+					_invalid : {},
+					updatedRows : []
+				};
+			}
+			dp._in_progress = newState._in_progress;
+			dp._invalid = newState._invalid;
+			dp.updatedRows = newState.updatedRows;
+			dp.modes = modes;
+			dp._ganttMode = mode;
+		};
+
+		oldAfterUpdate = dp.afterUpdate;
+		dp.afterUpdate = function(){
+			var xml;
+			if(arguments.length == 3){
+				xml = arguments[1];
+			}else{
+				// old dataprocessor
+				xml = arguments[4];
+			}
+			var mode = dp._ganttMode;
+			var reqUrl = xml.filePath;
+
+			if(this._tMode != "REST"){
+				if (reqUrl.indexOf("gantt_mode=links") != -1) {
+					mode = "links";
+				}else{
+					mode = "tasks";
+				}
+			}else{
+				if(reqUrl.indexOf("/link") > reqUrl.indexOf("/task")){
+					mode = "links";
+				}else{
+					mode = "tasks";
+				}
+			}
+			dp.setGanttMode(mode);
+
+			var res = oldAfterUpdate.apply(dp, arguments);
+			dp.setGanttMode(mode);
+			return res;
+		};
+
+		dp._getRowData=gantt.bind(function(id, pref) {
+			var task;
+			if (dp._ganttMode == "tasks")
+				task = this.isTaskExists(id) ? this.getTask(id) : { id: id };
+			else
+				task = this.isLinkExists(id) ? this.getLink(id) : { id: id };
+
+			task = gantt.copy(task);
+
+			var data = {};
+			for (var key in task) {
+				if (key.substr(0, 1) == "$") continue;
+				var value = task[key];
+				if (dateHelper.isDate(value))
+					data[key] = this.templates.xml_format(value);
+				else if(value === null)
+					data[key] = "";
+				else
+					data[key] = value;
+			}
+
+			var taskTiming = this._get_task_timing_mode(task);
+			if(taskTiming.$no_start){
+				task.start_date = "";
+				task.duration = "";
+			}
+			if(taskTiming.$no_end){
+				task.end_date = "";
+				task.duration = "";
+			}
+			data[dp.action_param] = this.getUserData(id, dp.action_param);
+			return data;
+		}, gantt);
+	}
+
+	function extendGantt(gantt, dp){
+		gantt._change_id = gantt.bind(function(oldid, newid) {
+			if (dp._ganttMode != "tasks")
+				this.changeLinkId(oldid, newid);
+			else
+				this.changeTaskId(oldid, newid);
+		}, this);
+
+		gantt._row_style = function(row_id, classname){
+			if (dp._ganttMode != "tasks") return;
+			if(!gantt.isTaskExists(row_id))
+				return;
+
+			var task = gantt.getTask(row_id);
+			task.$dataprocessor_class = classname;
+			gantt.refreshTask(row_id);
+		};
+
+		// fake method for dataprocessor
+		gantt._delete_task = function(row_id, node){};
+
+		gantt._sendTaskOrder = function(id, item){
+			if(item.$drop_target){
+				dp.setGanttMode("tasks");
+				this.getTask(id).target = item.$drop_target;
+				dp.setUpdated(id, true,"order");
+				delete this.getTask(id).$drop_target;
+			}
+		};
+
+		this._dp = dp;
+	}
+
+	function attachDataProcessorEvents(gantt, dp){
+		function clientSideDelete(id){
+			var updated = dp.updatedRows.slice();
+			var clientOnly = false;
+
+			for(var i = 0; i < updated.length && !dp._in_progress[id]; i++){
+				if(updated[i] == id ){
+					if(gantt.getUserData(id, "!nativeeditor_status") == "inserted"){
+						clientOnly = true;
+					}
+					dp.setUpdated(id,false);
+				}
+			}
+			return clientOnly;
+		}
+
+		function getTaskLinks(task){
+			var links = [];
+
+			if (task.$source) {
+				links = links.concat(task.$source);
+			}
+			if (task.$target) {
+				links = links.concat(task.$target);
+			}
+
+			return links;
+		}
+
+		dataProcessorHandlers.push(this.attachEvent("onAfterTaskAdd", function(id, item) {
+			dp.setGanttMode("tasks");
+			dp.setUpdated(id,true,"inserted");
+		}));
+		dataProcessorHandlers.push(this.attachEvent("onAfterTaskUpdate", function(id, item) {
+			dp.setGanttMode("tasks");
+			dp.setUpdated(id,true);
+
+			gantt._sendTaskOrder(id, item);
+		}));
+
+		var treeHelper = __webpack_require__(18);
+		var cascadeDelete = {};
+
+		dataProcessorHandlers.push(this.attachEvent("onBeforeTaskDelete", function(id, item){
+			if(!gantt.config.cascade_delete){
+				return true;
+			}
+
+			cascadeDelete[id] = {
+				tasks: treeHelper.getSubtreeTasks(gantt, id),
+				links: treeHelper.getSubtreeLinks(gantt, id)
+			};
+			return true;
+		}));
+
+		dataProcessorHandlers.push(this.attachEvent("onAfterTaskDelete", function(id, item) {
+			dp.setGanttMode("tasks");
+
+			// not send delete request if item is not inserted into the db - just remove it from the client
+			var needDbDelete = !clientSideDelete(id);
+			if(!needDbDelete)
+				return;
+			
+			if(gantt.config.cascade_delete && cascadeDelete[id]){
+				var dpMode = dp.updateMode;
+				dp.setUpdateMode("off");
+
+				var cascade = cascadeDelete[id];
+				for(var i in cascade.tasks){
+					if(!clientSideDelete(i)){
+						dp.setUpdated(i, true, "deleted");
+					}
+				}
+				dp.setGanttMode("links");
+				for(var i in cascade.links){
+					if(!clientSideDelete(i)){
+						dp.setUpdated(i, true, "deleted");
+					}
+				}
+				cascadeDelete[id] = null;
+
+				if(dpMode != "off"){
+					dp.sendAllData();
+				}
+				dp.setGanttMode("tasks");
+
+				dp.setUpdateMode(dpMode);
+
+			}
+
+			dp.setUpdated(id,true,"deleted");
+
+			if(dp.updateMode != 'off' && !dp._tSend){
+				dp.sendAllData();
+			}
+
+		}));
+		dataProcessorHandlers.push(this.attachEvent("onAfterLinkUpdate", function(id, item) {
+			dp.setGanttMode("links");
+			dp.setUpdated(id, true);
+		}));
+		dataProcessorHandlers.push(this.attachEvent("onAfterLinkAdd", function(id, item) {
+			dp.setGanttMode("links");
+			dp.setUpdated(id, true,"inserted");
+		}));
+		dataProcessorHandlers.push(this.attachEvent("onAfterLinkDelete", function(id, item) {
+			dp.setGanttMode("links");
+
+			var needDbDelete = !clientSideDelete(id);
+			if(!needDbDelete)
+				return;
+
+			dp.setUpdated(id, true,"deleted");
+		}));
+		dataProcessorHandlers.push(this.attachEvent("onRowDragEnd", function(id, target) {
+			gantt._sendTaskOrder(id, gantt.getTask(id));
+		}));
+
+		var tasks = null,
+			links = null;
+		dataProcessorHandlers.push(this.attachEvent("onTaskIdChange",function(oldId, newId){
+			if(!dp._waitMode) return;
+
+			var children = gantt.getChildren(newId);
+			if(children.length) {
+				tasks = tasks || {};
+
+				for (var i = 0; i < children.length; i++) {
+					var ch = this.getTask(children[i]);
+					tasks[ch.id] = ch;
+				}
+			}
+
+			var item = this.getTask(newId),
+				itemLinks = getTaskLinks(item);
+
+			if(itemLinks.length) {
+				links = links || {};
+
+				for (var i = 0; i < itemLinks.length; i++) {
+					var link = this.getLink(itemLinks[i]);
+					links[link.id] = link;
+				}
+			}
+		}));
+
+		dp.attachEvent("onAfterUpdateFinish", function(){
+			if(tasks || links){
+				gantt.batchUpdate(function(){
+					for(var id in tasks){
+						gantt.updateTask(tasks[id].id);
+					}
+
+					for(var id in links){
+						gantt.updateLink(links[id].id);
+					}
+					tasks = null;
+					links = null;
+				});
+				if(tasks) {
+					gantt._dp.setGanttMode("tasks");
+				}else{
+					gantt._dp.setGanttMode("links");
+				}
+			}
+		});
+
+		dp.attachEvent("onBeforeDataSending", function() {
+			var url = this._serverProcessor;
+			if(this._tMode == "REST"){
+				var mode = this._ganttMode.substr(0, this._ganttMode.length - 1);// links, tasks -> /link/id, /task/id
+
+				url = url.substring(0, url.indexOf("?") > -1 ? url.indexOf("?") : url.length);
+				//editing=true&
+				this.serverProcessor = url + (url.slice(-1) == "/" ? "" : "/") + mode;
+			}else{
+				this.serverProcessor = url + gantt.ajax.urlSeparator(url) + "gantt_mode=" + this._ganttMode;
+			}
+
+			return true;
+		});
+	}
+
+	var dataProcessorHandlers = [];
+
+	gantt._dp_init = function(dp) {
+		gantt.assert(!this._dp, "The dataProcessor is already attached to this gantt instance");
+
+		dp.setTransactionMode("POST", true);
+		dp.serverProcessor += (dp.serverProcessor.indexOf("?") != -1 ? "&" : "?") + "editing=true";
+		dp._serverProcessor = dp.serverProcessor;
+		dp.$gantt = this;
+		dp.styles = {
+			updated:"gantt_updated",
+			order:"gantt_updated",
+			inserted:"gantt_inserted",
+			deleted:"gantt_deleted",
+			invalid:"gantt_invalid",
+			error:"gantt_error",
+			clear:""
+		};
+
+		dp._methods=["_row_style","setCellTextStyle","_change_id","_delete_task"];
+
+		extendDataProcessor.call(this, gantt, dp);
+		extendGantt.call(this, gantt, dp);
+		attachDataProcessorEvents.call(this, gantt, dp);
+
+		dp.attachEvent("onDestroy", function(){
+			detachDataProcessor(gantt, dp);
+		});
+		liveUpdateHooks(gantt, dp);
+	};
+
+	gantt.getUserData = function(id, name) {
+		if (!this.userdata) this.userdata = {};
+		if (this.userdata[id] && this.userdata[id][name]) return this.userdata[id][name];
+		return "";
+	};
+	gantt.setUserData = function(id, name, value) {
+		if (!this.userdata) this.userdata = {};
+		if (!this.userdata[id]) this.userdata[id] = {};
+		this.userdata[id][name] = value;
+	};
+}
+
+module.exports = addDataProcessorHooks;
+
+
+/***/ }),
+/* 64 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__ (0);
+
+function updateCallback(upd, id) {
+	var data = upd.data || this.xml._xmlNodeToJSON(upd.firstChild);
+	if(!this.isTaskExists(id))
+		return;
+	var objData = this.getTask(id);
+	for(var key in data) {
+		var property = data[key];
+		switch(key) {
+			case "id":
+				continue;
+			case "start_date":
+			case "end_date":
+				property = this.templates.xml_date(property);
+				break;
+			case "duration":
+				objData.end_date = this.calculateEndDate({start_date: objData.start_date, duration: property, task:objData});
+				break;
+		}
+		objData[key] = property;
+	}
+	this.updateTask(id);
+	this.refreshData();
+}
+
+function insertCallback(upd, id, parent, mode) {
+	var data = upd.data || this.xml._xmlNodeToJSON(upd.firstChild),
+		methods = {
+			add: this.addTask,
+			isExist: this.isTaskExists
+		};
+	if(mode == "links") {
+		methods.add = this.addLink;
+		methods.isExist = this.isLinkExists;
+	}
+	if(methods.isExist.call(this, id))
+		return;
+	data.id = id;
+	methods.add.call(this, data);
+}
+
+function deleteCallback(upd, id, parent, mode) {
+	var methods = {
+		"delete": this.deleteTask,
+		"isExist": this.isTaskExists
+	};
+	if(mode == "links") {
+		methods["delete"] = this.deleteLink;
+		methods.isExist = this.isLinkExists;
+	}
+	if(methods.isExist.call(this, id))
+		methods["delete"].call(this, id);
+}
+
+function patchDataProcessor(gantt, dataprocessor){
+	dataprocessor.attachEvent("insertCallback", utils.bind(insertCallback, gantt));
+	dataprocessor.attachEvent("updateCallback",  utils.bind(deleteCallback, gantt));
+	dataprocessor.attachEvent("deleteCallback",  utils.bind(deleteCallback, gantt));
+}
+
+module.exports = patchDataProcessor;
+
+/***/ }),
+/* 65 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+var eventable = __webpack_require__(2);
+
+/**
+	* 	@desc: constructor, data processor object 
+	*	@param: serverProcessorURL - url used for update
+	*	@type: public
+	*/
+var dataProcessor = function(serverProcessorURL){
+    this.serverProcessor = serverProcessorURL;
+    this.action_param="!nativeeditor_status";
+    
+	this.object = null;
+	this.updatedRows = []; //ids of updated rows
+	
+	this.autoUpdate = true;
+	this.updateMode = "cell";
+	this._tMode="GET"; 
+	this._headers = null;
+	this._payload = null;
+	this.post_delim = "_";
+	
+    this._waitMode=0;
+    this._in_progress={};//?
+    this._invalid={};
+    this.mandatoryFields=[];
+    this.messages=[];
+    
+    this.styles={
+    	updated:"font-weight:bold;",
+    	inserted:"font-weight:bold;",
+    	deleted:"text-decoration : line-through;",
+    	invalid:"background-color:FFE0E0;",
+    	invalid_cell:"border-bottom:2px solid red;",
+    	error:"color:red;",
+    	clear:"font-weight:normal;text-decoration:none;"
+    };
+    
+    this.enableUTFencoding(true);
+	eventable(this);
+
+    return this;
+};
+
+dataProcessor.prototype={
+	setTransactionMode:function(mode,total){
+		if (typeof mode == "object"){
+			this._tMode = mode.mode || this._tMode;
+
+			if(utils.defined(mode.headers)){
+				this._headers = mode.headers;
+			}
+
+			if(utils.defined(mode.payload)){
+				this._payload = mode.payload;
+			}
+			
+		} else {
+     	    this._tMode=mode;
+			this._tSend=total;
+		}
+
+		if (this._tMode == "REST"){
+			this._tSend = false;
+			this._endnm = true;
+		}
+
+		if (this._tMode == "JSON"){
+			this._tSend = false;
+			this._endnm = true;
+			this._headers = this._headers || {};
+			this._headers["Content-type"] = "application/json";
+		}
+    },
+    escape:function(data){
+    	if (this._utf)
+    		return encodeURIComponent(data);
+    	else
+        	return escape(data);
+	},
+    /**
+	* 	@desc: allows to set escaping mode
+	*	@param: true - utf based escaping, simple - use current page encoding
+	*	@type: public
+	*/	
+	enableUTFencoding:function(mode){
+        this._utf=!!mode;
+    },
+    /**
+	* 	@desc: allows to define, which column may trigger update
+	*	@param: val - array or list of true/false values
+	*	@type: public
+	*/
+	setDataColumns:function(val){
+		this._columns=(typeof val == "string")?val.split(","):val;
+    },
+    /**
+	* 	@desc: get state of updating
+	*	@returns:   true - all in sync with server, false - some items not updated yet.
+	*	@type: public
+	*/
+	getSyncState:function(){
+		return !this.updatedRows.length;
+	},
+	/**
+	* 	@desc: enable/disable named field for data syncing, will use column ids for grid
+	*	@param:   mode - true/false
+	*	@type: public
+	*/
+	enableDataNames:function(mode){
+		this._endnm= !!mode;
+	},
+	/**
+	* 	@desc: enable/disable mode , when only changed fields and row id send to the server side, instead of all fields in default mode
+	*	@param:   mode - true/false
+	*	@type: public
+	*/
+	enablePartialDataSend:function(mode){
+		this._changed= !!mode;
+	},
+	/**
+	* 	@desc: set if rows should be send to server automaticaly
+	*	@param: mode - "row" - based on row selection changed, "cell" - based on cell editing finished, "off" - manual data sending
+	*	@type: public
+	*/
+	setUpdateMode:function(mode,dnd){
+		this.autoUpdate = (mode=="cell");
+		this.updateMode = mode;
+		this.dnd=dnd;
+	},
+	ignore:function(code,master){
+		this._silent_mode=true;
+		code.call(master||window);
+		this._silent_mode=false;
+	},
+	/**
+	* 	@desc: mark row as updated/normal. check mandatory fields,initiate autoupdate (if turned on)
+	*	@param: rowId - id of row to set update-status for
+	*	@param: state - true for "updated", false for "not updated"
+	*	@param: mode - update mode name
+	*	@type: public
+	*/
+	setUpdated:function(rowId,state,mode){
+		if (this._silent_mode) return;
+		var ind=this.findRow(rowId);
+		
+		mode=mode||"updated";
+		var existing = this.obj.getUserData(rowId,this.action_param);
+		if (existing && mode == "updated") mode=existing;
+		if (state){
+			this.set_invalid(rowId,false); //clear previous error flag
+			this.updatedRows[ind]=rowId;
+			this.obj.setUserData(rowId,this.action_param,mode);
+			if (this._in_progress[rowId]) 
+				this._in_progress[rowId]="wait";
+		} else{
+			if (!this.is_invalid(rowId)){
+				this.updatedRows.splice(ind,1);
+				this.obj.setUserData(rowId,this.action_param,"");
+			}
+		}
+
+		//clear changed flag
+		if (!state)
+			this._clearUpdateFlag(rowId);
+     			
+		this.markRow(rowId,state,mode);
+		if (state && this.autoUpdate) this.sendData(rowId);
+	},
+	_clearUpdateFlag:function(id){},
+	markRow:function(id,state,mode){ 
+		var str="";
+		var invalid=this.is_invalid(id);
+		if (invalid){
+        	str=this.styles[invalid];
+        	state=true;
+    	}
+		if (this.callEvent("onRowMark",[id,state,mode,invalid])){
+			//default logic
+			str=this.styles[state?mode:"clear"]+str;
+			
+        	this.obj[this._methods[0]](id,str);
+
+			if (invalid && invalid.details){
+				str+=this.styles[invalid+"_cell"];
+				for (var i=0; i < invalid.details.length; i++)
+					if (invalid.details[i])
+        				this.obj[this._methods[1]](id,i,str);
+			}
+		}
+	},
+	getState:function(id){
+		return this.obj.getUserData(id,this.action_param);
+	},
+	is_invalid:function(id){
+		return this._invalid[id];
+	},
+	set_invalid:function(id,mode,details){ 
+		if (details) mode={value:mode, details:details, toString:function(){ return this.value.toString(); }};
+		this._invalid[id]=mode;
+	},
+	/**
+	* 	@desc: check mandatory fields and varify values of cells, initiate update (if specified)
+	*	@param: rowId - id of row to set update-status for
+	*	@type: public
+	*/
+	checkBeforeUpdate:function(rowId){ 
+		return true;
+	},
+	/**
+	* 	@desc: send row(s) values to server
+	*	@param: rowId - id of row which data to send. If not specified, then all "updated" rows will be send
+	*	@type: public
+	*/
+	sendData:function(rowId){
+		if (this._waitMode && (this.obj.mytype=="tree" || this.obj._h2)) return;
+		if (this.obj.editStop) this.obj.editStop();
+	
+		
+		if(typeof rowId == "undefined" || this._tSend) return this.sendAllData();
+		if (this._in_progress[rowId]) return false;
+		
+		this.messages=[];
+		if (!this.checkBeforeUpdate(rowId) && this.callEvent("onValidationError",[rowId,this.messages])) return false;
+		this._beforeSendData(this._getRowData(rowId),rowId);
+    },
+    _beforeSendData:function(data,rowId){
+    	if (!this.callEvent("onBeforeUpdate",[rowId,this.getState(rowId),data])) return false;	
+		this._sendData(data,rowId);
+    },
+    serialize:function(data, id){
+    	if (typeof data == "string")
+    		return data;
+    	if (typeof id != "undefined")
+    		return this.serialize_one(data,"");
+    	else{
+    		var stack = [];
+    		var keys = [];
+    		for (var key in data)
+    			if (data.hasOwnProperty(key)){
+    				stack.push(this.serialize_one(data[key],key+this.post_delim));
+    				keys.push(key);
+				}
+    		stack.push("ids="+this.escape(keys.join(",")));
+    		if (this.$gantt.security_key)
+				stack.push("dhx_security="+this.$gantt.security_key);
+    		return stack.join("&");
+    	}
+    },
+    serialize_one:function(data, pref){
+    	if (typeof data == "string")
+    		return data;
+    	var stack = [];
+    	for (var key in data)
+    		if (data.hasOwnProperty(key)){
+    			if ((key == "id" || key == this.action_param) && this._tMode == "REST") continue;
+    			stack.push(this.escape((pref||"")+key)+"="+this.escape(data[key]));
+    		}
+		return stack.join("&");
+    },
+	_applyPayload:function(url){
+		var ajax = this.$gantt.ajax;
+		if (this._payload)
+			for (var key in this._payload)
+				url = url + ajax.urlSeparator(url) + this.escape(key) + "=" + this.escape(this._payload[key]);
+		return url;
+	},
+    _sendData:function(a1,rowId){
+    	if (!a1) return; //nothing to send
+		if (!this.callEvent("onBeforeDataSending",rowId?[rowId,this.getState(rowId),a1]:[null, null, a1])) return false;				
+		
+    	if (rowId)
+			this._in_progress[rowId]=(new Date()).valueOf();
+
+		var that = this;
+		var back = function(xml){
+			var ids = [];
+			if (rowId)
+				ids.push(rowId);
+			else if (a1)
+				for (var key in a1)
+					ids.push(key);
+
+			return that.afterUpdate(that,xml,ids);
+		};
+		var ajax = this.$gantt.ajax;
+
+		var a3 = this.serverProcessor+(this._user?(ajax.urlSeparator(this.serverProcessor)+["dhx_user="+this._user,"dhx_version="+this.obj.getUserData(0,"version")].join("&")):"");
+		var a4 = this._applyPayload(a3);
+
+		if (this._tMode=="GET") {
+			ajax.query({
+				url: a4 + ajax.urlSeparator(a4) + this.serialize(a1, rowId),
+				method: "GET",
+				callback: back,
+				headers: this._headers
+			});
+		} else if (this._tMode == "POST") {
+			ajax.query({
+				url: a4,
+				method: "POST",
+				headers: this._headers,
+				data: this.serialize(a1, rowId),
+				callback: back
+			});
+		} else if (this._tMode == "JSON"){
+			var action = a1[this.action_param];
+			var data = {};
+			for (var key in a1) data[key] = a1[key];
+			delete data[this.action_param];
+			delete data.id;
+			delete data.gr_id;
+
+			ajax.query({
+				url:a4,
+				method:"POST",
+				headers:this._headers,
+				callback:back,
+				data:JSON.stringify({
+					id: rowId,
+					action: action,
+					data: data
+				})
+			});
+		}
+        else if (this._tMode == "REST"){
+        	var state = this.getState(rowId);
+        	var url = a3.replace(/(\&|\?)editing\=true/,"");
+        	var data = "";
+        	var method = "post";
+
+        	if (state == "inserted"){
+        		data = this.serialize(a1, rowId);
+        	} else if (state == "deleted"){
+        		method = "DELETE";
+        		url = url + (url.slice(-1) == "/" ? "" : "/") + rowId;
+        	} else {
+        		method = "PUT";
+        		data = this.serialize(a1, rowId);
+        		url = url + (url.slice(-1) == "/" ? "" : "/") + rowId;
+        	}
+
+
+        	url = this._applyPayload(url);
+        	ajax.query({
+        		url:url,
+        		method:method,
+        		headers:this._headers,
+        		data:data,
+        		callback:back
+        	});
+        }
+
+		this._waitMode++;
+    },
+	sendAllData:function(){
+		if (!this.updatedRows.length) return;			
+
+		this.messages=[]; var valid=true;
+		for (var i=0; i<this.updatedRows.length; i++)
+			valid&=this.checkBeforeUpdate(this.updatedRows[i]);
+		if (!valid && !this.callEvent("onValidationError",["",this.messages])) return false;
+	
+		if (this._tSend) 
+			this._sendData(this._getAllData());
+		else
+			for (var i=0; i<this.updatedRows.length; i++)
+				if (!this._in_progress[this.updatedRows[i]]){
+					if (this.is_invalid(this.updatedRows[i])) continue;
+					this._beforeSendData(this._getRowData(this.updatedRows[i]),this.updatedRows[i]);
+					if (this._waitMode && (this.obj.mytype=="tree" || this.obj._h2)) return; //block send all for tree
+				}
+	},
+
+	_getAllData:function(rowId){
+		var out={};
+		var has_one = false;
+		for(var i=0;i<this.updatedRows.length;i++){
+			var id=this.updatedRows[i];
+			if (this._in_progress[id] || this.is_invalid(id)) continue;
+			var row = this._getRowData(id);
+			if (!this.callEvent("onBeforeUpdate",[id,this.getState(id), row])) continue;
+			out[id]=row;
+			has_one = true;
+			this._in_progress[id]=(new Date()).valueOf();
+		}
+		return has_one?out:null;
+	},
+	
+	
+	/**
+	* 	@desc: specify column which value should be varified before sending to server
+	*	@param: ind - column index (0 based)
+	*	@param: verifFunction - function (object) which should verify cell value (if not specified, then value will be compared to empty string). Two arguments will be passed into it: value and column name
+	*	@type: public
+	*/
+	setVerificator:function(ind,verifFunction){
+		this.mandatoryFields[ind] = verifFunction||(function(value){return (value!=="");});
+	},
+	/**
+	* 	@desc: remove column from list of those which should be verified
+	*	@param: ind - column Index (0 based)
+	*	@type: public
+	*/
+	clearVerificator:function(ind){
+		this.mandatoryFields[ind] = false;
+	},
+	
+	
+	
+	
+	
+	findRow:function(pattern){
+		var i=0;
+    	for(i=0;i<this.updatedRows.length;i++)
+		    if(pattern==this.updatedRows[i]) break;
+	    return i;
+    },
+
+   
+	
+
+
+    
+
+
+
+
+
+	/**
+	* 	@desc: define custom actions
+	*	@param: name - name of action, same as value of action attribute
+	*	@param: handler - custom function, which receives a XMl response content for action
+	*	@type: private
+	*/
+	defineAction:function(name,handler){
+        if (!this._uActions) this._uActions=[];
+            this._uActions[name]=handler;
+	},
+
+
+
+
+	/**
+*     @desc: used in combination with setOnBeforeUpdateHandler to create custom client-server transport system
+*     @param: sid - id of item before update
+*     @param: tid - id of item after up0ate
+*     @param: action - action name
+*     @type: public
+*     @topic: 0
+*/
+	afterUpdateCallback:function(sid, tid, action, btag) {
+		var marker = sid;
+		var correct=(action!="error" && action!="invalid");
+		if (!correct) this.set_invalid(sid,action);
+		if ((this._uActions)&&(this._uActions[action])&&(!this._uActions[action](btag)))
+			return (delete this._in_progress[marker]);
+
+		if (this._in_progress[marker]!="wait")
+			this.setUpdated(sid, false);
+
+		var soid = sid;
+
+		switch (action) {
+			case "inserted":
+			case "insert":
+				if (tid != sid) {
+					this.setUpdated(sid,false);
+					this.obj[this._methods[2]](sid, tid);
+					sid = tid;
+				}
+				break;
+			case "delete":
+			case "deleted":
+				this.obj.setUserData(sid, this.action_param, "true_deleted");
+				this.obj[this._methods[3]](sid);
+				delete this._in_progress[marker];
+				return this.callEvent("onAfterUpdate", [sid, action, tid, btag]);
+		}
+
+		if (this._in_progress[marker]!="wait"){
+			if (correct) this.obj.setUserData(sid, this.action_param,'');
+			delete this._in_progress[marker];
+		} else {
+			delete this._in_progress[marker];
+			this.setUpdated(tid,true,this.obj.getUserData(sid,this.action_param));
+		}
+
+		this.callEvent("onAfterUpdate", [soid, action, tid, btag]);
+	},
+
+	/**
+	* 	@desc: response from server
+	*	@param: xml - XMLLoader object with response XML
+	*	@type: private
+	*/
+	afterUpdate:function(that,xml,id){
+		var ajax = this.$gantt.ajax;
+		//try to use json first
+		if (window.JSON){
+			var tag;
+
+			try{
+				tag = JSON.parse(xml.xmlDoc.responseText);
+			} catch(e){
+
+				// empty response also can be processed by json handler
+				if(!xml.xmlDoc.responseText.length){
+					tag = {};
+				}
+			}
+
+			if(tag){
+				var action = tag.action || this.getState(id) || "updated";
+				var sid = tag.sid || id[0];
+				var tid = tag.tid || id[0];
+				that.afterUpdateCallback(sid, tid, action, tag);
+				that.finalizeUpdate();
+				return;
+			}
+		}
+		//xml response
+		var top = ajax.xmltop("data", xml.xmlDoc); //fix incorrect content type in IE
+		if (!top) return this.cleanUpdate(id);
+		var atag=ajax.xpath("//data/action", top);
+		if (!atag.length) return this.cleanUpdate(id);
+
+		for (var i=0; i<atag.length; i++){
+        	var btag=atag[i];
+			var action = btag.getAttribute("type");
+			var sid = btag.getAttribute("sid");
+			var tid = btag.getAttribute("tid");
+			
+			that.afterUpdateCallback(sid,tid,action,btag);
+		}
+		that.finalizeUpdate();
+	},
+	cleanUpdate:function(id){
+		if (id)
+			for (var i = 0; i < id.length; i++)
+				delete this._in_progress[id[i]];
+	},
+	finalizeUpdate:function(){
+		if (this._waitMode) this._waitMode--;
+		
+		if ((this.obj.mytype=="tree" || this.obj._h2) && this.updatedRows.length) 
+			this.sendData();
+		this.callEvent("onAfterUpdateFinish",[]);
+		if (!this.updatedRows.length)
+			this.callEvent("onFullSync",[]);
+	},
+
+
+
+
+	
+	/**
+	* 	@desc: initializes data-processor
+	*	@param: anObj - dhtmlxGrid object to attach this data-processor to
+	*	@type: public
+	*/
+	init:function(anObj){
+		this.obj = anObj;
+		if (this.obj._dp_init) 
+			this.obj._dp_init(this);
+	},
+	
+	
+	setOnAfterUpdate:function(ev){
+		this.attachEvent("onAfterUpdate",ev);
+	},
+	enableDebug:function(mode){
+	},
+	setOnBeforeUpdateHandler:function(func){  
+		this.attachEvent("onBeforeDataSending",func);
+	},
+
+
+
+	/* starts autoupdate mode
+		@param interval
+			time interval for sending update requests
+	*/
+	setAutoUpdate: function(interval, user) {
+		interval = interval || 2000;
+		
+		this._user = user || (new Date()).valueOf();
+		this._need_update = false;
+		//this._loader = null;
+		this._update_busy = false;
+		
+		this.attachEvent("onAfterUpdate",function(sid,action,tid,xml_node){
+			this.afterAutoUpdate(sid, action, tid, xml_node);
+		});
+		this.attachEvent("onFullSync",function(){
+			this.fullSync();
+		});
+		
+		var self = this;
+		window.setInterval(function(){
+			self.loadUpdate();
+		}, interval);
+	},
+
+
+	/* process updating request answer
+		if status == collision version is depricated
+		set flag for autoupdating immidiatly
+	*/
+	afterAutoUpdate: function(sid, action, tid, xml_node) {
+		if (action == 'collision') {
+			this._need_update = true;
+			return false;
+		} else {
+			return true;
+		}
+	},
+
+
+	/* callback function for onFillSync event
+		call update function if it's need
+	*/
+	fullSync: function() {
+		if (this._need_update) {
+			this._need_update = false;
+			this.loadUpdate();
+		}
+		return true;
+	},
+
+
+	/* sends query to the server and call callback function
+	*/
+	getUpdates: function(url,callback){
+		var ajax = this.$gantt.ajax;
+		if (this._update_busy) 
+			return false;
+		else
+			this._update_busy = true;
+		
+		//this._loader = this._loader || new dtmlXMLLoaderObject(true);
+		
+		//this._loader.async=true;
+		//this._loader.waitCall=callback;
+		//this._loader.loadXML(url);
+		ajax.get(url, callback);
+
+	},
+
+
+	/* returns xml node value
+		@param node
+			xml node
+	*/
+	_v: function(node) {
+		if (node.firstChild) return node.firstChild.nodeValue;
+		return "";
+	},
+
+
+	/* returns values array of xml nodes array
+		@param arr
+			array of xml nodes
+	*/
+	_a: function(arr) {
+		var res = [];
+		for (var i=0; i < arr.length; i++) {
+			res[i]=this._v(arr[i]);
+		}
+		return res;
+	},
+
+
+	/* loads updates and processes them
+	*/
+	loadUpdate: function(){
+		var ajax = this.$gantt.ajax;
+		var self = this;
+		var version = this.obj.getUserData(0,"version");
+		var url = this.serverProcessor+ajax.urlSeparator(this.serverProcessor)+["dhx_user="+this._user,"dhx_version="+version].join("&");
+		url = url.replace("editing=true&","");
+		this.getUpdates(url, function(xml){
+			var vers = ajax.xpath("//userdata", xml);
+			self.obj.setUserData(0,"version",self._v(vers[0]));
+			
+			var upds = ajax.xpath("//update", xml);
+			if (upds.length){
+				self._silent_mode = true;
+				
+				for (var i=0; i<upds.length; i++) {
+					var status = upds[i].getAttribute('status');
+					var id = upds[i].getAttribute('id');
+					var parent = upds[i].getAttribute('parent');
+					switch (status) {
+						case 'inserted':
+							self.callEvent("insertCallback",[upds[i], id, parent]);
+							break;
+						case 'updated':
+							self.callEvent("updateCallback",[upds[i], id, parent]);
+							break;
+						case 'deleted':
+							self.callEvent("deleteCallback",[upds[i], id, parent]);
+							break;
+					}
+				}
+				
+				self._silent_mode = false;
+			}
+			
+			self._update_busy = false;
+			self = null;
+		});
+	},
+
+	destructor: function(){
+		this.callEvent("onDestroy", []);
+		this.detachAllEvents();
+
+		this.updatedRows = [];
+		this._in_progress={};//?
+		this._invalid={};
+		this._headers = null;
+		this._payload = null;
+		this.obj = null;
+	}
+
+
+
+};
+
+module.exports = dataProcessor;
+
+/***/ }),
+/* 66 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = function(gantt){
+	var modules = [
+		__webpack_require__(67),
+		__webpack_require__(68),
+		__webpack_require__(69),
+		__webpack_require__(70),
+		__webpack_require__(71),
+		__webpack_require__(72)
+	];
+
+	for(var i = 0; i < modules.length; i++){
+		if(modules[i])
+			modules[i](gantt);
+	}
+};
+
+/***/ }),
+/* 67 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var domHelpers = __webpack_require__(1);
+
+module.exports = function(gantt){
+
+	var scrollRange = 50,
+		scrollStep = 30,
+		scrollDelay = 10,
+		scrollSpeed = 50;
+
+	var interval = null,
+		isMove = false,
+		delayTimeout = null,
+		box = {},
+		startPos = {
+			started: false
+		},
+		eventPos = {};
+
+	function isScrollState() {
+		var dragMarker = !!document.querySelector(".gantt_drag_marker");
+		var isResize = !!document.querySelector(".gantt_drag_marker.gantt_grid_resize_area");
+		var isLink = !!document.querySelector(".gantt_link_direction");
+		isMove = dragMarker && !isResize && !isLink;
+		return !((!gantt.getState().drag_mode && !dragMarker) || isResize);
+	}
+
+	function defineDelayTimeout(state) {
+		if (delayTimeout) {
+			clearTimeout(delayTimeout);
+			delayTimeout = null;
+		}
+		if (state) {
+			var speed = gantt.config.autoscroll_speed;
+			if (speed && speed < 10) // limit speed value to 10 
+				speed = 10;
+
+			delayTimeout = setTimeout(function() {
+				interval = setInterval(tick, speed || scrollSpeed);
+				box = domHelpers.getNodePosition(gantt.$task);
+			}, gantt.config.autoscroll_delay || scrollDelay);
+		}
+	}
+
+	function defineScrollInterval(state) {
+		if (state) {
+			defineDelayTimeout(true);
+			if (!startPos.started) {
+				startPos.x = eventPos.x;
+				startPos.y = eventPos.y;
+				startPos.started = true;
+			}
+		} else {
+			if (interval) {
+				clearInterval(interval);
+				interval = null;
+			}
+			defineDelayTimeout(false);
+			startPos.started = false;
+		}
+	}
+
+	function autoscrollInterval(event) {
+
+		var isScroll = isScrollState();
+
+		if ((interval || delayTimeout) && !isScroll) { 
+			defineScrollInterval(false);
+		}
+
+		if (!gantt.config.autoscroll || !isScroll) {
+			return false;
+		}
+
+		eventPos = {
+			x: event.clientX,
+			y: event.clientY
+		};
+
+		if (!interval && isScroll) {
+			defineScrollInterval(true);
+		}
+	}
+
+	function tick() {
+
+		if (!isScrollState()) {
+			defineScrollInterval(false);
+			return false;
+		}
+
+		var box = domHelpers.getNodePosition(gantt.$task);
+		var posX = eventPos.x - box.x; 
+		var posY = eventPos.y - box.y;
+
+		var scrollLeft = isMove ? 0 : need_scroll(posX, box.width, startPos.x - box.x);
+		var scrollTop = need_scroll(posY, box.height, startPos.y - box.y);
+
+		var scrollState = gantt.getScrollState();
+
+		var currentScrollTop = scrollState.y,
+			scrollOuterHeight = scrollState.inner_height,
+			scrollInnerHeight = scrollState.height,
+			currentScrollLeft = scrollState.x,
+			scrollOuterWidth = scrollState.inner_width,
+			scrollInnerWidth = scrollState.width;
+
+		// do scrolling only if we have scrollable area to do so
+		if (scrollTop && !scrollOuterHeight) {
+			scrollTop = 0;
+		} else if (scrollTop < 0 && !currentScrollTop) {
+			scrollTop = 0;
+		} else if (scrollTop > 0 && currentScrollTop + scrollOuterHeight >= scrollInnerHeight + 2) {
+			scrollTop = 0;
+		}
+
+		if (scrollLeft && !scrollOuterWidth) {
+			scrollLeft = 0;
+		} else if (scrollLeft < 0 && !currentScrollLeft) {
+			scrollLeft = 0;
+		} else if (scrollLeft > 0 && currentScrollLeft + scrollOuterWidth >= scrollInnerWidth) {
+			scrollLeft = 0;
+		}
+
+		var step = gantt.config.autoscroll_step;
+
+		if (step && step < 2) // limit step value to 2
+			step = 2;
+
+		scrollLeft = scrollLeft * (step || scrollStep);
+		scrollTop = scrollTop * (step || scrollStep);
+
+		if (scrollLeft || scrollTop) {
+			scroll(scrollLeft, scrollTop);
+		} 
+
+	}
+
+	function need_scroll(pos, boxSize, startCoord) {
+		if ((pos - scrollRange < 0) && (pos < startCoord))
+			return -1;
+		else if ((pos > boxSize - scrollRange) && (pos > startCoord))
+			return 1;
+		return 0;
+	}
+
+	function scroll(left, top) {
+		var scrollState = gantt.getScrollState();
+
+		var scrollLeft = null,
+			scrollTop = null;
+
+		if (left) {
+			scrollLeft = scrollState.x + left;
+			scrollLeft = Math.min(scrollState.width, scrollLeft);
+			scrollLeft = Math.max(0, scrollLeft);
+		}
+
+		if (top) {
+			scrollTop = scrollState.y + top;
+			scrollTop = Math.min(scrollState.height, scrollTop);
+			scrollTop = Math.max(0, scrollTop);
+		}
+
+		gantt.scrollTo(scrollLeft, scrollTop);
+	}
+
+	gantt.attachEvent("onGanttReady", function() {
+		gantt.eventRemove(document.body, "mousemove", autoscrollInterval);
+		gantt.event(document.body, "mousemove", autoscrollInterval);
+	});
+
+};
+
+/***/ }),
+/* 68 */
+/***/ (function(module, exports) {
+
+function createMethod(gantt){
+	var methods = {};
+	var isActive = false;
+	function disableMethod(methodName, dummyMethod){
+		dummyMethod = typeof dummyMethod == "function" ? dummyMethod : function(){};
+
+		if(!methods[methodName]){
+			methods[methodName] = this[methodName];
+			this[methodName] = dummyMethod;
+		}
+	}
+	function restoreMethod(methodName){
+		if(methods[methodName]){
+			this[methodName] = methods[methodName];
+			methods[methodName] = null;
+		}
+	}
+	function disableMethods(methodsHash){
+		for(var i in methodsHash){
+			disableMethod.call(this, i, methodsHash[i]);
+		}
+	}
+	 function restoreMethods(){
+		for(var i in methods){
+			restoreMethod.call(this, i);
+		}
+	}
+
+	function batchUpdatePayload(callback){
+		try{
+			callback();
+		}catch(e){
+			window.console.error(e);
+		}
+	}
+
+	var state = gantt.$services.getService("state");
+	state.registerProvider("batchUpdate", function(){
+		return {
+			batch_update: isActive
+		};
+	}, true);
+
+	return function batchUpdate(callback, noRedraw) {
+		if(isActive){
+			// batch mode is already active
+			batchUpdatePayload(callback);
+			return;
+		}
+
+		var call_dp = (this._dp && this._dp.updateMode != "off");
+		var dp_mode;
+		if (call_dp){
+			dp_mode = this._dp.updateMode;
+			this._dp.setUpdateMode("off");
+		}
+
+		// temporary disable some methods while updating multiple tasks
+		var resetProjects = {};
+		var methods = {
+			"render":true,
+			"refreshData":true,
+			"refreshTask":true,
+			"refreshLink":true,
+			"resetProjectDates":function(task){
+				resetProjects[task.id] = task;
+			}
+		};
+
+		disableMethods.call(this, methods);
+
+		isActive = true;
+		this.callEvent("onBeforeBatchUpdate", []);
+
+		batchUpdatePayload(callback);
+
+		this.callEvent("onAfterBatchUpdate", []);
+
+		restoreMethods.call(this);
+
+		// do required updates after changes applied
+		for(var i in resetProjects){
+			this.resetProjectDates(resetProjects[i]);
+		}
+
+		isActive = false;
+
+		if(!noRedraw){
+			this.render();
+		}
+
+		if (call_dp) {
+			this._dp.setUpdateMode(dp_mode);
+			this._dp.setGanttMode("tasks");
+			this._dp.sendData();
+			this._dp.setGanttMode("links");
+			this._dp.sendData();
+		}
+	};
+
+
+
+}
+
+module.exports = function(gantt){
+	gantt.batchUpdate = createMethod(gantt);
+};
+
+/***/ }),
+/* 69 */
+/***/ (function(module, exports) {
+
+var createWbs = (function(gantt){
+	return {
+	_needRecalc: true,
+	reset: function(){
+		this._needRecalc = true;
+	},
+	_isRecalcNeeded: function(){
+		return (!this._isGroupSort() && this._needRecalc);
+	},
+	_isGroupSort: function() {
+		return !!(gantt._groups && gantt._groups.is_active());
+	},
+	_getWBSCode: function(task) {
+		if(!task) return "";
+
+		if(this._isRecalcNeeded()){
+			this._calcWBS();
+		}
+
+		if(task.$virtual) return "";
+		if(this._isGroupSort()) return task.$wbs || "";
+
+		if(!task.$wbs) {
+			this.reset();
+			this._calcWBS();
+		}
+		return task.$wbs;
+	},
+	_setWBSCode: function(task, value) {
+		task.$wbs = value;
+	},
+	getWBSCode: function(task) {
+		return this._getWBSCode(task);
+	},
+	_calcWBS: function() {
+		if(!this._isRecalcNeeded()) return;
+
+		var _isFirst = true;
+		gantt.eachTask(function(ch) {
+			if(_isFirst) {
+				_isFirst = false;
+				this._setWBSCode(ch, "1");
+				return;
+			}
+			var _prevSibling = gantt.getPrevSibling(ch.id);
+			if (_prevSibling !== null) {
+				var _wbs = gantt.getTask(_prevSibling).$wbs;
+				if(_wbs) {
+					_wbs = _wbs.split(".");
+					_wbs[_wbs.length-1]++;
+					this._setWBSCode(ch, _wbs.join("."));
+				}
+			} else {
+				var _parent = gantt.getParent(ch.id);
+				this._setWBSCode(ch, gantt.getTask(_parent).$wbs + ".1");
+			}
+		}, gantt.config.root_id, this);
+
+		this._needRecalc = false;
+	}
+};
+});
+
+module.exports = function(gantt){
+	var wbs = createWbs(gantt);
+	gantt.getWBSCode = function getWBSCode(task) {
+		return wbs.getWBSCode(task);
+	};
+
+	gantt.attachEvent("onAfterTaskMove", function() {
+		wbs.reset();
+		return true;
+	});
+
+	gantt.attachEvent("onBeforeParse", function() {
+		wbs.reset();
+		return true;
+	});
+
+	gantt.attachEvent("onAfterTaskDelete", function() {
+		wbs.reset();
+		return true;
+	});
+
+	gantt.attachEvent("onAfterTaskAdd", function() {
+		wbs.reset();
+		return true;
+	});
+};
+
+
+/***/ }),
+/* 70 */
+/***/ (function(module, exports) {
+
+if (window.jQuery){
+
+	(function( $ ){
+
+		var methods = [];
+		$.fn.dhx_gantt = function(config){
+			config = config || {};
+			if (typeof(config) === 'string') {
+				if (methods[config] ) {
+					return methods[config].apply(this, []);
+				}else {
+					$.error('Method ' +  config + ' does not exist on jQuery.dhx_gantt');
+				}
+			} else {
+				var views = [];
+				this.each(function() {
+					if (this && this.getAttribute){
+						if (!this.gantt && !(window.gantt.$root == this)){
+
+							var newgantt = (window.gantt.$container && window.Gantt) ? window.Gantt.getGanttInstance():window.gantt;
+							for (var key in config)
+								if (key!="data")
+									newgantt.config[key] = config[key];
+
+							newgantt.init(this);
+							if (config.data)
+								newgantt.parse(config.data);
+
+							views.push(newgantt);
+						} else
+							views.push(typeof this.gantt == "object" ? this.gantt : window.gantt);
+					}
+				});
+
+
+				if (views.length === 1) return views[0];
+				return views;
+			}
+		};
+
+	})(jQuery);
+
+}
+
+
+module.exports = null;
+
+/***/ }),
+/* 71 */
+/***/ (function(module, exports) {
+
+if (window.dhtmlx){
+
+	if (!dhtmlx.attaches)
+		dhtmlx.attaches = {};
+
+	dhtmlx.attaches.attachGantt=function(start, end, gantt){
+		var obj = document.createElement("DIV");
+
+		gantt = gantt || window.gantt;
+
+		obj.id = "gantt_"+ gantt.uid();
+		obj.style.width = "100%";
+		obj.style.height = "100%";
+		obj.cmp = "grid";
+
+		document.body.appendChild(obj);
+		this.attachObject(obj.id);
+		this.dataType = "gantt";
+		this.dataObj = gantt;
+
+		var that = this.vs[this.av];
+		that.grid = gantt;
+
+		gantt.init(obj.id, start, end);
+		obj.firstChild.style.border = "none";
+
+		that.gridId = obj.id;
+		that.gridObj = obj;
+
+		var method_name="_viewRestore";
+		return this.vs[this[method_name]()].grid;
+	};
+
+}
+if (typeof(window.dhtmlXCellObject) != "undefined") {
+
+	dhtmlXCellObject.prototype.attachGantt=function(start, end, gantt){
+		gantt = gantt || window.gantt;
+
+		var obj = document.createElement("DIV");
+		obj.id = "gantt_"+gantt.uid();
+		obj.style.width = "100%";
+		obj.style.height = "100%";
+		obj.cmp = "grid";
+
+		document.body.appendChild(obj);
+		this.attachObject(obj.id);
+
+		this.dataType = "gantt";
+		this.dataObj = gantt;
+
+		gantt.init(obj.id, start, end);
+		obj.firstChild.style.border = "none";
+		var method_name="_viewRestore";
+		obj = null;
+		this.callEvent("_onContentAttach",[]);
+
+		return this.dataObj;
+	};
+}
+
+module.exports = null;
+
+/***/ }),
+/* 72 */
+/***/ (function(module, exports) {
+
+function createResourceMethods(gantt){
+
+	var resourceTaskCache = {},
+		resourceLoadCache = {};
+
+	gantt.$data.tasksStore.attachEvent("onStoreUpdated", function(){
+		resourceTaskCache = {};
+		resourceLoadCache = {};
+	});
+
+	function getTaskBy(propertyName, propertyValue){
+		if(typeof propertyName == "function"){
+			return filterResourceTasks(propertyName);
+		}else{
+			if(propertyValue instanceof Array){
+				return getResourceTasks(propertyName, propertyValue);
+			}else{
+				return getResourceTasks(propertyName, [propertyValue]);
+			}
+		}
+	}
+
+	function filterResourceTasks(filter){
+		var res = [];
+		gantt.eachTask(function (task) {
+			if (filter(task)) {
+				res.push(task);
+			}
+		});
+		return res;
+	}
+
+	function getResourceTasks(property, resourceIds) {
+		var res;
+
+		var cacheKey = resourceIds.join("_") + "_" + property;
+
+		var resourceHash = {};
+		for(var i = 0; i < resourceIds.length; i++){
+			resourceHash[resourceIds[i]] = true;
+		}
+
+		if(!resourceTaskCache[cacheKey]){
+			res = resourceTaskCache[cacheKey] = [];
+			gantt.eachTask(function (task) {
+				if (resourceHash[task[property]] && task.type != gantt.config.types.project) {
+					res.push(task);
+				}
+			});
+		}else{
+			res = resourceTaskCache[cacheKey];
+		}
+
+		return res;
+	}
+
+	function getResourceLoad(resourceId, resourceProperty, scale){
+		var cacheKey = [resourceId, resourceProperty, scale.unit, scale.step].join("_");
+		var res;
+		if(!resourceTaskCache[cacheKey]){
+			res = resourceTaskCache[cacheKey] = calculateResourceLoad(resourceId, resourceProperty, scale);
+
+		}else{
+			res = resourceTaskCache[cacheKey];
+		}
+		return res;
+	}
+
+	function calculateResourceLoad(resourceProperty, resourceId, scale) {
+
+		var tasks = getTaskBy(resourceProperty, resourceId);
+		var step = scale.unit;
+		var timegrid = {};
+
+		for (var i = 0; i < tasks.length; i++) {
+			var task = tasks[i];
+
+			var currDate = gantt.date[step + "_start"](new Date(task.start_date));
+
+			while (currDate < task.end_date) {
+
+				var date = currDate;
+				currDate = gantt.date.add(currDate, 1, step);
+
+				if (!gantt.isWorkTime({date: date, task: task})) {
+					continue;
+				}
+
+				var timestamp = date.valueOf();
+				if (!timegrid[timestamp]){
+					timegrid[timestamp] = {
+						tasks: []
+					};
+				}
+
+				timegrid[timestamp].tasks.push(task);
+			}
+		}
+
+		var timetable = [];
+		var start, end;
+		for (var i in timegrid) {
+			start = new Date(i * 1);
+			end = gantt.date.add(start, 1, step);
+			timetable.push({
+				start_date: start,
+				end_date: end,
+				tasks: timegrid[i].tasks
+			});
+		}
+
+		return timetable;
+	}
+
+	function renderResourceLine(resource, timeline) {
+		var config = timeline.$getConfig(),
+			templates = timeline.$getTemplates();
+		var timetable = getResourceLoad(config.resource_property, resource.id, timeline.getScale());
+
+		var cells = [];
+		for (var i = 0; i < timetable.length; i++) {
+
+			var day = timetable[i];
+
+			var css = templates.resource_cell_class(day.start_date, day.end_date, resource, day.tasks);
+			var content = templates.resource_cell_value(day.start_date, day.end_date, resource, day.tasks);
+
+			if(css || content){
+				var sizes = timeline.getItemPosition(resource, day.start_date, day.end_date);
+				var el = document.createElement('div');
+				el.className = ["gantt_resource_marker", css].join(" ");
+
+				el.style.cssText = [
+					'left:' + sizes.left + 'px',
+					'width:' + sizes.width + 'px',
+					'height:' + (config.row_height - 1) + 'px',
+					'line-height:' + (config.row_height - 1) + 'px',
+					'top:' + sizes.top + 'px'
+				].join(";");
+
+				if(content)
+					el.innerHTML = content;
+
+				cells.push(el);
+			}
+
+		}
+
+		var row = null;
+		if(cells.length){
+			row = document.createElement("div");
+			for(var i = 0; i < cells.length; i++){
+				row.appendChild(cells[i]);
+			}
+		}
+
+		return row;
+	}
+	return {
+		renderLine: renderResourceLine,
+		filterTasks: getTaskBy
+	};
+}
+
+module.exports = function(gantt){
+	var methods = createResourceMethods(gantt);
+
+	gantt.getTaskBy = methods.filterTasks;
+	gantt.$ui.layers.resourceRow = methods.renderLine;
+	gantt.config.resource_property = "owner_id";
+	gantt.config.resource_store = "resource";
+
+	gantt.templates.resource_cell_class = function(start, end, resource, tasks){
+		var css = "";
+		if (tasks.length <= 1) {
+			css = "gantt_resource_marker_ok";
+		} else {
+			css = "gantt_resource_marker_overtime";
+		}
+		return css;
+	};
+
+	gantt.templates.resource_cell_value = function(start, end, resource, tasks){
+		return tasks.length * 8;
+	};
+};
+
+
+
+
+/***/ }),
+/* 73 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt) {
+};
+
+/***/ }),
+/* 74 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt) {
+	gantt.getGridColumn = function (name) {
+		var columns = gantt.config.columns;
+
+		for (var i = 0; i < columns.length; i++) {
+			if (columns[i].name == name)
+				return columns[i];
+		}
+
+		return null;
+	};
+};
+
+/***/ }),
+/* 75 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt){
+
+	var htmlTags = new RegExp("<(?:.|\n)*?>", "gm");
+	var extraSpaces = new RegExp(" +", "gm");
+
+	function stripHTMLLite(htmlText){
+		return (htmlText + "")
+			.replace(htmlTags, " ").
+			replace(extraSpaces, " ");
+	}
+
+	var singleQuotes = new RegExp("'", "gm");
+	function escapeQuotes(text){
+		return (text + "").replace(singleQuotes, "&#39;");
+	}
+
+	gantt._waiAria = {
+		getAttributeString: function(attr){
+			var attributes = [" "];
+			for(var i in attr){
+				var text = escapeQuotes(stripHTMLLite(attr[i]));
+				attributes.push(i + "='" + text + "'");
+			}
+			attributes.push(" ");
+			return attributes.join(" ");
+
+		},
+
+		getTimelineCellAttr:function(dateString){
+
+			return gantt._waiAria.getAttributeString({"aria-label": dateString});
+		},
+
+
+		_taskCommonAttr: function(task, div){
+
+			if(!(task.start_date && task.end_date))
+				return;
+
+			div.setAttribute("aria-label", stripHTMLLite(gantt.templates.tooltip_text(task.start_date, task.end_date, task)));
+
+			if(gantt.isReadonly(task)){
+				div.setAttribute("aria-readonly", true);
+
+
+			}
+
+			if(task.$dataprocessor_class){
+				div.setAttribute("aria-busy", true);
+			}
+
+
+			div.setAttribute("aria-selected",
+				(gantt.getState().selected_task == task.id || (gantt.isSelectedTask && gantt.isSelectedTask(task.id))) ? "true" : "false");
+		},
+
+		setTaskBarAttr: function(task, div){
+			this._taskCommonAttr(task, div);
+
+			if(!gantt.isReadonly(task) && gantt.config.drag_move){
+				if(task.id != gantt.getState().drag_id){
+					div.setAttribute("aria-grabbed", false);
+				}else{
+					div.setAttribute("aria-grabbed", true);
+				}
+			}
+		},
+
+		taskRowAttr: function(task, div){
+
+			this._taskCommonAttr(task, div);
+
+			if(!gantt.isReadonly(task) && gantt.config.order_branch){
+				div.setAttribute("aria-grabbed", false);
+			}
+
+			div.setAttribute("role", "row");
+
+			div.setAttribute("aria-level", task.$level);
+
+			if(gantt.hasChild(task.id)){
+				div.setAttribute("aria-expanded", task.$open ? "true" : "false");
+			}
+		},
+
+		linkAttr: function(link, div){
+
+			var linkTypes = gantt.config.links;
+
+			var toStart = link.type == linkTypes.finish_to_start || link.type == linkTypes.start_to_start;
+			var fromStart = link.type == linkTypes.start_to_start || link.type == linkTypes.start_to_finish;
+
+			var content = gantt.locale.labels.link + " " +  gantt.templates.drag_link(link.source, fromStart, link.target, toStart);
+
+			div.setAttribute("aria-label", stripHTMLLite(content));
+			if(gantt.isReadonly(link)){
+				div.setAttribute("aria-readonly", true);
+			}
+		},
+
+		gridSeparatorAttr: function(div){
+			div.setAttribute("role", "separator");
+		},
+
+		lightboxHiddenAttr: function(div){
+			div.setAttribute("aria-hidden", "true");
+		},
+
+		lightboxVisibleAttr: function(div){
+			div.setAttribute("aria-hidden", "false");
+		},
+
+		lightboxAttr: function(div){
+			div.setAttribute("role", "dialog");
+			div.setAttribute("aria-hidden", "true");
+			div.firstChild.setAttribute("role", "heading");
+		},
+
+		lightboxButtonAttrString:function(buttonName){
+			return this.getAttributeString({"role":"button", "aria-label":gantt.locale.labels[buttonName], "tabindex":"0"});
+		},
+
+		lightboxHeader: function(div, headerText){
+			div.setAttribute("aria-label", headerText);
+		},
+
+		lightboxSelectAttrString: function(time_option){
+			var label = "";
+
+			switch (time_option) {
+				case "%Y":
+					label = gantt.locale.labels.years;
+					break;
+				case "%m":
+					label = gantt.locale.labels.months;
+					break;
+				case "%d":
+					label = gantt.locale.labels.days;
+					break;
+				case "%H:%i":
+					label = gantt.locale.labels.hours + gantt.locale.labels.minutes;
+					break;
+				default:
+					break;
+			}
+
+			return gantt._waiAria.getAttributeString({"aria-label": label});
+		},
+
+		lightboxDurationInputAttrString: function(section){
+			return this.getAttributeString({"aria-label": gantt.locale.labels.column_duration, "aria-valuemin": "0"});
+		},
+
+		gridAttrString: function(){
+			return [" role='treegrid'", gantt.config.multiselect ? "aria-multiselectable='true'" : "aria-multiselectable='false'", " "].join(" ");
+		},
+
+
+		gridScaleRowAttrString: function(){
+			return "role='row'";
+		},
+
+		gridScaleCellAttrString: function(column, label){
+			var attrs = "";
+			if(column.name == "add"){
+				attrs = this.getAttributeString({"role":"button", "aria-label": gantt.locale.labels.new_task});
+			}else{
+
+				var attributes = {
+					"role":"columnheader",
+					"aria-label": label
+				};
+
+				if(gantt._sort && gantt._sort.name == column.name){
+					if(gantt._sort.direction == "asc"){
+						attributes["aria-sort"] = "ascending";
+					}else{
+						attributes["aria-sort"] = "descending";
+					}
+				}
+
+				attrs = this.getAttributeString(attributes);
+			}
+			return attrs;
+		},
+
+		gridDataAttrString: function(){
+			return "role='rowgroup'";
+		},
+
+		gridCellAttrString: function(column, textValue){
+			return this.getAttributeString({"role":"gridcell", "aria-label": textValue});
+		},
+
+		gridAddButtonAttrString: function(column){
+			return this.getAttributeString({"role":"button", "aria-label": gantt.locale.labels.new_task});
+		},
+
+		messageButtonAttrString: function(buttonLabel){
+			return "tabindex='0' role='button' aria-label='"+buttonLabel+"'";
+		},
+
+		messageInfoAttr: function(div){
+			div.setAttribute("role", "alert");
+			//div.setAttribute("tabindex", "-1");
+		},
+
+		messageModalAttr: function(div, uid){
+			div.setAttribute("role", "dialog");
+			if(uid){
+				div.setAttribute("aria-labelledby", uid);
+			}
+
+		//	div.setAttribute("tabindex", "-1");
+		},
+
+		quickInfoAttr: function(div){
+			div.setAttribute("role", "dialog");
+		},
+
+		quickInfoHeaderAttrString: function(){
+			return " role='heading' ";
+		},
+
+		quickInfoHeader: function(div, header){
+			div.setAttribute("aria-label", header);
+		},
+
+		quickInfoButtonAttrString: function(label){
+			return gantt._waiAria.getAttributeString({"role":"button", "aria-label":label, "tabindex":"0"});
+		},
+
+		tooltipAttr: function(div){
+			div.setAttribute("role", "tooltip");
+		},
+
+		tooltipVisibleAttr: function(div){
+			div.setAttribute("aria-hidden", "false");
+		},
+
+		tooltipHiddenAttr: function(div){
+			div.setAttribute("aria-hidden", "true");
+		}
+	};
+
+	function isDisabled(){
+		return !gantt.config.wai_aria_attributes;
+	}
+
+	for(var i in gantt._waiAria){
+		gantt._waiAria[i] = (function(payload){
+			return function(){
+				if(isDisabled()){
+					return "";
+				}
+				return payload.apply(this, arguments);
+			};
+		})(gantt._waiAria[i]);
+	}
+
+
+};
+
+/***/ }),
+/* 76 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt) {
+	gantt.isReadonly = function (item) {
+		if (item && item[this.config.editable_property]) {
+			return false;
+		} else {
+			return (item && item[this.config.readonly_property]) || this.config.readonly;
+		}
+	};
+};
+
+/***/ }),
+/* 77 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+var dateHelper = __webpack_require__(3);
+
+module.exports = function(gantt) {
+
+	gantt.load = function (url, type, callback) {
+		this._load_url = url;
+		this.assert(arguments.length, "Invalid load arguments");
+
+		var tp = 'json', cl = null;
+		if (arguments.length >= 3) {
+			tp = type;
+			cl = callback;
+		} else {
+			if (typeof arguments[1] == "string")
+				tp = arguments[1];
+			else if (typeof arguments[1] == "function")
+				cl = arguments[1];
+		}
+
+		this._load_type = tp;
+
+		this.callEvent("onLoadStart", [url, tp]);
+
+		this.ajax.get(url, gantt.bind(function (l) {
+			this.on_load(l, tp);
+			this.callEvent("onLoadEnd", [url, tp]);
+			if (typeof cl == "function")
+				cl.call(this);
+		}, this));
+	};
+	gantt.parse = function (data, type) {
+		this.on_load({xmlDoc: {responseText: data}}, type);
+	};
+
+	gantt.serialize = function (type) {
+		type = type || "json";
+		return this[type].serialize();
+	};
+
+	/*
+	tasks and relations
+	{
+	data:[
+		{
+			"id":"string",
+			"text":"...",
+			"start_date":"Date or string",
+			"end_date":"Date or string",
+			"duration":"number",
+			"progress":"0..1",
+			"parent_id":"string",
+			"order":"number"
+		},...],
+	links:[
+		{
+			id:"string",
+			source:"string",
+			target:"string",
+			type:"string"
+		},...],
+	collections:{
+			collectionName:[
+				{key:, label:, optional:...},...
+			],...
+		}
+	}
+
+	* */
+
+	gantt.on_load = function (resp, type) {
+		this.callEvent("onBeforeParse", []);
+		if (!type)
+			type = "json";
+		this.assert(this[type], "Invalid data type:'" + type + "'");
+
+		var raw = resp.xmlDoc.responseText;
+
+		var data = this[type].parse(raw, resp);
+		this._process_loading(data);
+	};
+
+	gantt._process_loading = function (data) {
+		if(data.collections)
+			this._load_collections(data.collections);
+
+		this.$data.tasksStore.parse(data.data);
+		var links = data.links || (data.collections ? data.collections.links : []);
+		this.$data.linksStore.parse(links);
+
+		//this._sync_links();
+		this.callEvent("onParse", []);
+		this.render();
+		if(this.config.initial_scroll){
+			var firstTask = this.getTaskByIndex(0);
+			var id = firstTask ? firstTask.id : this.config.root_id;
+			if(this.isTaskExists(id))
+				this.showTask(id);
+		}
+	};
+
+
+	gantt._load_collections = function (collections) {
+		var collections_loaded = false;
+		for (var key in collections) {
+			if (collections.hasOwnProperty(key)) {
+				collections_loaded = true;
+				var collection = collections[key];
+				var arr = this.serverList[key];
+				if (!arr) continue;
+				arr.splice(0, arr.length); //clear old options
+				for (var j = 0; j < collection.length; j++) {
+					var option = collection[j];
+					var obj = this.copy(option);
+					obj.key = obj.value;// resulting option object
+
+					for (var option_key in option) {
+						if (option.hasOwnProperty(option_key)) {
+							if (option_key == "value" || option_key == "label")
+								continue;
+							obj[option_key] = option[option_key]; // obj['value'] = option['value']
+						}
+					}
+					arr.push(obj);
+				}
+			}
+		}
+		if (collections_loaded)
+			this.callEvent("onOptionsLoad", []);
+	};
+
+	gantt.attachEvent("onBeforeTaskDisplay", function (id, task) {
+		return !task.$ignore;
+	});
+
+	gantt.json = {
+		parse: function (data) {
+			gantt.assert(data, "Invalid data");
+
+			if (typeof data == "string") {
+				if (window.JSON)
+					data = JSON.parse(data);
+				else {
+					gantt.assert(false, "JSON is not supported");
+				}
+			}
+
+			if (data.dhx_security)
+				gantt.security_key = data.dhx_security;
+			return data;
+		},
+		serializeTask: function (task) {
+			return this._copyObject(task);
+		},
+		serializeLink: function (link) {
+			return this._copyLink(link);
+		},
+		_copyLink: function (obj) {
+			var copy = {};
+			for (var key in obj)
+				copy[key] = obj[key];
+			return copy;
+		},
+		_copyObject: function (obj) {
+			var copy = {};
+			for (var key in obj) {
+				if (key.charAt(0) == "$")
+					continue;
+				copy[key] = obj[key];
+
+				if (dateHelper.isDate(copy[key])) {
+					copy[key] = gantt.templates.xml_format(copy[key]);
+				}
+			}
+			return copy;
+		},
+		serialize: function () {
+			var tasks = [];
+			var links = [];
+
+			gantt.eachTask(function (obj) {
+				gantt.resetProjectDates(obj);
+				tasks.push(this.serializeTask(obj));
+			}, gantt.config.root_id, this);
+
+			var rawLinks = gantt.getLinks();
+			for (var i = 0; i < rawLinks.length; i++) {
+				links.push(this.serializeLink(rawLinks[i]));
+			}
+
+			return {
+				data: tasks,
+				links: links
+			};
+		}
+	};
+
+	/*
+	<data>
+		<task id:"some" parent_id="0" progress="0.5">
+			<text>My task 1</text>
+			<start_date>16.08.2013</start_date>
+			<end_date>22.08.2013</end_date>
+		</task>
+		<coll_options>
+			<links>
+				<link source='a1' target='b2' type='c3' />
+			</links>
+		</coll_options>
+	</data>
+	*/
+
+	gantt.xml = {
+		_xmlNodeToJSON: function (node, attrs_only) {
+			var t = {};
+			for (var i = 0; i < node.attributes.length; i++)
+				t[node.attributes[i].name] = node.attributes[i].value;
+
+			if (!attrs_only) {
+				for (var i = 0; i < node.childNodes.length; i++) {
+					var child = node.childNodes[i];
+					if (child.nodeType == 1)
+						t[child.tagName] = child.firstChild ? child.firstChild.nodeValue : "";
+				}
+
+				if (!t.text) t.text = node.firstChild ? node.firstChild.nodeValue : "";
+			}
+
+			return t;
+		},
+		_getCollections: function (loader) {
+			var collection = {};
+			var opts = gantt.ajax.xpath("//coll_options", loader);
+			for (var i = 0; i < opts.length; i++) {
+				var bind = opts[i].getAttribute("for");
+				var arr = collection[bind] = [];
+				var itms = gantt.ajax.xpath(".//item", opts[i]);
+				for (var j = 0; j < itms.length; j++) {
+					var itm = itms[j];
+					var attrs = itm.attributes;
+					var obj = {key: itms[j].getAttribute("value"), label: itms[j].getAttribute("label")};
+					for (var k = 0; k < attrs.length; k++) {
+						var attr = attrs[k];
+						if (attr.nodeName == "value" || attr.nodeName == "label")
+							continue;
+						obj[attr.nodeName] = attr.nodeValue;
+					}
+					arr.push(obj);
+				}
+			}
+			return collection;
+		},
+		_getXML: function (text, loader, toptag) {
+			toptag = toptag || "data";
+			if (!loader.getXMLTopNode) {
+				loader = gantt.ajax.parse(loader);
+			}
+
+			var xml = gantt.ajax.xmltop(toptag, loader.xmlDoc);
+			if (!xml || xml.tagName != toptag) throw "Invalid XML data";
+
+			var skey = xml.getAttribute("dhx_security");
+			if (skey)
+				gantt.security_key = skey;
+
+			return xml;
+		},
+		parse: function (text, loader) {
+			loader = this._getXML(text, loader);
+			var data = {};
+
+			var evs = data.data = [];
+			var xml = gantt.ajax.xpath("//task", loader);
+
+			for (var i = 0; i < xml.length; i++)
+				evs[i] = this._xmlNodeToJSON(xml[i]);
+
+			data.collections = this._getCollections(loader);
+			return data;
+		},
+		_copyLink: function (obj) {
+			return "<item id='" + obj.id + "' source='" + obj.source + "' target='" + obj.target + "' type='" + obj.type + "' />";
+		},
+		_copyObject: function (obj) {
+			return "<task id='" + obj.id + "' parent='" + (obj.parent || "") + "' start_date='" + obj.start_date + "' duration='" + obj.duration + "' open='" + (!!obj.open) + "' progress='" + obj.progress + "' end_date='" + obj.end_date + "'><![CDATA[" + obj.text + "]]></task>";
+		},
+		serialize: function () {
+			var tasks = [];
+			var links = [];
+
+			var json = gantt.json.serialize();
+			for (var i = 0, len = json.data.length; i < len; i++) {
+				tasks.push(this._copyObject(json.data[i]));
+			}
+			for (var i = 0, len = json.links.length; i < len; i++) {
+				links.push(this._copyLink(json.links[i]));
+			}
+			return "<data>" + tasks.join("") + "<coll_options for='links'>" + links.join("") + "</coll_options></data>";
+		}
+	};
+
+
+	gantt.oldxml = {
+		parse: function (text, loader) {
+			loader = gantt.xml._getXML(text, loader, "projects");
+			var data = {collections: {links: []}};
+
+			var evs = data.data = [];
+			var xml = gantt.ajax.xpath("//task", loader);
+
+			for (var i = 0; i < xml.length; i++) {
+				evs[i] = gantt.xml._xmlNodeToJSON(xml[i]);
+				var parent = xml[i].parentNode;
+
+				if (parent.tagName == "project")
+					evs[i].parent = "project-" + parent.getAttribute("id");
+				else
+					evs[i].parent = parent.parentNode.getAttribute("id");
+			}
+
+			xml = gantt.ajax.xpath("//project", loader);
+			for (var i = 0; i < xml.length; i++) {
+				var ev = gantt.xml._xmlNodeToJSON(xml[i], true);
+				ev.id = "project-" + ev.id;
+				evs.push(ev);
+			}
+
+			for (var i = 0; i < evs.length; i++) {
+				var ev = evs[i];
+				ev.start_date = ev.startdate || ev.est;
+				ev.end_date = ev.enddate;
+				ev.text = ev.name;
+				ev.duration = ev.duration / 8;
+				ev.open = 1;
+				if (!ev.duration && !ev.end_date) ev.duration = 1;
+				if (ev.predecessortasks)
+					data.collections.links.push({
+						target: ev.id,
+						source: ev.predecessortasks,
+						type: gantt.config.links.finish_to_start
+					});
+			}
+
+			return data;
+		},
+		serialize: function () {
+			gantt.message("Serialization to 'old XML' is not implemented");
+		}
+	};
+
+	gantt.serverList = function (name, array) {
+		if (array) {
+			this.serverList[name] = array.slice(0);
+		} else if (!this.serverList[name]) {
+			this.serverList[name] = [];
+		}
+		return this.serverList[name];
+	};
+
+};
+
+/***/ }),
+/* 78 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var CalendarManager = __webpack_require__(79),
+	TimeCalculator = __webpack_require__(82),
+	worktimeFacadeFactory = __webpack_require__(84),
+	utils = __webpack_require__(0);
+
+module.exports = function (gantt) {
+	var manager = new CalendarManager(gantt),
+	timeCalculator = new TimeCalculator(manager);
+	var facade = worktimeFacadeFactory.create(manager, timeCalculator);
+	utils.mixin(gantt, facade);
+};
+
+
+/***/ }),
+/* 79 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var utils = __webpack_require__(0);
+var createArgumentsHelper = __webpack_require__(19);
+var CalendarWorktimeStrategy = __webpack_require__(80);
+
+function CalendarManager (gantt){
+	this.$gantt = gantt;
+	this._calendars = {};
+}
+
+CalendarManager.prototype = {
+	_calendars: {},
+	_getDayHoursForMultiple: function (calendars, date) {
+		var units = [],
+			tick = true,
+			currPos = 0,
+			is_work_hour = false,
+			start = this.$gantt.date.day_start(new Date(date));
+		for (var hour = 0; hour < 24; hour++) {
+			is_work_hour = calendars.reduce(function (acc, calendar) {
+				return acc && calendar._is_work_hour(start);
+			}, true);
+			if (is_work_hour) {
+				if (tick) {
+					units[currPos] = hour;
+					units[currPos + 1] = (hour + 1);
+					currPos += 2;
+				} else {
+					units[currPos - 1] += 1;
+				}
+				tick = false;
+			} else if (!tick) {
+				tick = true;
+			}
+			start = this.$gantt.date.add(start, 1, "hour");
+		}
+		if (!units.length)
+			units = false;
+		return units;
+	},
+	mergeCalendars: function () {
+		var newCalendar = this.createCalendar(),
+			day,
+			units = [];
+		var calendars = Array.prototype.slice.call(arguments, 0);
+		newCalendar.worktime.hours = [0, 24];
+		newCalendar.worktime.dates = {};
+		var start = this.$gantt.date.day_start(new Date(259200000)); // 1970 day=0
+		for (day = 0; day < 7; day++) {
+			units = this._getDayHoursForMultiple(calendars, start);
+			newCalendar.worktime.dates[day] = units;
+			start = this.$gantt.date.add(start, 1, "day");
+		}
+		for (var i = 0; i < calendars.length; i++) {
+			for (var value in calendars[i].worktime.dates) if (+value > 10000) {
+				units = this._getDayHoursForMultiple(calendars, new Date(+value));
+				newCalendar.worktime.dates[value] = units;
+			}
+		}
+		return newCalendar;
+	},
+
+	_convertWorktimeSettings: function (settings) {
+		var days = settings.days;
+		if (days) {
+			settings.dates = settings.dates || {};
+			for (var i = 0; i < days.length; i++) {
+				settings.dates[i] = days[i];
+				if (!(days[i] instanceof Array)) {
+					settings.dates[i] = !!days[i];
+				}
+			}
+			delete settings.days;
+		}
+		return settings;
+	},
+
+	createCalendar: function (parentCalendar) {
+		var settings;
+
+		if (!parentCalendar) {
+			parentCalendar = {};
+		}
+
+		if (parentCalendar.worktime) {
+			settings = utils.copy(parentCalendar.worktime);
+		} else {
+			settings = utils.copy(parentCalendar);
+		}
+
+		var defaults = utils.copy(this.defaults.fulltime.worktime);
+		utils.mixin(settings, defaults);
+
+		var id = utils.uid();
+		var calendar = {
+			id: id + "",
+			worktime: this._convertWorktimeSettings(settings)
+		};
+
+		var apiCore = new CalendarWorktimeStrategy(this.$gantt, createArgumentsHelper(this.$gantt));
+		utils.mixin(apiCore, calendar);
+
+		// validate/check if empty calendar
+		if (!apiCore._tryChangeCalendarSettings(function () {
+			})) {
+			return null;
+		} else {
+			return apiCore;
+		}
+	},
+
+	getCalendar: function (id) {
+		id = id || "global";
+		this.createDefaultCalendars();
+		return this._calendars[id];
+	},
+
+	getCalendars: function () {
+		var res = [];
+		for (var i in this._calendars) {
+			res.push(this.getCalendar(i));
+		}
+		return res;
+	},
+
+	getTaskCalendar: function (task) {
+		var config = this.$gantt.$services.config();
+		if (!task) {
+			return this.getCalendar();
+		} else if (task[config.calendar_property]) {
+			return this.getCalendar(task[config.calendar_property]);
+		} else if (config.resource_calendars) {
+
+			for (var field in config.resource_calendars) {
+				var resource = config.resource_calendars[field];
+				if (task[field]) {
+					var calendarId = resource[task[field]];
+					if (calendarId) {
+						return this.getCalendar(calendarId);
+					}
+				}
+			}
+		}
+
+		return this.getCalendar();
+	},
+
+	addCalendar: function (calendar) { // puts new calendar to Global Storage - gantt.calendarManager._calendars {}
+		if (!(calendar instanceof CalendarWorktimeStrategy)) {
+			var id = calendar.id;
+			calendar = this.createCalendar(calendar);
+			calendar.id = id;
+		}
+		var config = this.$gantt.$services.config();
+
+		calendar.id = calendar.id || utils.uid();
+		this._calendars[calendar.id] = calendar;
+		if (!config.worktimes)
+			config.worktimes = {};
+		config.worktimes[calendar.id] = calendar.worktime;
+		return calendar.id;
+	},
+
+	deleteCalendar: function (calendar) {
+		var config = this.$gantt.$services.config();
+		if (!calendar) return false;
+		if (this._calendars[calendar]) {
+			delete this._calendars[calendar];
+			if (config.worktimes && config.worktimes[calendar])
+				delete config.worktimes[calendar];
+			return true;
+		} else {
+			return false;
+		}	},
+
+	restoreConfigCalendars: function (configs) {
+		for (var i in configs) {
+			if (this._calendars[i])
+				continue;
+
+			var settings = configs[i];
+			var calendar = this.createCalendar(settings);
+			calendar.id = i;
+			this.addCalendar(calendar);
+		}
+	},
+
+	defaults: {
+		global: {
+			id: "global",
+			worktime: {
+				hours: [8, 17],
+				days: [0, 1, 1, 1, 1, 1, 0]
+			}
+		},
+		fulltime: {
+			id: "fulltime",
+			worktime: {
+				hours: [0, 24],
+				days: [1, 1, 1, 1, 1, 1, 1]
+			}
+		}
+	},
+
+	createDefaultCalendars: function () {
+		var config = this.$gantt.$services.config();
+		this.restoreConfigCalendars(this.defaults);
+		this.restoreConfigCalendars(config.worktimes);
+	}
+};
+
+module.exports = CalendarManager;
+
+/***/ }),
+/* 80 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Cache = __webpack_require__(81),
+	utils = __webpack_require__(0);
+
+function CalendarWorkTimeStrategy(gantt, argumentsHelper){
+	this.argumentsHelper = argumentsHelper;
+	this.$gantt = gantt;
+	this._workingUnitsCache = new Cache();
+}
+
+CalendarWorkTimeStrategy.prototype = {
+	units: [
+		"year",
+		"month",
+		"week",
+		"day",
+		"hour",
+		"minute"
+	],
+	// cache previously calculated worktime
+	_getUnitOrder: function (unit) {
+		for (var i = 0, len = this.units.length; i < len; i++) {
+			if (this.units[i] == unit)
+				return i;
+		}
+	},
+	_timestamp: function (settings) {
+
+		var timestamp = null;
+		if ((settings.day || settings.day === 0)) {
+			timestamp = settings.day;
+		} else if (settings.date) {
+			// store worktime datestamp in utc so it could be recognized in different timezones (e.g. opened locally and sent to the export service in different timezone)
+			timestamp = Date.UTC(settings.date.getFullYear(), settings.date.getMonth(), settings.date.getDate());
+		}
+		return timestamp;
+	},
+	_checkIfWorkingUnit: function (date, unit, order) {
+		if (order === undefined) {
+			order = this._getUnitOrder(unit);
+		}
+
+		// disable worktime check for custom time units
+		if (order === undefined) {
+			return true;
+		}
+		if (order) {
+			//check if bigger time unit is a work time (hour < day < month...)
+			//i.e. don't check particular hour if the whole day is marked as not working
+			if (!this._isWorkTime(date, this.units[order - 1], order - 1))
+				return false;
+		}
+		if (!this["_is_work_" + unit])
+			return true;
+		return this["_is_work_" + unit](date);
+	},
+	//checkings for particular time units
+	//methods for month-year-week can be defined, otherwise always return 'true'
+	_is_work_day: function (date) {
+		var val = this._getWorkHours(date);
+
+		if (val instanceof Array) {
+			return val.length > 0;
+		}
+		return false;
+	},
+	_is_work_hour: function (date) {
+		var hours = this._getWorkHours(date); // [7,12] or []
+		var hour = date.getHours();
+		for (var i = 0; i < hours.length; i += 2) {
+			if (hours[i + 1] === undefined) {
+				return hours[i] == hour;
+			} else {
+				if (hour >= hours[i] && hour < hours[i + 1])
+					return true;
+			}
+		}
+		return false;
+	},
+	_internDatesPull: {},
+	_nextDate: function (start, unit, step) {
+		var dateHelper = this.$gantt.date;
+		return dateHelper.add(start, step, unit);
+
+		/*var start_value = +start,
+			key = unit + "_" + step;
+		var interned = this._internDatesPull[key];
+		if(!interned){
+			interned = this._internDatesPull[key] = {};
+		}
+		var calculated;
+		if(!interned[start_value]){
+			interned[start_value] = calculated = dateHelper.add(start, step, unit);
+			//interned[start_value] = dateHelper.add(start, step, unit);
+		}
+		return calculated || interned[start_value];*/
+	},
+	_getWorkUnitsBetweenGeneric: function (from, to, unit, step) {
+		var dateHelper = this.$gantt.date;
+		var start = new Date(from),
+			end = new Date(to);
+		step = step || 1;
+		var units = 0;
+
+
+		var next = null;
+		var stepStart,
+			stepEnd;
+
+		// calculating decimal durations, i.e. 2016-09-20 00:05:00 - 2016-09-20 01:00:00 ~ 0.95 instead of 1
+		// and also  2016-09-20 00:00:00 - 2016-09-20 00:05:00 ~ 0.05 instead of 1
+		// durations must be rounded later
+		var checkFirst = false;
+		stepStart = dateHelper[unit + "_start"](new Date(start));
+		if (stepStart.valueOf() != start.valueOf()) {
+			checkFirst = true;
+		}
+		var checkLast = false;
+		stepEnd = dateHelper[unit + "_start"](new Date(to));
+		if (stepEnd.valueOf() != to.valueOf()) {
+			checkLast = true;
+		}
+
+		var isLastStep = false;
+		while (start.valueOf() < end.valueOf()) {
+			next = this._nextDate(start, unit, step);
+			isLastStep = (next.valueOf() > end.valueOf());
+
+			if (this._isWorkTime(start, unit)) {
+				if (checkFirst || (checkLast && isLastStep)) {
+					stepStart = dateHelper[unit + "_start"](new Date(start));
+					stepEnd = dateHelper.add(stepStart, step, unit);
+				}
+
+				if (checkFirst) {
+					checkFirst = false;
+					next = this._nextDate(stepStart, unit, step);
+					units += ((stepEnd.valueOf() - start.valueOf()) / (stepEnd.valueOf() - stepStart.valueOf()));
+				} else if (checkLast && isLastStep) {
+					checkLast = false;
+					units += ((end.valueOf() - start.valueOf()) / (stepEnd.valueOf() - stepStart.valueOf()));
+
+				} else {
+					units++;
+				}
+			}
+			start = next;
+		}
+		return units;
+	},
+	_getHoursPerDay: function (date) {
+		var hours = this._getWorkHours(date);
+		var res = 0;
+		for (var i = 0; i < hours.length; i += 2) {
+			res += ((hours[i + 1] - hours[i]) || 0);
+		}
+		return res;
+	},
+	_getWorkHoursForRange: function (from, to) {
+		var hours = 0;
+		var start = new Date(from),
+			end = new Date(to);
+
+		while (start.valueOf() < end.valueOf()) {
+			if (this._isWorkTime(start, "day"))
+				hours += this._getHoursPerDay(start);
+			start = this._nextDate(start, "day", 1);
+		}
+		return hours;
+	},
+	_getWorkUnitsBetweenHours: function (from, to, unit, step) {
+		var start = new Date(from),
+			end = new Date(to);
+		step = step || 1;
+
+		var firstDayStart = new Date(start);
+		var firstDayEnd = this.$gantt.date.add(this.$gantt.date.day_start(new Date(start)), 1, "day");
+
+		if (end.valueOf() <= firstDayEnd.valueOf()) {
+			return this._getWorkUnitsBetweenGeneric(from, to, unit, step);
+		} else {
+
+			var lastDayStart = this.$gantt.date.day_start(new Date(end));
+			var lastDayEnd = end;
+
+			var startPart = this._getWorkUnitsBetweenGeneric(firstDayStart, firstDayEnd, unit, step);
+			var endPart = this._getWorkUnitsBetweenGeneric(lastDayStart, lastDayEnd, unit, step);
+
+			var hourRange = this._getWorkHoursForRange(firstDayEnd, lastDayStart);
+			hourRange = ((hourRange / step) + startPart + endPart);
+
+			return hourRange;
+		}
+	},
+
+	_getCalendar: function () {
+		return this.worktime;
+	},
+	_setCalendar: function (settings) {
+		this.worktime = settings;
+	},
+
+	_tryChangeCalendarSettings: function (payload) {
+		var backup = JSON.stringify(this._getCalendar());
+		payload();
+		if (this._isEmptyCalendar(this._getCalendar())) {
+			this.$gantt.assert(false, "Invalid calendar settings, no worktime available");
+			this._setCalendar(JSON.parse(backup));
+			this._workingUnitsCache.clear();
+			return false;
+		}
+		return true;
+
+	},
+
+	_isEmptyCalendar: function (settings) {
+		var result = false,
+			datesArray = [],
+			isFullWeekSet = true;
+		for (var i in settings.dates) {
+			result |= !!settings.dates[i];
+			datesArray.push(i);
+		}
+
+		var checkFullArray = [];
+		for (var i = 0; i < datesArray.length; i++) {
+			if (datesArray[i] < 10) {
+				checkFullArray.push(datesArray[i]);
+			}
+		}
+		checkFullArray.sort();
+
+		for (var i = 0; i < 7; i++) {
+			if (checkFullArray[i] != i)
+				isFullWeekSet = false;
+		}
+		if (isFullWeekSet)
+			return !result;
+		return !(result || !!settings.hours); // can still return false if separated dates are set to true
+	},
+
+	getWorkHours: function () {
+		var config = this.argumentsHelper.getWorkHoursArguments.apply(this.argumentsHelper, arguments);
+		return this._getWorkHours(config.date);
+	},
+	_getWorkHours: function (date) {
+		var t = this._timestamp({date: date});
+		var hours = true;
+		var calendar = this._getCalendar();
+		if (calendar.dates[t] !== undefined) {
+			hours = calendar.dates[t];//custom day
+		} else if (calendar.dates[date.getDay()] !== undefined) {
+			hours = calendar.dates[date.getDay()];//week day
+		}
+		if (hours === true) {
+			return calendar.hours;
+		} else if (hours) {
+			return hours;
+		}
+		return [];
+	},
+
+	setWorkTime: function (settings) {
+		return this._tryChangeCalendarSettings(utils.bind(function () {
+			var hours = settings.hours !== undefined ? settings.hours : true;
+			var timestamp = this._timestamp(settings);
+			if (timestamp !== null) {
+				this._getCalendar().dates[timestamp] = hours;
+			} else {
+				this._getCalendar().hours = hours;
+			}
+			this._workingUnitsCache.clear();
+		}, this));
+	},
+
+	unsetWorkTime: function (settings) {
+		return this._tryChangeCalendarSettings(utils.bind(function () {
+			if (!settings) {
+				this.reset_calendar();
+			} else {
+
+				var timestamp = this._timestamp(settings);
+
+				if (timestamp !== null) {
+					delete this._getCalendar().dates[timestamp];
+				}
+			}
+			// Clear work units cache
+			this._workingUnitsCache.clear();
+		}, this));
+	},
+
+	_isWorkTime: function (date, unit, order) {
+		//Check if this item has in the cache
+		var is_work_unit = this._workingUnitsCache.get(unit, date);
+
+		if (is_work_unit == -1) {
+			// calculate if not cached
+			is_work_unit = this._checkIfWorkingUnit(date, unit, order);
+			this._workingUnitsCache.put(unit, date, is_work_unit);
+		}
+
+		return is_work_unit;
+	},
+
+	isWorkTime: function () {
+		var config =  this.argumentsHelper.isWorkTimeArguments.apply( this.argumentsHelper, arguments);
+		return this._isWorkTime(config.date, config.unit);
+	},
+
+	calculateDuration: function () {
+		var config =  this.argumentsHelper.getDurationArguments.apply( this.argumentsHelper, arguments);
+
+		if (!config.unit) {
+			return false;
+		}
+
+		var res = 0;
+		if (config.unit == "hour") {
+			res = this._getWorkUnitsBetweenHours(config.start_date, config.end_date, config.unit, config.step);
+		} else {
+			res = this._getWorkUnitsBetweenGeneric(config.start_date, config.end_date, config.unit, config.step);
+		}
+
+		// getDuration.. returns decimal durations
+		return Math.round(res);
+	},
+	hasDuration: function () {
+		var config =  this.argumentsHelper.getDurationArguments.apply( this.argumentsHelper, arguments);
+
+		var from = config.start_date,
+			to = config.end_date,
+			unit = config.unit,
+			step = config.step;
+
+		if (!unit) {
+			return false;
+		}
+		var start = new Date(from),
+			end = new Date(to);
+		step = step || 1;
+
+		while (start.valueOf() < end.valueOf()) {
+			if (this._isWorkTime(start, unit))
+				return true;
+			start = this._nextDate(start, unit, step);
+		}
+		return false;
+	},
+
+	calculateEndDate: function () {
+		var config =  this.argumentsHelper.calculateEndDateArguments.apply( this.argumentsHelper, arguments);
+
+		var from = config.start_date,
+			duration = config.duration,
+			unit = config.unit,
+			step = config.step;
+
+		var mult = (config.duration >= 0) ? 1 : -1;
+		return this._calculateEndDate(from, duration, unit, step * mult);
+	},
+	_calculateEndDate: function (from, duration, unit, step) {
+		if (!unit)
+			return false;
+
+		var start = new Date(from),
+			added = 0;
+		step = step || 1;
+		duration = Math.abs(duration * 1);
+
+		while (added < duration) {
+			var next = this._nextDate(start, unit, step);
+			//if(this.isWorkTime(step > 0 ? start : next, unit))
+			if (this._isWorkTime(step > 0 ? new Date(next.valueOf() - 1) : new Date(next.valueOf() + 1), unit))
+				added++;
+			start = next;
+		}
+		return start;
+	},
+
+	getClosestWorkTime: function () {
+		var config =  this.argumentsHelper.getClosestWorkTimeArguments.apply( this.argumentsHelper, arguments);
+		return this._getClosestWorkTime(config);
+	},
+
+	_getClosestWorkTime: function (settings) {
+		if (this._isWorkTime(settings.date, settings.unit))
+			return settings.date;
+
+		var unit = settings.unit;
+
+		var curr = this.$gantt.date[unit + '_start'](settings.date);
+
+		var future_target = new Date(curr),
+			prev_target = new Date(curr),
+			tick = true,
+			maximum_loop = 3000,//be extra sure we won't fall into infinite loop, 3k seems big enough
+			count = 0,
+			both_directins = (settings.dir == 'any' || !settings.dir);
+
+		var inc = 1;
+		if (settings.dir == 'past')
+			inc = -1;
+
+		//will seek closest working hour in future or in past, one step in one direction per iteration
+		while (!this._isWorkTime(curr, unit)) {
+
+			if (both_directins) {
+				curr = tick ? future_target : prev_target;
+				inc = inc * (-1);
+			}
+			var tzOffset = curr.getTimezoneOffset();
+			curr = this.$gantt.date.add(curr, inc, unit);
+
+			curr = this.$gantt._correct_dst_change(curr, tzOffset, inc, unit);
+			if (this.$gantt.date[unit + '_start'])
+				curr = this.$gantt.date[unit + '_start'](curr);
+
+			if (both_directins) {
+				if (tick) {
+					future_target = curr;
+				} else {
+					prev_target = curr;
+				}
+			}
+			tick = !tick;
+			count++;
+			if (count > maximum_loop) {
+				this.$gantt.assert(false, "Invalid working time check");
+				return false;
+			}
+		}
+
+		if (curr == prev_target || settings.dir == 'past') {
+			curr = this.$gantt.date.add(curr, 1, unit);
+		}
+
+		return curr;
+	}
+};
+
+module.exports = CalendarWorkTimeStrategy;
+
+/***/ }),
+/* 81 */
+/***/ (function(module, exports) {
+
+function WorkUnitsCache() {
+	this._cache = {};
+}
+
+WorkUnitsCache.prototype = {
+	// cache previously calculated worktime
+	get: function (unit, date) {
+		var result = -1;// default value (if not existed in the cache)
+
+		var cache = this._cache;
+		if (cache && cache[unit]) {
+			var units = cache[unit];
+			var time = date.getTime();
+			if (units[time] !== undefined)
+				result = units[time];
+		}
+		return result;
+	},
+
+	put: function (unit, date, value) {
+		if (!unit || !date) return false;
+
+		var cache = this._cache;
+
+		var time = date.getTime();
+
+		value = !!value;
+
+		if (!cache) return false;
+		if (!cache[unit]) cache[unit] = {};
+		cache[unit][time] = value;
+		return true;
+	},
+
+	clear: function () {
+		this._cache = {};
+	}
+};
+
+module.exports = WorkUnitsCache;
+
+/***/ }),
+/* 82 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var createArgumentsHelper = __webpack_require__(19),
+	NoWorkTimeCalendar = __webpack_require__(83);
+
+function TimeCalculator(calendarManager){
+
+	this.$gantt = calendarManager.$gantt;
+	this.argumentsHelper = createArgumentsHelper(this.$gantt);
+	this.calendarManager = calendarManager;
+	this.$disabledCalendar = new NoWorkTimeCalendar(this.$gantt, this.argumentsHelper);
+}
+
+TimeCalculator.prototype = {
+	_getCalendar: function (config) {
+		var calendar;
+		if (!this.$gantt.$services.config().work_time) {
+			calendar = this.$disabledCalendar;
+		} else {
+			var manager = this.calendarManager;
+			if (config.task) {
+				calendar = manager.getTaskCalendar(config.task);
+			} else if (config.id) {
+				calendar = manager.getTaskCalendar(config);
+			} else if (config.calendar) {
+				calendar = config.calendar;
+			}
+			if (!calendar) {
+				calendar = manager.getTaskCalendar();
+			}
+		}
+		return calendar;
+	},
+
+	getWorkHours: function (config) {
+		config = this.argumentsHelper.getWorkHoursArguments.apply(this.argumentsHelper, arguments);
+
+		var calendar = this._getCalendar(config);
+
+		return calendar.getWorkHours(config.date);
+	},
+
+	setWorkTime: function (config, calendar) {
+		config = this.argumentsHelper.setWorkTimeArguments.apply(this.argumentsHelper, arguments);
+
+		if (!calendar)
+			calendar = this.calendarManager.getCalendar(); // Global
+		return calendar.setWorkTime(config);
+	},
+
+	unsetWorkTime: function (config, calendar) {
+		config = this.argumentsHelper.unsetWorkTimeArguments.apply(this.argumentsHelper, arguments);
+
+		if (!calendar)
+			calendar = this.calendarManager.getCalendar(); // Global
+		return calendar.unsetWorkTime(config);
+	},
+	isWorkTime: function (date, unit, task, calendar) {
+		var config = this.argumentsHelper.isWorkTimeArguments.apply(this.argumentsHelper, arguments);
+
+		calendar = this._getCalendar(config);
+		return calendar.isWorkTime(config);
+	},
+	getClosestWorkTime: function (config) {
+		config = this.argumentsHelper.getClosestWorkTimeArguments.apply(this.argumentsHelper, arguments);
+
+		var calendar = this._getCalendar(config);
+
+		return calendar.getClosestWorkTime(config);
+	},
+
+	calculateDuration: function () { // start_date_date, end_date, task
+		var config = this.argumentsHelper.getDurationArguments.apply(this.argumentsHelper, arguments);
+
+
+		var calendar = this._getCalendar(config);
+		return calendar.calculateDuration(config);
+	},
+	hasDuration: function () {
+		var config = this.argumentsHelper.hasDurationArguments.apply(this.argumentsHelper, arguments);
+
+		var calendar = this._getCalendar(config);
+
+		return calendar.hasDuration(config);
+	},
+	calculateEndDate: function (config) { // start_date, duration, unit, task
+		var config = this.argumentsHelper.calculateEndDateArguments.apply(this.argumentsHelper, arguments);
+
+		var calendar = this._getCalendar(config);
+		return calendar.calculateEndDate(config);
+	}
+};
+
+module.exports = TimeCalculator;
+
+
+
+/***/ }),
+/* 83 */
+/***/ (function(module, exports) {
+
+function CalendarDisabledTimeStrategy(gantt, argumentsHelper){
+	this.argumentsHelper = argumentsHelper;
+	this.$gantt = gantt;
+}
+
+CalendarDisabledTimeStrategy.prototype = {
+	getWorkHours: function () {
+		return [0, 24];
+	},
+	setWorkTime: function () {
+		return true;
+	},
+	unsetWorkTime: function () {
+		return true;
+	},
+	isWorkTime: function () {
+		return true;
+	},
+	getClosestWorkTime: function (config) {
+		var config = this.argumentsHelper.getClosestWorkTimeArguments.apply(this.argumentsHelper, arguments);
+		return config.date;
+	},
+
+	calculateDuration: function () {
+		var config = this.argumentsHelper.getDurationArguments.apply(this.argumentsHelper, arguments);
+		var from = config.start_date,
+			to = config.end_date,
+			unit = config.unit,
+			step = config.step;
+
+		return this._calculateDuration(from, to, unit, step);
+	},
+	_calculateDuration: function (start, end, unit, step) {
+		var dateHelper = this.$gantt.date;
+		var fixedUnits = {
+			"week": 1000 * 60 * 60 * 24 * 7,
+			"day": 1000 * 60 * 60 * 24,
+			"hour": 1000 * 60 * 60,
+			"minute": 1000 * 60
+		};
+
+		var res = 0;
+		if (fixedUnits[unit]) {
+			res = Math.round((end - start) / (step * fixedUnits[unit]));
+		} else {
+			var from = new Date(start),
+				to = new Date(end);
+			while (from.valueOf() < to.valueOf()) {
+				res += 1;
+				from = dateHelper.add(from, step, unit);
+			}
+
+			if (from.valueOf() != end.valueOf()) {
+				res += (to - from) / (dateHelper.add(from, step, unit) - from);
+			}
+		}
+
+		return Math.round(res);
+	},
+
+	hasDuration: function () {
+		var config = this.argumentsHelper.getDurationArguments.apply(this.argumentsHelper, arguments);
+		var from = config.start_date,
+			to = config.end_date,
+			unit = config.unit,
+			step = config.step;
+
+		if (!unit) {
+			return false;
+		}
+		from = new Date(from);
+		to = new Date(to);
+
+		return (from.valueOf() < to.valueOf());
+	},
+
+	calculateEndDate: function () {
+		var config = this.argumentsHelper.calculateEndDateArguments.apply(this.argumentsHelper, arguments);
+
+		var start = config.start_date,
+			duration = config.duration,
+			unit = config.unit,
+			step = config.step;
+
+		return this.$gantt.date.add(start, step * duration, unit);
+	}
+};
+
+module.exports = CalendarDisabledTimeStrategy;
+
+/***/ }),
+/* 84 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// TODO: rework public api for date methods
+var utils = __webpack_require__(0);
+
+var createWorktimeFacade = function(calendarManager, timeCalculator){
+	return {
+		getWorkHours: function (date) {
+			return timeCalculator.getWorkHours(date);
+		},
+
+		setWorkTime: function (config) {
+			return timeCalculator.setWorkTime(config);
+		},
+
+		unsetWorkTime: function (config) {
+			timeCalculator.unsetWorkTime(config);
+		},
+
+		isWorkTime: function (date, unit, task) {
+			return timeCalculator.isWorkTime(date, unit, task);
+		},
+
+		getClosestWorkTime: function (config) {
+			return timeCalculator.getClosestWorkTime(config);
+		},
+
+		calculateDuration: function (start_date, end_date, task) {
+			return timeCalculator.calculateDuration(start_date, end_date, task);
+		},
+		_hasDuration: function (start_date, end_date, task) {
+			return timeCalculator.hasDuration(start_date, end_date, task);
+		},
+
+		calculateEndDate: function (start, duration, unit, task) {
+			return timeCalculator.calculateEndDate(start, duration, unit, task);
+		},
+
+		createCalendar: utils.bind(calendarManager.createCalendar, calendarManager),
+		addCalendar: utils.bind(calendarManager.addCalendar, calendarManager),
+		getCalendar: utils.bind(calendarManager.getCalendar, calendarManager),
+		getCalendars: utils.bind(calendarManager.getCalendars, calendarManager),
+		getTaskCalendar: utils.bind(calendarManager.getTaskCalendar, calendarManager),
+		deleteCalendar: utils.bind(calendarManager.deleteCalendar, calendarManager)
+	};
+};
+
+
+module.exports = { create: createWorktimeFacade };
+
+
+/***/ }),
+/* 85 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var dateHelper = __webpack_require__(3),
+	helpers = __webpack_require__(6);
+
+module.exports = function(gantt) {
+
+	gantt.isUnscheduledTask = function (task) {
+		return (!!task.unscheduled || !task.start_date);
+	};
+
+	gantt._isAllowedUnscheduledTask = function (task) {
+		return !!(task.unscheduled && gantt.config.show_unscheduled);
+	};
+
+	gantt.isTaskVisible = function (id) {
+		if (!this.isTaskExists(id))
+			return false;
+
+		var task = this.getTask(id),
+			type = this.getTaskType(task.type);
+
+		if (!((+task.start_date <= +this._max_date && +task.end_date >= +this._min_date) || gantt._isAllowedUnscheduledTask(task))){
+			return false;
+		}
+
+		return !!(gantt.getGlobalTaskIndex(id) >= 0);
+	};
+
+	gantt._defaultTaskDate = function (item, parent_id) {
+		var parent = (parent_id && parent_id != this.config.root_id) ? this.getTask(parent_id) : false,
+			startDate = '';
+		if (parent) {
+			startDate = parent.start_date;
+		} else {
+			var first = this.getTaskByIndex(0);
+			startDate = first ? (first.start_date ? first.start_date : (first.end_date ? this.calculateEndDate({
+				start_date: first.end_date,
+				duration: -this.config.duration_step
+			}) : '')) : this.config.start_date || this.getState().min_date;
+		}
+		gantt.assert(startDate, "Invalid dates");
+		return new Date(startDate);
+	};
+
+	gantt._set_default_task_timing = function (task) {
+		task.start_date = task.start_date || gantt._defaultTaskDate(task, this.getParent(task));
+		task.duration = task.duration || this.config.duration_step;
+		task.end_date = task.end_date || this.calculateEndDate(task);
+	};
+
+	gantt.createTask = function (item, parent, index) {
+		item = item || {};
+		if (!gantt.defined(item.id))
+			item.id = gantt.uid();
+
+		if (!item.start_date) {
+			item.start_date = gantt._defaultTaskDate(item, parent);
+		}
+		if (item.text === undefined) {
+			item.text = gantt.locale.labels.new_task;
+		}
+		if (item.duration === undefined) {
+			item.duration = 1;
+		}
+
+		if (parent) {
+			this.setParent(item, parent, true);
+			var parentObj = this.getTask(parent);
+			parentObj.$open = true;
+		}
+
+		if (!this.callEvent("onTaskCreated", [item])) {
+			return null;
+		}
+		if (this.config.details_on_create) {
+			item.$new = true;
+			this.silent(function(){
+				gantt.$data.tasksStore.addItem(item, index);
+			});
+			this.selectTask(item.id);
+			this.refreshData();
+			this.showLightbox(item.id);
+		} else {
+			if (this.addTask(item, parent, index)) {
+				this.showTask(item.id);
+				this.selectTask(item.id);
+			}
+		}
+		return item.id;
+	};
+
+	gantt._update_flags = function (oldid, newid) {
+		//  TODO: need a proper way to update all possible flags
+		var store = gantt.$data.tasksStore;
+		if (oldid === undefined) {
+			this._lightbox_id = null;
+
+			store.silent(function(){
+				store.unselect();
+			});
+
+			if (this._tasks_dnd && this._tasks_dnd.drag) {
+				this._tasks_dnd.drag.id = null;
+			}
+		} else {
+			if (this._lightbox_id == oldid)
+				this._lightbox_id = newid;
+
+			if (store.getSelectedId() == oldid) {
+				store.silent(function(){
+					store.unselect(oldid);
+					store.select(newid);
+				});
+			}
+			if (this._tasks_dnd && this._tasks_dnd.drag && this._tasks_dnd.drag.id == oldid) {
+				this._tasks_dnd.drag.id = newid;
+			}
+		}
+	};
+
+	gantt._get_task_timing_mode = function (task, force) {
+		var task_type = this.getTaskType(task.type);
+
+		var state = {
+			type: task_type,
+			$no_start: false,
+			$no_end: false
+		};
+
+		if (!force && task_type == task.$rendered_type) {
+			state.$no_start = task.$no_start;
+			state.$no_end = task.$no_end;
+			return state;
+		}
+
+		if (task_type == this.config.types.project) {
+			//project duration is always defined by children duration
+			state.$no_end = state.$no_start = true;
+		} else if (task_type != this.config.types.milestone) {
+			//tasks can have fixed duration, children duration(as projects), or one date fixed, and other defined by nested items
+			state.$no_end = !(task.end_date || task.duration);
+			state.$no_start = !task.start_date;
+
+			if (this._isAllowedUnscheduledTask(task)) {
+				state.$no_end = state.$no_start = false;
+			}
+		}
+
+		return state;
+	};
+
+	gantt._init_task_timing = function (task) {
+		var task_mode = gantt._get_task_timing_mode(task, true);
+
+		var dirty = task.$rendered_type != task_mode.type;
+
+		var task_type = task_mode.type;
+
+		if (dirty) {
+			task.$no_start = task_mode.$no_start;
+			task.$no_end = task_mode.$no_end;
+			task.$rendered_type = task_mode.type;
+		}
+
+		if (dirty && task_type != this.config.types.milestone) {
+			if (task_type == this.config.types.project) {
+				//project duration is always defined by children duration
+				this._set_default_task_timing(task);
+			}
+		}
+
+		if (task_type == this.config.types.milestone) {
+			task.end_date = task.start_date;
+		}
+		if (task.start_date && task.end_date) {
+			task.duration = this.calculateDuration(task);
+		}
+		task.duration = task.duration || 0;
+	};
+
+	gantt.isSummaryTask = function (task) {
+		var mode = gantt._get_task_timing_mode(task);
+
+		return !!(mode.$no_end || mode.$no_start);
+	};
+
+// downward calculation of project duration
+	gantt.resetProjectDates = function (task) {
+		var taskMode = this._get_task_timing_mode(task);
+		if (taskMode.$no_end || taskMode.$no_start) {
+			var dates = this.getSubtaskDates(task.id);
+			this._assign_project_dates(task, dates.start_date, dates.end_date);
+		}
+	};
+
+	gantt.getSubtaskDuration = function (task_id) {
+		var res = 0,
+			root = task_id !== undefined ? task_id : gantt.config.root_id;
+
+		this.eachTask(function (child) {
+			if (this.getTaskType(child.type) == gantt.config.types.project || this.isUnscheduledTask(child))
+				return;
+
+			res += child.duration;
+		}, root);
+
+		return res;
+	};
+
+	gantt.getSubtaskDates = function (task_id) {
+		var min = null,
+			max = null,
+			root = task_id !== undefined ? task_id : gantt.config.root_id;
+
+		this.eachTask(function (child) {
+			if (this.getTaskType(child.type) == gantt.config.types.project || this.isUnscheduledTask(child))
+				return;
+
+			if ((child.start_date && !child.$no_start) && (!min || min > child.start_date.valueOf()))
+				min = child.start_date.valueOf();
+			if ((child.end_date && !child.$no_end) && (!max || max < child.end_date.valueOf()))
+				max = child.end_date.valueOf();
+		}, root);
+
+		return {
+			start_date: min ? new Date(min) : null,
+			end_date: max ? new Date(max) : null
+		};
+	};
+
+	gantt._assign_project_dates = function (task, from, to) {
+		var taskTiming = this._get_task_timing_mode(task);
+		if (taskTiming.$no_start) {
+			if (from && from != Infinity) {
+				task.start_date = new Date(from);
+			} else {
+				task.start_date = this._defaultTaskDate(task, this.getParent(task));
+			}
+		}
+
+		if (taskTiming.$no_end) {
+			if (to && to != -Infinity) {
+				task.end_date = new Date(to);
+			} else {
+				task.end_date = this.calculateEndDate({
+					start_date: task.start_date,
+					duration: this.config.duration_step,
+					task: task
+				});
+			}
+		}
+		if (taskTiming.$no_start || taskTiming.$no_end) {
+			this._init_task_timing(task);
+		}
+	};
+
+// upward calculation of project duration
+	gantt._update_parents = function (taskId, silent) {
+		if (!taskId) return;
+
+		var task = this.getTask(taskId);
+		var pid = this.getParent(task);
+
+		var taskTiming = this._get_task_timing_mode(task);
+
+		var has_changed = true;
+
+		if (taskTiming.$no_start || taskTiming.$no_end) {
+			var oldStart = task.start_date.valueOf(),
+				oldEnd = task.end_date.valueOf();
+
+			gantt.resetProjectDates(task);
+
+			// not refresh parent projects if dates hasn't changed
+			if (oldStart == task.start_date.valueOf() && oldEnd == task.end_date.valueOf()) {
+				has_changed = false;
+			}
+
+			if (has_changed && !silent) {
+				this.refreshTask(task.id, true);
+			}
+		}
+
+
+		if (has_changed && pid && this.isTaskExists(pid)) {
+			this._update_parents(pid, silent);
+		}
+	};
+
+	gantt.roundDate = function (config) {
+		if (dateHelper.isDate(config)) {
+			config = {
+				date: config,
+				unit: gantt.getScale().unit,
+				step: gantt.getScale().step
+			};
+		}
+		var date = config.date,
+			steps = config.step,
+			unit = config.unit;
+
+		var scale = gantt.getScale();
+		var upper, lower, colIndex;
+		if (unit == scale.unit && steps == scale.step &&
+			+date >= +gantt._min_date && +date <= +gantt._max_date) {
+			//find date in time scale config
+			colIndex = Math.floor(gantt.columnIndexByDate(date));
+
+			if (!gantt.getScale().trace_x[colIndex]) {
+				colIndex -= 1;// end of time scale
+				if(scale.rtl){
+					colIndex = 0;
+				}
+			}
+			lower = new Date(gantt.getScale().trace_x[colIndex]);
+			upper = gantt.date.add(lower, steps, unit);
+		} else {
+			colIndex = Math.floor(gantt.columnIndexByDate(date));
+
+			upper = gantt.date[unit + "_start"](new Date(this._min_date));
+			if (scale.trace_x[colIndex]) {
+				upper = gantt.date[unit + "_start"](scale.trace_x[colIndex]);// end of time scale
+			}
+
+			while (+upper < +date) {
+				upper = gantt.date[unit + "_start"](gantt.date.add(upper, steps, unit));
+
+				var tzOffset = upper.getTimezoneOffset();
+
+				upper = gantt._correct_dst_change(upper, tzOffset, upper, unit);
+				if (gantt.date[unit + '_start'])
+					upper = gantt.date[unit + '_start'](upper);
+			}
+
+			lower = gantt.date.add(upper, -1 * steps, unit);
+
+		}
+		if (config.dir && config.dir == 'future')
+			return upper;
+		if (config.dir && config.dir == 'past')
+			return lower;
+
+		if (Math.abs(date - lower) < Math.abs(upper - date)) {
+			return lower;
+		} else {
+			return upper;
+		}
+
+	};
+
+	gantt.correctTaskWorkTime = function (task) {
+		if (gantt.config.work_time && gantt.config.correct_work_time) {
+			if (!this.isWorkTime(task.start_date, undefined, task)) {
+				task.start_date = this.getClosestWorkTime({date: task.start_date, dir: 'future', task: task});
+				task.end_date = this.calculateEndDate(task);
+			} else if (!this.isWorkTime(new Date(+task.end_date - 1), undefined, task)) {
+				task.end_date = this.calculateEndDate(task);
+			}
+		}
+	};
+
+	gantt.attachEvent("onBeforeTaskUpdate", function (id, task) {
+		gantt._init_task_timing(task);
+		return true;
+	});
+	gantt.attachEvent("onBeforeTaskAdd", function (id, task) {
+		gantt._init_task_timing(task);
+		return true;
+	});
+
+};
+
+/***/ }),
+/* 86 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = function(gantt) {
+	var domHelpers = __webpack_require__(1),
+		helpers = __webpack_require__(6);
+
+	gantt._lightbox_methods = {};
+	gantt._lightbox_template = "<div class='gantt_cal_ltitle'><span class='gantt_mark'>&nbsp;</span><span class='gantt_time'></span><span class='gantt_title'></span></div><div class='gantt_cal_larea'></div>";
+
+
+	//TODO: gantt._lightbox_id is changed from data.js and accessed from autoscheduling, check if it can be removed from gantt object
+	var state = gantt.$services.getService("state");
+	state.registerProvider("lightbox", function(){
+		return {
+			lightbox: gantt._lightbox_id
+		};
+	});
+
+	gantt.showLightbox = function (id) {
+		if (!id || gantt.isReadonly(this.getTask(id))) return;
+		if (!this.callEvent("onBeforeLightbox", [id])) return;
+
+		var task = this.getTask(id);
+
+		var box = this.getLightbox(this.getTaskType(task.type));
+		this._center_lightbox(box);
+		this.showCover();
+		this._fill_lightbox(id, box);
+
+		this._waiAria.lightboxVisibleAttr(box);
+
+		this.callEvent("onLightbox", [id]);
+	};
+
+	function _is_chart_visible(gantt) {
+		var timeline = gantt.$ui.getView("timeline");
+		if(timeline && timeline.isVisible()){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	gantt._get_timepicker_step = function () {
+		if (this.config.round_dnd_dates) {
+			var scale = gantt.getScale(),
+				step = (helpers.getSecondsInUnit(scale.unit) * scale.step) / 60;//timepicker step is measured in minutes
+			if (step >= 60 * 24 || !_is_chart_visible(this)) {
+				step = this.config.time_step;
+			}
+			return step;
+		}
+		return this.config.time_step;
+	};
+	gantt.getLabel = function (property, key) {
+		var sections = this._get_typed_lightbox_config();
+		for (var i = 0; i < sections.length; i++) {
+			if (sections[i].map_to == property) {
+				var options = sections[i].options;
+				for (var j = 0; j < options.length; j++) {
+					if (options[j].key == key) {
+						return options[j].label;
+					}
+				}
+			}
+		}
+		return "";
+	};
+
+	gantt.updateCollection = function (list_name, collection) {
+		collection = collection.slice(0);
+		var list = gantt.serverList(list_name);
+		if (!list) return false;
+		list.splice(0, list.length);
+		list.push.apply(list, collection || []);
+		gantt.resetLightbox();
+	};
+	gantt.getLightboxType = function () {
+		return this.getTaskType(this._lightbox_type);
+	};
+	gantt.getLightbox = function (type) {
+		if (type === undefined)
+			type = this.getLightboxType();
+
+		if (!this._lightbox || this.getLightboxType() != this.getTaskType(type)) {
+			this._lightbox_type = this.getTaskType(type);
+			var d = document.createElement("DIV");
+			d.className = "gantt_cal_light";
+
+			var full_width = this._is_lightbox_timepicker();
+			if (gantt.config.wide_form || full_width)
+				d.className += " gantt_cal_light_wide";
+
+			if (full_width) {
+				gantt.config.wide_form = true;
+				d.className += " gantt_cal_light_full";
+			}
+
+
+			d.style.visibility = "hidden";
+
+			var html = this._lightbox_template;
+
+			var ariaAttr;
+			var buttons = this.config.buttons_left;
+			for (var i = 0; i < buttons.length; i++) {
+				// needed to migrate from 'dhx_something' to 'gantt_something' naming in a lightbox
+				var button = this.config._migrate_buttons[buttons[i]] ? this.config._migrate_buttons[buttons[i]] : buttons[i];
+
+				ariaAttr = this._waiAria.lightboxButtonAttrString(button);
+				html += "<div " + ariaAttr + " class='gantt_btn_set gantt_left_btn_set " + button + "_set'><div dhx_button='1' class='" + button + "'></div><div>" + this.locale.labels[button] + "</div></div>";
+
+			}
+			buttons = this.config.buttons_right;
+			for (var i = 0; i < buttons.length; i++) {
+				var button = this.config._migrate_buttons[buttons[i]] ? this.config._migrate_buttons[buttons[i]] : buttons[i];
+				ariaAttr = this._waiAria.lightboxButtonAttrString(button);
+
+				html += "<div " + ariaAttr + " class='gantt_btn_set gantt_right_btn_set " + button + "_set' style='float:right;'><div dhx_button='1' class='" + button + "'></div><div>" + this.locale.labels[button] + "</div></div>";
+
+			}
+			html += "</div>";
+			d.innerHTML = html;
+
+			gantt._waiAria.lightboxAttr(d);
+
+			if (gantt.config.drag_lightbox) {
+				d.firstChild.onmousedown = gantt._ready_to_dnd;
+				d.firstChild.onselectstart = function () {
+					return false;
+				};
+				d.firstChild.style.cursor = "pointer";
+				gantt._init_dnd_events();
+
+			}
+
+			document.body.insertBefore(d, document.body.firstChild);
+			this._lightbox = d;
+
+			var sns = this._get_typed_lightbox_config(type);
+			html = this._render_sections(sns);
+
+			var ds = d.getElementsByTagName("div");
+			for (var i = 0; i < ds.length; i++) {
+				var t_ds = ds[i];
+				if (t_ds.className == "gantt_cal_larea") {
+					t_ds.innerHTML = html;
+					break;
+				}
+			}
+
+			// bind labels to lightbox inputs
+			for (var i = 0; i < sns.length; i++) {
+				var section = sns[i];
+				if (!section.id || !document.getElementById(section.id))
+					continue;
+
+				var labelBlock = document.getElementById(section.id);
+				var label = labelBlock.querySelector("label");
+				var inputBlock = labelBlock.nextSibling;
+				if (!inputBlock)
+					continue;
+
+				var input = inputBlock.querySelector("input, select, textarea");
+				if (input) {
+					section.inputId = input.id || "input_" + gantt.uid();
+					if (!input.id)
+						input.id = section.inputId;
+
+					label.setAttribute("for", section.inputId);
+				}
+			}
+
+			//sizes
+			this.resizeLightbox();
+
+			this._init_lightbox_events(this);
+			d.style.display = "none";
+			d.style.visibility = "visible";
+		}
+		return this._lightbox;
+	};
+
+	gantt._render_sections = function (sns) {
+		var html = "";
+		for (var i = 0; i < sns.length; i++) {
+			var block = this.form_blocks[sns[i].type];
+			if (!block) continue; //ignore incorrect blocks
+			sns[i].id = "area_" + this.uid();
+
+			var display = sns[i].hidden ? " style='display:none'" : "";
+			var button = "";
+			if (sns[i].button) {
+				button = "<div class='gantt_custom_button' index='" + i + "'><div class='gantt_custom_button_" + sns[i].button + "'></div><div class='gantt_custom_button_label'>" + this.locale.labels["button_" + sns[i].button] + "</div></div>";
+			}
+			if (this.config.wide_form) {
+				html += "<div class='gantt_wrap_section' " + display + ">";
+			}
+			html += "<div id='" + sns[i].id + "' class='gantt_cal_lsection'><label>" + button + this.locale.labels["section_" + sns[i].name] + "</label></div>" + block.render.call(this, sns[i]);
+			html += "</div>";
+		}
+		return html;
+	};
+
+
+	gantt.resizeLightbox = function () {
+		var d = this._lightbox;
+		if (!d) return;
+
+		var con = d.childNodes[1];
+		con.style.height = "0px";
+		con.style.height = con.scrollHeight + "px";
+		d.style.height = con.scrollHeight + this.config.lightbox_additional_height + "px";
+		con.style.height = con.scrollHeight + "px"; //it is incredible , how ugly IE can be
+
+
+	};
+
+	gantt._center_lightbox = function (box) {
+		if (box) {
+			box.style.display = "block";
+
+			var scroll_top = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop;
+			var scroll_left = window.pageXOffset || document.body.scrollLeft || document.documentElement.scrollLeft;
+
+			var view_height = window.innerHeight || document.documentElement.clientHeight;
+
+			if (scroll_top) // if vertical scroll on window
+				box.style.top = Math.round(scroll_top + Math.max((view_height - box.offsetHeight) / 2, 0)) + "px";
+			else // vertical scroll on body
+				box.style.top = Math.round(Math.max(((view_height - box.offsetHeight) / 2), 0) + 9) + "px"; // +9 for compatibility with auto tests
+
+			// not quite accurate but used for compatibility reasons
+			if (document.documentElement.scrollWidth > document.body.offsetWidth) // if horizontal scroll on the window
+				box.style.left = Math.round(scroll_left + (document.body.offsetWidth - box.offsetWidth) / 2) + "px";
+			else // horizontal scroll on the body
+				box.style.left = Math.round((document.body.offsetWidth - box.offsetWidth) / 2) + "px";
+		}
+	};
+	gantt.showCover = function () {
+		if (this._cover) return;
+
+		this._cover = document.createElement("DIV");
+		this._cover.className = "gantt_cal_cover";
+		var _document_height = ((document.height !== undefined) ? document.height : document.body.offsetHeight);
+		var _scroll_height = ((document.documentElement) ? document.documentElement.scrollHeight : 0);
+		this._cover.style.height = Math.max(_document_height, _scroll_height) + 'px';
+		document.body.appendChild(this._cover);
+	};
+
+
+	gantt._init_lightbox_events = function () {
+		gantt.lightbox_events = {};
+
+
+		gantt.lightbox_events["gantt_save_btn"] = function (e) {
+			gantt._save_lightbox();
+		};
+
+
+		gantt.lightbox_events["gantt_delete_btn"] = function (e) {
+			if (!gantt.callEvent("onLightboxDelete", [gantt._lightbox_id]))
+				return;
+
+			if (gantt.isTaskExists(gantt._lightbox_id)) {
+				gantt.$click.buttons["delete"](gantt._lightbox_id);
+			} else {
+				gantt.hideLightbox();
+			}
+
+		};
+
+
+		gantt.lightbox_events["gantt_cancel_btn"] = function (e) {
+			gantt._cancel_lightbox();
+		};
+
+
+		gantt.lightbox_events["default"] = function (e, src) {
+			if (src.getAttribute("dhx_button")) {
+				gantt.callEvent("onLightboxButton", [src.className, src, e]);
+			} else {
+				var index, block, sec;
+
+				var className = domHelpers.getClassName(src);
+				if (className.indexOf("gantt_custom_button") != -1) {
+					if (className.indexOf("gantt_custom_button_") != -1) {
+						index = src.parentNode.getAttribute("index");
+						sec = src;
+						while (sec && domHelpers.getClassName(sec).indexOf("gantt_cal_lsection") == -1) {
+							sec = sec.parentNode;
+						}
+					} else {
+						index = src.getAttribute("index");
+						sec = src.parentNode;
+						src = src.firstChild;
+					}
+				}
+
+				var sections = gantt._get_typed_lightbox_config();
+
+				if (index) {
+					index = index * 1;
+					block = gantt.form_blocks[sections[index * 1].type];
+					block.button_click(index, src, sec, sec.nextSibling);
+				}
+			}
+		};
+		this.event(gantt.getLightbox(), "click", function (e) {
+			e = e || window.event;
+			var src = e.target ? e.target : e.srcElement;
+
+			var className = domHelpers.getClassName(src);
+			if (!className) {
+				src = src.previousSibling;
+				className = domHelpers.getClassName(src);
+			}
+			if (src && className && className.indexOf("gantt_btn_set") === 0) {
+				src = src.firstChild;
+				className = domHelpers.getClassName(src);
+			}
+			if (src && className) {
+				var func = gantt.defined(gantt.lightbox_events[src.className]) ? gantt.lightbox_events[src.className] : gantt.lightbox_events["default"];
+				return func(e, src);
+			}
+			return false;
+		});
+
+		gantt.getLightbox().onkeydown = function (e) {
+			var event = e || window.event;
+			var target = e.target || e.srcElement;
+			var buttonTarget = !!(domHelpers.getClassName(target).indexOf("gantt_btn_set") > -1);
+
+			switch ((e || event).keyCode) {
+				case 32: {//space
+					if ((e || event).shiftKey) return;
+					if (buttonTarget && target.click) {
+						target.click();
+					}
+					break;
+				}
+				case gantt.keys.edit_save:
+					if ((e || event).shiftKey) return;
+					if (buttonTarget && target.click) {
+						target.click();
+					} else {
+						gantt._save_lightbox();
+					}
+					break;
+				case gantt.keys.edit_cancel:
+					gantt._cancel_lightbox();
+					break;
+				default:
+					break;
+			}
+		};
+	};
+
+	gantt._cancel_lightbox = function () {
+		var task = this.getLightboxValues();
+		this.callEvent("onLightboxCancel", [this._lightbox_id, task.$new]);
+		if (gantt.isTaskExists(task.id) && task.$new) {
+			this.silent(function(){
+				gantt.$data.tasksStore.removeItem(task.id);
+				gantt._update_flags(task.id, null);
+			});
+		}
+
+		this.refreshData();
+		this.hideLightbox();
+	};
+
+	gantt._save_lightbox = function () {
+		var task = this.getLightboxValues();
+		if (!this.callEvent("onLightboxSave", [this._lightbox_id, task, !!task.$new]))
+			return;
+
+		if (task.$new) {
+			delete task.$new;
+			this.addTask(task);
+		}else if(this.isTaskExists(task.id)){
+			this.mixin(this.getTask(task.id), task, true);
+			this.refreshTask(task.id);
+			this.updateTask(task.id);
+		}
+		this.refreshData();
+
+		// TODO: do we need any blockable events here to prevent closing lightbox?
+		this.hideLightbox();
+	};
+
+	gantt._resolve_default_mapping = function (section) {
+		var mapping = section.map_to;
+		var time_controls = {"time": true, "time_optional": true, "duration": true, "duration_optional": true};
+		if (time_controls[section.type]) {
+			if (section.map_to == 'auto') {
+				mapping = {start_date: "start_date", end_date: "end_date", duration: "duration"};
+			} else if (typeof(section.map_to) === "string") {
+				mapping = {start_date: section.map_to};
+			}
+		}
+
+		return mapping;
+	};
+
+	gantt.getLightboxValues = function () {
+		var task = {};
+
+		if (gantt.isTaskExists(this._lightbox_id)) {
+			task = this.mixin({}, this.getTask(this._lightbox_id));
+		}
+
+		var sns = this._get_typed_lightbox_config();
+		for (var i = 0; i < sns.length; i++) {
+			var node = document.getElementById(sns[i].id);
+			node = (node ? node.nextSibling : node);
+			var block = this.form_blocks[sns[i].type];
+			if (!block) continue;
+			var res = block.get_value.call(this, node, task, sns[i]);
+			var map_to = gantt._resolve_default_mapping(sns[i]);
+			if (typeof map_to == "string" && map_to != "auto") {
+				task[map_to] = res;
+			} else if (typeof map_to == "object") {
+				for (var property in map_to) {
+					if (map_to[property])
+						task[map_to[property]] = res[property];
+				}
+			}
+		}
+		return task;
+	};
+
+
+	gantt.hideLightbox = function () {
+		var box = this.getLightbox();
+		if (box) box.style.display = "none";
+
+		this._waiAria.lightboxHiddenAttr(box);
+		this._lightbox_id = null;
+
+		this.hideCover();
+		this.callEvent("onAfterLightbox", []);
+	};
+	gantt.hideCover = function () {
+		if (this._cover)
+			this._cover.parentNode.removeChild(this._cover);
+		this._cover = null;
+	};
+
+	gantt.resetLightbox = function () {
+		if (gantt._lightbox && !gantt._custom_lightbox)
+			gantt._lightbox.parentNode.removeChild(gantt._lightbox);
+		gantt._lightbox = null;
+	};
+	gantt._set_lightbox_values = function (data, box) {
+		var task = data;
+		var s = box.getElementsByTagName("span");
+		var lightboxHeader = [];
+		if (gantt.templates.lightbox_header) {
+			lightboxHeader.push("");
+			lightboxHeader.push(gantt.templates.lightbox_header(task.start_date, task.end_date, task));
+			s[1].innerHTML = "";
+			s[2].innerHTML = gantt.templates.lightbox_header(task.start_date, task.end_date, task);
+		} else {
+			lightboxHeader.push(this.templates.task_time(task.start_date, task.end_date, task));
+			lightboxHeader.push((this.templates.task_text(task.start_date, task.end_date, task) || "").substr(0, 70)); //IE6 fix
+			s[1].innerHTML = this.templates.task_time(task.start_date, task.end_date, task);
+			s[2].innerHTML = (this.templates.task_text(task.start_date, task.end_date, task) || "").substr(0, 70); //IE6 fix
+		}
+		s[1].innerHTML = lightboxHeader[0];
+		s[2].innerHTML = lightboxHeader[1];
+
+		gantt._waiAria.lightboxHeader(box, lightboxHeader.join(" "));
+
+		var sns = this._get_typed_lightbox_config(this.getLightboxType());
+		for (var i = 0; i < sns.length; i++) {
+			var section = sns[i];
+
+			if (!this.form_blocks[section.type]) {
+				continue;//skip incorrect sections, same check is done during rendering
+			}
+
+
+			var node = document.getElementById(section.id).nextSibling;
+			var block = this.form_blocks[section.type];
+			var map_to = gantt._resolve_default_mapping(sns[i]);
+			var value = this.defined(task[map_to]) ? task[map_to] : section.default_value;
+			block.set_value.call(gantt, node, value, task, section);
+
+			if (section.focus)
+				block.focus.call(gantt, node);
+		}
+		if (data.id)
+			gantt._lightbox_id = data.id;
+	};
+	gantt._fill_lightbox = function (id, box) {
+		var task = this.getTask(id);
+		this._set_lightbox_values(task, box);
+	};
+
+
+	gantt.getLightboxSection = function (name) {
+		var config = this._get_typed_lightbox_config();
+		var i = 0;
+		for (i; i < config.length; i++)
+			if (config[i].name == name)
+				break;
+		var section = config[i];
+		if (!section)
+			return null;
+
+		if (!this._lightbox)
+			this.getLightbox();
+		var header = document.getElementById(section.id);
+		var node = header.nextSibling;
+
+		var result = {
+			section: section,
+			header: header,
+			node: node,
+			getValue: function (ev) {
+				return gantt.form_blocks[section.type].get_value.call(gantt, node, (ev || {}), section);
+			},
+			setValue: function (value, ev) {
+				return gantt.form_blocks[section.type].set_value.call(gantt, node, value, (ev || {}), section);
+			}
+		};
+
+		var handler = this._lightbox_methods["get_" + section.type + "_control"];
+		return handler ? handler(result) : result;
+	};
+
+	gantt._lightbox_methods.get_template_control = function (result) {
+		result.control = result.node;
+		return result;
+	};
+	gantt._lightbox_methods.get_select_control = function (result) {
+		result.control = result.node.getElementsByTagName('select')[0];
+		return result;
+	};
+	gantt._lightbox_methods.get_textarea_control = function (result) {
+		result.control = result.node.getElementsByTagName('textarea')[0];
+		return result;
+	};
+	gantt._lightbox_methods.get_time_control = function (result) {
+		result.control = result.node.getElementsByTagName('select'); // array
+		return result;
+	};
+
+
+	gantt._init_dnd_events = function () {
+		this.event(document.body, "mousemove", gantt._move_while_dnd);
+		this.event(document.body, "mouseup", gantt._finish_dnd);
+		gantt._init_dnd_events = function () {
+		};
+	};
+	gantt._move_while_dnd = function (e) {
+		if (gantt._dnd_start_lb) {
+			if (!document.gantt_unselectable) {
+				document.body.className += " gantt_unselectable";
+				document.gantt_unselectable = true;
+			}
+			var lb = gantt.getLightbox();
+			var now = (e && e.target) ? [e.pageX, e.pageY] : [event.clientX, event.clientY];
+			lb.style.top = gantt._lb_start[1] + now[1] - gantt._dnd_start_lb[1] + "px";
+			lb.style.left = gantt._lb_start[0] + now[0] - gantt._dnd_start_lb[0] + "px";
+		}
+	};
+	gantt._ready_to_dnd = function (e) {
+		var lb = gantt.getLightbox();
+		gantt._lb_start = [parseInt(lb.style.left, 10), parseInt(lb.style.top, 10)];
+		gantt._dnd_start_lb = (e && e.target) ? [e.pageX, e.pageY] : [event.clientX, event.clientY];
+	};
+	gantt._finish_dnd = function () {
+		if (gantt._lb_start) {
+			gantt._lb_start = gantt._dnd_start_lb = false;
+			document.body.className = document.body.className.replace(" gantt_unselectable", "");
+			document.gantt_unselectable = false;
+		}
+	};
+
+
+	gantt._focus = function (node, select) {
+		if (node && node.focus) {
+			if (gantt.config.touch) {
+				//do not focus editor, to prevent auto-zoom
+			} else {
+				try {
+					if (select && node.select) node.select();
+					node.focus();
+				} catch (e) {
+				}
+			}
+		}
+	};
+
+
+	gantt.form_blocks = {
+		getTimePicker: function (sns, hidden) {
+			var time_format = sns.time_format;
+			if (!time_format) {
+				// default order
+				var time_format = ["%d", "%m", "%Y"];
+				if (helpers.getSecondsInUnit(gantt.getScale().unit) < helpers.getSecondsInUnit("day")) {
+					time_format.push("%H:%i");
+				}
+			}
+			// map: default order => real one
+			sns._time_format_order = {size: 0};
+
+
+			var cfg = this.config;
+			var dt = this.date.date_part(new Date(gantt._min_date.valueOf()));
+			var last = 24 * 60, first = 0;
+			if (gantt.config.limit_time_select) {
+				last = 60 * cfg.last_hour + 1;
+				first = 60 * cfg.first_hour;
+				dt.setHours(cfg.first_hour);
+			}
+			var html = "";
+
+			for (var p = 0; p < time_format.length; p++) {
+				var time_option = time_format[p];
+
+				// adding spaces between selects
+				if (p > 0) {
+					html += " ";
+				}
+
+				var options = '';
+				switch (time_option) {
+					case "%Y":
+						sns._time_format_order[2] = p;
+						sns._time_format_order.size++;
+						//year
+
+						var range, offset, start_year, end_year;
+
+						if (sns.year_range) {
+							if (!isNaN(sns.year_range)) {
+								range = sns.year_range;
+							} else if (sns.year_range.push) {
+								// if
+								start_year = sns.year_range[0];
+								end_year = sns.year_range[1];
+							}
+						}
+
+						range = range || 10;
+						offset = offset || Math.floor(range / 2);
+						start_year = start_year || dt.getFullYear() - offset;
+						end_year = end_year || start_year + range;
+
+
+						for (var i = start_year; i < end_year; i++)
+							options += "<option value='" + (i) + "'>" + (i) + "</option>";
+						break;
+					case "%m":
+						sns._time_format_order[1] = p;
+						sns._time_format_order.size++;
+						//month
+						for (var i = 0; i < 12; i++)
+							options += "<option value='" + i + "'>" + this.locale.date.month_full[i] + "</option>";
+						break;
+					case "%d":
+						sns._time_format_order[0] = p;
+						sns._time_format_order.size++;
+						//days
+						for (var i = 1; i < 32; i++)
+							options += "<option value='" + i + "'>" + i + "</option>";
+						break;
+					case "%H:%i":
+						//  var last = 24*60, first = 0;
+						sns._time_format_order[3] = p;
+						sns._time_format_order.size++;
+						//hours
+						var i = first;
+						var tdate = dt.getDate();
+						sns._time_values = [];
+
+						while (i < last) {
+							var time = this.templates.time_picker(dt);
+							options += "<option value='" + i + "'>" + time + "</option>";
+							sns._time_values.push(i);
+							dt.setTime(dt.valueOf() + this._get_timepicker_step() * 60 * 1000);
+							var diff = (dt.getDate() != tdate) ? 1 : 0; // moved or not to the next day
+							i = diff * 24 * 60 + dt.getHours() * 60 + dt.getMinutes();
+						}
+						break;
+					default:
+						break;
+				}
+
+				if (options) {
+
+					var ariaAttrs = gantt._waiAria.lightboxSelectAttrString(time_option);
+
+					var readonly = sns.readonly ? "disabled='disabled'" : "";
+					var display = hidden ? " style='display:none' " : "";
+					html += "<select " + readonly + display + ariaAttrs + ">" + options + "</select>";
+				}
+			}
+			return html;
+		},
+		_fill_lightbox_select: function (s, i, d, map, cfg) {
+			s[i + map[0]].value = d.getDate();
+			s[i + map[1]].value = d.getMonth();
+			s[i + map[2]].value = d.getFullYear();
+			if (gantt.defined(map[3])) {
+				var v = d.getHours() * 60 + d.getMinutes();
+				v = Math.round(v / gantt._get_timepicker_step()) * gantt._get_timepicker_step();
+				var input = s[i + map[3]];
+				input.value = v;
+				//in case option not shown
+				input.setAttribute('data-value', v);
+			}
+		},
+		template: {
+			render: function (sns) {
+				var height = (sns.height || "30") + "px";
+				return "<div class='gantt_cal_ltext gantt_cal_template' style='height:" + height + ";'></div>";
+			},
+			set_value: function (node, value, ev, config) {
+				node.innerHTML = value || "";
+			},
+			get_value: function (node, ev, config) {
+				return node.innerHTML || "";
+			},
+			focus: function (node) {
+			}
+		},
+		textarea: {
+			render: function (sns) {
+				var height = (sns.height || "130") + "px";
+				return "<div class='gantt_cal_ltext' style='height:" + height + ";'><textarea></textarea></div>";
+			},
+			set_value: function (node, value, ev) {
+				this.form_blocks.textarea._get_input(node).value = value || "";
+			},
+			get_value: function (node, ev) {
+				return this.form_blocks.textarea._get_input(node).value;
+			},
+			focus: function (node) {
+				var a = this.form_blocks.textarea._get_input(node);
+				gantt._focus(a, true);
+			},
+			_get_input: function (node) {
+				return node.querySelector("textarea");
+			}
+		},
+		select: {
+			render: function (sns) {
+				var height = (sns.height || "23") + "px";
+				var html = "<div class='gantt_cal_ltext' style='height:" + height + ";'><select style='width:100%;'>";
+				for (var i = 0; i < sns.options.length; i++)
+					html += "<option value='" + sns.options[i].key + "'>" + sns.options[i].label + "</option>";
+				html += "</select></div>";
+				return html;
+			},
+			set_value: function (node, value, ev, sns) {
+				var select = node.firstChild;
+				if (!select._dhx_onchange && sns.onchange) {
+					select.onchange = sns.onchange;
+					select._dhx_onchange = true;
+				}
+				if (typeof value == "undefined")
+					value = (select.options[0] || {}).value;
+				select.value = value || "";
+			},
+			get_value: function (node, ev) {
+				return node.firstChild.value;
+			},
+			focus: function (node) {
+				var a = node.firstChild;
+				gantt._focus(a, true);
+			}
+		},
+		time: {
+			render: function (sns) {
+				var time = this.form_blocks.getTimePicker.call(this, sns);
+				var parts = ["<div style='height:" + (sns.height || 30) + "px;padding-top:0px;font-size:inherit;text-align:center;' class='gantt_section_time'>"];
+				parts.push(time);
+
+				if (sns.single_date) {
+					time = this.form_blocks.getTimePicker.call(this, sns, true);
+					parts.push("<span></span>");
+				} else {
+					parts.push("<span style='font-weight:normal; font-size:10pt;'> &nbsp;&ndash;&nbsp; </span>");
+				}
+
+				parts.push(time);
+				parts.push("</div>");
+				return parts.join('');
+			},
+			set_value: function (node, value, ev, config) {
+				var cfg = config;
+				var s = node.getElementsByTagName("select");
+
+				var map = config._time_format_order;
+				var map_size = config._time_format_size;
+
+				if (cfg.auto_end_date) {
+					var _update_lightbox_select = function () {
+						start_date = new Date(s[map[2]].value, s[map[1]].value, s[map[0]].value, 0, 0);
+						end_date = gantt.calculateEndDate({start_date: start_date, duration: 1, task: ev});
+						this.form_blocks._fill_lightbox_select(s, map.size, end_date, map, cfg);
+					};
+					for (var i = 0; i < 4; i++) {
+						s[i].onchange = _update_lightbox_select;
+					}
+				}
+
+				var mapping = gantt._resolve_default_mapping(config);
+
+				if (typeof(mapping) === "string") mapping = {start_date: mapping};
+
+				var start_date = ev[mapping.start_date] || new Date();
+				var end_date = ev[mapping.end_date] || gantt.calculateEndDate({
+					start_date: start_date,
+					duration: 1,
+					task: ev
+				});
+
+				this.form_blocks._fill_lightbox_select(s, 0, start_date, map, cfg);
+				this.form_blocks._fill_lightbox_select(s, map.size, end_date, map, cfg);
+			},
+
+			get_value: function (node, ev, config) {
+				var s = node.getElementsByTagName("select");
+				var map = config._time_format_order;
+
+				var hours = 0, minutes = 0;
+				if (gantt.defined(map[3])) {
+					var time = parseInt(s[map[3]].value, 10);
+					hours = Math.floor(time / 60);
+					minutes = time % 60;
+				}
+				var start_date = new Date(s[map[2]].value, s[map[1]].value, s[map[0]].value, hours, minutes);
+
+				hours = minutes = 0;
+				if (gantt.defined(map[3])) {
+					var time = parseInt(s[map.size + map[3]].value, 10);
+					hours = Math.floor(time / 60);
+					minutes = time % 60;
+				}
+				var end_date = new Date(s[map[2] + map.size].value, s[map[1] + map.size].value, s[map[0] + map.size].value, hours, minutes);
+
+				if (end_date <= start_date)
+					end_date = gantt.date.add(start_date, gantt._get_timepicker_step(), "minute");
+
+				var mapped_fields = gantt._resolve_default_mapping(config);
+
+				var res = {
+					start_date: new Date(start_date),
+					end_date: new Date(end_date)
+				};
+				if (typeof mapped_fields == "string") {
+					return res.start_date;
+				} else {
+					return res;
+				}
+			},
+			focus: function (node) {
+				gantt._focus(node.getElementsByTagName("select")[0]);
+			}
+		},
+		duration: {
+			render: function (sns) {
+				var time = this.form_blocks.getTimePicker.call(this, sns);
+				time = "<div class='gantt_time_selects'>" + time + "</div>";
+				var label = this.locale.labels[this.config.duration_unit + "s"];
+
+				var singleDate = sns.single_date ? ' style="display:none"' : "";
+				var readonly = sns.readonly ? " disabled='disabled'" : "";
+
+				var ariaAttr = this._waiAria.lightboxDurationInputAttrString(sns);
+
+				var duration = "<div class='gantt_duration' " + singleDate + ">" +
+					"<input type='button' class='gantt_duration_dec' value='−'" + readonly + ">" +
+					"<input type='text' value='5' class='gantt_duration_value'" + readonly + " " + ariaAttr + ">" +
+					"<input type='button' class='gantt_duration_inc' value='+'" + readonly + "> " + label + " <span></span>" +
+					"</div>";
+				var html = "<div style='height:" + (sns.height || 30) + "px;padding-top:0px;font-size:inherit;' class='gantt_section_time'>" + time + " " + duration + "</div>";
+				return html;
+			},
+			set_value: function (node, value, ev, config) {
+				var cfg = config;
+				var s = node.getElementsByTagName("select");
+				var inps = node.getElementsByTagName("input");
+
+				var duration = inps[1];
+				var btns = [inps[0], inps[2]];
+				var endspan = node.getElementsByTagName("span")[0];
+
+				var map = config._time_format_order;
+
+				function _calc_date() {
+					var start_date = gantt.form_blocks.duration._get_start_date.call(gantt, node, config);
+					var duration = gantt.form_blocks.duration._get_duration.call(gantt, node, config);
+					var end_date = gantt.calculateEndDate({start_date: start_date, duration: duration, task: ev});
+
+					endspan.innerHTML = gantt.templates.task_date(end_date);
+				}
+
+				function _change_duration(step) {
+					var value = duration.value;
+					value = parseInt(value, 10);
+					if (window.isNaN(value))
+						value = 0;
+					value += step;
+					if (value < 1) value = 1;
+					duration.value = value;
+					_calc_date();
+				}
+
+				btns[0].onclick = gantt.bind(function () {
+					_change_duration(-1 * this.config.duration_step);
+				}, this);
+				btns[1].onclick = gantt.bind(function () {
+					_change_duration(1 * this.config.duration_step);
+				}, this);
+				s[0].onchange = _calc_date;
+				s[1].onchange = _calc_date;
+				s[2].onchange = _calc_date;
+				if (s[3]) s[3].onchange = _calc_date;
+				duration.onkeydown = gantt.bind(function (e) {
+					e = e || window.event;
+					// up
+					var code = (e.charCode || e.keyCode || e.which);
+
+					if (code == 40) {
+						_change_duration(-1 * this.config.duration_step);
+						return false;
+					}
+					// down
+					if (code == 38) {
+						_change_duration(1 * this.config.duration_step);
+						return false;
+					}
+					window.setTimeout(function (e) {
+						_calc_date();
+					}, 1);
+				}, this);
+
+				duration.onchange = gantt.bind(function (e) {
+					_calc_date();
+				}, this);
+
+				var mapping = gantt._resolve_default_mapping(config);
+				if (typeof(mapping) === "string") mapping = {start_date: mapping};
+
+				var start_date = ev[mapping.start_date] || new Date();
+				var end_date = ev[mapping.end_date] || gantt.calculateEndDate({
+					start_date: start_date,
+					duration: 1,
+					task: ev
+				});
+				var duration_val = Math.round(ev[mapping.duration]) || gantt.calculateDuration({
+					start_date: start_date,
+					end_date: end_date,
+					task: ev
+				});
+
+				gantt.form_blocks._fill_lightbox_select(s, 0, start_date, map, cfg);
+				duration.value = duration_val;
+				_calc_date();
+			},
+
+			_get_start_date: function (node, config) {
+				var s = node.getElementsByTagName("select");
+				var map = config._time_format_order;
+				var hours = 0;
+				var minutes = 0;
+				if (gantt.defined(map[3])) {
+					var input = s[map[3]];
+					var time = parseInt(input.value, 10);
+					if (isNaN(time) && input.hasAttribute("data-value")) {
+						time = parseInt(input.getAttribute("data-value"), 10);
+					}
+
+					hours = Math.floor(time / 60);
+					minutes = time % 60;
+				}
+				return new Date(s[map[2]].value, s[map[1]].value, s[map[0]].value, hours, minutes);
+			},
+			_get_duration: function (node, config) {
+				var duration = node.getElementsByTagName("input")[1];
+				duration = parseInt(duration.value, 10);
+				if (!duration || window.isNaN(duration)) duration = 1;
+				if (duration < 0) duration *= -1;
+				return duration;
+			},
+
+			get_value: function (node, ev, config) {
+				var start_date = gantt.form_blocks.duration._get_start_date(node, config);
+				var duration = gantt.form_blocks.duration._get_duration(node, config);
+
+				var end_date = gantt.calculateEndDate({start_date: start_date, duration: duration, task: ev});
+				var mapped_fields = gantt._resolve_default_mapping(config);
+				var res = {
+					start_date: new Date(start_date),
+					end_date: new Date(end_date),
+					duration: duration
+				};
+				if (typeof mapped_fields == "string") {
+					return res.start_date;
+				} else {
+					return res;
+				}
+			},
+			focus: function (node) {
+				gantt._focus(node.getElementsByTagName("select")[0]);
+			}
+		},
+		parent: {
+			_filter: function (options, config, item_id) {
+				var filter = config.filter || function () {
+					return true;
+				};
+
+				options = options.slice(0);
+
+				for (var i = 0; i < options.length; i++) {
+					var task = options[i];
+					if (task.id == item_id || gantt.isChildOf(task.id, item_id) || filter(task.id, task) === false) {
+						options.splice(i, 1);
+						i--;
+					}
+				}
+				return options;
+			},
+
+			_display: function (config, item_id) {
+				var tasks = [],
+					options = [];
+				if (item_id) {
+					tasks = gantt.getTaskByTime();
+					if (config.allow_root) {
+						tasks.unshift({id: gantt.config.root_id, text: config.root_label || ""});
+					}
+					tasks = this._filter(tasks, config, item_id);
+					if (config.sort) {
+						tasks.sort(config.sort);
+					}
+				}
+				var text = config.template || gantt.templates.task_text;
+				for (var i = 0; i < tasks.length; i++) {
+					var label = text.apply(gantt, [tasks[i].start_date, tasks[i].end_date, tasks[i]]);
+					if (label === undefined) {
+						label = "";
+					}
+					options.push({
+						key: tasks[i].id,
+						label: label
+					});
+				}
+				config.options = options;
+				config.map_to = config.map_to || "parent";
+				return gantt.form_blocks.select.render.apply(this, arguments);
+			},
+			render: function (sns) {
+				return gantt.form_blocks.parent._display(sns, false);
+			},
+			set_value: function (node, value, ev, config) {
+				var tmpDom = document.createElement("div");
+				tmpDom.innerHTML = gantt.form_blocks.parent._display(config, ev.id);
+				var newOptions = tmpDom.removeChild(tmpDom.firstChild);
+				node.onselect = null;
+				node.parentNode.replaceChild(newOptions, node);
+
+				return gantt.form_blocks.select.set_value.apply(gantt, [newOptions, value, ev, config]);
+			},
+			get_value: function () {
+				return gantt.form_blocks.select.get_value.apply(gantt, arguments);
+			},
+			focus: function () {
+				return gantt.form_blocks.select.focus.apply(gantt, arguments);
+			}
+		}
+	};
+
+	gantt._is_lightbox_timepicker = function () {
+		var s = this._get_typed_lightbox_config();
+		for (var i = 0; i < s.length; i++)
+			if (s[i].name == "time" && s[i].type == "time")
+				return true;
+		return false;
+	};
+
+	gantt._dhtmlx_confirm = function (message, title, callback, ok) {
+		if (!message)
+			return callback();
+		var opts = {text: message};
+		if (title)
+			opts.title = title;
+		if (ok) {
+			opts.ok = ok;
+		}
+		if (callback) {
+			opts.callback = function (result) {
+				if (result)
+					callback();
+			};
+		}
+		gantt.confirm(opts);
+	};
+
+	function _get_type_name(type_value) {
+		for (var i in this.config.types) {
+			if (this.config.types[i] == type_value) {
+				return i;
+			}
+		}
+		return "task";
+	}
+
+	gantt._get_typed_lightbox_config = function (type) {
+		if (type === undefined) {
+			type = this.getLightboxType();
+		}
+
+		var field = _get_type_name.call(this, type);
+
+		if (gantt.config.lightbox[field + "_sections"]) {
+			return gantt.config.lightbox[field + "_sections"];
+		} else {
+			return gantt.config.lightbox.sections;
+		}
+	};
+
+	gantt._silent_redraw_lightbox = function (type) {
+		var oldType = this.getLightboxType();
+
+		if (this.getState().lightbox) {
+			var taskId = this.getState().lightbox;
+			var formData = this.getLightboxValues(),
+				task = this.copy(this.getTask(taskId));
+
+			this.resetLightbox();
+
+			var updTask = this.mixin(task, formData, true);
+			var box = this.getLightbox(type ? type : undefined);
+			this._center_lightbox(this.getLightbox());
+			this._set_lightbox_values(updTask, box);
+		} else {
+			this.resetLightbox();
+			this.getLightbox(type ? type : undefined);
+		}
+		this.callEvent("onLightboxChange", [oldType, this.getLightboxType()]);
+	};
+
+};
+
+/***/ }),
+/* 87 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt) {
+
+	gantt._extend_to_optional = function (lightbox_block) {
+
+		var duration = lightbox_block;
+		var optional_time = {
+			render: duration.render,
+			focus: duration.focus,
+			set_value: function (node, value, task, section) {
+				var mapping = gantt._resolve_default_mapping(section);
+				if (!task[mapping.start_date] || (mapping.start_date == "start_date" && this._isAllowedUnscheduledTask(task))) {
+					optional_time.disable(node, section);
+					var val = {};
+
+					for (var i in mapping) {
+						//take default values from the time control from task start/end dates
+						val[mapping[i]] = task[i];
+					}
+
+					return duration.set_value.call(gantt, node, value, val, section);//set default value
+				} else {
+					optional_time.enable(node, section);
+					return duration.set_value.call(gantt, node, value, task, section);
+				}
+			},
+			get_value: function (node, task, section) {
+				if (section.disabled) {
+					return {start_date: null};
+				} else {
+					return duration.get_value.call(gantt, node, task, section);
+				}
+			},
+			update_block: function (node, section) {
+				gantt.callEvent("onSectionToggle", [gantt._lightbox_id, section]);
+				node.style.display = section.disabled ? "none" : "block";
+
+				if (section.button) {
+					var button = node.previousSibling.querySelector(".gantt_custom_button_label"),
+						labels = gantt.locale.labels;
+
+					var button_text = section.disabled ? labels[section.name + "_enable_button"] : labels[section.name + "_disable_button"];
+
+					button.innerHTML = button_text;
+				}
+				gantt.resizeLightbox();
+			},
+			disable: function (node, section) {
+				section.disabled = true;
+				optional_time.update_block(node, section);
+
+			},
+			enable: function (node, section) {
+				section.disabled = false;
+				optional_time.update_block(node, section);
+			},
+			button_click: function (index, el, section, container) {
+				if (gantt.callEvent("onSectionButton", [gantt._lightbox_id, section]) === false) {
+					return;
+				}
+				var config = gantt._get_typed_lightbox_config()[index];
+				if (config.disabled) {
+					optional_time.enable(container, config);
+				} else {
+					optional_time.disable(container, config);
+				}
+			}
+		};
+		return optional_time;
+	};
+
+	gantt.form_blocks.duration_optional = gantt._extend_to_optional(gantt.form_blocks.duration);
+	gantt.form_blocks.time_optional = gantt._extend_to_optional(gantt.form_blocks.time);
+
+};
+
+/***/ }),
+/* 88 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt) {
+
+	gantt.getTaskType = function (type) {
+		return "task";
+	};
+};
+
+/***/ }),
+/* 89 */
+/***/ (function(module, exports) {
+
+/*
+ reuse results of functions that can be recalculated during rendering
+ greatly increases the rendering speed when critical path enabled
+ Sample - 94_dev/critical_path.html
+
+ */
+module.exports = function(gantt){
+
+gantt._cached_functions = {
+	cache: {},
+	mode: false,
+	critical_path_mode: false,
+	wrap_methods : function(methods, object){
+		if(object._prefetch_originals){
+			for(var i in object._prefetch_originals){
+				object[i] = object._prefetch_originals[i];
+			}
+		}
+		object._prefetch_originals = {};
+		for(var i = 0; i < methods.length; i++)
+			this.prefetch(methods[i], object);
+
+	},
+	prefetch : function(methodname, host){
+		var original = host[methodname];
+		if(original){
+			var optimizer = this;
+
+			host._prefetch_originals[methodname] = original;
+			host[methodname] = function get_prefetched_value(){
+
+				var argumentsArray = new Array(arguments.length);
+				for (var i = 0, l = arguments.length; i < l; i++) {
+					argumentsArray[i] = arguments[i];
+				}
+
+				if(optimizer.active){
+					var args = optimizer.get_arguments_hash(Array.prototype.slice.call(argumentsArray));
+					if(!optimizer.cache[methodname]){
+						optimizer.cache[methodname] = {};
+					}
+
+					var cached_values = optimizer.cache[methodname];
+
+					if(optimizer.has_cached_value(cached_values, args)){
+						return optimizer.get_cached_value(cached_values, args);
+					}else{
+						var value = original.apply(this, argumentsArray);
+						optimizer.cache_value(cached_values, args, value);
+						return value;
+					}
+				}
+
+				return original.apply(this, argumentsArray);
+			};
+		}
+		return original;
+	},
+	cache_value: function(cache, arguments_hash, value){
+		if(this.is_date(value))
+			value = new Date(value);
+		cache[arguments_hash] = value;
+	},
+	has_cached_value: function(cache, arguments_hash){
+		return cache.hasOwnProperty(arguments_hash);
+	},
+	get_cached_value: function(cache, arguments_hash){
+		var data = cache[arguments_hash];
+
+		//for cached dates - return copy
+		if(this.is_date(data)){
+			data = new Date(data);
+		}
+		return data;
+	},
+	is_date: function(value){
+		return (value && value.getUTCDate);
+	},
+	get_arguments_hash:function(args){
+		var values = [];
+		for(var i = 0; i < args.length; i++){
+			values.push(this.stringify_argument(args[i]));
+		}
+		return "(" + values.join(";") + ")";
+	},
+	stringify_argument: function(value){
+		//expecting task or link, or any other data entries, dates and primitive values
+		var ret = "";
+		if(value.id){
+			ret = value.id;
+		}else if(this.is_date(value)){
+			ret = value.valueOf();
+		}else{
+			ret = value;
+		}
+		return ret + "";
+	},
+	activate: function(){
+		this.clear();
+		this.active = true;
+	},
+	deactivate: function(){
+		this.clear();
+		this.active = false;
+	},
+	clear: function(){
+		this.cache = {};
+	},
+
+	setup: function(gantt){
+		var override_gantt = [];
+
+		var gantt_methods  = [
+			'_isCriticalTask',
+			'isCriticalLink',
+			'_isProjectEnd',
+			'_getProjectEnd',
+			'_getSlack'
+		];
+
+
+
+		if(this.mode == 'auto'){
+			if(gantt.config.highlight_critical_path){
+				override_gantt = gantt_methods;
+			}
+		}else if(this.mode === true){
+			override_gantt = gantt_methods;
+		}
+
+		this.wrap_methods(override_gantt, gantt);
+
+	},
+	update_if_changed: function(gantt){
+		var changed = (this.critical_path_mode != gantt.config.highlight_critical_path ||
+						this.mode !== gantt.config.optimize_render);
+		if(changed){
+			this.critical_path_mode = gantt.config.highlight_critical_path;
+			this.mode = gantt.config.optimize_render;
+			this.setup(gantt);
+		}
+	}
+};
+
+function activate(){
+	gantt._cached_functions.update_if_changed(gantt);
+	if(!gantt._cached_functions.active){
+		gantt._cached_functions.activate();
+	}
+	return true;
+}
+gantt.attachEvent("onBeforeGanttRender", activate);
+gantt.attachEvent("onBeforeDataRender", activate);
+gantt.attachEvent("onBeforeSmartRender",  function(){
+	activate();
+});
+gantt.attachEvent("onBeforeParse", activate);
+gantt.attachEvent("onDataRender", function(){
+	gantt._cached_functions.deactivate();
+});
+var deactivTimeout = null;
+gantt.attachEvent("onSmartRender", function(){
+	if(deactivTimeout)
+		clearTimeout(deactivTimeout);
+	deactivTimeout = setTimeout(function(){
+		gantt._cached_functions.deactivate();
+	}, 1000);
+});
+
+gantt.attachEvent("onBeforeGanttReady", function(){
+	gantt._cached_functions.update_if_changed(gantt);
+	return true;
+});
+
+};
+
+/***/ }),
+/* 90 */
+/***/ (function(module, exports) {
+
+function _configure(col, data, force) {
+	for (var key in data)
+		if (typeof col[key] == "undefined" || force)
+			col[key] = data[key];
+}
+
+function _get_skin(force, gantt) {
+	var skin = gantt.skin;
+	if (!skin || force) {
+		var links = document.getElementsByTagName("link");
+		for (var i = 0; i < links.length; i++) {
+			var res = links[i].href.match("dhtmlxgantt_([a-z\_]+).css");
+			if (res) {
+				if (gantt.skins[res[1]] || !skin) {
+					skin = res[1];
+					break;
+				}
+			}
+		}
+	}
+
+	gantt.skin = skin || "terrace";
+	var skinset = gantt.skins[gantt.skin] || gantt.skins["terrace"];
+
+	//apply skin related settings
+	_configure(gantt.config, skinset.config, force);
+
+	var config = gantt.getGridColumns();
+	if (config[1] && !gantt.defined(config[1].width))
+		config[1].width = skinset._second_column_width;
+	if (config[2] && !gantt.defined(config[2].width))
+		config[2].width = skinset._third_column_width;
+	
+	for (var i=0; i<config.length; i++) {
+		var column = config[i];
+		if (column.name == "add") {
+			if(!column.width){
+				column.width = 44;
+			}
+			if (!(gantt.defined(column.min_width) && gantt.defined(column.max_width))) {
+				column.min_width = column.min_width || column.width;
+				column.max_width = column.max_width || column.width;
+			}
+			if (column.min_width)
+				column.min_width = +column.min_width;
+			if (column.max_width)
+				column.max_width = +column.max_width;
+			if (column.width) {
+				column.width = +column.width;
+				column.width = (column.min_width && column.min_width > column.width) ? column.min_width : column.width;
+				column.width = (column.max_width && column.max_width < column.width) ? column.max_width : column.width;
+			}
+		}
+	}
+
+	if (skinset.config.task_height)
+		gantt.config.task_height = skinset.config.task_height || "full"; 
+
+	if (skinset._lightbox_template)
+		gantt._lightbox_template = skinset._lightbox_template;
+
+	if (skinset._redefine_lightbox_buttons) {
+		gantt.config.buttons_right = skinset._redefine_lightbox_buttons["buttons_right"];
+		gantt.config.buttons_left = skinset._redefine_lightbox_buttons["buttons_left"];
+	}
+
+
+	gantt.resetLightbox();
+}
+
+module.exports = function(gantt) {
+	if(!gantt.resetSkin){
+		gantt.resetSkin = function () {
+			this.skin = "";
+			_get_skin(true, this);
+		};
+		gantt.skins = {};
+
+		gantt.attachEvent("onGanttLayoutReady", function(){
+			_get_skin(false, this);
+		});
+	}
+};
+
+/***/ }),
+/* 91 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt) {
+gantt.skins.skyblue = {
+	config:{
+		grid_width:350,
+		row_height: 27,
+		scale_height: 27,
+		link_line_width:1,
+		link_arrow_size:8,
+		lightbox_additional_height:75
+	},
+	_second_column_width:95,
+	_third_column_width:80
+};
+
+};
+
+/***/ }),
+/* 92 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt) {
+gantt.skins.meadow = {
+	config:{
+		grid_width:350,
+		row_height: 27,
+		scale_height: 30,
+		link_line_width:2,
+		link_arrow_size:6,
+		lightbox_additional_height:72
+	},
+	_second_column_width:95,
+	_third_column_width:80
+};
+
+};
+
+/***/ }),
+/* 93 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt) {
+gantt.skins.terrace = {
+	config:{
+		grid_width:360,
+		row_height: 35,
+		scale_height: 35,
+		link_line_width:2,
+		link_arrow_size:6,
+		lightbox_additional_height:75
+	},
+	_second_column_width:90,
+	_third_column_width:70		
+};
+
+};
+
+/***/ }),
+/* 94 */
+/***/ (function(module, exports) {
+
+
+
+module.exports = function(gantt) {
+	gantt.skins.broadway = {
+		config: {
+			grid_width: 360,
+			row_height: 35,
+			scale_height: 35,
+			link_line_width: 1,
+			link_arrow_size: 7,
+			lightbox_additional_height: 86
+		},
+		_second_column_width: 90,
+		_third_column_width: 80,
+
+		_lightbox_template: "<div class='gantt_cal_ltitle'><span class='gantt_mark'>&nbsp;</span><span class='gantt_time'></span><span class='gantt_title'></span><div class='gantt_cancel_btn'></div></div><div class='gantt_cal_larea'></div>",
+		_config_buttons_left: {},
+		_config_buttons_right: {
+			"gantt_delete_btn": "icon_delete",
+			"gantt_save_btn": "icon_save"
+		}
+	};
+};
+
+/***/ }),
+/* 95 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt) {
+	gantt.skins.material = {
+		config: {
+			grid_width: 411,
+			row_height: 34,
+			task_height_offset: 6,
+			scale_height: 36,
+			link_line_width: 2,
+			link_arrow_size: 6,
+			lightbox_additional_height: 80
+		},
+		_second_column_width: 110,
+		_third_column_width: 75,
+		_redefine_lightbox_buttons: {
+			"buttons_left": ["dhx_delete_btn"],
+			"buttons_right": ["dhx_save_btn", "dhx_cancel_btn"]
+		}
+	};
+
+	gantt.attachEvent("onAfterTaskDrag", function (id) {
+		var t = gantt.getTaskNode(id);
+		if (t) {
+			t.className += " gantt_drag_animation";
+			setTimeout(function () {
+				var indx = t.className.indexOf(" gantt_drag_animation");
+				if (indx > -1) {
+					t.className = t.className.slice(0, indx);
+				}
+			}, 200);
+		}
+	});
+
+};
+
+/***/ }),
+/* 96 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt) {
+gantt.skins["contrast_black"] = {
+	config:{
+		grid_width:360,
+		row_height: 35,
+		scale_height: 35,
+		link_line_width:2,
+		link_arrow_size:6,
+		lightbox_additional_height:75
+	},
+	_second_column_width:100,
+	_third_column_width:80
+};
+
+};
+
+/***/ }),
+/* 97 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt) {
+gantt.skins["contrast_white"] = {
+	config:{
+		grid_width:360,
+		row_height: 35,
+		scale_height: 35,
+		link_line_width:2,
+		link_arrow_size:6,
+		lightbox_additional_height:75
+	},
+	_second_column_width:100,
+	_third_column_width:80
+};
+
+};
+
+/***/ }),
+/* 98 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt) {
+
+	gantt.config.touch_drag = 500; //nearly immediate dnd
+	gantt.config.touch = true;
+	gantt.config.touch_feedback = true;
+	gantt.config.touch_feedback_duration = 1;
+	gantt._prevent_touch_scroll = false;
+
+
+	gantt._touch_feedback = function () {
+		if (gantt.config.touch_feedback) {
+			if (navigator.vibrate)
+				navigator.vibrate(gantt.config.touch_feedback_duration);
+		}
+	};
+
+	gantt.attachEvent("onGanttReady", gantt.bind(function(){
+		if (this.config.touch != "force")
+			this.config.touch = this.config.touch &&
+				((navigator.userAgent.indexOf("Mobile") != -1) ||
+					(navigator.userAgent.indexOf("iPad") != -1) ||
+					(navigator.userAgent.indexOf("Android") != -1) ||
+					(navigator.userAgent.indexOf("Touch") != -1));
+
+		if (this.config.touch) {
+
+			var touchEventsSupported = true;
+			try {
+				document.createEvent("TouchEvent");
+			} catch (e) {
+				touchEventsSupported = false;
+			}
+
+			if (touchEventsSupported) {
+				this._touch_events(["touchmove", "touchstart", "touchend"], function (ev) {
+					if (ev.touches && ev.touches.length > 1) return null;
+					if (ev.touches[0])
+						return {
+							target: ev.target,
+							pageX: ev.touches[0].pageX,
+							pageY: ev.touches[0].pageY,
+							clientX: ev.touches[0].clientX,
+							clientY: ev.touches[0].clientY
+						};
+					else
+						return ev;
+				}, function () {
+					return false;
+				});
+			} else if (window.navigator.pointerEnabled) {
+				this._touch_events(["pointermove", "pointerdown", "pointerup"], function (ev) {
+					if (ev.pointerType == "mouse") return null;
+					return ev;
+				}, function (ev) {
+					return (!ev || (ev.pointerType == "mouse" ));
+				});
+			} else if (window.navigator.msPointerEnabled) {
+				this._touch_events(["MSPointerMove", "MSPointerDown", "MSPointerUp"], function (ev) {
+					if (ev.pointerType == ev.MSPOINTER_TYPE_MOUSE) return null;
+					return ev;
+				}, function (ev) {
+					return (!ev || ev.pointerType == ev.MSPOINTER_TYPE_MOUSE);
+				});
+			}
+
+		}
+	}, gantt));
+
+
+	function getTaskDND(){
+		var _tasks_dnd;
+		if(gantt.$ui.getView("timeline")){
+			_tasks_dnd = gantt.$ui.getView("timeline")._tasks_dnd;
+		}
+		return _tasks_dnd;
+	}
+
+	var touchHandlers = [];
+
+//we can't use native scrolling, as we need to sync momentum between different parts
+//so we will block native scroll and use the custom one
+//in future we can add custom momentum
+	gantt._touch_events = function (names, accessor, ignore) {
+		//webkit on android need to be handled separately
+		var dblclicktime = 0;
+		var action_mode = false;
+		var scroll_mode = false;
+		var dblclick_timer = 0;
+		var action_start = null;
+		var scroll_state;
+		var long_tap_timer = null;
+		var current_target = null;
+
+
+
+		for(var i = 0; i < touchHandlers.length; i++){
+			gantt.eventRemove(touchHandlers[i][0], touchHandlers[i][1], touchHandlers[i][2]);
+		}
+		touchHandlers = [];
+
+		//touch move
+		touchHandlers.push([gantt.$container, names[0], function (e) {
+			var _tasks_dnd = getTaskDND();
+
+				if (ignore(e)) return;
+
+				//ignore common and scrolling moves
+				if (!action_mode) return;
+
+				if (long_tap_timer) clearTimeout(long_tap_timer);
+
+				var source = accessor(e);
+				if (_tasks_dnd && (_tasks_dnd.drag.id || _tasks_dnd.drag.start_drag)) {
+					_tasks_dnd.on_mouse_move(source);
+					if (e.preventDefault)
+						e.preventDefault();
+					e.cancelBubble = true;
+					return false;
+				}
+				if (!gantt._prevent_touch_scroll) {
+					if (source && action_start) {
+						var dx = action_start.pageX - source.pageX;
+						var dy = action_start.pageY - source.pageY;
+						if (!scroll_mode && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+							gantt._touch_scroll_active = scroll_mode = true;
+							dblclicktime = 0;
+							scroll_state = gantt.getScrollState();
+						}
+
+						if (scroll_mode) {
+							gantt.scrollTo(scroll_state.x + dx, scroll_state.y + dy);
+							var new_scroll_state = gantt.getScrollState();
+
+							if ((scroll_state.x != new_scroll_state.x && dy > 2 * dx) ||
+								(scroll_state.y != new_scroll_state.y && dx > 2 * dy )) {
+								return block_action(e);
+							}
+						}
+					}
+					return block_action(e);
+				}
+				return true;
+			}]);
+
+
+		//block touch context menu in IE10
+		touchHandlers.push([this.$container, "contextmenu", function (e) {
+			if (action_mode)
+				return block_action(e);
+		}]);
+
+		//touch start
+		touchHandlers.push([this.$container, names[1], function (e) {
+			if (ignore(e)) return;
+			if (e.touches && e.touches.length > 1) {
+				action_mode = false;
+				return;
+			}
+
+			action_start = accessor(e);
+			if (!gantt._locate_css(action_start, "gantt_hor_scroll") && !gantt._locate_css(action_start, "gantt_ver_scroll")) {
+				action_mode = true;
+			}
+			var _tasks_dnd = getTaskDND();
+
+			//long tap
+			long_tap_timer = setTimeout(function () {
+				var taskId = gantt.locate(action_start);
+				if (_tasks_dnd && (taskId && !gantt._locate_css(action_start, "gantt_link_control") && !gantt._locate_css(action_start, "gantt_grid_data"))) {
+					_tasks_dnd.on_mouse_down(action_start);
+
+					if (_tasks_dnd.drag && _tasks_dnd.drag.start_drag) {
+						cloneTaskRendered(taskId);
+						_tasks_dnd._start_dnd(action_start);
+						gantt._touch_drag = true;
+
+						gantt.refreshTask(taskId);
+
+						gantt._touch_feedback();
+					}
+
+				}
+
+				long_tap_timer = null;
+			}, gantt.config.touch_drag);
+		}]);
+
+		//touch end
+		touchHandlers.push([this.$container, names[2], function (e) {
+			if (ignore(e)) return;
+			if (long_tap_timer) clearTimeout(long_tap_timer);
+			gantt._touch_drag = false;
+			action_mode = false;
+			var source = accessor(e);
+
+			var _tasks_dnd = getTaskDND();
+
+			if(_tasks_dnd)
+				_tasks_dnd.on_mouse_up(source);
+
+			if (current_target) {
+				gantt.refreshTask(gantt.locate(current_target));
+				if (current_target.parentNode) {
+					current_target.parentNode.removeChild(current_target);
+					gantt._touch_feedback();
+				}
+			}
+
+			gantt._touch_scroll_active = action_mode = scroll_mode = false;
+			current_target = null;
+
+			//dbl-tap handling
+			if (action_start && dblclicktime) {
+				var now = new Date();
+				if ((now - dblclicktime) < 500) {
+
+					var mouseEvents = gantt.$services.getService("mouseEvents");
+					mouseEvents.onDoubleClick(action_start);
+					block_action(e);
+				} else
+					dblclicktime = now;
+			} else {
+				dblclicktime = new Date();
+			}
+		}]);
+
+		for(var i = 0; i < touchHandlers.length; i++){
+			gantt.event(touchHandlers[i][0], touchHandlers[i][1], touchHandlers[i][2]);
+		}
+
+		//common helper, prevents event
+		function block_action(e) {
+			if (e && e.preventDefault)
+				e.preventDefault();
+			(e || event).cancelBubble = true;
+			return false;
+		}
+
+		function cloneTaskRendered(taskId) {
+			var renders = gantt._getTaskLayers();
+			var task = gantt.getTask(taskId);
+			if (task && gantt.isTaskVisible(taskId)) {
+				for (var i = 0; i < renders.length; i++) {
+					task = renders[i].rendered[taskId];
+					if (task && task.getAttribute("task_id") && task.getAttribute("task_id") == taskId) {
+						var copy = task.cloneNode(true);
+						current_target = task;
+						renders[i].rendered[taskId] = copy;
+						task.style.display = "none";
+						copy.className += " gantt_drag_move ";
+						task.parentNode.appendChild(copy);
+						//return copy;
+					}
+				}
+			}
+		}
+	};
+
+};
+
+/***/ }),
+/* 99 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt) {
+	gantt.locale = {
+		date: {
+			month_full: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+			month_short: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+			day_full: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+			day_short: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+		},
+		labels: {
+			new_task: "New task",
+			icon_save: "Save",
+			icon_cancel: "Cancel",
+			icon_details: "Details",
+			icon_edit: "Edit",
+			icon_delete: "Delete",
+			confirm_closing: "",//Your changes will be lost, are you sure?
+			confirm_deleting: "Task will be deleted permanently, are you sure?",
+			section_description: "Description",
+			section_time: "Time period",
+			section_type: "Type",
+
+			/* grid columns */
+			column_wbs: "WBS",
+			column_text: "Task name",
+			column_start_date: "Start time",
+			column_duration: "Duration",
+			column_add: "",
+
+			/* link confirmation */
+			link: "Link",
+			confirm_link_deleting: "will be deleted",
+			link_start: " (start)",
+			link_end: " (end)",
+
+			type_task: "Task",
+			type_project: "Project",
+			type_milestone: "Milestone",
+
+			minutes: "Minutes",
+			hours: "Hours",
+			days: "Days",
+			weeks: "Week",
+			months: "Months",
+			years: "Years",
+
+			/* message popup */
+			message_ok: "OK",
+			message_cancel: "Cancel"
+
+		}
+	};
+};
+
+
+
+/***/ }),
+/* 100 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var domHelpers = __webpack_require__(1),
+	helpers = __webpack_require__(6);
+
+module.exports = function(gantt){
+	var calculateScaleRange = __webpack_require__(17);
+
+	gantt.assert = __webpack_require__(101)(gantt);
+
+//initial initialization
+	gantt.init = function(node, from, to){
+		if(from && to){
+			this.config.start_date = this._min_date = new Date(from);
+			this.config.end_date = this._max_date = new Date(to);
+		}
+		this.date.init();
+
+		if (!this.config.scroll_size)
+			this.config.scroll_size = domHelpers.getScrollSize() || 1;
+
+		var resizeDelay;
+		gantt.event(window, "resize", function(){
+			clearTimeout(resizeDelay);
+			resizeDelay = setTimeout(function(){
+				gantt.render();
+			}, 300);
+		});
+
+		//can be called only once
+		this.init = function(node){
+			if (this.$container && this.$container.parentNode){
+				this.$container.parentNode.removeChild(this.$container);
+				this.$container = null;
+			}
+
+			if(this.$layout){
+				this.$layout.clear();
+			}
+			this._reinit(node);
+		};
+
+		this._reinit(node);
+	};
+
+	gantt._reinit = function(node){
+		this.callEvent("onBeforeGanttReady", []);
+		//this._init_tasks_range();
+		this.resetLightbox();
+		this._update_flags();
+
+
+		var config = this.$services.getService("templateLoader");
+		config.initTemplates(this);
+
+		this._clearTaskLayers();
+		this._clearLinkLayers();
+
+		//this.clear
+		if(this.$layout){
+			this.$layout.destructor();
+			this.$ui.reset();
+		}
+
+		this.$root = domHelpers.toNode(node);
+		if(this.$root){
+			this.$root.innerHTML = "";
+		}
+		this.$root.gantt = this;
+		calculateScaleRange(this);
+		this.config.layout.id = "main";
+		this.$layout = this.$ui.createView("layout", node, this.config.layout);
+
+		this.$layout.attachEvent("onBeforeResize", function(){
+			var storeNames = gantt.$services.getService("datastores");
+			for(var i = 0; i < storeNames.length; i++){
+				gantt.getDatastore(storeNames[i]).filter();
+			}
+		});
+
+		this.$layout.attachEvent("onResize", function(){
+			gantt.refreshData();
+		});
+
+		this.callEvent("onGanttLayoutReady", []);
+		this.$layout.render();
+
+		gantt.$container = this.$layout.$container.firstChild;
+		this.callEvent("onTemplatesReady",[]);
+		this.$mouseEvents.reset(this.$root);
+		this.callEvent("onGanttReady", []);
+
+		this.render();
+	};
+
+	gantt.$click={
+		buttons:{
+			"edit":function(id){
+				gantt.showLightbox(id);
+			},
+			"delete":function(id){
+				var question = gantt.locale.labels.confirm_deleting;
+				var title = gantt.locale.labels.confirm_deleting_title;
+
+				gantt._dhtmlx_confirm(question, title, function(){
+					if(!gantt.isTaskExists(id)){
+						gantt.hideLightbox();
+						return;
+					}
+
+					var task = gantt.getTask(id);
+					if(task.$new){
+						gantt.silent(function(){
+							gantt.deleteTask(id, true);
+						});
+						gantt.refreshData();
+					}else{
+						gantt.deleteTask(id);
+					}
+
+					gantt.hideLightbox();
+				});
+			}
+		}
+	};
+
+	gantt.getScrollState = function(){
+		var state = this._scroll_state();
+		return { x:state.x_pos, y:state.y_pos, inner_width:state.x, inner_height:state.y, width: state.x_inner, height: state.y_inner };
+	};
+
+	gantt.scrollTo = function(left, top){
+		var vertical = this._getVerticalScrollbar();
+		var horizontal = this._getHorizontalScrollbar();
+
+		var oldV = vertical.getScrollState(),
+			oldH = horizontal.getScrollState();
+
+		if (left*1 == left){
+			horizontal.scroll(left);
+		}
+		if(top*1 == top){
+			vertical.scroll(top);
+		}
+
+		var newV = vertical.getScrollState(),
+			newH = horizontal.getScrollState();
+
+		this.callEvent("onGanttScroll", [oldH.position, oldV.position, newH.position, newV.position]);
+	};
+
+	gantt.showDate = function(date){
+		var date_x = this.posFromDate(date);
+		var scroll_to = Math.max(date_x - this.config.task_scroll_offset, 0);
+		this.scrollTo(scroll_to);
+	};
+	gantt.showTask = function(id) {
+		var pos = this.getTaskPosition(this.getTask(id));
+
+		var left = Math.max(pos.left - this.config.task_scroll_offset, 0);
+
+		var dataHeight = this._scroll_state().y;
+		var top;
+		if(!dataHeight){
+			top = pos.top;
+		}else{
+			top = pos.top - (dataHeight - this.config.row_height)/2;
+		}
+
+		this.scrollTo(left, top);
+	};
+
+//renders self
+	gantt.render = function(){
+		this.callEvent("onBeforeGanttRender", []);
+
+		var pos = this.getScrollState();
+		var posX = pos ? pos.x : 0;
+		if(this._getHorizontalScrollbar()){
+			var scrollbar = this._getHorizontalScrollbar();
+			posX = scrollbar.$config.codeScrollLeft || posX || 0;
+		}
+
+
+		var visible_date = null;
+		if(posX){
+			visible_date = gantt.dateFromPos(posX + this.config.task_scroll_offset);
+		}
+		calculateScaleRange(this);
+
+		this.$layout.$config.autosize = this.config.autosize;
+		this.$layout.resize();
+
+		if(this.config.preserve_scroll && pos){
+
+			if(posX){
+				var new_pos = gantt.getScrollState();
+				var new_date = gantt.dateFromPos(new_pos.x);
+				if(!(+visible_date == +new_date && new_pos.y == pos.y)){
+					if(visible_date){
+						this.showDate(visible_date);
+					}
+					if(pos.y)
+						gantt.scrollTo(undefined, pos.y);
+				}
+			}
+		}
+
+		this.callEvent("onGanttRender", []);
+	};
+
+	//TODO: add layout.resize method that wouldn't trigger data repaint
+	gantt.setSizes = gantt.render;
+
+	gantt._scroll_state = function(){
+		var result = {
+			x: false,
+			y: false,
+			x_pos: 0,
+			y_pos: 0,
+			scroll_size: this.config.scroll_size + 1,//1px for inner content
+			x_inner: 0,
+			y_inner: 0
+		};
+
+		var scrollVer = gantt._getVerticalScrollbar(),
+			scrollHor = gantt._getHorizontalScrollbar();
+		if(scrollHor){
+			var horState = scrollHor.getScrollState();
+			if(horState.visible){
+				result.x = horState.size;
+				result.x_inner = horState.scrollSize;
+			}
+			result.x_pos = horState.position || 0;
+		}
+
+		if(scrollVer){
+			var verState = scrollVer.getScrollState();
+			if(verState.visible){
+				result.y = verState.size;
+
+				result.y_inner = verState.scrollSize;
+			}
+			result.y_pos = verState.position || 0;
+		}
+
+		return result;
+	};
+
+	gantt.locate = function(e) {
+		var trg = domHelpers.getTargetNode(e);
+
+		//ignore empty cells
+		var className = domHelpers.getClassName(trg);
+		if ((className || "").indexOf("gantt_task_cell") >= 0) return null;
+
+		var targetAttribute = arguments[1] || this.config.task_attribute;
+
+		var node = domHelpers.locateAttribute(trg, targetAttribute);
+		if(node){
+			return node.getAttribute(targetAttribute);
+		}else{
+			return null;
+		}
+	};
+
+	gantt._locate_css = function(e, classname, strict){
+		return domHelpers.locateClassName(e, classname, strict);
+	};
+
+	gantt._locateHTML = function(e, attribute) {
+		return domHelpers.locateAttribute(e, attribute || this.config.task_attribute);
+	};
+
+	gantt.getTaskRowNode = function(id) {
+		var els = this.$grid_data.childNodes;
+		var attribute = this.config.task_attribute;
+		for (var i = 0; i < els.length; i++) {
+			if (els[i].getAttribute) {
+				var value = els[i].getAttribute(attribute);
+				if (value == id) return els[i];
+			}
+		}
+		return null;
+	};
+
+	gantt.changeLightboxType = function(type){
+		if(this.getLightboxType() == type)
+			return true;
+		gantt._silent_redraw_lightbox(type);
+	};
+
+
+	gantt._get_link_type = function (from_start, to_start) {
+		var type = null;
+		if (from_start && to_start) {
+			type = gantt.config.links.start_to_start;
+		} else if (!from_start && to_start) {
+			type = gantt.config.links.finish_to_start;
+		} else if (!from_start && !to_start) {
+			type = gantt.config.links.finish_to_finish;
+		} else if (from_start && !to_start) {
+			type = gantt.config.links.start_to_finish;
+		}
+		return type;
+	};
+
+	gantt.isLinkAllowed = function (from, to, from_start, to_start) {
+		var link = null;
+		if (typeof(from) == "object") {
+			link = from;
+		} else {
+			link = {source: from, target: to, type: this._get_link_type(from_start, to_start)};
+		}
+
+		if (!link) return false;
+		if (!(link.source && link.target && link.type)) return false;
+		if (link.source == link.target) return false;
+
+		var res = true;
+		//any custom rules
+		if (this.checkEvent("onLinkValidation"))
+			res = this.callEvent("onLinkValidation", [link]);
+
+		return res;
+	};
+
+
+	gantt._correct_dst_change = function(date, prevOffset, step, unit){
+		var time_unit = helpers.getSecondsInUnit(unit) * step;
+		if(time_unit > 60*60 && time_unit < 60*60*24){
+			//correct dst change only if current unit is more than one hour and less than day (days have own checking), e.g. 12h
+			var offsetChanged = date.getTimezoneOffset() - prevOffset;
+			if(offsetChanged){
+				date = gantt.date.add(date, offsetChanged, "minute");
+			}
+		}
+		return date;
+	};
+
+	gantt.getGridColumns = function(){
+		return gantt.config.columns.slice();
+	};
+
+	gantt._is_icon_open_click = function(e) {
+		if (!e)
+			return false;
+		var target = e.target || e.srcElement;
+		if (!(target && target.className))
+			return false;
+		var className = domHelpers.getClassName(target);
+		if (className.indexOf("gantt_tree_icon") !== -1 && (className.indexOf("gantt_close") !== -1 || className.indexOf("gantt_open") !== -1))
+			return true;
+		return false;
+	};
+
+};
+
+/***/ }),
+/* 101 */
+/***/ (function(module, exports) {
+
+/*
+ 	asserts will be removed in final code, so you can place them anythere
+	without caring about performance impacts
+*/
+
+module.exports = function(gantt){
+	return function assert(check, message){
+		//jshint -W087
+		if (!check){
+			if(gantt.config.show_errors && gantt.callEvent("onError",[message]) !== false) {
+				gantt.message({type: "error", text: message, expire: -1});
+				debugger;
+			}
+		}
+	};
+};
+
+/***/ }),
+/* 102 */
+/***/ (function(module, exports) {
+
+function extend(gantt){
+
+	gantt.destructor = function(){
+		gantt.callEvent("onDestroy", []);
+
+		this.clearAll();
+		this.detachAllEvents();
+
+		if(this.$root){
+			delete this.$root.gantt;
+		}
+
+		this._eventRemoveAll();
+		if(this.$layout){
+			this.$layout.destructor();
+		}
+
+		this.resetLightbox();
+
+		if(this._dp && this._dp.destructor){
+			this._dp.destructor();
+		}
+
+		this.$services.destructor();
+
+		for(var i in this){
+			if(i.indexOf("$") === 0){
+				delete this[i];
+			}
+		}
+	};
+}
+
+module.exports = extend;
+
+
+/***/ }),
+/* 103 */
+/***/ (function(module, exports) {
+
+module.exports = function(gantt){
+
+	function deprecated(badCode, goodCode) {
+
+		var formatting = gantt.env.isIE ? "" : "%c";
+
+
+		var message = [
+			formatting, "\"", badCode, "\"",  formatting,
+			" has been deprecated in dhtmlxGantt v4.0 and will stop working in v6.0. Use ",
+			formatting, "\"", goodCode, "\"",  formatting,
+			" instead. \nSee more details at http://docs.dhtmlx.com/gantt/migrating.html "
+		].join("");
+
+		var log = window.console.warn || window.console.log;
+
+		var args = [message];
+		if(!gantt.env.isIE){
+			args = args.concat(["font-weight:bold", "font-weight:normal", "font-weight:bold", "font-weight:normal"]);
+		}
+
+		log.apply(window.console, args);
+	}
+
+	function wrapDeprecated(method) {
+		return function () {
+			deprecated("dhtmlx." + method, "gantt." + method);
+			return gantt[method].apply(gantt, arguments);
+		};
+	}
+
+	/* dhtmlx */
+
+
+	if (!window.dhtmlx)
+		window.dhtmlx = {};
+
+	var dhtmlxMethods = [
+		"message",
+		"alert",
+		"confirm",
+		"modalbox",
+		"uid",
+		"copy",
+		"mixin",
+		"defined",
+		"bind",
+		"assert"
+	];
+
+	var dynMethods = [];
+
+	for(var i = 0; i < dhtmlxMethods.length; i++){
+		// wrap dhtmlx methods with 'deprecated' warnings
+		// do not wrap if methods are defined by dhtmlxSuite
+		if(!window.dhtmlx[dhtmlxMethods[i]]){
+			dynMethods.push(dhtmlxMethods[i]);
+			dhtmlx[dhtmlxMethods[i]] = wrapDeprecated(dhtmlxMethods[i]);
+		}
+	}
+
+	gantt.attachEvent("onDestroy", function(){
+		for(var i = 0; i < dynMethods.length; i++){
+			delete window.dhtmlx[dynMethods[i]];
+		}
+		dynMethods = null;
+
+	});
+
+	/* global functions */
+
+
+	if (!window.dataProcessor) {
+		window.dataProcessor = function (url) {
+			deprecated("new dataProcessor(url)", "new gantt.dataProcessor(url)");
+			return new gantt.dataProcessor(url);
+		};
+		gantt.attachEvent("onDestroy", function(){
+			window.dataProcessor = null;
+		});
+	}
+
+};
+
+/***/ })
+/******/ ]);
