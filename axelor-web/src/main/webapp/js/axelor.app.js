@@ -343,7 +343,7 @@
     axelor.unblockUI = function() {
       return unblock();
     };
-    
+
     function notSilent(config) {
       return config && !config.silent;
     }
@@ -368,7 +368,7 @@
       responseError: function(error) {
         if (notSilent(error.config)) {
           onHttpStop();
-          $rootScope.$broadcast('event:http-error', error);          
+          $rootScope.$broadcast('event:http-error', error);
         }
         return $q.reject(error);
       }
