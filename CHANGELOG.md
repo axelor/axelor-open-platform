@@ -3,6 +3,7 @@
 #### Bugs
 
 * Fix RequestTest
+* Fix Query#update with several fields
 
 ## 5.0.18 (2019-09-19)
 
