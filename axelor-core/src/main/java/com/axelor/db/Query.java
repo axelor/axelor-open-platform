@@ -19,6 +19,7 @@ package com.axelor.db;
 
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.auth.db.User;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.hibernate.type.JsonFunction;
 import com.axelor.db.internal.DBHelper;
@@ -28,6 +29,7 @@ import com.axelor.db.mapper.PropertyType;
 import com.axelor.rpc.Resource;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.time.LocalDateTime;
@@ -430,9 +432,7 @@ public class Query<T extends Model> {
    * @return total number of records updated
    */
   public int update(String name, Object value) {
-    Map<String, Object> values = new HashMap<>();
-    values.put(name.replaceFirst("^self\\.", ""), value);
-    return update(values);
+    return update(ImmutableMap.of(name, value));
   }
 
   /**
@@ -446,6 +446,10 @@ public class Query<T extends Model> {
    * @return total number of records updated
    */
   public int update(Map<String, Object> values, User updatedBy) {
+    if (ObjectUtils.isEmpty(values)) {
+      return 0;
+    }
+
     final Map<String, Object> params = new HashMap<>();
     final Map<String, Object> namedParams = new HashMap<>();
     final List<String> where = new ArrayList<>();
@@ -454,9 +458,9 @@ public class Query<T extends Model> {
       namedParams.putAll(this.namedParams);
     }
 
-    for (String key : values.keySet()) {
-      String name = key.replaceFirst("^self\\.", "");
-      Object value = values.get(key);
+    for (final Entry<String, Object> entry : values.entrySet()) {
+      String name = entry.getKey().replaceFirst("^self\\.", "");
+      Object value = entry.getValue();
       params.put(name, value);
       if (value == null) {
         where.add("self." + name + " IS NOT NULL");
@@ -475,11 +479,12 @@ public class Query<T extends Model> {
     boolean versioned = updatedBy != null;
     boolean notMySQL = !DBHelper.isMySQL();
 
-    String whereClause = String.join(" AND ", where);
-    String selectQuery = updateQuery().replaceFirst("SELECT self", "SELECT self.id");
+    String whereClause = String.join(" OR ", where);
+    String selectQuery =
+        selectQuery().replaceFirst("SELECT self", "SELECT self.id").replaceFirst(" ORDER BY.*", "");
 
     if (selectQuery.contains(" WHERE ")) {
-      selectQuery = selectQuery.replaceFirst(" WHERE ", " WHERE " + whereClause + " AND ");
+      selectQuery = selectQuery.replaceFirst(" WHERE ", " WHERE (" + whereClause + ") AND (") + ")";
     } else {
       selectQuery = selectQuery + " WHERE " + whereClause;
     }
@@ -530,9 +535,7 @@ public class Query<T extends Model> {
    * @return total number of records updated
    */
   public int update(String name, Object value, User updatedBy) {
-    Map<String, Object> values = new HashMap<>();
-    values.put(name.replaceFirst("^self\\.", ""), value);
-    return update(values, updatedBy);
+    return update(ImmutableMap.of(name, value), updatedBy);
   }
 
   /**

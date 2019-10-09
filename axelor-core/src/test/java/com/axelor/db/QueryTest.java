@@ -20,6 +20,7 @@ package com.axelor.db;
 import com.axelor.JpaTest;
 import com.axelor.test.db.Circle;
 import com.axelor.test.db.Contact;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 import java.sql.Connection;
@@ -157,12 +158,29 @@ public class QueryTest extends JpaTest {
     for (Contact c : q.fetch()) {
       Assert.assertNull(c.getLang());
     }
+
+    final String lang = "EN";
+    final String food = "pizza";
+
     // managed instances are not affected with mass update
     // so clear the session to avoid unexpected results
     getEntityManager().clear();
-    q.update("self.lang", "EN");
+
+    // Update one field
+    q.update("self.lang", lang);
+
     for (Contact c : q.fetch()) {
-      Assert.assertEquals("EN", c.getLang());
+      Assert.assertEquals(lang, c.getLang());
+    }
+
+    getEntityManager().clear();
+
+    // Update several fields
+    q.update(ImmutableMap.of("self.lang", lang, "self.food", food));
+
+    for (Contact c : q.fetch()) {
+      Assert.assertEquals(lang, c.getLang());
+      Assert.assertEquals(food, c.getFood());
     }
   }
 
