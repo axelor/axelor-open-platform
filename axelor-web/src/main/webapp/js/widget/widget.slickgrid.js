@@ -1996,7 +1996,7 @@ Grid.prototype.showEditor = function (activeCell) {
         doCommit().then(function () { grid.onClick.notify(args, e, grid); });
       }
     });
-    
+
     $(grid.getCanvasNode()).parent().scroll(function (e) {
       if (that.isEditActive()) {
         e.target.scrollTop = that._lastScrollTop;

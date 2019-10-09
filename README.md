@@ -1,4 +1,4 @@
-# Axelor Development Kit
+# Axelor Open Platform
 
 [uri_axelor]: https://www.axelor.com
 [uri_docs]: https://docs.axelor.com/adk/latest/
@@ -10,7 +10,7 @@
 
 [![License: AGPL v3][uri_license_image]][uri_license]
 
-Axelor Development Kit (ADK) is an open source Java framework to create modern business applications.
+Axelor Open Platform is an open source Java framework to create modern business applications.
 
 ## Getting Started
 
