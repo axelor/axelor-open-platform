@@ -55,6 +55,8 @@ public class AuthPac4jProfileService {
   @Inject protected PermissionRepository permissionRepo;
   @Inject protected MetaSelectRepository metaSelectRepo;
 
+  public static final String GROUP_ATTRIBUTE = "group";
+
   public String getCodeOrEmail(CommonProfile profile) {
     return Stream.of(profile.getUsername(), profile.getEmail(), profile.getId())
         .filter(StringUtils::notBlank)
@@ -153,7 +155,7 @@ public class AuthPac4jProfileService {
 
   @Nullable
   public Group getGroup(CommonProfile profile) {
-    return Optional.ofNullable(profile.getAttribute("group"))
+    return Optional.ofNullable(profile.getAttribute(GROUP_ATTRIBUTE))
         .map(String::valueOf)
         .map(groupRepo::findByCode)
         .orElse(null);
@@ -162,7 +164,7 @@ public class AuthPac4jProfileService {
   @Nullable
   public Group getGroup(CommonProfile profile, String defaultGroupCode) {
     final String groupCode =
-        Optional.ofNullable(profile.getAttribute("group"))
+        Optional.ofNullable(profile.getAttribute(GROUP_ATTRIBUTE))
             .map(String::valueOf)
             .orElse(defaultGroupCode);
     return groupRepo.findByCode(groupCode);

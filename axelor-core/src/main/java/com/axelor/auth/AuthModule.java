@@ -19,7 +19,6 @@ package com.axelor.auth;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.auth.ldap.AuthLdapModule;
 import com.axelor.auth.pac4j.AuthPac4jModuleCas;
 import com.axelor.auth.pac4j.AuthPac4jModuleLocal;
 import com.axelor.auth.pac4j.AuthPac4jModuleOAuth;
@@ -61,12 +60,6 @@ public class AuthModule extends AbstractModule {
 
     // observe authentication-related events
     bind(AuthObserver.class);
-
-    // LDAP
-    if (AuthLdapModule.isEnabled()) {
-      install(new AuthLdapModule(context));
-      return;
-    }
 
     // Pac4j
     final AppSettings settings = AppSettings.get();

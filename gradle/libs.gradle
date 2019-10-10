@@ -14,6 +14,7 @@ versions.jackson = "2.8.8"
 versions.shiro = "1.4.1"
 versions.buji_pac4j = "4.1.1"
 versions.pac4j = "3.8.2"
+versions.ldaptive = "1.2.4"
 
 versions.junit = "4.12"
 versions.slf4j = "1.7.25"
@@ -170,7 +171,9 @@ libs.pac4j = [
   "org.pac4j:pac4j-oauth:${versions.pac4j}",
   "org.pac4j:pac4j-saml:${versions.pac4j}",
   "org.pac4j:pac4j-cas:${versions.pac4j}",
-  "org.pac4j:pac4j-http:${versions.pac4j}"
+  "org.pac4j:pac4j-http:${versions.pac4j}",
+  "org.pac4j:pac4j-ldap:${versions.pac4j}",
+  "org.ldaptive:ldaptive:${versions.ldaptive}"
 ]
 
 libs.pac4j_core = [

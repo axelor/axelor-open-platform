@@ -146,6 +146,29 @@ public interface AvailableAppSettings {
   String LDAP_USER_BASE = "ldap.user.base";
   String LDAP_USER_FILTER = "ldap.user.filter";
 
+  String AUTH_LDAP_SERVER_URL = "auth.ldap.server.url";
+  String AUTH_LDAP_USER_BASE = "auth.ldap.user.base";
+  String AUTH_LDAP_USER_FILTER = "auth.ldap.user.filter";
+  String AUTH_LDAP_USER_ID_ATTRIBUTE = "auth.ldap.user.id.attribute";
+  String AUTH_LDAP_GROUP_BASE = "auth.ldap.group.base";
+  String AUTH_LDAP_GROUP_FILTER = "auth.ldap.group.filter";
+  String AUTH_LDAP_SYSTEM_USER = "auth.ldap.system.user";
+  String AUTH_LDAP_SYSTEM_PASSWORD = "auth.ldap.system.password";
+  String AUTH_LDAP_AUTH_TYPE = "auth.ldap.auth.type";
+  String AUTH_LDAP_USE_SSL = "auth.ldap.use.ssl";
+  String AUTH_LDAP_USE_STARTTLS = "auth.ldap.use.starttls";
+  String AUTH_LDAP_CREDENTIAL_TRUST_STORE = "auth.ldap.credential.trust.store";
+  String AUTH_LDAP_CREDENTIAL_KEY_STORE = "auth.ldap.credential.key.store";
+  String AUTH_LDAP_CREDENTIAL_STORE_PASSWORD = "auth.ldap.credential.store.password";
+  String AUTH_LDAP_CREDENTIAL_STORE_TYPE = "auth.ldap.credential.store.type";
+  String AUTH_LDAP_CREDENTIAL_STORE_ALIASES = "auth.ldap.credential.store.aliases";
+  String AUTH_LDAP_CREDENTIAL_TRUST_CERTIFICATES = "auth.ldap.credential.trust.certificates";
+  String AUTH_LDAP_CREDENTIAL_AUTHENTICATION_CERTIFICATE =
+      "auth.ldap.credential.authentication.certificate";
+  String AUTH_LDAP_CREDENTIAL_AUTHENTICATION_KEY = "auth.ldap.credential.authentication.key";
+  String AUTH_LDAP_CONNECT_TIMEOUT = "auth.ldap.connect.timeout";
+  String AUTH_LDAP_RESPONSE_TIMEOUT = "auth.ldap.response.timeout";
+
   String AUTH_LOCAL_BASIC_AUTH_ENABLED = "auth.local.basic.auth.enabled";
 
   String AUTH_CAS_LOGIN_URL = "auth.cas.login.url";
