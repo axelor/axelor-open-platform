@@ -1061,7 +1061,7 @@
         </xsd:attribute>
         <xsd:attribute name="canDelete" type="xsd:boolean">
           <xsd:annotation>
-            <xsd:documentation>Specify whether to show the 'Remove' button.</xsd:documentation>
+            <xsd:documentation>Specify whether to show the 'Delete' button.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canArchive" type="xsd:boolean">
@@ -1441,7 +1441,7 @@
         </xsd:attribute>
         <xsd:attribute name="canDelete" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Show the 'Remove' button if the given JavaScript expression is true.</xsd:documentation>
+            <xsd:documentation>Show the 'Delete' button if the given JavaScript expression is true.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canArchive" type="xsd:string">
@@ -1812,6 +1812,16 @@
 
             orderBy="name,-age"
             </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canEdit" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the 'Edit' button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canDelete" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the 'Delete' button.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>

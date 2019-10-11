@@ -128,6 +128,16 @@ function BaseCardsCtrl(type, $scope, $element) {
       _archived: ds._showArchived
     }, ds._filter);
   };
+
+  $scope.canEdit = function() {
+    var view = $scope.schema;
+    return view.canEdit === undefined || view.canEdit;
+  };
+
+  $scope.canDelete = function() {
+    var view = $scope.schema;
+    return view.canDelete === undefined || view.canDelete;
+  };
 }
 
 ui.controller("CardsCtrl", ['$scope', '$element', function CardsCtrl($scope, $element) {

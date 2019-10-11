@@ -51,6 +51,10 @@ public class CardsView extends AbstractView {
 
   @XmlCDATA @XmlElement private String template;
 
+  @XmlAttribute private Boolean canEdit;
+
+  @XmlAttribute private Boolean canDelete;
+
   public String getOrderBy() {
     return orderBy;
   }
@@ -129,5 +133,21 @@ public class CardsView extends AbstractView {
 
   public void setTemplate(String template) {
     this.template = template;
+  }
+
+  public Boolean getCanEdit() {
+    return canEdit;
+  }
+
+  public void setCanEdit(Boolean canEdit) {
+    this.canEdit = canEdit;
+  }
+
+  public Boolean getCanDelete() {
+    return canDelete;
+  }
+
+  public void setCanDelete(Boolean canDelete) {
+    this.canDelete = canDelete;
   }
 }
