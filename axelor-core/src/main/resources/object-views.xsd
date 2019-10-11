@@ -1233,6 +1233,7 @@
             <xsd:documentation>Specify whether the rows can be moved to re-orders by sequence.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="showTitle" use="prohibited" />
         <xsd:attributeGroup ref="tns:RelationalAttributes" />
       </xsd:extension>
     </xsd:complexContent>
