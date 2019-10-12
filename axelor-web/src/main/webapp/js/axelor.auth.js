@@ -75,18 +75,13 @@ angular.module('axelor.auth', []).provider('authService', function() {
   $httpProvider.interceptors.push(['$rootScope', '$q', function($rootScope, $q) {
     return {
       responseError: function error(response) {
-        if (response.status === 401) {
-          if (axelor.config['auth.central.client']) {
+        if (response.status === 401 && axelor.config['auth.central.client']) {
             // redirect to central login page
             window.location.href = './?client_name=' + axelor.config['auth.central.client']
               + "&hash_location=" + encodeURIComponent(window.location.hash);
-          } else if (!response.config || !response.config.silent) {
-            // ajax login
-            $rootScope.$broadcast('event:auth-loginRequired', response.data);
-          }
-          return $q.reject(response);
+            return $q.reject(response);
         }
-        if (response.status === 502 || (response.status === 0 && !response.data)) {
+        if (response.status === 401 || response.status === 502 || (response.status === 0 && !response.data)) {
           var deferred = $q.defer();
           authServiceProvider.pushToBuffer(response.config, deferred);
           if (!response.config.silent) {
