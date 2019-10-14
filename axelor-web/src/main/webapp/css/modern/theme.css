@@ -559,6 +559,22 @@ header .navbar .nav .dropdown-menu {
   background-color: #fff;
 }
 
+.dropdown-menu {
+  background: #FFFFFF;
+}
+
+.dropdown-menu > li > a {
+  color: #A8B1C2;
+}
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus,
+.dropdown-submenu:hover > a,
+.dropdown-submenu:focus > a {
+  background: #fff;
+  color: #3ECF8E;
+}
+
 [ui-view-form] input,
 [ui-view-form] textarea,
 [ui-view-form] select,
@@ -645,9 +661,22 @@ header .navbar .nav .dropdown-menu {
   margin-left: 0;
 }
 
-.navbar .btn-group .btn:not(:disabled):hover {
-  background: #2185D0;
-  color: #fff;
+.navbar .btn-group .btn:focus {
+  color: #6772E5;
+}
+
+.navbar .btn-group .btn:focus,
+.navbar .btn-group .btn:active,
+.navbar .btn-group .btn:hover {
+  background: none;
+  box-shadow: none;
+  outline: none;
+  color: #3ECF8E;
+}
+
+.navbar .dropdown-toggle,
+.navbar .dropdown-toggle:active {
+  box-shadow: none;
 }
 
 .panel-layout .form-item > .btn-group .btn {
