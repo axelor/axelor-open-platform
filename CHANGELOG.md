@@ -2,8 +2,15 @@
 
 #### Bugs
 
-* Fix RequestTest
+* Silent requests should not hide loading indicator
+* Fix archived records not displayed when simple filter and advance filter are applied
 * Fix Query#update with several fields
+* Fix JNDI data source not working
+* Fix dotted fields setting unwanted intermediate records
+* Fix popup editor issue when a tab is opened from it
+* Fix dashlet refresh issue
+* Fix table layout on field editor
+* Fix collection fields with editor validation issue
 
 ## 5.0.18 (2019-09-19)
 
