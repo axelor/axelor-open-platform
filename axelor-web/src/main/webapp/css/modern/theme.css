@@ -473,6 +473,27 @@ header .navbar .nav .dropdown-menu {
   box-shadow: 3px 4px 8px 0px rgba(0,0,0,0.2);
 }
 
+.sidebar {
+  background: #32325D;
+}
+.sidebar .nav-tree > li.open,
+.sidebar .nav-tree > li.active,
+.sidebar .nav-tree li > a:hover,
+.sidebar .nav-tree li.active > a {
+  background-color: #29294C;
+}
+
+.sidebar .nav-tree li > a {
+  font-weight: normal;
+  color: #DEDEDE;
+}
+
+.sidebar .nav-tree li > a:hover,
+.sidebar .nav-tree li.active > a {
+  font-weight: 600;
+  color: #fff;
+}
+
 .navbar-inner,
 .panel .panel-header,
 .slickgrid .slick-header,
