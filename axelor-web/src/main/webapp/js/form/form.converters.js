@@ -41,7 +41,7 @@
     }
     return value;
   }
-  
+
   function canSetNested(record, name) {
     if (record && name && name in record) {
       return true;
