@@ -380,7 +380,7 @@
       },
       responseError: function(error) {
         if (notSilent(error.config)) {
-    	  onHttpStop();
+        onHttpStop();
           $rootScope.$broadcast('event:http-error', error);
         }
         return $q.reject(error);
