@@ -68,12 +68,13 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.authorization.authorizer.csrf.CsrfAuthorizer;
-import org.pac4j.core.authorization.authorizer.csrf.CsrfTokenGeneratorAuthorizer;
+import org.pac4j.core.authorization.authorizer.csrf.CsrfTokenGenerator;
 import org.pac4j.core.authorization.authorizer.csrf.DefaultCsrfTokenGenerator;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.client.DirectClient;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.context.Cookie;
 import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.Pac4jConstants;
@@ -100,6 +101,9 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
   private static final String CSRF_TOKEN_AUTHORIZER_NAME = "axelorCsrfToken";
   private static final String CSRF_AUTHORIZER_NAME = "axelorCsrf";
+
+  private static final String CSRF_COOKIE_NAME = "CSRF-TOKEN";
+  private static final String CSRF_HEADER_NAME = "X-CSRF-Token";
 
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -242,9 +246,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       final Clients clients = new Clients(getCallbackUrl(), clientList);
       final Map<String, Authorizer<?>> authorizers = new LinkedHashMap<>();
 
-      authorizers.put(
-          CSRF_TOKEN_AUTHORIZER_NAME,
-          new CsrfTokenGeneratorAuthorizer(new DefaultCsrfTokenGenerator()));
+      authorizers.put(CSRF_TOKEN_AUTHORIZER_NAME, new AxelorCsrfTokenGeneratorAuthorizer());
       authorizers.put(CSRF_AUTHORIZER_NAME, new AxelorCsrfAuthorizer());
 
       this.config = new Config(clients, Collections.unmodifiableMap(authorizers));
@@ -256,12 +258,35 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     }
   }
 
+  private static class AxelorCsrfTokenGeneratorAuthorizer implements Authorizer<CommonProfile> {
+
+    private final CsrfTokenGenerator tokenGenerator = new DefaultCsrfTokenGenerator();
+
+    @Override
+    public boolean isAuthorized(WebContext context, List<CommonProfile> profiles) {
+      final String token = tokenGenerator.get(context);
+      final Cookie cookie = new Cookie(CSRF_COOKIE_NAME, token);
+
+      cookie.setDomain(context.getServerName());
+      cookie.setPath("/");
+      context.addResponseCookie(cookie);
+
+      return true;
+    }
+  }
+
   private static class AxelorCsrfAuthorizer extends CsrfAuthorizer {
+
+    public AxelorCsrfAuthorizer() {
+      super(CSRF_HEADER_NAME, CSRF_HEADER_NAME);
+    }
 
     @Override
     public boolean isAuthorized(WebContext context, List<CommonProfile> profiles) {
       // No CSRF check if authenticated by direct client.
-      return profiles.stream().map(p -> p.getClientName()).anyMatch(directClientNames::contains)
+      return profiles.stream()
+              .map(CommonProfile::getClientName)
+              .anyMatch(directClientNames::contains)
           || super.isAuthorized(context, profiles);
     }
   }
@@ -317,13 +342,13 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   }
 
   private static class AxelorCallbackFilter extends CallbackFilter {
-    private final CsrfTokenGeneratorAuthorizer csrfTokenGeneratorAuthorizer;
+    private final Authorizer<?> csrfTokenAuthorizer;
 
     @Inject
     public AxelorCallbackFilter(Config config) {
       setConfig(config);
-      csrfTokenGeneratorAuthorizer =
-          (CsrfTokenGeneratorAuthorizer) config.getAuthorizers().get(CSRF_TOKEN_AUTHORIZER_NAME);
+      csrfTokenAuthorizer = (Authorizer<?>) config.getAuthorizers().get(CSRF_TOKEN_AUTHORIZER_NAME);
+      CommonHelper.assertNotNull("csrfTokenAuthorizer", csrfTokenAuthorizer);
 
       final AppSettings settings = AppSettings.get();
       final String defaultUrl = settings.getBaseURL();
@@ -342,9 +367,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
                 J2EContext context, String defaultUrl) {
 
               // Add CSRF token cookie
-              if (csrfTokenGeneratorAuthorizer != null) {
-                csrfTokenGeneratorAuthorizer.isAuthorized(context, null);
-              }
+              csrfTokenAuthorizer.isAuthorized(context, null);
 
               return isXHR(context)
                   ? HttpAction.status(HttpConstants.OK, context)
