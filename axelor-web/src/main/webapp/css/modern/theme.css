@@ -293,15 +293,49 @@ label,
 }
 
 .nav-tabs > li > a {
+  background-color: #fff;
+  color: #C9C9C9;
+}
+
+.nav-tabs > li > a:hover {
+  background-color: #FAFAFA;
+  color: #A8B1C2;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+  background-color: #fff;
+  color: #777777;
+}
+
+.nav-tabs > li > a,
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
   border-radius: 0;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .nav-tabs > li > a,
 .nav-tabs-main > li:not(.active) > a {
   border-left: 0;
   border-right: 0;
+}
+
+.nav-tabs > li > a > i.prefix-icon::before {
+  content: '\f111';
+  font-size: 8px;
+  float: left;
+}
+
+.nav-tabs-main > li:not(.active) > a {
+  border: 0 !important;
+}
+
+.nav-tabs-main > li:not(.active) > a:hover {
+  border-bottom: 1px solid #FAFAFA !important;
 }
 
 .panel-tabs .nav-tabs > li > a,
