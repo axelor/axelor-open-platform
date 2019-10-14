@@ -245,6 +245,8 @@
       <field name="left" widget="inline-checkbox"/>
       <field name="mobile" widget="inline-checkbox"/>
       <field name="hidden" widget="inline-checkbox"/>
+      <field name="conditionToCheck" colSpan="12"/>
+      <field name="moduleToCheck" colSpan="12"/>
     </panel>
     <panel title="Tag" sidebar="true" itemSpan="6">
       <field name="tag"/>
