@@ -691,6 +691,17 @@ header .navbar .nav .dropdown-menu {
   margin-left: 0;
 }
 
+.btn-group > .btn:first-child {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.btn-group > .btn:last-child,
+.btn-group > .btn.dropdown-toggle {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
 .navbar .btn-group .btn:focus {
   color: #6772E5;
 }
@@ -698,7 +709,6 @@ header .navbar .nav .dropdown-menu {
 .navbar .btn-group .btn:focus,
 .navbar .btn-group .btn:active,
 .navbar .btn-group .btn:hover {
-  background: none;
   box-shadow: none;
   outline: none;
   color: #3ECF8E;
