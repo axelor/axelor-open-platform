@@ -413,22 +413,64 @@ textarea {
   background-color: #fff;
 }
 
-header .navbar .nav .fa-bars, header .navbar .dropdown-toggle .caret,
+header .navbar .nav > li > a {
+  color: #A8B1C2;
+  text-transform: uppercase;
+  font-family: "Montserrat"
+}
+
+header .navbar .dropdown-toggle .caret {
+  color: #A8B1C2;
+}
+
+header .navbar .nav > li > a > i.fa {
+  color: #6772E5;
+}
+
+header .navbar .nav > li > a > i.fa-bars,
+header .navbar .nav > li > a:focus > i.fa,
+header .navbar .nav > li > a:hover > i.fa,
+header .navbar .nav > li > a:active > i.fa {
+  color: #3ECF8E;
+}
+
 header .navbar .nav > li > a:focus,
 header .navbar .nav > li > a:hover,
 header .navbar .nav > li > a:active,
+header .navbar .nav > li > a:focus .caret,
+header .navbar .nav > li > a:hover .caret,
+header .navbar .nav > li > a:active .caret,
 .navbar .nav li.dropdown.open > .dropdown-toggle,
 .navbar .nav li.dropdown.active > .dropdown-toggle,
 .navbar .nav li.dropdown.open.active > .dropdown-toggle {
-  color: #2185D0;
+  color: #3ECF8E;
+}
+
+header .navbar .nav .dropdown-submenu:hover > a:after {
+  border-left-color: #3ECF8E;
+}
+
+header .dropdown-menu > li > a,
+header .dropdown-submenu > a {
+  color: #A8B1C2;
 }
 
 header .dropdown-menu > li > a:hover,
 header .dropdown-menu > li > a:focus,
 header .dropdown-submenu:hover > a,
 header .dropdown-submenu:focus > a {
-  color: #fff;
-  background: #2185D0;
+  color: #3ECF8E;
+  background: none;
+}
+
+header .navbar .nav .dropdown-submenu > .dropdown-menu,
+header .navbar .nav .dropdown-menu {
+  border: 1px solid #f0f0f0;
+  
+}
+
+header .navbar .nav .dropdown-menu {
+  box-shadow: 3px 4px 8px 0px rgba(0,0,0,0.2);
 }
 
 .navbar-inner,
