@@ -215,6 +215,11 @@ label,
   color: #8C8C8C;
 }
 
+.img-polaroid,
+.mail-thread .mail-message > .arrow {
+  border-color: #eee;
+}
+
 .slick-cell.edit-icon {
   padding: 2px;
 }
@@ -256,7 +261,7 @@ label,
   border: 1px solid #eee;
   box-shadow: 1px 2px 8px 0px rgba(0, 0, 0, 0.15);
   margin-bottom: 22px;
-  border-radius: 5px;
+  border-radius: 8px;
 }
 
 .filter-menu .filter-inputs .tag-select {
@@ -591,7 +596,7 @@ header .navbar .nav .dropdown-menu {
 [ui-view-form] textarea,
 [ui-view-form] select,
 [ui-view-form] .tag-select {
-  border-color: #c0c0c0;
+  border-color: #eee;
 }
 
 [ui-view-form] .form-item-container,
@@ -753,9 +758,15 @@ header .navbar .nav .dropdown-menu {
 .o2m-list .o2m-list-row .toggle-item button {
   border-radius: 0 !important;
   box-shadow: none;
-  height: 20px !important;
+  height: 21px !important;
   padding: 0 1px 2px 1px !important;
-  border-bottom-color: #c0c0c0;
+  border-bottom-color: #eee;
+}
+
+.panel-layout .editable > .o2m-list .o2m-list-row .toggle-item button:hover,
+.panel-layout .editable > .o2m-list .o2m-list-row .toggle-item button:focus,
+.panel-layout .editable > .o2m-list .o2m-list-row .toggle-item button.active {
+  border-bottom-color: #eee;
 }
 
 .btn-default {
