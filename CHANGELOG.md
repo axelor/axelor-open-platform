@@ -1,3 +1,26 @@
+## 5.2.2 (2019-10-14)
+
+#### Features
+
+* Display `conditionToCheck` and `moduleToCheck` on meta menu view
+
+#### Fixed
+
+* Re-throw exception on Birt report generation exception
+* Fix JNDI data source not working
+* Update menu tags using `tag-count`
+* Fix Query#update with several fields
+* Fix archived records not displayed when simple filter and advance filter are applied
+* Fix dashlet refresh issue
+* Fix table layout on field editors
+* Fix tests
+* Fix query filtering on collections and using order by
+* Fix dotted fields setting unwanted intermediate records
+* Silent requests should not hide loading indicator
+* Fix ajax login should re-execute pending requests
+* Fix collection fields with editor validation issue
+* Fix popup editor issue when a tab is opened from it
+
 ## 5.2.1 (2019-09-19)
 
 #### Features

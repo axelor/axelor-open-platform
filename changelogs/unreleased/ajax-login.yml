@@ -1,3 +1,0 @@
----
-title: Fix ajax login should re-execute pending requests
-type: fix
