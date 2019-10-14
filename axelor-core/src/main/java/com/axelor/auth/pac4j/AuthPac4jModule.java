@@ -74,7 +74,6 @@ import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.client.DirectClient;
 import org.pac4j.core.config.Config;
-import org.pac4j.core.context.ContextHelper;
 import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.Pac4jConstants;
@@ -262,25 +261,8 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     @Override
     public boolean isAuthorized(WebContext context, List<CommonProfile> profiles) {
       // No CSRF check if authenticated by direct client.
-      if (profiles.stream()
-          .anyMatch(profile -> directClientNames.contains(profile.getClientName()))) {
-        return true;
-      }
-
-      final boolean checkRequest = !isOnlyCheckPostRequest() || ContextHelper.isPost(context);
-      if (checkRequest) {
-        final String parameterToken = context.getRequestParameter(getParameterName());
-        final String headerToken = context.getRequestHeader(getHeaderName());
-        @SuppressWarnings("unchecked")
-        SessionStore<WebContext> sessionStore =
-            (SessionStore<WebContext>) context.getSessionStore();
-
-        final String sessionToken = (String) sessionStore.get(context, Pac4jConstants.CSRF_TOKEN);
-        return sessionToken != null
-            && (sessionToken.equals(parameterToken) || sessionToken.equals(headerToken));
-      } else {
-        return true;
-      }
+      return profiles.stream().map(p -> p.getClientName()).anyMatch(directClientNames::contains)
+          || super.isAuthorized(context, profiles);
     }
   }
 
