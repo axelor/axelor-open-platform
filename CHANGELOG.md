@@ -1,5 +1,9 @@
 ## 5.0.19 (current)
 
+#### Enhancements
+
+* Display `conditionToCheck` and `moduleToCheck` on meta menu view.
+
 #### Bugs
 
 * Silent requests should not hide loading indicator
