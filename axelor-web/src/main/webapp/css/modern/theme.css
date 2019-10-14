@@ -518,7 +518,7 @@ header .dropdown-submenu:focus > a {
 header .navbar .nav .dropdown-submenu > .dropdown-menu,
 header .navbar .nav .dropdown-menu {
   border: 1px solid #f0f0f0;
-  
+
 }
 
 header .navbar .nav .dropdown-menu {
@@ -808,7 +808,7 @@ header .navbar .nav .dropdown-menu {
 .btn-primary.disabled,
 .btn-primary[disabled] {
   background-color: #0275d8;
-  border-color: #0275d8;  
+  border-color: #0275d8;
 }
 
 .info-button {
