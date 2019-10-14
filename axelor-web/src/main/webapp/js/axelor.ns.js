@@ -79,6 +79,24 @@
   axelor.browser = browser;
   axelor.device = device;
 
+  var lastCookieString;
+  var lastCookies = {};
+
+  function readCookie(name) {
+    var cookieString = (document.cookie || '');
+    if (cookieString !== lastCookieString) {
+      lastCookieString = cookieString;
+      lastCookies = _.reduce(cookieString.split('; '), function (obj, value) {
+        var parts = value.split('=');
+        obj[parts[0]] = parts[1];
+        return obj;
+      }, {});
+    }
+    return lastCookies[name];
+  }
+
+  axelor.readCookie = readCookie;
+
   function sanitizeElement(element) {
     $.each(element.attributes, function() {
       var attr = this.name;

@@ -597,6 +597,7 @@
         };
 
         xhr.open("POST", "ws/rest/" + this._model + "/upload", true);
+        xhr.setRequestHeader($http.defaults.xsrfHeaderName, axelor.readCookie($http.defaults.xsrfCookieName));
         xhr.send(data);
 
         return promise;

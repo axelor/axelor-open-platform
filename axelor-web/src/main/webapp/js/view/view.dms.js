@@ -881,9 +881,10 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 
       function sendChunk() {
         xhr.open("POST", "ws/files/upload", true);
-            xhr.overrideMimeType("application/octet-stream");
-            xhr.setRequestHeader("Content-Type", "application/octet-stream");
+        xhr.overrideMimeType("application/octet-stream");
+        xhr.setRequestHeader("Content-Type", "application/octet-stream");
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xhr.setRequestHeader($http.defaults.xsrfHeaderName, axelor.readCookie($http.defaults.xsrfCookieName));
 
         if (info.uuid) {
           xhr.setRequestHeader("X-File-Id", info.uuid);
