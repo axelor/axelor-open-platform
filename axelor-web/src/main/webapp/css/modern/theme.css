@@ -36,7 +36,7 @@ input[type="color"],
 .tag-select.picker-input,
 .form-item-container > .display-text,
 .uneditable-input {
-  color: #000;
+  color: #343434;
   border-color: #eee;
 }
 
@@ -85,8 +85,8 @@ label,
 .label-item span,
 .slickgrid .slick-header,
 .slickgrid .slick-header-column {
-  color: #5C5C5C;
-  font-weight: 400 !important;
+  color: #777777;
+  font-weight: 600 !important;
 }
 
 .panel .panel-title {
@@ -172,10 +172,22 @@ label,
 
 [ui-view-form] .panel .panel-title {
   font-size: 16px;
+  font-family: "Montserrat";
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #A8B1C2;
 }
 
 [ui-panel-viewer] > div > h5 {
   margin: 4px 0px;
+}
+
+.form-item label.label-large,
+.form-item-container.large,
+.form-item-container.large input:first-of-type,
+.form-item-container.large textarea:first-of-type {
+  font-family: "Montserrat";
+  color: #858E9D;
 }
 
 .slickgrid .slick-header:hover,
@@ -357,7 +369,7 @@ form .nav-tabs > li.active > a:hover,
 form .nav-tabs > li.active > a:focus {
   border-top-width: 2px;
   padding-top: 5px;
-  color: #0275d8 !important;
+  color: #0984FF !important;
 }
 
 .panel-tabs .nav-tabs > li {
@@ -378,7 +390,7 @@ form .panel-tabs .nav-tabs > li:hover > a {
 .panel-tabs .nav-tabs > li.active > a:hover,
 .panel-tabs .nav-tabs > li.active > a:focus {
   border: 0;
-  border-bottom: 2px solid #0275d8 !important;
+  border-bottom: 2px solid #0984FF !important;
   font-weight: 600;
 }
 
@@ -621,10 +633,23 @@ header .navbar .nav .dropdown-menu {
 
 [ui-view-form] .tag-select .label {
   padding: .2em .4em .3em;
+  border-radius: 8px;
 }
 
 [ui-view-form] .form-item-container > span.display-text {
   padding: 0;
+}
+
+[ui-view-form] .display-text > a {
+  color: #0984FF;
+}
+
+.label {
+  border-radius: 8px;
+}
+
+.ibox .box:before {
+  border-radius: 3px;
 }
 
 .ng-invalid > input,
@@ -691,7 +716,7 @@ header .navbar .nav .dropdown-menu {
 
 .panel-layout .form-item .btn {
   position: relative;
-  border-radius: 3px !important;
+  border-radius: 8px !important;
   box-shadow: 1px 2px 3px rgba(0,0,0,0.16), 1px 2px 3px rgba(0,0,0,0.23);
 }
 
@@ -744,9 +769,19 @@ header .navbar .nav .dropdown-menu {
 }
 
 .btn-primary {
-  background-color: #0275d8;
-  border-color: #0275d8;
+  background-color: #0984FF;
+  border-color: #0984FF;
   color: #fff;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active,
+.btn-primary.disabled,
+.btn-primary[disabled] {
+  background-color: #0275d8;
+  border-color: #0275d8;  
 }
 
 .info-button {
@@ -860,12 +895,29 @@ header .navbar .nav .dropdown-menu {
 
 .nav-select a.nav-label,
 .nav-select a.nav-label:after {
-  background-color: #eee;
+  background-color: #fff;
 }
 
 .nav-select a.nav-label:hover,
 .nav-select a.nav-label:hover:after {
-  background-color: #e2e2e2;
+  background-color: #FAFAFA;
+  color: A8B1C2;
+}
+
+.nav-select li.active a.nav-label,
+.nav-select li.active a.nav-label:after {
+  background-color: #fff;
+  color: #0884FF;
+}
+
+.nav-select li a.nav-label:after {
+  border-top: 1px solid #A8B1C2;
+  border-right: 1px solid #A8B1C2;
+}
+
+.nav-select li.active a.nav-label:after {
+  border-top: 1px solid #0884FF;
+  border-right: 1px solid #0884FF;
 }
 
 .dashboard .dashlet-header,
