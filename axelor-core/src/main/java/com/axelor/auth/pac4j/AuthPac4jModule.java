@@ -50,10 +50,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -127,7 +127,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
         Multibinder.newSetBinder(binder(), AuthenticationListener.class);
     listenerMultibinder.addBinding().to(AuthPac4jListener.class);
 
-    bind(ConfigSupplier.class);
+    bind(Config.class).toProvider(ConfigProvider.class);
     bindRealm().to(AuthPac4jRealm.class);
     addFilterChain("/logout", Key.get(AxelorLogoutFilter.class));
     addFilterChain("/callback", Key.get(AxelorCallbackFilter.class));
@@ -234,30 +234,21 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   }
 
   @Singleton
-  private static class ConfigSupplier implements Supplier<Config> {
-    private static Config config;
+  private static class ConfigProvider implements Provider<Config> {
+
+    private Config config;
 
     @Inject
-    public ConfigSupplier(@SuppressWarnings("rawtypes") List<Client> clientList) {
-      if (config != null) {
-        return;
-      }
-
+    public ConfigProvider(@SuppressWarnings("rawtypes") List<Client> clientList) {
       final Clients clients = new Clients(getCallbackUrl(), clientList);
-
-      @SuppressWarnings("rawtypes")
-      final Map<String, Authorizer> authorizers = new LinkedHashMap<>();
+      final Map<String, Authorizer<?>> authorizers = new LinkedHashMap<>();
 
       authorizers.put(
           CSRF_TOKEN_AUTHORIZER_NAME,
           new CsrfTokenGeneratorAuthorizer(new DefaultCsrfTokenGenerator()));
       authorizers.put(CSRF_AUTHORIZER_NAME, new AxelorCsrfAuthorizer());
 
-      setConfig(new Config(clients, Collections.unmodifiableMap(authorizers)));
-    }
-
-    private static void setConfig(Config config) {
-      ConfigSupplier.config = config;
+      this.config = new Config(clients, Collections.unmodifiableMap(authorizers));
     }
 
     @Override
@@ -296,14 +287,13 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   private static class AxelorLogoutFilter extends LogoutFilter {
 
     @Inject
-    public AxelorLogoutFilter(ConfigSupplier configSupplier) {
+    public AxelorLogoutFilter(Config config) {
       final AppSettings settings = AppSettings.get();
       final String logoutUrlPattern =
           settings.get(AvailableAppSettings.AUTH_LOGOUT_URL_PATTERN, null);
       final boolean localLogout = settings.getBoolean(AvailableAppSettings.AUTH_LOGOUT_LOCAL, true);
       final boolean centralLogout =
           settings.getBoolean(AvailableAppSettings.AUTH_LOGOUT_CENTRAL, false);
-      final Config config = configSupplier.get();
 
       setConfig(config);
       setDefaultUrl(getLogoutUrl());
@@ -348,8 +338,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     private final CsrfTokenGeneratorAuthorizer csrfTokenGeneratorAuthorizer;
 
     @Inject
-    public AxelorCallbackFilter(ConfigSupplier configSupplier) {
-      final Config config = configSupplier.get();
+    public AxelorCallbackFilter(Config config) {
       setConfig(config);
       csrfTokenGeneratorAuthorizer =
           (CsrfTokenGeneratorAuthorizer) config.getAuthorizers().get(CSRF_TOKEN_AUTHORIZER_NAME);
@@ -451,8 +440,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   private static class AxelorSecurityFilter extends SecurityFilter {
 
     @Inject
-    public AxelorSecurityFilter(ConfigSupplier configSupplier) {
-      final Config config = configSupplier.get();
+    public AxelorSecurityFilter(Config config) {
       setConfig(config);
       setAuthorizers(config.getAuthorizers().keySet().stream().collect(Collectors.joining(",")));
 
