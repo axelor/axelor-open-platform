@@ -713,6 +713,11 @@ header .navbar .nav .dropdown-menu {
   outline: none;
   color: #3ECF8E;
 }
+.navbar .btn-group .btn:not([class*=btn-]):focus,
+.navbar .btn-group .btn:not([class*=btn-]):active,
+.navbar .btn-group .btn:not([class*=btn-]):hover {
+  background: none;
+}
 
 .navbar .dropdown-toggle,
 .navbar .dropdown-toggle:active {
