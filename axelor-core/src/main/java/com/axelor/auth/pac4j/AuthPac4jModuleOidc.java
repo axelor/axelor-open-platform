@@ -24,6 +24,7 @@ import java.util.function.Function;
 import javax.servlet.ServletContext;
 import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.client.Client;
+import org.pac4j.core.http.url.DefaultUrlResolver;
 import org.pac4j.http.client.direct.HeaderClient;
 import org.pac4j.oidc.client.AzureAdClient;
 import org.pac4j.oidc.client.GoogleOidcClient;
@@ -118,6 +119,7 @@ public class AuthPac4jModuleOidc extends AuthPac4jModuleMultiClient {
     config.setSecret(secret);
 
     final GoogleOidcClient client = new GoogleOidcClient(config);
+    client.setUrlResolver(new DefaultUrlResolver(true));
     setClientInfo(client.getName(), ImmutableMap.of("title", title, "icon", icon));
     return client;
   }
@@ -136,6 +138,7 @@ public class AuthPac4jModuleOidc extends AuthPac4jModuleMultiClient {
     config.setTenant(tenant);
 
     final AzureAdClient client = new AzureAdClient(config);
+    client.setUrlResolver(new DefaultUrlResolver(true));
     setClientInfo(client.getName(), ImmutableMap.of("title", title, "icon", icon));
     return client;
   }
@@ -156,6 +159,7 @@ public class AuthPac4jModuleOidc extends AuthPac4jModuleMultiClient {
     config.setBaseUri(baseUri);
 
     final KeycloakOidcClient client = new KeycloakOidcClient(config);
+    client.setUrlResolver(new DefaultUrlResolver(true));
     setClientInfo(client.getName(), ImmutableMap.of("title", title, "icon", icon));
     return client;
   }

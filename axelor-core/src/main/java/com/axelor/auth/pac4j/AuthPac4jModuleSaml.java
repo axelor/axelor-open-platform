@@ -202,7 +202,7 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
       // Default service provider entity ID to "callback URL" + "?client_name=SAML2Client"
       if (configuration.getServiceProviderEntityId() == null) {
         final String serviceProviderEntityId =
-            String.format("%s?client_name=%s", AuthPac4jModule.getCallbackUrl(), getName());
+            String.format("%s?client_name=%s", AuthPac4jModule.getCallbackUrl(false), getName());
         configuration.setServiceProviderEntityId(serviceProviderEntityId);
       }
       super.clientInit();
@@ -210,7 +210,7 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
 
     @Override
     protected void initSAMLLogoutResponseValidator() {
-      final String postLogoutURL = AuthPac4jModule.getLogoutUrl();
+      final String postLogoutURL = AuthPac4jModule.getLogoutUrl(false);
       this.logoutValidator =
           new AxelorSAML2LogoutValidator(
               this.signatureTrustEngineProvider,

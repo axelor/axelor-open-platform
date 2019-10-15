@@ -79,7 +79,7 @@ Map<String, String> tenants = (Map) session.getAttribute("tenantMap");
 String tenantId = (String) session.getAttribute("tenantId");
 
 AppSettings settings = AppSettings.get();
-String callbackUrl = AuthPac4jModule.getCallbackUrl();
+String callbackUrl = AuthPac4jModule.getCallbackUrl(true);
 
 %>
 <!DOCTYPE html>

@@ -28,7 +28,6 @@ import com.axelor.inject.Beans;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 import javax.servlet.ServletContext;
 import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.Pac4jConstants;
@@ -94,11 +93,7 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
 
     @Override
     protected void clientInit() {
-      final AppSettings settings = AppSettings.get();
-      final String baseUrl =
-          Optional.ofNullable(settings.getBaseURL())
-              .orElseThrow(IllegalStateException::new)
-              .replaceAll("/+$", "");
+      final String baseUrl = AuthPac4jModule.getBaseURL(true);
       final String loginUrl = baseUrl + "/login.jsp";
       setLoginUrl(loginUrl);
       super.clientInit();
