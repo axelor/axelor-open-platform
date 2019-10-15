@@ -267,8 +267,13 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       final String token = tokenGenerator.get(context);
       final Cookie cookie = new Cookie(CSRF_COOKIE_NAME, token);
 
+      String path = ((J2EContext) context).getRequest().getContextPath();
+      if (path.length() == 0) {
+        path = "/";
+      }
+
       cookie.setDomain(context.getServerName());
-      cookie.setPath("/");
+      cookie.setPath(path);
       context.addResponseCookie(cookie);
 
       return true;
