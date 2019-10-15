@@ -492,7 +492,10 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
           if (value <= 0 || !value || record.$fetched || record.$fetchedRelated) {
             return;
           }
-          var missing = _.filter(_.keys(editor.fields), function (name) {
+          var fields = element.find('[x-field]:not(label,.panel,.btn)').map(function() {
+            return $(this).attr('x-field');
+          }).get();
+          var missing = _.filter(fields, function (name) {
             if (!record) return false;
             if (scope.$parent.isPermittedRead[_.sprintf("%s.%s", scope.$parent.field.name, name)] === false) return false;
             if (name.indexOf('.') === -1) {
