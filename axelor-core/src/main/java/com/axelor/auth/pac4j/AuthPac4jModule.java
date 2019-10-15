@@ -272,7 +272,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
         path = "/";
       }
 
-      cookie.setDomain(context.getServerName());
+      cookie.setDomain("");
       cookie.setPath(path);
       context.addResponseCookie(cookie);
 
