@@ -53,7 +53,7 @@ public class CorsFilter implements Filter {
   private static final String DEFAULT_CORS_ALLOW_CREDENTIALS = "true";
   private static final String DEFAULT_CORS_ALLOW_METHODS = "GET,PUT,POST,DELETE,HEAD,OPTIONS";
   private static final String DEFAULT_CORS_ALLOW_HEADERS =
-      "Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers";
+      "Origin,Accept,Authorization,X-Requested-With,X-CSRF-Token,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers";
   private static final String DEFAULT_EXPOSE_HEADERS = "";
   private static final String DEFAULT_CORS_MAX_AGE = "1728000";
 
