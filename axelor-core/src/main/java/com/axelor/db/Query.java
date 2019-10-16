@@ -876,6 +876,7 @@ public class Query<T extends Model> {
 
     private Map<String, String> joins = Maps.newLinkedHashMap();
 
+    private static final Pattern namePattern = Pattern.compile(NAME_PATTERN);
     private static final Pattern pathPattern = Pattern.compile("self\\." + NAME_PATTERN);
 
     public JoinHelper(Class<?> beanClass) {
@@ -977,17 +978,18 @@ public class Query<T extends Model> {
         }
       } else {
         Property property = mapper.getProperty(name);
-        if (property == null) {
-          throw new IllegalArgumentException(
-              String.format("No such field '%s' in object '%s'", variable, beanClass.getName()));
-        }
-        if (property.isCollection()) {
-          return null;
-        }
-        if (property.getTarget() != null) {
+        if (property != null && property.getTarget() != null) {
+          if (property.isCollection()) {
+            return null;
+          }
           prefix = "_" + name;
           joins.put("self." + name, prefix);
           return prefix;
+        }
+        if (property == null && !namePattern.matcher(name).matches()) {
+          throw new IllegalArgumentException(
+              String.format(
+                  "Invalid field name '%s' for object '%s'", variable, beanClass.getName()));
         }
       }
 
