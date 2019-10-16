@@ -97,6 +97,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   private static final Set<String> directClientNames = new LinkedHashSet<>();
 
   private static String callbackUrl;
+  private static boolean absCallbackUrlRequired;
   private static String logoutUrl;
 
   private static final String CSRF_TOKEN_AUTHORIZER_NAME = "axelorCsrfToken";
@@ -169,12 +170,12 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     return clientList;
   }
 
-  public static String getBaseURL(boolean relative) {
+  public static String getRelativeBaseURL() {
     String base = AppSettings.get().getBaseURL();
-    return relative ? URI.create(base).getPath() : base;
+    return URI.create(base).getPath();
   }
 
-  public static String getCallbackUrl(boolean relative) {
+  public static String getCallbackUrl() {
     if (callbackUrl == null) {
       final AppSettings settings = AppSettings.get();
       callbackUrl = settings.get(AvailableAppSettings.AUTH_CALLBACK_URL, null);
@@ -185,14 +186,22 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       }
 
       if (StringUtils.isBlank(callbackUrl)) {
-        callbackUrl = getBaseURL(relative) + "/callback";
+        String base = AppSettings.get().getBaseURL();
+        if (!absCallbackUrlRequired) {
+          base = URI.create(base).getPath();
+        }
+        callbackUrl = base + "/callback";
       }
     }
 
     return callbackUrl;
   }
 
-  public static String getLogoutUrl(boolean relative) {
+  public static void requireAbsCallbackUrl() {
+    absCallbackUrlRequired = true;
+  }
+
+  public static String getLogoutUrl() {
     if (logoutUrl == null) {
       // Backward-compatible CAS configuration
       final AppSettings settings = AppSettings.get();
@@ -200,8 +209,8 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       if (StringUtils.isBlank(logoutUrl)) {
         logoutUrl =
             AuthPac4jModuleCas.isEnabled()
-                ? settings.get(AvailableAppSettings.AUTH_CAS_LOGOUT_URL, getBaseURL(relative))
-                : getBaseURL(relative);
+                ? settings.get(AvailableAppSettings.AUTH_CAS_LOGOUT_URL, getRelativeBaseURL())
+                : getRelativeBaseURL();
       }
       if (StringUtils.isBlank(logoutUrl)) {
         logoutUrl = ".";
@@ -249,7 +258,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
     @Inject
     public ConfigProvider(@SuppressWarnings("rawtypes") List<Client> clientList) {
-      final Clients clients = new Clients(getCallbackUrl(true), clientList);
+      final Clients clients = new Clients(getCallbackUrl(), clientList);
       final Map<String, Authorizer<?>> authorizers = new LinkedHashMap<>();
 
       authorizers.put(CSRF_TOKEN_AUTHORIZER_NAME, new AxelorCsrfTokenGeneratorAuthorizer());
@@ -322,7 +331,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
           settings.getBoolean(AvailableAppSettings.AUTH_LOGOUT_CENTRAL, false);
 
       setConfig(config);
-      setDefaultUrl(getLogoutUrl(true));
+      setDefaultUrl(getLogoutUrl());
       setLogoutUrlPattern(logoutUrlPattern);
       setLocalLogout(localLogout);
       setCentralLogout(centralLogout);

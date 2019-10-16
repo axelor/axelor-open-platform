@@ -54,6 +54,7 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
 
   public AuthPac4jModuleSaml(ServletContext servletContext) {
     super(servletContext);
+    AuthPac4jModule.requireAbsCallbackUrl();
   }
 
   @Override
@@ -202,7 +203,7 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
       // Default service provider entity ID to "callback URL" + "?client_name=SAML2Client"
       if (configuration.getServiceProviderEntityId() == null) {
         final String serviceProviderEntityId =
-            String.format("%s?client_name=%s", AuthPac4jModule.getCallbackUrl(false), getName());
+            String.format("%s?client_name=%s", AuthPac4jModule.getCallbackUrl(), getName());
         configuration.setServiceProviderEntityId(serviceProviderEntityId);
       }
       super.clientInit();
@@ -210,7 +211,7 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
 
     @Override
     protected void initSAMLLogoutResponseValidator() {
-      final String postLogoutURL = AuthPac4jModule.getLogoutUrl(false);
+      final String postLogoutURL = AuthPac4jModule.getRelativeBaseURL();
       this.logoutValidator =
           new AxelorSAML2LogoutValidator(
               this.signatureTrustEngineProvider,

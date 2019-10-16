@@ -93,7 +93,7 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
 
     @Override
     protected void clientInit() {
-      final String baseUrl = AuthPac4jModule.getBaseURL(true);
+      final String baseUrl = AuthPac4jModule.getRelativeBaseURL();
       final String loginUrl = baseUrl + "/login.jsp";
       setLoginUrl(loginUrl);
       super.clientInit();

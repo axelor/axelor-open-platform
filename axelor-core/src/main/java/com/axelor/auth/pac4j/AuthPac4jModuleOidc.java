@@ -34,6 +34,7 @@ import org.pac4j.oidc.config.AzureAdOidcConfiguration;
 import org.pac4j.oidc.config.KeycloakOidcConfiguration;
 import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.oidc.credentials.authenticator.UserInfoOidcAuthenticator;
+import org.pac4j.oidc.profile.OidcProfile;
 
 public class AuthPac4jModuleOidc extends AuthPac4jModuleMultiClient {
 
@@ -99,7 +100,9 @@ public class AuthPac4jModuleOidc extends AuthPac4jModuleMultiClient {
       final UserInfoOidcAuthenticator authenticator = new UserInfoOidcAuthenticator(config);
       client = new HeaderClient(headerName, prefixHeader.trim() + " ", authenticator);
     } else {
-      client = new OidcClient<>(config);
+      final OidcClient<OidcProfile, OidcConfiguration> oidcClient = new OidcClient<>(config);
+      oidcClient.setUrlResolver(new DefaultUrlResolver(true));
+      client = oidcClient;
     }
 
     client.setName(name);
