@@ -278,6 +278,11 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
       return true;
     }
+
+    public void addResponseCookieAndHeader(WebContext context) {
+      this.isAuthorized(context, null);
+      context.setResponseHeader(CSRF_COOKIE_NAME, tokenGenerator.get(context));
+    }
   }
 
   private static class AxelorCsrfAuthorizer extends CsrfAuthorizer {
@@ -347,13 +352,10 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   }
 
   private static class AxelorCallbackFilter extends CallbackFilter {
-    private final Authorizer<?> csrfTokenAuthorizer;
 
     @Inject
     public AxelorCallbackFilter(Config config) {
       setConfig(config);
-      csrfTokenAuthorizer = (Authorizer<?>) config.getAuthorizers().get(CSRF_TOKEN_AUTHORIZER_NAME);
-      CommonHelper.assertNotNull("csrfTokenAuthorizer", csrfTokenAuthorizer);
 
       final AppSettings settings = AppSettings.get();
       final String defaultUrl = settings.getBaseURL();
@@ -372,7 +374,10 @@ public abstract class AuthPac4jModule extends AuthWebModule {
                 J2EContext context, String defaultUrl) {
 
               // Add CSRF token cookie
-              csrfTokenAuthorizer.isAuthorized(context, null);
+              AxelorCsrfTokenGeneratorAuthorizer csrfTokenAuthorizer =
+                  (AxelorCsrfTokenGeneratorAuthorizer)
+                      config.getAuthorizers().get(CSRF_TOKEN_AUTHORIZER_NAME);
+              csrfTokenAuthorizer.addResponseCookieAndHeader(context);
 
               return isXHR(context)
                   ? HttpAction.status(HttpConstants.OK, context)
