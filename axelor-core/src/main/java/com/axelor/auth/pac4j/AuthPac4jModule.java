@@ -236,6 +236,11 @@ public abstract class AuthPac4jModule extends AuthWebModule {
         || "application/json".equals(request.getHeader("Content-Type"));
   }
 
+  protected static boolean isNativeClient(WebContext context) {
+    String origin = context.getRequestHeader("Origin");
+    return StringUtils.isBlank(origin);
+  }
+
   @Singleton
   private static class ConfigProvider implements Provider<Config> {
 
@@ -264,6 +269,10 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
     @Override
     public boolean isAuthorized(WebContext context, List<CommonProfile> profiles) {
+
+      // don't need csrf check for native clients
+      if (isNativeClient(context)) return true;
+
       final String token = tokenGenerator.get(context);
       final Cookie cookie = new Cookie(CSRF_COOKIE_NAME, token);
 
@@ -280,8 +289,11 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     }
 
     public void addResponseCookieAndHeader(WebContext context) {
-      this.isAuthorized(context, null);
-      context.setResponseHeader(CSRF_COOKIE_NAME, tokenGenerator.get(context));
+      // don't need csrf check for native clients
+      if (!isNativeClient(context)) {
+        isAuthorized(context, null);
+        context.setResponseHeader(CSRF_COOKIE_NAME, tokenGenerator.get(context));
+      }
     }
   }
 
@@ -293,11 +305,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
     @Override
     public boolean isAuthorized(WebContext context, List<CommonProfile> profiles) {
-      // No CSRF check if authenticated by direct client.
-      return profiles.stream()
-              .map(CommonProfile::getClientName)
-              .anyMatch(directClientNames::contains)
-          || super.isAuthorized(context, profiles);
+      return isNativeClient(context) || super.isAuthorized(context, profiles);
     }
   }
 
