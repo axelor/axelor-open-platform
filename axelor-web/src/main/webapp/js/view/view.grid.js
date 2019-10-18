@@ -657,6 +657,7 @@ function GridViewCtrl($scope, $element) {
   };
 
   var _getContext = $scope.getContext;
+  $scope._isNestedGrid = !!_getContext;
   $scope.getContext = function() {
 
     // if nested grid then return parent's context
