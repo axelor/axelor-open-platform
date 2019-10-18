@@ -335,13 +335,13 @@ ui.formInput('DateTime', {
         e.stopPropagation();
         e.preventDefault();
         return false;
-      }
-      if (e.keyCode === $.ui.keyCode.ENTER && $(this).datepicker("widget").is(':visible')) {
+      } else if (e.keyCode === $.ui.keyCode.ENTER) {
+        updateModel();
+      } else if ($(this).datepicker("widget").is(':visible')) {
         e.stopPropagation();
         e.preventDefault();
         return false;
-      }
-      if (e.keyCode === $.ui.keyCode.ENTER || e.keyCode === $.ui.keyCode.TAB) {
+      } else if (e.keyCode === $.ui.keyCode.TAB) {
         if (changed) updateModel();
       }
     });

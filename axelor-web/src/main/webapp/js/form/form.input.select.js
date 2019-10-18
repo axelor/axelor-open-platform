@@ -108,7 +108,22 @@ ui.formWidget('BaseSelect', {
     };
 
     scope.handleEnter = function(e) {
-
+      var widget = input.autocomplete('widget');
+      if (widget) {
+        var item = widget.find('li .ui-state-focus').parent();
+        if (item.length === 0) {
+          item = widget.find('li:not(.tag-select-action)');
+          item = item.length === 1 ? item.first() : null;
+        }
+        var data = item ? item.data('ui-autocomplete-item') : null;
+        if (data) {
+          input.autocomplete('close');
+          if (model.$viewValue !== data.value) {
+            scope.setValue(data.value, true);
+            scope.$applyAsync();
+          }
+        }
+      }
     };
 
     scope.handleSelect = function(e, ui) {
@@ -668,6 +683,30 @@ ui.formInput('MultiSelect', 'Select', {
            of: element
          })
          .width(element.width() - 4);
+    };
+
+    scope.handleEnter = function(e) {
+      var widget = input.autocomplete('widget');
+      if (widget) {
+        var item = widget.find('li .ui-state-focus').parent();
+        if (item.length === 0) {
+          item = widget.find('li:not(.tag-select-action)');
+          item = item.length === 1 ? item.first() : null;
+        }
+        var data = item ? item.data('ui-autocomplete-item') : null;
+        if (data) {
+          var items = this.getSelection(), values = _.pluck(items, 'value');
+          var found = _.find(values, function(v) {
+            return scope.matchValues(v, data.value);
+          });
+          if (found) {
+            return false;
+          }
+          input.autocomplete('close');
+          values.push(data.value);
+          update(values);
+        }
+      }
     };
 
     scope.$render_editable = function() {

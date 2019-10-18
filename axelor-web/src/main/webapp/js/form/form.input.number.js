@@ -133,6 +133,11 @@ ui.formInput('Number', {
     element.on("grid:check", function(e, row) {
       updateModel(element.val());
     });
+    element.on("keydown", function(e, row) {
+      if (e.keyCode === $.ui.keyCode.ENTER) {
+        updateModel(element.val());
+      }
+    });
 
     var pendingChange = false;
 
