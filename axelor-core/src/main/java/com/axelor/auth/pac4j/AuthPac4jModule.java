@@ -29,17 +29,13 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
 import io.buji.pac4j.context.ShiroSessionStore;
 import io.buji.pac4j.engine.ShiroCallbackLogic;
+import io.buji.pac4j.engine.ShiroSecurityLogic;
 import io.buji.pac4j.filter.CallbackFilter;
 import io.buji.pac4j.filter.LogoutFilter;
 import io.buji.pac4j.filter.SecurityFilter;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,7 +44,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -72,7 +67,6 @@ import org.pac4j.core.authorization.authorizer.csrf.CsrfTokenGenerator;
 import org.pac4j.core.authorization.authorizer.csrf.DefaultCsrfTokenGenerator;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
-import org.pac4j.core.client.DirectClient;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.Cookie;
 import org.pac4j.core.context.HttpConstants;
@@ -94,7 +88,6 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
   private static final Map<String, Map<String, String>> clientInfo = new HashMap<>();
   private static final Set<String> centralClientNames = new LinkedHashSet<>();
-  private static final Set<String> directClientNames = new LinkedHashSet<>();
 
   private static String callbackUrl;
   private static boolean absCallbackUrlRequired;
@@ -105,6 +98,8 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
   private static final String CSRF_COOKIE_NAME = "CSRF-TOKEN";
   private static final String CSRF_HEADER_NAME = "X-CSRF-Token";
+
+  private static final String HASH_LOCATION_PARAMETER = "hash_location";
 
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -138,6 +133,12 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     addFilterChain("/**", Key.get(AxelorSecurityFilter.class));
   }
 
+  @Override
+  protected void configureAnon() {
+    super.configureAnon();
+    addFilterChain("/favicon.ico", ANON);
+  }
+
   protected abstract void configureClients();
 
   protected void addLocalClient(Client<?, ?> client) {
@@ -155,18 +156,14 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
   private void addClient(Client<?, ?> client) {
     clientList.add(client);
-    if (client instanceof DirectClient) {
-      directClientNames.add(client.getName());
-    }
   }
 
   public static Set<String> getCentralClients() {
     return centralClientNames;
   }
 
-  @Provides
   @SuppressWarnings("rawtypes")
-  public List<Client> getClientList() {
+  public static List<Client> getClientList() {
     return clientList;
   }
 
@@ -257,7 +254,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     private Config config;
 
     @Inject
-    public ConfigProvider(@SuppressWarnings("rawtypes") List<Client> clientList) {
+    public ConfigProvider() {
       final Clients clients = new Clients(getCallbackUrl(), clientList);
       final Map<String, Authorizer<?>> authorizers = new LinkedHashMap<>();
 
@@ -385,8 +382,8 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       setDefaultClient(config.getClients().getClients().get(0).getName());
       setCallbackLogic(
           new ShiroCallbackLogic<Object, J2EContext>() {
-            private final AppSettings appSettings = AppSettings.get();
 
+            @SuppressWarnings("unchecked")
             @Override
             protected HttpAction redirectToOriginallyRequestedUrl(
                 J2EContext context, String defaultUrl) {
@@ -397,74 +394,31 @@ public abstract class AuthPac4jModule extends AuthWebModule {
                       config.getAuthorizers().get(CSRF_TOKEN_AUTHORIZER_NAME);
               csrfTokenAuthorizer.addResponseCookieAndHeader(context);
 
-              return isXHR(context)
-                  ? HttpAction.status(HttpConstants.OK, context)
-                  : redirectToBaseUrl(context, defaultUrl);
-            }
+              // if xhr, return status code only
+              if (isXHR(context)) {
+                return HttpAction.status(HttpConstants.OK, context);
+              }
 
-            /** Redirects to base URL with hash location. */
-            @SuppressWarnings("unchecked")
-            private HttpAction redirectToBaseUrl(J2EContext context, String defaultUrl) {
-              final String pac4jRequestedUrl =
+              final String requestedUrl =
                   (String) context.getSessionStore().get(context, Pac4jConstants.REQUESTED_URL);
-              final String baseUrl =
-                  Optional.ofNullable(appSettings.getBaseURL())
-                      .orElseGet(() -> getBareUrl(pac4jRequestedUrl));
-              final String hashLocation =
-                  Optional.ofNullable(context.getRequestParameter("hash_location"))
-                      .orElseGet(
-                          () -> parseQuery(pac4jRequestedUrl).getOrDefault("hash_location", ""));
-              final String requestedUrl = baseUrl + hashLocation;
-              final String redirectUrl;
 
+              String redirectUrl = defaultUrl;
               if (StringUtils.notBlank(requestedUrl)) {
                 context.getSessionStore().set(context, Pac4jConstants.REQUESTED_URL, null);
                 redirectUrl = requestedUrl;
-              } else {
-                redirectUrl = defaultUrl;
+              }
+
+              String hashLocation = context.getRequestParameter(HASH_LOCATION_PARAMETER);
+              if (StringUtils.isBlank(hashLocation)) {
+                hashLocation =
+                    (String) context.getSessionStore().get(context, HASH_LOCATION_PARAMETER);
+              }
+              if (StringUtils.notBlank(hashLocation)) {
+                redirectUrl = redirectUrl + hashLocation;
               }
 
               logger.debug("redirectUrl: {}", redirectUrl);
               return HttpAction.redirect(context, redirectUrl);
-            }
-
-            /** Gets URL without query parameters. */
-            private String getBareUrl(String url) {
-              try {
-                final URI uri = new URI(url);
-                return new URI(
-                        uri.getScheme(), uri.getAuthority(), uri.getPath(), null, uri.getFragment())
-                    .toString();
-              } catch (URISyntaxException e) {
-                logger.error(e.getMessage(), e);
-              }
-
-              return "";
-            }
-
-            /** Parses URL query parameters. */
-            private Map<String, String> parseQuery(String url) {
-              final Map<String, String> queryPairs = new LinkedHashMap<>();
-
-              if (StringUtils.notBlank(url)) {
-                try {
-                  final String query = new URL(url).getQuery();
-                  if (query != null) {
-                    final String[] pairs = query.split("&");
-
-                    for (final String pair : pairs) {
-                      final int idx = pair.indexOf('=');
-                      queryPairs.put(
-                          URLDecoder.decode(pair.substring(0, idx), "UTF-8"),
-                          URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));
-                    }
-                  }
-                } catch (UnsupportedEncodingException | MalformedURLException e) {
-                  logger.error(e.getMessage(), e);
-                }
-              }
-
-              return queryPairs;
             }
           });
     }
@@ -481,7 +435,31 @@ public abstract class AuthPac4jModule extends AuthWebModule {
           config.getClients().getClients().stream()
               .map(Client::getName)
               .collect(Collectors.joining(","));
+
       setClients(clientNames);
+
+      setSecurityLogic(
+          new ShiroSecurityLogic<Object, J2EContext>() {
+
+            // Don't save requested URL if redirected to a non-default central client,
+            // so that the requested URL saved before redirection will be used instead.
+            @Override
+            @SuppressWarnings({"rawtypes", "unchecked"})
+            protected void saveRequestedUrl(J2EContext context, List<Client> currentClients) {
+              final String hashLocation = context.getRequestParameter(HASH_LOCATION_PARAMETER);
+              if (StringUtils.notBlank(hashLocation)) {
+                context.getSessionStore().set(context, HASH_LOCATION_PARAMETER, hashLocation);
+              }
+
+              final String clientName =
+                  context.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER);
+              if (StringUtils.isBlank(clientName)
+                  || currentClients.size() != 1
+                  || !centralClientNames.contains(currentClients.get(0).getName())) {
+                super.saveRequestedUrl(context, currentClients);
+              }
+            }
+          });
     }
   }
 }
