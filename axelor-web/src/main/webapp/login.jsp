@@ -74,10 +74,6 @@ AppSettings settings = AppSettings.get();
 String callbackUrl = AuthPac4jModule.getCallbackUrl();
 
 Set<String> centralClients = AuthPac4jModule.getCentralClients();
-
-if (AuthPac4jModule.getClientList().stream().noneMatch(client -> client instanceof FormClient)) {
-  response.sendRedirect(settings.getBaseURL());
-}
 %>
 <!DOCTYPE html>
 <html>

@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -56,6 +57,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.realm.Realm;
@@ -78,6 +80,7 @@ import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.http.adapter.J2ENopHttpActionAdapter;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.util.CommonHelper;
+import org.pac4j.http.client.indirect.FormClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,6 +131,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
     bind(Config.class).toProvider(ConfigProvider.class);
     bindRealm().to(AuthPac4jRealm.class);
+    addFilterChain("/login.jsp", Key.get(AxelorLoginPageFilter.class));
     addFilterChain("/logout", Key.get(AxelorLogoutFilter.class));
     addFilterChain("/callback", Key.get(AxelorCallbackFilter.class));
     addFilterChain("/**", Key.get(AxelorSecurityFilter.class));
@@ -160,11 +164,6 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
   public static Set<String> getCentralClients() {
     return centralClientNames;
-  }
-
-  @SuppressWarnings("rawtypes")
-  public static List<Client> getClientList() {
-    return clientList;
   }
 
   public static String getRelativeBaseURL() {
@@ -461,5 +460,28 @@ public abstract class AuthPac4jModule extends AuthWebModule {
             }
           });
     }
+  }
+
+  private static class AxelorLoginPageFilter implements Filter {
+
+    @Override
+    public void init(javax.servlet.FilterConfig filterConfig) throws ServletException {}
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+        throws IOException, ServletException {
+
+      // if already authenticated or if form login is not configured redirect to base url
+      if (SecurityUtils.getSubject().isAuthenticated()
+          || AuthPac4jModule.clientList.stream().anyMatch(client -> client instanceof FormClient)) {
+        ((HttpServletResponse) response).sendRedirect(AppSettings.get().getBaseURL());
+        return;
+      }
+
+      chain.doFilter(request, response);
+    }
+
+    @Override
+    public void destroy() {}
   }
 }
