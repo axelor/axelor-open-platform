@@ -473,7 +473,8 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
       // if already authenticated or if form login is not configured redirect to base url
       if (SecurityUtils.getSubject().isAuthenticated()
-          || AuthPac4jModule.clientList.stream().noneMatch(client -> client instanceof FormClient)) {
+          || AuthPac4jModule.clientList.stream()
+              .noneMatch(client -> client instanceof FormClient)) {
         ((HttpServletResponse) response).sendRedirect(AppSettings.get().getBaseURL());
         return;
       }
