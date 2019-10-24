@@ -1454,7 +1454,7 @@ Grid.prototype.isCellEditable = function(row, cell) {
   }
 
   var current = this.grid.getActiveCell();
-  if (current && current.row === row) {
+  if (current && current.row === row && !_.isEmpty(this.editorScope.record)) {
     var item = this.element.find('[x-field="' + field.name + '"]:first');
     if (item.length) {
       return !item.scope().isReadonly();
