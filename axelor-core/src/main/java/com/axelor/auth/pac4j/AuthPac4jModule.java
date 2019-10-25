@@ -19,6 +19,7 @@ package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
+import com.axelor.auth.AuthUtils;
 import com.axelor.auth.AuthWebModule;
 import com.axelor.common.StringUtils;
 import com.google.common.base.Preconditions;
@@ -61,6 +62,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.pac4j.core.authorization.authorizer.Authorizer;
@@ -471,8 +473,14 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
 
+      final Subject subject = SecurityUtils.getSubject();
+
+      if (AuthUtils.getUser() == null) {
+        subject.logout();
+      }
+
       // if already authenticated or if form login is not configured redirect to base url
-      if (SecurityUtils.getSubject().isAuthenticated()
+      if (subject.isAuthenticated()
           || AuthPac4jModule.clientList.stream()
               .noneMatch(client -> client instanceof FormClient)) {
         ((HttpServletResponse) response).sendRedirect(AppSettings.get().getBaseURL());
