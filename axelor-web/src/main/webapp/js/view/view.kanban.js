@@ -129,14 +129,11 @@ function BaseCardsCtrl(type, $scope, $element) {
     }, ds._filter);
   };
 
-  $scope.canEdit = function() {
-    var view = $scope.schema;
-    return view.canEdit === undefined || view.canEdit;
-  };
-
-  $scope.canDelete = function() {
-    var view = $scope.schema;
-    return view.canDelete === undefined || view.canDelete;
+  $scope.attr = function(name) {
+    if (!$scope.schema || $scope.schema[name] === undefined) {
+      return true;
+    }
+    return $scope.schema[name];
   };
 }
 

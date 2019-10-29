@@ -32,13 +32,13 @@
       </div>
       <ul class="kanban-card-list" ui-sortable="sortableOptions" ng-model="records">
         <li class="kanban-card" ng-class="hilite.color" ng-repeat="record in records" ui-card>
-          <div class="kanban-card-menu btn-group pull-right" ng-if="canEdit() || canDelete()" ng-show="hasPermission('write') || hasPermission('remove')">
+          <div class="kanban-card-menu btn-group pull-right" ng-if="hasButton('edit') || hasButton('delete')" ng-show="hasPermission('write') || hasPermission('remove')">
             <a tabindex="-1" href="javascript:" class="btn btn-link dropdown-toggle" data-toggle="dropdown">
               <i class="fa fa-caret-down"></i>
             </a>
             <ul class="dropdown-menu pull-right">
-              <li><a href="javascript:" ng-if="canEdit()" ng-show="hasPermission('write')" ng-click="onEdit(record)" x-translate>Edit</a></li>
-              <li><a href="javascript:" ng-if="canDelete()" ng-show="hasPermission('remove')" ng-click="onDelete(record)" x-translate>Delete</a></li>
+              <li><a href="javascript:" ng-if="hasButton('edit')" ng-show="hasPermission('write')" ng-click="onEdit(record)" x-translate>Edit</a></li>
+              <li><a href="javascript:" ng-if="hasButton('delete')" ng-show="hasPermission('remove')" ng-click="onDelete(record)" x-translate>Delete</a></li>
             </ul>
           </div>
           <div class="kanban-card-body"></div>

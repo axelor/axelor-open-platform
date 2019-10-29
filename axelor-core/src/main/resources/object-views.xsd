@@ -1814,6 +1814,11 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="canNew" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the 'New' button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="canEdit" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>Specify whether to show the 'Edit' button.</xsd:documentation>
