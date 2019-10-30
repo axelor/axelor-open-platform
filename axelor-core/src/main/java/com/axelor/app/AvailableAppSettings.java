@@ -136,16 +136,6 @@ public interface AvailableAppSettings {
   String LOGGING_PATTERN_FILE = "logging.pattern.file";
   String LOGGING_PATTERN_CONSOLE = "logging.pattern.console";
 
-  String LDAP_SERVER_URL = "ldap.server.url";
-  String LDAP_AUTH_TYPE = "ldap.auth.type";
-  String LDAP_SYSTEM_USER = "ldap.system.user";
-  String LDAP_SYSTEM_PASSWORD = "ldap.system.password";
-  String LDAP_GROUP_BASE = "ldap.group.base";
-  String LDAP_GROUP_OBJECT_CLASS = "ldap.group.object.class";
-  String LDAP_GROUP_FILTER = "ldap.group.filter";
-  String LDAP_USER_BASE = "ldap.user.base";
-  String LDAP_USER_FILTER = "ldap.user.filter";
-
   String AUTH_LDAP_SERVER_URL = "auth.ldap.server.url";
   String AUTH_LDAP_USER_BASE = "auth.ldap.user.base";
   String AUTH_LDAP_USER_FILTER = "auth.ldap.user.filter";
