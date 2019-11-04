@@ -205,7 +205,7 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
 
   public static interface AxelorAuthenticator extends Authenticator<UsernamePasswordCredentials> {}
 
-  private static class AxelorLocalAuthenticator implements AxelorAuthenticator {
+  public static class AxelorLocalAuthenticator implements AxelorAuthenticator {
 
     @Override
     public void validate(UsernamePasswordCredentials credentials, WebContext context) {
