@@ -12,8 +12,8 @@ versions.groovy = "2.4.10"
 versions.resteasy = "3.1.2.Final"
 versions.jackson = "2.8.8"
 versions.shiro = "1.4.1"
-versions.buji_pac4j = "4.1.0"
-versions.pac4j = "3.7.0"
+versions.buji_pac4j = "4.1.1"
+versions.pac4j = "3.8.2"
 
 versions.junit = "4.12"
 versions.slf4j = "1.7.25"
@@ -91,6 +91,7 @@ libs.hibernate = [
     "org.hibernate:hibernate-validator:${versions.hibernate_validator}",
   "org.hibernate:hibernate-ehcache:${versions.hibernate}",
   "org.hibernate:hibernate-jcache:${versions.hibernate}",
+  "org.hibernate:hibernate-entitymanager:${versions.hibernate}",
 ]
 
 // Hibernate search
