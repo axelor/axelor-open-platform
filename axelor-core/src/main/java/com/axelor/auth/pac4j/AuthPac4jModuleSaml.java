@@ -19,27 +19,13 @@ package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.common.StringUtils;
 import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletContext;
 import org.opensaml.saml.common.xml.SAMLConstants;
-import org.opensaml.saml.saml2.core.LogoutResponse;
-import org.opensaml.saml.saml2.encryption.Decrypter;
-import org.opensaml.xmlsec.signature.support.SignatureTrustEngine;
-import org.pac4j.core.context.J2EContext;
-import org.pac4j.core.context.session.SessionStore;
-import org.pac4j.core.credentials.Credentials;
-import org.pac4j.core.exception.HttpAction;
-import org.pac4j.core.logout.handler.DefaultLogoutHandler;
-import org.pac4j.core.logout.handler.LogoutHandler;
-import org.pac4j.core.util.CommonHelper;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.config.SAML2Configuration;
-import org.pac4j.saml.context.SAML2MessageContext;
-import org.pac4j.saml.crypto.SAML2SignatureTrustEngineProvider;
-import org.pac4j.saml.logout.impl.SAML2LogoutValidator;
 
 public class AuthPac4jModuleSaml extends AuthPac4jModule {
 
@@ -165,39 +151,6 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
     saml2Config.setWantsAssertionsSigned(wantsAssertionsSigned);
     saml2Config.setAuthnRequestSigned(authnRequestSigned);
 
-    saml2Config.setLogoutHandler(
-        new DefaultLogoutHandler<J2EContext>() {
-          @Override
-          public void destroySessionFront(J2EContext context, String key) {
-            getStore().remove(key);
-
-            @SuppressWarnings("rawtypes")
-            final SessionStore sessionStore = context.getSessionStore();
-            if (sessionStore == null) {
-              logger.error("No session store available for this web context");
-            } else {
-              @SuppressWarnings("unchecked")
-              String currentSessionId = sessionStore.getOrCreateSessionId(context);
-
-              // Session ID may be null if it is already destroyed.
-              if (currentSessionId != null) {
-                logger.debug("currentSessionId: {}", currentSessionId);
-                final String sessionToKey = (String) getStore().get(currentSessionId);
-                logger.debug("-> key: {}", key);
-                getStore().remove(currentSessionId);
-
-                if (CommonHelper.areEquals(key, sessionToKey)) {
-                  destroy(context, sessionStore, "front");
-                } else {
-                  logger.error(
-                      "The user profiles (and session) can not be destroyed for the front channel logout because the provided "
-                          + "key is not the same as the one linked to the current session");
-                }
-              }
-            }
-          }
-        });
-
     final SAML2Client client = new AxelorSAML2Client(saml2Config);
     addCentralClient(client);
   }
@@ -221,43 +174,10 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
             String.format("%s?client_name=%s", AuthPac4jModule.getCallbackUrl(), getName());
         configuration.setServiceProviderEntityId(serviceProviderEntityId);
       }
+
+      // Post Logout URL
+      configuration.setPostLogoutURL(AuthPac4jModule.getRelativeBaseURL());
       super.clientInit();
-    }
-
-    @Override
-    protected void initSAMLLogoutResponseValidator() {
-      final String postLogoutURL = AuthPac4jModule.getRelativeBaseURL();
-      this.logoutValidator =
-          new AxelorSAML2LogoutValidator(
-              this.signatureTrustEngineProvider,
-              this.decrypter,
-              this.configuration.getLogoutHandler(),
-              postLogoutURL);
-      this.logoutValidator.setAcceptedSkew(this.configuration.getAcceptedSkew());
-    }
-  }
-
-  private static class AxelorSAML2LogoutValidator extends SAML2LogoutValidator {
-    private final String postLogoutURL;
-
-    public AxelorSAML2LogoutValidator(
-        SAML2SignatureTrustEngineProvider engine,
-        Decrypter decrypter,
-        @SuppressWarnings("rawtypes") LogoutHandler logoutHandler,
-        String postLogoutURL) {
-      super(engine, decrypter, logoutHandler);
-      this.postLogoutURL = postLogoutURL;
-    }
-
-    @Override
-    public Credentials validate(final SAML2MessageContext context) {
-      if (context.getMessage() instanceof LogoutResponse && StringUtils.notBlank(postLogoutURL)) {
-        final LogoutResponse logoutResponse = (LogoutResponse) context.getMessage();
-        final SignatureTrustEngine engine = this.signatureTrustEngineProvider.build();
-        validateLogoutResponse(logoutResponse, context, engine);
-        throw HttpAction.redirect(context.getWebContext(), postLogoutURL);
-      }
-      return super.validate(context);
     }
   }
 }
