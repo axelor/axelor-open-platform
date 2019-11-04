@@ -191,6 +191,7 @@ public interface AvailableAppSettings {
   String AUTH_SAML_FORCE_AUTH = "auth.saml.force.auth";
   String AUTH_SAML_PASSIVE = "auth.saml.passive";
   String AUTH_SAML_AUTHN_REQUEST_BINDING_TYPE = "auth.saml.authn.request.binding.type";
+  String AUTH_SAML_RESPONSE_BINDING_TYPE = "auth.saml.response.binding.type";
   String AUTH_SAML_USE_NAME_QUALIFIER = "auth.saml.use.name.qualifier";
   String AUTH_SAML_ATTRIBUTE_CONSUMING_SERVICE_INDEX =
       "auth.saml.attribute.consuming.service.index";

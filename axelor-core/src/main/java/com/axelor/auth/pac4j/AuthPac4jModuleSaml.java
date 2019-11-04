@@ -52,6 +52,13 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
           "SAML2_REDIRECT_BINDING_URI",
           SAMLConstants.SAML2_REDIRECT_BINDING_URI);
 
+  private static final Map<String, String> responseBindingTypes =
+      ImmutableMap.of(
+          "SAML2_POST_BINDING_URI",
+          SAMLConstants.SAML2_POST_BINDING_URI,
+          "SAML2_ARTIFACT_BINDING_URI",
+          SAMLConstants.SAML2_ARTIFACT_BINDING_URI);
+
   public AuthPac4jModuleSaml(ServletContext servletContext) {
     super(servletContext);
     AuthPac4jModule.requireAbsCallbackUrl();
@@ -80,6 +87,9 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
 
     final String authnRequestBindingType =
         settings.get(AvailableAppSettings.AUTH_SAML_AUTHN_REQUEST_BINDING_TYPE, null);
+    final String responseBindingType =
+        settings.get(AvailableAppSettings.AUTH_SAML_RESPONSE_BINDING_TYPE, null);
+
     final boolean useNameQualifier =
         settings.getBoolean(AvailableAppSettings.AUTH_SAML_USE_NAME_QUALIFIER, false);
 
@@ -123,6 +133,11 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
     if (authnRequestBindingType != null) {
       saml2Config.setAuthnRequestBindingType(
           authnRequestBindingTypes.getOrDefault(authnRequestBindingType, authnRequestBindingType));
+    }
+
+    if (responseBindingType != null) {
+      saml2Config.setResponseBindingType(
+          responseBindingTypes.getOrDefault(responseBindingType, responseBindingType));
     }
 
     saml2Config.setUseNameQualifier(useNameQualifier);
