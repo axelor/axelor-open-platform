@@ -309,6 +309,10 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
                 "<li ng-if='showRefresh'>" +
                   "<a href='' ng-click='onRefresh()' x-translate>Refresh</a>" +
                 "</li>" +
+                "<li ng-if='isLegendVisible !== undefined'>" +
+                  "<a ng-if='isLegendVisible' href='' ng-click='toggleLegend()' x-translate>Hide legend</a>" +
+                  "<a ng-if='!isLegendVisible' href='' ng-click='toggleLegend()' x-translate>Show legend</a>" +
+                "</li>" +
                 "<li ng-if='canExport()'>" +
                   "<a href='' ng-click='onExport()' x-translate>Export</a>" +
                 "</li>" +
