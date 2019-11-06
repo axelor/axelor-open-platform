@@ -18,6 +18,7 @@
 package com.axelor.app.internal;
 
 import com.axelor.tomcat.TomcatRunner;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,20 +40,39 @@ public final class AppRunner {
     }
   }
 
-  private static void run(String[] args) {
-    Path baseWebapp = Paths.get("build", "webapp");
+  private static boolean prepare() {
     Path configFile = Paths.get("build", "tomcat", "axelor-tomcat.properties");
-
-    if (Files.notExists(baseWebapp)) {
-      log.error("Please run './gradlew copyWebapp' and try again...");
-      return;
+    Path webapp = Paths.get("build", "webapp");
+    if (Files.exists(configFile) && Files.exists(webapp)) {
+      return true;
     }
 
-    if (Files.notExists(configFile)) {
-      log.error("Plese run './gradlew runnerConfig' and try again...");
-      return;
+    log.info("Preparing...");
+
+    Path gradlew =
+        Paths.get(File.separatorChar == '\\' ? "gradlew.bat" : "gradlew")
+            .normalize()
+            .toAbsolutePath();
+
+    ProcessBuilder builder = new ProcessBuilder(gradlew.toString(), "runnerConfig");
+    try {
+      Process process = builder.start();
+      if (process.waitFor() != 0 || (Files.notExists(configFile) && Files.notExists(configFile))) {
+        log.error("Please run './gradlew runnerConfig' and try again.");
+        return false;
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      return false;
     }
 
-    TomcatRunner.main(args);
+    return true;
+  }
+
+  private static void run(String[] args) {
+    if (prepare()) {
+      log.info("Starting...");
+      TomcatRunner.main(args);
+    }
   }
 }
