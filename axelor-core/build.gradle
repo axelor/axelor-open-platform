@@ -8,7 +8,9 @@ dependencies {
   implementation libs.axelor_asm
 
   testImplementation project(":axelor-test")
+
   api project(":axelor-common")
+  implementation project(":axelor-tomcat")
 
   api libs.groovy
   api libs.groovy_wslite

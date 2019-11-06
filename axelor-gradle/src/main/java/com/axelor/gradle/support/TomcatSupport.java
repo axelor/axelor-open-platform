@@ -25,18 +25,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.WarPlugin;
-import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.bundling.Jar;
 import org.gradle.api.tasks.bundling.War;
 
 public class TomcatSupport extends AbstractSupport {
@@ -44,33 +38,17 @@ public class TomcatSupport extends AbstractSupport {
   public static final String TOMCAT_CONFIGURATION = "tomcat";
 
   public static final String TOMCAT_RUN_TASK = "run";
-  public static final String TOMCAT_RUNNER_JAR_TASK = "runnerJar";
-  public static final String TOMCAT_RUNNER_CONFIG_TASK = "runnerConfig";
 
-  public static final String TOMCAT_RUNNER_CLASS = "com.axelor.tomcat.TomcatRunner";
-  public static final String TOMCAT_RUNNER_JAR = "axelor-tomcat.jar";
   public static final String TOMCAT_RUNNER_CONFIG = "axelor-tomcat.properties";
+  public static final String TOMCAT_RUNNER_CONFIG_TASK = "runnerConfig";
 
   public static final String GENERATE_LAUNCHER_TASK = "generateLauncher";
 
   @Override
   public void apply(Project project) {
 
-    final Configuration tomcat = project.getConfigurations().create(TOMCAT_CONFIGURATION);
+    project.getConfigurations().create(TOMCAT_CONFIGURATION);
     applyConfigurationLibs(project, TOMCAT_CONFIGURATION, TOMCAT_CONFIGURATION);
-
-    final File baseDir = FileUtils.getFile(project.getBuildDir(), "tomcat");
-
-    project
-        .getTasks()
-        .create(
-            TOMCAT_RUN_TASK,
-            TomcatRun.class,
-            task -> {
-              task.dependsOn(TOMCAT_RUNNER_JAR_TASK);
-              task.setDescription("Run application using embedded tomcat server.");
-              task.setGroup(AxelorPlugin.AXELOR_APP_GROUP);
-            });
 
     project
         .getTasks()
@@ -78,45 +56,25 @@ public class TomcatSupport extends AbstractSupport {
             TOMCAT_RUNNER_CONFIG_TASK,
             task -> {
               task.dependsOn(
-                  new Callable<Object>() {
-                    @Override
-                    public Object call() throws Exception {
-                      return project
-                          .getConvention()
-                          .getPlugin(JavaPluginConvention.class)
-                          .getSourceSets()
-                          .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
-                          .getRuntimeClasspath();
-                    }
-                  });
+                  project
+                      .getConfigurations()
+                      .findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME));
               task.dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
               task.dependsOn(HotswapSupport.GENERATE_HOTSWAP_CONFIG_TASK);
               task.setDescription("Generate axelor-tomcat.properties.");
+              task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
               task.doLast(a -> generateConfig(project));
             });
 
     project
         .getTasks()
         .create(
-            TOMCAT_RUNNER_JAR_TASK,
-            Jar.class,
+            TOMCAT_RUN_TASK,
+            TomcatRun.class,
             task -> {
               task.dependsOn(TOMCAT_RUNNER_CONFIG_TASK);
-              task.getArchiveFileName().set(TOMCAT_RUNNER_JAR);
-              task.getDestinationDirectory().set(baseDir);
-              task.onlyIf(t -> !task.getArchiveFile().get().getAsFile().exists());
-
-              final Map<String, String> manifest = new HashMap<>();
-
-              manifest.put("Main-Class", TOMCAT_RUNNER_CLASS);
-              manifest.put(
-                  "Class-Path",
-                  tomcat.getFiles().stream()
-                      .filter(f -> !f.getName().contains("hotswap-agent"))
-                      .map(f -> f.getAbsolutePath())
-                      .collect(Collectors.joining(" ")));
-
-              task.getManifest().attributes(manifest);
+              task.setDescription("Run application using embedded tomcat server.");
+              task.setGroup(AxelorPlugin.AXELOR_APP_GROUP);
             });
 
     project
@@ -124,9 +82,9 @@ public class TomcatSupport extends AbstractSupport {
         .create(
             GENERATE_LAUNCHER_TASK,
             task -> {
+              task.dependsOn(TOMCAT_RUNNER_CONFIG_TASK);
               task.setDescription("Generate ide launcher configurations.");
               task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
-              task.dependsOn(TOMCAT_RUNNER_JAR_TASK);
             });
   }
 

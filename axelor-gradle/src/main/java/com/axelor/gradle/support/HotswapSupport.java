@@ -42,7 +42,7 @@ import org.gradle.composite.internal.DefaultIncludedBuild;
 
 public class HotswapSupport extends AbstractSupport {
 
-  public static String GENERATE_HOTSWAP_CONFIG_TASK = "generateHotswapConfig";
+  public static final String GENERATE_HOTSWAP_CONFIG_TASK = "generateHotswapConfig";
 
   private static boolean hasDCEVM;
 

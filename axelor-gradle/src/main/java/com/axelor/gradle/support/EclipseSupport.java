@@ -214,6 +214,10 @@ public class EclipseSupport extends AbstractSupport {
         .append("</listAttribute>\n");
 
     builder.append(
+        "<booleanAttribute key=\"org.eclipse.jdt.launching.ATTR_EXCLUDE_TEST_CODE\" value=\"true\"/>\n");
+    builder.append(
+        "<booleanAttribute key=\"org.eclipse.jdt.launching.ATTR_USE_CLASSPATH_ONLY_JAR\" value=\"true\"/>\n");
+    builder.append(
         "<booleanAttribute key=\"org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD\" value=\"true\"/>\n");
 
     builder
