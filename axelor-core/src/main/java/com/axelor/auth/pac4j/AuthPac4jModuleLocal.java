@@ -77,17 +77,19 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
   protected void addLocalClients() {
     final AppSettings settings = AppSettings.get();
     final String ldapUrl = settings.get(AvailableAppSettings.AUTH_LDAP_SERVER_URL, null);
-    final Authenticator<UsernamePasswordCredentials> authenticator =
-        ldapUrl == null ? new AxelorLdapProfileService() : new AxelorLocalAuthenticator();
 
     if (ldapUrl != null) {
+      bind(AxelorAuthenticator.class).to(AxelorLdapProfileService.class);
       logger.info("LDAP URL: {}", ldapUrl);
+    } else {
+      bind(AxelorAuthenticator.class).to(AxelorLocalAuthenticator.class);
     }
 
-    addLocalClient(new AxelorFormClient(authenticator));
+    expose(AxelorAuthenticator.class);
+    addLocalClient(new AxelorFormClient());
 
     if (isBasicAuthEnabled()) {
-      addLocalClient(new AxelorDirectBasicAuthClient(authenticator));
+      addLocalClient(new AxelorDirectBasicAuthClient());
     }
   }
 
@@ -103,11 +105,10 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
 
   private static class AxelorFormClient extends FormClient {
 
-    public AxelorFormClient(Authenticator<UsernamePasswordCredentials> authenticator) {
+    public AxelorFormClient() {
       setName(getClass().getSuperclass().getSimpleName());
       setCredentialsExtractor(new JsonExtractor());
       setAjaxRequestResolver(new AxelorAjaxRequestResolver());
-      defaultAuthenticator(authenticator);
     }
 
     @Override
@@ -115,6 +116,11 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
       final String baseUrl = AuthPac4jModule.getRelativeBaseURL();
       final String loginUrl = baseUrl + "/login.jsp";
       setLoginUrl(loginUrl);
+
+      final Authenticator<UsernamePasswordCredentials> authenticator =
+          Beans.get(AxelorAuthenticator.class);
+      defaultAuthenticator(authenticator);
+
       super.clientInit();
     }
 
@@ -176,9 +182,16 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
   }
 
   private static class AxelorDirectBasicAuthClient extends DirectBasicAuthClient {
-    public AxelorDirectBasicAuthClient(Authenticator<UsernamePasswordCredentials> authenticator) {
+    public AxelorDirectBasicAuthClient() {
       setName(getClass().getSuperclass().getSimpleName());
+    }
+
+    @Override
+    protected void clientInit() {
+      final Authenticator<UsernamePasswordCredentials> authenticator =
+          Beans.get(AxelorAuthenticator.class);
       defaultAuthenticator(authenticator);
+      super.clientInit();
     }
 
     @Override
@@ -190,8 +203,9 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
     }
   }
 
-  public static class AxelorLocalAuthenticator
-      implements Authenticator<UsernamePasswordCredentials> {
+  public static interface AxelorAuthenticator extends Authenticator<UsernamePasswordCredentials> {}
+
+  public static class AxelorLocalAuthenticator implements AxelorAuthenticator {
 
     @Override
     public void validate(UsernamePasswordCredentials credentials, WebContext context) {
