@@ -1,8 +1,24 @@
+/*
+ * Axelor Business Solutions
+ *
+ * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ *
+ * This program is free software: you can redistribute it and/or  modify
+ * it under the terms of the GNU Affero General Public License, version 3,
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.auth.pac4j.AuthPac4jModuleLocal.AxelorAuthenticator;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.google.common.collect.ImmutableList;
@@ -24,8 +40,6 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.ldaptive.BindConnectionInitializer;
 import org.ldaptive.Connection;
 import org.ldaptive.ConnectionConfig;
@@ -60,13 +74,11 @@ import org.pac4j.core.profile.definition.CommonProfileDefinition;
 import org.pac4j.ldap.profile.LdapProfile;
 import org.pac4j.ldap.profile.service.LdapProfileService;
 
-@Singleton
-public class AxelorLdapProfileService extends LdapProfileService implements AxelorAuthenticator {
+public class AxelorLdapProfileService extends LdapProfileService {
 
   private final String groupsDn;
   private final String groupFilter;
 
-  @Inject
   public AxelorLdapProfileService() {
     this(AppSettings.get().getProperties());
   }
