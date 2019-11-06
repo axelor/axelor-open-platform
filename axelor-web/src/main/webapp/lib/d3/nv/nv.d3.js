@@ -1892,6 +1892,44 @@ nv.models.axis = function() {
             }
             axisLabel.text(function(d) { return d });
 
+            (function ellipseLabelsAndAddTitles() {
+              var topOrBottom = ["top", "bottom"].indexOf(axis.orient()) >= 0;
+              if (topOrBottom && rotateLabels % 360 == 0) {
+                return;
+              }
+              var maxTextLength = topOrBottom ? 50 : 55;
+              var maxIteration = 20;
+              g.selectAll('g.tick text')
+                .each(function() {
+                  var self = d3.select(this);
+                  var fullText = self.text();
+                  var textLength = self.node().getComputedTextLength();
+                  if (textLength <= maxTextLength) {
+                    return;
+                  }
+                  var min = 0;
+                  var max = fullText.length - 1;
+                  var len;
+                  var nIteration = 0;
+                  do {
+                    len = Math.round((min + max) / 2);
+                    self.text(fullText.slice(0, len) + '…');
+                    if (self.node().getComputedTextLength() > maxTextLength) {
+                      max = len - 1;
+                    } else {
+                      min = len;
+                    }
+                  } while (min < max && nIteration++ < maxIteration);
+                  if (nIteration > maxIteration) {
+                    console.warn('Too many ellipsing attempts: ' + self.text());
+                  }
+                  if (len !== min) {
+                    self.text(fullText.slice(0, min) + '…');
+                  }
+                  self.append("title").text(fullText);
+                });
+            })();
+
             if (showMaxMin && (axis.orient() === 'left' || axis.orient() === 'right')) {
                 //check if max and min overlap other values, if so, hide the values that overlap
                 g.selectAll('g') // the g's wrapping each tick
