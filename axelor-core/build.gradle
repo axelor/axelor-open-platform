@@ -10,6 +10,9 @@ dependencies {
   testImplementation project(":axelor-test")
 
   api project(":axelor-common")
+
+  // these dependencies will be excluded from war package
+  implementation libs.hotswap_agent
   implementation project(":axelor-tomcat")
 
   api libs.groovy

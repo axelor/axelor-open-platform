@@ -75,7 +75,7 @@ public class HotswapSupport extends AbstractSupport {
     final List<String> args = new ArrayList<>();
     tomcat.getFiles().stream()
         .filter(f -> f.getName().endsWith(".jar"))
-        .filter(f -> f.getName().startsWith("hotswap-agent"))
+        .filter(f -> f.getName().startsWith("hotswap-agent-core"))
         .findFirst()
         .ifPresent(
             agentJar -> {
