@@ -480,8 +480,7 @@ public class Query<T extends Model> {
     boolean notMySQL = !DBHelper.isMySQL();
 
     String whereClause = String.join(" OR ", where);
-    String selectQuery =
-        selectQuery().replaceFirst("SELECT self", "SELECT self.id").replaceFirst(" ORDER BY.*", "");
+    String selectQuery = updateQuery().replaceFirst("SELECT self", "SELECT self.id");
 
     if (selectQuery.contains(" WHERE ")) {
       selectQuery = selectQuery.replaceFirst(" WHERE ", " WHERE (" + whereClause + ") AND (") + ")";

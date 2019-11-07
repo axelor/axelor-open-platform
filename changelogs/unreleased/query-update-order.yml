@@ -1,0 +1,3 @@
+---
+title: Fix Query#update when query has ORDER BY clause
+type: fix
