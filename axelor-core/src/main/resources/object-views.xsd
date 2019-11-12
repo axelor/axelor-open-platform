@@ -2425,7 +2425,7 @@
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="showTitle" use="prohibited" />
-        <xsd:attribute name="onClick" type="xsd:string">
+        <xsd:attribute name="onClick" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>
               An action to execute on click event. The current node record is
