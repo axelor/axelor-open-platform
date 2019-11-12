@@ -88,7 +88,9 @@
       lastCookieString = cookieString;
       lastCookies = _.reduce(cookieString.split('; '), function (obj, value) {
         var parts = value.split('=');
-        obj[parts[0]] = parts[1];
+        if (!obj.hasOwnProperty(parts[0])) {
+          obj[parts[0]] = parts[1];
+        }
         return obj;
       }, {});
     }
