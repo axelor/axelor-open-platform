@@ -989,6 +989,7 @@ var directiveFn = function(){
           scope.onAction = function () {
             scope.handleAction(data && data.dataset);
           };
+          scope.$applyAsync();
           return;
         });
       };
