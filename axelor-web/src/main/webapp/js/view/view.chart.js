@@ -434,25 +434,30 @@ function PlotData(series, data) {
   return datum;
 }
 
-function applyLimitsOnLegend(chart, scope, series, datum) {
-  if (chart.showLegend) {
-    if (scope.isLegendVisible !== undefined) {
-      chart.showLegend(scope.isLegendVisible);
-    } else if (chart.showLegend() && datum.length > legendHideLimit) {
-      chart.showLegend(false);
-    }
-    if (chart.showLegend() && datum.length > legendLengthLimit) {
-      chart.legend.maxKeyLength(legendMaxKeyLength);
-    }
-    if (series.groupBy || datum.length > 1) {
-      scope.isLegendVisible = chart.showLegend();
-      scope.$applyAsync();
-    }
+function applyLimitsOnLegend(chart, scope, series, datum, config) {
+  if (!chart.showLegend) {
+    return;
+  }
+
+  if (scope.isLegendVisible !== undefined) {
+    chart.showLegend(scope.isLegendVisible);
+  } else if (config && config.hideLegend !== undefined) {
+    var hideLegend = _.toBoolean(config.hideLegend);
+    chart.showLegend(!hideLegend);
+  } else if (chart.showLegend() && datum.length > legendHideLimit) {
+    chart.showLegend(false);
+  }
+  if (chart.showLegend() && datum.length > legendLengthLimit) {
+    chart.legend.maxKeyLength(legendMaxKeyLength);
+  }
+  if (series.groupBy || datum.length > 1) {
+    scope.isLegendVisible = chart.showLegend();
+    scope.$applyAsync();
   }
 }
 
-function applyLimitsOnLegendAndLabels(chart, scope, series, datum) {
-  applyLimitsOnLegend(chart, scope, series, datum);
+function applyLimitsOnLegendAndLabels(chart, scope, series, datum, config) {
+  applyLimitsOnLegend(chart, scope, series, datum, config);
 
   if (chart.showXAxis && chart.showXAxis()
       && (!chart.staggerLabels || !chart.staggerLabels())
@@ -473,7 +478,7 @@ function PieChart(scope, element, data) {
     .width(null)
     .x(function(d) { return d.x; })
     .y(function(d) { return d.y; });
-  applyLimitsOnLegend(chart, scope, series, datum);
+  applyLimitsOnLegend(chart, scope, series, datum, config);
 
   if (series.type === "donut") {
     chart.donut(true)
@@ -504,6 +509,7 @@ function DBarChart(scope, element, data) {
 
   var series = _.first(data.series);
   var datum = PlusData(series, data);
+  var config = data.config || {};
 
   datum = [{
     key: data.title,
@@ -515,7 +521,7 @@ function DBarChart(scope, element, data) {
       .y(function(d) { return d.y; })
       .staggerLabels(true)
       .showValues(true);
-  applyLimitsOnLegendAndLabels(chart, scope, series, datum);
+  applyLimitsOnLegendAndLabels(chart, scope, series, datum, config);
 
   d3.select(element[0])
     .datum(datum)
@@ -532,10 +538,11 @@ function BarChart(scope, element, data) {
 
   var series = _.first(data.series);
   var datum = PlotData(series, data);
+  var config = data.config || {};
 
   var chart = nv.models.multiBarChart()
     .reduceXTicks(false);
-  applyLimitsOnLegendAndLabels(chart, scope, series, datum);
+  applyLimitsOnLegendAndLabels(chart, scope, series, datum, config);
 
   chart.multibar.hideable(true);
   chart.stacked(data.stacked);
@@ -555,9 +562,10 @@ function HBarChart(scope, element, data) {
 
   var series = _.first(data.series);
   var datum = PlotData(series, data);
+  var config = data.config || {};
 
   var chart = nv.models.multiBarHorizontalChart();
-  applyLimitsOnLegendAndLabels(chart, scope, series, datum);
+  applyLimitsOnLegendAndLabels(chart, scope, series, datum, config);
 
   chart.stacked(data.stacked);
 
@@ -616,12 +624,13 @@ function LineChart(scope, element, data) {
 
   var series = _.first(data.series);
   var datum = PlotData(series, data);
+  var config = data.config || {};
 
   var chart = nv.models.lineChart()
     .showLegend(true)
     .showYAxis(true)
     .showXAxis(true);
-  applyLimitsOnLegend(chart, scope, series, datum);
+  applyLimitsOnLegend(chart, scope, series, datum, config);
 
   applyXY(chart, data);
 
@@ -636,9 +645,10 @@ function AreaChart(scope, element, data) {
 
   var series = _.first(data.series);
   var datum = PlotData(series, data);
+  var config = data.config || {};
 
   var chart = nv.models.stackedAreaChart();
-  applyLimitsOnLegend(chart, scope, series, datum);
+  applyLimitsOnLegend(chart, scope, series, datum, config);
 
   applyXY(chart, data);
 
