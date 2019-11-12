@@ -20,6 +20,7 @@ package com.axelor.meta.schema.views;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
@@ -33,13 +34,13 @@ public enum Position {
   AFTER(Node::getParentNode, Node::getNextSibling),
 
   @XmlEnumValue("before")
-  BEFORE(Node::getParentNode, Function.identity()),
+  BEFORE(Node::getParentNode, UnaryOperator.identity()),
 
   @XmlEnumValue("inside")
-  INSIDE_LAST(Function.identity(), node -> null),
+  INSIDE_LAST(UnaryOperator.identity(), node -> null),
 
   @XmlEnumValue("inside-first")
-  INSIDE_FIRST(Function.identity(), Node::getFirstChild);
+  INSIDE_FIRST(UnaryOperator.identity(), Node::getFirstChild);
 
   private final Function<Node, Node> parentNodeFunc;
   private final Function<Node, Node> refChildNodeFunc;
@@ -57,7 +58,7 @@ public enum Position {
                     }
                   }));
 
-  private Position(Function<Node, Node> parentNodeFunc, Function<Node, Node> refChildNodeFunc) {
+  private Position(UnaryOperator<Node> parentNodeFunc, UnaryOperator<Node> refChildNodeFunc) {
     this.parentNodeFunc = parentNodeFunc;
     this.refChildNodeFunc = refChildNodeFunc;
   }
