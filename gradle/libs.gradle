@@ -13,7 +13,7 @@ versions.resteasy = "3.1.2.Final"
 versions.jackson = "2.8.8"
 versions.shiro = "1.4.1"
 versions.buji_pac4j = "4.1.1"
-versions.pac4j = "3.8.2"
+versions.pac4j = "3.8.3"
 versions.ldaptive = "1.2.4"
 
 versions.junit = "4.12"
