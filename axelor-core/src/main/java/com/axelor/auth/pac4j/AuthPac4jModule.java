@@ -474,13 +474,14 @@ public abstract class AuthPac4jModule extends AuthWebModule {
         throws IOException, ServletException {
 
       final Subject subject = SecurityUtils.getSubject();
+      final boolean authenticated = subject.isAuthenticated();
 
-      if (AuthUtils.getUser() == null) {
+      if (authenticated && AuthUtils.getUser() == null) {
         subject.logout();
       }
 
       // if already authenticated or if form login is not configured redirect to base url
-      if (subject.isAuthenticated()
+      if (authenticated
           || AuthPac4jModule.clientList.stream()
               .noneMatch(client -> client instanceof FormClient)) {
         ((HttpServletResponse) response).sendRedirect(AppSettings.get().getBaseURL());
