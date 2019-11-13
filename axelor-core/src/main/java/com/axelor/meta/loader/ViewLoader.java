@@ -75,6 +75,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
@@ -98,6 +99,8 @@ public class ViewLoader extends AbstractLoader {
   @Inject private GroupRepository groups;
 
   @Inject private XMLViews.FinalViewGenerator finalViewGenerator;
+
+  private final Map<String, List<String>> viewsToMigrate = new ConcurrentHashMap<>();
 
   @Override
   @Transactional
@@ -124,7 +127,24 @@ public class ViewLoader extends AbstractLoader {
       throw new PersistenceException("There are some unresolve items, check the log.");
     }
 
+    migrateViews();
     generateFinalViews(module, update);
+  }
+
+  private void migrateViews() {
+    try {
+      viewsToMigrate.forEach(
+          (name, xmlIds) -> {
+            final MetaView baseView = views.findByNameAndComputed(name, false);
+            views
+                .all()
+                .filter("self.xmlId IN :xmlIds")
+                .bind("xmlIds", xmlIds)
+                .update("priority", baseView.getPriority());
+          });
+    } finally {
+      viewsToMigrate.clear();
+    }
   }
 
   private void generateFinalViews(Module module, boolean update) {
@@ -257,11 +277,13 @@ public class ViewLoader extends AbstractLoader {
       other = null;
     }
 
-    // set priority higher to existing view
-    if (entity.getId() == null
-        && other != null
-        && !Objects.equal(xmlId, other.getXmlId())
-        && view.getExtension() != Boolean.TRUE) {
+    if (Boolean.TRUE.equals(view.getExtension())) {
+      if (!Boolean.TRUE.equals(entity.getExtension())) {
+        // Migrated to extension view
+        viewsToMigrate.computeIfAbsent(view.getName(), k -> new ArrayList<>()).add(view.getXmlId());
+      }
+    } else if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+      // Set priority higher than existing view
       entity.setPriority(other.getPriority() + 1);
     }
 

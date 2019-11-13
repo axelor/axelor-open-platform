@@ -74,7 +74,7 @@
       AND COALESCE(self.computed, FALSE) = FALSE
       AND (self.name, self.priority)
       IN (SELECT other.name, MAX(other.priority) FROM MetaView other
-      WHERE COALESCE(self.extension, FALSE) = FALSE AND COALESCE(other.computed, FALSE) = FALSE
+      WHERE COALESCE(other.extension, FALSE) = FALSE AND COALESCE(other.computed, FALSE) = FALSE
       GROUP BY name)
       AND EXISTS (SELECT extensionView FROM MetaView extensionView
       WHERE extensionView.name = self.name AND extensionView.extension = TRUE)"/>
