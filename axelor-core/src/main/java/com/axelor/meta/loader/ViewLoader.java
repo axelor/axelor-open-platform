@@ -80,6 +80,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
@@ -104,7 +105,8 @@ public class ViewLoader extends AbstractParallelLoader {
 
   @Inject private XMLViews.FinalViewGenerator finalViewGenerator;
 
-  private final Set<String> viewsToGenerate = new HashSet<>();
+  private final Set<String> viewsToGenerate = ConcurrentHashMap.newKeySet();
+  private final Map<String, List<String>> viewsToMigrate = new ConcurrentHashMap<>();
 
   @Override
   protected void doLoad(URL file, Module module, boolean update) {
@@ -137,12 +139,33 @@ public class ViewLoader extends AbstractParallelLoader {
       throw new PersistenceException("There are some unresolve items; check the log.");
     }
 
+    migrateViews();
     generateFinalViews(module, update);
   }
 
+  private void migrateViews() {
+    try {
+      viewsToMigrate.forEach(
+          (name, xmlIds) -> {
+            final MetaView baseView = views.findByNameAndComputed(name, false);
+            views
+                .all()
+                .filter("self.xmlId IN :xmlIds")
+                .bind("xmlIds", xmlIds)
+                .update("priority", baseView.getPriority());
+          });
+    } finally {
+      viewsToMigrate.clear();
+    }
+  }
+
   private void generateFinalViews(Module module, boolean update) {
-    finalViewGenerator.parallelGenerate(findForCompute(module.getName(), update, viewsToGenerate));
-    viewsToGenerate.clear();
+    try {
+      finalViewGenerator.parallelGenerate(
+          findForCompute(module.getName(), update, viewsToGenerate));
+    } finally {
+      viewsToGenerate.clear();
+    }
   }
 
   private Query<MetaView> findForCompute(String module, boolean update, Collection<String> names) {
@@ -156,7 +179,7 @@ public class ViewLoader extends AbstractParallelLoader {
                 + "AND COALESCE(self.computed, FALSE) = FALSE "
                 + "AND (self.name, self.priority) "
                 + "IN (SELECT other.name, MAX(other.priority) FROM MetaView other "
-                + "WHERE COALESCE(self.extension, FALSE) = FALSE AND COALESCE(other.computed, FALSE) = FALSE "
+                + "WHERE COALESCE(other.extension, FALSE) = FALSE AND COALESCE(other.computed, FALSE) = FALSE "
                 + "GROUP BY name) "
                 + "AND EXISTS (SELECT extensionView FROM MetaView extensionView "
                 + "WHERE extensionView.name = self.name AND extensionView.extension = TRUE)")
@@ -282,11 +305,13 @@ public class ViewLoader extends AbstractParallelLoader {
       other = null;
     }
 
-    // set priority higher to existing view
-    if (entity.getId() == null
-        && other != null
-        && !Objects.equal(xmlId, other.getXmlId())
-        && view.getExtension() != Boolean.TRUE) {
+    if (Boolean.TRUE.equals(view.getExtension())) {
+      if (!Boolean.TRUE.equals(entity.getExtension())) {
+        // Migrated to extension view
+        viewsToMigrate.computeIfAbsent(view.getName(), k -> new ArrayList<>()).add(view.getXmlId());
+      }
+    } else if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+      // Set priority higher than existing view
       entity.setPriority(other.getPriority() + 1);
     }
 
