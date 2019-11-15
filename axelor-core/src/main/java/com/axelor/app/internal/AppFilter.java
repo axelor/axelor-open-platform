@@ -73,7 +73,7 @@ public class AppFilter implements Filter {
     return StringUtils.isBlank(value) ? defaultValue : value;
   }
 
-  private String getBaseUrl(ServletRequest req) {
+  private String computeBaseUrl(ServletRequest req) {
     final String proto = getHeader(req, "X-Forwarded-Proto", req.getScheme());
     final String port = getHeader(req, "X-Forwarded-Port", "" + req.getServerPort());
     final String host = getHeader(req, "X-Forwarded-Host", req.getServerName());
@@ -88,7 +88,7 @@ public class AppFilter implements Filter {
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
 
-    BASE_URL.set(getBaseUrl(request));
+    BASE_URL.set(computeBaseUrl(request));
     LANGUAGE.set(request.getLocale());
     try {
       chain.doFilter(request, response);
