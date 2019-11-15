@@ -24,6 +24,7 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
+import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
@@ -44,6 +45,7 @@ public class AuthPac4jUserService {
   @Inject protected AuthPac4jProfileService profileService;
 
   @Inject protected UserRepository userRepo;
+  @Inject protected GroupRepository groupRepo;
 
   private static final String DEFAULT_GROUP_CODE;
 
@@ -77,20 +79,26 @@ public class AuthPac4jUserService {
   private void process(CommonProfile profile, boolean withCreate) {
     final User user = getUser(profile);
 
-    if(withCreate && user == null) {
-      persistUser(profile);
-    } else if (user != null) {
+    if (user == null) {
+      if (withCreate) {
+        persistUser(profile);
+      }
+    } else {
       updateUser(user, profile);
     }
   }
 
   @Transactional
   protected void persistUser(CommonProfile profile) {
-    final User user = new User(profileService.getCodeOrEmail(profile), profileService.getName(profile));
+    final User user =
+        new User(profileService.getCodeOrEmail(profile), profileService.getName(profile));
     user.setPassword(authService.encrypt(UUID.randomUUID().toString()));
-    user.setGroup(profileService.getGroup(profile, getDefaultGroupCode()));
 
     updateUser(user, profile);
+
+    if (user.getGroup() == null) {
+      user.setGroup(groupRepo.findByCode(getDefaultGroupCode()));
+    }
 
     userRepo.persist(user);
     logger.info("User(code={}) created from {}", user.getCode(), profile);
