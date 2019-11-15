@@ -83,47 +83,51 @@ public class ActionExport extends Action {
     String templatePath = handler.evaluate(export.template).toString();
 
     Reader reader = null;
-    File template = new File(templatePath);
-    if (template.isFile()) {
-      reader = new FileReader(template);
-    }
 
-    if (reader == null) {
-      InputStream is = ResourceUtils.getResourceStream(templatePath);
-      if (is == null) {
-        throw new FileNotFoundException("No such template: " + templatePath);
-      }
-      reader = new InputStreamReader(is);
-    }
-
-    String name = export.getName();
-    if (name.indexOf("$") > -1 || (name.startsWith("#{") && name.endsWith("}"))) {
-      name = handler.evaluate(toExpression(name, true)).toString();
-    }
-
-    log.info("export {} as {}", templatePath, name);
-
-    Templates engine = new StringTemplates('$', '$');
-    if ("groovy".equals(export.engine)) {
-      engine = new GroovyTemplates();
-    }
-
-    File output = getExportPath();
-    output = FileUtils.getFile(output, dir, name);
-
-    String contents = null;
     try {
+      File template = new File(templatePath);
+      if (template.isFile()) {
+        reader = new FileReader(template);
+      }
+
+      if (reader == null) {
+        InputStream is = ResourceUtils.getResourceStream(templatePath);
+        if (is == null) {
+          throw new FileNotFoundException("No such template: " + templatePath);
+        }
+        reader = new InputStreamReader(is);
+      }
+
+      String name = export.getName();
+      if (name.indexOf("$") > -1 || (name.startsWith("#{") && name.endsWith("}"))) {
+        name = handler.evaluate(toExpression(name, true)).toString();
+      }
+
+      log.info("export {} as {}", templatePath, name);
+
+      Templates engine = new StringTemplates('$', '$');
+      if ("groovy".equals(export.engine)) {
+        engine = new GroovyTemplates();
+      }
+
+      File output = getExportPath();
+      output = FileUtils.getFile(output, dir, name);
+
+      String contents = null;
+
       contents = handler.template(engine, reader);
+
+      Files.createParentDirs(output);
+      Files.asCharSink(output, Charsets.UTF_8).write(contents);
+
+      log.info("file saved: {}", output);
+
+      return FileUtils.getFile(dir, name).toString();
     } finally {
-      reader.close();
+      if (reader != null) {
+        reader.close();
+      }
     }
-
-    Files.createParentDirs(output);
-    Files.asCharSink(output, Charsets.UTF_8).write(contents);
-
-    log.info("file saved: {}", output);
-
-    return FileUtils.getFile(dir, name).toString();
   }
 
   @Override

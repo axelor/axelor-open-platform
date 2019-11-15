@@ -76,6 +76,7 @@ public class LoggingTest {
       Assert.assertTrue(logPath.resolve("axelor.log").toFile().exists());
     } finally {
       System.setOut(sout);
+      out.close();
       loggerConfig.uninstall();
       FileUtils.deleteDirectory(logPath);
     }

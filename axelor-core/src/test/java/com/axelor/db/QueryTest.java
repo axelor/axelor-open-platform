@@ -192,15 +192,16 @@ public class QueryTest extends JpaTest {
 
           @Override
           public void execute(Connection connection) throws SQLException {
-            Statement stm = connection.createStatement();
-            ResultSet rs = stm.executeQuery("SELECT * FROM contact_title");
-            ResultSetMetaData meta = rs.getMetaData();
-            while (rs.next()) {
-              Map<String, Object> item = Maps.newHashMap();
-              for (int i = 0; i < meta.getColumnCount(); i++) {
-                item.put(meta.getColumnName(i + 1), rs.getObject(i + 1));
+            try (Statement stm = connection.createStatement()) {
+              ResultSet rs = stm.executeQuery("SELECT * FROM contact_title");
+              ResultSetMetaData meta = rs.getMetaData();
+              while (rs.next()) {
+                Map<String, Object> item = Maps.newHashMap();
+                for (int i = 0; i < meta.getColumnCount(); i++) {
+                  item.put(meta.getColumnName(i + 1), rs.getObject(i + 1));
+                }
+                Assert.assertFalse(item.isEmpty());
               }
-              Assert.assertFalse(item.isEmpty());
             }
           }
         });
