@@ -136,21 +136,8 @@ public class AuthPac4jProfileService {
 
   @Nullable
   public byte[] getImage(CommonProfile profile) throws IOException {
-    final URI uri;
-
-    if (profile.getPictureUrl() != null) {
-      uri = profile.getPictureUrl();
-    } else if (profile.getProfileUrl() != null) {
-      uri = profile.getProfileUrl();
-    } else {
-      uri = null;
-    }
-
-    if (uri == null) {
-      return null;
-    }
-
-    return downloadUrl(uri.toURL());
+    final URI uri = profile.getPictureUrl();
+    return uri != null ? downloadUrl(uri.toURL()) : null;
   }
 
   @Nullable
