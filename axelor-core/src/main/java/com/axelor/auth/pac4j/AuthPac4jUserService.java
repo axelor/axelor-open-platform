@@ -24,6 +24,7 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
+import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
@@ -44,6 +45,7 @@ public class AuthPac4jUserService {
   @Inject protected AuthPac4jProfileService profileService;
 
   @Inject protected UserRepository userRepo;
+  @Inject protected GroupRepository groupRepo;
 
   private static final String DEFAULT_GROUP_CODE;
 
@@ -67,61 +69,37 @@ public class AuthPac4jUserService {
   }
 
   public void saveUser(CommonProfile profile) {
-    final String codeOrEmail = profileService.getCodeOrEmail(profile);
+    process(profile, true);
+  }
 
-    if (codeOrEmail == null) {
-      return;
-    }
+  public void updateUser(CommonProfile profile) {
+    process(profile, false);
+  }
 
-    final User user = userRepo.findByCodeOrEmail(codeOrEmail);
+  private void process(CommonProfile profile, boolean withCreate) {
+    final User user = getUser(profile);
 
     if (user == null) {
-      persistUser(codeOrEmail, profile);
+      if (withCreate) {
+        persistUser(profile);
+      }
     } else {
       updateUser(user, profile);
     }
   }
 
-  public void updateUser(CommonProfile profile) {
-    final String codeOrEmail = profileService.getCodeOrEmail(profile);
-
-    if (codeOrEmail == null) {
-      return;
-    }
-
-    final User user = userRepo.findByCodeOrEmail(codeOrEmail);
-
-    if (user != null) {
-      updateUser(user, profile);
-    }
-  }
-
   @Transactional
-  protected void persistUser(String code, CommonProfile profile) {
-    final User user = new User(code, profileService.getName(profile));
-    user.setPassword(UUID.randomUUID().toString());
-    user.setEmail(profileService.getEmail(profile));
-    user.setLanguage(profileService.getLanguage(profile));
+  protected void persistUser(CommonProfile profile) {
+    final User user =
+        new User(profileService.getCodeOrEmail(profile), profileService.getName(profile));
+    user.setPassword(authService.encrypt(UUID.randomUUID().toString()));
 
-    if (StringUtils.isBlank(user.getLanguage())) {
-      final AppSettings settings = AppSettings.get();
-      final String appLocale = settings.get("application.locale", null);
-      if (appLocale != null) {
-        user.setLanguage(appLocale);
-      }
+    updateUser(user, profile);
+
+    if (user.getGroup() == null) {
+      user.setGroup(groupRepo.findByCode(getDefaultGroupCode()));
     }
 
-    user.setGroup(profileService.getGroup(profile, getDefaultGroupCode()));
-    profileService.getRoles(profile).forEach(user::addRole);
-    profileService.getPermissions(profile).forEach(user::addPermission);
-
-    try {
-      user.setImage(profileService.getImage(profile));
-    } catch (IOException e) {
-      logger.error(e.getMessage(), e);
-    }
-
-    authService.encrypt(user);
     userRepo.persist(user);
     logger.info("User(code={}) created from {}", user.getCode(), profile);
   }
