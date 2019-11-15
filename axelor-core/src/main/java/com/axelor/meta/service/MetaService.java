@@ -289,7 +289,10 @@ public class MetaService {
             .append("SELECT self FROM MetaMenu self ")
             .append("LEFT JOIN FETCH self.action ")
             .append("LEFT JOIN FETCH self.parent ")
-            .append(withTagsOnly ? "WHERE (self.tag IS NOT NULL OR self.tagGet IS NOT NULL OR self.tagCount IS NOT NULL) " : "")
+            .append(
+                withTagsOnly
+                    ? "WHERE (self.tag IS NOT NULL OR self.tagGet IS NOT NULL OR self.tagCount IS NOT NULL) "
+                    : "")
             .append(" ORDER BY COALESCE(self.priority, 0) DESC, self.id");
 
     final TypedQuery<MetaMenu> query = JPA.em().createQuery(queryString.toString(), MetaMenu.class);
