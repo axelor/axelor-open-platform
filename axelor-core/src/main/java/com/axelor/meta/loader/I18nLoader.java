@@ -49,8 +49,6 @@ import org.slf4j.LoggerFactory;
 
 public class I18nLoader extends AbstractParallelLoader {
 
-  private Logger log = LoggerFactory.getLogger(I18nLoader.class);
-
   @Inject private MetaTranslationRepository translations;
 
   /** Separate custom csv files from the rest. */
