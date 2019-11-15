@@ -103,14 +103,6 @@ public class AuthPac4jUserService {
     user.setEmail(profileService.getEmail(profile));
     user.setLanguage(profileService.getLanguage(profile));
 
-    if (StringUtils.isBlank(user.getLanguage())) {
-      final AppSettings settings = AppSettings.get();
-      final String appLocale = settings.get("application.locale", null);
-      if (appLocale != null) {
-        user.setLanguage(appLocale);
-      }
-    }
-
     user.setGroup(profileService.getGroup(profile, getDefaultGroupCode()));
     profileService.getRoles(profile).forEach(user::addRole);
     profileService.getPermissions(profile).forEach(user::addPermission);
