@@ -67,53 +67,31 @@ public class AuthPac4jUserService {
   }
 
   public void saveUser(CommonProfile profile) {
-    final String codeOrEmail = profileService.getCodeOrEmail(profile);
-
-    if (codeOrEmail == null) {
-      return;
-    }
-
-    final User user = userRepo.findByCodeOrEmail(codeOrEmail);
-
-    if (user == null) {
-      persistUser(codeOrEmail, profile);
-    } else {
-      updateUser(user, profile);
-    }
+    process(profile, true);
   }
 
   public void updateUser(CommonProfile profile) {
-    final String codeOrEmail = profileService.getCodeOrEmail(profile);
+    process(profile, false);
+  }
 
-    if (codeOrEmail == null) {
-      return;
-    }
+  private void process(CommonProfile profile, boolean withCreate) {
+    final User user = getUser(profile);
 
-    final User user = userRepo.findByCodeOrEmail(codeOrEmail);
-
-    if (user != null) {
+    if(withCreate && user == null) {
+      persistUser(profile);
+    } else if (user != null) {
       updateUser(user, profile);
     }
   }
 
   @Transactional
-  protected void persistUser(String code, CommonProfile profile) {
-    final User user = new User(code, profileService.getName(profile));
-    user.setPassword(UUID.randomUUID().toString());
-    user.setEmail(profileService.getEmail(profile));
-    user.setLanguage(profileService.getLanguage(profile));
-
+  protected void persistUser(CommonProfile profile) {
+    final User user = new User(profileService.getCodeOrEmail(profile), profileService.getName(profile));
+    user.setPassword(authService.encrypt(UUID.randomUUID().toString()));
     user.setGroup(profileService.getGroup(profile, getDefaultGroupCode()));
-    profileService.getRoles(profile).forEach(user::addRole);
-    profileService.getPermissions(profile).forEach(user::addPermission);
 
-    try {
-      user.setImage(profileService.getImage(profile));
-    } catch (IOException e) {
-      logger.error(e.getMessage(), e);
-    }
+    updateUser(user, profile);
 
-    authService.encrypt(user);
     userRepo.persist(user);
     logger.info("User(code={}) created from {}", user.getCode(), profile);
   }
