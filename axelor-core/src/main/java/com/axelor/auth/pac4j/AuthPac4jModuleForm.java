@@ -17,7 +17,6 @@
  */
 package com.axelor.auth.pac4j;
 
-import com.axelor.app.AppSettings;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
@@ -27,7 +26,6 @@ import com.axelor.inject.Beans;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 import javax.servlet.ServletContext;
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.context.WebContext;
@@ -80,11 +78,7 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
 
     @Override
     protected void clientInit() {
-      final AppSettings settings = AppSettings.get();
-      final String baseUrl =
-          Optional.ofNullable(settings.getBaseURL())
-              .orElseThrow(IllegalStateException::new)
-              .replaceAll("/+$", "");
+      final String baseUrl = AuthPac4jModule.getRelativeBaseURL();
       final String loginUrl = baseUrl + "/login.jsp";
       setLoginUrl(loginUrl);
       super.clientInit();

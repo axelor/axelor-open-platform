@@ -93,6 +93,7 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
 
   public AuthPac4jModuleSaml(ServletContext servletContext) {
     super(servletContext);
+    AuthPac4jModule.requireAbsCallbackUrl();
   }
 
   @Override
@@ -245,7 +246,7 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
 
     @Override
     protected void initSAMLLogoutResponseValidator() {
-      final String postLogoutURL = AuthPac4jModule.getLogoutUrl();
+      final String postLogoutURL = AuthPac4jModule.getRelativeBaseURL();
       this.logoutValidator =
           new AxelorSAML2LogoutValidator(
               this.signatureTrustEngineProvider,

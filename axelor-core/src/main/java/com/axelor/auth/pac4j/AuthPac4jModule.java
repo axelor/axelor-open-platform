@@ -100,7 +100,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   private static final Map<String, Map<String, String>> clientInfo = new HashMap<>();
 
   private static String callbackUrl;
-
+  private static boolean absCallbackUrlRequired;
   private static String logoutUrl;
 
   private static final Logger logger =
@@ -164,6 +164,11 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     return clientList;
   }
 
+  public static String getRelativeBaseURL() {
+    String base = AppSettings.get().getBaseURL();
+    return URI.create(base).getPath();
+  }
+
   public static String getCallbackUrl() {
     if (callbackUrl == null) {
       if (isEnabled()) {
@@ -176,11 +181,11 @@ public abstract class AuthPac4jModule extends AuthWebModule {
         }
 
         if (StringUtils.isBlank(callbackUrl)) {
-          final String baseUrl =
-              Optional.ofNullable(settings.getBaseURL())
-                  .orElseThrow(IllegalStateException::new)
-                  .replaceAll("/+$", "");
-          callbackUrl = baseUrl + "/callback";
+          String base = AppSettings.get().getBaseURL();
+          if (!absCallbackUrlRequired) {
+            base = URI.create(base).getPath();
+          }
+          callbackUrl = base + "/callback";
         }
       } else {
         callbackUrl = "";
@@ -188,6 +193,10 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     }
 
     return callbackUrl;
+  }
+
+  public static void requireAbsCallbackUrl() {
+    absCallbackUrlRequired = true;
   }
 
   public static String getLogoutUrl() {
@@ -198,8 +207,8 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       if (StringUtils.isBlank(logoutUrl)) {
         logoutUrl =
             AuthPac4jModuleCas.isEnabled()
-                ? settings.get(AuthPac4jModuleCas.CONFIG_CAS_LOGOUT_URL, settings.getBaseURL())
-                : settings.getBaseURL();
+                ? settings.get(AuthPac4jModuleCas.CONFIG_CAS_LOGOUT_URL, getRelativeBaseURL())
+                : getRelativeBaseURL();
       }
       if (StringUtils.isBlank(logoutUrl)) {
         logoutUrl = ".";

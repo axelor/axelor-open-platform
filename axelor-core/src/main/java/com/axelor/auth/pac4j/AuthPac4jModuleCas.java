@@ -31,6 +31,7 @@ import org.pac4j.cas.config.CasConfiguration;
 import org.pac4j.cas.config.CasProtocol;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.context.WebContext;
+import org.pac4j.core.http.url.DefaultUrlResolver;
 import org.pac4j.core.http.url.UrlResolver;
 import org.pac4j.core.logout.handler.LogoutHandler;
 import org.slf4j.Logger;
@@ -178,7 +179,9 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
         break;
       case "indirect":
       default:
-        client = new CasClient(casConfig);
+        final CasClient casClient = new CasClient(casConfig);
+        casClient.setUrlResolver(new DefaultUrlResolver(true));
+        client = casClient;
     }
 
     addClient(client);
