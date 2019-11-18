@@ -22,8 +22,8 @@ import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -118,11 +118,11 @@ public final class AppSettings {
     if (value == null) {
       return null;
     }
-    final Calendar cal = Calendar.getInstance();
+    final LocalDate now = LocalDate.now();
     return value
-        .replace("{year}", "" + cal.get(Calendar.YEAR))
-        .replace("{month}", "" + cal.get(Calendar.MONTH))
-        .replace("{day}", "" + cal.get(Calendar.DAY_OF_MONTH))
+        .replace("{year}", "" + now.getYear())
+        .replace("{month}", "" + now.getMonthValue())
+        .replace("{day}", "" + now.getDayOfMonth())
         .replace("{java.io.tmpdir}", System.getProperty("java.io.tmpdir"))
         .replace("{user.home}", System.getProperty("user.home"));
   }
