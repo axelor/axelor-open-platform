@@ -36,8 +36,8 @@ public class TestLoader extends AbstractTest {
         "<form name=\"some-name\" title=\"Some Name\" model=\"com.axelor.test.db.Contact\">"
             + "<field name=\"some\"/>"
             + "<group title=\"Group\" colSpan=\"4\" cols=\"3\" colWidths=\"33%,33%,33%\">"
-            + "<button name=\"button1\" title=\"Click 1\"/>"
-            + "<button name=\"button2\" title=\"Click 2\"/>"
+            + "<button name=\"button1\" title=\"Click 1\" onClick=\"action.button1\"/>"
+            + "<button name=\"button2\" title=\"Click 2\" onClick=\"action.button2\"/>"
             + "</group>"
             + "<field name=\"other\"/>"
             + "</form>";
