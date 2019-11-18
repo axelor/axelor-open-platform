@@ -299,14 +299,17 @@
                 field.targetName = field.widgetAttrs.targetName;
               }
 
-              // apply all x- prefixed attributes directly on field
+              // remove x- prefix from all widget attributes
               for (var key in field.widgetAttrs) {
-                if (key.startsWith('x-')) {
-                  field[key.substring(2)] = field.widgetAttrs[key];
+                if (_.startsWith(key, 'x-')) {
+                  field.widgetAttrs[key.substring(2)] = field.widgetAttrs[key];
+                  delete field.widgetAttrs[key];
                 }
               }
             }
             processWidget(field);
+            // apply all widget attributes directly on field
+            _.extend(field, field.widgetAttrs);
             if (field.type === 'panel' || field.type === 'separator') {
               field.visibleInGrid = false;
             }
