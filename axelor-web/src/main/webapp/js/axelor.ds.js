@@ -298,6 +298,13 @@
               if (field.widgetAttrs.targetName) {
                 field.targetName = field.widgetAttrs.targetName;
               }
+
+              // apply all x- prefixed attributes directly on field
+              for (var key in field.widgetAttrs) {
+                if (key.startsWith('x-')) {
+                  field[key.substring(2)] = field.widgetAttrs[key];
+                }
+              }
             }
             processWidget(field);
             if (field.type === 'panel' || field.type === 'separator') {
