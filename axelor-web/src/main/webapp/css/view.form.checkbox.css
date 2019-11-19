@@ -200,3 +200,8 @@
   margin: 4px 0 !important;
   float: left;
 }
+
+.checkbox-inline .ibox .title {
+  width: calc(100% - 28px);
+  display: inline-block;
+}
