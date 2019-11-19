@@ -44,8 +44,6 @@ Function<String, String> T = new Function<String, String>() {
 
 AuthService authService = AuthService.getInstance();
 
-String passwordPattern = authService.getPasswordPattern();
-String passwordPatternTitle = authService.getPasswordPatternTitle();
 String newPasswordMustBeDifferent = T.apply("New password must be different.");
 String confirmPasswordMismatch = T.apply("Confirm password doesn't match.");
 
@@ -62,17 +60,8 @@ String loginPassword = T.apply("Current password");
 String newPassword = T.apply("New password");
 String confirmPassword = T.apply("Confirm password");
 
-String warningBrowser = T.apply("Update your browser!");
-String warningAdblock = T.apply("Adblocker detected!");
-String warningAdblock2 = T.apply("Please disable the adblocker as it may slow down the application.");
-
 int year = Calendar.getInstance().get(Calendar.YEAR);
 String copyright = String.format("&copy; 2005 - %s Axelor. All Rights Reserved.", year);
-
-String loginHeader = "/login-header.jsp";
-if (pageContext.getServletContext().getResource(loginHeader) == null) {
-  loginHeader = null;
-}
 
 @SuppressWarnings("all")
 Map<String, String> tenants = (Map) session.getAttribute("tenantMap");
@@ -93,10 +82,6 @@ String callbackUrl = AuthPac4jModule.getCallbackUrl();
     <x:script src="js/application.login.js" />
   </head>
   <body>
-
-    <% if (loginHeader != null) { %>
-    <jsp:include page="<%= loginHeader %>" />
-    <% } %>
 
     <div class="container-fluid">
       <div class="panel login-panel">
@@ -125,7 +110,7 @@ String callbackUrl = AuthPac4jModule.getCallbackUrl();
               <div class="input-prepend">
                 <span class="add-on"><i class="fa fa-lock"></i></span>
                 <input type="password" id="newPasswordId" name="newPassword" placeholder="<%= newPassword %>"
-                  required="required" pattern="<%= passwordPattern %>" title="<%= passwordPatternTitle %>"
+                  required="required"
                   oninput="checkPasswordInputs()">
               </div>
               <div class="input-prepend">
@@ -151,37 +136,13 @@ String callbackUrl = AuthPac4jModule.getCallbackUrl();
           </form>
         </div>
       </div>
-      <div id="br-warning" class="alert alert-block alert-error hidden">
-	  	<h4><%= warningBrowser %></h4>
-	  	<ul>
-	  		<li>Chrome</li>
-	  		<li>Firefox</li>
-	  		<li>Safari</li>
-	  		<li>IE >= 11</li>
-	  	</ul>
-	  </div>
-	  <div id="ad-warning" class="alert hidden">
-	  	<h4><%= warningAdblock %></h4>
-	  	<%= warningAdblock2 %>
-	  </div>
     </div>
 
     <footer class="container-fluid">
       <p class="credit small"><%= copyright %></p>
     </footer>
 
-    <div id="adblock"></div>
-
     <script type="text/javascript">
-    $(function () {
-	    if (axelor.browser.msie && !axelor.browser.rv) {
-	    	$('#br-warning').removeClass('hidden');
-	    }
-	    if ($('#adblock') === undefined || $('#adblock').is(':hidden')) {
-	    	$('#ad-warning').removeClass('hidden');
-	    }
-    });
-
     function checkPasswordInputs() {
       var passwordElem = document.getElementById("passwordId");
       var newPasswordElem = document.getElementById("newPasswordId");

@@ -494,6 +494,7 @@
 "updated document",,,
 "user group",,,
 "user name",,,
+"user.password.pattern.title","Password does not meet requirements:<br/>it should have at least 4 characters.",,
 "your password",,,
 "{0} customized view is deleted.",,,
 "{0} customized views are deleted.",,,

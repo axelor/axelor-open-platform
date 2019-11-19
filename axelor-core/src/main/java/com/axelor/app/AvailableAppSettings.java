@@ -95,6 +95,7 @@ public interface AvailableAppSettings {
   String DATA_IMPORT_DEMO_DATA = "data.import.demo-data";
 
   String USER_PASSWORD_PATTERN = "user.password.pattern";
+  String USER_PASSWORD_PATTERN_TITLE = /*$$(*/ "user.password.pattern.title" /*)*/;
 
   String ENCRYPTION_ALGORITHM = "encryption.algorithm";
   String ENCRYPTION_PASSWORD = "encryption.password";

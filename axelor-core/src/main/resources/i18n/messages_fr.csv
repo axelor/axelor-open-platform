@@ -494,6 +494,7 @@
 "updated document","a modifié le document",,
 "user group","groupe",,
 "user name","nom",,
+"user.password.pattern.title","Le mot de passe ne répond pas aux exigences :<br/>il doit faire au moins 4 caractères.",,
 "your password","Votre mot de passe",,
 "{0} customized view is deleted.","{0} vue personnalisée est supprimée",,
 "{0} customized views are deleted.","{0} vues personnalisée sont supprimées",,

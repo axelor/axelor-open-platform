@@ -237,14 +237,18 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
         throw new CredentialsException(WRONG_CURRENT_PASSWORD);
       }
 
-      if (user.getForcePasswordChange()) {
+      if (Boolean.TRUE.equals(user.getForcePasswordChange())) {
         if (StringUtils.isBlank(newPassword)) {
           throw new CredentialsException(CHANGE_PASSWORD);
         }
 
         JPA.runInTransaction(
             () -> {
-              Beans.get(AuthService.class).changePassword(user, newPassword);
+              try {
+                Beans.get(AuthService.class).changePassword(user, newPassword);
+              } catch (IllegalArgumentException e) {
+                throw new CredentialsException(e.getMessage());
+              }
               user.setForcePasswordChange(false);
             });
       }
