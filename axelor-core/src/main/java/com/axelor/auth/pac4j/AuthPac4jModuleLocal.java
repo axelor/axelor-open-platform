@@ -33,6 +33,7 @@ import javax.servlet.ServletContext;
 import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.context.WebContext;
+import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.credentials.extractor.FormExtractor;
@@ -170,6 +171,14 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
 
       if (CHANGE_PASSWORD.equals(errorMessage)
           || StringUtils.notBlank(context.getRequestParameter(NEW_PASSWORD_PARAMETER))) {
+
+        final String tenanId = context.getRequestParameter("tenantId");
+        if (StringUtils.notBlank(tenanId)) {
+          @SuppressWarnings("unchecked")
+          final SessionStore<WebContext> sessionStore = context.getSessionStore();
+          sessionStore.set(context, "tenantId", tenanId);
+        }
+
         String redirectionUrl =
             CommonHelper.addParameter("change-password.jsp", getUsernameParameter(), username);
         redirectionUrl = CommonHelper.addParameter(redirectionUrl, ERROR_PARAMETER, errorMessage);
