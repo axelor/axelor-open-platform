@@ -379,7 +379,7 @@ ActionHandler.prototype = {
 
   _blockUI: function() {
     // block the entire ui (auto unblocks when actions are complete)
-    _.delay(axelor.blockUI, 100);
+    _.delay(axelor.blockUI, 10);
   },
 
   _fireBeforeSave: function() {
