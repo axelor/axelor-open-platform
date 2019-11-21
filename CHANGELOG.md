@@ -1,6 +1,8 @@
 ## 5.0.20 (current)
 
-TBD
+#### Bugs
+
+* Fix Query#update with null value
 
 ## 5.0.19 (2019-10-14)
 
