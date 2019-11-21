@@ -469,7 +469,7 @@ ui.directive('uiBindTemplate', ['$interpolate', function($interpolate){
 
       function update() {
         var output = expand(scope, template) || "";
-        element.html(output);
+        element.html(axelor.sanitize(output));
       }
 
       scope.$watch("text", function(text, old) {
