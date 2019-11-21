@@ -261,6 +261,7 @@
 .panel-layout .form-item-container.editable input[type="number"],
 .panel-layout .form-item-container.editable input[type="email"],
 .panel-layout .form-item-container.editable input[type="url"],
+.panel-layout .form-item-container.editable input[type="tel"],
 .panel-layout .form-item-container.editable .tag-select {
   border-top-width: 0;
   border-left-width: 0;
