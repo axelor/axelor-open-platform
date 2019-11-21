@@ -90,7 +90,7 @@
         value = value.replace(/<\!\-\-.*?\-\-\>/g, ''); // remove comments which might be interpreted as xml
       }
 
-      return attr.indexOf('xss-on') === 0 || (value && value.match(/^([a-zA-Z]+)\:/));
+      return attr.indexOf('xss-on') === 0 || (value && value.match(/^javascript\:/i));
     });
 
     _.each(attrs, function (a) {
