@@ -100,12 +100,21 @@
   axelor.readCookie = readCookie;
 
   function sanitizeElement(element) {
-    $.each(element.attributes, function() {
-      var attr = this.name;
-          var value = this.value;
-          if (attr.indexOf('xss-on') === 0 || value.indexOf('javascript:') === 0) {
-              $(element).removeAttr(attr);
-          }
+
+    var attrs = _.filter(element.attributes, function(a) {
+      var attr = a.name;
+      var value = a.value;
+
+      if (["src", "href", "action"].indexOf(attr) > -1 && value) {
+        value = value.replace(/[\x00-\x20]+/g, ''); // https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet#Embedded_tab
+        value = value.replace(/<\!\-\-.*?\-\-\>/g, ''); // remove comments which might be interpreted as xml
+      }
+
+      return attr.indexOf('xss-on') === 0 || (value && value.match(/^([a-zA-Z]+)\:/));
+    });
+
+    _.each(attrs, function (a) {
+      $(element).removeAttr(a.name);
     });
   }
 
@@ -119,7 +128,7 @@
 
     elems.find('*').each(function() {
       sanitizeElement(this);
-        });
+    });
 
     return elems.html();
   }
