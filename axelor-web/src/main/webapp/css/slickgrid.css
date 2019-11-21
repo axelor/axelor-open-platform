@@ -559,6 +559,11 @@
   flex: 1;
 }
 
+.slick-editor .form-item-container.readonly,
+.slick-editor .form-item-container.readonly > span.display-text {
+  background-color: #e7e7e7;
+}
+
 .slick-editor input,
 .slick-editor textarea {
   border-color: #ddd;
