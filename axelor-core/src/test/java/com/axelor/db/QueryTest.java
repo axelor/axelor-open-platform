@@ -163,25 +163,35 @@ public class QueryTest extends JpaTest {
     final String lang = "EN";
     final String food = "pizza";
 
+    // Update one field
+    q.update("self.lang", lang);
+
     // managed instances are not affected with mass update
     // so clear the session to avoid unexpected results
     getEntityManager().clear();
-
-    // Update one field
-    q.update("self.lang", lang);
 
     for (Contact c : q.fetch()) {
       Assert.assertEquals(lang, c.getLang());
     }
 
-    getEntityManager().clear();
-
     // Update several fields
     q.update(ImmutableMap.of("self.lang", lang, "self.food", food));
+
+    getEntityManager().clear();
 
     for (Contact c : q.fetch()) {
       Assert.assertEquals(lang, c.getLang());
       Assert.assertEquals(food, c.getFood());
+    }
+
+    q.update("self.lang", null);
+    q.update("self.food", null);
+
+    getEntityManager().clear();
+
+    for (Contact c : q.fetch()) {
+      Assert.assertEquals(null, c.getLang());
+      Assert.assertEquals(null, c.getFood());
     }
   }
 
