@@ -1,0 +1,3 @@
+---
+title: Fix Query#update with null value
+type: fix
