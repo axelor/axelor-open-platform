@@ -180,6 +180,15 @@ public class LoggerConfiguration {
     logger("org.eclipse.jetty.util.component.AbstractLifeCycle", Level.ERROR);
     logger("org.hibernate.validator.internal.util.Version", Level.WARN);
 
+    logger("org.pac4j.core.engine", Level.INFO);
+    logger("com.axelor.auth.pac4j.AuthPac4jModule$AxelorLogoutFilter", Level.INFO);
+    logger("com.axelor.auth.pac4j.AuthPac4jModule$AxelorCallbackFilter", Level.INFO);
+    logger("com.axelor.auth.pac4j.AuthPac4jModule$AxelorSecurityFilter", Level.INFO);
+    logger("com.axelor.auth.pac4j.AuthPac4jModule$AxelorLoginPageFilter", Level.INFO);
+    logger("com.axelor.auth.pac4j.AuthPac4jModuleLocal$AxelorFormClient", Level.INFO);
+    logger("com.axelor.auth.pac4j.AuthPac4jModuleLocal$AxelorDirectBasicAuthClient", Level.INFO);
+    logger("com.axelor.auth.pac4j.AuthPac4jModuleSaml$AxelorSAML2Client", Level.INFO);
+
     Level rootLevel = Level.ERROR;
 
     // add loggers
