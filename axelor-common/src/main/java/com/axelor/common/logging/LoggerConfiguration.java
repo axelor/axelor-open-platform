@@ -180,6 +180,10 @@ public class LoggerConfiguration {
     logger("org.eclipse.jetty.util.component.AbstractLifeCycle", Level.ERROR);
     logger("org.hibernate.validator.internal.util.Version", Level.WARN);
 
+    // pac4j
+    logger("org.pac4j.core.engine", Level.INFO);
+    logger("com.axelor.auth.pac4j", Level.INFO);
+
     Level rootLevel = Level.ERROR;
 
     // add loggers
