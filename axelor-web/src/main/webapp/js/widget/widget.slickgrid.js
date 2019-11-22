@@ -2635,8 +2635,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         scope.selector = attrs.selector;
         scope.noFilter = attrs.noFilter;
 
-        if (!scope.selector && (axelor.config["view.grid.selection"] === undefined
-            || axelor.config["view.grid.selection"] === "checkbox")) {
+        if (axelor.config["view.grid.selection"] === "checkbox" && !scope.selector) {
           scope.selector = "checkbox";
         } else {
           scope.selectorAttr = scope.selector;
