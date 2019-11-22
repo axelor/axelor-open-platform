@@ -1,3 +1,3 @@
 ---
-title: Enable checkbox selection by default in grid widget
-type: change
+title: Use styled checkbox for grid row selector
+type: fix
