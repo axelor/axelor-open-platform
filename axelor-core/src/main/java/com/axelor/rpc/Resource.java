@@ -398,7 +398,11 @@ public class Resource<T extends Model> {
       security.get().check(JpaSecurity.CAN_READ, model);
     }
 
-    LOG.debug("Searching '{}' with {}", model.getCanonicalName(), request.getData());
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Searching '{}' with {}", model.getCanonicalName(), request.getData());
+    } else {
+      LOG.debug("Searching '{}'", model.getCanonicalName());
+    }
 
     firePreRequestEvent(RequestEvent.SEARCH, request);
 
@@ -539,7 +543,12 @@ public class Resource<T extends Model> {
   public int export(Request request, Writer writer) throws IOException {
     security.get().check(JpaSecurity.CAN_READ, model);
     security.get().check(JpaSecurity.CAN_EXPORT, model);
-    LOG.debug("Exporting '{}' with {}", model.getName(), request.getData());
+
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Exporting '{}' with {}", model.getName(), request.getData());
+    } else {
+      LOG.debug("Exporting '{}'", model.getName());
+    }
 
     firePreRequestEvent(RequestEvent.EXPORT, request);
 
@@ -987,7 +996,11 @@ public class Resource<T extends Model> {
 
     security.get().check(JpaSecurity.CAN_WRITE, model);
 
-    LOG.debug("Mass update '{}' with {}", model.getCanonicalName(), request.getData());
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Mass update '{}' with", model.getCanonicalName(), request.getData());
+    } else {
+      LOG.debug("Mass update '{}'", model.getCanonicalName());
+    }
 
     firePreRequestEvent(RequestEvent.MASS_UPDATE, request);
 
