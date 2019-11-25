@@ -18,14 +18,20 @@
 package com.axelor.gradle.support;
 
 import com.axelor.common.FileUtils;
+import com.hierynomus.gradle.license.LicenseBasePlugin;
+import com.hierynomus.gradle.license.LicenseReportingPlugin;
+import com.hierynomus.gradle.license.tasks.LicenseCheck;
+import com.hierynomus.gradle.license.tasks.LicenseFormat;
 import java.io.File;
 import java.util.Calendar;
 import nl.javadude.gradle.plugins.license.License;
 import nl.javadude.gradle.plugins.license.LicenseExtension;
 import nl.javadude.gradle.plugins.license.LicensePlugin;
+import nl.javadude.gradle.plugins.license.PluginHelper;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.ExtraPropertiesExtension;
+import org.gradle.api.plugins.JavaBasePlugin;
 
 public class LicenseSupport extends AbstractSupport {
 
@@ -46,7 +52,7 @@ public class LicenseSupport extends AbstractSupport {
   public void apply(Project project) {
     final File header = findHeaderFile(project);
     final boolean headerExists = header != null && header.exists();
-    project.getPlugins().apply(LicensePlugin.class);
+    project.getPlugins().apply(AxelorLicensePlugin.class);
 
     final LicenseExtension license = project.getExtensions().getByType(LicenseExtension.class);
     final ExtraPropertiesExtension ext =
@@ -93,7 +99,8 @@ public class LicenseSupport extends AbstractSupport {
 
     project.afterEvaluate(
         p ->
-            p.getTasks()
+            project
+                .getTasks()
                 .withType(License.class)
                 .all(
                     task -> {
@@ -109,5 +116,32 @@ public class LicenseSupport extends AbstractSupport {
                                 tree.exclude("WEB-INF/web.xml");
                               }));
                     }));
+  }
+
+  /** License checking that is not added to check lifecycle */
+  static class AxelorLicensePlugin extends LicensePlugin {
+
+    @Override
+    public void apply(Project project) {
+      project.getPlugins().apply(LicenseBasePlugin.class);
+      project.getPlugins().apply(LicenseReportingPlugin.class);
+
+      baseCheckTask = project.task(LicenseBasePlugin.getLICENSE_TASK_BASE_NAME());
+      baseFormatTask = project.task(LicenseBasePlugin.getFORMAT_TASK_BASE_NAME());
+
+      baseCheckTask.setGroup("License");
+      baseFormatTask.setGroup(baseCheckTask.getGroup());
+      baseCheckTask.setDescription("Checks for header consistency.");
+      baseFormatTask.setDescription(
+          "Applies the license found in the header file in files missing the header.");
+
+      project.getPlugins().withType(JavaBasePlugin.class, plugin -> linkLicenseTasks(project));
+      PluginHelper.withAndroidPlugin(project, plugin -> linkLicenseTasks(project));
+    }
+
+    private void linkLicenseTasks(Project project) {
+      project.getTasks().withType(LicenseCheck.class, lt -> baseCheckTask.dependsOn(lt));
+      project.getTasks().withType(LicenseFormat.class, lt -> baseFormatTask.dependsOn(lt));
+    }
   }
 }
