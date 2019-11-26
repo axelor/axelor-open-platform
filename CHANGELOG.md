@@ -1,5 +1,9 @@
 ## 5.0.20 (current)
 
+#### Enhancements
+
+* Sort mail messages by most recent reply if any
+
 #### Bugs
 
 * Fix Query#update with null value
