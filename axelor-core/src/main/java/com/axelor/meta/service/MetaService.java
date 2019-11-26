@@ -24,6 +24,7 @@ import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
@@ -238,6 +239,10 @@ public class MetaService {
   }
 
   public List<MenuItem> getMenus(boolean withTagsOnly) {
+    return getMenus(withTagsOnly, false, Collections.emptyList());
+  }
+
+  public List<MenuItem> getMenus(boolean withTagsOnly, boolean inNamesOnly, List<String> names) {
 
     // make sure to apply hot updates
     if (!withTagsOnly) {
@@ -284,24 +289,36 @@ public class MetaService {
       }
     }
 
-    final StringBuilder queryString =
-        new StringBuilder()
-            .append("SELECT self FROM MetaMenu self ")
-            .append("LEFT JOIN FETCH self.action ")
-            .append("LEFT JOIN FETCH self.parent ")
-            .append(
-                withTagsOnly
-                    ? "WHERE (self.tag IS NOT NULL OR self.tagGet IS NOT NULL OR self.tagCount IS NOT NULL) "
-                    : "")
-            .append(" ORDER BY COALESCE(self.priority, 0) DESC, self.id");
+    final List<MetaMenu> queryResults;
 
-    final TypedQuery<MetaMenu> query = JPA.em().createQuery(queryString.toString(), MetaMenu.class);
-    QueryBinder.of(query).setCacheable();
+    if (inNamesOnly && ObjectUtils.isEmpty(names)) {
+      queryResults = Collections.emptyList();
+    } else {
+      final StringBuilder queryString =
+          new StringBuilder()
+              .append("SELECT self FROM MetaMenu self ")
+              .append("LEFT JOIN FETCH self.action ")
+              .append("LEFT JOIN FETCH self.parent");
+      if (withTagsOnly) {
+        queryString.append(
+            " WHERE (self.tag IS NOT NULL OR self.tagGet IS NOT NULL OR self.tagCount IS NOT NULL)");
+      }
+      if (inNamesOnly) {
+        queryString.append(withTagsOnly ? " AND" : " WHERE");
+        queryString.append(" self.name IN :names");
+      }
+      queryString.append(" ORDER BY COALESCE(self.priority, 0) DESC, self.id");
+
+      final TypedQuery<MetaMenu> query =
+          JPA.em().createQuery(queryString.toString(), MetaMenu.class);
+      QueryBinder.of(query).setCacheable().bind("names", names);
+      queryResults = query.getResultList();
+    }
 
     final List<MenuItem> menus = new ArrayList<>();
     final List<MetaMenu> records = new ArrayList<>();
 
-    for (MetaMenu menu : query.getResultList()) {
+    for (MetaMenu menu : queryResults) {
       records.add(menu);
       while (withTagsOnly && menu.getParent() != null) {
         // need to get parents to check visibility

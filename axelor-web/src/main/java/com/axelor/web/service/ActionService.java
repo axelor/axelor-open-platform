@@ -27,6 +27,7 @@ import com.axelor.rpc.Response;
 import com.axelor.team.web.TaskController;
 import com.google.inject.servlet.RequestScoped;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,10 +71,20 @@ public class ActionService extends AbstractService {
   @GET
   @Path("menu/tags")
   public Response tags() {
+    return tags(false, Collections.emptyList());
+  }
+
+  @POST
+  @Path("menu/tags")
+  public Response tags(TagRequest request) {
+    return tags(true, request.getNames());
+  }
+
+  private Response tags(boolean inNamesOnly, List<String> names) {
     final ActionResponse response = new ActionResponse();
     final List<Object> tags = new ArrayList<>();
     try {
-      for (MenuItem item : service.getMenus(true)) {
+      for (MenuItem item : service.getMenus(true, inNamesOnly, names)) {
         Map<String, Object> tag = new HashMap<>();
         tag.put("name", item.getName());
         tag.put("tag", item.getTag());
@@ -85,7 +96,7 @@ public class ActionService extends AbstractService {
       mailController.countMail(null, response);
       teamController.countTasks(null, response);
     } catch (Exception e) {
-      if (LOG.isErrorEnabled()) LOG.error(e.getMessage(), e);
+      LOG.error(e.getMessage(), e);
       response.setException(e);
     }
     return response;
@@ -101,5 +112,13 @@ public class ActionService extends AbstractService {
   public Response execute(@PathParam("action") String action, ActionRequest request) {
     request.setAction(action);
     return actionExecutor.execute(request);
+  }
+
+  private static class TagRequest {
+    private List<String> names;
+
+    public List<String> getNames() {
+      return names;
+    }
   }
 }

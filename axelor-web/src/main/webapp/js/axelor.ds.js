@@ -44,9 +44,14 @@
     }
 
     function tags() {
-      return $http.get('ws/action/menu/tags', {
-        silent: true,
-        transformRequest: []
+      // Select visible menus with tags
+      var names = $('.tagged:visible').get().map(function(elem) {
+        return elem.dataset.name;
+      });
+      return $http.post('ws/action/menu/tags', {
+        names: names
+      }, {
+        silent: true
       });
     }
 
