@@ -70,6 +70,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -135,7 +136,7 @@ public class MetaService {
     return helper.test(condition);
   }
 
-  private List<MenuItem> filter(List<MenuItem> items) {
+  private List<MenuItem> filter(Collection<MenuItem> items) {
 
     final Map<String, MenuItem> map = new LinkedHashMap<>();
     final Set<String> visited = new HashSet<>();
@@ -315,7 +316,7 @@ public class MetaService {
       queryResults = query.getResultList();
     }
 
-    final List<MenuItem> menus = new ArrayList<>();
+    final Map<MenuItem, MetaMenu> menus = new LinkedHashMap<>();
     final List<MetaMenu> records = new ArrayList<>();
 
     for (MetaMenu menu : queryResults) {
@@ -386,7 +387,6 @@ public class MetaService {
       item.setTitle(menu.getTitle());
       item.setIcon(menu.getIcon());
       item.setIconBackground(menu.getIconBackground());
-      item.setTag(getTag(menu));
       item.setTagStyle(menu.getTagStyle());
       item.setTop(menu.getTop());
       item.setLeft(menu.getLeft());
@@ -407,10 +407,13 @@ public class MetaService {
         item.setAction(menu.getAction().getName());
       }
 
-      menus.add(item);
+      menus.put(item, menu);
     }
 
-    return filter(menus);
+    final List<MenuItem> items = filter(menus.keySet());
+    items.forEach(item -> item.setTag(getTag(menus.get(item))));
+
+    return items;
   }
 
   @SuppressWarnings("unchecked")
