@@ -553,12 +553,13 @@ ui.formInput('ManyToOne', 'Select', {
             handled = true;
           }
         }
-        scope.$timeout(function () {
-          adjustPadding();
-          if (scope.onChangeNotify && handled) {
-            scope.onChangeNotify(scope, scope.record);
-          }
-        }, 100);
+        if (scope.onChangeNotify && handled) {
+          scope.notifyChangeNeeded = true;
+        } else {
+          scope.$timeout(function() {
+            adjustPadding();
+          }, 100);
+        }
       }
     };
 
@@ -571,13 +572,24 @@ ui.formInput('ManyToOne', 'Select', {
         scope.select(ui.item.value);
         handled = true;
       }
-      scope.$timeout(function () {
-        adjustPadding();
-        if (scope.onChangeNotify && handled) {
-          scope.onChangeNotify(scope, scope.record);
-        }
-      }, 100);
+      if (scope.onChangeNotify && handled) {
+        scope.notifyChangeNeeded = true;
+      } else {
+        scope.$timeout(function() {
+          adjustPadding();
+        }, 100);
+      }
     };
+
+    scope.$on("on:record-change", function() {
+      if (scope.notifyChangeNeeded) {
+        scope.notifyChangeNeeded = false;
+        scope.$timeout(function() {
+          adjustPadding();
+          scope.onChangeNotify(scope, scope.record);
+        }, 100);
+      }
+    });
 
     scope.$render_editable = function() {
 
