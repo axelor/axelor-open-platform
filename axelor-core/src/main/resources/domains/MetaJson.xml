@@ -18,11 +18,11 @@
     <string name="selection" />
     <string name="widget" />
     <string name="help" />
-    <string name="showIf" />
-    <string name="hideIf" />
-    <string name="requiredIf" />
-    <string name="readonlyIf" />
-    <string name="includeIf" />
+    <string name="showIf" max="512" />
+    <string name="hideIf" max="512" />
+    <string name="requiredIf" max="512" />
+    <string name="readonlyIf" max="512" />
+    <string name="includeIf" max="512" />
 
     <string name="contextField" />
     <string name="contextFieldTarget" />
