@@ -377,7 +377,7 @@ form .panel-tabs .nav-tabs > li:hover > a {
   background: #fff;
 }
 .slickgrid .slick-row {
-  border-bottom: 0 !important;
+  border-bottom-color: #fff !important;
 }
 
 .tree-view-container .tree-header th {
@@ -510,6 +510,13 @@ header .dropdown-submenu:focus > a {
 
 [ui-view-form] .form-item-container > span.display-text {
   padding: 0;
+}
+
+[ui-form].slick-editor .form-item-container,
+[ui-form].slick-editor .form-item-container > span.display-text,
+[ui-form].slick-editor .form-item-container input {
+  min-height: inherit !important;
+  line-height: inherit !important;
 }
 
 .ng-invalid > input,
