@@ -884,7 +884,7 @@ function FormViewCtrl($scope, $element) {
   $scope.onBack = function() {
     var record = $scope.record || {};
     var editable = $scope.isEditable();
-
+    $scope.$broadcast("cancel:grid-edit");
     if (record.id && editable && $scope.canEdit()) {
       $scope.setEditable(false);
       return;

@@ -447,7 +447,6 @@ var Grid = function(scope, element, attrs, ViewService, ActionService) {
   this.attrs = attrs;
   this.handler = scope.handler;
   this.showFilters = !noFilter;
-  this.$oldValues = null;
   this.grid = this.parse(scope.view);
 };
 
@@ -969,26 +968,10 @@ Grid.prototype._doInit = function(view) {
   }
 
   scope.$on("cancel:grid-edit", function(e) {
-
-    if (that.$oldValues && that.canSave()){
-
-      dataView.beginUpdate();
-      dataView.setItems(that.$oldValues);
-      dataView.endUpdate();
-
-      that.$oldValues = null;
-
-      that.clearDirty();
-
-      grid.invalidateAllRows();
-      grid.render();
-
-      e.preventDefault();
-    }
+    that.cancelEdit();
   });
 
   scope.$on("on:new", function(e) {
-    that.$oldValues = null;
     that.clearDirty();
     that.resetColumns();
     that.cancelEdit();
@@ -996,7 +979,6 @@ Grid.prototype._doInit = function(view) {
 
   scope.$on("on:edit", function(e, record) {
     if (record && record.id > 0) {
-      that.$oldValues = null;
       that.clearDirty();
       that.resetColumns();
       that.cancelEdit();
