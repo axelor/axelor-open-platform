@@ -520,6 +520,10 @@
   flex-direction: column-reverse;
 }
 
+[ui-slick-editors] {
+  background-color: #e7e7e7 !important;
+}
+
 .slick-editor {
   position: relative;
   display: flex;
