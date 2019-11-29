@@ -1,0 +1,3 @@
+---
+title: Fix error popup with empty message not showing up in prod mode
+type: fix

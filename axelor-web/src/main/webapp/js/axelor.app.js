@@ -630,8 +630,9 @@
         return;
       }
 
-      if (report.popup && report.message) {
-        return axelor.dialogs.box(report.message, {
+      if (report.popup) {
+        message = report.message || _t('A server error occurred. Please contact the administrator.');
+        return axelor.dialogs.box(message, {
           title: report.title
         });
       } else if (report.stacktrace) {
