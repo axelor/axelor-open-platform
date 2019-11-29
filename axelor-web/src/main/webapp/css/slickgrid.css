@@ -569,6 +569,12 @@
   border-color: #ddd;
 }
 
+.slick-form-buttons-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .slick-form-buttons {
   background: #e7e7e7;
   padding: 4px 4px 6px;

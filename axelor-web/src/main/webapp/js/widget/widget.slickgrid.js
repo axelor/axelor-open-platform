@@ -1943,34 +1943,9 @@ Grid.prototype.showEditor = function (activeCell) {
       }
     });
 
-    var buttons = $("<div class='slick-form-buttons'>")
+    $("<div class='slick-form-buttons'>")
       .append([confirm, cancel])
       .appendTo($("<div class='slick-form-buttons-wrapper'>").appendTo(form));
-
-    var buttonsAdjusted = false;
-
-    function adjustButtons(e) {
-      if (buttonsAdjusted) return;
-      if (that.isEditActive()) {
-        buttonsAdjusted = true;
-        buttonsWrapper.show();
-        var elem = $(e.target).is('.form-item-container') ? $(e.target) : $(e.target).parents('.form-item-container');
-        var viewPort = $(grid.getCanvasNode()).parent();
-        buttons.position({
-          my: 'center top',
-          at: 'center bottom',
-          of: elem,
-          within: viewPort,
-          collision: 'flipfit',
-          using: function (position) {
-            buttons.css('left', position.left);
-          }
-        });
-        setTimeout(function () {
-          buttonsAdjusted = false;
-        }, 100);
-      }
-    }
 
     form.on('focus', '.form-item-container :input', function (e) {
       var elem = $(e.target);
@@ -1980,12 +1955,9 @@ Grid.prototype.showEditor = function (activeCell) {
         var cell = grid.getColumnIndex(elemScope.field.name);
         if (cell >= 0) {
           grid.setActiveCell(args.row, cell);
-          adjustButtons(e);
         }
       }
     });
-
-    form.on('mouseover', '.form-item-container', adjustButtons);
 
     this._editorOverlay.click(function (e) {
       if (that._commitPromise) return;
@@ -2016,7 +1988,6 @@ Grid.prototype.showEditor = function (activeCell) {
   var box = grid.getCellNodeBox(args.row, 0);
   var node = grid.getCellNode(args.row, 0);
   var viewPort = $(grid.getCanvasNode()).parent();
-  var buttonsWrapper = form.find('.slick-form-buttons-wrapper');
   var zIndex = this.element.parents('.ui-dialog:first').zIndex();
 
   form.removeClass('slick-form-flip').show().css('visibility', 'hidden').css('display', '');
@@ -2094,7 +2065,6 @@ Grid.prototype.commitEdit = function () {
   if (!scope || !scope.isValid()) {
     defer.reject();
     return promise;
-    return;
   }
 
   if (!scope.isDirty()) {
