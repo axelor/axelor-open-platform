@@ -515,7 +515,7 @@ header .dropdown-submenu:focus > a {
 [ui-form].slick-editor .form-item-container,
 [ui-form].slick-editor .form-item-container > span.display-text,
 [ui-form].slick-editor .form-item-container input {
-  min-height: inherit !important;
+  min-height: 26px !important;
   line-height: inherit !important;
 }
 
