@@ -130,7 +130,7 @@ ui.formInput('JsonField', 'String', {
     function onUpdate() {
       var rec = null;
       _.each(scope.record, function (v, k) {
-        if (k.indexOf('$') === 0 || v === null || v === undefined) return;
+        if (k.indexOf('$') === 0 || v === null || v === undefined || !_.trim(v)) return;
         if (_.isArray(v)) {
           if (v.length == 0) return;
           v = v.map(function (x) {
