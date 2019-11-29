@@ -107,6 +107,6 @@ public abstract class AbstractJsonExtractFunction implements SQLFunction {
     buf.append(transformPath(path));
     buf.append(")");
     final String func = transformFunction(buf.toString());
-    return cast == null ? func : String.format("cast(%s as %s)", func, cast);
+    return cast == null ? func : String.format("cast(nullif(%s, '') as %s)", func, cast);
   }
 }
