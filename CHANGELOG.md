@@ -3,6 +3,7 @@
 #### Enhancements
 
 * Sort mail messages by most recent reply if any
+* Add tel link and pattern to phone widget
 
 #### Bugs
 
