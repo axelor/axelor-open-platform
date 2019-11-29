@@ -1987,7 +1987,7 @@ Grid.prototype.showEditor = function (activeCell) {
     form.zIndex(viewPort.zIndex() + 1);
   }
 
-  form.toggleClass('slick-form-flip', box.bottom + 48 > (viewPort.height() + viewPort.scrollTop()));
+  form.toggleClass('slick-form-flip', args.row > 1 && box.bottom + 48 > (viewPort.height() + viewPort.scrollTop()));
   setTimeout(function () {
     form.css('visibility', '');
   }, 100)
