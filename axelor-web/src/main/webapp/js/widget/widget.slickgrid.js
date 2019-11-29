@@ -155,7 +155,10 @@ var Formatters = {
   },
 
   "many-to-one": function(field, value) {
-    var text = (value||{})[field.targetName];
+    var key = field.targetName;
+    var trKey = '$t:' + key;
+    if (value && trKey in value) key = trKey;
+    var text = (value||{})[key];
     return text ? _.escapeHTML(text) : "";
   },
 
