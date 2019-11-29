@@ -952,7 +952,7 @@ ui.directive('uiPortletGrid', function(){
 
       $scope.onRefresh = function () {
         var tab = NavService.getSelected();
-        var type = $scope.$parent._viewType
+        var type = tab.params['details-view'] ? $scope.$parent._viewType : tab.viewType || tab.type;
         if (['dashboard', 'form'].indexOf(type) === -1) {
           if (unwatch) {
             unwatch();
