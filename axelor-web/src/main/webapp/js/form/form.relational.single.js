@@ -104,6 +104,10 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
           id: value.id,
           $version: value.version || value.$version
         });
+        var trKey = '$t:' + nameField;
+        if (trKey in value) {
+          record[trKey] = value[trKey];
+        }
         if (nameField in rec) {
           record[nameField] = rec[nameField];
         }
