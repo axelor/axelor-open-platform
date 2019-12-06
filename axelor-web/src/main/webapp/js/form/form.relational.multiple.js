@@ -808,7 +808,11 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
       if (item && scope._items && item.id in scope._items) {
         item = scope._items[item.id];
       }
-      return item ? item[nameField] : item;
+      if (!item) return item;
+      var key = nameField;
+      var trKey = '$t:' + key;
+      if (trKey in item) key = trKey;
+      return item[key];
     };
 
     scope.getItems = function() {
