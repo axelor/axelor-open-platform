@@ -808,7 +808,11 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
     };
 
     scope.formatItem = function(item) {
-      return item ? item[nameField] : item;
+      if (!item) return item;
+      var key = nameField;
+      var trKey = '$t:' + key;
+      if (trKey in item) key = trKey;
+      return item[key];
     };
 
     scope.getItems = function() {
