@@ -1910,18 +1910,38 @@ Grid.prototype.showEditor = function (activeCell) {
           }
         });
       }
+      if (e.keyCode !== 9) return;
+      if (e.shiftKey) {
+      form.find('.form-item-container :input').last().focus().select();
+      } else {
+      cancel.focus();
+      }
+      e.stopPropagation();
+      e.preventDefault();
+      return false;
     });
     cancel.keydown(function (e) {
-      if (e.keyCode === 9 && !e.shiftKey) {
+      if (e.keyCode !== 9) return;
+      if (e.shiftKey) {
+      confirm.focus();
+      } else {
         form.find('.form-item-container :input').first().focus().select();
+      }
+      e.stopPropagation();
+      e.preventDefault();
+      return false;
+    });
+    form.on('keydown', '.form-item-container :input:first', function (e) {
+      if (e.keyCode === 9 && e.shiftKey) {
+        cancel.focus();
         e.stopPropagation();
         e.preventDefault();
         return false;
       }
     });
-    form.on('keydown', '.form-item-container :input:first', function (e) {
-      if (e.keyCode === 9 && e.shiftKey) {
-        cancel.focus();
+    form.on('keydown', '.form-item-container :input:last', function (e) {
+      if (e.keyCode === 9 && !e.shiftKey) {
+        confirm.focus();
         e.stopPropagation();
         e.preventDefault();
         return false;
