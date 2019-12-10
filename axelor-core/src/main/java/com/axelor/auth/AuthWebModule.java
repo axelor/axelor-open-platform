@@ -43,6 +43,7 @@ public class AuthWebModule extends ShiroWebModule {
     this.addFilterChain("/css/**", ANON);
     this.addFilterChain("/js/**", ANON);
     this.addFilterChain("/error.jsp", ANON);
+    this.addFilterChain("/favicon.ico", ANON);
   }
 
   protected void configureAuth() {
