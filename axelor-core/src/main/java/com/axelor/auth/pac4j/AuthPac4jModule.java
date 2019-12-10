@@ -139,12 +139,6 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     addFilterChain("/**", Key.get(AxelorSecurityFilter.class));
   }
 
-  @Override
-  protected void configureAnon() {
-    super.configureAnon();
-    addFilterChain("/favicon.ico", ANON);
-  }
-
   protected abstract void configureClients();
 
   protected void addLocalClient(Client<?, ?> client) {
