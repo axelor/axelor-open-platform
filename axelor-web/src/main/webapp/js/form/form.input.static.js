@@ -792,6 +792,13 @@ ui.formItem('Button', {
   '</a>'
 });
 
+ui.formItem('GridButton', 'Button', {
+  template:
+    "<a href='' class='form-item-container'>" +
+      "<span class='btn-text' ng-transclude></span>" +
+    "</a>"
+});
+
 ui.formItem('InfoButton', 'Button', {
   link: function (scope, element, attrs) {
     this._super.apply(this, arguments);

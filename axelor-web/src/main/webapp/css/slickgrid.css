@@ -532,6 +532,7 @@
   padding: 0;
   margin: 0;
   background: #e7e7e7;
+  align-items: center;
 }
 
 .slick-editor .form-item-container {
@@ -566,6 +567,17 @@
 .slick-editor .form-item-container.readonly,
 .slick-editor .form-item-container.readonly > span.display-text {
   background-color: #e7e7e7;
+}
+
+.slick-editor .form-item-container.button-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+}
+
+.slick-editor .form-item-container.button-item i.fa {
+  width: auto;
 }
 
 .slick-editor input,

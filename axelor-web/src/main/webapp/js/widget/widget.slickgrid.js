@@ -2540,6 +2540,10 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         params.canEdit = forEdit;
       }
 
+      if (params.type === 'button') {
+        params.widget = 'GridButton';
+      }
+
       _items.push(params);
     });
 
