@@ -580,11 +580,11 @@ ui.formInput('MultiSelect', 'Select', {
 
     var input = this.findInput(element);
 
-    input.focus(function() {
+    input.on('input focus', function() {
       scaleInput();
-    }).blur(function() {
-      scaleInput(50);
-      input.val('');
+    }).on('blur', function() {
+        scaleInput(50);
+        input.val('');
     });
 
     var placeholder = null;
@@ -603,19 +603,10 @@ ui.formInput('MultiSelect', 'Select', {
         pos = elem.position();
 
       if (width) {
-        input.css('position', '');
-        elem.width('');
         return input.width(width);
       }
 
-      var top = pos.top,
-        left = pos.left;
-
-      width = element.innerWidth() - left;
-
-      elem.width(50);
-
-      input.css('width', width - 24);
+      input.css('width', element.innerWidth() - pos.left - 24);
     }
 
     function update(value) {
