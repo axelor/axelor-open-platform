@@ -8,6 +8,16 @@
 #### Bugs
 
 * Fix Query#update with null value
+* Block the UI as early as possible on action call
+* Fix dashlet refresh issue
+* Fix issue caused by empty string value on decimal field
+* Fix m2o field in grid not showing translated value
+* Fix untranslated namecolumn value in TagSelect
+* Fix untranslated namecolumn when fetching missing values
+* Fix tag-select widget's search field width issue
+
+#### Security
+* Fix XSS vulnerability with html widget
 
 ## 5.0.19 (2019-10-14)
 
