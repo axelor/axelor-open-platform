@@ -1,4 +1,4 @@
-## 5.0.20 (current)
+## 5.0.20 (2019-12-13)
 
 #### Enhancements
 
@@ -17,6 +17,7 @@
 * Fix tag-select widget's search field width issue
 
 #### Security
+
 * Fix XSS vulnerability with html widget
 
 ## 5.0.19 (2019-10-14)
