@@ -1,3 +1,35 @@
+## 5.2.3 (2019-12-13)
+
+#### Features
+
+* Increase custom field conditions limit to 512 characters
+* Set default logger config for pac4j package
+* Sort mail messages by most recent reply if any
+* Add tel link and pattern to phone widget
+
+#### Fixed
+
+* Fix Query#update with null value
+* Fix currency formatting with IE11
+* Fix scope syncing on charts
+* Block the UI as early as possible on action call
+* Fix Query#update when query has ORDER BY clause
+* Fix untranslated namecolumn when fetching missing values
+* Fix m2o field in grid not showing translated value
+* Fix dashlet refresh issue
+* Fix tag-select widget's search field width issue
+* Fix migration of existing views to extension views
+* Fix redirection to originally requested URL
+* Fix wrong redirection to favicon.ico
+* Fix multi-tenancy with pac4j
+* Fix issue caused by empty string value on decimal field
+* Fix untranslated namecolumn value in TagSelect
+* Fix selecting a m2o on editable grid when server is slow
+
+#### Security
+
+* Fix XSS vulnerability with html widget
+
 ## 5.2.2 (2019-10-14)
 
 #### Features
