@@ -45,13 +45,13 @@ public abstract class AbstractTag extends SimpleTagSupport {
   private boolean exists(String path) {
     try {
       return getResource(path) != null;
-    } catch (MalformedURLException e) {
+    } catch (MalformedURLException | IllegalArgumentException e) {
       return false;
     }
   }
 
   protected URL getResource(String path) throws MalformedURLException {
-    final String resource = path.startsWith("/") ? path : "/" + path;
+    final String resource = path.replaceFirst("^[\\./]*", "/");
     final PageContext ctx = (PageContext) getJspContext();
     return ctx.getServletContext().getResource(resource);
   }
@@ -73,12 +73,14 @@ public abstract class AbstractTag extends SimpleTagSupport {
   public void doTag() throws JspException, IOException {
 
     if (production) {
-      final String gzipped = src.replaceAll("^(js|css)\\/(.*)\\.(js|css)$", "dist/$2.gzip.$3");
+      final String gzipped =
+          src.replaceAll("^([\\./]*)(?:js|css)\\/(.*)\\.(js|css)$", "$1dist/$2.gzip.$3");
       if (exists(gzipped) && gzipSupported()) {
         doTag(gzipped);
         return;
       }
-      final String minified = src.replaceAll("^(js|css)\\/(.*)\\.(js|css)$", "dist/$2.min.$3");
+      final String minified =
+          src.replaceAll("^([\\./]*)(?:js|css)\\/(.*)\\.(js|css)$", "$1dist/$2.min.$3");
       if (exists(minified)) {
         doTag(minified);
         return;
