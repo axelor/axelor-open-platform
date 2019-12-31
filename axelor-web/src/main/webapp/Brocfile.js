@@ -27,6 +27,7 @@ const merge = require('broccoli-merge-trees');
 const uglify = require('broccoli-uglify-sourcemap');
 const Funnel = require('broccoli-funnel');
 const Gzip = require('broccoli-gzip');
+const YAML = require('yaml');
 
 const app = '.';
 
@@ -75,9 +76,12 @@ function minifyCss(name) {
   });
 }
 
-function minifyJs(name) {
+function minifyJs(name, headerFiles) {
+  if (headerFiles === undefined) {
+    headerFiles = jsList('js/' + name + '.js');
+  }
   const tree = concat(app, {
-    headerFiles: jsList('js/' + name + '.js'),
+    headerFiles: headerFiles,
     allowNone: true,
     outputFile: name + '.min.js',
   });
@@ -89,6 +93,10 @@ function minifyJs(name) {
   });
 }
 
+function minifyJsFile(name) {
+  return minifyJs(name, ['js/' + name + '.js']);
+}
+
 function gzip(tree) {
   return new Funnel(new Gzip(tree, { keepUncompressed: true }), {
     getDestinationPath: function (destPath) {
@@ -97,9 +105,40 @@ function gzip(tree) {
   });
 }
 
-module.exports = gzip(merge([
+const minifyList = [
   minifyCss('application'),
   minifyCss('application.login'),
   minifyJs('application'),
   minifyJs('application.login'),
-]));
+];
+
+try {
+  const minifyFile = fs.readFileSync('minify.yml', 'utf-8');
+  const minifyFiles = YAML.parse(minifyFile);
+  if (minifyFiles.css) {
+    minifyFiles.css.forEach(name => {
+      minifyList.push(minifyCss(name));
+      console.log(`Minified CSS: ${name}`);
+    });
+  }
+  if (minifyFiles.js) {
+    minifyFiles.js.forEach(name => {
+      minifyList.push(minifyJsFile(name));
+      console.log(`Minified JS: ${name}`);
+    });
+  }
+  if (minifyFiles.jsList) {
+    minifyFiles.jsList.forEach(name => {
+      minifyList.push(minifyJs(name));
+      console.log(`Minified JS list: ${name}`);
+    });
+  }
+} catch (err) {
+  if (err.code === 'ENOENT') {
+    console.log('No extra files to minify');
+  } else {
+    console.error(err);
+  }
+}
+
+module.exports = gzip(merge(minifyList));

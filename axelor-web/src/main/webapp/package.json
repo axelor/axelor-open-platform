@@ -22,6 +22,7 @@
     "postcss-import": "^9.1.0",
     "postcss-preset-env": "^6.5.0",
     "postcss-url": "^6.0.4",
-    "rimraf": "^2.6.1"
+    "rimraf": "^2.6.1",
+    "yaml": "^1.7.2"
   }
 }
