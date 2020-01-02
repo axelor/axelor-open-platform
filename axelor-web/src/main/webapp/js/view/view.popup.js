@@ -154,11 +154,13 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
     // wait for onChange actions
     $scope.waitForActions(function() {
       if ($scope.editorCanSave && isChanged()) {
+        var recordId = record.id;
         if (record.id < 0)
           record.id = null;
         return $scope.onSave({force: true}).then(function(record, page) {
           // wait for onSave actions
           $scope.waitForActions(function(){
+            record.$id = recordId;
             close(record, true);
           });
         });
