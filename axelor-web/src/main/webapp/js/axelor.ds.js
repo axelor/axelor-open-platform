@@ -379,6 +379,16 @@
               }
             });
           } else {
+            if (item.name.indexOf('.') > -1 && (meta.fields[item.name] || {}).jsonField) {
+              var field = meta.fields[item.name];
+              if (field.widgetAttrs) {
+                field.widgetAttrs = angular.fromJson(field.widgetAttrs);
+              }
+              processWidget(field);
+              if (field.widgetAttrs && field.widgetAttrs.targetName) {
+                field.targetName = field.widgetAttrs.targetName;
+              }
+            }
             items.push(item);
           }
         });
