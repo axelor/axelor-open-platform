@@ -109,6 +109,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
       var find = _.find(records, function(rec){
         var id1 = rec.id || rec.$id;
         var id2 = item.id || item.$id;
+        if (id1 < 0 && id2 > 0) id2 = item.$id || item.id;
         return id1 && id1 === id2;
       });
 
