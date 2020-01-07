@@ -1,6 +1,8 @@
 ## 5.0.21 (current)
 
-TBD
+### Bugs
+
+* Fix onRefresh issue on dashlet
 
 ## 5.0.20 (2019-12-13)
 
