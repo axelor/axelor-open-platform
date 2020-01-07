@@ -75,7 +75,7 @@ String tenantId = (String) session.getAttribute("tenantId");
     <meta name="description" content="<%= appDesc %>">
     <meta name="author" content="<%= appAuthor %>">
 
-    <!-- Le styles -->
+    <!-- Styles -->
     <x:style src="css/application.css" />
     <% if (appTheme != null) { %>
     <link href="css/<%= appTheme %>/theme.css" rel="stylesheet">

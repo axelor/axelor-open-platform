@@ -27,7 +27,7 @@ const merge = require('broccoli-merge-trees');
 const uglify = require('broccoli-uglify-sourcemap');
 const Funnel = require('broccoli-funnel');
 const Gzip = require('broccoli-gzip');
-const YAML = require('yaml');
+const glob = require('glob');
 
 const app = '.';
 
@@ -76,12 +76,9 @@ function minifyCss(name) {
   });
 }
 
-function minifyJs(name, headerFiles) {
-  if (headerFiles === undefined) {
-    headerFiles = jsList('js/' + name + '.js');
-  }
+function minifyJs(name) {
   const tree = concat(app, {
-    headerFiles: headerFiles,
+    headerFiles: jsList('js/' + name + '.js'),
     allowNone: true,
     outputFile: name + '.min.js',
   });
@@ -93,10 +90,6 @@ function minifyJs(name, headerFiles) {
   });
 }
 
-function minifyJsFile(name) {
-  return minifyJs(name, ['js/' + name + '.js']);
-}
-
 function gzip(tree) {
   return new Funnel(new Gzip(tree, { keepUncompressed: true }), {
     getDestinationPath: function (destPath) {
@@ -105,40 +98,23 @@ function gzip(tree) {
   });
 }
 
-const minifyList = [
-  minifyCss('application'),
-  minifyCss('application.login'),
-  minifyJs('application'),
-  minifyJs('application.login'),
-];
+const minifyNames = {"css": new Set(), "js": new Set()};
+const minifyList = [];
+const styleRe = /<x:style.*?\bsrc=['"][\.\/]*css\/(.*)\.css['"]/g;
+const scriptRe = /<x:script.*?\bsrc=['"][\.\/]*js\/(.*)\.js['"]/g;
 
-try {
-  const minifyFile = fs.readFileSync('minify.yml', 'utf-8');
-  const minifyFiles = YAML.parse(minifyFile);
-  if (minifyFiles.css) {
-    minifyFiles.css.forEach(name => {
-      minifyList.push(minifyCss(name));
-      console.log(`Minified CSS: ${name}`);
-    });
+glob.sync("**/*.jsp").forEach(input => {
+  const contents = fs.readFileSync(input).toString();
+  let match;
+  while ((match = styleRe.exec(contents)) !== null) {
+    minifyNames.css.add(match[1]);
   }
-  if (minifyFiles.js) {
-    minifyFiles.js.forEach(name => {
-      minifyList.push(minifyJsFile(name));
-      console.log(`Minified JS: ${name}`);
-    });
+  while ((match = scriptRe.exec(contents)) !== null) {
+    minifyNames.js.add(match[1]);
   }
-  if (minifyFiles.jsList) {
-    minifyFiles.jsList.forEach(name => {
-      minifyList.push(minifyJs(name));
-      console.log(`Minified JS list: ${name}`);
-    });
-  }
-} catch (err) {
-  if (err.code === 'ENOENT') {
-    console.log('No extra files to minify');
-  } else {
-    console.error(err);
-  }
-}
+});
+
+minifyNames.css.forEach(name => minifyList.push(minifyCss(name)));
+minifyNames.js.forEach(name => minifyList.push(minifyJs(name)));
 
 module.exports = gzip(merge(minifyList));
