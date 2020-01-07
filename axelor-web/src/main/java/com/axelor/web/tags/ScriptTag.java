@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import javax.servlet.jsp.JspWriter;
 
 public class ScriptTag extends AbstractTag {
@@ -37,6 +38,9 @@ public class ScriptTag extends AbstractTag {
       return files;
     }
 
+    final Matcher dirMatcher = dirPattern.matcher(getSrc());
+    final String dir = dirMatcher.find() ? dirMatcher.group() : "";
+
     try (final InputStream is = resource.openStream()) {
       return CharStreams.readLines(
           new InputStreamReader(is),
@@ -45,7 +49,7 @@ public class ScriptTag extends AbstractTag {
             public boolean processLine(String line) throws IOException {
               if (line.startsWith("//= ")) {
                 line = line.substring(3).trim();
-                files.add(line);
+                files.add(dir + line);
               }
               return true;
             }

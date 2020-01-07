@@ -23,6 +23,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
@@ -33,6 +35,8 @@ public abstract class AbstractTag extends SimpleTagSupport {
   private String src;
 
   private boolean production = AppSettings.get().isProduction();
+
+  protected static final Pattern dirPattern = Pattern.compile("^[\\./]*");
 
   public String getSrc() {
     return src;
@@ -51,7 +55,8 @@ public abstract class AbstractTag extends SimpleTagSupport {
   }
 
   protected URL getResource(String path) throws MalformedURLException {
-    final String resource = path.replaceFirst("^[\\./]*", "/");
+    final Matcher matcher = dirPattern.matcher(path);
+    final String resource = matcher.find() ? matcher.replaceFirst("/") : path;
     final PageContext ctx = (PageContext) getJspContext();
     return ctx.getServletContext().getResource(resource);
   }
