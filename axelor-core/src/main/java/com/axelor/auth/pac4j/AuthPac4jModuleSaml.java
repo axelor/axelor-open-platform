@@ -246,7 +246,7 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
 
     @Override
     protected void initSAMLLogoutResponseValidator() {
-      final String postLogoutURL = AuthPac4jModule.getRelativeBaseURL();
+      final String postLogoutURL = AppSettings.get().getBaseURL();
       this.logoutValidator =
           new AxelorSAML2LogoutValidator(
               this.signatureTrustEngineProvider,

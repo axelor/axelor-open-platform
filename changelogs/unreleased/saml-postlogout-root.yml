@@ -1,0 +1,3 @@
+---
+title: Fix SAML postLogoutURL for webapps deployed at root
+type: fix
