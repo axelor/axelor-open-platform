@@ -176,7 +176,7 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
       }
 
       // Post Logout URL
-      configuration.setPostLogoutURL(AuthPac4jModule.getRelativeBaseURL());
+      configuration.setPostLogoutURL(AppSettings.get().getBaseURL());
       super.clientInit();
     }
   }
