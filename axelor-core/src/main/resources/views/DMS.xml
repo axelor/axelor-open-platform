@@ -44,9 +44,9 @@
       <field name="$pdf" showTitle="false" readonly="true">
         <viewer depends="inlineUrl"><![CDATA[
           <object data="{{record.inlineUrl}}" type="application/pdf" width="100%" height="1200px">
-              <embed ng-src="{{record.inlineUrl}}" type="application/pdf">
-                  <p>This browser does not support PDFs.</p>
-              </embed>
+            <embed ng-src="{{record.inlineUrl}}" type="application/pdf">
+                <p>This browser does not support PDFs.</p>
+            </embed>
           </object>
         ]]></viewer>
       </field>
@@ -54,8 +54,7 @@
     <panel itemSpan="12" showIf="fileType.indexOf('image') == 0">
       <field name="$img" showTitle="false" readonly="true">
         <viewer depends="inlineUrl,fileName"><![CDATA[
-          <img ng-src="{{record.inlineUrl}}" alt="{{record.fileName}}"
-            style="width:100%; height:100%; object-fit: contain;"/>
+          <img ng-src="{{record.inlineUrl}}" alt="{{record.fileName}}"/>
         ]]></viewer>
       </field>
     </panel>
