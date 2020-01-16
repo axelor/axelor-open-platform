@@ -549,6 +549,7 @@ public class DmsService {
       if (fileName.endsWith(".html")) type = new MediaType("text", "html");
       if (fileName.endsWith(".png")) type = new MediaType("image", "png");
       if (fileName.endsWith(".jpg")) type = new MediaType("image", "jpg");
+      if (fileName.endsWith(".jpeg")) type = new MediaType("image", "jpg");
       if (fileName.endsWith(".svg")) type = new MediaType("image", "svg+xml");
       if (fileName.endsWith(".gif")) type = new MediaType("image", "gif");
       if (fileName.endsWith(".webp")) type = new MediaType("image", "webp");
