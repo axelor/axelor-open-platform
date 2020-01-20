@@ -1,3 +1,18 @@
+## 5.2.4 (2020-01-20)
+
+#### Features
+
+* Scan for css/js files to minify
+
+#### Fixed
+
+* Fix onRefresh issue on dashlet
+* Fix duplicate m2m item issue
+* Fix target-name of a custom field in grid view when visibleInGrid is not used
+* Fix relative style/script source in JSP
+* Fix SAML postLogoutURL for webapps deployed at root
+* Fix DMS file being automatically downloaded on form view
+
 ## 5.2.3 (2019-12-13)
 
 #### Features
