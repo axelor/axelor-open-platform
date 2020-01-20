@@ -1,11 +1,11 @@
 # Axelor Development Kit
 
-[uri_axelor]: http://www.axelor.com
-[uri_docs]: http://docs.axelor.com/adk/latest/welcome/index.html
-[uri_docs_install]: http://docs.axelor.com/adk/latest/welcome/index.html
-[uri_docs_tutorial]: http://docs.axelor.com/adk/latest/tutorial/step1.html
-[uri_docs_guide]: http://docs.axelor.com/adk/latest/dev_guide/index.html
-[uri_license]: http://www.gnu.org/licenses/agpl.html
+[uri_axelor]: https://www.axelor.com
+[uri_docs]: https://docs.axelor.com/adk/latest/
+[uri_docs_install]: https://docs.axelor.com/adk/latest/getting-started/index.html
+[uri_docs_tutorial]: https://docs.axelor.com/adk/latest/tutorial/step1.html
+[uri_docs_guide]: https://docs.axelor.com/adk/latest/dev-guide/index.html
+[uri_license]: https://www.gnu.org/licenses/agpl-3.0.html
 [uri_license_image]: https://img.shields.io/badge/License-AGPL%20v3-blue.svg
 
 [![License: AGPL v3][uri_license_image]][uri_license]
