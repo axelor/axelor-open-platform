@@ -1,0 +1,3 @@
+---
+title: Fix unknown tracked field detection when using inheritance
+type: fix

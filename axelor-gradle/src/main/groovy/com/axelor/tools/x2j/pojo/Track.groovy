@@ -136,6 +136,7 @@ class Track {
 
   def merge(Track other) {
     fields.addAll(other.fields);
+    names.addAll(other.names);
     messages.addAll(other.messages);
     contents.addAll(other.contents);
     imports.addAll(other.imports);
