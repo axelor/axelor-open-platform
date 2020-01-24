@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -470,7 +470,7 @@ ui.directive('uiBindTemplate', ['$interpolate', function($interpolate){
 
       function update() {
         var output = expand(scope, template) || "";
-        element.html(output);
+        element.html(axelor.sanitize(output));
       }
 
       scope.$watch("text", function(text, old) {

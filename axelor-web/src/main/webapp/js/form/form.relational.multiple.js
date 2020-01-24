@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -109,6 +109,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
       var find = _.find(records, function(rec){
         var id1 = rec.id || rec.$id;
         var id2 = item.id || item.$id;
+        if (id1 < 0 && id2 > 0) id2 = item.$id || item.id;
         return id1 && id1 === id2;
       });
 
@@ -580,7 +581,7 @@ ui.formInput('OneToMany', {
 
     scope.onGridInit = function(grid, inst) {
       var editIcon = scope.canView() || (!scope.isReadonly() && scope.canEdit());
-      var editable = grid.getOptions().editable && !axelor.device.mobile;
+      var editable = inst.editable && !axelor.device.mobile;
 
       adjustHeight = true;
 
@@ -594,10 +595,7 @@ ui.formInput('OneToMany', {
           }
         });
         scope.$watch("isReadonly()", function o2mReadonlyWatch(readonly) {
-          grid.setOptions({
-            editable: !readonly && scope.canEdit()
-          });
-
+          inst.readonly = readonly || !scope.canEdit()
           var _editIcon = scope.canView() || (!readonly && scope.canEdit());
           if (_editIcon != editIcon) {
             inst.showColumn('_edit_column', editIcon = _editIcon);
@@ -621,7 +619,7 @@ ui.formInput('OneToMany', {
         adjustSize();
       });
 
-      if (!(scope._viewParams || {}).summaryView || scope.field.widget === "MasterDetail") {
+      if (!(scope._viewParams || {}).summaryView || scope.field.widget === "master-detail") {
         return;
       }
       var col = {
@@ -671,7 +669,7 @@ ui.formInput('OneToMany', {
     };
 
     var field = scope.field;
-    if (field.widget === 'MasterDetail') {
+    if (field.widget === 'master-detail') {
       setTimeout(function(){
         scope.showDetailView();
       });
@@ -811,7 +809,11 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
       if (item && scope._items && item.id in scope._items) {
         item = scope._items[item.id];
       }
-      return item ? item[nameField] : item;
+      if (!item) return item;
+      var key = nameField;
+      var trKey = '$t:' + key;
+      if (trKey in item) key = trKey;
+      return item[key];
     };
 
     scope.getItems = function() {
@@ -1156,8 +1158,9 @@ ui.formInput('OneToManyInline', 'OneToMany', {
     };
 
     var field = scope.field;
-    var input = element.children('input');
-    var grid = element.children('[ui-slick-grid]');
+    var picker = element.children('.picker-input');
+    var input = picker.children('input');
+    var grid = picker.children('[ui-slick-grid]');
 
     var container = null;
     var wrapper = $('<div class="slick-editor-dropdown"></div>')
@@ -1192,7 +1195,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
       wrapper.position({
         my: "left top",
         at: "left bottom",
-        of: element,
+        of: picker,
         within: container
       })
       .zIndex(element.zIndex() + 1)
@@ -1249,10 +1252,10 @@ ui.formInput('OneToManyInline', 'OneToMany', {
       var all = element.add(wrapper);
       var elem = $(e.target);
       if (all.is(elem) || all.has(elem).length > 0) return;
-      if (elem.zIndex() > element.parents('.slickgrid:first').zIndex()) return;
+      if (elem.zIndex() > element.parents('.slick-form:first,.slickgrid:first').zIndex()) return;
       if (elem.parents(".ui-dialog:first").zIndex() > element.parents('.slickgrid:first').zIndex()) return;
 
-      element.trigger('close:slick-editor');
+      element.trigger('hide:slick-editor');
     }
 
     $(document).on('mousedown.mini-grid', hidePopup);
@@ -1290,7 +1293,8 @@ ui.formInput('OneToManyInline', 'OneToMany', {
   template_readonly: null,
 
   template:
-  '<span class="picker-input picker-icons-2" style="position: absolute;">'+
+  '<span class="form-item-container">'+
+  '<span class="picker-input picker-icons-2">'+
     '<input type="text" readonly>'+
     '<span class="picker-icons">'+
       '<i class="fa fa-plus" ng-click="onSelect()" ng-show="canShowAdd()" title="{{\'Select\' | t}}"></i>'+
@@ -1306,6 +1310,7 @@ ui.formInput('OneToManyInline', 'OneToMany', {
       'x-on-before-save="onGridBeforeSave" '+
       'x-on-after-save="onGridAfterSave" '+
       '></div>'+
+  '</span>'+
   '</span>'
 });
 

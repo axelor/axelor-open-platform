@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -63,10 +63,7 @@ class EventBus {
 
   private Map<Class<?>, List<Observer>> findObservers() {
     final Map<Class<?>, List<Observer>> observers = new HashMap<>();
-    injector
-        .getAllBindings()
-        .entrySet()
-        .stream()
+    injector.getAllBindings().entrySet().stream()
         .filter(entry -> !(entry.getValue() instanceof LinkedKeyBinding))
         .map(Entry::getKey)
         .map(Key::getTypeLiteral)
@@ -87,8 +84,7 @@ class EventBus {
     final Set<Annotation> annotations =
         Optional.ofNullable(qualifiers).orElse(Collections.emptySet());
 
-    return found
-        .stream()
+    return found.stream()
         .filter(o -> o.matches(eventType, annotations))
         .collect(Collectors.toList());
   }

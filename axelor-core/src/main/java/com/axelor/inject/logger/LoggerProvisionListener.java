@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,33 +17,28 @@
  */
 package com.axelor.inject.logger;
 
-import com.google.inject.spi.Dependency;
+import com.google.inject.Binding;
 import com.google.inject.spi.ProvisionListener;
-import org.slf4j.Logger;
+import java.util.ArrayDeque;
 
 final class LoggerProvisionListener implements ProvisionListener {
 
-  private boolean isLoggerDependency(Dependency<?> dependency) {
-    return dependency != null
-        && dependency.getKey().getTypeLiteral().getRawType().isAssignableFrom(Logger.class);
-  }
+  static final ThreadLocal<ArrayDeque<Binding<?>>> bindingStack =
+      new ThreadLocal<ArrayDeque<Binding<?>>>() {
+        protected ArrayDeque<Binding<?>> initialValue() {
+          return new ArrayDeque<>();
+        };
+      };
 
   @Override
   public <T> void onProvision(ProvisionInvocation<T> provision) {
-    provision
-        .getDependencyChain()
-        .stream()
-        .map(d -> d.getDependency())
-        .filter(this::isLoggerDependency)
-        .map(d -> d.getInjectionPoint().getDeclaringType().getRawType())
-        .forEach(
-            type -> {
-              LoggerProvider.NAME.set(type.getName());
-              try {
-                provision.provision();
-              } finally {
-                LoggerProvider.NAME.remove();
-              }
-            });
+    if (provision.getBinding().getSource() instanceof Class<?>) {
+      try {
+        bindingStack.get().push(provision.getBinding());
+        provision.provision();
+      } finally {
+        bindingStack.get().pop();
+      }
+    }
   }
 }

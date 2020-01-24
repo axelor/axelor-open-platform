@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -881,9 +881,10 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 
       function sendChunk() {
         xhr.open("POST", "ws/files/upload", true);
-            xhr.overrideMimeType("application/octet-stream");
-            xhr.setRequestHeader("Content-Type", "application/octet-stream");
+        xhr.overrideMimeType("application/octet-stream");
+        xhr.setRequestHeader("Content-Type", "application/octet-stream");
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xhr.setRequestHeader($http.defaults.xsrfHeaderName, axelor.readCookie($http.defaults.xsrfCookieName));
 
         if (info.uuid) {
           xhr.setRequestHeader("X-File-Id", info.uuid);

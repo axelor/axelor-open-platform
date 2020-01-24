@@ -40,13 +40,17 @@ public class WarSupport extends AbstractSupport {
     project.getPlugins().apply(WarPlugin.class);
 
     Configuration axelorWeb = project.getConfigurations().create("axelorWeb").setTransitive(false);
+    Configuration axelorTomcat = project.getConfigurations().create("axelorTomcat");
 
     // apply providedCompile dependencies
     applyConfigurationLibs(project, "provided", "compileOnly");
 
     // add dependency to axelor-web
-    project.getDependencies().add("compile", "com.axelor:axelor-web:" + version);
+    project.getDependencies().add("implementation", "com.axelor:axelor-web:" + version);
     project.getDependencies().add("axelorWeb", "com.axelor:axelor-web:" + version);
+
+    // add axelor-tomcat dependency
+    project.getDependencies().add("axelorTomcat", "com.axelor:axelor-tomcat:" + version);
 
     // copy webapp to root build dir
     project
@@ -60,9 +64,7 @@ public class WarSupport extends AbstractSupport {
               task.dependsOn(GenerateCode.TASK_NAME);
               task.dependsOn(JavaPlugin.PROCESS_RESOURCES_TASK_NAME);
               task.dependsOn(axelorWeb);
-              axelorWeb
-                  .getFiles()
-                  .stream()
+              axelorWeb.getFiles().stream()
                   .filter(file -> file.getName().startsWith("axelor-web"))
                   .forEach(
                       file -> {
@@ -73,7 +75,14 @@ public class WarSupport extends AbstractSupport {
                       });
             });
 
-    project.getTasks().withType(War.class).all(task -> task.dependsOn(COPY_WEBAPP_TASK_NAME));
+    project
+        .getTasks()
+        .withType(War.class)
+        .all(
+            task -> {
+              task.dependsOn(COPY_WEBAPP_TASK_NAME);
+              task.setClasspath(task.getClasspath().filter(file -> !axelorTomcat.contains(file)));
+            });
 
     final War war = (War) project.getTasks().getByName(WarPlugin.WAR_TASK_NAME);
     war.from(project.getBuildDir() + "/webapp");

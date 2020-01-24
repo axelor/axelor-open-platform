@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -29,12 +29,12 @@ import com.axelor.db.mapper.PropertyType;
 import com.axelor.rpc.Resource;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -432,7 +432,7 @@ public class Query<T extends Model> {
    * @return total number of records updated
    */
   public int update(String name, Object value) {
-    return update(ImmutableMap.of(name, value));
+    return update(Collections.singletonMap(name, value));
   }
 
   /**
@@ -480,8 +480,7 @@ public class Query<T extends Model> {
     boolean notMySQL = !DBHelper.isMySQL();
 
     String whereClause = String.join(" OR ", where);
-    String selectQuery =
-        selectQuery().replaceFirst("SELECT self", "SELECT self.id").replaceFirst(" ORDER BY.*", "");
+    String selectQuery = updateQuery().replaceFirst("SELECT self", "SELECT self.id");
 
     if (selectQuery.contains(" WHERE ")) {
       selectQuery = selectQuery.replaceFirst(" WHERE ", " WHERE (" + whereClause + ") AND (") + ")";
@@ -535,7 +534,7 @@ public class Query<T extends Model> {
    * @return total number of records updated
    */
   public int update(String name, Object value, User updatedBy) {
-    return update(ImmutableMap.of(name, value), updatedBy);
+    return update(Collections.singletonMap(name, value), updatedBy);
   }
 
   /**
@@ -630,9 +629,7 @@ public class Query<T extends Model> {
 
   protected String updateQuery(Map<String, Object> values, boolean versioned, String filter) {
     final String items =
-        values
-            .keySet()
-            .stream()
+        values.keySet().stream()
             .map(key -> String.format("self.%s = :%s", key, key))
             .collect(Collectors.joining(", "));
 

@@ -3,7 +3,7 @@ def versions = [:]
 
 // versions
 versions.guice = "4.2.2"
-versions.guava = "28.0-jre"
+versions.guava = "28.1-jre"
 versions.hibernate = "5.2.10.Final"
 versions.hibernate_validator = "5.4.1.Final"
 versions.hibernate_search = "5.7.0.Final"
@@ -12,8 +12,9 @@ versions.groovy = "2.4.10"
 versions.resteasy = "3.1.2.Final"
 versions.jackson = "2.8.8"
 versions.shiro = "1.4.1"
-versions.buji_pac4j = "4.1.0"
-versions.pac4j = "3.7.0"
+versions.buji_pac4j = "4.1.1"
+versions.pac4j = "3.8.3"
+versions.ldaptive = "1.2.4"
 
 versions.junit = "4.12"
 versions.slf4j = "1.7.25"
@@ -91,6 +92,7 @@ libs.hibernate = [
     "org.hibernate:hibernate-validator:${versions.hibernate_validator}",
   "org.hibernate:hibernate-ehcache:${versions.hibernate}",
   "org.hibernate:hibernate-jcache:${versions.hibernate}",
+  "org.hibernate:hibernate-entitymanager:${versions.hibernate}",
 ]
 
 // Hibernate search
@@ -169,7 +171,13 @@ libs.pac4j = [
   "org.pac4j:pac4j-oauth:${versions.pac4j}",
   "org.pac4j:pac4j-saml:${versions.pac4j}",
   "org.pac4j:pac4j-cas:${versions.pac4j}",
-  "org.pac4j:pac4j-http:${versions.pac4j}"
+  "org.pac4j:pac4j-http:${versions.pac4j}",
+  "org.pac4j:pac4j-ldap:${versions.pac4j}",
+  "org.ldaptive:ldaptive:${versions.ldaptive}"
+]
+
+libs.pac4j_core = [
+  "org.pac4j:pac4j-core:${versions.pac4j}"
 ]
 
 // Apache DS (for testing only)
@@ -226,4 +234,9 @@ libs.tomcat_embed = [
 ]
 
 // currently deployed on axelor repo
-libs.hotswap_agent = "org.hotswap.agent:hotswap-agent:1.3.0"
+libs.hotswap_agent = [
+  "org.hotswapagent:hotswap-agent-core:1.3.0",
+  "org.hotswapagent:hotswap-agent-tomcat-plugin:1.3.0",
+  "org.hotswapagent:hotswap-agent-logback-plugin:1.3.0",
+  "org.hotswapagent:hotswap-agent-proxy-plugin:1.3.0",
+]

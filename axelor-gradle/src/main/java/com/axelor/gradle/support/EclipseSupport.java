@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
-import org.gradle.composite.internal.IncludedBuildInternal;
+import org.gradle.composite.internal.DefaultIncludedBuild;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin;
 import org.gradle.plugins.ide.eclipse.model.AccessRule;
@@ -50,6 +50,9 @@ public class EclipseSupport extends AbstractSupport {
 
   @Override
   public void apply(Project project) {
+    final EclipseModel eclipse = project.getExtensions().getByType(EclipseModel.class);
+    final EclipseClasspath ecp = eclipse.getClasspath();
+
     project.getPlugins().apply(EclipsePlugin.class);
     project.getPlugins().apply(EclipseWtpPlugin.class);
 
@@ -60,6 +63,7 @@ public class EclipseSupport extends AbstractSupport {
                 .getTasks()
                 .getByName(EclipsePlugin.ECLIPSE_CP_TASK_NAME)
                 .dependsOn(GenerateCode.TASK_NAME);
+            eclipse.synchronizationTasks(GenerateCode.TASK_NAME);
           }
           if (project.getPlugins().hasPlugin(AppPlugin.class)) {
             project
@@ -78,29 +82,25 @@ public class EclipseSupport extends AbstractSupport {
                     });
             // Fix wtp issue in included builds (with buildship)
             // see: https://discuss.gradle.org/t/gradle-composite-builds-and-eclipse-wtp/23503
-            project
-                .getGradle()
-                .getIncludedBuilds()
-                .stream()
-                .map(ib -> ((IncludedBuildInternal) ib).getConfiguredBuild().getRootProject())
+            project.getGradle().getIncludedBuilds().stream()
+                .map(ib -> ((DefaultIncludedBuild) ib).getConfiguredBuild().getRootProject())
                 .flatMap(
                     ib -> Stream.concat(Arrays.asList(ib).stream(), ib.getSubprojects().stream()))
                 .filter(ip -> ip.getPlugins().hasPlugin(EclipseWtpPlugin.class))
                 .map(ip -> ip.getTasks().getByName("eclipseWtp"))
                 .forEach(it -> project.getTasks().getByName("eclipseWtp").dependsOn(it));
+
+            // generate run launcher
+            eclipse.synchronizationTasks("generateLauncher");
           }
         });
-
-    final EclipseModel eclipse = project.getExtensions().getByType(EclipseModel.class);
-    final EclipseClasspath ecp = eclipse.getClasspath();
 
     ecp.setDefaultOutputDir(project.file("bin/main"));
     ecp.getFile()
         .whenMerged(
             (Classpath cp) -> {
               // separate output for main & test sources
-              cp.getEntries()
-                  .stream()
+              cp.getEntries().stream()
                   .filter(it -> it instanceof SourceFolder)
                   .map(it -> (SourceFolder) it)
                   .filter(
@@ -108,8 +108,7 @@ public class EclipseSupport extends AbstractSupport {
                           it.getPath().startsWith("src/main/") || it.getPath().contains("src-gen/"))
                   .forEach(it -> it.setOutput("bin/main"));
 
-              cp.getEntries()
-                  .stream()
+              cp.getEntries().stream()
                   .filter(it -> it instanceof SourceFolder)
                   .map(it -> (SourceFolder) it)
                   .filter(it -> it.getPath().startsWith("src/test/"))
@@ -128,8 +127,7 @@ public class EclipseSupport extends AbstractSupport {
                               && ((Library) it).getPath().contains(project.getName() + "/build"));
 
               // add access rule for nashorn api
-              cp.getEntries()
-                  .stream()
+              cp.getEntries().stream()
                   .filter(it -> it instanceof Container)
                   .map(it -> (Container) it)
                   .filter(it -> it.getPath().contains("org.eclipse.jdt.launching.JRE_CONTAINER"))
@@ -166,10 +164,7 @@ public class EclipseSupport extends AbstractSupport {
   private void configureWtp(Project project, EclipseModel eclipse) {
     // try to link axelor-web's webapp dir
     final File dir =
-        project
-            .getGradle()
-            .getIncludedBuilds()
-            .stream()
+        project.getGradle().getIncludedBuilds().stream()
             .map(it -> new File(it.getProjectDir(), "axelor-web/src/main/webapp"))
             .filter(it -> it.exists())
             .findFirst()
@@ -218,6 +213,10 @@ public class EclipseSupport extends AbstractSupport {
         .append("<listEntry value=\"4\"/>\n")
         .append("</listAttribute>\n");
 
+    builder.append(
+        "<booleanAttribute key=\"org.eclipse.jdt.launching.ATTR_EXCLUDE_TEST_CODE\" value=\"true\"/>\n");
+    builder.append(
+        "<booleanAttribute key=\"org.eclipse.jdt.launching.ATTR_USE_CLASSPATH_ONLY_JAR\" value=\"true\"/>\n");
     builder.append(
         "<booleanAttribute key=\"org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD\" value=\"true\"/>\n");
 

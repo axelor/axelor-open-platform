@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,6 +18,7 @@
 package com.axelor.app.internal;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
@@ -43,7 +44,7 @@ public class AppFilter implements Filter {
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
     try {
-      final String appLocale = AppSettings.get().get("application.locale", null);
+      final String appLocale = AppSettings.get().get(AvailableAppSettings.APPLICATION_LOCALE, null);
       APP_LOCALE = appLocale == null ? null : new Locale(appLocale);
     } catch (Exception e) {
     }
@@ -72,7 +73,7 @@ public class AppFilter implements Filter {
     return StringUtils.isBlank(value) ? defaultValue : value;
   }
 
-  private String getBaseUrl(ServletRequest req) {
+  private String computeBaseUrl(ServletRequest req) {
     final String proto = getHeader(req, "X-Forwarded-Proto", req.getScheme());
     final String port = getHeader(req, "X-Forwarded-Port", "" + req.getServerPort());
     final String host = getHeader(req, "X-Forwarded-Host", req.getServerName());
@@ -87,7 +88,7 @@ public class AppFilter implements Filter {
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
 
-    BASE_URL.set(getBaseUrl(request));
+    BASE_URL.set(computeBaseUrl(request));
     LANGUAGE.set(request.getLocale());
     try {
       chain.doFilter(request, response);

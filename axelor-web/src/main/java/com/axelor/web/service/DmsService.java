@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -549,6 +549,7 @@ public class DmsService {
       if (fileName.endsWith(".html")) type = new MediaType("text", "html");
       if (fileName.endsWith(".png")) type = new MediaType("image", "png");
       if (fileName.endsWith(".jpg")) type = new MediaType("image", "jpg");
+      if (fileName.endsWith(".jpeg")) type = new MediaType("image", "jpg");
       if (fileName.endsWith(".svg")) type = new MediaType("image", "svg+xml");
       if (fileName.endsWith(".gif")) type = new MediaType("image", "gif");
       if (fileName.endsWith(".webp")) type = new MediaType("image", "webp");

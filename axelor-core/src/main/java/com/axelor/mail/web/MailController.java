@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -53,7 +53,8 @@ public class MailController extends JpaSupport {
           + " (mm.parent IS NULL) AND "
           + " (f.user.id = :uid AND f.archived = false) AND"
           + " (g.isRead IS NULL OR g.isRead = false) "
-          + "ORDER BY mm.createdOn DESC";
+          + "ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn "
+          + "ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC";
 
   private static final String SQL_SUBSCRIBERS =
       ""
@@ -76,7 +77,8 @@ public class MailController extends JpaSupport {
           + " (mm.parent IS NULL) AND "
           + " (f.user.id = :uid AND f.archived = false) AND"
           + " (g.isRead IS NULL OR g.isRead = false OR g.isArchived = false) "
-          + "ORDER BY mm.createdOn DESC";
+          + "ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn "
+          + "ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC";
 
   private static final String SQL_IMPORTANT =
       ""
@@ -87,7 +89,8 @@ public class MailController extends JpaSupport {
           + " (mm.parent IS NULL) AND "
           + " (f.user.id = :uid AND f.archived = false) AND"
           + " (g.isStarred = true AND g.isArchived = false) "
-          + "ORDER BY mm.createdOn DESC";
+          + "ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn "
+          + "ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC";
 
   private static final String SQL_ARCHIVE =
       ""
@@ -98,7 +101,8 @@ public class MailController extends JpaSupport {
           + " (mm.parent IS NULL) AND "
           + " (f.user.id = :uid AND f.archived = false) AND"
           + " (g.isArchived = true) "
-          + "ORDER BY mm.createdOn DESC";
+          + "ORDER BY CASE WHEN mm.replies IS EMPTY THEN mm.createdOn "
+          + "ELSE (SELECT MAX(reply.createdOn) FROM mm.replies reply) END DESC";
 
   @Inject private MailMessageRepository messages;
 
@@ -279,7 +283,7 @@ public class MailController extends JpaSupport {
     final String countString =
         queryString
             .replace("SELECT mm FROM MailMessage mm", "SELECT COUNT(mm.id) FROM MailMessage mm")
-            .replace(" ORDER BY mm.createdOn DESC", "");
+            .replaceFirst("\\s*ORDER BY.*$", "");
 
     final TypedQuery<Long> query = getEntityManager().createQuery(countString, Long.class);
 

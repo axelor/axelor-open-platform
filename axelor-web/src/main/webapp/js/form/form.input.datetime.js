@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -335,13 +335,13 @@ ui.formInput('DateTime', {
         e.stopPropagation();
         e.preventDefault();
         return false;
-      }
-      if (e.keyCode === $.ui.keyCode.ENTER && $(this).datepicker("widget").is(':visible')) {
+      } else if (e.keyCode === $.ui.keyCode.ENTER) {
+        updateModel();
+      } else if ($(this).datepicker("widget").is(':visible')) {
         e.stopPropagation();
         e.preventDefault();
         return false;
-      }
-      if (e.keyCode === $.ui.keyCode.ENTER || e.keyCode === $.ui.keyCode.TAB) {
+      } else if (e.keyCode === $.ui.keyCode.TAB) {
         if (changed) updateModel();
       }
     });

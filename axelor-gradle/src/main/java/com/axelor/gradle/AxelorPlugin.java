@@ -29,7 +29,7 @@ import java.io.File;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileTree;
-import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.plugins.JavaLibraryPlugin;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.compile.AbstractCompile;
@@ -46,6 +46,7 @@ public class AxelorPlugin implements Plugin<Project> {
 
   public static final boolean GRADLE_VERSION_3_X = GRADLE_VERSION.startsWith("3");
   public static final boolean GRADLE_VERSION_4_X = GRADLE_VERSION.startsWith("4");
+  public static final boolean GRADLE_VERSION_5_X = GRADLE_VERSION.startsWith("5");
 
   public static File getClassOutputDir(Project project, String sourceType) {
     return GRADLE_VERSION_3_X
@@ -56,7 +57,7 @@ public class AxelorPlugin implements Plugin<Project> {
   @Override
   public void apply(Project project) {
 
-    project.getPlugins().apply(JavaPlugin.class);
+    project.getPlugins().apply(JavaLibraryPlugin.class);
     project.getExtensions().create(AxelorExtension.EXTENSION_NAME, AxelorExtension.class);
 
     project.getPlugins().apply(JavaSupport.class);

@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -212,7 +212,7 @@ function GridViewCtrl($scope, $element) {
   };
 
   $scope.canEdit = function() {
-    return $scope.hasButton('edit') && $scope.selection.length > 0;
+    return $scope.hasButton('edit') && ($scope.selection.length > 0 || $scope.dataView.getItemById(0));
   };
 
   $scope.canShowDetailsView = function () {
@@ -657,6 +657,7 @@ function GridViewCtrl($scope, $element) {
   };
 
   var _getContext = $scope.getContext;
+  $scope._isNestedGrid = !!_getContext;
   $scope.getContext = function() {
 
     // if nested grid then return parent's context
@@ -952,7 +953,7 @@ ui.directive('uiPortletGrid', function(){
 
       $scope.onRefresh = function () {
         var tab = NavService.getSelected();
-        var type = $scope.$parent._viewType
+        var type = (tab.params||{})['details-view'] ? $scope.$parent._viewType : tab.viewType || tab.type;
         if (['dashboard', 'form'].indexOf(type) === -1) {
           if (unwatch) {
             unwatch();
@@ -993,7 +994,7 @@ ui.directive('uiPortletGrid', function(){
         editCol.descriptor = { hidden : true };
         $scope.$parent.$watch("isReadonly()", function (readonly) {
           if (inst.editable) {
-            grid.setOptions({ editable: readonly });
+            inst.readonly = readonly;
           }
           inst.showColumn('_edit_column', !readonly);
           editCol.descriptor = { hidden : readonly };

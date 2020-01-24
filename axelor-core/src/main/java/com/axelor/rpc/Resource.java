@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -20,6 +20,7 @@ package com.axelor.rpc;
 import static com.axelor.common.StringUtils.isBlank;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
@@ -397,7 +398,11 @@ public class Resource<T extends Model> {
       security.get().check(JpaSecurity.CAN_READ, model);
     }
 
-    LOG.debug("Searching '{}' with {}", model.getCanonicalName(), request.getData());
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Searching '{}' with {}", model.getCanonicalName(), request.getData());
+    } else {
+      LOG.debug("Searching '{}'", model.getCanonicalName());
+    }
 
     firePreRequestEvent(RequestEvent.SEARCH, request);
 
@@ -529,15 +534,21 @@ public class Resource<T extends Model> {
   private static final int DEFAULT_EXPORT_FETCH_SIZE = 500;
 
   private static final int EXPORT_MAX_SIZE =
-      AppSettings.get().getInt("data.export.max-size", DEFAULT_EXPORT_MAX_SIZE);
+      AppSettings.get().getInt(AvailableAppSettings.DATA_EXPORT_MAX_SIZE, DEFAULT_EXPORT_MAX_SIZE);
   private static final int EXPORT_FETCH_SIZE =
-      AppSettings.get().getInt("data.export.fetch-size", DEFAULT_EXPORT_FETCH_SIZE);
+      AppSettings.get()
+          .getInt(AvailableAppSettings.DATA_EXPORT_FETCH_SIZE, DEFAULT_EXPORT_FETCH_SIZE);
 
   @SuppressWarnings("all")
   public int export(Request request, Writer writer) throws IOException {
     security.get().check(JpaSecurity.CAN_READ, model);
     security.get().check(JpaSecurity.CAN_EXPORT, model);
-    LOG.debug("Exporting '{}' with {}", model.getName(), request.getData());
+
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Exporting '{}' with {}", model.getName(), request.getData());
+    } else {
+      LOG.debug("Exporting '{}'", model.getName());
+    }
 
     firePreRequestEvent(RequestEvent.EXPORT, request);
 
@@ -810,9 +821,7 @@ public class Resource<T extends Model> {
       return values;
     }
     final Mapper mapper = Mapper.of(model);
-    related
-        .entrySet()
-        .stream()
+    related.entrySet().stream()
         .filter(e -> e.getValue() != null)
         .filter(e -> e.getValue().size() > 0)
         .forEach(
@@ -824,9 +833,7 @@ public class Resource<T extends Model> {
               if (value instanceof Collection<?>) {
                 value =
                     ((Collection<?>) value)
-                        .stream()
-                        .map(input -> toMap(input, names))
-                        .collect(Collectors.toList());
+                        .stream().map(input -> toMap(input, names)).collect(Collectors.toList());
               } else if (value instanceof Model) {
                 value = toMap(value, names);
                 if (old instanceof Map) {
@@ -989,7 +996,11 @@ public class Resource<T extends Model> {
 
     security.get().check(JpaSecurity.CAN_WRITE, model);
 
-    LOG.debug("Mass update '{}' with {}", model.getCanonicalName(), request.getData());
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Mass update '{}' with", model.getCanonicalName(), request.getData());
+    } else {
+      LOG.debug("Mass update '{}'", model.getCanonicalName());
+    }
 
     firePreRequestEvent(RequestEvent.MASS_UPDATE, request);
 

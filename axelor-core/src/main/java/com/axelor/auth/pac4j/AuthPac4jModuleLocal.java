@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,6 +18,7 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
@@ -26,11 +27,13 @@ import com.axelor.db.JPA;
 import com.axelor.inject.Beans;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
-import java.util.Optional;
 import javax.servlet.ServletContext;
+import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.context.WebContext;
+import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.credentials.extractor.FormExtractor;
@@ -40,9 +43,12 @@ import org.pac4j.core.http.ajax.DefaultAjaxRequestResolver;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.redirect.RedirectAction;
 import org.pac4j.core.util.CommonHelper;
+import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.indirect.FormClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class AuthPac4jModuleForm extends AuthPac4jModule {
+public class AuthPac4jModuleLocal extends AuthPac4jModule {
 
   private static final String INCORRECT_CREDENTIALS = /*$$(*/ "Wrong username or password" /*)*/;
   private static final String WRONG_CURRENT_PASSWORD = /*$$(*/ "Wrong current password" /*)*/;
@@ -50,13 +56,16 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
 
   private static final String NEW_PASSWORD_PARAMETER = "newPassword";
 
-  public AuthPac4jModuleForm(ServletContext servletContext) {
+  private static final Logger logger =
+      LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+  public AuthPac4jModuleLocal(ServletContext servletContext) {
     super(servletContext);
   }
 
   @Override
   protected void configureClients() {
-    addFormClient();
+    addLocalClients();
   }
 
   @Override
@@ -66,27 +75,53 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
     addFilterChain("/change-password.jsp", ANON);
   }
 
-  protected void addFormClient() {
-    addClient(new AxelorFormClient());
+  protected void addLocalClients() {
+    final AppSettings settings = AppSettings.get();
+    final String ldapUrl = settings.get(AvailableAppSettings.AUTH_LDAP_SERVER_URL, null);
+
+    if (ldapUrl != null) {
+      bind(AxelorAuthenticator.class).to(AxelorLdapProfileService.class);
+      logger.info("LDAP URL: {}", ldapUrl);
+    } else {
+      bind(AxelorAuthenticator.class).to(AxelorLocalAuthenticator.class);
+    }
+
+    expose(AxelorAuthenticator.class);
+    addLocalClient(new AxelorFormClient());
+
+    if (isBasicAuthEnabled()) {
+      addLocalClient(new AxelorDirectBasicAuthClient());
+    }
+  }
+
+  public static boolean isLdapEnabled() {
+    final AppSettings settings = AppSettings.get();
+    return settings.get(AvailableAppSettings.AUTH_LDAP_SERVER_URL, null) != null;
+  }
+
+  public static boolean isBasicAuthEnabled() {
+    final AppSettings settings = AppSettings.get();
+    return settings.getBoolean(AvailableAppSettings.AUTH_LOCAL_BASIC_AUTH_ENABLED, false);
   }
 
   private static class AxelorFormClient extends FormClient {
 
     public AxelorFormClient() {
-      defaultAuthenticator(new AxelorFormAuthenticator());
-      this.setCredentialsExtractor(new JsonExtractor());
-      this.setAjaxRequestResolver(new AxelorAjaxRequestResolver());
+      setName(getClass().getSuperclass().getSimpleName());
+      setCredentialsExtractor(new JsonExtractor());
+      setAjaxRequestResolver(new AxelorAjaxRequestResolver());
     }
 
     @Override
     protected void clientInit() {
-      final AppSettings settings = AppSettings.get();
-      final String baseUrl =
-          Optional.ofNullable(settings.getBaseURL())
-              .orElseThrow(IllegalStateException::new)
-              .replaceAll("/+$", "");
+      final String baseUrl = AuthPac4jModule.getRelativeBaseURL();
       final String loginUrl = baseUrl + "/login.jsp";
       setLoginUrl(loginUrl);
+
+      final Authenticator<UsernamePasswordCredentials> authenticator =
+          Beans.get(AxelorAuthenticator.class);
+      defaultAuthenticator(authenticator);
+
       super.clientInit();
     }
 
@@ -136,6 +171,14 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
 
       if (CHANGE_PASSWORD.equals(errorMessage)
           || StringUtils.notBlank(context.getRequestParameter(NEW_PASSWORD_PARAMETER))) {
+
+        final String tenanId = context.getRequestParameter("tenantId");
+        if (StringUtils.notBlank(tenanId)) {
+          @SuppressWarnings("unchecked")
+          final SessionStore<WebContext> sessionStore = context.getSessionStore();
+          sessionStore.set(context, "tenantId", tenanId);
+        }
+
         String redirectionUrl =
             CommonHelper.addParameter("change-password.jsp", getUsernameParameter(), username);
         redirectionUrl = CommonHelper.addParameter(redirectionUrl, ERROR_PARAMETER, errorMessage);
@@ -147,8 +190,31 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
     }
   }
 
-  private static class AxelorFormAuthenticator
-      implements Authenticator<UsernamePasswordCredentials> {
+  private static class AxelorDirectBasicAuthClient extends DirectBasicAuthClient {
+    public AxelorDirectBasicAuthClient() {
+      setName(getClass().getSuperclass().getSimpleName());
+    }
+
+    @Override
+    protected void clientInit() {
+      final Authenticator<UsernamePasswordCredentials> authenticator =
+          Beans.get(AxelorAuthenticator.class);
+      defaultAuthenticator(authenticator);
+      super.clientInit();
+    }
+
+    @Override
+    protected UsernamePasswordCredentials retrieveCredentials(final WebContext context) {
+      if (StringUtils.isBlank(context.getRequestHeader(HttpConstants.AUTHORIZATION_HEADER))) {
+        return null;
+      }
+      return super.retrieveCredentials(context);
+    }
+  }
+
+  public static interface AxelorAuthenticator extends Authenticator<UsernamePasswordCredentials> {}
+
+  public static class AxelorLocalAuthenticator implements AxelorAuthenticator {
 
     @Override
     public void validate(UsernamePasswordCredentials credentials, WebContext context) {
@@ -180,14 +246,18 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
         throw new CredentialsException(WRONG_CURRENT_PASSWORD);
       }
 
-      if (user.getForcePasswordChange()) {
+      if (Boolean.TRUE.equals(user.getForcePasswordChange())) {
         if (StringUtils.isBlank(newPassword)) {
           throw new CredentialsException(CHANGE_PASSWORD);
         }
 
         JPA.runInTransaction(
             () -> {
-              Beans.get(AuthService.class).changePassword(user, newPassword);
+              try {
+                Beans.get(AuthService.class).changePassword(user, newPassword);
+              } catch (IllegalArgumentException e) {
+                throw new CredentialsException(e.getMessage());
+              }
               user.setForcePasswordChange(false);
             });
       }

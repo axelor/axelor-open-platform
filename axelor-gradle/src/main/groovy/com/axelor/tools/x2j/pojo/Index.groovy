@@ -24,52 +24,52 @@ import groovy.util.slurpersupport.NodeChild
 @CompileStatic
 class Index {
 
-	String name
+  String name
 
-	List<String> columns
+  List<String> columns
 
-	List<String> fields
+  List<String> fields
 
-	Entity entity
+  Entity entity
 
-	Index(Entity entity, NodeChild node) {
-		this.entity = entity
-		this.name = node.getProperty("@name")
-		this.columns = []
-		this.fields = []
+  Index(Entity entity, NodeChild node) {
+    this.entity = entity
+    this.name = node.getProperty("@name")
+    this.columns = []
+    this.fields = []
 
-		(node.getProperty("@columns") as String).trim().split(/\,/).each { String column ->
-			def field = column
-			if (field.empty) {
-				return
-			}
-			Property property = entity.getField(field)
+    (node.getProperty("@columns") as String).trim().split(/\,/).each { String column ->
+      def field = column
+      if (field.empty) {
+        return
+      }
+      Property property = entity.getField(field)
 
-			fields.add(field)
-			columns.add(getColumn(property, column))
-		}
-	}
+      fields.add(field)
+      columns.add(getColumn(property, column))
+    }
+  }
 
-	Index(Entity entity, String name, List<String> fields) {
-		this.entity = entity
-		this.name = name
-		this.fields = fields
-		this.columns = fields.collect { String n -> getColumn(entity.getField(n), n) }
-	}
+  Index(Entity entity, String name, List<String> fields) {
+    this.entity = entity
+    this.name = name
+    this.fields = fields
+    this.columns = fields.collect { String n -> getColumn(entity.getField(n), n) }
+  }
 
-	private static String getColumn(Property property, String column) {
-		if (property == null) return column
-		def col = property.getColumn()
-		if (col) return property.getColumn()
-		if (property.isReference()) return property.getColumnAuto()
-		return column
-	}
+  private static String getColumn(Property property, String column) {
+    if (property == null) return column
+    def col = property.getColumn()
+    if (col) return property.getColumn()
+    if (property.isReference()) return property.getColumnAuto()
+    return column
+  }
 
-	List<String> getColumns() {
-		return this.columns
-	}
+  List<String> getColumns() {
+    return this.columns
+  }
 
-	List<String> getFields() {
-		return this.fields
-	}
+  List<String> getFields() {
+    return this.fields
+  }
 }

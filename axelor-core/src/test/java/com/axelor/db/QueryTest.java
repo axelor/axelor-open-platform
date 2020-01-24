@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -136,8 +136,7 @@ public class QueryTest extends JpaTest {
   @Transactional
   public void testBulkRemove() {
     final List<String> names = Arrays.asList("Bulk Remove 1", "Bulk Remove 2");
-    names
-        .stream()
+    names.stream()
         .forEach(
             name -> {
               Contact c = new Contact();
@@ -163,25 +162,35 @@ public class QueryTest extends JpaTest {
     final String lang = "EN";
     final String food = "pizza";
 
+    // Update one field
+    q.update("self.lang", lang);
+
     // managed instances are not affected with mass update
     // so clear the session to avoid unexpected results
     getEntityManager().clear();
-
-    // Update one field
-    q.update("self.lang", lang);
 
     for (Contact c : q.fetch()) {
       Assert.assertEquals(lang, c.getLang());
     }
 
-    getEntityManager().clear();
-
     // Update several fields
     q.update(ImmutableMap.of("self.lang", lang, "self.food", food));
+
+    getEntityManager().clear();
 
     for (Contact c : q.fetch()) {
       Assert.assertEquals(lang, c.getLang());
       Assert.assertEquals(food, c.getFood());
+    }
+
+    q.update("self.lang", null);
+    q.update("self.food", null);
+
+    getEntityManager().clear();
+
+    for (Contact c : q.fetch()) {
+      Assert.assertEquals(null, c.getLang());
+      Assert.assertEquals(null, c.getFood());
     }
   }
 
@@ -193,15 +202,16 @@ public class QueryTest extends JpaTest {
 
           @Override
           public void execute(Connection connection) throws SQLException {
-            Statement stm = connection.createStatement();
-            ResultSet rs = stm.executeQuery("SELECT * FROM contact_title");
-            ResultSetMetaData meta = rs.getMetaData();
-            while (rs.next()) {
-              Map<String, Object> item = Maps.newHashMap();
-              for (int i = 0; i < meta.getColumnCount(); i++) {
-                item.put(meta.getColumnName(i + 1), rs.getObject(i + 1));
+            try (Statement stm = connection.createStatement()) {
+              ResultSet rs = stm.executeQuery("SELECT * FROM contact_title");
+              ResultSetMetaData meta = rs.getMetaData();
+              while (rs.next()) {
+                Map<String, Object> item = Maps.newHashMap();
+                for (int i = 0; i < meta.getColumnCount(); i++) {
+                  item.put(meta.getColumnName(i + 1), rs.getObject(i + 1));
+                }
+                Assert.assertFalse(item.isEmpty());
               }
-              Assert.assertFalse(item.isEmpty());
             }
           }
         });

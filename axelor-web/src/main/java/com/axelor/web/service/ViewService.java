@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -240,8 +240,7 @@ public class ViewService extends AbstractService {
         items.addAll(form.getToolbar());
       }
       if (form.getMenubar() != null) {
-        form.getMenubar()
-            .stream()
+        form.getMenubar().stream()
             .filter(m -> m.getItems() != null)
             .forEach(m -> collect.accept(m.getItems()));
       }
@@ -290,8 +289,7 @@ public class ViewService extends AbstractService {
       if (view instanceof FormView || view instanceof GridView) {
         Mapper mapper = Mapper.of(modelClass);
         boolean hasJson =
-            names
-                .stream()
+            names.stream()
                 .map(mapper::getProperty)
                 .filter(Objects::nonNull)
                 .anyMatch(Property::isJson);

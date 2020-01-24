@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -24,11 +24,11 @@ import com.axelor.db.mapper.Adapter;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonRecord;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -61,7 +61,11 @@ public class JsonContext extends SimpleBindings {
       ObjectMapperProvider.createObjectMapper(new ModelSerializer());
 
   static {
-    jsonMapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
+    jsonMapper
+        .configOverride(Map.class)
+        .setInclude(
+            JsonInclude.Value.construct(
+                JsonInclude.Include.NON_EMPTY, JsonInclude.Include.NON_NULL));
   }
 
   private final String jsonField;
@@ -195,9 +199,9 @@ public class JsonContext extends SimpleBindings {
     if (value instanceof Collection) {
       return ((Collection<?>) value)
           .stream()
-          .map(item -> (Map<String, Object>) item)
-          .map(item -> ContextHandlerFactory.newHandler(targetClass, item).getProxy())
-          .collect(Collectors.toList());
+              .map(item -> (Map<String, Object>) item)
+              .map(item -> ContextHandlerFactory.newHandler(targetClass, item).getProxy())
+              .collect(Collectors.toList());
     }
 
     return super.get(key);

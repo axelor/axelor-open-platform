@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -87,8 +87,7 @@ public class ModuleController {
       return all;
     }
 
-    depends
-        .stream()
+    depends.stream()
         .filter(m -> m.getInstalled() != Boolean.TRUE)
         .map(MetaModule::getName)
         .forEach(all::add);
@@ -185,8 +184,7 @@ public class ModuleController {
       }
 
       String text =
-          resolveLink(module, getMainModule())
-              .stream()
+          resolveLink(module, getMainModule()).stream()
               .map(n -> "<li>" + n + "</li>")
               .collect(Collectors.joining());
 

@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -50,6 +50,12 @@ public class CardsView extends AbstractView {
   private List<Hilite> hilites;
 
   @XmlCDATA @XmlElement private String template;
+
+  @XmlAttribute private Boolean canNew;
+
+  @XmlAttribute private Boolean canEdit;
+
+  @XmlAttribute private Boolean canDelete;
 
   public String getOrderBy() {
     return orderBy;
@@ -129,5 +135,29 @@ public class CardsView extends AbstractView {
 
   public void setTemplate(String template) {
     this.template = template;
+  }
+
+  public Boolean getCanNew() {
+    return canNew;
+  }
+
+  public void setCanNew(Boolean canNew) {
+    this.canNew = canNew;
+  }
+
+  public Boolean getCanEdit() {
+    return canEdit;
+  }
+
+  public void setCanEdit(Boolean canEdit) {
+    this.canEdit = canEdit;
+  }
+
+  public Boolean getCanDelete() {
+    return canDelete;
+  }
+
+  public void setCanDelete(Boolean canDelete) {
+    this.canDelete = canDelete;
   }
 }

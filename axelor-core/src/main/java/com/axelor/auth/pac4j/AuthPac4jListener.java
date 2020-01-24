@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -24,6 +24,7 @@ import com.axelor.event.NamedLiteral;
 import com.axelor.events.PostLogin;
 import java.lang.invoke.MethodHandles;
 import javax.inject.Inject;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationListener;
@@ -53,6 +54,7 @@ public class AuthPac4jListener implements AuthenticationListener {
 
     logger.error("No user found for principal: {}", token.getPrincipal());
     firePostLoginFailure(token, new UnknownAccountException(info.toString()));
+    SecurityUtils.getSubject().logout();
   }
 
   @Override

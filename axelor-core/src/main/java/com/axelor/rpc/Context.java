@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -71,9 +71,7 @@ public class Context extends SimpleBindings {
       if (value != null) {
         final JsonSerializer<Object> serializer = provider.findValueSerializer(Map.class, null);
         final Map<String, Object> map = new HashMap<>();
-        value
-            .entrySet()
-            .stream()
+        value.entrySet().stream()
             .filter(e -> !(e.getValue() instanceof JsonContext))
             .filter(e -> !KEY_PARENT_CONTEXT.equals(e.getKey()))
             .forEach(e -> map.put(e.getKey(), e.getValue()));

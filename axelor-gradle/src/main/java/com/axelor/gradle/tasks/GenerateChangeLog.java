@@ -35,10 +35,10 @@ import java.util.List;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.file.FileTree;
-import org.gradle.api.internal.tasks.options.Option;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.SkipWhenEmpty;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.options.Option;
 
 public class GenerateChangeLog extends DefaultTask {
 

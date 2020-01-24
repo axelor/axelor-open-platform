@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -35,9 +35,8 @@ import javax.validation.constraints.NotNull;
 public class Contact extends JpaModel {
 
   @ManyToOne(
-    fetch = FetchType.LAZY,
-    cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-  )
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private Title title;
 
   @NotNull private String firstName;
@@ -45,9 +44,8 @@ public class Contact extends JpaModel {
   @NotNull private String lastName;
 
   @Widget(
-    title = "Full Name",
-    search = {"firstName", "lastName"}
-  )
+      title = "Full Name",
+      search = {"firstName", "lastName"})
   @NameColumn
   @VirtualColumn
   @Access(AccessType.PROPERTY)
@@ -59,11 +57,10 @@ public class Contact extends JpaModel {
 
   @Widget(title = "Address List")
   @OneToMany(
-    fetch = FetchType.LAZY,
-    mappedBy = "contact",
-    cascade = CascadeType.ALL,
-    orphanRemoval = true
-  )
+      fetch = FetchType.LAZY,
+      mappedBy = "contact",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
   private List<Address> addresses;
 
   public Contact() {}

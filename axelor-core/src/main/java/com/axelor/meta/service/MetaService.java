@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -24,6 +24,7 @@ import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
@@ -69,6 +70,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -134,7 +136,7 @@ public class MetaService {
     return helper.test(condition);
   }
 
-  private List<MenuItem> filter(List<MenuItem> items) {
+  private List<MenuItem> filter(Collection<MenuItem> items) {
 
     final Map<String, MenuItem> map = new LinkedHashMap<>();
     final Set<String> visited = new HashSet<>();
@@ -238,6 +240,10 @@ public class MetaService {
   }
 
   public List<MenuItem> getMenus(boolean withTagsOnly) {
+    return getMenus(withTagsOnly, false, Collections.emptyList());
+  }
+
+  public List<MenuItem> getMenus(boolean withTagsOnly, boolean inNamesOnly, List<String> names) {
 
     // make sure to apply hot updates
     if (!withTagsOnly) {
@@ -284,21 +290,36 @@ public class MetaService {
       }
     }
 
-    final StringBuilder queryString =
-        new StringBuilder()
-            .append("SELECT self FROM MetaMenu self ")
-            .append("LEFT JOIN FETCH self.action ")
-            .append("LEFT JOIN FETCH self.parent ")
-            .append(withTagsOnly ? "WHERE (self.tag IS NOT NULL OR self.tagGet IS NOT NULL OR self.tagCount IS NOT NULL) " : "")
-            .append(" ORDER BY COALESCE(self.priority, 0) DESC, self.id");
+    final List<MetaMenu> queryResults;
 
-    final TypedQuery<MetaMenu> query = JPA.em().createQuery(queryString.toString(), MetaMenu.class);
-    QueryBinder.of(query).setCacheable();
+    if (inNamesOnly && ObjectUtils.isEmpty(names)) {
+      queryResults = Collections.emptyList();
+    } else {
+      final StringBuilder queryString =
+          new StringBuilder()
+              .append("SELECT self FROM MetaMenu self ")
+              .append("LEFT JOIN FETCH self.action ")
+              .append("LEFT JOIN FETCH self.parent");
+      if (withTagsOnly) {
+        queryString.append(
+            " WHERE (self.tag IS NOT NULL OR self.tagGet IS NOT NULL OR self.tagCount IS NOT NULL)");
+      }
+      if (inNamesOnly) {
+        queryString.append(withTagsOnly ? " AND" : " WHERE");
+        queryString.append(" self.name IN :names");
+      }
+      queryString.append(" ORDER BY COALESCE(self.priority, 0) DESC, self.id");
 
-    final List<MenuItem> menus = new ArrayList<>();
+      final TypedQuery<MetaMenu> query =
+          JPA.em().createQuery(queryString.toString(), MetaMenu.class);
+      QueryBinder.of(query).setCacheable().bind("names", names);
+      queryResults = query.getResultList();
+    }
+
+    final Map<MenuItem, MetaMenu> menus = new LinkedHashMap<>();
     final List<MetaMenu> records = new ArrayList<>();
 
-    for (MetaMenu menu : query.getResultList()) {
+    for (MetaMenu menu : queryResults) {
       records.add(menu);
       while (withTagsOnly && menu.getParent() != null) {
         // need to get parents to check visibility
@@ -366,7 +387,6 @@ public class MetaService {
       item.setTitle(menu.getTitle());
       item.setIcon(menu.getIcon());
       item.setIconBackground(menu.getIconBackground());
-      item.setTag(getTag(menu));
       item.setTagStyle(menu.getTagStyle());
       item.setTop(menu.getTop());
       item.setLeft(menu.getLeft());
@@ -387,10 +407,13 @@ public class MetaService {
         item.setAction(menu.getAction().getName());
       }
 
-      menus.add(item);
+      menus.put(item, menu);
     }
 
-    return filter(menus);
+    final List<MenuItem> items = filter(menus.keySet());
+    items.forEach(item -> item.setTag(getTag(menus.get(item))));
+
+    return items;
   }
 
   @SuppressWarnings("unchecked")

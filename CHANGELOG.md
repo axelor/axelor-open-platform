@@ -1,25 +1,98 @@
-## 5.2.2 (2019-10-14)
+## 5.3.0 (2020-01-24)
+
+#### Changes
+
+* Remove licenseCheck from check dependencies
+* Upgrade to Gradle 5.6.4
+* Run license task on src files only
+* Migrate LDAP to pac4j
+* Refactor grid widget to improve inline edit experience
+* Make button onClick attribute required
+* Upgrade to Spotless 3.24.3
+* Improve hotswap-agent support
+* Upgrade to pac4j 3.8.3
+* Upgrade to Guava 28.1
 
 #### Features
 
+* Increase custom field conditions limit to 512 characters
+* Add canNew, canEdit, and canDelete to cards and kanban views
+* Set default logger config for pac4j package
+* Centralize properties from application.properties
 * Display `conditionToCheck` and `moduleToCheck` on meta menu view
+* Add Request#getUser() method that returns current session user
+* Log request data at trace level
+* Watch for view updates
+* Improve display of forced password change
+* Sort mail messages by most recent reply if any
+* Only update visible tags
+* Parallelize loading of models, views, and i18n with rollback per module
+* Add tel link and pattern to phone widget
+* Add direct basic authentication client
+* Add position "inside" for view extensions
+* Add support for groupBy on custom models
+* Add hideIf and showIf support to grid buttons
+* Add responseBindingType to SAML configuration
+* Ability to toggle chart legends and ellipsed labels with tooltip
+* Add hideLegend config to charts
+* Add support for NavSelect widget on many-to-one fields
+* Scan for css/js files to minify
+* Trigger onChange on Enter key in simple fields
 
 #### Fixed
 
+* Fix 'x-' prefixed extra attributes on custom fields
+* Fix Query#update with null value
 * Re-throw exception on Birt report generation exception
 * Fix JNDI data source not working
-* Update menu tags using `tag-count`
-* Fix Query#update with several fields
-* Fix archived records not displayed when simple filter and advance filter are applied
+* Fix currency formatting with IE11
+* Do not set WWW-Authenticate response header when request has no basic auth header
+* Fix scope syncing on charts
+* Fix inline-checkbox widget title wrapping issue
+* Use styled checkbox for grid row selector
+* Block the UI as early as possible on action call
+* Fix Query#update when query has ORDER BY clause
+* Fix Gantt view scrolling
+* Fix untranslated namecolumn when fetching missing values
+* Fix m2o field in grid not showing translated value
 * Fix dashlet refresh issue
+* Update menu tags using `tag-count`
+* Fix tag-select widget's search field width issue
+* Fix popup editor issue when a tab is opened from it
+* Fix widget name check inconsistencies
+* Allow empty panel inside a panel
+* Fix migration of existing views to extension views
+* Fix Query#update with several fields
+* Fix archived records not displayed when simple filter and advanced filter are applied
+* Fix redirection to originally requested URL
+* Fix dashlet refresh issue
+* Remove deprecated api usage from Logger injection support
+* Fix wrong redirection to favicon.ico
 * Fix table layout on field editors
+* Fix month variable replacement in app settings value
+* Fix multi-tenancy with pac4j
 * Fix tests
+* Fix error popup with empty message not showing up in prod mode
+* Remove showTitle from panel-related
 * Fix query filtering on collections and using order by
+* Fix duplicate m2m item issue
 * Fix dotted fields setting unwanted intermediate records
 * Silent requests should not hide loading indicator
 * Fix ajax login should re-execute pending requests
+* Fix target-name of a custom field in grid view when visibleInGrid is not used
+* Fix issue caused by empty string value on decimal field
+* Fix untranslated namecolumn value in TagSelect
 * Fix collection fields with editor validation issue
+* Fix relative style/script source in JSP
 * Fix popup editor issue when a tab is opened from it
+* Fix selecting a m2o on editable grid when server is slow
+* Fix SAML postLogoutURL for webapps deployed at root
+* Fix DMS file being automatically downloaded on form view
+
+#### Security
+
+* Fix XSS vulnerability with html widget
+* Add CSRF protection using pac4j CSRF authorizer
 
 ## 5.2.1 (2019-09-19)
 

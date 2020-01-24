@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,6 +18,7 @@
 package com.axelor.auth;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.db.User;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -56,11 +57,20 @@ public class AuthService {
 
   private final ParsableHashFormat hashFormat = new Shiro1CryptFormat();
 
-  private static final String PASSWORD_PATTERN =
-      AppSettings.get().get("user.password.pattern", ".{4,}");
-  private static final Pattern passwordPattern = Pattern.compile(PASSWORD_PATTERN);
+  private static final String PASSWORD_PATTERN;
+  private static final String PASSWORD_PATTERN_TITLE;
 
-  private static final String EMPTY_STRING = "";
+  private static final Pattern passwordPattern;
+
+  static {
+    final AppSettings settings = AppSettings.get();
+    PASSWORD_PATTERN = settings.get(AvailableAppSettings.USER_PASSWORD_PATTERN, ".{4,}");
+    PASSWORD_PATTERN_TITLE =
+        settings.get(
+            AvailableAppSettings.USER_PASSWORD_PATTERN_TITLE,
+            AvailableAppSettings.USER_PASSWORD_PATTERN_TITLE);
+    passwordPattern = Pattern.compile(PASSWORD_PATTERN);
+  }
 
   @Inject
   public AuthService() {
@@ -176,11 +186,10 @@ public class AuthService {
    * Changes user password.
    *
    * @param user
-   * @param newPassword
+   * @param password
    */
   public void changePassword(User user, String password) {
-    Preconditions.checkArgument(
-        passwordMatchesPattern(password), I18n.get("Password doesn't match configured pattern."));
+    Preconditions.checkArgument(passwordMatchesPattern(password), PASSWORD_PATTERN_TITLE);
 
     user.setPassword(encrypt(password));
     user.setPasswordUpdatedOn(LocalDateTime.now());
@@ -218,6 +227,6 @@ public class AuthService {
    * @return
    */
   public String getPasswordPatternTitle() {
-    return EMPTY_STRING;
+    return I18n.get(PASSWORD_PATTERN_TITLE);
   }
 }

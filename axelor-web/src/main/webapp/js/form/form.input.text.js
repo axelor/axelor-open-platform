@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -119,7 +119,14 @@ ui.formInput('Url', {
  */
 ui.formInput('Phone', 'String', {
   css: 'phone-item',
-  template_editable: '<input type="tel">'
+  link_editable: function(scope, element, attrs, model) {
+    this._super.apply(this, arguments);
+    if (scope.field.pattern) {
+      element.attr("pattern", scope.field.pattern);
+    }
+  },
+  template_editable: '<input type="tel">',
+  template_readonly: '<a target="_blank" ng-show="text" href="tel:{{text}}">{{text}}</a>'
 });
 
 

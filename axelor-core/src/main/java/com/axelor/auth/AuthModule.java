@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,10 +18,9 @@
 package com.axelor.auth;
 
 import com.axelor.app.AppSettings;
-import com.axelor.auth.ldap.AuthLdapModule;
-import com.axelor.auth.pac4j.AuthPac4jModule;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.pac4j.AuthPac4jModuleCas;
-import com.axelor.auth.pac4j.AuthPac4jModuleForm;
+import com.axelor.auth.pac4j.AuthPac4jModuleLocal;
 import com.axelor.auth.pac4j.AuthPac4jModuleOAuth;
 import com.axelor.auth.pac4j.AuthPac4jModuleOidc;
 import com.axelor.auth.pac4j.AuthPac4jModuleSaml;
@@ -62,62 +61,50 @@ public class AuthModule extends AbstractModule {
     // observe authentication-related events
     bind(AuthObserver.class);
 
-    // LDAP
-    if (AuthLdapModule.isEnabled()) {
-      install(new AuthLdapModule(context));
-      return;
-    }
-
     // Pac4j
-    if (AuthPac4jModule.isEnabled()) {
-      final AppSettings settings = AppSettings.get();
-      final String userProvisioning =
-          settings.get(AuthPac4jModule.CONFIG_AUTH_USER_PROVISIONING, "create");
+    final AppSettings settings = AppSettings.get();
+    final String userProvisioning =
+        settings.get(AvailableAppSettings.AUTH_USER_PROVISIONING, "create");
 
-      // User provisioning
-      switch (userProvisioning) {
-        case "create":
-          // Create and update users
-          bind(AuthPac4jObserverCreate.class);
-          break;
-        case "link":
-          // Update users (must exist locally beforehand)
-          bind(AuthPac4jObserverLink.class);
-          break;
-        default:
-      }
+    // User provisioning
+    switch (userProvisioning) {
+      case "create":
+        // Create and update users
+        bind(AuthPac4jObserverCreate.class);
+        break;
+      case "link":
+        // Update users (must exist locally beforehand)
+        bind(AuthPac4jObserverLink.class);
+        break;
+      default:
+    }
 
-      // OpenID Connect
-      if (AuthPac4jModuleOidc.isEnabled()) {
-        install(new AuthPac4jModuleOidc(context));
-        return;
-      }
-
-      // OAuth
-      if (AuthPac4jModuleOAuth.isEnabled()) {
-        install(new AuthPac4jModuleOAuth(context));
-        return;
-      }
-
-      // SAML
-      if (AuthPac4jModuleSaml.isEnabled()) {
-        install(new AuthPac4jModuleSaml(context));
-        return;
-      }
-
-      // CAS
-      if (AuthPac4jModuleCas.isEnabled()) {
-        install(new AuthPac4jModuleCas(context));
-        return;
-      }
-
-      // Form
-      install(new AuthPac4jModuleForm(context));
+    // OpenID Connect
+    if (AuthPac4jModuleOidc.isEnabled()) {
+      install(new AuthPac4jModuleOidc(context));
       return;
     }
 
-    // Default
-    install(new AuthWebModule(context));
+    // OAuth
+    if (AuthPac4jModuleOAuth.isEnabled()) {
+      install(new AuthPac4jModuleOAuth(context));
+      return;
+    }
+
+    // SAML
+    if (AuthPac4jModuleSaml.isEnabled()) {
+      install(new AuthPac4jModuleSaml(context));
+      return;
+    }
+
+    // CAS
+    if (AuthPac4jModuleCas.isEnabled()) {
+      install(new AuthPac4jModuleCas(context));
+      return;
+    }
+
+    // Local
+    install(new AuthPac4jModuleLocal(context));
   }
 
   static final class MyShiroModule extends ShiroModule {

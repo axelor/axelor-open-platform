@@ -28,6 +28,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,7 +75,7 @@ public final class ResourceFinder {
    * @return list of URL objects
    */
   public List<URL> match() {
-    return find(false);
+    return find(Matcher::matches);
   }
 
   /**
@@ -83,20 +84,20 @@ public final class ResourceFinder {
    * @return list of URL objects
    */
   public List<URL> find() {
-    return find(true);
+    return find(Matcher::find);
   }
 
-  private List<URL> find(boolean partial) {
+  private List<URL> find(Predicate<Matcher> matchFunc) {
     List<URL> all = new ArrayList<>();
     for (Pattern namePattern : namePatterns) {
-      for (URL file : getResources(namePattern, loader, partial)) {
+      for (URL file : getResources(namePattern, loader, matchFunc)) {
         if (pathPatterns.isEmpty()) {
           all.add(file);
           continue;
         }
         for (Pattern pathPattern : pathPatterns) {
           Matcher matcher = pathPattern.matcher(file.getFile());
-          boolean matched = partial ? matcher.find() : matcher.matches();
+          boolean matched = matchFunc.test(matcher);
           if (matched) {
             all.add(file);
           }
@@ -106,7 +107,8 @@ public final class ResourceFinder {
     return Collections.unmodifiableList(all);
   }
 
-  private static List<URL> getResources(Pattern pattern, ClassLoader loader, boolean partial) {
+  private static List<URL> getResources(
+      Pattern pattern, ClassLoader loader, Predicate<Matcher> matchFunc) {
     final List<URL> all = new ArrayList<>();
     final ClassLoader classLoader =
         loader == null ? Thread.currentThread().getContextClassLoader() : loader;
@@ -114,7 +116,7 @@ public final class ResourceFinder {
       for (ResourceInfo info : ClassPath.from(classLoader).getResources()) {
         String name = info.getResourceName();
         Matcher matcher = pattern.matcher(name);
-        boolean matched = partial ? matcher.find() : matcher.matches();
+        boolean matched = matchFunc.test(matcher);
         if (matched) {
           Enumeration<URL> urls = classLoader.getResources(name);
           while (urls.hasMoreElements()) {

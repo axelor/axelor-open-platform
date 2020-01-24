@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <domain-models xmlns="http://axelor.com/xml/ns/domain-models"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_5.2.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_5.3.xsd">
 
   <module name="meta" package="com.axelor.meta.db" />
 
@@ -18,11 +18,11 @@
     <string name="selection" />
     <string name="widget" />
     <string name="help" />
-    <string name="showIf" />
-    <string name="hideIf" />
-    <string name="requiredIf" />
-    <string name="readonlyIf" />
-    <string name="includeIf" />
+    <string name="showIf" max="512" />
+    <string name="hideIf" max="512" />
+    <string name="requiredIf" max="512" />
+    <string name="readonlyIf" max="512" />
+    <string name="includeIf" max="512" />
 
     <string name="contextField" />
     <string name="contextFieldTarget" />
@@ -69,6 +69,7 @@
     <string name="nameField" />
     <string name="formWidth" />
     <string name="orderBy" />
+    <string name="groupBy" />
     <many-to-one name="menu" ref="MetaMenu" copy="false" />
     <many-to-one name="menuParent" ref="MetaMenu" />
     <string name="menuIcon" />

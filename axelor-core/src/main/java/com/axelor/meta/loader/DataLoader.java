@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -117,8 +117,8 @@ class DataLoader extends AbstractLoader {
     for (URL file : files) {
       String name = file.toString();
       name = name.substring(name.lastIndexOf(dirName));
-      try {
-        copy(file.openStream(), tmp, name);
+      try (final InputStream is = file.openStream()) {
+        copy(is, tmp, name);
       } catch (IOException e) {
         log.error(e.getMessage(), e);
         throw new RuntimeException(e);

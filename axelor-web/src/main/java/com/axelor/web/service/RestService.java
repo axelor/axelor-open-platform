@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -20,6 +20,7 @@ package com.axelor.web.service;
 import static com.axelor.common.ObjectUtils.isEmpty;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
@@ -589,7 +590,8 @@ public class RestService extends ResourceService {
 
   static {
     try {
-      csvCharset = Charset.forName(AppSettings.get().get("data.export.encoding"));
+      csvCharset =
+          Charset.forName(AppSettings.get().get(AvailableAppSettings.DATA_EXPORT_ENCODING));
     } catch (Exception e) {
     }
   }

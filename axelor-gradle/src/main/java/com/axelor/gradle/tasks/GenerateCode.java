@@ -47,7 +47,7 @@ import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectories;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.util.PatternSet;
-import org.gradle.composite.internal.IncludedBuildInternal;
+import org.gradle.composite.internal.DefaultIncludedBuild;
 
 public class GenerateCode extends DefaultTask {
 
@@ -71,7 +71,7 @@ public class GenerateCode extends DefaultTask {
 
   private List<ResolvedArtifact> artifacts() {
     if (artifacts == null) {
-      artifacts = findArtifacts(getProject().getConfigurations().getByName("compile"));
+      artifacts = findArtifacts(getProject().getConfigurations().getByName("runtimeClasspath"));
     }
     return artifacts;
   }
@@ -94,8 +94,7 @@ public class GenerateCode extends DefaultTask {
 
   @InputFiles
   public List<File> getLookupFiles() {
-    return artifacts()
-        .stream()
+    return artifacts().stream()
         .map(artifact -> findProject(artifact))
         .filter(Objects::nonNull)
         .map(sub -> getJavaOutputDir(sub))
@@ -181,11 +180,8 @@ public class GenerateCode extends DefaultTask {
       // consider projects from included builds
       if (sub == null) {
         sub =
-            getProject()
-                .getGradle()
-                .getIncludedBuilds()
-                .stream()
-                .map(b -> ((IncludedBuildInternal) b).getConfiguredBuild().getRootProject())
+            getProject().getGradle().getIncludedBuilds().stream()
+                .map(b -> ((DefaultIncludedBuild) b).getConfiguredBuild().getRootProject())
                 .map(p -> p.findProject(path))
                 .findFirst()
                 .orElse(null);
@@ -208,8 +204,7 @@ public class GenerateCode extends DefaultTask {
     }
 
     // projects from included build has AxelorPlugin.class loaded with another class loader
-    return sub.getPlugins()
-        .stream()
+    return sub.getPlugins().stream()
         .filter(p -> p.getClass().getName().equals(AxelorPlugin.class.getName()))
         .findFirst()
         .isPresent();

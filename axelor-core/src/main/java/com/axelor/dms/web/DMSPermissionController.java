@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -50,9 +50,7 @@ public class DMSPermissionController {
     final DMSFile file = request.getContext().getParent().asType(DMSFile.class);
     final Model current = getter.apply(permission);
     final String idListString =
-        Optional.ofNullable(file.getPermissions())
-            .orElse(Collections.emptyList())
-            .stream()
+        Optional.ofNullable(file.getPermissions()).orElse(Collections.emptyList()).stream()
             .map(getter)
             .filter(Objects::nonNull)
             .filter(model -> current == null || !current.equals(model))

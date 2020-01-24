@@ -1,4 +1,5 @@
 {
+  "node": true,
   "browser": true,
   "jquery": true,
   "devel": true,

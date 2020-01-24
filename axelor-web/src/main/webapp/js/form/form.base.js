@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -570,6 +570,33 @@ var FormInput = {
           setTimeout(onChange);
         }
       });
+
+      var oldValue = getInputValue();
+
+      // Default Enter key event handler
+      element.keydown(function(e) {
+        if (e.isDefaultPrevented()) {
+          return;
+        }
+        if (e.keyCode === $.ui.keyCode.ENTER) {
+          var value = getInputValue();
+          if (value !== oldValue) {
+            model.$setViewValue(value);
+            if (scope.validate(value)) {
+              scope.setValue(value, true);
+              scope.$applyAsync();
+              onChangePending = false;
+            }
+          }
+          oldValue = value;
+        }
+      });
+
+      function getInputValue() {
+        var childInput = element.find('input:first');
+        var valInput = childInput.length && childInput || element;
+        return valInput.val();
+      }
     }
 
     if (element.is(':input')) {

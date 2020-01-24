@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -127,6 +127,13 @@ function BaseCardsCtrl(type, $scope, $element) {
       _domainContext: _.extend({}, ds._lastContext, context),
       _archived: ds._showArchived
     }, ds._filter);
+  };
+
+  $scope.attr = function(name) {
+    if (!$scope.schema || $scope.schema[name] === undefined) {
+      return true;
+    }
+    return $scope.schema[name];
   };
 }
 

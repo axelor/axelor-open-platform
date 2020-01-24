@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -108,7 +108,22 @@ ui.formWidget('BaseSelect', {
     };
 
     scope.handleEnter = function(e) {
-
+      var widget = input.autocomplete('widget');
+      if (widget) {
+        var item = widget.find('li .ui-state-focus').parent();
+        if (item.length === 0) {
+          item = widget.find('li:not(.tag-select-action)');
+          item = item.length === 1 ? item.first() : null;
+        }
+        var data = item ? item.data('ui-autocomplete-item') : null;
+        if (data) {
+          input.autocomplete('close');
+          if (model.$viewValue !== data.value) {
+            scope.setValue(data.value, true);
+            scope.$applyAsync();
+          }
+        }
+      }
     };
 
     scope.handleSelect = function(e, ui) {
@@ -565,11 +580,11 @@ ui.formInput('MultiSelect', 'Select', {
 
     var input = this.findInput(element);
 
-    input.focus(function() {
+    input.on('input focus', function() {
       scaleInput();
-    }).blur(function() {
-      scaleInput(50);
-      input.val('');
+    }).on('blur', function() {
+        scaleInput(50);
+        input.val('');
     });
 
     var placeholder = null;
@@ -588,19 +603,10 @@ ui.formInput('MultiSelect', 'Select', {
         pos = elem.position();
 
       if (width) {
-        input.css('position', '');
-        elem.width('');
         return input.width(width);
       }
 
-      var top = pos.top,
-        left = pos.left;
-
-      width = element.innerWidth() - left;
-
-      elem.width(50);
-
-      input.css('width', width - 24);
+      input.css('width', element.innerWidth() - pos.left - 24);
     }
 
     function update(value) {
@@ -668,6 +674,30 @@ ui.formInput('MultiSelect', 'Select', {
            of: element
          })
          .width(element.width() - 4);
+    };
+
+    scope.handleEnter = function(e) {
+      var widget = input.autocomplete('widget');
+      if (widget) {
+        var item = widget.find('li .ui-state-focus').parent();
+        if (item.length === 0) {
+          item = widget.find('li:not(.tag-select-action)');
+          item = item.length === 1 ? item.first() : null;
+        }
+        var data = item ? item.data('ui-autocomplete-item') : null;
+        if (data) {
+          var items = this.getSelection(), values = _.pluck(items, 'value');
+          var found = _.find(values, function(v) {
+            return scope.matchValues(v, data.value);
+          });
+          if (found) {
+            return false;
+          }
+          input.autocomplete('close');
+          values.push(data.value);
+          update(values);
+        }
+      }
     };
 
     scope.$render_editable = function() {
@@ -859,6 +889,8 @@ ui.formInput('NavSelect', {
 
     var field = scope.field;
     var selection = field.selectionList || [];
+    var isReference = field.target;
+    var targetName = field.targetName;
 
     scope.getSelection = function () {
       return filterSelection(scope, field, selection, scope.getValue()) || [];
@@ -872,7 +904,20 @@ ui.formInput('NavSelect', {
       if (scope.attr('readonly')) {
         return;
       }
+
       var val = parseNumber(scope.field, select.value);
+
+      if (isReference) {
+        val = { id: parseInt(val) };
+        // using translated value?
+        if (select.data && targetName in select.data) {
+          val[targetName] = select.data[targetName];
+          val['$t:' + targetName] = select.title;
+        } else {
+          val[targetName] = select.title;
+        }
+      }
+
       this.setValue(val, true);
 
       elemNavs.removeClass('open');
@@ -884,7 +929,12 @@ ui.formInput('NavSelect', {
     };
 
     scope.isSelected = function (select) {
-      return select && scope.getValue() == select.value;
+      var value = select ? (isReference ? parseInt(select.value) : select.value) : null;
+      var current = scope.getValue();
+      if (current && isReference) {
+        current = current.id;
+      }
+      return select && value === current;
     };
 
     var lastWidth = 0;

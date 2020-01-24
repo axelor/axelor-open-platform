@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -256,6 +256,8 @@
     provider.interceptors.push('httpIndicator');
     provider.defaults.transformRequest.unshift(transformRequest);
     provider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
+    provider.defaults.xsrfCookieName = 'CSRF-TOKEN';
+    provider.defaults.xsrfHeaderName = 'X-CSRF-Token';
     provider.useApplyAsync(true);
   }]);
 
@@ -380,7 +382,7 @@
       },
       responseError: function(error) {
         if (notSilent(error.config)) {
-        onHttpStop();
+          onHttpStop();
           $rootScope.$broadcast('event:http-error', error);
         }
         return $q.reject(error);
@@ -628,8 +630,9 @@
         return;
       }
 
-      if (report.popup && report.message) {
-        return axelor.dialogs.box(report.message, {
+      if (report.popup) {
+        message = report.message || _t('A server error occurred. Please contact the administrator.');
+        return axelor.dialogs.box(message, {
           title: report.title
         });
       } else if (report.stacktrace) {

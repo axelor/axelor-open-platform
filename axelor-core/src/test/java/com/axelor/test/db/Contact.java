@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -47,9 +47,8 @@ import org.hibernate.annotations.Type;
 public class Contact extends JpaModel {
 
   @ManyToOne(
-    cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-    fetch = FetchType.LAZY
-  )
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+      fetch = FetchType.LAZY)
   private Title title;
 
   @NotNull private String firstName;
@@ -78,17 +77,15 @@ public class Contact extends JpaModel {
   private LocalDate dateOfBirth;
 
   @OneToMany(
-    mappedBy = "contact",
-    cascade = CascadeType.ALL,
-    fetch = FetchType.LAZY,
-    orphanRemoval = true
-  )
+      mappedBy = "contact",
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      orphanRemoval = true)
   private List<Address> addresses;
 
   @ManyToMany(
-    cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-    fetch = FetchType.LAZY
-  )
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+      fetch = FetchType.LAZY)
   private Set<Circle> circles;
 
   @Widget(title = "Photo", help = "Max size 4MB.")

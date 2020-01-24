@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -15,18 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+/*jshint esversion: 6 */
+'use strict';
+
 const fs = require('fs');
 
 const postcss = require('broccoli-postcss');
 const presetenv = require('postcss-preset-env');
 const cssimport = require('postcss-import');
 const cssurl = require('postcss-url');
+const cssnano = require('cssnano');
 
 const concat = require('broccoli-concat');
 const merge = require('broccoli-merge-trees');
 const uglify = require('broccoli-uglify-sourcemap');
 const Funnel = require('broccoli-funnel');
 const Gzip = require('broccoli-gzip');
+const glob = require('glob');
 
 const app = '.';
 
@@ -66,6 +71,12 @@ function minifyCss(name) {
           browsers: ['last 3 version', 'ie 11'],
         },
       },
+      {
+        module: cssnano,
+        options: {
+          preset: ['default', { "discardComments": { "removeAll": true } }]
+        }
+      }
     ],
   });
   return new Funnel(tree, {
@@ -82,10 +93,11 @@ function minifyJs(name) {
     outputFile: name + '.min.js',
   });
   return uglify(tree, {
-    compress: false,
-    sourceMapConfig: {
-      enabled: false,
+    uglify: {
+      compress: false,
+      sourceMap: false,
     },
+    hiddenSourceMap: false
   });
 }
 
@@ -97,9 +109,23 @@ function gzip(tree) {
   });
 }
 
-module.exports = gzip(merge([
-  minifyCss('application'),
-  minifyCss('application.login'),
-  minifyJs('application'),
-  minifyJs('application.login'),
-]));
+const minifyNames = {"css": new Set(), "js": new Set()};
+const minifyList = [];
+const styleRe = /<x:style.*?\bsrc=['"][\.\/]*css\/(.*)\.css['"]/g;
+const scriptRe = /<x:script.*?\bsrc=['"][\.\/]*js\/(.*)\.js['"]/g;
+
+glob.sync("**/*.jsp").forEach(input => {
+  const contents = fs.readFileSync(input).toString();
+  let match;
+  while ((match = styleRe.exec(contents)) !== null) {
+    minifyNames.css.add(match[1]);
+  }
+  while ((match = scriptRe.exec(contents)) !== null) {
+    minifyNames.js.add(match[1]);
+  }
+});
+
+minifyNames.css.forEach(name => minifyList.push(minifyCss(name)));
+minifyNames.js.forEach(name => minifyList.push(minifyJs(name)));
+
+module.exports = gzip(merge(minifyList));

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema targetNamespace="http://axelor.com/xml/ns/object-views"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
-  attributeFormDefault="unqualified" xmlns:tns="http://axelor.com/xml/ns/object-views" version="5.2">
+  attributeFormDefault="unqualified" xmlns:tns="http://axelor.com/xml/ns/object-views" version="5.3">
 
   <xsd:element name="object-views">
     <xsd:complexType>
@@ -1061,7 +1061,7 @@
         </xsd:attribute>
         <xsd:attribute name="canDelete" type="xsd:boolean">
           <xsd:annotation>
-            <xsd:documentation>Specify whether to show the 'Remove' button.</xsd:documentation>
+            <xsd:documentation>Specify whether to show the 'Delete' button.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canArchive" type="xsd:boolean">
@@ -1141,38 +1141,40 @@
     </xsd:complexContent>
   </xsd:complexType>
   <xsd:group name="PanelItems">
-    <xsd:choice>
-      <xsd:element name="field" type="tns:PanelField" />
-      <xsd:element name="label" type="tns:Label" />
-      <xsd:element name="help" type="tns:Help" />
-      <xsd:element name="static" type="tns:Static" />
-      <xsd:element name="spacer" type="tns:Spacer" />
-      <xsd:element name="separator" type="tns:Separator" />
-      <xsd:element name="button" type="tns:Button" />
-      <xsd:element name="button-group">
-        <xsd:complexType>
-          <xsd:complexContent>
-            <xsd:extension base="tns:AbstractContainer">
-              <xsd:sequence>
-                <xsd:element name="button" type="tns:Button" maxOccurs="unbounded"/>
-              </xsd:sequence>
-            </xsd:extension>
-          </xsd:complexContent>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="panel">
-        <xsd:complexType>
-          <xsd:complexContent>
-            <xsd:extension base="tns:AbstractPanel">
-              <xsd:group ref="tns:PanelItems" maxOccurs="unbounded"/>
-            </xsd:extension>
-          </xsd:complexContent>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="panel-related" type="tns:PanelRelated"/>
-      <xsd:element name="panel-dashlet" type="tns:Dashlet"/>
-      <xsd:element name="panel-include" type="tns:FormInclude"/>
-    </xsd:choice>
+   <xsd:sequence>
+     <xsd:choice minOccurs="0">
+        <xsd:element name="field" type="tns:PanelField" />
+        <xsd:element name="label" type="tns:Label" />
+        <xsd:element name="help" type="tns:Help" />
+        <xsd:element name="static" type="tns:Static" />
+        <xsd:element name="spacer" type="tns:Spacer" />
+        <xsd:element name="separator" type="tns:Separator" />
+        <xsd:element name="button" type="tns:Button" />
+        <xsd:element name="button-group">
+          <xsd:complexType>
+            <xsd:complexContent>
+              <xsd:extension base="tns:AbstractContainer">
+                <xsd:sequence>
+                  <xsd:element name="button" type="tns:Button" maxOccurs="unbounded"/>
+                </xsd:sequence>
+              </xsd:extension>
+            </xsd:complexContent>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="panel">
+          <xsd:complexType>
+            <xsd:complexContent>
+              <xsd:extension base="tns:AbstractPanel">
+                <xsd:group ref="tns:PanelItems" maxOccurs="unbounded"/>
+              </xsd:extension>
+            </xsd:complexContent>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="panel-related" type="tns:PanelRelated"/>
+        <xsd:element name="panel-dashlet" type="tns:Dashlet"/>
+        <xsd:element name="panel-include" type="tns:FormInclude"/>
+      </xsd:choice>
+    </xsd:sequence>
   </xsd:group>
   <xsd:complexType name="Panel">
     <xsd:complexContent>
@@ -1233,6 +1235,7 @@
             <xsd:documentation>Specify whether the rows can be moved to re-orders by sequence.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="showTitle" use="prohibited" />
         <xsd:attributeGroup ref="tns:RelationalAttributes" />
       </xsd:extension>
     </xsd:complexContent>
@@ -1440,7 +1443,7 @@
         </xsd:attribute>
         <xsd:attribute name="canDelete" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Show the 'Remove' button if the given JavaScript expression is true.</xsd:documentation>
+            <xsd:documentation>Show the 'Delete' button if the given JavaScript expression is true.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canArchive" type="xsd:string">
@@ -1811,6 +1814,21 @@
 
             orderBy="name,-age"
             </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canNew" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the 'New' button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canEdit" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the 'Edit' button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canDelete" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the 'Delete' button.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>
@@ -2409,7 +2427,7 @@
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="showTitle" use="prohibited" />
-        <xsd:attribute name="onClick" type="xsd:string">
+        <xsd:attribute name="onClick" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>
               An action to execute on click event. The current node record is
@@ -2754,6 +2772,7 @@
     <xsd:restriction base="xsd:string">
       <xsd:enumeration value="after" />
       <xsd:enumeration value="before" />
+      <xsd:enumeration value="inside" />
     </xsd:restriction>
   </xsd:simpleType>
 

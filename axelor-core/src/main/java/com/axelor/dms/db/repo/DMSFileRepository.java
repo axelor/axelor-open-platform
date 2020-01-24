@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -21,6 +21,7 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
+import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaSecurity;
@@ -57,6 +58,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
@@ -71,6 +73,8 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
   @Inject private DMSPermissionRepository dmsPermissions;
 
   @Inject private MetaAttachmentRepository attachments;
+
+  private static final Pattern previewSupportedPattern = Pattern.compile("\\b(?:pdf|image)\\b");
 
   public DMSFileRepository() {
     super(DMSFile.class);
@@ -203,8 +207,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
         .map(DMSFile::getPermissions)
         .ifPresent(
             permissions ->
-                permissions
-                    .stream()
+                permissions.stream()
                     .map(permission -> dmsPermissions.copy(permission, false))
                     .forEach(entity::addPermission));
   }
@@ -498,7 +501,11 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
       json.put("fileType", fileType);
       json.put("typeIcon", "fa fa-colored " + fileIcon);
       json.put("metaFile.sizeText", metaFile.getSizeText());
-      json.put("inlineUrl", String.format("ws/dms/inline/%d", file.getId()));
+
+      // Put inlineUrl only if preview for that file type is supported, to prevent auto-downloading
+      if (StringUtils.notBlank(fileType) && previewSupportedPattern.matcher(fileType).find()) {
+        json.put("inlineUrl", String.format("ws/dms/inline/%d", file.getId()));
+      }
     }
 
     if (file.getTags() != null) {

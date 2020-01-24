@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,6 +18,7 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.Role;
@@ -54,6 +55,8 @@ public class AuthPac4jProfileService {
   @Inject protected PermissionRepository permissionRepo;
   @Inject protected MetaSelectRepository metaSelectRepo;
 
+  public static final String GROUP_ATTRIBUTE = "group";
+
   public String getCodeOrEmail(CommonProfile profile) {
     return Stream.of(profile.getUsername(), profile.getEmail(), profile.getId())
         .filter(StringUtils::notBlank)
@@ -66,7 +69,7 @@ public class AuthPac4jProfileService {
     if (AuthPac4jModuleCas.isEnabled()) {
       final Optional<String> name =
           Optional.ofNullable(
-                  AppSettings.get().get(AuthPac4jModuleCas.CONFIG_CAS_ATTRS_USER_NAME, null))
+                  AppSettings.get().get(AvailableAppSettings.AUTH_CAS_ATTRS_USER_NAME, null))
               .map(profile::getAttribute)
               .map(Object::toString)
               .filter(StringUtils::notBlank);
@@ -88,7 +91,7 @@ public class AuthPac4jProfileService {
     if (AuthPac4jModuleCas.isEnabled()) {
       final Optional<String> email =
           Optional.ofNullable(
-                  AppSettings.get().get(AuthPac4jModuleCas.CONFIG_CAS_ATTRS_USER_EMAIL, null))
+                  AppSettings.get().get(AvailableAppSettings.AUTH_CAS_ATTRS_USER_EMAIL, null))
               .map(profile::getAttribute)
               .map(Object::toString)
               .filter(StringUtils::notBlank);
@@ -133,26 +136,13 @@ public class AuthPac4jProfileService {
 
   @Nullable
   public byte[] getImage(CommonProfile profile) throws IOException {
-    final URI uri;
-
-    if (profile.getPictureUrl() != null) {
-      uri = profile.getPictureUrl();
-    } else if (profile.getProfileUrl() != null) {
-      uri = profile.getProfileUrl();
-    } else {
-      uri = null;
-    }
-
-    if (uri == null) {
-      return null;
-    }
-
-    return downloadUrl(uri.toURL());
+    final URI uri = profile.getPictureUrl();
+    return uri != null ? downloadUrl(uri.toURL()) : null;
   }
 
   @Nullable
   public Group getGroup(CommonProfile profile) {
-    return Optional.ofNullable(profile.getAttribute("group"))
+    return Optional.ofNullable(profile.getAttribute(GROUP_ATTRIBUTE))
         .map(String::valueOf)
         .map(groupRepo::findByCode)
         .orElse(null);
@@ -161,25 +151,21 @@ public class AuthPac4jProfileService {
   @Nullable
   public Group getGroup(CommonProfile profile, String defaultGroupCode) {
     final String groupCode =
-        Optional.ofNullable(profile.getAttribute("group"))
+        Optional.ofNullable(profile.getAttribute(GROUP_ATTRIBUTE))
             .map(String::valueOf)
             .orElse(defaultGroupCode);
     return groupRepo.findByCode(groupCode);
   }
 
   public Set<Role> getRoles(CommonProfile profile) {
-    return profile
-        .getRoles()
-        .stream()
+    return profile.getRoles().stream()
         .map(roleRepo::findByName)
         .filter(Objects::nonNull)
         .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   public Set<Permission> getPermissions(CommonProfile profile) {
-    return profile
-        .getPermissions()
-        .stream()
+    return profile.getPermissions().stream()
         .map(permissionRepo::findByName)
         .filter(Objects::nonNull)
         .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -192,9 +178,7 @@ public class AuthPac4jProfileService {
       return Collections.emptySet();
     }
 
-    return Optional.ofNullable(languageSelect.getItems())
-        .orElse(Collections.emptyList())
-        .stream()
+    return Optional.ofNullable(languageSelect.getItems()).orElse(Collections.emptyList()).stream()
         .map(MetaSelectItem::getValue)
         .collect(Collectors.toCollection(LinkedHashSet::new));
   }

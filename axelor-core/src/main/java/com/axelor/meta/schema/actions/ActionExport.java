@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,6 +18,7 @@
 package com.axelor.meta.schema.actions;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.FileUtils;
 import com.axelor.common.ResourceUtils;
 import com.axelor.i18n.I18n;
@@ -73,7 +74,8 @@ public class ActionExport extends Action {
   }
 
   public static File getExportPath() {
-    final String path = AppSettings.get().getPath("data.export.dir", DEFAULT_EXPORT_DIR);
+    final String path =
+        AppSettings.get().getPath(AvailableAppSettings.DATA_EXPORT_DIR, DEFAULT_EXPORT_DIR);
     return new File(path);
   }
 
@@ -81,47 +83,51 @@ public class ActionExport extends Action {
     String templatePath = handler.evaluate(export.template).toString();
 
     Reader reader = null;
-    File template = new File(templatePath);
-    if (template.isFile()) {
-      reader = new FileReader(template);
-    }
 
-    if (reader == null) {
-      InputStream is = ResourceUtils.getResourceStream(templatePath);
-      if (is == null) {
-        throw new FileNotFoundException("No such template: " + templatePath);
-      }
-      reader = new InputStreamReader(is);
-    }
-
-    String name = export.getName();
-    if (name.indexOf("$") > -1 || (name.startsWith("#{") && name.endsWith("}"))) {
-      name = handler.evaluate(toExpression(name, true)).toString();
-    }
-
-    log.info("export {} as {}", templatePath, name);
-
-    Templates engine = new StringTemplates('$', '$');
-    if ("groovy".equals(export.engine)) {
-      engine = new GroovyTemplates();
-    }
-
-    File output = getExportPath();
-    output = FileUtils.getFile(output, dir, name);
-
-    String contents = null;
     try {
+      File template = new File(templatePath);
+      if (template.isFile()) {
+        reader = new FileReader(template);
+      }
+
+      if (reader == null) {
+        InputStream is = ResourceUtils.getResourceStream(templatePath);
+        if (is == null) {
+          throw new FileNotFoundException("No such template: " + templatePath);
+        }
+        reader = new InputStreamReader(is);
+      }
+
+      String name = export.getName();
+      if (name.indexOf("$") > -1 || (name.startsWith("#{") && name.endsWith("}"))) {
+        name = handler.evaluate(toExpression(name, true)).toString();
+      }
+
+      log.info("export {} as {}", templatePath, name);
+
+      Templates engine = new StringTemplates('$', '$');
+      if ("groovy".equals(export.engine)) {
+        engine = new GroovyTemplates();
+      }
+
+      File output = getExportPath();
+      output = FileUtils.getFile(output, dir, name);
+
+      String contents = null;
+
       contents = handler.template(engine, reader);
+
+      Files.createParentDirs(output);
+      Files.asCharSink(output, Charsets.UTF_8).write(contents);
+
+      log.info("file saved: {}", output);
+
+      return FileUtils.getFile(dir, name).toString();
     } finally {
-      reader.close();
+      if (reader != null) {
+        reader.close();
+      }
     }
-
-    Files.createParentDirs(output);
-    Files.asCharSink(output, Charsets.UTF_8).write(contents);
-
-    log.info("file saved: {}", output);
-
-    return FileUtils.getFile(dir, name).toString();
   }
 
   @Override

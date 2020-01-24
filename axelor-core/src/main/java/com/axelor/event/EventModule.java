@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -56,9 +56,7 @@ public class EventModule extends AbstractModule {
   }
 
   private static boolean checkDependencies(InjectionPoint injectionPoint) {
-    return injectionPoint
-        .getDependencies()
-        .stream()
+    return injectionPoint.getDependencies().stream()
         .map(Dependency::getKey)
         .map(Key::getTypeLiteral)
         .map(TypeLiteral::getRawType)
@@ -67,8 +65,7 @@ public class EventModule extends AbstractModule {
 
   private static Set<InjectionPoint> findInjectionPoints(TypeLiteral<?> type) {
     Set<InjectionPoint> injectionPoints = new HashSet<>();
-    InjectionPoint.forInstanceMethodsAndFields(type)
-        .stream()
+    InjectionPoint.forInstanceMethodsAndFields(type).stream()
         .filter(ip -> ip.getMember() instanceof Field && checkDependencies(ip))
         .forEach(injectionPoints::add);
 

@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -308,6 +308,10 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
               "<ul class='dropdown-menu pull-right'>" +
                 "<li ng-if='showRefresh'>" +
                   "<a href='' ng-click='onRefresh()' x-translate>Refresh</a>" +
+                "</li>" +
+                "<li ng-if='isLegendVisible !== undefined'>" +
+                  "<a ng-if='isLegendVisible' href='' ng-click='toggleLegend()' x-translate>Hide legend</a>" +
+                  "<a ng-if='!isLegendVisible' href='' ng-click='toggleLegend()' x-translate>Show legend</a>" +
                 "</li>" +
                 "<li ng-if='canExport()'>" +
                   "<a href='' ng-click='onExport()' x-translate>Export</a>" +

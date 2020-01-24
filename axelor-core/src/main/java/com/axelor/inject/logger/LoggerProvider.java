@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,19 +17,18 @@
  */
 package com.axelor.inject.logger;
 
+import com.google.inject.Binding;
 import javax.inject.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 final class LoggerProvider implements Provider<Logger> {
 
-  static final ThreadLocal<String> NAME = new ThreadLocal<>();
-
   @Override
   public Logger get() {
-    final String name = NAME.get();
-    return name == null
+    final Binding<?> binding = LoggerProvisionListener.bindingStack.get().peek();
+    return binding == null
         ? LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)
-        : LoggerFactory.getLogger(name);
+        : LoggerFactory.getLogger(binding.getKey().getTypeLiteral().getRawType().getName());
   }
 }

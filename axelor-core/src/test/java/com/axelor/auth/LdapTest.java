@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,11 +18,13 @@
 package com.axelor.auth;
 
 import com.axelor.JpaTestModule;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
-import com.axelor.auth.ldap.AuthLdapService;
+import com.axelor.auth.pac4j.AuthPac4jUserService;
+import com.axelor.auth.pac4j.AxelorLdapProfileService;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.persist.Transactional;
@@ -36,21 +38,21 @@ import org.apache.directory.server.core.annotations.CreatePartition;
 import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
 import org.apache.directory.server.core.integ.FrameworkRunner;
 import org.apache.directory.server.ldap.LdapServer;
-import org.apache.shiro.authc.AuthenticationException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.pac4j.core.credentials.UsernamePasswordCredentials;
+import org.pac4j.core.exception.CredentialsException;
+import org.pac4j.ldap.profile.LdapProfile;
 
 @RunWith(FrameworkRunner.class)
 @CreateLdapServer(
-  transports = {@CreateTransport(protocol = "LDAP"), @CreateTransport(protocol = "LDAPS")}
-)
+    transports = {@CreateTransport(protocol = "LDAP"), @CreateTransport(protocol = "LDAPS")})
 @CreateDS(
-  allowAnonAccess = true,
-  name = "axelor",
-  partitions = {@CreatePartition(name = "test", suffix = "dc=test,dc=com")}
-)
+    allowAnonAccess = true,
+    name = "axelor",
+    partitions = {@CreatePartition(name = "test", suffix = "dc=test,dc=com")})
 public class LdapTest extends AbstractLdapTestUnit {
 
   private static LdapServer ldapServer = getLdapServer();
@@ -62,19 +64,19 @@ public class LdapTest extends AbstractLdapTestUnit {
 
       Properties properties = new Properties();
 
-      properties.put(AuthLdapService.LDAP_SERVER_URL, "ldap://localhost:" + ldapServer.getPort());
-      properties.put(AuthLdapService.LDAP_SYSTEM_USER, "uid=admin,ou=system");
-      properties.put(AuthLdapService.LDAP_SYSTEM_PASSWORD, "secret");
+      properties.put(
+          AvailableAppSettings.AUTH_LDAP_SERVER_URL, "ldap://localhost:" + ldapServer.getPort());
+      properties.put(AvailableAppSettings.AUTH_LDAP_SYSTEM_USER, "uid=admin,ou=system");
+      properties.put(AvailableAppSettings.AUTH_LDAP_SYSTEM_PASSWORD, "secret");
 
-      properties.put(AuthLdapService.LDAP_GROUP_BASE, "ou=groups,dc=test,dc=com");
-      properties.put(AuthLdapService.LDAP_USER_BASE, "ou=users,dc=test,dc=com");
-      properties.put(AuthLdapService.LDAP_GROUP_OBJECT_CLASS, "groupOfUniqueNames");
+      properties.put(AvailableAppSettings.AUTH_LDAP_GROUP_BASE, "ou=groups,dc=test,dc=com");
+      properties.put(AvailableAppSettings.AUTH_LDAP_USER_BASE, "ou=users,dc=test,dc=com");
 
-      properties.put(AuthLdapService.LDAP_GROUP_FILTER, "(uniqueMember=uid={0})");
-      properties.put(AuthLdapService.LDAP_USER_FILTER, "(uid={0})");
+      properties.put(AvailableAppSettings.AUTH_LDAP_GROUP_FILTER, "(uniqueMember=uid={0})");
+      properties.put(AvailableAppSettings.AUTH_LDAP_USER_FILTER, "(uid={0})");
 
-      AuthLdapService ldap = new AuthLdapService(properties);
-      bind(AuthLdapService.class).toInstance(ldap);
+      AxelorLdapProfileService ldap = new AxelorLdapProfileService(properties);
+      bind(AxelorLdapProfileService.class).toInstance(ldap);
 
       super.configure();
     }
@@ -83,7 +85,9 @@ public class LdapTest extends AbstractLdapTestUnit {
   @Transactional
   public static class LdapTestRunner {
 
-    @Inject private AuthLdapService authLdap;
+    @Inject private AxelorLdapProfileService authLdap;
+
+    @Inject private AuthPac4jUserService userService;
 
     @Inject private UserRepository users;
 
@@ -91,11 +95,9 @@ public class LdapTest extends AbstractLdapTestUnit {
 
     public void test() {
 
-      Group testGroup = new Group("test", "Test");
-      Group myGroup = new Group("my", "My");
+      Group admins = new Group("admins", "Administrators");
 
-      groups.save(testGroup);
-      groups.save(myGroup);
+      groups.save(admins);
 
       // make sure there are no users
       ensureUsers(0);
@@ -118,9 +120,9 @@ public class LdapTest extends AbstractLdapTestUnit {
       // it should not create new user, as it's already created
       ensureUsers(1);
 
-      // make sure groups are create on ldap server
-      Assert.assertTrue(authLdap.ldapGroupExists("(cn={0})", "test"));
-      Assert.assertTrue(authLdap.ldapGroupExists("(cn={0})", "my"));
+      // make sure groups exists on ldap server
+      Assert.assertNotNull(authLdap.searchGroup("admins"));
+      Assert.assertNotNull(authLdap.searchGroup("users"));
     }
 
     void ensureUsers(int count) {
@@ -129,15 +131,22 @@ public class LdapTest extends AbstractLdapTestUnit {
 
     void loginFailed() {
       try {
-        authLdap.login("jsmith", "Secret");
-      } catch (AuthenticationException e) {
+        authLdap.validate(new UsernamePasswordCredentials("jsmith", "Secret"), null);
+      } catch (CredentialsException e) {
       }
       User user = users.findByCode("jsmith");
       Assert.assertNull(user);
     }
 
     void loginSuccess() {
-      authLdap.login("jsmith", "secret");
+      LdapProfile p = authLdap.findById("jsmith");
+
+      System.out.println(p);
+
+      authLdap.validate(new UsernamePasswordCredentials("jsmith", "secret"), null);
+      LdapProfile profile = authLdap.findById("jsmith");
+      userService.saveUser(profile);
+
       User user = users.findByCode("jsmith");
       Assert.assertNotNull(user);
       Assert.assertEquals("John Smith", user.getName());

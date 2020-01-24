@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.function.Function;
 import javax.servlet.ServletContext;
 import org.pac4j.core.client.Client;
+import org.pac4j.core.http.url.DefaultUrlResolver;
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.GenericOAuth20Client;
 import org.pac4j.oauth.client.GitHubClient;
@@ -57,7 +58,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleMultiClient {
 
   @Override
   protected void configureClients() {
-    addFormClientIfNotExclusive(allSettings);
+    addLocalClientsIfNotExclusive(allSettings);
     addCentralClients(allSettings, providers);
   }
 
@@ -77,6 +78,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleMultiClient {
     client.setName(name);
     client.setKey(key);
     client.setSecret(secret);
+    client.setUrlResolver(new DefaultUrlResolver(true));
 
     if (StringUtils.notBlank(authUrl)) {
       client.setAuthUrl(authUrl);
@@ -109,6 +111,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleMultiClient {
     final String icon = settings.getOrDefault("icon", "img/signin/google.svg");
 
     final Google2Client client = new Google2Client(key, secret);
+    client.setUrlResolver(new DefaultUrlResolver(true));
     setClientInfo(client.getName(), ImmutableMap.of("title", title, "icon", icon));
     return client;
   }
@@ -120,6 +123,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleMultiClient {
     final String icon = settings.getOrDefault("icon", "img/signin/facebook.svg");
 
     final FacebookClient client = new FacebookClient(key, secret);
+    client.setUrlResolver(new DefaultUrlResolver(true));
     setClientInfo(client.getName(), ImmutableMap.of("title", title, "icon", icon));
     return client;
   }
@@ -132,6 +136,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleMultiClient {
     final boolean includeEmail = settings.getOrDefault("include.email", "true").equals("true");
 
     final TwitterClient client = new TwitterClient(key, secret, includeEmail);
+    client.setUrlResolver(new DefaultUrlResolver(true));
     setClientInfo(client.getName(), ImmutableMap.of("title", title, "icon", icon));
     return client;
   }
@@ -143,6 +148,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleMultiClient {
     final String icon = settings.getOrDefault("icon", "img/signin/yahoo.svg");
 
     final YahooClient client = new YahooClient(key, secret);
+    client.setUrlResolver(new DefaultUrlResolver(true));
     setClientInfo(client.getName(), ImmutableMap.of("title", title, "icon", icon));
     return client;
   }
@@ -154,6 +160,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleMultiClient {
     final String icon = settings.getOrDefault("icon", "img/signin/linkedin.svg");
 
     final LinkedIn2Client client = new LinkedIn2Client(key, secret);
+    client.setUrlResolver(new DefaultUrlResolver(true));
     setClientInfo(client.getName(), ImmutableMap.of("title", title, "icon", icon));
     return client;
   }
@@ -165,6 +172,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleMultiClient {
     final String icon = settings.getOrDefault("icon", "img/signin/microsoft.svg");
 
     final WindowsLiveClient client = new WindowsLiveClient(key, secret);
+    client.setUrlResolver(new DefaultUrlResolver(true));
     setClientInfo(client.getName(), ImmutableMap.of("title", title, "icon", icon));
     return client;
   }
@@ -176,6 +184,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleMultiClient {
     final String icon = settings.getOrDefault("icon", "img/signin/wechat.svg");
 
     final WechatClient client = new WechatClient(key, secret);
+    client.setUrlResolver(new DefaultUrlResolver(true));
     setClientInfo(client.getName(), ImmutableMap.of("title", title, "icon", icon));
     return client;
   }
@@ -187,6 +196,7 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleMultiClient {
     final String icon = settings.getOrDefault("icon", "img/signin/github.svg");
 
     final GitHubClient client = new GitHubClient(key, secret);
+    client.setUrlResolver(new DefaultUrlResolver(true));
     setClientInfo(client.getName(), ImmutableMap.of("title", title, "icon", icon));
     return client;
   }

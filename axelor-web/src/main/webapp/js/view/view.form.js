@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -441,7 +441,7 @@ function FormViewCtrl($scope, $element) {
   };
 
   $scope.isDirty = function() {
-    $scope.$$dirty = $scope.$$disableDirtyCheck ? false : $scope.$$dirtyGrids.length > 0 || !ds.equals($scope.record, $scope.$$original);
+    $scope.$$dirty = $scope.$$disableDirtyCheck ? false : !ds.equals($scope.record, $scope.$$original);
     return $scope.$$dirty;
   };
 
@@ -884,7 +884,7 @@ function FormViewCtrl($scope, $element) {
   $scope.onBack = function() {
     var record = $scope.record || {};
     var editable = $scope.isEditable();
-
+    $scope.$broadcast("cancel:grid-edit");
     if (record.id && editable && $scope.canEdit()) {
       $scope.setEditable(false);
       return;

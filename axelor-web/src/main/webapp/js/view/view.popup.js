@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -154,11 +154,13 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
     // wait for onChange actions
     $scope.waitForActions(function() {
       if ($scope.editorCanSave && isChanged()) {
+        var recordId = record.id;
         if (record.id < 0)
           record.id = null;
         return $scope.onSave({force: true}).then(function(record, page) {
           // wait for onSave actions
           $scope.waitForActions(function(){
+            record.$id = recordId;
             close(record, true);
           });
         });

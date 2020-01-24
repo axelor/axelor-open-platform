@@ -1,7 +1,7 @@
 /**
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -377,7 +377,7 @@ form .panel-tabs .nav-tabs > li:hover > a {
   background: #fff;
 }
 .slickgrid .slick-row {
-  border-bottom: 0 !important;
+  border-bottom-color: #fff !important;
 }
 
 .tree-view-container .tree-header th {
@@ -510,6 +510,13 @@ header .dropdown-submenu:focus > a {
 
 [ui-view-form] .form-item-container > span.display-text {
   padding: 0;
+}
+
+[ui-form].slick-editor .form-item-container,
+[ui-form].slick-editor .form-item-container > span.display-text,
+[ui-form].slick-editor .form-item-container input {
+  min-height: 26px !important;
+  line-height: inherit !important;
 }
 
 .ng-invalid > input,

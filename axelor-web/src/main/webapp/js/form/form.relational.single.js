@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -104,6 +104,10 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
           id: value.id,
           $version: value.version || value.$version
         });
+        var trKey = '$t:' + nameField;
+        if (trKey in value) {
+          record[trKey] = value[trKey];
+        }
         if (nameField in rec) {
           record[nameField] = rec[nameField];
         }
@@ -358,7 +362,7 @@ ui.formInput('ManyToOne', 'Select', {
       return scope.isHidden();
     };
 
-    if (field.widget === 'NestedEditor') {
+    if (field.widget === 'nested-editor') {
 
       scope.isHiddenSelf = function() {
         if (!scope.canSelect()) {
@@ -553,12 +557,13 @@ ui.formInput('ManyToOne', 'Select', {
             handled = true;
           }
         }
-        scope.$timeout(function () {
-          adjustPadding();
-          if (scope.onChangeNotify && handled) {
-            scope.onChangeNotify(scope, scope.record);
-          }
-        }, 100);
+        if (scope.onChangeNotify && handled) {
+          scope.notifyChangeNeeded = true;
+        } else {
+          scope.$timeout(function() {
+            adjustPadding();
+          }, 100);
+        }
       }
     };
 
@@ -571,13 +576,24 @@ ui.formInput('ManyToOne', 'Select', {
         scope.select(ui.item.value);
         handled = true;
       }
-      scope.$timeout(function () {
-        adjustPadding();
-        if (scope.onChangeNotify && handled) {
-          scope.onChangeNotify(scope, scope.record);
-        }
-      }, 100);
+      if (scope.onChangeNotify && handled) {
+        scope.notifyChangeNeeded = true;
+      } else {
+        scope.$timeout(function() {
+          adjustPadding();
+        }, 100);
+      }
     };
+
+    scope.$on("on:record-change", function() {
+      if (scope.notifyChangeNeeded) {
+        scope.notifyChangeNeeded = false;
+        scope.$timeout(function() {
+          adjustPadding();
+          scope.onChangeNotify(scope, scope.record);
+        }, 100);
+      }
+    });
 
     scope.$render_editable = function() {
 

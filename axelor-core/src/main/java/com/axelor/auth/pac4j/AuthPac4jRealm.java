@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,6 +18,7 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.UserAuthenticationInfo;
 import com.axelor.auth.db.User;
@@ -40,7 +41,7 @@ public class AuthPac4jRealm extends Pac4jRealm {
   public AuthPac4jRealm() {
     final AppSettings settings = AppSettings.get();
     setPrincipalNameAttribute(
-        settings.get(AuthPac4jModule.CONFIG_AUTH_USER_PRINCIPAL_ATTRIBUTE, "email"));
+        settings.get(AvailableAppSettings.AUTH_USER_PRINCIPAL_ATTRIBUTE, "email"));
   }
 
   @Override
@@ -58,7 +59,6 @@ public class AuthPac4jRealm extends Pac4jRealm {
       final User user = userService.getUser(profile);
 
       if (user != null && AuthUtils.isActive(user)) {
-        profile.addRole(AuthPac4jModule.ROLE_HAS_USER);
         profile.clearSensitiveData();
         profile.setRemembered(true);
         return new UserAuthenticationInfo(user.getCode(), profiles.hashCode(), getName(), user);

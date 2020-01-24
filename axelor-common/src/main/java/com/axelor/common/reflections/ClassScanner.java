@@ -187,8 +187,7 @@ final class ClassScanner {
     final URL resource = info.url();
     boolean matched =
         pathPatterns.isEmpty()
-            || pathPatterns
-                .stream()
+            || pathPatterns.stream()
                 .map(p -> p.matcher(resource.getFile()).matches())
                 .findFirst()
                 .orElse(false);

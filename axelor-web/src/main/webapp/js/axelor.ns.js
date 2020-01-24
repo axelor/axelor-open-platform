@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -79,13 +79,42 @@
   axelor.browser = browser;
   axelor.device = device;
 
+  var lastCookieString;
+  var lastCookies = {};
+
+  function readCookie(name) {
+    var cookieString = (document.cookie || '');
+    if (cookieString !== lastCookieString) {
+      lastCookieString = cookieString;
+      lastCookies = _.reduce(cookieString.split('; '), function (obj, value) {
+        var parts = value.split('=');
+        if (!obj.hasOwnProperty(parts[0])) {
+          obj[parts[0]] = parts[1];
+        }
+        return obj;
+      }, {});
+    }
+    return lastCookies[name];
+  }
+
+  axelor.readCookie = readCookie;
+
   function sanitizeElement(element) {
-    $.each(element.attributes, function() {
-      var attr = this.name;
-          var value = this.value;
-          if (attr.indexOf('xss-on') === 0 || value.indexOf('javascript:') === 0) {
-              $(element).removeAttr(attr);
-          }
+
+    var attrs = _.filter(element.attributes, function(a) {
+      var attr = a.name;
+      var value = a.value;
+
+      if (["src", "href", "action"].indexOf(attr) > -1 && value) {
+        value = value.replace(/[\x00-\x20]+/g, ''); // https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet#Embedded_tab
+        value = value.replace(/<\!\-\-.*?\-\-\>/g, ''); // remove comments which might be interpreted as xml
+      }
+
+      return attr.indexOf('xss-on') === 0 || (value && value.match(/^javascript\:/i));
+    });
+
+    _.each(attrs, function (a) {
+      $(element).removeAttr(a.name);
     });
   }
 
@@ -99,7 +128,7 @@
 
     elems.find('*').each(function() {
       sanitizeElement(this);
-        });
+    });
 
     return elems.html();
   }

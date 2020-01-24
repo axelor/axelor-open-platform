@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -28,10 +28,7 @@ public class MailFetchJob implements Job {
 
   private boolean isRunning(JobExecutionContext context) {
     try {
-      return context
-          .getScheduler()
-          .getCurrentlyExecutingJobs()
-          .stream()
+      return context.getScheduler().getCurrentlyExecutingJobs().stream()
           .filter(j -> j.getTrigger().equals(context.getTrigger()))
           .filter(j -> !j.getFireInstanceId().equals(context.getFireInstanceId()))
           .findFirst()
