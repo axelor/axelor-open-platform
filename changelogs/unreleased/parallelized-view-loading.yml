@@ -1,3 +1,0 @@
----
-title: Parallelize loading of models, views, and i18n with rollback per module
-type: feature
