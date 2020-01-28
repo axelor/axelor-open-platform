@@ -847,13 +847,25 @@ public class XMLViews {
 
     private static void doInsert(
         List<Element> elements, Position position, Node targetNode, Document document) {
-      Node currentNode = targetNode;
+      final Iterator<Element> elementIt = elements.iterator();
+      Node currentNode = doInsert(elementIt, position, targetNode, document);
 
-      for (final Element element : elements) {
-        final Node node = document.importNode(element, true);
-        position.insert(currentNode, node);
-        currentNode = node;
+      while (currentNode != null) {
+        currentNode = doInsert(elementIt, Position.AFTER, currentNode, document);
       }
+    }
+
+    @Nullable
+    private static Node doInsert(
+        Iterator<Element> elementIt, Position position, Node targetNode, Document document) {
+      if (!elementIt.hasNext()) {
+        return null;
+      }
+
+      final Element element = elementIt.next();
+      final Node newChild = document.importNode(element, true);
+      position.insert(targetNode, newChild);
+      return newChild;
     }
 
     private static void doInsertToolBar(Element element, Document document, MetaView view)
