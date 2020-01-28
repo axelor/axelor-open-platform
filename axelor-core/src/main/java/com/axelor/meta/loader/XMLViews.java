@@ -139,7 +139,7 @@ public class XMLViews {
         }
 
         @Override
-        public Iterator<Object> getPrefixes(String namespaceURI) {
+        public Iterator<String> getPrefixes(String namespaceURI) {
           throw new UnsupportedOperationException();
         }
       };
