@@ -935,8 +935,14 @@ Grid.prototype._doInit = function(view) {
           input.attr('placeholder', '');
         });
         if (_.isArray(field.selectionList)) {
+          var selection = _.find(field.selectionList,
+              function(elem) { return elem && elem.value == input.val(); });
+          if (selection && selection.title) {
+            input.val(selection.title);
+          }
           makeFilterCombo(input, field.selectionList, function(filter){
             _.extend(filters, filter);
+            handler._simpleFilters = filters;
           });
         }
       });
