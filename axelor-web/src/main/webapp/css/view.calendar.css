@@ -76,6 +76,7 @@
 
 .calendar-bubble-content {
   overflow: hidden;
+  width: 100%;
 }
 
 .calendar-bubble-content hr {
