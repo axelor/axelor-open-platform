@@ -45,8 +45,7 @@ public class AuthObserver {
   }
 
   /**
-   * Observes all pre-requests and log out disabled users or users that logged in before password
-   * change date.
+   * Observes all pre-requests and log out users that logged in before password change date.
    *
    * @param event
    */
@@ -58,7 +57,6 @@ public class AuthObserver {
       final LocalDateTime loginDate = authSessionService.getLoginDate(subject.getSession());
 
       if (user != null
-          && AuthUtils.isActive(user)
           && (user.getPasswordUpdatedOn() == null
               || loginDate != null && !loginDate.isBefore(user.getPasswordUpdatedOn()))) {
         return;
