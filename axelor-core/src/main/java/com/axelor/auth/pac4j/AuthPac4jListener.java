@@ -51,7 +51,7 @@ public class AuthPac4jListener implements AuthenticationListener {
       }
     }
 
-    logger.error("No active user found for principal: {}", token.getPrincipal());
+    logger.error("No user found for principal: {}", token.getPrincipal());
     firePostLoginFailure(token, new UnknownAccountException(info.toString()));
   }
 
