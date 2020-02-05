@@ -583,12 +583,11 @@ ui.formatDuration = formatDuration;
 
 ui.formInput('Duration', 'Time', {
   metaWidget: true,
-  mask: '99:mm',
 
   init: function(scope) {
     this._super(scope);
 
-    var field = scope.field;
+    var field = scope.field || {};
     var pattern = /^\d+:\d+(:\d+)?$/;
 
     scope.format = function(value) {
@@ -614,13 +613,13 @@ ui.formInput('Duration', 'Time', {
 
   link_editable: function(scope, element, attrs, model) {
     var field = scope.field || {},
-      mask = this.mask;
+      mask = '99:mm';
 
     if (field.big) {
-      mask = "999:mm";
+      mask = '9' + mask;
     }
     if (field.seconds) {
-      mask = mask + ":mm";
+      mask += ':mm';
     }
 
     this.mask = mask;
