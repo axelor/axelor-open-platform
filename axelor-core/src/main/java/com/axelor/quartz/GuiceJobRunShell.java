@@ -21,7 +21,7 @@ import com.google.inject.servlet.RequestScoped;
 import com.google.inject.servlet.RequestScoper;
 import com.google.inject.servlet.ServletScopes;
 import java.util.Collections;
-import org.eclipse.core.runtime.jobs.Job;
+import org.quartz.Job;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger.CompletedExecutionInstruction;
