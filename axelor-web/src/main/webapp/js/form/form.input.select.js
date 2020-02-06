@@ -929,8 +929,8 @@ ui.formInput('NavSelect', {
     };
 
     scope.isSelected = function (select) {
-      var value = select ? (isReference ? parseInt(select.value) : select.value) : null;
       var current = scope.getValue();
+      var value = select ? (isReference || _.isNumber(current) ? parseInt(select.value) : select.value) : null;
       if (current && isReference) {
         current = current.id;
       }
