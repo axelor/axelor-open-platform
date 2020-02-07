@@ -1101,6 +1101,8 @@ public class Resource<T extends Model> {
       Property p = mapper.getProperty(func.getField());
       if (p != null && p.isJson()) {
         selectName = func.toString();
+      } else {
+        selectName = String.format("self.%s", name);
       }
     }
 
