@@ -1,6 +1,6 @@
 ## 5.0.22 (current)
 
-TBD
+* Fix same duration widget mask being applied to subsequent fields
 
 ## 5.0.21 (2020-01-07)
 
