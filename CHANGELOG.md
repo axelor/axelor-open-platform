@@ -1,3 +1,14 @@
+## 5.2.5 (2020-02-11)
+
+#### Fixed
+
+* Fix CSS of calendar bubble content
+* Fix menu title wrapping with tag
+* Fix combining selection simple filters with custom filters
+* Fix extension insert before in declaration order
+* Fix Overview panel randomly still present despite having custom panel as first element
+* Fix same duration widget mask being applied to subsequent fields
+
 ## 5.2.4 (2020-01-20)
 
 #### Features
