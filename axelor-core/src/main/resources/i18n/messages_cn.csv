@@ -1,0 +1,1000 @@
+key,message,comment,context
+"<i class=""fa fa-exclamation-triangle"" aria-hidden=""true""></i> The scheduler service is disabled.","<i class=""fa fa-exclamation-triangle"" aria-hidden=""true""></i> 已禁用任务计划服务。
+访问错误
+动作
+动作菜单
+动作菜单
+不能更改动作名称
+动作
+激活时间
+从指定日期开始激活用户。
+激活
+地址
+管理
+全部动作
+全部图表
+全部自定义视图
+全部文档
+全部菜单帮助
+全部菜单
+全部模型
+全部模块
+全部任务计划
+全部选择
+全部团队
+全部翻译
+全部视图帮助
+全部视图
+已重启所有的后台任务。
+将丢失所有的定制！你确定要继续吗？
+已恢复所有的视图（%s）。
+允许
+指定一个唯一的权限名称。
+应用
+已存档
+分配给
+附加到
+属性
+属性
+作者
+授权
+已授权角色
+阻止此用户登录
+无限期阻止此用户登录。
+正文
+布尔型
+按钮
+日历
+可以读取
+可以分享
+可以写入
+已取消
+卡片
+类别
+用于分组动作菜单的类别名称。
+修改密码？
+图表
+客户端 JS 表达式
+已关闭
+代码
+代码长度必须大于 2
+收缩
+列顺序号
+请稍后回来。该文件夹里没有消息...
+该条件的参数，使用逗号分隔的列表。
+注释
+已计算
+并发更新错误
+条件
+条件参数
+要检查的条件
+条件
+配置
+再次输入密码
+内容
+内容类型
+上下文字段
+上下文字段目标
+上下文字段目标名称
+上下文字段标题
+上下文字段值
+创建
+已创建
+创建者
+创建时间
+Cron
+当前密码
+自定义
+自定义字段
+自定义模型
+自定义字段
+自定义字段
+自定义模型
+自定义模型
+自定义——多对多
+自定义——多对一
+自定义——一对多
+仪表盘
+数据
+日期
+日期时间
+十进制数
+默认
+默认主页动作。
+默认值
+依赖的特性
+依赖的模块
+依赖
+依赖于
+描述
+明细
+目录
+目录
+在指定日期禁用用户
+文档
+文档
+域
+域过滤器作为条件
+下载
+电子邮件
+加密错误
+加密密钥也许不正确。
+英语
+枚举
+枚举型
+过期时间
+导出
+导出完成。
+扩展
+收藏
+收藏夹
+字段
+字段是必填的。
+字段
+文件
+已添加文件
+文件名
+文件路径
+已移除文件
+文件类型
+文件
+过滤自定义
+过滤文件
+过滤视图
+过滤器
+标志
+将安装以下模块：<p>%s</p> 你确定吗？
+将卸载以下模块：<p>%s</p> 你确定吗？
+强制修改密码
+强制用户必须在下次登录时修改密码。
+表单
+表单记录
+表单记录
+表单视图
+表单宽度
+法语
+发件人
+全名
+全限定的对象名或带通配符的包名。
+甘特图
+通用信息
+网格
+网格视图
+分组
+分组依据
+分组
+帮助
+帮助管理
+帮助链接
+隐藏
+隐藏菜单
+隐藏条件
+高度
+主页动作
+图标
+图标背景
+重要
+进行中
+收件箱
+收件箱是空的！
+包含条件
+增量
+信息
+初始值
+行内
+安装
+安装模块
+已安装
+整数
+内部服务器错误
+无效的 XML
+无效的 cron 表达式：
+无效的字段值。
+无效的权限
+动作记录 %s 的使用方法无效，必须作为最后一个动作。
+反转
+已标记为存档
+为目录
+为只读
+为已启动
+条目
+后台任务
+后台任务管理
+后台任务已更新
+JSON
+JSON 模型
+看板
+键
+标签
+语言
+最后修改于
+最近密码更新日期
+左侧菜单
+链接
+用户名
+低
+邮件
+多对多
+多对一
+映射条件
+最大值
+最大大小
+最大大小 4MB.
+成员
+菜单
+菜单帮助
+菜单项
+菜单项
+菜单背景
+菜单图标
+菜单顺序
+上级菜单
+菜单标题
+顶部菜单
+菜单
+消息
+元文件
+元模型
+元权限
+MetaScheduleParam
+最小值
+最小大小
+移动设备菜单
+模型
+模型管理
+模型字段
+模型
+修改于
+模块
+模块管理
+应检查模块
+模块
+我的文档
+我的团队
+我的进行中的任务
+名称
+名称字段
+名称必须长于两个字符。
+导航
+新建
+新密码
+下一个值
+没有已标记为存档的消息！
+无帮助
+无重要的消息！
+一般
+对象
+对象名称
+修改事件
+单击事件
+新建事件
+保存事件
+一对多
+一对一
+仅当
+仅当给定的表达式为真的时候使用此菜单项（例如“if”条件）。
+仅当给定的模块安装后才使用此菜单项（例如“if-module”条件）。
+选项
+排序
+排序依据
+总览
+所有者
+包
+填充
+面板
+参数
+上级
+上级菜单
+密码
+密码不符合已配置的模式。
+待定
+权限
+权限
+字段权限
+个性化
+个性化视图
+个性化视图
+照片
+占位符
+请修改你的密码。
+请重新登录。
+请刷新浏览器以便看到更新后的视图。
+精度
+首选项
+前缀
+优先级
+读取
+只读
+只读条件
+收件人
+已创建记录
+已更新记录
+该记录已被其他事务创建或更新
+引用错误
+正则表达式
+关联
+关联文档 ID
+关联文档模型
+关联文档名称
+关联模型
+关联名称
+关联对象
+关系
+可移除
+移除
+回复
+必填
+必填条件
+重启后台任务
+请重启服务器以便看到更新的效果。
+全部恢复...
+角色
+角色
+根
+规则
+规则
+SQL 错误
+比例
+任务计划
+任务计划
+数据库架构
+搜索
+选项
+选项条目
+选择
+选项
+分隔符
+序列
+序列顺序
+用于决定是否使用此字段的服务器端表达式。
+已分享
+已与我分享
+显示模型
+显示条件
+显示于顶部菜单
+显示权限
+简体中文
+单标签页
+大小
+大小（字节）
+间隔区
+指定该组的这些成员是否是技术岗员工。
+指定该动作是否可以作为主页动作。
+状态
+停止服务
+字符串
+样式
+主题
+订阅
+成功
+后缀
+摘要
+系统通知
+表格
+标签
+标签数
+标签标题
+标签方法
+标签演示
+标签
+目标自定义模型
+目标 JSON 模型
+目标模型
+任务
+已关闭任务
+已创建任务
+任务日期
+任务截止时间
+任务周期
+任务
+分配给我的任务
+我创建的任务
+到期任务
+待办任务
+团队
+团队
+团队协同
+技术岗员工
+用户界面控件得附加数据
+界面控件中要显示的图标图片。
+不能卸载模块，因为有其他模块处于未决状态。请先重启服务器。
+不能卸载模块，因为有其他不可卸载的模块依赖它。
+有其他的记录引用了此记录，请先删除其他的记录。
+无法更新记录，因为违反了唯一性约束。
+任务计划服务已停止。
+任务计划服务已禁用。
+选项标题
+选项条目值
+主题
+将终止所有运行中的后台任务，你确定要继续？
+将使用当前设置更新后台任务，你确定要继续？
+时间
+标题
+弹出提示
+ 顶部菜单
+主题
+已关闭主题
+已创建主题
+重新打开的主题
+主题
+翻译
+树
+类型
+服务器端发生了未预期的数据库错误。
+卸载
+违反唯一性约束
+唯一的消息标识符
+未读
+未订阅
+更新
+更新者
+更新时间
+紧急
+作为主页动作
+用户
+用户管理
+用户首选项
+用户
+无效的 cron 表达式。下次执行时间：
+校验
+校验错误
+值
+值表达式
+版本
+视图
+视图帮助
+视图管理
+视图
+可见性
+可见
+在网格中可见
+警告
+是否授予创建的权限。
+是否授予导出的权限。
+是否授予读取的权限。
+是否授予删除的权限。
+是否授予写入修改的权限。
+受否要显示帮助消息。
+是否使用标签页界面。
+界面控件
+控件属性
+控件属性
+写入
+当前密码错误
+错误的用户名或密码
+XML
+你不允许删除该过滤器
+你未被授权创建此资源。
+你未被授权导出此数据。
+你未被授权读取此资源。
+你未被授权删除此资源。
+你未被授权更新此资源。
+你不能在此处创建文档。
+你不能在此处移动文档。
+你的密码
+action-attrs
+action-condition
+action-export
+action-group
+action-import
+action-method
+action-record
+action-report
+action-script
+action-validate
+action-view
+action-ws
+已添加备注
+再次输入密码
+当前密码
+Select
+重要
+用户名
+新密码
+成功
+已更新文档
+用户组
+用户名
+密码不符合要求：<br/>至少需要 4 个字符。
+你的密码
+{0} 自定义视图已删除。
+{0} 自定义视图已删除。",,resources\views\Schedules.xml:19
+Access error,访问错误,,java\com\axelor\rpc\ResponseInterceptor.java:124
+Action,动作,,resources\domains\Meta.xml:108 resources\domains\Meta.xml:137 resources\domains\MetaJson.xml:80 resources\views\Group.xml:28 resources\views\Meta.xml:176 resources\views\User.xml:30
+Action Menu,动作菜单,,resources\views\Meta.xml:273
+Action Menus,动作菜单,,resources\views\Menu.xml:114 resources\views\Menu.xml:116 resources\views\Meta.xml:261
+Action name can't be changed.,不能更改动作名称,,java\com\axelor\meta\web\MetaController.java:108
+Actions,动作,,resources\views\Menu.xml:99
+Activate on,激活时间,,resources\domains\User.xml:28
+Activate the user from the specified date.,从指定日期开始激活用户。,,resources\domains\User.xml:28
+Active,激活,,resources\domains\MetaPermission.xml:12 resources\domains\MetaSchedule.xml:19 resources\domains\Team.xml:51
+Address,地址,,resources\domains\Mail.xml:12
+Administration,管理,,resources\views\Menu.xml:6
+All Actions,全部动作,,resources\views\Menu.xml:97 resources\views\Meta.xml:167
+All Charts,全部图表,,resources\views\Menu.xml:151 resources\views\Menu.xml:153 resources\views\Meta.xml:109
+All Custom Views,全部自定义视图,,resources\views\Menu.xml:78 resources\views\Menu.xml:80
+All Documents,全部文档,,resources\views\DMS.xml:167 resources\views\DMS.xml:212
+All Menu Help,全部菜单帮助,,resources\views\Meta.xml:431
+All Menus,全部菜单,,resources\views\Menu.xml:88
+All Models,全部模型,,resources\views\Menu.xml:60
+All Modules,全部模块,,resources\views\Menu.xml:51 resources\views\Meta.xml:52
+All Schedules,全部任务计划,,resources\views\Menu.xml:162 resources\views\Menu.xml:164
+All Selects,全部选择,,resources\views\Menu.xml:105 resources\views\Meta.xml:287
+All Teams,全部团队,,resources\views\Team.xml:140 resources\views\Team.xml:211
+All Translations,全部翻译,,resources\views\Menu.xml:123 resources\views\Menu.xml:125 resources\views\Meta.xml:383
+All View Help,全部视图帮助,,resources\views\Meta.xml:400
+All Views,全部视图,,resources\views\Menu.xml:69 resources\views\Meta.xml:93
+All jobs have been restarted.,已重启所有的后台任务。,,java\com\axelor\meta\web\JobController.java:68
+All the customizations will be lost. Are you sure?,将丢失所有的定制！你确定要继续吗？,,resources\views\Meta.xml:95
+All views have been restored (%s).,已恢复所有的视图（%s）。,,java\com\axelor\meta\web\MetaController.java:196
+Allow,允许,,resources\views\Permission.xml:26
+An unique permission name.,指定一个唯一的权限名称。,,resources\domains\Permission.xml:13
+Application,应用,,resources\domains\Meta.xml:19
+Archived,已存档,,resources\views\Mail.xml:38 resources\views\Mail.xml:65 resources\views\Mail.xml:79
+Assigned to,分配给,,resources\domains\Team.xml:30
+Attached to,附加到,,resources\views\DMS.xml:154
+Attributes,属性,,resources\views\Team.xml:102
+Attrs,属性,,resources\domains\MetaJson.xml:90 resources\domains\Team.xml:31
+Author,作者,,resources\domains\Mail.xml:24
+Authorization,授权,,resources\views\User.xml:35
+Authorized roles,已授权角色,,resources\domains\Team.xml:12
+Block the user,阻止此用户登录,,resources\domains\User.xml:27
+Block the user for an indefinite period.,无限期阻止此用户登录。,,resources\domains\User.xml:27
+Body,正文,,resources\domains\Mail.xml:33
+Boolean,布尔型,,resources\views\MetaJson.xml:10
+Button,按钮,,resources\views\MetaJson.xml:16
+Calendar,日历,,resources\views\Meta.xml:12
+Can read,可以读取,,resources\views\DMS.xml:84
+Can share,可以分享,,resources\views\DMS.xml:86
+Can write,可以写入,,resources\views\DMS.xml:85
+Canceled,已取消,,resources\views\Team.xml:10
+Cards,卡片,,resources\views\Meta.xml:14
+Category,类别,,resources\domains\Meta.xml:133
+Category name to group action menus.,用于分组动作菜单的类别名称。,,resources\domains\Meta.xml:133
+Change password?,修改密码？,,resources\views\User.xml:40 resources\views\User.xml:63
+Chart,图表,,resources\views\Meta.xml:10
+Client side js expression,客户端 JS 表达式,,resources\views\MetaPermission.xml:33 resources\views\MetaPermission.xml:34
+Closed,已关闭,,resources\views\Team.xml:9
+Code,代码,,resources\domains\DMS.xml:32 resources\domains\Group.xml:13
+Code length should be greater than 2.,代码长度必须大于 2,,resources\views\Group.xml:46 resources\views\User.xml:74
+Collapse,收缩,,resources\views\Group.xml:9
+Column sequence,列顺序号,,resources\domains\MetaJson.xml:44
+Come back later. There are no messages in this folder...,请稍后回来。该文件夹里没有消息...,,resources\views\Mail.xml:19 resources\views\Mail.xml:30 resources\views\Mail.xml:41
+Comma separated list of params for the condition.,该条件的参数，使用逗号分隔的列表。,,resources\domains\Permission.xml:21
+Comment,注释,,resources\views\Mail.xml:9
+Computed,已计算,,resources\domains\Meta.xml:37
+Concurrent updates error,并发更新错误,,java\com\axelor\rpc\ResponseInterceptor.java:150
+Condition,条件,,resources\domains\Permission.xml:20 resources\views\Permission.xml:33 resources\views\Permission.xml:34
+Condition params,条件参数,,resources\domains\Permission.xml:21
+Condition to check,要检查的条件,,resources\domains\Meta.xml:114
+Conditions,条件,,resources\views\MetaJson.xml:72 resources\views\MetaPermission.xml:32
+Configuration,配置,,resources\views\DMS.xml:215
+Confirm password,再次输入密码,,resources\views\User.xml:45 resources\views\User.xml:68
+Content,内容,,resources\domains\DMS.xml:27 resources\views\DMS.xml:184
+Content type,内容类型,,resources\domains\DMS.xml:28
+Context field,上下文字段,,resources\domains\MetaJson.xml:27
+Context field target,上下文字段目标,,resources\domains\MetaJson.xml:28
+Context field target name,上下文字段目标名称,,resources\domains\MetaJson.xml:29
+Context field title,上下文字段标题,,resources\domains\MetaJson.xml:31
+Context field value,上下文字段值,,resources\domains\MetaJson.xml:30
+Create,创建,,resources\domains\Permission.xml:17
+Created,已创建,,resources\views\DMS.xml:35
+Created by,创建者,,java\com\axelor\auth\db\AuditableModel.java:45
+Created on,创建时间,,java\com\axelor\auth\db\AuditableModel.java:39
+Cron,Cron,,resources\domains\MetaSchedule.xml:23
+Current password,当前密码,,resources\views\User.xml:65
+Custom,自定义,,resources\views\Meta.xml:16
+Custom Fields,自定义字段,,resources\views\MetaJson.xml:198 resources\views\MetaJson.xml:218
+Custom Models,自定义模型,,resources\views\MetaJson.xml:195 resources\views\MetaJson.xml:211
+Custom field,自定义字段,,resources\views\MetaJson.xml:113 resources\views\MetaJson.xml:134 resources\views\MetaJson.xml:35
+Custom fields,自定义字段,,resources\views\MetaJson.xml:28
+Custom model,自定义模型,,resources\views\MetaJson.xml:152
+Custom models,自定义模型,,resources\views\MetaJson.xml:147
+Custom-ManyToMany,自定义——多对多,,resources\views\MetaJson.xml:24
+Custom-ManyToOne,自定义——多对一,,resources\views\MetaJson.xml:23
+Custom-OneToMany,自定义——一对多,,resources\views\MetaJson.xml:25
+Dashboard,仪表盘,,resources\views\Meta.xml:11
+Data,数据,,resources\domains\Meta.xml:193
+Date,日期,,resources\views\MetaJson.xml:12
+DateTime,日期时间,,resources\views\MetaJson.xml:11
+Decimal,十进制数,,resources\views\MetaJson.xml:9
+Default,默认,,resources\views\DMS.xml:130 resources\views\Meta.xml:37
+Default home action.,默认主页动作。,,resources\domains\Group.xml:16
+Default value,默认值,,resources\domains\MetaJson.xml:13
+Dependent features,依赖的特性,,resources\domains\Meta.xml:44
+Dependent modules,依赖的模块,,resources\domains\Meta.xml:43
+Depends,依赖,,resources\domains\Meta.xml:18
+Depends On,依赖于,,resources\views\Meta.xml:78
+Description,描述,,resources\domains\Meta.xml:15 resources\domains\Meta.xml:223 resources\domains\Meta.xml:254 resources\domains\MetaSchedule.xml:21 resources\domains\Role.xml:13 resources\domains\Team.xml:10 resources\domains\Team.xml:20 resources\domains\Team.xml:50 resources\views\Meta.xml:374 resources\views\Meta.xml:81
+Details,明细,,resources\views\DMS.xml:25
+Directories,目录,,resources\views\DMS.xml:63
+Directory,目录,,resources\views\DMS.xml:31 resources\views\DMS.xml:67
+Disable the user from the specified date.,在指定日期禁用用户,,resources\domains\User.xml:29
+Document,文档,,resources\views\DMS.xml:17 resources\views\DMS.xml:180 resources\views\DMS.xml:195
+Documents,文档,,resources\views\DMS.xml:210 resources\views\DMS.xml:7
+Domain,域,,resources\domains\MetaJson.xml:53
+Domain filter as condition.,域过滤器作为条件,,resources\domains\Permission.xml:20
+Download,下载,,resources\views\DMS.xml:20
+Email,电子邮件,,resources\domains\Mail.xml:72 resources\domains\User.xml:20 resources\views\Mail.xml:8
+Encryption error,加密错误,,java\com\axelor\rpc\ResponseInterceptor.java:200
+Encryption key might be wrong.,加密密钥也许不正确。,,java\com\axelor\rpc\ResponseInterceptor.java:198
+English,英语,,resources\views\User.xml:7
+Enum,枚举,,resources\views\MetaJson.xml:15
+Enum type,枚举型,,resources\domains\MetaJson.xml:50
+Expires on,过期时间,,resources\domains\User.xml:29
+Export,导出,,resources\domains\MetaPermission.xml:21 resources\domains\Permission.xml:19 resources\views\Meta.xml:385
+Export complete.,导出完成。,,java\com\axelor\meta\schema\actions\ActionExport.java:154 java\com\axelor\meta\schema\actions\ActionExport.java:157 java\com\axelor\meta\web\MetaController.java:274
+Extension,扩展,,resources\domains\Meta.xml:40
+Favorite,收藏,,resources\views\Meta.xml:216
+Favorites,收藏夹,,resources\views\Meta.xml:210 resources\views\Meta.xml:224
+Field,字段,,resources\domains\Meta.xml:238 resources\domains\MetaPermission.xml:18 resources\views\Meta.xml:364
+Field is required.,字段是必填的。,,java\com\axelor\meta\schema\actions\ActionCondition.java:110
+Fields,字段,,resources\domains\Meta.xml:207 resources\domains\MetaJson.xml:83 resources\views\Meta.xml:356
+File,文件,,resources\domains\DMS.xml:39 resources\domains\Meta.xml:269 resources\views\Meta.xml:458
+File added,已添加文件,,java\com\axelor\dms\db\repo\DMSFileRepository.java:131
+File name,文件名,,resources\domains\DMS.xml:9 resources\domains\Meta.xml:250
+File path,文件路径,,resources\domains\Meta.xml:251
+File removed,已移除文件,,java\com\axelor\dms\db\repo\DMSFileRepository.java:131
+File type,文件类型,,resources\domains\Meta.xml:253
+Files,文件,,resources\views\Meta.xml:448 resources\views\Meta.xml:456
+Filter custom,过滤自定义,,resources\domains\MetaFilter.xml:17
+Filter files,过滤文件,,resources\views\DMS.xml:153
+Filter view,过滤视图,,resources\domains\MetaFilter.xml:18
+Filters,过滤器,,resources\domains\MetaFilter.xml:16 resources\views\Meta.xml:18
+Flags,标志,,resources\domains\Mail.xml:46
+Following modules will be installed : <p>%s</p> Are you sure ?,将安装以下模块：<p>%s</p> 你确定吗？,,java\com\axelor\meta\web\ModuleController.java:42
+Following modules will be uninstalled : <p>%s</p> Are you sure ?,将卸载以下模块：<p>%s</p> 你确定吗？,,java\com\axelor\meta\web\ModuleController.java:44
+Force password change,强制修改密码,,resources\domains\User.xml:17
+Force the user to change their password at next login.,强制用户必须在下次登录时修改密码。,,resources\domains\User.xml:17
+Form,表单,,resources\views\Meta.xml:8
+Form record,表单记录,,resources\views\MetaJson.xml:187
+Form records,表单记录,,resources\views\MetaJson.xml:182
+Form view,表单视图,,resources\domains\MetaJson.xml:51 resources\domains\MetaJson.xml:82
+Form width,表单宽度,,resources\domains\MetaJson.xml:70
+French,法语,,resources\views\User.xml:8
+From,发件人,,resources\domains\Mail.xml:27
+Fullname,全名,,resources\domains\Meta.xml:208
+Fully qualified object name or wild card package name.,全限定的对象名或带通配符的包名。,,resources\domains\Permission.xml:14
+Gantt,甘特图,,resources\views\Meta.xml:13
+General,通用信息,,resources\views\DMS.xml:97 resources\views\Meta.xml:231
+Grid,网格,,resources\views\Meta.xml:7
+Grid view,网格视图,,resources\domains\MetaJson.xml:52 resources\domains\MetaJson.xml:81
+Group,分组,,resources\domains\DMS.xml:40 resources\domains\User.xml:31 resources\views\Group.xml:18
+Group by,分组依据,,resources\domains\MetaJson.xml:72
+Groups,分组,,resources\domains\Meta.xml:111 resources\domains\Meta.xml:41 resources\views\Group.xml:12 resources\views\Menu.xml:23 resources\views\Menu.xml:26
+Help,帮助,,resources\domains\Meta.xml:243 resources\domains\MetaJson.xml:20 resources\views\Meta.xml:426 resources\views\Meta.xml:443
+Help Management,帮助管理,,resources\views\Menu.xml:10
+Help link,帮助链接,,resources\domains\Meta.xml:39
+Hidden,隐藏,,resources\domains\Meta.xml:135 resources\domains\Meta.xml:195 resources\domains\MetaJson.xml:33 resources\views\Group.xml:8
+Hidden menu,隐藏菜单,,resources\domains\Meta.xml:103
+Hide if,隐藏条件,,resources\domains\MetaJson.xml:22 resources\domains\MetaPermission.xml:23
+High,高度,,resources\views\Team.xml:16
+Home action,主页动作,,resources\domains\Group.xml:16 resources\domains\User.xml:22
+Icon,图标,,resources\domains\Meta.xml:192 resources\domains\Meta.xml:93 resources\views\MetaJson.xml:165
+Icon background,图标背景,,resources\domains\Meta.xml:94 resources\views\MetaJson.xml:166
+Important,重要,,resources\views\DMS.xml:133 resources\views\Mail.xml:27 resources\views\Mail.xml:60 resources\views\Mail.xml:77 resources\views\Meta.xml:38
+In Progress,进行中,,resources\views\Team.xml:8
+Inbox,收件箱,,resources\views\Mail.xml:16 resources\views\Mail.xml:49 resources\views\Mail.xml:75
+Inbox is empty!,收件箱是空的！,,resources\views\Mail.xml:18
+Include if,包含条件,,resources\domains\MetaJson.xml:25
+Increment,增量,,resources\domains\MetaSequence.xml:16
+Information,信息,,resources\views\DMS.xml:134 resources\views\Meta.xml:42
+Initial,初始值,,resources\domains\MetaSequence.xml:17
+Inline,行内,,resources\views\Meta.xml:48
+Install,安装,,resources\views\Meta.xml:74
+Install module,安装模块,,resources\views\Meta.xml:60
+Installed,已安装,,resources\domains\Meta.xml:21
+Integer,整数,,resources\views\MetaJson.xml:8
+Internal Server Error,内部服务器错误,,java\com\axelor\rpc\Response.java:154
+Invalid XML.,无效的 XML,,java\com\axelor\meta\web\MetaController.java:80
+Invalid cron :,无效的 cron 表达式：,,java\com\axelor\meta\web\JobController.java:52
+Invalid field value.,无效的字段值。,,java\com\axelor\meta\schema\actions\ActionCondition.java:112
+Invalid permission,无效的权限,,java\com\axelor\dms\db\repo\DMSPermissionRepository.java:90
+"Invalid use of action-record: %s, must be the last action.",动作记录 %s 的使用方法无效，必须作为最后一个动作。,,java\com\axelor\meta\schema\actions\ActionGroup.java:77
+Inverse,反转,,resources\views\DMS.xml:135 resources\views\Meta.xml:41
+Is archived,已标记为存档,,resources\domains\Mail.xml:58
+Is directory,为目录,,resources\domains\DMS.xml:10
+Is read,为只读,,resources\domains\Mail.xml:57
+Is starred,为已启动,,resources\domains\Mail.xml:56
+Items,条目,,resources\domains\Meta.xml:178
+Job,后台任务,,resources\domains\MetaSchedule.xml:22
+Job Management,后台任务管理,,resources\views\Menu.xml:12
+Job has been updated.,后台任务已更新,,java\com\axelor\meta\web\JobController.java:59
+Json,JSON,,resources\domains\Meta.xml:224
+Json model,JSON 模型,,resources\domains\MetaJson.xml:16 resources\domains\MetaJson.xml:88
+Kanban,看板,,resources\views\Meta.xml:15
+Key,键,,resources\domains\Meta.xml:228
+Label,标签,,resources\domains\Meta.xml:220 resources\views\MetaJson.xml:17
+Language,语言,,resources\domains\Meta.xml:230 resources\domains\Meta.xml:240 resources\domains\User.xml:21
+Last modified,最后修改于,,resources\views\DMS.xml:12
+Last password update date,最近密码更新日期,,resources\domains\User.xml:16
+Left menu,左侧菜单,,resources\domains\Meta.xml:101
+Link,链接,,resources\domains\Meta.xml:105 resources\views\Team.xml:100
+Login,用户名,,resources\domains\User.xml:13
+Low,低,,resources\views\Team.xml:14
+Mail,邮件,,resources\views\Mail.xml:72
+ManyToMany,多对多,,resources\views\Meta.xml:353 resources\views\MetaJson.xml:21
+ManyToOne,多对一,,resources\views\Meta.xml:351 resources\views\MetaJson.xml:20
+Mapped by,映射条件,,resources\domains\Meta.xml:222
+Max,最大值,,resources\views\MetaJson.xml:50
+Max size,最大大小,,resources\domains\MetaJson.xml:40
+Max size 4MB.,最大大小 4MB.,,resources\domains\User.xml:19
+Members,成员,,resources\domains\Team.xml:13
+Menu,菜单,,resources\domains\Meta.xml:236 resources\domains\MetaJson.xml:73 resources\views\MetaJson.xml:162
+Menu Help,菜单帮助,,resources\views\Menu.xml:135 resources\views\Menu.xml:143 resources\views\Meta.xml:436
+Menu Item,菜单项,,resources\views\Meta.xml:230
+Menu Items,菜单项,,resources\views\Meta.xml:190 resources\views\Meta.xml:196
+Menu background,菜单背景,,resources\domains\MetaJson.xml:76
+Menu icon,菜单图标,,resources\domains\MetaJson.xml:75
+Menu order,菜单顺序,,resources\domains\Meta.xml:89 resources\domains\MetaJson.xml:77
+Menu parent,上级菜单,,resources\domains\MetaJson.xml:74
+Menu title,菜单标题,,resources\domains\MetaJson.xml:78
+Menu top,顶部菜单,,resources\domains\MetaJson.xml:79
+Menus,菜单,,resources\domains\Group.xml:24 resources\domains\Role.xml:14 resources\views\Menu.xml:90
+Message,消息,,resources\domains\Mail.xml:36 resources\domains\Mail.xml:55 resources\domains\Meta.xml:229
+Meta file,元文件,,resources\domains\DMS.xml:18
+Meta model,元模型,,resources\domains\Meta.xml:216
+Meta permission,元权限,,resources\domains\MetaPermission.xml:17
+MetaScheduleParam,MetaScheduleParam,,resources\views\Schedules.xml:38
+Min,最小值,,resources\views\MetaJson.xml:49
+Min size,最小大小,,resources\domains\MetaJson.xml:39
+Mobile menu,移动设备菜单,,resources\domains\Meta.xml:102
+Model,模型,,resources\domains\Meta.xml:154 resources\domains\Meta.xml:237 resources\domains\Meta.xml:34 resources\domains\Meta.xml:74 resources\domains\MetaJson.xml:14 resources\views\Meta.xml:340
+Model Management,模型管理,,resources\views\Menu.xml:8
+Model field,模型字段,,resources\domains\MetaJson.xml:15
+Models,模型,,resources\views\Menu.xml:62 resources\views\Meta.xml:333
+Modified,修改于,,resources\views\DMS.xml:36
+Module,模块,,resources\domains\Meta.xml:134 resources\domains\Meta.xml:155 resources\domains\Meta.xml:177 resources\domains\Meta.xml:35 resources\domains\Meta.xml:95 resources\views\Meta.xml:64 resources\views\Meta.xml:65
+Module Management,模块管理,,resources\views\Menu.xml:11
+Module to check,应检查模块,,resources\domains\Meta.xml:115
+Modules,模块,,resources\views\Menu.xml:53
+My Documents,我的文档,,resources\views\DMS.xml:173 resources\views\DMS.xml:214
+My Teams,我的团队,,resources\views\Team.xml:145 resources\views\Team.xml:212
+My open tasks,我的进行中的任务,,resources\views\Team.xml:173 resources\views\Team.xml:207
+Name,名称,,resources\domains\DMS.xml:33 resources\domains\Group.xml:14 resources\domains\Meta.xml:13 resources\domains\Meta.xml:131 resources\domains\Meta.xml:151 resources\domains\Meta.xml:167 resources\domains\Meta.xml:175 resources\domains\Meta.xml:204 resources\domains\Meta.xml:217 resources\domains\Meta.xml:30 resources\domains\Meta.xml:71 resources\domains\Meta.xml:91 resources\domains\MetaFilter.xml:14 resources\domains\MetaJson.xml:65 resources\domains\MetaJson.xml:89 resources\domains\MetaJson.xml:9 resources\domains\MetaPermission.xml:10 resources\domains\MetaSchedule.xml:10 resources\domains\MetaSchedule.xml:20 resources\domains\MetaSequence.xml:12 resources\domains\Permission.xml:13 resources\domains\Role.xml:12 resources\domains\Team.xml:19 resources\domains\Team.xml:49 resources\domains\Team.xml:9 resources\domains\User.xml:14 resources\views\DMS.xml:23 resources\views\DMS.xml:69
+Name field,名称字段,,resources\domains\MetaJson.xml:36 resources\domains\MetaJson.xml:69
+Name length should be greater than 2.,名称必须长于两个字符。,,resources\views\Group.xml:42 resources\views\User.xml:78
+Navigation,导航,,resources\domains\Group.xml:15
+New,新建,,resources\views\Team.xml:7
+New password,新密码,,resources\views\User.xml:44 resources\views\User.xml:67
+Next,下一个值,,resources\domains\MetaSequence.xml:18
+No archived messages!,没有已标记为存档的消息！,,resources\views\Mail.xml:40
+No help,无帮助,,resources\domains\User.xml:25
+No important messages!,无重要的消息！,,resources\views\Mail.xml:29
+Normal,一般,,resources\views\Team.xml:15
+Object,对象,,resources\domains\Meta.xml:268 resources\domains\MetaPermission.xml:11 resources\domains\Permission.xml:14
+Object name,对象名称,,resources\domains\Meta.xml:267
+On change,修改事件,,resources\domains\MetaJson.xml:56
+On click,单击事件,,resources\domains\MetaJson.xml:57
+On new,新建事件,,resources\domains\MetaJson.xml:67
+On save,保存事件,,resources\domains\MetaJson.xml:68
+OneToMany,一对多,,resources\views\Meta.xml:352 resources\views\MetaJson.xml:22
+OneToOne,一对一,,resources\views\Meta.xml:350
+Only if,仅当,,resources\views\MetaJson.xml:78
+Only use this menu-item if the given expression is true (ie `if` condition).,仅当给定的表达式为真的时候使用此菜单项（例如“if”条件）。,,resources\domains\Meta.xml:114
+Only use this menu-item if the given module is installed (ie `if-module` condition).,仅当给定的模块安装后才使用此菜单项（例如“if-module”条件）。,,resources\domains\Meta.xml:115
+Options,选项,,resources\views\MetaJson.xml:102 resources\views\MetaJson.xml:37
+Order,排序,,resources\domains\Meta.xml:129 resources\domains\Meta.xml:194 resources\views\MetaJson.xml:167
+Order by,排序依据,,resources\domains\MetaJson.xml:71
+Overview,总览,,resources\views\DMS.xml:68 resources\views\Group.xml:22 resources\views\Meta.xml:123 resources\views\Meta.xml:156 resources\views\Meta.xml:177 resources\views\Meta.xml:217 resources\views\Meta.xml:274 resources\views\Meta.xml:294 resources\views\Meta.xml:310 resources\views\Meta.xml:341 resources\views\Meta.xml:365 resources\views\Meta.xml:409 resources\views\Meta.xml:437 resources\views\Meta.xml:457 resources\views\MetaJson.xml:114 resources\views\MetaJson.xml:135 resources\views\MetaJson.xml:153 resources\views\MetaJson.xml:188 resources\views\MetaPermission.xml:12 resources\views\MetaPermission.xml:26 resources\views\Permission.xml:22 resources\views\Role.xml:11 resources\views\Schedules.xml:21 resources\views\Schedules.xml:39 resources\views\Team.xml:117 resources\views\Team.xml:52 resources\views\Team.xml:85 resources\views\User.xml:21
+Owner,所有者,,resources\views\DMS.xml:34
+Package,包,,resources\domains\Meta.xml:205 resources\domains\Meta.xml:218
+Padding,填充,,resources\domains\MetaSequence.xml:15
+Panel,面板,,resources\views\MetaJson.xml:14
+Params,参数,,resources\domains\MetaSchedule.xml:24 resources\views\Permission.xml:35
+Parent,上级,,resources\domains\DMS.xml:11 resources\domains\Mail.xml:43 resources\domains\Meta.xml:107 resources\domains\Meta.xml:136
+Parent menu,上级菜单,,resources\views\MetaJson.xml:164
+Password,密码,,resources\domains\User.xml:15
+Password doesn't match configured pattern.,密码不符合已配置的模式。,,resources\views\User.xml:83
+Pending,待定,,resources\domains\Meta.xml:22
+Permission,权限,,resources\domains\DMS.xml:42 resources\views\DMS.xml:106 resources\views\DMS.xml:115 resources\views\DMS.xml:96 resources\views\Permission.xml:21
+Permissions,权限,,resources\domains\DMS.xml:21 resources\domains\Group.xml:21 resources\domains\Role.xml:15 resources\domains\User.xml:33 resources\views\DMS.xml:89 resources\views\Group.xml:49 resources\views\Menu.xml:41 resources\views\Menu.xml:44 resources\views\MetaPermission.xml:11 resources\views\MetaPermission.xml:6 resources\views\Permission.xml:11 resources\views\Permission.xml:6
+Permissions (fields),字段权限,,resources\domains\Group.xml:22 resources\domains\Role.xml:16 resources\domains\User.xml:34
+Personal,个性化,,resources\domains\Mail.xml:13
+Personalized View,个性化视图,,resources\views\Meta.xml:155
+Personalized Views,个性化视图,,resources\views\Meta.xml:146
+Photo,照片,,resources\domains\Team.xml:11 resources\domains\User.xml:19
+Placeholder,占位符,,resources\views\Meta.xml:47
+Please change your password.,请修改你的密码。,,java\com\axelor\auth\pac4j\AuthPac4jModuleLocal.java:55
+Please log back in.,请重新登录。,,java\com\axelor\auth\AuthObserver.java:70
+Please refresh your browser to see updated views.,请刷新浏览器以便看到更新后的视图。,,java\com\axelor\meta\web\MetaController.java:198
+Precision,精度,,resources\domains\MetaJson.xml:41
+Preferences,首选项,,resources\views\User.xml:55
+Prefix,前缀,,resources\domains\MetaSequence.xml:13
+Priority,优先级,,resources\domains\Meta.xml:128 resources\domains\Meta.xml:149 resources\domains\Meta.xml:176 resources\domains\Meta.xml:33 resources\domains\Meta.xml:88 resources\domains\Team.xml:22
+Read,读取,,resources\domains\MetaPermission.xml:19 resources\domains\Permission.xml:15
+Readonly,只读,,resources\domains\MetaJson.xml:35
+Readonly if,只读条件,,resources\domains\MetaJson.xml:24 resources\domains\MetaPermission.xml:22
+Recipients,收件人,,resources\domains\Mail.xml:30
+Record created,已创建记录,,java\com\axelor\auth\AuditTracker.java:326
+Record updated,已更新记录,,java\com\axelor\auth\AuditTracker.java:326
+Record was updated or deleted by another transaction,该记录已被其他事务创建或更新,,java\com\axelor\rpc\ResponseInterceptor.java:151
+Reference error,引用错误,,java\com\axelor\rpc\ResponseInterceptor.java:228
+Regex,正则表达式,,resources\domains\MetaJson.xml:46
+Related,关联,,resources\domains\DMS.xml:14 resources\domains\Mail.xml:65 resources\domains\Team.xml:29
+Related document id,关联文档 ID,,resources\domains\Mail.xml:38
+Related document model,关联文档模型,,resources\domains\Mail.xml:39
+Related document name,关联文档名称,,resources\domains\Mail.xml:40
+Related model,关联模型,,resources\domains\Mail.xml:66 resources\domains\Team.xml:27
+Related name,关联名称,,resources\domains\Team.xml:28
+Related object,关联对象,,resources\domains\DMS.xml:15
+Relationship,关系,,resources\domains\Meta.xml:221
+Removable,可移除,,resources\domains\Meta.xml:20
+Remove,移除,,resources\domains\Permission.xml:18
+Replies,回复,,resources\domains\Mail.xml:44
+Required,必填,,resources\domains\MetaJson.xml:34
+Required if,必填条件,,resources\domains\MetaJson.xml:23
+Restart jobs,重启后台任务,,resources\views\Schedules.xml:8
+Restart the server for updates to take effect.,请重启服务器以便看到更新的效果。,,java\com\axelor\meta\web\ModuleController.java:40
+Restore all…,全部恢复...,,resources\views\Meta.xml:95
+Role,角色,,resources\views\Role.xml:10
+Roles,角色,,resources\domains\Group.xml:20 resources\domains\Meta.xml:112 resources\domains\MetaJson.xml:61 resources\domains\MetaJson.xml:84 resources\domains\User.xml:32 resources\views\Menu.xml:32 resources\views\Menu.xml:35 resources\views\Role.xml:6
+Root,根,,resources\domains\Mail.xml:42
+Rule,规则,,resources\views\MetaPermission.xml:25
+Rules,规则,,resources\domains\MetaPermission.xml:13
+SQL error,SQL 错误,,java\com\axelor\rpc\ResponseInterceptor.java:238
+Scale,比例,,resources\domains\MetaJson.xml:42
+Schedule,任务计划,,resources\domains\MetaSchedule.xml:12 resources\views\Schedules.xml:17
+Schedules,任务计划,,resources\views\Schedules.xml:6
+Schema,数据库架构,,resources\views\Meta.xml:141 resources\views\Meta.xml:162 resources\views\Meta.xml:185
+Search,搜索,,resources\views\Meta.xml:17
+Select,选项,,resources\domains\Meta.xml:196
+Select Item,选项条目,,resources\views\Meta.xml:309
+Selection,选择,,resources\domains\MetaJson.xml:18
+Selects,选项,,resources\views\Menu.xml:107
+Separator,分隔符,,resources\views\MetaJson.xml:19
+Sequence,序列,,resources\domains\MetaJson.xml:43 resources\domains\Team.xml:23
+Sequence order,序列顺序,,resources\views\Meta.xml:316
+Server expression to check whether to use this field.,用于决定是否使用此字段的服务器端表达式。,,resources\views\MetaJson.xml:92
+Shared,已分享,,resources\domains\MetaFilter.xml:20
+Shared with me,已与我分享,,resources\views\DMS.xml:161
+Show Model,显示模型,,resources\views\Meta.xml:372
+Show if,显示条件,,resources\domains\MetaJson.xml:21
+Show in top menu,显示于顶部菜单,,resources\views\MetaJson.xml:168
+Show permissions,显示权限,,resources\views\Group.xml:20
+Simplified Chinese,简体中文,,resources\views\User.xml:9
+Single tab,单标签页,,resources\domains\User.xml:24
+Size,大小,,resources\domains\Meta.xml:255 resources\views\DMS.xml:13
+Size in bytes,大小（字节）,,resources\domains\Meta.xml:252
+Spacer,间隔区,,resources\views\MetaJson.xml:18
+Specify whether the members of this group are technical staff.,指定该组的这些成员是否是技术岗员工。,,resources\domains\Group.xml:18
+Specify whether this action can be used as home action.,指定该动作是否可以作为主页动作。,,resources\domains\Meta.xml:153
+Status,状态,,resources\domains\Team.xml:21
+Stop service,停止服务,,resources\views\Schedules.xml:9
+String,字符串,,resources\views\MetaJson.xml:7
+Style,样式,,resources\domains\DMS.xml:34 resources\domains\Meta.xml:241
+Subject,主题,,resources\domains\Mail.xml:32
+Subscribe,订阅,,resources\views\Team.xml:41
+Success,成功,,resources\views\DMS.xml:131 resources\views\Meta.xml:39
+Suffix,后缀,,resources\domains\MetaSequence.xml:14
+Summary,摘要,,resources\domains\Mail.xml:34
+System notification,系统通知,,resources\views\Mail.xml:10
+Table,表格,,resources\domains\Meta.xml:206
+Tag,标签,,resources\views\DMS.xml:144 resources\views\DMS.xml:160 resources\views\Meta.xml:251
+Tag count,标签数,,resources\domains\Meta.xml:98
+Tag label,标签标题,,resources\domains\Meta.xml:96
+Tag method,标签方法,,resources\domains\Meta.xml:97
+Tag style,标签演示,,resources\domains\Meta.xml:99
+Tags,标签,,resources\domains\DMS.xml:24 resources\views\DMS.xml:122 resources\views\DMS.xml:138 resources\views\DMS.xml:190 resources\views\DMS.xml:217 resources\views\DMS.xml:38
+Target custom model,目标自定义模型,,resources\views\MetaJson.xml:60
+Target json model,目标 JSON 模型,,resources\domains\MetaJson.xml:54
+Target model,目标模型,,resources\domains\MetaJson.xml:49
+Task,任务,,resources\views\Team.xml:84
+Task closed,已关闭任务,,resources\domains\Team.xml:42
+Task created,已创建任务,,resources\domains\Team.xml:41
+Task date,任务日期,,resources\domains\Team.xml:24
+Task deadline,任务截止时间,,resources\domains\Team.xml:26
+Task duration,任务周期,,resources\domains\Team.xml:25
+Tasks,任务,,resources\views\Team.xml:202 resources\views\Team.xml:69 resources\views\Team.xml:80
+Tasks assigned to me,分配给我的任务,,resources\views\Team.xml:181 resources\views\Team.xml:208
+Tasks created by me,我创建的任务,,resources\views\Team.xml:188 resources\views\Team.xml:209
+Tasks due,到期任务,,resources\views\Team.xml:151 resources\views\Team.xml:205
+Tasks todo,待办任务,,resources\views\Team.xml:162 resources\views\Team.xml:206
+Team,团队,,resources\domains\Team.xml:18 resources\domains\Team.xml:52 resources\views\Team.xml:21 resources\views\Team.xml:51
+Teams,团队,,resources\views\Team.xml:203 resources\views\Team.xml:24 resources\views\Team.xml:28
+Teamwork,团队协同,,resources\views\Team.xml:201
+Technical staff,技术岗员工,,resources\domains\Group.xml:18
+The addition data for UI widgets,用户界面控件得附加数据,,resources\domains\Meta.xml:193
+The image icon to show in UI widgets,界面控件中要显示的图标图片。,,resources\domains\Meta.xml:192
+The module can't be uninstalled because other modules are pending. Please restart the server before.,不能卸载模块，因为有其他模块处于未决状态。请先重启服务器。,,java\com\axelor\meta\web\ModuleController.java:49
+The module can't be uninstalled because other non-removable modules depend on it.,不能卸载模块，因为有其他不可卸载的模块依赖它。,,java\com\axelor\meta\web\ModuleController.java:46
+"The record(s) are referenced by other records, please remove all the references first.",有其他的记录引用了此记录，请先删除其他的记录。,,java\com\axelor\rpc\ResponseInterceptor.java:231
+The record(s) can't be updated as it violates unique constraint.,无法更新记录，因为违反了唯一性约束。,,java\com\axelor\rpc\ResponseInterceptor.java:235
+The scheduler service has been stopped.,任务计划服务已停止。,,java\com\axelor\meta\web\JobController.java:77
+The scheduler service is disabled.,任务计划服务已禁用。,,java\com\axelor\quartz\JobRunner.java:159 java\com\axelor\quartz\JobRunner.java:181
+The select item title,选项标题,,resources\domains\Meta.xml:190
+The select item value,选项条目值,,resources\domains\Meta.xml:191
+Theme,主题,,resources\domains\User.xml:23
+This may terminate any running jobs. Are sure to continue ?,将终止所有运行中的后台任务，你确定要继续？,,resources\views\Schedules.xml:8 resources\views\Schedules.xml:9
+This will update job with current settings. Are sure to continue ?,将使用当前设置更新后台任务，你确定要继续？,,resources\views\Schedules.xml:29
+Time,时间,,resources\views\MetaJson.xml:13
+Title,标题,,resources\domains\Meta.xml:132 resources\domains\Meta.xml:14 resources\domains\Meta.xml:190 resources\domains\Meta.xml:31 resources\domains\Meta.xml:72 resources\domains\Meta.xml:92 resources\domains\MetaFilter.xml:15 resources\domains\MetaJson.xml:10 resources\domains\MetaJson.xml:66 resources\views\MetaJson.xml:163
+Tooltip,弹出提示,,resources\views\Meta.xml:46
+Top menu," 顶部菜单",,resources\domains\Meta.xml:100
+Topic,主题,,resources\views\Team.xml:116
+Topic closed,已关闭主题,,resources\domains\Team.xml:57
+Topic created,已创建主题,,resources\domains\Team.xml:56
+Topic re-opened,重新打开的主题,,resources\domains\Team.xml:58
+Topics,主题,,resources\domains\Team.xml:14 resources\views\Team.xml:111 resources\views\Team.xml:196
+Translation,翻译,,resources\views\Meta.xml:392 resources\views\Meta.xml:393
+Tree,树,,resources\views\Meta.xml:9
+Type,类型,,resources\domains\Mail.xml:21 resources\domains\Meta.xml:152 resources\domains\Meta.xml:219 resources\domains\Meta.xml:242 resources\domains\Meta.xml:32 resources\domains\Meta.xml:73 resources\domains\MetaJson.xml:12 resources\views\DMS.xml:28
+Unexpected database error occurred on the server.,服务器端发生了未预期的数据库错误。,,java\com\axelor\rpc\ResponseInterceptor.java:239
+Uninstall,卸载,,resources\views\Meta.xml:75
+Unique constraint violation,违反唯一性约束,,java\com\axelor\rpc\ResponseInterceptor.java:234
+Unique message identifier,唯一的消息标识符,,resources\domains\Mail.xml:36
+Unread,未读,,resources\views\Mail.xml:54
+Unsubscribe,未订阅,,resources\views\Team.xml:42
+Update,更新,,resources\views\Schedules.xml:29
+Updated by,更新者,,java\com\axelor\auth\db\AuditableModel.java:51
+Updated on,更新时间,,java\com\axelor\auth\db\AuditableModel.java:42
+Urgent,紧急,,resources\domains\Team.xml:43 resources\views\Team.xml:17
+Used as home action,作为主页动作,,resources\domains\Meta.xml:153
+User,用户,,resources\domains\DMS.xml:41 resources\domains\Mail.xml:54 resources\domains\Mail.xml:69 resources\domains\Meta.xml:109 resources\domains\Meta.xml:76 resources\domains\MetaFilter.xml:21 resources\views\User.xml:20
+User Management,用户管理,,resources\views\Menu.xml:7
+User preferences,用户首选项,,resources\views\User.xml:56
+Users,用户,,resources\views\Menu.xml:15 resources\views\Menu.xml:17 resources\views\User.xml:12
+Valid cron. Next execution dates are :,无效的 cron 表达式。下次执行时间：,,java\com\axelor\meta\web\JobController.java:46
+Validate,校验,,resources\views\Schedules.xml:28
+Validation error,校验错误,,java\com\axelor\rpc\ResponseInterceptor.java:183
+Value,值,,resources\domains\DMS.xml:38 resources\domains\Meta.xml:191 resources\domains\MetaSchedule.xml:11 resources\views\MetaJson.xml:84
+Value Expression,值表达式,,resources\domains\MetaJson.xml:47 resources\views\MetaJson.xml:94
+Version,版本,,resources\domains\Meta.xml:16
+View,视图,,resources\domains\Meta.xml:239 resources\views\Meta.xml:122
+View Help,视图帮助,,resources\views\Menu.xml:132 resources\views\Menu.xml:137 resources\views\Meta.xml:408
+View Management,视图管理,,resources\views\Menu.xml:9
+Views,视图,,resources\domains\Group.xml:25 resources\views\Menu.xml:71 resources\views\Meta.xml:86
+Visibility,可见性,,resources\views\Meta.xml:241
+Visible,可见,,resources\views\Group.xml:7
+Visible in grid,在网格中可见,,resources\domains\MetaJson.xml:37
+Warning,警告,,resources\views\DMS.xml:132 resources\views\Meta.xml:40
+Whether to grant create access.,是否授予创建的权限。,,resources\domains\Permission.xml:17
+Whether to grant export access.,是否授予导出的权限。,,resources\domains\Permission.xml:19
+Whether to grant read access.,是否授予读取的权限。,,resources\domains\Permission.xml:15
+Whether to grant remove access.,是否授予删除的权限。,,resources\domains\Permission.xml:18
+Whether to grant write access.,是否授予写入修改的权限。,,resources\domains\Permission.xml:16
+Whether to show help messages.,受否要显示帮助消息。,,resources\domains\User.xml:25
+Whether to use tabbed ui.,是否使用标签页界面。,,resources\domains\User.xml:24
+Widget,界面控件,,resources\domains\MetaJson.xml:19
+Widget Attributes,控件属性,,resources\views\MetaJson.xml:109
+Widget attrs,控件属性,,resources\domains\MetaJson.xml:59
+Write,写入,,resources\domains\MetaPermission.xml:20 resources\domains\Permission.xml:16
+Wrong current password,当前密码错误,,java\com\axelor\auth\AuthRealm.java:46 java\com\axelor\auth\pac4j\AuthPac4jModuleLocal.java:54
+Wrong username or password,错误的用户名或密码,,java\com\axelor\auth\AuthRealm.java:45 java\com\axelor\auth\pac4j\AuthPac4jModuleLocal.java:53
+Xml,XML,,resources\domains\Meta.xml:130 resources\domains\Meta.xml:150 resources\domains\Meta.xml:156 resources\domains\Meta.xml:174 resources\domains\Meta.xml:36 resources\domains\Meta.xml:38 resources\domains\Meta.xml:75 resources\domains\Meta.xml:90
+You are not allowed to remove this filter,你不允许删除该过滤器,,java\com\axelor\meta\service\MetaFilterService.java:71
+You are not authorized to create this resource.,你未被授权创建此资源。,,java\com\axelor\db\JpaSecurity.java:29
+You are not authorized to export the data.,你未被授权导出此数据。,,java\com\axelor\db\JpaSecurity.java:31
+You are not authorized to read this resource.,你未被授权读取此资源。,,java\com\axelor\db\JpaSecurity.java:27
+You are not authorized to remove this resource.,你未被授权删除此资源。,,java\com\axelor\db\JpaSecurity.java:30
+You are not authorized to update this resource.,你未被授权更新此资源。,,java\com\axelor\db\JpaSecurity.java:28
+You can't create document here.,你不能在此处创建文档。,,java\com\axelor\dms\db\repo\DMSFileRepository.java:433
+You can't move document here.,你不能在此处移动文档。,,java\com\axelor\dms\db\repo\DMSFileRepository.java:436
+Your password,你的密码,,resources\views\User.xml:42
+action-attrs,action-attrs,,resources\views\Meta.xml:22
+action-condition,action-condition,,resources\views\Meta.xml:27
+action-export,action-export,,resources\views\Meta.xml:31
+action-group,action-group,,resources\views\Meta.xml:25
+action-import,action-import,,resources\views\Meta.xml:30
+action-method,action-method,,resources\views\Meta.xml:29
+action-record,action-record,,resources\views\Meta.xml:28
+action-report,action-report,,resources\views\Meta.xml:32
+action-script,action-script,,resources\views\Meta.xml:24
+action-validate,action-validate,,resources\views\Meta.xml:26
+action-view,action-view,,resources\views\Meta.xml:23
+action-ws,action-ws,,resources\views\Meta.xml:33
+added comment,已添加备注,,java\com\axelor\mail\db\repo\MailMessageRepository.java:341
+confirm password,再次输入密码,,resources\views\User.xml:45 resources\views\User.xml:68
+current password,当前密码,,resources\views\User.xml:65
+form::Select,Select,,resources\views\Meta.xml:293
+important,重要,,resources\domains\Team.xml:43
+login name,用户名,,resources\views\User.xml:23
+new password,新密码,,resources\views\User.xml:44 resources\views\User.xml:67
+success,成功,,resources\domains\Team.xml:42
+updated document,已更新文档,,java\com\axelor\mail\db\repo\MailMessageRepository.java:338
+user group,用户组,,resources\views\User.xml:24
+user name,用户名,,resources\views\User.xml:22
+user.password.pattern.title,密码不符合要求：<br/>至少需要 4 个字符。,,java\com\axelor\app\AvailableAppSettings.java:98
+your password,你的密码,,resources\views\User.xml:42
+{0} customized view is deleted.,{0} 自定义视图已删除。,,java\com\axelor\meta\web\MetaController.java:159
+{0} customized views are deleted.,{0} 自定义视图已删除。,,java\com\axelor\meta\web\MetaController.java:159
