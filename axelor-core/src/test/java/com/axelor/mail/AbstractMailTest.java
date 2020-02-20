@@ -20,6 +20,7 @@ package com.axelor.mail;
 import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.DummySSLSocketFactory;
+import com.icegreen.greenmail.util.ServerSetup;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import java.security.Security;
 import org.junit.After;
@@ -51,6 +52,9 @@ public abstract class AbstractMailTest {
   @Before
   public void startServer() {
     Security.setProperty("ssl.SocketFactory.provider", DummySSLSocketFactory.class.getName());
+    ServerSetup.SMTP.setServerStartupTimeout(5000);
+    ServerSetup.POP3.setServerStartupTimeout(5000);
+    ServerSetup.IMAP.setServerStartupTimeout(5000);
     user = server.setUser(USER_NAME, USER_PASS);
     server.start();
   }
