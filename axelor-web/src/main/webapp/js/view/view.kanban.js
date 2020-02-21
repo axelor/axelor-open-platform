@@ -616,6 +616,9 @@ ui.directive('uiCard', ["$compile", function ($compile) {
       });
 
       function showSummary() {
+        if((summary.text() || "").trim() == "") {
+          return;
+        }
         configureSummary();
         if (summaryPlacement) {
           clearTimeout(summaryPlacement);
