@@ -19,7 +19,7 @@ versions.ldaptive = "1.2.4"
 versions.junit = "4.12"
 versions.slf4j = "1.7.25"
 
-versions.tomcat = "8.5.24"
+versions.tomcat = "8.5.51"
 versions.tomcat_embed = "${versions.tomcat}"
 
 // unit testing
