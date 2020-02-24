@@ -254,7 +254,8 @@ public class JobRunner {
               : Longs.tryParse(((Map<?, ?>) item).get("id").toString());
       MetaSchedule record = Beans.get(MetaScheduleRepository.class).find(id);
       if (record.getActive() == Boolean.TRUE) {
-        throw new IllegalStateException("Cannot delete a task while schedular is running...");
+        throw new IllegalStateException(
+            I18n.get("Cannot delete a task while scheduler is running..."));
       }
     }
   }

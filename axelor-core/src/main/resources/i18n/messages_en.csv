@@ -49,6 +49,7 @@
 "Can share",,,
 "Can write",,,
 "Canceled",,,
+"Cannot delete a task while scheduler is running...",,,
 "Cards",,,
 "Category",,,
 "Category name to group action menus.",,,

@@ -49,6 +49,7 @@
 "Can share","Peut partager",,
 "Can write","Peut écrire",,
 "Canceled","Annulé",,
+"Cannot delete a task while scheduler is running...","Impossible de supprimer la tâche pendant l'exécution du planificateur...",,
 "Cards","Cartes",,
 "Category","Catégorie",,
 "Category name to group action menus.","Nom de la catégorie pour grouper les actions menus",,
