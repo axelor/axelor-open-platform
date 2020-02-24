@@ -1027,7 +1027,7 @@ public class Resource<T extends Model> {
 
     Request req = newRequest(request, id);
 
-    firePreRequestEvent(RequestEvent.REMOVE, request);
+    firePreRequestEvent(RequestEvent.REMOVE, req);
 
     Model bean = JPA.edit(model, data);
     if (bean.getId() != null) {
