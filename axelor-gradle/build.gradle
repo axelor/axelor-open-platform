@@ -56,12 +56,3 @@ classes.doLast {
 tasks.withType(PublishToMavenRepository).all {
   enabled =  name != 'publishMavenJavaPublicationToMavenRepository'
 }
-
-// XXX: https://github.com/gradle/gradle/issues/12047
-eclipse.classpath.file {
-  whenMerged { cp ->
-    def e = cp.entries.find { e -> e.path.contains("org.eclipse.jdt.launching.JRE_CONTAINER") }
-    e.entryAttributes['module'] = true
-    e.entryAttributes['limit-modules'] = 'java.base'
-  }
-}

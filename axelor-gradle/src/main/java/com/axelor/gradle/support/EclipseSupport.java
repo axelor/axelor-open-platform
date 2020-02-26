@@ -17,16 +17,12 @@
  */
 package com.axelor.gradle.support;
 
-import com.axelor.common.FileUtils;
 import com.axelor.gradle.AppPlugin;
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.tasks.GenerateCode;
 import com.axelor.gradle.tasks.TomcatRun;
-import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
-import com.google.common.io.Files;
+import com.axelor.tools.ide.EclipseHelper;
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,8 +39,6 @@ import org.gradle.plugins.ide.eclipse.model.EclipseClasspath;
 import org.gradle.plugins.ide.eclipse.model.EclipseModel;
 import org.gradle.plugins.ide.eclipse.model.Library;
 import org.gradle.plugins.ide.eclipse.model.SourceFolder;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 public class EclipseSupport extends AbstractSupport {
 
@@ -73,7 +67,13 @@ public class EclipseSupport extends AbstractSupport {
                     task -> {
                       final File cpFile = new File(project.getRootDir(), ".classpath");
                       task.onlyIf(t -> cpFile.exists());
-                      task.doLast(a -> generateLauncher(project));
+                      task.doLast(
+                          a ->
+                              EclipseHelper.createLauncher(
+                                  project.getRootDir(),
+                                  project.getName(),
+                                  TomcatRun.getArgs(project, 8080),
+                                  TomcatRun.getJvmArgs(project, true, false)));
                       final Task generateLauncher =
                           project.getTasks().getByName("generateLauncher");
                       if (generateLauncher != null) {
@@ -173,96 +173,9 @@ public class EclipseSupport extends AbstractSupport {
     if (dir != null) {
       eclipse.getProject().linkedResource(link("axelor-webapp", dir.getPath()));
       eclipse.getWtp().getComponent().resource(resource("/", dir.getPath()));
-      eclipse
-          .getWtp()
-          .getComponent()
-          .getFile()
-          .withXml(
-              provider -> {
-                // XXX: fix linked resource path issue
-                final NodeList nodes = provider.asElement().getElementsByTagName("wb-resource");
-                for (int i = 0; i < nodes.getLength(); i++) {
-                  final Element n = (Element) nodes.item(i);
-                  if (dir.getPath().equals(n.getAttribute("source-path"))) {
-                    n.setAttribute("source-path", "axelor-webapp");
-                    break;
-                  }
-                }
-              });
     }
 
     // finally add build/webapp
     eclipse.getWtp().getComponent().resource(resource("/", "build/webapp"));
-  }
-
-  private void generateLauncher(Project project) {
-    final StringBuilder builder = new StringBuilder();
-    builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
-    builder.append(
-        "<launchConfiguration type=\"org.eclipse.jdt.launching.localJavaApplication\">\n");
-
-    builder
-        .append("<listAttribute key=\"org.eclipse.debug.core.MAPPED_RESOURCE_PATHS\">\n")
-        .append("<listEntry value=\"/")
-        .append(project.getName())
-        .append("\"/>\n")
-        .append("</listAttribute>\n");
-
-    builder
-        .append("<listAttribute key=\"org.eclipse.debug.core.MAPPED_RESOURCE_TYPES\">\n")
-        .append("<listEntry value=\"4\"/>\n")
-        .append("</listAttribute>\n");
-
-    builder.append(
-        "<booleanAttribute key=\"org.eclipse.jdt.launching.ATTR_EXCLUDE_TEST_CODE\" value=\"true\"/>\n");
-    builder.append(
-        "<booleanAttribute key=\"org.eclipse.jdt.launching.ATTR_USE_CLASSPATH_ONLY_JAR\" value=\"true\"/>\n");
-    builder.append(
-        "<booleanAttribute key=\"org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD\" value=\"true\"/>\n");
-
-    builder
-        .append("<stringAttribute key=\"org.eclipse.jdt.launching.MAIN_TYPE\"")
-        .append(" value=")
-        .append('"')
-        .append("com.axelor.app.internal.AppRunner")
-        .append('"')
-        .append("/>\n");
-
-    builder
-        .append("<stringAttribute key=\"org.eclipse.jdt.launching.PROGRAM_ARGUMENTS\"")
-        .append(" value=")
-        .append('"')
-        .append(Joiner.on(' ').join(TomcatRun.getArgs(project, 8080)))
-        .append('"')
-        .append("/>\n");
-
-    builder
-        .append("<stringAttribute key=\"org.eclipse.jdt.launching.PROJECT_ATTR\"")
-        .append(" value=")
-        .append('"')
-        .append(project.getName())
-        .append('"')
-        .append("/>\n");
-
-    builder
-        .append("<stringAttribute key=\"org.eclipse.jdt.launching.VM_ARGUMENTS\"")
-        .append(" value=")
-        .append('"')
-        .append(Joiner.on(' ').join(TomcatRun.getJvmArgs(project, true, false)))
-        .append('"')
-        .append("/>\n");
-
-    builder.append("</launchConfiguration>");
-
-    final File output =
-        FileUtils.getFile(
-            project.getProjectDir(),
-            ".settings",
-            String.format("%s (run).launch", project.getName()));
-    try {
-      Files.createParentDirs(output);
-      Files.asCharSink(output, Charsets.UTF_8).write(builder);
-    } catch (IOException e) {
-    }
   }
 }

@@ -17,28 +17,18 @@
  */
 package com.axelor.gradle.support;
 
+import com.axelor.common.FileUtils;
 import com.axelor.gradle.AppPlugin;
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.tasks.GenerateCode;
 import com.axelor.gradle.tasks.TomcatRun;
-import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
-import com.google.common.io.Files;
-import java.io.ByteArrayInputStream;
+import com.axelor.tools.ide.IdeaHelper;
 import java.io.File;
-import java.io.IOException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
+import java.util.List;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
 import org.gradle.plugins.ide.idea.model.IdeaModel;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 public class IdeaSupport extends AbstractSupport {
 
@@ -63,28 +53,19 @@ public class IdeaSupport extends AbstractSupport {
                     });
           }
           if (project.getPlugins().hasPlugin(AppPlugin.class)) {
-            final String name = String.format("%s (run)", project.getName());
+            final File rootDir = project.getRootDir();
+            final File workspace = FileUtils.getFile(rootDir, ".idea", "workspace.xml");
+            final List<String> args = TomcatRun.getArgs(project, 8080);
+            final List<String> vmArgs = TomcatRun.getJvmArgs(project, true, false);
             project.getTasks().getByName("ideaModule").dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
-            project
-                .getExtensions()
-                .getByType(IdeaModel.class)
-                .getWorkspace()
-                .getIws()
-                .withXml(
-                    xmlProvider -> {
-                      try {
-                        generateLauncher(project.getRootProject(), xmlProvider.asElement(), name);
-                      } catch (Exception e) {
-                      }
-                    });
             project
                 .getTasks()
                 .create(
                     "generateIdeaLauncher",
                     task -> {
-                      task.onlyIf(
-                          t -> new File(project.getRootDir(), ".idea/workspace.xml").exists());
-                      task.doLast(t -> generateLauncher(project, name));
+                      task.onlyIf(t -> workspace.exists());
+                      task.doLast(
+                          t -> IdeaHelper.createLauncher(rootDir, project.getName(), args, vmArgs));
                       Task generateLauncher = project.getTasks().getByName("generateLauncher");
                       if (generateLauncher != null) {
                         generateLauncher.finalizedBy(task);
@@ -92,76 +73,5 @@ public class IdeaSupport extends AbstractSupport {
                     });
           }
         });
-  }
-
-  private void generateLauncher(Project project, Element root, String name) throws Exception {
-    final Document doc = root.getOwnerDocument();
-    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    final DocumentBuilder builder = factory.newDocumentBuilder();
-    final XPathFactory xPathfactory = XPathFactory.newInstance();
-    final XPath xpath = xPathfactory.newXPath();
-
-    final Element runManager =
-        (Element) xpath.evaluate("//component[@name='RunManager']", root, XPathConstants.NODE);
-    final Element run =
-        (Element)
-            xpath.evaluate(
-                "//configuration[@name='" + name + "']", runManager, XPathConstants.NODE);
-    if (run != null) {
-      runManager.removeChild(run);
-    }
-    final String code = generateRunConfiguration(project, name);
-    final Node node = builder.parse(new ByteArrayInputStream(code.getBytes())).getDocumentElement();
-    runManager.insertBefore(doc.importNode(node, true), runManager.getFirstChild());
-  }
-
-  private void generateLauncher(Project project, String name) {
-    final String outName =
-        String.format(".idea/runConfigurations/%s.xml", name.replaceAll("[^\\w]", "_"));
-    final File outFile = new File(project.getRootDir(), outName);
-    final String code =
-        "<component name='ProjectRunConfigurationManager'>\n"
-            + generateRunConfiguration(project, name)
-            + "</component>\n";
-
-    try {
-      Files.createParentDirs(outFile);
-      Files.asCharSink(outFile, Charsets.UTF_8).write(code);
-    } catch (IOException e) {
-    }
-  }
-
-  private String generateRunConfiguration(Project project, String name) {
-    final StringBuilder builder = new StringBuilder();
-    builder
-        .append("<configuration default=\"false\" name=\"")
-        .append(name)
-        .append("\" type=\"Application\" factoryName=\"Application\" singleton=\"true\">\n");
-    builder.append(
-        "  <extension name=\"coverage\" enabled=\"false\" merge=\"false\" sample_coverage=\"true\" runner=\"idea\" />\n");
-    builder.append(
-        "  <option name=\"MAIN_CLASS_NAME\" value=\"com.axelor.app.internal.AppRunner\" />\n");
-    builder
-        .append("  <option name=\"VM_PARAMETERS\" value=\"")
-        .append(Joiner.on(" ").join(TomcatRun.getJvmArgs(project, true, false)))
-        .append("\" />\n");
-    builder
-        .append("  <option name=\"PROGRAM_PARAMETERS\" value=\"")
-        .append(Joiner.on(" ").join(TomcatRun.getArgs(project, 8080)))
-        .append("\" />\n");
-    builder.append("  <option name=\"WORKING_DIRECTORY\" value=\"file://$PROJECT_DIR$\" />\n");
-    builder.append("  <option name=\"ALTERNATIVE_JRE_PATH_ENABLED\" value=\"false\" />\n");
-    builder.append("  <option name=\"ALTERNATIVE_JRE_PATH\" />\n");
-    builder.append("  <option name=\"ENABLE_SWING_INSPECTOR\" value=\"false\" />\n");
-    builder.append("  <option name=\"ENV_VARIABLES\" />\n");
-    builder.append("  <option name=\"PASS_PARENT_ENVS\" value=\"true\" />\n");
-    builder.append("  <shortenClasspath name=\"MANIFEST\" />\n");
-    builder.append("  <module name=\"").append(project.getName()).append(".main").append("\" />\n");
-    builder.append("  <envs />\n");
-    builder.append("  <method>\n");
-    builder.append("    <option name=\"Make\" enabled=\"true\" />\n");
-    builder.append("  </method>\n");
-    builder.append("</configuration>\n");
-    return builder.toString();
   }
 }
