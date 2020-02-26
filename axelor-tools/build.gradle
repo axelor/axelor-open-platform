@@ -1,0 +1,29 @@
+apply plugin: 'java-library'
+apply plugin: 'groovy'
+
+dependencies {
+  api libs.groovy
+
+  implementation project(':axelor-common')
+  implementation libs.guava
+  implementation libs.plugin_license
+  implementation libs.commons_csv
+  implementation libs.snakeyaml
+}
+
+sourceSets {
+  main {
+    java.srcDirs = []
+    groovy.srcDirs = ['src/main/java', 'src/main/groovy']
+  }
+}
+
+spotless {
+  groovy {
+    excludeJava()
+    greclipse()
+    indentWithSpaces(2)
+    trimTrailingWhitespace()
+    endWithNewline()
+  }
+}

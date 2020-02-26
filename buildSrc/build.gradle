@@ -13,11 +13,12 @@ sourceSets {
     }
     groovy {
       srcDirs '../axelor-gradle/src/main/java'
-      srcDirs '../axelor-gradle/src/main/groovy'
+      srcDirs '../axelor-tools/src/main/java'
+      srcDirs '../axelor-tools/src/main/groovy'
     }
     resources {
       srcDirs '../axelor-common/src/main/resources'
-      srcDirs '../axelor-gradle/src/main/resources'
+      srcDirs '../axelor-tools/src/main/resources'
     }
   }
 }
