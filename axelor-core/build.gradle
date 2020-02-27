@@ -29,7 +29,7 @@ dependencies {
   implementation libs.hibernate_search
 
   implementation libs.apache_tika_core
-  runtime libs.apache_tika_parsers
+  runtimeOnly libs.apache_tika_parsers
 
   implementation libs.flywaydb
 
