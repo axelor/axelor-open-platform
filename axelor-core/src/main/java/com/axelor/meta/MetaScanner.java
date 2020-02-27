@@ -144,11 +144,16 @@ public final class MetaScanner {
     }
 
     final ClassLoader loader = ClassUtils.getContextClassLoader();
+    final List<Path> outputs =
+        BUILD_OUTPUT_PATHS.stream()
+            .map(base::resolve)
+            .filter(Files::exists)
+            .collect(Collectors.toList());
 
     for (URL url : findClassPathURLs(loader)) {
       try {
         Path next = Paths.get(url.toURI());
-        if (Files.isDirectory(next) && next.startsWith(base)) {
+        if (Files.isDirectory(next) && outputs.contains(next)) {
           paths.add(url);
         }
       } catch (URISyntaxException e) {

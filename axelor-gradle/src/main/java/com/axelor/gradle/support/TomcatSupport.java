@@ -123,9 +123,6 @@ public class TomcatSupport extends AbstractSupport {
     final List<File> extraLibs = new ArrayList<>();
 
     for (File file : war.getClasspath()) {
-      if (file.isDirectory()) {
-        extraClasses.add(file);
-      }
       if (file.getName().endsWith(".jar")) {
         extraLibs.add(file);
       }
