@@ -72,9 +72,5 @@ task generateChangeLog(type: com.axelor.gradle.tasks.GenerateChangeLog) {
   }
 }
 
-wrapper {
-  gradleVersion = "5.6.4"
-}
-
 apply from: "gradle/javadoc.gradle"
 apply from: "gradle/style.gradle"
