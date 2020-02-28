@@ -21,6 +21,7 @@ import com.axelor.common.ClassUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.reflections.ClassFinder;
 import com.axelor.common.reflections.Reflections;
+import com.google.common.collect.Streams;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,6 +58,18 @@ public final class MetaScanner {
           "build/classes/scala/main",
           "build/classes/kotlin/main",
           "build/classes/groovy/main");
+
+  private static final List<String> BUILD_TEST_PATHS =
+      Arrays.asList(
+          "bin/test",
+          "out/test/classes",
+          "out/test/resources",
+          "build/resources/test",
+          "build/classes/test",
+          "build/classes/java/test",
+          "build/classes/scala/test",
+          "build/classes/kotlin/test",
+          "build/classes/groovy/test");
 
   private MetaScanner() {}
 
@@ -145,7 +158,7 @@ public final class MetaScanner {
 
     final ClassLoader loader = ClassUtils.getContextClassLoader();
     final List<Path> outputs =
-        BUILD_OUTPUT_PATHS.stream()
+        Streams.concat(BUILD_OUTPUT_PATHS.stream(), BUILD_TEST_PATHS.stream())
             .map(base::resolve)
             .filter(Files::exists)
             .collect(Collectors.toList());
