@@ -55,7 +55,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -175,10 +174,17 @@ public class ModuleManager {
   }
 
   public void update(Set<String> moduleNames, Set<Path> paths) {
-    final List<Module> moduleList =
-        resolver.all().stream()
-            .filter(m -> moduleNames.contains(m.getName()))
-            .collect(Collectors.toList());
+    final List<Module> moduleList = new ArrayList<>();
+    moduleNames.stream()
+        .forEach(
+            name -> {
+              final Module module = getModule(name);
+              if (module != null) {
+                moduleList.add(module);
+              } else {
+                log.error("Module not found: {}", name);
+              }
+            });
 
     try {
       pathsToRestore.addAll(paths);
