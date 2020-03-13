@@ -1,0 +1,4 @@
+---
+title: Fix new line confirmation in editable grid after ActionResponse#setValues
+type: fix
+

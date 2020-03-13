@@ -2090,6 +2090,9 @@ Grid.prototype.commitEdit = function () {
   var item = data.getItemByIdx(row);
 
   var record = _.extend({}, item, scope.record, { $dirty: true, _orignal: scope.$$original });
+  if (record.id === null || record.id === undefined) {
+    record.id = item.id;
+  }
 
   that.cols.forEach(function (col) {
     if (col.descriptor && col.descriptor.jsonField) {
