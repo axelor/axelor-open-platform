@@ -75,8 +75,7 @@ public final class ViewWatcher {
   private final List<ViewChangeEvent> pending = new ArrayList<>();
 
   private static final long UPDATE_DELAY = 200;
-  private static final Pattern moduleNamePattern =
-      Pattern.compile("(?:[a-z0-9_]+(?:\\.[a-z0-9_]+)+-)?(\\w*(-[a-z]\\w*)*)");
+  private static final Pattern moduleNamePattern = Pattern.compile("\\w*(-[a-z]\\w*)*");
   private Set<String> pendingModules;
   private Set<Path> pendingPaths;
   private ScheduledExecutorService scheduler;
@@ -199,7 +198,7 @@ public final class ViewWatcher {
       return;
     }
 
-    moduleName = moduleNameMatcher.group(1);
+    moduleName = moduleNameMatcher.group();
     addPending(moduleName, path);
   }
 
