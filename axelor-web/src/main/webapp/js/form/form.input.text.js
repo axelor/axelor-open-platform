@@ -137,14 +137,10 @@ ui.formInput('Text', {
   css: 'text-item',
   link_editable: function(scope, element, attrs, model) {
     this._super.apply(this, arguments);
-    var field = scope.field,
-      textarea = element.get(0);
+    var field = scope.field;
 
-    textarea.rows = parseInt(field.height) || 8;
-
-    //Firefox add one more line
-    if (axelor.browser.mozilla) {
-      textarea.rows -= 1;
+    if (element.is('textarea')) {
+      element.attr('rows', parseInt(field.height) || 8);
     }
 
     var field = scope.field,
@@ -175,6 +171,117 @@ ui.formInput('Text', {
   },
   template_editable: '<textarea></textarea >',
   template_readonly: '<pre ng-show="text">{{text}}</pre>'
+});
+
+ui.formInput('TextInline', 'Text', {
+  css: 'text-item-inline',
+  link_editable: function(scope, element, attrs, model) {
+    this._super.apply(this, arguments);
+    
+    var field = scope.field;
+    var picker = element;
+    var input = picker.children('input');
+    
+    var container = null;
+    var wrapper = $('<div class="slick-editor-dropdown textarea">').css("position", "absolute").hide();
+    var textarea = $('<textarea>').appendTo(wrapper);
+
+    scope.waitForActions(function() {
+      container = element.parents('.ui-dialog-content,.view-container').first();
+      wrapper.height(175).appendTo(container);
+    });
+
+    var dropdownVisible = false;
+
+    function adjust() {
+      if (!wrapper.is(":visible"))
+        return;
+      if (axelor.device.small) {
+        dropdownVisible = false;
+        return wrapper.hide();
+      }
+      wrapper.position({
+        my: "left top",
+        at: "left bottom",
+        of: picker,
+        within: container
+      })
+      .zIndex(element.zIndex() + 1);
+    }
+    
+    function onMouseDown(e) {
+      if (element.is(':hidden')) {
+        return;
+      }
+      var all = element.add(wrapper);
+      var elem = $(e.target);
+      if (all.is(elem) || all.has(elem).length > 0) return;
+      if (elem.zIndex() > element.parents('.slick-form:first,.slickgrid:first').zIndex()) return;
+      if (elem.parents(".ui-dialog:first").zIndex() > element.parents('.slickgrid:first').zIndex()) return;
+
+      element.trigger('hide:slick-editor');
+    }
+    
+    function showPopup(show) {
+      dropdownVisible = !!show;
+      if (dropdownVisible) {
+        $(document).on('mousedown', onMouseDown);
+        textarea.val(scope.getValue());
+        wrapper.show().css('display', 'flex');
+        adjust();
+        setTimeout(function () {
+          textarea.focus();
+        });
+      } else {
+        $(document).off('mousedown', onMouseDown);
+        wrapper.hide();
+        setTimeout(function () {
+          input.focus();
+        });
+      }
+    }
+    
+    scope.togglePopup = function () {
+      showPopup(!dropdownVisible);
+    };
+
+    element.on("hide:slick-editor", function(e) {
+      showPopup(false);
+    });
+    
+    input.on('keydown', function (e) {
+      if (e.keyCode === 40 && e.ctrlKey) { // down key
+        showPopup(true);
+      }
+    });
+
+    textarea.on('blur', function () {
+      scope.setValue(textarea.val(), true);
+    });
+    
+    textarea.on('keydown', function (e) {
+      if (e.keyCode === 9) { // tab key
+        e.preventDefault();
+        showPopup(false);
+      }
+    });
+
+    scope.$watch(attrs.ngModel, function textModelWatch(value) {
+      input.val(value);
+    });
+    
+    scope.$on("$destroy", function(e){
+      wrapper.remove();
+      $(document).off('mousedown', onMouseDown);
+    });
+  },
+  template_editable:
+      "<span class='picker-input picker-icons-1'>" +
+        "<input type='text' readonly>" +
+        "<span class='picker-icons'>" +
+          "<i class='fa fa-pencil' title='{{ \"Edit\" | t }}' ng-click='togglePopup()'></i>" +
+        "</span>" +
+      "</span>"
 });
 
 ui.formInput('Password', 'String', {
