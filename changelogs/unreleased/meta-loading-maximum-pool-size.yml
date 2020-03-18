@@ -1,0 +1,4 @@
+---
+title: Limit parallel meta loading to maximumPoolSize
+type: feature
+

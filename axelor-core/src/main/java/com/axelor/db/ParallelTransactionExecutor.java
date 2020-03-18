@@ -17,12 +17,15 @@
  */
 package com.axelor.db;
 
+import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import java.lang.invoke.MethodHandles;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Math;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -55,7 +58,15 @@ public class ParallelTransactionExecutor {
    * processors.
    */
   public ParallelTransactionExecutor() {
-    this(Runtime.getRuntime().availableProcessors());
+    this(getMaxWorkers());
+  }
+
+  private static int getMaxWorkers() {
+    final AppSettings settings = AppSettings.get();
+    final int maxPoolSize =
+        settings.getInt(AvailableAppSettings.HIBERNATE_HIKARI_MAXIMUN_POOL_SIZE, 0);
+    int maxWorkers = Runtime.getRuntime().availableProcessors();
+    return Math.min(maxPoolSize, maxWorkers);
   }
 
   /**
