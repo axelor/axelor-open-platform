@@ -267,7 +267,8 @@ ui.formInput('TextInline', 'Text', {
     });
 
     scope.$watch(attrs.ngModel, function textModelWatch(value) {
-      input.val(value);
+      var firstLine = value && value.split(/\n/)[0];
+      input.val(firstLine);
     });
     
     scope.$on("$destroy", function(e){
