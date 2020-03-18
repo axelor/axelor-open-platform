@@ -482,6 +482,15 @@ public abstract class AuthPac4jModule extends AuthWebModule {
         return;
       }
 
+      // Redirect to callback end-point if request body is not empty,
+      // in order to support sending credentials via login.jsp.
+      if (request.getContentLengthLong() > 0L) {
+        final HttpServletResponse httpResponse = (HttpServletResponse) response;
+        httpResponse.setStatus(307);
+        httpResponse.addHeader("Location", "callback");
+        return;
+      }
+
       chain.doFilter(request, response);
     }
 
