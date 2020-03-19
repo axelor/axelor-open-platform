@@ -110,4 +110,8 @@ public class I18nBundle extends ResourceBundle {
   public static void invalidate() {
     ResourceBundle.clearCache();
   }
+
+  public boolean containsValue(String key) {
+    return StringUtils.notBlank(load().get(key));
+  }
 }
