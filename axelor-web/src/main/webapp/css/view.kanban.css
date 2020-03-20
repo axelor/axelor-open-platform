@@ -151,7 +151,7 @@
 }
 
 .kanban-card.primary {
-  border-left: 3px solid #337ab7;
+  border-left: 3px solid #428bca;
 }
 
 .kanban-card.warning {
@@ -163,11 +163,11 @@
 }
 
 .kanban-card.info {
-  border-left: 3px solid #23c6c8;
+  border-left: 3px solid #5bc0de;
 }
 
 .kanban-card.success {
-  border-left: 3px solid #0275d8;
+  border-left: 3px solid #5cb85c;
 }
 
 .kanban-card h4 {
