@@ -232,6 +232,7 @@ ui.formInput('TextInline', 'Text', {
       if (dropdownVisible) {
         $(document).on('mousedown', onMouseDown);
         textarea.val(scope.getValue());
+        textarea.get(0).selectionEnd = 0;
         wrapper.show().css('display', 'flex');
         adjust();
         setTimeout(function () {
