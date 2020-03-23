@@ -177,18 +177,18 @@ ui.formInput('TextInline', 'Text', {
   css: 'text-item-inline',
   link_editable: function(scope, element, attrs, model) {
     this._super.apply(this, arguments);
-    
+
     var field = scope.field;
     var picker = element;
     var input = picker.children('input');
-    
+
     var container = null;
     var wrapper = $('<div class="slick-editor-dropdown textarea">').css("position", "absolute").hide();
     var textarea = $('<textarea>').appendTo(wrapper);
 
     scope.waitForActions(function() {
       container = element.parents('.ui-dialog-content,.view-container').first();
-      wrapper.height(175).appendTo(container);
+      wrapper.height(field.height || 175).appendTo(container);
     });
 
     var dropdownVisible = false;
@@ -207,8 +207,13 @@ ui.formInput('TextInline', 'Text', {
         within: container
       })
       .zIndex(element.zIndex() + 1);
+      wrapper.width(element.width());
+      textarea.width("auto");
+      textarea.css({
+        "min-width": textarea.width()
+      });
     }
-    
+
     function onMouseDown(e) {
       if (element.is(':hidden')) {
         return;
@@ -221,7 +226,7 @@ ui.formInput('TextInline', 'Text', {
 
       element.trigger('hide:slick-editor');
     }
-    
+
     function showPopup(show) {
       dropdownVisible = !!show;
       if (dropdownVisible) {
@@ -240,7 +245,7 @@ ui.formInput('TextInline', 'Text', {
         });
       }
     }
-    
+
     scope.togglePopup = function () {
       showPopup(!dropdownVisible);
     };
@@ -248,7 +253,7 @@ ui.formInput('TextInline', 'Text', {
     element.on("hide:slick-editor", function(e) {
       showPopup(false);
     });
-    
+
     input.on('keydown', function (e) {
       if (e.keyCode === 40 && e.ctrlKey) { // down key
         showPopup(true);
@@ -258,7 +263,7 @@ ui.formInput('TextInline', 'Text', {
     textarea.on('blur', function () {
       scope.setValue(textarea.val(), true);
     });
-    
+
     textarea.on('keydown', function (e) {
       if (e.keyCode === 9) { // tab key
         e.preventDefault();
@@ -270,7 +275,7 @@ ui.formInput('TextInline', 'Text', {
       var firstLine = value && value.split(/\n/)[0];
       input.val(firstLine);
     });
-    
+
     scope.$on("$destroy", function(e){
       wrapper.remove();
       $(document).off('mousedown', onMouseDown);
