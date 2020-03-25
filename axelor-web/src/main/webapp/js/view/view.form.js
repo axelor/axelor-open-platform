@@ -414,10 +414,14 @@ function FormViewCtrl($scope, $element) {
       });
     });
   };
+  
+  $scope.getContextRecord = function() {
+    return _.extend({}, $scope._routeSearch, $scope.record);
+  };
 
   $scope.getContext = function() {
     var dummy = $scope.getDummyValues();
-    var context = _.extend({}, $scope._routeSearch, $scope.record);
+    var context = $scope.getContextRecord();
     if ($scope.$parent && $scope.$parent.getContext) {
       context._parent = $scope.$parent.getContext();
     } else {

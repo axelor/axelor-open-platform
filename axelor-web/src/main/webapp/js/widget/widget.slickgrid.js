@@ -1789,6 +1789,22 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
   formScope.onNewHandler = function (event) {
 
   };
+  
+  formScope.getContextRecord = function () {
+    var cell = grid.getActiveCell();
+    var item = cell ? grid.getDataItem(cell.row) : {};
+    var record = formScope.record || {};
+    var result = _.extend({}, item);
+
+    // get updated values
+    _.filter(grid.getColumns(), function (col) {
+      return col.descriptor && col.field && col.field.indexOf('.') === -1;
+    }).forEach(function (col) {
+      result[col.field] = record[col.field];
+    });
+    
+    return result;
+  };
 
   // delegate isDirty to the dataView
   data.canSave = _.bind(this.canSave, this);
