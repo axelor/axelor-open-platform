@@ -2558,7 +2558,8 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
   var types = {
     'one-to-many' : 'one-to-many-inline',
     'many-to-many' : 'many-to-many-inline',
-    'text': 'text-inline'
+    'text': 'text-inline',
+    'html': 'html-inline'
   };
 
   function makeForm(scope, model, items, fields, forEdit, onNew) {
@@ -2568,7 +2569,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 
     _.each(items, function(item) {
       var field = _fields[item.name] || item,
-        type = types[field.widget] || types[field.type];
+        type = types[field.widget || item.widget] || types[field.type];
 
       // force lite html widget
       if (item.widget === 'html') {
