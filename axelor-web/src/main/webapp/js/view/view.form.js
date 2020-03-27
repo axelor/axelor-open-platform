@@ -382,7 +382,7 @@ function FormViewCtrl($scope, $element) {
         $scope.ajaxStop(function(){
           var handler = $scope.$events.onLoad,
             record = $scope.record;
-          if (handler && !ds.equals({}, record)) {
+          if (handler && !ds.equals({}, record) && record.id) {
             setTimeout(handler);
           }
         });
