@@ -379,8 +379,8 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
       };
 
       scope.onEdit = function (record, readonly) {
+        scope._dataSource._record = record;
         scope.switchTo('form', function (formScope) {
-          formScope.edit(record);
           formScope.setEditable(!readonly && scope.hasPermission('write') && formScope.canEdit());
         });
       };
@@ -408,17 +408,6 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
         scope.newItem = null;
         scope.records.length = 0;
         return fetch(options);
-      });
-
-      element.on("click", ".kanban-card", function (e) {
-        var elem = $(e.target);
-        var selector = '[ng-click],[ui-action-click],button,a,.iswitch,.ibox,.kanban-card-menu';
-        if (elem.is(selector) || element.find(selector).has(elem).length) {
-          return;
-        }
-        var record = $(this).scope().record;
-        scope.onEdit(record, true);
-        scope.$applyAsync();
       });
 
       if (scope.colWidth) {

@@ -208,11 +208,17 @@ function FormViewCtrl($scope, $element) {
       }
     }
 
-    var page = ds.page(),
-      record = null;
+    var record = null;
 
-    if (page.index > -1) {
-      record = ds.at(page.index);
+    if (ds._record) {
+      record = ds._record;
+      delete ds._record;
+    } else {
+      var page = ds.page();
+
+      if (page.index > -1) {
+        record = ds.at(page.index);
+      }
     }
 
     routeId = record && record.id > 0 ? record.id : null;
