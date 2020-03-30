@@ -420,7 +420,7 @@ function FormViewCtrl($scope, $element) {
       });
     });
   };
-  
+
   $scope.getContextRecord = function() {
     return _.extend({}, $scope._routeSearch, $scope.record);
   };

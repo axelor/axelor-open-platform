@@ -1789,7 +1789,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
   formScope.onNewHandler = function (event) {
 
   };
-  
+
   formScope.getContextRecord = function () {
     var cell = grid.getActiveCell();
     var item = cell ? grid.getDataItem(cell.row) : {};
@@ -1802,7 +1802,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
     }).forEach(function (col) {
       result[col.field] = record[col.field];
     });
-    
+
     return result;
   };
 
