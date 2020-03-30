@@ -2105,7 +2105,7 @@ Grid.prototype.commitEdit = function () {
   var row = this.grid.getActiveCell().row;
   var item = data.getItemByIdx(row);
 
-  var record = _.extend({}, item, scope.record, { $dirty: true, _orignal: scope.$$original });
+  var record = _.extend(scope.getContextRecord(), { $dirty: true, _orignal: scope.$$original });
   if (record.id === null || record.id === undefined) {
     record.id = item.id;
   }
