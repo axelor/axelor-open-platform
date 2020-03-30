@@ -512,7 +512,7 @@ ui.formInput('HtmlInline', 'Text', {
       dropdownVisible = !!show;
       if (dropdownVisible) {
         $(document).on('mousedown', onMouseDown);
-        shell.setHTML(scope.getValue());
+        shell.setHTML(scope.getValue() || '');
         wrapper.show().css('display', 'flex');
         adjust();
         setTimeout(function () {
