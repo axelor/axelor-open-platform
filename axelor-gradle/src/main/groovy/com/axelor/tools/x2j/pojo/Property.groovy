@@ -212,6 +212,14 @@ class Property {
   }
 
   String getSetterBody() {
+    def mappedBy = getMappedBy()
+
+    if (type == "one-to-one" && mappedBy) {
+      return """${getGetter()}().set${firstUpper(mappedBy)}(null);
+\t\t${name}.set${firstUpper(mappedBy)}(this);
+\t\tthis.$name = $name;"""
+    }
+
     return "this.$name = $name;"
   }
 
