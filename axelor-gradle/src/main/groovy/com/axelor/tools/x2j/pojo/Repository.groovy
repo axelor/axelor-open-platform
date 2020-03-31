@@ -81,6 +81,10 @@ class Repository {
     this.entity.extraImports
   }
 
+  String getRemoveMethodBody() {
+    this.entity.removeMethodBody
+  }
+
   String getExtraCode() {
     this.entity.extraCode
   }

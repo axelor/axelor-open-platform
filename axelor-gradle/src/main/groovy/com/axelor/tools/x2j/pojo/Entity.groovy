@@ -87,6 +87,8 @@ class Entity {
 
   private String extraImports
 
+  private String removeCode
+
   private String extraCode
 
   private Track track
@@ -234,6 +236,11 @@ class Entity {
           if (field.name == 'attrs') {
             jsonAttrs = 'false'
           }
+          if (it.name() == 'one-to-one' && field.mappedBy) {
+            removeCode = """if (entity.get${field.firstUpper(field.name)}() != null) {
+\tentity.get${field.firstUpper(field.name)}().set${field.firstUpper(field.mappedBy)}(null);
+}"""
+          }
       }
     }
 
@@ -295,6 +302,7 @@ class Entity {
     other.repository = this.repository
 
     extraImports = stripCode(extraImports, "") + stripCode(other.extraImports, "")
+    removeCode = stripCode(removeCode, "\n\t") + "\n" + stripCode(other.removeCode, "\n\t")
     extraCode = stripCode(extraCode, "\n\t") + "\n" + stripCode(other.extraCode, "\n\t")
   }
 
@@ -390,6 +398,15 @@ class Entity {
   private String stripCode(code, prefix) {
     if (!code || code.trim().empty) return "";
     return prefix + Utils.stripCode(code, prefix)
+  }
+
+  String getRemoveMethodBody() {
+    return removeCode?.trim() ? stripCode("""
+@Override
+public void remove($name entity) {
+\t$removeCode
+\tsuper.remove(entity);
+}""", "\n\t") : ""
   }
 
   String getExtraCode() {
