@@ -28,7 +28,6 @@ import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
-import com.axelor.db.Query;
 import com.axelor.db.Repository;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -51,6 +50,8 @@ import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
+import com.axelor.rpc.filter.Filter;
+import com.axelor.rpc.filter.JPQLFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Charsets;
@@ -189,24 +190,7 @@ public class RestService extends ResourceService {
     request.setModel(getModel());
     Response response = getResource().fetch(id, request);
 
-    long attachments =
-        Query.of(DMSFile.class)
-            .filter(
-                "self.id IN (SELECT x.id FROM DMSFile x "
-                    + "LEFT JOIN x.permissions x_permissions "
-                    + "LEFT JOIN x_permissions.group x_permissions_group "
-                    + "LEFT JOIN x_permissions.user x_permissions_user "
-                    + "WHERE x.relatedId = :id AND x.relatedModel = :model "
-                    + "AND COALESCE(x.isDirectory, FALSE) = FALSE "
-                    + "AND (x_permissions_group = :group OR x_permissions_user = :user "
-                    + "OR :isAdmin = TRUE))")
-            .bind("id", id)
-            .bind("model", getModel())
-            .bind("group", user.getGroup())
-            .bind("user", user)
-            .bind("isAdmin", AuthUtils.isAdmin(user))
-            .cacheable()
-            .count();
+    final long attachments = getAttachmentCount(id);
 
     if (response.getItem(0) != null) {
       @SuppressWarnings("all")
@@ -215,6 +199,22 @@ public class RestService extends ResourceService {
     }
 
     return response;
+  }
+
+  private long getAttachmentCount(long relatedId) {
+    final Filter securityFilter =
+        Beans.get(JpaSecurity.class).getFilter(JpaSecurity.CAN_READ, DMSFile.class);
+    final Filter filter =
+        new JPQLFilter(
+            "self.relatedModel = :relatedModel "
+                + "AND self.relatedId = :relatedId "
+                + "AND COALESCE(self.isDirectory, FALSE) = FALSE");
+    return (securityFilter != null ? Filter.and(securityFilter, filter) : filter)
+        .build(DMSFile.class)
+        .bind("relatedModel", getModel())
+        .bind("relatedId", relatedId)
+        .cacheable()
+        .count();
   }
 
   @POST
