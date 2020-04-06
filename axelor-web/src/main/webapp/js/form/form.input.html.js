@@ -458,12 +458,13 @@ ui.formInput('HtmlInline', 'Text', {
 
     var field = scope.field;
     var picker = element;
-    var input = picker.children('span.inline-html').first();
+    var input = picker.children('input');
 
     var container = null;
     var wrapper = $('<div class="slick-editor-dropdown textarea html">').css("position", "absolute").hide();
     var textarea = $('<textarea>').appendTo(wrapper);
     var shell = getShell(scope, textarea);
+    var shellElement = $(shell.getElement());
     wrapper.resizable();
 
     scope.waitForActions(function() {
@@ -516,7 +517,7 @@ ui.formInput('HtmlInline', 'Text', {
         wrapper.show().css('display', 'flex');
         adjust();
         setTimeout(function () {
-          textarea.focus();
+          shellElement.focus();
         });
       } else {
         $(document).off('mousedown', onMouseDown);
@@ -541,11 +542,11 @@ ui.formInput('HtmlInline', 'Text', {
       }
     });
 
-    textarea.on('blur', function () {
-      scope.setValue(textarea.val(), true);
+    shellElement.on('blur', function () {
+      scope.setValue(shell.getHTML(), true);
     });
 
-    textarea.on('keydown', function (e) {
+    shellElement.on('keydown', function (e) {
       if (e.keyCode === 9) { // tab key
         e.preventDefault();
         showPopup(false);
@@ -553,7 +554,8 @@ ui.formInput('HtmlInline', 'Text', {
     });
 
     scope.$watch(attrs.ngModel, function textModelWatch(value) {
-      input.html(axelor.sanitize(value));
+      var value = $('<div/>').html(value).text();
+      input.val(value);
     });
 
     scope.$on("$destroy", function(e){
@@ -563,7 +565,7 @@ ui.formInput('HtmlInline', 'Text', {
   },
   template_editable:
       "<span class='picker-input picker-icons-1'>" +
-        "<span class='inline-html'/>" +
+        "<input type='text' readonly>" +
         "<span class='picker-icons'>" +
           "<i class='fa fa-pencil' title='{{ \"Edit\" | t }}' ng-click='togglePopup()'></i>" +
         "</span>" +

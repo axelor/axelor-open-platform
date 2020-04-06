@@ -569,16 +569,6 @@ td.form-item > * {
   border-color: #953B39;
 }
 
-.picker-input .inline-html {
-  height: 24px;
-  line-height: 24px;
-  margin-left: 8px;
-  margin-right: 8px;
-  overflow: hidden;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
-
 .form-item form {
   margin: 0;
 }
