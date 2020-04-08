@@ -18,15 +18,14 @@
 package com.axelor.gradle.support;
 
 import com.axelor.common.VersionUtils;
+import com.axelor.gradle.tasks.CopyWebapp;
 import com.axelor.gradle.tasks.GenerateCode;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.WarPlugin;
-import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.bundling.War;
-import org.gradle.api.tasks.util.PatternSet;
 
 public class WarSupport extends AbstractSupport {
 
@@ -39,15 +38,10 @@ public class WarSupport extends AbstractSupport {
 
     project.getPlugins().apply(WarPlugin.class);
 
-    Configuration axelorWeb = project.getConfigurations().create("axelorWeb").setTransitive(false);
     Configuration axelorTomcat = project.getConfigurations().create("axelorTomcat");
 
     // apply providedCompile dependencies
     applyConfigurationLibs(project, "provided", "compileOnly");
-
-    // add dependency to axelor-web
-    project.getDependencies().add("implementation", "com.axelor:axelor-web:" + version);
-    project.getDependencies().add("axelorWeb", "com.axelor:axelor-web:" + version);
 
     // add axelor-tomcat dependency
     project.getDependencies().add("axelorTomcat", "com.axelor:axelor-tomcat:" + version);
@@ -57,22 +51,10 @@ public class WarSupport extends AbstractSupport {
         .getTasks()
         .create(
             COPY_WEBAPP_TASK_NAME,
-            Copy.class,
+            CopyWebapp.class,
             task -> {
-              task.setDestinationDir(project.getBuildDir());
-              task.into("webapp", spec -> spec.from("src/main/webapp"));
               task.dependsOn(GenerateCode.TASK_NAME);
               task.dependsOn(JavaPlugin.PROCESS_RESOURCES_TASK_NAME);
-              task.dependsOn(axelorWeb);
-              axelorWeb.getFiles().stream()
-                  .filter(file -> file.getName().startsWith("axelor-web"))
-                  .forEach(
-                      file -> {
-                        task.from(
-                            project
-                                .zipTree(file)
-                                .matching(new PatternSet().include("webapp/**/*")));
-                      });
             });
 
     project

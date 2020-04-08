@@ -20,6 +20,7 @@ package com.axelor.gradle;
 import com.axelor.common.VersionUtils;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.jvm.tasks.Jar;
 
 public class ModulePlugin implements Plugin<Project> {
 
@@ -31,6 +32,12 @@ public class ModulePlugin implements Plugin<Project> {
 
     // add core dependencies
     project.getDependencies().add("implementation", "com.axelor:axelor-core:" + version);
+    project.getDependencies().add("implementation", "com.axelor:axelor-web:" + version);
     project.getDependencies().add("testImplementation", "com.axelor:axelor-test:" + version);
+
+    // include webapp resources in jar
+    project
+        .getTasks()
+        .withType(Jar.class, jar -> jar.into("webapp", spec -> spec.from("src/main/webapp")));
   }
 }
