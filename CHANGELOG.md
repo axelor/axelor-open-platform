@@ -1,6 +1,11 @@
 ## 5.0.23 (current)
 
-TBD
+### Bugs
+
+* Fix tomcat 8.5.51 issue
+* Fix target-name on dotted field after selection from grid
+* Fix onLoad triggered twice from kanban
+* Fix onLoad triggered on empty records
 
 ## 5.0.22 (2020-02-11)
 
