@@ -1,3 +1,14 @@
+## 5.2.6 (2020-04-15)
+
+#### Fixed
+
+* Fix spurious onLoad execution from calendar and kanban views
+* Don't show kanban popover with empty content
+* Align kanban hilite colors with grid hilite colors
+* Do not allow deleting tasks when scheduler is running
+* Fix tomcat 8.5.51 issue caused by javax.el service discovery
+* Use permission filter in order to count attachments
+
 ## 5.2.5 (2020-02-11)
 
 #### Fixed
