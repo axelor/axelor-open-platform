@@ -1,3 +1,38 @@
+## 5.3.1 (2020-04-15)
+
+#### Breaking Changes
+
+* In order to migrate User activateOn and expiresOn fields, use these SQL statements:
+  
+    ```sql
+    ALTER TABLE auth_user ALTER COLUMN activate_on TYPE timestamp;
+    ALTER TABLE auth_user ALTER COLUMN expires_on TYPE timestamp;
+    UPDATE meta_field SET type_name = 'LocalDateTime' FROM meta_model WHERE meta_field.meta_model = meta_model.id AND meta_model.name = 'User' AND meta_field.name IN ('activateOn', 'expiresOn');
+    ```
+
+#### Changes
+
+* Change User activateOn and expiresOn to datetime type
+
+#### Features
+
+* Check for active user on every pre-request
+
+#### Fixed
+
+* Fix CSS of calendar bubble content
+* Fix menu title wrapping with tag
+* Fix combining selection simple filters with custom filters
+* Don't show kanban popover with empty content
+* Fix NavSelect widget on integer selection
+* Fix extension insert before in declaration order
+* Fix Overview panel randomly still present despite having custom panel as first element
+* Do not allow deleting tasks when scheduler is running
+* Fix tomcat 8.5.51 issue caused by javax.el service discovery
+* Fix unknown tracked field detection when using inheritance
+* Fix target-name on dotted field after selection from grid
+* Fix same duration widget mask being applied to subsequent fields
+
 ## 5.3.0 (2020-01-24)
 
 #### Changes

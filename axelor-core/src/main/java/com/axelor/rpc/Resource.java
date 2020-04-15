@@ -880,11 +880,6 @@ public class Resource<T extends Model> {
 
     // no password change
     if (StringUtils.isBlank(newPassword)) {
-      // Still update password date if blocked field has changed so that user gets logged out.
-      if (values.get("blocked") != null) {
-        user.setPasswordUpdatedOn(LocalDateTime.now());
-      }
-
       return user;
     }
 
@@ -1038,7 +1033,7 @@ public class Resource<T extends Model> {
 
     Request req = newRequest(request, id);
 
-    firePreRequestEvent(RequestEvent.REMOVE, request);
+    firePreRequestEvent(RequestEvent.REMOVE, req);
 
     Model bean = JPA.edit(model, data);
     if (bean.getId() != null) {
@@ -1212,6 +1207,8 @@ public class Resource<T extends Model> {
       Property p = mapper.getProperty(func.getField());
       if (p != null && p.isJson()) {
         selectName = func.toString();
+      } else {
+        selectName = String.format("self.%s", name);
       }
     }
 

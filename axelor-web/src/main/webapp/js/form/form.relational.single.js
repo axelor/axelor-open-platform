@@ -147,7 +147,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 
       if (value[nameField] !== undefined) {
         record[nameField] = value[nameField];
-      } else {
+      } else if (missing.indexOf(nameField) < 0) {
         missing.push(nameField);
       }
 
@@ -327,9 +327,10 @@ ui.formInput('ManyToOne', 'Select', {
     scope.canShowTag = scope.field['tag-edit'];
 
     scope.formatItem = function(item) {
-      var trKey = "$t:" + scope.field.targetName;
       if (item) {
-        return item[trKey] || item[(scope.field.targetName || "id")];
+        var trKey = "$t:" + scope.field.targetName;
+        var key = scope.field.targetName || "id";
+        return item[trKey] || item[key] || ui.findNested(item, key);
       }
       return "";
     };

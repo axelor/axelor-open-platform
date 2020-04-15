@@ -80,7 +80,7 @@
     <many-to-one name="action" ref="MetaAction" copy="false" />
     <many-to-one name="gridView" ref="MetaView" copy="false" />
     <many-to-one name="formView" ref="MetaView" copy="false" />
-    <one-to-many name="fields" ref="MetaJsonField" mappedBy="jsonModel" />
+    <one-to-many name="fields" ref="MetaJsonField" mappedBy="jsonModel" orderBy="sequence,id" />
     <many-to-many name="roles" ref="com.axelor.auth.db.Role" />
   </entity>
 

@@ -67,6 +67,9 @@
       var val = record || {};
       var idx = 0;
       while (val && idx < path.length) {
+        if (_.isString(val)) {
+          val = fromJsonOrEmpty(val);
+        }
         val = val[path[idx++]];
       }
       if (idx === path.length) {
@@ -74,6 +77,14 @@
       }
     }
     return undefined;
+  }
+
+  function fromJsonOrEmpty(json) {
+    try {
+      return angular.fromJson(json);
+    } catch (e) {
+      return {};
+    }
   }
 
   function setNested(record, name, value) {

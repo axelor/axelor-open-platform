@@ -20,12 +20,22 @@ package com.axelor.quartz;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.db.JPA;
+import com.axelor.event.Observes;
+import com.axelor.events.PreRequest;
+import com.axelor.events.qualifiers.EntityType;
 import com.axelor.i18n.I18n;
+import com.axelor.inject.Beans;
 import com.axelor.meta.CallMethod;
 import com.axelor.meta.db.MetaSchedule;
 import com.axelor.meta.db.MetaScheduleParam;
+import com.axelor.meta.db.repo.MetaScheduleRepository;
 import com.google.common.base.Preconditions;
+import com.google.common.primitives.Longs;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.Job;
@@ -215,5 +225,35 @@ public class JobRunner {
     }
     total = 0;
     this.start();
+  }
+
+  public void onRemove(
+      @Observes @Named(PreRequest.REMOVE) @EntityType(MetaSchedule.class) PreRequest event) {
+
+    if (!isEnabled()) return;
+    try {
+      if (scheduler.isShutdown()) return;
+    } catch (SchedulerException e) {
+      // ignore
+    }
+
+    List<Object> records = new ArrayList<>();
+    if (event.getRequest().getRecords().isEmpty()) {
+      records.add(event.getRequest().getData());
+    } else {
+      records.addAll(event.getRequest().getRecords());
+    }
+
+    for (Object item : records) {
+      Long id =
+          item instanceof MetaSchedule
+              ? ((MetaSchedule) item).getId()
+              : Longs.tryParse(((Map<?, ?>) item).get("id").toString());
+      MetaSchedule record = Beans.get(MetaScheduleRepository.class).find(id);
+      if (record.getActive() == Boolean.TRUE) {
+        throw new IllegalStateException(
+            I18n.get("Cannot delete a task while scheduler is running..."));
+      }
+    }
   }
 }

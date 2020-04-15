@@ -19,7 +19,6 @@ package com.axelor.meta.schema.views;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import javax.xml.bind.annotation.XmlEnum;
@@ -42,8 +41,8 @@ public enum Position {
   @XmlEnumValue("inside-first")
   INSIDE_FIRST(UnaryOperator.identity(), Node::getFirstChild);
 
-  private final Function<Node, Node> parentNodeFunc;
-  private final Function<Node, Node> refChildNodeFunc;
+  private final UnaryOperator<Node> parentNodeFunc;
+  private final UnaryOperator<Node> refChildNodeFunc;
 
   private static final Map<String, Position> POSITION_TYPES =
       Arrays.stream(Position.class.getFields())
