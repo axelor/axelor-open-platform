@@ -128,5 +128,20 @@ public class AxelorPlugin implements Plugin<Project> {
         .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
         .getResources()
         .srcDir(GenerateCode.getResourceOutputDir(project));
+
+    // XXX: prepend class output directory to compile classpath (see #26420)
+    // XXX: https://github.com/gradle/gradle/issues/12575
+    project
+        .getConvention()
+        .getPlugin(JavaPluginConvention.class)
+        .getSourceSets()
+        .getByName(
+            SourceSet.MAIN_SOURCE_SET_NAME,
+            sourceSet -> {
+              sourceSet.setCompileClasspath(
+                  project
+                      .files(sourceSet.getJava().getOutputDir())
+                      .plus(sourceSet.getCompileClasspath()));
+            });
   }
 }

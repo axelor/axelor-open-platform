@@ -460,6 +460,8 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
   private static class AxelorLoginPageFilter implements Filter {
 
+    @Inject private AxelorCallbackFilter axelorCallbackFilter;
+
     @Override
     public void init(javax.servlet.FilterConfig filterConfig) throws ServletException {}
 
@@ -479,6 +481,12 @@ public abstract class AuthPac4jModule extends AuthWebModule {
           || AuthPac4jModule.clientList.stream()
               .noneMatch(client -> client instanceof FormClient)) {
         ((HttpServletResponse) response).sendRedirect(AppSettings.get().getBaseURL());
+        return;
+      }
+
+      // Perform callback filter if request body is not empty.
+      if (request.getContentLengthLong() > 0L) {
+        axelorCallbackFilter.doFilter(request, response, chain);
         return;
       }
 

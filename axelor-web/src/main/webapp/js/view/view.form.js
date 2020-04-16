@@ -208,11 +208,17 @@ function FormViewCtrl($scope, $element) {
       }
     }
 
-    var page = ds.page(),
-      record = null;
+    var record = null;
 
-    if (page.index > -1) {
-      record = ds.at(page.index);
+    if (ds._record) {
+      record = ds._record;
+      delete ds._record;
+    } else {
+      var page = ds.page();
+
+      if (page.index > -1) {
+        record = ds.at(page.index);
+      }
     }
 
     routeId = record && record.id > 0 ? record.id : null;
@@ -381,7 +387,7 @@ function FormViewCtrl($scope, $element) {
         $scope.ajaxStop(function(){
           var handler = $scope.$events.onLoad,
             record = $scope.record;
-          if (handler && !ds.equals({}, record)) {
+          if (handler && !ds.equals({}, record) && record.id) {
             setTimeout(handler);
           }
         });
@@ -415,9 +421,13 @@ function FormViewCtrl($scope, $element) {
     });
   };
 
+  $scope.getContextRecord = function() {
+    return _.extend({}, $scope._routeSearch, $scope.record);
+  };
+
   $scope.getContext = function() {
     var dummy = $scope.getDummyValues();
-    var context = _.extend({}, $scope._routeSearch, $scope.record);
+    var context = $scope.getContextRecord();
     if ($scope.$parent && $scope.$parent.getContext) {
       context._parent = $scope.$parent.getContext();
     } else {

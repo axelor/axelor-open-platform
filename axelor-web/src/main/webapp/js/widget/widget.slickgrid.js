@@ -1790,6 +1790,22 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 
   };
 
+  formScope.getContextRecord = function () {
+    var cell = grid.getActiveCell();
+    var item = cell ? grid.getDataItem(cell.row) : {};
+    var record = formScope.record || {};
+    var result = _.extend({}, item);
+
+    // get updated values
+    _.filter(grid.getColumns(), function (col) {
+      return col.descriptor && col.field && col.field.indexOf('.') === -1;
+    }).forEach(function (col) {
+      result[col.field] = record[col.field];
+    });
+
+    return result;
+  };
+
   // delegate isDirty to the dataView
   data.canSave = _.bind(this.canSave, this);
   data.saveChanges = _.bind(this.saveChanges, this);
@@ -2089,30 +2105,35 @@ Grid.prototype.commitEdit = function () {
   var row = this.grid.getActiveCell().row;
   var item = data.getItemByIdx(row);
 
-  var record = _.extend({}, item, scope.record, { $dirty: true, _orignal: scope.$$original });
+  scope.waitForActions(function() {
+    var record = _.extend(scope.getContextRecord(), { $dirty: true, _orignal: scope.$$original });
+    if (record.id === null || record.id === undefined) {
+      record.id = item.id;
+    }
 
-  that.cols.forEach(function (col) {
-    if (col.descriptor && col.descriptor.jsonField) {
-      var json = record[col.descriptor.jsonField];
-      if (_.isObject(json)) {
-        record[col.descriptor.jsonField] = angular.toJson(record[col.descriptor.jsonField]);
+    that.cols.forEach(function (col) {
+      if (col.descriptor && col.descriptor.jsonField) {
+        var json = record[col.descriptor.jsonField];
+        if (_.isObject(json)) {
+          record[col.descriptor.jsonField] = angular.toJson(record[col.descriptor.jsonField]);
+        }
       }
-    }
+    });
+
+    data.updateItem(item.id, record);
+
+    var diff = scope._dataSource.diff(scope.$$original, scope.record);
+    that.cols.forEach(function (col) {
+      if (col.descriptor && diff[col.id] !== undefined) {
+        that.markDirty(row, col.id);
+      }
+    });
+
+    that.saveChanges(null, function () {
+      that.cancelEdit();
+      defer.resolve();
+    }, defer.reject);
   });
-
-  data.updateItem(item.id, record);
-
-  var diff = scope._dataSource.diff(scope.$$original, scope.record);
-  that.cols.forEach(function (col) {
-    if (col.descriptor && diff[col.id] !== undefined) {
-      that.markDirty(row, col.id);
-    }
-  });
-
-  this.saveChanges(null, function () {
-    that.cancelEdit();
-    defer.resolve();
-  }, defer.reject);
 
   return promise;
 };
@@ -2538,7 +2559,9 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 
   var types = {
     'one-to-many' : 'one-to-many-inline',
-    'many-to-many' : 'many-to-many-inline'
+    'many-to-many' : 'many-to-many-inline',
+    'text': 'text-inline',
+    'html': 'html-inline'
   };
 
   function makeForm(scope, model, items, fields, forEdit, onNew) {
@@ -2548,7 +2571,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 
     _.each(items, function(item) {
       var field = _fields[item.name] || item,
-        type = types[field.type];
+        type = types[field.widget || item.widget] || types[field.type];
 
       // force lite html widget
       if (item.widget === 'html') {

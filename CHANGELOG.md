@@ -1,3 +1,26 @@
+## 5.3.2 (2020-04-16)
+
+#### Features
+
+* Limit parallel meta loading to maximumPoolSize
+* Add support for providing webapp resources from modules
+* Add support for registering static web resources
+
+#### Fixed
+
+* Fix backward-compatible authentication via login.jsp
+* Fix compile classpath issue
+* Fix context issue with js expressions on m2o fields
+* Fix spurious onLoad execution from calendar and kanban views
+* Fix new line confirmation in editable grid after ActionResponse#setValues
+* Align kanban hilite colors with grid hilite colors
+* Fix view watching with IntelliJ IDEA
+* Wait for actions when committing changes in editable grid
+* Fix embedded tomcat run task issue
+* Fix large text field in editable grid widget
+* Use permission filter in order to count attachments
+* Context from grid row editor should use row record
+
 ## 5.3.1 (2020-04-15)
 
 #### Breaking Changes

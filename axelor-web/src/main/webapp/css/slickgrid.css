@@ -287,6 +287,36 @@
   top: 0; right: 0; border: 0; left: 0;
 }
 
+.slick-editor-dropdown.textarea {
+  display: 'flex';
+  flex-direction: column;
+  min-width: inherit;
+}
+
+.slick-editor-dropdown.textarea textarea {
+  flex: 1;
+  margin: 0;
+}
+
+.slick-editor-dropdown.textarea.html {
+  min-height: 147px;
+}
+
+.slick-editor-dropdown .wysiwyg-container {
+  background: white;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+}
+
+.slick-editor-dropdown .wysiwyg-editor {
+  height: 100%;
+  overflow: scroll;
+  overflow-x: hidden;
+  flex: 1;
+}
+
 .slickgrid-editable .slick-row.active .slick-cell-editable.dirty:before,
 .slick-cell.dirty {
   background-image: url('../img/dirty.gif');
