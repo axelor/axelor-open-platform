@@ -150,5 +150,5 @@ class NashornGlobals extends SimpleBindings {
       return contains;
     }
     return findClass((String) key) != null;
-  };
+  }
 }

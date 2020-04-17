@@ -42,8 +42,8 @@ public class AuthRealm extends AuthorizingRealm {
 
   private static Logger log = LoggerFactory.getLogger(AuthRealm.class);
 
-  private static final String INCORRECT_CREDENTIALS = /*$$(*/ "Wrong username or password"; /*)*/;
-  private static final String WRONG_CURRENT_PASSWORD = /*$$(*/ "Wrong current password"; /*)*/;
+  private static final String INCORRECT_CREDENTIALS = /*$$(*/ "Wrong username or password" /*)*/;
+  private static final String WRONG_CURRENT_PASSWORD = /*$$(*/ "Wrong current password" /*)*/;
 
   public static class AuthMatcher extends PasswordMatcher {
 

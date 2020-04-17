@@ -176,5 +176,5 @@ public class SmtpAccount implements MailAccount {
       session = init();
     }
     return session;
-  };
+  }
 }

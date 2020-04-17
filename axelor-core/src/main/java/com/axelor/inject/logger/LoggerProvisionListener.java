@@ -27,7 +27,7 @@ final class LoggerProvisionListener implements ProvisionListener {
       new ThreadLocal<ArrayDeque<Binding<?>>>() {
         protected ArrayDeque<Binding<?>> initialValue() {
           return new ArrayDeque<>();
-        };
+        }
       };
 
   @Override

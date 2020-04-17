@@ -480,7 +480,6 @@ public final class MetaStore {
         final Widget widget = field.getAnnotation(Widget.class);
         if (StringUtils.notBlank(widget.title())) {
           option.setTitle(widget.title());
-          ;
         }
       } catch (Exception e) {
       }

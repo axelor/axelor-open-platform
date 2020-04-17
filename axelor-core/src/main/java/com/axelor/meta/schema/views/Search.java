@@ -339,7 +339,6 @@ public class Search extends AbstractView {
           if (spec.startsWith("-")) orders.add(spec.substring(1) + " DESC");
           else orders.add(spec);
         }
-        ;
       }
 
       if (orders.size() > 0) {

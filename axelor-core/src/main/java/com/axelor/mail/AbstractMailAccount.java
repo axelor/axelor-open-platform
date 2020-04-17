@@ -117,5 +117,5 @@ public abstract class AbstractMailAccount implements MailAccount {
       session = init();
     }
     return session;
-  };
+  }
 }
