@@ -271,8 +271,16 @@ public class DBHelper {
       } catch (Exception e) {
       }
     } finally {
-      stmt.close();
-      connection.close();
+      try {
+        stmt.close();
+      } catch (SQLException e) {
+        // Ignored.
+      }
+      try {
+        connection.close();
+      } catch (SQLException e) {
+        // Ignored.
+      }
     }
     return false;
   }

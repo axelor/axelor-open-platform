@@ -355,12 +355,14 @@ public class ModuleManager {
 
   private static Set<String> getInstalledModules() {
     final Set<String> all = new HashSet<String>();
-    try (final Connection connection = DBHelper.getConnection();
-        final Statement statement = connection.createStatement();
-        final ResultSet rs =
+    try (final Connection connection = DBHelper.getConnection()) {
+      try (final Statement statement = connection.createStatement()) {
+        try (final ResultSet rs =
             statement.executeQuery("select name from meta_module where installed = true")) {
-      while (rs.next()) {
-        all.add(rs.getString("name"));
+          while (rs.next()) {
+            all.add(rs.getString("name"));
+          }
+        }
       }
     } catch (Exception e) {
     }
