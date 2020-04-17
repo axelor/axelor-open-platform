@@ -41,15 +41,15 @@ final class AuthResolver {
     }
     switch (accessType) {
       case READ:
-        return permission.getCanRead() == Boolean.TRUE;
+        return Boolean.TRUE.equals(permission.getCanRead());
       case WRITE:
-        return permission.getCanWrite() == Boolean.TRUE;
+        return Boolean.TRUE.equals(permission.getCanWrite());
       case CREATE:
-        return permission.getCanCreate() == Boolean.TRUE;
+        return Boolean.TRUE.equals(permission.getCanCreate());
       case REMOVE:
-        return permission.getCanRemove() == Boolean.TRUE;
+        return Boolean.TRUE.equals(permission.getCanRemove());
       case EXPORT:
-        return permission.getCanExport() == Boolean.TRUE;
+        return Boolean.TRUE.equals(permission.getCanExport());
       default:
         return false;
     }

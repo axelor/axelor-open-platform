@@ -263,7 +263,7 @@ public abstract class AbstractView {
   @XmlTransient
   @JsonProperty("helpOverride")
   public List<?> getHelpOverride() {
-    if (AuthUtils.getUser() != null && AuthUtils.getUser().getNoHelp() == Boolean.TRUE) {
+    if (AuthUtils.getUser() != null && Boolean.TRUE.equals(AuthUtils.getUser().getNoHelp())) {
       return null;
     }
     final MetaHelpRepository repo = Beans.get(MetaHelpRepository.class);

@@ -130,10 +130,10 @@ final class AuditTracker {
     if (value == null) {
       return "";
     }
-    if (value == Boolean.TRUE) {
+    if (Boolean.TRUE.equals(value)) {
       return "True";
     }
-    if (value == Boolean.FALSE) {
+    if (Boolean.FALSE.equals(value)) {
       return "False";
     }
     switch (property.getType()) {

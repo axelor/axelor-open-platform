@@ -91,7 +91,7 @@ public abstract class AbstractTenantFilter implements Filter {
     final Map<String, String> map = new LinkedHashMap<>();
     String first = null;
     for (TenantConfig config : provider.findAll(TenantResolver.CURRENT_HOST.get())) {
-      if (config.getActive() == Boolean.FALSE || config.getVisible() == Boolean.FALSE) {
+      if (Boolean.FALSE.equals(config.getActive()) || Boolean.FALSE.equals(config.getVisible())) {
         continue;
       }
       if (!all && !canAccess(config)) {

@@ -253,7 +253,7 @@ public class DBHelper {
         unaccentSupport = Boolean.FALSE;
       }
     }
-    return unaccentSupport == Boolean.TRUE;
+    return Boolean.TRUE.equals(unaccentSupport);
   }
 
   private static boolean testUnaccent() throws Exception {

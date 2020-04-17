@@ -117,15 +117,15 @@ public class AppCli {
       return -1;
     }
 
-    if ((opts.showHelp == Boolean.TRUE)
-        || (opts.init == Boolean.FALSE
-            && opts.update == Boolean.FALSE
-            && opts.migrate == Boolean.FALSE)) {
+    if ((Boolean.TRUE.equals(opts.showHelp))
+        || (Boolean.FALSE.equals(opts.init)
+            && Boolean.FALSE.equals(opts.update)
+            && Boolean.FALSE.equals(opts.migrate))) {
       cmd.usage();
       return 0;
     }
 
-    if (opts.migrate == Boolean.TRUE) {
+    if (Boolean.TRUE.equals(opts.migrate)) {
       try {
         println("Start db migration...");
         DBHelper.migrate();
@@ -134,7 +134,7 @@ public class AppCli {
       } catch (Exception e) {
         println("db migration failed.");
         println(e.getMessage());
-        if (opts.verbose == Boolean.TRUE) {
+        if (Boolean.TRUE.equals(opts.verbose)) {
           e.printStackTrace();
         }
         return -1;
@@ -154,7 +154,7 @@ public class AppCli {
       } catch (Exception e) {
         println("field value encryption failed.");
         println(e.getMessage());
-        if (opts.verbose == Boolean.TRUE) {
+        if (Boolean.TRUE.equals(opts.verbose)) {
           e.printStackTrace();
         }
         return -1;
@@ -165,8 +165,8 @@ public class AppCli {
 
     boolean demo = AppSettings.get().getBoolean(AvailableAppSettings.DATA_IMPORT_DEMO_DATA, true);
 
-    if (opts.init == Boolean.TRUE) {
-      manager.initialize(opts.update == Boolean.TRUE, demo);
+    if (Boolean.TRUE.equals(opts.init)) {
+      manager.initialize(Boolean.TRUE.equals(opts.update), demo);
       return 0;
     }
 

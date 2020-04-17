@@ -150,7 +150,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
     final MetaActionRepository actionRepo = Beans.get(MetaActionRepository.class);
 
     for (MailFollower follower : followers) {
-      if (follower.getArchived() == Boolean.TRUE) {
+      if (Boolean.TRUE.equals(follower.getArchived())) {
         continue;
       }
       final MailAddress email = follower.getEmail();
@@ -252,7 +252,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
   public void follow(Model entity, User user) {
 
     MailFollower follower = findOne(entity, user);
-    if (follower != null && follower.getArchived() == Boolean.FALSE) {
+    if (follower != null && Boolean.FALSE.equals(follower.getArchived())) {
       return;
     }
 
@@ -289,7 +289,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
     }
 
     MailFollower follower = findOne(entity, address);
-    if (follower != null && follower.getArchived() == Boolean.FALSE) {
+    if (follower != null && Boolean.FALSE.equals(follower.getArchived())) {
       return;
     }
 
@@ -338,6 +338,6 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 
   public boolean isFollowing(Model entity, User user) {
     final MailFollower found = findOne(entity, user);
-    return found != null && found.getArchived() == Boolean.FALSE;
+    return found != null && Boolean.FALSE.equals(found.getArchived());
   }
 }

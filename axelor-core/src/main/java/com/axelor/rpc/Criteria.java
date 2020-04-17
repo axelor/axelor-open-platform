@@ -145,7 +145,7 @@ public class Criteria {
     if (archived != null) {
       archived = "true".equalsIgnoreCase(archived.toString());
     }
-    if (archived != Boolean.TRUE) {
+    if (!Boolean.TRUE.equals(archived)) {
       all.add(new JPQLFilter("self.archived is null OR self.archived = false"));
     }
 

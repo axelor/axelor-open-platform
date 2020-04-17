@@ -121,7 +121,7 @@ public class MetaService {
       return false;
     }
     visited.add(item.getName());
-    if (item.getHidden() == Boolean.TRUE || !test(item, helper)) {
+    if (Boolean.TRUE.equals(item.getHidden()) || !test(item, helper)) {
       return false;
     }
     if (item.getParent() == null || !withParentCheck) {
@@ -220,7 +220,7 @@ public class MetaService {
       }
     }
 
-    if (item.getTagCount() == Boolean.TRUE && action != null) {
+    if (Boolean.TRUE.equals(item.getTagCount()) && action != null) {
       final ActionView act;
       try {
         act = (ActionView) MetaStore.getAction(action.getName());
@@ -369,7 +369,7 @@ public class MetaService {
     }
 
     final Map<String, String> help = new HashMap<>();
-    if (!withTagsOnly && user.getNoHelp() != Boolean.TRUE) {
+    if (!withTagsOnly && !Boolean.TRUE.equals(user.getNoHelp())) {
       final MetaHelpRepository helpRepo = Beans.get(MetaHelpRepository.class);
       final String lang =
           AppFilter.getLocale() == null ? "en" : AppFilter.getLocale().getLanguage();

@@ -39,7 +39,7 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
 
   public MetaJsonField findNameField(MetaJsonModel jsonModel) {
     return jsonModel.getFields().stream()
-        .filter(f -> f.getNameField() == Boolean.TRUE)
+        .filter(f -> Boolean.TRUE.equals(f.getNameField()))
         .findFirst()
         .orElseGet(
             () -> {

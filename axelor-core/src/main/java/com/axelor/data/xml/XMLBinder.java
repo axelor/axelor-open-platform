@@ -106,10 +106,10 @@ public abstract class XMLBinder {
       LOG.trace("search: " + binding.getSearch());
       bean = JPA.all((Class<Model>) type).filter(binding.getSearch()).bind(ctx).fetchOne();
       LOG.trace("search found: " + bean);
-      if (bean != null && binding.getUpdate() != Boolean.TRUE) {
+      if (bean != null && !Boolean.TRUE.equals(binding.getUpdate())) {
         LOG.trace("search no update");
         return bean;
-      } else if (bean == null && binding.getCreate() == Boolean.FALSE) {
+      } else if (bean == null && Boolean.FALSE.equals(binding.getCreate())) {
         LOG.trace("search no create");
         return null;
       }
@@ -153,7 +153,7 @@ public abstract class XMLBinder {
       LOG.trace("condition: " + bind.getCondition());
 
       if (newBean == false
-          && bind.getConditionEmpty() == Boolean.TRUE
+          && Boolean.TRUE.equals(bind.getConditionEmpty())
           && property.get(bean) != null) {
         LOG.trace("field is not empty");
         continue;

@@ -154,7 +154,7 @@ public class ActionRecord extends Action {
     if (ref != null) {
       Object result = handler.evaluate(ref);
       if (result != null) {
-        if (canCopy == Boolean.TRUE) {
+        if (Boolean.TRUE.equals(canCopy)) {
           return JPA.copy((Model) result, true);
         }
         return result;
@@ -190,7 +190,8 @@ public class ActionRecord extends Action {
           continue;
         }
 
-        if (((RecordField) recordField).getCanCopy() == Boolean.TRUE && value instanceof Model) {
+        if (Boolean.TRUE.equals(((RecordField) recordField).getCanCopy())
+            && value instanceof Model) {
           value = JPA.copy((Model) value, true);
         }
 
@@ -210,7 +211,7 @@ public class ActionRecord extends Action {
     if (search != null) {
       Object result = handler.search(entityClass, search, map);
       if (result != null) {
-        if (canCopy == Boolean.TRUE) {
+        if (Boolean.TRUE.equals(canCopy)) {
           return JPA.copy((Model) result, true);
         }
         return result;

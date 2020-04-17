@@ -71,7 +71,7 @@ public class ActionScript extends Action {
     bindings.put(KEY_REQUEST, request);
     bindings.put(KEY_RESPONSE, response);
     bindings.put(KEY_JSON, Beans.get(MetaJsonRecordRepository.class));
-    if (script.transactional == Boolean.TRUE) {
+    if (Boolean.TRUE.equals(script.transactional)) {
       bindings.put(KEY_EM, JPA.em());
     }
     try {
@@ -93,7 +93,7 @@ public class ActionScript extends Action {
 
   @Override
   public Object evaluate(ActionHandler handler) {
-    return script.transactional == Boolean.TRUE
+    return Boolean.TRUE.equals(script.transactional)
         ? Beans.get(ActRunner.class).run(this, handler)
         : run(handler);
   }

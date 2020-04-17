@@ -54,7 +54,7 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
   @Override
   public Object invoke(final MethodInvocation invocation) throws Throwable {
 
-    if (running.get() == Boolean.TRUE) {
+    if (Boolean.TRUE.equals(running.get())) {
       return invocation.proceed();
     }
 

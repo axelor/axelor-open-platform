@@ -455,8 +455,8 @@ public class ModuleManager {
       module.setVersion(version);
       module.setApplication(application);
       module.setRemovable(removable);
-      module.setInstalled(stored.getInstalled() == Boolean.TRUE);
-      module.setPending(stored.getPending() == Boolean.TRUE);
+      module.setInstalled(Boolean.TRUE.equals(stored.getInstalled()));
+      module.setPending(Boolean.TRUE.equals(stored.getPending()));
       module.setInstalledVersion(stored.getModuleVersion());
     }
 
@@ -482,8 +482,8 @@ public class ModuleManager {
       if (module == null || stored == null) {
         continue;
       }
-      module.setPending(stored.getInstalled() != Boolean.TRUE);
-      stored.setPending(stored.getInstalled() != Boolean.TRUE);
+      module.setPending(!Boolean.TRUE.equals(stored.getInstalled()));
+      stored.setPending(!Boolean.TRUE.equals(stored.getInstalled()));
       module.setInstalled(true);
       stored.setInstalled(true);
     }

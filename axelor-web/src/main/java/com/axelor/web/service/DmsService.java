@@ -507,7 +507,7 @@ public class DmsService {
   private Map<String, File> findFiles(
       DMSFile file, String base, String childrenQlString, User user) {
     final Map<String, File> files = new LinkedHashMap<>();
-    if (file.getIsDirectory() == Boolean.TRUE) {
+    if (Boolean.TRUE.equals(file.getIsDirectory())) {
       final List<DMSFile> children =
           repository
               .all()

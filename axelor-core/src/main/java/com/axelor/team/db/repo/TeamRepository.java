@@ -88,7 +88,7 @@ public class TeamRepository extends JpaRepository<Team> {
     final MailFollowerRepository followers = Beans.get(MailFollowerRepository.class);
     final MailFollower follower = followers.findOne(entity, AuthUtils.getUser());
 
-    json.put("_following", follower != null && follower.getArchived() == Boolean.FALSE);
+    json.put("_following", follower != null && Boolean.FALSE.equals(follower.getArchived()));
     json.put("_image", entity.getImage() != null);
 
     return json;

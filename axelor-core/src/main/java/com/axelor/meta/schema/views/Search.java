@@ -431,7 +431,7 @@ public class Search extends AbstractView {
       List<String> where = Lists.newArrayList();
       Map<String, Object> binding = Maps.newHashMap();
       Multimap<String, String> groups = HashMultimap.create();
-      boolean filterArchived = showArchived != Boolean.TRUE;
+      boolean filterArchived = !Boolean.TRUE.equals(showArchived);
 
       String join = "any".equals(match) ? " OR " : " AND ";
 
@@ -477,7 +477,7 @@ public class Search extends AbstractView {
           }
 
           if ("archived".equals(input.getField())) {
-            filterArchived = value != Boolean.TRUE;
+            filterArchived = !Boolean.TRUE.equals(value);
             if (filterArchived) {
               continue;
             }

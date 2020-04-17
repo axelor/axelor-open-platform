@@ -43,7 +43,7 @@ public class MailFlagsRepository extends JpaRepository<MailFlags> {
     final MailMessage message = flags.getMessage();
     final MailMessage root = message.getRoot();
 
-    if (flags.getIsStarred() == Boolean.FALSE) {
+    if (Boolean.FALSE.equals(flags.getIsStarred())) {
       // message is root, so unflag children
       if (root == null) {
         List<MailFlags> childFlags =
@@ -69,7 +69,7 @@ public class MailFlagsRepository extends JpaRepository<MailFlags> {
     rootFlags.setIsStarred(flags.getIsStarred());
 
     // mark root as unread
-    if (flags.getIsRead() != Boolean.TRUE) {
+    if (!Boolean.TRUE.equals(flags.getIsRead())) {
       rootFlags.setIsRead(false);
     }
 

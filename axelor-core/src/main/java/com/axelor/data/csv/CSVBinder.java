@@ -318,7 +318,7 @@ public class CSVBinder {
       LOG.trace("value: " + value);
       LOG.trace("condition: " + cb.getCondition());
 
-      if (newBean == false && cb.getConditionEmpty() == Boolean.TRUE) {
+      if (newBean == false && Boolean.TRUE.equals(cb.getConditionEmpty())) {
         Object o = p.get(bean);
         if (o != null && p.isCollection()) {
           if (o instanceof Collection<?> && !((Collection<?>) o).isEmpty()) {

@@ -149,7 +149,7 @@ public class ActionExport extends Action {
       final Map<String, Object> result = new HashMap<>();
       try {
         String file = doExport(dir, export, handler);
-        if (getDownload() == Boolean.TRUE) {
+        if (Boolean.TRUE.equals(getDownload())) {
           result.put("exportFile", file);
           result.put("notify", I18n.get("Export complete."));
           return result;

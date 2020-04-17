@@ -292,7 +292,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
   @Override
   public void remove(DMSFile entity) {
     // remove all children
-    if (entity.getIsDirectory() == Boolean.TRUE) {
+    if (Boolean.TRUE.equals(entity.getIsDirectory())) {
       final List<DMSFile> children = all().filter("self.parent.id = ?", entity.getId()).fetch();
       for (DMSFile child : children) {
         if (child != entity) {
@@ -363,7 +363,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
   }
 
   private boolean canOffline(DMSFile file, User user) {
-    return file.getIsDirectory() != Boolean.TRUE
+    return !Boolean.TRUE.equals(file.getIsDirectory())
         && file.getMetaFile() != null
         && dmsPermissions
                 .all()
@@ -377,7 +377,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
     Preconditions.checkNotNull(file, "file can't be null");
 
     // directory can't be marked as offline
-    if (file.getIsDirectory() == Boolean.TRUE) {
+    if (Boolean.TRUE.equals(file.getIsDirectory())) {
       return file;
     }
 
@@ -446,7 +446,7 @@ public class DMSFileRepository extends JpaRepository<DMSFile> {
       return json;
     }
 
-    boolean isFile = file.getIsDirectory() != Boolean.TRUE;
+    boolean isFile = !Boolean.TRUE.equals(file.getIsDirectory());
     LocalDateTime dt = file.getUpdatedOn();
     if (dt == null) {
       dt = file.getCreatedOn();

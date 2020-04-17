@@ -258,7 +258,7 @@ public final class MetaStore {
         continue;
       }
 
-      if (rule.getCanRead() != Boolean.TRUE) {
+      if (!Boolean.TRUE.equals(rule.getCanRead())) {
         continue;
       }
 
@@ -270,7 +270,7 @@ public final class MetaStore {
         attrs.put("hideIf", rule.getHideIf());
       }
 
-      if (rule.getCanWrite() != Boolean.TRUE) {
+      if (!Boolean.TRUE.equals(rule.getCanWrite())) {
         attrs.put("readonly", true);
         if (isBlank(rule.getReadonlyIf())) {
           attrs.remove("readonlyIf");
@@ -363,7 +363,7 @@ public final class MetaStore {
           continue;
         }
         final Object value = prop.get(record);
-        if (value == null || value == Boolean.FALSE) continue;
+        if (value == null || Boolean.FALSE.equals(value)) continue;
         if ("regex".equals(prop.getName())) {
           // XXX: rename regex to pattern to be aligned with pattern attribute used with normal
           // fields.
@@ -587,7 +587,7 @@ public final class MetaStore {
     final Map<String, Selection.Option> all = new LinkedHashMap<>();
 
     for (MetaSelectItem item : items) {
-      if (item.getHidden() == Boolean.TRUE) {
+      if (item.getHidden().equals(Boolean.TRUE)) {
         all.remove(item.getValue());
       } else {
         all.put(item.getValue(), getSelectionItem(item));

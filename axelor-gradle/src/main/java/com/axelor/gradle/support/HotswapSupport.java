@@ -191,7 +191,7 @@ public class HotswapSupport extends AbstractSupport {
     }
     if (extension.getLogAppend() != null) {
       hotswapProps.setProperty(
-          "logAppend", extension.getLogAppend() == Boolean.TRUE ? "true" : "false");
+          "logAppend", Boolean.TRUE.equals(extension.getLogAppend()) ? "true" : "false");
     }
 
     if (extension.getExtraClasspath() != null) {

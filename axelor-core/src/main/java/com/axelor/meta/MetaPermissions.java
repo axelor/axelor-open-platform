@@ -49,7 +49,7 @@ public class MetaPermissions {
       if (!object.equals(perm.getObject())) {
         continue;
       }
-      if (perm.getActive() != Boolean.TRUE || perm.getRules() == null) {
+      if (!Boolean.TRUE.equals(perm.getActive()) || perm.getRules() == null) {
         continue;
       }
       for (MetaPermissionRule rule : perm.getRules()) {
@@ -178,13 +178,13 @@ public class MetaPermissions {
     }
     switch (access) {
       case CAN_READ:
-        if (rule.getCanRead() == Boolean.TRUE) return true;
+        if (Boolean.TRUE.equals(rule.getCanRead())) return true;
         break;
       case CAN_WRITE:
-        if (rule.getCanWrite() == Boolean.TRUE) return true;
+        if (Boolean.TRUE.equals(rule.getCanWrite())) return true;
         break;
       case CAN_EXPORT:
-        if (rule.getCanExport() == Boolean.TRUE) return true;
+        if (Boolean.TRUE.equals(rule.getCanExport())) return true;
         break;
     }
     return false;

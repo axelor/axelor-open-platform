@@ -172,7 +172,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
       if (user == null) {
         return true;
       }
-      if (widget instanceof Help && user.getNoHelp() == Boolean.TRUE) {
+      if (widget instanceof Help && Boolean.TRUE.equals(user.getNoHelp())) {
         return false;
       }
       if (AuthUtils.isAdmin(user) || isBlank(object) || isBlank(field)) {
@@ -196,14 +196,14 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
       if (item.getHideIf() == null && rule.getHideIf() != null) {
         item.setHideIf(rule.getHideIf());
       }
-      if (rule.getCanWrite() != Boolean.TRUE) {
+      if (!Boolean.TRUE.equals(rule.getCanWrite())) {
         item.setReadonly(true);
         if (isBlank(rule.getReadonlyIf())) {
           item.setReadonlyIf(null);
         }
       }
 
-      return rule.getCanRead() == Boolean.TRUE;
+      return Boolean.TRUE.equals(rule.getCanRead());
     }
 
     @Override

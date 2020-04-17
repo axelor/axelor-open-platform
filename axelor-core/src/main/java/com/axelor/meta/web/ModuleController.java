@@ -88,7 +88,7 @@ public class ModuleController {
     }
 
     depends.stream()
-        .filter(m -> m.getInstalled() != Boolean.TRUE)
+        .filter(m -> !Boolean.TRUE.equals(m.getInstalled()))
         .map(MetaModule::getName)
         .forEach(all::add);
 
@@ -105,15 +105,15 @@ public class ModuleController {
     all.add(module.getName());
     for (MetaModule metaModule :
         modules.all().filter("?1 MEMBER OF self.depends", module.getId()).fetch()) {
-      if (metaModule.getApplication() == Boolean.TRUE
-          || metaModule.getInstalled() != Boolean.TRUE
+      if (Boolean.TRUE.equals(metaModule.getApplication())
+          || !Boolean.TRUE.equals(metaModule.getInstalled())
           || mainModule.equals(metaModule.getName())) {
         continue;
       }
-      if (metaModule.getPending() == Boolean.TRUE) {
+      if (Boolean.TRUE.equals(metaModule.getPending())) {
         throw new IllegalArgumentException(errorPending);
       }
-      if (metaModule.getRemovable() != Boolean.TRUE) {
+      if (!Boolean.TRUE.equals(metaModule.getRemovable())) {
         throw new IllegalArgumentException(errorDepends);
       }
       all.addAll(resolveLink(metaModule, mainModule));

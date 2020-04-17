@@ -63,7 +63,7 @@ public class AuthUtils {
   }
 
   public static boolean isActive(final User user) {
-    if (user.getArchived() == Boolean.TRUE || user.getBlocked() == Boolean.TRUE) {
+    if (Boolean.TRUE.equals(user.getArchived()) || Boolean.TRUE.equals(user.getBlocked())) {
       return false;
     }
 
@@ -84,7 +84,7 @@ public class AuthUtils {
   }
 
   public static boolean isTechnicalStaff(final User user) {
-    return user.getGroup() != null && user.getGroup().getTechnicalStaff() == Boolean.TRUE;
+    return user.getGroup() != null && Boolean.TRUE.equals(user.getGroup().getTechnicalStaff());
   }
 
   private static final String QS_HAS_ROLE =

@@ -168,7 +168,7 @@ public class ActionView extends Action {
       for (Context ctx : contexts) {
         if (ctx.test(handler)) {
           Object value = handler.evaluate(ctx.getExpression());
-          if (ctx.getCanCopy() == Boolean.TRUE && value instanceof Model) {
+          if (Boolean.TRUE.equals(ctx.getCanCopy()) && value instanceof Model) {
             value = JPA.copy((Model) value, true);
           }
           if (value instanceof ContextEntity) {

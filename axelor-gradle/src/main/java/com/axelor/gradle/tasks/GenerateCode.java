@@ -142,7 +142,7 @@ public class GenerateCode extends ModuleTask {
       text.append("\n").append("application = true").append("\n");
     }
 
-    if (removable == Boolean.TRUE) {
+    if (Boolean.TRUE.equals(removable)) {
       text.append("\n").append("removable = true").append("\n");
     }
     if (!depends.isEmpty()) {

@@ -64,7 +64,7 @@ public class Hilite {
     if (background != null) {
       css += " hilite-" + background;
     }
-    if (strong == Boolean.TRUE) {
+    if (Boolean.TRUE.equals(strong)) {
       css += " strong";
     }
     return css.trim();
