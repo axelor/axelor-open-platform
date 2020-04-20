@@ -102,15 +102,22 @@ function dotToNested(record, field) {
   return record;
 }
 
-function nestedToDot(record, name) {
+function nestedToDot(record, name, nullify) {
   var names = name.split('.');
   var val = record || {};
   var idx = 0;
   while (val && idx < names.length) {
-    val = val[names[idx++]];
+    var itName = names[idx++];
+    var itVal = val[itName];
+    if (nullify && (!itVal || itVal.id === undefined)) {
+      val[itName] = null;
+    }
+    val = itVal;
   }
   if (idx === names.length && val !== undefined) {
     record[name] = val;
+  } else if (nullify && !record.hasOwnProperty(name)) {
+    record[name] = null;
   }
   return record;
 }
@@ -2110,6 +2117,10 @@ Grid.prototype.commitEdit = function () {
     if (record.id === null || record.id === undefined) {
       record.id = item.id;
     }
+
+    // from nested fields to dotted fields and nullify empty values
+    _.filter(Object.keys(scope.fields), function(field) { return field.indexOf('.') >= 0; })
+      .forEach(function(field) { nestedToDot(record, field, true); });
 
     that.cols.forEach(function (col) {
       if (col.descriptor && col.descriptor.jsonField) {
