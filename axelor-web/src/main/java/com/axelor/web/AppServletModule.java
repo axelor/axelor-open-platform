@@ -70,7 +70,7 @@ public class AppServletModule extends ServletModule {
 
   protected void afterConfigureServlets() {
     // register initialization servlet
-    serve("__init__").with(AppInitializer.class);
+    serve("__init__").with(AppStartup.class);
   }
 
   @Override

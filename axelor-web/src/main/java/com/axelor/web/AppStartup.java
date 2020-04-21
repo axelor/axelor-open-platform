@@ -34,11 +34,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public class AppInitializer extends HttpServlet {
+public class AppStartup extends HttpServlet {
 
   private static final long serialVersionUID = -2493577642638670615L;
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AppInitializer.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AppStartup.class);
 
   @Inject private ModuleManager moduleManager;
 
