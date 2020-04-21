@@ -1805,7 +1805,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 
     // get updated values
     _.filter(grid.getColumns(), function (col) {
-      return col.descriptor && col.field && col.field.indexOf('.') === -1;
+      return col.descriptor && col.field && col.field.indexOf('.') === -1 && record[col.field] !== undefined;
     }).forEach(function (col) {
       result[col.field] = record[col.field];
     });
@@ -2110,12 +2110,13 @@ Grid.prototype.commitEdit = function () {
   scope.$emit("on:before-save", scope.record);
 
   var row = this.grid.getActiveCell().row;
-  var item = data.getItemByIdx(row);
 
   scope.waitForActions(function() {
-    var record = _.extend(scope.getContextRecord(), { $dirty: true, _orignal: scope.$$original });
-    if (record.id === null || record.id === undefined) {
-      record.id = item.id;
+    var record = _.extend(scope.getContextRecord(), { $fetched: false, $dirty: true, _orignal: scope.$$original });
+
+    if (!data.getItemById(record.id)) {
+      // record has changed elsewhere
+      return;
     }
 
     // from nested fields to dotted fields and nullify empty values
@@ -2131,7 +2132,7 @@ Grid.prototype.commitEdit = function () {
       }
     });
 
-    data.updateItem(item.id, record);
+    data.updateItem(record.id, record);
 
     var diff = scope._dataSource.diff(scope.$$original, scope.record);
     that.cols.forEach(function (col) {
