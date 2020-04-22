@@ -31,6 +31,7 @@ import com.axelor.db.tenants.TenantResolver;
 import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
 import com.axelor.events.ModuleChanged;
+import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaModule;
@@ -56,6 +57,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.slf4j.Logger;
@@ -87,6 +89,8 @@ public class ModuleManager {
 
   private static long lastRestored;
   private final Set<Path> pathsToRestore = new HashSet<>();
+
+  private static final AtomicBoolean BUSY = new AtomicBoolean(false);
 
   static {
     SKIP.add("axelor-common");
@@ -199,9 +203,15 @@ public class ModuleManager {
 
   public void restoreMeta() {
     try {
+      if (!BUSY.compareAndSet(false, true)) {
+        throw new IllegalStateException(
+            I18n.get(
+                "A views restoring is already in progress. Please wait until it ends and try again."));
+      }
       loadData = false;
       updateAll(false);
     } finally {
+      BUSY.set(false);
       loadData = true;
     }
   }
