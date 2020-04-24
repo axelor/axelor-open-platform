@@ -147,7 +147,6 @@ public class ModuleManager {
       this.encryptPasswords();
       this.doCleanUp();
     }
-    ViewWatcher.getInstance().start();
   }
 
   public void updateAll(boolean withDemo) {

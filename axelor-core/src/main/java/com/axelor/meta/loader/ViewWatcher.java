@@ -23,6 +23,9 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 import com.axelor.common.reflections.Reflections;
+import com.axelor.event.Observes;
+import com.axelor.events.ShutdownEvent;
+import com.axelor.events.StartupEvent;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaStore;
@@ -66,6 +69,7 @@ import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -474,7 +478,6 @@ public final class ViewWatcher {
     runner.start();
 
     running = true;
-    Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
   }
 
   public void stop() {
@@ -559,6 +562,18 @@ public final class ViewWatcher {
     @Override
     public String toString() {
       return "[" + kind + ", " + file + "]";
+    }
+  }
+
+  @Singleton
+  static class ViewWatcherLifecycleHandler {
+
+    public void onAppStart(@Observes StartupEvent event) {
+      ViewWatcher.getInstance().start();
+    }
+
+    public void onAppShutdown(@Observes ShutdownEvent event) {
+      ViewWatcher.getInstance().stop();
     }
   }
 }
