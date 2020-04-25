@@ -852,6 +852,9 @@ Grid.prototype._doInit = function(view) {
       grid.focus();
     }
   };
+  dataView.$cancelEdit = function () {
+    that.cancelEdit();
+  };
 
   if (this._canMove) {
     dataView.$resequence = _.bind(this._resequence, this);

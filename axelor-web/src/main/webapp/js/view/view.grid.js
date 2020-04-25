@@ -854,7 +854,6 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
           if (found) {
             found.selected = true;
           }
-          dataView.$syncSelection([], [], false);
         }
       });
     }],
@@ -866,6 +865,13 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
 
       scope.$watch('$$dirty', function gridDirtyWatch(dirty) {
         overlay.toggle(dirty);
+        if (scope.$parent.dataView) {
+          scope.$parent.dataView.$cancelEdit();
+        }
+      });
+
+      scope.$on('$destroy', function () {
+        overlay.remove();
       });
     },
     replace: true,
