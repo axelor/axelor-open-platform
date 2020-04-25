@@ -597,13 +597,13 @@ Grid.prototype.parse = function(view) {
       command: "sort-desc"
     } : null, sortable ? {
       separator: true
-    } : null, view.editable ? null : {
+    } : null, {
       title: _t("Group by") + " <i>" + column.name + "</i>",
       command: "group-by"
-    }, view.editable ? null : {
+    }, {
       title: _t("Ungroup"),
       command: "ungroup"
-    }, view.editable ? null : {
+    }, {
       separator: true
     }, {
       title: _t("Hide") + " <i>" + column.name + "</i>",
