@@ -828,10 +828,10 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
         });
       }
 
-      $scope.selectionChanged = _.debounce(function (selection) {
+      $scope.selectionChanged = _.debounce(function () {
         var current = $scope.record || {};
-        var first = _.first(selection);
-        if (first !== undefined) {
+        var first = parent.pagerIndex(true);
+        if (first > -1) {
           doEdit(first);
         } else if (current.id > 0) {
           $scope.edit(null);
