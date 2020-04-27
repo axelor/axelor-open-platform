@@ -1776,6 +1776,26 @@
     </xsd:attribute>
   </xsd:complexType>
 
+  <xsd:simpleType name="CardEditWindow">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="self">
+        <xsd:annotation>
+          <xsd:documentation>Show editor in same tab.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="popup">
+        <xsd:annotation>
+          <xsd:documentation>Show popup editor</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="popup-new">
+        <xsd:annotation>
+          <xsd:documentation>Show popup editor when creating new record.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+
   <xsd:complexType name="CardsView">
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleView">
@@ -1829,6 +1849,11 @@
         <xsd:attribute name="canDelete" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>Specify whether to show the 'Delete' button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="edit-window" type="tns:CardEditWindow">
+          <xsd:annotation>
+            <xsd:documentation>Specify how to show editor window.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>

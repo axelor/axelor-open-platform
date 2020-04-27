@@ -21,7 +21,7 @@
 
 var ui = angular.module('axelor.ui');
 
-function BaseCardsCtrl(type, $scope, $element) {
+function BaseCardsCtrl(type, $scope, $element, ViewService) {
 
   ui.DSViewCtrl(type, $scope, $element);
 
@@ -59,6 +59,7 @@ function BaseCardsCtrl(type, $scope, $element) {
   };
 
   $scope.onNew = function () {
+    if ($scope.onEditPopup(null, false)) return;
     ds._page.index = -1;
     $scope.switchTo('form', function (formScope) {
       formScope.edit(null);
@@ -66,6 +67,14 @@ function BaseCardsCtrl(type, $scope, $element) {
       formScope.$broadcast("on:new");
     });
   };
+
+  $scope.onEditPopup = function (record, readonly) {
+    var view = $scope.schema || {};
+    if (view.editWindow === 'popup' || (view.editWindow === 'popup-new' && !record)) {
+      $scope.showEditor(record, readonly);
+      return true;
+    }
+  }
 
   $scope.onRefresh = function () {
     return $scope.filter({});
@@ -135,11 +144,45 @@ function BaseCardsCtrl(type, $scope, $element) {
     }
     return $scope.schema[name];
   };
+
+  var editor = null;
+
+  $scope.showEditor = function(record, readonly) {
+    if (!editor) {
+      var editorScope = $scope.$new(true);
+      editorScope._viewParams = angular.copy($scope._viewParams);
+      editorScope.$$readonly = true;
+      editorScope.editorCanSave = true;
+      editorScope.select = angular.noop;
+      editorScope.getRouteOptions = angular.noop;
+      editorScope.setRouteOptions = angular.noop;
+      editor = ViewService.compile('<div ui-editor-popup></div>')(editorScope);
+      editor.data('$target', $element);
+      $scope.$on('$destroy', function () {
+        editor.remove();
+        editorScope.$destroy();
+      });
+    }
+
+    var popup = editor.isolateScope();
+
+    popup.show(record, function () {
+      $scope.onRefresh();
+    });
+
+    popup.waitForActions(function() {
+      if (!record || !record.id) {
+        popup.$broadcast("on:new");
+      } else {
+        popup.setEditable(!readonly);
+      }
+    });
+  };
 }
 
-ui.controller("CardsCtrl", ['$scope', '$element', function CardsCtrl($scope, $element) {
+ui.controller("CardsCtrl", ['$scope', '$element', 'ViewService', function CardsCtrl($scope, $element, ViewService) {
 
-  BaseCardsCtrl.call(this, 'cards', $scope, $element);
+  BaseCardsCtrl.call(this, 'cards', $scope, $element, ViewService);
 
   $scope.viewItems = {};
 
@@ -165,9 +208,9 @@ ui.controller("CardsCtrl", ['$scope', '$element', function CardsCtrl($scope, $el
   };
 }]);
 
-ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function KanbanCtrl($scope, $element, ActionService) {
+ui.controller("KanbanCtrl", ['$scope', '$element', 'ViewService', 'ActionService', function KanbanCtrl($scope, $element, ViewService, ActionService) {
 
-  BaseCardsCtrl.call(this, 'kanban', $scope, $element);
+  BaseCardsCtrl.call(this, 'kanban', $scope, $element, ViewService);
 
   $scope.parse = function (fields, view) {
     var params = $scope._viewParams.params || {};
@@ -379,6 +422,7 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
       };
 
       scope.onEdit = function (record, readonly) {
+        if (scope.onEditPopup(record, readonly)) return;
         scope._dataSource._record = record;
         scope.switchTo('form', function (formScope) {
           formScope.setEditable(!readonly && scope.hasPermission('write') && formScope.canEdit());
@@ -434,6 +478,7 @@ ui.directive('uiCards', function () {
     };
 
     scope.onEdit = function (record, readonly) {
+      if (scope.onEditPopup(record, readonly)) return;
       var ds = scope._dataSource;
       var page = ds._page;
       page.index = record ? ds._data.indexOf(record) : -1;

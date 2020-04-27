@@ -57,6 +57,9 @@ public class CardsView extends AbstractView {
 
   @XmlAttribute private Boolean canDelete;
 
+  @XmlAttribute(name = "edit-window")
+  private String editWindow;
+
   public String getOrderBy() {
     return orderBy;
   }
@@ -159,5 +162,13 @@ public class CardsView extends AbstractView {
 
   public void setCanDelete(Boolean canDelete) {
     this.canDelete = canDelete;
+  }
+
+  public String getEditWindow() {
+    return editWindow;
+  }
+
+  public void setEditWindow(String editWindow) {
+    this.editWindow = editWindow;
   }
 }
