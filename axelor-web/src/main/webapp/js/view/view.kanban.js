@@ -792,7 +792,10 @@ angular.module('axelor.ui').directive('uiPortletCards', function () {
   return {
     controller: 'CardsCtrl',
     replace: true,
-    link: linker,
+    link: function (scope, element, attrs) {
+      linker(scope, element, attrs);
+      scope.showPager = true;
+    },
     template:
       "<div class='portlet-cards' ui-portlet-refresh>" +
         "<div ui-cards></div>" +
