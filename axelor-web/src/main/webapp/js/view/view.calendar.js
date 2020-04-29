@@ -766,4 +766,24 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
   };
 }]);
 
+angular.module('axelor.ui').directive('uiPortletCalendar', function () {
+  return {
+    controller: CalendarViewCtrl,
+    replace: true,
+    link: function (scope, element, attrs) {
+      var colSpan = (scope.dashlet||{}).colSpan || 6;
+      var height = (scope.dashlet||{}).height;
+      height = height || (50 * colSpan);
+      setTimeout(function () {
+        element.parent().height(height);
+      });
+      scope.showPager = true;
+    },
+    template:
+      "<div class='portlet-calendar' ui-portlet-refresh>" +
+        "<div ui-view-calendar x-handler='this'></div>" +
+      "</div>"
+  };
+});
+
 })();
