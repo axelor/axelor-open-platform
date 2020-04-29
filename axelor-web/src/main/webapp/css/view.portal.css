@@ -176,6 +176,19 @@
   padding: 11px 15px 14px;
   margin-top: -1px;
   cursor: move;
+
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+}
+
+.dashboard .dashlet-header .dashlet-search {
+  margin-right: 4px;
+  border: 1px solid #e7e7e7;
+}
+
+.dashboard .dashlet-header .filter-box {
+  margin: 0;
 }
 
 .bar-layout .dashlet {
@@ -191,10 +204,10 @@
 .dashboard .dashlet-title {
   font-size: 14px;
   font-weight: 600;
-  max-width: 60%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1;  
 }
 
 .dashlet-title {
@@ -247,10 +260,6 @@
 .dashboard .dashlet-pager > a.disabled {
   color: gray;
   cursor: default;
-}
-
-.dashlet .chart-controls {
-
 }
 
 .dashlet .chart-controls form {
