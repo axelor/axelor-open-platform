@@ -329,6 +329,47 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ViewService', 'ActionService
   };
 }]);
 
+ui.directive('uiKanban', function () {
+  return {
+    replace: true,
+    template:
+      "<div class='kanban-view row-fluid' ng-clsss='::schema.css'>" +
+        "<div class='kanban-column' ng-repeat='column in ::columns' ui-kanban-column>" +
+          "<h3>{{::column.title}}</h3>" +
+          "<div class='input-group' ng-if='::column.canCreate' ng-show='hasPermission(\"create\")'>" +
+            "<input type='text' class='form-control' ng-model='$parent.newItem'>" +
+            "<span class='input-group-btn'>" +
+              "<button type='button' class='btn' ng-click='onCreate()'><span x-translate>Add</span></button>" +
+            "</span>" +
+          "</div>" +
+          "<ul class='kanban-card-list' ui-sortable='sortableOptions' ng-model='records'>" +
+            "<li class='kanban-card' ng-class='hilite.color' ng-repeat='record in records' ui-card>" +
+              "<div class='kanban-card-menu btn-group pull-right' ng-if='hasButton(\"edit\") || hasButton(\"delete\")' ng-show='hasPermission(\"write\") || hasPermission(\"remove\")'>" +
+                "<a tabindex='-1' href='javascript:' class='btn btn-link dropdown-toggle' data-toggle='dropdown'>" +
+                  "<i class='fa fa-caret-down'></i>" +
+                "</a>" +
+                "<ul class='dropdown-menu pull-right'>" +
+                  "<li><a href='javascript:' ng-if='hasButton(\"edit\")' ng-show='hasPermission(\"write\")' ng-click='onEdit(record)' x-translate>Edit</a></li>" +
+                  "<li><a href='javascript:' ng-if='hasButton(\"delete\")' ng-show='hasPermission(\"remove\")' ng-click='onDelete(record)' x-translate>Delete</a></li>" +
+                "</ul>" +
+              "</div>" +
+              "<div class='kanban-card-body'></div>" +
+            "</li>" +
+          "</ul>" +
+          "<div class='kanban-empty'>" +
+            "<span class='help-block text-center' x-translate>No records found.</span>" +
+          "</div>" +
+          "<div class='kanban-more ng-hide' ng-show='hasMore()'>" +
+            "<a class='btn btn-load-more' tabindex='-1' href='' role='button' ng-click='onMore()'>" +
+              "<span x-translate>load more</span>" +
+              "<i class='fa fa-arrow-right fa-fw'></i>" +
+            "</a>" +
+          "</div>" +
+        "</div>" +
+      "</div>"
+  }
+});
+
 ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 
   return {
@@ -723,36 +764,50 @@ ui.directive('uiCard', ["$compile", function ($compile) {
   };
 }]);
 
+function linker(scope, element, atts) {
+  scope.$$portlet = true;
+
+  var _filter = scope.filter;
+  var _action = scope._viewAction;
+  
+  scope.filter = function (options) {
+    var opts = _.extend({}, options, {
+      action: _action
+    });
+    if (scope._context && scope.formPath && scope.getContext) {
+      opts.context = _.extend({id: null}, scope._context, scope.getContext());
+    }
+    return _filter.call(scope, opts);
+  };
+
+  function refresh() {
+    scope.onRefresh();
+  }
+
+  scope.$on('on:new', refresh);
+  scope.$on('on:edit', refresh);
+}
+
 angular.module('axelor.ui').directive('uiPortletCards', function () {
   return {
     controller: 'CardsCtrl',
     replace: true,
-    link: function (scope, element, attrs) {
-      scope.$$portlet = true;
-      
-      var _filter = scope.filter;
-      var _action = scope._viewAction;
-      
-      scope.filter = function (options) {
-        var opts = _.extend({}, options, {
-          action: _action
-        });
-        if (scope._context && scope.formPath && scope.getContext) {
-          opts.context = _.extend({id: null}, scope._context, scope.getContext());
-        }
-        return _filter.call(scope, opts);
-      };
-
-      function refresh() {
-        scope.onRefresh();
-      }
-
-      scope.$on('on:new', refresh);
-      scope.$on('on:edit', refresh);
-    },
+    link: linker,
     template:
       "<div class='portlet-cards' ui-portlet-refresh>" +
         "<div ui-cards></div>" +
+      "</div>"
+  };
+});
+
+angular.module('axelor.ui').directive('uiPortletKanban', function () {
+  return {
+    controller: 'KanbanCtrl',
+    replace: true,
+    link: linker,
+    template:
+      "<div class='portlet-kanban' ui-portlet-refresh>" +
+        "<div ui-kanban></div>" +
       "</div>"
   };
 });
