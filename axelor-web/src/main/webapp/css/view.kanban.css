@@ -312,3 +312,11 @@
     padding-bottom: 0;
   }
 }
+
+.portlet-cards {
+  position: relative;
+}
+
+.portlet-cards .cards-view {
+  top: 0;
+}

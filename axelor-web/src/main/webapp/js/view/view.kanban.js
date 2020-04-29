@@ -70,7 +70,7 @@ function BaseCardsCtrl(type, $scope, $element, ViewService) {
 
   $scope.onEditPopup = function (record, readonly) {
     var view = $scope.schema || {};
-    if (view.editWindow === 'popup' || (view.editWindow === 'popup-new' && !record)) {
+    if (view.editWindow === 'popup' || (view.editWindow === 'popup-new' && !record) || $scope.$$portlet) {
       $scope.showEditor(record, readonly);
       return true;
     }
@@ -88,10 +88,10 @@ function BaseCardsCtrl(type, $scope, $element, ViewService) {
   };
 
   $scope.filter = function(options) {
-    var view = $scope.schema;
-    var opts = {
+    var view = $scope.schema || {};
+    var opts = _.extend(_.pick(options, ['action', 'domain', 'context', 'archived']), {
       fields: _.pluck($scope.fields, 'name')
-    };
+    });
     var handleEmpty = $scope.handleEmpty.bind($scope);
 
     if (options.criteria || options._domains) {
@@ -468,45 +468,66 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 }]);
 
 ui.directive('uiCards', function () {
+  return {
+    link: function (scope, element, attrs) {
+      var onRefresh = scope.onRefresh;
+      scope.onRefresh = function () {
+        scope.records = null;
+        return onRefresh.apply(scope, arguments);
+      };
 
-  return function (scope, element, attrs) {
-
-    var onRefresh = scope.onRefresh;
-    scope.onRefresh = function () {
-      scope.records = null;
-      return onRefresh.apply(scope, arguments);
-    };
-
-    scope.onEdit = function (record, readonly) {
-      if (scope.onEditPopup(record, readonly)) return;
-      var ds = scope._dataSource;
-      var page = ds._page;
-      page.index = record ? ds._data.indexOf(record) : -1;
-      scope.switchTo('form', function (formScope) {
-        formScope.setEditable(!readonly && scope.hasPermission('write') && formScope.canEdit());
-      });
-    };
-
-    scope.onDelete = function (record) {
-      axelor.dialogs.confirm(_t("Do you really want to delete the selected record?"),
-      function(confirmed) {
-        if (!confirmed) {
-          return;
-        }
+      scope.onEdit = function (record, readonly) {
+        if (scope.onEditPopup(record, readonly)) return;
         var ds = scope._dataSource;
-        ds.removeAll([record]).success(function() {
-          scope.onRefresh();
+        var page = ds._page;
+        page.index = record ? ds._data.indexOf(record) : -1;
+        scope.switchTo('form', function (formScope) {
+          formScope.setEditable(!readonly && scope.hasPermission('write') && formScope.canEdit());
         });
-      });
-    };
+      };
 
-    scope.isEmpty = function () {
-      return (scope.records||[]).length == 0;
-    };
+      scope.onDelete = function (record) {
+        axelor.dialogs.confirm(_t("Do you really want to delete the selected record?"),
+        function(confirmed) {
+          if (!confirmed) {
+            return;
+          }
+          var ds = scope._dataSource;
+          ds.removeAll([record]).success(function() {
+            scope.onRefresh();
+          });
+        });
+      };
 
-    scope.handleEmpty = function () {
-      element.toggleClass('empty', scope.isEmpty());
-    };
+      scope.isEmpty = function () {
+        return (scope.records||[]).length == 0;
+      };
+
+      scope.handleEmpty = function () {
+        element.toggleClass('empty', scope.isEmpty());
+      };
+    },
+    replace: true,
+    template:
+    "<div class='cards-view row-fluid' ng-class='::schema.css'>" +
+      "<div class='kanban-card-list'>" +
+        "<div class='cards-no-records' x-translate>No records found.</div>" +
+        "<div class='kanban-card-container' ng-repeat='record in records'>" +
+        "<div class='kanban-card' ng-class='hilite.color' ui-card>" +
+          "<div class='kanban-card-menu btn-group pull-right' ng-if='hasButton(\"edit\") || hasButton(\"delete\")' ng-show='hasPermission(\"write\") || hasPermission(\"remove\")'>" +
+            "<a tabindex='-1' href='javascript:' class='btn btn-link dropdown-toggle' data-toggle='dropdown'>" +
+                "<i class='fa fa-caret-down'></i>" +
+            "</a>" +
+            "<ul class='dropdown-menu pull-right'>" +
+                "<li><a href='javascript:' ng-if='hasButton(\"edit\")' ng-show='hasPermission(\"write\")' ng-click='onEdit(record)' x-translate>Edit</a></li>" +
+                "<li><a href='javascript:' ng-if='hasButton(\"delete\")' ng-show='hasPermission(\"remove\")' ng-click='onDelete(record)' x-translate>Delete</a></li>" +
+            "</ul>" +
+          "</div>" +
+          "<div class='kanban-card-body'></div>" +
+        "</div>" +
+        "</div>" +
+      "</div>" +
+    "</div>"
   };
 });
 
@@ -701,5 +722,39 @@ ui.directive('uiCard', ["$compile", function ($compile) {
     }
   };
 }]);
+
+angular.module('axelor.ui').directive('uiPortletCards', function () {
+  return {
+    controller: 'CardsCtrl',
+    replace: true,
+    link: function (scope, element, attrs) {
+      scope.$$portlet = true;
+      
+      var _filter = scope.filter;
+      var _action = scope._viewAction;
+      
+      scope.filter = function (options) {
+        var opts = _.extend({}, options, {
+          action: _action
+        });
+        if (scope._context && scope.formPath && scope.getContext) {
+          opts.context = _.extend({id: null}, scope._context, scope.getContext());
+        }
+        return _filter.call(scope, opts);
+      };
+
+      function refresh() {
+        scope.onRefresh();
+      }
+
+      scope.$on('on:new', refresh);
+      scope.$on('on:edit', refresh);
+    },
+    template:
+      "<div class='portlet-cards' ui-portlet-refresh>" +
+        "<div ui-cards></div>" +
+      "</div>"
+  };
+});
 
 })();
