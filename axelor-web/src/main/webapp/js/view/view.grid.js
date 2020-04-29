@@ -873,6 +873,49 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
   };
 }]);
 
+ui.directive('uiPortletRefresh', ['NavService', function (NavService) {
+  return function (scope, element) {
+    if (!scope.onRefresh) return;
+
+    var onRefresh = scope.onRefresh.bind(scope);
+    var unwatch = false;
+    var loading = false;
+
+    scope.onRefresh = function () {
+      var tab = NavService.getSelected();
+      var type = (tab.params||{})['details-view'] ? scope.$parent._viewType : tab.viewType || tab.type;
+      if (['dashboard', 'form'].indexOf(type) === -1) {
+        if (unwatch) {
+          unwatch();
+          unwatch = null;
+        }
+        return;
+      }
+
+      if (unwatch || loading) {
+        return;
+      }
+
+      unwatch =  scope.$watch(function portletVisibleWatch() {
+        if (element.is(":hidden")) {
+          return;
+        }
+
+        unwatch();
+        unwatch = null;
+        loading = true;
+
+        scope.waitForActions(function () {
+          scope.ajaxStop(function () {
+            loading = false;
+            onRefresh();
+          });
+        });
+      });
+    };
+  };
+}])
+
 ui.directive('uiPortletGrid', function(){
   return {
     controller: ['$scope', '$element', 'ViewService', 'NavService', 'MenuService',
@@ -948,40 +991,8 @@ ui.directive('uiPortletGrid', function(){
         $scope.onRefresh();
       });
 
-      var unwatch = false;
-      var loading = false;
-
       $scope.onRefresh = function () {
-        var tab = NavService.getSelected();
-        var type = (tab.params||{})['details-view'] ? $scope.$parent._viewType : tab.viewType || tab.type;
-        if (['dashboard', 'form'].indexOf(type) === -1) {
-          if (unwatch) {
-            unwatch();
-            unwatch = null;
-          }
-          return;
-        }
-
-        if (unwatch || loading) {
-          return;
-        }
-
-        unwatch =  $scope.$watch(function gridVisibleWatch() {
-          if ($element.is(":hidden")) {
-            return;
-          }
-
-          unwatch();
-          unwatch = null;
-          loading = true;
-
-          $scope.waitForActions(function () {
-            $scope.ajaxStop(function () {
-              loading = false;
-              $scope.filter({});
-            });
-          });
-        });
+        $scope.filter({});
       };
 
       var _onShow = $scope.onShow;
@@ -1029,7 +1040,7 @@ ui.directive('uiPortletGrid', function(){
     }],
     replace: true,
     template:
-    '<div class="portlet-grid">'+
+    '<div class="portlet-grid" ui-portlet-refresh>'+
       '<div ui-view-grid x-view="schema" x-on-init="onGridInit" x-data-view="dataView" x-editable="false" x-no-filter="{{noFilter}}" x-handler="this"></div>'+
     '</div>'
   };
