@@ -466,6 +466,19 @@ function applyLimitsOnLegendAndLabels(chart, scope, series, datum, config) {
   }
 }
 
+function applyTitles(chart, xTitle, yTitle) {
+  if (xTitle && chart.xAxis && chart.xAxis.axisLabel) {
+    var minMargin = 60;
+    if (chart.staggerLabels && chart.staggerLabels() && chart.margin().bottom < minMargin) {
+      chart.margin().bottom = minMargin;
+    }
+    chart.xAxis.axisLabel(xTitle);
+  }
+  if (yTitle && chart.yAxis && chart.yAxis.axisLabel) {
+    chart.yAxis.axisLabel(yTitle);
+  }
+}
+
 function PieChart(scope, element, data) {
 
   var series = _.first(data.series);
@@ -522,6 +535,7 @@ function DBarChart(scope, element, data) {
       .staggerLabels(true)
       .showValues(true);
   applyLimitsOnLegendAndLabels(chart, scope, series, datum, config);
+  applyTitles(chart, data.xTitle, series.title);
 
   d3.select(element[0])
     .datum(datum)
@@ -543,6 +557,7 @@ function BarChart(scope, element, data) {
   var chart = nv.models.multiBarChart()
     .reduceXTicks(false);
   applyLimitsOnLegendAndLabels(chart, scope, series, datum, config);
+  applyTitles(chart, data.xTitle, series.title);
 
   chart.multibar.hideable(true);
   chart.stacked(data.stacked);
@@ -566,6 +581,7 @@ function HBarChart(scope, element, data) {
 
   var chart = nv.models.multiBarHorizontalChart();
   applyLimitsOnLegendAndLabels(chart, scope, series, datum, config);
+  applyTitles(chart, data.xTitle, series.title);
 
   chart.stacked(data.stacked);
 
@@ -631,7 +647,7 @@ function LineChart(scope, element, data) {
     .showYAxis(true)
     .showXAxis(true);
   applyLimitsOnLegend(chart, scope, series, datum, config);
-
+  applyTitles(chart, data.xTitle, series.title);
   applyXY(chart, data);
 
   d3.select(element[0])
@@ -649,7 +665,7 @@ function AreaChart(scope, element, data) {
 
   var chart = nv.models.stackedAreaChart();
   applyLimitsOnLegend(chart, scope, series, datum, config);
-
+  applyTitles(chart, data.xTitle, series.title);
   applyXY(chart, data);
 
   d3.select(element[0])
