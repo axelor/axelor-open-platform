@@ -739,7 +739,9 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
     scope.$callWhen(function () {
       return main.is(':visible');
     }, function() {
-      element.parents('.view-container:first').css('overflow', 'inherit');
+      if (scope.viewType !== 'dashboard') {
+        element.parents('.view-container:first').css('overflow', 'inherit');
+      }
       scope.onMode(mode);
       adjustSize();
     }, 100);
