@@ -769,7 +769,7 @@ function linker(scope, element, atts) {
 
   var _filter = scope.filter;
   var _action = scope._viewAction;
-  
+
   scope.filter = function (options) {
     var opts = _.extend({}, options, {
       action: _action
