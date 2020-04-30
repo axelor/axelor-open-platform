@@ -92,7 +92,7 @@ ui.directive('uiViewDashboard', ['ViewService', function(ViewService) {
 
       scope.sortableOptions = {
         handle: ".dashlet-header",
-        cancel: ".dashlet-buttons",
+        cancel: ".dashlet-buttons,input,textarea,button,select,option",
         items: ".dashlet",
         tolerance: "pointer",
         activate: function(e, ui) {
