@@ -1,0 +1,9 @@
+---
+title: Add support for popup editor on cards and kanban views
+type: feature
+description: |
+  A new attribute `edit-window` is added with the following values:
+
+  * `self` - show editor in same tab
+  * `popup` - show popup editor
+  * `popup-new` - show popup editor for new records only
