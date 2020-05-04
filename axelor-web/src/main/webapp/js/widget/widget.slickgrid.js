@@ -827,11 +827,11 @@ Grid.prototype._doInit = function(view) {
       dataView.getItem(old[0]).selected = true;
     }
     if (!focus) {
-      _.each(dataView.getItems(), function (item, i) {
-        if (item.selected) {
-          selection.push(i);
-        }
-      });
+      var selectionIds = _.chain(dataView.getItems())
+        .filter(function(item) { return item.selected; })
+        .map(function(item) { return item.id; })
+        .value();
+      _.each(dataView.mapIdsToRows(selectionIds), function(row) { selection.push(row); });
     }
     selection = _.unique(selection);
     grid.setSelectedRows(selection);
