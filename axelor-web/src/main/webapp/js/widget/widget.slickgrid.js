@@ -1436,6 +1436,10 @@ Grid.prototype.onKeyDown = function (e) {
 };
 
 Grid.prototype.isCellEditable = function(row, cell) {
+  var dataItem = this.grid.getDataItem(row);
+  if (dataItem && (dataItem.__group || dataItem.__groupTotals)) {
+    return false;
+  }
   var cols = this.grid.getColumns(),
     col = cols[cell];
   if (!col || col.id === "_edit_column" || col.id === "_move_column" || col.id === "_checkbox_selector") {
