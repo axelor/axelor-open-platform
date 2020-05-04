@@ -2756,7 +2756,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         schema.rowHeight = field.rowHeight || schema.rowHeight;
         schema.orderBy = field.orderBy || schema.orderBy;
         schema.groupBy = field.groupBy || schema.groupBy;
-        schema.groupBy = (schema.editable || schema.groupBy === "false") ? false : schema.groupBy;
+        schema.groupBy = schema.groupBy === "false" ? false : schema.groupBy;
         schema.canMassUpdate = !!_.find(schema.items, function (item) { return item.massUpdate; });
 
         element.show();
