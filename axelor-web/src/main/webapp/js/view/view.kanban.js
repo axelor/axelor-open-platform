@@ -150,7 +150,7 @@ function BaseCardsCtrl(type, $scope, $element, ViewService) {
   $scope.showEditor = function(record, readonly) {
     if (!editor) {
       var editorScope = $scope.$new(true);
-      editorScope._viewParams = angular.copy($scope._viewParams);
+      editorScope._viewParams = _.extend({}, $scope._viewParams);
       editorScope.$$readonly = true;
       editorScope.editorCanSave = true;
       editorScope.select = angular.noop;
