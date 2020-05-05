@@ -269,6 +269,7 @@
 
 .slick-editor .form-item-container > .ibox {
   margin: 2px 3px !important;
+  width: auto;
 }
 
 .slick-editor-dropdown {
