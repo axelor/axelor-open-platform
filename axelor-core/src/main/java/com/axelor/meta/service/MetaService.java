@@ -82,7 +82,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import org.hibernate.query.internal.AbstractProducedQuery;
+import org.hibernate.transform.BasicTransformerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -852,9 +852,25 @@ public class MetaService {
     return response;
   }
 
+  @SuppressWarnings("deprecation")
   private void transformQueryResult(Query query) {
     // TODO: fix deprecation when new transformer api is implemented in hibernate
-    ((AbstractProducedQuery<?>) query)
-        .setResultTransformer(AliasToEntityOrderedMapResultTransformer.INSTANCE);
+    query.unwrap(org.hibernate.query.Query.class).setResultTransformer(new DataSetTransformer());
+  }
+
+  @SuppressWarnings("serial")
+  private static final class DataSetTransformer extends BasicTransformerAdapter {
+
+    @Override
+    public Object transformTuple(Object[] tuple, String[] aliases) {
+      Map<String, Object> result = new LinkedHashMap<>(tuple.length);
+      for (int i = 0; i < tuple.length; ++i) {
+        String alias = aliases[i];
+        if (alias != null) {
+          result.put(alias, tuple[i]);
+        }
+      }
+      return result;
+    }
   }
 }
