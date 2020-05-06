@@ -272,6 +272,14 @@
   width: auto;
 }
 
+.slick-editor .form-item-container > .ibox > input {
+  margin-left: 0 !important;
+  width: 20px !important;
+  height: 20px !important;
+  min-height: auto !important;
+  z-index: 1;
+}
+
 .slick-editor-dropdown {
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   min-width: 250px;
