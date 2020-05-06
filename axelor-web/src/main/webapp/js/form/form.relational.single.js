@@ -1013,9 +1013,7 @@ ui.formInput('RefText', 'ManyToOne', {
   link_editable: function (scope, element, attrs) {
     this._super.apply(this, arguments);
 
-    if (!scope.field.create) {
-      return;
-    }
+    var field = scope.field;
 
     function freeSelect(text) {
       return function () {
@@ -1028,10 +1026,20 @@ ui.formInput('RefText', 'ManyToOne', {
     scope.loadSelection = function(request, response) {
       this.fetchSelection(request, function(items, page) {
         var term = request.term;
-        if (term) {
+        if (term && field.create) {
           items.push({
             label : _t('Select "{0}"...', term),
             click : freeSelect(term)
+          });
+        }
+        if (field.targetSearch) {
+          items = items.map(function (item) {
+            var label = item.label;
+            var value = item.value;
+            return {
+              label: label + " (" + value[field.targetSearch] + ")",
+              value: value
+            };
           });
         }
         response(items);
