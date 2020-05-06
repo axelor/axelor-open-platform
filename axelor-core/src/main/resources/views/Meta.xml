@@ -419,6 +419,7 @@
       <field name="style" />
       <field name="view" widget="ref-text"
         x-target-name="name"
+        x-target-search="module"
         x-target="com.axelor.meta.db.MetaView"
         x-domain="self.model = :model AND self.type IN ('form', 'grid')" />
       <field name="language" />
