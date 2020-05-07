@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.lang.management.ManagementFactory;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -190,7 +192,7 @@ public final class ViewWatcher {
       return;
     }
 
-    final String fileName = Paths.get(path.toUri().getPath()).getFileName().toString();
+    final String fileName = path.getFileName().toString();
     final Matcher moduleNameMatcher = moduleNamePattern.matcher(fileName);
     final String moduleName;
 
@@ -298,7 +300,8 @@ public final class ViewWatcher {
       final Optional<URL> rootResourceOpt = Optional.ofNullable(classLoader.getResource(""));
       rootResourceOpt.ifPresent(
           rootResource -> {
-            final Path libPath = Paths.get(rootResource.getPath(), "..", "lib").normalize();
+            final Path libPath =
+                Paths.get(toURI(rootResource)).resolve(Paths.get("..", "lib")).normalize();
             if (libPath.toFile().isDirectory()) {
               paths.add(libPath);
             }
@@ -311,9 +314,8 @@ public final class ViewWatcher {
             .byName("(domains|i18n|views)/(.*?)\\.(xml|csv)$")
             .find()
             .parallelStream()
-            .map(URL::getPath)
-            .filter(path -> path.startsWith("/"))
-            .map(path -> Paths.get(path, "..").normalize())
+            .filter(url -> url.getPath().startsWith("/"))
+            .map(url -> Paths.get(toURI(url)).resolve("..").normalize())
             .distinct()
             .forEach(paths::add);
 
@@ -409,6 +411,14 @@ public final class ViewWatcher {
       }
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
+    }
+  }
+
+  private static URI toURI(URL url) {
+    try {
+      return url.toURI();
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
     }
   }
 
