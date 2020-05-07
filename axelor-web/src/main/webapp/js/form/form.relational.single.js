@@ -603,7 +603,7 @@ ui.formInput('ManyToOne', 'Select', {
 
       var value = scope.getValue();
       var name = scope.field.targetName;
-      if (value && value.id > 0 && !value[name]) {
+      if (name && value && value.id > 0 && !value[name]) {
         return scope._dataSource.details(value.id, name).success(function(rec) {
           value[name] = rec[name];
           input.val(scope.getText());
