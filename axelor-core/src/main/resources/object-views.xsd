@@ -947,6 +947,13 @@
         <xsd:documentation>Specify the default page limit of search popup.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-color-field" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify the color field to use with tag-select widget.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:attributeGroup name="ObjectViewAttributes">

@@ -167,6 +167,9 @@ public class Field extends SimpleWidget {
   @XmlAttribute(name = "x-search-limit")
   private Integer searchLimit;
 
+  @XmlAttribute(name = "x-color-field")
+  private String colorField;
+
   @XmlAttribute(name = "x-accept")
   private String accept;
 
@@ -534,6 +537,14 @@ public class Field extends SimpleWidget {
 
   public void setSearchLimit(Integer searchLimit) {
     this.searchLimit = searchLimit;
+  }
+
+  public String getColorField() {
+    return colorField;
+  }
+
+  public void setColorField(String colorField) {
+    this.colorField = colorField;
   }
 
   public String getAccept() {

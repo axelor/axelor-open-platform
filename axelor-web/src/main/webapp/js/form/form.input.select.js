@@ -376,6 +376,10 @@ ui.formInput('Select', 'BaseSelect', {
     };
 
     scope.findColor = function(item) {
+      if (!item) return null;
+      if (field.colorField && field.colorField in item) {
+        return item[field.colorField];
+      }
       return selectionColors["" + item];
     };
 
