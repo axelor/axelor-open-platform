@@ -622,6 +622,11 @@
                   <xsd:documentation>Image icon to show for this item.</xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
+              <xsd:attribute name="color" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>Tag color for this item.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
               <xsd:attribute name="order" type="xsd:int">
                 <xsd:annotation>
                   <xsd:documentation>

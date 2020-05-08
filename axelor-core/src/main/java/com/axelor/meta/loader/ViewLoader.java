@@ -417,6 +417,7 @@ public class ViewLoader extends AbstractParallelLoader {
       item.setValue(opt.getValue());
       item.setTitle(opt.getTitle());
       item.setIcon(opt.getIcon());
+      item.setColor(opt.getColor());
       item.setOrder(seq);
       item.setHidden(opt.getHidden());
 

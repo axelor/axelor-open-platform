@@ -237,11 +237,21 @@ var Formatters = {
       }
       return res;
     };
+    var formatTag = function (v) {
+      var css = "label label-primary";
+      if (v.color) {
+        css = css + " " + v.color;
+      }
+      return '<span class="'+ css +'"><span class="tag-text">'+v.title+'</span></span>';
+    };
+
+    if (value && field.widget === 'single-select') {
+      var item = formatTag(findSelect(value));
+      return '<span class="tag-select">' + item + '</span>';
+    }
 
     if (value && field.widget === 'multi-select') {
-      var items = value.split(/\s*,\s*/).map(findSelect).map(function (res) {
-        return '<span class="label label-primary"><span class="tag-text">'+res.title+'</span></span>';
-      });
+      var items = value.split(/\s*,\s*/).map(findSelect).map(formatTag);
       return '<span class="tag-select">' + items.join(' ') + '</span>';
     }
 

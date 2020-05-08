@@ -75,6 +75,8 @@ public class Selection {
 
     @XmlAttribute private String icon;
 
+    @XmlAttribute private String color;
+
     @XmlAttribute private Integer order;
 
     @XmlAttribute private Boolean hidden;
@@ -111,6 +113,14 @@ public class Selection {
 
     public void setIcon(String icon) {
       this.icon = icon;
+    }
+
+    public String getColor() {
+      return color;
+    }
+
+    public void setColor(String color) {
+      this.color = color;
     }
 
     public Integer getOrder() {

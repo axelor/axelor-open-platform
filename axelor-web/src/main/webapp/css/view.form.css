@@ -992,12 +992,13 @@ label.has-help > span:after,
 }
 
 .tag-select {
-  border: 1px solid #c1c1c1;
+  border: 1px solid #ccc;
   border-radius: 4px;
   transition: border linear .2s, box-shadow linear .2s;
   min-height: 26px;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   height: 100%;
 }
 
@@ -1042,14 +1043,19 @@ label.has-help > span:after,
 
 .tag-select li,
 .tag-select .label {
-  float: left;
   display: inline-block;
-  margin: 2px 2px 0 0;
+  margin: 2px;
 }
 
 .tag-select .label,
 .tag-select .tag-selector {
   height: 21px;
+}
+
+.tag-select .label {
+  display: inline-flex;
+  align-items: center;
+  max-width: calc(100% - 4px);
 }
 
 .tag-select ul,
@@ -1061,11 +1067,13 @@ label.has-help > span:after,
 .tag-select-single .tag-item i {
   font-size: 10px;
   cursor: pointer;
+  margin-left: 4px;
 }
 
 .tag-select .tag-text,
 .tag-select .tag-link,
 .tag-select-single .tag-link {
+  flex: 1;
   display: inline-block;
   height: 15px;
   max-width: 140px;
@@ -1153,13 +1161,123 @@ label.has-help > span:after,
 .slick-cell .tag-select.picker-input ul {
   margin-left: 3px;
 }
-.slick-cell .tag-select .label, .slick-cell .tag-select .tag-selector {
-  height: 20px;
-}
 
 .slick-cell .tag-select li.tag-selector input {
   height: 20px !important;
   min-height: inherit;
+}
+
+.tag-select-list-item > a {
+  padding: 4px .4em !important;
+}
+
+.tag-select-list-item > a > span {
+  display: inline-block;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 12px;
+  height: 20px;
+  line-height: 20px;
+  padding: 0 10px;
+}
+
+.tag-select .label.red,
+.tag-select-list-item.red > a > span {
+  background: #f44336;
+}
+
+.tag-select .label.pink,
+.tag-select-list-item.pink > a > span {
+  background: #e91e63;
+}
+
+.tag-select .label.purple,
+.tag-select-list-item.purple > a > span {
+  background: #9c27b0;
+}
+
+.tag-select .label.deeppurple,
+.tag-select-list-item.deeppurple > a > span {
+  background: #673ab7;
+}
+
+.tag-select .label.indigo,
+.tag-select-list-item.indigo > a > span {
+  background: #3f51b5;
+}
+
+.tag-select .label.blue,
+.tag-select-list-item.blue > a > span {
+  background: #2196f3;
+}
+
+.tag-select .label.lightblue,
+.tag-select-list-item.lightblue > a > span {
+  background: #03a9f4;
+}
+
+.tag-select .label.cyan,
+.tag-select-list-item.cyan > a > span {
+  background: #00bcd4;
+}
+
+.tag-select .label.teal,
+.tag-select-list-item.teal > a > span {
+  background: #009688;
+}
+
+.tag-select .label.green,
+.tag-select-list-item.green > a > span {
+  background: #4caf50;
+}
+
+.tag-select .label.lightgreen,
+.tag-select-list-item.lightgreen > a > span {
+  background: #8bc34a;
+}
+
+.tag-select .label.lime,
+.tag-select-list-item.lime > a > span {
+  background: #cddc39;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.tag-select .label.yellow,
+.tag-select-list-item.yellow > a > span {
+  background: #ffeb3b;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.tag-select .label.amber,
+.tag-select-list-item.amber > a > span {
+  background: #ffc107;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.tag-select .label.orange,
+.tag-select-list-item.orange > a > span {
+  background: #ff9800;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.tag-select .label.deeporange,
+.tag-select-list-item.deeporange > a > span {
+  background: #ff5722;
+}
+
+.tag-select .label.brown,
+.tag-select-list-item.brown > a > span {
+  background: #795548;
+}
+
+.tag-select .label.grey,
+.tag-select-list-item.grey > a > span {
+  background: #9e9e9e;
+}
+
+.tag-select .label.bluegrey,
+.tag-select-list-item.bluegrey > a > span {
+  background: #607d8b;
 }
 
 .image-select {
