@@ -216,7 +216,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ViewService', 'ActionService
     var params = $scope._viewParams.params || {};
     var hideCols = (params['kanban-hide-columns'] || '').split(',');
     var columnBy = fields[view.columnBy] || {};
-    var columns = _.filter(columnBy.selectionList, function (item) {
+    var columns = _.filter(view.columns, function (item) {
       return hideCols.indexOf(item.value) === -1;
     });
 
@@ -233,6 +233,16 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ViewService', 'ActionService
     $scope.sortableOptions.disabled = !view.draggable || !$scope.hasPermission('write');
     $scope.columns = columns;
     $scope.colWidth = params['kanban-column-width'];
+
+    if (columnBy.target) {
+      $scope.toColumnValue = function (value) {
+        return { id : value };
+      }
+    }
+  };
+
+  $scope.toColumnValue = function (value) {
+    return value;
   };
 
   $scope.move = function (record, to, next, prev) {
@@ -247,7 +257,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ViewService', 'ActionService
     var nxt = next ? _.pick(next, "id", "version", view.sequenceBy) : null;
 
     // update columnBy
-    rec[view.columnBy] = to;
+    rec[view.columnBy] = $scope.toColumnValue(to);
 
     // update sequenceBy
     var all = _.compact([prv, rec, nxt]);
@@ -381,7 +391,7 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
       var elemMore = element.children(".kanban-more");
 
       ds._context = _.extend({}, scope._dataSource._context);
-      ds._context[view.columnBy] = scope.column.value;
+      ds._context[view.columnBy] = scope.toColumnValue(scope.column.value);
       ds._page.limit = view.limit || 20;
 
       var domain = "self." + view.columnBy + " = :" + view.columnBy;
@@ -444,7 +454,7 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
         var rec = scope.record = {};
         var view = scope.schema;
 
-        rec[view.columnBy] = scope.column.value;
+        rec[view.columnBy] = scope.toColumnValue(scope.column.value);
 
         if (onNew === null) {
           onNew = ActionService.handler(scope, element, {

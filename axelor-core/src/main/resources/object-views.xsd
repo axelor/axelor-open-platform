@@ -1897,6 +1897,13 @@
             <xsd:documentation>Specify pagination limit per column.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="x-limit-columns" type="xsd:integer">
+          <xsd:annotation>
+            <xsd:documentation>
+            Specify maximum number of columns when columnBy is a reference field.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
