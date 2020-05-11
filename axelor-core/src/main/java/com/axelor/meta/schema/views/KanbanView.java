@@ -112,7 +112,7 @@ public class KanbanView extends CardsView {
     Mapper mapper = Mapper.of(getModelClass());
     Property columnField = mapper.getProperty(columnBy);
     if (columnField == null) {
-      throw new RuntimeException("Nuch field found: " + columnBy);
+      throw new RuntimeException("Null field found: " + columnBy);
     }
 
     if (columnField.isEnum()) {
