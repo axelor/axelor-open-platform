@@ -60,7 +60,11 @@ public interface AvailableAppSettings {
 
   String DOMAIN_BLACKLIST_PATTERN = "domain.blacklist.pattern";
 
-  String AXELOR_REPORT_DIR = "axelor.report.dir";
+  @Deprecated String AXELOR_REPORT_DIR = "axelor.report.dir";
+
+  String REPORTS_DESIGN_DIR = "reports.design.dir";
+  String REPORTS_FONTS_CONFIG = "reports.fonts.config";
+
   String TEMPLATE_SEARCH_DIR = "template.search.dir";
 
   String FILE_UPLOAD_DIR = "file.upload.dir";

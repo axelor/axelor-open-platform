@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE font>
+<font>
+  <font-aliases>
+    <mapping name="serif" font-family="DejaVu Serif" />
+    <mapping name="sans-serif" font-family="DejaVu Sans" />
+    <mapping name="monospace" font-family="DejaVu Sans Mono" />
+  </font-aliases>
+  <font-paths>
+    <path path="C:/windows/fonts" />
+    <path path="/usr/share/fonts/truetype" />
+    <path path="/usr/share/fonts/TTF" />
+  </font-paths>
+</font>
