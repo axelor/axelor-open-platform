@@ -231,6 +231,14 @@
   width: 100% !important;
 }
 
+.slick-editor .picker-input.image-select > img,
+.slick-editor .picker-input.image-select > i.fa {
+  padding-left: 6px;
+}
+.slick-editor .picker-input.image-select > input {
+  padding-left: 20px !important;
+}
+
 .slick-editor .ui-spinner {
   border: none;
 }

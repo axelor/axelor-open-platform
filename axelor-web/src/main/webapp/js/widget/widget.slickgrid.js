@@ -272,7 +272,12 @@ var Formatters = {
     var res = findSelect(value);
     var text = res.title;
     if (field.widget === 'image-select' && res.icon) {
-      var image = "<img style='max-height: 24px;' src='" + (res.icon || res.value) + "'>";
+      var image = res.icon || res.value;
+      if (image && image.indexOf('fa-') === 0) {
+        image = "<i class='fa " + image + "'></i>";
+      } else {
+        image = "<img style='max-width: 18px;' src='" + image + "'>";
+      }
       return field.labels === false ? image : image + " " + text;
     }
     return text;
