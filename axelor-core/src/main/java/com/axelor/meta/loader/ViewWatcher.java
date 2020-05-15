@@ -71,6 +71,8 @@ public final class ViewWatcher {
 
   private static ViewWatcher instance;
   private static ModuleManager moduleManager;
+  private static Set<String> moduleNames;
+  private static String appName;
 
   private WatchService watcher;
   private final Map<WatchKey, Path> keys = new HashMap<>();
@@ -98,6 +100,17 @@ public final class ViewWatcher {
 
       moduleManager = Beans.get(ModuleManager.class);
       moduleManager.setLoadData(false);
+
+      moduleNames = new HashSet<>();
+      ModuleManager.getAll().stream()
+          .forEach(
+              module -> {
+                final String name = module.getName();
+                moduleNames.add(name);
+                if (module.isApplication()) {
+                  appName = name;
+                }
+              });
     }
     return instance;
   }
@@ -187,11 +200,19 @@ public final class ViewWatcher {
     addPending(new ViewChangeEvent(kind, path, modulePath.toFile().getName()));
   }
 
-  private void handleJar(WatchEvent.Kind<?> kind, Path path) {
+  private void handleJarAndBin(WatchEvent.Kind<?> kind, Path path) {
     if (kind != ENTRY_CREATE && kind != ENTRY_MODIFY) {
       return;
     }
 
+    if (path.toString().endsWith(".jar")) {
+      handleJar(kind, path);
+    } else {
+      handleBin(kind, path);
+    }
+  }
+
+  private void handleJar(WatchEvent.Kind<?> kind, Path path) {
     final String fileName = path.getFileName().toString();
     final Matcher moduleNameMatcher = moduleNamePattern.matcher(fileName);
     final String moduleName;
@@ -206,10 +227,6 @@ public final class ViewWatcher {
   }
 
   private void handleBin(WatchEvent.Kind<?> kind, Path path) {
-    if (kind != ENTRY_CREATE && kind != ENTRY_MODIFY) {
-      return;
-    }
-
     final Path modulePath = path.resolve(Paths.get("..", "..", "..", "..")).normalize();
     final String moduleName = modulePath.toFile().getName();
     addPending(moduleName, path);
@@ -221,7 +238,8 @@ public final class ViewWatcher {
         wait(scheduledFuture);
       }
 
-      pendingModules.add(moduleName);
+      final String name = moduleNames.contains(moduleName) ? moduleName : appName;
+      pendingModules.add(name);
       pendingPaths.add(path);
 
       scheduledFuture =
@@ -307,21 +325,17 @@ public final class ViewWatcher {
             }
           });
 
-      if (!paths.isEmpty()) {
-        watchEventHandler = this::handleJar;
-      } else {
-        Reflections.findResources()
-            .byName("(domains|i18n|views)/(.*?)\\.(xml|csv)$")
-            .find()
-            .parallelStream()
-            .filter(url -> url.getPath().startsWith("/"))
-            .map(url -> Paths.get(toURI(url)).resolve("..").normalize())
-            .distinct()
-            .forEach(paths::add);
+      Reflections.findResources()
+          .byName("(domains|i18n|views)/(.*?)\\.(xml|csv)$")
+          .find()
+          .parallelStream()
+          .filter(url -> url.getPath().startsWith("/"))
+          .map(url -> Paths.get(toURI(url)).resolve("..").normalize())
+          .distinct()
+          .forEach(paths::add);
 
-        if (!paths.isEmpty()) {
-          watchEventHandler = this::handleBin;
-        }
+      if (!paths.isEmpty()) {
+        watchEventHandler = this::handleJarAndBin;
       }
     }
 
