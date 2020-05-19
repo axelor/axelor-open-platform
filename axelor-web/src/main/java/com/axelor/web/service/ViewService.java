@@ -385,6 +385,11 @@ public class ViewService extends AbstractService {
   @POST
   @Path("custom/{name}")
   public Response dataset(@PathParam("name") String name, Request request) {
+    final Map<String, Object> data = request.getData();
+    if (data == null || data.get("_domainAction") == null) {
+      return service.getDataSet(name, request);
+    }
+    ViewService.updateContext((String) data.get("_domainAction"), data);
     return service.getDataSet(name, request);
   }
 
