@@ -77,7 +77,7 @@ function CustomViewCtrl($scope, $http, DataSource, ViewService) {
   };
 
   $scope.onRefresh = function() {
-    var context = $scope.getContext();
+    var context = _.extend({}, $scope.getContext(), { _domainAction: $scope._viewAction });
     var params = {
       data: context
     };
@@ -112,6 +112,8 @@ var customDirective = ["$compile", function ($compile) {
         if (template) {
           unwatch();
           render(template);
+          scope.$on("on:new", function() { scope.onRefresh(); });
+          scope.$on("on:edit", function() { scope.onRefresh(); });
         }
       });
 
