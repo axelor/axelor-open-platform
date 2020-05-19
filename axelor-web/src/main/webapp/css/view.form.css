@@ -183,6 +183,10 @@ table.form-layout td.form-item.v-align-top {
   min-width: 170px;
 }
 
+.form-item-container.translatable input {
+  padding-right: 22px;
+}
+
 .form-item-container[style *= width] input {
   min-width: inherit;
 }
