@@ -184,8 +184,7 @@ public class ViewLoader extends AbstractParallelLoader {
 
   private void generateFinalViews(Module module, boolean update) {
     try {
-      finalViewGenerator.parallelGenerate(
-          findForCompute(module.getName(), update, viewsToGenerate));
+      finalViewGenerator.generate(findForCompute(module.getName(), update, viewsToGenerate));
     } finally {
       viewsToGenerate.clear();
     }
