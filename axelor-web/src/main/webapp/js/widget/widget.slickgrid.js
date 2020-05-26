@@ -369,7 +369,7 @@ _.extend(Factory.prototype, {
     }
 
     if (typeof value === 'string') {
-      value = axelor.sanitize(value).replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&');
+      value = axelor.sanitize(value).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
     }
 
     if (type === "button" || type === "progress") {
