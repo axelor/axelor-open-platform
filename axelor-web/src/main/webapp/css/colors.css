@@ -290,11 +290,11 @@ input, button, textarea, select, fieldset, pre {
   background-color: #eee;
 }
 
-.tag-select {
-    border-top-width: 0;
-    border-left-width: 0;
-    border-right-width: 0;
-    padding-left: 0;
+.panel-layout .tag-select {
+  border-top-width: 0;
+  border-left-width: 0;
+  border-right-width: 0;
+  padding-left: 0;
 }
 .tag-select > .picker-icons {
   right: 0;

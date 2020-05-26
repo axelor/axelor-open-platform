@@ -483,33 +483,40 @@ header .dropdown-submenu:focus > a {
   height: 18px;
 }
 
-[ui-view-form] .tag-select,
-[ui-view-form] .tag-select > ul {
-  min-height: 20px;
-}
-
 [ui-view-form] .tag-select {
   margin-top: -3px !important;
+}
+
+[ui-view-form] .tag-select > ul {
+  display: inline-flex;
+  flex-flow: row wrap;
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: 20px;
 }
 
 [ui-view-form] .tag-select .tag-text,
 [ui-view-form] .tag-select .tag-link,
 [ui-view-form] .tag-select-single .tag-link {
   height: 14px;
-  line-height: 12px;
-}
-
-[ui-view-form] .tag-select .label,
-[ui-view-form] .tag-select .tag-selector {
-  height: 17px;
+  line-height: 14px;
 }
 
 [ui-view-form] .tag-select .label {
   padding: .2em .4em .3em;
+  margin: 1px;
 }
 
 [ui-view-form] .form-item-container > span.display-text {
   padding: 0;
+}
+
+[ui-slick-editors] .tag-select {
+  margin-top: 0 !important;
+}
+
+[ui-slick-editors] .tag-select li.tag-selector input {
+  min-height: auto !important;
 }
 
 [ui-form].slick-editor .form-item-container,

@@ -1042,7 +1042,6 @@ label.has-help > span:after,
   overflow: hidden;
   margin: 0;
   margin-right: 16px;
-  padding-bottom: 2px;
 }
 
 .tag-select li,
@@ -1064,7 +1063,8 @@ label.has-help > span:after,
 
 .tag-select ul,
 .readonly > .tag-select {
-  padding-top: 2px;
+  padding-top: 1px;
+  padding-bottom: 1px;
 }
 
 .tag-select li.tag-item i,
@@ -1079,7 +1079,6 @@ label.has-help > span:after,
 .tag-select-single .tag-link {
   flex: 1;
   display: inline-block;
-  height: 15px;
   max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1108,6 +1107,7 @@ label.has-help > span:after,
   margin-top: -3px;
   line-height: 16px;
   height: auto !important;
+  min-height: auto;
 }
 
 .tag-select-single .tag-item {
@@ -1139,6 +1139,7 @@ label.has-help > span:after,
 
 .slick-cell .tag-select {
   height: 25px !important;
+  border: 0;
 }
 
 .slick-cell .tag-select .label {
@@ -1169,6 +1170,15 @@ label.has-help > span:after,
 .slick-cell .tag-select li.tag-selector input {
   height: 20px !important;
   min-height: inherit;
+}
+
+[ui-slick-editors] .tag-select ul {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+[ui-slick-editors] .tag-select li {
+  margin: 1px;
 }
 
 .tag-select-list-item > a {
