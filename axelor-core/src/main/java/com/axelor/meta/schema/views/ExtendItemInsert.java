@@ -66,6 +66,8 @@ public class ExtendItemInsert {
   })
   private List<AbstractWidget> items;
 
+  @XmlElement private ToolTip tooltip;
+
   @XmlElement private PanelViewer viewer;
 
   @XmlElement private PanelEditor editor;
@@ -84,6 +86,14 @@ public class ExtendItemInsert {
 
   public void setItems(List<AbstractWidget> items) {
     this.items = items;
+  }
+
+  public ToolTip getTooltip() {
+    return tooltip;
+  }
+
+  public void setTooltip(ToolTip tooltip) {
+    this.tooltip = tooltip;
   }
 
   public PanelViewer getViewer() {

@@ -1189,6 +1189,7 @@ ui.formBuild = function (scope, schema, fields) {
 
   var path = scope.formPath || "";
   var hasPanels = false;
+  var hasToolTipField = false;
 
   function update(e, attrs) {
     _.each(attrs, function(v, k) {
@@ -1314,6 +1315,11 @@ ui.formBuild = function (scope, schema, fields) {
       if (_attrs.name) {
         _attrs['x-path'] = path ? path + "." + _attrs.name : _attrs.name;
       }
+      
+      if (attrs.tooltip) {
+        hasToolTipField = true;
+        item.addClass('has-tooltip');
+      }
 
       update(item, _attrs);
 
@@ -1363,6 +1369,10 @@ ui.formBuild = function (scope, schema, fields) {
   if (hasPanels) {
     elem.removeAttr('ui-table-layout').attr('ui-bar-layout', '');
   }
+  
+  if (hasToolTipField) {
+    $("<div ui-tooltip selector='.form-item-container.has-tooltip' getter='getToolTip($event)'>").appendTo(elem);
+  }
 
   return elem;
 };
@@ -1390,6 +1400,21 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
     };
 
     var translatted = null;
+
+    scope.getToolTip = function (e) {
+      var elem = $(e.currentTarget);
+      var fieldScope = elem.scope();
+      var field = fieldScope.field || {};
+      if (!field.tooltip) {
+        return;
+      }
+      
+      return {
+        tooltip: field.tooltip,
+        record: scope.record,
+        dataSource: scope._dataSource
+      };
+    };
 
     scope.showErrorNotice = function () {
       var form = scope.form || $(element).data('$formController'),

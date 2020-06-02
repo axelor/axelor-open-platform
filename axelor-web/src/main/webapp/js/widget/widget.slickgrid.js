@@ -592,6 +592,10 @@ Grid.prototype.parse = function(view) {
         css.push('slick-cell-required');
       }
     }
+    if (item.tooltip) {
+      css.push('has-tooltip');
+    }
+
     column.cssClass = css.join(' ');
 
     cols.push(column);
@@ -2725,6 +2729,10 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
           addHelp(schema.inlineHelp);
         }
 
+        if (_.some(schema.items, function (x) { return x.tooltip; })) {
+          addTooltip(grid);
+        }
+
         // handle pending attrs change on dashlets
         if (handler.$$pendingAttrs) {
           _.each(handler.$$pendingAttrs, function (itemAttrs, itemName) {
@@ -2765,6 +2773,35 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         setTimeout(function () {
           element.before(helpElem.css('visibility', ''));
         });
+      }
+
+      function addTooltip(inst) {
+        var grid = inst.grid;
+
+        scope.getToolTip = function (event) {
+          var cell = grid.getCellFromEvent(event);
+          var col = grid.getColumns()[cell.cell];
+          var field = col.descriptor || {};
+          var tooltip = field.tooltip;
+
+          if (!tooltip) return;
+
+          var record = grid.getDataItem(cell.row);
+
+          return {
+            tooltip: tooltip,
+            record: record,
+            dataSource: handler._dataSource
+          };
+        };
+
+        var tooltip = ViewService.compile(
+            "<div ui-tooltip" +
+            " selector='.slick-cell.has-tooltip'" +
+            " getter='getToolTip($event)'>"
+            )(scope);
+
+        element.append(tooltip);
       }
 
       element.addClass('slickgrid').hide();

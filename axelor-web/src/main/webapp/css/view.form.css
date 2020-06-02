@@ -752,6 +752,23 @@ table.field-details .help-text hr {
   margin: 9px 0;
 }
 
+.field-tooltip {
+  position: absolute;
+  padding: 10px;
+  display: block;
+  color: #fff;
+  background-color: #000;
+  border-radius: 4px;
+  z-index: 2147483647;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.2s ease-in;
+}
+
+.field-tooltip.open {
+  opacity: 1;
+}
+
 .popover {
   width: auto;
   max-width: inherit;

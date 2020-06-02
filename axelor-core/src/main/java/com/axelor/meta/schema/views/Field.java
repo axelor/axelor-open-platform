@@ -179,6 +179,8 @@ public class Field extends SimpleWidget {
   @XmlElement(name = "hilite")
   private List<Hilite> hilites;
 
+  @XmlElement private ToolTip tooltip;
+
   @XmlElements({
     @XmlElement(name = "form", type = FormView.class),
     @XmlElement(name = "grid", type = GridView.class)
@@ -569,6 +571,14 @@ public class Field extends SimpleWidget {
 
   public void setHilites(List<Hilite> hilites) {
     this.hilites = hilites;
+  }
+
+  public ToolTip getTooltip() {
+    return tooltip;
+  }
+
+  public void setTooltip(ToolTip tooltip) {
+    this.tooltip = tooltip;
   }
 
   public List<AbstractView> getViews() {

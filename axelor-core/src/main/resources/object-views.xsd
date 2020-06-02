@@ -2516,6 +2516,13 @@
               </xsd:documentation>
             </xsd:annotation>
           </xsd:element>
+          <xsd:element name="tooltip" type="tns:PanelViewer" minOccurs="0">
+            <xsd:annotation>
+              <xsd:documentation>
+              Template to display the tooltip popup for the field.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
         </xsd:sequence>
         <xsd:attribute name="name" type="xsd:string" use="required">
           <xsd:annotation>
@@ -2751,11 +2758,12 @@
       <xsd:element name="menu" type="tns:MenubarMenu" />
       <xsd:element name="item" type="tns:MenubarMenuItem" />
       <xsd:element name="divider" type="tns:MenubarMenuDivider" />
-      <xsd:element name="viewer" type="tns:PanelViewer"></xsd:element>
-      <xsd:element name="editor" type="tns:PanelEditor"></xsd:element>
-      <xsd:element name="panel-stack" type="tns:PanelTabs"></xsd:element>
-      <xsd:element name="panel-tabs" type="tns:PanelTabs"></xsd:element>
-      <xsd:element name="panel-mail" type="tns:PanelMail"></xsd:element>
+      <xsd:element name="tooltip" type="tns:PanelViewer"/>
+      <xsd:element name="viewer" type="tns:PanelViewer" />
+      <xsd:element name="editor" type="tns:PanelEditor" />
+      <xsd:element name="panel-stack" type="tns:PanelTabs" />
+      <xsd:element name="panel-tabs" type="tns:PanelTabs" />
+      <xsd:element name="panel-mail" type="tns:PanelMail" />
     </xsd:choice>
   </xsd:group>
 

@@ -87,6 +87,7 @@
 //= js/widget/widget.update.js
 //= js/widget/widget.search.js
 //= js/widget/widget.menubar.js
+//= js/widget/widget.tooltip.js
 
 //= js/form/form.base.js
 //= js/form/form.converters.js
