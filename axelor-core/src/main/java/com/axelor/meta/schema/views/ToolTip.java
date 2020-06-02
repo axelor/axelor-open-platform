@@ -23,10 +23,22 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("tooltip")
 @JsonTypeInfo(use = Id.NAME, include = As.PROPERTY, property = "type")
 @JsonInclude(Include.NON_NULL)
-public class ToolTip extends PanelViewer {}
+public class ToolTip extends PanelViewer {
+
+  @XmlAttribute private String call;
+
+  public String getCall() {
+    return call;
+  }
+
+  public void setCall(String call) {
+    this.call = call;
+  }
+}

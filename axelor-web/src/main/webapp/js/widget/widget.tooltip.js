@@ -34,6 +34,17 @@ ui.directive('uiTooltip', ['ViewService', function (ViewService) {
       var ttContent = null;
 
       function fetch(ds, record, tooltip) {
+
+        if (tooltip.call) {
+          var context = _.extend({ _model: ds._model }, record, tooltip.context);
+          var promise = ViewService.action(tooltip.call, ds._model, context);
+          return promise.then(function (response) {
+            var res = response.data;
+            var data = _.isArray(res.data) ? _.first(res.data) : res.data;
+            return data;
+          });
+        }
+
         var id = record.id;
         var depends = (tooltip.depends || '').trim().split(/\s*,\s*/);
 

@@ -2505,6 +2505,20 @@
     </xsd:complexContent>
   </xsd:complexType>
 
+  <xsd:complexType name="ToolTip">
+    <xsd:simpleContent>
+      <xsd:extension base="tns:PanelViewer">
+        <xsd:attribute name="call" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+            Specify a controller method to fetch tooltip data.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
   <xsd:complexType name="BaseField">
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleWidget">
@@ -2516,7 +2530,7 @@
               </xsd:documentation>
             </xsd:annotation>
           </xsd:element>
-          <xsd:element name="tooltip" type="tns:PanelViewer" minOccurs="0">
+          <xsd:element name="tooltip" type="tns:ToolTip" minOccurs="0">
             <xsd:annotation>
               <xsd:documentation>
               Template to display the tooltip popup for the field.
@@ -2758,7 +2772,7 @@
       <xsd:element name="menu" type="tns:MenubarMenu" />
       <xsd:element name="item" type="tns:MenubarMenuItem" />
       <xsd:element name="divider" type="tns:MenubarMenuDivider" />
-      <xsd:element name="tooltip" type="tns:PanelViewer"/>
+      <xsd:element name="tooltip" type="tns:ToolTip"/>
       <xsd:element name="viewer" type="tns:PanelViewer" />
       <xsd:element name="editor" type="tns:PanelEditor" />
       <xsd:element name="panel-stack" type="tns:PanelTabs" />
