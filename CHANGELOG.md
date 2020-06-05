@@ -1,3 +1,18 @@
+## 5.2.7 (2020-06-05)
+
+#### Features
+
+* Allow to show additional details with ref-text widget
+
+#### Fixed
+
+* Fix unnecessary requests for name values
+* Fix inline-checkbox widget title wrapping issue
+* Fix custom view refresh issue in dashlet
+* Fix embedded tomcat runner
+* Preserve column order in data exported from charts
+* Fix text value escape in grid widget
+
 ## 5.2.6 (2020-04-15)
 
 #### Fixed
