@@ -1,6 +1,8 @@
 ## 5.0.24 (current)
 
-TBD
+* Fix unnecessary requests for name values
+* Fix embedded tomcat startup issue
+* Fix custom view refresh issue in dashlet
 
 ## 5.0.23 (2020-04-15)
 
