@@ -1,4 +1,4 @@
-## 5.0.24 (current)
+## 5.0.24 (2020-06-05)
 
 * Fix unnecessary requests for name values
 * Fix embedded tomcat startup issue
