@@ -1,3 +1,0 @@
----
-title: Fix meta loading deadlock when creating groups
-type: fix

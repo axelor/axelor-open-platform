@@ -1,3 +1,46 @@
+## 5.3.3 (2020-06-05)
+
+#### Features
+
+* Add support for font config for birt reports
+* Support axis titles on charts
+* Support cards, kanban, and calendar views on dashlets
+* Add support to use m2o fields for kanban columns
+* Allow to show additional details with ref-text widget
+* Add single-select and improve multi-select widget with color support
+* Add support for popup editor on cards and kanban views
+
+  <details>
+  A new attribute `edit-window` is added with the following values:
+
+  * `self` - show editor in same tab
+  * `popup` - show popup editor
+  * `popup-new` - show popup editor for new records only
+  </details>
+
+#### Fixed
+
+* Fix unnecessary requests for name values
+* Fix validation error in editable grid
+* Fix "Invalid or non-matching id" when committing edit in grid
+* Fix meta loading deadlock when creating groups
+* Fix group creation when generating computed views
+* Fix custom view refresh issue in dashlet
+* Fix embedded tomcat runner
+* Preserve column order in data exported from charts
+* Fix text value escape in grid widget
+* Fix details-view with grouped grid not working
+* Fix path resolution in view watcher under Windows
+* Fix CSRF token cookie when using SSO
+* Allow deletion of one-to-one on the non-owning side and change of owner
+* Allow inline edit with grouped grid
+* Fix no file in response when observing exports
+* Fix view watcher on application's resources
+* Don't show fallback characters instead of icons on slow network
+* Fix editable grid issue in details-view
+* Fix setting of owner of one-to-one
+* Fix checkbox alignment in editable grid
+
 ## 5.3.2 (2020-04-16)
 
 #### Features
