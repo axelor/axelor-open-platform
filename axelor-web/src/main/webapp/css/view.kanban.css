@@ -312,3 +312,13 @@
     padding-bottom: 0;
   }
 }
+
+.portlet-cards,
+.portlet-kanban {
+  position: relative;
+}
+
+.portlet-cards .cards-view,
+.portlet-kanban .kanban-view {
+  top: 0;
+}

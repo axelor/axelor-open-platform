@@ -739,7 +739,9 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
     scope.$callWhen(function () {
       return main.is(':visible');
     }, function() {
-      element.parents('.view-container:first').css('overflow', 'inherit');
+      if (scope.viewType !== 'dashboard') {
+        element.parents('.view-container:first').css('overflow', 'inherit');
+      }
       scope.onMode(mode);
       adjustSize();
     }, 100);
@@ -765,5 +767,25 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
     '</div>'
   };
 }]);
+
+angular.module('axelor.ui').directive('uiPortletCalendar', function () {
+  return {
+    controller: CalendarViewCtrl,
+    replace: true,
+    link: function (scope, element, attrs) {
+      var colSpan = (scope.dashlet||{}).colSpan || 6;
+      var height = (scope.dashlet||{}).height;
+      height = height || (50 * colSpan);
+      setTimeout(function () {
+        element.parent().height(height);
+      });
+      scope.showPager = true;
+    },
+    template:
+      "<div class='portlet-calendar' ui-portlet-refresh>" +
+        "<div ui-view-calendar x-handler='this'></div>" +
+      "</div>"
+  };
+});
 
 })();

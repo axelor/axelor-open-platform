@@ -51,6 +51,7 @@ import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.i18n.L10n;
 import com.axelor.inject.Beans;
+import com.axelor.meta.MetaFiles;
 import com.axelor.meta.MetaPermissions;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
@@ -70,11 +71,15 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.inject.TypeLiteral;
 import com.google.inject.persist.Transactional;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -539,8 +544,7 @@ public class Resource<T extends Model> {
       AppSettings.get()
           .getInt(AvailableAppSettings.DATA_EXPORT_FETCH_SIZE, DEFAULT_EXPORT_FETCH_SIZE);
 
-  @SuppressWarnings("all")
-  public int export(Request request, Writer writer) throws IOException {
+  public Response export(Request request, Charset csvCharset) {
     security.get().check(JpaSecurity.CAN_READ, model);
     security.get().check(JpaSecurity.CAN_EXPORT, model);
 
@@ -551,6 +555,30 @@ public class Resource<T extends Model> {
     }
 
     firePreRequestEvent(RequestEvent.EXPORT, request);
+
+    final Response response = new Response();
+    final Map<String, Object> data = new HashMap<>();
+
+    try {
+      final java.nio.file.Path tempFile = MetaFiles.createTempFile(null, ".csv");
+      try (final OutputStream os = new FileOutputStream(tempFile.toFile())) {
+        try (final Writer writer = new OutputStreamWriter(os, csvCharset)) {
+          data.put("exportSize", export(request, writer));
+        }
+      }
+      data.put("fileName", tempFile.toFile().getName());
+      response.setData(data);
+    } catch (IOException e) {
+      response.setException(e);
+    }
+
+    firePostRequestEvent(RequestEvent.EXPORT, request, response);
+
+    return response;
+  }
+
+  @SuppressWarnings("all")
+  private int export(Request request, Writer writer) throws IOException {
 
     List<String> fields = request.getFields();
     List<String> header = new ArrayList<>();
@@ -752,8 +780,6 @@ public class Resource<T extends Model> {
 
     Response response = new Response();
     response.setTotal(count);
-
-    firePostRequestEvent(RequestEvent.EXPORT, request, response);
 
     return count;
   }

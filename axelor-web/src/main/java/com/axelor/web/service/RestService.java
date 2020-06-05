@@ -63,12 +63,9 @@ import com.google.inject.servlet.RequestScoped;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -634,26 +631,10 @@ public class RestService extends ResourceService {
       return fail();
     }
 
-    final Response response = new Response();
-    final Map<String, Object> data = new HashMap<>();
-
     request.setModel(getModel());
     updateContext(request);
 
-    try {
-      final java.nio.file.Path tempFile = MetaFiles.createTempFile(null, ".csv");
-      try (final OutputStream os = new FileOutputStream(tempFile.toFile())) {
-        try (final Writer writer = new OutputStreamWriter(os, csvCharset)) {
-          data.put("exportSize", getResource().export(request, writer));
-        }
-      }
-      data.put("fileName", tempFile.toFile().getName());
-      response.setData(data);
-    } catch (IOException e) {
-      response.setException(e);
-    }
-
-    return response;
+    return getResource().export(request, csvCharset);
   }
 
   @GET

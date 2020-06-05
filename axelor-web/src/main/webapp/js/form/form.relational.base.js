@@ -338,12 +338,13 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 
     var field = this.field;
     var nameField = field.targetName || 'id',
+      colorField = field.colorField,
       fields = field.targetSearch || [],
       filter = {},
       limit = field.limit || (axelor.device.small ? 6 : 10),
       sortBy = field.orderBy;
 
-    fields = ["id", nameField].concat(fields);
+    fields = ["id", nameField, colorField].concat(fields);
     fields = _.chain(fields).compact().unique().value();
 
     _.each(fields, function(name){
@@ -380,7 +381,8 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
       var items = _.map(records, function(record) {
         return {
           label: record[trKey] || record[nameField],
-          value: record
+          value: record,
+          color: record[colorField]
         };
       });
       response(items, page);

@@ -102,15 +102,22 @@ function dotToNested(record, field) {
   return record;
 }
 
-function nestedToDot(record, name) {
+function nestedToDot(record, name, nullify) {
   var names = name.split('.');
   var val = record || {};
   var idx = 0;
   while (val && idx < names.length) {
-    val = val[names[idx++]];
+    var itName = names[idx++];
+    var itVal = val[itName];
+    if (nullify && (!itVal || itVal.id === undefined)) {
+      val[itName] = null;
+    }
+    val = itVal;
   }
   if (idx === names.length && val !== undefined) {
     record[name] = val;
+  } else if (nullify && !record.hasOwnProperty(name)) {
+    record[name] = null;
   }
   return record;
 }
@@ -230,11 +237,21 @@ var Formatters = {
       }
       return res;
     };
+    var formatTag = function (v) {
+      var css = "label label-primary";
+      if (v.color) {
+        css = css + " " + v.color;
+      }
+      return '<span class="'+ css +'"><span class="tag-text">'+v.title+'</span></span>';
+    };
+
+    if (value && field.widget === 'single-select') {
+      var item = formatTag(findSelect(value));
+      return '<span class="tag-select">' + item + '</span>';
+    }
 
     if (value && field.widget === 'multi-select') {
-      var items = value.split(/\s*,\s*/).map(findSelect).map(function (res) {
-        return '<span class="label label-primary"><span class="tag-text">'+res.title+'</span></span>';
-      });
+      var items = value.split(/\s*,\s*/).map(findSelect).map(formatTag);
       return '<span class="tag-select">' + items.join(' ') + '</span>';
     }
 
@@ -352,7 +369,7 @@ _.extend(Factory.prototype, {
     }
 
     if (typeof value === 'string') {
-      value = axelor.sanitize(value).replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&');
+      value = axelor.sanitize(value).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
     }
 
     if (type === "button" || type === "progress") {
@@ -590,13 +607,13 @@ Grid.prototype.parse = function(view) {
       command: "sort-desc"
     } : null, sortable ? {
       separator: true
-    } : null, view.editable ? null : {
+    } : null, {
       title: _t("Group by") + " <i>" + column.name + "</i>",
       command: "group-by"
-    }, view.editable ? null : {
+    }, {
       title: _t("Ungroup"),
       command: "ungroup"
-    }, view.editable ? null : {
+    }, {
       separator: true
     }, {
       title: _t("Hide") + " <i>" + column.name + "</i>",
@@ -820,11 +837,11 @@ Grid.prototype._doInit = function(view) {
       dataView.getItem(old[0]).selected = true;
     }
     if (!focus) {
-      _.each(dataView.getItems(), function (item, i) {
-        if (item.selected) {
-          selection.push(i);
-        }
-      });
+      var selectionIds = _.chain(dataView.getItems())
+        .filter(function(item) { return item.selected; })
+        .map(function(item) { return item.id; })
+        .value();
+      _.each(dataView.mapIdsToRows(selectionIds), function(row) { selection.push(row); });
     }
     selection = _.unique(selection);
     grid.setSelectedRows(selection);
@@ -844,6 +861,9 @@ Grid.prototype._doInit = function(view) {
       grid.setActiveCell(_.first(selection), 1);
       grid.focus();
     }
+  };
+  dataView.$cancelEdit = function () {
+    that.cancelEdit();
   };
 
   if (this._canMove) {
@@ -1429,6 +1449,10 @@ Grid.prototype.onKeyDown = function (e) {
 };
 
 Grid.prototype.isCellEditable = function(row, cell) {
+  var dataItem = this.grid.getDataItem(row);
+  if (dataItem && (dataItem.__group || dataItem.__groupTotals)) {
+    return false;
+  }
   var cols = this.grid.getColumns(),
     col = cols[cell];
   if (!col || col.id === "_edit_column" || col.id === "_move_column" || col.id === "_checkbox_selector") {
@@ -1798,7 +1822,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
 
     // get updated values
     _.filter(grid.getColumns(), function (col) {
-      return col.descriptor && col.field && col.field.indexOf('.') === -1;
+      return col.descriptor && col.field && col.field.indexOf('.') === -1 && record[col.field] !== undefined;
     }).forEach(function (col) {
       result[col.field] = record[col.field];
     });
@@ -2103,13 +2127,18 @@ Grid.prototype.commitEdit = function () {
   scope.$emit("on:before-save", scope.record);
 
   var row = this.grid.getActiveCell().row;
-  var item = data.getItemByIdx(row);
 
   scope.waitForActions(function() {
-    var record = _.extend(scope.getContextRecord(), { $dirty: true, _orignal: scope.$$original });
-    if (record.id === null || record.id === undefined) {
-      record.id = item.id;
+    var record = _.extend(scope.getContextRecord(), { $fetched: false, $dirty: true, _orignal: scope.$$original });
+
+    if (!data.getItemById(record.id)) {
+      // record has changed elsewhere
+      return;
     }
+
+    // from nested fields to dotted fields and nullify empty values
+    _.filter(Object.keys(scope.fields), function(field) { return field.indexOf('.') >= 0; })
+      .forEach(function(field) { nestedToDot(record, field, true); });
 
     that.cols.forEach(function (col) {
       if (col.descriptor && col.descriptor.jsonField) {
@@ -2120,7 +2149,7 @@ Grid.prototype.commitEdit = function () {
       }
     });
 
-    data.updateItem(item.id, record);
+    data.updateItem(record.id, record);
 
     var diff = scope._dataSource.diff(scope.$$original, scope.record);
     that.cols.forEach(function (col) {
@@ -2744,7 +2773,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         schema.rowHeight = field.rowHeight || schema.rowHeight;
         schema.orderBy = field.orderBy || schema.orderBy;
         schema.groupBy = field.groupBy || schema.groupBy;
-        schema.groupBy = (schema.editable || schema.groupBy === "false") ? false : schema.groupBy;
+        schema.groupBy = schema.groupBy === "false" ? false : schema.groupBy;
         schema.canMassUpdate = !!_.find(schema.items, function (item) { return item.massUpdate; });
 
         element.show();

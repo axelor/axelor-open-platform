@@ -32,6 +32,8 @@ import java.util.regex.Pattern;
 import org.eclipse.birt.report.model.api.IResourceLocator;
 import org.eclipse.birt.report.model.api.ModuleHandle;
 import org.eclipse.datatools.connectivity.oda.flatfile.ResourceLocator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is a {@link ResourceLocator} that first searches external reports directory for the
@@ -43,11 +45,25 @@ public class ReportResourceLocator implements IResourceLocator {
 
   private static final Pattern URL_PATTERN = Pattern.compile("^(file|jar|http|https|ftp):/.*");
 
+  private static final Logger log = LoggerFactory.getLogger(ReportResourceLocator.class);
+
   private Path searchPath;
 
+  @SuppressWarnings("deprecation")
   public ReportResourceLocator() {
+    if (AppSettings.get().getProperties().containsKey(AvailableAppSettings.AXELOR_REPORT_DIR)) {
+      log.warn(
+          "configuration '{}' is deprecated, please use '{}'",
+          AvailableAppSettings.AXELOR_REPORT_DIR,
+          AvailableAppSettings.REPORTS_DESIGN_DIR);
+    }
+
     final String dir =
-        AppSettings.get().getPath(AvailableAppSettings.AXELOR_REPORT_DIR, DEFAULT_REPORT_DIR);
+        AppSettings.get()
+            .getPath(
+                AvailableAppSettings.REPORTS_DESIGN_DIR,
+                AppSettings.get()
+                    .getPath(AvailableAppSettings.AXELOR_REPORT_DIR, DEFAULT_REPORT_DIR));
     this.searchPath = Paths.get(dir);
   }
 

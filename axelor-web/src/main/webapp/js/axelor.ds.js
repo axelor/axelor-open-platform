@@ -569,6 +569,11 @@
         } else if (item.type === 'field') {
           items.push(item.name);
         }
+        // to fetch colors for tag-select
+        if (item.colorField && item.targetName) {
+          (result.related[item.name] || (result.related[item.name] = [])).push(item.colorField);
+          (result.related[item.name] || (result.related[item.name] = [])).push(item.targetName);
+        }
       });
 
       if (view.type === "calendar") {

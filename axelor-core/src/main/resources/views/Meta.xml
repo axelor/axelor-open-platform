@@ -48,6 +48,27 @@
     <option value="inline">Inline</option>
   </selection>
 
+  <selection name="color.name.selection">
+    <option value="red" color="red">Red</option>
+    <option value="pink" color="pink">Pink</option>
+    <option value="purple" color="purple">Purple</option>
+    <option value="deeppurple" color="deeppurple">Deep Purple</option>
+    <option value="indigo" color="indigo">Indigo</option>
+    <option value="blue" color="blue">Blue</option>
+    <option value="lightblue" color="lightblue">Light Blue</option>
+    <option value="cyan" color="cyan">Cyan</option>
+    <option value="teal" color="teal">Teal</option>
+    <option value="green" color="green">Green</option>
+    <option value="lightgreen" color="lightgreen">Light Green</option>
+    <option value="lime" color="lime">Lime</option>
+    <option value="yellow" color="yellow">Yellow</option>
+    <option value="amber" color="amber">Amber</option>
+    <option value="orange" color="orange">Orange</option>
+    <option value="deeporange" color="deeporange">Deep Orange</option>
+    <option value="brown" color="brown">Brown</option>
+    <option value="grey" color="grey">Grey</option>
+  </selection>
+
   <grid title="All Modules" name="meta-module-grid" model="com.axelor.meta.db.MetaModule"
     canDelete="false" canNew="false" canEdit="false" edit-icon="false">
     <hilite color="danger" if="!installed &amp;&amp; !pending"/>
@@ -300,6 +321,7 @@
       <field name="title"/>
       <field name="value"/>
       <field name="icon"/>
+      <field name="color" widget="SingleSelect" />
       <field name="data"/>
       <field name="hidden"/>
       <field name="order" width="100"/>
@@ -311,6 +333,7 @@
       <field name="title" />
       <field name="value" />
       <field name="icon" />
+      <field name="color" widget="SingleSelect" />
       <field name="data" />
       <field name="hidden" />
       <field name="order" help="Sequence order" width="100" />
@@ -419,6 +442,7 @@
       <field name="style" />
       <field name="view" widget="ref-text"
         x-target-name="name"
+        x-target-search="module"
         x-target="com.axelor.meta.db.MetaView"
         x-domain="self.model = :model AND self.type IN ('form', 'grid')" />
       <field name="language" />

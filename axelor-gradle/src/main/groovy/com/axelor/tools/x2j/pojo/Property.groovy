@@ -215,8 +215,12 @@ class Property {
     def mappedBy = getMappedBy()
 
     if (type == "one-to-one" && mappedBy) {
-      return """${getGetter()}().set${firstUpper(mappedBy)}(null);
-\t\t${name}.set${firstUpper(mappedBy)}(this);
+      return """if (${getGetter()}() != null) {
+\t\t\t${getGetter()}().set${firstUpper(mappedBy)}(null);
+\t\t}
+\t\tif (${name} != null) {
+\t\t\t${name}.set${firstUpper(mappedBy)}(this);
+\t\t}
 \t\tthis.$name = $name;"""
     }
 

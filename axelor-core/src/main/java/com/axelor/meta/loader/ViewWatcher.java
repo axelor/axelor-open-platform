@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.lang.management.ManagementFactory;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -69,6 +71,8 @@ public final class ViewWatcher {
 
   private static ViewWatcher instance;
   private static ModuleManager moduleManager;
+  private static Set<String> moduleNames;
+  private static String appName;
 
   private WatchService watcher;
   private final Map<WatchKey, Path> keys = new HashMap<>();
@@ -96,6 +100,17 @@ public final class ViewWatcher {
 
       moduleManager = Beans.get(ModuleManager.class);
       moduleManager.setLoadData(false);
+
+      moduleNames = new HashSet<>();
+      ModuleManager.getAll().stream()
+          .forEach(
+              module -> {
+                final String name = module.getName();
+                moduleNames.add(name);
+                if (module.isApplication()) {
+                  appName = name;
+                }
+              });
     }
     return instance;
   }
@@ -185,12 +200,20 @@ public final class ViewWatcher {
     addPending(new ViewChangeEvent(kind, path, modulePath.toFile().getName()));
   }
 
-  private void handleJar(WatchEvent.Kind<?> kind, Path path) {
+  private void handleJarAndBin(WatchEvent.Kind<?> kind, Path path) {
     if (kind != ENTRY_CREATE && kind != ENTRY_MODIFY) {
       return;
     }
 
-    final String fileName = Paths.get(path.toUri().getPath()).getFileName().toString();
+    if (path.toString().endsWith(".jar")) {
+      handleJar(kind, path);
+    } else {
+      handleBin(kind, path);
+    }
+  }
+
+  private void handleJar(WatchEvent.Kind<?> kind, Path path) {
+    final String fileName = path.getFileName().toString();
     final Matcher moduleNameMatcher = moduleNamePattern.matcher(fileName);
     final String moduleName;
 
@@ -204,10 +227,6 @@ public final class ViewWatcher {
   }
 
   private void handleBin(WatchEvent.Kind<?> kind, Path path) {
-    if (kind != ENTRY_CREATE && kind != ENTRY_MODIFY) {
-      return;
-    }
-
     final Path modulePath = path.resolve(Paths.get("..", "..", "..", "..")).normalize();
     final String moduleName = modulePath.toFile().getName();
     addPending(moduleName, path);
@@ -219,7 +238,8 @@ public final class ViewWatcher {
         wait(scheduledFuture);
       }
 
-      pendingModules.add(moduleName);
+      final String name = moduleNames.contains(moduleName) ? moduleName : appName;
+      pendingModules.add(name);
       pendingPaths.add(path);
 
       scheduledFuture =
@@ -298,28 +318,24 @@ public final class ViewWatcher {
       final Optional<URL> rootResourceOpt = Optional.ofNullable(classLoader.getResource(""));
       rootResourceOpt.ifPresent(
           rootResource -> {
-            final Path libPath = Paths.get(rootResource.getPath(), "..", "lib").normalize();
+            final Path libPath =
+                Paths.get(toURI(rootResource)).resolve(Paths.get("..", "lib")).normalize();
             if (libPath.toFile().isDirectory()) {
               paths.add(libPath);
             }
           });
 
-      if (!paths.isEmpty()) {
-        watchEventHandler = this::handleJar;
-      } else {
-        Reflections.findResources()
-            .byName("(domains|i18n|views)/(.*?)\\.(xml|csv)$")
-            .find()
-            .parallelStream()
-            .map(URL::getPath)
-            .filter(path -> path.startsWith("/"))
-            .map(path -> Paths.get(path, "..").normalize())
-            .distinct()
-            .forEach(paths::add);
+      Reflections.findResources()
+          .byName("(domains|i18n|views)/(.*?)\\.(xml|csv)$")
+          .find()
+          .parallelStream()
+          .filter(url -> url.getPath().startsWith("/"))
+          .map(url -> Paths.get(toURI(url)).resolve("..").normalize())
+          .distinct()
+          .forEach(paths::add);
 
-        if (!paths.isEmpty()) {
-          watchEventHandler = this::handleBin;
-        }
+      if (!paths.isEmpty()) {
+        watchEventHandler = this::handleJarAndBin;
       }
     }
 
@@ -409,6 +425,14 @@ public final class ViewWatcher {
       }
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
+    }
+  }
+
+  private static URI toURI(URL url) {
+    try {
+      return url.toURI();
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
     }
   }
 

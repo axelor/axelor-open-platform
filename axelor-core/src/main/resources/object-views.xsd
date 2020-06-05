@@ -622,6 +622,11 @@
                   <xsd:documentation>Image icon to show for this item.</xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
+              <xsd:attribute name="color" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>Tag color for this item.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
               <xsd:attribute name="order" type="xsd:int">
                 <xsd:annotation>
                   <xsd:documentation>
@@ -940,6 +945,13 @@
     <xsd:attribute name="x-search-limit" type="xsd:int">
       <xsd:annotation>
         <xsd:documentation>Specify the default page limit of search popup.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-color-field" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify the color field to use with tag-select widget.
+        </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
   </xsd:attributeGroup>
@@ -1776,6 +1788,26 @@
     </xsd:attribute>
   </xsd:complexType>
 
+  <xsd:simpleType name="CardEditWindow">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="self">
+        <xsd:annotation>
+          <xsd:documentation>Show editor in same tab.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="popup">
+        <xsd:annotation>
+          <xsd:documentation>Show popup editor</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="popup-new">
+        <xsd:annotation>
+          <xsd:documentation>Show popup editor when creating new record.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+
   <xsd:complexType name="CardsView">
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleView">
@@ -1831,6 +1863,11 @@
             <xsd:documentation>Specify whether to show the 'Delete' button.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="edit-window" type="tns:CardEditWindow">
+          <xsd:annotation>
+            <xsd:documentation>Specify how to show editor window.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1870,6 +1907,13 @@
         <xsd:attribute name="limit" type="xsd:integer">
           <xsd:annotation>
             <xsd:documentation>Specify pagination limit per column.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="x-limit-columns" type="xsd:integer">
+          <xsd:annotation>
+            <xsd:documentation>
+            Specify maximum number of columns when columnBy is a reference field.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>

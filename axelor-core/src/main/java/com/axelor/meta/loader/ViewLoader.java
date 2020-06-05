@@ -65,7 +65,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.inject.persist.Transactional;
 import java.io.File;
@@ -74,6 +73,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -81,6 +81,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
@@ -107,6 +108,7 @@ public class ViewLoader extends AbstractParallelLoader {
 
   private final Set<String> viewsToGenerate = ConcurrentHashMap.newKeySet();
   private final Map<String, List<String>> viewsToMigrate = new ConcurrentHashMap<>();
+  private final Map<String, List<Consumer<Group>>> groupsToCreate = new ConcurrentHashMap<>();
 
   @Override
   protected void doLoad(URL file, Module module, boolean update) {
@@ -140,6 +142,7 @@ public class ViewLoader extends AbstractParallelLoader {
     }
 
     migrateViews();
+    linkMissingGroups();
     generateFinalViews(module, update);
   }
 
@@ -159,10 +162,29 @@ public class ViewLoader extends AbstractParallelLoader {
     }
   }
 
+  private void linkMissingGroups() {
+    try {
+      groupsToCreate.forEach(
+          (code, adders) -> {
+            final Group existingGroup = groups.findByCode(code);
+            final Group group;
+            if (existingGroup != null) {
+              log.debug("User group already created by data/demo: {}", code);
+              group = existingGroup;
+            } else {
+              log.info("Creating a new user group: {}", code);
+              group = groups.save(new Group(code, code));
+            }
+            adders.forEach(adder -> adder.accept(group));
+          });
+    } finally {
+      groupsToCreate.clear();
+    }
+  }
+
   private void generateFinalViews(Module module, boolean update) {
     try {
-      finalViewGenerator.parallelGenerate(
-          findForCompute(module.getName(), update, viewsToGenerate));
+      finalViewGenerator.generate(findForCompute(module.getName(), update, viewsToGenerate));
     } finally {
       viewsToGenerate.clear();
     }
@@ -308,7 +330,9 @@ public class ViewLoader extends AbstractParallelLoader {
     if (Boolean.TRUE.equals(view.getExtension())) {
       if (!Boolean.TRUE.equals(entity.getExtension())) {
         // Migrated to extension view
-        viewsToMigrate.computeIfAbsent(view.getName(), k -> new ArrayList<>()).add(view.getXmlId());
+        viewsToMigrate
+            .computeIfAbsent(view.getName(), k -> Collections.synchronizedList(new ArrayList<>()))
+            .add(view.getXmlId());
       }
     } else if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
       // Set priority higher than existing view
@@ -338,7 +362,7 @@ public class ViewLoader extends AbstractParallelLoader {
     entity.setModule(module.getName());
     entity.setXml(xml);
     entity.setComputed(null);
-    entity.setGroups(this.findGroups(view.getGroups(), entity.getGroups()));
+    final Set<String> missingGroups = addGroups(entity::addGroup, view.getGroups());
     entity.setExtension(view.getExtension());
 
     if (entity.getTitle() == null) {
@@ -350,6 +374,7 @@ public class ViewLoader extends AbstractParallelLoader {
     }
 
     entity = views.save(entity);
+    addToGroupsToCreate(entity, missingGroups);
   }
 
   private static String getName(String name, String xmlId) {
@@ -417,6 +442,7 @@ public class ViewLoader extends AbstractParallelLoader {
       item.setValue(opt.getValue());
       item.setTitle(opt.getTitle());
       item.setIcon(opt.getIcon());
+      item.setColor(opt.getColor());
       item.setOrder(seq);
       item.setHidden(opt.getHidden());
 
@@ -441,26 +467,51 @@ public class ViewLoader extends AbstractParallelLoader {
     selects.save(entity);
   }
 
-  private Set<Group> findGroups(String names, Set<Group> existing) {
-    if (StringUtils.isBlank(names)) {
-      return existing;
+  private Set<String> addGroups(Consumer<Group> adder, String codes) {
+    final Set<String> missing = new HashSet<>();
+
+    if (StringUtils.notBlank(codes)) {
+      Arrays.stream(codes.split("\\s*,\\s*"))
+          .forEach(
+              code -> {
+                final Group group = groups.findByCode(code);
+                if (group != null) {
+                  adder.accept(group);
+                } else {
+                  missing.add(code);
+                }
+              });
     }
 
-    Set<Group> all =
-        ObjectUtils.isEmpty(existing) ? new HashSet<Group>() : Sets.newHashSet(existing);
-    for (String code : names.split(",")) {
-      Group group = groups.all().filter("self.code = ?1", code).fetchOne();
-      if (group == null) {
-        log.info("Creating a new user group: {}", code);
-        group = new Group();
-        group.setCode(code);
-        group.setName(code);
-        group = groups.save(group);
-      }
-      all.add(group);
-    }
+    return missing;
+  }
 
-    return all;
+  private void addToGroupsToCreate(MetaView metaView, Set<String> codes) {
+    final Long id = metaView.getId();
+    codes.stream()
+        .forEach(
+            code ->
+                groupsToCreate
+                    .computeIfAbsent(code, k -> Collections.synchronizedList(new ArrayList<>()))
+                    .add(
+                        group -> {
+                          final MetaView entity = views.find(id);
+                          entity.addGroup(group);
+                        }));
+  }
+
+  private void addToGroupsToCreate(MetaMenu metaMenu, Set<String> codes) {
+    final Long id = metaMenu.getId();
+    codes.stream()
+        .forEach(
+            code ->
+                groupsToCreate
+                    .computeIfAbsent(code, k -> Collections.synchronizedList(new ArrayList<>()))
+                    .add(
+                        group -> {
+                          final MetaMenu entity = menus.find(id);
+                          entity.addGroup(group);
+                        }));
   }
 
   @Transactional
@@ -613,7 +664,7 @@ public class ViewLoader extends AbstractParallelLoader {
     entity.setLeft(menuItem.getLeft() == null ? true : menuItem.getLeft());
     entity.setMobile(menuItem.getMobile());
     entity.setHidden(menuItem.getHidden());
-    entity.setGroups(this.findGroups(menuItem.getGroups(), entity.getGroups()));
+    final Set<String> missingGroups = addGroups(entity::addGroup, menuItem.getGroups());
 
     entity.setConditionToCheck(menuItem.getConditionToCheck());
     entity.setModuleToCheck(menuItem.getModuleToCheck());
@@ -647,6 +698,7 @@ public class ViewLoader extends AbstractParallelLoader {
     Long entityId = entity.getId();
 
     addResolveTask(MetaMenu.class, name, entityId, this::resolveParentOnMenu);
+    addToGroupsToCreate(entity, missingGroups);
   }
 
   private void resolveParentOnMenu(Long menuId, Long parentMenuId) {

@@ -594,6 +594,7 @@ public final class MetaStore {
     option.setValue(item.getValue());
     option.setTitle(item.getTitle());
     option.setIcon(item.getIcon());
+    option.setColor(item.getColor());
     option.setOrder(item.getOrder());
     option.setHidden(item.getHidden());
     try {

@@ -92,7 +92,7 @@ ui.directive('uiViewDashboard', ['ViewService', function(ViewService) {
 
       scope.sortableOptions = {
         handle: ".dashlet-header",
-        cancel: ".dashlet-buttons",
+        cancel: ".dashlet-buttons,input,textarea,button,select,option",
         items: ".dashlet",
         tolerance: "pointer",
         activate: function(e, ui) {
@@ -302,7 +302,7 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
     template:
       "<div class='dashlet hidden'>" +
         "<div class='dashlet-header'>" +
-          "<ul class='dashlet-buttons pull-right' ng-if='showRefresh || canExport() || hasAction()'>" +
+          "<ul class='dashlet-buttons' ng-if='showRefresh || canExport() || hasAction()'>" +
             "<li class='dropdown'>" +
               "<a href='' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-gear'></i></a>" +
               "<ul class='dropdown-menu pull-right'>" +
@@ -324,10 +324,13 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
             "</li>" +
             "<li ng-if='showToggle'><a href='' ng-click='onDashletToggle()'><i class='fa' ng-class='collapsedIcon'></i></a></li>" +
           "</ul>" +
-          "<div class='dashlet-pager pull-right' ng-if='showPager'>" +
+          "<div class='dashlet-pager' ng-if='showPager'>" +
             "<span class='dashlet-pager-text'>{{pagerText()}}</span>" +
             "<a href='' ng-click='doPrev()' ng-class='{disabled: !canPrev()}'><i class='fa fa-step-backward'></i></a>" +
             "<a href='' ng-click='doNext()' ng-class='{disabled: !canNext()}'><i class='fa fa-step-forward'></i></a>" +
+          "</div>" +
+          "<div class='dashlet-search' ng-if='showSearch'>" +
+            "<div ui-filter-box x-handler='this'></div>" +
           "</div>" +
           "<div class='dashlet-title'>{{title}}</div>" +
         "</div>" +
