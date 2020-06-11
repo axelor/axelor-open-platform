@@ -31,6 +31,8 @@ import com.axelor.db.annotations.TrackField;
 import com.axelor.db.annotations.TrackMessage;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.event.Event;
+import com.axelor.events.internal.BeforeTransactionComplete;
 import com.axelor.inject.Beans;
 import com.axelor.mail.MailConstants;
 import com.axelor.mail.db.MailFollower;
@@ -50,13 +52,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.hibernate.Transaction;
 
 /** This class provides change tracking for auditing and notifications. */
 final class AuditTracker {
 
-  private static final ThreadLocal<Map<String, EntityState>> STORE = new ThreadLocal<>();
-  private static final ThreadLocal<Set<Model>> DELETED = new ThreadLocal<>();
+  private static final ThreadLocal<Map<String, EntityState>> STORE =
+      ThreadLocal.withInitial(HashMap::new);
+
+  private static final ThreadLocal<Set<Model>> UPDATED = ThreadLocal.withInitial(HashSet::new);
+  private static final ThreadLocal<Set<Model>> DELETED = ThreadLocal.withInitial(HashSet::new);
 
   private static class EntityState {
 
@@ -67,9 +74,6 @@ final class AuditTracker {
 
     public static void create(
         AuditableModel entity, Map<String, Object> values, Map<String, Object> oldValues) {
-      if (STORE.get() == null) {
-        STORE.set(new HashMap<String, EntityState>());
-      }
       String key = entity.getClass().getName() + ":" + entity.getId();
       EntityState state = STORE.get().get(key);
       if (state == null) {
@@ -184,10 +188,11 @@ final class AuditTracker {
   }
 
   public void delete(Model entity) {
-    if (DELETED.get() == null) {
-      DELETED.set(new HashSet<>());
-    }
     DELETED.get().add(entity);
+  }
+
+  public void updated(Model entity) {
+    UPDATED.get().add(entity);
   }
 
   private String findMessage(
@@ -323,7 +328,10 @@ final class AuditTracker {
     }
 
     if (msg == null) {
-      msg = previousState == null ? /*$$(*/ "Record created" /*)*/ : /*$$(*/ "Record updated" /*)*/;
+      msg =
+          previousState == null
+              ? /* $$( */ "Record created" /* ) */
+              : /* $$( */ "Record updated" /* ) */;
     }
 
     final Map<String, Object> json = new HashMap<>();
@@ -361,7 +369,7 @@ final class AuditTracker {
 
   private void processTracks(Transaction tx, User user) {
     final Map<String, EntityState> store = STORE.get();
-    if (store == null) {
+    if (store.isEmpty()) {
       return;
     }
     // prevent concurrent update
@@ -373,7 +381,7 @@ final class AuditTracker {
 
   private void processDelete(Transaction tx, User user) {
     final Set<Model> deleted = DELETED.get();
-    if (deleted == null) {
+    if (deleted.isEmpty()) {
       return;
     }
     final MetaFiles files = Beans.get(MetaFiles.class);
@@ -382,6 +390,15 @@ final class AuditTracker {
     for (Model entity : deleted) {
       files.deleteAttachments(entity);
     }
+  }
+
+  private void fireBeforeCompleteEvent() {
+    final Set<Model> updated = UPDATED.get();
+    final Set<Model> deleted = DELETED.get();
+    if (updated.isEmpty() && deleted.isEmpty()) {
+      return;
+    }
+    Beans.get(BeforeTransactionCompleteService.class).fire(updated, deleted);
   }
 
   /**
@@ -401,12 +418,24 @@ final class AuditTracker {
    */
   public void onComplete(Transaction tx, User user) {
     try {
+      this.fireBeforeCompleteEvent();
       this.processTracks(tx, user);
       this.processDelete(tx, user);
     } finally {
       STORE.remove();
       DELETED.remove();
+      UPDATED.remove();
       JPA.em().flush();
+    }
+  }
+
+  @Singleton
+  static class BeforeTransactionCompleteService {
+
+    @Inject private Event<BeforeTransactionComplete> event;
+
+    public void fire(Set<? extends Model> updated, Set<? extends Model> deleted) {
+      event.fire(new BeforeTransactionComplete(updated, deleted));
     }
   }
 }

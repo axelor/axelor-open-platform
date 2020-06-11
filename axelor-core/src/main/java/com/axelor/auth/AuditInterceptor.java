@@ -168,9 +168,11 @@ public class AuditInterceptor extends EmptyInterceptor {
       }
     }
 
-    // change tracking
     if (tracker.get() != null) {
+      // change tracking
       tracker.get().track((AuditableModel) entity, propertyNames, currentState, previousState);
+      // for before completion event
+      tracker.get().updated((AuditableModel) entity);
     }
 
     return true;
@@ -198,9 +200,11 @@ public class AuditInterceptor extends EmptyInterceptor {
       }
     }
 
-    // change tracking
     if (tracker.get() != null) {
+      // change tracking
       tracker.get().track((AuditableModel) entity, propertyNames, state, null);
+      // for before completion event
+      tracker.get().updated((AuditableModel) entity);
     }
 
     return true;

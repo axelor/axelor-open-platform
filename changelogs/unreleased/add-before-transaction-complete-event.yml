@@ -1,0 +1,6 @@
+---
+title: Add before transaction complete event
+type: feature
+description: |
+  The event is for internal purpose only. We may promote it as public api in some future version.
+  The event is fired with total number of records updated/deleted in current transaction.
