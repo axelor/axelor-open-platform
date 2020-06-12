@@ -27,6 +27,7 @@ import com.axelor.auth.db.User;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
+import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
@@ -218,17 +219,28 @@ public class MetaService {
       request.setModel(action.getModel());
       request.setData(new HashMap<String, Object>());
       try {
+        final JpaSecurity security = Beans.get(JpaSecurity.class);
+        final List<Filter> filters = new ArrayList<>();
+        final Class<? extends Model> modelClass = (Class<? extends Model>) request.getBeanClass();
+        final Filter securityFilter = security.getFilter(JpaSecurity.CAN_READ, modelClass);
+        if (securityFilter != null) {
+          filters.add(securityFilter);
+        } else if (!security.isPermitted(JpaSecurity.CAN_READ, modelClass)) {
+          return null;
+        }
         final Map<String, Object> data =
             (Map) ((Map) actionExecutor.execute(request).getItem(0)).get("view");
-        final Map<String, Object> context = (Map) data.get("context");
+        final Map<String, Object> params = (Map<String, Object>) data.get("params");
+        if (params == null || !Boolean.TRUE.equals(params.get("showArchived"))) {
+          filters.add(new JPQLFilter("self.archived IS NULL OR self.archived = FALSE"));
+        }
         final String domain = (String) data.get("domain");
-        final List<Filter> filters =
-            Lists.newArrayList(new JPQLFilter("self.archived IS NULL OR self.archived = FALSE"));
         if (StringUtils.notBlank(domain)) {
           filters.add(JPQLFilter.forDomain(domain));
         }
         final Filter filter = Filter.and(filters);
-        return String.valueOf(filter.build((Class) request.getBeanClass()).bind(context).count());
+        final Map<String, Object> context = (Map) data.get("context");
+        return String.valueOf(filter.build(modelClass).bind(context).count());
       } catch (Exception e) {
         LOG.error("Unable to read tag for menu: {}", item.getName());
         LOG.trace("Error", e);
