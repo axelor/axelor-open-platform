@@ -817,9 +817,9 @@
       var params = {
         model: model,
         action: action,
-        data: data || {
+        data: _.extend({}, data, {
           context: _.extend({ _model: model }, context)
-        }
+        })
       };
 
       var promise = $http.post('ws/action', params, config);

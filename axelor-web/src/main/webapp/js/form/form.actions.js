@@ -305,18 +305,36 @@ ActionHandler.prototype = {
   },
 
   _getContext: function() {
-    var scope = this.scope,
-      context = scope.getContext ? scope.getContext() : scope.record,
-      viewParams = scope._viewParams || {};
+    var scope = this.scope;
+    var context = scope.getContext ? scope.getContext() : scope.record;
+    var viewParams = scope._viewParams || {};
+
+    if (scope._isEditorScope && scope.handler) {
+      viewParams = scope.handler._viewParams || viewParams;
+    }
 
     context = _.extend({}, viewParams.context, context);
     if (context._model === undefined) {
       context._model = scope._model;
     }
 
+    if (viewParams.viewType) context._viewType = viewParams.viewType;
+    if (viewParams.views && viewParams.views.length) {
+      context._views = _.map(viewParams.views, function (view) {
+        if (view.type === context._viewType) context._viewName = view.name;
+        return { type: view.type, name: view.name };
+      });
+    }
+
     // include button name as _signal (used by workflow engine)
     if (this.element.is("button,.button-item,li.action-item")) {
       context._signal = this.element.attr('name') || this.element.attr('x-name');
+    }
+
+    // include field name as source
+    var source = this.element.attr('x-field') || this.element.attr('name') || this.element.attr('x-name');
+    if (source) {
+      context._source = source;
     }
 
     return context;

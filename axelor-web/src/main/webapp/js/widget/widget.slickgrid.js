@@ -498,6 +498,7 @@ function buttonScope(scope) {
   var handler = scope.handler;
 
   btnScope._dataSource = handler._dataSource;
+  btnScope._viewParams = handler._viewParams;
   btnScope.editRecord = function (record) {};
   btnScope.reload = function () {
     if ((handler.field||{}).target) {
@@ -2738,6 +2739,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         grid = new Grid(scope, element, attrs, ViewService, ActionService);
         if (form) {
           formScope.grid = grid;
+          formScope._isEditorScope = true;
           grid.setEditors(form, formScope, forEdit);
         }
 
