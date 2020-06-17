@@ -244,6 +244,16 @@
     <string name="help" column="help_value" max="1024" multiline="true" required="true" />
   </entity>
 
+  <entity name="MetaAttrs" table="META_ATTRS" logUpdates="false">
+    <string name="model" column="model_name" required="true" />
+    <string name="view" column="view_name" />
+    <string name="field" column="field_name" />
+    <string name="name" column="attr_name" />
+    <string name="value" column="attr_value" />
+    <string name="condition" column="condition_value" max="1024" />
+    <many-to-many name="roles" ref="com.axelor.auth.db.Role" />
+  </entity>
+
   <entity name="MetaFile" table="META_FILE">
     <![CDATA[
     This object stores the files.

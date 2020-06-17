@@ -146,6 +146,15 @@
     <domain>self.menu is not null</domain>
   </action-view>
 
+  <menuitem name="menu-meta-attrs" parent="menu-view-management"
+    title="View Attributes"
+    action="action-meta-attrs" />
+
+  <action-view name="action-meta-attrs" title="View Attributes" model="com.axelor.meta.db.MetaAttrs">
+    <view type="grid" name="meta-attrs-grid"/>
+    <view type="form" name="meta-attrs-form"/>
+  </action-view>
+
   <menuitem name="menu-view-charts" parent="menu-view-management"
     title="All Charts"
     action="meta.charts"/>

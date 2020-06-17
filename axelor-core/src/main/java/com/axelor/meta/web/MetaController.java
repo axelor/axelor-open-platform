@@ -19,6 +19,8 @@ package com.axelor.meta.web;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
+import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -28,11 +30,13 @@ import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
+import com.axelor.meta.db.MetaAttrs;
 import com.axelor.meta.db.MetaField;
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaModel;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.MetaView;
+import com.axelor.meta.db.repo.MetaAttrsRepository;
 import com.axelor.meta.db.repo.MetaTranslationRepository;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.XMLViews;
@@ -42,6 +46,8 @@ import com.axelor.meta.schema.actions.ActionView;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
+import com.axelor.rpc.Context;
+import com.axelor.script.ScriptHelper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -122,6 +128,36 @@ public class MetaController {
     }
 
     response.setData(ImmutableList.of(data));
+  }
+
+  public void moreAttrs(ActionRequest request, ActionResponse response) {
+    Context ctx = request.getContext();
+    String model = (String) ctx.get("_model");
+    String view = (String) ctx.get("_viewName");
+
+    User user = AuthUtils.getUser();
+    ScriptHelper sh = request.getScriptHelper();
+
+    MetaAttrsRepository repo = Beans.get(MetaAttrsRepository.class);
+    List<MetaAttrs> attrs =
+        repo.all()
+            .filter("self.model = :model and self.view = :view")
+            .bind("model", model)
+            .bind("view", view)
+            .fetch();
+
+    attrs.stream()
+        // check roles
+        .filter(
+            attr ->
+                attr.getRoles() == null
+                    || attr.getRoles().isEmpty()
+                    || attr.getRoles().stream()
+                        .anyMatch(role -> AuthUtils.hasRole(user, role.getName())))
+        // check conditions
+        .filter(attr -> sh.test(attr.getCondition()))
+        // set attrs
+        .forEach(attr -> response.setAttr(attr.getField(), attr.getName(), attr.getValue()));
   }
 
   /** This action is called from custom fields form when context field is changed. */

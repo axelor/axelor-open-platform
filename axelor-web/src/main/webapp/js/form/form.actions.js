@@ -269,6 +269,14 @@ ActionHandler.prototype = {
 
   onClick: function(event) {
     var self = this;
+    var withMoreAttrs = function (promise) {
+      var actions = self.action.trim().split(/\s*,\s*/);
+      if (actions.indexOf('save') > -1) {        
+        return self._handleAction('com.axelor.meta.web.MetaController:moreAttrs');
+      }
+      return promise;
+    };
+    
     var prompt = this._getPrompt();
     if (prompt) {
       var deferred = this.ws.defer(),
@@ -276,7 +284,7 @@ ActionHandler.prototype = {
       axelor.dialogs.confirm(prompt, function(confirmed){
         if (confirmed) {
           self._fireBeforeSave().then(function() {
-            self.handle().then(deferred.resolve, deferred.reject);
+            withMoreAttrs(self.handle()).then(deferred.resolve, deferred.reject);
           });
         } else {
           self.scope.$timeout(deferred.reject);
@@ -287,7 +295,7 @@ ActionHandler.prototype = {
       return promise;
     }
     return this._fireBeforeSave().then(function() {
-      return self.handle();
+      return withMoreAttrs(self.handle());
     });
   },
 
@@ -566,7 +574,7 @@ ActionHandler.prototype = {
   _isSameViewType: function () {
     return this.viewType === this.scope.viewType;
   },
-
+  
   _handleAction: function(action) {
 
     this._blockUI();

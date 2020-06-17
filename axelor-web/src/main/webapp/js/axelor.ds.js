@@ -395,6 +395,13 @@
         items = items.sort(function (x, y) { return x.columnSequence - y.columnSequence; });
         view.items = items;
       }
+
+      // more attrs action
+      if (view.type === 'form') {
+        var onLoad = 'com.axelor.meta.web.MetaController:moreAttrs';
+        if (view.onLoad) onLoad = view.onLoad + ',' + onLoad;
+        view.onLoad = onLoad;
+      }
     };
 
     function processJsonForm(view) {

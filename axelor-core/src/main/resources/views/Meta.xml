@@ -471,6 +471,27 @@
     </panel>
   </form>
 
+  <grid title="View Attributes" name="meta-attrs-grid" model="com.axelor.meta.db.MetaAttrs">
+    <field name="model" />
+    <field name="view" />
+    <field name="field" />
+    <field name="name" />
+    <field name="value" />
+    <field name="condition" />
+  </grid>
+
+  <form title="View Attribute" name="meta-attrs-form" model="com.axelor.meta.db.MetaAttrs">
+    <panel title="Overview">
+      <field name="model" />
+      <field name="view" />
+      <field name="field" />
+      <field name="condition" />
+      <field name="name" />
+      <field name="value" />
+    </panel>
+    <panel-related field="roles" />
+  </form>
+
   <grid title="Files" name="meta-files-grid" model="com.axelor.meta.db.MetaFile">
     <field name="fileName"/>
     <field name="sizeText" width="100"/>
