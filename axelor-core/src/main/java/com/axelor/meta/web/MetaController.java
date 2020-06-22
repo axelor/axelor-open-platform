@@ -144,6 +144,7 @@ public class MetaController {
             .filter("self.model = :model and self.view = :view")
             .bind("model", model)
             .bind("view", view)
+            .order("order")
             .fetch();
 
     attrs.stream()
@@ -157,7 +158,14 @@ public class MetaController {
         // check conditions
         .filter(attr -> sh.test(attr.getCondition()))
         // set attrs
-        .forEach(attr -> response.setAttr(attr.getField(), attr.getName(), attr.getValue()));
+        .forEach(
+            attr -> {
+              final Object value =
+                  attr.getName().matches("readonly|required|recommend|hidden|collapse")
+                      ? sh.test(attr.getValue())
+                      : sh.eval(attr.getValue());
+              response.setAttr(attr.getField(), attr.getName(), value);
+            });
   }
 
   /** This action is called from custom fields form when context field is changed. */

@@ -471,13 +471,15 @@
     </panel>
   </form>
 
-  <grid title="View Attributes" name="meta-attrs-grid" model="com.axelor.meta.db.MetaAttrs">
+  <grid title="View Attributes" name="meta-attrs-grid" model="com.axelor.meta.db.MetaAttrs"
+    orderBy="model,view,order">
     <field name="model" />
     <field name="view" />
     <field name="field" />
     <field name="name" />
     <field name="value" />
     <field name="condition" />
+    <field name="order" />
   </grid>
 
   <form title="View Attribute" name="meta-attrs-form" model="com.axelor.meta.db.MetaAttrs">
@@ -485,9 +487,10 @@
       <field name="model" />
       <field name="view" />
       <field name="field" />
-      <field name="condition" />
+      <field name="order" />
       <field name="name" />
       <field name="value" />
+      <field name="condition" colSpan="12" />
     </panel>
     <panel-related field="roles" />
   </form>
