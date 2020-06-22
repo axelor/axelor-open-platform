@@ -1052,6 +1052,10 @@ ActionHandler.prototype = {
             parentElem.scope().$$pendingAttrs[itemName.substring(itemName.indexOf('.')+1)] = itemAttrs;
           }
         }
+        // self (form itself)
+        if (itemName === 'self') {
+          setAttrs(formElement, _.pick(itemAttrs, 'readonly'));
+        }
         return;
       }
       items.each(function(i) {
