@@ -84,9 +84,14 @@ function AboutCtrl($scope) {
   $scope.appHome = axelor.config["application.home"];
   $scope.appHelp = axelor.config["application.help"];
   $scope.appYear = moment().year();
+  $scope.technical = axelor.config['user.technical'];
 }
 
 function SystemCtrl($scope, $element, $location, $http) {
+  if (!axelor.config['user.technical']) {
+     window.location.hash = '/about';
+     return;
+  }
 
   var promise = null;
 
