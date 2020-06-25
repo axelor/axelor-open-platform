@@ -897,7 +897,7 @@ ui.directive('uiFilterForm', function() {
         "<a href='' ng-click='addFilter()' x-translate>Add filter</a>"+
         "<span class='divider'>|</span>"+
         "<a href='' ng-click='clearFilter(true)' x-translate>Clear</a></li>"+
-        "<span class='divider' ng-if='canExport()'>|</span>"+
+        "<span class='divider'>|</span>"+
         "<a href='' ng-if='canExport()' ng-click='onExport()' x-translate>Export</a></li>"+
         "<span class='divider' ng-if='canExport()'>|</span>"+
         "<a href='' ng-if='canExport(true)' ng-click='onExport(true)' x-translate>Export full</a></li>"+
