@@ -1,0 +1,3 @@
+---
+title: Fix query building with empty logical filters
+type: fix
