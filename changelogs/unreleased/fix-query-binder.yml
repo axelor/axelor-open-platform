@@ -1,0 +1,3 @@
+---
+title: Fix wrong positional parameter resolution from query binder
+type: fix

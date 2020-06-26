@@ -17,9 +17,9 @@
  */
 package com.axelor.db;
 
-import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Adapter;
 import com.axelor.rpc.ContextEntity;
+import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
@@ -175,10 +175,15 @@ public class QueryBinder {
         value = ((ContextEntity) value).getContextId();
       } else if (value instanceof Model) {
         value = ((Model) value).getId();
-      } else if (value instanceof String
-          && !StringUtils.isBlank((String) value)
-          && bindings.containsKey(value)) {
-        value = bindings.get(value);
+      } else if (value instanceof String) {
+        final String expr = (String) value;
+        if (expr.startsWith("__") && expr.endsWith("__") && bindings.containsKey(expr)) {
+          // special variable
+          value = bindings.get(expr);
+        } else if (expr.startsWith("__ctx__.")) {
+          // permission param
+          value = new GroovyScriptHelper(bindings).eval(expr.substring(8));
+        }
       }
       try {
         param = query.getParameter(i + offset);

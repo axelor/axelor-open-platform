@@ -24,11 +24,8 @@ import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Provider;
@@ -51,23 +48,13 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
           param = param.trim();
           if ("__user__".equals(param)) {
             args.add(user);
-          } else if (param.startsWith("__user__.")) {
-            args.add(this.eval(user, "__user__", param));
           } else {
-            args.add(param);
+            args.add("__ctx__." + param);
           }
         }
       }
 
       this.filter = new JPQLFilter(condition, args.toArray());
-    }
-
-    private Object eval(Object bean, String prefix, String expr) {
-      if (bean == null) {
-        return null;
-      }
-      GroovyShell shell = new GroovyShell(new Binding(ImmutableMap.of(prefix, bean)));
-      return shell.evaluate(expr);
     }
 
     public Filter getFilter() {
