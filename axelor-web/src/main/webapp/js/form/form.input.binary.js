@@ -25,7 +25,7 @@ var BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABA
 var META_FILE = "com.axelor.meta.db.MetaFile";
 var META_JSON_RECORD = "com.axelor.meta.db.MetaJsonRecord";
 
-function makeURL(model, field, recordOrId, version, scope) {
+function makeURL(model, field, recordOrId, version, scope, parentId) {
   var value = recordOrId;
   if (!value) return null;
   var id = value.id ? value.id : value;
@@ -35,12 +35,17 @@ function makeURL(model, field, recordOrId, version, scope) {
   if (ver === undefined || ver === null) ver = (new Date()).getTime();
   if (!id || id <= 0) return null;
   var url = "ws/rest/" + model + "/" + id + "/" + field + "/download?v=" + ver;
-  if (scope && scope.record) {
-    var parentId = scope.record.id;
-    if (!parentId && scope.field && scope._jsonContext && scope._jsonContext.$record) {
-      parentId = scope._jsonContext.$record.id;
+  if (scope) {
+    if ((!parentId || parentId < 0) && scope.record) {
+      parentId = scope.record.id;
+      if ((!parentId || parentId < 0) && scope.field && scope._jsonContext && scope._jsonContext.$record) {
+        parentId = scope._jsonContext.$record.id;
+      }
     }
-    url += "&parentId=" + parentId + "&parentModel=" + scope._model;
+    if (parentId > 0) {
+      url += "&parentId=" + parentId;
+    }
+    url += "&parentModel=" + scope._model;
   }
   return url;
 }
