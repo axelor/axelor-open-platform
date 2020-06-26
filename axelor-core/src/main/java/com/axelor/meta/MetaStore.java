@@ -172,7 +172,7 @@ public final class MetaStore {
       if (property.getTarget() != null) {
         map.put("perms", getPermissions(property.getTarget()));
       }
-      if (property.isMassUpdate()) {
+      if (property.isMassUpdate() && !name.contains(".")) {
         massUpdate = true;
       }
       // find the default value
