@@ -26,10 +26,46 @@
     fr: '\u20AC'
   };
 
+  var thousandSeparator = {
+    en: ',',
+    fr: ' '
+  };
+
+  var getFirstBrowserLanguage = function () {
+    var nav = window.navigator,
+      browserLanguagePropertyKeys = ['language', 'browserLanguage', 'systemLanguage', 'userLanguage'],
+      i,
+      language;
+
+    // support for HTML 5.1 "navigator.languages"
+    if (Array.isArray(nav.languages)) {
+      for (i = 0; i < nav.languages.length; i++) {
+        language = nav.languages[i];
+        if (language && language.length) {
+          return language;
+        }
+      }
+    }
+
+    // support for other well known properties in browsers
+    for (i = 0; i < browserLanguagePropertyKeys.length; i++) {
+      language = nav[browserLanguagePropertyKeys[i]];
+      if (language && language.length) {
+        return language;
+      }
+    }
+
+    return null;
+  };
+
+  function getBrowserLocale() {
+    return getFirstBrowserLanguage() || axelor.config['user.lang'] || 'en';
+  }
+
   function addCurrency(value, symbol) {
     if (value && symbol) {
       var val = '' + value;
-      var lang = (axelor.config['user.lang'] || navigator.language).split(/-|_/)[0];
+      var lang = getBrowserLocale().split(/-|_/)[0];
       if (lang === 'fr') {
         return _.endsWith(val, symbol) ? val : val + ' ' + symbol;
       }
@@ -110,7 +146,7 @@
       return value;
     }
     if (num === 0 || num) {
-      return num.toLocaleString(navigator.language, {
+      return num.toLocaleString(getBrowserLocale(), {
         minimumFractionDigits: scale,
         maximumFractionDigits: scale
       });
@@ -132,7 +168,9 @@
   ui.setNested = setNested;
   ui.canSetNested = canSetNested;
 
-  var dateFormat = navigator.language === 'en-US' ? 'MM/DD/YYYY' : 'DD/MM/YYYY';
+  var mm = moment().clone();
+  mm.locale(getBrowserLocale());
+  var dateFormat = mm.localeData()._longDateFormat.L || 'DD/MM/YYYY';
 
   Object.defineProperty(ui, 'dateFormat', {
     get: function () {
