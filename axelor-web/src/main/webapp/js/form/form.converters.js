@@ -135,9 +135,11 @@
   ui.setNested = setNested;
   ui.canSetNested = canSetNested;
 
+  var dateFormat = navigator.language === 'en-US' ? 'MM/DD/YYYY' : 'DD/MM/YYYY';
+
   Object.defineProperty(ui, 'dateFormat', {
     get: function () {
-      return (axelor.config['user.dateFormat'] || 'dd/MM/yyyy').toUpperCase();
+      return dateFormat;
     }
   });
 

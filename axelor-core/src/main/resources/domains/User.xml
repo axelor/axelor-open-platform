@@ -19,7 +19,6 @@
     <binary name="image" title="Photo" help="Max size 4MB." image="true"/>
     <string name="email"/>
     <string name="language" selection="select.language"/>
-    <string name="dateFormat" selection="select.date.format" />
     <string name="homeAction"/>
     <string name="theme" />
     <boolean name="singleTab" help="Whether to use tabbed ui."/>

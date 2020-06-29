@@ -68,7 +68,6 @@ public class AppInfo {
     // if name field is overridden
     final Property nameField = Mapper.of(User.class).getNameField();
     final Object nameValue = nameField.get(user);
-    
 
     map.put("user.id", user.getId());
     map.put("user.name", nameValue);
@@ -78,12 +77,6 @@ public class AppInfo {
     map.put("user.action", user.getHomeAction());
     map.put("user.singleTab", user.getSingleTab());
     map.put("user.noHelp", user.getNoHelp() == Boolean.TRUE);
-
-    if (StringUtils.isBlank(user.getDateFormat())) {
-      map.put("user.dateFormat", SETTINGS.get("date.format"));
-    } else {
-      map.put("user.dateFormat", user.getDateFormat());
-    }
 
     if (user.getImage() != null) {
       map.put("user.image", getLink(user, null));
