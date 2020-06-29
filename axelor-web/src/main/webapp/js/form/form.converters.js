@@ -26,15 +26,11 @@
     fr: '\u20AC'
   };
 
-  var thousandSeparator = {
-    en: ',',
-    fr: ' '
-  };
-
   function addCurrency(value, symbol) {
     if (value && symbol) {
       var val = '' + value;
-      if (axelor.config['user.lang'] === 'fr' ) {
+      var lang = (axelor.config['user.lang'] || navigator.language).split(/-|_/)[0];
+      if (lang === 'fr') {
         return _.endsWith(val, symbol) ? val : val + ' ' + symbol;
       }
       return _.startsWith(val, symbol) ? val : symbol + val;
@@ -114,9 +110,10 @@
       return value;
     }
     if (num === 0 || num) {
-      var lang = axelor.config['user.lang'];
-      var tsep = thousandSeparator[lang] || thousandSeparator.en;
-      return _.numberFormat(num, scale, '.', tsep);
+      return num.toLocaleString(navigator.language, {
+        minimumFractionDigits: scale,
+        maximumFractionDigits: scale
+      });
     }
     return value;
   }
