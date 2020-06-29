@@ -21,16 +21,6 @@
 
   var ui = angular.module('axelor.ui');
 
-  var currencySymbols = {
-    en: '\u0024',
-    fr: '\u20AC'
-  };
-
-  var thousandSeparator = {
-    en: ',',
-    fr: ' '
-  };
-
   var getFirstBrowserLanguage = function () {
     var nav = window.navigator,
       browserLanguagePropertyKeys = ['language', 'browserLanguage', 'systemLanguage', 'userLanguage'],
