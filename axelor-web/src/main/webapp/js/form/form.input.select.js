@@ -532,7 +532,7 @@ ui.formInput('ImageSelect', 'Select', {
   template_readonly:
     '<span class="image-select readonly">'+
       '<i ng-if="isIcon" class="fa" ng-class="image"></i>'+
-      '<img ng-if="!isIcon" ng-src="{{image}}"></img> <span ng-show="canShowText()">{{text}}</span>' +
+      '<img ng-if="image && !isIcon" ng-src="{{image}}"></img> <span ng-show="canShowText()">{{text}}</span>' +
     '</span>',
 
   template_editable:
