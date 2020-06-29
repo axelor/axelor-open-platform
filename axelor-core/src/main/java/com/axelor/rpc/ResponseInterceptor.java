@@ -220,7 +220,10 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     PSQLException pe = (PSQLException) e;
 
     String title = null;
-    String message = pe.getServerErrorMessage().getMessage();
+    String message =
+        pe.getServerErrorMessage() != null
+            ? pe.getServerErrorMessage().getMessage()
+            : pe.getMessage();
 
     // http://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
     switch (state) {

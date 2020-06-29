@@ -514,7 +514,18 @@ ui.formInput('ImageSelect', 'Select', {
     scope.$render_editable = function () {
       $render_editable.apply(scope, arguments);
       setTimeout(function () {
-        element.find('input').css('padding-left', element.find('i.image,img').width());
+        var img = element.find('i.image,img');
+        if (img.is(':visible')) {
+          element.find('input').css('padding-left', img.width());
+        } else {
+          var unwatchImgVisible = scope.$watch(function() { return img.is(':visible'); },
+            function(visible) {
+              if (visible) {
+                element.find('input').css('padding-left', img.width());
+                unwatchImgVisible();
+              }
+            });
+        }
       });
     };
   },

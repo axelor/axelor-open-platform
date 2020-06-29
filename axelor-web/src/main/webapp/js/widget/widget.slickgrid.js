@@ -384,13 +384,13 @@ _.extend(Factory.prototype, {
       var url = null;
       if (field.target === "com.axelor.meta.db.MetaFile") {
         if (value) {
-          url = ui.makeImageURL("com.axelor.meta.db.MetaFile", "content", (value.id || value), undefined, this.grid.handler);
+          url = ui.makeImageURL("com.axelor.meta.db.MetaFile", "content", (value.id || value), undefined, this.grid.handler, dataContext.id);
         }
         if (url && widget === "binary-link") {
           return '<a href="' + url + '" download="' + value.fileName + '">' + value.fileName + '</a>';
         }
       } else {
-        url = ui.makeImageURL(this.grid.handler._model, field.name, dataContext, undefined, this.grid.handler) + "&image=true";
+        url = ui.makeImageURL(this.grid.handler._model, field.name, dataContext, undefined, this.grid.handler, dataContext.id) + "&image=true";
       }
       return url ? '<img src="' + url + '" style="height: 21px;margin-top: -2px;">' : '';
     }
@@ -2774,7 +2774,9 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         schema.orderBy = field.orderBy || schema.orderBy;
         schema.groupBy = field.groupBy || schema.groupBy;
         schema.groupBy = schema.groupBy === "false" ? false : schema.groupBy;
-        schema.canMassUpdate = !!_.find(schema.items, function (item) { return item.massUpdate; });
+        schema.canMassUpdate = !!_.find(schema.items, function (item) {
+          return item.massUpdate && item.name.indexOf('.') === -1;
+        });
 
         element.show();
         doInit();

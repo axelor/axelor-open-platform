@@ -67,6 +67,8 @@
     <option value="deeporange" color="deeporange">Deep Orange</option>
     <option value="brown" color="brown">Brown</option>
     <option value="grey" color="grey">Grey</option>
+    <option value="black" color="black">Black</option>
+    <option value="white" color="white">White</option>
   </selection>
 
   <grid title="All Modules" name="meta-module-grid" model="com.axelor.meta.db.MetaModule"

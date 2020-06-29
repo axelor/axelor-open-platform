@@ -1,3 +1,18 @@
+## 5.3.4 (2020-06-29)
+
+#### Fixed
+
+* Fix mass update on grid view because of dotted fields
+* Restrict system page to technical staff
+* Fix the button _signal in context
+* Fix query building with empty logical filters
+* Formatting the restoring meta execution time in ISO time
+* Fix NPE caused by response exception handler
+* Fix missing delimiter in advanced search when no export permission
+* Fix input left padding with ImageSelect widget when element is not shown immediately after edit mode
+* Consider permissions and showArchived view-param for tag-count
+* Fix meta file link with no parent
+
 ## 5.3.3 (2020-06-05)
 
 #### Features

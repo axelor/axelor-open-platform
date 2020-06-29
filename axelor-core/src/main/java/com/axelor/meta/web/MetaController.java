@@ -57,6 +57,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -191,12 +192,13 @@ public class MetaController {
       MetaStore.clear();
       I18nBundle.invalidate();
       final Duration duration = Duration.between(startInstant, Instant.now());
-      final LocalTime durationTime = LocalTime.MIN.plusSeconds(duration.getSeconds());
+      final String durationTime =
+          LocalTime.MIN.plusSeconds(duration.getSeconds()).format(DateTimeFormatter.ISO_LOCAL_TIME);
       response.setNotify(
           String.format(I18n.get("All views have been restored (%s)."), durationTime)
               + "<br>"
               + I18n.get("Please refresh your browser to see updated views."));
-      log.info("Restore meta time: {}", LocalTime.MIN.plusSeconds(duration.getSeconds()));
+      log.info("Restore meta time: {}", durationTime);
     } catch (Exception e) {
       response.setException(e);
     }
