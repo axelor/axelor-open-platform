@@ -236,15 +236,15 @@ ui.formInput('DateTime', {
 
   css	: 'datetime-item',
 
-  format: 'DD/MM/YYYY HH:mm',
-  mask: 'DD/MM/YYYY HH:mm',
+  getFormat: function () { return ui.dateTimeFormat; },
+  getMask: function () { return ui.dateTimeFormat; },
 
   widgets: ['Datetime'],
 
   init: function(scope) {
 
-    var isDate = this.isDate,
-      format = this.format;
+    var isDate = this.isDate;
+    var that = this;
 
     scope.parse = function(value) {
       if (angular.isDate(value)) {
@@ -255,7 +255,7 @@ ui.formInput('DateTime', {
 
     scope.format = function(value) {
       if (value) {
-        return moment(value).format(format);
+        return moment(value).format(that.getFormat());
       }
       return value;
     };
@@ -271,7 +271,7 @@ ui.formInput('DateTime', {
     var lastValue = null;
 
     var options = {
-      dateFormat: 'dd/mm/yy',
+      dateFormat: ui.dateFormat.toLowerCase().replace('yyyy', 'yy'),
       showButtonsPanel: false,
       showTime: false,
       showOn: null,
@@ -301,7 +301,7 @@ ui.formInput('DateTime', {
 
     input.datetimepicker(options);
     input.mask({
-      mask: this.mask
+      mask: this.getMask()
     });
 
     var changed = false;
@@ -456,8 +456,8 @@ ui.formInput('DateTime', {
 });
 
 ui.formInput('Date', 'DateTime', {
-  format: 'DD/MM/YYYY',
-  mask: 'DD/MM/YYYY',
+  getFormat: function () { return ui.dateFormat; },
+  getMask: function () { return ui.dateFormat; },
   isDate: true
 });
 

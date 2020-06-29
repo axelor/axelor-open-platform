@@ -1042,11 +1042,11 @@ function FormViewCtrl($scope, $element) {
 
     var info = {};
     if (record.createdOn) {
-      info.createdOn = moment(record.createdOn).format('DD/MM/YYYY HH:mm');
+      info.createdOn = moment(record.createdOn).format(ui.dateTimeFormat);
       info.createdBy = nameOf(record.createdBy);
     }
     if (record.updatedOn) {
-      info.updatedOn = moment(record.updatedOn).format('DD/MM/YYYY HH:mm');
+      info.updatedOn = moment(record.updatedOn).format(ui.dateTimeFormat);
       info.updatedBy = nameOf(record.updatedBy);
     }
     var table = $("<table class='table field-details'>");

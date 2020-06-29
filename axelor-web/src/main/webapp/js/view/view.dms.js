@@ -1366,8 +1366,8 @@ ui.directive("uiDmsDetails", function () {
           info.type = record.isDirectory ? _t("Directory") : record.fileType || _t("Unknown");
           info.tags = record.tags;
           info.owner = getUserName(record.createdBy);
-          info.created = moment(record.createdOn).format('DD/MM/YYYY HH:mm');
-          info.updated = moment(record.updatedOn || record.createdOn).format('DD/MM/YYYY HH:mm');
+          info.created = moment(record.createdOn).format(ui.dateTimeFormat);
+          info.updated = moment(record.updatedOn || record.createdOn).format(ui.dateTimeFormat);
           info.canOffline = !record.isDirectory && (record.metaFile || record['metaFile.id']);
           info.offline = record.offline;
         }

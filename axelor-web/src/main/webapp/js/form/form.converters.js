@@ -121,9 +121,31 @@
     return value;
   }
 
+  function formatDate(value) {
+    var format = arguments.length > 1 ? arguments[1] : ui.dateFormat;
+    return value ? moment(value).format(format) : "";
+  }
+
+  function formatDateTime(value) {
+    var format = arguments.length > 1 ? arguments[1] : ui.dateTimeFormat;
+    return value ? moment(value).format(format) : "";
+  }
+
   ui.findNested = findNested;
   ui.setNested = setNested;
   ui.canSetNested = canSetNested;
+
+  Object.defineProperty(ui, 'dateFormat', {
+    get: function () {
+      return (axelor.config['user.dateFormat'] || 'dd/MM/yyyy').toUpperCase();
+    }
+  });
+
+  Object.defineProperty(ui, 'dateTimeFormat', {
+    get: function () {
+      return this.dateFormat + ' HH:mm';
+    }
+  });
 
   ui.formatters = {
 
@@ -159,7 +181,7 @@
     },
 
     "date": function(field, value) {
-      return value ? moment(value).format('DD/MM/YYYY') : "";
+      return formatDate(value);
     },
 
     "time": function(field, value) {
@@ -167,7 +189,7 @@
     },
 
     "datetime": function(field, value) {
-      return value ? moment(value).format('DD/MM/YYYY HH:mm') : "";
+      return formatDateTime(value);
     },
 
     "many-to-one": function(field, value) {

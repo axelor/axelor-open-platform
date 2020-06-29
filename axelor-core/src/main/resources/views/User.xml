@@ -8,6 +8,11 @@
     <option value="fr">French</option>
   </selection>
 
+  <selection name="select.date.format">
+    <option value="dd/MM/yyyy">dd/MM/yyyy</option>
+    <option value="MM/dd/yyyy">MM/dd/yyyy</option>
+  </selection>
+
   <grid name="user-grid" title="Users" model="com.axelor.auth.db.User">
     <field name="name"/>
     <field name="code"/>
@@ -24,6 +29,7 @@
       <field name="email" widget="Email"/>
       <field name="language"/>
       <field name="theme" widget="theme-select"/>
+      <field name="dateFormat" />
       <panel stacked="true">
         <field name="homeAction" hidden="true" x-bind="{{__actionSelect.name}}"/>
         <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" target="com.axelor.meta.db.MetaAction" target-name="name" domain="self.home = true"/>
@@ -57,6 +63,7 @@
       <field name="email" widget="Email"/>
       <field name="language"/>
       <field name="theme" widget="theme-select"/>
+      <field name="dateFormat" />
       <field name="singleTab" widget="inline-checkbox"/>
       <field name="noHelp" widget="inline-checkbox" />
       <field name="change" title="Change password?" widget="inline-checkbox"/>

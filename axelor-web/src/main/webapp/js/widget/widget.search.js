@@ -337,7 +337,7 @@ ui.directive('uiFilterInput', function() {
       var isopattern = /^(\d{4}-\d{2}-\d{2}T.*)$/;
 
       var options = {
-        dateFormat: 'dd/mm/yy',
+        dateFormat: ui.dateFormat.toLowerCase().replace('yyyy', 'yy'),
         showButtonsPanel: false,
         showTime: false,
         showOn: null,
@@ -358,7 +358,7 @@ ui.directive('uiFilterInput', function() {
 
       model.$formatters.push(function(value) {
         if (_.isDate(value)) {
-          value = moment(value).format('DD/MM/YYYY');
+          value = moment(value).format(ui.dateFormat);
         }
         return value;
       });
@@ -369,8 +369,8 @@ ui.directive('uiFilterInput', function() {
             return value;
           } else if (pattern.test(value)) {
             var isValue2 = _.str.endsWith(attrs.ngModel, 'value2');
-            return isValue2 ? moment(value, 'DD/MM/YYYY').endOf('day').toDate() :
-                      moment(value, 'DD/MM/YYYY').startOf('day').toDate();
+            return isValue2 ? moment(value, ui.dateFormat).endOf('day').toDate() :
+                      moment(value, ui.dateFormat).startOf('day').toDate();
           }
           return null;
         }
@@ -393,8 +393,8 @@ ui.directive('uiFilterInput', function() {
 
       function toMoment(value) {
         var format = null;
-        if (/\d+\/\d+\/\d+/.test(value)) format = 'DD/MM/YYYY';
-        if (/\d+\/\d+\/\d+\s+\d+:\d+/.test(value)) format = 'DD/MM/YYYY HH:mm';
+        if (/\d+\/\d+\/\d+/.test(value)) format = ui.dateFormat;
+        if (/\d+\/\d+\/\d+\s+\d+:\d+/.test(value)) format = ui.dateTimeFormat;
         if (format === null) {
           return moment();
         }

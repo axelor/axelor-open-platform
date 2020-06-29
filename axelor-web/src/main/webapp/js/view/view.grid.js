@@ -377,8 +377,8 @@ function GridViewCtrl($scope, $element) {
 
       function toMoment(val) {
         var format = 'MM/YYYY';
-        if (/\d+\/\d+\/\d+/.test(val)) format = 'DD/MM/YYYY';
-        if (/\d+\/\d+\/\d+\s+\d+:\d+/.test(val)) format = 'DD/MM/YYYY HH:mm';
+        if (/\d+\/\d+\/\d+/.test(val)) format = ui.dateFormat;
+        if (/\d+\/\d+\/\d+\s+\d+:\d+/.test(val)) format = ui.dateTimeFormat;
         return val ? moment(val, format) : moment();
       }
 
@@ -387,7 +387,7 @@ function GridViewCtrl($scope, $element) {
       }
 
       function toDateString(val) {
-          return moment.utc(val, 'DD/MM/YYYY').toDate().toISOString().split("T")[0];
+          return moment.utc(val, ui.dateFormat).toDate().toISOString().split("T")[0];
       }
 
       switch(type) {

@@ -382,7 +382,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
            columns.push({ name:"text", label:field.title, tree:isTree,
          template: function(item){
                   if(moment(item[fname], moment.ISO_8601, true).isValid()) {
-              return moment(item[fname], moment.ISO_8601, true).format("MM/DD/YYYY h:mm:ss");
+              return moment(item[fname], moment.ISO_8601, true).format(ui.dateTimeFormat);
             }
             return item.text;
              }});
@@ -392,7 +392,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
              template: function(item){
                if (!item.label) {
                     if(moment(item[fname], moment.ISO_8601, true).isValid()) {
-                return moment(item[fname], moment.ISO_8601, true).format("MM/DD/YYYY h:mm:ss");
+                return moment(item[fname], moment.ISO_8601, true).format(ui.dateTimeFormat);
               }
               return item[fname];
                }

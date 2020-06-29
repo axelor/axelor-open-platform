@@ -194,10 +194,10 @@ ui.directive('uiMailMessage', function () {
         if (value === 'True') return _t('True');
         if (value === 'False') return _t('False');
         if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$/.test(value)) {
-          return moment(value).format("DD/MM/YYYY HH:mm");
+          return moment(value).format(ui.dateTimeFormat);
         }
         if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-          return moment(value).format("DD/MM/YYYY");
+          return moment(value).format(ui.dateFormat);
         }
         if (value === '0E-10') value = '0.000000000000';
         return value;
@@ -427,7 +427,7 @@ ui.formWidget('uiMailMessages', {
       }
       var line = message.$eventText
         + " - "
-        + "<a href='javascript:void(0)' title='" + moment(message.$eventTime).format('DD/MM/YYYY HH:mm') + "'>"
+        + "<a href='javascript:void(0)' title='" + moment(message.$eventTime).format(ui.dateTimeFormat) + "'>"
         + moment(message.$eventTime).fromNow()
         + "</a>";
       message.$eventLine = line;

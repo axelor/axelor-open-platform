@@ -143,7 +143,7 @@ var Formatters = {
   },
 
   "date": function(field, value) {
-    return value ? moment(value).format('DD/MM/YYYY') : "";
+    return ui.formatters.date(field, value);
   },
 
   "time": function(field, value) {
@@ -151,7 +151,7 @@ var Formatters = {
   },
 
   "datetime": function(field, value) {
-    return value ? moment(value).format('DD/MM/YYYY HH:mm') : "";
+    return ui.formatters.datetime(field, value);
   },
 
   "one-to-one": function(field, value, record) {
