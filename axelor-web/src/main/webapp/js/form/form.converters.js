@@ -160,7 +160,12 @@
 
   var mm = moment().clone();
   mm.locale(getBrowserLocale());
-  var dateFormat = mm.localeData()._longDateFormat.L || 'DD/MM/YYYY';
+  var dateFormat = (mm.localeData()._longDateFormat.L || 'DD/MM/YYYY')
+    .replace(/\u200f/g, '') // ar
+    .replace(/YYYY年MMMD日/g, 'YYYY-MM-DD') // zh-tw
+    .replace(/MMM/g, 'MM') // Don't support MMM
+    .replace(/(?<!D)D(?!D)/g, 'DD') // D -> DD
+    .replace(/(?<!M)M(?!M)/g, 'MM'); // M -> MM
 
   Object.defineProperty(ui, 'dateFormat', {
     get: function () {
