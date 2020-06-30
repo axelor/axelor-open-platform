@@ -510,21 +510,20 @@ ui.formInput('ImageSelect', 'Select', {
       return el;
     };
 
+    scope.onShowSelection = function() {
+      scope.$timeout(function() {
+        input.focus();
+        scope.showSelection();
+      });
+    };
+
     var $render_editable = scope.$render_editable;
     scope.$render_editable = function () {
       $render_editable.apply(scope, arguments);
       setTimeout(function () {
-        var img = element.find('i.image,img');
-        if (img.is(':visible')) {
-          element.find('input').css('padding-left', img.width());
-        } else {
-          var unwatchImgVisible = scope.$watch(function() { return img.is(':visible'); },
-            function(visible) {
-              if (visible) {
-                element.find('input').css('padding-left', img.width());
-                unwatchImgVisible();
-              }
-            });
+        if (!scope.canShowText()) {
+          var img = element.find('i.image,img');
+          img.addClass('image-select-no-labels');
         }
       });
     };
@@ -532,16 +531,16 @@ ui.formInput('ImageSelect', 'Select', {
   template_readonly:
     '<span class="image-select readonly">'+
       '<i ng-if="isIcon" class="fa" ng-class="image"></i>'+
-      '<img ng-if="image && !isIcon" ng-src="{{image}}"></img> <span ng-show="canShowText()">{{text}}</span>' +
+      '<img ng-if="image && !isIcon" ng-src="{{image}}"></img> <span ng-if="canShowText()">{{text}}</span>' +
     '</span>',
 
   template_editable:
     '<span class="picker-input image-select">'+
-      '<i ng-if="isIcon" class="fa" ng-class="image"></i>'+
-      '<img ng-if="!isIcon" ng-src="{{image}}"></img>' +
+      '<i ng-if="isIcon" class="fa" ng-class="image" ng-click="onShowSelection()"></i>'+
+      '<img ng-if="image && !isIcon" ng-src="{{image}}" ng-click="onShowSelection()"></img>' +
       '<input type="text" autocomplete="off">'+
       '<span class="picker-icons">'+
-        '<i class="fa fa-caret-down" ng-click="showSelection()"></i>'+
+        '<i class="fa fa-caret-down" ng-click="onShowSelection()"></i>'+
       '</span>'+
     '</span>'
 });

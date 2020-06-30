@@ -276,7 +276,11 @@ var Formatters = {
       if (image && image.indexOf('fa-') === 0) {
         image = "<i class='fa " + image + "'></i>";
       } else {
-        image = "<img style='max-width: 18px;' src='" + image + "'>";
+        if (field.labels === false) {
+          image = "<img style='max-height: 18px;' src='" + image + "'>";
+        } else {
+          image = "<img style='max-width: 18px;' src='" + image + "'>";
+        }
       }
       return field.labels === false ? image : image + " " + text;
     }

@@ -1355,6 +1355,14 @@ label.has-help > span:after,
   max-width: 18px;
 }
 
+.image-select > img:only-child,
+.image-select > i.fa:only-child,
+.image-select-item img:only-child,
+.image-select-item i.fa:only-child,
+.image-select-no-labels {
+  max-width: unset !important;
+}
+
 .image-select-item > a {
   display: flex;
   align-items: center;
