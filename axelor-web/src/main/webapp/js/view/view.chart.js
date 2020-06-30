@@ -848,33 +848,10 @@ function Chart(scope, element, data) {
       scale = 0;
     }
 
-    if (isInteger(scale)) {
-      var format = '.' + scale + 'f';
-      chart.yAxis && chart.yAxis.tickFormat(d3.format(format));
-      chart.valueFormat && chart.valueFormat(d3.format(format));
-    }
-
-    if (chart.color) {
-      chart.color(colors(config.colors, config.shades, type));
-    }
-
-    if (chart.noData) {
-      chart.noData(noData);
-    }
-    if(chart.controlLabels) {
-      chart.controlLabels({
-        grouped: _t('Grouped'),
-        stacked: _t('Stacked'),
-        stream: _t('Stream'),
-        expanded: _t('Expanded'),
-        stack_percent: _t('Stack %')
-      });
-    }
-
     var tickFormats = {
       "date" : function (d) {
-        var f = config.xFormat;
-        return moment(d).format(f || 'YYYY-MM-DD');
+        var f = config.xFormat || ui.dateFormat || 'DD/MM/YYYY';
+        return moment(d).format(f);
       },
       "month" : function(d) {
         var v = "" + d;
@@ -894,10 +871,42 @@ function Chart(scope, element, data) {
       "year" : function(d) {
         return moment([moment().year(), d - 1, 1]).format("YYYY");
       },
-      "number": d3.format(',f'),
-      "decimal": d3.format(',.1f'),
+      "number": function(d) {
+        return ui.formatters.integer({}, d);
+      },
+      "decimal": function(d) {
+        var field = _.extend({}, {
+          scale: scale,
+        });
+        return ui.formatters.decimal(field, d);
+      },
       "text": function(d) { return d; }
     };
+
+    if (isInteger(scale) && scale > 0) {
+      chart.yAxis && chart.yAxis.tickFormat(tickFormats.decimal);
+      chart.valueFormat && chart.valueFormat(tickFormats.decimal);
+    } else if (isInteger(scale)) {
+      chart.yAxis && chart.yAxis.tickFormat(tickFormats.number);
+      chart.valueFormat && chart.valueFormat(tickFormats.number);
+    }
+
+    if (chart.color) {
+      chart.color(colors(config.colors, config.shades, type));
+    }
+
+    if (chart.noData) {
+      chart.noData(noData);
+    }
+    if(chart.controlLabels) {
+      chart.controlLabels({
+        grouped: _t('Grouped'),
+        stacked: _t('Stacked'),
+        stream: _t('Stream'),
+        expanded: _t('Expanded'),
+        stack_percent: _t('Stack %')
+      });
+    }
 
     var tickFormat = tickFormats[data.xType];
     if (chart.xAxis && tickFormat) {
