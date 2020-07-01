@@ -24,8 +24,11 @@ import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
+import com.axelor.script.GroovyScriptHelper;
+import com.axelor.script.ScriptBindings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Provider;
@@ -49,12 +52,22 @@ class AuthSecurity implements JpaSecurity, Provider<JpaSecurity> {
           if ("__user__".equals(param)) {
             args.add(user);
           } else {
-            args.add("__ctx__." + param);
+            final Object value = eval(user, "__user__", param);
+            args.add(value);
           }
         }
       }
 
       this.filter = new JPQLFilter(condition, args.toArray());
+    }
+
+    private Object eval(Object bean, String prefix, String expr) {
+      if (bean == null) {
+        return null;
+      }
+
+      return new GroovyScriptHelper(new ScriptBindings(Collections.singletonMap(prefix, bean)))
+          .eval(expr);
     }
 
     public Filter getFilter() {
