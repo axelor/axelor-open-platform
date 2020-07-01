@@ -183,6 +183,10 @@ var Formatters = {
     var help = field.help || field.title;
     var handler = grid.scope.handler;
 
+    if (field.css) {
+      css += ' ' + field.css;
+    }
+
     var rec = context;
     if (field.jsonField && rec) {
       rec = angular.fromJson(rec[field.jsonField]);
