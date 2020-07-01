@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -315,6 +316,15 @@ public class DmsService {
       return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
 
+    if (records.stream()
+        .anyMatch(
+            record ->
+                !Boolean.TRUE.equals(record.getIsDirectory())
+                    && (record.getMetaFile() == null
+                        || !Files.exists(MetaFiles.getPath(record.getMetaFile()))))) {
+      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
+    }
+
     final String batchId = UUID.randomUUID().toString();
     final Map<String, Object> data = new HashMap<>();
 
@@ -402,13 +412,10 @@ public class DmsService {
         new StreamingOutput() {
           @Override
           public void write(OutputStream output) throws IOException, WebApplicationException {
-            final ZipOutputStream zos = new ZipOutputStream(output);
-            try {
+            try (final ZipOutputStream zos = new ZipOutputStream(output)) {
               for (DMSFile file : records) {
                 writeToZip(zos, file);
               }
-            } finally {
-              zos.close();
             }
           }
         };
@@ -516,7 +523,7 @@ public class DmsService {
       return files;
     }
     final File relatedFile = getFile(file);
-    if (relatedFile != null) {
+    if (relatedFile != null && relatedFile.exists()) {
       files.put(base + "/" + getFileName(file), relatedFile);
     }
     return files;
