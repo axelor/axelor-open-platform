@@ -130,6 +130,15 @@ public class MetaController {
     response.setData(ImmutableList.of(data));
   }
 
+  private List<MetaAttrs> findAttrs(String model, String view) {
+    String filter =
+        StringUtils.isBlank(view)
+            ? "self.model = :model and self.view is null"
+            : "self.model = :model and self.view = :view";
+    MetaAttrsRepository repo = Beans.get(MetaAttrsRepository.class);
+    return repo.all().filter(filter).bind("model", model).bind("view", view).order("order").fetch();
+  }
+
   public void moreAttrs(ActionRequest request, ActionResponse response) {
     Context ctx = request.getContext();
     String model = (String) ctx.get("_model");
@@ -137,15 +146,11 @@ public class MetaController {
 
     User user = AuthUtils.getUser();
     ScriptHelper sh = request.getScriptHelper();
+    List<MetaAttrs> attrs = new ArrayList<>(findAttrs(model, null));
 
-    MetaAttrsRepository repo = Beans.get(MetaAttrsRepository.class);
-    List<MetaAttrs> attrs =
-        repo.all()
-            .filter("self.model = :model and self.view = :view")
-            .bind("model", model)
-            .bind("view", view)
-            .order("order")
-            .fetch();
+    if (StringUtils.notBlank(view)) {
+      attrs.addAll(findAttrs(model, view));
+    }
 
     attrs.stream()
         // check roles

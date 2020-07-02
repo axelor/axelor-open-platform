@@ -246,7 +246,7 @@
 
   <entity name="MetaAttrs" table="META_ATTRS" logUpdates="false">
     <string name="model" column="model_name" required="true" />
-    <string name="view" column="view_name" required="true" />
+    <string name="view" column="view_name" />
     <string name="field" column="field_name" required="true" />
     <string name="name" column="attr_name" required="true" />
     <string name="value" column="attr_value" required="true" />
