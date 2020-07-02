@@ -2707,10 +2707,21 @@
     </xsd:complexContent>
   </xsd:complexType>
 
+  <xsd:complexType name="GridButton">
+    <xsd:complexContent>
+      <xsd:extension base="tns:Button">
+        <xsd:attribute name="colSpan" use="prohibited" />
+        <xsd:attribute name="colOffset" use="prohibited" />
+        <xsd:attribute name="height" use="prohibited" />
+        <xsd:attribute name="link" use="prohibited" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
   <xsd:group name="GridWidgets">
     <xsd:choice>
       <xsd:element name="field" type="tns:GridField" />
-      <xsd:element name="button" type="tns:Button" />
+      <xsd:element name="button" type="tns:GridButton" />
     </xsd:choice>
   </xsd:group>
 
