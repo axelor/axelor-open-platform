@@ -57,7 +57,7 @@ public class FileService extends AbstractService {
   public javax.ws.rs.core.Response exportFile(@PathParam("name") final String name) {
     final File file = FileUtils.getFile(ActionExport.getExportPath(), name);
     if (!file.isFile()) {
-      throw new IllegalArgumentException(new FileNotFoundException(name));
+      return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
     return javax.ws.rs.core.Response.ok(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)
         .header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"")
