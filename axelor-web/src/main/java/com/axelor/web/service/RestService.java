@@ -44,7 +44,9 @@ import com.axelor.mail.web.MailController;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaFile;
+import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.repo.MetaFileRepository;
+import com.axelor.meta.db.repo.MetaModuleRepository;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
@@ -77,6 +79,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -189,13 +192,15 @@ public class RestService extends ResourceService {
 
     request.setModel(getModel());
     Response response = getResource().fetch(id, request);
+    Optional<Map<String, Object>> values =
+        Optional.ofNullable(response.getItem(0)).map(Map.class::cast);
 
-    final long attachments = getAttachmentCount(id);
-
-    if (response.getItem(0) != null) {
-      @SuppressWarnings("all")
-      Map<String, Object> item = (Map) response.getItem(0);
+    if (values.isPresent()) {
+      final long attachments = getAttachmentCount(id);
+      final Object processInstanceId = findProcessInstanceId(request.getBeanClass(), id);
+      final Map<String, Object> item = values.get();
       item.put("$attachments", attachments);
+      item.put("$processInstanceId", processInstanceId);
     }
 
     return response;
@@ -215,6 +220,15 @@ public class RestService extends ResourceService {
         .bind("relatedId", relatedId)
         .cacheable()
         .count();
+  }
+
+  private Object findProcessInstanceId(Class<?> klass, long id) {
+    final MetaModule bpm = Beans.get(MetaModuleRepository.class).findByName("axelor-bpm");
+    if (bpm != null && Objects.equals(bpm.getInstalled(), Boolean.TRUE)) {
+      Object bean = JPA.em().find(klass, id);
+      return Mapper.of(klass).get(bean, "processInstanceId");
+    }
+    return null;
   }
 
   @POST

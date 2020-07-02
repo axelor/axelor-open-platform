@@ -1123,6 +1123,16 @@ function FormViewCtrl($scope, $element) {
         $scope.onUnarchive();
       },
     }, {
+      visible: function () {
+        return ($scope.record || {}).$processInstanceId;
+      }
+    }, {
+      title: _t('Show workflow...'),
+      visible: function () {
+        return ($scope.record || {}).$processInstanceId;
+      },
+      action: "wkf-instance-view-from-record"
+    }, {
     }, {
       active: function () {
         return $scope.hasAuditLog();
@@ -1519,6 +1529,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
         });
         form.removeClass('large-form mid-form mini-form');
       }
+
       scope.$timeout(function () {
         element.append(form);
         preparing = false;
