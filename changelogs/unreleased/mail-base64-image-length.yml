@@ -1,0 +1,3 @@
+---
+title: Fix mail base64 image max line (RFC2045)
+type: fix
