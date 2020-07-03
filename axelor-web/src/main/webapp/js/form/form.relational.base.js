@@ -558,6 +558,42 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
     }
     return true;
   };
+
+  var icons = null;
+  var actions = {
+    'new': 'canNew',
+    'create': 'canNew',
+    'edit': 'canEdit',
+    'select': 'canSelect',
+    'remove': 'canRemove',
+    'clear': 'canRemove'
+  };
+
+  $scope.canShowIcon = function (which) {
+    var names;
+    var field = $scope.field || {};
+    var prop = actions[which];
+    if (prop !== undefined && $scope.attr(prop) === false) {
+      return false;
+    }
+
+    if (icons === null) {
+      icons = {};
+      names = $scope.field.showIcons || $scope.$parent.field.showIcons;
+      if (names === false || names === 'false') {
+        icons.$all = false;
+      } else if (names === true || names === 'true' || names === undefined) {
+        icons.$all = true;
+      } else if (names) {
+        icons.$all = false;
+        names = names.split(',');
+        names.forEach(function (name) {
+          icons[name.trim()] = true;
+        });
+      }
+    }
+    return icons.$all || !!icons[which];
+  };
 }
 
 })();

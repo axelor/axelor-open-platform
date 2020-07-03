@@ -698,19 +698,19 @@ ui.formInput('OneToMany', {
           "</ul>" +
         "</span>" +
               "<span class='icons-bar pull-right' ng-show='!isReadonly()'>" +
-          "<a href='' ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()'>" +
+          "<a href='' ng-click='onSelect()' ng-show='hasPermission(\"read\") && canShowIcon(\"select\") && !isDisabled() && canSelect()'>" +
             "<i class='fa fa-search'></i><span x-translate>Select</span>" +
           "</a>" +
-          "<a href='' ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()'>" +
+          "<a href='' ng-click='onNew()' ng-show='hasPermission(\"create\") && canShowIcon(\"new\") && !isDisabled() && canNew()'>" +
             "<i class='fa fa-plus'></i><span x-translate>New</span>" +
           "</a>" +
-          "<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()'>" +
+          "<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowIcon(\"edit\") && canShowEdit()'>" +
             "<i class='fa fa-pencil'></i><span x-translate>Edit</span>" +
           "</a>" +
-          "<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowView()'>" +
+          "<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowIcon(\"view\") && canShowView()'>" +
             "<i class='fa fa-file-text-o'></i><span x-translate>Show</span>" +
           "</a>" +
-          "<a href='' ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()'>" +
+          "<a href='' ng-click='onRemove()' ng-show='hasPermission(\"read\") && canShowIcon(\"remove\") && !isDisabled() && canRemove()'>" +
             "<i class='fa fa-remove'></i><span x-translate>Remove</span>" +
           "</a>" +
                   "<i ng-click='onCopy()' ng-show='hasPermission(\"create\") && !isDisabled() && canCopy()' title='{{\"Duplicate\" | t}}' class='fa fa-files-o'></i>" +
@@ -743,19 +743,19 @@ var panelRelatedTemplate =
     "<div class='panel-title'><span ui-help-popover ng-bind-html='title'></span></div>" +
     "<div ui-nested-grid-actions></div>" +
     "<div class='icons-bar' ng-show='!isReadonly()'>" +
-      "<a href='' ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()'>" +
+      "<a href='' ng-click='onSelect()' ng-show='hasPermission(\"read\") && canShowIcon(\"select\") && !isDisabled() && canSelect()'>" +
         "<i class='fa fa-search'></i><span x-translate>Select</span>" +
       "</a>" +
-      "<a href='' ng-click='onNew()' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()'>" +
+      "<a href='' ng-click='onNew()' ng-show='hasPermission(\"create\") && canShowIcon(\"new\") && !isDisabled() && canNew()'>" +
         "<i class='fa fa-plus'></i><span x-translate>New</span>" +
       "</a>" +
-      "<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowEdit()'>" +
+      "<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowIcon(\"edit\") && canShowEdit()'>" +
         "<i class='fa fa-pencil'></i><span x-translate>Edit</span>" +
       "</a>" +
-      "<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowView()'>" +
+      "<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowIcon(\"view\") && canShowView()'>" +
         "<i class='fa fa-file-text-o'></i><span x-translate>Show</span>" +
       "</a>" +
-      "<a href='' ng-click='onRemove()' ng-show='hasPermission(\"read\") && !isDisabled() && canRemove()'>" +
+      "<a href='' ng-click='onRemove()' ng-show='hasPermission(\"read\") && canShowIcon(\"remove\") && !isDisabled() && canRemove()'>" +
         "<i class='fa fa-remove'></i><span x-translate>Remove</span>" +
       "</a>" +
     "</div>" +
