@@ -365,6 +365,16 @@
   border-top-color: #B94A48;
 }
 
+.panel-related-actions {
+  display: flex;
+  align-items: center;
+}
+
+.panel-related-actions .view-toolbar,
+.panel-related-actions .view-menubar {
+  margin: 0 4px 0 0;
+}
+
 .panel-tabs,
 .panel-stack,
 .bar-layout .dashboard {

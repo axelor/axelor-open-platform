@@ -741,6 +741,7 @@ var panelRelatedTemplate =
 "<div class='panel panel-related' ng-class='{noEdit: canView() && !canEdit()}'>" +
   "<div class='panel-header'>" +
     "<div class='panel-title'><span ui-help-popover ng-bind-html='title'></span></div>" +
+    "<div ui-nested-grid-actions></div>" +
     "<div class='icons-bar' ng-show='!isReadonly()'>" +
       "<a href='' ng-click='onSelect()' ng-show='hasPermission(\"read\") && !isDisabled() && canSelect()'>" +
         "<i class='fa fa-search'></i><span x-translate>Select</span>" +

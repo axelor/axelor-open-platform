@@ -332,6 +332,7 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
           "<div class='dashlet-search' ng-if='showSearch'>" +
             "<div ui-filter-box x-handler='this'></div>" +
           "</div>" +
+          "<div ui-nested-grid-actions></div>" +
           "<div class='dashlet-title'><span ui-help-popover>{{title}}</span></div>" +
         "</div>" +
         "<div class='dashlet-body'></div>" +
