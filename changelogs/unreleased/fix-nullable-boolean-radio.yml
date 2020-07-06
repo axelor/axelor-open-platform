@@ -1,0 +1,3 @@
+---
+title: Fix nullable boolean radio displayed as false
+type: fix
