@@ -157,8 +157,12 @@ public class Context extends SimpleBindings {
     return handler;
   }
 
-  private Object getProxy() {
+  protected Object getTarget() {
     return getContextHandler().getProxy();
+  }
+
+  protected Object validate(String name, Object value) {
+    return handler.validate(mapper.getProperty(name), value);
   }
 
   /**
@@ -203,7 +207,7 @@ public class Context extends SimpleBindings {
    */
   @SuppressWarnings("unchecked")
   public <T> T asType(Class<T> type) {
-    final T bean = (T) getProxy();
+    final T bean = (T) getTarget();
     if (!type.isInstance(bean)) {
       throw new IllegalArgumentException(
           String.format("Invalid type {}, should be {}", type.getName(), beanClass.getName()));
@@ -254,7 +258,7 @@ public class Context extends SimpleBindings {
 
   private JsonContext getJsonContext() {
     final Property property = mapper.getProperty(KEY_JSON_ATTRS);
-    return getJsonContext(property, property.get(getProxy()));
+    return getJsonContext(property, property.get(getTarget()));
   }
 
   private Object tryJsonGet(String name) {
@@ -299,13 +303,13 @@ public class Context extends SimpleBindings {
 
     // if real field access
     if (property != null && !isJsonName(name)) {
-      return property.get(getProxy());
+      return property.get(getTarget());
     }
 
     // try json context
     if (isJsonField(name)) {
       final Property jsonProperty = mapper.getProperty(name.substring(KEY_JSON_PREFIX.length()));
-      return getJsonContext(jsonProperty, jsonProperty.get(getProxy()));
+      return getJsonContext(jsonProperty, jsonProperty.get(getTarget()));
     }
 
     // else try json fields
@@ -316,10 +320,10 @@ public class Context extends SimpleBindings {
   public Object put(String name, Object value) {
     if (mapper.getSetter(name) == null || (isJsonRecord() && hasJsonField(name))) {
       if (isJsonName(name)) {
-        mapper.set(getProxy(), name, value);
+        mapper.set(getTarget(), name, value);
       }
       return tryJsonPut(name, value);
     }
-    return mapper.set(getProxy(), name, handler.validate(mapper.getProperty(name), value));
+    return mapper.set(getTarget(), name, validate(name, value));
   }
 }
