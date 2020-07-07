@@ -2669,7 +2669,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         if (attrs.editable === "false") {
           schema.editable = false;
         }
-        scope.selector = attrs.selector;
+        scope.selector = attrs.selector || schema.selector;
         scope.noFilter = attrs.noFilter;
 
         if (axelor.config["view.grid.selection"] === "checkbox" && !scope.selector) {
@@ -2769,6 +2769,9 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         }
         if (field.editable !== undefined) {
           schema.editable = field.editable;
+        }
+        if (field.selector !== undefined) {
+          schema.selector = field.selector;
         }
         schema.rowHeight = field.rowHeight || schema.rowHeight;
         schema.orderBy = field.orderBy || schema.orderBy;
