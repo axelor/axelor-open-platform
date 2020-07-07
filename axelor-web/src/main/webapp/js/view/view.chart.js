@@ -476,6 +476,8 @@ function applyTitles(chart, xTitle, yTitle) {
   }
   if (yTitle && chart.yAxis && chart.yAxis.axisLabel) {
     chart.yAxis.axisLabel(yTitle);
+    chart.yAxis.axisLabelDistance(15);
+    chart.margin().left = 80;
   }
 }
 

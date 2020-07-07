@@ -1897,7 +1897,7 @@ nv.models.axis = function() {
               if (topOrBottom && rotateLabels % 360 == 0) {
                 return;
               }
-              var maxTextLength = topOrBottom ? 50 : 55;
+              var maxTextLength = topOrBottom ? 50 : 65;
               var maxIteration = 20;
               g.selectAll('g.tick text')
                 .each(function() {
