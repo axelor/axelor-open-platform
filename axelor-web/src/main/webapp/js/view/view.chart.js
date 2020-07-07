@@ -842,10 +842,9 @@ function Chart(scope, element, data) {
     var series = _.first(data.series);
     var scale = series && series.scale;
 
-    // format as integer if no scale is specified
-    // and data has integer series values
-    if (!isInteger(scale) && hasIntegerValues(data)) {
-      scale = 0;
+    // set default scale value if no scale is specified
+    if (!isInteger(scale)) {
+      scale = hasIntegerValues(data) ? 0 : 2;
     }
 
     var tickFormats = {
@@ -883,10 +882,10 @@ function Chart(scope, element, data) {
       "text": function(d) { return d; }
     };
 
-    if (isInteger(scale) && scale > 0) {
+    if (scale > 0) {
       chart.yAxis && chart.yAxis.tickFormat(tickFormats.decimal);
       chart.valueFormat && chart.valueFormat(tickFormats.decimal);
-    } else if (isInteger(scale)) {
+    } else if (scale === 0) {
       chart.yAxis && chart.yAxis.tickFormat(tickFormats.number);
       chart.valueFormat && chart.valueFormat(tickFormats.number);
     }
