@@ -195,6 +195,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				// Support for events
 				this.onItemClick = settings.onItemClick;
+				this.valueFormatter = settings.valueFormatter || function(n) { return n.toLocaleString(window.navigator.language); };
 			}
 		}, {
 			key: '_makePaths',
@@ -523,7 +524,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				return [{
 					index: index,
 					label: this.data[index][0],
-					value: isArray(this.data[index][1]) ? this.data[index][1][0] : this.data[index][1], formattedValue: isArray(this.data[index][1]) ? this.data[index][1][1] : this.data[index][1].toLocaleString(),
+					value: isArray(this.data[index][1]) ? this.data[index][1][0] : this.data[index][1], formattedValue: isArray(this.data[index][1]) ? this.data[index][1][1] : this.valueFormatter(this.data[index][1]),
 					baseColor: this.data[index][2],
 					fill: this._getColor(index)
 				}];

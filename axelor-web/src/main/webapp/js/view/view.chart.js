@@ -596,7 +596,7 @@ function HBarChart(scope, element, data) {
   return chart;
 }
 
-function FunnelChart(scope, element, data) {
+function FunnelChart(scope, element, data, valueFormatter) {
 
   if(!data.dataset){
     return;
@@ -610,7 +610,9 @@ function FunnelChart(scope, element, data) {
       fillType: 'gradient',
       hoverEffects: true,
       dynamicArea: true,
-      animation: 200};
+      animation: 200,
+      valueFormatter: valueFormatter
+  };
 
   if(config.width){
     props.width = w*config.width/100;
@@ -831,13 +833,6 @@ function Chart(scope, element, data) {
       data.dataset = [];
     }
 
-    var maker = CHARTS[type] || CHARTS.bar || function () {};
-    var chart = maker(scope, element, data);
-
-    if (!chart) {
-      return;
-    }
-
     // series scale attribute
     var series = _.first(data.series);
     var scale = series && series.scale;
@@ -882,12 +877,21 @@ function Chart(scope, element, data) {
       "text": function(d) { return d; }
     };
 
-    if (scale > 0) {
-      chart.yAxis && chart.yAxis.tickFormat(tickFormats.decimal);
-      chart.valueFormat && chart.valueFormat(tickFormats.decimal);
-    } else if (scale === 0) {
-      chart.yAxis && chart.yAxis.tickFormat(tickFormats.number);
-      chart.valueFormat && chart.valueFormat(tickFormats.number);
+    var valueFormatter = scale > 0 ? tickFormats.decimal : tickFormats.number;
+
+    var maker = CHARTS[type] || CHARTS.bar || function () {};
+    var chart = maker(scope, element, data, valueFormatter);
+
+    if (!chart) {
+      return;
+    }
+
+    if (chart.yAxis) {
+      chart.yAxis.tickFormat(valueFormatter);
+    }
+
+    if (chart.valueFormat) {
+      chart.valueFormat(valueFormatter);
     }
 
     if (chart.color) {
