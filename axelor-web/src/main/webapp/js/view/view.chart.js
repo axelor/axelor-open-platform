@@ -604,6 +604,21 @@ function FunnelChart(scope, element, data, valueFormatter) {
     return;
   }
 
+  if (_.isEmpty(data.dataset)) {
+    return {
+      "noData": function(value) {
+        var svg = d3.select(element.empty()[0]);
+        svg.append("svg:text")
+        .attr("x", "50%")
+        .attr("y", "50%")
+        .attr("dy", ".3em")
+          .attr("text-anchor", "middle")
+        .text(value);
+      },
+      "update": function() {}
+    };
+  }
+
   var chart = new D3Funnel(element[0]);
   var w = element.width();
   var h = element.height();
