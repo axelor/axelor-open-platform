@@ -122,6 +122,17 @@ var customDirective = ["$compile", function ($compile) {
       scope.$watch('data', function customDataWatch(data) {
         evalScope.data = data;
         evalScope.first = _.first(data);
+
+        evalScope.$moment = function(d) { return moment(d); };
+        evalScope.$number = function(d) { return +d; };
+        evalScope.$image = function (fieldName, imageName) { return ui.formatters.$image(this, fieldName, imageName); };
+        evalScope.$fmt = function (fieldName, fieldValue) {
+          var args = [_.extend(this, {record: {first: this.first}}), fieldName];
+          if (arguments.length > 1) {
+            args.push(fieldValue);
+          }
+          return ui.formatters.$fmt.apply(null, args);
+        };
       });
     }
   };

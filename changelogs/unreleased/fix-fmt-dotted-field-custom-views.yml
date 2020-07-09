@@ -1,0 +1,3 @@
+---
+title: Fix $fmt with dotted fields and custom views
+type: fix

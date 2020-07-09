@@ -280,7 +280,7 @@
 
   ui.formatters.$fmt = function (scope, fieldName, fieldValue, record) {
     var context = record || scope.record || {};
-    var value = arguments.length === 2 ? context[fieldName] : fieldValue;
+    var value = arguments.length === 2 ? findNested(context, fieldName) : fieldValue;
     if (value === undefined || value === null) {
       return "";
     }
