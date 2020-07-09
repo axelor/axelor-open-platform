@@ -555,7 +555,16 @@ _.extend(Factory.prototype, {
           return '<a href="' + url + '" download="' + value.fileName + '">' + value.fileName + '</a>';
         }
       } else {
-        url = ui.makeImageURL(this.grid.handler._model, field.name, dataContext, undefined, this.grid.handler, dataContext.id) + "&image=true";
+        var parentScope;
+        var parentId;
+        if (this.grid.handler.$parent && this.grid.handler.$parent.record && this.grid.handler.$parent.record.id) {
+            parentScope = this.grid.handler.$parent;
+            parentId = this.grid.handler.$parent.record.id;
+        } else {
+          parentScope = this.grid.handler;
+          parentId = dataContext.id;
+        }
+        url = ui.makeImageURL(this.grid.handler._model, field.name, dataContext, undefined, parentScope, parentId) + "&image=true";
       }
       return url ? '<img src="' + url + '" style="height: 21px;margin-top: -2px;">' : '';
     }
