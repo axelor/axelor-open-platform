@@ -70,6 +70,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -434,24 +436,47 @@ public class RestService extends ResourceService {
                   if (value != null) {
                     final String target = (String) value.get("target");
                     if (target != null && MetaFile.class.isAssignableFrom(Class.forName(target))) {
-                      final MetaFile metaFile = (MetaFile) context.get(entry.getKey());
-                      if (metaFile != null && Objects.equals(metaFile.getId(), id)) {
-                        permittedByParent =
-                            Beans.get(JpaSecurity.class)
-                                .isPermitted(JpaSecurity.CAN_READ, parentClass, parentId);
-                        break;
+                      final Collection<MetaFile> metaFiles;
+                      final String type = (String) value.getOrDefault("type", "null");
+                      if (type.endsWith("-to-one")) {
+                        final MetaFile metaFile = (MetaFile) context.get(entry.getKey());
+                        metaFiles = Collections.singletonList(metaFile);
+                      } else if (type.endsWith("-to-many")) {
+                        metaFiles = (Collection<MetaFile>) context.get(entry.getKey());
+                      } else {
+                        throw new IllegalArgumentException(
+                            String.format("Unexpected type: %s", type));
+                      }
+                      for (final MetaFile metaFile : metaFiles) {
+                        if (metaFile != null && Objects.equals(metaFile.getId(), id)) {
+                          permittedByParent =
+                              Beans.get(JpaSecurity.class)
+                                  .isPermitted(JpaSecurity.CAN_READ, parentClass, parentId);
+                          break;
+                        }
                       }
                     }
                   }
                 }
               } else if (property.getTarget() != null
                   && MetaFile.class.isAssignableFrom(property.getTarget())) {
-                final MetaFile metaFile = (MetaFile) context.get(property.getName());
-                if (metaFile != null && Objects.equals(metaFile.getId(), id)) {
-                  permittedByParent =
-                      Beans.get(JpaSecurity.class)
-                          .isPermitted(JpaSecurity.CAN_READ, parentClass, parentId);
-                  break;
+                final Collection<MetaFile> metaFiles;
+                if (property.isReference()) {
+                  final MetaFile metaFile = (MetaFile) context.get(property.getName());
+                  metaFiles = Collections.singletonList(metaFile);
+                } else if (property.isCollection()) {
+                  metaFiles = (Collection<MetaFile>) context.get(property.getName());
+                } else {
+                  throw new IllegalArgumentException(
+                      String.format("Unexpected type: %s", property.getType()));
+                }
+                for (final MetaFile metaFile : metaFiles) {
+                  if (metaFile != null && Objects.equals(metaFile.getId(), id)) {
+                    permittedByParent =
+                        Beans.get(JpaSecurity.class)
+                            .isPermitted(JpaSecurity.CAN_READ, parentClass, parentId);
+                    break;
+                  }
                 }
               }
             }
