@@ -345,11 +345,11 @@
     if (value === undefined || value === null) {
       return "";
     }
-    var field = findField(scope, fieldName);
+    var field = findField(scope, fieldName) || scope.field;
     if (!field) {
       return value;
     }
-    var type = field.selection ? "selection" : field.type;
+    var type = field.selection ? "selection" : field.serverType || field.type;
     var formatter = ui.formatters[type];
     if (formatter) {
       return formatter(field, value, context);
