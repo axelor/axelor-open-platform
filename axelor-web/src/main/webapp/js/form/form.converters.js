@@ -126,8 +126,69 @@
   }
 
   // override angular.js currency filter
-  ui.filter('currency', function () {
-    return addCurrency;
+  var currencySymbolToCode = {
+      '$': 'USD',
+      '€': 'EUR',
+      '¥': 'JPY',
+      '£': 'GBP'
+  };
+  ui.filter('currency', function() {
+    return function(value, symbol, fractionSize, currencyDisplay) {
+      if (isNaN(value)) {
+        return addCurrency(value, symbol);
+      }
+      var options = {
+        style : 'currency',
+        currency : currencySymbolToCode[symbol] || symbol,
+      };
+      if (fractionSize !== undefined && fractionSize != null) {
+        options.minimumFractionDigits = fractionSize;
+        options.maximumFractionDigits = fractionSize;
+      }
+      if (currencyDisplay !== undefined && currencyDisplay != null) {
+        options.currencyDisplay = currencyDisplay
+      }
+      return new Intl.NumberFormat(getBrowserLocale(), options).format(value);
+    };
+  });
+
+  // add percent filter
+  ui.filter('percent', function() {
+    return function(value, fractionSize) {
+      if (isNaN(value)) {
+        return value + '%';
+      }
+      var options = {
+        style : 'percent'
+      };
+      if (fractionSize !== undefined && fractionSize !== null) {
+        options.minimumFractionDigits = fractionSize;
+        options.maximumFractionDigits = fractionSize;
+      } else {
+        options.maximumFractionDigits = 1;
+      }
+      return new Intl.NumberFormat(getBrowserLocale(), options).format(value);
+    };
+  });
+
+  // override angular.js number filter
+  ui.filter('number', function() {
+    return function(value, fractionSize) {
+      return formatNumber(null, value, fractionSize);
+    };
+  });
+
+  // override angular.js date filter
+  ui.filter('date', function() {
+    return function(value, format) {
+      if (!value || !value.match(/\d{4,}\D\d{2}\D\d{2}/)) {
+        return value;
+      }
+      if (format === undefined || format == null) {
+        return value && value.length > 10 ? formatDateTime(value) : formatDate(value);
+      }
+      return moment(value).locale(getBrowserLocale()).format(format);
+    };
   });
 
   function formatNumber(field, value, scale) {
