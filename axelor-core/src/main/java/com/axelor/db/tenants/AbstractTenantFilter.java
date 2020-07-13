@@ -19,8 +19,10 @@ package com.axelor.db.tenants;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.servlet.Filter;
@@ -42,7 +44,8 @@ public abstract class AbstractTenantFilter implements Filter {
   protected static final String SESSION_KEY_TENANT_MAP = "tenantMap";
   protected static final String SESSION_KEY_TENANT_ID = TENANT_LOGIN_PARAM;
 
-  protected static final String SESSION_KEY_PREFIX_SHIRO = "org.apache.shiro";
+  protected static final List<String> SESSION_KEY_PREFIX_KEEP_LIST =
+      ImmutableList.of("org.apache.shiro", "pac4j", "com.axelor.internal");
 
   private boolean enabled;
   private AtomicBoolean cleared = new AtomicBoolean();
