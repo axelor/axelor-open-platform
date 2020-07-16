@@ -172,11 +172,11 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
       if (CHANGE_PASSWORD.equals(errorMessage)
           || StringUtils.notBlank(context.getRequestParameter(NEW_PASSWORD_PARAMETER))) {
 
-        final String tenanId = context.getRequestParameter("tenantId");
-        if (StringUtils.notBlank(tenanId)) {
+        final String tenantId = context.getRequestParameter("tenantId");
+        if (StringUtils.notBlank(tenantId)) {
           @SuppressWarnings("unchecked")
           final SessionStore<WebContext> sessionStore = context.getSessionStore();
-          sessionStore.set(context, "tenantId", tenanId);
+          sessionStore.set(context, "tenantId", tenantId);
         }
 
         String redirectionUrl =
