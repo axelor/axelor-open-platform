@@ -94,6 +94,7 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
     final Group group = entity.getGroup();
 
     Permission permission = null;
+    Permission __read__ = findOrCreateRead();
 
     switch (entity.getValue()) {
       case "FULL":
@@ -131,7 +132,7 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
         permission.setCanRemove(true);
         break;
       case "READ":
-        permission = findOrCreateRead();
+        permission = __read__;
         break;
     }
 
@@ -176,12 +177,14 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
 
     if (user != null) {
       user.addPermission(permission);
+      user.addPermission(__read__);
       user.addPermission(__create__);
       user.addPermission(__meta__);
       user.addPermission(__perm_full__);
     }
     if (group != null) {
       group.addPermission(permission);
+      group.addPermission(__read__);
       group.addPermission(__create__);
       group.addPermission(__meta__);
       group.addPermission(__perm_full__);
@@ -191,7 +194,7 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
     final int version = entity.getVersion();
     entity = super.save(entity);
 
-    applyReadPermissionToParents(entity);
+    applyPermissionToParents(entity, __read__);
 
     if (file.getIsDirectory() && entity.getVersion() > version) {
       applySamePermissionToChildren(entity);
@@ -205,18 +208,18 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
     recursiveRemoveHavingSamePermission(entity);
   }
 
-  private void applyReadPermissionToParents(DMSPermission entity) {
+  private void applyPermissionToParents(DMSPermission entity, Permission permission) {
     for (DMSFile parentFile = entity.getFile().getParent();
         parentFile != null;
         parentFile = parentFile.getParent()) {
       if (!filterPermission(parentFile.getPermissions(), entity).findFirst().isPresent()) {
-        final DMSPermission permission = new DMSPermission();
-        permission.setUser(entity.getUser());
-        permission.setGroup(entity.getGroup());
-        permission.setValue("READ");
-        permission.setPermission(findOrCreateRead());
-        permission.setFile(parentFile);
-        JPA.em().persist(permission);
+        final DMSPermission dmsPermission = new DMSPermission();
+        dmsPermission.setUser(entity.getUser());
+        dmsPermission.setGroup(entity.getGroup());
+        dmsPermission.setValue("READ");
+        dmsPermission.setPermission(permission);
+        dmsPermission.setFile(parentFile);
+        JPA.em().persist(dmsPermission);
       }
     }
   }
