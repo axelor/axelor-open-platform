@@ -179,7 +179,10 @@ public final class MailBuilder {
             String cid = "image" + UUID.randomUUID().toString();
             content.cid = "<" + cid + ">";
             content.name = img.attr("title");
-            content.imageData = new String(Base64.getMimeEncoder().encode(Base64.getDecoder().decode(src.split(",")[1])), StandardCharsets.UTF_8);
+            content.imageData =
+                new String(
+                    Base64.getMimeEncoder().encode(Base64.getDecoder().decode(src.split(",")[1])),
+                    StandardCharsets.UTF_8);
             content.imageType = matcher.group(1);
             img.attr("src", "cid:" + cid);
             contents.add(content);

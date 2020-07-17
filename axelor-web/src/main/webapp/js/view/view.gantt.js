@@ -175,22 +175,22 @@ function GanttViewCtrl($scope, $element) {
       offset:offset
     };
 
-    function fetchParents(records,cb) { 
-    
+    function fetchParents(records,cb) {
+
       var recordIds = _.chain(records)
-                          .map(function(record) { 
-                            return record.id; 
+                          .map(function(record) {
+                            return record.id;
                           })
                           .uniq()
                           .value();
 
       var _parentIds = _.chain(records)
-                          .map(function(record) { 
+                          .map(function(record) {
                                 return record[schema.taskParent] ?
                                         record[schema.taskParent].id :
-                                        null; 
+                                        null;
                           })
-                          .filter(function(id) { 
+                          .filter(function(id) {
                                 return id && !recordIds.includes(id);
                           })
                           .uniq()
@@ -204,7 +204,7 @@ function GanttViewCtrl($scope, $element) {
         context: { _parentIds: _parentIds},
         offset:0
       });
-      
+
       ds.search(opts).success(function(parentRecords) {
         records=records.concat(parentRecords);
         fetchParents(records,cb);
