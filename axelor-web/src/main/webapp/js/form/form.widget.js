@@ -299,10 +299,10 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
         handle(rec);
       }
     });
-    scope.$on("on:grid-selection-change", function(e, context) {
+    scope.$on("on:grid-selection-change", function(e, context, force) {
       if (field && field.jsonField) return;
-      if (scope._isNestedGrid === undefined || !scope._isNestedGrid) return;
-      if (!scope._isDetailsForm) {
+      if (!force && (scope._isNestedGrid === undefined || !scope._isNestedGrid)) return;
+      if (!scope._isDetailsForm || force) {
         handle(context);
       }
     });

@@ -75,7 +75,7 @@ function GridViewCtrl($scope, $element) {
         };
 
         $scope.filter(opts).then(function(){
-          $scope.$broadcast('on:grid-selection-change', $scope.getContext());
+          $scope.$broadcast('on:grid-selection-change', $scope.getContext(), true);
           $scope.updateRoute();
         });
       });
