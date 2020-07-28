@@ -50,9 +50,27 @@ public class MySQLDialect extends MySQL57Dialect {
     }
   }
 
+  static class JsonSetFunction extends AbstractJsonSetFunction {
+
+    public JsonSetFunction() {
+      super("json_set");
+    }
+
+    @Override
+    protected String transformPath(String path) {
+      return "'$." + path + "'";
+    }
+
+    @Override
+    protected Object transformValue(Object value) {
+      return value;
+    }
+  }
+
   public MySQLDialect() {
     super();
     registerColumnType(Types.OTHER, "json");
+    registerFunction("json_set", new JsonSetFunction());
     registerFunction("json_extract", new JsonExtractFunction(StandardBasicTypes.STRING, null));
     registerFunction("json_extract_text", new JsonExtractFunction(StandardBasicTypes.STRING, null));
     registerFunction(

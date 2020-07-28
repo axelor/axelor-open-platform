@@ -42,9 +42,27 @@ public class PostgreSQLDialect extends PostgreSQL94Dialect {
     }
   }
 
+  static class JsonSetFunction extends AbstractJsonSetFunction {
+
+    public JsonSetFunction() {
+      super("jsonb_set");
+    }
+
+    @Override
+    protected String transformPath(String path) {
+      return "'{" + path.replace('.', ',') + "}'";
+    }
+
+    @Override
+    protected Object transformValue(Object value) {
+      return String.format("to_jsonb(%s)", value);
+    }
+  }
+
   public PostgreSQLDialect() {
     super();
     registerColumnType(Types.OTHER, "jsonb");
+    registerFunction("json_set", new JsonSetFunction());
     registerFunction("json_extract", new JsonExtractFunction(StandardBasicTypes.STRING, null));
     registerFunction("json_extract_text", new JsonExtractFunction(StandardBasicTypes.STRING, null));
     registerFunction(

@@ -1,0 +1,16 @@
+---
+title: Implement `json_set` function
+type: feature
+description: |
+  The function can be used to update json values using JPQL.
+    
+  For example:
+
+  ```sql
+  UPDATE
+    Product p
+  SET
+    p.attrs = json_set(p.attrs, 'seller.name', '"Some NAME"')
+  WHERE
+    json_extract(p.attrs, 'seller', 'id') = 1
+  ```
