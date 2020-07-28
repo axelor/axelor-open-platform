@@ -1,0 +1,6 @@
+---
+title: Fix reference names in json fields
+type: fix
+description: |
+  When name field of the reference record is changed, the name value saved in json field
+  is updated to reflect the updated name.

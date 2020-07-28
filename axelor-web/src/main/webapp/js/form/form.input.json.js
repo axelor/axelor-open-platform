@@ -33,6 +33,7 @@ ui.formInput('JsonField', 'String', {
     var field = scope.field;
     var jsonFields = field.jsonFields || [];
     var jsonNames = _.pluck(jsonFields, 'name');
+    var jsonNameField = _.find(jsonFields, function(f) { return f.nameField; });
     var jsonFix = {};
 
     jsonFields.forEach(function (item) {
@@ -145,6 +146,9 @@ ui.formInput('JsonField', 'String', {
       unwatchParent();
       if (scope.$parent.record[field.name] || rec) {
         scope.$parent.record[field.name] = rec ? angular.toJson(rec) : rec;
+        if (jsonNameField) {
+          scope.$parent.record.name = rec ? rec[jsonNameField.name] : null;
+        }
       }
       watchParent();
     }

@@ -301,6 +301,9 @@ public class ViewService extends AbstractService {
           }
         }
       }
+      if (MetaJsonRecord.class.getName().equals(model)) {
+        names.add("name");
+      }
       data.putAll(MetaStore.findFields(modelClass, names));
     }
 
