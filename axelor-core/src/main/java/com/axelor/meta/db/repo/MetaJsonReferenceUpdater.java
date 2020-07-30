@@ -17,8 +17,6 @@
  */
 package com.axelor.meta.db.repo;
 
-import static java.util.stream.Collectors.toList;
-
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
@@ -75,9 +73,9 @@ public class MetaJsonReferenceUpdater {
       return;
     }
 
-    List<Map<String, Object>> maps = items.stream().map(Map.class::cast).collect(toList());
     List<? extends Model> records =
-        maps.stream()
+        items.stream()
+            .map(Map.class::cast)
             .filter(map -> map.get("id") != null)
             .filter(map -> nameChanged(field, map))
             .map(map -> Long.parseLong(map.get("id").toString()))
@@ -88,7 +86,7 @@ public class MetaJsonReferenceUpdater {
     updateJsonFields(records);
   }
 
-  private boolean nameChanged(Property field, Map<String, Object> map) {
+  private boolean nameChanged(Property field, Map<?, ?> map) {
     if (field.isVirtual()) {
       Mapper mapper = Mapper.of(field.getEntity());
       return mapper.getComputeDependencies(field).stream().anyMatch(name -> map.containsKey(name));
