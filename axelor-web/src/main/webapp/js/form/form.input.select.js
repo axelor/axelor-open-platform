@@ -939,6 +939,12 @@ ui.formInput('NavSelect', {
     scope.$watch('text', function navSelectTextWatch(text, old) {
       adjust();
     });
+    
+    scope.$watch('attr("selection-in")', function (filter, old) {
+      if (filter !== old) {
+        setup();
+      }
+    });
 
     scope.onSelect = function(select) {
       if (scope.attr('readonly')) {
@@ -1033,7 +1039,7 @@ ui.formInput('NavSelect', {
 
       setMenuTitle(null);
 
-      while (elemNavs.parent().width() > parentWidth) {
+      while (index >= 0 && elemNavs.parent().width() > parentWidth) {
         elem = $(elemNavs[--index]);
         elem.hide();
         if (index === selectedIndex) {
@@ -1050,9 +1056,9 @@ ui.formInput('NavSelect', {
     }
 
     scope.$onAdjust(adjust);
-    scope.$callWhen(setup, function () {
+    scope.$callWhen(function () {
       return element.is(':visible');
-    });
+    }, setup);
   },
   template_editable: null,
   template_readonly: null,
