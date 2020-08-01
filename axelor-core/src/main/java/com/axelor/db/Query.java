@@ -26,6 +26,7 @@ import com.axelor.db.internal.DBHelper;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
+import com.axelor.i18n.I18n;
 import com.axelor.rpc.Resource;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -38,6 +39,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -207,10 +209,10 @@ public class Query<T extends Model> {
     }
 
     if (name.charAt(0) == '-') {
-      name = this.joinHelper.joinFetchName(name.substring(1));
+      name = this.joinHelper.joinName(name.substring(1), true, true);
       orderBy += name + " DESC";
     } else {
-      name = this.joinHelper.joinFetchName(name);
+      name = this.joinHelper.joinName(name, true, true);
       orderBy += name;
     }
 
@@ -894,7 +896,9 @@ public class Query<T extends Model> {
 
     private Class<?> beanClass;
 
-    private Map<String, String> joins = Maps.newLinkedHashMap();
+    private Map<String, String> joins = new LinkedHashMap<>();
+
+    private Set<String> translationJoins = new HashSet<>();
 
     private Set<String> fetches = new HashSet<>();
 
@@ -926,7 +930,7 @@ public class Query<T extends Model> {
       int last = 0;
       while (matcher.find()) {
         MatchResult matchResult = matcher.toMatchResult();
-        String alias = joinName(matchResult.group(1));
+        String alias = joinName(matchResult.group(1), false, true);
         if (alias == null) {
           alias = "self." + matchResult.group(1);
         }
@@ -943,10 +947,11 @@ public class Query<T extends Model> {
      * expression) and return the join variable.
      *
      * @param name the path expression or field name
+     * @param fetch whether to generate fetch join
+     * @param translate whether to generate translation join
      * @return join variable if join is created else returns name
      */
-    protected String joinName(String name, boolean fetch) {
-
+    private String joinName(String name, boolean fetch, boolean translate) {
       Mapper mapper = Mapper.of(beanClass);
       String[] path = name.split("\\.");
       String prefix = null;
@@ -1015,6 +1020,9 @@ public class Query<T extends Model> {
               }
               return prefix;
             }
+            if (translate && property.isTranslatable()) {
+              return translate(property, prefix);
+            }
           }
         }
       } else {
@@ -1035,6 +1043,10 @@ public class Query<T extends Model> {
           }
           return prefix;
         }
+
+        if (translate && property.isTranslatable()) {
+          return translate(property, null);
+        }
       }
 
       if (prefix == null) {
@@ -1044,12 +1056,26 @@ public class Query<T extends Model> {
       return prefix + "." + variable;
     }
 
-    public String joinName(String name) {
-      return joinName(name, false);
+    private String translate(Property property, String prefix) {
+      String variable = property.getName();
+      String language = I18n.getBundle().getLocale().getLanguage();
+      String joinName =
+          prefix == null
+              ? String.format("_meta_translation_%s", variable)
+              : String.format("_meta_translation%s_%s", prefix, variable);
+      String from = prefix == null ? "self" : prefix;
+      String join =
+          String.format(
+              "MetaTranslation %s ON %s.key = CONCAT('value:', %s.%s) AND %s.language = '%s'",
+              joinName, joinName, from, variable, joinName, language);
+
+      translationJoins.add(join);
+
+      return String.format("COALESCE(NULLIF(%s.message, ''), %s.%s)", joinName, from, variable);
     }
 
-    public String joinFetchName(String name) {
-      return joinName(name, true);
+    public String joinName(String name) {
+      return joinName(name, false, false);
     }
 
     public String fixSelect(String query) {
@@ -1062,14 +1088,16 @@ public class Query<T extends Model> {
     }
 
     public String toString(boolean fetch) {
-      if (joins.isEmpty()) return "";
       final List<String> joinItems = new ArrayList<>();
       for (final Entry<String, String> entry : joins.entrySet()) {
         final String fetchString = fetch && fetches.contains(entry.getKey()) ? " FETCH" : "";
         joinItems.add(
             String.format("LEFT JOIN%s %s %s", fetchString, entry.getKey(), entry.getValue()));
       }
-      return " " + joinItems.stream().collect(Collectors.joining(" "));
+      for (final String join : translationJoins) {
+        joinItems.add(String.format("LEFT JOIN %s", join));
+      }
+      return joinItems.isEmpty() ? "" : " " + joinItems.stream().collect(Collectors.joining(" "));
     }
   }
 }
