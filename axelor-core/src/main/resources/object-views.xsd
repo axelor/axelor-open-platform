@@ -2691,7 +2691,6 @@
         <xsd:attribute name="canSelect" use="prohibited" />
         <xsd:attribute name="edit-window" use="prohibited" />
         <xsd:attribute name="summary-view" use="prohibited" />
-        <xsd:attribute name="target-name" use="prohibited" />
         <xsd:attribute name="colSpan" use="prohibited" />
         <xsd:attribute name="colOffset" use="prohibited" />
         <xsd:attribute name="showTitle" use="prohibited" />

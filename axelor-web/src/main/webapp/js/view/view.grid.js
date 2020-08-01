@@ -271,12 +271,21 @@ function GridViewCtrl($scope, $element) {
   };
 
   $scope.selectFields = function() {
-    return _.map($scope.fields, function (field) {
+    var fields = _.map($scope.fields, function (field) {
       if (field.jsonField) {
         return field.name + '::' + (field.jsonType || 'text');
       }
       return field.name;
     });
+
+    // consider target-name on m2o
+    _.each(($scope.schema||{}).items, function (item) {
+      if (item.targetName) {
+        fields.push(item.name + '.' + item.targetName);
+      }
+    });
+
+    return _.unique(fields);
   };
 
   $scope.filter = function(searchFilter) {

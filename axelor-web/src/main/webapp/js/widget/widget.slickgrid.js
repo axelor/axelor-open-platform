@@ -154,16 +154,28 @@ var Formatters = {
     return value ? moment(value).format('DD/MM/YYYY HH:mm') : "";
   },
 
-  "one-to-one": function(field, value) {
-    var text = (value||{})[field.targetName];
-    return text ? _.escapeHTML(text) : "";
+  "one-to-one": function(field, value, record) {
+    return Formatters['many-to-one'](field, value, record);
   },
 
-  "many-to-one": function(field, value) {
+  "many-to-one": function(field, value, record) {
     var key = field.targetName;
+    var keyDot = field.name + '.' + key;
+
+    // consider dotted value in case custom target-name is given
+    if (value && record && !(key in value) && keyDot in record) {
+      key = keyDot;
+      value = record;
+    }
+
     var trKey = '$t:' + key;
-    if (value && trKey in value) key = trKey;
+
+    if (value && trKey in value) {
+      key = trKey;
+    }
+
     var text = (value||{})[key];
+
     return text ? _.escapeHTML(text) : "";
   },
 
