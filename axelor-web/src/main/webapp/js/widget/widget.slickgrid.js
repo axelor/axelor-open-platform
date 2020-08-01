@@ -1379,7 +1379,7 @@ Grid.prototype.onBeforeMenuShow = function(event, args) {
   });
 
   _.each(this.cols, function(col) {
-    if (_.contains(this.visibleCols, col.id)) return;
+    if (_.contains(this.visibleCols, col.id) || (col.descriptor && col.descriptor.hidden)) return;
     menu.items.push({
       title: _t('Show') + " <i>" + col.name + "</i>",
       command: 'show',
