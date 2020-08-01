@@ -939,7 +939,7 @@ ui.formInput('NavSelect', {
     scope.$watch('text', function navSelectTextWatch(text, old) {
       adjust();
     });
-    
+
     scope.$watch('attr("selection-in")', function (filter, old) {
       if (filter !== old) {
         setup();
