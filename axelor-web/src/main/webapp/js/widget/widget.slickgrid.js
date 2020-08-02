@@ -1830,7 +1830,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
     var result = _.extend({}, item);
 
     // get updated values
-    _.filter(grid.getColumns(), function (col) {
+    _.filter(that.cols, function (col) {
       return col.descriptor && col.field && col.field.indexOf('.') === -1 && record[col.field] !== undefined;
     }).forEach(function (col) {
       result[col.field] = record[col.field];
