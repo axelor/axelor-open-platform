@@ -771,6 +771,41 @@ function FilterFormCtrl($scope, $element, ViewService) {
         };
       }
 
+      if (filter.type === 'string' || filter.type === 'text') {
+        if (criterion.operator == "isNull") {
+          criterion = {
+            operator: "or",
+            criteria: [
+                {
+                  fieldName: filter.field,
+                  operator: "isNull"
+                },
+                {
+                  fieldName: filter.field,
+                  operator: "=",
+                  value: ''
+                }
+            ]
+          };
+        }
+        if (criterion.operator == "notNull") {
+          criterion = {
+            operator: "and",
+            criteria: [
+                {
+                  fieldName: filter.field,
+                  operator: "notNull"
+                },
+                {
+                  fieldName: filter.field,
+                  operator: "!=",
+                  value: ''
+                }
+            ]
+          };
+        }
+      }
+
       if (criterion.operator == "between" || criterion.operator == "notBetween") {
         criterion.value2 = filter.value2;
       }
