@@ -102,22 +102,20 @@ function dotToNested(record, field) {
   return record;
 }
 
-function nestedToDot(record, name, nullify) {
+function nestedToDot(record, name, deleteEmpty) {
   var names = name.split('.');
   var val = record || {};
   var idx = 0;
   while (val && idx < names.length) {
     var itName = names[idx++];
     var itVal = val[itName];
-    if (nullify && (!itVal || itVal.id === undefined)) {
-      val[itName] = null;
+    if (deleteEmpty && _.isObject(itVal) && itVal.id === undefined) {
+      delete val[itName];
     }
     val = itVal;
   }
   if (idx === names.length && val !== undefined) {
     record[name] = val;
-  } else if (nullify && !record.hasOwnProperty(name)) {
-    record[name] = null;
   }
   return record;
 }
@@ -2109,6 +2107,12 @@ Grid.prototype.commitEdit = function () {
 
   var cleanUp = function () {
     that._commitPromise = null;
+
+    // Force fetch if pop-up form view is opened.
+    // This is needed if form view has fields no present in grid view.
+    _.forEach(data.getItems(), function(item) {
+      data.updateItem(item.id, _.extend(item || {}, { $fetched: false }));
+    });
   }
 
   this._commitPromise = promise;
@@ -2145,7 +2149,7 @@ Grid.prototype.commitEdit = function () {
       return;
     }
 
-    // from nested fields to dotted fields and nullify empty values
+    // from nested fields to dotted fields and delete empty values
     _.filter(Object.keys(scope.fields), function(field) { return field.indexOf('.') >= 0; })
       .forEach(function(field) { nestedToDot(record, field, true); });
 
