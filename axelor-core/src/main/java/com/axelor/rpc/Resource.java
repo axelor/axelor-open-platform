@@ -86,6 +86,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
@@ -108,6 +109,8 @@ public class Resource<T extends Model> {
 
   private final Event<PreRequest> preRequest;
   private final Event<PostRequest> postRequest;
+
+  private static final Pattern NAME_PATTERN = Pattern.compile("[\\w\\.]+");
 
   @Inject
   @SuppressWarnings("unchecked")
@@ -500,6 +503,14 @@ public class Resource<T extends Model> {
       modelName = (String) childOn.get("model");
       parentName = (String) childOn.get("parent");
     }
+
+    ImmutableList.of(modelName, parentName).stream()
+        .filter(name -> !NAME_PATTERN.matcher(name).matches())
+        .findAny()
+        .ifPresent(
+            name -> {
+              throw new IllegalArgumentException(String.format("Invalid name: %s", name));
+            });
 
     builder
         .append("SELECT new map(_parent.id as id, count(self.id) as count) FROM ")
