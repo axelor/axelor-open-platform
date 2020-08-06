@@ -1825,13 +1825,12 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
     var cell = grid.getActiveCell();
     var item = cell ? grid.getDataItem(cell.row) : {};
     var record = formScope.record || {};
-    var result = _.extend({}, item);
+    var result = _.extend({}, item, record, { id: item.id });
 
-    // get updated values
-    _.filter(that.cols, function (col) {
-      return col.descriptor && col.field && col.field.indexOf('.') === -1 && record[col.field] !== undefined;
-    }).forEach(function (col) {
-      result[col.field] = record[col.field];
+    _.each(result, function(value, name) {
+      if (_.isObject(value) && value.id === undefined && !_.startsWith(name, '$')) {
+        delete result[name];
+      }
     });
 
     return result;
@@ -2142,7 +2141,7 @@ Grid.prototype.commitEdit = function () {
   var row = this.grid.getActiveCell().row;
 
   scope.waitForActions(function() {
-    var record = _.extend(scope.getContextRecord(), { $fetched: false, $dirty: true, _orignal: scope.$$original });
+    var record = _.extend(scope.getContextRecord(), { $fetched: false, $dirty: true });
 
     if (!data.getItemById(record.id)) {
       // record has changed elsewhere
