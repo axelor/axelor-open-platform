@@ -2074,7 +2074,7 @@ Grid.prototype.showEditor = function (activeCell) {
   // convert dotted values
   this.cols
     .map(function (col) { return col.descriptor; })
-    .filter(function (field) { return field && field.name && field.name.indexOf('.') > -1; })
+    .filter(function (field) { return field && field.name && field.name.indexOf('.') > -1 && record[field.name] !== undefined; })
     .forEach(function (field) { dotToNested(record, field); });
 
   formScope.editRecord(record);
