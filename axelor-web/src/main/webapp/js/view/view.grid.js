@@ -183,16 +183,24 @@ function GridViewCtrl($scope, $element) {
 
     var details = $scope.$details;
     if (details) {
-      details.$timeout(function () {
+      var onSyncDetails = function() {
         var record = details.record || {};
         var found = _.findWhere(items, { id: record.id });
         if (found) {
           found.selected = true;
-          return;
+        } else {
+          details.edit(null);
         }
-        details.edit(null);
         syncSelection();
-      });
+      }
+      if (_.isEmpty(details.record)) {
+        details.$timeout(onSyncDetails);
+      } else {
+        var removeOnSyncDetails = details.$on('on:edit', function() {
+          onSyncDetails();
+          removeOnSyncDetails();
+        });
+      }
     } else {
       syncSelection();
     }
