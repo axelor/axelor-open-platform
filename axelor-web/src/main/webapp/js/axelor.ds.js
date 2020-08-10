@@ -550,6 +550,11 @@
         } else if (item.type === 'field') {
           items.push(item.name);
         }
+
+        // fetch target names for tag-select
+        if (/tag-?select/i.test(item.widget) && item.targetName) {
+          (result.related[item.name] || (result.related[item.name] = [])).push(item.targetName);
+        }
       });
 
       if (view.type === "calendar") {
