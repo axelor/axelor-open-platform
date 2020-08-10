@@ -569,10 +569,18 @@
         } else if (item.type === 'field') {
           items.push(item.name);
         }
-        // to fetch colors for tag-select
-        if (item.colorField && item.targetName) {
-          (result.related[item.name] || (result.related[item.name] = [])).push(item.colorField);
-          (result.related[item.name] || (result.related[item.name] = [])).push(item.targetName);
+
+        // process tag-select
+        processWidget(item);
+        if (item.widget === 'tag-select') {
+          // fetch colors
+          if (item.colorField) {
+            (result.related[item.name] || (result.related[item.name] = [])).push(item.colorField);
+          }
+          // fetch target names
+          if (item.targetName) {
+            (result.related[item.name] || (result.related[item.name] = [])).push(item.targetName);
+          }
         }
       });
 
