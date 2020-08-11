@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <object-views xmlns="http://axelor.com/xml/ns/object-views"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.1.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.3.xsd">
 
   <selection name="view.type.selection">
     <option value="grid">Grid</option>
@@ -48,6 +48,29 @@
     <option value="inline">Inline</option>
   </selection>
 
+  <selection name="color.name.selection">
+    <option value="red" color="red">Red</option>
+    <option value="pink" color="pink">Pink</option>
+    <option value="purple" color="purple">Purple</option>
+    <option value="deeppurple" color="deeppurple">Deep Purple</option>
+    <option value="indigo" color="indigo">Indigo</option>
+    <option value="blue" color="blue">Blue</option>
+    <option value="lightblue" color="lightblue">Light Blue</option>
+    <option value="cyan" color="cyan">Cyan</option>
+    <option value="teal" color="teal">Teal</option>
+    <option value="green" color="green">Green</option>
+    <option value="lightgreen" color="lightgreen">Light Green</option>
+    <option value="lime" color="lime">Lime</option>
+    <option value="yellow" color="yellow">Yellow</option>
+    <option value="amber" color="amber">Amber</option>
+    <option value="orange" color="orange">Orange</option>
+    <option value="deeporange" color="deeporange">Deep Orange</option>
+    <option value="brown" color="brown">Brown</option>
+    <option value="grey" color="grey">Grey</option>
+    <option value="black" color="black">Black</option>
+    <option value="white" color="white">White</option>
+  </selection>
+
   <grid title="All Modules" name="meta-module-grid" model="com.axelor.meta.db.MetaModule"
     canDelete="false" canNew="false" canEdit="false" edit-icon="false">
     <hilite color="danger" if="!installed &amp;&amp; !pending"/>
@@ -92,7 +115,7 @@
 
   <grid title="All Views" name="meta-view-grid" model="com.axelor.meta.db.MetaView" orderBy="priority,name">
     <toolbar>
-      <button name="restoreAll" icon="fa-undo" help="Restore all..." prompt="All the customizations will be lost. Are you sure ?" onClick="action-meta-restore-all"/>
+      <button name="restoreAll" icon="fa-undo" help="Restore all…" prompt="All the customizations will be lost. Are you sure?" onClick="action-meta-restore-all"/>
     </toolbar>
     <hilite if="extension" color="warning"/>
     <hilite if="computed" color="info"/>
@@ -245,6 +268,8 @@
       <field name="left" widget="inline-checkbox"/>
       <field name="mobile" widget="inline-checkbox"/>
       <field name="hidden" widget="inline-checkbox"/>
+      <field name="conditionToCheck" colSpan="12"/>
+      <field name="moduleToCheck" colSpan="12"/>
     </panel>
     <panel title="Tag" sidebar="true" itemSpan="6">
       <field name="tag"/>
@@ -298,6 +323,7 @@
       <field name="title"/>
       <field name="value"/>
       <field name="icon"/>
+      <field name="color" widget="SingleSelect" />
       <field name="data"/>
       <field name="hidden"/>
       <field name="order" width="100"/>
@@ -309,6 +335,7 @@
       <field name="title" />
       <field name="value" />
       <field name="icon" />
+      <field name="color" widget="SingleSelect" />
       <field name="data" />
       <field name="hidden" />
       <field name="order" help="Sequence order" width="100" />
@@ -417,6 +444,7 @@
       <field name="style" />
       <field name="view" widget="ref-text"
         x-target-name="name"
+        x-target-search="module"
         x-target="com.axelor.meta.db.MetaView"
         x-domain="self.model = :model AND self.type IN ('form', 'grid')" />
       <field name="language" />

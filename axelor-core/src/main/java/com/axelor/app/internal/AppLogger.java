@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,6 +18,7 @@
 package com.axelor.app.internal;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.logging.LoggerConfiguration;
 import java.util.Properties;
 import java.util.function.Predicate;
@@ -33,17 +34,16 @@ public final class AppLogger {
     final AppSettings settings = AppSettings.get();
     final Properties loggingConfig = new Properties();
     final Predicate<String> isLogging = (n) -> n.startsWith("logging.");
-    settings
-        .getProperties()
-        .stringPropertyNames()
-        .stream()
+    settings.getProperties().stringPropertyNames().stream()
         .filter(isLogging)
         .forEach(
             n -> {
               loggingConfig.setProperty(n, settings.get(n));
             });
-    if (loggingConfig.containsKey("logging.path")) {
-      loggingConfig.setProperty("logging.path", settings.getPath("logging.path", null));
+    if (loggingConfig.containsKey(AvailableAppSettings.LOGGING_PATH)) {
+      loggingConfig.setProperty(
+          AvailableAppSettings.LOGGING_PATH,
+          settings.getPath(AvailableAppSettings.LOGGING_PATH, null));
     }
     return new LoggerConfiguration(loggingConfig);
   }

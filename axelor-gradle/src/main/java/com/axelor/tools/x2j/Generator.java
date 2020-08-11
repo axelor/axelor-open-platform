@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -22,6 +22,7 @@ import com.axelor.tools.x2j.pojo.EnumType;
 import com.axelor.tools.x2j.pojo.Repository;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
@@ -31,9 +32,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import org.slf4j.Logger;
@@ -55,6 +59,11 @@ public class Generator {
 
   private final Multimap<String, Entity> entities = LinkedHashMultimap.create();
   private final Multimap<String, EnumType> enums = LinkedHashMultimap.create();
+
+  private static final Map<String, Entity> mergedEntities = new HashMap<>();
+  private static final Set<String> MODEL_FIELD_NAMES = ImmutableSet.of("archived");
+  private static final Set<String> AUDITABLE_MODEL_FIELD_NAMES =
+      ImmutableSet.of("createdOn", "updatedOn", "createdBy", "updatedBy");
 
   public Generator(File domainPath, File outputPath) {
     this(domainPath, outputPath, String -> String);
@@ -172,6 +181,16 @@ public class Generator {
     for (Entity it : all) {
       entity.merge(it);
     }
+    mergedEntities.put(entity.getName(), entity);
+
+    Optional.ofNullable(entity.getTrack())
+        .ifPresent(
+            track ->
+                track.getNames().stream()
+                    .filter(fieldName -> !fieldExists(entity.getName(), fieldName))
+                    .forEach(
+                        fieldName ->
+                            log.error("{}: track unknown field: {}", entity.getName(), fieldName)));
 
     entityFile.getParentFile().mkdirs();
     if (repoFile != null) {
@@ -202,6 +221,26 @@ public class Generator {
     }
 
     return rendered;
+  }
+
+  private boolean fieldExists(String entityName, String fieldName) {
+    Entity itEntity;
+    String itEntityName = entityName;
+    do {
+      itEntity = mergedEntities.get(itEntityName);
+      if (itEntity == null) {
+        if ("AuditableModel".equals(itEntityName)
+            && AUDITABLE_MODEL_FIELD_NAMES.contains(fieldName)) {
+          return true;
+        }
+        return MODEL_FIELD_NAMES.contains(fieldName);
+      }
+      if (itEntity.getPropertyMap().keySet().contains(fieldName)) {
+        return true;
+      }
+    } while ((itEntityName = itEntity.getBaseClass()) != null);
+
+    return false;
   }
 
   protected void writeTo(File output, String content) throws IOException {

@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,6 +18,7 @@
 package com.axelor.report;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.FileUtils;
 import com.axelor.common.ResourceUtils;
 import com.axelor.db.internal.DBHelper;
@@ -31,6 +32,8 @@ import java.util.regex.Pattern;
 import org.eclipse.birt.report.model.api.IResourceLocator;
 import org.eclipse.birt.report.model.api.ModuleHandle;
 import org.eclipse.datatools.connectivity.oda.flatfile.ResourceLocator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is a {@link ResourceLocator} that first searches external reports directory for the
@@ -38,15 +41,29 @@ import org.eclipse.datatools.connectivity.oda.flatfile.ResourceLocator;
  */
 public class ReportResourceLocator implements IResourceLocator {
 
-  public static final String CONFIG_REPORT_DIR = "axelor.report.dir";
   public static final String DEFAULT_REPORT_DIR = "{user.home}/axelor/reports";
 
   private static final Pattern URL_PATTERN = Pattern.compile("^(file|jar|http|https|ftp):/.*");
 
+  private static final Logger log = LoggerFactory.getLogger(ReportResourceLocator.class);
+
   private Path searchPath;
 
+  @SuppressWarnings("deprecation")
   public ReportResourceLocator() {
-    final String dir = AppSettings.get().getPath(CONFIG_REPORT_DIR, DEFAULT_REPORT_DIR);
+    if (AppSettings.get().getProperties().containsKey(AvailableAppSettings.AXELOR_REPORT_DIR)) {
+      log.warn(
+          "configuration '{}' is deprecated, please use '{}'",
+          AvailableAppSettings.AXELOR_REPORT_DIR,
+          AvailableAppSettings.REPORTS_DESIGN_DIR);
+    }
+
+    final String dir =
+        AppSettings.get()
+            .getPath(
+                AvailableAppSettings.REPORTS_DESIGN_DIR,
+                AppSettings.get()
+                    .getPath(AvailableAppSettings.AXELOR_REPORT_DIR, DEFAULT_REPORT_DIR));
     this.searchPath = Paths.get(dir);
   }
 

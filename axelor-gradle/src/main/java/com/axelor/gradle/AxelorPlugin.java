@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -29,7 +29,7 @@ import java.io.File;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileTree;
-import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.plugins.JavaLibraryPlugin;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.compile.AbstractCompile;
@@ -46,6 +46,7 @@ public class AxelorPlugin implements Plugin<Project> {
 
   public static final boolean GRADLE_VERSION_3_X = GRADLE_VERSION.startsWith("3");
   public static final boolean GRADLE_VERSION_4_X = GRADLE_VERSION.startsWith("4");
+  public static final boolean GRADLE_VERSION_5_X = GRADLE_VERSION.startsWith("5");
 
   public static File getClassOutputDir(Project project, String sourceType) {
     return GRADLE_VERSION_3_X
@@ -56,7 +57,7 @@ public class AxelorPlugin implements Plugin<Project> {
   @Override
   public void apply(Project project) {
 
-    project.getPlugins().apply(JavaPlugin.class);
+    project.getPlugins().apply(JavaLibraryPlugin.class);
     project.getExtensions().create(AxelorExtension.EXTENSION_NAME, AxelorExtension.class);
 
     project.getPlugins().apply(JavaSupport.class);
@@ -127,5 +128,20 @@ public class AxelorPlugin implements Plugin<Project> {
         .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
         .getResources()
         .srcDir(GenerateCode.getResourceOutputDir(project));
+
+    // XXX: prepend class output directory to compile classpath (see #26420)
+    // XXX: https://github.com/gradle/gradle/issues/12575
+    project
+        .getConvention()
+        .getPlugin(JavaPluginConvention.class)
+        .getSourceSets()
+        .getByName(
+            SourceSet.MAIN_SOURCE_SET_NAME,
+            sourceSet -> {
+              sourceSet.setCompileClasspath(
+                  project
+                      .files(sourceSet.getJava().getOutputDir())
+                      .plus(sourceSet.getCompileClasspath()));
+            });
   }
 }

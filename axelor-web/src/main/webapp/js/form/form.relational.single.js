@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -90,7 +90,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
     var related = {};
     var relatives = fields || $scope.findRelativeFields();
     var missing = _.filter(relatives, function (name) {
-      return !value || ui.findNested(value, name) === undefined;
+      return !value || (ui.canSetNested(value, name) && ui.findNested(value, name) === undefined);
     });
     _.each(relatives, function(name) {
       var prefix = name.split('.')[0];
@@ -104,12 +104,17 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
           id: value.id,
           $version: value.version || value.$version
         });
+        var trKey = '$t:' + nameField;
+        if (trKey in value) {
+          record[trKey] = value[trKey];
+        }
         if (nameField in rec) {
           record[nameField] = rec[nameField];
         }
         _.each(missing, function(name) {
-          var prefix = name.split('.')[0];
-          record[prefix] = rec[prefix];
+          var value = ui.findNested(rec, name);
+          if (value === undefined) value = null;
+          ui.setNested(record, name, value);
         });
         $scope.setValue(record, false);
       });
@@ -123,6 +128,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
     }
 
     var nameField = $scope.field.targetName || 'id';
+    var trKey = '$t:' + nameField;
     var record = value;
 
     if (value && value.id) {
@@ -135,9 +141,13 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
         return !value || ui.findNested(value, name) === undefined;
       });
 
+      if (value[trKey] !== undefined) {
+        record[trKey] = value[trKey];
+      }
+
       if (value[nameField] !== undefined) {
         record[nameField] = value[nameField];
-      } else {
+      } else if (missing.indexOf(nameField) < 0) {
         missing.push(nameField);
       }
 
@@ -318,7 +328,9 @@ ui.formInput('ManyToOne', 'Select', {
 
     scope.formatItem = function(item) {
       if (item) {
-        return item[(scope.field.targetName || "id")];
+        var trKey = "$t:" + scope.field.targetName;
+        var key = scope.field.targetName || "id";
+        return item[trKey] || item[key] || ui.findNested(item, key);
       }
       return "";
     };
@@ -347,7 +359,11 @@ ui.formInput('ManyToOne', 'Select', {
       }
     });
 
-    if (field.widget === 'NestedEditor') {
+    scope.isHiddenSelf = function() {
+      return scope.isHidden();
+    };
+
+    if (field.widget === 'nested-editor') {
 
       scope.isHiddenSelf = function() {
         if (!scope.canSelect()) {
@@ -542,12 +558,13 @@ ui.formInput('ManyToOne', 'Select', {
             handled = true;
           }
         }
-        scope.$timeout(function () {
-          adjustPadding();
-          if (scope.onChangeNotify && handled) {
-            scope.onChangeNotify(scope, scope.record);
-          }
-        }, 100);
+        if (scope.onChangeNotify && handled) {
+          scope.notifyChangeNeeded = true;
+        } else {
+          scope.$timeout(function() {
+            adjustPadding();
+          }, 100);
+        }
       }
     };
 
@@ -560,13 +577,24 @@ ui.formInput('ManyToOne', 'Select', {
         scope.select(ui.item.value);
         handled = true;
       }
-      scope.$timeout(function () {
-        adjustPadding();
-        if (scope.onChangeNotify && handled) {
-          scope.onChangeNotify(scope, scope.record);
-        }
-      }, 100);
+      if (scope.onChangeNotify && handled) {
+        scope.notifyChangeNeeded = true;
+      } else {
+        scope.$timeout(function() {
+          adjustPadding();
+        }, 100);
+      }
     };
+
+    scope.$on("on:record-change", function() {
+      if (scope.notifyChangeNeeded) {
+        scope.notifyChangeNeeded = false;
+        scope.$timeout(function() {
+          adjustPadding();
+          scope.onChangeNotify(scope, scope.record);
+        }, 100);
+      }
+    });
 
     scope.$render_editable = function() {
 
@@ -576,7 +604,7 @@ ui.formInput('ManyToOne', 'Select', {
 
       var value = scope.getValue();
       var name = scope.field.targetName;
-      if (value && value.id > 0 && !value[name]) {
+      if (name && value && value.id > 0 && !value[name]) {
         return scope._dataSource.details(value.id, name).success(function(rec) {
           value[name] = rec[name];
           input.val(scope.getText());
@@ -852,7 +880,7 @@ ui.formInput('RefItem', 'ManyToOne', {
         });
       }
       return getViewDef.call($scope, elem);
-    }
+    };
 
     ManyToOneCtrl.apply(this, arguments);
   }],
@@ -953,10 +981,24 @@ ui.formInput('RefItem', 'ManyToOne', {
 
     var doSelect = _.debounce(function () {
       scope.$timeout(function() {
+        var ds = scope._dataSource;
         var value = (scope.record || {})[ref];
+        if (!value) return;
         var v = scope.getValue();
         if (v && v.id === value) return;
-        scope.select(value ? { id: value } : null);
+        var nameField = scope.field.targetName;
+        var fields = nameField ? [nameField] : undefined;
+        var promise = ds._request('fetch', value).post({ fields: fields }, { silent: true });
+        promise.success(function (response) {
+          var record = _.first(response.data) || (value ? { id: value } : null);
+          scope.select(record);
+        }).error(function () {
+          var record = value ? { id: value } : null;
+          if (record) {
+            record[nameField] = value;
+          }
+          scope.setValue(record, false);
+        });
       });
     }, 100);
 
@@ -971,9 +1013,7 @@ ui.formInput('RefText', 'ManyToOne', {
   link_editable: function (scope, element, attrs) {
     this._super.apply(this, arguments);
 
-    if (!scope.field.create) {
-      return;
-    }
+    var field = scope.field;
 
     function freeSelect(text) {
       return function () {
@@ -986,10 +1026,20 @@ ui.formInput('RefText', 'ManyToOne', {
     scope.loadSelection = function(request, response) {
       this.fetchSelection(request, function(items, page) {
         var term = request.term;
-        if (term) {
+        if (term && field.create) {
           items.push({
             label : _t('Select "{0}"...', term),
             click : freeSelect(term)
+          });
+        }
+        if (field.targetSearch) {
+          items = items.map(function (item) {
+            var label = item.label;
+            var value = item.value;
+            return {
+              label: label + " (" + value[field.targetSearch] + ")",
+              value: value
+            };
           });
         }
         response(items);

@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,6 +18,7 @@
 package com.axelor.web;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,7 +43,7 @@ public final class AppSessionListener implements HttpSessionListener {
    */
   @Inject
   public AppSessionListener(AppSettings settings) {
-    this.timeout = settings.getInt("session.timeout", 60);
+    this.timeout = settings.getInt(AvailableAppSettings.SESSION_TIMEOUT, 60);
   }
 
   @Override

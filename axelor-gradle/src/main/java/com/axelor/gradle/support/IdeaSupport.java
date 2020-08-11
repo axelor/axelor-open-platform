@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -156,7 +156,7 @@ public class IdeaSupport extends AbstractSupport {
     builder.append("  <option name=\"ENV_VARIABLES\" />\n");
     builder.append("  <option name=\"PASS_PARENT_ENVS\" value=\"true\" />\n");
     builder.append("  <shortenClasspath name=\"MANIFEST\" />\n");
-    builder.append("  <module name=\"").append(project.getName()).append("_main").append("\" />\n");
+    builder.append("  <module name=\"").append(project.getName()).append(".main").append("\" />\n");
     builder.append("  <envs />\n");
     builder.append("  <method>\n");
     builder.append("    <option name=\"Make\" enabled=\"true\" />\n");

@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -251,7 +251,7 @@ ui.formInput('DateTime', {
         return isDate ? moment(value).startOf('day').format('YYYY-MM-DD') : value.toISOString();
       }
       return value;
-    },
+    };
 
     scope.format = function(value) {
       if (value) {
@@ -335,13 +335,13 @@ ui.formInput('DateTime', {
         e.stopPropagation();
         e.preventDefault();
         return false;
-      }
-      if (e.keyCode === $.ui.keyCode.ENTER && $(this).datepicker("widget").is(':visible')) {
+      } else if (e.keyCode === $.ui.keyCode.ENTER) {
+        updateModel();
+      } else if ($(this).datepicker("widget").is(':visible')) {
         e.stopPropagation();
         e.preventDefault();
         return false;
-      }
-      if (e.keyCode === $.ui.keyCode.ENTER || e.keyCode === $.ui.keyCode.TAB) {
+      } else if (e.keyCode === $.ui.keyCode.TAB) {
         if (changed) updateModel();
       }
     });
@@ -471,7 +471,7 @@ ui.formInput('Time', 'DateTime', {
 
     scope.parse = function(value) {
       return value;
-    },
+    };
 
     scope.format = function(value) {
       return value;
@@ -583,12 +583,11 @@ ui.formatDuration = formatDuration;
 
 ui.formInput('Duration', 'Time', {
   metaWidget: true,
-  mask: '99:mm',
 
   init: function(scope) {
     this._super(scope);
 
-    var field = scope.field;
+    var field = scope.field || {};
     var pattern = /^\d+:\d+(:\d+)?$/;
 
     scope.format = function(value) {
@@ -614,13 +613,13 @@ ui.formInput('Duration', 'Time', {
 
   link_editable: function(scope, element, attrs, model) {
     var field = scope.field || {},
-      mask = this.mask;
+      mask = '99:mm';
 
     if (field.big) {
-      mask = "999:mm";
+      mask = '9' + mask;
     }
     if (field.seconds) {
-      mask = mask + ":mm";
+      mask += ':mm';
     }
 
     this.mask = mask;

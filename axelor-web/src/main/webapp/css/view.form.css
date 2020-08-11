@@ -1,7 +1,7 @@
 /**
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -181,6 +181,10 @@ table.form-layout td.form-item.v-align-top {
   height: 28px;
   padding: 2px 6px;
   min-width: 170px;
+}
+
+.form-item-container.translatable input {
+  padding-right: 22px;
 }
 
 .form-item-container[style *= width] input {
@@ -523,6 +527,18 @@ td.form-item > * {
   background: inherit !important;
 }
 
+.text-item-inline input,
+.one2many-inline input,
+.many2many-inline input {
+  background: #fff !important;
+}
+
+.text-item-inline.readonly input,
+.one2many-inline.readonly input,
+.many2many-inline.readonly input {
+  background: #eeeeee !important;
+}
+
 .ng-invalid > input,
 .ng-invalid > textarea,
 .ng-invalid > .picker-input input,
@@ -661,7 +677,8 @@ td.form-item > * {
 }
 
 .form-item ul.radio-select,
-.form-item ul.checkbox-select  {
+.form-item ul.checkbox-select,
+.form-item-container ul.boolean-radio {
   list-style-type: none;
   overflow: hidden;
   padding-top: 3px;
@@ -669,13 +686,15 @@ td.form-item > * {
 }
 
 .form-item ul.radio-select > li,
-.form-item ul.checkbox-select > li {
+.form-item ul.checkbox-select > li,
+.form-item-container ul.boolean-radio > li {
   float: left;
   margin: 0 4px;
 }
 
 .form-item ul.radio-select-vertical > li,
-.form-item ul.checkbox-select-vertical > li {
+.form-item ul.checkbox-select-vertical > li,
+.form-item-container ul.boolean-radio-vertical > li {
   float: none;
 }
 
@@ -977,12 +996,13 @@ label.has-help > span:after,
 }
 
 .tag-select {
-  border: 1px solid #c1c1c1;
+  border: 1px solid #ccc;
   border-radius: 4px;
   transition: border linear .2s, box-shadow linear .2s;
   min-height: 26px;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   height: 100%;
 }
 
@@ -1022,14 +1042,12 @@ label.has-help > span:after,
   overflow: hidden;
   margin: 0;
   margin-right: 16px;
-  padding-bottom: 2px;
 }
 
 .tag-select li,
 .tag-select .label {
-  float: left;
   display: inline-block;
-  margin: 2px 2px 0 0;
+  margin: 2px;
 }
 
 .tag-select .label,
@@ -1037,22 +1055,30 @@ label.has-help > span:after,
   height: 21px;
 }
 
+.tag-select .label {
+  display: inline-flex;
+  align-items: center;
+  max-width: calc(100% - 4px);
+}
+
 .tag-select ul,
 .readonly > .tag-select {
-  padding-top: 2px;
+  padding-top: 1px;
+  padding-bottom: 1px;
 }
 
 .tag-select li.tag-item i,
 .tag-select-single .tag-item i {
   font-size: 10px;
   cursor: pointer;
+  margin-left: 4px;
 }
 
 .tag-select .tag-text,
 .tag-select .tag-link,
 .tag-select-single .tag-link {
+  flex: 1;
   display: inline-block;
-  height: 15px;
   max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1081,6 +1107,7 @@ label.has-help > span:after,
   margin-top: -3px;
   line-height: 16px;
   height: auto !important;
+  min-height: auto;
 }
 
 .tag-select-single .tag-item {
@@ -1112,6 +1139,7 @@ label.has-help > span:after,
 
 .slick-cell .tag-select {
   height: 25px !important;
+  border: 0;
 }
 
 .slick-cell .tag-select .label {
@@ -1138,13 +1166,132 @@ label.has-help > span:after,
 .slick-cell .tag-select.picker-input ul {
   margin-left: 3px;
 }
-.slick-cell .tag-select .label, .slick-cell .tag-select .tag-selector {
-  height: 20px;
-}
 
 .slick-cell .tag-select li.tag-selector input {
   height: 20px !important;
   min-height: inherit;
+}
+
+[ui-slick-editors] .tag-select ul {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+[ui-slick-editors] .tag-select li {
+  margin: 1px;
+}
+
+.tag-select-list-item > a {
+  padding: 4px .4em !important;
+}
+
+.tag-select-list-item > a > span {
+  display: inline-block;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 12px;
+  height: 20px;
+  line-height: 20px;
+  padding: 0 10px;
+}
+
+.tag-select .label.red,
+.tag-select-list-item.red > a > span {
+  background: #f44336;
+}
+
+.tag-select .label.pink,
+.tag-select-list-item.pink > a > span {
+  background: #e91e63;
+}
+
+.tag-select .label.purple,
+.tag-select-list-item.purple > a > span {
+  background: #9c27b0;
+}
+
+.tag-select .label.deeppurple,
+.tag-select-list-item.deeppurple > a > span {
+  background: #673ab7;
+}
+
+.tag-select .label.indigo,
+.tag-select-list-item.indigo > a > span {
+  background: #3f51b5;
+}
+
+.tag-select .label.blue,
+.tag-select-list-item.blue > a > span {
+  background: #2196f3;
+}
+
+.tag-select .label.lightblue,
+.tag-select-list-item.lightblue > a > span {
+  background: #03a9f4;
+}
+
+.tag-select .label.cyan,
+.tag-select-list-item.cyan > a > span {
+  background: #00bcd4;
+}
+
+.tag-select .label.teal,
+.tag-select-list-item.teal > a > span {
+  background: #009688;
+}
+
+.tag-select .label.green,
+.tag-select-list-item.green > a > span {
+  background: #4caf50;
+}
+
+.tag-select .label.lightgreen,
+.tag-select-list-item.lightgreen > a > span {
+  background: #8bc34a;
+}
+
+.tag-select .label.lime,
+.tag-select-list-item.lime > a > span {
+  background: #cddc39;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.tag-select .label.yellow,
+.tag-select-list-item.yellow > a > span {
+  background: #ffeb3b;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.tag-select .label.amber,
+.tag-select-list-item.amber > a > span {
+  background: #ffc107;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.tag-select .label.orange,
+.tag-select-list-item.orange > a > span {
+  background: #ff9800;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.tag-select .label.deeporange,
+.tag-select-list-item.deeporange > a > span {
+  background: #ff5722;
+}
+
+.tag-select .label.brown,
+.tag-select-list-item.brown > a > span {
+  background: #795548;
+}
+
+.tag-select .label.grey,
+.tag-select-list-item.grey > a > span {
+  background: #9e9e9e;
+}
+
+.tag-select .label.bluegrey,
+.tag-select-list-item.bluegrey > a > span {
+  background: #607d8b;
 }
 
 .image-select {
@@ -1156,17 +1303,11 @@ label.has-help > span:after,
 .image-select > i.fa {
   position: absolute;
   max-height: 18px;
-  height: 18px;
-  width: 18px;
 }
 
 .image-select.readonly > img,
 .image-select.readonly > i.fa {
   position: initial;
-}
-
-.image-select input {
-  padding-left: 18px !important;
 }
 
 .empty > .image-select input {
@@ -1177,8 +1318,6 @@ label.has-help > span:after,
 .image-select-item i.fa {
   margin-right: 6px;
   max-height: 18px;
-  width: 18px;
-  height: 18px;
 }
 
 .image-select-item > a {
@@ -1212,11 +1351,14 @@ label.has-help > span:after,
 }
 
 .button-item.img-button {
-  background: #fff !important;
   width: auto !important;
+  height: inherit !important;
+}
+
+.button-item.img-button:not([class*=btn-]) {
+  background: inherit !important;
   border: none  !important;
   padding: 2px !important;
-  height: inherit !important;
 }
 
 .button-item.img-button img {

@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -23,6 +23,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
@@ -33,6 +35,8 @@ public abstract class AbstractTag extends SimpleTagSupport {
   private String src;
 
   private boolean production = AppSettings.get().isProduction();
+
+  protected static final Pattern dirPattern = Pattern.compile("^[\\./]*");
 
   public String getSrc() {
     return src;
@@ -45,13 +49,14 @@ public abstract class AbstractTag extends SimpleTagSupport {
   private boolean exists(String path) {
     try {
       return getResource(path) != null;
-    } catch (MalformedURLException e) {
+    } catch (MalformedURLException | IllegalArgumentException e) {
       return false;
     }
   }
 
   protected URL getResource(String path) throws MalformedURLException {
-    final String resource = path.startsWith("/") ? path : "/" + path;
+    final Matcher matcher = dirPattern.matcher(path);
+    final String resource = matcher.find() ? matcher.replaceFirst("/") : path;
     final PageContext ctx = (PageContext) getJspContext();
     return ctx.getServletContext().getResource(resource);
   }
@@ -73,12 +78,14 @@ public abstract class AbstractTag extends SimpleTagSupport {
   public void doTag() throws JspException, IOException {
 
     if (production) {
-      final String gzipped = src.replaceAll("^(js|css)\\/(.*)\\.(js|css)$", "dist/$2.gzip.$3");
+      final String gzipped =
+          src.replaceAll("^([\\./]*)(?:js|css)\\/(.*)\\.(js|css)$", "$1dist/$2.gzip.$3");
       if (exists(gzipped) && gzipSupported()) {
         doTag(gzipped);
         return;
       }
-      final String minified = src.replaceAll("^(js|css)\\/(.*)\\.(js|css)$", "dist/$2.min.$3");
+      final String minified =
+          src.replaceAll("^([\\./]*)(?:js|css)\\/(.*)\\.(js|css)$", "$1dist/$2.min.$3");
       if (exists(minified)) {
         doTag(minified);
         return;

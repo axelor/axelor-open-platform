@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -19,6 +19,7 @@ package com.axelor.db;
 
 import com.axelor.auth.db.AuditableModel;
 import com.axelor.auth.db.User;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.hibernate.type.JsonFunction;
 import com.axelor.db.internal.DBHelper;
@@ -33,10 +34,14 @@ import com.google.common.collect.Maps;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,6 +50,7 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.TypedQuery;
+import org.hibernate.jpa.QueryHints;
 
 /**
  * The {@code Query} class allows filtering and fetching records quickly.
@@ -63,6 +69,8 @@ public class Query<T extends Model> {
   private Map<String, Object> namedParams;
 
   private String orderBy;
+
+  private List<String> orderNames;
 
   private JoinHelper joinHelper;
 
@@ -85,6 +93,7 @@ public class Query<T extends Model> {
   public Query(Class<T> beanClass) {
     this.beanClass = beanClass;
     this.orderBy = "";
+    this.orderNames = new ArrayList<>();
     this.joinHelper = new JoinHelper(beanClass);
   }
 
@@ -169,7 +178,7 @@ public class Query<T extends Model> {
    * <pre>
    * Query&lt;Person&gt; query = Query.of(Person);
    * query = query.filter(&quot;name =&quot;, &quot;some&quot;).filter(&quot;age &gt;=&quot;, 20)
-   * 		.filter(&quot;lang in&quot;, &quot;en&quot;, &quot;hi&quot;);
+   *        .filter(&quot;lang in&quot;, &quot;en&quot;, &quot;hi&quot;);
    *
    * query = query.order(&quot;name&quot;).order(&quot;-age&quot;);
    * </pre>
@@ -198,11 +207,14 @@ public class Query<T extends Model> {
     }
 
     if (name.charAt(0) == '-') {
-      name = name.substring(1);
-      orderBy += this.joinHelper.joinName(name) + " DESC";
+      name = this.joinHelper.joinFetchName(name.substring(1));
+      orderBy += name + " DESC";
     } else {
-      orderBy += this.joinHelper.joinName(name);
+      name = this.joinHelper.joinFetchName(name);
+      orderBy += name;
     }
+
+    orderNames.add(name);
 
     return this;
   }
@@ -338,6 +350,7 @@ public class Query<T extends Model> {
 
   private TypedQuery<T> fetchQuery(int limit, int offset) {
     final TypedQuery<T> query = em().createQuery(selectQuery(), beanClass);
+    query.setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false);
     if (limit > 0) {
       query.setMaxResults(limit);
     }
@@ -386,6 +399,7 @@ public class Query<T extends Model> {
    */
   public long count() {
     final TypedQuery<Long> query = em().createQuery(countQuery(), Long.class);
+    query.setHint(QueryHints.HINT_PASS_DISTINCT_THROUGH, false);
     this.bind(query).setCacheable(cacheable).setFlushMode(flushMode).setReadOnly();
     return query.getSingleResult();
   }
@@ -418,9 +432,7 @@ public class Query<T extends Model> {
    * @return total number of records updated
    */
   public int update(String name, Object value) {
-    Map<String, Object> values = new HashMap<>();
-    values.put(name.replaceFirst("^self\\.", ""), value);
-    return update(values);
+    return update(Collections.singletonMap(name, value));
   }
 
   /**
@@ -434,6 +446,10 @@ public class Query<T extends Model> {
    * @return total number of records updated
    */
   public int update(Map<String, Object> values, User updatedBy) {
+    if (ObjectUtils.isEmpty(values)) {
+      return 0;
+    }
+
     final Map<String, Object> params = new HashMap<>();
     final Map<String, Object> namedParams = new HashMap<>();
     final List<String> where = new ArrayList<>();
@@ -442,9 +458,9 @@ public class Query<T extends Model> {
       namedParams.putAll(this.namedParams);
     }
 
-    for (String key : values.keySet()) {
-      String name = key.replaceFirst("^self\\.", "");
-      Object value = values.get(key);
+    for (final Entry<String, Object> entry : values.entrySet()) {
+      String name = entry.getKey().replaceFirst("^self\\.", "");
+      Object value = entry.getValue();
       params.put(name, value);
       if (value == null) {
         where.add("self." + name + " IS NOT NULL");
@@ -463,12 +479,11 @@ public class Query<T extends Model> {
     boolean versioned = updatedBy != null;
     boolean notMySQL = !DBHelper.isMySQL();
 
-    String whereClause = String.join(" AND ", where);
-    String selectQuery =
-        selectQuery().replaceFirst("SELECT self", "SELECT self.id").replaceFirst(" ORDER BY.*", "");
+    String whereClause = String.join(" OR ", where);
+    String selectQuery = updateQuery().replaceFirst("SELECT self", "SELECT self.id");
 
     if (selectQuery.contains(" WHERE ")) {
-      selectQuery = selectQuery.replaceFirst(" WHERE ", " WHERE " + whereClause + " AND ");
+      selectQuery = selectQuery.replaceFirst(" WHERE ", " WHERE (" + whereClause + ") AND (") + ")";
     } else {
       selectQuery = selectQuery + " WHERE " + whereClause;
     }
@@ -519,9 +534,7 @@ public class Query<T extends Model> {
    * @return total number of records updated
    */
   public int update(String name, Object value, User updatedBy) {
-    Map<String, Object> values = new HashMap<>();
-    values.put(name.replaceFirst("^self\\.", ""), value);
-    return update(values, updatedBy);
+    return update(Collections.singletonMap(name, value), updatedBy);
   }
 
   /**
@@ -536,10 +549,7 @@ public class Query<T extends Model> {
   public int delete() {
     boolean notMySQL = !DBHelper.isMySQL();
     String selectQuery =
-        selectQuery()
-            .replaceFirst("SELECT self", "SELECT self.id")
-            .replaceFirst(" ORDER BY.*", "")
-            .replaceAll("\\bself", "that");
+        updateQuery().replaceFirst("SELECT self", "SELECT self.id").replaceAll("\\bself", "that");
 
     if (notMySQL) {
       javax.persistence.Query q = em().createQuery(deleteQuery("self.id IN (" + selectQuery + ")"));
@@ -585,15 +595,26 @@ public class Query<T extends Model> {
     return fetchStream().peek(JPA::remove).count();
   }
 
-  protected String selectQuery() {
+  protected String selectQuery(boolean update) {
     StringBuilder sb =
         new StringBuilder("SELECT self FROM ")
             .append(beanClass.getSimpleName())
             .append(" self")
-            .append(joinHelper.toString());
+            .append(joinHelper.toString(!update));
     if (filter != null && filter.trim().length() > 0) sb.append(" WHERE ").append(filter);
+    if (update) {
+      return sb.toString();
+    }
     sb.append(orderBy);
-    return sb.toString();
+    return joinHelper.fixSelect(sb.toString());
+  }
+
+  protected String selectQuery() {
+    return selectQuery(false);
+  }
+
+  protected String updateQuery() {
+    return selectQuery(true);
   }
 
   protected String countQuery() {
@@ -601,16 +622,14 @@ public class Query<T extends Model> {
         new StringBuilder("SELECT COUNT(self.id) FROM ")
             .append(beanClass.getSimpleName())
             .append(" self")
-            .append(joinHelper.toString());
+            .append(joinHelper.toString(false));
     if (filter != null && filter.trim().length() > 0) sb.append(" WHERE ").append(filter);
-    return sb.toString();
+    return joinHelper.fixSelect(sb.toString());
   }
 
   protected String updateQuery(Map<String, Object> values, boolean versioned, String filter) {
     final String items =
-        values
-            .keySet()
-            .stream()
+        values.keySet().stream()
             .map(key -> String.format("self.%s = :%s", key, key))
             .collect(Collectors.joining(", "));
 
@@ -683,7 +702,7 @@ public class Query<T extends Model> {
    *
    * <pre>
    * List&lt;Map&gt; data = Contact.all().filter(&quot;self.age &gt; ?&quot;, 20)
-   * 		.select(&quot;title.name&quot;, &quot;fullName&quot;, &quot;age&quot;).fetch(80, 0);
+   *        .select(&quot;title.name&quot;, &quot;fullName&quot;, &quot;age&quot;).fetch(80, 0);
    * </pre>
    *
    * This results in following query:
@@ -736,16 +755,20 @@ public class Query<T extends Model> {
         }
       }
 
+      if (joinHelper.hasCollection) {
+        orderNames.stream().filter(n -> !selects.contains(n)).forEach(selects::add);
+      }
+
       StringBuilder sb =
-          new StringBuilder("SELECT ")
+          new StringBuilder("SELECT")
               .append(" new List(" + Joiner.on(", ").join(selects) + ")")
               .append(" FROM ")
               .append(beanClass.getSimpleName())
               .append(" self")
-              .append(joinHelper.toString());
+              .append(joinHelper.toString(false));
       if (filter != null && filter.trim().length() > 0) sb.append(" WHERE ").append(filter);
       sb.append(orderBy);
-      query = sb.toString();
+      query = joinHelper.fixSelect(sb.toString());
     }
 
     private Property getProperty(String field) {
@@ -856,7 +879,7 @@ public class Query<T extends Model> {
    * <p>For example:
    *
    * <pre>
-   * 	Query<Contact> q = Contact.all().filter("self.title.code = ?1 OR self.age > ?2", "mr", 20);
+   *    Query<Contact> q = Contact.all().filter("self.title.code = ?1 OR self.age > ?2", "mr", 20);
    * </pre>
    *
    * Results in:
@@ -867,11 +890,18 @@ public class Query<T extends Model> {
    *
    * So that all the records are matched even if <code>title</code> field is null.
    */
-  static class JoinHelper {
+  private static class JoinHelper {
 
     private Class<?> beanClass;
 
     private Map<String, String> joins = Maps.newLinkedHashMap();
+
+    private Set<String> fetches = new HashSet<>();
+
+    private boolean hasCollection;
+
+    private static final Pattern selectPattern =
+        Pattern.compile("^SELECT\\s+(COUNT\\s*\\()?", Pattern.CASE_INSENSITIVE);
 
     private static final Pattern pathPattern = Pattern.compile("self\\." + NAME_PATTERN);
 
@@ -888,7 +918,7 @@ public class Query<T extends Model> {
      * @param filter the filter expression
      * @return the transformed filter expression
      */
-    public String parse(String filter) {
+    private String parse(String filter) {
 
       String result = "";
       Matcher matcher = pathPattern.matcher(filter);
@@ -915,7 +945,7 @@ public class Query<T extends Model> {
      * @param name the path expression or field name
      * @return join variable if join is created else returns name
      */
-    public String joinName(String name) {
+    protected String joinName(String name, boolean fetch) {
 
       Mapper mapper = Mapper.of(beanClass);
       String[] path = name.split("\\.");
@@ -944,6 +974,12 @@ public class Query<T extends Model> {
           if (prefix == null) {
             joinOn = "self." + item;
             prefix = "_" + item;
+
+            // Use at least one join fetch on collection,
+            // so that we still get unique results when not passing distinct to SQL
+            if (fetches.isEmpty() && property.isCollection()) {
+              fetches.add(joinOn);
+            }
           } else {
             joinOn = prefix + "." + item;
             prefix = prefix + "_" + item;
@@ -951,9 +987,15 @@ public class Query<T extends Model> {
           if (!joins.containsKey(joinOn)) {
             joins.put(joinOn, prefix);
           }
+          if (fetch) {
+            fetches.add(joinOn);
+          }
 
           if (property.getTarget() != null) {
             currentMapper = Mapper.of(property.getTarget());
+            if (property.isCollection()) {
+              this.hasCollection = true;
+            }
           }
 
           if (i == path.length - 2) {
@@ -964,22 +1006,33 @@ public class Query<T extends Model> {
                       "No such field '%s' in object '%s'",
                       variable, currentMapper.getBeanClass().getName()));
             }
-            if (property != null && property.isReference()) {
+            if (property.isReference()) {
               joinOn = prefix + "." + variable;
               prefix = prefix + "_" + variable;
               joins.put(joinOn, prefix);
+              if (fetch) {
+                fetches.add(joinOn);
+              }
               return prefix;
             }
           }
         }
       } else {
         Property property = mapper.getProperty(name);
-        if (property != null && property.getTarget() != null) {
-          if (property.isCollection()) {
-            return null;
-          }
+        if (property == null) {
+          throw new IllegalArgumentException(
+              String.format("No such field '%s' in object '%s'", variable, beanClass.getName()));
+        }
+        if (property.isCollection()) {
+          return null;
+        }
+        if (property.getTarget() != null) {
           prefix = "_" + name;
-          joins.put("self." + name, prefix);
+          final String joinOn = "self." + name;
+          joins.put(joinOn, prefix);
+          if (fetch) {
+            fetches.add(joinOn);
+          }
           return prefix;
         }
       }
@@ -991,15 +1044,32 @@ public class Query<T extends Model> {
       return prefix + "." + variable;
     }
 
+    public String joinName(String name) {
+      return joinName(name, false);
+    }
+
+    public String joinFetchName(String name) {
+      return joinName(name, true);
+    }
+
+    public String fixSelect(String query) {
+      return hasCollection ? selectPattern.matcher(query).replaceFirst("$0DISTINCT ") : query;
+    }
+
     @Override
     public String toString() {
-      if (joins.size() == 0) return "";
-      List<String> joinItems = Lists.newArrayList();
-      for (String key : joins.keySet()) {
-        String val = joins.get(key);
-        joinItems.add("LEFT JOIN " + key + " " + val);
+      return toString(true);
+    }
+
+    public String toString(boolean fetch) {
+      if (joins.isEmpty()) return "";
+      final List<String> joinItems = new ArrayList<>();
+      for (final Entry<String, String> entry : joins.entrySet()) {
+        final String fetchString = fetch && fetches.contains(entry.getKey()) ? " FETCH" : "";
+        joinItems.add(
+            String.format("LEFT JOIN%s %s %s", fetchString, entry.getKey(), entry.getValue()));
       }
-      return " " + Joiner.on(" ").join(joinItems);
+      return " " + joinItems.stream().collect(Collectors.joining(" "));
     }
   }
 }

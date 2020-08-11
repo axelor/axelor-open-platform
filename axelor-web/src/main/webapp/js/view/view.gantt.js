@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -298,7 +298,8 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 
        if (schema.taskUser) {
          columns.push({name: "users", label: fields[schema.taskUser].title, align: "center", template: function (item) {
-          return byId(gantt.serverList("users"), item.user_id)}});
+          return byId(gantt.serverList("users"), item.user_id);
+         }});
        }
 
        var isTree = true;
@@ -311,7 +312,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
               return moment(item[fname], moment.ISO_8601, true).format("MM/DD/YYYY h:mm:ss");
             }
             return item.text;
-             }})
+             }});
          }
          else {
            columns.push({ name:field.name, label:field.title, tree:isTree,
@@ -324,7 +325,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
                }
                return "";
              }
-           })
+           });
          }
          isTree = false;
        });

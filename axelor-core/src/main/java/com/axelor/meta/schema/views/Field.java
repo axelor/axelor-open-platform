@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,6 +18,7 @@
 package com.axelor.meta.schema.views;
 
 import com.axelor.common.StringUtils;
+import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.MetaStore;
@@ -165,6 +166,12 @@ public class Field extends SimpleWidget {
 
   @XmlAttribute(name = "x-search-limit")
   private Integer searchLimit;
+
+  @XmlAttribute(name = "x-color-field")
+  private String colorField;
+
+  @XmlAttribute(name = "x-accept")
+  private String accept;
 
   @XmlAttribute(name = "x-json-model")
   private String jsonModel;
@@ -344,7 +351,23 @@ public class Field extends SimpleWidget {
         throw new RuntimeException("No such enum type found: " + typeName, e);
       }
     }
-    return MetaStore.getSelectionList(getSelection());
+
+    String selection = getSelection();
+    if (StringUtils.notBlank(selection)) {
+      return MetaStore.getSelectionList(getSelection());
+    }
+
+    String widget = getWidget();
+    if ("NavSelect".equals(widget) || "nav-select".equals(widget)) {
+      Class<?> targetClass = getTargetClass();
+      Integer limit = getLimit();
+      if (targetClass != null) {
+        return MetaStore.getSelectionList(
+            targetClass.asSubclass(Model.class), getOrderBy(), limit == null ? 40 : limit);
+      }
+    }
+
+    return null;
   }
 
   public void setSelection(String selection) {
@@ -516,6 +539,22 @@ public class Field extends SimpleWidget {
     this.searchLimit = searchLimit;
   }
 
+  public String getColorField() {
+    return colorField;
+  }
+
+  public void setColorField(String colorField) {
+    this.colorField = colorField;
+  }
+
+  public String getAccept() {
+    return accept;
+  }
+
+  public void setAccept(String accept) {
+    this.accept = accept;
+  }
+
   public String getJsonModel() {
     return jsonModel;
   }
@@ -617,16 +656,21 @@ public class Field extends SimpleWidget {
     this.summaryView = summaryView;
   }
 
-  private String getTargetModel() {
-    Mapper mapper = null;
+  private Class<?> getTargetClass() {
     try {
-      mapper = Mapper.of(Class.forName(this.getModel()));
-      return mapper.getProperty(getName()).getTarget().getName();
-    } catch (ClassNotFoundException e) {
+      Mapper mapper = Mapper.of(Class.forName(this.getModel()));
+      return mapper.getProperty(getName()).getTarget();
+    } catch (ClassNotFoundException | NullPointerException e) {
       return null;
-    } catch (NullPointerException e) {
     }
-    return null;
+  }
+
+  private String getTargetModel() {
+    try {
+      return getTargetClass().getName();
+    } catch (NullPointerException e) {
+      return null;
+    }
   }
 
   @XmlTransient

@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,6 +17,10 @@
  */
 package com.axelor.meta.schema.views;
 
+import static com.axelor.common.StringUtils.isBlank;
+
+import com.axelor.rpc.Request;
+import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -227,7 +231,22 @@ public class GridView extends AbstractView implements ExtendableView {
   }
 
   public Help getInlineHelp() {
-    return inlineHelp;
+    if (inlineHelp == null) {
+      return null;
+    }
+
+    if (isBlank(inlineHelp.getConditionToCheck())) {
+      return inlineHelp;
+    }
+
+    final String condition = inlineHelp.getConditionToCheck();
+    final Request request = Request.current();
+    if (request == null) {
+      return inlineHelp;
+    }
+
+    final ScriptHelper helper = request.getScriptHelper();
+    return helper.test(condition) ? inlineHelp : null;
   }
 
   public void setInlineHelp(Help inlineHelp) {

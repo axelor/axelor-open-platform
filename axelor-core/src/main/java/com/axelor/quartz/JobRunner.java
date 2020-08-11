@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,18 +18,31 @@
 package com.axelor.quartz;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.db.JPA;
+import com.axelor.event.Observes;
+import com.axelor.events.PreRequest;
+import com.axelor.events.qualifiers.EntityType;
 import com.axelor.i18n.I18n;
+import com.axelor.inject.Beans;
 import com.axelor.meta.CallMethod;
 import com.axelor.meta.db.MetaSchedule;
 import com.axelor.meta.db.MetaScheduleParam;
+import com.axelor.meta.db.repo.MetaScheduleRepository;
+import com.google.common.base.Preconditions;
+import com.google.common.primitives.Longs;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -47,7 +60,6 @@ import org.slf4j.LoggerFactory;
 public class JobRunner {
 
   private static Logger log = LoggerFactory.getLogger(JobRunner.class);
-  private static final String CONFIG_QUARTZ_ENABLE = "quartz.enable";
   private static final String META_SCHEDULE_QUERY =
       "SELECT DISTINCT self FROM MetaSchedule self LEFT JOIN FETCH self.params";
 
@@ -60,10 +72,12 @@ public class JobRunner {
     this.scheduler = scheduler;
   }
 
+  @CallMethod
   public boolean isEnabled() {
-    return AppSettings.get().getBoolean(CONFIG_QUARTZ_ENABLE, false);
+    return AppSettings.get().getBoolean(AvailableAppSettings.QUARTZ_ENABLE, false);
   }
 
+  /** Configure all schedulers. */
   private void configure() {
     if (total > 0) {
       return;
@@ -71,15 +85,17 @@ public class JobRunner {
     total = 0;
     log.info("Configuring scheduled jobs...");
 
-    JPA.em()
-        .createQuery(META_SCHEDULE_QUERY, MetaSchedule.class)
-        .getResultList()
-        .stream()
+    JPA.em().createQuery(META_SCHEDULE_QUERY, MetaSchedule.class).getResultList().stream()
         .forEach(this::configure);
 
     log.info("Configured total jobs: {}", total);
   }
 
+  /**
+   * Configure the given scheduler
+   *
+   * @param meta
+   */
   private void configure(MetaSchedule meta) {
 
     if (meta == null || meta.getActive() != Boolean.TRUE) {
@@ -143,21 +159,33 @@ public class JobRunner {
   }
 
   /**
-   * Validate the given cron string.
+   * Update the given scheduler.
    *
-   * @param cron the cron string to validate
+   * @param meta
+   * @throws SchedulerException
    */
-  @CallMethod
-  public void validate(String cron) {
-    try {
-      CronScheduleBuilder.cronSchedule(cron);
-    } catch (Exception e) {
-      throw new IllegalArgumentException(I18n.get("Invalid cron:") + " " + cron);
+  public void update(MetaSchedule meta) throws SchedulerException {
+    if (!isEnabled()) {
+      throw new IllegalStateException(I18n.get("The scheduler service is disabled."));
     }
+
+    Preconditions.checkNotNull(meta);
+
+    JobKey jobKey = new JobKey(meta.getName());
+    if (scheduler.checkExists(jobKey)) {
+      log.info("Deleting job: {}", meta.getName());
+      scheduler.deleteJob(jobKey);
+      total -= 1;
+    }
+
+    if (meta.getActive() != Boolean.TRUE) {
+      return;
+    }
+
+    configure(meta);
   }
 
   /** Start the scheduler. */
-  @CallMethod
   public void start() {
     if (!isEnabled()) {
       throw new IllegalStateException(I18n.get("The scheduler service is disabled."));
@@ -175,7 +203,6 @@ public class JobRunner {
   }
 
   /** Stop the scheduler. */
-  @CallMethod
   public void stop() {
     log.info("Stopping scheduler...");
     try {
@@ -188,7 +215,6 @@ public class JobRunner {
   }
 
   /** Reconfigure the scheduler and restart. */
-  @CallMethod
   public void restart() {
     try {
       scheduler.clear();
@@ -199,5 +225,35 @@ public class JobRunner {
     }
     total = 0;
     this.start();
+  }
+
+  public void onRemove(
+      @Observes @Named(PreRequest.REMOVE) @EntityType(MetaSchedule.class) PreRequest event) {
+
+    if (!isEnabled()) return;
+    try {
+      if (scheduler.isShutdown()) return;
+    } catch (SchedulerException e) {
+      // ignore
+    }
+
+    List<Object> records = new ArrayList<>();
+    if (event.getRequest().getRecords().isEmpty()) {
+      records.add(event.getRequest().getData());
+    } else {
+      records.addAll(event.getRequest().getRecords());
+    }
+
+    for (Object item : records) {
+      Long id =
+          item instanceof MetaSchedule
+              ? ((MetaSchedule) item).getId()
+              : Longs.tryParse(((Map<?, ?>) item).get("id").toString());
+      MetaSchedule record = Beans.get(MetaScheduleRepository.class).find(id);
+      if (record.getActive() == Boolean.TRUE) {
+        throw new IllegalStateException(
+            I18n.get("Cannot delete a task while scheduler is running..."));
+      }
+    }
   }
 }

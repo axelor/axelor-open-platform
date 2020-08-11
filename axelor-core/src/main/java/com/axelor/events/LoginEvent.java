@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -21,24 +21,24 @@ import org.apache.shiro.authc.AuthenticationToken;
 
 public abstract class LoginEvent {
 
-  private final String principal;
+  private final Object principal;
 
-  private final String credentials;
+  private final Object credentials;
 
   public LoginEvent(AuthenticationToken token) {
     Object credentials = token.getCredentials();
     if (credentials instanceof char[]) {
       credentials = new String((char[]) credentials);
     }
-    this.principal = (String) token.getPrincipal();
-    this.credentials = (String) credentials;
+    this.principal = token.getPrincipal();
+    this.credentials = credentials;
   }
 
-  public String getPrincipal() {
+  public Object getPrincipal() {
     return principal;
   }
 
-  public String getCredentials() {
+  public Object getCredentials() {
     return credentials;
   }
 }

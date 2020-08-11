@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,9 +18,14 @@
 package com.axelor.web.servlet;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.internal.AppFilter;
+import com.axelor.common.StringUtils;
+import com.google.common.collect.ImmutableList;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import javax.inject.Singleton;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -52,6 +57,8 @@ public class NoCacheFilter implements Filter {
     "*.jpg"
   };
 
+  private static final List<String> EXCLUDED_EXTS = ImmutableList.of(".jsp");
+
   private static final String CACHE_BUSTER_PARAM = "" + Calendar.getInstance().getTimeInMillis();
 
   private boolean production;
@@ -76,8 +83,16 @@ public class NoCacheFilter implements Filter {
       res.setHeader("Content-Encoding", "gzip");
     }
 
-    if (production && !busted) {
-      res.sendRedirect(uri + "?" + CACHE_BUSTER_PARAM);
+    if (production && !busted && EXCLUDED_EXTS.stream().noneMatch(uri::endsWith)) {
+      final StringBuilder requestUri = new StringBuilder(uri + "?" + CACHE_BUSTER_PARAM);
+      final String queryString = req.getQueryString();
+
+      if (StringUtils.notBlank(queryString)) {
+        requestUri.append("&").append(queryString);
+      }
+
+      res.sendRedirect(
+          URI.create(AppFilter.getBaseURL()).resolve(requestUri.toString()).toString());
       return;
     }
 

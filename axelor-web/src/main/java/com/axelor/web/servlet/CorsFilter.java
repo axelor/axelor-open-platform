@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -20,6 +20,7 @@ package com.axelor.web.servlet;
 import static com.axelor.common.StringUtils.isBlank;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import java.io.IOException;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -52,7 +53,7 @@ public class CorsFilter implements Filter {
   private static final String DEFAULT_CORS_ALLOW_CREDENTIALS = "true";
   private static final String DEFAULT_CORS_ALLOW_METHODS = "GET,PUT,POST,DELETE,HEAD,OPTIONS";
   private static final String DEFAULT_CORS_ALLOW_HEADERS =
-      "Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers";
+      "Origin,Accept,Authorization,X-Requested-With,X-CSRF-Token,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers";
   private static final String DEFAULT_EXPOSE_HEADERS = "";
   private static final String DEFAULT_CORS_MAX_AGE = "1728000";
 
@@ -72,12 +73,16 @@ public class CorsFilter implements Filter {
 
     final AppSettings settings = AppSettings.get();
 
-    corsAllowOrigin = settings.get("cors.allow.origin");
-    corsAllowCredentials = settings.get("cors.allow.credentials", DEFAULT_CORS_ALLOW_CREDENTIALS);
-    corsAllowMethods = settings.get("cors.allow.methods", DEFAULT_CORS_ALLOW_METHODS);
-    corsAllowHeaders = settings.get("cors.allow.headers", DEFAULT_CORS_ALLOW_HEADERS);
-    corsExposeHeaders = settings.get("cors.expose.headers", DEFAULT_EXPOSE_HEADERS);
-    corsMaxAge = settings.get("cors.max.age", DEFAULT_CORS_MAX_AGE);
+    corsAllowOrigin = settings.get(AvailableAppSettings.CORS_ALLOW_ORIGIN);
+    corsAllowCredentials =
+        settings.get(AvailableAppSettings.CORS_ALLOW_CREDENTIALS, DEFAULT_CORS_ALLOW_CREDENTIALS);
+    corsAllowMethods =
+        settings.get(AvailableAppSettings.CORS_ALLOW_METHODS, DEFAULT_CORS_ALLOW_METHODS);
+    corsAllowHeaders =
+        settings.get(AvailableAppSettings.CORS_ALLOW_HEADERS, DEFAULT_CORS_ALLOW_HEADERS);
+    corsExposeHeaders =
+        settings.get(AvailableAppSettings.CORS_EXPOSE_HEADERS, DEFAULT_EXPOSE_HEADERS);
+    corsMaxAge = settings.get(AvailableAppSettings.CORS_MAX_AGE, DEFAULT_CORS_MAX_AGE);
 
     if (isBlank(corsAllowOrigin)) {
       return;

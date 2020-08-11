@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -59,7 +59,7 @@ ui.formInput('JsonField', 'String', {
             v[item.targetName.substring(6)] = v[item.targetName];
           }
           return v;
-        }
+        };
       }
       if (item.contextField && item.contextFieldValue) {
         if (item.showIf === undefined && item.hideIf === undefined && item.hidden) {
@@ -130,7 +130,7 @@ ui.formInput('JsonField', 'String', {
     function onUpdate() {
       var rec = null;
       _.each(scope.record, function (v, k) {
-        if (k.indexOf('$') === 0 || v === null || v === undefined) return;
+        if (k.indexOf('$') === 0 || v === null || v === undefined || !_.trim(v)) return;
         if (_.isArray(v)) {
           if (v.length == 0) return;
           v = v.map(function (x) {
@@ -187,7 +187,7 @@ ui.formInput('JsonField', 'String', {
       if (rec) {
         scope.record = _.extend({}, scope.record, rec);
       }
-    }
+    };
 
     watchParent();
 
@@ -409,7 +409,7 @@ ui.formInput('JsonRefItem', 'ManyToOne', {
 
     scope.getValue = function () {
       return scope.record[name];
-    }
+    };
 
     var __setValue = scope.setValue;
 
@@ -417,7 +417,7 @@ ui.formInput('JsonRefItem', 'ManyToOne', {
       var val = _.pick(scope.record[name], 'model');
       val = _.extend(val, value);
       __setValue.call(scope, val);
-    }
+    };
 
     function doSelect() {
       var value = (scope.record || {})[name];

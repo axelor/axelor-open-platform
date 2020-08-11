@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -51,7 +51,7 @@ public class PublishSupport extends AbstractSupport {
                   task.dependsOn(JavaPlugin.COMPILE_JAVA_TASK_NAME);
                   task.from(main.getAllSource());
                   task.setManifest(jar.getManifest());
-                  task.setClassifier("sources");
+                  task.getArchiveClassifier().set("sources");
                 });
 
     final PublishingExtension publishing =

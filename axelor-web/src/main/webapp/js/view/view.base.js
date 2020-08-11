@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -620,11 +620,11 @@ ui.directive('uiViewCustomize', ['NavService', function(NavService) {
         var viewScope = (scope.selectedTab || {}).$viewScope;
         var view = viewScope && viewScope.schema;
         return view && view.modelId;
-      }
+      };
 
       scope.hasActionID = function () {
         return (scope.selectedTab || {}).actionId;
-      }
+      };
 
       scope.onShowView = function () {
         var id = scope.hasViewID();
@@ -638,7 +638,7 @@ ui.directive('uiViewCustomize', ['NavService', function(NavService) {
             vs.setEditable();
           }
         });
-      }
+      };
 
       scope.onShowModel = function () {
         var id = scope.hasModelID();
@@ -646,7 +646,7 @@ ui.directive('uiViewCustomize', ['NavService', function(NavService) {
           mode: "edit",
           state: id
         });
-      }
+      };
 
       scope.onShowAction = function () {
         var id = scope.hasActionID();
@@ -654,7 +654,7 @@ ui.directive('uiViewCustomize', ['NavService', function(NavService) {
           mode: "edit",
           state: id
         });
-      }
+      };
     },
     replace: true,
     template:

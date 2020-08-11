@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -119,25 +119,19 @@ public class TomcatServer {
     context.setUnpackWAR(false);
 
     // additional webapp resources
-    options
-        .getExtraResources()
-        .stream()
+    options.getExtraResources().stream()
         .map(Path::toFile)
         .map(dir -> new DirResourceSet(resources, "/", dir.getAbsolutePath(), "/"))
         .forEach(resources::addPostResources);
 
     // additional classes, should be search before libs
-    options
-        .getClasses()
-        .stream()
+    options.getClasses().stream()
         .map(Path::toFile)
         .map(dir -> new DirResourceSet(resources, "/WEB-INF/classes", dir.getAbsolutePath(), "/"))
         .forEach(resources::addPreResources);
 
     // additional libs
-    options
-        .getLibs()
-        .stream()
+    options.getLibs().stream()
         .map(Path::toFile)
         .map(
             file ->

@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -172,9 +172,24 @@ ui.directive('uiMailMessage', function () {
         scope.body = null;
       }
 
-      function format(value) {
+      function findField(name) {
+        if (scope.field && scope.field.target) {
+          return ((scope.field.viewer||{}).fields||{})[name]
+              || ((scope.field.editor||{}).fields||{})[name];
+        }
+        return (scope.viewItems || scope.fields || {})[name];
+      }
+
+      function format(item, value) {
         if (!value) {
           return value;
+        }
+        var field = findField(item.name);
+        if(field && ["many-to-many", "one-to-many", "many-to-one"].indexOf(field.type) === -1) {
+          var formatter = ui.formatters[field.type];
+          if (formatter) {
+            return formatter(field, value);
+          }
         }
         if (value === 'True') return _t('True');
         if (value === 'False') return _t('False');
@@ -185,19 +200,13 @@ ui.directive('uiMailMessage', function () {
           return moment(value).format("DD/MM/YYYY");
         }
         if (value === '0E-10') value = '0.000000000000';
-        if (/^\d+(\.\d+)?$/.test(value)) {
-          var dot = value.indexOf('.');
-          return dot > -1
-            ? ui.formatters.decimal({ scale: Math.min(4, value.length - dot - 1) }, value)
-            : ui.formatters.integer({}, value);
-        }
         return value;
       }
 
       if (body && body.tracks) {
         _.each(body.tracks, function (item) {
-          item.displayValue = item.displayValue || format(item.value);
-          item.oldDisplayValue = item.oldDisplayValue || format(item.oldValue);
+          item.displayValue = item.displayValue || format(item, item.value);
+          item.oldDisplayValue = item.oldDisplayValue || format(item, item.oldValue);
           if (item.oldDisplayValue !== undefined) {
             item.displayValue = item.oldDisplayValue + " &raquo; " + item.displayValue;
           }
@@ -587,7 +596,7 @@ ui.directive('uiMailFiles', [function () {
 
       scope.fileIcon = function (file) {
         return file.fileIcon || 'fa-paperclip';
-      }
+      };
     },
     replace: true,
     template:
@@ -724,7 +733,7 @@ ui.formInput('uiMailSelect', 'MultiSelect', {
 
   init: function (scope) {
     this._super.apply(this, arguments);
-    scope.isReadonly = function () { return false; }
+    scope.isReadonly = function () { return false; };
   },
 
   link_editable: function (scope, element, attrs, model) {
@@ -953,7 +962,7 @@ ui.formWidget('uiMailFollowers', {
     $scope.updateStatus = function() {
       var followers = $scope.followers || [];
       var found = _.find(followers, function (item) {
-        return item.$author && item.$author.code === axelor.config["user.login"]
+        return item.$author && item.$author.code === axelor.config["user.login"];
       });
       $scope.following = !!found;
     };
@@ -970,7 +979,7 @@ ui.formWidget('uiMailFollowers', {
         $scope.followers = res.data || [];
         $scope.updateStatus();
       });
-    };
+    }
 
     function findName() {
       var record = $scope.record || {};
@@ -1089,14 +1098,27 @@ ui.formWidget('PanelMail', {
       if (!author || !author.id) {
         return;
       }
-      NavService.openTab({
-        action: act || _.uniqueId('$act'),
-        model: model,
-        viewType: "form",
-        views: [{ type: "form", name: "user-info-form" }]
-      }, {
-        mode: "edit",
-        state: author.id
+
+      function openUserForm(name) {
+        NavService.openTab({
+          title: _t('User'),
+          action: act || _.uniqueId('$act'),
+          model: model,
+          viewType: "form",
+          views: [{ type: "form", name: name }]
+        }, {
+          mode: "edit",
+          state: author.id
+        });
+      };
+
+      ViewService.getMetaDef(model, {
+        type: 'form',
+        name: 'user-info-form'
+      }).then(function (meta) {
+        openUserForm('user-info-form');
+      },function () {
+        openUserForm('user-form');
       });
     };
 

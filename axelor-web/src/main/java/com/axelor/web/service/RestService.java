@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -20,6 +20,7 @@ package com.axelor.web.service;
 import static com.axelor.common.ObjectUtils.isEmpty;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
@@ -28,9 +29,9 @@ import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
-import com.axelor.db.Query;
 import com.axelor.db.Repository;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.db.mapper.Property;
 import com.axelor.dms.db.DMSFile;
 import com.axelor.inject.Beans;
 import com.axelor.mail.db.MailAddress;
@@ -41,6 +42,7 @@ import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.mail.service.MailService;
 import com.axelor.mail.web.MailController;
 import com.axelor.meta.MetaFiles;
+import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.db.repo.MetaFileRepository;
 import com.axelor.meta.service.MetaService;
@@ -49,6 +51,8 @@ import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
+import com.axelor.rpc.filter.Filter;
+import com.axelor.rpc.filter.JPQLFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Charsets;
@@ -56,20 +60,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import com.google.inject.servlet.RequestScoped;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -77,6 +73,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -190,24 +188,7 @@ public class RestService extends ResourceService {
     request.setModel(getModel());
     Response response = getResource().fetch(id, request);
 
-    long attachments =
-        Query.of(DMSFile.class)
-            .filter(
-                "self.id IN (SELECT x.id FROM DMSFile x "
-                    + "LEFT JOIN x.permissions x_permissions "
-                    + "LEFT JOIN x_permissions.group x_permissions_group "
-                    + "LEFT JOIN x_permissions.user x_permissions_user "
-                    + "WHERE x.relatedId = :id AND x.relatedModel = :model "
-                    + "AND COALESCE(x.isDirectory, FALSE) = FALSE "
-                    + "AND (x_permissions_group = :group OR x_permissions_user = :user "
-                    + "OR :isAdmin = TRUE))")
-            .bind("id", id)
-            .bind("model", getModel())
-            .bind("group", user.getGroup())
-            .bind("user", user)
-            .bind("isAdmin", AuthUtils.isAdmin(user))
-            .cacheable()
-            .count();
+    final long attachments = getAttachmentCount(id);
 
     if (response.getItem(0) != null) {
       @SuppressWarnings("all")
@@ -216,6 +197,22 @@ public class RestService extends ResourceService {
     }
 
     return response;
+  }
+
+  private long getAttachmentCount(long relatedId) {
+    final Filter securityFilter =
+        Beans.get(JpaSecurity.class).getFilter(JpaSecurity.CAN_READ, DMSFile.class);
+    final Filter filter =
+        new JPQLFilter(
+            "self.relatedModel = :relatedModel "
+                + "AND self.relatedId = :relatedId "
+                + "AND COALESCE(self.isDirectory, FALSE) = FALSE");
+    return (securityFilter != null ? Filter.and(securityFilter, filter) : filter)
+        .build(DMSFile.class)
+        .bind("relatedModel", getModel())
+        .bind("relatedId", relatedId)
+        .cacheable()
+        .count();
   }
 
   @POST
@@ -423,13 +420,34 @@ public class RestService extends ResourceService {
           final Class<? extends Model> parentClass =
               (Class<? extends Model>) Class.forName(parentModel);
           final Model parent = JpaRepository.of(parentClass).find(parentId);
+
           if (parent != null) {
-            for (final PropertyDescriptor propertyDescriptor :
-                Introspector.getBeanInfo(parentClass).getPropertyDescriptors()) {
-              final Method readMethod = propertyDescriptor.getReadMethod();
-              if (readMethod != null && klass.isAssignableFrom(readMethod.getReturnType())) {
-                final Model bean = (Model) readMethod.invoke(parent);
-                if (bean != null && bean.getId().equals(id)) {
+            final Mapper mapper = Mapper.of(parentClass);
+            final Context context = new Context(Mapper.toMap(parent), parentClass);
+
+            for (final Property property : mapper.getProperties()) {
+              if (property.isJson()) {
+                final Map<String, Object> jsonFields =
+                    MetaStore.findJsonFields(parentModel, property.getName());
+                for (final Entry<String, Object> entry : jsonFields.entrySet()) {
+                  final Map<String, Object> value = (Map<String, Object>) entry.getValue();
+                  if (value != null) {
+                    final String target = (String) value.get("target");
+                    if (target != null && MetaFile.class.isAssignableFrom(Class.forName(target))) {
+                      final MetaFile metaFile = (MetaFile) context.get(entry.getKey());
+                      if (metaFile != null && Objects.equals(metaFile.getId(), id)) {
+                        permittedByParent =
+                            Beans.get(JpaSecurity.class)
+                                .isPermitted(JpaSecurity.CAN_READ, parentClass, parentId);
+                        break;
+                      }
+                    }
+                  }
+                }
+              } else if (property.getTarget() != null
+                  && MetaFile.class.isAssignableFrom(property.getTarget())) {
+                final MetaFile metaFile = (MetaFile) context.get(property.getName());
+                if (metaFile != null && Objects.equals(metaFile.getId(), id)) {
                   permittedByParent =
                       Beans.get(JpaSecurity.class)
                           .isPermitted(JpaSecurity.CAN_READ, parentClass, parentId);
@@ -438,11 +456,7 @@ public class RestService extends ResourceService {
               }
             }
           }
-        } catch (ClassNotFoundException
-            | IntrospectionException
-            | IllegalAccessException
-            | IllegalArgumentException
-            | InvocationTargetException e) {
+        } catch (ClassNotFoundException e) {
           // Ignore
         }
       }
@@ -573,7 +587,8 @@ public class RestService extends ResourceService {
 
   static {
     try {
-      csvCharset = Charset.forName(AppSettings.get().get("data.export.encoding"));
+      csvCharset =
+          Charset.forName(AppSettings.get().get(AvailableAppSettings.DATA_EXPORT_ENCODING));
     } catch (Exception e) {
     }
   }
@@ -616,26 +631,10 @@ public class RestService extends ResourceService {
       return fail();
     }
 
-    final Response response = new Response();
-    final Map<String, Object> data = new HashMap<>();
-
     request.setModel(getModel());
     updateContext(request);
 
-    try {
-      final java.nio.file.Path tempFile = MetaFiles.createTempFile(null, ".csv");
-      try (final OutputStream os = new FileOutputStream(tempFile.toFile())) {
-        try (final Writer writer = new OutputStreamWriter(os, csvCharset)) {
-          data.put("exportSize", getResource().export(request, writer));
-        }
-      }
-      data.put("fileName", tempFile.toFile().getName());
-      response.setData(data);
-    } catch (IOException e) {
-      response.setException(e);
-    }
-
-    return response;
+    return getResource().export(request, csvCharset);
   }
 
   @GET

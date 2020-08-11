@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,6 +18,7 @@
 package com.axelor.quartz;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import java.util.Properties;
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -35,16 +36,19 @@ class SchedulerProvider implements Provider<Scheduler> {
 
   private static final String DEFAULT_THREAD_COUNT = "3";
 
-  private static final String THREAD_COUNT_GET = "quartz.threadCount";
   private static final String THREAD_COUNT_SET = "org.quartz.threadPool.threadCount";
 
   @Inject private GuiceJobFactory jobFactory;
+
+  @Inject private JobCleaner jobCleaner;
 
   @Override
   public Scheduler get() {
 
     Properties cfg = new Properties();
-    cfg.put(THREAD_COUNT_SET, AppSettings.get().get(THREAD_COUNT_GET, DEFAULT_THREAD_COUNT));
+    cfg.put(
+        THREAD_COUNT_SET,
+        AppSettings.get().get(AvailableAppSettings.QUARTZ_THREAD_COUNT, DEFAULT_THREAD_COUNT));
 
     Scheduler scheduler;
     SchedulerFactory schedulerFactory;
@@ -52,6 +56,7 @@ class SchedulerProvider implements Provider<Scheduler> {
       schedulerFactory = new GuiceSchedulerFactory(cfg);
       scheduler = schedulerFactory.getScheduler();
       scheduler.setJobFactory(jobFactory);
+      scheduler.getListenerManager().addJobListener(jobCleaner);
     } catch (SchedulerException e) {
       throw new RuntimeException(e);
     }

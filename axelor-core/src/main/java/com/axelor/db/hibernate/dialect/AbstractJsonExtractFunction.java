@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -20,6 +20,8 @@ package com.axelor.db.hibernate.dialect;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
+import javax.persistence.PersistenceException;
 import org.hibernate.QueryException;
 import org.hibernate.dialect.function.SQLFunction;
 import org.hibernate.engine.spi.Mapping;
@@ -27,6 +29,9 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.type.Type;
 
 public abstract class AbstractJsonExtractFunction implements SQLFunction {
+
+  private static final Pattern NAME_PATTERN = Pattern.compile("\\w+(\\.\\w+)*");
+  private static final Pattern ARGS_PATTERN = Pattern.compile("'\\w+'");
 
   private Type type;
 
@@ -73,6 +78,20 @@ public abstract class AbstractJsonExtractFunction implements SQLFunction {
     return func;
   }
 
+  private static String validateField(String name) {
+    if (NAME_PATTERN.matcher(name).matches()) {
+      return name;
+    }
+    throw new PersistenceException("Invalid field name: " + name);
+  }
+
+  private static String validateArg(String name) {
+    if (ARGS_PATTERN.matcher(name).matches()) {
+      return name;
+    }
+    throw new PersistenceException("Invalid json field: " + name);
+  }
+
   @Override
   @SuppressWarnings("rawtypes")
   public String render(Type firstArgumentType, List arguments, SessionFactoryImplementor factory) {
@@ -80,14 +99,14 @@ public abstract class AbstractJsonExtractFunction implements SQLFunction {
     final Iterator iter = arguments.iterator();
     final List<String> path = new ArrayList<>();
     buf.append(getName()).append("(");
-    buf.append(iter.next());
+    buf.append(validateField((String) iter.next()));
     while (iter.hasNext()) {
-      path.add((String) iter.next());
+      path.add(validateArg((String) iter.next()));
     }
     buf.append(", ");
     buf.append(transformPath(path));
     buf.append(")");
     final String func = transformFunction(buf.toString());
-    return cast == null ? func : String.format("cast(%s as %s)", func, cast);
+    return cast == null ? func : String.format("cast(nullif(%s, '') as %s)", func, cast);
   }
 }

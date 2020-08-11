@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -208,11 +208,17 @@ function FormViewCtrl($scope, $element) {
       }
     }
 
-    var page = ds.page(),
-      record = null;
+    var record = null;
 
-    if (page.index > -1) {
-      record = ds.at(page.index);
+    if (ds._record) {
+      record = ds._record;
+      delete ds._record;
+    } else {
+      var page = ds.page();
+
+      if (page.index > -1) {
+        record = ds.at(page.index);
+      }
     }
 
     routeId = record && record.id > 0 ? record.id : null;
@@ -240,12 +246,12 @@ function FormViewCtrl($scope, $element) {
   $scope.isForceEdit = function () {
     var params = this._viewParams || {};
     return params.forceEdit || (params.params && params.params.forceEdit);
-  }
+  };
 
   $scope.isForceReadonly = function () {
     var params = this._viewParams || {};
     return params.forceReadonly || (params.params && params.params.forceReadonly);
-  }
+  };
 
   $scope.isEditable = function() {
     return $scope.isForceEdit() || (editable && !$scope.isForceReadonly());
@@ -319,7 +325,7 @@ function FormViewCtrl($scope, $element) {
       locationChangeOff();
       locationChangeOff = null;
     }
-  }
+  };
 
   $scope.$locationChangeCheck = function () {
     $scope._viewPromise.then(function () {
@@ -381,7 +387,7 @@ function FormViewCtrl($scope, $element) {
         $scope.ajaxStop(function(){
           var handler = $scope.$events.onLoad,
             record = $scope.record;
-          if (handler && !ds.equals({}, record)) {
+          if (handler && !ds.equals({}, record) && record.id) {
             setTimeout(handler);
           }
         });
@@ -415,9 +421,13 @@ function FormViewCtrl($scope, $element) {
     });
   };
 
+  $scope.getContextRecord = function() {
+    return _.extend({}, $scope._routeSearch, $scope.record);
+  };
+
   $scope.getContext = function() {
     var dummy = $scope.getDummyValues();
-    var context = _.extend({}, $scope._routeSearch, $scope.record);
+    var context = $scope.getContextRecord();
     if ($scope.$parent && $scope.$parent.getContext) {
       context._parent = $scope.$parent.getContext();
     } else {
@@ -441,7 +451,7 @@ function FormViewCtrl($scope, $element) {
   };
 
   $scope.isDirty = function() {
-    $scope.$$dirty = $scope.$$disableDirtyCheck ? false : $scope.$$dirtyGrids.length > 0 || !ds.equals($scope.record, $scope.$$original);
+    $scope.$$dirty = $scope.$$disableDirtyCheck ? false : !ds.equals($scope.record, $scope.$$original);
     return $scope.$$dirty;
   };
 
@@ -842,7 +852,7 @@ function FormViewCtrl($scope, $element) {
       ds.removeAll([record]).success(function(records, page){
         if ($scope.switchBack() === false) {
           $scope.onNew();
-        };
+        }
       });
     });
   };
@@ -884,7 +894,7 @@ function FormViewCtrl($scope, $element) {
   $scope.onBack = function() {
     var record = $scope.record || {};
     var editable = $scope.isEditable();
-
+    $scope.$broadcast("cancel:grid-edit");
     if (record.id && editable && $scope.canEdit()) {
       $scope.setEditable(false);
       return;

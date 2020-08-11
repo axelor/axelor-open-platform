@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -94,7 +94,7 @@ function DMSFileListCtrl($scope, $element, NavService) {
   $scope.$confirmMessage = function() {
     var strong = function (text, quote) {
       return "<strong>" + (quote ? "<em>\"" + text + "\"</em>" : text) + "</strong>";
-    }
+    };
     var all = getSelectedAll();
     if (all.length === 1 || $scope.currentFolder) {
       var doc = _.first(all) || $scope.currentFolder;
@@ -881,15 +881,16 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
 
       function sendChunk() {
         xhr.open("POST", "ws/files/upload", true);
-            xhr.overrideMimeType("application/octet-stream");
-            xhr.setRequestHeader("Content-Type", "application/octet-stream");
+        xhr.overrideMimeType("application/octet-stream");
+        xhr.setRequestHeader("Content-Type", "application/octet-stream");
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xhr.setRequestHeader($http.defaults.xsrfHeaderName, axelor.readCookie($http.defaults.xsrfCookieName));
 
         if (info.uuid) {
           xhr.setRequestHeader("X-File-Id", info.uuid);
         }
 
-        xhr.setRequestHeader("X-File-Name", file.name);
+        xhr.setRequestHeader("X-File-Name", encodeURIComponent(file.name));
         xhr.setRequestHeader("X-File-Type", file.type);
         xhr.setRequestHeader("X-File-Size", file.size);
         xhr.setRequestHeader("X-File-Offset", info._start);
@@ -1193,7 +1194,7 @@ ui.directive("uiDmsFolders", function () {
       scope._dataSource.on("on:remove", function (e, records) {
         var ids = _.pluck(records, 'id');
         records
-          .filter(function (record) { return record.id in scope.folders })
+          .filter(function (record) { return record.id in scope.folders; })
           .forEach(function (record) {
             var found = scope.folders[record.id];
             var parent = scope.folders[(found.parent||{}).id] || _.first(scope.rootFolders);

@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -243,6 +243,43 @@ function getButtons(scope, element) {
   };
 }
 
+function getShell(scope, textElement) {
+  textElement.wysiwyg({
+    toolbar: 'top',
+    buttons: getButtons(scope, textElement),
+    submit: {
+              title: _t('Submit'),
+              image: '\uf00c'
+          },
+          selectImage: _t('Click or drop image'),
+          placeholderUrl: 'www.example.com',
+          maxImageSize: [600, 200],
+    hijackContextmenu: false,
+    onKeyPress: function(key, character, shiftKey, altKey, ctrlKey, metaKey) {
+      if (key !== 13 || shiftKey) {
+        return;
+      }
+
+      function findParagraph(node) {
+        function isParagraph(node) {
+          return node && /^DIV|^P|^LI|^H[1-7]/.test(node.nodeName.toUpperCase());
+        }
+        if (!node) return null;
+        if (node.classList && node.classList.contains('wysiwyg-editor')) return null;
+        if (isParagraph(node)) return node;
+        return findParagraph(node.parentNode);
+      }
+
+      var parent = findParagraph(document.getSelection().anchorNode);
+      if (!parent) {
+        document.execCommand('formatBlock', false, '<p>');
+      }
+    }
+  });
+
+  return textElement.wysiwyg('shell');
+}
+
 ui.formInput('Html', {
 
   css: "html-item",
@@ -258,7 +295,6 @@ ui.formInput('Html', {
   link_editable: function(scope, element, attrs, model) {
     this._super(scope, element, attrs, model);
     var textElement = element.find('textarea');
-    var buttons = getButtons(scope, textElement);
 
     var props = scope.field,
       minSize = +props.minSize,
@@ -269,40 +305,7 @@ ui.formInput('Html', {
       height = Math.max(100, height);
     }
 
-    function isParagraph(node) {
-      return node && /^DIV|^P|^LI|^H[1-7]/.test(node.nodeName.toUpperCase());
-    }
-
-    function findParagraph(node) {
-      if (!node) return null;
-      if (node.classList && node.classList.contains('wysiwyg-editor')) return null;
-      if (isParagraph(node)) return node;
-      return findParagraph(node.parentNode);
-    }
-
-    textElement.wysiwyg({
-      toolbar: 'top',
-      buttons: buttons,
-      submit: {
-                title: _t('Submit'),
-                image: '\uf00c'
-            },
-            selectImage: _t('Click or drop image'),
-            placeholderUrl: 'www.example.com',
-            maxImageSize: [600, 200],
-      hijackContextmenu: false,
-      onKeyPress: function(key, character, shiftKey, altKey, ctrlKey, metaKey) {
-        if (key !== 13 || shiftKey) {
-          return;
-        }
-          var parent = findParagraph(document.getSelection().anchorNode);
-          if (!parent) {
-            document.execCommand('formatBlock', false, '<p>');
-          }
-      }
-    });
-
-    var shell = textElement.wysiwyg('shell');
+    var shell = getShell(scope, textElement);
     var shellElement = $(shell.getElement());
     var shellActive = true;
 
@@ -320,8 +323,9 @@ ui.formInput('Html', {
     function onChange(e) {
 
       var value = shellActive ? shell.getHTML() : textElement.val();
+      var text = (value || '').trim()
 
-      if (value && value.trim() === '<br>') {
+      if (text === '<p><br></p>' || text === '<br>') {
         value = null;
       }
 
@@ -447,6 +451,127 @@ ui.formInput('Html', {
 
 });
 
+ui.formInput('HtmlInline', 'Text', {
+  css: 'text-item-inline',
+  link_editable: function(scope, element, attrs, model) {
+    this._super.apply(this, arguments);
+
+    var field = scope.field;
+    var picker = element;
+    var input = picker.children('input');
+
+    var container = null;
+    var wrapper = $('<div class="slick-editor-dropdown textarea html">').css("position", "absolute").hide();
+    var textarea = $('<textarea>').appendTo(wrapper);
+    var shell = getShell(scope, textarea);
+    var shellElement = $(shell.getElement());
+    wrapper.resizable();
+
+    scope.waitForActions(function() {
+      container = element.parents('.ui-dialog-content,.view-container').first();
+      wrapper.height(field.height || 175).appendTo(container);
+    });
+
+    var dropdownVisible = false;
+
+    function adjust() {
+      if (!wrapper.is(":visible"))
+        return;
+      if (axelor.device.small) {
+        dropdownVisible = false;
+        return wrapper.hide();
+      }
+      setTimeout(function() {
+        wrapper.position({
+          my: "left top",
+          at: "left bottom",
+          of: picker,
+          within: container
+        })
+        .zIndex(element.zIndex() + 1)
+        .width(element.width())
+        .css({
+          "min-width": Math.max(element.width(), 322)
+        });
+      });
+    }
+
+    function onMouseDown(e) {
+      if (element.is(':hidden')) {
+        return;
+      }
+      var all = element.add(wrapper);
+      var elem = $(e.target);
+      if (all.is(elem) || all.has(elem).length > 0) return;
+      if (elem.zIndex() > element.parents('.slick-form:first,.slickgrid:first').zIndex()) return;
+      if (elem.parents(".ui-dialog:first").zIndex() > element.parents('.slickgrid:first').zIndex()) return;
+
+      element.trigger('hide:slick-editor');
+    }
+
+    function showPopup(show) {
+      dropdownVisible = !!show;
+      if (dropdownVisible) {
+        $(document).on('mousedown', onMouseDown);
+        shell.setHTML(scope.getValue() || '');
+        wrapper.show().css('display', 'flex');
+        adjust();
+        setTimeout(function () {
+          shellElement.focus();
+        });
+      } else {
+        $(document).off('mousedown', onMouseDown);
+        wrapper.hide();
+        setTimeout(function () {
+          input.focus();
+        });
+      }
+    }
+
+    scope.togglePopup = function () {
+      showPopup(!dropdownVisible);
+    };
+
+    element.on("hide:slick-editor", function(e) {
+      showPopup(false);
+    });
+
+    input.on('keydown', function (e) {
+      if (e.keyCode === 40 && e.ctrlKey) { // down key
+        showPopup(true);
+      }
+    });
+
+    shellElement.on('blur', function () {
+      scope.setValue(shell.getHTML(), true);
+    });
+
+    shellElement.on('keydown', function (e) {
+      if (e.keyCode === 9) { // tab key
+        e.preventDefault();
+        showPopup(false);
+      }
+    });
+
+    scope.$watch(attrs.ngModel, function textModelWatch(value) {
+      var value = $('<div/>').html(value).text();
+      input.val(value);
+    });
+
+    scope.$on("$destroy", function(e){
+      wrapper.remove();
+      $(document).off('mousedown', onMouseDown);
+    });
+  },
+  template_editable:
+      "<span class='picker-input picker-icons-1'>" +
+        "<input type='text' readonly>" +
+        "<span class='picker-icons'>" +
+          "<i class='fa fa-pencil' title='{{ \"Edit\" | t }}' ng-click='togglePopup()'></i>" +
+        "</span>" +
+      "</span>"
+});
+
 ui.directive('uiBindTemplate', ['$interpolate', function($interpolate){
 
   function expand(scope, template) {
@@ -469,7 +594,7 @@ ui.directive('uiBindTemplate', ['$interpolate', function($interpolate){
 
       function update() {
         var output = expand(scope, template) || "";
-        element.html(output);
+        element.html(axelor.sanitize(output));
       }
 
       scope.$watch("text", function(text, old) {

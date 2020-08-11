@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,6 +18,7 @@
 package com.axelor.db;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuditInterceptor;
 import com.axelor.common.StringUtils;
 import com.axelor.db.hibernate.dialect.CustomDialectResolver;
@@ -116,20 +117,19 @@ public class JpaModule extends AbstractModule {
     properties.put(Environment.DIALECT_RESOLVERS, CustomDialectResolver.class.getName());
 
     properties.put(Environment.AUTOCOMMIT, "false");
-    properties.put(Environment.CONNECTION_PROVIDER_DISABLES_AUTOCOMMIT, "true");
     properties.put(Environment.MAX_FETCH_DEPTH, "3");
 
-    // Use HikariCP as default pool provider
-    properties.put(Environment.CONNECTION_PROVIDER, HikariCPConnectionProvider.class.getName());
-    properties.put("hibernate.hikari.minimumIdle", "5");
-    properties.put("hibernate.hikari.maximumPoolSize", "20");
-    properties.put("hibernate.hikari.idleTimeout", "300000");
+    if (!DBHelper.isDataSourceUsed()) {
+      // Use HikariCP as default pool provider
+      properties.put(Environment.CONNECTION_PROVIDER, HikariCPConnectionProvider.class.getName());
+      properties.put(Environment.CONNECTION_PROVIDER_DISABLES_AUTOCOMMIT, "true");
+      properties.put(AvailableAppSettings.HIBERNATE_HIKARI_MINIMUN_IDLE, "5");
+      properties.put(AvailableAppSettings.HIBERNATE_HIKARI_MAXIMUN_POOL_SIZE, "20");
+      properties.put(AvailableAppSettings.HIBERNATE_HIKARI_IDLE_TIMEOUT, "300000");
+    }
 
     // update properties with all hibernate.* settings from app configuration
-    settings
-        .getProperties()
-        .stringPropertyNames()
-        .stream()
+    settings.getProperties().stringPropertyNames().stream()
         .filter(n -> n.startsWith("hibernate."))
         .forEach(n -> properties.put(n, settings.get(n)));
 
@@ -183,8 +183,8 @@ public class JpaModule extends AbstractModule {
     properties.put(Environment.USE_SECOND_LEVEL_CACHE, "true");
     properties.put(Environment.USE_QUERY_CACHE, "true");
 
-    final String jcacheProvider = settings.get(JCacheRegionFactory.PROVIDER);
-    final String jcacheConfig = settings.get(JCacheRegionFactory.CONFIG_URI);
+    final String jcacheProvider = settings.get(AvailableAppSettings.HIBERNATE_JAVAX_CACHE_PROVIDER);
+    final String jcacheConfig = settings.get(AvailableAppSettings.HIBERNATE_JAVAX_CACHE_URI);
 
     if (jcacheProvider != null) {
       // use jcache
@@ -211,16 +211,21 @@ public class JpaModule extends AbstractModule {
     // hibernate-search support
     if (!SearchModule.isEnabled()) {
       properties.put(org.hibernate.search.cfg.Environment.AUTOREGISTER_LISTENERS, "false");
-      properties.remove(SearchModule.CONFIG_DIRECTORY_PROVIDER);
+      properties.remove(AvailableAppSettings.HIBERNATE_SEARCH_DEFAULT_DIRECTORY_PROVIDER);
     } else {
-      if (properties.getProperty(SearchModule.CONFIG_DIRECTORY_PROVIDER) == null) {
+      if (properties.getProperty(AvailableAppSettings.HIBERNATE_SEARCH_DEFAULT_DIRECTORY_PROVIDER)
+          == null) {
         properties.setProperty(
-            SearchModule.CONFIG_DIRECTORY_PROVIDER, SearchModule.DEFAULT_DIRECTORY_PROVIDER);
+            AvailableAppSettings.HIBERNATE_SEARCH_DEFAULT_DIRECTORY_PROVIDER,
+            SearchModule.DEFAULT_DIRECTORY_PROVIDER);
       }
-      if (properties.getProperty(SearchModule.CONFIG_INDEX_BASE) == null) {
+      if (properties.getProperty(AvailableAppSettings.HIBERNATE_SEARCH_DEFAULT_INDEX_BASE)
+          == null) {
         properties.setProperty(
-            SearchModule.CONFIG_INDEX_BASE,
-            settings.getPath(SearchModule.CONFIG_INDEX_BASE, SearchModule.DEFAULT_INDEX_BASE));
+            AvailableAppSettings.HIBERNATE_SEARCH_DEFAULT_INDEX_BASE,
+            settings.getPath(
+                AvailableAppSettings.HIBERNATE_SEARCH_DEFAULT_INDEX_BASE,
+                SearchModule.DEFAULT_INDEX_BASE));
       }
       properties.put(
           org.hibernate.search.cfg.Environment.MODEL_MAPPING, SearchMappingFactory.class.getName());

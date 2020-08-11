@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -24,9 +24,10 @@ import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
-import com.axelor.db.JpaRepository;
+import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
@@ -60,6 +61,8 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
+import com.axelor.rpc.filter.Filter;
+import com.axelor.rpc.filter.JPQLFilter;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
@@ -68,6 +71,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -79,8 +83,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import org.hibernate.query.internal.AbstractProducedQuery;
-import org.hibernate.transform.AliasToEntityMapResultTransformer;
+import org.hibernate.transform.BasicTransformerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,7 +136,7 @@ public class MetaService {
     return helper.test(condition);
   }
 
-  private List<MenuItem> filter(List<MenuItem> items) {
+  private List<MenuItem> filter(Collection<MenuItem> items) {
 
     final Map<String, MenuItem> map = new LinkedHashMap<>();
     final Set<String> visited = new HashSet<>();
@@ -216,15 +219,28 @@ public class MetaService {
       request.setModel(action.getModel());
       request.setData(new HashMap<String, Object>());
       try {
+        final JpaSecurity security = Beans.get(JpaSecurity.class);
+        final List<Filter> filters = new ArrayList<>();
+        final Class<? extends Model> modelClass = (Class<? extends Model>) request.getBeanClass();
+        final Filter securityFilter = security.getFilter(JpaSecurity.CAN_READ, modelClass);
+        if (securityFilter != null) {
+          filters.add(securityFilter);
+        } else if (!security.isPermitted(JpaSecurity.CAN_READ, modelClass)) {
+          return null;
+        }
         final Map<String, Object> data =
             (Map) ((Map) actionExecutor.execute(request).getItem(0)).get("view");
-        final Map<String, Object> context = (Map) data.get("context");
+        final Map<String, Object> params = (Map<String, Object>) data.get("params");
+        if (params == null || !Boolean.TRUE.equals(params.get("showArchived"))) {
+          filters.add(new JPQLFilter("self.archived IS NULL OR self.archived = FALSE"));
+        }
         final String domain = (String) data.get("domain");
-        final JpaRepository<?> repo = JpaRepository.of((Class) request.getBeanClass());
-        return ""
-            + (domain == null
-                ? repo.all().count()
-                : repo.all().filter(domain).bind(context).count());
+        if (StringUtils.notBlank(domain)) {
+          filters.add(JPQLFilter.forDomain(domain));
+        }
+        final Filter filter = Filter.and(filters);
+        final Map<String, Object> context = (Map) data.get("context");
+        return String.valueOf(filter.build(modelClass).bind(context).count());
       } catch (Exception e) {
         LOG.error("Unable to read tag for menu: {}", item.getName());
         LOG.trace("Error", e);
@@ -235,6 +251,10 @@ public class MetaService {
   }
 
   public List<MenuItem> getMenus(boolean withTagsOnly) {
+    return getMenus(withTagsOnly, false, Collections.emptyList());
+  }
+
+  public List<MenuItem> getMenus(boolean withTagsOnly, boolean inNamesOnly, List<String> names) {
 
     // make sure to apply hot updates
     if (!withTagsOnly) {
@@ -281,21 +301,36 @@ public class MetaService {
       }
     }
 
-    final StringBuilder queryString =
-        new StringBuilder()
-            .append("SELECT self FROM MetaMenu self ")
-            .append("LEFT JOIN FETCH self.action ")
-            .append("LEFT JOIN FETCH self.parent ")
-            .append(withTagsOnly ? "WHERE (self.tag IS NOT NULL OR self.tagGet IS NOT NULL) " : "")
-            .append(" ORDER BY COALESCE(self.priority, 0) DESC, self.id");
+    final List<MetaMenu> queryResults;
 
-    final TypedQuery<MetaMenu> query = JPA.em().createQuery(queryString.toString(), MetaMenu.class);
-    QueryBinder.of(query).setCacheable();
+    if (inNamesOnly && ObjectUtils.isEmpty(names)) {
+      queryResults = Collections.emptyList();
+    } else {
+      final StringBuilder queryString =
+          new StringBuilder()
+              .append("SELECT self FROM MetaMenu self ")
+              .append("LEFT JOIN FETCH self.action ")
+              .append("LEFT JOIN FETCH self.parent");
+      if (withTagsOnly) {
+        queryString.append(
+            " WHERE (self.tag IS NOT NULL OR self.tagGet IS NOT NULL OR self.tagCount IS NOT NULL)");
+      }
+      if (inNamesOnly) {
+        queryString.append(withTagsOnly ? " AND" : " WHERE");
+        queryString.append(" self.name IN :names");
+      }
+      queryString.append(" ORDER BY COALESCE(self.priority, 0) DESC, self.id");
 
-    final List<MenuItem> menus = new ArrayList<>();
+      final TypedQuery<MetaMenu> query =
+          JPA.em().createQuery(queryString.toString(), MetaMenu.class);
+      QueryBinder.of(query).setCacheable().bind("names", names);
+      queryResults = query.getResultList();
+    }
+
+    final Map<MenuItem, MetaMenu> menus = new LinkedHashMap<>();
     final List<MetaMenu> records = new ArrayList<>();
 
-    for (MetaMenu menu : query.getResultList()) {
+    for (MetaMenu menu : queryResults) {
       records.add(menu);
       while (withTagsOnly && menu.getParent() != null) {
         // need to get parents to check visibility
@@ -363,7 +398,6 @@ public class MetaService {
       item.setTitle(menu.getTitle());
       item.setIcon(menu.getIcon());
       item.setIconBackground(menu.getIconBackground());
-      item.setTag(getTag(menu));
       item.setTagStyle(menu.getTagStyle());
       item.setTop(menu.getTop());
       item.setLeft(menu.getLeft());
@@ -384,10 +418,13 @@ public class MetaService {
         item.setAction(menu.getAction().getName());
       }
 
-      menus.add(item);
+      menus.put(item, menu);
     }
 
-    return filter(menus);
+    final List<MenuItem> items = filter(menus.keySet());
+    items.forEach(item -> item.setTag(getTag(menus.get(item))));
+
+    return items;
   }
 
   @SuppressWarnings("unchecked")
@@ -731,6 +768,7 @@ public class MetaService {
       map.put("groupBy", cs.getGroupBy());
       map.put("aggregate", cs.getAggregate());
       map.put("title", cs.getLocalizedTitle());
+      map.put("scale", cs.getScale());
       series.add(map);
     }
 
@@ -826,9 +864,25 @@ public class MetaService {
     return response;
   }
 
+  @SuppressWarnings("deprecation")
   private void transformQueryResult(Query query) {
     // TODO: fix deprecation when new transformer api is implemented in hibernate
-    ((AbstractProducedQuery<?>) query)
-        .setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+    query.unwrap(org.hibernate.query.Query.class).setResultTransformer(new DataSetTransformer());
+  }
+
+  @SuppressWarnings("serial")
+  private static final class DataSetTransformer extends BasicTransformerAdapter {
+
+    @Override
+    public Object transformTuple(Object[] tuple, String[] aliases) {
+      Map<String, Object> result = new LinkedHashMap<>(tuple.length);
+      for (int i = 0; i < tuple.length; ++i) {
+        String alias = aliases[i];
+        if (alias != null) {
+          result.put(alias, tuple[i]);
+        }
+      }
+      return result;
+    }
   }
 }

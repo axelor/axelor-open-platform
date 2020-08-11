@@ -1,7 +1,7 @@
 /**
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -178,4 +178,27 @@ body > footer > p a:visited {
 
 .alert h4 {
   margin-bottom: 8px;
+}
+
+#social-buttons {
+  display: flex;
+  flex-direction: column;
+  padding: 18px 22px;
+}
+
+#social-buttons button {
+  display: flex;
+  flex: 1;
+  padding: 8px 10px;
+  font-weight: 600;
+  margin: 4px 0;
+}
+
+#social-buttons .social-logo {
+  height: 18px;
+  width: 18px;
+}
+
+#social-buttons .social-title {
+  padding-left: 8px;
 }

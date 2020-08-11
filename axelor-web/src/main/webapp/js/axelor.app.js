@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -49,7 +49,7 @@
     }, 500);
   }
 
-  function onHttpStart(data, headersGetter) {
+  function onHttpStart() {
 
     updateLoadingCounter(1);
 
@@ -69,7 +69,6 @@
         }).appendTo('body');
     }
     loadingElem.show();
-    return data;
   }
 
   function onHttpStop() {
@@ -165,7 +164,7 @@
       if (value) {
         return angular.fromJson(value);
       }
-    }
+    };
 
     evalScope.$readonly = scope.isReadonly ? _.bind(scope.isReadonly, scope) : angular.noop;
     evalScope.$required = scope.isRequired ? _.bind(scope.isRequired, scope) : angular.noop;
@@ -255,9 +254,10 @@
       }
 
     provider.interceptors.push('httpIndicator');
-    provider.defaults.transformRequest.push(onHttpStart);
     provider.defaults.transformRequest.unshift(transformRequest);
     provider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
+    provider.defaults.xsrfCookieName = 'CSRF-TOKEN';
+    provider.defaults.xsrfHeaderName = 'X-CSRF-Token';
     provider.useApplyAsync(true);
   }]);
 
@@ -346,20 +346,45 @@
       return unblock();
     };
 
+    function notSilent(config) {
+      return config && !config.silent;
+    }
+
     return {
+      request: function(config) {
+        if (notSilent(config)) {
+          onHttpStart();
+        }
+        return config;
+      },
       response: function(response) {
-        if (!response.config || !response.config.silent) {
+        if (notSilent(response.config)) {
           onHttpStop();
         }
-        if (response.data && response.data.status === -1) {
-          $rootScope.$broadcast('event:http-error', response.data);
-          return $q.reject(response);
+        if (response.data) {
+          if (response.data.status === -1) { // STATUS_FAILURE
+            if (notSilent(response.config)) $rootScope.$broadcast('event:http-error', response.data);
+            return $q.reject(response);
+          }
+          if (response.data.status === -7) { // STATUS_LOGIN_REQUIRED
+            if (axelor.config['auth.central.client']) {
+              // redirect to central login page
+              window.location.href = './?client_name=' + axelor.config['auth.central.client']
+                + "&hash_location=" + encodeURIComponent(window.location.hash);
+            } else if (notSilent(response.config)) {
+              // ajax login
+              $rootScope.$broadcast('event:auth-loginRequired', response.data);
+            }
+            return $q.reject(response);
+          }
         }
         return response;
       },
       responseError: function(error) {
-        onHttpStop();
-        $rootScope.$broadcast('event:http-error', error);
+        if (notSilent(error.config)) {
+          onHttpStop();
+          $rootScope.$broadcast('event:http-error', error);
+        }
         return $q.reject(error);
       }
     };
@@ -568,7 +593,7 @@
 
       var last = axelor.config["user.login"];
 
-      $http.post('login.jsp', data).then(function(response){
+      $http.post('callback', data).then(function(response){
         authService.loginConfirmed();
         $('#loginWindow form input').val('');
         $('#loginWindow .alert').hide();
@@ -600,8 +625,14 @@
       var message = _t("Internal Server Error"),
         report = data.data || data, stacktrace = null, cause = null, exception;
 
-      if (report.popup && report.message) {
-        return axelor.dialogs.box(report.message, {
+      // unauthorized errors are handled separately
+      if (data.status === 401) {
+        return;
+      }
+
+      if (report.popup) {
+        message = report.message || _t('A server error occurred. Please contact the administrator.');
+        return axelor.dialogs.box(message, {
           title: report.title
         });
       } else if (report.stacktrace) {

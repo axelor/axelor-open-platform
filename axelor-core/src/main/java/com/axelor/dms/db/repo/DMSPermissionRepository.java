@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -336,8 +336,7 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
 
       while (!(results = query.fetch(DBHelper.getJdbcFetchSize(), offset)).isEmpty()) {
         processor.accept(results);
-        results
-            .stream()
+        results.stream()
             .filter(DMSFile::getIsDirectory)
             .map(DMSFile::getId)
             .forEach(parentIds::add);
@@ -350,9 +349,7 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
 
   private Stream<DMSPermission> filterPermission(
       List<DMSPermission> permissions, DMSPermission basePermission) {
-    return Optional.ofNullable(permissions)
-        .orElse(Collections.emptyList())
-        .stream()
+    return Optional.ofNullable(permissions).orElse(Collections.emptyList()).stream()
         .filter(
             permission ->
                 permission.getUser() != null

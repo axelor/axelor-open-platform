@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -36,8 +36,8 @@ public class TestLoader extends AbstractTest {
         "<form name=\"some-name\" title=\"Some Name\" model=\"com.axelor.test.db.Contact\">"
             + "<field name=\"some\"/>"
             + "<group title=\"Group\" colSpan=\"4\" cols=\"3\" colWidths=\"33%,33%,33%\">"
-            + "<button name=\"button1\" title=\"Click 1\"/>"
-            + "<button name=\"button2\" title=\"Click 2\"/>"
+            + "<button name=\"button1\" title=\"Click 1\" onClick=\"action.button1\"/>"
+            + "<button name=\"button2\" title=\"Click 2\" onClick=\"action.button2\"/>"
             + "</group>"
             + "<field name=\"other\"/>"
             + "</form>";

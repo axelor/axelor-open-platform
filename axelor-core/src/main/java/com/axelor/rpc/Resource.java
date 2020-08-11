@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -20,6 +20,7 @@ package com.axelor.rpc;
 import static com.axelor.common.StringUtils.isBlank;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
@@ -50,6 +51,7 @@ import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.i18n.L10n;
 import com.axelor.inject.Beans;
+import com.axelor.meta.MetaFiles;
 import com.axelor.meta.MetaPermissions;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaAction;
@@ -69,11 +71,15 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.inject.TypeLiteral;
 import com.google.inject.persist.Transactional;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -397,7 +403,11 @@ public class Resource<T extends Model> {
       security.get().check(JpaSecurity.CAN_READ, model);
     }
 
-    LOG.debug("Searching '{}' with {}", model.getCanonicalName(), request.getData());
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Searching '{}' with {}", model.getCanonicalName(), request.getData());
+    } else {
+      LOG.debug("Searching '{}'", model.getCanonicalName());
+    }
 
     firePreRequestEvent(RequestEvent.SEARCH, request);
 
@@ -406,7 +416,7 @@ public class Resource<T extends Model> {
     int offset = request.getOffset();
     int limit = request.getLimit();
 
-    Query<?> query = getSearchQuery(request, check ? filter : null).cacheable().readOnly();
+    Query<?> query = getSearchQuery(request, check ? filter : null).readOnly();
     List<?> data = null;
     try {
       if (limit > 0) {
@@ -513,7 +523,7 @@ public class Resource<T extends Model> {
     javax.persistence.Query q = JPA.em().createQuery(builder.toString());
     q.setParameter("ids", ids);
 
-    QueryBinder.of(q).setCacheable().setReadOnly();
+    QueryBinder.of(q).setReadOnly();
 
     Map counts = Maps.newHashMap();
     for (Object item : q.getResultList()) {
@@ -529,17 +539,46 @@ public class Resource<T extends Model> {
   private static final int DEFAULT_EXPORT_FETCH_SIZE = 500;
 
   private static final int EXPORT_MAX_SIZE =
-      AppSettings.get().getInt("data.export.max-size", DEFAULT_EXPORT_MAX_SIZE);
+      AppSettings.get().getInt(AvailableAppSettings.DATA_EXPORT_MAX_SIZE, DEFAULT_EXPORT_MAX_SIZE);
   private static final int EXPORT_FETCH_SIZE =
-      AppSettings.get().getInt("data.export.fetch-size", DEFAULT_EXPORT_FETCH_SIZE);
+      AppSettings.get()
+          .getInt(AvailableAppSettings.DATA_EXPORT_FETCH_SIZE, DEFAULT_EXPORT_FETCH_SIZE);
 
-  @SuppressWarnings("all")
-  public int export(Request request, Writer writer) throws IOException {
+  public Response export(Request request, Charset csvCharset) {
     security.get().check(JpaSecurity.CAN_READ, model);
     security.get().check(JpaSecurity.CAN_EXPORT, model);
-    LOG.debug("Exporting '{}' with {}", model.getName(), request.getData());
+
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Exporting '{}' with {}", model.getName(), request.getData());
+    } else {
+      LOG.debug("Exporting '{}'", model.getName());
+    }
 
     firePreRequestEvent(RequestEvent.EXPORT, request);
+
+    final Response response = new Response();
+    final Map<String, Object> data = new HashMap<>();
+
+    try {
+      final java.nio.file.Path tempFile = MetaFiles.createTempFile(null, ".csv");
+      try (final OutputStream os = new FileOutputStream(tempFile.toFile())) {
+        try (final Writer writer = new OutputStreamWriter(os, csvCharset)) {
+          data.put("exportSize", export(request, writer));
+        }
+      }
+      data.put("fileName", tempFile.toFile().getName());
+      response.setData(data);
+    } catch (IOException e) {
+      response.setException(e);
+    }
+
+    firePostRequestEvent(RequestEvent.EXPORT, request, response);
+
+    return response;
+  }
+
+  @SuppressWarnings("all")
+  private int export(Request request, Writer writer) throws IOException {
 
     List<String> fields = request.getFields();
     List<String> header = new ArrayList<>();
@@ -742,8 +781,6 @@ public class Resource<T extends Model> {
     Response response = new Response();
     response.setTotal(count);
 
-    firePostRequestEvent(RequestEvent.EXPORT, request, response);
-
     return count;
   }
 
@@ -810,9 +847,7 @@ public class Resource<T extends Model> {
       return values;
     }
     final Mapper mapper = Mapper.of(model);
-    related
-        .entrySet()
-        .stream()
+    related.entrySet().stream()
         .filter(e -> e.getValue() != null)
         .filter(e -> e.getValue().size() > 0)
         .forEach(
@@ -824,9 +859,7 @@ public class Resource<T extends Model> {
               if (value instanceof Collection<?>) {
                 value =
                     ((Collection<?>) value)
-                        .stream()
-                        .map(input -> toMap(input, names))
-                        .collect(Collectors.toList());
+                        .stream().map(input -> toMap(input, names)).collect(Collectors.toList());
               } else if (value instanceof Model) {
                 value = toMap(value, names);
                 if (old instanceof Map) {
@@ -873,11 +906,6 @@ public class Resource<T extends Model> {
 
     // no password change
     if (StringUtils.isBlank(newPassword)) {
-      // Still update password date if blocked field has changed so that user gets logged out.
-      if (values.get("blocked") != null) {
-        user.setPasswordUpdatedOn(LocalDateTime.now());
-      }
-
       return user;
     }
 
@@ -989,7 +1017,11 @@ public class Resource<T extends Model> {
 
     security.get().check(JpaSecurity.CAN_WRITE, model);
 
-    LOG.debug("Mass update '{}' with {}", model.getCanonicalName(), request.getData());
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("Mass update '{}' with", model.getCanonicalName(), request.getData());
+    } else {
+      LOG.debug("Mass update '{}'", model.getCanonicalName());
+    }
 
     firePreRequestEvent(RequestEvent.MASS_UPDATE, request);
 
@@ -1027,7 +1059,7 @@ public class Resource<T extends Model> {
 
     Request req = newRequest(request, id);
 
-    firePreRequestEvent(RequestEvent.REMOVE, request);
+    firePreRequestEvent(RequestEvent.REMOVE, req);
 
     Model bean = JPA.edit(model, data);
     if (bean.getId() != null) {
@@ -1201,6 +1233,8 @@ public class Resource<T extends Model> {
       Property p = mapper.getProperty(func.getField());
       if (p != null && p.isJson()) {
         selectName = func.toString();
+      } else {
+        selectName = String.format("self.%s", name);
       }
     }
 

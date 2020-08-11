@@ -2,7 +2,7 @@
 
     Axelor Business Solutions
 
-    Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+    Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
 
     This program is free software: you can redistribute it and/or  modify
     it under the terms of the GNU Affero General Public License, version 3,
@@ -20,8 +20,10 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page language="java" session="true" %>
 <%@ taglib prefix="x" uri="WEB-INF/axelor.tld" %>
+<%@ page import="com.axelor.app.AvailableAppSettings" %>
 <%@ page import="com.axelor.app.AppSettings" %>
 <%@ page import="com.axelor.web.internal.AppInfo" %>
+<%@ page import="com.axelor.web.internal.StaticResources" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Locale"%>
@@ -31,14 +33,14 @@
 AppSettings settings = AppSettings.get();
 AppInfo info = new AppInfo();
 
-String appName = settings.get("application.name", "My App");
-String appDesc = settings.get("application.description", null);
-String appHome = settings.get("application.home", "#/");
+String appName = settings.get(AvailableAppSettings.APPLICATION_NAME, "My App");
+String appDesc = settings.get(AvailableAppSettings.APPLICATION_DESCRIPTION, null);
+String appHome = settings.get(AvailableAppSettings.APPLICATION_HOME, "#/");
 String appLogo = info.getLogo();
 String appStyle = info.getStyle();
-String appAuthor = settings.get("application.author", "");
+String appAuthor = settings.get(AvailableAppSettings.APPLICATION_AUTHOR, "");
 String appTheme = info.getTheme();
-String appMenu = settings.get("application.menu", "both");
+String appMenu = settings.get(AvailableAppSettings.VIEW_MENUBAR_LOCATION, "both");
 
 String appTitle =  appName;
 
@@ -75,8 +77,11 @@ String tenantId = (String) session.getAttribute("tenantId");
     <meta name="description" content="<%= appDesc %>">
     <meta name="author" content="<%= appAuthor %>">
 
-    <!-- Le styles -->
+    <!-- Styles -->
     <x:style src="css/application.css" />
+    <% for (String style : StaticResources.getStyles()) { %>
+    <link href="<%= style %>" rel="stylesheet">
+    <% } %>
     <% if (appTheme != null) { %>
     <link href="css/<%= appTheme %>/theme.css" rel="stylesheet">
     <% } %>
@@ -142,7 +147,9 @@ String tenantId = (String) session.getAttribute("tenantId");
               <li class="divider-vertical"></li>
               <li class="dropdown">
                 <a href="javascript:" class="dropdown-toggle nav-link-user" data-toggle="dropdown">
-                  <img ng-src="{{ $user.image }}" width="20px"> <b class="caret"></b>
+                  <img ng-if="$user.image" ng-src="{{ $user.image }}" width="20px">
+                  <i class="fa fa-user" ng-if="!$user.image"></i>
+                  <b class="caret"></b>
                 </a>
                 <ul class="dropdown-menu">
                   <li>
@@ -197,6 +204,9 @@ String tenantId = (String) session.getAttribute("tenantId");
     <!-- JavaScript at the bottom for fast page loading -->
     <script src="js/messages.js"></script>
     <x:script src="js/application.js"/>
+    <% for (String script : StaticResources.getScripts()) { %>
+    <script src="<%= script %>"></script>
+    <% } %>
     <% if (extraFoot != null) { %> <jsp:include page="<%= extraFoot %>" /> <% } %>
   </body>
 </html>

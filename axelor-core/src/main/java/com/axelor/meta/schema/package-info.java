@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,13 +17,11 @@
  */
 @javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)
 @javax.xml.bind.annotation.XmlSchema(
-  namespace = com.axelor.meta.schema.ObjectViews.NAMESPACE,
-  xmlns = {
-    @javax.xml.bind.annotation.XmlNs(
-      namespaceURI = com.axelor.meta.schema.ObjectViews.NAMESPACE,
-      prefix = ""
-    ),
-  },
-  elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED
-)
+    namespace = com.axelor.meta.schema.ObjectViews.NAMESPACE,
+    xmlns = {
+      @javax.xml.bind.annotation.XmlNs(
+          namespaceURI = com.axelor.meta.schema.ObjectViews.NAMESPACE,
+          prefix = ""),
+    },
+    elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package com.axelor.meta.schema;

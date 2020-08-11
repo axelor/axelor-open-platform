@@ -1,7 +1,7 @@
 /**
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -113,9 +113,9 @@
   background: transparent;
 }
 
-.nav-tree li > a > .nav-title {
+.nav-tree li > a .nav-title {
   display: inline-block;
-  max-width: 160px;
+  max-width: 170px;
 }
 
 .nav-tree li > a > .nav-image,
@@ -183,6 +183,14 @@
   z-index: 2;
 }
 
+.nav-tree > li > a::after {
+  top: 11px;
+}
+
+.nav-tree > li > ul a::after {
+  top: 7px;
+}
+
 .nav-tree li.folder.animate > a::after {
   -webkit-transform: rotate(-90deg);
      -moz-transform: rotate(-90deg);
@@ -211,14 +219,14 @@
 }
 
 .nav-tree span.nav-tag {
-  float: right;
   text-transform: uppercase;
   text-shadow: none;
   line-height: 1;
   font-size: 10px;
   padding: 3px 8px;
   border-radius: .25em;
-  margin-left: 3px;
+  margin-left: auto;
+  top: 2px;
 }
 
 .nav-tree > li > ul > li:last-child {
@@ -227,6 +235,12 @@
 
 .nav-tree li > a {
   padding: 7px 8px;
+  position: relative;
+}
+
+.nav-tree li > a > .nav-label {
+  display: flex;
+  align-items: flex-start;
 }
 
 /* 1st level */

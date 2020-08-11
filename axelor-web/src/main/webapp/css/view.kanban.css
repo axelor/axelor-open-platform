@@ -1,7 +1,7 @@
 /**
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -151,7 +151,7 @@
 }
 
 .kanban-card.primary {
-  border-left: 3px solid #337ab7;
+  border-left: 3px solid #428bca;
 }
 
 .kanban-card.warning {
@@ -163,11 +163,11 @@
 }
 
 .kanban-card.info {
-  border-left: 3px solid #23c6c8;
+  border-left: 3px solid #5bc0de;
 }
 
 .kanban-card.success {
-  border-left: 3px solid #0275d8;
+  border-left: 3px solid #5cb85c;
 }
 
 .kanban-card h4 {
@@ -311,4 +311,14 @@
   .kanban-column ul.kanban-card-list {
     padding-bottom: 0;
   }
+}
+
+.portlet-cards,
+.portlet-kanban {
+  position: relative;
+}
+
+.portlet-cards .cards-view,
+.portlet-kanban .kanban-view {
+  top: 0;
 }

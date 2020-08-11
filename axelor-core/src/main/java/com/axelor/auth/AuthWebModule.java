@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,7 +18,6 @@
 package com.axelor.auth;
 
 import com.google.inject.Key;
-import javax.servlet.Filter;
 import javax.servlet.ServletContext;
 import org.apache.shiro.guice.web.ShiroWebModule;
 
@@ -34,12 +33,8 @@ public class AuthWebModule extends ShiroWebModule {
     this.configureAuth();
   }
 
-  @SuppressWarnings("unchecked")
-  protected void addFilterChain(String pattern, Key<? extends Filter> key) {
-    super.addFilterChain(pattern, key);
-  }
-
   protected void configureAnon() {
+    this.addFilterChain("/ws/public/**", ANON);
     this.addFilterChain("/public/**", ANON);
     this.addFilterChain("/dist/**", ANON);
     this.addFilterChain("/lib/**", ANON);
@@ -48,6 +43,7 @@ public class AuthWebModule extends ShiroWebModule {
     this.addFilterChain("/css/**", ANON);
     this.addFilterChain("/js/**", ANON);
     this.addFilterChain("/error.jsp", ANON);
+    this.addFilterChain("/favicon.ico", ANON);
   }
 
   protected void configureAuth() {

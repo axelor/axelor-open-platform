@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -67,7 +67,7 @@ function updateValues(source, target, itemScope, formScope) {
         if (!rec.selected) delete rec.selected;
       }
       return rec;
-    }
+    };
 
     _.each(values, function (v, k) {
       values[k] = fix(v);
@@ -315,7 +315,7 @@ ActionHandler.prototype = {
     }
 
     // include button name as _signal (used by workflow engine)
-    if (this.element.is("button,a.button-item,li.action-item")) {
+    if (this.element.is("button,.button-item,li.action-item")) {
       context._signal = this.element.attr('name') || this.element.attr('x-name');
     }
 
@@ -379,7 +379,7 @@ ActionHandler.prototype = {
 
   _blockUI: function() {
     // block the entire ui (auto unblocks when actions are complete)
-    _.delay(axelor.blockUI, 100);
+    _.delay(axelor.blockUI, 10);
   },
 
   _fireBeforeSave: function() {

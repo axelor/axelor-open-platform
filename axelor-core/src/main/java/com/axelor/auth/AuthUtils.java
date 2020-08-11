@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -22,7 +22,7 @@ import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.QueryBinder;
 import com.google.common.base.Preconditions;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import javax.persistence.FlushModeType;
@@ -67,9 +67,9 @@ public class AuthUtils {
       return false;
     }
 
-    final LocalDate from = user.getActivateOn();
-    final LocalDate till = user.getExpiresOn();
-    final LocalDate now = LocalDate.now();
+    final LocalDateTime from = user.getActivateOn();
+    final LocalDateTime till = user.getExpiresOn();
+    final LocalDateTime now = LocalDateTime.now();
 
     if ((from != null && from.isAfter(now)) || (till != null && till.isBefore(now))) {
       return false;

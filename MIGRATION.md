@@ -15,7 +15,7 @@ Migrating your v4.x apps to 5.0 should be easy as there very few breaking change
 
 ### Update build scripts
 
-ADK 5.0 uses Gradle 4.4.1 and there are some major changes with gradle build scripts.
+Axelor Open Platform 5.0 uses Gradle 4.4.1 and there are some major changes with gradle build scripts.
 
 The application build script now looks like this:
 
@@ -76,7 +76,7 @@ as normal gradle dependencies.
 
 The old `axelor-app` plugin is renamed to `com.axelor.app`.
 
-The app now doesn't require ADK installation, it will fetch core dependencies
+The app now doesn't require Axelor Open Platform installation, it will fetch core dependencies
 from our nexus repository.
 
 The module build scripts now looks like this:

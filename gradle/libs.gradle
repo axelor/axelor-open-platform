@@ -2,8 +2,8 @@ def libs = ext.libs = [:]
 def versions = [:]
 
 // versions
-versions.guice = "4.1.0"
-versions.guava = "23.0"
+versions.guice = "4.2.2"
+versions.guava = "28.1-jre"
 versions.hibernate = "5.2.10.Final"
 versions.hibernate_validator = "5.4.1.Final"
 versions.hibernate_search = "5.7.0.Final"
@@ -11,12 +11,15 @@ versions.hibernate_search = "5.7.0.Final"
 versions.groovy = "2.4.10"
 versions.resteasy = "3.1.2.Final"
 versions.jackson = "2.8.8"
-versions.shiro = "1.2.6"
+versions.shiro = "1.4.1"
+versions.buji_pac4j = "4.1.1"
+versions.pac4j = "3.8.3"
+versions.ldaptive = "1.2.4"
 
 versions.junit = "4.12"
 versions.slf4j = "1.7.25"
 
-versions.tomcat = "8.5.24"
+versions.tomcat = "8.5.54"
 versions.tomcat_embed = "${versions.tomcat}"
 
 // unit testing
@@ -49,10 +52,10 @@ libs.slf4j_logback = libs.slf4j_base + [
 ]
 
 // Guava
-libs.guava = ["com.google.guava:guava:${versions.guava}", "com.google.code.findbugs:jsr305:3.0.1"]
+libs.guava = ["com.google.guava:guava:${versions.guava}", "com.google.code.findbugs:jsr305:3.0.2"]
 
 // yaml
-libs.snakeyaml = "org.yaml:snakeyaml:1.17"
+libs.snakeyaml = "org.yaml:snakeyaml:1.25"
 
 // Guice
 libs.guice = "com.google.inject:guice:${versions.guice}"
@@ -89,6 +92,7 @@ libs.hibernate = [
     "org.hibernate:hibernate-validator:${versions.hibernate_validator}",
   "org.hibernate:hibernate-ehcache:${versions.hibernate}",
   "org.hibernate:hibernate-jcache:${versions.hibernate}",
+  "org.hibernate:hibernate-entitymanager:${versions.hibernate}",
 ]
 
 // Hibernate search
@@ -159,18 +163,29 @@ libs.apache_shiro = [
   "org.apache.shiro:shiro-web:${versions.shiro}",
   "org.apache.shiro:shiro-guice:${versions.shiro}"]
 
-// Apache Shiro CAS
-libs.apache_shiro_cas = [
-  "org.apache.shiro:shiro-cas:${versions.shiro}",
-  "commons-codec:commons-codec:1.10",
-  "org.opensaml:opensaml:1.1",
-  "org.apache.santuario:xmlsec:1.4.3"]
+libs.pac4j = [
+  "io.buji:buji-pac4j:${versions.buji_pac4j}",
+  dependencies.create("org.pac4j:pac4j-oidc:${versions.pac4j}") {
+    exclude group: 'org.mockito', module: 'mockito-core'
+  },
+  "org.pac4j:pac4j-oauth:${versions.pac4j}",
+  "org.pac4j:pac4j-saml:${versions.pac4j}",
+  "org.pac4j:pac4j-cas:${versions.pac4j}",
+  "org.pac4j:pac4j-http:${versions.pac4j}",
+  "org.pac4j:pac4j-ldap:${versions.pac4j}",
+  "org.ldaptive:ldaptive:${versions.ldaptive}"
+]
+
+libs.pac4j_core = [
+  "org.pac4j:pac4j-core:${versions.pac4j}"
+]
 
 // Apache DS (for testing only)
 libs.apache_ds = [
   "org.apache.directory.jdbm:apacheds-jdbm1:2.0.0-M3",
   dependencies.create("org.apache.directory.server:apacheds-test-framework:2.0.0-M15") {
     exclude group: "org.apache.directory.jdbm"
+    exclude group: "bouncycastle"
   }
 ]
 
@@ -192,7 +207,10 @@ libs.jcommander = "com.beust:jcommander:1.71"
 libs.quartz = dependencies.create("org.quartz-scheduler:quartz:2.2.3") { exclude module: "c3p0" }
 
 // xstream
-libs.xstream = "com.thoughtworks.xstream:xstream:1.4.9"
+libs.xstream = [
+  "com.thoughtworks.xstream:xstream:1.4.11.1",
+  "com.fasterxml.woodstox:woodstox-core:5.3.0"
+]
 
 // opencsv
 libs.opencsv = "com.opencsv:opencsv:3.9"
@@ -216,4 +234,9 @@ libs.tomcat_embed = [
 ]
 
 // currently deployed on axelor repo
-libs.hotswap_agent = "org.hotswap.agent:hotswap-agent:1.3.0"
+libs.hotswap_agent = [
+  "org.hotswapagent:hotswap-agent-core:1.3.0",
+  "org.hotswapagent:hotswap-agent-tomcat-plugin:1.3.0",
+  "org.hotswapagent:hotswap-agent-logback-plugin:1.3.0",
+  "org.hotswapagent:hotswap-agent-proxy-plugin:1.3.0",
+]

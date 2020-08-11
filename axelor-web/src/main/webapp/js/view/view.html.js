@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -34,7 +34,7 @@ function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
   $scope.getContext = function () {
     var params = $scope._viewParams || {};
     var parent = $scope.$parent;
-    return _.extend({}, params.context, parent.getContext ? parent.getContext() : {})
+    return _.extend({}, params.context, parent.getContext ? parent.getContext() : {});
   };
 
   $scope.getURL = function getURL() {
@@ -101,6 +101,21 @@ var directiveFn = function(){
           $(this).scope().keepAttached = true;
         });
       }, 100);
+
+      // XXX: chrome 76 issue? See RM-20400
+      if (axelor.browser.chrome) {
+        scope.$on('on:nav-click', function (e, tab) {
+          if (tab.$viewScope !== scope) return;
+          var iframe = element.find('iframe')[0];
+          var embed = iframe.contentDocument.body.firstChild;
+          if (embed && embed.id === 'plugin') {
+            embed.height = '101%';
+            setTimeout(function () {
+              embed.height = '100%';
+            });
+          }
+        });
+      }
     },
     template:
     '<div class="iframe-container">'+

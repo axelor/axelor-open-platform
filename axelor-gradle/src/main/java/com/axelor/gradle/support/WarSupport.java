@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,15 +18,14 @@
 package com.axelor.gradle.support;
 
 import com.axelor.common.VersionUtils;
+import com.axelor.gradle.tasks.CopyWebapp;
 import com.axelor.gradle.tasks.GenerateCode;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.DuplicatesStrategy;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.WarPlugin;
-import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.bundling.War;
-import org.gradle.api.tasks.util.PatternSet;
 
 public class WarSupport extends AbstractSupport {
 
@@ -39,41 +38,33 @@ public class WarSupport extends AbstractSupport {
 
     project.getPlugins().apply(WarPlugin.class);
 
-    Configuration axelorWeb = project.getConfigurations().create("axelorWeb").setTransitive(false);
+    Configuration axelorTomcat = project.getConfigurations().create("axelorTomcat");
 
     // apply providedCompile dependencies
     applyConfigurationLibs(project, "provided", "compileOnly");
 
-    // add dependency to axelor-web
-    project.getDependencies().add("compile", "com.axelor:axelor-web:" + version);
-    project.getDependencies().add("axelorWeb", "com.axelor:axelor-web:" + version);
+    // add axelor-tomcat dependency
+    project.getDependencies().add("axelorTomcat", "com.axelor:axelor-tomcat:" + version);
 
     // copy webapp to root build dir
     project
         .getTasks()
         .create(
             COPY_WEBAPP_TASK_NAME,
-            Copy.class,
+            CopyWebapp.class,
             task -> {
-              task.setDestinationDir(project.getBuildDir());
-              task.into("webapp", spec -> spec.from("src/main/webapp"));
               task.dependsOn(GenerateCode.TASK_NAME);
               task.dependsOn(JavaPlugin.PROCESS_RESOURCES_TASK_NAME);
-              task.dependsOn(axelorWeb);
-              axelorWeb
-                  .getFiles()
-                  .stream()
-                  .filter(file -> file.getName().startsWith("axelor-web"))
-                  .forEach(
-                      file -> {
-                        task.from(
-                            project
-                                .zipTree(file)
-                                .matching(new PatternSet().include("webapp/**/*")));
-                      });
             });
 
-    project.getTasks().withType(War.class).all(task -> task.dependsOn(COPY_WEBAPP_TASK_NAME));
+    project
+        .getTasks()
+        .withType(War.class)
+        .all(
+            task -> {
+              task.dependsOn(COPY_WEBAPP_TASK_NAME);
+              task.setClasspath(task.getClasspath().filter(file -> !axelorTomcat.contains(file)));
+            });
 
     final War war = (War) project.getTasks().getByName(WarPlugin.WAR_TASK_NAME);
     war.from(project.getBuildDir() + "/webapp");

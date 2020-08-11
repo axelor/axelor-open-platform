@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <object-views xmlns="http://axelor.com/xml/ns/object-views"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.1.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_5.3.xsd">
 
   <selection name="json.field.type">
     <option value="string">String</option>
@@ -15,6 +15,7 @@
     <option value="enum">Enum</option>
     <option value="button">Button</option>
     <option value="label">Label</option>
+    <option value="spacer">Spacer</option>
     <option value="separator">Separator</option>
     <option value="many-to-one">ManyToOne</option>
     <option value="many-to-many">ManyToMany</option>
@@ -24,7 +25,7 @@
     <option value="json-one-to-many">Custom-OneToMany</option>
   </selection>
 
-  <grid name="json-field-grid" title="Custom fields" model="com.axelor.meta.db.MetaJsonField">
+  <grid name="json-field-grid" title="Custom fields" model="com.axelor.meta.db.MetaJsonField" groupBy="model">
     <field name="name" />
     <field name="type" />
     <field name="model" />
@@ -84,11 +85,11 @@
         <field name="contextFieldTitle" hidden="true" />
         <field name="contextFieldTarget" hidden="true" />
         <field name="contextFieldTargetName" hidden="true" />
-        <field name="showIf" />
-        <field name="hideIf" />
-        <field name="requiredIf" />
-        <field name="readonlyIf" />
-        <field name="includeIf" help="Server expression to check whether to use this field."/>
+        <field name="showIf" widget="code-editor" x-height="25" x-mode="javascript" />
+        <field name="hideIf" widget="code-editor" x-height="25" x-mode="javascript" />
+        <field name="requiredIf" widget="code-editor" x-height="25" x-mode="javascript" />
+        <field name="readonlyIf" widget="code-editor" x-height="25" x-mode="javascript" />
+        <field name="includeIf" widget="code-editor" x-height="25" x-mode="groovy" help="Server expression to check whether to use this field."/>
       </panel>
       <panel title="Value Expression">
         <field name="valueExpr" showTitle="false" colSpan="12"
@@ -98,7 +99,7 @@
         <field name="name" />
       </panel-related>
     </panel-tabs>
-    <panel title="Options" sidebar="true" itemSpan="6">
+    <panel title="Options" sidebar="true" itemSpan="12">
       <field name="required" widget="inline-checkbox" />
       <field name="readonly" widget="inline-checkbox" />
       <field name="nameField" widget="inline-checkbox" showIf="type === 'string'" />
@@ -115,7 +116,7 @@
       <field name="type" />
       <field name="title" />
       <field name="defaultValue" />
-      <field name="help" />
+      <field name="help" colSpan="12" />
       <field name="sequence" />
       <field name="columnSequence" />
       <field name="model" widget="ref-text"
@@ -156,6 +157,7 @@
       <field name="onSave" />
       <field name="formWidth" />
       <field name="orderBy" />
+      <field name="groupBy" />
     </panel>
     <panel title="Menu">
       <field name="menuTitle" title="Title"/>
@@ -169,6 +171,7 @@
       <panel-related field="fields" form-view="json-field-form-2" orderBy="sequence" canMove="true">
         <field name="name"/>
         <field name="type"/>
+        <field name="title"/>
       </panel-related>
       <panel-related field="roles">
         <field name="name" />

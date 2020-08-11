@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -22,24 +22,27 @@ import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Calendar;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class AppSettings {
 
   private static final String DEFAULT_CONFIG_LOCATION = "application.properties";
-  private static final String CUSTOM_CONFIG_LOCATION = "axelor.config";
 
   private Properties properties;
 
   private static AppSettings instance;
 
   private AppSettings() {
-    String config = System.getProperty(CUSTOM_CONFIG_LOCATION);
+    String config = System.getProperty("axelor.config");
     InputStream stream = null;
     try {
       if (StringUtils.isBlank(config)) {
@@ -48,7 +51,7 @@ public final class AppSettings {
         stream = new FileInputStream(config);
       }
       try {
-        properties = new Properties();
+        properties = new LinkedProperties();
         properties.load(stream);
       } finally {
         stream.close();
@@ -115,11 +118,11 @@ public final class AppSettings {
     if (value == null) {
       return null;
     }
-    final Calendar cal = Calendar.getInstance();
+    final LocalDate now = LocalDate.now();
     return value
-        .replace("{year}", "" + cal.get(Calendar.YEAR))
-        .replace("{month}", "" + cal.get(Calendar.MONTH))
-        .replace("{day}", "" + cal.get(Calendar.DAY_OF_MONTH))
+        .replace("{year}", "" + now.getYear())
+        .replace("{month}", "" + now.getMonthValue())
+        .replace("{day}", "" + now.getDayOfMonth())
         .replace("{java.io.tmpdir}", System.getProperty("java.io.tmpdir"))
         .replace("{user.home}", System.getProperty("user.home"));
   }
@@ -136,13 +139,13 @@ public final class AppSettings {
   public String getBaseURL() {
     String url = AppFilter.getBaseURL();
     if (url == null) {
-      url = get("application.baseUrl");
+      url = get(AvailableAppSettings.APPLICATION_BASE_URL);
     }
     return url;
   }
 
   public boolean isProduction() {
-    return !"dev".equals(get("application.mode", "dev"));
+    return !"dev".equals(get(AvailableAppSettings.APPLICATION_MODE, "dev"));
   }
 
   /**
@@ -152,5 +155,48 @@ public final class AppSettings {
    */
   public Properties getProperties() {
     return properties;
+  }
+
+  /** Properties with keys in order of insertion */
+  public static class LinkedProperties extends Properties {
+
+    private static final long serialVersionUID = -1869328576799427860L;
+    private final Set<Object> keys = new LinkedHashSet<>();
+
+    @Override
+    public synchronized Object put(Object key, Object value) {
+      keys.add(key);
+      return super.put(key, value);
+    }
+
+    @Override
+    public synchronized void putAll(Map<? extends Object, ? extends Object> t) {
+      keys.addAll(t.keySet());
+      super.putAll(t);
+    }
+
+    @Override
+    public synchronized Object remove(Object key) {
+      keys.remove(key);
+      return super.remove(key);
+    }
+
+    @Override
+    public synchronized boolean remove(Object key, Object value) {
+      keys.remove(key);
+      return super.remove(key, value);
+    }
+
+    @Override
+    public Set<Object> keySet() {
+      return Collections.unmodifiableSet(keys);
+    }
+
+    @Override
+    public Set<String> stringPropertyNames() {
+      return keys.stream()
+          .map(Object::toString)
+          .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
   }
 }

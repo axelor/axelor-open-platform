@@ -2,7 +2,7 @@
 
     Axelor Business Solutions
 
-    Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+    Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
 
     This program is free software: you can redistribute it and/or  modify
     it under the terms of the GNU Affero General Public License, version 3,
@@ -24,8 +24,13 @@
 <%@ page import="java.util.Calendar" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="java.util.Map.Entry"%>
+<%@ page import="java.util.Set" %>
 <%@ page import="java.util.function.Function"%>
+<%@ page import="org.pac4j.http.client.indirect.FormClient" %>
 <%@ page import="com.axelor.i18n.I18n" %>
+<%@ page import="com.axelor.app.AppSettings" %>
+<%@ page import="com.axelor.auth.pac4j.AuthPac4jModule" %>
 <%
 
 Function<String, String> T = new Function<String, String>() {
@@ -38,7 +43,7 @@ Function<String, String> T = new Function<String, String>() {
   }
 };
 
-String errorMsg = T.apply(request.getParameter("errorMsg"));
+String errorMsg = T.apply(request.getParameter(FormClient.ERROR_PARAMETER));
 
 String loginTitle = T.apply("Please sign in");
 String loginRemember = T.apply("Remember me");
@@ -50,6 +55,8 @@ String loginPassword = T.apply("Password");
 String warningBrowser = T.apply("Update your browser!");
 String warningAdblock = T.apply("Adblocker detected!");
 String warningAdblock2 = T.apply("Please disable the adblocker as it may slow down the application.");
+
+String loginWith = T.apply("Log in with %s");
 
 int year = Calendar.getInstance().get(Calendar.YEAR);
 String copyright = String.format("&copy; 2005 - %s Axelor. All Rights Reserved.", year);
@@ -63,6 +70,10 @@ if (pageContext.getServletContext().getResource(loginHeader) == null) {
 Map<String, String> tenants = (Map) session.getAttribute("tenantMap");
 String tenantId = (String) session.getAttribute("tenantId");
 
+AppSettings settings = AppSettings.get();
+String callbackUrl = AuthPac4jModule.getCallbackUrl();
+
+Set<String> centralClients = AuthPac4jModule.getCentralClients();
 %>
 <!DOCTYPE html>
 <html>
@@ -90,8 +101,24 @@ String tenantId = (String) session.getAttribute("tenantId");
           <h4><%= errorMsg %></h4>
         </div>
 
+        <% if (!centralClients.isEmpty()) { %>
+	      <div id="social-buttons" class="form-fields text-center">
+          <% for (String client : centralClients) { %>
+            <%
+            Map<String, String> info = AuthPac4jModule.getClientInfo(client);
+            String title = info.get("title");
+            String icon = info.get("icon");
+            %>
+            <button class="btn" type="button" data-provider="<%= client %>">
+              <img class="social-logo <%= client %>" src="<%= icon %>" alt="<%= title %>" title="<%= title %>">
+              <div class="social-title"><%= String.format(loginWith, title) %></div>
+            </button>
+            <% } %>
+          </div>
+        <% } %>
+
         <div class="panel-body">
-          <form id="login-form" action="" method="POST">
+          <form id="login-form" action="<%=callbackUrl%>" method="POST">
             <div class="form-fields">
               <div class="input-prepend">
                 <span class="add-on"><i class="fa fa-envelope"></i></span>
@@ -116,6 +143,7 @@ String tenantId = (String) session.getAttribute("tenantId");
                 <span class="box"></span>
                 <span class="title"><%= loginRemember %></span>
               </label>
+              <input type="hidden" name="hash_location" id="hash-location">
             </div>
             <div class="form-footer">
               <button class="btn btn-primary" type="submit"><%= loginSubmit %></button>
@@ -147,12 +175,22 @@ String tenantId = (String) session.getAttribute("tenantId");
     <script type="text/javascript">
     $(function () {
 	    if (axelor.browser.msie && !axelor.browser.rv) {
-	    	$('#br-warning').removeClass('hidden');
+	     	$('#br-warning').removeClass('hidden');
 	    }
 	    if ($('#adblock') === undefined || $('#adblock').is(':hidden')) {
-	    	$('#ad-warning').removeClass('hidden');
+	     	$('#ad-warning').removeClass('hidden');
 	    }
+	    
+	    $("#social-buttons").on('click', 'button', function (e) {
+	     var client = $(e.currentTarget).data('provider');
+	     window.location.href = './?client_name=' + client
+	         + "&hash_location=" + encodeURIComponent(window.location.hash);
+	    });
+
+        $('#login-form').submit(function(e) {
+          document.getElementById("hash-location").value = window.location.hash;
+        });
     });
-    </script>
+        </script>
   </body>
 </html>

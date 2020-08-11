@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -69,10 +69,12 @@ function GridViewCtrl($scope, $element) {
 
         if (view.noFetch) return;
 
-        $scope.filter({
+        var opts = ds._filter ? ds._filter : {
           _sortBy: sortBy,
           _pageNum: pageNum
-        }).then(function(){
+        };
+
+        $scope.filter(opts).then(function(){
           $scope.$broadcast('on:grid-selection-change', $scope.getContext());
           $scope.updateRoute();
         });
@@ -210,7 +212,7 @@ function GridViewCtrl($scope, $element) {
   };
 
   $scope.canEdit = function() {
-    return $scope.hasButton('edit') && $scope.selection.length > 0;
+    return $scope.hasButton('edit') && ($scope.selection.length > 0 || $scope.dataView.getItemById(0));
   };
 
   $scope.canShowDetailsView = function () {
@@ -223,7 +225,7 @@ function GridViewCtrl($scope, $element) {
       return true;
     }
     return $scope.hasButton('save') && $scope.canEditInline();
-  }
+  };
 
   $scope.canSave = function() {
     if ($scope.$details && $scope.$details.canSave()) {
@@ -456,8 +458,8 @@ function GridViewCtrl($scope, $element) {
         criteria.operator = "and";
       }
     }
-    if (advance && criteria.archived === undefined) {
-      criteria.archived = advance.archived;
+    if (advance && advance.archived !== undefined) {
+      options.archived = advance.archived;
     }
     return ds.search(options).then(fixPage);
   };
@@ -555,7 +557,7 @@ function GridViewCtrl($scope, $element) {
         $scope.onRefresh();
       });
     });
-  }
+  };
 
   $scope.onArchive = function() {
     $scope._doArchive($scope.$confirmArchiveMessage, true);
@@ -625,7 +627,7 @@ function GridViewCtrl($scope, $element) {
     });
     _.each(args.rows, function(index) {
       var item = args.grid.getDataItem(index);
-      if (item && item.id !== 0) {
+      if (item && item.id && item.id !== 0) {
         item.selected = true;
         selection.push(index);
       }
@@ -655,6 +657,7 @@ function GridViewCtrl($scope, $element) {
   };
 
   var _getContext = $scope.getContext;
+  $scope._isNestedGrid = !!_getContext;
   $scope.getContext = function() {
 
     // if nested grid then return parent's context
@@ -826,10 +829,10 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
         });
       }
 
-      $scope.selectionChanged = _.debounce(function (selection) {
+      $scope.selectionChanged = _.debounce(function () {
         var current = $scope.record || {};
-        var first = _.first(selection);
-        if (first !== undefined) {
+        var first = parent.pagerIndex(true);
+        if (first > -1) {
           doEdit(first);
         } else if (current.id > 0) {
           $scope.edit(null);
@@ -851,7 +854,6 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
           if (found) {
             found.selected = true;
           }
-          dataView.$syncSelection([], [], false);
         }
       });
     }],
@@ -863,12 +865,62 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
 
       scope.$watch('$$dirty', function gridDirtyWatch(dirty) {
         overlay.toggle(dirty);
+        if (scope.$parent.dataView && scope.$parent.dataView.$cancelEdit) {
+          scope.$parent.dataView.$cancelEdit();
+        }
+      });
+
+      scope.$on('$destroy', function () {
+        overlay.remove();
       });
     },
     replace: true,
     templateUrl: "partials/views/details-form.html"
-  }
+  };
 }]);
+
+ui.directive('uiPortletRefresh', ['NavService', function (NavService) {
+  return function (scope, element) {
+    if (!scope.onRefresh) return;
+
+    var onRefresh = scope.onRefresh.bind(scope);
+    var unwatch = false;
+    var loading = false;
+
+    scope.onRefresh = function () {
+      var tab = NavService.getSelected();
+      var type = (tab.params||{})['details-view'] ? scope.$parent._viewType : tab.viewType || tab.type;
+      if (['dashboard', 'form'].indexOf(type) === -1) {
+        if (unwatch) {
+          unwatch();
+          unwatch = null;
+        }
+        return;
+      }
+
+      if (unwatch || loading) {
+        return;
+      }
+
+      unwatch =  scope.$watch(function portletVisibleWatch() {
+        if (element.is(":hidden")) {
+          return;
+        }
+
+        unwatch();
+        unwatch = null;
+        loading = true;
+
+        scope.waitForActions(function () {
+          scope.ajaxStop(function () {
+            loading = false;
+            onRefresh();
+          });
+        });
+      });
+    };
+  };
+}])
 
 ui.directive('uiPortletGrid', function(){
   return {
@@ -906,7 +958,7 @@ ui.directive('uiPortletGrid', function(){
         tab.viewType = "form";
         tab.recordId = record.id;
         tab.action = _.uniqueId('$act');
-        tab.forceReadonly = $scope.isReadonly();
+        tab.forceReadonly = $scope.isReadonly && $scope.isReadonly();
 
         if (tab.forceReadonly || $scope._isPopup || (($scope._viewParams || {}).params || {}).popup) {
           tab.$popupParent = $scope;
@@ -945,40 +997,8 @@ ui.directive('uiPortletGrid', function(){
         $scope.onRefresh();
       });
 
-      var unwatch = false;
-      var loading = false;
-
       $scope.onRefresh = function () {
-        var tab = NavService.getSelected();
-        var type = tab.viewType || tab.type;
-        if (type === "grid") {
-          if (unwatch) {
-            unwatch();
-            unwatch = null;
-          }
-          return;
-        }
-
-        if (unwatch || loading) {
-          return;
-        }
-
-        unwatch =  $scope.$watch(function gridVisibleWatch() {
-          if ($element.is(":hidden")) {
-            return;
-          }
-
-          unwatch();
-          unwatch = null;
-          loading = true;
-
-          $scope.waitForActions(function () {
-            $scope.ajaxStop(function () {
-              loading = false;
-              $scope.filter({});
-            });
-          });
-        });
+        $scope.filter({});
       };
 
       var _onShow = $scope.onShow;
@@ -991,7 +1011,7 @@ ui.directive('uiPortletGrid', function(){
         editCol.descriptor = { hidden : true };
         $scope.$parent.$watch("isReadonly()", function (readonly) {
           if (inst.editable) {
-            grid.setOptions({ editable: readonly });
+            inst.readonly = readonly;
           }
           inst.showColumn('_edit_column', !readonly);
           editCol.descriptor = { hidden : readonly };
@@ -1026,7 +1046,7 @@ ui.directive('uiPortletGrid', function(){
     }],
     replace: true,
     template:
-    '<div class="portlet-grid">'+
+    '<div class="portlet-grid" ui-portlet-refresh>'+
       '<div ui-view-grid x-view="schema" x-on-init="onGridInit" x-data-view="dataView" x-editable="false" x-no-filter="{{noFilter}}" x-handler="this"></div>'+
     '</div>'
   };

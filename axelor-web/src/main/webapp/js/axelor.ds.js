@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -44,9 +44,14 @@
     }
 
     function tags() {
-      return $http.get('ws/action/menu/tags', {
-        silent: true,
-        transformRequest: []
+      // Select visible menus with tags
+      var names = $('.tagged:visible').get().map(function(elem) {
+        return elem.dataset.name;
+      });
+      return $http.post('ws/action/menu/tags', {
+        names: names
+      }, {
+        silent: true
       });
     }
 
@@ -135,9 +140,9 @@
             listeners.splice(i, 1);
           }
           return listener;
-        }
+        };
       }
-    }
+    };
   }]);
 
   ds.factory('ViewService', ['$http', '$q', '$cacheFactory', '$compile', function($http, $q, $cacheFactory, $compile) {
@@ -162,7 +167,7 @@
       return $compile(template);
     };
 
-    ViewService.prototype.process = function(meta, view) {
+    ViewService.prototype.process = function(meta, view, parent) {
 
       var fields = {};
 
@@ -272,7 +277,7 @@
         });
 
         if (item.items || item.pages) {
-          ViewService.prototype.process(meta, item);
+          ViewService.prototype.process(meta, item, view);
         }
         if (item.password) {
           item.widget = "password";
@@ -285,22 +290,40 @@
           };
           var panel = null;
           var panelTab = null;
+          item.jsonFields.sort(function (x, y) { return x.sequence - y.sequence; });
           item.jsonFields.forEach(function (field) {
             if (field.widgetAttrs) {
               field.widgetAttrs = angular.fromJson(field.widgetAttrs);
-              processWidget(field);
               if (field.widgetAttrs.showTitle !== undefined) {
                 field.showTitle = field.widgetAttrs.showTitle;
               }
               if (field.widgetAttrs.multiline) {
                 field.type = 'text';
               }
+              if (field.widgetAttrs.targetName) {
+                field.targetName = field.widgetAttrs.targetName;
+              }
+
+              // remove x- prefix from all widget attributes
+              for (var key in field.widgetAttrs) {
+                if (_.startsWith(key, 'x-')) {
+                  field.widgetAttrs[key.substring(2)] = field.widgetAttrs[key];
+                  delete field.widgetAttrs[key];
+                }
+              }
             }
+            processWidget(field);
+            // apply all widget attributes directly on field
+            _.extend(field, field.widgetAttrs);
             if (field.type === 'panel' || field.type === 'separator') {
               field.visibleInGrid = false;
             }
             if (field.type === 'panel') {
               panel = _.extend({}, field, { items: [] });
+              if ((field.widgetAttrs || {}).sidebar && parent) {
+                panel.sidebar = true;
+                parent.width = 'large';
+              }
               if ((field.widgetAttrs || {}).tab) {
                 panelTab = panelTab || {
                   type: 'panel-tabs',
@@ -341,7 +364,6 @@
           if (!item.viewer) {
             item.editor.viewer = true;
           }
-          editor.items.sort(function (x, y) { return x.sequence - y.sequence; });
         }
       });
 
@@ -357,6 +379,16 @@
               }
             });
           } else {
+            if (item.name.indexOf('.') > -1 && (meta.fields[item.name] || {}).jsonField) {
+              var field = meta.fields[item.name];
+              if (field.widgetAttrs) {
+                field.widgetAttrs = angular.fromJson(field.widgetAttrs);
+              }
+              processWidget(field);
+              if (field.widgetAttrs && field.widgetAttrs.targetName) {
+                field.targetName = field.widgetAttrs.targetName;
+              }
+            }
             items.push(item);
           }
         });
@@ -420,10 +452,14 @@
         if (value === "false") value = false;
         if (value === "null") value = null;
         if (/^(-)?\d+$/.test(value)) value = +(value);
+        if (name === "widget" && value) value = _.chain(value).underscored().dasherize().value();
         attrs[_.str.camelize(name)] = value;
       });
       if (field.serverType) {
         field.serverType = _.chain(field.serverType).underscored().dasherize().value();
+      }
+      if (field.widget) {
+        field.widget = _.chain(field.widget).underscored().dasherize().value();
       }
       field.widgetAttrs = attrs;
     }
@@ -496,7 +532,7 @@
             } else if (child.type === 'panel') {
               acceptItems(child.items);
             }
-            if (/RefSelect|ref-select/.test(child.widget)) {
+            if (child.widget === 'ref-select') {
               collect.push(child.related);
             }
             if (child.depends) {
@@ -533,6 +569,11 @@
         } else if (item.type === 'field') {
           items.push(item.name);
         }
+        // to fetch colors for tag-select
+        if (item.colorField && item.targetName) {
+          (result.related[item.name] || (result.related[item.name] = [])).push(item.colorField);
+          (result.related[item.name] || (result.related[item.name] = [])).push(item.targetName);
+        }
       });
 
       if (view.type === "calendar") {
@@ -557,7 +598,7 @@
     function createStore(prefix) {
       var toKey = function (name) {
         return prefix + ':' + axelor.config['user.id'] + ':' + name;
-      }
+      };
       return {
         get: function (name) {
           return new $q(function (resolve) {
@@ -573,7 +614,7 @@
           }
           return $q.resolve(value);
         }
-      }
+      };
     }
 
     var PENDING_REQUESTS = {};

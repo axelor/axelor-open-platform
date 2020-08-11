@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -58,12 +58,25 @@ _.each(["long", "decimal", "date", "time", "datetime"], function(type) {
 });
 
 _.each(["one-to-many"], function(type) {
-  OPERATORS_BY_TYPE[type] = OPERATORS_BY_TYPE.text;
+  OPERATORS_BY_TYPE[type] = ["isNull", "notNull"];
 });
 
 _.each(["one-to-one", "many-to-one", "many-to-many"], function(type) {
   OPERATORS_BY_TYPE[type] = ["like", "notLike", "in", "notIn", "isNull", "notNull"];
 });
+
+
+function sharedProperty(scope, handler, property, initialValue) {
+  var ds = handler._dataSource;
+  if (ds) {
+    var adv = ds._advSearch || (ds._advSearch = {});
+    adv[property] = adv[property] || initialValue;
+    Object.defineProperty(scope, property, {
+      get: function () { return adv[property]; },
+      set: function (value) { adv[property] = value; }
+    });
+  }
+}
 
 ui.directive('uiFilterItem', function() {
 
@@ -166,6 +179,10 @@ ui.directive('uiFilterItem', function() {
       };
 
       scope.$watch('filter.field', function searchFilterFieldWatch(value, old) {
+        scope.operators = getOperators();
+      });
+
+      scope.$on('on:show-menu', function () {
         scope.operators = getOperators();
       });
 
@@ -305,7 +322,7 @@ ui.directive('uiFilterTags', function() {
     }],
     template:
       "<div ui-view-form x-handler='true'></div>"
-  }
+  };
 });
 
 ui.directive('uiFilterInput', function() {
@@ -546,9 +563,10 @@ function FilterFormCtrl($scope, $element, ViewService) {
   };
 
   $scope.fields = {};
-  $scope.filters = [{ $new: true }];
-  $scope.operator = 'and';
-  $scope.showArchived = false;
+
+  sharedProperty($scope, $scope.$parent.handler, 'filters', [{ $new: true }]);
+  sharedProperty($scope, $scope.$parent.handler, 'operator', 'and');
+  sharedProperty($scope, $scope.$parent.handler, 'showArchived', false);
 
   var handler = $scope.$parent.handler;
   if (handler && handler._dataSource) {
@@ -879,7 +897,7 @@ ui.directive('uiFilterForm', function() {
         "<a href='' ng-click='addFilter()' x-translate>Add filter</a>"+
         "<span class='divider'>|</span>"+
         "<a href='' ng-click='clearFilter(true)' x-translate>Clear</a></li>"+
-        "<span class='divider' ng-if='canExport()'>|</span>"+
+        "<span class='divider'>|</span>"+
         "<a href='' ng-if='canExport()' ng-click='onExport()' x-translate>Export</a></li>"+
         "<span class='divider' ng-if='canExport()'>|</span>"+
         "<a href='' ng-if='canExport(true)' ng-click='onExport(true)' x-translate>Export full</a></li>"+
@@ -909,8 +927,9 @@ ui.directive('uiFilterBox', function() {
       $scope.model = handler._model;
       $scope.view = {};
 
-      $scope.viewFilters = [];
-      $scope.custFilters = [];
+      sharedProperty($scope, $scope.handler, 'viewFilters', []);
+      sharedProperty($scope, $scope.handler, 'custFilters', []);
+      sharedProperty($scope, $scope.handler, 'tagItems', []);
 
       $scope.canShare = axelor.config["view.adv-search.share"] !== false;
 
@@ -1134,8 +1153,6 @@ ui.directive('uiFilterBox', function() {
         }
       };
 
-      $scope.tagItems = [];
-
       $scope.onFilter = function(criteria) {
 
         if (criteria) {
@@ -1313,6 +1330,8 @@ ui.directive('uiFilterBox', function() {
 
             var field = fields[name];
 
+            if (field.transient) continue;
+
             switch (field.type) {
             case 'integer':
             case 'decimal':
@@ -1381,6 +1400,7 @@ ui.directive('uiFilterBox', function() {
 
         scope.$applyAsync(function () {
           scope.visible = true;
+          scope.$broadcast('on:show-menu');
         });
       };
 
@@ -1393,11 +1413,11 @@ ui.directive('uiFilterBox', function() {
         };
         if (element.hasClass('pull-right')) {
           opts.my = "right top";
-          opts.at = "right bottom"
+          opts.at = "right bottom";
         }
         return function() {
           menu.position(opts);
-        }
+        };
       }());
 
       scope.onClearFilter = function () {
@@ -1499,7 +1519,7 @@ ui.directive('uiFilterBox', function() {
         "<i ng-click='onRefresh()' class='fa fa-search'></i>" +
         "</span>" +
       "</div>" +
-      "<div class='filter-menu' ui-watch-if='visible'>" +
+      "<div class='filter-menu'>" +
         "<span>" +
           "<strong x-translate>Advanced Search</strong>" +
           "<a href='' class='pull-right' ng-click='hideMenu()'><i class='fa fa-times'></i></a>" +

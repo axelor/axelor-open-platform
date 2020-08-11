@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -336,8 +336,12 @@ public class CSVBinder {
       }
 
       if (p.isCollection()) {
-        if (value instanceof Collection<?>) p.addAll(bean, (Collection<?>) value);
-        else p.add(bean, value);
+        if (value == null) {
+        } else if (value instanceof Collection<?>) {
+          p.addAll(bean, (Collection<?>) value);
+        } else {
+          p.add(bean, value);
+        }
       } else if (!AuditHelper.update(bean, field, value)) {
         p.set(bean, value);
       }
@@ -392,7 +396,7 @@ public class CSVBinder {
     localContext.putAll(map);
     for (CSVBind cb : flatten(this.bindings)) {
       String field = cb.getColumn();
-      if (Strings.isNullOrEmpty(field) || !map.containsKey(field)) continue;
+      if (Strings.isNullOrEmpty(field)) continue;
       localContext.put(field, cb.evaluate(map));
       if (field.contains("."))
         localContext.put(field.replace(".", "_") + "_", localContext.get(field));

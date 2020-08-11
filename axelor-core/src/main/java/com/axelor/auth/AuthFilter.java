@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -95,6 +95,11 @@ public class AuthFilter extends FormAuthenticationFilter {
   }
 
   @Override
+  protected boolean isLoginRequest(ServletRequest request, ServletResponse response) {
+    return super.isLoginRequest(request, response) || pathsMatch("/callback", request);
+  }
+
+  @Override
   public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)
       throws ServletException, IOException {
 
@@ -162,7 +167,7 @@ public class AuthFilter extends FormAuthenticationFilter {
       final UriBuilder builder = UriBuilder.fromPath("login.jsp");
 
       if (StringUtils.notBlank(e.getMessage())) {
-        builder.queryParam("errorMsg", e.getMessage());
+        builder.queryParam("error", e.getMessage());
       }
 
       final String path = builder.build().toString();
@@ -173,7 +178,7 @@ public class AuthFilter extends FormAuthenticationFilter {
           UriBuilder.fromPath("change-password.jsp").queryParam("username", username);
 
       if (StringUtils.notBlank(e.getMessage())) {
-        builder.queryParam("errorMsg", e.getMessage());
+        builder.queryParam("error", e.getMessage());
       }
 
       final String path = builder.build().toString();

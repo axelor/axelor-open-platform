@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,14 +18,17 @@
 package com.axelor.web.internal;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
+import com.axelor.auth.pac4j.AuthPac4jModule;
 import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
@@ -38,12 +41,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
+import org.pac4j.core.context.J2EContext;
+import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.profile.ProfileManager;
 
 public class AppInfo {
 
   private static final AppSettings SETTINGS = AppSettings.get();
-  private static final String APP_THEME = SETTINGS.get("application.theme", null);
+  private static final String APP_THEME =
+      SETTINGS.get(AvailableAppSettings.APPLICATION_THEME, null);
 
   public Map<String, Object> info(final ServletContext context) {
 
@@ -71,8 +80,6 @@ public class AppInfo {
 
     if (user.getImage() != null) {
       map.put("user.image", getLink(user, null));
-    } else {
-      map.put("user.image", "img/user.png");
     }
 
     if (group != null) {
@@ -84,16 +91,16 @@ public class AppInfo {
       map.put("user.action", group.getHomeAction());
     }
 
-    map.put("application.name", SETTINGS.get("application.name"));
-    map.put("application.description", SETTINGS.get("application.description"));
-    map.put("application.version", SETTINGS.get("application.version"));
-    map.put("application.author", SETTINGS.get("application.author"));
-    map.put("application.copyright", SETTINGS.get("application.copyright"));
-    map.put("application.home", SETTINGS.get("application.home"));
-    map.put("application.help", SETTINGS.get("application.help"));
-    map.put("application.mode", SETTINGS.get("application.mode", "dev"));
+    map.put("application.name", SETTINGS.get(AvailableAppSettings.APPLICATION_NAME));
+    map.put("application.description", SETTINGS.get(AvailableAppSettings.APPLICATION_DESCRIPTION));
+    map.put("application.version", SETTINGS.get(AvailableAppSettings.APPLICATION_VERSION));
+    map.put("application.author", SETTINGS.get(AvailableAppSettings.APPLICATION_AUTHOR));
+    map.put("application.copyright", SETTINGS.get(AvailableAppSettings.APPLICATION_COPYRIGHT));
+    map.put("application.home", SETTINGS.get(AvailableAppSettings.APPLICATION_HOME));
+    map.put("application.help", SETTINGS.get(AvailableAppSettings.APPLICATION_HELP));
+    map.put("application.mode", SETTINGS.get(AvailableAppSettings.APPLICATION_MODE, "dev"));
 
-    map.put("file.upload.size", SETTINGS.get("file.upload.size", "5"));
+    map.put("file.upload.size", SETTINGS.get(AvailableAppSettings.FILE_UPLOAD_SIZE, "5"));
     map.put("application.sdk", VersionUtils.getVersion().version);
 
     for (String key : SETTINGS.getProperties().stringPropertyNames()) {
@@ -121,11 +128,22 @@ public class AppInfo {
 
     map.put("application.themes", themes);
 
+    // find central client name
+    final ProfileManager<CommonProfile> profileManager =
+        new ProfileManager<>(
+            new J2EContext(
+                Beans.get(HttpServletRequest.class), Beans.get(HttpServletResponse.class)));
+
+    profileManager
+        .get(true)
+        .filter(profile -> AuthPac4jModule.getCentralClients().contains(profile.getClientName()))
+        .ifPresent(profile -> map.put("auth.central.client", profile.getClientName()));
+
     return map;
   }
 
   public String getStyle() {
-    if (SETTINGS.get("context.appStyle") != null) {
+    if (SETTINGS.get(AvailableAppSettings.CONTEXT_APP_STYLE) != null) {
       final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
       final ScriptHelper helper = new CompositeScriptHelper(bindings);
       try {
@@ -140,8 +158,8 @@ public class AppInfo {
   }
 
   public String getLogo() throws JspException, IOException {
-    final String logo = SETTINGS.get("application.logo", "img/axelor.png");
-    if (SETTINGS.get("context.appLogo") != null) {
+    final String logo = SETTINGS.get(AvailableAppSettings.APPLICATION_LOGO, "img/axelor.png");
+    if (SETTINGS.get(AvailableAppSettings.CONTEXT_APP_LOGO) != null) {
       final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
       final ScriptHelper helper = new CompositeScriptHelper(bindings);
       try {

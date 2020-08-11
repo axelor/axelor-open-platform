@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,6 +18,7 @@
 package com.axelor.web;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.db.search.SearchService;
 import com.axelor.db.tenants.TenantModule;
 import com.axelor.event.Event;
@@ -54,7 +55,8 @@ public class AppInitializer extends HttpServlet {
     LOGGER.info("Initializing...");
 
     try {
-      moduleManager.initialize(false, AppSettings.get().getBoolean("data.import.demo-data", true));
+      moduleManager.initialize(
+          false, AppSettings.get().getBoolean(AvailableAppSettings.DATA_IMPORT_DEMO_DATA, true));
     } catch (Exception e) {
       LOGGER.error(e.getMessage(), e);
     }

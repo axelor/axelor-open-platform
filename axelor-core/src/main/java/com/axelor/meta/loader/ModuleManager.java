@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -25,6 +25,7 @@ import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.common.StringUtils;
+import com.axelor.db.ParallelTransactionExecutor;
 import com.axelor.db.internal.DBHelper;
 import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
@@ -38,8 +39,10 @@ import com.axelor.meta.db.repo.MetaMenuRepository;
 import com.axelor.meta.db.repo.MetaModuleRepository;
 import com.axelor.meta.db.repo.MetaSelectRepository;
 import com.axelor.meta.db.repo.MetaViewRepository;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.persist.Transactional;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -52,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,23 +68,24 @@ public class ModuleManager {
 
   private boolean loadData = true;
 
-  @Inject private AuthService authService;
+  private final AuthService authService;
 
-  @Inject private MetaModuleRepository modules;
+  private final MetaModuleRepository modules;
 
-  @Inject private ViewLoader viewLoader;
+  private final ViewLoader viewLoader;
 
-  @Inject private ModelLoader modelLoader;
+  private final DataLoader dataLoader;
 
-  @Inject private I18nLoader i18nLoader;
+  private final DemoLoader demoLoader;
 
-  @Inject private DataLoader dataLoader;
-
-  @Inject private DemoLoader demoLoader;
+  private final List<AbstractParallelLoader> metaLoaders;
 
   @Inject private Event<ModuleChanged> moduleChangedEvent;
 
   private static final Set<String> SKIP = new HashSet<>();
+
+  private static long lastRestored;
+  private final Set<Path> pathsToRestore = new HashSet<>();
 
   static {
     SKIP.add("axelor-common");
@@ -88,7 +93,22 @@ public class ModuleManager {
     SKIP.add("axelor-test");
   }
 
-  public ModuleManager() {}
+  @Inject
+  public ModuleManager(
+      AuthService authService,
+      MetaModuleRepository modules,
+      ViewLoader viewLoader,
+      ModelLoader modelLoader,
+      I18nLoader i18nLoader,
+      DataLoader dataLoader,
+      DemoLoader demoLoader) {
+    this.authService = authService;
+    this.modules = modules;
+    this.viewLoader = viewLoader;
+    this.dataLoader = dataLoader;
+    this.demoLoader = demoLoader;
+    metaLoaders = ImmutableList.of(modelLoader, viewLoader, i18nLoader);
+  }
 
   public void initialize(final boolean update, final boolean withDemo) {
     try {
@@ -98,25 +118,19 @@ public class ModuleManager {
           .run(
               () -> {
                 // install modules
-                resolver
-                    .all()
-                    .stream()
+                resolver.all().stream()
                     .filter(m -> !m.isRemovable() || m.isInstalled())
                     .peek(m -> log.info("Loading package " + m.getName() + "..."))
                     .filter(m -> !m.isRemovable() || m.isPending())
                     .forEach(m -> install(m.getName(), update, withDemo, false));
 
                 // second iteration ensures proper view sequence
-                resolver
-                    .all()
-                    .stream()
+                resolver.all().stream()
                     .filter(Module::isInstalled)
                     .forEach(m -> viewLoader.doLast(m, update));
 
                 // uninstall pending modules
-                resolver
-                    .all()
-                    .stream()
+                resolver.all().stream()
                     .filter(Module::isRemovable)
                     .filter(Module::isPending)
                     .filter(m -> !m.isInstalled())
@@ -127,6 +141,7 @@ public class ModuleManager {
       this.encryptPasswords();
       this.doCleanUp();
     }
+    ViewWatcher.getInstance().start();
   }
 
   public void updateAll(boolean withDemo) {
@@ -138,29 +153,40 @@ public class ModuleManager {
     if (moduleNames != null) {
       Collections.addAll(names, moduleNames);
     }
+
     try {
       this.createUsers();
       this.resolve(true);
       if (names.isEmpty()) {
-        resolver
-            .all()
-            .stream()
+        resolver.all().stream()
             .filter(Module::isInstalled)
             .map(Module::getName)
             .forEach(names::add);
       }
-      resolver
-          .all()
-          .stream()
+      resolver.all().stream()
           .filter(m -> names.contains(m.getName()))
           .forEach(m -> install(m, true, withDemo));
-      resolver
-          .all()
-          .stream()
+      resolver.all().stream()
           .filter(m -> names.contains(m.getName()))
           .forEach(m -> viewLoader.doLast(m, true));
     } finally {
       this.doCleanUp();
+    }
+  }
+
+  public void update(Set<String> moduleNames, Set<Path> paths) {
+    final List<Module> moduleList =
+        resolver.all().stream()
+            .filter(m -> moduleNames.contains(m.getName()))
+            .collect(Collectors.toList());
+
+    try {
+      pathsToRestore.addAll(paths);
+      moduleList.forEach(m -> install(m, true, false));
+      moduleList.forEach(m -> viewLoader.doLast(m, true));
+    } finally {
+      pathsToRestore.clear();
+      doCleanUp();
     }
   }
 
@@ -171,6 +197,22 @@ public class ModuleManager {
     } finally {
       loadData = true;
     }
+  }
+
+  public boolean isLoadData() {
+    return loadData;
+  }
+
+  public void setLoadData(boolean loadData) {
+    this.loadData = loadData;
+  }
+
+  static long getLastRestored() {
+    return lastRestored;
+  }
+
+  private static void updateLastRestored() {
+    lastRestored = System.currentTimeMillis();
   }
 
   public static List<String> getResolution() {
@@ -187,9 +229,7 @@ public class ModuleManager {
 
   public void install(String moduleName, boolean update, boolean withDemo) {
     try {
-      resolver
-          .resolve(moduleName)
-          .stream()
+      resolver.resolve(moduleName).stream()
           .map(Module::getName)
           .forEach(name -> install(name, update, withDemo, true));
       resolver.resolve(moduleName).stream().forEach(m -> viewLoader.doLast(m, update));
@@ -225,6 +265,7 @@ public class ModuleManager {
 
   private void doCleanUp() {
     AbstractLoader.doCleanUp();
+    updateLastRestored();
   }
 
   private void install(String moduleName, boolean update, boolean withDemo, boolean force) {
@@ -273,16 +314,13 @@ public class ModuleManager {
     updateState(module);
   }
 
-  @Transactional
-  void installMeta(Module module, boolean update) {
-    // load model info
-    modelLoader.load(module, update);
-
-    // load views
-    viewLoader.load(module, update);
-
-    // load i18n
-    i18nLoader.load(module, update);
+  private void installMeta(Module module, boolean update) {
+    final ParallelTransactionExecutor transactionExecutor = new ParallelTransactionExecutor();
+    metaLoaders.forEach(
+        metaLoader ->
+            metaLoader.feedTransactionExecutor(
+                transactionExecutor, module, update, pathsToRestore));
+    transactionExecutor.run();
   }
 
   @Transactional
@@ -413,7 +451,7 @@ public class ModuleManager {
         final MetaModule depending = modules.findByName(name);
         if (depending == null) {
           throw new RuntimeException(
-              "No such depemodule found: " + name + ", required by: " + stored.getName());
+              "No such depmodule found: " + name + ", required by: " + stored.getName());
         }
         depends.add(depending);
       }

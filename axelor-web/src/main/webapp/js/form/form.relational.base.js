@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -338,12 +338,13 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 
     var field = this.field;
     var nameField = field.targetName || 'id',
+      colorField = field.colorField,
       fields = field.targetSearch || [],
       filter = {},
       limit = field.limit || (axelor.device.small ? 6 : 10),
       sortBy = field.orderBy;
 
-    fields = ["id", nameField].concat(fields);
+    fields = ["id", nameField, colorField].concat(fields);
     fields = _.chain(fields).compact().unique().value();
 
     _.each(fields, function(name){
@@ -376,10 +377,12 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
     }
 
     fetchDS().search(params).success(function(records, page){
+      var trKey = '$t:' + nameField;
       var items = _.map(records, function(record) {
         return {
-          label: record[nameField],
-          value: record
+          label: record[trKey] || record[nameField],
+          value: record,
+          color: record[colorField]
         };
       });
       response(items, page);

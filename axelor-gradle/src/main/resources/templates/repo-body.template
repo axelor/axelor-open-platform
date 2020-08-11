@@ -7,5 +7,6 @@ public ${repo.classStatement} extends ${repo.baseClass} {
 	<% repo.finderMethods.each { %>\
 		${it.getCode(false)}\
 	<% } %>\
+	${repo.removeMethodBody}
 	${repo.extraCode}
 }

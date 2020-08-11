@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.web;
 
+import com.axelor.meta.CallMethod;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 
@@ -26,7 +27,12 @@ public class Hello {
     response.setFlash("Hello World!!!");
   }
 
+  @CallMethod
   public String say(String what) {
     return "Say: " + what;
+  }
+
+  public String unauthorizedCallMethod(String what) {
+    return "Call unauthorizedCallMethod: " + what;
   }
 }

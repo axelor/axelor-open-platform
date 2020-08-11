@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -20,68 +20,72 @@ package com.axelor.tools.x2j.pojo
 
 class Repository {
 
-	private Entity entity
+  private Entity entity
 
-	private ImportManager importManager
+  private ImportManager importManager
 
-	String namespace
-	String baseClass
-	String modelClass
+  String namespace
+  String baseClass
+  String modelClass
 
-	String name
+  String name
 
-	boolean concrete = true
+  boolean concrete = true
 
-	public Repository(Entity entity) {
+  public Repository(Entity entity) {
 
-		this.entity = entity
+    this.entity = entity
 
-		this.namespace = entity.repoNamespace
-		this.baseClass = "JpaRepository<${entity.name}>"
-		this.modelClass = entity.name
-		this.name = "${entity.name}Repository"
+    this.namespace = entity.repoNamespace
+    this.baseClass = "JpaRepository<${entity.name}>"
+    this.modelClass = entity.name
+    this.name = "${entity.name}Repository"
 
-		this.importManager = new ImportManager(this.namespace, false)
+    this.importManager = new ImportManager(this.namespace, false)
 
-		this.importManager.importType("com.axelor.db.JpaRepository")
-		this.importManager.importType("${entity.namespace}.${entity.name}")
-	}
+    this.importManager.importType("com.axelor.db.JpaRepository")
+    this.importManager.importType("${entity.namespace}.${entity.name}")
+  }
 
-	String getClassName() {
-		if (concrete) {
-			return name;
-		}
-		return "Abstract${name}"
-	}
+  String getClassName() {
+    if (concrete) {
+      return name;
+    }
+    return "Abstract${name}"
+  }
 
-	String getClassStatement() {
-		if (concrete) {
-			return "class $className"
-		}
-		return "abstract class $className"
-	}
+  String getClassStatement() {
+    if (concrete) {
+      return "class $className"
+    }
+    return "abstract class $className"
+  }
 
-	String getFile() {
-		return namespace.replace(".", "/") + "/${className}.java"
-	}
+  String getFile() {
+    return namespace.replace(".", "/") + "/${className}.java"
+  }
 
-	String importType(String fqn) {
-		return importManager.importType(fqn)
-	}
+  String importType(String fqn) {
+    return importManager.importType(fqn)
+  }
 
-	List<String> getImportStatements() {
-		return importManager.getImportStatements()
-	}
+  List<String> getImportStatements() {
+    return importManager.getImportStatements()
+  }
 
-	List<Finder> getFinderMethods() {
-		return this.entity.getFinderMethods()
-	}
+  List<Finder> getFinderMethods() {
+    return this.entity.getFinderMethods()
+  }
 
-	String getExtraImports() {
-		this.entity.extraImports
-	}
+  String getExtraImports() {
+    this.entity.extraImports
+  }
 
-	String getExtraCode() {
-		this.entity.extraCode
-	}
+  String getRemoveMethodBody() {
+    this.entity.removeMethodBody
+  }
+
+  String getExtraCode() {
+    this.entity.extraCode
+  }
 }

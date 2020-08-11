@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -34,10 +34,9 @@ public class Country extends Model {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CONTACT_COUNTRY_SEQ")
   @SequenceGenerator(
-    name = "CONTACT_COUNTRY_SEQ",
-    sequenceName = "CONTACT_COUNTRY_SEQ",
-    allocationSize = 1
-  )
+      name = "CONTACT_COUNTRY_SEQ",
+      sequenceName = "CONTACT_COUNTRY_SEQ",
+      allocationSize = 1)
   private Long id;
 
   @NotNull private String code;

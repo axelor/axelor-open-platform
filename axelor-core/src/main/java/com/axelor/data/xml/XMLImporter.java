@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -21,6 +21,7 @@ import com.axelor.data.ImportException;
 import com.axelor.data.ImportTask;
 import com.axelor.data.Importer;
 import com.axelor.data.Listener;
+import com.axelor.data.XStreamUtils;
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
@@ -28,7 +29,7 @@ import com.axelor.db.internal.DBHelper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.StaxDriver;
+import com.thoughtworks.xstream.io.xml.WstxDriver;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,6 +45,7 @@ import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
+import javax.xml.stream.XMLInputFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -194,8 +196,18 @@ public class XMLImporter implements Importer {
 
     final int batchSize = DBHelper.getJdbcBatchSize();
 
+    final WstxDriver driver =
+        new WstxDriver() {
+          @Override
+          protected XMLInputFactory createInputFactory() {
+            XMLInputFactory factory = super.createInputFactory();
+            factory.setProperty(XMLInputFactory.IS_COALESCING, Boolean.TRUE);
+            return factory;
+          }
+        };
+
     final XStream stream =
-        new XStream(new StaxDriver()) {
+        new XStream(driver) {
 
           private String root = null;
 
@@ -291,6 +303,7 @@ public class XMLImporter implements Importer {
       binder.registerAdapter(adapter);
     }
 
+    XStreamUtils.setupSecurity(stream);
     stream.setMode(XStream.NO_REFERENCES);
     stream.registerConverter(new ElementConverter(binder));
 

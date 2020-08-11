@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -179,6 +179,10 @@ public class LoggerConfiguration {
     logger("org.apache.tomcat.util.net.NioSelectorPool", Level.WARN);
     logger("org.eclipse.jetty.util.component.AbstractLifeCycle", Level.ERROR);
     logger("org.hibernate.validator.internal.util.Version", Level.WARN);
+
+    // pac4j
+    logger("org.pac4j.core.engine", Level.INFO);
+    logger("com.axelor.auth.pac4j", Level.INFO);
 
     Level rootLevel = Level.ERROR;
 

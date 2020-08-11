@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -23,8 +23,9 @@ var ui = angular.module('axelor.ui');
 
 var BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 var META_FILE = "com.axelor.meta.db.MetaFile";
+var META_JSON_RECORD = "com.axelor.meta.db.MetaJsonRecord";
 
-function makeURL(model, field, recordOrId, version, scope) {
+function makeURL(model, field, recordOrId, version, scope, parentId) {
   var value = recordOrId;
   if (!value) return null;
   var id = value.id ? value.id : value;
@@ -34,8 +35,17 @@ function makeURL(model, field, recordOrId, version, scope) {
   if (ver === undefined || ver === null) ver = (new Date()).getTime();
   if (!id || id <= 0) return null;
   var url = "ws/rest/" + model + "/" + id + "/" + field + "/download?v=" + ver;
-  if (scope && scope.record) {
-    url += "&parentId=" + scope.record.id + "&parentModel=" + scope._model;
+  if (scope) {
+    if ((!parentId || parentId < 0) && scope.record) {
+      parentId = scope.record.id;
+      if ((!parentId || parentId < 0) && scope.field && scope._jsonContext && scope._jsonContext.$record) {
+        parentId = scope._jsonContext.$record.id;
+      }
+    }
+    if (parentId > 0) {
+      url += "&parentId=" + parentId;
+    }
+    url += "&parentModel=" + scope._model;
   }
   return url;
 }
@@ -91,9 +101,10 @@ ui.formInput('ImageLink', {
       if (scope.isReadonly()) {
         image.get(0).src = scope.parseText(model.$viewValue) || BLANK;
       }
-    }
+    };
 
     scope.$watch("record.id", update);
+    scope.$watch("record.version", update);
     scope.$watch("isReadonly()", update);
   },
   template_editable: '<input type="text">',
@@ -245,15 +256,16 @@ ui.formInput('Image', 'ImageLink', {
       };
     }
 
-    scope.$render_editable = function() {
+    var updateLink = scope.$render_editable = function() {
       image.get(0).src = scope.getLink(model.$viewValue);
     };
 
-    scope.$watch("record.id", function imageRecordIdWatch(id, old) {
-      if (!scope.isReadonly()) {
-        scope.$render_editable();
-      }
-    });
+    scope.$watch("record.id", updateLink);
+    scope.$watch("record.version", updateLink);
+
+    if (field.accept) {
+      input.attr('accept', field.accept);
+    }
   },
   template_editable:
   '<div ng-style="styles[0]" class="image-wrapper">' +
@@ -329,6 +341,10 @@ ui.formInput('Binary', {
         });
       }
     });
+
+    if (field.accept) {
+      input.attr('accept', field.accept);
+    }
   },
   template_readonly: null,
   template_editable: null,
@@ -415,6 +431,10 @@ ui.formInput('BinaryLink', {
         scope.setValue(rec, true);
       });
     });
+
+    if (field.accept) {
+      input.attr('accept', field.accept);
+    }
   },
   template_readonly: null,
   template_editable: null,

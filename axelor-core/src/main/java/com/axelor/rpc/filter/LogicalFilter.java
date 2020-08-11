@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -17,9 +17,11 @@
  */
 package com.axelor.rpc.filter;
 
+import com.axelor.common.StringUtils;
 import com.google.common.base.Joiner;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 class LogicalFilter extends Filter {
 
@@ -34,19 +36,24 @@ class LogicalFilter extends Filter {
 
   @Override
   public String getQuery() {
+    if (filters == null || filters.isEmpty()) return "";
 
-    if (filters == null || filters.size() == 0) return "";
+    final List<String> filterParts =
+        filters.stream()
+            .map(Filter::toString)
+            .filter(StringUtils::notBlank)
+            .collect(Collectors.toList());
 
     StringBuilder sb = new StringBuilder();
 
     if (operator == Operator.NOT) sb.append("NOT ");
 
-    if (filters.size() > 1) sb.append("(");
+    if (filterParts.size() > 1) sb.append("(");
 
     String joiner = operator == Operator.NOT ? " AND " : " " + operator.name() + " ";
-    sb.append(Joiner.on(joiner).join(filters));
+    sb.append(Joiner.on(joiner).join(filterParts));
 
-    if (filters.size() > 1) sb.append(")");
+    if (filterParts.size() > 1) sb.append(")");
 
     return sb.toString();
   }

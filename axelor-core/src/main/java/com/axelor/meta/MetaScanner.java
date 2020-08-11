@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -21,6 +21,8 @@ import com.axelor.common.ClassUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.reflections.ClassFinder;
 import com.axelor.common.reflections.Reflections;
+import com.google.common.collect.Streams;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -56,6 +58,18 @@ public final class MetaScanner {
           "build/classes/scala/main",
           "build/classes/kotlin/main",
           "build/classes/groovy/main");
+
+  private static final List<String> BUILD_TEST_PATHS =
+      Arrays.asList(
+          "bin/test",
+          "out/test/classes",
+          "out/test/resources",
+          "build/resources/test",
+          "build/classes/test",
+          "build/classes/java/test",
+          "build/classes/scala/test",
+          "build/classes/kotlin/test",
+          "build/classes/groovy/test");
 
   private MetaScanner() {}
 
@@ -129,8 +143,7 @@ public final class MetaScanner {
     }
 
     final Path base =
-        BUILD_OUTPUT_PATHS
-            .stream()
+        BUILD_OUTPUT_PATHS.stream()
             .filter(p -> file.endsWith(p))
             .findFirst()
             .map(p -> p.replaceAll("[^/]+", ".."))
@@ -144,33 +157,40 @@ public final class MetaScanner {
     }
 
     final ClassLoader loader = ClassUtils.getContextClassLoader();
-    if (loader instanceof URLClassLoader) {
-      for (URL url : ((URLClassLoader) loader).getURLs()) {
-        try {
-          Path next = Paths.get(url.toURI());
-          if (Files.isDirectory(next) && next.startsWith(base)) {
-            paths.add(url);
-          }
-        } catch (URISyntaxException e) {
-          // this should never happen
+    final List<Path> outputs =
+        Streams.concat(BUILD_OUTPUT_PATHS.stream(), BUILD_TEST_PATHS.stream())
+            .map(base::resolve)
+            .filter(Files::exists)
+            .collect(Collectors.toList());
+
+    for (URL url : findClassPathURLs(loader)) {
+      try {
+        Path next = Paths.get(url.toURI());
+        if (Files.isDirectory(next) && outputs.contains(next)) {
+          paths.add(url);
         }
+      } catch (URISyntaxException e) {
+        // this should never happen
       }
-    } else {
-      BUILD_OUTPUT_PATHS
-          .stream()
-          .map(base::resolve)
-          .filter(Files::exists)
-          .forEach(
-              next -> {
-                try {
-                  paths.add(next.toUri().toURL());
-                } catch (MalformedURLException e) {
-                  // this should never happen
-                }
-              });
     }
 
     return paths;
+  }
+
+  private static List<URL> findClassPathURLs(ClassLoader loader) {
+    return loader instanceof URLClassLoader
+        ? Arrays.asList(((URLClassLoader) loader).getURLs())
+        : Arrays.stream(System.getProperty("java.class.path").split(File.pathSeparator))
+            .map(
+                item -> {
+                  try {
+                    return new File(item).toURI().toURL();
+                  } catch (MalformedURLException e) {
+                    // this should not happen
+                    throw new RuntimeException(e);
+                  }
+                })
+            .collect(Collectors.toList());
   }
 
   /**
@@ -179,8 +199,7 @@ public final class MetaScanner {
    * @return list of class path entry urls of the modules.
    */
   private static List<URL> findClassPath() {
-    return findModuleFiles()
-        .stream()
+    return findModuleFiles().stream()
         .flatMap(file -> findClassPath(file).stream())
         .collect(Collectors.toList());
   }
@@ -239,8 +258,7 @@ public final class MetaScanner {
    * @return list of module properties
    */
   public static List<Properties> findModuleProperties() {
-    return findModuleFiles()
-        .stream()
+    return findModuleFiles().stream()
         .map(file -> findProperties(file))
         .filter(p -> StringUtils.notBlank(p.getProperty("name")))
         .collect(Collectors.toList());

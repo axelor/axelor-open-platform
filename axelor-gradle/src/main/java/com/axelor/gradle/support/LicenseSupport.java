@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -18,24 +18,22 @@
 package com.axelor.gradle.support;
 
 import com.axelor.common.FileUtils;
-import com.axelor.gradle.tasks.GenerateCode;
-import groovy.text.SimpleTemplateEngine;
-import groovy.text.TemplateEngine;
+import com.hierynomus.gradle.license.LicenseBasePlugin;
+import com.hierynomus.gradle.license.LicenseReportingPlugin;
+import com.hierynomus.gradle.license.tasks.LicenseCheck;
+import com.hierynomus.gradle.license.tasks.LicenseFormat;
 import java.io.File;
-import java.io.StringWriter;
 import java.util.Calendar;
-import java.util.Map;
 import nl.javadude.gradle.plugins.license.License;
 import nl.javadude.gradle.plugins.license.LicenseExtension;
 import nl.javadude.gradle.plugins.license.LicensePlugin;
-import org.gradle.api.GradleException;
+import nl.javadude.gradle.plugins.license.PluginHelper;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.plugins.ExtraPropertiesExtension;
+import org.gradle.api.plugins.JavaBasePlugin;
 
 public class LicenseSupport extends AbstractSupport {
-
-  private String headerText;
 
   private File findHeaderFile(Project project) {
     final String[] paths = {
@@ -50,23 +48,11 @@ public class LicenseSupport extends AbstractSupport {
     return project.file("src/license/header.txt");
   }
 
-  private String getLicenseText(Project project, Map<String, Object> props) {
-    final File licenseFile = findHeaderFile(project);
-    final StringWriter writer = new StringWriter();
-    final TemplateEngine engine = new SimpleTemplateEngine();
-    try {
-      engine.createTemplate(licenseFile).make(props).writeTo(writer);
-    } catch (Exception e) {
-      throw new GradleException(e.getMessage(), e);
-    }
-    String text = writer.toString().replaceAll("\n", "\n * ").trim();
-    return "/*\n * " + text + "/\n";
-  }
-
   @Override
   public void apply(Project project) {
     final File header = findHeaderFile(project);
-    project.getPlugins().apply(LicensePlugin.class);
+    final boolean headerExists = header != null && header.exists();
+    project.getPlugins().apply(AxelorLicensePlugin.class);
 
     final LicenseExtension license = project.getExtensions().getByType(LicenseExtension.class);
     final ExtraPropertiesExtension ext =
@@ -77,21 +63,6 @@ public class LicenseSupport extends AbstractSupport {
     ext.set("year", Calendar.getInstance().get(Calendar.YEAR));
     ext.set("owner", "Axelor");
     ext.set("website", "http://axelor.com");
-
-    // format generated code with license header
-    project
-        .getTasks()
-        .withType(GenerateCode.class)
-        .all(
-            task -> {
-              task.setFormatter(
-                  text -> {
-                    if (headerText == null) {
-                      headerText = getLicenseText(project, ext.getProperties());
-                    }
-                    return headerText + text;
-                  });
-            });
 
     license.setHeader(header);
     license.setIgnoreFailures(true);
@@ -123,26 +94,54 @@ public class LicenseSupport extends AbstractSupport {
     license.exclude("**/webapp/node_modules/**");
     license.exclude("**/webapp/WEB-INF/web.xml");
 
+    final File src = FileUtils.getFile(project.getProjectDir(), "src");
     final File webapp = FileUtils.getFile(project.getProjectDir(), "src", "main", "webapp");
 
     project.afterEvaluate(
-        p -> {
-          project
-              .getTasks()
-              .withType(License.class)
-              .all(
-                  task -> {
-                    task.onlyIf(spec -> header != null && header.exists());
-                    task.source(
-                        project.fileTree(
-                            webapp,
-                            tree -> {
-                              tree.exclude("lib/**");
-                              tree.exclude("dist/**");
-                              tree.exclude("node_modules/**");
-                              tree.exclude("WEB-INF/web.xml");
-                            }));
-                  });
-        });
+        p ->
+            project
+                .getTasks()
+                .withType(License.class)
+                .all(
+                    task -> {
+                      task.setEnabled(headerExists);
+                      task.setSource(project.fileTree(src));
+                      task.source(
+                          project.fileTree(
+                              webapp,
+                              tree -> {
+                                tree.exclude("lib/**");
+                                tree.exclude("dist/**");
+                                tree.exclude("node_modules/**");
+                                tree.exclude("WEB-INF/web.xml");
+                              }));
+                    }));
+  }
+
+  /** License checking that is not added to check lifecycle */
+  static class AxelorLicensePlugin extends LicensePlugin {
+
+    @Override
+    public void apply(Project project) {
+      project.getPlugins().apply(LicenseBasePlugin.class);
+      project.getPlugins().apply(LicenseReportingPlugin.class);
+
+      baseCheckTask = project.task(LicenseBasePlugin.getLICENSE_TASK_BASE_NAME());
+      baseFormatTask = project.task(LicenseBasePlugin.getFORMAT_TASK_BASE_NAME());
+
+      baseCheckTask.setGroup("License");
+      baseFormatTask.setGroup(baseCheckTask.getGroup());
+      baseCheckTask.setDescription("Checks for header consistency.");
+      baseFormatTask.setDescription(
+          "Applies the license found in the header file in files missing the header.");
+
+      project.getPlugins().withType(JavaBasePlugin.class, plugin -> linkLicenseTasks(project));
+      PluginHelper.withAndroidPlugin(project, plugin -> linkLicenseTasks(project));
+    }
+
+    private void linkLicenseTasks(Project project) {
+      project.getTasks().withType(LicenseCheck.class, lt -> baseCheckTask.dependsOn(lt));
+      project.getTasks().withType(LicenseFormat.class, lt -> baseFormatTask.dependsOn(lt));
+    }
   }
 }

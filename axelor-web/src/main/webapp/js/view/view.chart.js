@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -22,6 +22,10 @@
 "use strict";
 
 var ui = angular.module('axelor.ui');
+var legendLengthLimit = 8;  // limit before limiting legend length
+var legendMaxKeyLength = 10 // maximum legend length when above limit
+var legendHideLimit = 16;   // limit before hiding legend by default
+var labelRotateLimit = 5;   // limit before rotating labels
 
 ui.ChartCtrl = ChartCtrl;
 ui.ChartCtrl.$inject = ['$scope', '$element', '$http', 'ActionService'];
@@ -157,6 +161,11 @@ function ChartCtrl($scope, $element, $http, ActionService) {
     });
   };
 
+  $scope.toggleLegend = function() {
+    $scope.isLegendVisible = !$scope.isLegendVisible;
+    $scope.onRefresh();
+  }
+
   $scope.render = function(data) {
 
   };
@@ -209,7 +218,7 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
             placeholder: item.title || item.autoTitle
           });
           if (item.multiple && (item.target || item.selection)) {
-            item.widget = item.target ? "TagSelect" : "MultiSelect";
+            item.widget = item.target ? "tag-select" : "multi-select";
           }
           return props;
         })
@@ -425,6 +434,51 @@ function PlotData(series, data) {
   return datum;
 }
 
+function applyLimitsOnLegend(chart, scope, series, datum, config) {
+  if (!chart.showLegend) {
+    return;
+  }
+
+  if (scope.isLegendVisible !== undefined) {
+    chart.showLegend(scope.isLegendVisible);
+  } else if (config && config.hideLegend !== undefined) {
+    var hideLegend = _.toBoolean(config.hideLegend);
+    chart.showLegend(!hideLegend);
+  } else if (chart.showLegend() && datum.length > legendHideLimit) {
+    chart.showLegend(false);
+  }
+  if (chart.showLegend() && datum.length > legendLengthLimit) {
+    chart.legend.maxKeyLength(legendMaxKeyLength);
+  }
+  if (series.groupBy || datum.length > 1) {
+    scope.isLegendVisible = chart.showLegend();
+    scope.$applyAsync();
+  }
+}
+
+function applyLimitsOnLegendAndLabels(chart, scope, series, datum, config) {
+  applyLimitsOnLegend(chart, scope, series, datum, config);
+
+  if (chart.showXAxis && chart.showXAxis()
+      && (!chart.staggerLabels || !chart.staggerLabels())
+      && _.chain(datum).pluck("values").flatten().pluck("x").unique().size().value() > labelRotateLimit) {
+    chart.xAxis.rotateLabels(-45);
+  }
+}
+
+function applyTitles(chart, xTitle, yTitle) {
+  if (xTitle && chart.xAxis && chart.xAxis.axisLabel) {
+    var minMargin = 60;
+    if (chart.staggerLabels && chart.staggerLabels() && chart.margin().bottom < minMargin) {
+      chart.margin().bottom = minMargin;
+    }
+    chart.xAxis.axisLabel(xTitle);
+  }
+  if (yTitle && chart.yAxis && chart.yAxis.axisLabel) {
+    chart.yAxis.axisLabel(yTitle);
+  }
+}
+
 function PieChart(scope, element, data) {
 
   var series = _.first(data.series);
@@ -437,6 +491,7 @@ function PieChart(scope, element, data) {
     .width(null)
     .x(function(d) { return d.x; })
     .y(function(d) { return d.y; });
+  applyLimitsOnLegend(chart, scope, series, datum, config);
 
   if (series.type === "donut") {
     chart.donut(true)
@@ -467,6 +522,7 @@ function DBarChart(scope, element, data) {
 
   var series = _.first(data.series);
   var datum = PlusData(series, data);
+  var config = data.config || {};
 
   datum = [{
     key: data.title,
@@ -478,6 +534,8 @@ function DBarChart(scope, element, data) {
       .y(function(d) { return d.y; })
       .staggerLabels(true)
       .showValues(true);
+  applyLimitsOnLegendAndLabels(chart, scope, series, datum, config);
+  applyTitles(chart, data.xTitle, series.title);
 
   d3.select(element[0])
     .datum(datum)
@@ -494,9 +552,12 @@ function BarChart(scope, element, data) {
 
   var series = _.first(data.series);
   var datum = PlotData(series, data);
+  var config = data.config || {};
 
   var chart = nv.models.multiBarChart()
     .reduceXTicks(false);
+  applyLimitsOnLegendAndLabels(chart, scope, series, datum, config);
+  applyTitles(chart, data.xTitle, series.title);
 
   chart.multibar.hideable(true);
   chart.stacked(data.stacked);
@@ -516,8 +577,11 @@ function HBarChart(scope, element, data) {
 
   var series = _.first(data.series);
   var datum = PlotData(series, data);
+  var config = data.config || {};
 
   var chart = nv.models.multiBarHorizontalChart();
+  applyLimitsOnLegendAndLabels(chart, scope, series, datum, config);
+  applyTitles(chart, data.xTitle, series.title);
 
   chart.stacked(data.stacked);
 
@@ -576,12 +640,14 @@ function LineChart(scope, element, data) {
 
   var series = _.first(data.series);
   var datum = PlotData(series, data);
+  var config = data.config || {};
 
   var chart = nv.models.lineChart()
     .showLegend(true)
     .showYAxis(true)
     .showXAxis(true);
-
+  applyLimitsOnLegend(chart, scope, series, datum, config);
+  applyTitles(chart, data.xTitle, series.title);
   applyXY(chart, data);
 
   d3.select(element[0])
@@ -595,9 +661,11 @@ function AreaChart(scope, element, data) {
 
   var series = _.first(data.series);
   var datum = PlotData(series, data);
+  var config = data.config || {};
 
   var chart = nv.models.stackedAreaChart();
-
+  applyLimitsOnLegend(chart, scope, series, datum, config);
+  applyTitles(chart, data.xTitle, series.title);
   applyXY(chart, data);
 
   d3.select(element[0])
@@ -753,6 +821,9 @@ function Chart(scope, element, data) {
   })();
 
   nv.addGraph(function generate() {
+    if (!data.dataset) {
+      return;
+    }
 
     var noData = _t('No records found.');
     if (data.dataset && data.dataset.stacktrace) {
@@ -765,6 +836,22 @@ function Chart(scope, element, data) {
 
     if (!chart) {
       return;
+    }
+
+    // series scale attribute
+    var series = _.first(data.series);
+    var scale = series && series.scale;
+
+    // format as integer if no scale is specified
+    // and data has integer series values
+    if (!isInteger(scale) && hasIntegerValues(data)) {
+      scale = 0;
+    }
+
+    if (isInteger(scale)) {
+      var format = '.' + scale + 'f';
+      chart.yAxis && chart.yAxis.tickFormat(d3.format(format));
+      chart.valueFormat && chart.valueFormat(d3.format(format));
     }
 
     if (chart.color) {
@@ -815,7 +902,6 @@ function Chart(scope, element, data) {
     var tickFormat = tickFormats[data.xType];
     if (chart.xAxis && tickFormat) {
       chart.xAxis
-        .rotateLabels(-45)
         .tickFormat(tickFormat);
     }
 
@@ -864,6 +950,16 @@ function Chart(scope, element, data) {
 
     return chart;
   });
+}
+
+function hasIntegerValues(data) {
+  var series = _.first(data.series);
+  var dataset = _.first(data.dataset);
+  return series && dataset && isInteger(dataset[series.key]);
+}
+
+function isInteger(n) {
+  return (n ^ 0) === n;
 }
 
 var directiveFn = function(){
@@ -915,10 +1011,11 @@ var directiveFn = function(){
           };
           scope.onExport = function () {
             doExport(data);
-          }
+          };
           scope.onAction = function () {
             scope.handleAction(data && data.dataset);
-          }
+          };
+          scope.$applyAsync();
           return;
         });
       };

@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -87,6 +87,7 @@ ui.directive('uiTabGate', function() {
       return {
         pre: function preLink(scope, element, attrs) {
           scope.$watchChecker(function(current) {
+            if (current.$$popupStack.length) return true;
             if (current.tabSelected === undefined) {
               return !scope.tab || scope.tab.selected === undefined || scope.tab.selected;
             }
@@ -190,18 +191,27 @@ ui.directive('uiShow', function() {
 ui.directive('uiAttach', function () {
   return function (scope, element, attrs) {
     var parent = null;
+    var detachTimer = null;
     var uiAttachWatch = function uiAttachWatch(attach) {
       var result = toBoolean(attach);
       if (result) {
         if (parent) {
-          element.appendTo(parent);
+          if (detachTimer) {
+            clearTimeout(detachTimer);
+            detachTimer = null;
+          } else {
+            element.appendTo(parent);
+          }
           parent = null;
           scope.$broadcast('dom:attach');
         }
       } else {
         parent = element.parent();
         scope.$broadcast('dom:detach');
-        element.detach();
+        detachTimer = setTimeout(function () {
+          detachTimer = null;
+          element.detach();
+        }, 200);
       }
     };
 
@@ -209,6 +219,10 @@ ui.directive('uiAttach', function () {
 
     scope.$watch(attrs.uiAttach, uiAttachWatch, true);
     scope.$on('$destroy', function () {
+      if (detachTimer) {
+        clearTimeout(detachTimer);
+        detachTimer = null;
+      }
       if (parent) {
         parent = null;
         element.remove();
@@ -236,7 +250,7 @@ ui.directive('uiAttachScroll', function () {
 
       function resetScroll() {
         elem.scrollTop(scrollTop);
-      };
+      }
 
       scope.$on('dom:attach', resetScroll);
       scope.$on('tab:select', resetScroll);
@@ -258,7 +272,13 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
   }
 
   function withContext(scope, record) {
-    var values = _.extend({}, scope._context, scope._jsonContext, record);
+    var context = scope._context;
+    var parent = scope.$parent;
+    while (parent) {
+      context = _.extend({}, parent._context, context);
+      parent = parent.$parent;
+    }
+    var values = _.extend({}, context, scope._jsonContext, record);
     return _.extend(values, {
       $user: axelor.config['user.login'],
       $group: axelor.config['user.group'],
@@ -280,6 +300,8 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
       }
     });
     scope.$on("on:grid-selection-change", function(e, context) {
+      if (field && field.jsonField) return;
+      if (scope._isNestedGrid === undefined || !scope._isNestedGrid) return;
       if (!scope._isDetailsForm) {
         handle(context);
       }
@@ -320,7 +342,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
     }
 
     var hilites = field.hilites || [];
-    var exprs = _.map(_.pluck(hilites, 'condition'), $parse);
+    var exprs = _.map(_.pluck(hilites, 'condition'), function (s) { return $parse(s); });
 
     function handle(rec) {
       for (var i = 0; i < hilites.length; i++) {

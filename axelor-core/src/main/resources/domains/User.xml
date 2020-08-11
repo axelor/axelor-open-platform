@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <domain-models xmlns="http://axelor.com/xml/ns/domain-models"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_5.1.xsd">
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models http://axelor.com/xml/ns/domain-models/domain-models_5.3.xsd">
 
   <module name="auth" package="com.axelor.auth.db"/>
 
@@ -25,8 +25,8 @@
     <boolean name="noHelp" help="Whether to show help messages." />
 
     <boolean name="blocked" default="false" title="Block the user" help="Block the user for an indefinite period."/>
-    <date name="activateOn" help="Activate the user from the specified date."/>
-    <date name="expiresOn" help="Disable the user from the specified date."/>
+    <datetime name="activateOn" help="Activate the user from the specified date."/>
+    <datetime name="expiresOn" help="Disable the user from the specified date."/>
 
     <many-to-one name="group" ref="Group" column="group_id"/>
     <many-to-many name="roles" ref="Role"/>
@@ -36,6 +36,8 @@
     <finder-method name="findByGroup" using="Long:groupId" filter="self.group[].id = :groupId" cacheable="true" all="false"/>
     <finder-method name="findByGroup" using="String:groupCode" filter="self.group[].code = :groupCode" cacheable="true" all="false"/>
     <finder-method name="findByEmail" using="email" cacheable="true" />
+    <finder-method name="findByCodeOrEmail" using="String:codeOrEmail"
+        filter="self.code = :codeOrEmail OR self.email = :codeOrEmail" cacheable="true" />
   </entity>
 
 </domain-models>

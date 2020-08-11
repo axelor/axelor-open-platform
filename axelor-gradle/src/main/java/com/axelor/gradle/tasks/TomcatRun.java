@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -32,11 +32,11 @@ import java.util.stream.Collectors;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.internal.tasks.options.Option;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.options.Option;
 
 public class TomcatRun extends JavaExec {
 
@@ -78,6 +78,7 @@ public class TomcatRun extends JavaExec {
       } else {
         project.getLogger().info("Cannot enable hot-swaping as DCEVM is not installed.");
       }
+      jvmArgs.add("-Daxelor.view.watch=true");
     }
     return jvmArgs;
   }
@@ -100,9 +101,7 @@ public class TomcatRun extends JavaExec {
     attributes.put(Attributes.Name.MAIN_CLASS, MAIN_CLASS);
     attributes.put(
         Attributes.Name.CLASS_PATH,
-        classpath
-            .getFiles()
-            .stream()
+        classpath.getFiles().stream()
             .map(File::toURI)
             .map(Object::toString)
             .collect(Collectors.joining(" ")));

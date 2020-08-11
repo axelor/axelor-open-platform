@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -77,7 +77,7 @@ function CustomViewCtrl($scope, $http, DataSource, ViewService) {
   };
 
   $scope.onRefresh = function() {
-    var context = $scope.getContext();
+    var context = _.extend({}, $scope.getContext(), { _domainAction: $scope._viewAction });
     var params = {
       data: context
     };
@@ -112,6 +112,8 @@ var customDirective = ["$compile", function ($compile) {
         if (template) {
           unwatch();
           render(template);
+          scope.$on("on:new", function() { scope.onRefresh(); });
+          scope.$on("on:edit", function() { scope.onRefresh(); });
         }
       });
 

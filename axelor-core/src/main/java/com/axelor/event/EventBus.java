@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -23,6 +23,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
+import com.google.inject.spi.LinkedKeyBinding;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -62,10 +63,8 @@ class EventBus {
 
   private Map<Class<?>, List<Observer>> findObservers() {
     final Map<Class<?>, List<Observer>> observers = new HashMap<>();
-    injector
-        .getAllBindings()
-        .entrySet()
-        .stream()
+    injector.getAllBindings().entrySet().stream()
+        .filter(entry -> !(entry.getValue() instanceof LinkedKeyBinding))
         .map(Entry::getKey)
         .map(Key::getTypeLiteral)
         .map(TypeLiteral::getRawType)
@@ -85,8 +84,7 @@ class EventBus {
     final Set<Annotation> annotations =
         Optional.ofNullable(qualifiers).orElse(Collections.emptySet());
 
-    return found
-        .stream()
+    return found.stream()
         .filter(o -> o.matches(eventType, annotations))
         .collect(Collectors.toList());
   }

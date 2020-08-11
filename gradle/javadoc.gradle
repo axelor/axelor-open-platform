@@ -66,6 +66,6 @@ task generateDocs(type: Javadoc) {
   ]
 
   doFirst {
-    title = "Axelor Development Kit $version API"
+    title = "Axelor Open Platform $version API"
   }
 }

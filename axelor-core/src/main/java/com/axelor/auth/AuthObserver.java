@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -45,7 +45,8 @@ public class AuthObserver {
   }
 
   /**
-   * Observes all pre-requests and log out users that logged in before password change date.
+   * Observes all pre-requests and log out disabled users or users that logged in before password
+   * change date.
    *
    * @param event
    */
@@ -57,6 +58,7 @@ public class AuthObserver {
       final LocalDateTime loginDate = authSessionService.getLoginDate(subject.getSession());
 
       if (user != null
+          && AuthUtils.isActive(user)
           && (user.getPasswordUpdatedOn() == null
               || loginDate != null && !loginDate.isBefore(user.getPasswordUpdatedOn()))) {
         return;

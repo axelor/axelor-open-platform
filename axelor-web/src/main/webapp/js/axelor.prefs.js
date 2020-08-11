@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -63,7 +63,7 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
 
   $scope.isMidForm = function (elem) {
     return $element.find('form.mid-form').size();
-  }
+  };
 
   $scope.setEditable();
   $scope.show();
@@ -84,9 +84,14 @@ function AboutCtrl($scope) {
   $scope.appHome = axelor.config["application.home"];
   $scope.appHelp = axelor.config["application.help"];
   $scope.appYear = moment().year();
+  $scope.technical = axelor.config['user.technical'];
 }
 
 function SystemCtrl($scope, $element, $location, $http) {
+  if (!axelor.config['user.technical']) {
+     window.location.hash = '/about';
+     return;
+  }
 
   var promise = null;
 

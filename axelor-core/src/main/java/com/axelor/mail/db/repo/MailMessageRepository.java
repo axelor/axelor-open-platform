@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -19,6 +19,7 @@ package com.axelor.mail.db.repo;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
@@ -295,7 +296,7 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
     for (Map<String, String> item : (List<Map>) bodyData.get("tracks")) {
       values.add(item);
       final Property property = mapper.getProperty(item.get("name"));
-      if (property == null || property.getSelection() == null) {
+      if (property == null || StringUtils.isBlank(property.getSelection())) {
         continue;
       }
       final Selection.Option d1 =

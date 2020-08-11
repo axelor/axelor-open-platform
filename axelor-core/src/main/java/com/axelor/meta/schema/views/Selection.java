@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -75,6 +75,8 @@ public class Selection {
 
     @XmlAttribute private String icon;
 
+    @XmlAttribute private String color;
+
     @XmlAttribute private Integer order;
 
     @XmlAttribute private Boolean hidden;
@@ -111,6 +113,14 @@ public class Selection {
 
     public void setIcon(String icon) {
       this.icon = icon;
+    }
+
+    public String getColor() {
+      return color;
+    }
+
+    public void setColor(String color) {
+      this.color = color;
     }
 
     public Integer getOrder() {

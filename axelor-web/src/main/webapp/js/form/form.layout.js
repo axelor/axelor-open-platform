@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -205,12 +205,6 @@ function PanelLayout(items, attrs, $scope, $compile) {
       span = 0;
     }
 
-    if (item.is('.spacer-item')) {
-      curCol += (span + offset);
-      item.remove();
-      return;
-    }
-
     if (curCol + (span + offset) >= numCols + 1 && canAddRow) {
       curCol = 0, row = $('<div>').addClass(rowClass);
       layout.push(row);
@@ -383,15 +377,22 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
       }
 
       var items = editor.items || [];
+      var hasColSpan = false;
       var widths = _.map(items, function (item) {
         applyAttrs(item);
+        if (item.colSpan) {
+          hasColSpan = true;
+        }
         var width = item.width || (item.widgetAttrs||{}).width;
         return width ? width : (item.widget === 'toggle' ? 24 : '*');
       });
 
-      var schema = {
+      var schema = hasColSpan ? {
+        cols: 12,
+        items: items
+      } : {
         cols: items.length,
-        colWidths: widths.join(','),
+        colWidths: widths,
         items: items
       };
 
@@ -582,7 +583,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
           valid = !errors.valid;
         }
         if (scope.setValidity) {
-          scope.setValidity('valid', valid);
+          scope.setValidity('valid', valid, scope.record);
           element.toggleClass('nested-not-required', valid);
         } else {
           scope.$parent.form.$setValidity('valid', valid, scope.form);

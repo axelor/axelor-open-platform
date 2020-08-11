@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -34,18 +34,18 @@ import com.axelor.meta.db.repo.MetaFileRepository;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Resource;
 import com.axelor.rpc.Response;
-import com.axelor.script.NashornScriptHelper;
+import com.axelor.script.GroovyScriptHelper;
 import com.axelor.script.ScriptHelper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Longs;
 import com.google.inject.servlet.RequestScoped;
+import com.opencsv.CSVWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.io.UncheckedIOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -57,6 +57,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.inject.Inject;
@@ -76,8 +77,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
-import jdk.nashorn.api.scripting.ScriptUtils;
 import org.eclipse.persistence.annotations.Transformation;
 
 @Consumes(MediaType.APPLICATION_JSON)
@@ -445,19 +444,28 @@ public class DmsService {
           {
             final java.nio.file.Path path = MetaFiles.createTempFile(record.getFileName(), ".csv");
             final File file = path.toFile();
-            final ScriptHelper scriptHelper = new NashornScriptHelper(null);
-            try (final PrintStream writer = new PrintStream(file)) {
-              if (StringUtils.notBlank(record.getContent())) {
-                final ScriptObjectMirror content =
-                    (ScriptObjectMirror) scriptHelper.eval(record.getContent());
-                if (content != null) {
-                  for (final Object value : content.values()) {
-                    final Object line = ScriptUtils.convert(value, String.class);
-                    writer.println(line != null ? line.toString() : "");
-                  }
-                }
-              }
+
+            if (StringUtils.isBlank(record.getContent())) {
+              return file;
             }
+
+            final ScriptHelper scriptHelper = new GroovyScriptHelper(null);
+            final List<?> content = (List<?>) scriptHelper.eval(record.getContent());
+
+            if (content == null || content.isEmpty()) {
+              return file;
+            }
+
+            final List<String[]> lines =
+                content.stream()
+                    .map(line -> (List<?>) line)
+                    .map(line -> line.toArray(new String[] {}))
+                    .collect(Collectors.toList());
+
+            try (final CSVWriter writer = new CSVWriter(new FileWriter(file))) {
+              writer.writeAll(lines);
+            }
+
             return file;
           }
         default:
@@ -549,6 +557,7 @@ public class DmsService {
       if (fileName.endsWith(".html")) type = new MediaType("text", "html");
       if (fileName.endsWith(".png")) type = new MediaType("image", "png");
       if (fileName.endsWith(".jpg")) type = new MediaType("image", "jpg");
+      if (fileName.endsWith(".jpeg")) type = new MediaType("image", "jpg");
       if (fileName.endsWith(".svg")) type = new MediaType("image", "svg+xml");
       if (fileName.endsWith(".gif")) type = new MediaType("image", "gif");
       if (fileName.endsWith(".webp")) type = new MediaType("image", "webp");

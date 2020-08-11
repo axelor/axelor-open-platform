@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -26,66 +26,68 @@ import groovy.util.slurpersupport.NodeChild
 
 class EnumItem {
 
-	EnumType entity
+  EnumType entity
 
-	String name
+  String name
 
-	String value
-	
-	String title
-	
-	String help
+  String value
 
-	EnumItem(EnumType entity, NodeChild node) {
-		this.entity = entity
-		this.name = node.@name
-		this.value = node.@value
-		this.title = node.@title
-		this.help = node.@help
-	}
-	
-	String getDocumentation() {
-		String text = Utils.stripCode(help, "\n * ")
-		if (text == "") {
-			return ""
-		}
-		return """
+  String title
+
+  String help
+
+  EnumItem(EnumType entity, NodeChild node) {
+    this.entity = entity
+    this.name = node.@name
+    this.value = node.@value
+    this.title = node.@title
+    this.help = node.@help
+  }
+
+  String getDocumentation() {
+    String text = Utils.stripCode(help, "\n * ")
+    if (text == "") {
+      return ""
+    }
+    return """
 \t/**
 \t * """ + text + """
 \t */"""
-	}
+  }
 
-	private String quote(String text) {
-		if (text) {
-			return '"' + text + '"';
-		}
-		return null;
-	}
+  private String quote(String text) {
+    if (text) {
+      return '"' + text + '"';
+    }
+    return null;
+  }
 
-	private Annotation $widget() {
-		if (title) {
-			return new Annotation(entity.importManager, "com.axelor.db.annotations.Widget", false)
-				.add("title", title);
-		}
-		return null
-	}
+  private Annotation $widget() {
+    if (title) {
+      return new Annotation(entity.importManager, "com.axelor.db.annotations.Widget", false)
+          .add("title", title);
+    }
+    return null
+  }
 
-	String getItemCode() {
-		def args = []
-		if (value) {
-			args = [entity.numeric ? value : quote(value)]
-		}
-		String code = name
-		if (args.size() > 0) {
-			code += "(" + String.join(", ", args) + ")"
-		}
-		def annon = $widget()
-		if (annon != null) {
-			code = annon.toString() + "\n\t" + code;
-		}
+  String getItemCode() {
+    def args = []
+    if (value) {
+      args = [
+        entity.numeric ? value : quote(value)
+      ]
+    }
+    String code = name
+    if (args.size() > 0) {
+      code += "(" + String.join(", ", args) + ")"
+    }
+    def annon = $widget()
+    if (annon != null) {
+      code = annon.toString() + "\n\t" + code;
+    }
 
-		return """
+    return """
 ${documentation}
-	${code}"""
-	}
+  ${code}"""
+  }
 }

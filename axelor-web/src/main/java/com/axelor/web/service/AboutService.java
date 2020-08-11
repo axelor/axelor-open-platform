@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -62,46 +62,47 @@ public class AboutService extends AbstractService {
   @Path("sysinfo")
   public Map<String, Object> getSystemInfo() {
     final Map<String, Object> info = new HashMap<>();
-    final Runtime runtime = Runtime.getRuntime();
-    final Set<String> sessions = AppSessionListener.getActiveSessions();
     final User user = AuthUtils.getUser();
-    final List<Map<String, Object>> users = new ArrayList<>();
 
-    int mb = 1024;
+    if (user != null && AuthUtils.isTechnicalStaff(user)) {
+      final Runtime runtime = Runtime.getRuntime();
+      final Set<String> sessions = AppSessionListener.getActiveSessions();
+      final List<Map<String, Object>> users = new ArrayList<>();
 
-    for (String id : sessions) {
-      HttpSession session = AppSessionListener.getSession(id);
-      try {
-        if (session == null
-            || session.getAttribute(PRINCIPALS_SESSION_KEY) == null
-            || session.getAttribute(AUTHENTICATED_SESSION_KEY) != TRUE) {
+      int mb = 1024;
+
+      for (String id : sessions) {
+        HttpSession session = AppSessionListener.getSession(id);
+        try {
+          if (session == null
+              || session.getAttribute(PRINCIPALS_SESSION_KEY) == null
+              || session.getAttribute(AUTHENTICATED_SESSION_KEY) != TRUE) {
+            continue;
+          }
+        } catch (IllegalStateException e) {
+          // invalid session
           continue;
         }
-      } catch (IllegalStateException e) {
-        // invalid session
-        continue;
+        String login = session.getAttribute(PRINCIPALS_SESSION_KEY).toString();
+        Map<String, Object> map = new HashMap<>();
+        map.put("user", login);
+        map.put("loginTime", session.getCreationTime());
+        map.put("accessTime", session.getLastAccessedTime());
+        users.add(map);
       }
-      String login = session.getAttribute(PRINCIPALS_SESSION_KEY).toString();
-      Map<String, Object> map = new HashMap<>();
-      map.put("user", login);
-      map.put("loginTime", session.getCreationTime());
-      map.put("accessTime", session.getLastAccessedTime());
-      users.add(map);
-    }
 
-    info.put("osName", System.getProperty("os.name"));
-    info.put("osArch", System.getProperty("os.arch"));
-    info.put("osVersion", System.getProperty("os.version"));
+      info.put("osName", System.getProperty("os.name"));
+      info.put("osArch", System.getProperty("os.arch"));
+      info.put("osVersion", System.getProperty("os.version"));
 
-    info.put("javaRuntime", System.getProperty("java.runtime.name"));
-    info.put("javaVersion", System.getProperty("java.runtime.version"));
+      info.put("javaRuntime", System.getProperty("java.runtime.name"));
+      info.put("javaVersion", System.getProperty("java.runtime.version"));
 
-    info.put("memTotal", (runtime.totalMemory() / mb) + " Kb");
-    info.put("memMax", (runtime.maxMemory() / mb) + " Kb");
-    info.put("memUsed", ((runtime.totalMemory() - runtime.freeMemory()) / mb) + " Kb");
-    info.put("memFree", (runtime.freeMemory() / mb) + " Kb");
+      info.put("memTotal", (runtime.totalMemory() / mb) + " Kb");
+      info.put("memMax", (runtime.maxMemory() / mb) + " Kb");
+      info.put("memUsed", ((runtime.totalMemory() - runtime.freeMemory()) / mb) + " Kb");
+      info.put("memFree", (runtime.freeMemory() / mb) + " Kb");
 
-    if (AuthUtils.isTechnicalStaff(user)) {
       info.put("users", users);
     }
 

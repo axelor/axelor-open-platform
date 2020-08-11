@@ -5,61 +5,67 @@ axelor {
 }
 
 dependencies {
+  implementation libs.axelor_asm
 
-  testCompile project(":axelor-test")
-  compile project(":axelor-common")
+  testImplementation project(":axelor-test")
 
-  compile libs.groovy
-  compile libs.groovy_wslite
+  api project(":axelor-common")
 
-  compile libs.guava
-  compile	libs.guice
-  compile libs.guice_servlet
-  compile libs.guice_persist
-  compile libs.guice_multibindings
+  // these dependencies will be excluded from war package
+  implementation libs.hotswap_agent
+  implementation project(":axelor-tomcat")
 
-  compile libs.byte_buddy
+  api libs.groovy
+  api libs.groovy_wslite
 
-  testCompile libs.jdbc_hsqldb
-  compile libs.jdbc_postgres
-  compile libs.jdbc_mysql
-  compile libs.hibernate
-  compile libs.hibernate_search
+  api libs.guava
+  api libs.guice
+  api libs.guice_servlet
+  api libs.guice_persist
+  api libs.guice_multibindings
 
-  compile libs.apache_tika_core
+  implementation libs.byte_buddy
+
+  testImplementation libs.jdbc_hsqldb
+  implementation libs.jdbc_postgres
+  implementation libs.jdbc_mysql
+  api libs.hibernate
+  implementation libs.hibernate_search
+
+  implementation libs.apache_tika_core
   runtime libs.apache_tika_parsers
 
-  compile libs.flywaydb
+  implementation libs.flywaydb
 
-  compile libs.resteasy
-  compile libs.resteasy_guice
-  compile libs.jackson_libs
+  api libs.resteasy
+  api libs.resteasy_guice
+  api libs.jackson_libs
 
-  compile libs.ST4
-  compile libs.apache_shiro
-  compile libs.snakeyaml
-  compile libs.xstream
-  compile libs.opencsv
+  api libs.ST4
+  api libs.apache_shiro
+  implementation libs.snakeyaml
+  api libs.xstream
+  api libs.opencsv
 
-  compile libs.javax_servlet
-  compile libs.javax_mail
+  api libs.javax_servlet
+  api libs.javax_mail
 
-  compile libs.axelor_el
-  compile libs.jsoup
+  implementation libs.axelor_el
+  implementation libs.jsoup
 
-  compile libs.quartz
+  api libs.quartz
 
-  compile libs.eclipselink_moxy
+  implementation libs.eclipselink_moxy
 
-  // CAS
-  compile libs.apache_shiro_cas
+  // pac4j
+  implementation libs.pac4j
 
   // BIRT
-  compile libs.birt_runtime
+  api libs.birt_runtime
 
-  compile libs.commons_jxpath
-  compile libs.jcommander
+  implementation libs.commons_jxpath
+  implementation libs.jcommander
 
-  testCompile libs.greenmail
-  testCompile libs.apache_ds
+  testImplementation libs.greenmail
+  testImplementation libs.apache_ds
 }

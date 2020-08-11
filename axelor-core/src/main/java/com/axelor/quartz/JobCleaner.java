@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -15,17 +15,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.auth.cas;
+package com.axelor.quartz;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import org.apache.shiro.web.filter.authc.LogoutFilter;
+import javax.inject.Provider;
+import javax.persistence.EntityManager;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.quartz.listeners.JobListenerSupport;
 
-public class AuthCasLogoutFilter extends LogoutFilter {
+public class JobCleaner extends JobListenerSupport {
 
-  @Inject
+  private static final String NAME = "JobCleaner";
+
+  @Inject private Provider<EntityManager> emp;
+
   @Override
-  public void setRedirectUrl(@Named("shiro.cas.logout.url") String redirectUrl) {
-    super.setRedirectUrl(redirectUrl);
+  public String getName() {
+    return NAME;
+  }
+
+  @Override
+  public void jobWasExecuted(JobExecutionContext context, JobExecutionException jobException) {
+    emp.get().clear();
   }
 }

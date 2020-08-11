@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema targetNamespace="http://axelor.com/xml/ns/object-views"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
-  attributeFormDefault="unqualified" xmlns:tns="http://axelor.com/xml/ns/object-views" version="5.1">
+  attributeFormDefault="unqualified" xmlns:tns="http://axelor.com/xml/ns/object-views" version="5.3">
 
   <xsd:element name="object-views">
     <xsd:complexType>
@@ -622,6 +622,11 @@
                   <xsd:documentation>Image icon to show for this item.</xsd:documentation>
                 </xsd:annotation>
               </xsd:attribute>
+              <xsd:attribute name="color" type="xsd:string">
+                <xsd:annotation>
+                  <xsd:documentation>Tag color for this item.</xsd:documentation>
+                </xsd:annotation>
+              </xsd:attribute>
               <xsd:attribute name="order" type="xsd:int">
                 <xsd:annotation>
                   <xsd:documentation>
@@ -717,10 +722,18 @@
         <xsd:documentation>Specify whether to allow export to csv from o2m/m2m.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="x-direction" type="xsd:string">
+    <xsd:attribute name="x-direction">
       <xsd:annotation>
-        <xsd:documentation>Specify the layout direction (horizontal, vertical) of some widgets(e.g. RadioSelect)</xsd:documentation>
+        <xsd:documentation>
+          Specify the layout direction (horizontal, vertical) of some widgets(e.g. RadioSelect)
+        </xsd:documentation>
       </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="horizontal"></xsd:enumeration>
+          <xsd:enumeration value="vertical"></xsd:enumeration>
+        </xsd:restriction>
+      </xsd:simpleType>
     </xsd:attribute>
     <xsd:attribute name="x-code-syntax" type="xsd:string">
       <xsd:annotation>
@@ -784,6 +797,22 @@
       <xsd:annotation>
         <xsd:documentation>
         Specify the display value for "false" state of a boolean widget.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-big" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Allow duration of more than 100 hours in a duration widget</xsd:documentation>
+      </xsd:annotation></xsd:attribute>
+    <xsd:attribute name="x-seconds" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Show seconds in a duration widget</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="x-accept" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify the file types the file input should accept.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -918,6 +947,13 @@
         <xsd:documentation>Specify the default page limit of search popup.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-color-field" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify the color field to use with tag-select widget.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:attributeGroup name="ObjectViewAttributes">
@@ -1037,7 +1073,7 @@
         </xsd:attribute>
         <xsd:attribute name="canDelete" type="xsd:boolean">
           <xsd:annotation>
-            <xsd:documentation>Specify whether to show the 'Remove' button.</xsd:documentation>
+            <xsd:documentation>Specify whether to show the 'Delete' button.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canArchive" type="xsd:boolean">
@@ -1117,38 +1153,40 @@
     </xsd:complexContent>
   </xsd:complexType>
   <xsd:group name="PanelItems">
-    <xsd:choice>
-      <xsd:element name="field" type="tns:PanelField" />
-      <xsd:element name="label" type="tns:Label" />
-      <xsd:element name="help" type="tns:Help" />
-      <xsd:element name="static" type="tns:Static" />
-      <xsd:element name="spacer" type="tns:Spacer" />
-      <xsd:element name="separator" type="tns:Separator" />
-      <xsd:element name="button" type="tns:Button" />
-      <xsd:element name="button-group">
-        <xsd:complexType>
-          <xsd:complexContent>
-            <xsd:extension base="tns:AbstractContainer">
-              <xsd:sequence>
-                <xsd:element name="button" type="tns:Button" maxOccurs="unbounded"/>
-              </xsd:sequence>
-            </xsd:extension>
-          </xsd:complexContent>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="panel">
-        <xsd:complexType>
-          <xsd:complexContent>
-            <xsd:extension base="tns:AbstractPanel">
-              <xsd:group ref="tns:PanelItems" maxOccurs="unbounded"/>
-            </xsd:extension>
-          </xsd:complexContent>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="panel-related" type="tns:PanelRelated"/>
-      <xsd:element name="panel-dashlet" type="tns:Dashlet"/>
-      <xsd:element name="panel-include" type="tns:FormInclude"/>
-    </xsd:choice>
+   <xsd:sequence>
+     <xsd:choice minOccurs="0">
+        <xsd:element name="field" type="tns:PanelField" />
+        <xsd:element name="label" type="tns:Label" />
+        <xsd:element name="help" type="tns:Help" />
+        <xsd:element name="static" type="tns:Static" />
+        <xsd:element name="spacer" type="tns:Spacer" />
+        <xsd:element name="separator" type="tns:Separator" />
+        <xsd:element name="button" type="tns:Button" />
+        <xsd:element name="button-group">
+          <xsd:complexType>
+            <xsd:complexContent>
+              <xsd:extension base="tns:AbstractContainer">
+                <xsd:sequence>
+                  <xsd:element name="button" type="tns:Button" maxOccurs="unbounded"/>
+                </xsd:sequence>
+              </xsd:extension>
+            </xsd:complexContent>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="panel">
+          <xsd:complexType>
+            <xsd:complexContent>
+              <xsd:extension base="tns:AbstractPanel">
+                <xsd:group ref="tns:PanelItems" maxOccurs="unbounded"/>
+              </xsd:extension>
+            </xsd:complexContent>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="panel-related" type="tns:PanelRelated"/>
+        <xsd:element name="panel-dashlet" type="tns:Dashlet"/>
+        <xsd:element name="panel-include" type="tns:FormInclude"/>
+      </xsd:choice>
+    </xsd:sequence>
   </xsd:group>
   <xsd:complexType name="Panel">
     <xsd:complexContent>
@@ -1209,6 +1247,7 @@
             <xsd:documentation>Specify whether the rows can be moved to re-orders by sequence.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="showTitle" use="prohibited" />
         <xsd:attributeGroup ref="tns:RelationalAttributes" />
       </xsd:extension>
     </xsd:complexContent>
@@ -1309,6 +1348,9 @@
             <xsd:documentation>Specify whether to show editor on new record (o2m/m2m fields)</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="depends" use="prohibited" />
+        <xsd:attribute name="onTabSelect" use="prohibited" />
+        <xsd:attribute name="sidebar" use="prohibited" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -1413,7 +1455,7 @@
         </xsd:attribute>
         <xsd:attribute name="canDelete" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>Show the 'Remove' button if the given JavaScript expression is true.</xsd:documentation>
+            <xsd:documentation>Show the 'Delete' button if the given JavaScript expression is true.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="canArchive" type="xsd:string">
@@ -1746,6 +1788,26 @@
     </xsd:attribute>
   </xsd:complexType>
 
+  <xsd:simpleType name="CardEditWindow">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="self">
+        <xsd:annotation>
+          <xsd:documentation>Show editor in same tab.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="popup">
+        <xsd:annotation>
+          <xsd:documentation>Show popup editor</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="popup-new">
+        <xsd:annotation>
+          <xsd:documentation>Show popup editor when creating new record.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+
   <xsd:complexType name="CardsView">
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleView">
@@ -1784,6 +1846,26 @@
 
             orderBy="name,-age"
             </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canNew" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the 'New' button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canEdit" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the 'Edit' button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="canDelete" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show the 'Delete' button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="edit-window" type="tns:CardEditWindow">
+          <xsd:annotation>
+            <xsd:documentation>Specify how to show editor window.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>
@@ -1825,6 +1907,13 @@
         <xsd:attribute name="limit" type="xsd:integer">
           <xsd:annotation>
             <xsd:documentation>Specify pagination limit per column.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="x-limit-columns" type="xsd:integer">
+          <xsd:annotation>
+            <xsd:documentation>
+            Specify maximum number of columns when columnBy is a reference field.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>
@@ -1975,6 +2064,10 @@
                   </xsd:restriction>
                 </xsd:simpleType>
               </xsd:attribute>
+              <xsd:attribute name="scale" type="xsd:int">
+                <xsd:annotation>
+                  <xsd:documentation>Scale of the values (number of digits in decimal part)</xsd:documentation>
+                </xsd:annotation></xsd:attribute>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="config" maxOccurs="unbounded" minOccurs="0">
@@ -2378,7 +2471,7 @@
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="showTitle" use="prohibited" />
-        <xsd:attribute name="onClick" type="xsd:string">
+        <xsd:attribute name="onClick" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>
               An action to execute on click event. The current node record is
@@ -2557,6 +2650,18 @@
         <xsd:attribute name="canSelect" use="prohibited" />
         <xsd:attribute name="edit-window" use="prohibited" />
         <xsd:attribute name="summary-view" use="prohibited" />
+        <xsd:attribute name="target-name" use="prohibited" />
+        <xsd:attribute name="colSpan" use="prohibited" />
+        <xsd:attribute name="colOffset" use="prohibited" />
+        <xsd:attribute name="showTitle" use="prohibited" />
+        <xsd:attribute name="height" use="prohibited" />
+        <xsd:attribute name="depends" use="prohibited"/>
+        <xsd:attribute name="x-call-onSave" use="prohibited" />
+        <xsd:attribute name="x-can-copy" use="prohibited" />
+        <xsd:attribute name="x-can-reload" use="prohibited" />
+        <xsd:attribute name="x-can-export" use="prohibited" />
+        <xsd:attribute name="x-labels" use="prohibited" />
+        <xsd:attribute name="x-show-icons" use="prohibited" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -2711,6 +2816,7 @@
     <xsd:restriction base="xsd:string">
       <xsd:enumeration value="after" />
       <xsd:enumeration value="before" />
+      <xsd:enumeration value="inside" />
     </xsd:restriction>
   </xsd:simpleType>
 

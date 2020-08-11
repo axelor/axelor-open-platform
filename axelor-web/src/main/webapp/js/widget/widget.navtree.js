@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -153,7 +153,7 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
             tab.color = null;
           }
         }
-      };
+      }
 
       MenuService.updateTabStyle = function (tab) {
         deferred.promise.then(function () {
@@ -169,13 +169,13 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
         if (!axelor.device.mobile) {
           scope.showSearch = show === undefined ? !scope.showSearch : show;
         }
-      }
+      };
       scope.onShowSearch = function () {
         scope.showSearch = true;
         setTimeout(function () {
           input.val('').focus();
         });
-      }
+      };
 
       input.attr('placeholder', _t('Search...'));
       input.blur(function (e) {
@@ -318,7 +318,7 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
           element.hover(function () {
             icon.css(cssName, bright);
           }, function () {
-            icon.css(cssName, color)
+            icon.css(cssName, color);
           });
 
           // use same color for vertical line
@@ -426,8 +426,10 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
         "<a href='#'>" +
           "<img class='nav-image' ng-if='::menu.icon' ng-src='{{::menu.icon}}'></img>" +
           "<span class='nav-icon' ng-if='::menu.fa'><i class='fa' ng-class='::menu.fa'></i></span>" +
-          "<span ng-show='menu.tag' ng-class='menu.tagCss' class='nav-tag label'>{{menu.tag}}</span>" +
-          "<span class='nav-title'>{{::menu.title}}</span>" +
+          "<span class='nav-label'>" +
+            "<span class='nav-title'>{{::menu.title}}</span>" +
+            "<span ng-show='menu.tag' ng-class='menu.tagCss' class='nav-tag label'>{{menu.tag}}</span>" +
+          "</span>" +
         "</a>" +
       "</li>"
   };

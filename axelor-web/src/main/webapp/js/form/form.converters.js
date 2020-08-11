@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -35,11 +35,27 @@
     if (value && symbol) {
       var val = '' + value;
       if (axelor.config['user.lang'] === 'fr' ) {
-        return val.endsWith(symbol) ? val : val + ' ' + symbol;
+        return _.endsWith(val, symbol) ? val : val + ' ' + symbol;
       }
-      return val.startsWith(symbol) ? val : symbol + val;
+      return _.startsWith(val, symbol) ? val : symbol + val;
     }
     return value;
+  }
+
+  function canSetNested(record, name) {
+    if (record && name && name in record) {
+      return true;
+    }
+    if (name) {
+      var path = name.split('.');
+      var val = record || {};
+      var idx = 0;
+      while (idx < path.length - 1) {
+        val = val[path[idx++]];
+        if (!val) return false;
+      }
+    }
+    return true;
   }
 
   function findNested(record, name) {
@@ -51,6 +67,9 @@
       var val = record || {};
       var idx = 0;
       while (val && idx < path.length) {
+        if (_.isString(val)) {
+          val = fromJsonOrEmpty(val);
+        }
         val = val[path[idx++]];
       }
       if (idx === path.length) {
@@ -58,6 +77,30 @@
       }
     }
     return undefined;
+  }
+
+  function fromJsonOrEmpty(json) {
+    try {
+      return angular.fromJson(json);
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function setNested(record, name, value) {
+    if (!record || !name) return record;
+    var path = name.split('.');
+    var nested = record;
+    var idx = -1;
+    while (++idx < path.length) {
+      var key = path[idx];
+      if (idx !== path.length - 1) {
+        nested = nested[key] || (nested[key] = {});
+      } else {
+        nested[key] = value;
+      }
+    }
+    return record;
   }
 
   // override angular.js currency filter
@@ -79,6 +122,8 @@
   }
 
   ui.findNested = findNested;
+  ui.setNested = setNested;
+  ui.canSetNested = canSetNested;
 
   ui.formatters = {
 
@@ -174,7 +219,7 @@
     var n = record.id;
     if (n > 0) {
       return "ws/rest/" + model + "/" + n + "/" + imageName + "/download?image=true&v=" + v
-        + "&parentId=" + scope.record.id + "&parentModel=" + scope._model;
+        + "&parentId=" + n + "&parentModel=" + model;
     }
     return "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
   };

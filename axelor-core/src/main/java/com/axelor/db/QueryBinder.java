@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -26,6 +26,7 @@ import com.google.common.primitives.Ints;
 import java.util.Map;
 import javax.persistence.FlushModeType;
 import javax.persistence.Parameter;
+import org.hibernate.jpa.QueryHints;
 
 /**
  * The query binder class provides the helper methods to bind query parameters and mark the query
@@ -70,7 +71,7 @@ public class QueryBinder {
    * @return the same query binder instance
    */
   public QueryBinder setCacheable(boolean cacheable) {
-    query.setHint("org.hibernate.cacheable", "" + cacheable);
+    query.setHint(QueryHints.HINT_CACHEABLE, cacheable);
     return this;
   }
 
@@ -92,7 +93,7 @@ public class QueryBinder {
    * @return the same query binder instance
    */
   public QueryBinder setReadOnly(boolean readOnly) {
-    query.unwrap(org.hibernate.query.Query.class).setReadOnly(readOnly);
+    query.setHint(QueryHints.HINT_READONLY, readOnly);
     return this;
   }
 

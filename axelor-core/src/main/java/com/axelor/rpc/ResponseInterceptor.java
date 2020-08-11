@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -38,6 +38,7 @@ import javax.validation.ConstraintViolationException;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.authz.UnauthenticatedException;
 import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,7 +128,12 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     report.put("message", message);
 
     response.setData(report);
-    response.setStatus(Response.STATUS_FAILURE);
+
+    if (e instanceof UnauthenticatedException) {
+      response.setStatus(Response.STATUS_LOGIN_REQUIRED);
+    } else {
+      response.setStatus(Response.STATUS_FAILURE);
+    }
 
     log.error("Authorization Error: {}", e.getMessage());
     return response;
@@ -214,7 +220,10 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     PSQLException pe = (PSQLException) e;
 
     String title = null;
-    String message = pe.getServerErrorMessage().getMessage();
+    String message =
+        pe.getServerErrorMessage() != null
+            ? pe.getServerErrorMessage().getMessage()
+            : pe.getMessage();
 
     // http://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
     switch (state) {

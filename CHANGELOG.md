@@ -1,3 +1,320 @@
+## 5.3.4 (2020-06-29)
+
+#### Fixed
+
+* Fix mass update on grid view because of dotted fields
+* Restrict system page to technical staff
+* Fix the button _signal in context
+* Fix query building with empty logical filters
+* Formatting the restoring meta execution time in ISO time
+* Fix NPE caused by response exception handler
+* Fix missing delimiter in advanced search when no export permission
+* Fix input left padding with ImageSelect widget when element is not shown immediately after edit mode
+* Consider permissions and showArchived view-param for tag-count
+* Fix meta file link with no parent
+
+## 5.3.3 (2020-06-05)
+
+#### Features
+
+* Add support for font config for birt reports
+* Support axis titles on charts
+* Support cards, kanban, and calendar views on dashlets
+* Add support to use m2o fields for kanban columns
+* Allow to show additional details with ref-text widget
+* Add single-select and improve multi-select widget with color support
+* Add support for popup editor on cards and kanban views
+
+  <details>
+  A new attribute `edit-window` is added with the following values:
+
+  * `self` - show editor in same tab
+  * `popup` - show popup editor
+  * `popup-new` - show popup editor for new records only
+  </details>
+
+#### Fixed
+
+* Fix unnecessary requests for name values
+* Fix validation error in editable grid
+* Fix "Invalid or non-matching id" when committing edit in grid
+* Fix meta loading deadlock when creating groups
+* Fix group creation when generating computed views
+* Fix custom view refresh issue in dashlet
+* Fix embedded tomcat runner
+* Preserve column order in data exported from charts
+* Fix text value escape in grid widget
+* Fix details-view with grouped grid not working
+* Fix path resolution in view watcher under Windows
+* Fix CSRF token cookie when using SSO
+* Allow deletion of one-to-one on the non-owning side and change of owner
+* Allow inline edit with grouped grid
+* Fix no file in response when observing exports
+* Fix view watcher on application's resources
+* Don't show fallback characters instead of icons on slow network
+* Fix editable grid issue in details-view
+* Fix setting of owner of one-to-one
+* Fix checkbox alignment in editable grid
+
+## 5.3.2 (2020-04-16)
+
+#### Features
+
+* Limit parallel meta loading to maximumPoolSize
+* Add support for providing webapp resources from modules
+* Add support for registering static web resources
+
+#### Fixed
+
+* Fix backward-compatible authentication via login.jsp
+* Fix compile classpath issue
+* Fix context issue with js expressions on m2o fields
+* Fix spurious onLoad execution from calendar and kanban views
+* Fix new line confirmation in editable grid after ActionResponse#setValues
+* Align kanban hilite colors with grid hilite colors
+* Fix view watching with IntelliJ IDEA
+* Wait for actions when committing changes in editable grid
+* Fix embedded tomcat run task issue
+* Fix large text field in editable grid widget
+* Use permission filter in order to count attachments
+* Context from grid row editor should use row record
+
+## 5.3.1 (2020-04-15)
+
+#### Breaking Changes
+
+* In order to migrate User activateOn and expiresOn fields, use these SQL statements:
+  
+    ```sql
+    ALTER TABLE auth_user ALTER COLUMN activate_on TYPE timestamp;
+    ALTER TABLE auth_user ALTER COLUMN expires_on TYPE timestamp;
+    UPDATE meta_field SET type_name = 'LocalDateTime' FROM meta_model WHERE meta_field.meta_model = meta_model.id AND meta_model.name = 'User' AND meta_field.name IN ('activateOn', 'expiresOn');
+    ```
+
+#### Changes
+
+* Change User activateOn and expiresOn to datetime type
+
+#### Features
+
+* Check for active user on every pre-request
+
+#### Fixed
+
+* Fix CSS of calendar bubble content
+* Fix menu title wrapping with tag
+* Fix combining selection simple filters with custom filters
+* Don't show kanban popover with empty content
+* Fix NavSelect widget on integer selection
+* Fix extension insert before in declaration order
+* Fix Overview panel randomly still present despite having custom panel as first element
+* Do not allow deleting tasks when scheduler is running
+* Fix tomcat 8.5.51 issue caused by javax.el service discovery
+* Fix unknown tracked field detection when using inheritance
+* Fix target-name on dotted field after selection from grid
+* Fix same duration widget mask being applied to subsequent fields
+
+## 5.3.0 (2020-01-24)
+
+#### Changes
+
+* Remove licenseCheck from check dependencies
+* Upgrade to Gradle 5.6.4
+* Run license task on src files only
+* Migrate LDAP to pac4j
+* Refactor grid widget to improve inline edit experience
+* Make button onClick attribute required
+* Upgrade to Spotless 3.24.3
+* Improve hotswap-agent support
+* Upgrade to pac4j 3.8.3
+* Upgrade to Guava 28.1
+
+#### Features
+
+* Increase custom field conditions limit to 512 characters
+* Add canNew, canEdit, and canDelete to cards and kanban views
+* Set default logger config for pac4j package
+* Centralize properties from application.properties
+* Display `conditionToCheck` and `moduleToCheck` on meta menu view
+* Add Request#getUser() method that returns current session user
+* Log request data at trace level
+* Watch for view updates
+* Improve display of forced password change
+* Sort mail messages by most recent reply if any
+* Only update visible tags
+* Parallelize loading of models, views, and i18n with rollback per module
+* Add tel link and pattern to phone widget
+* Add direct basic authentication client
+* Add position "inside" for view extensions
+* Add support for groupBy on custom models
+* Add hideIf and showIf support to grid buttons
+* Add responseBindingType to SAML configuration
+* Ability to toggle chart legends and ellipsed labels with tooltip
+* Add hideLegend config to charts
+* Add support for NavSelect widget on many-to-one fields
+* Scan for css/js files to minify
+* Trigger onChange on Enter key in simple fields
+
+#### Fixed
+
+* Fix 'x-' prefixed extra attributes on custom fields
+* Fix Query#update with null value
+* Re-throw exception on Birt report generation exception
+* Fix JNDI data source not working
+* Fix currency formatting with IE11
+* Do not set WWW-Authenticate response header when request has no basic auth header
+* Fix scope syncing on charts
+* Fix inline-checkbox widget title wrapping issue
+* Use styled checkbox for grid row selector
+* Block the UI as early as possible on action call
+* Fix Query#update when query has ORDER BY clause
+* Fix Gantt view scrolling
+* Fix untranslated namecolumn when fetching missing values
+* Fix m2o field in grid not showing translated value
+* Fix dashlet refresh issue
+* Update menu tags using `tag-count`
+* Fix tag-select widget's search field width issue
+* Fix popup editor issue when a tab is opened from it
+* Fix widget name check inconsistencies
+* Allow empty panel inside a panel
+* Fix migration of existing views to extension views
+* Fix Query#update with several fields
+* Fix archived records not displayed when simple filter and advanced filter are applied
+* Fix redirection to originally requested URL
+* Fix dashlet refresh issue
+* Remove deprecated api usage from Logger injection support
+* Fix wrong redirection to favicon.ico
+* Fix table layout on field editors
+* Fix month variable replacement in app settings value
+* Fix multi-tenancy with pac4j
+* Fix tests
+* Fix error popup with empty message not showing up in prod mode
+* Remove showTitle from panel-related
+* Fix query filtering on collections and using order by
+* Fix duplicate m2m item issue
+* Fix dotted fields setting unwanted intermediate records
+* Silent requests should not hide loading indicator
+* Fix ajax login should re-execute pending requests
+* Fix target-name of a custom field in grid view when visibleInGrid is not used
+* Fix issue caused by empty string value on decimal field
+* Fix untranslated namecolumn value in TagSelect
+* Fix collection fields with editor validation issue
+* Fix relative style/script source in JSP
+* Fix popup editor issue when a tab is opened from it
+* Fix selecting a m2o on editable grid when server is slow
+* Fix SAML postLogoutURL for webapps deployed at root
+* Fix DMS file being automatically downloaded on form view
+
+#### Security
+
+* Fix XSS vulnerability with html widget
+* Add CSRF protection using pac4j CSRF authorizer
+
+## 5.2.1 (2019-09-19)
+
+#### Features
+
+* Add `generateChangelog` gradle task to generate final CHANGELOG from unreleased entries.
+* Log tracking of unknown fields during code generation
+
+#### Fixed
+
+* Fix distinct query issue when search is done on o2m/m2m
+* Prohibited usage of unsupported xml attributes in grid fields.
+* Invalid meta and translations when restore is done
+
+#### Security
+
+* Fix security issue in criteria filter, Query and json function
+
+## 5.2.0 (2019-09-16)
+
+#### Enhancements
+
+* Upgrade to Shiro 1.4.1
+* Add support for SAML2
+* Add support for OpenID Connect
+* Log authentication failure
+* Add support for sidebar panels with custom models
+* Add support for customer field type spacer
+* Add "auth." prefix to authentication-related configurations
+* Implement CAS via pac4j
+* Use view.menubar.location instead of application.menu
+* Add support for more CAS client types
+* Improved custom field views
+* Do not generate default value if default="" is given
+* Add support for OAuth
+* Allow to set target-name attribute on custom model fields
+* Use woodstox StAX API for data import
+* Improve tracking message formatting
+* Add support for toolbar and menubar in kanban view
+* Prohibited usage of some unsupported editor attributes
+* Add domain field name validation for few more reserved names
+* Add x-big and x-seconds attributes
+* Configure XStream security framework
+* Add scale attribute to chart series
+* Clear the persistence context after job is executed
+* Add /ws/public/\*\* as anonymous rest endpoints
+* Use icon if user profile image is not set
+* Have boolean-radio behave like radio-select
+* Restrict x-direction values to "horizontal" and "vertical"
+* Improve Meta Scheduler views and usage
+* Add x-accept support to specify file type filters
+
+#### Bugs
+
+* Skip linked bindings when finding observers
+* Fix json field ordering issue
+* Fix unable to open form from grid dashlet
+* Fix calendar view color issue
+* Fix BinaryLink & Image widgets with custom json models
+* Fix advanced search on transient fields
+* Fix showIf expression on custom o2m field issue
+* Fix button in custom model grid
+* Fix readonlyIf on button of custom model grid
+* Fix downloading of meta files in JSON fields
+* Fix EntityHelper#hashCode inconsistent with generated entities
+* Fix toolbar buttons remains highlighted on view switch
+* Center mail message avast image
+* Fix grid selected rows (exclude group rows)
+* Fix display time on calendar
+* Fix hilite expression parsing issue
+* Fix pagination issue caused by use of query cache
+* Fix pagination issue when searching on collection fields
+* Fix file name encoding when upload DMSFile
+* Fix random view if view by name not found
+* Fix initParam with field override
+* Fix img-button css
+* Fix dotted fields issue
+* Fix image widget reload issue
+* Do not show concurrent updates error on missing reference
+* Fix html widget empty value issue
+* Exclude archived records from tag-count
+* Fix empty PDF tab with Chrome
+* Extract title attribute in extensions for i18n
+* Fix kanban view tooltip placement issue
+* Fix redirect issue with https proxy
+* Fix nested editor issue with canSelect=false
+* Fix ImageSelect widget regression
+* Fix translation value of translatable m2o name field is not reflected
+* Fix old-style view extensions when base view has panel-mail
+* Fix advanced search state sharing on card and grid views
+* Fix if condition on help element of grid view not working
+* Fix change tracking emails having null values
+* Fix csv import on collection fields
+* Fix xml import on collection fields
+* Allow non csv column in local context values
+* Fix xml import on collection fields
+
+#### Breaking Changes
+
+* View lookup: if a view with a specified name is not found,
+  no view is now returned, instead of returning another unpredictable view.
+* All authentication-related configurations are now prefixed with "auth.".
+  For instance, previous "cas.\*" configurations are now named "auth.cas.\*".
+* `x-direction` attribute (used with `boolean-radio` and `radio-select` widgets)
+  is now restricted to either "horizontal" or "vertical".
+
 ## 5.1.0 (2019-06-28)
 
 Check the `5.1.0-rc1` and `5.1.0-rc2` Changelog for complete list of changes.
@@ -19,7 +336,7 @@ Check the `5.1.0-rc1` and `5.1.0-rc2` Changelog for complete list of changes.
 * Calling arbitrary methods from action-method or with `call:` is not allowed.
 
   All such methods should be annotated with `@CallMethod` annotation (`com.axelor.meta.CallMethod`).
-  Use following shell commend to find all the method calls in your code base:
+  Use following shell command to find all the method calls in your code base:
 
   ```
   $ grep -P "(expr)(\s*=\s*)(\"call:([^\"]+\([^\"]+)\")" -r * -oh --include="*.xml" \

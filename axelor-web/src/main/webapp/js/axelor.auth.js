@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -75,6 +75,12 @@ angular.module('axelor.auth', []).provider('authService', function() {
   $httpProvider.interceptors.push(['$rootScope', '$q', function($rootScope, $q) {
     return {
       responseError: function error(response) {
+        if (response.status === 401 && axelor.config['auth.central.client']) {
+            // redirect to central login page
+            window.location.href = './?client_name=' + axelor.config['auth.central.client']
+              + "&hash_location=" + encodeURIComponent(window.location.hash);
+            return $q.reject(response);
+        }
         if (response.status === 401 || response.status === 502 || (response.status === 0 && !response.data)) {
           var deferred = $q.defer();
           authServiceProvider.pushToBuffer(response.config, deferred);

@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -65,6 +65,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,7 +172,7 @@ public final class MetaStore {
       if (property.getTarget() != null) {
         map.put("perms", getPermissions(property.getTarget()));
       }
-      if (property.isMassUpdate()) {
+      if (property.isMassUpdate() && !name.contains(".")) {
         massUpdate = true;
       }
       // find the default value
@@ -243,7 +244,7 @@ public final class MetaStore {
       Map<String, Object> fields, String object, String jsonField) {
     final User user = AuthUtils.getUser();
     final MetaPermissions perms = Beans.get(MetaPermissions.class);
-    final Map<String, Object> result = new HashMap<>();
+    final Map<String, Object> result = new LinkedHashMap<>();
 
     for (Map.Entry<String, Object> item : fields.entrySet()) {
       String name = jsonField == null ? item.getKey() : jsonField + "." + item.getKey();
@@ -294,6 +295,7 @@ public final class MetaStore {
             .filter("self.model = :model AND self.modelField = :field")
             .bind("model", modelName)
             .bind("field", fieldName)
+            .order("sequence")
             .order("id")
             .fetch();
 
@@ -485,6 +487,40 @@ public final class MetaStore {
     return all;
   }
 
+  public static List<Selection.Option> getSelectionList(
+      Class<? extends Model> model, String orderBy, int limit) {
+    Mapper mapper = Mapper.of(model);
+    Property nameField = mapper.getNameField();
+    String name = nameField == null ? "id" : nameField.getName();
+
+    Query<?> query = Query.of(model);
+
+    if (StringUtils.notBlank(orderBy)) {
+      query.order(orderBy);
+    }
+
+    return query.select(name).fetch(limit, 0).stream()
+        .map(record -> (Map<?, ?>) record)
+        .map(
+            record -> {
+              Selection.Option option = new Selection.Option();
+              option.setValue(record.get("id").toString());
+              option.setTitle(record.get(name).toString());
+              if (nameField != null && nameField.isTranslatable()) {
+                String key = "value:" + option.getTitle();
+                String value = I18n.get(key);
+                if (!value.equals(key)) {
+                  Map<String, Object> data = new HashMap<>();
+                  data.put(name, option.getTitle());
+                  option.setData(data);
+                  option.setTitle(value);
+                }
+              }
+              return option;
+            })
+        .collect(Collectors.toList());
+  }
+
   public static List<Selection.Option> getSelectionList(String selection) {
     if (StringUtils.isBlank(selection)) {
       return null;
@@ -558,6 +594,7 @@ public final class MetaStore {
     option.setValue(item.getValue());
     option.setTitle(item.getTitle());
     option.setIcon(item.getIcon());
+    option.setColor(item.getColor());
     option.setOrder(item.getOrder());
     option.setHidden(item.getHidden());
     try {

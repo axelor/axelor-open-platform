@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -19,8 +19,11 @@ package com.axelor.meta.loader;
 
 import com.axelor.app.AppConfig;
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
+import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.common.StringUtils;
 import com.axelor.db.Query;
 import com.axelor.db.internal.DBHelper;
@@ -58,6 +61,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -68,9 +72,6 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -139,7 +140,7 @@ public class XMLViews {
         }
 
         @Override
-        public Iterator<Object> getPrefixes(String namespaceURI) {
+        public Iterator<String> getPrefixes(String namespaceURI) {
           throw new UnsupportedOperationException();
         }
       };
@@ -163,7 +164,6 @@ public class XMLViews {
                 }
               });
 
-  private static final String APP_CONFIG_PROVIDER_KEY = "application.config.provider";
   private static AppConfig appConfigProvider;
 
   static {
@@ -218,7 +218,8 @@ public class XMLViews {
     // This adds default attributes to generated XML
     // documentBuilderFactory.setSchema(schema);
 
-    final String appConfigProdiverName = AppSettings.get().get(APP_CONFIG_PROVIDER_KEY);
+    final String appConfigProdiverName =
+        AppSettings.get().get(AvailableAppSettings.APPLICATION_CONFIG_PROVIDER);
 
     if (StringUtils.notBlank(appConfigProdiverName)) {
       try {
@@ -227,7 +228,9 @@ public class XMLViews {
         appConfigProvider = Beans.get(cls);
       } catch (ClassNotFoundException e) {
         log.error(
-            "Can't find class {} specified by {}", appConfigProdiverName, APP_CONFIG_PROVIDER_KEY);
+            "Can't find class {} specified by {}",
+            appConfigProdiverName,
+            AvailableAppSettings.APPLICATION_CONFIG_PROVIDER);
       }
     }
 
@@ -444,7 +447,7 @@ public class XMLViews {
     applyHotUpdates();
 
     // first find by name
-    if (name != null) {
+    if (StringUtils.notBlank(name)) {
       // with group
       view = findMetaView(views, name, null, model, module, group);
       view = view == null ? findMetaView(views, name, null, null, module, group) : view;
@@ -452,6 +455,11 @@ public class XMLViews {
       // without group
       view = view == null ? findMetaView(views, name, null, model, module, null) : view;
       view = view == null ? findMetaView(views, name, null, null, module, null) : view;
+
+      if (view == null) {
+        log.error("No such view found: {}", name);
+        return null;
+      }
     }
 
     // next find by type
@@ -545,8 +553,6 @@ public class XMLViews {
 
   static class FinalViewGenerator {
 
-    private static final int NUM_WORKERS = Runtime.getRuntime().availableProcessors();
-    private static final int FETCH_INCREMENT = NUM_WORKERS * DBHelper.getJdbcFetchSize();
     private static final String STRING_DELIMITER = ",";
     private static final String TOOL_BAR = "toolbar";
     private static final String MENU_BAR = "menubar";
@@ -556,6 +562,7 @@ public class XMLViews {
             Position.AFTER, Position.INSIDE_LAST, Position.BEFORE, Position.INSIDE_FIRST);
 
     @Inject private MetaViewRepository metaViewRepo;
+    @Inject private GroupRepository groupRepo;
 
     public void generate(MetaView view) {
       try {
@@ -613,15 +620,32 @@ public class XMLViews {
           if ("extend".equals(node.getNodeName())) {
             processExtend(document, node, originalView, extensionView);
           } else {
-            processAppend(document, node, viewNode);
+            processAppend(document, node, viewNode, originalView);
           }
         }
       }
 
       final ObjectViews objectViews = unmarshal(document);
-      final String finalXml = toXml(objectViews.getViews().get(0), true);
+      final AbstractView finalView = objectViews.getViews().get(0);
+      final String finalXml = toXml(finalView, true);
       computedView.setXml(finalXml);
       computedView.setModule(getLastModule(extensionViews));
+      addGroups(computedView, finalView.getGroups());
+    }
+
+    private void addGroups(MetaView view, String codes) {
+      if (StringUtils.notBlank(codes)) {
+        Arrays.stream(codes.split("\\s*,\\s*"))
+            .forEach(
+                code -> {
+                  Group group = groupRepo.findByCode(code);
+                  if (group == null) {
+                    log.info("Creating a new user group: {}", code);
+                    group = groupRepo.save(new Group(code, code));
+                  }
+                  view.addGroup(group);
+                });
+      }
     }
 
     @Nullable
@@ -685,10 +709,7 @@ public class XMLViews {
       Optional.ofNullable(ModuleManager.getModule(extensionView.getModule()))
           .map(Module::isRemovable)
           .filter(removable -> removable)
-          .ifPresent(
-              removable -> {
-                addDependentModule(view, extensionView.getModule());
-              });
+          .ifPresent(removable -> addDependentModule(view, extensionView.getModule()));
 
       final NamedNodeMap extendAttributes = extensionNode.getAttributes();
       final String feature = getNodeAttributeValue(extendAttributes, "if-feature");
@@ -749,9 +770,19 @@ public class XMLViews {
       }
     }
 
-    private static void processAppend(Document document, Node extensionNode, Node viewNode) {
+    private static void processAppend(
+        Document document, Node extensionNode, Node viewNode, MetaView view)
+        throws XPathExpressionException {
       final Node node = document.importNode(extensionNode, true);
-      viewNode.appendChild(node);
+      final Node panelMailNode =
+          (Node)
+              evaluateXPath(
+                  PANEL_MAIL, view.getName(), view.getType(), document, XPathConstants.NODE);
+      if (panelMailNode == null) {
+        viewNode.appendChild(node);
+      } else {
+        viewNode.insertBefore(node, panelMailNode);
+      }
     }
 
     private static void doInsert(
@@ -832,13 +863,25 @@ public class XMLViews {
 
     private static void doInsert(
         List<Element> elements, Position position, Node targetNode, Document document) {
-      Node currentNode = targetNode;
+      final Iterator<Element> elementIt = elements.iterator();
+      Node currentNode = doInsert(elementIt, position, targetNode, document);
 
-      for (final Element element : elements) {
-        final Node node = document.importNode(element, true);
-        position.insert(currentNode, node);
-        currentNode = node;
+      while (currentNode != null) {
+        currentNode = doInsert(elementIt, Position.AFTER, currentNode, document);
       }
+    }
+
+    @Nullable
+    private static Node doInsert(
+        Iterator<Element> elementIt, Position position, Node targetNode, Document document) {
+      if (!elementIt.hasNext()) {
+        return null;
+      }
+
+      final Element element = elementIt.next();
+      final Node newChild = document.importNode(element, true);
+      position.insert(targetNode, newChild);
+      return newChild;
     }
 
     private static void doInsertToolBar(Element element, Document document, MetaView view)
@@ -1096,21 +1139,9 @@ public class XMLViews {
     }
 
     private static List<Element> filterElements(List<Element> elements, String nodeName) {
-      return elements
-          .stream()
+      return elements.stream()
           .filter(element -> nodeName.equals(element.getNodeName()))
           .collect(Collectors.toList());
-    }
-
-    public void parallelGenerate(Query<MetaView> query) {
-      final ExecutorService pool = Executors.newFixedThreadPool(NUM_WORKERS);
-
-      for (int i = 0; i < NUM_WORKERS; ++i) {
-        final int startOffset = i * DBHelper.getJdbcFetchSize();
-        pool.execute(() -> generate(query, startOffset, FETCH_INCREMENT));
-      }
-
-      shutdownAndAwaitTermination(pool);
     }
 
     public void generate(Query<MetaView> query) {
@@ -1130,19 +1161,6 @@ public class XMLViews {
     @Transactional
     public void generate(List<MetaView> views) {
       views.forEach(this::generate);
-    }
-
-    private static void shutdownAndAwaitTermination(ExecutorService pool) {
-      pool.shutdown();
-
-      try {
-        while (!pool.awaitTermination(1, TimeUnit.HOURS)) {
-          log.warn("Pool {} takes too long to terminate.", pool);
-        }
-      } catch (InterruptedException e) {
-        pool.shutdownNow();
-        Thread.currentThread().interrupt();
-      }
     }
 
     private static String getNodeAttributeValue(NamedNodeMap attributes, String name) {

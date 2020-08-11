@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -176,9 +176,7 @@ public class ContextHandler<T> {
     if (property.isCollection() && value instanceof Collection) {
       value =
           ((Collection<?>) value)
-              .stream()
-              .map(item -> createOrFind(property, item))
-              .collect(Collectors.toList());
+              .stream().map(item -> createOrFind(property, item)).collect(Collectors.toList());
     } else if (property.isReference()) {
       value = createOrFind(property, value);
     }
@@ -237,7 +235,7 @@ public class ContextHandler<T> {
   public Object interceptJsonAccess(Method method, Object[] args) throws Exception {
     final String name = (String) args[0];
     if ("class".equals(name)) return method.invoke(proxy, args);
-    if ("get".equals(method.getName()) || "set".equals(method.getName())) {
+    if ("get".equals(method.getName()) || "put".equals(method.getName())) {
       Method accessor = args.length == 1 ? beanMapper.getGetter(name) : beanMapper.getSetter(name);
       Object[] params = args.length == 1 ? new Object[] {} : new Object[] {args[1]};
       if (accessor != null) {

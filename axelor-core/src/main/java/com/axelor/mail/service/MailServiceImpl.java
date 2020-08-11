@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -20,6 +20,7 @@ package com.axelor.mail.service;
 import static com.axelor.common.StringUtils.isBlank;
 
 import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuditableRunner;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.UserRepository;
@@ -135,14 +136,15 @@ public class MailServiceImpl implements MailService, MailConstants {
 
     final AppSettings settings = AppSettings.get();
 
-    final String host = settings.get(CONFIG_SMTP_HOST);
-    final String port = settings.get(CONFIG_SMTP_PORT);
-    final String user = settings.get(CONFIG_SMTP_USER);
-    final String pass = settings.get(CONFIG_SMTP_PASS);
-    final String channel = settings.get(CONFIG_SMTP_CHANNEL);
+    final String host = settings.get(AvailableAppSettings.MAIL_SMTP_HOST);
+    final String port = settings.get(AvailableAppSettings.MAIL_SMTP_PORT);
+    final String user = settings.get(AvailableAppSettings.MAIL_SMTP_USER);
+    final String pass = settings.get(AvailableAppSettings.MAIL_SMTP_PASS);
+    final String channel = settings.get(AvailableAppSettings.MAIL_SMTP_CHANNEL);
 
-    final int timeout = settings.getInt(CONFIG_SMTP_TIMEOUT, DEFAULT_TIMEOUT);
-    final int connectionTimeout = settings.getInt(CONFIG_SMTP_CONNECTION_TIMEOUT, DEFAULT_TIMEOUT);
+    final int timeout = settings.getInt(AvailableAppSettings.MAIL_SMTP_TIMEOUT, DEFAULT_TIMEOUT);
+    final int connectionTimeout =
+        settings.getInt(AvailableAppSettings.MAIL_SMTP_CONNECTION_TIMEOUT, DEFAULT_TIMEOUT);
 
     if (isBlank(host)) {
       return null;
@@ -162,8 +164,6 @@ public class MailServiceImpl implements MailService, MailConstants {
    * <p>Can be overridden to provide {@link MailReader} configured differently (e.g. from database
    * config).
    *
-   * @param message the message to send with the sender
-   * @param entity the related entity, can be null if there is no related record
    * @return a {@link MailSender}, null if not configured
    */
   protected MailReader getMailReader() {
@@ -181,14 +181,15 @@ public class MailServiceImpl implements MailService, MailConstants {
 
     final AppSettings settings = AppSettings.get();
 
-    final String host = settings.get(CONFIG_IMAP_HOST);
-    final String port = settings.get(CONFIG_IMAP_PORT);
-    final String user = settings.get(CONFIG_IMAP_USER);
-    final String pass = settings.get(CONFIG_IMAP_PASS);
-    final String channel = settings.get(CONFIG_IMAP_CHANNEL);
+    final String host = settings.get(AvailableAppSettings.MAIL_IMAP_HOST);
+    final String port = settings.get(AvailableAppSettings.MAIL_IMAP_PORT);
+    final String user = settings.get(AvailableAppSettings.MAIL_IMAP_USER);
+    final String pass = settings.get(AvailableAppSettings.MAIL_IMAP_PASS);
+    final String channel = settings.get(AvailableAppSettings.MAIL_IMAP_CHANNEL);
 
-    final int timeout = settings.getInt(CONFIG_IMAP_TIMEOUT, DEFAULT_TIMEOUT);
-    final int connectionTimeout = settings.getInt(CONFIG_IMAP_CONNECTION_TIMEOUT, DEFAULT_TIMEOUT);
+    final int timeout = settings.getInt(AvailableAppSettings.MAIL_IMAP_TIMEOUT, DEFAULT_TIMEOUT);
+    final int connectionTimeout =
+        settings.getInt(AvailableAppSettings.MAIL_IMAP_CONNECTION_TIMEOUT, DEFAULT_TIMEOUT);
 
     if (isBlank(host)) {
       return null;
@@ -523,7 +524,7 @@ public class MailServiceImpl implements MailService, MailConstants {
   /**
    * Fetch email messages from the given mail store.
    *
-   * @param store the mail store to fetch message from
+   * @param reader the mail reader to fetch message from
    * @throws MessagingException if unable to parse message
    * @throws IOException if unable to load message content
    */

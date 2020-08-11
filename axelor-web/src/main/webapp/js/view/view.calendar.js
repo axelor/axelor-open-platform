@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -122,7 +122,7 @@ function CalendarViewCtrl($scope, $element) {
         criteria = {
           operator: "and",
           criteria: [criteria].concat(ds._filter.criteria)
-        }
+        };
       }
       if (_.size(ds._filter._domains) > 0) {
         criteria._domains = ds._filter._domains;
@@ -139,7 +139,9 @@ function CalendarViewCtrl($scope, $element) {
     };
 
     ds.search(opts).success(function(records) {
-      updateColors(records, true);
+      var items = _.clone(records);
+      items.sort(function (x, y) { return x.id - y.id; });
+      updateColors(items, true);
       callback(records);
     });
   };
@@ -243,11 +245,11 @@ function CalendarViewCtrl($scope, $element) {
   };
 
   function isAllDay(event) {
-    var start = moment(event.start);
-    var end = moment(event.end);
-    if (!start.hasTime()) {
+    if($scope.fields[view.start] && $scope.fields[view.start].type === 'date') {
       return true;
     }
+    var start = moment(event.start);
+    var end = moment(event.end);
     if (start.format("HH:mm") !== "00:00") {
       return false;
     }
@@ -737,7 +739,9 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
     scope.$callWhen(function () {
       return main.is(':visible');
     }, function() {
-      element.parents('.view-container:first').css('overflow', 'inherit');
+      if (scope.viewType !== 'dashboard') {
+        element.parents('.view-container:first').css('overflow', 'inherit');
+      }
       scope.onMode(mode);
       adjustSize();
     }, 100);
@@ -763,5 +767,25 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
     '</div>'
   };
 }]);
+
+angular.module('axelor.ui').directive('uiPortletCalendar', function () {
+  return {
+    controller: CalendarViewCtrl,
+    replace: true,
+    link: function (scope, element, attrs) {
+      var colSpan = (scope.dashlet||{}).colSpan || 6;
+      var height = (scope.dashlet||{}).height;
+      height = height || (50 * colSpan);
+      setTimeout(function () {
+        element.parent().height(height);
+      });
+      scope.showPager = true;
+    },
+    template:
+      "<div class='portlet-calendar' ui-portlet-refresh>" +
+        "<div ui-view-calendar x-handler='this'></div>" +
+      "</div>"
+  };
+});
 
 })();

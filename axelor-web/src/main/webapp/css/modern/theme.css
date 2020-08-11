@@ -1,7 +1,7 @@
 /**
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -377,7 +377,7 @@ form .panel-tabs .nav-tabs > li:hover > a {
   background: #fff;
 }
 .slickgrid .slick-row {
-  border-bottom: 0 !important;
+  border-bottom-color: #fff !important;
 }
 
 .tree-view-container .tree-header th {
@@ -483,33 +483,47 @@ header .dropdown-submenu:focus > a {
   height: 18px;
 }
 
-[ui-view-form] .tag-select,
-[ui-view-form] .tag-select > ul {
-  min-height: 20px;
-}
-
 [ui-view-form] .tag-select {
   margin-top: -3px !important;
+}
+
+[ui-view-form] .tag-select > ul {
+  display: inline-flex;
+  flex-flow: row wrap;
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: 20px;
 }
 
 [ui-view-form] .tag-select .tag-text,
 [ui-view-form] .tag-select .tag-link,
 [ui-view-form] .tag-select-single .tag-link {
   height: 14px;
-  line-height: 12px;
-}
-
-[ui-view-form] .tag-select .label,
-[ui-view-form] .tag-select .tag-selector {
-  height: 17px;
+  line-height: 14px;
 }
 
 [ui-view-form] .tag-select .label {
   padding: .2em .4em .3em;
+  margin: 1px;
 }
 
 [ui-view-form] .form-item-container > span.display-text {
   padding: 0;
+}
+
+[ui-slick-editors] .tag-select {
+  margin-top: 0 !important;
+}
+
+[ui-slick-editors] .tag-select li.tag-selector input {
+  min-height: auto !important;
+}
+
+[ui-form].slick-editor .form-item-container,
+[ui-form].slick-editor .form-item-container > span.display-text,
+[ui-form].slick-editor .form-item-container input {
+  min-height: 26px !important;
+  line-height: inherit !important;
 }
 
 .ng-invalid > input,

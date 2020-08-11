@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -24,6 +24,7 @@ import com.axelor.common.Inflector;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
+import com.axelor.db.Query;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
@@ -60,9 +61,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.inject.persist.Transactional;
 import java.io.File;
@@ -71,17 +73,22 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
-public class ViewLoader extends AbstractLoader {
+public class ViewLoader extends AbstractParallelLoader {
 
   @Inject private ObjectMapper objectMapper;
 
@@ -99,44 +106,113 @@ public class ViewLoader extends AbstractLoader {
 
   @Inject private XMLViews.FinalViewGenerator finalViewGenerator;
 
+  private final Set<String> viewsToGenerate = ConcurrentHashMap.newKeySet();
+  private final Map<String, List<String>> viewsToMigrate = new ConcurrentHashMap<>();
+  private final Map<String, List<Consumer<Group>>> groupsToCreate = new ConcurrentHashMap<>();
+
   @Override
-  @Transactional
-  protected void doLoad(Module module, boolean update) {
-    for (URL file : MetaScanner.findAll(module.getName(), "views", "(.*?)\\.xml")) {
-      log.debug("importing: {}", file.getFile());
-      try {
-        process(file, module, update);
-      } catch (IOException | JAXBException e) {
-        throw new RuntimeException(e);
-      }
+  protected void doLoad(URL file, Module module, boolean update) {
+    log.debug("Importing: {}", file.getFile());
+
+    try {
+      process(file, module, update);
+    } catch (IOException | JAXBException e) {
+      log.error("Error while loading {}", file);
+      throw new RuntimeException(e);
     }
   }
 
   @Override
+  protected List<List<URL>> findFileLists(Module module) {
+    return ImmutableList.of(MetaScanner.findAll(module.getName(), "views", "(.*?)\\.xml"));
+  }
+
+  @Override
   @Transactional
-  void doLast(Module module, boolean update) {
+  protected void doLast(Module module, boolean update) {
     // generate default views
     importDefault(module);
 
+    runResolveTasks();
+
     Set<?> unresolved = this.unresolvedKeys();
     if (!unresolved.isEmpty()) {
-      log.error("unresolved items: {}", unresolved);
-      throw new PersistenceException("There are some unresolve items, check the log.");
+      log.error("Unresolved items: {}", unresolved);
+      throw new PersistenceException("There are some unresolve items; check the log.");
     }
 
+    migrateViews();
+    linkMissingGroups();
     generateFinalViews(module, update);
   }
 
+  private void migrateViews() {
+    try {
+      viewsToMigrate.forEach(
+          (name, xmlIds) -> {
+            final MetaView baseView = views.findByNameAndComputed(name, false);
+            views
+                .all()
+                .filter("self.xmlId IN :xmlIds")
+                .bind("xmlIds", xmlIds)
+                .update("priority", baseView.getPriority());
+          });
+    } finally {
+      viewsToMigrate.clear();
+    }
+  }
+
+  private void linkMissingGroups() {
+    try {
+      groupsToCreate.forEach(
+          (code, adders) -> {
+            final Group existingGroup = groups.findByCode(code);
+            final Group group;
+            if (existingGroup != null) {
+              log.debug("User group already created by data/demo: {}", code);
+              group = existingGroup;
+            } else {
+              log.info("Creating a new user group: {}", code);
+              group = groups.save(new Group(code, code));
+            }
+            adders.forEach(adder -> adder.accept(group));
+          });
+    } finally {
+      groupsToCreate.clear();
+    }
+  }
+
   private void generateFinalViews(Module module, boolean update) {
-    finalViewGenerator.parallelGenerate(
-        views.findHavingExtensionsByModule(module.getName(), update));
+    try {
+      finalViewGenerator.generate(findForCompute(module.getName(), update, viewsToGenerate));
+    } finally {
+      viewsToGenerate.clear();
+    }
+  }
+
+  private Query<MetaView> findForCompute(String module, boolean update, Collection<String> names) {
+    return Query.of(MetaView.class)
+        .filter(
+            "(self.name IN :names OR (:module IS NULL OR self.module = :module) "
+                + "AND (:update = TRUE OR NOT EXISTS ("
+                + "SELECT computedView FROM MetaView computedView "
+                + "WHERE computedView.name = self.name AND self.computed = TRUE))) "
+                + "AND COALESCE(self.extension, FALSE) = FALSE "
+                + "AND COALESCE(self.computed, FALSE) = FALSE "
+                + "AND (self.name, self.priority) "
+                + "IN (SELECT other.name, MAX(other.priority) FROM MetaView other "
+                + "WHERE COALESCE(other.extension, FALSE) = FALSE AND COALESCE(other.computed, FALSE) = FALSE "
+                + "GROUP BY name) "
+                + "AND EXISTS (SELECT extensionView FROM MetaView extensionView "
+                + "WHERE extensionView.name = self.name AND extensionView.extension = TRUE)")
+        .bind("module", module)
+        .bind("update", update)
+        .bind("names", names.isEmpty() ? ImmutableSet.of("") : names)
+        .order("id");
   }
 
   private static <T> List<T> getList(List<T> list) {
-    if (list == null) {
-      return Lists.newArrayList();
-    }
-    return list;
+    return list != null ? list : Collections.emptyList();
   }
 
   @Transactional
@@ -156,26 +232,20 @@ public class ViewLoader extends AbstractLoader {
       all = XMLViews.unmarshal(stream);
     }
 
-    for (AbstractView view : getList(all.getViews())) {
-      importView(view, module, update, getFileName(url));
-    }
+    getList(all.getViews()).forEach(view -> importView(view, module, update, getFileName(url)));
 
-    for (Selection selection : getList(all.getSelections())) {
-      importSelection(selection, module, update);
-    }
+    getList(all.getSelections()).forEach(selection -> importSelection(selection, module, update));
 
-    for (Action action : getList(all.getActions())) {
-      importAction(action, module, update);
-      MetaStore.invalidate(action.getName());
-    }
+    getList(all.getActions())
+        .forEach(
+            action -> {
+              importAction(action, module, update);
+              MetaStore.invalidate(action.getName());
+            });
 
-    for (MenuItem item : getList(all.getMenus())) {
-      importMenu(item, module, update);
-    }
+    getList(all.getMenus()).forEach(item -> importMenu(item, module, update));
 
-    for (MenuItem item : getList(all.getActionMenus())) {
-      importActionMenu(item, module, update);
-    }
+    getList(all.getActionMenus()).forEach(item -> importActionMenu(item, module, update));
   }
 
   private static String getFileName(URL url) {
@@ -205,18 +275,18 @@ public class ViewLoader extends AbstractLoader {
     }
 
     if (view instanceof ExtendableView) {
-      ExtendableView extendableView = (ExtendableView) view;
+      final ExtendableView extendableView = (ExtendableView) view;
 
-      if (!Boolean.TRUE.equals(view.getExtension())
-          && ObjectUtils.notEmpty(extendableView.getExtends())) {
-        log.error("View with extensions must have extension=\"true\": {}(id={})", name, xmlId);
+      if (Boolean.TRUE.equals(view.getExtension())) {
+        viewsToGenerate.add(view.getName());
+      } else if (ObjectUtils.notEmpty(extendableView.getExtends())) {
+        log.error("View with extensions must have extension=\"true\": {}", getName(name, xmlId));
         return;
       }
     }
 
-    log.debug("Loading view: {}(id={})", name, xmlId);
-
-    String xml = XMLViews.toXml(view, true);
+    log.debug("Loading view: {}", getName(name, xmlId));
+    final String xml = XMLViews.toXml(view, true);
 
     if (type.matches("tree|chart|portal|dashboard|search|custom")) {
       modelName = null;
@@ -257,11 +327,15 @@ public class ViewLoader extends AbstractLoader {
       other = null;
     }
 
-    // set priority higher to existing view
-    if (entity.getId() == null
-        && other != null
-        && !Objects.equal(xmlId, other.getXmlId())
-        && view.getExtension() != Boolean.TRUE) {
+    if (Boolean.TRUE.equals(view.getExtension())) {
+      if (!Boolean.TRUE.equals(entity.getExtension())) {
+        // Migrated to extension view
+        viewsToMigrate
+            .computeIfAbsent(view.getName(), k -> Collections.synchronizedList(new ArrayList<>()))
+            .add(view.getXmlId());
+      }
+    } else if (entity.getId() == null && other != null && !Objects.equal(xmlId, other.getXmlId())) {
+      // Set priority higher than existing view
       entity.setPriority(other.getPriority() + 1);
     }
 
@@ -288,7 +362,7 @@ public class ViewLoader extends AbstractLoader {
     entity.setModule(module.getName());
     entity.setXml(xml);
     entity.setComputed(null);
-    entity.setGroups(this.findGroups(view.getGroups(), entity.getGroups()));
+    final Set<String> missingGroups = addGroups(entity::addGroup, view.getGroups());
     entity.setExtension(view.getExtension());
 
     if (entity.getTitle() == null) {
@@ -300,9 +374,15 @@ public class ViewLoader extends AbstractLoader {
     }
 
     entity = views.save(entity);
+    addToGroupsToCreate(entity, missingGroups);
   }
 
-  private void importSelection(Selection selection, Module module, boolean update) {
+  private static String getName(String name, String xmlId) {
+    return xmlId == null ? name : String.format("%s(id=%s)", name, xmlId);
+  }
+
+  @Transactional
+  protected void importSelection(Selection selection, Module module, boolean update) {
 
     String name = selection.getName();
     String xmlId = selection.getXmlId();
@@ -362,6 +442,7 @@ public class ViewLoader extends AbstractLoader {
       item.setValue(opt.getValue());
       item.setTitle(opt.getTitle());
       item.setIcon(opt.getIcon());
+      item.setColor(opt.getColor());
       item.setOrder(seq);
       item.setHidden(opt.getHidden());
 
@@ -386,29 +467,55 @@ public class ViewLoader extends AbstractLoader {
     selects.save(entity);
   }
 
-  private Set<Group> findGroups(String names, Set<Group> existing) {
-    if (StringUtils.isBlank(names)) {
-      return existing;
+  private Set<String> addGroups(Consumer<Group> adder, String codes) {
+    final Set<String> missing = new HashSet<>();
+
+    if (StringUtils.notBlank(codes)) {
+      Arrays.stream(codes.split("\\s*,\\s*"))
+          .forEach(
+              code -> {
+                final Group group = groups.findByCode(code);
+                if (group != null) {
+                  adder.accept(group);
+                } else {
+                  missing.add(code);
+                }
+              });
     }
 
-    Set<Group> all =
-        ObjectUtils.isEmpty(existing) ? new HashSet<Group>() : Sets.newHashSet(existing);
-    for (String code : names.split(",")) {
-      Group group = groups.all().filter("self.code = ?1", code).fetchOne();
-      if (group == null) {
-        log.info("Creating a new user group: {}", code);
-        group = new Group();
-        group.setCode(code);
-        group.setName(code);
-        group = groups.save(group);
-      }
-      all.add(group);
-    }
-
-    return all;
+    return missing;
   }
 
-  private void importAction(Action action, Module module, boolean update) {
+  private void addToGroupsToCreate(MetaView metaView, Set<String> codes) {
+    final Long id = metaView.getId();
+    codes.stream()
+        .forEach(
+            code ->
+                groupsToCreate
+                    .computeIfAbsent(code, k -> Collections.synchronizedList(new ArrayList<>()))
+                    .add(
+                        group -> {
+                          final MetaView entity = views.find(id);
+                          entity.addGroup(group);
+                        }));
+  }
+
+  private void addToGroupsToCreate(MetaMenu metaMenu, Set<String> codes) {
+    final Long id = metaMenu.getId();
+    codes.stream()
+        .forEach(
+            code ->
+                groupsToCreate
+                    .computeIfAbsent(code, k -> Collections.synchronizedList(new ArrayList<>()))
+                    .add(
+                        group -> {
+                          final MetaMenu entity = menus.find(id);
+                          entity.addGroup(group);
+                        }));
+  }
+
+  @Transactional
+  protected void importAction(Action action, Module module, boolean update) {
 
     String name = action.getName();
     String xmlId = action.getXmlId();
@@ -479,21 +586,29 @@ public class ViewLoader extends AbstractLoader {
     }
 
     entity = actions.save(entity);
+    Long entityId = entity.getId();
 
-    for (MetaMenu pending : this.resolve(MetaMenu.class, entity.getName())) {
-      log.debug("Resolved menu: {}", pending.getName());
-      pending.setAction(entity);
-      pending = menus.save(pending);
-    }
+    addResolveTask(MetaMenu.class, name, entityId, this::resolveActionOnMenu);
 
-    for (MetaActionMenu pending : this.resolve(MetaActionMenu.class, entity.getName())) {
-      log.debug("Resolved action menu: {}", pending.getName());
-      pending.setAction(entity);
-      pending = actionMenus.save(pending);
-    }
+    addResolveTask(MetaActionMenu.class, name, entityId, this::resolveActionOnActionMenu);
   }
 
-  private void importMenu(MenuItem menuItem, Module module, boolean update) {
+  private void resolveActionOnMenu(Long menuId, Long actionId) {
+    MetaMenu pending = menus.find(menuId);
+    log.debug("Resolved menu: {}", pending.getName());
+    MetaAction actionEntity = actions.find(actionId);
+    pending.setAction(actionEntity);
+  }
+
+  private void resolveActionOnActionMenu(Long menuId, Long actionId) {
+    MetaActionMenu pending = actionMenus.find(menuId);
+    log.debug("Resolved action menu: {}", pending.getName());
+    MetaAction actionEntity = actions.find(actionId);
+    pending.setAction(actionEntity);
+  }
+
+  @Transactional
+  protected void importMenu(MenuItem menuItem, Module module, boolean update) {
 
     String name = menuItem.getName();
     String xmlId = menuItem.getXmlId();
@@ -549,7 +664,7 @@ public class ViewLoader extends AbstractLoader {
     entity.setLeft(menuItem.getLeft() == null ? true : menuItem.getLeft());
     entity.setMobile(menuItem.getMobile());
     entity.setHidden(menuItem.getHidden());
-    entity.setGroups(this.findGroups(menuItem.getGroups(), entity.getGroups()));
+    final Set<String> missingGroups = addGroups(entity::addGroup, menuItem.getGroups());
 
     entity.setConditionToCheck(menuItem.getConditionToCheck());
     entity.setModuleToCheck(menuItem.getModuleToCheck());
@@ -558,11 +673,13 @@ public class ViewLoader extends AbstractLoader {
       entity.setOrder(menuItem.getOrder());
     }
 
+    entity = menus.save(entity);
+
     if (!Strings.isNullOrEmpty(menuItem.getParent())) {
       MetaMenu parent = menus.findByName(menuItem.getParent());
       if (parent == null) {
         log.debug("Unresolved parent: {}", menuItem.getParent());
-        this.setUnresolved(MetaMenu.class, menuItem.getParent(), entity);
+        this.setUnresolved(MetaMenu.class, menuItem.getParent(), entity.getId());
       } else {
         entity.setParent(parent);
       }
@@ -572,22 +689,27 @@ public class ViewLoader extends AbstractLoader {
       MetaAction action = actions.findByName(menuItem.getAction());
       if (action == null) {
         log.debug("Unresolved action: {}", menuItem.getAction());
-        setUnresolved(MetaMenu.class, menuItem.getAction(), entity);
+        setUnresolved(MetaMenu.class, menuItem.getAction(), entity.getId());
       } else {
         entity.setAction(action);
       }
     }
 
-    entity = menus.save(entity);
+    Long entityId = entity.getId();
 
-    for (MetaMenu pending : this.resolve(MetaMenu.class, name)) {
-      log.debug("Resolved menu: {}", pending.getName());
-      pending.setParent(entity);
-      pending = menus.save(pending);
-    }
+    addResolveTask(MetaMenu.class, name, entityId, this::resolveParentOnMenu);
+    addToGroupsToCreate(entity, missingGroups);
   }
 
-  private void importActionMenu(MenuItem menuItem, Module module, boolean update) {
+  private void resolveParentOnMenu(Long menuId, Long parentMenuId) {
+    MetaMenu pending = menus.find(menuId);
+    log.debug("Resolved menu: {}", pending.getName());
+    MetaMenu metaMenuEntity = menus.find(parentMenuId);
+    pending.setParent(metaMenuEntity);
+  }
+
+  @Transactional
+  protected void importActionMenu(MenuItem menuItem, Module module, boolean update) {
     String name = menuItem.getName();
     String xmlId = menuItem.getXmlId();
 
@@ -638,11 +760,13 @@ public class ViewLoader extends AbstractLoader {
       entity.setOrder(menuItem.getOrder());
     }
 
+    entity = actionMenus.save(entity);
+
     if (!Strings.isNullOrEmpty(menuItem.getParent())) {
       MetaActionMenu parent = actionMenus.findByName(menuItem.getParent());
       if (parent == null) {
         log.debug("Unresolved parent: {}", menuItem.getParent());
-        this.setUnresolved(MetaActionMenu.class, menuItem.getParent(), entity);
+        this.setUnresolved(MetaActionMenu.class, menuItem.getParent(), entity.getId());
       } else {
         entity.setParent(parent);
       }
@@ -652,19 +776,22 @@ public class ViewLoader extends AbstractLoader {
       MetaAction action = actions.findByName(menuItem.getAction());
       if (action == null) {
         log.debug("Unresolved action: {}", menuItem.getAction());
-        setUnresolved(MetaActionMenu.class, menuItem.getAction(), entity);
+        setUnresolved(MetaActionMenu.class, menuItem.getAction(), entity.getId());
       } else {
         entity.setAction(action);
       }
     }
 
-    entity = actionMenus.save(entity);
+    Long entityId = entity.getId();
 
-    for (MetaActionMenu pending : this.resolve(MetaActionMenu.class, name)) {
-      log.debug("Resolved action menu: {}", pending.getName());
-      pending.setParent(entity);
-      pending = actionMenus.save(pending);
-    }
+    addResolveTask(MetaActionMenu.class, name, entityId, this::resolveParentOnActionMenu);
+  }
+
+  private void resolveParentOnActionMenu(Long actionMenuId, Long parentActionMenuId) {
+    MetaActionMenu pending = actionMenus.find(actionMenuId);
+    log.debug("Resolved action menu: {}", pending.getName());
+    MetaActionMenu metaActionMenuEntity = actionMenus.find(parentActionMenuId);
+    pending.setParent(metaActionMenuEntity);
   }
 
   private static final File outputDir =

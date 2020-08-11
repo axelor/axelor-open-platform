@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2019 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -21,7 +21,7 @@
 
 var ui = angular.module('axelor.ui');
 
-function BaseCardsCtrl(type, $scope, $element) {
+function BaseCardsCtrl(type, $scope, $element, ViewService) {
 
   ui.DSViewCtrl(type, $scope, $element);
 
@@ -51,7 +51,6 @@ function BaseCardsCtrl(type, $scope, $element) {
 
     viewPromise.then(function (meta) {
       $scope.parse(meta.fields, meta.view);
-      $scope.$broadcast("on:clear-filter-silent");
     });
   };
 
@@ -60,6 +59,7 @@ function BaseCardsCtrl(type, $scope, $element) {
   };
 
   $scope.onNew = function () {
+    if ($scope.onEditPopup(null, false)) return;
     ds._page.index = -1;
     $scope.switchTo('form', function (formScope) {
       formScope.edit(null);
@@ -67,6 +67,14 @@ function BaseCardsCtrl(type, $scope, $element) {
       formScope.$broadcast("on:new");
     });
   };
+
+  $scope.onEditPopup = function (record, readonly) {
+    var view = $scope.schema || {};
+    if (view.editWindow === 'popup' || (view.editWindow === 'popup-new' && !record) || $scope.$$portlet) {
+      $scope.showEditor(record, readonly);
+      return true;
+    }
+  }
 
   $scope.onRefresh = function () {
     return $scope.filter({});
@@ -80,10 +88,10 @@ function BaseCardsCtrl(type, $scope, $element) {
   };
 
   $scope.filter = function(options) {
-    var view = $scope.schema;
-    var opts = {
+    var view = $scope.schema || {};
+    var opts = _.extend(_.pick(options, ['action', 'domain', 'context', 'archived']), {
       fields: _.pluck($scope.fields, 'name')
-    };
+    });
     var handleEmpty = $scope.handleEmpty.bind($scope);
 
     if (options.criteria || options._domains) {
@@ -129,11 +137,52 @@ function BaseCardsCtrl(type, $scope, $element) {
       _archived: ds._showArchived
     }, ds._filter);
   };
+
+  $scope.attr = function(name) {
+    if (!$scope.schema || $scope.schema[name] === undefined) {
+      return true;
+    }
+    return $scope.schema[name];
+  };
+
+  var editor = null;
+
+  $scope.showEditor = function(record, readonly) {
+    if (!editor) {
+      var editorScope = $scope.$new(true);
+      editorScope._viewParams = _.extend({}, $scope._viewParams);
+      editorScope.$$readonly = true;
+      editorScope.editorCanSave = true;
+      editorScope.select = angular.noop;
+      editorScope.getRouteOptions = angular.noop;
+      editorScope.setRouteOptions = angular.noop;
+      editor = ViewService.compile('<div ui-editor-popup></div>')(editorScope);
+      editor.data('$target', $element);
+      $scope.$on('$destroy', function () {
+        editor.remove();
+        editorScope.$destroy();
+      });
+    }
+
+    var popup = editor.isolateScope();
+
+    popup.show(record, function () {
+      $scope.onRefresh();
+    });
+
+    popup.waitForActions(function() {
+      if (!record || !record.id) {
+        popup.$broadcast("on:new");
+      } else {
+        popup.setEditable(!readonly);
+      }
+    });
+  };
 }
 
-ui.controller("CardsCtrl", ['$scope', '$element', function CardsCtrl($scope, $element) {
+ui.controller("CardsCtrl", ['$scope', '$element', 'ViewService', function CardsCtrl($scope, $element, ViewService) {
 
-  BaseCardsCtrl.call(this, 'cards', $scope, $element);
+  BaseCardsCtrl.call(this, 'cards', $scope, $element, ViewService);
 
   $scope.viewItems = {};
 
@@ -159,15 +208,15 @@ ui.controller("CardsCtrl", ['$scope', '$element', function CardsCtrl($scope, $el
   };
 }]);
 
-ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function KanbanCtrl($scope, $element, ActionService) {
+ui.controller("KanbanCtrl", ['$scope', '$element', 'ViewService', 'ActionService', function KanbanCtrl($scope, $element, ViewService, ActionService) {
 
-  BaseCardsCtrl.call(this, 'kanban', $scope, $element);
+  BaseCardsCtrl.call(this, 'kanban', $scope, $element, ViewService);
 
   $scope.parse = function (fields, view) {
     var params = $scope._viewParams.params || {};
     var hideCols = (params['kanban-hide-columns'] || '').split(',');
     var columnBy = fields[view.columnBy] || {};
-    var columns = _.filter(columnBy.selectionList, function (item) {
+    var columns = _.filter(view.columns, function (item) {
       return hideCols.indexOf(item.value) === -1;
     });
 
@@ -184,6 +233,16 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
     $scope.sortableOptions.disabled = !view.draggable || !$scope.hasPermission('write');
     $scope.columns = columns;
     $scope.colWidth = params['kanban-column-width'];
+
+    if (columnBy.target) {
+      $scope.toColumnValue = function (value) {
+        return { id : value };
+      }
+    }
+  };
+
+  $scope.toColumnValue = function (value) {
+    return value;
   };
 
   $scope.move = function (record, to, next, prev) {
@@ -198,7 +257,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
     var nxt = next ? _.pick(next, "id", "version", view.sequenceBy) : null;
 
     // update columnBy
-    rec[view.columnBy] = to;
+    rec[view.columnBy] = $scope.toColumnValue(to);
 
     // update sequenceBy
     var all = _.compact([prv, rec, nxt]);
@@ -280,6 +339,47 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ActionService', function Kan
   };
 }]);
 
+ui.directive('uiKanban', function () {
+  return {
+    replace: true,
+    template:
+      "<div class='kanban-view row-fluid' ng-clsss='::schema.css'>" +
+        "<div class='kanban-column' ng-repeat='column in ::columns' ui-kanban-column>" +
+          "<h3>{{::column.title}}</h3>" +
+          "<div class='input-group' ng-if='::column.canCreate' ng-show='hasPermission(\"create\")'>" +
+            "<input type='text' class='form-control' ng-model='$parent.newItem'>" +
+            "<span class='input-group-btn'>" +
+              "<button type='button' class='btn' ng-click='onCreate()'><span x-translate>Add</span></button>" +
+            "</span>" +
+          "</div>" +
+          "<ul class='kanban-card-list' ui-sortable='sortableOptions' ng-model='records'>" +
+            "<li class='kanban-card' ng-class='hilite.color' ng-repeat='record in records' ui-card>" +
+              "<div class='kanban-card-menu btn-group pull-right' ng-if='hasButton(\"edit\") || hasButton(\"delete\")' ng-show='hasPermission(\"write\") || hasPermission(\"remove\")'>" +
+                "<a tabindex='-1' href='javascript:' class='btn btn-link dropdown-toggle' data-toggle='dropdown'>" +
+                  "<i class='fa fa-caret-down'></i>" +
+                "</a>" +
+                "<ul class='dropdown-menu pull-right'>" +
+                  "<li><a href='javascript:' ng-if='hasButton(\"edit\")' ng-show='hasPermission(\"write\")' ng-click='onEdit(record)' x-translate>Edit</a></li>" +
+                  "<li><a href='javascript:' ng-if='hasButton(\"delete\")' ng-show='hasPermission(\"remove\")' ng-click='onDelete(record)' x-translate>Delete</a></li>" +
+                "</ul>" +
+              "</div>" +
+              "<div class='kanban-card-body'></div>" +
+            "</li>" +
+          "</ul>" +
+          "<div class='kanban-empty'>" +
+            "<span class='help-block text-center' x-translate>No records found.</span>" +
+          "</div>" +
+          "<div class='kanban-more ng-hide' ng-show='hasMore()'>" +
+            "<a class='btn btn-load-more' tabindex='-1' href='' role='button' ng-click='onMore()'>" +
+              "<span x-translate>load more</span>" +
+              "<i class='fa fa-arrow-right fa-fw'></i>" +
+            "</a>" +
+          "</div>" +
+        "</div>" +
+      "</div>"
+  }
+});
+
 ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 
   return {
@@ -291,7 +391,7 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
       var elemMore = element.children(".kanban-more");
 
       ds._context = _.extend({}, scope._dataSource._context);
-      ds._context[view.columnBy] = scope.column.value;
+      ds._context[view.columnBy] = scope.toColumnValue(scope.column.value);
       ds._page.limit = view.limit || 20;
 
       var domain = "self." + view.columnBy + " = :" + view.columnBy;
@@ -354,7 +454,7 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
         var rec = scope.record = {};
         var view = scope.schema;
 
-        rec[view.columnBy] = scope.column.value;
+        rec[view.columnBy] = scope.toColumnValue(scope.column.value);
 
         if (onNew === null) {
           onNew = ActionService.handler(scope, element, {
@@ -373,8 +473,9 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
       };
 
       scope.onEdit = function (record, readonly) {
+        if (scope.onEditPopup(record, readonly)) return;
+        scope._dataSource._record = record;
         scope.switchTo('form', function (formScope) {
-          formScope.edit(record);
           formScope.setEditable(!readonly && scope.hasPermission('write') && formScope.canEdit());
         });
       };
@@ -404,17 +505,6 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
         return fetch(options);
       });
 
-      element.on("click", ".kanban-card", function (e) {
-        var elem = $(e.target);
-        var selector = '[ng-click],[ui-action-click],button,a,.iswitch,.ibox,.kanban-card-menu';
-        if (elem.is(selector) || element.find(selector).has(elem).length) {
-          return;
-        }
-        var record = $(this).scope().record;
-        scope.onEdit(record, true);
-        scope.$applyAsync();
-      });
-
       if (scope.colWidth) {
         element.width(scope.colWidth);
       }
@@ -429,44 +519,66 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 }]);
 
 ui.directive('uiCards', function () {
+  return {
+    link: function (scope, element, attrs) {
+      var onRefresh = scope.onRefresh;
+      scope.onRefresh = function () {
+        scope.records = null;
+        return onRefresh.apply(scope, arguments);
+      };
 
-  return function (scope, element, attrs) {
-
-    var onRefresh = scope.onRefresh;
-    scope.onRefresh = function () {
-      scope.records = null;
-      return onRefresh.apply(scope, arguments);
-    };
-
-    scope.onEdit = function (record, readonly) {
-      var ds = scope._dataSource;
-      var page = ds._page;
-      page.index = record ? ds._data.indexOf(record) : -1;
-      scope.switchTo('form', function (formScope) {
-        formScope.setEditable(!readonly && scope.hasPermission('write') && formScope.canEdit());
-      });
-    };
-
-    scope.onDelete = function (record) {
-      axelor.dialogs.confirm(_t("Do you really want to delete the selected record?"),
-      function(confirmed) {
-        if (!confirmed) {
-          return;
-        }
+      scope.onEdit = function (record, readonly) {
+        if (scope.onEditPopup(record, readonly)) return;
         var ds = scope._dataSource;
-        ds.removeAll([record]).success(function() {
-          scope.onRefresh();
+        var page = ds._page;
+        page.index = record ? ds._data.indexOf(record) : -1;
+        scope.switchTo('form', function (formScope) {
+          formScope.setEditable(!readonly && scope.hasPermission('write') && formScope.canEdit());
         });
-      });
-    };
+      };
 
-    scope.isEmpty = function () {
-      return (scope.records||[]).length == 0;
-    };
+      scope.onDelete = function (record) {
+        axelor.dialogs.confirm(_t("Do you really want to delete the selected record?"),
+        function(confirmed) {
+          if (!confirmed) {
+            return;
+          }
+          var ds = scope._dataSource;
+          ds.removeAll([record]).success(function() {
+            scope.onRefresh();
+          });
+        });
+      };
 
-    scope.handleEmpty = function () {
-      element.toggleClass('empty', scope.isEmpty());
-    };
+      scope.isEmpty = function () {
+        return (scope.records||[]).length == 0;
+      };
+
+      scope.handleEmpty = function () {
+        element.toggleClass('empty', scope.isEmpty());
+      };
+    },
+    replace: true,
+    template:
+    "<div class='cards-view row-fluid' ng-class='::schema.css'>" +
+      "<div class='kanban-card-list'>" +
+        "<div class='cards-no-records' x-translate>No records found.</div>" +
+        "<div class='kanban-card-container' ng-repeat='record in records'>" +
+        "<div class='kanban-card' ng-class='hilite.color' ui-card>" +
+          "<div class='kanban-card-menu btn-group pull-right' ng-if='hasButton(\"edit\") || hasButton(\"delete\")' ng-show='hasPermission(\"write\") || hasPermission(\"remove\")'>" +
+            "<a tabindex='-1' href='javascript:' class='btn btn-link dropdown-toggle' data-toggle='dropdown'>" +
+                "<i class='fa fa-caret-down'></i>" +
+            "</a>" +
+            "<ul class='dropdown-menu pull-right'>" +
+                "<li><a href='javascript:' ng-if='hasButton(\"edit\")' ng-show='hasPermission(\"write\")' ng-click='onEdit(record)' x-translate>Edit</a></li>" +
+                "<li><a href='javascript:' ng-if='hasButton(\"delete\")' ng-show='hasPermission(\"remove\")' ng-click='onDelete(record)' x-translate>Delete</a></li>" +
+            "</ul>" +
+          "</div>" +
+          "<div class='kanban-card-body'></div>" +
+        "</div>" +
+        "</div>" +
+      "</div>" +
+    "</div>"
   };
 });
 
@@ -579,11 +691,28 @@ ui.directive('uiCard', ["$compile", function ($compile) {
       element.fadeIn("slow");
 
       var summaryHandler;
+      var summaryPlacement;
       var summary = body.find('.card-summary.popover');
 
       var configureSummary = _.once(function configureSummary() {
         element.popover({
-          placement: 'top',
+          placement: function (tip, el) {
+            summaryPlacement = setTimeout(function () {
+              $(tip).css('visibility', 'hidden').css('max-width', 400).position({
+                my: 'left',
+                at: 'right',
+                of: el,
+                using: function (pos, feedback) {
+                  $(feedback.element.element)
+                    .css(pos)
+                    .css('visibility', '')
+                    .removeClass('left right')
+                    .addClass(feedback.horizontal === 'left' ? 'right' : 'left');
+                  summaryPlacement = null;
+                }
+              });
+            });
+          },
           container: 'body',
           trigger: 'manual',
           title: summary.attr('title'),
@@ -593,7 +722,14 @@ ui.directive('uiCard', ["$compile", function ($compile) {
       });
 
       function showSummary() {
+        if((summary.text() || "").trim() == "") {
+          return;
+        }
         configureSummary();
+        if (summaryPlacement) {
+          clearTimeout(summaryPlacement);
+          summaryPlacement = null;
+        }
         summaryHandler = setTimeout(function () {
           summaryHandler = null;
           element.popover('show');
@@ -601,6 +737,10 @@ ui.directive('uiCard', ["$compile", function ($compile) {
       }
 
       function hideSummary() {
+        if (summaryPlacement) {
+          clearTimeout(summaryPlacement);
+          summaryPlacement = null;
+        }
         if (summaryHandler) {
           clearTimeout(summaryHandler);
           summaryHandler = null;
@@ -633,5 +773,57 @@ ui.directive('uiCard', ["$compile", function ($compile) {
     }
   };
 }]);
+
+function linker(scope, element, atts) {
+  scope.$$portlet = true;
+
+  var _filter = scope.filter;
+  var _action = scope._viewAction;
+
+  scope.filter = function (options) {
+    var opts = _.extend({}, options, {
+      action: _action
+    });
+    if (scope._context && scope.formPath && scope.getContext) {
+      opts.context = _.extend({id: null}, scope._context, scope.getContext());
+    }
+    return _filter.call(scope, opts);
+  };
+
+  function refresh() {
+    scope.onRefresh();
+  }
+
+  scope.$on('on:new', refresh);
+  scope.$on('on:edit', refresh);
+}
+
+angular.module('axelor.ui').directive('uiPortletCards', function () {
+  return {
+    controller: 'CardsCtrl',
+    replace: true,
+    link: function (scope, element, attrs) {
+      linker(scope, element, attrs);
+      scope.showPager = true;
+      scope.showSearch = true;
+    },
+    template:
+      "<div class='portlet-cards' ui-portlet-refresh>" +
+        "<div ui-cards></div>" +
+      "</div>"
+  };
+});
+
+angular.module('axelor.ui').directive('uiPortletKanban', function () {
+  return {
+    controller: 'KanbanCtrl',
+    replace: true,
+    link: linker,
+    template:
+      "<div class='portlet-kanban' ui-portlet-refresh>" +
+        "<div ui-kanban></div>" +
+      "</div>"
+  };
+});
 
 })();
