@@ -129,6 +129,28 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
       if (value && (forceSelect || canOK())) {
         value.$fetched = true;
         value.selected = true;
+
+        // add missing values
+        _.chain(Object.keys(record))
+          .filter(function(name) {
+            return !_.startsWith(name, '$') && _.isObject(record[name]);
+          })
+          .each(function(name) {
+            _.chain(Object.keys(record[name]))
+              .filter(function(subName) {
+                return !_.startsWith(subName, '$')
+                  && subName !== 'version'
+                  && _.isObject(value[name])
+                  && value[name][subName] === undefined;
+              })
+              .each(function(subName) {
+                value[name][subName] = record[name][subName];
+              });
+          });
+        _.chain(value)
+          .filter(function(val) { return val && val.$updatedValues; })
+          .each(function(val) { _.extend(val, val.$updatedValues); });
+
         $scope.$parent.select(value);
       }
       canClose = true;
