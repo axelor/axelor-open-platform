@@ -83,6 +83,18 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
       return;
     }
 
+    // update dotted fields from nested fields
+    value = _.clone(value);
+    _.chain(Object.keys($scope.fields))
+      .filter(function(name) { return name.indexOf('.') >= 0; })
+      .each(function(name) {
+        delete value[name];
+        var val = ui.findNested(value, name);
+        if (val !== undefined) {
+          value[name] = val;
+        }
+      });
+
     var items = _.chain([value]).flatten(true).compact().value();
     var records = _.map($scope.getItems(), _.clone);
 
