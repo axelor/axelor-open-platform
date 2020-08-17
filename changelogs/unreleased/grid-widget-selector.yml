@@ -1,6 +1,0 @@
----
-title: Add support for per grid widget checkbox selector
-type: feature
-description: |
-  Now we can use `x-selector="checkbox"` on grid view or panel-related to
-  show checkbox selection.
