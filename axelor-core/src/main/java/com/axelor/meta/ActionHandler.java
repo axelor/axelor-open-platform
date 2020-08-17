@@ -349,7 +349,7 @@ public class ActionHandler {
 
     if (Strings.isNullOrEmpty(expression)) return null;
 
-    String[] parts = expression.split("\\:");
+    String[] parts = expression.split("\\:", 2);
     if (parts.length != 2) {
       log.error("Invalid call expression: ", expression);
       return null;
