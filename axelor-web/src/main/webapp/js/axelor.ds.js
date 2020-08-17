@@ -812,7 +812,7 @@
       return $q.defer();
     };
 
-    ViewService.prototype.action = function(action, model, context, data) {
+    ViewService.prototype.action = function(action, model, context, data, config) {
 
       var params = {
         model: model,
@@ -822,7 +822,7 @@
         }
       };
 
-      var promise = $http.post('ws/action', params);
+      var promise = $http.post('ws/action', params, config);
       promise.success = function(fn) {
         promise.then(function(response){
           fn(response.data);

@@ -37,7 +37,9 @@ ui.directive('uiTooltip', ['ViewService', function (ViewService) {
 
         if (tooltip.call) {
           var context = _.extend({ _model: ds._model }, record, tooltip.context);
-          var promise = ViewService.action(tooltip.call, ds._model, context);
+          var promise = ViewService.action(tooltip.call, ds._model, context, null, {
+            silent: true
+          });
           return promise.then(function (response) {
             var res = response.data;
             var data = _.isArray(res.data) ? _.first(res.data) : res.data;
