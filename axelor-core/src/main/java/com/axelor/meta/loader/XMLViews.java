@@ -861,24 +861,25 @@ public class XMLViews {
       doInsert(elements, position, targetNode, document);
     }
 
-    private static void doInsert(
+    private static Node doInsert(
         List<Element> elements, Position position, Node targetNode, Document document) {
-      final Iterator<Element> elementIt = elements.iterator();
-      Node currentNode = doInsert(elementIt, position, targetNode, document);
+      final Iterator<Element> it = elements.iterator();
 
-      while (currentNode != null) {
-        currentNode = doInsert(elementIt, Position.AFTER, currentNode, document);
+      if (!it.hasNext()) {
+        return targetNode;
       }
+
+      Node node = doInsert(it.next(), position, targetNode, document);
+
+      while (it.hasNext()) {
+        node = doInsert(it.next(), Position.AFTER, node, document);
+      }
+
+      return node;
     }
 
-    @Nullable
     private static Node doInsert(
-        Iterator<Element> elementIt, Position position, Node targetNode, Document document) {
-      if (!elementIt.hasNext()) {
-        return null;
-      }
-
-      final Element element = elementIt.next();
+        Element element, Position position, Node targetNode, Document document) {
       final Node newChild = document.importNode(element, true);
       position.insert(targetNode, newChild);
       return newChild;
@@ -969,39 +970,46 @@ public class XMLViews {
         Node extendItemNode, Node targetNode, Document document, MetaView view)
         throws XPathExpressionException {
       final List<Element> elements = findElements(extendItemNode.getChildNodes());
+      Node changedTargetNode = null;
 
       final List<Element> toolBarElements = filterElements(elements, TOOL_BAR);
       for (final Element element : toolBarElements) {
-        doReplaceToolBar(element, document, view);
+        changedTargetNode = doReplaceToolBar(element, document, view);
       }
       elements.removeAll(toolBarElements);
 
       final List<Element> menuBarElements = filterElements(elements, MENU_BAR);
       for (final Element element : menuBarElements) {
-        doReplaceMenuBar(element, document, view);
+        changedTargetNode = doReplaceMenuBar(element, document, view);
       }
       elements.removeAll(menuBarElements);
 
       final List<Element> panelMailElements = filterElements(elements, PANEL_MAIL);
       for (final Element element : panelMailElements) {
-        doReplacePanelMail(element, document, view);
+        changedTargetNode = doReplacePanelMail(element, document, view);
       }
       elements.removeAll(panelMailElements);
 
-      doReplace(elements, targetNode, document);
-    }
-
-    private static void doReplace(List<Element> elements, Node targetNode, Document document) {
-      if (elements.isEmpty()) {
-        targetNode.getParentNode().removeChild(targetNode);
+      if (changedTargetNode != null) {
+        doInsert(elements, Position.AFTER, changedTargetNode, document);
       } else {
-        final Node node = document.importNode(elements.get(0), true);
-        targetNode.getParentNode().replaceChild(node, targetNode);
-        doInsert(elements.subList(1, elements.size()), Position.AFTER, node, document);
+        doReplace(elements, targetNode, document);
       }
     }
 
-    private static void doReplaceToolBar(Element element, Document document, MetaView view)
+    @Nullable
+    private static Node doReplace(List<Element> elements, Node targetNode, Document document) {
+      if (elements.isEmpty()) {
+        targetNode.getParentNode().removeChild(targetNode);
+        return null;
+      } else {
+        final Node node = document.importNode(elements.get(0), true);
+        targetNode.getParentNode().replaceChild(node, targetNode);
+        return doInsert(elements.subList(1, elements.size()), Position.AFTER, node, document);
+      }
+    }
+
+    private static Node doReplaceToolBar(Element element, Document document, MetaView view)
         throws XPathExpressionException {
       final List<Element> elements = ImmutableList.of(element);
       final Node toolBarNode =
@@ -1010,17 +1018,16 @@ public class XMLViews {
                   TOOL_BAR, view.getName(), view.getType(), document, XPathConstants.NODE);
 
       if (toolBarNode != null) {
-        doReplace(elements, toolBarNode, document);
-        return;
+        return doReplace(elements, toolBarNode, document);
       }
 
       final Node targetNode =
           (Node) evaluateXPath("/", view.getName(), view.getType(), document, XPathConstants.NODE);
       final Position position = Position.INSIDE_FIRST;
-      doInsert(elements, position, targetNode, document);
+      return doInsert(elements, position, targetNode, document);
     }
 
-    private static void doReplaceMenuBar(Element element, Document document, MetaView view)
+    private static Node doReplaceMenuBar(Element element, Document document, MetaView view)
         throws XPathExpressionException {
       final List<Element> elements = ImmutableList.of(element);
       final Node menuBarNode =
@@ -1029,8 +1036,7 @@ public class XMLViews {
                   MENU_BAR, view.getName(), view.getType(), document, XPathConstants.NODE);
 
       if (menuBarNode != null) {
-        doReplace(elements, menuBarNode, document);
-        return;
+        return doReplace(elements, menuBarNode, document);
       }
 
       final Node targetNode;
@@ -1050,10 +1056,10 @@ public class XMLViews {
         position = Position.INSIDE_FIRST;
       }
 
-      doInsert(elements, position, targetNode, document);
+      return doInsert(elements, position, targetNode, document);
     }
 
-    private static void doReplacePanelMail(Element element, Document document, MetaView view)
+    private static Node doReplacePanelMail(Element element, Document document, MetaView view)
         throws XPathExpressionException {
       final List<Element> elements = ImmutableList.of(element);
       final Node panelMailNode =
@@ -1062,14 +1068,13 @@ public class XMLViews {
                   PANEL_MAIL, view.getName(), view.getType(), document, XPathConstants.NODE);
 
       if (panelMailNode != null) {
-        doReplace(elements, panelMailNode, document);
-        return;
+        return doReplace(elements, panelMailNode, document);
       }
 
       final Node targetNode =
           (Node) evaluateXPath("/", view.getName(), view.getType(), document, XPathConstants.NODE);
       final Position position = Position.INSIDE_LAST;
-      doInsert(elements, position, targetNode, document);
+      return doInsert(elements, position, targetNode, document);
     }
 
     private static void doMove(

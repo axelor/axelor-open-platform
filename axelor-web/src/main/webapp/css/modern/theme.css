@@ -484,7 +484,11 @@ header .dropdown-submenu:focus > a {
 }
 
 [ui-view-form] .tag-select {
-  margin-top: -3px !important;
+  min-height: 21px;
+}
+
+.tag-select .label, .tag-select .tag-selector {
+    height: 16px;
 }
 
 [ui-view-form] .tag-select > ul {
@@ -503,7 +507,7 @@ header .dropdown-submenu:focus > a {
 }
 
 [ui-view-form] .tag-select .label {
-  padding: .2em .4em .3em;
+  padding: .3em .4em .3em;
   margin: 1px;
 }
 

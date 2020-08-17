@@ -1294,6 +1294,17 @@ label.has-help > span:after,
   background: #607d8b;
 }
 
+.tag-select .label.black,
+.tag-select-list-item.black > a > span {
+  background: black;
+}
+
+.tag-select .label.white,
+.tag-select-list-item.white > a > span {
+  background: whitesmoke;
+  color: rgba(0, 0, 0, 0.8);
+}
+
 .image-select {
   display: flex;
   align-items: center;

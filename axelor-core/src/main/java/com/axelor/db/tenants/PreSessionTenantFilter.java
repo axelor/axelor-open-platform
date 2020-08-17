@@ -19,9 +19,11 @@ package com.axelor.db.tenants;
 
 import com.axelor.common.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.Set;
 import javax.inject.Singleton;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -39,10 +41,11 @@ import javax.servlet.http.HttpSession;
 @Singleton
 public class PreSessionTenantFilter extends AbstractTenantFilter {
 
-  private static final String LOGIN_PAGE = "/login.jsp";
+  private static final Set<String> LOGIN_OR_CALLBACK_PAGE =
+      ImmutableSet.of("/login.jsp", "/callback");
 
   private boolean isLoginRequest(HttpServletRequest request) {
-    return LOGIN_PAGE.equals(request.getServletPath());
+    return LOGIN_OR_CALLBACK_PAGE.contains(request.getServletPath());
   }
 
   private boolean isLoginSubmit(HttpServletRequest request) {
@@ -91,7 +94,7 @@ public class PreSessionTenantFilter extends AbstractTenantFilter {
           final Enumeration<String> attrs = session.getAttributeNames();
           while (attrs.hasMoreElements()) {
             final String attr = attrs.nextElement();
-            if (!attr.startsWith(SESSION_KEY_PREFIX_SHIRO)) {
+            if (SESSION_KEY_PREFIX_KEEP_LIST.stream().noneMatch(attr::startsWith)) {
               session.removeAttribute(attr);
             }
           }

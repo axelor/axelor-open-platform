@@ -1,3 +1,46 @@
+## 5.3.5 (2020-08-17)
+
+#### Features
+
+* Add support for help on panel-dashlet
+* Add support for per grid widget checkbox selector
+
+  <details>
+  Now we can use `x-selector="checkbox"` on grid view or panel-related to
+  show checkbox selection.
+  </details>
+
+* Fix gantt view pagination issue
+
+#### Fixed
+
+* Fix switching to another tenant
+* Fix dotted fields disappearing after edition on top-level editable grids
+* Fix black and white tag colors
+* Fix empty form after saving new records in details view
+* Fix downloading of meta files if parent has collections of meta files
+* Fix missing read permission on user/group for DMS
+* Fetch target names for tag-select widget
+* Fix view extension replace on menubar/toolbar/panel-mail
+* Fix action method call with arguments having ':'
+* Fix charts with zero in series
+* Fix emptied field not present in grid after opening popup form
+* Fix truncated title and vertical alignment of tag-select with modern theme
+* Fix view watching from mixed location kinds
+* Fix nullable boolean radio displayed as false
+* Fix search null or empty string field values
+* Fix grid toolbar button js expression issue
+* Fix onNew on editable grid row
+* Fix column menu show/hide item in grid view
+* Fix wrong positional parameter resolution from query binder
+* Fix mail base64 image max line (RFC2045)
+* Fix dotted field translation in grid view
+* Fix NavSelect and MenuBar size adjust issue
+
+#### Security
+
+* Validate external input for tree view
+
 ## 5.3.4 (2020-06-29)
 
 #### Fixed

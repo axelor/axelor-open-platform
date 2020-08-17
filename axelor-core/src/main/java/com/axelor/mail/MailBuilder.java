@@ -25,7 +25,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -177,7 +179,10 @@ public final class MailBuilder {
             String cid = "image" + UUID.randomUUID().toString();
             content.cid = "<" + cid + ">";
             content.name = img.attr("title");
-            content.imageData = src.split(",")[1];
+            content.imageData =
+                new String(
+                    Base64.getMimeEncoder().encode(Base64.getDecoder().decode(src.split(",")[1])),
+                    StandardCharsets.UTF_8);
             content.imageType = matcher.group(1);
             img.attr("src", "cid:" + cid);
             contents.add(content);

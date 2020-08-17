@@ -54,6 +54,9 @@ public class PanelRelated extends AbstractPanel {
   @XmlAttribute(name = "x-row-height")
   private Integer rowHeight;
 
+  @XmlAttribute(name = "x-selector")
+  private String selector;
+
   @XmlAttribute private Boolean editable;
 
   @XmlAttribute private Boolean required;
@@ -153,6 +156,14 @@ public class PanelRelated extends AbstractPanel {
 
   public void setRowHeight(Integer rowHeight) {
     this.rowHeight = rowHeight;
+  }
+
+  public String getSelector() {
+    return selector;
+  }
+
+  public void setSelector(String selector) {
+    this.selector = selector;
   }
 
   public String getOrderBy() {

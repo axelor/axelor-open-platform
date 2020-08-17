@@ -168,7 +168,7 @@ String tenantId = (String) session.getAttribute("tenantId");
                   	<ul class="dropdown-menu">
                   	<% for (String key : tenantMap.keySet()) { %>
                   	<% if (!key.equals(tenantId)) { %>
-                  	  <li><a href="login.jsp?tenant=<%= key %>"><%= tenantMap.get(key) %></a></li>
+                  	  <li><a href="callback?tenant=<%= key %>"><%= tenantMap.get(key) %></a></li>
                   	<% } %>
                   	<% } %>
                   	</ul>

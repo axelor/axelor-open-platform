@@ -475,7 +475,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       if (authenticated
           || AuthPac4jModule.clientList.stream()
               .noneMatch(client -> client instanceof FormClient)) {
-        ((HttpServletResponse) response).sendRedirect(AppSettings.get().getBaseURL());
+        ((HttpServletResponse) response).sendRedirect(".");
         return;
       }
 

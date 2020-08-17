@@ -102,22 +102,20 @@ function dotToNested(record, field) {
   return record;
 }
 
-function nestedToDot(record, name, nullify) {
+function nestedToDot(record, name, deleteEmpty) {
   var names = name.split('.');
   var val = record || {};
   var idx = 0;
   while (val && idx < names.length) {
     var itName = names[idx++];
     var itVal = val[itName];
-    if (nullify && (!itVal || itVal.id === undefined)) {
-      val[itName] = null;
+    if (deleteEmpty && _.isObject(itVal) && itVal.id === undefined) {
+      delete val[itName];
     }
     val = itVal;
   }
   if (idx === names.length && val !== undefined) {
     record[name] = val;
-  } else if (nullify && !record.hasOwnProperty(name)) {
-    record[name] = null;
   }
   return record;
 }
@@ -390,7 +388,16 @@ _.extend(Factory.prototype, {
           return '<a href="' + url + '" download="' + value.fileName + '">' + value.fileName + '</a>';
         }
       } else {
-        url = ui.makeImageURL(this.grid.handler._model, field.name, dataContext, undefined, this.grid.handler, dataContext.id) + "&image=true";
+        var parentScope;
+        var parentId;
+        if (this.grid.handler.$parent && this.grid.handler.$parent.record && this.grid.handler.$parent.record.id) {
+            parentScope = this.grid.handler.$parent;
+            parentId = this.grid.handler.$parent.record.id;
+        } else {
+          parentScope = this.grid.handler;
+          parentId = dataContext.id;
+        }
+        url = ui.makeImageURL(this.grid.handler._model, field.name, dataContext, undefined, parentScope, parentId) + "&image=true";
       }
       return url ? '<img src="' + url + '" style="height: 21px;margin-top: -2px;">' : '';
     }
@@ -1370,7 +1377,7 @@ Grid.prototype.onBeforeMenuShow = function(event, args) {
   });
 
   _.each(this.cols, function(col) {
-    if (_.contains(this.visibleCols, col.id)) return;
+    if (_.contains(this.visibleCols, col.id) || (col.descriptor && col.descriptor.hidden)) return;
     menu.items.push({
       title: _t('Show') + " <i>" + col.name + "</i>",
       command: 'show',
@@ -1818,13 +1825,12 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
     var cell = grid.getActiveCell();
     var item = cell ? grid.getDataItem(cell.row) : {};
     var record = formScope.record || {};
-    var result = _.extend({}, item);
+    var result = _.extend({}, item, record, { id: item.id });
 
-    // get updated values
-    _.filter(grid.getColumns(), function (col) {
-      return col.descriptor && col.field && col.field.indexOf('.') === -1 && record[col.field] !== undefined;
-    }).forEach(function (col) {
-      result[col.field] = record[col.field];
+    _.each(result, function(value, name) {
+      if (_.isObject(value) && value.id === undefined && !_.startsWith(name, '$')) {
+        delete result[name];
+      }
     });
 
     return result;
@@ -2067,7 +2073,7 @@ Grid.prototype.showEditor = function (activeCell) {
   // convert dotted values
   this.cols
     .map(function (col) { return col.descriptor; })
-    .filter(function (field) { return field && field.name && field.name.indexOf('.') > -1; })
+    .filter(function (field) { return field && field.name && field.name.indexOf('.') > -1 && record[field.name] !== undefined; })
     .forEach(function (field) { dotToNested(record, field); });
 
   formScope.editRecord(record);
@@ -2100,6 +2106,12 @@ Grid.prototype.commitEdit = function () {
 
   var cleanUp = function () {
     that._commitPromise = null;
+
+    // Force fetch if pop-up form view is opened.
+    // This is needed if form view has fields no present in grid view.
+    _.forEach(data.getItems(), function(item) {
+      data.updateItem(item.id, _.extend(item || {}, { $fetched: false }));
+    });
   }
 
   this._commitPromise = promise;
@@ -2129,14 +2141,14 @@ Grid.prototype.commitEdit = function () {
   var row = this.grid.getActiveCell().row;
 
   scope.waitForActions(function() {
-    var record = _.extend(scope.getContextRecord(), { $fetched: false, $dirty: true, _orignal: scope.$$original });
+    var record = _.extend(scope.getContextRecord(), { $fetched: false, $dirty: true });
 
     if (!data.getItemById(record.id)) {
       // record has changed elsewhere
       return;
     }
 
-    // from nested fields to dotted fields and nullify empty values
+    // from nested fields to dotted fields and delete empty values
     _.filter(Object.keys(scope.fields), function(field) { return field.indexOf('.') >= 0; })
       .forEach(function(field) { nestedToDot(record, field, true); });
 
@@ -2669,7 +2681,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         if (attrs.editable === "false") {
           schema.editable = false;
         }
-        scope.selector = attrs.selector;
+        scope.selector = attrs.selector || schema.selector;
         scope.noFilter = attrs.noFilter;
 
         if (axelor.config["view.grid.selection"] === "checkbox" && !scope.selector) {
@@ -2769,6 +2781,9 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         }
         if (field.editable !== undefined) {
           schema.editable = field.editable;
+        }
+        if (field.selector !== undefined) {
+          schema.selector = field.selector;
         }
         schema.rowHeight = field.rowHeight || schema.rowHeight;
         schema.orderBy = field.orderBy || schema.orderBy;

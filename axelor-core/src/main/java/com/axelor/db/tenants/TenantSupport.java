@@ -26,11 +26,11 @@ class TenantSupport {
 
   private static TenantSupport INSTANCE;
 
-  private TenantConfigProvider confixProvider;
+  private TenantConfigProvider configProvider;
 
   @Inject
   private TenantSupport(TenantConfigProvider configProvider) {
-    this.confixProvider = configProvider;
+    this.configProvider = configProvider;
     TenantSupport.INSTANCE = this;
   }
 
@@ -42,6 +42,6 @@ class TenantSupport {
   }
 
   public TenantConfigProvider getConfigProvider() {
-    return confixProvider;
+    return configProvider;
   }
 }

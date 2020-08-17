@@ -1046,6 +1046,16 @@
             <xsd:documentation>Whether to fetch initial records.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="x-selector">
+          <xsd:annotation>
+            <xsd:documentation>Specify the row selection control</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:enumeration value="checkbox" />
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
         <xsd:attribute name="edit-icon" type="xsd:boolean" default="true">
           <xsd:annotation>
             <xsd:documentation>Whether to show edit icon.</xsd:documentation>
@@ -1246,6 +1256,16 @@
           <xsd:annotation>
             <xsd:documentation>Specify whether the rows can be moved to re-orders by sequence.</xsd:documentation>
           </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="x-selector">
+          <xsd:annotation>
+            <xsd:documentation>Specify the row selection control</xsd:documentation>
+          </xsd:annotation>
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:enumeration value="checkbox" />
+            </xsd:restriction>
+          </xsd:simpleType>
         </xsd:attribute>
         <xsd:attribute name="showTitle" use="prohibited" />
         <xsd:attributeGroup ref="tns:RelationalAttributes" />

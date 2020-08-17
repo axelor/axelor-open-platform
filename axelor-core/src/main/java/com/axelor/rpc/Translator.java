@@ -21,15 +21,18 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 final class Translator {
 
   private Translator() {}
 
-  private static String getTranslation(Property property, String value) {
-    if (property.isTranslatable() && StringUtils.notBlank(value)) {
+  private static String getTranslation(String value) {
+    if (StringUtils.notBlank(value)) {
       String key = "value:" + value;
       String val = I18n.get(key);
       if (val != key) {
@@ -43,11 +46,28 @@ final class Translator {
     return String.format("$t:%s", name);
   }
 
+  private static boolean isTranslatable(Mapper mapper, String field) {
+    Property property = null;
+    Iterator<String> names = Arrays.stream(field.split("\\.")).iterator();
+    while (names.hasNext()) {
+      property = mapper.getProperty(names.next());
+      if (property == null) return false;
+      if (names.hasNext()) {
+        if (property.getTarget() == null) return false;
+        mapper = Mapper.of(property.getTarget());
+      }
+    }
+    return property != null && property.isTranslatable();
+  }
+
   static Map<String, Object> translate(Map<String, Object> values, Property property) {
-    String name = property.getName();
+    return translate(values, property.getName());
+  }
+
+  static Map<String, Object> translate(Map<String, Object> values, String name) {
     Object value = values.get(name);
     if (value instanceof String) {
-      Object val = getTranslation(property, (String) value);
+      Object val = getTranslation((String) value);
       if (val != value) {
         values.put(toKey(name), val);
       }
@@ -63,7 +83,7 @@ final class Translator {
       final String name = property.getName();
       final Object value = values.get(name);
       if (property.isTranslatable() && value instanceof String) {
-        translate(values, property);
+        translate(values, property.getName());
       }
       if (property.getTarget() != null && value instanceof Map) {
         applyTranslatables((Map) value, property.getTarget());
@@ -76,5 +96,12 @@ final class Translator {
         }
       }
     }
+
+    // translate dotted fields
+    values.keySet().stream()
+        .filter(name -> name.contains("."))
+        .filter(name -> isTranslatable(mapper, name))
+        .collect(Collectors.toList())
+        .forEach(name -> translate(values, name));
   }
 }

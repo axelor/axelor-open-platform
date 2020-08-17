@@ -119,6 +119,8 @@ function GanttViewCtrl($scope, $element) {
   var ds = $scope._dataSource;
   var view = $scope._views.gantt;
   var initialized = false;
+  var offset = 0;
+  var dsPage = null;
 
   $scope.onShow = function(viewPromise) {
 
@@ -169,12 +171,53 @@ function GanttViewCtrl($scope, $element) {
       fields: searchFields,
       filter: false,
       domain: this._domain,
-      store: false
+      store: false,
+      offset:offset
     };
 
-    ds.search(opts).success(function(records) {
-      callback(records);
+    function fetchParents(records,cb) {
+
+      var recordIds = _.chain(records)
+                          .map(function(record) {
+                            return record.id;
+                          })
+                          .uniq()
+                          .value();
+
+      var _parentIds = _.chain(records)
+                          .map(function(record) {
+                                return record[schema.taskParent] ?
+                                        record[schema.taskParent].id :
+                                        null;
+                          })
+                          .filter(function(id) {
+                                return id && !recordIds.includes(id);
+                          })
+                          .uniq()
+                          .value();
+      if(_parentIds.length == 0) {
+        return cb(records);
+      }
+
+      opts=_.extend(opts, {
+        domain:`self.id in (:_parentIds) and ${opts.domain}`,
+        context: { _parentIds: _parentIds},
+        offset:0
+      });
+
+      ds.search(opts).success(function(parentRecords) {
+        records=records.concat(parentRecords);
+        fetchParents(records,cb);
+      });
+    }
+
+    ds.search(opts).success(function(records, page) {
+      dsPage=page;
+      fetchParents(records,function(records){
+        callback(records);
+      });
     });
+
   };
 
   $scope.getContext = function() {
@@ -204,6 +247,36 @@ function GanttViewCtrl($scope, $element) {
     return ds.save(record).success(function(res){
       callback(task, res);
     });
+  };
+
+  $scope.canNext = function() {
+    var page = dsPage;
+    return page && page.to < page.total;
+  };
+
+   $scope.canPrev = function() {
+    var page = dsPage;
+    return page && page.from > 0;
+  };
+
+   $scope.onNext = function() {
+    var page = dsPage;
+    offset= page.from + page.limit;
+    $scope.onRefresh();
+  };
+
+   $scope.onPrev = function() {
+    var page = dsPage;
+    offset= Math.max(0, page.from - page.limit);
+    $scope.onRefresh();
+  };
+
+   $scope.pagerText = function() {
+    var page = dsPage;
+    if (page && page.from !== undefined) {
+      if (page.total === 0) return null;
+      return _t("{0} to {1} of {2}", page.from + 1, page.to, page.total);
+    }
   };
 
   $scope.doRemove = function(id, task){
