@@ -117,6 +117,11 @@ public abstract class AbstractWidget {
     return attrs;
   }
 
+  @XmlTransient
+  public void setWidgetAttrs(Map<String, Object> attrs) {
+    // does nothing
+  }
+
   public String getModel() {
     return model;
   }
