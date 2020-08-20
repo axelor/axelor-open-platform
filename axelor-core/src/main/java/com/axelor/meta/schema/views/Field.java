@@ -25,6 +25,7 @@ import com.axelor.meta.MetaStore;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.Collection;
 import java.util.List;
@@ -205,6 +206,7 @@ public class Field extends SimpleWidget {
     return placeholder;
   }
 
+  @JsonSetter
   public void setPlaceholder(String placeholder) {
     this.placeholder = placeholder;
   }

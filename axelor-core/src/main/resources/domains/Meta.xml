@@ -74,6 +74,7 @@
     <string name="model" />
     <string name="xml" required="true" large="true"/>
     <many-to-one name="user" ref="com.axelor.auth.db.User" column="user_id" required="true" />
+    <boolean name="shared" />
 
     <finder-method name="findByUser" using="name,user" cacheable="true"/>
     <finder-method name="findByUser" using="name,model,user" cacheable="true"/>

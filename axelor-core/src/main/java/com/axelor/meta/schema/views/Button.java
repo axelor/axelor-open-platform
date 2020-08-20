@@ -21,6 +21,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
@@ -72,6 +73,7 @@ public class Button extends SimpleWidget {
     return prompt;
   }
 
+  @JsonSetter
   public void setPrompt(String prompt) {
     this.prompt = prompt;
   }

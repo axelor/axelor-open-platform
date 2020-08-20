@@ -22,6 +22,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
@@ -87,6 +88,7 @@ public abstract class SimpleWidget extends AbstractWidget {
     return title;
   }
 
+  @JsonSetter
   public void setTitle(String title) {
     this.title = title;
   }
@@ -101,6 +103,7 @@ public abstract class SimpleWidget extends AbstractWidget {
     return help;
   }
 
+  @JsonSetter
   public void setHelp(String help) {
     this.help = help;
   }

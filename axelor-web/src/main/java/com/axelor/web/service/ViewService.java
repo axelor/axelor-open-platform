@@ -29,9 +29,11 @@ import com.axelor.meta.ActionExecutor;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonRecord;
+import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.AbstractWidget;
+import com.axelor.meta.schema.views.Button;
 import com.axelor.meta.schema.views.Dashboard;
 import com.axelor.meta.schema.views.Field;
 import com.axelor.meta.schema.views.FormInclude;
@@ -57,6 +59,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.servlet.RequestScoped;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -339,11 +342,13 @@ public class ViewService extends AbstractService {
     final ObjectMapper om = Beans.get(ObjectMapper.class);
     try {
       final String type = (String) data.get("type");
-      final String json = om.writeValueAsString(data);
       AbstractView view = null;
       switch (type) {
         case "dashboard":
-          view = om.readValue(json, Dashboard.class);
+          view = om.readValue(om.writeValueAsString(data), Dashboard.class);
+          break;
+        case "grid":
+          view = saveGridView(data);
           break;
       }
       if (view != null) {
@@ -352,6 +357,47 @@ public class ViewService extends AbstractService {
     } catch (Exception e) {
     }
     return null;
+  }
+
+  private AbstractView saveGridView(Map<String, Object> json) {
+    final Object viewId = json.get("viewId");
+    final Object customViewId = json.get("customViewId");
+
+    if (viewId == null && customViewId == null) {
+      return null;
+    }
+
+    final ObjectMapper om = Beans.get(ObjectMapper.class);
+    final GridView view =
+        customViewId == null
+            ? (GridView) XMLViews.findView(Long.parseLong(viewId.toString()))
+            : (GridView) XMLViews.findCustomView(Long.parseLong(customViewId.toString()));
+
+    final List<AbstractWidget> items = new ArrayList<>();
+
+    for (AbstractWidget item : view.getItems()) {
+      if (item instanceof Field || item instanceof Button) continue;
+      items.add(item);
+    }
+
+    for (Object item : (List<?>) json.get("items")) {
+      final Map<?, ?> map = (Map<?, ?>) item;
+      final String type = (String) map.get("type");
+      if ("field".equals(type) || "button".equals(type)) {
+        final Class<?> itemType = "field".equals(type) ? Field.class : Button.class;
+        try {
+          items.add((AbstractWidget) om.readValue(om.writeValueAsString(map), itemType));
+        } catch (IOException e) {
+          // this should not happen
+          throw new IllegalArgumentException("Trying to save invalid view schema.");
+        }
+      }
+    }
+
+    view.setCustomViewShared((Boolean) json.get("customViewShared"));
+    view.setItems(items);
+
+    return view;
   }
 
   @GET

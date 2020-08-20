@@ -68,6 +68,10 @@ public abstract class AbstractView {
 
   @XmlTransient @JsonProperty private Long modelId;
 
+  @XmlTransient @JsonProperty private Long customViewId;
+
+  @XmlTransient @JsonProperty private Boolean customViewShared;
+
   @XmlAttribute private String name;
 
   @XmlAttribute private String title;
@@ -112,6 +116,22 @@ public abstract class AbstractView {
 
   public void setModelId(Long modelId) {
     this.modelId = modelId;
+  }
+
+  public Long getCustomViewId() {
+    return customViewId;
+  }
+
+  public void setCustomViewId(Long customViewId) {
+    this.customViewId = customViewId;
+  }
+
+  public Boolean getCustomViewShared() {
+    return customViewShared;
+  }
+
+  public void setCustomViewShared(Boolean customViewShared) {
+    this.customViewShared = customViewShared;
   }
 
   public String getName() {

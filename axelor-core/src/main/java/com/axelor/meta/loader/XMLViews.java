@@ -367,6 +367,44 @@ public class XMLViews {
     return result;
   }
 
+  private static MetaViewCustom findCustomView(
+      MetaViewCustomRepository views, String name, String type, String model) {
+    User user = AuthUtils.getUser();
+    List<String> conditions = new ArrayList<>();
+
+    if (StringUtils.notBlank(name)) conditions.add("self.name = :name");
+    if (StringUtils.notBlank(type)) conditions.add("self.type = :type");
+    if (StringUtils.notBlank(model)) conditions.add("self.model = :model");
+
+    // find personal
+    String filter = String.join(" AND ", conditions) + " AND self.user = :user";
+
+    MetaViewCustom custom =
+        views
+            .all()
+            .filter(filter)
+            .bind("name", name)
+            .bind("type", type)
+            .bind("model", model)
+            .bind("user", user)
+            .fetchOne();
+
+    if (custom != null) {
+      return custom;
+    }
+
+    // find shared
+    filter = String.join(" AND ", conditions) + " AND self.shared = true";
+
+    return views
+        .all()
+        .filter(filter)
+        .bind("name", name)
+        .bind("type", type)
+        .bind("model", model)
+        .fetchOne();
+  }
+
   private static MetaView findMetaView(
       MetaViewRepository views, String name, String type, String model, String module, Long group) {
     final List<String> select = new ArrayList<>();
@@ -399,6 +437,32 @@ public class XMLViews {
         .cacheable()
         .order("-priority")
         .fetchOne();
+  }
+
+  public static AbstractView findView(Long id) {
+    final MetaView view = Beans.get(MetaViewRepository.class).find(id);
+    if (view == null) {
+      return null;
+    }
+    try {
+      return unmarshal(view.getXml()).getViews().get(0);
+    } catch (JAXBException e) {
+      log.error(e.getMessage(), e);
+      return null;
+    }
+  }
+
+  public static AbstractView findCustomView(Long id) {
+    final MetaViewCustom view = Beans.get(MetaViewCustomRepository.class).find(id);
+    if (view == null) {
+      return null;
+    }
+    try {
+      return unmarshal(view.getXml()).getViews().get(0);
+    } catch (JAXBException e) {
+      log.error(e.getMessage(), e);
+      return null;
+    }
   }
 
   public static AbstractView findView(String name, String type) {
@@ -438,9 +502,8 @@ public class XMLViews {
     MetaViewCustom custom = null;
 
     // find personalized view
-    if (module == null && name != null && user != null) {
-      custom = customViews.findByUser(name, model, user);
-      custom = custom == null ? customViews.findByUser(name, user) : custom;
+    if (module == null && user != null) {
+      custom = findCustomView(customViews, name, type, model);
     }
 
     // make sure hot updates are applied
@@ -505,6 +568,10 @@ public class XMLViews {
           xmlView.setModelId(metaModel.getId());
         }
       }
+    }
+    if (custom != null) {
+      xmlView.setCustomViewId(custom.getId());
+      xmlView.setCustomViewShared(custom.getShared());
     }
     return xmlView;
   }

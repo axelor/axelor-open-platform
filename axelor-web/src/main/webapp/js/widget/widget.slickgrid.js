@@ -486,8 +486,8 @@ var Grid = function(scope, element, attrs, ViewService, ActionService) {
     noFilter = noFilter === 'true';
   }
 
-  this.compile = function(template) {
-    return ViewService.compile(template)(scope.$new());
+  this.compile = function(template, newScope) {
+    return ViewService.compile(template)(newScope || scope.$new());
   };
 
   this.newActionHandler = function(scope, element, options) {
@@ -655,6 +655,11 @@ Grid.prototype.parse = function(view) {
     }, {
       title: _t("Hide") + " <i>" + column.name + "</i>",
       command: "hide"
+    }, {
+      separator: true
+    }, {
+      title: _t("Customize..."),
+      command: "customize"
     }];
 
     menus = _.compact(menus);
@@ -723,7 +728,7 @@ Grid.prototype.parse = function(view) {
   }
 
   // add column for re-ordering rows
-  this._canMove = view.canMove && view.orderBy === "sequence" && !view.groupBy;
+  this._canMove = view.canMove && !view.groupBy;
   if (this._canMove) {
     cols.push({
       id: "_move_column",
@@ -1408,7 +1413,8 @@ Grid.prototype.onBeforeMenuShow = function(event, args) {
 
   _.each(this.cols, function(col) {
     if (_.contains(this.visibleCols, col.id) || (col.descriptor && col.descriptor.hidden)) return;
-    menu.items.push({
+    // before customize command
+    menu.items.splice(menu.items.length - 2, 0, {
       title: _t('Show') + " <i>" + col.name + "</i>",
       command: 'show',
       field: col.field
@@ -1461,6 +1467,33 @@ Grid.prototype.onMenuCommand = function(event, args) {
   if (args.command === 'show') {
     return this.showColumn(args.item.field, true);
   }
+
+  if (args.command === 'customize') {
+    this.showCustomizePopup();
+  }
+};
+
+Grid.prototype.showCustomizePopup = function () {
+  var that = this;
+  var formScope = null;
+  var popup = this._customizePopup || (function () {
+    formScope = that.scope.$new(true);
+    formScope.target = that.handler._model;
+    formScope.view = that.scope.view;
+
+    var form = that.compile("<div ui-slick-columns-form target='target' view='view'></div>", formScope);
+
+    that.scope.$on('$destroy', function () {
+      form.dialog("destroy");
+      form = null;
+      popup = null;
+      that._customizePopup = null;
+    });
+
+    return that._customizePopup = form;
+  })();
+
+  popup.dialog("open");
 };
 
 Grid.prototype.onKeyDown = function (e) {
@@ -2267,65 +2300,73 @@ Grid.prototype._resequence = function (items) {
 Grid.prototype.onMoveRows = function (event, args) {
   var grid = this.grid;
   var dataView = this.scope.dataView;
-    var rows = args.rows;
-    var items = dataView.getItems();
-    var insertBefore = args.insertBefore;
+  var rows = args.rows;
+  var items = dataView.getItems();
+  var insertBefore = args.insertBefore;
 
-    var left = items.slice(0, insertBefore);
-    var right = items.slice(insertBefore, items.length);
-    var extractedRows = [];
+  var left = items.slice(0, insertBefore);
+  var right = items.slice(insertBefore, items.length);
+  var extractedRows = [];
 
-    rows.sort(function(a, b) { return a - b; });
+  rows.sort(function(a, b) { return a - b; });
 
-    var i;
+  var i;
 
-    for (i = 0; i < rows.length; i++) {
-      extractedRows.push(items[rows[i]]);
-    }
-
-    rows.reverse();
-
-    for (i = 0; i < rows.length; i++) {
-      var row = rows[i];
-      if (row < insertBefore) {
-        left.splice(row, 1);
-      } else {
-        right.splice(row - insertBefore, 1);
-      }
-    }
-
-    items = left.concat(extractedRows.concat(right));
-
-    var selectedRows = [];
-    for (i = 0; i < rows.length; i++) {
-      selectedRows.push(left.length + i);
+  for (i = 0; i < rows.length; i++) {
+    extractedRows.push(items[rows[i]]);
   }
 
-    // resequence
-    this._resequence(items);
+  rows.reverse();
 
-    function resetSelection() {
-      grid.setActiveCell(selectedRows[0], 0);
-      grid.setSelectedRows(selectedRows);
+  for (i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    if (row < insertBefore) {
+      left.splice(row, 1);
+    } else {
+      right.splice(row - insertBefore, 1);
     }
+  }
 
-    dataView.beginUpdate();
+  items = left.concat(extractedRows.concat(right));
+
+  var selectedRows = [];
+  for (i = 0; i < rows.length; i++) {
+    selectedRows.push(left.length + i);
+  }
+
+  // resequence
+  this._resequence(items);
+
+  function resetSelection() {
+    grid.setActiveCell(selectedRows[0], 0);
+    grid.setSelectedRows(selectedRows);
+  }
+
+  dataView.beginUpdate();
   dataView.setItems(items);
   dataView.endUpdate();
   resetSelection();
-    grid.render();
+  grid.render();
 
-    var that = this;
-    this.scope.$timeout(function () {
-      dataView.$isResequencing = true;
-      var saved = that.saveChanges(null, function() {
-        delete dataView.$isResequencing;
-        resetSelection();
-      }, true);
-      if (saved === false) {
-        delete dataView.$isResequencing;
-      }
-    });
+  if (this.scope.view.orderBy !== "sequence") {
+    var field = this.handler.field;
+    if (field && field.name && this.handler.record) {
+      this.handler.record[field.name] = items;
+    }
+    return;
+  }
+
+  var that = this;
+  this.scope.$timeout(function () {
+    dataView.$isResequencing = true;
+    var saved = that.saveChanges(null, function() {
+      delete dataView.$isResequencing;
+      resetSelection();
+    }, true);
+    if (saved === false) {
+      delete dataView.$isResequencing;
+    }
+  });
 };
 
 Grid.prototype.onButtonClick = function(event, args) {
@@ -2582,6 +2623,146 @@ function EditIconColumn(options) {
     "getColumnDefinition": getColumnDefinition
   });
 }
+
+ui.directive("uiSlickColumnsForm", function () {
+  return {
+    restrict: 'EA',
+    replace: true,
+    scope: {
+      target: "=",
+      view: "="
+    },
+    controller: ["$scope", "$element", 'DataSource', 'ViewService', function($scope, $element, DataSource, ViewService) {
+      $scope._viewParams = {
+        model: "com.axelor.meta.db.MetaField",
+        viewType: "form",
+        views: [{
+          type: "form",
+          items: [{
+            type: "panel-related",
+            title: _t("Items"),
+            name: "items",
+            target: "com.axelor.meta.db.MetaField",
+            domain: "self.metaModel.fullName = '" + $scope.target + "'",
+            serverType: "MANY_TO_MANY",
+            canNew: false,
+            canEdit: false,
+            canView: false,
+            canMove: true,
+            items: [{
+              type: "field",
+              name: "name"
+            }, {
+              type: "field",
+              name: "typeName"
+            }, {
+              type: "field",
+              name: "$hidden",
+              serverType: "BOOLEAN",
+              title: _t("Hidden")
+            }]
+          }, {
+            name: "share",
+            type: "field",
+            serverType: "BOOLEAN",
+            widget: "inline-checkbox",
+            title: _t("Share")
+          }]
+        }]
+      };
+
+      ui.ViewCtrl.call(this, $scope, DataSource, ViewService);
+      ui.FormViewCtrl.call(this, $scope, $element);
+
+      $scope.setEditable();
+      $scope.onHotKey = function (e) {
+        e.preventDefault();
+        return false;
+      };
+
+      var ds = $scope._dataSource;
+
+      $scope.onShow = function(viewPromise) {
+        ds.search({
+          fields: ['name', 'typeName'],
+          domain: "self.metaModel.fullName = '" + $scope.target + "'"
+        }).success(function (records) {
+          var items = $scope.view.items.filter(function (x) {
+            return x.type === 'field' || x.type === 'button';
+          });
+
+          var recordsMap = records.reduce(function (a, x) {
+            a[x.name] = x;
+            return a;
+          }, {});
+
+          var fakeId = 0;
+          var values = items.map(function (x) {
+            var rec = x.type === 'field' && recordsMap[x.name] ? recordsMap[x.name] : x;
+            if (x.hidden) {
+              rec = _.extend({}, rec, { $hidden: true });
+            }
+            return rec.id === undefined ? _.extend({}, rec, { id: --fakeId }) : rec;
+          });
+
+          var record = {
+            share: $scope.view.customViewShared,
+            items: values
+          };
+
+          $scope.edit(record);
+        });
+      };
+
+      $scope.onSaveView = function () {
+        var record = $scope.record;
+        var schema = $scope.view;
+
+        schema.customViewShared = record.share;
+
+        var items = [];
+        var existing = schema.items
+          .filter(function (x) { return x.type === 'field' || x.type === 'button'; })
+          .reduce(function (m, x) {
+            m[x.name] = x;
+            return m;
+          }, {});
+
+        // first add non-field items
+        schema.items
+          .filter(function (x) { return x.type !== 'field'; })
+          .filter(function (x) { return x.type !== 'button'; })
+          .forEach(function (item) {
+            items.push(item);
+          });
+
+        // add items
+        record.items
+          .forEach(function (x) {
+            items.push(existing[x.name] || { name: x.name, type: "field" });
+          });
+
+        schema = _.extend({}, schema, { items: items });
+
+        ViewService.save(schema).then(function () {
+          $scope.doClose();
+          setTimeout(function () {
+            window.location.reload();
+          });
+        });
+      };
+
+      $scope.show();
+    }],
+    link: function (scope, element, attrs) {
+
+      scope.doClose = function () {
+        element.dialog("close");
+      };
+    },
+    template: "<div ui-dialog ui-view-form x-handler='true' x-on-ok='onSaveView'></div>"
+  };
+});
 
 ui.directive('uiSlickEditors', function() {
 

@@ -31,6 +31,7 @@ import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
+import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.meta.ActionExecutor;
 import com.axelor.meta.MetaFiles;
@@ -79,8 +80,10 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import javax.inject.Inject;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import org.hibernate.transform.BasicTransformerAdapter;
@@ -512,7 +515,15 @@ public class MetaService {
     final Response response = new Response();
     final String xml = XMLViews.toXml(view, true);
 
-    MetaViewCustom entity = customViews.findByUser(view.getName(), user);
+    if (Objects.equals(view.getCustomViewShared(), Boolean.TRUE) && !AuthUtils.isAdmin(user)) {
+      throw new PersistenceException(I18n.get("You are not allowed to share custom views."));
+    }
+
+    MetaViewCustom entity =
+        view.getCustomViewId() == null
+            ? customViews.findByUser(view.getName(), user)
+            : customViews.find(view.getCustomViewId());
+
     if (entity == null) {
       entity = new MetaViewCustom();
       entity.setName(view.getName());
@@ -523,6 +534,7 @@ public class MetaService {
 
     entity.setTitle(view.getTitle());
     entity.setXml(xml);
+    entity.setShared(view.getCustomViewShared());
 
     customViews.save(entity);
 
