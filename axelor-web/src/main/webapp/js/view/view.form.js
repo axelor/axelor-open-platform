@@ -1335,7 +1335,7 @@ ui.formBuild = function (scope, schema, fields) {
       if (_attrs.name) {
         _attrs['x-path'] = path ? path + "." + _attrs.name : _attrs.name;
       }
-      
+
       if (attrs.tooltip) {
         hasToolTipField = true;
         item.addClass('has-tooltip');
@@ -1389,7 +1389,7 @@ ui.formBuild = function (scope, schema, fields) {
   if (hasPanels) {
     elem.removeAttr('ui-table-layout').attr('ui-bar-layout', '');
   }
-  
+
   if (hasToolTipField) {
     $("<div ui-tooltip selector='.form-item-container.has-tooltip' getter='getToolTip($event)'>").appendTo(elem);
   }
@@ -1428,7 +1428,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
       if (!field.tooltip) {
         return;
       }
-      
+
       return {
         tooltip: field.tooltip,
         record: scope.record,

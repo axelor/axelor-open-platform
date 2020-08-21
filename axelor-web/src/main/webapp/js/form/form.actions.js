@@ -271,12 +271,12 @@ ActionHandler.prototype = {
     var self = this;
     var withMoreAttrs = function (promise) {
       var actions = self.action.trim().split(/\s*,\s*/);
-      if (actions.indexOf('save') > -1) {        
+      if (actions.indexOf('save') > -1) {
         return self._handleAction('com.axelor.meta.web.MetaController:moreAttrs');
       }
       return promise;
     };
-    
+
     var prompt = this._getPrompt();
     if (prompt) {
       var deferred = this.ws.defer(),
@@ -574,7 +574,7 @@ ActionHandler.prototype = {
   _isSameViewType: function () {
     return this.viewType === this.scope.viewType;
   },
-  
+
   _handleAction: function(action) {
 
     this._blockUI();
