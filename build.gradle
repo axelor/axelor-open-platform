@@ -63,8 +63,8 @@ task updateVersion(type: com.axelor.gradle.tasks.UpdateVersion) {
   }
 }
 
-task generateChangeLog(type: com.axelor.gradle.tasks.GenerateChangeLog) {
-  description "Generate change logs from unreleased entries."
+task generateChangelog(type: com.axelor.gradle.tasks.GenerateChangelog) {
+  description "Generate changelog from unreleased entries."
   group "Axelor"
   files = fileTree(projectDir) {
     include 'changelogs/unreleased/*.yml'

@@ -41,7 +41,7 @@ import org.gradle.api.tasks.SkipWhenEmpty;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.options.Option;
 
-public class GenerateChangeLog extends DefaultTask {
+public class GenerateChangelog extends DefaultTask {
 
   private static final String CHANGELOG_PATH = "CHANGELOG.md";
 
@@ -69,14 +69,14 @@ public class GenerateChangeLog extends DefaultTask {
     List<ChangelogEntry> entries = getChangelogEntries();
 
     if (ObjectUtils.isEmpty(entries)) {
-      getLogger().lifecycle("No unreleased change log entries to process");
+      getLogger().lifecycle("No unreleased changelog entries to process");
       return;
     }
 
     String newChangelog = generate(entries);
 
     if (preview) {
-      getLogger().lifecycle("Generated change log : ");
+      getLogger().lifecycle("Generated changelog: ");
       getLogger().lifecycle("--------------------");
       getLogger().lifecycle(newChangelog);
       getLogger().lifecycle("--------------------");
@@ -88,7 +88,7 @@ public class GenerateChangeLog extends DefaultTask {
   }
 
   private List<ChangelogEntry> getChangelogEntries() throws IOException {
-    getLogger().lifecycle("Processing unreleased change log entries");
+    getLogger().lifecycle("Processing unreleased changelog entries");
     ChangelogEntryParser parser = new ChangelogEntryParser();
     List<ChangelogEntry> entries = new ArrayList<>();
     for (File file : getFiles()) {
@@ -129,7 +129,7 @@ public class GenerateChangeLog extends DefaultTask {
   }
 
   private void clean() {
-    getLogger().lifecycle("Clean up unreleased change log entries");
+    getLogger().lifecycle("Clean up unreleased changelog entries");
     for (File file : getFiles()) {
       try {
         getLogger().lifecycle("Deleting {}", file);

@@ -6,7 +6,7 @@ The `unreleased` folder contains all changelog entries that haven't been release
 
 At the release time, all unreleased entries are combined into final CHANGELOG.md file. 
 
-#### Change log entry
+#### Changelog entry
 
 Under `changelogs/unreleased`, create a new file.
 
@@ -45,12 +45,12 @@ migration steps if any.
 
 To generate the `CHANGELOG.md` with unreleased entries, run following gradle task:
 ```
-./gradlew generateChangeLog
+./gradlew generateChangelog
 ```
 
 The unreleased entries are also automatically removed from `changelogs/unreleased`.
 
-`--preview` arguments can also be used to preview the generated change log without deleting/updating files.
+`--preview` arguments can also be used to preview the generated changelog without deleting/updating files.
 
 #### Source
 
