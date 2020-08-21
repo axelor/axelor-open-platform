@@ -730,7 +730,8 @@ public class Query<T extends Model> {
         Property property = getProperty(name);
         if (property != null
             && property.getType() != PropertyType.BINARY
-            && !property.isTransient()) {
+            && !property.isTransient()
+            && !hasTransientParent(name)) {
           String alias = joinHelper.joinName(name);
           if (alias != null) {
             selects.add(alias);
@@ -771,6 +772,20 @@ public class Query<T extends Model> {
       if (filter != null && filter.trim().length() > 0) sb.append(" WHERE ").append(filter);
       sb.append(orderBy);
       query = joinHelper.fixSelect(sb.toString());
+    }
+
+    private boolean hasTransientParent(String fieldName) {
+      final List<String> fieldNameParts = Splitter.on('.').splitToList(fieldName);
+
+      for (int i = 1; i < fieldNameParts.size(); ++i) {
+        final String name = Joiner.on('.').join(fieldNameParts.subList(0, i));
+        final Property property = getProperty(name);
+        if (property != null && property.isTransient()) {
+          return true;
+        }
+      }
+
+      return false;
     }
 
     private Property getProperty(String field) {
