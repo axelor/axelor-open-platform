@@ -315,7 +315,9 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
     $scope.$timeout(function() {
       var dvs = detailView.scope();
       var rec = $scope.getSelectedRecord() || {};
-      detailView.show();
+      if (!$scope.isHidden()) {
+        detailView.show();
+      }
       if (!dvs.record || (dvs.record.id !== rec.id)) {
         dvs.edit(rec);
       }
