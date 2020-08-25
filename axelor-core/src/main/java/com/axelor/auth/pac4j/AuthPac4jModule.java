@@ -35,6 +35,7 @@ import io.buji.pac4j.filter.CallbackFilter;
 import io.buji.pac4j.filter.LogoutFilter;
 import io.buji.pac4j.filter.SecurityFilter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.ArrayList;
@@ -79,6 +80,7 @@ import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.exception.HttpAction;
+import org.pac4j.core.http.adapter.HttpActionAdapter;
 import org.pac4j.core.http.adapter.J2ENopHttpActionAdapter;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.util.CommonHelper;
@@ -372,6 +374,34 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       setDefaultClient(config.getClients().getClients().get(0).getName());
       setCallbackLogic(
           new ShiroCallbackLogic<Object, J2EContext>() {
+
+            @Override
+            public Object perform(
+                J2EContext context,
+                Config config,
+                HttpActionAdapter<Object, J2EContext> httpActionAdapter,
+                String inputDefaultUrl,
+                Boolean inputSaveInSession,
+                Boolean inputMultiProfile,
+                Boolean inputRenewSession,
+                String client) {
+
+              try {
+                context.getRequest().setCharacterEncoding("UTF-8");
+              } catch (UnsupportedEncodingException e) {
+                logger.error(e.getMessage(), e);
+              }
+
+              return super.perform(
+                  context,
+                  config,
+                  httpActionAdapter,
+                  inputDefaultUrl,
+                  inputSaveInSession,
+                  inputMultiProfile,
+                  inputRenewSession,
+                  client);
+            }
 
             @SuppressWarnings("unchecked")
             @Override
