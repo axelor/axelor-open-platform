@@ -1209,6 +1209,9 @@ Grid.prototype.zIndexFix = function() {
   var zIndex = this.element.parents('.ui-dialog:first').zIndex();
   if (zIndex) {
     this.element.find('.slick-headerrow-column').zIndex(zIndex);
+    if (this.editorForm.is(':visible')) {
+      this.editorForm.find('.boolean-item input').zIndex(zIndex);
+    }
   }
 };
 
@@ -1966,6 +1969,7 @@ Grid.prototype.adjustEditor = function () {
   });
 
   form.css('padding-left', leftPadding);
+  this.zIndexFix();
 }
 
 Grid.prototype.showEditor = function (activeCell) {
