@@ -430,7 +430,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
     }
 
     scope.$on("on:record-change", function(e, rec) {
-      scope.$timeout(function () {
+      scope.waitForActions(function () {
         if (field && field.jsonField) {
           handle(scope.record);
         } else if (rec && rec === scope.record) {
