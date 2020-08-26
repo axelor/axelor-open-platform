@@ -1209,7 +1209,7 @@ Grid.prototype.zIndexFix = function() {
   var zIndex = this.element.parents('.ui-dialog:first').zIndex();
   if (zIndex) {
     this.element.find('.slick-headerrow-column').zIndex(zIndex);
-    if (this.editorForm.is(':visible')) {
+    if (this.editorForm && this.editorForm.is(':visible')) {
       this.editorForm.find('.boolean-item input').zIndex(zIndex);
     }
   }
