@@ -347,10 +347,13 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
       return items;
     }
 
-    function fetchData() {
+    function fetchData(success) {
       var items = scope.getValue();
       return scope.fetchData(items, function(records){
         scope.setItems(ensureIds(records, true));
+        if (_.isFunction(success)) {
+          success(records);
+        }
       });
     }
 
@@ -507,7 +510,9 @@ ui.formInput('OneToMany', {
         }
         doRenderUnwatch();
         doRenderUnwatch = null;
-          scope.$$fetchData();
+          scope.$$fetchData(function() {
+            element.find('.navbar + .slickgrid').css({position: 'relative', top: 0});
+          });
         });
     }
 
