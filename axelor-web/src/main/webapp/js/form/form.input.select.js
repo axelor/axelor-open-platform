@@ -565,11 +565,17 @@ ui.formInput('MultiSelect', 'Select', {
     scope.format = function(value) {
       var items = value,
         values = [];
-      if (!value) {
+      if (_.isBlank(value)) {
         scope.items = [];
         return value;
       }
-      if (!_.isArray(items)) items = items.split(/,\s*/);
+      if (!_.isArray(items)) {
+        if (_.isString(items)) {
+          items = items.split(/,\s*/);
+        } else {
+          items = ["" + items];
+        }
+      }
       values = _.map(items, function(item) {
         return {
           value: item,
