@@ -295,6 +295,7 @@ function BarLayout(items, attrs, $scope, $compile) {
   }
 
   wrap.children('[ui-panel-mail]').appendTo(main);
+  wrap.children('[ui-wkf-status]').prependTo(main);
 
   if (side.children().length > 0) {
     side.appendTo(row.addClass('has-side'));

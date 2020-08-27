@@ -1726,6 +1726,23 @@ label.has-help > span:after,
   width: 340px;
 }
 
+.wkf-status {
+  display: flex;
+  flex-flow: wrap;
+}
+
+.wkf-status,
+.wkf-status li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wkf-status li {
+  margin: 2px;
+  font-size: 14px;
+}
+
 .tag-select-placeholder {
     color: #777;
     font-size: 12px;

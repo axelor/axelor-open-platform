@@ -396,11 +396,20 @@
         view.items = items;
       }
 
-      // more attrs action
       if (view.type === 'form') {
+        // more attrs action
         var onLoad = 'com.axelor.meta.web.MetaController:moreAttrs';
         if (view.onLoad) onLoad = view.onLoad + ',' + onLoad;
         view.onLoad = onLoad;
+        // wkf status
+        view.items.unshift({
+          colSpan: 12,
+          type: "field",
+          name: "$wkfStatus",
+          showTitle: false,
+          widget: "WkfStatus",
+          showIf: "$wkfStatus"
+        });
       }
     };
 

@@ -1567,4 +1567,28 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
   };
 }]);
 
+ui.formWidget('uiWkfStatus', {
+  link: function (scope, element, attrs) {
+
+    scope.hasColorCode = function (item) {
+      return item.color && item.color.startsWith('#');
+    };
+
+    scope.getColorClass = function (item) {
+      return item.color ? 'bg-' + item.color : 'bg-blue';
+    };
+  },
+  template:
+    "<div class='panel wkf-status-container'>" +
+      "<div class='panel-body'>" +
+        "<ul class='wkf-status'>" +
+          "<li ng-repeat='item in record.$wkfStatus track by item.name'>" +
+            "<span class='badge' style='background-color: {{item.color}}' ng-if='hasColorCode(item)'>{{item.title}}</span>" +
+            "<span class='badge' ng-class='getColorClass(item)' ng-if='!hasColorCode(item)'>{{item.title}}</span>" +
+          "</li>" +
+        "</ul>" +
+      "</div>" +
+    "</div>"
+});
+
 })();
