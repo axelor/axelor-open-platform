@@ -918,6 +918,7 @@ function FormViewCtrl($scope, $element) {
   };
 
   $scope.reload = function() {
+    $scope.$broadcast("on:attrs-reset");
     var record = $scope.record;
     if (record && record.id) {
       return doEdit(record.id).success(function (rec) {
@@ -1011,7 +1012,10 @@ function FormViewCtrl($scope, $element) {
   $scope.onNext = function() {
     $scope.confirmDirty(function() {
       ds.nextItem(function(record){
-        if (record && record.id) doEdit(record.id);
+        if (record && record.id) {
+          $scope.$broadcast("on:attrs-reset");
+          doEdit(record.id);
+        }
       });
     });
   };
@@ -1019,7 +1023,10 @@ function FormViewCtrl($scope, $element) {
   $scope.onPrev = function() {
     $scope.confirmDirty(function() {
       ds.prevItem(function(record){
-        if (record && record.id) doEdit(record.id);
+        if (record && record.id) {
+          $scope.$broadcast("on:attrs-reset");
+          doEdit(record.id);
+        }
       });
     });
   };
