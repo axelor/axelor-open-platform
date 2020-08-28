@@ -107,7 +107,7 @@ var directiveFn = function(){
         scope.$on('on:nav-click', function (e, tab) {
           if (tab.$viewScope !== scope) return;
           var iframe = element.find('iframe')[0];
-          var embed = iframe.contentDocument.body.firstChild;
+          var embed = iframe.contentDocument ? iframe.contentDocument.body.firstChild : null;
           if (embed && embed.id === 'plugin') {
             embed.height = '101%';
             setTimeout(function () {
