@@ -476,6 +476,18 @@
         $scope.$broadcast("on:nav-click", NavService.getSelected());
       });
     };
+    
+    axelor.$openHtmlTab = function (url, title) {
+      $scope.openTab({
+        title: title || url,
+        action: "$act" + new Date().getTime(),
+        viewType: "html",
+        views: [{
+          type: "html",
+          resource: url
+        }]
+      });
+    };
 
     var loginAttempts = 0;
     var loginWindow = null;
