@@ -1,0 +1,3 @@
+---
+title: Fix onChange not triggered when setting date to null
+type: fix
