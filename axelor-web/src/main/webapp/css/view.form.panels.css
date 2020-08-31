@@ -632,6 +632,12 @@
    padding-top: 30px;
 }
 
+.panel-layout .stackbar .navbar .navbar-inner .icons-bar > a,
+.panel-related .panel-header .icons-bar > a {
+  display: inline-block;
+  white-space: nowrap;
+}
+
 .panel-json .bar-layout {
   padding: 0;
 }
