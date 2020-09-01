@@ -534,6 +534,9 @@ ui.formInput('OneToMany', {
       if (elem.is('.panel-related')) {
         elem = element.children('.panel-body');
         minSize = 28;
+      } else if (elem.is('.stackbar')) {
+        elem = element.children('.grid-container');
+        minSize = 50;
       } else if (scope.$hasPanels) {
         minSize += 28;
       }
@@ -732,7 +735,8 @@ ui.formInput('OneToMany', {
           "</div>" +
       "</div>" +
   "</div>" +
-  "<div ui-view-grid " +
+  "<div class='grid-container'>" +
+    "<div ui-view-grid " +
       "x-view='schema' " +
       "x-data-view='dataView' " +
       "x-handler='this' " +
@@ -741,6 +745,7 @@ ui.formInput('OneToMany', {
       "x-on-before-save='onGridBeforeSave' " +
       "x-on-after-save='onGridAfterSave' " +
       "></div>" +
+  "</div>" +
   "</div>"
 });
 

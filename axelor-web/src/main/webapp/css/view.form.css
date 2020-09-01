@@ -385,6 +385,14 @@ table.form-layout .tabbable-tabs .tab-content {
   border-top: none;
 }
 
+.form-item .stackbar .grid-container {
+  position: relative;
+}
+
+.form-item .stackbar .grid-container > .slickgrid {
+  top: 0px;
+}
+
 .icons-bar {
   display: inline-block;
   padding-top: 4px;
