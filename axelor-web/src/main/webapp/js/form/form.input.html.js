@@ -563,6 +563,8 @@ ui.formInput('HtmlInline', 'Text', {
       $(document).off('mousedown', onMouseDown);
     });
   },
+  template_readonly:
+    '<div class="html-viewer-inline" ui-bind-template x-text="text"></div>',
   template_editable:
       "<span class='picker-input picker-icons-1'>" +
         "<input type='text' readonly>" +
