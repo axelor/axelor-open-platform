@@ -204,3 +204,10 @@ input.wysiwyg-input {
 .slick-external-editor .wysiwyg-container textarea {
   resize: none;
 }
+
+.html-viewer-inline {
+  height: 24px;
+  line-height: 24px;
+  overflow: hidden;
+  padding-left: 8px;
+}
