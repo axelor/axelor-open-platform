@@ -1894,7 +1894,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
     var result = _.extend({}, item, record, { id: item.id });
 
     _.each(result, function(value, name) {
-      if (_.isObject(value) && value.id === undefined && !_.startsWith(name, '$')) {
+      if (_.isObject(value) && !_.isArray(value) && value.id === undefined && !_.startsWith(name, '$')) {
         delete result[name];
       }
     });
