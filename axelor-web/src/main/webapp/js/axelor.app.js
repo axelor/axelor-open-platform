@@ -476,7 +476,7 @@
         $scope.$broadcast("on:nav-click", NavService.getSelected());
       });
     };
-    
+
     axelor.$openHtmlTab = function (url, title) {
       $scope.openTab({
         title: title || url,
