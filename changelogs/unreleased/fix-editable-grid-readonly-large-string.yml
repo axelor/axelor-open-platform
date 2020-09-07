@@ -1,0 +1,3 @@
+---
+title: Fix readonly rendering of large string in editable grid
+type: fix

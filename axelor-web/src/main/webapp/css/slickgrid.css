@@ -603,6 +603,13 @@
   flex: 1;
 }
 
+.slick-editor .form-item-container pre {
+  height: 24px;
+  line-height: 24px;
+  overflow: hidden;
+  padding-top: 0px;
+}
+
 .slick-editor .form-item-container.readonly,
 .slick-editor .form-item-container.readonly > span.display-text {
   background-color: #e7e7e7;
