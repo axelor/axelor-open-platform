@@ -181,9 +181,13 @@ ui.directive('uiMailMessage', function () {
       }
 
       function format(item, value) {
-        if (!value) {
+        if (value == null || value === undefined) {
           return value;
         }
+
+        if (value === 'True') return _t('True');
+        if (value === 'False') return _t('False');
+
         var field = findField(item.name);
         if(field && ["many-to-many", "one-to-many", "many-to-one"].indexOf(field.type) === -1) {
           var formatter = ui.formatters[field.type];
@@ -191,15 +195,17 @@ ui.directive('uiMailMessage', function () {
             return formatter(field, value);
           }
         }
-        if (value === 'True') return _t('True');
-        if (value === 'False') return _t('False');
+
         if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$/.test(value)) {
           return moment(value).format(ui.dateTimeFormat);
         }
+
         if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
           return moment(value).format(ui.dateFormat);
         }
+
         if (value === '0E-10') value = '0.000000000000';
+
         return value;
       }
 
