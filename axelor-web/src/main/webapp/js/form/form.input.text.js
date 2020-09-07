@@ -202,7 +202,7 @@ ui.formInput('TextInline', 'Text', {
       }
       wrapper.position({
         my: "left top",
-        at: "left bottom",
+        at: "left top",
         of: picker,
         within: container
       })
@@ -250,10 +250,6 @@ ui.formInput('TextInline', 'Text', {
       }
     }
 
-    scope.togglePopup = function () {
-      showPopup(!dropdownVisible);
-    };
-
     element.on("hide:slick-editor", function(e) {
       showPopup(false);
     });
@@ -267,7 +263,7 @@ ui.formInput('TextInline', 'Text', {
     });
 
     input.on('click', function () {
-      scope.togglePopup();
+      showPopup(true);
     });
 
     input.on('keydown', function (e) {
@@ -298,11 +294,8 @@ ui.formInput('TextInline', 'Text', {
     });
   },
   template_editable:
-      "<span class='picker-input picker-icons-1'>" +
+      "<span>" +
         "<input type='text' readonly>" +
-        "<span class='picker-icons'>" +
-          "<i class='fa fa-pencil' title='{{ \"Edit\" | t }}' ng-click='togglePopup()'></i>" +
-        "</span>" +
       "</span>"
 });
 
