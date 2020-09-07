@@ -227,6 +227,8 @@ ui.formInput('TextInline', 'Text', {
       element.trigger('hide:slick-editor');
     }
 
+    var canShowOnFocus = true;
+
     function showPopup(show) {
       dropdownVisible = !!show;
       if (dropdownVisible) {
@@ -242,6 +244,7 @@ ui.formInput('TextInline', 'Text', {
         $(document).off('mousedown', onMouseDown);
         wrapper.hide();
         setTimeout(function () {
+          canShowOnFocus = false;
           input.focus();
         });
       }
@@ -253,6 +256,18 @@ ui.formInput('TextInline', 'Text', {
 
     element.on("hide:slick-editor", function(e) {
       showPopup(false);
+    });
+
+    input.on('focus', function () {
+      if (canShowOnFocus) {
+        showPopup(true);
+      } else {
+        canShowOnFocus = true;
+      }
+    });
+
+    input.on('click', function () {
+      scope.togglePopup();
     });
 
     input.on('keydown', function (e) {
