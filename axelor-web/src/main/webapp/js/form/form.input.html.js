@@ -511,7 +511,7 @@ ui.formInput('HtmlInline', 'Text', {
 
     var canShowOnFocus = true;
 
-    function showPopup(show) {
+    function showPopup(show, focusElem) {
       dropdownVisible = !!show;
       if (dropdownVisible) {
         $(document).on('mousedown', onMouseDown);
@@ -524,10 +524,11 @@ ui.formInput('HtmlInline', 'Text', {
       } else {
         $(document).off('mousedown', onMouseDown);
         wrapper.hide();
-        setTimeout(function () {
-          canShowOnFocus = false;
-          input.focus();
-        });
+        if (focusElem) {
+          setTimeout(function () {
+            focusElem.focus();
+          });
+        }
       }
     }
 
@@ -554,15 +555,23 @@ ui.formInput('HtmlInline', 'Text', {
     });
 
     shellElement.on('blur', function () {
-      scope.setValue(shell.getHTML(), true);
+      if (!dropdownVisible) {
+        scope.setValue(shell.getHTML(), true);
+      }
     });
 
     shellElement.on('keydown', function (e) {
       if (e.keyCode === 9) { // tab key
         e.preventDefault();
-        showPopup(false);
+        showPopup(false, navigateTabbable(e.shiftKey ? -1 : 1));
       }
     });
+
+    function navigateTabbable(inc) {
+      var tabbables = element.closest('.slick-form').find(':tabbable');
+      var index = (tabbables.index(input) + inc + tabbables.length) % tabbables.length;
+      return tabbables.eq(index);
+    }
 
     scope.$watch(attrs.ngModel, function textModelWatch(value) {
       var text = htmlToPlain(value).split('\n')[0];
