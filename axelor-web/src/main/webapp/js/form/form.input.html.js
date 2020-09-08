@@ -554,9 +554,26 @@ ui.formInput('HtmlInline', 'Text', {
     });
 
     scope.$watch(attrs.ngModel, function textModelWatch(value) {
-      var value = $('<div/>').html(value).text();
-      input.val(value);
+      var text = htmlToPlain(value).split('\n')[0];
+      input.val(text);
     });
+
+    function htmlToPlain(value) {
+      var html = $('<div/>').html(value);
+      var text;
+      if (typeof window.getSelection !== 'undefined'
+          && typeof document.createRange !== 'undefined') {
+        var selection = window.getSelection();
+        html.appendTo('body');
+        selection.selectAllChildren(html.get(0));
+        text = selection.toString();
+        html.remove();
+        selection.removeAllRanges();
+      } else {
+        text = html.text();
+      }
+      return text;
+    }
 
     scope.$on("$destroy", function(e){
       wrapper.remove();
