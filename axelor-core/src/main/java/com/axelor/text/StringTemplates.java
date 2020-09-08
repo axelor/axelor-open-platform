@@ -23,6 +23,7 @@ import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaStore;
+import com.axelor.script.ScriptBindings;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.common.xml.XmlEscapers;
@@ -31,15 +32,23 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.stringtemplate.v4.AttributeRenderer;
 import org.stringtemplate.v4.AutoIndentWriter;
+import org.stringtemplate.v4.DateRenderer;
 import org.stringtemplate.v4.Interpreter;
+import org.stringtemplate.v4.NumberRenderer;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.compiler.Bytecode;
 import org.stringtemplate.v4.misc.ObjectModelAdaptor;
 import org.stringtemplate.v4.misc.STNoSuchPropertyException;
@@ -47,17 +56,50 @@ import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 /** The implementation of {@link Templates} for the StringTemplate (ST4) support. */
 public class StringTemplates implements Templates {
 
-  class StringRenderer implements AttributeRenderer {
+  class StrRenderer extends StringRenderer {
 
     @Override
     public String toString(Object o, String formatString, Locale locale) {
-      if (o == null) return "";
-      if (formatString == null) return o.toString();
-      if (formatString.equals("escape"))
-        return XmlEscapers.xmlAttributeEscaper().escape(o.toString());
-      if (formatString.startsWith("selection:"))
-        return getSelectionTitle(formatString.substring(10).trim(), o.toString());
-      return o.toString();
+      final String str = (String) o;
+      if (StringUtils.notBlank(formatString)) {
+        if (formatString.endsWith("escape")) {
+          return XmlEscapers.xmlAttributeEscaper().escape(str);
+        }
+        if (formatString.startsWith("selection:")) {
+          return getSelectionTitle(formatString.substring(10).trim(), o.toString());
+        }
+      }
+      return super.toString(str, formatString, locale);
+    }
+  }
+
+  class LocalDateRenderer implements AttributeRenderer {
+
+    @Override
+    public String toString(Object o, String formatString, Locale locale) {
+      return StringUtils.isBlank(formatString)
+          ? o.toString()
+          : ((LocalDate) o).format(DateTimeFormatter.ofPattern(formatString));
+    }
+  }
+
+  class LocalDateTimeRenderer implements AttributeRenderer {
+
+    @Override
+    public String toString(Object o, String formatString, Locale locale) {
+      return StringUtils.isBlank(formatString)
+          ? o.toString()
+          : ((LocalDateTime) o).format(DateTimeFormatter.ofPattern(formatString));
+    }
+  }
+
+  class LocalTimeRenderer implements AttributeRenderer {
+
+    @Override
+    public String toString(Object o, String formatString, Locale locale) {
+      return StringUtils.isBlank(formatString)
+          ? o.toString()
+          : ((LocalTime) o).format(DateTimeFormatter.ofPattern(formatString));
     }
   }
 
@@ -121,9 +163,10 @@ public class StringTemplates implements Templates {
       return new Renderer() {
         @Override
         public void render(Writer out) throws IOException {
+          final ScriptBindings vars = new ScriptBindings(context);
           for (String name : names) {
             try {
-              template.add(name, context.get(name));
+              template.add(name, vars.get(name));
             } catch (Exception e) {
             }
           }
@@ -162,8 +205,17 @@ public class StringTemplates implements Templates {
 
   public StringTemplates(char delimiterStartChar, char delimiterStopChar) {
     this.group = new STGroup(delimiterStartChar, delimiterStopChar);
-    this.group.registerRenderer(String.class, new StringRenderer());
+
+    // Custom renderers
+    this.group.registerRenderer(String.class, new StrRenderer());
+    this.group.registerRenderer(LocalDate.class, new LocalDateRenderer());
+    this.group.registerRenderer(LocalDateTime.class, new LocalDateTimeRenderer());
+    this.group.registerRenderer(LocalTime.class, new LocalTimeRenderer());
     this.group.registerModelAdaptor(Object.class, new DataAdapter());
+
+    // Other renderers provide by ST
+    this.group.registerRenderer(Number.class, new NumberRenderer());
+    this.group.registerRenderer(Date.class, new DateRenderer());
   }
 
   @Override
