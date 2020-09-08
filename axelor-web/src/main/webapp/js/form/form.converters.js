@@ -134,6 +134,9 @@
   };
   ui.filter('currency', function() {
     return function(value, symbol, fractionSize, currencyDisplay) {
+      if (_.isBlank(value)) {
+        return value;
+      }
       if (isNaN(value)) {
         return addCurrency(value, symbol);
       }
@@ -155,6 +158,9 @@
   // add percent filter
   ui.filter('percent', function() {
     return function(value, fractionSize) {
+      if (_.isBlank(value)) {
+        return value;
+      }
       if (isNaN(value)) {
         return value + '%';
       }
@@ -193,7 +199,7 @@
 
   function formatNumber(field, value, scale) {
     var num = +(value);
-    if ((value === null || value === undefined) && !field.defaultValue) {
+    if ((value === null || value === undefined) && (!field || !field.defaultValue)) {
       return value;
     }
     if (num === 0 || num) {
