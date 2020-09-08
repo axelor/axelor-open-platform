@@ -23,7 +23,6 @@ import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.meta.MetaStore;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.common.xml.XmlEscapers;
@@ -32,6 +31,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -118,15 +118,15 @@ public class StringTemplates implements Templates {
 
     @Override
     public Renderer make(Map<String, Object> context) {
-      for (String name : names) {
-        try {
-          template.add(name, context.get(name));
-        } catch (Exception e) {
-        }
-      }
       return new Renderer() {
         @Override
         public void render(Writer out) throws IOException {
+          for (String name : names) {
+            try {
+              template.add(name, context.get(name));
+            } catch (Exception e) {
+            }
+          }
           try {
             template.write(new AutoIndentWriter(out));
           } catch (IOException e) {
@@ -137,7 +137,7 @@ public class StringTemplates implements Templates {
 
     @Override
     public <T extends Model> Renderer make(T context) {
-      final Map<String, Object> ctx = Maps.newHashMap();
+      final Map<String, Object> ctx = new HashMap<>();
       if (context != null) {
         Mapper mapper = Mapper.of(EntityHelper.getEntityClass(context));
         for (String name : names) {

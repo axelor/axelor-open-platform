@@ -254,6 +254,11 @@ public class ContextHandler<T> {
       }
       return ctx.put(name, args[1]);
     }
+    if ("containsKey".equals(method.getName())) {
+      return beanMapper.getGetter(name) != null
+          || getJsonContext().containsKey(name)
+          || getJsonContext().hasField(name);
+    }
     throw new UnsupportedOperationException("cannot call '" + method + "' on proxy object");
   }
 
