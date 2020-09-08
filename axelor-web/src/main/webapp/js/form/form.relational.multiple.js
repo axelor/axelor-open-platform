@@ -1257,6 +1257,12 @@ ui.formInput('OneToManyInline', 'OneToMany', {
       }
     });
 
+    input.on('keydown', function (e) {
+      if (e.keyCode === 9) { // tab key
+        element.trigger('hide:slick-editor');
+      }
+    });
+
     function hidePopup(e) {
       if (element.is(':hidden')) {
         return;
