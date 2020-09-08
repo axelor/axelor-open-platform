@@ -484,7 +484,7 @@ ui.formInput('HtmlInline', 'Text', {
       setTimeout(function() {
         wrapper.position({
           my: "left top",
-          at: "left bottom",
+          at: "left top",
           of: picker,
           within: container
         })
@@ -509,6 +509,8 @@ ui.formInput('HtmlInline', 'Text', {
       element.trigger('hide:slick-editor');
     }
 
+    var canShowOnFocus = true;
+
     function showPopup(show) {
       dropdownVisible = !!show;
       if (dropdownVisible) {
@@ -523,17 +525,26 @@ ui.formInput('HtmlInline', 'Text', {
         $(document).off('mousedown', onMouseDown);
         wrapper.hide();
         setTimeout(function () {
+          canShowOnFocus = false;
           input.focus();
         });
       }
     }
 
-    scope.togglePopup = function () {
-      showPopup(!dropdownVisible);
-    };
-
     element.on("hide:slick-editor", function(e) {
       showPopup(false);
+    });
+
+    input.on('focus', function () {
+      if (canShowOnFocus) {
+        showPopup(true);
+      } else {
+        canShowOnFocus = true;
+      }
+    });
+
+    input.on('click', function () {
+      showPopup(true);
     });
 
     input.on('keydown', function (e) {
@@ -583,11 +594,8 @@ ui.formInput('HtmlInline', 'Text', {
   template_readonly:
     '<div class="html-viewer-inline" ui-bind-template x-text="text"></div>',
   template_editable:
-      "<span class='picker-input picker-icons-1'>" +
+      "<span>" +
         "<input type='text' readonly>" +
-        "<span class='picker-icons'>" +
-          "<i class='fa fa-pencil' title='{{ \"Edit\" | t }}' ng-click='togglePopup()'></i>" +
-        "</span>" +
       "</span>"
 });
 
