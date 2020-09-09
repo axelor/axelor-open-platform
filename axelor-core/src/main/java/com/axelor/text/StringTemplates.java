@@ -22,6 +22,7 @@ import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonField;
@@ -72,7 +73,7 @@ public class StringTemplates implements Templates {
           return XmlEscapers.xmlAttributeEscaper().escape(str);
         }
         if (formatString.startsWith("selection:")) {
-          return getSelectionTitle(formatString.substring(10).trim(), o.toString());
+          return getSelectionTitle(formatString.substring(10).trim(), o);
         }
       }
       return super.toString(str, formatString, locale);
@@ -125,8 +126,8 @@ public class StringTemplates implements Templates {
           return MetaStore.getSelectionList(field.getEnumType()).stream()
               .filter(x -> x.getValue().equals(value.toString()))
               .findFirst()
-              .get()
-              .getTitle();
+              .map(x -> translate(x.getTitle()))
+              .orElseGet(() -> (String) value);
         } catch (NullPointerException e) {
           return value;
         }
@@ -158,14 +159,6 @@ public class StringTemplates implements Templates {
           .bind("model", jsonModel)
           .bind("name", name)
           .fetchOne();
-    }
-
-    private Object getSelectionTitle(String selection, Object value) {
-      try {
-        return MetaStore.getSelectionItem(selection, value.toString()).getLocalizedTitle();
-      } catch (NullPointerException e) {
-        return value;
-      }
     }
 
     private Object handle(Model entity, String name) {
@@ -232,10 +225,12 @@ public class StringTemplates implements Templates {
 
     private ST template;
     private Set<String> names;
+    private Locale locale;
 
-    private StringTemplate(ST template) {
+    private StringTemplate(ST template, Locale locale) {
       this.template = template;
       this.names = findAttributes();
+      this.locale = locale == null ? Locale.getDefault() : locale;
     }
 
     private Set<String> findAttributes() {
@@ -271,8 +266,8 @@ public class StringTemplates implements Templates {
             }
           }
           try {
-            template.write(new AutoIndentWriter(out));
-          } catch (IOException e) {
+            template.write(new AutoIndentWriter(out), locale);
+          } catch (Exception e) {
           }
         }
       };
@@ -299,6 +294,8 @@ public class StringTemplates implements Templates {
 
   private final STGroup group;
 
+  private Locale locale;
+
   public StringTemplates() {
     this(DEFAULT_START_DELIMITER, DEFAULT_STOP_DELIMITER);
   }
@@ -323,10 +320,15 @@ public class StringTemplates implements Templates {
     this.group.registerRenderer(Date.class, new DateRenderer());
   }
 
+  public StringTemplates withLocale(Locale locale) {
+    this.locale = locale;
+    return this;
+  }
+
   @Override
   public Template fromText(String text) {
     ST template = new ST(group, text);
-    return new StringTemplate(template);
+    return new StringTemplate(template, locale);
   }
 
   @Override
@@ -339,18 +341,25 @@ public class StringTemplates implements Templates {
     return fromText(CharStreams.toString(reader));
   }
 
+  private String translate(String value) {
+    if (locale == null || StringUtils.isBlank(value)) {
+      return value;
+    }
+    return I18n.getBundle(locale).getString(value);
+  }
+
   private String valueOf(Object value) {
     if (value == null) return "";
     return String.valueOf(value);
   }
 
-  private String getSelectionTitle(String name, Object value) {
+  private String getSelectionTitle(String selection, Object value) {
     final String val = valueOf(value);
     if (StringUtils.isBlank(val)) return val;
     try {
-      return MetaStore.getSelectionItem(name, val).getLocalizedTitle();
+      return translate(MetaStore.getSelectionItem(selection, val).getTitle());
     } catch (Exception e) {
+      return val;
     }
-    return val;
   }
 }
