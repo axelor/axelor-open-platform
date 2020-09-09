@@ -22,7 +22,12 @@ import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
+import com.axelor.inject.Beans;
 import com.axelor.meta.MetaStore;
+import com.axelor.meta.db.MetaJsonField;
+import com.axelor.meta.db.MetaJsonRecord;
+import com.axelor.meta.db.repo.MetaJsonFieldRepository;
+import com.axelor.rpc.Context;
 import com.axelor.script.ScriptBindings;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
@@ -50,6 +55,7 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.StringRenderer;
 import org.stringtemplate.v4.compiler.Bytecode;
+import org.stringtemplate.v4.misc.MapModelAdaptor;
 import org.stringtemplate.v4.misc.ObjectModelAdaptor;
 import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
@@ -105,26 +111,120 @@ public class StringTemplates implements Templates {
 
   class DataAdapter extends ObjectModelAdaptor {
 
+    private MapModelAdaptor mapModelAdaptor = new MapModelAdaptor();
+
+    private Object format(Property field, Object value) {
+      if (field == null) return value;
+
+      if (StringUtils.notBlank(field.getSelection())) {
+        return getSelectionTitle(field.getSelection(), value);
+      }
+
+      if (field.isEnum()) {
+        try {
+          return MetaStore.getSelectionList(field.getEnumType()).stream()
+              .filter(x -> x.getValue().equals(value.toString()))
+              .findFirst()
+              .get()
+              .getTitle();
+        } catch (NullPointerException e) {
+          return value;
+        }
+      }
+
+      return value;
+    }
+
+    private Object format(MetaJsonField field, Object value) {
+      if (field == null || StringUtils.isBlank(field.getSelection())) {
+        return value;
+      }
+      return getSelectionTitle(field.getSelection(), value);
+    }
+
+    private MetaJsonField findCustomField(Class<?> entityClass, String name) {
+      return Beans.get(MetaJsonFieldRepository.class)
+          .all()
+          .filter("self.model = :model and self.name = :name and self.modelField = 'attrs'")
+          .bind("model", entityClass.getName())
+          .bind("name", name)
+          .fetchOne();
+    }
+
+    private MetaJsonField findCustomField(String jsonModel, String name) {
+      return Beans.get(MetaJsonFieldRepository.class)
+          .all()
+          .filter("self.jsonModel.name = :model and self.name = :name")
+          .bind("model", jsonModel)
+          .bind("name", name)
+          .fetchOne();
+    }
+
+    private Object getSelectionTitle(String selection, Object value) {
+      try {
+        return MetaStore.getSelectionItem(selection, value.toString()).getLocalizedTitle();
+      } catch (NullPointerException e) {
+        return value;
+      }
+    }
+
+    private Object handle(Model entity, String name) {
+      final Class<?> klass = EntityHelper.getEntityClass(entity);
+      final Mapper mapper = Mapper.of(klass);
+      final Property field = mapper.getProperty(name);
+
+      // custom field?
+      if (field == null) {
+        final MetaJsonField jsonField = findCustomField(klass, name);
+        if (jsonField != null) {
+          final Context ctx = new Context(entity.getId(), klass);
+          // unsaved entity?
+          if (entity.getId() == null) {
+            ctx.put("attrs", mapper.get(entity, "attrs"));
+          }
+          return handle(ctx, name);
+        }
+        return null;
+      }
+
+      return format(field, field.get(entity));
+    }
+
+    private Object handle(Context context, String key) {
+      final Class<?> klass = context.getContextClass();
+      if (klass == null) {
+        return context.get(key);
+      }
+
+      final Object value = context.get(key);
+      final Object jsonModel = context.get("jsonModel");
+
+      // custom model?
+      if (jsonModel instanceof String && MetaJsonRecord.class.isAssignableFrom(klass)) {
+        final MetaJsonField field = findCustomField((String) jsonModel, key);
+        return format(field, value);
+      }
+
+      final Property field = Mapper.of(klass).getProperty(key);
+
+      // custom field?
+      if (field == null) {
+        return format(findCustomField(klass, key), value);
+      }
+
+      return format(field, value);
+    }
+
     @Override
     public Object getProperty(
         Interpreter interp, ST self, Object o, Object property, String propertyName)
         throws STNoSuchPropertyException {
-
-      if (!(o instanceof Model)) {
-        return super.getProperty(interp, self, o, property, propertyName);
+      if (o instanceof Context) return handle((Context) o, propertyName);
+      if (o instanceof Model) return handle((Model) o, propertyName);
+      if (o instanceof Map) {
+        return mapModelAdaptor.getProperty(interp, self, o, property, propertyName);
       }
-
-      final Mapper mapper = Mapper.of(EntityHelper.getEntityClass(o));
-      final Property field = mapper.getProperty(propertyName);
-
-      if (field == null) {
-        return null;
-      }
-
-      if (StringUtils.isBlank(field.getSelection())) {
-        return field.get(o);
-      }
-      return getSelectionTitle(field.getSelection(), field.get(o));
+      return super.getProperty(interp, self, o, property, propertyName);
     }
   }
 
@@ -204,7 +304,12 @@ public class StringTemplates implements Templates {
   }
 
   public StringTemplates(char delimiterStartChar, char delimiterStopChar) {
-    this.group = new STGroup(delimiterStartChar, delimiterStopChar);
+    this.group =
+        new STGroup(delimiterStartChar, delimiterStopChar) {
+          {
+            adaptors.remove(Map.class);
+          }
+        };
 
     // Custom renderers
     this.group.registerRenderer(String.class, new StrRenderer());
