@@ -93,6 +93,13 @@ public class Contact extends JpaModel {
   @Basic(fetch = FetchType.LAZY)
   private byte[] image;
 
+  @Widget(selection = "contact.type")
+  private String contactType;
+
+  @Basic
+  @Type(type = "com.axelor.db.hibernate.type.ValueEnumType")
+  private EnumStatusNumber contactStatus;
+
   @Transient
   @Widget(multiline = true)
   private String notes;
@@ -235,6 +242,22 @@ public class Contact extends JpaModel {
 
   public void setImage(byte[] image) {
     this.image = image;
+  }
+
+  public String getContactType() {
+    return contactType;
+  }
+
+  public void setContactType(String contactType) {
+    this.contactType = contactType;
+  }
+
+  public EnumStatusNumber getContactStatus() {
+    return contactStatus;
+  }
+
+  public void setContactStatus(EnumStatusNumber contactStatus) {
+    this.contactStatus = contactStatus;
   }
 
   public String getNotes() {

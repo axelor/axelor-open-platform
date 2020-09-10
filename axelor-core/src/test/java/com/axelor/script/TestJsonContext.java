@@ -17,162 +17,22 @@
  */
 package com.axelor.script;
 
-import com.axelor.JpaTest;
 import com.axelor.inject.Beans;
-import com.axelor.meta.db.MetaJsonField;
-import com.axelor.meta.db.MetaJsonModel;
 import com.axelor.meta.db.MetaJsonRecord;
-import com.axelor.meta.db.repo.MetaJsonFieldRepository;
-import com.axelor.meta.db.repo.MetaJsonModelRepository;
 import com.axelor.meta.db.repo.MetaJsonRecordRepository;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.JsonContext;
 import com.axelor.test.db.Contact;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.persist.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-public class TestJsonContext extends JpaTest {
-
-  @Inject private ObjectMapper jsonMapper;
-
-  @Before
-  @Transactional
-  public void setup() {
-
-    final MetaJsonModelRepository jsonModels = Beans.get(MetaJsonModelRepository.class);
-    final MetaJsonFieldRepository jsonFields = Beans.get(MetaJsonFieldRepository.class);
-
-    if (jsonFields
-            .all()
-            .filter("self.model = :model AND self.modelField = :field")
-            .bind("model", Contact.class.getName())
-            .bind("field", "attrs")
-            .count()
-        == 0) {
-
-      final Consumer<MetaJsonField> fields =
-          f -> {
-            f.setModel(Contact.class.getName());
-            f.setModelField("attrs");
-            jsonFields.save(f);
-          };
-
-      MetaJsonField field;
-
-      field = new MetaJsonField();
-      field.setName("name");
-      field.setType("string");
-      fields.accept(field);
-
-      field = new MetaJsonField();
-      field.setName("size");
-      field.setType("integer");
-      fields.accept(field);
-
-      field = new MetaJsonField();
-      field.setName("date");
-      field.setType("datetime");
-      fields.accept(field);
-
-      field = new MetaJsonField();
-      field.setName("customer");
-      field.setType("many-to-one");
-      field.setTargetModel(Contact.class.getName());
-      fields.accept(field);
-    }
-
-    if (jsonModels.findByName("hello") == null) {
-      final MetaJsonModel hello = new MetaJsonModel();
-      hello.setName("hello");
-      hello.setTitle("Hello");
-      hello.addField(
-          new MetaJsonField() {
-            {
-              setName("name");
-              setNameField(true);
-              setType("string");
-              setModel(MetaJsonRecord.class.getName());
-              setModelField("attrs");
-            }
-          });
-      hello.addField(
-          new MetaJsonField() {
-            {
-              setName("date");
-              setType("datetime");
-              setModel(MetaJsonRecord.class.getName());
-              setModelField("attrs");
-            }
-          });
-
-      jsonModels.save(hello);
-
-      final MetaJsonModel world = new MetaJsonModel();
-      world.setName("world");
-      world.setTitle("World");
-      world.addField(
-          new MetaJsonField() {
-            {
-              setName("name");
-              setNameField(true);
-              setType("string");
-              setModel(MetaJsonRecord.class.getName());
-              setModelField("attrs");
-            }
-          });
-      world.addField(
-          new MetaJsonField() {
-            {
-              setName("price");
-              setType("decimal");
-              setModel(MetaJsonRecord.class.getName());
-              setModelField("attrs");
-            }
-          });
-
-      hello.addField(
-          new MetaJsonField() {
-            {
-              setName("world");
-              setType("json-many-to-one");
-              setTargetJsonModel(world);
-              setModel(MetaJsonRecord.class.getName());
-              setModelField("attrs");
-            }
-          });
-
-      jsonModels.save(world);
-    }
-  }
-
-  private String getCustomerAttrsJson() {
-    final Map<String, Object> map = new HashMap<>();
-
-    map.put("name", "Some Name");
-    map.put("size", "100");
-
-    final Map<String, Object> customer = new HashMap<>();
-    customer.put("id", all(Contact.class).fetchOne().getId());
-
-    map.put("customer", customer);
-
-    try {
-      return jsonMapper.writeValueAsString(map);
-    } catch (JsonProcessingException e) {
-      return null;
-    }
-  }
+public class TestJsonContext extends ScriptTest {
 
   private void testCustomFields(Context context, String json) throws Exception {
     final ScriptHelper engine = new GroovyScriptHelper(context);
@@ -180,8 +40,8 @@ public class TestJsonContext extends JpaTest {
     Assert.assertEquals(json, context.asType(Contact.class).getAttrs());
     Assert.assertTrue(engine.eval("$attrs") instanceof JsonContext);
 
-    Assert.assertTrue(engine.eval("$attrs.customer") instanceof Contact);
-    Assert.assertTrue(engine.eval("$attrs.customer.fullName") instanceof String);
+    Assert.assertTrue(engine.eval("$attrs.guardian") instanceof Contact);
+    Assert.assertTrue(engine.eval("$attrs.guardian.fullName") instanceof String);
 
     Assert.assertEquals("Some NAME", engine.eval("$attrs.name = 'Some NAME'"));
     Assert.assertEquals(context.get("attrs"), context.asType(Contact.class).getAttrs());
@@ -189,17 +49,17 @@ public class TestJsonContext extends JpaTest {
     Assert.assertTrue(context.asType(Contact.class).getAttrs().contains("Some NAME"));
 
     Assert.assertFalse(context.asType(Contact.class).getAttrs().contains("date"));
-    Assert.assertNotNull(engine.eval("$attrs.date = __time__"));
-    Assert.assertTrue(context.asType(Contact.class).getAttrs().contains("date"));
+    Assert.assertNotNull(engine.eval("$attrs.birthDate = __time__"));
+    Assert.assertTrue(context.asType(Contact.class).getAttrs().contains("birthDate"));
 
-    context.put("customer", null);
-    Assert.assertFalse(context.asType(Contact.class).getAttrs().contains("customer"));
+    context.put("guardian", null);
+    Assert.assertFalse(context.asType(Contact.class).getAttrs().contains("guardian"));
 
-    context.put("customer", all(Contact.class).fetchOne());
-    Assert.assertTrue(context.asType(Contact.class).getAttrs().contains("customer"));
+    context.put("guardian", all(Contact.class).fetchOne());
+    Assert.assertTrue(context.asType(Contact.class).getAttrs().contains("guardian"));
 
     try {
-      context.put("customer", new Contact());
+      context.put("guardian", new Contact());
       Assert.fail();
     } catch (IllegalArgumentException e) {
     }
@@ -236,6 +96,10 @@ public class TestJsonContext extends JpaTest {
     final Context helloCtx = $json.create("hello");
     helloCtx.put("name", "Hello!!!");
     helloCtx.put("date", LocalDateTime.now());
+    helloCtx.put("color", "red");
+
+    final Contact contact = all(Contact.class).fetchOne();
+    helloCtx.put("contact", contact);
 
     final Context worldCtx = $json.create("world");
     worldCtx.put("name", "World!!!");
@@ -264,6 +128,7 @@ public class TestJsonContext extends JpaTest {
     final ScriptHelper sh = new NashornScriptHelper(ctx);
     final Object name = sh.eval("name");
     Assert.assertEquals("Hello!!!", name);
+    Assert.assertNotNull(sh.eval("contact"));
     Assert.assertTrue(sh.eval("world") instanceof MetaJsonRecord);
     Assert.assertTrue(sh.eval("world.price") instanceof BigDecimal);
   }
