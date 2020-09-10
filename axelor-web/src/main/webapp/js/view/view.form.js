@@ -78,7 +78,15 @@ ui.prepareContext = function(model, values, dummyValues, parentContext) {
   // use selected flag for o2m/m2m fields
   // see onSelectionChanged in o2m controller
   _.each(context.$many, function (getItems, name) {
-    if (!getItems) return;
+    if (!getItems) {
+      // no items selected
+      _.each(context[name], function(item) {
+        if (item.selected) {
+          item.selected = false;
+        }
+      });
+      return;
+    }
     if (name.indexOf('$') === 0) name = name.substring(1);
     var items = getItems();
     var value = context[name] || [];
