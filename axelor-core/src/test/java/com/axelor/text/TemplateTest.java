@@ -211,8 +211,6 @@ public class TemplateTest extends ScriptTest {
 
     String output = tmpl.make(vars).render();
 
-    System.err.println("QQQ: " + output);
-
     Assert.assertTrue(output.contains("Name: Hello!!!"));
     Assert.assertTrue(output.contains("Contact Type: Customer"));
     Assert.assertTrue(output.contains("World Name: World!!!"));
