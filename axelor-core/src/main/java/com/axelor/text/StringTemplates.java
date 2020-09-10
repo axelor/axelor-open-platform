@@ -28,6 +28,7 @@ import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonField;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.repo.MetaJsonFieldRepository;
+import com.axelor.meta.db.repo.MetaJsonRecordRepository;
 import com.axelor.rpc.Context;
 import com.axelor.script.ScriptBindings;
 import com.google.common.collect.Sets;
@@ -112,7 +113,13 @@ public class StringTemplates implements Templates {
 
   class DataAdapter extends ObjectModelAdaptor {
 
-    private MapModelAdaptor mapModelAdaptor = new MapModelAdaptor();
+    private final MapModelAdaptor mapModelAdaptor;
+    private final MetaJsonRecordRepository jsonRecords;
+
+    public DataAdapter() {
+      this.mapModelAdaptor = new MapModelAdaptor();
+      this.jsonRecords = Beans.get(MetaJsonRecordRepository.class);
+    }
 
     private Object format(Property field, Object value) {
       if (field == null) return value;
@@ -208,11 +215,18 @@ public class StringTemplates implements Templates {
       return format(field, value);
     }
 
+    private Object handle(MetaJsonRecord record, String name) {
+      Context context = jsonRecords.create(record);
+      context.put("attrs", record.getAttrs());
+      return handle(context, name);
+    }
+
     @Override
     public Object getProperty(
         Interpreter interp, ST self, Object o, Object property, String propertyName)
         throws STNoSuchPropertyException {
       if (o instanceof Context) return handle((Context) o, propertyName);
+      if (o instanceof MetaJsonRecord) return handle((MetaJsonRecord) o, propertyName);
       if (o instanceof Model) return handle((Model) o, propertyName);
       if (o instanceof Map) {
         return mapModelAdaptor.getProperty(interp, self, o, property, propertyName);
