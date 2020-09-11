@@ -833,7 +833,7 @@
       var params = {
         model: model,
         action: action,
-        data: _.extend({}, data, {
+        data: _.extend({ criteria: [] }, data, {
           context: _.extend({ _model: model }, context)
         })
       };
