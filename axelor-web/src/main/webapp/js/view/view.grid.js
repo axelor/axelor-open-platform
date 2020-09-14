@@ -939,38 +939,6 @@ ui.directive('uiPortletRefresh', ['NavService', function (NavService) {
   };
 }])
 
-ui.directive('uiNestedGridActions2', function () {
-  return {
-    scope: true,
-    link: function (scope, element, attrs) {
-
-      var _getContext = scope.getContext;
-
-      scope.getContext = function () {
-        var dataView = scope.dataView;
-        var selected = _.map(scope.selection || [], function(index) {
-          return dataView.getItem(index).id;
-        });
-        var context = {
-          _parent: _getContext.call(scope),
-          _ids: selected.length ? selected : undefined
-        };
-        return context;
-      };
-    },
-    replace: true,
-    template:
-      "<div class='panel-related-actions'>" +
-        "<div class='btn-group view-toolbar' ng-if='toolbar.length'>" +
-          "<button ng-repeat='btn in toolbar | filter:{custom: true}' class='btn' ui-actions>" +
-            "<span ng-show='btn.showTitle !== false'>{{btn.title}}</span>" +
-          "</button>" +
-        "</div>" +
-      "</div>"
-  }
-});
-
-
 ui.directive('uiNestedGridActions', function () {
   return {
     scope: true,

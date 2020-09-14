@@ -30,6 +30,8 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
     ui.GridViewCtrl.call(this, $scope, $element);
     $scope.editorCanSave = false;
     $scope.selectEnable = false;
+    $scope.toolbar = null;
+    $scope.menubar = null;
     if (initCallback) {
       initCallback();
     }
