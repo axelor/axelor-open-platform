@@ -1269,6 +1269,7 @@
         </xsd:attribute>
         <xsd:attribute name="showTitle" use="prohibited" />
         <xsd:attributeGroup ref="tns:RelationalAttributes" />
+        <xsd:attributeGroup ref="tns:ExtraAttributes" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
