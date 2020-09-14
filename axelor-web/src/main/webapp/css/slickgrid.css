@@ -356,10 +356,15 @@
   cursor: pointer;
 }
 
-.slick-cell.button .disabled {
+.slick-cell.button .disabled,
+.slick-editor .form-item-container.button-item.disabled {
   outline: none;
   opacity: 0.45;
   cursor: inherit;
+}
+
+.slick-editor .form-item-container.button-item:hover {
+  text-decoration: none;
 }
 
 .slick-cell.button,
@@ -627,7 +632,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   background: transparent;
+}
+
+.slick-editor .form-item-container.button-item > i {
+  flex: unset;
+}
+
+.slick-editor .form-item-container.button-item > .btn-text {
+  flex: 0;
 }
 
 .slick-editor .form-item-container.button-item i.fa {
