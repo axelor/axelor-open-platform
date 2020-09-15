@@ -450,12 +450,15 @@ $removeCode
     code += "if (this.getId() != null || other.getId() != null) {"
     code += "\treturn Objects.equals(this.getId(), other.getId());"
     code += "}"
-    if (!hashables.empty) {
-      code += ""
-      code += getHashables().collect { p -> "if (!Objects.equals(${p.getter}(), other.${p.getter}())) return false;"}
-    }
     code += ""
-    code += hashables.empty ? "return false;" : "return true;"
+    if (!hashables.empty) {
+      def conditions = hashables.collect { p -> "Objects.equals(${p.getter}(), other.${p.getter}())"}
+      def nullConditions = hashables.collect { p -> "${p.getter}() != null"}
+      conditions += "(${nullConditions.join('\n\t\t\t\t|| ')})"
+      code += "return ${conditions.join('\n\t\t\t&& ')};"
+    } else {
+      code += "return false;"
+    }
     return code.join("\n\t\t")
   }
 

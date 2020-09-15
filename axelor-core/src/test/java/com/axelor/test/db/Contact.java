@@ -336,9 +336,7 @@ public class Contact extends JpaModel {
       return Objects.equals(this.getId(), other.getId());
     }
 
-    if (!Objects.equals(getUniqueName(), other.getUniqueName())) return false;
-
-    return true;
+    return Objects.equals(getUniqueName(), other.getUniqueName()) && (getUniqueName() != null);
   }
 
   @Override
