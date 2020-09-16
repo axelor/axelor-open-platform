@@ -43,12 +43,7 @@ function ChartCtrl($scope, $element, $http, ActionService) {
   var loading = false;
   var unwatch = null;
 
-  function refresh() {
-
-    if (viewChart && searchScope && $scope.searchFields && !searchScope.isValid()) {
-      return;
-    }
-
+  function prepareContext() {
     var context = $scope._context || {};
     if ($scope.getContext) {
       context = _.extend({}, $scope.getContext(), context);
@@ -58,11 +53,19 @@ function ChartCtrl($scope, $element, $http, ActionService) {
       context = _.extend({}, context, searchScope.getContext());
     }
 
-    context = _.extend({}, context, { _domainAction: $scope._viewAction });
+    return _.extend({}, context, { _domainAction: $scope._viewAction });
+  }
+
+  function refresh() {
+
+    if (viewChart && searchScope && $scope.searchFields && !searchScope.isValid()) {
+      return;
+    }
+
     loading = true;
 
     var params = {
-      data: context
+      data: prepareContext()
     };
 
     if (viewChart) {
@@ -120,7 +123,7 @@ function ChartCtrl($scope, $element, $http, ActionService) {
   $scope.handleAction = function (data) {
     if (actionHandler) {
       actionHandler._getContext = function () {
-        return _.extend({}, { _data: data }, {
+        return _.extend({}, prepareContext(), { _data: data }, {
           _model: $scope._model || 'com.axelor.meta.db.MetaView',
           _chart: view.name
         });
@@ -132,7 +135,7 @@ function ChartCtrl($scope, $element, $http, ActionService) {
   $scope.handleClick = function (e) {
     if (clickHandler) {
       clickHandler._getContext = function () {
-        return _.extend({}, e.data.raw, {
+        return _.extend({}, prepareContext(), e.data.raw, {
           _model: $scope._model || 'com.axelor.meta.db.MetaView',
           _chart: view.name
         });
