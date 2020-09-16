@@ -2197,7 +2197,11 @@ Grid.prototype.commitEdit = function () {
     return promise;
   }
 
-  if (!scope.isDirty()) {
+  var itemRecord = (data.getItemById(scope.record.id) || {});
+  var itemVersion = itemRecord.version || itemRecord.$version;
+  var currentVersion = scope.record.version || scope.record.$version;
+
+  if (!scope.isDirty() && itemVersion === currentVersion) {
     this.cancelEdit();
     defer.resolve();
     return promise;
