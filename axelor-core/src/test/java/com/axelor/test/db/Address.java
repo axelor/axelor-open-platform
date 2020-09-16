@@ -19,6 +19,7 @@ package com.axelor.test.db;
 
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaModel;
+import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -103,6 +104,25 @@ public class Address extends JpaModel {
 
   public void setContact(Contact contact) {
     this.contact = contact;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (this == obj) return true;
+    if (!(obj instanceof Address)) return false;
+
+    final Address other = (Address) obj;
+    if (this.getId() != null || other.getId() != null) {
+      return Objects.equals(this.getId(), other.getId());
+    }
+
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return 31;
   }
 
   @Override

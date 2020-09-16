@@ -23,6 +23,7 @@ import com.axelor.test.db.Circle;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
@@ -156,5 +157,30 @@ public class RequestTest extends RpcTest {
     Contact o = contacts.edit(data);
 
     o = contacts.manage(o);
+  }
+
+  @Test
+  public void testEdit() {
+    Map<String, Object> janeValues = ImmutableMap.of("firstName", "Jane", "lastName", "Doe");
+    Map<String, Object> babyValues = ImmutableMap.of("firstName", "Baby", "lastName", "Doe");
+    Map<String, Object> johnValues =
+        ImmutableMap.of(
+            "firstName",
+            "John",
+            "lastName",
+            "Doe",
+            "relatedContacts",
+            ImmutableList.of(janeValues, babyValues));
+    Contact john = contacts.edit(johnValues);
+    Assert.assertNotNull(
+        String.format("Entity instance should contain field passed to JPA#edit.", john),
+        john.getFirstName());
+    john.getRelatedContacts().stream()
+        .forEach(
+            relatedContact ->
+                Assert.assertNotNull(
+                    String.format(
+                        "Child entity instance should contain field passed to JPA#edit.", john),
+                    relatedContact.getFirstName()));
   }
 }

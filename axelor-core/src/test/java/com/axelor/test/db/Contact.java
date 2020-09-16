@@ -19,18 +19,22 @@ package com.axelor.test.db;
 
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaModel;
+import com.axelor.db.annotations.HashKey;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.VirtualColumn;
 import com.axelor.db.annotations.Widget;
 import com.google.common.collect.Lists;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Lob;
@@ -103,6 +107,15 @@ public class Contact extends JpaModel {
   @Transient
   @Widget(multiline = true)
   private String notes;
+
+  @HashKey
+  @Column(unique = true)
+  private String uniqueName;
+
+  @ManyToMany(
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  private Set<Contact> relatedContacts;
 
   @Widget(title = "Attributes")
   @Type(type = "json")
@@ -268,12 +281,69 @@ public class Contact extends JpaModel {
     this.notes = notes;
   }
 
+  public String getUniqueName() {
+    return uniqueName;
+  }
+
+  public void setUniqueName(String uniqueName) {
+    this.uniqueName = uniqueName;
+  }
+
+  public Set<Contact> getRelatedContacts() {
+    return relatedContacts;
+  }
+
+  public void setRelatedContacts(Set<Contact> relatedContacts) {
+    this.relatedContacts = relatedContacts;
+  }
+
+  public void addRelatedContact(Contact item) {
+    if (getRelatedContacts() == null) {
+      setRelatedContacts(new HashSet<>());
+    }
+    getRelatedContacts().add(item);
+  }
+
+  public void removeRelatedContact(Contact item) {
+    if (getRelatedContacts() == null) {
+      return;
+    }
+    getRelatedContacts().remove(item);
+  }
+
+  public void clearRelatedContacts() {
+    if (getRelatedContacts() != null) {
+      getRelatedContacts().clear();
+    }
+  }
+
   public String getAttrs() {
     return attrs;
   }
 
   public void setAttrs(String attrs) {
     this.attrs = attrs;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) return false;
+    if (this == obj) return true;
+    if (!(obj instanceof Contact)) return false;
+
+    final Contact other = (Contact) obj;
+    if (this.getId() != null || other.getId() != null) {
+      return Objects.equals(this.getId(), other.getId());
+    }
+
+    if (!Objects.equals(getUniqueName(), other.getUniqueName())) return false;
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(-1678787584, this.getUniqueName());
   }
 
   @Override
