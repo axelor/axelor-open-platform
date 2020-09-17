@@ -53,6 +53,10 @@ public class MetaJsonReferenceUpdater {
     }
 
     final Request request = event.getRequest();
+    if (request.getBeanClass() == null) {
+      return;
+    }
+
     final Class<? extends Model> beanClass = request.getBeanClass().asSubclass(Model.class);
     final Mapper mapper = Mapper.of(beanClass);
     final Property field = mapper.getNameField();
