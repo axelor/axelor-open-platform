@@ -171,6 +171,33 @@ public class EqualityTest extends JpaTest {
   }
 
   @Test
+  public void testEntityHelperEquals() {
+    Address address1 = new Address();
+    Address address2 = new Address();
+    assertEquals(address1.equals(address2), EntityHelper.equals(address1, address2));
+    address1.setId(1L);
+    assertEquals(address1.equals(address2), EntityHelper.equals(address1, address2));
+    address2.setId(1L);
+    assertEquals(address1.equals(address2), EntityHelper.equals(address1, address2));
+    address1.setId(2L);
+    assertEquals(address1.equals(address2), EntityHelper.equals(address1, address2));
+    address2.setId(2L);
+    assertEquals(address1.equals(address2), EntityHelper.equals(address1, address2));
+
+    Contact contact1 = new Contact();
+    Contact contact2 = new Contact();
+    assertEquals(contact1.equals(contact2), EntityHelper.equals(contact1, contact2));
+    contact1.setUniqueName("John");
+    assertEquals(contact1.equals(contact2), EntityHelper.equals(contact1, contact2));
+    contact2.setUniqueName("John");
+    assertEquals(contact1.equals(contact2), EntityHelper.equals(contact1, contact2));
+    contact1.setUniqueName("Jane");
+    assertEquals(contact1.equals(contact2), EntityHelper.equals(contact1, contact2));
+    contact2.setUniqueName("Jane");
+    assertEquals(contact1.equals(contact2), EntityHelper.equals(contact1, contact2));
+  }
+
+  @Test
   public void testEqualityConsistencyContact() {
     Contact contact = new Contact("John", "Doe");
     assertEqualityConsistency(Contact.class, contact);

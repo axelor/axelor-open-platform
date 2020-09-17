@@ -125,18 +125,19 @@ public final class EntityHelper {
     }
 
     final Mapper mapper = Mapper.of(entity.getClass());
-    boolean hasHashKeys = false;
+    final List<Object> hashKeyValues = new ArrayList<>();
 
     for (Property field : mapper.getProperties()) {
       if (field.isHashKey()) {
-        hasHashKeys = true;
-        if (!Objects.equals(field.get(entity), field.get(other))) {
+        final Object value = field.get(entity);
+        hashKeyValues.add(value);
+        if (!Objects.equals(value, field.get(other))) {
           return false;
         }
       }
     }
 
-    return hasHashKeys;
+    return hashKeyValues.stream().anyMatch(Objects::nonNull);
   }
 
   /**
