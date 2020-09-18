@@ -354,7 +354,21 @@ ui.formInput('Html', {
       }
     };
 
-    textElement.on('input paste change blur', _.debounce(onChange, 100));
+    var onChangePending = false;
+
+    textElement.on('input paste change', function () {
+      var value = _.str.trim(shellActive ? shell.getHTML() : textElement.val()) || null;
+      if (value !== model.$viewValue) {
+        onChangePending = true;
+      }
+    });
+
+    textElement.on("blur", function (e) {
+      if (onChangePending) {
+        onChangePending = false;
+        setTimeout(onChange);
+      }
+    });
 
     textElement.on("focus", _.once(function (e) {
 
