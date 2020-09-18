@@ -99,7 +99,6 @@ label,
 
 .panel .panel-header {
   position: relative;
-  z-index: 1;
   padding: 8px 4px !important;
   outline: none !important;
 }
