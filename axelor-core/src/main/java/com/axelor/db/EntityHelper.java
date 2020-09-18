@@ -82,6 +82,7 @@ public final class EntityHelper {
    * @param entity generate the hashCode for the given entity
    * @return hashCode
    */
+  @Deprecated
   public static <T extends Model> int hashCode(T entity) {
     if (entity == null) {
       return 31;

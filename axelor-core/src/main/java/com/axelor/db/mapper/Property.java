@@ -94,7 +94,7 @@ public class Property {
 
   private transient boolean equalsInclude;
 
-  private transient boolean hashKey;
+  @Deprecated private transient boolean hashKey;
 
   private transient boolean copyable;
 
@@ -416,6 +416,7 @@ public class Property {
     return equalsInclude;
   }
 
+  @Deprecated
   public boolean isHashKey() {
     return hashKey;
   }
