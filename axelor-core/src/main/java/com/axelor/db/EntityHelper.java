@@ -90,7 +90,7 @@ public final class EntityHelper {
     final List<Object> values = new ArrayList<>();
 
     for (Property p : mapper.getProperties()) {
-      if (isSimple(p) && (p.isHashKey() || p.isUnique())) {
+      if (isSimple(p) && p.isHashKey()) {
         values.add(p.get(entity));
       }
     }
@@ -125,19 +125,19 @@ public final class EntityHelper {
     }
 
     final Mapper mapper = Mapper.of(entity.getClass());
-    final List<Object> hashKeyValues = new ArrayList<>();
+    final List<Object> equalsValues = new ArrayList<>();
 
     for (Property field : mapper.getProperties()) {
-      if (field.isHashKey()) {
+      if (field.isEqualsInclude()) {
         final Object value = field.get(entity);
-        hashKeyValues.add(value);
+        equalsValues.add(value);
         if (!Objects.equals(value, field.get(other))) {
           return false;
         }
       }
     }
 
-    return hashKeyValues.stream().anyMatch(Objects::nonNull);
+    return equalsValues.stream().anyMatch(Objects::nonNull);
   }
 
   /**

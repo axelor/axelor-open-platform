@@ -1,0 +1,4 @@
+---
+title: `equalsInclude` attribute marks field to be included in equality test, instead of `hashKey`
+type: change
+

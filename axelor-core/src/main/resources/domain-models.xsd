@@ -254,10 +254,17 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="equalsInclude" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              If this is not a unique field, whether it is included in equality test.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="hashKey" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>
-              If this is not an unique field, whether it can be used to calculate the hashCode.
+              Whether it can be used to calculate the hashCode.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -1017,6 +1024,14 @@
         Whether to log `creation date, last modified date, user who created the record and
         user who modified it last` information. The information is stored in these four
         fields respectively `createdOn, updatedOn, createdBy, and updatedBy`
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="equalsIncludeAll" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+        Whether to include all the simple non-function fields in equality test.
+        You can still ignore some fields with equalsInclude="false" attribute.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>

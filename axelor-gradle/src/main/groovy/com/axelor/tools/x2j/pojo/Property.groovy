@@ -340,10 +340,17 @@ class Property {
     return attrs["sequence"]
   }
 
+  boolean isEqualsInclude() {
+    if (name == "id" || name == "version") return false
+    if (attrs["equalsInclude"] == "false") return false
+    if (attrs["equalsInclude"] == "true" || isUnique()) return true
+    return entity.equalsIncludeAll && isSimple() && !isVirtual()
+  }
+
   boolean isHashKey() {
     if (name == "id" || name == "version") return false
     if (attrs["hashKey"] == "false") return false
-    if (attrs["hashKey"] == "true" || isUnique()) return true
+    if (attrs["hashKey"] == "true") return true
     return entity.hashAll && isSimple() && !isVirtual()
   }
 
@@ -454,6 +461,7 @@ class Property {
   List<Annotation> getAnnotations() {
     [
       $id(),
+      $equalsInclude(),
       $hashKey(),
       $widget(),
       $binary(),
@@ -835,6 +843,11 @@ class Property {
     def sequence = attrs.get('sequence')?.trim()
     if (!sequence) return null
     return annon("com.axelor.db.annotations.Sequence").add(sequence);
+  }
+
+  private Annotation $equalsInclude() {
+    if (!equalsInclude) return null
+    return annon("com.axelor.db.annotations.EqualsInclude", true)
   }
 
   private Annotation $hashKey() {

@@ -19,6 +19,7 @@ package com.axelor.db.mapper;
 
 import com.axelor.common.Inflector;
 import com.axelor.db.Model;
+import com.axelor.db.annotations.EqualsInclude;
 import com.axelor.db.annotations.HashKey;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.Sequence;
@@ -90,6 +91,8 @@ public class Property {
   private boolean unique;
 
   private boolean orphan;
+
+  private transient boolean equalsInclude;
 
   private transient boolean hashKey;
 
@@ -257,6 +260,10 @@ public class Property {
         transient_ = true;
       }
 
+      if (annotation instanceof EqualsInclude) {
+        equalsInclude = true;
+      }
+
       if (annotation instanceof HashKey) {
         hashKey = true;
       }
@@ -403,6 +410,10 @@ public class Property {
 
   public boolean isOrphan() {
     return orphan;
+  }
+
+  public boolean isEqualsInclude() {
+    return equalsInclude;
   }
 
   public boolean isHashKey() {

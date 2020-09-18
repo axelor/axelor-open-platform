@@ -59,6 +59,8 @@ class Entity {
 
   boolean dynamicUpdate
 
+  boolean equalsIncludeAll
+
   boolean hashAll
 
   boolean hasExtends
@@ -107,6 +109,7 @@ class Entity {
     mappedSuper = node.'@persistable' == 'false'
     sequential = !(node.'@sequential' == "false")
     groovy = node.'@lang' == "groovy"
+    equalsIncludeAll = node.'@equalsIncludeAll' == "true"
     hashAll = node.'@hashAll' == "true"
     cacheable = node.'@cacheable'.text().size() > 0 ? node.'@cacheable' : node.'@cachable';
     interfaces = node.'@implements'
@@ -418,6 +421,10 @@ $removeCode
     return "\n" + Utils.stripCode(extraImports, "\n") + "\n"
   }
 
+  private List<Property> getEqualsIncludes() {
+    return properties.findAll { p -> p.equalsInclude }
+  }
+
   private List<Property> getHashables() {
     return properties.findAll { p -> p.hashKey }
   }
@@ -432,7 +439,7 @@ $removeCode
       return "return EntityHelper.equals(this, obj);"
     }
 
-    def hashables = getHashables()
+    def data = getEqualsIncludes()
     def code = [
       "if (obj == null) return false;"
     ]
@@ -451,9 +458,9 @@ $removeCode
     code += "\treturn Objects.equals(this.getId(), other.getId());"
     code += "}"
     code += ""
-    if (!hashables.empty) {
-      def conditions = hashables.collect { p -> "Objects.equals(${p.getter}(), other.${p.getter}())"}
-      def nullConditions = hashables.collect { p -> "${p.getter}() != null"}
+    if (!data.empty) {
+      def conditions = data.collect { p -> "Objects.equals(${p.getter}(), other.${p.getter}())"}
+      def nullConditions = data.collect { p -> "${p.getter}() != null"}
       conditions += "(${nullConditions.join('\n\t\t\t\t|| ')})"
       code += "return ${conditions.join('\n\t\t\t&& ')};"
     } else {
@@ -468,9 +475,8 @@ $removeCode
     }
     importType("java.util.Objects")
     def data = getHashables().collect { "this.${it.getter}()" }.join(", ")
-    if (data.size()) {
-      def hash = name.hashCode()
-      return "return Objects.hash(${hash}, ${data});"
+    if (!data.empty) {
+      return "return Objects.hash(${data});"
     }
     return "return 31;"
   }

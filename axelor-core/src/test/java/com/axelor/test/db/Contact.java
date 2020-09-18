@@ -19,6 +19,7 @@ package com.axelor.test.db;
 
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaModel;
+import com.axelor.db.annotations.EqualsInclude;
 import com.axelor.db.annotations.HashKey;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.VirtualColumn;
@@ -108,9 +109,14 @@ public class Contact extends JpaModel {
   @Widget(multiline = true)
   private String notes;
 
-  @HashKey
+  @EqualsInclude
   @Column(unique = true)
   private String uniqueName;
+
+  @EqualsInclude
+  @HashKey
+  @Column(unique = true)
+  private String UUID;
 
   @ManyToMany(
       fetch = FetchType.LAZY,
@@ -289,6 +295,14 @@ public class Contact extends JpaModel {
     this.uniqueName = uniqueName;
   }
 
+  public String getUUID() {
+    return UUID;
+  }
+
+  public void setUUID(String UUID) {
+    this.UUID = UUID;
+  }
+
   public Set<Contact> getRelatedContacts() {
     return relatedContacts;
   }
@@ -336,12 +350,14 @@ public class Contact extends JpaModel {
       return Objects.equals(this.getId(), other.getId());
     }
 
-    return Objects.equals(getUniqueName(), other.getUniqueName()) && (getUniqueName() != null);
+    return Objects.equals(getUniqueName(), other.getUniqueName())
+        && Objects.equals(getUUID(), other.getUUID())
+        && (getUniqueName() != null || getUUID() != null);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(-1678787584, this.getUniqueName());
+    return Objects.hash(this.getUUID());
   }
 
   @Override
