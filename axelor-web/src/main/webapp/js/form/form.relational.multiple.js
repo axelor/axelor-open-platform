@@ -209,12 +209,13 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
   };
 
   $scope.canShowEdit = function () {
+    if ($scope._editorVisible) return false;
     var selected = $scope.selection.length ? $scope.selection[0] : null;
     return selected !== null && $scope.canEdit();
   };
 
   $scope.canShowView = function () {
-    if ($scope.canShowEdit()) return false;
+    if ($scope._editorVisible || $scope.canShowEdit()) return false;
     var selected = $scope.selection.length ? $scope.selection[0] : null;
     return selected !== null && $scope.canView();
   };
