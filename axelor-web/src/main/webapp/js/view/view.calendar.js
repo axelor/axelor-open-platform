@@ -83,6 +83,8 @@ function CalendarViewCtrl($scope, $element) {
   }
 
   $scope.fetchItems = function(start, end, callback) {
+    start = start.clone().local();
+    end = end.clone().local();
     var fields = _.pluck(this.fields, 'name');
     var criteria = {
       operator: "and",
