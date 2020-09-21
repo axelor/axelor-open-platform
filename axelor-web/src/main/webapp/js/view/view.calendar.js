@@ -108,7 +108,7 @@ function CalendarViewCtrl($scope, $element) {
             operator: ">=",
             value: start
           }, {
-            fieldName: view.stop,
+            fieldName: view.start,
             operator: "<=",
             value: end
           }]
