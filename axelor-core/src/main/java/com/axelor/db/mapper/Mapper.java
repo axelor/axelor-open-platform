@@ -42,10 +42,12 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
@@ -109,12 +111,12 @@ public class Mapper {
               sequenceFields.add(property);
             }
             if (property.isVirtual()) {
-              try {
-                final Method compute =
-                    beanClass.getDeclaredMethod(
-                        PREFIX_COMPUTE + name.substring(0, 1).toUpperCase() + name.substring(1));
+              final Method compute =
+                  getMethod(
+                      beanClass,
+                      PREFIX_COMPUTE + name.substring(0, 1).toUpperCase() + name.substring(1));
+              if (compute != null) {
                 methods.put(compute.getName(), name);
-              } catch (NoSuchMethodException | SecurityException e) {
               }
             }
           } catch (Exception e) {
@@ -122,15 +124,14 @@ public class Mapper {
           }
         }
         if (setter == null) {
-          try {
-            setter =
-                beanClass.getDeclaredMethod(
-                    PREFIX_SET + name.substring(0, 1).toUpperCase() + name.substring(1), type);
-            setter.setAccessible(true);
-          } catch (NoSuchMethodException | SecurityException e) {
-          }
+          setter =
+              getMethod(
+                  beanClass,
+                  PREFIX_SET + name.substring(0, 1).toUpperCase() + name.substring(1),
+                  type);
         }
         if (setter != null) {
+          setter.setAccessible(true);
           setters.put(name, setter);
           methods.put(setter.getName(), name);
         }
@@ -166,10 +167,20 @@ public class Mapper {
   }
 
   private Field getField(Class<?> klass, String name) {
+    if (klass == null) return null;
     try {
       return klass.getDeclaredField(name);
     } catch (NoSuchFieldException e) {
       return getField(klass.getSuperclass(), name);
+    }
+  }
+
+  private Method getMethod(Class<?> klass, String name, Class<?>... parameterTypes) {
+    if (klass == null) return null;
+    try {
+      return klass.getDeclaredMethod(name, parameterTypes);
+    } catch (NoSuchMethodException e) {
+      return getMethod(klass.getSuperclass(), name, parameterTypes);
     }
   }
 
@@ -260,7 +271,13 @@ public class Mapper {
     if (computeDependencies == null) {
       computeDependencies = findComputeDependencies();
     }
-    return computeDependencies.get(property.getName());
+    return computeDependencies.computeIfAbsent(
+        property.getName(),
+        key ->
+            Optional.ofNullable(beanClass.getSuperclass())
+                .map(Mapper::of)
+                .map(mapper -> mapper.getComputeDependencies(property))
+                .orElse(Collections.emptySet()));
   }
 
   private Map<String, Set<String>> findComputeDependencies() {

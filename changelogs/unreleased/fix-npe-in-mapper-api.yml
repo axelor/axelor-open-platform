@@ -1,0 +1,3 @@
+---
+title: Fix NPE when finding computed field dependencies
+type: fix
