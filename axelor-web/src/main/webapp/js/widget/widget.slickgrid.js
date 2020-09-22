@@ -1538,7 +1538,8 @@ Grid.prototype.findPrevEditable = function(posY, posX) {
 Grid.prototype.saveChanges = function(args, callback) {
 
   // onBeforeSave may cause recursion
-  if (this._saveChangesRunning) {
+  // also prevent saving changes while still committing
+  if (this._saveChangesRunning || this._committing) {
     return;
   }
 
@@ -2070,6 +2071,7 @@ Grid.prototype.showEditor = function (activeCell) {
 
   var parentScope = this.scope.$parent || {};
   this._editorVisible = grid._editorVisible = parentScope._editorVisible = true;
+  this.scope.$emit('on:grid-edit-start', this);
   this.adjustEditor(args);
 
   var item = grid.getDataItem(args.row) || {};
@@ -2091,6 +2093,7 @@ Grid.prototype.cancelEdit = function (focus) {
   this._editorOverlay.hide();
   var parentScope = this.scope.$parent || {};
   this._editorVisible = this.grid._editorVisible = parentScope._editorVisible = false;
+  this.scope.$emit('on:grid-edit-end', this);
   if (this.handler.dataView.getItemById(0)) {
     this.handler.dataView.deleteItem(0);
   }
@@ -2105,6 +2108,7 @@ Grid.prototype.cancelEdit = function (focus) {
 };
 
 Grid.prototype.commitEdit = function () {
+  this._committing = true;
 
   var that = this;
   var defer = this.handler._defer();
@@ -2176,6 +2180,7 @@ Grid.prototype.commitEdit = function () {
       }
     });
 
+    delete that._committing;
     that.saveChanges(null, function () {
       that.cancelEdit();
       defer.resolve();

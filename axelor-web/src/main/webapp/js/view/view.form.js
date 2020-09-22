@@ -747,6 +747,19 @@ function FormViewCtrl($scope, $element) {
     return _.pick($scope.record, extra);
   };
 
+  $scope._gridEditCount = 0;
+
+  $scope.$on('on:grid-edit-start', function() {
+    ++$scope._gridEditCount;
+  });
+
+  $scope.$on('on:grid-edit-end', function() {
+    if (!--$scope._gridEditCount && $scope._doOnSave) {
+      $scope._doOnSave();
+      delete $scope._doOnSave;
+    }
+  });
+
   $scope.onSave = function(options) {
 
     var opts = _.extend({ fireOnLoad: true }, options);
@@ -828,7 +841,12 @@ function FormViewCtrl($scope, $element) {
       }
     }
 
-    waitForActions(doOnSave);
+    if ($scope._gridEditCount) {
+      // save when all grid editing ends
+      $scope._doOnSave = function() { waitForActions(doOnSave); };
+    } else {
+      waitForActions(doOnSave);
+    }
 
     return defer.promise;
   };
