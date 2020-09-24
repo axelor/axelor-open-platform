@@ -208,6 +208,14 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
     return $scope.canEdit() && $scope.attr('canEdit') !== false;
   };
 
+  $scope.$on('on:grid-edit-start', function() {
+    $scope._editorVisible = true;
+  });
+
+  $scope.$on('on:grid-edit-end', function() {
+    $scope._editorVisible = false;
+  });
+
   $scope.canShowEdit = function () {
     if ($scope._editorVisible) return false;
     var selected = $scope.selection.length ? $scope.selection[0] : null;
