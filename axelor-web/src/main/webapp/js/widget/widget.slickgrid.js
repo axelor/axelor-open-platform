@@ -2069,8 +2069,7 @@ Grid.prototype.showEditor = function (activeCell) {
     form.css('visibility', '');
   }, 100)
 
-  var parentScope = this.scope.$parent || {};
-  this._editorVisible = grid._editorVisible = parentScope._editorVisible = true;
+  this._editorVisible = grid._editorVisible = true;
   this.scope.$emit('on:grid-edit-start', this);
   this.adjustEditor(args);
 
@@ -2091,8 +2090,7 @@ Grid.prototype.cancelEdit = function (focus) {
   this.editorForm.hide();
   this.editorScope.edit(null);
   this._editorOverlay.hide();
-  var parentScope = this.scope.$parent || {};
-  this._editorVisible = this.grid._editorVisible = parentScope._editorVisible = false;
+  this._editorVisible = this.grid._editorVisible = false;
   this.scope.$emit('on:grid-edit-end', this);
   if (this.handler.dataView.getItemById(0)) {
     this.handler.dataView.deleteItem(0);
