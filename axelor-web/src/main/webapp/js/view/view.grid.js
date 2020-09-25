@@ -650,6 +650,16 @@ function GridViewCtrl($scope, $element) {
       }
     });
 
+    // update selected flags on record
+    if ($scope.record && $scope.field) {
+      var recordItems = $scope.record[$scope.field.name];
+      if (recordItems && recordItems.length === items.length) {
+        _.each(recordItems, function (recordItem, index) {
+          recordItem.selected = items[index].selected;
+        });
+      }
+    }
+
     $scope.selection = selection;
     $scope.$timeout(function () {
       $scope.$broadcast('on:grid-selection-change', $scope.getContext());
