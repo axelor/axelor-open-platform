@@ -80,10 +80,9 @@ ui.prepareContext = function(model, values, dummyValues, parentContext) {
   _.each(context.$many, function (getItems, name) {
     if (!getItems) {
       // no items selected
-      _.each(context[name], function(item) {
-        if (item.selected) {
-          item.selected = false;
-        }
+      context[name] = _.map(context[name], function (item) {
+        if (item.selected) item = _.extend({}, item, {selected: false});
+        return item;
       });
       return;
     }

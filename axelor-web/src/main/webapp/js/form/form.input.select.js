@@ -273,7 +273,6 @@ function filterSelection(scope, field, selection, current) {
   if (_.isEmpty(selection)) return selection;
   if (_.isEmpty(selectionIn)) return selection;
 
-  var context = (scope.getContext || angular.noop)() || {};
   var list = selectionIn;
 
   if (_.isString(selectionIn)) {
@@ -281,6 +280,7 @@ function filterSelection(scope, field, selection, current) {
     if (expr.indexOf('[') !== 0) {
       expr = '[' + expr + ']';
     }
+    var context = scope.getContext && scope.getContext() || {};
     list = axelor.$eval(scope, expr, context);
   }
 
