@@ -154,10 +154,11 @@ function GridViewCtrl($scope, $element) {
     var selection = $scope.selection || [];
     var selectionIds = dataView.mapRowsToIds(selection);
     var hasSelected = _.some(items, function (item) { return item.selected; });
+    var allFetched = _.all(items, function (item) { return item.$fetched; });
     var syncSelection = function () {
       if (dataView.$syncSelection) {
         setTimeout(function(){
-          if (hasSelected) {
+          if (hasSelected || allFetched) {
             dataView.$syncSelection();
           } else {
             dataView.$syncSelection(selection, selectionIds);
