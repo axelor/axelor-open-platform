@@ -1,6 +1,8 @@
 ## 5.0.25 (current)
 
-TBD
+* Invalid meta and translations when restore is done
+* Fix timezone issue with start/end of calendar view
+* Fix multi-month calendar events missing for intermediate months
 
 ## 5.0.24 (2020-06-05)
 
