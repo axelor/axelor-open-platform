@@ -509,7 +509,7 @@ ui.formWidget('Panel', {
       "<div class='panel-header' ng-click='toggle()' ng-if='!notitle &amp;&amp; field.title' ng-class=\"{'clickable-header' : canCollapse()}\" tabindex='-1'>" +
         "<div class='panel-icon' ng-if='icon'><i class='fa' ng-class='icon'></i></div>" +
         "<img class='panel-image' ng-if='image' ng-src='{{image}}'>" +
-        "<div class='panel-title'>{{title}}</div>" +
+        "<div class='panel-title'><span ui-help-popover>{{title}}</span></div>" +
         "<div ng-if='menus' ui-menu-bar menus='menus' handler='this'></div>" +
         "<div ng-show='canCollapse()' class='panel-icons'>" +
           "<a href=''><i class='fa' ng-class='collapsedIcon'></i></a>" +
@@ -541,7 +541,8 @@ ui.formWidget('PanelTabs', {
         hidden: false,
         elem: elem,
         tabItem: $(),
-        menuItem: $()
+        menuItem: $(),
+        field: elem.scope().field
       };
       scope.tabs.push(tab);
     });
@@ -782,8 +783,11 @@ ui.formWidget('PanelTabs', {
   template:
     "<div class='panel-tabs tabbable-tabs'>" +
       "<ul class='nav nav-tabs nav-tabs-responsive'>" +
-        "<li ng-repeat='tab in tabs' ng-class='{active: tab.selected}'>" +
-          "<a tabindex='-1' href='' ng-click='selectTab(tab)' ng-bind-html='tab.title'></a>" +
+        "<li ng-repeat='tab in tabs' ng-class='{active: tab.selected}' ng-init='field = tab.field'>" +
+          "<a tabindex='-1' href='' ng-click='selectTab(tab)'>"+
+            "<span ng-if='field.type != \"panel\"' ng-bind-html='tab.title'></span>"+
+            "<span ng-if='field.type == \"panel\"' ui-help-popover><span ng-bind-html='tab.title'></span></span>"+
+          "</a>" +
         "</li>" +
         "<li class='dropdown' style='display: none'>" +
           "<a tabindex='-1' href='' class='dropdown-toggle' data-toggle='dropdown'><span></span><b class='caret'></b></a>" +
