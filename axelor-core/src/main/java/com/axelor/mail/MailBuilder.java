@@ -300,7 +300,18 @@ public final class MailBuilder {
 
     message.setReplyTo(InternetAddress.parse(Joiner.on(",").join(replyRecipients)));
 
-    if (!isBlank(from)) message.setFrom(new InternetAddress(from));
+    InternetAddress fromAddress = null;
+
+    if (!isBlank(from)) {
+      fromAddress = new InternetAddress(from);
+    } else {
+      fromAddress =
+          new InternetAddress(
+              session.getProperty("mail.smtp.from"),
+              session.getProperty("mail.smtp.from.personal"));
+    }
+
+    if (fromAddress != null) message.setFrom(fromAddress);
     if (!isBlank(sender)) message.setSender(new InternetAddress(sender));
 
     for (String name : headers.keySet()) {

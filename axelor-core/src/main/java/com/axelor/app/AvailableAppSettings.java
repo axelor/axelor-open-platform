@@ -127,6 +127,7 @@ public interface AvailableAppSettings {
   String MAIL_SMTP_CHANNEL = "mail.smtp.channel";
   String MAIL_SMTP_TIMEOUT = "mail.smtp.timeout";
   String MAIL_SMTP_CONNECTION_TIMEOUT = "mail.smtp.connectionTimeout";
+  String MAIL_SMTP_FROM = "mail.smtp.from";
 
   String MAIL_IMAP_HOST = "mail.imap.host";
   String MAIL_IMAP_PORT = "mail.imap.port";

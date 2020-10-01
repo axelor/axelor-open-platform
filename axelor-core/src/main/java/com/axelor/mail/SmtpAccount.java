@@ -17,14 +17,14 @@
  */
 package com.axelor.mail;
 
-import static com.axelor.common.StringUtils.isBlank;
-
 import com.axelor.common.StringUtils;
 import com.google.common.base.Preconditions;
 import java.util.Properties;
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 
 /** The default implementation of {@link MailAccount} for SMPT accounts. */
 public class SmtpAccount implements MailAccount {
@@ -34,6 +34,7 @@ public class SmtpAccount implements MailAccount {
   private String user;
   private String password;
   private String channel;
+  private String from;
 
   private int connectionTimeout = MailConstants.DEFAULT_TIMEOUT;
   private int timeout = MailConstants.DEFAULT_TIMEOUT;
@@ -82,6 +83,22 @@ public class SmtpAccount implements MailAccount {
     this.channel = channel;
   }
 
+  /**
+   * Create an authenticating SMTP account.
+   *
+   * @param host the smtp server host
+   * @param port the smtp server port
+   * @param user the smtp server login user name
+   * @param password the smtp server login password
+   * @param channel the smtp encryption channel (starttls or ssl)
+   * @param from the envelope return address
+   */
+  public SmtpAccount(
+      String host, String port, String user, String password, String channel, String from) {
+    this(host, port, user, password, channel);
+    this.from = from;
+  }
+
   private Session init() {
 
     final boolean authenticating = !StringUtils.isBlank(user);
@@ -99,8 +116,18 @@ public class SmtpAccount implements MailAccount {
     props.setProperty("mail.smtp.port", port);
     props.setProperty("mail.smtp.auth", "" + authenticating);
 
-    if (!isBlank(user)) {
-      props.setProperty("mail.smtp.from", user);
+    if (StringUtils.notBlank(from)) {
+      try {
+        final InternetAddress fromAddress = new InternetAddress(from);
+        if (StringUtils.notBlank(fromAddress.getAddress())) {
+          props.setProperty("mail.smtp.from", fromAddress.getAddress());
+        }
+        if (StringUtils.notBlank(fromAddress.getPersonal())) {
+          props.setProperty("mail.smtp.from.personal", fromAddress.getPersonal());
+        }
+      } catch (AddressException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     if (!authenticating) {

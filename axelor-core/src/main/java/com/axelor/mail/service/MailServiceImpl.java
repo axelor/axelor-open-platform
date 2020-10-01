@@ -141,6 +141,7 @@ public class MailServiceImpl implements MailService, MailConstants {
     final String user = settings.get(AvailableAppSettings.MAIL_SMTP_USER);
     final String pass = settings.get(AvailableAppSettings.MAIL_SMTP_PASS);
     final String channel = settings.get(AvailableAppSettings.MAIL_SMTP_CHANNEL);
+    final String from = settings.get(AvailableAppSettings.MAIL_SMTP_FROM);
 
     final int timeout = settings.getInt(AvailableAppSettings.MAIL_SMTP_TIMEOUT, DEFAULT_TIMEOUT);
     final int connectionTimeout =
@@ -150,7 +151,7 @@ public class MailServiceImpl implements MailService, MailConstants {
       return null;
     }
 
-    final SmtpAccount smtpAccount = new SmtpAccount(host, port, user, pass, channel);
+    final SmtpAccount smtpAccount = new SmtpAccount(host, port, user, pass, channel, from);
     smtpAccount.setTimeout(timeout);
     smtpAccount.setConnectionTimeout(connectionTimeout);
     sender = new MailSender(smtpAccount);
