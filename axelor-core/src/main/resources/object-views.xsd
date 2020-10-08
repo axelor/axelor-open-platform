@@ -1758,28 +1758,28 @@
         <xsd:attribute name="x-finish-to-start" type="xsd:string" use="optional">
           <xsd:annotation>
             <xsd:documentation>
-              Name of the M2M field contains links finish to start current task.
+              Name of the M2M field containing tasks to finish before starting current task.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="x-start-to-start" type="xsd:string" use="optional">
           <xsd:annotation>
             <xsd:documentation>
-              Name of the M2M field contains links start to start current task.
+              Name of the M2M field containing tasks to start before starting current task.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="x-finish-to-finish" type="xsd:string" use="optional">
           <xsd:annotation>
             <xsd:documentation>
-              Name of the M2M field contains links finish to finsh current task.
+              Name of the M2M field containing tasks to finish before finishing current task.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="x-start-to-finish" type="xsd:string" use="optional">
           <xsd:annotation>
             <xsd:documentation>
-              Name of the M2M field contains links start to finish current task.
+              Name of the M2M field containing tasks to start before finishing current task.
             </xsd:documentation>
           </xsd:annotation>
        </xsd:attribute>
