@@ -45,6 +45,7 @@
 
     <one-to-many name="flags" ref="MailFlags" mappedBy="message" />
 
+    <index columns="relatedModel,relatedId" />
   </entity>
 
   <entity name="MailFlags" table="MAIL_FLAGS" cacheable="true" repository="none">
