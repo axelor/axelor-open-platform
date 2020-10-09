@@ -846,7 +846,7 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
       var key = nameField;
       var trKey = '$t:' + key;
       if (trKey in item) key = trKey;
-      return item[key];
+      return ui.findNested(item, key);
     };
 
     scope.getItems = function() {
