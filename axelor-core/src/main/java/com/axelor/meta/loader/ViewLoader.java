@@ -143,7 +143,7 @@ public class ViewLoader extends AbstractParallelLoader {
 
     migrateViews();
     linkMissingGroups();
-    generateFinalViews(module, update);
+    generateFinalViews(update);
   }
 
   private void migrateViews() {
@@ -182,21 +182,21 @@ public class ViewLoader extends AbstractParallelLoader {
     }
   }
 
-  private void generateFinalViews(Module module, boolean update) {
+  private void generateFinalViews(boolean update) {
     try {
-      finalViewGenerator.generate(findForCompute(module.getName(), update, viewsToGenerate));
+      finalViewGenerator.generate(findForCompute(update, viewsToGenerate));
     } finally {
       viewsToGenerate.clear();
     }
   }
 
-  private Query<MetaView> findForCompute(String module, boolean update, Collection<String> names) {
+  private Query<MetaView> findForCompute(boolean update, Collection<String> names) {
     return Query.of(MetaView.class)
         .filter(
-            "(self.name IN :names OR (:module IS NULL OR self.module = :module) "
+            "(self.name IN :names "
                 + "AND (:update = TRUE OR NOT EXISTS ("
                 + "SELECT computedView FROM MetaView computedView "
-                + "WHERE computedView.name = self.name AND self.computed = TRUE))) "
+                + "WHERE computedView.name = self.name AND computedView.computed = TRUE))) "
                 + "AND COALESCE(self.extension, FALSE) = FALSE "
                 + "AND COALESCE(self.computed, FALSE) = FALSE "
                 + "AND (self.name, self.priority) "
@@ -205,7 +205,6 @@ public class ViewLoader extends AbstractParallelLoader {
                 + "GROUP BY name) "
                 + "AND EXISTS (SELECT extensionView FROM MetaView extensionView "
                 + "WHERE extensionView.name = self.name AND extensionView.extension = TRUE)")
-        .bind("module", module)
         .bind("update", update)
         .bind("names", names.isEmpty() ? ImmutableSet.of("") : names)
         .order("id");
