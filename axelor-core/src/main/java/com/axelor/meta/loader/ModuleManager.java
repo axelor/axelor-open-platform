@@ -117,17 +117,22 @@ public class ModuleManager {
       Beans.get(AuditableRunner.class)
           .run(
               () -> {
+                final List<Module> newlyInstalledModules = new ArrayList<>();
+
                 // install modules
                 resolver.all().stream()
                     .filter(m -> !m.isRemovable() || m.isInstalled())
-                    .peek(m -> log.info("Loading package " + m.getName() + "..."))
+                    .peek(m -> log.info("Loading package {}...", m.getName()))
                     .filter(m -> !m.isRemovable() || m.isPending())
-                    .forEach(m -> install(m.getName(), update, withDemo, false));
+                    .forEach(
+                        m -> {
+                          if (install(m.getName(), update, withDemo, false)) {
+                            newlyInstalledModules.add(m);
+                          }
+                        });
 
                 // second iteration ensures proper view sequence
-                resolver.all().stream()
-                    .filter(Module::isInstalled)
-                    .forEach(m -> viewLoader.doLast(m, update));
+                newlyInstalledModules.forEach(m -> viewLoader.doLast(m, update));
 
                 // uninstall pending modules
                 resolver.all().stream()
@@ -268,23 +273,24 @@ public class ModuleManager {
     updateLastRestored();
   }
 
-  private void install(String moduleName, boolean update, boolean withDemo, boolean force) {
+  private boolean install(String moduleName, boolean update, boolean withDemo, boolean force) {
     final Module module = resolver.get(moduleName);
     final MetaModule metaModule = modules.findByName(moduleName);
     if (metaModule == null) {
-      return;
+      return false;
     }
     if (!module.isInstalled() && module.isRemovable() && !force) {
-      return;
+      return false;
     }
     if (module.isInstalled() && !(update || module.isUpgradable() || module.isPending())) {
-      return;
+      return false;
     }
     install(module, update, withDemo);
 
     moduleChangedEvent
         .select(NamedLiteral.of(moduleName))
         .fire(new ModuleChanged(moduleName, module.isInstalled()));
+    return true;
   }
 
   private void install(Module module, boolean update, boolean withDemo) {
