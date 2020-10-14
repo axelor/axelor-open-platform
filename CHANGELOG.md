@@ -1,3 +1,28 @@
+## 5.2.8 (2020-10-14)
+
+#### Features
+
+* Fix gantt view pagination issue
+* Add index to MailMessage on relatedModel, relatedId fields
+
+#### Fixed
+
+* Fix nullable boolean radio displayed as false
+* Fetch target names for tag-select widget
+* Fix timezone issue with start/end time in calendar view popup
+* Fix timezone issue with start/end of calendar view
+* Fix empty form after saving new records in details view
+* Fix details-view with grouped grid not working
+* Fix change tracking translation on boolean fields
+* Fix downloading of meta files if parent has collections of meta files
+* Fix change tracking translation on boolean fields
+* Fix meta file link with no parent
+* Fix multi-month calendar events missing for intermediate months
+
+#### Security
+
+* Validate external input for tree view
+
 ## 5.2.7 (2020-06-05)
 
 #### Features
