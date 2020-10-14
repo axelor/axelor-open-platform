@@ -1,4 +1,4 @@
-## 5.0.25 (current)
+## 5.0.25 (2020-10-14)
 
 * Invalid meta and translations when restore is done
 * Fix timezone issue with start/end of calendar view
