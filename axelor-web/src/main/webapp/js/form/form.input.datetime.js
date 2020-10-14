@@ -376,7 +376,7 @@ ui.formInput('DateTime', {
       if (_.isEmpty(masked)) {
         value = null;
       }
-      if (!input.mask("valid")) {
+      if (value && !input.mask("valid")) {
         model.$setViewValue(value); // force validation
         model.$render();
         scope.$applyAsync();

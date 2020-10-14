@@ -408,7 +408,7 @@ function PlotData(series, data) {
     var name = groupBy ? groupName : null;
     var values = _.map(group, function (item) {
       var x = $conv(item[data.xAxis], data.xType) || 0;
-      var y = $conv(item[series.key] || name || 0);
+      var y = $conv(item[series.key] !== undefined ? item[series.key] : name || 0);
       return { x: x, y: y, raw: item };
     });
 

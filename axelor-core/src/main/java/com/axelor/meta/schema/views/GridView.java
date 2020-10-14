@@ -71,6 +71,9 @@ public class GridView extends AbstractView implements ExtendableView {
   @XmlAttribute(name = "x-no-fetch")
   private Boolean noFetch;
 
+  @XmlAttribute(name = "x-selector")
+  private String selector;
+
   @XmlElement(name = "help")
   private Help inlineHelp;
 
@@ -228,6 +231,14 @@ public class GridView extends AbstractView implements ExtendableView {
 
   public void setNoFetch(Boolean noFetch) {
     this.noFetch = noFetch;
+  }
+
+  public String getSelector() {
+    return selector;
+  }
+
+  public void setSelector(String selector) {
+    this.selector = selector;
   }
 
   public Help getInlineHelp() {

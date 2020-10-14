@@ -1,3 +1,75 @@
+## 5.3.5 (2020-10-14)
+
+#### Features
+
+* Go into edit on focus for multiline string in editable grid
+* Add index to MailMessage on relatedModel, relatedId fields
+
+#### Fixed
+
+* Fix change tracking translation issue
+* Hide edit in grid icons bar while editing row
+* Set authentication request character encoding to UTF-8
+* Fix customize dashboard with drag & drop
+* Fix Context#asType invalid type error message
+* Fix boolean field focus issue in editable grid
+* Fix timezone issue with start/end time in calendar view popup
+* Fix timezone issue with start/end of calendar view
+* Fix single-select widget on integer field
+* Fix readonly rendering of inline HTML widget
+* Fix readonly rendering of large string in editable grid
+* Fix setting of o2m/m2m field in editable grid from action
+* Fix PostAction event issue for action-record
+* Fix buttons not shown when using x-selector="checkbox"
+* Ignore hiding of fields in editable grid
+* Update dotted fields in grid from form dotted fields
+* Fix onChange not triggered when setting date to null
+* Fix rare emptied row on save issue in editable grid
+* Fix multi-month calendar events missing for intermediate months
+
+## 5.3.5 (2020-08-17)
+
+#### Features
+
+* Add support for help on panel-dashlet
+* Add support for per grid widget checkbox selector
+
+  <details>
+  Now we can use `x-selector="checkbox"` on grid view or panel-related to
+  show checkbox selection.
+  </details>
+
+* Fix gantt view pagination issue
+
+#### Fixed
+
+* Fix switching to another tenant
+* Fix dotted fields disappearing after edition on top-level editable grids
+* Fix black and white tag colors
+* Fix empty form after saving new records in details view
+* Fix downloading of meta files if parent has collections of meta files
+* Fix missing read permission on user/group for DMS
+* Fetch target names for tag-select widget
+* Fix view extension replace on menubar/toolbar/panel-mail
+* Fix action method call with arguments having ':'
+* Fix charts with zero in series
+* Fix emptied field not present in grid after opening popup form
+* Fix truncated title and vertical alignment of tag-select with modern theme
+* Fix view watching from mixed location kinds
+* Fix nullable boolean radio displayed as false
+* Fix search null or empty string field values
+* Fix grid toolbar button js expression issue
+* Fix onNew on editable grid row
+* Fix column menu show/hide item in grid view
+* Fix wrong positional parameter resolution from query binder
+* Fix mail base64 image max line (RFC2045)
+* Fix dotted field translation in grid view
+* Fix NavSelect and MenuBar size adjust issue
+
+#### Security
+
+* Validate external input for tree view
+
 ## 5.3.4 (2020-06-29)
 
 #### Fixed

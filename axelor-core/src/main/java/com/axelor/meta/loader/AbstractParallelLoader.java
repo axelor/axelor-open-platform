@@ -18,7 +18,6 @@
 package com.axelor.meta.loader;
 
 import com.axelor.db.ParallelTransactionExecutor;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
@@ -32,9 +31,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 abstract class AbstractParallelLoader extends AbstractLoader {
@@ -55,17 +52,8 @@ abstract class AbstractParallelLoader extends AbstractLoader {
       Module module,
       boolean update,
       Set<Path> paths) {
-    final Function<Module, List<List<URL>>> findFileListsFunc;
 
-    if (paths.isEmpty()) {
-      findFileListsFunc = this::findFileLists;
-    } else if (paths.iterator().next().toString().endsWith(".jar")) {
-      findFileListsFunc = this::findFileListsJar;
-    } else {
-      findFileListsFunc = m -> findFileListsPath(m, paths);
-    }
-
-    for (final ListIterator<List<URL>> it = findFileListsFunc.apply(module).listIterator();
+    for (final ListIterator<List<URL>> it = findFileLists(module, paths).listIterator();
         it.hasNext(); ) {
       final int priority = it.nextIndex();
       final List<URL> files = it.next();
@@ -75,75 +63,76 @@ abstract class AbstractParallelLoader extends AbstractLoader {
     }
   }
 
-  private List<List<URL>> findFileListsJar(Module module) {
+  private List<List<URL>> findFileLists(Module module, Set<Path> paths) {
     final List<List<URL>> lists = findFileLists(module);
-    final Optional<URL> firstURLOpt = lists.stream().flatMap(List::stream).findFirst();
 
-    if (!firstURLOpt.isPresent()) {
-      return Collections.emptyList();
+    // All files
+    if (paths.isEmpty()) {
+      return lists;
     }
 
-    final URL firstURL = firstURLOpt.get();
+    // Filtered by modified in JAR if any
+    final List<List<URL>> foundInJar = findFileListsJar(lists);
 
-    try (final JarFileSystem jarFS = new JarFileSystem(firstURL.toURI())) {
-      return lists
-          .parallelStream()
-          .map(
-              list ->
-                  list.parallelStream()
-                      .filter(
-                          url -> {
-                            try {
-                              return Files.getLastModifiedTime(jarFS.getPath(url.toURI()))
-                                      .toMillis()
-                                  >= ModuleManager.getLastRestored();
-                            } catch (IOException e) {
-                              throw new UncheckedIOException(e);
-                            } catch (URISyntaxException e) {
-                              throw new RuntimeException(e);
-                            }
-                          })
-                      .collect(Collectors.toList()))
-          .collect(Collectors.toList());
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
+    if (foundInJar.parallelStream().anyMatch(list -> !list.isEmpty())) {
+      return foundInJar;
     }
-  }
 
-  private List<List<URL>> findFileListsPath(Module module, Set<Path> paths) {
-    return findFileLists(module)
+    // Filtered by paths
+    return lists
         .parallelStream()
         .map(
             list ->
                 list.parallelStream()
                     .filter(
-                        url -> {
-                          try {
-                            return paths.contains(Paths.get(url.toURI()));
-                          } catch (URISyntaxException e) {
-                            throw new RuntimeException(e);
-                          }
-                        })
+                        url ->
+                            "file".equals(url.getProtocol())
+                                && paths.contains(Paths.get(toUri(url))))
                     .collect(Collectors.toList()))
         .collect(Collectors.toList());
   }
 
-  private static class JarFileSystem implements Closeable {
-    private final FileSystem jarFS;
+  private List<List<URL>> findFileListsJar(List<List<URL>> lists) {
+    return lists.stream()
+        .flatMap(List::stream)
+        .findAny()
+        .filter(url -> "jar".equals(url.getProtocol()))
+        .map(
+            url -> {
+              try (final FileSystem fs =
+                  FileSystems.newFileSystem(toUri(url), Collections.emptyMap())) {
+                return lists
+                    .parallelStream()
+                    .map(
+                        list ->
+                            list.parallelStream()
+                                .filter(
+                                    urlInFs ->
+                                        getLastModifiedTimeMillis(fs, urlInFs)
+                                            >= ModuleManager.getLastRestored())
+                                .collect(Collectors.toList()))
+                    .collect(Collectors.toList());
+              } catch (IOException e) {
+                throw new UncheckedIOException(e);
+              }
+            })
+        .orElse(Collections.emptyList());
+  }
 
-    public JarFileSystem(URI uri) throws IOException {
-      jarFS = FileSystems.newFileSystem(uri, Collections.emptyMap());
+  private URI toUri(URL url) {
+    try {
+      return url.toURI();
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    public Path getPath(URI uri) {
-      return jarFS.getPath(Paths.get(uri).toString());
-    }
-
-    @Override
-    public void close() throws IOException {
-      jarFS.close();
+  private long getLastModifiedTimeMillis(FileSystem fs, URL url) {
+    final Path path = fs.getPath(Paths.get(toUri(url)).toString());
+    try {
+      return Files.getLastModifiedTime(path).toMillis();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
     }
   }
 }

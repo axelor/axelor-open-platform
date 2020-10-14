@@ -83,6 +83,8 @@ function CalendarViewCtrl($scope, $element) {
   }
 
   $scope.fetchItems = function(start, end, callback) {
+    start = start.clone().local();
+    end = end.clone().local();
     var fields = _.pluck(this.fields, 'name');
     var criteria = {
       operator: "and",
@@ -108,7 +110,7 @@ function CalendarViewCtrl($scope, $element) {
             operator: ">=",
             value: start
           }, {
-            fieldName: view.stop,
+            fieldName: view.start,
             operator: "<=",
             value: end
           }]
@@ -643,8 +645,8 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
       var view = this.schema;
       var record = _.extend({}, event.record);
 
-      record[view.eventStart] = event.start;
-      record[view.eventStop] = event.end;
+      record[view.eventStart] = event.start ? event.start.clone().local() : event.start;
+      record[view.eventStop] = event.end ? event.end.clone().local() : event.end;
 
       if (!editor) {
         editor = ViewService.compile('<div ui-editor-popup></div>')(scope.$new());
