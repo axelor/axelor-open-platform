@@ -83,6 +83,18 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
       return;
     }
 
+    // update dotted fields from nested fields
+    value = _.clone(value);
+    _.chain(Object.keys($scope.fields))
+      .filter(function(name) { return name.indexOf('.') >= 0; })
+      .each(function(name) {
+        delete value[name];
+        var val = ui.findNested(value, name);
+        if (val !== undefined) {
+          value[name] = val;
+        }
+      });
+
     var items = _.chain([value]).flatten(true).compact().value();
     var records = _.map($scope.getItems(), _.clone);
 
@@ -194,13 +206,22 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
     return $scope.canEdit() && $scope.attr('canEdit') !== false;
   };
 
+  $scope.$on('on:grid-edit-start', function() {
+    $scope._editorVisible = true;
+  });
+
+  $scope.$on('on:grid-edit-end', function() {
+    $scope._editorVisible = false;
+  });
+
   $scope.canShowEdit = function () {
+    if ($scope._editorVisible) return false;
     var selected = $scope.selection.length ? $scope.selection[0] : null;
     return selected !== null && $scope.canEdit();
   };
 
   $scope.canShowView = function () {
-    if ($scope.canShowEdit()) return false;
+    if ($scope._editorVisible || $scope.canShowEdit()) return false;
     var selected = $scope.selection.length ? $scope.selection[0] : null;
     return selected !== null && $scope.canView();
   };
@@ -1242,6 +1263,12 @@ ui.formInput('OneToManyInline', 'OneToMany', {
     input.on('keydown', function (e) {
       if (e.keyCode === 40 && e.ctrlKey && !dropdownVisible) {
         scope.onDropdown();
+      }
+    });
+
+    input.on('keydown', function (e) {
+      if (e.keyCode === 9) { // tab key
+        element.trigger('hide:slick-editor');
       }
     });
 

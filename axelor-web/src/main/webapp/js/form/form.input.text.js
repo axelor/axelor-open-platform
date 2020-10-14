@@ -202,7 +202,7 @@ ui.formInput('TextInline', 'Text', {
       }
       wrapper.position({
         my: "left top",
-        at: "left bottom",
+        at: "left top",
         of: picker,
         within: container
       })
@@ -227,7 +227,9 @@ ui.formInput('TextInline', 'Text', {
       element.trigger('hide:slick-editor');
     }
 
-    function showPopup(show) {
+    var canShowOnFocus = true;
+
+    function showPopup(show, focusElem) {
       dropdownVisible = !!show;
       if (dropdownVisible) {
         $(document).on('mousedown', onMouseDown);
@@ -241,18 +243,28 @@ ui.formInput('TextInline', 'Text', {
       } else {
         $(document).off('mousedown', onMouseDown);
         wrapper.hide();
-        setTimeout(function () {
-          input.focus();
-        });
+        if (focusElem) {
+          setTimeout(function () {
+            focusElem.focus();
+          });
+        }
       }
     }
 
-    scope.togglePopup = function () {
-      showPopup(!dropdownVisible);
-    };
-
     element.on("hide:slick-editor", function(e) {
       showPopup(false);
+    });
+
+    input.on('focus', function () {
+      if (canShowOnFocus) {
+        showPopup(true);
+      } else {
+        canShowOnFocus = true;
+      }
+    });
+
+    input.on('click', function () {
+      showPopup(true);
     });
 
     input.on('keydown', function (e) {
@@ -268,9 +280,15 @@ ui.formInput('TextInline', 'Text', {
     textarea.on('keydown', function (e) {
       if (e.keyCode === 9) { // tab key
         e.preventDefault();
-        showPopup(false);
+        showPopup(false, navigateTabbable(e.shiftKey ? -1 : 1));
       }
     });
+
+    function navigateTabbable(inc) {
+      var tabbables = element.closest('.slick-form').find(':tabbable');
+      var index = (tabbables.index(input) + inc + tabbables.length) % tabbables.length;
+      return tabbables.eq(index);
+    }
 
     scope.$watch(attrs.ngModel, function textModelWatch(value) {
       var firstLine = value && value.split(/\n/)[0];
@@ -283,11 +301,8 @@ ui.formInput('TextInline', 'Text', {
     });
   },
   template_editable:
-      "<span class='picker-input picker-icons-1'>" +
+      "<span>" +
         "<input type='text' readonly>" +
-        "<span class='picker-icons'>" +
-          "<i class='fa fa-pencil' title='{{ \"Edit\" | t }}' ng-click='togglePopup()'></i>" +
-        "</span>" +
       "</span>"
 });
 

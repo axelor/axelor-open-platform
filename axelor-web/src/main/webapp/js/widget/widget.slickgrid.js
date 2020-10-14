@@ -1174,6 +1174,9 @@ Grid.prototype.zIndexFix = function() {
   var zIndex = this.element.parents('.ui-dialog:first').zIndex();
   if (zIndex) {
     this.element.find('.slick-headerrow-column').zIndex(zIndex);
+    if (this.editorForm && this.editorForm.is(':visible')) {
+      this.editorForm.find('.boolean-item input').zIndex(zIndex);
+    }
   }
 };
 
@@ -1535,7 +1538,8 @@ Grid.prototype.findPrevEditable = function(posY, posX) {
 Grid.prototype.saveChanges = function(args, callback) {
 
   // onBeforeSave may cause recursion
-  if (this._saveChangesRunning) {
+  // also prevent saving changes while still committing
+  if (this._saveChangesRunning || this._committing) {
     return;
   }
 
@@ -1828,7 +1832,7 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
     var result = _.extend({}, item, record, { id: item.id });
 
     _.each(result, function(value, name) {
-      if (_.isObject(value) && value.id === undefined && !_.startsWith(name, '$')) {
+      if (_.isObject(value) && !_.isArray(value) && value.id === undefined && !_.startsWith(name, '$')) {
         delete result[name];
       }
     });
@@ -1903,6 +1907,7 @@ Grid.prototype.adjustEditor = function () {
   });
 
   form.css('padding-left', leftPadding);
+  this.zIndexFix();
 }
 
 Grid.prototype.showEditor = function (activeCell) {
@@ -2065,6 +2070,7 @@ Grid.prototype.showEditor = function (activeCell) {
   }, 100)
 
   this._editorVisible = grid._editorVisible = true;
+  this.scope.$emit('on:grid-edit-start', this);
   this.adjustEditor(args);
 
   var item = grid.getDataItem(args.row) || {};
@@ -2085,6 +2091,7 @@ Grid.prototype.cancelEdit = function (focus) {
   this.editorScope.edit(null);
   this._editorOverlay.hide();
   this._editorVisible = this.grid._editorVisible = false;
+  this.scope.$emit('on:grid-edit-end', this);
   if (this.handler.dataView.getItemById(0)) {
     this.handler.dataView.deleteItem(0);
   }
@@ -2099,6 +2106,7 @@ Grid.prototype.cancelEdit = function (focus) {
 };
 
 Grid.prototype.commitEdit = function () {
+  this._committing = true;
 
   var that = this;
   var defer = this.handler._defer();
@@ -2170,6 +2178,7 @@ Grid.prototype.commitEdit = function () {
       }
     });
 
+    delete that._committing;
     that.saveChanges(null, function () {
       that.cancelEdit();
       defer.resolve();
@@ -2686,7 +2695,7 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
 
         if (axelor.config["view.grid.selection"] === "checkbox" && !scope.selector) {
           scope.selector = "checkbox";
-        } else {
+        } else if (scope.selector !== "checkbox") {
           scope.selectorAttr = scope.selector;
         }
 

@@ -747,6 +747,19 @@ function FormViewCtrl($scope, $element) {
     return _.pick($scope.record, extra);
   };
 
+  $scope._gridEditCount = 0;
+
+  $scope.$on('on:grid-edit-start', function() {
+    ++$scope._gridEditCount;
+  });
+
+  $scope.$on('on:grid-edit-end', function() {
+    if (!--$scope._gridEditCount && $scope._doOnSave) {
+      $scope._doOnSave();
+      delete $scope._doOnSave;
+    }
+  });
+
   $scope.onSave = function(options) {
 
     var opts = _.extend({ fireOnLoad: true }, options);
@@ -789,6 +802,16 @@ function FormViewCtrl($scope, $element) {
       });
 
       promise.success(function(record) {
+        // update dotted fields with new values from form
+        _.chain(Object.keys(record).concat(Object.keys($scope.fields)))
+          .filter(function(name) { return name.indexOf('.') >= 0; })
+          .uniq()
+          .each(function(name) {
+            var value = ui.findNested(values, name);
+            if (value !== undefined) {
+              record[name] = value;
+            }
+          });
         defer.resolve(record);
       });
       promise.error(function(error) {
@@ -818,7 +841,12 @@ function FormViewCtrl($scope, $element) {
       }
     }
 
-    waitForActions(doOnSave);
+    if ($scope._gridEditCount) {
+      // save when all grid editing ends
+      $scope._doOnSave = function() { waitForActions(doOnSave); };
+    } else {
+      waitForActions(doOnSave);
+    }
 
     return defer.promise;
   };
