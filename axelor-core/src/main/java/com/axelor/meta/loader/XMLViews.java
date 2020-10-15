@@ -25,6 +25,7 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.common.StringUtils;
+import com.axelor.db.JPA;
 import com.axelor.db.Query;
 import com.axelor.db.internal.DBHelper;
 import com.axelor.inject.Beans;
@@ -43,12 +44,14 @@ import com.axelor.meta.schema.views.Position;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Joiner;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
@@ -62,6 +65,7 @@ import java.io.Writer;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -77,6 +81,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.persistence.TypedQuery;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -96,6 +101,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import org.hotswap.agent.util.spring.util.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -576,35 +582,6 @@ public class XMLViews {
     return xmlView;
   }
 
-  private static List<MetaView> findExtensionMetaViews(String name, String model, String type) {
-
-    final MetaViewRepository repo = Beans.get(MetaViewRepository.class);
-    final User user = AuthUtils.getUser();
-    final Long group = user != null && user.getGroup() != null ? user.getGroup().getId() : null;
-    final List<String> select = new ArrayList<>();
-
-    select.add("self.extension = true");
-    select.add("self.name = :name");
-    select.add("self.model = :model");
-    select.add("self.type = :type");
-
-    if (group == null) {
-      select.add("self.groups is empty");
-    } else {
-      select.add("(self.groups is empty OR self.groups[].id = :group)");
-    }
-
-    return repo.all()
-        .filter(Joiner.on(" AND ").join(select))
-        .bind("name", name)
-        .bind("model", model)
-        .bind("type", type)
-        .bind("group", group)
-        .cacheable()
-        .order("-priority")
-        .fetch();
-  }
-
   public static Action findAction(String name) {
     applyHotUpdates();
     final MetaAction metaAction = Beans.get(MetaActionRepository.class).findByName(name);
@@ -631,9 +608,10 @@ public class XMLViews {
     @Inject private MetaViewRepository metaViewRepo;
     @Inject private GroupRepository groupRepo;
 
-    public void generate(MetaView view) {
+    @Transactional
+    public boolean generate(MetaView view) {
       try {
-        generateChecked(view);
+        return generateChecked(view);
       } catch (XPathExpressionException
           | ParserConfigurationException
           | SAXException
@@ -643,18 +621,45 @@ public class XMLViews {
       }
     }
 
+    private TypedQuery<MetaView> findForCompute(Collection<String> names, boolean update) {
+      return JPA.em()
+          .createQuery(
+              "SELECT self FROM MetaView self LEFT JOIN self.groups viewGroup WHERE "
+                  + "(self.name IN :names "
+                  + "AND (:update = TRUE OR NOT EXISTS ("
+                  + "SELECT computedView FROM MetaView computedView "
+                  + "WHERE computedView.name = self.name AND computedView.computed = TRUE))) "
+                  + "AND COALESCE(self.extension, FALSE) = FALSE "
+                  + "AND COALESCE(self.computed, FALSE) = FALSE "
+                  + "AND (self.name, self.priority, COALESCE(viewGroup.id, 0)) "
+                  + "IN (SELECT other.name, MAX(other.priority), COALESCE(otherGroup.id, 0) FROM MetaView other "
+                  + "LEFT JOIN other.groups otherGroup "
+                  + "WHERE COALESCE(other.extension, FALSE) = FALSE AND COALESCE(other.computed, FALSE) = FALSE "
+                  + "GROUP BY other.name, otherGroup) "
+                  + "AND EXISTS (SELECT extensionView FROM MetaView extensionView "
+                  + "WHERE extensionView.name = self.name AND extensionView.extension = TRUE) "
+                  + "GROUP BY self "
+                  + "ORDER BY self.id",
+              MetaView.class)
+          .setParameter("update", update)
+          .setParameter("names", names.isEmpty() ? ImmutableSet.of("") : names);
+    }
+
     @Transactional(rollbackOn = Exception.class)
-    public void generateChecked(MetaView view)
+    public boolean generateChecked(MetaView view)
         throws ParserConfigurationException, SAXException, IOException, XPathExpressionException,
             JAXBException {
 
       final MetaView originalView = getOriginalView(view);
       final List<MetaView> extensionViews = findExtensionMetaViewsByModuleOrder(originalView);
 
+      final String xmlId =
+          MoreObjects.firstNonNull(originalView.getXmlId(), originalView.getName())
+              + "__computed__";
+
       if (extensionViews.isEmpty()) {
-        Optional.ofNullable(metaViewRepo.findByNameAndComputed(originalView.getName(), true))
-            .ifPresent(metaViewRepo::remove);
-        return;
+        Optional.ofNullable(metaViewRepo.findByID(xmlId)).ifPresent(metaViewRepo::remove);
+        return false;
       }
 
       final String xml = originalView.getXml();
@@ -662,10 +667,11 @@ public class XMLViews {
       final Node viewNode = findViewNode(document);
 
       final MetaView computedView =
-          Optional.ofNullable(metaViewRepo.findByNameAndComputed(originalView.getName(), true))
+          Optional.ofNullable(metaViewRepo.findByID(xmlId))
               .orElseGet(
                   () -> {
                     final MetaView copy = metaViewRepo.copy(originalView, false);
+                    copy.setXmlId(xmlId);
                     copy.setComputed(true);
                     metaViewRepo.persist(copy);
                     return copy;
@@ -698,6 +704,8 @@ public class XMLViews {
       computedView.setXml(finalXml);
       computedView.setModule(getLastModule(extensionViews));
       addGroups(computedView, finalView.getGroups());
+
+      return true;
     }
 
     private void addGroups(MetaView view, String codes) {
@@ -729,9 +737,8 @@ public class XMLViews {
       return null;
     }
 
-    private static List<MetaView> findExtensionMetaViewsByModuleOrder(MetaView view) {
-      final List<MetaView> views =
-          findExtensionMetaViews(view.getName(), view.getModel(), view.getType());
+    private List<MetaView> findExtensionMetaViewsByModuleOrder(MetaView view) {
+      final List<MetaView> views = findExtensionMetaViews(view);
       final Map<String, List<MetaView>> viewsByModuleName =
           views
               .parallelStream()
@@ -752,8 +759,33 @@ public class XMLViews {
       return result;
     }
 
+    private List<MetaView> findExtensionMetaViews(MetaView view) {
+      final List<String> select = new ArrayList<>();
+
+      select.add("self.extension = true");
+      select.add("self.name = :name");
+      select.add("self.model = :model");
+      select.add("self.type = :type");
+
+      return metaViewRepo
+          .all()
+          .filter(Joiner.on(" AND ").join(select))
+          .bind("name", view.getName())
+          .bind("model", view.getModel())
+          .bind("type", view.getType())
+          .cacheable()
+          .order("-priority")
+          .order("id")
+          .fetchStream()
+          .filter(
+              extView ->
+                  extView.getGroups().isEmpty()
+                      || view.getGroups().stream().anyMatch(extView.getGroups()::contains))
+          .collect(Collectors.toList());
+    }
+
     private MetaView getOriginalView(MetaView view) {
-      if (view.getComputed()) {
+      if (Boolean.TRUE.equals(view.getComputed())) {
         log.warn("View is computed: {}", view.getName());
         return Optional.ofNullable(metaViewRepo.findByNameAndComputed(view.getName(), false))
             .orElseThrow(NoSuchElementException::new);
@@ -1216,23 +1248,70 @@ public class XMLViews {
           .collect(Collectors.toList());
     }
 
-    public void generate(Query<MetaView> query) {
-      generate(query, 0, DBHelper.getJdbcFetchSize());
-    }
-
-    private void generate(Query<MetaView> query, int startOffset, int increment) {
-      List<MetaView> views;
-      int offset = startOffset;
-
-      while (!(views = query.fetch(DBHelper.getJdbcFetchSize(), offset)).isEmpty()) {
-        generate(views);
-        offset += increment;
+    @Transactional
+    public long generate(Collection<String> names, boolean update) {
+      if (ObjectUtils.isEmpty(names)) {
+        return 0L;
       }
+
+      final long count = generate(findForCompute(names, update));
+
+      if (count == 0L) {
+        metaViewRepo
+            .all()
+            .filter("self.name IN :names AND self.computed = TRUE")
+            .bind("names", names)
+            .remove();
+      }
+
+      return count;
     }
 
     @Transactional
-    public void generate(List<MetaView> views) {
-      views.forEach(this::generate);
+    public long generate(TypedQuery<MetaView> query) {
+      query.setMaxResults(DBHelper.getJdbcFetchSize());
+      return generate(query, 0, DBHelper.getJdbcFetchSize());
+    }
+
+    private long generate(TypedQuery<MetaView> query, int startOffset, int increment) {
+      List<MetaView> views;
+      int offset = startOffset;
+      long count = 0;
+
+      while (!(views = fetch(query, offset)).isEmpty()) {
+        count += generate(views);
+        offset += increment;
+      }
+
+      return count;
+    }
+
+    private List<MetaView> fetch(TypedQuery<MetaView> query, int offset) {
+      query.setFirstResult(offset);
+      return query.getResultList();
+    }
+
+    @Transactional
+    public long generate(Query<MetaView> query) {
+      return generate(query, 0, DBHelper.getJdbcFetchSize());
+    }
+
+    private long generate(Query<MetaView> query, int startOffset, int increment) {
+      List<MetaView> views;
+      int offset = startOffset;
+      long count = 0;
+
+      while (!(views = query.fetch(DBHelper.getJdbcFetchSize(), offset)).isEmpty()) {
+        count += generate(views);
+        offset += increment;
+      }
+
+      return count;
+    }
+
+    @Transactional
+    public long generate(List<MetaView> views) {
+      return views.stream().map(view -> generate(view) ? 1L : 0L).mapToLong(Long::longValue).sum();
     }
 
     private static String getNodeAttributeValue(NamedNodeMap attributes, String name) {

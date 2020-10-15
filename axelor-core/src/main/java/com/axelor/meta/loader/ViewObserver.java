@@ -29,9 +29,8 @@ import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.repo.MetaViewRepository;
 import com.axelor.rpc.RequestUtils;
 import com.google.inject.Singleton;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -63,11 +62,12 @@ public class ViewObserver {
       @Observes @Named(RequestEvent.SAVE) @EntityType(MetaView.class) PostRequest event) {
     RequestUtils.processResponse(
         event.getResponse(),
-        values ->
-            Optional.ofNullable((String) values.get("name"))
-                .map(name -> metaViewRepo.findByNameAndComputed(name, false))
-                .filter(view -> !(Boolean) values.getOrDefault("computed", false))
-                .ifPresent(finalViewGenerator::generate));
+        values -> {
+          final MetaView view = JPA.edit(MetaView.class, values);
+          if (!Boolean.TRUE.equals(view.getComputed())) {
+            finalViewGenerator.generate(Collections.singletonList(view.getName()), true);
+          }
+        });
   }
 
   void onPreRemove(
@@ -83,10 +83,10 @@ public class ViewObserver {
 
   void onPostRemove(
       @Observes @Named(RequestEvent.REMOVE) @EntityType(MetaView.class) PostRequest event) {
-    toRegenerate.stream()
-        .map(name -> metaViewRepo.findByNameAndComputed(name, false))
-        .filter(Objects::nonNull)
-        .forEach(finalViewGenerator::generate);
-    toRegenerate.clear();
+    try {
+      finalViewGenerator.generate(toRegenerate, true);
+    } finally {
+      toRegenerate.clear();
+    }
   }
 }
