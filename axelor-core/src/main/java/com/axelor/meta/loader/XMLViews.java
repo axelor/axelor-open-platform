@@ -24,6 +24,7 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
@@ -74,6 +75,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -101,7 +103,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.hotswap.agent.util.spring.util.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -777,10 +778,7 @@ public class XMLViews {
           .order("-priority")
           .order("id")
           .fetchStream()
-          .filter(
-              extView ->
-                  extView.getGroups().isEmpty()
-                      || view.getGroups().stream().anyMatch(extView.getGroups()::contains))
+          .filter(extView -> Objects.equals(extView.getGroups(), view.getGroups()))
           .collect(Collectors.toList());
     }
 
