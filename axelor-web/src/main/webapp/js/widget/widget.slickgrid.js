@@ -1064,7 +1064,7 @@ Grid.prototype._doInit = function(view) {
     that.resetColumns();
   });
 
-  scope.$on("on:before-save", function(e, record) {
+  function onBeforeSave(e, record, noWait) {
 
     // only for editable grid
     if (!that.editable || !that.isEditActive()) {
@@ -1073,7 +1073,7 @@ Grid.prototype._doInit = function(view) {
 
     var row = null;
     if (that.isEditActive() && that.editorScope.record !== record) {
-      that.commitEdit();
+      that.commitEdit(noWait);
       row = grid.getDataItem(grid.getDataLength() - 1); // to check if adding new row
     }
     if (grid.getActiveCell() && that.focusInvalidCell(grid.getActiveCell())) {
@@ -1140,8 +1140,15 @@ Grid.prototype._doInit = function(view) {
 
     e.preventDefault();
     return false;
+  }
+
+  scope.$on("on:before-save", function (e, record) {
+    onBeforeSave(e, record);
   });
 
+  scope.$on("on:before-save-action", function (e, record) {
+    onBeforeSave(e, record, true);
+  });
 
   scope.$timeout(function () {
     that.zIndexFix();
@@ -1594,7 +1601,7 @@ Grid.prototype.findPrevEditable = function(posY, posX) {
   return null;
 };
 
-Grid.prototype.saveChanges = function(args, callback) {
+Grid.prototype.saveChanges = function(args, callback, errback, noWait) {
 
   // onBeforeSave may cause recursion
   // also prevent saving changes while still committing
@@ -1607,10 +1614,16 @@ Grid.prototype.saveChanges = function(args, callback) {
   var params = arguments;
 
   this._saveChangesRunning = true;
-  this.scope.waitForActions(function () {
+  var task = function () {
     that.__saveChanges.apply(that, params);
     that._saveChangesRunning = false;
-  }, 100);
+  };
+
+  if (noWait) {
+    task();
+  } else {
+    this.scope.waitForActions(task, 100);
+  }
 
   return true;
 };
@@ -2164,7 +2177,7 @@ Grid.prototype.cancelEdit = function (focus) {
   }
 };
 
-Grid.prototype.commitEdit = function () {
+Grid.prototype.commitEdit = function (noWait) {
   this._committing = true;
 
   var that = this;
@@ -2211,7 +2224,7 @@ Grid.prototype.commitEdit = function () {
 
   var row = this.grid.getActiveCell().row;
 
-  scope.waitForActions(function() {
+  var task = function () {
     var record = _.extend(scope.getContextRecord(), { $fetched: false, $dirty: true });
 
     if (!data.getItemById(record.id)) {
@@ -2245,8 +2258,14 @@ Grid.prototype.commitEdit = function () {
     that.saveChanges(null, function () {
       that.cancelEdit();
       defer.resolve();
-    }, defer.reject);
-  });
+    }, defer.reject, noWait);
+  };
+
+  if (noWait) {
+    task();
+  } else {
+    scope.waitForActions(task);
+  }
 
   return promise;
 };

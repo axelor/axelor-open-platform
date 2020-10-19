@@ -740,21 +740,12 @@ ui.formItem('Button', {
         setEnable(scope.fireAction("onClick"));
       }
 
-      var doClickWrapper;
-      if (scope.grid) {
-        doClickWrapper = function() {
-          return scope.grid.commitEdit().then(doClick);
-        }
-      } else {
-        doClickWrapper = doClick;
-      }
-
       setDisabled(true);
 
       if (scope.waitForActions) {
-        return scope.waitForActions(doClickWrapper);
+        return scope.waitForActions(doClick);
       }
-      return doClickWrapper();
+      return doClick();
     });
 
     function setDisabled(disabled) {

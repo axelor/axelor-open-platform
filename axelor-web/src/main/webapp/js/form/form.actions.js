@@ -841,13 +841,18 @@ ActionHandler.prototype = {
     }
 
     if (data.validate || data.save) {
-      scope.$timeout(function () {
-        self._handleSave(!!data.validate).then(function(){
-          scope.ajaxStop(function () {
-            deferred.resolve(data.pending);
-          }, 100);
-        }, deferred.reject);
+      scope.$emit('on:before-save-action', rootScope.record);
+
+      rootScope.afterGridEdit(function () {
+        scope.$timeout(function () {
+          self._handleSave(!!data.validate).then(function () {
+            scope.ajaxStop(function () {
+              deferred.resolve(data.pending);
+            }, 100);
+          }, deferred.reject);
+        });
       });
+
       return deferred.promise;
     }
 

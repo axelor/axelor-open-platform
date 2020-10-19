@@ -755,17 +755,31 @@ function FormViewCtrl($scope, $element) {
   };
 
   $scope._gridEditCount = 0;
+  $scope._afterGridEditTasks = [];
 
-  $scope.$on('on:grid-edit-start', function() {
+  $scope.$on('on:grid-edit-start', function () {
     ++$scope._gridEditCount;
   });
 
-  $scope.$on('on:grid-edit-end', function() {
-    if (!--$scope._gridEditCount && $scope._doOnSave) {
-      $scope._doOnSave();
-      delete $scope._doOnSave;
+  $scope.$on('on:grid-edit-end', function () {
+    if (!--$scope._gridEditCount) {
+      try {
+        _.each($scope._afterGridEditTasks, function (task) {
+          task();
+        });
+      } finally {
+        $scope._afterGridEditTasks = [];
+      }
     }
   });
+
+  $scope.afterGridEdit = function (task) {
+    if ($scope._gridEditCount) {
+      $scope._afterGridEditTasks.push(task);
+    } else {
+      task();
+    }
+  };
 
   $scope.onSave = function(options) {
 
@@ -848,12 +862,7 @@ function FormViewCtrl($scope, $element) {
       }
     }
 
-    if ($scope._gridEditCount) {
-      // save when all grid editing ends
-      $scope._doOnSave = function() { waitForActions(doOnSave); };
-    } else {
-      waitForActions(doOnSave);
-    }
+    $scope.afterGridEdit(function () { waitForActions(doOnSave); });
 
     return defer.promise;
   };
