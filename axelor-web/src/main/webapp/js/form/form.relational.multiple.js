@@ -67,14 +67,21 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
   };
 
   $scope.showDetailView = function() {
+    var es;
     if (detailView == null) {
       detailView = $('<div ui-embedded-editor class="detail-form"></div>').attr('x-title', $element.attr('x-title'));
       detailView = ViewService.compile(detailView)($scope);
       detailView.data('$rel', $());
-      detailView.data('$scope').isDetailView = true;
+      es = detailView.data('$scope');
+      es.isDetailView = true;
       $element.after(detailView);
+
+      es.$on('on:before-save-action', function () {
+        es.$parent.select(_.extend(es.record, {selected: true}));
+      });
+    } else {
+      es = detailView.data('$scope');
     }
-    var es = detailView.data('$scope');
     detailView.toggle(es.visible = !es.visible);
   };
 
