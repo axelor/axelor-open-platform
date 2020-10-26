@@ -2251,6 +2251,10 @@ Grid.prototype.commitEdit = function () {
   return promise;
 };
 
+function getSelectedFlags(items) {
+  return _.map(items, function (item) { return item.selected });
+}
+
 Grid.prototype.onSelectionChanged = function(event, args) {
   var grid = this.grid;
   var activeCell = grid.getActiveCell();
@@ -2261,7 +2265,22 @@ Grid.prototype.onSelectionChanged = function(event, args) {
   }
 
   if (this.handler.onSelectionChanged) {
+    var items = this.handler.getItems();
+    var selectedFlags = getSelectedFlags(items);
+    var changedRows = [];
+
     this.handler.onSelectionChanged(event, args);
+
+    _.each(getSelectedFlags(items), function (selected, row) {
+      if (Boolean(selected) !== Boolean(selectedFlags[row])) {
+        changedRows.push(row);
+      }
+    });
+
+    if (changedRows.length) {
+      grid.invalidateRows(changedRows);
+      grid.render();
+    }
   }
   this.element.find(' > .slick-viewport > .grid-canvas > .slick-row')
     .removeClass('selected')
