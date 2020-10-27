@@ -25,7 +25,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 
 final class Translator {
 
@@ -33,31 +35,36 @@ final class Translator {
 
   private static String getTranslation(String value) {
     if (StringUtils.notBlank(value)) {
-      String key = "value:" + value;
+      String key = toValueKey(value);
       String val = I18n.get(key);
-      if (val != key) {
+      if (!Objects.equals(val, key)) {
         return val;
       }
     }
     return value;
   }
 
-  private static String toKey(String name) {
-    return String.format("$t:%s", name);
+  private static String toValueKey(String name) {
+    return "value:" + name;
   }
 
-  private static boolean isTranslatable(Mapper mapper, String field) {
+  private static String toKey(String name) {
+    return "$t:" + name;
+  }
+
+  @Nullable
+  private static Property getProperty(Mapper mapper, String field) {
     Property property = null;
     Iterator<String> names = Arrays.stream(field.split("\\.")).iterator();
     while (names.hasNext()) {
       property = mapper.getProperty(names.next());
-      if (property == null) return false;
+      if (property == null) return null;
       if (names.hasNext()) {
-        if (property.getTarget() == null) return false;
+        if (property.getTarget() == null) return null;
         mapper = Mapper.of(property.getTarget());
       }
     }
-    return property != null && property.isTranslatable();
+    return property;
   }
 
   static Map<String, Object> translate(Map<String, Object> values, Property property) {
@@ -68,40 +75,33 @@ final class Translator {
     Object value = values.get(name);
     if (value instanceof String) {
       Object val = getTranslation((String) value);
-      if (val != value) {
+      if (!Objects.equals(val, value)) {
         values.put(toKey(name), val);
       }
     }
     return values;
   }
 
-  @SuppressWarnings("all")
   static void applyTranslatables(Map<String, Object> values, Class<?> model) {
-    if (values == null || values.isEmpty()) return;
     final Mapper mapper = Mapper.of(model);
-    for (Property property : mapper.getProperties()) {
-      final String name = property.getName();
-      final Object value = values.get(name);
-      if (property.isTranslatable() && value instanceof String) {
-        translate(values, property.getName());
-      }
-      if (property.getTarget() != null && value instanceof Map) {
-        applyTranslatables((Map) value, property.getTarget());
-      }
-      if (property.getTarget() != null && value instanceof Collection) {
-        for (Object item : (Collection) value) {
-          if (item instanceof Map) {
-            applyTranslatables((Map) item, property.getTarget());
-          }
-        }
-      }
-    }
+    final Collection<String> names = values.keySet().stream().collect(Collectors.toList());
 
-    // translate dotted fields
-    values.keySet().stream()
-        .filter(name -> name.contains("."))
-        .filter(name -> isTranslatable(mapper, name))
-        .collect(Collectors.toList())
-        .forEach(name -> translate(values, name));
+    names.forEach(
+        name -> {
+          final Object value = values.get(name);
+          if (value instanceof String) {
+            final Property property = getProperty(mapper, name);
+            if (property != null && property.isTranslatable()) {
+              translate(values, name);
+            }
+          } else if (value instanceof Map) {
+            final Property property = getProperty(mapper, name);
+            if (property != null && property.getTarget() != null) {
+              @SuppressWarnings("unchecked")
+              final Map<String, Object> map = (Map<String, Object>) value;
+              applyTranslatables(map, property.getTarget());
+            }
+          }
+        });
   }
 }
