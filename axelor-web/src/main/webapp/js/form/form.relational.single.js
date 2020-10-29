@@ -104,12 +104,19 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
           id: value.id,
           $version: value.version || value.$version
         });
-        var trKey = '$t:' + nameField;
-        if (trKey in value) {
-          record[trKey] = value[trKey];
+        var trKey = ui.getNestedTrKey(nameField);
+        var nameValue = ui.findNested(rec, trKey);
+        if (nameValue !== undefined) {
+          ui.setNested(record, trKey, nameValue);
+        } else {
+          nameValue = ui.findNested(value, trKey);
+          if (nameValue !== undefined) {
+            ui.setNested(record, trKey, nameValue);
+          }
         }
-        if (nameField in rec) {
-          record[nameField] = rec[nameField];
+        nameValue = ui.findNested(rec, nameField);
+        if (nameValue !== undefined) {
+          ui.setNested(record, nameField, nameValue);
         }
         _.each(missing, function(name) {
           var value = ui.findNested(rec, name);
@@ -128,7 +135,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
     }
 
     var nameField = $scope.field.targetName || 'id';
-    var trKey = '$t:' + nameField;
+    var trKey = ui.getNestedTrKey(nameField);
     var record = value;
 
     if (value && value.id) {
@@ -141,8 +148,9 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
         return !value || ui.findNested(value, name) === undefined;
       });
 
-      if (value[trKey] !== undefined) {
-        record[trKey] = value[trKey];
+      var nameValue = ui.findNested(value, trKey);
+      if (nameValue !== undefined) {
+        ui.setNested(record, trKey, nameValue);
       }
 
       if (value[nameField] !== undefined) {
@@ -292,9 +300,9 @@ ui.formInput('ManyToOne', 'Select', {
 
     scope.formatItem = function(item) {
       if (item) {
-        var trKey = "$t:" + scope.field.targetName;
+        var trKey = ui.getNestedTrKey(scope.field.targetName);
         var key = scope.field.targetName || "id";
-        return item[trKey] || item[key] || ui.findNested(item, key);
+        return ui.findNested(item, trKey) || ui.findNested(item, key);
       }
       return "";
     };

@@ -91,6 +91,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -1348,6 +1349,9 @@ public class Resource<T extends Model> {
         if (child != null) {
           result.put(name, child);
         }
+        Optional.ofNullable(mapper.getProperty(name))
+            .filter(Property::isTranslatable)
+            .ifPresent(property -> Translator.translate(result, property));
       }
       return result;
     }

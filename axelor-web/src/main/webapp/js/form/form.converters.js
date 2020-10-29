@@ -125,6 +125,12 @@
     return record;
   }
 
+  function getNestedTrKey(nameField) {
+    var names = nameField.split('.');
+    names.push('$t:' + names.pop());
+    return names.join('.');
+  }
+
   // override angular.js currency filter
   var currencySymbolToCode = {
       '$': 'USD',
@@ -224,6 +230,7 @@
   ui.findNested = findNested;
   ui.setNested = setNested;
   ui.canSetNested = canSetNested;
+  ui.getNestedTrKey = getNestedTrKey;
 
   var mm = moment().clone();
   mm.locale(getBrowserLocale());

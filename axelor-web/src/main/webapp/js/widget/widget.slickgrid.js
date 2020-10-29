@@ -88,17 +88,13 @@ function dotToNested(record, field) {
     return;
   }
 
-  var name = field.name;
-  var value = record[name];
-  var names = name.split('.');
-  var first = names.shift();
-  var last = names.pop();
-  var obj = record[first] || (record[first] = {});
-  while (names.length) {
-    var next = names.shift();
-    obj = obj[next] || (obj[next] = {});
+  ui.setNested(record, field.name, record[field.name]);
+
+  var trValue = record['$t:' + field.name];
+  if (trValue !== undefined) {
+    ui.setNested(record, ui.getNestedTrKey(field.name), trValue);
   }
-  obj[last] = value;
+
   return record;
 }
 
