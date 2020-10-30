@@ -251,7 +251,7 @@ function getShell(scope, textElement) {
               title: _t('Submit'),
               image: '\uf00c'
           },
-          selectImage: _t('Click or drop image'),
+          selectImage: _t('Select image'),
           placeholderUrl: 'www.example.com',
           maxImageSize: [600, 200],
     hijackContextmenu: false,
