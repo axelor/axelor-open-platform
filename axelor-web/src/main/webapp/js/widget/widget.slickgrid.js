@@ -2028,9 +2028,9 @@ Grid.prototype.showEditor = function (activeCell) {
       }
       if (e.keyCode !== 9) return;
       if (e.shiftKey) {
-      form.find('.form-item-container :input').last().focus().select();
+        cancel.focus();
       } else {
-      cancel.focus();
+        form.find('.form-item-container :input').first().focus().select();
       }
       e.stopPropagation();
       e.preventDefault();
@@ -2039,9 +2039,9 @@ Grid.prototype.showEditor = function (activeCell) {
     cancel.keydown(function (e) {
       if (e.keyCode !== 9) return;
       if (e.shiftKey) {
-      confirm.focus();
+        form.find('.form-item-container :input').last().focus().select();
       } else {
-        form.find('.form-item-container :input').first().focus().select();
+        confirm.focus();
       }
       e.stopPropagation();
       e.preventDefault();
@@ -2049,7 +2049,7 @@ Grid.prototype.showEditor = function (activeCell) {
     });
     form.on('keydown', '.form-item-container :input:first', function (e) {
       if (e.keyCode === 9 && e.shiftKey) {
-        cancel.focus();
+        confirm.focus();
         e.stopPropagation();
         e.preventDefault();
         return false;
@@ -2057,7 +2057,7 @@ Grid.prototype.showEditor = function (activeCell) {
     });
     form.on('keydown', '.form-item-container :input:last', function (e) {
       if (e.keyCode === 9 && !e.shiftKey) {
-        confirm.focus();
+        cancel.focus();
         e.stopPropagation();
         e.preventDefault();
         return false;
@@ -2065,7 +2065,7 @@ Grid.prototype.showEditor = function (activeCell) {
     });
 
     $("<div class='slick-form-buttons'>")
-      .append([confirm, cancel])
+      .append([cancel, confirm])
       .appendTo($("<div class='slick-form-buttons-wrapper'>").appendTo(form));
 
     form.on('focus', '.form-item-container :input', function (e) {
