@@ -202,9 +202,9 @@ var EmbeddedEditor = {
       '<div ui-view-form x-handler="this"></div>'+
       '<div class="btn-toolbar pull-right">'+
         '<button type="button" class="btn btn btn-info" ng-click="onClose()" ng-show="isReadonly()"><span x-translate>Back</span></button> '+
-        '<button type="button" class="btn btn-primary" ng-click="onOK()" ng-show="!isReadonly() && canUpdate()"><span x-translate>OK</span></button>'+
-        '<button type="button" class="btn btn-primary" ng-click="onAdd()" ng-show="!isReadonly() && !canUpdate()"><span x-translate>Add</span></button> '+
         '<button type="button" class="btn btn-danger" ng-click="onClose()" ng-show="!isReadonly()"><span x-translate>Cancel</span></button> '+
+        '<button type="button" class="btn btn-primary" ng-click="onAdd()" ng-show="!isReadonly() && !canUpdate()"><span x-translate>Add</span></button> '+
+        '<button type="button" class="btn btn-primary" ng-click="onOK()" ng-show="!isReadonly() && canUpdate()"><span x-translate>OK</span></button>'+
       '</div>'+
     '</fieldset>'
 };
