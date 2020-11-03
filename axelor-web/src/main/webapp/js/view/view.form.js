@@ -1589,6 +1589,12 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
           .effect('pulsate', { times: 3 }, 600);
       }
     });
+
+    scope.$on('refresh-tab', function () {
+      scope.waitForActions(function () {
+        scope.reloadTab(scope.selectedTab);
+      });
+    });
   };
 }]);
 
