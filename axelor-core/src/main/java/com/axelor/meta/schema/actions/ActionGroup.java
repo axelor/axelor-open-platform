@@ -33,11 +33,15 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -342,14 +346,26 @@ public class ActionGroup extends ActionResumable {
     if (value == null || value instanceof ContextEntity) return;
 
     Object values = value.get("values");
-    Map<String, Object> map = Maps.newHashMap();
+    final Map<String, Object> map;
 
     if (values instanceof ContextEntity) {
       map = ((ContextEntity) values).getContextMap();
     } else if (values instanceof Model) {
       map = Mapper.toMap(value);
     } else if (values instanceof Map) {
-      map = Maps.newHashMap((Map) values);
+      map =
+          ((Map<String, Object>) values)
+              .entrySet().stream()
+                  .map(
+                      entry ->
+                          new SimpleImmutableEntry<>(
+                              entry.getKey().startsWith("$")
+                                  ? entry.getKey().substring(1)
+                                  : entry.getKey(),
+                              entry.getValue()))
+                  .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+    } else {
+      map = new HashMap<>();
     }
 
     values = value.get("attrs");
