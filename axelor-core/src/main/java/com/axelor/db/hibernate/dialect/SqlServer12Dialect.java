@@ -17,22 +17,24 @@
  */
 package com.axelor.db.hibernate.dialect;
 
+import com.axelor.db.hibernate.dialect.unique.SqlServer2008UniqueDelegate;
 import com.axelor.db.hibernate.type.EncryptedTextType;
 import com.axelor.db.hibernate.type.JsonTextSqlTypeDescriptor;
 import com.axelor.db.hibernate.type.JsonType;
 import org.hibernate.boot.model.TypeContributions;
-import org.hibernate.dialect.Oracle12cDialect;
-import org.hibernate.dialect.SQLServer2008Dialect;
 import org.hibernate.dialect.SQLServer2012Dialect;
+import org.hibernate.dialect.unique.InformixUniqueDelegate;
+import org.hibernate.dialect.unique.UniqueDelegate;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
-import java.sql.Types;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class SqlServer12Dialect extends SQLServer2012Dialect {
+
+  private final UniqueDelegate uniqueDelegate;
 
   static class JsonValueFunction extends AbstractJsonExtractFunction {
 
@@ -48,6 +50,11 @@ public class SqlServer12Dialect extends SQLServer2012Dialect {
     }
   }
 
+  @Override
+  public UniqueDelegate getUniqueDelegate() {
+    return uniqueDelegate;
+  }
+
   public SqlServer12Dialect() {
     super();
 
@@ -59,6 +66,7 @@ public class SqlServer12Dialect extends SQLServer2012Dialect {
         "json_extract_integer", new JsonValueFunction(StandardBasicTypes.INTEGER, "bigint"));
     registerFunction(
         "json_extract_decimal", new JsonValueFunction(StandardBasicTypes.BIG_DECIMAL, "numeric(28,12)"));
+    uniqueDelegate = new SqlServer2008UniqueDelegate( this );
   }
 
   @Override

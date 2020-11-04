@@ -20,6 +20,7 @@ package com.axelor.team.web;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.db.JpaSupport;
+import com.axelor.db.internal.DBHelper;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
@@ -61,8 +62,14 @@ public class TaskController extends JpaSupport {
       return 0L;
     }
 
-    final String countString =
+    String countString =
         queryString.replace("SELECT tt FROM TeamTask tt", "SELECT COUNT(tt.id) FROM TeamTask tt");
+
+    if (DBHelper.isMsSQL()){
+      countString =
+              countString.replace("current_date", "CONVERT(DATE, GETDATE())");
+    }
+
 
     final TypedQuery<Long> query = getEntityManager().createQuery(countString, Long.class);
 

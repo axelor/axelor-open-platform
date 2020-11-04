@@ -57,6 +57,15 @@ public class CustomDialectResolver extends StandardDialectResolver {
       }
       log.error("MySQL 5.7 or later is required.");
     }
+
+    if ("Microsoft SQL Server".equals(databaseName)) {
+      //if (majorVersion >= 11 ) {
+        return new SqlServer12Dialect();
+      //}
+      //log.error("Microsoft SQL Server 12 or later is required.");
+    }
+
+
     log.error("{} {}.{} is not suppported.", databaseName, majorVersion, minorVersion);
     return null;
   }

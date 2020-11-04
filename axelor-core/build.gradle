@@ -29,6 +29,7 @@ dependencies {
   testImplementation libs.jdbc_hsqldb
   implementation libs.jdbc_postgres
   implementation libs.jdbc_mysql
+  implementation libs.jdbc_mssql
   api libs.hibernate
   implementation libs.hibernate_search
 

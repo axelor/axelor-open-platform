@@ -110,6 +110,9 @@ public interface AvailableAppSettings {
       "hibernate.search.default.directory_provider";
   String HIBERNATE_SEARCH_DEFAULT_INDEX_BASE = "hibernate.search.default.indexBase";
 
+
+  String HIBERNATE_CONNECTION_ISOLATION = "hibernate.connection.isolation";
+
   String HIBERNATE_HIKARI_MINIMUN_IDLE = "hibernate.hikari.minimumIdle";
   String HIBERNATE_HIKARI_MAXIMUN_POOL_SIZE = "hibernate.hikari.maximumPoolSize";
   String HIBERNATE_HIKARI_IDLE_TIMEOUT = "hibernate.hikari.idleTimeout";

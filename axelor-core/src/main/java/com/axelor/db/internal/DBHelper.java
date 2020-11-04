@@ -226,6 +226,11 @@ public class DBHelper {
     return jdbcDriver != null && jdbcDriver.contains("mysql");
   }
 
+  /** Whether using ms sql server database. */
+  public static boolean isMsSQL() {
+    return jdbcDriver != null && jdbcDriver.contains("SQLServer");
+  }
+
   /**
    * Get the jdbc batch size configured with <code>hibernate.jdbc.batch_size</code> property.
    *

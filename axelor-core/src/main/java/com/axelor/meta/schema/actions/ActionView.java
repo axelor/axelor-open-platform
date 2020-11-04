@@ -19,6 +19,7 @@ package com.axelor.meta.schema.actions;
 
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.db.internal.DBHelper;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.axelor.rpc.ActionResponse;
@@ -219,6 +220,11 @@ public class ActionView extends Action {
     if (domain != null
         && (domain.contains("$") || (domain.startsWith("#{") && domain.endsWith("}")))) {
       domain = handler.evaluate(toExpression(domain, true)).toString();
+    }
+    if (domain != null
+            && DBHelper.isMsSQL()){
+      domain = domain.replace("current_date", "CONVERT(DATE, GETDATE())");
+      domain = domain.replace("CURRENT_DATE", "CONVERT(DATE, GETDATE())");
     }
 
     String title = this.getLocalizedTitle();
