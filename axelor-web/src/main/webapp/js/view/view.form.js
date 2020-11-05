@@ -1178,7 +1178,7 @@ function FormViewCtrl($scope, $element) {
         return ($scope.record || {}).$processInstanceId;
       }
     }, {
-      title: _t('Show workflow...'),
+      title: _t('Display process'),
       visible: function () {
         return ($scope.record || {}).$processInstanceId;
       },
