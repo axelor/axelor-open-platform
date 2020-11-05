@@ -433,6 +433,10 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
       criteria: [criterion]
     };
 
+    var context = _.pick($scope.getContext(), ['id', '_model']);
+    context._field = $scope.field.name;
+    context._field_ids = ids;
+
     $scope.selection = [];
     $scope._dataSource.search({
       filter: filter,
@@ -441,7 +445,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
       archived: true,
       limit: -1,
       domain: null,
-      context: null
+      context: context
     });
   };
 
