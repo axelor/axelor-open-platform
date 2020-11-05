@@ -34,6 +34,7 @@ public class MailBuilderTest extends AbstractMailTest {
   @Override
   @Before
   public void startServer() {
+    super.startServer();
     if (sender == null) {
       sender = new MailSender(SMTP_ACCOUNT);
     }

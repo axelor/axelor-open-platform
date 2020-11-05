@@ -78,7 +78,7 @@ libs.javax_servlet_jsp = "javax.servlet.jsp:javax.servlet.jsp-api:2.3.1"
 libs.javax_validation = "javax.validation:validation-api:1.1.0.Final"
 libs.javax_el = ["org.apache.tomcat:tomcat-jasper:${versions.tomcat}", "org.apache.tomcat:tomcat-el-api:${versions.tomcat}"]
 libs.javax_mail = ["com.sun.mail:javax.mail:1.5.6"]
-libs.greenmail = "com.icegreen:greenmail:1.5.3"
+libs.greenmail = "com.icegreen:greenmail:1.6.0"
 
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.3.4"
