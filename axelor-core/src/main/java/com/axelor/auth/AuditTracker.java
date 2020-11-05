@@ -328,10 +328,7 @@ final class AuditTracker {
     }
 
     if (msg == null) {
-      msg =
-          previousState == null
-              ? /* $$( */ "Record created" /* ) */
-              : /* $$( */ "Record updated" /* ) */;
+      msg = previousState == null ? /*$$(*/ "Record created" /*)*/ : /*$$(*/ "Record updated" /*)*/;
     }
 
     final Map<String, Object> json = new HashMap<>();

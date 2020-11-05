@@ -43,7 +43,7 @@ public class JobController {
       CronExpression.validateExpression(cronExpression);
 
       response.setNotify(
-          I18n.get("Valid cron. Next execution dates are :")
+          I18n.get("Valid cron. Next execution dates are:")
               + "<br/>"
               + getNextSchedule(cronExpression).stream()
                   .map(this::format)
