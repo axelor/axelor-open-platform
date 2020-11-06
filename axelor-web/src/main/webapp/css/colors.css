@@ -234,9 +234,6 @@ input, button, textarea, select, fieldset, pre {
 .tag-select .label {
   border-radius: 8px;
 }
-.tag-select .picker-icons > i.fa {
-  padding-top: 3px;
-}
 .tag-select .label {
     background-color: #0275d8;
 }

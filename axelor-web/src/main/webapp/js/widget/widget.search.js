@@ -616,6 +616,10 @@ function FilterFormCtrl($scope, $element, ViewService) {
     }
   });
 
+  $scope.$on('on:apply-filter', function (e, hide) {
+    $scope.applyFilter(hide);
+  });
+
   $scope.$on('on:clear-filter', function (e, options) {
     $scope.clearFilter(options);
   });
@@ -1068,7 +1072,11 @@ ui.directive('uiFilterBox', function() {
         if (this.custTerm) {
           return this.onFreeSearch();
         }
-        handler.onRefresh();
+        $scope.$broadcast('on:apply-filter', true);
+      };
+
+      $scope.onReset = function() {
+        $scope.$broadcast('on:clear-filter-silent');
       };
 
       $scope.hasFilters = function(which) {
@@ -1551,6 +1559,7 @@ ui.directive('uiFilterBox', function() {
         "</ul>" +
         "<span class='picker-icons'>" +
         "<i ng-click='onSearch($event)' class='fa fa-caret-down'></i>"+
+        "<i ng-click='onReset()' class='fa fa-eraser'></i>" +
         "<i ng-click='onRefresh()' class='fa fa-search'></i>" +
         "</span>" +
       "</div>" +
