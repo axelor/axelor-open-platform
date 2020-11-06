@@ -931,6 +931,7 @@ img.prefix-icon {
 
 .keyboard-shortcuts td.keys {
   padding-right: 16px;
+  white-space: nowrap;
 }
 
 /* single tab view mode */
