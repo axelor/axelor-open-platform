@@ -67,6 +67,13 @@ ui.formInput('JsonField', 'String', {
           return;
         }
         var condition = "($record." + item.contextField + ".id === " + item.contextFieldValue + ")";
+
+        if (item.required || item.requiredIf) {
+          item.requiredIf = item.requiredIf
+            ? condition + " && (" + item.requiredIf + ")"
+            : condition;
+        }
+
         if (item.showIf) condition += " && (" + item.showIf + ")";
         if (item.hideIf) condition += " && !(" + item.hideIf + ")";
         item.showIf = condition;
