@@ -1215,6 +1215,9 @@ function FormViewCtrl($scope, $element) {
       }
       focusFirst();
     }
+    if (action === "delete" && $scope.canDelete()) {
+      $scope.onDelete();
+    }
     if (action === "select") {
       focusFirst();
     }
@@ -1226,6 +1229,13 @@ function FormViewCtrl($scope, $element) {
     }
     if (action === "search") {
       $scope.onBack();
+      $scope.waitForActions(function () {
+        var filterBox = $('.filter-box :input:visible');
+        if (filterBox.length) {
+          filterBox.focus().select();
+          return false;
+        }
+      }, 300);
     }
 
     $scope.$applyAsync();

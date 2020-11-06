@@ -175,6 +175,7 @@ String tenantId = (String) session.getAttribute("tenantId");
                   </li>
                   <% } %>
                   <li class="divider"></li>
+                  <li><a href="#" ng-click="showShortcuts()"><span x-translate>Shortcuts</span></a></li>
                   <li><a href="#/about"><span x-translate>About</span></a></li>
                   <li><a href="logout"><span x-translate>Log out</span></a></li>
                 </ul>

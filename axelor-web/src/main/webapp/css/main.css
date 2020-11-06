@@ -912,6 +912,26 @@ img.prefix-icon {
   text-align: left;
 }
 
+.keyboard-shortcuts kbd {
+  display: inline-block;
+  font-size: 10px;
+  background: #fafafa;
+  border: 1px solid #c1c1c1;
+  border-radius: 3px;
+  box-shadow: 0 1px 0 #c1c1c1, inset 0 0 0 0.1em #fff;
+  padding: 0 8px;
+  vertical-align: text-bottom;
+  white-space: nowrap;
+  font-family: monospace;
+}
+
+.keyboard-shortcuts td {
+  padding: 4px;
+}
+
+.keyboard-shortcuts td.keys {
+  padding-right: 16px;
+}
 
 /* single tab view mode */
 .view-tabs-single,

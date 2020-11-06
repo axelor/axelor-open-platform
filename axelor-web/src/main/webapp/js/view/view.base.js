@@ -774,17 +774,20 @@ ui.directive('uiHotKeys', function() {
     69: 'edit',		// e
     83: 'save',		// s
     68: 'delete',	// d
-    82: 'refresh',	// r
-    70: 'search',	// f
-    71: 'select',	// g
+    82: 'refresh',// r
     74: 'prev',		// j
-    75:	'next',		// n
+    75:	'next',		// k
 
-    77: 'focus-menu',		// m
-     120: 'toggle-menu',		// F9
+    77: 'focus-menu',		  // m
+    120: 'toggle-menu',		// F9
 
     81: 'close'		// q
   };
+
+  var altKeys = {
+    70: 'search', // f
+    71: 'select', // g
+  }
 
   return function(scope, element, attrs) {
 
@@ -802,27 +805,23 @@ ui.directive('uiHotKeys', function() {
         return false;
       }
 
-      var action = keys[e.which];
+      var action = null;
+      
+      if (e.ctrlKey || e.which === 120) action = keys[e.which];
+      if (e.altKey) action = altKeys[e.which];
+      if (e.altKey && e.ctrlKey) action = null;
+
+      if (!action) {
+        return;
+      }
 
       if (action === "toggle-menu") {
         $('#offcanvas-toggle a').click();
         return false;
       }
-
-      if (e.altKey || e.shiftKey || !e.ctrlKey) {
-        return;
-      }
-
+      
       if (action === "focus-menu") {
-        var activeMenu = $('.sidebar .nav-tree li.active');
-        if (activeMenu.length === 0) {
-          activeMenu = $('.sidebar .nav-tree li:first');
-        }
-
-        var navTree = activeMenu.parents('[nav-tree]:first');
-        if (navTree.length) {
-          navTree.navtree('selectItem', activeMenu);
-        }
+        $('.sidebar .nav-search-toggle > i').click();
         return false;
       }
 
@@ -834,7 +833,7 @@ ui.directive('uiHotKeys', function() {
         vs = dlg.scope();
       }
 
-      if (!vs || !keys.hasOwnProperty(e.which)) {
+      if (!vs) {
         return;
       }
 
@@ -846,7 +845,7 @@ ui.directive('uiHotKeys', function() {
       }
 
       if (action === "search") {
-        var filterBox = $('.filter-box .search-query:visible');
+        var filterBox = $('.filter-box :input:visible');
         if (filterBox.length) {
           filterBox.focus().select();
           return false;
