@@ -770,23 +770,24 @@ ui.directive('uiViewSwitcherMenu', function(){
 ui.directive('uiHotKeys', function() {
 
   var keys = {
-    45: 'new',		// insert
-    69: 'edit',		// e
-    83: 'save',		// s
-    68: 'delete',	// d
-    82: 'refresh',// r
-    74: 'prev',		// j
-    75:	'next',		// k
-
-    77: 'focus-menu',		  // m
-    120: 'toggle-menu',		// F9
-
-    81: 'close'		// q
-  };
-
-  var altKeys = {
-    70: 'search', // f
-    71: 'select', // g
+    '': {
+      120: 'toggle-menu'// F9
+    },
+    'ctrl': {
+      45: 'new',        // insert
+      69: 'edit',       // e
+      83: 'save',       // s
+      68: 'delete',     // d
+      82: 'refresh',    // r
+      74: 'prev',       // j
+      75: 'next',       // k
+      77: 'focus-menu', // m
+      81: 'close'       // q
+    },
+    'alt': {
+      70: 'search',     // f
+      71: 'select',     // g
+    }
   }
 
   return function(scope, element, attrs) {
@@ -805,11 +806,22 @@ ui.directive('uiHotKeys', function() {
         return false;
       }
 
-      var action = null;
-      
-      if (e.ctrlKey || e.which === 120) action = keys[e.which];
-      if (e.altKey) action = altKeys[e.which];
-      if (e.altKey && e.ctrlKey) action = null;
+      // no shortcuts defined with shift or meta modifiers
+      if (e.shiftKey || e.metaKey) {
+        return;
+      }
+
+      var modifierKeys = '';
+
+      if (e.ctrlKey) {
+        modifierKeys += 'ctrl';
+      }
+
+      if (e.altKey) {
+        modifierKeys += 'alt';
+      }
+
+      var action = (keys[modifierKeys] || {})[e.which];
 
       if (!action) {
         return;
@@ -819,7 +831,7 @@ ui.directive('uiHotKeys', function() {
         $('#offcanvas-toggle a').click();
         return false;
       }
-      
+
       if (action === "focus-menu") {
         $('.sidebar .nav-search-toggle > i').click();
         return false;
