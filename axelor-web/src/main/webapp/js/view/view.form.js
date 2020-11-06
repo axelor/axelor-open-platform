@@ -1470,10 +1470,18 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
         return;
       }
 
+      var record = scope.record;
+      var dataSource = scope._dataSource;
+
+      if (field.serverType === 'many-to-one' || field.serverType === 'one-to-one') {
+        record = fieldScope.getValue();
+        dataSource = fieldScope._dataSource;
+      }
+
       return {
         tooltip: field.tooltip,
-        record: scope.record,
-        dataSource: scope._dataSource
+        record: record,
+        dataSource: dataSource
       };
     };
 
