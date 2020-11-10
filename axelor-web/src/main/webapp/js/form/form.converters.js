@@ -126,6 +126,9 @@
   }
 
   function getNestedTrKey(nameField) {
+    if (!nameField) {
+      return undefined;
+    }
     var names = nameField.split('.');
     names.push('$t:' + names.pop());
     return names.join('.');
