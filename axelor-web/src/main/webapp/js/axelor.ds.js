@@ -671,6 +671,7 @@
       }
 
       function updateFields(fetched) {
+        fetched = fetched || {};
         return FIELDS.get(model).then(function (current) {
           current = current || {};
           if (current !== fetched.fields) {
@@ -737,7 +738,7 @@
           if (pending) {
             pending.then(clear, clear);
             pending.then(function (response) {
-              resolve((response.data || {}).data);
+              resolve((response && response.data || {}).data);
             });
             return promise;
           }
