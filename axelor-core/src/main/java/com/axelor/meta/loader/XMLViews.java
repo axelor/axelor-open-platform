@@ -623,10 +623,11 @@ public class XMLViews {
     }
 
     private TypedQuery<MetaView> findForCompute(Collection<String> names, boolean update) {
+      final boolean namesEmpty = ObjectUtils.isEmpty(names);
       return JPA.em()
           .createQuery(
               "SELECT self FROM MetaView self LEFT JOIN self.groups viewGroup WHERE "
-                  + "(self.name IN :names "
+                  + "((self.name IN :names OR :namesEmpty = TRUE) "
                   + "AND (:update = TRUE OR NOT EXISTS ("
                   + "SELECT computedView FROM MetaView computedView "
                   + "WHERE computedView.name = self.name AND computedView.computed = TRUE))) "
@@ -643,7 +644,8 @@ public class XMLViews {
                   + "ORDER BY self.id",
               MetaView.class)
           .setParameter("update", update)
-          .setParameter("names", names.isEmpty() ? ImmutableSet.of("") : names);
+          .setParameter("names", namesEmpty ? ImmutableSet.of("") : names)
+          .setParameter("namesEmpty", namesEmpty);
     }
 
     @Transactional(rollbackOn = Exception.class)
@@ -1248,13 +1250,9 @@ public class XMLViews {
 
     @Transactional
     public long generate(Collection<String> names, boolean update) {
-      if (ObjectUtils.isEmpty(names)) {
-        return 0L;
-      }
-
       final long count = generate(findForCompute(names, update));
 
-      if (count == 0L) {
+      if (count == 0L && ObjectUtils.notEmpty(names)) {
         metaViewRepo
             .all()
             .filter("self.name IN :names AND self.computed = TRUE")
