@@ -2936,7 +2936,10 @@
         </xsd:attribute>
         <xsd:attribute name="action" type="xsd:string">
           <xsd:annotation>
-            <xsd:documentation>An action-record to be executed on confimation.</xsd:documentation>
+            <xsd:documentation>
+            An action to be executed on error or alert message to make corrective measures, when
+            error dialog is closed or alert dialog is canceled.
+            </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>
