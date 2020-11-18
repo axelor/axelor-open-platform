@@ -174,6 +174,9 @@ public class Field extends SimpleWidget {
   @XmlAttribute(name = "x-accept")
   private String accept;
 
+  @XmlAttribute(name = "x-popup-maximized")
+  private String popupMaximized;
+
   @XmlAttribute(name = "x-json-model")
   private String jsonModel;
 
@@ -557,6 +560,14 @@ public class Field extends SimpleWidget {
 
   public void setAccept(String accept) {
     this.accept = accept;
+  }
+
+  public String getPopupMaximized() {
+    return popupMaximized;
+  }
+
+  public void setPopupMaximized(String popupMaximized) {
+    this.popupMaximized = popupMaximized;
   }
 
   public String getJsonModel() {

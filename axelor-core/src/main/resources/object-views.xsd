@@ -954,6 +954,20 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-popup-maximized">
+      <xsd:annotation>
+        <xsd:documentation>
+        Specify whether to open the popup as maximized.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="all" />
+          <xsd:enumeration value="editor" />
+          <xsd:enumeration value="selector" />
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:attributeGroup name="ObjectViewAttributes">
