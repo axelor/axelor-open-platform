@@ -1273,6 +1273,7 @@ label.has-help > span:after,
 .tag-select .label.lightgreen,
 .tag-select-list-item.lightgreen > a > span {
   background: #8bc34a;
+  color: rgba(0, 0, 0, 0.8);
 }
 
 .tag-select .label.lime,
@@ -1312,6 +1313,7 @@ label.has-help > span:after,
 .tag-select .label.grey,
 .tag-select-list-item.grey > a > span {
   background: #9e9e9e;
+  color: rgba(0, 0, 0, 0.8);
 }
 
 .tag-select .label.bluegrey,

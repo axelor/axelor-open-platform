@@ -202,7 +202,7 @@
 .hilite-lightblue input:first-of-type,
 .hilite-lightblue textarea:first-of-type,
 .hilite-lightblue .slick-cell {
-  color: #000 !important;
+  color: #fff !important;
   background-color: #03a9f4 !important;
 }
 
@@ -216,7 +216,7 @@
 .hilite-cyan input:first-of-type,
 .hilite-cyan textarea:first-of-type,
 .hilite-cyan .slick-cell {
-  color: #000 !important;
+  color: #fff !important;
   background-color: #00bcd4 !important;
 }
 
@@ -244,7 +244,7 @@
 .hilite-green input:first-of-type,
 .hilite-green textarea:first-of-type,
 .hilite-green .slick-cell {
-  color: #000 !important;
+  color: #fff !important;
   background-color: #4caf50 !important;
 }
 
@@ -328,7 +328,7 @@
 .hilite-deeporange input:first-of-type,
 .hilite-deeporange textarea:first-of-type,
 .hilite-deeporange .slick-cell {
-  color: #000 !important;
+  color: #fff !important;
   background-color: #ff5722 !important;
 }
 
