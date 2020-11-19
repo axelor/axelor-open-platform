@@ -553,6 +553,7 @@
       <xsd:enumeration value="deeporange" />
       <xsd:enumeration value="brown" />
       <xsd:enumeration value="grey" />
+      <xsd:enumeration value="bluegrey" />
       <xsd:enumeration value="black" />
       <xsd:enumeration value="white" />
       <xsd:enumeration value="olive" />
