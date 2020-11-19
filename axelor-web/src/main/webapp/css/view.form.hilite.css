@@ -18,9 +18,10 @@
 [class*=hilite-] > .display-text {
   color: inherit;
 }
-[class*=hilite-] .strong,
-[class*=hilite-] .strong input:first-of-type,
-[class*=hilite-] .strong textarea:first-of-type {
+
+[class*=hilite-].strong,
+[class*=hilite-].strong input:first-of-type,
+[class*=hilite-].strong textarea:first-of-type {
   font-weight: 600 !important;
 }
 

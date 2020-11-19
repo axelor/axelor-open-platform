@@ -127,16 +127,15 @@ $label_backgrounds_text: (
   "primary": #fff,
 );
 
-[class*="hilite-"] {
-  > .display-text {
-    color: inherit;
-  }
-  .strong {
-    &,
-    input:first-of-type,
-    textarea:first-of-type {
-      font-weight: 600 !important;
-    }
+[class*="hilite-"] > .display-text {
+  color: inherit;
+}
+
+[class*="hilite-"].strong {
+  &,
+  input:first-of-type,
+  textarea:first-of-type {
+    font-weight: 600 !important;
   }
 }
 
