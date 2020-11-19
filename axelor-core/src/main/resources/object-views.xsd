@@ -533,26 +533,35 @@
     </xsd:complexContent>
   </xsd:complexType>
 
+  <xsd:simpleType name="ColorNameStyle">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="red" />
+      <xsd:enumeration value="pink" />
+      <xsd:enumeration value="purple" />
+      <xsd:enumeration value="deeppurple" />
+      <xsd:enumeration value="indigo" />
+      <xsd:enumeration value="blue" />
+      <xsd:enumeration value="lightblue" />
+      <xsd:enumeration value="cyan" />
+      <xsd:enumeration value="teal" />
+      <xsd:enumeration value="green" />
+      <xsd:enumeration value="lightgreen" />
+      <xsd:enumeration value="lime" />
+      <xsd:enumeration value="yellow" />
+      <xsd:enumeration value="amber" />
+      <xsd:enumeration value="orange" />
+      <xsd:enumeration value="deeporange" />
+      <xsd:enumeration value="brown" />
+      <xsd:enumeration value="grey" />
+      <xsd:enumeration value="black" />
+      <xsd:enumeration value="white" />
+      <xsd:enumeration value="olive" />
+      <xsd:enumeration value="violet" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
   <xsd:simpleType name="ColorStyle">
-    <xsd:union>
-      <xsd:simpleType>
-        <xsd:restriction base="xsd:string">
-          <xsd:enumeration value="green" />
-          <xsd:enumeration value="blue" />
-          <xsd:enumeration value="red" />
-          <xsd:enumeration value="yellow" />
-          <xsd:enumeration value="pink" />
-          <xsd:enumeration value="orange" />
-          <xsd:enumeration value="olive" />
-          <xsd:enumeration value="purple" />
-          <xsd:enumeration value="violet" />
-          <xsd:enumeration value="teal" />
-          <xsd:enumeration value="brown" />
-          <xsd:enumeration value="grey" />
-          <xsd:enumeration value="white" />
-          <xsd:enumeration value="black" />
-        </xsd:restriction>
-      </xsd:simpleType>
+    <xsd:union memberTypes="tns:ColorNameStyle">
       <xsd:simpleType>
         <xsd:restriction base="xsd:string">
           <xsd:pattern value="#[\dA-Fa-f]{6}([\dA-Fa-f][\dA-Fa-f])?"></xsd:pattern>
@@ -562,14 +571,18 @@
   </xsd:simpleType>
 
   <xsd:simpleType name="HiliteStyle">
-    <xsd:restriction base="xsd:string">
-      <xsd:enumeration value="default"/>
-      <xsd:enumeration value="primary"/>
-      <xsd:enumeration value="warning"/>
-      <xsd:enumeration value="success"/>
-      <xsd:enumeration value="danger"/>
-      <xsd:enumeration value="info"/>
-    </xsd:restriction>
+    <xsd:union memberTypes="tns:ColorNameStyle">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="default"/>
+          <xsd:enumeration value="primary"/>
+          <xsd:enumeration value="warning"/>
+          <xsd:enumeration value="success"/>
+          <xsd:enumeration value="danger"/>
+          <xsd:enumeration value="info"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:union>
   </xsd:simpleType>
 
   <xsd:simpleType name="LabelStyle">
