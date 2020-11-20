@@ -1044,7 +1044,9 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
           unwatch();
           model.$setViewValue(scope.items);
         }
-        item.$changed = true;
+        if (!scope._dataSource.equals(item, old)) {
+          item.$changed = true;
+        }
       }, true);
     };
 
@@ -1094,7 +1096,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
         return;
       }
       if (canAdd()) {
-        items.push({});
+        items.push(showOnNew && !items.length ? {} : { $changed: true });
       }
     };
 
