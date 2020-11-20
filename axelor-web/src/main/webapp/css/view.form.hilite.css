@@ -27,7 +27,8 @@
 
 .hilite-primary-text,
 .hilite-primary-text input:first-of-type,
-.hilite-primary-text textarea:first-of-type {
+.hilite-primary-text textarea:first-of-type,
+.hilite-primary-text .slick-cell {
   color: #428bca !important;
 }
 
@@ -35,13 +36,14 @@
 .hilite-primary input:first-of-type,
 .hilite-primary textarea:first-of-type,
 .hilite-primary .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #428bca !important;
 }
 
 .hilite-warning-text,
 .hilite-warning-text input:first-of-type,
-.hilite-warning-text textarea:first-of-type {
+.hilite-warning-text textarea:first-of-type,
+.hilite-warning-text .slick-cell {
   color: #f0ad4e !important;
 }
 
@@ -49,13 +51,14 @@
 .hilite-warning input:first-of-type,
 .hilite-warning textarea:first-of-type,
 .hilite-warning .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #f0ad4e !important;
 }
 
 .hilite-success-text,
 .hilite-success-text input:first-of-type,
-.hilite-success-text textarea:first-of-type {
+.hilite-success-text textarea:first-of-type,
+.hilite-success-text .slick-cell {
   color: #5cb85c !important;
 }
 
@@ -63,13 +66,14 @@
 .hilite-success input:first-of-type,
 .hilite-success textarea:first-of-type,
 .hilite-success .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #5cb85c !important;
 }
 
 .hilite-danger-text,
 .hilite-danger-text input:first-of-type,
-.hilite-danger-text textarea:first-of-type {
+.hilite-danger-text textarea:first-of-type,
+.hilite-danger-text .slick-cell {
   color: #d9534f !important;
 }
 
@@ -77,13 +81,14 @@
 .hilite-danger input:first-of-type,
 .hilite-danger textarea:first-of-type,
 .hilite-danger .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #d9534f !important;
 }
 
 .hilite-error-text,
 .hilite-error-text input:first-of-type,
-.hilite-error-text textarea:first-of-type {
+.hilite-error-text textarea:first-of-type,
+.hilite-error-text .slick-cell {
   color: #b94a48 !important;
 }
 
@@ -91,13 +96,14 @@
 .hilite-error input:first-of-type,
 .hilite-error textarea:first-of-type,
 .hilite-error .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #b94a48 !important;
 }
 
 .hilite-info-text,
 .hilite-info-text input:first-of-type,
-.hilite-info-text textarea:first-of-type {
+.hilite-info-text textarea:first-of-type,
+.hilite-info-text .slick-cell {
   color: #5bc0de !important;
 }
 
@@ -105,13 +111,14 @@
 .hilite-info input:first-of-type,
 .hilite-info textarea:first-of-type,
 .hilite-info .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #5bc0de !important;
 }
 
 .hilite-red-text,
 .hilite-red-text input:first-of-type,
-.hilite-red-text textarea:first-of-type {
+.hilite-red-text textarea:first-of-type,
+.hilite-red-text .slick-cell {
   color: #f44336 !important;
 }
 
@@ -119,13 +126,14 @@
 .hilite-red input:first-of-type,
 .hilite-red textarea:first-of-type,
 .hilite-red .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #f44336 !important;
 }
 
 .hilite-pink-text,
 .hilite-pink-text input:first-of-type,
-.hilite-pink-text textarea:first-of-type {
+.hilite-pink-text textarea:first-of-type,
+.hilite-pink-text .slick-cell {
   color: #e91e63 !important;
 }
 
@@ -133,13 +141,14 @@
 .hilite-pink input:first-of-type,
 .hilite-pink textarea:first-of-type,
 .hilite-pink .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #e91e63 !important;
 }
 
 .hilite-purple-text,
 .hilite-purple-text input:first-of-type,
-.hilite-purple-text textarea:first-of-type {
+.hilite-purple-text textarea:first-of-type,
+.hilite-purple-text .slick-cell {
   color: #9c27b0 !important;
 }
 
@@ -147,13 +156,14 @@
 .hilite-purple input:first-of-type,
 .hilite-purple textarea:first-of-type,
 .hilite-purple .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #9c27b0 !important;
 }
 
 .hilite-deeppurple-text,
 .hilite-deeppurple-text input:first-of-type,
-.hilite-deeppurple-text textarea:first-of-type {
+.hilite-deeppurple-text textarea:first-of-type,
+.hilite-deeppurple-text .slick-cell {
   color: #673ab7 !important;
 }
 
@@ -161,13 +171,14 @@
 .hilite-deeppurple input:first-of-type,
 .hilite-deeppurple textarea:first-of-type,
 .hilite-deeppurple .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #673ab7 !important;
 }
 
 .hilite-indigo-text,
 .hilite-indigo-text input:first-of-type,
-.hilite-indigo-text textarea:first-of-type {
+.hilite-indigo-text textarea:first-of-type,
+.hilite-indigo-text .slick-cell {
   color: #3f51b5 !important;
 }
 
@@ -175,13 +186,14 @@
 .hilite-indigo input:first-of-type,
 .hilite-indigo textarea:first-of-type,
 .hilite-indigo .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #3f51b5 !important;
 }
 
 .hilite-blue-text,
 .hilite-blue-text input:first-of-type,
-.hilite-blue-text textarea:first-of-type {
+.hilite-blue-text textarea:first-of-type,
+.hilite-blue-text .slick-cell {
   color: #2196f3 !important;
 }
 
@@ -189,13 +201,14 @@
 .hilite-blue input:first-of-type,
 .hilite-blue textarea:first-of-type,
 .hilite-blue .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #2196f3 !important;
 }
 
 .hilite-lightblue-text,
 .hilite-lightblue-text input:first-of-type,
-.hilite-lightblue-text textarea:first-of-type {
+.hilite-lightblue-text textarea:first-of-type,
+.hilite-lightblue-text .slick-cell {
   color: #03a9f4 !important;
 }
 
@@ -203,13 +216,14 @@
 .hilite-lightblue input:first-of-type,
 .hilite-lightblue textarea:first-of-type,
 .hilite-lightblue .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #03a9f4 !important;
 }
 
 .hilite-cyan-text,
 .hilite-cyan-text input:first-of-type,
-.hilite-cyan-text textarea:first-of-type {
+.hilite-cyan-text textarea:first-of-type,
+.hilite-cyan-text .slick-cell {
   color: #00bcd4 !important;
 }
 
@@ -217,13 +231,14 @@
 .hilite-cyan input:first-of-type,
 .hilite-cyan textarea:first-of-type,
 .hilite-cyan .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #00bcd4 !important;
 }
 
 .hilite-teal-text,
 .hilite-teal-text input:first-of-type,
-.hilite-teal-text textarea:first-of-type {
+.hilite-teal-text textarea:first-of-type,
+.hilite-teal-text .slick-cell {
   color: #009688 !important;
 }
 
@@ -231,13 +246,14 @@
 .hilite-teal input:first-of-type,
 .hilite-teal textarea:first-of-type,
 .hilite-teal .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #009688 !important;
 }
 
 .hilite-green-text,
 .hilite-green-text input:first-of-type,
-.hilite-green-text textarea:first-of-type {
+.hilite-green-text textarea:first-of-type,
+.hilite-green-text .slick-cell {
   color: #4caf50 !important;
 }
 
@@ -245,13 +261,14 @@
 .hilite-green input:first-of-type,
 .hilite-green textarea:first-of-type,
 .hilite-green .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #4caf50 !important;
 }
 
 .hilite-lightgreen-text,
 .hilite-lightgreen-text input:first-of-type,
-.hilite-lightgreen-text textarea:first-of-type {
+.hilite-lightgreen-text textarea:first-of-type,
+.hilite-lightgreen-text .slick-cell {
   color: #8bc34a !important;
 }
 
@@ -259,13 +276,14 @@
 .hilite-lightgreen input:first-of-type,
 .hilite-lightgreen textarea:first-of-type,
 .hilite-lightgreen .slick-cell {
-  color: #000 !important;
+  color: #000;
   background-color: #8bc34a !important;
 }
 
 .hilite-lime-text,
 .hilite-lime-text input:first-of-type,
-.hilite-lime-text textarea:first-of-type {
+.hilite-lime-text textarea:first-of-type,
+.hilite-lime-text .slick-cell {
   color: #cddc39 !important;
 }
 
@@ -273,13 +291,14 @@
 .hilite-lime input:first-of-type,
 .hilite-lime textarea:first-of-type,
 .hilite-lime .slick-cell {
-  color: #000 !important;
+  color: #000;
   background-color: #cddc39 !important;
 }
 
 .hilite-yellow-text,
 .hilite-yellow-text input:first-of-type,
-.hilite-yellow-text textarea:first-of-type {
+.hilite-yellow-text textarea:first-of-type,
+.hilite-yellow-text .slick-cell {
   color: #ffeb3b !important;
 }
 
@@ -287,13 +306,14 @@
 .hilite-yellow input:first-of-type,
 .hilite-yellow textarea:first-of-type,
 .hilite-yellow .slick-cell {
-  color: #000 !important;
+  color: #000;
   background-color: #ffeb3b !important;
 }
 
 .hilite-amber-text,
 .hilite-amber-text input:first-of-type,
-.hilite-amber-text textarea:first-of-type {
+.hilite-amber-text textarea:first-of-type,
+.hilite-amber-text .slick-cell {
   color: #ffc107 !important;
 }
 
@@ -301,13 +321,14 @@
 .hilite-amber input:first-of-type,
 .hilite-amber textarea:first-of-type,
 .hilite-amber .slick-cell {
-  color: #000 !important;
+  color: #000;
   background-color: #ffc107 !important;
 }
 
 .hilite-orange-text,
 .hilite-orange-text input:first-of-type,
-.hilite-orange-text textarea:first-of-type {
+.hilite-orange-text textarea:first-of-type,
+.hilite-orange-text .slick-cell {
   color: #ff9800 !important;
 }
 
@@ -315,13 +336,14 @@
 .hilite-orange input:first-of-type,
 .hilite-orange textarea:first-of-type,
 .hilite-orange .slick-cell {
-  color: #000 !important;
+  color: #000;
   background-color: #ff9800 !important;
 }
 
 .hilite-deeporange-text,
 .hilite-deeporange-text input:first-of-type,
-.hilite-deeporange-text textarea:first-of-type {
+.hilite-deeporange-text textarea:first-of-type,
+.hilite-deeporange-text .slick-cell {
   color: #ff5722 !important;
 }
 
@@ -329,13 +351,14 @@
 .hilite-deeporange input:first-of-type,
 .hilite-deeporange textarea:first-of-type,
 .hilite-deeporange .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #ff5722 !important;
 }
 
 .hilite-brown-text,
 .hilite-brown-text input:first-of-type,
-.hilite-brown-text textarea:first-of-type {
+.hilite-brown-text textarea:first-of-type,
+.hilite-brown-text .slick-cell {
   color: #795548 !important;
 }
 
@@ -343,13 +366,14 @@
 .hilite-brown input:first-of-type,
 .hilite-brown textarea:first-of-type,
 .hilite-brown .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #795548 !important;
 }
 
 .hilite-grey-text,
 .hilite-grey-text input:first-of-type,
-.hilite-grey-text textarea:first-of-type {
+.hilite-grey-text textarea:first-of-type,
+.hilite-grey-text .slick-cell {
   color: #9e9e9e !important;
 }
 
@@ -357,13 +381,14 @@
 .hilite-grey input:first-of-type,
 .hilite-grey textarea:first-of-type,
 .hilite-grey .slick-cell {
-  color: #000 !important;
+  color: #000;
   background-color: #9e9e9e !important;
 }
 
 .hilite-bluegrey-text,
 .hilite-bluegrey-text input:first-of-type,
-.hilite-bluegrey-text textarea:first-of-type {
+.hilite-bluegrey-text textarea:first-of-type,
+.hilite-bluegrey-text .slick-cell {
   color: #607d8b !important;
 }
 
@@ -371,13 +396,14 @@
 .hilite-bluegrey input:first-of-type,
 .hilite-bluegrey textarea:first-of-type,
 .hilite-bluegrey .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #607d8b !important;
 }
 
 .hilite-black-text,
 .hilite-black-text input:first-of-type,
-.hilite-black-text textarea:first-of-type {
+.hilite-black-text textarea:first-of-type,
+.hilite-black-text .slick-cell {
   color: black !important;
 }
 
@@ -385,13 +411,14 @@
 .hilite-black input:first-of-type,
 .hilite-black textarea:first-of-type,
 .hilite-black .slick-cell {
-  color: white !important;
+  color: white;
   background-color: black !important;
 }
 
 .hilite-white-text,
 .hilite-white-text input:first-of-type,
-.hilite-white-text textarea:first-of-type {
+.hilite-white-text textarea:first-of-type,
+.hilite-white-text .slick-cell {
   color: white !important;
 }
 
@@ -399,13 +426,14 @@
 .hilite-white input:first-of-type,
 .hilite-white textarea:first-of-type,
 .hilite-white .slick-cell {
-  color: black !important;
+  color: black;
   background-color: white !important;
 }
 
 .hilite-olive-text,
 .hilite-olive-text input:first-of-type,
-.hilite-olive-text textarea:first-of-type {
+.hilite-olive-text textarea:first-of-type,
+.hilite-olive-text .slick-cell {
   color: #cddc39 !important;
 }
 
@@ -413,13 +441,14 @@
 .hilite-olive input:first-of-type,
 .hilite-olive textarea:first-of-type,
 .hilite-olive .slick-cell {
-  color: #000 !important;
+  color: #000;
   background-color: #cddc39 !important;
 }
 
 .hilite-violet-text,
 .hilite-violet-text input:first-of-type,
-.hilite-violet-text textarea:first-of-type {
+.hilite-violet-text textarea:first-of-type,
+.hilite-violet-text .slick-cell {
   color: #9c27b0 !important;
 }
 
@@ -427,7 +456,7 @@
 .hilite-violet input:first-of-type,
 .hilite-violet textarea:first-of-type,
 .hilite-violet .slick-cell {
-  color: #fff !important;
+  color: #fff;
   background-color: #9c27b0 !important;
 }
 

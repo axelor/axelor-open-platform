@@ -142,7 +142,8 @@ $label_backgrounds_text: (
 @each $name, $value in $colors {
   .hilite-#{$name}-text,
   .hilite-#{$name}-text input:first-of-type,
-  .hilite-#{$name}-text textarea:first-of-type {
+  .hilite-#{$name}-text textarea:first-of-type,
+  .hilite-#{$name}-text .slick-cell {
     color: $value !important;
   }
 
@@ -150,7 +151,7 @@ $label_backgrounds_text: (
   .hilite-#{$name} input:first-of-type,
   .hilite-#{$name} textarea:first-of-type,
   .hilite-#{$name} .slick-cell {
-    color: map.get($text, $name) !important;
+    color: map.get($text, $name);
     background-color: $value !important;
   }
 }
