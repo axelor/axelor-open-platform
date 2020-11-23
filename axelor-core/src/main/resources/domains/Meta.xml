@@ -243,6 +243,7 @@
     <string name="style" />
     <string name="type" column="help_type" selection="help.type.selection" />
     <string name="help" column="help_value" max="1024" multiline="true" required="true" />
+    <index columns="model_name,language,view_name" />
   </entity>
 
   <entity name="MetaAttrs" table="META_ATTRS" logUpdates="false">
