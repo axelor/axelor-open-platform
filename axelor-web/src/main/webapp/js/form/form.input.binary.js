@@ -71,7 +71,7 @@ ui.formInput('ImageLink', {
     var field = scope.field;
 
     var width = field.width || 140;
-    var height = field.height || '100%';
+    var height = field.height || 'auto';
 
     scope.styles = [{
       'width': width,
