@@ -146,7 +146,7 @@
       if (_.isBlank(value)) {
         return value;
       }
-      if (isNaN(value)) {
+      if (isNaN(value) || _.isBlank(symbol)) {
         return addCurrency(value, symbol);
       }
       var options = {
