@@ -46,6 +46,10 @@ public class TomcatRun extends JavaExec {
 
   private int port = 8080;
 
+  public TomcatRun() {
+    setMain(MAIN_CLASS);
+  }
+
   @Option(option = "hot", description = "Specify whether to enable hot-swaping.")
   public void setHot(boolean hot) {
     this.hot = hot;
@@ -120,7 +124,6 @@ public class TomcatRun extends JavaExec {
 
     classpath(createManifestJar(project));
 
-    setMain(MAIN_CLASS);
     setArgs(getArgs(project, port));
     setJvmArgs(getJvmArgs(project, hot, getDebug()));
 
