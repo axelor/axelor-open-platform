@@ -422,7 +422,7 @@ ui.directive('uiNavSubTree', ['$compile', function ($compile) {
     },
     replace: true,
     template:
-      "<li ng-class='{folder: menu.children, tagged: menu.tag }' data-name='{{::menu.name}}'>" +
+      "<li ng-class='{folder: menu.children, tagged: menu.hasTag }' data-name='{{::menu.name}}'>" +
         "<a href='#'>" +
           "<img class='nav-image' ng-if='::menu.icon' ng-src='{{::menu.icon}}'></img>" +
           "<span class='nav-icon' ng-if='::menu.fa'><i class='fa' ng-class='::menu.fa'></i></span>" +

@@ -63,6 +63,9 @@ public class MenuItem extends SimpleWidget {
   @XmlAttribute(name = "tag-style")
   private String tagStyle;
 
+  @XmlAttribute(name = "has-tag")
+  private Boolean hasTag;
+
   public String getXmlId() {
     return xmlId;
   }
@@ -201,5 +204,13 @@ public class MenuItem extends SimpleWidget {
 
   public void setTagStyle(String tagStyle) {
     this.tagStyle = tagStyle;
+  }
+
+  public Boolean getHasTag() {
+    return hasTag;
+  }
+
+  public void setHasTag(Boolean hasTag) {
+    this.hasTag = hasTag;
   }
 }
