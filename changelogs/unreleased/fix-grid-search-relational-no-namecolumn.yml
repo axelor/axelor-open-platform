@@ -1,0 +1,3 @@
+---
+title: Prevent searching on relational field without namecolumn in grid
+type: fix

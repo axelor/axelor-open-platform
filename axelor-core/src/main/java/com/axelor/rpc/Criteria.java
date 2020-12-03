@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class Criteria {
 
@@ -195,7 +196,13 @@ public class Criteria {
       // use the name field of the target object in case of relational field
       Property property = Mapper.of(beanClass).getProperty(fieldName);
       if (property != null && property.getTarget() != null) {
-        fieldName = fieldName + "." + Mapper.of(property.getTarget()).getNameField().getName();
+        final Property nameField =
+            Optional.ofNullable(Mapper.of(property.getTarget()).getNameField())
+                .orElseThrow(
+                    () ->
+                        new IllegalArgumentException(
+                            String.format("%s doesn't have a name column.", property.getTarget())));
+        fieldName = String.format("%s.%s", fieldName, nameField.getName());
       }
     }
 

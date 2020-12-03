@@ -984,7 +984,8 @@ Grid.prototype._doInit = function(view) {
       _.each(cols, function(col){
         if (!col.xpath || col.descriptor.type === 'button'
             || col.descriptor.transient || col.descriptor.dummy
-            || col.descriptor.json || col.descriptor.encrypted) {
+            || col.descriptor.json || col.descriptor.encrypted
+            || col.descriptor.target && !col.descriptor.targetName) {
           return;
         }
         var header = grid.getHeaderRowColumn(col.id),
