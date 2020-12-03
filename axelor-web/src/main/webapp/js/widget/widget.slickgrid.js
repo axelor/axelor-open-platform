@@ -542,7 +542,10 @@ Grid.prototype.parse = function(view) {
 
     type = (item.widgetAttrs||{}).type || field.type || item.serverType || item.type || 'string';
 
+    var dummy = angular.equals(field, {});
+
     field = _.extend({}, field, item, {type: type});
+    if (dummy) { field.dummy = true; }
     scope.fields_view[item.name] = field;
     path = path ? path + '.' + item.name : item.name;
 
@@ -568,7 +571,7 @@ Grid.prototype.parse = function(view) {
       break;
     }
 
-    if (field.transient || field.json || field.encrypted) {
+    if (field.transient || field.dummy || field.json || field.encrypted) {
       sortable = false;
     }
 
