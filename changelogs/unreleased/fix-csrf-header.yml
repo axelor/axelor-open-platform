@@ -1,0 +1,3 @@
+---
+title: Fix missing CSRF header upon successful login request
+type: fix
