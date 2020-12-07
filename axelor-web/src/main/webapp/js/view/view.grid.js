@@ -279,9 +279,10 @@ function GridViewCtrl($scope, $element) {
       return field.name;
     });
 
-    // consider target-name on m2o
+    // consider target-name on o2o/m2o
     _.each(($scope.schema||{}).items, function (item) {
-      if (item.targetName) {
+      var field = $scope.fields[item.name] || {};
+      if (item.targetName && item.targetName !== field.targetName && _.endsWith(field.type, 'to-one')) {
         fields.push(item.name + '.' + item.targetName);
       }
     });

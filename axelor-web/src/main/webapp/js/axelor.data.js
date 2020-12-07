@@ -293,7 +293,6 @@
 
         promise = promise.then(function(response){
           var res = response.data;
-          var length = (res.data||[]).length;
           res.offset = offset;
           res.data = _.unique(res.data, function (a) { return a.id; });
 
@@ -303,10 +302,6 @@
           } else {
             records = res.data || [];
             page = that._pageInfo(res);
-          }
-
-          if (length !== page.size) {
-            page.total -= (length - page.size);
           }
         });
         promise.success = function(fn){
