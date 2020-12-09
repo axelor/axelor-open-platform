@@ -239,6 +239,15 @@
       },
 
       search: function(options) {
+        function setVersion(value) {
+          if (_.isObject(value)) {
+            if (value.version !== undefined) {
+              value.$version = value.version;
+              delete value.version;
+            }
+            _.each(value, setVersion);
+          }
+        }
 
         var opts = _.extend({
           store: true
@@ -269,6 +278,7 @@
 
         offset = offset || 0;
         context = _.extend({}, this._context, context);
+        _.each(context, setVersion);
 
         var query = extend({
           _domain: domain,
