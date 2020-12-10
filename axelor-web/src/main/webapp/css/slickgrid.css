@@ -386,6 +386,7 @@
   margin-top: 2px !important;
 }
 
+.slick-group > .slick-cell,
 .slick-group > .slick-cell-checkboxsel {
    text-align: inherit;
 }
