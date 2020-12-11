@@ -106,8 +106,9 @@ ui.formInput('Number', {
     };
 
     scope.parse = function(value) {
-      if (isDecimal) return value;
-      if (value && _.isString(value)) return +value;
+      if (_.isString(value)) value = +(value);
+      if (_.isNaN(value)) value = null;
+      if (_.isNumber(value) && isDecimal) value = value.toFixed(scale());
       return value;
     };
 
