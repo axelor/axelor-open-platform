@@ -579,7 +579,7 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
 
     if (icons === null) {
       icons = {};
-      names = $scope.field.showIcons || $scope.$parent.field.showIcons;
+      names = $scope.field.showIcons !== undefined ? $scope.field.showIcons : $scope.$parent.field.showIcons;
       if (names === false || names === 'false') {
         icons.$all = false;
       } else if (names === true || names === 'true' || names === undefined) {
