@@ -363,12 +363,15 @@ ui.formInput('Html', {
       }
     });
 
-    textElement.on("blur", function (e) {
+    function doChangePending() {
       if (onChangePending) {
         onChangePending = false;
         setTimeout(onChange);
       }
-    });
+    }
+
+    textElement.on("blur", doChangePending);
+    scope.$on("on:before-save", doChangePending);
 
     textElement.on("focus", _.once(function (e) {
 
