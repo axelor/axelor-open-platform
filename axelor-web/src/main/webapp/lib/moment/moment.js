@@ -9021,7 +9021,7 @@
         longDateFormat : {
             LT : 'H นาฬิกา m นาที',
             LTS : 'LT s วินาที',
-            L : 'YYYY/MM/DD',
+            L : 'DD/MM/YYYY',
             LL : 'D MMMM YYYY',
             LLL : 'D MMMM YYYY เวลา LT',
             LLLL : 'วันddddที่ D MMMM YYYY เวลา LT'
