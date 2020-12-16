@@ -6129,6 +6129,126 @@
     });
 
     //! moment.js locale configuration
+    //! locale : Gujarati [gu]
+    //! author : Kaushik Thanki : https://github.com/Kaushik1987
+
+    var gu__symbolMap = {
+            1: '૧',
+            2: '૨',
+            3: '૩',
+            4: '૪',
+            5: '૫',
+            6: '૬',
+            7: '૭',
+            8: '૮',
+            9: '૯',
+            0: '૦',
+        },
+        gu__numberMap = {
+            '૧': '1',
+            '૨': '2',
+            '૩': '3',
+            '૪': '4',
+            '૫': '5',
+            '૬': '6',
+            '૭': '7',
+            '૮': '8',
+            '૯': '9',
+            '૦': '0',
+        };
+
+    var gu = _moment__default.defineLocale('gu', {
+        months: 'જાન્યુઆરી_ફેબ્રુઆરી_માર્ચ_એપ્રિલ_મે_જૂન_જુલાઈ_ઑગસ્ટ_સપ્ટેમ્બર_ઑક્ટ્બર_નવેમ્બર_ડિસેમ્બર'.split(
+            '_'
+        ),
+        monthsShort: 'જાન્યુ._ફેબ્રુ._માર્ચ_એપ્રિ._મે_જૂન_જુલા._ઑગ._સપ્ટે._ઑક્ટ્._નવે._ડિસે.'.split(
+            '_'
+        ),
+        monthsParseExact: true,
+        weekdays: 'રવિવાર_સોમવાર_મંગળવાર_બુધ્વાર_ગુરુવાર_શુક્રવાર_શનિવાર'.split(
+            '_'
+        ),
+        weekdaysShort: 'રવિ_સોમ_મંગળ_બુધ્_ગુરુ_શુક્ર_શનિ'.split('_'),
+        weekdaysMin: 'ર_સો_મં_બુ_ગુ_શુ_શ'.split('_'),
+        longDateFormat: {
+            LT: 'A h:mm વાગ્યે',
+            LTS: 'A h:mm:ss વાગ્યે',
+            L: 'DD/MM/YYYY',
+            LL: 'D MMMM YYYY',
+            LLL: 'D MMMM YYYY, A h:mm વાગ્યે',
+            LLLL: 'dddd, D MMMM YYYY, A h:mm વાગ્યે',
+        },
+        calendar: {
+            sameDay: '[આજ] LT',
+            nextDay: '[કાલે] LT',
+            nextWeek: 'dddd, LT',
+            lastDay: '[ગઇકાલે] LT',
+            lastWeek: '[પાછલા] dddd, LT',
+            sameElse: 'L',
+        },
+        relativeTime: {
+            future: '%s મા',
+            past: '%s પહેલા',
+            s: 'અમુક પળો',
+            ss: '%d સેકંડ',
+            m: 'એક મિનિટ',
+            mm: '%d મિનિટ',
+            h: 'એક કલાક',
+            hh: '%d કલાક',
+            d: 'એક દિવસ',
+            dd: '%d દિવસ',
+            M: 'એક મહિનો',
+            MM: '%d મહિનો',
+            y: 'એક વર્ષ',
+            yy: '%d વર્ષ',
+        },
+        preparse: function (string) {
+            return string.replace(/[૧૨૩૪૫૬૭૮૯૦]/g, function (match) {
+                return gu__numberMap[match];
+            });
+        },
+        postformat: function (string) {
+            return string.replace(/\d/g, function (match) {
+                return gu__symbolMap[match];
+            });
+        },
+        // Gujarati notation for meridiems are quite fuzzy in practice. While there exists
+        // a rigid notion of a 'Pahar' it is not used as rigidly in modern Gujarati.
+        meridiemParse: /રાત|બપોર|સવાર|સાંજ/,
+        meridiemHour: function (hour, meridiem) {
+            if (hour === 12) {
+                hour = 0;
+            }
+            if (meridiem === 'રાત') {
+                return hour < 4 ? hour : hour + 12;
+            } else if (meridiem === 'સવાર') {
+                return hour;
+            } else if (meridiem === 'બપોર') {
+                return hour >= 10 ? hour : hour + 12;
+            } else if (meridiem === 'સાંજ') {
+                return hour + 12;
+            }
+        },
+        meridiem: function (hour, minute, isLower) {
+            if (hour < 4) {
+                return 'રાત';
+            } else if (hour < 10) {
+                return 'સવાર';
+            } else if (hour < 17) {
+                return 'બપોર';
+            } else if (hour < 20) {
+                return 'સાંજ';
+            } else {
+                return 'રાત';
+            }
+        },
+        week: {
+            dow: 0, // Sunday is the first day of the week.
+            doy: 6, // The week that contains Jan 6th is the first week of the year.
+        },
+    });
+
+    //! moment.js locale configuration
     //! locale : Hebrew (he)
     //! author : Tomer Cohen : https://github.com/tomer
     //! author : Moshe Simantov : https://github.com/DevelopmentIL
@@ -7148,6 +7268,128 @@
             dow: 1, // Monday is the first day of the week.
             doy: 4 // The week that contains Jan 4th is the first week of the year.
         }
+    });
+
+    //! moment.js locale configuration
+    //! locale : Kannada [kn]
+    //! author : Rajeev Naik : https://github.com/rajeevnaikte
+
+    var kn__symbolMap = {
+        1: '೧',
+        2: '೨',
+        3: '೩',
+        4: '೪',
+        5: '೫',
+        6: '೬',
+        7: '೭',
+        8: '೮',
+        9: '೯',
+        0: '೦',
+    },
+    kn__numberMap = {
+        '೧': '1',
+        '೨': '2',
+        '೩': '3',
+        '೪': '4',
+        '೫': '5',
+        '೬': '6',
+        '೭': '7',
+        '೮': '8',
+        '೯': '9',
+        '೦': '0',
+    };
+
+    var kn = _moment__default.defineLocale('kn', {
+        months: 'ಜನವರಿ_ಫೆಬ್ರವರಿ_ಮಾರ್ಚ್_ಏಪ್ರಿಲ್_ಮೇ_ಜೂನ್_ಜುಲೈ_ಆಗಸ್ಟ್_ಸೆಪ್ಟೆಂಬರ್_ಅಕ್ಟೋಬರ್_ನವೆಂಬರ್_ಡಿಸೆಂಬರ್'.split(
+            '_'
+        ),
+        monthsShort: 'ಜನ_ಫೆಬ್ರ_ಮಾರ್ಚ್_ಏಪ್ರಿಲ್_ಮೇ_ಜೂನ್_ಜುಲೈ_ಆಗಸ್ಟ್_ಸೆಪ್ಟೆಂ_ಅಕ್ಟೋ_ನವೆಂ_ಡಿಸೆಂ'.split(
+            '_'
+        ),
+        monthsParseExact: true,
+        weekdays: 'ಭಾನುವಾರ_ಸೋಮವಾರ_ಮಂಗಳವಾರ_ಬುಧವಾರ_ಗುರುವಾರ_ಶುಕ್ರವಾರ_ಶನಿವಾರ'.split(
+            '_'
+        ),
+        weekdaysShort: 'ಭಾನು_ಸೋಮ_ಮಂಗಳ_ಬುಧ_ಗುರು_ಶುಕ್ರ_ಶನಿ'.split('_'),
+        weekdaysMin: 'ಭಾ_ಸೋ_ಮಂ_ಬು_ಗು_ಶು_ಶ'.split('_'),
+        longDateFormat: {
+            LT: 'A h:mm',
+            LTS: 'A h:mm:ss',
+            L: 'DD/MM/YYYY',
+            LL: 'D MMMM YYYY',
+            LLL: 'D MMMM YYYY, A h:mm',
+            LLLL: 'dddd, D MMMM YYYY, A h:mm',
+        },
+        calendar: {
+            sameDay: '[ಇಂದು] LT',
+            nextDay: '[ನಾಳೆ] LT',
+            nextWeek: 'dddd, LT',
+            lastDay: '[ನಿನ್ನೆ] LT',
+            lastWeek: '[ಕೊನೆಯ] dddd, LT',
+            sameElse: 'L',
+        },
+        relativeTime: {
+            future: '%s ನಂತರ',
+            past: '%s ಹಿಂದೆ',
+            s: 'ಕೆಲವು ಕ್ಷಣಗಳು',
+            ss: '%d ಸೆಕೆಂಡುಗಳು',
+            m: 'ಒಂದು ನಿಮಿಷ',
+            mm: '%d ನಿಮಿಷ',
+            h: 'ಒಂದು ಗಂಟೆ',
+            hh: '%d ಗಂಟೆ',
+            d: 'ಒಂದು ದಿನ',
+            dd: '%d ದಿನ',
+            M: 'ಒಂದು ತಿಂಗಳು',
+            MM: '%d ತಿಂಗಳು',
+            y: 'ಒಂದು ವರ್ಷ',
+            yy: '%d ವರ್ಷ',
+        },
+        preparse: function (string) {
+            return string.replace(/[೧೨೩೪೫೬೭೮೯೦]/g, function (match) {
+                return kn__numberMap[match];
+            });
+        },
+        postformat: function (string) {
+            return string.replace(/\d/g, function (match) {
+                return kn__symbolMap[match];
+            });
+        },
+        meridiemParse: /ರಾತ್ರಿ|ಬೆಳಿಗ್ಗೆ|ಮಧ್ಯಾಹ್ನ|ಸಂಜೆ/,
+        meridiemHour: function (hour, meridiem) {
+            if (hour === 12) {
+                hour = 0;
+            }
+            if (meridiem === 'ರಾತ್ರಿ') {
+                return hour < 4 ? hour : hour + 12;
+            } else if (meridiem === 'ಬೆಳಿಗ್ಗೆ') {
+                return hour;
+            } else if (meridiem === 'ಮಧ್ಯಾಹ್ನ') {
+                return hour >= 10 ? hour : hour + 12;
+            } else if (meridiem === 'ಸಂಜೆ') {
+                return hour + 12;
+            }
+        },
+        meridiem: function (hour, minute, isLower) {
+            if (hour < 4) {
+                return 'ರಾತ್ರಿ';
+            } else if (hour < 10) {
+                return 'ಬೆಳಿಗ್ಗೆ';
+            } else if (hour < 17) {
+                return 'ಮಧ್ಯಾಹ್ನ';
+            } else if (hour < 20) {
+                return 'ಸಂಜೆ';
+            } else {
+                return 'ರಾತ್ರಿ';
+            }
+        },
+        dayOfMonthOrdinalParse: /\d{1,2}(ನೇ)/,
+        ordinal: function (number) {
+            return number + 'ನೇ';
+        },
+        week: {
+            dow: 0, // Sunday is the first day of the week.
+            doy: 6, // The week that contains Jan 6th is the first week of the year.
+        },
     });
 
     //! moment.js locale configuration
@@ -9444,6 +9686,91 @@
         }
     });
 
+  //! moment.js locale configuration
+  //! locale : Telugu [te]
+  //! author : Krishna Chaitanya Thota : https://github.com/kcthota
+
+    var te = _moment__default.defineLocale('te', {
+        months: 'జనవరి_ఫిబ్రవరి_మార్చి_ఏప్రిల్_మే_జూన్_జులై_ఆగస్టు_సెప్టెంబర్_అక్టోబర్_నవంబర్_డిసెంబర్'.split(
+            '_'
+        ),
+        monthsShort: 'జన._ఫిబ్ర._మార్చి_ఏప్రి._మే_జూన్_జులై_ఆగ._సెప్._అక్టో._నవ._డిసె.'.split(
+            '_'
+        ),
+        monthsParseExact: true,
+        weekdays: 'ఆదివారం_సోమవారం_మంగళవారం_బుధవారం_గురువారం_శుక్రవారం_శనివారం'.split(
+            '_'
+        ),
+        weekdaysShort: 'ఆది_సోమ_మంగళ_బుధ_గురు_శుక్ర_శని'.split('_'),
+        weekdaysMin: 'ఆ_సో_మం_బు_గు_శు_శ'.split('_'),
+        longDateFormat: {
+            LT: 'A h:mm',
+            LTS: 'A h:mm:ss',
+            L: 'DD/MM/YYYY',
+            LL: 'D MMMM YYYY',
+            LLL: 'D MMMM YYYY, A h:mm',
+            LLLL: 'dddd, D MMMM YYYY, A h:mm',
+        },
+        calendar: {
+            sameDay: '[నేడు] LT',
+            nextDay: '[రేపు] LT',
+            nextWeek: 'dddd, LT',
+            lastDay: '[నిన్న] LT',
+            lastWeek: '[గత] dddd, LT',
+            sameElse: 'L',
+        },
+        relativeTime: {
+            future: '%s లో',
+            past: '%s క్రితం',
+            s: 'కొన్ని క్షణాలు',
+            ss: '%d సెకన్లు',
+            m: 'ఒక నిమిషం',
+            mm: '%d నిమిషాలు',
+            h: 'ఒక గంట',
+            hh: '%d గంటలు',
+            d: 'ఒక రోజు',
+            dd: '%d రోజులు',
+            M: 'ఒక నెల',
+            MM: '%d నెలలు',
+            y: 'ఒక సంవత్సరం',
+            yy: '%d సంవత్సరాలు',
+        },
+        dayOfMonthOrdinalParse: /\d{1,2}వ/,
+        ordinal: '%dవ',
+        meridiemParse: /రాత్రి|ఉదయం|మధ్యాహ్నం|సాయంత్రం/,
+        meridiemHour: function (hour, meridiem) {
+            if (hour === 12) {
+                hour = 0;
+            }
+            if (meridiem === 'రాత్రి') {
+                return hour < 4 ? hour : hour + 12;
+            } else if (meridiem === 'ఉదయం') {
+                return hour;
+            } else if (meridiem === 'మధ్యాహ్నం') {
+                return hour >= 10 ? hour : hour + 12;
+            } else if (meridiem === 'సాయంత్రం') {
+                return hour + 12;
+            }
+        },
+        meridiem: function (hour, minute, isLower) {
+            if (hour < 4) {
+                return 'రాత్రి';
+            } else if (hour < 10) {
+                return 'ఉదయం';
+            } else if (hour < 17) {
+                return 'మధ్యాహ్నం';
+            } else if (hour < 20) {
+                return 'సాయంత్రం';
+            } else {
+                return 'రాత్రి';
+            }
+        },
+        week: {
+            dow: 0, // Sunday is the first day of the week.
+            doy: 6, // The week that contains Jan 6th is the first week of the year.
+        },
+    });
+
     //! moment.js locale configuration
     //! locale : thai (th)
     //! author : Kridsada Thanabulpong : https://github.com/sirn
@@ -9862,6 +10189,87 @@
             dow : 1, // Monday is the first day of the week.
             doy : 7  // The week that contains Jan 1st is the first week of the year.
         }
+    });
+
+    //! moment.js locale configuration
+    //! locale : Urdu [ur]
+    //! author : Sawood Alam : https://github.com/ibnesayeed
+    //! author : Zack : https://github.com/ZackVision
+
+    var ur__months = [
+        'جنوری',
+        'فروری',
+        'مارچ',
+        'اپریل',
+        'مئی',
+        'جون',
+        'جولائی',
+        'اگست',
+        'ستمبر',
+        'اکتوبر',
+        'نومبر',
+        'دسمبر',
+    ],
+    ur__days = ['اتوار', 'پیر', 'منگل', 'بدھ', 'جمعرات', 'جمعہ', 'ہفتہ'];
+
+    var ur = _moment__default.defineLocale('ur', {
+        months: ur__months,
+        monthsShort: ur__months,
+        weekdays: ur__days,
+        weekdaysShort: ur__days,
+        weekdaysMin: ur__days,
+        longDateFormat: {
+            LT: 'HH:mm',
+            LTS: 'HH:mm:ss',
+            L: 'DD/MM/YYYY',
+            LL: 'D MMMM YYYY',
+            LLL: 'D MMMM YYYY HH:mm',
+            LLLL: 'dddd، D MMMM YYYY HH:mm',
+        },
+        meridiemParse: /صبح|شام/,
+        isPM: function (input) {
+            return 'شام' === input;
+        },
+        meridiem: function (hour, minute, isLower) {
+            if (hour < 12) {
+                return 'صبح';
+            }
+            return 'شام';
+        },
+        calendar: {
+            sameDay: '[آج بوقت] LT',
+            nextDay: '[کل بوقت] LT',
+            nextWeek: 'dddd [بوقت] LT',
+            lastDay: '[گذشتہ روز بوقت] LT',
+            lastWeek: '[گذشتہ] dddd [بوقت] LT',
+            sameElse: 'L',
+        },
+        relativeTime: {
+            future: '%s بعد',
+            past: '%s قبل',
+            s: 'چند سیکنڈ',
+            ss: '%d سیکنڈ',
+            m: 'ایک منٹ',
+            mm: '%d منٹ',
+            h: 'ایک گھنٹہ',
+            hh: '%d گھنٹے',
+            d: 'ایک دن',
+            dd: '%d دن',
+            M: 'ایک ماہ',
+            MM: '%d ماہ',
+            y: 'ایک سال',
+            yy: '%d سال',
+        },
+        preparse: function (string) {
+            return string.replace(/،/g, ',');
+        },
+        postformat: function (string) {
+            return string.replace(/,/g, '،');
+        },
+        week: {
+            dow: 1, // Monday is the first day of the week.
+            doy: 4, // The week that contains Jan 4th is the first week of the year.
+        },
     });
 
     //! moment.js locale configuration
