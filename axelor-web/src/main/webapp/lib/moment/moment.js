@@ -4980,6 +4980,337 @@
     });
 
     //! moment.js locale configuration
+    //! locale : English (India) [en-in]
+    //! author : Jatin Agrawal : https://github.com/jatinag22
+
+    var enIn = _moment__default.defineLocale('en-in', {
+        months: 'January_February_March_April_May_June_July_August_September_October_November_December'.split(
+            '_'
+        ),
+        monthsShort: 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
+        weekdays: 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split(
+            '_'
+        ),
+        weekdaysShort: 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_'),
+        weekdaysMin: 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_'),
+        longDateFormat: {
+            LT: 'h:mm A',
+            LTS: 'h:mm:ss A',
+            L: 'DD/MM/YYYY',
+            LL: 'D MMMM YYYY',
+            LLL: 'D MMMM YYYY h:mm A',
+            LLLL: 'dddd, D MMMM YYYY h:mm A',
+        },
+        calendar: {
+            sameDay: '[Today at] LT',
+            nextDay: '[Tomorrow at] LT',
+            nextWeek: 'dddd [at] LT',
+            lastDay: '[Yesterday at] LT',
+            lastWeek: '[Last] dddd [at] LT',
+            sameElse: 'L',
+        },
+        relativeTime: {
+            future: 'in %s',
+            past: '%s ago',
+            s: 'a few seconds',
+            ss: '%d seconds',
+            m: 'a minute',
+            mm: '%d minutes',
+            h: 'an hour',
+            hh: '%d hours',
+            d: 'a day',
+            dd: '%d days',
+            M: 'a month',
+            MM: '%d months',
+            y: 'a year',
+            yy: '%d years',
+        },
+        dayOfMonthOrdinalParse: /\d{1,2}(st|nd|rd|th)/,
+        ordinal: function (number) {
+            var b = number % 10,
+                output =
+                    ~~((number % 100) / 10) === 1
+                        ? 'th'
+                        : b === 1
+                        ? 'st'
+                        : b === 2
+                        ? 'nd'
+                        : b === 3
+                        ? 'rd'
+                        : 'th';
+            return number + output;
+        },
+        week: {
+            dow: 0, // Sunday is the first day of the week.
+            doy: 6, // The week that contains Jan 1st is the first week of the year.
+        },
+    });
+
+    //! moment.js locale configuration
+    //! locale : English (Ireland) [en-ie]
+    //! author : Chris Cartlidge : https://github.com/chriscartlidge
+
+    var enIe = _moment__default.defineLocale('en-ie', {
+        months: 'January_February_March_April_May_June_July_August_September_October_November_December'.split(
+            '_'
+        ),
+        monthsShort: 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
+        weekdays: 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split(
+            '_'
+        ),
+        weekdaysShort: 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_'),
+        weekdaysMin: 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_'),
+        longDateFormat: {
+            LT: 'HH:mm',
+            LTS: 'HH:mm:ss',
+            L: 'DD/MM/YYYY',
+            LL: 'D MMMM YYYY',
+            LLL: 'D MMMM YYYY HH:mm',
+            LLLL: 'dddd D MMMM YYYY HH:mm',
+        },
+        calendar: {
+            sameDay: '[Today at] LT',
+            nextDay: '[Tomorrow at] LT',
+            nextWeek: 'dddd [at] LT',
+            lastDay: '[Yesterday at] LT',
+            lastWeek: '[Last] dddd [at] LT',
+            sameElse: 'L',
+        },
+        relativeTime: {
+            future: 'in %s',
+            past: '%s ago',
+            s: 'a few seconds',
+            ss: '%d seconds',
+            m: 'a minute',
+            mm: '%d minutes',
+            h: 'an hour',
+            hh: '%d hours',
+            d: 'a day',
+            dd: '%d days',
+            M: 'a month',
+            MM: '%d months',
+            y: 'a year',
+            yy: '%d years',
+        },
+        dayOfMonthOrdinalParse: /\d{1,2}(st|nd|rd|th)/,
+        ordinal: function (number) {
+            var b = number % 10,
+                output =
+                    ~~((number % 100) / 10) === 1
+                        ? 'th'
+                        : b === 1
+                        ? 'st'
+                        : b === 2
+                        ? 'nd'
+                        : b === 3
+                        ? 'rd'
+                        : 'th';
+            return number + output;
+        },
+        week: {
+            dow: 1, // Monday is the first day of the week.
+            doy: 4, // The week that contains Jan 4th is the first week of the year.
+        },
+    });
+
+    //! moment.js locale configuration
+    //! locale : English (Israel) [en-il]
+    //! author : Chris Gedrim : https://github.com/chrisgedrim
+
+    var enIl = _moment__default.defineLocale('en-il', {
+        months: 'January_February_March_April_May_June_July_August_September_October_November_December'.split(
+            '_'
+        ),
+        monthsShort: 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
+        weekdays: 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split(
+            '_'
+        ),
+        weekdaysShort: 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_'),
+        weekdaysMin: 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_'),
+        longDateFormat: {
+            LT: 'HH:mm',
+            LTS: 'HH:mm:ss',
+            L: 'DD/MM/YYYY',
+            LL: 'D MMMM YYYY',
+            LLL: 'D MMMM YYYY HH:mm',
+            LLLL: 'dddd, D MMMM YYYY HH:mm',
+        },
+        calendar: {
+            sameDay: '[Today at] LT',
+            nextDay: '[Tomorrow at] LT',
+            nextWeek: 'dddd [at] LT',
+            lastDay: '[Yesterday at] LT',
+            lastWeek: '[Last] dddd [at] LT',
+            sameElse: 'L',
+        },
+        relativeTime: {
+            future: 'in %s',
+            past: '%s ago',
+            s: 'a few seconds',
+            ss: '%d seconds',
+            m: 'a minute',
+            mm: '%d minutes',
+            h: 'an hour',
+            hh: '%d hours',
+            d: 'a day',
+            dd: '%d days',
+            M: 'a month',
+            MM: '%d months',
+            y: 'a year',
+            yy: '%d years',
+        },
+        dayOfMonthOrdinalParse: /\d{1,2}(st|nd|rd|th)/,
+        ordinal: function (number) {
+            var b = number % 10,
+                output =
+                    ~~((number % 100) / 10) === 1
+                        ? 'th'
+                        : b === 1
+                        ? 'st'
+                        : b === 2
+                        ? 'nd'
+                        : b === 3
+                        ? 'rd'
+                        : 'th';
+            return number + output;
+        },
+    });
+
+    //! moment.js locale configuration
+    //! locale : English (New Zealand) [en-nz]
+    //! author : Luke McGregor : https://github.com/lukemcgregor
+
+    var enNz = _moment__default.defineLocale('en-nz', {
+        months: 'January_February_March_April_May_June_July_August_September_October_November_December'.split(
+            '_'
+        ),
+        monthsShort: 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
+        weekdays: 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split(
+            '_'
+        ),
+        weekdaysShort: 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_'),
+        weekdaysMin: 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_'),
+        longDateFormat: {
+            LT: 'h:mm A',
+            LTS: 'h:mm:ss A',
+            L: 'DD/MM/YYYY',
+            LL: 'D MMMM YYYY',
+            LLL: 'D MMMM YYYY h:mm A',
+            LLLL: 'dddd, D MMMM YYYY h:mm A',
+        },
+        calendar: {
+            sameDay: '[Today at] LT',
+            nextDay: '[Tomorrow at] LT',
+            nextWeek: 'dddd [at] LT',
+            lastDay: '[Yesterday at] LT',
+            lastWeek: '[Last] dddd [at] LT',
+            sameElse: 'L',
+        },
+        relativeTime: {
+            future: 'in %s',
+            past: '%s ago',
+            s: 'a few seconds',
+            ss: '%d seconds',
+            m: 'a minute',
+            mm: '%d minutes',
+            h: 'an hour',
+            hh: '%d hours',
+            d: 'a day',
+            dd: '%d days',
+            M: 'a month',
+            MM: '%d months',
+            y: 'a year',
+            yy: '%d years',
+        },
+        dayOfMonthOrdinalParse: /\d{1,2}(st|nd|rd|th)/,
+        ordinal: function (number) {
+            var b = number % 10,
+                output =
+                    ~~((number % 100) / 10) === 1
+                        ? 'th'
+                        : b === 1
+                        ? 'st'
+                        : b === 2
+                        ? 'nd'
+                        : b === 3
+                        ? 'rd'
+                        : 'th';
+            return number + output;
+        },
+        week: {
+            dow: 1, // Monday is the first day of the week.
+            doy: 4, // The week that contains Jan 4th is the first week of the year.
+        },
+    });
+
+    //! moment.js locale configuration
+    //! locale : English (Singapore) [en-sg]
+    //! author : Matthew Castrillon-Madrigal : https://github.com/techdimension
+
+    var enSg = _moment__default.defineLocale('en-sg', {
+        months: 'January_February_March_April_May_June_July_August_September_October_November_December'.split(
+            '_'
+        ),
+        monthsShort: 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
+        weekdays: 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split(
+            '_'
+        ),
+        weekdaysShort: 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_'),
+        weekdaysMin: 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_'),
+        longDateFormat: {
+            LT: 'HH:mm',
+            LTS: 'HH:mm:ss',
+            L: 'DD/MM/YYYY',
+            LL: 'D MMMM YYYY',
+            LLL: 'D MMMM YYYY HH:mm',
+            LLLL: 'dddd, D MMMM YYYY HH:mm',
+        },
+        calendar: {
+            sameDay: '[Today at] LT',
+            nextDay: '[Tomorrow at] LT',
+            nextWeek: 'dddd [at] LT',
+            lastDay: '[Yesterday at] LT',
+            lastWeek: '[Last] dddd [at] LT',
+            sameElse: 'L',
+        },
+        relativeTime: {
+            future: 'in %s',
+            past: '%s ago',
+            s: 'a few seconds',
+            ss: '%d seconds',
+            m: 'a minute',
+            mm: '%d minutes',
+            h: 'an hour',
+            hh: '%d hours',
+            d: 'a day',
+            dd: '%d days',
+            M: 'a month',
+            MM: '%d months',
+            y: 'a year',
+            yy: '%d years',
+        },
+        dayOfMonthOrdinalParse: /\d{1,2}(st|nd|rd|th)/,
+        ordinal: function (number) {
+            var b = number % 10,
+                output =
+                    ~~((number % 100) / 10) === 1
+                        ? 'th'
+                        : b === 1
+                        ? 'st'
+                        : b === 2
+                        ? 'nd'
+                        : b === 3
+                        ? 'rd'
+                        : 'th';
+            return number + output;
+        },
+        week: {
+            dow: 1, // Monday is the first day of the week.
+            doy: 4, // The week that contains Jan 4th is the first week of the year.
+        },
+    });
+
+    //! moment.js locale configuration
     //! locale : esperanto (eo)
     //! author : Colin Dean : https://github.com/colindean
     //! komento: Mi estas malcerta se mi korekte traktis akuzativojn en tiu traduko.
@@ -5107,6 +5438,111 @@
             dow : 1, // Monday is the first day of the week.
             doy : 4  // The week that contains Jan 4th is the first week of the year.
         }
+    });
+
+    //! moment.js locale configuration
+    //! locale : Spanish (United States) [es-us]
+    //! author : bustta : https://github.com/bustta
+    //! author : chrisrodz : https://github.com/chrisrodz
+
+    var esUs__monthsShortDot = 'ene._feb._mar._abr._may._jun._jul._ago._sep._oct._nov._dic.'.split(
+        '_'
+    ),
+    esUS__monthsShort = 'ene_feb_mar_abr_may_jun_jul_ago_sep_oct_nov_dic'.split('_'),
+    esUS__monthsParse = [
+        /^ene/i,
+        /^feb/i,
+        /^mar/i,
+        /^abr/i,
+        /^may/i,
+        /^jun/i,
+        /^jul/i,
+        /^ago/i,
+        /^sep/i,
+        /^oct/i,
+        /^nov/i,
+        /^dic/i,
+    ],
+    esUS__monthsRegex = /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i;
+
+    var esUs = _moment__default.defineLocale('es-us', {
+        months: 'enero_febrero_marzo_abril_mayo_junio_julio_agosto_septiembre_octubre_noviembre_diciembre'.split(
+            '_'
+        ),
+        monthsShort: function (m, format) {
+            if (!m) {
+                return esUs__monthsShortDot;
+            } else if (/-MMM-/.test(format)) {
+                return esUS__monthsShort[m.month()];
+            } else {
+                return esUs__monthsShortDot[m.month()];
+            }
+        },
+        monthsRegex: esUS__monthsRegex,
+        monthsShortRegex: esUS__monthsRegex,
+        monthsStrictRegex: /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/i,
+        monthsShortStrictRegex: /^(ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i,
+        monthsParse: esUS__monthsParse,
+        longMonthsParse: esUS__monthsParse,
+        shortMonthsParse: esUS__monthsParse,
+        weekdays: 'domingo_lunes_martes_miércoles_jueves_viernes_sábado'.split('_'),
+        weekdaysShort: 'dom._lun._mar._mié._jue._vie._sáb.'.split('_'),
+        weekdaysMin: 'do_lu_ma_mi_ju_vi_sá'.split('_'),
+        weekdaysParseExact: true,
+        longDateFormat: {
+            LT: 'h:mm A',
+            LTS: 'h:mm:ss A',
+            L: 'MM/DD/YYYY',
+            LL: 'D [de] MMMM [de] YYYY',
+            LLL: 'D [de] MMMM [de] YYYY h:mm A',
+            LLLL: 'dddd, D [de] MMMM [de] YYYY h:mm A',
+        },
+        calendar: {
+            sameDay: function () {
+                return '[hoy a la' + (this.hours() !== 1 ? 's' : '') + '] LT';
+            },
+            nextDay: function () {
+                return '[mañana a la' + (this.hours() !== 1 ? 's' : '') + '] LT';
+            },
+            nextWeek: function () {
+                return 'dddd [a la' + (this.hours() !== 1 ? 's' : '') + '] LT';
+            },
+            lastDay: function () {
+                return '[ayer a la' + (this.hours() !== 1 ? 's' : '') + '] LT';
+            },
+            lastWeek: function () {
+                return (
+                    '[el] dddd [pasado a la' +
+                    (this.hours() !== 1 ? 's' : '') +
+                    '] LT'
+                );
+            },
+            sameElse: 'L',
+        },
+        relativeTime: {
+            future: 'en %s',
+            past: 'hace %s',
+            s: 'unos segundos',
+            ss: '%d segundos',
+            m: 'un minuto',
+            mm: '%d minutos',
+            h: 'una hora',
+            hh: '%d horas',
+            d: 'un día',
+            dd: '%d días',
+            w: 'una semana',
+            ww: '%d semanas',
+            M: 'un mes',
+            MM: '%d meses',
+            y: 'un año',
+            yy: '%d años',
+        },
+        dayOfMonthOrdinalParse: /\d{1,2}º/,
+        ordinal: '%dº',
+        week: {
+            dow: 0, // Sunday is the first day of the week.
+            doy: 6, // The week that contains Jan 6th is the first week of the year.
+        },
     });
 
     //! moment.js locale configuration
