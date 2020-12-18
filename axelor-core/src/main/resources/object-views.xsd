@@ -1357,6 +1357,7 @@
           <xsd:element name="field" type="tns:BaseField"/>
           <xsd:element name="button" type="tns:Button"/>
           <xsd:element name="spacer" type="tns:Spacer" />
+          <xsd:element name="separator" type="tns:Separator" />
           <xsd:element name="label" type="tns:Label" />
           <xsd:element name="panel">
             <xsd:complexType>
