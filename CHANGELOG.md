@@ -1,3 +1,13 @@
+## 5.2.9 (2020-12-18)
+
+#### Fixed
+
+* Prevent usage of proxies in search request
+* Fix o2m/m2m sorting issue caused by permissions
+* Save decimal value with applied x-scale from view
+* Fix one-to-many editor validation issue
+* Fix required field validation on contextual custom fields
+
 ## 5.2.8 (2020-10-14)
 
 #### Features
