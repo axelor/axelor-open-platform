@@ -412,7 +412,7 @@ public class Query<T extends Model> {
    */
   public Selector select(String... names) {
     return new Selector(names);
-  };
+  }
 
   /**
    * Perform mass update on the matched records with the given values.
@@ -836,7 +836,7 @@ public class Query<T extends Model> {
     }
 
     private Object getReferenceValue(List<?> items, int at) {
-      if (items.get(at) == null) {
+      if (items.get(at) == null && items.get(at + 1) == null) {
         return null;
       }
       Map<String, Object> value = Maps.newHashMap();

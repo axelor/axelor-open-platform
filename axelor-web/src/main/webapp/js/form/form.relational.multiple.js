@@ -420,6 +420,10 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
       criteria: [criterion]
     };
 
+    var context = _.pick($scope.getContext(), ['id', '_model']);
+    context._field = $scope.field.name;
+    context._field_ids = ids;
+
     $scope.selection = [];
     $scope._dataSource.search({
       filter: filter,
@@ -428,7 +432,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
       archived: true,
       limit: -1,
       domain: null,
-      context: null
+      context: context
     });
   };
 
@@ -1040,7 +1044,9 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
           unwatch();
           model.$setViewValue(scope.items);
         }
-        item.$changed = true;
+        if (!scope._dataSource.equals(item, old)) {
+          item.$changed = true;
+        }
       }, true);
     };
 
@@ -1090,7 +1096,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
         return;
       }
       if (canAdd()) {
-        items.push({});
+        items.push(showOnNew && !items.length ? {} : { $changed: true });
       }
     };
 

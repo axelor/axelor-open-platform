@@ -398,6 +398,7 @@ public class MetaService {
       item.setTitle(menu.getTitle());
       item.setIcon(menu.getIcon());
       item.setIconBackground(menu.getIconBackground());
+      item.setHasTag(menu.getTagCount() || StringUtils.notEmpty(menu.getTagGet()));
       item.setTagStyle(menu.getTagStyle());
       item.setTop(menu.getTop());
       item.setLeft(menu.getLeft());
