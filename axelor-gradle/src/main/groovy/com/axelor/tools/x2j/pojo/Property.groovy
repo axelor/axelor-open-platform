@@ -501,6 +501,8 @@ class Property {
     def column = attrs.column
     def unique = attrs.unique
     def nullable = attrs.required == "true" ? null : attrs.nullable
+    def insertable = attrs.insertable == "false" ? attrs.insertable : null
+    def updatable = attrs.updatable == "false" ? attrs.updatable : null
 
     if (Naming.isReserved(name)) {
       throw new IllegalArgumentException(
@@ -517,7 +519,7 @@ class Property {
       "Invalid use of an SQL keyword '${col}' in domain object: ${entity.name}")
     }
 
-    if (column == null && unique == null && nullable == null)
+    if (column == null && unique == null && nullable == null && insertable == null && updatable == null)
       return null
 
     def res = annon(reference ? "javax.persistence.JoinColumn" : "javax.persistence.Column")
@@ -526,6 +528,14 @@ class Property {
 
     if (nullable) {
       res.add("nullable", nullable, false)
+    }
+
+    if (insertable != null) {
+      res.add("insertable", insertable, false)
+    }
+
+    if (updatable != null) {
+      res.add("updatable", updatable, false)
     }
 
     return res
