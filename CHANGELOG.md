@@ -1,3 +1,22 @@
+## 5.3.7 (2020-12-18)
+
+#### Features
+
+* Add index to MetaHelp on model, language, view fields
+
+#### Fixed
+
+* Prevent usage of proxies in search request
+* Fix o2m/m2m sorting issue caused by permissions
+* Fix missing CSRF header upon successful login request
+* Fix searching for o2o field on the non-owning side
+* Fix MenuItem tag display with null/empty value
+* Save decimal value with applied x-scale from view
+* Fix translation of dotted fields on references in grid view
+* Fix one-to-many editor validation issue
+* Fix misalignment on grid group row
+* Fix required field validation on contextual custom fields
+
 ## 5.3.5 (2020-10-14)
 
 #### Features

@@ -277,11 +277,11 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       // don't need csrf check for native clients
       if (isNativeClient(context)) return true;
 
-      addResponseCookie(context);
+      addResponseCookieAndHeader(context);
       return true;
     }
 
-    private void addResponseCookie(WebContext context) {
+    private void addResponseCookieAndHeader(WebContext context) {
       final String token = tokenGenerator.get(context);
       final Cookie cookie = new Cookie(CSRF_COOKIE_NAME, token);
 
@@ -293,6 +293,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       cookie.setDomain("");
       cookie.setPath(path);
       context.addResponseCookie(cookie);
+      context.setResponseHeader(CSRF_HEADER_NAME, token);
     }
   }
 
@@ -408,11 +409,11 @@ public abstract class AuthPac4jModule extends AuthWebModule {
             protected HttpAction redirectToOriginallyRequestedUrl(
                 J2EContext context, String defaultUrl) {
 
-              // Add CSRF token cookie
+              // Add CSRF token cookie and header
               AxelorCsrfTokenGeneratorAuthorizer csrfTokenAuthorizer =
                   (AxelorCsrfTokenGeneratorAuthorizer)
                       config.getAuthorizers().get(CSRF_TOKEN_AUTHORIZER_NAME);
-              csrfTokenAuthorizer.addResponseCookie(context);
+              csrfTokenAuthorizer.addResponseCookieAndHeader(context);
 
               // if xhr, return status code only
               if (isXHR(context)) {
