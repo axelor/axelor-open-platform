@@ -1,6 +1,0 @@
----
-title: Add support for toolbar and menubar on dashlet and o2m/m2m widgets
-type: change
-description: |
-  For the toolbar, only first 3 buttons will be visible.
-  For the menubar, only first menu will be visible.

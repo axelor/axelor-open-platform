@@ -1,6 +1,0 @@
----
-title: Add support for maximized popups for relational fields
-type: feature
-description: |
-  We can specify `x-popup-maximized="all|editor|selector" to specify whether to show
-  the `editor`, `selector` or both popups in maximized state.

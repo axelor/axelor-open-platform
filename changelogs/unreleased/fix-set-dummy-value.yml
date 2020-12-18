@@ -1,3 +1,0 @@
----
-title: Fix Response#setValue with $-prefixed dummy field
-type: fix

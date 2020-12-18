@@ -1,8 +1,0 @@
----
-title: Improve keyboard shortcuts
-type: change
-description: |
-  The keyboard shortcuts Ctrl+F and Ctrl+G were conflicting with browser shortcuts,
-  they are now changed to Alt+F and Alt+G respectively. Also fixed some broken shortcuts.
-
-  Also added a dialog to show keyboard shortcuts which can be shown from the top-right corner menu.

@@ -1,8 +1,0 @@
----
-title: Implement grid view customization
-type: feature
-description: |
-  We can now customize the top-level grid view with a customize column menu and
-  selecting/removing/reordering fields.
-  
-  The customized view can be shared to all users by admins.

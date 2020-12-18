@@ -1,5 +1,0 @@
----
-title: Add support for more hilite colors
-type: feature
-description: |
-  We can now use more named colors with hilite besides the hilite styles.

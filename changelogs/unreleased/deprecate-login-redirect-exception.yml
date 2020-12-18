@@ -1,3 +1,0 @@
----
-title: Deprecate `LoginRedirectException` in favor of `WebUtils.issueRedirect`
-type: deprecate

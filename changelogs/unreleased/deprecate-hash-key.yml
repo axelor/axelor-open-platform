@@ -1,4 +1,0 @@
----
-title: Deprecate `hashKey` and `hashAll` in favor of `equalsInclude` and `equalsIncludeAll`
-type: deprecate
-
