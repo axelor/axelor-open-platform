@@ -1,3 +1,51 @@
+## 5.3.7 (2020-12-18)
+
+#### Features
+
+* Add index to MetaHelp on model, language, view fields
+
+#### Fixed
+
+* Prevent usage of proxies in search request
+* Fix o2m/m2m sorting issue caused by permissions
+* Fix missing CSRF header upon successful login request
+* Fix searching for o2o field on the non-owning side
+* Fix MenuItem tag display with null/empty value
+* Save decimal value with applied x-scale from view
+* Fix translation of dotted fields on references in grid view
+* Fix one-to-many editor validation issue
+* Fix misalignment on grid group row
+* Fix required field validation on contextual custom fields
+
+## 5.3.5 (2020-10-14)
+
+#### Features
+
+* Go into edit on focus for multiline string in editable grid
+* Add index to MailMessage on relatedModel, relatedId fields
+
+#### Fixed
+
+* Fix change tracking translation issue
+* Hide edit in grid icons bar while editing row
+* Set authentication request character encoding to UTF-8
+* Fix customize dashboard with drag & drop
+* Fix Context#asType invalid type error message
+* Fix boolean field focus issue in editable grid
+* Fix timezone issue with start/end time in calendar view popup
+* Fix timezone issue with start/end of calendar view
+* Fix single-select widget on integer field
+* Fix readonly rendering of inline HTML widget
+* Fix readonly rendering of large string in editable grid
+* Fix setting of o2m/m2m field in editable grid from action
+* Fix PostAction event issue for action-record
+* Fix buttons not shown when using x-selector="checkbox"
+* Ignore hiding of fields in editable grid
+* Update dotted fields in grid from form dotted fields
+* Fix onChange not triggered when setting date to null
+* Fix rare emptied row on save issue in editable grid
+* Fix multi-month calendar events missing for intermediate months
+
 ## 5.3.5 (2020-08-17)
 
 #### Features
