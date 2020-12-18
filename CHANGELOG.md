@@ -31,7 +31,6 @@
 * Add menu item in form view to show workflow
 * Add support for x-show-icons on panel-related
 * Add `refresh-tab` response signal
-* Go into edit on focus for multiline string in editable grid
 * Add helper api to easily open html tabs
 * Add support for defining view attrs externally
 * Improve Context api to allow overriding proxy usage
@@ -81,7 +80,6 @@
 * Date and DateTime format support based on browser language
 * Add support for `help` attribute to panel widgets
 * Add support for field tooltip templates
-* Add index to MailMessage on relatedModel, relatedId fields
 * Support CSS on grid buttons
 * Add `mail.smtp.from` application setting
 * Add support to show workflow status on top of the form
@@ -99,52 +97,38 @@
 #### Fixed
 
 * Fix random mail sender test failure
-* Fix change tracking translation issue
 * Fix save action in editable grid
-* Hide edit in grid icons bar while editing row
 * Fix onChange issue on html widget
 * Fix select image button text in HTML widget
 * Fix `LoginRedirectException`
-* Set authentication request character encoding to UTF-8
 * Fix js error when clicking on html view tab
-* Fix customize dashboard with drag & drop
-* Fix Context#asType invalid type error message
 * Fix Response#setValue with $-prefixed dummy field
 * Fix PDF visibility in DMS when changing tab content with Chrome
 * Fix image-select widget issues
 * Fix updating of selected flags for JavaScript expressions
 * Fix dotted target-name on TagSelect and many-to-one fields
-* Fix boolean field focus issue in editable grid
 * Prevent sorting/searching on transient/dummy field in grid
 * Reset attributes when navigating and refreshing records from form view
-* Fix timezone issue with start/end time in calendar view popup
 * Fix image height in *-to-many editor
 * Prevent searching on relational field without namecolumn in grid
 * Fix OK/Cancel button order on editable grid and master-detail
-* Fix timezone issue with start/end of calendar view
 * Fix needless recomputing of views
 * Fix visibility evaluation of field using master-detail widget
 * Fix empty selection in grid when action initialized selection state
 * Fix $fmt with dotted fields and custom views
-* Fix single-select widget on integer field
 * Remove unsupported grid button attributes from autocompletion
 * Add missing Indian momentjs locales
 * Fix o2m/m2m field button bar display
 * Fix `target-name` attribute issue on m2o field of grid view
 * Fix save action in master-detail
-* Fix readonly rendering of inline HTML widget
-* Fix readonly rendering of large string in editable grid
 * Apply view extensions by matching name and groups
-* Fix setting of o2m/m2m field in editable grid from action
 * Fix NPE when finding computed field dependencies
 * Fix translation of dotted target names
-* Fix PostAction event issue for action-record
 * Fix touchpad click to confirm on a popup
 * Fix custom field value expression doesn't make form dirty
 * Fix Thai momentjs locale
 * Fix rendering of buttons and action execution on editable grids
 * Fix TypeError when several editable grids have the same dummy fields
-* Fix buttons not shown when using x-selector="checkbox"
 * Add missing English momentjs locales
 * Fix reference names in json fields
 
@@ -153,14 +137,9 @@
   is updated to reflect the updated name.
   </details>
 
-* Ignore hiding of fields in editable grid
 * Fix custom fields support in string templates
 * Fix editable row reset to old value issue
 * Fix context issue with chart click actions
-* Update dotted fields in grid from form dotted fields
-* Fix onChange not triggered when setting date to null
-* Fix rare emptied row on save issue in editable grid
-* Fix multi-month calendar events missing for intermediate months
 
 ## 5.3.7 (2020-12-18)
 
@@ -181,7 +160,7 @@
 * Fix misalignment on grid group row
 * Fix required field validation on contextual custom fields
 
-## 5.3.5 (2020-10-14)
+## 5.3.6 (2020-10-14)
 
 #### Features
 
