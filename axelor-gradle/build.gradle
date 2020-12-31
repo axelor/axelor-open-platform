@@ -44,7 +44,9 @@ def generateLibsList(config) {
   def outFile = new File(outDir, "${config}-libs.txt");
   outDir.mkdirs()
   outFile.text = ""
-  configurations.getByName(config).dependencies.each { outFile << "${it.group}:${it.name}:${it.version}\n" }
+  configurations.getByName(config).dependencies.each {
+    outFile << "${it.group}:${it.name}:${it.version}\n"
+  }
 }
 
 classes.doLast {
@@ -54,5 +56,5 @@ classes.doLast {
 
 // prevent double publish
 tasks.withType(PublishToMavenRepository).all {
-  enabled =  name != 'publishMavenJavaPublicationToMavenRepository'
+  enabled = name != 'publishMavenJavaPublicationToMavenRepository'
 }
