@@ -69,6 +69,10 @@ ui.formInput('Number', {
       return _.isEmpty(value) || _.isNumber(value) || pattern.test(value);
     };
 
+    function isEmpty(value) {
+      return _.isEmpty(value) && !_.isNumber(value);
+    }
+
     scope.validate = scope.isValid = function(value) {
       var valid = scope.isNumber(value);
       if (valid && isDecimal && _.isString(value)) {
@@ -78,10 +82,10 @@ ui.formInput('Number', {
       }
 
       if (valid && (minSize || minSize === 0)) {
-        valid = value >= minSize;
+        valid = value >= minSize || scope.field.nullable && isEmpty(value);
       }
       if (valid && (maxSize || maxSize === 0)) {
-        valid = value <= maxSize;
+        valid = value <= maxSize || scope.field.nullable && isEmpty(value);
       }
 
       return valid;
@@ -106,6 +110,7 @@ ui.formInput('Number', {
     };
 
     scope.parse = function(value) {
+      if (scope.field.nullable && isEmpty(value)) return null;
       if (_.isString(value)) value = +(value);
       if (_.isNaN(value)) value = null;
       if (_.isNumber(value) && isDecimal) value = value.toFixed(scale());

@@ -1,0 +1,3 @@
+---
+title: Fix setting null on nullable number field with min/max attributes
+type: fix
