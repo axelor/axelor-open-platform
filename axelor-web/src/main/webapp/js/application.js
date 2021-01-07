@@ -63,6 +63,8 @@
 
 //= lib/angular-ui/sortable.js
 
+//= lib/intl-tel-input/js/intlTelInput.js
+
 //= js/axelor.ns.js
 //= js/axelor.ng.js
 

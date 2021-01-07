@@ -176,7 +176,7 @@ function handleError(scope, item, message) {
   var e = $('<span class="error"></span>').text(message);
   var p = item.parent('.form-item');
 
-  if (item.children(':first').is(':input,.input-append,.picker-input')) {
+  if (item.children(':first').is(':input,.input-append,.picker-input,.input')) {
     p.append(e);
   } else {
     p.prepend(e);

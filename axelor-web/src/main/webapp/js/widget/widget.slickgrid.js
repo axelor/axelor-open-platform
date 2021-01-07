@@ -1978,7 +1978,7 @@ Grid.prototype.adjustEditor = function () {
       left = false;
       setTimeout(function () {
         if (activeCell.cell === n) {
-          widget.find('input,:focusable').first().focus().select();
+          widget.find('input,:focusable:not(".secondary-focus")').first().focus().select();
         }
       }, 100)
     } else if (left) {

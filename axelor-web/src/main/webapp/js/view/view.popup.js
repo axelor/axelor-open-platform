@@ -412,7 +412,7 @@ ui.directive('uiDialogSize', function() {
 
       //XXX: ui-dialog issue
       element.find('.slick-headerrow-column,.slickgrid,[ui-embedded-editor]').zIndex(element.zIndex());
-      element.find('.record-toolbar .btn').zIndex(element.zIndex()+1);
+      element.find('.record-toolbar .btn, .dropdown').zIndex(element.zIndex()+1);
     }
 
     // a flag used by evalScope to detect popup (see form.base.js)
