@@ -323,6 +323,10 @@ var Formatters = {
     });
 
     return items.join(' &bull; ');
+  },
+
+  "phone": function (field, value) {
+    return value ? '<a href="tel:' + value + '">' + value + '</a>' : '';
   }
 };
 
@@ -395,7 +399,7 @@ _.extend(Factory.prototype, {
       return Formatters[type](field, value, dataContext, this.grid);
     }
 
-    if (["url", "duration"].indexOf(widget) >= 0) {
+    if (["url", "duration", "phone"].indexOf(widget) >= 0) {
       type = widget.toLowerCase();
     }
 
