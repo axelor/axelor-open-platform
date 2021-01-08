@@ -37,8 +37,19 @@ public class PublishSupport extends AbstractSupport {
   }
 
   private void configure(Project project) {
+    PublishingExtension publishing = project.getExtensions().findByType(PublishingExtension.class);
+    configureLibrary(project, publishing);
+    configureRepository(project, publishing);
+  }
+
+  private void configureLibrary(Project project, PublishingExtension publishing) {
     final JavaPluginConvention convention =
-        project.getConvention().getPlugin(JavaPluginConvention.class);
+        project.getConvention().findPlugin(JavaPluginConvention.class);
+
+    if (convention == null) {
+      return;
+    }
+
     final SourceSet main = convention.getSourceSets().findByName(SourceSet.MAIN_SOURCE_SET_NAME);
     final Jar jar = (Jar) project.getTasks().findByName(JavaPlugin.JAR_TASK_NAME);
     final Jar sourcesJar =
@@ -54,9 +65,6 @@ public class PublishSupport extends AbstractSupport {
                   task.getArchiveClassifier().set("sources");
                 });
 
-    final PublishingExtension publishing =
-        project.getExtensions().findByType(PublishingExtension.class);
-
     publishing
         .getPublications()
         .create(
@@ -66,7 +74,9 @@ public class PublishSupport extends AbstractSupport {
               publication.from(project.getComponents().getByName("java"));
               publication.artifact(sourcesJar);
             });
+  }
 
+  private void configureRepository(Project project, PublishingExtension publishing) {
     final Object mavenUser = project.findProperty("mavenUsername");
     final Object mavenPass = project.findProperty("mavenPassword");
     final Object mavenRepo = project.findProperty("mavenRepository");
