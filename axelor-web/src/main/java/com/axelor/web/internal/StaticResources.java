@@ -20,6 +20,7 @@ package com.axelor.web.internal;
 import com.axelor.meta.MetaScanner;
 import com.axelor.web.StaticResourceProvider;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,8 +46,14 @@ public final class StaticResources {
             })
         .forEach(provider -> provider.register(resources));
 
-    styles = resources.stream().filter(res -> res.endsWith(".css")).collect(Collectors.toSet());
-    scripts = resources.stream().filter(res -> res.endsWith(".js")).collect(Collectors.toSet());
+    styles =
+        resources.stream()
+            .filter(res -> res.endsWith(".css"))
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+    scripts =
+        resources.stream()
+            .filter(res -> res.endsWith(".js"))
+            .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   public static Set<String> getStyles() {
