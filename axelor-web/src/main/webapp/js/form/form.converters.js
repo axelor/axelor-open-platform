@@ -234,6 +234,7 @@
   ui.setNested = setNested;
   ui.canSetNested = canSetNested;
   ui.getNestedTrKey = getNestedTrKey;
+  ui.getBrowserLocale = getBrowserLocale;
 
   var mm = moment().clone();
   mm.locale(getBrowserLocale());

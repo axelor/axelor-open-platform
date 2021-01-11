@@ -42,7 +42,14 @@ var OPERATORS = {
   "notNull" 	: _t("is not null"),
 
   "true"		: _t("is true"),
-  "false" 	: _t("is false")
+  "false" 	: _t("is false"),
+
+  "$inPast": _t("in the past"),
+  "$inNext": _t("in the next"),
+  "$inCurrent": _t("in the current"),
+
+  "$isCurrentUser": _t("is current user"),
+  "$isCurrentGroup": _t("is current group")
 };
 
 var OPERATORS_BY_TYPE = {
@@ -53,8 +60,14 @@ var OPERATORS_BY_TYPE = {
   "boolean"	: ["true", "false"]
 };
 
-_.each(["long", "decimal", "date", "time", "datetime"], function(type) {
+_.each(["long", "decimal", "time"], function(type) {
   OPERATORS_BY_TYPE[type] = OPERATORS_BY_TYPE.integer;
+});
+
+var DATE_OPERATORS = OPERATORS_BY_TYPE.integer.concat(["$inPast", "$inNext", "$inCurrent"]);
+
+_.each(["date", "datetime"], function(type) {
+  OPERATORS_BY_TYPE[type] = DATE_OPERATORS;
 });
 
 _.each(["one-to-many"], function(type) {
@@ -65,6 +78,91 @@ _.each(["one-to-one", "many-to-one", "many-to-many"], function(type) {
   OPERATORS_BY_TYPE[type] = ["like", "notLike", "in", "notIn", "isNull", "notNull"];
 });
 
+var EXTRA_OPERATORS_BY_TARGET = {
+  "com.axelor.auth.db.User": ["$isCurrentUser"],
+  "com.axelor.auth.db.Group": ["$isCurrentGroup"]
+};
+
+var CAN_SHOW = {
+  "$inPast": { timeUnit: true },
+  "$inNext": { timeUnit: true },
+  "$inCurrent": { input: false, timeUnit: true },
+  "$isCurrentUser": { input: false },
+  "$isCurrentGroup": { input: false }
+};
+
+var PAST_NEXT_TIME_UNIT_SELECTION = [
+    {value: "day", title: _t("days")},
+    {value: "week", title: _t("weeks")},
+    {value: "month", title: _t("months")},
+    {value: "quarter", title: _t("quarters")},
+    {value: "year", title: _t("years")}
+];
+var CURRENT_TIME_UNIT_SELECTION = [
+    {value: "day", title: _t("day")},
+    {value: "week", title: _t("week")},
+    {value: "month", title: _t("month")},
+    {value: "quarter", title: _t("quarter")},
+    {value: "year", title: _t("year")}
+];
+
+var TIME_UNIT_SELECTIONS = {
+  "$inPast": PAST_NEXT_TIME_UNIT_SELECTION,
+  "$inNext": PAST_NEXT_TIME_UNIT_SELECTION,
+  "$inCurrent": CURRENT_TIME_UNIT_SELECTION
+};
+
+var CRITERION_PREPARATORS = {
+  "$inPast": function (criterion, filter) {
+    criterion.value = criterion.value || 0;
+    criterion.timeUnit = filter.timeUnit;
+  },
+  "$inNext": function (criterion, filter) {
+    criterion.value = criterion.value || 0;
+    criterion.timeUnit = filter.timeUnit;
+  },
+  "$inCurrent": function (criterion, filter) {
+    criterion.timeUnit = filter.timeUnit;
+  },
+  "$isCurrentUser": function (criterion) {
+    criterion.fieldName += ".id";
+  },
+  "$isCurrentGroup": function (criterion) {
+    criterion.fieldName += ".code";
+  }
+};
+
+var FILTER_TRANSFORMERS = {
+  "$inPast": function (filter) {
+    var now = moment().locale(ui.getBrowserLocale());
+    filter.operator = "between";
+    filter.value = now.clone().subtract(filter.value, filter.timeUnit).startOf(filter.timeUnit).toDate();
+    filter.value2 = now.clone().endOf("day").toDate();
+    delete filter.timeUnit;
+  },
+  "$inNext": function (filter) {
+    var now = moment().locale(ui.getBrowserLocale());
+    filter.operator = "between";
+    filter.value2 = now.clone().add(filter.value, filter.timeUnit).endOf(filter.timeUnit).toDate();
+    filter.value = now.clone().startOf("day").toDate();
+    delete filter.timeUnit;
+  },
+  "$inCurrent": function (filter) {
+    var now = moment().locale(ui.getBrowserLocale());
+    filter.operator = "between";
+    filter.value = now.clone().startOf(filter.timeUnit).toDate();
+    filter.value2 = now.clone().endOf(filter.timeUnit).toDate();
+    delete filter.timeUnit;
+  },
+  "$isCurrentUser": function (filter) {
+    filter.operator = "=";
+    filter.value = axelor.config["user.id"];
+  },
+  "$isCurrentGroup": function (filter) {
+    filter.operator = "=";
+    filter.value = axelor.config["user.group"];
+  }
+};
 
 function sharedProperty(scope, handler, property, initialValue) {
   var ds = handler._dataSource;
@@ -110,6 +208,11 @@ ui.directive('uiFilterItem', function() {
           operators = ["isNull", "notNull"];
         }
 
+        var extraOperators = EXTRA_OPERATORS_BY_TARGET[field.target];
+        if (!_.isEmpty(extraOperators)) {
+          operators = operators.concat(extraOperators);
+        }
+
         return _.map(operators, function(name) {
           return {
             name: name,
@@ -123,6 +226,10 @@ ui.directive('uiFilterItem', function() {
       };
 
       scope.canShowSelect = function () {
+        var canShow = (CAN_SHOW[scope.filter.operator] || {})['select'];
+        if (canShow !== undefined) {
+          return canShow;
+        }
         return scope.filter && scope.filter.selectionList &&
              scope.filter.operator && !(
              scope.filter.operator == 'isNull' ||
@@ -130,13 +237,21 @@ ui.directive('uiFilterItem', function() {
       };
 
       scope.canShowTags = function() {
+        var canShow = (CAN_SHOW[scope.filter.operator] || {})['tags'];
+        if (canShow !== undefined) {
+          return canShow;
+        }
         return scope.filter &&
            ['many-to-one', 'one-to-one', 'many-to-many'].indexOf(scope.filter.type) > -1
            && ( scope.filter.operator == 'in' ||
-            scope.filter.operator == 'notNot');
+            scope.filter.operator == 'notIn');
       };
 
       scope.canShowInput = function() {
+        var canShow = (CAN_SHOW[scope.filter.operator] || {})['input'];
+        if (canShow !== undefined) {
+          return canShow;
+        }
         return scope.filter && !scope.canShowSelect() && !scope.canShowTags() &&
              scope.filter.operator && !(
              scope.filter.type == 'boolean' ||
@@ -145,15 +260,31 @@ ui.directive('uiFilterItem', function() {
       };
 
       scope.canShowRange = function() {
+        var canShow = (CAN_SHOW[scope.filter.operator] || {})['range'];
+        if (canShow !== undefined) {
+          return canShow;
+        }
         return scope.filter && (
              scope.filter.operator === 'between' ||
              scope.filter.operator === 'notBetween');
+      };
+
+      scope.canShowTimeUnit = function() {
+        var canShow = (CAN_SHOW[scope.filter.operator] || {})['timeUnit'];
+        if (canShow !== undefined) {
+          return canShow;
+        }
+        return false;
       };
 
       scope.getSelection = function () {
         if (!scope.canShowSelect()) return [];
         var field = (scope.fields||{})[scope.filter.field] || {};
         return field.selectionList || [];
+      };
+
+      scope.getTimeUnitSelection = function () {
+        return TIME_UNIT_SELECTIONS[scope.filter.operator];
       };
 
       scope.onFieldChange = function() {
@@ -173,6 +304,14 @@ ui.directive('uiFilterItem', function() {
       };
 
       scope.onOperatorChange = function() {
+        if (scope.canShowTimeUnit()) {
+          if (!Number.isInteger || !Number.isInteger(scope.filter.value)) {
+            scope.filter.value = undefined;
+          }
+          if (!scope.filter.timeUnit) {
+            scope.filter.timeUnit = scope.getTimeUnitSelection()[0].value;
+          }
+        }
         setTimeout(function() {
           scope.$parent.$parent.$parent.doAdjust();
         });
@@ -234,6 +373,9 @@ ui.directive('uiFilterItem', function() {
             "</span>" +
             "<span ng-show='canShowRange()'>" +
               "<input type='text' ui-filter-input ng-model='filter.value2' class='input-medium'> " +
+            "</span>" +
+            "<span ng-show='canShowTimeUnit()'>" +
+              "<select ng-model='filter.timeUnit' class='input=medium' ng-options='o.value as o.title for o in getTimeUnitSelection()'></select>" +
             "</span>" +
           "</div>" +
         "</div>" +
@@ -364,6 +506,9 @@ ui.directive('uiFilterInput', function() {
       });
 
       model.$parsers.push(function(value) {
+        if (scope.canShowTimeUnit()) {
+          return parseInt(value);
+        }
         if (/^date/.test(scope.filter.type)) {
           if (isopattern.test(value)) {
             return value;
@@ -378,6 +523,9 @@ ui.directive('uiFilterInput', function() {
       });
 
       model.$parsers.push(function(value) {
+        if (scope.canShowTimeUnit()) {
+          return value;
+        }
         var type = scope.filter.type;
         if (!(type == 'date' || type == 'datetime') || isDate(value)) {
           return value;
@@ -403,7 +551,7 @@ ui.directive('uiFilterInput', function() {
 
       element.focus(function(e) {
         var type = scope.filter.type;
-        if (!(type == 'date' || type == 'datetime')) {
+        if (!(type == 'date' || type == 'datetime') || scope.canShowTimeUnit()) {
           return;
         }
         picker = picker || element.datepicker(options);
@@ -668,26 +816,30 @@ function FilterFormCtrl($scope, $element, ViewService) {
         filter.selectionList = field.selectionList;
       }
 
-      if (item.operator === '=' && filter.value === true) {
-        filter.operator = 'true';
-      }
-      if (filter.operator === '=' && filter.value === false) {
-        filter.operator = 'false';
-      }
-
-      if (field.type === 'date' || field.type === 'datetime') {
-        if (filter.value) {
-          filter.value = moment(filter.value).toDate();
+      var criterionPreparator = CRITERION_PREPARATORS[item.operator];
+      if (criterionPreparator) {
+        criterionPreparator(filter, item);
+      } else {
+        if (item.operator === '=' && filter.value === true) {
+          filter.operator = 'true';
         }
-        if (filter.value2) {
-          filter.value2 = moment(filter.value2).toDate();
+        if (filter.operator === '=' && filter.value === false) {
+          filter.operator = 'false';
+        }
+  
+        if (field.type === 'date' || field.type === 'datetime') {
+          if (filter.value) {
+            filter.value = moment(filter.value).toDate();
+          }
+          if (filter.value2) {
+            filter.value2 = moment(filter.value2).toDate();
+          }
+        }
+  
+        if (filter.type == 'many-to-one' || field.type === 'one-to-one') {
+          filter.targetName = field.targetName;
         }
       }
-
-      if (filter.type == 'many-to-one' || field.type === 'one-to-one') {
-        filter.targetName = field.targetName;
-      }
-
       $scope.addFilter(filter);
     });
   }
@@ -738,7 +890,10 @@ function FilterFormCtrl($scope, $element, ViewService) {
         criterion.value = criterion.value || '';
       }
 
-      if (filter.operator == 'in' ||
+      var criterionPreparator = CRITERION_PREPARATORS[filter.operator];
+      if (criterionPreparator) {
+        criterionPreparator(criterion, filter);
+      } else if (filter.operator == 'in' ||
         filter.operator == 'notIn') {
         if (_.isEmpty(filter.value)) {
           return;
@@ -1256,6 +1411,12 @@ ui.directive('uiFilterBox', function() {
             filter.criteria = process(filter.criteria);
             return filter;
           }
+
+          var transformer = FILTER_TRANSFORMERS[filter.operator];
+          if (transformer) {
+            filter.transformer = transformer;
+          }
+
           var name = filter.fieldName;
           var type = (($scope.fields||$scope.$parent.fields||{})[filter.fieldName]||{}).type;
 
