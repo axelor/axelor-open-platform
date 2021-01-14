@@ -27,7 +27,10 @@ import com.axelor.events.PreLogin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import javax.inject.Inject;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -35,6 +38,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriBuilder;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -49,6 +53,8 @@ public class AuthFilter extends FormAuthenticationFilter {
 
   @Inject private Event<PreLogin> preLogin;
   @Inject private Event<PostLogin> postLogin;
+
+  private static final String SESSION_COOKIE_NAME = "JSESSIONID";
 
   @Override
   protected boolean executeLogin(ServletRequest request, ServletResponse response)
@@ -153,7 +159,28 @@ public class AuthFilter extends FormAuthenticationFilter {
       throws Exception {
     // change session id to prevent session fixation
     ((HttpServletRequest) request).changeSessionId();
+    if (request.isSecure()) {
+      setSessionSameSiteNone((HttpServletResponse) response);
+    }
     return super.onLoginSuccess(token, subject, request, response);
+  }
+
+  public static void setSessionSameSiteNone(HttpServletResponse response) {
+    final Collection<String> headers = response.getHeaders(HttpHeaders.SET_COOKIE);
+    final Iterator<String> it = headers.iterator();
+    if (it.hasNext()) {
+      addCookieHeader(it.next(), response::setHeader);
+      while (it.hasNext()) {
+        addCookieHeader(it.next(), response::addHeader);
+      }
+    }
+  }
+
+  private static void addCookieHeader(String header, BiConsumer<String, String> headerAdder) {
+    if (header.startsWith(SESSION_COOKIE_NAME)) {
+      header = String.format("%s; %s", header, "SameSite=None");
+    }
+    headerAdder.accept(HttpHeaders.SET_COOKIE, header);
   }
 
   @Override
