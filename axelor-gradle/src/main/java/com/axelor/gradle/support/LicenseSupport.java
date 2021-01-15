@@ -68,12 +68,14 @@ public class LicenseSupport extends AbstractSupport {
     license.setIgnoreFailures(true);
 
     license.mapping("java", "SLASHSTAR_STYLE");
+    license.mapping("scss", "JAVADOC_STYLE");
 
     license.include("**/*.java");
     license.include("**/*.groovy");
     license.include("**/*.scala");
     license.include("**/*.js");
     license.include("**/*.css");
+    license.include("**/*.scss");
     license.include("**/*.jsp");
 
     license.exclude("**/LICENSE");
@@ -88,7 +90,6 @@ public class LicenseSupport extends AbstractSupport {
     license.exclude("**/data-init/**");
     license.exclude("**/data-demo/**");
     license.exclude("**/resources/**");
-    license.exclude("**/webapp/lib/**");
     license.exclude("**/webapp/lib/**");
     license.exclude("**/webapp/dist/**");
     license.exclude("**/webapp/node_modules/**");
