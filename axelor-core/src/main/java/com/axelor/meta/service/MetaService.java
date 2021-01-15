@@ -155,8 +155,7 @@ public class MetaService {
    */
   private List<MenuItem> filter(Collection<MenuItem> items, Boolean withParentCheck) {
 
-    final Map<String, MenuItem> map = new LinkedHashMap<>();
-    final Set<String> visited = new HashSet<>();
+    final Map<String, MenuItem> visited = new LinkedHashMap<>();
     final List<MenuItem> all = new ArrayList<>();
 
     final Map<String, Object> vars = new HashMap<>();
@@ -164,18 +163,15 @@ public class MetaService {
 
     for (MenuItem item : items) {
       final String name = item.getName();
-      if (visited.contains(name)) {
+      if (visited.containsKey(name)) {
         continue;
       }
-      visited.add(name);
-      if (item.getHidden() != Boolean.TRUE) {
-        map.put(name, item);
-      }
+      visited.put(name, item);
     }
 
-    for (final String name : map.keySet()) {
-      final MenuItem item = map.get(name);
-      if (canShow(item, map, null, scriptHelper, withParentCheck)) {
+    for (final String name : visited.keySet()) {
+      final MenuItem item = visited.get(name);
+      if (canShow(item, visited, null, scriptHelper, withParentCheck)) {
         all.add(item);
       }
     }
