@@ -19,7 +19,10 @@ package com.axelor.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.FilterChain;
@@ -28,6 +31,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.HttpHeaders;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -40,6 +44,8 @@ public class AuthFilter extends FormAuthenticationFilter {
   @Inject
   @Named("app.loginUrl")
   private String loginUrl;
+
+  private static final String SESSION_COOKIE_NAME = "JSESSIONID";
 
   @Override
   public String getLoginUrl() {
@@ -110,7 +116,28 @@ public class AuthFilter extends FormAuthenticationFilter {
       throws Exception {
     // change session id to prevent session fixation
     ((HttpServletRequest) request).changeSessionId();
+    if (request.isSecure()) {
+      setSessionSameSiteNone((HttpServletResponse) response);
+    }
     return super.onLoginSuccess(token, subject, request, response);
+  }
+
+  public static void setSessionSameSiteNone(HttpServletResponse response) {
+    final Collection<String> headers = response.getHeaders(HttpHeaders.SET_COOKIE);
+    final Iterator<String> it = headers.iterator();
+    if (it.hasNext()) {
+      addCookieHeader(it.next(), response::setHeader);
+      while (it.hasNext()) {
+        addCookieHeader(it.next(), response::addHeader);
+      }
+    }
+  }
+
+  private static void addCookieHeader(String header, BiConsumer<String, String> headerAdder) {
+    if (header.startsWith(SESSION_COOKIE_NAME)) {
+      header = String.format("%s; %s", header, "SameSite=None");
+    }
+    headerAdder.accept(HttpHeaders.SET_COOKIE, header);
   }
 
   @SuppressWarnings("unchecked")

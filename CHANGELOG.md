@@ -1,6 +1,8 @@
 ## 5.0.26 (current)
 
-TBD
+### Bugs
+
+* Set "SameSite=None" attribute to session cookie to allow CORS requests
 
 ## 5.0.25 (2020-10-14)
 
