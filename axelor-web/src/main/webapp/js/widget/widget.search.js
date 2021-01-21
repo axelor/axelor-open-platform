@@ -826,7 +826,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
         if (filter.operator === '=' && filter.value === false) {
           filter.operator = 'false';
         }
-  
+
         if (field.type === 'date' || field.type === 'datetime') {
           if (filter.value) {
             filter.value = moment(filter.value).toDate();
@@ -835,7 +835,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
             filter.value2 = moment(filter.value2).toDate();
           }
         }
-  
+
         if (filter.type == 'many-to-one' || field.type === 'one-to-one') {
           filter.targetName = field.targetName;
         }
