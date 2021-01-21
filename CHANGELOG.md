@@ -1,3 +1,7 @@
+## 5.0.26 (current)
+
+TBD
+
 ## 5.0.25 (2020-10-14)
 
 * Invalid meta and translations when restore is done
