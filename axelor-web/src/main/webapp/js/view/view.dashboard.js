@@ -141,6 +141,8 @@ function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 
   var self = this;
   var init = _.once(function init() {
+    $scope.toolbar = null;
+    $scope.menubar = null;
 
     ui.ViewCtrl.call(self, $scope, DataSource, ViewService);
 
