@@ -69,7 +69,7 @@ var regional = {
   closeText :		_t('Done'),
   prevText : 		_t('Prev'),
   nextText : 		_t('Next'),
-  firstDay: 		1
+  firstDay: 		moment.localeData(ui.getBrowserLocale()).firstDayOfWeek()
 };
 
 // configure datepicker

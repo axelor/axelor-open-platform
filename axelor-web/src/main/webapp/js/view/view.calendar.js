@@ -468,6 +468,8 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
 
       lang: lang,
 
+      firstDay: mini.datepicker('option', 'firstDay'),
+
       editable: editable,
 
       selectable: editable,
@@ -529,7 +531,6 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
       _.extend(options, {
         timeFormat: 'H:mm',
         axisFormat: 'H:mm',
-        firstDay: 1,
 
         views: {
           week: {
