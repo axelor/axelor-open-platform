@@ -139,10 +139,11 @@ ui.directive('uiViewDashboard', ['ViewService', function(ViewService) {
 DashletCtrl.$inject = ['$scope', '$element', 'MenuService', 'DataSource', 'ViewService'];
 function DashletCtrl($scope, $element, MenuService, DataSource, ViewService) {
 
+  $scope.toolbar = null;
+  $scope.menubar = null;
+
   var self = this;
   var init = _.once(function init() {
-    $scope.toolbar = null;
-    $scope.menubar = null;
 
     ui.ViewCtrl.call(self, $scope, DataSource, ViewService);
 
