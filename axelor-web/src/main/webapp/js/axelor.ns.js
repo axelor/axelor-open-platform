@@ -150,6 +150,8 @@
     html: $.fn.html
   };
 
-  $.fn.html = function html() { return jq.html.apply(this, sanitize(arguments)); };
+  $.fn.html = function html() {
+    return jq.html.apply(this, sanitize(Array.prototype.slice.call(arguments)));
+  };
 
 })();
