@@ -395,7 +395,7 @@ _.extend(Factory.prototype, {
       return Formatters[type](field, value, dataContext, this.grid);
     }
 
-    if (["url", "duration"].indexOf(widget) > 0) {
+    if (["url", "duration"].indexOf(widget) >= 0) {
       type = widget.toLowerCase();
     }
 
