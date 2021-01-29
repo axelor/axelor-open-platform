@@ -4,6 +4,10 @@
 
 * Set "SameSite=None" attribute to session cookie to allow CORS requests
 
+### Security
+
+* Fix HTML sanitization in suggest box
+
 ## 5.0.25 (2020-10-14)
 
 * Invalid meta and translations when restore is done

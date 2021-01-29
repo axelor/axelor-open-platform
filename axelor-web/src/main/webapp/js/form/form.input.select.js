@@ -124,7 +124,8 @@ ui.formWidget('BaseSelect', {
     };
 
     function renderItem(ul, item) {
-      var el = $("<li>").append( $("<a>").html(item.label)).appendTo(ul);
+      var label = axelor.sanitize(item.label);
+      var el = $("<li>").append( $("<a>").html(label)).appendTo(ul);
       if (item.click) {
         el.addClass("tag-select-action");
         ul.addClass("tag-select-action-menu");
