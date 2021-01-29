@@ -172,7 +172,7 @@ var Formatters = {
 
     var text = (value||{})[key];
 
-    return text ? _.escapeHTML(text) : "";
+    return text ? _.escapeHTML(axelor.sanitize(text)) : "";
   },
 
   "one-to-many": function(field, value) {

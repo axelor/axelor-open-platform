@@ -302,7 +302,8 @@ ui.formInput('ManyToOne', 'Select', {
       if (item) {
         var trKey = ui.getNestedTrKey(scope.field.targetName);
         var key = scope.field.targetName || "id";
-        return ui.findNested(item, trKey) || ui.findNested(item, key);
+        var value = ui.findNested(item, trKey) || ui.findNested(item, key);
+        return axelor.sanitize(value);
       }
       return "";
     };
