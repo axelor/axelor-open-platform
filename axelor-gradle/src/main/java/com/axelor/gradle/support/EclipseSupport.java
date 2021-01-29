@@ -73,7 +73,7 @@ public class EclipseSupport extends AbstractSupport {
                                   project.getRootDir(),
                                   project.getName(),
                                   TomcatRun.getArgs(project, 8080),
-                                  TomcatRun.getJvmArgs(project, true, false)));
+                                  TomcatRun.getJvmArgs(project, false)));
                       final Task generateLauncher =
                           project.getTasks().getByName("generateLauncher");
                       if (generateLauncher != null) {

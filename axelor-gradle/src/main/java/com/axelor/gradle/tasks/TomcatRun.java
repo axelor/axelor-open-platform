@@ -18,7 +18,6 @@
 package com.axelor.gradle.tasks;
 
 import com.axelor.common.FileUtils;
-import com.axelor.gradle.support.HotswapSupport;
 import com.axelor.gradle.support.TomcatSupport;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,17 +41,10 @@ public class TomcatRun extends JavaExec {
 
   private static final String MAIN_CLASS = "com.axelor.app.internal.AppRunner";
 
-  private boolean hot;
-
   private int port = 8080;
 
   public TomcatRun() {
     setMain(MAIN_CLASS);
-  }
-
-  @Option(option = "hot", description = "Specify whether to enable hot-swaping.")
-  public void setHot(boolean hot) {
-    this.hot = hot;
   }
 
   @Option(option = "port", description = "Specify the tomcat server port.")
@@ -74,14 +66,9 @@ public class TomcatRun extends JavaExec {
     return args;
   }
 
-  public static List<String> getJvmArgs(Project project, boolean hot, boolean debug) {
+  public static List<String> getJvmArgs(Project project, boolean debug) {
     final List<String> jvmArgs = new ArrayList<>();
-    if (hot || debug) {
-      if (HotswapSupport.hasDCEVM()) {
-        HotswapSupport.getAgentArgs(project, !debug).forEach(jvmArgs::add);
-      } else {
-        project.getLogger().info("Cannot enable hot-swaping as DCEVM is not installed.");
-      }
+    if (debug) {
       jvmArgs.add("-Daxelor.view.watch=true");
     }
     return jvmArgs;
@@ -125,7 +112,7 @@ public class TomcatRun extends JavaExec {
     classpath(createManifestJar(project));
 
     setArgs(getArgs(project, port));
-    setJvmArgs(getJvmArgs(project, hot, getDebug()));
+    setJvmArgs(getJvmArgs(project, getDebug()));
 
     super.exec();
   }

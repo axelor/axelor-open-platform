@@ -56,7 +56,7 @@ public class IdeaSupport extends AbstractSupport {
             final File rootDir = project.getRootDir();
             final File workspace = FileUtils.getFile(rootDir, ".idea", "workspace.xml");
             final List<String> args = TomcatRun.getArgs(project, 8080);
-            final List<String> vmArgs = TomcatRun.getJvmArgs(project, true, false);
+            final List<String> vmArgs = TomcatRun.getJvmArgs(project, false);
             project.getTasks().getByName("ideaModule").dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
             project
                 .getTasks()

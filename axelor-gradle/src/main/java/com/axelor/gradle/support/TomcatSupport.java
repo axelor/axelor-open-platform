@@ -64,7 +64,6 @@ public class TomcatSupport extends AbstractSupport {
                       .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
                       .getRuntimeClasspath());
               task.dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
-              task.dependsOn(HotswapSupport.GENERATE_HOTSWAP_CONFIG_TASK);
               task.setDescription("Generate axelor-tomcat.properties.");
               task.setGroup(AxelorPlugin.AXELOR_BUILD_GROUP);
               task.doLast(a -> generateConfig(project));
@@ -128,7 +127,7 @@ public class TomcatSupport extends AbstractSupport {
       }
     }
 
-    extraClasses.addAll(HotswapSupport.findOutputPaths(project));
+    extraClasses.add(FileUtils.getFile(project.getBuildDir(), "classes", "java", "main"));
 
     props.setProperty(
         "extraClasses",

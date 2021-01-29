@@ -103,7 +103,6 @@ public final class TldSkipPatterns {
     patterns.add("hamcrest-core-*.jar");
     patterns.add("hibernate-*.jar");
     patterns.add("HikariCP-*.jar");
-    patterns.add("hotswap-*.jar");
     patterns.add("hsqldb-*.jar");
     patterns.add("httpclient-*.jar");
     patterns.add("httpcore-*.jar");
