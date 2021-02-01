@@ -551,7 +551,7 @@ ui.directive('uiViewTree', function(){
         tr.data('$record', record);
 
         _.each(scope.columns, function(col) {
-          $('<td>').html(col.cellText(record)).appendTo(tr);
+          $('<td>').html(axelor.sanitize(col.cellText(record))).appendTo(tr);
         });
 
         if (scope.draggable && (record.$folder || scope._countOn || !record.$parent)) {

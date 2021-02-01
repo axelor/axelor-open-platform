@@ -6,7 +6,7 @@
 
 ### Security
 
-* Fix HTML sanitization in suggest box
+* Fix HTML sanitization in suggest box and tree view
 
 ## 5.0.25 (2020-10-14)
 
