@@ -18,6 +18,7 @@
 package com.axelor.gradle.tasks;
 
 import com.axelor.common.FileUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.gradle.support.TomcatSupport;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,28 +29,38 @@ import java.util.jar.Attributes;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
+import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.plugins.JavaPluginConvention;
-import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.options.Option;
 
-public class TomcatRun extends JavaExec {
+public class TomcatRun extends DefaultTask {
 
   private static final String MAIN_CLASS = "com.axelor.app.internal.AppRunner";
 
   private int port = 8080;
 
-  public TomcatRun() {
-    setMain(MAIN_CLASS);
-  }
+  private String config;
 
-  @Option(option = "port", description = "Specify the tomcat server port.")
+  private boolean debug;
+
+  @Option(option = "port", description = "Specify the tomcat server port (default 8080).")
   public void setPort(String port) {
     this.port = Integer.parseInt(port);
+  }
+
+  @Option(option = "config", description = "specify the appliction config file path.")
+  public void setConfig(String config) {
+    this.config = config;
+  }
+
+  @Option(option = "debug-jvm", description = "Specify whether to enable debugging on port 5005.")
+  public void setDebug(boolean debug) {
+    this.debug = debug;
   }
 
   public static List<String> getArgs(Project project, int port) {
@@ -104,16 +115,28 @@ public class TomcatRun extends JavaExec {
     }
   }
 
+  protected List<String> getArgs() {
+    return getArgs(getProject(), port);
+  }
+
+  protected List<String> getJvmArgs() {
+    final List<String> jvmArgs = getJvmArgs(getProject(), debug);
+    if (StringUtils.notBlank(config)) {
+      jvmArgs.add("-Daxelor.config=" + config);
+    }
+    return jvmArgs;
+  }
+
   @TaskAction
-  @Override
-  public void exec() {
+  public void exec() throws Exception {
     final Project project = getProject();
 
-    classpath(createManifestJar(project));
-
-    setArgs(getArgs(project, port));
-    setJvmArgs(getJvmArgs(project, getDebug()));
-
-    super.exec();
+    project.javaexec(
+        task -> {
+          task.classpath(createManifestJar(project));
+          task.setDebug(debug);
+          task.args(getArgs());
+          task.jvmArgs(getJvmArgs());
+        });
   }
 }
