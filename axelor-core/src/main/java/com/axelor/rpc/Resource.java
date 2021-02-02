@@ -504,7 +504,8 @@ public class Resource<T extends Model> {
       parentName = (String) childOn.get("parent");
     }
 
-    ImmutableList.of(modelName, parentName).stream()
+    ImmutableList.of(modelName, parentName)
+        .stream()
         .filter(name -> !NAME_PATTERN.matcher(name).matches())
         .findAny()
         .ifPresent(
