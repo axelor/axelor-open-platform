@@ -835,6 +835,7 @@ ui.formInput('RadioSelect', {
   metaWidget: true,
 
   link: function(scope, element, attrs, model) {
+    scope.prepareTemplate = true;
 
     var field = scope.field;
     var selection = field.selectionList || [];
@@ -877,6 +878,7 @@ ui.formInput('CheckboxSelect', {
   metaWidget: true,
 
   link: function(scope, element, attrs, model) {
+    scope.prepareTemplate = true;
 
     var field = scope.field;
     var selection = field.selectionList || [];
@@ -933,6 +935,7 @@ ui.formInput('NavSelect', {
   metaWidget: true,
 
   link: function(scope, element, attrs, model) {
+    scope.prepareTemplate = true;
 
     var field = scope.field;
     var selection = field.selectionList || [];

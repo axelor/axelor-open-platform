@@ -366,6 +366,7 @@ ui.formInput('BinaryLink', {
   metaWidget: true,
 
   link: function(scope, element, attrs, model) {
+    scope.prepareTemplate = true;
 
     var field = scope.field;
     var input = element.children('input:first').hide();
@@ -442,7 +443,7 @@ ui.formInput('BinaryLink', {
   '<div>' +
     '<input type="file">' +
     '<div class="btn-group">' +
-      '<button ng-click="doSelect()" ng-show="!isReadonly()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
+      '<button ng-click="doSelect()" ng-show="!isReadonly()" class="btn select" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
       '<button ng-click="doRemove()" ng-show="canDownload() && !isReadonly()" class="btn" type="button"><i class="fa fa-times"></i></button>' +
     '</div> ' +
     '<a ng-show="text" href="javascript:" ng-click="doSave()">{{text}}</a>' +
