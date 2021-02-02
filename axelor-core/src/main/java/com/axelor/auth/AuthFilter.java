@@ -24,6 +24,7 @@ import com.axelor.event.NamedLiteral;
 import com.axelor.events.LoginRedirectException;
 import com.axelor.events.PostLogin;
 import com.axelor.events.PreLogin;
+import com.axelor.inject.Beans;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -109,6 +110,8 @@ public class AuthFilter extends FormAuthenticationFilter {
   public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)
       throws ServletException, IOException {
 
+    setSessionSameSiteNone((HttpServletRequest) request, (HttpServletResponse) response);
+
     // tomcat 7.0.67 doesn't redirect with / if root request is sent without slash
     // see RM-4500 for more details
     if (!SecurityUtils.getSubject().isAuthenticated() && isRootWithoutSlash(request)) {
@@ -158,14 +161,34 @@ public class AuthFilter extends FormAuthenticationFilter {
       AuthenticationToken token, Subject subject, ServletRequest request, ServletResponse response)
       throws Exception {
     // change session id to prevent session fixation
-    ((HttpServletRequest) request).changeSessionId();
-    if (request.isSecure()) {
-      setSessionSameSiteNone((HttpServletResponse) response);
-    }
+    changeSessionId((HttpServletRequest) request, (HttpServletResponse) response);
     return super.onLoginSuccess(token, subject, request, response);
   }
 
-  public static void setSessionSameSiteNone(HttpServletResponse response) {
+  public static void changeSessionId() {
+    final HttpServletRequest request = Beans.get(HttpServletRequest.class);
+    request.changeSessionId();
+    if (request.isSecure()) {
+      setSessionSameSiteNone(Beans.get(HttpServletResponse.class));
+    }
+  }
+
+  private static void changeSessionId(HttpServletRequest request, HttpServletResponse response) {
+    request.changeSessionId();
+    setSessionSameSiteNone(request, response);
+  }
+
+  public static void setSessionSameSiteNone(
+      HttpServletRequest request, HttpServletResponse response) {
+    if (request.isSecure()) {
+      setSessionSameSiteNone(response);
+    }
+  }
+
+  private static void setSessionSameSiteNone(HttpServletResponse response) {
+    final Subject subject = SecurityUtils.getSubject();
+    subject.getSession();
+
     final Collection<String> headers = response.getHeaders(HttpHeaders.SET_COOKIE);
     final Iterator<String> it = headers.iterator();
     if (it.hasNext()) {

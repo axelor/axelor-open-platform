@@ -55,11 +55,7 @@ public class AuthPac4jListener implements AuthenticationListener {
       final User user = ((UserAuthenticationInfo) info).getUser();
 
       if (user != null) {
-        final HttpServletRequest request = Beans.get(HttpServletRequest.class);
-        request.changeSessionId();
-        if (request.isSecure()) {
-          AuthFilter.setSessionSameSiteNone(Beans.get(HttpServletResponse.class));
-        }
+        AuthFilter.changeSessionId();
         firePostLoginSuccess(token, user);
         return;
       }
