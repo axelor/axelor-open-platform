@@ -397,7 +397,7 @@ form .panel-tabs .nav-tabs > li:hover > a {
   border-bottom: 0;
 }
 
-.bar-main .wysiwyg-container {
+.bar-main .html-item:not(.ng-invalid) .wysiwyg-container {
   border: 0;
 }
 

@@ -31,6 +31,7 @@ ui.formInput('CodeEditor', {
   metaWidget: true,
 
   link: function(scope, element, attrs, model) {
+    scope.prepareTemplate = true;
 
     var editor = null;
     var loading = false;

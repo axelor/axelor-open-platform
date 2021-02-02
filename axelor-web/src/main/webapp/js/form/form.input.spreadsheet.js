@@ -28,6 +28,7 @@ ui.formInput('Spreadsheet', {
   css: "spreadsheet-item",
 
   link: function (scope, element, attrs, model) {
+    scope.prepareTemplate = true;
 
     var field = scope.field;
     var height = field.height || 580;

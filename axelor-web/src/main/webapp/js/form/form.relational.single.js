@@ -818,6 +818,7 @@ ui.formInput('RefSelect', {
 
   link: function(scope, element, attrs, model) {
     this._super.apply(this, arguments);
+    scope.prepareTemplate = true;
 
     var name = scope.field.name,
       selectionList = scope.field.selectionList,

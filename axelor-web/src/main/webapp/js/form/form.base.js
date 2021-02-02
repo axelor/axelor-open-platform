@@ -312,7 +312,7 @@ ui.formDirective = function(name, object) {
 
       var self = this;
 
-      if (!this.template_editable && !this.template_readonly) {
+      if (!this.template_editable && !this.template_readonly && !scope.prepareTemplate) {
         return;
       }
 
