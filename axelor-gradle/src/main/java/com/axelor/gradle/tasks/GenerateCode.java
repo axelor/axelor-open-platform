@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.gradle.api.Project;
@@ -119,9 +118,6 @@ public class GenerateCode extends ModuleTask {
       descriptionLines = Splitter.on("\n").trimResults().splitToList(description.trim());
     }
 
-    final Set<String> installs = extension.getInstall();
-    final Boolean removable = extension.getRemovable();
-
     final StringBuilder text = new StringBuilder();
 
     text.append("name = ")
@@ -142,14 +138,8 @@ public class GenerateCode extends ModuleTask {
       text.append("\n").append("application = true").append("\n");
     }
 
-    if (Boolean.TRUE.equals(removable)) {
-      text.append("\n").append("removable = true").append("\n");
-    }
     if (!depends.isEmpty()) {
       text.append("\n").append("depends = ").append(Joiner.on(", ").join(depends)).append("\n");
-    }
-    if (installs != null && !installs.isEmpty()) {
-      text.append("\n").append("installs = ").append(Joiner.on(", ").join(installs)).append("\n");
     }
 
     Files.asCharSink(outputPath, Charsets.UTF_8).write(text);

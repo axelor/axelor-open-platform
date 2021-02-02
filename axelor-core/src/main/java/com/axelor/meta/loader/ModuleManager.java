@@ -35,12 +35,7 @@ import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaModule;
-import com.axelor.meta.db.repo.MetaActionMenuRepository;
-import com.axelor.meta.db.repo.MetaActionRepository;
-import com.axelor.meta.db.repo.MetaMenuRepository;
 import com.axelor.meta.db.repo.MetaModuleRepository;
-import com.axelor.meta.db.repo.MetaSelectRepository;
-import com.axelor.meta.db.repo.MetaViewRepository;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.persist.Transactional;
 import java.lang.reflect.Field;
@@ -49,7 +44,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -118,38 +112,29 @@ public class ModuleManager {
   public void initialize(final boolean update, final boolean withDemo) {
     try {
       createUsers();
-      resolve(true);
+      resolve(update);
       Beans.get(AuditableRunner.class)
           .run(
               () -> {
-                final List<Module> newlyInstalledModules = new ArrayList<>();
+                final List<Module> installed = new ArrayList<>();
 
                 // install modules
                 resolver.all().stream()
-                    .filter(m -> !m.isRemovable() || m.isInstalled())
                     .peek(m -> log.info("Loading package {}...", m.getName()))
-                    .filter(m -> !m.isRemovable() || m.isPending())
+                    .filter(m -> m.isPending())
                     .forEach(
                         m -> {
-                          if (install(m.getName(), update, withDemo, false)) {
-                            newlyInstalledModules.add(m);
+                          if (installOne(m.getName(), update, withDemo)) {
+                            installed.add(m);
                           }
                         });
 
                 // second iteration ensures proper view sequence
-                newlyInstalledModules.forEach(m -> viewLoader.doLast(m, update));
-
-                // uninstall pending modules
-                resolver.all().stream()
-                    .filter(Module::isRemovable)
-                    .filter(Module::isPending)
-                    .filter(m -> !m.isInstalled())
-                    .map(Module::getName)
-                    .forEach(this::uninstall);
+                installed.forEach(module -> viewLoader.doLast(module, update));
               });
     } finally {
-      this.encryptPasswords();
-      this.doCleanUp();
+      encryptPasswords();
+      doCleanUp();
     }
   }
 
@@ -174,7 +159,7 @@ public class ModuleManager {
       }
       resolver.all().stream()
           .filter(m -> names.contains(m.getName()))
-          .forEach(m -> install(m, true, withDemo));
+          .forEach(m -> installOne(m.getName(), true, withDemo));
       resolver.all().stream()
           .filter(m -> names.contains(m.getName()))
           .forEach(m -> viewLoader.doLast(m, true));
@@ -193,7 +178,7 @@ public class ModuleManager {
 
     try {
       pathsToRestore.addAll(paths);
-      moduleList.forEach(m -> install(m, true, false));
+      moduleList.forEach(m -> installOne(m.getName(), true, false));
       moduleList.forEach(m -> viewLoader.doLast(m, true));
     } finally {
       pathsToRestore.clear();
@@ -248,36 +233,11 @@ public class ModuleManager {
     try {
       resolver.resolve(moduleName).stream()
           .map(Module::getName)
-          .forEach(name -> install(name, update, withDemo, true));
+          .forEach(name -> installOne(name, update, withDemo));
       resolver.resolve(moduleName).stream().forEach(m -> viewLoader.doLast(m, update));
     } finally {
       this.doCleanUp();
     }
-  }
-
-  @Transactional
-  public void uninstall(String moduleName) {
-    log.info("Removing package {}...", moduleName);
-
-    final MetaModule entity = modules.findByName(moduleName);
-
-    Beans.get(MetaViewRepository.class).findByModule(moduleName).remove();
-    Beans.get(MetaSelectRepository.class).findByModule(moduleName).remove();
-    Beans.get(MetaMenuRepository.class).findByModule(moduleName).remove();
-    Beans.get(MetaActionRepository.class).findByModule(moduleName).remove();
-    Beans.get(MetaActionMenuRepository.class).findByModule(moduleName).remove();
-
-    entity.setInstalled(false);
-    entity.setPending(false);
-
-    modules.save(entity);
-
-    resolver.get(moduleName).setInstalled(false);
-    resolver.get(moduleName).setPending(false);
-
-    moduleChangedEvent
-        .select(NamedLiteral.of(moduleName))
-        .fire(new ModuleChanged(moduleName, entity.getInstalled()));
   }
 
   private void doCleanUp() {
@@ -289,37 +249,17 @@ public class ModuleManager {
     updateLastRestored(time);
   }
 
-  private boolean install(String moduleName, boolean update, boolean withDemo, boolean force) {
+  private boolean installOne(String moduleName, boolean update, boolean withDemo) {
     final Module module = resolver.get(moduleName);
     final MetaModule metaModule = modules.findByName(moduleName);
-    if (metaModule == null) {
+
+    if (metaModule == null || SKIP.contains(moduleName) || !module.isPending()) {
       return false;
     }
-    if (!module.isInstalled() && module.isRemovable() && !force) {
-      return false;
-    }
-    if (module.isInstalled() && !(update || module.isUpgradable() || module.isPending())) {
-      return false;
-    }
-    install(module, update, withDemo);
 
-    moduleChangedEvent
-        .select(NamedLiteral.of(moduleName))
-        .fire(new ModuleChanged(moduleName, module.isInstalled()));
-    return true;
-  }
-
-  private void install(Module module, boolean update, boolean withDemo) {
-    if (SKIP.contains(module.getName())) {
-      return;
-    }
-
-    String message = "Installing package ";
-    if (module.isInstalled()) {
-      message = "Updating package ";
-    }
-
-    log.info(message + module + "...");
+    final String message =
+        module.isInstalled() ? "Updating package {}..." : "Installing package {}...";
+    log.info(message, moduleName);
 
     // load meta
     installMeta(module, update);
@@ -333,7 +273,14 @@ public class ModuleManager {
     }
 
     // finally update install state
-    updateState(module);
+    module.setPending(false);
+    module.setInstalled(true);
+
+    moduleChangedEvent
+        .select(NamedLiteral.of(moduleName))
+        .fire(new ModuleChanged(moduleName, module.isInstalled()));
+
+    return true;
   }
 
   private void installMeta(Module module, boolean update) {
@@ -346,16 +293,6 @@ public class ModuleManager {
             metaLoader.feedTransactionExecutor(
                 transactionExecutor, module, update, pathsToRestore));
     transactionExecutor.run();
-  }
-
-  @Transactional
-  void updateState(Module module) {
-    MetaModule metaModule = modules.findByName(module.getName());
-    module.setInstalled(true);
-    module.setPending(false);
-    module.setInstalledVersion(module.getVersion());
-    metaModule.setInstalled(true);
-    metaModule.setPending(false);
   }
 
   public static boolean isInstalled(String module) {
@@ -393,18 +330,10 @@ public class ModuleManager {
       }
 
       final String[] depends = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
-      final String[] installs = properties.getProperty("installs", "").trim().split("\\s*,\\s*");
-      final boolean removable = "true".equals(properties.getProperty("removable"));
       final boolean application = "true".equals(properties.getProperty("application"));
 
       final Module module = resolver.add(name, depends);
-      module.setRemovable(removable);
       module.setApplication(application);
-
-      // install forced modules on init
-      if (installed.isEmpty()) {
-        installed.addAll(Arrays.asList(installs));
-      }
     }
 
     for (Module module : resolver.all()) {
@@ -413,7 +342,7 @@ public class ModuleManager {
       if (installed.contains(name)) {
         module.setInstalled(true);
       }
-      if (module.isInstalled() || !module.isRemovable()) {
+      if (module.isInstalled()) {
         found.add(name);
       }
     }
@@ -423,9 +352,7 @@ public class ModuleManager {
 
   @Transactional
   void resolve(boolean update) {
-    final Set<String> forceInstall = new HashSet<>();
     final Map<MetaModule, String[]> dependencies = new HashMap<>();
-    final boolean forceInit = modules.all().count() == 0;
 
     for (final Properties properties : MetaScanner.findModuleProperties()) {
       final String name = properties.getProperty("name");
@@ -437,37 +364,30 @@ public class ModuleManager {
       final String title = properties.getProperty("title");
       final String description = properties.getProperty("description");
       final String version = properties.getProperty("version");
-      final boolean removable = "true".equals(properties.getProperty("removable"));
       final boolean application = "true".equals(properties.getProperty("application"));
-
-      if (forceInit && forceInstall.isEmpty()) {
-        String[] installs = properties.getProperty("installs", "").trim().split("\\s*,\\s*");
-        forceInstall.addAll(Arrays.asList(installs));
-      }
 
       final Module module = resolver.add(name, depends);
       MetaModule stored = modules.findByName(name);
+
       if (stored == null) {
         stored = new MetaModule();
         stored.setName(name);
+      } else {
+        module.setInstalled(true);
       }
+
+      module.setVersion(version);
+      module.setApplication(application);
 
       if (stored.getId() == null || update) {
         stored.setTitle(title);
         stored.setDescription(description);
         stored.setModuleVersion(version);
-        stored.setRemovable(removable);
         stored.setApplication(application);
         stored = modules.save(stored);
         dependencies.put(stored, depends);
+        module.setPending(true);
       }
-
-      module.setVersion(version);
-      module.setApplication(application);
-      module.setRemovable(removable);
-      module.setInstalled(Boolean.TRUE.equals(stored.getInstalled()));
-      module.setPending(Boolean.TRUE.equals(stored.getPending()));
-      module.setInstalledVersion(stored.getModuleVersion());
     }
 
     // resolve dependencies
@@ -484,18 +404,6 @@ public class ModuleManager {
       }
       stored.clearDepends();
       stored.setDepends(depends);
-    }
-
-    for (String name : forceInstall) {
-      Module module = resolver.get(name);
-      MetaModule stored = modules.findByName(name);
-      if (module == null || stored == null) {
-        continue;
-      }
-      module.setPending(!Boolean.TRUE.equals(stored.getInstalled()));
-      stored.setPending(!Boolean.TRUE.equals(stored.getInstalled()));
-      module.setInstalled(true);
-      stored.setInstalled(true);
     }
   }
 

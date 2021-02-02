@@ -17,9 +17,6 @@
     <many-to-many name="depends" ref="MetaModule"
       table="META_MODULE_DEPENDS" column="module_id" column2="depend_id" />
     <boolean name="application" />
-    <boolean name="removable" />
-    <boolean name="installed" />
-    <boolean name="pending" />
   </entity>
 
   <entity name="MetaView" table="META_VIEW" cacheable="true">

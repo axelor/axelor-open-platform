@@ -17,9 +17,6 @@
  */
 package com.axelor.gradle;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 public class AxelorExtension {
 
   public static final String EXTENSION_NAME = "axelor";
@@ -27,10 +24,6 @@ public class AxelorExtension {
   private String title;
 
   private String description;
-
-  private Boolean removable;
-
-  private Set<String> install;
 
   public String getTitle() {
     return title;
@@ -48,38 +41,11 @@ public class AxelorExtension {
     this.description = description;
   }
 
-  public Boolean getRemovable() {
-    return removable;
-  }
-
-  public void setRemovable(Boolean removable) {
-    this.removable = removable;
-  }
-
-  public Set<String> getInstall() {
-    return install;
-  }
-
-  public void setInstall(Set<String> install) {
-    this.install = install;
-  }
-
   public void title(String title) {
     this.title = title;
   }
 
   public void description(String description) {
     this.description = description;
-  }
-
-  public void removable(Boolean removable) {
-    this.removable = removable;
-  }
-
-  public void install(String module) {
-    if (install == null) {
-      install = new LinkedHashSet<>();
-    }
-    install.add(module);
   }
 }

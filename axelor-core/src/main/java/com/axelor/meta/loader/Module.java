@@ -31,13 +31,9 @@ final class Module {
 
   private String version;
 
-  private String installedVersion;
-
   private boolean application = false;
 
   private boolean installed = false;
-
-  private boolean removable = false;
 
   private boolean pending = false;
 
@@ -61,14 +57,6 @@ final class Module {
     this.version = version;
   }
 
-  public String getInstalledVersion() {
-    return installedVersion;
-  }
-
-  public void setInstalledVersion(String installedVersion) {
-    this.installedVersion = installedVersion;
-  }
-
   public boolean isApplication() {
     return application;
   }
@@ -85,24 +73,12 @@ final class Module {
     this.installed = installed;
   }
 
-  public boolean isRemovable() {
-    return removable;
-  }
-
-  public void setRemovable(boolean removable) {
-    this.removable = removable;
-  }
-
   public boolean isPending() {
     return pending;
   }
 
   public void setPending(boolean pending) {
     this.pending = pending;
-  }
-
-  public boolean isUpgradable() {
-    return installed && !Objects.equal(version, installedVersion);
   }
 
   public void dependsOn(Module module) {

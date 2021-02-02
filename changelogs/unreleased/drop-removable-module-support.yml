@@ -1,0 +1,14 @@
+---
+title: Drop removable module support
+type: remove
+description: |
+  The feature is not used by any axelor apps and has many
+  technical issues.
+  
+  Run following SQL script to drop unnecessary columns
+  
+  ```
+  alter table meta_module drop column installed;
+  alter table meta_module drop column removable;
+  alter table meta_module drop column pending;
+  ```

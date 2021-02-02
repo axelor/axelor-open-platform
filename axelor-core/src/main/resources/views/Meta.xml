@@ -74,14 +74,9 @@
 
   <grid title="All Modules" name="meta-module-grid" model="com.axelor.meta.db.MetaModule"
     canDelete="false" canNew="false" canEdit="false" edit-icon="false">
-    <hilite color="danger" if="!installed &amp;&amp; !pending"/>
-    <hilite color="warning" if="pending"/>
     <field name="name"/>
     <field name="title"/>
     <field name="moduleVersion" width="200"/>
-    <field name="installed" width="100"/>
-    <field name="pending" width="100"/>
-    <button name="btnInstall" icon="fa-download" help="Install module" onClick="com.axelor.meta.web.ModuleController:validInstall(name),com.axelor.meta.web.ModuleController:install(name)" readonlyIf="installed || pending"/>
   </grid>
 
   <form name="meta-module-form" title="Module" model="com.axelor.meta.db.MetaModule"
@@ -91,13 +86,6 @@
       <field name="moduleVersion"/>
       <field name="title"/>
       <field name="application"/>
-      <field name="removable" widget="inline-checkbox"/>
-      <field name="installed" widget="inline-checkbox"/>
-      <field name="pending" widget="inline-checkbox"/>
-      <panel showIf="removable" stacked="true" colSpan="3">
-        <button name="btnInstall" title="Install" showIf="!installed &amp;&amp; !pending" onClick="com.axelor.meta.web.ModuleController:validInstall(name),com.axelor.meta.web.ModuleController:install(name)"/>
-        <button name="btnUninstall" title="Uninstall" showIf="installed &amp;&amp; !pending &amp;&amp; removable" onClick="com.axelor.meta.web.ModuleController:validUninstall(name),com.axelor.meta.web.ModuleController:uninstall(name)"/>
-      </panel>
     </panel>
     <panel title="Depends On">
       <field name="depends" widget="TagSelect" colSpan="12" showTitle="false"/>
