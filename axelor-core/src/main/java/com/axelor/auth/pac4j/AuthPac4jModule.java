@@ -18,6 +18,7 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
+import com.axelor.auth.AuthFilter;
 import com.axelor.auth.AuthWebModule;
 import com.axelor.common.StringUtils;
 import com.google.common.collect.ImmutableMap;
@@ -26,13 +27,12 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
-import io.buji.pac4j.context.ShiroSessionStore;
 import io.buji.pac4j.engine.ShiroCallbackLogic;
 import io.buji.pac4j.engine.ShiroSecurityLogic;
 import io.buji.pac4j.filter.CallbackFilter;
 import io.buji.pac4j.filter.LogoutFilter;
 import io.buji.pac4j.filter.SecurityFilter;
-import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.ArrayList;
@@ -46,13 +46,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.realm.Realm;
@@ -67,11 +62,11 @@ import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.context.session.SessionStore;
+import org.pac4j.core.engine.DefaultLogoutLogic;
+import org.pac4j.core.engine.SecurityGrantedAccessAdapter;
 import org.pac4j.core.exception.HttpAction;
-import org.pac4j.core.http.adapter.J2ENopHttpActionAdapter;
+import org.pac4j.core.http.adapter.HttpActionAdapter;
 import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.core.util.CommonHelper;
 import org.pac4j.http.client.indirect.FormClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -282,37 +277,34 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       setLogoutUrlPattern(logoutUrlPattern);
       setLocalLogout(localLogout);
       setCentralLogout(centralLogout);
-    }
+      setLogoutLogic(
+          new DefaultLogoutLogic<Object, J2EContext>() {
 
-    @Override
-    public void doFilter(
-        final ServletRequest servletRequest,
-        final ServletResponse servletResponse,
-        final FilterChain filterChain)
-        throws IOException, ServletException {
+            @Override
+            public Object perform(
+                J2EContext context,
+                Config config,
+                HttpActionAdapter<Object, J2EContext> httpActionAdapter,
+                String defaultUrl,
+                String inputLogoutUrlPattern,
+                Boolean inputLocalLogout,
+                Boolean inputDestroySession,
+                Boolean inputCentralLogout) {
 
-      CommonHelper.assertNotNull("logoutLogic", getLogoutLogic());
-      CommonHelper.assertNotNull("config", getConfig());
+              AuthFilter.setSessionSameSiteNone(context.getRequest(), context.getResponse());
 
-      final HttpServletRequest request = (HttpServletRequest) servletRequest;
-      final HttpServletResponse response = (HttpServletResponse) servletResponse;
-      @SuppressWarnings("unchecked")
-      final SessionStore<J2EContext> sessionStore = getConfig().getSessionStore();
-      final J2EContext context =
-          new J2EContext(
-              request, response, sessionStore != null ? sessionStore : ShiroSessionStore.INSTANCE);
-
-      // Destroy web session.
-      getLogoutLogic()
-          .perform(
-              context,
-              getConfig(),
-              J2ENopHttpActionAdapter.INSTANCE,
-              getDefaultUrl(),
-              getLogoutUrlPattern(),
-              getLocalLogout(),
-              true,
-              getCentralLogout());
+              // Destroy web session.
+              return super.perform(
+                  context,
+                  config,
+                  httpActionAdapter,
+                  defaultUrl,
+                  inputLogoutUrlPattern,
+                  inputLocalLogout,
+                  true,
+                  inputCentralLogout);
+            }
+          });
     }
   }
 
@@ -333,6 +325,36 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       setDefaultClient(config.getClients().getClients().get(0).getName());
       setCallbackLogic(
           new ShiroCallbackLogic<Object, J2EContext>() {
+
+            @Override
+            public Object perform(
+                J2EContext context,
+                Config config,
+                HttpActionAdapter<Object, J2EContext> httpActionAdapter,
+                String inputDefaultUrl,
+                Boolean inputSaveInSession,
+                Boolean inputMultiProfile,
+                Boolean inputRenewSession,
+                String client) {
+
+              AuthFilter.setSessionSameSiteNone(context.getRequest(), context.getResponse());
+
+              try {
+                context.getRequest().setCharacterEncoding("UTF-8");
+              } catch (UnsupportedEncodingException e) {
+                logger.error(e.getMessage(), e);
+              }
+
+              return super.perform(
+                  context,
+                  config,
+                  httpActionAdapter,
+                  inputDefaultUrl,
+                  inputSaveInSession,
+                  inputMultiProfile,
+                  inputRenewSession,
+                  client);
+            }
 
             @SuppressWarnings("unchecked")
             @Override
@@ -388,6 +410,32 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
       setSecurityLogic(
           new ShiroSecurityLogic<Object, J2EContext>() {
+
+            @Override
+            public Object perform(
+                J2EContext context,
+                Config config,
+                SecurityGrantedAccessAdapter<Object, J2EContext> securityGrantedAccessAdapter,
+                HttpActionAdapter<Object, J2EContext> httpActionAdapter,
+                String clients,
+                String authorizers,
+                String matchers,
+                Boolean inputMultiProfile,
+                Object... parameters) {
+
+              AuthFilter.setSessionSameSiteNone(context.getRequest(), context.getResponse());
+
+              return super.perform(
+                  context,
+                  config,
+                  securityGrantedAccessAdapter,
+                  httpActionAdapter,
+                  clients,
+                  authorizers,
+                  matchers,
+                  inputMultiProfile,
+                  parameters);
+            }
 
             // Don't save requested URL if redirected to a non-default central client,
             // so that the requested URL saved before redirection will be used instead.

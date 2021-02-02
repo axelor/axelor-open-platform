@@ -17,6 +17,7 @@
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.auth.AuthFilter;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
@@ -24,9 +25,15 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.inject.Beans;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Key;
 import java.io.IOException;
 import java.util.Map;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.shiro.web.filter.authc.AnonymousFilter;
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
@@ -60,8 +67,8 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
   @Override
   protected void configureAnon() {
     super.configureAnon();
-    addFilterChain("/login.jsp", ANON);
-    addFilterChain("/change-password.jsp", ANON);
+    addFilterChain("/login.jsp", Key.get(FormFilter.class));
+    addFilterChain("/change-password.jsp", Key.get(FormFilter.class));
   }
 
   protected void addFormClient() {
@@ -235,6 +242,17 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
       }
 
       return new UsernamePasswordCredentials(username, password);
+    }
+  }
+
+  public static class FormFilter extends AnonymousFilter {
+
+    @Override
+    protected boolean onPreHandle(
+        ServletRequest request, ServletResponse response, Object mappedValue) {
+      AuthFilter.setSessionSameSiteNone(
+          (HttpServletRequest) request, (HttpServletResponse) response);
+      return super.onPreHandle(request, response, mappedValue);
     }
   }
 }
