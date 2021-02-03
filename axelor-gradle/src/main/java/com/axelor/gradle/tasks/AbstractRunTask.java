@@ -37,6 +37,7 @@ import org.gradle.api.file.FileCollection;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.TaskAction;
@@ -87,11 +88,12 @@ public abstract class AbstractRunTask extends DefaultTask {
     return classpath;
   }
 
-  @Input
+  @InputFile
   protected File getManifestJar() {
     return FileUtils.getFile(getProject().getBuildDir(), "classpath.jar");
   }
 
+  @Input
   protected abstract String getMainClass();
 
   protected File createManifestJar() {
