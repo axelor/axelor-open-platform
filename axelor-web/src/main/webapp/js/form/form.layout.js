@@ -277,7 +277,7 @@ function BarLayout(items, attrs, $scope, $compile) {
   items.each(function(item, i) {
     var elem = $(this);
     var prop = elem.scope().field || {};
-    if (elem.attr('x-sidebar')) {
+    if (_.toBoolean(elem.attr('x-sidebar'))) {
       elem.appendTo(side);
     } else {
       elem.appendTo(wrap);
@@ -317,7 +317,7 @@ ui.directive('uiBarLayout', ['$compile', function($compile) {
     element.append(layout);
     element.addClass('bar-layout');
 
-    if (element.has('[x-sidebar]').length === 0) {
+    if (element.has('[x-sidebar=true]').length === 0) {
       css = "mid";
     }
     if (element.is('form') && ["mini", "mid", "large"].indexOf(schema.width) > -1) {
