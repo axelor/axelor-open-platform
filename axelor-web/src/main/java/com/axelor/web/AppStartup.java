@@ -31,14 +31,13 @@ import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Singleton
 public class AppStartup extends HttpServlet {
 
   private static final long serialVersionUID = -2493577642638670615L;
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AppStartup.class);
+  @Inject private Logger log;
 
   @Inject private ModuleManager moduleManager;
 
@@ -52,13 +51,12 @@ public class AppStartup extends HttpServlet {
 
   @Override
   public void init() throws ServletException {
-    LOGGER.info("Initializing...");
-
+    log.info("Initializing...");
     try {
       moduleManager.initialize(
           false, AppSettings.get().getBoolean(AvailableAppSettings.DATA_IMPORT_DEMO_DATA, true));
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      log.error(e.getMessage(), e);
     }
 
     // initialize search index
@@ -66,24 +64,24 @@ public class AppStartup extends HttpServlet {
       try {
         searchService.createIndex(false);
       } catch (InterruptedException e) {
-        LOGGER.error(e.getMessage(), e);
+        log.error(e.getMessage(), e);
       }
     }
 
     try {
       if (jobRunner.isEnabled()) {
         if (TenantModule.isEnabled()) {
-          LOGGER.info("Scheduler is not supported in multi-tenant mode.");
+          log.info("Scheduler is not supported in multi-tenant mode.");
         } else {
           jobRunner.start();
         }
       }
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      log.error(e.getMessage(), e);
     }
 
     startupEvent.fire(new StartupEvent());
-    LOGGER.info("Ready to serve...");
+    log.info("Ready to serve...");
   }
 
   @Override
@@ -92,7 +90,7 @@ public class AppStartup extends HttpServlet {
       shutdownEvent.fire(new ShutdownEvent());
       jobRunner.stop();
     } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
+      log.error(e.getMessage(), e);
     }
   }
 }

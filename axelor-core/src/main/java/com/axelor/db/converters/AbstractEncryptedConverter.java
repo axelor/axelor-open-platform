@@ -55,7 +55,7 @@ public abstract class AbstractEncryptedConverter<T, R> implements AttributeConve
   }
 
   protected boolean isMigrating() {
-    return "true".equalsIgnoreCase(System.getProperty("database.encrypt.migrate"));
+    return "encrypt".equalsIgnoreCase(System.getProperty("axelor.task.database"));
   }
 
   @Override

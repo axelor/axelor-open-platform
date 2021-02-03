@@ -18,16 +18,18 @@
 package com.axelor.gradle.support;
 
 import com.axelor.gradle.AxelorPlugin;
-import com.axelor.gradle.tasks.DbTask;
+import com.axelor.gradle.tasks.DatabaseTask;
 import org.gradle.api.Project;
-import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.Exec;
-import org.gradle.api.tasks.SourceSet;
 
 public class ScriptsSupport extends AbstractSupport {
 
+  public static final String DATABASE_CONFIGURATION = "database";
+
   @Override
   public void apply(Project project) {
+    project.getConfigurations().create(DATABASE_CONFIGURATION);
+    applyConfigurationLibs(project, DATABASE_CONFIGURATION, DATABASE_CONFIGURATION);
 
     project
         .getTasks()
@@ -58,18 +60,11 @@ public class ScriptsSupport extends AbstractSupport {
     project
         .getTasks()
         .create(
-            DbTask.TASK_NAME,
-            DbTask.class,
+            DatabaseTask.TASK_NAME,
+            DatabaseTask.class,
             task -> {
-              task.setDescription(DbTask.TASK_DESCRIPTION);
-              task.setGroup(DbTask.TASK_GROUP);
-              task.setClasspath(
-                  project
-                      .getConvention()
-                      .getPlugin(JavaPluginConvention.class)
-                      .getSourceSets()
-                      .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
-                      .getRuntimeClasspath());
+              task.setDescription(DatabaseTask.TASK_DESCRIPTION);
+              task.setGroup(DatabaseTask.TASK_GROUP);
             });
   }
 }

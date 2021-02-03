@@ -25,6 +25,9 @@ import javax.servlet.ServletException;
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.loader.WebappLoader;
@@ -145,24 +148,21 @@ public class TomcatServer {
     tomcat
         .getServer()
         .addLifecycleListener(
-            event -> {
-              final Lifecycle lifecycle = event.getLifecycle();
-              switch (lifecycle.getState()) {
-                case FAILED:
-                  System.err.println(
-                      "Context ["
-                          + contextPath
-                          + "] failed in ["
-                          + lifecycle.getClass().getName()
-                          + "] lifecycle.");
-                  break;
-                case STARTED:
-                  System.out.println();
-                  System.out.println("Running at http://localhost:" + port + contextPath);
-                  System.out.println();
-                  break;
-                default:
-                  break;
+            new LifecycleListener() {
+              @Override
+              public void lifecycleEvent(LifecycleEvent event) {
+                final Lifecycle lifecycle = event.getLifecycle();
+                final boolean existAfterStart = System.getProperty("axelor.task.database") != null;
+                if (lifecycle.getState() == LifecycleState.STARTED) {
+                  tomcat.getServer().removeLifecycleListener(this);
+                  if (existAfterStart) {
+                    stop();
+                  } else {
+                    System.out.println();
+                    System.out.println("Running at http://localhost:" + port + contextPath);
+                    System.out.println();
+                  }
+                }
               }
             });
 
@@ -186,7 +186,9 @@ public class TomcatServer {
         System.setProperty("catalina.base", catalinaBase);
       }
     }
-    tomcat.getServer().await();
+    if (tomcat != null) {
+      tomcat.getServer().await();
+    }
   }
 
   public void stop() {
@@ -195,6 +197,7 @@ public class TomcatServer {
     }
     try {
       tomcat.stop();
+      tomcat = null;
     } catch (Exception e) {
       throw new RuntimeException("Cannot Stop Tomcat " + e.getMessage(), e);
     }

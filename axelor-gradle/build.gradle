@@ -5,6 +5,8 @@ configurations {
   tomcat.transitive false
   provided
   provided.transitive false
+  database
+  database.transitive false
 }
 
 dependencies {
@@ -50,6 +52,7 @@ def generateLibsList(config) {
 
 classes.doLast {
   generateLibsList "tomcat"
+  generateLibsList "database"
   generateLibsList "provided"
 }
 

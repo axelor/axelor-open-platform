@@ -138,10 +138,6 @@ public class ModuleManager {
     }
   }
 
-  public void updateAll(boolean withDemo) {
-    update(withDemo);
-  }
-
   public void update(boolean withDemo, String... moduleNames) {
     final List<String> names = new ArrayList<>();
     if (moduleNames != null) {
@@ -149,20 +145,24 @@ public class ModuleManager {
     }
 
     try {
-      this.createUsers();
-      this.resolve(true);
+      createUsers();
+      resolve(true);
       if (names.isEmpty()) {
         resolver.all().stream()
             .filter(Module::isInstalled)
             .map(Module::getName)
             .forEach(names::add);
       }
-      resolver.all().stream()
-          .filter(m -> names.contains(m.getName()))
-          .forEach(m -> installOne(m.getName(), true, withDemo));
-      resolver.all().stream()
-          .filter(m -> names.contains(m.getName()))
-          .forEach(m -> viewLoader.doLast(m, true));
+      Beans.get(AuditableRunner.class)
+          .run(
+              () -> {
+                resolver.all().stream()
+                    .filter(m -> names.contains(m.getName()))
+                    .forEach(m -> installOne(m.getName(), true, withDemo));
+                resolver.all().stream()
+                    .filter(m -> names.contains(m.getName()))
+                    .forEach(m -> viewLoader.doLast(m, true));
+              });
     } finally {
       this.doCleanUp();
     }
@@ -178,8 +178,12 @@ public class ModuleManager {
 
     try {
       pathsToRestore.addAll(paths);
-      moduleList.forEach(m -> installOne(m.getName(), true, false));
-      moduleList.forEach(m -> viewLoader.doLast(m, true));
+      Beans.get(AuditableRunner.class)
+          .run(
+              () -> {
+                moduleList.forEach(m -> installOne(m.getName(), true, false));
+                moduleList.forEach(m -> viewLoader.doLast(m, true));
+              });
     } finally {
       pathsToRestore.clear();
       doCleanUp(startTime);
@@ -194,7 +198,7 @@ public class ModuleManager {
                 "A views restoring is already in progress. Please wait until it ends and try again."));
       }
       loadData = false;
-      updateAll(false);
+      update(false);
     } finally {
       BUSY.set(false);
       loadData = true;
