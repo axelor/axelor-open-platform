@@ -1,0 +1,3 @@
+---
+title: Add `x-show-bars` attribute to `panel-related` and `panel-dashlet` (disabled by default)
+type: change

@@ -726,6 +726,11 @@
         <xsd:documentation>Specify the name of icons to show on nested editor.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-show-bars" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>Specify whether to show toolbar and menubar.</xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="x-can-copy" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>Specify whether to allow copy of o2m/m2m field items.</xsd:documentation>
@@ -1422,6 +1427,11 @@
   <xsd:complexType name="Dashlet">
     <xsd:complexContent>
       <xsd:extension base="tns:Portlet">
+        <xsd:attribute name="x-show-bars" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to show toolbar and menubar.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="rowSpan" use="prohibited"/>
       </xsd:extension>
     </xsd:complexContent>
@@ -2732,6 +2742,7 @@
         <xsd:attribute name="x-can-export" use="prohibited" />
         <xsd:attribute name="x-labels" use="prohibited" />
         <xsd:attribute name="x-show-icons" use="prohibited" />
+        <xsd:attribute name="x-show-bars" use="prohibited" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
