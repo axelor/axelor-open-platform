@@ -250,8 +250,7 @@ public class AuthPac4jModuleForm extends AuthPac4jModule {
     @Override
     protected boolean onPreHandle(
         ServletRequest request, ServletResponse response, Object mappedValue) {
-      AuthFilter.setSessionSameSiteNone(
-          (HttpServletRequest) request, (HttpServletResponse) response);
+      AuthFilter.setSameSiteNone((HttpServletRequest) request, (HttpServletResponse) response);
       return super.onPreHandle(request, response, mappedValue);
     }
   }

@@ -291,7 +291,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
                 Boolean inputDestroySession,
                 Boolean inputCentralLogout) {
 
-              AuthFilter.setSessionSameSiteNone(context.getRequest(), context.getResponse());
+              AuthFilter.setSameSiteNone(context.getRequest(), context.getResponse());
 
               // Destroy web session.
               return super.perform(
@@ -337,7 +337,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
                 Boolean inputRenewSession,
                 String client) {
 
-              AuthFilter.setSessionSameSiteNone(context.getRequest(), context.getResponse());
+              AuthFilter.setSameSiteNone(context.getRequest(), context.getResponse());
 
               try {
                 context.getRequest().setCharacterEncoding("UTF-8");
@@ -423,7 +423,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
                 Boolean inputMultiProfile,
                 Object... parameters) {
 
-              AuthFilter.setSessionSameSiteNone(context.getRequest(), context.getResponse());
+              AuthFilter.setSameSiteNone(context.getRequest(), context.getResponse());
 
               return super.perform(
                   context,
