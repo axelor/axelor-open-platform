@@ -17,14 +17,15 @@
  */
 package com.axelor.auth.pac4j;
 
-import com.axelor.auth.AuthFilter;
 import com.axelor.auth.UserAuthenticationInfo;
 import com.axelor.auth.db.User;
 import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
 import com.axelor.events.PostLogin;
+import com.axelor.inject.Beans;
 import java.lang.invoke.MethodHandles;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -48,7 +49,7 @@ public class AuthPac4jListener implements AuthenticationListener {
       final User user = ((UserAuthenticationInfo) info).getUser();
 
       if (user != null) {
-        AuthFilter.changeSessionId();
+        Beans.get(HttpServletRequest.class).changeSessionId();
         firePostLoginSuccess(token, user);
         return;
       }
