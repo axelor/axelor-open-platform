@@ -297,6 +297,8 @@ public abstract class AuthPac4jModule extends AuthWebModule {
       cookie.setDomain("");
       cookie.setPath(path);
       context.addResponseCookie(cookie);
+      final J2EContext j2eContext = ((J2EContext) context);
+      AuthFilter.setSameSiteNone(j2eContext.getRequest(), j2eContext.getResponse());
       context.setResponseHeader(CSRF_HEADER_NAME, token);
     }
   }
@@ -343,7 +345,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
                 Boolean inputDestroySession,
                 Boolean inputCentralLogout) {
 
-              AuthFilter.setSessionSameSiteNone(context.getRequest(), context.getResponse());
+              AuthFilter.setSameSiteNone(context.getRequest(), context.getResponse());
 
               // Destroy web session.
               return super.perform(
@@ -388,7 +390,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
                 Boolean inputRenewSession,
                 String client) {
 
-              AuthFilter.setSessionSameSiteNone(context.getRequest(), context.getResponse());
+              AuthFilter.setSameSiteNone(context.getRequest(), context.getResponse());
 
               try {
                 context.getRequest().setCharacterEncoding("UTF-8");
@@ -477,7 +479,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
                 Boolean inputMultiProfile,
                 Object... parameters) {
 
-              AuthFilter.setSessionSameSiteNone(context.getRequest(), context.getResponse());
+              AuthFilter.setSameSiteNone(context.getRequest(), context.getResponse());
 
               return super.perform(
                   context,
@@ -524,8 +526,7 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
 
-      AuthFilter.setSessionSameSiteNone(
-          (HttpServletRequest) request, (HttpServletResponse) response);
+      AuthFilter.setSameSiteNone((HttpServletRequest) request, (HttpServletResponse) response);
 
       final Subject subject = SecurityUtils.getSubject();
       final boolean authenticated = subject.isAuthenticated();

@@ -55,8 +55,6 @@ public class AuthFilter extends FormAuthenticationFilter {
   @Inject private Event<PreLogin> preLogin;
   @Inject private Event<PostLogin> postLogin;
 
-  private static final String SESSION_COOKIE_NAME = "JSESSIONID";
-
   @Override
   protected boolean executeLogin(ServletRequest request, ServletResponse response)
       throws Exception {
@@ -110,7 +108,7 @@ public class AuthFilter extends FormAuthenticationFilter {
   public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)
       throws ServletException, IOException {
 
-    setSessionSameSiteNone((HttpServletRequest) request, (HttpServletResponse) response);
+    setSameSiteNone((HttpServletRequest) request, (HttpServletResponse) response);
 
     // tomcat 7.0.67 doesn't redirect with / if root request is sent without slash
     // see RM-4500 for more details
@@ -169,23 +167,22 @@ public class AuthFilter extends FormAuthenticationFilter {
     final HttpServletRequest request = Beans.get(HttpServletRequest.class);
     request.changeSessionId();
     if (request.isSecure()) {
-      setSessionSameSiteNone(Beans.get(HttpServletResponse.class));
+      setSameSiteNone(Beans.get(HttpServletResponse.class));
     }
   }
 
   private static void changeSessionId(HttpServletRequest request, HttpServletResponse response) {
     request.changeSessionId();
-    setSessionSameSiteNone(request, response);
+    setSameSiteNone(request, response);
   }
 
-  public static void setSessionSameSiteNone(
-      HttpServletRequest request, HttpServletResponse response) {
+  public static void setSameSiteNone(HttpServletRequest request, HttpServletResponse response) {
     if (request.isSecure()) {
-      setSessionSameSiteNone(response);
+      setSameSiteNone(response);
     }
   }
 
-  private static void setSessionSameSiteNone(HttpServletResponse response) {
+  private static void setSameSiteNone(HttpServletResponse response) {
     final Subject subject = SecurityUtils.getSubject();
     subject.getSession();
 
@@ -200,9 +197,7 @@ public class AuthFilter extends FormAuthenticationFilter {
   }
 
   private static void addCookieHeader(String header, BiConsumer<String, String> headerAdder) {
-    if (header.startsWith(SESSION_COOKIE_NAME)) {
-      header = String.format("%s; %s", header, "SameSite=None");
-    }
+    header = String.format("%s; %s", header, "SameSite=None");
     headerAdder.accept(HttpHeaders.SET_COOKIE, header);
   }
 
