@@ -17,6 +17,7 @@
  */
 package com.axelor.auth;
 
+import com.axelor.common.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Collection;
@@ -45,8 +46,6 @@ public class AuthFilter extends FormAuthenticationFilter {
   @Named("app.loginUrl")
   private String loginUrl;
 
-  private static final String SESSION_COOKIE_NAME = "JSESSIONID";
-
   @Override
   public String getLoginUrl() {
     if (loginUrl != null) {
@@ -66,7 +65,7 @@ public class AuthFilter extends FormAuthenticationFilter {
   public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)
       throws ServletException, IOException {
 
-    setSessionSameSiteNone((HttpServletRequest) request, (HttpServletResponse) response);
+    setSameSiteNone((HttpServletRequest) request, (HttpServletResponse) response);
 
     // tomcat 7.0.67 doesn't redirect with / if root request is sent without slash
     // see RM-4500 for more details
@@ -123,35 +122,38 @@ public class AuthFilter extends FormAuthenticationFilter {
 
   private static void changeSessionId(HttpServletRequest request, HttpServletResponse response) {
     request.changeSessionId();
-    setSessionSameSiteNone(request, response);
+    setSameSiteNone(request, response);
   }
 
-  public static void setSessionSameSiteNone(
-      HttpServletRequest request, HttpServletResponse response) {
-    if (request.isSecure()) {
-      setSessionSameSiteNone(response);
+  public static void setSameSiteNone(HttpServletRequest request, HttpServletResponse response) {
+    if (!request.isSecure() && !"https".equalsIgnoreCase(getProto(request))) {
+      return;
     }
-  }
 
-  private static void setSessionSameSiteNone(HttpServletResponse response) {
     final Subject subject = SecurityUtils.getSubject();
     subject.getSession();
 
     final Collection<String> headers = response.getHeaders(HttpHeaders.SET_COOKIE);
     final Iterator<String> it = headers.iterator();
     if (it.hasNext()) {
-      addCookieHeader(it.next(), response::setHeader);
+      addSameSiteCookieHeader(response::setHeader, it.next());
       while (it.hasNext()) {
-        addCookieHeader(it.next(), response::addHeader);
+        addSameSiteCookieHeader(response::addHeader, it.next());
       }
     }
   }
 
-  private static void addCookieHeader(String header, BiConsumer<String, String> headerAdder) {
-    if (header.startsWith(SESSION_COOKIE_NAME)) {
-      header = String.format("%s; %s", header, "SameSite=None");
+  private static String getProto(HttpServletRequest request) {
+    final String proto = request.getHeader("X-Forwarded-Proto");
+    return StringUtils.isBlank(proto) ? request.getScheme() : proto;
+  }
+
+  private static void addSameSiteCookieHeader(BiConsumer<String, String> adder, String header) {
+    String extraAttrs = "; SameSite=None";
+    if (header.indexOf("; Secure") < 0) {
+      extraAttrs += "; Secure";
     }
-    headerAdder.accept(HttpHeaders.SET_COOKIE, header);
+    adder.accept(HttpHeaders.SET_COOKIE, header + extraAttrs);
   }
 
   @SuppressWarnings("unchecked")

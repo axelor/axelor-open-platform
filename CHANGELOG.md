@@ -2,7 +2,7 @@
 
 ### Bugs
 
-* Set "SameSite=None" attribute to session cookie to allow CORS requests
+* Set "SameSite=None" attribute on cookies to allow CORS requests
 
 ### Security
 
