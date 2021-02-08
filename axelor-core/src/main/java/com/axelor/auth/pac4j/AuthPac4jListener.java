@@ -17,7 +17,6 @@
  */
 package com.axelor.auth.pac4j;
 
-import com.axelor.auth.AuthFilter;
 import com.axelor.auth.UserAuthenticationInfo;
 import com.axelor.auth.db.User;
 import com.axelor.event.Event;
@@ -55,7 +54,7 @@ public class AuthPac4jListener implements AuthenticationListener {
       final User user = ((UserAuthenticationInfo) info).getUser();
 
       if (user != null) {
-        AuthFilter.changeSessionId();
+        Beans.get(HttpServletRequest.class).changeSessionId();
         firePostLoginSuccess(token, user);
         return;
       }
