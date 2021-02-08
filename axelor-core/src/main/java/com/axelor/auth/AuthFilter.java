@@ -168,8 +168,7 @@ public class AuthFilter extends FormAuthenticationFilter {
   }
 
   public static void setSameSiteNone(HttpServletRequest request, HttpServletResponse response) {
-    // XXX: request.isSecure might return false on HTTPS on some configurations.
-    if (!"https".equals(request.getScheme())) {
+    if (!request.isSecure() && !"https".equalsIgnoreCase(getProto(request))) {
       return;
     }
 
@@ -184,6 +183,11 @@ public class AuthFilter extends FormAuthenticationFilter {
         addSameSiteCookieHeader(response::addHeader, it.next());
       }
     }
+  }
+
+  private static String getProto(HttpServletRequest request) {
+    final String proto = request.getHeader("X-Forwarded-Proto");
+    return StringUtils.isBlank(proto) ? request.getScheme() : proto;
   }
 
   private static void addSameSiteCookieHeader(BiConsumer<String, String> adder, String header) {
