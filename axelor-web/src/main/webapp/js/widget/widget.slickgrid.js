@@ -135,7 +135,8 @@ var Formatters = {
   },
 
   "duration": function(field, value) {
-    return ui.formatDuration(field, value);
+    var attrs = _.extend({}, field, field.widgetAttrs);
+    return ui.formatDuration(attrs, value);
   },
 
   "date": function(field, value) {
@@ -352,7 +353,14 @@ function totalsFormatter(totals, columnDef) {
   var vals = totals[field.aggregate || 'sum'] || {};
   var val = vals[field.name];
 
-  var formatter = Formatters[field.type];
+  var type = field.type;
+  var widget = field.widget;
+
+  if (["duration"].indexOf(widget) >= 0) {
+    type = widget;
+  }
+
+  var formatter = Formatters[type];
   if (formatter) {
     return formatter(field, val);
   }

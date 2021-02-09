@@ -649,6 +649,10 @@
   width: auto;
 }
 
+.slick-editor .form-item-container.time-item > input.ui-mask {
+  text-align: right;
+}
+
 .slick-editor .form-item-container.phone-item .phone-validation {
   display: none;
 }
