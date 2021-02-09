@@ -147,12 +147,12 @@ var phoneInput = {
   },
 
   getNavigatorCountries: function () {
-    if (!phoneInput.localizedCountries.length) {
-      phoneInput.localizedCountries = _.uniq(window.navigator.languages
+    if (!phoneInput.navigatorCountries.length) {
+      phoneInput.navigatorCountries = _.uniq(window.navigator.languages
         .map(function (language) { return language.split("-")[1]; })
         .filter(function (language) { return language; })) || [phoneInput.getFallbackCountries()[0]]
     }
-    return phoneInput.localizedCountries;
+    return phoneInput.navigatorCountries;
   },
 
   getNavigatorCountry: function () {
