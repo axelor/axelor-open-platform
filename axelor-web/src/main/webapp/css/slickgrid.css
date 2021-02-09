@@ -649,6 +649,10 @@
   width: auto;
 }
 
+.slick-editor .form-item-container.phone-item .phone-validation {
+  display: none;
+}
+
 .slick-editor input,
 .slick-editor textarea {
   border-color: #ddd;
