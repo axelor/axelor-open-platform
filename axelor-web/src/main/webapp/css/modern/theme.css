@@ -618,7 +618,8 @@ header .dropdown-submenu:focus > a {
 .o2m-list .o2m-list-row .toggle-item button {
   border-radius: 0 !important;
   box-shadow: none;
-  height: 20px !important;
+  line-height: 21px;
+  height: 21px !important;
   padding: 0 1px 2px 1px !important;
   border-bottom-color: #c0c0c0;
 }
