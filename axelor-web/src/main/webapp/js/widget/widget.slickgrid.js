@@ -332,6 +332,16 @@ var Formatters = {
 
 Formatters.text = Formatters.string;
 
+var GroupFormatters = {
+  "one-to-one": function(field, value, record) {
+    return GroupFormatters['many-to-one'](field, value, record);
+  },
+
+  "many-to-one": function(field, value, record) {
+    return Formatters['many-to-one'](field, value, record) + '<span class="hidden">' + (value || {}).id + '</span>';
+  }
+};
+
 function totalsFormatter(totals, columnDef) {
 
   var field = columnDef.descriptor;
@@ -2607,7 +2617,8 @@ Grid.prototype.groupBy = function(names) {
     return {
       getter: function(item) {
         var value = item[name];
-        var formatter = Formatters[field.selection ? 'selection' : field.type];
+        var type = field.selection ? 'selection' : field.type;
+        var formatter = GroupFormatters[type] || Formatters[type];
         if (field.jsonPath && field.jsonField) {
           var jsonValue = item[field.jsonField];
           if (jsonValue) {
