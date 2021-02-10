@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2021 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -143,7 +143,8 @@ ui.formWidget('BaseSelect', {
     };
 
     function renderItem(ul, item) {
-      var el = $("<li>").append($("<a>").append($("<span>").html(item.label))).appendTo(ul);
+      var label = axelor.sanitize(item.label);
+      var el = $("<li>").append($("<a>").append($("<span>").html(label))).appendTo(ul);
       if (item.color) {
         el.addClass('tag-select-list-item').addClass(item.color);
       }
@@ -834,6 +835,7 @@ ui.formInput('RadioSelect', {
   metaWidget: true,
 
   link: function(scope, element, attrs, model) {
+    scope.prepareTemplate = true;
 
     var field = scope.field;
     var selection = field.selectionList || [];
@@ -876,6 +878,7 @@ ui.formInput('CheckboxSelect', {
   metaWidget: true,
 
   link: function(scope, element, attrs, model) {
+    scope.prepareTemplate = true;
 
     var field = scope.field;
     var selection = field.selectionList || [];
@@ -932,6 +935,7 @@ ui.formInput('NavSelect', {
   metaWidget: true,
 
   link: function(scope, element, attrs, model) {
+    scope.prepareTemplate = true;
 
     var field = scope.field;
     var selection = field.selectionList || [];

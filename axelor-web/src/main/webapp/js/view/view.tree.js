@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2021 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -551,7 +551,7 @@ ui.directive('uiViewTree', function(){
         tr.data('$record', record);
 
         _.each(scope.columns, function(col) {
-          $('<td>').html(col.cellText(record)).appendTo(tr);
+          $('<td>').html(axelor.sanitize(col.cellText(record))).appendTo(tr);
         });
 
         if (scope.draggable && (record.$folder || scope._countOn || !record.$parent)) {

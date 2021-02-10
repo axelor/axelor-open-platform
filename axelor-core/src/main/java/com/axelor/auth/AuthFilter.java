@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2021 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -27,7 +27,10 @@ import com.axelor.events.PreLogin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import javax.inject.Inject;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -35,6 +38,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriBuilder;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -103,6 +107,8 @@ public class AuthFilter extends FormAuthenticationFilter {
   public void doFilterInternal(ServletRequest request, ServletResponse response, FilterChain chain)
       throws ServletException, IOException {
 
+    setSameSiteNone((HttpServletRequest) request, (HttpServletResponse) response);
+
     // tomcat 7.0.67 doesn't redirect with / if root request is sent without slash
     // see RM-4500 for more details
     if (!SecurityUtils.getSubject().isAuthenticated() && isRootWithoutSlash(request)) {
@@ -152,8 +158,44 @@ public class AuthFilter extends FormAuthenticationFilter {
       AuthenticationToken token, Subject subject, ServletRequest request, ServletResponse response)
       throws Exception {
     // change session id to prevent session fixation
-    ((HttpServletRequest) request).changeSessionId();
+    changeSessionId((HttpServletRequest) request, (HttpServletResponse) response);
     return super.onLoginSuccess(token, subject, request, response);
+  }
+
+  private static void changeSessionId(HttpServletRequest request, HttpServletResponse response) {
+    request.changeSessionId();
+    setSameSiteNone(request, response);
+  }
+
+  public static void setSameSiteNone(HttpServletRequest request, HttpServletResponse response) {
+    if (!request.isSecure() && !"https".equalsIgnoreCase(getProto(request))) {
+      return;
+    }
+
+    final Subject subject = SecurityUtils.getSubject();
+    subject.getSession();
+
+    final Collection<String> headers = response.getHeaders(HttpHeaders.SET_COOKIE);
+    final Iterator<String> it = headers.iterator();
+    if (it.hasNext()) {
+      addSameSiteCookieHeader(response::setHeader, it.next());
+      while (it.hasNext()) {
+        addSameSiteCookieHeader(response::addHeader, it.next());
+      }
+    }
+  }
+
+  private static String getProto(HttpServletRequest request) {
+    final String proto = request.getHeader("X-Forwarded-Proto");
+    return StringUtils.isBlank(proto) ? request.getScheme() : proto;
+  }
+
+  private static void addSameSiteCookieHeader(BiConsumer<String, String> adder, String header) {
+    String extraAttrs = "; SameSite=None";
+    if (header.indexOf("; Secure") < 0) {
+      extraAttrs += "; Secure";
+    }
+    adder.accept(HttpHeaders.SET_COOKIE, header + extraAttrs);
   }
 
   @Override

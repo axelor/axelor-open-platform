@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2021 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -315,7 +315,7 @@ ui.formDirective = function(name, object) {
 
       var self = this;
 
-      if (!this.template_editable && !this.template_readonly) {
+      if (!this.template_editable && !this.template_readonly && !scope.prepareTemplate) {
         return;
       }
 

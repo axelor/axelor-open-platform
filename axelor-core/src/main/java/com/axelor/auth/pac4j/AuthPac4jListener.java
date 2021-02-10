@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2020 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2021 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or  modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -22,8 +22,10 @@ import com.axelor.auth.db.User;
 import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
 import com.axelor.events.PostLogin;
+import com.axelor.inject.Beans;
 import java.lang.invoke.MethodHandles;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -47,6 +49,7 @@ public class AuthPac4jListener implements AuthenticationListener {
       final User user = ((UserAuthenticationInfo) info).getUser();
 
       if (user != null) {
+        Beans.get(HttpServletRequest.class).changeSessionId();
         firePostLoginSuccess(token, user);
         return;
       }
