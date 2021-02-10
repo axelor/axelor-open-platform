@@ -1,3 +1,36 @@
+## 5.4.1 (2021-02-10)
+
+#### Changes
+
+* Add `x-show-bars` attribute to `panel-related` and `panel-dashlet` (disabled by default)
+
+#### Features
+
+* Add relative dates and current user/group criteria to advanced search
+* Add support for defining Column attributes `insertable` and `updatable`
+* Add tel link on grid view when using Phone widget
+* Add support for aggregation with Duration widget
+* Add flag dropdown to Phone widget
+
+#### Fixed
+
+* Fix requiredIf with some widgets (BinaryLink, CodeEditor…)
+* Fix setting null on nullable number field with min/max attributes
+* Preserve per module web resource inclusion order
+* Fix sidebar="false" panel attribute evaluation
+* Fix URL widget in grid view
+* Fix grid field hilite overwritten by grid view hilite
+* Fix parent toolbar/menubar displayed in dashlet
+* Fix search engine action menu selection
+* Group M2O/O2O by ID in grid, but show namecolumn
+* Set "SameSite=None" attribute on cookies to allow CORS requests
+* Set first day of week according to browser locale
+* Fix modern theme button alignment in O2M editor
+
+#### Security
+
+* Fix HTML sanitization
+
 ## 5.4.0 (2020-12-18)
 
 #### Changes
