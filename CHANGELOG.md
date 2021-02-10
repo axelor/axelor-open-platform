@@ -1,3 +1,18 @@
+## 5.3.8 (2021-02-10)
+
+#### Features
+
+* Add support for defining Column attributes `insertable` and `updatable`
+
+#### Fixed
+
+* Fix requiredIf with some widgets (BinaryLink, CodeEditor…)
+* Set "SameSite=None" attribute on cookies to allow CORS requests
+
+#### Security
+
+* Fix HTML sanitization in suggest box and tree view
+
 ## 5.3.7 (2020-12-18)
 
 #### Features
