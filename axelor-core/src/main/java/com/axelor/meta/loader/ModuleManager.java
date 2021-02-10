@@ -181,6 +181,7 @@ public class ModuleManager {
       Beans.get(AuditableRunner.class)
           .run(
               () -> {
+                moduleList.forEach(m -> m.setPending(true));
                 moduleList.forEach(m -> installOne(m.getName(), true, false));
                 moduleList.forEach(m -> viewLoader.doLast(m, true));
               });
