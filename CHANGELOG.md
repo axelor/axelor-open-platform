@@ -1,3 +1,14 @@
+## 5.2.10 (2021-02-10)
+
+#### Fixed
+
+* Fix requiredIf with some widgets (BinaryLink, CodeEditor…)
+* Set "SameSite=None" attribute on cookies to allow CORS requests
+
+#### Security
+
+* Fix HTML sanitization in suggest box and tree view
+
 ## 5.2.9 (2020-12-18)
 
 #### Fixed
