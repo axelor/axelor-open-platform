@@ -219,12 +219,6 @@ ui.formInput('BooleanRadio', 'BooleanSelect', {
         falseInput.prop('checked', true);
       }
     };
-
-    element.on('change', 'input', function (e) {
-      var value = $(this).data('value') === true;
-      scope.setValue(value, true);
-      scope.$applyAsync();
-    });
   },
   template_editable: "<ul class='boolean-radio'></ul>"
 });
