@@ -74,6 +74,8 @@ public interface AvailableAppSettings {
   String DATA_EXPORT_MAX_SIZE = "data.export.max-size";
   String DATA_EXPORT_FETCH_SIZE = "data.export.fetch-size";
   String DATA_EXPORT_ENCODING = "data.export.encoding";
+  String DATA_EXPORT_LOCALE = "data.export.locale";
+  String DATA_EXPORT_LIST_SEPARTOR = "data.export.list.separator";
 
   String CORS_ALLOW_ORIGIN = "cors.allow.origin";
   String CORS_ALLOW_CREDENTIALS = "cors.allow.credentials";
@@ -88,7 +90,7 @@ public interface AvailableAppSettings {
   String QUARTZ_ENABLE = "quartz.enable";
   String QUARTZ_THREAD_COUNT = "quartz.threadCount";
 
-  String DATE_FORMAT = "date.format";
+  @Deprecated String DATE_FORMAT = "date.format";
 
   String FILE_UPLOAD_FILENAME_PATTERN = "file.upload.filename.pattern";
   String FILE_UPLOAD_WHITELIST_PATTERN = "file.upload.whitelist.pattern";

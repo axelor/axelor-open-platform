@@ -23,25 +23,47 @@ import com.axelor.app.internal.AppFilter;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 /** This class provider methods for localization (L10n) services. */
 public final class L10n {
 
-  private static final String DEFAULT_DATE_FORMAT = "yyy-MM-dd";
-  private static final String DEFAULT_TIME_FORMAT = "HH:mm";
-
   private static final String DATE_FORMAT =
-      AppSettings.get().get(AvailableAppSettings.DATE_FORMAT, DEFAULT_DATE_FORMAT);
-  private static final String TIME_FORMAT = DEFAULT_TIME_FORMAT;
-  private static final String DATE_TIME_FORMAT = DATE_FORMAT + " " + TIME_FORMAT;
+      AppSettings.get().get(AvailableAppSettings.DATE_FORMAT, null);
+  private static final String TIME_FORMAT;
+  private static final String DATE_TIME_FORMAT;
 
-  private Locale locale;
+  static {
+    if (DATE_FORMAT != null) {
+      TIME_FORMAT = "HH:mm";
+      DATE_TIME_FORMAT = String.format("%s %s", DATE_FORMAT, TIME_FORMAT);
+    } else {
+      TIME_FORMAT = null;
+      DATE_TIME_FORMAT = null;
+    }
+  }
+
+  private final NumberFormat numberFormat;
+  private final DateTimeFormatter dateFormatter;
+  private final DateTimeFormatter timeFormatter;
+  private final DateTimeFormatter dateTimeFormatter;
 
   private L10n(Locale locale) {
-    this.locale = locale;
+    numberFormat = NumberFormat.getInstance(locale);
+    if (DATE_FORMAT == null) {
+      dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale);
+      timeFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale);
+      dateTimeFormatter =
+          DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(locale);
+    } else {
+      dateFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+      timeFormatter = DateTimeFormatter.ofPattern(TIME_FORMAT);
+      dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+    }
   }
 
   /**
@@ -71,11 +93,7 @@ public final class L10n {
    * @return value as formated string
    */
   public String format(Number value) {
-    if (value == null) {
-      return null;
-    }
-    final NumberFormat fmt = NumberFormat.getInstance(locale);
-    return fmt.format(value);
+    return format(value, true);
   }
 
   /**
@@ -89,9 +107,8 @@ public final class L10n {
     if (value == null) {
       return null;
     }
-    final NumberFormat fmt = NumberFormat.getInstance(locale);
-    fmt.setGroupingUsed(grouping);
-    return fmt.format(value);
+    numberFormat.setGroupingUsed(grouping);
+    return numberFormat.format(value);
   }
 
   /**
@@ -104,7 +121,20 @@ public final class L10n {
     if (value == null) {
       return null;
     }
-    return DateTimeFormatter.ofPattern(DATE_FORMAT).format(value);
+    return dateFormatter.format(value);
+  }
+
+  /**
+   * Format the time value.
+   *
+   * @param value the value to format
+   * @return value as formated string
+   */
+  public String format(LocalTime value) {
+    if (value == null) {
+      return null;
+    }
+    return timeFormatter.format(value);
   }
 
   /**
@@ -117,7 +147,7 @@ public final class L10n {
     if (value == null) {
       return null;
     }
-    return DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).format(value);
+    return dateTimeFormatter.format(value);
   }
 
   /**
@@ -130,6 +160,6 @@ public final class L10n {
     if (value == null) {
       return null;
     }
-    return DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).format(value);
+    return dateTimeFormatter.format(value);
   }
 }

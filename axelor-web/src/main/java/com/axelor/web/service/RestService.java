@@ -57,7 +57,6 @@ import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.CaseFormat;
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
@@ -69,18 +68,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -112,6 +115,8 @@ public class RestService extends ResourceService {
   @Inject private MailMessageRepository messages;
 
   @Inject private MailFollowerRepository followers;
+
+  @Inject private HttpServletRequest httpRequest;
 
   private Response fail() {
     final Response response = new Response();
@@ -641,14 +646,45 @@ public class RestService extends ResourceService {
     return getResource().perms();
   }
 
-  private static Charset csvCharset = Charsets.ISO_8859_1;
+  private static Charset csvCharset = StandardCharsets.UTF_8;
+  private static boolean csvCharsetBom = false;
+  private static Locale csvLocale = null;
+  private static Character csvListSeparator = null;
 
   static {
-    try {
-      csvCharset =
-          Charset.forName(AppSettings.get().get(AvailableAppSettings.DATA_EXPORT_ENCODING));
-    } catch (Exception e) {
+    final AppSettings settings = AppSettings.get();
+
+    final String encoding = settings.get(AvailableAppSettings.DATA_EXPORT_ENCODING, null);
+    if (encoding != null) {
+      if ("UTF-8-BOM".equalsIgnoreCase(encoding)) {
+        csvCharsetBom = true;
+      } else {
+        csvCharset = Charset.forName(encoding);
+      }
     }
+
+    final String locale = settings.get(AvailableAppSettings.DATA_EXPORT_LOCALE, null);
+    if (locale != null) {
+      csvLocale = Locale.forLanguageTag(locale.replace("_", "-"));
+    }
+
+    final String listSeparator = settings.get(AvailableAppSettings.DATA_EXPORT_LIST_SEPARTOR, null);
+    if (listSeparator != null) {
+      csvListSeparator = listSeparator.charAt(0);
+    }
+  }
+
+  private Locale getCsvLocale() {
+    return csvLocale == null ? httpRequest.getLocale() : csvLocale;
+  }
+
+  private char getCsvListSeparator() {
+    return csvListSeparator == null ? getLocaleListSeparator() : csvListSeparator;
+  }
+
+  private char getLocaleListSeparator() {
+    char decimalSeparator = DecimalFormatSymbols.getInstance(getCsvLocale()).getDecimalSeparator();
+    return decimalSeparator == ',' ? ';' : ',';
   }
 
   @HEAD
@@ -692,7 +728,8 @@ public class RestService extends ResourceService {
     request.setModel(getModel());
     updateContext(request);
 
-    return getResource().export(request, csvCharset);
+    return getResource()
+        .export(request, csvCharset, csvCharsetBom, getCsvLocale(), getCsvListSeparator());
   }
 
   @GET

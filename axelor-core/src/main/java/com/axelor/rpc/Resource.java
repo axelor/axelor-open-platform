@@ -21,6 +21,7 @@ import static com.axelor.common.StringUtils.isBlank;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
+import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
@@ -80,8 +81,10 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -90,6 +93,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -556,7 +560,12 @@ public class Resource<T extends Model> {
       AppSettings.get()
           .getInt(AvailableAppSettings.DATA_EXPORT_FETCH_SIZE, DEFAULT_EXPORT_FETCH_SIZE);
 
-  public Response export(Request request, Charset csvCharset) {
+  public Response export(Request request, Charset charset) {
+    return export(request, charset, false, AppFilter.getLocale(), ';');
+  }
+
+  public Response export(
+      Request request, Charset charset, boolean useBom, Locale locale, char listSeparator) {
     security.get().check(JpaSecurity.CAN_READ, model);
     security.get().check(JpaSecurity.CAN_EXPORT, model);
 
@@ -574,8 +583,11 @@ public class Resource<T extends Model> {
     try {
       final java.nio.file.Path tempFile = MetaFiles.createTempFile(null, ".csv");
       try (final OutputStream os = new FileOutputStream(tempFile.toFile())) {
-        try (final Writer writer = new OutputStreamWriter(os, csvCharset)) {
-          data.put("exportSize", export(request, writer));
+        try (final Writer writer = new OutputStreamWriter(os, charset)) {
+          if (useBom && StandardCharsets.UTF_8.equals(charset)) {
+            writer.write('\ufeff');
+          }
+          data.put("exportSize", export(request, writer, locale, listSeparator));
         }
       }
       data.put("fileName", tempFile.toFile().getName());
@@ -590,7 +602,8 @@ public class Resource<T extends Model> {
   }
 
   @SuppressWarnings("all")
-  private int export(Request request, Writer writer) throws IOException {
+  private int export(Request request, Writer writer, Locale locale, char listSeparator)
+      throws IOException {
 
     List<String> fields = request.getFields();
     List<String> header = new ArrayList<>();
@@ -732,7 +745,7 @@ public class Resource<T extends Model> {
       header.add(escapeCsv(title));
     }
 
-    writer.write(Joiner.on(";").join(header));
+    writer.write(Joiner.on(listSeparator).join(header));
 
     int limit =
         EXPORT_MAX_SIZE > 0 ? Math.min(EXPORT_FETCH_SIZE, EXPORT_MAX_SIZE) : EXPORT_FETCH_SIZE;
@@ -744,7 +757,7 @@ public class Resource<T extends Model> {
 
     List<?> data = selector.values(limit, offset);
 
-    final L10n formatter = L10n.getInstance();
+    final L10n formatter = L10n.getInstance(locale);
 
     while (!data.isEmpty()) {
       for (Object item : data) {
@@ -759,21 +772,20 @@ public class Resource<T extends Model> {
           }
           if (objValue instanceof Number) {
             objValue = formatter.format((Number) objValue, false);
-          }
-          if (objValue instanceof LocalDate) {
+          } else if (objValue instanceof LocalDate) {
             objValue = formatter.format((LocalDate) objValue);
-          }
-          if (objValue instanceof LocalDateTime) {
+          } else if (objValue instanceof LocalTime) {
+            objValue = formatter.format((LocalTime) objValue);
+          } else if (objValue instanceof LocalDateTime) {
             objValue = formatter.format((LocalDateTime) objValue);
-          }
-          if (objValue instanceof ZonedDateTime) {
+          } else if (objValue instanceof ZonedDateTime) {
             objValue = formatter.format((ZonedDateTime) objValue);
           }
           String strValue = objValue == null ? "" : escapeCsv(objValue.toString());
           line.add(strValue);
         }
         writer.write("\n");
-        writer.write(Joiner.on(";").join(line));
+        writer.write(Joiner.on(listSeparator).join(line));
       }
 
       count += data.size();
