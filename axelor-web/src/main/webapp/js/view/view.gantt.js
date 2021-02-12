@@ -200,7 +200,7 @@ function GanttViewCtrl($scope, $element) {
       }
 
       opts=_.extend(opts, {
-        domain:`self.id in (:_parentIds) and ${opts.domain}`,
+        domain: "self.id in (:_parentIds) and " + opts.domain,
         context: { _parentIds: _parentIds},
         offset:0
       });
