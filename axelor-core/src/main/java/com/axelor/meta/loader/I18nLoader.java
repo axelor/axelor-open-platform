@@ -130,7 +130,7 @@ public class I18nLoader extends AbstractParallelLoader {
       return;
     }
 
-    language = matcher.group(1);
+    language = matcher.group(1).toLowerCase();
 
     try (Reader reader = new InputStreamReader(stream, Charsets.UTF_8);
         CSVReader csvReader =
