@@ -18,7 +18,6 @@
 package com.axelor.rpc;
 
 import static com.axelor.common.StringUtils.isBlank;
-
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
@@ -37,6 +36,7 @@ import com.axelor.db.Query;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.Repository;
 import com.axelor.db.ValueEnum;
+import com.axelor.db.annotations.Widget;
 import com.axelor.db.hibernate.type.JsonFunction;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -77,6 +77,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -96,6 +97,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -608,6 +610,7 @@ public class Resource<T extends Model> {
     List<String> fields = request.getFields();
     List<String> header = new ArrayList<>();
     List<String> names = new ArrayList<>();
+    Set<String> translatableNames = new HashSet<>();
     Map<Integer, Map<String, String>> selection = new HashMap<>();
     Map<String, Map<String, Object>> jsonFieldsMap = new HashMap<>();
 
@@ -668,6 +671,8 @@ public class Resource<T extends Model> {
         }
       }
     }
+
+    final ResourceBundle bundle = I18n.getBundle(locale);
 
     for (String field : fields) {
       Iterator<String> iter = Splitter.on(".").split(field).iterator();
@@ -734,15 +739,20 @@ public class Resource<T extends Model> {
       } else if (options != null && !options.isEmpty()) {
         Map<String, String> map = new HashMap<>();
         for (Selection.Option option : options) {
-          map.put(option.getValue(), option.getLocalizedTitle());
+          final String localizedTitle = getTranslation(bundle, option.getTitle());
+          map.put(option.getValue(), localizedTitle);
         }
         selection.put(header.size(), map);
       }
 
-      title = I18n.get(title);
+      title = getTranslation(bundle, title);
 
       names.add(name);
       header.add(escapeCsv(title));
+
+      if (prop.isTranslatable()) {
+        translatableNames.add(name);
+      }
     }
 
     writer.write(Joiner.on(listSeparator).join(header));
@@ -764,13 +774,18 @@ public class Resource<T extends Model> {
         List<?> row = (List<?>) item;
         List<String> line = new ArrayList<>();
         int index = 0;
+        // Ignore first two items (id, version).
+        row = row.size() > 2 ? row.subList(2, row.size()) : Collections.emptyList();
         for (Object value : row) {
-          if (index++ < 2) continue; // ignore first two items (id, version)
           Object objValue = value == null ? "" : value;
-          if (selection.containsKey(index - 3)) {
-            objValue = selection.get(index - 3).get(objValue.toString());
+          if (selection.containsKey(index)) {
+            objValue = selection.get(index).get(objValue.toString());
           }
-          if (objValue instanceof Number) {
+          if (objValue instanceof String) {
+            if (translatableNames.contains(names.get(index))) {
+              objValue = getValueTranslation(bundle, (String) objValue);
+            }
+          } else if (objValue instanceof Number) {
             objValue = formatter.format((Number) objValue, false);
           } else if (objValue instanceof LocalDate) {
             objValue = formatter.format((LocalDate) objValue);
@@ -780,9 +795,12 @@ public class Resource<T extends Model> {
             objValue = formatter.format((LocalDateTime) objValue);
           } else if (objValue instanceof ZonedDateTime) {
             objValue = formatter.format((ZonedDateTime) objValue);
+          } else if (objValue instanceof Enum) {
+            objValue = getTranslation(bundle, getTitle((Enum<?>) objValue));
           }
           String strValue = objValue == null ? "" : escapeCsv(objValue.toString());
           line.add(strValue);
+          ++index;
         }
         writer.write("\n");
         writer.write(Joiner.on(listSeparator).join(line));
@@ -806,6 +824,30 @@ public class Resource<T extends Model> {
     response.setTotal(count);
 
     return count;
+  }
+
+  private String getTranslation(ResourceBundle bundle, String text) {
+    return Optional.ofNullable(bundle.getString(text)).filter(StringUtils::notBlank).orElse(text);
+  }
+
+  private String getValueTranslation(ResourceBundle bundle, String text) {
+    final String key = "value:" + text;
+    return Optional.ofNullable(bundle.getString(key))
+        .filter(StringUtils::notBlank)
+        .filter(translation -> !Objects.equal(key, translation))
+        .orElse(text);
+  }
+
+  private String getTitle(Enum<?> value) {
+    final Field field;
+    try {
+      field = value.getClass().getField(value.name());
+    } catch (NoSuchFieldException | SecurityException e) {
+      throw new RuntimeException(e);
+    }
+    return Optional.ofNullable(field.getAnnotation(Widget.class))
+        .map(Widget::title)
+        .orElseGet(() -> Inflector.getInstance().titleize(value.toString()));
   }
 
   private String escapeCsv(String value) {

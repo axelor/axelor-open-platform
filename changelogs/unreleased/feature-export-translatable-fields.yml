@@ -1,0 +1,6 @@
+---
+title: Apply translations on translatable fields and enums for data exports
+description: |
+  Only headers and selections were translated.
+  Translatable fields and enums are now also translated.
+type: feature
