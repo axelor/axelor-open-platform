@@ -39,7 +39,6 @@ import com.axelor.script.ScriptHelper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Longs;
 import com.google.inject.servlet.RequestScoped;
-import com.opencsv.CSVWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -78,6 +77,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.eclipse.persistence.annotations.Transformation;
 
 @Consumes(MediaType.APPLICATION_JSON)
@@ -469,8 +470,9 @@ public class DmsService {
                     .map(line -> line.toArray(new String[] {}))
                     .collect(Collectors.toList());
 
-            try (final CSVWriter writer = new CSVWriter(new FileWriter(file))) {
-              writer.writeAll(lines);
+            try (final CSVPrinter printer =
+                new CSVPrinter(new FileWriter(file), CSVFormat.DEFAULT)) {
+              printer.printRecords(lines);
             }
 
             return file;

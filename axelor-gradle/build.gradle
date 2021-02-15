@@ -14,7 +14,7 @@ dependencies {
   implementation project(':axelor-common')
 
   implementation libs.guava
-  implementation libs.opencsv
+  implementation libs.commons_csv
   implementation libs.plugin_license
   implementation libs.snakeyaml
 

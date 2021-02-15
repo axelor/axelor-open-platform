@@ -23,13 +23,10 @@ import com.axelor.db.JPA;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.repo.MetaTranslationRepository;
-import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
-import com.opencsv.CSVParser;
-import com.opencsv.CSVReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -37,13 +34,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.StreamSupport;
 import javax.inject.Inject;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 public class I18nLoader extends AbstractParallelLoader {
 
@@ -132,17 +134,17 @@ public class I18nLoader extends AbstractParallelLoader {
 
     language = matcher.group(1);
 
-    try (Reader reader = new InputStreamReader(stream, Charsets.UTF_8);
-        CSVReader csvReader =
-            new CSVReader(
-                reader, CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, '\0')) {
+    try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+        CSVParser csvParser =
+            new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader().withEscape('\0'))) {
 
-      String[] fields = csvReader.readNext();
+      String[] fields = csvParser.getHeaderNames().toArray(new String[] {});
       String[] values = null;
 
       int counter = 0;
 
-      while ((values = csvReader.readNext()) != null) {
+      for (CSVRecord record : csvParser) {
+        values = StreamSupport.stream(record.spliterator(), false).toArray(String[]::new);
         if (isEmpty(values)) {
           continue;
         }

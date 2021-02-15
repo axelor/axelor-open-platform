@@ -52,11 +52,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.Writer;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -69,7 +69,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.StreamSupport;
 import javax.xml.bind.JAXBException;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -281,19 +286,17 @@ public class MetaController {
     Path target = path.resolve(Paths.get(module, "src/main/resources/i18n", name));
 
     List<String[]> items = new ArrayList<>();
-    CSVReader reader = new CSVReader(new InputStreamReader(file.openStream()));
-    try {
-      String[] header = reader.readNext();
+    try (Reader reader = new InputStreamReader(file.openStream());
+        CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT)) {
+      String[] header = csvParser.getHeaderNames().toArray(new String[] {});
       String[] values = null;
-      while ((values = reader.readNext()) != null) {
+      for (CSVRecord record : csvParser) {
+        values = StreamSupport.stream(record.spliterator(), false).toArray(String[]::new);
         if (header.length != values.length) {
           continue;
         }
 
-        final Map<String, String> map = new HashMap<>();
-        for (int i = 0; i < header.length; i++) {
-          map.put(header[i], values[i]);
-        }
+        final Map<String, String> map = new HashMap<>(record.toMap());
 
         String key = map.get("key");
         String value = map.get("value");
@@ -309,18 +312,14 @@ public class MetaController {
         String[] row = {key, value, map.get("comment"), map.get("context")};
         items.add(row);
       }
-    } finally {
-      reader.close();
     }
 
     Files.createParentDirs(target.toFile());
 
-    CSVWriter writer = new CSVWriter(new FileWriter(target.toFile()));
-    try {
-      writer.writeNext(new String[] {"key", "message", "comment", "context"});
-      writer.writeAll(items);
-    } finally {
-      writer.close();
+    try (Writer writer = new FileWriter(target.toFile());
+        CSVPrinter printer = new CSVPrinter(writer, CSVFormat.EXCEL)) {
+      printer.printRecord("key", "message", "comment", "context");
+      printer.printRecords(items);
     }
   }
 

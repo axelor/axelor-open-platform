@@ -19,16 +19,12 @@ package com.axelor.tools.i18n;
 
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
-import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
-import com.opencsv.CSVParser;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -37,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,6 +41,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +51,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -99,8 +101,6 @@ public class I18nExtractor {
 
   private static final Set<String> TEXT_NODES =
       Sets.newHashSet("option", "message", "static", "help");
-
-  private static final String[] CSV_HEADER = {"key", "message", "comment", "context"};
 
   private static class I18nItem {
 
@@ -461,34 +461,30 @@ public class I18nExtractor {
     }
   }
 
-  private boolean isEmpty(String[] items) {
-    if (items == null || items.length == 0) return true;
-    if (items.length == 1 && (items[0] == null || "".equals(items[0].trim()))) return true;
-    return false;
+  private boolean isEmpty(Collection<String> items) {
+    if (items == null || items.isEmpty()) return true;
+    return items.stream().map(String::trim).allMatch(String::isEmpty);
   }
 
   private void update(Path file, List<String[]> lines) throws IOException {
     if (!file.toFile().exists()) return;
 
     final Map<String, Map<String, String>> values = new HashMap<>();
-    try (final CSVReader reader =
-        new CSVReader(
-            new InputStreamReader(new FileInputStream(file.toFile()), Charsets.UTF_8),
-            CSVParser.DEFAULT_SEPARATOR,
-            CSVParser.DEFAULT_QUOTE_CHARACTER,
-            '\0')) {
-      String[] headers = reader.readNext();
-      if (headers.length < 2) {
+    try (final CSVParser csvParser =
+        new CSVParser(
+            new InputStreamReader(new FileInputStream(file.toFile()), StandardCharsets.UTF_8),
+            CSVFormat.EXCEL.withFirstRecordAsHeader().withEscape('\0'))) {
+
+      if (csvParser.getHeaderNames().size() < 2) {
         throw new IOException("Invalid language file: " + file);
       }
-      String[] items = null;
-      while ((items = reader.readNext()) != null) {
-        if (items.length != headers.length || isEmpty(items)) continue;
-        Map<String, String> value = new HashMap<>();
-        for (int i = 0; i < headers.length; i++) {
-          value.put(headers[i], items[i]);
+
+      for (CSVRecord record : csvParser) {
+        Map<String, String> map = record.toMap();
+        if (isEmpty(map.values())) {
+          continue;
         }
-        values.put(value.get("key"), value);
+        values.put(map.get("key"), map);
       }
     } catch (IOException e) {
       throw e;
@@ -511,18 +507,19 @@ public class I18nExtractor {
 
   private void save(Path file, List<String[]> values) throws IOException {
     Files.createDirectories(file.getParent());
-    try (CSVWriter csv =
-        new CSVWriter(
-            new OutputStreamWriter(new FileOutputStream(file.toFile()), Charsets.UTF_8))) {
-      csv.writeNext(CSV_HEADER);
+    try (CSVPrinter csv =
+        new CSVPrinter(
+            new OutputStreamWriter(new FileOutputStream(file.toFile()), StandardCharsets.UTF_8),
+            CSVFormat.EXCEL)) {
+      csv.printRecord("key", "message", "comment", "context");
       for (String[] line : values) {
         for (int i = 0; i < line.length; i++) {
           if (StringUtils.isBlank(line[i])) {
             line[i] = null;
           }
         }
-        csv.writeNext(line);
       }
+      csv.printRecords(values);
     } catch (IOException e) {
       throw e;
     }

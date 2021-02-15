@@ -17,7 +17,6 @@
  */
 package com.axelor.data.csv;
 
-import com.axelor.common.StringUtils;
 import com.axelor.data.ImportException;
 import com.axelor.data.ImportTask;
 import com.axelor.data.Importer;
@@ -30,7 +29,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.opencsv.CSVReader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,9 +40,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -252,32 +254,28 @@ public class CSVImporter implements Importer {
 
     LOG.info("Importing {} from {}", beanName, csvInput.getFileName());
 
-    BufferedReader streamReader = new BufferedReader(reader);
-    CSVReader csvReader = new CSVReader(streamReader, csvInput.getSeparator());
-    String[] fields;
-
-    if (StringUtils.isBlank(csvInput.getHeader())) {
-      fields = csvReader.readNext();
-    } else {
-      fields = csvInput.getHeader().trim().split("\\s*,\\s*");
-    }
-
-    Class<?> beanClass = Class.forName(beanName);
-    if (loggerManager != null) {
-      loggerManager.prepareInput(csvInput, fields);
-    }
-
-    LOG.debug("Header {}", Arrays.asList(fields));
-
-    CSVBinder binder = new CSVBinder(beanClass, fields, csvInput);
-    String[] values = null;
-
     int count = 0;
     int total = 0;
     int batchSize = DBHelper.getJdbcBatchSize();
 
-    JPA.em().getTransaction().begin();
-    try {
+    try (CSVParser csvParser =
+        new CSVParser(
+            new BufferedReader(reader),
+            CSVFormat.DEFAULT.withFirstRecordAsHeader().withDelimiter(csvInput.getSeparator()))) {
+
+      String[] fields = csvParser.getHeaderNames().toArray(new String[] {});
+
+      Class<?> beanClass = Class.forName(beanName);
+      if (loggerManager != null) {
+        loggerManager.prepareInput(csvInput, fields);
+      }
+
+      LOG.debug("Header {}", Arrays.asList(fields));
+
+      CSVBinder binder = new CSVBinder(beanClass, fields, csvInput);
+      String[] values = null;
+
+      JPA.em().getTransaction().begin();
 
       final Map<String, Object> context = new HashMap<>();
 
@@ -304,12 +302,14 @@ public class CSVImporter implements Importer {
         binder.registerAdapter(adapter);
       }
 
-      // Process for each lines
-      while ((values = csvReader.readNext()) != null) {
+      // Process for each record
+      for (CSVRecord record : csvParser) {
+        values = StreamSupport.stream(record.spliterator(), false).toArray(String[]::new);
 
         if (isEmpty(values)) {
           continue;
         }
+
         LOG.trace("Record {}", Arrays.asList(values));
 
         Object bean = null;
@@ -373,7 +373,6 @@ public class CSVImporter implements Importer {
       }
 
       valuesStack.clear();
-      csvReader.close();
     }
   }
 

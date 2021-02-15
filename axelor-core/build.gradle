@@ -45,7 +45,7 @@ dependencies {
   api libs.apache_shiro
   implementation libs.snakeyaml
   api libs.xstream
-  api libs.opencsv
+  api libs.commons_csv
 
   api libs.javax_servlet
   api libs.javax_mail
