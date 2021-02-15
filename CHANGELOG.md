@@ -1,6 +1,8 @@
 ## 5.0.27 (current)
 
-TBD
+### Changes
+
+* Remove jcenter repository
 
 ## 5.0.26 (2021-02-10)
 
