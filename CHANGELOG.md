@@ -1,3 +1,9 @@
+## 5.2.11 (2021-02-15)
+
+#### Fixed
+
+* Fix Unexpected character '`' when running npm-build
+
 ## 5.2.10 (2021-02-10)
 
 #### Fixed
