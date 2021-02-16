@@ -18,6 +18,7 @@
 package com.axelor.rpc;
 
 import static com.axelor.common.StringUtils.isBlank;
+
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;

@@ -25,7 +25,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.time.chrono.IsoChronology;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
 import java.util.Locale;
 
@@ -53,17 +55,38 @@ public final class L10n {
   private final DateTimeFormatter dateTimeFormatter;
 
   private L10n(Locale locale) {
+    final String datePattern;
+    final String timePattern;
+    final String dateTimePattern;
+
     numberFormat = NumberFormat.getInstance(locale);
+
     if (DATE_FORMAT == null) {
-      dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale);
-      timeFormatter = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale);
-      dateTimeFormatter =
-          DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(locale);
+      datePattern =
+          getPatternWithFullYear(
+              DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+                  FormatStyle.SHORT, null, IsoChronology.INSTANCE, locale));
+      timePattern =
+          DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+              null, FormatStyle.SHORT, IsoChronology.INSTANCE, locale);
+      dateTimePattern =
+          getPatternWithFullYear(
+              DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+                  FormatStyle.SHORT, FormatStyle.SHORT, IsoChronology.INSTANCE, locale));
     } else {
-      dateFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
-      timeFormatter = DateTimeFormatter.ofPattern(TIME_FORMAT);
-      dateTimeFormatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+      datePattern = DATE_FORMAT;
+      timePattern = TIME_FORMAT;
+      dateTimePattern = DATE_TIME_FORMAT;
     }
+
+    dateFormatter = DateTimeFormatter.ofPattern(datePattern);
+    timeFormatter = DateTimeFormatter.ofPattern(timePattern);
+    dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimePattern);
+  }
+
+  /** Get pattern with 4-digit year. */
+  private String getPatternWithFullYear(String pattern) {
+    return pattern.replaceAll("\\by+\\b", "yyyy").replaceAll("\\bu+\\b", "uuuu");
   }
 
   /**
