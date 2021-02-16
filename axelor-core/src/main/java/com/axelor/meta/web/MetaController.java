@@ -22,6 +22,7 @@ import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
+import com.axelor.common.csv.CSVFile;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.i18n.I18n;
@@ -52,12 +53,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -65,13 +63,10 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.StreamSupport;
 import javax.xml.bind.JAXBException;
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
@@ -285,18 +280,17 @@ public class MetaController {
     String lang = name.substring(9, name.length() - 4);
     Path target = path.resolve(Paths.get(module, "src/main/resources/i18n", name));
 
-    List<String[]> items = new ArrayList<>();
-    try (Reader reader = new InputStreamReader(file.openStream());
-        CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT)) {
-      String[] header = csvParser.getHeaderNames().toArray(new String[] {});
-      String[] values = null;
+    final List<String[]> items = new ArrayList<>();
+    final CSVFile csv = CSVFile.DEFAULT.withFirstRecordAsHeader();
+
+    try (CSVParser csvParser = csv.parse(file.openStream(), StandardCharsets.UTF_8)) {
       for (CSVRecord record : csvParser) {
-        values = StreamSupport.stream(record.spliterator(), false).toArray(String[]::new);
-        if (header.length != values.length) {
+
+        if (CSVFile.isEmpty(record)) {
           continue;
         }
 
-        final Map<String, String> map = new HashMap<>(record.toMap());
+        final Map<String, String> map = record.toMap();
 
         String key = map.get("key");
         String value = map.get("value");
@@ -316,8 +310,7 @@ public class MetaController {
 
     Files.createParentDirs(target.toFile());
 
-    try (Writer writer = new FileWriter(target.toFile());
-        CSVPrinter printer = new CSVPrinter(writer, CSVFormat.EXCEL)) {
+    try (CSVPrinter printer = CSVFile.DEFAULT.withQuoteAll().write(target.toFile())) {
       printer.printRecord("key", "message", "comment", "context");
       printer.printRecords(items);
     }

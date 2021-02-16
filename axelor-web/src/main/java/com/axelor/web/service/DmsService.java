@@ -21,6 +21,7 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.common.csv.CSVFile;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
@@ -77,7 +78,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.eclipse.persistence.annotations.Transformation;
 
@@ -470,8 +470,7 @@ public class DmsService {
                     .map(line -> line.toArray(new String[] {}))
                     .collect(Collectors.toList());
 
-            try (final CSVPrinter printer =
-                new CSVPrinter(new FileWriter(file), CSVFormat.DEFAULT)) {
+            try (CSVPrinter printer = CSVFile.DEFAULT.write(file)) {
               printer.printRecords(lines);
             }
 

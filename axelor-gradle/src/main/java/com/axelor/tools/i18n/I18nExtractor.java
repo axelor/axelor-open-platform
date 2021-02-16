@@ -19,6 +19,7 @@ package com.axelor.tools.i18n;
 
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
+import com.axelor.common.csv.CSVFile;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultimap;
@@ -26,14 +27,9 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,7 +37,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +46,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
@@ -461,30 +455,20 @@ public class I18nExtractor {
     }
   }
 
-  private boolean isEmpty(Collection<String> items) {
-    if (items == null || items.isEmpty()) return true;
-    return items.stream().map(String::trim).allMatch(String::isEmpty);
-  }
-
   private void update(Path file, List<String[]> lines) throws IOException {
     if (!file.toFile().exists()) return;
 
     final Map<String, Map<String, String>> values = new HashMap<>();
-    try (final CSVParser csvParser =
-        new CSVParser(
-            new InputStreamReader(new FileInputStream(file.toFile()), StandardCharsets.UTF_8),
-            CSVFormat.EXCEL.withFirstRecordAsHeader().withEscape('\0'))) {
+    final CSVFile csv = CSVFile.DEFAULT.withFirstRecordAsHeader();
 
-      if (csvParser.getHeaderNames().size() < 2) {
+    try (CSVParser csvParser = csv.parse(file.toFile())) {
+      if (!csvParser.getHeaderNames().contains("key")) {
         throw new IOException("Invalid language file: " + file);
       }
-
       for (CSVRecord record : csvParser) {
-        Map<String, String> map = record.toMap();
-        if (isEmpty(map.values())) {
-          continue;
+        if (CSVFile.notEmpty(record)) {
+          values.put(record.get("key"), record.toMap());
         }
-        values.put(map.get("key"), map);
       }
     } catch (IOException e) {
       throw e;
@@ -507,11 +491,8 @@ public class I18nExtractor {
 
   private void save(Path file, List<String[]> values) throws IOException {
     Files.createDirectories(file.getParent());
-    try (CSVPrinter csv =
-        new CSVPrinter(
-            new OutputStreamWriter(new FileOutputStream(file.toFile()), StandardCharsets.UTF_8),
-            CSVFormat.EXCEL)) {
-      csv.printRecord("key", "message", "comment", "context");
+    try (CSVPrinter printer = CSVFile.DEFAULT.withQuoteAll().write(file.toFile())) {
+      printer.printRecord("key", "message", "comment", "context");
       for (String[] line : values) {
         for (int i = 0; i < line.length; i++) {
           if (StringUtils.isBlank(line[i])) {
@@ -519,7 +500,7 @@ public class I18nExtractor {
           }
         }
       }
-      csv.printRecords(values);
+      printer.printRecords(values);
     } catch (IOException e) {
       throw e;
     }
