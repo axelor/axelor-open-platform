@@ -17,6 +17,7 @@
  */
 package com.axelor.data.csv;
 
+import com.axelor.common.StringUtils;
 import com.axelor.data.ImportException;
 import com.axelor.data.ImportTask;
 import com.axelor.data.Importer;
@@ -258,10 +259,15 @@ public class CSVImporter implements Importer {
     int total = 0;
     int batchSize = DBHelper.getJdbcBatchSize();
 
-    try (CSVParser csvParser =
-        new CSVParser(
-            new BufferedReader(reader),
-            CSVFormat.DEFAULT.withFirstRecordAsHeader().withDelimiter(csvInput.getSeparator()))) {
+    CSVFormat format = CSVFormat.DEFAULT.withDelimiter(csvInput.getSeparator());
+    if (StringUtils.isBlank(csvInput.getHeader())) {
+      format = format.withFirstRecordAsHeader();
+    } else {
+      final String[] header = csvInput.getHeader().trim().split("\\s*,\\s*");
+      format = format.withHeader(header);
+    }
+
+    try (CSVParser csvParser = new CSVParser(new BufferedReader(reader), format)) {
 
       String[] fields = csvParser.getHeaderNames().toArray(new String[] {});
 
