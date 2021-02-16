@@ -227,10 +227,6 @@ libs.birt_runtime = [
   "org.apache.xmlbeans:xmlbeans:3.1.0"
 ]
 
-
-// jcommander
-libs.jcommander = "com.beust:jcommander:1.71"
-
 // Quartz Scheduler
 libs.quartz = dependencies.create("org.quartz-scheduler:quartz:2.3.2") {
   exclude module: "c3p0"

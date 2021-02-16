@@ -17,16 +17,10 @@
  */
 package com.axelor.gradle.support;
 
-import com.axelor.common.FileUtils;
 import com.axelor.gradle.AppPlugin;
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.tasks.GenerateCode;
-import com.axelor.gradle.tasks.TomcatRun;
-import com.axelor.tools.ide.IdeaHelper;
-import java.io.File;
-import java.util.List;
 import org.gradle.api.Project;
-import org.gradle.api.Task;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
 import org.gradle.plugins.ide.idea.model.IdeaModel;
 
@@ -53,24 +47,7 @@ public class IdeaSupport extends AbstractSupport {
                     });
           }
           if (project.getPlugins().hasPlugin(AppPlugin.class)) {
-            final File rootDir = project.getRootDir();
-            final File workspace = FileUtils.getFile(rootDir, ".idea", "workspace.xml");
-            final List<String> args = TomcatRun.getArgs(project, 8080);
-            final List<String> vmArgs = TomcatRun.getJvmArgs(project, false);
             project.getTasks().getByName("ideaModule").dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
-            project
-                .getTasks()
-                .create(
-                    "generateIdeaLauncher",
-                    task -> {
-                      task.onlyIf(t -> workspace.exists());
-                      task.doLast(
-                          t -> IdeaHelper.createLauncher(rootDir, project.getName(), args, vmArgs));
-                      Task generateLauncher = project.getTasks().getByName("generateLauncher");
-                      if (generateLauncher != null) {
-                        generateLauncher.finalizedBy(task);
-                      }
-                    });
           }
         });
   }

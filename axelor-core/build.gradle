@@ -11,9 +11,6 @@ dependencies {
 
   api project(":axelor-common")
 
-  // these dependencies will be excluded from war package
-  implementation project(":axelor-tomcat")
-
   api libs.groovy
   api libs.groovy_wslite
 
@@ -65,7 +62,6 @@ dependencies {
   api libs.birt_runtime
 
   implementation libs.commons_jxpath
-  implementation libs.jcommander
 
   testImplementation libs.greenmail
   testImplementation libs.apache_ds

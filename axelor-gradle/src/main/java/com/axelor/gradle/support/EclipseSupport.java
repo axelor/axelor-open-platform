@@ -20,16 +20,10 @@ package com.axelor.gradle.support;
 import com.axelor.gradle.AppPlugin;
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.tasks.GenerateCode;
-import com.axelor.gradle.tasks.TomcatRun;
-import com.axelor.tools.ide.EclipseHelper;
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 import org.gradle.api.Project;
-import org.gradle.api.Task;
-import org.gradle.composite.internal.DefaultIncludedBuild;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.eclipse.EclipseWtpPlugin;
 import org.gradle.plugins.ide.eclipse.model.AccessRule;
@@ -53,45 +47,19 @@ public class EclipseSupport extends AbstractSupport {
     project.afterEvaluate(
         p -> {
           if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
-            project
-                .getTasks()
-                .getByName(EclipsePlugin.ECLIPSE_CP_TASK_NAME)
-                .dependsOn(GenerateCode.TASK_NAME);
             eclipse.synchronizationTasks(GenerateCode.TASK_NAME);
           }
           if (project.getPlugins().hasPlugin(AppPlugin.class)) {
-            project
-                .getTasks()
-                .create(
-                    "generateEclipseLauncher",
-                    task -> {
-                      final File cpFile = new File(project.getRootDir(), ".classpath");
-                      task.onlyIf(t -> cpFile.exists());
-                      task.doLast(
-                          a ->
-                              EclipseHelper.createLauncher(
-                                  project.getRootDir(),
-                                  project.getName(),
-                                  TomcatRun.getArgs(project, 8080),
-                                  TomcatRun.getJvmArgs(project, false)));
-                      final Task generateLauncher =
-                          project.getTasks().getByName("generateLauncher");
-                      if (generateLauncher != null) {
-                        generateLauncher.finalizedBy(task);
-                      }
-                    });
             // Fix wtp issue in included builds (with buildship)
             // see: https://discuss.gradle.org/t/gradle-composite-builds-and-eclipse-wtp/23503
-            project.getGradle().getIncludedBuilds().stream()
-                .map(ib -> ((DefaultIncludedBuild) ib).getConfiguredBuild().getRootProject())
-                .flatMap(
-                    ib -> Stream.concat(Arrays.asList(ib).stream(), ib.getSubprojects().stream()))
-                .filter(ip -> ip.getPlugins().hasPlugin(EclipseWtpPlugin.class))
-                .map(ip -> ip.getTasks().getByName("eclipseWtp"))
-                .forEach(it -> project.getTasks().getByName("eclipseWtp").dependsOn(it));
-
-            // generate run launcher
-            eclipse.synchronizationTasks("generateLauncher");
+            findIncludedBuildProjects(project).stream()
+                .filter(included -> included.getPlugins().hasPlugin(EclipseWtpPlugin.class))
+                .forEach(
+                    included ->
+                        project
+                            .getTasks()
+                            .getByName("eclipseWtp")
+                            .dependsOn(included.getTasks().getByName("eclipseWtp")));
           }
         });
 

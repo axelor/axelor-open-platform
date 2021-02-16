@@ -17,9 +17,12 @@
  */
 package com.axelor.gradle;
 
+import com.axelor.gradle.support.AbstractSupport;
 import com.axelor.gradle.support.ScriptsSupport;
 import com.axelor.gradle.support.TomcatSupport;
 import com.axelor.gradle.support.WarSupport;
+import com.axelor.gradle.tasks.GenerateCode;
+import java.util.Objects;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository;
@@ -35,5 +38,11 @@ public class AppPlugin implements Plugin<Project> {
 
     // disable publishing apps by default
     project.getTasks().withType(PublishToMavenRepository.class).all(task -> task.setEnabled(false));
+
+    // run generateCode on included builds
+    AbstractSupport.findIncludedBuildProjects(project).stream()
+        .map(included -> included.getTasks().findByName(GenerateCode.TASK_NAME))
+        .filter(Objects::nonNull)
+        .forEach(task -> project.getTasks().getByName(GenerateCode.TASK_NAME).dependsOn(task));
   }
 }
