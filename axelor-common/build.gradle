@@ -6,6 +6,7 @@ dependencies {
 
   implementation libs.guava
   implementation libs.axelor_asm
+  implementation libs.commons_csv
 }
 
 configurations {
