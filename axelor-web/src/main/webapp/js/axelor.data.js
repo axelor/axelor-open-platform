@@ -243,7 +243,7 @@
           if (_.isObject(value)) {
             if (value.version !== undefined) {
               var newValue = _.extend({}, value, {$version: value.version});
-              delete newValue.version
+              delete newValue.version;
               parent[key] = newValue;
             }
             _.each(value, setVersion);
