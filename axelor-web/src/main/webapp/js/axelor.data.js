@@ -239,11 +239,12 @@
       },
 
       search: function(options) {
-        function setVersion(value) {
+        function setVersion(value, key, parent) {
           if (_.isObject(value)) {
             if (value.version !== undefined) {
-              value.$version = value.version;
-              delete value.version;
+              var newValue = _.extend({}, value, {$version: value.version});
+              delete newValue.version
+              parent[key] = newValue;
             }
             _.each(value, setVersion);
           }
