@@ -4,4 +4,5 @@ description: |
   Client locale is used for exports, unless `data.export.locale` is set.
   Only numbers (integer, long, decimal) were formatted using client locale.
   Dates, times, and datetimes now also use client locale.
+  Setting `date.format` is removed.
 type: change

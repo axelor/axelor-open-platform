@@ -90,8 +90,6 @@ public interface AvailableAppSettings {
   String QUARTZ_ENABLE = "quartz.enable";
   String QUARTZ_THREAD_COUNT = "quartz.threadCount";
 
-  @Deprecated String DATE_FORMAT = "date.format";
-
   String FILE_UPLOAD_FILENAME_PATTERN = "file.upload.filename.pattern";
   String FILE_UPLOAD_WHITELIST_PATTERN = "file.upload.whitelist.pattern";
   String FILE_UPLOAD_BLACKLIST_PATTERN = "file.upload.blacklist.pattern";

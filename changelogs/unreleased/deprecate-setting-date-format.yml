@@ -1,7 +1,0 @@
----
-title: Deprecate setting `date.format`
-description: |
-  When this setting is not used, exported dates, times, and datetimes
-  are now formatted according to client locale.
-type: deprecate
-

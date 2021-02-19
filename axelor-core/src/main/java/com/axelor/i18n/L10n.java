@@ -17,8 +17,6 @@
  */
 package com.axelor.i18n;
 
-import com.axelor.app.AppSettings;
-import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -34,54 +32,28 @@ import java.util.Locale;
 /** This class provider methods for localization (L10n) services. */
 public final class L10n {
 
-  private static final String DATE_FORMAT =
-      AppSettings.get().get(AvailableAppSettings.DATE_FORMAT, null);
-  private static final String TIME_FORMAT;
-  private static final String DATE_TIME_FORMAT;
-
-  static {
-    if (DATE_FORMAT != null) {
-      TIME_FORMAT = "HH:mm";
-      DATE_TIME_FORMAT = String.format("%s %s", DATE_FORMAT, TIME_FORMAT);
-    } else {
-      TIME_FORMAT = null;
-      DATE_TIME_FORMAT = null;
-    }
-  }
-
   private final NumberFormat numberFormat;
   private final DateTimeFormatter dateFormatter;
   private final DateTimeFormatter timeFormatter;
   private final DateTimeFormatter dateTimeFormatter;
 
   private L10n(Locale locale) {
-    final String datePattern;
-    final String timePattern;
-    final String dateTimePattern;
-
-    numberFormat = NumberFormat.getInstance(locale);
-
-    if (DATE_FORMAT == null) {
-      datePattern =
-          getPatternWithFullYear(
-              DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-                  FormatStyle.SHORT, null, IsoChronology.INSTANCE, locale));
-      timePattern =
-          DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-              null, FormatStyle.SHORT, IsoChronology.INSTANCE, locale);
-      dateTimePattern =
-          getPatternWithFullYear(
-              DateTimeFormatterBuilder.getLocalizedDateTimePattern(
-                  FormatStyle.SHORT, FormatStyle.SHORT, IsoChronology.INSTANCE, locale));
-    } else {
-      datePattern = DATE_FORMAT;
-      timePattern = TIME_FORMAT;
-      dateTimePattern = DATE_TIME_FORMAT;
-    }
+    final String datePattern =
+        getPatternWithFullYear(
+            DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+                FormatStyle.SHORT, null, IsoChronology.INSTANCE, locale));
+    final String timePattern =
+        DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+            null, FormatStyle.SHORT, IsoChronology.INSTANCE, locale);
+    final String dateTimePattern =
+        getPatternWithFullYear(
+            DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+                FormatStyle.SHORT, FormatStyle.SHORT, IsoChronology.INSTANCE, locale));
 
     dateFormatter = DateTimeFormatter.ofPattern(datePattern);
     timeFormatter = DateTimeFormatter.ofPattern(timePattern);
     dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimePattern);
+    numberFormat = NumberFormat.getInstance(locale);
   }
 
   /** Get pattern with 4-digit year. */
