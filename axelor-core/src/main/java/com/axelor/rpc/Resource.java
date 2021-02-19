@@ -564,11 +564,10 @@ public class Resource<T extends Model> {
           .getInt(AvailableAppSettings.DATA_EXPORT_FETCH_SIZE, DEFAULT_EXPORT_FETCH_SIZE);
 
   public Response export(Request request, Charset charset) {
-    return export(request, charset, false, AppFilter.getLocale(), ';');
+    return export(request, charset, AppFilter.getLocale(), ';');
   }
 
-  public Response export(
-      Request request, Charset charset, boolean useBom, Locale locale, char separator) {
+  public Response export(Request request, Charset charset, Locale locale, char separator) {
     security.get().check(JpaSecurity.CAN_READ, model);
     security.get().check(JpaSecurity.CAN_EXPORT, model);
 
@@ -587,7 +586,7 @@ public class Resource<T extends Model> {
       final java.nio.file.Path tempFile = MetaFiles.createTempFile(null, ".csv");
       try (final OutputStream os = new FileOutputStream(tempFile.toFile())) {
         try (final Writer writer = new OutputStreamWriter(os, charset)) {
-          if (useBom && StandardCharsets.UTF_8.equals(charset)) {
+          if (StandardCharsets.UTF_8.equals(charset)) {
             writer.write('\ufeff');
           }
           data.put("exportSize", export(request, writer, locale, separator));

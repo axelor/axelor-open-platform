@@ -1,6 +1,5 @@
 ---
 title: Default setting `data.export.encoding` to UTF-8
 description: |
-  `UTF-8-BOM` value can be used to add BOM, so that Excel recognizes the encoding.
+  When UTF-8 is used, BOM is added so that Excel recognizes the encoding.
 type: change
-

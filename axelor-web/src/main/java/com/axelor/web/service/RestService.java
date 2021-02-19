@@ -647,7 +647,6 @@ public class RestService extends ResourceService {
   }
 
   private static Charset csvCharset = StandardCharsets.UTF_8;
-  private static boolean csvCharsetBom = false;
   private static Locale csvLocale = null;
   private static Character csvSeparator = null;
 
@@ -656,11 +655,7 @@ public class RestService extends ResourceService {
 
     final String encoding = settings.get(AvailableAppSettings.DATA_EXPORT_ENCODING, null);
     if (encoding != null) {
-      if ("UTF-8-BOM".equalsIgnoreCase(encoding)) {
-        csvCharsetBom = true;
-      } else {
-        csvCharset = Charset.forName(encoding);
-      }
+      csvCharset = Charset.forName(encoding);
     }
 
     final String locale = settings.get(AvailableAppSettings.DATA_EXPORT_LOCALE, null);
@@ -728,8 +723,7 @@ public class RestService extends ResourceService {
     request.setModel(getModel());
     updateContext(request);
 
-    return getResource()
-        .export(request, csvCharset, csvCharsetBom, getCsvLocale(), getCsvSeparator());
+    return getResource().export(request, csvCharset, getCsvLocale(), getCsvSeparator());
   }
 
   @GET
