@@ -649,7 +649,7 @@ public class RestService extends ResourceService {
   private static Charset csvCharset = StandardCharsets.UTF_8;
   private static boolean csvCharsetBom = false;
   private static Locale csvLocale = null;
-  private static Character csvListSeparator = null;
+  private static Character csvSeparator = null;
 
   static {
     final AppSettings settings = AppSettings.get();
@@ -668,9 +668,9 @@ public class RestService extends ResourceService {
       csvLocale = Locale.forLanguageTag(locale.replace("_", "-"));
     }
 
-    final String listSeparator = settings.get(AvailableAppSettings.DATA_EXPORT_LIST_SEPARTOR, null);
-    if (listSeparator != null) {
-      csvListSeparator = listSeparator.charAt(0);
+    final String separator = settings.get(AvailableAppSettings.DATA_EXPORT_SEPARTOR, null);
+    if (separator != null) {
+      csvSeparator = separator.charAt(0);
     }
   }
 
@@ -678,11 +678,11 @@ public class RestService extends ResourceService {
     return csvLocale == null ? httpRequest.getLocale() : csvLocale;
   }
 
-  private char getCsvListSeparator() {
-    return csvListSeparator == null ? getLocaleListSeparator() : csvListSeparator;
+  private char getCsvSeparator() {
+    return csvSeparator == null ? getLocaleSeparator() : csvSeparator;
   }
 
-  private char getLocaleListSeparator() {
+  private char getLocaleSeparator() {
     char decimalSeparator = DecimalFormatSymbols.getInstance(getCsvLocale()).getDecimalSeparator();
     return decimalSeparator == ',' ? ';' : ',';
   }
@@ -729,7 +729,7 @@ public class RestService extends ResourceService {
     updateContext(request);
 
     return getResource()
-        .export(request, csvCharset, csvCharsetBom, getCsvLocale(), getCsvListSeparator());
+        .export(request, csvCharset, csvCharsetBom, getCsvLocale(), getCsvSeparator());
   }
 
   @GET

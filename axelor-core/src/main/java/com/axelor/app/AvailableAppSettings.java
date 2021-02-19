@@ -75,7 +75,7 @@ public interface AvailableAppSettings {
   String DATA_EXPORT_FETCH_SIZE = "data.export.fetch-size";
   String DATA_EXPORT_ENCODING = "data.export.encoding";
   String DATA_EXPORT_LOCALE = "data.export.locale";
-  String DATA_EXPORT_LIST_SEPARTOR = "data.export.list.separator";
+  String DATA_EXPORT_SEPARTOR = "data.export.separator";
 
   String CORS_ALLOW_ORIGIN = "cors.allow.origin";
   String CORS_ALLOW_CREDENTIALS = "cors.allow.credentials";

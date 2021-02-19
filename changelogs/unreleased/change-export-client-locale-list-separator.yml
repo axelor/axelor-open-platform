@@ -1,7 +1,0 @@
----
-title: Select list separator for exports according to client locale
-description: |
-  Use client locale to determine list separator, unless `data.export.list.separator` is set.
-  Default list separator in a CSV is a comma unless the decimal separator of the locale is a comma.
-type: change
-

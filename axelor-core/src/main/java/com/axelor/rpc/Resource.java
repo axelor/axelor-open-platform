@@ -568,7 +568,7 @@ public class Resource<T extends Model> {
   }
 
   public Response export(
-      Request request, Charset charset, boolean useBom, Locale locale, char listSeparator) {
+      Request request, Charset charset, boolean useBom, Locale locale, char separator) {
     security.get().check(JpaSecurity.CAN_READ, model);
     security.get().check(JpaSecurity.CAN_EXPORT, model);
 
@@ -590,7 +590,7 @@ public class Resource<T extends Model> {
           if (useBom && StandardCharsets.UTF_8.equals(charset)) {
             writer.write('\ufeff');
           }
-          data.put("exportSize", export(request, writer, locale, listSeparator));
+          data.put("exportSize", export(request, writer, locale, separator));
         }
       }
       data.put("fileName", tempFile.toFile().getName());
@@ -605,7 +605,7 @@ public class Resource<T extends Model> {
   }
 
   @SuppressWarnings("all")
-  private int export(Request request, Writer writer, Locale locale, char listSeparator)
+  private int export(Request request, Writer writer, Locale locale, char separator)
       throws IOException {
 
     List<String> fields = request.getFields();
@@ -756,7 +756,7 @@ public class Resource<T extends Model> {
       }
     }
 
-    writer.write(Joiner.on(listSeparator).join(header));
+    writer.write(Joiner.on(separator).join(header));
 
     int limit =
         EXPORT_MAX_SIZE > 0 ? Math.min(EXPORT_FETCH_SIZE, EXPORT_MAX_SIZE) : EXPORT_FETCH_SIZE;
@@ -804,7 +804,7 @@ public class Resource<T extends Model> {
           ++index;
         }
         writer.write("\n");
-        writer.write(Joiner.on(listSeparator).join(line));
+        writer.write(Joiner.on(separator).join(line));
       }
 
       count += data.size();
