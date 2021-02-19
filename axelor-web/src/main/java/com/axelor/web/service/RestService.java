@@ -68,9 +68,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -646,40 +644,32 @@ public class RestService extends ResourceService {
     return getResource().perms();
   }
 
-  private static Charset csvCharset = StandardCharsets.UTF_8;
-  private static Locale csvLocale = null;
-  private static Character csvSeparator = null;
+  private static final Charset CSV_CHARSET;
+  private static final Locale CSV_LOCALE;
+  private static final Character CSV_SEPARATOR;
 
   static {
     final AppSettings settings = AppSettings.get();
 
-    final String encoding = settings.get(AvailableAppSettings.DATA_EXPORT_ENCODING, null);
-    if (encoding != null) {
-      csvCharset = Charset.forName(encoding);
-    }
+    final String encoding = settings.get(AvailableAppSettings.DATA_EXPORT_ENCODING, "UTF-8");
+    CSV_CHARSET = Charset.forName(encoding);
 
     final String locale = settings.get(AvailableAppSettings.DATA_EXPORT_LOCALE, null);
     if (locale != null) {
-      csvLocale = Locale.forLanguageTag(locale.replace("_", "-"));
+      CSV_LOCALE = Locale.forLanguageTag(locale.replace("_", "-"));
+    } else {
+      CSV_LOCALE = null;
     }
 
-    final String separator = settings.get(AvailableAppSettings.DATA_EXPORT_SEPARTOR, null);
-    if (separator != null) {
-      csvSeparator = separator.charAt(0);
+    final String separator =
+        Optional.ofNullable(settings.get(AvailableAppSettings.DATA_EXPORT_SEPARTOR))
+            .filter(StringUtils::notEmpty)
+            .orElse(";");
+    if (separator.length() != 1) {
+      throw new IllegalArgumentException(
+          String.format("Illegal data export separator: %s", separator));
     }
-  }
-
-  private Locale getCsvLocale() {
-    return csvLocale == null ? httpRequest.getLocale() : csvLocale;
-  }
-
-  private char getCsvSeparator() {
-    return csvSeparator == null ? getLocaleSeparator() : csvSeparator;
-  }
-
-  private char getLocaleSeparator() {
-    char decimalSeparator = DecimalFormatSymbols.getInstance(getCsvLocale()).getDecimalSeparator();
-    return decimalSeparator == ',' ? ';' : ',';
+    CSV_SEPARATOR = separator.charAt(0);
   }
 
   @HEAD
@@ -723,7 +713,9 @@ public class RestService extends ResourceService {
     request.setModel(getModel());
     updateContext(request);
 
-    return getResource().export(request, csvCharset, getCsvLocale(), getCsvSeparator());
+    // ServletRequest#getLocale() returns server locale if no Accept-Language header is set.
+    final Locale locale = CSV_LOCALE != null ? CSV_LOCALE : httpRequest.getLocale();
+    return getResource().export(request, CSV_CHARSET, locale, CSV_SEPARATOR);
   }
 
   @GET
