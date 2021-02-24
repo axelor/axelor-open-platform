@@ -150,7 +150,9 @@ var phoneInput = {
     if (!phoneInput.navigatorCountries.length) {
       phoneInput.navigatorCountries = _.uniq(window.navigator.languages
         .map(function (language) { return language.split("-")[1]; })
-        .filter(function (language) { return language; })) || [phoneInput.getFallbackCountries()[0]]
+        .filter(function (country) { return country; })
+        .map(function (country) { return country.toLowerCase(); }))
+        || phoneInput.getFallbackCountries();
     }
     return phoneInput.navigatorCountries;
   },
@@ -232,7 +234,8 @@ var phoneInput = {
   },
 
   detectCountry: function (iti, value, input) {
-    if (input && input.is(":focus") || phoneInput.isValidNumber(iti)) {
+    if (input && input.is(":focus") && !input.hasClass("phone-input-readonly")
+        || phoneInput.isValidNumber(iti, value)) {
       return;
     }
 
@@ -507,6 +510,10 @@ ui.formInput('Phone', 'String', {
         return;
       }
 
+      if (!value) {
+        return;
+      }
+
       input.val(value);
 
       var options = {
@@ -523,7 +530,7 @@ ui.formInput('Phone', 'String', {
 
         adjustWidth = function () {
           span.text(input.val());
-          itiElem.width(span.width() + 32);
+          itiElem.css("max-width", span.width() + 35);
         }
 
         scope.isVisible = function () {
@@ -548,7 +555,7 @@ ui.formInput('Phone', 'String', {
     }
   },
   template_editable: '<div class="input"><input type="tel" title="{{numberType}}"><span class="phone-validation" ng-show="validationError">{{validationError}}</span></div>',
-  template_readonly: '<div ng-show="text"></span><input type="button" ng-click="onClick()" title="{{numberType}}" class="phone-input-readonly"><span class="hidden phone"></div>'
+  template_readonly: '<div ng-show="text"></span><input type="button" ng-click="onClick()" title="{{numberType}}" class="phone-input-readonly"><span class="hidden phone" style="white-space: nowrap"></div>'
 });
 
 

@@ -1817,6 +1817,8 @@ label.has-help > span:after,
   vertical-align: inherit;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .phone-input-readonly:only-child {
