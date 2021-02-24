@@ -327,12 +327,14 @@ ui.directive('uiDialogSize', function() {
       var elemTitle = elemDialog.find('.ui-dialog-title');
       var elemButton = $('<a href="#" class="ui-dialog-titlebar-max"><i class="fa fa-expand"></i></a>')
         .click(function (e) {
-          $(this).children('i').toggleClass('fa-expand fa-compress');
-          elemDialog.toggleClass('maximized');
-          axelor.$adjustSize();
-          setTimeout(function () {
-            scope.$broadcast('grid:adjust-columns');
-          }, 350);
+          scope.waitForActions(function () {
+            $(this).children('i').toggleClass('fa-expand fa-compress');
+            elemDialog.toggleClass('maximized');
+            axelor.$adjustSize();
+            setTimeout(function () {
+              scope.$broadcast('grid:adjust-columns');
+            }, 350);
+          });
           return false;
       }).insertAfter(elemTitle);
 
