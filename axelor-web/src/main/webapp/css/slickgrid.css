@@ -698,3 +698,34 @@
 .slick-form .iti__flag-container {
   border: 1px solid #ddd;
 }
+
+@media (pointer: fine) {
+  .form-view .slick-viewport {
+    scrollbar-width: thin;
+  }
+
+  .form-view .slick-viewport::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .form-view .slick-viewport::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+  }
+
+  .form-view .slick-viewport::-webkit-scrollbar-thumb {
+    background-color: #c1c1c1;
+  }
+
+  .form-view .slick-viewport::-webkit-scrollbar-thumb:hover {
+    background-color: #a8a8a8;
+  }
+
+  .form-view .slick-viewport::-webkit-scrollbar-thumb:active {
+    background-color: #787878;
+  }
+
+  .form-view .slick-viewport::-webkit-scrollbar-corner {
+    background-color: #f7f7f7;
+  }
+}
