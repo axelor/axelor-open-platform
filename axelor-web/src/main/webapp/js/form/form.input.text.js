@@ -519,6 +519,7 @@ ui.formInput('Phone', 'String', {
       var options = {
         utilsScript: "lib/intl-tel-input/js/utils.js",
         initialCountry: phoneInput.getNavigatorCountry(),
+        localizedCountries: phoneInput.getLocalizedCountries(),
         nationalMode: false,
         allowDropdown: false
       };
