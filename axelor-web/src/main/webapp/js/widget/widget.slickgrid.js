@@ -606,6 +606,9 @@ Grid.prototype.parse = function(view) {
     }
 
     if (field.type == "button" || field.type == "icon") {
+      if (!item.autoTitle) {
+        item.autoTitle = item.title;
+      }
       item.title = "&nbsp;";
       item.width = field.width || 32;
     }
@@ -676,12 +679,16 @@ Grid.prototype.parse = function(view) {
     }, {
       title: _t("Hide") + " <i>" + column.name + "</i>",
       command: "hide"
-    }, {
-      separator: true
-    }, {
-      title: _t("Customize..."),
-      command: "customize"
     }];
+
+    if (view.name) {
+      Array.prototype.push.apply(menus, [{
+        separator: true
+      }, {
+        title: _t("Customize…"),
+        command: "customize"
+      }]);
+    }
 
     menus = _.compact(menus);
 
@@ -1211,9 +1218,18 @@ Grid.prototype._doInit = function(view) {
   scope.$on('dom:attach', resetScroll);
   scope.$on('tab:select', resetScroll);
 
+  function setWidthChanged() {
+    _.each(grid.getColumns(), function (column) {
+      if (column.previousWidth != column.width) {
+        column.$widthChanged = true;
+      }
+    });
+  }
+
   var onColumnsResized = false;
   this.subscribe(grid.onColumnsResized, function (e, args) {
     onColumnsResized = true;
+    setWidthChanged();
   });
 
   scope.$on('grid:adjust-columns', function () {
@@ -1516,6 +1532,7 @@ Grid.prototype.showCustomizePopup = function () {
     formScope = that.scope.$new(true);
     formScope.target = that.handler._model;
     formScope.view = that.scope.view;
+    formScope.grid = that.grid;
 
     var form = that.compile("<div ui-slick-columns-form target='target' view='view'></div>", formScope);
 
@@ -2711,6 +2728,21 @@ ui.directive("uiSlickColumnsForm", function () {
       view: "="
     },
     controller: ["$scope", "$element", 'DataSource', 'ViewService', function($scope, $element, DataSource, ViewService) {
+      function isAdmin() {
+        return axelor.config["user.login"] === "admin" || axelor.config["user.group"] === "admins";
+      }
+
+      function canReset() {
+        return $scope.view.customViewId && (!$scope.view.customViewShared || isAdmin());
+      }
+
+      function closeAndReload() {
+        $scope.doClose();
+        setTimeout(function () {
+          window.location.reload();
+        });
+      }
+
       $scope._viewParams = {
         model: "com.axelor.meta.db.MetaField",
         viewType: "form",
@@ -2718,10 +2750,10 @@ ui.directive("uiSlickColumnsForm", function () {
           type: "form",
           items: [{
             type: "panel-related",
-            title: _t("Items"),
+            title: _t("Columns"),
             name: "items",
             target: "com.axelor.meta.db.MetaField",
-            domain: "self.metaModel.fullName = '" + $scope.target + "'",
+            domain: _.sprintf("self.metaModel.fullName = '%s' AND self.name NOT IN ('id', 'version')", $scope.target),
             serverType: "MANY_TO_MANY",
             canNew: false,
             canEdit: false,
@@ -2729,10 +2761,20 @@ ui.directive("uiSlickColumnsForm", function () {
             canMove: true,
             items: [{
               type: "field",
+              name: "$title",
+              serverType: "STRING",
+              title: _t("Title")
+            }, {
+              type: "field",
               name: "name"
             }, {
               type: "field",
-              name: "typeName"
+              name: "label",
+              hidden: true
+            }, {
+              type: "field",
+              name: "typeName",
+              hidden: true
             }, {
               type: "field",
               name: "$hidden",
@@ -2740,11 +2782,21 @@ ui.directive("uiSlickColumnsForm", function () {
               title: _t("Hidden")
             }]
           }, {
-            name: "share",
-            type: "field",
-            serverType: "BOOLEAN",
-            widget: "inline-checkbox",
-            title: _t("Share")
+            type: "panel",
+            items: [{
+              name: "saveWidths",
+              type: "field",
+              serverType: "BOOLEAN",
+              widget: "inline-checkbox",
+              title: _t("Save column widths")
+            },{
+              name: "share",
+              type: "field",
+              serverType: "BOOLEAN",
+              widget: "inline-checkbox",
+              title: _t("Share"),
+              hidden: !isAdmin()
+            }]
           }]
         }]
       };
@@ -2760,10 +2812,21 @@ ui.directive("uiSlickColumnsForm", function () {
 
       var ds = $scope._dataSource;
 
+      $scope.$on('grid-change:items', function(e, records) {
+        _.each(records, function (record) {
+          record.$title = _t(record.label || _.humanize(record.name));
+        })
+      });
+
+      $scope.$on('ui-selector-popup', function(e, scope) {
+        _.findWhere(scope._views.grid.items, { name: "$hidden" })
+          .hidden = true;
+      });
+
       $scope.onShow = function(viewPromise) {
         ds.search({
-          fields: ['name', 'typeName'],
-          domain: "self.metaModel.fullName = '" + $scope.target + "'"
+          fields: ['name', 'label', 'typeName'],
+          domain: _.sprintf("self.metaModel.fullName = '%s'", $scope.target)
         }).success(function (records) {
           var items = $scope.view.items.filter(function (x) {
             return x.type === 'field' || x.type === 'button';
@@ -2777,6 +2840,14 @@ ui.directive("uiSlickColumnsForm", function () {
           var fakeId = 0;
           var values = items.map(function (x) {
             var rec = x.type === 'field' && recordsMap[x.name] ? recordsMap[x.name] : x;
+            if (x.autoTitle) {
+              rec = _.extend({}, rec, { $title: x.autoTitle });
+              delete rec.title;
+            } else if (x.title) {
+              rec = _.extend({}, rec, { $title: x.title });
+            } else {
+              rec = _.extend({}, rec, { $title: _t(rec.label || _.humanize(rec.name)) });
+            }
             if (x.hidden) {
               rec = _.extend({}, rec, { $hidden: true });
             }
@@ -2784,7 +2855,7 @@ ui.directive("uiSlickColumnsForm", function () {
           });
 
           var record = {
-            share: $scope.view.customViewShared,
+            share: $scope.view.customViewShared && isAdmin(),
             items: values
           };
 
@@ -2802,6 +2873,9 @@ ui.directive("uiSlickColumnsForm", function () {
         var existing = schema.items
           .filter(function (x) { return x.type === 'field' || x.type === 'button'; })
           .reduce(function (m, x) {
+            if (x.autoTitle) {
+              x = _.extend({}, x, { title: x.autoTitle });
+            }
             m[x.name] = x;
             return m;
           }, {});
@@ -2820,15 +2894,41 @@ ui.directive("uiSlickColumnsForm", function () {
             items.push(existing[x.name] || { name: x.name, type: "field" });
           });
 
+        // apply changed widths
+        if (record.saveWidths) {
+          $scope.$parent.grid.getColumns()
+            .filter(function (column) { return column.$widthChanged })
+            .forEach(function (column) {
+              var item = _.findWhere(items, { name: column.field });
+              if (item) {
+                item.width = column.width;
+              }
+            });
+        }
+
         schema = _.extend({}, schema, { items: items });
 
-        ViewService.save(schema).then(function () {
-          $scope.doClose();
-          setTimeout(function () {
-            window.location.reload();
-          });
+        ViewService.save(schema).then(closeAndReload);
+      };
+
+      $scope.onReset = function () {
+        axelor.dialogs.confirm(_t('Are you sure you want to reset this view customization?'),
+          function (confirmed) {
+            if (confirmed) {
+              var action = "com.axelor.meta.web.MetaController:removeUserCustomViews";
+              var model = "com.axelor.meta.db.MetaView";
+              var context = _.extend({}, $scope.view, { id: $scope.view.viewId });
+              ViewService.action(action, model, context).then(closeAndReload);
+            }
         });
       };
+
+      $scope.buttons = canReset() ? [{
+          text: _t('Reset'),
+          'class': 'btn btn-danger button-reset',
+          tabIndex: -1,
+          click: $scope.onReset
+      }] : [];
 
       $scope.show();
     }],
@@ -2838,7 +2938,7 @@ ui.directive("uiSlickColumnsForm", function () {
         element.dialog("close");
       };
     },
-    template: "<div ui-dialog ui-view-form x-handler='true' x-on-ok='onSaveView'></div>"
+    template: "<div ui-dialog ui-view-form x-handler='true' x-on-ok='onSaveView' x-buttons='buttons'></div>"
   };
 });
 

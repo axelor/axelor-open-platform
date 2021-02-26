@@ -80,7 +80,6 @@
   <action-view name="action-meta-views-my" title="All Custom Views" model="com.axelor.meta.db.MetaViewCustom">
     <view type="grid" name="meta-view-custom-grid"/>
     <view type="form" name="meta-view-custom-form"/>
-    <domain>self.user = :__user__</domain>
   </action-view>
 
   <menuitem name="menu-view-menus" parent="menu-view-management"

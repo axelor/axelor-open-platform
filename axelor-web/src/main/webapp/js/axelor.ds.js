@@ -176,10 +176,24 @@
 
       if (meta.jsonAttrs && view && view.items) {
         if (view.type === 'grid') {
+          function findLast(array, callback) {
+            for (var index = (array || []).length - 1; index >= 0; --index) {
+              var element = array[index];
+              if (callback(element, index, array)) {
+                return element;
+              }
+            }
+          }
+
+          function lastShownIsButton(itemList) {
+            var found = findLast(itemList, function (item) { return item && !item.hidden });
+            return found && found.type === "button";
+          }
+
           view.items = (function (items) {
             var button = _.findWhere(items, { type: 'button' });
             var index = items.indexOf(button);
-            if (index < 0) {
+            if (index < 0 || !lastShownIsButton(items)) {
               index = items.length;
             }
             items.splice(index, 0, {

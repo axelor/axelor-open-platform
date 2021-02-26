@@ -660,7 +660,7 @@ ui.directive('uiViewCustomize', ['NavService', function(NavService) {
     template:
       "<ul ng-show='canShow()' class='nav menu-bar view-customize hidden-phone'>" +
         "<li class='dropdown menu'>" +
-          "<a class='dropdown-toggle btn' data-toggle='dropdown' title='{{ \"Customize...\" | t}}'>" +
+          "<a class='dropdown-toggle btn' data-toggle='dropdown' title='{{ \"Customize…\" | t}}'>" +
             "<i class='fa fa-wrench'></i>" +
           "</a>" +
           "<ul class='dropdown-menu pull-right'>" +

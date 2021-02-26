@@ -566,6 +566,19 @@ public class MetaService {
     return deleteQuery.executeUpdate();
   }
 
+  @Transactional
+  public int removeCustomViews(MetaView view, User user) {
+    if (view == null || StringUtils.isBlank(view.getName()) || user == null) {
+      return 0;
+    }
+
+    return com.axelor.db.Query.of(MetaViewCustom.class)
+        .filter("self.name = :name AND self.user = :user")
+        .bind("name", view.getName())
+        .bind("user", user)
+        .delete();
+  }
+
   @SuppressWarnings("all")
   public Response runSearch(Request request) {
     Response response = new Response();

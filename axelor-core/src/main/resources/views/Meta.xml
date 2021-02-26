@@ -173,6 +173,7 @@
     <field name="type"/>
     <field name="model"/>
     <field name="user"/>
+    <field name="shared"/>
   </grid>
 
   <form name="meta-view-custom-form" title="Personalized View" model="com.axelor.meta.db.MetaViewCustom"
@@ -182,6 +183,7 @@
       <field name="title"/>
       <field name="type"/>
       <field name="user"/>
+      <field name="shared"/>
     </panel>
     <panel title="Schema">
       <field name="xml" showTitle="false" widget="CodeEditor" height="500" x-code-syntax="xml" colSpan="12"/>

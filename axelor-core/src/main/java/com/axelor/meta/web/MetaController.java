@@ -68,6 +68,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -202,14 +203,25 @@ public class MetaController {
   public void clearCache(ActionRequest request, ActionResponse response) {
     if (request.getBeanClass() != null && MetaView.class.isAssignableFrom(request.getBeanClass())) {
       final MetaView view = request.getContext().asType(MetaView.class);
-      int deleted = Beans.get(MetaService.class).removeCustomViews(view);
-      if (deleted > 0) {
-        response.setNotify(
-            I18n.get(
-                "{0} customized view is deleted.", "{0} customized views are deleted.", deleted));
+      if (!Objects.equals(view.getType(), "grid")) {
+        int deleted = Beans.get(MetaService.class).removeCustomViews(view);
+        if (deleted > 0) {
+          response.setNotify(
+              I18n.get(
+                  "{0} customized view is deleted.", "{0} customized views are deleted.", deleted));
+        }
       }
     }
     MetaStore.clear();
+  }
+
+  public void removeUserCustomViews(ActionRequest request, ActionResponse response) {
+    if (!MetaView.class.isAssignableFrom(request.getBeanClass())) {
+      throw new IllegalArgumentException(String.valueOf(request.getBeanClass()));
+    }
+
+    final MetaView view = request.getContext().asType(MetaView.class);
+    Beans.get(MetaService.class).removeCustomViews(view, AuthUtils.getUser());
   }
 
   /**

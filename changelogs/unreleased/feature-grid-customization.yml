@@ -1,0 +1,11 @@
+---
+title: Improve grid customization
+description: |
+  <ul>
+    <li>Show translated field titles besides field names</li>
+    <li>Allow to save column widths</li>
+    <li>Add reset customization button</li>
+    <li>Don’t delete customized grids when clearing cache</li>
+    <li>Remove move icons in selector</li>
+  </ul>
+type: feature
