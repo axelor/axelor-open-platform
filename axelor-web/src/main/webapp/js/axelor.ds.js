@@ -407,8 +407,7 @@
           type: "field",
           name: "$wkfStatus",
           showTitle: false,
-          widget: "WkfStatus",
-          showIf: "$wkfStatus"
+          widget: "WkfStatus"
         });
       }
     };

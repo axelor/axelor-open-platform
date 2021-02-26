@@ -1637,7 +1637,7 @@ ui.formWidget('uiWkfStatus', {
     };
   },
   template:
-    "<div class='panel wkf-status-container'>" +
+    "<div class='panel wkf-status-container' ng-show='record.$wkfStatus'>" +
       "<div class='panel-body'>" +
         "<ul class='wkf-status'>" +
           "<li ng-repeat='item in record.$wkfStatus track by item.name'>" +
