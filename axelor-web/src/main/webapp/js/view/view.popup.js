@@ -504,7 +504,6 @@ ui.directive('uiSelectorPopup', function(){
       if (((scope._views || {}).grid || {}).canMove) {
         scope._views.grid.canMove = false;
       }
-      scope.$emit("ui-selector-popup", scope, element, attrs);
 
       var onShow = scope.onShow;
       scope.onShow = function (viewPromise) {

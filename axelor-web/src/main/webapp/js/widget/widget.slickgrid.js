@@ -836,8 +836,6 @@ Grid.prototype.parse = function(view) {
   this.doInit = _.once(function doInit() {
     this._doInit(view);
     element.removeClass('slickgrid-empty');
-    var fieldName = (handler.field || {}).name;
-    scope.$emit('slickgrid-initialized:' + fieldName, grid);
   }.bind(this));
 
   handler._dataSource.on('change', function (e, records, page) {
@@ -2793,16 +2791,6 @@ ui.directive("uiSlickColumnsForm", function () {
               type: "field",
               name: "label",
               hidden: true
-            }, {
-              type: "field",
-              name: "typeName",
-              hidden: true
-            }, {
-              type: "field",
-              name: "$hidden",
-              serverType: "BOOLEAN",
-              title: _t("Hidden"),
-              hidden: true,
             }]
           }, {
             type: "panel",
@@ -2841,34 +2829,9 @@ ui.directive("uiSlickColumnsForm", function () {
         })
       });
 
-      $scope.$on('ui-selector-popup', function(e, scope) {
-        _.findWhere(scope._views.grid.items, { name: "$hidden" })
-          .hidden = true;
-      });
-
-      function toggleHidden(e, args) {
-        if (args.grid.getColumns()[args.cell].field !== "$hidden"
-            || !$(e.toElement).hasClass("fa") && [" ", "Enter"].indexOf(e.key) < 0) {
-          return;
-        }
-
-        var data = args.grid.getData();
-        var dataItem = data.getItem(args.row);
-        dataItem.$hidden = !dataItem.$hidden;
-        data.updateItem(dataItem.id, dataItem);
-
-        var item = $scope.record.items[args.row];
-        item.$hidden = dataItem.$hidden;
-      }
-
-      $scope.$on('slickgrid-initialized:items', function (e, grid) {
-        grid.onClick.subscribe(toggleHidden);
-        grid.onKeyDown.subscribe(toggleHidden);
-      });
-
       $scope.onShow = function(viewPromise) {
         ds.search({
-          fields: ['name', 'label', 'typeName'],
+          fields: ['name', 'label'],
           domain: _.sprintf("self.metaModel.fullName = '%s'", $scope.target)
         }).success(function (records) {
           var recordsMap = records.reduce(function (a, x) {
@@ -2916,9 +2879,6 @@ ui.directive("uiSlickColumnsForm", function () {
             } else {
               rec = _.extend({}, rec, { $title: _t(rec.label || _.humanize(rec.name)) });
             }
-            if (x.hidden) {
-              rec = _.extend({}, rec, { $hidden: true });
-            }
             return rec.id === undefined ? _.extend({}, rec, { id: --fakeId }) : rec;
           });
 
@@ -2957,14 +2917,7 @@ ui.directive("uiSlickColumnsForm", function () {
         record.items
           .forEach(function (x) {
             var item = existing[x.name] || { name: x.name, type: "field" };
-            var hidden = _.toBoolean(x.$hidden);
-            if (hidden !== _.toBoolean(item.hidden)) {
-              if (hidden) {
-                item.hidden = true;
-              } else {
-                delete item.hidden;
-              }
-            }
+            delete item.hidden;
             items.push(item);
           });
 
