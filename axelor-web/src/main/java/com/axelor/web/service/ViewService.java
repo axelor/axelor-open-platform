@@ -368,12 +368,15 @@ public class ViewService extends AbstractService {
     }
 
     final ObjectMapper om = Beans.get(ObjectMapper.class);
+    final GridView originalView =
+        viewId != null ? (GridView) XMLViews.findView(Long.parseLong(viewId.toString())) : null;
     final GridView view =
         customViewId == null
-            ? (GridView) XMLViews.findView(Long.parseLong(viewId.toString()))
+            ? originalView
             : (GridView) XMLViews.findCustomView(Long.parseLong(customViewId.toString()));
 
     final List<AbstractWidget> items = new ArrayList<>();
+    final Set<String> names = new HashSet<>();
 
     for (AbstractWidget item : view.getItems()) {
       if (item instanceof Field || item instanceof Button) continue;
@@ -386,10 +389,10 @@ public class ViewService extends AbstractService {
       final String type = (String) map.get("type");
       if ("field".equals(type) || "button".equals(type)) {
         final Class<?> itemType = "field".equals(type) ? Field.class : Button.class;
+        final String name = (String) map.get("name");
 
         // Retrieve original title
         if (map.containsKey("title")) {
-          final String name = (String) map.get("name");
           view.getItems().stream()
               .filter(widget -> widget instanceof SimpleWidget)
               .map(SimpleWidget.class::cast)
@@ -401,11 +404,28 @@ public class ViewService extends AbstractService {
 
         try {
           items.add((AbstractWidget) om.readValue(om.writeValueAsString(map), itemType));
+          if (StringUtils.notBlank(name)) {
+            names.add(name);
+          }
         } catch (IOException e) {
           // this should not happen
           throw new IllegalArgumentException("Trying to save invalid view schema.");
         }
       }
+    }
+
+    // Add missing fields as hidden
+    if (originalView != null) {
+      originalView.getItems().stream()
+          .filter(widget -> widget instanceof SimpleWidget)
+          .map(SimpleWidget.class::cast)
+          .filter(widget -> StringUtils.notBlank(widget.getName()))
+          .filter(widget -> !names.contains(widget.getName()))
+          .forEach(
+              widget -> {
+                widget.setHidden(true);
+                items.add(widget);
+              });
     }
 
     view.setCustomViewShared((Boolean) json.get("customViewShared"));

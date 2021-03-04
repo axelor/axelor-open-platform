@@ -2801,7 +2801,8 @@ ui.directive("uiSlickColumnsForm", function () {
               type: "field",
               name: "$hidden",
               serverType: "BOOLEAN",
-              title: _t("Hidden")
+              title: _t("Hidden"),
+              hidden: true,
             }]
           }, {
             type: "panel",
@@ -2878,7 +2879,9 @@ ui.directive("uiSlickColumnsForm", function () {
           var items = [];
           var jsonFields = [];
           _.each($scope.view.items, function (x) {
-            if (x.type === 'field' || x.type === 'button') {
+            if (x.hidden) {
+              return;
+            } else if (x.type === 'field' || x.type === 'button') {
               items.push(x);
             } else if (x.jsonField && jsonFields.indexOf(x.jsonField) < 0) {
               jsonFields.push(x.jsonField);
