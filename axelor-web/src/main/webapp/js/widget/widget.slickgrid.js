@@ -2745,6 +2745,26 @@ ui.directive("uiSlickColumnsForm", function () {
         });
       }
 
+      function findIndex(array, callback) {
+        for (var index = 0; index < (array || []).length; ++index) {
+          var element = array[index];
+          if (callback(element, index, array)) {
+            return index;
+          }
+        }
+        return -1;
+      }
+
+      function findLastIndex(array, callback) {
+        for (var index = (array || []).length - 1; index >= 0; --index) {
+          var element = array[index];
+          if (callback(element, index, array)) {
+            return index;
+          }
+        }
+        return -1;
+      }
+
       $scope._viewParams = {
         model: "com.axelor.meta.db.MetaField",
         viewType: "form",
@@ -2850,14 +2870,37 @@ ui.directive("uiSlickColumnsForm", function () {
           fields: ['name', 'label', 'typeName'],
           domain: _.sprintf("self.metaModel.fullName = '%s'", $scope.target)
         }).success(function (records) {
-          var items = $scope.view.items.filter(function (x) {
-            return x.type === 'field' || x.type === 'button';
-          });
-
           var recordsMap = records.reduce(function (a, x) {
             a[x.name] = x;
             return a;
           }, {});
+
+          var items = [];
+          var jsonFields = [];
+          _.each($scope.view.items, function (x) {
+            if (x.type === 'field' || x.type === 'button') {
+              items.push(x);
+            } else if (x.jsonField && jsonFields.indexOf(x.jsonField) < 0) {
+              jsonFields.push(x.jsonField);
+              var jsonField = recordsMap[x.jsonField];
+              if (jsonField) {
+                items.push(jsonField);
+              }
+            }
+          });
+
+          // Remove attrs at default index
+          var buttonIndex = findIndex(items, function (item) { return item && item.type === "button" });
+          var lastIndex = findLastIndex(items, function (item) { return item && !item.hidden; });
+          var defaultJsonIndex;
+          if (buttonIndex < 0 || (items[lastIndex] || {}).type !== "button") {
+            defaultJsonIndex = items.length - 1;
+          } else {
+            defaultJsonIndex = buttonIndex - 1;
+          }
+          if ((items[defaultJsonIndex] || {}).name === "attrs") {
+            items.splice(defaultJsonIndex, 1);
+          }
 
           var fakeId = 0;
           var values = items.map(function (x) {
