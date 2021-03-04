@@ -836,6 +836,8 @@ Grid.prototype.parse = function(view) {
   this.doInit = _.once(function doInit() {
     this._doInit(view);
     element.removeClass('slickgrid-empty');
+    var fieldName = (handler.field || {}).name;
+    scope.$emit('slickgrid-initialized:' + fieldName, grid);
   }.bind(this));
 
   handler._dataSource.on('change', function (e, records, page) {
@@ -2823,6 +2825,26 @@ ui.directive("uiSlickColumnsForm", function () {
           .hidden = true;
       });
 
+      function toggleHidden(e, args) {
+        if (args.grid.getColumns()[args.cell].field !== "$hidden"
+            || !$(e.toElement).hasClass("fa") && [" ", "Enter"].indexOf(e.key) < 0) {
+          return;
+        }
+
+        var data = args.grid.getData();
+        var dataItem = data.getItem(args.row);
+        dataItem.$hidden = !dataItem.$hidden;
+        data.updateItem(dataItem.id, dataItem);
+
+        var item = $scope.record.items[args.row];
+        item.$hidden = dataItem.$hidden;
+      }
+
+      $scope.$on('slickgrid-initialized:items', function (e, grid) {
+        grid.onClick.subscribe(toggleHidden);
+        grid.onKeyDown.subscribe(toggleHidden);
+      });
+
       $scope.onShow = function(viewPromise) {
         ds.search({
           fields: ['name', 'label', 'typeName'],
@@ -2891,7 +2913,16 @@ ui.directive("uiSlickColumnsForm", function () {
         // add items
         record.items
           .forEach(function (x) {
-            items.push(existing[x.name] || { name: x.name, type: "field" });
+            var item = existing[x.name] || { name: x.name, type: "field" };
+            var hidden = _.toBoolean(x.$hidden);
+            if (hidden !== _.toBoolean(item.hidden)) {
+              if (hidden) {
+                item.hidden = true;
+              } else {
+                delete item.hidden;
+              }
+            }
+            items.push(item);
           });
 
         // apply changed widths
