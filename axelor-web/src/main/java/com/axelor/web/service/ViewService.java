@@ -381,10 +381,24 @@ public class ViewService extends AbstractService {
     }
 
     for (Object item : (List<?>) json.get("items")) {
-      final Map<?, ?> map = (Map<?, ?>) item;
+      @SuppressWarnings("unchecked")
+      final Map<Object, Object> map = (Map<Object, Object>) item;
       final String type = (String) map.get("type");
       if ("field".equals(type) || "button".equals(type)) {
         final Class<?> itemType = "field".equals(type) ? Field.class : Button.class;
+
+        // Retrieve original title
+        if (map.containsKey("title")) {
+          final String name = (String) map.get("name");
+          view.getItems().stream()
+              .filter(widget -> widget instanceof SimpleWidget)
+              .map(SimpleWidget.class::cast)
+              .filter(widget -> Objects.equals(widget.getName(), name))
+              .filter(widget -> StringUtils.notBlank(widget.getTitle()))
+              .findFirst()
+              .ifPresent(widget -> map.put("title", widget.getTitle()));
+        }
+
         try {
           items.add((AbstractWidget) om.readValue(om.writeValueAsString(map), itemType));
         } catch (IOException e) {

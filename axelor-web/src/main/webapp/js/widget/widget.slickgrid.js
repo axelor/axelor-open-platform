@@ -2895,9 +2895,6 @@ ui.directive("uiSlickColumnsForm", function () {
         var existing = schema.items
           .filter(function (x) { return x.type === 'field' || x.type === 'button'; })
           .reduce(function (m, x) {
-            if (x.autoTitle) {
-              x = _.extend({}, x, { title: x.autoTitle });
-            }
             m[x.name] = x;
             return m;
           }, {});
