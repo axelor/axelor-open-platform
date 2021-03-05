@@ -2822,10 +2822,13 @@ ui.directive("uiSlickColumnsForm", function () {
       };
 
       var ds = $scope._dataSource;
+      var recordsMap = {};
 
       $scope.$on('grid-change:items', function(e, records) {
         _.each(records, function (record) {
-          record.$title = _t(record.label || _.humanize(record.name));
+          var existing = recordsMap[record.name] || {};
+          var title = existing.$title || _t(record.label || _.humanize(record.name));
+          record.$title = title;
         })
       });
 
@@ -2834,7 +2837,7 @@ ui.directive("uiSlickColumnsForm", function () {
           fields: ['name', 'label'],
           domain: _.sprintf("self.metaModel.fullName = '%s'", $scope.target)
         }).success(function (records) {
-          var recordsMap = records.reduce(function (a, x) {
+          recordsMap = records.reduce(function (a, x) {
             a[x.name] = x;
             return a;
           }, {});
@@ -2842,9 +2845,7 @@ ui.directive("uiSlickColumnsForm", function () {
           var items = [];
           var jsonFields = [];
           _.each($scope.view.items, function (x) {
-            if (x.hidden) {
-              return;
-            } else if (x.type === 'field' || x.type === 'button') {
+            if (x.type === 'field' || x.type === 'button') {
               items.push(x);
             } else if (x.jsonField && jsonFields.indexOf(x.jsonField) < 0) {
               jsonFields.push(x.jsonField);
@@ -2872,14 +2873,16 @@ ui.directive("uiSlickColumnsForm", function () {
           var values = items.map(function (x) {
             var rec = x.type === 'field' && recordsMap[x.name] ? recordsMap[x.name] : x;
             if (x.autoTitle) {
-              rec = _.extend({}, rec, { $title: x.autoTitle });
-              delete rec.title;
+              rec.$title = x.autoTitle;
             } else if (x.title) {
-              rec = _.extend({}, rec, { $title: x.title });
+              rec.$title = x.title;
             } else {
-              rec = _.extend({}, rec, { $title: _t(rec.label || _.humanize(rec.name)) });
+              rec.$title = _t(rec.label || _.humanize(rec.name));
             }
+            rec = _.extend({}, rec, { hidden: x.hidden });
             return rec.id === undefined ? _.extend({}, rec, { id: --fakeId }) : rec;
+          }).filter(function (x) {
+            return !x.hidden;
           });
 
           var record = {
