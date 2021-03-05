@@ -40,7 +40,9 @@ function GridViewCtrl($scope, $element) {
 
   ds.on('change', function(e, records, page){
     var fieldName = ($scope.field || $scope.$parent.field || {}).name;
-    $scope.$emit('grid-change:' + fieldName, records, page);
+    if (fieldName) {
+      $scope.$emit('grid-change:' + fieldName, records, page);
+    }
     $scope.setItems(records, page);
   });
 

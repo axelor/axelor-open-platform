@@ -2728,6 +2728,11 @@ ui.directive("uiSlickColumnsForm", function () {
       view: "="
     },
     controller: ["$scope", "$element", 'DataSource', 'ViewService', function($scope, $element, DataSource, ViewService) {
+      var searchLimit = 200;
+      var excludedFieldNames = ["id", "version"];
+      var columnDomain = "self.metaModel.fullName = :_modelName AND self.name NOT IN :_excludedFieldNames";
+      var columnContext = {"_modelName": $scope.target, "_excludedFieldNames": excludedFieldNames};
+
       function isAdmin() {
         return axelor.config["user.login"] === "admin" || axelor.config["user.group"] === "admins";
       }
@@ -2773,7 +2778,9 @@ ui.directive("uiSlickColumnsForm", function () {
             title: _t("Columns"),
             name: "items",
             target: "com.axelor.meta.db.MetaField",
-            domain: _.sprintf("self.metaModel.fullName = '%s' AND self.name NOT IN ('id', 'version')", $scope.target),
+            domain: columnDomain,
+            context: columnContext,
+            searchLimit: searchLimit,
             serverType: "MANY_TO_MANY",
             canNew: false,
             canEdit: false,
@@ -2823,19 +2830,32 @@ ui.directive("uiSlickColumnsForm", function () {
 
       var ds = $scope._dataSource;
       var recordsMap = {};
+      var extraFields = [];
 
-      $scope.$on('grid-change:items', function(e, records) {
+      $scope.$on('grid-change:items', function(e, records, page) {
         _.each(records, function (record) {
           var existing = recordsMap[record.name] || {};
           var title = existing.$title || _t(record.label || _.humanize(record.name));
           record.$title = title;
-        })
+        });
+        if (page.from === 0) {
+          _.each(extraFields, function (field) {
+            if (!_.findWhere(records, { name: field.name })) {
+              records.push(field);
+            }
+          });
+        }
+        records.sort(function (first, second) {
+          return (first.$title || "").localeCompare(second.$title || "");
+        });
       });
 
       $scope.onShow = function(viewPromise) {
         ds.search({
           fields: ['name', 'label'],
-          domain: _.sprintf("self.metaModel.fullName = '%s'", $scope.target)
+          domain: columnDomain,
+          context: columnContext,
+          limit: searchLimit
         }).success(function (records) {
           recordsMap = records.reduce(function (a, x) {
             a[x.name] = x;
@@ -2880,7 +2900,11 @@ ui.directive("uiSlickColumnsForm", function () {
               rec.$title = _t(rec.label || _.humanize(rec.name));
             }
             rec = _.extend({}, rec, { hidden: x.hidden });
-            return rec.id === undefined ? _.extend({}, rec, { id: --fakeId }) : rec;
+            rec = rec.id === undefined ? _.extend({}, rec, { id: --fakeId }) : rec;
+            if (rec.hidden || rec.name.indexOf(".") >= 0) {
+              extraFields.push(rec);
+            }
+            return rec;
           }).filter(function (x) {
             return !x.hidden;
           });
