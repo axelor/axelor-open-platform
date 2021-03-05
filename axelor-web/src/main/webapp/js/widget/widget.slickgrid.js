@@ -2831,6 +2831,8 @@ ui.directive("uiSlickColumnsForm", function () {
       var ds = $scope._dataSource;
       var recordsMap = {};
       var extraFields = [];
+      var filterViewName = (($scope.$parent.$parent.$parent._viewParams || {})
+        .params || {})["search-filters"];
 
       $scope.$on('grid-change:items', function(e, records, page) {
         _.each(records, function (record) {
@@ -2851,6 +2853,24 @@ ui.directive("uiSlickColumnsForm", function () {
       });
 
       $scope.onShow = function(viewPromise) {
+        var fakeId = 0;
+
+        if (filterViewName) {
+          ViewService.getMetaDef($scope.target, {name: filterViewName, type: 'search-filters'})
+            .success(function(fields, view) {
+              _.each(view.items, function (item) {
+                if (item.hidden && item.name) {
+                  excludedFieldNames.push(item.name);
+                  return;
+                }
+                item.$title = item.title || item.autoTitle
+                  || _t(_.humanize(item.name.substring(item.name.lastIndexOf(".") + 1)));
+                item.id = --fakeId;
+                extraFields.push(item);
+              });
+            })
+        }
+
         ds.search({
           fields: ['name', 'label'],
           domain: columnDomain,
@@ -2889,7 +2909,6 @@ ui.directive("uiSlickColumnsForm", function () {
             items.splice(defaultJsonIndex, 1);
           }
 
-          var fakeId = 0;
           var values = items.map(function (x) {
             var rec = x.type === 'field' && recordsMap[x.name] ? recordsMap[x.name] : x;
             if (x.autoTitle) {
@@ -2944,6 +2963,9 @@ ui.directive("uiSlickColumnsForm", function () {
         record.items
           .forEach(function (x) {
             var item = existing[x.name] || { name: x.name, type: "field" };
+            if (x.title) {
+              item.title = x.title;
+            }
             delete item.hidden;
             items.push(item);
           });
@@ -2960,7 +2982,7 @@ ui.directive("uiSlickColumnsForm", function () {
             });
         }
 
-        schema = _.extend({}, schema, { items: items });
+        schema = _.extend({}, schema, { items: items, filterViewName: filterViewName });
 
         ViewService.save(schema).then(closeAndReload);
       };

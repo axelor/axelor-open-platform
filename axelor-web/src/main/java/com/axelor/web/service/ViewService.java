@@ -70,6 +70,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -362,6 +363,7 @@ public class ViewService extends AbstractService {
   private AbstractView saveGridView(Map<String, Object> json) {
     final Object viewId = json.get("viewId");
     final Object customViewId = json.get("customViewId");
+    final String filterViewName = (String) json.get("filterViewName");
 
     if (viewId == null && customViewId == null) {
       return null;
@@ -374,6 +376,10 @@ public class ViewService extends AbstractService {
         customViewId == null
             ? originalView
             : (GridView) XMLViews.findCustomView(Long.parseLong(customViewId.toString()));
+    final SearchFilters filterView =
+        filterViewName != null
+            ? (SearchFilters) XMLViews.findView(filterViewName, "search-filters")
+            : null;
 
     final List<AbstractWidget> items = new ArrayList<>();
     final Set<String> names = new HashSet<>();
@@ -393,7 +399,11 @@ public class ViewService extends AbstractService {
 
         // Retrieve original title
         if (map.containsKey("title")) {
-          view.getItems().stream()
+          Stream<AbstractWidget> stream = view.getItems().stream();
+          if (filterView != null) {
+            stream = Stream.concat(stream, filterView.getItems().stream());
+          }
+          stream
               .filter(widget -> widget instanceof SimpleWidget)
               .map(SimpleWidget.class::cast)
               .filter(widget -> Objects.equals(widget.getName(), name))

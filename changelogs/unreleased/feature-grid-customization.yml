@@ -7,6 +7,7 @@ description: |
     <li>Add removed fields as hidden as to preserve expressions</li>
     <li>Add reset customization button</li>
     <li>Don’t delete customized grids when clearing cache</li>
+    <li>List fields from search filters in selector</li>
     <li>Remove move icons in selector</li>
   </ul>
 type: feature
