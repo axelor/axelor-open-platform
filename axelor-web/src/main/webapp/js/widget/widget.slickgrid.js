@@ -654,7 +654,7 @@ Grid.prototype.parse = function(view) {
       column.groupTotalsFormatter = totalsFormatter;
     }
 
-    if (field.type === "button" || field.type === "boolean" || field.type === "icon") {
+    if (field.type === "button" || field.type === "icon") {
       return;
     }
 
@@ -2939,6 +2939,12 @@ ui.directive("uiSlickColumnsForm", function () {
 
       $scope.onSaveView = function () {
         var record = $scope.record;
+
+        if (!_.find(record.items, function (item) { return !item.type || item.type === "field"; })) {
+          axelor.dialogs.error(_t("Grid requires at least one field."));
+          return;
+        }
+
         var schema = $scope.view;
 
         schema.customViewShared = record.share;

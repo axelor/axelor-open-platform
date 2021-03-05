@@ -137,6 +137,7 @@
 "Gantt","Gantt",,
 "Go","Lancer",,
 "Grid","Liste",,
+"Grid requires at least one field.","La liste doit contenir au moins un champ.",,
 "Group by","Grouper par",,
 "Grouped","Groupé",,
 "Header 1","Titre niveau 1",,
