@@ -396,6 +396,26 @@ public class ViewService extends AbstractService {
       if ("field".equals(type) || "button".equals(type)) {
         final Class<?> itemType = "field".equals(type) ? Field.class : Button.class;
         final String name = (String) map.get("name");
+        if (StringUtils.notBlank(name)) {
+          names.add(name);
+        }
+
+        final Optional<SimpleWidget> existing =
+            view.getItems().stream()
+                .filter(widget -> widget instanceof SimpleWidget)
+                .map(SimpleWidget.class::cast)
+                .filter(widget -> Objects.equals(widget.getName(), name))
+                .findFirst();
+        if (existing.isPresent()) {
+          final SimpleWidget widget = existing.get();
+          widget.setHidden(null);
+          final Object width = map.get("width");
+          if (width != null) {
+            widget.setWidth(String.valueOf(width));
+          }
+          items.add(widget);
+          continue;
+        }
 
         // Retrieve original title
         if (map.containsKey("title")) {
@@ -414,9 +434,6 @@ public class ViewService extends AbstractService {
 
         try {
           items.add((AbstractWidget) om.readValue(om.writeValueAsString(map), itemType));
-          if (StringUtils.notBlank(name)) {
-            names.add(name);
-          }
         } catch (IOException e) {
           // this should not happen
           throw new IllegalArgumentException("Trying to save invalid view schema.");
