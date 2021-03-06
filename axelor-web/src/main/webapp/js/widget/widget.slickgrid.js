@@ -2865,7 +2865,7 @@ ui.directive("uiSlickColumnsForm", function () {
                 }
                 item.$title = item.title || item.autoTitle
                   || _t(_.humanize(item.name.substring(item.name.lastIndexOf(".") + 1)));
-                item.id = --fakeId;
+                item.id = item.$id = --fakeId;
                 extraFields.push(item);
               });
             })
@@ -2919,8 +2919,11 @@ ui.directive("uiSlickColumnsForm", function () {
               rec.$title = _t(rec.label || _.humanize(rec.name));
             }
             rec = _.extend({}, rec, { hidden: x.hidden });
-            rec = rec.id === undefined ? _.extend({}, rec, { id: --fakeId }) : rec;
-            if (rec.hidden || rec.name.indexOf(".") >= 0) {
+            if (rec.id === undefined) {
+              --fakeId;
+              rec = _.extend({}, rec, { id: fakeId, $id: fakeId });
+            }
+            if (rec.name.indexOf(".") >= 0 || rec.type && rec.type !== "field") {
               extraFields.push(rec);
             }
             return rec;
