@@ -159,16 +159,26 @@ ui.directive('uiMenuItem', ['$compile', 'ActionService', function($compile, Acti
         });
       }
 
-      scope.onClick = function(e) {
-        element.parents('.dropdown').dropdown('toggle');
-        if (scope.isSubMenu) return;
+      function getAction() {
         if (item.action) {
-          return handler.onClick();
+          return { thisArg: handler, fn: handler.onClick };
         }
         if (_.isFunction(item.click)) {
-          return item.click(e);
+          return { thisArg: item, fn: item.click };
+        }
+      }
+
+      scope.onClick = function(e) {
+        if (scope.isSubMenu) return;
+        var action = getAction();
+        if (action) {
+          return action.fn.apply(action.thisArg, e);
         }
       };
+
+      element.children("li > a").click(function (e) {
+        return _.toBoolean(getAction());
+      });
 
       scope.cssClass = function() {
         if (scope.isDivider) {
@@ -198,18 +208,20 @@ ui.directive('uiToolbarAdjust', function() {
 
   return function (scope, element, attrs) {
 
-    var elemMenubar = null;
     var elemToolbar = null;
+    var elemMenubar = null;
     var elemSiblings = null;
 
     var elemToolbarMobile = null;
+    var mergedBars = null;
 
     function setup() {
-      elemMenubar = element.children('.view-menubar');
       elemToolbar = element.children('.view-toolbar');
-      elemSiblings = element.children(':not(.view-menubar,.view-toolbar,.view-toolbar-mobile)');
+      elemMenubar = element.children('.view-menubar');
+      elemSiblings = element.children(':not(.view-toolbar,.view-menubar,.view-toolbar-mobile,.view-menubar-mobile)');
 
       elemToolbarMobile = element.children('.view-toolbar-mobile').hide();
+      mergedBars = element.children('.view-menubar-mobile').hide();
 
       var running = false;
       scope.$onAdjust(function () {
@@ -230,7 +242,7 @@ ui.directive('uiToolbarAdjust', function() {
     }
 
     function hideAndShow(first, second, visibility) {
-      [elemMenubar, elemToolbar, elemToolbarMobile].forEach(function (elem) {
+      [elemToolbar, elemMenubar, elemToolbarMobile, mergedBars].forEach(function (elem) {
         elem.hide().css('visibility', 'hidden');
       });
       [first, second].forEach(function (elem) {
@@ -254,10 +266,10 @@ ui.directive('uiToolbarAdjust', function() {
       if (axelor.device.small) {
         if (width > elemToolbarMobile.width() + elemMenubar.width()) {
           hideAndShow(elemToolbarMobile, elemMenubar);
-        } else if (width > elemToolbarMobile.width()) {
-          hideAndShow(elemToolbarMobile);
-        } else if (width > elemMenubar.width()) {
-          hideAndShow(elemMenubar);
+        } else if (width > mergedBars.width()) {
+          hideAndShow(mergedBars);
+        } else {
+          hideAndShow();
         }
         return;
       }
@@ -274,8 +286,7 @@ ui.directive('uiToolbarAdjust', function() {
 
       canShow(elemToolbar, elemMenubar) ||
       canShow(elemToolbarMobile, elemMenubar) ||
-      canShow(elemToolbar, $()) ||
-      canShow(elemToolbarMobile, $());
+      hideAndShow(mergedBars);
     }
 
     scope.waitForActions(setup, 100);

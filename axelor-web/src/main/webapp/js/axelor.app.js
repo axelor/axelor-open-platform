@@ -679,12 +679,17 @@
 
     //trigger adjustSize event on window resize -->
   $(function(){
+    function toggleDeviceClasses() {
+      $('body').toggleClass('device-small', axelor.device.small);
+      $('body').toggleClass('device-mobile', axelor.device.mobile);
+    }
+
+    toggleDeviceClasses();
     $(window).resize(function(event){
       if (!event.isTrigger) {
         $(document).trigger('adjust:size');
       }
-      $('body').toggleClass('device-small', axelor.device.small);
-      $('body').toggleClass('device-mobile', axelor.device.mobile);
+      toggleDeviceClasses();
     });
   });
 

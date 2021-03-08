@@ -1485,6 +1485,17 @@ label.has-help > span:after,
   }
 }
 
+@media (max-width: 355px) {
+  .filter-box {
+    width: 0px;
+    display: none;
+  }
+
+  .dropdown-menu {
+    min-width: 80px;
+  }
+}
+
 .update-menu,
 .filter-menu {
 
