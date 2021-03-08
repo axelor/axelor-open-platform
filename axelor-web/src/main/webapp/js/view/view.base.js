@@ -237,6 +237,14 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
           })
         }];
 
+        var mergedBarsItems = ((($scope.toolbarAsMenu || [])[0] || {}).items || [])
+          .concat($scope.menubar || []);
+        $scope.mergedBars = _.isEmpty(mergedBarsItems) ? null : [{
+          icon: 'fa-wrench',
+          isButton: true,
+          items: mergedBarsItems
+        }];
+
         // watch on view.loaded to improve performance
         schema.loaded = true;
       });

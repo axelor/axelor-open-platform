@@ -532,6 +532,7 @@ header .navbar .nav-link-user-sub {
 
 .record-toolbar {
   margin: 0;
+  white-space: nowrap;
 }
 
 .record-toolbar .navbar-inner {
