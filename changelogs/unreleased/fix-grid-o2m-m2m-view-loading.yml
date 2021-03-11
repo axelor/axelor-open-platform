@@ -1,0 +1,3 @@
+---
+title: Fix looped view loading when grid has o2m/m2m fields referencing themselves
+type: fix
