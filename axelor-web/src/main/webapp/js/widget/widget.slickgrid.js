@@ -2748,6 +2748,10 @@ ui.directive("uiSlickColumnsForm", function () {
         });
       }
 
+      function humanizeName(name) {
+        return _.humanize(name.substring(name.lastIndexOf(".") + 1));
+      }
+
       function findIndex(array, callback) {
         for (var index = 0; index < (array || []).length; ++index) {
           var element = array[index];
@@ -2786,6 +2790,7 @@ ui.directive("uiSlickColumnsForm", function () {
             canEdit: false,
             canView: false,
             canMove: true,
+            editIcon: false,
             items: [{
               type: "field",
               name: "$title",
@@ -2793,7 +2798,8 @@ ui.directive("uiSlickColumnsForm", function () {
               title: _t("Title")
             }, {
               type: "field",
-              name: "name"
+              name: "name",
+              sortable: false
             }, {
               type: "field",
               name: "label",
@@ -2837,7 +2843,7 @@ ui.directive("uiSlickColumnsForm", function () {
       $scope.$on('grid-change:items', function(e, records, page) {
         _.each(records, function (record) {
           var existing = recordsMap[record.name] || {};
-          var title = existing.$title || _t(record.label || _.humanize(record.name));
+          var title = existing.$title || _t(record.label || humanizeName(record.name));
           record.$title = title;
         });
         if (page.from === 0) {
@@ -2847,9 +2853,11 @@ ui.directive("uiSlickColumnsForm", function () {
             }
           });
         }
-        records.sort(function (first, second) {
-          return (first.$title || "").localeCompare(second.$title || "");
-        });
+        if (!(e.targetScope._dataSource || {})._sortBy) {
+          records.sort(function (first, second) {
+            return (first.$title || "").localeCompare(second.$title || "");
+          });
+        }
       });
 
       $scope.onShow = function(viewPromise) {
@@ -2858,13 +2866,15 @@ ui.directive("uiSlickColumnsForm", function () {
         if (filterViewName) {
           ViewService.getMetaDef($scope.target, {name: filterViewName, type: 'search-filters'})
             .success(function(fields, view) {
+              var existingNames = _.pluck($scope.view.items, 'name');
               _.each(view.items, function (item) {
                 if (item.hidden && item.name) {
-                  excludedFieldNames.push(item.name);
+                  if (existingNames.indexOf(item.name) < 0) {
+                    excludedFieldNames.push(item.name);
+                  }
                   return;
                 }
-                item.$title = item.title || item.autoTitle
-                  || _t(_.humanize(item.name.substring(item.name.lastIndexOf(".") + 1)));
+                item.$title = item.title || item.autoTitle || _t(humanizeName(item.name));
                 item.id = item.$id = --fakeId;
                 extraFields.push(item);
               });
@@ -2910,13 +2920,12 @@ ui.directive("uiSlickColumnsForm", function () {
           }
 
           var values = items.map(function (x) {
-            var rec = x.type === 'field' && recordsMap[x.name] ? recordsMap[x.name] : x;
-            if (x.autoTitle) {
-              rec.$title = x.autoTitle;
-            } else if (x.title) {
-              rec.$title = x.title;
+            var rec = recordsMap[x.name];
+            if (!rec || x.type !== 'field') {
+              rec = x;
+              rec.$title = x.autoTitle || x.title || _t(humanizeName(x.name));
             } else {
-              rec.$title = _t(rec.label || _.humanize(rec.name));
+              rec.$title = x.title || _t(rec.label) || x.autoTitle || _t(humanizeName(x.name));
             }
             rec = _.extend({}, rec, { hidden: x.hidden });
             if (rec.id === undefined) {
