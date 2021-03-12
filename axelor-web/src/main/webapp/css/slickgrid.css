@@ -657,6 +657,16 @@
   display: none;
 }
 
+.slick-editor .form-item-container.image-item img {
+  height: 26px !important;
+  width: auto !important;
+  padding: 0px;
+}
+
+.slick-editor .form-item-container.image-item div.btn-group {
+  bottom: 0px;
+}
+
 .slick-editor input,
 .slick-editor textarea {
   border-color: #ddd;
