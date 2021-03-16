@@ -55,17 +55,21 @@ public class SearchFilters extends AbstractView {
 
   @XmlType
   @JsonInclude(Include.NON_NULL)
-  public static class SearchFilter {
+  public static class SearchFilter extends AbstractWidget {
+
+    @XmlAttribute private String name;
 
     @XmlAttribute private String title;
 
     @XmlElement private String domain;
 
-    @JsonIgnore private String model;
-
     @JsonIgnore
     @XmlElement(name = "context")
     private List<SearchContext> contexts;
+
+    public String getName() {
+      return name;
+    }
 
     @JsonGetter("title")
     public String getLocalizedTitle() {
@@ -79,10 +83,6 @@ public class SearchFilters extends AbstractView {
 
     public String getDomain() {
       return domain;
-    }
-
-    public void setModel(String model) {
-      this.model = model;
     }
 
     public Map<String, Object> getContext() {

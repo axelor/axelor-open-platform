@@ -2216,6 +2216,13 @@
             </xsd:complexType>
           </xsd:element>
         </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>
+              The name of the filter.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="title" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>

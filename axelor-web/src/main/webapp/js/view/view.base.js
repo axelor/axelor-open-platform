@@ -262,7 +262,15 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
       });
     }
 
-    $scope.onShow(viewPromise);
+    if ($scope.beforeOnShowEventName) {
+      var unwatchBeforeOnShowEventName = $scope.$on($scope.beforeOnShowEventName, function () {
+        delete $scope.beforeOnShowEventName;
+        unwatchBeforeOnShowEventName();
+        $scope.onShow(viewPromise);
+      });
+    } else {
+      $scope.onShow(viewPromise);
+    }
   };
 
   $scope.onShow = function(promise) {

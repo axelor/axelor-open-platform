@@ -764,8 +764,8 @@ function FilterFormCtrl($scope, $element, ViewService) {
     }
   });
 
-  $scope.$on('on:apply-filter', function (e, hide) {
-    $scope.applyFilter(hide);
+  $scope.$on('on:apply-filter', function (e, hide, applyingDefaults) {
+    $scope.applyFilter(hide, applyingDefaults);
   });
 
   $scope.$on('on:clear-filter', function (e, options) {
@@ -1013,11 +1013,11 @@ function FilterFormCtrl($scope, $element, ViewService) {
     appliedContext = data === old;
   }, true);
 
-  $scope.applyFilter = function(hide) {
+  $scope.applyFilter = function(hide, applyingDefaults) {
     var criteria = $scope.prepareFilter();
     var promise;
     if ($scope.$parent.onFilter) {
-      promise = $scope.$parent.onFilter(criteria);
+      promise = $scope.$parent.onFilter(criteria, applyingDefaults);
     }
     if ($scope.$parent && hide) {
       $scope.$parent.$broadcast('on:hide-menu');
@@ -1128,6 +1128,11 @@ ui.directive('uiFilterBox', function() {
       $scope.canShare = axelor.config["view.adv-search.share"] !== false;
 
       if (filterView) {
+        var defaultFilters = params && params['default-search-filters'];
+        if (defaultFilters) {
+          $scope.handler.beforeOnShowEventName = 'on:default-search-filters-applied';
+        }
+
         ViewService.getMetaDef($scope.model, {name: filterView, type: 'search-filters'})
         .success(function(fields, view) {
           var viewItems = _.map(view.items, function (item) {
@@ -1137,6 +1142,17 @@ ui.directive('uiFilterBox', function() {
           $scope.view = view;
           $scope.viewItems = viewItems;
           $scope.viewFilters = angular.copy(view.filters);
+
+          if (defaultFilters) {
+            defaultFilters = defaultFilters.split(/\s*,\s*/);
+            _.each($scope.viewFilters, function (filter) {
+              if (_.contains(defaultFilters, filter.name)) {
+                filter.$selected = true;
+                $scope.selectFilter(filter, false, false);
+              }
+            });
+            $scope.$broadcast('on:apply-filter', false, true);
+          }
         });
       } else {
         $scope.viewItems = [];
@@ -1351,7 +1367,7 @@ ui.directive('uiFilterBox', function() {
         }
       };
 
-      $scope.onFilter = function(criteria) {
+      $scope.onFilter = function(criteria, applyingDefaults) {
 
         if (criteria) {
           current.criteria = criteria;
@@ -1504,6 +1520,12 @@ ui.directive('uiFilterBox', function() {
           $scope.tagItems = [];
         } else {
           $scope.tagItems = [tag];
+        }
+
+        if (applyingDefaults) {
+          $scope.$parent._dataSource._filter = search;
+          $scope.$emit('on:default-search-filters-applied');
+          return Promise.resolve(search);
         }
 
         return handler._simpleFilters
