@@ -1,0 +1,3 @@
+---
+title: Fix wrong query string append with dynamic URL in HTML view
+type: fix

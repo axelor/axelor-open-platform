@@ -41,6 +41,9 @@ function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
     var view = $scope.view;
     if (view) {
       var url = view.name || view.resource;
+      if (url && url.indexOf('{{') > -1) {
+        url = $interpolate(url)($scope.getContext());
+      }
       if (stamp > 0) {
         var q = url.lastIndexOf('?');
         if (q > -1) {
@@ -48,9 +51,6 @@ function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
         } else {
           url += "?t" + stamp;
         }
-      }
-      if (url && url.indexOf('{{') > -1) {
-        url = $interpolate(url)($scope.getContext());
       }
       return $sce.trustAsResourceUrl(url);
     }
