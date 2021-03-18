@@ -148,11 +148,13 @@ public class ViewLoader extends AbstractParallelLoader {
       viewsToMigrate.forEach(
           (name, xmlIds) -> {
             final MetaView baseView = views.findByNameAndComputed(name, false);
-            views
-                .all()
-                .filter("self.xmlId IN :xmlIds")
-                .bind("xmlIds", xmlIds)
-                .update("priority", baseView.getPriority());
+            if (baseView != null) {
+              views
+                  .all()
+                  .filter("self.xmlId IN :xmlIds")
+                  .bind("xmlIds", xmlIds)
+                  .update("priority", baseView.getPriority());
+            }
           });
     } finally {
       viewsToMigrate.clear();
