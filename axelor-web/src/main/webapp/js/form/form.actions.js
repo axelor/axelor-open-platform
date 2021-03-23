@@ -1037,6 +1037,20 @@ ActionHandler.prototype = {
             itemScope.removeItems(value);
           }
           break;
+        case 'active':
+          if (itemScope.selectTab) {
+            var tabName = (itemScope.field || {}).name;
+            var selectedTab = _.find(itemScope.tabs, _.toBoolean(value)
+              ? function (tab) {
+              return tabName === (tab.field || {}).name;
+            } : function (tab) {
+              return tabName !== (tab.field || {}).name;
+            });
+            if (selectedTab) {
+              itemScope.selectTab(selectedTab);
+            }
+          }
+          break;
         }
       });
 
