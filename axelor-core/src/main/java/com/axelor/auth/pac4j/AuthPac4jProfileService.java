@@ -144,7 +144,7 @@ public class AuthPac4jProfileService {
   public Group getGroup(CommonProfile profile) {
     return Optional.ofNullable(profile.getAttribute(GROUP_ATTRIBUTE))
         .map(String::valueOf)
-        .map(groupRepo::findByCode)
+        .map(this::getGroup)
         .orElse(null);
   }
 
@@ -154,6 +154,11 @@ public class AuthPac4jProfileService {
         Optional.ofNullable(profile.getAttribute(GROUP_ATTRIBUTE))
             .map(String::valueOf)
             .orElse(defaultGroupCode);
+    return getGroup(groupCode);
+  }
+
+  @Nullable
+  protected Group getGroup(String groupCode) {
     return groupRepo.findByCode(groupCode);
   }
 
