@@ -23,6 +23,7 @@ import com.axelor.auth.pac4j.AuthPac4jModuleLocal.AxelorAuthenticator;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
@@ -38,6 +39,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -94,17 +96,25 @@ public class AxelorLdapProfileService extends LdapProfileService implements Axel
     final String idAttribute =
         properties.getProperty(
             AvailableAppSettings.AUTH_LDAP_USER_ID_ATTRIBUTE, AxelorLdapProfileDefinition.USERNAME);
+    final String usernameAttribute =
+        properties.getProperty(
+            AvailableAppSettings.AUTH_LDAP_USER_USERNAME_ATTRIBUTE,
+            AxelorLdapProfileDefinition.USERNAME);
     final String userFilter =
         Optional.ofNullable(properties.getProperty(AvailableAppSettings.AUTH_LDAP_USER_FILTER))
             .map(property -> property.replace("{0}", "{user}"))
             .orElse(null);
+    final String userDnFormat =
+        properties.getProperty(AvailableAppSettings.AUTH_LDAP_USER_DN_FORMAT, null);
     final String systemDn = properties.getProperty(AvailableAppSettings.AUTH_LDAP_SYSTEM_USER);
     final String systemPassword =
         properties.getProperty(AvailableAppSettings.AUTH_LDAP_SYSTEM_PASSWORD);
     final String authenticationType =
         properties.getProperty(AvailableAppSettings.AUTH_LDAP_AUTH_TYPE);
     final boolean useSSL =
-        Boolean.parseBoolean(properties.getProperty(AvailableAppSettings.AUTH_LDAP_USE_SSL));
+        Optional.ofNullable(properties.getProperty(AvailableAppSettings.AUTH_LDAP_USE_SSL, null))
+            .map(Boolean::parseBoolean)
+            .orElseGet(() -> ldapUrl != null && ldapUrl.toLowerCase().startsWith("ldaps:"));
     final boolean useStartTLS =
         Boolean.parseBoolean(properties.getProperty(AvailableAppSettings.AUTH_LDAP_USE_STARTTLS));
     final String trustStore =
@@ -219,7 +229,11 @@ public class AxelorLdapProfileService extends LdapProfileService implements Axel
       searchDnResolver.setUserFilter(userFilter);
       dnResolver = searchDnResolver;
     } else {
-      dnResolver = new FormatDnResolver(String.format("%s=%%s,%s", idAttribute, usersDn));
+      final String format =
+          StringUtils.notBlank(userDnFormat)
+              ? userDnFormat
+              : String.format("%s=%%s,%s", idAttribute, usersDn);
+      dnResolver = new FormatDnResolver(format);
     }
 
     final Authenticator ldapAuthenticator = new Authenticator(dnResolver, handler);
@@ -232,7 +246,7 @@ public class AxelorLdapProfileService extends LdapProfileService implements Axel
     setUsersDn(usersDn);
 
     setIdAttribute(idAttribute);
-    setUsernameAttribute(AxelorLdapProfileDefinition.USERNAME);
+    setUsernameAttribute(usernameAttribute);
     setPasswordAttribute(AxelorLdapProfileDefinition.PASSWORD);
     setProfileDefinition(new AxelorLdapProfileDefinition());
   }
@@ -412,8 +426,19 @@ public class AxelorLdapProfileService extends LdapProfileService implements Axel
     }
 
     public static String getAttributes(String idAttribute) {
+      final Set<String> excludedAttributes = Sets.newHashSet(USERNAME);
+      switch (idAttribute) {
+        case USERNAME:
+          break;
+        case DISPLAY_NAME:
+          excludedAttributes.add(DISPLAY_NAME);
+          break;
+        default:
+          throw new IllegalArgumentException(
+              String.format("Illegal ID attribute: %s", idAttribute));
+      }
       return ATTRIBUTES.stream()
-          .filter(attribute -> !attribute.equals(idAttribute))
+          .filter(attribute -> !excludedAttributes.contains(attribute))
           .collect(Collectors.joining(","));
     }
   }
