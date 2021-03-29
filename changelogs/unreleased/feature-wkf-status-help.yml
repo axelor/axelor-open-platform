@@ -1,0 +1,20 @@
+---
+title: Add workflow status help
+description: |
+  Example:
+
+  ```java
+  public void onFetch(
+      @Observes @Named(RequestEvent.FETCH) @EntityType(Order.class) PostRequest event) {
+    @SuppressWarnings("unchecked")
+    final Map<String, Object> values = (Map<String, Object>) event.getResponse().getItem(0);
+    if (values != null) {
+      List<Map<String, Object>> status = new ArrayList<>();
+      status.add(
+          ImmutableMap.of(
+              "name", "s1", "title", I18n.get("Status 1"), "color", "red", "help", "Some help…"));
+      values.put("$wkfStatus", status);
+    }
+  }
+  ```
+type: feature

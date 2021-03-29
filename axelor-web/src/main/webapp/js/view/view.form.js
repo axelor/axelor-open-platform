@@ -1640,9 +1640,9 @@ ui.formWidget('uiWkfStatus', {
     "<div class='panel wkf-status-container' ng-show='record.$wkfStatus'>" +
       "<div class='panel-body'>" +
         "<ul class='wkf-status'>" +
-          "<li ng-repeat='item in record.$wkfStatus track by item.name'>" +
-            "<span class='badge' style='background-color: {{item.color}}' ng-if='hasColorCode(item)'>{{item.title}}</span>" +
-            "<span class='badge' ng-class='getColorClass(item)' ng-if='!hasColorCode(item)'>{{item.title}}</span>" +
+          "<li ng-repeat='field in record.$wkfStatus track by field.name' ui-help-popover>" +
+            "<span class='badge' style='background-color: {{field.color}}' ng-if='hasColorCode(field)'>{{field.title}}</span>" +
+            "<span class='badge' ng-class='getColorClass(field)' ng-if='!hasColorCode(field)'>{{field.title}}</span>" +
           "</li>" +
         "</ul>" +
       "</div>" +
