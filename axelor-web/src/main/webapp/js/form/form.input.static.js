@@ -27,7 +27,7 @@ function canDisplayPopover(scope, details) {
   if (axelor.device.mobile) {
     return false;
   }
-  if(!axelor.config['user.technical']) {
+  if(!axelor.config['user.technical'] || scope._noHelpDetails) {
     return details ? false : scope.field && scope.field.help;
   }
   return true;

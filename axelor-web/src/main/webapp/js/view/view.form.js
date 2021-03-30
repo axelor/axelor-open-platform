@@ -1627,6 +1627,7 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
 
 ui.formWidget('uiWkfStatus', {
   link: function (scope, element, attrs) {
+    scope._noHelpDetails = true;
 
     scope.hasColorCode = function (item) {
       return item.color && item.color.startsWith('#');
