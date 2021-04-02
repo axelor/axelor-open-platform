@@ -1,0 +1,3 @@
+---
+title: Fix "Cannot change session ID" exception when using basic auth on non-secure requests
+type: fix
