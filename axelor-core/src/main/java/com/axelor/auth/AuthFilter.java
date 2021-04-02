@@ -168,12 +168,12 @@ public class AuthFilter extends FormAuthenticationFilter {
   }
 
   public static void setSameSiteNone(HttpServletRequest request, HttpServletResponse response) {
+    final Subject subject = SecurityUtils.getSubject();
+    subject.getSession();
+
     if (!request.isSecure() && !"https".equalsIgnoreCase(getProto(request))) {
       return;
     }
-
-    final Subject subject = SecurityUtils.getSubject();
-    subject.getSession();
 
     final Collection<String> headers = response.getHeaders(HttpHeaders.SET_COOKIE);
     final Iterator<String> it = headers.iterator();
