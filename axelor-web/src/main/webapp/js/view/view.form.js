@@ -173,6 +173,9 @@ function FormViewCtrl($scope, $element) {
       if (dummy) {
         record = _.extend(dummy, record);
       }
+      if ($scope.record && $scope.record.$processInstanceId) {
+        $scope.$broadcast("on:attrs-reset");
+      }
       $scope.edit(record, fireOnLoad);
     });
   }
