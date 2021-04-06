@@ -272,7 +272,9 @@ ActionHandler.prototype = {
     var withMoreAttrs = function (promise) {
       var actions = self.action.trim().split(/\s*,\s*/);
       if (actions.indexOf('save') > -1) {
-        return self._handleAction('com.axelor.meta.web.MetaController:moreAttrs');
+        return promise.then(function() {
+          return self._handleAction('com.axelor.meta.web.MetaController:moreAttrs');
+        });
       }
       return promise;
     };

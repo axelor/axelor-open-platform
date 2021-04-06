@@ -160,6 +160,10 @@ function FormViewCtrl($scope, $element) {
     var promise = ds.read(id, params);
     promise.success(function (record) {
       record.$fetched = true;
+      //XXX: special case for BPMN (see #36477)
+      if (record.$processInstanceId) {
+        $scope.$broadcast("on:attrs-reset");
+      }
     });
     return promise;
   };
@@ -172,9 +176,6 @@ function FormViewCtrl($scope, $element) {
       }
       if (dummy) {
         record = _.extend(dummy, record);
-      }
-      if ($scope.record && $scope.record.$processInstanceId) {
-        $scope.$broadcast("on:attrs-reset");
       }
       $scope.edit(record, fireOnLoad);
     });
