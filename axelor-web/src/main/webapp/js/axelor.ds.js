@@ -412,9 +412,9 @@
 
       if (view.type === 'form') {
         // more attrs action
-        var onLoad = 'com.axelor.meta.web.MetaController:moreAttrs';
-        if (view.onLoad) onLoad = view.onLoad + ',' + onLoad;
-        view.onLoad = onLoad;
+        var moreAttrs = 'com.axelor.meta.web.MetaController:moreAttrs';
+        view.onNew = view.onNew ? view.onNew + ',' + moreAttrs : moreAttrs;
+        view.onLoad = view.onLoad ? view.onLoad + ',' + moreAttrs : moreAttrs;
         // wkf status
         view.items.unshift({
           colSpan: 12,
