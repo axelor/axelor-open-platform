@@ -1008,6 +1008,18 @@ ui.InlineOneToManyCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewServi
 function InlineOneToManyCtrl($scope, $element, DataSource, ViewService) {
 
   var field = $scope.field || $scope.getViewDef($element);
+
+  $scope.$on("ds:saved", function (e, scope) {
+    var updatedItems = ((scope._data || [])[(scope._page || {}).index] || {})[field.name] || [];
+    for (var i = 0; i < updatedItems.length; ++i) {
+      var updatedItem = updatedItems[i] || {};
+      var item = $scope.items[i] || {};
+      if (!item.id || item.id < 0 && updatedItem.id > 0) {
+        item.id = updatedItem.id;
+      }
+    }
+  });
+
   var params = {
     model: field.target
   };
