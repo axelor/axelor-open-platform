@@ -1,3 +1,14 @@
+## 5.2.12 (2021-04-15)
+
+#### Changes
+
+* Remove jcenter
+
+#### Fixed
+
+* Fix "Cannot change session ID" exception when using basic auth on non-secure requests
+* Fix search query causing dirty form
+
 ## 5.2.11 (2021-02-15)
 
 #### Fixed
