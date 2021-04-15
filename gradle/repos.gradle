@@ -5,6 +5,13 @@ def repos = {
     }
   }
   maven {
+    url 'https://plugins.gradle.org/m2/'
+    content {
+      excludeGroup 'com.axelor'
+    }
+  }
+
+  maven {
     url 'https://repository.axelor.com/nexus/repository/maven-public/'
   }
 }
