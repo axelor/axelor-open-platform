@@ -1,3 +1,127 @@
+## 5.4.2 (2021-04-15)
+
+#### Changes
+
+* Default setting `data.export.encoding` to UTF-8
+
+  <details>
+  When UTF-8 is used, BOM is added so that Excel recognizes the encoding.
+  </details>
+
+* Remove jcenter and prevent dependency confusion risk
+* Migrate from opencsv to commons-csv
+* Format exported dates and times with client locale
+
+  <details>
+  Setting `data.export.locale` to set a fixed locale for all exports.
+  Setting `data.export.separator` defaults to ';'.
+  Only numbers (integer, long, decimal) were formatted using client locale.
+  Dates, times, and datetimes now also use client locale.
+  Setting `date.format` is removed.
+  </details>
+
+
+#### Features
+
+* Improve grid customization
+
+  <details>
+  <ul>
+    <li>Show translated field titles besides field names</li>
+    <li>Allow to save column widths</li>
+    <li>Add removed fields as hidden as to preserve expressions</li>
+    <li>Add reset customization button</li>
+    <li>Don’t delete customized grids when clearing cache</li>
+    <li>List fields from search filters in selector</li>
+    <li>Remove move icons in selector</li>
+  </ul>
+  </details>
+
+* Add action to select a `panel` in `panel-tabs`
+
+  <details>
+  Example:
+
+  ```xml
+    <form ...>
+     ...
+     <panel-tabs>
+      <panel title="One" name="t1"></panel>
+      <panel title="Two" name="t2"></panel>
+     </panel-tabs>
+    </form>
+
+    <action-attrs ...>
+      <attribute name="active" for="t1" expr="true" />
+    </action-attrs>
+  ```
+  </details>
+
+* Apply translations on translatable fields and enums for data exports
+
+  <details>
+  Only headers and selections were translated.
+  Translatable fields and enums are now also translated.
+  </details>
+
+* Add "auth.ldap.user.dn.format" and "auth.ldap.user.username.attribute" configurations
+* Add `view-param` named `default-search-filters` to apply filters by default
+
+  <details>
+  Example:
+
+  ```xml
+    <view-param name="search-filters" value="filter-sales"/>
+    <view-param name="default-search-filters" value="confirmed,highValue"/>
+  ```
+
+  Filters named `confirmed` and `highValue` will be applied by default.
+  For that usage, use new attribute `name` for each `filter` in `search-filters`.
+  </details>
+
+* Use thin scrollbars on grids inside form views
+* Add workflow status help
+
+  <details>
+  Example:
+
+  ```java
+  public void onFetch(
+      @Observes @Named(RequestEvent.FETCH) @EntityType(Order.class) PostRequest event) {
+    @SuppressWarnings("unchecked")
+    final Map<String, Object> values = (Map<String, Object>) event.getResponse().getItem(0);
+    if (values != null) {
+      List<Map<String, Object>> status = new ArrayList<>();
+      status.add(
+          ImmutableMap.of(
+              "name", "s1", "title", I18n.get("Status 1"), "color", "red", "help", "Some help…"));
+      values.put("$wkfStatus", status);
+    }
+  }
+  ```
+  </details>
+
+
+#### Fixed
+
+* Fix NPE when loading extension views without corresponding base views
+* Fix "cn" used as ID attribute with LDAP
+* Fix Unexpected character '`' when running npm-build
+* Fix evaluation of filter `if` and `if-module` attributes
+* Fix grid column widths when popup is opened as maximized
+* Fix attrs reset for bpmn use case
+* Fix looped view loading when grid has o2m/m2m fields referencing themselves
+* Fix duplicate onChange call with BooleanRadio widget
+* Merge menus into mobile toolbar
+* Fix fetching LDAP attributes with Active Directory
+* Fix row height when using Image widget in editable grid
+* Fix missing ID in context after 'save' action in multirelational editor
+* Apply view attributes to new records as well
+* Fix "Cannot change session ID" exception when using basic auth on non-secure requests
+* Fix search query causing dirty form
+* Fix Phone widget readonly width adjustment
+* Fix wrong query string append with dynamic URL in HTML view
+
 ## 5.4.1 (2021-02-10)
 
 #### Changes

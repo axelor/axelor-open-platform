@@ -1,3 +1,0 @@
----
-title: Fix evaluation of filter `if` and `if-module` attributes
-type: fix
