@@ -1,3 +1,19 @@
+## 5.3.9 (2021-04-15)
+
+#### Changes
+
+* Remove jcenter and prevent dependency confusion risk
+
+#### Fixed
+
+* Fix NPE when loading extension views without corresponding base views
+* Fix Unexpected character '`' when running npm-build
+* Fix needless recomputing of views
+* Merge menus into mobile toolbar
+* Apply view extensions by matching name and groups
+* Fix "Cannot change session ID" exception when using basic auth on non-secure requests
+* Fix search query causing dirty form
+
 ## 5.3.8 (2021-02-10)
 
 #### Features
