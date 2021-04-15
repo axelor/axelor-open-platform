@@ -24,7 +24,6 @@ import com.axelor.common.Inflector;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
-import com.axelor.db.Query;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
@@ -62,7 +61,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -74,7 +72,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -143,7 +140,7 @@ public class ViewLoader extends AbstractParallelLoader {
 
     migrateViews();
     linkMissingGroups();
-    generateFinalViews(module, update);
+    generateFinalViews(update);
   }
 
   private void migrateViews() {
@@ -151,11 +148,13 @@ public class ViewLoader extends AbstractParallelLoader {
       viewsToMigrate.forEach(
           (name, xmlIds) -> {
             final MetaView baseView = views.findByNameAndComputed(name, false);
-            views
-                .all()
-                .filter("self.xmlId IN :xmlIds")
-                .bind("xmlIds", xmlIds)
-                .update("priority", baseView.getPriority());
+            if (baseView != null) {
+              views
+                  .all()
+                  .filter("self.xmlId IN :xmlIds")
+                  .bind("xmlIds", xmlIds)
+                  .update("priority", baseView.getPriority());
+            }
           });
     } finally {
       viewsToMigrate.clear();
@@ -182,33 +181,12 @@ public class ViewLoader extends AbstractParallelLoader {
     }
   }
 
-  private void generateFinalViews(Module module, boolean update) {
+  private void generateFinalViews(boolean update) {
     try {
-      finalViewGenerator.generate(findForCompute(module.getName(), update, viewsToGenerate));
+      finalViewGenerator.generate(viewsToGenerate, update);
     } finally {
       viewsToGenerate.clear();
     }
-  }
-
-  private Query<MetaView> findForCompute(String module, boolean update, Collection<String> names) {
-    return Query.of(MetaView.class)
-        .filter(
-            "(self.name IN :names OR (:module IS NULL OR self.module = :module) "
-                + "AND (:update = TRUE OR NOT EXISTS ("
-                + "SELECT computedView FROM MetaView computedView "
-                + "WHERE computedView.name = self.name AND self.computed = TRUE))) "
-                + "AND COALESCE(self.extension, FALSE) = FALSE "
-                + "AND COALESCE(self.computed, FALSE) = FALSE "
-                + "AND (self.name, self.priority) "
-                + "IN (SELECT other.name, MAX(other.priority) FROM MetaView other "
-                + "WHERE COALESCE(other.extension, FALSE) = FALSE AND COALESCE(other.computed, FALSE) = FALSE "
-                + "GROUP BY name) "
-                + "AND EXISTS (SELECT extensionView FROM MetaView extensionView "
-                + "WHERE extensionView.name = self.name AND extensionView.extension = TRUE)")
-        .bind("module", module)
-        .bind("update", update)
-        .bind("names", names.isEmpty() ? ImmutableSet.of("") : names)
-        .order("id");
   }
 
   private static <T> List<T> getList(List<T> list) {
