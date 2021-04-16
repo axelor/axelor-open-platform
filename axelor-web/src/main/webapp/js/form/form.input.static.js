@@ -793,6 +793,20 @@ ui.formItem('Button', {
 });
 
 ui.formItem('GridButton', 'Button', {
+  link: function(scope, element, attrs, model) {
+    this._super.apply(this, arguments);
+
+    var hiddenSet = false;
+    scope.$watch("isHidden()", function buttonHiddenWatch(hidden, old) {
+      if (hidden === old && hiddenSet) return;
+      hiddenSet = true;
+      return setHidden(hidden);
+    });
+
+    function setHidden(hidden) {
+      return element[hidden ? "addClass" : "removeClass"].apply(element, ["hidden"]);
+    }
+  },
   template:
     "<a href='' class='form-item-container'>" +
       "<span class='btn-text' ng-transclude></span>" +
