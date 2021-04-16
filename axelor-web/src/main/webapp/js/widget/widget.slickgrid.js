@@ -206,7 +206,7 @@ var Formatters = {
     if (field.showIf && !axelor.$eval(grid.scope, field.showIf, _.extend({}, handler._context, rec))) {
       return "";
     }
-    if (field.readonlyIf && axelor.$eval(grid.scope, field.readonlyIf, _.extend({}, handler._context, rec))) {
+    if (field.readonly || field.readonlyIf && axelor.$eval(grid.scope, field.readonlyIf, _.extend({}, handler._context, rec))) {
       css += " readonly disabled";
     }
 
