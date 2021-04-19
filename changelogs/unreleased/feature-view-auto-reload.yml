@@ -1,0 +1,11 @@
+---
+title: Add support for view auto-reloading
+description: |
+  Use `view-param` named `auto-reload`, with value specified in seconds. Example:
+
+  ```xml
+    <view-param name="auto-reload" value="30" />
+  ```
+
+  Auto-reloading is paused when tab is not selected or when record is in edit mode.
+type: feature

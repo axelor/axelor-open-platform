@@ -113,6 +113,13 @@
         return $timeout.apply(null, arguments);
       };
 
+      __custom__.$timeout.cancel = function () {
+        if ($timeout === null) {
+          $timeout = $injector.get('$timeout');
+        }
+        return $timeout.cancel.apply(null, arguments);
+      };
+
       __custom__.$onAdjust = function (events, handler, wait) {
         var names = events;
         if (_.isFunction(names)) {

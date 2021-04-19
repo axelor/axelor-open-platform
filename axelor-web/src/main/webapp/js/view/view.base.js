@@ -125,15 +125,27 @@ function ViewCtrl($scope, DataSource, ViewService) {
   // hide toolbar button titles
   $scope.tbTitleHide = !axelor.config['view.toolbar.titles'];
 
-  function switchAndEdit(id, readonly) {
+  function switchAndEdit(id, readonly, callback) {
     $scope.switchTo('form', function(scope) {
       scope._viewPromise.then(function() {
         scope.doRead(id).success(function(record) {
           scope.edit(record);
           scope.setEditable(!readonly);
+          if (callback) {
+            callback(scope);
+          }
         });
       });
     });
+  }
+
+  // auto-reload
+  function setUpAutoReload(scope) {
+    var autoReloadValue = (params.params || {})["auto-reload"];
+    if (autoReloadValue) {
+      ui.setUpAutoReload($scope, autoReloadValue, function () { $scope.reloadTab($scope.tab); });
+    }
+    return scope;
   }
 
   // show single or default record if specified
@@ -144,7 +156,7 @@ function ViewCtrl($scope, DataSource, ViewService) {
 
     if (context._showRecord > 0) {
       params.viewType = "form";
-      return $scope.switchTo('form');
+      return $scope.switchTo('form', setUpAutoReload);
     }
 
     return ds.search({
@@ -153,14 +165,66 @@ function ViewCtrl($scope, DataSource, ViewService) {
       fields: ["id"]
     }).success(function(records, page){
       if (page.total === 1 && records.length === 1) {
-        return switchAndEdit(records[0].id, !forceEdit);
+        return switchAndEdit(records[0].id, !forceEdit, setUpAutoReload);
       }
-      return $scope.switchTo($scope._viewType || 'grid');
+      return $scope.switchTo($scope._viewType || 'grid', setUpAutoReload);
     });
   }
 
-  // switch to the the current viewType
-  $scope.switchTo($scope._viewType || 'grid');
+  // switch to the current viewType
+  $scope.switchTo($scope._viewType || 'grid', setUpAutoReload);
+}
+
+ui.setUpAutoReload = function ($scope, interval, reloadFunc) {
+  var intervalMillis = Number(interval) * 1000;
+
+  if (isNaN(intervalMillis) || intervalMillis <= 0) {
+    console.warn(_.sprintf("%s: auto-reload value must be a positive number in seconds: %s",
+      $scope._viewAction || ($scope.tab || {}).action, interval));
+    return;
+  }
+
+  function isEditActive() {
+    var isEditable = (($scope.tab || {}).$viewScope || {}).isEditable;
+    return isEditable ? isEditable() : $(".slick-editor").is(":visible");
+  }
+
+  $scope.canAutoReload = function () {
+    return !document.hidden && ($scope.tab || {}).selected && !isEditActive();
+  };
+
+  function autoReload() {
+    if ($scope.canAutoReload()) {
+      reloadAndReschedule();
+    } else {
+      timer = null;
+    }
+  }
+
+  function reloadAndReschedule() {
+    reloadFunc();
+    timer = $scope.$timeout(autoReload, intervalMillis);
+  }
+
+  var timer = $scope.$timeout(autoReload, intervalMillis);
+
+  $scope.$watch("canAutoReload()", function (canAutoReload) {
+    if (!timer && canAutoReload) {
+      reloadAndReschedule();
+    }
+  });
+
+  function onVisibilityChange() {
+    if (!timer && $scope.canAutoReload()) {
+      reloadAndReschedule();
+    }
+  }
+  document.addEventListener("visibilitychange", onVisibilityChange);
+
+  $scope.$on("$destroy", function () {
+    $scope.$timeout.cancel(timer);
+    document.removeEventListener("visibilitychange", onVisibilityChange);
+  });
 }
 
 /**

@@ -266,9 +266,17 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 
         scope.show();
 
-        // if lazy, load data
-        if (scope.onRefresh && lazy) {
-          scope.onRefresh();
+        if (scope.onRefresh) {
+          // if lazy, load data
+          if (lazy) {
+            scope.onRefresh();
+          }
+
+          // auto-reload
+          var autoReloadValue = (view.params || {})["auto-reload"];
+          if (autoReloadValue) {
+            ui.setUpAutoReload(scope, autoReloadValue, function () { scope.onRefresh(); });
+          }
         }
       });
 
