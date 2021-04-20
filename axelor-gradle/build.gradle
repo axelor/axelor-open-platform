@@ -27,13 +27,9 @@ dependencies {
 
 gradlePlugin {
   plugins {
-    appPlugin {
+    axelorPlugin {
       id = "com.axelor.app"
-      implementationClass = "com.axelor.gradle.AppPlugin"
-    }
-    appModulePlugin {
-      id = "com.axelor.app-module"
-      implementationClass = "com.axelor.gradle.ModulePlugin"
+      implementationClass = "com.axelor.gradle.AxelorPlugin"
     }
   }
 }

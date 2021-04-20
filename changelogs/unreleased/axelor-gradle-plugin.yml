@@ -1,0 +1,8 @@
+---
+title: Merge `com.axelor.app` and `com.axelor.app-module` gradle plugins
+type: change
+description: |
+  Now there is only a single `com.axelor.app` plugin. All modules
+  should use the app plugin only.
+  
+  Now all axelor modules are axelor apps.

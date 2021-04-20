@@ -17,7 +17,6 @@
  */
 package com.axelor.gradle.tasks;
 
-import com.axelor.gradle.AppPlugin;
 import com.axelor.gradle.AxelorExtension;
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.tools.x2j.Generator;
@@ -133,10 +132,6 @@ public class GenerateCode extends ModuleTask {
         .append("description = ")
         .append(Joiner.on("\\n").join(descriptionLines))
         .append("\n");
-
-    if (project.getPlugins().hasPlugin(AppPlugin.class)) {
-      text.append("\n").append("application = true").append("\n");
-    }
 
     if (!depends.isEmpty()) {
       text.append("\n").append("depends = ").append(Joiner.on(", ").join(depends)).append("\n");

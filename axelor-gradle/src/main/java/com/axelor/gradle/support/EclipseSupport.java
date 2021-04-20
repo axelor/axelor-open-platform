@@ -17,7 +17,6 @@
  */
 package com.axelor.gradle.support;
 
-import com.axelor.gradle.AppPlugin;
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.tasks.GenerateCode;
 import java.io.File;
@@ -49,7 +48,7 @@ public class EclipseSupport extends AbstractSupport {
           if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
             eclipse.synchronizationTasks(GenerateCode.TASK_NAME);
           }
-          if (project.getPlugins().hasPlugin(AppPlugin.class)) {
+          if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
             // Fix wtp issue in included builds (with buildship)
             // see: https://discuss.gradle.org/t/gradle-composite-builds-and-eclipse-wtp/23503
             findIncludedBuildProjects(project).stream()
@@ -108,7 +107,7 @@ public class EclipseSupport extends AbstractSupport {
     // finally configure wtp resources
     project.afterEvaluate(
         p -> {
-          if (project.getPlugins().hasPlugin(AppPlugin.class)) {
+          if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
             configureWtp(project, eclipse);
           }
         });

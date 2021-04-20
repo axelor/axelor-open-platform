@@ -21,9 +21,3 @@ dependencies {
   implementation libs.eclipselink_moxy
   implementation libs.pac4j_core
 }
-
-jar {
-  into("webapp") {
-    from("src/main/webapp")
-  }
-}

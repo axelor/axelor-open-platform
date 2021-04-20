@@ -17,7 +17,6 @@
  */
 package com.axelor.gradle.support;
 
-import com.axelor.gradle.AppPlugin;
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.tasks.GenerateCode;
 import org.gradle.api.Project;
@@ -33,6 +32,7 @@ public class IdeaSupport extends AbstractSupport {
         p -> {
           if (project.getPlugins().hasPlugin(AxelorPlugin.class)) {
             project.getTasks().getByName("ideaModule").dependsOn(GenerateCode.TASK_NAME);
+            project.getTasks().getByName("ideaModule").dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
             project
                 .getTasks()
                 .getByName(
@@ -45,9 +45,6 @@ public class IdeaSupport extends AbstractSupport {
                           .getGeneratedSourceDirs()
                           .addAll(((GenerateCode) task).getOutputDirectories());
                     });
-          }
-          if (project.getPlugins().hasPlugin(AppPlugin.class)) {
-            project.getTasks().getByName("ideaModule").dependsOn(WarSupport.COPY_WEBAPP_TASK_NAME);
           }
         });
   }

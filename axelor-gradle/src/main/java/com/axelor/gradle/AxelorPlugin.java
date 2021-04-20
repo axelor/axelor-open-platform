@@ -17,15 +17,21 @@
  */
 package com.axelor.gradle;
 
+import com.axelor.common.VersionUtils;
+import com.axelor.gradle.support.AbstractSupport;
 import com.axelor.gradle.support.EclipseSupport;
 import com.axelor.gradle.support.IdeaSupport;
 import com.axelor.gradle.support.JavaSupport;
 import com.axelor.gradle.support.LicenseSupport;
 import com.axelor.gradle.support.PublishSupport;
+import com.axelor.gradle.support.ScriptsSupport;
+import com.axelor.gradle.support.TomcatSupport;
+import com.axelor.gradle.support.WarSupport;
 import com.axelor.gradle.tasks.GenerateCode;
 import com.axelor.gradle.tasks.I18nTask;
 import com.axelor.gradle.tasks.UpdateVersion;
 import java.io.File;
+import java.util.Objects;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileTree;
@@ -33,6 +39,7 @@ import org.gradle.api.plugins.JavaLibraryPlugin;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.compile.AbstractCompile;
+import org.gradle.jvm.tasks.Jar;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
 import org.gradle.util.GradleVersion;
@@ -43,6 +50,8 @@ public class AxelorPlugin implements Plugin<Project> {
   public static final String AXELOR_BUILD_GROUP = "axelor build";
 
   public static final String GRADLE_VERSION = GradleVersion.current().getVersion();
+
+  private final String version = VersionUtils.getVersion().version;
 
   public static File getClassOutputDir(Project project, String sourceType) {
     return new File(project.getBuildDir(), "classes/" + sourceType + "/main");
@@ -66,6 +75,42 @@ public class AxelorPlugin implements Plugin<Project> {
     }
 
     configureCodeGeneration(project);
+    configureJarSupport(project);
+    configureWarSupport(project);
+  }
+
+  private boolean isCore(Project project) {
+    String name = project.getName();
+    return "axelor-core".equals(name) || "axelor-web".equals(name) || "axelor-test".equals(name);
+  }
+
+  private void configureJarSupport(Project project) {
+    // include webapp resources in jar
+    project
+        .getTasks()
+        .withType(Jar.class, jar -> jar.into("webapp", spec -> spec.from("src/main/webapp")));
+
+    // include core dependencies
+    if (!isCore(project)) {
+      project.getDependencies().add("implementation", "com.axelor:axelor-core:" + version);
+      project.getDependencies().add("implementation", "com.axelor:axelor-web:" + version);
+      project.getDependencies().add("testImplementation", "com.axelor:axelor-test:" + version);
+    }
+  }
+
+  private void configureWarSupport(Project project) {
+    // only on root project
+    if (project != project.getRootProject()) return;
+
+    project.getPlugins().apply(WarSupport.class);
+    project.getPlugins().apply(ScriptsSupport.class);
+    project.getPlugins().apply(TomcatSupport.class);
+
+    // run generateCode on included builds
+    AbstractSupport.findIncludedBuildProjects(project).stream()
+        .map(included -> included.getTasks().findByName(GenerateCode.TASK_NAME))
+        .filter(Objects::nonNull)
+        .forEach(task -> project.getTasks().getByName(GenerateCode.TASK_NAME).dependsOn(task));
   }
 
   private void configureCodeGeneration(Project project) {
