@@ -262,7 +262,7 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
 
   // Prevent looped view loading
   var parentSchema = ((($scope.$parent || {}).$parent || {}).$parent || {}).schema || {};
-  if (parentSchema.loadedLoop) {
+  if (parentSchema.loadedLoop > 1) {
     $scope.schema = { loaded: true };
   } else {
     $scope.schema = null;
@@ -321,7 +321,7 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
 
         // Detect looped view loading
         if (schema.viewId && schema.viewId === parentSchema.viewId) {
-          schema.loadedLoop = true;
+          schema.loadedLoop = (schema.loadedLoop || 0) + 1;
         }
       });
     }
