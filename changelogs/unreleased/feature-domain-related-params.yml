@@ -1,0 +1,10 @@
+---
+title: Add support for related parameters in domain expressions
+description: |
+  Character `$` is used to access related fields in domain expression parameters.
+  This can be used to access other JSON fields. Example:
+
+  ```
+  "self.product = :$extraAttrs$myCustomProduct"
+  ```
+type: feature

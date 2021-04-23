@@ -18,11 +18,17 @@
 package com.axelor.db;
 
 import com.axelor.db.mapper.Adapter;
+import com.axelor.db.mapper.Mapper;
 import com.axelor.rpc.ContextEntity;
 import com.axelor.script.ScriptBindings;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.persistence.FlushModeType;
 import javax.persistence.Parameter;
 import org.hibernate.jpa.QueryHints;
@@ -134,7 +140,7 @@ public class QueryBinder {
    */
   public QueryBinder bind(Map<String, Object> namedParams, Object... params) {
 
-    ScriptBindings bindings = null;
+    final ScriptBindings bindings;
 
     if (namedParams instanceof ScriptBindings) {
       bindings = (ScriptBindings) namedParams;
@@ -149,7 +155,13 @@ public class QueryBinder {
     if (namedParams != null) {
       for (Parameter<?> p : query.getParameters()) {
         if (p.getName() != null && Ints.tryParse(p.getName()) == null) {
-          this.bind(p.getName(), bindings.get(p.getName()));
+          final String name = p.getName();
+          Object value = bindings.get(name);
+          if (value == null && name.indexOf('$', 1) >= 0) {
+            final String dottedName = name.replaceAll("(?<=\\w)\\$", ".");
+            value = getDottedValue(bindings, dottedName);
+          }
+          this.bind(name, value);
         }
       }
     }
@@ -194,6 +206,33 @@ public class QueryBinder {
     }
 
     return this;
+  }
+
+  private Object getDottedValue(ScriptBindings bindings, String dottedName) {
+    final List<String> names = Splitter.on('.').splitToList(dottedName);
+    return getRelatedValue(bindings.get(names.get(0)), names.subList(1, names.size()));
+  }
+
+  private Object getRelatedValue(Object value, Collection<String> subNames) {
+    for (final String name : subNames) {
+      if (value == null) {
+        break;
+      } else if (value instanceof Map) {
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> map = (Map<String, Object>) value;
+        value = map.get(name);
+      } else if (value instanceof Collection) {
+        @SuppressWarnings("unchecked")
+        final Collection<Object> items = (Collection<Object>) value;
+        value =
+            items.stream()
+                .map(item -> getRelatedValue(item, Collections.singleton(name)))
+                .collect(Collectors.toList());
+      } else {
+        value = Mapper.of(value.getClass()).get(value, name);
+      }
+    }
+    return value;
   }
 
   /**
