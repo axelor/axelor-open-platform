@@ -1385,6 +1385,7 @@ ui.directive('uiFilterBox', function() {
 
         if (arguments.length > 1 && _.isString(arguments[1])) {
           search._searchText = arguments[1];
+          applyingDefaults = false;
         }
 
         var domains = [],
