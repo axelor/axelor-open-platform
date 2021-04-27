@@ -32,14 +32,15 @@ public class TenantResolver implements CurrentTenantIdentifierResolver {
   }
 
   public static String currentTenantIdentifier() {
-    if (!enabled) {
-      return null;
-    }
+    if (!enabled) return null;
     final String tenant = CURRENT_TENANT.get();
-    if (tenant == null) {
-      return TenantConfig.DEFAULT_TENANT_ID;
-    }
-    return tenant;
+    return tenant == null ? TenantConfig.DEFAULT_TENANT_ID : tenant;
+  }
+
+  public static String currentTenantHost() {
+    if (!enabled) return null;
+    final String tenant = CURRENT_HOST.get();
+    return tenant == null ? null : tenant;
   }
 
   @Override
