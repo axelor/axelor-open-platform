@@ -19,6 +19,7 @@ package com.axelor.db;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
+import com.axelor.db.tenants.TenantAware;
 import java.lang.invoke.MethodHandles;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
@@ -42,11 +43,20 @@ import org.slf4j.LoggerFactory;
 /** Executes transactions in parallel and handles rollback if any exception occurs. */
 public class ParallelTransactionExecutor {
 
+  private final String tenantId;
+
+  private final String tenantHost;
+
   private final int numWorkers;
+
   private final ExecutorService workerPool;
+
   private final List<Future<?>> workerFutures;
+
   private final ConcurrentMap<Integer, Entry<CountDownLatch, Queue<Runnable>>> commandsByPriority;
+
   private final List<Entry<CountDownLatch, Queue<Runnable>>> commands;
+
   private boolean rollbackNeeded;
 
   private static final Logger logger =
@@ -56,8 +66,8 @@ public class ParallelTransactionExecutor {
    * Instantiates a parallel transaction executor with as many workers as there are available
    * processors.
    */
-  public ParallelTransactionExecutor() {
-    this(getMaxWorkers());
+  public ParallelTransactionExecutor(String tenantId, String tenantHost) {
+    this(tenantId, tenantHost, getMaxWorkers());
   }
 
   private static int getMaxWorkers() {
@@ -73,7 +83,9 @@ public class ParallelTransactionExecutor {
    *
    * @param numWorkers
    */
-  public ParallelTransactionExecutor(int numWorkers) {
+  public ParallelTransactionExecutor(String tenantId, String tenantHost, int numWorkers) {
+    this.tenantId = tenantId;
+    this.tenantHost = tenantHost;
     this.numWorkers = numWorkers;
     workerPool = Executors.newFixedThreadPool(numWorkers);
     workerFutures = new ArrayList<>(numWorkers);
@@ -124,7 +136,13 @@ public class ParallelTransactionExecutor {
         .forEachOrdered(priority -> commands.add(commandsByPriority.get(priority)));
 
     for (int i = 0; i < numWorkers; ++i) {
-      workerFutures.add(workerPool.submit(this::runCommandsInTransaction));
+      workerFutures.add(
+          workerPool.submit(
+              new TenantAware()
+                  .tenantId(tenantId)
+                  .tenantHost(tenantHost)
+                  .transactional()
+                  .task(this::runCommands)));
     }
   }
 
@@ -168,45 +186,42 @@ public class ParallelTransactionExecutor {
     } while (!Thread.currentThread().isInterrupted());
   }
 
-  private void runCommandsInTransaction() {
-    JPA.runInTransaction(
-        () -> {
-          RuntimeException error = null;
+  private void runCommands() {
+    RuntimeException error = null;
 
-          for (final Entry<CountDownLatch, Queue<Runnable>> entry : commands) {
-            final CountDownLatch doneSignal = entry.getKey();
-            final Queue<Runnable> commandQueue = entry.getValue();
+    for (final Entry<CountDownLatch, Queue<Runnable>> entry : commands) {
+      final CountDownLatch doneSignal = entry.getKey();
+      final Queue<Runnable> commandQueue = entry.getValue();
 
-            try {
-              for (Runnable command; (command = commandQueue.poll()) != null; ) {
-                command.run();
-              }
-            } catch (RuntimeException e) {
-              rollbackNeeded = true;
-              error = e;
-              clearCommandQueues();
-            } finally {
-              doneSignal.countDown();
-            }
+      try {
+        for (Runnable command; (command = commandQueue.poll()) != null; ) {
+          command.run();
+        }
+      } catch (RuntimeException e) {
+        rollbackNeeded = true;
+        error = e;
+        clearCommandQueues();
+      } finally {
+        doneSignal.countDown();
+      }
 
-            try {
-              doneSignal.await();
-            } catch (InterruptedException e) {
-              logger.error(e.getMessage(), e);
-              Thread.currentThread().interrupt();
-            }
-          }
+      try {
+        doneSignal.await();
+      } catch (InterruptedException e) {
+        logger.error(e.getMessage(), e);
+        Thread.currentThread().interrupt();
+      }
+    }
 
-          if (error != null) {
-            throw error;
-          } else if (rollbackNeeded) {
-            throw new ErrorInAnotherWorker();
-          }
-        });
+    if (error != null) {
+      throw error;
+    } else if (rollbackNeeded) {
+      throw new ErrorInAnotherWorker();
+    }
   }
 
   private void clearCommandQueues() {
-    commands.parallelStream().map(Entry::getValue).forEach(Collection::clear);
+    commands.stream().map(Entry::getValue).forEach(Collection::clear);
   }
 
   private static class ErrorInAnotherWorker extends RuntimeException {

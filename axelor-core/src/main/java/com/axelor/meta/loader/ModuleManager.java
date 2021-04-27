@@ -27,6 +27,7 @@ import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.common.StringUtils;
 import com.axelor.db.ParallelTransactionExecutor;
 import com.axelor.db.internal.DBHelper;
+import com.axelor.db.tenants.TenantResolver;
 import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
 import com.axelor.events.ModuleChanged;
@@ -321,7 +322,10 @@ public class ModuleManager {
   }
 
   private void installMeta(Module module, boolean update) {
-    final ParallelTransactionExecutor transactionExecutor = new ParallelTransactionExecutor();
+    final String tenantId = TenantResolver.currentTenantIdentifier();
+    final String tenantHost = TenantResolver.currentTenantHost();
+    final ParallelTransactionExecutor transactionExecutor =
+        new ParallelTransactionExecutor(tenantId, tenantHost);
     metaLoaders.forEach(
         metaLoader ->
             metaLoader.feedTransactionExecutor(
