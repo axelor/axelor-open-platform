@@ -17,6 +17,8 @@
  */
 package com.axelor.db.tenants;
 
+import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
 import com.google.common.base.Preconditions;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -73,13 +75,25 @@ public class TenantConnectionProvider
 
   private DataSource createDataSource(TenantConfig config) {
     LOGGER.debug("creating datasource for tenant config: {}", config);
+
+    final AppSettings settings = AppSettings.get();
     final HikariConfig hc = new HikariConfig();
+
     hc.setDataSourceJNDI(config.getJndiDataSource());
     hc.setDriverClassName(config.getJdbcDriver());
     hc.setJdbcUrl(config.getJdbcUrl());
     hc.setUsername(config.getJdbcUser());
     hc.setPassword(config.getJdbcPassword());
     hc.setAutoCommit(false);
+
+    hc.setIdleTimeout(
+        Long.valueOf(settings.get(AvailableAppSettings.HIBERNATE_HIKARI_IDLE_TIMEOUT, "300000")));
+    hc.setMaximumPoolSize(
+        Integer.valueOf(
+            settings.get(AvailableAppSettings.HIBERNATE_HIKARI_MAXIMUN_POOL_SIZE, "20")));
+    hc.setMinimumIdle(
+        Integer.valueOf(settings.get(AvailableAppSettings.HIBERNATE_HIKARI_MINIMUN_IDLE, "5")));
+
     return new HikariDataSource(hc);
   }
 
