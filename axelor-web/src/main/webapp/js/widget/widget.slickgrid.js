@@ -2225,6 +2225,18 @@ Grid.prototype.cancelEdit = function (focus) {
 };
 
 Grid.prototype.commitEdit = function (noWait) {
+  if (!noWait) {
+    var that = this;
+    var defer = this.handler._defer();
+    this.handler.waitForActions(function () {
+      defer.resolve(commitEdit.apply(that, arguments));
+    });
+    return defer.promise;
+  }
+  return commitEdit.apply(this, arguments);
+};
+
+function commitEdit(noWait) {
   this._committing = true;
 
   var that = this;
