@@ -720,7 +720,8 @@ ActionHandler.prototype = {
       formElement = this._getFormElement(),
       formScope = formElement.data('$scope') || scope,
       rootForm = this._getRootFormElement(),
-      rootScope = rootForm.is('[ui-view-grid]') ? scope : rootForm.scope();
+      rootScope = rootForm.is('[ui-view-grid]') ? scope
+        : rootForm.scope() || (scope.selectedTab || {}).$viewScope;
 
     function doReload(pending) {
       self._invalidateContext = true;
@@ -751,6 +752,11 @@ ActionHandler.prototype = {
         window.location.reload();
       }
       return deferred.promise;
+    }
+    if (data.signal === 'refresh-tab') {
+      rootScope.waitForActions(function () {
+        rootScope.reloadTab(rootScope.selectedTab);
+      });
     }
 
     if(data.flash || data.info) {
