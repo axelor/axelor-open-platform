@@ -136,7 +136,10 @@ class Property {
 
     switch(type) {
       case "boolean":
-        return value ==~ /(?i)true|t|1|Boolean\\.TRUE/ ? "Boolean.TRUE" : "Boolean.FALSE"
+        if (value ==~ /(?i)true|t|1|Boolean\\.TRUE/) {
+          return "Boolean.TRUE"
+        }
+        return !isNullable() || value ==~ /(?i)false|f|0|Boolean\\.FALSE/ ? "Boolean.FALSE" : "null"
       case "string":
         return "\"${value}\""
       case "long":
