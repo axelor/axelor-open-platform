@@ -290,19 +290,17 @@ public class ViewService extends AbstractService {
     final Class<?> modelClass = findClass(model);
     if (view instanceof AbstractView && modelClass != null) {
       final Set<String> names = findNames((AbstractView) view);
-      if (view instanceof FormView || view instanceof GridView) {
-        Mapper mapper = Mapper.of(modelClass);
-        boolean hasJson =
-            names.stream()
-                .map(mapper::getProperty)
-                .filter(Objects::nonNull)
-                .anyMatch(Property::isJson);
-        if (!hasJson && mapper.getProperty("attrs") != null) {
-          Map<String, Object> jsonAttrs = MetaStore.findJsonFields(model, "attrs");
-          if (jsonAttrs != null && jsonAttrs.size() > 0) {
-            names.add("attrs");
-            data.put("jsonAttrs", jsonAttrs.values());
-          }
+      Mapper mapper = Mapper.of(modelClass);
+      boolean hasJson =
+          names.stream()
+              .map(mapper::getProperty)
+              .filter(Objects::nonNull)
+              .anyMatch(Property::isJson);
+      if (!hasJson && mapper.getProperty("attrs") != null) {
+        Map<String, Object> jsonAttrs = MetaStore.findJsonFields(model, "attrs");
+        if (jsonAttrs != null && jsonAttrs.size() > 0) {
+          names.add("attrs");
+          data.put("jsonAttrs", jsonAttrs.values());
         }
       }
       if (MetaJsonRecord.class.getName().equals(model)) {
