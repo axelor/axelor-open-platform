@@ -138,11 +138,9 @@ public class ParallelTransactionExecutor {
     for (int i = 0; i < numWorkers; ++i) {
       workerFutures.add(
           workerPool.submit(
-              new TenantAware()
+              new TenantAware(this::runCommands)
                   .tenantId(tenantId)
-                  .tenantHost(tenantHost)
-                  .transactional()
-                  .task(this::runCommands)));
+                  .tenantHost(tenantHost)));
     }
   }
 

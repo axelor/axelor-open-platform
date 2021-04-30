@@ -19,17 +19,17 @@ package com.axelor.db.tenants;
 
 import com.axelor.db.JPA;
 
-public class TenantAware implements Runnable {
+public class TenantAware extends Thread {
 
   private String tenantId;
 
   private String tenantHost;
 
-  private boolean transactional;
-
-  private Runnable task;
-
-  public TenantAware() {}
+  public TenantAware(Runnable task) {
+    super(task);
+    this.tenantId = TenantResolver.currentTenantIdentifier();
+    this.tenantHost = TenantResolver.currentTenantHost();
+  }
 
   public TenantAware tenantId(String tenantId) {
     this.tenantId = tenantId;
@@ -41,16 +41,6 @@ public class TenantAware implements Runnable {
     return this;
   }
 
-  public TenantAware transactional() {
-    this.transactional = true;
-    return this;
-  }
-
-  public TenantAware task(Runnable task) {
-    this.task = task;
-    return this;
-  }
-
   @Override
   public void run() {
     String currentId = TenantResolver.CURRENT_TENANT.get();
@@ -58,11 +48,7 @@ public class TenantAware implements Runnable {
     TenantResolver.CURRENT_TENANT.set(tenantId);
     TenantResolver.CURRENT_HOST.set(tenantHost);
     try {
-      if (transactional) {
-        JPA.runInTransaction(task);
-      } else {
-        task.run();
-      }
+      JPA.runInTransaction(super::run);
     } finally {
       TenantResolver.CURRENT_TENANT.set(currentId);
       TenantResolver.CURRENT_HOST.set(currentHost);
