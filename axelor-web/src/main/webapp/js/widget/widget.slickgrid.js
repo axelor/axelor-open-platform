@@ -2830,7 +2830,7 @@ ui.directive("uiSlickColumnsForm", function () {
               type: "field",
               serverType: "BOOLEAN",
               widget: "inline-checkbox",
-              title: _t("Share"),
+              title: _t("Apply as default for all users"),
               hidden: !isAdmin()
             }]
           }]
