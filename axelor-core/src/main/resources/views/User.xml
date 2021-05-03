@@ -38,10 +38,10 @@
       <field name="forcePasswordChange"/>
       <field name="change" title="Change password?" showIf="id &amp;&amp; !$readonly()" widget="boolean"/>
       <panel showIf="change || !id" colSpan="12" itemSpan="12">
-        <field name="oldPassword" title="Your password" placeholder="your password" widget="password" requiredIf="change || !id"/>
-        <field name="newPassword" title="New password" placeholder="new password" widget="password" requiredIf="change || !id" validIf="(!change &amp;&amp; id) || newPassword.length >= 4"
+        <field name="oldPassword" title="Your current password" placeholder="your current password" help="Current password of the logged in user" widget="password" requiredIf="change || !id"/>
+        <field name="newPassword" title="New password" placeholder="new password" help="New password of the user" widget="password" requiredIf="change || !id" validIf="(!change &amp;&amp; id) || newPassword.length >= 4"
           onChange="action-condition-user-password"/>
-        <field name="chkPassword" title="Confirm password" placeholder="confirm password" widget="password" requiredIf="change || !id" validIf="chkPassword === newPassword"/>
+        <field name="chkPassword" title="Confirm new password" placeholder="confirm new password" help="Confirm new password of the user (must be identical to the new password)" widget="password" requiredIf="change || !id" validIf="chkPassword === newPassword"/>
       </panel>
     </panel>
     <panel-tabs>
@@ -61,10 +61,10 @@
       <field name="noHelp" widget="inline-checkbox" />
       <field name="change" title="Change password?" widget="inline-checkbox"/>
       <panel showIf="change" itemSpan="12">
-          <field name="oldPassword" title="Current password" placeholder="current password" widget="password" requiredIf="change" />
-          <field name="newPassword" title="New password" placeholder="new password" widget="password" requiredIf="change" validIf="!change || newPassword.length >= 4"
+          <field name="oldPassword" title="Current password" placeholder="current password" help="Current password of the user" widget="password" requiredIf="change" />
+          <field name="newPassword" title="New password" placeholder="new password" help="New password of the user" widget="password" requiredIf="change" validIf="!change || newPassword.length >= 4"
             onChange="action-condition-user-password"/>
-          <field name="chkPassword" title="Confirm password" placeholder="confirm password" widget="password" requiredIf="change" validIf="chkPassword === newPassword"/>
+          <field name="chkPassword" title="Confirm new password" placeholder="confirm new password" help="Confirm new password of the user (must be identical to the new password)" widget="password" requiredIf="change" validIf="chkPassword === newPassword"/>
       </panel>
     </panel>
   </form>
