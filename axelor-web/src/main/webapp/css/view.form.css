@@ -1851,3 +1851,13 @@ label.has-help > span:after,
 .panel-layout .form-item-container.editable .iti__flag-container + input[type="tel"] {
   padding-left: 2px !important;
 }
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}

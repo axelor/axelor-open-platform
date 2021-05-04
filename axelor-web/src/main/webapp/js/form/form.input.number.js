@@ -33,6 +33,7 @@ ui.formInput('Number', {
   widgets: ['Integer', 'Long', 'Decimal'],
 
   template_readonly: '<span class="display-text">{{localeValue()}}</span>',
+  template_editable: '<input type="number">',
 
   link: function(scope, element, attrs, model) {
 
@@ -40,10 +41,14 @@ ui.formInput('Number', {
       minSize = +props.minSize,
       maxSize = +props.maxSize;
 
-    var isDecimal = props.serverType === "decimal" || props.widget === "decimal",
+    scope.isDecimal = function () {
+      return props.serverType === "decimal" || props.widget === "decimal";
+    };
+
+    var isDecimal = scope.isDecimal(),
       pattern = isDecimal ? /^(-)?\d+(\.\d+)?$/ : /^\s*-?[0-9]*\s*$/;
 
-    function scale() {
+    scope.scale = function () {
       var value = scope.attr('scale');
       if (value) {
         return value;
@@ -52,7 +57,7 @@ ui.formInput('Number', {
         return props.widgetAttrs.scale;
       }
       return props.scale || 2;
-    }
+    };
 
     function precision() {
       var value = scope.attr('precision');
@@ -94,7 +99,7 @@ ui.formInput('Number', {
     scope.localeValue = function localeValue() {
       var value = scope.getValue();
       var field = isDecimal ? _.extend({}, scope.field, {
-        scale: scale(),
+        scale: scope.scale(),
         precision: precision()
       }) : scope.field;
       return isDecimal
@@ -104,7 +109,7 @@ ui.formInput('Number', {
 
     scope.format = function format(value) {
       if (isDecimal && _.isString(value) && value.trim().length > 0) {
-        return parseFloat(value).toFixed(scale());
+        return parseFloat(value).toFixed(scope.scale());
       }
       return value;
     };
@@ -113,7 +118,7 @@ ui.formInput('Number', {
       if (scope.field.nullable && isEmpty(value)) return null;
       if (_.isString(value)) value = +(value);
       if (_.isNaN(value)) value = null;
-      if (_.isNumber(value) && isDecimal) value = value.toFixed(scale());
+      if (_.isNumber(value) && isDecimal) value = value.toFixed(scope.scale());
       return value;
     };
 
@@ -131,6 +136,15 @@ ui.formInput('Number', {
     var options = {
       step: 1
     };
+    var keyPattern;
+
+    if (scope.isDecimal()) {
+      var scale = scope.scale();
+      element.attr("step", _.sprintf("%." + scale + "f", 1 / Math.pow(10, scale)));
+      keyPattern = /[\d-.]/;
+    } else {
+      keyPattern = /[\d-]/;
+    }
 
     element.on("spin", onSpin);
     element.on("spinchange", function(e, row) {
@@ -140,8 +154,18 @@ ui.formInput('Number', {
       updateModel(element.val());
     });
     element.on("keydown", function(e, row) {
+      if (!e.ctrlKey && e.key.length === 1 && !e.key.match(keyPattern)) {
+        e.preventDefault();
+        return;
+      }
       if (e.keyCode === $.ui.keyCode.ENTER) {
         updateModel(element.val());
+      }
+    });
+    element.on("blur", function () {
+      var value = element.val();
+      if (value === "") {
+        element.val(value);
       }
     });
 
@@ -171,7 +195,7 @@ ui.formInput('Number', {
     function updateModel(value, handle) {
       if (!scope.isNumber(value)) {
         return model.$setViewValue(value); // force validation
-            }
+      }
       var val = scope.parse(value);
       var old = scope.getValue();
       var text = scope.format(value);
@@ -179,6 +203,7 @@ ui.formInput('Number', {
       element.val(text);
 
       if (equals(val, old)) {
+        element.val(val);
         return handleChange();
       }
 
