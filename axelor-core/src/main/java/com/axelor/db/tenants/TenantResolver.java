@@ -17,6 +17,7 @@
  */
 package com.axelor.db.tenants;
 
+import javax.servlet.http.HttpSession;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 
 /** The tenant identifier resolver. */
@@ -41,6 +42,15 @@ public class TenantResolver implements CurrentTenantIdentifierResolver {
     if (!enabled) return null;
     final String tenant = CURRENT_HOST.get();
     return tenant == null ? null : tenant;
+  }
+
+  public static boolean isCurrentTenantSession(HttpSession session) {
+    if (session == null) return false;
+    return !enabled
+        || CURRENT_TENANT.get() == null
+        || CURRENT_TENANT
+            .get()
+            .equals(session.getAttribute(AbstractTenantFilter.SESSION_KEY_TENANT_ID));
   }
 
   @Override
