@@ -24,6 +24,7 @@ import com.google.inject.persist.Transactional;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Map;
@@ -148,6 +149,7 @@ public class JpaFixture {
           class TimeStampConstruct extends Constructor.ConstructScalar {
 
             Construct dateConstructor = yamlConstructors.get(Tag.TIMESTAMP);
+            Construct timeConstructor = yamlConstructors.get(Tag.STR);
 
             @Override
             public Object construct(Node nnode) {
@@ -160,6 +162,9 @@ public class JpaFixture {
                   return date.toInstant().atZone(ZoneOffset.UTC).toLocalDateTime();
                 }
                 return date.toInstant().atZone(ZoneOffset.UTC);
+              } else if (nnode.getType() == LocalTime.class) {
+                String time = (String) timeConstructor.construct(nnode);
+                return LocalTime.parse(time);
               } else {
                 return super.construct(nnode);
               }
