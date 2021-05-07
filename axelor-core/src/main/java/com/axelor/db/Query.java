@@ -80,6 +80,8 @@ public class Query<T extends Model> {
 
   private boolean readOnly;
 
+  private boolean translate;
+
   private FlushModeType flushMode = FlushModeType.AUTO;
 
   private static final String NAME_PATTERN = "((?:[a-zA-Z_]\\w+)(?:(?:\\[\\])?\\.\\w+)*)";
@@ -105,6 +107,34 @@ public class Query<T extends Model> {
 
   protected EntityManager em() {
     return JPA.em();
+  }
+
+  protected JoinHelper getJoinHelper() {
+    return joinHelper;
+  }
+
+  protected String getFilter() {
+    return filter;
+  }
+
+  protected void setFilter(String filter) {
+    this.filter = filter;
+  }
+
+  protected Object[] getParams() {
+    return params;
+  }
+
+  protected void setParams(Object[] params) {
+    this.params = params;
+  }
+
+  protected Map<String, Object> getNamedParams() {
+    return namedParams;
+  }
+
+  protected void setNamedParams(Map<String, Object> namedParams) {
+    this.namedParams = namedParams;
   }
 
   /**
@@ -150,6 +180,17 @@ public class Query<T extends Model> {
           "JDBC and JPA-style positional parameters can't be mixed: " + filter);
     }
 
+    this.filter = joinHelper.parse(fixPlaceholders(filter), translate);
+    this.params = params;
+    return this;
+  }
+
+  public Query<T> filter(String filter) {
+    final Object[] params = {};
+    return filter(filter, params);
+  }
+
+  protected String fixPlaceholders(String filter) {
     // fix JDBC style parameters
     int i = 1;
     final Matcher matcher = PLACEHOLDER_PLAIN.matcher(filter);
@@ -158,15 +199,7 @@ public class Query<T extends Model> {
       matcher.appendReplacement(sb, "?" + (i++));
     }
     matcher.appendTail(sb);
-
-    this.filter = joinHelper.parse(sb.toString());
-    this.params = params;
-    return this;
-  }
-
-  public Query<T> filter(String filter) {
-    final Object[] params = {};
-    return filter(filter, params);
+    return sb.toString();
   }
 
   /**
@@ -209,10 +242,10 @@ public class Query<T extends Model> {
     }
 
     if (name.charAt(0) == '-') {
-      name = this.joinHelper.joinName(name.substring(1), true, true);
+      name = this.joinHelper.joinName(name.substring(1), true, translate);
       orderBy += name + " DESC";
     } else {
-      name = this.joinHelper.joinName(name, true, true);
+      name = this.joinHelper.joinName(name, true, translate);
       orderBy += name;
     }
 
@@ -239,6 +272,26 @@ public class Query<T extends Model> {
   public Query<T> readOnly() {
     this.readOnly = true;
     return this;
+  }
+
+  /**
+   * Set whether to use translation join.
+   *
+   * @param translate
+   * @return
+   */
+  public Query<T> translate(boolean translate) {
+    this.translate = translate;
+    return this;
+  }
+
+  /**
+   * Use translation join.
+   *
+   * @return the same query instance.
+   */
+  public Query<T> translate() {
+    return translate(true);
   }
 
   public Query<T> autoFlush(boolean auto) {
@@ -907,7 +960,7 @@ public class Query<T extends Model> {
    *
    * So that all the records are matched even if <code>title</code> field is null.
    */
-  private static class JoinHelper {
+  protected static class JoinHelper {
 
     private Class<?> beanClass;
 
@@ -935,9 +988,10 @@ public class Query<T extends Model> {
      * path expressions are replaced with the join variables.
      *
      * @param filter the filter expression
+     * @param translate whether to generate translation join
      * @return the transformed filter expression
      */
-    private String parse(String filter) {
+    public String parse(String filter, boolean translate) {
 
       String result = "";
       Matcher matcher = pathPattern.matcher(filter);
@@ -945,7 +999,7 @@ public class Query<T extends Model> {
       int last = 0;
       while (matcher.find()) {
         MatchResult matchResult = matcher.toMatchResult();
-        String alias = joinName(matchResult.group(1), false, true);
+        String alias = joinName(matchResult.group(1), false, translate);
         if (alias == null) {
           alias = "self." + matchResult.group(1);
         }

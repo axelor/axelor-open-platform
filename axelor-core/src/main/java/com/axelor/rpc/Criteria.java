@@ -83,10 +83,11 @@ public class Criteria {
     if (data.get("operator") == null) {
       raw.put("operator", "or");
     }
+
     // if data itself is criteria root
     if (data.get("criteria") != null) {
       raw.putAll(data);
-      return parse(raw, request.getBeanClass());
+      return parse(raw, request.getBeanClass(), request.isTranslate());
     }
 
     // simple search where data is field -> search value map
@@ -109,11 +110,12 @@ public class Criteria {
 
     raw.put("criteria", items);
 
-    return parse(raw, request.getBeanClass());
+    return parse(raw, request.getBeanClass(), request.isTranslate());
   }
 
   @SuppressWarnings("unchecked")
-  public static Criteria parse(Map<String, Object> rawCriteria, Class<?> beanClass) {
+  public static Criteria parse(
+      Map<String, Object> rawCriteria, Class<?> beanClass, boolean translate) {
     final Filter search = Criteria.parseCriterion(rawCriteria, beanClass);
     final List<Filter> all = Lists.newArrayList();
     final Map<String, Object> context = Maps.newHashMap();
@@ -141,14 +143,14 @@ public class Criteria {
 
     Object archived = rawCriteria.get("_archived");
     if (archived != null) {
-      archived = "true".equals(archived.toString().toLowerCase());
+      archived = "true".equalsIgnoreCase(archived.toString());
     }
     if (archived != Boolean.TRUE) {
       all.add(new JPQLFilter("self.archived is null OR self.archived = false"));
     }
 
     if (!Strings.isNullOrEmpty(search.getQuery())) {
-      all.add(search);
+      all.add(search.translate(translate));
     }
 
     Criteria result = new Criteria(Filter.and(all));

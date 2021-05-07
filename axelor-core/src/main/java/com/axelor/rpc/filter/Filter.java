@@ -27,6 +27,7 @@ import java.util.List;
 public abstract class Filter {
 
   private String query;
+  private boolean translate;
 
   public abstract String getQuery();
 
@@ -44,6 +45,30 @@ public abstract class Filter {
       query.filter(sb.toString(), getParams().toArray());
     }
     return query;
+  }
+
+  /**
+   * Set whether to use translation join.
+   *
+   * @param translate
+   * @return filter
+   */
+  public Filter translate(boolean translate) {
+    this.translate = translate;
+    return this;
+  }
+
+  /**
+   * Use translation join.
+   *
+   * @return filter
+   */
+  public Filter translate() {
+    return translate(true);
+  }
+
+  protected boolean isTranslate() {
+    return translate;
   }
 
   @Override

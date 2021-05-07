@@ -304,7 +304,7 @@
           _archived: archived
         }, angular.copy(filter));
 
-        if (query.criteria) {
+        if (query.criteria && query.criteria.length) {
           transform(query.criteria);
         }
 
@@ -317,7 +317,8 @@
             data: query,
             limit: limit,
             offset: offset,
-            parent: opts.parent
+            parent: opts.parent,
+            translate: true
           };
 
         var promise = this._request('search').post(params);

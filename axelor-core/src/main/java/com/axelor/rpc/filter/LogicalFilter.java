@@ -18,9 +18,12 @@
 package com.axelor.rpc.filter;
 
 import com.axelor.common.StringUtils;
+import com.axelor.db.Model;
+import com.axelor.db.Query;
 import com.google.common.base.Joiner;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 class LogicalFilter extends Filter {
@@ -32,6 +35,11 @@ class LogicalFilter extends Filter {
   public LogicalFilter(Operator operator, List<Filter> filters) {
     this.operator = operator;
     this.filters = filters;
+  }
+
+  @Override
+  public <T extends Model> Query<T> build(Class<T> klass) {
+    return new LogicalFilterQuery<>(klass).filter();
   }
 
   @Override
@@ -65,5 +73,43 @@ class LogicalFilter extends Filter {
       params.addAll(filter.getParams());
     }
     return params;
+  }
+
+  protected class LogicalFilterQuery<T extends Model> extends Query<T> {
+
+    public LogicalFilterQuery(Class<T> beanClass) {
+      super(beanClass);
+    }
+
+    public Query<T> filter() {
+      final UnaryOperator<String> queryTransform;
+      final Operator joinOperator;
+
+      if (Operator.NOT.equals(operator)) {
+        queryTransform = query -> Operator.NOT.name() + ' ' + query;
+        joinOperator = Operator.AND;
+      } else {
+        queryTransform = UnaryOperator.identity();
+        joinOperator = operator;
+      }
+
+      final String filterString =
+          filters.stream()
+              .filter(filterItem -> StringUtils.notBlank(filterItem.toString()))
+              .map(
+                  filterItem ->
+                      getJoinHelper()
+                          .parse(
+                              queryTransform.apply(filterItem.toString()),
+                              LogicalFilter.this.isTranslate() || filterItem.isTranslate()))
+              .collect(Collectors.joining(' ' + joinOperator.name() + ' '));
+
+      if (StringUtils.notBlank(filterString)) {
+        setFilter(fixPlaceholders(filterString));
+        setParams(LogicalFilter.this.getParams().toArray());
+      }
+
+      return this;
+    }
   }
 }

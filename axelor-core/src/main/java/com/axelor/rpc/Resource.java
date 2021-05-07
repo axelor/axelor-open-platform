@@ -364,17 +364,20 @@ public class Resource<T extends Model> {
   }
 
   private Query<?> getQuery(Request request, Filter filter) {
-    Criteria criteria = getCriteria(request);
-    Query<?> query = JPA.all(model);
+    final Criteria criteria = getCriteria(request);
+    final Query<?> query;
 
     if (criteria != null) {
       query = criteria.createQuery(model, filter);
     } else if (filter != null) {
       query = filter.build(model);
+    } else {
+      query = JPA.all(model);
     }
 
+    query.translate(request.isTranslate());
     for (String spec : getSortBy(request)) {
-      query = query.order(spec);
+      query.order(spec);
     }
 
     return query;

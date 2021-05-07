@@ -53,6 +53,8 @@ public class Request {
 
   private ScriptHelper scriptHelper;
 
+  private boolean translate;
+
   public static Request current() {
     return CURRENT.get();
   }
@@ -225,5 +227,9 @@ public class Request {
       return null;
     }
     return context = new Context(vars, klass);
+  }
+
+  public boolean isTranslate() {
+    return translate;
   }
 }
