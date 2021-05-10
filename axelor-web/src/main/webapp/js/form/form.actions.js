@@ -20,8 +20,9 @@
 "use strict";
 
 var ui = angular.module('axelor.ui');
+var ds = angular.module('axelor.ds');
 
-var equals = angular.equals,
+var equals = ds.equals,
   forEach = angular.forEach,
   isArray = angular.isArray,
   isObject = angular.isObject,
