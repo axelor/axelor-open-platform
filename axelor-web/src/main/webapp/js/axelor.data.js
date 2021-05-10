@@ -27,6 +27,47 @@
 
   var ds = angular.module('axelor.ds');
 
+  /**
+   * Check whether two objects are equal.
+   *
+   * It compares relational field values by it's id if version property
+   * is missing (assuming, they are not modified).
+   *
+   */
+  function equals(a, b) {
+    if (a === b) return true;
+    if (a === null || b === null) return false;
+    if (a !== a && b !== b) return true; // NaN === NaN
+
+    function isWindow(obj) {
+      return obj && obj.document && obj.location && obj.alert && obj.setInterval;
+    }
+
+    function isScope(obj) {
+      return obj && obj.$evalAsync && obj.$watch;
+    }
+
+    function compact(obj) {
+      if (!obj || !_.isObject(obj)) return obj;
+      if (isScope(obj) || isWindow(obj)) return obj;
+      if (_.isArray(obj)) return _.map(obj, compact).sort();
+      if (_.isDate(obj)) return obj;
+      if (obj.id > 0 && !obj.$dirty && !_.has(obj, "version")) {
+        return obj.id;
+      }
+      var res = {};
+      _.each(obj, function(v, k) {
+        if (k.substring(0, 2) === '__') return;
+        if (k === 'selected') return; // selected is transient field
+        res[k] = compact(v);
+      });
+      res.id = res.id || res.$id; // make sure to use dummy id
+      return res;
+    }
+    return angular.equals(compact(a), compact(b));
+  };
+
+  ds.equals = equals;
   ds.factory('DataSource', ['$injector', '$rootScope', '$http', '$q', '$exceptionHandler', function($injector, $rootScope, $http, $q, $exceptionHandler) {
 
     function DataSource(model, options) {
@@ -130,45 +171,7 @@
         });
       },
 
-      /**
-       * Check whether two objects are equal.
-       *
-       * It compares relational field values by it's id if version property
-       * is missing (assuming, they are not modified).
-       *
-       */
-      equals: function(a, b) {
-        if (a === b) return true;
-        if (a === null || b === null) return false;
-        if (a !== a && b !== b) return true; // NaN === NaN
-
-        function isWindow(obj) {
-          return obj && obj.document && obj.location && obj.alert && obj.setInterval;
-        }
-
-        function isScope(obj) {
-          return obj && obj.$evalAsync && obj.$watch;
-        }
-
-        function compact(obj) {
-          if (!obj || !_.isObject(obj)) return obj;
-          if (isScope(obj) || isWindow(obj)) return obj;
-          if (_.isArray(obj)) return _.map(obj, compact).sort();
-          if (_.isDate(obj)) return obj;
-          if (obj.id > 0 && !obj.$dirty && !_.has(obj, "version")) {
-            return obj.id;
-          }
-          var res = {};
-          _.each(obj, function(v, k) {
-            if (k.substring(0, 2) === '__') return;
-            if (k === 'selected') return; // selected is transient field
-            res[k] = compact(v);
-          });
-          res.id = res.id || res.$id; // make sure to use dummy id
-          return res;
-        }
-        return angular.equals(compact(a), compact(b));
-      },
+      equals: equals,
 
       /**
        * Return the difference between two records.

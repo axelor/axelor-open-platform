@@ -1,0 +1,7 @@
+---
+title: Fix dirty checking issue with relational fields
+type: fix
+description: |
+  When some o2m has an onChange action that updates parent record with
+  `setValues(instance)` the o2m items were wrongly marked as dirty if
+  the o2m doesn't have named column.
