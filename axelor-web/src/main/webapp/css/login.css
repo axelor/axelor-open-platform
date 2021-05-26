@@ -176,8 +176,12 @@ body > footer > p a:visited {
   border-radius: 0;
 }
 
-.alert h4 {
-  margin-bottom: 8px;
+.alert h4 + ul, .alert h4 + div {
+  margin-top: 8px;
+}
+
+.form-fields > .alert {
+  width: 100%;
 }
 
 #social-buttons {

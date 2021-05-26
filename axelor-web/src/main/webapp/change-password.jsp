@@ -48,6 +48,7 @@ String newPasswordMustBeDifferent = T.apply("New password must be different.");
 String confirmPasswordMismatch = T.apply("Confirm password doesn't match.");
 
 String errorMsg = T.apply(request.getParameter(FormClient.ERROR_PARAMETER));
+String username = request.getParameter("username");
 
 if (errorMsg == null) {
   errorMsg = T.apply("Please change your password.");
@@ -58,7 +59,9 @@ String confirmSubmit = T.apply("Change password");
 String loginUserName = T.apply("Username");
 String loginPassword = T.apply("Current password");
 String newPassword = T.apply("New password");
-String confirmPassword = T.apply("Confirm password");
+String confirmPassword = T.apply("Confirm new password");
+String passwordPattern = authService.getPasswordPattern();
+String passwordPatternTitle = authService.getPasswordPatternTitle();
 
 int year = Calendar.getInstance().get(Calendar.YEAR);
 String copyright = String.format("&copy; 2005 - %s Axelor. All Rights Reserved.", year);
@@ -99,7 +102,8 @@ String callbackUrl = AuthPac4jModule.getCallbackUrl();
               <div class="input-prepend">
                 <span class="add-on"><i class="fa fa-envelope"></i></span>
                 <input type="text" id="usernameId" name="username" placeholder="<%= loginUserName %>"
-                  required="required" value="<%= request.getParameter("username") %>" readonly="readonly">
+                  required="required"
+                  <%= username != null ? "value=\"" + username + "\" readonly=\"readonly\"" : "autofocus=\"autofocus\"" %>>
               </div>
               <div class="input-prepend">
                 <span class="add-on"><i class="fa fa-lock"></i></span>
@@ -111,7 +115,9 @@ String callbackUrl = AuthPac4jModule.getCallbackUrl();
                 <span class="add-on"><i class="fa fa-lock"></i></span>
                 <input type="password" id="newPasswordId" name="newPassword" placeholder="<%= newPassword %>"
                   required="required"
-                  oninput="checkPasswordInputs()">
+                  oninput="checkPasswordInputs()"
+                  pattern="<%= passwordPattern %>"
+                  title="<%= passwordPatternTitle %>">
               </div>
               <div class="input-prepend">
                 <span class="add-on"><i class="fa fa-lock"></i></span>
@@ -119,6 +125,9 @@ String callbackUrl = AuthPac4jModule.getCallbackUrl();
                   required="required"
                   oninput="checkPasswordInputs()">
               </div>
+	            <div id="password-title" class="alert alert-block alert-info text-center">
+	              <h4><%= passwordPatternTitle %></h4>
+	            </div>
               <% if (tenants != null && tenants.size() > 1) { %>
               <div class="input-prepend">
                 <span class="add-on"><i class="fa fa-database"></i></span>

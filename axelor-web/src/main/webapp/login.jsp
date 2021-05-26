@@ -162,7 +162,7 @@ Set<String> centralClients = AuthPac4jModule.getCentralClients();
 	  </div>
 	  <div id="ad-warning" class="alert hidden">
 	  	<h4><%= warningAdblock %></h4>
-	  	<%= warningAdblock2 %>
+	  	<div><%= warningAdblock2 %></div>
 	  </div>
     </div>
 
