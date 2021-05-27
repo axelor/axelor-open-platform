@@ -189,7 +189,7 @@ public class AuthService {
    * @param password
    */
   public void changePassword(User user, String password) {
-    Preconditions.checkArgument(passwordMatchesPattern(password), PASSWORD_PATTERN_TITLE);
+    Preconditions.checkArgument(passwordMatchesPattern(password), getPasswordPatternTitle());
 
     user.setPassword(encrypt(password));
     user.setPasswordUpdatedOn(LocalDateTime.now());
