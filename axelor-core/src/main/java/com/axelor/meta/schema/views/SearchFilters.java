@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("search-filters")
-public class SearchFilters extends AbstractView {
+public class SearchFilters extends AbstractView implements ContainerView {
 
   @XmlElement(name = "field", type = Field.class)
   private List<AbstractWidget> items;
@@ -40,6 +40,7 @@ public class SearchFilters extends AbstractView {
   @XmlElement(name = "filter")
   private List<SearchFilter> filters;
 
+  @Override
   public List<AbstractWidget> getItems() {
     return items;
   }

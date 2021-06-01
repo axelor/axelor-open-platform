@@ -23,6 +23,9 @@ import com.axelor.rpc.Request;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -31,7 +34,7 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("grid")
-public class GridView extends AbstractView implements ExtendableView {
+public class GridView extends AbstractView implements ContainerView, ExtendableView {
 
   @XmlAttribute private Boolean expandable;
 
@@ -298,6 +301,7 @@ public class GridView extends AbstractView implements ExtendableView {
     this.menubar = menubar;
   }
 
+  @Override
   public List<AbstractWidget> getItems() {
     if (items != null) {
       for (AbstractWidget field : items) {
@@ -309,6 +313,11 @@ public class GridView extends AbstractView implements ExtendableView {
 
   public void setItems(List<AbstractWidget> items) {
     this.items = items;
+  }
+
+  @Override
+  public Set<String> getExtraNames() {
+    return Stream.of(getOrderBy()).filter("sequence"::equals).collect(Collectors.toSet());
   }
 
   @Override

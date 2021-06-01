@@ -19,8 +19,11 @@ package com.axelor.meta.schema.views;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -29,7 +32,7 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("form")
-public class FormView extends AbstractView implements ExtendableView {
+public class FormView extends AbstractView implements ContainerView, ExtendableView {
 
   @XmlAttribute private Integer cols;
 
@@ -220,6 +223,7 @@ public class FormView extends AbstractView implements ExtendableView {
     this.menubar = menubar;
   }
 
+  @Override
   @JsonProperty("items")
   public List<AbstractWidget> getItems() {
     if (items == null) {
@@ -236,6 +240,22 @@ public class FormView extends AbstractView implements ExtendableView {
 
   public void setItems(List<AbstractWidget> items) {
     this.items = items;
+  }
+
+  @Override
+  public List<AbstractWidget> getExtraItems() {
+    final List<AbstractWidget> extraItems = new ArrayList<>();
+
+    Optional.ofNullable(getToolbar()).ifPresent(extraItems::addAll);
+    Optional.ofNullable(getMenubar())
+        .ifPresent(
+            m ->
+                m.stream()
+                    .map(Menu::getItems)
+                    .filter(Objects::nonNull)
+                    .forEach(extraItems::addAll));
+
+    return Collections.unmodifiableList(extraItems);
   }
 
   @Override

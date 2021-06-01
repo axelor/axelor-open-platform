@@ -25,13 +25,14 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("dashboard")
-public class Dashboard extends AbstractView {
+public class Dashboard extends AbstractView implements ContainerView {
 
   @XmlElements({
     @XmlElement(name = "dashlet", type = Dashlet.class),
   })
   private List<AbstractWidget> items;
 
+  @Override
   public List<AbstractWidget> getItems() {
     return items;
   }

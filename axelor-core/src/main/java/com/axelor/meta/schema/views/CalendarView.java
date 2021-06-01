@@ -17,15 +17,19 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.axelor.common.StringUtils;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("calendar")
-public class CalendarView extends AbstractView {
+public class CalendarView extends AbstractView implements ContainerView {
 
   @XmlAttribute private String mode;
 
@@ -44,8 +48,16 @@ public class CalendarView extends AbstractView {
   @XmlElement(name = "field", type = Field.class)
   private List<AbstractWidget> items;
 
+  @Override
   public List<AbstractWidget> getItems() {
     return items;
+  }
+
+  @Override
+  public Set<String> getExtraNames() {
+    return Stream.of(getEventStart(), getEventStop(), getColorBy())
+        .filter(StringUtils::notBlank)
+        .collect(Collectors.toSet());
   }
 
   public String getMode() {

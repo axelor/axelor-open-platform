@@ -17,15 +17,19 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.axelor.common.StringUtils;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("gantt")
-public class GanttView extends AbstractView {
+public class GanttView extends AbstractView implements ContainerView {
 
   @XmlAttribute private String taskStart;
 
@@ -144,11 +148,17 @@ public class GanttView extends AbstractView {
     this.finishToFinish = finishToFinish;
   }
 
+  @Override
   public List<AbstractWidget> getItems() {
     return items;
   }
 
   public void setItems(List<AbstractWidget> items) {
     this.items = items;
+  }
+
+  @Override
+  public Set<String> getExtraNames() {
+    return Stream.of(getTaskUser()).filter(StringUtils::notBlank).collect(Collectors.toSet());
   }
 }

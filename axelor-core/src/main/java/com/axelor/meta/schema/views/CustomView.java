@@ -26,7 +26,7 @@ import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 
 @XmlType
 @JsonTypeName("custom")
-public class CustomView extends AbstractView {
+public class CustomView extends AbstractView implements ContainerView {
 
   @XmlElement(name = "field", type = Field.class)
   private List<AbstractWidget> items;
@@ -37,6 +37,7 @@ public class CustomView extends AbstractView {
 
   @XmlCDATA @XmlElement private String template;
 
+  @Override
   public List<AbstractWidget> getItems() {
     return items;
   }

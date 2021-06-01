@@ -27,7 +27,7 @@ import org.eclipse.persistence.oxm.annotations.XmlCDATA;
 
 @XmlType
 @JsonTypeName("cards")
-public class CardsView extends AbstractView {
+public class CardsView extends AbstractView implements ContainerView {
 
   @XmlAttribute private String orderBy;
 
@@ -110,6 +110,7 @@ public class CardsView extends AbstractView {
     this.menubar = menubar;
   }
 
+  @Override
   public List<AbstractWidget> getItems() {
     if (items == null) {
       return items;

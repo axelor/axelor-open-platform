@@ -34,10 +34,10 @@ import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.AbstractWidget;
 import com.axelor.meta.schema.views.Button;
+import com.axelor.meta.schema.views.ContainerView;
 import com.axelor.meta.schema.views.Dashboard;
 import com.axelor.meta.schema.views.Field;
 import com.axelor.meta.schema.views.FormInclude;
-import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.schema.views.Notebook;
@@ -69,7 +69,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -235,36 +234,22 @@ public class ViewService extends AbstractService {
   private Set<String> findNames(final AbstractView view) {
     final Set<String> names = new HashSet<>();
     final List<AbstractWidget> items = new ArrayList<>();
-    final Consumer<List<AbstractWidget>> collect =
-        all -> Optional.ofNullable(all).ifPresent(items::addAll);
-    if (view instanceof FormView) {
-      FormView form = (FormView) view;
-      collect.accept(form.getItems());
-      if (form.getToolbar() != null) {
-        items.addAll(form.getToolbar());
-      }
-      if (form.getMenubar() != null) {
-        form.getMenubar().stream()
-            .filter(m -> m.getItems() != null)
-            .forEach(m -> collect.accept(m.getItems()));
-      }
+
+    if (view instanceof ContainerView) {
+      final ContainerView containerView = (ContainerView) view;
+      items.addAll(Optional.ofNullable(containerView.getItems()).orElse(Collections.emptyList()));
+      items.addAll(containerView.getExtraItems());
+      names.addAll(containerView.getExtraNames());
     }
-    if (view instanceof GridView) {
-      GridView grid = (GridView) view;
-      collect.accept(grid.getItems());
-      if ("sequence".equals(grid.getOrderBy())) {
-        names.add("sequence");
-      }
-    }
-    if (view instanceof SearchFilters) {
-      collect.accept(((SearchFilters) view).getItems());
-    }
+
     if (items.isEmpty()) {
       return names;
     }
+
     for (AbstractWidget widget : items) {
       findNames(names, widget);
     }
+
     return names;
   }
 
@@ -289,7 +274,7 @@ public class ViewService extends AbstractService {
 
     final Class<?> modelClass = findClass(model);
     if (view instanceof AbstractView && modelClass != null) {
-      final Set<String> names = findNames((AbstractView) view);
+      final Set<String> names = findNames(view);
       Mapper mapper = Mapper.of(modelClass);
       boolean hasJson =
           names.stream()

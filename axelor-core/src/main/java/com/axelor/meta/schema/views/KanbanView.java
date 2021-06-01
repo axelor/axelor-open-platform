@@ -26,6 +26,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
@@ -49,6 +52,13 @@ public class KanbanView extends CardsView {
   @JsonIgnore
   @XmlAttribute(name = "x-limit-columns")
   private Integer limitColumns;
+
+  @Override
+  public Set<String> getExtraNames() {
+    return Stream.of(getColumnBy(), getSequenceBy())
+        .filter(StringUtils::notBlank)
+        .collect(Collectors.toSet());
+  }
 
   public String getColumnBy() {
     return columnBy;
