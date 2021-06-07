@@ -278,7 +278,7 @@ public class CSVBinder {
       LOG.trace("binding: " + cb);
 
       String field = cb.getField();
-      Property p = mapper.getProperty(field);
+      Property p = mapper.getProperty(bean, field);
 
       if (p == null) { // handle dummy binding
         this.handleDummyBind(cb, values);

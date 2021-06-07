@@ -136,7 +136,7 @@ public abstract class XMLBinder {
 
       final String field = bind.getField();
       final String name = bind.getAlias() != null ? bind.getAlias() : field;
-      final Property property = mapper.getProperty(field);
+      final Property property = mapper.getProperty(bean, field);
 
       if (property == null) { // handle dummy binding
         // TODO: this.handleDummyBind(bind, values);

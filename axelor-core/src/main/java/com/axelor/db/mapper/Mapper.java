@@ -25,6 +25,7 @@ import com.axelor.internal.asm.Opcodes;
 import com.axelor.internal.asm.tree.ClassNode;
 import com.axelor.internal.asm.tree.FieldInsnNode;
 import com.axelor.internal.asm.tree.MethodNode;
+import com.axelor.meta.db.MetaJsonRecord;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -218,6 +219,22 @@ public class Mapper {
    */
   public Property getProperty(String name) {
     return fields.get(name);
+  }
+
+  /**
+   * Get the {@link Property} or {@link JsonProperty} of the given name if it exists.
+   *
+   * @param bean the bean
+   * @param name name of the property
+   * @return a Property or null if property doesn't exist.
+   */
+  public Property getProperty(Object bean, String name) {
+    return Optional.ofNullable(getProperty(name))
+        .orElseGet(
+            () ->
+                bean instanceof MetaJsonRecord
+                    ? JsonProperty.of(((MetaJsonRecord) bean).getJsonModel(), name)
+                    : JsonProperty.of(bean.getClass(), name));
   }
 
   /**

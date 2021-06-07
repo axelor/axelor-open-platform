@@ -1,0 +1,17 @@
+---
+title: Add support for CSV/XML data import of custom fields
+description: |
+  Example:
+
+  ```xml
+  <!-- for CSV data -->
+  <input file="some-data.csv" ...>
+    <bind column="some" to="$attrs.some" />
+  </input>
+
+  <!-- for XML data -->
+  <input file="some-data.xml" ...>
+    <bind node="some" to="$attrs.some" />
+  </input>
+  ```
+type: feature
