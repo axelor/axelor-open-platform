@@ -174,7 +174,8 @@ public class CSVBind {
 
                       @Override
                       public String apply(String input) {
-                        return String.format("self.%s = :%s_%s_", input, field, input);
+                        return String.format(
+                            "self.%s = :%s_%s_", input, field.replace('.', '_'), input);
                       }
                     }));
 

@@ -38,7 +38,7 @@ public class JsonProperty extends Property {
   final String fieldName;
   final String subFieldName;
 
-  private static final String KEY_JSON_PREFIX = "$";
+  public static final String KEY_JSON_PREFIX = "$";
   private static final Annotation[] EMPTY_ANNOTATIONS = {};
 
   private JsonProperty(

@@ -21,6 +21,7 @@ import com.axelor.data.AuditHelper;
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
+import com.axelor.db.mapper.JsonProperty;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -37,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,11 +129,20 @@ public class CSVBinder {
       if (field.contains(".")) {
 
         String[] parts = field.split("\\.");
+
+        if (field.startsWith(JsonProperty.KEY_JSON_PREFIX) && parts.length > 2) {
+          final String fieldName = String.format("%s.%s", parts[0], parts[1]);
+          final String subFieldName =
+              Arrays.stream(Arrays.copyOfRange(parts, 2, parts.length))
+                  .collect(Collectors.joining("."));
+          parts = new String[] {fieldName, subFieldName};
+        }
+
         beanFields.add(parts[0]);
 
         Set<String> refs = refFields.get(parts[0]);
         if (refs == null) {
-          refs = new HashSet<String>();
+          refs = new HashSet<>();
           refFields.put(parts[0], refs);
         }
         refs.add(parts[1]);
