@@ -1524,6 +1524,7 @@ ui.directive('uiFilterBox', function() {
         }
 
         if (applyingDefaults) {
+          search._applyingDefaults = true;
           $scope.$parent._dataSource._filter = search;
           $scope.$emit('on:default-search-filters-applied');
           return Promise.resolve(search);

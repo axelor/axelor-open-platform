@@ -78,6 +78,11 @@ function GridViewCtrl($scope, $element) {
           _pageNum: pageNum
         };
 
+        if (opts._applyingDefaults) {
+          opts._defaultSortBy = sortBy;
+          delete opts._applyingDefaults;
+        }
+
         $scope.filter(opts).then(function(){
           $scope.$broadcast('on:grid-selection-change', $scope.getContext(), true);
           $scope.updateRoute();
@@ -313,6 +318,10 @@ function GridViewCtrl($scope, $element) {
         filter: searchFilter,
         fields: fields
       };
+      if (searchFilter._defaultSortBy) {
+        options.sortBy = searchFilter._defaultSortBy;
+        delete searchFilter._defaultSortBy;
+      }
       if (searchFilter.archived !== undefined) {
         options.archived = searchFilter.archived;
       }
