@@ -557,7 +557,7 @@ td.form-item > * {
   border-color: #B94A48;
 }
 
-.ng-invalid.editable .select {
+.ng-invalid.editable > div > .select {
   color: #B94A48;
 }
 
@@ -570,7 +570,7 @@ td.form-item > * {
   border-color: #953B39;
 }
 
-.ng-invalid.editable .select:focus {
+.ng-invalid.editable > div > .select:focus {
   color: #953B39;
 }
 
@@ -584,7 +584,7 @@ td.form-item > * {
   border-color: #ccc;
 }
 
-.nested-not-required .form-item .ng-invalid.editable .select {
+.nested-not-required .form-item .ng-invalid.editable > div > .select {
   color: #333;
 }
 
@@ -597,7 +597,7 @@ td.form-item > * {
   border-color: #953B39;
 }
 
-.nested-not-required .form-item .ng-invalid.editable .select:focus {
+.nested-not-required .form-item .ng-invalid.editable > div > .select:focus {
   color: #953B39;
 }
 
