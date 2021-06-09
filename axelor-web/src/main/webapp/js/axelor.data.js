@@ -34,7 +34,7 @@
    * is missing (assuming, they are not modified).
    *
    */
-  function equals(a, b) {
+  function equals(a, b, jsonKeys) {
     if (a === b) return true;
     if (a === null || b === null) return false;
     if (a !== a && b !== b) return true; // NaN === NaN
@@ -59,13 +59,21 @@
       _.each(obj, function(v, k) {
         if (k.substring(0, 2) === '__') return;
         if (k === 'selected') return; // selected is transient field
-        res[k] = compact(v);
+        res[k] = _.indexOf(jsonKeys, k) < 0 ? compact(v) : compactJson(v);
       });
       res.id = res.id || res.$id; // make sure to use dummy id
       return res;
     }
+    function compactJson(obj) {
+      try {
+        return JSON.stringify(JSON.parse(obj));
+      } catch (e) {
+        console.warn(_.sprintf("Invalid JSON: %s", obj));
+      }
+      return compact(obj);
+    }
     return angular.equals(compact(a), compact(b));
-  };
+  }
 
   ds.equals = equals;
   ds.factory('DataSource', ['$injector', '$rootScope', '$http', '$q', '$exceptionHandler', function($injector, $rootScope, $http, $q, $exceptionHandler) {

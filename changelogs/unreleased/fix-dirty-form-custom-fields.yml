@@ -1,0 +1,3 @@
+---
+title: Fix dirty form when there are custom multirelational fields
+type: fix
