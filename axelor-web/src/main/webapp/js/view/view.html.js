@@ -108,7 +108,7 @@ var directiveFn = function(){
           if (tab.$viewScope !== scope) return;
           var iframe = element.find('iframe')[0];
           var embed = iframe.contentDocument ? iframe.contentDocument.body.firstChild : null;
-          if (embed && embed.id === 'plugin') {
+          if (embed && embed.type === 'application/pdf' && embed.height === '100%') {
             embed.height = '101%';
             setTimeout(function () {
               embed.height = '100%';
