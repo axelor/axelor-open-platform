@@ -1,6 +1,8 @@
 ## 5.0.28 (current)
 
-TBD
+### Bugs
+
+* Fix empty PDF tab with latest Chrome
 
 ## 5.0.27 (2021-04-15)
 

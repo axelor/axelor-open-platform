@@ -107,8 +107,8 @@ var directiveFn = function(){
         scope.$on('on:nav-click', function (e, tab) {
           if (tab.$viewScope !== scope) return;
           var iframe = element.find('iframe')[0];
-          var embed = iframe.contentDocument.body.firstChild;
-          if (embed && embed.id === 'plugin') {
+          var embed = iframe.contentDocument ? iframe.contentDocument.body.firstChild : null;
+          if (embed && embed.type === 'application/pdf' && embed.height === '100%') {
             embed.height = '101%';
             setTimeout(function () {
               embed.height = '100%';
