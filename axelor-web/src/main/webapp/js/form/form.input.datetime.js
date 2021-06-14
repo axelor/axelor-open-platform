@@ -162,7 +162,8 @@ $.extend($.ui.mask.prototype.options.definitions, {
   "DD": createTwoDigitDefinition( 31 ),
   "YYYY": yearsDefinition,
   "HH": createTwoDigitDefinition( 23 ),
-  "mm": createTwoDigitDefinition( 59 )
+  "mm": createTwoDigitDefinition( 59 ),
+  "ss": createTwoDigitDefinition( 59 ),
 });
 
 // datepicker keyboad navigation hack
@@ -464,7 +465,7 @@ ui.formInput('Date', 'DateTime', {
 ui.formInput('Time', 'DateTime', {
 
   css: 'time-item',
-  mask: 'HH:mm',
+  mask: null,
 
   init: function(scope) {
     this._super(scope);
@@ -479,6 +480,9 @@ ui.formInput('Time', 'DateTime', {
   },
 
   link_editable: function(scope, element, attrs, model) {
+    if (!this.mask) {
+      this.mask = ui.getTimeFormat(scope.field);
+    }
 
     element.mask({
       mask: this.mask
@@ -502,7 +506,7 @@ ui.formInput('Time', 'DateTime', {
     });
 
     scope.validate = function(value) {
-      return !value || /^(\d+:\d+)$/.test(value);
+      return !value || /^(\d+:\d+(:\d+)?)$/.test(value);
     };
 
     function updateModel() {
@@ -619,7 +623,7 @@ ui.formInput('Duration', 'Time', {
       mask = '9' + mask;
     }
     if (field.seconds) {
-      mask += ':mm';
+      mask += ':ss';
     }
 
     this.mask = mask;
