@@ -144,11 +144,13 @@ var Formatters = {
   },
 
   "time": function(field, value) {
-    return value ? value : "";
+    var attrs = _.extend({}, field, field.widgetAttrs);
+    return ui.formatters.time(attrs, value);
   },
 
   "datetime": function(field, value) {
-    return ui.formatters.datetime(field, value);
+    var attrs = _.extend({}, field, field.widgetAttrs);
+    return ui.formatters.datetime(attrs, value);
   },
 
   "one-to-one": function(field, value, record) {

@@ -1,0 +1,6 @@
+---
+title: Serialize Time with seconds
+description: |
+  Time is now serialized with formatter "HH:mm:ss".
+  Seconds are still not displayed by default in client (need to use `x-seconds="true"`).
+type: change

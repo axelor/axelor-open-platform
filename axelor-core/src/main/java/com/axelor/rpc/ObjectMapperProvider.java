@@ -123,7 +123,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
         java.time.LocalTime value, JsonGenerator jgen, SerializerProvider provider)
         throws IOException, JsonProcessingException {
       if (value != null) {
-        jgen.writeString(value.format(DateTimeFormatter.ofPattern("HH:mm")));
+        jgen.writeString(value.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
       }
     }
   }

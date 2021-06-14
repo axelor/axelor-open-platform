@@ -236,7 +236,7 @@ ui.formInput('DateTime', {
 
   css	: 'datetime-item',
 
-  getFormat: function () { return ui.dateTimeFormat; },
+  getFormat: function (field) { return ui.getDateTimeFormat(field); },
   getMask: function () { return ui.dateTimeFormat; },
 
   widgets: ['Datetime'],
@@ -255,7 +255,7 @@ ui.formInput('DateTime', {
 
     scope.format = function(value) {
       if (value) {
-        return moment(value).format(that.getFormat());
+        return moment(value).format(that.getFormat(scope.field));
       }
       return value;
     };
@@ -474,7 +474,7 @@ ui.formInput('Time', 'DateTime', {
     };
 
     scope.format = function(value) {
-      return value;
+      return value ? ui.formatters.time(scope.field, value) : value;
     };
   },
 

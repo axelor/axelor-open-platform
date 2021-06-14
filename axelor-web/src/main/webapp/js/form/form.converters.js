@@ -200,7 +200,7 @@
         return value;
       }
       if (format === undefined || format == null) {
-        return value && value.length > 10 ? formatDateTime(value) : formatDate(value);
+        return value && value.length > 10 ? formatDateTime(null, value) : formatDate(value);
       }
       return moment(value).locale(getBrowserLocale()).format(format);
     };
@@ -225,8 +225,13 @@
     return value ? moment(value).format(format) : "";
   }
 
-  function formatDateTime(value) {
-    var format = arguments.length > 1 ? arguments[1] : ui.dateTimeFormat;
+  function formatTime(field, value) {
+    var format = arguments.length > 2 ? arguments[2] : ui.getTimeFormat(field);
+    return value ? moment(value, [moment.ISO_8601, 'HH:mm:ss']).format(format) : "";
+  }
+
+  function formatDateTime(field, value) {
+    var format = arguments.length > 2 ? arguments[2] : ui.getDateTimeFormat(field);
     return value ? moment(value).format(format) : "";
   }
 
@@ -253,9 +258,21 @@
 
   Object.defineProperty(ui, 'dateTimeFormat', {
     get: function () {
-      return this.dateFormat + ' HH:mm';
+      return this.dateFormat + ' ' + ui.getTimeFormat();
     }
   });
+
+  ui.getTimeFormat = function (field) {
+    var format = "HH:mm";
+    if ((field || {}).seconds) {
+      format += ":ss";
+    }
+    return format;
+  }
+
+  ui.getDateTimeFormat = function (field) {
+    return this.dateFormat + ' ' + ui.getTimeFormat(field);
+  }
 
   ui.formatters = {
 
@@ -295,11 +312,11 @@
     },
 
     "time": function(field, value) {
-      return value ? value : "";
+      return formatTime(field, value);
     },
 
     "datetime": function(field, value) {
-      return formatDateTime(value);
+      return formatDateTime(field, value);
     },
 
     "many-to-one": function(field, value) {
