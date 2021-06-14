@@ -361,6 +361,7 @@ function GridViewCtrl($scope, $element) {
       var operator = 'like';
       var origValue = value;
       var value2;
+      var granularity = 'day';
 
       //TODO: implement expression parser
 
@@ -382,7 +383,7 @@ function GridViewCtrl($scope, $element) {
           value2 = match[2].trim();
           return match[4].trim();
         }
-        match = /(<=?|>=?|=)(.*)/.exec(val);
+        match = /(<=?|>=?|!?=)(.*)/.exec(val);
         if (match) {
           operator = match[1];
           return match[2].trim();
@@ -391,9 +392,46 @@ function GridViewCtrl($scope, $element) {
       }
 
       function toMoment(val) {
-        var format = 'MM/YYYY';
-        if (/\d+\/\d+\/\d+/.test(val)) format = ui.dateFormat;
-        if (/\d+\/\d+\/\d+\s+\d+:\d+/.test(val)) format = ui.dateTimeFormat;
+        var monthFirst = /M+.+D+/.test(ui.dateFormat);
+        var format = monthFirst ? 'MM/DD' : 'MM/YYYY';
+        granularity = 'month';
+        if (/^\D*\d{4,}\D*$/.test(val)) {
+          format = 'YYYY';
+          granularity = 'year';
+        } else if (/^\D*\d{1,2}\D*$/.test(val)) {
+          format = 'MM';
+        } else if (/^\D*\d{4,}\D+\d{1,2}\D*$/.test(val)) {
+          format = 'YYYY/MM';
+        } else if (/^\D*\d{1,2}\D+\d{1,2}\D*$/.test(val)) {
+          format = monthFirst ? 'MM/DD' : 'DD/MM';
+        } else if (/^\D*\d{1,2}\D+\d{4,}\D*$/.test(val)) {
+          format = 'MM/YYYY';
+        } else if (/^\D*\d+\D+\d+\D+\d+\D*$/.test(val)) {
+          format = ui.dateFormat;
+          granularity = 'day';
+        } else if (/^\D*\d+\D+\d+\D+\d+\D+\d+\D*$/.test(val)) {
+          format = ui.dateTimeFormat.replace(/\W+m+$/, "");
+          granularity = 'hour';
+        } else if (/^\D*\d+\D+\d+\D+\d+\D+\d+\D+\d+\D*$/.test(val)) {
+          format = ui.dateTimeFormat;
+          granularity = 'minute';
+        } else if (/^\D*\d+\D+\d+\D+\d+\D+\d+\D+\d+\D+\d+\D*$/.test(val)) {
+          format = ui.getDateTimeFormat({seconds: true});
+          granularity = 'second';
+        }
+        return val ? moment(val, format) : moment();
+      }
+
+      function toTimeMoment(val) {
+        var format = ui.getTimeFormat();
+        granularity = 'minute';
+        if (/^\D*\d+\D*$/.test(val)) {
+          format = (format.match(/\w+/) || [])[0] || format;
+          granularity = 'hour';
+        } else if (/^\D*\d+\D+\d+\D+\d+\D*$/.test(val)) {
+          format = ui.getTimeFormat({seconds: true});
+          granularity = 'second';
+        }
         return val ? moment(val, format) : moment();
       }
 
@@ -403,6 +441,44 @@ function GridViewCtrl($scope, $element) {
 
       function toDateString(val) {
           return moment.utc(val, ui.dateFormat).toDate().toISOString().split("T")[0];
+      }
+
+      function setValues(transform, format) {
+        value = transform(value);
+        value2 = value2 ? transform(value2) : value2;
+        switch (operator) {
+          case 'between':
+            if (!value2) {
+              value2 = value.clone();
+            }
+            if (value > value2) {
+              var tmp = value;
+              value = value2;
+              value2 = tmp;
+            }
+            value = format(value.startOf(granularity));
+            value2 = format(value2.endOf(granularity));
+            break;
+          case '<':
+          case '>=':
+            value = format(value.startOf(granularity));
+            break;
+          case '>':
+          case '<=':
+            value = format(value.endOf(granularity));
+            break;
+          case '=':
+            value = format(value);
+            break;
+          case '!=':
+            operator = 'notBetween';
+            value2 = value ? format(value.endOf(granularity)) : value;
+            value = value ? format(value.startOf(granularity)) : value;
+            break;
+          default:
+            value = format(value);
+            value2 = value2 ? format(value2) : value2;
+        }
       }
 
       switch(type) {
@@ -418,21 +494,17 @@ function GridViewCtrl($scope, $element) {
           operator = '=';
           value = !/f|n|false|no|0/.test(value);
           break;
-        case 'date':
-          operator = '=';
-          value = stripOperator(value);
-          if (value) value = toDateString(value);
-          if (value2) value2 = toDateString(value2);
-          break;
         case 'time':
-          operator = '=';
+          operator = 'between';
+          value = stripOperator(value);
+          setValues(toTimeMoment, function (v) {
+            return v.format(ui.getTimeFormat({seconds: true})); });
           break;
+        case 'date':
         case 'datetime':
           operator = 'between';
           value = stripOperator(value);
-          var val = toMoment(value);
-          value = (operator == 'between' ? val.startOf('day') : val).toDate().toISOString();
-          value2 = (operator == 'between' ? val.endOf('day') : val).toDate().toISOString();
+          setValues(toMoment, function (v) { return v.toDate().toISOString(); });
           break;
         case 'enum':
         case 'selection':
