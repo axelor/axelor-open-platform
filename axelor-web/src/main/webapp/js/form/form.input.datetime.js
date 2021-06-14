@@ -238,7 +238,7 @@ ui.formInput('DateTime', {
   css	: 'datetime-item',
 
   getFormat: function (field) { return ui.getDateTimeFormat(field); },
-  getMask: function () { return ui.dateTimeFormat; },
+  getMask: function (field) { return ui.getDateTimeFormat(field); },
 
   widgets: ['Datetime'],
 
@@ -273,9 +273,11 @@ ui.formInput('DateTime', {
 
     var options = {
       dateFormat: ui.dateFormat.toLowerCase().replace('yyyy', 'yy'),
+      timeFormat: ui.getTimeFormat(props),
       showButtonsPanel: false,
       showTime: false,
       showOn: null,
+      showSecond: props.seconds,
       beforeShow: function (e, ui) {
         lastValue = input.mask("value") || '';
         isShowing = true;
@@ -302,7 +304,7 @@ ui.formInput('DateTime', {
 
     input.datetimepicker(options);
     input.mask({
-      mask: this.getMask()
+      mask: this.getMask(props)
     });
 
     var changed = false;
@@ -465,7 +467,7 @@ ui.formInput('Date', 'DateTime', {
 ui.formInput('Time', 'DateTime', {
 
   css: 'time-item',
-  mask: null,
+  getMask: function (field) { return ui.getTimeFormat(field); },
 
   init: function(scope) {
     this._super(scope);
@@ -480,12 +482,8 @@ ui.formInput('Time', 'DateTime', {
   },
 
   link_editable: function(scope, element, attrs, model) {
-    if (!this.mask) {
-      this.mask = ui.getTimeFormat(scope.field);
-    }
-
     element.mask({
-      mask: this.mask
+      mask: this.getMask(scope.field)
     });
 
     element.change(function(e, ui) {
@@ -587,6 +585,17 @@ ui.formatDuration = formatDuration;
 
 ui.formInput('Duration', 'Time', {
   metaWidget: true,
+  getMask: function (field) {
+    field = field || {};
+    var mask = '99:mm';
+    if (field.big) {
+      mask = '9' + mask;
+    }
+    if (field.seconds) {
+      mask += ':ss';
+    }
+    return mask;
+  },
 
   init: function(scope) {
     this._super(scope);
@@ -616,17 +625,6 @@ ui.formInput('Duration', 'Time', {
   },
 
   link_editable: function(scope, element, attrs, model) {
-    var field = scope.field || {},
-      mask = '99:mm';
-
-    if (field.big) {
-      mask = '9' + mask;
-    }
-    if (field.seconds) {
-      mask += ':ss';
-    }
-
-    this.mask = mask;
     this._super.apply(this, arguments);
 
     scope.validate = function(value) {
