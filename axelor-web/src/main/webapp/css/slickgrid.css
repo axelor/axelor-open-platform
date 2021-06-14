@@ -649,7 +649,7 @@
   width: auto;
 }
 
-.slick-editor .form-item-container.time-item > input.ui-mask {
+.slick-editor .form-item-container.duration-item > input.ui-mask {
   text-align: right;
 }
 

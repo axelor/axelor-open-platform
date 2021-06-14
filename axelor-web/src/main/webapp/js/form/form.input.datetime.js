@@ -584,6 +584,7 @@ function formatDuration(field, value) {
 ui.formatDuration = formatDuration;
 
 ui.formInput('Duration', 'Time', {
+  css: 'time-item duration-item',
   metaWidget: true,
   getMask: function (field) {
     field = field || {};
