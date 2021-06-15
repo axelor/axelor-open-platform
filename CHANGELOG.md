@@ -1,5 +1,9 @@
 ## 5.0.28 (Current)
 
+### Enhancements
+
+* Add property `ldap.use.ssl` for LDAPS authentication
+
 ## 5.0.28 (2021-09-08)
 
 ### Bugs
