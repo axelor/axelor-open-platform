@@ -27,6 +27,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.Sets;
 import com.google.inject.persist.Transactional;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -68,9 +69,14 @@ public class AuthLdap {
 
   public static final String DEFAULT_AUTH_TYPE = "simple";
 
+  public static final String LDAP_USE_SSL = "ldap.use.ssl";
+  public static final String LDAP_USE_SSL_TRUE_VALUE = "true";
+
   private String ldapServerUrl;
 
   private String ldapAuthType;
+
+  private Boolean ldapUseSSL;
 
   private String ldapSysUser;
 
@@ -105,11 +111,18 @@ public class AuthLdap {
     ldapGroupFilter = properties.getProperty(LDAP_GROUP_FILTER);
     ldapUserFilter = properties.getProperty(LDAP_USER_FILTER);
     ldapGroupObjectClass = properties.getProperty(LDAP_GROUP_OBJECT_CLASS);
+    ldapUseSSL = LDAP_USE_SSL_TRUE_VALUE.equals(properties.getProperty(LDAP_USE_SSL));
 
     factory.setUrl(ldapServerUrl);
     factory.setSystemUsername(ldapSysUser);
     factory.setSystemPassword(ldapSysPassword);
     factory.setAuthenticationMechanism(ldapAuthType);
+
+    if (ldapUseSSL) {
+      Map<String, Object> env = factory.getEnvironment();
+      env.put("java.naming.security.protocol", "ssl");
+      factory.setEnvironment(env);
+    }
 
     this.authService = authService;
   }
