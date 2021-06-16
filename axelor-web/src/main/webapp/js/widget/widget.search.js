@@ -1538,19 +1538,20 @@ ui.directive('uiFilterBox', function() {
       $scope.onFreeSearch = function() {
 
         var filters = [],
-          fields = {},
           text = this.custTerm,
           number = +(text);
 
-        var freeSearch = handler.schema && handler.schema.freeSearch;
-        var freeCols = freeSearch && freeSearch !== 'all' ? freeSearch.split(/\s*,\s*/) : [];
-        var cols = freeCols.length === 0 ? $scope.findCols() : freeCols;
-
         text = text ? text.trim() : null;
-        fields = _.pick(this.$parent.fields, cols);
 
         if (text) {
-          for(var name in fields) {
+          var freeSearch = handler.schema && handler.schema.freeSearch;
+          var freeCols = freeSearch && freeSearch !== 'all' ? freeSearch.split(/\s*,\s*/) : [];
+          var cols = freeCols.length === 0 ? $scope.findCols() : freeCols;
+          var fields = this.$parent.fields || {};
+          var viewItems = (this.$parent.view || {}).items
+            || Object.values(this.$parent.viewItems || {}) || [];
+
+          _.each(cols, function (name) {
 
             var fieldName = null,
               operator = "like",
@@ -1558,13 +1559,18 @@ ui.directive('uiFilterBox', function() {
 
             var field = fields[name];
 
-            if (field.transient) continue;
+            if (!field) {
+              field = _.findWhere(viewItems, {name: name});
+              if (!field) return;
+            }
+
+            if (field.transient) return;
 
             switch (field.type) {
             case 'integer':
             case 'decimal':
-              if (_.isNaN(number) || !_.isNumber(number)) continue;
-              if (field.type === 'integer' && (number > 2147483647 || number < -2147483648)) continue;
+              if (_.isNaN(number) || !_.isNumber(number)) return;
+              if (field.type === 'integer' && (number > 2147483647 || number < -2147483648)) return;
               fieldName = name;
               operator = '=';
               value = number;
@@ -1590,14 +1596,14 @@ ui.directive('uiFilterBox', function() {
               break;
             }
 
-            if (!fieldName) continue;
+            if (!fieldName) return;
 
             filters.push({
               fieldName: fieldName,
               operator: operator,
               value: value
             });
-          }
+          });
         }
 
         var criteria = {
@@ -1707,9 +1713,13 @@ ui.directive('uiFilterBox', function() {
 
       scope.findCols = function () {
         var grid = element.parents('.grid-view:first').children('[ui-slick-grid]:first').data('grid');
-        return grid
+        var cols = grid
           ? _.pluck(grid.getColumns(), 'field').filter(function (n) { return n in scope.$parent.fields; })
-          : _.pluck(scope.$parent.fields, 'name');
+          : _.chain(scope.$parent.fields).filter(function (item) { return !item.json; }).pluck('name').value();
+        var viewItems = (this.$parent.view || {}).items || Object.values(this.$parent.viewItems || {}) || [];
+        var jsonCols = _.chain(viewItems)
+          .filter(function (item) { return item.jsonField; }).pluck('name').value();
+        return cols.concat(jsonCols);
       };
 
       scope.handler.$watch('schema.freeSearch', function searchFreeSearchWatch(value, old) {
