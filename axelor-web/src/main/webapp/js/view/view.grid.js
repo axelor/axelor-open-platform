@@ -1067,7 +1067,7 @@ ui.directive('uiNestedGridActions', function () {
     template:
       "<div class='panel-related-actions'>" +
         "<div class='btn-group view-toolbar' ng-if='toolbar.length'>" +
-          "<button ng-repeat='btn in toolbar | filter:{custom: true} | limitTo:3' class='btn' ui-tool-button='btn'>{{btn.title}}</button>" +
+          "<button type='button' ng-repeat='btn in toolbar | filter:{custom: true} | limitTo:3' class='btn' ui-tool-button='btn'>{{btn.title}}</button>" +
         "</div>" +
         "<div ui-menu-bar x-menus='[menubar[0]]' x-handler='this' class='view-menubar' ng-if='menubar.length'></div>" +
       "</div>"
