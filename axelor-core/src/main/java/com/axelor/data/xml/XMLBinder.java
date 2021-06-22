@@ -202,7 +202,7 @@ public abstract class XMLBinder {
       }
     }
 
-    return isNull ? null : bean;
+    return isNull ? null : binding.postBind(bean);
   }
 
   @SuppressWarnings("all")

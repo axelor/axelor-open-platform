@@ -50,6 +50,10 @@ public class XMLConfig {
     XStream stream = XStreamUtils.createXStream();
     stream.setMode(XStream.NO_REFERENCES);
     stream.processAnnotations(XMLConfig.class);
+    stream.registerConverter(
+        new XMLBindConverter(
+            stream.getConverterLookup().lookupConverterForType(XMLBind.class),
+            stream.getReflectionProvider()));
     return (XMLConfig) stream.fromXML(input);
   }
 }

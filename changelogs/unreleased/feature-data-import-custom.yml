@@ -14,4 +14,72 @@ description: |
     <bind node="some" to="$attrs.some" />
   </input>
   ```
+
+  For custom model records, you can specify `json-model` in order to automatically bind jsonModel,
+  handle search domain, and set namecolumn.
+
+  Example:
+
+  ```xml
+  <!-- Configuration -->
+
+  <bind node="electricityBillSubscription" json-model="ElectricityBillSubscription" update="true"
+      search="json_extract_text(self.attrs, 'name') = :_electricityBillSubscriptionName">
+    <bind node="name" to="_electricityBillSubscriptionName" />
+    <bind node="name" to="$attrs.name" />
+    <bind node="startDate" to="$attrs.startDate" adapter="LocalDate" />
+    <bind node="endDate" to="$attrs.endDate" adapter="LocalDate" />
+
+    <bind node="product" to="$attrs.product" search="self.code = :code" create="false">
+      <bind node="@code" to="code" />
+    </bind>
+
+    <bind node="billSubscription" to="$attrs.billSubscription" update="true"
+        search="json_extract_text(self.attrs, 'name') = :_billSubscriptionName">
+      <bind node="@name" to="_billSubscriptionName" />
+      <bind node="@name" to="$attrs.name" />
+    </bind>
+  </bind>
+
+  <bind node="user" type="com.axelor.auth.db.User" search="self.code = :code" update="true">
+    <bind node="code" to="code" />
+    <bind node="name" to="name" />
+    <bind node="password" to="password" />
+
+    <bind node="group" to="group" search="self.code = :code" create="false">
+      <bind node="@code" to="code" />
+    </bind>
+
+    <bind node="product" to="$attrs.product" search="self.code = :code" create="false">
+      <bind node="@code" to="code" />
+    </bind>
+
+    <bind node="billSubscription" to="$attrs.billSubscription" update="true"
+        search="json_extract_text(self.attrs, 'name') = :_billSubscriptionName">
+      <bind node="@name" to="_billSubscriptionName" />
+      <bind node="@name" to="$attrs.name" />
+    </bind>
+  </bind>
+  ```
+
+  ```xml
+  <!-- Data -->
+
+  <electricityBillSubscription>
+    <name>Bill Jan2021</name>
+    <startDate>01/01/2021</startDate>
+    <endDate>31/01/2021</endDate>
+    <product code="COMP-0001"/>
+    <billSubscription name="Test01"/>
+  </electricityBillSubscription>
+
+  <user>
+    <code>test</code>
+    <name>Test</name>
+    <password>test</password>
+    <group code="users"/>
+    <product code="COMP-0002"/>
+    <billSubscription name="Test02"/>
+  </user>
+  ```
 type: feature

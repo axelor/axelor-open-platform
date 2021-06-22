@@ -75,12 +75,18 @@ public class XMLBind {
   @XStreamImplicit(itemFieldName = "bind")
   private List<XMLBind> bindings;
 
+  private boolean bindingsInitialized;
+
   public String getNode() {
     return node;
   }
 
   public String getField() {
     return field;
+  }
+
+  protected void setField(String field) {
+    this.field = field;
   }
 
   public String getAlias() {
@@ -120,6 +126,10 @@ public class XMLBind {
     return expression;
   }
 
+  protected void setExpression(String expression) {
+    this.expression = expression;
+  }
+
   public String getCondition() {
     return condition;
   }
@@ -137,7 +147,23 @@ public class XMLBind {
   }
 
   public List<XMLBind> getBindings() {
+    if (!bindingsInitialized) {
+      setParentBindings();
+    }
+
     return bindings;
+  }
+
+  private void setParentBindings() {
+    if (bindings == null) {
+      return;
+    }
+
+    bindings.stream()
+        .filter(XMLBindJson.class::isInstance)
+        .map(XMLBindJson.class::cast)
+        .forEach(binding -> binding.setParent(this));
+    bindingsInitialized = true;
   }
 
   private Set<String> multiples;
@@ -264,5 +290,9 @@ public class XMLBind {
     if (alias != null) sb.append(" alias='").append(alias).append("'");
 
     return sb.append(" ... >").toString();
+  }
+
+  public Object postBind(Object bean) {
+    return bean;
   }
 }
