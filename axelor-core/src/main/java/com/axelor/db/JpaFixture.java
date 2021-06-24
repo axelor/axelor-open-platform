@@ -22,12 +22,15 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Construct;
@@ -126,6 +129,8 @@ import org.yaml.snakeyaml.nodes.Tag;
  */
 public class JpaFixture {
 
+  private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
   private InputStream read(String resource) {
     return ResourceUtils.getResourceStream("fixtures/" + resource);
   }
@@ -199,6 +204,7 @@ public class JpaFixture {
       try {
         JPA.manage((Model) item);
       } catch (Exception e) {
+        log.error(e.getMessage(), e);
       }
     }
   }
