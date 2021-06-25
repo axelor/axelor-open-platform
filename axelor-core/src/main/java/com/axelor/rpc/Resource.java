@@ -26,6 +26,7 @@ import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.Inflector;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
@@ -89,6 +90,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -103,6 +105,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.persistence.EntityTransaction;
@@ -463,6 +466,7 @@ public class Resource<T extends Model> {
     final boolean populate =
         request.getContext() != null && request.getContext().get("_populate") != Boolean.FALSE;
 
+    final JpaSecurity jpaSecurity = security.get();
     for (Object item : data) {
       if (item instanceof Model) {
         item = toMap(item);
@@ -898,7 +902,8 @@ public class Resource<T extends Model> {
     final List<Object> data = Lists.newArrayList();
     final String[] fields =
         request.getFields() == null ? null : request.getFields().toArray(new String[] {});
-    final Map<String, Object> values = mergeRelated(request, entity, toMap(entity, fields));
+    final Map<String, Object> map = toMap(entity, filterPermitted(entity, fields));
+    final Map<String, Object> values = mergeRelated(request, entity, map);
 
     data.add(repository.populate(values, request.getContext()));
     response.setData(data);
@@ -911,6 +916,7 @@ public class Resource<T extends Model> {
   @SuppressWarnings("all")
   private Map<String, Object> mergeRelated(
       Request request, Model entity, Map<String, Object> values) {
+    final JpaSecurity jpaSecurity = security.get();
     final Map<String, List<String>> related = request.getRelated();
     if (related == null) {
       return values;
@@ -930,7 +936,13 @@ public class Resource<T extends Model> {
                     ((Collection<?>) value)
                         .stream().map(input -> toMap(input, names)).collect(Collectors.toList());
               } else if (value instanceof Model) {
-                value = toMap(value, names);
+                final Model modelValue = (Model) value;
+                final Class<? extends Model> modelClass = EntityHelper.getEntityClass(modelValue);
+                if (jpaSecurity.isPermitted(JpaSecurity.CAN_READ, modelClass, modelValue.getId())) {
+                  value = toMap(value, filterPermitted(value, names));
+                } else {
+                  value = toMap(value, "id");
+                }
                 if (old instanceof Map) {
                   value = mergeMaps((Map) value, (Map) old);
                 }
@@ -1344,6 +1356,63 @@ public class Resource<T extends Model> {
 
   public boolean isPermitted(AccessType accessType, Long id) {
     return security.get().isPermitted(accessType, model, id);
+  }
+
+  /**
+   * Filters given field names so that only base fields and readable related fields remains.
+   *
+   * @param bean object
+   * @param names field names
+   * @return readable field names
+   */
+  @Nullable
+  public String[] filterPermitted(Object bean, String... names) {
+    if (ObjectUtils.isEmpty(names)) {
+      return names;
+    }
+
+    final JpaSecurity jpaSecurity = security.get();
+    final List<String> permittedNames = new ArrayList<>();
+    final Mapper beanMapper = Mapper.of(EntityHelper.getEntityClass(bean));
+
+    for (final String name : names) {
+      final List<String> nameParts = Arrays.asList(name.split("\\."));
+      if (nameParts.size() < 2) {
+        permittedNames.add(name);
+        continue;
+      }
+
+      Object value = bean;
+      Mapper mapper = beanMapper;
+      String permittedName = name;
+      for (int i = 0; i < nameParts.size(); ++i) {
+        final String namePart = nameParts.get(i);
+        value = mapper.get(value, namePart);
+        if (!(value instanceof Model)) {
+          break;
+        }
+
+        final Model modelValue = (Model) value;
+        final Class<? extends Model> modelClass = EntityHelper.getEntityClass(modelValue);
+        if (!jpaSecurity.isPermitted(JpaSecurity.CAN_READ, modelClass, modelValue.getId())) {
+          permittedName = nameParts.subList(0, i + 1).stream().collect(Collectors.joining("."));
+          break;
+        }
+
+        mapper = Mapper.of(modelClass);
+      }
+      if (StringUtils.notBlank(permittedName)) {
+        permittedNames.add(permittedName);
+      }
+    }
+
+    if (permittedNames.isEmpty() && names.length > 0) {
+      final String nameField =
+          Optional.ofNullable(beanMapper.getNameField()).map(Property::getName).orElse("id");
+      permittedNames.add(nameField);
+    }
+
+    return permittedNames.stream().toArray(String[]::new);
   }
 
   public static Map<String, Object> toMap(Object bean, String... names) {
