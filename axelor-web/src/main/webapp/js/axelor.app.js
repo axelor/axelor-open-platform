@@ -516,6 +516,10 @@
       });
     };
 
+    axelor.$openTab = function (tab, options) {
+      $scope.openTab(tab, options);
+    };
+
     axelor.$openHtmlTab = function (url, title) {
       $scope.openTab({
         title: title || url,

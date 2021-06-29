@@ -1,0 +1,5 @@
+---
+title: Expose $scope.openTab as axelor.$openTab
+type: feature
+description: |
+  The api can be useful for some apps loading in iframe.
