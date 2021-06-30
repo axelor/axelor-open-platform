@@ -19,8 +19,10 @@ package com.axelor.meta.schema.views;
 
 import static com.axelor.common.StringUtils.isBlank;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
@@ -30,6 +32,8 @@ public class PanelField extends Field {
   @XmlElement private PanelViewer viewer;
 
   @XmlElement private PanelEditor editor;
+
+  @XmlTransient @JsonIgnore private boolean fromEditor;
 
   public PanelViewer getViewer() {
     if (viewer != null) {
@@ -52,5 +56,13 @@ public class PanelField extends Field {
 
   public void setEditor(PanelEditor editor) {
     this.editor = editor;
+  }
+
+  public boolean isFromEditor() {
+    return fromEditor;
+  }
+
+  void setFromEditor(boolean fromEditor) {
+    this.fromEditor = fromEditor;
   }
 }

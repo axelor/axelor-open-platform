@@ -511,7 +511,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
             return;
           }
           record.$fetchedRelated = true;
-          return ds.read(value, {fields: missing}).success(function(rec) {
+          return ds.read(value, {fields: missing}, {silent: true}).success(function(rec) {
             var values = _.pick(rec, missing);
             record = _.extend(record, values);
           });

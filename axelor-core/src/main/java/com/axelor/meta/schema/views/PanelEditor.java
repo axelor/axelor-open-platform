@@ -20,17 +20,21 @@ package com.axelor.meta.schema.views;
 import com.axelor.common.StringUtils;
 import com.axelor.meta.MetaStore;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
@@ -39,6 +43,8 @@ public class PanelEditor extends AbstractPanel {
 
   transient PanelField forField;
   transient List<Object> targetFields;
+
+  @XmlTransient @JsonIgnore private boolean fromEditorProcessed;
 
   @XmlAttribute private String layout;
 
@@ -79,6 +85,12 @@ public class PanelEditor extends AbstractPanel {
   public List<AbstractWidget> getItems() {
     // process target fields
     getTargetFields();
+
+    if (!fromEditorProcessed) {
+      processFromEditor();
+      fromEditorProcessed = true;
+    }
+
     return process(items);
   }
 
@@ -136,5 +148,20 @@ public class PanelEditor extends AbstractPanel {
     this.targetFields.addAll((Collection<?>) fields.get("fields"));
 
     return targetFields;
+  }
+
+  /** Sets flags in child fields so that we know those fields are within an editor. */
+  protected void processFromEditor() {
+    final Queue<AbstractWidget> widgets = new ArrayDeque<>();
+    widgets.addAll(items);
+
+    while (!widgets.isEmpty()) {
+      final AbstractWidget widget = widgets.remove();
+      if (widget instanceof PanelField) {
+        ((PanelField) widget).setFromEditor(true);
+      } else if (widget instanceof Panel) {
+        widgets.addAll(((Panel) widget).getItems());
+      }
+    }
   }
 }

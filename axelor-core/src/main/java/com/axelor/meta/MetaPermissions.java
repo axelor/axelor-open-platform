@@ -27,6 +27,9 @@ import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaPermission;
 import com.axelor.meta.db.MetaPermissionRule;
+import com.axelor.meta.schema.views.PanelField;
+import com.axelor.meta.schema.views.SimpleWidget;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import javax.inject.Singleton;
@@ -116,7 +119,7 @@ public class MetaPermissions {
             .isPermitted(JpaSecurity.CAN_READ, property.getTarget().asSubclass(Model.class));
   }
 
-  public boolean isRelatedReadable(String object, String field) {
+  public boolean isRelatedReadable(String object, String field, SimpleWidget widget) {
     if (StringUtils.isBlank(object)) return true;
     final Class<?> klass;
     try {
@@ -130,6 +133,14 @@ public class MetaPermissions {
 
     if (fieldParts.length < 2) {
       property = mapper.getProperty(field);
+
+      // For editor fields, allow name field only if no read permissions.
+      if (widget instanceof PanelField && ((PanelField) widget).isFromEditor()) {
+        return Objects.equals(property, mapper.getNameField())
+            || Beans.get(JpaSecurity.class)
+                .isPermitted(JpaSecurity.CAN_READ, klass.asSubclass(Model.class));
+      }
+
       return property == null
           || !property.isCollection()
           || Beans.get(JpaSecurity.class)

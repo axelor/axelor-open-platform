@@ -180,7 +180,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
       }
       final MetaPermissions perms = Beans.get(MetaPermissions.class);
       // hide o2m/m2m or dotted o2o/m2o if not readable at all
-      if (!perms.isRelatedReadable(object, field)) {
+      if (!perms.isRelatedReadable(object, field, item)) {
         item.setHidden(true);
         item.setHideIf("true");
         item.setShowIf(null);
