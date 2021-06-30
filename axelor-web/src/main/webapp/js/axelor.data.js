@@ -377,13 +377,13 @@
        * @param options request options
        * @returns promise
        */
-      read: function(id, options) {
+      read: function(id, options, config) {
         var promise, record;
         if (options) {
           promise = this._request('fetch', id).post({
             fields: options.fields,
             related: options.related
-          });
+          }, config);
         } else {
           promise = this._request(null, id).get();
         }

@@ -27,6 +27,7 @@ import com.axelor.db.mapper.Property;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaPermission;
 import com.axelor.meta.db.MetaPermissionRule;
+import java.util.Optional;
 import java.util.Set;
 import javax.inject.Singleton;
 
@@ -98,6 +99,7 @@ public class MetaPermissions {
     return null;
   }
 
+  @Deprecated
   public boolean isCollectionReadable(User user, String object, String field) {
     if (StringUtils.isBlank(object)) return true;
     final Class<?> klass;
@@ -112,6 +114,50 @@ public class MetaPermissions {
         || !property.isCollection()
         || Beans.get(JpaSecurity.class)
             .isPermitted(JpaSecurity.CAN_READ, property.getTarget().asSubclass(Model.class));
+  }
+
+  public boolean isRelatedReadable(String object, String field) {
+    if (StringUtils.isBlank(object)) return true;
+    final Class<?> klass;
+    try {
+      klass = Class.forName(object);
+    } catch (ClassNotFoundException e) {
+      throw new IllegalArgumentException(e);
+    }
+    Mapper mapper = Mapper.of(klass);
+    Property property;
+    final String[] fieldParts = Optional.ofNullable(field).orElse("").split("\\.");
+
+    if (fieldParts.length < 2) {
+      property = mapper.getProperty(field);
+      return property == null
+          || !property.isCollection()
+          || Beans.get(JpaSecurity.class)
+              .isPermitted(JpaSecurity.CAN_READ, property.getTarget().asSubclass(Model.class));
+    }
+
+    // Check for read permissions on dotted field
+
+    final JpaSecurity security = Beans.get(JpaSecurity.class);
+
+    for (final String fieldPart : fieldParts) {
+      property = mapper.getProperty(fieldPart);
+      final Optional<Class<?>> target = Optional.ofNullable(property).map(Property::getTarget);
+
+      if (!target.isPresent()) {
+        break;
+      }
+
+      final Class<?> targetClass = target.get();
+
+      if (!security.isPermitted(JpaSecurity.CAN_READ, targetClass.asSubclass(Model.class))) {
+        return false;
+      }
+
+      mapper = Mapper.of(targetClass);
+    }
+
+    return true;
   }
 
   private boolean can(User user, String object, String field, String access) {

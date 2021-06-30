@@ -99,6 +99,8 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
     if (missing.length > 0 && value && value.id) {
       return ds.read(value.id, {
         fields: missing
+      }, {
+        silent: true
       }).success(function(rec){
         var record = _.extend({}, related, {
           id: value.id,
