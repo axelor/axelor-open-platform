@@ -22,6 +22,7 @@ import static com.axelor.common.StringUtils.isBlank;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
+import com.axelor.auth.AuthSecurityException;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
@@ -70,6 +71,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.inject.TypeLiteral;
@@ -111,6 +113,7 @@ import javax.inject.Provider;
 import javax.persistence.EntityTransaction;
 import javax.persistence.OptimisticLockException;
 import javax.validation.ValidationException;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.hibernate.StaleObjectStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1038,6 +1041,8 @@ public class Resource<T extends Model> {
       names = request.getFields().toArray(names);
     }
 
+    final Mapper mapper = Mapper.of(model);
+
     for (Object record : records) {
 
       if (record == null) {
@@ -1053,6 +1058,77 @@ public class Resource<T extends Model> {
       if (id == null || id <= 0L) {
         security.get().check(JpaSecurity.CAN_CREATE, model);
       }
+
+      // Check create/write permissions on related fields
+      ((Map<String, Object>) record)
+          .entrySet().stream()
+              .forEach(
+                  entry -> {
+                    final String name = entry.getKey();
+                    final Class<? extends Model> target =
+                        Optional.ofNullable(mapper.getProperty(name))
+                            .map(Property::getTarget)
+                            .map(
+                                targetClass ->
+                                    (Class<? extends Model>) targetClass.asSubclass(Model.class))
+                            .orElse(null);
+
+                    if (target == null) {
+                      return;
+                    }
+
+                    final Object value = entry.getValue();
+
+                    if (value instanceof Map) {
+                      final Map<String, Object> valueMap = (Map<String, Object>) value;
+                      final Long valueId = findId(valueMap);
+                      final AccessType valueAccessType;
+                      final boolean isPermitted;
+
+                      if (valueId == null || valueId <= 0L) {
+                        valueAccessType = JpaSecurity.CAN_CREATE;
+                        isPermitted = security.get().isPermitted(valueAccessType, target);
+                      } else {
+                        valueAccessType = JpaSecurity.CAN_WRITE;
+                        isPermitted = security.get().isPermitted(valueAccessType, target, valueId);
+                      }
+
+                      if (!isPermitted) {
+                        final Mapper valueMapper = Mapper.of(target);
+                        final Property nameField = valueMapper.getNameField();
+                        final Set<String> allowedKeys =
+                            Sets.newHashSet("id", "version", "name", "code");
+                        Optional.ofNullable(valueMapper.getNameField())
+                            .map(Property::getName)
+                            .ifPresent(allowedKeys::add);
+
+                        if (!allowedKeys.containsAll(valueMap.keySet())) {
+                          final AuthSecurityException cause =
+                              new AuthSecurityException(valueAccessType, target, valueId);
+                          throw new UnauthorizedException(cause.getMessage(), cause);
+                        }
+
+                        valueMap.clear();
+                        valueMap.put("id", valueId);
+                      }
+                    } else if (value instanceof Collection) {
+                      for (final Map<String, Object> valueMap :
+                          ((Collection<Map<String, Object>>) value)) {
+                        final Long valueId = findId(valueMap);
+                        final boolean isPermitted =
+                            valueId == null || valueId <= 0L
+                                ? security.get().isPermitted(JpaSecurity.CAN_CREATE, target)
+                                : security
+                                    .get()
+                                    .isPermitted(JpaSecurity.CAN_WRITE, target, valueId);
+
+                        if (!isPermitted) {
+                          valueMap.clear();
+                          valueMap.put("id", valueId);
+                        }
+                      }
+                    }
+                  });
 
       Map<String, Object> orig = (Map) ((Map) record).get("_original");
       JPA.verify(model, orig);
