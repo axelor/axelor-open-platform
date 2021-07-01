@@ -429,12 +429,15 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
     return _.toBoolean(permitted);
   };
 
-  $scope.isPermitted = function(perm, record, callback) {
+  $scope.isPermitted = function(perm, record, callback, errorCallback) {
     var ds = this._dataSource;
     ds.isPermitted(perm, record).success(function(res){
       var errors = res.errors;
       if (errors) {
-        return axelor.dialogs.error(errors.read);
+        if (errorCallback) {
+          return errorCallback(errors);
+        }
+        return axelor.dialogs.error(Object.values(errors));
       }
       callback();
     });

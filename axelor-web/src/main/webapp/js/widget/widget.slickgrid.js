@@ -1103,6 +1103,16 @@ Grid.prototype._doInit = function(view) {
     that.resetColumns();
   });
 
+  // Cache write permission info and reset it after saved changes.
+  this.isPermittedWrite = {};
+  if (this.editorScope) {
+    scope.$on("on:edit", function () {
+      if (!_.isEmpty(that.isPermittedWrite)) {
+        that.isPermittedWrite = {};
+      }
+    });
+  }
+
   function onBeforeSave(e, record, noWait) {
 
     // only for editable grid
@@ -2034,6 +2044,25 @@ Grid.prototype.adjustEditor = function () {
 Grid.prototype.showEditor = function (activeCell) {
 
   if (this.isEditActive() || !this.canEdit()) return;
+
+  // Check for write permission on current row before going into edit mode.
+  var that = this;
+  var record = this.grid.getDataItem((activeCell || this.grid.getActiveCell()).row) || {};
+  var id = record.id;
+  var isPermittedWrite = this.isPermittedWrite[id];
+  if (isPermittedWrite === undefined) {
+    this.editorScope.isPermitted("write", record, function () {
+      that._showEditor(activeCell);
+      that.isPermittedWrite[id] = true;
+    }, function () {
+      that.isPermittedWrite[id] = false;
+    });
+  } else if (isPermittedWrite) {
+    this._showEditor(activeCell);
+  }
+}
+
+Grid.prototype._showEditor = function (activeCell) {
 
   var that = this;
   var form = this.editorForm;
