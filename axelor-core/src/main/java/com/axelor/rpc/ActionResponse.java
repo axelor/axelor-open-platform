@@ -19,11 +19,16 @@ package com.axelor.rpc;
 
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
+import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
+import com.axelor.db.mapper.Mapper;
+import com.axelor.inject.Beans;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.slf4j.Logger;
@@ -185,7 +190,38 @@ public class ActionResponse extends Response {
       values = new HashMap<>();
       setValues(values);
     }
-    values.put(fieldName, value);
+    final Object permittedValue = toPermitted(value);
+    values.put(fieldName, permittedValue);
+  }
+
+  /**
+   * Turns given bean into map of id, $version, and namecolumn if user has no read permission.
+   *
+   * @param bean object
+   * @return original bean or compact map of id, $version, and namecolumn if not permitted
+   */
+  @Nullable
+  private Object toPermitted(Object bean) {
+    if (!(bean instanceof Model)) {
+      return bean;
+    }
+
+    final Model model = (Model) bean;
+    final Class<? extends Model> beanClass =
+        EntityHelper.getEntityClass(model).asSubclass(Model.class);
+
+    if (Beans.get(JpaSecurity.class).isPermitted(JpaSecurity.CAN_READ, beanClass, model.getId())) {
+      return model;
+    }
+
+    final Mapper mapper = Mapper.of(beanClass);
+    final Map<String, Object> map = new HashMap<>();
+    map.put("id", mapper.getProperty("id").get(model));
+    map.put("$version", mapper.getProperty("version").get(model));
+    Optional.ofNullable(mapper.getNameField())
+        .ifPresent(property -> map.put(property.getName(), property.get(model)));
+
+    return map;
   }
 
   /**
