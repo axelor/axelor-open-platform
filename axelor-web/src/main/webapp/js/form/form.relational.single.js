@@ -669,7 +669,7 @@ function InlineManyToOneCtrl($scope, $element, DataSource, ViewService) {
     function set(val) {
       var record = _.pick(val, names);
       record.id = val.id;
-      record.$version = val.version || val.$version;
+      record.$version = val.version || val.$version || 0;
       $scope.setValue(record, true);
     }
 
