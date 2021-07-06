@@ -1,3 +1,18 @@
 ---
 title: Check for permissions on dotted fields
+description: |
+  Check for permissions on dotted fields:
+
+  * Filter permitted dotted fields in fetch request
+  * Check create/write permission on related fields in save request
+  * Filter permitted fields in ActionRequest.setValue
+  * Hide dotted fields if user has no access at all
+  * Hide dotted fields in editors if user has no access at all
+  * Check write permission on editable grid
+
+  Users are still permitted to read dotted fields’ id, version, and namecolumn
+  regardless of permissions.
+
+  Dotted fields are not hidden if there are conditional permissions,
+  but are shown empty if user has no permissions and check is still performed in save request.
 type: security
