@@ -17,17 +17,23 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import javax.xml.bind.annotation.XmlTransient;
 
 public interface ContainerView {
   List<AbstractWidget> getItems();
 
+  @XmlTransient
+  @JsonIgnore
   default List<AbstractWidget> getExtraItems() {
     return Collections.emptyList();
   }
 
+  @XmlTransient
+  @JsonIgnore
   default Set<String> getExtraNames() {
     return Collections.emptySet();
   }
