@@ -778,7 +778,7 @@ public class Resource<T extends Model> {
         List<String> line = new ArrayList<>();
         int index = 0;
         // Ignore first two items (id, version).
-        row = row.size() > 2 ? row.subList(2, row.size()) : Collections.emptyList();
+        row = row.size() > 2 ? row.subList(2, 2 + names.size()) : Collections.emptyList();
         for (Object value : row) {
           Object objValue = value == null ? "" : value;
           if (selection.containsKey(index)) {
