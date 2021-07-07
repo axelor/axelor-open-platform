@@ -494,6 +494,7 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
           }
           var missing = _.filter(_.keys(editor.fields), function (name) {
             if (!record) return false;
+            if (scope.$parent.isPermittedRead[_.sprintf("%s.%s", scope.$parent.field.name, name)] === false) return false;
             if (name.indexOf('.') === -1) {
               return !record.hasOwnProperty(name);
             }
@@ -511,9 +512,15 @@ ui.directive('uiPanelEditor', ['$compile', 'ActionService', function($compile, A
             return;
           }
           record.$fetchedRelated = true;
-          return ds.read(value, {fields: missing}, {silent: true}).success(function(rec) {
+          return ds.read(value, {fields: missing}, {silent: true}).success(function (rec) {
             var values = _.pick(rec, missing);
             record = _.extend(record, values);
+          }).error(function () {
+            _.each(missing, function (name) {
+              var fullName = _.sprintf("%s.%s", scope.$parent.field.name, name);
+              scope.$parent.isPermittedRead[fullName] = false;
+            });
+            scope.$root.$broadcast("on:record-perm-change");
           });
         };
         // make sure to trigger record-change with proper record data

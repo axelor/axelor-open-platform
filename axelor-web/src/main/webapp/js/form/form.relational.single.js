@@ -24,6 +24,12 @@ var ui = angular.module("axelor.ui");
 ui.ManyToOneCtrl = ManyToOneCtrl;
 ui.ManyToOneCtrl.$inject = ['$scope', '$element', 'DataSource', 'ViewService'];
 
+function updatePermittedRead($scope, fields) {
+  var readParams = {related: {}};
+  readParams.related[($scope.field || {}).name] = fields;
+  $scope.$emit("on:update-permitted-read", $scope.record, readParams);
+}
+
 function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
 
   ui.RefFieldCtrl.apply(this, arguments);
@@ -90,18 +96,15 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
     var related = {};
     var relatives = fields || $scope.findRelativeFields();
     var missing = _.filter(relatives, function (name) {
-      return !value || (name === nameField || ui.canSetNested(value, name)) && ui.findNested(value, name) === undefined;
+      return !value || (name === nameField || ui.canSetNested(value, name)) && ui.findNested(value, name) === undefined
+        && $scope.isPermittedRead[_.sprintf("%s.%s", $scope.field.name, name)] !== false;
     });
     _.each(relatives, function(name) {
       var prefix = name.split('.')[0];
       related[prefix] = value[prefix];
     });
     if (missing.length > 0 && value && value.id) {
-      return ds.read(value.id, {
-        fields: missing
-      }, {
-        silent: true
-      }).success(function(rec){
+      return ds.read(value.id, {fields: missing}, {silent: true}).success(function (rec) {
         var record = _.extend({}, related, {
           id: value.id,
           $version: value.version || value.$version
@@ -126,6 +129,12 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
           ui.setNested(record, name, value);
         });
         $scope.setValue(record, false);
+      }).error(function () {
+        _.each(missing, function (name) {
+          var fullName = _.sprintf("%s.%s", $scope.field.name, name);
+          $scope.isPermittedRead[fullName] = false;
+        });
+        $scope.$root.$broadcast("on:record-perm-change");
       });
     }
   };
@@ -139,6 +148,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
     var nameField = $scope.field.targetName || 'id';
     var trKey = ui.getNestedTrKey(nameField);
     var record = value;
+    var relativeFields;
 
     if (value && value.id) {
       record = _.extend({}, {
@@ -146,7 +156,8 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
         $version: value.version === undefined ? value.$version : value.version
       });
 
-      var missing = $scope.findRelativeFields().filter(function (name) {
+      relativeFields = $scope.findRelativeFields();
+      var missing = relativeFields.filter(function (name) {
         return !value || ui.findNested(value, name) === undefined;
       });
 
@@ -160,20 +171,27 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
       } else if (missing.indexOf(nameField) < 0) {
         missing.push(nameField);
       }
+      _.each(relativeFields, function (field) {
+        if (value[field] !== undefined) {
+          record[field] = value[field];
+        }
+      });
+      if (value.code) {
+        record.code = value.code;
+      }
 
       if (missing.length) {
         return ds.read(value.id, {fields: missing}).success(function(rec) {
           record = _.extend(record, _.omit(rec, 'version'));
           record.$version = rec.version === undefined ? record.$version : rec.version;
           $scope.setValue(record, true);
+          updatePermittedRead($scope, relativeFields);
         });
-      }
-      if (value.code) {
-        record.code = value.code;
       }
     }
 
     $scope.setValue(record, true);
+    updatePermittedRead($scope, relativeFields);
   };
 
   $scope.canEditTarget = function () {
@@ -671,6 +689,7 @@ function InlineManyToOneCtrl($scope, $element, DataSource, ViewService) {
       record.id = val.id;
       record.$version = val.version || val.$version || 0;
       $scope.setValue(record, true);
+      updatePermittedRead($scope, names);
     }
 
     var record = _.pick(value, names);

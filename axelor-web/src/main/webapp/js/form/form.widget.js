@@ -323,6 +323,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
     }
 
     function handle(rec) {
+      if (scope.suspendCondition[attr]) return;
       var value;
       try {
         value = !!axelor.$eval(scope, expr, withContext(scope, rec));
@@ -449,6 +450,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
   function handleForField(scope) {
     var field = scope.field;
     if (!field) return;
+    scope.suspendCondition = {};
     handleFor(scope, field, "valid", "validIf");
     handleFor(scope, field, "hidden", "hideIf");
     handleFor(scope, field, "hidden", "showIf", true);

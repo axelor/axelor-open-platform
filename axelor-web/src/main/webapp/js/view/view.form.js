@@ -152,6 +152,47 @@ function FormViewCtrl($scope, $element) {
     return attrs;
   };
 
+  $scope.isPermittedRead = {};
+
+  function getParentField(field) {
+    return field.split(".").slice(0, -1).join(".");
+  }
+
+  function updatePermittedRead(record, params) {
+    // Reset permitted read flags
+    _.each(Object.keys($scope.isPermittedRead), function (field) {
+      $scope.isPermittedRead[field] = true;
+    });
+    _.chain(params.fields).filter(function (field) {
+      var data = $scope.fields[field] || {};
+      return field!== "archived" && !data.image && !data.password;
+    }).each(function (field) {
+      if (ui.findNested(record, field) === undefined) {
+        var parentField = getParentField(field);
+        if (parentField && ui.findNested(record, parentField)) {
+          $scope.isPermittedRead[field] = false;
+        }
+      }
+    });
+    _.each(params.related, function (subFields, field) {
+      var value = ui.findNested(record, field);
+      if (value === undefined || value === null) {
+        return;
+      }
+      _.each(subFields, function (subField) {
+        var dottedName = _.sprintf("%s.%s", field, subField);
+        if (ui.findNested(record, dottedName) === undefined) {
+          $scope.isPermittedRead[dottedName] = false;
+        }
+      })
+    });
+    $scope.$broadcast("on:record-perm-change");
+  }
+
+  $scope.$on("on:update-permitted-read", function (e, record, params) {
+    updatePermittedRead(record, params);
+  });
+
   $scope.doRead = function(id) {
     var params = {
       fields : _.pluck($scope.fields, 'name'),
@@ -159,6 +200,7 @@ function FormViewCtrl($scope, $element) {
     };
     var promise = ds.read(id, params);
     promise.success(function (record) {
+      updatePermittedRead(record, params);
       record.$fetched = true;
       //XXX: special case for BPMN (see #36477)
       if (record.$processInstanceId) {

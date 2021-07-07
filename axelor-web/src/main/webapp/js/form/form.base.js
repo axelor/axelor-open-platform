@@ -127,6 +127,24 @@ ui.formCompile = function(element, attrs, linkerFn) {
       }
     });
 
+    scope.$on("on:record-perm-change", function () {
+      var path = element.attr("x-path");
+      if (!path) return;
+      var permitted = scope.isPermittedRead[path];
+      if (permitted === undefined) return;
+      scope.forceAttr("hidden", !permitted);
+    });
+
+    scope.forceAttr = function(attr, value) {
+      if (scope.suspendCondition === undefined) return;
+      scope.suspendCondition[attr] = value;
+      if (value) {
+        scope.attr(attr, true);
+      } else {
+        resetAttrs();
+      }
+    }
+
     scope.$watch("isEditable()", function isEditableWatch(editable, old) {
       if (editable === undefined) return;
       if (editable === old) return;
