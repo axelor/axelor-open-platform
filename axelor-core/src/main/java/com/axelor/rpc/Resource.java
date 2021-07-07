@@ -104,10 +104,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.persistence.EntityTransaction;
@@ -438,6 +438,7 @@ public class Resource<T extends Model> {
 
     Query<?> query = getSearchQuery(request, check ? filter : null).readOnly();
     List<?> data = null;
+    String[] dottedFields = null;
     try {
       if (limit > 0) {
         response.setTotal(query.count());
@@ -446,6 +447,10 @@ public class Resource<T extends Model> {
         Query<?>.Selector selector = query.select(request.getFields().toArray(new String[] {}));
         LOG.debug("JPQL: {}", selector);
         data = selector.fetch(limit, offset);
+        dottedFields =
+            request.getFields().stream()
+                .filter(field -> field.contains("."))
+                .toArray(String[]::new);
       } else {
         LOG.debug("JPQL: {}", query);
         data = query.fetch(limit, offset);
@@ -476,6 +481,7 @@ public class Resource<T extends Model> {
       }
       if (item instanceof Map) {
         Map<String, Object> map = (Map) item;
+        removeNotPermitted(map, dottedFields);
         if (User.class.isAssignableFrom(model)) {
           map.remove("password");
         }
@@ -1435,26 +1441,49 @@ public class Resource<T extends Model> {
   }
 
   /**
+   * Removes not permitted fields in specified map.
+   *
+   * @param map data
+   * @param names field names
+   */
+  protected void removeNotPermitted(Map<String, Object> map, String... names) {
+    filterPermitted(name -> {}, map::remove, Mapper.toBean(model, map), names);
+  }
+
+  /**
    * Filters given field names so that only base fields and readable related fields remains.
    *
    * @param bean object
    * @param names field names
    * @return readable field names
    */
-  @Nullable
-  public String[] filterPermitted(Object bean, String... names) {
+  protected String[] filterPermitted(Object bean, String... names) {
+    final List<String> permittedNames = new ArrayList<>();
+    filterPermitted(permittedNames::add, name -> {}, bean, names);
+
+    if (permittedNames.isEmpty() && ObjectUtils.notEmpty(names)) {
+      final Mapper mapper = Mapper.of(model);
+      final String nameField =
+          Optional.ofNullable(mapper.getNameField()).map(Property::getName).orElse("id");
+      permittedNames.add(nameField);
+    }
+
+    return permittedNames.stream().toArray(String[]::new);
+  }
+
+  protected void filterPermitted(
+      Consumer<String> permitted, Consumer<String> notPermitted, Object bean, String... names) {
     if (ObjectUtils.isEmpty(names)) {
-      return names;
+      return;
     }
 
     final JpaSecurity jpaSecurity = security.get();
-    final List<String> permittedNames = new ArrayList<>();
     final Mapper beanMapper = Mapper.of(EntityHelper.getEntityClass(bean));
 
     for (final String name : names) {
       final List<String> nameParts = Arrays.asList(name.split("\\."));
       if (nameParts.size() < 2) {
-        permittedNames.add(name);
+        permitted.accept(name);
         continue;
       }
 
@@ -1471,6 +1500,7 @@ public class Resource<T extends Model> {
         final Model modelValue = (Model) value;
         final Class<? extends Model> modelClass = EntityHelper.getEntityClass(modelValue);
         if (!jpaSecurity.isPermitted(JpaSecurity.CAN_READ, modelClass, modelValue.getId())) {
+          notPermitted.accept(name);
           permittedName = nameParts.subList(0, i + 1).stream().collect(Collectors.joining("."));
           break;
         }
@@ -1478,17 +1508,9 @@ public class Resource<T extends Model> {
         mapper = Mapper.of(modelClass);
       }
       if (StringUtils.notBlank(permittedName)) {
-        permittedNames.add(permittedName);
+        permitted.accept(permittedName);
       }
     }
-
-    if (permittedNames.isEmpty() && names.length > 0) {
-      final String nameField =
-          Optional.ofNullable(beanMapper.getNameField()).map(Property::getName).orElse("id");
-      permittedNames.add(nameField);
-    }
-
-    return permittedNames.stream().toArray(String[]::new);
   }
 
   public static Map<String, Object> toMap(Object bean, String... names) {

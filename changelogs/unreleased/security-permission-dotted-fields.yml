@@ -4,11 +4,12 @@ description: |
   Check for permissions on dotted fields:
 
   * Filter permitted dotted fields in fetch request
-  * Check create/write permission on related fields in save request
+  * Filter permitted dotted fields in search request
   * Filter permitted fields in ActionRequest.setValue
+  * Check create/write permission on related fields in save request
+  * Check write permission on editable grid
   * Hide dotted fields if user has no access at all
   * Hide dotted fields in editors if user has no access at all
-  * Check write permission on editable grid
 
   Users are still permitted to read dotted fields’ id, version, and namecolumn
   regardless of permissions.
