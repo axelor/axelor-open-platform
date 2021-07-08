@@ -19,6 +19,7 @@ package com.axelor.meta.schema.actions;
 
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
+import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -115,6 +116,7 @@ public class ActionRecord extends Action {
     if (StringUtils.isBlank(getName())) {
       result = evaluate(handler, map);
     } else {
+      handler.checkPermission(JpaSecurity.CAN_WRITE, getModel());
       handler.firePreEvent(getName());
       result = evaluate(handler, map);
       handler.firePostEvent(getName(), result instanceof ActionResponse ? result : map);

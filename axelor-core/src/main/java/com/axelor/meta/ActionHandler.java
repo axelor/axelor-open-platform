@@ -17,8 +17,10 @@
  */
 package com.axelor.meta;
 
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
+import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
 import com.axelor.event.Event;
@@ -41,6 +43,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import com.google.common.io.CharStreams;
@@ -54,6 +57,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -76,6 +80,8 @@ public class ActionHandler {
 
   private final Event<PostAction> postActionEvent;
 
+  private final JpaSecurity security;
+
   private final Context context;
 
   private final Bindings bindings;
@@ -85,6 +91,9 @@ public class ActionHandler {
   private final Pattern pattern =
       Pattern.compile("^\\s*(select\\[\\]|select|action|call|eval):\\s*(.*)");
 
+  private static final Set<String> ALWAYS_PERMITTED_MODELS =
+      ImmutableSet.of("com.axelor.meta.db.MetaAction", "com.axelor.meta.db.MetaFilter");
+
   /** @deprecated Use {@link ActionExecutor#newActionHandler(ActionRequest)} instead. */
   @Deprecated
   public ActionHandler(ActionRequest request) {
@@ -92,18 +101,61 @@ public class ActionHandler {
   }
 
   private ActionHandler(ActionRequest request, ActionExecutor actionExecutor) {
-    this(request, actionExecutor.getPreActionEvent(), actionExecutor.getPostActionEvent());
+    this(
+        request,
+        actionExecutor.getPreActionEvent(),
+        actionExecutor.getPostActionEvent(),
+        actionExecutor.getSecurity());
   }
 
   ActionHandler(
-      ActionRequest request, Event<PreAction> preActionEvent, Event<PostAction> postActionEvent) {
+      ActionRequest request,
+      Event<PreAction> preActionEvent,
+      Event<PostAction> postActionEvent,
+      JpaSecurity security) {
     this.request = request;
     this.preActionEvent = preActionEvent;
     this.postActionEvent = postActionEvent;
+    this.security = security;
     this.context = request.getContext();
     this.scriptHelper = new CompositeScriptHelper(this.context);
     this.bindings = this.scriptHelper.getBindings();
     this.bindings.put("__me__", this);
+  }
+
+  public void checkPermission(JpaSecurity.AccessType accessType, String model) {
+    if (context == null) {
+      if (StringUtils.notBlank(model) && !ALWAYS_PERMITTED_MODELS.contains(model)) {
+        try {
+          security.check(accessType, Class.forName(model).asSubclass(Model.class));
+        } catch (ClassNotFoundException e) {
+          throw new RuntimeException(e);
+        }
+      }
+      return;
+    }
+
+    if (!Model.class.isAssignableFrom(context.getContextClass())
+        || ALWAYS_PERMITTED_MODELS.contains(request.getModel())) {
+      return;
+    }
+
+    final Long id = (Long) context.get("id");
+    if (id != null) {
+      security.check(accessType, context.getContextClass().asSubclass(Model.class), id);
+      return;
+    }
+
+    @SuppressWarnings("unchecked")
+    final List<Object> idList = (List<Object>) context.get("_ids");
+    if (ObjectUtils.notEmpty(idList)) {
+      final Long[] ids =
+          idList.stream().map(value -> Long.valueOf(String.valueOf(value))).toArray(Long[]::new);
+      security.check(accessType, context.getContextClass().asSubclass(Model.class), ids);
+      return;
+    }
+
+    security.check(accessType, context.getContextClass().asSubclass(Model.class));
   }
 
   public void firePreEvent(String name) {

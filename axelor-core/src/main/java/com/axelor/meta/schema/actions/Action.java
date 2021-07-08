@@ -18,6 +18,7 @@
 package com.axelor.meta.schema.actions;
 
 import com.axelor.common.StringUtils;
+import com.axelor.db.JpaSecurity;
 import com.axelor.events.PostAction;
 import com.axelor.meta.ActionHandler;
 import com.axelor.rpc.ActionResponse;
@@ -94,6 +95,7 @@ public abstract class Action {
     if (StringUtils.isBlank(getName())) {
       result = evaluate(handler);
     } else {
+      handler.checkPermission(JpaSecurity.CAN_READ, getModel());
       handler.firePreEvent(getName());
       final Object value = evaluate(handler);
       PostAction event = handler.firePostEvent(getName(), value);

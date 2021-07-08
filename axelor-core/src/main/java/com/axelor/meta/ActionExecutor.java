@@ -17,6 +17,7 @@
  */
 package com.axelor.meta;
 
+import com.axelor.db.JpaSecurity;
 import com.axelor.event.Event;
 import com.axelor.events.PostAction;
 import com.axelor.events.PreAction;
@@ -28,15 +29,18 @@ public class ActionExecutor {
 
   private final Event<PreAction> preActionEvent;
   private final Event<PostAction> postActionEvent;
+  private final JpaSecurity security;
 
   @Inject
-  ActionExecutor(Event<PreAction> preActionEvent, Event<PostAction> postActionEvent) {
+  ActionExecutor(
+      Event<PreAction> preActionEvent, Event<PostAction> postActionEvent, JpaSecurity security) {
     this.preActionEvent = preActionEvent;
     this.postActionEvent = postActionEvent;
+    this.security = security;
   }
 
   public ActionHandler newActionHandler(ActionRequest request) {
-    return new ActionHandler(request, preActionEvent, postActionEvent);
+    return new ActionHandler(request, preActionEvent, postActionEvent, security);
   }
 
   public ActionResponse execute(ActionRequest request) {
@@ -49,5 +53,9 @@ public class ActionExecutor {
 
   Event<PostAction> getPostActionEvent() {
     return postActionEvent;
+  }
+
+  JpaSecurity getSecurity() {
+    return security;
   }
 }
