@@ -2962,6 +2962,16 @@ ui.directive("uiSlickColumnsForm", function () {
             items.splice(defaultJsonIndex, 1);
           }
 
+          var uniqueItems = [];
+          var names = new Set();
+          _.each(items, function (item) {
+            var name = item.name;
+            if (names.has(name)) return;
+            names.add(name);
+            uniqueItems.push(item);
+          });
+          items = uniqueItems;
+
           var values = items.map(function (x) {
             var rec = recordsMap[x.name];
             if (!rec || x.type !== 'field') {
