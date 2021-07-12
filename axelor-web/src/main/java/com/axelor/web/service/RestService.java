@@ -430,20 +430,21 @@ public class RestService extends ResourceService {
       throws IOException {
 
     final Class klass = getResource().getModel();
-    final boolean permittedByParent;
-
-    if (MetaFile.class.isAssignableFrom(klass)) {
-      permittedByParent = checkMetaFileParentPermission(id, parentId, parentModel);
-    } else {
-      permittedByParent = false;
-    }
-
-    if (!permittedByParent && !getResource().isPermitted(JpaSecurity.CAN_READ, id)) {
-      return javax.ws.rs.core.Response.status(Status.FORBIDDEN).build();
-    }
-
+    final boolean permitted;
     final Mapper mapper = Mapper.of(klass);
     final Model bean = JPA.find(klass, id);
+
+    if (MetaFile.class.isAssignableFrom(klass)) {
+      permitted =
+          Objects.equals(mapper.get(bean, "createdBy"), AuthUtils.getUser())
+              || checkMetaFileParentPermission(id, parentId, parentModel);
+    } else {
+      permitted = false;
+    }
+
+    if (!permitted && !getResource().isPermitted(JpaSecurity.CAN_READ, id)) {
+      return javax.ws.rs.core.Response.status(Status.FORBIDDEN).build();
+    }
 
     if (bean == null) {
       return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
