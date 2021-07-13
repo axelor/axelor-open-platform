@@ -25,6 +25,7 @@ import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Query;
 import com.axelor.db.internal.DBHelper;
+import com.axelor.db.tenants.TenantAware;
 import com.axelor.dms.db.DMSFile;
 import com.axelor.dms.db.DMSPermission;
 import com.axelor.i18n.I18n;
@@ -37,6 +38,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import javax.inject.Inject;
@@ -45,6 +48,10 @@ import javax.persistence.PersistenceException;
 public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
 
   @Inject private PermissionRepository perms;
+
+  private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+  private static final int BATCH_SIZE = 1000;
 
   public DMSPermissionRepository() {
     super(DMSPermission.class);
@@ -226,8 +233,8 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
 
   private void applySamePermissionToChildren(DMSPermission entity) {
     final int valueLevel = getValueLevel(entity);
-    List<Long> existingPermissionIds = new ArrayList<>();
-    List<Long> createPermissionFileIds = new ArrayList<>();
+    final List<Long> existingPermissionIds = new ArrayList<>();
+    final List<Long> createPermissionFileIds = new ArrayList<>();
 
     processDMSFileChildren(
         entity,
@@ -248,30 +255,60 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
                   }
                 }));
 
-    if (!existingPermissionIds.isEmpty()) {
-      JPA.em()
-          .createQuery(
-              "UPDATE DMSPermission self SET self.value = :value "
-                  + "WHERE self.id IN (:existingPermissionIds)")
-          .setParameter("value", entity.getValue())
-          .setParameter("existingPermissionIds", existingPermissionIds)
-          .executeUpdate();
-    }
+    Lists.partition(existingPermissionIds, BATCH_SIZE)
+        .forEach(
+            ids ->
+                executor.execute(
+                    new TenantAware(
+                        () -> {
+                          JPA.clear();
+                          JPA.em()
+                              .createQuery(
+                                  "UPDATE DMSPermission self SET self.value = :value "
+                                      + "WHERE self.id IN :ids")
+                              .setParameter("value", entity.getValue())
+                              .setParameter("ids", ids)
+                              .executeUpdate();
+                        })));
 
-    if (!createPermissionFileIds.isEmpty()) {
-      final DMSPermission basePermission = find(entity.getId());
-      JpaRepository.of(DMSFile.class)
-          .all()
-          .filter("self.id IN (:createPermissionFileIds)")
-          .bind("createPermissionFileIds", createPermissionFileIds)
-          .fetchStream()
-          .forEach(
-              file -> {
-                final DMSPermission permission = copy(basePermission, false);
-                permission.setFile(file);
-                JPA.em().persist(permission);
-              });
-    }
+    Lists.partition(createPermissionFileIds, BATCH_SIZE)
+        .forEach(
+            ids ->
+                executor.execute(
+                    new TenantAware(
+                        () -> {
+                          JPA.clear();
+                          final Group group =
+                              Optional.ofNullable(entity.getGroup())
+                                  .map(Group::getId)
+                                  .map(id -> JpaRepository.of(Group.class).find(id))
+                                  .orElse(null);
+                          final User user =
+                              Optional.ofNullable(entity.getUser())
+                                  .map(User::getId)
+                                  .map(id -> JpaRepository.of(User.class).find(id))
+                                  .orElse(null);
+                          final Permission permission =
+                              Optional.ofNullable(entity.getPermission())
+                                  .map(Permission::getId)
+                                  .map(id -> JpaRepository.of(Permission.class).find(id))
+                                  .orElse(null);
+                          JpaRepository.of(DMSFile.class)
+                              .all()
+                              .filter("self.id IN :ids")
+                              .bind("ids", ids)
+                              .fetch()
+                              .forEach(
+                                  file -> {
+                                    final DMSPermission dmsPermission = new DMSPermission();
+                                    dmsPermission.setValue(entity.getValue());
+                                    dmsPermission.setFile(file);
+                                    dmsPermission.setGroup(group);
+                                    dmsPermission.setUser(user);
+                                    dmsPermission.setPermission(permission);
+                                    JPA.em().persist(dmsPermission);
+                                  });
+                        })));
   }
 
   private void recursiveRemoveHavingSamePermission(DMSPermission entity) {
