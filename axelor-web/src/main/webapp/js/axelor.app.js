@@ -655,6 +655,8 @@
         if (last !== data.username) {
           window.location.reload();
         }
+      }, function () {
+        $('#loginWindow .alert.login-failed').show();
       });
     };
 
