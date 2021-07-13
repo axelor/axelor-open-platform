@@ -247,8 +247,8 @@
     .replace(/\u200f/g, '') // ar
     .replace(/YYYY年MMMD日/g, 'YYYY-MM-DD') // zh-tw
     .replace(/MMM/g, 'MM') // Don't support MMM
-    .replace(/(?<!D)D(?!D)/g, 'DD') // D -> DD
-    .replace(/(?<!M)M(?!M)/g, 'MM'); // M -> MM
+    .replace(/\bD\b/g, 'DD') // D -> DD
+    .replace(/\bM\b/g, 'MM'); // M -> MM
 
   Object.defineProperty(ui, 'dateFormat', {
     get: function () {

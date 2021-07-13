@@ -1,0 +1,3 @@
+---
+title: Fix unsupported regular expression in WebKit causing empty grid
+type: fix
