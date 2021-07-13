@@ -846,7 +846,9 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
   $scope.clearFilter = function(options) {
     $scope.filters.length = 0;
-    $scope.showArchived = false;
+    if (!((($scope.$parent.handler || {})._viewParams || {}).params || {}).showArchived) {
+      $scope.showArchived = false;
+    }
     $scope.addFilter();
     $scope.contextData = {};
 
