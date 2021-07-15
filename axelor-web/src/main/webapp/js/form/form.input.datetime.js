@@ -62,11 +62,12 @@ var regional = {
   dayNamesShort :	[_t('Sun'), _t('Mon'), _t('Tue'), _t('Wed'), _t('Thu'), _t('Fri'), _t('Sat')],
    dayNamesMin :	[_t('Su'), _t('Mo'), _t('Tu'), _t('We'), _t('Th'), _t('Fr'), _t('Sa')],
   weekHeader : 	_t('Wk'),
+  timeText:     _t('Time'),
   hourText : 		_t('Hour'),
   minuteText : 	_t('Minute'),
   secondText : 	_t('Second'),
   currentText : 	_t('Now'),
-  closeText :		_t('Done'),
+  closeText :		_t('Close'),
   prevText : 		_t('Prev'),
   nextText : 		_t('Next'),
   firstDay: 		moment.localeData(ui.getBrowserLocale()).firstDayOfWeek()
@@ -278,6 +279,10 @@ ui.formInput('DateTime', {
       showTime: false,
       showOn: null,
       showSecond: props.seconds,
+      changeYear: true,
+      yearRange: "c-100:c+30",
+      controlType: "select",
+      oneLine: true,
       beforeShow: function (e, ui) {
         lastValue = input.mask("value") || '';
         isShowing = true;
