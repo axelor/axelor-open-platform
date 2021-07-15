@@ -261,7 +261,6 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
                 executor.execute(
                     new TenantAware(
                         () -> {
-                          JPA.clear();
                           JPA.em()
                               .createQuery(
                                   "UPDATE DMSPermission self SET self.value = :value "
@@ -269,6 +268,8 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
                               .setParameter("value", entity.getValue())
                               .setParameter("ids", ids)
                               .executeUpdate();
+                          JPA.flush();
+                          JPA.clear();
                         })));
 
     Lists.partition(createPermissionFileIds, BATCH_SIZE)
@@ -277,7 +278,6 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
                 executor.execute(
                     new TenantAware(
                         () -> {
-                          JPA.clear();
                           final Group group =
                               Optional.ofNullable(entity.getGroup())
                                   .map(Group::getId)
@@ -308,6 +308,8 @@ public class DMSPermissionRepository extends JpaRepository<DMSPermission> {
                                     dmsPermission.setPermission(permission);
                                     JPA.em().persist(dmsPermission);
                                   });
+                          JPA.flush();
+                          JPA.clear();
                         })));
   }
 
