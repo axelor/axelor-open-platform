@@ -2017,6 +2017,7 @@ Grid.prototype.adjustEditor = function () {
   var activeCell = grid.getActiveCell();
   var leftPadding = 0;
   var left = true;
+  var that = this;
 
   grid.getColumns().forEach(function (col, n) {
     var box = grid.getCellNodeBox(activeCell.row, n);
@@ -2028,7 +2029,7 @@ Grid.prototype.adjustEditor = function () {
       widget.show().width(width - 1);
       left = false;
       setTimeout(function () {
-        if (activeCell.cell === n) {
+        if (activeCell.cell === n && !that.editorScope._focusedScope) {
           widget.find('input,:focusable:not(".secondary-focus")').first().focus().select();
         }
       }, 100)
@@ -2036,6 +2037,13 @@ Grid.prototype.adjustEditor = function () {
       leftPadding += width;
     }
   });
+
+  setTimeout(function () {
+    if (that.editorScope._focusedScope) {
+      that.editorScope._focusedScope.focus();
+      delete that.editorScope._focusedScope;
+    }
+  }, 100);
 
   form.css('padding-left', leftPadding);
   this.zIndexFix();

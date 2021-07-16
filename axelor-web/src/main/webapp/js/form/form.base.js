@@ -387,8 +387,60 @@ ui.formDirective = function(name, object) {
         }
         element.append(scope.$elem_editable);
         if (scope.$render_editable) scope.$render_editable();
+
+        if ((scope.field || {}).name === scope.focusedFieldName) {
+          scope.$timeout(function () { scope.focus(); }, 100);
+        }
+
         return true;
       }
+
+      scope.focus = function () {
+        function changeTab () {
+          var fieldName = (scope.field || {}).name;
+          var foundTab = _.find(scope.tabs, function (tab) {
+            return (tab.elem || $()).find(_.sprintf("*[x-path='%s']", fieldName)).length;
+          });
+
+          if (foundTab) {
+            scope.selectTab(foundTab);
+            return foundTab;
+          }
+        }
+
+        function focus(elem) {
+          elem.focus().select();
+        }
+
+        scope.setFocusedFieldName((scope.field || {}).name);
+        var item = scope.$elem_editable;
+
+        if (!item || !scope.isEditable()) {
+          changeTab();
+          return;
+        }
+
+        var selector = ':focusable:not(".secondary-focus")';
+        var focusable = item.is(selector) ? item : item.find(selector).first();
+
+        if (focusable.length) {
+          focus(focusable);
+          return;
+        }
+
+        if (!changeTab()) {
+          if (item.parents(".slick-form").first().length) {
+            scope.$parent._focusedScope = scope;
+          }
+          return;
+        }
+
+        focusable = item.is(selector) ? item : item.find(selector).first();
+
+        if (focusable.length) {
+          focus(focusable);
+        }
+      };
 
       function showReadonly() {
         var field = scope.field || {};

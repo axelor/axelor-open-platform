@@ -131,6 +131,10 @@ function FormViewCtrl($scope, $element) {
 
   $scope.$events = {};
 
+  $scope.setFocusedFieldName = function (name) {
+    $scope.focusedFieldName = name;
+  }
+
   /**
    * Get field attributes.
    *

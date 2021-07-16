@@ -1060,6 +1060,11 @@ ActionHandler.prototype = {
             }
           }
           break;
+        case 'focus':
+          if (value) {
+            itemScope.focus();
+          }
+          break;
         }
       });
 
