@@ -279,6 +279,7 @@ ui.formInput('DateTime', {
       showTime: false,
       showOn: null,
       showSecond: props.seconds,
+      changeMonth: true,
       changeYear: true,
       yearRange: "c-100:c+30",
       controlType: "select",
@@ -305,6 +306,7 @@ ui.formInput('DateTime', {
 
     if (this.isDate) {
       options.showTimepicker = false;
+      options.currentText = _t("Today");
     }
 
     input.datetimepicker(options);
@@ -370,6 +372,7 @@ ui.formInput('DateTime', {
     });
 
     scope.$onAdjust('size scroll', function () {
+      if (axelor.device.mobile) return;
       if (isShowing) {
         input.datepicker('widget').hide();
         input.datetimepicker('hide');

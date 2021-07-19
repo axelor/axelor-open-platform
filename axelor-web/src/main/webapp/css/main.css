@@ -1019,7 +1019,16 @@ img.prefix-icon {
   margin-left: .5em;
 }
 
-.ui-datepicker select.ui-datepicker-month, .ui-datepicker select.ui-datepicker-year {
+.ui-datepicker .ui-datepicker-header {
+  height: 28px;
+}
+
+.ui-datepicker .ui-datepicker-header a[class^="ui-datepicker-"] {
+  height: inherit;
+  top: 3px;
+}
+
+.ui-datepicker select.ui-datepicker-month, .ui-datepicker select[class^="ui-datepicker-"] {
   vertical-align: baseline;
   padding-top: 0px;
   padding-bottom: 0px;
