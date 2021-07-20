@@ -595,7 +595,10 @@ Grid.prototype.parse = function(view) {
       break;
     }
 
-    if (field.transient || field.dummy || field.json || field.encrypted) {
+    if (field.transient
+        || field.dummy && !field.jsonField
+        || field.json
+        || field.encrypted) {
       sortable = false;
     }
 
@@ -1013,9 +1016,12 @@ Grid.prototype._doInit = function(view) {
 
     function _setInputs(cols) {
       _.each(cols, function(col){
-        if (!col.xpath || col.descriptor.type === 'button'
-            || col.descriptor.transient || col.descriptor.dummy
-            || col.descriptor.json || col.descriptor.encrypted
+        if (!col.xpath
+            || col.descriptor.type === 'button'
+            || col.descriptor.transient
+            || col.descriptor.dummy && !col.descriptor.jsonField
+            || col.descriptor.json
+            || col.descriptor.encrypted
             || col.descriptor.target && !col.descriptor.targetName) {
           return;
         }
