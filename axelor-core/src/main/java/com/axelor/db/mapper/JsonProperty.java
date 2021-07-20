@@ -17,6 +17,7 @@
  */
 package com.axelor.db.mapper;
 
+import com.axelor.common.StringUtils;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.rpc.Context;
@@ -68,6 +69,10 @@ public class JsonProperty extends Property {
 
   @Nullable
   private static JsonProperty of(Class<?> beanClass, String jsonModel, String field) {
+    if (StringUtils.isBlank(field)) {
+      return null;
+    }
+
     final List<String> fieldParts = Arrays.asList(field.split("\\.", 2));
 
     if (fieldParts.size() < 2) {
