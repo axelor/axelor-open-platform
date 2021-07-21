@@ -125,17 +125,19 @@ public class XMLBindJson extends XMLBind {
 
   @Override
   public String getSearch() {
-    if (StringUtils.notBlank(getJsonModel())) {
-      return Optional.of(
-              Stream.of(super.getSearch(), domain)
-                  .filter(StringUtils::notBlank)
-                  .map(search -> String.format("(%s)", search))
-                  .collect(Collectors.joining(" AND ")))
-          .filter(StringUtils::notBlank)
-          .orElse(null);
+    final String search = super.getSearch();
+
+    if (StringUtils.isBlank(getJsonModel()) || StringUtils.isBlank(search)) {
+      return search;
     }
 
-    return super.getSearch();
+    return Optional.of(
+            Stream.of(search, domain)
+                .filter(StringUtils::notBlank)
+                .map(item -> String.format("(%s)", item))
+                .collect(Collectors.joining(" AND ")))
+        .filter(StringUtils::notBlank)
+        .orElse(null);
   }
 
   @Override
