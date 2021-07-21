@@ -200,7 +200,7 @@ ui.directive('uiFilterItem', function() {
         }
 
         var field = scope.fields[filter.field] || {};
-        var operators = filter.selectionList
+        var operators = filter.selectionList && !_.startsWith(field.widget, "multi")
           ? OPERATORS_BY_TYPE["enum"] || []
           : OPERATORS_BY_TYPE[filter.type] || [];
 
@@ -647,6 +647,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
   this.doInit = function(model, viewItems) {
     var context = $scope.$parent.$parent._context || {};
+    var schemaItems = ($scope.$parent.$parent.schema || {}).items || [];
     return ViewService
     .getFields(model, context.jsonModel)
     .success(function(fields, jsonFields) {
@@ -661,6 +662,13 @@ function FilterFormCtrl($scope, $element, ViewService) {
         if (field.nameColumn) {
           nameField = name;
         }
+        var schemaItem = _.findWhere(schemaItems, {name: name}) || {};
+        if (schemaItem.selectionList) {
+          field.selectionList = schemaItem.selectionList;
+        }
+        if (schemaItem.widget) {
+          field.widget = schemaItem.widget;
+        }
         items[name] = field;
       });
 
@@ -672,10 +680,14 @@ function FilterFormCtrl($scope, $element, ViewService) {
           if (field.type !== 'many-to-one') {
             key += '::' + (field.jsonType || 'text');
           }
-          items[key] = _.extend({}, field, {
+          var fieldItem = _.extend({}, field, {
             name: key,
             title: (field.title || field.autoTitle) + " (" + items[prefix].title + ")"
           });
+          if (field.widget) {
+            fieldItem.widget = ui.getWidget(field.widget);
+          }
+          items[key] = fieldItem;
         });
         // don't search parent
         delete items[prefix];

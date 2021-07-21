@@ -508,7 +508,9 @@ function GridViewCtrl($scope, $element) {
           break;
         case 'enum':
         case 'selection':
-          operator = '=';
+          if (!_.startsWith(field.widget, "multi")) {
+            operator = '=';
+          }
           break;
       }
 

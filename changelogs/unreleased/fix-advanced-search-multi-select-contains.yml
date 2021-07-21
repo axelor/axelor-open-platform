@@ -1,0 +1,3 @@
+---
+title: Fix missing "contains" search with MultiSelect widget
+type: fix
