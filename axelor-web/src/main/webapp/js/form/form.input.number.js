@@ -103,7 +103,7 @@ ui.formInput('Number', {
         precision: precision()
       }) : scope.field;
       return isDecimal
-        ? ui.formatters.decimal(field, value)
+        ? ui.formatters.decimal(field, value, scope.record)
         : ui.formatters.integer(field, value);
     };
 

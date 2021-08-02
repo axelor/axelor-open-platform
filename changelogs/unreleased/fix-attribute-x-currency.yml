@@ -1,0 +1,3 @@
+---
+title: Fix attribute `x-currency` not taken into account
+type: fix
