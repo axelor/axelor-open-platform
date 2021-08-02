@@ -135,23 +135,17 @@
   }
 
   // override angular.js currency filter
-  var currencySymbolToCode = {
-      '$': 'USD',
-      '€': 'EUR',
-      '¥': 'JPY',
-      '£': 'GBP'
-  };
   ui.filter('currency', function() {
-    return function(value, symbol, fractionSize, currencyDisplay) {
-      if (_.isBlank(value)) {
+    return function(value, currency, fractionSize, currencyDisplay) {
+      if (_.isBlank(value) || _.isBlank(currency)) {
         return value;
       }
-      if (isNaN(value) || _.isBlank(symbol)) {
-        return addCurrency(value, symbol);
+      if (isNaN(value)) {
+        return addCurrency(value, currency);
       }
       var options = {
         style : 'currency',
-        currency : currencySymbolToCode[symbol] || symbol,
+        currency : currency,
       };
       if (fractionSize !== undefined && fractionSize != null) {
         options.minimumFractionDigits = fractionSize;
@@ -160,7 +154,12 @@
       if (currencyDisplay !== undefined && currencyDisplay != null) {
         options.currencyDisplay = currencyDisplay
       }
-      return new Intl.NumberFormat(getBrowserLocale(), options).format(value);
+      try {
+        return new Intl.NumberFormat(getBrowserLocale(), options).format(value);
+      } catch (e) {
+        // Fall back to adding currency symbol
+        return addCurrency(value, currency);
+      }
     };
   });
 

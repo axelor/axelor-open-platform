@@ -1,0 +1,3 @@
+---
+title: Fix currency filter with symbols other than $, €, ¥, £
+type: fix
