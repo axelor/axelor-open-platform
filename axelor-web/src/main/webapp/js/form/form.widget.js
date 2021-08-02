@@ -450,7 +450,6 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
   function handleForField(scope) {
     var field = scope.field;
     if (!field) return;
-    scope.suspendCondition = {};
     handleFor(scope, field, "valid", "validIf");
     handleFor(scope, field, "hidden", "hideIf");
     handleFor(scope, field, "hidden", "showIf", true);
@@ -481,6 +480,7 @@ ui.directive('uiWidgetStates', ['$parse', '$interpolate', function($parse, $inte
 
   return function(scope, element, attrs) {
     scope.$evalAsync(function() {
+      scope.suspendCondition = {};
       if (element.is('[ui-form]')) {
         return handleForView(scope);
       }
