@@ -56,7 +56,7 @@ public abstract class XMLBinder {
 
   private Map<String, DataAdapter> adapters = new HashMap<>();
 
-  public XMLBinder(XMLInput input, Map<String, Object> context) {
+  protected XMLBinder(XMLInput input, Map<String, Object> context) {
     this.input = input;
     this.context = context;
   }
@@ -202,7 +202,7 @@ public abstract class XMLBinder {
       }
     }
 
-    return isNull ? null : binding.postBind(bean);
+    return isNull ? null : binding.postProcess(bean);
   }
 
   @SuppressWarnings("all")

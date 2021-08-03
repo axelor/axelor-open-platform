@@ -164,11 +164,11 @@ public class XMLBindJson extends XMLBind {
   }
 
   @Override
-  public Object postBind(Object bean) {
+  public Object postProcess(Object bean) {
     if (StringUtils.notBlank(getJsonModel())) {
       return JpaRepository.of(MetaJsonRecord.class).save((MetaJsonRecord) bean);
     }
 
-    return super.postBind(bean);
+    return super.postProcess(bean);
   }
 }

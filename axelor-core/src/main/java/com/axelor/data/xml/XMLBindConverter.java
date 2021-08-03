@@ -52,20 +52,20 @@ public class XMLBindConverter implements Converter {
     if (StringUtils.isBlank(field)) {
       final String jsonModel = reader.getAttribute("json-model");
       return StringUtils.isBlank(jsonModel)
-          ? newXMLBind(context)
-          : newXMLBindJson(context, jsonModel);
+          ? newInstance(context)
+          : newInstanceJson(context, jsonModel);
     }
 
     return field.startsWith(JsonProperty.KEY_JSON_PREFIX)
-        ? newXMLBindJson(context, null)
-        : newXMLBind(context);
+        ? newInstanceJson(context, reader.getAttribute("json-model"))
+        : newInstance(context);
   }
 
-  private Object newXMLBind(UnmarshallingContext context) {
+  private Object newInstance(UnmarshallingContext context) {
     return newInstance(XMLBind.class, context);
   }
 
-  private Object newXMLBindJson(UnmarshallingContext context, String jsonModel) {
+  private Object newInstanceJson(UnmarshallingContext context, String jsonModel) {
     final Object result = newInstance(XMLBindJson.class, context);
 
     if (StringUtils.notBlank(jsonModel)) {
