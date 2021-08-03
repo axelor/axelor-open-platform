@@ -66,6 +66,8 @@ public class CSVInput {
   @XStreamImplicit(itemFieldName = "bind")
   private List<CSVBind> bindings = Lists.newArrayList();
 
+  private boolean bindingsLinked;
+
   @XStreamImplicit(itemFieldName = "adapter")
   private List<DataAdapter> adapters = Lists.newArrayList();
 
@@ -139,11 +141,26 @@ public class CSVInput {
   }
 
   public List<CSVBind> getBindings() {
+    if (!bindingsLinked) {
+      linkBindings();
+    }
     return bindings;
   }
 
   public void setBindings(List<CSVBind> bindings) {
     this.bindings = bindings;
+  }
+
+  private void linkBindings() {
+    if (bindings == null) {
+      return;
+    }
+
+    bindings.stream()
+        .filter(CSVBindJson.class::isInstance)
+        .map(CSVBindJson.class::cast)
+        .forEach(binding -> binding.setInput(this));
+    bindingsLinked = true;
   }
 
   public List<DataAdapter> getAdapters() {
@@ -205,6 +222,10 @@ public class CSVInput {
       System.err.println("EEE: " + e);
       throw new ImportException(e);
     }
+  }
+
+  public Object postProcess(Object bean) {
+    return bean;
   }
 
   @Override

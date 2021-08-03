@@ -67,6 +67,8 @@ public class CSVBind {
   @XStreamImplicit(itemFieldName = "bind")
   private List<CSVBind> bindings;
 
+  private boolean bindingsLinked;
+
   @XStreamAsAttribute private String adapter;
 
   public String getColumn() {
@@ -134,11 +136,27 @@ public class CSVBind {
   }
 
   public List<CSVBind> getBindings() {
+    if (!bindingsLinked) {
+      linkBindings();
+    }
+
     return bindings;
   }
 
   public void setBindings(List<CSVBind> bindings) {
     this.bindings = bindings;
+  }
+
+  private void linkBindings() {
+    if (bindings == null) {
+      return;
+    }
+
+    bindings.stream()
+        .filter(CSVBindJson.class::isInstance)
+        .map(CSVBindJson.class::cast)
+        .forEach(binding -> binding.setParent(this));
+    bindingsLinked = true;
   }
 
   public String getAdapter() {
@@ -249,6 +267,10 @@ public class CSVBind {
       System.err.println("EEE: " + e);
       return null;
     }
+  }
+
+  public Object postProcess(Object bean) {
+    return bean;
   }
 
   @Override

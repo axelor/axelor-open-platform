@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,8 @@ public class CSVBinder {
   private boolean update;
 
   private boolean newBean;
+
+  private final UnaryOperator<Object> postProcess;
 
   private String searchCall;
 
@@ -82,6 +85,7 @@ public class CSVBinder {
         true,
         csvInput.getSearch(),
         csvInput.isUpdate(),
+        csvInput::postProcess,
         csvInput.getSearchCall());
   }
 
@@ -93,6 +97,7 @@ public class CSVBinder {
         false,
         csvBind.getSearch(),
         csvBind.isUpdate(),
+        csvBind::postProcess,
         null);
   }
 
@@ -103,12 +108,14 @@ public class CSVBinder {
       boolean autoBind,
       String query,
       boolean update,
+      UnaryOperator<Object> postProcess,
       String searchCall) {
     this.beanClass = beanClass;
     this.fields = fields;
     this.bindings = Lists.newArrayList();
     this.query = query;
     this.update = update;
+    this.postProcess = postProcess;
     this.searchCall = searchCall;
 
     if (csvBinds != null) this.bindings.addAll(csvBinds);
@@ -130,7 +137,11 @@ public class CSVBinder {
 
         String[] parts = field.split("\\.");
 
-        if (field.startsWith(JsonProperty.KEY_JSON_PREFIX) && parts.length > 2) {
+        if (field.startsWith(JsonProperty.KEY_JSON_PREFIX)) {
+          if (parts.length < 3) {
+            beanFields.add(field);
+            continue;
+          }
           final String fieldName = String.format("%s.%s", parts[0], parts[1]);
           final String subFieldName =
               Arrays.stream(Arrays.copyOfRange(parts, 2, parts.length))
@@ -364,7 +375,7 @@ public class CSVBinder {
       }
     }
 
-    return bean;
+    return postProcess.apply(bean);
   }
 
   private boolean isValueGiven(CSVBind bind, Map<String, Object> values) {

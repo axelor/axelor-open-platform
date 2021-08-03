@@ -143,11 +143,16 @@
             </element>
           </sequence>
         </sequence>
-        <attribute name="type" type="string" use="required">
+        <attribute name="type" type="string">
           <annotation>
             <documentation>
               Fully qualified name of the domain object.
             </documentation>
+          </annotation>
+        </attribute>
+        <attribute name="json-model" type="string">
+          <annotation>
+            <documentation>Name of custom model (instead of type).</documentation>
           </annotation>
         </attribute>
         <attribute name="separator" default=",">

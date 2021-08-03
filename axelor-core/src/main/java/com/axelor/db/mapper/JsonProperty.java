@@ -112,6 +112,10 @@ public class JsonProperty extends Property {
 
   @Override
   public Class<?> getTarget() {
+    if (!isReference() && !isCollection()) {
+      return null;
+    }
+
     return Optional.ofNullable(
             (String) jsonField.get(getJsonType().startsWith("json-") ? "jsonTarget" : "target"))
         .map(

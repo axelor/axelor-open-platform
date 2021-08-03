@@ -79,6 +79,14 @@ public class CSVConfig {
   public static CSVConfig parse(File input) {
     XStream stream = XStreamUtils.createXStream();
     stream.processAnnotations(CSVConfig.class);
+    stream.registerConverter(
+        new CSVInputConverter(
+            stream.getConverterLookup().lookupConverterForType(CSVInput.class),
+            stream.getReflectionProvider()));
+    stream.registerConverter(
+        new CSVBindConverter(
+            stream.getConverterLookup().lookupConverterForType(CSVBind.class),
+            stream.getReflectionProvider()));
     return (CSVConfig) stream.fromXML(input);
   }
 }
