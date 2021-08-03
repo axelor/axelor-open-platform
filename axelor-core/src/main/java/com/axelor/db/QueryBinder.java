@@ -209,6 +209,12 @@ public class QueryBinder {
   }
 
   private Object getDottedValue(ScriptBindings bindings, String dottedName) {
+    final Object value = bindings.get(dottedName);
+
+    if (value != null) {
+      return value;
+    }
+
     final List<String> names = Splitter.on('.').splitToList(dottedName);
     return getRelatedValue(bindings.get(names.get(0)), names.subList(1, names.size()));
   }
