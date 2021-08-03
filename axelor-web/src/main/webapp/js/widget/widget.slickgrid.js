@@ -175,7 +175,10 @@ var Formatters = {
 
     var text = (value||{})[key];
 
-    return text ? _.escapeHTML(axelor.sanitize(text)).replace(/&amp;/g, '&') : "";
+    return text
+      ? _.escapeHTML(
+          axelor.sanitize(text).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'))
+      : "";
   },
 
   "one-to-many": function(field, value) {

@@ -323,7 +323,9 @@ ui.formInput('ManyToOne', 'Select', {
         var trKey = ui.getNestedTrKey(scope.field.targetName);
         var key = scope.field.targetName || "id";
         var value = ui.findNested(item, trKey) || ui.findNested(item, key);
-        return axelor.sanitize(value).replace(/&amp;/g, '&');
+        return value
+          ? axelor.sanitize(value).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
+          : value;
       }
       return "";
     };
