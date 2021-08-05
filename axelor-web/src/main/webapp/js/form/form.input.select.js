@@ -1074,7 +1074,7 @@ ui.formInput('NavSelect', {
     "<div class='nav-select'>" +
       "<ul class='nav-steps' style='display: inline-flex; visibility: hidden;'>" +
         "<li class='nav-step' ng-repeat='select in getSelection()' ng-class='{ active: isSelected(select), last: $last }'>" +
-          "<a href='' class='nav-label' ng-click='onSelect(select)' ng-bind-html='select.title'></a>" +
+          "<a href='' class='nav-label' ng-click='onSelect(select)' ng-bind-html='select.title || \"&nbsp;\"'></a>" +
         "</li>" +
         "<li class='nav-step dropdown'>" +
           "<a href='' class='nav-label dropdown-toggle' data-toggle='dropdown'><span></span></a>" +
