@@ -64,6 +64,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -505,7 +506,9 @@ public final class MetaStore {
             record -> {
               Selection.Option option = new Selection.Option();
               option.setValue(record.get("id").toString());
-              option.setTitle(record.get(name).toString());
+              Optional.ofNullable(record.get(name))
+                  .map(Object::toString)
+                  .ifPresent(option::setTitle);
               if (nameField != null && nameField.isTranslatable()) {
                 String key = "value:" + option.getTitle();
                 String value = I18n.get(key);
