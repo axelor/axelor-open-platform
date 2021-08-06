@@ -1,0 +1,14 @@
+---
+title: Add view-param `grid-width` to set width of grid in details-view
+description: |
+  Example:
+
+  ```xml
+  <action-view name="sale.orders" model="com.axelor.sale.db.Order" title="Sale Orders">
+    <view type="grid" name="order-grid" />
+    <view type="form" name="order-form" />
+    <view-param name="details-view" value="true" />
+    <view-param name="grid-width" value="25%" />
+  </action-view>
+  ```
+type: feature

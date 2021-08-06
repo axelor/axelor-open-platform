@@ -989,6 +989,13 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
       scope.$on('$destroy', function () {
         overlay.remove();
       });
+
+      var width = ((scope._viewParams || {}).params || {})["grid-width"];
+      if (width !== undefined) {
+        element.css("left", width);
+        element.parent(".has-details-view").children(".slickgrid")
+          .css("right", _.sprintf("calc(100%% - %s)", width));
+      }
     },
     replace: true,
     templateUrl: "partials/views/details-form.html"
