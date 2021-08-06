@@ -276,7 +276,7 @@ public final class ViewWatcher {
 
         throw new RuntimeException(e.getCause());
       } catch (TimeoutException e) {
-        log.warn("Furure {} is taking a long time to complete.", future);
+        log.warn("Future {} is taking a long time to complete.", future);
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
       }
