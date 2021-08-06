@@ -177,7 +177,7 @@ public class ParallelTransactionExecutor {
         future.get(1, TimeUnit.HOURS);
         return;
       } catch (TimeoutException e) {
-        logger.warn("Furure {} of pool {} is taking a long time to complete.", future, workerPool);
+        logger.warn("Future {} of pool {} is taking a long time to complete.", future, workerPool);
       }
     } while (!Thread.currentThread().isInterrupted());
   }
