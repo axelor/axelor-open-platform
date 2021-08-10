@@ -69,6 +69,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -101,6 +102,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -619,6 +621,9 @@ public class Resource<T extends Model> {
     return response;
   }
 
+  private static final Set<String> EXCLUDED_EXPORT_TYPES =
+      ImmutableSet.of("panel", "button", "label", "spacer", "separator");
+
   @SuppressWarnings("all")
   private int export(Request request, Writer writer, Locale locale, char separator)
       throws IOException {
@@ -648,7 +653,18 @@ public class Resource<T extends Model> {
           final Map<String, Object> map = findJsonFields.apply(name);
           return map == null
               ? Collections.EMPTY_LIST
-              : map.keySet().stream().map(n -> name + "." + n).collect(Collectors.toList());
+              : map.entrySet().stream()
+                  .filter(
+                      entry -> {
+                        final Object value = entry.getValue();
+                        if (value instanceof Map) {
+                          return !EXCLUDED_EXPORT_TYPES.contains(((Map<?, ?>) value).get("type"));
+                        }
+                        return true;
+                      })
+                  .map(Entry::getKey)
+                  .map(n -> name + "." + n)
+                  .collect(Collectors.toList());
         };
 
     if (fields == null) {
