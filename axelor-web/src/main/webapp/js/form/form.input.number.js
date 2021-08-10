@@ -154,7 +154,7 @@ ui.formInput('Number', {
       updateModel(element.val());
     });
     element.on("keydown", function(e, row) {
-      if (!e.ctrlKey && e.key.length === 1 && !e.key.match(keyPattern)) {
+      if (!axelor.browser.chrome && !e.ctrlKey && e.key.length === 1 && !e.key.match(keyPattern)) {
         e.preventDefault();
         return;
       }
