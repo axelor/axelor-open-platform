@@ -18,6 +18,8 @@
 package com.axelor.db.mapper;
 
 import com.axelor.common.StringUtils;
+import com.axelor.db.JPA;
+import com.axelor.db.Model;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.rpc.Context;
@@ -148,7 +150,7 @@ public class JsonProperty extends Property {
   public Object set(Object bean, Object value) {
     final Context context = getContext(bean);
     final Map<String, Object> bindings = getBindings(context);
-    bindings.put(subFieldName, value);
+    bindings.put(subFieldName, persist(value));
     return property.set(bean, context.get(property.getName()));
   }
 
@@ -172,11 +174,23 @@ public class JsonProperty extends Property {
             .orElseGet(ArrayList::new);
 
     if (adder.test(items)) {
-      bindings.put(subFieldName, items);
+      bindings.put(subFieldName, persist(items));
       property.set(bean, context.get(property.getName()));
     }
 
     return bean;
+  }
+
+  private Object persist(Object value) {
+    if (value instanceof Model) {
+      final Model bean = (Model) value;
+      if (Optional.ofNullable(bean.getId()).orElse(0L) <= 0L) {
+        JPA.em().persist(bean);
+      }
+    } else if (value instanceof Collection) {
+      ((Collection<?>) value).forEach(this::persist);
+    }
+    return value;
   }
 
   private Context getContext(Object bean) {
