@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class MailFollowerRepository extends JpaRepository<MailFollower> {
 
@@ -275,6 +276,18 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 
   @Transactional
   public void follow(Model entity, MailAddress address) {
+    final Optional<User> user =
+        Optional.ofNullable(address)
+            .map(MailAddress::getAddress)
+            .map(Beans.get(MailService.class)::resolve)
+            .filter(User.class::isInstance)
+            .map(User.class::cast);
+
+    if (user.isPresent()) {
+      follow(entity, user.get());
+      return;
+    }
+
     MailFollower follower = findOne(entity, address);
     if (follower != null && follower.getArchived() == Boolean.FALSE) {
       return;
