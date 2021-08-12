@@ -87,6 +87,9 @@ String tenantId = (String) session.getAttribute("tenantId");
     <% } %>
     <link href="ws/app/custom.css" rel="stylesheet">
 
+    <!-- Async styles -->
+    <x:style-async src="css/application.async.css" />
+
     <style>
     header .nav > li {
       /* fix wierd dots in MS-Edge */
@@ -205,6 +208,10 @@ String tenantId = (String) session.getAttribute("tenantId");
     <% for (String script : StaticResources.getScripts()) { %>
     <script src="<%= script %>"></script>
     <% } %>
+
+    <!-- Async scripts-->
+    <x:script-async src="js/application.async.js" />
+
     <% if (extraFoot != null) { %> <jsp:include page="<%= extraFoot %>" /> <% } %>
   </body>
 </html>

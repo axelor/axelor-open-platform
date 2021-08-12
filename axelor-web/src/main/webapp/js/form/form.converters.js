@@ -68,6 +68,21 @@
     );
   }
 
+  function localeToLanguage(locale) {
+    return locale.split('-')[0];
+  }
+
+  // Finds supported locale in specified list of locales
+  function findSupportedLocale(locales) {
+    var locale = ui.getPreferredLocale().toLowerCase();
+    var found = _.find(locales, function (l) { return locale === l.toLowerCase(); });
+    if (found) return found;
+    var language = localeToLanguage(locale);
+    found = _.find(locales, function (l) { return language === l.toLowerCase(); });
+    if (found) return found;
+    return _.find(locales, function (l) { return language === localeToLanguage(l).toLowerCase(); });
+  }
+
   function addCurrency(value, symbol) {
     if (value && symbol) {
       var val = '' + value;
@@ -255,6 +270,7 @@
   ui.canSetNested = canSetNested;
   ui.getNestedTrKey = getNestedTrKey;
   ui.getPreferredLocale = getPreferredLocale;
+  ui.findSupportedLocale = findSupportedLocale;
 
   var dateFormat = 'DD/MM/YYYY';
   $("body").on("app:config-fetched", function () {

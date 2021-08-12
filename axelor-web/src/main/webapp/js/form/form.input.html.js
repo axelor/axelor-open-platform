@@ -175,6 +175,17 @@ function getButtons(scope, element) {
       d3: lite ? false : {
       html: $('<span class="wysiwyg-toolbar-divider"></span>')
     },
+    insertlink: lite ? false : {
+            title: _t('Insert link'),
+            image: '\uf08e'
+    },
+    insertimage: lite ? false : {
+            title: _t('Insert image'),
+            image: '\uf03e'
+    },
+    d8: lite ? false : {
+      html: $('<span class="wysiwyg-toolbar-divider"></span>')
+    },
       alignleft: {
           title: _t('Left'),
           image: '\uf036'
@@ -194,37 +205,26 @@ function getButtons(scope, element) {
       d4: {
       html: $('<span class="wysiwyg-toolbar-divider"></span>')
     },
-      orderedList: {
-          title: _t('Ordered list'),
-          image: '\uf0cb'
-      },
       unorderedList: {
           title: _t('Unordered list'),
           image: '\uf0ca'
       },
+      orderedList: {
+          title: _t('Ordered list'),
+          image: '\uf0cb'
+      },
       d6: lite ? false : {
       html: $('<span class="wysiwyg-toolbar-divider"></span>')
     },
-      indent: lite ? false : {
-          title: _t('Indent'),
-          image: '\uf03c'
-      },
       outdent: lite ? false : {
           title: _t('Outdent'),
           image: '\uf03b'
       },
+      indent: lite ? false : {
+          title: _t('Indent'),
+          image: '\uf03c'
+      },
       d7: lite ? false : {
-      html: $('<span class="wysiwyg-toolbar-divider"></span>')
-    },
-    insertimage: lite ? false : {
-            title: _t('Insert image'),
-            image: '\uf030'
-    },
-    insertlink: lite ? false : {
-            title: _t('Insert link'),
-            image: '\uf08e'
-    },
-    d8: lite ? false : {
       html: $('<span class="wysiwyg-toolbar-divider"></span>')
     },
     normalize: lite ? false : {

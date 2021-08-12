@@ -34,4 +34,30 @@
     </attribute>
   </tag>
 
+  <!-- style async tag -->
+  <tag>
+    <name>style-async</name>
+    <tag-class>com.axelor.web.tags.StyleAsyncTag</tag-class>
+    <body-content>empty</body-content>
+    <attribute>
+      <name>src</name>
+      <required>true</required>
+    </attribute>
+  </tag>
+
+  <!-- script async tag -->
+  <tag>
+    <name>script-async</name>
+    <tag-class>com.axelor.web.tags.ScriptAsyncTag</tag-class>
+    <body-content>empty</body-content>
+    <attribute>
+      <name>src</name>
+      <required>true</required>
+    </attribute>
+    <attribute>
+      <name>bundle</name>
+      <required>false</required>
+    </attribute>
+  </tag>
+
 </taglib>

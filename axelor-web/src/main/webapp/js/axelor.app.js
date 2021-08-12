@@ -507,7 +507,7 @@
       } else {
         ctrl = _t('Ctrl');
         alt = _t('Alt');
-        newRecordShortcut = [ctrl, _t('Insert')];
+        newRecordShortcut = [ctrl, _t('Insert.Key')];
       }
 
       var shortcuts = [

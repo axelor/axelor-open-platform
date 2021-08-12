@@ -106,6 +106,7 @@
 //= js/form/form.input.text.js
 //= js/form/form.input.phone.js
 //= js/form/form.input.html.js
+//= js/form/form.input.markdown.js
 //= js/form/form.input.number.js
 //= js/form/form.input.datetime.js
 //= js/form/form.input.select.js
