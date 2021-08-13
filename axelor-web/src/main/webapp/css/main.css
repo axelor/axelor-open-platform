@@ -171,6 +171,7 @@ header .navbar .nav-link-user-sub {
   opacity: 1;
   background: rgba(0, 0, 0, 0.5);
   transition: opacity ease 0.4s;
+  cursor: wait;
 }
 
 .blocker-overlay .blocker-wait {

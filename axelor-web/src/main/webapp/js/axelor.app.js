@@ -33,30 +33,19 @@
   }
 
   function hideLoading() {
-    if (loadingTimer) {
-      clearTimeout(loadingTimer);
-      loadingTimer = null;
-    }
-    if (loadingCounter > 0) {
-      loadingTimer = _.delay(hideLoading, 500);
-      return;
-    }
-    loadingTimer = _.delay(function () {
+    clearTimeout(loadingTimer);
+    loadingTimer = setTimeout(function () {
       loadingTimer = null;
       if (loadingElem) {
-        loadingElem.fadeOut(100);
+        loadingElem.fadeOut(300);
       }
-    }, 500);
+    }, 300);
   }
 
   function onHttpStart() {
 
     updateLoadingCounter(1);
-
-    if (loadingTimer) {
-      clearTimeout(loadingTimer);
-      loadingTimer = null;
-    }
+    clearTimeout(loadingTimer);
 
     if (loadingElem === null) {
       loadingElem = $('<div><span class="label label-important loading-counter">' + _t('Loading') + '...</span></div>')
@@ -68,7 +57,13 @@
           'z-index': 2000
         }).appendTo('body');
     }
-    loadingElem.show();
+
+    loadingTimer = setTimeout(function () {
+      loadingTimer = null;
+      if (loadingElem) {
+        loadingElem.fadeIn(300);
+      }
+    }, 1000);
   }
 
   function onHttpStop() {
@@ -301,7 +296,6 @@
           e.preventDefault();
           e.stopPropagation();
         });
-        body.css("cursor", "wait");
         blocker.show();
       }
       unblock(callback);
@@ -325,7 +319,6 @@
         return;
       }
       doc.off("keydown.blockui mousedown.blockui");
-      body.css("cursor", "");
       blocker.removeClass('wait').hide();
       spinnerTime = 0;
       if (callback) {
