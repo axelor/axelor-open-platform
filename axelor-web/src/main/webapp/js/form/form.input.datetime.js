@@ -295,7 +295,7 @@ ui.formInput('DateTime', {
       onSelect: function(dateText, inst) {
         input.mask('value', dateText);
         updateModel();
-        if (!inst.timeDefined) {
+        if (!inst.timeDefined && isDate) {
           input.datetimepicker('hide');
           setTimeout(function(){
             input.focus().select();
