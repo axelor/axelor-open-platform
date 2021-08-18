@@ -433,7 +433,7 @@ _.extend(Factory.prototype, {
           url = ui.makeImageURL("com.axelor.meta.db.MetaFile", "content", (value.id || value), undefined, this.grid.handler, dataContext.id);
         }
         if (url && widget === "binary-link") {
-          return '<a href="' + url + '" download="' + value.fileName + '">' + value.fileName + '</a>';
+          return '<a onclick="event.stopPropagation()" href="' + url + '" download="' + value.fileName + '">' + value.fileName + '</a>';
         }
       } else {
         var parentScope;
@@ -451,10 +451,12 @@ _.extend(Factory.prototype, {
     }
 
     if (type === "binary") {
-      var model = (((this.grid || {}).scope || {}).view || {}).model;
-      var url = ui.makeImageURL(model, field.name, dataContext.id, dataContext.version);
-      var onClick = _.sprintf('angular.module("axelor.ui").download("%s", "%s")', url, field.name);
-      return _.sprintf('<button onclick=\'%s\' class="btn btn-small" type="button"><i class="fa fa-arrow-circle-down"></i></button>', onClick);
+      var model = ((this.grid || {}).handler || {})._model;
+      if (model) {
+        var url = ui.makeImageURL(model, field.name, dataContext.id, dataContext.version);
+        var onClick = _.sprintf('angular.module("axelor.ui").download("%s", "%s")', url, field.name);
+        return _.sprintf('<button onclick=\'%s;event.stopPropagation()\' class="btn btn-small" type="button"><i class="fa fa-arrow-circle-down"></i></button>', onClick);
+      }
     }
 
     if (widget === "html") {
