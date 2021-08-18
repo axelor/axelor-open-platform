@@ -450,6 +450,13 @@ _.extend(Factory.prototype, {
       return url ? '<img src="' + url + '" style="height: 21px;margin-top: -2px;">' : '';
     }
 
+    if (type === "binary") {
+      var model = (((this.grid || {}).scope || {}).view || {}).model;
+      var url = ui.makeImageURL(model, field.name, dataContext.id, dataContext.version);
+      var onClick = _.sprintf('angular.module("axelor.ui").download("%s", "%s")', url, field.name);
+      return _.sprintf('<button onclick=\'%s\' class="btn btn-small" type="button"><i class="fa fa-arrow-circle-down"></i></button>', onClick);
+    }
+
     if (widget === "html") {
       return value ? '<span>' + value + '</span>' : '';
     }
@@ -1752,27 +1759,35 @@ Grid.prototype.__saveChanges = function(args, callback, errback) {
     });
   }
 
-  records = _.where(records, { $dirty: true });
-  if (records.length === 0) {
+  var dirtyRecords = _.where(records, { $dirty: true });
+  if (dirtyRecords.length === 0) {
     return setTimeout(focus, 200);
   }
 
+  var upload = (dirtyRecords || []).length === 1 && dirtyRecords[0].$upload;
   var fields = handler.selectFields ? handler.selectFields() : undefined;
-  var promise = saveDS.saveAll(records, fields);
+  var promise = upload ? saveDS.save(dirtyRecords[0]) : saveDS.saveAll(dirtyRecords, fields);
 
-  promise.success(function(records, page) {
+  promise.success(function(value, page) {
     if (data.getItemById(0)) {
       data.deleteItem(0);
     }
     if (onAfterSave) {
-      onAfterSave(records, page);
+      if (!_.isArray(value)) {
+        var found = _.findWhere(records, { id: value.id });
+        if (found) {
+          _.extend(found, value);
+        }
+        value = records;
+      }
+      onAfterSave(value, page);
     }
     setTimeout(focus);
   });
 
   if (errback) {
     promise.error(errback);
-  };
+  }
 
   return promise;
 };

@@ -349,7 +349,7 @@ ui.formInput('Binary', {
   template_readonly: null,
   template_editable: null,
   template:
-  '<div>' +
+  '<div class="form-item-container">' +
     '<input type="file">' +
     '<div class="btn-group">' +
       '<button ng-click="doSelect()" ng-show="!isReadonly()" class="btn" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +
@@ -440,7 +440,7 @@ ui.formInput('BinaryLink', {
   template_readonly: null,
   template_editable: null,
   template:
-  '<div>' +
+  '<div class="form-item-container">' +
     '<input type="file">' +
     '<div class="btn-group">' +
       '<button ng-click="doSelect()" ng-show="!isReadonly()" class="btn select" type="button"><i class="fa fa-arrow-circle-up"></i></button>' +

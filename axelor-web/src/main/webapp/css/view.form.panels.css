@@ -299,6 +299,35 @@
   height: 28px;
 }
 
+.form-item-container.file-item {
+  display: flex;
+  align-items: center;
+}
+
+.form-item-container.file-item > .btn-group {
+  flex: 1;
+}
+
+.slick-editor .form-item-container.file-item > .btn-group {
+  background-color: #f7f7f7;
+  padding-left: 8px;
+}
+
+.form-item-container.file-item > .btn-group + a {
+  flex: auto;
+  margin-left: 5px !important;
+}
+
+.slick-editor .form-item-container.file-item > .btn-group + a {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slick-cell.binary > button {
+  position: absolute;
+}
+
 .panel-layout .tag-select,
 .panel-layout .tag-select > ul {
   min-height: 27px;
