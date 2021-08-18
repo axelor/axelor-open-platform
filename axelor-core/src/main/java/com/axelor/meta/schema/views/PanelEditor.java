@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.meta.MetaStore;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -152,6 +153,10 @@ public class PanelEditor extends AbstractPanel {
 
   /** Sets flags in child fields so that we know those fields are within an editor. */
   protected void processFromEditor() {
+    if (ObjectUtils.isEmpty(items)) {
+      return;
+    }
+
     final Queue<AbstractWidget> widgets = new ArrayDeque<>();
     widgets.addAll(items);
 
