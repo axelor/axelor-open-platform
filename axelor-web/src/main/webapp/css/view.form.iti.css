@@ -1,0 +1,66 @@
+/**
+ * Axelor Business Solutions
+ *
+ * Copyright (C) 2005-2022 Axelor (<http://axelor.com>).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+.iti {
+  display: flex;
+}
+
+.iti__flag-container {
+  right: unset;
+  position: relative;
+}
+
+.iti__selected-flag {
+  padding: unset;
+}
+
+.phone-input-readonly {
+  border: none;
+  background-color: inherit;
+  color: #0275d8;
+  text-decoration: none;
+  vertical-align: inherit;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.phone-input-readonly:only-child {
+  padding-left: 0 !important;
+}
+
+.phone-input-readonly:hover,
+.phone-input-readonly:focus {
+  color: #014c8c;
+  text-decoration: underline;
+}
+
+.iti__flag-container + input {
+  flex-grow: 1;
+  text-align: inherit;
+  min-width: 26px !important;
+}
+
+.panel-layout .form-item-container.editable .iti__flag-container + input[type="tel"] {
+  padding-left: 2px !important;
+}
+
+.slick-form .iti__flag-container {
+  border: 1px solid #ddd;
+}
