@@ -1886,6 +1886,16 @@ Grid.prototype.focusInvalidCell = function(args) {
         grid.setActiveCell(args.row, cell);
         that.showEditor();
         that.adjustEditor();
+
+        var actionPromises = (that.scope || {}).$actionPromises || [];
+        if (actionPromises.length) {
+          var defer = that.handler._defer();
+          _.each(actionPromises, function (promise) {
+            promise.then(defer.reject, defer.reject);
+          });
+          actionPromises.length = 0;
+        }
+
         return true;
       }
     }
