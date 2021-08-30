@@ -3,6 +3,7 @@
 ### Bugs
 
 * Fix empty PDF tab with latest Chrome
+* Fix readonly input in mass update form when grid has readonlyIf in fields
 
 ## 5.0.27 (2021-04-15)
 
