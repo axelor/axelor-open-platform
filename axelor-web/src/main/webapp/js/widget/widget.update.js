@@ -213,6 +213,7 @@ ui.directive('uiUpdateForm',  function () {
       field.hidden = false;
       field.required = false;
       field.readonly = false;
+      field.readonlyIf = null;
       field.onChange = null;
       field.placeholder = field.placeholder || field.title;
 

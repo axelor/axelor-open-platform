@@ -1,0 +1,3 @@
+---
+title: Fix readonly input in mass update form when grid has readonlyIf in fields
+type: fix
