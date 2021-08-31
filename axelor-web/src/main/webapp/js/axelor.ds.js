@@ -77,7 +77,97 @@
     };
   }]);
 
-  ds.factory('TagService', ['$q', '$timeout', '$rootScope', 'MenuService', function($q, $timeout, $rootScope, MenuService) {
+  ds.factory('Socket', ['$q', '$rootScope', function($q, $rootScope) {
+    var url = new URL('websocket', location.href).toString().replace(/^http/, 'ws');
+    var ws = null;
+    var connectPromise = null;
+
+    var listeners = {};
+
+    var listen = channel => listener => {
+      var callbacks = listeners[channel];
+      if (callbacks === undefined) {
+        callbacks = listeners[channel] = [];
+      }
+      var index = callbacks.length;
+      callbacks.push(listener);
+      return () => callbacks.splice(index, 1);
+    };
+
+    var notify = channel => data => {
+      var callbacks = listeners[channel];
+      if (callbacks !== undefined) {
+        callbacks.forEach(cb => cb(data));
+      }
+    };
+
+    var connect = function() {
+
+      if (connectPromise) {
+        return connectPromise;
+      }
+
+      var deferred = $q.defer();
+      var promise = deferred.promise;
+      var cleanUp = () => connectPromise = null;
+
+      connectPromise = promise;
+      connectPromise.then(cleanUp, cleanUp);
+
+      var resolve = () => connectPromise && deferred.resolve();
+      var reject = () => connectPromise && deferred.reject();
+
+      if (ws) {
+        resolve();
+        return promise;
+      }
+
+      ws = new WebSocket(url);
+
+      ws.onopen = event => resolve();
+
+      ws.onclose = event => reject();
+
+      ws.onerror = event => reject();
+
+      ws.onmessage = event => {
+        var message = JSON.parse(event.data);
+        notify(message.channel)(message.data);
+      };
+
+      return promise;
+    };
+
+    var disconnect = function() {
+      if (ws) {
+        ws.close();
+        ws = null;
+      }
+    };
+
+    var send = function(type, channel, data) {
+      return connect().then(() => ws.send(JSON.stringify({ type: type, channel: channel, data: data })));
+    }
+
+    $rootScope.$on('$destroy', disconnect);
+
+    return function(name) {
+      var funcs = [];
+      return {
+        subscribe(callback) {
+          return send('SUB', name).then(() => funcs.push(listen(name)(callback)));
+        },
+        unsubscribe() {
+          return send('UNS', name).then(() => funcs.forEach(cb));
+        },
+        send(data) {
+          return send('MSG', name, data);
+        },
+      };
+    };
+  }]);
+
+  ds.factory('TagService', ['$q', '$timeout', '$rootScope', 'Socket', function($q, $timeout, $rootScope, Socket) {
 
     var POLL_INTERVAL = 10000;
 
@@ -104,26 +194,34 @@
       }
     }
 
-    var starting = false;
-    function findTags() {
-      if (starting) { return; }
-      if (pollPromise) {
-        $timeout.cancel(pollPromise);
-      }
-      starting = true;
-      MenuService.tags().success(function (res) {
-        var data = _.first(res.data);
-        var values = data.values;
-        for (var i = 0; i < listeners.length; i++) {
-          listeners[i](values);
-        }
+    var channel = Socket('tags');
+    var pending = false;
+
+    channel.subscribe(message => {
+      var values = message.values;
+
+      $rootScope.$apply(() => listeners.forEach(cb => cb(values)));
+
         pollPromise = $timeout(findTags, POLL_INTERVAL);
+
         if (pollIdle === null) {
           pollIdle = setTimeout(cancelPolling, POLL_INTERVAL * 2);
         }
-        starting = false;
+
+      pending = false;
       });
+
+    function findTags() {
+      if (pending) return;
+      if (pollPromise) $timeout.cancel(pollPromise);
+
+      var names = $('.tagged:visible').get().map(elem => elem.dataset.name);
+
+      pending = true;
+      return channel.send(names);
     }
+
+    $rootScope.$on('$destroy', () => channel.unsubscribe());
 
     window.addEventListener("mousemove", startPolling, false);
     window.addEventListener("mousedown", startPolling, false);
