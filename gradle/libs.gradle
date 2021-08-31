@@ -85,6 +85,7 @@ libs.javax_el = ["org.apache.tomcat:tomcat-jasper:${versions.tomcat}", "org.apac
 libs.javax_mail = "com.sun.mail:javax.mail:1.6.2"
 libs.greenmail = "com.icegreen:greenmail-junit5:1.6.8"
 libs.javax_el = "org.glassfish:jakarta.el:3.0.4"
+libs.websocket_api = "javax.websocket:javax.websocket-api:1.1"
 
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.6.1"
@@ -261,6 +262,7 @@ libs.plugin_node = "com.github.node-gradle:gradle-node-plugin:3.2.1"
 libs.tomcat_embed = [
   "org.apache.tomcat.embed:tomcat-embed-core:${versions.tomcat_embed}",
   "org.apache.tomcat.embed:tomcat-embed-jasper:${versions.tomcat_embed}",
+  "org.apache.tomcat.embed:tomcat-embed-websocket:${versions.tomcat_embed}",
   libs.javax_el
 ]
 

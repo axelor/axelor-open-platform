@@ -34,6 +34,9 @@ import com.axelor.rpc.ResponseInterceptor;
 import com.axelor.web.servlet.CorsFilter;
 import com.axelor.web.servlet.I18nServlet;
 import com.axelor.web.servlet.NoCacheFilter;
+import com.axelor.web.socket.inject.WebSocketModule;
+import com.axelor.web.socket.inject.WebSocketSecurity;
+import com.axelor.web.socket.inject.WebSocketSecurityInterceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Module;
 import com.google.inject.matcher.AbstractMatcher;
@@ -82,6 +85,9 @@ public class AppServletModule extends ServletModule {
 
     // initialize JPA
     install(new JpaModule(jpaUnit, true, false));
+
+    // WebSocket
+    install(new WebSocketModule());
 
     // trick to ensure PersistFilter is registered before anything else
     install(
@@ -134,6 +140,12 @@ public class AppServletModule extends ServletModule {
           }
         },
         new RequestFilter());
+
+    // intercept WebSocket endpoint
+    bindInterceptor(
+        Matchers.annotatedWith(WebSocketSecurity.class),
+        Matchers.any(),
+        new WebSocketSecurityInterceptor());
 
     // bind all the web service resources
     for (Class<?> type :
