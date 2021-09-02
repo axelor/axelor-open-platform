@@ -82,24 +82,28 @@
     var ws = null;
     var connectPromise = null;
 
-    var listeners = {};
-
-    var listen = channel => listener => {
-      var callbacks = listeners[channel];
-      if (callbacks === undefined) {
-        callbacks = listeners[channel] = [];
-      }
-      var index = callbacks.length;
-      callbacks.push(listener);
-      return () => callbacks.splice(index, 1);
+    var listeners = {
+      onopen: [],
+      onclose: [],
+      onerror: [],
+      onmessage: {}
     };
 
-    var notify = channel => data => {
-      var callbacks = listeners[channel];
-      if (callbacks !== undefined) {
-        callbacks.forEach(cb => cb(data));
-      }
+    var registerCallback = (callbacks, callback) => {
+      var index = callbacks.length; callbacks.push(callback);
+      return () => callback.splice(index, 1);
     };
+
+    var registerOnOpen = listener => registerCallback(listeners.onopen, listener);
+    var registerOnClose = listener => registerCallback(listeners.onclose, listener);
+    var registerOnError = listener => registerCallback(listeners.onerror, listener);
+
+    var registerOnMessage = channel => listener => {
+      var callbacks = listeners.onmessage[channel] || (listeners.onmessage[channel] = []);
+      registerCallback(callbacks, listener);
+    };
+
+    var notify = callbacks => message => (callbacks||[]).forEach(cb => cb(message));
 
     var connect = function() {
 
@@ -117,22 +121,31 @@
       var resolve = () => connectPromise && deferred.resolve();
       var reject = () => connectPromise && deferred.reject();
 
-      if (ws) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
         resolve();
         return promise;
       }
 
       ws = new WebSocket(url);
 
-      ws.onopen = event => resolve();
+      ws.onopen = event => {
+        notify(listeners.onopen)(event);
+        resolve();
+      };
 
-      ws.onclose = event => reject();
+      ws.onclose = event => {
+        notify(listeners.onclose)(event);
+        reject();
+      };
 
-      ws.onerror = event => reject();
+      ws.onerror = event => {
+        notify(listeners.onerror)(event);
+        reject();
+      };
 
       ws.onmessage = event => {
         var message = JSON.parse(event.data);
-        notify(message.channel)(message.data);
+        notify(listeners.onmessage[message.channel])(message.data);
       };
 
       return promise;
@@ -145,24 +158,58 @@
       }
     };
 
+    var reconnect = function () {
+      if (ws && ws.readyState === WebSocket.CLOSED) {
+        connect();
+      }
+    };
+
     var send = function(type, channel, data) {
       return connect().then(() => ws.send(JSON.stringify({ type: type, channel: channel, data: data })));
     }
 
     $rootScope.$on('$destroy', disconnect);
+    $rootScope.$on('event:auth-loginRequired', reconnect);
+    $rootScope.$on('event:auth-loginConfirmed', reconnect);
+    $rootScope.$on('event:http-response:200', reconnect);
 
     return function(name) {
-      var funcs = [];
+      var opts = arguments.length > 1 ? arguments[1] : {};
+
+      var openback = opts.onopen;
+      var closeback = opts.onclose;
+
+      var unopen = null;
+      var unclose = null;
+
+      var onUnsubscribed = (uncallback) => {
+        if (unopen) unopen();
+        if (unclose) unclose();
+        uncallback();
+      };
+
+      var onSubscribed = (callback) => {
+        if (openback) unopen = unopen || registerOnOpen(openback);
+        if (closeback) unclose = unclose || registerOnClose(closeback);
+        return registerOnMessage(name)(callback);
+      };
+
       return {
         subscribe(callback) {
-          return send('SUB', name).then(() => funcs.push(listen(name)(callback)));
-        },
-        unsubscribe() {
-          return send('UNS', name).then(() => funcs.forEach(cb));
+          var uncallback = null;
+          send('SUB', name).then(
+            () => uncallback = onSubscribed(callback));
+          return () =>
+            send('UNS', name).then(
+              () => onUnsubscribed(uncallback),
+              () => onUnsubscribed(uncallback));
         },
         send(data) {
           return send('MSG', name, data);
         },
+        get state() {
+          return ws ? ws.readyState : WebSocket.CLOSED;
+        }
       };
     };
   }]);
@@ -171,7 +218,6 @@
 
     var POLL_INTERVAL = 10000;
 
-    var pollResult = {};
     var pollPromise = null;
     var pollIdle = null;
 
@@ -195,9 +241,7 @@
     }
 
     var channel = Socket('tags');
-    var pending = false;
-
-    channel.subscribe(message => {
+    var unsubscribe = channel.subscribe(message => {
       var values = message.values;
 
       $rootScope.$apply(() => listeners.forEach(cb => cb(values)));
@@ -207,21 +251,25 @@
         if (pollIdle === null) {
           pollIdle = setTimeout(cancelPolling, POLL_INTERVAL * 2);
         }
-
-      pending = false;
       });
 
+    var pending = false;
+    var pendingReset = () => {
+      console.log('reset');
+      pending = false;
+    };
+
     function findTags() {
-      if (pending) return;
+      if (pending || channel.state !== WebSocket.OPEN) return;
       if (pollPromise) $timeout.cancel(pollPromise);
 
       var names = $('.tagged:visible').get().map(elem => elem.dataset.name);
 
       pending = true;
-      return channel.send(names);
+      return channel.send(names).then(pendingReset, pendingReset);
     }
 
-    $rootScope.$on('$destroy', () => channel.unsubscribe());
+    $rootScope.$on('$destroy', unsubscribe);
 
     window.addEventListener("mousemove", startPolling, false);
     window.addEventListener("mousedown", startPolling, false);

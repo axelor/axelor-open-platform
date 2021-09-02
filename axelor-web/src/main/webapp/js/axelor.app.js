@@ -372,6 +372,7 @@
             return $q.reject(response);
           }
         }
+        $rootScope.$broadcast('event:http-response:' + response.status, response);
         return response;
       },
       responseError: function(error) {
