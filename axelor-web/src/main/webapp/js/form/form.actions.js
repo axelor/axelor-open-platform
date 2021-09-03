@@ -152,7 +152,7 @@ function updateValues(source, target, itemScope, formScope) {
       target.$dirty = true;
     }
 
-    if (target.id > 0) {
+    if (itemScope && target.id > 0) {
       var item = _.findWhere(itemScope.items, { id: target.id });
       if (item && item.version > target.version) {
         target.version = item.version;
