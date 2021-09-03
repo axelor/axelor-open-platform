@@ -141,6 +141,17 @@ public class EclipseSupport extends AbstractSupport {
     if (dir != null) {
       eclipse.getProject().linkedResource(link("axelor-webapp", dir.getPath()));
       eclipse.getWtp().getComponent().resource(resource("/", dir.getPath()));
+      eclipse
+          .getWtp()
+          .getComponent()
+          .getFile()
+          .withXml(
+              provider -> {
+                StringBuilder sb = provider.asString();
+                String text = sb.toString().replace(dir.getPath(), "axelor-webapp");
+                sb.setLength(0);
+                sb.append(text);
+              });
     }
 
     // finally add build/webapp
