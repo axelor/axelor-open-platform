@@ -422,6 +422,7 @@
   overflow: inherit;
   background-color: #fff;
   border: 1px solid #e7e7e7;
+  margin-top: -4px;
 }
 
 .panel-tabs .tab-content > .panel {
@@ -591,10 +592,6 @@
 .panel-tabs .nav-tabs-responsive {
   margin-bottom: -1px;
   display: inline-flex;
-}
-
-.panel-tabs .nav-tabs-responsive > li {
-    margin-top: -12px;
 }
 
 .panel-tabs .nav-tabs-responsive > li.dropdown {
