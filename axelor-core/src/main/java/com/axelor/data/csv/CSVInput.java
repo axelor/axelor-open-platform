@@ -120,6 +120,10 @@ public class CSVInput {
     return update;
   }
 
+  public void setUpdate(boolean update) {
+    this.update = update;
+  }
+
   public String getCallable() {
     return callable;
   }
@@ -130,6 +134,10 @@ public class CSVInput {
 
   public String getPrepareContext() {
     return prepareContext;
+  }
+
+  public void setPrepareContext(String prepareContext) {
+    this.prepareContext = prepareContext;
   }
 
   public void setSearchCall(String searchCall) {
@@ -168,6 +176,10 @@ public class CSVInput {
       adapters = Lists.newArrayList();
     }
     return adapters;
+  }
+
+  public void setAdapters(List<DataAdapter> adapters) {
+    this.adapters = adapters;
   }
 
   private Object callObject;

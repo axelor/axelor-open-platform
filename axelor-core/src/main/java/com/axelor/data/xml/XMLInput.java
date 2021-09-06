@@ -52,6 +52,10 @@ public class XMLInput {
     return root;
   }
 
+  public void setRoot(String root) {
+    this.root = root;
+  }
+
   public List<DataAdapter> getAdapters() {
     if (adapters == null) {
       adapters = Lists.newArrayList();
@@ -59,8 +63,16 @@ public class XMLInput {
     return adapters;
   }
 
+  public void setAdapters(List<DataAdapter> adapters) {
+    this.adapters = adapters;
+  }
+
   public List<XMLBind> getBindings() {
     return bindings;
+  }
+
+  public void setBindings(List<XMLBind> bindings) {
+    this.bindings = bindings;
   }
 
   @Override

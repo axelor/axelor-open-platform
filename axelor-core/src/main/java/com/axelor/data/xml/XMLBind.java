@@ -81,16 +81,24 @@ public class XMLBind {
     return node;
   }
 
+  public void setNode(String node) {
+    this.node = node;
+  }
+
   public String getField() {
     return field;
   }
 
-  protected void setField(String field) {
+  public void setField(String field) {
     this.field = field;
   }
 
   public String getAlias() {
     return alias;
+  }
+
+  public void setAlias(String alias) {
+    this.alias = alias;
   }
 
   public String getAliasOrName() {
@@ -100,6 +108,10 @@ public class XMLBind {
 
   public String getTypeName() {
     return typeName;
+  }
+
+  public void setTypeName(String typeName) {
+    this.typeName = typeName;
   }
 
   public Class<?> getType() {
@@ -114,19 +126,31 @@ public class XMLBind {
     return search;
   }
 
+  public void setSearch(String search) {
+    this.search = search;
+  }
+
   public Boolean getUpdate() {
     return update;
+  }
+
+  public void setUpdate(Boolean update) {
+    this.update = update;
   }
 
   public Boolean getCreate() {
     return create;
   }
 
+  public void setCreate(Boolean create) {
+    this.create = create;
+  }
+
   public String getExpression() {
     return expression;
   }
 
-  protected void setExpression(String expression) {
+  public void setExpression(String expression) {
     this.expression = expression;
   }
 
@@ -134,16 +158,32 @@ public class XMLBind {
     return condition;
   }
 
+  public void setCondition(String condition) {
+    this.condition = condition;
+  }
+
   public Boolean getConditionEmpty() {
     return conditionEmpty;
+  }
+
+  public void setConditionEmpty(Boolean conditionEmpty) {
+    this.conditionEmpty = conditionEmpty;
   }
 
   public String getCallable() {
     return callable;
   }
 
+  public void setCallable(String callable) {
+    this.callable = callable;
+  }
+
   public String getAdapter() {
     return adapter;
+  }
+
+  public void setAdapter(String adapter) {
+    this.adapter = adapter;
   }
 
   public List<XMLBind> getBindings() {
@@ -152,6 +192,10 @@ public class XMLBind {
     }
 
     return bindings;
+  }
+
+  public void setBindings(List<XMLBind> bindings) {
+    this.bindings = bindings;
   }
 
   private void linkBindings() {
