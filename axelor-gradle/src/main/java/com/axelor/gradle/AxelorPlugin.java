@@ -18,7 +18,6 @@
 package com.axelor.gradle;
 
 import com.axelor.common.VersionUtils;
-import com.axelor.gradle.support.AbstractSupport;
 import com.axelor.gradle.support.EclipseSupport;
 import com.axelor.gradle.support.IdeaSupport;
 import com.axelor.gradle.support.JavaSupport;
@@ -32,14 +31,17 @@ import com.axelor.gradle.tasks.I18nTask;
 import com.axelor.gradle.tasks.UpdateVersion;
 import java.io.File;
 import java.util.Objects;
+import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.file.ConfigurableFileTree;
 import org.gradle.api.plugins.JavaLibraryPlugin;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.compile.AbstractCompile;
 import org.gradle.jvm.tasks.Jar;
+import org.gradle.language.jvm.tasks.ProcessResources;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
 import org.gradle.util.GradleVersion;
@@ -107,7 +109,7 @@ public class AxelorPlugin implements Plugin<Project> {
     project.getPlugins().apply(TomcatSupport.class);
 
     // run generateCode on included builds
-    AbstractSupport.findIncludedBuildProjects(project).stream()
+    AxelorUtils.findIncludedBuildProjects(project).stream()
         .map(included -> included.getTasks().findByName(GenerateCode.TASK_NAME))
         .filter(Objects::nonNull)
         .forEach(task -> project.getTasks().getByName(GenerateCode.TASK_NAME).dependsOn(task));
@@ -137,32 +139,46 @@ public class AxelorPlugin implements Plugin<Project> {
               task.setProcessFiles(files);
             });
 
-    project
-        .getTasks()
-        .create(
-            GenerateCode.TASK_NAME,
-            GenerateCode.class,
-            task -> {
-              task.setDescription(GenerateCode.TASK_DESCRIPTION);
-              task.setGroup(GenerateCode.TASK_GROUP);
-            });
+    GenerateCode generateCodeTask =
+        project
+            .getTasks()
+            .create(
+                GenerateCode.TASK_NAME,
+                GenerateCode.class,
+                task -> {
+                  task.setDescription(GenerateCode.TASK_DESCRIPTION);
+                  task.setGroup(GenerateCode.TASK_GROUP);
+                });
+
+    project.afterEvaluate(
+        p -> {
+          AxelorUtils.findAxelorProjects(p).stream()
+              .map(dep -> dep.getTasks().findByName(GenerateCode.TASK_NAME))
+              .filter(Objects::nonNull)
+              .forEach(task -> generateCodeTask.dependsOn(task));
+        });
 
     project
         .getTasks()
         .withType(AbstractCompile.class)
         .all(task -> task.dependsOn(GenerateCode.TASK_NAME));
 
+    project
+        .getTasks()
+        .withType(ProcessResources.class)
+        .all(task -> task.dependsOn(GenerateCode.TASK_NAME));
+
     // add src-gen dirs
     project
-        .getConvention()
-        .getPlugin(JavaPluginConvention.class)
+        .getExtensions()
+        .getByType(JavaPluginExtension.class)
         .getSourceSets()
         .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
         .getJava()
         .srcDir(GenerateCode.getJavaOutputDir(project));
     project
-        .getConvention()
-        .getPlugin(JavaPluginConvention.class)
+        .getExtensions()
+        .getByType(JavaPluginExtension.class)
         .getSourceSets()
         .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
         .getResources()
@@ -171,15 +187,15 @@ public class AxelorPlugin implements Plugin<Project> {
     // XXX: prepend class output directory to compile classpath (see #26420)
     // XXX: https://github.com/gradle/gradle/issues/12575
     project
-        .getConvention()
-        .getPlugin(JavaPluginConvention.class)
+        .getExtensions()
+        .getByType(JavaPluginExtension.class)
         .getSourceSets()
         .getByName(
             SourceSet.MAIN_SOURCE_SET_NAME,
             sourceSet -> {
               sourceSet.setCompileClasspath(
                   project
-                      .files(sourceSet.getJava().getOutputDir())
+                      .files(sourceSet.getJava().getClassesDirectory().get().getAsFile())
                       .plus(sourceSet.getCompileClasspath()));
             });
   }

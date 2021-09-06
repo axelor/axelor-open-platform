@@ -19,6 +19,7 @@ package com.axelor.gradle.tasks;
 
 import com.axelor.gradle.AxelorExtension;
 import com.axelor.gradle.AxelorPlugin;
+import com.axelor.gradle.AxelorUtils;
 import com.axelor.tools.x2j.Generator;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -29,9 +30,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ResolvedArtifact;
 import org.gradle.api.tasks.InputFiles;
@@ -39,7 +40,7 @@ import org.gradle.api.tasks.OutputDirectories;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.util.PatternSet;
 
-public class GenerateCode extends ModuleTask {
+public class GenerateCode extends DefaultTask {
 
   public static final String TASK_NAME = "generateCode";
   public static final String TASK_DESCRIPTION =
@@ -75,9 +76,7 @@ public class GenerateCode extends ModuleTask {
 
   @InputFiles
   public List<File> getLookupFiles() {
-    return moduleArtifacts().stream()
-        .map(artifact -> findProject(artifact))
-        .filter(Objects::nonNull)
+    return AxelorUtils.findAxelorProjects(getProject()).stream()
         .map(sub -> getJavaOutputDir(sub))
         .collect(Collectors.toList());
   }
@@ -156,15 +155,17 @@ public class GenerateCode extends ModuleTask {
       return;
     }
 
+    List<ResolvedArtifact> axelorArtifacts = AxelorUtils.findAxelorArtifacts(getProject());
+
     // generate module info
-    generateInfo(extension, moduleArtifacts());
+    generateInfo(extension, axelorArtifacts);
 
     // start code generation
     final Generator generator = buildGenerator(project);
 
     // add lookup generators
-    for (ResolvedArtifact artifact : moduleArtifacts()) {
-      final Project sub = findProject(artifact);
+    for (ResolvedArtifact artifact : axelorArtifacts) {
+      final Project sub = AxelorUtils.findProject(project, artifact);
       if (sub == null) {
         generator.addLookupSource(
             Generator.forFiles(

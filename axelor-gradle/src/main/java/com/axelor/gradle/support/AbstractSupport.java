@@ -19,21 +19,16 @@ package com.axelor.gradle.support;
 
 import com.axelor.common.ResourceUtils;
 import com.google.common.io.CharStreams;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
-import org.gradle.composite.internal.DefaultIncludedBuild;
 
 public abstract class AbstractSupport implements Plugin<Project> {
 
-  public void applyConfigurationLibs(Project project, String libs, String as) {
+  protected void applyConfigurationLibs(Project project, String libs, String as) {
     final String path = String.format("com/axelor/gradle/%s-libs.txt", libs);
     try (Reader reader = new InputStreamReader(ResourceUtils.getResourceStream(path))) {
       final DependencyHandler handler = project.getDependencies();
@@ -41,16 +36,5 @@ public abstract class AbstractSupport implements Plugin<Project> {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  public static String toRelativePath(Project project, File file) {
-    return project.getProjectDir().toPath().relativize(file.toPath()).toString();
-  }
-
-  public static List<Project> findIncludedBuildProjects(Project project) {
-    return project.getGradle().getIncludedBuilds().stream()
-        .map(build -> ((DefaultIncludedBuild) build).getConfiguredBuild().getRootProject())
-        .flatMap(root -> Stream.concat(Stream.of(root), root.getSubprojects().stream()))
-        .collect(Collectors.toList());
   }
 }

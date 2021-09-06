@@ -19,11 +19,10 @@ package com.axelor.gradle.support;
 
 import java.util.ArrayList;
 import org.gradle.api.Project;
-import org.gradle.api.internal.plugins.DslObject;
 import org.gradle.api.plugins.GroovyPlugin;
 import org.gradle.api.plugins.JavaPlugin;
-import org.gradle.api.plugins.JavaPluginConvention;
-import org.gradle.api.tasks.GroovySourceSet;
+import org.gradle.api.plugins.JavaPluginExtension;
+import org.gradle.api.tasks.GroovySourceDirectorySet;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.compile.JavaCompile;
 
@@ -60,16 +59,16 @@ public class JavaSupport extends AbstractSupport {
   }
 
   private void configureGroovy(Project project) {
-    final JavaPluginConvention convention =
-        project.getConvention().getPlugin(JavaPluginConvention.class);
-    final SourceSet main = convention.getSourceSets().findByName(SourceSet.MAIN_SOURCE_SET_NAME);
-    final SourceSet test = convention.getSourceSets().findByName(SourceSet.TEST_SOURCE_SET_NAME);
-    final GroovySourceSet mainGroovy =
-        new DslObject(main).getConvention().getPlugin(GroovySourceSet.class);
-    final GroovySourceSet testGroovy =
-        new DslObject(test).getConvention().getPlugin(GroovySourceSet.class);
-    mainGroovy.getGroovy().srcDirs(main.getJava().getSrcDirs());
-    testGroovy.getGroovy().srcDirs(test.getJava().getSrcDirs());
+    final JavaPluginExtension extension =
+        project.getExtensions().getByType(JavaPluginExtension.class);
+    final SourceSet main = extension.getSourceSets().findByName(SourceSet.MAIN_SOURCE_SET_NAME);
+    final SourceSet test = extension.getSourceSets().findByName(SourceSet.TEST_SOURCE_SET_NAME);
+    final GroovySourceDirectorySet mainGroovy =
+        main.getExtensions().findByType(GroovySourceDirectorySet.class);
+    final GroovySourceDirectorySet testGroovy =
+        main.getExtensions().findByType(GroovySourceDirectorySet.class);
+    mainGroovy.srcDirs(main.getJava().getSrcDirs());
+    testGroovy.srcDirs(test.getJava().getSrcDirs());
     main.getJava().setSrcDirs(new ArrayList<>());
     test.getJava().setSrcDirs(new ArrayList<>());
   }

@@ -18,6 +18,7 @@
 package com.axelor.gradle.tasks;
 
 import com.axelor.common.FileUtils;
+import com.axelor.gradle.AxelorUtils;
 import com.axelor.gradle.support.TomcatSupport;
 import java.io.File;
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public class TomcatRun extends AbstractRunTask {
     args.add("--port");
     args.add("" + port);
     args.add("--config");
-    args.add(TomcatSupport.toRelativePath(project, confFile));
+    args.add(AxelorUtils.toRelativePath(project, confFile));
 
     return args;
   }

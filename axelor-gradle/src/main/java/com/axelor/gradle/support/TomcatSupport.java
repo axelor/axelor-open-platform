@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import org.gradle.api.Project;
-import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.plugins.WarPlugin;
 import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.bundling.War;
@@ -58,8 +58,8 @@ public class TomcatSupport extends AbstractSupport {
             task -> {
               task.dependsOn(
                   project
-                      .getConvention()
-                      .getPlugin(JavaPluginConvention.class)
+                      .getExtensions()
+                      .getByType(JavaPluginExtension.class)
                       .getSourceSets()
                       .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
                       .getRuntimeClasspath());

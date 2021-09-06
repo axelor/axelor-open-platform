@@ -21,7 +21,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaPlugin;
-import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin;
@@ -43,14 +43,14 @@ public class PublishSupport extends AbstractSupport {
   }
 
   private void configureLibrary(Project project, PublishingExtension publishing) {
-    final JavaPluginConvention convention =
-        project.getConvention().findPlugin(JavaPluginConvention.class);
+    final JavaPluginExtension extension =
+        project.getExtensions().findByType(JavaPluginExtension.class);
 
-    if (convention == null) {
+    if (extension == null) {
       return;
     }
 
-    final SourceSet main = convention.getSourceSets().findByName(SourceSet.MAIN_SOURCE_SET_NAME);
+    final SourceSet main = extension.getSourceSets().findByName(SourceSet.MAIN_SOURCE_SET_NAME);
     final Jar jar = (Jar) project.getTasks().findByName(JavaPlugin.JAR_TASK_NAME);
     final Jar sourcesJar =
         project

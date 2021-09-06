@@ -15,66 +15,85 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.gradle.tasks;
+package com.axelor.gradle;
 
-import com.axelor.gradle.AxelorPlugin;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.jar.JarFile;
-import org.gradle.api.DefaultTask;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ResolvedArtifact;
 import org.gradle.api.artifacts.ResolvedDependency;
 import org.gradle.api.artifacts.component.ComponentIdentifier;
 import org.gradle.api.artifacts.component.ProjectComponentIdentifier;
-import org.gradle.composite.internal.DefaultIncludedBuild;
+import org.gradle.internal.composite.IncludedBuildInternal;
 
-public abstract class ModuleTask extends DefaultTask {
+public class AxelorUtils {
 
-  private List<ResolvedArtifact> artifacts;
-
-  protected List<ResolvedArtifact> moduleArtifacts() {
-    if (artifacts == null) {
-      artifacts = moduleArtifacts(getProject().getConfigurations().getByName("runtimeClasspath"));
-      artifacts = Collections.unmodifiableList(artifacts);
-    }
-    return artifacts;
+  public static String toRelativePath(Project project, File file) {
+    return project.getProjectDir().toPath().relativize(file.toPath()).toString();
   }
 
-  private List<ResolvedArtifact> moduleArtifacts(Configuration config) {
+  private static Stream<Project> includedBuildRoots(Project project) {
+    return project.getGradle().getIncludedBuilds().stream()
+        .map(b -> ((IncludedBuildInternal) b).getTarget())
+        .map(b -> b.getBuild().getRootProject());
+  }
+
+  public static List<Project> findIncludedBuildProjects(Project project) {
+    return includedBuildRoots(project)
+        .flatMap(root -> Stream.concat(Stream.of(root), root.getSubprojects().stream()))
+        .collect(Collectors.toList());
+  }
+
+  public static List<Project> findAxelorProjects(Project project) {
+    return findAxelorArtifacts(project).stream()
+        .map(artifact -> findProject(project, artifact))
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+  }
+
+  public static List<ResolvedArtifact> findAxelorArtifacts(Project project) {
+    final Configuration config = project.getConfigurations().getByName("runtimeClasspath");
     final Set<Object> visited = new LinkedHashSet<>();
     final List<ResolvedArtifact> result = new ArrayList<>();
     config
         .getResolvedConfiguration()
         .getFirstLevelModuleDependencies()
-        .forEach(it -> sortArtifacts(it, visited, result));
-    return result;
+        .forEach(it -> sortArtifacts(project, it, visited, result));
+    return Collections.unmodifiableList(result);
   }
 
-  private void sortArtifacts(
-      ResolvedDependency dependency, Set<Object> visited, List<ResolvedArtifact> result) {
+  private static void sortArtifacts(
+      Project project,
+      ResolvedDependency dependency,
+      Set<Object> visited,
+      List<ResolvedArtifact> result) {
     if (visited.contains(dependency.getName())) {
       return;
     }
     visited.add(dependency.getName());
     final Set<ResolvedArtifact> artifacts = dependency.getModuleArtifacts();
     for (ResolvedArtifact artifact : artifacts) {
-      if (isAxelorModule(artifact)) {
+      if (isAxelorModule(project, artifact)) {
         for (ResolvedDependency child : dependency.getChildren()) {
-          sortArtifacts(child, visited, result);
+          sortArtifacts(project, child, visited, result);
         }
         result.add(artifact);
       }
     }
   }
 
-  private boolean isAxelorModule(ResolvedArtifact artifact) {
-    final Project sub = findProject(artifact);
+  public static boolean isAxelorModule(Project project, ResolvedArtifact artifact) {
+    final Project sub = findProject(project, artifact);
     if (sub == null) {
       try (JarFile jar = new JarFile(artifact.getFile())) {
         if (jar.getEntry("module.properties") != null) {
@@ -92,19 +111,14 @@ public abstract class ModuleTask extends DefaultTask {
         .isPresent();
   }
 
-  protected Project findProject(ResolvedArtifact artifact) {
+  public static Project findProject(Project project, ResolvedArtifact artifact) {
     final ComponentIdentifier cid = artifact.getId().getComponentIdentifier();
     if (cid instanceof ProjectComponentIdentifier) {
       String path = ((ProjectComponentIdentifier) cid).getProjectPath();
-      Project sub = getProject().findProject(path);
+      Project sub = project.findProject(path);
       // consider projects from included builds
       if (sub == null) {
-        sub =
-            getProject().getGradle().getIncludedBuilds().stream()
-                .map(b -> ((DefaultIncludedBuild) b).getConfiguredBuild().getRootProject())
-                .map(p -> p.findProject(path))
-                .findFirst()
-                .orElse(null);
+        sub = includedBuildRoots(project).map(p -> p.findProject(path)).findFirst().orElse(null);
       }
       return sub;
     }

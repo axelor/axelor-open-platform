@@ -34,7 +34,7 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
@@ -80,8 +80,8 @@ public abstract class AbstractRunTask extends DefaultTask {
   protected FileCollection getClasspath() {
     final FileCollection classpath =
         getProject()
-            .getConvention()
-            .getPlugin(JavaPluginConvention.class)
+            .getExtensions()
+            .getByType(JavaPluginExtension.class)
             .getSourceSets()
             .getByName(SourceSet.MAIN_SOURCE_SET_NAME)
             .getRuntimeClasspath();
