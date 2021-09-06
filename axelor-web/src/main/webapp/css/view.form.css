@@ -1787,6 +1787,27 @@ label.has-help > span:after,
   font-size: 14px;
 }
 
+.view-watcher .button-menu a.btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: start;
+  margin-top: 4px !important;
+  padding: 2px 4px;
+}
+
+.view-watcher-users {
+  font-weight: 600;
+  font-size: 85%;
+  line-height: 1;
+}
+
+.view-watcher-action {
+  font-size: 75%;
+  font-style: oblique;
+  line-height: 1;
+  margin-top: 4px;
+}
+
 ::-webkit-input-placeholder {
   font-size: 12px;
 }

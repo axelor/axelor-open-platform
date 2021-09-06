@@ -20,6 +20,7 @@ package com.axelor.web.socket.inject;
 
 import com.axelor.web.socket.Channel;
 import com.axelor.web.socket.channels.TagsChannel;
+import com.axelor.web.socket.channels.WatchChannel;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 
@@ -31,5 +32,6 @@ public class WebSocketModule extends AbstractModule {
 
     final Multibinder<Channel> multibinder = Multibinder.newSetBinder(binder(), Channel.class);
     multibinder.addBinding().to(TagsChannel.class);
+    multibinder.addBinding().to(WatchChannel.class);
   }
 }

@@ -603,6 +603,10 @@ header .navbar .nav-link-user-sub {
   top: 0;
   right: 6px;
   position: absolute;
+
+  display: inline-flex;
+  flex-direction: row-reverse;
+  align-items: center;
 }
 
 .grid-view > .details-view .record-toolbar {
