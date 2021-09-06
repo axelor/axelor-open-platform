@@ -1271,8 +1271,23 @@ ui.directive('uiActionClick', ['ViewService', function(ViewService) {
   return {
     link: function(scope, element, attrs) {
       var action = attrs.uiActionClick;
+      var actionContext = attrs.uiActionContext;
+      var actionScope = scope;
+
+      if (actionContext) {
+        var getContext = scope.getContext;
+        actionScope = actionScope.$new();
+        actionScope.getContext = function () {
+          var context = getContext ? getContext.apply(scope, arguments) : {};
+          var value = actionScope.$eval(actionContext);
+          if (_.isArray(value) || _.isDate(value)) return context;
+          if (_.isObject(value)) return _.extend({}, context, value);
+          return context;
+        };
+      }
+
       scope.$evalAsync(function() {
-        var handler = new ActionHandler(scope, ViewService, {
+        var handler = new ActionHandler(actionScope, ViewService, {
           element: element,
           action: action
         });
