@@ -2323,9 +2323,11 @@ function commitEdit(noWait) {
 
     // Force fetch if pop-up form view is opened.
     // This is needed if form view has fields no present in grid view.
+    data.beginUpdate();
     _.forEach(data.getItems(), function(item) {
       data.updateItem(item.id, _.extend(item || {}, { $fetched: false }));
     });
+    data.endUpdate();
   }
 
   this._commitPromise = promise;
