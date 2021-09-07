@@ -22,6 +22,7 @@ spotless {
       exclude '**/webapp/lib/*'
       exclude '**/webapp/dist/*'
       exclude '**/webapp/node_modules/*'
+      exclude '**/build/*'
     }
     indentWithSpaces(2)
     trimTrailingWhitespace()
@@ -36,7 +37,7 @@ spotless {
 
 spotlessMisc.dependsOn(spotlessMarkdown)
 
-subprojects {
+subprojects { p ->
   apply plugin: com.diffplug.gradle.spotless.SpotlessPlugin
   spotless {
     java {
@@ -44,6 +45,14 @@ subprojects {
     }
   }
   task formatCode(dependsOn: ['licenseFormat', 'spotlessApply'])
+
+  // fix up-to-date check issue
+  p.afterEvaluate {
+    try {
+      p.spotlessJava.dependsOn(p.generateCode)
+    } catch (Exception e) {
+    }
+  }
 }
 
 task formatCode(dependsOn: 'spotlessApply')

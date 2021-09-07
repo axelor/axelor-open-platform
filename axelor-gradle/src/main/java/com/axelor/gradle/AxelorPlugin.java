@@ -33,13 +33,13 @@ import java.io.File;
 import java.util.Objects;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.file.ConfigurableFileTree;
 import org.gradle.api.plugins.JavaLibraryPlugin;
-import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
-import org.gradle.api.tasks.compile.AbstractCompile;
 import org.gradle.jvm.tasks.Jar;
-import org.gradle.language.jvm.tasks.ProcessResources;
 import org.gradle.plugins.ide.eclipse.EclipsePlugin;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
 import org.gradle.util.GradleVersion;
@@ -137,7 +137,9 @@ public class AxelorPlugin implements Plugin<Project> {
               task.setProcessFiles(files);
             });
 
-    GenerateCode generateCodeTask =
+    Task compileTask = project.getTasks().findByName(JavaPlugin.COMPILE_JAVA_TASK_NAME);
+    Task resourcesTask = project.getTasks().findByName(JavaPlugin.PROCESS_RESOURCES_TASK_NAME);
+    Task generateCodeTask =
         project
             .getTasks()
             .create(
@@ -148,23 +150,18 @@ public class AxelorPlugin implements Plugin<Project> {
                   task.setGroup(GenerateCode.TASK_GROUP);
                 });
 
+    // add dependencies to optimize up-to-date checks
+    dependsOn(compileTask, generateCodeTask);
+    dependsOn(resourcesTask, generateCodeTask);
     project.afterEvaluate(
         p -> {
-          AxelorUtils.findAxelorProjects(p).stream()
-              .map(dep -> dep.getTasks().findByName(GenerateCode.TASK_NAME))
-              .filter(Objects::nonNull)
-              .forEach(task -> generateCodeTask.dependsOn(task));
+          AxelorUtils.findAxelorProjects(p)
+              .forEach(
+                  d -> {
+                    dependsOn(generateCodeTask, d.getTasks().findByName(GenerateCode.TASK_NAME));
+                    dependsOn(compileTask, d.getTasks().findByName(JavaPlugin.CLASSES_TASK_NAME));
+                  });
         });
-
-    project
-        .getTasks()
-        .withType(AbstractCompile.class)
-        .all(task -> task.dependsOn(GenerateCode.TASK_NAME));
-
-    project
-        .getTasks()
-        .withType(ProcessResources.class)
-        .all(task -> task.dependsOn(GenerateCode.TASK_NAME));
 
     // add src-gen dirs
     project
@@ -196,5 +193,11 @@ public class AxelorPlugin implements Plugin<Project> {
                       .files(sourceSet.getJava().getClassesDirectory().get().getAsFile())
                       .plus(sourceSet.getCompileClasspath()));
             });
+  }
+
+  private void dependsOn(Task task, Task dependency) {
+    if (task != null && dependency != null) {
+      task.dependsOn(dependency);
+    }
   }
 }
