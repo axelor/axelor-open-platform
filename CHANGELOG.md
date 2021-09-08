@@ -1,3 +1,260 @@
+## 5.4.3 (2021-09-08)
+
+#### Changes
+
+* Serialize Time with seconds
+
+  <details>
+  Time is now serialized with formatter "HH:mm:ss".
+  Seconds are still not displayed by default in client (need to use `x-seconds="true"`).
+  </details>
+
+* Require manual closing of datetime picker
+* Disable translation joins on queries by default
+
+  <details>
+  Add Query.translate() and Filter.translate() to enable translation joins.
+
+  REST API now accepts parameter `translate` to enable translation joins
+  on criteria and for ordering, but never for domains.
+
+  Web client always uses the `translate` parameter.
+  </details>
+
+
+#### Features
+
+* Clarify title/placeholder of user password fields
+
+  <details>
+  Clarify title/placeholder of user password fields in form view and change password page.
+
+  * Change title depending on existing or new user
+  * Add help popovers
+  * Add password pattern help using `user.password.pattern.title` (customized via translation)
+  </details>
+
+* Use select control type on year, month, and time in datetime widget
+* Add support for related parameters in domain expressions
+
+  <details>
+  Character `$` is used to access related fields in domain expression parameters.
+  This can be used to access other JSON fields. Example:
+
+  ```
+  "self.product = :$extraAttrs$myCustomProduct"
+  ```
+  </details>
+
+* Add view-param `grid-width` to set width of grid in details-view
+
+  <details>
+  Example:
+
+  ```xml
+  <action-view name="sale.orders" model="com.axelor.sale.db.Order" title="Sale Orders">
+    <view type="grid" name="order-grid" />
+    <view type="form" name="order-form" />
+    <view-param name="details-view" value="true" />
+    <view-param name="grid-width" value="25%" />
+  </action-view>
+  ```
+  </details>
+
+* Add multi-tenant aware thread implementation
+
+  <details>
+  The `com.axelor.db.tenants.TenantAware` is a custom `Thread` implementation
+  that keeps track of current tenant and runs the thread in transaction with
+  current tenant in the context.
+  </details>
+
+* Add setter methods for all attributes in XMLInput/XMLBind CSVInput/CSVBind
+* Support adaptive date/time/datetime quick search in grid view
+* Add support for CSV/XML data import of custom fields
+
+  <details>
+  Example:
+
+  ```xml
+  <!-- for CSV data -->
+  <input file="some-data.csv" ...>
+    <bind column="some" to="$attrs.some" />
+  </input>
+
+  <!-- for XML data -->
+  <input file="some-data.xml" ...>
+    <bind node="some" to="$attrs.some" />
+  </input>
+  ```
+
+  For custom model records, you can specify `json-model` in order to automatically bind jsonModel,
+  handle search domain, and set namecolumn.
+
+  CSV import example:
+
+  ```xml
+  <input file="data.csv" json-model="ElectricityBillSubscription"
+      search="json_extract_text(self.attrs, 'name') = :name">
+    <bind column="name" to="$attrs.name" />
+    <bind column="startDate" to="$attrs.startDate" adapter="LocalDate" />
+    <bind column="endDate" to="$attrs.endDate" adapter="LocalDate" />
+
+    <bind to="$attrs.billSubscription"
+        search="json_extract_text(self.attrs, 'name') = :billName">
+      <bind column="billName" to="$attrs.name" />
+    </bind>
+  </input>
+  ```
+
+  ```csv
+  name,startDate,endDate,billName
+  "Bill Jan2021","01/01/2021","31/01/2021","Test01"
+  "Bill Feb2021","01/02/2021","28/02/2021","Test02"
+  ```
+
+  XML import example:
+
+  ```xml
+  <bind node="electricityBillSubscription" json-model="ElectricityBillSubscription" update="true"
+      search="json_extract_text(self.attrs, 'name') = :_electricityBillSubscriptionName">
+    <bind node="name" to="_electricityBillSubscriptionName" />
+    <bind node="name" to="$attrs.name" />
+    <bind node="startDate" to="$attrs.startDate" adapter="LocalDate" />
+    <bind node="endDate" to="$attrs.endDate" adapter="LocalDate" />
+
+    <bind node="billSubscription" to="$attrs.billSubscription" update="true"
+        search="json_extract_text(self.attrs, 'name') = :_billSubscriptionName">
+      <bind node="@name" to="_billSubscriptionName" />
+      <bind node="@name" to="$attrs.name" />
+    </bind>
+  </bind>
+  ```
+
+  ```xml
+  <electricityBillSubscription>
+    <name>Bill Jan2021</name>
+    <startDate>01/01/2021</startDate>
+    <endDate>31/01/2021</endDate>
+    <billSubscription name="Test01"/>
+  </electricityBillSubscription>
+  ```
+  </details>
+
+* Support `x-seconds` attribute on DateTime and Time widgets
+* Add ui-action-context attribute to use with ui-action-click
+
+  <details>
+  The `ui-action-context="scopeVariable"` can be used with `ui-action-click` in custom view
+  template to provide extra details in action context.
+  </details>
+
+* Expose $scope.openTab as axelor.$openTab
+
+  <details>
+  The api can be useful for some apps loading in iframe.
+  </details>
+
+* Improve the indicator and delay the wait cursor
+
+  <details>
+  - delay showing of loading indicator by 1 second
+  - delay wait cursor till the wait spinner appears
+  </details>
+
+* Add support for view auto-reloading
+
+  <details>
+  Use `view-param` named `auto-reload`, with value specified in seconds. Example:
+
+  ```xml
+    <view-param name="auto-reload" value="30" />
+  ```
+
+  Auto-reloading is paused when tab is not selected or when record is in edit mode.
+  </details>
+
+* Add JSON field meta info on all views
+
+#### Fixed
+
+* Fix CSS of invalid BinaryLink
+* Fix value update action after save in one-to-many/many-to-many editor
+* Fix dirty form when there are custom multirelational fields
+* Fix grid search on custom fields
+* Fix grid customization when view has duplicate fields
+* Fix duplicate computed views after upgrade
+* Fix `ActionResponse.setReload` and `refresh-tab` signal from editor
+* Fix NavSelect widget with M2O record having an empty name
+* Fix attribute `x-currency` not taken into account
+* Fix user notifications for followers added by email address
+* Fix dashlet search triggering buttons
+* Log errors when persisting JpaFixture items
+* Exclude UI custom fields from exports
+* Fix missing handling of LocalTime in JpaFixture::load
+
+  <details>
+  When loading fixture in tests with LocalTime fields, the JpaFixture throw
+  a exception because LocalTime hasn't appropriate constructor.
+
+  ```
+  Caused by: org.yaml.snakeyaml.error.YAMLException: No single argument constructor found for class java.time.LocalTime : null
+  ```
+  </details>
+
+* Wait for actions before confirming line on editable grid
+* Fix unsupported regular expression in WebKit causing empty grid
+* Fix currency filter with symbols other than $, €, ¥, £
+* Use number input type on number fields
+* Fix text value escape on M2O names
+* Fix multi-tenant datasource configuration
+* Fix generated code when setting `default="null"` on nullable boolean
+* Fix broken free search
+* Fix stuck login dialog after wrong attempt
+* Fix recursive child grid view in popup
+* Fix readonly input in mass update form when grid has readonlyIf in fields
+* Fix grid export IndexOutOfBoundsException with collection columns and translatable order by
+* Fix ignored grid orderBy when applying default search filters
+* Fix empty PDF tab with latest Chrome
+* Fix readonly button on grid
+* Fix mass applying same permission to children DMS files
+* Fix free search with custom fields
+* Fix button showIf/hideIf on editable grid
+* Fix unnecessary fetch from field editor
+* Fix missing "contains" search with MultiSelect widget
+* Fix dirty checking issue with relational fields
+
+  <details>
+  When some o2m has an onChange action that updates parent record with
+  `setValues(instance)` the o2m items were wrongly marked as dirty if
+  the o2m doesn't have named column.
+  </details>
+
+* Fix multi-tenant datasource configuration
+* Preserve view-param showArchived when clearing filters
+* Fix uploading of meta files in form view
+* Fix Binary/BinaryLink in editable grid
+
+#### Security
+
+* Check for permissions when calling actions
+* Check for permissions on dotted fields
+
+  <details>
+  Check for permissions on dotted fields:
+
+  * Filter permitted dotted fields in fetch request
+  * Filter permitted dotted fields in search request
+  * Filter permitted fields in ActionRequest.setValue
+  * Check for create/write permissions on related fields in save request
+  * Check for write permissions on editable grid
+  * Hide dotted fields if user has no read permissions
+
+  Users are still permitted to read dotted fields’ id, version, and namecolumn
+  regardless of permissions.
+  </details>
+
+
 ## 5.4.2 (2021-04-15)
 
 #### Changes

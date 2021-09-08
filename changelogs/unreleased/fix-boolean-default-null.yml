@@ -1,3 +1,0 @@
----
-title: Fix generated code when setting `default="null"` on nullable boolean
-type: fix

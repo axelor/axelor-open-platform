@@ -1,6 +1,0 @@
----
-title: Improve the indicator and delay the wait cursor
-type: feature
-description: |
-  - delay showing of loading indicator by 1 second
-  - delay wait cursor till the wait spinner appears

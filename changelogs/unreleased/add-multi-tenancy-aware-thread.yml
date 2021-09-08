@@ -1,7 +1,0 @@
----
-title: Add multi-tenant aware thread implementation
-type: feature
-description: |
-  The `com.axelor.db.tenants.TenantAware` is a custom `Thread` implementation
-  that keeps track of current tenant and runs the thread in transaction with
-  current tenant in the context.

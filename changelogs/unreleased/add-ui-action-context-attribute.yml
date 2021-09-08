@@ -1,6 +1,0 @@
----
-title: Add ui-action-context attribute to use with ui-action-click
-type: feature
-description: |
-  The `ui-action-context="scopeVariable"` can be used with `ui-action-click` in custom view
-  template to provide extra details in action context.

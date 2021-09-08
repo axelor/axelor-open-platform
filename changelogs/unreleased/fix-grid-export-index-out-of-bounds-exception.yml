@@ -1,3 +1,0 @@
----
-title: Fix grid export IndexOutOfBoundsException with collection columns and translatable order by
-type: fix

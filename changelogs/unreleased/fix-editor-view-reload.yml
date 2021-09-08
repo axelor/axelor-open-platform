@@ -1,3 +1,0 @@
----
-title: Fix `ActionResponse.setReload` and `refresh-tab` signal from editor
-type: fix
