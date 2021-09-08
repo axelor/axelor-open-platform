@@ -588,13 +588,14 @@ public class XMLViews {
 
       final MetaView originalView = getOriginalView(view);
       final List<MetaView> extensionViews = findExtensionMetaViewsByModuleOrder(originalView);
-
-      final String xmlId =
-          MoreObjects.firstNonNull(originalView.getXmlId(), originalView.getName())
-              + "__computed__";
+      final Query<MetaView> computedViewQuery =
+          metaViewRepo
+              .all()
+              .filter("self.name = :name AND self.computed = TRUE")
+              .bind("name", originalView.getName());
 
       if (extensionViews.isEmpty()) {
-        Optional.ofNullable(metaViewRepo.findByID(xmlId)).ifPresent(metaViewRepo::remove);
+        computedViewQuery.remove();
         return false;
       }
 
@@ -602,16 +603,24 @@ public class XMLViews {
       final Document document = parseXml(xml);
       final Node viewNode = findViewNode(document);
 
-      final MetaView computedView =
-          Optional.ofNullable(metaViewRepo.findByID(xmlId))
-              .orElseGet(
-                  () -> {
-                    final MetaView copy = metaViewRepo.copy(originalView, false);
-                    copy.setXmlId(xmlId);
-                    copy.setComputed(true);
-                    metaViewRepo.persist(copy);
-                    return copy;
-                  });
+      final MetaView computedView;
+      final Iterator<MetaView> computedViewIt =
+          computedViewQuery.order("xmlId").fetchStream().iterator();
+      if (computedViewIt.hasNext()) {
+        computedView = computedViewIt.next();
+        while (computedViewIt.hasNext()) {
+          metaViewRepo.remove(computedViewIt.next());
+        }
+      } else {
+        final MetaView copy = metaViewRepo.copy(originalView, false);
+        final String xmlId =
+            MoreObjects.firstNonNull(originalView.getXmlId(), originalView.getName())
+                + "__computed__";
+        copy.setXmlId(xmlId);
+        copy.setComputed(true);
+        computedView = metaViewRepo.save(copy);
+      }
+
       computedView.setPriority(originalView.getPriority() + 1);
 
       originalView.setDependentModules(null);

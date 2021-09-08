@@ -116,7 +116,7 @@ abstract class AbstractLoader {
     }
 
     synchronized (resolveTasks) {
-      resolveTasks.parallelStream().forEach(task -> JPA.runInTransaction(task::run));
+      resolveTasks.forEach(task -> JPA.runInTransaction(task::run));
       resolveTasks.clear();
     }
   }
