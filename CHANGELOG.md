@@ -1,3 +1,26 @@
+## 5.3.10 (2021-09-08)
+
+#### Fixed
+
+* Fix CSS of invalid BinaryLink
+* Fix touchpad click to confirm on a popup
+* Fix duplicate computed views after upgrade
+* Fix NavSelect widget with M2O record having an empty name
+* Fix user notifications for followers added by email address
+* Log errors when persisting JpaFixture items
+* Fix multi-tenant datasource configuration
+* Fix readonly input in mass update form when grid has readonlyIf in fields
+* Fix empty PDF tab with latest Chrome
+* Fix dirty checking issue with relational fields
+
+  <details>
+  When some o2m has an onChange action that updates parent record with
+  `setValues(instance)` the o2m items were wrongly marked as dirty if
+  the o2m doesn't have named column.
+  </details>
+
+* Fix multi-tenant datasource configuration
+
 ## 5.3.9 (2021-04-15)
 
 #### Changes
