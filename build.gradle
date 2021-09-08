@@ -20,9 +20,6 @@ subprojects {
   group = "com.axelor"
   version = rootProject.version
 
-  sourceCompatibility = JavaVersion.VERSION_11
-  targetCompatibility = JavaVersion.VERSION_11
-
   afterEvaluate {
     test {
       forkEvery 1

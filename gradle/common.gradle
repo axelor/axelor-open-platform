@@ -2,6 +2,12 @@ apply plugin: "java"
 apply plugin: "eclipse"
 apply plugin: "idea"
 
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(11)
+  }
+}
+
 dependencies {
   testImplementation libs.junit
   if (project.name != "axelor-tomcat") {
