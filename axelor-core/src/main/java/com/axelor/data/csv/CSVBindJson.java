@@ -22,7 +22,6 @@ import com.axelor.db.JpaRepository;
 import com.axelor.db.mapper.JsonProperty;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonRecord;
-import com.google.common.base.MoreObjects;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import java.util.Arrays;
@@ -41,8 +40,6 @@ public class CSVBindJson extends CSVBind {
   @XStreamAsAttribute
   private String jsonModel;
 
-  private String target;
-
   private String domain;
 
   private CSVInput input;
@@ -56,7 +53,7 @@ public class CSVBindJson extends CSVBind {
   private void initialize() {
     try {
       if (StringUtils.notBlank(jsonModel)) {
-        target = MetaJsonRecord.class.getName();
+        setType(MetaJsonRecord.class.getName());
         domain = String.format("self.jsonModel = '%s'", jsonModel);
         return;
       }
@@ -100,7 +97,7 @@ public class CSVBindJson extends CSVBind {
                   .map(fields -> fields.get(fieldParts.get(1)))
                   .orElse(Collections.emptyMap());
       jsonModel = (String) jsonField.get("jsonTarget");
-      target = (String) jsonField.get("target");
+      setType((String) jsonField.get("target"));
       domain = (String) jsonField.get("domain");
     } finally {
       initialized = true;
@@ -115,20 +112,33 @@ public class CSVBindJson extends CSVBind {
     return jsonModel;
   }
 
+  public void setJsonModel(String jsonModel) {
+    this.jsonModel = jsonModel;
+    initialized = false;
+  }
+
   @Override
   public String getType() {
     if (!initialized) {
       initialize();
     }
 
-    return MoreObjects.firstNonNull(target, super.getType());
+    return super.getType();
   }
 
-  protected void setInput(CSVInput input) {
+  public CSVInput getInput() {
+    return input;
+  }
+
+  public void setInput(CSVInput input) {
     this.input = input;
   }
 
-  protected void setParent(CSVBind parent) {
+  public CSVBind getParent() {
+    return parent;
+  }
+
+  public void setParent(CSVBind parent) {
     this.parent = parent;
   }
 

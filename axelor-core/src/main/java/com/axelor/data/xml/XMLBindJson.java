@@ -22,7 +22,6 @@ import com.axelor.db.JpaRepository;
 import com.axelor.db.mapper.JsonProperty;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaJsonRecord;
-import com.google.common.base.MoreObjects;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import java.util.Arrays;
@@ -40,8 +39,6 @@ public class XMLBindJson extends XMLBind {
   @XStreamAsAttribute
   private String jsonModel;
 
-  private String target;
-
   private String domain;
 
   private XMLBind parent;
@@ -53,7 +50,7 @@ public class XMLBindJson extends XMLBind {
   private void initialize() {
     try {
       if (StringUtils.notBlank(jsonModel)) {
-        target = MetaJsonRecord.class.getName();
+        setTypeName(MetaJsonRecord.class.getName());
         domain = "self.jsonModel = :jsonModel";
         return;
       }
@@ -82,7 +79,7 @@ public class XMLBindJson extends XMLBind {
                   .map(fields -> fields.get(fieldParts.get(1)))
                   .orElse(Collections.emptyMap());
       jsonModel = (String) jsonField.get("jsonTarget");
-      target = (String) jsonField.get("target");
+      setTypeName((String) jsonField.get("target"));
       domain = (String) jsonField.get("domain");
     } finally {
       initialized = true;
@@ -97,13 +94,18 @@ public class XMLBindJson extends XMLBind {
     return jsonModel;
   }
 
+  public void setJsonModel(String jsonModel) {
+    this.jsonModel = jsonModel;
+    initialized = false;
+  }
+
   @Override
   public String getTypeName() {
     if (!initialized) {
       initialize();
     }
 
-    return MoreObjects.firstNonNull(target, super.getTypeName());
+    return super.getTypeName();
   }
 
   @Override
@@ -112,14 +114,14 @@ public class XMLBindJson extends XMLBind {
       initialize();
     }
 
-    try {
-      return Class.forName(getTypeName());
-    } catch (ClassNotFoundException e) {
-      return null;
-    }
+    return super.getType();
   }
 
-  protected void setParent(XMLBind parent) {
+  public XMLBind getParent() {
+    return parent;
+  }
+
+  public void setParent(XMLBind parent) {
     this.parent = parent;
   }
 
