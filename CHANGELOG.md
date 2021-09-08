@@ -1,3 +1,20 @@
+## 5.2.13 (2021-09-08)
+
+#### Fixed
+
+* Fix CSS of invalid BinaryLink
+* Fix touchpad click to confirm on a popup
+* Fix readonly input in mass update form when grid has readonlyIf in fields
+* Fix empty PDF tab with latest Chrome
+* Fix dirty checking issue with relational fields
+
+  <details>
+  When some o2m has an onChange action that updates parent record with
+  `setValues(instance)` the o2m items were wrongly marked as dirty if
+  the o2m doesn't have named column.
+  </details>
+
+
 ## 5.2.12 (2021-04-15)
 
 #### Changes
