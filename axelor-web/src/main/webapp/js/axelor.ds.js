@@ -255,7 +255,6 @@
 
     var pending = false;
     var pendingReset = () => {
-      console.log('reset');
       pending = false;
     };
 
