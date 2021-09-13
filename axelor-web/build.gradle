@@ -16,8 +16,6 @@ dependencies {
   compileOnly libs.javax_servlet_jsp
   compileOnly libs.websocket_api
 
-  testImplementation libs.websocket_api
-
   implementation libs.resteasy
   implementation libs.resteasy_guice
   implementation libs.resteasy_multipart

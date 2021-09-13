@@ -19,6 +19,7 @@ dependencies {
 
   compileOnly libs.javax_el
   compileOnly libs.javax_servlet
+  api libs.websocket_api
 
   implementation libs.resteasy
   implementation libs.resteasy_guice
