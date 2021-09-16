@@ -414,8 +414,8 @@
   border: 0;
 }
 
-.dms-permission-popup {
-
+.dms-permission-popup .ui-dialog-content {
+  overflow-y: auto;
 }
 
 .dms-permission-popup [x-field="user"] input,
