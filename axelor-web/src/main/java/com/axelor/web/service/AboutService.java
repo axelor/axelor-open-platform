@@ -23,6 +23,7 @@ import static org.apache.shiro.subject.support.DefaultSubjectContext.PRINCIPALS_
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.common.StringUtils;
 import com.axelor.web.AppSessionListener;
 import com.axelor.web.internal.AppInfo;
 import com.google.inject.servlet.RequestScoped;
@@ -107,5 +108,14 @@ public class AboutService extends AbstractService {
     }
 
     return info;
+  }
+
+  @GET
+  @Produces("text/css")
+  @Path("custom.css")
+  public String css() {
+    final AppInfo info = new AppInfo();
+    final String style = info.getStyle();
+    return StringUtils.notBlank(style) ? style : "";
   }
 }

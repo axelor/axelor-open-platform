@@ -37,7 +37,6 @@ String appName = settings.get(AvailableAppSettings.APPLICATION_NAME, "My App");
 String appDesc = settings.get(AvailableAppSettings.APPLICATION_DESCRIPTION, null);
 String appHome = settings.get(AvailableAppSettings.APPLICATION_HOME, "#/");
 String appLogo = info.getLogo();
-String appStyle = info.getStyle();
 String appAuthor = settings.get(AvailableAppSettings.APPLICATION_AUTHOR, "");
 String appTheme = info.getTheme();
 String appMenu = settings.get(AvailableAppSettings.VIEW_MENUBAR_LOCATION, "both");
@@ -85,11 +84,7 @@ String tenantId = (String) session.getAttribute("tenantId");
     <% if (appTheme != null) { %>
     <link href="css/<%= appTheme %>/theme.css" rel="stylesheet">
     <% } %>
-    <% if (appStyle != null) { %>
-    <style>
-    <%= appStyle %>
-    </style>
-    <% } %>
+    <link href="ws/app/custom.css" rel="stylesheet">
 
     <style>
     header .nav > li {
