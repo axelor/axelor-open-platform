@@ -1,8 +1,12 @@
-## 5.0.28 (Current)
+## 5.0.29 (Current)
 
 ### Enhancements
 
 * Add property `ldap.use.ssl` for LDAPS authentication
+
+### Security
+
+* Prevent script execution from custom stylesheet
 
 ## 5.0.28 (2021-09-08)
 
