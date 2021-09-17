@@ -3244,6 +3244,10 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
         handler = scope.handler,
         initialized = false;
 
+      function getParentScope($scope) {
+        return (($scope.$parent || {}).$parent || {}).$parent || {};
+      }
+
       function doInit() {
         if (initialized || !schema || !scope.dataView) return;
         initialized = true;
@@ -3280,7 +3284,8 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
           schema.onNew = handler.field.onNew;
         }
 
-        if (canEdit) {
+        if (canEdit && !getParentScope(scope)._isSlickEditor) {
+          scope._isSlickEditor = true;
           formScope = scope.$new();
           form = makeForm(formScope, handler._model, schema.items, handler.fields, forEdit, schema.onNew);
         }

@@ -259,14 +259,7 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
 
   $scope.fields = {};
   $scope.fields_related = {};
-
-  // Prevent looped view loading
-  var parentSchema = ((($scope.$parent || {}).$parent || {}).$parent || {}).schema || {};
-  if (parentSchema.loadedLoop > 1) {
-    $scope.schema = { loaded: true };
-  } else {
-    $scope.schema = null;
-  }
+  $scope.schema = null;
 
   $scope.show = function() {
     if (!viewPromise) {
@@ -318,11 +311,6 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
 
         // watch on view.loaded to improve performance
         schema.loaded = true;
-
-        // Detect looped view loading
-        if (schema.viewId && schema.viewId === parentSchema.viewId) {
-          schema.loadedLoop = (schema.loadedLoop || 0) + 1;
-        }
       });
     }
 
