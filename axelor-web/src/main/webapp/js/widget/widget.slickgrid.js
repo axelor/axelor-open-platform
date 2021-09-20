@@ -177,7 +177,7 @@ var Formatters = {
 
     return text
       ? _.escapeHTML(
-          axelor.sanitize(text).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'))
+          axelor.sanitize(text + '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'))
       : "";
   },
 

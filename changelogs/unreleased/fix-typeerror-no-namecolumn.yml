@@ -1,0 +1,4 @@
+---
+title: Fix JS error when M2O field has no namecolumn
+type: fix
+
