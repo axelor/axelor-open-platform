@@ -972,6 +972,9 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
         var ver = item.version;
         var val = _.omit(item, "version");
         val.$version = ver;
+        if (val.$id === undefined) {
+          delete val.$id;
+        }
         return val;
       });
       items = _.isEmpty(items) ? null : items;
