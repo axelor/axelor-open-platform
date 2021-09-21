@@ -140,9 +140,21 @@ public class ActionHandler {
       return;
     }
 
+    Class<? extends Model> modelClass = null;
+    if (StringUtils.notBlank(model)) {
+      try {
+        modelClass = Class.forName(model).asSubclass(Model.class);
+      } catch (ClassNotFoundException e) {
+        log.error(e.getMessage(), e);
+      }
+    }
+    if (modelClass == null) {
+      modelClass = context.getContextClass().asSubclass(Model.class);
+    }
+
     final Long id = (Long) context.get("id");
     if (id != null) {
-      security.check(accessType, context.getContextClass().asSubclass(Model.class), id);
+      security.check(accessType, modelClass, id);
       return;
     }
 
@@ -151,11 +163,11 @@ public class ActionHandler {
     if (ObjectUtils.notEmpty(idList)) {
       final Long[] ids =
           idList.stream().map(value -> Long.valueOf(String.valueOf(value))).toArray(Long[]::new);
-      security.check(accessType, context.getContextClass().asSubclass(Model.class), ids);
+      security.check(accessType, modelClass, ids);
       return;
     }
 
-    security.check(accessType, context.getContextClass().asSubclass(Model.class));
+    security.check(accessType, modelClass);
   }
 
   public void firePreEvent(String name) {
