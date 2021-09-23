@@ -23,6 +23,7 @@ import com.axelor.db.mapper.PropertyType;
 import com.axelor.inject.Beans;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
@@ -120,17 +121,28 @@ public class JpaRepository<T extends Model> implements Repository<T> {
     }
     final Mapper mapper = Mapper.of(EntityHelper.getEntityClass(entity));
     for (Property property : mapper.getProperties()) {
-      if (property.getType() != PropertyType.ONE_TO_MANY || !property.isOrphan()) {
+      if ((property.getType() != PropertyType.ONE_TO_MANY
+              && property.getType() != PropertyType.ONE_TO_ONE)
+          || !property.isOrphan()) {
         continue;
       }
-      final Property mappedBy = mapper.of(property.getTarget()).getProperty(property.getMappedBy());
+
+      final Property mappedBy = Mapper.of(property.getTarget()).getProperty(property.getMappedBy());
       if (mappedBy != null && mappedBy.isRequired()) {
         continue;
       }
-      final Collection<? extends Model> items = (Collection) property.get(entity);
-      if (items == null || items.size() == 0) {
+
+      final Object value = property.get(entity);
+      final Collection<? extends Model> items;
+
+      if (value instanceof Collection) {
+        items = (Collection<? extends Model>) value;
+      } else if (value instanceof Model) {
+        items = Collections.singletonList((Model) value);
+      } else {
         continue;
       }
+
       for (Model item : items) {
         property.setAssociation(item, null);
       }

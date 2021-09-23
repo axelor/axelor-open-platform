@@ -178,6 +178,7 @@ public class Property {
         type = PropertyType.ONE_TO_ONE;
         target = (Class<? extends Model>) javaType;
         mappedBy = ((OneToOne) annotation).mappedBy();
+        orphan = !((OneToOne) annotation).orphanRemoval();
       }
 
       if (annotation instanceof ManyToOne) {
