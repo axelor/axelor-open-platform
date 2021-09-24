@@ -238,7 +238,8 @@ ui.formCompile = function(element, attrs, linkerFn) {
       elem = isTable && parent.length ? parent : elem;
       label = isTable && label_parent.length ? label_parent : label;
 
-      if (!isTable && !parent.next(".form-item").first().length) {
+      if (!isTable && (!parent.next(".form-item").first().length
+          || parent.parent().hasClass("panel-flex"))) {
         parent.toggleClass("form-item-hidden", hidden);
       }
 
