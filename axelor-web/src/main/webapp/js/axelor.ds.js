@@ -91,7 +91,7 @@
 
     var registerCallback = (callbacks, callback) => {
       var index = callbacks.length; callbacks.push(callback);
-      return () => callback.splice(index, 1);
+      return () => callbacks.splice(index, 1);
     };
 
     var registerOnOpen = listener => registerCallback(listeners.onopen, listener);
@@ -100,7 +100,7 @@
 
     var registerOnMessage = channel => listener => {
       var callbacks = listeners.onmessage[channel] || (listeners.onmessage[channel] = []);
-      registerCallback(callbacks, listener);
+      return registerCallback(callbacks, listener);
     };
 
     var notify = callbacks => message => (callbacks||[]).forEach(cb => cb(message));
