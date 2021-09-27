@@ -89,6 +89,9 @@ ui.formInput('JsonField', 'String', {
         case 'integer':
           value = +(value);
           break;
+        case 'boolean':
+          value = String(value).toLowerCase() === 'true';
+          break;
         case 'date':
         case 'datetime':
           value = value === 'now' ? new Date() : moment(value).toDate();
