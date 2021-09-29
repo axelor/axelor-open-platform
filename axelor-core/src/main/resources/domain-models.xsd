@@ -256,8 +256,8 @@
             <xsd:documentation>
               Allow null value to be stored for fields that by default uses their
               system default when value is not given. For example, integer and decimal
-              types store 0 and 0.0 respectively when their the provided values are
-              null or empty.
+              types store 0 and 0.0 respectively when the provided values are null or 
+              empty.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
