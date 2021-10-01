@@ -1,3 +1,19 @@
+## 5.4.4 (2021-10-01)
+
+#### Fixed
+
+* Check for permission on action model if defined
+* Fix infinite recursive popup grid loading
+* Fix alignment of meta JSON field using contextField
+* Fix JS error when M2O field has no namecolumn
+* Add scrollbar in DMS Permission dialog box
+* Fix missing ID on created records from TagSelect widget
+* Fix detaching of one-to-one from non-owning side
+
+#### Security
+
+* Prevent script execution from custom stylesheet
+
 ## 5.4.3 (2021-09-08)
 
 #### Changes
