@@ -1,3 +1,9 @@
+## 5.3.11 (2021-10-01)
+
+#### Security
+
+* Prevent script execution from custom stylesheet
+
 ## 5.3.10 (2021-09-08)
 
 #### Fixed
