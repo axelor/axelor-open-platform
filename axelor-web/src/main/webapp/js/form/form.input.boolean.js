@@ -215,8 +215,11 @@ ui.formInput('BooleanRadio', 'BooleanSelect', {
       var value = scope.field.nullable ? model.$viewValue : model.$viewValue || false;
       if (value) {
         trueInput.prop('checked', true);
-      } else if (value == false) {
+      } else if (value === false) {
         falseInput.prop('checked', true);
+      } else {
+        trueInput.prop('checked', false);
+        falseInput.prop('checked', false);
       }
     };
   },

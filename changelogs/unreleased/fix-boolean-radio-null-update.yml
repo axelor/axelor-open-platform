@@ -1,0 +1,3 @@
+---
+title: Fix null value with BooleanRadio when switching from a record to another
+type: fix
