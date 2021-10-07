@@ -47,6 +47,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
+import com.google.common.base.Suppliers;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -78,6 +79,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -172,6 +174,10 @@ public class XMLViews {
               });
 
   private static AppConfig appConfigProvider;
+
+  private static final Supplier<Boolean> customizationEnabled =
+      Suppliers.memoize(
+          () -> AppSettings.get().getBoolean(AvailableAppSettings.VIEW_CUSTOMIZATION, true));
 
   static {
     try {
@@ -509,7 +515,7 @@ public class XMLViews {
     MetaViewCustom custom = null;
 
     // find personalized view
-    if (module == null && user != null) {
+    if (Boolean.TRUE.equals(customizationEnabled.get()) && module == null && user != null) {
       custom = findCustomView(customViews, name, type, model);
     }
 

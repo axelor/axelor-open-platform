@@ -16,6 +16,7 @@
     <string name="homeAction" help="Default home action."/>
 
     <boolean name="technicalStaff" help="Specify whether the members of this group are technical staff." />
+    <enum name="viewCustomizationPermission" ref="ViewCustomizationPermission" default="NOT_ALLOWED" title="View customization"/>
 
     <many-to-many name="roles" ref="Role" />
     <many-to-many name="permissions" ref="Permission" />
@@ -24,5 +25,11 @@
     <many-to-many name="menus" ref="com.axelor.meta.db.MetaMenu" mappedBy="groups" />
     <many-to-many name="views" ref="com.axelor.meta.db.MetaView" mappedBy="groups" />
   </entity>
+
+  <enum name="ViewCustomizationPermission" numeric="true">
+    <item name="NOT_ALLOWED" value="0"/>
+    <item name="CAN_CUSTOMIZE" value="1"/>
+    <item name="CAN_SHARE" value="2"/>
+  </enum>
 
 </domain-models>

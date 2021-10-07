@@ -216,8 +216,8 @@ public class MetaController {
   }
 
   public void removeUserCustomViews(ActionRequest request, ActionResponse response) {
-    if (!MetaView.class.isAssignableFrom(request.getBeanClass())) {
-      throw new IllegalArgumentException(String.valueOf(request.getBeanClass()));
+    if (StringUtils.isBlank(request.getModel())) {
+      request.setModel(MetaView.class.getName());
     }
 
     final MetaView view = request.getContext().asType(MetaView.class);

@@ -23,6 +23,7 @@ import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
+import com.axelor.auth.db.ViewCustomizationPermission;
 import com.axelor.auth.pac4j.AuthPac4jModule;
 import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
@@ -40,6 +41,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -86,6 +88,10 @@ public class AppInfo {
       map.put("user.navigator", group.getNavigation());
       map.put("user.technical", group.getTechnicalStaff());
       map.put("user.group", group.getCode());
+      map.put(
+          "user.viewCustomizationPermission",
+          Optional.ofNullable(group.getViewCustomizationPermission())
+              .map(ViewCustomizationPermission::getValue));
     }
     if (user.getHomeAction() == null && group != null) {
       map.put("user.action", group.getHomeAction());

@@ -698,7 +698,7 @@ Grid.prototype.parse = function(view) {
       command: "hide"
     }];
 
-    if (view.name) {
+    if (view.name && axelor.config["user.viewCustomizationPermission"] && axelor.config["view.customization"] !== false) {
       Array.prototype.push.apply(menus, [{
         separator: true
       }, {
@@ -2810,12 +2810,12 @@ ui.directive("uiSlickColumnsForm", function () {
       var columnDomain = "self.metaModel.fullName = :_modelName AND self.name NOT IN :_excludedFieldNames";
       var columnContext = {"_modelName": $scope.target, "_excludedFieldNames": excludedFieldNames};
 
-      function isAdmin() {
-        return axelor.config["user.login"] === "admin" || axelor.config["user.group"] === "admins";
+      function canShare() {
+        return axelor.config["user.viewCustomizationPermission"] > 1;
       }
 
       function canReset() {
-        return $scope.view.customViewId && (!$scope.view.customViewShared || isAdmin());
+        return $scope.view.customViewId && (!$scope.view.customViewShared || canShare());
       }
 
       function closeAndReload() {
@@ -2896,7 +2896,7 @@ ui.directive("uiSlickColumnsForm", function () {
               serverType: "BOOLEAN",
               widget: "inline-checkbox",
               title: _t("Apply as default for all users"),
-              hidden: !isAdmin()
+              hidden: !canShare()
             }]
           }]
         }]
@@ -3028,7 +3028,7 @@ ui.directive("uiSlickColumnsForm", function () {
           });
 
           var record = {
-            share: $scope.view.customViewShared && isAdmin(),
+            share: $scope.view.customViewShared && canShare(),
             items: values
           };
 
@@ -3097,9 +3097,8 @@ ui.directive("uiSlickColumnsForm", function () {
           function (confirmed) {
             if (confirmed) {
               var action = "com.axelor.meta.web.MetaController:removeUserCustomViews";
-              var model = "com.axelor.meta.db.MetaView";
               var context = _.extend({}, $scope.view, { id: $scope.view.viewId });
-              ViewService.action(action, model, context).then(closeAndReload);
+              ViewService.action(action, null, context).then(closeAndReload);
             }
         });
       };

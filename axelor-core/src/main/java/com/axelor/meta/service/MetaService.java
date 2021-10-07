@@ -22,8 +22,10 @@ import static com.axelor.meta.loader.ModuleManager.isInstalled;
 
 import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Role;
 import com.axelor.auth.db.User;
+import com.axelor.auth.db.ViewCustomizationPermission;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
@@ -81,6 +83,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
@@ -521,12 +524,27 @@ public class MetaService {
     return response;
   }
 
+  private ViewCustomizationPermission getViewCustomizationPermission(User user) {
+    return Optional.ofNullable(user)
+        .map(User::getGroup)
+        .map(Group::getViewCustomizationPermission)
+        .orElse(ViewCustomizationPermission.NOT_ALLOWED);
+  }
+
   @Transactional
   public Response saveView(AbstractView view, User user) {
+    final ViewCustomizationPermission viewCustomizationPermission =
+        getViewCustomizationPermission(user);
+
+    if (viewCustomizationPermission == ViewCustomizationPermission.NOT_ALLOWED) {
+      throw new PersistenceException(I18n.get("You are not allowed to customize views."));
+    }
+
     final Response response = new Response();
     final String xml = XMLViews.toXml(view, true);
 
-    if (Objects.equals(view.getCustomViewShared(), Boolean.TRUE) && !AuthUtils.isAdmin(user)) {
+    if (Objects.equals(view.getCustomViewShared(), Boolean.TRUE)
+        && viewCustomizationPermission != ViewCustomizationPermission.CAN_SHARE) {
       throw new PersistenceException(I18n.get("You are not allowed to share custom views."));
     }
 

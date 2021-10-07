@@ -45,6 +45,7 @@ public interface AvailableAppSettings {
   String VIEW_ADVSEARCH_EXPORT_FULL = "view.adv-search.export.full";
   String VIEW_ADVSEARCH_SHARE = "view.adv-search.share";
   String VIEW_GRID_SELECTION = "view.grid.selection";
+  String VIEW_CUSTOMIZATION = "view.customization";
 
   String AXELOR_SCRIPT_CACHE_SIZE = "axelor.ScriptCacheSize";
   String AXELOR_SCRIPT_CACHE_EXPIRETIME = "axelor.ScriptCacheExpireTime";
