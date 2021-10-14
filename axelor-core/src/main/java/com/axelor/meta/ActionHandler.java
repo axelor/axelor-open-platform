@@ -152,19 +152,21 @@ public class ActionHandler {
       modelClass = context.getContextClass().asSubclass(Model.class);
     }
 
-    final Long id = (Long) context.get("id");
-    if (id != null) {
-      security.check(accessType, modelClass, id);
-      return;
-    }
+    if (context.getContextClass() == modelClass) {
+      final Long id = (Long) context.get("id");
+      if (id != null) {
+        security.check(accessType, modelClass, id);
+        return;
+      }
 
-    @SuppressWarnings("unchecked")
-    final List<Object> idList = (List<Object>) context.get("_ids");
-    if (ObjectUtils.notEmpty(idList)) {
-      final Long[] ids =
-          idList.stream().map(value -> Long.valueOf(String.valueOf(value))).toArray(Long[]::new);
-      security.check(accessType, modelClass, ids);
-      return;
+      @SuppressWarnings("unchecked")
+      final List<Object> idList = (List<Object>) context.get("_ids");
+      if (ObjectUtils.notEmpty(idList)) {
+        final Long[] ids =
+            idList.stream().map(value -> Long.valueOf(String.valueOf(value))).toArray(Long[]::new);
+        security.check(accessType, modelClass, ids);
+        return;
+      }
     }
 
     security.check(accessType, modelClass);
