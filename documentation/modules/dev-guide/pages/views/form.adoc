@@ -195,6 +195,7 @@ A `panel-related` includes the following attributes:
 | `canMove` | whether to allow re-ordering of rows with drag & drop
 | `height` | number of rows (not pixel height)
 | `x-selector` | specify the row selection control (`checkbox` to show checkbox selection)
+| `edit-window` | display mode of edit window for relational fields. Can be `self`, `blank` or `popup` (default value).
 |===
 
 IMPORTANT: The object should have a numeric field named `sequence` to allow
