@@ -19,18 +19,12 @@
 package com.axelor.web.service;
 
 import com.axelor.auth.AuthUtils;
-import com.axelor.mail.web.MailController;
 import com.axelor.meta.ActionExecutor;
 import com.axelor.meta.service.menu.MenuService;
-import com.axelor.meta.service.tags.TagsService;
 import com.axelor.rpc.ActionRequest;
-import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
-import com.axelor.team.web.TaskController;
 import com.axelor.ui.QuickMenuService;
 import com.google.inject.servlet.RequestScoped;
-import java.util.Collections;
-import java.util.List;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -48,13 +42,9 @@ public class ActionService extends AbstractService {
 
   @Inject private MenuService menuService;
 
-  @Inject private TagsService tagsService;
-
-  @Inject private MailController mailController;
-
-  @Inject private TaskController teamController;
-
   @Inject private ActionExecutor actionExecutor;
+
+  @Inject private QuickMenuService quickMenus;
 
   @GET
   @Path("menu/all")
@@ -69,34 +59,6 @@ public class ActionService extends AbstractService {
     }
     return response;
   }
-
-  @GET
-  @Path("menu/tags")
-  public Response tags() {
-    return tags(false, Collections.emptyList());
-  }
-
-  @POST
-  @Path("menu/tags")
-  public Response tags(TagRequest request) {
-    return tags(true, request.getNames());
-  }
-
-  private Response tags(boolean inNamesOnly, List<String> names) {
-    final ActionResponse response = new ActionResponse();
-    try {
-      response.setValue("tags", tagsService.get(names));
-      response.setStatus(Response.STATUS_SUCCESS);
-      mailController.countMail(null, response);
-      teamController.countTasks(null, response);
-    } catch (Exception e) {
-      LOG.error(e.getMessage(), e);
-      response.setException(e);
-    }
-    return response;
-  }
-
-  @Inject private QuickMenuService quickMenus;
 
   @GET
   @Path("menu/quick")
@@ -122,13 +84,5 @@ public class ActionService extends AbstractService {
   public Response execute(@PathParam("action") String action, ActionRequest request) {
     request.setAction(action);
     return actionExecutor.execute(request);
-  }
-
-  private static class TagRequest {
-    private List<String> names;
-
-    public List<String> getNames() {
-      return names;
-    }
   }
 }
