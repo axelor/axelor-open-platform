@@ -187,7 +187,7 @@ public class ActionGroup extends ActionResumable {
     List<Object> result = Lists.newArrayList();
     Iterator<ActionItem> iter = actions.iterator();
 
-    if (StringUtils.notBlank(getName()) && !getName().endsWith("MenuTag()")) {
+    if (StringUtils.notBlank(getName()) && !getName().matches("(.*)MenuTag\\((.*)\\)$")) {
       log.debug("action-group: {}", getName());
     }
 
@@ -196,7 +196,7 @@ public class ActionGroup extends ActionResumable {
       Element element = actions.get(i);
       String name = element.getName().trim();
 
-      if (!name.endsWith("MenuTag()")) {
+      if (!name.matches("(.*)MenuTag\\((.*)\\)$")) {
         log.debug("action: {}", name);
       }
 
