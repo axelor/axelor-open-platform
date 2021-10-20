@@ -1,3 +1,5 @@
+description = 'Gradle plugin for integrating Axelor'
+
 apply plugin: 'java-gradle-plugin'
 
 configurations {

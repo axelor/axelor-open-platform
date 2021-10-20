@@ -1,3 +1,5 @@
+description = 'Tooling to build Axelor apps'
+
 apply plugin: 'java-library'
 apply plugin: 'groovy'
 

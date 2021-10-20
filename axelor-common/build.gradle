@@ -1,3 +1,5 @@
+description = 'Axelor\'s common APIs'
+
 apply plugin: 'java'
 
 dependencies {

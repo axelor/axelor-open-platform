@@ -1,7 +1,10 @@
+description = 'Axelor\'s core functionalities'
+
 apply plugin: com.axelor.gradle.AxelorPlugin
 
 axelor {
   title = "Axelor Core"
+  description = project.description
 }
 
 dependencies {

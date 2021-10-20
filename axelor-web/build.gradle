@@ -1,7 +1,10 @@
+description = 'Axelor\'s web functionalities'
+
 apply plugin: com.axelor.gradle.AxelorPlugin
 
 axelor {
   title = "Axelor Web"
+  description = project.description
 }
 
 dependencies {
