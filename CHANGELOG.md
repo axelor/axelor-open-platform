@@ -1,3 +1,23 @@
+## 5.4.5 (2021-10-21)
+
+#### Changes
+
+* Add view customization permission on Group and `view.customization` application configuration
+
+  <details>
+  All users used to be allowed to customize views, and only admins could share.
+  Now, view customization permission is checked on Group, and can be set to "Not allowed" (default),
+  "Can customize", or "Can share".
+  `view.customization` application configuration defaults to `true`.
+  If set to `false`, Customize menu and custom views are disabled.
+  </details>
+
+
+#### Fixed
+
+* Fix null value with BooleanRadio when switching from a record to another
+* Fix permission check on action targeting a different model from current record
+
 ## 5.4.4 (2021-10-01)
 
 #### Fixed

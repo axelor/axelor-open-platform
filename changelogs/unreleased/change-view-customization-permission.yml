@@ -1,9 +1,0 @@
----
-title: Add view customization permission on Group and `view.customization` application configuration
-type: change
-description: |
-  All users used to be allowed to customize views, and only admins could share.
-  Now, view customization permission is checked on Group, and can be set to "Not allowed" (default),
-  "Can customize", or "Can share".
-  `view.customization` application configuration defaults to `true`.
-  If set to `false`, Customize menu and custom views are disabled.
