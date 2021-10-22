@@ -48,18 +48,6 @@
       return $http.get('ws/action/menu/quick');
     }
 
-    function tags() {
-      // Select visible menus with tags
-      var names = $('.tagged:visible').get().map(function(elem) {
-        return elem.dataset.name;
-      });
-      return $http.post('ws/action/menu/tags', {
-        names: names
-      }, {
-        silent: true
-      });
-    }
-
     function action(name, options) {
 
       return $http.post('ws/action/' + name, {
@@ -72,7 +60,6 @@
       get: get,
       all: all,
       quick: quick,
-      tags: tags,
       action: action
     };
   }]);
