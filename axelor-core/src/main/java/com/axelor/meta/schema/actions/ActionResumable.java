@@ -17,7 +17,7 @@
  */
 package com.axelor.meta.schema.actions;
 
-abstract class ActionResumable extends Action {
+public abstract class ActionResumable extends Action {
 
   private transient int index;
 

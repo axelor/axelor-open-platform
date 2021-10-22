@@ -98,9 +98,9 @@
     </action-record>
 
     <action-validate name="action-contact-validate">
-      <error message="Name is too short." if="eval: firstName.length() &lt;= 2"/>
+      <error message="Name is too short." if="eval: firstName.length() &lt;= 2" title="Invalid data"/>
       <alert message="Last name is too short. Would you like to continue?"
-        if="eval: lastName.length() &lt;= 2"/>
+        if="eval: lastName.length() &lt;= 2" title="Too short data" confirm-btn-title="Continue" cancel-btn-title="Abort"/>
     </action-validate>
 
     <action-method name="action-contact-greetings">

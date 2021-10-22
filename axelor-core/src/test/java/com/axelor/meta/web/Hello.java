@@ -24,7 +24,7 @@ import com.axelor.rpc.ActionResponse;
 public class Hello {
 
   public void say(ActionRequest request, ActionResponse response) {
-    response.setFlash("Hello World!!!");
+    response.setInfo("Hello World!!!", "My title");
   }
 
   @CallMethod

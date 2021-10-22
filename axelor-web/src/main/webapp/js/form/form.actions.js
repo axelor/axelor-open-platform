@@ -765,11 +765,14 @@ ActionHandler.prototype = {
     }
 
     if (data.signal === 'refresh-app') {
-      if(data.flash || data.info) {
-        axelor.dialogs.box(data.flash || data.info, {
+      if(data.info) {
+        axelor.dialogs.box(data.info.message, {
           onClose: function () {
             window.location.reload();
           }
+        }, {
+          title: data.info.title,
+          confirmBtnTitle: data.info.confirmBtnTitle
         });
       } else {
         window.location.reload();
@@ -782,8 +785,8 @@ ActionHandler.prototype = {
       });
     }
 
-    if(data.flash || data.info) {
-      axelor.dialogs.box(data.flash || data.info, {
+    if(data.info) {
+      axelor.dialogs.box(data.info.message, {
         onClose: function () {
           if (data.pending) {
             scope.$applyAsync(function(){
@@ -793,7 +796,9 @@ ActionHandler.prototype = {
               deferred.resolve(data.pending);
             });
           }
-        }
+        },
+        title: data.info.title,
+        confirmBtnTitle: data.info.confirmBtnTitle
       });
       if (data.pending) {
         return deferred.promise;
@@ -801,34 +806,41 @@ ActionHandler.prototype = {
     }
 
     if(data.notify) {
-      axelor.notify.info(data.notify);
+      axelor.notify.info(data.notify.message, {
+        title: data.notify.title
+      });
     }
 
     if(data.error) {
-      axelor.dialogs.error(data.error, function(){
+      axelor.dialogs.error(data.error.message, function(){
         scope.$applyAsync(function(){
-          if (data.action) {
-            self._handleAction(data.action);
+          if (data.error.action) {
+            self._handleAction(data.error.action);
           }
           deferred.reject();
         });
+      }, {
+        title: data.error.title,
+        confirmBtnTitle: data.error.confirmBtnTitle
       });
       return deferred.promise;
     }
 
     if (data.alert) {
-      axelor.dialogs.confirm(data.alert, function(confirmed){
+      axelor.dialogs.confirm(data.alert.message, function(confirmed){
         scope.$applyAsync(function(){
           if (confirmed) {
             return deferred.resolve(data.pending);
           }
-          if (data.action) {
-            self._handleAction(data.action);
+          if (data.alert.action) {
+            self._handleAction(data.alert.action);
           }
           deferred.reject();
         });
       }, {
-        title: _t('Warning'),
+        title: data.alert.title || _t('Warning'),
+        confirmBtnTitle: data.alert.confirmBtnTitle,
+        cancelBtnTitle: data.alert.cancelBtnTitle,
         yesNo: false
       });
 

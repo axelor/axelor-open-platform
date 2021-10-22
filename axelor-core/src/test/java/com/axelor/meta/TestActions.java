@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
+import com.axelor.meta.schema.actions.validate.validator.Info;
 import com.axelor.meta.schema.views.FormView;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
@@ -222,6 +223,7 @@ public class TestActions extends MetaTest {
     assertTrue(!((Map<?, ?>) value).isEmpty());
   }
 
+  @SuppressWarnings("rawtypes")
   @Test
   public void testMethod() {
 
@@ -236,9 +238,11 @@ public class TestActions extends MetaTest {
     Object value = action.execute(handler);
 
     assertNotNull(value);
-    assertEquals(
-        "Hello World!!!",
-        ((Map<?, ?>) ((List<?>) ((ActionResponse) value).getData()).get(0)).get("flash"));
+    Map infoMap =
+        (Map) ((Map<?, ?>) ((List<?>) ((ActionResponse) value).getData()).get(0)).get(Info.KEY);
+    assertNotNull(infoMap);
+    assertEquals("Hello World!!!", infoMap.get("message"));
+    assertEquals("My title", infoMap.get("title"));
   }
 
   @Test

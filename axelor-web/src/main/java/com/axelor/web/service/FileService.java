@@ -21,6 +21,8 @@ import com.axelor.common.FileUtils;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.schema.actions.ActionExport;
+import com.axelor.meta.schema.actions.validate.ActionValidateBuilder;
+import com.axelor.meta.schema.actions.validate.validator.ValidatorType;
 import com.google.inject.persist.Transactional;
 import com.google.inject.servlet.RequestScoped;
 import java.io.File;
@@ -149,11 +151,15 @@ public class FileService extends AbstractService {
         return javax.ws.rs.core.Response.ok(meta).build();
       }
     } catch (IllegalArgumentException e) {
-      data.put("error", e.getMessage());
+      ActionValidateBuilder validateBuilder =
+          new ActionValidateBuilder(ValidatorType.ERROR).setMessage(e.getMessage());
+      data.putAll(validateBuilder.build());
       return javax.ws.rs.core.Response.status(Status.BAD_REQUEST).entity(data).build();
     } catch (Exception e) {
-      e.printStackTrace();
-      data.put("error", e.getMessage());
+      LOG.error("Error when uploading file:", e);
+      ActionValidateBuilder validateBuilder =
+          new ActionValidateBuilder(ValidatorType.ERROR).setMessage(e.getMessage());
+      data.putAll(validateBuilder.build());
       return javax.ws.rs.core.Response.status(Status.INTERNAL_SERVER_ERROR).entity(data).build();
     }
 

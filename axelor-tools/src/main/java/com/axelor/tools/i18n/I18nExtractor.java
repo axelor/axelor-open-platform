@@ -92,7 +92,14 @@ public class I18nExtractor {
           "many-to-many");
 
   private static final Set<String> TEXT_ATTRS =
-      Sets.newHashSet("tag", "prompt", "placeholder", "x-true-text", "x-false-text");
+      Sets.newHashSet(
+          "tag",
+          "prompt",
+          "placeholder",
+          "x-true-text",
+          "x-false-text",
+          "confirm-btn-title",
+          "cancel-btn-title");
 
   private static final Set<String> TEXT_NODES =
       Sets.newHashSet("option", "message", "static", "help");

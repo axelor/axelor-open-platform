@@ -44,6 +44,8 @@ import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.actions.ActionView;
+import com.axelor.meta.schema.actions.validate.ActionValidateBuilder;
+import com.axelor.meta.schema.actions.validate.validator.ValidatorType;
 import com.axelor.meta.service.MetaService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
@@ -99,7 +101,7 @@ public class MetaController {
     MetaAction meta = request.getContext().asType(MetaAction.class);
 
     Action action = XMLViews.findAction(meta.getName());
-    Map<String, String> data = Maps.newHashMap();
+    Map<String, Map<String, String>> data = Maps.newHashMap();
 
     response.setData(ImmutableList.of(data));
 
@@ -107,25 +109,32 @@ public class MetaController {
     try {
       views = validateXML(meta.getXml());
     } catch (Exception e) {
-      data.put("error", e.getMessage());
+      ActionValidateBuilder validateBuilder =
+          new ActionValidateBuilder(ValidatorType.ERROR).setMessage(e.getMessage());
+      data.putAll(validateBuilder.build());
       return;
     }
 
     Action current = views.getActions().get(0);
     if (action != null && !action.getName().equals(current.getName())) {
-      data.put("error", I18n.get("Action name can't be changed."));
+      ActionValidateBuilder validateBuilder =
+          new ActionValidateBuilder(ValidatorType.ERROR)
+              .setMessage(I18n.get("Action name can't be changed."));
+      data.putAll(validateBuilder.build());
       return;
     }
   }
 
   public void validateView(ActionRequest request, ActionResponse response) {
     MetaView meta = request.getContext().asType(MetaView.class);
-    Map<String, String> data = Maps.newHashMap();
+    Map<String, Object> data = Maps.newHashMap();
 
     try {
       validateXML(meta.getXml());
     } catch (Exception e) {
-      data.put("error", e.getMessage());
+      ActionValidateBuilder validateBuilder =
+          new ActionValidateBuilder(ValidatorType.ERROR).setMessage(e.getMessage());
+      data.putAll(validateBuilder.build());
     }
 
     response.setData(ImmutableList.of(data));
@@ -326,6 +335,6 @@ public class MetaController {
         }
       }
     }
-    response.setFlash(I18n.get("Export complete."));
+    response.setInfo(I18n.get("Export complete."));
   }
 }

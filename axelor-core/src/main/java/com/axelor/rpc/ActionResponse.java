@@ -17,12 +17,17 @@
  */
 package com.axelor.rpc;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.inject.Beans;
+import com.axelor.meta.schema.actions.validate.validator.Alert;
+import com.axelor.meta.schema.actions.validate.validator.Error;
+import com.axelor.meta.schema.actions.validate.validator.Info;
+import com.axelor.meta.schema.actions.validate.validator.Notify;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,14 +86,39 @@ public class ActionResponse extends Response {
   }
 
   /**
-   * Set a flash message.
+   * Set an info message.
    *
    * <p>This message will be shown on the client screen as a dialog.
    *
-   * @param flash the message to show on client
+   * @param message the message to show on client
    */
-  public void setFlash(String flash) {
-    set("flash", flash);
+  public void setInfo(String message) {
+    setInfo(message, null);
+  }
+
+  /**
+   * Set an info message.
+   *
+   * <p>This message will be shown on the client screen as a dialog.
+   *
+   * @param message the message to show on client
+   * @param title the title of the modal
+   */
+  public void setInfo(String message, String title) {
+    setInfo(message, title, null);
+  }
+
+  /**
+   * Set an info message.
+   *
+   * <p>This message will be shown on the client screen as a dialog.
+   *
+   * @param message the message to show on client
+   * @param title the title of the modal
+   * @param confirmBtnTitle the title of the confirm button
+   */
+  public void setInfo(String message, String title, String confirmBtnTitle) {
+    setMessage(Info.KEY, message, title, confirmBtnTitle, null, null);
   }
 
   /**
@@ -99,7 +129,19 @@ public class ActionResponse extends Response {
    * @param message the message to show on client
    */
   public void setNotify(String message) {
-    set("notify", message);
+    setNotify(message, null);
+  }
+
+  /**
+   * Set a notification message.
+   *
+   * <p>The message will be show on the client screen as a notification.
+   *
+   * @param message the message to show on client
+   * @param title the title of the notification box
+   */
+  public void setNotify(String message, String title) {
+    setMessage(Notify.KEY, message, title, null, null, null);
   }
 
   /**
@@ -110,7 +152,36 @@ public class ActionResponse extends Response {
    * @param message the message to show as an alert
    */
   public void setAlert(String message) {
-    set("alert", message);
+    setAlert(message, null);
+  }
+
+  /**
+   * Set an alert message.
+   *
+   * <p>The message will be shown on the client screen as an alert dialog.
+   *
+   * @param message the message to show as an alert
+   * @param title the title of the modal
+   */
+  public void setAlert(String message, String title) {
+    setAlert(message, title, null, null, null);
+  }
+
+  /**
+   * Set an alert message.
+   *
+   * <p>The message will be shown on the client screen as an alert dialog.
+   *
+   * @param message the message to show as an alert
+   * @param title the title of the modal
+   * @param confirmBtnTitle the title of the confirm button
+   * @param cancelBtnTitle the title of the cancel button
+   * @param action action to be executed on error or alert message to make corrective measures, when
+   *     error dialog is closed or alert dialog is canceled.
+   */
+  public void setAlert(
+      String message, String title, String confirmBtnTitle, String cancelBtnTitle, String action) {
+    setMessage(Alert.KEY, message, title, confirmBtnTitle, cancelBtnTitle, action);
   }
 
   /**
@@ -121,7 +192,69 @@ public class ActionResponse extends Response {
    * @param message the message to show as an error
    */
   public void setError(String message) {
-    set("error", message);
+    setError(message, null);
+  }
+
+  /**
+   * Set an error message.
+   *
+   * <p>The message will be shown on the client screen as an error dialog.
+   *
+   * @param message the message to show as an error
+   * @param title the title of the modal
+   */
+  public void setError(String message, String title) {
+    setError(message, title, null, null);
+  }
+
+  /**
+   * Set an error message.
+   *
+   * <p>The message will be shown on the client screen as an error dialog.
+   *
+   * @param message the message to show as an error
+   * @param title the title of the modal
+   * @param confirmBtnTitle the title of the confirm button
+   * @param action action to be executed on error or alert message to make corrective measures, when
+   *     error dialog is closed or alert dialog is canceled.
+   */
+  public void setError(String message, String title, String confirmBtnTitle, String action) {
+    setMessage(Error.KEY, message, title, confirmBtnTitle, null, action);
+  }
+
+  /**
+   * Set a message on the client screen
+   *
+   * @param type the type of the message
+   * @param message the message to show
+   * @param title the title of the modal/notification
+   * @param confirmBtnTitle the title of the confirm button
+   * @param cancelBtnTitle the title of the cancel button
+   * @param action action to be executed on error or alert message to make corrective measures, when
+   *     error dialog is closed or alert dialog is canceled.
+   */
+  private void setMessage(
+      String type,
+      String message,
+      String title,
+      String confirmBtnTitle,
+      String cancelBtnTitle,
+      String action) {
+    final Map<String, Object> map = new HashMap<>();
+    map.put("message", message);
+    if (StringUtils.notBlank(title)) {
+      map.put("title", title);
+    }
+    if (StringUtils.notBlank(confirmBtnTitle)) {
+      map.put("confirmBtnTitle", confirmBtnTitle);
+    }
+    if (StringUtils.notBlank(cancelBtnTitle)) {
+      map.put("cancelBtnTitle", cancelBtnTitle);
+    }
+    if (StringUtils.notBlank(action)) {
+      map.put("action", action);
+    }
+    set(type, map);
   }
 
   /**

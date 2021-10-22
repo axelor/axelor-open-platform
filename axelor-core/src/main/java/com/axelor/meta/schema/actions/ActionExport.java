@@ -23,6 +23,8 @@ import com.axelor.common.FileUtils;
 import com.axelor.common.ResourceUtils;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
+import com.axelor.meta.schema.actions.validate.ActionValidateBuilder;
+import com.axelor.meta.schema.actions.validate.validator.ValidatorType;
 import com.axelor.text.GroovyTemplates;
 import com.axelor.text.StringTemplates;
 import com.axelor.text.Templates;
@@ -151,14 +153,17 @@ public class ActionExport extends Action {
         String file = doExport(dir, export, handler);
         if (Boolean.TRUE.equals(getDownload())) {
           result.put("exportFile", file);
-          result.put("notify", I18n.get("Export complete."));
-          return result;
         }
-        result.put("notify", I18n.get("Export complete."));
+        ActionValidateBuilder validateBuilder =
+            new ActionValidateBuilder(ValidatorType.NOTIFY)
+                .setMessage(I18n.get("Export complete."));
+        result.putAll(validateBuilder.build());
         return result;
       } catch (Exception e) {
         log.error("error while exporting: ", e);
-        result.put("error", e.getMessage());
+        ActionValidateBuilder validateBuilder =
+            new ActionValidateBuilder(ValidatorType.ERROR).setMessage(e.getMessage());
+        result.putAll(validateBuilder.build());
         return result;
       }
     }

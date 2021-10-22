@@ -25,6 +25,10 @@ import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.loader.XMLViews;
+import com.axelor.meta.schema.actions.validate.ActionValidate;
+import com.axelor.meta.schema.actions.validate.validator.Alert;
+import com.axelor.meta.schema.actions.validate.validator.Error;
+import com.axelor.meta.schema.actions.validate.validator.Info;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.rpc.ContextEntity;
 import com.axelor.rpc.Response;
@@ -302,9 +306,9 @@ public class ActionGroup extends ActionResumable {
         }
         if (last == null) continue;
         if (Objects.equal(Boolean.TRUE, last.get("reload"))
-            || last.containsKey("info")
-            || last.containsKey("alert")
-            || last.containsKey("error")
+            || last.containsKey(Info.KEY)
+            || last.containsKey(Alert.KEY)
+            || last.containsKey(Error.KEY)
             || last.containsKey("save")
             || last.containsKey("validate")
             || last.containsKey("close")

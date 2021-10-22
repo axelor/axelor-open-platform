@@ -3172,7 +3172,7 @@
   <xsd:complexType name="AbstractAct" abstract="true">
     <xsd:attribute name="if" type="xsd:string">
       <xsd:annotation>
-        <xsd:documentation>A Groovy boolean expression against the current form values.</xsd:documentation>
+        <xsd:documentation>A boolean expression against the current form values.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
   </xsd:complexType>
@@ -3192,6 +3192,29 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="title" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Title of the modal/notification</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="confirm-btn-title" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Title of the confirm button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="cancel-btn-title" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Title of the cancel button.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="ActInfo">
+    <xsd:complexContent>
+      <xsd:extension base="tns:ActMessage">
+        <xsd:attribute name="action" type="xsd:string" use="prohibited" />
+        <xsd:attribute name="cancel-btn-title" type="xsd:string" use="prohibited" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -3199,6 +3222,15 @@
     <xsd:complexContent>
       <xsd:extension base="tns:ActMessage">
         <xsd:attribute name="action" type="xsd:string" use="prohibited" />
+        <xsd:attribute name="confirm-btn-title" type="xsd:string" use="prohibited" />
+        <xsd:attribute name="cancel-btn-title" type="xsd:string" use="prohibited" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="ActError">
+    <xsd:complexContent>
+      <xsd:extension base="tns:ActMessage">
+        <xsd:attribute name="cancel-btn-title" type="xsd:string" use="prohibited" />
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -3312,9 +3344,9 @@
     <xsd:complexContent>
       <xsd:extension base="tns:AbstractBaseAction">
         <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="error" type="tns:ActMessage" />
+          <xsd:element name="error" type="tns:ActError" />
           <xsd:element name="alert" type="tns:ActMessage" />
-          <xsd:element name="info" type="tns:ActMessage" />
+          <xsd:element name="info" type="tns:ActInfo" />
           <xsd:element name="notify" type="tns:ActNotify" />
         </xsd:choice>
       </xsd:extension>

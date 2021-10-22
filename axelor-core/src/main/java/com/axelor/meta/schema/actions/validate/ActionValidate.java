@@ -15,61 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.meta.schema.actions;
+package com.axelor.meta.schema.actions.validate;
 
 import com.axelor.common.StringUtils;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.ActionHandler;
+import com.axelor.meta.schema.actions.ActionResumable;
+import com.axelor.meta.schema.actions.validate.validator.Alert;
+import com.axelor.meta.schema.actions.validate.validator.Error;
+import com.axelor.meta.schema.actions.validate.validator.Info;
+import com.axelor.meta.schema.actions.validate.validator.Notify;
+import com.axelor.meta.schema.actions.validate.validator.Validator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 public class ActionValidate extends ActionResumable {
-
-  public static class Validator extends Element {
-
-    @XmlAttribute(name = "message")
-    private String message;
-
-    @XmlAttribute(name = "action")
-    private String action;
-
-    public String getMessage() {
-      return message;
-    }
-
-    public void setMessage(String message) {
-      this.message = message;
-    }
-
-    public String getAction() {
-      return action;
-    }
-
-    public void setAction(String action) {
-      this.action = action;
-    }
-  }
-
-  @XmlType
-  public static class Error extends Validator {}
-
-  @XmlType
-  public static class Alert extends Validator {}
-
-  @XmlType
-  public static class Info extends Validator {}
-
-  @XmlType
-  public static class Notify extends Validator {}
 
   @JsonIgnore
   @XmlElements({
@@ -101,8 +69,8 @@ public class ActionValidate extends ActionResumable {
   @Override
   public Object evaluate(ActionHandler handler) {
 
-    final List<String> info = Lists.newArrayList();
-    final List<String> notify = Lists.newArrayList();
+    final List<Map<String, String>> info = Lists.newArrayList();
+    final List<Map<String, String>> notify = Lists.newArrayList();
     final Map<String, Object> result = Maps.newHashMap();
 
     for (int i = getIndex(); i < validators.size(); i++) {
@@ -112,12 +80,14 @@ public class ActionValidate extends ActionResumable {
         continue;
       }
 
-      String key = validator.getClass().getSimpleName().toLowerCase();
-      String value = I18n.get(validator.getMessage());
+      String key = validator.getKey();
+      String message = I18n.get(validator.getMessage());
 
-      if (!StringUtils.isBlank(value)) {
-        value = handler.evaluate(toExpression(value, true)).toString();
+      if (!StringUtils.isBlank(message)) {
+        message = handler.evaluate(toExpression(message, true)).toString();
       }
+
+      Map<String, String> value = validator.toMap(message);
 
       if (validator instanceof Info) {
         info.add(value);
@@ -130,29 +100,25 @@ public class ActionValidate extends ActionResumable {
 
       result.put(key, value);
 
-      if (!StringUtils.isBlank(validator.getAction())) {
-        result.put("action", validator.getAction());
-      }
-
       if (i + 1 < validators.size() && validator instanceof Alert) {
         result.put("pending", String.format("%s[%d]", getName(), i + 1));
       }
 
       if (!info.isEmpty()) {
-        result.put("info", info);
+        result.put(Info.KEY, info);
       }
       if (!notify.isEmpty()) {
-        result.put("notify", notify);
+        result.put(Notify.KEY, notify);
       }
 
       return result;
     }
 
     if (!info.isEmpty()) {
-      result.put("info", info);
+      result.put(Info.KEY, info);
     }
     if (!notify.isEmpty()) {
-      result.put("notify", notify);
+      result.put(Notify.KEY, notify);
     }
 
     return result.isEmpty() ? null : result;

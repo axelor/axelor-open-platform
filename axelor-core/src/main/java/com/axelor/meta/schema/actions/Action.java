@@ -125,7 +125,7 @@ public abstract class Action {
     return MoreObjects.toStringHelper(getClass()).add("name", getName()).toString();
   }
 
-  static String toExpression(String expression, boolean quote) {
+  protected static String toExpression(String expression, boolean quote) {
     Pattern pattern = Pattern.compile("^(#\\{|(eval|select|action):)");
     if (expression != null && !pattern.matcher(expression).find()) {
       expression = "eval: " + (quote ? "\"\"\"" + expression + "\"\"\"" : expression);
@@ -133,7 +133,7 @@ public abstract class Action {
     return expression;
   }
 
-  static boolean test(ActionHandler handler, String expression) {
+  protected static boolean test(ActionHandler handler, String expression) {
     if (Strings.isNullOrEmpty(expression)) // if expression is not given always return true
     return true;
     if ("true".equals(expression)) return true;
@@ -180,7 +180,7 @@ public abstract class Action {
       this.expression = expression;
     }
 
-    boolean test(ActionHandler handler) {
+    public boolean test(ActionHandler handler) {
       return Action.test(handler, getCondition());
     }
   }

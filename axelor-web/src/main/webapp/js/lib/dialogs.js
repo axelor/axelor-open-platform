@@ -25,15 +25,19 @@
       yesNo: false
     },
 
-    say: function(str) {
+    say: function(str, options) {
+      var opts = $.extend({}, options);
       return this.box(str, {
-        title: _t('Information')
+        title: opts.title || _t('Information'),
+        confirmBtnTitle: opts.confirmBtnTitle,
       });
     },
 
-    warn: function(str, callback) {
+    warn: function(str, callback, options) {
+      var opts = $.extend({}, options);
       return this.box(str, {
-        title: _t('Warning'),
+        title: opts.title || _t('Warning'),
+        confirmBtnTitle: opts.confirmBtnTitle,
         css: 'ui-dialog-warning',
         onClose: callback
       });
@@ -43,6 +47,7 @@
       var opts = $.extend({}, options);
       return this.box(str, {
         title: opts.title || _t('Error'),
+        confirmBtnTitle: opts.confirmBtnTitle,
         css: 'ui-dialog-error',
         onClose: callback
       });
@@ -64,8 +69,8 @@
         title: _t('Question')
       }, this.config, opts);
 
-      var titleOK = opts.yesNo ? _t('Yes') : _t('OK');
-      var titleCancel = opts.yesNo ? _t('No') : _t('Cancel');
+      var titleOK = opts.confirmBtnTitle || (opts.yesNo ? _t('Yes') : _t('OK'));
+      var titleCancel = opts.cancelBtnTitle || (opts.yesNo ? _t('No') : _t('Cancel'));
 
       element = this.box(str, {
         title: opts.title,
@@ -107,7 +112,7 @@
       var css = opts.css || 'ui-dialog-info';
       var buttons = opts.buttons || [
         {
-          'text'	: _t('OK'),
+          'text'	: opts.confirmBtnTitle || _t('OK'),
           'class'	: 'btn btn-primary',
           'click'	: function() {
             element.dialog('close');
@@ -207,7 +212,7 @@
   var notify = {
 
     info: function(message, options) {
-      var opts = _.extend({
+      var opts = $.extend({
         title: _t('Information'),
         css: 'alert-info'
       }, options);
@@ -215,7 +220,7 @@
     },
 
     alert: function(message, options) {
-      var opts = _.extend({
+      var opts = $.extend({
         title: _t('Alert'),
         css: 'alert-default'
       }, options);
@@ -223,7 +228,7 @@
     },
 
     success: function(message, options) {
-      var opts = _.extend({
+      var opts = $.extend({
         title: _t('Success'),
         css: 'alert-primary'
       }, options);
@@ -231,7 +236,7 @@
     },
 
     error: function(message, options) {
-      var opts = _.extend({
+      var opts = $.extend({
         title: _t('Error'),
         css: 'alert-error'
       }, options);
