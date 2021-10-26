@@ -230,18 +230,15 @@
     var channel = Socket('tags');
     var unsubscribe = channel.subscribe(message => {
       var values = message.values;
-
       $rootScope.$apply(() => listeners.forEach(cb => cb(values)));
-
-        pollPromise = $timeout(findTags, POLL_INTERVAL);
-
-        if (pollIdle === null) {
-          pollIdle = setTimeout(cancelPolling, POLL_INTERVAL * 2);
-        }
       });
 
     var pending = false;
     var pendingReset = () => {
+      pollPromise = $timeout(findTags, POLL_INTERVAL);
+      if (pollIdle === null) {
+        pollIdle = setTimeout(cancelPolling, POLL_INTERVAL * 2);
+      }
       pending = false;
     };
 
