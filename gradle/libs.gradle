@@ -200,6 +200,7 @@ libs.birt_runtime = ["milyn:flute:1.3", dependencies.create("org.eclipse.birt.ru
   exclude module: "org.apache.batik.pdf" // causing issue with commons-io
   exclude module: "commons-cli"
   exclude module: "flute"
+  exclude module: "org.apache.commons.codec"
 }]
 
 // jcommander
