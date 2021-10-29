@@ -1585,8 +1585,12 @@ Grid.prototype.onKeyDown = function (e) {
   var args = grid.getActiveCell();
 
   if (e.isDefaultPrevented()) return;
-  if (e.keyCode === 13) {
-    if (this.isEditActive() && e.ctrlKey) {
+  if (e.keyCode === 27) { // ESCAPE
+    that.cancelEdit(true);
+    return;
+  }
+  if (e.keyCode === 13) { // ENTER
+    if (this.isEditActive()) {
       var promise = that.commitEdit();
       promise.then(function () {
         if (args.row === grid.getDataLength() - 1) {

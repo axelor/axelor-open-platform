@@ -242,7 +242,11 @@ ui.formWidget('BaseSelect', {
         scope.handleDelete(e);
         break;
       case KEY.ENTER:
+        var isShowing = showing;
         scope.handleEnter(e);
+        if (isShowing) {
+          e.preventDefault();
+        }
         break;
       }
     }).click(function() {
