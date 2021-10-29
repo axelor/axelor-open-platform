@@ -2257,6 +2257,20 @@ Grid.prototype._showEditor = function (activeCell) {
     form.css('visibility', '');
   }, 100)
 
+  var unwatchScrollbar = this.scope.$watch(function () {
+    return viewPort.prop("clientHeight");
+  }, function (clientHeight) {
+    var bottom = viewPort.height() - clientHeight;
+    that._editorOverlay.css("bottom", bottom);
+  });
+  var viewPortOverflowY = viewPort.css("overflow-y");
+  viewPort.css("overflow-y", "hidden");
+  this.uninstallScrollbarWatcher = function () {
+    unwatchScrollbar();
+    viewPort.css("overflow-y", viewPortOverflowY);
+    delete that.uninstallScrollbarWatcher;
+  }
+
   this._editorVisible = grid._editorVisible = true;
   this.scope.$emit('on:grid-edit-start', this);
   this.adjustEditor(args);
@@ -2278,7 +2292,12 @@ Grid.prototype.cancelEdit = function (focus) {
   this.editorForm.hide();
   this.editorScope.edit(null);
   this._editorOverlay.hide();
-  this._editorVisible = this.grid._editorVisible = false;
+
+  if (this.uninstallScrollbarWatcher) {
+    this.uninstallScrollbarWatcher();
+  }
+
+ this._editorVisible = this.grid._editorVisible = false;
   this.scope.$emit('on:grid-edit-end', this);
   if (this.handler.dataView.getItemById(0)) {
     this.handler.dataView.deleteItem(0);
