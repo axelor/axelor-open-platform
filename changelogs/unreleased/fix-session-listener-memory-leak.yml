@@ -1,0 +1,3 @@
+---
+title: Fix memory leak in session listener
+type: fix
