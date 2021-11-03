@@ -737,7 +737,14 @@ ui.formItem('Button', {
       }
 
       function doClick() {
-        setEnable(scope.fireAction("onClick"));
+        function fireOnClick() {
+          setEnable(scope.fireAction("onClick"));
+        }
+        if (scope.grid && scope.grid.isEditActive && scope.grid.isEditActive()) {
+          scope.grid.commitEdit().then(fireOnClick, function () { setEnable(true); });
+        } else {
+          fireOnClick()
+        }
       }
 
       setDisabled(true);
