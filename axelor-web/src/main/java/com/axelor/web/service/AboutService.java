@@ -68,13 +68,12 @@ public class AboutService extends AbstractService {
 
     if (user != null && AuthUtils.isTechnicalStaff(user)) {
       final Runtime runtime = Runtime.getRuntime();
-      final Set<String> sessions = AppSessionListener.getActiveSessions();
+      final Set<HttpSession> sessions = AppSessionListener.getSessions();
       final List<Map<String, Object>> users = new ArrayList<>();
 
       int mb = 1024;
 
-      for (String id : sessions) {
-        HttpSession session = AppSessionListener.getSession(id);
+      for (HttpSession session : sessions) {
         try {
           if (session == null
               || session.getAttribute(PRINCIPALS_SESSION_KEY) == null

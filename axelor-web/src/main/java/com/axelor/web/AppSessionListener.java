@@ -19,9 +19,10 @@ package com.axelor.web;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpSession;
@@ -34,7 +35,7 @@ public final class AppSessionListener implements HttpSessionListener {
 
   private final int timeout;
 
-  private static final Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
+  private static final Set<HttpSession> sessions = ConcurrentHashMap.newKeySet();
 
   /**
    * Create a new {@link AppSessionListener} with the given app settings.
@@ -49,21 +50,30 @@ public final class AppSessionListener implements HttpSessionListener {
   @Override
   public void sessionCreated(HttpSessionEvent event) {
     final HttpSession session = event.getSession();
-    sessions.put(session.getId(), session);
+    sessions.add(session);
     session.setMaxInactiveInterval(timeout * 60);
   }
 
   @Override
   public void sessionDestroyed(HttpSessionEvent event) {
     final HttpSession session = event.getSession();
-    sessions.remove(session.getId());
+    sessions.remove(session);
   }
 
+  public static Set<HttpSession> getSessions() {
+    return sessions;
+  }
+
+  @Deprecated
   public static Set<String> getActiveSessions() {
-    return sessions.keySet();
+    return sessions.stream().map(HttpSession::getId).collect(Collectors.toSet());
   }
 
+  @Deprecated
   public static HttpSession getSession(String id) {
-    return sessions.get(id);
+    return sessions.stream()
+        .filter(session -> Objects.equals(session.getId(), id))
+        .findAny()
+        .orElse(null);
   }
 }
