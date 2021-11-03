@@ -347,6 +347,10 @@ ui.formInput('DateTime', {
         return false;
       } else if (e.keyCode === $.ui.keyCode.ENTER) {
         updateModel();
+        if ($(this).datepicker("widget").is(':visible')) {
+          input.datetimepicker('hide');
+          e.preventDefault();
+        }
       } else if ($(this).datepicker("widget").is(':visible')) {
         e.stopPropagation();
         e.preventDefault();

@@ -1,0 +1,5 @@
+---
+title: Improve editable grid shortcuts to confirm/cancel edit
+type: change
+description: |
+  We can now use `ENTER` key to confirm current edit and `ESCAPE` key to cancel.

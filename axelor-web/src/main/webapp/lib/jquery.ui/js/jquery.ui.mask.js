@@ -205,9 +205,11 @@ $.widget( "ui.mask", {
 
 			switch ( key ) {
 				case keyCode.ESCAPE:
-					this.element.val( this.lastUnsavedValue );
-					this._caretSelect( 0, this._parseValue() );
-					event.preventDefault();
+					if ( this.lastUnsavedValue !== this.element.val() ) { 
+						this.element.val( this.lastUnsavedValue );
+						this._caretSelect( 0, this._parseValue() );
+						event.preventDefault();
+					}
 					return;
 
 				case keyCode.BACKSPACE:
