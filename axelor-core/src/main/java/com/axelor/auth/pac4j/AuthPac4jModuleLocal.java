@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
+import java.util.Optional;
 import javax.servlet.ServletContext;
 import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.Pac4jConstants;
@@ -106,6 +107,8 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
 
   private static class AxelorFormClient extends FormClient {
 
+    private AuthPac4jCredentialsHandler credentialsHandler;
+
     public AxelorFormClient() {
       setName(getClass().getSuperclass().getSimpleName());
       setCredentialsExtractor(new JsonExtractor());
@@ -121,7 +124,7 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
       final Authenticator<UsernamePasswordCredentials> authenticator =
           Beans.get(AxelorAuthenticator.class);
       defaultAuthenticator(authenticator);
-
+      credentialsHandler = Beans.get(AuthPac4jCredentialsHandler.class);
       super.clientInit();
     }
 
@@ -186,11 +189,14 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
       }
 
       logger.error("Password authentication failed for user: {}", username);
+      credentialsHandler.handleInvalidCredentials(this, username, errorMessage);
       return super.handleInvalidCredentials(context, username, message, errorMessage);
     }
   }
 
   private static class AxelorDirectBasicAuthClient extends DirectBasicAuthClient {
+    private AuthPac4jCredentialsHandler credentialsHandler;
+
     public AxelorDirectBasicAuthClient() {
       setName(getClass().getSuperclass().getSimpleName());
     }
@@ -200,6 +206,7 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
       final Authenticator<UsernamePasswordCredentials> authenticator =
           Beans.get(AxelorAuthenticator.class);
       defaultAuthenticator(authenticator);
+      credentialsHandler = Beans.get(AuthPac4jCredentialsHandler.class);
       super.clientInit();
     }
 
@@ -208,7 +215,18 @@ public class AuthPac4jModuleLocal extends AuthPac4jModule {
       if (StringUtils.isBlank(context.getRequestHeader(HttpConstants.AUTHORIZATION_HEADER))) {
         return null;
       }
-      return super.retrieveCredentials(context);
+
+      final UsernamePasswordCredentials credentials = super.retrieveCredentials(context);
+
+      if (credentials == null) {
+        final String username =
+            Optional.ofNullable(getCredentialsExtractor().extract(context))
+                .map(UsernamePasswordCredentials::getUsername)
+                .orElse(null);
+        credentialsHandler.handleInvalidCredentials(this, username, INCORRECT_CREDENTIALS);
+      }
+
+      return credentials;
     }
   }
 

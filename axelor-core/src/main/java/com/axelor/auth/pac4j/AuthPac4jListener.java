@@ -67,8 +67,7 @@ public class AuthPac4jListener implements AuthenticationListener {
 
   @Override
   public void onFailure(AuthenticationToken token, AuthenticationException ae) {
-    logger.error("Authentication failed for principal: {}", token.getPrincipal());
-    firePostLoginFailure(token, ae);
+    // Login failure handled by {@link com.axelor.auth.pac4j.AuthPac4jCredentialsHandler}
   }
 
   @Override
