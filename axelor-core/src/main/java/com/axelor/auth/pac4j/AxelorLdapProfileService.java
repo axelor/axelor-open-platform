@@ -78,6 +78,9 @@ import org.ldaptive.ssl.CredentialConfig;
 import org.ldaptive.ssl.KeyStoreCredentialConfig;
 import org.ldaptive.ssl.SslConfig;
 import org.ldaptive.ssl.X509CredentialConfig;
+import org.pac4j.core.context.WebContext;
+import org.pac4j.core.credentials.UsernamePasswordCredentials;
+import org.pac4j.core.exception.BadCredentialsException;
 import org.pac4j.core.profile.converter.AbstractAttributeConverter;
 import org.pac4j.core.profile.converter.Converters;
 import org.pac4j.core.profile.definition.CommonProfileDefinition;
@@ -256,6 +259,14 @@ public class AxelorLdapProfileService extends LdapProfileService implements Axel
     setUsernameAttribute(usernameAttribute);
     setPasswordAttribute(AxelorLdapProfileDefinition.PASSWORD);
     setProfileDefinition(new AxelorLdapProfileDefinition());
+  }
+
+  @Override
+  public void validate(UsernamePasswordCredentials credentials, WebContext context) {
+    if (credentials == null || StringUtils.isBlank(credentials.getUsername())) {
+      throw new BadCredentialsException("Username cannot be blank.");
+    }
+    super.validate(credentials, context);
   }
 
   public String getGroupsDn() {
