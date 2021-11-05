@@ -336,7 +336,11 @@ public class ViewService extends AbstractService {
           break;
       }
       if (view != null) {
-        return service.saveView(view, AuthUtils.getUser());
+        final Long customViewId =
+            Optional.ofNullable(data.get("customViewId"))
+                .map(id -> Long.parseLong(id.toString()))
+                .orElse(null);
+        return service.saveView(view, AuthUtils.getUser(), customViewId);
       }
     } catch (RuntimeException e) {
       throw e;

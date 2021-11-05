@@ -533,6 +533,11 @@ public class MetaService {
 
   @Transactional
   public Response saveView(AbstractView view, User user) {
+    return saveView(view, user, null);
+  }
+
+  @Transactional
+  public Response saveView(AbstractView view, User user, Long customViewId) {
     final ViewCustomizationPermission viewCustomizationPermission =
         getViewCustomizationPermission(user);
 
@@ -546,6 +551,11 @@ public class MetaService {
     if (Objects.equals(view.getCustomViewShared(), Boolean.TRUE)
         && viewCustomizationPermission != ViewCustomizationPermission.CAN_SHARE) {
       throw new PersistenceException(I18n.get("You are not allowed to share custom views."));
+    }
+
+    if (viewCustomizationPermission == ViewCustomizationPermission.CAN_SHARE
+        && customViewId != null) {
+      view.setCustomViewId(customViewId);
     }
 
     MetaViewCustom entity =
@@ -591,10 +601,10 @@ public class MetaService {
     }
 
     return com.axelor.db.Query.of(MetaViewCustom.class)
-        .filter("self.name = :name AND self.user = :user")
-        .bind("name", view.getName())
-        .bind("user", user)
-        .delete();
+            .filter("self.name = :name AND self.user = :user")
+            .bind("name", view.getName())
+            .bind("user", user)
+            .delete();
   }
 
   @SuppressWarnings("all")
