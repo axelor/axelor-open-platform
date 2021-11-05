@@ -600,11 +600,23 @@ public class MetaService {
       return 0;
     }
 
-    return com.axelor.db.Query.of(MetaViewCustom.class)
+    int count =
+        com.axelor.db.Query.of(MetaViewCustom.class)
             .filter("self.name = :name AND self.user = :user")
             .bind("name", view.getName())
             .bind("user", user)
             .delete();
+
+    if (count == 0
+        && getViewCustomizationPermission(user) == ViewCustomizationPermission.CAN_SHARE) {
+      count =
+          com.axelor.db.Query.of(MetaViewCustom.class)
+              .filter("self.name = :name AND self.shared = TRUE")
+              .bind("name", view.getName())
+              .delete();
+    }
+
+    return count;
   }
 
   @SuppressWarnings("all")
