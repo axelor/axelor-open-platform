@@ -2140,7 +2140,7 @@ Grid.prototype._showEditor = function (activeCell) {
       return promise;
     }
 
-    this.useEditorButtons = axelor.config["view.grid.editor.buttons"];
+    this.useEditorButtons = axelor.config["view.grid.editor.buttons"] !== false;
 
     var beforeFirstElem;
     var afterLastElem;
