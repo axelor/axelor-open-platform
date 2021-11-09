@@ -17,24 +17,18 @@
  */
 package com.axelor.meta.loader;
 
-import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.csv.CSVFile;
 import com.axelor.db.JPA;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.repo.MetaTranslationRepository;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
-import com.google.inject.persist.Transactional;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -81,41 +75,6 @@ public class I18nLoader extends AbstractParallelLoader {
   protected List<List<URL>> findFileLists(Module module) {
     final List<URL> files = MetaScanner.findAll(module.getName(), "i18n", "(.*?)\\.csv");
     return separateFiles(files);
-  }
-
-  @Transactional
-  public void load(String importPath) {
-    // Import by module resolver order
-    for (final Module module : ModuleManager.getAll()) {
-      if (Strings.isNullOrEmpty(importPath)) {
-        this.doLoad(module, false);
-      } else {
-        this.loadModule(module, importPath);
-      }
-    }
-  }
-
-  private void loadModule(Module module, String importPath) {
-
-    File moduleDir = FileUtils.getFile(importPath, module.getName());
-    if (!moduleDir.exists() || !moduleDir.isDirectory() || moduleDir.listFiles() == null) {
-      return;
-    }
-
-    log.debug("Load {} translations", module.getName());
-
-    final List<List<File>> fileLists = separateFiles(Arrays.asList(moduleDir.listFiles()));
-
-    fileLists.forEach(
-        files ->
-            files.forEach(
-                file -> {
-                  try (InputStream is = new FileInputStream(file)) {
-                    process(is, file.getPath());
-                  } catch (IOException e) {
-                    log.error("Unable to import file: {}", file.getName());
-                  }
-                }));
   }
 
   private void process(InputStream stream, String fileName) throws IOException {
