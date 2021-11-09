@@ -20,19 +20,25 @@ package com.axelor.meta.loader;
 import com.axelor.common.StringUtils;
 import com.axelor.common.csv.CSVFile;
 import com.axelor.db.JPA;
+import com.axelor.db.ParallelTransactionExecutor;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.repo.MetaTranslationRepository;
-import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -41,24 +47,7 @@ public class I18nLoader extends AbstractParallelLoader {
 
   @Inject private MetaTranslationRepository translations;
 
-  /** Separate custom csv files from the rest. */
-  private <T> List<List<T>> separateFiles(List<T> files) {
-
-    final List<T> main = new ArrayList<>();
-    final List<T> custom = new ArrayList<>();
-    final Pattern pattern = Pattern.compile(".*(?:custom_)(\\w+)\\.csv$");
-
-    for (final T file : files) {
-      final String name = file.toString();
-      if (pattern.matcher(name).matches()) {
-        custom.add(file);
-      } else {
-        main.add(file);
-      }
-    }
-
-    return ImmutableList.of(main, custom);
-  }
+  private static final String FILE_PATTERN = ".*(?:messages_|custom_)([a-zA-Z_]+)\\.csv$";
 
   @Override
   protected void doLoad(URL file, Module module, boolean update) {
@@ -72,14 +61,60 @@ public class I18nLoader extends AbstractParallelLoader {
   }
 
   @Override
-  protected List<List<URL>> findFileLists(Module module) {
-    final List<URL> files = MetaScanner.findAll(module.getName(), "i18n", "(.*?)\\.csv");
-    return separateFiles(files);
+  protected void doLoad(Module module, boolean update) {
+    splitFiles(findFiles(module)).forEach(files -> doLoad(files, module, update));
+  }
+
+  protected void doLoad(List<URL> files, Module module, boolean update) {
+    for (URL file : files) {
+      doLoad(file, module, update);
+    }
+  }
+
+  @Override
+  protected void feedTransactionExecutor(
+      ParallelTransactionExecutor transactionExecutor,
+      Module module,
+      boolean update,
+      Set<Path> paths) {
+
+    for (List<URL> files : splitFiles(findFiles(module, paths))) {
+      transactionExecutor.add(() -> doLoad(files, module, update));
+    }
+  }
+
+  @Override
+  protected List<URL> findFiles(Module module) {
+    List<URL> files = MetaScanner.findAll(module.getName(), "i18n", FILE_PATTERN);
+    // Make sure to put custom translation files at the end
+    return files.stream()
+        .sorted(
+            Comparator.comparing(
+                URL::toString,
+                Comparator.comparing((String x) -> x.matches(".*(?:custom_)(\\w+)\\.csv$"))
+                    .thenComparing(Comparator.naturalOrder())))
+        .collect(Collectors.toList());
+  }
+
+  protected Collection<List<URL>> splitFiles(List<URL> urls) {
+    Map<String, List<URL>> map = new HashMap<>();
+    urls.forEach(
+        o -> {
+          Pattern pattern = Pattern.compile(FILE_PATTERN);
+          Matcher matcher = pattern.matcher(o.getFile());
+
+          if (!matcher.matches()) {
+            return;
+          }
+
+          map.computeIfAbsent(matcher.group(1), k -> new LinkedList<>()).add(o);
+        });
+    return map.values();
   }
 
   private void process(InputStream stream, String fileName) throws IOException {
     // Get language name from the file name
-    Pattern pattern = Pattern.compile(".*(?:messages_|custom_)([a-zA-Z_]+)\\.csv$");
+    Pattern pattern = Pattern.compile(FILE_PATTERN);
     Matcher matcher = pattern.matcher(fileName);
 
     if (!matcher.matches()) {
