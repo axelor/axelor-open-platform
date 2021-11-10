@@ -69,6 +69,7 @@ ui.formInput('CodeEditor', {
     setTimeout(function () {
       props.readOnly = scope.$$readonly;
       editor = CodeMirror(element.get(0), props);
+      editor.debouncedRefresh = _.debounce(editor.refresh, 250);
       model.$render();
       readonlySet(props.readOnly);
       editor.on("change", changed);
@@ -82,6 +83,11 @@ ui.formInput('CodeEditor', {
       if (editor) {
         editor.setValue(val || "");
         editor.clearHistory();
+        editor.debouncedRefresh();
+      } else {
+        setTimeout(function () {
+          model.$render();
+        }, 250);
       }
       loading = false;
     };
