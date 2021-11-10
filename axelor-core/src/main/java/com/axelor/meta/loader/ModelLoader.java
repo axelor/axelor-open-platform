@@ -24,7 +24,6 @@ import com.axelor.meta.db.MetaSequence;
 import com.axelor.meta.db.repo.MetaEnumRepository;
 import com.axelor.meta.db.repo.MetaSequenceRepository;
 import com.axelor.meta.service.MetaModelService;
-import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import java.io.IOException;
@@ -90,9 +89,8 @@ public class ModelLoader extends AbstractParallelLoader {
   }
 
   @Override
-  protected List<List<URL>> findFileLists(Module module) {
-    return ImmutableList.of(
-        MetaScanner.findAll(module.getName(), "(domains|objects)", "(.*?)\\.xml$"));
+  protected List<URL> findFiles(Module module) {
+    return MetaScanner.findAll(module.getName(), "(domains|objects)", "(.*?)\\.xml$");
   }
 
   static Set<String> findEntities(Module module) {

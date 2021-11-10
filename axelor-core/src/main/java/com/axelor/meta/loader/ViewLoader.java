@@ -60,7 +60,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
@@ -120,8 +119,8 @@ public class ViewLoader extends AbstractParallelLoader {
   }
 
   @Override
-  protected List<List<URL>> findFileLists(Module module) {
-    return ImmutableList.of(MetaScanner.findAll(module.getName(), "views", "(.*?)\\.xml"));
+  protected List<URL> findFiles(Module module) {
+    return MetaScanner.findAll(module.getName(), "views", "(.*?)\\.xml");
   }
 
   @Override

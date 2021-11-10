@@ -30,21 +30,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 abstract class AbstractParallelLoader extends AbstractLoader {
 
-  protected abstract List<List<URL>> findFileLists(Module module);
+  protected abstract List<URL> findFiles(Module module);
 
   protected abstract void doLoad(URL file, Module module, boolean update);
 
   @Override
   protected void doLoad(Module module, boolean update) {
-    findFileLists(module).stream()
-        .flatMap(List::stream)
-        .forEach(file -> doLoad(file, module, update));
+    findFiles(module).forEach(file -> doLoad(file, module, update));
   }
 
   protected void feedTransactionExecutor(
@@ -53,18 +50,13 @@ abstract class AbstractParallelLoader extends AbstractLoader {
       boolean update,
       Set<Path> paths) {
 
-    for (final ListIterator<List<URL>> it = findFileLists(module, paths).listIterator();
-        it.hasNext(); ) {
-      final int priority = it.nextIndex();
-      final List<URL> files = it.next();
-      files
-          .parallelStream()
-          .forEach(file -> transactionExecutor.add(() -> doLoad(file, module, update), priority));
+    for (URL file : findFiles(module, paths)) {
+      transactionExecutor.add(() -> doLoad(file, module, update));
     }
   }
 
-  private List<List<URL>> findFileLists(Module module, Set<Path> paths) {
-    final List<List<URL>> lists = findFileLists(module);
+  protected List<URL> findFiles(Module module, Set<Path> paths) {
+    final List<URL> lists = findFiles(module);
 
     // All files
     if (paths.isEmpty()) {
@@ -72,29 +64,21 @@ abstract class AbstractParallelLoader extends AbstractLoader {
     }
 
     // Filtered by modified in JAR if any
-    final List<List<URL>> foundInJar = findFileListsJar(lists);
+    final List<URL> foundInJar = findFilesInJar(lists);
 
-    if (foundInJar.parallelStream().anyMatch(list -> !list.isEmpty())) {
+    if (!foundInJar.isEmpty()) {
       return foundInJar;
     }
 
     // Filtered by paths
     return lists
         .parallelStream()
-        .map(
-            list ->
-                list.parallelStream()
-                    .filter(
-                        url ->
-                            "file".equals(url.getProtocol())
-                                && paths.contains(Paths.get(toUri(url))))
-                    .collect(Collectors.toList()))
+        .filter(url -> "file".equals(url.getProtocol()) && paths.contains(Paths.get(toUri(url))))
         .collect(Collectors.toList());
   }
 
-  private List<List<URL>> findFileListsJar(List<List<URL>> lists) {
+  private List<URL> findFilesInJar(List<URL> lists) {
     return lists.stream()
-        .flatMap(List::stream)
         .findAny()
         .filter(url -> "jar".equals(url.getProtocol()))
         .map(
@@ -103,14 +87,10 @@ abstract class AbstractParallelLoader extends AbstractLoader {
                   FileSystems.newFileSystem(toUri(url), Collections.emptyMap())) {
                 return lists
                     .parallelStream()
-                    .map(
-                        list ->
-                            list.parallelStream()
-                                .filter(
-                                    urlInFs ->
-                                        getLastModifiedTimeMillis(fs, urlInFs)
-                                            >= ModuleManager.getLastRestored())
-                                .collect(Collectors.toList()))
+                    .filter(
+                        urlInFs ->
+                            getLastModifiedTimeMillis(fs, urlInFs)
+                                >= ModuleManager.getLastRestored())
                     .collect(Collectors.toList());
               } catch (IOException e) {
                 throw new UncheckedIOException(e);
