@@ -600,6 +600,12 @@ public class MetaService {
       return 0;
     }
 
+    final ViewCustomizationPermission permission = getViewCustomizationPermission(user);
+
+    if (permission == ViewCustomizationPermission.NOT_ALLOWED) {
+      throw new PersistenceException(I18n.get("You are not allowed to customize views."));
+    }
+
     int count =
         com.axelor.db.Query.of(MetaViewCustom.class)
             .filter("self.name = :name AND self.user = :user")
@@ -607,8 +613,7 @@ public class MetaService {
             .bind("user", user)
             .delete();
 
-    if (count == 0
-        && getViewCustomizationPermission(user) == ViewCustomizationPermission.CAN_SHARE) {
+    if (count == 0 && permission == ViewCustomizationPermission.CAN_SHARE) {
       count =
           com.axelor.db.Query.of(MetaViewCustom.class)
               .filter("self.name = :name AND self.shared = TRUE")
