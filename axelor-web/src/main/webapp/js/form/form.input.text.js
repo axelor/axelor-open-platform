@@ -55,7 +55,7 @@ ui.formInput('String', {
 
     scope.validate = function(value) {
       if (_.isEmpty(value)) {
-        return true;
+        return !regex || regex.test(value || "");
       }
       var length = value.length,
         valid = true;
