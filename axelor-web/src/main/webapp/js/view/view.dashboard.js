@@ -75,6 +75,7 @@ function DashboardCtrl($scope, $element) {
       item.$index = i;
       item.spanCss = {};
       item.spanCss['dashlet-cs' + span] = true;
+      item.field = _.extend({}, item.widgetAttrs, { readonly: item.readonly, hidden: item.hidden });
 
       row.push(item);
     });
@@ -201,6 +202,19 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
     scope: true,
     controller: DashletCtrl,
     link: function(scope, element, attrs) {
+
+      // Dashboard
+      var field = (scope.dashlet || {}).field;
+      if (field && !scope.field) {
+        scope.field = scope.dashlet.field;
+        if (scope.field.readonly) {
+          element.addClass("readonly");
+          scope.isReadonly = function () { return true; };
+        }
+        if (scope.field.hidden) {
+          element.hide();
+        }
+      }
 
       var lazy = true;
       (function () {

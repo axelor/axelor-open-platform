@@ -384,7 +384,9 @@
 .panel-related.noEdit .edit-icon i:before,
 .panel-related.readonly .edit-icon i:before,
 .dashboard.noEdit .edit-icon i:before,
-.dashboard.readonly .edit-icon i:before {
+.dashboard.readonly .edit-icon i:before,
+.dashlet.noEdit .edit-icon i:before,
+.dashlet.readonly .edit-icon i:before {
   content: "\f0f6";
 }
 
