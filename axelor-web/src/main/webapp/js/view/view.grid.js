@@ -1168,14 +1168,10 @@ ui.directive('uiPortletGrid', function(){
       var _field = $scope.field || {};
 
       $scope.onGridInit = function (grid, inst) {
-        var editCol = _.findWhere(inst.cols, {id: '_edit_column'}) || {};
-        editCol.descriptor = { hidden : true };
         $scope.$parent.$watch("isReadonly()", function (readonly) {
           if (inst.editable) {
             inst.readonly = readonly;
           }
-          inst.showColumn('_edit_column', !readonly);
-          editCol.descriptor = { hidden : readonly };
         });
       };
 
