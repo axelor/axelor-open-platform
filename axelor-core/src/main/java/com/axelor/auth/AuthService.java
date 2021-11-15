@@ -30,6 +30,7 @@ import com.axelor.rpc.Context;
 import com.google.common.base.Preconditions;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -209,7 +210,7 @@ public class AuthService {
    * @return
    */
   public boolean passwordMatchesPattern(String password) {
-    return passwordPattern.matcher(password).matches();
+    return passwordPattern.matcher(Optional.ofNullable(password).orElse("")).matches();
   }
 
   /**

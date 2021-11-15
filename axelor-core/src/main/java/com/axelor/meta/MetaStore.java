@@ -364,6 +364,12 @@ public final class MetaStore {
         }
         final Object value = prop.get(record);
         if (value == null || value == Boolean.FALSE) continue;
+        if ("regex".equals(prop.getName())) {
+          // XXX: rename regex to pattern to be aligned with pattern attribute used with normal
+          // fields.
+          attrs.put("pattern", value);
+          continue;
+        }
         attrs.put(prop.getName(), value);
       }
 
