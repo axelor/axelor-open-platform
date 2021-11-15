@@ -26,6 +26,7 @@ import com.axelor.db.mapper.Property;
 import com.axelor.meta.ActionHandler;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Resource;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,13 +117,23 @@ public class ActionRecord extends Action {
     if (StringUtils.isBlank(getName())) {
       result = evaluate(handler, map);
     } else {
-      handler.checkPermission(JpaSecurity.CAN_WRITE, getModel());
+      handler.checkPermission(
+          hasRealFields() ? JpaSecurity.CAN_WRITE : JpaSecurity.CAN_READ, getModel());
       handler.firePreEvent(getName());
       result = evaluate(handler, map);
       handler.firePostEvent(getName(), result instanceof ActionResponse ? result : map);
     }
 
     return result == null || result instanceof ActionResponse ? result : wrapper(map);
+  }
+
+  private boolean hasRealFields() {
+    final Class<?> entityClass = findClass(getModel());
+    final Mapper mapper = Mapper.of(entityClass);
+    return fields.stream()
+        .map(field -> field.getName().split("\\s*,\\s*"))
+        .flatMap(Arrays::stream)
+        .anyMatch(name -> mapper.getProperty(name) != null);
   }
 
   @Override
