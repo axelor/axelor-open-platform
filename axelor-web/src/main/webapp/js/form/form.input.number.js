@@ -149,6 +149,7 @@ ui.formInput('Number', {
     element.on("spin", onSpin);
     element.on("spinchange", function(e, row) {
       updateModel(element.val());
+      element.focus();
     });
     element.on("grid:check", function(e, row) {
       updateModel(element.val());

@@ -2008,8 +2008,11 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
   var that = this;
   var onNew = this.handler.onNew;
   if (onNew) {
-    this.handler.onNew = function () {
+    this.handler.onNew = function (event) {
       if (that.editable) {
+        if (event) {
+          event.stopPropagation();
+        }
         return that.addNewRow();
       }
       return onNew.apply(that.handler, arguments);
@@ -2128,9 +2131,6 @@ Grid.prototype._showEditor = function (activeCell) {
     editor.children().hide();
     editor.append(widgets);
 
-    var confirm = $("<button class='btn btn-success'>").html(_t('Confirm'));
-    var cancel = $("<button class='btn btn-danger'>").html(_t('Cancel'));
-
     function doCancel() {
       that.cancelEdit();
     }
@@ -2143,42 +2143,82 @@ Grid.prototype._showEditor = function (activeCell) {
       return promise;
     }
 
-    cancel.click(doCancel);
-    confirm.click(doCommit);
-    confirm.keydown(function (e) {
-      if (e.keyCode === 13) {
+    this.useEditorButtons = axelor.config["view.grid.editor.buttons"] !== false;
+
+    var beforeFirstElem;
+    var afterLastElem;
+
+    if (this.useEditorButtons) {
+      var confirm = $("<button class='btn btn-success'>").html(_t('Confirm'));
+      var cancel = $("<button class='btn btn-danger'>").html(_t('Cancel'));
+
+      cancel.click(doCancel);
+      confirm.click(doCommit);
+      confirm.keydown(function (e) {
+        if (e.keyCode === 13) {
+          e.preventDefault();
+          doCommit().then(function () {
+            var args = grid.getActiveCell();
+            if (args.row === grid.getDataLength() - 1) {
+              that.addNewRow();
+            }
+          });
+        }
+        if (e.keyCode !== 9) return;
+        if (e.shiftKey) {
+          cancel.focus();
+        } else {
+          form.find('.form-item-container :input').first().focus().select();
+        }
+        e.stopPropagation();
         e.preventDefault();
-        doCommit().then(function () {
-          var args = grid.getActiveCell();
-          if (args.row === grid.getDataLength() - 1) {
-            that.addNewRow();
-          }
-        });
+        return false;
+      });
+      cancel.keydown(function (e) {
+        if (e.keyCode !== 9) return;
+        if (e.shiftKey) {
+          form.find('.form-item-container :input').last().focus().select();
+        } else {
+          confirm.focus();
+        }
+        e.stopPropagation();
+        e.preventDefault();
+        return false;
+      });
+
+      $("<div class='slick-form-buttons'>")
+        .append([cancel, confirm])
+        .appendTo($("<div class='slick-form-buttons-wrapper'>").appendTo(form));
+
+      beforeFirstElem = confirm;
+      afterLastElem = cancel;
+    } else {
+      beforeFirstElem = form.find('.form-item-container :input:last');
+      afterLastElem = form.find('.form-item-container :input:first');
+      var gridElem = form.parents(".slickgrid").first();
+
+      function isSibling(elem) {
+        return elem.parents(".slickgrid").first().is(gridElem)
+          || elem.parents(".slick-editor-dropdown").first().length !== 0
+          || elem.parents(".view-container, .nav").first().length === 0;
       }
-      if (e.keyCode !== 9) return;
-      if (e.shiftKey) {
-        cancel.focus();
-      } else {
-        form.find('.form-item-container :input').first().focus().select();
+
+      this.checkAutoCommit = function (e) {
+        if (isSibling($(e.target))) {
+          return;
+        }
+        if (that.editorScope.isDirty()) {
+          that.commitEdit();
+        } else {
+          that.cancelEdit();
+        }
+        $("body").off("click", this.checkAutoCommit);
       }
-      e.stopPropagation();
-      e.preventDefault();
-      return false;
-    });
-    cancel.keydown(function (e) {
-      if (e.keyCode !== 9) return;
-      if (e.shiftKey) {
-        form.find('.form-item-container :input').last().focus().select();
-      } else {
-        confirm.focus();
-      }
-      e.stopPropagation();
-      e.preventDefault();
-      return false;
-    });
+    }
+
     form.on('keydown', '.form-item-container :input:first', function (e) {
       if (e.keyCode === 9 && e.shiftKey) {
-        confirm.focus();
+        beforeFirstElem.focus();
         e.stopPropagation();
         e.preventDefault();
         return false;
@@ -2186,16 +2226,12 @@ Grid.prototype._showEditor = function (activeCell) {
     });
     form.on('keydown', '.form-item-container :input:last', function (e) {
       if (e.keyCode === 9 && !e.shiftKey) {
-        cancel.focus();
+        afterLastElem.focus();
         e.stopPropagation();
         e.preventDefault();
         return false;
       }
     });
-
-    $("<div class='slick-form-buttons'>")
-      .append([cancel, confirm])
-      .appendTo($("<div class='slick-form-buttons-wrapper'>").appendTo(form));
 
     form.on('focus', '.form-item-container :input', function (e) {
       var elem = $(e.target);
@@ -2256,6 +2292,10 @@ Grid.prototype._showEditor = function (activeCell) {
   setTimeout(function () {
     form.css('visibility', '');
   }, 100)
+
+  if (this.checkAutoCommit) {
+    $("body").on("click", this.checkAutoCommit);
+  }
 
   var unwatchScrollbar = this.scope.$watch(function () {
     return viewPort.prop("clientHeight");
@@ -2330,6 +2370,7 @@ function commitEdit(noWait) {
   var that = this;
   var defer = this.handler._defer();
   var promise = defer.promise;
+  var data = this.scope.dataView;
 
   var cleanUp = function () {
     that._commitPromise = null;
@@ -2350,7 +2391,6 @@ function commitEdit(noWait) {
   }
 
   var scope = this.editorScope;
-  var data = this.scope.dataView;
 
   if (!scope || !scope.isValid()) {
     defer.reject();
