@@ -2008,8 +2008,11 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
   var that = this;
   var onNew = this.handler.onNew;
   if (onNew) {
-    this.handler.onNew = function () {
+    this.handler.onNew = function (event) {
       if (that.editable) {
+        if (event) {
+          event.stopPropagation();
+        }
         return that.addNewRow();
       }
       return onNew.apply(that.handler, arguments);
@@ -2201,10 +2204,15 @@ Grid.prototype._showEditor = function (activeCell) {
       }
 
       this.checkAutoCommit = function (e) {
-        if (!isSibling($(e.target))) {
-          that.commitEdit();
-          $("body").off("click", this.checkAutoCommit);
+        if (isSibling($(e.target))) {
+          return;
         }
+        if (that.editorScope.isDirty()) {
+          that.commitEdit();
+        } else {
+          that.cancelEdit();
+        }
+        $("body").off("click", this.checkAutoCommit);
       }
     }
 

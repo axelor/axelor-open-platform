@@ -742,7 +742,7 @@ ui.formInput('OneToMany', {
           "<a href='' ng-click='onSelect()' ng-show='hasPermission(\"read\") && canShowIcon(\"select\") && !isDisabled() && canSelect()'>" +
             "<i class='fa fa-search'></i><span x-translate>Select</span>" +
           "</a>" +
-          "<a href='' ng-click='onNew()' ng-show='hasPermission(\"create\") && canShowIcon(\"new\") && !isDisabled() && canNew()'>" +
+          "<a href='' ng-click='onNew($event)' ng-show='hasPermission(\"create\") && canShowIcon(\"new\") && !isDisabled() && canNew()'>" +
             "<i class='fa fa-plus'></i><span x-translate>New</span>" +
           "</a>" +
           "<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowIcon(\"edit\") && canShowEdit()'>" +
@@ -789,7 +789,7 @@ var panelRelatedTemplate =
       "<a href='' ng-click='onSelect()' ng-show='hasPermission(\"read\") && canShowIcon(\"select\") && !isDisabled() && canSelect()'>" +
         "<i class='fa fa-search'></i><span x-translate>Select</span>" +
       "</a>" +
-      "<a href='' ng-click='onNew()' ng-show='hasPermission(\"create\") && canShowIcon(\"new\") && !isDisabled() && canNew()'>" +
+      "<a href='' ng-click='onNew($event)' ng-show='hasPermission(\"create\") && canShowIcon(\"new\") && !isDisabled() && canNew()'>" +
         "<i class='fa fa-plus'></i><span x-translate>New</span>" +
       "</a>" +
       "<a href='' ng-click='onEdit()' ng-show='hasPermission(\"read\") && canShowIcon(\"edit\") && canShowEdit()'>" +
