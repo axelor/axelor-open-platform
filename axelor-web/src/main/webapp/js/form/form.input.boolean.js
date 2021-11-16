@@ -33,21 +33,20 @@ ui.formInput('Boolean', {
   link: function (scope, element, attrs, model) {
 
     element.on('click', 'input:not(.no-toggle)', function (e) {
+      var waitForActions = scope.waitForActions ? scope.waitForActions : function (f) { f() };
       var doClick = function () {
-        var value = $(e.target).data('value');
-        var checked = value === undefined ? e.target.checked : value;
-        if (scope.field.nullable && value === model.$viewValue ) {
-          $(e.target).prop('checked', false);
-          checked = null;
-        }
-        scope.setValue(checked, true);
+        waitForActions.apply(scope, [function () {
+          var value = $(e.target).data('value');
+          var checked = value === undefined ? e.target.checked : value;
+          if (scope.field.nullable && value === model.$viewValue ) {
+            $(e.target).prop('checked', false);
+            checked = null;
+          }
+          scope.setValue(checked, true);
+        }]);
       };
 
-      if (scope.waitForActions) {
-        scope.waitForActions(doClick);
-      } else {
-        doClick();
-      }
+      scope.afterGridEdit(doClick);
     });
 
     Object.defineProperty(scope, '$value', {
