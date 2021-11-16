@@ -40,8 +40,7 @@ public class AuthPac4jCredentialsHandler {
 
   @Inject private Event<PostLogin> postLogin;
 
-  public void handleInvalidCredentials(
-      Client<?, ?> client, String username, String errorMessage) {
+  public void handleInvalidCredentials(Client<?, ?> client, String username, String errorMessage) {
     final CommonProfile profile = new CommonProfile();
     profile.setClientName(client.getName());
 
