@@ -799,9 +799,10 @@ public class RestService extends ResourceService {
   @GET
   @Path("{id}/followers")
   public Response messageFollowers(@PathParam("id") long id) {
+    final Class<? extends Model> entityClass = entityClass();
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
 
-    @SuppressWarnings("all")
-    final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
+    final Repository<?> repo = JpaRepository.of(entityClass);
     final Model entity = repo.find(id);
     final Response response = new Response();
 
@@ -815,9 +816,11 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("{id}/follow")
-  @SuppressWarnings("all")
   public Response messageFollow(@PathParam("id") long id, Request request) {
-    final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
+    final Class<? extends Model> entityClass = entityClass();
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
+
+    final Repository<?> repo = JpaRepository.of(entityClass);
     final Model entity = repo.find(id);
 
     if (entity == null) {
@@ -851,9 +854,11 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("{id}/unfollow")
-  @SuppressWarnings("all")
   public Response messageUnfollow(@PathParam("id") long id, Request request) {
-    final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
+    final Class<? extends Model> entityClass = entityClass();
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
+
+    final Repository<?> repo = JpaRepository.of(entityClass);
     final Model entity = repo.find(id);
     if (entity == null) {
       return messageFollowers(id);
