@@ -764,8 +764,9 @@ public class RestService extends ResourceService {
     }
 
     if (relatedClass != null && relatedId != null) {
-      @SuppressWarnings("all")
-      JpaRepository<?> repo = JpaRepository.of((Class) relatedClass);
+      final Class<? extends Model> modelClass = relatedClass.asSubclass(Model.class);
+      Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, modelClass, relatedId);
+      JpaRepository<?> repo = JpaRepository.of(modelClass);
       if (repo != null) {
         related = repo.find(relatedId);
       }
@@ -901,9 +902,14 @@ public class RestService extends ResourceService {
     if (request == null || isEmpty(request.getData())) {
       return fail();
     }
+
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_CREATE, MailMessage.class);
+    final Class<? extends Model> entityClass = entityClass();
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
+
     final Response response = new Response();
     @SuppressWarnings("all")
-    final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
+    final Repository<?> repo = JpaRepository.of(entityClass);
     final Context ctx = new Context(request.getData(), MailMessage.class);
     final MailMessage msg = EntityHelper.getEntity(ctx.asType(MailMessage.class));
 
