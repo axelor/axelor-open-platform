@@ -28,6 +28,8 @@ import com.axelor.event.NamedLiteral;
 import com.axelor.events.PostAction;
 import com.axelor.events.PreAction;
 import com.axelor.inject.Beans;
+import com.axelor.meta.db.MetaAction;
+import com.axelor.meta.db.MetaFilter;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.actions.ActionGroup;
 import com.axelor.meta.schema.actions.ActionMethod;
@@ -91,8 +93,8 @@ public class ActionHandler {
   private final Pattern pattern =
       Pattern.compile("^\\s*(select\\[\\]|select|action|call|eval):\\s*(.*)");
 
-  private static final Set<String> ALWAYS_PERMITTED_MODELS =
-      ImmutableSet.of("com.axelor.meta.db.MetaAction", "com.axelor.meta.db.MetaFilter");
+  private static final Set<Class<? extends Model>> ALWAYS_PERMITTED_MODELS =
+      ImmutableSet.of(MetaAction.class, MetaFilter.class);
 
   /** @deprecated Use {@link ActionExecutor#newActionHandler(ActionRequest)} instead. */
   @Deprecated
@@ -123,36 +125,39 @@ public class ActionHandler {
     this.bindings.put("__me__", this);
   }
 
-  public void checkPermission(JpaSecurity.AccessType accessType, String model) {
-    if (context == null) {
-      if (StringUtils.notBlank(model) && !ALWAYS_PERMITTED_MODELS.contains(model)) {
-        try {
-          security.check(accessType, Class.forName(model).asSubclass(Model.class));
-        } catch (ClassNotFoundException e) {
-          throw new RuntimeException(e);
-        }
-      }
-      return;
+  private Class<?> findClass(String className) {
+    try {
+      return Class.forName(className);
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    if (!Model.class.isAssignableFrom(context.getContextClass())
-        || ALWAYS_PERMITTED_MODELS.contains(request.getModel())) {
-      return;
-    }
-
-    Class<? extends Model> modelClass = null;
+  private Class<?> findModelClass(String model) {
     if (StringUtils.notBlank(model)) {
-      try {
-        modelClass = Class.forName(model).asSubclass(Model.class);
-      } catch (ClassNotFoundException e) {
-        log.error(e.getMessage(), e);
-      }
+      return findClass(model);
     }
-    if (modelClass == null) {
-      modelClass = context.getContextClass().asSubclass(Model.class);
+    if (context != null) {
+      return context.getContextClass();
+    }
+    if (StringUtils.notBlank(request.getModel())) {
+      return findClass(request.getModel());
+    }
+    return null;
+  }
+
+  public void checkPermission(JpaSecurity.AccessType accessType, String model) {
+    final Class<?> checkClass = findModelClass(model);
+
+    if (checkClass == null
+        || !Model.class.isAssignableFrom(checkClass)
+        || ALWAYS_PERMITTED_MODELS.contains(checkClass)) {
+      return;
     }
 
-    if (context.getContextClass() == modelClass) {
+    final Class<? extends Model> modelClass = checkClass.asSubclass(Model.class);
+
+    if (context != null && context.getContextClass() == modelClass) {
       final Long id = (Long) context.get("id");
       if (id != null) {
         security.check(accessType, modelClass, id);
