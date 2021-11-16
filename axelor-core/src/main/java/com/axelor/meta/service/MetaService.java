@@ -713,7 +713,7 @@ public class MetaService {
     List<Object> records = request.getRecords();
 
     if (records == null || records.isEmpty()) {
-      return response.fail("No records provides.");
+      return response.fail("No records provided.");
     }
 
     for (Object record : records) {

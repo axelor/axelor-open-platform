@@ -599,6 +599,10 @@ public class RestService extends ResourceService {
     if (request == null || isEmpty(request.getFields())) {
       return fail();
     }
+
+    final Class<? extends Model> entityClass = entityClass();
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
+
     request.setModel(getModel());
     return service.getAttachment(id, getModel(), request);
   }
@@ -609,6 +613,14 @@ public class RestService extends ResourceService {
     if (request == null || isEmpty(request.getRecords())) {
       return fail();
     }
+
+    @SuppressWarnings("rawtypes")
+    final Long[] ids =
+        request.getRecords().stream()
+            .map(rec -> Long.valueOf(((Map) rec).get("id").toString()))
+            .toArray(Long[]::new);
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_REMOVE, MetaFile.class, ids);
+
     request.setModel(getModel());
     return service.removeAttachment(request);
   }
@@ -619,6 +631,10 @@ public class RestService extends ResourceService {
     if (request == null || isEmpty(request.getData())) {
       return fail();
     }
+
+    final Class<? extends Model> entityClass = entityClass();
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_WRITE, entityClass, id);
+
     request.setModel(getModel());
     return service.addAttachment(id, request);
   }
