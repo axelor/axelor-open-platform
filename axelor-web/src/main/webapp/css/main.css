@@ -914,6 +914,10 @@ img.prefix-icon {
   text-align: left;
 }
 
+.keyboard-shortcuts tbody {
+  vertical-align: text-top;
+}
+
 .keyboard-shortcuts kbd {
   display: inline-block;
   font-size: 10px;
