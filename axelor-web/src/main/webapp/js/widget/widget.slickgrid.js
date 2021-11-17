@@ -2197,14 +2197,17 @@ Grid.prototype._showEditor = function (activeCell) {
       afterLastElem = form.find('.form-item-container :input:first');
       var gridElem = form.parents(".slickgrid").first();
 
-      function isSibling(elem) {
-        return elem.parents(".slickgrid").first().is(gridElem)
+      function cannotCommit(elem) {
+        return !elem.hasClass("slickgrid-edit-overlay")
+          && (elem.parents(".slickgrid").first().is(gridElem)
           || elem.parents(".slick-editor-dropdown").first().length !== 0
-          || elem.parents(".view-container, .nav").first().length === 0;
+          || elem.parents("body").first().length === 0
+          || elem.parents(".ui-dialog").first().length !== 0
+          || elem.hasClass("ui-widget-overlay"));
       }
 
       this.checkAutoCommit = function (e) {
-        if (isSibling($(e.target))) {
+        if (cannotCommit($(e.target))) {
           return;
         }
         if (that.editorScope.isDirty()) {
