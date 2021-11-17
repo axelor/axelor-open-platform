@@ -472,23 +472,37 @@
 
     $scope.showShortcuts = function () {
       var content = $("<table class='keyboard-shortcuts'>");
+
+      var ctrl;
+      var alt;
+      var newRecordShortcut;
+      if (axelor.device.macLike) {
+        ctrl = _t('⌃');
+        alt = [ctrl, _t('⌥')];
+        newRecordShortcut = [ctrl, _t('⌤')];
+      } else {
+        ctrl = _t('Ctrl');
+        alt = _t('Alt');
+        newRecordShortcut = [ctrl, _t('Insert')];
+      }
+
       var shortcuts = [
-        [[_t('Ctrl'), _t('Insert')], _t('create new record')],
-        [[_t('Ctrl'), 'E'], _t('edit selected record')],
-        [[_t('Ctrl'), 'S'], _t('save current record')],
-        [[_t('Ctrl'), 'D'], _t('delete current/selected record(s)')],
-        [[_t('Ctrl'), 'R'], _t('refresh current view')],
-        [[_t('Ctrl'), 'Q'], _t('close the current view tab')],
-        [[_t('Alt'), 'F'], _t('search for records')],
-        [[_t('Alt'), 'G'], _t('focus first or selected item in view')],
-        [[_t('Ctrl'), 'J'], _t('navigate to previous page/record')],
-        [[_t('Ctrl'), 'K'], _t('navigate to next page/record')],
-        [[_t('Ctrl'), 'M'], _t('focus left menu search box')],
+        [newRecordShortcut, _t('create new record')],
+        [[ctrl, 'E'], _t('edit selected record')],
+        [[ctrl, 'S'], _t('save current record')],
+        [[ctrl, 'D'], _t('delete current/selected record(s)')],
+        [[ctrl, 'R'], _t('refresh current view')],
+        [[ctrl, 'Q'], _t('close the current view tab')],
+        [[alt, 'F'], _t('search for records')],
+        [[alt, 'G'], _t('focus first or selected item in view')],
+        [[ctrl, 'J'], _t('navigate to previous page/record')],
+        [[ctrl, 'K'], _t('navigate to next page/record')],
+        [[ctrl, 'M'], _t('focus left menu search box')],
         [['F9'], _t('toggle left menu')],
       ];
 
       shortcuts.forEach(function (item) {
-        var keys = item[0];
+        var keys = item[0].flat();
         var text = item[1];
 
         var d1 = $("<td class='keys'>").appendTo(content);

@@ -75,6 +75,7 @@
   device.large = $(window).width() > 768;
   device.small = !device.large;
   device.mobile = /Mobile|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(ua);
+  device.macLike = /Mac OS/i.test(ua);
 
   axelor.browser = browser;
   axelor.device = device;

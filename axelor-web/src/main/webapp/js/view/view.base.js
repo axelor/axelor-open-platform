@@ -852,12 +852,20 @@ ui.directive('uiViewSwitcherMenu', function(){
 
 ui.directive('uiHotKeys', function() {
 
+  var alt = "alt";
+  var newKey;
+  if (axelor.device.macLike) {
+    alt = "ctrl" + alt;
+    newKey = "NumpadEnter";
+  } else {
+    newKey = 45;        // insert
+  }
   var keys = {
     '': {
       120: 'toggle-menu'// F9
     },
     'ctrl': {
-      45: 'new',        // insert
+      [newKey]: 'new',
       69: 'edit',       // e
       83: 'save',       // s
       68: 'delete',     // d
@@ -867,7 +875,7 @@ ui.directive('uiHotKeys', function() {
       77: 'focus-menu', // m
       81: 'close'       // q
     },
-    'alt': {
+    [alt]: {
       70: 'search',     // f
       71: 'select',     // g
     }
@@ -904,7 +912,9 @@ ui.directive('uiHotKeys', function() {
         modifierKeys += 'alt';
       }
 
-      var action = (keys[modifierKeys] || {})[e.which];
+      var key = keys[modifierKeys] || {};
+      var event = e.originalEvent || e;
+      var action = key[event.which] || key[event.code];
 
       if (!action) {
         return;

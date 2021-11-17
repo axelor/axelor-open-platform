@@ -1,0 +1,6 @@
+---
+title: Fix keyboard shortcuts on Mac-like devices
+type: fix
+description: |
+  When Macintosh is detected, use specific keyboard shortcuts.
+  Macintosh keyboards don’t have AltGr nor Insert keys.
