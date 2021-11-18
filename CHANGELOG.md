@@ -5,11 +5,13 @@
 * Add view customization permission on Group and `view.customization` application configuration
 
   <details>
+
   All users used to be allowed to customize views, and only admins could share.
   Now, view customization permission is checked on Group, and can be set to "Not allowed" (default),
   "Can customize", or "Can share".
   `view.customization` application configuration defaults to `true`.
   If set to `false`, Customize menu and custom views are disabled.
+
   </details>
 
 
@@ -41,20 +43,24 @@
 * Serialize Time with seconds
 
   <details>
+  
   Time is now serialized with formatter "HH:mm:ss".
   Seconds are still not displayed by default in client (need to use `x-seconds="true"`).
+  
   </details>
 
 * Require manual closing of datetime picker
 * Disable translation joins on queries by default
 
   <details>
+  
   Add Query.translate() and Filter.translate() to enable translation joins.
 
   REST API now accepts parameter `translate` to enable translation joins
   on criteria and for ordering, but never for domains.
 
   Web client always uses the `translate` parameter.
+  
   </details>
 
 
@@ -63,28 +69,33 @@
 * Clarify title/placeholder of user password fields
 
   <details>
+  
   Clarify title/placeholder of user password fields in form view and change password page.
 
   * Change title depending on existing or new user
   * Add help popovers
   * Add password pattern help using `user.password.pattern.title` (customized via translation)
+  
   </details>
 
 * Use select control type on year, month, and time in datetime widget
 * Add support for related parameters in domain expressions
 
   <details>
+  
   Character `$` is used to access related fields in domain expression parameters.
   This can be used to access other JSON fields. Example:
 
   ```
   "self.product = :$extraAttrs$myCustomProduct"
   ```
+  
   </details>
 
 * Add view-param `grid-width` to set width of grid in details-view
 
   <details>
+  
   Example:
 
   ```xml
@@ -95,14 +106,17 @@
     <view-param name="grid-width" value="25%" />
   </action-view>
   ```
+  
   </details>
 
 * Add multi-tenant aware thread implementation
 
   <details>
+  
   The `com.axelor.db.tenants.TenantAware` is a custom `Thread` implementation
   that keeps track of current tenant and runs the thread in transaction with
   current tenant in the context.
+  
   </details>
 
 * Add setter methods for all attributes in XMLInput/XMLBind CSVInput/CSVBind
@@ -110,6 +124,7 @@
 * Add support for CSV/XML data import of custom fields
 
   <details>
+  
   Example:
 
   ```xml
@@ -175,32 +190,40 @@
     <billSubscription name="Test01"/>
   </electricityBillSubscription>
   ```
+  
   </details>
 
 * Support `x-seconds` attribute on DateTime and Time widgets
 * Add ui-action-context attribute to use with ui-action-click
 
   <details>
+  
   The `ui-action-context="scopeVariable"` can be used with `ui-action-click` in custom view
   template to provide extra details in action context.
+  
   </details>
 
 * Expose $scope.openTab as axelor.$openTab
 
   <details>
+  
   The api can be useful for some apps loading in iframe.
+  
   </details>
 
 * Improve the indicator and delay the wait cursor
 
   <details>
+  
   - delay showing of loading indicator by 1 second
   - delay wait cursor till the wait spinner appears
+  
   </details>
 
 * Add support for view auto-reloading
 
   <details>
+  
   Use `view-param` named `auto-reload`, with value specified in seconds. Example:
 
   ```xml
@@ -208,6 +231,7 @@
   ```
 
   Auto-reloading is paused when tab is not selected or when record is in edit mode.
+  
   </details>
 
 * Add JSON field meta info on all views
@@ -230,12 +254,14 @@
 * Fix missing handling of LocalTime in JpaFixture::load
 
   <details>
+  
   When loading fixture in tests with LocalTime fields, the JpaFixture throw
   a exception because LocalTime hasn't appropriate constructor.
 
   ```
   Caused by: org.yaml.snakeyaml.error.YAMLException: No single argument constructor found for class java.time.LocalTime : null
   ```
+  
   </details>
 
 * Wait for actions before confirming line on editable grid
@@ -261,9 +287,11 @@
 * Fix dirty checking issue with relational fields
 
   <details>
+  
   When some o2m has an onChange action that updates parent record with
   `setValues(instance)` the o2m items were wrongly marked as dirty if
   the o2m doesn't have named column.
+  
   </details>
 
 * Fix multi-tenant datasource configuration
@@ -277,6 +305,7 @@
 * Check for permissions on dotted fields
 
   <details>
+  
   Check for permissions on dotted fields:
 
   * Filter permitted dotted fields in fetch request
@@ -288,6 +317,7 @@
 
   Users are still permitted to read dotted fields’ id, version, and namecolumn
   regardless of permissions.
+  
   </details>
 
 
@@ -298,7 +328,9 @@
 * Default setting `data.export.encoding` to UTF-8
 
   <details>
+  
   When UTF-8 is used, BOM is added so that Excel recognizes the encoding.
+  
   </details>
 
 * Remove jcenter and prevent dependency confusion risk
@@ -306,11 +338,13 @@
 * Format exported dates and times with client locale
 
   <details>
+  
   Setting `data.export.locale` to set a fixed locale for all exports.
   Setting `data.export.separator` defaults to ';'.
   Only numbers (integer, long, decimal) were formatted using client locale.
   Dates, times, and datetimes now also use client locale.
   Setting `date.format` is removed.
+  
   </details>
 
 
@@ -319,6 +353,7 @@
 * Improve grid customization
 
   <details>
+  
   <ul>
     <li>Show translated field titles besides field names</li>
     <li>Allow to save column widths</li>
@@ -328,11 +363,13 @@
     <li>List fields from search filters in selector</li>
     <li>Remove move icons in selector</li>
   </ul>
+  
   </details>
 
 * Add action to select a `panel` in `panel-tabs`
 
   <details>
+  
   Example:
 
   ```xml
@@ -348,19 +385,23 @@
       <attribute name="active" for="t1" expr="true" />
     </action-attrs>
   ```
+  
   </details>
 
 * Apply translations on translatable fields and enums for data exports
 
   <details>
+  
   Only headers and selections were translated.
   Translatable fields and enums are now also translated.
+  
   </details>
 
 * Add "auth.ldap.user.dn.format" and "auth.ldap.user.username.attribute" configurations
 * Add `view-param` named `default-search-filters` to apply filters by default
 
   <details>
+  
   Example:
 
   ```xml
@@ -370,12 +411,14 @@
 
   Filters named `confirmed` and `highValue` will be applied by default.
   For that usage, use new attribute `name` for each `filter` in `search-filters`.
+  
   </details>
 
 * Use thin scrollbars on grids inside form views
 * Add workflow status help
 
   <details>
+  
   Example:
 
   ```java
@@ -392,6 +435,7 @@
     }
   }
   ```
+  
   </details>
 
 
@@ -456,17 +500,21 @@
 * Improve keyboard shortcuts
 
   <details>
+  
   The keyboard shortcuts Ctrl+F and Ctrl+G were conflicting with browser shortcuts,
   they are now changed to Alt+F and Alt+G respectively. Also fixed some broken shortcuts.
 
   Also added a dialog to show keyboard shortcuts which can be shown from the top-right corner menu.
+  
   </details>
 
 * Add support for toolbar and menubar on dashlet and o2m/m2m widgets
 
   <details>
+  
   For the toolbar, only first 3 buttons will be visible.
   For the menubar, only first menu will be visible.
+  
   </details>
 
 
@@ -489,22 +537,27 @@
 * Implement grid view customization
 
   <details>
+  
   We can now customize the top-level grid view with a customize column menu and
   selecting/removing/reordering fields.
 
   The customized view can be shared to all users by admins.
+  
   </details>
 
 * Add support for more hilite colors
 
   <details>
+  
   We can now use more named colors with hilite besides the hilite styles.
+  
   </details>
 
 * Alert when DMS files and exported files are not found
 * Implement `json_set` function
 
   <details>
+  
   The function can be used to update json values using JPQL.
 
   For example:
@@ -517,13 +570,16 @@
   WHERE
     json_extract(p.attrs, 'seller', 'id') = 1
   ```
+  
   </details>
 
 * Add before transaction complete event
 
   <details>
+  
   The event is for internal purpose only. We may promote it as public api in some future version.
   The event is fired with total number of records updated/deleted in current transaction.
+  
   </details>
 
 * Numeric and Decimal format support based on browser language
@@ -539,8 +595,10 @@
 * Add support for maximized popups for relational fields
 
   <details>
+  
   We can specify `x-popup-maximized="all|editor|selector" to specify whether to show
   the `editor`, `selector` or both popups in maximized state.
+  
   </details>
 
 
@@ -583,8 +641,10 @@
 * Fix reference names in json fields
 
   <details>
+  
   When name field of the reference record is changed, the name value saved in json field
   is updated to reflect the updated name.
+  
   </details>
 
 * Fix custom fields support in string templates
@@ -647,8 +707,10 @@
 * Add support for per grid widget checkbox selector
 
   <details>
+  
   Now we can use `x-selector="checkbox"` on grid view or panel-related to
   show checkbox selection.
+  
   </details>
 
 * Fix gantt view pagination issue
@@ -710,11 +772,13 @@
 * Add support for popup editor on cards and kanban views
 
   <details>
+  
   A new attribute `edit-window` is added with the following values:
 
   * `self` - show editor in same tab
   * `popup` - show popup editor
   * `popup-new` - show popup editor for new records only
+  
   </details>
 
 #### Fixed
