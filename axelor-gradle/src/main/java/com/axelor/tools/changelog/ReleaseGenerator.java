@@ -64,9 +64,11 @@ public class ReleaseGenerator {
       if (!StringUtils.isEmpty(entry.getDescription())) {
         List<String> lines = new ArrayList<>();
         lines.add("  <details>");
+        lines.add("  ");
         for (String line : entry.getDescription().trim().split("\n")) {
           lines.add(StringUtils.isBlank(line) ? "" : "  " + line);
         }
+        lines.add("  ");
         lines.add("  </details>");
         String details = String.join(NEW_LINE, lines);
         content.append(NEW_LINE).append(details).append(NEW_LINE).append(NEW_LINE);
