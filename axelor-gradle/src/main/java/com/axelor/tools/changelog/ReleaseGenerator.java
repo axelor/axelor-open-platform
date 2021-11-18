@@ -62,16 +62,11 @@ public class ReleaseGenerator {
     for (ChangelogEntry entry : entries) {
       content.append(MessageFormat.format("* {0}", entry.getTitle())).append(NEW_LINE);
       if (!StringUtils.isEmpty(entry.getDescription())) {
-        List<String> lines = new ArrayList<>();
-        lines.add("  <details>");
-        lines.add("  ");
-        for (String line : entry.getDescription().trim().split("\n")) {
-          lines.add(StringUtils.isBlank(line) ? "" : "  " + line);
-        }
-        lines.add("  ");
-        lines.add("  </details>");
-        String details = String.join(NEW_LINE, lines);
-        content.append(NEW_LINE).append(details).append(NEW_LINE).append(NEW_LINE);
+        content
+            .append(NEW_LINE)
+            .append(new EntryDescriptionGenerator(entry.getDescription()).generate())
+            .append(NEW_LINE)
+            .append(NEW_LINE);
       }
     }
     content.append(NEW_LINE);
@@ -82,5 +77,26 @@ public class ReleaseGenerator {
         .append(MessageFormat.format("## {0} ({1})", release.getVersion(), release.getDate()))
         .append(NEW_LINE)
         .append(NEW_LINE);
+  }
+
+  static class EntryDescriptionGenerator {
+
+    private final String content;
+
+    public EntryDescriptionGenerator(String content) {
+      this.content = content;
+    }
+
+    public String generate() {
+      List<String> lines = new ArrayList<>();
+      lines.add("\t<details>");
+      lines.add("\t");
+      for (String line : content.trim().split("\n")) {
+        lines.add(StringUtils.isBlank(line) ? "\t" : "\t" + line);
+      }
+      lines.add("\t");
+      lines.add("\t</details>");
+      return String.join(NEW_LINE, lines);
+    }
   }
 }
