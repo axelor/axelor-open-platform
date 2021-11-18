@@ -903,7 +903,6 @@ public class RestService extends ResourceService {
       return fail();
     }
 
-    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_CREATE, MailMessage.class);
     final Class<? extends Model> entityClass = entityClass();
     Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
 
