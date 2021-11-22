@@ -28,16 +28,17 @@
             <property name="nullsOrdering">nulls lowest</property>
             <list-property name="columnHints">
                 <structure>
-                    <property name="columnName">FULL_NAME</property>
-                    <text-property name="displayName">Full name</text-property>
-                    <text-property name="heading">Full name</text-property>
+                    <property name="columnName">ContactFullName</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">ContactFullName</text-property>
+                    <text-property name="heading">ContactFullName</text-property>
                 </structure>
             </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
                         <property name="position">1</property>
-                        <property name="name">FULL_NAME</property>
+                        <property name="name">ContactFullName</property>
                         <property name="dataType">string</property>
                     </structure>
                 </list-property>
@@ -46,13 +47,13 @@
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
-                    <property name="name">FULL_NAME</property>
-                    <property name="nativeName">FULL_NAME</property>
+                    <property name="name">ContactFullName</property>
+                    <property name="nativeName">ContactFullName</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">12</property>
                 </structure>
             </list-property>
-            <xml-property name="queryText"><![CDATA[select c.FULL_NAME as FULL_NAME
+            <xml-property name="queryText"><![CDATA[select c.full_name as "ContactFullName"
 from contact_contact c;	]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
@@ -143,43 +144,41 @@ from contact_contact c;	]]></xml-property>
             <property name="paddingRight">4pt</property>
             <text-property name="text">All Contacts</text-property>
         </label>
-        <table id="33">
+        <table id="43">
             <property name="dataSet">Contacts</property>
             <list-property name="boundDataColumns">
                 <structure>
-                    <property name="name">FULL_NAME</property>
-                    <text-property name="displayName">Full name</text-property>
-                    <expression name="expression" type="javascript">dataSetRow["FULL_NAME"]</expression>
+                    <property name="name">ContactFullName</property>
+                    <text-property name="displayName">ContactFullName</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["ContactFullName"]</expression>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <column id="42"/>
+            <column id="52"/>
             <header>
-                <row id="34">
-                    <cell id="35">
-                        <label id="36">
-                            <property name="fontFamily">sans-serif</property>
+                <row id="44">
+                    <cell id="45">
+                        <label id="46">
                             <property name="fontWeight">bold</property>
                             <property name="fontStyle">italic</property>
                             <property name="textAlign">left</property>
-                            <structure name="toc"/>
                             <text-property name="text">Contact Name</text-property>
                         </label>
                     </cell>
                 </row>
             </header>
             <detail>
-                <row id="37">
-                    <cell id="38">
-                        <data id="39">
-                            <property name="resultSetColumn">FULL_NAME</property>
+                <row id="47">
+                    <cell id="48">
+                        <data id="49">
+                            <property name="resultSetColumn">ContactFullName</property>
                         </data>
                     </cell>
                 </row>
             </detail>
             <footer>
-                <row id="40">
-                    <cell id="41"/>
+                <row id="50">
+                    <cell id="51"/>
                 </row>
             </footer>
         </table>
