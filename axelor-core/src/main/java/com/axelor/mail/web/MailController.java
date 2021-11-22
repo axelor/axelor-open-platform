@@ -19,6 +19,7 @@ package com.axelor.mail.web;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.db.JpaSecurity;
 import com.axelor.db.JpaSupport;
 import com.axelor.db.Model;
 import com.axelor.inject.Beans;
@@ -187,6 +188,19 @@ public class MailController extends JpaSupport {
     }
 
     final MailMessage parent = messages.find((Long) request.getRecords().get(0));
+
+    if (parent == null) {
+      return;
+    }
+
+    try {
+      final Class<? extends Model> modelClass =
+          Class.forName(parent.getRelatedModel()).asSubclass(Model.class);
+      Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, modelClass, parent.getRelatedId());
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+
     final List<MailMessage> found = findChildren(parent);
     final List<Object> all = new ArrayList<>();
 

@@ -599,6 +599,10 @@ public class RestService extends ResourceService {
     if (request == null || isEmpty(request.getFields())) {
       return fail();
     }
+
+    final Class<? extends Model> entityClass = entityClass();
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
+
     request.setModel(getModel());
     return service.getAttachment(id, getModel(), request);
   }
@@ -609,6 +613,14 @@ public class RestService extends ResourceService {
     if (request == null || isEmpty(request.getRecords())) {
       return fail();
     }
+
+    @SuppressWarnings("rawtypes")
+    final Long[] ids =
+        request.getRecords().stream()
+            .map(rec -> Long.valueOf(((Map) rec).get("id").toString()))
+            .toArray(Long[]::new);
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_REMOVE, MetaFile.class, ids);
+
     request.setModel(getModel());
     return service.removeAttachment(request);
   }
@@ -619,6 +631,10 @@ public class RestService extends ResourceService {
     if (request == null || isEmpty(request.getData())) {
       return fail();
     }
+
+    final Class<? extends Model> entityClass = entityClass();
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_WRITE, entityClass, id);
+
     request.setModel(getModel());
     return service.addAttachment(id, request);
   }
@@ -748,8 +764,9 @@ public class RestService extends ResourceService {
     }
 
     if (relatedClass != null && relatedId != null) {
-      @SuppressWarnings("all")
-      JpaRepository<?> repo = JpaRepository.of((Class) relatedClass);
+      final Class<? extends Model> modelClass = relatedClass.asSubclass(Model.class);
+      Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, modelClass, relatedId);
+      JpaRepository<?> repo = JpaRepository.of(modelClass);
       if (repo != null) {
         related = repo.find(relatedId);
       }
@@ -799,9 +816,10 @@ public class RestService extends ResourceService {
   @GET
   @Path("{id}/followers")
   public Response messageFollowers(@PathParam("id") long id) {
+    final Class<? extends Model> entityClass = entityClass();
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
 
-    @SuppressWarnings("all")
-    final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
+    final Repository<?> repo = JpaRepository.of(entityClass);
     final Model entity = repo.find(id);
     final Response response = new Response();
 
@@ -815,9 +833,11 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("{id}/follow")
-  @SuppressWarnings("all")
   public Response messageFollow(@PathParam("id") long id, Request request) {
-    final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
+    final Class<? extends Model> entityClass = entityClass();
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
+
+    final Repository<?> repo = JpaRepository.of(entityClass);
     final Model entity = repo.find(id);
 
     if (entity == null) {
@@ -851,9 +871,11 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("{id}/unfollow")
-  @SuppressWarnings("all")
   public Response messageUnfollow(@PathParam("id") long id, Request request) {
-    final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
+    final Class<? extends Model> entityClass = entityClass();
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
+
+    final Repository<?> repo = JpaRepository.of(entityClass);
     final Model entity = repo.find(id);
     if (entity == null) {
       return messageFollowers(id);
@@ -880,9 +902,13 @@ public class RestService extends ResourceService {
     if (request == null || isEmpty(request.getData())) {
       return fail();
     }
+
+    final Class<? extends Model> entityClass = entityClass();
+    Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
+
     final Response response = new Response();
     @SuppressWarnings("all")
-    final Repository<?> repo = JpaRepository.of((Class) getResource().getModel());
+    final Repository<?> repo = JpaRepository.of(entityClass);
     final Context ctx = new Context(request.getData(), MailMessage.class);
     final MailMessage msg = EntityHelper.getEntity(ctx.asType(MailMessage.class));
 
