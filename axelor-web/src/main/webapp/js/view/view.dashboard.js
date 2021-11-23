@@ -208,12 +208,16 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
       if (field && !scope.field) {
         scope.field = scope.dashlet.field;
         if (scope.field.readonly) {
-          element.addClass("readonly");
+          element.parent(".dashboard").addClass("readonly");
           scope.isReadonly = function () { return true; };
         }
         if (scope.field.hidden) {
           element.hide();
         }
+        scope.isForceEdit = function () {
+          var params = this._viewParams || {};
+          return params.forceEdit || (params.params || {}).forceEdit;
+        };
       }
 
       var lazy = true;
@@ -277,6 +281,10 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
         }
 
         element.removeClass('hidden');
+
+        if (scope.isForceEdit && scope.isForceEdit()) {
+          element.parent('.dashboard').addClass('forceEdit');
+        }
 
         scope.show();
 
