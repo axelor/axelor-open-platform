@@ -29,6 +29,8 @@ public class Portlet extends AbstractPanel {
 
   @XmlAttribute private Boolean canSearch;
 
+  @XmlAttribute private String canEdit;
+
   public String getAction() {
     return action;
   }
@@ -43,5 +45,13 @@ public class Portlet extends AbstractPanel {
 
   public void setCanSearch(Boolean canSearch) {
     this.canSearch = canSearch;
+  }
+
+  public String getCanEdit() {
+    return canEdit;
+  }
+
+  public void setCanEdit(String canEdit) {
+    this.canEdit = canEdit;
   }
 }

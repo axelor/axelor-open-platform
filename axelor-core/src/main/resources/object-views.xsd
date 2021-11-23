@@ -1432,6 +1432,11 @@
             <xsd:documentation>Specify whether to show toolbar and menubar.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="canEdit" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>Specify whether to allow to edit the records.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="rowSpan" use="prohibited"/>
       </xsd:extension>
     </xsd:complexContent>

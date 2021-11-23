@@ -282,9 +282,21 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 
         element.removeClass('hidden');
 
-        if (scope.isForceEdit && scope.isForceEdit()) {
-          element.parent('.dashboard').addClass('forceEdit');
-        }
+        scope.canEdit = function () {
+          return _.isString(this.field.canEdit)
+            ? scope.$eval(this.field.canEdit, this.getContext())
+            : this.field.canEdit;
+        };
+
+        var dashboard = element.parent('.dashboard');
+
+        scope.$watch("canEdit()", function (canEdit) {
+          if (canEdit) {
+            dashboard.addClass('canEdit');
+          } else {
+            dashboard.removeClass('canEdit');
+          }
+        });
 
         scope.show();
 
