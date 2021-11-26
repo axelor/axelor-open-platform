@@ -301,6 +301,7 @@ function FormViewCtrl($scope, $element) {
   var editable = false;
 
   $scope.isForceEdit = function () {
+    if (this.isForceReadonly()) return false;
     var params = this._viewParams || {};
     return params.forceEdit || (params.params && params.params.forceEdit);
   };
