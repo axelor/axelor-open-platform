@@ -501,6 +501,14 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
        ganttAttachEvents();
        setChildTaskDisplay();
        fetchRecords();
+
+       var unwatch = scope.$watch(function () { return element.is(":visible"); },
+         function (visible) {
+           if (visible) {
+            gantt.render();
+            unwatch();
+          }
+         });
      }
 
      function ganttAttachEvents(){
