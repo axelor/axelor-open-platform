@@ -1132,6 +1132,8 @@ ui.directive('uiPortletGrid', function(){
           } else {
             forcePopup = true;
           }
+        } else if (isPopup) {
+          tab.forceEdit = true;
         }
 
         if (forcePopup) {
