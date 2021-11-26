@@ -1226,7 +1226,7 @@
           </xsd:complexType>
         </xsd:element>
         <xsd:element name="panel-related" type="tns:PanelRelated"/>
-        <xsd:element name="panel-dashlet" type="tns:Dashlet"/>
+        <xsd:element name="panel-dashlet" type="tns:PanelDashlet"/>
         <xsd:element name="panel-include" type="tns:FormInclude"/>
       </xsd:choice>
     </xsd:sequence>
@@ -1312,7 +1312,7 @@
         <xsd:choice maxOccurs="unbounded">
           <xsd:element name="panel" type="tns:Panel" />
           <xsd:element name="panel-related" type="tns:PanelRelated"/>
-          <xsd:element name="panel-dashlet" type="tns:Dashlet" />
+          <xsd:element name="panel-dashlet" type="tns:PanelDashlet" />
           <xsd:element name="panel-include" type="tns:FormInclude" />
         </xsd:choice>
         <xsd:attribute name="stacked" use="prohibited"/>
@@ -1432,12 +1432,19 @@
             <xsd:documentation>Specify whether to show toolbar and menubar.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="rowSpan" use="prohibited"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="PanelDashlet">
+    <xsd:complexContent>
+      <xsd:extension base="tns:Dashlet">
         <xsd:attribute name="canEdit" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>Specify whether to allow to edit the records.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="rowSpan" use="prohibited"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -2815,7 +2822,7 @@
       <xsd:element name="help" type="tns:Help" />
       <xsd:element name="panel" type="tns:Panel" />
       <xsd:element name="panel-include" type="tns:FormInclude" />
-      <xsd:element name="panel-dashlet" type="tns:Dashlet" />
+      <xsd:element name="panel-dashlet" type="tns:PanelDashlet" />
       <xsd:element name="panel-related" type="tns:PanelRelated" />
       <xsd:element name="panel-stack" type="tns:PanelTabs" />
       <xsd:element name="panel-tabs" type="tns:PanelTabs" />
