@@ -1,0 +1,7 @@
+---
+title: Fix changelog generator formatting of `details` content
+type: fix
+description: |
+  Without starting with an empty line, if the first line of the
+  `details` content contains backticks for a code block, the
+  code is not formatted.
