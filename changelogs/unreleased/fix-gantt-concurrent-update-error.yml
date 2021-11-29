@@ -1,0 +1,3 @@
+---
+title: Fix concurrent update error when moving tasks in Gantt view
+type: fix

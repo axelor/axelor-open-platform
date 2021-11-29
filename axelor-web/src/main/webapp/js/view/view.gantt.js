@@ -484,7 +484,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
          if(links){
            for(var i=0; i < links.length; i++){
              var link = this.getLink(links[i]);
-             if(this.isTaskExists(link.target)){
+             if(this.isTaskExists(link.target) && !traversedTasks[link.target]){
                callback.call(this, this.getTask(link.target));
 
                // iterate the whole branch, not only first-level dependencies
@@ -501,6 +501,14 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
        ganttAttachEvents();
        setChildTaskDisplay();
        fetchRecords();
+
+       var unwatch = scope.$watch(function () { return element.is(":visible"); },
+         function (visible) {
+           if (visible) {
+            gantt.render();
+            unwatch();
+          }
+         });
      }
 
      function ganttAttachEvents(){
