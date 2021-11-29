@@ -2202,7 +2202,7 @@ Grid.prototype._showEditor = function (activeCell) {
           && (elem.parents(".slickgrid").first().is(gridElem)
           || elem.parents(".slick-editor-dropdown").first().length !== 0
           || elem.parents("body").first().length === 0
-          || elem.parents(".ui-dialog").first().length !== 0
+          || elem.parents(".ui-dialog, .ui-menu").first().length !== 0
           || elem.hasClass("ui-widget-overlay"));
       }
 
