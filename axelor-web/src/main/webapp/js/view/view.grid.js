@@ -1128,7 +1128,10 @@ ui.directive('uiPortletGrid', function(){
         if (isReadonly) {
           if ($scope.canEdit()) {
             forcePopup = isPopup;
-            delete tab.forceReadonly;
+            if (forcePopup) {
+              delete tab.forceReadonly;
+              tab.forceEdit = true;
+            }
           } else {
             forcePopup = true;
           }
