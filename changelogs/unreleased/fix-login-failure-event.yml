@@ -1,8 +1,0 @@
----
-title: Fix login failure event
-type: fix
-description: |
-  Fire login failure event with form client, LDAP, and Basic Auth.
-
-  Can't be triggered with other indirect clients like OAuth 2.0, OpenID
-  Connect, SAML 2.0, etc.

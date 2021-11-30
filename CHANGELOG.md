@@ -1,3 +1,77 @@
+## 5.4.6 (2021-11-30)
+
+#### Changes
+
+* Improve editable grid shortcuts to confirm/cancel edit
+
+	<details>
+	
+	We can now use `ENTER` key to confirm current edit and `ESCAPE` key to cancel.
+	
+	</details>
+
+
+#### Features
+
+* Add `view.grid.editor.buttons` application configuration
+* Add `canEdit` attribute to `panel-dashlet`
+
+	<details>
+	
+	The new `canEdit` attribute on `panel-dashlet` will control whatever we can edit
+	dashlet records even if the dashlet is in readonly. By default, when a `panel-dashlet`
+	is in readonly (or main view is readonly mode or top container element is readonly),
+	the record will be opened in popup. We can't edit the records. If editable, the record
+	will be opened in a new tab, in readonly mode. We can then switch to edit mode to edit the record.
+	
+	Few more improvements :
+	* Show file icon in grid dashlet when in readonly mode
+	* Show pencil icon in grid dashlet when editable
+	* Fix ignored dashlet attributes in dashboard
+	
+	</details>
+
+
+#### Fixed
+
+* Fix login failure event
+
+	<details>
+	
+	Fire login failure event with form client, LDAP, and Basic Auth.
+	
+	Can't be triggered with other indirect clients like OAuth 2.0, OpenID
+	Connect, SAML 2.0, etc.
+	
+	</details>
+
+* Fix memory leak in session listener
+* Fix horizontal scrolling in editable grid
+* Fix field sometimes blank on initialization with CodeEditor widget
+* Check for permission on messages requests
+* Fix `commons.codec` dependency conflict when using SAML
+* Check for read permission on action-record changing dummy fields
+* Translate grid selection checkbox tooltip
+* Fix readonly dashlet with forceEdit should open readonly popup in readonly mode
+* Fix Gantt view sometimes blank on initialization
+* Fix resetting of shared custom views
+* Fix keyboard shortcuts on Mac-like devices
+
+	<details>
+	
+	When Macintosh is detected, use specific keyboard shortcuts.
+	Macintosh keyboards don’t have AltGr nor Insert keys.
+	
+	</details>
+
+* Fix concurrent update error when moving tasks in Gantt view
+* Check for permission on followers requests
+* Fix NPE with null password to `AuthService#passwordMatchesPattern()`
+* Fix blocked loading of custom translations
+* Fix ignored regex on custom field
+* Check for permission on attachments requests
+* Fix dashlet with popup should open editable popup in editable mode
+
 ## 5.4.5 (2021-10-21)
 
 #### Changes
