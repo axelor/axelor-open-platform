@@ -1,10 +1,14 @@
 ---
-title: Add `canEdit` atttribute to dashlets and other improvements
+title: Add `canEdit` atttribute to `panel-dashlet`
 type: feature
 description: |
-  * Add `canEdit` atttribute to dashlets
+  The new `canEdit` attribute on `panel-dashlet` will control whatever we can edit
+  dashlet records even if the dashlet is in readonly. By default, when a `panel-dashlet`
+  is in readonly (or main view is readonly mode or top container element is readonly),
+  the record will be opened in popup. We can't edit the records. If editable, the record
+  will be opened in a new tab, in readonly mode. We can then switch to edit mode to edit the record.
+
+  Few more improvments :
   * Show file icon in grid dashlet when in readonly mode
   * Show pencil icon in grid dashlet when editable
   * Fix ignored dashlet attributes in dashboard
-  * Fix default dashlet with popup should open editable popup in editable mode
-  * Fix default dashlet with forceEdit should open readonly popup in readonly mode
