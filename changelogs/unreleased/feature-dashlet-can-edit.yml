@@ -1,0 +1,10 @@
+---
+title: Add `canEdit` atttribute to dashlets and other improvements
+type: feature
+description: |
+  * Add `canEdit` atttribute to dashlets
+  * Show file icon in grid dashlet when in readonly mode
+  * Show pencil icon in grid dashlet when editable
+  * Fix ignored dashlet attributes in dashboard
+  * Fix default dashlet with popup should open editable popup in editable mode
+  * Fix default dashlet with forceEdit should open readonly popup in readonly mode

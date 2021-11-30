@@ -1116,12 +1116,30 @@ ui.directive('uiPortletGrid', function(){
           return;
         }
 
+        var isReadonly = $scope.isReadonly && $scope.isReadonly();
+        var isPopup = $scope._isPopup || (($scope._viewParams || {}).params || {}).popup;
+        var forcePopup = isReadonly || isPopup;
+
         tab.viewType = "form";
         tab.recordId = record.id;
         tab.action = _.uniqueId('$act');
-        tab.forceReadonly = $scope.isReadonly && $scope.isReadonly();
+        tab.forceReadonly = isReadonly;
 
-        if (tab.forceReadonly || $scope._isPopup || (($scope._viewParams || {}).params || {}).popup) {
+        if (isReadonly) {
+          if ($scope.canEdit()) {
+            delete tab.forceReadonly;
+            forcePopup = isPopup;
+            if (forcePopup) {
+              tab.forceEdit = true;
+            }
+          } else {
+            forcePopup = true;
+          }
+        } else if (isPopup) {
+          tab.forceEdit = true;
+        }
+
+        if (forcePopup) {
           tab.$popupParent = $scope;
           tab.params = tab.params || {};
           _.defaults(tab.params, {
@@ -1168,14 +1186,10 @@ ui.directive('uiPortletGrid', function(){
       var _field = $scope.field || {};
 
       $scope.onGridInit = function (grid, inst) {
-        var editCol = _.findWhere(inst.cols, {id: '_edit_column'}) || {};
-        editCol.descriptor = { hidden : true };
         $scope.$parent.$watch("isReadonly()", function (readonly) {
           if (inst.editable) {
             inst.readonly = readonly;
           }
-          inst.showColumn('_edit_column', !readonly);
-          editCol.descriptor = { hidden : readonly };
         });
       };
 

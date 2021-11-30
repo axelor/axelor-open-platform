@@ -75,6 +75,7 @@ function DashboardCtrl($scope, $element) {
       item.$index = i;
       item.spanCss = {};
       item.spanCss['dashlet-cs' + span] = true;
+      item.field = _.extend({}, item.widgetAttrs, { readonly: item.readonly, hidden: item.hidden });
 
       row.push(item);
     });
@@ -202,6 +203,23 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
     controller: DashletCtrl,
     link: function(scope, element, attrs) {
 
+      // Dashboard
+      var field = (scope.dashlet || {}).field;
+      if (field && !scope.field) {
+        scope.field = scope.dashlet.field;
+        if (scope.field.readonly) {
+          element.parent(".dashboard").addClass("readonly");
+          scope.isReadonly = function () { return true; };
+        }
+        if (scope.field.hidden) {
+          element.hide();
+        }
+        scope.isForceEdit = function () {
+          var params = this._viewParams || {};
+          return params.forceEdit || (params.params || {}).forceEdit;
+        };
+      }
+
       var lazy = true;
       (function () {
         var counter = 0;
@@ -263,6 +281,22 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
         }
 
         element.removeClass('hidden');
+
+        scope.canEdit = function () {
+          return _.isString(this.field.canEdit)
+            ? scope.$eval(this.field.canEdit, this.getContext())
+            : this.field.canEdit;
+        };
+
+        var dashboard = element.parent('.dashboard');
+
+        scope.$watch("canEdit()", function (canEdit) {
+          if (canEdit) {
+            dashboard.addClass('canEdit');
+          } else {
+            dashboard.removeClass('canEdit');
+          }
+        });
 
         scope.show();
 
