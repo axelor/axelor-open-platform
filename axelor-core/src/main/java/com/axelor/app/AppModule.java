@@ -80,5 +80,7 @@ public class AppModule extends AbstractModule {
         throw new RuntimeException(e);
       }
     }
+
+    bind(AppSettingsObserver.class);
   }
 }

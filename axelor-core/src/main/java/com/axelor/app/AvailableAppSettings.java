@@ -36,6 +36,13 @@ public interface AvailableAppSettings {
   String APPLICATION_CONFIG_PROVIDER = "application.config.provider";
   String CONFIG_MULTI_TENANCY = "application.multi_tenancy";
 
+  @Deprecated
+  String APPLICATION_DISABLE_PERMISSION_RELATIONAL_FIELDS =
+      "application.disable.relational.field.permission";
+
+  @Deprecated
+  String APPLICATION_DISABLE_PERMISSION_ACTIONS = "application.disable.action.permission";
+
   String VIEW_MENUBAR_LOCATION = "view.menubar.location";
   String VIEW_CONFIRM_YESNO = "view.confirm.yes-no";
   String VIEW_SINGLE_TAB = "view.single.tab";

@@ -1,0 +1,7 @@
+---
+title: Add application setting to disable permission check on actions
+type: feature
+description: |
+  Use `application.disable.action.permission = true` to disable permission checking on actions.
+  That setting severely breaks security. It should be used with extreme caution and as a last resort only.
+  It will be removed in the future.

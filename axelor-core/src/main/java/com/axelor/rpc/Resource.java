@@ -22,6 +22,7 @@ import static com.axelor.common.StringUtils.isBlank;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
+import com.axelor.auth.AuthSecurityWarner;
 import com.axelor.auth.AuthService;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
@@ -113,6 +114,7 @@ import javax.inject.Provider;
 import javax.persistence.EntityTransaction;
 import javax.persistence.OptimisticLockException;
 import javax.validation.ValidationException;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.hibernate.StaleObjectStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,6 +132,13 @@ public class Resource<T extends Model> {
   private final Event<PostRequest> postRequest;
 
   private static final Pattern NAME_PATTERN = Pattern.compile("[\\w\\.]+");
+
+  private static JpaSecurity securityWarner =
+      AppSettings.get()
+              .getBoolean(
+                  AvailableAppSettings.APPLICATION_DISABLE_PERMISSION_RELATIONAL_FIELDS, false)
+          ? Beans.get(AuthSecurityWarner.class)
+          : Beans.get(JpaSecurity.class);
 
   @Inject
   @SuppressWarnings("unchecked")
@@ -1157,9 +1166,9 @@ public class Resource<T extends Model> {
       Map<String, Object> recordMap, Class<? extends Model> target) {
     final Long valueId = findId(recordMap);
     if (valueId == null || valueId <= 0L) {
-      security.get().check(JpaSecurity.CAN_CREATE, target);
+      securityWarner.check(JpaSecurity.CAN_CREATE, target);
     } else if (recordMap.containsKey("version")) {
-      security.get().check(JpaSecurity.CAN_WRITE, target, valueId);
+      securityWarner.check(JpaSecurity.CAN_WRITE, target, valueId);
     } else {
       recordMap.clear();
       recordMap.put("id", valueId);
@@ -1470,7 +1479,6 @@ public class Resource<T extends Model> {
       return;
     }
 
-    final JpaSecurity jpaSecurity = security.get();
     final Mapper beanMapper = Mapper.of(EntityHelper.getEntityClass(bean));
 
     for (final String name : names) {
@@ -1492,7 +1500,9 @@ public class Resource<T extends Model> {
 
         final Model modelValue = (Model) value;
         final Class<? extends Model> modelClass = EntityHelper.getEntityClass(modelValue);
-        if (!jpaSecurity.isPermitted(JpaSecurity.CAN_READ, modelClass, modelValue.getId())) {
+        try {
+          securityWarner.check(JpaSecurity.CAN_READ, modelClass, modelValue.getId());
+        } catch (UnauthorizedException e) {
           notPermitted.accept(name);
           permittedName = nameParts.subList(0, i + 1).stream().collect(Collectors.joining("."));
           break;
