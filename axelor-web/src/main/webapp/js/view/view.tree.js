@@ -493,6 +493,10 @@ ui.directive('uiViewTree', function(){
 
         branchAttr: "folder",
 
+        stringExpand: _t("Expand"),
+
+        stringCollapse: _t("Collapse"),
+
         onNodeCollapse: function onNodeCollapse() {
           var node = this,
             row = node.row;
