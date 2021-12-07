@@ -27,6 +27,7 @@ import java.util.TreeMap;
 public class ReleaseGenerator {
 
   private static final String NEW_LINE = System.lineSeparator();
+  private static final String INDENT = "  ";
 
   public String generate(Release release) {
     StringBuilder releaseContent = new StringBuilder();
@@ -89,13 +90,13 @@ public class ReleaseGenerator {
 
     public String generate() {
       List<String> lines = new ArrayList<>();
-      lines.add("\t<details>");
-      lines.add("\t");
+      lines.add(INDENT + "<details>");
+      lines.add("");
       for (String line : content.trim().split("\n")) {
-        lines.add(StringUtils.isBlank(line) ? "\t" : "\t" + line);
+        lines.add(StringUtils.isBlank(line) ? "" : INDENT + line);
       }
-      lines.add("\t");
-      lines.add("\t</details>");
+      lines.add("");
+      lines.add(INDENT + "</details>");
       return String.join(NEW_LINE, lines);
     }
   }
