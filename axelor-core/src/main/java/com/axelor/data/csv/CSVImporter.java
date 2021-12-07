@@ -34,9 +34,10 @@ import com.google.common.collect.Maps;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +47,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.input.BOMInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -223,7 +225,12 @@ public class CSVImporter implements Importer {
    * @throws ClassNotFoundException
    */
   private void process(CSVInput input, File file) throws IOException, ClassNotFoundException {
-    this.process(input, new InputStreamReader(new FileInputStream(file), Charset.forName("UTF-8")));
+    this.process(input, newReader(new FileInputStream(file)));
+  }
+
+  /** Creates a reader capable of handling BOMs. */
+  private InputStreamReader newReader(final InputStream inputStream) {
+    return new InputStreamReader(new BOMInputStream(inputStream), StandardCharsets.UTF_8);
   }
 
   /**
