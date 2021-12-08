@@ -19,6 +19,7 @@ package com.axelor.rpc;
 
 import com.axelor.auth.AuthSecurityException;
 import com.axelor.auth.AuthUtils;
+import com.axelor.auth.db.User;
 import com.axelor.common.crypto.EncryptorException;
 import com.axelor.db.JpaSecurity.AccessType;
 import com.axelor.db.JpaSupport;
@@ -29,6 +30,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import javax.crypto.BadPaddingException;
 import javax.persistence.EntityTransaction;
 import javax.persistence.OptimisticLockException;
@@ -135,13 +137,24 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
       response.setStatus(Response.STATUS_FAILURE);
     }
 
-    log.error("Authorization Error: {}", e.getMessage());
+    if (e.getCause() instanceof AuthSecurityException) {
+      logAuthSecurityException((AuthSecurityException) e.getCause());
+    } else {
+      log.error("Authorization Error: {}", e.getMessage());
+    }
     return response;
   }
 
   private Response onAuthSecurityException(AuthSecurityException e, Response response) {
-    log.error("Access Error: {}", e.getMessage());
+    logAuthSecurityException(e);
     return e.getType() == AccessType.READ ? response : response.fail(e.getMessage());
+  }
+
+  private void logAuthSecurityException(AuthSecurityException e) {
+    log.error(
+        "Access Error with user {}: {}",
+        Optional.ofNullable(AuthUtils.getUser()).map(User::getCode).orElse(null),
+        e.getTechnicalMessage());
   }
 
   private Response onOptimisticLockException(OptimisticLockException e, Response response) {
