@@ -1,0 +1,3 @@
+---
+title: Add support to UTF-8 BOM file in CSV Importer and `CSVFile` helpers class
+type: feature
