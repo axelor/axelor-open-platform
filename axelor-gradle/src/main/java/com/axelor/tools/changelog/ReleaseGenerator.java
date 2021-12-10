@@ -17,17 +17,21 @@
  */
 package com.axelor.tools.changelog;
 
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
+import com.google.common.base.Strings;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ReleaseGenerator {
 
   private static final String NEW_LINE = System.lineSeparator();
-  private static final String INDENT = "  ";
 
   public String generate(Release release) {
     StringBuilder releaseContent = new StringBuilder();
@@ -90,14 +94,27 @@ public class ReleaseGenerator {
 
     public String generate() {
       List<String> lines = new ArrayList<>();
-      lines.add(INDENT + "<details>");
+      lines.add("<details>");
       lines.add("");
-      for (String line : content.trim().split("\n")) {
-        lines.add(StringUtils.isBlank(line) ? "" : INDENT + line);
+      for (String line : content.trim().split(NEW_LINE)) {
+        lines.add(StringUtils.isBlank(line) ? "" : line);
       }
       lines.add("");
-      lines.add(INDENT + "</details>");
-      return String.join(NEW_LINE, lines);
+      lines.add("</details>");
+      return indent(String.join(NEW_LINE, lines), 2);
+    }
+
+    private String indent(String text, int n) {
+      if (ObjectUtils.isEmpty(text)) {
+        return "";
+      }
+      Stream<String> stream = Arrays.stream(text.split(NEW_LINE));
+      stream = stream.map(s -> s.replaceAll("^\\s+", ""));
+      if (n > 0) {
+        final String spaces = Strings.repeat(" ", n);
+        stream = stream.map(s -> spaces + s);
+      }
+      return stream.collect(Collectors.joining(NEW_LINE, "", NEW_LINE));
     }
   }
 }
