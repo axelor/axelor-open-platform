@@ -38,6 +38,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.csv.QuoteMode;
+import org.apache.commons.io.input.BOMInputStream;
 
 /**
  * This class provides api to work with csv files using {@link CSVParser} and {@link CSVPrinter}.
@@ -74,8 +75,12 @@ public final class CSVFile {
     return new CSVFile(format.withHeader(header));
   }
 
+  public CSVParser parse(InputStream in) throws IOException {
+    return parse(in, StandardCharsets.UTF_8);
+  }
+
   public CSVParser parse(InputStream in, Charset charset) throws IOException {
-    return CSVParser.parse(in, charset, format);
+    return parse(new InputStreamReader(new BOMInputStream(in), charset));
   }
 
   public CSVParser parse(Reader in) throws IOException {
@@ -83,11 +88,11 @@ public final class CSVFile {
   }
 
   public CSVParser parse(File in) throws IOException {
-    return CSVParser.parse(in, StandardCharsets.UTF_8, format);
+    return parse(in, StandardCharsets.UTF_8);
   }
 
   public CSVParser parse(File in, Charset charset) throws IOException {
-    return CSVParser.parse(in, charset, format);
+    return parse(new FileInputStream(in), charset);
   }
 
   public CSVPrinter write(Writer out) throws IOException {
@@ -107,7 +112,9 @@ public final class CSVFile {
   }
 
   public void parse(File in, Consumer<CSVParser> task) throws IOException {
-    parse(new InputStreamReader(new FileInputStream(in), StandardCharsets.UTF_8), task);
+    parse(
+        new InputStreamReader(new BOMInputStream(new FileInputStream(in)), StandardCharsets.UTF_8),
+        task);
   }
 
   public void parse(Reader in, Consumer<CSVParser> task) throws IOException {
