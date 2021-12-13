@@ -48,7 +48,7 @@ public class TestCSVFileUtils {
     Assert.assertEquals("Lastname", bomParser.getHeaderNames().get(0));
 
     // Check if records are strictly identical to file without BOM
-    CSVParser parser = parse("grades_bom.csv");
+    CSVParser parser = parse("grades.csv");
 
     List<CSVRecord> records = parser.getRecords();
     List<CSVRecord> bomRecords = bomParser.getRecords();
