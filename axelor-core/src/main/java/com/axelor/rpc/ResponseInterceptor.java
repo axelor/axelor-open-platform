@@ -152,9 +152,10 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
 
   private void logAuthSecurityException(AuthSecurityException e) {
     log.error(
-        "Access Error with user {}: {}",
+        "Authorization Error: [Message={}, User={}, Detail={}]",
+        e.getMessage(),
         Optional.ofNullable(AuthUtils.getUser()).map(User::getCode).orElse(null),
-        e.getTechnicalMessage());
+        e.getViolationsDetail());
   }
 
   private Response onOptimisticLockException(OptimisticLockException e, Response response) {

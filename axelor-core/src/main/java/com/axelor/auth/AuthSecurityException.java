@@ -54,18 +54,12 @@ public class AuthSecurityException extends RuntimeException {
 
   @Override
   public String getMessage() {
-    if (model == null
-        || AuthUtils.getUser() == null
-        || !AuthUtils.isTechnicalStaff(AuthUtils.getUser())) {
-      return type.getMessage();
-    }
-    return getTechnicalMessage();
+    return type.getMessage();
   }
 
-  public String getTechnicalMessage() {
+  public String getViolationsDetail() {
     final String modelName = Optional.ofNullable(model).map(Class::getName).orElse("null");
-    final StringBuilder builder =
-        new StringBuilder(type.getMessage()).append("[").append(modelName);
+    final StringBuilder builder = new StringBuilder().append(modelName);
     if (ids.length > 0) {
       builder.append("#");
       for (int i = 0, n = Math.min(5, ids.length); i < n; i++) {
@@ -78,7 +72,6 @@ public class AuthSecurityException extends RuntimeException {
         builder.append(",...");
       }
     }
-    builder.append("]");
     return builder.toString();
   }
 }

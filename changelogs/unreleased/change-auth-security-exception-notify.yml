@@ -1,0 +1,6 @@
+---
+title: Only show access type error for all users
+type: change
+description: |
+  Technical and non-technical users are now notified the same undetailed access type error message.
+  Details are shown in the logs only.
