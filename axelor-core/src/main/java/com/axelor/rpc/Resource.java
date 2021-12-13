@@ -254,7 +254,12 @@ public class Resource<T extends Model> {
     return response;
   }
 
+  @Deprecated
   public Response perms(Long id, String perm) {
+    return perms(perm, id);
+  }
+
+  public Response perms(String perm, Long... ids) {
     Response response = new Response();
 
     JpaSecurity sec = security.get();
@@ -265,7 +270,7 @@ public class Resource<T extends Model> {
     }
 
     try {
-      sec.check(type, model, id);
+      sec.check(type, model, ids);
       response.setStatus(Response.STATUS_SUCCESS);
     } catch (Exception e) {
       response.addError(perm, e.getMessage());

@@ -652,8 +652,11 @@ public class RestService extends ResourceService {
   @GET
   @Path("perms")
   public Response perms(@QueryParam("action") String action, @QueryParam("id") Long id) {
-    if (action != null && id != null) {
-      return getResource().perms(id, action);
+    if (action != null) {
+      if (id != null) {
+        return getResource().perms(action, id);
+      }
+      return getResource().perms(action);
     }
     if (id != null) {
       return getResource().perms(id);
