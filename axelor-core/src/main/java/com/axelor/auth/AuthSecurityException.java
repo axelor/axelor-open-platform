@@ -17,6 +17,7 @@
  */
 package com.axelor.auth;
 
+import com.axelor.common.ObjectUtils;
 import com.axelor.db.JpaSecurity.AccessType;
 
 public class AuthSecurityException extends RuntimeException {
@@ -53,14 +54,15 @@ public class AuthSecurityException extends RuntimeException {
 
   @Override
   public String getMessage() {
-    if (model == null
-        || AuthUtils.getUser() == null
-        || !AuthUtils.isTechnicalStaff(AuthUtils.getUser())) {
-      return type.getMessage();
+    return type.getMessage();
+  }
+
+  public String getViolationsDetail() {
+    if (model == null) {
+      return null;
     }
-    final StringBuilder builder =
-        new StringBuilder(type.getMessage()).append("[").append(model.getName());
-    if (ids.length > 0) {
+    final StringBuilder builder = new StringBuilder().append(model.getName());
+    if (ObjectUtils.notEmpty(ids)) {
       builder.append("#");
       for (int i = 0, n = Math.min(5, ids.length); i < n; i++) {
         builder.append(ids[i]);
@@ -72,7 +74,6 @@ public class AuthSecurityException extends RuntimeException {
         builder.append(",...");
       }
     }
-    builder.append("]");
     return builder.toString();
   }
 }
