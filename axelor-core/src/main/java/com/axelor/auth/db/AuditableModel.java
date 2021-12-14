@@ -36,19 +36,19 @@ import javax.persistence.MappedSuperclass;
 @MappedSuperclass
 public abstract class AuditableModel extends Model {
 
-  @Widget(readonly = true, title = /*$$(*/ "Created on" /*)*/)
+  @Widget(readonly = true, copyable = false, title = /*$$(*/ "Created on" /*)*/)
   private LocalDateTime createdOn;
 
-  @Widget(readonly = true, title = /*$$(*/ "Updated on" /*)*/)
+  @Widget(readonly = true, copyable = false, title = /*$$(*/ "Updated on" /*)*/)
   private LocalDateTime updatedOn;
 
-  @Widget(readonly = true, title = /*$$(*/ "Created by" /*)*/)
+  @Widget(readonly = true, copyable = false, title = /*$$(*/ "Created by" /*)*/)
   @ManyToOne(
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private User createdBy;
 
-  @Widget(readonly = true, title = /*$$(*/ "Updated by" /*)*/)
+  @Widget(readonly = true, copyable = false, title = /*$$(*/ "Updated by" /*)*/)
   @ManyToOne(
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
