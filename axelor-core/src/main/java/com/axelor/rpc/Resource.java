@@ -1078,9 +1078,6 @@ public class Resource<T extends Model> {
         security.get().check(JpaSecurity.CAN_CREATE, model);
       }
 
-      // Check for permissions on related fields
-      checkRelationalPermissions((Map<String, Object>) record, mapper);
-
       Map<String, Object> orig = (Map) ((Map) record).get("_original");
       JPA.verify(model, orig);
 
@@ -1090,6 +1087,9 @@ public class Resource<T extends Model> {
       if (bean != null && id != null && id > 0L) {
         security.get().check(JpaSecurity.CAN_WRITE, model, id);
       }
+
+      // Check for permissions on related fields
+      checkRelationalPermissions((Map<String, Object>) record, mapper);
 
       // if user, update password
       if (bean instanceof User) {
