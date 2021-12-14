@@ -33,18 +33,6 @@ libs.slf4j_base = [
     "org.slf4j:log4j-over-slf4j:${versions.slf4j}"
 ]
 
-libs.slf4j_log4j = libs.slf4j_base + [
-  "org.apache.logging.log4j:log4j-slf4j-impl:2.7",
-  "org.apache.logging.log4j:log4j-api:2.7",
-  "org.apache.logging.log4j:log4j-core:2.7"
-]
-
-libs.slf4j_log4j_web = "org.apache.logging.log4j:log4j-web:2.7"
-
-libs.slf4j_simple = libs.slf4j_base + [
-  "org.slf4j:slf4j-simple:${versions.slf4j}"
-]
-
 libs.slf4j_logback = libs.slf4j_base + [
   "ch.qos.logback:logback-core:1.2.3",
   "ch.qos.logback:logback-classic:1.2.3",
