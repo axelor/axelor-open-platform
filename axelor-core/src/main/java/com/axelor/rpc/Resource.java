@@ -1070,26 +1070,25 @@ public class Resource<T extends Model> {
 
       record = (Map) repository.validate((Map) record, request.getContext());
 
-      Long id = findId((Map) record);
-      JpaSecurity.AccessType accessType =
-          id == null || id <= 0L ? JpaSecurity.CAN_CREATE : JpaSecurity.CAN_WRITE;
+      final Long id = findId((Map) record);
+      final JpaSecurity.AccessType accessType;
 
+      // Check for permissions on main object
       if (id == null || id <= 0L) {
-        security.get().check(JpaSecurity.CAN_CREATE, model);
+        accessType = JpaSecurity.CAN_CREATE;
+        security.get().check(accessType, model);
+      } else {
+        accessType = JpaSecurity.CAN_WRITE;
+        security.get().check(accessType, model, id);
       }
+
+      // Check for permissions on relational fields
+      checkRelationalPermissions((Map<String, Object>) record, mapper);
 
       Map<String, Object> orig = (Map) ((Map) record).get("_original");
       JPA.verify(model, orig);
 
       Model bean = JPA.edit(model, (Map) record);
-      id = bean.getId();
-
-      if (bean != null && id != null && id > 0L) {
-        security.get().check(JpaSecurity.CAN_WRITE, model, id);
-      }
-
-      // Check for permissions on related fields
-      checkRelationalPermissions((Map<String, Object>) record, mapper);
 
       // if user, update password
       if (bean instanceof User) {
