@@ -31,6 +31,7 @@
 <%@ page import="com.axelor.i18n.I18n" %>
 <%@ page import="com.axelor.app.AppSettings" %>
 <%@ page import="com.axelor.auth.pac4j.AuthPac4jModule" %>
+<%@ page import="com.axelor.common.HtmlUtils" %>
 <%
 
 Function<String, String> T = new Function<String, String>() {
@@ -98,7 +99,7 @@ Set<String> centralClients = AuthPac4jModule.getCentralClients();
         </div>
 
         <div id="error-msg" class="alert alert-block alert-error text-center <%= errorMsg == null ? "hidden" : "" %>">
-          <h4><%= errorMsg %></h4>
+          <h4><%= HtmlUtils.escape(errorMsg) %></h4>
         </div>
 
         <% if (!centralClients.isEmpty()) { %>
