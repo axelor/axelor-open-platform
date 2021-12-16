@@ -1158,6 +1158,7 @@ public class Resource<T extends Model> {
     } else if (!security.get().isPermitted(JpaSecurity.CAN_READ, target, valueId)) {
       recordMap.clear();
       recordMap.put("id", valueId);
+      return;
     }
     checkRelationalPermissions(recordMap, Mapper.of(target));
   }
