@@ -1,0 +1,5 @@
+---
+title: Don’t trigger popup’s onLoad upon closing
+type: fix
+description: |
+  Fix JS and save errors because of triggering onLoad on a closed popup.

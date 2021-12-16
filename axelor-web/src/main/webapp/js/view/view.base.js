@@ -577,7 +577,7 @@ ui.directive('uiViewPopup', function() {
           return $scope.onOK();
         }
         return viewScope.onSave({ fireOnLoad: false }).then(function(record, page) {
-          viewScope.edit(record);
+          viewScope.edit(record, false);
           viewScope.$timeout($scope.onOK.bind($scope));
         });
       };
