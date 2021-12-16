@@ -1155,7 +1155,7 @@ public class Resource<T extends Model> {
       security.get().check(JpaSecurity.CAN_CREATE, target);
     } else if (recordMap.containsKey("version")) {
       security.get().check(JpaSecurity.CAN_WRITE, target, valueId);
-    } else if (!security.get().isPermitted(JpaSecurity.CAN_READ, target, valueId)) {
+    } else {
       recordMap.clear();
       recordMap.put("id", valueId);
       return;
