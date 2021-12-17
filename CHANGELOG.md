@@ -1,3 +1,53 @@
+## 5.4.7 (2021-12-17)
+
+#### Changes
+
+* Only show access type error for all users
+
+  <details>
+  
+  Technical and non-technical users are now notified the same undetailed access type error message.
+  Details are shown in the logs only.
+  
+  </details>
+
+
+
+#### Features
+
+* Add support to UTF-8 BOM file in CSV Importer and `CSVFile` helpers class
+* Log technical message for AuthSecurityException
+
+#### Fixed
+
+* Do not test pattern on empty string
+* Check for create permission when adding row in editable grid
+* Fix web service `perms` ignoring `action` parameter when no `id` is specified
+* Translate tree node Expand/Collapse tooltip
+* Exclude auditable fields, `created(On|By)` and `updated(On|By)`, when copying record
+
+#### Security
+
+* Check for relational permissions recursively in save request
+* Escape data to prevent XSS vulnerabilities in JSP pages
+* Upgrade to SLF4J 1.7.32 and logback 1.2.9
+
+  <details>
+  
+  Mitigate LOGBACK-1591
+  - slf4j to 1.7.32
+  - logback to 1.2.9
+  - jansi to 1.18
+  
+  See:
+  - https://jira.qos.ch/browse/LOGBACK-1591
+  - http://slf4j.org/log4shell.html
+  - http://mailman.qos.ch/pipermail/announce/2021/000163.html
+  
+  </details>
+
+
+
 ## 5.4.6 (2021-11-30)
 
 #### Changes

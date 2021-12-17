@@ -1,3 +1,0 @@
----
-title: Exclude auditable fields, `created(On|By)` and `updated(On|By)`, when copying record
-type: fix
