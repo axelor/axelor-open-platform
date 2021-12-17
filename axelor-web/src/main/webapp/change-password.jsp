@@ -30,6 +30,7 @@
 <%@ page import="com.axelor.app.AppSettings" %>
 <%@ page import="com.axelor.auth.pac4j.AuthPac4jModule" %>
 <%@ page import="org.pac4j.http.client.indirect.FormClient" %>
+<%@ page import="com.axelor.common.HtmlUtils" %>
 <%
 
 Function<String, String> T = new Function<String, String>() {
@@ -93,7 +94,7 @@ String callbackUrl = AuthPac4jModule.getCallbackUrl();
         </div>
 
         <div class="alert alert-block alert-error text-center">
-					<h4><%= errorMsg %></h4>
+					<h4><%= HtmlUtils.escape(errorMsg) %></h4>
 				</div>
 
 			  <div class="panel-body">
@@ -103,7 +104,7 @@ String callbackUrl = AuthPac4jModule.getCallbackUrl();
                 <span class="add-on"><i class="fa fa-envelope"></i></span>
                 <input type="text" id="usernameId" name="username" placeholder="<%= loginUserName %>"
                   required="required"
-                  <%= username != null ? "value=\"" + username + "\" readonly=\"readonly\"" : "autofocus=\"autofocus\"" %>>
+                  <%= username != null ? "value=\"" + HtmlUtils.escapeAttribute(username) + "\" readonly=\"readonly\"" : "autofocus=\"autofocus\"" %>>
               </div>
               <div class="input-prepend">
                 <span class="add-on"><i class="fa fa-lock"></i></span>
