@@ -1122,13 +1122,14 @@ Grid.prototype._doInit = function(view) {
     that.resetColumns();
   });
 
-  // Cache write permission info and reset it after saved changes.
-  this.isPermittedWrite = {};
+  // Cache permission info and reset it after saved changes.
+  function resetPermissionCache() {
+    that.isPermitted = {};
+  }
+  resetPermissionCache();
   if (this.editorScope) {
     scope.$on("on:edit", function () {
-      if (!_.isEmpty(that.isPermittedWrite)) {
-        that.isPermittedWrite = {};
-      }
+      resetPermissionCache();
     });
   }
 
@@ -2087,19 +2088,30 @@ Grid.prototype.showEditor = function (activeCell) {
 
   if (this.isEditActive() || !this.canEdit()) return;
 
-  // Check for write permission on current row before going into edit mode.
+  // Check for permission on current row before going into edit mode.
   var that = this;
   var record = this.grid.getDataItem((activeCell || this.grid.getActiveCell()).row) || {};
-  var id = record.id;
-  var isPermittedWrite = this.isPermittedWrite[id];
-  if (isPermittedWrite === undefined) {
-    this.editorScope.isPermitted("write", record, function () {
+  var id = record && record.id;
+  var permType;
+  if (id >= 1) {
+    permType = "write"
+  } else {
+    permType = "create";
+    record = null;
+  }
+  var permissions = this.isPermitted[permType];
+  if (permissions == undefined) {
+    permissions = this.isPermitted[permType] = {};
+  }
+  var isPermitted = permissions[id];
+  if (isPermitted === undefined) {
+    this.editorScope.isPermitted(permType, record, function () {
       that._showEditor(activeCell);
-      that.isPermittedWrite[id] = true;
+      permissions[id] = true;
     }, function () {
-      that.isPermittedWrite[id] = false;
+      permissions[id] = false;
     });
-  } else if (isPermittedWrite) {
+  } else if (isPermitted) {
     this._showEditor(activeCell);
   }
 }
