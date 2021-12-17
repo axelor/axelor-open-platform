@@ -1,3 +1,23 @@
+## 5.3.12 (2021-12-17)
+
+#### Security
+
+* Escape data to prevent XSS vulnerabilities in JSP pages
+* Upgrade to SLF4J 1.7.32 and logback 1.2.9
+
+  <details>
+  Mitigate LOGBACK-1591
+  - slf4j to 1.7.32
+  - logback to 1.2.9
+  - jansi to 1.18
+
+  See:
+  - https://jira.qos.ch/browse/LOGBACK-1591
+  - http://slf4j.org/log4shell.html
+  - http://mailman.qos.ch/pipermail/announce/2021/000163.html
+  </details>
+
+
 ## 5.3.11 (2021-10-01)
 
 #### Security
