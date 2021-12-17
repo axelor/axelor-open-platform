@@ -1070,77 +1070,25 @@ public class Resource<T extends Model> {
 
       record = (Map) repository.validate((Map) record, request.getContext());
 
-      Long id = findId((Map) record);
-      JpaSecurity.AccessType accessType =
-          id == null || id <= 0L ? JpaSecurity.CAN_CREATE : JpaSecurity.CAN_WRITE;
+      final Long id = findId((Map) record);
+      final JpaSecurity.AccessType accessType;
 
+      // Check for permissions on main object
       if (id == null || id <= 0L) {
-        security.get().check(JpaSecurity.CAN_CREATE, model);
+        accessType = JpaSecurity.CAN_CREATE;
+        security.get().check(accessType, model);
+      } else {
+        accessType = JpaSecurity.CAN_WRITE;
+        security.get().check(accessType, model, id);
       }
 
-      // Check for permissions on related fields
-      ((Map<String, Object>) record)
-          .entrySet().stream()
-              .forEach(
-                  entry -> {
-                    final String name = entry.getKey();
-                    final Class<? extends Model> target =
-                        Optional.ofNullable(mapper.getProperty(name))
-                            .map(Property::getTarget)
-                            .map(
-                                targetClass ->
-                                    (Class<? extends Model>) targetClass.asSubclass(Model.class))
-                            .orElse(null);
-
-                    if (target == null) {
-                      return;
-                    }
-
-                    final Object value = entry.getValue();
-
-                    if (value instanceof Map) {
-                      final Map<String, Object> valueMap = (Map<String, Object>) value;
-                      final Long valueId = findId(valueMap);
-
-                      if (valueId != null && valueId > 0L) {
-                        if (valueMap.containsKey("version")) {
-                          security.get().check(JpaSecurity.CAN_WRITE, target, valueId);
-                        } else {
-                          security.get().check(JpaSecurity.CAN_READ, target, valueId);
-                          valueMap.clear();
-                          valueMap.put("id", valueId);
-                        }
-                      } else {
-                        security.get().check(JpaSecurity.CAN_CREATE, target);
-                      }
-                    } else if (value instanceof Collection) {
-                      for (final Map<String, Object> valueMap :
-                          ((Collection<Map<String, Object>>) value)) {
-                        final Long valueId = findId(valueMap);
-                        final boolean isPermitted =
-                            valueId == null || valueId <= 0L
-                                ? security.get().isPermitted(JpaSecurity.CAN_CREATE, target)
-                                : security
-                                    .get()
-                                    .isPermitted(JpaSecurity.CAN_WRITE, target, valueId);
-
-                        if (!isPermitted) {
-                          valueMap.clear();
-                          valueMap.put("id", valueId);
-                        }
-                      }
-                    }
-                  });
+      // Check for permissions on relational fields
+      checkRelationalPermissions((Map<String, Object>) record, mapper);
 
       Map<String, Object> orig = (Map) ((Map) record).get("_original");
       JPA.verify(model, orig);
 
       Model bean = JPA.edit(model, (Map) record);
-      id = bean.getId();
-
-      if (bean != null && id != null && id > 0L) {
-        security.get().check(JpaSecurity.CAN_WRITE, model, id);
-      }
 
       // if user, update password
       if (bean instanceof User) {
@@ -1169,6 +1117,50 @@ public class Resource<T extends Model> {
     firePostRequestEvent(RequestEvent.SAVE, request, response);
 
     return response;
+  }
+
+  private void checkRelationalPermissions(Map<String, Object> recordMap, Mapper mapper) {
+    for (final Entry<String, Object> entry : recordMap.entrySet()) {
+      final String name = entry.getKey();
+      final Class<? extends Model> target =
+          Optional.ofNullable(mapper.getProperty(name))
+              .map(Property::getTarget)
+              .map(targetClass -> (Class<? extends Model>) targetClass.asSubclass(Model.class))
+              .orElse(null);
+
+      if (target == null) {
+        continue;
+      }
+
+      final Object value = entry.getValue();
+
+      if (value instanceof Map) {
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> valueMap = (Map<String, Object>) value;
+        checkRelationalPermissions(valueMap, target);
+      } else if (value instanceof Collection) {
+        @SuppressWarnings("unchecked")
+        final Collection<Map<String, Object>> values = ((Collection<Map<String, Object>>) value);
+        for (final Map<String, Object> valueMap : values) {
+          checkRelationalPermissions(valueMap, target);
+        }
+      }
+    }
+  }
+
+  private void checkRelationalPermissions(
+      Map<String, Object> recordMap, Class<? extends Model> target) {
+    final Long valueId = findId(recordMap);
+    if (valueId == null || valueId <= 0L) {
+      security.get().check(JpaSecurity.CAN_CREATE, target);
+    } else if (recordMap.containsKey("version")) {
+      security.get().check(JpaSecurity.CAN_WRITE, target, valueId);
+    } else {
+      recordMap.clear();
+      recordMap.put("id", valueId);
+      return;
+    }
+    checkRelationalPermissions(recordMap, Mapper.of(target));
   }
 
   @Transactional
