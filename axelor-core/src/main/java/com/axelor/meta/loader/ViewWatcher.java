@@ -34,8 +34,10 @@ import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
@@ -58,7 +60,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -78,9 +79,7 @@ public final class ViewWatcher {
   private final Map<WatchKey, Path> keys = new HashMap<>();
   private final List<ViewChangeEvent> pending = new ArrayList<>();
 
-  private static final long UPDATE_DELAY = 200;
-  private static final Pattern moduleNamePattern =
-      Pattern.compile("(?:[a-z0-9_]+(?:\\.[a-z0-9_]+)+-)?(\\w*(?:-[a-z]\\w*)*)");
+  private static final long UPDATE_DELAY = 300;
   private Set<String> pendingModules;
   private Set<Path> pendingPaths;
   private ScheduledExecutorService scheduler;
@@ -200,36 +199,76 @@ public final class ViewWatcher {
     addPending(new ViewChangeEvent(kind, path, modulePath.toFile().getName()));
   }
 
-  private void handleJarAndBin(WatchEvent.Kind<?> kind, Path path) {
-    if (kind != ENTRY_CREATE && kind != ENTRY_MODIFY) {
+  private void handlePath(WatchEvent.Kind<?> kind, Path path) {
+    if (kind != ENTRY_CREATE) {
       return;
     }
 
-    if (path.toString().endsWith(".jar")) {
-      handleJar(kind, path);
-    } else {
-      handleBin(kind, path);
+    handlePath(path);
+  }
+
+  private void handlePath(Path path) {
+    try {
+      final String moduleName = findAxelorModule(path);
+      if (moduleName != null) {
+        addPending(moduleName, path);
+      }
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
     }
   }
 
-  private void handleJar(WatchEvent.Kind<?> kind, Path path) {
-    final String fileName = path.getFileName().toString();
-    final Matcher moduleNameMatcher = moduleNamePattern.matcher(fileName);
-    final String moduleName;
+  private String findAxelorModule(Path path) throws IOException {
+    Path propsPath = null;
+    FileSystem fs = null;
+    InputStream is = null;
 
-    if (!moduleNameMatcher.find()) {
-      log.error("Cannot identify module name: {}", path);
-      return;
+    try {
+      final String pathStr = path.toString();
+      if (pathStr.endsWith(".jar")) {
+        // resources in jar
+        fs = FileSystems.newFileSystem(path, null);
+        propsPath = fs.getPath("module.properties");
+      } else {
+        final String subPathStr = Paths.get("/WEB-INF/classes").toString();
+        final int index = pathStr.indexOf(subPathStr);
+        if (index >= 0) {
+          // resources on root module
+          propsPath =
+              Paths.get(pathStr.substring(0, index))
+                  .resolve(Paths.get("WEB-INF", "classes", "module.properties"));
+        } else {
+          throw new IllegalArgumentException("Unable to find module name of file " + path.toFile());
+        }
+      }
+
+      final Properties props = new Properties();
+      try {
+        is = Files.newInputStream(propsPath);
+      } catch (NoSuchFileException e) {
+        // Not an Axelor module
+        log.trace("No module file for: {}", path);
+        return null;
+      }
+      props.load(is);
+      return props.getProperty("name");
+
+    } finally {
+      if (is != null) {
+        try {
+          is.close();
+        } catch (Exception e) {
+          // ignore
+        }
+      }
+      if (fs != null) {
+        try {
+          fs.close();
+        } catch (Exception e) {
+          // ignore
+        }
+      }
     }
-
-    moduleName = moduleNameMatcher.group(1);
-    addPending(moduleName, path);
-  }
-
-  private void handleBin(WatchEvent.Kind<?> kind, Path path) {
-    final Path modulePath = path.resolve(Paths.get("..", "..", "..", "..")).normalize();
-    final String moduleName = modulePath.toFile().getName();
-    addPending(moduleName, path);
   }
 
   private void addPending(String moduleName, Path path) {
@@ -335,7 +374,7 @@ public final class ViewWatcher {
           .forEach(paths::add);
 
       if (!paths.isEmpty()) {
-        watchEventHandler = this::handleJarAndBin;
+        watchEventHandler = this::handlePath;
       }
     }
 

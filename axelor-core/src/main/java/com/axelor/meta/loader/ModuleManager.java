@@ -181,6 +181,8 @@ public class ModuleManager {
   }
 
   public void update(Set<String> moduleNames, Set<Path> paths) {
+    final long startTime = System.currentTimeMillis();
+
     final List<Module> moduleList =
         resolver.all().stream()
             .filter(m -> moduleNames.contains(m.getName()))
@@ -192,7 +194,7 @@ public class ModuleManager {
       moduleList.forEach(m -> viewLoader.doLast(m, true));
     } finally {
       pathsToRestore.clear();
-      doCleanUp();
+      doCleanUp(startTime);
     }
   }
 
@@ -217,8 +219,8 @@ public class ModuleManager {
     return lastRestored;
   }
 
-  private static void updateLastRestored() {
-    lastRestored = System.currentTimeMillis();
+  private static void updateLastRestored(long time) {
+    lastRestored = time != 0 ? time : System.currentTimeMillis();
   }
 
   public static List<String> getResolution() {
@@ -270,8 +272,12 @@ public class ModuleManager {
   }
 
   private void doCleanUp() {
+    doCleanUp(0);
+  }
+
+  private void doCleanUp(long time) {
     AbstractLoader.doCleanUp();
-    updateLastRestored();
+    updateLastRestored(time);
   }
 
   private boolean install(String moduleName, boolean update, boolean withDemo, boolean force) {
