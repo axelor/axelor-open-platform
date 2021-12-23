@@ -2288,7 +2288,8 @@ Grid.prototype._showEditor = function (activeCell) {
   }
 
   var box = grid.getCellNodeBox(args.row, 0);
-  var node = grid.getCellNode(args.row, 0);
+  var node = grid.getCellNode(args.row, 0)
+    || $(grid.getActiveCellNode()).parent().children().first()[0];
   var viewPort = $(grid.getCanvasNode()).parent();
   var zIndex = this.element.parents('.ui-dialog:first').zIndex();
 
