@@ -47,6 +47,8 @@ import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
 import java.math.BigDecimal;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -153,6 +155,9 @@ final class AuditTracker {
     }
     if (value instanceof BigDecimal) {
       return ((BigDecimal) value).toPlainString();
+    }
+    if (value instanceof ZonedDateTime) {
+      return ((ZonedDateTime) value).withZoneSameInstant(ZoneOffset.UTC).toString();
     }
     return value.toString();
   }
