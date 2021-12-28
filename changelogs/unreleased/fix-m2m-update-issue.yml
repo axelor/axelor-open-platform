@@ -1,0 +1,6 @@
+---
+title: Fix m2m field update issue
+type: fix
+description: |
+  The m2m items, upon edit should not be fully populated as the record
+  is already saved (similar to m2o).
