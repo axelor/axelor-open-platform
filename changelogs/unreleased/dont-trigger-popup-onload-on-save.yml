@@ -1,0 +1,7 @@
+---
+title: Don’t trigger popup’s onLoad upon closing
+type: fix
+description: |
+  When a popup was closing when saving the record, onLoad actions was triggered.
+  This is unnecessary as the popup will be closed in all was. It was also
+  causing errors because the actions results was applied on a closed popup/form.

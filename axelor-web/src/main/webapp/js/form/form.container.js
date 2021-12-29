@@ -560,12 +560,15 @@ ui.formWidget('PanelTabs', {
 
     var doOnSelectPending = false;
     var doOnSelect = _.debounce(function () {
-      if (doOnSelectPending || !selected || !selected.elem) {
+      if (doOnSelectPending) {
+        return;
+      }
+      var elemScope = ((selected || {}).elem || {}).scope();
+      if (!elemScope) {
         return;
       }
       doOnSelectPending = true;
       scope.waitForActions(function () {
-        var elemScope = selected.elem.scope();
         if (elemScope.handleSelect) {
           elemScope.handleSelect();
         }

@@ -179,7 +179,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
         var recordId = record.id;
         if (record.id < 0)
           record.id = null;
-        return $scope.onSave({force: true}).then(function(record, page) {
+        return $scope.onSave({fireOnLoad: false}).then(function(record, page) {
           // wait for onSave actions
           $scope.waitForActions(function(){
             record.$id = recordId;
