@@ -49,6 +49,7 @@ public class ExtendItemReplace {
     @XmlElement(name = "label", type = Label.class),
     @XmlElement(name = "help", type = Help.class),
     @XmlElement(name = "button", type = Button.class),
+    @XmlElement(name = "button-group", type = ButtonGroup.class),
     @XmlElement(name = "panel", type = Panel.class),
     @XmlElement(name = "panel-include", type = PanelInclude.class),
     @XmlElement(name = "panel-dashlet", type = Dashlet.class),
@@ -60,7 +61,8 @@ public class ExtendItemReplace {
     @XmlElement(name = "hilite", type = Hilite.class),
     @XmlElement(name = "item", type = Item.class),
     @XmlElement(name = "menu", type = Menu.class),
-    @XmlElement(name = "divider", type = Devider.class)
+    @XmlElement(name = "divider", type = Devider.class),
+    @XmlElement(name = "tooltip", type = ToolTip.class)
   })
   private List<AbstractWidget> items;
 
