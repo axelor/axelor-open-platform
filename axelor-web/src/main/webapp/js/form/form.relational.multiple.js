@@ -92,20 +92,35 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
       return;
     }
 
-    // update dotted fields from nested fields
-    value = _.clone(value);
-    _.chain(Object.keys($scope.fields))
-      .filter(function(name) { return name.indexOf('.') >= 0; })
-      .each(function(name) {
-        delete value[name];
-        var val = ui.findNested(value, name);
-        if (val !== undefined) {
-          value[name] = val;
-        }
-      });
-
     var items = _.chain([value]).flatten(true).compact().value();
     var records = _.map($scope.getItems(), _.clone);
+    
+    if ($scope.editorCanSave) {
+      items = items.map(function (item) {
+        var id = item.id;
+        var version = item.version || item.$version || 0;
+        var result = _.pick(item, $scope.selectFields());
+        return _.extend(result, {
+          id: id,
+          $version: version,
+          $fetched: false
+        });
+      });
+    }
+    
+    // update dotted fields from nested fields
+    if (value && !Array.isArray(value)) {
+      Object.keys($scope.fields)
+        .filter(function(name) { return name.indexOf('.') >= 0; })
+        .forEach(function(name) {
+          var first = items[0];
+          delete first[name];
+          var val = ui.findNested(first, name);
+          if (val !== undefined) {
+            first[name] = val;
+          }
+        });
+    }
 
     _.each(records, function(item) {
       item.selected = false;
