@@ -47,6 +47,7 @@ public class ExtendItemInsert {
     @XmlElement(name = "field", type = PanelField.class),
     @XmlElement(name = "break", type = Break.class),
     @XmlElement(name = "spacer", type = Spacer.class),
+    @XmlElement(name = "static", type = Static.class),
     @XmlElement(name = "separator", type = Separator.class),
     @XmlElement(name = "label", type = Label.class),
     @XmlElement(name = "help", type = Help.class),
