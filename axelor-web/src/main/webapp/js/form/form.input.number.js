@@ -157,7 +157,6 @@ ui.formInput('Number', {
     element.on("spin", onSpin);
     element.on("spinchange", function(e, row) {
       updateModel(element.val());
-      element.focus();
     });
     element.on("grid:check", function(e, row) {
       updateModel(element.val());
@@ -270,7 +269,12 @@ ui.formInput('Number', {
       options.max = +props.maxSize;
 
     setTimeout(function(){
-      element.spinner(options);
+      var spinner = element.spinner(options);
+
+      spinner.siblings(".ui-spinner-button").on("click", function (e) {
+        e.stopPropagation();
+      });
+
       scope.$elem_editable = element.parent();
       model.$render = function() {
         var value = model.$viewValue;

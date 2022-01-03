@@ -1,0 +1,4 @@
+---
+title: Fix spinner buttons triggering onChange inside editable grid
+type: fix
+
