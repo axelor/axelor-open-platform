@@ -1,9 +1,0 @@
----
-title: Fix m2m field update issue
-type: fix
-description: |
-  The m2m items, upon select/edit should not be fully populated as the record
-  is already saved (similar to m2o).
-  In controllers, make sure to return a compact map in m2m fields, ie a
-  list of map with the records ids. Then, the view will fetch the records
-  with all necessary fields by itself.

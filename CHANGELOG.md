@@ -1,3 +1,33 @@
+## 5.4.8 (2022-01-03)
+
+#### Fixed
+
+* Fix going into edit mode in editable grid with large horizontal scrolling
+* Don’t trigger popup’s onLoad upon closing
+
+  <details>
+  
+  When a popup was closing when saving the record, onLoad actions was triggered.
+  This is unnecessary as the popup will be closed in all cases. It was also
+  causing errors because the actions results was applied on a closed popup/form.
+  
+  </details>
+
+
+* Fix m2m field update issue
+
+  <details>
+  
+  The m2m items, upon select/edit should not be fully populated as the record
+  is already saved (similar to m2o).
+  In controllers, make sure to return a compact map in m2m fields, ie a
+  list of map with the records ids. Then, the view will fetch the records
+  with all necessary fields by itself.
+  
+  </details>
+
+
+
 ## 5.4.7 (2021-12-17)
 
 #### Changes
