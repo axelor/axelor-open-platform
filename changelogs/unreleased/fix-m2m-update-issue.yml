@@ -6,4 +6,4 @@ description: |
   is already saved (similar to m2o).
   In controllers, make sure to return a compact map in m2m fields, ie a
   list of map with the records ids. Then, the view will fetch the records
-  with all necessary fields by himself.
+  with all necessary fields by itself.
