@@ -82,6 +82,7 @@
   bottom: 0;
   left: 0;
   overflow: auto;
+  padding: 0px 8px !important;
 }
 
 .dms-file-list .dms-details > .panel-header .panel-title {
@@ -187,6 +188,7 @@
 .dms-file-list .dms-details .panel-header,
 .dms-file-upload .panel-header {
   overflow: hidden;
+  padding: 8px 8px !important;
 }
 
 .dms-file-list .dms-details .panel-header a,
