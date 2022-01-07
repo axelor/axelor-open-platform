@@ -946,7 +946,7 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
         var term = request.term;
         var text = '<strong><em>' + term + '</em></strong>';
         var canSelect = scope.canSelect() && (items.length < page.total || (request.term && items.length === 0));
-        if (field.create && term && scope.canNew()) {
+        if (field.create && term && scope.canNew() && scope.hasPermission("create")) {
           items.push({
             label : _t('Create "{0}" and select...', text),
             click : function() { create(term); }
@@ -962,7 +962,8 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
             click : function() { scope.showSelector(); }
           });
         }
-        if ((field.create === undefined || (field.create && !term)) && scope.canNew()) {
+        if ((field.create === undefined || (field.create && !term))
+            && scope.canNew() && scope.hasPermission("create")) {
           items.push({
             label: _t("Create..."),
             click: function() { scope.showPopupEditor(); }
