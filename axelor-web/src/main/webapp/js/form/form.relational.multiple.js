@@ -1207,7 +1207,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
           "<a tabindex='-1' href='' ng-click='removeItem($index)' title='{{\"Remove\" | t}}'><i class='fa fa-times'></i></a>" +
         "</span>" +
       "</div>" +
-      "<div class='o2m-list-row o2m-list-add' ng-show='hasPermission(\"write\") && !isDisabled() && canNew()'>" +
+      "<div class='o2m-list-row o2m-list-add' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()'>" +
         "<a tabindex='-1' href='' ng-click='addItem()'  title='{{\"Add\" | t}}'><i class='fa fa-plus'></i></a>" +
       "</div>" +
     "</div>";
