@@ -1,0 +1,3 @@
+---
+title: Deprecate form widgets `<notebook>`, `<break>`, `<group>`, `<portlet>`, and `<include>`
+type: deprecate
