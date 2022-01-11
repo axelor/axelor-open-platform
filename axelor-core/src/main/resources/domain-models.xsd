@@ -1024,6 +1024,7 @@
         <xsd:documentation>
           Generate code in the given target language.
         </xsd:documentation>
+        <xsd:documentation>DEPRECATED: This attribute is deprecated and will be removed in the next major version.</xsd:documentation>
       </xsd:annotation>
       <xsd:simpleType>
         <xsd:restriction base="xsd:string">
