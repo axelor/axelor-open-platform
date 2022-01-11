@@ -1487,9 +1487,14 @@
         <xsd:attribute name="cols" type="xsd:int">
           <xsd:annotation>
             <xsd:documentation>Number of initial column for the form.</xsd:documentation>
+            <xsd:documentation>DEPRECATED: This attribute is deprecated and will be removed in the next major version. Use panel layout instead.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="colWidths" type="xsd:string" />
+        <xsd:attribute name="colWidths" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>DEPRECATED: This attribute is deprecated and will be removed in the next major version. Use panel layout instead.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="onLoad" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>Comma separate list of actions to execute on load event.</xsd:documentation>
