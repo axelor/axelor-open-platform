@@ -1006,12 +1006,26 @@ ActionHandler.prototype = {
         column = item.data('column');
         itemScope = item.parents('[x-path]:first,.portlet-grid').data('$scope');
         forEach(itemAttrs, function(value, attr){
-          if (attr == 'hidden')
-            itemScope.showColumn(column.id, !value);
-          if (attr == 'title')
-            setTimeout(function(){
-              itemScope.setColumnTitle(column.id, value);
-            });
+          switch (attr) {
+            case 'hidden':
+              itemScope.showColumn(column.id, !value);
+              break;
+            case 'title':
+              setTimeout(function(){
+                itemScope.setColumnTitle(column.id, value);
+              });
+              break;
+            case 'scale':
+              var grid = item.parents('.slickgrid:first').data('grid');
+              if (grid) {
+                var found = _.findWhere(grid.getColumns(), {id: column.id});
+                if (found) {
+                  var descriptor = found.descriptor;
+                  descriptor.widgetAttrs = _.extend(descriptor.widgetAttrs || {}, {scale: value});
+                }
+                itemScope.setItems(itemScope.getItems());
+              }
+          }
         });
         return;
       }
