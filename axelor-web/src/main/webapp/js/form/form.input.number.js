@@ -50,14 +50,8 @@ ui.formInput('Number', {
       pattern = isDecimal ? /^(-)?\d+(\.\d+)?$/ : /^\s*-?[0-9]*\s*$/;
 
     scope.scale = function () {
-      var value = scope.attr('scale');
-      if (value) {
-        return value;
-      }
-      if ((props.widgetAttrs||{}).scale) {
-        return props.widgetAttrs.scale;
-      }
-      return props.scale || 2;
+      return [scope.attr('scale'), (props.widgetAttrs || {}).scale, props.scale, 2]
+        .find(function (val) { return val !== undefined && val !== null; });
     };
 
     function precision() {

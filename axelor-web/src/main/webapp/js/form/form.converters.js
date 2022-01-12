@@ -323,7 +323,8 @@
     },
 
     "decimal": function(field, value, context) {
-      var scale = (field.widgetAttrs||{}).scale || field.scale || 2;
+      var scale = [(field.widgetAttrs || {}).scale, field.scale, 2]
+        .find(function (val) { return _.isNumber(val); });
       var currency = (field.widgetAttrs||{}).currency || field.currency;
 
       var text = formatNumber(field, value, scale);
