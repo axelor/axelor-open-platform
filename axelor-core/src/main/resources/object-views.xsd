@@ -775,7 +775,7 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="x-scale" type="xsd:integer">
+    <xsd:attribute name="x-scale" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
           The scale of the decimal value (total number of digits in decimal part).

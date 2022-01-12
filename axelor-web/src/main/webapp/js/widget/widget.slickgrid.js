@@ -127,7 +127,18 @@ var Formatters = {
     return ui.formatters.integer(field, value);
   },
 
-  "decimal": function(field, value, context) {
+  "decimal": function(field, value, context, grid) {
+    var scale = [(field.widgetAttrs || {}).scale, field.scale]
+      .find(function (val) { return val !== undefined && val !== null; });
+    if (_.isString(scale)) {
+      context = _.extend({}, context);
+      Object.keys(context)
+        .filter(function (name) { return name.indexOf(".") >= 0; })
+        .forEach(function (name) {
+          ui.setNested(context, name, context[name]);
+      });
+      field = _.extend({}, field, {scale: grid.scope.$eval(scale, context)});
+    }
     return ui.formatters.decimal(field, value, context);
   },
 

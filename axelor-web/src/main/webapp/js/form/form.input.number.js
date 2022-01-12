@@ -50,8 +50,12 @@ ui.formInput('Number', {
       pattern = isDecimal ? /^(-)?\d+(\.\d+)?$/ : /^\s*-?[0-9]*\s*$/;
 
     scope.scale = function () {
-      return [scope.attr('scale'), (props.widgetAttrs || {}).scale, props.scale, 2]
+      var scale = [scope.attr('scale'), (props.widgetAttrs || {}).scale, props.scale]
         .find(function (val) { return val !== undefined && val !== null; });
+      if (_.isString(scale)) {
+        scale = scope.$eval(scale, scope.getContext());
+      }
+      return _.isNumber(scale) ? scale : 2;
     };
 
     function precision() {
@@ -131,15 +135,7 @@ ui.formInput('Number', {
     var options = {
       step: 1
     };
-    var keyPattern;
-
-    if (scope.isDecimal()) {
-      var scale = scope.scale();
-      element.attr("step", _.sprintf("%." + scale + "f", 1 / Math.pow(10, scale)));
-      keyPattern = /[\d-.]/;
-    } else {
-      keyPattern = /[\d-]/;
-    }
+    var keyPattern = scope.isDecimal() ? /[\d-.]/ : /[\d-]/;
 
     element.on("spin", onSpin);
     element.on("spinchange", function(e, row) {
@@ -268,6 +264,10 @@ ui.formInput('Number', {
         scope.initValue(value);
       };
       model.$render();
+      scope.$watch(scope.scale, function (scale) {
+        element.attr("step", _.sprintf("%." + scale + "f", 1 / Math.pow(10, scale)));
+        model.$render();
+      });
     });
   }
 });
