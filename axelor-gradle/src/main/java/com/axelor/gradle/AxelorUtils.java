@@ -17,6 +17,9 @@
  */
 package com.axelor.gradle;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,18 +41,31 @@ import org.gradle.internal.composite.IncludedBuildInternal;
 
 public class AxelorUtils {
 
+  private AxelorUtils() {}
+
+  private static LoadingCache<Project, List<Project>> includedBuildRootsCache =
+      CacheBuilder.newBuilder()
+          .build(
+              new CacheLoader<Project, List<Project>>() {
+                @Override
+                public List<Project> load(Project project) throws Exception {
+                  return project.getGradle().getIncludedBuilds().stream()
+                      .map(b -> ((IncludedBuildInternal) b).getTarget())
+                      .map(b -> b.getBuild().getRootProject())
+                      .collect(Collectors.toList());
+                }
+              });
+
   public static String toRelativePath(Project project, File file) {
     return project.getProjectDir().toPath().relativize(file.toPath()).toString();
   }
 
-  private static Stream<Project> includedBuildRoots(Project project) {
-    return project.getGradle().getIncludedBuilds().stream()
-        .map(b -> ((IncludedBuildInternal) b).getTarget())
-        .map(b -> b.getBuild().getRootProject());
+  private static List<Project> includedBuildRoots(Project project) {
+    return includedBuildRootsCache.getUnchecked(project);
   }
 
   public static List<Project> findIncludedBuildProjects(Project project) {
-    return includedBuildRoots(project)
+    return includedBuildRoots(project).stream()
         .flatMap(root -> Stream.concat(Stream.of(root), root.getSubprojects().stream()))
         .collect(Collectors.toList());
   }
@@ -118,7 +134,11 @@ public class AxelorUtils {
       Project sub = project.findProject(path);
       // consider projects from included builds
       if (sub == null) {
-        sub = includedBuildRoots(project).map(p -> p.findProject(path)).findFirst().orElse(null);
+        sub =
+            includedBuildRoots(project).stream()
+                .map(p -> p.findProject(path))
+                .findFirst()
+                .orElse(null);
       }
       return sub;
     }
