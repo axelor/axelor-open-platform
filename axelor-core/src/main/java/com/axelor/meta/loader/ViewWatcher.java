@@ -257,7 +257,7 @@ public final class ViewWatcher {
       final String pathStr = path.toString();
       if (pathStr.toLowerCase().endsWith(".jar")) {
         // resources in jar
-        fs = FileSystems.newFileSystem(path, null);
+        fs = FileSystems.newFileSystem(path, (ClassLoader) null);
         propsPath = fs.getPath("module.properties");
       } else {
         for (final String location : ImmutableList.of("WEB-INF/classes", "main")) {
