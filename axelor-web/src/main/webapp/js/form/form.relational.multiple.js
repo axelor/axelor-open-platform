@@ -94,7 +94,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 
     var items = _.chain([value]).flatten(true).compact().value();
     var records = _.map($scope.getItems(), _.clone);
-    
+
     if ($scope.editorCanSave) {
       items = items.map(function (item) {
         var id = item.id;
@@ -107,7 +107,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
         });
       });
     }
-    
+
     // update dotted fields from nested fields
     if (value && !Array.isArray(value)) {
       Object.keys($scope.fields)
