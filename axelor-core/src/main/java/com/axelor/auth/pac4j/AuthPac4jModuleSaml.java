@@ -97,6 +97,8 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
         settings.getBoolean(AvailableAppSettings.AUTH_SAML_WANTS_ASSERTIONS_SIGNED, false);
     final boolean authnRequestSigned =
         settings.getBoolean(AvailableAppSettings.AUTH_SAML_AUTHN_REQUEST_SIGNED, false);
+    final boolean spLogoutRequestSigned =
+        settings.getBoolean(AvailableAppSettings.AUTH_SAML_LOGOUT_REQUEST_SIGNED, false);
 
     final SAML2Configuration saml2Config =
         new SAML2Configuration(
@@ -150,6 +152,7 @@ public class AuthPac4jModuleSaml extends AuthPac4jModule {
 
     saml2Config.setWantsAssertionsSigned(wantsAssertionsSigned);
     saml2Config.setAuthnRequestSigned(authnRequestSigned);
+    saml2Config.setSpLogoutRequestSigned(spLogoutRequestSigned);
 
     final SAML2Client client = new AxelorSAML2Client(saml2Config);
     addCentralClient(client);

@@ -228,4 +228,5 @@ public interface AvailableAppSettings {
       "auth.saml.signature.canonicalization.algorithm";
   String AUTH_SAML_WANTS_ASSERTIONS_SIGNED = "auth.saml.wants.assertions.signed";
   String AUTH_SAML_AUTHN_REQUEST_SIGNED = "auth.saml.authn.request.signed";
+  String AUTH_SAML_LOGOUT_REQUEST_SIGNED = "auth.saml.logout.request.signed";
 }
