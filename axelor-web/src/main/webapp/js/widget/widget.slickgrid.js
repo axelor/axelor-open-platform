@@ -137,6 +137,7 @@ var Formatters = {
         .forEach(function (name) {
           ui.setNested(context, name, context[name]);
       });
+      _.defaults(context, (grid.handler || {})._context);
       field = _.extend({}, field, {scale: grid.scope.$eval(scale, context)});
     }
     return ui.formatters.decimal(field, value, context);
