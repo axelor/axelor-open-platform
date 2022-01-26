@@ -1,0 +1,3 @@
+---
+title: Add setting "auth.saml.logout.request.signed"
+type: feature
