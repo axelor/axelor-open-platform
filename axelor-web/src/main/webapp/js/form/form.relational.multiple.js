@@ -32,6 +32,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
     $scope.selectEnable = false;
     $scope.toolbar = null;
     $scope.menubar = null;
+    $scope.selectMode = "multi";
     if (initCallback) {
       initCallback();
     }
