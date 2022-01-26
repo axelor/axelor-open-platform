@@ -415,7 +415,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 
     for (var i = 0; i < records.length; i++) {
       var item = records[i];
-      if (!item.id || item.id <= 0) {
+      if (item.$dirty || !item.id || item.id <= 0) {
         return;
       }
     }
