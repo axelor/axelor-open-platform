@@ -1487,9 +1487,14 @@
         <xsd:attribute name="cols" type="xsd:int">
           <xsd:annotation>
             <xsd:documentation>Number of initial column for the form.</xsd:documentation>
+            <xsd:documentation>DEPRECATED: This attribute is deprecated and will be removed in the next major version. Use panel layout instead.</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="colWidths" type="xsd:string" />
+        <xsd:attribute name="colWidths" type="xsd:string">
+          <xsd:annotation>
+            <xsd:documentation>DEPRECATED: This attribute is deprecated and will be removed in the next major version. Use panel layout instead.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="onLoad" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>Comma separate list of actions to execute on load event.</xsd:documentation>
@@ -2786,16 +2791,33 @@
 
   <xsd:group name="FormWidgets">
     <xsd:choice>
-      <xsd:element name="include" type="tns:FormInclude" />
-      <xsd:element name="portlet" type="tns:Portlet" />
-      <xsd:element name="group" type="tns:Group" />
-      <xsd:element name="notebook" type="tns:Notebook" />
+      <xsd:element name="include" type="tns:FormInclude">
+        <xsd:annotation>
+          <xsd:documentation>DEPRECATED: This field is deprecated and will be removed in the next major version. Use &lt;panel-include&gt; instead.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="portlet" type="tns:Portlet">
+        <xsd:annotation>
+          <xsd:documentation>DEPRECATED: This field is deprecated and will be removed in the next major version. Use &lt;panel-dashlet&gt; instead.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="group" type="tns:Group">
+        <xsd:annotation>
+          <xsd:documentation>DEPRECATED: This field is deprecated and will be removed in the next major version. Use &lt;panel&gt; instead.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="notebook" type="tns:Notebook">
+        <xsd:annotation>
+          <xsd:documentation>DEPRECATED: This field is deprecated and will be removed in the next major version. Use &lt;panel-tabs&gt; instead.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
       <xsd:element name="field" type="tns:Field" />
       <xsd:element name="break" type="tns:Break">
         <xsd:annotation>
           <xsd:documentation>
             Break previous row and start new one.
           </xsd:documentation>
+          <xsd:documentation>DEPRECATED: This field is deprecated and will be removed in the next major version. Use &lt;spacer&gt; instead.</xsd:documentation>
         </xsd:annotation>
       </xsd:element>
       <xsd:element name="spacer" type="tns:Spacer">

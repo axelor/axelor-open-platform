@@ -1,0 +1,7 @@
+---
+title: Deprecate legacy form layout in favor of panel layout
+type: deprecate
+description: |
+  Form widgets `<notebook>`, `<break>`, `<group>`, `<portlet>`, and `<include>` are deprecated.
+  `cols` and `colWidths` form attributes used for legacy form layout are also deprecated.
+  Those will be removed in the next major version. Use panel layout instead.
