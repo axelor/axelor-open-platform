@@ -300,7 +300,7 @@ var m2oTemplateEditable = '' +
   '<i class="fa fa-eye" ng-click="onSummary()" ng-show="hasPermission(\'read\') && _viewParams.summaryView && canToggle()"></i>'+
   '<i class="fa fa-pencil" ng-click="onEdit()" ng-show="hasPermission(\'read\') && canView() && canEdit()" title="{{\'Edit\' | t}}"></i>'+
   '<i class="fa fa-file-text-o" ng-click="onEdit()" ng-show="hasPermission(\'read\') && canView() && !canEdit()" title="{{\'View\' | t}}"></i>'+
-  '<i class="fa fa-plus" ng-click="onNew()" ng-show="canNew() && hasPermission(\'write\') && !isDisabled()" title="{{\'New\' | t}}"></i>'+
+  '<i class="fa fa-plus" ng-click="onNew()" ng-show="canNew() && hasPermission(\'create\') && !isDisabled()" title="{{\'New\' | t}}"></i>'+
   '<i class="fa fa-search" ng-click="onSelect()" ng-show="canSelect() && hasPermission(\'read\') && !isDisabled()" title="{{\'Select\' | t}}"></i>'+
 '</span>'+
 '</div>';
@@ -464,7 +464,7 @@ ui.formInput('ManyToOne', 'Select', {
           }
         }
 
-        if (field.create && term && scope.canNew()) {
+        if (field.create && term && scope.canNew() && scope.hasPermission("create")) {
           items.push({
             label : _t('Create "{0}" and select...', term),
             click : function() { create(term); }
@@ -475,7 +475,8 @@ ui.formInput('ManyToOne', 'Select', {
           });
         }
 
-        if ((field.create === undefined || (field.create && !term)) && scope.canNew()) {
+        if ((field.create === undefined || (field.create && !term))
+            && scope.canNew() && scope.hasPermission("create")) {
           items.push({
             label: _t("Create..."),
             click: function() { scope.showPopupEditor(); }

@@ -946,7 +946,7 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
         var term = request.term;
         var text = '<strong><em>' + term + '</em></strong>';
         var canSelect = scope.canSelect() && (items.length < page.total || (request.term && items.length === 0));
-        if (field.create && term && scope.canNew()) {
+        if (field.create && term && scope.canNew() && scope.hasPermission("create")) {
           items.push({
             label : _t('Create "{0}" and select...', text),
             click : function() { create(term); }
@@ -962,7 +962,8 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
             click : function() { scope.showSelector(); }
           });
         }
-        if ((field.create === undefined || (field.create && !term)) && scope.canNew()) {
+        if ((field.create === undefined || (field.create && !term))
+            && scope.canNew() && scope.hasPermission("create")) {
           items.push({
             label: _t("Create..."),
             click: function() { scope.showPopupEditor(); }
@@ -1206,7 +1207,7 @@ ui.formInput('InlineOneToMany', 'OneToMany', {
           "<a tabindex='-1' href='' ng-click='removeItem($index)' title='{{\"Remove\" | t}}'><i class='fa fa-times'></i></a>" +
         "</span>" +
       "</div>" +
-      "<div class='o2m-list-row o2m-list-add' ng-show='hasPermission(\"write\") && !isDisabled() && canNew()'>" +
+      "<div class='o2m-list-row o2m-list-add' ng-show='hasPermission(\"create\") && !isDisabled() && canNew()'>" +
         "<a tabindex='-1' href='' ng-click='addItem()'  title='{{\"Add\" | t}}'><i class='fa fa-plus'></i></a>" +
       "</div>" +
     "</div>";
