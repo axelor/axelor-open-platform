@@ -1,5 +1,0 @@
----
-title: Prevent sorting when any row is dirty in o2m/m2m grid
-type: fix
-description: |
-  This fixes losing changes after sorting on a column.

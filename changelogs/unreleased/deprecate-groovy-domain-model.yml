@@ -1,5 +1,0 @@
----
-title: Deprecate Groovy domain models
-type: deprecate
-description: |
-  In next major release, domain models will be generated in Java only.

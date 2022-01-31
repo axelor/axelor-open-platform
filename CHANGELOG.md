@@ -1,3 +1,74 @@
+## 5.4.9 (2022-01-31)
+
+#### Deprecated
+
+* Deprecate legacy form layout in favor of panel layout
+
+  <details>
+  
+  Form widgets `<notebook>`, `<break>`, `<group>`, `<portlet>`, and `<include>` are deprecated.
+  `cols` and `colWidths` form attributes used for legacy form layout are also deprecated.
+  Those will be removed in the next major version. Use panel layout instead.
+  
+  </details>
+
+
+* Deprecate Groovy domain models
+
+  <details>
+  
+  In next major release, domain models will be generated in Java only.
+  
+  </details>
+
+
+
+#### Features
+
+* Add application setting to disable permission check on actions
+
+  <details>
+  
+  Use `application.disable.action.permission = true` to disable permission checking on actions.
+  That setting severely breaks security. It should be used with extreme caution and as a last resort only.
+  It will be removed in the future.
+  
+  </details>
+
+
+* Add application setting to disable permission check on relational fields
+
+  <details>
+  
+  Use `application.disable.relational.field.permission = true` to disable permission checking on relational fields.
+  That setting severely breaks security. It should be used with extreme caution and as a last resort only.
+  It will be removed in the future.
+  
+  </details>
+
+
+* Better visibility in DMS file details
+* Add setting "auth.saml.logout.request.signed"
+
+#### Fixed
+
+* Allow to select multiple records in o2m/m2m inside an editor
+* Prevent sorting when any row is dirty in o2m/m2m grid
+
+  <details>
+  
+  This fixes losing changes after sorting on a column.
+  
+  </details>
+
+
+* Fix default value of Boolean custom fields
+* Fix checking for create permission on add actions
+* Fix static/tooltip/button-group widget in views extensions
+* Translate "Use offline..." text in dms file details
+* Fix view hotswap with IntelliJ IDEA
+* Check for permission in suggest box create actions
+
 ## 5.4.8 (2022-01-03)
 
 #### Fixed
