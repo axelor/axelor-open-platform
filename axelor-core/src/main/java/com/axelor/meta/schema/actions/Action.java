@@ -18,6 +18,7 @@
  */
 package com.axelor.meta.schema.actions;
 
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JpaSecurity;
 import com.axelor.events.PostAction;
@@ -25,7 +26,6 @@ import com.axelor.meta.ActionHandler;
 import com.axelor.rpc.ActionResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Strings;
 import java.util.regex.Pattern;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlTransient;
@@ -135,15 +135,17 @@ public abstract class Action {
   }
 
   protected static boolean test(ActionHandler handler, String expression) {
-    if (Strings.isNullOrEmpty(expression)) // if expression is not given always return true
-    return true;
+    // if expression is not given always return true
+    if (StringUtils.isBlank(expression)) return true;
+
     if ("true".equals(expression)) return true;
     if ("false".equals(expression)) return false;
+
     Object result = handler.evaluate(toExpression(expression, false));
-    if (result == null) return false;
-    if (result instanceof Number && result.equals(0)) return false;
     if (result instanceof Boolean) return (Boolean) result;
-    return true;
+    if (result instanceof Number) return Double.compare(((Number) result).doubleValue(), 0) != 0;
+
+    return ObjectUtils.notEmpty(result);
   }
 
   @XmlType

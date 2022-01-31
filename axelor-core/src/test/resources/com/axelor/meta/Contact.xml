@@ -57,6 +57,45 @@
       <attribute name="domain" for="title" expr="self.code IN ?1"/>
     </action-attrs>
 
+    <action-attrs name="action-contact-attrs-if">
+      <attribute name="value" for="dummy" expr="eval: 1"/>
+      <attribute name="value" for="dummy2" expr="eval: 1" if="null"/>
+      <attribute name="value" for="dummyIfBoolean" expr="eval: 1" if="myBoolean"/>
+      <attribute name="value" for="dummyIfInteger" expr="eval: 1" if="myInteger"/>
+      <attribute name="value" for="dummyIfLong" expr="eval: 1" if="myLong"/>
+      <attribute name="value" for="dummyIfDouble" expr="eval: 1" if="myDouble"/>
+      <attribute name="value" for="dummyIfDecimal" expr="eval: 1" if="myDecimal"/>
+      <attribute name="value" for="dummyIfString" expr="eval: 1" if="myString"/>
+      <attribute name="value" for="dummyIfBinary" expr="eval: 1" if="myBinary"/>
+      <attribute name="value" for="dummyIfDate" expr="eval: 1" if="myDate"/>
+      <attribute name="value" for="dummyIfTime" expr="eval: 1" if="myTime"/>
+      <attribute name="value" for="dummyIfDateTime" expr="eval: 1" if="myDateTime"/>
+      <attribute name="value" for="dummyIfEnum" expr="eval: 1" if="myEnum"/>
+      <attribute name="value" for="dummyIfReference" expr="eval: 1" if="myReference"/>
+      <attribute name="value" for="dummyIfCollection" expr="eval: 1" if="myCollection"/>
+      <attribute name="value" for="dummyIfCollection2" expr="eval: 1" if="myCollection2"/>
+    </action-attrs>
+
+    <!-- Should behave the same as above -->
+    <action-attrs name="action-contact-attrs-if-forced-boolean">
+      <attribute name="value" for="dummy" expr="eval: 1" if="true"/>
+      <attribute name="value" for="dummy2" expr="eval: 1" if="false"/>
+      <attribute name="value" for="dummyIfBoolean" expr="eval: 1" if="!!myBoolean"/>
+      <attribute name="value" for="dummyIfInteger" expr="eval: 1" if="!!myInteger"/>
+      <attribute name="value" for="dummyIfLong" expr="eval: 1" if="!!myLong"/>
+      <attribute name="value" for="dummyIfDouble" expr="eval: 1" if="!!myDouble"/>
+      <attribute name="value" for="dummyIfDecimal" expr="eval: 1" if="!!myDecimal"/>
+      <attribute name="value" for="dummyIfString" expr="eval: 1" if="!!myString"/>
+      <attribute name="value" for="dummyIfBinary" expr="eval: 1" if="!!myBinary"/>
+      <attribute name="value" for="dummyIfDate" expr="eval: 1" if="!!myDate"/>
+      <attribute name="value" for="dummyIfTime" expr="eval: 1" if="!!myTime"/>
+      <attribute name="value" for="dummyIfDateTime" expr="eval: 1" if="!!myDateTime"/>
+      <attribute name="value" for="dummyIfEnum" expr="eval: 1" if="!!myEnum"/>
+      <attribute name="value" for="dummyIfReference" expr="eval: 1" if="!!myReference"/>
+      <attribute name="value" for="dummyIfCollection" expr="eval: 1" if="!!myCollection"/>
+      <attribute name="value" for="dummyIfCollection2" expr="eval: 1" if="!!myCollection2"/>
+    </action-attrs>
+
     <action-record name="action-contact-defaults"
       model="com.axelor.test.db.Contact">
       <field name="title" expr="action:action-default-title"/>

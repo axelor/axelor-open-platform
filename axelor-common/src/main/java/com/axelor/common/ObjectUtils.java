@@ -66,10 +66,10 @@ public final class ObjectUtils {
       return ((CharSequence) value).length() == 0;
     }
     if (value instanceof Collection) {
-      return ((Collection<?>) value).size() == 0;
+      return ((Collection<?>) value).isEmpty();
     }
     if (value instanceof Map) {
-      return ((Map<?, ?>) value).size() == 0;
+      return ((Map<?, ?>) value).isEmpty();
     }
     return false;
   }

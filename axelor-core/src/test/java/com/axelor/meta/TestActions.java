@@ -30,12 +30,21 @@ import com.axelor.meta.schema.actions.validate.validator.Info;
 import com.axelor.meta.schema.views.FormView;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
+import com.axelor.test.db.Address;
 import com.axelor.test.db.Contact;
+import com.axelor.test.db.EnumStatusNumber;
+import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -330,5 +339,86 @@ public class TestActions extends MetaTest {
     assertFalse(((List<?>) value).isEmpty());
     assertNotNull(((List<?>) value).get(0));
     assertTrue(value.toString().contains("pending"));
+  }
+
+  @Test
+  void testIfTrue() {
+    Map<String, Object> context = new HashMap<>();
+    context.put("myBoolean", true);
+    context.put("myInteger", 1);
+    context.put("myLong", 1L);
+    context.put("myDouble", Double.MIN_VALUE);
+    context.put("myDecimal", new BigDecimal(Double.MIN_VALUE));
+    context.put("myString", " ");
+    context.put("myBinary", new byte[] {0});
+    context.put("myDate", LocalDate.now());
+    context.put("myTime", LocalTime.now());
+    context.put("myDateTime", LocalDateTime.now());
+    context.put("myEnum", EnumStatusNumber.ONE);
+    context.put("myReference", new Title());
+    context.put("myCollection", ImmutableList.of(new Address()));
+    context.put("myCollection2", ImmutableList.of(new Address()));
+
+    Map<String, Object> expected =
+        Map.ofEntries(
+            Map.entry("dummyIfTime", Map.of("value", 1)),
+            Map.entry("dummyIfDateTime", Map.of("value", 1)),
+            Map.entry("dummyIfCollection2", Map.of("value", 1)),
+            Map.entry("dummyIfEnum", Map.of("value", 1)),
+            Map.entry("dummyIfBoolean", Map.of("value", 1)),
+            Map.entry("dummyIfLong", Map.of("value", 1)),
+            Map.entry("dummyIfBinary", Map.of("value", 1)),
+            Map.entry("dummy", Map.of("value", 1)),
+            Map.entry("dummyIfInteger", Map.of("value", 1)),
+            Map.entry("dummyIfDecimal", Map.of("value", 1)),
+            Map.entry("dummyIfDate", Map.of("value", 1)),
+            Map.entry("dummyIfDouble", Map.of("value", 1)),
+            Map.entry("dummyIfString", Map.of("value", 1)),
+            Map.entry("dummyIfCollection", Map.of("value", 1)),
+            Map.entry("dummyIfReference", Map.of("value", 1)));
+
+    Action action = MetaStore.getAction("action-contact-attrs-if");
+    ActionHandler handler = createHandler(action, context);
+    Object values = action.execute(handler);
+
+    assertEquals(expected, values);
+
+    Action actionExpected = MetaStore.getAction("action-contact-attrs-if-forced-boolean");
+    ActionHandler handlerExpected = createHandler(actionExpected, context);
+    Object forcedValues = actionExpected.execute(handlerExpected);
+
+    assertEquals(expected, forcedValues);
+  }
+
+  @Test
+  void testIfFalse() {
+    Map<String, Object> context = new HashMap<>();
+    context.put("myBoolean", false);
+    context.put("myInteger", 0);
+    context.put("myLong", 0L);
+    context.put("myDouble", 0.0);
+    context.put("myDecimal", BigDecimal.ZERO);
+    context.put("myString", "");
+    context.put("myBinary", new byte[0]);
+    context.put("myDate", null);
+    context.put("myTime", null);
+    context.put("myDateTime", null);
+    context.put("myEnum", null);
+    context.put("myReference", null);
+    context.put("myCollection", Collections.emptyList());
+    context.put("myCollection2", null);
+
+    Map<String, Object> expected = Map.of("dummy", Map.of("value", 1));
+
+    Action action = MetaStore.getAction("action-contact-attrs-if");
+    ActionHandler handler = createHandler(action, context);
+    Object values = action.execute(handler);
+    assertEquals(expected, values);
+
+    Action actionExpected = MetaStore.getAction("action-contact-attrs-if-forced-boolean");
+    ActionHandler handlerExpected = createHandler(actionExpected, context);
+    Object forcedValues = actionExpected.execute(handlerExpected);
+
+    assertEquals(expected, forcedValues);
   }
 }
