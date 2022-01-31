@@ -109,7 +109,6 @@ public class ReleaseGenerator {
         return "";
       }
       Stream<String> stream = Arrays.stream(text.split(NEW_LINE));
-      stream = stream.map(s -> s.replaceAll("^\\s+", ""));
       if (n > 0) {
         final String spaces = Strings.repeat(" ", n);
         stream = stream.map(s -> spaces + s);
