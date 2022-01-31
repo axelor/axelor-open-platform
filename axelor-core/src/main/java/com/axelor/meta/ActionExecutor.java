@@ -17,14 +17,20 @@
  */
 package com.axelor.meta;
 
+import com.axelor.app.AppSettings;
+import com.axelor.app.AvailableAppSettings;
+import com.axelor.auth.AuthSecurityWarner;
 import com.axelor.db.JpaSecurity;
 import com.axelor.event.Event;
 import com.axelor.events.PostAction;
 import com.axelor.events.PreAction;
+import com.axelor.inject.Beans;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class ActionExecutor {
 
   private final Event<PreAction> preActionEvent;
@@ -36,7 +42,11 @@ public class ActionExecutor {
       Event<PreAction> preActionEvent, Event<PostAction> postActionEvent, JpaSecurity security) {
     this.preActionEvent = preActionEvent;
     this.postActionEvent = postActionEvent;
-    this.security = security;
+    this.security =
+        AppSettings.get()
+                .getBoolean(AvailableAppSettings.APPLICATION_DISABLE_PERMISSION_ACTIONS, false)
+            ? Beans.get(AuthSecurityWarner.class)
+            : security;
   }
 
   public ActionHandler newActionHandler(ActionRequest request) {

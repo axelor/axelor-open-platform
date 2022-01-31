@@ -1,0 +1,7 @@
+---
+title: Add application setting to disable permission check on relational fields
+type: feature
+description: |
+  Use `application.disable.relational.field.permission = true` to disable permission checking on relational fields.
+  That setting severely breaks security. It should be used with extreme caution and as a last resort only.
+  It will be removed in the future.
