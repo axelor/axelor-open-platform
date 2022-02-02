@@ -1,3 +1,17 @@
+## 5.4.10 (2022-02-02)
+
+#### Fixed
+
+* Fix AuthSecurityWarner initialization on app startup
+
+  <details>
+  
+  Resource might be loaded before Guice is initialized, which causes "Guice is not initialized." error.
+  
+  </details>
+
+
+
 ## 5.4.9 (2022-01-31)
 
 #### Deprecated
