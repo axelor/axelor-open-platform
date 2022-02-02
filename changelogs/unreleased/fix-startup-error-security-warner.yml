@@ -1,0 +1,5 @@
+---
+title: Fix AuthSecurityWarner initialization on app startup
+type: fix
+description: |
+  Resource might be loaded before Guice is initialized, which causes "Guice is not initialized." error.

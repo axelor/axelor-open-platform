@@ -133,12 +133,7 @@ public class Resource<T extends Model> {
 
   private static final Pattern NAME_PATTERN = Pattern.compile("[\\w\\.]+");
 
-  private static JpaSecurity securityWarner =
-      AppSettings.get()
-              .getBoolean(
-                  AvailableAppSettings.APPLICATION_DISABLE_PERMISSION_RELATIONAL_FIELDS, false)
-          ? Beans.get(AuthSecurityWarner.class)
-          : Beans.get(JpaSecurity.class);
+  private static JpaSecurity securityWarner;
 
   @Inject
   @SuppressWarnings("unchecked")
@@ -151,6 +146,18 @@ public class Resource<T extends Model> {
     this.security = security;
     this.preRequest = preRequest;
     this.postRequest = postRequest;
+  }
+
+  private static JpaSecurity getSecurityWarner() {
+    if (securityWarner == null) {
+      securityWarner =
+          AppSettings.get()
+                  .getBoolean(
+                      AvailableAppSettings.APPLICATION_DISABLE_PERMISSION_RELATIONAL_FIELDS, false)
+              ? Beans.get(AuthSecurityWarner.class)
+              : Beans.get(JpaSecurity.class);
+    }
+    return securityWarner;
   }
 
   /** Returns the resource class. */
@@ -1166,9 +1173,9 @@ public class Resource<T extends Model> {
       Map<String, Object> recordMap, Class<? extends Model> target) {
     final Long valueId = findId(recordMap);
     if (valueId == null || valueId <= 0L) {
-      securityWarner.check(JpaSecurity.CAN_CREATE, target);
+      getSecurityWarner().check(JpaSecurity.CAN_CREATE, target);
     } else if (recordMap.containsKey("version")) {
-      securityWarner.check(JpaSecurity.CAN_WRITE, target, valueId);
+      getSecurityWarner().check(JpaSecurity.CAN_WRITE, target, valueId);
     } else {
       recordMap.clear();
       recordMap.put("id", valueId);
@@ -1501,7 +1508,7 @@ public class Resource<T extends Model> {
         final Model modelValue = (Model) value;
         final Class<? extends Model> modelClass = EntityHelper.getEntityClass(modelValue);
         try {
-          securityWarner.check(JpaSecurity.CAN_READ, modelClass, modelValue.getId());
+          getSecurityWarner().check(JpaSecurity.CAN_READ, modelClass, modelValue.getId());
         } catch (UnauthorizedException e) {
           notPermitted.accept(name);
           permittedName = nameParts.subList(0, i + 1).stream().collect(Collectors.joining("."));
