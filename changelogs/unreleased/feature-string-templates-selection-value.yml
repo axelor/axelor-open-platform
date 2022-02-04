@@ -1,0 +1,6 @@
+---
+title: Allow to get value of field with selection in string templates
+type: feature
+description: |
+  For example, use `<SaleOrder.statusSelect.value>` to get the value of the selection.
+  With `<SaleOrder.statusSelect>`, you still get the title of the selection.

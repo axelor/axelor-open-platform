@@ -127,7 +127,7 @@ public class StringTemplates implements Templates {
       if (field == null) return value;
 
       if (StringUtils.notBlank(field.getSelection())) {
-        return getSelectionTitle(field.getSelection(), value);
+        return getSelection(field.getSelection(), value);
       }
 
       if (field.isEnum()) {
@@ -149,7 +149,7 @@ public class StringTemplates implements Templates {
       if (field == null || StringUtils.isBlank(field.getSelection())) {
         return value;
       }
-      return getSelectionTitle(field.getSelection(), value);
+      return getSelection(field.getSelection(), value);
     }
 
     private MetaJsonField findCustomField(Class<?> entityClass, String name, String modelField) {
@@ -248,6 +248,38 @@ public class StringTemplates implements Templates {
         return mapModelAdaptor.getProperty(interp, self, (Map<?, ?>) o, property, propertyName);
       }
       return super.getProperty(interp, self, o, property, propertyName);
+    }
+
+    private Object getSelection(String selection, Object value) {
+      final String title = getSelectionTitle(selection, value);
+      return new Selection(value, title);
+    }
+
+    private class Selection {
+      private final Object value;
+      private final String title;
+
+      public Selection(Object value, String title) {
+        this.value = value;
+        this.title = title;
+      }
+
+      // Used in template, e.g.: <SaleOrder.statusSelect.value>
+      @SuppressWarnings("unused")
+      public Object getValue() {
+        return value;
+      }
+
+      // Used in template, e.g.: <SaleOrder.statusSelect.title>
+      public String getTitle() {
+        return title;
+      }
+
+      // Used in template, e.g.: <SaleOrder.statusSelect>
+      @Override
+      public String toString() {
+        return getTitle();
+      }
     }
   }
 

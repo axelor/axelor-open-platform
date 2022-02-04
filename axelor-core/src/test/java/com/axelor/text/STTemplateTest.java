@@ -247,4 +247,15 @@ public class STTemplateTest extends TemplateScriptTest {
     assertTrue(output.contains("World Name: World!!!"));
     assertTrue(output.contains("World Price: 1000.25"));
   }
+
+  @Test
+  void testStringTemplateSelection() {
+    final StringTemplates st = new StringTemplates('$', '$');
+    final Map<String, Object> vars = new HashMap<>();
+    vars.put("x", context());
+
+    assertEquals("Customer", st.fromText("$x.contactType$").make(vars).render());
+    assertEquals("customer", st.fromText("$x.contactType.value$").make(vars).render());
+    assertEquals("Customer", st.fromText("$x.contactType.title$").make(vars).render());
+  }
 }
