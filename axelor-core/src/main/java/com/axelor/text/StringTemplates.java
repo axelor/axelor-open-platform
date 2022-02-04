@@ -237,7 +237,7 @@ public class StringTemplates implements Templates {
     }
 
     @Override
-    public Object getProperty(
+    public synchronized Object getProperty(
         Interpreter interp, ST self, Object o, Object property, String propertyName)
         throws STNoSuchPropertyException {
       if (o instanceof Context) return handle((Context) o, propertyName);
