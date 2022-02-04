@@ -1,0 +1,5 @@
+---
+title: Allow access to custom fields in string templates via dotted notation
+type: feature
+description: |
+  Example: `<SaleOrder.extraAttrs.myCustomField>`

@@ -187,6 +187,14 @@ public class StringTemplates implements Templates {
         return null;
       }
 
+      if (field.isJson()) {
+        final Context context =
+            entity.getId() != null
+                ? new Context(entity.getId(), klass)
+                : new Context(Mapper.toMap(entity), klass);
+        return context.get("$" + name);
+      }
+
       return format(field, field.get(entity));
     }
 
@@ -196,12 +204,12 @@ public class StringTemplates implements Templates {
         return context.get(key);
       }
 
-      final Object value = context.get(key);
       final Object jsonModel = context.get("jsonModel");
 
       // custom model?
       if (jsonModel instanceof String && MetaJsonRecord.class.isAssignableFrom(klass)) {
         final MetaJsonField field = findCustomField((String) jsonModel, key);
+        final Object value = context.get(key);
         return format(field, value);
       }
 
@@ -209,9 +217,15 @@ public class StringTemplates implements Templates {
 
       // custom field?
       if (field == null) {
+        final Object value = context.get(key);
         return format(findCustomField(klass, key), value);
       }
 
+      if (field.isJson()) {
+        return context.get("$" + key);
+      }
+
+      final Object value = context.get(key);
       return format(field, value);
     }
 
