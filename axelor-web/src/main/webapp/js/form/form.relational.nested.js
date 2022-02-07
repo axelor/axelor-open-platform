@@ -70,8 +70,9 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 
   function doEdit(record) {
     if (record && record.id > 0 && !record.$fetched) {
-      $scope.doRead(record.id).success(function(record){
-        originalEdit(record);
+      $scope.doRead(record.id).success(function(rec){
+        var updated = _.extend({}, rec, record);
+        originalEdit(updated);
       });
     } else {
       originalEdit(record);
