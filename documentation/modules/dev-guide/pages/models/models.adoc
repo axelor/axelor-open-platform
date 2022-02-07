@@ -29,7 +29,7 @@ Let's see with an example:
 ----
 <module name="contact" package="com.axelor.contact.db" />
 
-<entity name="Contact" sequential="true" cacheable="true">
+<entity name="Contact">
   <many-to-one name="title" ref="Title"/> <1>
   <string name="firstName" required="true" /> <2>
   <string name="lastName" required="true" />

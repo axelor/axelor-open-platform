@@ -17,7 +17,7 @@ The sequence can be defined like this:
 
   <sequence name="sale.order.seq" initial="1" increment="1" padding="5" prefix="SO"/>
 
-  <entity name="Order" sequential="true">
+  <entity name="Order">
     <many-to-one name="customer" ref="com.axelor.contact.db.Contact" required="true"/>
     <string name="name" sequence="sale.order.seq" />
     ...

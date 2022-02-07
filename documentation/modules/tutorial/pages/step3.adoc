@@ -47,7 +47,7 @@ re-generate code for only modified files.
 
   <module name="contact" package="com.axelor.contact.db" />
 
-  <entity name="Address" cacheable="true">
+  <entity name="Address">
     <many-to-one name="contact" ref="Contact" required="true" />
     <string name="street" required="true" max="255" />
     <string name="area" max="255" />
@@ -71,7 +71,7 @@ re-generate code for only modified files.
 
   <module name="contact" package="com.axelor.contact.db"/>
 
-  <entity name="Contact" sequential="true" cacheable="true">
+  <entity name="Contact">
     <many-to-one name="title" ref="Title"/> <1>
     <string name="firstName" required="true" /> <2>
     <string name="lastName" required="true" />
