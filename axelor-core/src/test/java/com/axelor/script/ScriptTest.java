@@ -34,6 +34,8 @@ import com.axelor.test.db.repo.TitleRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.persist.Transactional;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -58,7 +60,7 @@ public abstract class ScriptTest extends JpaTest {
 
   @Inject private ObjectMapper jsonMapper;
 
-  private Contact contact;
+  protected Contact contact;
 
   private Title title;
 
@@ -67,6 +69,7 @@ public abstract class ScriptTest extends JpaTest {
   public void prepare() {
     prepareCustomModels();
     prepareCustomFields();
+    prepareAnotherCustomFields();
     prepareDemoData();
     prepareMoreData();
   }
@@ -177,7 +180,60 @@ public abstract class ScriptTest extends JpaTest {
 
       field = new MetaJsonField();
       field.setName("birthDate");
+      field.setType("date");
+      fields.accept(field);
+
+      field = new MetaJsonField();
+      field.setName("guardian");
+      field.setType("many-to-one");
+      field.setTargetModel(Contact.class.getName());
+      fields.accept(field);
+
+      field = new MetaJsonField();
+      field.setName("favColor");
+      field.setType("string");
+      field.setSelection("colors");
+      fields.accept(field);
+
+      field = new MetaJsonField();
+      field.setName("isCustomer");
+      field.setType("boolean");
+      fields.accept(field);
+
+      field = new MetaJsonField();
+      field.setName("orderAmount");
+      field.setType("decimal");
+      field.setScale(2);
+      fields.accept(field);
+
+      field = new MetaJsonField();
+      field.setName("lastActivity");
       field.setType("datetime");
+      fields.accept(field);
+    }
+  }
+
+  private void prepareAnotherCustomFields() {
+    if (jsonFields
+            .all()
+            .filter("self.model = :model AND self.modelField = :field")
+            .bind("model", Contact.class.getName())
+            .bind("field", "anotherAttrs")
+            .count()
+        == 0) {
+
+      final Consumer<MetaJsonField> fields =
+          f -> {
+            f.setModel(Contact.class.getName());
+            f.setModelField("anotherAttrs");
+            jsonFields.save(f);
+          };
+
+      MetaJsonField field;
+
+      field = new MetaJsonField();
+      field.setName("nickName");
+      field.setType("string");
       fields.accept(field);
 
       field = new MetaJsonField();
@@ -298,6 +354,7 @@ public abstract class ScriptTest extends JpaTest {
     values.put("contactStatus", 1);
 
     values.put("attrs", getCustomerAttrsJson());
+    values.put("anotherAttrs", getCustomerAnotherAttrsJson());
 
     final List<Map<String, Object>> addresses = new ArrayList<>();
     final Map<String, Object> a1 = new HashMap<>();
@@ -333,8 +390,30 @@ public abstract class ScriptTest extends JpaTest {
 
     map.put("nickName", "Some Name");
     map.put("numerology", 2);
-    map.put("birthDate", LocalDateTime.now().minusYears(20));
+    map.put("birthDate", LocalDate.of(2020, 5, 22).toString());
     map.put("favColor", "red");
+    map.put("isCustomer", true);
+    map.put("orderAmount", new BigDecimal("1000.20"));
+    map.put("lastActivity", LocalDateTime.of(2021, 4, 29, 7, 57, 0));
+
+    final Map<String, Object> guardian = new HashMap<>();
+    guardian.put("id", all(Contact.class).fetchOne().getId());
+
+    map.put("guardian", guardian);
+
+    try {
+      return jsonMapper.writeValueAsString(map);
+    } catch (JsonProcessingException e) {
+      return null;
+    }
+  }
+
+  protected String getCustomerAnotherAttrsJson() {
+    final Map<String, Object> map = new HashMap<>();
+
+    map.put("nickName", "Some Custom Name");
+    map.put("numerology", 5);
+    map.put("favColor", "black");
 
     final Map<String, Object> guardian = new HashMap<>();
     guardian.put("id", all(Contact.class).fetchOne().getId());
