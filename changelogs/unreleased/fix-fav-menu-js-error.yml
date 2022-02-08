@@ -1,0 +1,6 @@
+---
+title: Fix JS error when having favorite menus with duplicate names
+type: fix
+description: |
+  In "Organize favorites", in the user changes a menu link, they may then add another menu with the same name,
+  causing AngularJS error tracking for unique names.
