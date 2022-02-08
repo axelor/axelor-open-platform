@@ -30,6 +30,7 @@ import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.repo.MetaJsonFieldRepository;
 import com.axelor.meta.db.repo.MetaJsonRecordRepository;
 import com.axelor.rpc.Context;
+import com.axelor.rpc.JsonContext;
 import com.axelor.script.ScriptBindings;
 import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
@@ -150,12 +151,13 @@ public class StringTemplates implements Templates {
       return getSelectionTitle(field.getSelection(), value);
     }
 
-    private MetaJsonField findCustomField(Class<?> entityClass, String name) {
+    private MetaJsonField findCustomField(Class<?> entityClass, String name, String modelField) {
       return Beans.get(MetaJsonFieldRepository.class)
           .all()
-          .filter("self.model = :model and self.name = :name and self.modelField = 'attrs'")
+          .filter("self.model = :model and self.name = :name and self.modelField = :modelField")
           .bind("model", entityClass.getName())
           .bind("name", name)
+          .bind("modelField", modelField)
           .fetchOne();
     }
 
@@ -175,24 +177,18 @@ public class StringTemplates implements Templates {
 
       // custom field?
       if (field == null) {
-        final MetaJsonField jsonField = findCustomField(klass, name);
+        final MetaJsonField jsonField = findCustomField(klass, name, "attrs");
         if (jsonField != null) {
           final Context ctx = new Context(entity.getId(), klass);
-          // unsaved entity?
-          if (entity.getId() == null) {
-            ctx.put("attrs", mapper.get(entity, "attrs"));
-          }
+          ctx.put("attrs", mapper.get(entity, "attrs"));
           return handle(ctx, name);
         }
         return null;
       }
 
       if (field.isJson()) {
-        final Context context =
-            entity.getId() != null
-                ? new Context(entity.getId(), klass)
-                : new Context(Mapper.toMap(entity), klass);
-        return context.get("$" + name);
+        final Context context = new Context(Mapper.toMap(entity), klass);
+        return new JsonContext(context, field, (String) context.get(name));
       }
 
       return format(field, field.get(entity));
@@ -204,12 +200,12 @@ public class StringTemplates implements Templates {
         return context.get(key);
       }
 
+      final Object value = context.get(key);
       final Object jsonModel = context.get("jsonModel");
 
       // custom model?
       if (jsonModel instanceof String && MetaJsonRecord.class.isAssignableFrom(klass)) {
         final MetaJsonField field = findCustomField((String) jsonModel, key);
-        final Object value = context.get(key);
         return format(field, value);
       }
 
@@ -217,15 +213,13 @@ public class StringTemplates implements Templates {
 
       // custom field?
       if (field == null) {
-        final Object value = context.get(key);
-        return format(findCustomField(klass, key), value);
+        return format(findCustomField(klass, key, "attrs"), value);
       }
 
       if (field.isJson()) {
-        return context.get("$" + key);
+        return new JsonContext(context, field, (String) value);
       }
 
-      final Object value = context.get(key);
       return format(field, value);
     }
 
@@ -235,11 +229,18 @@ public class StringTemplates implements Templates {
       return handle(context, name);
     }
 
+    private Object handle(JsonContext jsonContext, String name) {
+      MetaJsonField customField =
+          findCustomField(jsonContext.getContextClass(), name, jsonContext.getJsonField());
+      return format(customField, jsonContext.get(name));
+    }
+
     @Override
     public Object getProperty(
         Interpreter interp, ST self, Object o, Object property, String propertyName)
         throws STNoSuchPropertyException {
       if (o instanceof Context) return handle((Context) o, propertyName);
+      if (o instanceof JsonContext) return handle((JsonContext) o, propertyName);
       if (o instanceof MetaJsonRecord) return handle((MetaJsonRecord) o, propertyName);
       if (o instanceof Model) return handle((Model) o, propertyName);
       if (o instanceof Map) {
@@ -289,7 +290,14 @@ public class StringTemplates implements Templates {
           final ScriptBindings vars = new ScriptBindings(context);
           for (String name : names) {
             try {
-              template.add(name, vars.get(name));
+              Object value = vars.get(name);
+              if (context instanceof Context) {
+                Object jsonContext = buildJsonContext((Context) context, name);
+                if (jsonContext != null) {
+                  value = jsonContext;
+                }
+              }
+              template.add(name, value);
             } catch (Exception e) {
             }
           }
@@ -303,18 +311,25 @@ public class StringTemplates implements Templates {
 
     @Override
     public <T extends Model> Renderer make(T context) {
-      final Map<String, Object> ctx = new HashMap<>();
       if (context != null) {
-        Mapper mapper = Mapper.of(EntityHelper.getEntityClass(context));
-        for (String name : names) {
-          Property property = mapper.getProperty(name);
-          if (property != null) {
-            ctx.put(name, property.get(context));
-          }
-        }
+        return make(new Context(Mapper.toMap(context), EntityHelper.getEntityClass(context)));
       }
-      return make(ctx);
+      return make(new HashMap<>());
     }
+  }
+
+  private Object buildJsonContext(Context context, String propertyName) {
+    if (context == null || propertyName == null) {
+      return null;
+    }
+
+    Mapper mapper = Mapper.of(context.getContextClass());
+    Property property = mapper.getProperty(propertyName);
+    if (property == null || !property.isJson()) {
+      return null;
+    }
+
+    return new JsonContext(context, property, (String) context.get(propertyName));
   }
 
   private static final char DEFAULT_START_DELIMITER = '<';

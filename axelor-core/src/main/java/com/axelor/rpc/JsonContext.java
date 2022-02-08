@@ -141,6 +141,14 @@ public class JsonContext extends SimpleBindings {
     return fields.containsKey(name);
   }
 
+  public String getJsonField() {
+    return jsonField;
+  }
+
+  public Class<?> getContextClass() {
+    return context.getContextClass();
+  }
+
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public Object get(Object key) {
