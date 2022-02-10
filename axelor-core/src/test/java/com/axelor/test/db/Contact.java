@@ -127,6 +127,10 @@ public class Contact extends JpaModel {
   @Type(type = "json")
   private String attrs;
 
+  @Widget(title = "Another Attributes")
+  @Type(type = "json")
+  private String anotherAttrs;
+
   public Contact() {}
 
   public Contact(String firstName) {
@@ -337,6 +341,14 @@ public class Contact extends JpaModel {
 
   public void setAttrs(String attrs) {
     this.attrs = attrs;
+  }
+
+  public String getAnotherAttrs() {
+    return anotherAttrs;
+  }
+
+  public void setAnotherAttrs(String anotherAttrs) {
+    this.anotherAttrs = anotherAttrs;
   }
 
   @Override
