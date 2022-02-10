@@ -18,9 +18,10 @@ A form view is defined like this:
 
 [source,xml]
 -----
-<form name="contact-form" title="Contact"
-  model="com.axelor.contact.db.Contact"> <1>
-  <panel title="Overview"> <2>
+<form name="contact-form"
+      title="Contact"
+      model="com.axelor.contact.db.Contact"> <1>
+  <panel name="overviewPanel" title="Overview"> <2>
     <field name="fullName" readonly="false"> <3>
       <editor> <4>
         <field name="title" colSpan="3"/>
@@ -40,10 +41,10 @@ A form view is defined like this:
       ]]></viewer>
     </field>
   </panel>
-  <panel title="About me">
+  <panel name="aboutMePanel" title="About me">
       <field name="notes" showTitle="false" colSpan="12"/>
   </panel>
-  <panel-related field="addresses"> <6>
+  <panel-related name="addressesPanel" field="addresses"> <6>
       <field name="street"/>
       <field name="area"/>
       <field name="city"/>
@@ -51,7 +52,7 @@ A form view is defined like this:
       <field name="zip"/>
       <field name="country"/>
   </panel-related>
-  <panel sidebar="true"> <7>
+  <panel name="sidebarPanel" sidebar="true"> <7>
     <field name="createdOn"/>
     <field name="createdBy"/>
     <field name="updatedOn"/>

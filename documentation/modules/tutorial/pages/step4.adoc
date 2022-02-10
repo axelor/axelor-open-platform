@@ -18,17 +18,19 @@ we'll see how to create `grid` and `form` views for the `Contact` model:
   xsi:schemaLocation="http://axelor.com/xml/ns/object-views
   http://axelor.com/xml/ns/object-views/object-views_6.0.xsd">
 
-  <grid name="contact-grid" title="Contacts"
-    model="com.axelor.contact.db.Contact"> <1>
+  <grid name="contact-grid"
+        title="Contacts"
+        model="com.axelor.contact.db.Contact"> <1>
     <field name="fullName" />
     <field name="email" />
     <field name="phone" />
     <field name="dateOfBirth" />
   </grid>
 
-  <form name="contact-form" title="Contact"
-    model="com.axelor.contact.db.Contact"> <2>
-    <panel title="Overview"> <3>
+  <form name="contact-form"
+        title="Contact"
+        model="com.axelor.contact.db.Contact"> <2>
+    <panel name="overviewPanel" title="Overview"> <3>
       <field name="fullName" readonly="false">
         <editor> <4>
           <field name="title" colSpan="3"/>
@@ -48,11 +50,12 @@ we'll see how to create `grid` and `form` views for the `Contact` model:
         ]]></viewer>
       </field>
     </panel>
-    <panel title="About me">
+    <panel name="aboutMePanel" title="About me">
         <field name="notes" showTitle="false" colSpan="12"/>
     </panel>
-    <panel-related field="addresses" <6>
-      form-view="address-form-popup"> <7>
+    <panel-related name="addressesPanel
+                   field="addresses" <6>
+                   form-view="address-form-popup"> <7>
         <field name="street"/>
         <field name="area"/>
         <field name="city"/>
@@ -60,7 +63,7 @@ we'll see how to create `grid` and `form` views for the `Contact` model:
         <field name="zip"/>
         <field name="country"/>
     </panel-related>
-    <panel sidebar="true"> <8>
+    <panel name="sidePanel" sidebar="true"> <8>
       <field name="createdOn"/>
       <field name="createdBy"/>
       <field name="updatedOn"/>
@@ -68,8 +71,9 @@ we'll see how to create `grid` and `form` views for the `Contact` model:
     </panel>
   </form>
 
-  <form name="address-form-popup" title="Address"
-    model="com.axelor.contact.db.Address">
+  <form name="address-form-popup"
+        title="Address"
+        model="com.axelor.contact.db.Address">
     <panel title="Overview">
       <field name="street" />
       <field name="area" />

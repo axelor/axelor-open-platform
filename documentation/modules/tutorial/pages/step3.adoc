@@ -21,6 +21,7 @@ re-generate code for only modified files.
 [source,xml]
 .axelor-contact/src/main/resources/domains/Title.xml
 ----
+<?xml version="1.0" encoding="UTF-8"?>
 <domain-models xmlns="http://axelor.com/xml/ns/domain-models"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
