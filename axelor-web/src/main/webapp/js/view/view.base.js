@@ -747,9 +747,9 @@ ui.directive('uiViewCustomize', ['NavService', function(NavService) {
             "<i class='fa fa-wrench'></i>" +
           "</a>" +
           "<ul class='dropdown-menu pull-right'>" +
-            "<li><a ng-click='onShowView()' ng-show='hasViewID()'>View...</a></li>" +
-            "<li><a ng-click='onShowModel()' ng-show='hasModelID()'>Model...</a></li>" +
-            "<li><a ng-click='onShowAction()' ng-show='hasActionID()'>Action...</a></li>" +
+            "<li><a ng-click='onShowView()' ng-show='hasViewID()' x-translate>View…</a></li>" +
+            "<li><a ng-click='onShowModel()' ng-show='hasModelID()' x-translate>Model…</a></li>" +
+            "<li><a ng-click='onShowAction()' ng-show='hasActionID()' x-translate>Action…</a></li>" +
           "</ul>" +
         "</li>" +
       "</ul>"
