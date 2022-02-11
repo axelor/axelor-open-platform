@@ -26,6 +26,8 @@ import com.axelor.common.reflections.Reflections;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaStore;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Sets;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -225,19 +227,25 @@ public final class ViewWatcher {
 
     try {
       final String pathStr = path.toString();
-      if (pathStr.endsWith(".jar")) {
+      if (pathStr.toLowerCase().endsWith(".jar")) {
         // resources in jar
         fs = FileSystems.newFileSystem(path, null);
         propsPath = fs.getPath("module.properties");
       } else {
-        final String subPathStr = Paths.get("/WEB-INF/classes").toString();
-        final int index = pathStr.indexOf(subPathStr);
-        if (index >= 0) {
-          // resources on root module
-          propsPath =
-              Paths.get(pathStr.substring(0, index))
-                  .resolve(Paths.get("WEB-INF", "classes", "module.properties"));
-        } else {
+        for (final String location : ImmutableList.of("WEB-INF/classes", "main")) {
+          final String subPathStr = Paths.get('/' + location).toString();
+          final int index = pathStr.indexOf(subPathStr);
+          if (index >= 0) {
+            final Path current =
+                Paths.get(pathStr.substring(0, index))
+                    .resolve(Paths.get(location, "module.properties"));
+            if (Files.exists(current)) {
+              propsPath = current;
+              break;
+            }
+          }
+        }
+        if (propsPath == null) {
           throw new IllegalArgumentException("Unable to find module name of file " + path.toFile());
         }
       }

@@ -1,0 +1,3 @@
+---
+title: Fix view hotswap when running embedded Tomcat
+type: fix
