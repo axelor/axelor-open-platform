@@ -27,7 +27,7 @@ import com.axelor.i18n.I18nBundle;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaStore;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +46,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -81,7 +82,6 @@ public final class ViewWatcher {
   private final Map<WatchKey, Path> keys = new HashMap<>();
   private final List<ViewChangeEvent> pending = new ArrayList<>();
 
-  private static final long UPDATE_DELAY = 300;
   private Set<String> pendingModules;
   private Set<Path> pendingPaths;
   private ScheduledExecutorService scheduler;
@@ -91,6 +91,32 @@ public final class ViewWatcher {
   private boolean running;
 
   private BiConsumer<WatchEvent.Kind<?>, Path> watchEventHandler;
+
+  private static final long UPDATE_DELAY =
+      Optional.ofNullable(System.getProperty("axelor.view.watch.delay"))
+          .map(Long::valueOf)
+          .orElse(300L);
+
+  private static final Set<WatchEvent.Kind<Path>> WATCHED_KINDS =
+      Optional.ofNullable(System.getProperty("axelor.view.watch.kinds"))
+          .map(
+              property ->
+                  Arrays.stream(property.split("\\s*,\\s*"))
+                      .map(
+                          name -> {
+                            switch (name) {
+                              case "ENTRY_CREATE":
+                                return ENTRY_CREATE;
+                              case "ENTRY_MODIFY":
+                                return ENTRY_MODIFY;
+                              case "ENTRY_DELETE":
+                                return ENTRY_DELETE;
+                              default:
+                                throw new IllegalArgumentException(name);
+                            }
+                          })
+                      .collect(Collectors.toSet()))
+          .orElseGet(() -> ImmutableSet.of(ENTRY_CREATE));
 
   private ViewWatcher() {}
 
@@ -202,11 +228,9 @@ public final class ViewWatcher {
   }
 
   private void handlePath(WatchEvent.Kind<?> kind, Path path) {
-    if (kind != ENTRY_CREATE) {
-      return;
+    if (WATCHED_KINDS.contains(kind)) {
+      handlePath(path);
     }
-
-    handlePath(path);
   }
 
   private void handlePath(Path path) {

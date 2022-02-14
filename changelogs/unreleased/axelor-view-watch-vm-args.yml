@@ -1,0 +1,27 @@
+---
+title: Add `axelor.view.watch.delay` and `axelor.view.watch.kinds` VM arguments
+type: feature
+description: |
+  Defaults are as follows (working on Eclipse/IntelliJ on Linux):
+
+  ```
+  -Daxelor.view.watch.kinds=ENTRY_CREATE
+  -Daxelor.view.watch.delay=300
+  ```
+  
+  `axelor.view.watch.kinds` is a list of comma-separated strings of the following values:
+  `ENTRY_CREATE`, `ENTRY_MODIFY`, `ENTRY_DELETE`.
+
+  `axelor.view.watch.delay` is the update delay in milliseconds.
+
+  Varying development environments may require special configuration in
+  order to have view hotswap working.
+
+  For example, on Windows, only `ENTRY_MODIFY` events might be triggered
+  in some cases. Moreover, there may be a big gap between those events,
+  requiring to increase the update delay. So one might want to use:
+
+  ```
+  -Daxelor.view.watch.kinds=ENTRY_CREATE,ENTRY_MODIFY
+  -Daxelor.view.watch.delay=4000
+  ```
