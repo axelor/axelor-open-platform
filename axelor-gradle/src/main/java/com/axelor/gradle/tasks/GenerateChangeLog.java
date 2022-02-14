@@ -30,6 +30,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.gradle.api.DefaultTask;
@@ -99,7 +100,7 @@ public class GenerateChangeLog extends DefaultTask {
 
   private String generate(List<ChangelogEntry> entries) {
     ReleaseProcessor processor = new ReleaseProcessor();
-    Release release = processor.process(entries, version);
+    Release release = processor.process(entries, version, LocalDate.now());
 
     ReleaseGenerator generator = new ReleaseGenerator();
     return generator.generate(release);

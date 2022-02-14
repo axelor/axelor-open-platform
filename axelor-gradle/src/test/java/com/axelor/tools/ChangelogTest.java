@@ -32,7 +32,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -44,15 +43,12 @@ public class ChangelogTest {
   @Test
   public void generateChangelogTest() throws URISyntaxException, IOException {
     ReleaseProcessor processor = new ReleaseProcessor();
-    Release release = processor.process(getEntries(), "1.0.0");
+    Release release = processor.process(getEntries(), "1.0.0", LocalDate.of(2020, 1, 10));
 
     File outputFile =
         Paths.get(ResourceUtils.getResource("changelogs/EXPECTED_CHANGELOG.md").toURI()).toFile();
     String output =
         com.google.common.io.Files.asCharSource(outputFile, StandardCharsets.UTF_8).read();
-    output =
-        output.replace(
-            "XXXX-XX-XX", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
     Assert.assertEquals(output, new ReleaseGenerator().generate(release));
   }
