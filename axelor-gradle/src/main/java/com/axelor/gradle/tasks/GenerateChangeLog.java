@@ -132,7 +132,7 @@ public class GenerateChangeLog extends DefaultTask {
     getLogger().lifecycle("Clean up unreleased change log entries");
     for (File file : getFiles()) {
       try {
-        getLogger().lifecycle("Deleteting {}", file);
+        getLogger().lifecycle("Deleting {}", file);
         Files.delete(file.toPath());
       } catch (IOException ex) {
         throw new GradleException("Could not delete file: " + file, ex);

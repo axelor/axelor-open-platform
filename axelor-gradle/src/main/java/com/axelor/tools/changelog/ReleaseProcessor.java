@@ -62,7 +62,7 @@ public class ReleaseProcessor {
         changelogEntries.stream().filter(entry -> entry.getTitle() == null).findFirst();
     if (entryWithNullTitle.isPresent()) {
       throw new IllegalArgumentException(
-          "Title cannot be null in changelog entry: " + entryWithNullType.get());
+          "Title cannot be null in changelog entry: " + entryWithNullTitle.get());
     }
   }
 }

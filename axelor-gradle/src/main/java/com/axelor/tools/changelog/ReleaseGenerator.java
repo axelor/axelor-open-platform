@@ -68,7 +68,8 @@ public class ReleaseGenerator {
       content.append(MessageFormat.format("* {0}", entry.getTitle()));
       if (!StringUtils.isEmpty(entry.getDescription())) {
         content
-            .append(NEW_LINE).append(NEW_LINE)
+            .append(NEW_LINE)
+            .append(NEW_LINE)
             .append(new EntryDescriptionGenerator(entry.getDescription()).generate());
       }
       content.append(NEW_LINE);
