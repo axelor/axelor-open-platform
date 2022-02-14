@@ -1,0 +1,19 @@
+---
+title: Add action to select a `panel` in `panel-tabs`
+description: |
+  Example:
+
+  ```xml
+    <form ...>
+     ...
+     <panel-tabs>
+      <panel title="One" name="t1"></panel>
+      <panel title="Two" name="t2"></panel>
+     </panel-tabs>
+    </form>
+
+    <action-attrs ...>
+      <attribute name="active" for="t1" expr="true" />
+    </action-attrs>
+  ```
+type: feature
