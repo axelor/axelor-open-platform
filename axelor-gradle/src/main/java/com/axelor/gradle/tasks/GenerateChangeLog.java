@@ -122,7 +122,7 @@ public class GenerateChangeLog extends DefaultTask {
     changelogFile.delete();
 
     try (FileOutputStream fos = new FileOutputStream(changelogFile)) {
-      fos.write((newChangelog + contentBuilder.toString()).getBytes());
+      fos.write((newChangelog + System.lineSeparator() + contentBuilder.toString()).getBytes());
       fos.flush();
     }
   }

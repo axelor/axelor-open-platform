@@ -65,16 +65,14 @@ public class ReleaseGenerator {
     }
     content.append("#### ").append(type.getValue()).append(NEW_LINE).append(NEW_LINE);
     for (ChangelogEntry entry : entries) {
-      content.append(MessageFormat.format("* {0}", entry.getTitle())).append(NEW_LINE);
+      content.append(MessageFormat.format("* {0}", entry.getTitle()));
       if (!StringUtils.isEmpty(entry.getDescription())) {
         content
-            .append(NEW_LINE)
-            .append(new EntryDescriptionGenerator(entry.getDescription()).generate())
-            .append(NEW_LINE)
-            .append(NEW_LINE);
+            .append(NEW_LINE).append(NEW_LINE)
+            .append(new EntryDescriptionGenerator(entry.getDescription()).generate());
       }
+      content.append(NEW_LINE);
     }
-    content.append(NEW_LINE);
   }
 
   private void appendHeader(StringBuilder content, Release release) {
