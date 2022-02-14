@@ -30,6 +30,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.gradle.api.DefaultTask;
@@ -99,7 +100,7 @@ public class GenerateChangeLog extends DefaultTask {
 
   private String generate(List<ChangelogEntry> entries) {
     ReleaseProcessor processor = new ReleaseProcessor();
-    Release release = processor.process(entries, version);
+    Release release = processor.process(entries, version, LocalDate.now());
 
     ReleaseGenerator generator = new ReleaseGenerator();
     return generator.generate(release);
@@ -122,7 +123,7 @@ public class GenerateChangeLog extends DefaultTask {
     changelogFile.delete();
 
     try (FileOutputStream fos = new FileOutputStream(changelogFile)) {
-      fos.write((newChangelog + contentBuilder.toString()).getBytes());
+      fos.write((newChangelog + System.lineSeparator() + contentBuilder.toString()).getBytes());
       fos.flush();
     }
   }
@@ -131,7 +132,7 @@ public class GenerateChangeLog extends DefaultTask {
     getLogger().lifecycle("Clean up unreleased change log entries");
     for (File file : getFiles()) {
       try {
-        getLogger().lifecycle("Deleteting {}", file);
+        getLogger().lifecycle("Deleting {}", file);
         Files.delete(file.toPath());
       } catch (IOException ex) {
         throw new GradleException("Could not delete file: " + file, ex);

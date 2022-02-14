@@ -28,28 +28,24 @@ import java.util.stream.Collectors;
 
 public class ReleaseProcessor {
 
-  public Release process(Collection<ChangelogEntry> changelogEntries, String version) {
+  public Release process(
+      Collection<ChangelogEntry> changelogEntries, String version, LocalDate date) {
 
     Objects.requireNonNull(version);
+    Objects.requireNonNull(date);
     Objects.requireNonNull(changelogEntries);
 
     validate(changelogEntries);
 
     Release release = new Release();
     release.setVersion(version);
-    release.setDate(getCurrentDate());
+    release.setDate(date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
     Map<EntryType, List<ChangelogEntry>> entriesGroupedByType =
         changelogEntries.stream().collect(Collectors.groupingBy(ChangelogEntry::getType));
     release.setEntries(entriesGroupedByType);
 
     return release;
-  }
-
-  private static String getCurrentDate() {
-    LocalDate today = LocalDate.now();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    return today.format(formatter);
   }
 
   private void validate(Collection<ChangelogEntry> changelogEntries) {
@@ -66,7 +62,7 @@ public class ReleaseProcessor {
         changelogEntries.stream().filter(entry -> entry.getTitle() == null).findFirst();
     if (entryWithNullTitle.isPresent()) {
       throw new IllegalArgumentException(
-          "Title cannot be null in changelog entry: " + entryWithNullType.get());
+          "Title cannot be null in changelog entry: " + entryWithNullTitle.get());
     }
   }
 }
