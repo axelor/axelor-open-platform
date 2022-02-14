@@ -100,6 +100,7 @@ function updateValues(source, target, itemScope, formScope) {
   }
 
   var changed = false;
+  var selectedChanged = false;
 
   forEach(source, function(value, key) {
     var dest;
@@ -119,7 +120,14 @@ function updateValues(source, target, itemScope, formScope) {
           var found_ = _.extend({}, found);
           var changed_ = updateValues(item, found_);
           changed = changed || changed_;
-          return changed_ ? found_ : found;
+          var result = changed_ ? found_ : found;
+          if (item.selected !== result.selected) {
+            result.selected = item.selected;
+            selectedChanged = true;
+          }
+          return result;
+        } else if (item.selected) {
+          selectedChanged = true;
         }
         return item;
       });
@@ -143,6 +151,9 @@ function updateValues(source, target, itemScope, formScope) {
 
     if (!equals(oldValue, newValue)) {
       changed = true;
+      target[key] = newValue;
+    } else if (selectedChanged) {
+      // Update even if only selected flags have changed
       target[key] = newValue;
     }
   });
