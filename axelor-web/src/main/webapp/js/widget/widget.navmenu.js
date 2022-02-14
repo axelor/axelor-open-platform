@@ -365,7 +365,7 @@ ui.directive('navMenuFav', function() {
       "<ul class='dropdown-menu'>" +
         "<li><a href='' ng-click='addFav()' x-translate>Add to favorites...</a></li>" +
         "<li class='divider'></li>" +
-        "<li ng-repeat='item in items track by item.name'><a ng-href='#{{item.link}}'>{{item.title}}</a></li>" +
+        "<li ng-repeat='item in items'><a ng-href='#{{item.link}}'>{{item.title}}</a></li>" +
         "<li class='divider'></li>" +
         "<li><a href='' ng-click='manageFav()' x-translate>Organize favorites...</a></li>" +
       "</ul>"
