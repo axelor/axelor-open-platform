@@ -98,11 +98,9 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 
     if ($scope.editorCanSave) {
       items = items.map(function (item) {
-        var id = item.id;
         var version = item.version || item.$version || 0;
-        var result = _.pick(item, $scope.selectFields());
+        var result = _.omit(item, 'version');
         return _.extend(result, {
-          id: id,
           $version: version,
           $fetched: false
         });
