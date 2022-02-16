@@ -112,8 +112,10 @@ function updateValues(source, target, itemScope, formScope) {
     if (isArray(value)) {
       dest = target[key] || [];
       newValue = _.map(value, function(item) {
-        var found = _.find(dest, function(v){
-          return item.id && v.id === item.id;
+        var found = _.find(dest, item.id > 0 ? function (v) {
+          return v.id === item.id;
+        } : function (v) {
+          return equals(v, item);
         });
         if (_.has(item, "version") && item.id) item.$fetched = true;
         if (found) {
