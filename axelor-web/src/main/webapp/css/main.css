@@ -1059,3 +1059,12 @@ header .navbar .nav .dropdown-menu > li.quick-menu-item a {
 ul.dropdown-menu.quick-menu {
   width: max-content;
 }
+
+.report-table th.integer,
+.report-table th.long,
+.report-table th.decimal,
+.report-table td.integer,
+.report-table td.long,
+.report-table td.decimal {
+  text-align: right;
+}

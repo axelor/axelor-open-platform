@@ -194,7 +194,8 @@ ui.directive('reportTable',  function() {
           var field = _.findWhere(schema.items, { name: name }) || {};
           var col = _.extend({}, field, field.widgetAttrs, {
             name: name,
-            title: field.title || field.autoTitle || _.humanize(name)
+            title: field.title || field.autoTitle || _.humanize(name),
+            type: field.selection ? 'selection' : field.serverType || field.type
           });
           fields[name] = col;
           cols.push(col);
@@ -228,16 +229,11 @@ ui.directive('reportTable',  function() {
           return _t('value:' + value);
         }
 
-        var type;
-
         if (field.selection) {
-          type = 'selection';
           value = '' + value;
-        } else {
-          type = field.serverType || field.type;
         }
 
-        var formatter = ui.formatters[type];
+        var formatter = ui.formatters[field.type];
 
         if (formatter) {
           return formatter(field, value);
@@ -268,17 +264,17 @@ ui.directive('reportTable',  function() {
       "<table class='table table-striped'>" +
         "<thead>" +
           "<tr>" +
-            "<th ng-repeat='col in cols'>{{col.title | t}}</th>" +
+            "<th ng-repeat='col in cols' ng-class='col.type'>{{col.title | t}}</th>" +
           "</tr>" +
         "</thead>" +
         "<tbody>" +
           "<tr ng-repeat='row in data'>" +
-            "<td ng-repeat='col in cols'>{{format(row[col.name], col.name)}}</td>" +
+            "<td ng-repeat='col in cols' ng-class='col.type'>{{format(row[col.name], col.name)}}</td>" +
           "</tr>" +
         "</tbody>" +
         "<tfoot ng-if='sums.length'>" +
           "<tr>" +
-            "<td ng-repeat='col in cols'>{{sum(col.name)}}</td>" +
+            "<td ng-repeat='col in cols' ng-class='col.type'>{{sum(col.name)}}</td>" +
           "</tr>" +
         "</tfoot>" +
       "</table>"
