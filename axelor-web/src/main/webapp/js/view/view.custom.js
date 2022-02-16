@@ -194,7 +194,7 @@ ui.directive('reportTable',  function() {
           var field = _.findWhere(schema.items, { name: name }) || {};
           var col = _.extend({}, field, field.widgetAttrs, {
             name: name,
-            title: _.humanize(name)
+            title: field.title || field.autoTitle || _.humanize(name)
           });
           fields[name] = col;
           cols.push(col);
@@ -210,7 +210,7 @@ ui.directive('reportTable',  function() {
             unwatch();
             var first = _.first(data) || {};
             var names = _.keys(first).filter(function (name) { return name !== '$$hashKey'; });
-            makeColumns(names.sort());
+            makeColumns(names);
           }
         });
       }
@@ -221,13 +221,28 @@ ui.directive('reportTable',  function() {
         if (value === null || value === undefined) {
           return "";
         }
-        var field = fields[name];
-        if (field && field.scale) {
-          var val = +(value);
-          if (_.isNumber(val)) {
-            return val.toFixed(field.scale);
-          }
+
+        var field = fields[name] || {};
+
+        if (field.translatable) {
+          return _t('value:' + value);
         }
+
+        var type;
+
+        if (field.selection) {
+          type = 'selection';
+          value = '' + value;
+        } else {
+          type = field.serverType || field.type;
+        }
+
+        var formatter = ui.formatters[type];
+
+        if (formatter) {
+          return formatter(field, value);
+        }
+
         return value;
       };
 
@@ -253,7 +268,7 @@ ui.directive('reportTable',  function() {
       "<table class='table table-striped'>" +
         "<thead>" +
           "<tr>" +
-            "<th ng-repeat='col in cols'>{{col.title}}</th>" +
+            "<th ng-repeat='col in cols'>{{col.title | t}}</th>" +
           "</tr>" +
         "</thead>" +
         "<tbody>" +
