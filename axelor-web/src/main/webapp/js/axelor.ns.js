@@ -111,7 +111,7 @@
         value = value.replace(/<\!\-\-.*?\-\-\>/g, ''); // remove comments which might be interpreted as xml
       }
 
-      return attr.indexOf('xss-on') === 0 || (value && value.match(/^javascript\:/i));
+      return _.startsWith(attr, "on") || (value && value.match(/^javascript\:/i));
     });
 
     _.each(attrs, function (a) {
@@ -124,7 +124,8 @@
     if (typeof html !== 'string') {
       return html;
     }
-    var value = "<div>" + html.replace(/(\s)(on(?:\w+))(\s*=)/, '$1xss-$2$3') + "</div>";
+
+    var value = "<div>" + html + "</div>";
     var elems = $($.parseHTML(value, null, false));
 
     elems.find('*').each(function() {
