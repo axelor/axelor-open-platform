@@ -48,7 +48,6 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -67,9 +66,6 @@ public class MetaFiles {
       Paths.get(AppSettings.get().get(AvailableAppSettings.FILE_UPLOAD_DIR, DEFAULT_UPLOAD_PATH));
 
   private static final String UPLOAD_NAME_PATTERN_AUTO = "auto";
-  private static final String UPLOAD_NAME_PATTERN =
-      AppSettings.get()
-          .get(AvailableAppSettings.FILE_UPLOAD_FILENAME_PATTERN, UPLOAD_NAME_PATTERN_AUTO);
 
   private static final CopyOption[] COPY_OPTIONS = {
     StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES
@@ -297,31 +293,33 @@ public class MetaFiles {
   }
 
   private String getTargetName(String fileName) {
-    if (UPLOAD_NAME_PATTERN.equals(UPLOAD_NAME_PATTERN_AUTO)) {
+    String targetName =
+        AppSettings.get()
+            .get(AvailableAppSettings.FILE_UPLOAD_FILENAME_PATTERN, UPLOAD_NAME_PATTERN_AUTO);
+
+    if (targetName.equals(UPLOAD_NAME_PATTERN_AUTO)) {
       return fileName;
     }
 
-    LocalDate date = LocalDate.now();
-    String targetName = UPLOAD_NAME_PATTERN;
-
-    if (targetName.indexOf("{A}") > -1) {
+    if (targetName.contains("{A}")) {
       targetName = targetName.replace("{A}", fileName.substring(0, 1).toUpperCase());
     }
-    if (targetName.indexOf("{AA}") > -1) {
+    if (targetName.contains("{AA}")) {
       targetName =
           targetName.replace(
               "{AA}", fileName.substring(0, Math.min(2, fileName.length())).toUpperCase());
     }
-    if (targetName.indexOf("{AAA}") > -1) {
+    if (targetName.contains("{AAA}")) {
       targetName =
           targetName.replace(
               "{AAA}", fileName.substring(0, Math.min(3, fileName.length())).toUpperCase());
     }
 
-    targetName = targetName.replace("{year}", "" + date.getYear());
-    targetName = targetName.replace("{month}", "" + date.getMonthValue());
-    targetName = targetName.replace("{day}", "" + date.getDayOfMonth());
-    targetName = targetName.replace("{name}", fileName);
+    if (targetName.contains("{name}")) {
+      targetName = targetName.replace("{name}", fileName);
+    } else {
+      targetName = Paths.get(targetName, fileName).toString();
+    }
 
     return targetName;
   }
