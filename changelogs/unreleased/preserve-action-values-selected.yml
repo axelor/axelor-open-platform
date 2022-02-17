@@ -1,0 +1,6 @@
+---
+title: Preserve selected flags from action values
+type: fix
+description: |
+  Preserve selected flags when using `response.setValue(field, collection)`
+  with collection of maps without version field.

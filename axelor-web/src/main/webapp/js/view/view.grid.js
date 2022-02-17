@@ -158,11 +158,20 @@ function GridViewCtrl($scope, $element) {
   };
 
   $scope.setItems = function(items, pageInfo) {
+    // Preserve selected flags from action values
+    _.each($scope.getValue && $scope.getValue(), function (item) {
+      if (item.selected !== undefined) {
+        var found = _.findWhere(items, {id: item.id});
+        if (found) {
+          found.selected = item.selected;
+        }
+      }
+    });
 
     var dataView = $scope.dataView;
     var selection = $scope.selection || [];
     var selectionIds = dataView.mapRowsToIds(selection);
-    var hasSelected = _.some(items, function (item) { return item.selected; });
+    var hasSelected = _.some(items, function (item) { return item.selected !== undefined; });
     var allFetched = _.all(items, function (item) { return item.$fetched; });
     var syncSelection = function () {
       if (dataView.$syncSelection) {
