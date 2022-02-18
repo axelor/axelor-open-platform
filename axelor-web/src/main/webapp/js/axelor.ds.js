@@ -477,11 +477,16 @@
     function processWidget(field) {
       var attrs = {};
       _.each(field.widgetAttrs || {}, function (value, name) {
+        var initialValue = value;
         if (value === "true") value = true;
         if (value === "false") value = false;
         if (value === "null") value = null;
         if (/^(-)?\d+$/.test(value)) value = +(value);
         if (name === "widget" && value) value = _.chain(value).underscored().dasherize().value();
+        if (['validIf', 'hideIf', 'showIf', 'readonlyIf', 'requiredIf', 'collapseIf'].indexOf(name) !== -1) {
+          // keep a string type for expr, see form.widget.js#L291
+          value = initialValue;
+        }
         attrs[_.str.camelize(name)] = value;
       });
       if (field.serverType) {

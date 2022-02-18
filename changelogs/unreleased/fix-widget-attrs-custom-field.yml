@@ -1,0 +1,3 @@
+---
+title: Fix js condition for custom model not evaluated when boolean is provided
+type: fix
