@@ -1240,6 +1240,7 @@ ui.directive('uiFilterBox', function() {
         domains: [],
         customs: []
       };
+      $scope.handler.current = current;
 
       function acceptCustom(filter) {
 

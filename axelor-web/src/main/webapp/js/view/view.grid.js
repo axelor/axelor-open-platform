@@ -613,6 +613,15 @@ function GridViewCtrl($scope, $element) {
       options.archived = advance.archived;
     }
 
+    var current = $scope.current || {};
+    if (!_.isEmpty(current.domains)) {
+      criteria._domains = criteria._domains || [];
+      _.each(current.domains, function (currentDomain) {
+        if (!_.findWhere(criteria._domains, {domain: currentDomain.domain})) {
+          criteria._domains.push(currentDomain);
+        }
+      });
+    }
     return ds.search(options).then(fixPage);
   };
 
