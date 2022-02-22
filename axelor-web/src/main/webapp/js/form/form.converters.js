@@ -390,4 +390,21 @@
     return value;
   };
 
+  // Returns a copy of list sorted in lexicographic order, running each value through iteratee
+  function sortBy(list, iteratee) {
+    var locale = getBrowserLocale(); // Use getPreferredLocale in v6
+    var localeCompare = Intl.Collator(locale).compare;
+    var result = (list || []).slice();
+
+    function toKey(key) { return (key || '').toLocaleString(locale).toLocaleLowerCase(locale); }
+    var getKey = _.isFunction(iteratee) ?
+      function (value) { return toKey(iteratee(value)); } :
+      function (value) { return toKey(value[iteratee]); };
+
+    return result.sort(function (a, b) {
+      return localeCompare(getKey(a), getKey(b));
+    });
+  }
+
+  axelor.sortBy = sortBy;
 })();

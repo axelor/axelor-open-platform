@@ -244,7 +244,7 @@ ui.directive('uiUpdateForm',  function () {
         var promise = ViewService.getFields(handler._model);
         promise.success(function (fields) {
           $scope.fields = findFields(fields, view.items);
-          $scope.options = _.sortBy(_.values($scope.fields), 'title');
+          $scope.options = axelor.sortBy(_.values($scope.fields), 'title');
           $scope.record = {};
         });
       });

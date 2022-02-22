@@ -346,13 +346,7 @@ ui.directive('uiFilterItem', function() {
         if (_.isEmpty(fields)) return;
         unwatch();
         var options = _.values(fields);
-        var locale = ui.getBrowserLocale(); // v6: use ui.getPreferredLocale
-        function getKey(x) { return (x.title || '').toLocaleLowerCase(locale); }
-        var compare = Intl.Collator(locale).compare;
-        options.sort(function (a, b) {
-          return compare(getKey(a), getKey(b));
-        });
-        scope.options = options;
+        scope.options = axelor.sortBy(options, 'title');
       }, true);
     },
     template:
@@ -618,7 +612,7 @@ ui.directive('uiFilterContext', function () {
             contextFields[name] = fields[name];
           }
         }
-        $scope.contextFields = _.sortBy(_.values(contextFields), function (x) { return (x.title||'').toLowerCase(); });
+        $scope.contextFields = axelor.sortBy(_.values(contextFields), 'title');
         $scope.remove();
       };
     }],
