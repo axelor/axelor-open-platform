@@ -482,7 +482,7 @@
         if (name === "widget" && value) val = _.chain(value).underscored().dasherize().value();
         else if (['exclusive', 'showBars', 'canCopy', 'lite', 'labels', 'big', 'seconds', 'canSuggest',
           'canReload', 'callOnSave', 'showTitle', 'editable', 'canMove', 'showBars', 'canExport', 'showFrame',
-          'sidebar', 'stacked', 'attached', 'required', 'hidden', 'readonly'].indexOf(name) !== -1) {
+          'sidebar', 'stacked', 'attached', 'required', 'hidden', 'readonly', 'canCollapse'].indexOf(name) !== -1) {
           val = _.toBoolean(value);
         }
         else if (['rowSpan', 'cols', 'limit', 'precision', 'scale', 'searchLimit', 'colOffset', 'colSpan',
