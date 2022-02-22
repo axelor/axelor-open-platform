@@ -1115,9 +1115,34 @@ Grid.prototype._doInit = function(view) {
     }
   });
 
+  function combineCriteria(criteria, other) {
+    if (_.isEmpty(criteria.criteria)) {
+      return other;
+    }
+    criteria.criteria = [{
+      operator: criteria.operator,
+      criteria: criteria.criteria
+    }, {
+      operator: other.operator,
+      criteria: other.criteria
+    }];
+    criteria.operator = "and";
+    return criteria;
+  }
+
   scope.$on("on:advance-filter", function (e, criteria) {
     if (e.targetScope === handler) {
-      that.advanceFilter = criteria;
+      that.advanceFilter = angular.copy(criteria);
+      var current = e.targetScope.current || {};
+      // If filter was applied live, custom filters are already combined into criteria
+      if (!current.live && !_.isEmpty(current.customs)) {
+        var customCriteria = {operator: 'and'};
+        current.customs
+          .map(function (custom) { return custom.criteria; } )
+          .filter(function (custom) { return !_.isEmpty(custom); })
+          .forEach(function (custom) { customCriteria = combineCriteria(customCriteria, custom); });
+        that.advanceFilter = combineCriteria(that.advanceFilter, customCriteria);
+      }
     }
   });
 

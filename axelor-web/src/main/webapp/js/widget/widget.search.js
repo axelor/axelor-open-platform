@@ -1225,6 +1225,7 @@ ui.directive('uiFilterBox', function() {
         var selected = live ? !filter.$selected : filter.$selected;
         var selection = isCustom ? current.customs : current.domains;
         var applyAll = (handler.schema||{}).customSearch === false;
+        current.live = live;
 
         if (live) {
           $scope.onClear();
