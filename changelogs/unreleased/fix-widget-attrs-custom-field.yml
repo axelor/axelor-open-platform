@@ -1,3 +1,8 @@
 ---
-title: Fix js condition for custom model not evaluated when boolean is provided
+title: Fix parsing field widgetAttrs to preserve type depending on attribute
 type: fix
+description: |
+  Extra widget attributes doesn't takes into account the type of each attributes. 
+  This result of some unexpected behaviors. For example, the `x-true-text="true"` 
+  cause error on `BooleanSelect` widget.
+  Depending on the attribute, the value is converting to the right type.
