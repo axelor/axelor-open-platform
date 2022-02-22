@@ -78,10 +78,18 @@ function TableLayout(items, attrs, $scope, $compile) {
     }
   }
 
+  function isPanel(elem) {
+    return elem.is('[ui-panel]');
+  }
+
   items.each(function(){
     var el = $(this),
       title = el.attr('x-title'),
       noTitle = el.attr('x-show-title') == 'false';
+
+    if (isPanel(el)) {
+      return add(el);
+    }
 
     var labelScope = el.data('$scope');
     if (labelScope) {
@@ -229,10 +237,18 @@ function PanelLayout(items, attrs, $scope, $compile) {
     curCol += (span + offset);
   }
 
+  function isPanel(elem) {
+    return elem.is('[ui-panel]');
+  }
+
   items.each(function (item, i) {
     var el = $(this),
       title = el.attr('x-title'),
       noTitle = el.attr('x-show-title') == 'false';
+
+    if (isPanel(el)) {
+      return add(el);
+    }
 
     var labelScope = el.data('$scope');
     if (labelScope) {
