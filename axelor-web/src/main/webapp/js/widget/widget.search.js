@@ -346,7 +346,13 @@ ui.directive('uiFilterItem', function() {
         if (_.isEmpty(fields)) return;
         unwatch();
         var options = _.values(fields);
-        scope.options = _.sortBy(options, function (x) { return (x.title||'').toLowerCase(); });
+        var locale = ui.getBrowserLocale(); // v6: use ui.getPreferredLocale
+        function getKey(x) { return (x.title || '').toLocaleLowerCase(locale); }
+        var compare = Intl.Collator(locale).compare;
+        options.sort(function (a, b) {
+          return compare(getKey(a), getKey(b));
+        });
+        scope.options = options;
       }, true);
     },
     template:
