@@ -771,7 +771,7 @@
     </xsd:attribute>
     <xsd:attribute name="x-labels" type="xsd:boolean">
       <xsd:annotation>
-        <xsd:documentation>Specify whether to show lebels in ImageSelect widget.</xsd:documentation>
+        <xsd:documentation>Specify whether to show labels in ImageSelect widget.</xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
     <xsd:attribute name="x-order" type="xsd:string">
@@ -1702,7 +1702,7 @@
         <xsd:attribute name="eventStop" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-              Name of the field of type date/datetme to be used as event stop time.
+              Name of the field of type date/datetime to be used as event stop time.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
