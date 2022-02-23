@@ -346,7 +346,7 @@ ui.directive('uiFilterItem', function() {
         if (_.isEmpty(fields)) return;
         unwatch();
         var options = _.values(fields);
-        scope.options = _.sortBy(options, function (x) { return (x.title||'').toLowerCase(); });
+        scope.options = axelor.sortBy(options, 'title');
       }, true);
     },
     template:
@@ -612,7 +612,7 @@ ui.directive('uiFilterContext', function () {
             contextFields[name] = fields[name];
           }
         }
-        $scope.contextFields = _.sortBy(_.values(contextFields), function (x) { return (x.title||'').toLowerCase(); });
+        $scope.contextFields = axelor.sortBy(_.values(contextFields), 'title');
         $scope.remove();
       };
     }],
