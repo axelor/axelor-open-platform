@@ -477,12 +477,19 @@
     function processWidget(field) {
       var attrs = {};
       _.each(field.widgetAttrs || {}, function (value, name) {
-        if (value === "true") value = true;
-        if (value === "false") value = false;
-        if (value === "null") value = null;
-        if (/^(-)?\d+$/.test(value)) value = +(value);
-        if (name === "widget" && value) value = _.chain(value).underscored().dasherize().value();
-        attrs[_.str.camelize(name)] = value;
+        var val = value;
+        if (value === "null") val = null;
+        if (name === "widget" && value) val = _.chain(value).underscored().dasherize().value();
+        else if (['exclusive', 'showBars', 'canCopy', 'lite', 'labels', 'big', 'seconds', 'canSuggest',
+          'canReload', 'callOnSave', 'showTitle', 'editable', 'canMove', 'showBars', 'canExport', 'showFrame',
+          'sidebar', 'stacked', 'attached', 'required', 'hidden', 'readonly', 'canCollapse'].indexOf(name) !== -1) {
+          val = _.toBoolean(value);
+        }
+        else if (['rowSpan', 'cols', 'limit', 'precision', 'scale', 'searchLimit', 'colOffset', 'colSpan',
+          'itemSpan', 'minSize', 'maxSize'].indexOf(name) !== -1 && /^(-)?\d+(\.\d+)?$/.test(value)) {
+          val = +(value);
+        }
+        attrs[_.str.camelize(name)] = val;
       });
       if (field.serverType) {
         field.serverType = _.chain(field.serverType).underscored().dasherize().value();
