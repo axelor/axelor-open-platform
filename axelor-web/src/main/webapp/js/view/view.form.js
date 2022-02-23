@@ -993,7 +993,7 @@ function FormViewCtrl($scope, $element) {
     var record = $scope.record || {};
     var editable = $scope.isEditable();
     $scope.$broadcast("cancel:grid-edit");
-    if (record.id && editable && $scope.canEdit()) {
+    if (record.id && editable && $scope.canEdit() && !$scope.isForceEdit()) {
       $scope.setEditable(false);
       return;
     }
