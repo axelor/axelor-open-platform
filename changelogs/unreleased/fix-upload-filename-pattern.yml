@@ -1,8 +1,0 @@
----
-title: Fix file upload when using filename pattern
-type: fix
-description: |
-  Property `file.upload.filename.pattern` should be evaluated on each upload
-  in order to evaluate `{year}`/`{month}` or `{day}` keys.
-  Moreover, when using a custom filename pattern, `{name}` should be placed at
-  the end of the pattern. If omitted, he is appended by default at the end.

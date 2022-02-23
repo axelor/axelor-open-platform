@@ -1,9 +1,0 @@
----
-title: Allow access to custom fields in StringTemplate via dotted notation
-type: feature
-description: |
-  StringTemplate doesn't allow `$` character in expressions. This is the way we use to access custom field
-  from context : `$extraAttrs.myCustomField`. Accessing custom fields need to be prefixed by the related
-  json field name (ex: `<SaleOrder.extraAttrs.myField>`or `<SaleOrder.attrs.anotherField>`). For custom fields
-  in default `attrs` field, it is not needed to use prefix (ex: `<SaleOrder.myField>` ). However, it is
-  recommended to always use the related json field name as prefix.

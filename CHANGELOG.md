@@ -1,3 +1,110 @@
+## 5.4.11 (2022-02-23)
+
+#### Features
+
+* Allow access to custom fields in StringTemplate via dotted notation
+
+  <details>
+  
+  StringTemplate doesn't allow `$` character in expressions. This is the way we use to access custom field
+  from context : `$extraAttrs.myCustomField`. Accessing custom fields need to be prefixed by the related
+  json field name (ex: `<SaleOrder.extraAttrs.myField>`or `<SaleOrder.attrs.anotherField>`). For custom fields
+  in default `attrs` field, it is not needed to use prefix (ex: `<SaleOrder.myField>` ). However, it is
+  recommended to always use the related json field name as prefix.
+  
+  </details>
+
+* Add `axelor.view.watch.delay` and `axelor.view.watch.kinds` VM arguments
+
+  <details>
+  
+  Defaults are as follows (working on Eclipse/IntelliJ on Linux):
+  
+  ```
+  -Daxelor.view.watch.kinds=ENTRY_CREATE
+  -Daxelor.view.watch.delay=300
+  ```
+  
+  `axelor.view.watch.kinds` is a list of comma-separated strings of the following values:
+  `ENTRY_CREATE`, `ENTRY_MODIFY`, `ENTRY_DELETE`.
+  
+  `axelor.view.watch.delay` is the update delay in milliseconds.
+  
+  Varying development environments may require special configuration in
+  order to have view hotswap working.
+  
+  For example, on Windows, only `ENTRY_MODIFY` events might be triggered
+  in some cases. Moreover, there may be a big gap between those events,
+  requiring to increase the update delay. So one might want to use:
+  
+  ```
+  -Daxelor.view.watch.kinds=ENTRY_CREATE,ENTRY_MODIFY
+  -Daxelor.view.watch.delay=4000
+  ```
+  
+  </details>
+
+#### Fixed
+
+* Fix parsing field widgetAttrs to preserve type depending on attribute
+
+  <details>
+  
+  Extra widget attributes doesn't takes into account the type of each attributes. 
+  This result of some unexpected behaviors. For example, the `x-true-text="true"` 
+  cause error on `BooleanSelect` widget.
+  Depending on the attribute, the value is converting to the right type.
+  
+  </details>
+
+* Preserve selected flags from action values
+
+  <details>
+  
+  Preserve selected flags when using `response.setValue(field, collection)`
+  with collection of maps without version field.
+  
+  </details>
+
+* Sort advanced search fields in lexicographic order
+* Fix view hotswap when running embedded Tomcat
+* Fix JS error when having favorite menus with duplicate names
+
+  <details>
+  
+  In "Organize favorites", in the user changes a menu link, they may then add another menu with the same name,
+  causing AngularJS error tracking for unique names.
+  
+  </details>
+
+* Fix panel `showTitle` attribute
+* Translate toolbar menu customization shown to technical staff
+* Fix back button when view-parem `forceEdit` is used
+* Fix m2m field update upon select record
+
+  <details>
+  
+  Populated the m2m items all data. Only omit the version
+  field (not fully populated as the record is already saved)
+  
+  </details>
+
+* Fix position of field error message to be always to bottom of the field
+* Fix file upload when using filename pattern
+
+  <details>
+  
+  Property `file.upload.filename.pattern` should be evaluated on each upload
+  in order to evaluate `{year}`/`{month}` or `{day}` keys.
+  Moreover, when using a custom filename pattern, `{name}` should be placed at
+  the end of the pattern. If omitted, he is appended by default at the end.
+  
+  </details>
+
+#### Security
+
+* Fix sanitize to prevent XSS vulnerabilities
+
 ## 5.4.10 (2022-02-02)
 
 #### Fixed

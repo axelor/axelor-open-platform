@@ -1,6 +1,0 @@
----
-title: Fix m2m field update upon select record
-type: fix
-description: |
-  Populated the m2m items all data. Only omit the version
-  field (not fully populated as the record is already saved)
