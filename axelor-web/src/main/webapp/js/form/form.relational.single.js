@@ -128,6 +128,7 @@ function ManyToOneCtrl($scope, $element, DataSource, ViewService) {
           if (value === undefined) value = null;
           ui.setNested(record, name, value);
         });
+        _.defaults(record, value);
         $scope.setValue(record, false);
       }).error(function () {
         _.each(missing, function (name) {

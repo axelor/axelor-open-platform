@@ -904,14 +904,18 @@ ActionHandler.prototype = {
 
     function findItems(name) {
 
-      var items;
+      var items = $();
       var toolbar;
       var containers;
+      var formPaths = [formScope.formPath];
+      var isSlickEditor;
 
       if (formElement.is('[ui-slick-editors]')) {
         containers = formElement.parent().add(formElement);
+        isSlickEditor = true;
       } else if (formElement.parent().is('[ui-slick-editors],.slick-cell')) {
         containers = formElement.parent().parent().add(formElement);
+        isSlickEditor = true;
       } else if (formElement.parent().is('[ui-panel-editor]')) {
         containers = formElement.parent().add(formElement).is('.m2o-editor-form,.o2m-editor-form') ? formElement : formElement.parents('[ui-form]:first').add(formElement);
       } else {
@@ -920,15 +924,27 @@ ActionHandler.prototype = {
           .find('.record-toolbar:first,.search-view-toolbar:first');
       }
 
-      var formPath = formScope.formPath;
-      if (formScope._model === 'com.axelor.meta.db.MetaJsonRecord') {
-        formPath = formPath || 'attrs';
+      if (isSlickEditor) {
+        var detailForm = formElement.parents('.form-item').first().children('.detail-form').first();
+        if (detailForm.length) {
+          containers = containers.add(detailForm);
+          formPaths.push(detailForm.scope().formPath);
+        }
       }
 
-      items = containers.find('[x-path="' + (formPath ?  formPath + '.' + name : name) + '"]');
-      if (items.length === 0 && formPath != 'attrs') {
-        items = containers.find('[x-path="attrs.' + name + '"]');
-      }
+      _.each(formPaths, function (formPath) {
+        if (formScope._model === 'com.axelor.meta.db.MetaJsonRecord') {
+          formPath = formPath || 'attrs';
+        }
+
+        var current = containers.find('[x-path="' + (formPath ?  formPath + '.' + name : name) + '"]');
+        if (current.length === 0 && formPath != 'attrs') {
+          current = containers.find('[x-path="attrs.' + name + '"]');
+        }
+
+        items = items.add(current);
+      });
+
       if (toolbar) {
         return toolbar.find('[name="' + name + '"],[x-name="' + name + '"]').add(items);
       }

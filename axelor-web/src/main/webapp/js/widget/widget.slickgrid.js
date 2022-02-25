@@ -918,7 +918,7 @@ Grid.prototype._doInit = function(view) {
 
   dataView.$syncSelection = function(old, oldIds, focus) {
     // cancel edit
-    that.cancelEdit(false);
+    that.cancelEdit({focus: false});
     var selection = dataView.mapIdsToRows(oldIds || []);
     // if saving o2m items, we may get negative oldIds, consider reselecting old selection
     if (old && oldIds && old.length === 1 && oldIds.length === 1 && oldIds[0] < 0) {
@@ -1588,7 +1588,7 @@ Grid.prototype.onKeyDown = function (e) {
 
   if (e.isDefaultPrevented()) return;
   if (e.keyCode === 27) { // ESCAPE
-    that.cancelEdit(true);
+    that.cancelEdit({focus: true, cancel: true});
     return;
   }
   if (e.keyCode === 13) { // ENTER
@@ -2145,7 +2145,7 @@ Grid.prototype._showEditor = function (activeCell) {
     editor.append(widgets);
 
     function doCancel() {
-      that.cancelEdit();
+      that.cancelEdit({cancel: true});
     }
 
     function doCommit() {
@@ -2344,7 +2344,13 @@ Grid.prototype._showEditor = function (activeCell) {
   formScope.editRecord(record);
 };
 
-Grid.prototype.cancelEdit = function (focus) {
+Grid.prototype.cancelEdit = function (opts) {
+  if (_.isBoolean(opts)) {
+    opts = {focus: opts};
+  } else if (opts === undefined) {
+    opts = {};
+  }
+
   if (!this.isEditActive()) return;
   this.editorForm.hide();
   this.editorScope.edit(null);
@@ -2355,12 +2361,12 @@ Grid.prototype.cancelEdit = function (focus) {
   }
 
  this._editorVisible = this.grid._editorVisible = false;
-  this.scope.$emit('on:grid-edit-end', this);
+  this.scope.$emit('on:grid-edit-end', this, opts);
   if (this.handler.dataView.getItemById(0)) {
     this.handler.dataView.deleteItem(0);
   }
 
-  if (focus === undefined || focus) {
+  if (opts.focus === undefined || opts.focus) {
     var activeCell = this.grid.getActiveCell()
       || this.findNextEditable(this.grid.getDataLength() - 1 , 0)
       || { row: 0, cell: 0 };
@@ -3367,6 +3373,14 @@ ui.directive('uiSlickGrid', ['ViewService', 'ActionService', function(ViewServic
           scope._isSlickEditor = true;
           formScope = scope.$new();
           form = makeForm(formScope, handler._model, schema.items, handler.fields, forEdit, schema.onNew);
+
+          formScope.$emit('on:slick-editor-init', formScope);
+          formScope.$watch('record', function (record) {
+            if (_.isEmpty(record)) {
+              return;
+            }
+            formScope.$emit('on:slick-editor-change', record);
+          }, true);
         }
 
         grid = new Grid(scope, element, attrs, ViewService, ActionService);
