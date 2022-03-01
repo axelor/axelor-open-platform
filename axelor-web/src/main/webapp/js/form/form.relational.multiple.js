@@ -87,6 +87,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 
       $scope.$on('on:slick-editor-change', function (e, record) {
         es.record = record;
+        es.$broadcast('on:record-change', record);
       });
 
       $scope.$on('on:grid-edit-start', function () {
