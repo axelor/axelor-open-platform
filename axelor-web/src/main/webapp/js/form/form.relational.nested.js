@@ -70,6 +70,12 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 
   function doEdit(record) {
     if (record && record.id > 0 && !record.$fetched) {
+      Object.keys(record)
+        .filter(function (name) { return name.indexOf(".") >= 0 })
+        .forEach(function (name) {
+          ui.setNested(record, name, record[name]);
+          delete record[name];
+        });
       $scope.doRead(record.id).success(function(rec){
         var updated = _.extend({}, rec, record);
         originalEdit(updated);
