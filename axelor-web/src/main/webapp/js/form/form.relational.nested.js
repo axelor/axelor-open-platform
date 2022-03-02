@@ -186,10 +186,6 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     });
 
     $scope.$parent.$on('on:grid-edit-start', function () {
-      // Dashlets in detail view need to be refreshed when adding a row in grid
-      if (_.isEmpty($scope.getSelectedRecord())) {
-        $scope.$broadcast('on:attrs-change:refresh');
-      }
       $scope.$timeout(function () {
         $scope.gridEditing = true;
       })
