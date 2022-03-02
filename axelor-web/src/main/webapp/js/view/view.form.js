@@ -1359,6 +1359,10 @@ ui.formBuild = function (scope, schema, fields) {
            ui.getWidget(attrs.serverType) ||
            attrs.type || attrs.serverType || 'string';
 
+      if (scope.isDetailView && type === 'panel-mail') {
+        return;
+      }
+
       if (_.isArray(attrs.selectionList) && !widget) {
         type = attrs.multiple ? 'multi-select' : 'select';
       }
