@@ -38,34 +38,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
     }
   });
 
-  var embedded = null,
-    detailView = null;
-
-  $scope.createNestedEditor = function() {
-
-    embedded = $('<div ui-embedded-editor class="inline-form"></div>');
-    embedded.attr('x-title', $element.attr('x-title'));
-    embedded = ViewService.compile(embedded)($scope);
-    embedded.hide();
-
-    $element.append(embedded);
-    embedded.data('$rel', $element.children('.slickgrid:first').children('.slick-viewport'));
-
-    return embedded;
-  };
-
-  var _showNestedEditor = $scope.showNestedEditor;
-  $scope.showNestedEditor = function(show, record) {
-    _showNestedEditor(show, record);
-    if (embedded) {
-      embedded.data('$rel').hide();
-      var formScope = embedded.scope();
-      formScope._viewPromise.then(function () {
-        formScope.edit(record);
-      });
-    }
-    return embedded;
-  };
+  var detailView = null;
 
   $scope.showDetailView = function() {
     var es;
@@ -204,14 +177,13 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
   $scope.setItems = function(items) {
     _setItems(items);
     $scope.itemsPending = [];
-    if (embedded !== null) {
-      embedded.data('$scope').onClose();
+    if (detailView !== null) {
+      if (items === null || _.isEmpty(items)) {
+        detailView.hide();
+      } else {
+        detailView.show();
+      }
     }
-    if (detailView !== null)
-    if (items === null || _.isEmpty(items))
-      detailView.hide();
-    else
-      detailView.show();
   };
 
   $scope.removeItems = function(items, fireOnChange) {
@@ -330,13 +302,6 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
       if (confirmed && $scope.selection && $scope.selection.length)
         $scope.removeSelected($scope.selection);
     });
-  };
-
-  $scope.onSummary = function() {
-    var selected = $scope.getSelectedRecord();
-    if (selected) {
-      $scope.showNestedEditor(true, selected);
-    }
   };
 
   $scope.viewCanCopy = function () {
@@ -698,35 +663,6 @@ ui.formInput('OneToMany', {
 
       scope.dataView.onRowCountChanged.subscribe(function (e, args) {
         adjustSize();
-      });
-
-      if (!(scope._viewParams || {}).summaryView || scope.field.widget === "master-detail") {
-        return;
-      }
-      var col = {
-        id: '_summary',
-        name: '<span>&nbsp;</span>',
-        sortable: false,
-        resizable: false,
-        width: 16,
-        formatter: function(row, cell, value, columnDef, dataContext) {
-          return '<i class="fa fa-caret-right" style="display: inline-block; cursor: pointer; padding: 4px 10px;"></i>';
-        }
-      };
-
-      var cols = grid.getColumns();
-      cols.splice(0, 0, col);
-
-      grid.setColumns(cols);
-      grid.onClick.subscribe(function(e, args) {
-        if ($(e.target).is('.fa-caret-right'))
-          scope.$timeout(function(){
-            grid.setSelectedRows([args.row]);
-            grid.setActiveCell(args.row, args.cell);
-            scope.$timeout(function () {
-              scope.onSummary();
-            });
-          });
       });
     };
 

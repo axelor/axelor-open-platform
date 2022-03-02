@@ -80,16 +80,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
   }
 
   function doClose() {
-    if ($scope.isDetailView) {
-      $scope.edit($scope.getSelectedRecord());
-      return;
-    }
-    $scope.edit(null);
-    $scope.waitForActions(function () {
-      $scope.visible = false;
-      $element.hide();
-      $element.data('$rel').show();
-    });
+    $scope.edit($scope.getSelectedRecord());
   }
 
   $scope.edit = function(record) {
@@ -162,9 +153,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 
   function loadSelected() {
     var record = $scope.getSelectedRecord();
-    if ($scope.isDetailView) {
-      $scope.edit(record);
-    }
+    $scope.edit(record);
   }
 
   $scope.$on('grid:changed', function(event) {
@@ -190,14 +179,6 @@ var EmbeddedEditor = {
   css: 'nested-editor',
   scope: true,
   controller: EmbeddedEditorCtrl,
-  link: function (scope, element, attrs) {
-    setTimeout(function () {
-      var prev = element.prev();
-      if (prev.is("[ui-slick-grid]")) {
-        element.zIndex(prev.zIndex() + 1);
-      }
-    });
-  },
   template:
     '<fieldset class="form-item-group bordered-box" ui-show="visible">'+
       '<div ui-view-form x-handler="this"></div>'+
