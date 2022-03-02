@@ -47,37 +47,11 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
       detailView = ViewService.compile(detailView)($scope);
       detailView.data('$rel', $());
       es = detailView.data('$scope');
-      es.isDetailView = true;
+      es.setDetailView();
       $element.after(detailView);
 
       es.$on('on:before-save-action', function () {
         es.$parent.select(_.extend(es.record, {selected: true}));
-      });
-
-      $scope.$on('on:slick-editor-init', function () {
-        es._viewParams.forceReadonly = true;
-      });
-
-      $scope.$on('on:slick-editor-change', function (e, record) {
-        es.record = record;
-        es.$broadcast('on:record-change', record);
-      });
-
-      $scope.$on('on:grid-edit-start', function () {
-        // Dashlets in detail view need to be refreshed when adding a row in grid
-        if (_.isEmpty($scope.getSelectedRecord())) {
-          es.$broadcast('on:attrs-change:refresh');
-        }
-      });
-
-      $scope.$on('on:grid-edit-end', function (e, grid, opts) {
-        // Revert changes
-        if (opts.cancel && es.record.id) {
-          es.waitForActions(function () {
-            var record = $scope.getSelectedRecord();
-            es.edit(record);
-          });
-        }
       });
     } else {
       es = detailView.data('$scope');
