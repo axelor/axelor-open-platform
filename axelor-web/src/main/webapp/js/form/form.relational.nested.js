@@ -179,8 +179,10 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     });
 
     $scope.$parent.$on('on:slick-editor-change', function (e, record) {
-      $scope.record = record;
-      $scope.$broadcast('on:record-change', record);
+      if ($scope.gridEditing) {
+        $scope.record = record;
+        $scope.$broadcast('on:record-change', record);
+      }
     });
 
     $scope.$parent.$on('on:grid-edit-start', function () {
@@ -188,9 +190,13 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
       if (_.isEmpty($scope.getSelectedRecord())) {
         $scope.$broadcast('on:attrs-change:refresh');
       }
+      $scope.$timeout(function () {
+        $scope.gridEditing = true;
+      })
     });
 
     $scope.$parent.$on('on:grid-edit-end', function (e, grid, opts) {
+      $scope.gridEditing = false;
       // Revert changes
       if (opts.cancel && $scope.record.id) {
         $scope.waitForActions(function () {
