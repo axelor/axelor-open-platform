@@ -83,21 +83,63 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     } else {
       originalEdit(record, fireOnLoad);
     }
+
+    if ($scope.gridEditing) {
+      return;
+    }
+    $scope.visible = record != null;
   }
 
-  function doClose() {
-    $scope.edit($scope.getSelectedRecord());
+  function clearForm() {
+    doEdit(null);
+  }
+
+  function isPopulated() {
+    return $scope.record != null && $scope.record.id != null;
   }
 
   $scope.edit = function(record, fireOnLoad) {
+    if ($scope.closeForm) {
+      $scope.closeForm = false;
+      clearForm();
+      return;
+    }
     doEdit(record, fireOnLoad);
     $scope.setEditable(!$scope.$parent.$$readonly);
   };
 
   $scope.onClose = function() {
-    $scope.onClear();
-    doClose();
+    clearForm();
   };
+
+  $scope.onCancel = function() {
+    clearForm();
+  };
+
+  $scope.canClose = function() {
+    return $scope.isReadonly() && $scope.visible;
+  }
+
+  $scope.canCancel = function() {
+    return !$scope.isReadonly() && $scope.visible;
+  }
+
+  $scope.canAdd = function() {
+    return !$scope.isReadonly() && !isPopulated() && $scope.visible;
+  }
+
+  $scope.canUpdate = function() {
+    return !$scope.isReadonly() && isPopulated() && $scope.visible;
+  }
+
+  $scope.canCreate = function() {
+    return $scope.hasPermission("create") && !$scope.isReadonly() && $scope.isEditable() && $scope.$parent.canNew() && !$scope.visible;
+  }
+
+  $scope.onCreate = function() {
+    $scope.visible = true;
+    $scope.$broadcast('on:new');
+  }
 
   $scope.onOK = function() {
     if (!$scope.isValid()) {
@@ -114,7 +156,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     }
     $scope.waitForActions(function () {
       $scope.select($scope.record);
-      $scope.waitForActions(doClose);
+      $scope.waitForActions(clearForm);
     });
   };
 
@@ -127,14 +169,14 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     record.id = null;
     record.version = null;
     record.$version = null;
-
-    $scope.onClear();
+    // make the record as selected in the grid (like in popup)
+    record.selected = true;
 
     function doSelect(rec) {
+      $scope.closeForm = true;
       if (rec) {
         $scope.select(rec);
       }
-      return doEdit(rec);
     }
 
     if (!$scope.editorCanSave) {
@@ -146,30 +188,14 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     });
   };
 
-  $scope.onClear = function() {
-    if ($scope.$parent.selection) {
-      $scope.$parent.selection.length = 0;
-    }
-    doEdit(null);
-  };
-
-  $scope.canUpdate = function () {
-    return $scope.record && $scope.record.id;
-  };
-
   function loadSelected() {
     var record = $scope.getSelectedRecord();
     $scope.edit(record);
   }
 
-  $scope.$on('grid:changed', function(event) {
-    if (!$scope.gridEditing) {
-      loadSelected();
-    }
-  });
-
   $scope.$on('on:edit', function(event, record) {
     if ($scope.$parent.record === record) {
+      // on parent top form editing
       $scope.waitForActions(loadSelected);
     }
   });
@@ -196,6 +222,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     $scope.$parent.$on('on:grid-edit-start', function () {
       $scope.$timeout(function () {
         $scope.gridEditing = true;
+        $scope.visible = true;
       })
     });
 
@@ -219,13 +246,14 @@ var EmbeddedEditor = {
   scope: true,
   controller: EmbeddedEditorCtrl,
   template:
-    '<fieldset class="form-item-group bordered-box" ui-show="visible">'+
-      '<div ui-view-form x-handler="this"></div>'+
+    '<fieldset class="form-item-group bordered-box">'+
+      '<div ui-view-form x-handler="this" ng-show="visible"></div>'+
       '<div class="btn-toolbar pull-right">'+
-        '<button type="button" class="btn btn btn-info" ng-click="onClose()" ng-show="isReadonly()"><span x-translate>Back</span></button> '+
-        '<button type="button" class="btn btn-danger" ng-click="onClose()" ng-show="!isReadonly()"><span x-translate>Cancel</span></button> '+
-        '<button type="button" class="btn btn-primary" ng-click="onAdd()" ng-show="!isReadonly() && !canUpdate()"><span x-translate>Add</span></button> '+
-        '<button type="button" class="btn btn-primary" ng-click="onOK()" ng-show="!isReadonly() && canUpdate()"><span x-translate>OK</span></button>'+
+        '<button type="button" class="btn btn btn-info" ng-click="onClose()" ng-show="canClose()"><span x-translate>Close</span></button> '+
+        '<button type="button" class="btn btn-danger" ng-click="onCancel()" ng-show="canCancel()"><span x-translate>Cancel</span></button> '+
+        '<button type="button" class="btn btn-primary" ng-click="onAdd()" ng-show="canAdd()"><span x-translate>Ok</span></button> '+
+        '<button type="button" class="btn btn-primary" ng-click="onOK()" ng-show="canUpdate()"><span x-translate>Update</span></button>'+
+        '<button type="button" class="btn btn-primary" ng-click="onCreate()" ng-show="canCreate()"><span x-translate>New</span></button>'+
       '</div>'+
     '</fieldset>'
 };
