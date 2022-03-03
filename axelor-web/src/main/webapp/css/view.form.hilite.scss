@@ -236,6 +236,9 @@ $label_backgrounds_text: (
 .font-bold {
   font-weight: 600;
 }
+
+// Remove mispelled rule name in future versions
+.font-normal,
 .font-noraml {
   font-weight: 400;
 }
