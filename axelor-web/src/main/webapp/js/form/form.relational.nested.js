@@ -100,20 +100,38 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 
   $scope.edit = function(record, fireOnLoad) {
     if ($scope.closeForm) {
+      // When we just add item, don't display MaterDetail form
       $scope.closeForm = false;
       clearForm();
+      scrollToGrid();
       return;
     }
     doEdit(record, fireOnLoad);
     $scope.setEditable(!$scope.$parent.$$readonly);
   };
 
+  function scrollToGrid() {
+    var gridElem = $element.prev()[0];
+    if (gridElem) {
+      gridElem.scrollIntoView();
+    }
+  }
+
+  function scrollToDetailView() {
+    var detailViewElem = $element[0];
+    if (detailViewElem) {
+      detailViewElem.scrollIntoView();
+    }
+  }
+
   $scope.onClose = function() {
     clearForm();
+    scrollToGrid();
   };
 
   $scope.onCancel = function() {
     clearForm();
+    scrollToGrid();
   };
 
   $scope.canClose = function() {
@@ -139,6 +157,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
   $scope.onCreate = function() {
     $scope.visible = true;
     $scope.$broadcast('on:new');
+    scrollToDetailView();
   }
 
   $scope.onOK = function() {
@@ -157,6 +176,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     $scope.waitForActions(function () {
       $scope.select($scope.record);
       $scope.waitForActions(clearForm);
+      scrollToGrid();
     });
   };
 
