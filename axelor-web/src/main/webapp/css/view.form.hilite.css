@@ -736,6 +736,90 @@
   background-color: inherit !important;
 }
 
+.form-item label.label-bold,
+.form-item-container.bold,
+.form-item-container.bold input:first-of-type,
+.form-item-container.bold input:first-of-type {
+  font-weight: 600 !important;
+}
+
+.form-item label.label-italic,
+.form-item-container.italic,
+.form-item-container.italic input:first-of-type,
+.form-item-container.italic input:first-of-type {
+  font-style: italic !important;
+}
+
+.form-item label.label-underline,
+.form-item-container.underline,
+.form-item-container.underline input:first-of-type,
+.form-item-container.underline input:first-of-type {
+  text-decoration: underline !important;
+}
+
+.form-item label.label-overline,
+.form-item-container.overline,
+.form-item-container.overline input:first-of-type,
+.form-item-container.overline input:first-of-type {
+  text-decoration: overline !important;
+}
+
+.form-item label.label-line-through,
+.form-item-container.line-through,
+.form-item-container.line-through input:first-of-type,
+.form-item-container.line-through input:first-of-type {
+  text-decoration: line-through !important;
+}
+
+.form-item label.label-small,
+.form-item-container.small,
+.form-item-container.small input:first-of-type,
+.form-item-container.small input:first-of-type {
+  font-size: 10px !important;
+}
+
+.form-item label.label-big,
+.form-item-container.big,
+.form-item-container.big input:first-of-type,
+.form-item-container.big input:first-of-type {
+  font-size: 16px !important;
+}
+
+.form-item label.label-large,
+.form-item-container.large,
+.form-item-container.large input:first-of-type,
+.form-item-container.large input:first-of-type {
+  font-size: 18px !important;
+}
+
+.form-item label.label-left,
+.form-item-container.left,
+.form-item-container.left input:first-of-type,
+.form-item-container.left input:first-of-type {
+  text-align: left !important;
+}
+
+.form-item label.label-right,
+.form-item-container.right,
+.form-item-container.right input:first-of-type,
+.form-item-container.right input:first-of-type {
+  text-align: right !important;
+}
+
+.form-item label.label-center,
+.form-item-container.center,
+.form-item-container.center input:first-of-type,
+.form-item-container.center input:first-of-type {
+  text-align: center !important;
+}
+
+.form-item label.label-justify,
+.form-item-container.justify,
+.form-item-container.justify input:first-of-type,
+.form-item-container.justify input:first-of-type {
+  text-align: justify !important;
+}
+
 .form-item label.label-red,
 .form-item-container.red,
 .form-item-container.red input:first-of-type,

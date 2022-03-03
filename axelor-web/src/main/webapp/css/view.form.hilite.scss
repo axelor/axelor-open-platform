@@ -83,40 +83,40 @@ $text: (
 
 $text_styles: (
   "bold": (
-    "font-weight": "600",
+    font-weight: 600,
   ),
   "italic": (
-    "font-style": "italic",
+    font-style: italic,
   ),
   "underline": (
-    "text-decoration": "underline",
+    text-decoration: underline,
   ),
   "overline": (
-    "text-decoration": "overline",
+    text-decoration: overline,
   ),
   "line-through": (
-    "text-decoration": "line-through",
+    text-decoration: line-through,
   ),
   "small": (
-    "font-size": "10px",
+    font-size: 10px,
   ),
   "big": (
-    "font-size": "16px",
+    font-size: 16px,
   ),
   "large": (
-    "font-size": "18px",
+    font-size: 18px,
   ),
   "left": (
-    "text-align": "left",
+    text-align: left,
   ),
   "right": (
-    "text-align": "right",
+    text-align: right,
   ),
   "center": (
-    "text-align": "center",
+    text-align: center,
   ),
   "justify": (
-    "text-align": "justify",
+    text-align: justify,
   ),
 );
 
@@ -201,6 +201,17 @@ $label_backgrounds_text: (
   .slick-cell-editable:before,
 [class*="hilite-"].form-item-container {
   background-color: inherit !important;
+}
+
+@each $name, $properties in $text_styles {
+  @each $property, $value in $properties {
+    .form-item label.label-#{$name},
+    .form-item-container.#{$name},
+    .form-item-container.#{$name} input:first-of-type,
+    .form-item-container.#{$name} input:first-of-type {
+      #{$property}: $value !important;
+    }
+  }
 }
 
 @each $name, $value in $label_colors {
