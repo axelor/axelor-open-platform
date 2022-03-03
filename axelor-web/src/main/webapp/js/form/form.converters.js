@@ -473,22 +473,67 @@
   }
   ui.findForm = findForm;
 
-  // Returns a copy of list sorted in lexicographic order, running each value through iteratee
-  function sortBy(list, iteratee, descending) {
+  // Returns a copy of list sorted in lexicographic order by given fields
+  function sortBy(list, fields, extractor) {
     var locale = getPreferredLocale();
     var localeCompare = Intl.Collator(locale).compare;
-    var result = (list || []).slice();
+    list = (list || []).slice();
 
-    function toKey(key) { return (key || '').toLocaleString(locale).toLocaleLowerCase(locale); }
-    var getKey = _.isFunction(iteratee) ?
-      function (value) { return toKey(iteratee(value)); } :
-      function (value) { return toKey(value[iteratee]); };
-
-    return result.sort(descending ? function (a, b) {
-      return localeCompare(getKey(b), getKey(a));
-    } : function (a, b) {
-      return localeCompare(getKey(a), getKey(b));
+    if (!_.isArray(fields)) {
+      fields = [fields];
+    }
+    fields = fields.map(function (field) {
+      var matches = (field || '').match(/(\W)?(.*)/);
+      return { key: matches[2], descending: matches[1] === '-' };
     });
+    if (!_.findWhere(fields, { key: 'id' })) {
+      fields.push({ key: 'id', descending: fields[0].descending });
+    }
+
+    if (!_.isFunction(extractor)) {
+      extractor = function (item, key) {
+        return item[key];
+      }
+    }
+
+    function toLocaleString(value) {
+      return (value || '').toLocaleString(locale).toLocaleLowerCase(locale);
+    }
+
+    function compare(first, second) {
+      if (first == null) {
+        return 1;
+      }
+      if (second == null) {
+        return -1;
+      }
+      if (isNaN(first) || isNaN(second)) {
+        return localeCompare(toLocaleString(first), toLocaleString(second));
+      }
+      return first - second;
+    }
+
+    function rcompare(first, second) {
+      var temp = first;
+      first = second;
+      second = temp;
+      return compare(first, second);
+    }
+
+    function comparator(first, second) {
+      for (var i = 0; i < fields.length; ++i) {
+        var field = fields[i];
+        var key = field.key;
+        var cmp = field.descending ? rcompare : compare;
+        var result = cmp(extractor(first, key), extractor(second, key));
+        if (result) {
+          return result;
+        }
+      }
+      return 0;
+    }
+
+    return list.sort(comparator);
   }
 
   axelor.sortBy = sortBy;

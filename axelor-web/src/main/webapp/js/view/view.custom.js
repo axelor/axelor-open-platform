@@ -328,17 +328,10 @@ ui.directive('reportTable',  function() {
           activeSort.key = col.name;
           activeSort.descending = false;
         }
-        if (['integer', 'long', 'decimal'].indexOf(col.type) < 0) {
-          scope.data = axelor.sortBy(scope.data, function (item) {
-            return scope.format(item, activeSort.key) || '';
-          }, activeSort.descending);
-        } else {
-          scope.data = _.sortBy(scope.data, activeSort.descending ? function (item) {
-            return -item[activeSort.key] || 0;
-          } : function (item) {
-            return +item[activeSort.key] || 0;
-          });
-        }
+
+        var sortKey = (activeSort.descending ? '-' : '') + activeSort.key;
+        var extractor = col.type === 'string' ? scope.format : null;
+        scope.data = axelor.sortBy(scope.data, sortKey, extractor);
       };
 
       scope.sortIndicator = function (col) {
