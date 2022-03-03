@@ -68,7 +68,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 
   var originalEdit = $scope.edit;
 
-  function doEdit(record) {
+  function doEdit(record, fireOnLoad) {
     if (record && record.id > 0 && !record.$fetched) {
       Object.keys(record)
         .filter(function (name) { return name.indexOf(".") >= 0 })
@@ -78,10 +78,10 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
         });
       $scope.doRead(record.id).success(function(rec){
         var updated = _.extend({}, rec, record);
-        originalEdit(updated);
+        originalEdit(updated, fireOnLoad);
       });
     } else {
-      originalEdit(record);
+      originalEdit(record, fireOnLoad);
     }
   }
 
@@ -89,8 +89,8 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     $scope.edit($scope.getSelectedRecord());
   }
 
-  $scope.edit = function(record) {
-    doEdit(record);
+  $scope.edit = function(record, fireOnLoad) {
+    doEdit(record, fireOnLoad);
     $scope.setEditable(!$scope.$parent.$$readonly);
   };
 
@@ -163,7 +163,9 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
   }
 
   $scope.$on('grid:changed', function(event) {
-    loadSelected();
+    if (!$scope.gridEditing) {
+      loadSelected();
+    }
   });
 
   $scope.$on('on:edit', function(event, record) {
@@ -200,7 +202,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     $scope.$parent.$on('on:grid-edit-end', function (e, grid, opts) {
       $scope.gridEditing = false;
       // Revert changes
-      if (opts.cancel && $scope.record.id) {
+      if (opts.cancel && opts.dirty && $scope.record.id) {
         $scope.waitForActions(function () {
           loadSelected();
         });

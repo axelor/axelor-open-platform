@@ -2351,6 +2351,9 @@ Grid.prototype.cancelEdit = function (opts) {
     opts = {};
   }
 
+  var isDirty = (this.editorScope || {}).isDirty;
+  opts.dirty = _.isFunction(isDirty) && isDirty();
+
   if (!this.isEditActive()) return;
   this.editorForm.hide();
   this.editorScope.edit(null);
