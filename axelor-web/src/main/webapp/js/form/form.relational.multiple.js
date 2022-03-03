@@ -318,7 +318,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
         detailView.show();
       }
       if (!dvs.record || ((dvs.record.id || 0) !== (rec.id || 0))) {
-        if (dvs.record && dvs.record.id === 0 && rec.id < 0) {
+        if (dvs.record && (dvs.record.id === 0 || dvs.record.id === null) && rec.id < 0) {
           // Same record; was just assigned a negative id
           dvs.edit(rec, false);
         } else {
