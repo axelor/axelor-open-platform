@@ -68,7 +68,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 
   var originalEdit = $scope.edit;
 
-  function doEdit(record, fireOnLoad) {
+  function doEdit(record, fireOnLoad, adjustVisible) {
     if (record && record.id > 0 && !record.$fetched) {
       Object.keys(record)
         .filter(function (name) { return name.indexOf(".") >= 0 })
@@ -84,14 +84,14 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
       originalEdit(record, fireOnLoad);
     }
 
-    if ($scope.gridEditing) {
+    if ($scope.gridEditing || adjustVisible === false) {
       return;
     }
     $scope.visible = record != null;
   }
 
-  function clearForm() {
-    doEdit(null);
+  function clearForm(adjustVisible) {
+    doEdit(null, false, adjustVisible);
   }
 
   function isPopulated() {
@@ -100,10 +100,14 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 
   $scope.edit = function(record, fireOnLoad) {
     if ($scope.closeForm) {
-      // When we just add item, don't display MaterDetail form
       $scope.closeForm = false;
-      clearForm();
-      scrollToGrid();
+      if ($scope.fireNew) {
+        $scope.onCreate()
+      } else {
+        // When we just add item, don't display MaterDetail form
+        clearForm(true);
+        scrollToGrid();
+      }
       return;
     }
     doEdit(record, fireOnLoad);
@@ -125,12 +129,12 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
   }
 
   $scope.onClose = function() {
-    clearForm();
+    clearForm(true);
     scrollToGrid();
   };
 
   $scope.onCancel = function() {
-    clearForm();
+    clearForm(true);
     scrollToGrid();
   };
 
@@ -156,6 +160,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 
   $scope.onCreate = function() {
     $scope.visible = true;
+    clearForm(false);
     $scope.$broadcast('on:new');
     scrollToDetailView();
   }
@@ -175,12 +180,14 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     }
     $scope.waitForActions(function () {
       $scope.select($scope.record);
-      $scope.waitForActions(clearForm);
+      $scope.waitForActions(function () {
+        clearForm(true);
+      });
       scrollToGrid();
     });
   };
 
-  $scope.onAdd = function() {
+  $scope.onAdd = function(fireNew) {
     if (!$scope.isValid() || !$scope.record) {
       return;
     }
@@ -194,6 +201,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 
     function doSelect(rec) {
       $scope.closeForm = true;
+      $scope.fireNew = fireNew;
       if (rec) {
         $scope.select(rec);
       }
@@ -210,7 +218,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 
   function loadSelected() {
     var record = $scope.getSelectedRecord();
-    $scope.edit(record);
+    $scope.edit(record, true);
   }
 
   $scope.$on('on:edit', function(event, record) {
@@ -219,7 +227,9 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
       if($scope.visible) {
         $scope.waitForActions(loadSelected);
       } else {
-        $scope.waitForActions(clearForm);
+        $scope.waitForActions(function () {
+          clearForm(true);
+        });
       }
     }
   });
@@ -275,9 +285,10 @@ var EmbeddedEditor = {
       '<div class="btn-toolbar pull-right">'+
         '<button type="button" class="btn btn btn-info" ng-click="onClose()" ng-show="canClose()"><span x-translate>Close</span></button> '+
         '<button type="button" class="btn btn-danger" ng-click="onCancel()" ng-show="canCancel()"><span x-translate>Cancel</span></button> '+
-        '<button type="button" class="btn btn-primary" ng-click="onAdd()" ng-show="canAdd()"><span x-translate>Ok</span></button> '+
+        '<button type="button" class="btn btn-primary" ng-click="onAdd()" ng-show="canAdd()"><span x-translate>Add</span></button> '+
         '<button type="button" class="btn btn-primary" ng-click="onOK()" ng-show="canUpdate()"><span x-translate>Update</span></button>'+
         '<button type="button" class="btn btn-primary" ng-click="onCreate()" ng-show="canCreate()"><span x-translate>New</span></button>'+
+      '<button type="button" class="btn btn-primary" ng-click="onAdd(true)" ng-show="canAdd()"><span x-translate>Add and new</span></button>'+
       '</div>'+
     '</fieldset>'
 };
