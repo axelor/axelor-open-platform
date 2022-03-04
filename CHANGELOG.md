@@ -1,3 +1,10 @@
+## 5.4.12 (2022-03-04)
+
+#### Fixed
+
+* Add missing hilite style CSS
+* Add missing attributes when processing widgetAttrs
+
 ## 5.4.11 (2022-02-23)
 
 #### Features
