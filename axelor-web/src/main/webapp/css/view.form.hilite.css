@@ -736,6 +736,90 @@
   background-color: inherit !important;
 }
 
+.form-item label.label-bold,
+.form-item-container.bold,
+.form-item-container.bold input:first-of-type,
+.form-item-container.bold input:first-of-type {
+  font-weight: 600 !important;
+}
+
+.form-item label.label-italic,
+.form-item-container.italic,
+.form-item-container.italic input:first-of-type,
+.form-item-container.italic input:first-of-type {
+  font-style: italic !important;
+}
+
+.form-item label.label-underline,
+.form-item-container.underline,
+.form-item-container.underline input:first-of-type,
+.form-item-container.underline input:first-of-type {
+  text-decoration: underline !important;
+}
+
+.form-item label.label-overline,
+.form-item-container.overline,
+.form-item-container.overline input:first-of-type,
+.form-item-container.overline input:first-of-type {
+  text-decoration: overline !important;
+}
+
+.form-item label.label-line-through,
+.form-item-container.line-through,
+.form-item-container.line-through input:first-of-type,
+.form-item-container.line-through input:first-of-type {
+  text-decoration: line-through !important;
+}
+
+.form-item label.label-small,
+.form-item-container.small,
+.form-item-container.small input:first-of-type,
+.form-item-container.small input:first-of-type {
+  font-size: 10px !important;
+}
+
+.form-item label.label-big,
+.form-item-container.big,
+.form-item-container.big input:first-of-type,
+.form-item-container.big input:first-of-type {
+  font-size: 16px !important;
+}
+
+.form-item label.label-large,
+.form-item-container.large,
+.form-item-container.large input:first-of-type,
+.form-item-container.large input:first-of-type {
+  font-size: 18px !important;
+}
+
+.form-item label.label-left,
+.form-item-container.left,
+.form-item-container.left input:first-of-type,
+.form-item-container.left input:first-of-type {
+  text-align: left !important;
+}
+
+.form-item label.label-right,
+.form-item-container.right,
+.form-item-container.right input:first-of-type,
+.form-item-container.right input:first-of-type {
+  text-align: right !important;
+}
+
+.form-item label.label-center,
+.form-item-container.center,
+.form-item-container.center input:first-of-type,
+.form-item-container.center input:first-of-type {
+  text-align: center !important;
+}
+
+.form-item label.label-justify,
+.form-item-container.justify,
+.form-item-container.justify input:first-of-type,
+.form-item-container.justify input:first-of-type {
+  text-align: justify !important;
+}
+
 .form-item label.label-red,
 .form-item-container.red,
 .form-item-container.red input:first-of-type,
@@ -839,6 +923,7 @@
   font-weight: 600;
 }
 
+.font-normal,
 .font-noraml {
   font-weight: 400;
 }
@@ -957,122 +1042,6 @@
 
 .fg-violet {
   color: #9c27b0;
-}
-
-.bg-primary {
-  background-color: #428bca;
-}
-
-.bg-warning {
-  background-color: #f0ad4e;
-}
-
-.bg-success {
-  background-color: #5cb85c;
-}
-
-.bg-danger {
-  background-color: #d9534f;
-}
-
-.bg-error {
-  background-color: #b94a48;
-}
-
-.bg-info {
-  background-color: #5bc0de;
-}
-
-.bg-red {
-  background-color: #f44336;
-}
-
-.bg-pink {
-  background-color: #e91e63;
-}
-
-.bg-purple {
-  background-color: #9c27b0;
-}
-
-.bg-deeppurple {
-  background-color: #673ab7;
-}
-
-.bg-indigo {
-  background-color: #3f51b5;
-}
-
-.bg-blue {
-  background-color: #2196f3;
-}
-
-.bg-lightblue {
-  background-color: #03a9f4;
-}
-
-.bg-cyan {
-  background-color: #00bcd4;
-}
-
-.bg-teal {
-  background-color: #009688;
-}
-
-.bg-green {
-  background-color: #4caf50;
-}
-
-.bg-lightgreen {
-  background-color: #8bc34a;
-}
-
-.bg-lime {
-  background-color: #cddc39;
-}
-
-.bg-yellow {
-  background-color: #ffeb3b;
-}
-
-.bg-amber {
-  background-color: #ffc107;
-}
-
-.bg-orange {
-  background-color: #ff9800;
-}
-
-.bg-deeporange {
-  background-color: #ff5722;
-}
-
-.bg-brown {
-  background-color: #795548;
-}
-
-.bg-grey {
-  background-color: #9e9e9e;
-}
-
-.bg-bluegrey {
-  background-color: #607d8b;
-}
-
-.bg-black {
-  background-color: black;
-}
-
-.bg-white {
-  background-color: white;
-}
-
-.bg-olive {
-  background-color: #cddc39;
-}
-
-.bg-violet {
-  background-color: #9c27b0;
 }
 
 .bg-primary {
