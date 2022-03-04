@@ -69,6 +69,9 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
   var originalEdit = $scope.edit;
 
   function doEdit(record, fireOnLoad, adjustVisible) {
+    if ($scope.gridEditing) {
+      return;
+    }
     if (record && record.id > 0 && !record.$fetched) {
       Object.keys(record)
         .filter(function (name) { return name.indexOf(".") >= 0 })
@@ -84,7 +87,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
       originalEdit(record, fireOnLoad);
     }
 
-    if ($scope.gridEditing || adjustVisible === false) {
+    if (adjustVisible === false) {
       return;
     }
     $scope.visible = record != null;
@@ -108,9 +111,6 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
         clearForm(true);
         scrollToGrid();
       }
-      return;
-    }
-    if ($scope.gridEditing) {
       return;
     }
     doEdit(record, fireOnLoad);
