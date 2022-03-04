@@ -311,6 +311,17 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
         });
       }
     });
+
+    var _onItemClick = $scope.$parent.onItemClick;
+    $scope.$parent.onItemClick = function (e, args) {
+      _onItemClick(e, args);
+      $scope.$applyAsync(function () {
+        if (!$scope.visible) {
+          setVisibility(true, true);
+          loadSelected();
+        }
+      });
+    }
   }
 
   $scope.show();
