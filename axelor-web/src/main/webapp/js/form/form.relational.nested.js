@@ -110,6 +110,9 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
       }
       return;
     }
+    if ($scope.gridEditing) {
+      return;
+    }
     doEdit(record, fireOnLoad);
     $scope.setEditable(!$scope.$parent.$$readonly);
   };
