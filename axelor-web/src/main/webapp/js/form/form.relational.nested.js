@@ -66,35 +66,74 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 
   };
 
+  var tout = 300;
+
+  var visibilityTimer = null;
+  function setVisibility(visibility, immediate) {
+    if(visibilityTimer) {
+      clearTimeout(visibilityTimer)
+    }
+
+    function update(_visibility) {
+      $scope.visible = _visibility;
+    }
+
+    if (immediate === true) {
+      update(visibility);
+      return;
+    }
+    visibilityTimer = setTimeout(() => {
+      update(visibility);
+    }, tout);
+  }
+
+  var recordTimer = null;
+  function setRecord(record, fireOnLoad, immediate) {
+    if(recordTimer) {
+      clearTimeout(recordTimer)
+    }
+
+    function update(_record, _fireOnLoad) {
+      if (_record && _record.id > 0 && !_record.$fetched) {
+        Object.keys(_record)
+            .filter(function (name) { return name.indexOf(".") >= 0 })
+            .forEach(function (name) {
+              ui.setNested(_record, name, _record[name]);
+              delete _record[name];
+            });
+        $scope.doRead(_record.id).success(function(rec){
+          var updated = _.extend({}, rec, _record);
+          originalEdit(updated, _fireOnLoad);
+        });
+      } else {
+        originalEdit(_record, _fireOnLoad);
+      }
+    }
+
+    if (immediate === true) {
+      update(record, fireOnLoad);
+      return;
+    }
+    recordTimer = setTimeout(() => {
+      update(record, fireOnLoad);
+    }, tout);
+  }
+
   var originalEdit = $scope.edit;
 
-  function doEdit(record, fireOnLoad, adjustVisible) {
+  function doEdit(record, fireOnLoad, adjustVisible, immediate) {
     if ($scope.gridEditing) {
       return;
     }
-    if (record && record.id > 0 && !record.$fetched) {
-      Object.keys(record)
-        .filter(function (name) { return name.indexOf(".") >= 0 })
-        .forEach(function (name) {
-          ui.setNested(record, name, record[name]);
-          delete record[name];
-        });
-      $scope.doRead(record.id).success(function(rec){
-        var updated = _.extend({}, rec, record);
-        originalEdit(updated, fireOnLoad);
-      });
-    } else {
-      originalEdit(record, fireOnLoad);
-    }
-
+    setRecord(record, fireOnLoad, immediate);
     if (adjustVisible === false) {
       return;
     }
-    $scope.visible = record != null;
+    setVisibility(record != null, immediate);
   }
 
-  function clearForm(adjustVisible) {
-    doEdit(null, false, adjustVisible);
+  function clearForm(adjustVisible, immediate) {
+    doEdit(null, false, adjustVisible, immediate);
   }
 
   function isPopulated() {
@@ -113,7 +152,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
       }
       return;
     }
-    doEdit(record, fireOnLoad);
+    doEdit(record, fireOnLoad, true);
     $scope.setEditable(!$scope.$parent.$$readonly);
   };
 
@@ -132,12 +171,12 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
   }
 
   $scope.onClose = function() {
-    clearForm(true);
+    clearForm(true, true);
     scrollToGrid();
   };
 
   $scope.onCancel = function() {
-    clearForm(true);
+    clearForm(true, true);
     scrollToGrid();
   };
 
@@ -162,8 +201,8 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
   }
 
   $scope.onCreate = function() {
-    $scope.visible = true;
-    clearForm(false);
+    setVisibility(true);
+    clearForm(false, true);
     $scope.$broadcast('on:new');
     scrollToDetailView();
   }
@@ -184,7 +223,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     $scope.waitForActions(function () {
       $scope.select($scope.record);
       $scope.waitForActions(function () {
-        clearForm(true);
+        clearForm(true, true);
       });
       scrollToGrid();
     });
@@ -259,7 +298,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     $scope.$parent.$on('on:grid-edit-start', function () {
       $scope.$timeout(function () {
         $scope.gridEditing = true;
-        $scope.visible = true;
+        setVisibility(true);
       })
     });
 
