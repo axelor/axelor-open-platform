@@ -40,7 +40,7 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 
   var detailView = null;
 
-  $scope.showDetailView = function() {
+  $scope.createDetailView = function() {
     var es;
     if (detailView == null) {
       detailView = $('<div ui-embedded-editor class="detail-form"></div>').attr('x-title', $element.attr('x-title'));
@@ -56,7 +56,6 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
     } else {
       es = detailView.data('$scope');
     }
-    detailView.toggle(es.visible = !es.visible);
   };
 
   $scope.select = function(value) {
@@ -671,7 +670,7 @@ ui.formInput('OneToMany', {
     var field = scope.field;
     if (field.widget === 'master-detail') {
       setTimeout(function(){
-        scope.showDetailView();
+        scope.createDetailView();
       });
     }
 
