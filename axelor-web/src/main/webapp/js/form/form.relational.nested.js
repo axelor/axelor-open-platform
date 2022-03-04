@@ -216,7 +216,11 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
   $scope.$on('on:edit', function(event, record) {
     if ($scope.$parent.record === record) {
       // on parent top form editing
-      $scope.waitForActions(loadSelected);
+      if($scope.visible) {
+        $scope.waitForActions(loadSelected);
+      } else {
+        $scope.waitForActions(clearForm);
+      }
     }
   });
 
