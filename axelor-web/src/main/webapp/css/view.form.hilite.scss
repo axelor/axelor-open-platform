@@ -256,12 +256,6 @@ $label_backgrounds_text: (
 }
 
 @each $name, $value in $colors {
-  .bg-#{$name} {
-    background-color: $value;
-  }
-}
-
-@each $name, $value in $colors {
   .panel-#{$name} .panel .panel-header,
   .panel-#{$name} .dashlet .dashlet-header {
     border-top-color: $value;
