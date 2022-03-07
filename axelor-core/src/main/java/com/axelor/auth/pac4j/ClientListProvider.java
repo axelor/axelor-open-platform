@@ -302,7 +302,7 @@ public class ClientListProvider implements Provider<List<Client>> {
     if (configClassName != null) {
       final Class<?> configClass = findClass(configClassName);
       config = inject(configClass);
-      set(client, "configuration", config);
+      setField(client, "configuration", config);
     } else {
       // configure client directly if no configuration object
       config = client;
@@ -313,7 +313,7 @@ public class ClientListProvider implements Provider<List<Client>> {
         .forEach(
             item -> {
               try {
-                set(config, item.getKey(), item.getValue());
+                setField(config, item.getKey(), item.getValue());
               } catch (Exception e) {
                 logger.error("Configuration error", e.getCause());
               }
@@ -322,23 +322,30 @@ public class ClientListProvider implements Provider<List<Client>> {
     return client;
   }
 
-  private void set(Object obj, String property, Object value) {
+  private void setField(Object obj, String property, Object value) {
     try {
       final Method method = findSetter(obj.getClass(), property);
       Class<?> type = method.getParameterTypes()[0];
       type = PRIMITIVE_TYPES.getOrDefault(type, type);
-      final Object converted;
-
-      if (type.isAssignableFrom(value.getClass())) {
-        converted = value;
-      } else {
-        final Method valueOf = type.getMethod("valueOf", String.class);
-        converted = valueOf.invoke(null, String.valueOf(value));
-      }
+      final Object converted = convert(type, value);
 
       method.invoke(obj, converted);
     } catch (ReflectiveOperationException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  private Object convert(Class<?> type, Object value) throws ReflectiveOperationException {
+    if (type.isAssignableFrom(value.getClass())) {
+      return value;
+    }
+    final String valueStr = String.valueOf(value);
+    try {
+      final Method valueOf = type.getMethod("valueOf", String.class);
+      return valueOf.invoke(null, valueStr);
+    } catch (NoSuchMethodException e) {
+      final Class<?> cls = Class.forName(valueStr);
+      return Beans.get(cls);
     }
   }
 
