@@ -447,7 +447,7 @@ ui.directive('uiViewGantt', ['ViewService', 'ActionService', function(ViewServic
 
      function ganttInit(){
        gantt = main.dhx_gantt();
-       setScaleConfig("week");
+       setScaleConfig(mode);
        gantt.templates.leftside_text = function(start, end, task){
           if (!task.progress){
           return "";

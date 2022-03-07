@@ -8,6 +8,7 @@ The Gantt view shows data in a Gantt chart:
 [source,xml]
 -----
   <gantt name="project-task-gantt" title="Task Planning" model="com.axelor.project.db.ProjectTask"
+    mode="year"
     taskStart="plannedStartDate"
     taskDuration="plannedDuration"
     taskParent="parentTask"
@@ -31,6 +32,7 @@ Gantt view attributes:
 | `name` | name of the Gantt view
 | `title` | title of the Gantt view
 | `model` | fully qualified name of the domain model
+| `mode` | view mode, between `year`, `month`, `week`, or `day` (default to `month`)
 | `taskStart` | name of the field of type date/datetime to be used as start time
 | `taskDuration` | name of the duration field
 | `taskEnd` | name of the field of type date/datetime to be used as end time

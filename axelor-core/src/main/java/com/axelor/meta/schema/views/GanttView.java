@@ -31,6 +31,8 @@ import javax.xml.bind.annotation.XmlType;
 @JsonTypeName("gantt")
 public class GanttView extends AbstractView implements ContainerView {
 
+  @XmlAttribute private String mode;
+
   @XmlAttribute private String taskStart;
 
   @XmlAttribute private String taskDuration;
@@ -59,6 +61,14 @@ public class GanttView extends AbstractView implements ContainerView {
 
   @XmlElement(name = "field", type = Field.class)
   private List<AbstractWidget> items;
+
+  public String getMode() {
+    return mode;
+  }
+
+  public void setMode(String mode) {
+    this.mode = mode;
+  }
 
   public String getTaskStart() {
     return taskStart;
