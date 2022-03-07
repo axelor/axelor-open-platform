@@ -68,6 +68,8 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleMultiClient {
     final String secret = settings.get("secret");
     final String authUrl = settings.get("auth.url");
     final String tokenUrl = settings.get("token.url");
+    final String profileUrl = settings.get("profile.url");
+    final String profileId = settings.get("profile.id");
     final String profileAttrsSetting = settings.get("profile.attrs");
 
     final String name = settings.getOrDefault("name", providerName);
@@ -85,6 +87,14 @@ public class AuthPac4jModuleOAuth extends AuthPac4jModuleMultiClient {
     }
     if (StringUtils.notBlank(tokenUrl)) {
       client.setTokenUrl(tokenUrl);
+    }
+    if (StringUtils.notBlank(profileUrl)) {
+      client.setProfileUrl(profileUrl);
+    }
+    if (StringUtils.notBlank(profileId)) {
+      client.setProfileId(profileId);
+    }else{
+      client.setProfileId("id");
     }
 
     if (StringUtils.notBlank(profileAttrsSetting)) {
