@@ -3537,7 +3537,7 @@
 
   <xsd:complexType name="ActionReport">
     <xsd:complexContent>
-      <xsd:extension base="tns:AbstractAction">
+      <xsd:extension base="tns:AbstractBaseAction">
         <xsd:sequence>
           <xsd:element name="param" type="tns:ActContext" minOccurs="0" maxOccurs="unbounded">
             <xsd:annotation>
