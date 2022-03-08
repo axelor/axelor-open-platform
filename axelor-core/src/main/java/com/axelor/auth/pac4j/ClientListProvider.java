@@ -354,6 +354,9 @@ public class ClientListProvider implements Provider<List<Client>> {
       return value;
     }
     final String valueStr = String.valueOf(value);
+    if (type.isAssignableFrom(List.class)) {
+      return Arrays.asList(valueStr.split("\\s*,\\s*"));
+    }
     try {
       final Method valueOf = type.getMethod("valueOf", String.class);
       return valueOf.invoke(null, valueStr);
