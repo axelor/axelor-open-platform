@@ -27,6 +27,7 @@ import com.google.inject.Provider;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -324,12 +325,25 @@ public class ClientListProvider implements Provider<List<Client>> {
 
   private void setField(Object obj, String property, Object value) {
     try {
-      final Method method = findSetter(obj.getClass(), property);
-      Class<?> type = method.getParameterTypes()[0];
+      final List<String> propertyParts = Arrays.asList(property.split("\\.", 2));
+      final Method setter = findSetter(obj.getClass(), propertyParts.get(0));
+      Class<?> type = setter.getParameterTypes()[0];
       type = PRIMITIVE_TYPES.getOrDefault(type, type);
-      final Object converted = convert(type, value);
 
-      method.invoke(obj, converted);
+      if (type.isAssignableFrom(Map.class)) {
+        final Method getter = findGetter(obj.getClass(), propertyParts.get(0));
+        @SuppressWarnings("unchecked")
+        Map<String, Object> map = (Map<String, Object>) getter.invoke(obj);
+        if (map == null) {
+          map = new LinkedHashMap<>();
+          setter.invoke(obj, map);
+        }
+        map.put(propertyParts.get(1), value);
+        return;
+      }
+
+      final Object converted = convert(type, value);
+      setter.invoke(obj, converted);
     } catch (ReflectiveOperationException e) {
       throw new RuntimeException(e);
     }
@@ -347,6 +361,16 @@ public class ClientListProvider implements Provider<List<Client>> {
       final Class<?> cls = Class.forName(valueStr);
       return Beans.get(cls);
     }
+  }
+
+  private Method findGetter(Class<?> klass, String property) throws NoSuchMethodException {
+    final String getter = "get" + Inflector.getInstance().camelize(property);
+    return Stream.of(klass.getMethods())
+        .filter(m -> m.getName().equalsIgnoreCase(getter))
+        .filter(m -> m.getParameterCount() == 0)
+        .findAny()
+        .orElseThrow(
+            () -> new NoSuchMethodException(String.format("%s.%s", klass.getName(), getter)));
   }
 
   private Method findSetter(Class<?> klass, String property) throws NoSuchMethodException {
