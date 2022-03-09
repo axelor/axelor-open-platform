@@ -19,6 +19,7 @@ package com.axelor.meta.schema.actions;
 
 import com.axelor.app.internal.AppFilter;
 import com.axelor.db.JPA;
+import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
@@ -92,6 +93,17 @@ public class ActionReport extends Action {
 
   public List<Parameter> getParameters() {
     return parameters;
+  }
+
+  @Override
+  protected void checkPermission(ActionHandler handler) {
+    super.checkPermission(handler);
+
+    if (attachment) {
+      final Class<? extends Model> klass = handler.getContext().getContextClass().asSubclass(Model.class);
+      final Long id = (Long) handler.getContext().get("id");
+      handler.checkPermission(JpaSecurity.AccessType.READ, klass, id);
+    }
   }
 
   private Object _evaluate(ActionHandler handler) throws IOException, BirtException {
