@@ -158,9 +158,9 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 
   $scope.$on('grid:changed', function(event) {
     var record = $scope.getSelectedRecord();
-    if ($scope.closeAfterAdd) {
+    if ($scope.closeAfterUpdate) {
       // Don't reopen same record after updated in MasterDetail
-      $scope.closeAfterAdd = false;
+      $scope.closeAfterUpdate = false;
       return;
     }
     if (record && record.selected) {
@@ -233,7 +233,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
       }
     }
     $scope.waitForActions(function () {
-      $scope.closeAfterAdd = true;
+      $scope.closeAfterUpdate = true;
       $scope.select($scope.record);
       $scope.waitForActions(function () {
         clearForm(true, true);
