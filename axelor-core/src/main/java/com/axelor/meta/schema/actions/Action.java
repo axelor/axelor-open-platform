@@ -95,7 +95,7 @@ public abstract class Action {
     if (StringUtils.isBlank(getName())) {
       result = evaluate(handler);
     } else {
-      handler.checkPermission(JpaSecurity.CAN_READ, getModel());
+      checkPermission(handler);
       handler.firePreEvent(getName());
       final Object value = evaluate(handler);
       PostAction event = handler.firePostEvent(getName(), value);
@@ -103,6 +103,10 @@ public abstract class Action {
     }
 
     return result;
+  }
+
+  protected void checkPermission(ActionHandler handler) {
+    handler.checkPermission(JpaSecurity.CAN_READ, getModel());
   }
 
   public Object wrap(ActionHandler handler) {

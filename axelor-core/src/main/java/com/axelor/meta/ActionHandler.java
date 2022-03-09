@@ -133,7 +133,7 @@ public class ActionHandler {
     }
   }
 
-  private Class<?> findModelClass(String model) {
+  public Class<?> findModelClass(String model) {
     if (StringUtils.notBlank(model)) {
       return findClass(model);
     }
@@ -160,7 +160,7 @@ public class ActionHandler {
     if (context != null && context.getContextClass() == modelClass) {
       final Long id = (Long) context.get("id");
       if (id != null) {
-        security.check(accessType, modelClass, id);
+        checkPermission(accessType, modelClass, id);
         return;
       }
 
@@ -169,12 +169,17 @@ public class ActionHandler {
       if (ObjectUtils.notEmpty(idList)) {
         final Long[] ids =
             idList.stream().map(value -> Long.valueOf(String.valueOf(value))).toArray(Long[]::new);
-        security.check(accessType, modelClass, ids);
+        checkPermission(accessType, modelClass, ids);
         return;
       }
     }
 
-    security.check(accessType, modelClass);
+    checkPermission(accessType, modelClass);
+  }
+
+  public void checkPermission(
+      JpaSecurity.AccessType type, Class<? extends Model> model, Long... ids) {
+    security.check(type, model, ids);
   }
 
   public void firePreEvent(String name) {
