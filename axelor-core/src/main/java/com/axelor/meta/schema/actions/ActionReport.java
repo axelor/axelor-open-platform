@@ -18,6 +18,7 @@
 package com.axelor.meta.schema.actions;
 
 import com.axelor.app.internal.AppFilter;
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
@@ -38,9 +39,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.eclipse.birt.core.exception.BirtException;
 
 public class ActionReport extends Action {
@@ -97,10 +100,22 @@ public class ActionReport extends Action {
 
   @Override
   protected void checkPermission(ActionHandler handler) {
+    if (handler.getContext() != null
+        && StringUtils.notBlank(getModel())
+        && !Objects.equals(
+            handler.getContext().getContextClass(), handler.findModelClass(getModel()))) {
+      log.error(
+          "Model mismatching : ActionReport#model ({}) does not match Context#model ({})",
+          getModel(),
+          handler.getContext().getContextClass().toString());
+      throw new UnauthorizedException(I18n.get("You are not allowed to execute this action."));
+    }
+
     super.checkPermission(handler);
 
     if (attachment == Boolean.TRUE) {
-      final Class<? extends Model> klass = handler.getContext().getContextClass().asSubclass(Model.class);
+      final Class<? extends Model> klass =
+          handler.getContext().getContextClass().asSubclass(Model.class);
       final Long id = (Long) handler.getContext().get("id");
       if (id != null) {
         handler.checkPermission(JpaSecurity.AccessType.READ, klass, id);

@@ -133,7 +133,7 @@ public class ActionHandler {
     }
   }
 
-  private Class<?> findModelClass(String model) {
+  public Class<?> findModelClass(String model) {
     if (StringUtils.notBlank(model)) {
       return findClass(model);
     }
@@ -177,7 +177,8 @@ public class ActionHandler {
     checkPermission(accessType, modelClass);
   }
 
-  public void checkPermission(JpaSecurity.AccessType type, Class<? extends Model> model, Long... ids) {
+  public void checkPermission(
+      JpaSecurity.AccessType type, Class<? extends Model> model, Long... ids) {
     security.check(type, model, ids);
   }
 
