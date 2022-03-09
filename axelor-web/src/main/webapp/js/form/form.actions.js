@@ -1131,7 +1131,7 @@ ActionHandler.prototype = {
           scope.$applyAsync(function() {
             if (confirmed) {
               var url = "ws/rest/com.axelor.meta.db.MetaFile/" + data.attached.id + "/content/download";
-              ui.download(url);
+              ui.download(url, data.attached.fileName);
               return deferred.resolve();
             }
             deferred.reject();
