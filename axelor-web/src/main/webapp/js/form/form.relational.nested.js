@@ -330,7 +330,6 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
       _onItemClick(e, args);
       $scope.$applyAsync(function () {
         if (!$scope.visible) {
-          setVisibility(true, true);
           loadSelected();
         }
       });
