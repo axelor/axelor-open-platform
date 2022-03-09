@@ -131,7 +131,7 @@ public class ActionReport extends Action {
     if (attachment == Boolean.TRUE && id != null) {
       final Model bean = (Model) JPA.em().find(klass, id);
       try (InputStream is = new FileInputStream(output)) {
-        result.put("attached", Beans.get(MetaFiles.class).attach(is, fileName, bean));
+        result.put("attached", Beans.get(MetaFiles.class).attach(is, fileName, bean).getMetaFile());
       }
     }
 
