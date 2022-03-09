@@ -99,10 +99,12 @@ public class ActionReport extends Action {
   protected void checkPermission(ActionHandler handler) {
     super.checkPermission(handler);
 
-    if (attachment) {
+    if (attachment == Boolean.TRUE) {
       final Class<? extends Model> klass = handler.getContext().getContextClass().asSubclass(Model.class);
       final Long id = (Long) handler.getContext().get("id");
-      handler.checkPermission(JpaSecurity.AccessType.READ, klass, id);
+      if (id != null) {
+        handler.checkPermission(JpaSecurity.AccessType.READ, klass, id);
+      }
     }
   }
 
