@@ -1793,7 +1793,7 @@ ui.download = function download(url, fileName) {
     axelor.notify.info(_t("Downloading {0}...", fname));
   }
 
-  var name = axelor.sanitize(fileName);
+  var name = axelor.sanitize(fileName) || "";
   $.ajax({
     url : url,
     type : 'HEAD',

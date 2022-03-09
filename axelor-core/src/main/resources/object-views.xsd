@@ -3570,7 +3570,7 @@
         </xsd:attribute>
         <xsd:attribute name="attachment" type="xsd:boolean">
           <xsd:annotation>
-            <xsd:documentation>Specify whether to attach the generatd report to current object</xsd:documentation>
+            <xsd:documentation>Specify whether to attach the generated report to current object</xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
       </xsd:extension>
