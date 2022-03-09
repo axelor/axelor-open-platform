@@ -163,7 +163,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
       $scope.closeAfterUpdate = false;
       return;
     }
-    if (record && record.selected) {
+    if (record && record.selected && !$scope.gridEditing) {
       $scope.waitForActions(loadSelected);
     }
   });
