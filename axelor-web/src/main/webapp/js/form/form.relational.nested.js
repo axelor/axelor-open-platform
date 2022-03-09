@@ -156,6 +156,18 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     $scope.setEditable(!$scope.$parent.$$readonly);
   };
 
+  $scope.$on('grid:changed', function(event) {
+    var record = $scope.getSelectedRecord();
+    if ($scope.closeAfterAdd) {
+      // Don't reopen same record after updated in MasterDetail
+      $scope.closeAfterAdd = false;
+      return;
+    }
+    if (record && record.selected) {
+      $scope.waitForActions(loadSelected);
+    }
+  });
+
   function scrollToGrid() {
     var gridElem = $element.prev()[0];
     if (gridElem) {
@@ -221,6 +233,7 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
       }
     }
     $scope.waitForActions(function () {
+      $scope.closeAfterAdd = true;
       $scope.select($scope.record);
       $scope.waitForActions(function () {
         clearForm(true, true);
