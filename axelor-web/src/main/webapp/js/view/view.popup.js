@@ -188,6 +188,9 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
         });
       }
       if ($scope.isValid()) {
+        if ($scope.isDirty && $scope.isDirty()) {
+          record.$dirty = true;
+        }
         close(record);
       } else if ($scope.showErrorNotice) {
         $scope.showErrorNotice();
