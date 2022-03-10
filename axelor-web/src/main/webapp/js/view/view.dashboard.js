@@ -116,7 +116,7 @@ ui.directive('uiViewDashboard', ['ViewService', function(ViewService) {
           schema.items = items;
           return ViewService.save(schema);
         },
-        disabled: !axelor.config['user.viewCustomizationPermission']
+        disabled: !axelor.config['user.viewCustomizationPermission'] || axelor.config["view.customization"] === false
       };
 
       var unwatch = scope.$watch("schema", function dashboardSchemaWatch(schema) {
