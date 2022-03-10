@@ -124,7 +124,6 @@ function ChartCtrl($scope, $element, $http, ActionService) {
     if (actionHandler) {
       actionHandler._getContext = function () {
         return _.extend({}, prepareContext(), { _data: data }, {
-          _model: $scope._model || 'com.axelor.meta.db.MetaView',
           _chart: view.name
         });
       };
@@ -136,7 +135,6 @@ function ChartCtrl($scope, $element, $http, ActionService) {
     if (clickHandler) {
       clickHandler._getContext = function () {
         return _.extend({}, prepareContext(), e.data.raw, {
-          _model: $scope._model || 'com.axelor.meta.db.MetaView',
           _chart: view.name
         });
       };
@@ -180,7 +178,7 @@ function ChartCtrl($scope, $element, $http, ActionService) {
 ChartFormCtrl.$inject = ['$scope', '$element', 'ViewService', 'DataSource'];
 function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 
-  $scope._dataSource = DataSource.create('com.axelor.meta.db.MetaView');
+  $scope._dataSource = DataSource.create();
 
   ui.FormViewCtrl.call(this, $scope, $element);
 
@@ -230,6 +228,8 @@ function ChartFormCtrl($scope, $element, ViewService, DataSource) {
 
     ViewService.process(meta, view);
 
+    // Set _model for onInit action, in order to use the context
+    $scope._model = $scope._model || "com.axelor.script.ScriptBindings";
     view.onLoad = $scope.searchInit;
 
     $scope.fields = meta.fields;

@@ -799,13 +799,9 @@ public class MetaService {
 
         reqData.put("context", context);
 
-        req.setModel(request.getModel());
+        req.setModel(ScriptBindings.class.getName());
         req.setData(reqData);
         req.setAction(string);
-
-        if (req.getModel() == null) {
-          req.setModel(ScriptBindings.class.getName());
-        }
 
         res = actionExecutor.execute(req);
 
@@ -905,13 +901,9 @@ public class MetaService {
       ActionRequest req = new ActionRequest();
       ActionResponse res = new ActionResponse();
 
-      req.setModel(request.getModel());
+      req.setModel(ScriptBindings.class.getName());
       req.setData(request.getData());
       req.setAction(dataSet.getText());
-
-      if (req.getModel() == null) {
-        req.setModel(ScriptBindings.class.getName());
-      }
 
       res = actionExecutor.execute(req);
 

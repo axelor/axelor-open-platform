@@ -1,0 +1,7 @@
+---
+title: Fix permission checking with charts and custom views
+type: fix
+description: |
+  Should not check for permission on `MetaView` when executing actions from charts.
+  `onInit` action on charts use current model if calling from `action-view` else,
+  `ScriptBindings` is used, so that we still have a context.
