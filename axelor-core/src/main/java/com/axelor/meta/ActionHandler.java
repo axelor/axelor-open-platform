@@ -29,6 +29,7 @@ import com.axelor.event.NamedLiteral;
 import com.axelor.events.PostAction;
 import com.axelor.events.PreAction;
 import com.axelor.inject.Beans;
+import com.axelor.mail.db.MailMessage;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaFilter;
 import com.axelor.meta.schema.actions.Action;
@@ -95,7 +96,7 @@ public class ActionHandler {
       Pattern.compile("^\\s*(select\\[\\]|select|action|call|eval):\\s*(.*)");
 
   private static final Set<Class<? extends Model>> ALWAYS_PERMITTED_MODELS =
-      ImmutableSet.of(MetaAction.class, MetaFilter.class);
+      ImmutableSet.of(MetaAction.class, MetaFilter.class, MailMessage.class);
 
   ActionHandler(
       ActionRequest request,
