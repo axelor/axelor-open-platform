@@ -175,11 +175,14 @@
   border-top: 4px solid #e7e7e7;
   padding: 11px 15px 14px;
   margin-top: -1px;
-  cursor: move;
 
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
+}
+
+.dashboard.ui-sortable:not(.ui-sortable-disabled) .dashlet-header {
+  cursor: move;
 }
 
 .dashboard .dashlet-header .dashlet-search {
@@ -193,9 +196,6 @@
 
 .bar-layout .dashlet {
   height: 100%;
-}
-.bar-layout .dashlet-header {
-  cursor: default;
 }
 .bar-layout .panel .dashboard {
   margin-bottom: 0;
