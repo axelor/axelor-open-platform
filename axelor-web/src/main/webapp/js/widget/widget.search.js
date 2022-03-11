@@ -44,6 +44,9 @@ var OPERATORS = {
   "true"		: _t("is true"),
   "false" 	: _t("is false"),
 
+  "$isEmpty"  : _t("is empty"),
+  "$notEmpty"   : _t("is not empty"),
+
   "$inPast": _t("in the past"),
   "$inNext": _t("in the next"),
   "$inCurrent": _t("in the current"),
@@ -54,8 +57,8 @@ var OPERATORS = {
 
 var OPERATORS_BY_TYPE = {
   "enum"		: ["=", "!=", "isNull", "notNull"],
-  "text"		: ["like", "notLike", "isNull", "notNull"],
-  "string"	: ["=", "!=", "like", "notLike", "isNull", "notNull"],
+  "text"		: ["like", "notLike", "$isEmpty", "$notEmpty"],
+  "string"	: ["=", "!=", "like", "notLike", "$isEmpty", "$notEmpty"],
   "integer"	: ["=", "!=", ">=", "<=", ">", "<", "between", "notBetween", "isNull", "notNull"],
   "boolean"	: ["true", "false"]
 };
@@ -84,6 +87,8 @@ var EXTRA_OPERATORS_BY_TARGET = {
 };
 
 var CAN_SHOW = {
+  "$isEmpty": { input: false },
+  "$notEmpty": { input: false },
   "$inPast": { timeUnit: true },
   "$inNext": { timeUnit: true },
   "$inCurrent": { input: false, timeUnit: true },
@@ -133,6 +138,40 @@ var CRITERION_PREPARATORS = {
 };
 
 var FILTER_TRANSFORMERS = {
+  "$isEmpty": function (filter) {
+    _.extend(filter, {
+      operator: "or",
+      criteria: [
+        {
+          fieldName: filter.fieldName,
+          operator: "isNull"
+        },
+        {
+          fieldName: filter.fieldName,
+          operator: "=",
+          value: ''
+        }
+      ]
+    });
+    delete filter.fieldName;
+  },
+  "$notEmpty": function (filter) {
+    _.extend(filter, {
+      operator: "and",
+      criteria: [
+        {
+          fieldName: filter.fieldName,
+          operator: "notNull"
+        },
+        {
+          fieldName: filter.fieldName,
+          operator: "!=",
+          value: ''
+        }
+      ]
+    });
+    delete filter.fieldName;
+  },
   "$inPast": function (filter) {
     var now = moment().locale(ui.getBrowserLocale());
     filter.operator = "between";
@@ -944,41 +983,6 @@ function FilterFormCtrl($scope, $element, ViewService) {
         };
       }
 
-      if (filter.type === 'string' || filter.type === 'text') {
-        if (criterion.operator == "isNull") {
-          criterion = {
-            operator: "or",
-            criteria: [
-                {
-                  fieldName: filter.field,
-                  operator: "isNull"
-                },
-                {
-                  fieldName: filter.field,
-                  operator: "=",
-                  value: ''
-                }
-            ]
-          };
-        }
-        if (criterion.operator == "notNull") {
-          criterion = {
-            operator: "and",
-            criteria: [
-                {
-                  fieldName: filter.field,
-                  operator: "notNull"
-                },
-                {
-                  fieldName: filter.field,
-                  operator: "!=",
-                  value: ''
-                }
-            ]
-          };
-        }
-      }
-
       if (criterion.operator == "between" || criterion.operator == "notBetween") {
         criterion.value2 = filter.value2;
       }
@@ -1019,8 +1023,8 @@ function FilterFormCtrl($scope, $element, ViewService) {
   var appliedFilters = false;
   var appliedContext = false;
 
-  $scope.$watch('filters', function (fitlers, old) {
-    appliedFilters = fitlers === old;
+  $scope.$watch('filters', function (filters, old) {
+    appliedFilters = filters === old;
   }, true);
 
   $scope.$watch('contextData', function (data, old) {
