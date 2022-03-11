@@ -1,0 +1,10 @@
+---
+title: Fix saving filter with string field
+type: fix
+description: |
+  In the case of string fields with operators `isNull` and `notNull`,
+  filter was transformed in order to check for null or empty.
+  But by doing that, original criteria was lost, breaking meta filter saving.
+
+  Instead, use new virtual operators `$isEmpty` and `$notEmpty`
+  which perform client-side transformation.
