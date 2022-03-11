@@ -56,6 +56,8 @@ import com.axelor.i18n.I18n;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.i18n.L10n;
 import com.axelor.inject.Beans;
+import com.axelor.mail.MailConstants;
+import com.axelor.mail.db.MailMessage;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.MetaPermissions;
 import com.axelor.meta.MetaStore;
@@ -76,6 +78,7 @@ import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.inject.TypeLiteral;
+import com.google.inject.persist.Transactional;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -1306,6 +1309,27 @@ public class Resource<T extends Model> {
     response.setStatus(Response.STATUS_SUCCESS);
 
     firePostRequestEvent(RequestEvent.REMOVE, request, response);
+
+    return response;
+  }
+
+  @Transactional
+  public Response removeMessage(long id) {
+    final MailMessage message = JPA.edit(MailMessage.class, ImmutableMap.of("id", id));
+    final String eventType = message.getType();
+
+    if (!MailConstants.MESSAGE_TYPE_COMMENT.equals(eventType)
+            && !MailConstants.MESSAGE_TYPE_EMAIL.equals(eventType)
+        || !Objects.equal(message.getCreatedBy(), AuthUtils.getUser())) {
+      security.get().check(JpaSecurity.CAN_REMOVE, MailMessage.class, id);
+    }
+
+    final Repository<MailMessage> repo = JpaRepository.of(MailMessage.class);
+    repo.remove(message);
+
+    final Response response = new Response();
+    response.setData(ImmutableList.of(toMapCompact(message)));
+    response.setStatus(Response.STATUS_SUCCESS);
 
     return response;
   }

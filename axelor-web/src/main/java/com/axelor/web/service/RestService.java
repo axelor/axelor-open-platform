@@ -952,4 +952,10 @@ public class RestService extends ResourceService {
 
     return response;
   }
+
+  @POST
+  @Path("{id}/messageRemove")
+  public Response messageRemove(@PathParam("id") long id) {
+    return getResource().removeMessage(id);
+  }
 }

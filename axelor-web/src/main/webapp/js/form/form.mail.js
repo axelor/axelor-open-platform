@@ -133,7 +133,7 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', 'TagService', func
   }
 
   function removeMessage(message) {
-    var promise = dsMessage.remove(message);
+    var promise = dsMessage.messageRemove(message);
     promise.then(function () {
       TagService.find(); // force unread check
     });

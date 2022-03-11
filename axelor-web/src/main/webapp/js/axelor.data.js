@@ -486,6 +486,25 @@
         return promise;
       },
 
+      messageRemove: function (message) {
+        var page = this._page;
+        var records = this._data;
+        var promise = this._request('messageRemove', message.id).post();
+
+        promise.success = function (fn) {
+          promise.then(function (response) {
+            fn(records, page);
+          });
+          return promise;
+        };
+        promise.error = function (fn) {
+          promise.then(null, fn);
+          return promise;
+        };
+
+        return promise;
+      },
+
       messageFollow: function (id, options) {
         var opts = _.extend({}, options);
         var promise = this._request('follow', id).post({
