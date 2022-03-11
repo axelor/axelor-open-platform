@@ -39,3 +39,7 @@
   </details>
 
 * Fix going into edit mode in editable grid with large horizontal scrolling
+
+#### Security
+
+* Fix a bug

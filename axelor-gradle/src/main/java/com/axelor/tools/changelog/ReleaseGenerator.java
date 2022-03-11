@@ -63,6 +63,9 @@ public class ReleaseGenerator {
     if (entries == null || entries.isEmpty()) {
       return;
     }
+    if (!endWithEmptyLine(content.toString())) {
+      content.append(NEW_LINE);
+    }
     content.append("#### ").append(type.getValue()).append(NEW_LINE).append(NEW_LINE);
     for (ChangelogEntry entry : entries) {
       content.append(MessageFormat.format("* {0}", entry.getTitle()));
@@ -74,6 +77,11 @@ public class ReleaseGenerator {
       }
       content.append(NEW_LINE);
     }
+  }
+
+  private boolean endWithEmptyLine(String content) {
+    return NEW_LINE.equals(Character.toString(content.charAt(content.length() - 1)))
+        && NEW_LINE.equals(Character.toString(content.charAt(content.length() - 2)));
   }
 
   private void appendHeader(StringBuilder content, Release release) {
