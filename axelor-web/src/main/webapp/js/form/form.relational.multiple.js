@@ -38,43 +38,16 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
     }
   });
 
-  var embedded = null,
-    detailView = null;
+  var detailView = null;
 
-  $scope.createNestedEditor = function() {
-
-    embedded = $('<div ui-embedded-editor class="inline-form"></div>');
-    embedded.attr('x-title', $element.attr('x-title'));
-    embedded = ViewService.compile(embedded)($scope);
-    embedded.hide();
-
-    $element.append(embedded);
-    embedded.data('$rel', $element.children('.slickgrid:first').children('.slick-viewport'));
-
-    return embedded;
-  };
-
-  var _showNestedEditor = $scope.showNestedEditor;
-  $scope.showNestedEditor = function(show, record) {
-    _showNestedEditor(show, record);
-    if (embedded) {
-      embedded.data('$rel').hide();
-      var formScope = embedded.scope();
-      formScope._viewPromise.then(function () {
-        formScope.edit(record);
-      });
-    }
-    return embedded;
-  };
-
-  $scope.showDetailView = function() {
+  $scope.createDetailView = function() {
     var es;
     if (detailView == null) {
       detailView = $('<div ui-embedded-editor class="detail-form"></div>').attr('x-title', $element.attr('x-title'));
       detailView = ViewService.compile(detailView)($scope);
       detailView.data('$rel', $());
       es = detailView.data('$scope');
-      es.isDetailView = true;
+      es.setDetailView();
       $element.after(detailView);
 
       es.$on('on:before-save-action', function () {
@@ -83,7 +56,6 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
     } else {
       es = detailView.data('$scope');
     }
-    detailView.toggle(es.visible = !es.visible);
   };
 
   $scope.select = function(value) {
@@ -178,14 +150,13 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
   $scope.setItems = function(items) {
     _setItems(items);
     $scope.itemsPending = [];
-    if (embedded !== null) {
-      embedded.data('$scope').onClose();
+    if (detailView !== null) {
+      if (items === null || _.isEmpty(items)) {
+        detailView.hide();
+      } else {
+        detailView.show();
+      }
     }
-    if (detailView !== null)
-    if (items === null || _.isEmpty(items))
-      detailView.hide();
-    else
-      detailView.show();
   };
 
   $scope.removeItems = function(items, fireOnChange) {
@@ -306,13 +277,6 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
     });
   };
 
-  $scope.onSummary = function() {
-    var selected = $scope.getSelectedRecord();
-    if (selected) {
-      $scope.showNestedEditor(true, selected);
-    }
-  };
-
   $scope.viewCanCopy = function () {
     return this.hasPermission("create") && !this.isDisabled() && !this.isReadonly() && this.canCopy();
   };
@@ -346,14 +310,23 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 
     $scope.$timeout(function() {
       var dvs = detailView.scope();
-      var rec = $scope.getSelectedRecord() || {};
+      var rec = $scope.getSelectedRecord();
       if ($scope.isHidden()) {
         detailView.hide();
       } else {
         detailView.show();
       }
-      if (!dvs.record || (dvs.record.id !== rec.id)) {
+      if (rec == null) {
         dvs.edit(rec);
+        return;
+      }
+      if (!dvs.record || ((dvs.record.id || 0) !== (rec.id || 0))) {
+        if (dvs.record && (dvs.record.id === 0 || dvs.record.id === null) && rec.id < 0) {
+          // Same record; was just assigned a negative id
+          dvs.edit(rec, false);
+        } else {
+          dvs.edit(rec);
+        }
       }
     });
   };
@@ -673,35 +646,6 @@ ui.formInput('OneToMany', {
       scope.dataView.onRowCountChanged.subscribe(function (e, args) {
         adjustSize();
       });
-
-      if (!(scope._viewParams || {}).summaryView || scope.field.widget === "master-detail") {
-        return;
-      }
-      var col = {
-        id: '_summary',
-        name: '<span>&nbsp;</span>',
-        sortable: false,
-        resizable: false,
-        width: 16,
-        formatter: function(row, cell, value, columnDef, dataContext) {
-          return '<i class="fa fa-caret-right" style="display: inline-block; cursor: pointer; padding: 4px 10px;"></i>';
-        }
-      };
-
-      var cols = grid.getColumns();
-      cols.splice(0, 0, col);
-
-      grid.setColumns(cols);
-      grid.onClick.subscribe(function(e, args) {
-        if ($(e.target).is('.fa-caret-right'))
-          scope.$timeout(function(){
-            grid.setSelectedRows([args.row]);
-            grid.setActiveCell(args.row, args.cell);
-            scope.$timeout(function () {
-              scope.onSummary();
-            });
-          });
-      });
     };
 
     scope.onGridBeforeSave = function(records) {
@@ -726,7 +670,7 @@ ui.formInput('OneToMany', {
     var field = scope.field;
     if (field.widget === 'master-detail') {
       setTimeout(function(){
-        scope.showDetailView();
+        scope.createDetailView();
       });
     }
 

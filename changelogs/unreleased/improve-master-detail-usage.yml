@@ -1,0 +1,9 @@
+---
+title: Improve MasterDetail usage
+type: feature
+description: |
+  MasterDetail form is no more displayed by default, but only when a line is selected and we want to create new record from.
+  Also, when we add a new record, cancel current edit or click on back button, MaterDetail form is hidden.
+  Add a new button "Add and new" to allow pushing current record in grid and quickly create a new one.
+  
+  

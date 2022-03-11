@@ -66,40 +66,158 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
 
   };
 
-  var originalEdit = $scope.edit;
+  var tout = 300;
 
-  function doEdit(record) {
-    if (record && record.id > 0 && !record.$fetched) {
-      $scope.doRead(record.id).success(function(record){
-        originalEdit(record);
-      });
-    } else {
-      originalEdit(record);
+  var visibilityTimer = null;
+  function setVisibility(visibility, immediate) {
+    if(visibilityTimer) {
+      clearTimeout(visibilityTimer)
     }
-  }
 
-  function doClose() {
-    if ($scope.isDetailView) {
-      $scope.edit($scope.getSelectedRecord());
+    function update(_visibility) {
+      $scope.visible = _visibility;
+    }
+
+    if (immediate === true) {
+      update(visibility);
       return;
     }
-    $scope.edit(null);
-    $scope.waitForActions(function () {
-      $scope.visible = false;
-      $element.hide();
-      $element.data('$rel').show();
-    });
+    visibilityTimer = setTimeout(() => {
+      update(visibility);
+    }, tout);
   }
 
-  $scope.edit = function(record) {
-    doEdit(record);
+  var recordTimer = null;
+  function setRecord(record, fireOnLoad, immediate) {
+    if(recordTimer) {
+      clearTimeout(recordTimer)
+    }
+
+    function update(_record, _fireOnLoad) {
+      if (_record && _record.id > 0 && !_record.$fetched) {
+        Object.keys(_record)
+            .filter(function (name) { return name.indexOf(".") >= 0 })
+            .forEach(function (name) {
+              ui.setNested(_record, name, _record[name]);
+              delete _record[name];
+            });
+        $scope.doRead(_record.id).success(function(rec){
+          var updated = _.extend({}, rec, _record);
+          originalEdit(updated, _fireOnLoad);
+        });
+      } else {
+        originalEdit(_record, _fireOnLoad);
+      }
+    }
+
+    if (immediate === true) {
+      update(record, fireOnLoad);
+      return;
+    }
+    recordTimer = setTimeout(() => {
+      update(record, fireOnLoad);
+    }, tout);
+  }
+
+  var originalEdit = $scope.edit;
+
+  function doEdit(record, fireOnLoad, adjustVisible, immediate) {
+    if ($scope.gridEditing) {
+      return;
+    }
+    setRecord(record, fireOnLoad, immediate);
+    if (adjustVisible === false) {
+      return;
+    }
+    setVisibility(record != null, immediate);
+  }
+
+  function clearForm(adjustVisible, immediate) {
+    doEdit(null, false, adjustVisible, immediate);
+  }
+
+  function isPopulated() {
+    return $scope.record != null && $scope.record.id != null;
+  }
+
+  $scope.edit = function(record, fireOnLoad) {
+    if ($scope.closeForm) {
+      $scope.closeForm = false;
+      if ($scope.fireNew) {
+        $scope.onCreate()
+      } else {
+        // When we just add item, don't display MaterDetail form
+        clearForm(true);
+        scrollToGrid();
+      }
+      return;
+    }
+    doEdit(record, fireOnLoad, true);
     $scope.setEditable(!$scope.$parent.$$readonly);
   };
 
+  $scope.$on('grid:changed', function(event) {
+    var record = $scope.getSelectedRecord();
+    if ($scope.closeAfterUpdate) {
+      // Don't reopen same record after updated in MasterDetail
+      $scope.closeAfterUpdate = false;
+      return;
+    }
+    if (record && record.selected && !$scope.gridEditing) {
+      $scope.waitForActions(loadSelected);
+    }
+  });
+
+  function scrollToGrid() {
+    var gridElem = $element.prev()[0];
+    if (gridElem) {
+      gridElem.scrollIntoView();
+    }
+  }
+
+  function scrollToDetailView() {
+    var detailViewElem = $element[0];
+    if (detailViewElem) {
+      detailViewElem.scrollIntoView();
+    }
+  }
+
   $scope.onClose = function() {
-    $scope.onClear();
-    doClose();
+    clearForm(true, true);
+    scrollToGrid();
   };
+
+  $scope.onCancel = function() {
+    clearForm(true, true);
+    scrollToGrid();
+  };
+
+  $scope.canClose = function() {
+    return $scope.isReadonly() && $scope.visible;
+  }
+
+  $scope.canCancel = function() {
+    return !$scope.isReadonly() && $scope.visible;
+  }
+
+  $scope.canAdd = function() {
+    return !$scope.isReadonly() && !isPopulated() && $scope.visible;
+  }
+
+  $scope.canUpdate = function() {
+    return !$scope.isReadonly() && isPopulated() && $scope.visible;
+  }
+
+  $scope.canCreate = function() {
+    return $scope.hasPermission("create") && !$scope.isReadonly() && $scope.isEditable() && $scope.$parent.canNew() && !$scope.visible;
+  }
+
+  $scope.onCreate = function() {
+    setVisibility(true);
+    clearForm(false, true);
+    $scope.$broadcast('on:new');
+    scrollToDetailView();
+  }
 
   $scope.onOK = function() {
     if (!$scope.isValid()) {
@@ -115,12 +233,16 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
       }
     }
     $scope.waitForActions(function () {
+      $scope.closeAfterUpdate = true;
       $scope.select($scope.record);
-      $scope.waitForActions(doClose);
+      $scope.waitForActions(function () {
+        clearForm(true, true);
+      });
+      scrollToGrid();
     });
   };
 
-  $scope.onAdd = function() {
+  $scope.onAdd = function(fireNew) {
     if (!$scope.isValid() || !$scope.record) {
       return;
     }
@@ -129,14 +251,15 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     record.id = null;
     record.version = null;
     record.$version = null;
-
-    $scope.onClear();
+    // make the record as selected in the grid (like in popup)
+    record.selected = true;
 
     function doSelect(rec) {
+      $scope.closeForm = true;
+      $scope.fireNew = fireNew;
       if (rec) {
         $scope.select(rec);
       }
-      return doEdit(rec);
     }
 
     if (!$scope.editorCanSave) {
@@ -148,31 +271,21 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     });
   };
 
-  $scope.onClear = function() {
-    if ($scope.$parent.selection) {
-      $scope.$parent.selection.length = 0;
-    }
-    doEdit(null);
-  };
-
-  $scope.canUpdate = function () {
-    return $scope.record && $scope.record.id;
-  };
-
   function loadSelected() {
     var record = $scope.getSelectedRecord();
-    if ($scope.isDetailView) {
-      $scope.edit(record);
-    }
+    $scope.edit(record, true);
   }
-
-  $scope.$on('grid:changed', function(event) {
-    loadSelected();
-  });
 
   $scope.$on('on:edit', function(event, record) {
     if ($scope.$parent.record === record) {
-      $scope.waitForActions(loadSelected);
+      // on parent top form editing
+      if($scope.visible) {
+        $scope.waitForActions(loadSelected);
+      } else {
+        $scope.waitForActions(function () {
+          clearForm(true);
+        });
+      }
     }
   });
 
@@ -180,6 +293,48 @@ function EmbeddedEditorCtrl($scope, $element, DataSource, ViewService) {
     if (readonly === old) return;
     $scope.setEditable(!readonly);
   });
+
+  $scope.setDetailView = function () {
+    $scope.isDetailView = true;
+
+    $scope.$parent.$on('on:slick-editor-init', function () {
+      $scope._viewParams.forceReadonly = true;
+    });
+
+    $scope.$parent.$on('on:slick-editor-change', function (e, record) {
+      if ($scope.gridEditing) {
+        $scope.record = record;
+        $scope.$broadcast('on:record-change', record);
+      }
+    });
+
+    $scope.$parent.$on('on:grid-edit-start', function () {
+      $scope.$timeout(function () {
+        $scope.gridEditing = true;
+        setVisibility(true);
+      })
+    });
+
+    $scope.$parent.$on('on:grid-edit-end', function (e, grid, opts) {
+      $scope.gridEditing = false;
+      // Revert changes
+      if (opts.cancel && opts.dirty && $scope.record.id) {
+        $scope.waitForActions(function () {
+          loadSelected();
+        });
+      }
+    });
+
+    var _onItemClick = $scope.$parent.onItemClick;
+    $scope.$parent.onItemClick = function (e, args) {
+      _onItemClick(e, args);
+      $scope.$applyAsync(function () {
+        if (!$scope.visible) {
+          loadSelected();
+        }
+      });
+    }
+  }
 
   $scope.show();
 }
@@ -189,22 +344,16 @@ var EmbeddedEditor = {
   css: 'nested-editor',
   scope: true,
   controller: EmbeddedEditorCtrl,
-  link: function (scope, element, attrs) {
-    setTimeout(function () {
-      var prev = element.prev();
-      if (prev.is("[ui-slick-grid]")) {
-        element.zIndex(prev.zIndex() + 1);
-      }
-    });
-  },
   template:
-    '<fieldset class="form-item-group bordered-box" ui-show="visible">'+
-      '<div ui-view-form x-handler="this"></div>'+
+    '<fieldset class="form-item-group bordered-box">'+
+      '<div ui-view-form x-handler="this" ng-show="visible"></div>'+
       '<div class="btn-toolbar pull-right">'+
-        '<button type="button" class="btn btn btn-info" ng-click="onClose()" ng-show="isReadonly()"><span x-translate>Back</span></button> '+
-        '<button type="button" class="btn btn-danger" ng-click="onClose()" ng-show="!isReadonly()"><span x-translate>Cancel</span></button> '+
-        '<button type="button" class="btn btn-primary" ng-click="onAdd()" ng-show="!isReadonly() && !canUpdate()"><span x-translate>Add</span></button> '+
-        '<button type="button" class="btn btn-primary" ng-click="onOK()" ng-show="!isReadonly() && canUpdate()"><span x-translate>OK</span></button>'+
+        '<button type="button" class="btn btn btn-info" ng-click="onClose()" ng-show="canClose()"><span x-translate>Close</span></button> '+
+        '<button type="button" class="btn btn-danger" ng-click="onCancel()" ng-show="canCancel()"><span x-translate>Cancel</span></button> '+
+        '<button type="button" class="btn btn-primary" ng-click="onAdd()" ng-show="canAdd()"><span x-translate>Add</span></button> '+
+        '<button type="button" class="btn btn-primary" ng-click="onOK()" ng-show="canUpdate()"><span x-translate>Update</span></button>'+
+        '<button type="button" class="btn btn-primary" ng-click="onCreate()" ng-show="canCreate()"><span x-translate>New</span></button>'+
+      '<button type="button" class="btn btn-primary" ng-click="onAdd(true)" ng-show="canAdd()"><span x-translate>Add and new</span></button>'+
       '</div>'+
     '</fieldset>'
 };
