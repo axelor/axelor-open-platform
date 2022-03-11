@@ -1,6 +1,0 @@
----
-title: Check context read perm on action-report in case of attachment
-type: security
-description: |
-  If action-report attach the generated report to current object, it 
-  now check for read permission on that object.

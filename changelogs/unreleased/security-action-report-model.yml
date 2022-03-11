@@ -1,5 +1,0 @@
----
-title: Add model attribute to action-report
-type: security
-description: |
-  If a model is not specified on action-report, permission is checked against context.

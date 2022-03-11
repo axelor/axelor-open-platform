@@ -1,6 +1,0 @@
----
-title: Add support to use MasterDetail with editable grid
-type: feature
-description: |
-  When MasterDetail is used with editable grid, the form is readonly 
-  and record is now live sync with the changes made in editable grid.

@@ -1,3 +1,63 @@
+## 5.4.13 (2022-03-11)
+
+#### Features
+
+* Improve MasterDetail usage
+
+  <details>
+  
+  MasterDetail form is no more displayed by default, but only when a line is selected and we want to create new record from.
+  Also, when we add a new record, cancel current edit or click on back button, MaterDetail form is hidden.
+  Add a new button "Add and new" to allow pushing current record in grid and quickly create a new one.
+  
+  </details>
+
+* Add support to use MasterDetail with editable grid
+
+  <details>
+  
+  When MasterDetail is used with editable grid, the form is readonly 
+  and record is now live sync with the changes made in editable grid.
+  
+  </details>
+
+#### Fixed
+
+* Fix downloading attachment of action-report
+* Fix permission checking with charts and custom views
+
+  <details>
+  
+  Should not check for permission on `MetaView` when executing actions from charts.
+  `onInit` action on charts use current model if calling from `action-view` else,
+  `ScriptBindings` is used, so that we still have a context.
+  
+  </details>
+
+* Fix file name downloaded in notify box
+* Prevent grid sorting when there are dirty rows
+* Allow dashboard drag&drop according to view customization permission
+
+#### Security
+
+* Add model attribute to action-report
+
+  <details>
+  
+  If a model is not specified on action-report, permission is checked against context.
+  
+  </details>
+
+* Check context read perm on action-report in case of attachment
+
+  <details>
+  
+  If action-report attach the generated report to current object, it 
+  now check for read permission on that object.
+  
+  </details>
+
+
 ## 5.4.12 (2022-03-04)
 
 #### Fixed
