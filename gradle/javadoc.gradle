@@ -55,8 +55,7 @@ task generateDocs(type: Javadoc) {
   include '**/com/axelor/text/**'
 
   options.links = [
-    'https://docs.oracle.com/javaee/7/api',
-    'https://docs.oracle.com/javase/7/docs/api',
+    'https://docs.oracle.com/en/java/javase/11/docs/api',
     'http://google.github.io/guice/api-docs/4.0/javadoc',
     'http://google.github.io/guava/releases/18.0/api/docs/',
     'http://docs.jboss.org/hibernate/orm/4.2/javadocs',
