@@ -2544,6 +2544,21 @@ Grid.prototype.cancelEdit = function (opts) {
   }
 };
 
+Grid.prototype.isEditCancelled = function () {
+  // Escape
+  if (!this.isEditActive()) {
+    return true;
+  }
+
+  // Cancel button
+  if ($(document.activeElement)
+      .is(this.editorForm.find('.slick-form-buttons').find('.btn-danger'))) {
+    return true;
+  }
+
+  return false;
+};
+
 Grid.prototype.commitEdit = function (noWait) {
   if (!noWait) {
     var that = this;

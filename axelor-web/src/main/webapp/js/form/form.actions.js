@@ -326,6 +326,9 @@ ActionHandler.prototype = {
   },
 
   onChange: function(event) {
+    if (this.scope.grid && this.scope.grid.isEditCancelled()) {
+      return;
+    }
     return this.handle({ wait: 100 });
   },
 
