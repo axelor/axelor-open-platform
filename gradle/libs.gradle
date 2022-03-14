@@ -61,6 +61,7 @@ libs.byte_buddy = "net.bytebuddy:byte-buddy:1.6.14"
 libs.axelor_el = "com.axelor:axelor-el:${versions.tomcat}"
 
 // javax libs
+libs.javax_jaxb = "javax.xml.bind:jaxb-api:2.3.1"
 libs.javax_servlet = "javax.servlet:javax.servlet-api:3.1.0"
 libs.javax_servlet_jsp = "javax.servlet.jsp:javax.servlet.jsp-api:2.3.1"
 libs.javax_validation = "javax.validation:validation-api:1.1.0.Final"
