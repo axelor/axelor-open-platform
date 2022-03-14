@@ -186,13 +186,28 @@ libs.commons_csv = [
 ]
 
 // BIRT Runtime
-libs.birt_runtime = ["milyn:flute:1.3", dependencies.create("org.eclipse.birt.runtime:org.eclipse.birt.runtime:4.4.2") {
-  exclude module: "derby"
-  exclude module: "org.apache.batik.pdf" // causing issue with commons-io
-  exclude module: "commons-cli"
-  exclude module: "flute"
-  exclude module: "org.apache.commons.codec"
-}]
+libs.birt_runtime = [
+  dependencies.create("org.eclipse.birt.runtime:org.eclipse.birt.runtime:4.4.2") {
+    exclude module: "derby"
+    exclude module: "org.eclipse.datatools.connectivity.apache.derby"
+    exclude module: "org.eclipse.datatools.connectivity.apache.derby.dbdefinition"
+    exclude module: "org.apache.batik.pdf" // causing issue with commons-io
+    exclude module: "commons-cli"
+    exclude module: "xml-apis"
+    exclude module: "javax.xml.stream"
+    exclude module: "org.w3c.dom.smil"
+    exclude module: "org.apache.xerces"
+    exclude module: "xmlbeans"
+    exclude module: "flute"
+  },
+  // overrides
+  dependencies.create("xerces:xercesImpl:2.9.0") {
+    exclude module: "xml-apis"
+  },
+  "milyn:flute:1.3",
+  "org.apache.xmlbeans:xmlbeans:3.1.0"
+]
+
 
 // jcommander
 libs.jcommander = "com.beust:jcommander:1.71"
