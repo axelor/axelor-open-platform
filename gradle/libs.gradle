@@ -17,7 +17,7 @@ versions.pac4j = "3.8.3"
 versions.ldaptive = "1.2.4"
 
 versions.junit = "4.12"
-versions.slf4j = "1.7.32"
+versions.slf4j = "1.7.35"
 
 versions.tomcat = "8.5.54"
 versions.tomcat_embed = "${versions.tomcat}"
@@ -34,9 +34,9 @@ libs.slf4j_base = [
 ]
 
 libs.slf4j_logback = libs.slf4j_base + [
-  "ch.qos.logback:logback-core:1.2.9",
-  "ch.qos.logback:logback-classic:1.2.9",
-  "org.fusesource.jansi:jansi:1.18"
+  "ch.qos.logback:logback-core:1.2.11",
+  "ch.qos.logback:logback-classic:1.2.11",
+  "org.fusesource.jansi:jansi:2.4.0"
 ]
 
 // Guava
