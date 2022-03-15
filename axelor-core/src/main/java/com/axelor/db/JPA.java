@@ -319,7 +319,7 @@ public final class JPA {
     if (id == null || id <= 0) {
       id = null;
       try {
-        bean = klass.newInstance();
+        bean = klass.getDeclaredConstructor().newInstance();
       } catch (Exception ex) {
         throw new IllegalArgumentException(ex);
       }

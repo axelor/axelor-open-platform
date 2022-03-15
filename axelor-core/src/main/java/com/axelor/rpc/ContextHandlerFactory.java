@@ -118,7 +118,7 @@ public final class ContextHandlerFactory {
     final ContextHandler<T> handler = new ContextHandler<>(beanClass, values);
     try {
       final Class<? extends T> proxyClass = PROXY_CACHE.get(beanClass).asSubclass(beanClass);
-      final T proxy = proxyClass.newInstance();
+      final T proxy = proxyClass.getDeclaredConstructor().newInstance();
       ((HandlerAccessor) proxy).setContextHandler(handler);
       handler.setProxy(proxy);
       return handler;

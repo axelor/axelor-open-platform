@@ -154,7 +154,7 @@ public final class MetaStore {
     boolean massUpdate = false;
     Object bean = null;
     try {
-      bean = modelClass.newInstance();
+      bean = modelClass.getDeclaredConstructor().newInstance();
     } catch (Exception e) {
     }
 
@@ -181,7 +181,7 @@ public final class MetaStore {
         Object obj = null;
         if (name.contains(".")) {
           try {
-            obj = property.getEntity().newInstance();
+            obj = property.getEntity().getDeclaredConstructor().newInstance();
           } catch (Exception e) {
           }
         } else {

@@ -421,7 +421,7 @@ public class Mapper {
   public static <T> T toBean(Class<T> klass, Map<String, Object> values) {
     final T bean;
     try {
-      bean = klass.newInstance();
+      bean = klass.getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       throw new IllegalArgumentException(e);
     }

@@ -86,7 +86,7 @@ public class DataAdapter {
   private Adapter create() {
     Class<?> type = getType();
     try {
-      return (Adapter) type.newInstance();
+      return (Adapter) type.getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       throw new IllegalArgumentException("Invalid adapter: " + klass);
     }

@@ -124,7 +124,7 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
   @Override
   public Object eval(String expr, Bindings bindings) throws Exception {
     Class<?> klass = SCRIPT_CACHE.get(expr);
-    Script script = (Script) klass.newInstance();
+    Script script = (Script) klass.getDeclaredConstructor().newInstance();
     script.setBinding(
         new Binding(bindings) {
 

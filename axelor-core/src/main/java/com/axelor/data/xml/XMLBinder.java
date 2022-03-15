@@ -379,7 +379,7 @@ public abstract class XMLBinder {
 
   private Object newInstance(Class<?> type) {
     try {
-      return type.newInstance();
+      return type.getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       throw new IllegalArgumentException(e);
     }

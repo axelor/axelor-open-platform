@@ -315,6 +315,7 @@ public class ActionHandler {
                 .make()
                 .load(klass.getClassLoader())
                 .getLoaded()
+                .getDeclaredConstructor()
                 .newInstance();
 
         // validate method

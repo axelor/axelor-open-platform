@@ -51,10 +51,10 @@ public class EqualityTest extends JpaTest {
       ImmutableList.of(Address.class, Contact.class);
 
   @Test
-  public void testNewInstanceNotEquals() throws InstantiationException, IllegalAccessException {
+  public void testNewInstanceNotEquals() throws Exception {
     for (Class<? extends Model> modelClass : modelClasses) {
-      Model entity1 = modelClass.newInstance();
-      Model entity2 = modelClass.newInstance();
+      Model entity1 = modelClass.getDeclaredConstructor().newInstance();
+      Model entity2 = modelClass.getDeclaredConstructor().newInstance();
       assertNotEquals(
           String.format(
               "Two new empty instances of %s should not be equal.", modelClass.getSimpleName()),
@@ -64,11 +64,11 @@ public class EqualityTest extends JpaTest {
   }
 
   @Test
-  public void testModelSet() throws InstantiationException, IllegalAccessException {
+  public void testModelSet() throws Exception {
     for (Class<? extends Model> modelClass : modelClasses) {
       Set<Model> entities = new HashSet<>();
-      Model entity1 = modelClass.newInstance();
-      Model entity2 = modelClass.newInstance();
+      Model entity1 = modelClass.getDeclaredConstructor().newInstance();
+      Model entity2 = modelClass.getDeclaredConstructor().newInstance();
       entities.add(entity1);
       entities.add(entity2);
       assertTrue(
@@ -94,11 +94,11 @@ public class EqualityTest extends JpaTest {
   }
 
   @Test
-  public void testModelMap() throws InstantiationException, IllegalAccessException {
+  public void testModelMap() throws Exception {
     for (Class<? extends Model> modelClass : ImmutableList.of(Address.class, Contact.class)) {
       Map<Model, Model> entities = new HashMap<>();
-      Model entity1 = modelClass.newInstance();
-      Model entity2 = modelClass.newInstance();
+      Model entity1 = modelClass.getDeclaredConstructor().newInstance();
+      Model entity2 = modelClass.getDeclaredConstructor().newInstance();
       entities.put(entity1, entity1);
       entities.put(entity2, entity2);
       assertSame(

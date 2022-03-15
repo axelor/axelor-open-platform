@@ -73,7 +73,7 @@ public class GuiceRunner extends BlockJUnit4ClassRunner {
 
     for (Class<? extends Module> c : guiceModules.value()) {
       try {
-        modules.add(c.newInstance());
+        modules.add(c.getDeclaredConstructor().newInstance());
       } catch (Exception e) {
         throw new InitializationError(e);
       }

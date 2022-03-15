@@ -210,7 +210,7 @@ public class CSVBinder {
 
     try {
       newBean = true;
-      return beanClass.newInstance();
+      return beanClass.getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

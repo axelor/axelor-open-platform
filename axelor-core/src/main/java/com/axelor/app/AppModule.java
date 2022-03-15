@@ -75,8 +75,8 @@ public class AppModule extends AbstractModule {
     for (Class<? extends AxelorModule> module : moduleClasses) {
       try {
         log.debug("Configure module: {}", module.getName());
-        install(module.newInstance());
-      } catch (InstantiationException | IllegalAccessException e) {
+        install(module.getDeclaredConstructor().newInstance());
+      } catch (Exception e) {
         throw new RuntimeException(e);
       }
     }
