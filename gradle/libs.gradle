@@ -234,9 +234,6 @@ libs.xstream = [
   "com.fasterxml.woodstox:woodstox-core:5.3.0"
 ]
 
-// opencsv
-libs.opencsv = "com.opencsv:opencsv:3.9"
-
 // jsoup for html parsing & sanitize
 libs.jsoup = "org.jsoup:jsoup:1.10.2"
 

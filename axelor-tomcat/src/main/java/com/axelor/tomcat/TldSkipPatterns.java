@@ -148,7 +148,6 @@ public final class TldSkipPatterns {
     patterns.add("lutung-*.jar");
     patterns.add("metadata-extractor-*.jar");
     patterns.add("mysql-connector-java-*.jar");
-    patterns.add("opencsv-*.jar");
     patterns.add("opensaml-*.jar");
     patterns.add("org.apache.batik.*.jar");
     patterns.add("org.apache.commons.codec-*.jar");
