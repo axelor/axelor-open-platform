@@ -51,8 +51,14 @@ libs.guice_servlet = "com.google.inject.extensions:guice-servlet:${versions.guic
 libs.guice_persist = "com.google.inject.extensions:guice-persist:${versions.guice}"
 libs.guice_multibindings = "com.google.inject.extensions:guice-multibindings:${versions.guice}"
 
-// ASM (repackaged to avoid version conflicts)
-libs.axelor_asm = "com.axelor:axelor-asm:5.2"
+// ASM
+libs.asm = [
+  "org.ow2.asm:asm:9.2",
+  "org.ow2.asm:asm-commons:9.2",
+  "org.ow2.asm:asm-util:9.2",
+  "org.ow2.asm:asm-tree:9.2",
+  "org.ow2.asm:asm-analysis:9.2"
+]
 
 // Byte Buddy
 libs.byte_buddy = "net.bytebuddy:byte-buddy:1.6.14"

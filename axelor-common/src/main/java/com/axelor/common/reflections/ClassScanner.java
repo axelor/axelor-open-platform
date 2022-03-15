@@ -17,10 +17,6 @@
  */
 package com.axelor.common.reflections;
 
-import com.axelor.internal.asm.AnnotationVisitor;
-import com.axelor.internal.asm.ClassReader;
-import com.axelor.internal.asm.ClassVisitor;
-import com.axelor.internal.asm.Opcodes;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 import java.io.IOException;
@@ -35,6 +31,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Opcodes;
 
 /**
  * The {@link ClassScanner} uses ASM and guava's ClassPath API to search for types based on super
@@ -217,7 +217,7 @@ final class ClassScanner {
     private Set<String> annotations;
 
     public Collector() {
-      super(Opcodes.ASM4);
+      super(Opcodes.ASM9);
     }
 
     private void acceptSuper(String name) {

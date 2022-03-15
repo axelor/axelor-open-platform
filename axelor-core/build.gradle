@@ -5,7 +5,7 @@ axelor {
 }
 
 dependencies {
-  implementation libs.axelor_asm
+  implementation libs.asm
 
   testImplementation project(":axelor-test")
 

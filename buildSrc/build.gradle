@@ -24,7 +24,7 @@ sourceSets {
 
 dependencies {
   implementation libs.guava
-  implementation libs.axelor_asm
+  implementation libs.asm
   implementation libs.commons_csv
   implementation libs.plugin_license
   implementation libs.snakeyaml

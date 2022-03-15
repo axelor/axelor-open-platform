@@ -20,11 +20,6 @@ package com.axelor.db.mapper;
 import com.axelor.common.ResourceUtils;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.Sequence;
-import com.axelor.internal.asm.ClassReader;
-import com.axelor.internal.asm.Opcodes;
-import com.axelor.internal.asm.tree.ClassNode;
-import com.axelor.internal.asm.tree.FieldInsnNode;
-import com.axelor.internal.asm.tree.MethodNode;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
@@ -52,6 +47,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 
 /**
  * This class can be used to map params to Java bean using reflection. It also provides convenient

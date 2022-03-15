@@ -5,7 +5,7 @@ dependencies {
   testImplementation libs.junit
 
   implementation libs.guava
-  implementation libs.axelor_asm
+  implementation libs.asm
   implementation libs.commons_csv
 }
 
