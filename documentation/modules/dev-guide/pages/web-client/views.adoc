@@ -1,0 +1,12 @@
+= Views
+:toc:
+:toc-title:
+
+The views represents the information to the users.
+
+* Grid View - represents data in tabular (list) form
+* Form View - represents data in html form
+* Tree View - represents data in hierarchical format
+* Chart View - represents data as 2D graphs
+* Calendar View - represents data as agenda/schedule based on date/time information
+* Search View - multi-object search view where search can be done on multiple objects

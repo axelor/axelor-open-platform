@@ -1,0 +1,151 @@
+= Reports
+:toc:
+:toc-title:
+
+:url-birt: http://eclipse.org/birt/
+
+The {page-component-title} integrates powerful {url-birt}[BIRT reports] for reporting.
+
+== Configuration
+
+Following configuration settings should be provided via `axelor-config.properties`.
+
+[source,properties]
+----
+# The external report design directory
+# ~~~~~
+# this directory is searched for the rptdesign files
+# (fallbacks to designs provided by modules)
+reports.design.dir = {user.home}/axelor/reports
+
+# Storage path for report outputs
+reports.output.dir = {user.home}/axelor/reports-gen
+----
+
+* `reports.design.dir` - the external directory of design files and related resources
+* `reports.output.dir` - the directory where generated reports are saved
+
+== Directory Structure
+
+The reports directory structure should be as follow:
+
+* `reports` - contains design files (`.rptdesign`)
+* `reports/lib` - contains library files (`.rptlibrary`)
+* `reports/img` - contains images
+* `reports/css` - contains style sheets
+
+The reports can also be provided from modules itself from the `src/main/resources/reports`
+directory which follows same structure.
+
+If `reports.design.dir` configuration is given, the resource locator first
+searches design files and related resources from that directory and fallbacks
+to the module provided resources.
+
+== Report Data Source
+
+The reports should only use `JDBC Data Source` to create data sets for the report.
+
+The {page-component-title} applications utilizes the internal hibernate connection to
+configure the report data sources.
+
+== Action Report
+
+Reports can be executed using a special xml action `action-report`.
+
+The `<action-report>` is used to define the action reports.
+
+[cols="2,8"]
+.Attributes
+|===
+| Name | Description
+
+| *`name`* | name of the action
+| *`design`* | the design file name (.rptdesign file)
+| *`output`* | name of the output file (can use `$\{name}`, `$\{date}`, `$\{time}` to provide dynamic name)
+| `format` | output format (pdf, doc, xsl, ps, html)
+| `attachment` | boolean, whether to attach the generated report to current object
+|===
+
+The action report can have following elements:
+
+* `<param>` - the report parameter
+** `name` - name of the parameter
+** `expr` - expression to provide parameter value
+** `if` - condition to check before preparing the value
+
+example:
+
+[source,xml]
+----
+<action-report name="action-report-invoice"
+    design="invoice.rptdesign"
+    output="invoice-${date}${time}"
+    format="pdf">
+    <param name="some" expr="eval: expression" if="confirmed"/>
+    <param name="thing" expr="constant" />
+</action-report>
+----
+
+The `action-report` must be the last action in the group of actions. For example:
+
+[source,xml]
+----
+<button ... onClick="action-report-invoice" /> <1>
+<button ... onClick="save,action-some,action-report-invoice" /> <2>
+<button ... onClick="save,action-some,action-report-invoice,action-another" /> <3>
+----
+<1> valid, only one action
+<2> valid, action-report is last action
+<3> invalid, action-report is not last action
+
+== Integration
+
+The {page-component-title} provides easy to use API to handle report generation.
+
+* `com.axelor.report.ReportGenerator` - provides methods to generate reports
+* `com.axelor.report.ReportEngineProvider` - provides a preconfigured singleton instance of `IReportEngine`
+
+You can generate reports from your code like this:
+
+[source,java]
+----
+public class PrintService {
+
+    @Inject private ReportGenerator generator;
+
+    public void print(String design, Map<String, Object> params) throws IOException {
+
+        OutputStream output = new FileOutputStream(...);
+        try {
+            generator.generate(output, design, params, Locale.getDefault());
+        } finally {
+            output.close();
+        }
+    }
+}
+----
+
+You can also work with `IReportEngine` instance directly (not recommended though) like this:
+
+[source,java]
+----
+public class PrintService {
+
+    @Inject private IReportEngine engine;
+
+    public void print(String design, Map<String, Object> params) throws IOException {
+
+        IResourceLocator locator = engine.getConfig().getResourceLocator();
+        URL found = locator.findResource(null, design, IResourceLocator.OTHERS);
+
+        if (found == null) {
+            return;
+        }
+
+        // TODO: open the design
+        // TODO: create render tasks
+        // TODO: provide task options
+        // TODO: run the task
+    }
+}
+----

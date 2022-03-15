@@ -1,0 +1,22 @@
+= Eclipse
+:toc:
+:toc-title:
+
+:url-eclipse: http://www.eclipse.org/
+:url-wtp: http://www.eclipse.org/webtools/
+:url-wtp-tomcat: http://help.eclipse.org/mars/index.jsp?topic=%2Forg.eclipse.jst.server.ui.doc.user%2Ftopics%2Ftomcat.html
+:url-buildship: https://projects.eclipse.org/projects/tools.buildship
+:url-buildship_install: https://github.com/eclipse/buildship/blob/master/docs/user/Installation.md
+
+The application project can be imported in {url-eclipse}[eclipse] as {url-buildship}[buildship] project.
+
+From the eclipse, import the project using menu:File[Import... > Gradle > Existing Gradle Project]
+
+[IMPORTANT]
+====
+* repeat `./gradlew generateCode` whenever you add/change any domain model definitions
+* repeat `./gradlew copyWebapp` if you run gradle clean task or delete build directory
+====
+
+The application project is configured to be {url-wtp}[eclipse webtool] compatible.
+{url-wtp-tomcat}[Create a tomcat 9.x server], add the `open-platform-demo` module and run the server.

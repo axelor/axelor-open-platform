@@ -1,0 +1,58 @@
+= Full-Text Search
+:toc:
+:toc-title:
+
+:url-search-home: http://hibernate.org/search
+:url-search-api: https://docs.jboss.org/hibernate/search/5.7/reference/en-US/html_single/#hsearch-mapping-programmaticapi
+
+Full-Text search is implemented in v5 using {url-search-home}[hibernate-search].
+Right now only name fields are searched except files (`DMSFile` and `MetaFile`).
+The global search box on grid view is used to make full-text search.
+
+== Configuration
+
+To enable full-text support, provide following configuration:
+
+[source,properties]
+----
+hibernate.search.default.directory_provider = filesystem
+hibernate.search.default.indexBase = {user.home}/.axelor/indexes
+----
+
+== Customization
+
+By default, only files and users are. Applications has to provide custom index configuration using
+hibernate search api by providing an implementation of `com.axelor.db.search.SearchMappingContributor`.
+
+.Example
+[source,java]
+----
+@Singleton
+public class MySearchMappingContributor implements SearchMappingContributor {
+
+    @Override
+    public void contribute(SearchMapping mapping) {
+
+        // index contacts
+        mapping.entity(Contact.class)
+            .indexed().indexName("contact")
+            .property("fullName", ElementType.FIELD).field()
+            .property("addresses", ElementType.FIELD).indexEmbedded();
+    }
+}
+----
+
+and in your bind it from app's module class:
+
+[source,java]
+----
+public class DemoModule extends AxelorModule {
+
+    @Override
+    protected void configure() {
+        bind(SearchMappingContributor.class).to(MySearchMappingContributor.class);
+    }
+}
+----
+
+See {url-search-api}[hibernate-search docs] for more details.

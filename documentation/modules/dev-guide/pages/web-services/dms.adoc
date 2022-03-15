@@ -1,0 +1,210 @@
+= Document Services
+:toc:
+:toc-title:
+
+These services provides basic access to various DMS features.
+
+== File listing
+
+This service can be used to find list of files under a specific directory.
+
+The web service is accessible with following url pattern:
+
+  GET /ws/dms/files?parent=id&pattern=matching
+
+.Request
+----
+GET /ws/dms/files
+Accept: application/json
+----
+
+.Request
+----
+GET /ws/dms/files?parent=2
+Accept: application/json
+----
+
+.Request
+----
+GET /ws/dms/files?parent=2&pattern=some
+Accept: application/json
+----
+
+The request also accepts query params:
+
+- `parent` - id of parent directory
+- `pattern` - file name match pattern
+
+Both params are optional and in that case lists root directory.
+
+.Response:
+[source,json]
+----
+{
+  "total": 2,
+  "data": [{
+    "id": 1,
+    "version": 1,
+    "fileName": "some.pdf",
+    "isDirectory": false
+  }, {
+    "id": 2,
+    "version": 0,
+    "fileName": "Some Folder",
+    "isDirectory": true
+  }]
+}
+----
+
+The response data represents `DMSFile` records.
+
+== File download
+
+This service can be used to download a file. It should be used as normal
+http request.
+
+  GET /ws/dms/download/:id
+
+The `id` should be a `DMSFile` record id.
+
+.Request
+----
+GET /ws/dms/download/1
+----
+
+.Response:
+[source]
+----
+Content-Disposition -> attachment; filename="some.pdf"
+Content-Length -> 7296
+Content-Transfer-Encoding -> binary
+Content-Type -> application/octet-stream
+----
+
+== File upload
+
+The upload service doesn't include file to DMS directly, but creates `MetaFile`
+records pointing to the uploaded file. The `MetaFile` record can be used later
+to create a `DMSFile` record (normal or attachment).
+
+The upload service allows to upload files in chunk. This is useful to upload
+large files effectively.
+
+.Request
+----
+POST /ws/files/upload
+Content-Length:148009
+Content-Type:application/octet-stream
+X-File-Name:some.tar.gz
+X-File-Offset:0
+X-File-Size:148009
+X-File-Type:application/gzip
+----
+
+The request body should be chunk of file data. The `Content-Length`,
+`X-File-Offset` and `X-File-Size` headers should be used to provide details
+about chunk so that:
+
+  X-File-Offset + Content-Length <= X-File-Size
+
+The headers are:
+
+- `X-File-Id` - the file id returned by the first chunk upload request
+- `X-File-Name` - the name of the file being uploaded
+- `X-File-Offset` - the chunk offset
+- `X-File-Size` - actual file size
+- `X-File-Type` - file mime type
+
+If uploaded in chunk, first upload request with offset `0` returns an unique
+file id. This file id should be passed as `X-File-Id` header on subsequent
+chunk uploads for remaining content.
+
+The last upload request returns following response:
+
+.Response
+[source,json]
+----
+{
+  "id": 1,
+  "fileName": "some.tar.gz",
+  "filePath": "some.tar.gz",
+  ...
+}
+----
+
+The response record represents a `MetaFile` record.
+
+== List attachments
+
+This service can be used to find list of files attached to some specific
+record.
+
+The web service is accessible with following url pattern:
+
+  GET /ws/dms/attachments/:model/:id
+
+.Request
+----
+GET /ws/dms/attachments/com.axelor.sale.db.Order/1
+Accept: application/json
+----
+
+.Response:
+[source,json]
+----
+{
+  "total": 2,
+  "data": [{
+    "id": 1,
+    "version": 1,
+    "fileName": "some.pdf"
+  }, {
+    "id": 2,
+    "version": 0,
+    "fileName": "another.pdf"
+  }]
+}
+----
+
+The response data represents `DMSFile` records.
+
+== Add attachment
+
+The `MetaFile` record obtained with upload service can be used to create
+attachments.
+
+.Request
+----
+PUT /ws/dms/attachments/com.axelor.sale.db.Order/1
+Accept: application/json
+Content-Type: application/json
+----
+
+[source,json]
+----
+{
+  "records": [{
+      "id": 1
+  }]
+}
+----
+
+The records array are `MetaFile` records (obtained with <<file-upload,upload service>>).
+
+.Resource
+[source,json]
+----
+{
+  "data": [{
+      "id": 101,
+      "fileName": "some.tar.gz"
+  }]
+}
+----
+
+The response data represents `DMSFile` records.
+
+== Delete attachment
+
+Just perform xref:web-services/rest.adoc#delete-a-record[delete request] on
+`com.axelor.dms.db.DMSFile` to delete the attachment represented by the file.

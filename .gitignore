@@ -51,3 +51,5 @@ application.gzip.*
 application.login.min.*
 application.login.gzip.*
 
+.cache
+

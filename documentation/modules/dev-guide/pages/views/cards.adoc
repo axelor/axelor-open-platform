@@ -1,0 +1,82 @@
+= Cards View
+:toc:
+:toc-title:
+
+The cards view can be used to show related data like photo, text and a link about
+a single subject as cards.
+
+[source,xml]
+-----
+<cards name="contact-cards" title="Contacts" model="com.axelor.contact.db.Contact" orderBy="fullName">
+  <field name="fullName" />
+  <field name="phone" />
+  <field name="email" />
+  <field name="address" />
+  <field name="hasImage" />
+  <template><![CDATA[
+  <div class="span4 card-image">
+    <img ng-if="hasImage" ng-src="{{$image(null, 'image')}}">
+    <img ng-if="!hasImage" src="img/user.png">
+    <strong>{{fullName}}</strong>
+  </div>
+  <div class="span8">
+    <address>
+      <strong>{{address.street}} {{address.area}}</strong><br>
+      {{address.city}}<span ng-if="address.state">, {{address.state}}</span><span ng-if="address.zip"> - {{address.zip}}</span><br>
+      {{address.country.name}}<br>
+      <abbr ng-if="phone" title="Phone">P:</abbr> {{phone}}<br>
+      <abbr ng-if="email" title="Email">E:</abbr> {{email}}<br>
+    </address>
+  </div>
+  ]]></template>
+</cards>
+-----
+
+The cards view attributes are:
+
+[cols="2,8"]
+|===
+| Attribute | Description
+| *`name`*    | name of the view
+| *`model`*   | fully qualified name of the domain model
+| `orderBy`   | a field to use to order cards
+| `cardWidth` | specify the widget of a card (default 33.33%)
+|===
+
+You can use `ui-action-click` directive in template to execute any action on click event.
+
+For example:
+
+[source,xml]
+-----
+<template><![CDATA[
+<button type="button" class="btn" ui-action-click="some.action" />
+]]>
+</template>
+-----
+
+== Template
+
+The `<template>` should be used to provide angular.js template to prepare the
+context of cards. It can use only the defined `<field>` values.
+
+A template helper function `$image(field, image)` can be used to put an image.
+
+[source,xml]
+----
+<!-- if image is binary field -->
+<img ng-src="{{$image(null, 'image')}}">
+
+<!-- if image is m2o to MetaFile -->
+<img ng-src="{{$image('image', 'content')}}">
+
+<!-- show binary field image of custom in sale order card -->
+<img ng-src="{{$image('customer', 'image')}}">
+----
+
+The field must be included in card view definition with `<field>` tag.
+
+Following helpers are provided
+
+* `$image(field, image)` - show image for the given field
+* `$fmt(field)` - show the formatted value of the given field

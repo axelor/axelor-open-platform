@@ -1,0 +1,51 @@
+= Attrs Action
+:toc:
+:toc-title:
+
+The `<action-attrs>` is used to define attrs action which is used to change
+attributes of view items.
+
+[source,xml]
+----
+<action-attrs name="order.on-confirm">
+  <attribute for="orderDate" name="readonly" expr="confirmed" /> <1>
+  <attribute for="name" name="hidden" expr="!id" /> <2>
+</action-attrs>
+----
+<1> make the `orderDate` field readonly if order is `confirmed`
+<2> make the `name` field hidden if the order is not saved yet
+
+[cols="2,8"]
+.Attributes
+|===
+| Name | Description
+
+| *name* | name of the action
+|===
+
+The attrs action requires following elements:
+
+* `<attribute>` - specify the attribute to update
+** `for` - comma-separated list of target field names
+** `name` - the name of the attribute to change
+** `expr` - groovy expression to calculate attribute value
+** `if` - a groovy boolean expression against the current context
+
+The following attributes can be changed:
+
+* `required` - mark the field as required or not
+* `readonly` - mark the field as readonly or not
+* `hidden` - show/hide the field
+* `domain` - change the domain filter of relational field
+* `title` - change the title of the field
+* `value` - the value to set
+* `value:set` - same as `value`
+* `value:add` - add a new item to the multi-valued relational field
+* `value:del` - remove an item from the multi-valued relational field value
+* `collapse` - collapsed state of a panel
+* `precision` - total number of digits of a decimal value
+* `scale` - number of digits in decimal part of a decimal value
+* `css` - CSS of an element
+* `icon` - icon of an element
+* `refresh` - refresh a dashlet
+* `selection-in` - The filter on the selection

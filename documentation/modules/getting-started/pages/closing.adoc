@@ -1,0 +1,17 @@
+= What's Next?
+:toc:
+:toc-title:
+
+:product-home: http://axelor.com
+:product-downloads: https://github.com/axelor/axelor-open-platform/releases
+:product-sources: https://github.com/axelor/axelor-open-platform
+
+Follow the xref:tutorial:step1.adoc[Tutorial] to create your first application using the {page-component-title}.
+
+For more detailed documentation, check the xref:dev-guide:index.adoc[Developer Guide].
+
+== Links
+
+* {product-home}
+* {product-downloads}
+* {product-sources}

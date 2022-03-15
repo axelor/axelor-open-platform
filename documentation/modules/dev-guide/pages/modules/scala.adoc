@@ -1,0 +1,110 @@
+= Scala Support
+:toc:
+:toc-title:
+
+:url-scala: http://www.scala-lang.org/
+:url-scala-eclipse: http://scala-ide.org/
+:url-scala-idea: http://www.scala-lang.org/documentation/getting-started-intellij-track/getting-started-with-scala-in-intellij.html
+
+{url-scala}[Scala] is a general-purpose programming language providing support for functional
+programming and a strong static type system. Designed to be concise,[10] many of Scala's design
+decisions aimed to address criticisms of Java.
+
+You can use Scala to create app modules.
+
+TIP: We can use {url-scala-eclipse}[Eclipse] for Scala, but for best experience, use {url-scala-idea}[IntelliJ IDEA].
+
+== Create Scala module
+
+You can create a new application module using scala with following `build.gradle`:
+
+[source,gradle]
+----
+apply plugin: 'scala'
+apply plugin: 'com.axelor.app-module'
+
+dependencies {
+    compile 'org.scala-lang:scala-library:2.11.8'
+    testCompile 'org.scalatest:scalatest_2.11:3.0.0'
+}
+----
+
+That's it. Your app module can now use Scala to implement business logic.
+
+== Create Services
+
+Let's create a simple HelloService using Scala:
+
+.HelloService.scala
+[source,scala]
+----
+package com.axelor.hello.service
+
+trait HelloService {
+
+  def say(what: String): Unit
+}
+----
+
+and an implementation:
+
+.HelloServiceImpl.scala
+[source,scala]
+----
+package com.axelor.hello.service
+
+class HelloServiceImpl extends HelloService {
+
+  override def say(what: String): Unit = {
+    println(s"Say: ${what}")
+  }
+}
+----
+
+== Create Controllers
+
+Let's create a controller class `HelloController` that uses the above `HelloService`:
+
+.HelloController.scala
+[source,scala]
+----
+package com.axelor.hello.web
+
+import javax.inject.Inject
+
+import com.axelor.hello.db.Hello
+
+import com.axelor.hello.service.HelloService
+import com.axelor.rpc.{Response, ActionRequest, ActionResponse}
+
+class HelloController @Inject() (service: HelloService) {
+
+  def say(req: ActionRequest, res: ActionResponse): Unit = {
+    val ctx = req.getContext.asType(classOf[Hello])
+    service.say(ctx.getMessage)
+    res.setStatus(Response.STATUS_SUCCESS)
+  }
+}
+----
+
+== Configure
+
+Now it's time to configure our scala services. Create a Guice module:
+
+.HelloModule.scala
+[source,scala]
+----
+package com.axelor.hello
+
+import com.axelor.app.AxelorModule
+import com.axelor.hello.service.{HelloService, HelloServiceImpl}
+
+class HelloModule extends AxelorModule {
+
+  override protected def configure(): Unit = {
+    bind(classOf[HelloService]).to(classOf[HelloServiceImpl])
+  }
+}
+----
+
+That's it...

@@ -1,0 +1,90 @@
+= Script Action
+:toc:
+:toc-title:
+
+The `<action-script>`, introduced in v5, can be used to create complex actions using scripting languages.
+
+[source,xml]
+----
+<action-script
+  name="create.invoice" <1>
+  model="com.axelor.sale.db.Order" <2>
+  >
+  <script
+    language="js" <3>
+    transactional="true" <4>
+    >
+  <![CDATA[
+  var req = $request; <5>
+  var res = $response; <6>
+  var so = req.context;
+  var invoice = new Invoice();
+  invoice.date = so.confirmDate;
+  // prepare invoice lines from sale order
+  //TODO: invoice.invoiceLines = listOf(...);
+
+  // if you want to save invoice
+  //invoice.saleOrder = em.find(Order.class, so.id);
+  //return $em.persist(invoice);
+
+  res.setValue('invoice', invoice);
+  res.setReadonly('customer', true);
+  // and so on...
+  ]]>
+  </script>
+</action-script>
+----
+<1> the name of the action (required)
+<2> the name of the context model
+<3> scripting language to use (required, currently `js` and `groovy` only)
+<4> whether the code is transactional
+<5> the `ActionRequest` is available as `$request`
+<6> the `ActionResponse` is available as `$response`
+
+The `action-script` is nothing but the xref:modules/coding.adoc#controllers[controller] method
+dynamically created using a scripting language. The `$request` and `$response` variables are nothing
+but the `ActionRequest` and `ActionResponse` parameters of controller method.
+
+Following variables are available in script execution context:
+
+[%header,cols="2,8"]
+|===
+| Name | Description
+| `$request` | the `ActionRequest`
+| `$response` | the `ActionReponse`
+| `$em` | the `EntityManager` if script is `transactional`
+| `$json` | instance of `MetaJsonRecordRepository` to work with xref:models/custom-models.adoc#[custom models]
+|===
+
+The `action-script` can be used for custom models too. Here is an example:
+
+[source,xml]
+----
+<action-script name="create.hello" model="com.axelor.meta.db.MetaJsonRecord">
+  <script language="js" transactional="true">
+  <![CDATA[
+    var hello = $json.create('hello'); <1>
+    hello.name = "Hello!!!";           <2>
+
+    var world = $json.all('world').by('name', '=', 'World!!!').fetchOne(); <3>
+    if (world == null) {
+        world = $json.create('world');
+        world.name = "World!!!";
+        world = $json.save(world); <4>
+        // now we can't update world, as it's converted to real instance
+    }
+
+    hello.world = world;  <5>
+
+    // return as response values
+    $response.values = hello;
+
+  ]]>
+  </script>
+</action-script>
+----
+<1> create a new empty context for `MetaJsonRecord` for the `hello` model
+<2> the context allows seamless access to custom field values
+<3> find a `world` model record by field `name`
+<4> record(s) intended for relational field values must be saved manually
+<5> set relational value (m2o)

@@ -1,0 +1,27 @@
+= Condition Action
+:toc:
+:toc-title:
+
+The `<action-condition>` is used to check the validity of a field and show a
+message under the field.
+
+[source,xml]
+-----
+<action-condition name="check-order-dates">
+  <check field="orderDate"/>
+  <check field="createDate"/>
+  <check field="createDate" if="orderDate &gt; createDate"
+    error="Order creation date is in the future."/>
+</action-condition>
+-----
+
+The condition action requires following items:
+
+* `<check>` - define a check
+** `field` - name of the field
+** `error` - error message
+** `if` - a boolean expression against the current context
+
+If `if` is not specified, it checks if the field is null.
+
+If `error` is not specified, a default message is displayed.

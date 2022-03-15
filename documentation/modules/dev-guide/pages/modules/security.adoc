@@ -1,0 +1,765 @@
+= Security
+:toc:
+:toc-title:
+
+:shiro: http://shiro.apache.org[Apache Shiro]
+:pac4j: http://www.pac4j.org[PAC4J security engine]
+
+Authentication is the process of identity verification and authorization is the
+process of determining access rights to resources in an application.
+
+The authentication and authorization support in {page-component-title} is based on {shiro}, while the different kinds of authentications mechanisms are implemented with the {pac4j}.
+
+In the next few sections, we will see how authentication and authorization are
+supported in {page-component-title}.
+
+== Authentication
+
+Authentication is the process of identity verification, i.e. allowing users
+to log in into to the system to use it.
+
+{page-component-title} is a web application framework used to create web applications.
+So by default, it provides form-based user authentication.
+
+User information is backed by the application database and it's also possible
+to integrate LDAP backend.
+
+*User*
+
+The User object has various properties, most important of them are:
+
+* `code` - the user login name
+* `name` - the display name
+* `password` - the password (stored encrypted in database)
+* `blocked` - whether the user is blocked
+* `activateOn` - the time from when access should be activated
+* `expiresOn` - the time from when access should expire
+* `groups` - the groups assigned to the user
+* `roles` - the roles assigned to the user
+* `permissions` - explicit permissions granted to the user
+
+The `groups`, `roles`, and `permissions` are associated with authorization which
+we will see in next section.
+
+== Authorization
+
+Authorization, also called access control, is the process of determining access
+rights to resources in an application.
+
+Authorization is a critical element of any application but it can quickly
+become very complex. Based on the simplicity of {shiro}, the {page-component-title} provides
+very simple yet powerful way to define authorization rules.
+
+IMPORTANT: Special user `admin` and members of group `admins` have
+full access to all the resources.
+
+*Features*
+
+* Role based permissions
+* Permission defines single access rule (finer granularity)
+* Groups are for organizational structure but also supports roles & permissions
+* Deny all, grant selectively (proven most secure as all permissions are denied by default)
+* Package level permission rules
+
+Authorization has four core elements permissions, roles, groups and users. They
+are represented by corresponding backing domain objects `Permission`, `Role`,
+`Group` and `User` respectively.
+
+*Objects*
+
+* `User` has one `Group`
+* `User` has many `Role`
+* `User` has many `Permission`
+* `Group` has many `Role`
+* `Group` has many `Permission`
+* `Role` has many `Permission`
+
+The relationship between the authorization objects allows to achieve finer level
+of granularity on access control.
+
+*Permission*
+
+The permission object defines the access rule. It has the following properties:
+
+* `name` - permission name
+* `object` - the object name (class name or wild card package name)
+* `canRead` - whether to grant read permission
+* `canWrite` - whether to grant update permission
+* `canCreate` - whether to grant create permission
+* `canRemove` - whether to grant delete permission
+* `canExport` - whether to grant export data permission
+* `condition` - permission condition (JPQL where clause with positional parameters)
+* `conditionParams` - comma-separated list of condition params (evaluates against current context)
+
+The `condition` is optional and the boolean flags are grant only, that is, `false`
+value doesn't mean deny.
+
+Some permission examples (pseudo code):
+
+-----
+name: perm.sale.read.all
+object: com.axelor.sale.db.*
+canRead: true
+-----
+
+-----
+name: perm.sale.create.all
+object: com.axelor.sale.db.*
+canCreate: true
+-----
+
+-----
+name: perm.sale.self
+object: com.axelor.sale.db.Order
+canRead: true
+canWrite: true
+canRemove: true
+canExport: true
+condition: self.createdBy = ?
+conditionParams: __user__
+-----
+
+The first rule grants readonly permission to all the objects under `com.axelor.sale.db` package.
+The second rule grants create permission to all the objects under `com.axelor.sale.db` package.
+The third rule grants read, write, delete, export permission on `com.axelor.sale.db.Order` to the creator user.
+
+The permission resolution is done in this order:
+
+* check for permissions assigned to the user object
+* check for permissions assigned to the roles of the user
+* check for the permissions assigned to the group of the user
+* check for the permissions assigned to the group's roles
+
+== View Access
+
+Similar to the object authorization, view access permissions can be used to
+control object view fields for users, groups and roles.
+
+The `Permission (fields)` defined on `User`, `Group` and `Role` objects can be
+used to define permission rules for view item.
+
+The permission rules are applied to all the views associated with the given
+object. The view items should have a name in order to define a rule for them.
+
+The rule also allows setting client side conditions (js expressions) to control
+readonly/visibility of the fields/items.
+
+Some examples (pseudo code):
+
+.Define a rule to hide total amount
+-----
+name: perm.sales.hide-total
+object: com.axelor.sale.db.Order
+rules:
+  field: totalAmount
+  canRead: false
+  canWrite: false
+  canExport: false
+-----
+
+.Define a rule to control customer field
+-----
+name: perm.sales.customer-change
+object: com.axelor.sale.db.Order
+rules:
+  field: customer
+  canRead: true
+  canWrite: true
+  canExport: true
+  readonlyIf: confirmed && __group__ == 'manager'
+  hideIf: __group__ == 'user'
+-----
+
+The first rule hides the `totalAmount` field from the views.
+The second rule defines how the `customer` field should behave depending on user group.
+
+Unlike the object permission rules, view permission rules follows `Grant all -> Deny Selectively` strategy.
+
+== Single Sign-On
+
+:direct-vs-indirect-clients: https://www.pac4j.org/docs/clients.html#1-direct-vs-indirect-clients
+
+Single sign-on in {page-component-title} relies on the various clients from the {pac4j}. There are two kinds of clients: {direct-vs-indirect-clients}[direct and indirect clients].
+
+For indirect clients, the user is redirected to an external identity provider for login and then back to the application.
+If no callback URL is configured, it defaults to "base URL" + "/callback".
+
+[source,properties]
+-----
+# Single sign-on common configuration
+#
+# callback URL for all indirect clients (defaults to application.baseUrl + "/callback")
+auth.callback.url = http://localhost:8080/open-platform-demo/callback
+-----
+
+You can define how users provided by central authentication should be dealt with. You can choose between "create" (create and update users), "link" (only update users), and "none" (do nothing). You can also specify the default group for new users.
+
+[[auth-user-provisioning]]
+[source,properties]
+-----
+# user provisioning: create / link / none
+auth.user.provisioning = create
+# default group for created users
+auth.user.default.group = users
+-----
+
+You can define what logout URL to use when no `url` request parameter is provided to the logout endpoint.
+You can also define the logout URL pattern that the `url` parameter must match (only relative URLs are allowed by default).
+By default, only local logout is performed, but you may choose whether central logout should be performed as well (needs to be supported by the configured central authentication).
+
+[source,properties]
+-----
+# logout URL
+auth.logout.url =
+# logout URL pattern
+auth.logout.url.pattern =
+# remove profiles from session
+auth.logout.local = true
+# call identity provider logout endpoint
+auth.logout.central = false
+-----
+
+=== OpenID Connect
+
+Various OpenID Connect clients are built-in. client ID and secret are the base configurations, but a few more configurations might be required, depending on the client.
+
+==== Built-in clients
+
+[source,properties]
+-----
+# OpenID Connect
+
+# Google client
+#
+# Google client ID
+auth.oidc.google.client.id = 127736102816-tc5mmsfaasa399jhqkfbv48nftoc55ft.apps.googleusercontent.com
+# Google client secret
+auth.oidc.google.secret = qySuozNl72zzM5SKW-0kczwV
+
+# Azure Active Directory client
+#
+# Azure Active Directory client ID
+auth.oidc.azuread.client.id = 53baf26b-526d-4f5c-e08a-dc207a808854
+# Azure Active Directory client secret
+auth.oidc.azuread.secret = NMubGVqkcDwwGs6fa01tBBqlkTisfUd4nCpYgcxxx=
+# Azure Active Directory tenant ID
+auth.oidc.azuread.tenant = 491caf37-da1b-774c-b91f-f428b77d5055
+
+# Keycloak client
+#
+# Keycloak client ID
+auth.oidc.keycloak.client.id =
+# Keycloak client secret
+auth.oidc.keycloak.secret =
+# Keycloak authentication realm
+auth.oidc.keycloak.realm =
+# Keycloak server base URI
+auth.oidc.keycloak.base.uri =
+-----
+
+[[oidc-customization]]
+Each built-in client has a default icon and a default title (text displayed beside the icon on the login page), but you can customize them.
+
+[source,properties]
+-----
+auth.oidc.google.icon = path/to/custom_icon.svg
+auth.oidc.google.title = My custom Google title
+-----
+
+By default, users can log in with either the configured central authentications or form authentication. If you want to disable form authentication, you need to configure only one central client and add the exclusive configuration.
+
+[source,properties]
+-----
+auth.oidc.google.exclusive = true
+-----
+
+==== Custom clients
+You can configure several custom OpenID Connect clients. Just replace `generic` in the parameter names with your own unique client name.
+
+[source,properties]
+-----
+# Generic OpenID Connect client
+#
+# name of the generic client (needs to be unique)
+auth.oidc.generic.name = OidcClient
+# client title
+auth.oidc.generic.title = OpenID Connect
+# client icon URL (a generic one is used if not specified)
+auth.oidc.generic.icon =
+# exclusive client (no form authentication) if no other client is specified
+auth.oidc.generic.exclusive = false
+-----
+
+In addition to client ID and secret configurations, you need to specify the discovery URI, ie. the URI to the document that provides details about the OpenID Connect provider's configuration.
+
+[source,properties]
+-----
+# client ID
+auth.oidc.generic.client.id =
+# client secret
+auth.oidc.generic.secret =
+# discovery URI
+auth.oidc.generic.discovery.uri =
+-----
+
+You can reinforce security by using the `nonce parameter`, which is a random value generated by your application that enables replay protection when present.
+[source,properties]
+-----
+# Additional configuration
+#
+# use the nonce parameter
+auth.oidc.generic.use.nonce = false
+-----
+
+You can define the flow you want to use by defining the response type and the response mode. For the response type, if the value is `code`, launches a Basic flow, requiring a `POST` to the token endpoint to obtain the tokens. If the value is `token id_token` or `id_token token`, launches an Implicit flow, requiring the use of JavaScript at the redirect URI to retrieve tokens from the URI `#fragment`. If response mode is set to `form_post`, Authorization Response parameters are encoded as HTML form values that are auto-submitted in the User Agent.
+
+[source,properties]
+-----
+# define flow's response_type
+auth.oidc.generic.response.type = code
+# define flow's response_mode
+auth.oidc.generic.response.mode =
+-----
+
+You can customize the scope. In that case, the value must begin with the string `openid` and then include `profile`, `email`, and/or any other user details supported by your configured OpenID Connect client.
+
+[source,properties]
+-----
+# define the scope
+auth.oidc.generic.scope =
+-----
+
+You can define a direct client by defining the header name and the prefix header.
+
+[source,properties]
+-----
+# Direct client
+#
+# header name
+auth.oidc.generic.header.name =
+# prefix header
+auth.oidc.generic.prefix.header =
+-----
+
+=== OAuth
+
+==== Built-in clients
+
+Various OAuth clients are built-in. For each of them, the key and secret configurations are required.
+
+[source,properties]
+-----
+# OAuth
+
+# Google client key
+auth.oauth.google.key = 127736102816-tc5mmsfaasa399jhqkfbv48nftoc55ft.apps.googleusercontent.com
+# Google client secret
+auth.oauth.google.secret = qySuozNl72zzM5SKW-0kczwV
+
+# Facebook client key
+auth.oauth.facebook.key =
+# Facebook client secret
+auth.oauth.facebook.secret =
+
+# Twitter client key
+auth.oauth.twitter.key =
+# Twitter client secret
+auth.oauth.twitter.secret =
+
+# Yahoo! client key
+auth.oauth.yahoo.key =
+# Yahoo! client secret
+auth.oauth.yahoo.secret =
+
+# LinkedIn client key
+auth.oauth.linkedin.key =
+# LinkedIn client secret
+auth.oauth.linkedin.secret =
+
+# Windows Live client key
+auth.oauth.windowslive.key =
+# Windows Live client secret
+auth.oauth.windowslive.secret =
+
+# WeChat client key
+auth.oauth.wechat.key =
+# WeChat client secret
+auth.oauth.wechat.secret =
+
+# GitHub client key
+auth.oauth.github.key =
+# GitHub client secret
+auth.oauth.github.secret =
+-----
+
+Icon, title, and exclusive mode can be configured the same way as for xref:oidc-customization[OpenID Connect clients].
+
+==== Custom clients
+You can configure several custom OAuth 2.0 clients. Just replace `generic` in the parameter names with your own unique client name.
+
+[source,properties]
+-----
+# Generic OAuth 2.0 client
+#
+# name of the generic client (needs to be unique)
+auth.oauth.generic.name = GenericOAuth20Client
+# client title
+auth.oauth.generic.title = OAuth 2.0
+# client icon URL (a generic one is used if not specified)
+auth.oauth.generic.icon =
+# exclusive client (no form authentication) if no other client is specified
+auth.oauth.generic.exclusive = false
+
+# client key
+auth.oauth.generic.key =
+# client secret
+auth.oauth.generic.secret =
+-----
+
+When configuring a generic OAuth 2.0 client, you may configure an authentication URL (where clients authenticate), a token URL (where clients obtain identity and access tokens), and a profile attribute mapper.
+
+[source,properties]
+-----
+# authentication URL
+auth.oauth.generic.auth.url =
+# token URL
+auth.oauth.generic.token.url =
+# profile attributes: list of comma-separated key:type|tag
+# supported types: Integer, Boolean, Color, Gender, Locale, Long, URI, String (default)
+auth.oauth.generic.profile.attrs = age:Integer|age,is_admin:Boolean|is_admin
+
+-----
+
+=== SAML 2.0
+
+You can configure login with any SAML identity provider using the SAML v2.0 protocol. Basic configuration consists of the path to the keystore, the keystore password, the private key password, the path to the identity provider metadata, and the path to the service provider metadata.
+
+[source,properties]
+-----
+# SAML 2.0
+
+# Basic configuration
+#
+# path to keystore
+auth.saml.keystore.path = path/to/samlKeystore.jks
+# value of the -storepass option for the keystore
+auth.saml.keystore.password = open-platform-demo-passwd
+# value of the -keypass option
+auth.saml.private.key.password = open-platform-demo-passwd
+# path to IdP metadata
+auth.saml.identity.provider.metadata.path = path/to/idp-metadata.xml
+# path to SP metadata
+auth.saml.service.provider.metadata.path = path/to/sp-metadata.xml
+-----
+
+By default, the SAML client will accept assertions based on a previous authentication for one hour, but you can change that behavior. The service provider entity ID defaults to "callback URL" + "?client_name=SAML2Client", but you can customize it.
+
+[source,properties]
+-----
+# Additional configuration
+#
+# accept assertions based on a previous authentication for one hour by default
+auth.saml.maximum.authentication.lifetime = 3600
+# custom SP entity ID
+auth.saml.service.provider.entity.id = http://localhost:8080/open-platform-demo/callback?client_name=SAML2Client
+-----
+
+You can control aspects of the authentication request such as forced and/or passive authentication.
+
+[source,properties]
+-----
+# Advanced configuration
+#
+# forced authentication
+auth.saml.force.auth = false
+# passive authentication
+auth.saml.passive = false
+-----
+
+You can define the binding type for the authentication request.
+
+[source,properties]
+-----
+# binding type for the authentication request: SAML2_POST_BINDING_URI / SAML2_POST_SIMPLE_SIGN_BINDING_URI / SAML2_REDIRECT_BINDING_URI
+auth.saml.authn.request.binding.type = SAML2_POST_BINDING_URI
+-----
+
+You can define the binding type for the authentication response.
+
+[source,properties]
+-----
+# binding type for the authentication response: SAML2_POST_BINDING_URI / SAML2_ARTIFACT_BINDING_URI
+auth.saml.response.binding.type = SAML2_POST_BINDING_URI
+-----
+
+By SAML specification, the authentication request must not contain a NameQualifier, if the SP entity is in the format nameid-format:entity. However, some IdP require that information to be present. You can force a NameQualifier in the request.
+
+[source,properties]
+-----
+# force a NameQualifier in the request
+auth.saml.use.name.qualifier = false
+-----
+
+You can allow the authentication request sent to the identity provider to specify an attribute consuming index and an assertion consumer service index.
+
+[source,properties]
+-----
+# attribute consuming index
+auth.saml.attribute.consuming.service.index = -1
+# assertion consumer service index
+auth.saml.assertion.consumer.service.index = -1
+-----
+
+You can configure the supported algorithms and digest methods for the initial authentication request.
+
+[source,properties]
+-----
+# list of blacklisted signature signing algorithms
+auth.saml.blacklisted.signature.signing.algorithms =
+# list of signature algorithms
+auth.saml.signature.algorithms =
+# list of signature reference digest methods
+auth.saml.signature.reference.digest.methods =
+# signature canonicalization algorithm
+auth.saml.signature.canonicalization.algorithm =
+-----
+
+By default, assertions must be signed, but this may be disabled. You may also want to enable signing of the authentication requests.
+
+[source,properties]
+-----
+# whether assertions must be signed
+auth.saml.wants.assertions.signed = true
+# enable signing of the authentication requests
+auth.saml.authn.request.signed = false
+-----
+
+=== CAS
+
+To login with a CAS server, you need to configure the CAS login URL and/or the CAS prefix URL (when different URLs are required). You can define the CAS protocol you want to support (CAS30 by default).
+
+[source,properties]
+-----
+# CAS
+
+# Application configuration
+#
+# login URL of CAS server
+auth.cas.login.url = https://localhost:8443/cas
+# CAS prefix URL
+auth.cas.prefix.url =
+# CAS protocol: CAS10 / CAS20 / CAS20_PROXY / CAS30 / CAS30_PROXY / SAML
+auth.cas.protocol = CAS30
+-----
+
+Various parameters are available.
+
+[source,properties]
+-----
+# Various parameters
+#
+# encoding used for parsing the CAS responses
+auth.cas.encoding = UTF-8
+# whether the renew parameter will be used
+auth.cas.renew = false
+# whether the gateway parameter will be used
+auth.cas.gateway = false
+# time tolerance for the SAML ticket validation
+auth.cas.time.tolerance = 1000
+# class name for specific CallbackUrlResolver
+auth.cas.url.resolver.class =
+# class name for default TicketValidator
+auth.cas.default.ticket.validator.class =
+-----
+
+You can enable proxy support.
+
+[source,properties]
+-----
+# use proxy support
+auth.cas.proxy.support = false
+-----
+
+:logout-handler: https://github.com/pac4j/pac4j/blob/master/pac4j-core/src/main/java/org/pac4j/core/logout/handler/LogoutHandler.java[LogoutHandler]
+
+You can specify your own implementation of the {logout-handler} interface.
+
+[source,properties]
+-----
+# class name for specific LogoutHandler
+auth.cas.logout.handler.class =
+-----
+
+By default, an indirect CAS client is used, but you may opt for any of the different kinds of direct clients.
+
+[source,properties]
+-----
+# client type: indirect / direct / direct-proxy / rest-form / rest-basic-auth
+auth.cas.client.type = indirect
+-----
+
+When using a direct-proxy client, you need to specify the service URL.
+
+[source,properties]
+-----
+# direct-proxy client configuration
+#
+# service URL
+auth.cas.service.url =
+-----
+
+When using a rest-form client, you need to specify the username and password parameters.
+
+[source,properties]
+-----
+# rest-form client configuration
+#
+# username parameter
+auth.cas.username.parameter =
+# password parameter
+auth.cas.password.parameter =
+-----
+
+When using a rest-basic-auth client, you need to specify the header name and the prefix header.
+
+[source,properties]
+-----
+# rest-basic-auth client configuration
+#
+# header name
+auth.cas.header.name =
+# prefix header
+auth.cas.prefix.header =
+-----
+
+== LDAP
+
+In order to enable LDAP authentication, you typically need at least this kind of configuration
+in your `axelor-config.properties` file:
+
+[source,properties]
+-----
+# LDAP
+
+# server URL
+auth.ldap.server.url = ldap://localhost:389
+
+# search base suffix for the users
+auth.ldap.user.base = ou=users,dc=example,dc=com
+
+# search base suffix for the groups
+auth.ldap.group.base = ou=groups,dc=example,dc=com
+-----
+
+You may tweak user and group search if needed for your LDAP server.
+
+[source,properties]
+-----
+# template to search users by user identifier
+auth.ldap.user.filter = (uid={0})
+
+# user identifier attribute: uid / cn
+auth.ldap.user.id.attribute = uid
+
+# template to search groups by user identifier
+auth.ldap.group.filter = (uniqueMember=uid={0},ou=users,dc=example,dc=com)
+-----
+
+
+:ldap-profile-service: https://github.com/pac4j/pac4j/blob/master/pac4j-ldap/src/main/java/org/pac4j/ldap/profile/service/LdapProfileService.java[LdapProfileService]
+
+If you configure the system user, the {ldap-profile-service} will be able to create, update, and remove profiles.
+
+[source,properties]
+-----
+# system user
+auth.ldap.system.user = uid=admin,ou=system
+# system password
+auth.ldap.system.password = secret
+-----
+
+User creation/update on the application side is controlled by the xref:auth-user-provisioning[`auth.user.provisioning`] configuration. With the base implementation, the LDAP server is accessed as read-only. If you want to achieve full synchronization, you need to configure the system user and implement your own synchronization logic.
+
+Simple example updating user e-mail address:
+
+[source,java]
+-----
+public class MyUserRepository extends UserRepository {
+  @Inject private AxelorLdapProfileService axelorLdapProfileService;
+
+  @Override
+  public User save(User user) {
+    final LdapProfile profile = axelorLdapProfileService.findById(user.getCode());
+
+    if (profile != null) {
+      profile.addAttribute(AxelorLdapProfileDefinition.EMAIL, user.getEmail());
+      axelorLdapProfileService.update(profile, null);
+    }
+
+    return super.save(user);
+  }
+}
+-----
+
+
+You may configure the SASL mechanism and the connection security.
+
+[source,properties]
+-----
+# SASL authentication type: simple / CRAM-MD5 / DIGEST-MD5 / EXTERNAL / GSSAPI
+auth.ldap.auth.type = simple
+
+# use SSL
+auth.ldap.use.ssl = false
+# use StartTLS
+auth.ldap.use.starttls = false
+-----
+
+You may customize the truststore or keystore configuration.
+
+[source,properties]
+-----
+# truststore
+auth.ldap.credential.trust.store =
+# keystore
+auth.ldap.credential.key.store =
+
+# Truststore/keystore password
+auth.ldap.credential.store.password =
+# Truststore/keystore type
+auth.ldap.credential.store.type =
+# comma-separated list of truststore/keystore aliases
+auth.ldap.credential.store.aliases =
+-----
+
+You may use X509 certificates for both authentication and trust.
+
+[source,properties]
+-----
+# trust certificates
+auth.ldap.credential.trust.certificates =
+# authentication certificate
+auth.ldap.credential.authentication.certificate =
+# authentication key
+auth.ldap.credential.authentication.key =
+-----
+
+You may set the timeouts.
+
+[source,properties]
+-----
+# time that connections will block in seconds
+auth.ldap.connect.timeout =
+# time to wait for responses in seconds
+auth.ldap.response.timeout =
+-----
+
+== Basic Authentication
+
+You can enable direct basic authentication, which is a method to provide username and password when making a request (disabled by default).
+
+[source,properties]
+-----
+# Basic authentication
+auth.local.basic.auth.enabled = false
+-----

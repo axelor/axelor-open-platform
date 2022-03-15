@@ -1,0 +1,54 @@
+= MetaData Services
+:toc:
+:toc-title:
+
+Following are the services to get meta data of domain models.
+
+== Get models
+
+This service returns list of all domain models
+
+.Request
+----
+GET /ws/meta/models HTTP/1.1
+Accept: application/json
+----
+
+.Respose:
+[source,json]
+-----
+{
+  "status"  : 0,
+  "total"   : 32,
+  "data"    : ["com.axelor.contact.db.Contact", "..."]
+}
+-----
+
+== Get model properties
+
+This service can be used to get properties of a domain model.
+
+.Request
+----
+GET /ws/meta/fields/com.axelor.contact.db.Contact HTTP/1.1
+Accept: application/json
+----
+
+.Response:
+[source,json]
+----
+{
+  "status": 0,
+  "data": {
+    "model": "com.axelor.contact.db.Contact",
+    "fields": [{
+      "name": "firstName",
+      "type": "STRING",
+      "required": true
+    }, {
+      "name": "lastName",
+      "type": "STRING"
+    }, "..."]
+  }
+}
+----

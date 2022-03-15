@@ -1,0 +1,336 @@
+= CSV DataSource
+:toc:
+:toc-title:
+
+The CSV (comma-separated values) are most widely used legacy data format.
+
+The CSV data transform requires `csv-config` files which are xml based data
+mapping rules.
+
+== Data Mapping
+
+The CSV data mapping definitions are defined using XML syntax. A typical config
+file looks like this:
+
+[source,xml]
+-----
+<?xml version="1.0"?>
+<csv-inputs xmlns="http://axelor.com/xml/ns/data-import"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://axelor.com/xml/ns/data-import
+    http://axelor.com/xml/ns/data-import/data-import_6.0.xsd">
+
+    <input file="titles.csv" type="com.axelor.contact.db.Title"/>
+    <input file="circles.csv" type="com.axelor.contact.db.Circle"/>
+    <input file="company.csv" type="com.axelor.contact.db.Company"/>
+    <input file="contacts.csv" type="com.axelor.contact.db.Contact"/>
+
+    <input file="titles.csv" type="com.axelor.contact.db.Title"
+        search="self.code = :code" update="true">
+        <bind to="code" column="code"></bind>
+        <bind to="name" column="name" if-empty="true"></bind>
+    </input>
+
+    <input file="titles-no-header.csv" type="com.axelor.contact.db.Title"
+        search="self.code = :code" update="true">
+        <header>code,name</header>
+        <bind to="code" column="code"></bind>
+        <bind to="name" column="name" if-empty="true"></bind>
+    </input>
+
+    <input file="contacts-update.csv" type="com.axelor.contact.db.Contact"
+        separator="\t"
+        search="self.firstName = :firstName AND self.lastName = :lastName"
+        update="true"/>
+
+    <input file="taxes.csv" type="com.axelor.sale.db.Tax"/>
+
+    <input file="sale-orders.csv" type="com.axelor.sale.db.Order"
+        call="com.axelor.data.tests.Validators:validateSaleOrder">
+
+        <!-- transform boolean value into 'true' or 'false' -->
+        <bind column="confirmed" to="confirmed"
+            eval="confirmed ==~ /^(T|Y|1)$/ ? 'true' : 'false'"/>
+
+        <bind column="date" to="orderDate"/>
+        <bind column="date" to="createDate"/>
+
+        <!-- default value provided with eval expression -->
+        <bind to="confirmDate" eval="java.time.LocalDate.now()"/>
+
+        <bind to="customer" search="self.email = :email" if="!email.empty">
+            <bind column="firstName" to="firstName"/>
+            <bind column="lastName" to="lastName"/>
+            <bind column="email" to="email"/>
+        </bind>
+
+        <bind to="customer" if="email.empty">
+            <bind column="firstName" to="firstName"/>
+            <bind column="lastName" to="lastName"/>
+            <bind to="email" eval='"${firstName}.${lastName}@gmail.com".toLowerCase()'/>
+        </bind>
+
+        <bind to="items">
+            <bind column="q1" to="quantity"/>
+            <bind column="r1" to="price"/>
+            <bind to="product" search="self.name = :p1">
+                <bind column="p1" to="name"/>
+                <bind column="p1" to="code"/>
+            </bind>
+            <bind column="t11" to="taxes" search="self.code = :t11"/>
+            <bind column="t12" to="taxes" search="self.code = :t12"/>
+      </bind>
+
+      <bind to="items">
+            <bind column="q2" to="quantity"/>
+            <bind column="r2" to="price"/>
+            <bind to="product" search="self.name = :p2">
+                <bind column="p2" to="name"/>
+                <bind column="p2" to="code"/>
+            </bind>
+            <bind column="t2" to="taxes" search="self.code in :t2"
+                eval="t2.split('\\|') as List"/>
+      </bind>
+
+    </input>
+
+</csv-input>
+-----
+
+As you can see, a mapping file maps input files to target objects and binds csv
+columns to target object fields. The syntax is self-explanatory and easy to understand.
+
+Let's see the binding in details:
+
+The `<input>` tag is used to map a source csv file to a target model type.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `file` | the source input file name
+| `type` | the target model name
+| `separator` | the separator character (default is comma `,`)
+| `search` | JPQL where clause search for existing record
+| `update` | `true` to only allow updating (if an existing record is not found, it will not be created)
+| `call` | call a method on the transformed object before saving it to database
+| `prepare-context` | call a method to prepare context before transforming the csv row
+|===
+
+The `<input>` can be used in many ways. You can see the first four inputs in the
+example are very simple. This is because of automatic import as the csv header
+column names matches to the target model field names. Otherwise, we need to
+specify binding manually using the `<bind>` tag.
+
+The `<bind>` tag can be used to map CSV columns to a target object field.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `column` | the CSV column name
+| `to` | the target model field name
+| `adapter` | type adapter, followed by an optional string argument separated by `{vbar}` character
+| `search` | jpql where clause search for existing record
+| `update` | if search returns an existing record whether to update it
+| `eval` | groovy expression, to transform the value
+| `if` | boolean groovy expression, only bind if condition passed
+| `if-empty` | only update the target value if target field is empty (or null)
+|===
+
+The `<bind>` tag can again have nested `<bind>` tags in case of binding
+relational fields.
+
+== Automatic Import
+
+If the CSV data files have identical columns with the field names of the target
+domain model class, it can be imported automatically with minimal configuration.
+
+[source,csv]
+-----
+title.code,firstName,lastName,email,phone,dateOfBirth,group.code,company.code
+mr,Peter,Parker,peter.parker@gmail.com,,1988-11-11,friends,
+mr,John,Smith,jsmith@gmail.com,,1979-11-01,friends,my
+-----
+
+The first line of the CSV file gives fields information.
+
+The dotted fields `title.code`, `group.code` and `company.code` can be used to
+related records directly.
+
+One of the major concern of importing data from external source is to manage
+relationship (data integration). As primary keys are often auto-generated values
+it's not easy to map the source keys with the target key. In order to overcome
+with this issue, instead of referencing the relations with primary key, we are
+using one or more keys of the related object that results in unique constraint
+to locate referenced record.
+
+Here `title.code` tells the transformation engine to query the referenced
+`title` record by `code` field. We can also provide multiple lookup fields like:
+
+
+[source,csv]
+----
+  orderDate,confirmed,...,customer.firstName,customer.lastName,...
+----
+
+In this case the record will be fetched by AND expression like this:
+
+[source,sql]
+----
+  SELECT self FROM Contact self WHERE self.firstName = :firstName AND self.lastName = :lastName
+----
+
+Similarly, `many-to-many` fields can be imported with multiple values separated
+with `|` like this:
+
+[source,csv]
+-----
+...,taxes.code
+...,tax1.4|tax0.2|tax0.4
+-----
+
+The many-to-many field will be set with the result of following query:
+
+[source,sql]
+----
+  SELECT self FROM Tax self WHERE self.code IN :code
+----
+
+The format of ``csv-config.xml` for automatic import looks like this:
+
+[source,xml]
+-----
+<?xml version="1.0"?>
+<csv-inputs xmlns="http://axelor.com/xml/ns/data-import"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/data-import
+  http://axelor.com/xml/ns/data-import/data-import_6.0.xsd">
+
+  <input file="titles.csv" type="com.axelor.contact.db.Title"/>
+  <input file="company.csv" type="com.axelor.contact.db.Company"/>
+  ...
+  ...
+  ...
+</csv-inputs>
+-----
+
+== Advanced Import
+
+Sometime it's more convenient to import complex records at once instead of
+providing different CSV for each object in the object graph.
+
+For example, sale orders, consider the following input:
+
+[source,csv]
+-----
+confirmed,date,firstName,lastName,email,p1,q1,r1,t11,t12,p2,q2,r2,t2
+T,2011-12-11,John,Smith,j.smith@gmail.com,PC1,1,200.12,vat0.4,stx,PC2,4,230.23,vat0.4|stx
+1,2011-12-12,John,Smith,j.smith@gmail.com,PC1,1,200.12,vat0.4,stx,PC2,4,230.23,vat0.6|stx
+F,2011-12-13,John,Smith,j.smith@gmail.com,PC1,10,200.12,vat0.4,stx,PC2,3,230.23,vat0.4|stx
+F,2011-12-14,John,Smith,,L1,5,20.12,vat0.4,stx,L2,3,20.23,vat0.4|vat0.6
+-----
+
+A confirmed order placed on a particular date by someone with the given items.
+The columns are not matched with underlying object so can't be mapped automatically.
+
+The manual data binding should be done from configuration like this:
+
+[source,xml]
+-----
+<?xml version="1.0"?>
+<csv-inputs xmlns="http://axelor.com/xml/ns/data-import"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/data-import
+  http://axelor.com/xml/ns/data-import/data-import_6.0.xsd">
+
+  ...
+  ...
+
+  <input file="sale-orders.csv" type="com.axelor.sale.db.Order"
+    call="com.axelor.data.tests.Validators:validateSaleOrder">
+
+    <!-- transform boolean value into 'true' or 'false' -->
+    <bind column="confirmed" to="confirmed"
+      eval="confirmed ==~ /^(T|Y|1)$/ ? 'true' : 'false'"/>
+
+    <bind column="date" to="orderDate"/>
+    <bind column="date" to="createDate"/>
+
+    <!-- default value provided with eval expression -->
+    <bind to="confirmDate" eval="java.time.LocalDate.now()"/>
+
+    <bind to="customer" search="self.email = :email" if="!email.empty">
+      <bind column="firstName" to="firstName"/>
+      <bind column="lastName" to="lastName"/>
+      <bind column="email" to="email"/>
+    </bind>
+
+    <bind to="customer" if="email.empty">
+      <bind column="firstName" to="firstName"/>
+      <bind column="lastName" to="lastName"/>
+      <bind to="email" eval='"${firstName}.${lastName}@gmail.com".toLowerCase()'/>
+    </bind>
+
+    <bind to="items">
+      <bind column="q1" to="quantity"/>
+      <bind column="r1" to="price"/>
+      <bind to="product" search="self.name = :p1">
+        <bind column="p1" to="name"/>
+        <bind column="p1" to="code"/>
+      </bind>
+      <bind column="t11" to="taxes" search="self.code = :t11"/>
+      <bind column="t12" to="taxes" search="self.code = :t12"/>
+   </bind>
+
+   <bind to="items">
+      <bind column="q2" to="quantity"/>
+      <bind column="r2" to="price"/>
+      <bind to="product" search="self.name = :p2">
+        <bind column="p2" to="name"/>
+        <bind column="p2" to="code"/>
+      </bind>
+      <bind column="t2" to="taxes" search="self.code in :t2"
+        eval="t2.split('\\|') as List"/>
+   </bind>
+
+  </input>
+
+</csv-inputs>
+-----
+
+The related records can be searched using the given search query. If related
+object is not found, a new record will be created.
+
+== Conditional Binding
+
+This feature allows you to bind columns based on some condition.
+This can be done like this:
+
+[source,xml]
+-----
+...
+  <bind to="customer" search="self.email = :email" if="!email.empty">
+   <bind column="firstName" to="firstName"/>
+   <bind column="lastName" to="lastName"/>
+   <bind column="email" to="email"/>
+  </bind>
+
+  <bind to="customer" if="email.empty">
+   <bind column="firstName" to="firstName"/>
+   <bind column="lastName" to="lastName"/>
+   <bind to="email" eval='"${firstName}.${lastName}@gmail.com".toLowerCase()'/>
+  </bind>
+...
+-----
+
+The first binding is applied if the given if condition `!email.empty` is
+evaluated to true. In that case, the record will be searched by the given search
+expression and if found will be updated with provided values. If not, a new
+record will be created.
+
+The second binding is applied if the given if condition `email.empty` is
+evaluate to true. In this case, a new records is create with calculated
+email address.
+
+The if conditions should be simple groovy expressions.

@@ -1,0 +1,24 @@
+= Overview
+:toc:
+:toc-title:
+
+:url-hibernate,: http://hibernate.org/orm/
+
+In this chapter we will see one of the main component of the modules, the domain objects.
+
+The domain objects, also called models or entities are nothing but a representation
+of data in object form used by the modules.
+
+The domain objects are JPA pojo classes. The {page-component-title} uses
+{url-hibernate}[Hibernate] as the JPA provider.
+
+The domain objects are defined using XML in the `src/main/resources/domains`
+folder. The definition is then used by code generator to generate entity and
+repository classes.
+
+The generated entity classes are JPA compatible pojo classes with some added
+features to deal with collection fields & computed fields.
+
+The generated repository classes provides methods for CRUD operations and some
+finder methods. The repository class generation is configurable, we'll see
+about this very soon.

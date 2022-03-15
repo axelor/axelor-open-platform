@@ -1,0 +1,84 @@
+= Step 2: Create a Module
+:toc:
+:toc-title:
+
+:url-gradle: http://gradle.org/
+:url-gradle-multi: https://docs.gradle.org/current/userguide/multi_project_builds.html
+
+We have created the application project successfully in previous step.
+Now the real functionalities should be added by creating modules.
+
+== Create a module
+
+A module is again a gradle sub project. Typically created inside `modules` directory.
+However, you can use any directory structure. See {url-gradle-multi}[gradle multi-project builds]
+documentation for more details.
+
+In this section, we will see how to create a simple `axelor-contact` module.
+This demo module defines some objects for managing contacts.
+
+Create a new directory `modules/axelor-contact` inside application project and create module
+build script like this:
+
+.modules/axelor-contact/build.gradle
+[source,gradle]
+----
+plugins {
+  id 'com.axelor.app' // <1>
+}
+
+axelor { // <2>
+  title = 'Axelor Contact'
+}
+----
+<1> The gradle plugin for module project
+<2> The module project configuration
+
+That's it. You have successfully created your first module.
+
+Let's check the `build.gradle` script:
+
+The `com.axelor.app` plugin defines an extension point `axelor` where we
+can define various properties.
+
+* title - display title for the module
+* description - a short description about the module
+
+== Update application project
+
+Now as we have the module ready, we have to utilize it in the build process.
+So we have to include the module to the `settings.gradle` of the application
+project.
+
+.settings.gradle
+[source,gradle,indent=0]
+----
+// Include modules
+include "modules:axelor-contact"
+----
+
+And the application is using this module, so the `build.gradle` has to be
+updated like this:
+
+[source,gradle]
+.build.gradle
+----
+...
+dependencies {
+  compile project(':modules:axelor-contact')
+}
+----
+
+Now check whether the project is configured properly, build it again:
+
+[source,sh]
+----
+$ ./gradlew build
+----
+
+The build should complete without any error.
+
+== What's next?
+
+Still we have only created bare module and it doesn't provide any functionalities yet.
+In the xref:step3.adoc[next step], we'll see how to add domain entities.

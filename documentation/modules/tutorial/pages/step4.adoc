@@ -1,0 +1,176 @@
+= Step 4: Define Views
+:toc:
+:toc-title:
+
+Now we have some models defined, it's time to define views for them.
+
+== Define views
+
+The {page-component-title} uses xml definition to define the views. In this section,
+we'll see how to create `grid` and `form` views for the `Contact` model:
+
+[source,xml]
+.axelor-contact/src/main/resources/views/Contact.xml
+----
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views
+  http://axelor.com/xml/ns/object-views/object-views_6.0.xsd">
+
+  <grid name="contact-grid" title="Contacts"
+    model="com.axelor.contact.db.Contact"> <1>
+    <field name="fullName" />
+    <field name="email" />
+    <field name="phone" />
+    <field name="dateOfBirth" />
+  </grid>
+
+  <form name="contact-form" title="Contact"
+    model="com.axelor.contact.db.Contact"> <2>
+    <panel title="Overview"> <3>
+      <field name="fullName" readonly="false">
+        <editor> <4>
+          <field name="title" colSpan="3"/>
+          <field name="firstName" colSpan="4"/>
+          <field name="lastName" colSpan="5"/>
+        </editor>
+      </field>
+      <field name="dateOfBirth" />
+      <field name="email">
+        <viewer><![CDATA[ <5>
+        <a href="mailto:{{record.email}}">{{record.email}}</a>
+        ]]></viewer>
+      </field>
+      <field name="phone">
+        <viewer><![CDATA[
+        <a href="tel:{{record.phone}}">{{record.phone}}</a>
+        ]]></viewer>
+      </field>
+    </panel>
+    <panel title="About me">
+        <field name="notes" showTitle="false" colSpan="12"/>
+    </panel>
+    <panel-related field="addresses" <6>
+      form-view="address-form-popup"> <7>
+        <field name="street"/>
+        <field name="area"/>
+        <field name="city"/>
+        <field name="state"/>
+        <field name="zip"/>
+        <field name="country"/>
+    </panel-related>
+    <panel sidebar="true"> <8>
+      <field name="createdOn"/>
+      <field name="createdBy"/>
+      <field name="updatedOn"/>
+      <field name="updatedBy"/>
+    </panel>
+  </form>
+
+  <form name="address-form-popup" title="Address"
+    model="com.axelor.contact.db.Address">
+    <panel title="Overview">
+      <field name="street" />
+      <field name="area" />
+      <field name="city" />
+      <field name="zip" />
+      <field name="state" />
+      <field name="country" />
+    </panel>
+  </form>
+
+</object-views>
+----
+<1> The grid view with the give fields are grid columns
+<2> The form view is used to view/edit a record
+<3> The panel that can be used to group relevant fields
+<4> The editor can be used to define custom editor for the field
+<5> The viewer can be used to define custom template to display field value
+<6> The panel-related can be used to show o2m/m2m fields
+<7> The form view to edit the address in popup
+<8> The panel to show in the right sidebar
+
+Views are generally mapped to some domain object, here the `grid` and `form`
+view are defined for the `Contact` object.
+
+The view definition is minimal and you only have to define layout of fields.
+The fields defined in the view binds to the object fields, if a corresponding
+field doesn't exist in the object it's considered as dummy field and values
+from dummy fields has to be handled manually.
+
+Let's see these views in some more details:
+
+== Grid  view
+
+The grid view is used to show the record list. Grid view has following properties:
+
+* `name` - unique name of the view
+* `model` - fully qualified model name
+* `editable` - whether the grid is editable
+* `orderBy` - order by the given field
+
+An `editable` grid allows to update records inline. This can be used for quick
+data updates.
+
+Grid view has some advanced features, like grouping, row/cell highlight, buttons etc.
+
+== Form View
+
+The form view is used to show/edit a single record. This is the most important
+view for an object and provide rich set of widgets.
+
+Form view has the following properties:
+
+* `name` - unique name of the view
+* `model` - fully qualified model name
+* `editable` - whether the form is editable
+* `onNew` - action to execute when creating new record
+* `onLoad` - action to execute when loading a record
+* `onSave` - action to execute when saving the record
+
+The form uses responsive layout that adjusts according to the available screen size.
+The form is divided into 12 columns. The first 8 columns are used to place the normal
+`panel` and `panel-related` panels and the rest 4 columns are used to place the
+`sidebar` panels. If sidebar panels are not provided the normal panels will occupy
+all the 12 columns.
+
+Let's see each type of panel.
+
+* `panel` - panel with 12 columns, generally used to put simple fields
+* `panel-related` - a panel to put o2m/m2m fields
+* `panel-tabs` - holds another panels which are shown as notebook tabs
+* `panel-include` - include another panel form
+* `panel-dashlet` - dashlet panel can be used to embed another views
+
+The `panel` can use following widgets:
+
+* `field` - binds a model field, automatically selects appropriate widget
+* `spacer` - can be used to skip a cell
+* `label` - can be used to set a static label
+* `button` - a button widget that executes some action
+* `button-group` - group of buttons
+* `panel` - nested panel to fine tune the layout, with `stacked="true"` the contents
+   can be stacked vertically (useful when showing widgets using `showIf/hideIf` expressions or by other means)
+
+The field has few properties, but most common of them are:
+
+* `name` - name of the widget
+* `hidden` - whether the widget is hidden
+* `readonly` - whether the widget is readonly
+* `required` - whether the field is required
+
+Form view also supports some advanced features like dynamic expressions.
+See the xref:dev-guide:index.adoc[Developer Guide] for more details.
+
+== Update views
+
+If you change the view xml file, you have to re-import the views in database. Use the button:[Restore All...]
+on menu:Administration[View Management > All Views] to re-import all the views.
+
+CAUTION: All the changes applied directly to views in the database (through web ui) will be lost
+
+== What's Next?
+
+In this chapter we seen how to define views. In the xref:step5.adoc[next chapter]
+we will see how to create actions and menu items.

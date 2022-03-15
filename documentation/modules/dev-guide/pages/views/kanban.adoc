@@ -1,0 +1,51 @@
+= Kanban View
+:toc:
+:toc-title:
+
+The kanban view is a agile dashboard like view.
+
+[source,xml]
+-----
+<kanban name="project-task-kanban" title="Project Tasks" model="com.axelor.project.db.ProjectTask"
+  columnBy="state" sequenceBy="priority" onNew="project.task.kanban.on.new" limit="10">
+  <field name="name"/>
+  <field name="notes" />
+  <field name="progress"/>
+  <field name="startDate"/>
+  <field name="endDate"/>
+  <field name="user"/>
+  <hilite color="danger" if="progress == 0" />
+  <hilite color="success" if="progress == 100" />
+  <hilite color="info" if="progress &gt;= 50" />
+  <hilite color="warning" if="progress &gt; 0" />
+  <template><![CDATA[
+  <h4>{{name}}</h4>
+  <img ng-if="user" src="{{$image('user', 'image')}}">
+  <div class="card-body">{{notes}}</div>
+  <div class="card-footer">
+    <i class='fa fa-clock-o'></i> <span>{{startDate|date:'yyyy-MM-dd HH:mm:ss'}}</span>
+  </div>
+  ]]></template>
+</kanban>
+-----
+
+The kanban view attributes are:
+
+[cols="2,8"]
+|===
+| Attribute | Description
+| *`name`* | name of the view
+| *`model`* | fully qualified name of the domain model
+| *`columnBy`* | a selection field to create columns
+| *`sequenceBy`* | a field to use to re-order the cards (numeric fields only)
+| `onNew` | a field to use when creating record on the fly
+| `onMove` | action to call when moving a kanban card
+| `limit` | pagination limit per column
+|===
+
+== Template
+
+The `<template>` should be used to provide angular.js template to prepare the
+context of cards. It can use only the defined `<field>` values.
+
+A template helper function `$image(field, image)` can be used to put an image.

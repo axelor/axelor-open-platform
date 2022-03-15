@@ -1,0 +1,39 @@
+= Calendar View
+:toc:
+:toc-title:
+
+The calendar view shows data with schedule/agenda like interface with drag and
+drop support.
+
+[source,xml]
+-----
+<calendar name="project-task-calendar-my"
+  title="My Tasks"
+  model="com.axelor.project.db.ProjectTask"
+  colorBy="project"
+  eventStart="startDate"
+  eventStop="endDate"
+  eventLength="1">
+  <field name="name" />
+</calendar>
+-----
+
+The calendar view attributes are:
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| *`name`* | name of the calendar view
+| `model` | fully qualified name of the domain model
+| `eventStart` | name of the field of type date/datetime to be used as event start time
+| `eventStop` | name of the field of type date/datetme to be used as event stop time
+| `eventLength` | if eventStop is not given, the length of an event in hour (default is 1)
+| `dayLength` | working hours per day (default is 8)
+| `colorBy` | name of the field to be used to colorize the events (colors are used consistently according to the field and there is a maximum of 30 different colors)
+| `mode` | default view mode (month, week or day)
+| `onChange` | an action to call when event is changed (with drag or resize)
+|===
+
+The calendar data shows records as events. The display value if the event is
+configured with `<field>` items.

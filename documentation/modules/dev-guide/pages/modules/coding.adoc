@@ -1,0 +1,301 @@
+= Services & Controllers
+:toc:
+:toc-title:
+
+:url-guice: https://github.com/google/guice
+:url-groovy: http://www.groovy-lang.org/
+:url-scala: http://www.scala-lang.org/
+:url-kotlin: https://kotlinlang.org/
+:url-apidoc: http://docs.axelor.com/{page-component-name}/{page-component-version}/javadoc
+
+Till now we have seen how to define objects, view, actions using xml syntax.
+However, the business code has to be implemented by writing some real code.
+
+Besides Java, the most natural candidates to write business code are pure JVM
+languages like {url-groovy}[Groovy], {url-scala}[Scala] or {url-kotlin}[Kotlin].
+The {url-groovy}[Groovy] support is built-in, just make sure to add
+`apply plugin: groovy` to your modules `build.gradle` script. For other languages,
+check gradle integration for them.
+
+== Services
+
+The actual business implementation is done at service layer. Services
+are Java classes whose lifecycle is managed by {url-guice}[Guice] framework.
+
+The pattern is something like this:
+
+* Define a business service interface
+* Provide a default implementation of the service
+* Bind the service interface with the default implementation
+
+The interface should provide the blueprint of your business requirements
+that should be fulfilled.
+
+[source,java]
+-----
+package com.axelor.contact.service;
+
+import com.axelor.contact.db.Contact;
+
+public interface HelloService {
+
+  String say(Contact contact);
+
+  String hello();
+}
+-----
+
+The interface defines two methods to fulfill our business requirements.
+The application module that defines the interface can provide a default
+implementation of this interface.
+
+For the above example, an implementation may look like this:
+
+[source,java]
+-----
+package com.axelor.contact.service;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.axelor.contact.db.Contact;
+
+public class HelloServiceImpl implements HelloService {
+
+  protected Logger log = LoggerFactory.getLogger(getClass());
+
+  @Override
+  public String say(Contact contact) {
+    return String.format("Welcome, '%s!'", contact.getFullName());
+  }
+
+  @Override
+  public String hello() {
+    return "Hello, World!";
+  }
+}
+-----
+
+You can mark the implementation with appropriate https://github.com/google/guice/wiki/Scopes[scope]
+if required (read the docs carefully before using them).
+
+Now the business service should be utilized somewhere to fulfill the business
+requirement. Generally, use web controllers to expose services.
+
+== Controllers
+
+The controllers are intermediary between views & service layer.
+
+[source,java]
+-----
+package com.axelor.contact.web;
+
+import javax.inject.Inject;
+import com.google.inject.servlet.RequestScoped;
+
+import com.axelor.contact.db.Contact;
+import com.axelor.contact.service.HelloService;
+
+import com.axelor.meta.CallMethod;
+
+import com.axelor.rpc.ActionRequest;
+import com.axelor.rpc.ActionResponse;
+import com.axelor.rpc.Response;
+
+@RequestScope <1>
+public class HelloController {
+
+  @Inject private HelloService service; <2>
+
+  public void say(ActionRequest request, ActionResponse response) { <3>
+
+    Contact contact = request.getContext().asType(Contact.class); <4>
+    String message = service.say(contact); <5>
+
+    response.setFlash(message); <6>
+  }
+
+  @CallMethod <7>
+  public Response validate(String email) { <8>
+
+    Response response = new ActionResponse();
+
+    // validate email & set response properties
+    // logic can be moved to service layer
+
+    if (email == null) {
+      response.addError("email", "Email required");
+    } else if (!email.matches("\w+@\w+")) {
+      response.addError("email", "Invalid email.");
+    }
+
+    return response;
+  }
+}
+-----
+<1> controller lifecyle
+<2> inject a service
+<3> controller method
+<4> get the view context and convert to business object
+<5> call service method
+<6> mark the response to flash the message on client
+<7> free form controller method should be annotatted with `@CallMethod`
+<8> free form controller method
+
+The `ActionRequest` and `ActionResponse` are special classes to deal with
+action requests and responses. For more details see the {url-apidoc}.
+
+=== Response Signals
+`ActionResponse.setSignal(signal, data)` is used to send any arbitrary signal to the client. Here are a couple of them that might be of interest:
+
+[cols="2,8"]
+|===
+
+|`refresh-app`
+|refresh browser tab (send null data)
+
+|`refresh-tab`
+|refresh refresh current tab in the application (send null data) - _new in version 5.4_
+
+|===
+
+The free form controller methods can accept any parameter. The views/actions
+can pass the param values from the current context.
+
+Controllers generally don’t implement business logic, but deal with RPC requests only.
+
+The controller methods can be used from XML actions and views:
+
+[source,xml]
+-----
+<button name="greet" title="Greet" onClick="com.axelor.contact.web.HelloController:say" />
+-----
+
+Or a free form controller method
+
+[source,xml]
+-----
+<form name="contact-form" model="com.axelor.contact.db.Contact">
+  ...
+  <field name="email" onChange="com.axelor.contact.web.HelloController:validate(email)"/>
+  ...
+</form>
+-----
+
+The format of using controller method is like this:
+
+  <fqn>:<method>[(var1,var2[,...])]
+
+where `fqn` is fully qualified name of the controller, followed by a colon `:`
+followed by `method` name and optionally parameter values from current context
+if the method is a free form method.
+
+== Configuration
+
+The services should be configured with a special class called Guice module but
+in our case should be derived from the `com.axelor.app.AxelorModule`.
+
+[source,java]
+-----
+package com.axelor.contact;
+
+import com.axelor.app.AxelorModule;
+import com.axelor.contact.service.HelloService;
+import com.axelor.contact.service.HelloServiceImpl;
+
+public class ContactModule extends AxelorModule { <1>
+
+  @Override
+  protected void configure() {
+    bind(HelloService.class).to(HelloServiceImpl.class); <2>
+  }
+}
+-----
+
+<1> The guice module class used to configure services
+<2> Bind the service with desired implementation
+
+The `bind(HelloService.class).to(HelloServiceImpl.class);` tells the application
+that "bind HelloService interface to HelloServiceImpl".
+
+See Guice documentation for more details on dependency injection and bindings.
+
+== Overriding
+
+For some different business requirements, we may have to provide some different
+implementation.
+
+For example, here the default implementation of say method returns
+`"Welcome 'Some Name!'"`` message. If we want to replace this message with say
+`"You are welcome 'Some Name!'"` without changing the original code, we provide
+a new implementation.
+
+The pattern is like this:
+
+* Override the default implementation in another module
+* Chain bind the default implementation with new implementation
+* The service interface now binds to the new implementation
+
+[source,java]
+-----
+package com.axelor.sale.service;
+
+import com.axelor.contact.db.Contact;
+import com.axelor.contact.service.HelloServiceImpl;
+
+public class HelloServiceSaleImpl extends HelloServiceImpl {
+
+  @Override
+  public String say(Contact contact) {
+    log.info("Overrding the default HelloService.say ...");
+    String message = super.say(contact);
+    log.info("The default message was: {}", message);
+    message = String.format("You are welcome '%s!'", contact.getFullName());
+    log.info("I would say: {}", message);
+    return message;
+  }
+}
+-----
+
+Technically, we can provide pure implementation of `HelloService` other then
+extending the default implementation but that requires much more efforts to
+configure the application. In that case, the main application module should
+exclusively bind the business services.
+
+However, in most cases the scheme described here works just fine.
+
+The `HelloServiceSaleImpl` extends the `HelloServiceImpl` and overrides
+the `say` method with different message.
+
+Now the new implementation must be configured so that the application can know
+about it. This should be again done from the configuration module.
+
+[source,java]
+-----
+package com.axelor.sale;
+
+import com.axelor.app.AxelorModule;
+import com.axelor.contact.service.HelloServiceImpl;
+import com.axelor.sale.service.HelloServiceSaleImpl;
+
+public class SaleModule extends AxelorModule {
+
+  @Override
+  protected void configure() {
+    bind(HelloServiceImpl.class).to(HelloServiceSaleImpl.class);
+  }
+}
+-----
+
+Here you can see, we are not binding `HelloService` interface but the default
+implementation with the new one. This is called chain binding. It is because,
+we can't bind same interface/implementation more then once in the application.
+
+If we have to do that in some case, the binding should be done from the main
+application module exclusively.
+
+Now, the application will pickup the `HelloServiceSaleImpl`
+for the `HelloService` interface and wherever you inject the `HelloService`, you
+will get an instance of the `HelloServiceSaleImpl` class.
+
+See {url-guice}[Guice Documentation] for more details.

@@ -1,0 +1,311 @@
+= Configurations
+:toc:
+:toc-title:
+
+:url-mysql: https://www.mysql.com/
+:url-oracle: http://www.oracle.com/technetwork/indexes/downloads/index.html#database
+
+In this chapter we will see various configuration options available to the {page-component-title}
+applications.
+
+== Introduction
+
+The application configuration is provided through various configuration files.
+These are:
+
+- `axelor-config.properties` - the application configuration
+- `persistence.xml` - hibernate/jpa configuration
+
+The most important of them is `axelor-config.properties`.
+
+== Application Configuration
+
+The `axelor-config.properties` provides various configuration options for the
+application. It's located under `src/main/resources/META-INF` directory of the
+application project.
+
+However, the application configuration can be provided from some external
+location using a JVM option.
+
+[source,sh]
+----
+$ export JAVA_OPTS="-Daxelor.config=/path/to/dev.properties"
+----
+
+We can also provide configuration values using system properties using
+`axelor.config.<settings-name>` pattern like this:
+
+[source,sh]
+----
+$ export JAVA_OPTS="-Daxelor.config.db.default.password=secret"
+----
+
+== Database Settings
+
+We can configure database connection settings with following properties:
+
+[source,properties]
+----
+# Database settings
+# ~~~~~
+# See hibernate documentation for connection parameters
+db.default.ddl = update <1>
+db.default.url = jdbc:postgresql://localhost:5432/my-database <2>
+db.default.user = username <3>
+db.default.password = secret <4>
+----
+<1> hbm2ddl option, (update, create, create-drop or validate)
+<2> the jdbc url to connect to
+<3> user name to be used to connect to the database server
+<4> user password to authenticate the user
+
+If you want to use {url-mysql}[MySQL] use following settings:
+
+[source,properties]
+----
+# Database settings
+# ~~~~~
+# See hibernate documentation for connection parameters
+db.default.ddl = update
+db.default.url = jdbc:mysql://localhost:3306/my_database
+db.default.user = username
+db.default.password = secret
+----
+
+== Others Settings
+
+[cols="1,9"]
+|===
+| Key Name | Description
+| `application.name` | application name, e.g. axelor-erp
+| `application.name` | application name
+| `application.description` | application description
+| `application.version` | application version
+| `application.author` | application author
+| `application.copyright` | application copyright
+| `application.logo` | header logo. Should be 40px in height with transparent background (default is img/axelor-logo.png)
+| `application.home` | home website. Link to be used with header logo.
+| `application.help` | link to the online help
+| `application.mode` | application deployment mode. Can be `prod` or `dev` (default is dev)
+| `application.theme` | CSS theme. If not defined, default theme is used.
+| `application.locale` | default locale (if not set, system default is used)
+| `session.timeout` | session timeout in minutes (default is 60)
+| `file.upload.dir` | storage path for upload files for attachments (default is \{user.home}/.axelor/attachments)
+| `file.upload.size` | maximum upload size in MB (default is 5 MB)
+| `file.upload.whitelist.pattern` | whitelist file name pattern, only matching files will be allowed
+| `file.upload.blacklist.pattern` | blacklist file name pattern, maching files will be rejected
+| `file.upload.whitelist.types` | whitelist file mime types, detects content type
+| `file.upload.blacklist.types` | blacklist file mime types, detects content type
+| `reports.design.dir` | external directory for birt report designs (default is \{user.home}/.axelor/reports)
+| `reports.output.dir` | external directory for generated pdf reports (default is \{user.home}/.axelor/reports-gen)
+| `data.export.encoding` | data export (csv) encoding (default is ISO_8859_1)
+| `data.export.dir` | storage path for export action (default is \{user.home}/.axelor/data-export)
+| `data.import.demo-data` | whether to import demo data for the application (default is true)
+| `template.search.dir` | storage path for templates (default is \{user.home}/.axelor/templates)
+| `view.single.tab` | whether to use single tab layout (default is false)
+| `view.menubar.location` | set menu style. Can be `left`, `top` or `both` (default is left)
+| `view.toolbar.titles` | whether to show button titles in toolbar (default is false)
+| `view.confirm.yes-no` | whether show confirm dialog with yes/no buttons (default is Cancel/OK)
+| `view.grid.selection` | if set to `checkbox`, grid widgets will have checkbox selection enabled
+|===
+
+All specified path can use specials variables :
+
+* `{user.home}` : reference to the home directory, `System.getProperty("user.home")`
+* `{java.io.tmpdir}` : reference to the tmp directory, `System.getProperty("java.io.tmpdir")`
+
+The differences between `prod` and `dev` mode are :
+
+* use minify js/css file.
+* use browser cache.
+* don't display technical popup.
+
+== Example configuration
+
+Here is a complete configuration file with default values
+
+[source,properties]
+----
+include::{examplesdir}/axelor-config.properties[]
+----
+
+== JPA/Hibernate Configuration
+
+The `persistence.xml` located under `src/main/resources/META-INF` provides
+JPA/Hibernate configuration.
+
+A minimal persistence xml file is required to confirm JPA requirements:
+
+.persistence.xml
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<persistence version="2.1"
+  xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="persistenceUnit" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+    <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+  </persistence-unit>
+</persistence>
+----
+
+== Logging Configuration
+
+The logging can be configured from `axelor-config.properties` using following properties:
+
+[source,properties]
+----
+# Logging
+# ~~~~~
+# Custom logback configuration can be provided with `logging.config` property pointing
+# to a custom `logback.xml`. In this case, all the logging configuration provided here
+# will be ignored.
+#
+# Following settings can be used to configure logging system automatically.
+#
+#logging.path = {user.home}/.axelor/logs
+#logging.pattern.file = %d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- [%t] %-40.40logger{39} : %m%n
+#logging.pattern.console = %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n
+
+# Global logging
+logging.level.root = ERROR
+
+# Axelor logging
+
+# Log everything.
+logging.level.com.axelor = DEBUG
+
+# Hibernate logging
+
+# Log everything. Good for troubleshooting
+#logging.level.org.hibernate = INFO
+
+# Log all SQL DML statements as they are executed
+#logging.level.org.hibernate.SQL = DEBUG
+#logging.level.org.hibernate.engine.jdbc = DEBUG
+
+# Log all SQL DDL statements as they are executed
+#logging.level.org.hibernate.tool.hbm2ddl = INFO
+
+# Log all JDBC parameters
+#logging.level.org.hibernate.type = ALL
+
+# Log transactions
+#logging.level.org.hibernate.transaction = DEBUG
+
+# Log L2-Cache
+#logging.level.org.hibernate.cache = DEBUG
+
+# Log JDBC resource acquisition
+#logging.level.org.hibernate.jdbc = TRACE
+#logging.level.org.hibernate.service.jdbc = TRACE
+
+# Log connection pooling
+#logging.level.com.zaxxer.hikari = INFO
+----
+
+The `logging.path` can be used to save logs to file.
+The `logging.pattern.file` can be used to change log message format for file logging
+The `logging.pattern.console` can be used to change log message format for console logging
+
+We can set logging for any package using `logging.level.<package.name>` keys.
+
+== EhCache Configuration
+
+The `ehcache.xml` located under `src/main/resources` provides ehcache
+configuration.
+
+Please see ehcache documentation for more details.
+
+== Global Context Configuration
+
+Besides the static configuration values, we can also provide configuration for
+dynamic global context with `context.` prefix. It's used by actions and script
+handlers when evaluating expressions and domain filters. The values can be
+referenced from expressions with special variable `\\__config__`.
+
+[source,properties]
+----
+# Custom context
+# ~~~~~
+
+# instance
+context.hello = com.axelor.script.TestContext
+
+# instance method
+context.world = com.axelor.script.TestContext:hello
+
+# static method
+context.some = com.axelor.script.TestContext:staticMethod
+
+# static field
+context.thing = com.axelor.script.TestContext:STATIC_FIELD
+
+# static values
+context.flag = true
+context.string = some static text value
+context.number = 100
+----
+
+Now, we can use them in expressions like this:
+
+[source,xml]
+----
+<field ... value="#{__config__.hello.message}" /> <1>
+<field ... value="#{__config__.world}" /> <2>
+<field ... value="#{__config__.some}" /> <3>
+<field ... value="#{__config__.thing}" /> <4>
+<field ... value="#{__config__.flag}" /> <5>
+----
+<1> calls getter on the instance
+<2> calls an instance method
+<3> calls a static method
+<4> public static final field value
+<5> any constant value
+
+== Custom Logo
+
+A special context setting `context.appLogo` can be used to dynamically change
+header logo per user. For example:
+
+[source,properties]
+----
+context.appLogo = com.axelor.custom.LogoService:getLogo
+----
+
+The `getLogo()` method then can return link to user specific application logo.
+
+== Custom Style
+
+A special context setting `context.appStyle` can be used to provide custom style
+for web ui. For example:
+
+[source,properties]
+----
+context.appStyle = com.axelor.custom.StyleService:getStyle
+----
+
+and the code:
+
+[source,java]
+----
+public class StyleService {
+
+  public String getStyle() {
+    // we can even read the style from database
+    return "header .navbar .nav .fa-bars { color: #86bc25; }"; <1>
+  }
+}
+----
+<1> change the color of sidebar toggle icon
+
+The `getStyle()` method should return custom style as String value.
+
+The custom style is applied in following order:
+
+. default style
+. user theme if available
+. custom style if provided
+
+So the custom style will aways override default and theme styles.

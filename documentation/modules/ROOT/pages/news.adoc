@@ -1,0 +1,34 @@
+= Release Notes
+:toc:
+:toc-title:
+
+:product-changelog: https://github.com/axelor/axelor-open-platform/blob/{page-component-version}/CHANGELOG.md
+
+This release has many breaking changes as we migrated to JDK-11.
+
+== Breaking Changes
+
+* Migrate to JDK-11
+* Migrate to GraalVM JavaScript engine (drop nashorn engine)
+* Migrate to JUnit 5 for unit testing
+* Migrate axelor-test to use JUnit5
+* Remove the experimental hotswap-agent support (as it was very buggy)
+* Drop removable modules support (this feature was hardly used)
+* The application configuration is now optional
+* The application configuration file is now named `META-INF/axelor-config.properties`
+* The application configuration can be defined via file, system props and environment vars
+
+== New Features
+
+* Add WebSocket support
+* Add support to see concurrent users in real-time on form views
+
+== Enhancements
+
+* Re-implement action-ws using http client api
+* Re-implement entity code generator
+* Re-implement authentication support
+
+== Fixes & Other Changes
+
+Please check the {product-changelog}[change log] for detailed list of changes.

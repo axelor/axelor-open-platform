@@ -1,0 +1,358 @@
+= Custom Fields
+:toc:
+:toc-title:
+
+Starting from {page-component-title} v5, we can now add custom fields to the domain models
+dynamically at runtime.
+
+== Models
+
+Custom fields are implemented using `JSON` data type support from underlying database.
+All the three officially supported databases (PostgreSQL, MySQL and Oracle) are supported.
+
+A domain model (entity) can have custom fields if it has either `jsonAttr="true"`
+attribute defined or has a `string` field with `json="true"`.
+
+Here are some examples:
+
+[source,xml]
+----
+<entity name="Product" jsonAttr="true">
+  <string name="name" required="true" unique="true" min="2" />
+  ...
+</entity>
+----
+
+or
+
+[source,xml]
+----
+<entity name="Product">
+  <string name="name" required="true" unique="true" min="2" />
+  ...
+  <string name="attrs" title="Attributes" json="true" />
+</entity>
+----
+
+If we provide `jsonAttr="true"`, which is default, a field `string` field
+named `"attrs"` is automatically generated in entity class which is same
+as second example.
+
+IMPORTANT: The field name `attrs` is now reserved for defining json field to store custom field values.
+
+We can also define multiple json fields in domain model:
+
+[source,xml]
+----
+<entity name="Contact">
+  <string name="name" required="true" unique="true" min="2" />
+  ...
+  <string name="customAttrs" title="Custom Attributes" json="true" />
+  <string name="extraAttrs" title="Extra Attributes" json="true" />
+</entity>
+----
+
+== Views
+
+If the entity has `attrs` field, the `form` and `grid` views can show custom fields automatically.
+Otherwise, for differently named json fields, we have to include those fields in view:
+
+[source,xml]
+----
+<form ...>
+  ...
+  <panel title="Attributes">
+    <field name="attrs" colSpan="12" />
+  </panel>
+</form>
+----
+
+All custom fields defined for the given json field will be visible inside this panel widget. However,
+visibility in grid view is controlled by `Show in grid` flag which we will see in next section.
+
+== Define fields
+
+The custom fields are defined dynamically at runtime using graphical interface.
+All defined fields are accessible from menu:Administration[Model Management > Custom Fields].
+
+The image bellow shows the grid view listing all the defined custom fields:
+
+.Custom Fields (grid)
+image::custom-fields-grid.png[]
+
+The image bellow shows the form view to create/edit custom fields:
+
+.Custom Fields (form)
+image::custom-fields-form.png[]
+
+=== Properties
+
+The custom fields are saved as `com.axelor.meta.db.MetaJsonField` records. Following fields are defined:
+
+[%header,cols="2,8"]
+|===
+| Name
+| Description
+
+| `name`
+| name of the custom field (required)
+
+| `title`
+| the display title
+
+| `type`
+| field type, see bellow for supported types
+
+| `defaultValue`
+| default value for the field
+
+| `model`
+| fully qualified name of the model for which the field is defined
+
+| `modelField`
+| the name of the json field on which this custom field is defined (e.g. `attrs`)
+
+| `selection`
+| name of selection list if the field is selection field
+
+| `widget`
+| alternative widget to use
+
+| `help`
+| short help
+
+| `showIf`
+| conditional js expression to show/hide the field
+
+| `hideIf`
+| conditional js expression to show/hide the field
+
+| `requiredIf`
+| conditional js expression to make field required
+
+| `readonlyIf`
+| conditional js expression to make field readonly
+
+| `hidden`
+| whether to hide the field by default`
+
+| `required`
+| whether the field is required
+
+| `readonly`
+| whether the field is readonly
+
+| `nameField`
+| whether to use this field as name field
+
+| `visibleInGrid`
+| whether the field should be visible in grid view
+
+| `minSize`
+| miniumum size of value
+
+| `maxSize`
+| maximum size of value
+
+| `scale`
+| scale for decimal type fields
+
+| `precision`
+| precision for decimal type fields
+
+| `regex`
+| regular expression to validate field value
+
+| `sequence`
+| ordering in auto generated view
+
+| `targetModel`
+| if it's a relational field, the fully qualified name of the target model
+
+| `valueExpr`
+| simple js expression to compute value
+
+| `enumType`
+| fully qualified name of the enum if it's a enum type field
+
+| `formView`
+| if it's a relational field, the form view to use for popup editor
+
+| `gridView`
+| if it's a relational field, the grid view to use for list widget and selector
+
+| `domain`
+| the domain filter for relational fields
+
+| `onChange`
+| actions to call when field changes
+
+| `onClick`
+| actions to call when field is clicked (button)
+|===
+
+=== Types
+
+Following custom field types are supported:
+
+[cols="2,2,6"]
+|===
+| Type
+| Display Name
+| Description
+
+| `string`
+| String
+| For string fields
+
+| `integer`
+| Integer
+| For integer fields
+
+| `decimal`
+| Decimal
+| For decimal fields
+
+| `boolean`
+| Boolean
+| For fields fields
+
+| `date`
+| Date
+| For date fields
+
+| `datetime`
+| DateTime
+| For datetime fields
+
+| `time`
+| Time
+| For time fields
+
+| `panel`
+| Panel
+| A virtual field to create a new panel widget for subsequent fields
+
+| `enum`
+| Enum
+| For enum fields
+
+| `button`
+| Button
+| A virtual field to create a button widget (with `onClick` action)
+
+| `separator`
+| Separator
+| A virtual widget to create seperator widget
+
+| `many-to-one`
+| ManyToOne
+| For ManyToOne relationship
+
+| `many-to-many`
+| ManyToMany
+| For ManyToMany relationship
+
+| `one-to-many`
+| OneToMany
+| It's actually same as ManyToMany relationship but uses OneToMany widget
+
+|===
+
+== Predefined fields
+
+Sometime we may have to predefine few custom fields. This can be done with data import feature.
+Here is an example data import rules and input format:
+
+.Input data
+[source,xml]
+----
+<custom-fields for="com.axelor.sale.db.Product" on="attrs">
+  <field name="color" selection="product.color.selection" />
+  <field name="active" type="boolean" />
+  <field name="price" type="decimal" />
+  <field name="quantity" type="integer" />
+  <field name="date" type="datetime" />
+  <field name="seller" type="many-to-one" target="com.axelor.contact.db.Contact" />
+</custom-fields>
+----
+
+.Import config
+[source,xml]
+----
+<bind node="custom-fields/field" type="com.axelor.meta.db.MetaJsonField"
+  search="self.name = :name AND self.model = :model AND self.modelField = :modelField">
+  <bind node="../@for" to="model" />
+  <bind node="../@on" to="modelField" />
+  <bind node="@name" to="name" />
+  <bind node="@type" to="type" eval="type?:'string'" />
+  <bind node="@target" to="targetModel" />
+  <bind node="@selection" to="selection" />
+  <bind node="@widget" to="widget" />
+</bind>
+----
+
+== Context-aware fields
+
+Custom fields can be context aware, means they can be shown/hidden depending on the value
+of some `ManyToOne` field of current record.
+
+For example, if we have defined a custom field `color` for `Product` model and if `Product`
+model has a `ManyToOne` field `category`, we can make `color` field contextual by setting:
+
+- `contextField (Value if)` to `category`
+- `contextFieldValue (Value)` to desired `category` value (e.g. `Computer`)
+
+The `color` field is now contextual and will become visible only if product category is `Computer`.
+
+== Context-aware search
+
+In advanced search, the contextual fields can be used to search on specific context value.
+If searched with context a value, corresponding contetual fields will become visible in grid view.
+
+Following image shows a context field selection in top section of the advanced search popup.
+
+.Contextual Advance Search
+image::contextual-search-popup.png[]
+
+Following image shows the contextual search result. You can see the `Color` column becomes visible:
+
+.Contextual Search Result
+image::contextual-search-result.png[]
+
+== JPQL Functions
+
+JPQL functions can be used to extract and set values in custom fields:
+
+[cols="4,8"]
+|===
+| Function | Description
+
+| `json_extract(jsonField, path…)`
+`json_extract_text(jsonField, path…)`
+| extract a String from specified JSON field
+
+| `json_extract_integer(jsonField, path…)`
+| extract an Integer from specified JSON field
+
+| `json_extract_decimal(jsonField, path…)`
+| extract a BigDecimal from specified JSON field
+
+| `json_extract_boolean(jsonField, path…)`
+| extract a Boolean from specified JSON field
+
+| `json_set(jsonField, path, value)`
+| set value in specified JSON field - _new in version 5.4_
+|===
+
+Example:
+
+[source,sql]
+----
+UPDATE
+  Product p
+SET
+  p.attrs = json_set(p.attrs, 'seller.name', :value)
+WHERE
+  json_extract_integer(p.attrs, 'seller', 'id') = 1
+----

@@ -1,0 +1,151 @@
+= XML DataSource
+:toc:
+:toc-title:
+
+XML is another widely used format to store information.
+
+The XML data transform requires `xml-config` files which are xml based data
+mapping rules.
+
+== Data Mapping
+
+The XML data mapping definitions are defined using XML syntax. A typical config
+file looks like this:
+
+[source,xml]
+-----
+<?xml version="1.0"?>
+<xml-inputs xmlns="http://axelor.com/xml/ns/data-import"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/data-import
+  http://axelor.com/xml/ns/data-import/data-import_6.0.xsd">
+
+  <input file="contacts.xml" root="address-book">
+
+    <bind node="configs/titles/title" type="com.axelor.contact.db.Title"
+      search="self.code = :code" update="false">
+      <bind node="@code" to="code" />
+      <bind node="text()" to="name" />
+    </bind>
+
+    <bind node="configs/country" type="com.axelor.contact.db.Country"
+      search="self.code = :code" update="false">
+      <bind node="@code" to="code" />
+      <bind node="text()" to="name" />
+    </bind>
+
+    <bind node="contacts/contact" type="com.axelor.contact.db.Contact">
+      <bind node="title" to="title" search="self.name = :title" />
+
+      <!-- if @code of node title exist and not empty then bind to field notes -->
+      <bind node="title/@code" to="notes" alias="title_code"
+        if="title_code &amp;&amp; !title_code.empty" /> <!-- NOT SURE -->
+
+      <!-- MEV_ERP_ID is provided with "context" : so here it may be null -->
+      <bind eval="MEV_ERP_ID" to="notes" if="MEV_ERP_ID"/>
+
+      <bind node="name[@type='F']" to="firstName" />
+      <bind node="name[@type='L']" to="lastName" />
+      <bind node="email" to="email"/>
+
+      <!-- generate email if doesn't exist -->
+      <bind to="email" eval='"${firstName}.${lastName}@gmail.com".toLowerCase()'
+        if="email == null || email.empty"/>
+
+      <!-- bind multi-value field -->
+      <bind node="my/address-list/address" to="addresses">
+        <bind node="line1" to="street"/>
+        <bind node="line2" to="area"/>
+        <bind node="city" to="city"/>
+        <bind node="@zip" to="zip"/>
+
+        <!-- find country codes and put them in the context -->
+        <bind node="../../../@location" alias="location_contact"/>
+        <bind node="city/@country" alias="city_country"/>
+
+        <!--
+          if location_contact exists then use it,
+          if city_country exists then use it
+          else use 'FR'
+        -->
+        <bind to="country" search="self.code = :country"
+          eval="location_contact" if="location_contact != null"/>
+        <bind to="country" search="self.code = :country"
+          eval="city_country" if="city_country != null"/>
+        <bind to="country" search="self.code = :country"
+          eval="'FR'" if="location_contact == null &amp;&amp; city_country == null"/>
+
+      </bind>
+    </bind>
+
+  </input>
+
+</xml-inputs>
+-----
+
+You can see the mapping is almost identical to CSV mapping format. The only
+difference is the `<bind>` tag which required `node` attribute that tags xpath
+expressions to bind a perticular node to the object field.
+
+Let's see the binding in details:
+
+The `<input>` tag is used to map a source xml file to a target model type.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `file` | the source input file name
+| `root` | the root element name
+|===
+
+The `<bind>` tag can be used to map nodes to target object fields.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `node` | xpath expression to locate the node
+| `alias` | if node is relative xpath, a simple name to be used in context
+| `to` | the target model field name
+| `adapter` | type adapter, followed by an optional string argument separated by `\|` character
+| `search` | jpql where clause search for existing record
+| `update` | `true` in order to allow updating an existing record
+| `create` | `false` in order to prevent creation if an existing record is not found
+| `eval` | groovy expression, to transform the value
+| `if` | boolean groovy expression, only bind if condition passed
+| `if-empty` | only update the target value if target field is empty (or null)
+|===
+
+The `<bind>` tag can again have nested `<bind>` tags in case of binding
+relational fields.
+
+== Node Binding
+
+Node binding uses xpath expressions to bind a node (element or attribute) values
+to the object fields.
+
+The xpath is relative to the parent node or the `root` node of the given `<input>`.
+
+- attribute nodes can be located with `@attribute` syntax
+- text nodes can be located with `text()` method
+
+Some examples:
+
+[source,xml]
+-----
+
+<!-- bind value of code attribute -->
+<bind node="@code" to="code" />
+
+<!-- bind text value of a node -->
+<bind node="text()" to="name" />
+
+<!-- bind name node depending on type attribute value -->
+<bind node="name[@type='F']" to="firstName" />
+<bind node="name[@type='L']" to="lastName" />
+
+<!-- find country codes and put them in the context -->
+<bind node="../../../@location" alias="location_contact"/>
+<bind node="city/@country" alias="city_country"/>
+-----

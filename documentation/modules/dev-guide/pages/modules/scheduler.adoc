@@ -1,0 +1,76 @@
+= Job Scheduling
+:toc:
+:toc-title:
+
+:url-quartz: https://quartz-scheduler.org/
+:url-cron: https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html
+
+The {page-component-title} integrates feature rich {url-quartz}[quartz scheduler] library
+for job scheduling.
+
+Jobs are executed by a separate process running under an admin session. The
+services executed can be transactional. All database operations will be executed
+using the admin access.
+
+== Configuration
+
+The scheduler is disabled by default. It can be enabled with following
+configuration.
+
+[source,properties]
+----
+# Quartz Scheduler
+# ~~~~~
+# quartz job scheduler
+
+# Specify whether to enable quartz scheduler
+quartz.enable = false
+
+# total number of threads in quartz thread pool
+# the number of jobs that can run simultaneously
+quartz.threadCount = 5
+----
+
+== Jobs
+
+Scheduled jobs can be configured from `Administration -> Jobs -> Schedules` menu.
+The schedule configuration data requires:
+
+* `name` - name of the job
+* `job` - the job class implementing `org.quartz.Job` interface
+* `cron` - the {url-cron}[cron] string to schedule the job
+* `active` - whether the job is enabled
+
+Additionally, job configuration can have parameter values (list of key -> value pairs).
+
+Here is an example job implementation:
+
+[source,java]
+----
+package com.axelor.contact.jobs;
+
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+
+public class HelloJob implements Job {
+
+  @Override
+  public void execute(JobExecutionContext context) throws JobExecutionException {
+    JobDetail detail = context.getJobDetail();
+    JobDataMap data = context.getJobDetail().getJobDataMap();
+
+    String name = detail.getKey().getName();
+    String desc = detail.getDescription();
+
+    System.err.println("Job fired: " + name + " (" + desc + ")");
+    if (data != null && data.size() > 0) {
+      for (String key : data.keySet()) {
+        System.err.println("    " + key + " = " + data.getString(key));
+      }
+    }
+  }
+}
+----

@@ -1,0 +1,156 @@
+= Actions & Menus
+:toc:
+:toc-title:
+
+The view action is used to open object views. The view actions are used to
+define application menu.
+
+== View Action
+
+The `<action-view>` is used to define the action views.
+
+[cols="2,8"]
+.Attributes
+|===
+| Name | Description
+
+| *name* | name of the action
+| title | override the view title
+| model | fully qualified name of the model object
+| icon | icon displayed on top-level navigation tab
+|===
+
+The action view requires the following elements:
+
+* `<view>` - specify the view to use
+** `type` - the view type
+** `name` - the view name
+* `<view-param>` - define additional view parameter
+** `name` - parameter name
+** `value` - parameter value
+* `<domain>` - specify a domain filter to restrict search (jpql where clause)
+* `<context>` - define the base context for the action
+** `name` - context variable name
+** `expr` - context variable value expression
+
+The `<view-param>` parameter name accepts the following options:
+
+* `forceEdit` - `true` to force to open in editable mode
+* `forceTitle` - `true` to force to use action title instead of view title
+* `showArchived` - `true` to include archived records
+* `details-view` - `true` to show grid and form views side by side
+* `search-filters` - name of custom xref:views/grid.adoc#advanced-search[search filters]
+* `default-search-filters` - comma-separated list of search filter names to apply by default (used in conjunction with `search-filters`) - _new in version 5.4.2_
+* `limit` - number of records per page on grid view
+* `popup` - `true` to open view as popup, `reload` to reload parent upon closing the popup
+* `popup-save` - `false` to hide OK button used to save record upon closing the popup
+* `popup.maximized` - `true` to open as maximized popup
+* `show-toolbar` - `false` to hide form toolbar
+* `show-confirm` - `false` to disable dirty check
+* `reload-dotted` - `true` to refresh the grid when switching back from form view
+* `download` - `true` to mark view as pointing to a downloadable link
+
+Special context variable names
+
+* `_showRecord` - show the record by given id in form view
+* `_showSingle` - `true` to show the only record in form view
+
+
+example:
+
+[source,xml]
+----
+<action-view name="contact.all" title="Contacts"
+  model="com.axelor.contact.db.Contact"> <1>
+  <view type="grid" name="contact-grid"/> <2>
+  <view type="form" name="contact-form"/> <3>
+</action-view>
+
+<action-view name="contact.friends" title="My Friends"
+  model="com.axelor.contact.db.Contact">
+  <view type="grid" name="contact-grid"/>
+  <view type="form" name="contact-form"/>
+  <domain>self.circle.code = :circleCode</domain> <4>
+  <context name="circleCode" expr="friend"/> <5>
+</action-view>
+----
+<1> define an `action-view` for the given object
+<2> use the `contact-grid` view defined for the `grid` view
+<3> use the `contact-form` view defined for the `form` view
+<4> define a domain filter (jpql where clause)
+<5> define a context variable
+
+You can see the `<domain>` filter uses named parameters. These parameters are
+evaluated against the context.
+
+== Application Menu
+
+In order to access object views, we need application menu. The menu is also
+defined using xml syntax along with views & view actions.
+
+The `<menuitem>` is used to define a menu item. The application menu is
+hierarchical so menu items can be organized as parent child.
+
+[cols="2,8"]
+.Attributes
+|===
+| Name | Description
+
+| *name* | name of the menu item
+| parent | name of the parent menu item
+| *title* | display title
+| icon | display icon name
+| icon-background | icon background color (predefined or html hex color)
+| action | the action to be executed on menu item click
+| order | menu item display order sequence
+| groups | comma-separated list of user groups who can see this menu item
+| top | whether to show this menu on top
+| left | whether to show this menu on left
+| hidden | whether to hide this menu
+| tag | specify a tag to show on menu item
+| tag-count | specify whether to use count of menu action records as tag
+| tag-get | specify a method call to get tag value
+| tag-style | specify the tag display style
+|===
+
+example:
+
+[source,xml]
+----
+<menuitem name="menu-contact-book"
+  title="Address Book" /> <1>
+
+<menuitem name="menu-contact-friends"
+  parent="menu-contact-book"
+  title="All Contact"
+  action="contact.all"/> <2> <3> <4>
+
+<menuitem name="menu-mail-inbox"
+  parent="menu-mail"
+  title="Inbox"
+  action="mail.inbox"
+  tag-get="com.axelor.mail.web.MailController:inboxMenuTag()"
+  tag-style="warning"/> <5>
+
+  <menuitem name="menu-mail-important"
+    parent="menu-mail"
+    title="Important"
+    action="mail.important"
+    tag="Important"
+    tag-style="important"/> <6>
+----
+<1> define a top-level menu with no parent
+<2> define a child menu item with parent
+<3> the display text of the menu item
+<4> the action (of type action-view) to execute
+<5> the get tag value from the given method
+<6> user the given static tag
+
+The `tag-style` can be one of the:
+
+- `default`
+- `important`
+- `success`
+- `warning`
+- `inverse`
+- `info`

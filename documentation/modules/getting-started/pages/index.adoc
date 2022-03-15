@@ -1,0 +1,18 @@
+= Introduction
+:toc:
+:toc-title:
+
+The {page-component-title} is a business application development framework for Java.
+
+This document provides details on quickly getting started with the {page-component-title},
+running a demo application, etc. For more detailed documentation please see
+the xref:dev-guide:index.adoc[Developer Guide].
+
+In this guide, you will see:
+
+xref:install.adoc[Installation]::
+  Describes how to install prerequisites to get started with {page-component-title}.
+xref:eclipse.adoc[Eclipse]::
+  Describes how to configure Eclipse IDE.
+xref:idea.adoc[IntelliJ IDEA]::
+  Describes how to configure IntelliJ IDEA.

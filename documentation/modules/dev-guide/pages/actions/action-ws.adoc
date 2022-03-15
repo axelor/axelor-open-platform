@@ -1,0 +1,36 @@
+= WebService Action
+:toc:
+:toc-title:
+
+The `<action-ws>` can be used to call a SOAP web services. This action is
+generally used as a `provider` action to the `<action-import>`.
+
+[source,xml]
+-----
+<action-ws name="ws.1" service="http://localhost/ws/soap/SomeService.asmx">
+  <action name="SoapServiceName" template="data/ws/ws-login.tmpl" engine="groovy"/>
+</action-ws>
+-----
+
+[cols="2,8"]
+.Attributes
+|===
+| Name | Description
+
+| *name* | name of the action
+| service | service url or reference to another `action-ws` with service is set
+            to some url. In that case, the referenced action is called prior to
+            this one. This allows to perform some initial actions like `login`.
+| connect-timeout | connection timeout in seconds (default 60 seconds)
+| read-timeout | read timeout in seconds (default 300 seconds).
+|===
+
+More then one SOAP action can be called in sequence. The result is returned as
+a collection string values returned by each actions respectively.
+
+The SOAP actions can be specified using:
+
+* `<action>` - specify a soap action to call
+** `name` - name of the SOAP action
+** `template` - a template to transform the result to another format
+** `engine` - template engine (groovy, ST)

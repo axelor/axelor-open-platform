@@ -1,0 +1,73 @@
+= Sequences
+:toc:
+:toc-title:
+
+The custom sequences can be used to generate a patterned sequential string
+values. These are especially useful to generate sequences for sale order,
+employee, invoice etc.
+
+IMPORTANT: Sequences are stored as `MetaSequence` records, you must update meta
+records after adding new sequences.
+
+The sequence can be defined like this:
+
+[source,xml]
+----
+<domain-models ...>
+
+  <sequence name="sale.order.seq" initial="1" increment="1" padding="5" prefix="SO"/>
+
+  <entity name="Order" sequential="true">
+    <many-to-one name="customer" ref="com.axelor.contact.db.Contact" required="true"/>
+    <string name="name" sequence="sale.order.seq" />
+    ...
+  </entity>
+
+  ...
+</domain-models>
+----
+
+The `<sequence>` tag has following attributes:
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| *`name`* | the name of the sequence (required)
+| `prefix` | the prefix string (optional)
+| `suffix` | the suffix string (optional)
+| `padding` | the padding width of the numeric part of the sequence (optional)
+| `initial` | the initial value of the numeric part (default 1)
+| `increment` | the increment step for the numeric part (default 1)
+|===
+
+So for the above example, sequences are generated like this:
+
+----
+SO00001
+SO00002
+SO00003
+...
+SO0000N
+----
+
+Sequence fields will be automatically assigned while saving new records. If you want to obtain sequence values
+in some rare cases, you can do something like this:
+
+[source,java]
+----
+public class MyService {
+
+  @Transactional
+  public void doSomeThing() {
+
+    Order order = new Order();
+
+    // not required though
+    order.setName(JpaSequence.nextValue("sale.order.seq"));
+
+    ...
+  }
+}
+----
+

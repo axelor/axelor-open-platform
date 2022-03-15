@@ -1,0 +1,167 @@
+= Step 1: Create a Project
+:toc:
+:toc-title:
+
+The {page-component-title} uses http://gradle.org[Gradle] to manage application project and it's
+modules.
+
+== Directory structure
+
+The directory structure of a typical {page-component-title} application
+project is something like this:
+
+.Directory Structure
+[source,text]
+----
+axelor-demo
+└── src
+│   └── main
+│       ├── java
+│       └── resources
+│           └── META-INF
+│               ├── axelor-config.properties <1>
+│               └── persistence.xml <2>
+├── gradle <3>
+│   └── wrapper
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
+├── modules <4>
+├── gradlew <5>
+├── gradlew.bat <5>
+├── settings.gradle <6>
+└── build.gradle <7>
+----
+<1> The application config file
+<2> The minimal persistence xml file to confirm JPA requirement
+<3> The directory to keep gradle wrapper files
+<4> The directory to keep module projects
+<5> The shell and batch scripts to execute the build with wrapper
+<6> The gradle settings script
+<7> The gradle build script
+
+== Create build.gradle
+
+Create the application build script like this:
+
+.build.gradle
+[source,gradle]
+----
+plugins {
+  id 'com.axelor.app' // <1>
+}
+
+axelor { // <2>
+  title = 'Axelor DEMO'
+}
+
+allprojects {
+
+  group = 'com.axelor'
+  version = '1.0.0'
+
+  java {
+    toolchain {
+      languageVersion = JavaLanguageVersion.of(11) // <3>
+    }
+  }
+
+  afterEvaluate {
+    test {
+      useJUnitPlatform() // <4>
+      beforeTest { descriptor ->
+        logger.lifecycle('Running: ' + descriptor)
+      }
+    }
+  }
+}
+
+dependencies {
+  // add dependencies
+}
+----
+<1> Use axelor application plugin
+<2> The application project config
+<3> Use Java 11
+<4> Use JUnit5 for unit testing
+
+The `com.axelor.app` gradle plugin defines an extension point `axelor` where
+we can define various properties.
+
+* title - display title for the application
+
+== Create settings.gradle
+
+Create the `settings.gradle` like this:
+
+.settings.gradle
+[source,gradle]
+----
+pluginManagement {
+  repositories {
+    maven {
+      url 'https://repository.axelor.com/nexus/repository/maven-public/' <1>
+    }
+  }
+  plugins {
+    id 'com.axelor.app' version '6.0.+' <2>
+  }
+}
+
+dependencyResolutionManagement {
+  repositories {
+    mavenCentral() {
+      content {
+        excludeGroup 'com.axelor' <3>
+      }
+    }
+    maven {
+      url 'https://repository.axelor.com/nexus/repository/maven-public/'
+    }
+  }
+}
+
+rootProject.name = 'axelor-demo'
+----
+<1> The axelor maven repository
+<2> The axelor app gradle plugin version
+<3> Use maven central but don't load `com.axelor` from it
+
+The `include "modules:axelor-contact"` line tells gradle to include the module
+`axelor-contact` in current build cycle. It is required to list all the modules
+in `settings.gradle` file.
+
+To check whether application project is configured properly, issue the following
+command:
+
+[source,sh]
+----
+$ gradle build
+----
+
+The build process should finish without any error.
+
+== Generate Gradle wrapper
+
+The recommended way to execute gradle build is with the help of https://docs.gradle.org/current/userguide/gradle_wrapper.html[Gradle Wrapper].
+Run the following command from terminal to generate wrapper:
+
+[source,sh]
+----
+$ gradle wrapper
+----
+
+Now onward, you can use either @gradlew@ shell script or @gradlew.bat@ batch script to execute build. Like:
+
+[source,sh]
+----
+$ ./gradlew build
+----
+
+== Create config files
+
+We also need to create following configuration files:
+
+. `src/main/resources/META-INF/axelor-config.properties` - the application config file
+. `src/main/resources/META-INF/persistence.xml` - the jpa configuration file
+
+Please follow the xref:dev-guide:application/config.adoc[app configuration] guide for more details.

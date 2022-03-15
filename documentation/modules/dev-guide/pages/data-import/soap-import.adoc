@@ -1,0 +1,10 @@
+= SOAP DataSource
+:toc:
+:toc-title:
+
+Data import through SOAP web services is supported using xml actions:
+
+- xref:actions/action-ws.adoc[action-ws] - is an action to configure SOAP web service
+- xref:actions/action-import.adoc[action-import] - is an action to configure & launch data import task
+
+See the given examples for the respective actions.

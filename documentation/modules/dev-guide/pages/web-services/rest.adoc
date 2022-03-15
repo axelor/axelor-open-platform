@@ -1,0 +1,175 @@
+= REST Services
+:toc:
+:toc-title:
+
+The REST like services for common search, create, read, update, delete operations.
+
+== Find records
+
+The web service is accessible with following url pattern:
+
+  GET /ws/rest/:model
+
+.Request
+----
+GET /ws/rest/com.axelor.contact.db.Contact?offset=0&limit=10 HTTP/1.1
+Accept: application/json
+----
+
+.Response:
+[source,json]
+----
+{
+  "status": 0,
+  "offset": 0,
+  "total": 120,
+  "data": [{
+    "id": 1,
+    "fullName": "John Smith",
+    "email": "j.smith@gmail.com",
+    "version": 1
+  }, {
+    "id": 9,
+    "fullName": "Tom Boy",
+    "email": "tom.boy@gmail.com",
+    "version": 0
+  }, "..."]
+}
+----
+
+== Read a record
+
+The web service is accessible with following url pattern:
+
+  GET /ws/rest/:model/:id
+
+.Request
+----
+GET /ws/rest/com.axelor.contact.db.Contact/1 HTTP/1.1
+Accept: application/json
+----
+
+.Response:
+[source,json]
+----
+{
+  "status": 0,
+  "data": [{
+    "id": 1,
+    "version": 0,
+    "fullName": "John Smith",
+    "firstName": "John",
+    "..."
+  }]
+}
+----
+
+== Create a record
+
+The web service is accessible with following url pattern:
+
+  PUT /ws/rest/:model
+
+.Request
+----
+PUT /ws/rest/com.axelor.contact.db.Contact HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+----
+
+[source,json]
+----
+{
+  "data": {
+    "firstName": "John",
+    "lastName": "Smith",
+    "email": "j.smith@gmail.com",
+    "..."
+  }
+}
+----
+
+.Response:
+[source,json]
+----
+{
+  "status": 0,
+  "data": [{
+    "id": 1,
+    "version": 0,
+    "fullName": "John Smith",
+    "firstName": "John",
+    "..."
+  }]
+}
+----
+
+== Update a record
+
+The web service is accessible with following url pattern:
+
+  POST /ws/rest/:model/:id
+
+.Request
+----
+POST /ws/rest/com.axelor.contact.db.Contact/1 HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+----
+
+[source,json]
+----
+{
+  "data": {
+    "id": 1,
+    "version": 1,
+    "firstName": "John",
+    "lastName": "SMITH"
+    "..."
+  }
+}
+----
+
+.Response:
+[source,json]
+----
+{
+  "status": 0,
+  "data": [{
+    "id": 1,
+    "version": 2,
+    "fullName": "John SMITH",
+    "firstName": "John",
+    "lastName": "SMITH",
+    "..."
+  }]
+}
+----
+
+[IMPORTANT]
+====
+Version number is used in order to ensure non-conflicting modifications of the record, and thus must be specified.
+====
+
+== Delete a record
+
+The web service is accessible with following url pattern:
+
+  DELETE /ws/rest/:model/:id
+
+.Request
+----
+DELETE /ws/rest/com.axelor.contact.db.Contact/1 HTTP/1.1
+Accept: application/json
+----
+
+.Response:
+[source,json]
+----
+{
+  "status": 0,
+  "data": [1]
+}
+----
+
+The `data` is an array with id of deleted record as only element.

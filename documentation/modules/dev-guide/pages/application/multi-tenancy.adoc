@@ -1,0 +1,99 @@
+= Multi-Tenancy
+:toc:
+:toc-title:
+
+The {page-component-title} v5 has added https://en.wikipedia.org/wiki/Multitenancy[multi-tenancy] support.
+The term multi-tenancy refers to a software architecture in which a single instance of software runs
+on a server and serves multiple tenants. A tenant is a group of users who share a common access with
+specific privileges to the software instance.
+
+So now, a single instance of Axelor app can serve multiple tenants (users, companies etc).
+
+== Configuration
+
+The default multi-tenancy implementation uses multiple databases per tenant and requires
+configuration from `axelor-config.properties`.
+
+The database configuration keys with format `db.<tenant-id>.<key>` is used to configure
+database connections.
+
+[source,properties]
+----
+# enable multi-tenancy
+application.multi_tenancy = true <1>
+
+db.default.visible = false <2>
+db.default.driver = org.postgresql.Driver
+db.default.ddl = update <3>
+db.default.url = jdbc:postgresql://localhost:5432/open-platform-demo-db
+db.default.user = axelor
+db.default.password =
+
+db.db1.name = DB1 <4>
+db.db1.hosts = host1,host1:8080 <5>
+db.db1.roles = admin <6>
+db.db1.driver = org.postgresql.Driver
+db.db1.url = jdbc:postgresql://localhost:5432/open-platform-demo-db1
+db.db1.user = axelor
+db.db1.password =
+
+db.db2.name = DB2
+db.db2.hosts = host1,host1:8080
+db.db2.driver = org.postgresql.Driver
+db.db2.url = jdbc:postgresql://localhost:5432/open-platform-demo-db2
+db.db2.user = axelor
+db.db2.password =
+
+db.db3.name = DB3
+db.db3.hosts = host1,host1:8080,host2,host2:8080
+db.db3.driver = org.postgresql.Driver
+db.db3.url = jdbc:postgresql://localhost:5432/open-platform-demo-db3
+db.db3.user = axelor
+db.db3.password =
+----
+<1> required to enable multi-tenancy feature
+<2> the default database should be invisible as it's a fallback
+<3> only default database supports DDL operations, schema for other tenants should be created manually
+<4> display name of the tenant
+<5> roles filter, only users with those roles can access these tenants
+<6> host name based filter, the tenant is accessible from those hosts only
+
+The default tenant is required and will be used in case the app is unable to resolve tenant id
+for some reason. So the default tenant should not be used for anything but demo/fallback purpose.
+
+== Customization
+
+We can override this default implementation by providing custom implementation of these two interfaces:
+
+* `com.axelor.db.tenants.TenantConfig` - an interface to provide tenant connection config values
+* `com.axelor.db.tenants.TenantConfigProvider` - an interface to obtain TenantConfig, may be from external resource
+
+The `TenantConfigProvider` defines following methods to implement:
+
+* `TenantConfig find(String tenantId)` - find a TenantConfig instance for the given tenant id
+* `List<TenantConfig> findAll(String host)` - find all the TenantConfig for the given hostname
+* `boolean hasAccess(User user, TenantConfig config)` - check whether the given authenticated user can use the tenant
+
+The custom implementation should be integrated from application module like this:
+
+[source,java]
+----
+public class DemoModule extends AxelorModule {
+
+    @Override
+    protected void configure() {
+        bind(TenantConfigProvider.class).to(MyTenantConfigProvider.class);
+    }
+
+}
+----
+
+It's up to the `MyTenantConfigProvider` to decide how to resolve tenants (may be using jdbc connection
+to some external database).
+
+== Limitations
+
+Following features are disabled in multi-tenancy mode:
+
+* xref:modules/scheduler.adoc[Scheduler]
+* Schema generations

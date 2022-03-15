@@ -1,0 +1,31 @@
+= Development
+:toc:
+:toc-title:
+
+In this chapter, we will see how to develop axelor applications effectively.
+
+== Requirements
+
+Please check the xref:getting-started:index.adoc[getting started guide] for
+pre-requisites and configuring your favourite IDE.
+
+== Run in Debug mode
+
+You can run the application in debug mode during development like this:
+
+[source,sh]
+----
+$ ./gradlew --no-daemon run --debug-jvm
+----
+
+This will start the app in debug mode waiting for debugger on `5005` port. Attach your
+favourite Java debugger on this port to start debugging.
+
+== XML Hotswap
+
+If you run the app in debug mode as mentioned above, changes to XML views
+are hot reloaded. However, you still have to refresh current view with browser refresh button.
+
+Moreover, this feature is experimental and has limitations. For example, it can only detect
+XML file changes once the application is started. Any changes done before application start
+are not recognized. That issue will be resolved in upcoming releases.

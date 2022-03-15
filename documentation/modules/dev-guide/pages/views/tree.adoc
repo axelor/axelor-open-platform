@@ -1,0 +1,73 @@
+= Tree View
+:toc:
+:toc-title:
+
+The tree view shows data in hierarchical tree list with several columns.
+
+A tree view can be defined like this:
+
+[source,xml]
+-----
+<tree name="project-task-tree" title="Project Tasks">
+
+  <!-- define tree columns -->
+  <column name="title" type="string" /> <1>
+  <column name="progress" type="integer" />
+
+  <!-- define 1st level node -->
+  <node model="com.axelor.project.db.Project"> <2>
+    <field name="name" as="title" />
+  </node>
+
+  <!-- define 2nd level node -->
+  <node model="com.axelor.project.db.ProjectTask" parent="project"
+    draggable="true" onClick="project.task.add"> <3>
+    <field name="name" as="title" />
+    <field name="progress" as="progress" />
+  </node>
+
+</tree>
+-----
+<1> define a tree column with the given name and type
+<2> define the root node data source
+<3> define 2nd level node data source with root node as parent
+
+== Column
+
+The `<column>` items are used to define display columns for the tree view.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| *`name`* | name of the node
+| *`type`* | data type of the column
+| `title` | column title
+|===
+
+The columns are bound to node fields described below.
+
+== Node
+
+Tree view requires `<node>` items to define data sources for the tree nodes.
+
+The `<node>` item can have following attributes:
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| *`model`* | name of the data source model
+| `parent` | name of the parent field
+| `domain` | domain filter to restrict node data
+| `orderBy` | comma-separated list of field name to order the node data
+| `draggable` | whether the node is draggable
+| `onClick` | action to execute when double click on a node
+|===
+
+The first node item should define data source of the type referenced by the
+`parent` attribute of the next node item. Subsequent nodes should follow the
+same rule.
+
+If a node is `draggable` it can be dropped on any of the parent node to change
+the parent of the dragged node.

@@ -1,0 +1,87 @@
+= Installation
+:toc:
+:toc-title:
+
+:url-jdk: https://adoptium.net/
+:url-jdk-more: https://jdk.dev/download/
+:url-gradle: http://gradle.org/
+:url-postgresql: http://www.postgresql.org/download/
+
+In this chapter we will see how to prepare the development environment on Linux and Windows
+operating systems for working with {page-component-title} sources.
+
+== Prerequisite
+
+* {url-jdk}[OpenJDK 11]
+* {url-gradle}[Gradle 7.2] or later
+* {url-postgresql}[PostgreSQL 11.0] or later
+* Your favourite IDE
+  ** xref:eclipse.adoc[Eclipse 2021-06] or later
+  ** xref:idea.adoc[Intellij IDEA 2021.2] or later
+
+== OpenJDK
+
+On Linux/MacOS install OpenJDK 11 and make sure JDK command line tools are in your path.
+If you use distribution provided OpenJDK, they are already available in `PATH` otherwise do this:
+
+[source,sh]
+----
+$ export JAVA_HOME=/path/to/jdk
+$ export PATH=$JAVA_HOME/bin:$PATH
+----
+
+On Windows, the JDK installer generally configures `PATH` environment.
+However, you can do following to setup `PATH` manually.
+
+[source,batch]
+----
+$ set JAVA_HOME=\path\to\jdk
+$ set PATH=%JAVA_HOME%\bin;%PATH%
+----
+
+To ensure, JDK is installed properly, try this command from console:
+
+[source,sh]
+----
+$ javac -version
+----
+
+NOTE: See the list of well known {url-jdk-more}[OpenJDK 8 distributions].
+
+== Gradle
+
+You can install {url-gradle}[Gradle] as documented in https://gradle.org/install/[gradle installation guide]
+or install manually and configure `PATH` environment like this:
+
+[source,sh]
+----
+$ export GRADLE_HOME=/path/to/gradle
+$ export PATH=$GRADLE_HOME/bin:$PATH
+----
+
+To ensure Gradle is installed properly, try this command in console:
+
+[source,sh]
+----
+$ gradle -version
+----
+
+== PostgreSQL
+
+See {url-postgresql}[PostgreSQL] download page for more detailed information about installation process.
+
+You may also require to configure postgresql server to allow
+https://www.postgresql.org/docs/current/static/auth-methods.html[password authentication].
+
+.Example pg_hba.conf
+[source,apache]
+----
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# "local" is for Unix domain socket connections only
+local   all             all                                     trust
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            md5
+# IPv6 local connections:
+host    all             all             ::1/128                 md5
+----

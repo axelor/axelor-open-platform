@@ -1,0 +1,27 @@
+= Introduction
+:toc:
+:toc-title:
+
+The {page-component-title} is an business application development framework for Java.
+
+This document provides in-depth documentation for developers. If you are new to
+the {page-component-title} don't forget to check the xref:getting-started:index.adoc[Getting Started] guide.
+
+The guide is organized in following chapters:
+
+xref:application/index.adoc[Application]::
+  Documents application and module structure.
+xref:modules/index.adoc[Modules]::
+  Documents how to organize business logic in modules.
+xref:models/index.adoc[Models]::
+  Documents domain models and fields in details.
+xref:views/index.adoc[Views]::
+  Documents different view types and how to define them.
+xref:actions/index.adoc[Actions]::
+  Documents actions.
+xref:data-import/index.adoc[Data-Import]::
+  Documents the powerful data import feature.
+xref:web-services/index.adoc[Web Services]::
+  Documents web services.
+xref:web-client/index.adoc[Web Client]::
+  Documents web client widgets, customizing look and feel etc.

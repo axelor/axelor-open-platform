@@ -1,0 +1,83 @@
+= Groovy Scripting
+:toc:
+:toc-title:
+
+Sometime while importing large data, it's required to process the data and
+transform it according to our needs. Doing this manually on all the CSV files
+is time consuming and error prone. Hoverer, {page-component-title} provides embed groovy
+scripting support to process/transform the data during the import process.
+
+You can specify inline groovy expressions to process individual field value,
+provide default field value or can process the newly constructed data object.
+This should be specified in the mapping file like this:
+
+[source,xml]
+-----
+<?xml version="1.0"?>
+<csv-inputs xmlns="http://axelor.com/xml/ns/data-import"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/data-import
+  http://axelor.com/xml/ns/data-import/data-import_6.0.xsd">
+
+  ...
+  ...
+
+  <input file="sale-orders.csv" type="com.axelor.sale.db.Order"
+    call="com.axelor.data.tests.Validators:validateSaleOrder">
+
+    <!-- transform boolean value into 'true' or 'false' -->
+    <bind column="confirmed" to="confirmed"
+      eval="confirmed ==~ /^(T|Y|1)$/ ? 'true' : 'false'"/>
+
+    ...
+  </input>
+
+</csv-inputs>
+-----
+
+First, we can provide any method with call attribute to input tag to post-process
+the data object once it's populated but before persisting to the database.
+
+Here is an example groovy script:
+
+[source,groovy]
+-----
+import com.google.inject.Inject
+import com.google.inject.Injector
+
+import com.axelor.db.JpaSupport
+import com.axelor.contact.db.Contact
+import com.axelor.sale.service.SaleOrderService
+import com.axelor.sale.db.Order
+
+class Validators extends JpaSupport {
+
+  @Inject
+  SaleOrderService soService
+
+  def validateSaleOrder(Object bean) {
+    assert bean instanceof Order
+    Order so = (Order) bean
+
+    soService.validate(so)
+
+    println("Date: $so.orderDate")
+    println("Customer: $so.customer.firstName $so.customer.lastName")
+    println("Items: $so.items.size")
+
+    int count = all(Contact).count()
+    assert count > 1
+
+    return bean
+  }
+}
+-----
+
+Second, you can specify simple groovy expression via `eval` attribute.
+This expression will be evaluated with the context of current CSV record's
+(column name -> value) map.
+
+You can see that,
+
+* the values of column confirmed is processed to convert in valid boolean value.
+* default value for `confirmDate` is provided with groovy expression.

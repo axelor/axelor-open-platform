@@ -1,0 +1,21 @@
+= Quick Tutorial
+:toc:
+:toc-title:
+
+In this tutorial we will learn how to create a simple Axelor application
+step by step.
+
+xref:step1.adoc[Step 1: Create a Project]::
+  Describes how to create a new application project
+xref:step2.adoc[Step 2: Create a Module]::
+  Describes how to create application module
+xref:step3.adoc[Step 3: Define Models]::
+  Describes how to define domain models
+xref:step4.adoc[Step 4: Define Views]::
+  Describes how to define object views
+xref:step5.adoc[Step 5: Define Actions]::
+  Describes how to define actions
+xref:step6.adoc[Step 6: Configuration]::
+  Describes how to configure the app
+xref:step7.adoc[Step 7: Start the Server]::
+  Describes how to start the application using embedded server

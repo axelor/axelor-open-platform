@@ -1,0 +1,54 @@
+= Auth Services
+:toc:
+:toc-title:
+
+For the moment, web services uses session based authentication. So the client
+application must keep track of session id and cookies between requests.
+
+The session can be established with login services:
+
+== Login
+
+.Request
+----
+POST /login.jsp HTTP/1.1
+----
+
+.Header
+----
+Content-Type: application/json
+----
+
+.Body
+[source,json]
+----
+{
+  "username": "admin",
+  "password" : "secret"
+}
+----
+
+The authentication data is sent in the body of the request.
+
+Returns response with HTTP status `200` if login success otherwise returns
+HTTP status `401`.
+
+Only relevent headers and request body is shown.
+
+== Logout
+
+.Request
+[source]
+----
+GET /logout HTTP/1.1
+----
+
+The login response returns session cookies which should be tracked by client
+application.
+
+Some of the libraries that can keep track of sessions:
+
+* http://requests.ryanmccue.info/[Request for PHP]
+* http://docs.python-requests.org/en/latest/[Request for Python]
+* https://github.com/request/request[Request for NodeJS]
+* http://hc.apache.org/[Apache HTTP Client (Java)]

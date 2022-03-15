@@ -1,0 +1,201 @@
+= Overview
+:toc:
+:toc-title:
+
+:url-gradle: http://gradle.org/
+:url-gradle-multi: https://docs.gradle.org/current/userguide/multi_project_builds.html
+
+In this chapter, we'll see about the application & module structures.
+
+== Application
+
+An application is nothing but a configuration of a set of modules. The modules
+are built-time packages handled with {url-gradle}[Gradle] build system.
+
+Here is a directory structure of a typical axelor application:
+
+.Directory Structure
+[source,text]
+----
+axelor-demo
+└── src
+│   └── main
+│       ├── java
+│       └── resources
+│           └── META-INF
+│               ├── axelor-config.properties <1>
+│               └── persistence.xml <2>
+├── gradle <3>
+│   └── wrapper
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
+├── modules <4>
+├── gradlew <5>
+├── gradlew.bat <5>
+├── settings.gradle <6>
+└── build.gradle <7>
+----
+<1> The application config file
+<2> The minimal persistence xml file to confirm JPA requirement
+<3> The directory to keep gradle wrapper files
+<4> The directory to keep module projects
+<5> The shell and batch scripts to execute the build with wrapper
+<6> The gradle settings script
+<7> The gradle build script
+
+The `modules` directory contains application specific feature modules. First,
+let's see about some important files here before checking module structure.
+
+The `build.gradle` file is a build script used by {url-gradle}[gradle] to build
+the application.
+
+.build.gradle
+[source,gradle]
+----
+plugins {
+  id 'com.axelor.app' // <1>
+}
+
+axelor { // <2>
+  title = 'Axelor DEMO'
+}
+
+allprojects {
+
+  group = 'com.axelor'
+  version = '1.0.0'
+
+  java {
+    toolchain {
+      languageVersion = JavaLanguageVersion.of(11) // <3>
+    }
+  }
+
+  afterEvaluate {
+    test {
+      useJUnitPlatform() // <4>
+      beforeTest { descriptor ->
+        logger.lifecycle('Running: ' + descriptor)
+      }
+    }
+  }
+}
+
+dependencies {
+  // add dependencies
+  implementation project(':axelor-contact') // <5>
+}
+----
+<1> Use axelor application plugin
+<2> The application project config
+<3> Use Java 11
+<4> Use JUnit5 for unit testing
+<5> Add dependencies
+
+The `com.axelor.app` gradle plugin defines an extension point `axelor` where
+we can define various properties.
+
+* title - display title for the application
+
+Another important build script is the `settings.gradle` where we configure
+the gradle build and aggregates all the feature module projects to be used
+in current build process:
+
+.settings.gradle
+[source,gradle]
+----
+pluginManagement {
+  repositories {
+    maven {
+      url 'https://repository.axelor.com/nexus/repository/maven-public/' <1>
+    }
+  }
+  plugins {
+    id 'com.axelor.app' version '6.0.+' <2>
+  }
+}
+
+dependencyResolutionManagement {
+  repositories {
+    mavenCentral() {
+      content {
+        excludeGroup 'com.axelor' <3>
+      }
+    }
+    maven {
+      url 'https://repository.axelor.com/nexus/repository/maven-public/'
+    }
+  }
+}
+
+rootProject.name = 'axelor-demo'
+
+// Include modules
+include 'modules:axelor-contact'
+----
+<1> The axelor maven repository
+<2> The axelor app gradle plugin version
+<3> Use maven central but don't load `com.axelor` from it
+
+The `include 'modules:axelor-contact'` line tells gradle to include the module
+`axelor-contact` in current build cycle. It is required to list all the modules
+used by the application in `settings.gradle` file.
+
+== Module
+
+The application project generally doesn't provide any implementation logic.
+The functionalities should be provided by creating modules.
+
+A module is again a gradle sub project. Typically created inside `modules` directory.
+However, you can use any directory structure. See {url-gradle-multi}[gradle multi-project builds]
+documentation for more details.
+
+Now let's see what a feature module directory structure looks like:
+
+.Directory Structure
+[source,text]
+----
+axelor-contact
+├── build.gradle <1>
+└── src
+    ├── main <2>
+    │   ├── java
+    │   └── resources
+    │       ├── domains <3>
+    │       ├── views <4>
+    │       └── i18n <5>
+    └── test <6>
+        ├── java
+        └── resources
+----
+<1> The gradle build script
+<2> The main sources
+<3> The XML resources for domain object definitions
+<4> The XML resources for object view definitions
+<5> The CSV files with translations
+<6> The unit test sources
+
+You can see the module structure follows standard maven/gradle directory
+structure.
+
+Let's see the `build.gradle` script for the module.
+
+[source,groovy]
+.modules/axelor-contact/build.gradle
+----
+plugins {
+  id 'com.axelor.app' // <1>
+}
+
+axelor { // <2>
+  title = "Axelor :: Contact"
+}
+----
+<1> The gradle plugin for module project
+<2> The module project configuration
+
+The `com.axelor.app` plugin defines an extension point `axelor` where we
+define various properties.
+
+* title - display title for the module
+* description - a short description about the module

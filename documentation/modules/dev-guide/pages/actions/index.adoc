@@ -1,0 +1,155 @@
+= Actions
+:toc:
+:toc-title:
+
+:url-java-el: https://docs.oracle.com/javaee/7/tutorial/jsf-el.htm
+:url-groovy: http://www.groovy-lang.org/
+
+In previous chapter we have checked about the object views. The views however
+requires actions to do something useful other then just CRUD operations.
+
+The actions are also defined using xml and can be used to change views, objects,
+call controllers or doing some specific tasks like sending email, importing
+remote data etc.
+
+In this chapter we'll see different kind of actions.
+
+== Concepts
+
+Actions can be used to perform some advanced operations on the view, including:
+
+* providing default values
+* changing form values
+* changing field attributes
+* calling controller methods
+* validating current record
+
+Actions are re-usable. So each action should be given an unique name.
+
+== Events
+
+Actions can be performed on various events. These includes:
+
+* `onNew` - when creating new record
+* `onLoad` - when record is loaded in form view
+* `onSave` - when record is about to save
+* `onChange` - when a field value is changed
+* `onSelect` - when select record button is clicked (relational fields only)
+* `onClick` - when a field/button is clicked
+
+== Context
+
+The context is a map of key-value pair of the current object being edited.
+The context may contain some extra information like `\\__parent__` context.
+Also, the values of multi-value fields (O2M/M2M) are marked with `selected` flag
+to check whether the record is selected.
+
+These extra attributes are available: (_new in version 5.4_)
+
+* `_viewName` - name of the current view
+* `_viewType` - type of the current view
+* `_views` - all the views defined by current action-view
+* `_source` - name of the action source (field name)
+
+== Expressions
+
+The xml actions uses dynamic expressions to access object values or conditional
+test expressions to enable/disable actions.
+
+An expression is either a:
+
+* groovy expression - prefixed with `eval:`
+* select expression - JPQL select queries, prefixed with `select:`
+* action expression - another action, prefixed with `action:`
+* call expression - call a method, prefixed with `call:`
+* constant expression - the expression is considered as constant value
+
+These expressions can be defined in {url-groovy}[groovy] or {url-java-el}[Java EL]
+syntax. The {url-java-el}[Java EL] support has been added in v4.0.
+
+We can mix both expression syntax in same action definition. The rules are:
+
+1. the `eval:` expressions are considered groovy expressions
+2. the `select:` expressions are considered Java EL expression
+3. expression wrapped inside `#{...}` are considered Java EL expression
+
+The rules in details:
+
+* `expr="eval: ..."` - use groovy
+* `expr="select: ..."` - use EL
+* `expr="#{...}"` - use EL
+* `expr="..."` - return as it is (constant)
+* `search="..."` - search expression on `action-record` are handled with EL
+* `if="#{...}"` - use EL
+* `if="eval: ..."` - use groovy
+* `if="select: ..."` - use EL
+* `if="..."` - use groovy
+
+The EL expressions can use following predefined helper functions:
+
+* `is(Object, Class)` - check whether the given object is instance of the the class
+* `as(Object, Class)` - cast the object as the given class (generally, casting is automatic in EL but useful to convert context to a model class)
+* `str(Object)` - convert object to string (if null, returns empty string "")
+* `imp(String)` - import a class by name
+* `__repo__(Class)` - get the repository of the given model class
+* `fmt:text(String, Object...)` - string format helper
+
+Some examples:
+
+[source,xml]
+----
+<action-attrs name="action-test">
+  <attribute ... if="code == 'some'" expr="eval: __self__?.customer?.fullName" /> <1>
+  <attribute ... if="#{code == 'some'}" expr="#{ __self__.customer.fullName }" /> <2>
+  <attribute ... expr="call: com.axelor.contact.SomeController:method" /> <3>
+  <attribute ... expr="select: s.fullName from Contact s where s.code = :code" /> <4>
+</action-attrs>
+----
+<1> standard groovy expressions
+<2> Java EL expression needs to be wrapped inside `#{...}`, also no need of null value check
+<3> `call:` expressions are handled with JavaEL
+<4> `select:` expressions are handled with JavaEL
+
+We are using Java EL 3.0 (from tomcat8). See the {url-java-el}[Java EL]
+documentation for more details.
+
+== Built-ins variables
+
+Some built-in variables are available to be used with expressions. These includes:
+
+* `\\__date__` - current date as `LocalDate`
+* `\\__time__` - current datetime as `LocalDateTime`
+* `\\__datetime__` - current datetime as `ZonedDateTime`
+* `\\__user__` - current user
+* `\\__this__` - the record being edited (representing form values)
+* `\\__self__` - the corresponding record from the database
+* `\\__parent__` - the parent record
+* `\\__ref__` - the selected record in multi-object search view
+* `\\__id__` - ID of the current record
+* `\\__ids__` - list of IDs of the selected records
+* `\\__config__` - xref:../application/config.adoc#global-context-configuration[global context configuration]
+
+== Special actions
+
+The following special actions can be used to perform some special operations:
+
+- `sync` - to sync record, can be used at the beginning or end only
+- `save` - to save record, can be used anywhere
+- `new` - start a new record, can be used at the end only
+- `close` - close current view, can be used at the end only
+- `validate` - validate current form, can be used anywhere
+
+For example:
+
+[source,xml]
+----
+<form ...>
+  ...
+  <!-- save current form before executing some-action,
+       and save again at the end -->
+  <field name="some" onChange="save,some-action,another-action,save" />
+  ...
+  <!-- close current view after action is complete -->
+  <field name="some" onChange="some-action,close" />
+</form>
+----

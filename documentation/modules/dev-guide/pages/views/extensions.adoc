@@ -1,0 +1,175 @@
+= Extension Views
+:toc:
+:toc-title:
+
+:url-xpath-expr: https://www.w3.org/TR/1999/REC-xpath-19991116/
+
+Form and grid views can be altered by defining a new view that has the same `name`, a unique `id` defined, and `extension="true"`. That kind of view is called an _extension view_.
+
+== Example
+
+[source,xml]
+-----
+<form name="contact-form" title="Contact" model="com.axelor.contact.db.Contact"
+  id="sale-contact-form" extension="true">
+
+  <!-- Insert a dashlet after Contacts panel. -->
+  <extend target="panel[@title='Contacts']">
+    <insert position="after">
+      <panel-dashlet action="action-view-orders-by-contact" title="Orders"/>
+    </insert>
+  </extend>
+
+  <!-- Replace fullName field by firstName and lastName fields. -->
+  <extend target="//field[@name='fullName']">
+    <replace>
+      <field name="firstName"/>
+      <field name="lastName"/>
+    </replace>
+  </extend>
+
+  <!-- Move Extra panel before first sidebar panel. -->
+  <extend target="panel[@sidebar='true']">
+    <move position="before" source="panel[@title='Extra']"/>
+  </extend>
+
+  <!-- Change widget attribute on notes field. -->
+  <extend target="//field[@name='notes']">
+    <attribute name="widget" value="html"/>
+  </extend>
+
+  <!-- Change attributes on the root element. -->
+  <extend target="/">
+    <attribute name="canAttach" value="false"/>
+    <attribute name="width" value="large"/>
+  </extend>
+
+</form>
+-----
+
+Defining extension views causes computed views to be generated (views with `computed="true"`) with a priority higher than the original views'. Those computed views are regenerated whenever the extension views or the original views are updated.
+
+== Tags
+
+=== extend
+
+Extension views have one or more `<extend>` tags defining the extensions:
+
+[source,xml]
+-----
+<extend target="<XPath expression>" if-feature="<feature name>" if-module="<module name>">
+  <!-- One or more extension operations -->
+</extend>
+-----
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `target` | {url-xpath-expr}[XPath expression] to select the target element of the extension operation (extend operation is performed on the first match only)
+| `if-feature` | name of a feature and only apply this extension if this feature is enabled _(optional)_
+| `if-module` | name of a module and only apply this extension if this module is installed _(optional)_
+|===
+
+The `if-feature` attribute works with a class extending `com.axelor.app.AppConfig` and specified by `application.config.provider` configuration in `axelor-config.properties` file:
+
+[source,java]
+-----
+import com.axelor.app.AppConfig;
+
+public class AppService implements AppConfig {
+
+  @Override
+  public boolean hasFeature(String featureName) {
+    // Return whether the feature is enabled.
+  }
+}
+-----
+
+An `<extend>` tag is composed of one or more extension operations, among `insert`, `replace`, `move`, and `attribute`.
+
+=== insert
+
+Insert specified elements at a position relative to the target element.
+
+[source,xml]
+-----
+<insert position="before|after|inside">
+  <!-- Elements to insert -->
+</insert>
+-----
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `position` | position where to insert these elements, relative to the target element: `before`, `after`, or `inside`
+|===
+
+=== replace
+
+Replace the target element by the specified elements. Only one `replace` operation may be applied to one target element.
+
+[source,xml]
+-----
+<replace>
+  <!-- Elements to replace the target element with -->
+</replace>
+-----
+
+If no elements are specified, the target element is removed.
+
+=== move
+
+Move a specified source element to a position relative to the target element.
+
+[source,xml]
+-----
+<move position="before|after|inside" source="<XPath expression>"/>
+-----
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `position` | position where to move this source element, relative to the target element: `before`, `after`, or `inside`
+| `source` | {url-xpath-expr}[XPath expression] to select the source element of the `move` operation
+|===
+
+=== attribute
+
+Change a specified attribute on the target element.
+
+[source,xml]
+-----
+<attribute name="<attribute name>" value="<attribute value>"/>
+-----
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `name` | name of the attribute to change
+| `value` | new value of the attribute
+|===
+
+If the value is empty, the attribute is removed from the element.
+
+== Positioning
+
+Normally, `before` means before the target element, and `after` means after the target element.
+
+However, when the target element is `"/"` (root element of the view), the meaning is altered: `before` means before first child element, and `after` means after last child element:
+Special cases where some elements such as `<toolbar>` and `<menubar>` that need to stay on top are dealt with automatically:
+
+[source,xml]
+-----
+<!-- Insert a dashlet as first element inside the view. -->
+<!-- If a toolbar and/or a menubar already exist, -->
+<!-- the dashlet is inserted after those. -->
+<extend target="/">
+  <insert position="before">
+    <panel-dashlet action="action-view-orders-by-contact" title="Orders"/>
+  </insert>
+</extend>
+-----

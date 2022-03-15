@@ -1,0 +1,89 @@
+= Adapters
+:toc:
+:toc-title:
+
+The input values from CSV or XML data source are string values, so we need
+type adapters to convert them to target data type.
+
+Most of the time, the conversion is automatic but in some cases conversion is
+required. For example, non-iso date format, boolean flags, numbers etc.
+
+Following type adapters are pre-defined:
+
+- `LocalDate` - convert date string to `LocalDate` instance
+- `LocalTime` - convert time string to `LocalTime` instance
+- `LocalDateTime` - convert the datetime string to `LocalDateTime` instance
+- `DateTime` - convert the datetime string to `DateTime` instance (with timezone info)
+- `Boolean` - convert boolean string to Boolean
+- `Number` - convert integer or decimal string to respective type
+
+You can implement your own type adapter by extending the `com.axelor.data.adapters.Adapter`
+and overriding `adapt` method.
+
+Here is an example:
+
+[source,java]
+-----
+public class BooleanAdapter extends Adapter {
+
+  private Pattern pattern;
+
+  @Override
+  public Object adapt(Object value, Map<String, Object> context) {
+
+    if (value == null || "".equals(value)) {
+      return Boolean.FALSE;
+    }
+
+    if (pattern == null) {
+      String falsePattern = this.get("falsePattern", "(0|false|no|f|n)");
+      pattern = Pattern.compile(falsePattern, Pattern.CASE_INSENSITIVE);
+    }
+
+    return !pattern.matcher((String) value).matches();
+  }
+}
+-----
+
+The adapter then has to be registered from the mapping file like this:
+
+[source,xml]
+-----
+<adapter name="Boolean" type="com.axelor.data.adapter.BooleanAdapter">
+  <option name="falsePattern" value="(0|false|no|f|n)"/>
+</adapter>
+-----
+
+Once registerred, it can be used like this:
+
+[source,xml]
+-----
+<bind node="some-flag" to="active" adapter="Boolean" .../>
+-----
+
+The built-in type adapters are registered like this:
+
+[source,xml]
+-----
+<adapter name="LocalDate" type="com.axelor.data.adapter.JavaTimeAdapter">
+  <option name="type" value="LocalDate"/>
+  <option name="format" value="dd/MM/yyyy"/>
+</adapter>
+
+<adapter name="LocalTime" type="com.axelor.data.adapter.JavaTimeAdapter">
+  <option name="type" value="LocalTime"/>
+  <option name="format" value="HH:mm"/>
+</adapter>
+
+<adapter name="LocalDateTime" type="com.axelor.data.adapter.JavaTimeAdapter">
+  <option name="type" value="LocalDateTime"/>
+  <option name="format" value="dd/MM/yyyy HH:mm"/>
+</adapter>
+
+<adapter name="DateTime" type="com.axelor.data.adapter.JavaTimeAdapter">
+  <option name="type" value="DateTime"/>
+  <option name="format" value="dd/MM/yyyy HH:mm"/>
+</adapter>
+-----
+
+You can reconfigure them accordingly.

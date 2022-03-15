@@ -1,0 +1,144 @@
+= Web Services
+:toc:
+:toc-title:
+
+:url-cors: https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
+:url-pac4j: https://www.pac4j.org
+
+The {page-component-title} provides REST like JSON web services.
+
+The web services are accessible `/ws/` endpoint, for example:
+
+  http://localhost:8080/open-platform-demo/ws/
+
+Every web service returns JSON data in a specific format. Also, some web
+services requires JSON data as request body.
+
+== Request
+
+[source,json]
+-----
+{
+  "model"   : "",  <1>
+  "offset"  : 0,   <2>
+  "limit"   : 40,  <3>
+  "sortBy"  : [],  <4>
+  "data"    : {},  <5>
+  "records" : [],  <6>
+  "fields"  : []   <7>
+}
+-----
+<1> `model` - resource model name
+<2> `offset` - pagination offset
+<3> `limit` - pagination limit
+<4> `sortBy` - list of fields to sort the result
+<5> `data` - json map, varies on web service
+<6> `records` - list of json maps or record ids
+<7> `fields` - name of the fields
+
+These request attributes are service dependent, only the required attributes
+have to be provided.
+
+== Response
+
+[source,json]
+-----
+{
+  "status"  : 0,    <1>
+  "offset"  : 0,    <2>
+  "total"   : 0,    <3>
+  "errors"  : {},   <4>
+  "data"    : {},   <5>
+  "data"    : []    <5>
+}
+-----
+<1> `status` - response status
+<2> `offset` - current pagination offset
+<3> `total` - total number of records matched
+<4> `errors` - validation errors (key is field name, value is error message)
+<5> `data` - json map or array depending on the service type
+
+The response attributes are service dependent, only the specific attributes may
+be returned by the service.
+
+The `status` attribute can have following values:
+
+[cols="2,8"]
+|===
+| Code | Reason
+
+| 0 | success
+| -1 | failure
+| -4 | validation error
+|===
+
+== CORS
+
+The {page-component-title} supports {url-cors}[CORS], generally required for calling
+web services from mobile applications.
+
+It can be controlled with following settings:
+
+[source,properties]
+----
+# CORS configuration
+# ~~~~~
+# CORS settings to allow cross origin requests
+
+# regular expression to test allowed origin or * to allow all (not recommended)
+#cors.allow.origin = *
+#cors.allow.credentials = true
+#cors.allow.methods = GET,PUT,POST,DELETE,HEAD,OPTIONS
+#cors.allow.headers = Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers
+#cors.expose.headers =
+#cors.max.age = 1728000
+----
+
+Generally, you should only set `cors.allow.origin` to a list of domains to allow.
+Other options should be left as it is.
+
+To avoid preflight cors requests, do not add `X-Requested-With` header and
+provide `Accept: application/json` header for `GET` and `POST` requests and
+use `Content-Type: text/plain;json` header for `POST` methods.
+
+== CSRF Protection
+
+The {page-component-title} has CSRF protection enabled using {url-pac4j}[pac4j]. If you want to call web services from a browser client, you need to make sure you handle the CSRF token:
+
+* read the cookie named `CSRF-TOKEN`
+* when performing your request, pass the value of that cookie in a header named `X-CSRF-Token`
+
+Example:
+[source,html]
+----
+  <ul id="product-list"></ul>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    function getCookies() {
+      return decodeURIComponent(document.cookie)
+        .split('; ')
+        .reduce((acc, cur) => { const [k, v] = cur.split('='); return {...acc, [k]: v}; }, {});
+    }
+
+    const cookies = getCookies();
+
+    $.ajax({
+      url: 'ws/rest/com.axelor.sale.db.Product/search',
+      type: 'POST',
+      headers: { 'X-CSRF-Token': cookies['CSRF-TOKEN'] },
+      data: JSON.stringify({
+        fields: ['name'],
+        sortBy: ['name'],
+        limit: 20
+      }),
+      contentType: 'application/json'
+    }).done(response => {
+      const productNames = response.data.map(e => e.name);
+      const productList = $('#product-list');
+      productNames.forEach(name => {
+        $(`<li>${name}</li>`).appendTo(productList);
+      });
+    });
+  </script>
+----

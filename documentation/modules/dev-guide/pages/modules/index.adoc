@@ -1,0 +1,28 @@
+= Overview
+:toc:
+:toc-title:
+
+The {page-component-title} applications generally implements all business logic using
+modules. As we have xref:application/index.adoc#module[seen earlier], a typical
+business module consists:
+
+xref:models/models.adoc[Models]::
+  defines domain data
+xref:views/index.adoc[Views]::
+  defines views for the domain objects
+xref:actions/index.adoc[Actions]::
+  defines actions to interact with services from views
+xref:modules/coding.adoc[Services]::
+  provides business services
+xref:modules/coding.adoc[Controllers]::
+  provides glue layer between views and services
+xref:modules/reports.adoc[Reports]::
+  define various reports
+xref:modules/scheduler.adoc[Schedules]::
+  provide scheduled job implementation
+xref:modules/i18n.adoc[i18n]::
+  provides i18n catalogues
+xref:modules/security.adoc[Security]::
+  define security
+xref:modules/messaging.adoc[Change tracking]::
+  define change tracking and notifications

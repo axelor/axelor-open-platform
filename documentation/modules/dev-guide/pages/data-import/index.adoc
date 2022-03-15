@@ -1,0 +1,20 @@
+= Data Transformation
+:toc:
+:toc-title:
+
+Data are essential to all the operations of every company. As businesses evolve, usage of legacy systems create loads of information stored in different forms.
+
+Data transformation is the process of converting data from one format to another,
+usually from the format of a source system into the required format of a new
+destination system.
+
+Data transformation involves two key phases:
+
+1. Data Mapping: the assignment of data items from the source to the the destination
+2. Data Import: the process of importing data based on the data mapping
+
+The {page-component-title} provides powerful way to achieve this with declarative manner
+using xml syntax. The mapping is provided with special xml config files that
+defines rules to transform the source data.
+
+In the next few sections, we'll see built-in support for various source data formats.

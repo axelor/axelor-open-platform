@@ -1,0 +1,28 @@
+= Import Action
+:toc:
+:toc-title:
+
+The `<action-import>` can be used to perform data import from xml data stream.
+
+[source,xml]
+-----
+<action-import name="data.import.1" config="ws-data/xml-config.xml">
+  <import file="ws-data.xml" provider="ws.1" name="titles" />
+</action-import>
+-----
+
+[cols="2,8"]
+.Attributes
+|===
+| Name | Description
+
+| *name* | name of the action
+| *config* | path to data import config
+|===
+
+The import action requires one or more `<import>` tasks:
+
+* `<import>` - specify an import task
+** `file` - input file name as given in the config file.
+** `provider` - the stream provider (reference to an `action-ws`)
+** `name` - put the data as the given name in the result map

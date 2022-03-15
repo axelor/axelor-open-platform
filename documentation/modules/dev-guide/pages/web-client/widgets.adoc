@@ -1,0 +1,528 @@
+= Widgets
+:toc:
+:toc-title:
+
+The {page-component-title} web application provides some built-in widgets. These widgets are
+used to represent data in form view.
+
+All the widgets represents a domain object field and can override all the
+properties (min, max, required, readonly etc.) of underlying fields.
+
+Following widgets have been implemented:
+
+== String
+
+The string widget represents the `string` data type. It's used for simple string
+fields.
+
+[source,xml]
+----
+<field name="string"/>
+----
+
+== Email
+
+This widget can be used for string fields to enter email address.
+
+[source,xml]
+----
+<field name="email" widget="email" />
+----
+
+The input value will be validated to ensure user provides valid email id.
+
+== Url
+
+This widget can be used for string fields to enter url value.
+
+[source,xml]
+----
+<field name="website" widget="url" />
+----
+
+== Phone
+
+This widget can be used for string fields to enter phone values.
+
+[source,xml]
+----
+<field name="phone" widget="phone" />
+----
+
+_New in version 5.4.2:_
+
+The phone widget uses the https://github.com/jackocnr/intl-tel-input[International Telephone Input] plugin. All `x-` prefixed attributes are passed to the plugin. Here are a few useful options:
+
+* `x-placeholder-number-type` - number type to use for the placeholder, such as `MOBILE` (default) or `FIXED_LINE` (https://github.com/jackocnr/intl-tel-input/blob/master/src/js/utils.js#L114[list of all possible keys])
+* `x-custom-placeholder` - JSON of custom placeholders by country code
+* `x-initial-country` - initial country selection by specifying its country code (default is browser-dependent)
+* `x-preferred-countries` - countries to appear at the top of the list (space-separated list of country codes) (default is browser-dependent)
+* `x-only-countries` - in the dropdown, display only the countries you specify (space-separated list of country codes)
+
+== Password
+
+This widget can be used for string fields to enter password values.
+
+[source,xml]
+----
+<field name="password" widget="password" />
+----
+
+== Number
+
+The number widget is used for `integer` and `decimal` data fields.
+
+Number widget has specials attributes :
+
+* `min` : lowest bound of the value
+* `max` : upper bound of the value
+* `x-scale` : scale of the decimal value (total number of digits in decimal part).
+* `x-precision` : precision of the decimal value (total number of digits).
+
+[source,xml]
+----
+<field name="integer" widget="Integer"/>
+<field name="decimal" widget="Decimal" x-scale="2" x-precision="18"/>
+----
+
+== DateTime
+
+The datetime widgets is used for `date` and `datetime` fields.
+
+[source,xml]
+----
+<field name="date" widget="date" />
+<field name="time" widget="time" />
+<field name="dateTime" widget="date-time" />
+----
+
+Two more widgets `relative-time` and `duration` can be used with `DateTime` and
+`Integer` fields respectively.
+
+- `relative-time` - shows relative time from now
+- `duration` - shows numeric value in seconds as time duration
+
+The `duration` widget can have following extra attributes:
+
+- `x-big=true` - if expected duration is more than 100 hours
+- `x-seconds=true` - show seconds
+
+== Boolean
+
+The boolean widget is used for `boolean` data fields.
+
+[source,xml]
+----
+<field name="confirmed" widget="boolean" /> <!-- title on top -->
+<field name="confirmed" widget="boolean" css="inline-checkbox" /> <!-- title on right -->
+----
+
+NOTE: if field type is boolean, no need to specify `widget="boolean"`
+
+Additionally, the following variants of boolean widgets are provided:
+
+* `toggle` - a two state toggle button (true is down, up otherwise)
+* `boolean-select` - a combo box with yes/no selection
+* `boolean-radio` - a group of two radio boxes with yes/no text
+* `boolean-switch` - a switch like sliding widget for boolean fields
+
+The yes/no text can be configured with `x-true-text` and `x-false-text`
+attributes:
+
+[source,xml]
+----
+<field name="some" widget="boolean-select" x-true-text="Yes" x-false-text="No" />
+<field name="some" widget="boolean-radio" x-true-text="On" x-false-text="Off" />
+<field name="some" widget="boolean-switch" />
+----
+
+== Text
+
+The text widget is used for multiline or large `string` data fields.
+
+The `height` attribute define the number of rows takes by the widget.
+
+[source,xml]
+----
+<field name="notes" widget="Text"/>
+----
+
+== Help
+
+This widget is used to show static help information in form view.
+
+[source,xml]
+----
+<help css="alert-info">
+<![CDATA[
+Some help text goes here....
+]]>
+</help>
+----
+
+== Static
+
+This widget is similar to help widget but doesn't apply any specific style
+
+[source,xml]
+----
+<static>
+<![CDATA[
+Some static text goes here....
+]]>
+</static>
+----
+
+== ManyToOne
+
+The widget is used for `many-to-one` fields.
+
+[source,xml]
+----
+<field name="contact" /> <!-- assuming it's m2o field -->
+<field name="some" x-type="many-to-one"
+  x-target="com.axelor.contact.db.Contact"
+  x-target-name="fullName" /> <!-- dummy m2o field -->
+----
+
+The `viewer` and `editor` for this field refers to the linked record.
+
+[source,xml]
+----
+<field name="contact">
+  <viewer>
+  <![CDATA[
+  <strong>{{fullName}}</strong>
+  ]]>
+  </viewer>
+  <editor>
+    <field name="firstName" />
+    <field name="lastName" />
+  </editor>
+</field>
+----
+
+== OneToOne
+
+The widget is used for `one-to-one` fields. This is same `many-to-one` widget.
+
+== OneToMany
+
+The widget is used for `one-to-many` fields.
+
+[source,xml]
+----
+<panel-related field="orderItems" /> <!-- assuming it's o2m field -->
+<panel-related field="some" x-type="one-to-many"
+  x-target="com.axelor.sale.db.OrderItem" /> <!-- dummy o2m field -->
+----
+
+The default widget uses a grid widget to show linked records. You can specify
+field names to show in the list:
+
+[source,xml]
+----
+<panel-related field="orderItems">
+  <field name="product" />
+  <field name="quantity" />
+  <field name="price" />
+</panel-related>
+----
+
+You can also display the values as repeated `viewer` or `editor` using normal
+`field` widget:
+
+[source,xml]
+----
+<field name="addresses" colSpan="12" css="address-list">
+  <viewer><![CDATA[
+  <address>
+  {{record.street}} {{record.area}}<br>
+  {{record.city}}, {{record.state}} - {{record.zip}}<br>
+  {{record.country.name}}
+  </address>
+  ]]></viewer>
+  <editor x-show-titles="false">
+    <field name="street" colSpan="12"/>
+    <field name="area" colSpan="12"/>
+    <field name="city" colSpan="4"/>
+    <field name="state" colSpan="4"/>
+    <field name="zip" colSpan="4"/>
+    <field name="country" colSpan="12" />
+  </editor>
+</field>
+----
+
+When using `viewer` with `one-to-many` fields, values should be referenced with
+`record.<fieldName>`.
+
+== ManyToMany
+
+The widget is used for `many-to-many` fields. This is same widget as `one-to-many`
+but one additional icon to select existing records.
+
+== Binary
+
+The binary widget is file upload widget used with `binary` fields.
+
+[source,xml]
+----
+<field name="content" widget="binary" />
+----
+
+== Image
+
+The image widget is used with `binary` fields that stores image data or
+`many-to-one` fields referencing `com.axelor.meta.db.MetaFile` records.
+
+[source,xml]
+----
+<field name="picture" widget="image" />
+<field name="metaFile" widget="image" />
+----
+
+== Button
+
+The button widget is used to show a clickable button on a form.
+
+Button widget has specials attributes :
+
+* `onClick` : action to execute on click event
+* `prompt` : confirmation message before performing client action
+* `link` : If specified then the button is rendered as a link.
+Use empty value if you only need a link effect and perform actual action with onClick.
+* `icon` : button icon (an image or font-awesome icon)
+* `iconHover` : button icon on mouse hover (an image or font-awesome icon)
+
+[source,xml]
+----
+<button name="customBtn" title="Click Me!" onClick="actions"
+  prompt="This is a confirmation message."
+  icon="fa-check-square-o" />
+----
+
+== NavSelect
+
+The `NavSelect` widget is a breadcrumb like widget and can be used with selection fields.
+
+== RadioSelect
+
+The `RadioSelect` widget can be used with selection fields. The field is rendered
+as radio selection list.
+
+[source,xml]
+----
+<field name="language" selection="language-selection" widget="RadioSelect" />
+----
+
+The radio list is rendered horizontally but can be change to vertical with
+`x-direction="vertical"` attribute.
+
+== CheckboxSelect
+
+The `CheckboxSelect` is same as `RadioSelect` but uses checkbox list.
+
+== ImageSelect
+
+The `ImageSelect` widget can be used with a selection field where selection values are either
+image urls or font icons.
+
+== MultiSelect
+
+The `MultiSelect` widget can be used with a selection field to select multiple values displayed as tags. Tag colors can be defined in the selection options via the `color` attribute.
+
+== SingleSelect
+
+The `SingleSelect` widget can be used with a selection field to select a single value displayed as a tag. Tag colors can be defined in the selection options via the `color` attribute.
+
+== TagSelect
+
+The `TagSelect` widget can be used with a many-to-many field to select multiple values displayed as tags. Use `x-color-field` to specify the tag color field that should use selection `color.name.selection`.
+
+Available tag color values for `MultiSelect`, `SingleSelect`, and `TagSelect`:
+
+[source,xml]
+----
+<selection name="color.name.selection">
+  <option value="red" color="red">Red</option>
+  <option value="pink" color="pink">Pink</option>
+  <option value="purple" color="purple">Purple</option>
+  <option value="deeppurple" color="deeppurple">Deep Purple</option>
+  <option value="indigo" color="indigo">Indigo</option>
+  <option value="blue" color="blue">Blue</option>
+  <option value="lightblue" color="lightblue">Light Blue</option>
+  <option value="cyan" color="cyan">Cyan</option>
+  <option value="teal" color="teal">Teal</option>
+  <option value="green" color="green">Green</option>
+  <option value="lightgreen" color="lightgreen">Light Green</option>
+  <option value="lime" color="lime">Lime</option>
+  <option value="yellow" color="yellow">Yellow</option>
+  <option value="amber" color="amber">Amber</option>
+  <option value="orange" color="orange">Orange</option>
+  <option value="deeporange" color="deeporange">Deep Orange</option>
+  <option value="brown" color="brown">Brown</option>
+  <option value="grey" color="grey">Grey</option>
+  <option value="bluegrey" color="bluegrey">Blue Grey</option> <!-- new in version 5.4 -->
+  <option value="black" color="black">Black</option>
+  <option value="white" color="white">White</option>
+</selection>
+----
+
+== RefSelect
+
+Sometimes we need to reference a record from different types. For example,
+in an `Email`, we may have to give reference to an `Invoice` or `SaleOrder` or
+even a `Contact`. The standard `ManyToOne` field can't work here as it can
+only refer single type.
+
+The `RefSelect` widget can be used in such cases. In order to use `RefSelect`,
+we require two fields in target object and a selection of types.
+
+[source,xml]
+----
+<entity ...>
+  ...
+  <string name="reference" /> <1>
+  <integer name="referenceId" /> <2>
+</entity>
+----
+<1> - will store the reference object type name
+<2> - will store the reference record id
+
+and a selection of types:
+
+[source,xml]
+----
+<selection name="my.reference.select">
+  <option value="com.axelor.sale.db.Order">SaleOrder</option> <1>
+  <option value="com.axelor.contact.db.Contact"
+    data-domain="self.email LIKE '%gmail%'"
+    data-grid="my-custom-grid-view">Contact</option> <2>
+</selection>
+----
+<1> - define selection option with fully qualified type name as value
+<2> - you can define extra attributes using `data-` prefix
+
+and we can use the reference widget like this:
+
+[source,xml]
+----
+<form ...>
+  ...
+  <field name="reference" selection="my.reference.select" widget="RefSelect" />
+</form>
+----
+
+NOTE: Use `data-grid` or `data-form` attributes to specify different views
+
+== CodeEditor
+
+The CodeEditor widget is a special widget for string data fields to use a code
+editor to input the source code text.
+
+CodeEditor widget has two specials attributes :
+
+* `x-code-syntax` : syntax highlighting
+* `x-code-theme` : theme to style the editor.If not define use the default theme
+
+[source,xml]
+----
+<field name="script" widget="code-editor" x-code-syntax="xml"/>
+----
+
+== HTML
+
+The html editor widget is a special widget for string data fields to provide
+html text.
+
+Html widget has a special attribute `x-lite` to use a compact and
+little version of the widget.
+
+[source,xml]
+----
+<field name="note" widget="html"/>
+
+<!-- or use compact version of the widget -->
+<field name="note" widget="html" x-lite="true"/>
+----
+
+== Extra Attributes
+
+In addition to the common properties, widgets supports the following extra properties
+depending on the widget/type.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `x-bind` | angular.js expression to bind to the field value
+| `x-related` | specify related field for `ref-select` widget
+| `x-create` | the names of required fields to be used for quick record creation from `select` widget
+| `x-icon` | specify an icon
+| `x-icon-hover` | specify an icon for hover state
+| `x-icon-active` | specify an icon for active state (used with `toggle` widget)
+| `x-exclusive` | whether the boolean field used inside the o2m repeat editor should be exclusive
+| `x-show-icons` a| comma-separated list of names of icons to show, or `false` to hide them all
+
+* editor: `edit`, `view`, `select`, `clear`
+* multirelational field: `select`, `new`, `edit`, `view`, `remove` - _new in version 5.4_
+| `x-can-copy` | whether to allow copy of o2m/m2m field items
+| `x-direction` | layout direction (horizontal, vertical) of some widgets (e.g. `radio-select`)
+| `x-code-syntax` | syntax highlighting for the code editor widget
+| `x-code-theme` | color scheme for the code editor
+| `x-lite` | whether to use compact version of the widget (used with `html` widget)
+| `x-labels` | whether to show label in `image-select` widget
+| `x-order` | specify the order of suggest box list
+| `x-limit` | specify the maximum number of items in suggest box list
+| `x-search-limit` | specify the default page limit of search popup
+| `x-precision` | precision of the decimal value (total number of digits)
+| `x-scale` | scale of the decimal value (total number of digits in decimal part)
+| `x-true-text` | the display value for "true" state of a boolean widget
+| `x-false-text` | specify the display value for "false" state of a boolean widget
+| `x-big` | allow duration of more than 100 hours in a duration widget
+| `x-seconds` | show seconds in a duration widget
+| `x-accept` | specify the file types the file input should accept
+| `x-color-field` | specify the color field to use with `tag-select` widget
+| `x-popup-maximized` | specify whether to open the `editor`, `selector`, or `all` popups as maximized - _new in version 5.4_
+|===
+
+== Expressions
+
+The form view widget's states can be set using angular.js boolean expressions
+from the xml views.
+
+These are:
+
+- `showIf` - show the widget
+- `hideIf` - hide the widget
+- `requiredIf` - mark the widget as required
+- `readonlyIf` - mark the widget as readonly
+- `validIf` - validate the field
+
+The boolean expressions are evaluated against current form values. The following
+special variables can be used:
+
+- `$moment(d)` - a helper to convert date to moment.js object
+- `$number(d)` - a helper to convert text to number
+- `$contains(list, item)` - a helper to check whether list contains the item
+- `$readonly()` - whether the widget is readonly
+- `$required()` - whether the widget is required
+- `$valid([name])` - whether the widget is valid
+- `$invalid([name])` - whether the widget is invalid
+- `$get(path)` - get the value with dotted path
+- `$popup()` - whether the form is a popup
+- `$context` - current context
+- `$user` : login of current user
+- `$group` : group code of current user
+
+Examples :
+
+[source,xml]
+----
+<field name="createDate" readonlyIf="confirmed"/>
+
+<field name="amount" validIf="$number(amount) &gt;= 100" />
+
+<field name="password" validIf="password.length &gt; 5" />
+<field name="confirmPassword" validIf="password === confirmPassword" />
+----

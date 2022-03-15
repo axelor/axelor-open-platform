@@ -1,0 +1,71 @@
+= Advanced Customization
+:toc:
+:toc-title:
+
+== Extra partial JSP templates
+
+You can provide custom partial JSP templates which are included by main `index.jsp` if found in app's `src/main/webapp` folder. These templates are:
+
+* `index-head.jsp` - provide extra tags inside html `<head>` (mostly for adding extra `<link>` and/or `<meta>` tags)
+* `index-foot.jsp` - provide extra html to append at the bottom of page body (mostly used for adding a common footer)
+* `index-nav-buttons.jsp` - provide extra navigation buttons in the top-right part of the main header
+
+Examples:
+
+.index-head.jsp
+[source,html]
+----
+<!-- add font -->
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+----
+
+.index-foot.jsp
+[source,html]
+----
+<footer>
+© 2020 Axelor. All rights reserved.
+</footer>
+----
+
+.index-nav-buttons.jsp
+[source,html]
+----
+<ul class="nav nav-shortcuts pull-right">
+  <li class="divider-vertical"></li>
+  <li>
+    <a href="http://axelor.com"><i class="fa fa-star"></i> Axelor</a>
+  </li>
+</ul>
+----
+
+
+== Per module web resources
+
+Modules can include web resources from `src/main/webapp folder`. Make sure to run `./gradlew copyWebapp` whenever the web resources are changed.
+
+The `src/main/webapp` from modules will be copied in this dependency order:
+
+* copy webapp from axelor-web
+* copy webapp from all other modules in dependency order
+* finally, copy own webapp
+
+Depending on the structure of the webapp folder, it may overwrite resources of dependency modules.
+
+
+There is also an API `com.axelor.web.StaticResourceProvider` that can be used to register custom CSS and/or JavaScript files. Example:
+
+
+[source,java]
+----
+public class MyStaticResources implements StaticResourceProvider {
+
+  @Override
+  public void register(List<String> resources) {
+    resources.add("my/css/style.css");
+    resources.add("my/js/some.js");
+  }
+}
+----
+
+The application scans for any classes implementing that interface. The CSS and JavaScript files will be included in `index.jsp` file.

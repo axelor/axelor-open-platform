@@ -1,0 +1,43 @@
+= Step 7: Start the Server
+:toc:
+:toc-title:
+
+Now it's time to test the application. The application can be tested either by
+creating a war package and deploying on a tomcat server or by using the embedded
+tomcat server.
+
+== Run the application
+
+The embedded server is easiest way to run the application during development.
+
+Run the following command in terminal:
+
+[source,sh]
+----
+  $ ./gradlew --no-daemon run
+----
+
+IMPORTANT: always execute run task with gradle using `--no-daemon` to avoid application clean up issues (known gradle problem)
+
+The `run` task accepts following command line options:
+
+* `--port <number>` - alternative port
+* `--debug-jvm` - start application in debug mode
+
+After a few seconds, you should see some logs and at the end something like this:
+
+[source,text]
+----
+...
+Ready to serve...
+
+Running at http://localhost:8080/axelor-demo
+----
+
+Open the given link in your browser and log in using the default admin account
+using `admin` as the username and password.
+
+== What's Next?
+
+Congratulations! You have learned how to create simple axelor application.
+Follow the xref:dev-guide:index.adoc[Developer Guide] for more detailed documentation.

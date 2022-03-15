@@ -1,0 +1,55 @@
+= Validate Action
+:toc:
+:toc-title:
+
+The `<action-validate>` is used to validate a record.
+
+[source,xml]
+-----
+<action-validate name="action-sale-order-validate">
+  <error message="Create Date is in future." if="confirmed &amp;&amp; createDate &gt; __date__"/>
+  <error message="Order Date is in future." if="confirmed &amp;&amp; orderDate &gt; __date__"/>
+  <alert message="No Sale Order Items. Would you like to continue?" if="confirmed &amp;&amp; !items"/>
+</action-validate>
+-----
+
+[cols="2,8"]
+.Attributes
+|===
+| Name | Description
+
+| *name* | name of the action
+|===
+
+The validate action requires following items:
+
+* `<error>` - define an error condition
+** `if` - a boolean expression against the current context
+** `message` - the message to show if condition failed
+** `action` - an action to be executed to make corrective measures
+* `<alert>` - define an alert condition
+** `if` - a boolean expression against the current context
+** `message` - the message to show if condition failed
+** `action` - an action to be executed to make corrective measures
+* `<info>` - define an information condition
+** `if` - a boolean expression against the current context
+** `message` - the message to show if condition failed
+* `<notify>` - define an notification condition
+** `if` - a boolean expression against the current context
+** `message` - the message to show if condition failed
+
+If the action results in an `error`, further action processing is terminated,
+and an error message is shown to the user.
+If provided, error action is executed to make corrective measures when error dialog is closed.
+
+If the action results in an `alert`, further action processing is halted,
+and a confirmation message is shown to the user.
+If confirmed, the pending actions are executed.
+If provided, alert action is executed to make corrective measures when alert dialog is canceled.
+
+If the action results in an `info`, a message is shown to the user,
+then pending actions are executed when info dialog is closed.
+
+If the action results in a `notify`, pending actions will be executed and a
+notification popup is shown at the bottom right corner.
+The notification disappears automatically after 5 seconds if not manually closed.

@@ -1,0 +1,49 @@
+= Logging
+:toc:
+:toc-title:
+
+:url-logback: https://logback.qos.ch/
+
+Starting from v5, the {page-component-title} is switch to {url-logback}[logback] as logging framework.
+
+== Configuration
+
+If you are migrating from v4, remove the `log4j.properties` file. Also the {page-component-title} v5 will
+auto configure logging so there is not need of any custom logging configuration file `logback.xml`
+unless you want total control on how to log (it's still possible).
+
+Generally, we will configure logging from `axelor-config.properties` files:
+
+[source,properties]
+----
+# Logging
+# ~~~~~
+# Custom logback configuration can be provided with `logging.config` property pointing
+# to a custom `logback.xml`. In this case, all the logging configuration provided here
+# will be ignored.
+#
+# Following settings can be used to configure logging system automatically.
+#
+logging.path = {user.home}/.axelor/logs
+logging.pattern.file = %d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- [%t] %-40.40logger{39} : %m%n
+logging.pattern.console = %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n
+logging.level.root = error
+logging.level.com.axelor = info
+logging.level.org.hibernate = warn
+----
+
+== Customization
+
+* If `logging.path` is given, log files will be stored under that directory
+* If `logging.pattern.file = OFF` then file logging will be disabled
+* If `logging.pattern.console = OFF` then console logging will be disabled
+
+Global log level can be changed with `logging.level.root` property. Package specific log levels
+can be configured with `logging.level.<package-name> = <level>` settings.
+
+The console logger may log with colors if terminal supports colors.
+
+We can by-pass auto configuration from `axelor-config.properties` by including `logback.xml`
+under `src/main/resources`. In that case, you have to configure it on your own. We can also
+specify an external config location with `logging.config = /path/to/logback.xml` if we don't
+want to include the config in war package.

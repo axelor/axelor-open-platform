@@ -1,0 +1,21 @@
+= Dashboard
+:toc:
+:toc-title:
+
+The dashboard is used to provide overviews. The dashboard view is composed of
+dashlets.
+
+[source,xml]
+-----
+<dashboard name="welcome.dashboard" title="Welcome!">
+  <dashlet action="chart:chart.sales.per.month"/>
+  <dashlet action="chart:chart.sales.per.month.pie"/>
+  <dashlet colSpan="12" action="sale.orders"/>
+</dashboard>
+-----
+
+Dashlets are nothing but embedded views. Right now, `grid` and `chart` views
+are supported.
+
+The dashlet `action` can be either an action view or `<view-type>:<view-name>`
+value. Right now, only `grid`, `chart` and `custom` views are supported.

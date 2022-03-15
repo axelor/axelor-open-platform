@@ -1,0 +1,618 @@
+= Models
+:toc:
+:toc-title:
+
+The entity classes represents domain models and are defined using xml format.
+
+Each files should have proper declaration:
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
+  http://axelor.com/xml/ns/domain-models/domain-models_6.0.xsd">
+
+  <!-- entity definitions here -->
+
+</domain-models>
+----
+
+IMPORTANT: Java reserved keywords can't be used as field names. SQL reserved
+keywords (PostgreSQL, MySQL & Oracle) can't be used as column names.
+
+Let's see with an example:
+
+[source,xml]
+.axelor-contact/src/main/resources/domains/Address.xml
+----
+<module name="contact" package="com.axelor.contact.db" />
+
+<entity name="Contact" sequential="true" cacheable="true">
+  <many-to-one name="title" ref="Title"/> <1>
+  <string name="firstName" required="true" /> <2>
+  <string name="lastName" required="true" />
+
+  <string name="fullName" namecolumn="true" search="firstName,lastName"> <3>
+    <![CDATA[
+    if (firstName == null && lastName == null)
+        return null;
+    if (title == null)
+        return firstName + " " + lastName;
+    return title.getName() + " " + firstName + " " + lastName;
+  ]]></string>
+
+  <date name="dateOfBirth"/>
+
+  <string name="email" required="true" unique="true" max="100" />
+  <string name="phone" max="20" massUpdate="true"/>
+  <string name="notes" title="About me" large="true" />
+
+  <one-to-many name="addresses" ref="Address" mappedBy="contact"/> <4>
+
+  <finder-method name="findByName" using="fullName" /> <5>
+  <finder-method name="findByEmail" using="email" />
+</entity>
+----
+<1> define a many-to-one field `title` referencing `Title` object
+<2> define a string field `firstName`
+<3> define a calculated string field `fullName`
+<4> define a one-to-many field `addresses` referencing `Address` object
+<5> define a custom finder method `findByName`
+
+A domain model is defined using `<entity>` tag, it supports some attributes.
+
+* `name` - name of the Entity (should begin with upper case letter)
+* `sequential` - whether to use a new ID sequence (default is true)
+* `cacheable` - whether to make this entity cacheable (default is false)
+* `repository=[none|default|abstract]` - how to generate repository class
+* `table` - table name for the entity
+* `logUpdates` - whether to enable update logging (default is true)
+* `lang` - language of the generated source code (default is java)
+* `extends` - inheritance base entity class
+* `implements` - list of interfaces to implement (generally empty, or confirming the getter/setter)
+* `persistable` - whether this entity is persistable (in database).
+* `strategy=[SINGLE|JOINED|CLASS]` - inheritance strategy (default is SINGLE)
+* `equalsIncludeAll` - whether to include all the simple non-function fields in equality test (default is false) - _new in version 5.4_
+* `hashAll` - whether to use all the simple non-function fields as hash keys (default is false)
+
+The `strategy` attribute can be used on base entity only.
+
+The `persistable` attribute can be used to define a non-persitable entity class
+annotated with `@MappedSuperclass` that can be used as base class of other entities.
+
+The `<module>` tag can be used to define package names of the generated entities
+& repositories:
+
+[source,xml]
+----
+<!-- default behavior -->
+<module name="contact"
+  package="com.axelor.contact.db"
+  repo-package="com.axelor.contact.db.repo"
+  table-prefix="contact" />
+
+<!-- custom behavior -->
+<module name="contact"
+  package="my.models"
+  repo-package="my.repos"
+  table-prefix="my" />
+----
+
+* `name` - is required, used to group entities in a logical module
+* `package` - is required, used as java package name of the generated entity class
+* `repo-package` - is optional, used as java package name of the generated repository class, defaults to `<package>.repo`
+* `table-prefix` - is optional, used as table name prefix, defaults to module `name`
+
+WARNING: If package name ends with .db, the second to last part of package name is used instead of module `name` for default table prefix, eg. if package is named `com.axelor.sale.db`, `sale` will be used as default table prefix.
+
+== Fields
+
+Fields of different types are used to define model properties.
+
+The following are the common attributes for all field types:
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| *`name`* | name of the field (required)
+| `title` | display title of the field
+| `help` | detailed help string
+| `column` | database column name (if field name is reserved name in underlying database)
+| `index` | whether to generate index of this field
+| `default` | default value of the field
+| `required` | whether the field value is required
+| `readonly` | whether the field value is readonly
+| `unique` | whether the field value is unique (defines unique constraint)
+| `insertable` | whether the column is included in SQL INSERT statements generated by the persistence provider - _new in versions 5.3.8, 5.4.1_
+| `updatable` | whether the column is included in SQL UPDATE statements generated by the persistence provider - _new in versions 5.3.8, 5.4.1_
+| `hidden` | whether the field is hidden by default in user interfaces
+| `transient` | whether the field is transient (can't be saved in db)
+| `initParam` | whether to use the field as a contractor parameter
+| `massUpdate` | whether to allow mass update on this field
+|===
+
+Non-relational fields have the following extra attributes:
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `nullable` | allow null value to be stored for fields that by default uses their system default when value is not given
+| `selection` | selection key name
+| `equalsInclude` | whether the field is included in equality test - _new in version 5.4_
+| `hashKey` | whether to consider this field as hashCode candidate
+| `formula` | whether this is a native SQL formula field
+|===
+
+=== String
+
+The `<string>` field is used to define textual data fields.
+
+The field accepts following additional attributes:
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `min` | minimum length of the text value
+| `max` | maximum length of the text value
+| `large` | whether to use large text type
+| `search` | comma-separated list of field names used by autocompletion UI component to search.
+| `sequence` | user the specified custom sequence generator
+| `multiline` | whether the string is multiline text (used by UI components)
+| `translatable` | whether the field value is translatable
+| `password` | whether the field is storing password text
+| `encrypted` | whether the field is encrypted
+|===
+
+example:
+
+[source,xml]
+----
+<string name="firstName" min="1" />
+<string name="lastName"/>
+<string name="notes" large="true" multiline="true"/>
+----
+
+The `translatable` attribute can be used to mark the field values as translatable.
+For example:
+
+[source,xml]
+----
+<entity name="Product">
+  <string name="name" translatable="true" />
+</entity>
+----
+
+Translated values are stored in same general translation table (no context saved).
+
+The `encrypted` field values are stored in database using AES-256 encrypted values.
+The password should be provided from application config file using `encryption.password` key.
+
+=== Boolean
+
+The `<boolean>` field is used to define boolean type fields.
+
+example:
+
+[source,xml]
+----
+<boolean name="active" />
+----
+
+=== Integer
+
+The `<integer>` field is used to define non-decimal numeric fields.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `min` | minimum value (inclusive)
+| `max` | maximum value (inclusive)
+|===
+
+example:
+
+[source,xml]
+----
+<integer name="quantity" min="1" max="100"/>
+<integer name="count"/>
+----
+
+=== Long
+
+The `<long>` field is used to define non-decimal numeric field where value can't
+be represented by `integer` type.
+
+IMPORTANT: Avoid using this field type as some dbms (oracle) only allows one
+long column per table (we already have one for `id` column)
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `min` | minimum value (inclusive)
+| `max` | maximum value (inclusive)
+|===
+
+example:
+
+[source,xml]
+----
+<long name="counter"/>
+----
+
+=== Decimal
+
+The `<decimal>` field is used to define decimal type fields using `java.math.BigDecimal` java type.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `min` | minimum value (inclusive)
+| `max` | maximum value (inclusive)
+| `precision` | precision of the decimal value (total number of digits)
+| `scale` | scale of the decimal value (total number of digits in decimal part)
+|===
+
+example:
+
+[source,xml]
+----
+<decimal name="price" precision="8" scale="2" />
+----
+
+=== Date
+
+The `<date>` field is used to define fields to store date using `java.time.LocalDate` java type.
+
+example:
+
+[source,xml]
+----
+<date name="orderDate" />
+----
+
+=== Time
+
+The `<time` field is used to define fields to store time values using the
+`java.time.LocalTime` java type.
+
+example:
+
+[source,xml]
+----
+<time name="duration" />
+----
+
+=== DateTime
+
+The `<datetime>` field is used to define fields to store datetime values using
+the `java.time.LocalDateTime` java type.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `tz` | whether to use timezone info
+|===
+
+In case of `tz` is true, the java type is `java.time.ZonedDateTime`
+
+example:
+
+[source,xml]
+----
+<datetime name="startsOn" />
+<datetime name="startsOn" tz="true"/>
+----
+
+=== Enum
+
+The `<enum>` field is used to define fields with Java enumeration type.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `ref` | the fully qualified type name of the enumeration
+|===
+
+example:
+
+[source,xml]
+----
+<enum name="status" ref="OrderStatus" />
+----
+
+The `OrderStatus` enumeration should be defined using domain xml like this:
+
+.Enum with default values
+[source,xml]
+----
+<enum name="OrderStatus">
+  <item name="DRAFT" />
+  <item name="OPEN" />
+  <item name="CLOSED" />
+  <item name="CANCELED" />
+</enum>
+----
+
+.Enum with custom string values
+[source,xml]
+----
+<enum name="OrderStatus">
+  <item name="DRAFT" value="draft" />
+  <item name="OPEN" value="open" />
+  <item name="CLOSED" value="closed" />
+  <item name="CANCELED" value="canceled" />
+</enum>
+----
+
+.Enum with custom numeric values
+[source,xml]
+----
+<enum name="OrderStatus" numeric="true">
+  <item name="DRAFT" value="1" />
+  <item name="OPEN" value="2" />
+  <item name="CLOSED" value="3" />
+  <item name="CANCELED" value="4" />
+</enum>
+----
+
+For JPQL query on `enum` fields, we must always use query parameter.
+
+[source,java]
+----
+// this is correct way
+TypedQuery<Order> query = em.createQuery(
+  "SELECT s FROM Order s WHERE s.status = :status");
+
+query.setParameter("status", OrderStatus.OPEN);
+
+// this is wrong way
+TypedQuery<Order> query = em.createQuery(
+  "SELECT s FROM Order s WHERE s.status = 'OPEN'");
+
+// using ADK query api
+Query<Order> q = Query.of(Order.class)
+  .filter("self.status = :status")
+  .bind("status", "OPEN");
+
+// or
+
+Query<Order> q = Query.of(Order.class)
+  .filter("self.status = :status")
+  .bind("status", OrderStatus.OPEN);
+
+// or directly as positional arguments
+Query<Order> q = Query.of(Order.class)
+  .filter("self.status = ?1 OR self.status = ?2", "DRAFT", OrderStatus.OPEN);
+----
+
+In scripting expressions, `enum` should be referenced using it's type name. For example:
+
+[source,xml]
+----
+<check
+  field="confirmDate"
+  if="status == OrderStatus.OPEN &amp;&amp; confirmDate == null"
+  error="Invalid value..." />
+----
+
+=== Binary
+
+The `<binary>` field is used to store binary blobs.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `image` | if the field is intended to store image data
+| `encrypted` | whether the field is encrypted
+|===
+
+TIP: only use this field for small or non-reusable binary data, prefer using
+an `many-to-one` to `com.axelor.meta.db.MetaFile`.
+
+example:
+
+[source,xml]
+----
+<binary name="photo" image="true" />
+<binary name="report" />
+----
+
+=== ManyToOne
+
+The `<many-to-one>` field is used to define a single value reference field using
+many-to-one relationship.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `ref` | name of the reference entity class (FQN if not in same package)
+|===
+
+example:
+
+[source,xml]
+----
+<many-to-one name="customer" ref="com.axelor.contact.db.Contact" />
+----
+
+=== OneToOne
+
+The `<one-to-one>` field is used to define a single value reference field using
+one-to-one relationship.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `ref` | name of the reference entity class (FQN if not in same package)
+| `mappedBy` | for bi-directional fields, name of the owner side field
+|===
+
+[source,xml]
+----
+<!-- defined in Engine object -->
+<one-to-one name="car" ref="com.axelor.cars.db.Car" />
+
+<!-- defined in Cat object -->
+<one-to-one name="engine" ref="com.axelor.cars.db.Engine" mappedBy="car"/>
+----
+
+=== OneToMany
+
+The `<one-to-many>` field is used to define multi-value fields using one-to-many
+relationship.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `ref` | name of the reference entity class (FQN if not in same package)
+| `mappedBy` | for bi-directional fields, name of the inverse many-to-one field
+| `orphanRemoval` | whether to remove orphaned records (default true)
+| `orderBy` | specify the ordering of the collection value by the given field
+|===
+
+[source,xml]
+----
+<one-to-many name="items" ref="OrderItem" mappedBy="order" />
+<one-to-many name="addresses" ref="Address" mappedBy="contact" />
+----
+
+=== ManyToMany
+
+The `<many-to-many>` field is used to define multi-value fields using many-to-many
+relationship.
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `ref` | name of the reference entity class (FQN if not in same package)
+| `mappedBy` | for bi-directional fields, name of the owner side field
+| `orderBy` | specify the ordering of the collection value by the given field
+|===
+
+[source,xml]
+----
+<many-to-many name="taxes" ref="Tax" />
+----
+
+== Index
+
+The `<index>` tag can be used to define a composite index.
+
+It is defined by specifying a comma-separated list of column names
+in the `columns` attribute. A name can be defined with the `name` attribute.
+
+[source,xml]
+----
+<index columns="firstName,lastName,fullName" name="idx_names"/>
+----
+
+A index can be defined on a field using `index` attribute.
+A custom index name can be provided (starting with 'idx_' prefix), else default
+index name is generated using table name and column name.
+By default, all reference fields, namecolumn, name and code are automatically indexed.
+
+[source,xml]
+----
+<string name="firstName" required="true" index="true"/>
+<string name="lastName" required="true" index="idx_contact_last_name"/>
+----
+
+== Unique Constraint
+
+The `<unique-constraint>` tag can be used to define a composite unique constraint.
+
+It is defined by specifying a comma-separated list of column names
+in the `columns` attribute. A name can be defined with the `name` attribute.
+
+[source,xml]
+----
+<unique-constraint columns="first_name,last_name" />
+----
+
+== Field Encryption
+
+Starting from 5.0, we can now encrypt sensitive fields. In order to use this
+feature, following application settings are required:
+
+[source,properties]
+----
+# Encryption
+# ~~~~~
+# Set encryption password
+encryption.password = MySuperSecretKey
+
+# Set encryption algorithm (CBC or GCM)
+#encryption.algorithm = CBC
+----
+
+We can marked `<string>` and `<binary>` fields as encrypted like this:
+
+[source,xml]
+----
+<string name="myEmail" encrypted="true" />
+<binary name="myPicture" encrypted="true" />
+----
+
+Encrypted values will be longer than actual values, so you should make sure that
+the field size is reasonably good enough to hold the encrypted value in database.
+
+== Entity Listeners
+
+:url-entity-listeners: https://javaee.github.io/javaee-spec/javadocs/javax/persistence/EntityListeners.html
+
+One or more `<entity-listener>` tags can be used to define {url-entity-listeners}[entity listeners]. This would add an `@EntityListeners` annotation to the generated entity class:
+
+[source,xml]
+----
+<entity name="Contact">
+  ...
+  <entity-listener class="com.axelor.contact.db.repo.ContactListener"/>
+</entity>
+----
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| `class` | fully qualified name of the entity listener class
+|===
+
+You may then define your own entity listener classes with callback methods annotated with lifecycle event annotations for which they are invoked:
+
+[source,java]
+----
+public class ContactListener {
+
+  // Called upon PostPersist or PostUpdate events on Contact objects.
+  @PostPersist
+  @PostUpdate
+  private void onPostPersistOrUpdate(Contact contact) {
+    System.out.println("Contact saved");
+  }
+}
+----
+
+Lifecycle event annotations:
+
+* `@PrePersist`
+* `@PostPersist`
+* `@PreRemove`
+* `@PostRemove`
+* `@PreUpdate`
+* `@PostUpdate`
+* `@PostLoad`

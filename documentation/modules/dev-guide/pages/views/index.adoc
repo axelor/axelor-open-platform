@@ -1,0 +1,40 @@
+= Object Views
+:toc:
+:toc-title:
+
+In chapter we will see the object views. The object views are xml definitions
+about the user interface to represent the object models to the end users.
+
+The {page-component-title} support several kind of views for an object. These includes:
+
+* xref:views/grid.adoc[Grid] - shows the data list in as columns
+* xref:views/form.adoc[Form] - shows a single record in a form layout
+* xref:views/tree.adoc[Tree] - shows data in hierarchical manner
+* xref:views/charts.adoc[Chart] - shows data as 2D graphs
+* xref:views/calendar.adoc[Calendar] - shows data in schedule like view
+* xref:views/kanban.adoc[Kanban] - shows data as agile kanban board
+* xref:views/cards.adoc[Cards] - shows data list as cards
+* xref:views/custom.adoc[Custom] - shows data using custom templates
+* xref:views/gantt.adoc[Gantt] - shows data using a Gantt chart
+
+The xref:views/grid.adoc[Grid] & xref:views/form.adoc[Form] views are the main views. If these
+views are not provided for model, a set of default views are generated automatically.
+However, they may not produce good looking interface, it's always advised to
+provide views for domain models.
+
+Like the object models, views are also defined using xml format.
+
+Each files should have proper declaration :
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views
+  http://axelor.com/xml/ns/object-views/object-views_6.0.xsd">
+
+  <!-- views definitions here -->
+
+</object-views>
+----

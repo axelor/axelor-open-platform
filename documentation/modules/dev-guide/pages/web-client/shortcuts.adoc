@@ -1,0 +1,16 @@
+= Keyboard Shortcuts
+:toc:
+:toc-title:
+
+- kbd:[Ctrl+Insert] - create new record
+- kbd:[Ctrl+E] - edit selected record
+- kbd:[Ctrl+S] - save current record
+- kbd:[Ctrl+D] - delete current/selected record(s)
+- kbd:[Ctrl+R] - refresh current view
+- kbd:[Ctrl+Q] - close the current view tab
+- kbd:[Alt+F] - search for records - _changed in version 5.4_
+- kbd:[Alt+G] - focus first or selected item in view - _changed in version 5.4_
+- kbd:[Ctrl+J] - navigate to previous page/record
+- kbd:[Ctrl+K] - navigate to next page/record
+- kbd:[Ctrl+M] - focus left menu search box
+- kbd:[F9] - toggle left menu

@@ -1,0 +1,46 @@
+= Record Action
+:toc:
+:toc-title:
+
+The `<action-record>` can be used to construct an object with some values.
+
+[source,xml]
+-----
+<action-record name="default-order-record" model="com.axelor.sale.db.Order">
+  <field name="customer" expr="action:default-customer-record" if="!(__ref__ instanceof Contact)"/>
+  <field name="customer" expr="eval: __ref__" if="__ref__ instanceof Contact"/>
+  <field name="orderDate" expr="eval: __date__"/>
+  <field name="createDate" expr="eval: __date__"/>
+  <field name="items" expr="action:default-orderline-record"/>
+</action-record>
+-----
+
+[cols="2,8"]
+.Attributes
+|===
+| Name | Description
+
+| *name* | name of the action
+| *model* | the domain model to construct the object of
+| search | search for existing record before creating new
+| ref | reference to the existing record from context, gets preference over `search`
+| copy | if record is found, whether to create a copy of it
+| saveIf | save if the given expression is true and `id` is `null` or `version` value is provided.
+|===
+
+The action required `<field>` items to set object properties.
+
+* `<field>` - define a field to update
+** `name` - name of the field
+** `expr` - expression to execute to get the value
+** `if` - a groovy boolean expression against the current context
+** `copy` - if the expression return a model object, whether to copy it
+
+The `expr` has following format:
+
+* `eval: ...` - evaluate as groovy expression
+* `call: ...` - call a given controller method
+* `action: ...` - call a given action
+* `select: ...` - execute a select query and return first matched record
+* `select[]: ...` - execute a select query and return all matched records
+* `...` - if none of the above, consider the expression as static value

@@ -1,0 +1,45 @@
+= Gantt View
+:toc:
+:toc-title:
+
+
+The Gantt view shows data in a Gantt chart:
+
+[source,xml]
+-----
+  <gantt name="project-task-gantt" title="Task Planning" model="com.axelor.project.db.ProjectTask"
+    taskStart="plannedStartDate"
+    taskDuration="plannedDuration"
+    taskParent="parentTask"
+    taskSequence="sequence"
+    taskProgress="plannedProgress"
+    x-finish-to-start="finishToStartTaskSet"
+    x-start-to-start="startToStartTaskSet"
+    x-finish-to-finish="finishToFinishTaskSet"
+    x-start-to-finish="startToFinishaskSet">
+    <field name="name" />
+    <field name="project" />
+    <field name="user" />
+  </gantt>
+-----
+
+Gantt view attributes:
+
+[cols="2,8"]
+|===
+| Attribute | Description
+| `name` | name of the Gantt view
+| `title` | title of the Gantt view
+| `model` | fully qualified name of the domain model
+| `taskStart` | name of the field of type date/datetime to be used as start time
+| `taskDuration` | name of the duration field
+| `taskEnd` | name of the field of type date/datetime to be used as end time
+| `taskParent` | name of the parent field
+| `taskProgress` | name of the progress field
+| `taskSequence` | name of a field to order tasks in sequence
+| `taskUser` | name of the user field related to task
+| `x-finish-to-start` | name of the M2M field containing tasks to finish before starting current task
+| `x-start-to-start` | name of the M2M field containing tasks to start before starting current task
+| `x-finish-to-finish` | name of the M2M field containing tasks to finish before finishing current task
+| `x-start-to-finish` | name of the M2M field containing tasks to start before finishing current task
+|===

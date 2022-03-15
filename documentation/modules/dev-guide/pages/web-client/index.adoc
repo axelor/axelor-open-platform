@@ -1,0 +1,18 @@
+= Web Client
+:toc:
+:toc-title:
+
+The web client is developed using the following web technologies:
+
+. angular.js - modern JavaScript framework
+. bootstrap - CSS framework
+. jquery - the famous JavaScript library
+. jquery.ui - the missing UI library
+
+The {page-component-title} web is the only and official frontend application included with
+the {page-component-title}.
+
+The web app is generic enough to cover most needs.
+Most of the time, developers only need to work on XML views, actions, and server-side Java code.
+
+However, in case advanced web app customization is needed, it is possible to create themes, add custom JSP templates, and register static web resources in order to customize the UI.

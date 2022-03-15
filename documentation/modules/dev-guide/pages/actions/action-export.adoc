@@ -1,0 +1,34 @@
+= Export Action
+:toc:
+:toc-title:
+
+The `<action-export>` can be used to export records.
+
+[source,xml]
+-----
+<action-export name="export.sale.order" output="${name}/${date}${time}">
+  <export name="${name}.xml"
+    template="data/ws-test/export-sale-order.tmpl"
+    engine="groovy"/>
+  <export name="${name}-customer-copy.xml"
+    template="data/ws-test/export-sale-order.tmpl"
+    engine="groovy"/>
+</action-export>
+-----
+
+[cols="2,8"]
+.Attributes
+|===
+| Name | Description
+
+| *name* | name of the action
+| output | override the default output path
+| download | whether to download the exported files
+|===
+
+The export action requires one or more `<export>` tasks:
+
+* `<export>` - specify an export task
+** `name` - output file name
+** `template` - the template to be used to generate output file
+** `engine` - the template engine to use (groovy, ST)

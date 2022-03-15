@@ -1,0 +1,56 @@
+= Step 5: Define Actions
+:toc:
+:toc-title:
+
+Now the view have to be made available to the UI. This is done using menus.
+
+== Define menus
+
+The application menu is also defined using xml definition. A menu item when
+clicked executes an action. The actions again have to be defined using xml.
+
+The {page-component-title} supports several action types. The `action-view` can be
+used to define menu actions.
+
+Let's create an action and a menu item for the Contact object:
+
+[source,xml]
+.axelor-contact/src/main/resources/views/Menu.xml
+----
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/object-views
+  http://axelor.com/xml/ns/object-views/object-views_6.0.xsd">
+
+  <menuitem name="menu-contact-book"
+    title="Address Book" /> <1>
+
+  <menuitem name="menu-contact-friends"
+    parent="menu-contact-book"
+    title="All Contact"
+    action="contact.all"/> <2> <3> <4>
+
+  <action-view name="contact.all"
+    title="Contacts"
+    model="com.axelor.contact.db.Contact"> <5>
+    <view type="grid" name="contact-grid"/> <6>
+    <view type="form" name="contact-form"/> <7>
+  </action-view>
+
+</object-views>
+----
+<1> define a top-level menu with no parent
+<2> define a child menu item with parent
+<3> the display text of the menu item
+<4> the action (of type action-view) to execute
+<5> define an `action-view` for the given object
+<6> use the `contact-grid` view defined for the `grid` view
+<7> use the `contact-form` view defined for the `form` view
+
+For more information on `action-view` see the xref:dev-guide:index.adoc[Developer Guide].
+
+== What's Next?
+
+In this chapter we seen how to define menus. In the xref:step6.adoc[next chapter] we will see how to
+configure the application properties like database connection etc.

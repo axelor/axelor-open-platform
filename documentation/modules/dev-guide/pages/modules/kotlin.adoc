@@ -1,0 +1,139 @@
+= Kotlin Support
+:toc:
+:toc-title:
+
+:url-kotlin: http://kotlinlang.org/
+:url-kotlin-eclipse: http://kotlinlang.org/docs/tutorials/getting-started-eclipse.html
+:url-kotlin-idea: http://kotlinlang.org/docs/tutorials/getting-started.html
+
+{url-kotlin}[Kotlin] is a new statically typed programming language for modern
+multiplatform applications. It's 100% interoperable with Java and Android and
+gaining in popularity in recent time.
+
+Starting with v5, {page-component-title} now officially support Kotlin to create
+app modules.
+
+TIP: We can use {url-kotlin-eclipse}[Eclipse for Kotlin] development,
+     but for best experience, use {url-kotlin-idea}[IntelliJ IDEA].
+
+== Create Kotlin module
+
+You can create a new application module using kotlin with following `build.gradle`:
+
+[source,gradle]
+----
+buildscript {
+    ext.kotlin_version = '1.2.10'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'com.axelor.app-module'
+
+axelor {
+    title = "Axelor :: Hello"
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+----
+
+That's it. Your app module can now use Kotlin to implement business logic.
+
+== Create Services
+
+Let's create a simple HelloService using Kotlin:
+
+.HelloService.kt
+[source,kotlin]
+----
+package com.axelor.hello.service
+
+interface HelloService {
+
+    fun say(what: String): Unit
+}
+----
+
+and an implementation:
+
+.HelloServiceImpl.kt
+[source,kotlin]
+----
+package com.axelor.hello.service
+
+open class HelloServiceImpl : HelloService {
+
+    override fun say(what: String) {
+        println("Say: ${what}")
+    }
+}
+----
+
+== Create Controllers
+
+Let's create a controller class `HelloController` that uses the above `HelloService`:
+
+.HelloController.kt
+[source,kotlin]
+----
+package com.axelor.hello.web
+
+import com.axelor.hello.db.Hello
+import com.axelor.hello.service.HelloService
+import com.axelor.rpc.ActionRequest
+import com.axelor.rpc.ActionResponse
+import javax.inject.Inject
+
+open class HelloController @Inject constructor(val service: HelloService) {
+
+    fun say(req: ActionRequest, res: ActionResponse) {
+        val ctx = req.context.asType(Hello::class.java)
+        service.say(ctx.message)
+        res.status = ActionResponse.STATUS_SUCCESS
+    }
+}
+----
+
+== Configure
+
+Now it's time to configure our kotlin services. Create a Guice module:
+
+.HelloModule.kt
+[source,kotlin]
+----
+package com.axelor.hello
+
+import com.axelor.app.AxelorModule
+import com.axelor.hello.service.DefaultHelloService
+import com.axelor.hello.service.HelloService
+
+class HelloModule : AxelorModule() {
+
+    override fun configure() {
+        bind(HelloService::class.java).to(DefaultHelloService::class.java)
+    }
+}
+----
+
+That's it...

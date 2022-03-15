@@ -1,0 +1,9 @@
+name: adk
+title: Axelor Open Platform
+version: "6.0"
+start_page: ROOT:index.adoc
+nav:
+  - modules/ROOT/nav.adoc
+  - modules/getting-started/nav.adoc
+  - modules/tutorial/nav.adoc
+  - modules/dev-guide/nav.adoc

@@ -1,0 +1,121 @@
+= Chart View
+:toc:
+:toc-title:
+
+:nvd3: https://nvd3-community.github.io/nvd3/
+
+The chart view shows data as 2D graphs and is powered by {nvd3}[NVD3].
+
+[source,xml]
+-----
+<chart name="chart.sales.per.month" title="Sales per month"> <1>
+  <search-fields> <2>
+     <field type="datetime" name="fromDateTime" title="From Date"/>
+     <field type="datetime" name="toDateTime" title="To Date"/>
+  </search-fields>
+  <dataset type="jpql"> <3>
+  <![CDATA[
+  SELECT
+      SUM(self.totalAmount) AS amount,
+      MONTH(self.orderDate) AS month,
+      _customer.fullName AS customer
+  FROM
+      Order self
+  LEFT JOIN
+      self.customer AS _customer
+  WHERE
+      YEAR(self.orderDate) = YEAR(current_date)
+      AND self.orderDate > :fromDateTime
+      AND self.orderDate < :toDateTime
+  GROUP BY
+      _customer,
+      MONTH(self.orderDate)
+  ORDER BY
+      month
+  ]]>
+  </dataset>
+  <category key="month" type="month"/> <4>
+  <series key="amount" groupBy="customer" type="bar"/> <5>
+</chart>
+-----
+<1> define a chart view
+<2> define search fields (the input values can be used as query params)
+<3> define the data source for the chart (jpql, sql or rpc)
+<4> define the category axis
+<5> define the series for the chart
+
+The chart view is not bound to any object but depends on dataset retrieved with
+JPQL/SQL queries or the given rpc (method call).
+
+The optional `<search-fields>` can be used to define input fields to provide
+query parameter values or context for the rpc calls.
+
+== Chart types
+
+Following chart types are supported:
+
+* pie
+* bar
+* hbar
+* line
+* area
+* donut
+* radar
+* gauge
+* scatter
+
+A chart view requires following information:
+
+* `name` - unique name for the chart
+* `title` - chart title
+* `stacked` - whether to create stacked chart
+* `onInit` - an action to be called during chart init
+* `<dataset>` - JPQL/SQL select query with select name aliases
+* `<category>` - defines the X-Axis of the chart with
+** `key` - the dataset field to be used to categories the data (used as X-Axis data points)
+** `type` - category type can be, numeric, date, time, month, year or text
+** `title` - category title displayed on X-Axis
+* `<series>` - list of data series defines the Y-Axis (for the moment only one series is allowed)
+** `key` - the dataset field to be used as Y-Axis data points
+** `groupBy` - the dataset field use to group the related data
+** `title` - the title for the Y-Axis
+** `type` - graph type, (pie, bar, hbar, line, area)
+** `side` - Y-Axis side (left or right)
+* `<config>` - custom configuration data
+** `name` - name of the configuration item
+** `value` - configuration value
+
+== Config
+
+Charts can be configured with specific config values. These configuration may
+not be applicable to all chart types.
+
+Most important config values are:
+
+* `width` - width of the chart
+* `height` - height of the chart
+* `xFormat` - custom x-axis format
+* `percent` - used with pie chart, show labels in percent
+* `colors` - specify base colors for charts,  each color is used to provide 5 gradient shades
+* `onClick` - call specified action with clicked data in context
+
+Please check the {nvd3}[NVD3 documentation] for more configurations.
+
+== Colors
+
+Colors can be specified with colors config value (comma-separated). Each color
+is used to provide 5 gradient shades + 20 shades from d3's category20b preset.
+
+[source,xml]
+----
+<chart ...>
+  ...
+  ...
+  <!-- html named colors -->
+  <config name="colors" value="red,green" />
+
+  <!-- or html hex colors -->
+  <config name="colors" value="#31a354,#e6550d" />
+
+</chart>
+----

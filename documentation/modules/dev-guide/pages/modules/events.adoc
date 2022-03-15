@@ -1,0 +1,282 @@
+= Events
+:toc:
+:toc-title:
+
+:url-cdi-events: http://docs.jboss.org/cdi/spec/2.0/cdi-spec.html#events
+:url-binding: xref:modules/coding.adoc#configuration
+:url-entity-listeners: xref:models/models.adoc#entity-listeners
+:url-authentication-token: https://shiro.apache.org/static/current/apidocs/org/apache/shiro/authc/AuthenticationToken.html
+
+The {page-component-title} implements a subset of the {url-cdi-events}[CDI 2.0 event notification model].
+Event observer classes need to be {url-binding}[bound] and have observer methods, ie. methods that take an event as parameter, annotated with `@Observes`, optional `@Priority` (observer methods are called in ascending order of priority) and other optional qualifiers in order to narrow down which events to observe. Observer methods are called whenever the corresponding event is fired.
+
+== Built-in Events
+
+All built-in events are located inside the `com.axelor.events` package.
+
+=== Login Events
+
+These events are fired during user login process.
+
+* `PreLogin(AuthenticationToken token)` – fired before user login
+* `PostLogin(AuthenticationToken token, User user, Throwable error)` – fired after user login
+
+[cols="2,8"]
+|===
+| Field | Description
+
+| `token` | {url-authentication-token}[authentication token]
+| `user` | authenticated user
+| `error` | exception that caused login failure
+|===
+
+`PostLogin` observer methods may use a `@Named` qualifier with either `PostLogin.SUCCESS` or `PostLogin.FAILURE`.
+
+[source,java]
+-----
+import com.axelor.event.Observes;
+import com.axelor.events.PostLogin;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
+
+@RequestScoped
+public class LoginObserver {
+
+  @Inject private HttpServletRequest request;
+
+  // Observes successful login.
+  void onLoginSuccess(@Observes @Named(PostLogin.SUCCESS) PostLogin event) {
+    final String userCode = event.getUser().getCode();
+    final String userAgent = request.getHeader("User-Agent");
+    System.out.printf("User: %s, User-Agent: %s%n", userCode, userAgent);
+  }
+}
+
+-----
+
+If you want to redirect the current request to a new URL, you may use https://shiro.apache.org/static/1.4.1/apidocs/org/apache/shiro/web/util/WebUtils.html#issueRedirect(javax.servlet.ServletRequest,javax.servlet.ServletResponse,java.lang.String)[`WebUtils.issueRedirect`].
+
+=== Action Events
+
+These events are fired when actions are called.
+
+* `PreAction(String name, Context context)` – fired before action execution
+* `PostAction(String name, Context context, Object result)` – fired after action execution
+
+[cols="2,8"]
+|===
+| Field | Description
+
+| `name` | name of the action
+| `context` | context of the action
+| `result` | object returned by the action
+|===
+
+Observer methods may use the `@Named` qualifier with the name of the action to observe.
+
+[source,java]
+-----
+import com.axelor.event.Observes;
+import com.axelor.events.PostAction;
+
+import javax.inject.Named;
+
+public class SaleOrderObserver {
+
+  // Observes built-in post-action event by its name.
+  void onConfirmed(@Observes @Named("action-sale-order-confirm") PostAction event) {
+    System.out.println(event.getName());
+  }
+}
+-----
+
+=== Request Events
+
+These events are fired during server requests (REST service).
+
+* `PreRequest(Object source, Request request)` - fired before a request
+* `PostRequest(Object source, Request request, Response response)` - fired after a request
+
+[cols="2,8"]
+|===
+| Field | Description
+
+| `source` | source of the event
+| `request` | request object
+| `response` | response object
+|===
+
+Observer methods may use the `@Named` qualifier with the name of the request to observe:
+
+* `RequestEvent.SEARCH`
+* `RequestEvent.EXPORT`
+* `RequestEvent.READ`
+* `RequestEvent.FETCH`
+* `RequestEvent.SAVE`
+* `RequestEvent.MASS_UPDATE`
+* `RequestEvent.REMOVE`
+* `RequestEvent.COPY`
+* `RequestEvent.FETCH_NAME`
+
+Observer methods may also use the built-in `@EntityType` qualifier to select which entity type to observe.
+
+[source,java]
+-----
+import com.axelor.event.Observes;
+import com.axelor.event.Priority;
+
+import com.axelor.events.PostRequest;
+import com.axelor.events.RequestEvent;
+import com.axelor.events.qualifiers.EntityType;
+
+import javax.inject.Named;
+
+public class ContactObserver {
+
+  void onExport(@Observes @Priority(0)
+      @Named(RequestEvent.EXPORT) @EntityType(Contact.class) PostRequest event) {
+    System.out.println(event.getSource());
+  }
+}
+-----
+
+==== Workflow Status Tags
+
+_New in version 5.4_
+
+Observing fetch events, it is possible to add workflow status as tags in the form view.
+
+[source,java]
+-----
+  public void onFetch(@Observes @Named(RequestEvent.FETCH) PostRequest event) {
+    @SuppressWarnings("unchecked")
+    final Map<String, Object> values = (Map<String, Object>) event.getResponse().getItem(0);
+    if (values != null) {
+      final List<Map<String, Object>> status = new ArrayList<>();
+      status.add(ImmutableMap.of("name", "s1", "title", "Status 1", "color", "red"));
+      values.put("$wkfStatus", status);
+    }
+  }
+-----
+
+`status` should be a list of maps with the following keys:
+
+* name – name of the node
+* title – display title
+* color – background HTML color
+
+=== Application Events
+
+These events are fired during application startup and shutdown.
+
+* `StartupEvent()` – fired after application initialization
+* `ShutdownEvent()` – fired before application shutdown
+
+== Custom Events
+
+=== Event Object
+
+You can create your own events. An event object can be any kind of POJO:
+
+[source,java]
+-----
+public class ContactSaved {
+  private final Contact contact;
+
+  public ContactSaved(Contact contact) {
+    this.contact = contact;
+  }
+
+  public Contact getContact() {
+    return contact;
+  }
+}
+-----
+
+=== Event Source
+
+A service firing an event is an event source. To fire an event, a service needs to inject a parameterized Event object and invoke its `fire` method with an instance of the event object as parameter:
+
+[source,java]
+-----
+import com.axelor.event.Event;
+import javax.inject.Inject;
+
+public class ContactService {
+
+  @Inject private Event<ContactSaved> contactSavedEvent;
+
+  // Probably should be called from entity listener. <1>
+  public void fireContactSavedEvent(Contact contact) {
+    contactSavedEvent.fire(new ContactSaved(contact));
+  }
+}
+-----
+
+<1> See {url-entity-listeners}[entity listeners].
+
+=== Event Observer
+
+You can observe your custom events in an event observer. Remember that the observer class needs to be {url-binding}[bound] and consists of observer methods.
+
+[source,java]
+-----
+import com.axelor.event.Observes;
+
+public class ContactObserver {
+
+  void onContactChanged(@Observes ContactSaved event) {
+    Contact contact = event.getContact();
+    System.out.println(contact);
+  }
+}
+-----
+
+=== Qualifiers
+
+When firing your events, you can also `select` your own qualifiers in order to narrow down which observer methods to call:
+
+[source,java]
+-----
+import com.axelor.event.Event;
+import com.axelor.event.NamedLiteral;
+import javax.inject.Inject;
+
+public class ContactService {
+
+  @Inject private Event<ContactSaved> contactSavedEvent;
+
+  public void fireContactSavedEvent(Contact contact) {
+    contactSavedEvent.fire(new ContactSaved(contact));
+  }
+
+  public void fireContactSavedEventSuccess(Contact contact) {
+    contactSavedEvent.select(NamedLiteral.of("success")).fire(new ContactSaved(contact));
+  }
+
+  public void fireContactSavedEventFailure(Contact contact) {
+    contactSavedEvent.select(NamedLiteral.of("failure")).fire(new ContactSaved(contact));
+  }
+}
+-----
+
+[source,java]
+-----
+public class ContactObserver {
+
+  void onContactChanged(@Observes ContactSaved event) {
+    // Called by fireContactSavedEvent,
+    // fireContactSavedEventSuccess, and fireContactSavedEventFailure.
+  }
+
+  void onContactChangedSuccess(@Observes @Named("success") ContactSaved event) {
+    // Called by fireContactSavedEventSuccess.
+  }
+
+  void onContactChangedFailure(@Observes @Named("failure") ContactSaved event) {
+    // Called by fireContactSavedEventFailure.
+  }
+}
+-----

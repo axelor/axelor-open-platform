@@ -1,0 +1,154 @@
+= Custom View
+:toc:
+:toc-title:
+
+:url-fontawesome: http://fortawesome.github.io/Font-Awesome/icons
+:url-angular-templates: https://docs.angularjs.org/guide/templates
+
+The custom view allows to show arbitrary data using custom templates. This view
+is generally useful to create readonly reports.
+
+The custom view definition is:
+
+[source,xml]
+-----
+<custom name="view-name" title="View Title">
+
+  <!-- dataset fields (optional) -->
+  <field name="some" type="integer" />
+  <field name="total" type="decimal" scale="4"/>
+
+  <!-- dataset is required -->
+  <dataset type="jpql|sql|rpc">
+  <![CDATA[
+  // jpql or sql or method call
+  ]]>
+  </dataset>
+
+  <!-- template is require -->
+  <template>
+  <![CDATA[
+  // angular.js template, data can be accessed using `data`, and first data item
+  // is accessible as `first`.
+  ]]>
+  </template>
+</custom>
+-----
+
+Some examples:
+
+[source,xml]
+-----
+<!-- dashboard box with custom template -->
+<custom name="report.total.sale" title="Total sale" css="report-box">
+  <dataset type="jpql">
+  <![CDATA[
+  select sum(self.totalAmount) as total from Order self
+  ]]>
+  </dataset>
+  <template>
+  <![CDATA[
+  <div class="report-data">
+    <h1>{{first.total}}</h1>
+    <small>Total sale</small>
+    <div class="report-percent font-bold text-info pull-right">20% <i class="fa fa-level-up"></i></div>
+    <div class="report-tags"><span class="label label-important">Monthly</span></div>
+  </div>
+  ]]>
+  </template>
+</custom>
+
+<!-- using predefined template and method call for dataset -->
+<report name="report.total.sale" title="Total sale">
+  <dataset type="rpc">
+  <![CDATA[
+  com.axelor.sale.web.SomeController:someMethod
+  ]]>
+  </dataset>
+  <template>
+  <![CDATA[
+  <report-box
+    icon='fa-search'
+    label='Total sales this month' value='first.total'
+    percent='first.percent'
+    up='first.increased'
+    tag='first.tag' tag-css='first.tagStyle'></report-box>
+  ]]>
+  </template>
+</report>
+
+<!-- dashboard data table with predefined template tag -->
+<report name="report.sales" title="Sales">
+  <field name="total" type="decimal" x-scale="2" />
+  <dataset type="jpql" limit="10">
+  <![CDATA[
+  select self.name as name, c.fullName as customer, self.totalAmount as total
+  from Order self left join self.customer as c
+  ]]>
+  </dataset>
+  <template>
+  <![CDATA[
+  <report-table data='data' columns='name,customer,total' sums='total'></report-table>
+  ]]>
+  </template>
+</report>
+-----
+
+The attributes are:
+
+[cols="2,8"]
+|===
+| Attribute | Description
+| *`name`* | name of the view
+| *`title`* | display title of the view
+|===
+
+The elements are:
+
+[cols="2,8"]
+|===
+| Element | Description
+| `<field>` | field definitions for the dataset (optional, can be multiple)
+| *`<dataset>`* | dataset definition
+| *`<template>`* | custom template
+|===
+
+== Field
+
+The `<field>` element can be used to provide metadata information about a dataset
+item. This is same as fields in `grid` view.
+
+== DataSet
+
+The `<dataset>` element is used to define custom dataset.
+
+* `type` - dataset type (`jpql`, `sql` or `rpc`)
+* `limit` - query result limit (in case of `jpql` and `sql`)
+
+== Template
+
+The `<template>` element is used to define custom {url-angular-templates}[angular.js template]
+to render the data.
+
+The dataset result is available as `data` and the first result of the data is
+available as `first`.
+
+Two custom template tags are provided:
+
+* `<report-box>` - render data as a small simple report box (useful in dashboard)
+  * `@icon` - {url-fontawesome}[Font Awesome] icon name
+  * `=value` - a number value in dataset
+  * `@label` - a label to describe the value
+  * `=percent` - a percent value in dataset
+  * `=up` - boolean expression to say if value is up or down
+  * `=tag` - a tag to show on title area of the box
+  * `=tag-style` - css class to apply to tag
+* `<report-table>` - render the dataset as table
+  * `=data` - the data to render as table
+  * `@columns` - comma-separated list of dataset fields as table columns
+  * `@sums` - comma-separated list for dataset field to show sum
+
+The `@` means the attribute value is static and `=` mean the attribute value is
+a dynamic expression. Don't include the them in template, it's just for information.
+
+See the listing for some examples.

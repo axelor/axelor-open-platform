@@ -1,0 +1,175 @@
+= Migration Guide
+:toc:
+:toc-title:
+
+:url-jdk-upgrade: https://docs.oracle.com/en/java/javase/11/migrate/index.html
+:url-tomcat-9: https://tomcat.apache.org/tomcat-9.0-doc/index.html
+:url-pg-upgrade: https://www.postgresql.org/docs/12/upgrading.html
+:url-gradle-docs: https://docs.gradle.org/7.3/userguide/userguide.html
+:url-groovy-upgrade: https://groovy-lang.org/releasenotes/groovy-3.0.html
+:url-graalvm-js: https://www.graalvm.org/reference-manual/js/NashornMigrationGuide/
+:url-junit-upgrade: https://www.baeldung.com/junit-5-migration
+:url-pac4j-clients: http://www.pac4j.org/4.5.x/docs/clients.html
+
+In this document, we will see the major steps required to migrate from 5.x to 6.0.
+
+== Java 8 to Java 11
+
+JAVA 11 is now our minimal version to build and run applications.
+
+Install JAVA 11 and then increase the Java version number in the `build.gradle` file:
+
+.build.gradle
+[source,gradle]
+----
+allprojects {
+
+  java {
+    toolchain {
+      languageVersion = JavaLanguageVersion.of(11)
+    }
+  }
+
+}
+----
+
+Also make sure to use JDK 11 in the IDE as well as in your terminal (if needed).
+
+In JAVA 8, JAXB was part of standard JDK. It has been removed in JDK 11. To use JAXB API in Java 11, you need to use
+separate library : `javax.xml.bind:jaxb-api`, `com.sun.xml.bind:jaxb-core`, `com.sun.xml.bind:jaxb-impl` and `javax.activation:activation`
+
+See the {url-jdk-upgrade}[JDK 11 migration guide] for details.
+
+== Tomcat 8.5 to Tomcat 9
+
+Apache Tomcat version 8.5 is no more supported. You need to upgrade to {url-tomcat-9}[Apache Tomcat 9]. 
+
+== PostgreSQL 9 to PostgreSQL 12+
+
+Minimal PostgreSQL 12 is now required to run applications.
+
+Please check the {url-pg-upgrade}[PostgreSQL 12 upgrade guide] for details.
+
+== Gradle 5 to Gradle 7
+
+----
+./gradlew wrapper --gradle-version 7.2
+----
+
+=== Dependencies
+
+Many transitive dependencies are removed. If you use them, you need to add them in each affected module.
+
+The `compile` configuration is deprecated. Use the `api` configuration to declare dependencies which are exported, and the `implementation`  configuration to declare dependencies which are internal to your module.
+
+Example:
+
+.build.gradle
+[source,gradle]
+----
+dependencies {
+  api project(":modules:axelor-base")
+  implementation libs.commons_lang3
+}
+----
+
+=== Axelor plugin
+
+The Axelor Gradle plugins `com.axelor.app` and `com.axelor.app-module` are merged.
+
+There is now a single `com.axelor.app` plugin, ie. all Axelor modules are Axelor apps. All modules should use the app plugin only.
+
+See the Gradle upgrade guides for details:
+
+* https://docs.gradle.org/7.3/userguide/upgrading_version_5.html
+* https://docs.gradle.org/7.3/userguide/upgrading_version_6.html
+* https://docs.gradle.org/7.3/userguide/upgrading_version_7.html
+
+== Groovy 2 to Groovy 3
+
+{url-groovy-upgrade}[Groovy 3] improves compatibility with Java and has many other improvements.
+
+== Nashorn to GraalVM JavaScript
+
+Nashorn is replaced by the {url-graalvm-js}[Graal JavaScript Engine].
+
+The Nashorn script engine is deprecated in Java 11 and has some incompatible changes compared to Java 8.
+The new implementation uses the GraalVM JavaScript Engine, which supports the latest ECMAScript features.
+
+The collection helpers `listOf`, `setOf`, and `mapOf` are removed as corresponding native JavaScript objects
+are passed with appropriate Java equivalent wrapper to the Java calls.
+
+== OpenCSV to Commons CSV
+
+Dependency to OpenCSV has been removed. For ease of migration, you may manually add the dependency in your own module if you wish to continue using it. The desirable end goal is to fully migrate to Commons CSV.
+
+== Reserved keywords
+
+With upgraded database support, more keywords ar now reserved. So you need to rename database
+column of any affected fields.
+
+Some notable new reserved keywords:
+
+* `condition`
+* `file`
+* `key`
+* `message`
+* `rank`
+* `signal`
+* `size`
+* `uid`
+
+== Dropped removable modules
+
+The feature is not used by any axelor apps and had many technical issues.
+
+Run the following SQL script to drop unnecessary columns:
+
+[source,sql]
+----
+ALTER TABLE meta_module DROP COLUMN installed;
+ALTER TABLE meta_module DROP COLUMN removable;
+ALTER TABLE meta_module DROP COLUMN pending;
+----
+
+== Dropped deprecated features
+
+Features that were marked as deprecated in AOP v5 are now dropped.
+
+Notable Changes:
+
+* `Context.getParentContext()` → `Context.getParent()`
+* `new ActionHandler(ActionRequest)` → `ActionExecutor.newActionHandler(ActionRequest)`
+* `LoginRedirectException` → `WebUtils.issueRedirect()`
+* `hashKey`/`hashAll` (`hashCode`) → `equalsInclude`/`equalsIncludeAll` (`equals`)
+* `cachable` → `cacheable`
+* `axelor.report.dir` → `reports.design.dir`
+
+== Authentication configuration
+
+Reflection is now used to configure authentication clients. The new syntax is `auth.provider.<providerName>.<configurationName>`. You may use any of the built-in providers (`google`, `facebook`, `azure`, `keycloak`, `apple`, `oauth`, `oidc`, `saml`, `cas`) or configure any other clients supported by {url-pac4j-clients}[pac4j] using your own custom provider name. You may even create and use your own custom authentication clients.
+
+Example using a built-in provider:
+
+.axelor-config.properties
+[source,properties]
+----
+auth.provider.google.key = 127736102816-tc5mmsfaasa399jhqkfbv48nftoc55ft.apps.googleusercontent.com
+auth.provider.google.secret = qySuozNl72zzM5SKW-0kczwV
+----
+
+Built-in providers come with preconfigured settings. The above is equivalent to:
+
+.axelor-config.properties
+[source,properties]
+----
+auth.provider.myprovider.client = org.pac4j.oauth.client.Google2Client
+auth.provider.myprovider.configuration = org.pac4j.oauth.config.OAuth20Configuration
+auth.provider.myprovider.title = Google
+auth.provider.myprovider.icon = img/signin/google.svg
+auth.provider.myprovider.exclusive = false
+auth.provider.myprovider.absoluteUrlRequired = false
+
+auth.provider.myprovider.key = 127736102816-tc5mmsfaasa399jhqkfbv48nftoc55ft.apps.googleusercontent.com
+auth.provider.myprovider.secret = qySuozNl72zzM5SKW-0kczwV
+----

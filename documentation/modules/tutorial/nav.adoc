@@ -1,0 +1,8 @@
+* xref:index.adoc[Quick Tutorial]
+** xref:step1.adoc[Step 1: Create a Project]
+** xref:step2.adoc[Step 2: Create a Module]
+** xref:step3.adoc[Step 3: Define Models]
+** xref:step4.adoc[Step 4: Define Views]
+** xref:step5.adoc[Step 5: Define Actions]
+** xref:step6.adoc[Step 6: Configuration]
+** xref:step7.adoc[Step 7: Start the Server]

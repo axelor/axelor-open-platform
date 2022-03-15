@@ -1,0 +1,20 @@
+= {page-component-title} {page-component-version} Documentation
+:toc:
+:toc-title:
+
+Welcome to the {page-component-title} Documentation. Here you will find information
+and resources to help you learn about {page-component-title}.
+
+xref:news.adoc[What's New]::
+  Describes what is new in {page-component-title} {page-component-version}.
+xref:migration.adoc[Migration Guide]::
+  Describes the steps required to migrate from {page-component-title} 5.x to {page-component-version}.
+xref:getting-started:index.adoc[Getting Started]::
+  These topics describe how to get started with {page-component-title} as a developer.
+xref:tutorial:index.adoc[Quick Tutorial]::
+  This tutorial will quickly introduce you to the {page-component-title} and guide you
+  to create your first application.
+xref:dev-guide:index.adoc[Developer Guide]::
+  These topics describe how to use Axelor Open Platform as a developer.
+link:javadoc[API Documentation]::
+  The {page-component-title} {page-component-version} javadoc api documentation.

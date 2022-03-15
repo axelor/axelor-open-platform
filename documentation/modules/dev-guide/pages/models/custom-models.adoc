@@ -1,0 +1,49 @@
+= Custom Models
+:toc:
+:toc-title:
+
+Starting from {page-component-title} v5, we can now add custom data models dynamically at runtime. The feature can be used
+for use cases like dynamic survey forms, or preparing quick prototype etc.
+
+== Models
+
+The custom models can be defined from menu:Administration[Model Management > Custom Models].
+
+The image bellow shows the grid view listing all the defined custom models:
+
+.Custom Models (grid)
+image::custom-models-grid.png[]
+
+The image bellow shows the form view to create/edit custom models:
+
+.Custom Models (form)
+image::custom-models-form.png[]
+
+Custom models are defined as `com.axelor.meta.db.MetaJsonModel` records with following properties:
+
+[%header,cols="2,8"]
+|===
+| Name        | Description
+| `name`      | Name of the custom model
+| `title`     | Display name of the custom model
+| `onNew`     | Action to call when creating new record
+| `onLoad`    | Action to call when loading record of this model
+| `metaMenu`  | Menu to use for this model
+| `metaForm`  | Form view to use for this model
+| `metaGrid`  | Frid view to use for this model
+| `roles`     | Roles who have permission to see these models
+|===
+
+== Views
+
+When we create custom models, `form` view and `grid` views along with a `menu` are automatically created.
+
+The image bellow shows the grid view for a custom model `Question`.
+
+.Grid View
+image::custom-model-grid.png[]
+
+The image bellow shows the form view for a custom model `Question`.
+
+.Form View
+image::custom-model-form.png[]

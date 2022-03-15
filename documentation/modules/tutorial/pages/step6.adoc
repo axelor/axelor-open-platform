@@ -1,0 +1,42 @@
+= Step 6: Configuration
+:toc:
+:toc-title:
+
+At this stage, our first application is now ready. However, before we run the application, we have
+to provide some configuration details like database connection etc.
+
+Open the `src/main/resources/META-INF/axelor-config.properties` file and set the database
+configuration as described bellow.
+
+[source,properties]
+.src/main/resources/META-INF/axelor-config.properties
+----
+# Database settings
+# ~~~~~
+db.default.ddl = update
+db.default.url = jdbc:postgresql://localhost:5432/axelor-demo  <1>
+db.default.user = user <2>
+db.default.password = secret <3>
+----
+<1> use the database `axelor-demo`
+<2> the postgresql user
+<3> the postgresql user's password
+
+TIP: You can also provide external config file with `-Daxelor.config=/path/to/dev.properties`
+
+TIP: You can also provide config value with system properties `-Daxelor.config.db.default.password=secret`
+
+Create the database using the postgresql's `createdb` utility:
+
+[source,sh]
+----
+$ createdb axelor-demo
+----
+
+The `axelor-config.properties` has few more settings that you can adjust if you wish.
+
+== What's Next?
+
+In this chapter we seen how to provide application configure. In the
+xref:step7.adoc[next chapter] we will see how to run the application and access
+the web frontend.

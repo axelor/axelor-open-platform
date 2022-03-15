@@ -1,0 +1,28 @@
+= Group Action
+:toc:
+:toc-title:
+
+The `<action-group>` can be used to gather actions.
+
+[source,xml]
+-----
+<action-group name="action-validate-invoice">
+  <action name="act1"/>
+  <action name="act2"/>
+  <action name="act3" if="invoiceDate"/>
+</action-group>
+-----
+
+[cols="2,8"]
+.Attributes
+|===
+| Name | Description
+
+| *name* | name of the action
+|===
+
+The group action requires following items:
+
+* `<action>` - define an action
+** `name` - name of the action
+** `if` - a boolean expression against the current context

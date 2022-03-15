@@ -1,0 +1,302 @@
+= Advanced Services
+:toc:
+:toc-title:
+
+:url-jpql: https://docs.oracle.com/javaee/7/tutorial/persistence-querylanguage.htm
+
+The REST services strictly follows traditional rules for restful api. However,
+there are few cases which are difficult to achieve with pure REST.
+
+The {page-component-title} provides some additional non-standard api for such cases:
+
+== Advanced Read
+
+This is a specialized `read` service besides the standard REST service to
+partially read record.
+
+The web service is accessible with following url pattern:
+
+  POST /ws/rest/:model/:id/fetch
+
+.Request
+----
+POST /ws/rest/com.axelor.contact.db.Contact/1/fetch HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+----
+
+[source,json]
+----
+{
+  "fields": ["fullName"],
+  "related": {
+    "user": ["name", "email"],
+    "parent": ["fullName"]
+  }
+}
+----
+
+.Response:
+[source,json]
+----
+{
+  "status": 0,
+  "data": [{
+    "id": 1,
+    "version": 1,
+    "fullName": "John Smith",
+    "user": {
+      "name": "j.smith",
+      "email": "j.smith@example.com",
+      "id": 123,
+      "version": 0
+    },
+    "parent": {
+      "fullName": "Thomas Smith",
+      "id": 12,
+      "version": 0
+    }
+  }]
+}
+----
+
+== Advanced Delete
+
+This is a specialized `delete` service besides the standard REST service to
+delete records in bulk.
+
+The web service is accessible with following url pattern:
+
+  POST /ws/rest/:model/removeAll
+
+.Request
+----
+POST /ws/rest/com.axelor.contact.db.Contact/removeAll HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+----
+
+[source,json]
+----
+{
+  "records": [{
+    "id": 1,
+    "version": 1
+  }, {
+    "id": 2,
+    "version": 0
+  }]
+}
+----
+
+.Response:
+[source,json]
+----
+{
+  "status": 0,
+  "data": [{
+    "id": 1,
+    "version": 1
+  }, {
+    "id": 2,
+    "version": 0
+  }]
+}
+----
+
+== Advanced Search
+
+The advanced search service allows searching for records with advanced search criteria.
+
+The web service is accessible with following url pattern:
+
+  POST /ws/rest/:model/search
+
+Some examples:
+
+.Search using domain filter
+----
+POST /ws/rest/com.axelor.contact.db.Contact/search HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+----
+
+[source,json]
+----
+{
+  "offset": 0,
+  "limit": 10,
+  "fields": ["fullName", "email"],
+  "sortBy": ["fullName", "-createdOn"],
+  "data": {
+    "_domain": "self.email like :email",
+    "_domainContext": {
+      "email": "%gmail.com"
+    },
+    "_archived": true
+  }
+}
+----
+
+The `_domain` is a simple {url-jpql}[JPQL] `where` clause with `self.` as object prefix.
+The named parameter values can be provided with `_domainContext`.
+
+The `_archived` can be used to search on archived records. By default, archived records are not returned.
+
+.Search using advanced criteria
+----
+POST /ws/rest/com.axelor.contact.db.Contact/search HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+----
+
+[source,json]
+----
+{
+  "offset": 0,
+  "limit": 10,
+  "fields": ["fullName", "email"],
+  "sortBy": ["fullName", "-createdOn"],
+  "data": {
+    "criteria": [{
+      "operator": "or",
+      "criteria": [{
+        "fieldName": "email",
+        "operator": "like",
+        "value": "%gmail.com"
+      }, {
+        "fieldName": "lang",
+        "operator": "=",
+        "value": "FR"
+      }, {
+        "fieldName": "age",
+        "operator": "between",
+        "value": 18,
+        "value2": 40
+      }, {
+        "operator": "and",
+        "criteria": [{
+          "fieldName": "firstName",
+          "operator": "like",
+          "value": "j%"
+        }, {
+          "fieldName": "lastName",
+          "operator": "like",
+          "value": "s%"
+        }]
+      }]
+    }]
+  }
+}
+----
+
+You can see the `criteria` can be nested, to create complex search filters:
+
+Criteria has following attributes:
+
+[cols="2,8"]
+|===
+| Attribute | Meaning
+
+| *`operator`* | matching operator (see bellow)
+| `criteria` | list of criteria (for `OR`, `AND` or `NOT` operator only)
+| `fieldName` | name of the field to check
+| `value` | value to match
+| `value2` | second value for bounding check (for between, notBetween)
+|===
+
+Criteria `operator` can be:
+
+[cols="2,8"]
+|===
+| Operator | Meaning
+
+| `and` | `AND` nested criteria list
+| `or` | `OR` nested criteria list
+| `not` | negate the nested criteria list
+| `=` | equal to
+| `!=` | not equal to
+| `>` | greater than
+| `<` | less than
+| `>=` | greater or equal to
+| `\<=` | less or equal to
+| `like` | search for values like
+| `notLike` | search for values not like
+| `between` | search in range
+| `notBetween` | search not in range
+| `isNull` | search for null values
+| `notNull` | search for non-null values
+|===
+
+In case of operator `OR`, `AND` and `NOT` the other property `criteria` is a
+list of one or more criteria. It can be nested to create complex search filters.
+
+Also, both `_domain` and `criteria` can be used for search.
+
+.Response:
+[source,json]
+----
+{
+  "status": 0,
+  "offset": 0,
+  "total": 120,
+  "data": [{
+    "id": 1,
+    "fullName": "John Smith",
+    "email": "j.smith@gmail.com",
+    "version": 1
+  }, {
+    "id": 9,
+    "fullName": "Tom Boy",
+    "email": "tom.boy@gmail.com",
+    "version": 0
+  }, "..."]
+}
+----
+
+== Action Service
+
+The action service allows executing one or more actions.
+
+The web service is accessible with following url pattern:
+
+  POST /ws/action/
+
+Some examples:
+
+.Execute an action
+----
+POST /ws/action HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+----
+
+[source,json]
+----
+{
+  "action": "check-order-dates,com.axelor.sale.web.SaleOrderController:calculate",
+  "data": {
+    "context":  {
+      "id": 1,
+      ...
+    },
+  }
+}
+----
+
+The `action` can be single or list of comma-separated actions. An action can be either
+an xml action or a method call.
+
+.Response:
+[source,json]
+----
+{
+  "status": 0,
+  "data": [
+    { ... },
+    { ... }
+  ]
+}
+----
+
+The result of the actions are returned as data array.

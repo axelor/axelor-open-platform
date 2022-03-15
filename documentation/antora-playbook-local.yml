@@ -1,0 +1,25 @@
+runtime:
+  cache_dir: ./.cache/antora
+site:
+  title: Axelor Documentation
+  start_page: adk::index
+content:
+  edit_url: false
+  sources:
+    - url: ../
+      start_path: documentation
+      branches: HEAD
+asciidoc:
+  attributes:
+    experimental: ''
+    idprefix: ''
+    idseparator: '-'
+    linkattrs: ''
+    tabsize: 4
+    source-indent: 0
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/master/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true
+output:
+  dir: build/preview

@@ -1,0 +1,233 @@
+= Messaging
+:toc:
+:toc-title:
+
+The {page-component-title} provides integrated messaging & stream features:
+
+- change tracking
+- document discussions
+- group discussions
+- email integration
+
+== Change Tracking
+
+The change tracking feature can be used to record audit trail in the form of
+stream of messages when document/record gets changed.
+
+To enable change tracking on an object, the object definition has to provide
+tracking details.
+
+Here is an example:
+
+[source,xml]
+-----
+<entity name="SaleOrder">
+  <string name="name" ... />
+  ...
+  ...
+
+  <track>
+    <field name="name" />
+    <field name="createDate" on="CREATE" />
+    <field name="customer" />
+    <field name="confirmDate" on="UPDATE" if="status == 'confirmed'" />
+    <field name="totalAmount" />
+    <message if="true" on="CREATE">Order created.</message>
+    <message if="status == 'confirmed'" on="UPDATE">Order confirmed.</message>
+    <message if="status == 'draft'" tag="important">Draft</message>
+    <message if="status == 'confirmed'" tag="success" fields="status">Confirmed</message>
+  </track>
+
+</entity>
+-----
+
+The `track` messages are generated `on` the following operations:
+
+- `CREATE` - generate when record is created
+- `UPDATE` - generate when record is updated
+- `ALWAYS` - generate in all cases
+
+Other `track` attributes:
+
+- `files` - specify whether to track attached files
+- `subscribe` - specify whether to auto subscribe for change notifications
+- `replace` - specify whether to replace original change track config
+
+The `track` information is provided with:
+
+* `<field>` - specify which field to track
+- *`name`* - name of the field to track
+- `on` - on which event this field should be tracked
+- `if` - a boolean expression to test before tracking the field (JEL)
+* `<message>` - specify messages to display
+- `if` - a boolean expression to test before using the message
+- `on` - on which event this messages should be used
+- `tag` - specify predefined tag class if this message is a tag
+- `fields` - only use this message as tag if any of the given field is changed
+
+If a `<message>` is supposed to be used as a `tag`, following predefined css
+class names should be used:
+
+- `important` - important style (red)
+- `success` - success style (green)
+- `warning` - warning style (yellow)
+- `info` - information style (blue)
+
+The `if` expressions are simple JEL boolean expressions evaluated against current
+values of the record.
+
+By default, `<field>` are tracked only if it's value is changed and given `if`
+expression evaluates to `true`.
+
+A root message is created when record is created. All the followup messages are
+considered as replies to this root message. This done to keep change tracking
+messages in threaded format.
+
+== Streams & Discussions
+
+The change tracking streams can be shown on any form views with following
+markups:
+
+[source,xml]
+-----
+<form name="sale-order-form" title="Sale Order" ....>
+  ...
+  ...
+  <panel-mail>
+    <mail-messages limit="4" />
+    <mail-followers />
+  </panel-mail>
+</form>
+-----
+
+The `<panel-mail>` can be used to show change tracking streams or discussion
+messages in threaded layout.
+
+* `<mail-messages>` - shows the messages in threaded layout
+* `<mail-followers>` - shows the list of followers/subscribers
+
+The messages are shown according the given `limit` on the `<mail-messages>` which
+is default to 30 messages.
+
+The most recent messages are shown first. More messages can be loaded with a link
+provided at the end of message list (if there are more messages).
+
+== Discussion Groups
+
+Discussion groups can be used to create messaging groups where users can subscribe
+and post messages.
+
+== Messaging Menu
+
+The messaging menu provides quick links to see the messages.
+
+* _Messaging -> Inbox_ - shows all the non-archived messages
+* _Messaging -> Important_ - shows all the messages marked as important
+* _Messaging -> Archived_ - shows all the archived messages
+* _Messaging -> Groups -> All Groups_ - show all the available groups
+
+Besides theses, when user subscribes to a messaging group, a personal menu is
+added as _Messaging -> Groups -> Group Name_
+
+== Email integration
+
+The messaging & stream feature can be configured to send/receive email messages
+from SMTP/IMAP servers.
+
+The default implementation would configure mail sender and fetches from the
+application configuration settings:
+
+[source,properties]
+----
+# Quartz Scheduler
+# ~~~~~
+# quartz job scheduler
+
+# Specify whether to enable quartz scheduler
+quartz.enable = true
+
+# SMPT configuration
+# ~~~~~
+# SMTP server configuration
+#mail.smtp.host = smtp.gmail.com
+#mail.smtp.port = 587
+#mail.smtp.channel = starttls
+#mail.smtp.user = user@gmail.com
+#mail.smtp.pass = secret
+
+# timeout settings
+#mail.smtp.timeout = 60000
+#mail.smtp.connectionTimeout = 60000
+
+# IMAP configuration
+# ~~~~~
+# IMAP server configuration
+# (quartz scheduler should be enabled for fetching stream replies)
+#mail.imap.host = imap.gmail.com
+#mail.imap.port = 993
+#mail.imap.channel = ssl
+#mail.imap.user = user@gmail.com
+#mail.imap.pass = secret
+
+# timeout settings
+#mail.imap.timeout = 60000
+#mail.imap.connectionTimeout = 60000
+----
+
+The `quartz` scheduler should be enabled to fetch incoming messages from the
+configured `IMAP` server.
+
+The default implementation sends email notifications to the followers of a
+record/document.
+
+The mail service can be extended by providing alternative implementation
+of mail service api:
+
+[source,java]
+----
+public interface MailService {
+
+  void send(MailMessage message) throws MailException; <1>
+
+  void fetch() throws MailException; <2>
+
+  Model resolve(String email); <3>
+
+  List<InternetAddress> findEmails(String matching, List<String> selected, int maxResults); <4>
+}
+----
+<1> send an email for the given message
+<2> fetch email messages
+<3> resolve the given email address to it's associated record
+<4> find email addresses for the matching string
+
+The API is designed to work with any kind of contact models. The implementation
+should provide a way to list email addresses and resolve an email address to
+it's associated record.
+
+The default implementation provides email addresses of users and resolves email
+address to user records only.
+
+The default implementation `MailServiceImpl` provides some additional overridable
+methods to customize default implementation.
+
+For example:
+
+[source,java]
+----
+public class MyMailService extends MailServiceImpl {
+
+  public Model resolve(String email) {
+    // find contact by the email
+    // if not found, find another contact like object (depends on your requirements)
+    // if not found, find with default implementation
+  }
+
+  public List<InternetAddress> findEmails(String matching, List<String> selected, int maxResults) {
+    // search all contacts matching the given email pattern
+    // prepare list of InternetAddress and return
+  }
+}
+----
+
+See javadocs, for other overridable methods of the default implementation.

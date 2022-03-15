@@ -1,0 +1,185 @@
+= Step 3: Define Models
+:toc:
+:toc-title:
+
+Now we have created the application project and a module, it's time to add some
+functionality to it. In this chapter, we'll see how to add new domain models
+(data entities).
+
+== Define a domain entity
+
+The {page-component-title} uses xml definitions to define the data models. The code
+generator than generates JPA compatible Java POJO classes with some additional
+helper methods and meta data used by the framework for UI purpose.
+
+Let's create some address book objects:
+
+TIP: We can define multiple models in single xml file but it's recommended to
+create separate xml file for each model, this allows the build system to
+re-generate code for only modified files.
+
+[source,xml]
+.axelor-contact/src/main/resources/domains/Title.xml
+----
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
+  http://axelor.com/xml/ns/domain-models/domain-models_6.0.xsd">
+
+  <module name="contact" package="com.axelor.contact.db"/>
+
+  <entity name="Title">
+    <string name="code" required="true" unique="true" min="2" />
+    <string name="name" required="true" unique="true" min="2" />
+  </entity>
+
+</domain-models>
+----
+
+[source,xml]
+.axelor-contact/src/main/resources/domains/Address.xml
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
+  http://axelor.com/xml/ns/domain-models/domain-models_6.0.xsd">
+
+  <module name="contact" package="com.axelor.contact.db" />
+
+  <entity name="Address" cacheable="true">
+    <many-to-one name="contact" ref="Contact" required="true" />
+    <string name="street" required="true" max="255" />
+    <string name="area" max="255" />
+    <string name="city" />
+    <string name="zip" />
+    <string name="state" />
+    <string name="country" />
+  </entity>
+
+</domain-models>
+----
+
+[source,xml]
+.axelor-contact/src/main/resources/domains/Contact.xml
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
+  http://axelor.com/xml/ns/domain-models/domain-models_6.0.xsd">
+
+  <module name="contact" package="com.axelor.contact.db"/>
+
+  <entity name="Contact" sequential="true" cacheable="true">
+    <many-to-one name="title" ref="Title"/> <1>
+    <string name="firstName" required="true" /> <2>
+    <string name="lastName" required="true" />
+
+    <string name="fullName" namecolumn="true" search="firstName,lastName"> <3>
+    <![CDATA[
+    if (firstName == null && lastName == null) {
+        return null;
+    }
+    if (title == null) {
+        return firstName + " " + lastName;
+    }
+    return title.getName() + " " + firstName + " " + lastName;
+    ]]></string>
+
+    <date name="dateOfBirth" />
+
+    <string name="email" required="true" unique="true" max="100" />
+    <string name="phone" max="20" massUpdate="true" />
+    <string name="notes" title="About me" large="true" />
+
+    <one-to-many name="addresses" ref="Address" mappedBy="contact" /> <4>
+
+    <finder-method name="findByName" using="fullName" /> <5>
+    <finder-method name="findByEmail" using="email" />
+  </entity>
+</domain-models>
+----
+<1> define a many-to-one field `title`
+<2> define a string field `firstName`
+<3> define a calculated string field `fullName`
+<4> define a one-to-many field `addresses`
+<5> define a custom finder method `findByName`
+
+A domain model is defined using `<entity>` tag, it supports some attributes.
+
+* `cacheable` - whether to make this entity cacheable
+* `sequential` - whether to use a new ID sequence
+* `repository=[none|default|abstract]` - how to generate repository class
+
+And we define model fields as the child nodes. Following fields are supported:
+
+[cols="2,8"]
+|===
+| Field type | Description
+
+| string   | String type field
+| integer  | Integer type field
+| long     | Long type field
+| decimal  | Decimal type field (BigDecimal)
+| boolean  | Boolean type field
+| date     | Date type field (uses LocalDate)
+| time     | Time type field (uses LocalTime)
+| datetime | DateTime type field (uses LocalDateTime)
+| enum     | Enumeration type field
+| binary   | Binary type field
+| many-to-one | The ManyToOne field
+| one-to-many | The OneToMany field
+| many-to-many | The ManyToMany field
+| one-to-one | The OneToOne field
+|===
+
+Each field type supports some attributes. Here are few of them:
+
+[cols="2,8"]
+|===
+| Attribute | Description
+
+| name | name of the field
+| title | display name of the field (used by UI layer)
+| help | help string (used by UI layer)
+| column | database column name
+| required | whether the field is required
+| unique | whether the field is unique
+| readonly | whether the field is readonly (used by UI layer)
+| hidden | whether the field is hidden (used by UI layer)
+| min | minimum size of data (depends on field type)
+| max | maximum size of data (depends on field type)
+| index | whether to generate index on this field
+| transient | whether the field is transient
+| initParam | whether the field can be used for a contructor
+| equalsInclude | whether the field is included in equality test
+| hashKey | whether the field can be used for hashCode calculation
+| massUpdate | whether to allow mass update on this field
+| formula | sql formula if this is a formula field
+| ref | referenced object (relational fields)
+| mappedBy | used with bi-directional relation fields to name the reverse field
+| orphanRemoval | whether to remove orphaned records if parent record is deleted
+| large | whether the string field should use large type (text or clob)
+|===
+
+The code generator also generates a repository class per model. The repository
+class provides methods for CRUD operations and some finder methods.
+
+The code generator can be invoked with following command.
+
+[source,sh]
+----
+$ ./gradlew generateCode
+----
+
+However, the build task or any other tasks that requires compiled classes automatically
+invokes the `generateCode` task.
+
+For more details and advanced features on the object definition, please see
+the xref:dev-guide:index.adoc[Developer Guide].
+
+== What's Next?
+
+In this chapter we have seen how to create domain models. In the xref:step4.adoc[next chapter]
+we will see how to define views for the model entities.
