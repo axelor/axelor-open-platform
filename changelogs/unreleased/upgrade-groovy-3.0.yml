@@ -1,0 +1,9 @@
+---
+title: Upgrade from Groovy 2.4.10 to 3.0.10
+type: change
+description: |
+  Beware of breaking changes.
+  See release note for more details :
+  - https://groovy-lang.org/releasenotes/groovy-2.5.html
+  - https://groovy-lang.org/releasenotes/groovy-2.6.html
+  - https://groovy-lang.org/releasenotes/groovy-3.0.html
