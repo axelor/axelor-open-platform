@@ -82,37 +82,37 @@ public class StringTemplates implements Templates {
     }
   }
 
-  class LocalDateRenderer implements AttributeRenderer {
+  class LocalDateRenderer implements AttributeRenderer<LocalDate> {
 
     @Override
-    public String toString(Object o, String formatString, Locale locale) {
+    public String toString(LocalDate o, String formatString, Locale locale) {
       return StringUtils.isBlank(formatString)
           ? o.toString()
-          : ((LocalDate) o).format(DateTimeFormatter.ofPattern(formatString));
+          : o.format(DateTimeFormatter.ofPattern(formatString));
     }
   }
 
-  class LocalDateTimeRenderer implements AttributeRenderer {
+  class LocalDateTimeRenderer implements AttributeRenderer<LocalDateTime> {
 
     @Override
-    public String toString(Object o, String formatString, Locale locale) {
+    public String toString(LocalDateTime o, String formatString, Locale locale) {
       return StringUtils.isBlank(formatString)
           ? o.toString()
-          : ((LocalDateTime) o).format(DateTimeFormatter.ofPattern(formatString));
+          : o.format(DateTimeFormatter.ofPattern(formatString));
     }
   }
 
-  class LocalTimeRenderer implements AttributeRenderer {
+  class LocalTimeRenderer implements AttributeRenderer<LocalTime> {
 
     @Override
-    public String toString(Object o, String formatString, Locale locale) {
+    public String toString(LocalTime o, String formatString, Locale locale) {
       return StringUtils.isBlank(formatString)
           ? o.toString()
-          : ((LocalTime) o).format(DateTimeFormatter.ofPattern(formatString));
+          : o.format(DateTimeFormatter.ofPattern(formatString));
     }
   }
 
-  class DataAdapter extends ObjectModelAdaptor {
+  class DataAdapter extends ObjectModelAdaptor<Object> {
 
     private final MapModelAdaptor mapModelAdaptor;
     private final MetaJsonRecordRepository jsonRecords;
@@ -244,7 +244,7 @@ public class StringTemplates implements Templates {
       if (o instanceof MetaJsonRecord) return handle((MetaJsonRecord) o, propertyName);
       if (o instanceof Model) return handle((Model) o, propertyName);
       if (o instanceof Map) {
-        return mapModelAdaptor.getProperty(interp, self, o, property, propertyName);
+        return mapModelAdaptor.getProperty(interp, self, (Map<?, ?>) o, property, propertyName);
       }
       return super.getProperty(interp, self, o, property, propertyName);
     }
