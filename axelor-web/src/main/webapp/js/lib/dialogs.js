@@ -34,6 +34,7 @@
     warn: function(str, callback) {
       return this.box(str, {
         title: _t('Warning'),
+        css: 'ui-dialog-warning',
         onClose: callback
       });
     },
@@ -41,6 +42,7 @@
     error: function(str, callback) {
       return this.box(str, {
         title: _t('Error'),
+        css: 'ui-dialog-error',
         onClose: callback
       });
     },
@@ -66,6 +68,7 @@
 
       element = this.box(str, {
         title: opts.title,
+        css: 'ui-dialog-confirm',
         onClose: function() {
           if (doCall) cb(false);
         },
@@ -100,6 +103,7 @@
       var title = opts.title || _t('Information');
       var onClose = opts.onClose || $.noop;
       var onOpen = opts.onOpen || $.noop;
+      var css = opts.css || 'ui-dialog-info';
       var buttons = opts.buttons || [
         {
           'text'	: _t('OK'),
@@ -112,7 +116,7 @@
 
       var element = $('<div class="message-box" style="padding: 15px;"></div>').attr('title', title).html(str);
       var dialog = element.dialog({
-        dialogClass: 'ui-dialog-responsive ui-dialog-small ui-dialog-dragged',
+        dialogClass: 'ui-dialog-responsive ui-dialog-small ui-dialog-dragged ' + css,
         resizable: false,
         draggable: true,
         autoOpen: false,
@@ -211,7 +215,8 @@
 
     alert: function(message, options) {
       var opts = _.extend({
-        title: _t('Alert')
+        title: _t('Alert'),
+        css: 'alert-default'
       }, options);
       return doNotify(message, opts);
     },
