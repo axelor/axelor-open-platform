@@ -26,6 +26,7 @@ import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.common.XMLUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
 import com.axelor.db.internal.DBHelper;
@@ -133,9 +134,12 @@ public class XMLViews {
 
   private static Marshaller marshaller;
   private static Unmarshaller unmarshaller;
-  private static DocumentBuilderFactory documentBuilderFactory;
 
-  private static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
+  private static final Object DOCUMENT_BUILDER_FACTORY_MONITOR = new Object();
+  private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY =
+      XMLUtils.createDocumentBuilderFactory(true);
+
+  private static final XPathFactory XPATH_FACTORY = XMLUtils.createXPathFactory();
   private static final NamespaceContext NS_CONTEXT =
       new NamespaceContext() {
         @Override
@@ -226,11 +230,6 @@ public class XMLViews {
       }
     }
 
-    documentBuilderFactory = DocumentBuilderFactory.newInstance();
-    documentBuilderFactory.setNamespaceAware(true);
-    // This adds default attributes to generated XML
-    // documentBuilderFactory.setSchema(schema);
-
     final String appConfigProdiverName =
         AppSettings.get().get(AvailableAppSettings.APPLICATION_CONFIG_PROVIDER);
 
@@ -284,9 +283,11 @@ public class XMLViews {
 
   public static Document parseXml(String xml)
       throws ParserConfigurationException, SAXException, IOException {
-    final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-    final InputSource is = new InputSource(new StringReader(prepareXML(xml)));
-    return documentBuilder.parse(is);
+    synchronized (DOCUMENT_BUILDER_FACTORY_MONITOR) {
+      final DocumentBuilder documentBuilder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
+      final InputSource is = new InputSource(new StringReader(prepareXML(xml)));
+      return documentBuilder.parse(is);
+    }
   }
 
   public static boolean isViewType(String type) {

@@ -1,0 +1,6 @@
+---
+title: Fix JAXP usage
+type: fix
+description: |
+  Thread safe usage of JAXP API. Use `XMLUtils` to protect XML Parsers from XXE attacks 
+  but also disable external entity processing. 

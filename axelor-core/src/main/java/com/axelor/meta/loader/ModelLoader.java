@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.loader;
 
+import com.axelor.common.XMLUtils;
 import com.axelor.db.JPA;
 import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaEnum;
@@ -50,17 +51,9 @@ public class ModelLoader extends AbstractParallelLoader {
 
   @Inject private MetaEnumRepository enums;
 
-  private static final DocumentBuilderFactory documentBuilderFactory =
-      DocumentBuilderFactory.newInstance();
-  private static final ThreadLocal<DocumentBuilder> documentBuilder =
-      ThreadLocal.withInitial(
-          () -> {
-            try {
-              return documentBuilderFactory.newDocumentBuilder();
-            } catch (ParserConfigurationException e) {
-              throw new RuntimeException(e);
-            }
-          });
+  private static final Object DOCUMENT_BUILDER_FACTORY_MONITOR = new Object();
+  private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY =
+      XMLUtils.createDocumentBuilderFactory(false);
 
   @Override
   protected void doLoad(URL url, Module module, boolean update) {
@@ -68,14 +61,19 @@ public class ModelLoader extends AbstractParallelLoader {
 
     try (InputStream is = url.openStream()) {
       process(is, update);
-    } catch (IOException | SAXException e) {
+    } catch (IOException | SAXException | ParserConfigurationException e) {
       throw new RuntimeException(e);
     }
   }
 
-  private void process(InputStream stream, boolean update) throws IOException, SAXException {
-    final Document doc = documentBuilder.get().parse(stream);
-    final NodeList elements = doc.getDocumentElement().getChildNodes();
+  private void process(InputStream stream, boolean update)
+      throws IOException, SAXException, ParserConfigurationException {
+    Document doc;
+    synchronized (DOCUMENT_BUILDER_FACTORY_MONITOR) {
+      doc = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(stream);
+    }
+    NodeList elements = doc.getDocumentElement().getChildNodes();
+
     for (int i = 0; i < elements.getLength(); i++) {
       final Node node = elements.item(i);
       if (node instanceof Element) {
@@ -97,10 +95,9 @@ public class ModelLoader extends AbstractParallelLoader {
 
     final Set<String> names = new HashSet<>();
 
-    final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     final DocumentBuilder db;
     try {
-      db = dbf.newDocumentBuilder();
+      db = XMLUtils.createDocumentBuilder();
     } catch (ParserConfigurationException e) {
       return names;
     }

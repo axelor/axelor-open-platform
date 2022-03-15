@@ -23,6 +23,7 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.ResourceUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.common.XMLUtils;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -32,16 +33,18 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathFactory;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /** This class provides some database helper methods (for internal use only). */
 public class DBHelper {
+
+  private static final Logger LOG = LoggerFactory.getLogger(DBHelper.class);
 
   private static Boolean unaccentSupport = null;
 
@@ -99,12 +102,9 @@ public class DBHelper {
 
     final AppSettings settings = AppSettings.get();
 
-    final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    final XPathFactory xpf = XPathFactory.newInstance();
-    final XPath xpath = xpf.newXPath();
-
     try (final InputStream res = ResourceUtils.getResourceStream("META-INF/persistence.xml")) {
-      final DocumentBuilder db = dbf.newDocumentBuilder();
+      final XPath xpath = XMLUtils.createXPath();
+      final DocumentBuilder db = XMLUtils.createDocumentBuilder();
       final Document document = db.parse(res);
 
       final String jpaUnit = evaluate(xpath, XPATH_ROOT, "@name", document);
@@ -155,6 +155,7 @@ public class DBHelper {
         jdbcPassword = evaluate(xpath, XPATH_ROOT, XPATH_PERSISTENCE_PASSWORD, document);
       }
     } catch (Exception e) {
+      LOG.error("Error when parsing database properties : ", e);
     }
   }
 

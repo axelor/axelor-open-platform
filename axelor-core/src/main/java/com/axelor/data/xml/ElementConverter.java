@@ -17,6 +17,7 @@
  */
 package com.axelor.data.xml;
 
+import com.axelor.common.XMLUtils;
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -26,7 +27,6 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.naming.NoNameCoder;
 import com.thoughtworks.xstream.io.xml.DomWriter;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -69,10 +69,9 @@ public class ElementConverter implements Converter {
       return null;
     }
 
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder = null;
     try {
-      builder = factory.newDocumentBuilder();
+      builder = XMLUtils.createDocumentBuilder();
     } catch (ParserConfigurationException e) {
       throw new ConversionException("Cannot instantiate " + Document.class.getName(), e);
     }

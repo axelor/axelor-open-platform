@@ -19,6 +19,7 @@ package com.axelor.tools.i18n;
 
 import com.axelor.common.Inflector;
 import com.axelor.common.StringUtils;
+import com.axelor.common.XMLUtils;
 import com.axelor.common.csv.CSVFile;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -45,7 +46,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
@@ -159,8 +159,7 @@ public class I18nExtractor {
 
       log.debug("processing XML for: {}", base.getParent().relativize(file));
 
-      final SAXParserFactory factory = SAXParserFactory.newInstance();
-      final SAXParser parser = factory.newSAXParser();
+      final SAXParser parser = XMLUtils.createSAXParser();
       final DefaultHandler handler =
           new DefaultHandler() {
 

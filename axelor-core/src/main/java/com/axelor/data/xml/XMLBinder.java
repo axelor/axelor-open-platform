@@ -17,6 +17,7 @@
  */
 package com.axelor.data.xml;
 
+import com.axelor.common.XMLUtils;
 import com.axelor.data.AuditHelper;
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
@@ -36,7 +37,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 import org.apache.commons.jxpath.JXPathContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -338,7 +338,7 @@ public abstract class XMLBinder {
     // if referencing parents use jdk xpath, see RM-6911
     if (path.contains("../")) {
       if (xpath == null) {
-        xpath = XPathFactory.newInstance().newXPath();
+        xpath = XMLUtils.createXPath();
       }
       final XPathExpression expression = xpath.compile(path);
       final List<Node> nodes = new ArrayList<>();
