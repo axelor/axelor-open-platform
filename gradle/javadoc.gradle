@@ -59,7 +59,7 @@ task generateDocs(type: Javadoc) {
     'http://google.github.io/guice/api-docs/4.0/javadoc',
     'http://google.github.io/guava/releases/18.0/api/docs/',
     'http://docs.jboss.org/hibernate/orm/4.2/javadocs',
-    'https://www.quartz-scheduler.org/api/2.2.1',
+    'https://javadoc.io/doc/org.quartz-scheduler/quartz/2.3.2',
     'http://help.eclipse.org/mars/topic/org.eclipse.birt.doc.isv/model/api',
     'http://help.eclipse.org/mars/topic/org.eclipse.birt.doc.isv/engine/api'
   ]
