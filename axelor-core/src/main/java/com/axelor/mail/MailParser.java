@@ -38,9 +38,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
+import org.jsoup.select.NodeFilter;
 import org.jsoup.select.NodeTraversor;
-import org.jsoup.select.NodeVisitor;
 
 /**
  * Parses a {@link MimeMessage} and stores the individual parts such as context text, attachments
@@ -284,17 +284,16 @@ public final class MailParser {
 
   private String toPlainText(String html) {
     final Element doc = Jsoup.parse(html);
-    final FormattingVisitor formatter = new FormattingVisitor();
-    final NodeTraversor traversor = new NodeTraversor(formatter);
-    traversor.traverse(doc);
-    return formatter.toString();
+    final FormattingFilter filter = new FormattingFilter();
+    NodeTraversor.filter(filter, doc);
+    return filter.toString();
   }
 
   private String sanitize(String html) {
-    return Jsoup.clean(html, Whitelist.basicWithImages());
+    return Jsoup.clean(html, Safelist.basicWithImages());
   }
 
-  private static final class FormattingVisitor implements NodeVisitor {
+  private static final class FormattingFilter implements NodeFilter {
 
     private final StringBuilder builder = new StringBuilder();
 
@@ -306,10 +305,10 @@ public final class MailParser {
     }
 
     @Override
-    public void head(Node node, int depth) {
+    public FilterResult head(Node node, int depth) {
       if (node instanceof TextNode) {
         builder.append(((TextNode) node).text());
-        return;
+        return FilterResult.CONTINUE;
       }
       final String name = node.nodeName();
       switch (name) {
@@ -331,10 +330,11 @@ public final class MailParser {
           newLine();
           break;
       }
+      return FilterResult.CONTINUE;
     }
 
     @Override
-    public void tail(Node node, int depth) {
+    public FilterResult tail(Node node, int depth) {
       final String name = node.nodeName();
       switch (name) {
         case "a":
@@ -354,6 +354,7 @@ public final class MailParser {
           newLine();
           break;
       }
+      return FilterResult.CONTINUE;
     }
 
     @Override

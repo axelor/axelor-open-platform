@@ -239,7 +239,7 @@ libs.xstream = [
 ]
 
 // jsoup for html parsing & sanitize
-libs.jsoup = "org.jsoup:jsoup:1.10.2"
+libs.jsoup = "org.jsoup:jsoup:1.14.3"
 
 // StringTemplate
 libs.ST4 = "org.antlr:ST4:4.3.1"
