@@ -39,9 +39,10 @@
       });
     },
 
-    error: function(str, callback) {
+    error: function(str, callback, options) {
+      var opts = $.extend({}, options);
       return this.box(str, {
-        title: _t('Error'),
+        title: opts.title || _t('Error'),
         css: 'ui-dialog-error',
         onClose: callback
       });

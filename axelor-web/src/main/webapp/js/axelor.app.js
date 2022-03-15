@@ -696,7 +696,7 @@
 
       if (report.popup) {
         message = report.message || _t('A server error occurred. Please contact the administrator.');
-        return axelor.dialogs.box(message, {
+        return axelor.dialogs.error(message, null, {
           title: report.title
         });
       } else if (report.stacktrace) {
