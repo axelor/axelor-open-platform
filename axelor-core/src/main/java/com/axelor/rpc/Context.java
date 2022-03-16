@@ -189,12 +189,6 @@ public class Context extends SimpleBindings {
     return parent;
   }
 
-  /** @see #getParent() */
-  @Deprecated
-  public Context getParentContext() {
-    return getParent();
-  }
-
   public Class<?> getContextClass() {
     return beanClass;
   }
