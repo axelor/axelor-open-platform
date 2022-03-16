@@ -10,6 +10,10 @@ java {
 
 dependencies {
   testImplementation libs.junit
+  testImplementation libs.junit_jupiter
+  testRuntimeOnly libs.junit_vintage
+  testRuntimeOnly libs.junit_launcher
+
   if (project.name != "axelor-tomcat") {
     implementation libs.slf4j_logback
   }

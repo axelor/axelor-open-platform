@@ -25,6 +25,8 @@ subprojects {
       forkEvery 1
       maxParallelForks 4
 
+      useJUnitPlatform()
+
       beforeTest { descriptor ->
         logger.lifecycle("Running: " + descriptor)
       }

@@ -16,14 +16,19 @@ versions.buji_pac4j = "4.1.1"
 versions.pac4j = "3.8.3"
 versions.ldaptive = "1.2.4"
 
-versions.junit = "4.13.2"
+versions.junit4 = "4.13.2"
+versions.junit5 = "5.8.2"
+
 versions.slf4j = "1.7.35"
 
 versions.tomcat = "8.5.54"
 versions.tomcat_embed = "${versions.tomcat}"
 
 // unit testing
-libs.junit = "junit:junit:${versions.junit}"
+libs.junit = "junit:junit:${versions.junit4}"
+libs.junit_jupiter = "org.junit.jupiter:junit-jupiter:${versions.junit5}"
+libs.junit_vintage = "org.junit.vintage:junit-vintage-engine:${versions.junit5}" // junit4 compatibility
+libs.junit_launcher = "org.junit.platform:junit-platform-launcher:1.8.2" // for IDE
 
 // logging
 libs.slf4j_base = [
@@ -121,7 +126,9 @@ libs.flywaydb = "org.flywaydb:flyway-core:8.5.4"
 libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.7.10"
 
 // groovy
-libs.groovy = "org.codehaus.groovy:groovy-all:${versions.groovy}:indy"
+libs.groovy = dependencies.create("org.codehaus.groovy:groovy-all:${versions.groovy}") {
+    exclude group: "org.junit.platform"
+}
 libs.groovy_wslite = dependencies.create("com.github.groovy-wslite:groovy-wslite:1.1.2") { exclude group: "org.codehaus.groovy" }
 
 def resteasy_module = { name ->

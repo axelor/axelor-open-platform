@@ -12,8 +12,6 @@ configurations {
 }
 
 dependencies {
-  testImplementation libs.junit
-
   implementation project(':axelor-common')
   implementation project(':axelor-tools')
 
