@@ -49,21 +49,9 @@ public class ReportResourceLocator implements IResourceLocator {
 
   private Path searchPath;
 
-  @SuppressWarnings("deprecation")
   public ReportResourceLocator() {
-    if (AppSettings.get().getProperties().containsKey(AvailableAppSettings.AXELOR_REPORT_DIR)) {
-      log.warn(
-          "configuration '{}' is deprecated, please use '{}'",
-          AvailableAppSettings.AXELOR_REPORT_DIR,
-          AvailableAppSettings.REPORTS_DESIGN_DIR);
-    }
-
     final String dir =
-        AppSettings.get()
-            .getPath(
-                AvailableAppSettings.REPORTS_DESIGN_DIR,
-                AppSettings.get()
-                    .getPath(AvailableAppSettings.AXELOR_REPORT_DIR, DEFAULT_REPORT_DIR));
+        AppSettings.get().getPath(AvailableAppSettings.REPORTS_DESIGN_DIR, DEFAULT_REPORT_DIR);
     this.searchPath = Paths.get(dir);
   }
 
