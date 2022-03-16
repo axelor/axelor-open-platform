@@ -42,7 +42,7 @@ See the {url-jdk-upgrade}[JDK 11 migration guide] for details.
 
 == Tomcat 8.5 to Tomcat 9
 
-Apache Tomcat version 8.5 is no more supported. You need to upgrade to {url-tomcat-9}[Apache Tomcat 9]. 
+Apache Tomcat version 8.5 is no more supported. You need to upgrade to {url-tomcat-9}[Apache Tomcat 9].
 
 == PostgreSQL 9 to PostgreSQL 12+
 

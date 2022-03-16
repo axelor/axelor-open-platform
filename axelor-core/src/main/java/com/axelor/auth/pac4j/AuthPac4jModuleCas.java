@@ -92,7 +92,8 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
 
     if (urlResolverClass != null) {
       try {
-        final UrlResolver urlResorver = (UrlResolver) Class.forName(urlResolverClass).getDeclaredConstructor().newInstance();
+        final UrlResolver urlResorver =
+            (UrlResolver) Class.forName(urlResolverClass).getDeclaredConstructor().newInstance();
         casConfig.setUrlResolver(urlResorver);
       } catch (Exception e) {
         logger.error(e.getMessage(), e);
@@ -102,7 +103,8 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
     if (defaultTicketValidatorClass != null) {
       try {
         final TicketValidator defaultTicketValidator =
-            (TicketValidator) Class.forName(defaultTicketValidatorClass).getDeclaredConstructor().newInstance();
+            (TicketValidator)
+                Class.forName(defaultTicketValidatorClass).getDeclaredConstructor().newInstance();
         casConfig.setDefaultTicketValidator(defaultTicketValidator);
       } catch (Exception e) {
         logger.error(e.getMessage(), e);
@@ -117,7 +119,8 @@ public class AuthPac4jModuleCas extends AuthPac4jModule {
     if (logoutHandlerClass != null) {
       try {
         final LogoutHandler<? extends WebContext> logoutHandler =
-            (LogoutHandler<? extends WebContext>) Class.forName(logoutHandlerClass).getDeclaredConstructor().newInstance();
+            (LogoutHandler<? extends WebContext>)
+                Class.forName(logoutHandlerClass).getDeclaredConstructor().newInstance();
         casConfig.setLogoutHandler(logoutHandler);
       } catch (Exception e) {
         logger.error(e.getMessage(), e);
