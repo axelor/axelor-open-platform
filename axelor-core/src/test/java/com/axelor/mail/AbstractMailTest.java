@@ -17,49 +17,39 @@
  */
 package com.axelor.mail;
 
-import com.icegreen.greenmail.user.GreenMailUser;
-import com.icegreen.greenmail.util.DummySSLSocketFactory;
-import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
+import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.ServerSetup;
 import com.icegreen.greenmail.util.ServerSetupTest;
-import java.security.Security;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 public abstract class AbstractMailTest {
 
-  protected static final String SERVER_HOST = "127.0.0.1";
-
-  protected static final String SMTP_PORT = "" + ServerSetupTest.SMTP.getPort();
-  protected static final String IMAP_PORT = "" + ServerSetupTest.IMAP.getPort();
-  protected static final String POP3_PORT = "" + ServerSetupTest.POP3.getPort();
-
+  protected static final String MY_EMAIL = "me@localhost";
   protected static final String USER_NAME = "test";
   protected static final String USER_PASS = "test";
 
-  public final GreenMail server = new GreenMail(ServerSetupTest.SMTP_POP3_IMAP);
+  @RegisterExtension
+  GreenMailExtension greenMail =
+      new GreenMailExtension(ServerSetupTest.SMTP_POP3_IMAP)
+          .withConfiguration(GreenMailConfiguration.aConfig().withUser(USER_NAME, USER_PASS));
 
   protected final SmtpAccount SMTP_ACCOUNT =
-      new SmtpAccount(SERVER_HOST, SMTP_PORT, USER_NAME, USER_PASS);
+      new SmtpAccount(
+          ServerSetup.getLocalHostAddress(),
+          String.valueOf(ServerSetupTest.SMTP.getPort()),
+          USER_NAME,
+          USER_PASS);
   protected final ImapAccount IMAP_ACCOUNT =
-      new ImapAccount(SERVER_HOST, IMAP_PORT, USER_NAME, USER_PASS);
+      new ImapAccount(
+          ServerSetup.getLocalHostAddress(),
+          String.valueOf(ServerSetupTest.IMAP.getPort()),
+          USER_NAME,
+          USER_PASS);
   protected final Pop3Account POP3_ACCOUNT =
-      new Pop3Account(SERVER_HOST, POP3_PORT, USER_NAME, USER_PASS);
-
-  protected GreenMailUser user;
-
-  @BeforeEach
-  public void startServer() {
-    Security.setProperty("ssl.SocketFactory.provider", DummySSLSocketFactory.class.getName());
-    ServerSetup.SMTP.setServerStartupTimeout(5000);
-    ServerSetup.POP3.setServerStartupTimeout(5000);
-    ServerSetup.IMAP.setServerStartupTimeout(5000);
-    user = server.setUser(USER_NAME, USER_PASS);
-    server.start();
-  }
-
-  @AfterEach
-  public void stopServer() {
-    server.stop();
-  }
+      new Pop3Account(
+          ServerSetup.getLocalHostAddress(),
+          String.valueOf(ServerSetupTest.POP3.getPort()),
+          USER_NAME,
+          USER_PASS);
 }

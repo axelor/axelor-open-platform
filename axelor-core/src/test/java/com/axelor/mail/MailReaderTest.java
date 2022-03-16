@@ -36,14 +36,14 @@ public class MailReaderTest extends AbstractMailTest {
     final MimeMessage msg =
         sender
             .compose()
-            .from("me@localhost")
+            .from(MY_EMAIL)
             .to("you@localhost")
             .subject("Hello...")
             .text("Hello!!!")
             .build();
 
-    user.deliver(msg);
-    server.waitForIncomingEmail(1);
+    greenMail.getUserManager().getUser(USER_NAME).deliver(msg);
+    greenMail.waitForIncomingEmail(1);
 
     Store store = reader.getStore();
     assertNotNull(store);
@@ -62,8 +62,8 @@ public class MailReaderTest extends AbstractMailTest {
     MimeMessage reply = (MimeMessage) incoming.reply(false);
     reply.setText("This is a reply...");
 
-    user.deliver(reply);
-    server.waitForIncomingEmail(1);
+    greenMail.getUserManager().getUser(USER_NAME).deliver(reply);
+    greenMail.waitForIncomingEmail(1);
 
     folder = store.getFolder("INBOX");
     folder.open(Folder.READ_ONLY);

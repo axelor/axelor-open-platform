@@ -34,10 +34,8 @@ public class MailBuilderTest extends AbstractMailTest {
 
   private MailSender sender;
 
-  @Override
   @BeforeEach
   public void startServer() {
-    super.startServer();
     if (sender == null) {
       sender = new MailSender(SMTP_ACCOUNT);
     }
@@ -45,8 +43,8 @@ public class MailBuilderTest extends AbstractMailTest {
 
   private MimeMessage sendAndRecieve(Message message) throws Exception {
     sender.send(message);
-    server.waitForIncomingEmail(1);
-    return server.getReceivedMessages()[0];
+    greenMail.waitForIncomingEmail(1);
+    return greenMail.getReceivedMessages()[0];
   }
 
   @Test
@@ -55,7 +53,7 @@ public class MailBuilderTest extends AbstractMailTest {
     Message message =
         sender
             .compose()
-            .to("me@localhost")
+            .to(MY_EMAIL)
             .to("you@localhost", "else@localhost")
             .bcc("you@localhost")
             .subject("Hello...")
@@ -81,7 +79,7 @@ public class MailBuilderTest extends AbstractMailTest {
     Message message =
         sender
             .compose()
-            .to("me@localhost")
+            .to("aa@test.com")
             .bcc("you@localhost")
             .subject("Hello...")
             .text("Hello!!!")
@@ -112,7 +110,7 @@ public class MailBuilderTest extends AbstractMailTest {
     Message message =
         sender
             .compose()
-            .to("me@localhost")
+            .to(MY_EMAIL)
             .bcc("you@localhost")
             .subject("Hello...")
             .text("Hello!!!")

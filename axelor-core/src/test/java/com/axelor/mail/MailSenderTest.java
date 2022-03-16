@@ -103,10 +103,10 @@ public class MailSenderTest extends AbstractMailTest {
 
     send(SMTP_ACCOUNT, sentOn);
 
-    assertNotNull(server.getReceivedMessages());
-    assertTrue(server.getReceivedMessages().length > 0);
+    assertNotNull(greenMail.getReceivedMessages());
+    assertTrue(greenMail.getReceivedMessages().length > 0);
 
-    final MimeMessage m1 = server.getReceivedMessages()[0];
+    final MimeMessage m1 = greenMail.getReceivedMessages()[0];
 
     assertNotNull(m1);
     assertEquals("Hello...", m1.getSubject());
