@@ -179,6 +179,7 @@ public class JpaModule extends AbstractModule {
       return;
     }
 
+    properties.put(Environment.JPA_SHARED_CACHE_MODE, DBHelper.getSharedCacheMode());
     properties.put(Environment.USE_SECOND_LEVEL_CACHE, "true");
     properties.put(Environment.USE_QUERY_CACHE, "true");
 

@@ -18,6 +18,7 @@
 package com.axelor.app;
 
 import org.hibernate.cache.jcache.ConfigSettings;
+import org.hibernate.cfg.Environment;
 
 public interface AvailableAppSettings {
 
@@ -128,6 +129,8 @@ public interface AvailableAppSettings {
 
   String HIBERNATE_JAVAX_CACHE_PROVIDER = ConfigSettings.PROVIDER;
   String HIBERNATE_JAVAX_CACHE_URI = ConfigSettings.CONFIG_URI;
+
+  String JAVAX_PERSISTENCE_SHAREDCACHE_MODE = Environment.JPA_SHARED_CACHE_MODE;
 
   String MAIL_SMTP_HOST = "mail.smtp.host";
   String MAIL_SMTP_PORT = "mail.smtp.port";

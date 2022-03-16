@@ -31,6 +31,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.persistence.SharedCacheMode;
 import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.xpath.XPath;
@@ -210,12 +211,36 @@ public class DBHelper {
     return !isBlank(jndiName);
   }
 
-  /** Check whether shared cache is enabled. */
+  /** Check whether shared cache (ie second-level cache) is enabled. */
   public static boolean isCacheEnabled() {
-    if (isBlank(cacheMode)) return false;
-    if (cacheMode.equals("ALL")) return true;
-    if (cacheMode.equals("ENABLE_SELECTIVE")) return true;
-    return false;
+    SharedCacheMode sharedCacheMode = SharedCacheMode.NONE;
+    try {
+      sharedCacheMode = getSharedCacheMode();
+    } catch (Exception e) {
+      LOG.error("Shared cache mode is specified with an unknown value.");
+    }
+    switch (sharedCacheMode) {
+      case ALL:
+      case ENABLE_SELECTIVE:
+      case DISABLE_SELECTIVE:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Returns the shared cache mode (ie second-level cache).<br/>
+   * <br/>
+   * The result of this method corresponds to the <code>javax.persistence.sharedCache.mode</code>
+   * property in <code>application.properties<code/> if defined, else to the <code>shared-cache-mode</code>
+   * element in the <code>persistence.xml</code> file.
+   *
+   * @return the second-level cache mode used
+   */
+  public static SharedCacheMode getSharedCacheMode() {
+    return SharedCacheMode.valueOf(
+        AppSettings.get().get(AvailableAppSettings.JAVAX_PERSISTENCE_SHAREDCACHE_MODE, cacheMode));
   }
 
   /** Whether using oracle database. */
