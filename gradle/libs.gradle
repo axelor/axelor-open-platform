@@ -116,7 +116,7 @@ libs.apache_tika_parsers = dependencies.create("org.apache.tika:tika-parsers:1.4
 libs.flywaydb = "org.flywaydb:flyway-core:4.1.2"
 
 // eclipselink
-libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.6.4"
+libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.7.10"
 
 // groovy
 libs.groovy = "org.codehaus.groovy:groovy-all:${versions.groovy}:indy"
