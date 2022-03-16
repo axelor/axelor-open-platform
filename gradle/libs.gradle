@@ -186,6 +186,7 @@ libs.pac4j = [
   dependencies.create("org.pac4j:pac4j-saml:${versions.pac4j}") {
     exclude group: 'xml-apis', module: 'xml-apis'
     exclude group: 'org.hibernate', module: 'hibernate-entitymanager'
+    exclude group: 'org.hibernate.javax.persistence', module: 'hibernate-jpa-2.1-api'
   },
   "org.pac4j:pac4j-cas:${versions.pac4j}",
   "org.pac4j:pac4j-http:${versions.pac4j}",
