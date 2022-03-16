@@ -29,7 +29,6 @@ public class XStreamUtils {
   }
 
   public static XStream setupSecurity(XStream xStream) {
-    XStream.setupDefaultSecurity(xStream);
     // Permission for any type which is annotated with an XStream annotation.
     xStream.addPermission(
         type -> {
