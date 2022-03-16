@@ -1,0 +1,5 @@
+---
+title: Remove deprecated `ActionHandler(ActionRequest)` method
+type: remove
+description: |
+  Use `ActionExecutor#newActionHandler(ActionRequest)` instead

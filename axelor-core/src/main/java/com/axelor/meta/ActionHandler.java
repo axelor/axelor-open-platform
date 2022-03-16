@@ -96,20 +96,6 @@ public class ActionHandler {
   private static final Set<Class<? extends Model>> ALWAYS_PERMITTED_MODELS =
       ImmutableSet.of(MetaAction.class, MetaFilter.class);
 
-  /** @deprecated Use {@link ActionExecutor#newActionHandler(ActionRequest)} instead. */
-  @Deprecated
-  public ActionHandler(ActionRequest request) {
-    this(request, Beans.get(ActionExecutor.class));
-  }
-
-  private ActionHandler(ActionRequest request, ActionExecutor actionExecutor) {
-    this(
-        request,
-        actionExecutor.getPreActionEvent(),
-        actionExecutor.getPostActionEvent(),
-        actionExecutor.getSecurity());
-  }
-
   ActionHandler(
       ActionRequest request,
       Event<PreAction> preActionEvent,
