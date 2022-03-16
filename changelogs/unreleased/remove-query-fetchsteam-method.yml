@@ -1,0 +1,5 @@
+---
+title: Remove deprecated `Query#fetchSteam` methods
+type: remove
+description: |
+  Use `Query#fetchStream` instead.

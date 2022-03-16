@@ -316,12 +316,6 @@ public class Query<T extends Model> {
     return fetchStream(0, 0);
   }
 
-  /** @deprecated Use {@link #fetchStream()}. */
-  @Deprecated
-  public Stream<T> fetchSteam() {
-    return fetchStream();
-  }
-
   /**
    * Fetch the matched records as {@link Stream} with the given limit.
    *
@@ -337,12 +331,6 @@ public class Query<T extends Model> {
    */
   public Stream<T> fetchStream(int limit) {
     return fetchStream(limit, 0);
-  }
-
-  /** @deprecated Use {@link #fetchStream(int)}. */
-  @Deprecated
-  public Stream<T> fetchSteam(int limit) {
-    return fetchStream(limit);
   }
 
   /**
@@ -365,12 +353,6 @@ public class Query<T extends Model> {
       query.setFetchSize(DBHelper.getJdbcFetchSize());
     }
     return query.stream();
-  }
-
-  /** @deprecated Use {@link #fetchStream(int, int)}. */
-  @Deprecated
-  public Stream<T> fetchSteam(int limit, int offset) {
-    return fetchStream(limit, offset);
   }
 
   /**
