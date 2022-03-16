@@ -1,0 +1,5 @@
+---
+title: Remove deprecated usage of `hashKey` and `hashAll` attributes
+type: remove
+description: |
+  Use `equalsInclude` and `equalsIncludeAll` instead.

@@ -217,17 +217,12 @@ public class EqualityTest extends JpaTest {
 
   @Test
   public void testEntityHelperHashCode() {
-    Address address = new Address();
-    assertEquals(address.hashCode(), EntityHelper.hashCode(address));
-
     Contact contact1 = new Contact();
     Contact contact2 = new Contact();
     contact1.setUniqueName("John");
     contact2.setUniqueName("Jane");
     contact1.setUUID(UUID.randomUUID().toString());
     contact2.setUUID(UUID.randomUUID().toString());
-    assertEquals(contact1.hashCode(), EntityHelper.hashCode(contact1));
-    assertEquals(contact2.hashCode(), EntityHelper.hashCode(contact2));
 
     Set<Contact> contacts = new HashSet<>();
     contacts.add(contact1);
@@ -244,12 +239,6 @@ public class EqualityTest extends JpaTest {
     contact2.setUniqueName("Mary");
     assertFalse(contacts.contains(contact1));
     assertTrue(contacts.contains(contact2));
-
-    // Change of fields used for hash code will affect Set.
-    contact1.setUUID(null);
-    contact2.setUUID(null);
-    assertFalse(contacts.contains(contact1));
-    assertFalse(contacts.contains(contact2));
   }
 
   @Test

@@ -20,7 +20,6 @@ package com.axelor.test.db;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaModel;
 import com.axelor.db.annotations.EqualsInclude;
-import com.axelor.db.annotations.HashKey;
 import com.axelor.db.annotations.NameColumn;
 import com.axelor.db.annotations.VirtualColumn;
 import com.axelor.db.annotations.Widget;
@@ -114,7 +113,6 @@ public class Contact extends JpaModel {
   private String uniqueName;
 
   @EqualsInclude
-  @HashKey
   @Column(unique = true)
   private String UUID;
 
@@ -369,7 +367,7 @@ public class Contact extends JpaModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.getUUID());
+    return 31;
   }
 
   @Override

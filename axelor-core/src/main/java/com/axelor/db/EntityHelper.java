@@ -17,7 +17,7 @@
  */
 package com.axelor.db;
 
-import com.axelor.db.annotations.HashKey;
+import com.axelor.db.annotations.EqualsInclude;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
 import com.axelor.db.mapper.PropertyType;
@@ -26,7 +26,6 @@ import com.axelor.rpc.ContextEntity;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import org.hibernate.proxy.HibernateProxy;
@@ -73,42 +72,15 @@ public final class EntityHelper {
   }
 
   /**
-   * The hashCode helper method.
-   *
-   * <p>This method searches for all the fields marked with {@link HashKey} and uses them to
-   * generate the hash code.
-   *
-   * @param <T> type of the entity
-   * @param entity generate the hashCode for the given entity
-   * @return hashCode
-   */
-  @Deprecated
-  public static <T extends Model> int hashCode(T entity) {
-    if (entity == null) {
-      return 31;
-    }
-    final Mapper mapper = Mapper.of(entity.getClass());
-    final List<Object> values = new ArrayList<>();
-
-    for (Property p : mapper.getProperties()) {
-      if (isSimple(p) && p.isHashKey()) {
-        values.add(p.get(entity));
-      }
-    }
-
-    return values.isEmpty() ? 31 : Arrays.hashCode(values.toArray());
-  }
-
-  /**
    * The equals helper method.
    *
-   * <p>This method searches for all the fields marked with {@link HashKey} and uses them to check
-   * for the equality.
+   * <p>This method searches for all the fields marked with {@link EqualsInclude} and uses them to
+   * check for the equality.
    *
    * @param <T> type of the entity
    * @param entity the current entity
    * @param other the other entity
-   * @return true if both the objects are equals by their hashing keys
+   * @return true if both objects are equal by their fields included for equality check
    */
   public static <T extends Model> boolean equals(T entity, Object other) {
     if (entity == other) {

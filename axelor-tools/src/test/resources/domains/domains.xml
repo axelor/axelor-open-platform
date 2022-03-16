@@ -20,7 +20,7 @@
     @author John Smith <john.smith@gmail.com>
     @since 1.0
     ]]>
-    <string name="code" column="ccc" required="true" unique="true" min="2" hashKey="false" help="The unique code."/>
+    <string name="code" column="ccc" required="true" unique="true" min="2" equalsInclude="false" help="The unique code."/>
     <string name="name" required="true" unique="true" min="2" help="The title name." index="idx_my"/>
 
     <extra-imports>
@@ -77,7 +77,7 @@
     <!-- should have 'attrs' json field as well -->
   </entity>
 
-  <entity name="Contact" sequential="true" hashAll="true" cacheable="false">
+  <entity name="Contact" sequential="true" equalsIncludeAll="true" cacheable="false">
     <string name="empId" sequence="emp.seq"/>
     <many-to-one name="title" ref="Title" unique="true" />
     <string name="firstName" required="true" initParam="true"/>
@@ -95,7 +95,7 @@
     <string name="email" required="true" unique="true" initParam="true" massUpdate="true"  column="email_address"/>
     <string name="personalEmail" encrypted="true" />
     <binary name="personalPhoto" encrypted="true" />
-    <string name="phone" max="20"  hashKey="false" massUpdate="true"/>
+    <string name="phone" max="20" equalsInclude="false" massUpdate="true"/>
     <string name="notes" multiline="true" title="About Me" />
     <string name="resume" large="true" encrypted="true" />
     <date name="dateOfBirth" default="now" />
@@ -129,7 +129,7 @@
     </track>
   </entity>
 
-  <entity name="Address" hashAll="true">
+  <entity name="Address" equalsIncludeAll="true">
     <many-to-one name="contact" ref="Contact" required="true" />
     <string name="street" required="true" />
     <string name="area" required="true" />
@@ -203,7 +203,7 @@
     </track>
   </entity>
 
-  <entity name="HelloWorld" extends="Hello" strategy="CLASS" hashAll="true">
+  <entity name="HelloWorld" extends="Hello" strategy="CLASS" equalsIncludeAll="true">
     <string name="tags"/>
     <string name="hrCode" />
     <string name="hRCode" />

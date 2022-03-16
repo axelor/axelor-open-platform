@@ -275,13 +275,6 @@
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="hashKey" type="xsd:boolean">
-          <xsd:annotation>
-            <xsd:documentation>(Deprecated: use equalsInclude to use a field in equality test)
-              Whether it can be used to calculate the hashCode.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="formula" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>
@@ -1064,14 +1057,6 @@
         <xsd:documentation>
         Whether to include all the simple non-function fields in equality test.
         You can still ignore some fields with equalsInclude="false" attribute.
-        </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="hashAll" type="xsd:boolean">
-      <xsd:annotation>
-        <xsd:documentation>(Deprecated: use equalsIncludeAll to include all keys in equality test)
-        Whether to use all the simple non-function fields as hash keys.
-        You can still ignore some fields with hashKey="false" attribute.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
