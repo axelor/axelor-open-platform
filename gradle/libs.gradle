@@ -16,7 +16,7 @@ versions.buji_pac4j = "4.1.1"
 versions.pac4j = "3.8.3"
 versions.ldaptive = "1.2.4"
 
-versions.junit = "4.12"
+versions.junit = "4.13.2"
 versions.slf4j = "1.7.35"
 
 versions.tomcat = "8.5.54"
