@@ -17,7 +17,7 @@
  */
 package com.axelor.rpc;
 
-import static net.bytebuddy.description.modifier.FieldManifestation.TRANSIENT;
+import static net.bytebuddy.description.modifier.FieldPersistence.TRANSIENT;
 import static net.bytebuddy.description.modifier.Visibility.PRIVATE;
 import static net.bytebuddy.implementation.FieldAccessor.ofBeanProperty;
 import static net.bytebuddy.implementation.MethodDelegation.toField;
