@@ -38,8 +38,7 @@ import java.util.Map;
 import java.util.Properties;
 import javax.inject.Inject;
 import org.hibernate.MultiTenancyStrategy;
-import org.hibernate.cache.ehcache.EhCacheRegionFactory;
-import org.hibernate.cache.jcache.JCacheRegionFactory;
+import org.hibernate.cache.jcache.ConfigSettings;
 import org.hibernate.cfg.Environment;
 import org.hibernate.hikaricp.internal.HikariCPConnectionProvider;
 import org.slf4j.Logger;
@@ -188,12 +187,12 @@ public class JpaModule extends AbstractModule {
 
     if (jcacheProvider != null) {
       // use jcache
-      properties.put(Environment.CACHE_REGION_FACTORY, JCacheRegionFactory.class.getName());
-      properties.put(JCacheRegionFactory.PROVIDER, jcacheProvider);
-      properties.put(JCacheRegionFactory.CONFIG_URI, jcacheConfig);
+      properties.put(Environment.CACHE_REGION_FACTORY, "jcache");
+      properties.put(ConfigSettings.PROVIDER, jcacheProvider);
+      properties.put(ConfigSettings.CONFIG_URI, jcacheConfig);
     } else {
       // use ehcache
-      properties.put(Environment.CACHE_REGION_FACTORY, EhCacheRegionFactory.class.getName());
+      properties.put(Environment.CACHE_REGION_FACTORY, "ehcache");
     }
   }
 

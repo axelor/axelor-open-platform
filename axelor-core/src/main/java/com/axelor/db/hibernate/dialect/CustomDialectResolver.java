@@ -18,12 +18,12 @@
 package com.axelor.db.hibernate.dialect;
 
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.jdbc.dialect.internal.StandardDialectResolver;
 import org.hibernate.engine.jdbc.dialect.spi.DialectResolutionInfo;
+import org.hibernate.engine.jdbc.dialect.spi.DialectResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CustomDialectResolver extends StandardDialectResolver {
+public class CustomDialectResolver implements DialectResolver {
 
   private static final long serialVersionUID = 8211296180497513187L;
 

@@ -170,16 +170,8 @@ public class QueryBinder {
       return this;
     }
 
-    // check if we have 1 based positional params
-    int offset = 0;
-    try {
-      query.getParameter(0);
-      // TODO: enforce JPA style positional params
-    } catch (Exception e) {
-      offset = 1;
-    }
-
     for (int i = 0; i < params.length; i++) {
+      int pos = i + 1;
       Parameter<?> param;
       Object value = params[i];
       if (value instanceof ContextEntity) {
@@ -194,14 +186,14 @@ public class QueryBinder {
         }
       }
       try {
-        param = query.getParameter(i + offset);
+        param = query.getParameter(pos);
       } catch (Exception e) {
         continue;
       }
       try {
-        query.setParameter(i + offset, value);
+        query.setParameter(pos, value);
       } catch (IllegalArgumentException e) {
-        query.setParameter(i + offset, adapt(value, param));
+        query.setParameter(pos, adapt(value, param));
       }
     }
 

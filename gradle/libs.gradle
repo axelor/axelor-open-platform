@@ -4,7 +4,7 @@ def versions = [:]
 // versions
 versions.guice = "5.1.0"
 versions.guava = "31.1-jre"
-versions.hibernate = "5.2.10.Final"
+versions.hibernate = "5.6.5.Final"
 versions.hibernate_validator = "5.4.1.Final"
 versions.hibernate_search = "5.7.0.Final"
 
@@ -93,8 +93,7 @@ libs.hibernate = [
   "org.hibernate:hibernate-hikaricp:${versions.hibernate}",
   "org.hibernate:hibernate-validator:${versions.hibernate_validator}",
   "org.hibernate:hibernate-ehcache:${versions.hibernate}",
-  "org.hibernate:hibernate-jcache:${versions.hibernate}",
-  "org.hibernate:hibernate-entitymanager:${versions.hibernate}"
+  "org.hibernate:hibernate-jcache:${versions.hibernate}"
 ]
 
 // Hibernate search
@@ -185,6 +184,7 @@ libs.pac4j = [
   "org.pac4j:pac4j-oauth:${versions.pac4j}",
   dependencies.create("org.pac4j:pac4j-saml:${versions.pac4j}") {
     exclude group: 'xml-apis', module: 'xml-apis'
+    exclude group: 'org.hibernate', module: 'hibernate-entitymanager'
   },
   "org.pac4j:pac4j-cas:${versions.pac4j}",
   "org.pac4j:pac4j-http:${versions.pac4j}",

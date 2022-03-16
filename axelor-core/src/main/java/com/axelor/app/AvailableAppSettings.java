@@ -17,7 +17,7 @@
  */
 package com.axelor.app;
 
-import org.hibernate.cache.jcache.JCacheRegionFactory;
+import org.hibernate.cache.jcache.ConfigSettings;
 
 public interface AvailableAppSettings {
 
@@ -126,8 +126,8 @@ public interface AvailableAppSettings {
   String HIBERNATE_JDBC_BATCH_SIZE = "hibernate.jdbc.batch_size";
   String HIBERNATE_JDBC_FETCH_SIZE = "hibernate.jdbc.fetch_size";
 
-  String HIBERNATE_JAVAX_CACHE_PROVIDER = JCacheRegionFactory.PROVIDER;
-  String HIBERNATE_JAVAX_CACHE_URI = JCacheRegionFactory.CONFIG_URI;
+  String HIBERNATE_JAVAX_CACHE_PROVIDER = ConfigSettings.PROVIDER;
+  String HIBERNATE_JAVAX_CACHE_URI = ConfigSettings.CONFIG_URI;
 
   String MAIL_SMTP_HOST = "mail.smtp.host";
   String MAIL_SMTP_PORT = "mail.smtp.port";
