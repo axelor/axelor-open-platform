@@ -2,7 +2,7 @@ def libs = ext.libs = [:]
 def versions = [:]
 
 // versions
-versions.guice = "4.2.2"
+versions.guice = "5.1.0"
 versions.guava = "31.1-jre"
 versions.hibernate = "5.2.10.Final"
 versions.hibernate_validator = "5.4.1.Final"
@@ -52,7 +52,6 @@ libs.snakeyaml = "org.yaml:snakeyaml:1.30"
 libs.guice = "com.google.inject:guice:${versions.guice}"
 libs.guice_servlet = "com.google.inject.extensions:guice-servlet:${versions.guice}"
 libs.guice_persist = "com.google.inject.extensions:guice-persist:${versions.guice}"
-libs.guice_multibindings = "com.google.inject.extensions:guice-multibindings:${versions.guice}"
 
 // ASM
 libs.asm = [

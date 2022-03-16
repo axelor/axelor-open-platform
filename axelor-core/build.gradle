@@ -21,7 +21,6 @@ dependencies {
   api libs.guice
   api libs.guice_servlet
   api libs.guice_persist
-  api libs.guice_multibindings
 
   implementation libs.byte_buddy
 
