@@ -25,16 +25,17 @@ import com.google.inject.Binding;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
+import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.SessionCookieConfig;
-import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.core.ResourceMethodRegistry;
+import org.jboss.resteasy.core.ResteasyContext;
 import org.jboss.resteasy.core.SynchronousDispatcher;
 import org.jboss.resteasy.plugins.guice.GuiceResourceFactory;
 import org.jboss.resteasy.plugins.guice.ModuleProcessor;
 import org.jboss.resteasy.plugins.server.servlet.ListenerBootstrap;
-import org.jboss.resteasy.spi.Registry;
+import org.jboss.resteasy.spi.Dispatcher;
 import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
@@ -43,22 +44,14 @@ public class AppContextListener extends GuiceServletContextListener {
 
   private ResteasyDeployment deployment;
 
-  @Override
-  public void contextInitialized(ServletContextEvent servletContextEvent) {
-    AppLogger.install();
-    super.contextInitialized(servletContextEvent);
-
+  private void configureRestEasy(ServletContextEvent servletContextEvent) {
     final ServletContext context = servletContextEvent.getServletContext();
     final ListenerBootstrap config = new ListenerBootstrap(context);
+
+    final Map<Class<?>, Object> map = ResteasyContext.getContextDataMap();
+    map.put(ServletContext.class, context);
+
     final Injector injector = (Injector) context.getAttribute(Injector.class.getName());
-
-    final SessionCookieConfig cookieConfig = context.getSessionCookieConfig();
-
-    cookieConfig.setHttpOnly(true);
-    cookieConfig.setSecure(
-        AppSettings.get().getBoolean(AvailableAppSettings.SESSION_COOKIE_SECURE, false));
-
-    deployment = config.createDeployment();
 
     // use custom registry for hotswap-agent support
     final ResteasyProviderFactory providerFactory = ResteasyProviderFactory.getInstance();
@@ -76,16 +69,16 @@ public class AppContextListener extends GuiceServletContextListener {
             }
           }
         };
+
     final Dispatcher dispatcher = new SynchronousDispatcher(providerFactory, registry);
 
+    deployment = config.createDeployment();
     deployment.setProviderFactory(providerFactory);
     deployment.setAsyncJobServiceEnabled(false);
     deployment.setDispatcher(dispatcher);
     deployment.start();
 
-    context.setAttribute(ResteasyProviderFactory.class.getName(), providerFactory);
-    context.setAttribute(Dispatcher.class.getName(), dispatcher);
-    context.setAttribute(Registry.class.getName(), registry);
+    context.setAttribute(ResteasyDeployment.class.getName(), deployment);
 
     final ModuleProcessor processor = new ModuleProcessor(registry, providerFactory);
 
@@ -97,12 +90,45 @@ public class AppContextListener extends GuiceServletContextListener {
     }
   }
 
+  private void configureCookie(ServletContextEvent servletContextEvent) {
+    final ServletContext context = servletContextEvent.getServletContext();
+    final SessionCookieConfig cookieConfig = context.getSessionCookieConfig();
+    cookieConfig.setHttpOnly(true);
+    cookieConfig.setSecure(
+        AppSettings.get().getBoolean(AvailableAppSettings.SESSION_COOKIE_SECURE, false));
+  }
+
+  private void beforeStart(ServletContextEvent servletContextEvent) {
+    AppLogger.install();
+  }
+
+  private void afterStart(ServletContextEvent servletContextEvent) {
+    configureCookie(servletContextEvent);
+    configureRestEasy(servletContextEvent);
+  }
+
+  private void beforeStop(ServletContextEvent servletContextEvent) {
+    ViewWatcher.getInstance().stop();
+    servletContextEvent.getServletContext().removeAttribute(ResteasyDeployment.class.getName());
+    deployment.stop();
+  }
+
+  private void afterStop(ServletContextEvent servletContextEvent) {
+    AppLogger.uninstall();
+  }
+
+  @Override
+  public void contextInitialized(ServletContextEvent servletContextEvent) {
+    this.beforeStart(servletContextEvent);
+    super.contextInitialized(servletContextEvent);
+    this.afterStart(servletContextEvent);
+  }
+
   @Override
   public void contextDestroyed(ServletContextEvent servletContextEvent) {
-    ViewWatcher.getInstance().stop();
-    deployment.stop();
+    this.beforeStop(servletContextEvent);
     super.contextDestroyed(servletContextEvent);
-    AppLogger.uninstall();
+    this.afterStop(servletContextEvent);
   }
 
   @Override

@@ -17,6 +17,11 @@
     <listener-class>com.axelor.web.AppContextListener</listener-class>
   </listener>
 
+  <!-- Session Listener -->
+  <listener>
+    <listener-class>com.axelor.web.AppSessionListener</listener-class>
+  </listener>
+
   <!-- RESTEasy servlet -->
   <context-param>
     <param-name>resteasy.servlet.mapping.prefix</param-name>

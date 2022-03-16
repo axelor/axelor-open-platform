@@ -23,28 +23,20 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 /** The {@link AppSessionListener} configures the session timeout. */
-@Singleton
 public final class AppSessionListener implements HttpSessionListener {
 
   private final int timeout;
 
   private static final Set<HttpSession> sessions = ConcurrentHashMap.newKeySet();
 
-  /**
-   * Create a new {@link AppSessionListener} with the given app settings.
-   *
-   * @param settings application settings
-   */
-  @Inject
-  public AppSessionListener(AppSettings settings) {
-    this.timeout = settings.getInt(AvailableAppSettings.SESSION_TIMEOUT, 60);
+  /** Create a new {@link AppSessionListener} with the given app settings. */
+  public AppSessionListener() {
+    this.timeout = AppSettings.get().getInt(AvailableAppSettings.SESSION_TIMEOUT, 60);
   }
 
   @Override

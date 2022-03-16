@@ -18,7 +18,6 @@
 package com.axelor.web;
 
 import com.axelor.app.AppModule;
-import com.axelor.app.AppSettings;
 import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthModule;
 import com.axelor.db.JpaModule;
@@ -76,9 +75,6 @@ public class AppServletModule extends ServletModule {
 
   @Override
   protected void configureServlets() {
-
-    // load application settings
-    AppSettings settings = AppSettings.get();
 
     // some common bindings
     bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
@@ -149,7 +145,7 @@ public class AppServletModule extends ServletModule {
     }
 
     // register the session listener
-    getServletContext().addListener(new AppSessionListener(settings));
+    getServletContext().addListener(new AppSessionListener());
 
     // run additional configuration tasks
     this.afterConfigureServlets();

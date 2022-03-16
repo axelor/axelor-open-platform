@@ -9,8 +9,8 @@ versions.hibernate_validator = "5.4.1.Final"
 versions.hibernate_search = "5.7.0.Final"
 
 versions.groovy = "2.4.10"
-versions.resteasy = "3.1.2.Final"
-versions.jackson = "2.8.8"
+versions.resteasy = "4.7.5.Final"
+versions.jackson = "2.13.2"
 versions.shiro = "1.4.1"
 versions.buji_pac4j = "4.1.1"
 versions.pac4j = "3.8.3"
@@ -122,20 +122,24 @@ libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.
 libs.groovy = "org.codehaus.groovy:groovy-all:${versions.groovy}:indy"
 libs.groovy_wslite = dependencies.create("com.github.groovy-wslite:groovy-wslite:1.1.2") { exclude group: "org.codehaus.groovy" }
 
-// jax-rs
-libs.resteasy = [
-  "org.jboss.resteasy:resteasy-jaxrs:${versions.resteasy}",
-  "org.jboss.resteasy:resteasy-jackson2-provider:${versions.resteasy}",
-  "org.jboss.resteasy:resteasy-servlet-initializer:${versions.resteasy}",
-]
-
-libs.resteasy_multipart = dependencies.create("org.jboss.resteasy:resteasy-multipart-provider:${versions.resteasy}") {
-  exclude module: "resteasy-jaxb-provider"
-  exclude module: "mail", group: "javax.mail"
+def resteasy_module = { name ->
+    dependencies.create("org.jboss.resteasy:${name}:${versions.resteasy}") {
+        exclude module: "smallrye-config"
+        exclude module: "resteasy-jaxb-provider"
+        exclude module: "mail", group: "javax.mail"
+    }
 }
 
-libs.resteasy_guice = "org.jboss.resteasy:resteasy-guice:${versions.resteasy}"
-libs.resteasy_client = "org.jboss.resteasy:resteasy-client:${versions.resteasy}"
+// jax-rs
+libs.resteasy = [
+    resteasy_module("resteasy-core"),
+    resteasy_module("resteasy-jackson2-provider"),
+    "io.smallrye.config:smallrye-config:1.6.1"
+]
+
+libs.resteasy_multipart = resteasy_module("resteasy-multipart-provider")
+libs.resteasy_guice = resteasy_module("resteasy-guice")
+libs.resteasy_client = resteasy_module("resteasy-client");
 libs.resteasy_server = [
   "org.jboss.resteasy:resteasy-undertow:${versions.resteasy}",
   "io.undertow:undertow-core:1.4.4.Final",
