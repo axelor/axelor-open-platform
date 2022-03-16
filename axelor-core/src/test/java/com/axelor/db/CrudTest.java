@@ -17,6 +17,14 @@
  */
 package com.axelor.db;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.JpaTest;
 import com.axelor.test.db.Address;
 import com.axelor.test.db.Circle;
@@ -29,16 +37,15 @@ import com.google.inject.persist.Transactional;
 import java.util.HashSet;
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 @Transactional
 public class CrudTest extends JpaTest {
 
   @Inject private ContactRepository contacts;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     if (all(Contact.class).count() > 0) {
       return;
@@ -108,29 +115,29 @@ public class CrudTest extends JpaTest {
     contacts.save(contact);
 
     for (Model e : Lists.newArrayList(contact, title, addr1, country)) {
-      Assert.assertNotNull(e.getId());
-      Assert.assertNotNull(e.getVersion());
+      assertNotNull(e.getId());
+      assertNotNull(e.getVersion());
     }
   }
 
   @Test
   public void testRead() {
     Contact contact = all(Contact.class).filter("self.firstName = ?1", "My").fetchOne();
-    Assert.assertNotNull(contact);
+    assertNotNull(contact);
 
     Contact c1 = contacts.find(contact.getId());
-    Assert.assertSame(contact, c1);
+    assertSame(contact, c1);
 
     getEntityManager().clear(); // clear the context
 
     Contact c2 = contacts.find(contact.getId());
-    Assert.assertNotSame(contact, c2);
+    assertNotSame(contact, c2);
   }
 
-  @Test(expected = OptimisticLockException.class)
+  @Test()
   public void testUpdate() {
     final Contact contact = all(Contact.class).filter("self.firstName = ?1", "My").fetchOne();
-    Assert.assertNotNull(contact);
+    assertNotNull(contact);
 
     Integer versionPrev = contact.getVersion();
 
@@ -139,7 +146,7 @@ public class CrudTest extends JpaTest {
 
     Integer versionNext = contact.getVersion();
 
-    Assert.assertTrue(versionNext > versionPrev);
+    assertTrue(versionNext > versionPrev);
 
     // test optimistic concurrency check
 
@@ -147,32 +154,32 @@ public class CrudTest extends JpaTest {
     contact.setVersion(0); // manipulate version
 
     contact.setPhone("0123456789");
-    contacts.save(contact); // this throws OptimisticLockException
+    assertThrows(OptimisticLockException.class, () -> contacts.save(contact));
   }
 
-  @Test(expected = OptimisticLockException.class)
+  @Test()
   public void testDeleteUpdated() {
     final Contact contact = all(Contact.class).filter("self.firstName = ?1", "My").fetchOne();
-    Assert.assertNotNull(contact);
+    assertNotNull(contact);
 
     getEntityManager().clear();
     contact.setVersion(0);
 
-    contacts.remove(contact);
+    assertThrows(OptimisticLockException.class, () -> contacts.remove(contact));
   }
 
-  @Test(expected = OptimisticLockException.class)
+  @Test()
   public void testDelete() {
     final Contact contact = all(Contact.class).filter("self.firstName = ?1", "My").fetchOne();
-    Assert.assertNotNull(contact);
+    assertNotNull(contact);
 
     contacts.remove(contact);
 
     Contact c1 = contacts.find(contact.getId());
-    Assert.assertNull(c1);
+    assertNull(c1);
 
     // try to save deleted record
-    contacts.save(contact);
+    assertThrows(OptimisticLockException.class, () -> contacts.save(contact));
   }
 
   @Test
@@ -183,7 +190,7 @@ public class CrudTest extends JpaTest {
     g1.setCode("group_x");
     g1.setName("Group X");
 
-    Assert.assertNotNull(c1);
+    assertNotNull(c1);
 
     if (c1.getCircles() == null) {
       c1.setCircles(new HashSet<Circle>());
@@ -197,21 +204,21 @@ public class CrudTest extends JpaTest {
     Contact c2 = contacts.copy(c1, true);
     c2 = contacts.save(c2);
 
-    Assert.assertNotNull(c1.getCircles());
-    Assert.assertNotNull(c2.getCircles());
+    assertNotNull(c1.getCircles());
+    assertNotNull(c2.getCircles());
 
     int numGroups = c1.getCircles().size();
 
     c2.getCircles().clear();
     c2 = contacts.save(c2);
 
-    Assert.assertNotNull(c2);
-    Assert.assertFalse(c1.getId() == c2.getId());
+    assertNotNull(c2);
+    assertNotSame(c1.getId(), c2.getId());
 
-    Assert.assertEquals(numGroups, c1.getCircles().size());
-    Assert.assertEquals(0, c2.getCircles().size());
+    assertEquals(numGroups, c1.getCircles().size());
+    assertEquals(0, c2.getCircles().size());
 
-    Assert.assertEquals(numItems, c1.getAddresses().size());
-    Assert.assertEquals(numItems, c2.getAddresses().size());
+    assertEquals(numItems, c1.getAddresses().size());
+    assertEquals(numItems, c2.getAddresses().size());
   }
 }

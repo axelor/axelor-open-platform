@@ -17,19 +17,20 @@
  */
 package com.axelor.event;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import com.axelor.test.GuiceExtension;
 import com.axelor.test.GuiceModules;
-import com.axelor.test.GuiceRunner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-@RunWith(GuiceRunner.class)
+@ExtendWith(GuiceExtension.class)
 @GuiceModules({EventModule.class, TestModule.class})
 public class TestEventsParallel {
 
@@ -66,7 +67,7 @@ public class TestEventsParallel {
     }
 
     shutdownAndAwaitTermination(pool);
-    Assert.assertEquals(numIterations * numObservers, count.getAndUpdate(n -> 0));
+    assertEquals(numIterations * numObservers, count.getAndUpdate(n -> 0));
   }
 
   private static void shutdownAndAwaitTermination(ExecutorService pool) {

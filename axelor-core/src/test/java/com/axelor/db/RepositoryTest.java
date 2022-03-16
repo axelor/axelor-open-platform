@@ -17,8 +17,8 @@
  */
 package com.axelor.db;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.JpaTest;
 import com.axelor.JpaTestModule;
@@ -31,7 +31,7 @@ import com.axelor.test.db.repo.ContactRepository;
 import com.axelor.test.db.repo.ContactRepositoryEx;
 import java.util.HashMap;
 import javax.inject.Inject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 @GuiceModules(RepositoryTest.MyModule.class)
 public class RepositoryTest extends JpaTest {

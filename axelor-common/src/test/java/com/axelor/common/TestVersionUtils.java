@@ -17,9 +17,10 @@
  */
 package com.axelor.common;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.axelor.common.VersionUtils.Version;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestVersionUtils {
 
@@ -30,23 +31,23 @@ public class TestVersionUtils {
     Version v2 = new Version("3.0.1-rc1");
     Version v3 = new Version("3.0.1-SNAPSHOT");
 
-    Assert.assertEquals("3.0", v1.feature);
-    Assert.assertEquals("3.0", v2.feature);
-    Assert.assertEquals("3.0", v3.feature);
+    assertEquals("3.0", v1.feature);
+    assertEquals("3.0", v2.feature);
+    assertEquals("3.0", v3.feature);
 
-    Assert.assertEquals(3, v1.major);
-    Assert.assertEquals(0, v1.minor);
-    Assert.assertEquals(1, v1.patch);
-    Assert.assertEquals(0, v1.rc);
+    assertEquals(3, v1.major);
+    assertEquals(0, v1.minor);
+    assertEquals(1, v1.patch);
+    assertEquals(0, v1.rc);
 
-    Assert.assertEquals(3, v2.major);
-    Assert.assertEquals(0, v2.minor);
-    Assert.assertEquals(1, v2.patch);
-    Assert.assertEquals(1, v2.rc);
+    assertEquals(3, v2.major);
+    assertEquals(0, v2.minor);
+    assertEquals(1, v2.patch);
+    assertEquals(1, v2.rc);
 
-    Assert.assertEquals(3, v3.major);
-    Assert.assertEquals(0, v3.minor);
-    Assert.assertEquals(1, v3.patch);
-    Assert.assertEquals(0, v3.rc);
+    assertEquals(3, v3.major);
+    assertEquals(0, v3.minor);
+    assertEquals(1, v3.patch);
+    assertEquals(0, v3.rc);
   }
 }

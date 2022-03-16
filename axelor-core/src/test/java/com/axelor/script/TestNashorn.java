@@ -17,17 +17,20 @@
  */
 package com.axelor.script;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.rpc.Context;
 import com.axelor.test.db.Contact;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Assert;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class TestNashorn extends ScriptTest {
 
   private static final int COUNT = 1000;
@@ -46,7 +49,7 @@ public class TestNashorn extends ScriptTest {
     final ScriptHelper helper = new NashornScriptHelper(context());
     for (int i = 0; i < COUNT; i++) {
       Object result = helper.eval(expr);
-      Assert.assertNotNull(result);
+      assertNotNull(result);
     }
   }
 
@@ -54,16 +57,16 @@ public class TestNashorn extends ScriptTest {
     final ScriptHelper helper = new NashornScriptHelper(context());
 
     Object actual = helper.eval("__parent__");
-    Assert.assertTrue(actual instanceof Context);
+    assertTrue(actual instanceof Context);
 
     actual = helper.eval("__ref__");
-    Assert.assertTrue(actual instanceof Contact);
+    assertTrue(actual instanceof Contact);
 
     actual = helper.eval("__parent__.asType(Contact.class)");
-    Assert.assertTrue(actual instanceof Contact);
+    assertTrue(actual instanceof Contact);
 
     actual = helper.eval("__ref__.fullName");
-    Assert.assertTrue(actual instanceof String);
+    assertTrue(actual instanceof String);
 
     actual = helper.eval("__ref__.fullName + ' (" + counter + ")'");
   }
@@ -73,29 +76,29 @@ public class TestNashorn extends ScriptTest {
     final ScriptHelper helper = new NashornScriptHelper(context());
 
     Object list = helper.eval("listOf([1, 2, 3, 4])");
-    Assert.assertNotNull(list);
-    Assert.assertTrue(list instanceof List);
-    Assert.assertEquals(4, ((List<?>) list).size());
+    assertNotNull(list);
+    assertTrue(list instanceof List);
+    assertEquals(4, ((List<?>) list).size());
 
     list = helper.eval("listOf(1, 2, 3, 4)");
-    Assert.assertNotNull(list);
-    Assert.assertTrue(list instanceof List);
-    Assert.assertEquals(4, ((List<?>) list).size());
+    assertNotNull(list);
+    assertTrue(list instanceof List);
+    assertEquals(4, ((List<?>) list).size());
 
     Object set = helper.eval("setOf([1, 2, 3, 4])");
-    Assert.assertNotNull(set);
-    Assert.assertTrue(set instanceof Set);
-    Assert.assertEquals(4, ((Set<?>) set).size());
+    assertNotNull(set);
+    assertTrue(set instanceof Set);
+    assertEquals(4, ((Set<?>) set).size());
 
     set = helper.eval("setOf(1, 2, 3, 4)");
-    Assert.assertNotNull(set);
-    Assert.assertTrue(set instanceof Set);
-    Assert.assertEquals(4, ((Set<?>) set).size());
+    assertNotNull(set);
+    assertTrue(set instanceof Set);
+    assertEquals(4, ((Set<?>) set).size());
 
     final Object map = helper.eval("mapOf({a: 1, b: 2})");
-    Assert.assertNotNull(map);
-    Assert.assertTrue(map instanceof Map);
-    Assert.assertEquals(2, ((Map<?, ?>) map).size());
+    assertNotNull(map);
+    assertTrue(map instanceof Map);
+    assertEquals(2, ((Map<?, ?>) map).size());
   }
 
   @Test
@@ -104,8 +107,8 @@ public class TestNashorn extends ScriptTest {
     final Object bean =
         helper.eval("" + "doInJPA(function (em) {" + "	return em.find(Contact.class, id);" + "})");
 
-    Assert.assertNotNull(bean);
-    Assert.assertTrue(bean instanceof Contact);
+    assertNotNull(bean);
+    assertTrue(bean instanceof Contact);
   }
 
   @Test

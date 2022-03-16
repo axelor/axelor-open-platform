@@ -17,6 +17,10 @@
  */
 package com.axelor.report;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import com.axelor.JpaTest;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.db.Contact;
@@ -28,8 +32,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import org.eclipse.birt.report.engine.api.IReportEngine;
 import org.eclipse.birt.report.model.api.IResourceLocator;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 @GuiceModules(MyModule.class)
 public class ReportTest extends JpaTest {
@@ -44,15 +47,15 @@ public class ReportTest extends JpaTest {
 
   @Test
   public void testEngine() {
-    Assert.assertNotNull(engine);
-    Assert.assertNotNull(generator);
+    assertNotNull(engine);
+    assertNotNull(generator);
   }
 
   @Test
   public void testResourceLocator() {
     IResourceLocator locator = engine.getConfig().getResourceLocator();
     URL found = locator.findResource(null, DESIGN, IResourceLocator.OTHERS);
-    Assert.assertNotNull(found);
+    assertNotNull(found);
   }
 
   @Test
@@ -69,18 +72,18 @@ public class ReportTest extends JpaTest {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
 
     byte[] bytes = output.toByteArray();
 
-    Assert.assertNotNull(bytes);
-    Assert.assertTrue(bytes.length > 0);
+    assertNotNull(bytes);
+    assertTrue(bytes.length > 0);
 
     String html = new String(bytes);
 
     for (Contact contact : contacts.all().fetch()) {
-      Assert.assertTrue(html.contains(contact.getFullName()));
+      assertTrue(html.contains(contact.getFullName()));
     }
   }
 }

@@ -17,6 +17,8 @@
  */
 package com.axelor.common.logging;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.common.FileUtils;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,8 +26,7 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,12 +69,12 @@ public class LoggingTest {
 
       final String output = builder.toString();
 
-      Assert.assertTrue(output.contains("Test info..."));
-      Assert.assertTrue(output.contains("Test warn..."));
-      Assert.assertTrue(output.contains("Test error..."));
-      Assert.assertTrue(output.contains("Test trace..."));
-      Assert.assertTrue(output.contains("Test JUL..."));
-      Assert.assertTrue(logPath.resolve("axelor.log").toFile().exists());
+      assertTrue(output.contains("Test info..."));
+      assertTrue(output.contains("Test warn..."));
+      assertTrue(output.contains("Test error..."));
+      assertTrue(output.contains("Test trace..."));
+      assertTrue(output.contains("Test JUL..."));
+      assertTrue(logPath.resolve("axelor.log").toFile().exists());
     } finally {
       System.setOut(sout);
       out.close();

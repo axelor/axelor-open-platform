@@ -17,6 +17,10 @@
  */
 package com.axelor.auth;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.JpaTest;
 import com.axelor.auth.AuthFilter.UsernamePasswordTokenWithParams;
 import com.axelor.auth.db.Group;
@@ -30,9 +34,8 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class AuthTest extends JpaTest {
 
@@ -42,7 +45,7 @@ public class AuthTest extends JpaTest {
 
   @Inject private UserRepository users;
 
-  @Before
+  @BeforeEach
   @Transactional
   public void setUp() {
     if (users.all().count() == 0) {
@@ -147,13 +150,13 @@ public class AuthTest extends JpaTest {
   @Transactional
   public void superUserTest() {
     // ensure has super user role
-    Assert.assertTrue(authSecurity.hasRole("super.user"));
+    assertTrue(authSecurity.hasRole("super.user"));
 
     // check that super use has full permissions
-    Assert.assertTrue(authSecurity.isPermitted(AccessType.READ, User.class));
-    Assert.assertTrue(authSecurity.isPermitted(AccessType.WRITE, Group.class));
-    Assert.assertTrue(authSecurity.isPermitted(AccessType.CREATE, Role.class));
-    Assert.assertTrue(authSecurity.isPermitted(AccessType.REMOVE, Permission.class));
+    assertTrue(authSecurity.isPermitted(AccessType.READ, User.class));
+    assertTrue(authSecurity.isPermitted(AccessType.WRITE, Group.class));
+    assertTrue(authSecurity.isPermitted(AccessType.CREATE, Role.class));
+    assertTrue(authSecurity.isPermitted(AccessType.REMOVE, Permission.class));
   }
 
   @Test
@@ -165,24 +168,24 @@ public class AuthTest extends JpaTest {
   @Transactional
   public void normalUserTest() {
     // ensure has super user role
-    Assert.assertTrue(authSecurity.hasRole("normal.user"));
+    assertTrue(authSecurity.hasRole("normal.user"));
 
     // but not super user role
-    Assert.assertFalse(authSecurity.hasRole("super.user"));
+    assertFalse(authSecurity.hasRole("super.user"));
 
     // check if has read access to User model
-    Assert.assertTrue(authSecurity.isPermitted(AccessType.READ, User.class));
+    assertTrue(authSecurity.isPermitted(AccessType.READ, User.class));
 
     // check if no other models are accessible
-    Assert.assertFalse(authSecurity.isPermitted(AccessType.READ, Group.class));
-    Assert.assertFalse(authSecurity.isPermitted(AccessType.READ, Role.class));
-    Assert.assertFalse(authSecurity.isPermitted(AccessType.READ, Permission.class));
+    assertFalse(authSecurity.isPermitted(AccessType.READ, Group.class));
+    assertFalse(authSecurity.isPermitted(AccessType.READ, Role.class));
+    assertFalse(authSecurity.isPermitted(AccessType.READ, Permission.class));
 
     // check if can update own user instance
-    Assert.assertTrue(
+    assertTrue(
         authSecurity.isPermitted(AccessType.WRITE, User.class, users.findByCode("demo").getId()));
     // but not others
-    Assert.assertFalse(
+    assertFalse(
         authSecurity.isPermitted(AccessType.WRITE, User.class, users.findByCode("admin").getId()));
   }
 
@@ -195,30 +198,30 @@ public class AuthTest extends JpaTest {
   @Transactional
   public void guestUserTest() {
     // ensure has super user role
-    Assert.assertTrue(authSecurity.hasRole("guest.user"));
+    assertTrue(authSecurity.hasRole("guest.user"));
 
     // but not super user role
-    Assert.assertFalse(authSecurity.hasRole("super.user"));
+    assertFalse(authSecurity.hasRole("super.user"));
 
     // check if has read access to User model
-    Assert.assertTrue(authSecurity.isPermitted(AccessType.READ, User.class));
+    assertTrue(authSecurity.isPermitted(AccessType.READ, User.class));
     // and can only read self record
-    Assert.assertTrue(
+    assertTrue(
         authSecurity.isPermitted(AccessType.READ, User.class, users.findByCode("guest").getId()));
     // and not others
-    Assert.assertFalse(
+    assertFalse(
         authSecurity.isPermitted(AccessType.READ, User.class, users.findByCode("demo").getId()));
 
     // check if no other models are accessible
-    Assert.assertFalse(authSecurity.isPermitted(AccessType.READ, Group.class));
-    Assert.assertFalse(authSecurity.isPermitted(AccessType.READ, Role.class));
-    Assert.assertFalse(authSecurity.isPermitted(AccessType.READ, Permission.class));
+    assertFalse(authSecurity.isPermitted(AccessType.READ, Group.class));
+    assertFalse(authSecurity.isPermitted(AccessType.READ, Role.class));
+    assertFalse(authSecurity.isPermitted(AccessType.READ, Permission.class));
 
     // check if can update own user instance
-    Assert.assertTrue(
+    assertTrue(
         authSecurity.isPermitted(AccessType.WRITE, User.class, users.findByCode("guest").getId()));
     // but not others
-    Assert.assertFalse(
+    assertFalse(
         authSecurity.isPermitted(AccessType.WRITE, User.class, users.findByCode("demo").getId()));
   }
 
@@ -234,15 +237,15 @@ public class AuthTest extends JpaTest {
     EntityManager em = getEntityManager();
     User user = users.all().filter("self.code = ?", "demo").fetchOne();
 
-    Assert.assertNotNull(user);
+    assertNotNull(user);
 
     User current = AuthUtils.getUser();
 
-    Assert.assertTrue(em.contains(current));
+    assertTrue(em.contains(current));
 
     em.clear();
 
-    Assert.assertFalse(em.contains(current));
+    assertFalse(em.contains(current));
 
     User user2 = new User();
     user2.setCode("demo2");
@@ -253,7 +256,7 @@ public class AuthTest extends JpaTest {
 
     users.save(user2);
 
-    Assert.assertNotNull(user2.getCreatedBy());
+    assertNotNull(user2.getCreatedBy());
 
     authService.match("demo2", user2.getPassword());
   }

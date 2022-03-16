@@ -17,11 +17,12 @@
  */
 package com.axelor.meta.loader;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestResolver {
 
@@ -54,11 +55,11 @@ public class TestResolver {
       actual.add(module.getName());
     }
 
-    Assert.assertEquals(expected, actual);
+    assertEquals(expected, actual);
 
     List<String> all = resolver.names();
 
-    Assert.assertEquals("axelor-core", all.get(0));
-    Assert.assertEquals("axelor-project", all.get(all.size() - 1));
+    assertEquals("axelor-core", all.get(0));
+    assertEquals("axelor-project", all.get(all.size() - 1));
   }
 }

@@ -17,15 +17,17 @@
  */
 package com.axelor.script;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.db.JpaRepository;
 import com.axelor.rpc.Context;
 import com.axelor.test.db.Contact;
-import org.junit.Assert;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class TestEL extends ScriptTest {
 
   private static final int COUNT = 1000;
@@ -44,7 +46,7 @@ public class TestEL extends ScriptTest {
     ScriptHelper helper = new ELScriptHelper(context());
     for (int i = 0; i < COUNT; i++) {
       Object result = helper.eval(expr);
-      Assert.assertNotNull(result);
+      assertNotNull(result);
     }
   }
 
@@ -54,25 +56,25 @@ public class TestEL extends ScriptTest {
     Object actual;
 
     actual = helper.eval("__parent__");
-    Assert.assertTrue(actual instanceof Context);
+    assertTrue(actual instanceof Context);
 
     actual = helper.eval("__ref__");
-    Assert.assertTrue(actual instanceof Contact);
+    assertTrue(actual instanceof Contact);
 
     actual = helper.eval("__parent__.asType(Contact)");
-    Assert.assertTrue(actual instanceof Contact);
+    assertTrue(actual instanceof Contact);
 
     actual = helper.eval("__repo__(Contact)");
-    Assert.assertTrue(actual instanceof JpaRepository);
+    assertTrue(actual instanceof JpaRepository);
 
     actual = helper.eval("__ref__.fullName");
-    Assert.assertTrue(actual instanceof String);
+    assertTrue(actual instanceof String);
 
     actual = helper.eval("__ref__.fullName += ' (" + counter + ")'");
 
-    Assert.assertNotNull(helper.eval("__config__.string"));
-    Assert.assertNotNull(helper.eval("__config__.world"));
-    Assert.assertNotNull(helper.eval("__config__.hello.contact()"));
+    assertNotNull(helper.eval("__config__.string"));
+    assertNotNull(helper.eval("__config__.world"));
+    assertNotNull(helper.eval("__config__.hello.contact()"));
   }
 
   @Test
@@ -127,7 +129,7 @@ public class TestEL extends ScriptTest {
               + " ("
               + context.get("__user__")
               + ")";
-      Assert.assertNotNull(result);
+      assertNotNull(result);
     }
   }
 }

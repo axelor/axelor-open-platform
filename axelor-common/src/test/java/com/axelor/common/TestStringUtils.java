@@ -17,25 +17,28 @@
  */
 package com.axelor.common;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.google.common.base.Joiner;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestStringUtils {
 
   @Test
   public void testIsEmpty() {
-    Assert.assertTrue(StringUtils.isEmpty(null));
-    Assert.assertTrue(StringUtils.isEmpty(""));
-    Assert.assertFalse(StringUtils.isEmpty(" "));
+    assertTrue(StringUtils.isEmpty(null));
+    assertTrue(StringUtils.isEmpty(""));
+    assertFalse(StringUtils.isEmpty(" "));
   }
 
   @Test
   public void testIsBlank() {
-    Assert.assertTrue(StringUtils.isBlank(null));
-    Assert.assertTrue(StringUtils.isBlank(""));
-    Assert.assertTrue(StringUtils.isBlank(" "));
-    Assert.assertFalse(StringUtils.isBlank("some value"));
+    assertTrue(StringUtils.isBlank(null));
+    assertTrue(StringUtils.isBlank(""));
+    assertTrue(StringUtils.isBlank(" "));
+    assertFalse(StringUtils.isBlank("some value"));
   }
 
   static final String text1 =
@@ -53,26 +56,26 @@ public class TestStringUtils {
   @Test
   public void testStripIndent() {
     String[] lines = StringUtils.stripIndent(text1).split("\n");
-    Assert.assertFalse(Character.isWhitespace(lines[0].charAt(0)));
-    Assert.assertFalse(Character.isWhitespace(lines[1].charAt(0)));
-    Assert.assertFalse(Character.isWhitespace(lines[2].charAt(0)));
-    Assert.assertEquals(
+    assertFalse(Character.isWhitespace(lines[0].charAt(0)));
+    assertFalse(Character.isWhitespace(lines[1].charAt(0)));
+    assertFalse(Character.isWhitespace(lines[2].charAt(0)));
+    assertEquals(
         Joiner.on("\n").join(lines),
         "" + "this is some text\n" + "this is some text\n" + "this is some text");
 
     lines = StringUtils.stripIndent(text2).split("\n");
-    Assert.assertFalse(Character.isWhitespace(lines[0].charAt(0)));
-    Assert.assertTrue(Character.isWhitespace(lines[1].charAt(0)));
-    Assert.assertTrue(Character.isWhitespace(lines[2].charAt(0)));
-    Assert.assertEquals(
+    assertFalse(Character.isWhitespace(lines[0].charAt(0)));
+    assertTrue(Character.isWhitespace(lines[1].charAt(0)));
+    assertTrue(Character.isWhitespace(lines[2].charAt(0)));
+    assertEquals(
         Joiner.on("\n").join(lines),
         "" + "this is some text\n" + "  \tthis is some text\n" + " this is some text");
 
     lines = StringUtils.stripIndent(text3).split("\n");
-    Assert.assertTrue(Character.isWhitespace(lines[0].charAt(0)));
-    Assert.assertTrue(Character.isWhitespace(lines[1].charAt(0)));
-    Assert.assertFalse(Character.isWhitespace(lines[2].charAt(0)));
-    Assert.assertEquals(
+    assertTrue(Character.isWhitespace(lines[0].charAt(0)));
+    assertTrue(Character.isWhitespace(lines[1].charAt(0)));
+    assertFalse(Character.isWhitespace(lines[2].charAt(0)));
+    assertEquals(
         Joiner.on("\n").join(lines),
         "" + " this is some text\n" + " this is some text\n" + "this is some text");
   }
@@ -80,20 +83,20 @@ public class TestStringUtils {
   @Test
   public void testStripMargin() {
     String[] lines = StringUtils.stripMargin(text4).split("\n");
-    Assert.assertEquals(
+    assertEquals(
         Joiner.on("\n").join(lines),
         "" + "this is some text\n" + "this is some text\n" + "this is some text");
   }
 
   @Test
   public void testStripAccent() {
-    Assert.assertEquals(
+    assertEquals(
         "AAAAAACEEEEIIIINOOOOOUUUUY", StringUtils.stripAccent("ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ"));
-    Assert.assertEquals(
+    assertEquals(
         "aaaaaaceeeeiiiinooooouuuuyy", StringUtils.stripAccent("àáâãäåçèéêëìíîïñòóôõöùúûüýÿ"));
-    Assert.assertEquals("L", StringUtils.stripAccent("Ł"));
-    Assert.assertEquals("l", StringUtils.stripAccent("ł"));
-    Assert.assertEquals("Cesar", StringUtils.stripAccent("César"));
-    Assert.assertEquals("Andre", StringUtils.stripAccent("André"));
+    assertEquals("L", StringUtils.stripAccent("Ł"));
+    assertEquals("l", StringUtils.stripAccent("ł"));
+    assertEquals("Cesar", StringUtils.stripAccent("César"));
+    assertEquals("Andre", StringUtils.stripAccent("André"));
   }
 }

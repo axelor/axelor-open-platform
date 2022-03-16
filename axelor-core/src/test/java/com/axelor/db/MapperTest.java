@@ -17,6 +17,12 @@
  */
 package com.axelor.db;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.JpaTest;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.test.db.Contact;
@@ -26,14 +32,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MapperTest extends JpaTest {
 
   private Mapper mapper = Mapper.of(Contact.class);
 
   @Test
+  @Order(1)
   public void testGet() {
 
     Contact contact = all(Contact.class).fetchOne();
@@ -42,12 +52,13 @@ public class MapperTest extends JpaTest {
     String lastName = contact.getLastName();
     Long id = contact.getId();
 
-    Assert.assertEquals(firstName, mapper.get(contact, "firstName"));
-    Assert.assertEquals(lastName, mapper.get(contact, "lastName"));
-    Assert.assertEquals(id, mapper.get(contact, "id"));
+    assertEquals(firstName, mapper.get(contact, "firstName"));
+    assertEquals(lastName, mapper.get(contact, "lastName"));
+    assertEquals(id, mapper.get(contact, "id"));
   }
 
   @Test
+  @Order(2)
   public void testSet() {
 
     Contact contact = all(Contact.class).fetchOne();
@@ -55,35 +66,36 @@ public class MapperTest extends JpaTest {
     contact.setFirstName("Some");
     contact.setLastName("Name");
 
-    Assert.assertEquals("Some", mapper.get(contact, "firstName"));
-    Assert.assertEquals("Name", mapper.get(contact, "lastName"));
+    assertEquals("Some", mapper.get(contact, "firstName"));
+    assertEquals("Name", mapper.get(contact, "lastName"));
   }
 
   @Test
+  @Order(3)
   public void testBean() {
     Map<String, Object> values = getDemoData();
     Contact contact = JPA.edit(Contact.class, values);
 
-    Assert.assertEquals("Some", contact.getFirstName());
-    Assert.assertEquals("Name", contact.getLastName());
-    Assert.assertNotSame("Mr. My Name", contact.getFullName());
-    Assert.assertEquals("Mr. Some Name", contact.getFullName());
+    assertEquals("Some", contact.getFirstName());
+    assertEquals("Name", contact.getLastName());
+    assertNotSame("Mr. My Name", contact.getFullName());
+    assertEquals("Mr. Some Name", contact.getFullName());
 
-    Assert.assertNotNull(contact);
-    Assert.assertNotNull(contact.getId());
-    Assert.assertNotNull(contact.getDateOfBirth());
+    assertNotNull(contact);
+    assertNotNull(contact.getId());
+    assertNotNull(contact.getDateOfBirth());
 
     LocalDate date = contact.getDateOfBirth();
-    Assert.assertEquals(1975, date.getYear());
-    Assert.assertEquals(3, date.getMonthValue());
-    Assert.assertEquals(23, date.getDayOfMonth());
+    assertEquals(1975, date.getYear());
+    assertEquals(3, date.getMonthValue());
+    assertEquals(23, date.getDayOfMonth());
 
-    Assert.assertNotNull(contact.getTitle());
-    Assert.assertEquals("Mr.", contact.getTitle().getName());
+    assertNotNull(contact.getTitle());
+    assertEquals("Mr.", contact.getTitle().getName());
 
-    Assert.assertNotNull(contact.getCircles());
-    Assert.assertEquals(1, contact.getCircles().size());
-    Assert.assertEquals("Business", contact.getCircle(0).getName());
+    assertNotNull(contact.getCircles());
+    assertEquals(1, contact.getCircles().size());
+    assertEquals("Business", contact.getCircle(0).getName());
   }
 
   private Map<String, Object> getDemoData() {
@@ -110,6 +122,7 @@ public class MapperTest extends JpaTest {
   }
 
   @Test
+  @Order(4)
   public void testTypes() {
     Map<String, Object> values = new HashMap<String, Object>();
     values.put("boolValue", "true");
@@ -130,18 +143,18 @@ public class MapperTest extends JpaTest {
 
     TypeCheck bean = JPA.edit(TypeCheck.class, values);
 
-    Assert.assertSame(Boolean.TRUE, bean.getBoolValue());
-    Assert.assertTrue(121 == bean.getIntValue());
-    Assert.assertTrue(199L == bean.getLongValue());
-    Assert.assertTrue(23.12 == bean.getDoubleValue());
+    assertSame(Boolean.TRUE, bean.getBoolValue());
+    assertTrue(121 == bean.getIntValue());
+    assertTrue(199L == bean.getLongValue());
+    assertTrue(23.12 == bean.getDoubleValue());
 
-    Assert.assertTrue(false == bean.isBoolValue2());
-    Assert.assertTrue(0 == bean.getIntValue2());
-    Assert.assertTrue(0L == bean.getLongValue2());
-    Assert.assertTrue(0.0 == bean.getDoubleValue2());
+    assertTrue(false == bean.isBoolValue2());
+    assertTrue(0 == bean.getIntValue2());
+    assertTrue(0L == bean.getLongValue2());
+    assertTrue(0.0 == bean.getDoubleValue2());
 
-    Assert.assertEquals("123.0123456789", bean.getDecimalValue1().toString());
-    Assert.assertTrue(bean.getDateTime1().getYear() == 2011);
-    Assert.assertTrue(bean.getLocalDate1().getYear() == 1111);
+    assertEquals("123.0123456789", bean.getDecimalValue1().toString());
+    assertTrue(bean.getDateTime1().getYear() == 2011);
+    assertTrue(bean.getLocalDate1().getYear() == 1111);
   }
 }

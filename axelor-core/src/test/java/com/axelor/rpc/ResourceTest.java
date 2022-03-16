@@ -17,6 +17,12 @@
  */
 package com.axelor.rpc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.db.JPA;
 import com.axelor.test.db.Address;
 import com.axelor.test.db.Circle;
@@ -30,8 +36,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ResourceTest extends RpcTest {
 
@@ -44,9 +49,9 @@ public class ResourceTest extends RpcTest {
 
     Response res = resource.fields();
 
-    Assert.assertNotNull(res);
-    Assert.assertNotNull(res.getData());
-    Assert.assertTrue(res.getData() instanceof Map);
+    assertNotNull(res);
+    assertNotNull(res.getData());
+    assertTrue(res.getData() instanceof Map);
   }
 
   @Test
@@ -55,9 +60,9 @@ public class ResourceTest extends RpcTest {
     Request req = fromJson("find3.json", Request.class);
     Response res = resource.search(req);
 
-    Assert.assertNotNull(res);
-    Assert.assertNotNull(res.getData());
-    Assert.assertTrue(res.getData() instanceof List);
+    assertNotNull(res);
+    assertNotNull(res.getData());
+    assertTrue(res.getData() instanceof List);
   }
 
   @Test
@@ -68,23 +73,23 @@ public class ResourceTest extends RpcTest {
     Request req = fromJson("add2.json", Request.class);
     Response res = resource.save(req);
 
-    Assert.assertNotNull(res);
-    Assert.assertNotNull(res.getData());
-    Assert.assertNotNull(res.getItem(0));
-    Assert.assertTrue(res.getItem(0) instanceof Map);
-    Assert.assertNotNull(((Map) res.getItem(0)).get("id"));
+    assertNotNull(res);
+    assertNotNull(res.getData());
+    assertNotNull(res.getItem(0));
+    assertTrue(res.getItem(0) instanceof Map);
+    assertNotNull(((Map) res.getItem(0)).get("id"));
 
     Contact p = JPA.em().find(Contact.class, ((Map) res.getItem(0)).get("id"));
 
-    Assert.assertEquals(Title.class, p.getTitle().getClass());
-    Assert.assertEquals(Address.class, p.getAddresses().get(0).getClass());
-    Assert.assertEquals(Circle.class, p.getCircle(0).getClass());
-    Assert.assertEquals(LocalDate.class, p.getDateOfBirth().getClass());
+    assertEquals(Title.class, p.getTitle().getClass());
+    assertEquals(Address.class, p.getAddresses().get(0).getClass());
+    assertEquals(Circle.class, p.getCircle(0).getClass());
+    assertEquals(LocalDate.class, p.getDateOfBirth().getClass());
 
-    Assert.assertEquals("mr", p.getTitle().getCode());
-    Assert.assertEquals("France", p.getAddresses().get(0).getCountry().getName());
-    Assert.assertEquals("family", p.getCircle(0).getCode());
-    Assert.assertEquals("1977-05-01", p.getDateOfBirth().toString());
+    assertEquals("mr", p.getTitle().getCode());
+    assertEquals("France", p.getAddresses().get(0).getCountry().getName());
+    assertEquals("family", p.getCircle(0).getCode());
+    assertEquals("1977-05-01", p.getDateOfBirth().toString());
   }
 
   @Test
@@ -105,16 +110,16 @@ public class ResourceTest extends RpcTest {
     Request req = fromJson(json, Request.class);
     Response res = resource.save(req);
 
-    Assert.assertNotNull(res);
-    Assert.assertNotNull(res.getData());
-    Assert.assertNotNull(res.getItem(0));
-    Assert.assertTrue(res.getItem(0) instanceof Map);
-    Assert.assertNotNull(((Map) res.getItem(0)).get("id"));
+    assertNotNull(res);
+    assertNotNull(res.getData());
+    assertNotNull(res.getItem(0));
+    assertTrue(res.getItem(0) instanceof Map);
+    assertNotNull(((Map) res.getItem(0)).get("id"));
 
     Contact contact = JPA.em().find(Contact.class, ((Map) res.getItem(0)).get("id"));
 
-    Assert.assertEquals("jack", contact.getFirstName());
-    Assert.assertEquals("sparrow", contact.getLastName());
+    assertEquals("jack", contact.getFirstName());
+    assertEquals("sparrow", contact.getLastName());
   }
 
   @Test
@@ -123,11 +128,11 @@ public class ResourceTest extends RpcTest {
     Contact c = contacts.all().filter("firstName = ?", "James").fetchOne();
     Contact n = contacts.copy(c, true);
 
-    Assert.assertNotSame(c, n);
-    Assert.assertNotSame(c.getAddresses(), n.getAddresses());
-    Assert.assertEquals(c.getAddresses().size(), n.getAddresses().size());
+    assertNotSame(c, n);
+    assertNotSame(c.getAddresses(), n.getAddresses());
+    assertEquals(c.getAddresses().size(), n.getAddresses().size());
 
-    Assert.assertSame(c, c.getAddresses().get(0).getContact());
-    Assert.assertSame(n, n.getAddresses().get(0).getContact());
+    assertSame(c, c.getAddresses().get(0).getContact());
+    assertSame(n, n.getAddresses().get(0).getContact());
   }
 }

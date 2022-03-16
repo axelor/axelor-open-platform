@@ -17,14 +17,17 @@
  */
 package com.axelor.meta.loader;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import com.axelor.AbstractTest;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.test.db.Contact;
 import java.util.List;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestLoader extends AbstractTest {
 
@@ -44,19 +47,19 @@ public class TestLoader extends AbstractTest {
     try {
       XMLViews.fromXML(xml);
     } catch (JAXBException e) {
-      Assert.fail(e.getMessage());
+      fail(e.getMessage());
     }
   }
 
   @Test
   public void testDefault() {
     List<AbstractView> views = loader.createDefaults(Contact.class);
-    Assert.assertNotNull(views);
-    Assert.assertEquals(2, views.size());
+    assertNotNull(views);
+    assertEquals(2, views.size());
 
     for (AbstractView view : views) {
       String text = XMLViews.toXml(view, true);
-      Assert.assertNotNull(text);
+      assertNotNull(text);
     }
   }
 }

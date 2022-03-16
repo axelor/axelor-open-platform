@@ -17,22 +17,25 @@
  */
 package com.axelor.mail;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.common.ResourceUtils;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.Message.RecipientType;
 import javax.mail.Multipart;
 import javax.mail.internet.MimeMessage;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MailBuilderTest extends AbstractMailTest {
 
   private MailSender sender;
 
   @Override
-  @Before
+  @BeforeEach
   public void startServer() {
     super.startServer();
     if (sender == null) {
@@ -61,15 +64,15 @@ public class MailBuilderTest extends AbstractMailTest {
 
     MimeMessage msg = sendAndRecieve(message);
 
-    Assert.assertEquals(3, message.getRecipients(RecipientType.TO).length);
-    Assert.assertEquals(1, message.getRecipients(RecipientType.BCC).length);
+    assertEquals(3, message.getRecipients(RecipientType.TO).length);
+    assertEquals(1, message.getRecipients(RecipientType.BCC).length);
 
-    Assert.assertTrue(msg.getContent() instanceof String);
+    assertTrue(msg.getContent() instanceof String);
 
     String content = (String) msg.getContent();
 
-    Assert.assertEquals("Hello...", msg.getSubject());
-    Assert.assertEquals("Hello!!!", content.trim());
+    assertEquals("Hello...", msg.getSubject());
+    assertEquals("Hello!!!", content.trim());
   }
 
   @Test
@@ -87,16 +90,16 @@ public class MailBuilderTest extends AbstractMailTest {
 
     MimeMessage msg = sendAndRecieve(message);
 
-    Assert.assertEquals("Hello...", msg.getSubject());
-    Assert.assertTrue(msg.getContent() instanceof Multipart);
+    assertEquals("Hello...", msg.getSubject());
+    assertTrue(msg.getContent() instanceof Multipart);
 
     Multipart content = (Multipart) msg.getContent();
 
-    Assert.assertEquals(1, content.getCount());
+    assertEquals(1, content.getCount());
 
     for (int i = 0; i < content.getCount(); i++) {
       BodyPart part = content.getBodyPart(i);
-      Assert.assertTrue(part.getContent() instanceof String);
+      assertTrue(part.getContent() instanceof String);
     }
   }
 
@@ -119,16 +122,16 @@ public class MailBuilderTest extends AbstractMailTest {
 
     MimeMessage msg = sendAndRecieve(message);
 
-    Assert.assertTrue(msg.getContent() instanceof Multipart);
+    assertTrue(msg.getContent() instanceof Multipart);
 
     Multipart content = (Multipart) msg.getContent();
 
-    Assert.assertEquals(3, content.getCount());
+    assertEquals(3, content.getCount());
 
     for (int i = 1; i < content.getCount(); i++) {
       BodyPart part = content.getBodyPart(i);
-      Assert.assertNotNull(part.getFileName());
-      Assert.assertNotNull(part.getContent());
+      assertNotNull(part.getFileName());
+      assertNotNull(part.getContent());
     }
   }
 }

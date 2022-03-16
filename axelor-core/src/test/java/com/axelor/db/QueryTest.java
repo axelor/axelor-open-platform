@@ -17,6 +17,12 @@
  */
 package com.axelor.db;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.JpaTest;
 import com.axelor.test.db.Circle;
 import com.axelor.test.db.Contact;
@@ -34,15 +40,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class QueryTest extends JpaTest {
 
   @Test
   public void testCount() {
-    Assert.assertTrue(all(Circle.class).count() > 0);
-    Assert.assertTrue(all(Contact.class).count() > 0);
+    assertTrue(all(Circle.class).count() > 0);
+    assertTrue(all(Contact.class).count() > 0);
   }
 
   @Test
@@ -54,7 +59,7 @@ public class QueryTest extends JpaTest {
 
     Query<Contact> q = all(Contact.class).filter(filter, "some", "thing");
 
-    Assert.assertEquals(expected, q.toString());
+    assertEquals(expected, q.toString());
   }
 
   @Test
@@ -78,11 +83,11 @@ public class QueryTest extends JpaTest {
 
     Query<Contact> q =
         all(Contact.class).filter(filter, "FR", "MR", "John").order("-addresses[].country.name");
-    Assert.assertEquals(expected, q.toString());
+    assertEquals(expected, q.toString());
 
     List<?> result = q.fetch();
-    Assert.assertNotNull(result);
-    Assert.assertTrue(result.size() > 0);
+    assertNotNull(result);
+    assertTrue(result.size() > 0);
   }
 
   @Test
@@ -93,22 +98,21 @@ public class QueryTest extends JpaTest {
             + "OR self.firstName IS NOT NULL";
     final List<Contact> resultList = all(Contact.class).filter(filter).fetch();
     final Set<Contact> resultSet = new HashSet<>(resultList);
-    Assert.assertEquals("Results should be unique.", resultSet.size(), resultList.size());
+    assertEquals(resultSet.size(), resultList.size(), "Results should be unique.");
 
     final List<Contact> orderedResultList =
         all(Contact.class).filter(filter).order("-addresses.country.name").fetch();
     final Set<Contact> orderedResultSet = new HashSet<>(orderedResultList);
-    Assert.assertEquals(
-        "Ordered results should be unique.", orderedResultSet.size(), orderedResultList.size());
+    assertEquals(
+        orderedResultSet.size(), orderedResultList.size(), "Ordered results should be unique.");
 
-    Assert.assertEquals(
-        "Ordering should not change number of results.",
+    assertEquals(
         resultList.size(),
-        orderedResultList.size());
+        orderedResultList.size(),
+        "Ordering should not change number of results.");
 
     final long count = all(Contact.class).filter(filter).count();
-    Assert.assertEquals(
-        "Counting should be consistent with number of results.", resultList.size(), count);
+    assertEquals(resultList.size(), count, "Counting should be consistent with number of results.");
 
     @SuppressWarnings("rawtypes")
     final List<Map> selectResults =
@@ -118,10 +122,10 @@ public class QueryTest extends JpaTest {
             .select("fullName", "email")
             .fetch(0, 0);
 
-    Assert.assertEquals(
-        "Selecting fields should be consistent with number of results.",
+    assertEquals(
         resultList.size(),
-        selectResults.size());
+        selectResults.size(),
+        "Selecting fields should be consistent with number of results.");
   }
 
   @Test
@@ -129,7 +133,7 @@ public class QueryTest extends JpaTest {
     final Query<Contact> q = all(Contact.class);
     final List<?> first = q.fetch();
     final List<?> second = q.fetchStream().collect(Collectors.toList());
-    Assert.assertEquals(first.size(), second.size());
+    assertEquals(first.size(), second.size());
   }
 
   @Test
@@ -148,7 +152,7 @@ public class QueryTest extends JpaTest {
         all(Contact.class).filter("self.firstName in (:names)").bind("names", names);
     final long count = q.count();
     final long removed = q.remove();
-    Assert.assertEquals(count, removed);
+    assertEquals(count, removed);
   }
 
   @Test
@@ -156,7 +160,7 @@ public class QueryTest extends JpaTest {
   public void testBulkUpdate() {
     Query<Contact> q = all(Contact.class).filter("self.title.code = ?1", "mr");
     for (Contact c : q.fetch()) {
-      Assert.assertNull(c.getLang());
+      assertNull(c.getLang());
     }
 
     final String lang = "EN";
@@ -170,7 +174,7 @@ public class QueryTest extends JpaTest {
     getEntityManager().clear();
 
     for (Contact c : q.fetch()) {
-      Assert.assertEquals(lang, c.getLang());
+      assertEquals(lang, c.getLang());
     }
 
     // Update several fields
@@ -179,8 +183,8 @@ public class QueryTest extends JpaTest {
     getEntityManager().clear();
 
     for (Contact c : q.fetch()) {
-      Assert.assertEquals(lang, c.getLang());
-      Assert.assertEquals(food, c.getFood());
+      assertEquals(lang, c.getLang());
+      assertEquals(food, c.getFood());
     }
 
     q.update("self.lang", null);
@@ -189,8 +193,8 @@ public class QueryTest extends JpaTest {
     getEntityManager().clear();
 
     for (Contact c : q.fetch()) {
-      Assert.assertEquals(null, c.getLang());
-      Assert.assertEquals(null, c.getFood());
+      assertEquals(null, c.getLang());
+      assertEquals(null, c.getFood());
     }
   }
 
@@ -210,7 +214,7 @@ public class QueryTest extends JpaTest {
                   for (int i = 0; i < meta.getColumnCount(); i++) {
                     item.put(meta.getColumnName(i + 1), rs.getObject(i + 1));
                   }
-                  Assert.assertFalse(item.isEmpty());
+                  assertFalse(item.isEmpty());
                 }
               }
             }

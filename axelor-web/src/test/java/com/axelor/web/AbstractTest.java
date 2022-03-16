@@ -20,14 +20,14 @@ package com.axelor.web;
 import com.axelor.test.WebServer;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 
 public abstract class AbstractTest {
 
   private static WebServer server;
 
-  @BeforeClass
+  @BeforeAll
   public static void setUp() {
     if (server == null) {
       server = WebServer.create(new WebTestModule());
@@ -35,7 +35,7 @@ public abstract class AbstractTest {
     server.start();
   }
 
-  @AfterClass
+  @AfterAll
   public static void tearDown() {
     if (server != null) {
       server.stop();

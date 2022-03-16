@@ -17,6 +17,9 @@
  */
 package com.axelor.meta;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import com.axelor.AbstractTest;
 import com.axelor.JpaTestModule;
 import com.axelor.meta.db.MetaSchedule;
@@ -26,9 +29,8 @@ import com.axelor.quartz.SchedulerModule;
 import com.axelor.test.GuiceModules;
 import com.google.inject.persist.Transactional;
 import javax.inject.Inject;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -53,7 +55,7 @@ public class TestScheduler extends AbstractTest {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-      Assert.assertNotNull(scheduler);
+      assertNotNull(scheduler);
       jobCounter += 1;
     }
   }
@@ -64,7 +66,7 @@ public class TestScheduler extends AbstractTest {
 
   private static int jobCounter = 0;
 
-  @Before
+  @BeforeEach
   @Transactional
   public void setUp() {
     if (schedules.all().count() > 0) {
@@ -86,13 +88,13 @@ public class TestScheduler extends AbstractTest {
     runner.start();
     Thread.sleep(3000);
     current = jobCounter;
-    Assert.assertEquals(4, current);
+    assertEquals(4, current);
 
     jobCounter = 0;
     runner.restart();
     Thread.sleep(5000);
     current = jobCounter;
-    Assert.assertEquals(6, current);
+    assertEquals(6, current);
 
     runner.stop();
   }

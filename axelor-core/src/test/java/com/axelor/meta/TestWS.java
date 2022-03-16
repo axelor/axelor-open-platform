@@ -17,6 +17,9 @@
  */
 package com.axelor.meta;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
@@ -40,11 +43,10 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-@Ignore
+@Disabled
 public class TestWS extends MetaTest {
 
   @Inject private ActionExecutor executor;
@@ -68,8 +70,8 @@ public class TestWS extends MetaTest {
     ObjectViews views = this.unmarshal("com/axelor/meta/WSTest.xml", ObjectViews.class);
     List<Action> actions = views.getActions();
 
-    Assert.assertNotNull(actions);
-    Assert.assertEquals(4, actions.size());
+    assertNotNull(actions);
+    assertEquals(4, actions.size());
 
     MetaStore.resister(views);
 
@@ -148,10 +150,10 @@ public class TestWS extends MetaTest {
         new StringReader("<%__fmt__.debug('Person food : {}', person.food)%>${person.food}");
 
     String text = actionHandler.template(engine, template);
-    Assert.assertEquals("pizza", text);
+    assertEquals("pizza", text);
 
     template = new StringReader("${ person.food | text}");
     text = actionHandler.template(engine, template);
-    Assert.assertEquals("Pizza", text);
+    assertEquals("Pizza", text);
   }
 }

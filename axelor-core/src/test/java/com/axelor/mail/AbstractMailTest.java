@@ -17,15 +17,14 @@
  */
 package com.axelor.mail;
 
-import com.icegreen.greenmail.junit.GreenMailRule;
 import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.DummySSLSocketFactory;
+import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import java.security.Security;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 public abstract class AbstractMailTest {
 
@@ -38,7 +37,7 @@ public abstract class AbstractMailTest {
   protected static final String USER_NAME = "test";
   protected static final String USER_PASS = "test";
 
-  @Rule public final GreenMailRule server = new GreenMailRule(ServerSetupTest.SMTP_POP3_IMAP);
+  public final GreenMail server = new GreenMail(ServerSetupTest.SMTP_POP3_IMAP);
 
   protected final SmtpAccount SMTP_ACCOUNT =
       new SmtpAccount(SERVER_HOST, SMTP_PORT, USER_NAME, USER_PASS);
@@ -49,7 +48,7 @@ public abstract class AbstractMailTest {
 
   protected GreenMailUser user;
 
-  @Before
+  @BeforeEach
   public void startServer() {
     Security.setProperty("ssl.SocketFactory.provider", DummySSLSocketFactory.class.getName());
     ServerSetup.SMTP.setServerStartupTimeout(5000);
@@ -59,7 +58,7 @@ public abstract class AbstractMailTest {
     server.start();
   }
 
-  @After
+  @AfterEach
   public void stopServer() {
     server.stop();
   }

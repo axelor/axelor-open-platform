@@ -17,6 +17,13 @@
  */
 package com.axelor.script;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.repo.MetaJsonRecordRepository;
@@ -29,38 +36,37 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.EntityManager;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestJsonContext extends ScriptTest {
 
   private void testCustomFields(Context context, String json) throws Exception {
     final ScriptHelper engine = new GroovyScriptHelper(context);
 
-    Assert.assertEquals(json, context.asType(Contact.class).getAttrs());
-    Assert.assertTrue(engine.eval("$attrs") instanceof JsonContext);
+    assertEquals(json, context.asType(Contact.class).getAttrs());
+    assertTrue(engine.eval("$attrs") instanceof JsonContext);
 
-    Assert.assertTrue(engine.eval("$attrs.guardian") instanceof Contact);
-    Assert.assertTrue(engine.eval("$attrs.guardian.fullName") instanceof String);
+    assertTrue(engine.eval("$attrs.guardian") instanceof Contact);
+    assertTrue(engine.eval("$attrs.guardian.fullName") instanceof String);
 
-    Assert.assertEquals("Some NAME", engine.eval("$attrs.name = 'Some NAME'"));
-    Assert.assertEquals(context.get("attrs"), context.asType(Contact.class).getAttrs());
-    Assert.assertNotEquals(json, context.asType(Contact.class).getAttrs());
-    Assert.assertTrue(context.asType(Contact.class).getAttrs().contains("Some NAME"));
+    assertEquals("Some NAME", engine.eval("$attrs.name = 'Some NAME'"));
+    assertEquals(context.get("attrs"), context.asType(Contact.class).getAttrs());
+    assertNotEquals(json, context.asType(Contact.class).getAttrs());
+    assertTrue(context.asType(Contact.class).getAttrs().contains("Some NAME"));
 
-    Assert.assertFalse(context.asType(Contact.class).getAttrs().contains("date"));
-    Assert.assertNotNull(engine.eval("$attrs.birthDate = __time__"));
-    Assert.assertTrue(context.asType(Contact.class).getAttrs().contains("birthDate"));
+    assertFalse(context.asType(Contact.class).getAttrs().contains("date"));
+    assertNotNull(engine.eval("$attrs.birthDate = __time__"));
+    assertTrue(context.asType(Contact.class).getAttrs().contains("birthDate"));
 
     context.put("guardian", null);
-    Assert.assertFalse(context.asType(Contact.class).getAttrs().contains("guardian"));
+    assertFalse(context.asType(Contact.class).getAttrs().contains("guardian"));
 
     context.put("guardian", all(Contact.class).fetchOne());
-    Assert.assertTrue(context.asType(Contact.class).getAttrs().contains("guardian"));
+    assertTrue(context.asType(Contact.class).getAttrs().contains("guardian"));
 
     try {
       context.put("guardian", new Contact());
-      Assert.fail();
+      fail();
     } catch (IllegalArgumentException e) {
     }
   }
@@ -111,25 +117,25 @@ public class TestJsonContext extends ScriptTest {
 
     final MetaJsonRecord hello = $json.save(helloCtx);
 
-    Assert.assertNotNull(hello.getAttrs());
-    Assert.assertNotNull(world.getAttrs());
-    Assert.assertEquals("Hello!!!", hello.getName());
-    Assert.assertEquals("World!!!", world.getName());
+    assertNotNull(hello.getAttrs());
+    assertNotNull(world.getAttrs());
+    assertEquals("Hello!!!", hello.getName());
+    assertEquals("World!!!", world.getName());
 
-    Assert.assertTrue(hello.getAttrs().contains("date"));
-    Assert.assertTrue(hello.getAttrs().contains("world"));
-    Assert.assertTrue(hello.getAttrs().contains("World!!!"));
-    Assert.assertTrue(world.getAttrs().contains("1000.25"));
+    assertTrue(hello.getAttrs().contains("date"));
+    assertTrue(hello.getAttrs().contains("world"));
+    assertTrue(hello.getAttrs().contains("World!!!"));
+    assertTrue(world.getAttrs().contains("1000.25"));
 
     final Context ctx = $json.create(hello);
-    Assert.assertEquals("Hello!!!", ctx.get("name"));
-    Assert.assertTrue(ctx.get("world") instanceof Map);
+    assertEquals("Hello!!!", ctx.get("name"));
+    assertTrue(ctx.get("world") instanceof Map);
 
     final ScriptHelper sh = new NashornScriptHelper(ctx);
     final Object name = sh.eval("name");
-    Assert.assertEquals("Hello!!!", name);
-    Assert.assertNotNull(sh.eval("contact"));
-    Assert.assertTrue(sh.eval("world") instanceof MetaJsonRecord);
-    Assert.assertTrue(sh.eval("world.price") instanceof BigDecimal);
+    assertEquals("Hello!!!", name);
+    assertNotNull(sh.eval("contact"));
+    assertTrue(sh.eval("world") instanceof MetaJsonRecord);
+    assertTrue(sh.eval("world.price") instanceof BigDecimal);
   }
 }

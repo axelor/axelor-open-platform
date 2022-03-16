@@ -17,16 +17,16 @@
  */
 package com.axelor.text;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.common.ResourceUtils;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class GroovyTemplateTest extends TemplateScriptTest {
 
@@ -41,7 +41,7 @@ public class GroovyTemplateTest extends TemplateScriptTest {
     Template template = templates.fromText(TEMPLATE_SIMPLE);
 
     String output = template.make(vars).render();
-    Assert.assertEquals(OUTPUT_SIMPLE, output);
+    assertEquals(OUTPUT_SIMPLE, output);
   }
 
   private static final String SPECIAL_TEMPLATE_SIMPLE =
@@ -56,7 +56,7 @@ public class GroovyTemplateTest extends TemplateScriptTest {
     Template template = templates.fromText(SPECIAL_TEMPLATE_SIMPLE);
 
     String output = template.make(vars).render();
-    Assert.assertEquals(SPECIAL_OUTPUT_SIMPLE, output);
+    assertEquals(SPECIAL_OUTPUT_SIMPLE, output);
   }
 
   @Test

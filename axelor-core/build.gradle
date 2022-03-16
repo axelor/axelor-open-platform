@@ -68,3 +68,9 @@ dependencies {
   testImplementation libs.greenmail
   testImplementation libs.apache_ds
 }
+
+configurations {
+  // Remove Junit4, only keep Junit5
+  testImplementation.exclude group: 'junit', module: 'junit'
+  testImplementation.exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+}

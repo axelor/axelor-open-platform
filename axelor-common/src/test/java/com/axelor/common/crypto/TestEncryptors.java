@@ -17,10 +17,15 @@
  */
 package com.axelor.common.crypto;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.security.SecureRandom;
 import java.util.Arrays;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestEncryptors {
 
@@ -39,15 +44,15 @@ public class TestEncryptors {
     byte[] encrypted = encryptor.encrypt(value);
     byte[] decrypted = encryptor.decrypt(encrypted);
 
-    Assert.assertNotNull(encrypted);
-    Assert.assertFalse(Arrays.equals(encrypted, value));
-    Assert.assertTrue(Arrays.equals(decrypted, value));
+    assertNotNull(encrypted);
+    assertFalse(Arrays.equals(encrypted, value));
+    assertTrue(Arrays.equals(decrypted, value));
 
     // make sure to have special prefix
     byte[] prefix = new byte[BytesEncryptor.PREFIX_BYTES.length];
     System.arraycopy(encrypted, 0, prefix, 0, prefix.length);
 
-    Assert.assertTrue(Arrays.equals(BytesEncryptor.PREFIX_BYTES, prefix));
+    assertTrue(Arrays.equals(BytesEncryptor.PREFIX_BYTES, prefix));
   }
 
   private void testStringEncryptor(StringEncryptor encryptor) {
@@ -57,9 +62,9 @@ public class TestEncryptors {
     String encrypted = encryptor.encrypt(value);
     String decrypted = encryptor.decrypt(encrypted);
 
-    Assert.assertNotNull(encrypted);
-    Assert.assertNotEquals(encrypted, value);
-    Assert.assertEquals(decrypted, value);
+    assertNotNull(encrypted);
+    assertNotEquals(encrypted, value);
+    assertEquals(decrypted, value);
   }
 
   @Test

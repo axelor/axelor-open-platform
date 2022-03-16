@@ -17,34 +17,36 @@
  */
 package com.axelor.common;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import org.junit.jupiter.api.Test;
 
 public class TestHtmlUtils {
 
   @Test
   public void testEscapeAttribute() {
-    Assert.assertNull(HtmlUtils.escapeAttribute(null));
-    Assert.assertEquals("", HtmlUtils.escapeAttribute(""));
-    Assert.assertEquals(" ", HtmlUtils.escapeAttribute(" "));
-    Assert.assertEquals("&gt;", HtmlUtils.escapeAttribute(">"));
-    Assert.assertEquals("&lt;", HtmlUtils.escapeAttribute("<"));
+    assertNull(HtmlUtils.escapeAttribute(null));
+    assertEquals("", HtmlUtils.escapeAttribute(""));
+    assertEquals(" ", HtmlUtils.escapeAttribute(" "));
+    assertEquals("&gt;", HtmlUtils.escapeAttribute(">"));
+    assertEquals("&lt;", HtmlUtils.escapeAttribute("<"));
 
-    Assert.assertEquals(
+    assertEquals(
         "ho&#39; : &quot;a nice quote&quot;", HtmlUtils.escapeAttribute("ho' : \"a nice quote\""));
-    Assert.assertEquals("&lt;script&gt;", HtmlUtils.escapeAttribute("<script>"));
+    assertEquals("&lt;script&gt;", HtmlUtils.escapeAttribute("<script>"));
   }
 
   @Test
   public void testEscape() {
-    Assert.assertNull(HtmlUtils.escape(null));
-    Assert.assertEquals("", HtmlUtils.escapeAttribute(""));
-    Assert.assertEquals(" ", HtmlUtils.escapeAttribute(" "));
-    Assert.assertEquals("&gt;", HtmlUtils.escape(">"));
-    Assert.assertEquals("&lt;", HtmlUtils.escape("<"));
+    assertNull(HtmlUtils.escape(null));
+    assertEquals("", HtmlUtils.escapeAttribute(""));
+    assertEquals(" ", HtmlUtils.escapeAttribute(" "));
+    assertEquals("&gt;", HtmlUtils.escape(">"));
+    assertEquals("&lt;", HtmlUtils.escape("<"));
 
-    Assert.assertEquals(
+    assertEquals(
         "ho&#39; : &quot;a nice quote&quot;", HtmlUtils.escapeAttribute("ho' : \"a nice quote\""));
-    Assert.assertEquals("&lt;script&gt;", HtmlUtils.escape("<script>"));
+    assertEquals("&lt;script&gt;", HtmlUtils.escape("<script>"));
   }
 }

@@ -17,9 +17,9 @@
  */
 package com.axelor.web;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ResourceTest extends AbstractTest {
 

@@ -17,6 +17,9 @@
  */
 package com.axelor.text;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaJsonRecord;
 import com.axelor.meta.db.repo.MetaJsonRecordRepository;
@@ -27,8 +30,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class STTemplateTest extends TemplateScriptTest {
 
@@ -42,7 +44,7 @@ public class STTemplateTest extends TemplateScriptTest {
     Template template = templates.fromText(TEMPLATE_SIMPLE);
 
     String text = template.make(vars).render();
-    Assert.assertEquals(OUTPUT_SIMPLE, text);
+    assertEquals(OUTPUT_SIMPLE, text);
   }
 
   private static final String TEMPLATE_COMPLEX =
@@ -105,7 +107,7 @@ public class STTemplateTest extends TemplateScriptTest {
     vars.put("x", context);
 
     String output = tmpl.make(vars).render();
-    Assert.assertEquals(OUTPUT_COMPLEX, output);
+    assertEquals(OUTPUT_COMPLEX, output);
   }
 
   @Test
@@ -119,7 +121,7 @@ public class STTemplateTest extends TemplateScriptTest {
 
     // handling `< favColor >` will not be formatted. Should use `attrs` prefix
     // else can use `selection` formatter
-    Assert.assertEquals("Red, red, Red, Black", output);
+    assertEquals("Red, red, Red, Black", output);
   }
 
   @Test
@@ -137,7 +139,7 @@ public class STTemplateTest extends TemplateScriptTest {
             .make(entity)
             .render();
 
-    Assert.assertEquals("Red, Red, Black", output);
+    assertEquals("Red, Red, Black", output);
   }
 
   @Test
@@ -154,7 +156,7 @@ public class STTemplateTest extends TemplateScriptTest {
 
     // handling `< favColor >` will not be formatted. Should use `attrs` prefix
     // else can use `selection` formatter
-    Assert.assertEquals("Red, red, Red, Black", output);
+    assertEquals("Red, red, Red, Black", output);
   }
 
   @Test
@@ -168,7 +170,7 @@ public class STTemplateTest extends TemplateScriptTest {
             .make(values)
             .render();
 
-    Assert.assertEquals("Red, Red, Black", output);
+    assertEquals("Red, Red, Black", output);
   }
 
   @Test
@@ -184,7 +186,7 @@ public class STTemplateTest extends TemplateScriptTest {
             .make(values)
             .render();
 
-    Assert.assertEquals("2020-05-22, 1, Mr. Mark Ram, true, 1000.20, 29/04/2021 07:57:00", output);
+    assertEquals("2020-05-22, 1, Mr. Mark Ram, true, 1000.20, 29/04/2021 07:57:00", output);
   }
 
   private static final String TEMPLATE_JSON =
@@ -239,9 +241,9 @@ public class STTemplateTest extends TemplateScriptTest {
 
     String output = tmpl.make(vars).render();
 
-    Assert.assertTrue(output.contains("Name: Hello!!!"));
-    Assert.assertTrue(output.contains("Contact Type: Customer"));
-    Assert.assertTrue(output.contains("World Name: World!!!"));
-    Assert.assertTrue(output.contains("World Price: 1000.25"));
+    assertTrue(output.contains("Name: Hello!!!"));
+    assertTrue(output.contains("Contact Type: Customer"));
+    assertTrue(output.contains("World Name: World!!!"));
+    assertTrue(output.contains("World Price: 1000.25"));
   }
 }

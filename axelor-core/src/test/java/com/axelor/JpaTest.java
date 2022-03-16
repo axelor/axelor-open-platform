@@ -19,24 +19,24 @@ package com.axelor;
 
 import com.axelor.db.JpaFixture;
 import com.axelor.db.JpaSupport;
+import com.axelor.test.GuiceExtension;
 import com.axelor.test.GuiceModules;
-import com.axelor.test.GuiceRunner;
 import com.axelor.test.db.Contact;
 import com.google.inject.persist.Transactional;
 import javax.inject.Inject;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-@RunWith(GuiceRunner.class)
+@ExtendWith(GuiceExtension.class)
 @GuiceModules({JpaTestModule.class})
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public abstract class JpaTest extends JpaSupport {
 
   @Inject private JpaFixture fixture;
 
-  @Before
+  @BeforeEach
   @Transactional
   public void setUp() {
     if (all(Contact.class).count() == 0) {

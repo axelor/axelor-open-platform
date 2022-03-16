@@ -18,7 +18,7 @@
 package com.axelor.db;
 
 import com.axelor.db.internal.DBHelper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MigrationTest {
 

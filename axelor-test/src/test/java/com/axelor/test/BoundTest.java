@@ -17,7 +17,7 @@
  */
 package com.axelor.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.servlet.RequestScoped;
@@ -29,9 +29,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class BoundTest {
 
@@ -101,12 +101,12 @@ public class BoundTest {
 
   private static WebServer server = WebServer.create(new MyModule());
 
-  @BeforeClass
+  @BeforeAll
   public static void beforeClass() {
     server.start();
   }
 
-  @AfterClass
+  @AfterAll
   public static void afterClass() {
     server.stop();
   }

@@ -24,3 +24,9 @@ dependencies {
   implementation libs.eclipselink_moxy
   implementation libs.pac4j_core
 }
+
+configurations {
+  // Remove Junit4, only keep Junit5
+  testImplementation.exclude group: 'junit', module: 'junit'
+  testImplementation.exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+}

@@ -17,6 +17,10 @@
  */
 package com.axelor.db;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.AbstractTest;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -24,8 +28,7 @@ import com.axelor.db.mapper.PropertyType;
 import com.axelor.test.db.Address;
 import com.axelor.test.db.Contact;
 import java.util.Arrays;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class PropertyTest extends AbstractTest {
 
@@ -35,41 +38,41 @@ public class PropertyTest extends AbstractTest {
   public void test() {
 
     Property p = mapper.getProperty("firstName");
-    Assert.assertEquals(Contact.class, p.getEntity());
-    Assert.assertEquals("firstName", p.getName());
-    Assert.assertEquals(PropertyType.STRING, p.getType());
+    assertEquals(Contact.class, p.getEntity());
+    assertEquals("firstName", p.getName());
+    assertEquals(PropertyType.STRING, p.getType());
 
     p = mapper.getProperty("addresses");
-    Assert.assertEquals("addresses", p.getName());
-    Assert.assertEquals(PropertyType.ONE_TO_MANY, p.getType());
-    Assert.assertEquals("contact", p.getMappedBy());
-    Assert.assertEquals(Address.class, p.getTarget());
+    assertEquals("addresses", p.getName());
+    assertEquals(PropertyType.ONE_TO_MANY, p.getType());
+    assertEquals("contact", p.getMappedBy());
+    assertEquals(Address.class, p.getTarget());
 
-    Assert.assertTrue(mapper.getProperties().length > 0);
+    assertTrue(mapper.getProperties().length > 0);
 
     // virtual column
     p = mapper.getProperty("fullName");
-    Assert.assertEquals(Contact.class, p.getEntity());
-    Assert.assertEquals("fullName", p.getName());
-    Assert.assertEquals(PropertyType.STRING, p.getType());
+    assertEquals(Contact.class, p.getEntity());
+    assertEquals("fullName", p.getName());
+    assertEquals(PropertyType.STRING, p.getType());
 
     // virtual column dependencies
-    Assert.assertNotNull(mapper.getComputeDependencies(p));
-    Assert.assertTrue(
+    assertNotNull(mapper.getComputeDependencies(p));
+    assertTrue(
         mapper
             .getComputeDependencies(p)
             .containsAll(Arrays.asList("firstName", "lastName", "title")));
 
     // binary column
     p = mapper.getProperty("image");
-    Assert.assertEquals(Contact.class, p.getEntity());
-    Assert.assertEquals("image", p.getName());
-    Assert.assertEquals(PropertyType.BINARY, p.getType());
+    assertEquals(Contact.class, p.getEntity());
+    assertEquals("image", p.getName());
+    assertEquals(PropertyType.BINARY, p.getType());
 
     // multiline text
     p = mapper.getProperty("notes");
-    Assert.assertEquals(Contact.class, p.getEntity());
-    Assert.assertEquals("notes", p.getName());
-    Assert.assertEquals(PropertyType.TEXT, p.getType());
+    assertEquals(Contact.class, p.getEntity());
+    assertEquals("notes", p.getName());
+    assertEquals(PropertyType.TEXT, p.getType());
   }
 }

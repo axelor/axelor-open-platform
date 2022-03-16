@@ -17,10 +17,15 @@
  */
 package com.axelor.common;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.File;
 import java.io.IOException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestFileUtils {
 
@@ -28,10 +33,10 @@ public class TestFileUtils {
   public void testGetFile() {
 
     File file = FileUtils.getFile("file.text");
-    Assert.assertEquals("file.text", file.getPath());
+    assertEquals("file.text", file.getPath());
 
     file = FileUtils.getFile("my", "dir", "file.text");
-    Assert.assertEquals("my/dir/file.text".replace("/", File.separator), file.getPath());
+    assertEquals("my/dir/file.text".replace("/", File.separator), file.getPath());
   }
 
   @Test
@@ -43,19 +48,19 @@ public class TestFileUtils {
     try {
       FileUtils.copyDirectory(source, target);
     } catch (IOException e) {
-      Assert.fail();
+      fail();
     }
 
-    Assert.assertTrue(target.exists() && target.isDirectory());
-    Assert.assertNotNull(target.listFiles());
-    Assert.assertTrue(target.listFiles().length > 0);
+    assertTrue(target.exists() && target.isDirectory());
+    assertNotNull(target.listFiles());
+    assertTrue(target.listFiles().length > 0);
 
     try {
       FileUtils.deleteDirectory(target);
     } catch (IOException e) {
-      Assert.fail();
+      fail();
     }
 
-    Assert.assertFalse(target.exists());
+    assertFalse(target.exists());
   }
 }

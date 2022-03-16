@@ -18,7 +18,7 @@
 package com.axelor.common.foo;
 
 import com.axelor.common.bar.MyBase;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
-@Ignore
+@Disabled
 public abstract class MyClass2 extends MyBase {}

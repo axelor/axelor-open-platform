@@ -17,6 +17,10 @@
  */
 package com.axelor.mail;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.common.ResourceUtils;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,8 +33,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MailSenderTest extends AbstractMailTest {
 
@@ -100,55 +103,55 @@ public class MailSenderTest extends AbstractMailTest {
 
     send(SMTP_ACCOUNT, sentOn);
 
-    Assert.assertNotNull(server.getReceivedMessages());
-    Assert.assertTrue(server.getReceivedMessages().length > 0);
+    assertNotNull(server.getReceivedMessages());
+    assertTrue(server.getReceivedMessages().length > 0);
 
     final MimeMessage m1 = server.getReceivedMessages()[0];
 
-    Assert.assertNotNull(m1);
-    Assert.assertEquals("Hello...", m1.getSubject());
-    Assert.assertTrue(sentOn.compareTo(m1.getSentDate()) >= 0);
-    Assert.assertTrue(m1.getContent() instanceof MimeMultipart);
+    assertNotNull(m1);
+    assertEquals("Hello...", m1.getSubject());
+    assertTrue(sentOn.compareTo(m1.getSentDate()) >= 0);
+    assertTrue(m1.getContent() instanceof MimeMultipart);
 
     final MimeMultipart parts = (MimeMultipart) m1.getContent();
 
-    Assert.assertEquals(2, parts.getCount());
+    assertEquals(2, parts.getCount());
 
     // test multipart/related
     final MimeBodyPart part1 = (MimeBodyPart) parts.getBodyPart(0);
-    Assert.assertTrue(part1.getContentType().contains("multipart/related"));
-    Assert.assertTrue(part1.getContent() instanceof MimeMultipart);
+    assertTrue(part1.getContentType().contains("multipart/related"));
+    assertTrue(part1.getContent() instanceof MimeMultipart);
 
     final MimeMultipart related = (MimeMultipart) part1.getContent();
 
-    Assert.assertEquals(3, related.getCount());
-    Assert.assertTrue(related.getBodyPart(0).getContent() instanceof MimeMultipart);
+    assertEquals(3, related.getCount());
+    assertTrue(related.getBodyPart(0).getContent() instanceof MimeMultipart);
 
     final MimeMultipart alternative = (MimeMultipart) related.getBodyPart(0).getContent();
-    Assert.assertEquals(3, related.getCount());
+    assertEquals(3, related.getCount());
 
     final MimeBodyPart textPart = (MimeBodyPart) alternative.getBodyPart(0);
     final MimeBodyPart htmlPart = (MimeBodyPart) alternative.getBodyPart(1);
 
-    Assert.assertTrue(textPart.getContent() instanceof String);
-    Assert.assertTrue(htmlPart.getContent() instanceof String);
+    assertTrue(textPart.getContent() instanceof String);
+    assertTrue(htmlPart.getContent() instanceof String);
 
     final String text = (String) textPart.getContent();
     final String html = (String) htmlPart.getContent();
 
-    Assert.assertEquals(TEXT.trim().replace("\n", "\r\n"), text);
-    Assert.assertTrue(html.contains("<strong>Hello world...</strong>"));
-    Assert.assertTrue(html.contains("src=\"cid:image"));
+    assertEquals(TEXT.trim().replace("\n", "\r\n"), text);
+    assertTrue(html.contains("<strong>Hello world...</strong>"));
+    assertTrue(html.contains("src=\"cid:image"));
 
     // test inline attachment
     final MimeBodyPart inline = (MimeBodyPart) related.getBodyPart(1);
-    Assert.assertEquals("test-image.png", inline.getFileName());
-    Assert.assertTrue(inline.getContentType().contains("image/png"));
-    Assert.assertTrue(inline.getDisposition().contains("inline"));
+    assertEquals("test-image.png", inline.getFileName());
+    assertTrue(inline.getContentType().contains("image/png"));
+    assertTrue(inline.getDisposition().contains("inline"));
 
     // test attachment
     final MimeBodyPart part2 = (MimeBodyPart) parts.getBodyPart(1);
-    Assert.assertEquals("text.txt", part2.getFileName());
-    Assert.assertEquals("Hello...", part2.getContent());
+    assertEquals("text.txt", part2.getFileName());
+    assertEquals("Hello...", part2.getContent());
   }
 }

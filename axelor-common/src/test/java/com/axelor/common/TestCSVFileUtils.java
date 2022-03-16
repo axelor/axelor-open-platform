@@ -17,6 +17,9 @@
  */
 package com.axelor.common;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import com.axelor.common.csv.CSVFile;
 import java.io.File;
 import java.io.IOException;
@@ -25,8 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestCSVFileUtils {
 
@@ -34,9 +36,9 @@ public class TestCSVFileUtils {
   public void testReadCsv() throws IOException {
     CSVParser parser = parse("grades.csv");
 
-    Assert.assertEquals(9, parser.getHeaderNames().size());
-    Assert.assertEquals("Lastname", parser.getHeaderNames().get(0));
-    Assert.assertEquals(16, parser.getRecords().size());
+    assertEquals(9, parser.getHeaderNames().size());
+    assertEquals("Lastname", parser.getHeaderNames().get(0));
+    assertEquals(16, parser.getRecords().size());
   }
 
   @Test
@@ -45,7 +47,7 @@ public class TestCSVFileUtils {
 
     // Without handle files that start with a Byte Order Mark (BOM), we would have ["Lastname"] as
     // first header name instead of [Lastname]
-    Assert.assertEquals("Lastname", bomParser.getHeaderNames().get(0));
+    assertEquals("Lastname", bomParser.getHeaderNames().get(0));
 
     // Check if records are strictly identical to file without BOM
     CSVParser parser = parse("grades.csv");
@@ -56,7 +58,7 @@ public class TestCSVFileUtils {
     for (int i = 0; i < bomRecords.size(); i++) {
       for (int j = 0; j < bomRecords.get(i).size(); j++) {
         if (!Objects.equals(bomRecords.get(i).get(j), records.get(i).get(j))) {
-          Assert.fail("Records are not same");
+          fail("Records are not same");
         }
       }
     }
@@ -66,7 +68,7 @@ public class TestCSVFileUtils {
 
     for (String key : bomHeaders.keySet()) {
       if (!Objects.equals(headers.get(key), bomHeaders.get(key))) {
-        Assert.fail("Headers are not same");
+        fail("Headers are not same");
       }
     }
   }

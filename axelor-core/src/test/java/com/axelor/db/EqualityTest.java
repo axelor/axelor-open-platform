@@ -17,11 +17,11 @@
  */
 package com.axelor.db;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.JpaTest;
 import com.axelor.test.db.Address;
@@ -36,7 +36,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import javax.persistence.EntityManager;
 import org.hibernate.Session;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test entity equality
@@ -56,10 +56,10 @@ public class EqualityTest extends JpaTest {
       Model entity1 = modelClass.getDeclaredConstructor().newInstance();
       Model entity2 = modelClass.getDeclaredConstructor().newInstance();
       assertNotEquals(
-          String.format(
-              "Two new empty instances of %s should not be equal.", modelClass.getSimpleName()),
           entity1,
-          entity2);
+          entity2,
+          String.format(
+              "Two new empty instances of %s should not be equal.", modelClass.getSimpleName()));
     }
   }
 
@@ -72,24 +72,24 @@ public class EqualityTest extends JpaTest {
       entities.add(entity1);
       entities.add(entity2);
       assertTrue(
-          String.format("Set should contain added instance of %s.", modelClass.getSimpleName()),
-          entities.contains(entity1));
+          entities.contains(entity1),
+          String.format("Set should contain added instance of %s.", modelClass.getSimpleName()));
       assertTrue(
-          String.format("Set should contain added instance of %s.", modelClass.getSimpleName()),
-          entities.contains(entity2));
+          entities.contains(entity2),
+          String.format("Set should contain added instance of %s.", modelClass.getSimpleName()));
       entities.remove(entity1);
       assertFalse(
+          entities.contains(entity1),
           String.format(
-              "Set should not contain removed instance of %s.", modelClass.getSimpleName()),
-          entities.contains(entity1));
+              "Set should not contain removed instance of %s.", modelClass.getSimpleName()));
       assertTrue(
-          String.format("Set should contain added instance of %s.", modelClass.getSimpleName()),
-          entities.contains(entity2));
+          entities.contains(entity2),
+          String.format("Set should contain added instance of %s.", modelClass.getSimpleName()));
       entities.remove(entity2);
       assertFalse(
+          entities.contains(entity2),
           String.format(
-              "Set should not contain removed instance of %s.", modelClass.getSimpleName()),
-          entities.contains(entity2));
+              "Set should not contain removed instance of %s.", modelClass.getSimpleName()));
     }
   }
 
@@ -102,32 +102,32 @@ public class EqualityTest extends JpaTest {
       entities.put(entity1, entity1);
       entities.put(entity2, entity2);
       assertSame(
-          String.format(
-              "Should retrieve same instance of %s from map.", modelClass.getSimpleName()),
           entity1,
-          entities.get(entity1));
-      assertSame(
+          entities.get(entity1),
           String.format(
-              "Should retrieve same instance of %s from map.", modelClass.getSimpleName()),
+              "Should retrieve same instance of %s from map.", modelClass.getSimpleName()));
+      assertSame(
           entity2,
-          entities.get(entity2));
+          entities.get(entity2),
+          String.format(
+              "Should retrieve same instance of %s from map.", modelClass.getSimpleName()));
       entities.remove(entity1);
       assertSame(
-          String.format(
-              "Should not find removed instance of %s from map.", modelClass.getSimpleName()),
           null,
-          entities.get(entity1));
-      assertSame(
+          entities.get(entity1),
           String.format(
-              "Should retrieve same instandce of %s from map.", modelClass.getSimpleName()),
+              "Should not find removed instance of %s from map.", modelClass.getSimpleName()));
+      assertSame(
           entity2,
-          entities.get(entity2));
+          entities.get(entity2),
+          String.format(
+              "Should retrieve same instandce of %s from map.", modelClass.getSimpleName()));
       entities.remove(entity2);
       assertSame(
-          String.format(
-              "Should not find removed instance of %s from map.", modelClass.getSimpleName()),
           null,
-          entities.get(entity2));
+          entities.get(entity2),
+          String.format(
+              "Should not find removed instance of %s from map.", modelClass.getSimpleName()));
     }
   }
 
@@ -138,7 +138,7 @@ public class EqualityTest extends JpaTest {
     entity1.setUniqueName("John");
     entity2.setUniqueName("James");
     assertNotEquals(
-        "Entity instances having different unique fields should not be equal.", entity1, entity2);
+        entity1, entity2, "Entity instances having different unique fields should not be equal.");
   }
 
   @Test
@@ -147,11 +147,11 @@ public class EqualityTest extends JpaTest {
     Contact entity2 = new Contact();
     entity1.setUniqueName("John");
     entity2.setUniqueName("John");
-    assertEquals("Entity instances having same unique fields should be equal.", entity1, entity2);
+    assertEquals(entity1, entity2, "Entity instances having same unique fields should be equal.");
     assertEquals(
-        "Entity instances that are equal should have same hash code.",
         entity1.hashCode(),
-        entity2.hashCode());
+        entity2.hashCode(),
+        "Entity instances that are equal should have same hash code.");
   }
 
   @Test
@@ -279,7 +279,7 @@ public class EqualityTest extends JpaTest {
           getEntityManager().persist(entity);
           getEntityManager().flush();
           assertTrue(
-              "The entity is not found in the Set after it's persisted.", tuples.contains(entity));
+              tuples.contains(entity), "The entity is not found in the Set after it's persisted.");
         });
 
     assertTrue(tuples.contains(entity));
@@ -287,43 +287,43 @@ public class EqualityTest extends JpaTest {
     inTransaction(
         () -> {
           T entityProxy = getEntityManager().getReference(clazz, entity.getId());
-          assertTrue("The entity proxy is not equal with the entity.", entityProxy.equals(entity));
+          assertTrue(entityProxy.equals(entity), "The entity proxy is not equal with the entity.");
         });
 
     inTransaction(
         () -> {
           T entityProxy = getEntityManager().getReference(clazz, entity.getId());
-          assertTrue("The entity is not equal with the entity proxy.", entity.equals(entityProxy));
+          assertTrue(entity.equals(entityProxy), "The entity is not equal with the entity proxy.");
         });
 
     inTransaction(
         () -> {
           T _entity = getEntityManager().merge(entity);
           assertTrue(
-              "The entity is not found in the Set after it's merged.", tuples.contains(_entity));
+              tuples.contains(_entity), "The entity is not found in the Set after it's merged.");
         });
 
     inTransaction(
         () -> {
           getEntityManager().unwrap(Session.class).update(entity);
           assertTrue(
-              "The entity is not found in the Set after it's reattached.", tuples.contains(entity));
+              tuples.contains(entity), "The entity is not found in the Set after it's reattached.");
         });
 
     inTransaction(
         () -> {
           T _entity = getEntityManager().find(clazz, entity.getId());
           assertTrue(
-              "The entity is not found in the Set after it's loaded in a different Persistence Context.",
-              tuples.contains(_entity));
+              tuples.contains(_entity),
+              "The entity is not found in the Set after it's loaded in a different Persistence Context.");
         });
 
     inTransaction(
         () -> {
           T _entity = getEntityManager().getReference(clazz, entity.getId());
           assertTrue(
-              "The entity is not found in the Set after it's loaded as a proxy in a different Persistence Context.",
-              tuples.contains(_entity));
+              tuples.contains(_entity),
+              "The entity is not found in the Set after it's loaded as a proxy in a different Persistence Context.");
         });
 
     T deletedEntity =
@@ -335,8 +335,8 @@ public class EqualityTest extends JpaTest {
             });
 
     assertTrue(
-        "The entity is not found in the Set even after it's deleted.",
-        tuples.contains(deletedEntity));
+        tuples.contains(deletedEntity),
+        "The entity is not found in the Set even after it's deleted.");
   }
 
   protected <T> T inTransaction(Supplier<T> supplier) {

@@ -17,10 +17,11 @@
  */
 package com.axelor.meta;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.actions.Action;
@@ -36,9 +37,8 @@ import com.google.inject.persist.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class TestActions extends MetaTest {
 
@@ -48,7 +48,7 @@ public class TestActions extends MetaTest {
 
   @Inject private ActionExecutor executor;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     try {
       views = this.unmarshal("com/axelor/meta/Contact.xml", ObjectViews.class);
@@ -322,21 +322,21 @@ public class TestActions extends MetaTest {
     ActionHandler handler = createHandler(action, context);
     Object value = action.execute(handler);
 
-    Assert.assertNotNull(value);
-    Assert.assertTrue(value instanceof List);
-    Assert.assertFalse(((List<?>) value).isEmpty());
-    Assert.assertNotNull(((List<?>) value).get(0));
-    Assert.assertFalse(value.toString().contains("pending"));
+    assertNotNull(value);
+    assertTrue(value instanceof List);
+    assertFalse(((List<?>) value).isEmpty());
+    assertNotNull(((List<?>) value).get(0));
+    assertFalse(value.toString().contains("pending"));
 
     handler.getContext().put("firstName", "J");
     handler.getContext().put("email", "j.smith@gmail.com");
 
     value = action.execute(handler);
 
-    Assert.assertNotNull(value);
-    Assert.assertTrue(value instanceof List);
-    Assert.assertFalse(((List<?>) value).isEmpty());
-    Assert.assertNotNull(((List<?>) value).get(0));
-    Assert.assertTrue(value.toString().contains("pending"));
+    assertNotNull(value);
+    assertTrue(value instanceof List);
+    assertFalse(((List<?>) value).isEmpty());
+    assertNotNull(((List<?>) value).get(0));
+    assertTrue(value.toString().contains("pending"));
   }
 }

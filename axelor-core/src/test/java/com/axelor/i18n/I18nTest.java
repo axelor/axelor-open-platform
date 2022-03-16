@@ -17,21 +17,21 @@
  */
 package com.axelor.i18n;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.axelor.JpaTest;
 import com.axelor.meta.db.MetaTranslation;
 import com.axelor.meta.db.repo.MetaTranslationRepository;
 import com.google.inject.persist.Transactional;
 import javax.inject.Inject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class I18nTest extends JpaTest {
 
   @Inject private MetaTranslationRepository translations;
 
-  @Before
+  @BeforeEach
   @Transactional
   public void setup() {
     if (translations.all().count() > 0) {

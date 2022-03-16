@@ -17,14 +17,17 @@
  */
 package com.axelor.common;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.common.bar.MyBase;
 import com.axelor.common.reflections.Reflections;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("all")
 public class TestReflections implements Serializable {
@@ -37,33 +40,34 @@ public class TestReflections implements Serializable {
     // scan by sub type
     all = Reflections.findSubTypesOf(Map.class).find();
 
-    Assert.assertNotNull(all);
-    Assert.assertTrue(all.size() > 2);
+    assertNotNull(all);
+    assertTrue(all.size() > 2);
 
     // scan by annotation within a package
-    all = Reflections.findTypes().having(Ignore.class).within("com.axelor.common").find();
+    all = Reflections.findTypes().having(Disabled.class).within("com.axelor.common").find();
 
-    Assert.assertNotNull(all);
-    Assert.assertEquals(2, all.size());
+    assertNotNull(all);
+    assertEquals(2, all.size());
 
     // scan by annotation within a package
-    all = Reflections.findTypes().having(Ignore.class).within("com.axelor.common.foo").find();
+    all = Reflections.findTypes().having(Disabled.class).within("com.axelor.common.foo").find();
 
-    Assert.assertNotNull(all);
-    Assert.assertEquals(1, all.size());
+    assertNotNull(all);
+    assertEquals(1, all.size());
 
     // scan by sub type and annotation
-    all = Reflections.findSubTypesOf(MyBase.class).having(Ignore.class).within("com.axelor").find();
+    all =
+        Reflections.findSubTypesOf(MyBase.class).having(Disabled.class).within("com.axelor").find();
 
     // scan by url pattern
     all = Reflections.findSubTypesOf(Map.class).byURL(".*/axelor-common/.*").find();
 
-    Assert.assertNotNull(all);
-    Assert.assertEquals(4, all.size());
+    assertNotNull(all);
+    assertEquals(4, all.size());
   }
 
   @Test
   public void testResourceFinder() {
-    Assert.assertNotNull(Reflections.findResources().byName("(.*)\\.java").find());
+    assertNotNull(Reflections.findResources().byName("(.*)\\.java").find());
   }
 }

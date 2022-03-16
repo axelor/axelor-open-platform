@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import javax.inject.Inject;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 public abstract class ScriptTest extends JpaTest {
 
@@ -64,7 +64,7 @@ public abstract class ScriptTest extends JpaTest {
 
   private Title title;
 
-  @Before
+  @BeforeEach
   @Transactional
   public void prepare() {
     prepareCustomModels();

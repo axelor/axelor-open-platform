@@ -17,6 +17,10 @@
  */
 package com.axelor.rpc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.db.Query;
 import com.axelor.test.db.Address;
 import com.axelor.test.db.Circle;
@@ -31,8 +35,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class RequestTest extends RpcTest {
 
@@ -43,11 +46,11 @@ public class RequestTest extends RpcTest {
 
     Request req = fromJson("find.json", Request.class);
 
-    Assert.assertTrue(req.getData() instanceof Map);
-    Assert.assertTrue(req.getData().get("criteria") instanceof List);
+    assertTrue(req.getData() instanceof Map);
+    assertTrue(req.getData().get("criteria") instanceof List);
 
     for (Object o : (List<?>) req.getData().get("criteria")) {
-      Assert.assertTrue(o instanceof Map);
+      assertTrue(o instanceof Map);
     }
   }
 
@@ -60,7 +63,7 @@ public class RequestTest extends RpcTest {
     Query<Contact> q = c.createQuery(Contact.class);
 
     String actual = q.toString();
-    Assert.assertNotNull(actual);
+    assertNotNull(actual);
   }
 
   @Test
@@ -73,7 +76,7 @@ public class RequestTest extends RpcTest {
 
     String actual = q.toString();
 
-    Assert.assertEquals(
+    assertEquals(
         "SELECT self FROM Contact self WHERE (self.archived is null OR self.archived = false)",
         actual);
   }
@@ -86,7 +89,7 @@ public class RequestTest extends RpcTest {
     Criteria c = Criteria.parse(req);
     Query<Contact> q = c.createQuery(Contact.class);
 
-    Assert.assertTrue(q.count() > 0);
+    assertTrue(q.count() > 0);
   }
 
   @Test
@@ -94,13 +97,13 @@ public class RequestTest extends RpcTest {
 
     Request req = fromJson("add.json", Request.class);
 
-    Assert.assertTrue(req.getData() instanceof Map);
+    assertTrue(req.getData() instanceof Map);
 
     Map<String, Object> data = req.getData();
 
-    Assert.assertEquals("some", data.get("firstName"));
-    Assert.assertEquals("thing", data.get("lastName"));
-    Assert.assertEquals("some@thing.com", data.get("email"));
+    assertEquals("some", data.get("firstName"));
+    assertEquals("thing", data.get("lastName"));
+    assertEquals("some@thing.com", data.get("email"));
   }
 
   @Test
@@ -109,25 +112,25 @@ public class RequestTest extends RpcTest {
 
     Request req = fromJson("add2.json", Request.class);
 
-    Assert.assertTrue(req.getData() instanceof Map);
+    assertTrue(req.getData() instanceof Map);
 
     Map<String, Object> data = req.getData();
 
-    Assert.assertEquals("Jack", data.get("firstName"));
-    Assert.assertEquals("Sparrow", data.get("lastName"));
-    Assert.assertEquals("jack.sparrow@gmail.com", data.get("email"));
+    assertEquals("Jack", data.get("firstName"));
+    assertEquals("Sparrow", data.get("lastName"));
+    assertEquals("jack.sparrow@gmail.com", data.get("email"));
 
     Contact p = contacts.edit(data);
 
-    Assert.assertEquals(Title.class, p.getTitle().getClass());
-    Assert.assertEquals(Address.class, p.getAddresses().get(0).getClass());
-    Assert.assertEquals(Circle.class, p.getCircle(0).getClass());
-    Assert.assertEquals(LocalDate.class, p.getDateOfBirth().getClass());
+    assertEquals(Title.class, p.getTitle().getClass());
+    assertEquals(Address.class, p.getAddresses().get(0).getClass());
+    assertEquals(Circle.class, p.getCircle(0).getClass());
+    assertEquals(LocalDate.class, p.getDateOfBirth().getClass());
 
-    Assert.assertEquals("mr", p.getTitle().getCode());
-    Assert.assertEquals("France", p.getAddresses().get(0).getCountry().getName());
-    Assert.assertEquals("family", p.getCircle(0).getCode());
-    Assert.assertEquals("1977-05-01", p.getDateOfBirth().toString());
+    assertEquals("mr", p.getTitle().getCode());
+    assertEquals("France", p.getAddresses().get(0).getCountry().getName());
+    assertEquals("family", p.getCircle(0).getCode());
+    assertEquals("1977-05-01", p.getDateOfBirth().toString());
 
     contacts.manage(p);
   }
@@ -147,12 +150,12 @@ public class RequestTest extends RpcTest {
     String json = toJson(ImmutableMap.of("data", data));
     Request req = fromJson(json, Request.class);
 
-    Assert.assertTrue(req.getData() instanceof Map);
+    assertTrue(req.getData() instanceof Map);
 
     data = req.getData();
 
-    Assert.assertEquals("Some", data.get("firstName"));
-    Assert.assertEquals("thing", data.get("lastName"));
+    assertEquals("Some", data.get("firstName"));
+    assertEquals("thing", data.get("lastName"));
 
     Contact o = contacts.edit(data);
 
@@ -172,13 +175,13 @@ public class RequestTest extends RpcTest {
             "relatedContacts",
             ImmutableList.of(janeValues, babyValues));
     Contact john = contacts.edit(johnValues);
-    Assert.assertNotNull(
+    assertNotNull(
         String.format("Entity instance should contain field passed to JPA#edit.", john),
         john.getFirstName());
     john.getRelatedContacts().stream()
         .forEach(
             relatedContact ->
-                Assert.assertNotNull(
+                assertNotNull(
                     String.format(
                         "Child entity instance should contain field passed to JPA#edit.", john),
                     relatedContact.getFirstName()));

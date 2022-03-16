@@ -17,15 +17,15 @@
  */
 package com.axelor.test;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 @GuiceModules(InjectedTest.Module.class)
-public class InjectedTest extends GuiceTest {
+public class InjectedTest extends GuiceJunit5Test {
 
   static class Module extends AbstractModule {
 

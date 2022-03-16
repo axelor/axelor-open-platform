@@ -17,41 +17,44 @@
  */
 package com.axelor.common;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.google.common.collect.ImmutableMap;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Optional;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestObjectUtils {
 
   @Test
   public void testIsEmpty() {
-    Assert.assertTrue(ObjectUtils.isEmpty(null));
-    Assert.assertTrue(ObjectUtils.isEmpty(""));
-    Assert.assertFalse(ObjectUtils.isEmpty(" "));
-    Assert.assertTrue(ObjectUtils.isEmpty(Optional.empty()));
-    Assert.assertFalse(ObjectUtils.isEmpty(Optional.of("some")));
-    Assert.assertTrue(ObjectUtils.isEmpty(new String[] {}));
-    Assert.assertFalse(ObjectUtils.isEmpty(new String[] {"some", "value"}));
-    Assert.assertTrue(ObjectUtils.isEmpty(new HashMap<>()));
-    Assert.assertFalse(ObjectUtils.isEmpty(ImmutableMap.of("some", "value")));
-    Assert.assertTrue(ObjectUtils.isEmpty(Arrays.asList()));
-    Assert.assertFalse(ObjectUtils.isEmpty(Arrays.asList("some", "value")));
+    assertTrue(ObjectUtils.isEmpty(null));
+    assertTrue(ObjectUtils.isEmpty(""));
+    assertFalse(ObjectUtils.isEmpty(" "));
+    assertTrue(ObjectUtils.isEmpty(Optional.empty()));
+    assertFalse(ObjectUtils.isEmpty(Optional.of("some")));
+    assertTrue(ObjectUtils.isEmpty(new String[] {}));
+    assertFalse(ObjectUtils.isEmpty(new String[] {"some", "value"}));
+    assertTrue(ObjectUtils.isEmpty(new HashMap<>()));
+    assertFalse(ObjectUtils.isEmpty(ImmutableMap.of("some", "value")));
+    assertTrue(ObjectUtils.isEmpty(Arrays.asList()));
+    assertFalse(ObjectUtils.isEmpty(Arrays.asList("some", "value")));
   }
 
   @Test
   public void testGetResource() {
     URL url = ResourceUtils.getResource("test.txt");
-    Assert.assertNotNull(url);
+    assertNotNull(url);
   }
 
   @Test
   public void testGetResourceStream() {
     InputStream stream = ResourceUtils.getResourceStream("test.txt");
-    Assert.assertNotNull(stream);
+    assertNotNull(stream);
   }
 }

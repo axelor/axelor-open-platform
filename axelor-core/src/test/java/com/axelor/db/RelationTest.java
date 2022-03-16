@@ -17,6 +17,10 @@
  */
 package com.axelor.db;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import com.axelor.JpaTest;
 import com.axelor.test.db.Invoice;
 import com.axelor.test.db.Move;
@@ -28,9 +32,8 @@ import com.google.inject.persist.Transactional;
 import java.math.BigDecimal;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class RelationTest extends JpaTest {
 
@@ -38,7 +41,7 @@ public class RelationTest extends JpaTest {
 
   @Inject private MoveRepository moves;
 
-  @Before
+  @BeforeEach
   @Transactional
   public void createInvoice() {
     Invoice invoice = new Invoice();
@@ -66,11 +69,11 @@ public class RelationTest extends JpaTest {
 
     invoices.save(invoice);
 
-    Assert.assertSame(line1, invoice.getRejectMoveLine());
-    Assert.assertSame(line1, move.getMoveLines().get(0));
+    assertSame(line1, invoice.getRejectMoveLine());
+    assertSame(line1, move.getMoveLines().get(0));
 
-    Assert.assertEquals(new BigDecimal("20"), line1.getCredit());
-    Assert.assertEquals(BigDecimal.ZERO, line1.getDebit());
+    assertEquals(new BigDecimal("20"), line1.getCredit());
+    assertEquals(BigDecimal.ZERO, line1.getDebit());
 
     moves.save(move);
   }
@@ -81,11 +84,11 @@ public class RelationTest extends JpaTest {
     MoveLine line = all(MoveLine.class).fetchOne();
     Invoice invoice = all(Invoice.class).fetchOne();
 
-    Assert.assertSame(move, line.getMove());
-    Assert.assertSame(move, invoice.getMove());
-    Assert.assertSame(line, invoice.getRejectMoveLine());
+    assertSame(move, line.getMove());
+    assertSame(move, invoice.getMove());
+    assertSame(line, invoice.getRejectMoveLine());
 
-    Assert.assertSame(line, move.getMoveLines().get(0));
+    assertSame(line, move.getMoveLines().get(0));
   }
 
   @Transactional
@@ -122,7 +125,7 @@ public class RelationTest extends JpaTest {
 
     try {
       testRemoveCollection();
-      Assert.fail();
+      fail();
     } catch (PersistenceException e) {
     }
 

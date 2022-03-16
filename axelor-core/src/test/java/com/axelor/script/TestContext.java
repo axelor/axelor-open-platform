@@ -17,6 +17,11 @@
  */
 package com.axelor.script;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.inject.Beans;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.ContextEntity;
@@ -26,12 +31,11 @@ import com.axelor.test.db.repo.ContactRepository;
 import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.Assert;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
-@FixMethodOrder(MethodSorters.JVM)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class TestContext extends ScriptTest {
 
   public static final String STATIC_FIELD = "A static value...";
@@ -58,43 +62,43 @@ public class TestContext extends ScriptTest {
     final Contact proxy = context.asType(Contact.class);
     final Contact managed = getEntityManager().find(Contact.class, proxy.getId());
 
-    Assert.assertNotNull(proxy.getTitle());
-    Assert.assertEquals("Mrs. John NAME", proxy.getFullName());
+    assertNotNull(proxy.getTitle());
+    assertEquals("Mrs. John NAME", proxy.getFullName());
 
     proxy.setFirstName("Some");
-    Assert.assertEquals("Mrs. Some NAME", proxy.getFullName());
+    assertEquals("Mrs. Some NAME", proxy.getFullName());
 
     context.putAll(ImmutableMap.of("firstName", "Some1"));
-    Assert.assertEquals("Mrs. Some1 NAME", proxy.getFullName());
+    assertEquals("Mrs. Some1 NAME", proxy.getFullName());
 
-    Assert.assertEquals("Mr. John Smith", managed.getFullName());
+    assertEquals("Mr. John Smith", managed.getFullName());
 
-    Assert.assertNotNull(proxy.getAddresses());
-    Assert.assertEquals(2, proxy.getAddresses().size());
+    assertNotNull(proxy.getAddresses());
+    assertEquals(2, proxy.getAddresses().size());
 
-    Assert.assertTrue(proxy.getAddresses().get(1) instanceof ContextEntity);
-    Assert.assertTrue(proxy.getAddresses().get(1).isSelected());
+    assertTrue(proxy.getAddresses().get(1) instanceof ContextEntity);
+    assertTrue(proxy.getAddresses().get(1).isSelected());
 
-    Assert.assertTrue(context.get("parentContext") instanceof Context);
+    assertTrue(context.get("parentContext") instanceof Context);
 
-    Assert.assertEquals(managed.getEmail(), proxy.getEmail());
-    Assert.assertEquals(managed.getEmail(), context.get("email"));
+    assertEquals(managed.getEmail(), proxy.getEmail());
+    assertEquals(managed.getEmail(), context.get("email"));
 
-    Assert.assertNotNull(proxy.getCircles());
-    Assert.assertTrue(proxy.getCircles().size() > 0);
-    Assert.assertFalse(proxy.getCircle(0) instanceof ContextEntity);
+    assertNotNull(proxy.getCircles());
+    assertTrue(proxy.getCircles().size() > 0);
+    assertFalse(proxy.getCircle(0) instanceof ContextEntity);
 
-    Assert.assertTrue(proxy instanceof ContextEntity);
-    Assert.assertNotNull(((ContextEntity) proxy).getContextEntity());
-    Assert.assertNotNull(((ContextEntity) proxy).getContextMap());
+    assertTrue(proxy instanceof ContextEntity);
+    assertNotNull(((ContextEntity) proxy).getContextEntity());
+    assertNotNull(((ContextEntity) proxy).getContextMap());
   }
 
   @Test
   public void testBooleanAndIntegerFields() {
     Map<String, Object> data = new HashMap<>();
     Context context = new Context(data, TypeCheck.class);
-    Assert.assertEquals(Boolean.FALSE, context.get("boolValue"));
-    Assert.assertEquals(0, context.get("intValue"));
+    assertEquals(Boolean.FALSE, context.get("boolValue"));
+    assertEquals(0, context.get("intValue"));
   }
 
   @Test
@@ -113,15 +117,15 @@ public class TestContext extends ScriptTest {
     final Object result = helper.eval("__config__.hello.hello()");
     final Object contact = helper.eval("__config__.hello.contact()");
 
-    Assert.assertNotNull(hello);
-    Assert.assertNotNull(world);
-    Assert.assertNotNull(result);
-    Assert.assertNotNull(contact);
+    assertNotNull(hello);
+    assertNotNull(world);
+    assertNotNull(result);
+    assertNotNull(contact);
 
-    Assert.assertTrue(hello instanceof TestContext);
-    Assert.assertEquals(HELLO_MESSAGE, world);
-    Assert.assertEquals(HELLO_MESSAGE, result);
-    Assert.assertTrue(contact instanceof Contact);
+    assertTrue(hello instanceof TestContext);
+    assertEquals(HELLO_MESSAGE, world);
+    assertEquals(HELLO_MESSAGE, result);
+    assertTrue(contact instanceof Contact);
 
     final Object some = helper.eval("__config__.some");
     final Object thing = helper.eval("__config__.thing");
@@ -129,16 +133,16 @@ public class TestContext extends ScriptTest {
     final Object string = helper.eval("__config__.string");
     final Object number = helper.eval("__config__.number");
 
-    Assert.assertNotNull(some);
-    Assert.assertNotNull(thing);
-    Assert.assertNotNull(flag);
-    Assert.assertNotNull(string);
-    Assert.assertNotNull(number);
+    assertNotNull(some);
+    assertNotNull(thing);
+    assertNotNull(flag);
+    assertNotNull(string);
+    assertNotNull(number);
 
-    Assert.assertEquals(some, STATIC_FIELD);
-    Assert.assertEquals(thing, STATIC_FIELD);
-    Assert.assertEquals(flag, Boolean.TRUE);
-    Assert.assertEquals(string, "some static text value");
-    Assert.assertEquals(number, 100);
+    assertEquals(some, STATIC_FIELD);
+    assertEquals(thing, STATIC_FIELD);
+    assertEquals(flag, Boolean.TRUE);
+    assertEquals(string, "some static text value");
+    assertEquals(number, 100);
   }
 }

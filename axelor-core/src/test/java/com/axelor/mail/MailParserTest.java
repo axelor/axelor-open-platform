@@ -17,10 +17,13 @@
  */
 package com.axelor.mail;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MailParserTest {
 
@@ -38,12 +41,12 @@ public class MailParserTest {
 
     final MailParser parser = new MailParser(message).parse();
 
-    Assert.assertEquals(html, parser.getHtml());
-    Assert.assertNotNull(parser.getText());
-    Assert.assertNotNull(parser.getSummary());
+    assertEquals(html, parser.getHtml());
+    assertNotNull(parser.getText());
+    assertNotNull(parser.getSummary());
 
-    Assert.assertTrue(parser.getText().startsWith("This is a test.."));
-    Assert.assertTrue(parser.getText().endsWith("John Smith"));
-    Assert.assertTrue(parser.getSummary().equals("This is a test.."));
+    assertTrue(parser.getText().startsWith("This is a test.."));
+    assertTrue(parser.getText().endsWith("John Smith"));
+    assertTrue(parser.getSummary().equals("This is a test.."));
   }
 }

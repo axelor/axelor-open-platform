@@ -17,9 +17,9 @@
  */
 package com.axelor.meta.loader;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.common.ResourceUtils;
 import com.axelor.meta.MetaTest;
@@ -36,8 +36,7 @@ import java.net.URL;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.persistence.Query;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestViews extends MetaTest {
 
@@ -84,7 +83,7 @@ public class TestViews extends MetaTest {
     Search search = (Search) views.getViews().get(0);
 
     Title title = all(Title.class).filter("self.code = ?", "mr").fetchOne();
-    Assert.assertNotNull(title);
+    assertNotNull(title);
 
     Map<String, Object> binding = Maps.newHashMap();
     binding.put("customer", "Some");
