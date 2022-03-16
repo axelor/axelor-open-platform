@@ -17,8 +17,8 @@
  */
 package com.axelor.test;
 
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-/** Abstract class to run Junit4 tests */
-@RunWith(GuiceRunner.class)
-public abstract class GuiceTest {}
+/** Abstract class to run Junit5 tests */
+@ExtendWith(GuiceExtension.class)
+public abstract class GuiceJunit5Test {}

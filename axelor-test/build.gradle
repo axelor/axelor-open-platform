@@ -5,6 +5,7 @@ apply plugin: "java-library"
 dependencies {
 
   api libs.junit
+  api libs.junit_jupiter
 
   implementation libs.guice
   implementation libs.guice_servlet
