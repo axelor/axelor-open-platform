@@ -81,6 +81,7 @@ libs.javax_validation = "javax.validation:validation-api:2.0.1.Final"
 libs.javax_el = ["org.apache.tomcat:tomcat-jasper:${versions.tomcat}", "org.apache.tomcat:tomcat-el-api:${versions.tomcat}"]
 libs.javax_mail = "com.sun.mail:javax.mail:1.6.2"
 libs.greenmail = "com.icegreen:greenmail-junit5:1.6.7"
+libs.javax_el = "org.glassfish:jakarta.el:3.0.4"
 
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.3.4"
@@ -262,5 +263,6 @@ libs.plugin_license = "gradle.plugin.com.hierynomus.gradle.plugins:license-gradl
 // embeded tomcat
 libs.tomcat_embed = [
   "org.apache.tomcat.embed:tomcat-embed-core:${versions.tomcat_embed}",
-  "org.apache.tomcat.embed:tomcat-embed-jasper:${versions.tomcat_embed}"
+  "org.apache.tomcat.embed:tomcat-embed-jasper:${versions.tomcat_embed}",
+  libs.javax_el
 ]
