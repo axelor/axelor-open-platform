@@ -37,6 +37,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.w3c.dom.Document;
 
 /** This class provides some database helper methods (for internal use only). */
@@ -186,17 +187,17 @@ public class DBHelper {
 
   /** Run database migration scripts using flyway migration engine. */
   public static void migrate() {
-    final Flyway flyway = new Flyway();
+    FluentConfiguration flywayConfiguration = Flyway.configure();
     if (!isBlank(jndiName)) {
       try {
-        flyway.setDataSource((DataSource) InitialContext.doLookup(jndiName));
+        flywayConfiguration.dataSource((DataSource) InitialContext.doLookup(jndiName));
       } catch (NamingException e) {
         throw new FlywayException(e);
       }
     } else {
-      flyway.setDataSource(jdbcUrl, jdbcUser, jdbcPassword);
+      flywayConfiguration.dataSource(jdbcUrl, jdbcUser, jdbcPassword);
     }
-    flyway.migrate();
+    flywayConfiguration.load().migrate();
   }
 
   public static String getDataSourceName() {
