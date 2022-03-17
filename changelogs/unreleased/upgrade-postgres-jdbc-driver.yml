@@ -1,0 +1,10 @@
+---
+title: Upgrade PostgreSQL Jdbc to 42.3.3
+type: change
+description: |
+  This add support new `SCRAM-SHA-256` password encryption method which is  
+  now the default password encryption method is PostgreSQL 14.
+  
+  Jdbc also introduce a change about Timestamp rouding : 2018-06-03T23:59:59.999999999 is rounded to 
+  2018-06-04 00:00:00 (previously it was rounded to 2022-03-08 23:59:59.999). This new behavior follow psql’s suit.
+  Especially if you work with Datetime/Timestamp having `LocalTime.MAX` as time, make sure to adjust your query.
