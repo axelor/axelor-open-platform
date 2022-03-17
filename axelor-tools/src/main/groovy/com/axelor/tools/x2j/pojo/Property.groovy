@@ -291,9 +291,9 @@ class Property {
     for (int i = 1; i < buf.length() - 1; i++) {
       if (
       Character.isLowerCase(buf.charAt(i-1)) &&
-      Character.isUpperCase(buf.charAt(i) ) &&
-      Character.isLowerCase(buf.charAt(i+1))
-      ) {
+          Character.isUpperCase(buf.charAt(i) ) &&
+          Character.isLowerCase(buf.charAt(i+1))
+          ) {
         buf.insert(i++, '_');
       }
     }
@@ -686,7 +686,7 @@ class Property {
     }
 
     if (title || help || readonly || hidden || multiline || selection ||
-    image || isPassword() || massUpdate || search || translatable || copyable || defaultNow)
+        image || isPassword() || massUpdate || search || translatable || copyable || defaultNow)
       annon("com.axelor.db.annotations.Widget")
           .add("image", image, false)
           .add("title", title)

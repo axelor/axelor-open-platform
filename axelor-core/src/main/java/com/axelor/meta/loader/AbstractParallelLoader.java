@@ -71,8 +71,7 @@ abstract class AbstractParallelLoader extends AbstractLoader {
     }
 
     // Filtered by paths
-    return lists
-        .parallelStream()
+    return lists.parallelStream()
         .filter(url -> "file".equals(url.getProtocol()) && paths.contains(Paths.get(toUri(url))))
         .collect(Collectors.toList());
   }
@@ -85,8 +84,7 @@ abstract class AbstractParallelLoader extends AbstractLoader {
             url -> {
               try (final FileSystem fs =
                   FileSystems.newFileSystem(toUri(url), Collections.emptyMap())) {
-                return lists
-                    .parallelStream()
+                return lists.parallelStream()
                     .filter(
                         urlInFs ->
                             getLastModifiedTimeMillis(fs, urlInFs)

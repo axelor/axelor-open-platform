@@ -758,8 +758,7 @@ public class XMLViews {
     private List<MetaView> findExtensionMetaViewsByModuleOrder(MetaView view) {
       final List<MetaView> views = findExtensionMetaViews(view);
       final Map<String, List<MetaView>> viewsByModuleName =
-          views
-              .parallelStream()
+          views.parallelStream()
               .collect(Collectors.groupingBy(v -> Optional.ofNullable(v.getModule()).orElse("")));
       final List<MetaView> result = new ArrayList<>(views.size());
 

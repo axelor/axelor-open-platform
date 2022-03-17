@@ -588,8 +588,7 @@ public class RestService extends ResourceService {
     @SuppressWarnings("unchecked")
     final Collection<MetaFile> metaFiles = (Collection<MetaFile>) metaFilesObj;
 
-    return metaFiles
-        .parallelStream()
+    return metaFiles.parallelStream()
         .anyMatch(metaFile -> metaFile != null && Objects.equals(metaFile.getId(), id));
   }
 
