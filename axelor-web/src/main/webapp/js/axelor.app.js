@@ -384,18 +384,38 @@
   }]);
 
   module.filter('unaccent', function() {
-    var source = 'ąàáäâãåæăćčĉęèéëêĝĥìíïîĵłľńňòóöőôõðøśșşšŝťțţŭùúüűûñÿýçżźž';
-    var target = 'aaaaaaaaaccceeeeeghiiiijllnnoooooooossssstttuuuuuunyyczzz';
+    var unaccent;
 
-    source += source.toUpperCase();
-    target += target.toUpperCase();
+    if (String.prototype.normalize) {
+      unaccent = function (text) {
+        return text.normalize("NFKD")
+          .replace(/\p{Diacritic}/gu, "")
+          .replace(/./g, function (c) {
+            return {
+              "’": "'",
+              "æ": "ae", "Æ": "AE",
+              "œ": "oe", "Œ": "OE",
+              "ð": "d", "Ð": "D",
+              "ł": "l", "Ł": "L",
+              "ø": "o", "Ø": "O"
+              }[c] || c
+          });
+      };
+    } else {
+      var source = 'ąàáäâãåæăćčĉðęèéëêĝĥìíïîĵłľńňòóöőôõøœśșşšŝťțţŭùúüűûñÿýçżźž’';
+      var target = "aaaaaaaaacccdeeeeeghiiiijllnnoooooooossssstttuuuuuunyyczzz'";
 
-    var unaccent = function (text) {
-      return typeof(text) !== 'string' ? text : text.replace(/.{1}/g, function(c) {
-        var i = source.indexOf(c);
-        return i === -1 ? c : target[i];
-      });
-    };
+      source += source.toUpperCase();
+      target += target.toUpperCase();
+
+      unaccent = function (text) {
+        return typeof(text) !== 'string' ? text : text.replace(/.{1}/g, function(c) {
+          var i = source.indexOf(c);
+          return i === -1 ? c : target[i];
+        });
+      };
+    }
+
     return function(input) {
       return unaccent(input);
     };

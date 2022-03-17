@@ -27,7 +27,7 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
     scope: {
       itemClick: "&"
     },
-    controller: ["$scope", "$q", function ($scope, $q) {
+    controller: ["$scope", "$q", "$filter", function ($scope, $q, $filter) {
 
       var items = [];
       var menus = [];
@@ -97,6 +97,7 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
         });
         $scope.menus = menus;
         $scope.searchItems = searchItems;
+        $scope.unaccent = $filter("unaccent");
         deferred.resolve();
       };
 
@@ -191,6 +192,12 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
         }
       });
 
+      function normalize(text) {
+        return scope.unaccent(text.toLocaleLowerCase())
+          .replace(/\s+/, " ")
+          .replace(/[^\w\s]/g, "");
+      }
+
       function search(request, response) {
         var term = request.term;
         var items = _.filter(scope.searchItems, function (item) {
@@ -200,7 +207,7 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
             search = search.substring(1);
             text = item.title;
           }
-          text = text.replace('/', '').toLowerCase();
+          text = normalize(text.replace('/', ''));
           if (search[0] === '"' || search[0] === '=') {
             search = search.substring(1);
             if (search.indexOf('"') === search.length - 1) {
@@ -208,7 +215,7 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
             }
             return text.indexOf(search) > -1;
           }
-          var parts = search.toLowerCase().split(/\s+/);
+          var parts = normalize(search).split(/\s+/);
           for (var i = 0; i < parts.length; i++) {
             if (text.indexOf(parts[i]) === -1) {
               return false;
