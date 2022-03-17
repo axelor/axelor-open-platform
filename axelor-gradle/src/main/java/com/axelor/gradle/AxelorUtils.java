@@ -51,7 +51,7 @@ public class AxelorUtils {
                 public List<Project> load(Project project) throws Exception {
                   return project.getGradle().getIncludedBuilds().stream()
                       .map(b -> ((IncludedBuildInternal) b).getTarget())
-                      .map(b -> b.getBuild().getRootProject())
+                      .map(b -> b.getMutableModel().getRootProject())
                       .collect(Collectors.toList());
                 }
               });
