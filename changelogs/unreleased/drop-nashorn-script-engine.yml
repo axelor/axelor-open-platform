@@ -1,0 +1,12 @@
+---
+title: Replace nashorn script helper with GraalJS engine
+type: change
+description: |
+  The nashorn script engine is deprecated in JDK-11 and has some
+  incompatible changes than JDK-8.
+  
+  The new implementation uses GraalJS which supports latest ECMAScript features.
+  
+  The collection helpers `listOf`, `setOf` and `mapOf` are removed as corresponding
+  native JavaScript objects are passed with appropriate Java equivalent wrapper to the
+  Java calls.

@@ -131,7 +131,7 @@ public class TestJsonContext extends ScriptTest {
     assertEquals("Hello!!!", ctx.get("name"));
     assertTrue(ctx.get("world") instanceof Map);
 
-    final ScriptHelper sh = new NashornScriptHelper(ctx);
+    final ScriptHelper sh = new JavaScriptScriptHelper(ctx);
     final Object name = sh.eval("name");
     assertEquals("Hello!!!", name);
     assertNotNull(sh.eval("contact"));

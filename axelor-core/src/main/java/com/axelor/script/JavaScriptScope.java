@@ -24,7 +24,6 @@ import com.axelor.db.JpaScanner;
 import com.axelor.db.Model;
 import com.axelor.db.Repository;
 import com.axelor.inject.Beans;
-import com.google.common.base.Preconditions;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.time.LocalDate;
@@ -35,15 +34,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import javax.management.Query;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
+import javax.script.Bindings;
 import javax.script.SimpleBindings;
-import jdk.nashorn.api.scripting.JSObject;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.proxy.ProxyObject;
 
-class NashornGlobals extends SimpleBindings {
+class JavaScriptScope implements ProxyObject {
 
   @FunctionalInterface
   public static interface VarArgs {
@@ -68,48 +68,22 @@ class NashornGlobals extends SimpleBindings {
     Arrays.class,
   };
 
-  private JSObject typeFunction;
+  private final Bindings globals;
 
-  private final ScriptEngine engine;
+  private final Bindings bindings;
 
-  public NashornGlobals(ScriptEngine engine) {
-    this.engine = engine;
+  public JavaScriptScope(Bindings bindings) {
+    this.globals = new SimpleBindings();
+    this.bindings = bindings;
 
-    this.put("__repo__", (Function<Class<? extends Model>, Object>) t -> JpaRepository.of(t));
-
-    this.put(
-        "doInJPA",
-        (Function<ScriptObjectMirror, Object>)
-            task -> {
-              Preconditions.checkArgument(task.isFunction(), "doInJPA expectes function argument");
-              final Object[] result = {null};
-              JPA.runInTransaction(() -> result[0] = task.call(null, JPA.em()));
-              return result[0];
-            });
-
-    this.put("listOf", (VarArgs) args -> new ArrayList<>(Arrays.asList(args)));
-    this.put("setOf", (VarArgs) args -> new HashSet<>(Arrays.asList(args)));
-    this.put(
-        "mapOf",
-        (Function<ScriptObjectMirror, Object>)
-            obj -> {
-              if (obj.isArray()) {
-                throw new IllegalArgumentException("mapOf expectes object literal as argument");
-              }
-              return new HashMap<>(obj);
-            });
+    globals.put("__repo__", (Function<Class<? extends Model>, Object>) t -> JpaRepository.of(t));
+    globals.put("doInJPA", (Function<Function<Object[], Object>, ?>) this::doInJPA);
   }
 
-  private JSObject typeFunction() {
-    if (typeFunction == null) {
-      try {
-        typeFunction = (JSObject) engine.eval("Java.type");
-      } catch (ScriptException e) {
-        // this should never happen
-        throw new RuntimeException(e);
-      }
-    }
-    return typeFunction;
+  private Object doInJPA(Function<Object[], Object> task) {
+    final AtomicReference<Object> result = new AtomicReference<>(null);
+    JPA.runInTransaction(() -> result.set(task.apply(new Object[] {JPA.em()})));
+    return result.get();
   }
 
   private Class<?> findClass(String simpleName) {
@@ -132,23 +106,24 @@ class NashornGlobals extends SimpleBindings {
     return found;
   }
 
-  public Object get(Object key) {
-    if (super.containsKey(key)) {
-      return super.get(key);
-    }
-    final Object value = super.get(key);
-    if (value == null && key instanceof String) {
-      final Class<?> klass = findClass((String) key);
-      return klass == null ? null : typeFunction().call(null, klass.getName());
-    }
-    return value;
+  @Override
+  public Object getMember(String key) {
+    return globals.computeIfAbsent(key, x -> bindings.computeIfAbsent(x, this::findClass));
   }
 
-  public boolean containsKey(Object key) {
-    boolean contains = super.containsKey(key);
-    if (contains || !(key instanceof String)) {
-      return contains;
-    }
-    return findClass((String) key) != null;
+  @Override
+  public Object getMemberKeys() {
+    Set<String> names = new HashSet<>();
+    names.addAll(globals.keySet());
+    names.addAll(bindings.keySet());
+    return names.toArray();
   }
+
+  @Override
+  public boolean hasMember(String key) {
+    return globals.containsKey(key) || bindings.containsKey(key) || findClass(key) != null;
+  }
+
+  @Override
+  public void putMember(String key, Value value) {}
 }

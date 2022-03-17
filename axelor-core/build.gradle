@@ -46,6 +46,7 @@ dependencies {
   api libs.javax_servlet_jsp
   api libs.javax_mail
   api libs.javax_jaxb
+  api libs.graal_js
 
   implementation libs.axelor_el
   implementation libs.jsoup

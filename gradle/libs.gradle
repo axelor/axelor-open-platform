@@ -73,6 +73,9 @@ libs.byte_buddy = "net.bytebuddy:byte-buddy:1.11.22"
 // Tomcat EL (repackaged to avoid version conflicts)
 libs.axelor_el = "com.axelor:axelor-el:${versions.tomcat}"
 
+// Graal JS
+libs.graal_js = "org.graalvm.js:js:21.3.1"
+
 // javax libs
 libs.javax_jaxb = "javax.xml.bind:jaxb-api:2.3.1"
 libs.javax_servlet = "javax.servlet:javax.servlet-api:4.0.1"

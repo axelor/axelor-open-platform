@@ -25,18 +25,17 @@ import com.axelor.rpc.Context;
 import com.axelor.test.db.Contact;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
-public class TestNashorn extends ScriptTest {
+public class TestJavaScript extends ScriptTest {
 
   private static final int COUNT = 1000;
 
   private static final String EXPR_INTERPOLATION =
-      "'(${title.name}) = ${firstName} ${lastName} (${fullName}) = (${__user__})'";
+      "`(${title.name}) = ${firstName} ${lastName} (${fullName}) = (${__user__})`";
 
   private static final String EXPR_CONCAT =
       "'(' + title.name + ') = ' + firstName + ' ' + lastName + ' (' + fullName + ') = (' + __user__ + ')' ";
@@ -46,7 +45,7 @@ public class TestNashorn extends ScriptTest {
       "(title instanceof Contact || fullName == 'foo') || (__ref__ instanceof Title) || (__parent__ == 0.102) || (__self__ == __this__)";
 
   private void doTestSpeed(String expr) {
-    final ScriptHelper helper = new NashornScriptHelper(context());
+    final ScriptHelper helper = new JavaScriptScriptHelper(context());
     for (int i = 0; i < COUNT; i++) {
       Object result = helper.eval(expr);
       assertNotNull(result);
@@ -54,7 +53,7 @@ public class TestNashorn extends ScriptTest {
   }
 
   private void doCastTest(int counter) {
-    final ScriptHelper helper = new NashornScriptHelper(context());
+    final ScriptHelper helper = new JavaScriptScriptHelper(context());
 
     Object actual = helper.eval("__parent__");
     assertTrue(actual instanceof Context);
@@ -62,7 +61,7 @@ public class TestNashorn extends ScriptTest {
     actual = helper.eval("__ref__");
     assertTrue(actual instanceof Contact);
 
-    actual = helper.eval("__parent__.asType(Contact.class)");
+    actual = helper.eval("__parent__.asType(Contact)");
     assertTrue(actual instanceof Contact);
 
     actual = helper.eval("__ref__.fullName");
@@ -73,29 +72,14 @@ public class TestNashorn extends ScriptTest {
 
   @Test
   public void doCollectionTest() {
-    final ScriptHelper helper = new NashornScriptHelper(context());
+    final ScriptHelper helper = new JavaScriptScriptHelper(context());
 
-    Object list = helper.eval("listOf([1, 2, 3, 4])");
+    Object list = helper.eval("[1, 2, 3, 4]");
     assertNotNull(list);
     assertTrue(list instanceof List);
     assertEquals(4, ((List<?>) list).size());
 
-    list = helper.eval("listOf(1, 2, 3, 4)");
-    assertNotNull(list);
-    assertTrue(list instanceof List);
-    assertEquals(4, ((List<?>) list).size());
-
-    Object set = helper.eval("setOf([1, 2, 3, 4])");
-    assertNotNull(set);
-    assertTrue(set instanceof Set);
-    assertEquals(4, ((Set<?>) set).size());
-
-    set = helper.eval("setOf(1, 2, 3, 4)");
-    assertNotNull(set);
-    assertTrue(set instanceof Set);
-    assertEquals(4, ((Set<?>) set).size());
-
-    final Object map = helper.eval("mapOf({a: 1, b: 2})");
+    final Object map = helper.eval("({a: 1, b: 2})");
     assertNotNull(map);
     assertTrue(map instanceof Map);
     assertEquals(2, ((Map<?, ?>) map).size());
@@ -103,9 +87,8 @@ public class TestNashorn extends ScriptTest {
 
   @Test
   public void doJpaTest() {
-    final ScriptHelper helper = new NashornScriptHelper(context());
-    final Object bean =
-        helper.eval("" + "doInJPA(function (em) {" + "	return em.find(Contact.class, id);" + "})");
+    final ScriptHelper helper = new JavaScriptScriptHelper(context());
+    final Object bean = helper.eval("doInJPA(em => __repo__(Contact).find(id))");
 
     assertNotNull(bean);
     assertTrue(bean instanceof Contact);

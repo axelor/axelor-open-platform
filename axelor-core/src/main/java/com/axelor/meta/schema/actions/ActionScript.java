@@ -24,7 +24,7 @@ import com.axelor.meta.db.repo.MetaJsonRecordRepository;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.script.GroovyScriptHelper;
-import com.axelor.script.NashornScriptHelper;
+import com.axelor.script.JavaScriptScriptHelper;
 import com.axelor.script.ScriptHelper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.inject.persist.Transactional;
@@ -60,7 +60,7 @@ public class ActionScript extends Action {
 
   private ScriptHelper getScriptHelper(Bindings bindings) {
     return LANGUAGE_JS.equalsIgnoreCase(script.language)
-        ? new NashornScriptHelper(bindings)
+        ? new JavaScriptScriptHelper(bindings)
         : new GroovyScriptHelper(bindings);
   }
 
