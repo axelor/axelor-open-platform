@@ -84,7 +84,7 @@ libs.greenmail = "com.icegreen:greenmail-junit5:1.6.7"
 libs.javax_el = "org.glassfish:jakarta.el:3.0.4"
 
 // jdbc
-libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.3.4"
+libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.6.1"
 libs.jdbc_postgres = "org.postgresql:postgresql:42.0.0"
 libs.jdbc_mysql = "mysql:mysql-connector-java:5.1.41"
 
