@@ -42,6 +42,7 @@ public class JavaScriptScriptHelper extends AbstractScriptHelper {
         org.graalvm.polyglot.Context.newBuilder()
             .allowExperimentalOptions(true)
             .allowAllAccess(true)
+            .option("engine.WarnInterpreterOnly", "false")
             .option("js.nashorn-compat", "true")
             .option("js.ecmascript-version", "latest")
             .build();
