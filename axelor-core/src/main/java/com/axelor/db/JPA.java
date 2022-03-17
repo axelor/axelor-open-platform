@@ -47,7 +47,9 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.OneToMany;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
+import org.hibernate.CacheMode;
 import org.hibernate.HibernateException;
+import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.Session;
 import org.hibernate.StaleObjectStateException;
 import org.hibernate.collection.spi.PersistentCollection;
@@ -108,6 +110,26 @@ public final class JPA {
    */
   public static <T extends Model> T find(Class<T> klass, Long id) {
     return em().find(klass, id);
+  }
+
+  /**
+   * Find multiple entities by their primary key.<br>
+   * <br>
+   * Ensure to check the first-level cache first then the second-level cache and, if the entity is
+   * found and already managed by the Hibernate Session, the cached entity will be added to the
+   * returned List, therefore skipping it from being fetched via the multi-load query.
+   *
+   * @param klass The model class
+   * @param ids The ids to load
+   * @return list of all the matched records
+   * @see MultiIdentifierLoadAccess
+   */
+  public static <T extends Model> List<T> findByIds(Class<T> klass, List<Long> ids) {
+    return em().unwrap(Session.class)
+        .byMultipleIds(klass)
+        .enableSessionCheck(true)
+        .with(CacheMode.GET)
+        .multiLoad(ids);
   }
 
   private static boolean isAutoFlushEnabled() {

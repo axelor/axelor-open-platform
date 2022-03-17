@@ -71,6 +71,14 @@ public interface Repository<T extends Model> {
   T find(Long id);
 
   /**
+   * Find multiple entities by their primary key.
+   *
+   * @param ids The ids to load
+   * @return list of all the matched records
+   */
+  List<T> findByIds(List<Long> ids);
+
+  /**
    * Save the given entity.
    *
    * <p>Depending on the implementation, it may return same entity or a copy of it. For example JPA

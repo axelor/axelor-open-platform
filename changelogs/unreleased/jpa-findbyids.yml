@@ -1,0 +1,3 @@
+---
+title: Add JpaRepository#findByIds(List<Long>) method to find multiple entities by their primary key
+type: feature

@@ -17,6 +17,7 @@
  */
 package com.axelor.db;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,7 +30,9 @@ import com.axelor.test.GuiceModules;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.repo.ContactRepository;
 import com.axelor.test.db.repo.ContactRepositoryEx;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import javax.inject.Inject;
 import org.junit.jupiter.api.Test;
 
@@ -72,5 +75,12 @@ public class RepositoryTest extends JpaTest {
     Object obj = helper.eval(expr);
     assertNotNull(obj);
     assertTrue(obj instanceof ContactRepositoryEx);
+  }
+
+  @Test
+  public void testFindByIds() {
+    List<Contact> contacts = Beans.get(ContactRepository.class).findByIds(Arrays.asList(1L, 2L));
+    assertNotNull(contacts);
+    assertEquals(2, contacts.size());
   }
 }

@@ -82,6 +82,11 @@ public class JpaRepository<T extends Model> implements Repository<T> {
   }
 
   @Override
+  public List<T> findByIds(List<Long> ids) {
+    return JPA.findByIds(modelClass, ids);
+  }
+
+  @Override
   public T save(T entity) {
     return JPA.save(entity);
   }
