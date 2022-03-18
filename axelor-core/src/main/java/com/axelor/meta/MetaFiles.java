@@ -21,6 +21,7 @@ import static com.axelor.common.StringUtils.isBlank;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
+import com.axelor.common.MimeTypesUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.Model;
@@ -55,7 +56,6 @@ import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
-import org.apache.tika.Tika;
 
 /** This class provides some helper methods to deal with files. */
 public class MetaFiles {
@@ -88,8 +88,6 @@ public class MetaFiles {
       getMimeTypes(AvailableAppSettings.FILE_UPLOAD_WHITELIST_TYPES);
   private static final List<MimeType> BLACKLIST_TYPES =
       getMimeTypes(AvailableAppSettings.FILE_UPLOAD_BLACKLIST_TYPES);
-
-  private static final Tika TIKA = new Tika();
 
   private MetaFileRepository filesRepo;
 
@@ -250,18 +248,7 @@ public class MetaFiles {
    */
   public static void checkType(File file) {
     Preconditions.checkNotNull(file, "file can't be null");
-
-    String type = null;
-    try {
-      type = Files.probeContentType(file.toPath());
-      if (type == null) {
-        type = TIKA.detect(file);
-      }
-    } catch (IOException e1) {
-      throw new IllegalArgumentException("File is not accessible: " + file.getName());
-    }
-
-    checkType(type);
+    checkType(MimeTypesUtils.getContentType(file));
   }
 
   /**
@@ -502,7 +489,7 @@ public class MetaFiles {
         metaFile.setFileName(file.getName());
       }
       if (isBlank(metaFile.getFileType())) {
-        metaFile.setFileType(Files.probeContentType(target));
+        metaFile.setFileType(MimeTypesUtils.getContentType(target));
       }
       metaFile.setFileSize(Files.size(target));
       metaFile.setFilePath(getUploadPath().relativize(target).toString());

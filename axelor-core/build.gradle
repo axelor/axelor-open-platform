@@ -30,8 +30,6 @@ dependencies {
   api libs.hibernate
   implementation libs.hibernate_search
 
-  implementation libs.apache_tika_core
-
   implementation libs.flywaydb
 
   api libs.resteasy
