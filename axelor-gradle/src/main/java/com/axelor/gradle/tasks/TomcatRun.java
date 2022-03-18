@@ -26,6 +26,7 @@ import java.util.List;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.options.Option;
 import org.gradle.process.JavaExecSpec;
 
@@ -93,6 +94,7 @@ public class TomcatRun extends AbstractRunTask {
   }
 
   @Override
+  @Internal
   protected File getManifestJar() {
     return FileUtils.getFile(getProject().getBuildDir(), "tomcat", "classpath.jar");
   }
