@@ -9,6 +9,7 @@ dependencies {
   implementation libs.guava
   implementation libs.asm
   implementation libs.commons_csv
+  implementation libs.apache_tika_core
 }
 
 configurations {
