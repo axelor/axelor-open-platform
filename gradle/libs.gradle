@@ -11,7 +11,7 @@ versions.hibernate_search = "5.7.0.Final"
 versions.groovy = "2.4.10"
 versions.resteasy = "4.7.5.Final"
 versions.jackson = "2.13.2"
-versions.shiro = "1.4.1"
+versions.shiro = "1.8.0"
 versions.buji_pac4j = "4.1.1"
 versions.pac4j = "3.8.3"
 versions.ldaptive = "1.2.4"
@@ -164,7 +164,10 @@ libs.jackson_libs = [
 libs.apache_shiro = [
   "org.apache.shiro:shiro-core:${versions.shiro}",
   "org.apache.shiro:shiro-web:${versions.shiro}",
-  "org.apache.shiro:shiro-guice:${versions.shiro}"
+  dependencies.create("org.apache.shiro:shiro-guice:${versions.shiro}") {
+      // Shiro 1.8 still depends on guice-multibindings 4.2.2 (included as part of Guice core)
+      exclude group: 'com.google.inject.extensions', module: 'guice-multibindings'
+  }
 ]
 
 libs.pac4j = [
