@@ -101,23 +101,7 @@ libs.hibernate = [
 libs.hibernate_search = "org.hibernate:hibernate-search-orm:${versions.hibernate_search}"
 
 // apache tika
-libs.apache_tika_core = "org.apache.tika:tika-core:1.4"
-
-// minimal set of tika-parsers
-libs.apache_tika_parsers = dependencies.create("org.apache.tika:tika-parsers:1.4") {
-  exclude group: 'org.gagravarr', module: 'vorbis-java-tika'
-  exclude group: 'edu.ucar', module: 'netcdf'
-  exclude group: 'org.apache.james', module: 'apache-mime4j-core'
-  exclude group: 'org.apache.james', module: 'apache-mime4j-dom'
-  exclude group: 'org.bouncycastle', module: 'bcmail-jdk15'
-  exclude group: 'org.bouncycastle', module: 'bcprov-jdk15'
-  exclude group: 'org.ow2.asm', module: 'asm-debug-all'
-  exclude group: 'com.googlecode.mp4parser', module: 'isoparser'
-  exclude group: 'xerces', module: 'xercesImpl'
-  exclude group: 'rome', module: 'rome'
-  exclude group: 'org.gagravarr', module: 'vorbis-java-core'
-  exclude group: 'org.apache.geronimo.specs', module: 'geronimo-stax-api_1.0_spec'
-}
+libs.apache_tika_core = "org.apache.tika:tika-core:2.2.1"
 
 // flyway
 libs.flywaydb = "org.flywaydb:flyway-core:8.5.4"
