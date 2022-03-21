@@ -3,19 +3,11 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_6.0.xsd">
 
-  <action-ws name="ws.test" service="http://ip.axelor.com:81/SrvWebPortailGRD/SrvImportAffaire.asmx">
-    <action name="WebRegister" template="data/ws-test/ws-login.tmpl" engine="groovy"/>
+  <action-ws name="ws.capital.city" service="http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso">
+    <action name="CapitalCity" template="data/ws-test/ws-CountryInfoService.tmpl"/>
   </action-ws>
 
-  <action-ws name="ws.test.1" service="ref:ws.test">
-    <action name="ControleCreeAffaire" template="data/ws-test/ws-test1.tmpl" engine="groovy"/>
-  </action-ws>
-
-  <action-import name="data.import.1" config="data/ws-test/xml-config.xml">
-    <import file="ws-test1.xml" provider="ws.test.1" name="titles"/>
-  </action-import>
-
-  <action-export name="export.sale.order" output="${name}/${date}${time}">
+  <action-export name="export.sale.order" output="${name}/${date}${time}" download="true">
     <export name="${name}.xml" template="data/ws-test/export-sale-order.tmpl" engine="groovy"/>
     <export name="${name}-customer-copy.xml" template="data/ws-test/export-sale-order.tmpl" engine="groovy"/>
   </action-export>
