@@ -46,7 +46,7 @@ public class CustomDialectResolver implements DialectResolver {
       log.error("PostgreSQL 9.4 or later is required.");
     }
     if ("Oracle".equals(databaseName)) {
-      if (majorVersion > 11) {
+      if (majorVersion >= 12) {
         return new OracleDialect();
       }
       log.error("Oracle 12c or later is required.");
