@@ -42,6 +42,8 @@ public class CustomDialectResolver implements DialectResolver {
     if ("PostgreSQL".equals(databaseName)) {
       // Don't support version < 9.4
       if (majorVersion == 9) {
+        log.debug(
+            "Consider upgrading to 'PostgreSQL >= 10' for better performance and functionality.");
         if (minorVersion == 4) {
           return new AxelorPostgreSQL94Dialect();
         } else if (minorVersion >= 5) {
