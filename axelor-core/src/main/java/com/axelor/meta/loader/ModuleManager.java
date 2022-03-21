@@ -26,7 +26,6 @@ import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.common.StringUtils;
 import com.axelor.db.ParallelTransactionExecutor;
-import com.axelor.db.internal.DBHelper;
 import com.axelor.db.tenants.TenantResolver;
 import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
@@ -40,9 +39,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.persist.Transactional;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -303,56 +299,6 @@ public class ModuleManager {
   public static boolean isInstalled(String module) {
     final Module mod = resolver.get(module);
     return mod != null && mod.isInstalled();
-  }
-
-  private static Set<String> getInstalledModules() {
-    final Set<String> all = new HashSet<String>();
-    try (final Connection connection = DBHelper.getConnection()) {
-      try (final Statement statement = connection.createStatement()) {
-        try (final ResultSet rs =
-            statement.executeQuery("select name from meta_module where installed = true")) {
-          while (rs.next()) {
-            all.add(rs.getString("name"));
-          }
-        }
-      }
-    } catch (Exception e) {
-    }
-
-    return all;
-  }
-
-  /** Find all modules which are installed or non-removable (default candidates). */
-  public static List<String> findInstalled() {
-    final Resolver resolver = new Resolver();
-    final Set<String> installed = getInstalledModules();
-    final List<String> found = new ArrayList<>();
-
-    for (final Properties properties : MetaScanner.findModuleProperties()) {
-      final String name = properties.getProperty("name");
-      if (SKIP.contains(name)) {
-        continue;
-      }
-
-      final String[] depends = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
-      final boolean application = "true".equals(properties.getProperty("application"));
-
-      final Module module = resolver.add(name, depends);
-      module.setApplication(application);
-    }
-
-    for (Module module : resolver.all()) {
-      String name = module.getName();
-      if (SKIP.contains(name)) continue;
-      if (installed.contains(name)) {
-        module.setInstalled(true);
-      }
-      if (module.isInstalled()) {
-        found.add(name);
-      }
-    }
-
-    return found;
   }
 
   @Transactional
