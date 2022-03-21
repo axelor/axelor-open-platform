@@ -120,8 +120,6 @@ libs.groovy = [
   "org.codehaus.groovy:groovy-json:${versions.groovy}"
 ]
 
-libs.groovy_wslite = dependencies.create("com.github.groovy-wslite:groovy-wslite:1.1.2") { exclude group: "org.codehaus.groovy" }
-
 def resteasy_module = { name ->
     dependencies.create("org.jboss.resteasy:${name}:${versions.resteasy}") {
         exclude module: "smallrye-config"

@@ -17,29 +17,39 @@
  */
 package com.axelor.meta.schema.actions;
 
+import com.axelor.common.ResourceUtils;
+import com.axelor.common.StringUtils;
+import com.axelor.common.XMLUtils;
 import com.axelor.meta.ActionHandler;
 import com.axelor.meta.MetaStore;
 import com.axelor.text.GroovyTemplates;
 import com.axelor.text.StringTemplates;
 import com.axelor.text.Templates;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import groovy.util.slurpersupport.GPathResult;
-import groovy.xml.XmlUtil;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.ProxySelector;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import wslite.soap.SOAPClient;
-import wslite.soap.SOAPResponse;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 @XmlType
 public class ActionWS extends Action {
@@ -92,10 +102,21 @@ public class ActionWS extends Action {
   }
 
   private Object send(String location, WSAction act, String template, ActionHandler handler)
-      throws IOException, FileNotFoundException, ClassNotFoundException {
+      throws IOException, ParserConfigurationException, SAXException, InterruptedException {
 
-    File templateFile = new File(template);
-    if (!templateFile.isFile()) {
+    InputStream templateStream = null;
+    try {
+      File templateFile = new File(template);
+      if (templateFile.isFile()) {
+        templateStream = new FileInputStream(templateFile);
+      } else {
+        templateStream = ResourceUtils.getResourceStream(template.replace("classpath:", ""));
+      }
+
+      if (templateStream == null) {
+        throw new IllegalArgumentException();
+      }
+    } catch (Exception e) {
       throw new IllegalArgumentException("No such template: " + template);
     }
 
@@ -105,27 +126,69 @@ public class ActionWS extends Action {
     }
 
     String payload = null;
-    Reader reader = new FileReader(templateFile);
-    try {
+    try (Reader reader = new InputStreamReader(templateStream)) {
       payload = handler.template(engine, reader);
-    } finally {
-      reader.close();
     }
-    Map<String, Object> params = Maps.newHashMap();
+    Document envelope = XMLUtils.parse(new StringReader(payload));
+    String namespace = envelope.getDocumentElement().getNamespaceURI();
+    String charset = envelope.getXmlEncoding();
 
-    params.put("connectTimeout", getConnectTimeout() * 1000);
-    params.put("readTimeout", getReadTimeout() * 1000);
-
-    SOAPClient client = new SOAPClient(location);
-    SOAPResponse response = client.send(params, payload);
-
-    GPathResult gpath = ((GPathResult) response.getBody()).children();
-    String ns = gpath.lookupNamespace("");
-    if (ns != null) {
-      gpath.declareNamespace(ImmutableMap.of(":", ns));
+    if (StringUtils.isBlank(charset)) {
+      charset = StandardCharsets.UTF_8.name();
     }
 
-    return XmlUtil.serialize(gpath);
+    String contentType = "text/xml";
+    String actionHeader = "SOAPAction";
+
+    // SOAP 1.2
+    if (Objects.equals(namespace, "http://www.w3.org/2003/05/soap-envelope")) {
+      contentType = "application/soap+xml";
+      actionHeader = "action";
+    }
+
+    contentType = contentType + "; charset=" + charset;
+
+    HttpClient httpClient =
+        HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(getConnectTimeout()))
+            .followRedirects(java.net.http.HttpClient.Redirect.NORMAL)
+            .proxy(ProxySelector.getDefault())
+            .build();
+
+    HttpRequest httpRequest =
+        HttpRequest.newBuilder()
+            .uri(URI.create(location))
+            .timeout(Duration.ofSeconds(getReadTimeout()))
+            .header("Content-Type", contentType)
+            .header(actionHeader, act.getName())
+            .POST(HttpRequest.BodyPublishers.ofString(payload))
+            .build();
+
+    HttpResponse<InputStream> response =
+        httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
+    envelope = XMLUtils.parse(response.body());
+
+    org.w3c.dom.Element body =
+        XMLUtils.stream(envelope.getDocumentElement(), "Body").findFirst().orElse(null);
+
+    if (body == null) {
+      throw new IllegalStateException("No body found in response");
+    }
+
+    org.w3c.dom.Element result = XMLUtils.stream(body, "*").findFirst().orElse(null);
+
+    if (result == null) {
+      throw new IllegalStateException("No result found in response");
+    }
+
+    StringWriter writer = new StringWriter();
+    try {
+      XMLUtils.transform(result, writer, envelope.getXmlEncoding());
+    } catch (TransformerException e) {
+      throw new IllegalStateException(e);
+    }
+
+    return writer.toString();
   }
 
   private String getService(ActionWS ref, ActionHandler handler) {
@@ -146,13 +209,15 @@ public class ActionWS extends Action {
     ActionWS ref = getRef();
     String url = getService(ref, handler);
 
-    if (Strings.isNullOrEmpty(url)) return null;
+    if (StringUtils.isBlank(url)) {
+      return null;
+    }
 
     if (ref != null) {
       ref.evaluate(handler);
     }
 
-    List<Object> result = Lists.newArrayList();
+    List<Object> result = new ArrayList<>();
     log.info("action-ws (name): " + getName());
     for (WSAction act : methods) {
       Object template = handler.evaluate(act.template);

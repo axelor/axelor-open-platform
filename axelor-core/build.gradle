@@ -17,7 +17,6 @@ dependencies {
   api project(":axelor-common")
 
   api libs.groovy
-  api libs.groovy_wslite
 
   api libs.guava
   api libs.guice
