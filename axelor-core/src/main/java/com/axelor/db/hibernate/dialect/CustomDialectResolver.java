@@ -40,9 +40,17 @@ public class CustomDialectResolver implements DialectResolver {
       return new AxelorHSQLDialect();
     }
     if ("PostgreSQL".equals(databaseName)) {
-      if ((majorVersion >= 9 && minorVersion >= 4) || majorVersion >= 10) {
-        return new AxelorPostgreSQL94Dialect();
+      // Don't support version < 9.4
+      if (majorVersion == 9) {
+        if (minorVersion == 4) {
+          return new AxelorPostgreSQL94Dialect();
+        } else if (minorVersion >= 5) {
+          return new AxelorPostgreSQL95Dialect();
+        }
+      } else if (majorVersion >= 10) {
+        return new AxelorPostgreSQL10Dialect();
       }
+
       log.error("PostgreSQL 9.4 or later is required.");
     }
     if ("Oracle".equals(databaseName)) {
@@ -52,12 +60,19 @@ public class CustomDialectResolver implements DialectResolver {
       log.error("Oracle 12c or later is required.");
     }
     if ("MySQL".equals(databaseName)) {
-      if (majorVersion >= 5 && minorVersion >= 7) {
-        return new AxelorMySQL57Dialect();
+      // Don't support version < 5.7
+      if (majorVersion == 5) {
+        if (minorVersion >= 7) {
+          return new AxelorMySQL57Dialect();
+        }
+      } else if (majorVersion > 5) {
+        // There is no MySQL 6 or 7, only MySQL 8.
+        return new AxelorMySQL8Dialect();
       }
+
       log.error("MySQL 5.7 or later is required.");
     }
-    log.error("{} {}.{} is not suppported.", databaseName, majorVersion, minorVersion);
+    log.error("{} {}.{} is not supported.", databaseName, majorVersion, minorVersion);
     return null;
   }
 }
