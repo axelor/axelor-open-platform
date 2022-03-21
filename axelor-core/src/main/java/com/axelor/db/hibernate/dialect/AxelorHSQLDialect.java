@@ -22,11 +22,12 @@ import com.axelor.db.hibernate.type.JsonSqlTypeDescriptor;
 import com.axelor.db.hibernate.type.JsonType;
 import java.sql.Types;
 import org.hibernate.boot.model.TypeContributions;
+import org.hibernate.dialect.HSQLDialect;
 import org.hibernate.service.ServiceRegistry;
 
-public class HSQLDialect extends org.hibernate.dialect.HSQLDialect {
+public class AxelorHSQLDialect extends HSQLDialect {
 
-  public HSQLDialect() {
+  public AxelorHSQLDialect() {
     super();
     registerColumnType(Types.OTHER, "clob");
   }

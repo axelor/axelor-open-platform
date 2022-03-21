@@ -37,23 +37,23 @@ public class CustomDialectResolver implements DialectResolver {
     final int majorVersion = info.getDatabaseMajorVersion();
     final int minorVersion = info.getDatabaseMinorVersion();
     if ("HSQL Database Engine".equals(databaseName)) {
-      return new HSQLDialect();
+      return new AxelorHSQLDialect();
     }
     if ("PostgreSQL".equals(databaseName)) {
       if ((majorVersion >= 9 && minorVersion >= 4) || majorVersion >= 10) {
-        return new PostgreSQLDialect();
+        return new AxelorPostgreSQL94Dialect();
       }
       log.error("PostgreSQL 9.4 or later is required.");
     }
     if ("Oracle".equals(databaseName)) {
       if (majorVersion >= 12) {
-        return new OracleDialect();
+        return new AxelorOracle12cDialect();
       }
       log.error("Oracle 12c or later is required.");
     }
     if ("MySQL".equals(databaseName)) {
       if (majorVersion >= 5 && minorVersion >= 7) {
-        return new MySQLDialect();
+        return new AxelorMySQL57Dialect();
       }
       log.error("MySQL 5.7 or later is required.");
     }

@@ -28,7 +28,7 @@ import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.StandardBasicTypes;
 import org.hibernate.type.Type;
 
-public class PostgreSQLDialect extends PostgreSQL94Dialect {
+public class AxelorPostgreSQL94Dialect extends PostgreSQL94Dialect {
 
   static class JsonExtractFunction extends AbstractJsonExtractFunction {
 
@@ -59,7 +59,7 @@ public class PostgreSQLDialect extends PostgreSQL94Dialect {
     }
   }
 
-  public PostgreSQLDialect() {
+  public AxelorPostgreSQL94Dialect() {
     super();
     registerColumnType(Types.OTHER, "jsonb");
     registerFunction("json_set", new JsonSetFunction());
