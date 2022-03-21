@@ -56,6 +56,8 @@ public class I18nTest extends JpaTest {
     obj.setMessage("{0} records selected.");
     obj.setLanguage("en");
     obj = translations.save(obj);
+
+    I18nBundle.invalidate();
   }
 
   @Test
