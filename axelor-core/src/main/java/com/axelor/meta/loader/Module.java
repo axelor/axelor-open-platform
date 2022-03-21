@@ -27,6 +27,10 @@ final class Module {
 
   private String name;
 
+  private String title;
+
+  private String description;
+
   private List<Module> depends = new ArrayList<>();
 
   private String version;
@@ -43,6 +47,22 @@ final class Module {
 
   public String getName() {
     return name;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public List<Module> getDepends() {

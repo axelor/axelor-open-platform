@@ -24,7 +24,6 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
-import com.axelor.common.StringUtils;
 import com.axelor.db.ParallelTransactionExecutor;
 import com.axelor.db.tenants.TenantResolver;
 import com.axelor.event.Event;
@@ -32,7 +31,6 @@ import com.axelor.event.NamedLiteral;
 import com.axelor.events.ModuleChanged;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
-import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.repo.MetaModuleRepository;
 import com.google.common.collect.ImmutableList;
@@ -41,11 +39,8 @@ import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -57,7 +52,7 @@ public class ModuleManager {
 
   private static final Logger log = LoggerFactory.getLogger(ModuleManager.class);
 
-  private static final Resolver resolver = new Resolver();
+  private static final ModuleResolver RESOLVER = ModuleResolver.scan();
 
   private boolean loadData = true;
 
@@ -73,20 +68,12 @@ public class ModuleManager {
 
   private final List<AbstractParallelLoader> metaLoaders;
 
-  @Inject private Event<ModuleChanged> moduleChangedEvent;
-
-  private static final Set<String> SKIP = new HashSet<>();
+  private final Event<ModuleChanged> moduleChangedEvent;
 
   private static long lastRestored;
   private final Set<Path> pathsToRestore = new HashSet<>();
 
   private static final AtomicBoolean BUSY = new AtomicBoolean(false);
-
-  static {
-    SKIP.add("axelor-common");
-    SKIP.add("axelor-cglib");
-    SKIP.add("axelor-test");
-  }
 
   @Inject
   public ModuleManager(
@@ -96,12 +83,14 @@ public class ModuleManager {
       ModelLoader modelLoader,
       I18nLoader i18nLoader,
       DataLoader dataLoader,
-      DemoLoader demoLoader) {
+      DemoLoader demoLoader,
+      Event<ModuleChanged> moduleChangedEvent) {
     this.authService = authService;
     this.modules = modules;
     this.viewLoader = viewLoader;
     this.dataLoader = dataLoader;
     this.demoLoader = demoLoader;
+    this.moduleChangedEvent = moduleChangedEvent;
     metaLoaders = ImmutableList.of(modelLoader, viewLoader, i18nLoader);
   }
 
@@ -115,7 +104,7 @@ public class ModuleManager {
                 final List<Module> installed = new ArrayList<>();
 
                 // install modules
-                resolver.all().stream()
+                RESOLVER.all().stream()
                     .peek(m -> log.info("Loading package {}...", m.getName()))
                     .filter(m -> m.isPending())
                     .forEach(
@@ -144,7 +133,7 @@ public class ModuleManager {
       createUsers();
       resolve(true);
       if (names.isEmpty()) {
-        resolver.all().stream()
+        RESOLVER.all().stream()
             .filter(Module::isInstalled)
             .map(Module::getName)
             .forEach(names::add);
@@ -152,10 +141,10 @@ public class ModuleManager {
       Beans.get(AuditableRunner.class)
           .run(
               () -> {
-                resolver.all().stream()
+                RESOLVER.all().stream()
                     .filter(m -> names.contains(m.getName()))
                     .forEach(m -> installOne(m.getName(), true, withDemo));
-                resolver.all().stream()
+                RESOLVER.all().stream()
                     .filter(m -> names.contains(m.getName()))
                     .forEach(m -> viewLoader.doLast(m, true));
               });
@@ -168,7 +157,7 @@ public class ModuleManager {
     final long startTime = System.currentTimeMillis();
 
     final List<Module> moduleList =
-        resolver.all().stream()
+        RESOLVER.all().stream()
             .filter(m -> moduleNames.contains(m.getName()))
             .collect(Collectors.toList());
 
@@ -219,26 +208,15 @@ public class ModuleManager {
   }
 
   public static List<String> getResolution() {
-    return resolver.names();
+    return RESOLVER.names();
   }
 
   static List<Module> getAll() {
-    return resolver.all();
+    return RESOLVER.all();
   }
 
   static Module getModule(String name) {
-    return resolver.get(name);
-  }
-
-  public void install(String moduleName, boolean update, boolean withDemo) {
-    try {
-      resolver.resolve(moduleName).stream()
-          .map(Module::getName)
-          .forEach(name -> installOne(name, update, withDemo));
-      resolver.resolve(moduleName).stream().forEach(m -> viewLoader.doLast(m, update));
-    } finally {
-      this.doCleanUp();
-    }
+    return RESOLVER.get(name);
   }
 
   private void doCleanUp() {
@@ -251,10 +229,10 @@ public class ModuleManager {
   }
 
   private boolean installOne(String moduleName, boolean update, boolean withDemo) {
-    final Module module = resolver.get(moduleName);
+    final Module module = RESOLVER.get(moduleName);
     final MetaModule metaModule = modules.findByName(moduleName);
 
-    if (metaModule == null || SKIP.contains(moduleName) || !module.isPending()) {
+    if (metaModule == null || !module.isPending()) {
       return false;
     }
 
@@ -297,27 +275,21 @@ public class ModuleManager {
   }
 
   public static boolean isInstalled(String module) {
-    final Module mod = resolver.get(module);
+    final Module mod = RESOLVER.get(module);
     return mod != null && mod.isInstalled();
   }
 
   @Transactional
   void resolve(boolean update) {
-    final Map<MetaModule, String[]> dependencies = new HashMap<>();
 
-    for (final Properties properties : MetaScanner.findModuleProperties()) {
-      final String name = properties.getProperty("name");
-      if (SKIP.contains(name)) {
-        continue;
-      }
+    List<MetaModule> saved = new ArrayList<>();
 
-      final String[] depends = properties.getProperty("depends", "").trim().split("\\s*,\\s*");
-      final String title = properties.getProperty("title");
-      final String description = properties.getProperty("description");
-      final String version = properties.getProperty("version");
-      final boolean application = "true".equals(properties.getProperty("application"));
+    for (Module module : RESOLVER.all()) {
+      String name = module.getName();
+      String title = module.getTitle();
+      String description = module.getDescription();
+      String version = module.getVersion();
 
-      final Module module = resolver.add(name, depends);
       MetaModule stored = modules.findByName(name);
 
       if (stored == null) {
@@ -328,30 +300,24 @@ public class ModuleManager {
       }
 
       module.setVersion(version);
-      module.setApplication(application);
 
       if (stored.getId() == null || update) {
         stored.setTitle(title);
         stored.setDescription(description);
         stored.setModuleVersion(version);
-        stored.setApplication(application);
         stored = modules.save(stored);
-        dependencies.put(stored, depends);
         module.setPending(true);
       }
+
+      saved.add(stored);
     }
 
-    // resolve dependencies
-    for (MetaModule stored : dependencies.keySet()) {
+    // set dependencies
+    for (MetaModule stored : saved) {
       final Set<MetaModule> depends = new HashSet<>();
-      for (String name : dependencies.get(stored)) {
-        if (StringUtils.isBlank(name)) continue;
-        final MetaModule depending = modules.findByName(name);
-        if (depending == null) {
-          throw new RuntimeException(
-              "No such depmodule found: " + name + ", required by: " + stored.getName());
-        }
-        depends.add(depending);
+      final Module module = RESOLVER.get(stored.getName());
+      for (Module dep : module.getDepends()) {
+        depends.add(modules.findByName(dep.getName()));
       }
       stored.clearDepends();
       stored.setDepends(depends);

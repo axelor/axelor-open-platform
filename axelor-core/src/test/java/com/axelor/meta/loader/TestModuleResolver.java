@@ -21,25 +21,35 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import org.junit.jupiter.api.Test;
 
-public class TestResolver {
+public class TestModuleResolver {
 
-  private Resolver resolver = new Resolver();
+  private Map<String, Properties> modules = new LinkedHashMap<>();
+
+  private void add(String name, String... depends) {
+    Properties props = new Properties();
+    props.setProperty("name", name);
+    props.setProperty("depends", String.join(",", depends));
+    modules.put(name, props);
+  }
 
   @Test
   public void test() {
 
-    resolver.add("axelor-auth", "axelor-core");
-    resolver.add("axelor-meta", "axelor-data");
+    add("axelor-auth", "axelor-core");
+    add("axelor-meta", "axelor-data");
 
-    resolver.add("axelor-x");
+    add("axelor-x");
 
-    resolver.add("axelor-sale", "axelor-contact");
-    resolver.add("axelor-data", "axelor-auth", "axelor-core");
-    resolver.add("axelor-contact", "axelor-auth", "axelor-core", "axelor-meta");
-    resolver.add("axelor-project", "axelor-sale");
+    add("axelor-sale", "axelor-contact");
+    add("axelor-data", "axelor-auth", "axelor-core");
+    add("axelor-contact", "axelor-auth", "axelor-core", "axelor-meta");
+    add("axelor-project", "axelor-sale");
 
     List<String> expected =
         Lists.newArrayList(
@@ -49,6 +59,8 @@ public class TestResolver {
             "axelor-meta",
             "axelor-contact",
             "axelor-sale");
+
+    ModuleResolver resolver = new ModuleResolver(modules.values());
 
     List<String> actual = new ArrayList<>();
     for (Module module : resolver.resolve("axelor-sale")) {
