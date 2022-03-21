@@ -282,11 +282,15 @@ public class DBHelper {
 
   /** Check whether the database has unaccent support. */
   public static boolean isUnaccentEnabled() {
-    if (unaccentSupport == null) {
+    // TODO: add unaccent support for other database
+    if (unaccentSupport == null && isPostgreSQL()) {
       try {
         unaccentSupport = testUnaccent();
       } catch (Exception e) {
         unaccentSupport = Boolean.FALSE;
+      }
+      if (Boolean.FALSE.equals(unaccentSupport)) {
+        LOG.warn("unaccent extension is not supported by the database.");
       }
     }
     return Boolean.TRUE.equals(unaccentSupport);
