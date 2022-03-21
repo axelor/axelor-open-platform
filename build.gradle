@@ -101,3 +101,4 @@ task generateChangelog(type: com.axelor.gradle.tasks.GenerateChangelog) {
 
 apply from: "gradle/javadoc.gradle"
 apply from: "gradle/style.gradle"
+apply from: "gradle/deps-versions.gradle"

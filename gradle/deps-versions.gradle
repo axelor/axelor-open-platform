@@ -1,0 +1,105 @@
+import com.axelor.gradle.util.VersionNumber
+
+buildscript {
+    repositories repos
+    dependencies {
+        classpath "com.github.ben-manes:gradle-versions-plugin:0.42.0"
+    }
+}
+
+apply plugin: com.github.benmanes.gradle.versions.VersionsPlugin
+
+def isStable = { String version ->
+    def stableKeyword = ['RELEASE', 'FINAL', 'GA', 'SP', '-JRE'].any { it -> version.toUpperCase().contains(it) }
+    def regex = /^[0-9,.v-]+$/
+    return stableKeyword || version ==~ regex
+}
+
+/**
+ * Gradle Versions Plugin : https://github.com/ben-manes/gradle-versions-plugin
+ * Determine which dependencies have updates and checks for updates to Gradle itself.
+ *
+ * Rules :
+ *
+ * - Prefer guava's jre artifacts (reject -android versions)
+ *   See https://github.com/google/guava#adding-guava-to-your-build
+ *
+ * - for dependencies using stable versions : reject unstable newer versions
+ *   and always report newer stable version.
+ *
+ * - for dependencies using unstable versions : accept newer unstable versions
+ *   if it’s the same base version (i.e. 1.0.0-alpha1 -> 1.0.0-alpha2).
+ *   Otherwise prefer newer stable and reject newer unstable with different base versions (like 1.1.0-alpha1)
+ *
+ * Options :
+ * - add -PonlyMinor property to list only minor updates
+ * - add -PonlyPatch property to list only patch updates
+ */
+dependencyUpdates {
+    checkForGradleUpdate = true
+    gradleReleaseChannel = "current"
+
+    resolutionStrategy {
+        componentSelection {
+            all { ComponentSelection selection ->
+                if (selection.candidate.group == 'com.google.guava' && selection.candidate.module == 'guava') {
+                    if (!selection.candidate.version.endsWith('-jre')) {
+                        selection.reject('Wrong flavors')
+                    }
+                }
+                if ((selection.candidate.group == 'commons-cli' && selection.candidate.version == '20040117.000000')
+                        || (selection.candidate.group == 'commons-io' && selection.candidate.version == '20030203.000550')) {
+                    // See https://github.com/ben-manes/gradle-versions-plugin/issues/446#issuecomment-730960590
+                    selection.reject('Not relevant')
+                }
+
+                def currentIsStable = isStable(selection.currentVersion)
+                def candidateIsStable = isStable(selection.candidate.version)
+                def candidateVersion = VersionNumber.parse(selection.candidate.version)
+                def currentVersion = VersionNumber.parse(selection.currentVersion.toString())
+
+                if (!currentIsStable) {
+                    // for unstable versions
+                    if (candidateIsStable) {
+                        // Always prefer stable candidates newer than a current unstable version
+                    } else {
+                        if (candidateVersion != VersionNumber.UNKNOWN && currentVersion != VersionNumber.UNKNOWN) {
+                            // Both are unstable. Only accept a newer unstable version if it's the same maj.min.patch. This is so we
+                            // don't accidentally skip a more stable version in between.
+                            def shouldReject = candidateVersion.baseVersion > currentVersion.baseVersion
+                            if (shouldReject) {
+                                selection.reject('Reject')
+                            }
+                        }
+                    }
+                }
+
+                if (!candidateIsStable && currentIsStable) {
+                    // for stable versions - reject unstable newer versions
+                    selection.reject('Reject')
+                } else if (currentVersion.qualifier != null && currentVersion.qualifier.contains("SP")) {
+                    // manage SP versions : 2.0.SP2 > 2.0.SP1 > 2.0
+                    def currentSPNumber = currentVersion.qualifier.substring(currentVersion.qualifier.lastIndexOf("SP") + 2) as Integer
+                    def candidateSPNumber = candidateVersion.qualifier != null && candidateVersion.qualifier.contains("SP")
+                            ? candidateVersion.qualifier.substring(candidateVersion.qualifier.lastIndexOf("SP") + 2) as Integer : 0
+                    if (candidateVersion.baseVersion == currentVersion.baseVersion && candidateSPNumber < currentSPNumber) {
+                        selection.reject('Current SP version is greather than candidate')
+                    }
+                }
+
+                if (project.hasProperty("onlyMinor")) {
+                    // list only minor updates (Major.+)
+                    if (candidateVersion.major != currentVersion.major) {
+                        selection.reject('Only minor updates')
+                    }
+                } else if (project.hasProperty("onlyPatch")) {
+                    // list only patch updates (Major.Minor.+)
+                    if (candidateVersion.major != currentVersion.major || candidateVersion.minor != currentVersion.minor) {
+                        selection.reject('Only patch updates')
+                    }
+                }
+
+            }
+        }
+    }
+}
