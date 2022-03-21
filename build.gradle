@@ -22,9 +22,6 @@ subprojects {
 
   afterEvaluate {
     test {
-      forkEvery 1
-      maxParallelForks 4
-
       useJUnitPlatform()
 
       beforeTest { descriptor ->
