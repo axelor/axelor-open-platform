@@ -34,6 +34,7 @@ import java.io.Reader;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -353,9 +354,13 @@ public class I18nExtractor {
   }
 
   public void extract(final Path base, boolean update, boolean withContext) {
+    Path src = base.resolve(Paths.get("src", "main"));
+    Path dest = src.resolve("resources");
+    extract(src, dest, update, withContext);
+  }
 
-    final Path srcPath = base.resolve("src/main");
-    if (!Files.exists(srcPath)) {
+  public void extract(Path srcPath, Path destPath, boolean update, boolean withContext) {
+    if (Files.notExists(srcPath)) {
       return;
     }
 
@@ -407,17 +412,17 @@ public class I18nExtractor {
     }
 
     try {
-      update(base, values, update);
+      update(destPath, values, update);
     } catch (IOException e) {
     }
   }
 
-  private void update(final Path base, final List<String[]> lines, boolean all) throws IOException {
+  private void update(Path destPath, final List<String[]> lines, boolean all) throws IOException {
 
     // first save the template
-    Path template = base.resolve("src/main/resources/i18n/messages.csv");
+    Path template = destPath.resolve(Paths.get("i18n", "messages.csv"));
 
-    log.info("generating: " + base.relativize(template));
+    log.info("generating: " + template);
 
     save(template, lines);
 
@@ -436,7 +441,7 @@ public class I18nExtractor {
             final Pattern pattern = Pattern.compile("messages_([a-zA-Z_]+)\\.csv");
             final Matcher matcher = pattern.matcher(name);
             if (matcher.matches()) {
-              log.info("updating: " + base.relativize(file));
+              log.info("updating: " + file);
               update(file, lines);
             }
             return FileVisitResult.CONTINUE;
@@ -448,7 +453,7 @@ public class I18nExtractor {
     for (String lang : langs) {
       Path target = template.resolveSibling("messages_" + lang + ".csv");
       if (!Files.exists(target)) {
-        log.info("generating: " + base.relativize(target));
+        log.info("generating: " + target);
         Files.copy(template, target);
       }
     }

@@ -18,6 +18,7 @@
 package com.axelor.tools;
 
 import com.axelor.tools.i18n.I18nExtractor;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.junit.Test;
 
@@ -29,6 +30,11 @@ public class I18nExtractorTest {
   @Test
   public void test() {
     I18nExtractor tools = new I18nExtractor();
-    tools.extract(Paths.get(BASE, MODULE), true, true);
+
+    Path base = Paths.get(BASE, MODULE);
+    Path src = base.resolve(Paths.get("src", "main"));
+    Path dest = base.resolve(Paths.get("build", "resources", "test"));
+
+    tools.extract(src, dest, true, true);
   }
 }
