@@ -18,8 +18,10 @@
 package com.axelor.db;
 
 import com.axelor.db.internal.DBHelper;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+@Disabled
 public class MigrationTest {
 
   @Test
