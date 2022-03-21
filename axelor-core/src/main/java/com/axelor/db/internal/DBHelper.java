@@ -245,12 +245,21 @@ public class DBHelper {
 
   /** Whether using oracle database. */
   public static boolean isOracle() {
-    return jdbcDriver != null && jdbcDriver.contains("Oracle");
+    return isEngine(TargetDatabase.ORACLE);
   }
 
   /** Whether using MySQL database. */
   public static boolean isMySQL() {
-    return jdbcDriver != null && jdbcDriver.contains("mysql");
+    return isEngine(TargetDatabase.MYSQL);
+  }
+
+  /** Whether using PostgreSQL database. */
+  public static boolean isPostgreSQL() {
+    return isEngine(TargetDatabase.POSTGRESQL);
+  }
+
+  private static boolean isEngine(String engine) {
+    return jdbcDriver != null && jdbcDriver.toLowerCase().contains(engine.toLowerCase());
   }
 
   /**

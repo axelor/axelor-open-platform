@@ -17,6 +17,7 @@
  */
 package com.axelor.db.hibernate.dialect;
 
+import com.axelor.db.internal.TargetDatabase;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.dialect.spi.DialectResolutionInfo;
 import org.hibernate.engine.jdbc.dialect.spi.DialectResolver;
@@ -36,10 +37,10 @@ public class CustomDialectResolver implements DialectResolver {
     final String databaseName = info.getDatabaseName();
     final int majorVersion = info.getDatabaseMajorVersion();
     final int minorVersion = info.getDatabaseMinorVersion();
-    if ("HSQL Database Engine".equals(databaseName)) {
+    if (TargetDatabase.HSQLDB.equals(databaseName)) {
       return new AxelorHSQLDialect();
     }
-    if ("PostgreSQL".equals(databaseName)) {
+    if (TargetDatabase.POSTGRESQL.equals(databaseName)) {
       // Don't support version < 9.4
       if (majorVersion == 9) {
         log.debug(
@@ -55,13 +56,13 @@ public class CustomDialectResolver implements DialectResolver {
 
       log.error("PostgreSQL 9.4 or later is required.");
     }
-    if ("Oracle".equals(databaseName)) {
+    if (TargetDatabase.ORACLE.equals(databaseName)) {
       if (majorVersion >= 12) {
         return new AxelorOracle12cDialect();
       }
       log.error("Oracle 12c or later is required.");
     }
-    if ("MySQL".equals(databaseName)) {
+    if (TargetDatabase.MYSQL.equals(databaseName)) {
       // Don't support version < 5.7
       if (majorVersion == 5) {
         if (minorVersion >= 7) {
