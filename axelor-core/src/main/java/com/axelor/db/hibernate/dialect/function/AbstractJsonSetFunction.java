@@ -15,10 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.db.hibernate.dialect;
+package com.axelor.db.hibernate.dialect.function;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.persistence.PersistenceException;
@@ -28,33 +26,18 @@ import org.hibernate.engine.spi.Mapping;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.type.Type;
 
-public abstract class AbstractJsonExtractFunction implements SQLFunction {
+public abstract class AbstractJsonSetFunction implements SQLFunction {
 
-  private static final Pattern NAME_PATTERN = Pattern.compile("\\w+(\\.\\w+)*");
-  private static final Pattern ARGS_PATTERN = Pattern.compile("'\\w+'");
-
-  private Type type;
+  private static final Pattern PATH_PATTERN = Pattern.compile("\\w+(\\.\\w+)*");
 
   private String name;
 
-  private String cast;
-
-  public AbstractJsonExtractFunction(String name, Type type, String cast) {
-    this.type = type;
+  public AbstractJsonSetFunction(String name) {
     this.name = name;
-    this.cast = cast;
   }
 
   public String getName() {
     return name;
-  }
-
-  public String getCast() {
-    return cast;
-  }
-
-  public Type getType() {
-    return type;
   }
 
   @Override
@@ -69,44 +52,38 @@ public abstract class AbstractJsonExtractFunction implements SQLFunction {
 
   @Override
   public Type getReturnType(Type firstArgumentType, Mapping mapping) throws QueryException {
-    return type == null ? firstArgumentType : type;
+    return firstArgumentType;
   }
 
-  protected abstract String transformPath(List<String> path);
+  protected abstract String transformPath(String path);
 
-  protected String transformFunction(String func) {
-    return func;
-  }
+  protected abstract Object transformValue(Object value);
 
-  private static String validateField(String name) {
-    if (NAME_PATTERN.matcher(name).matches()) {
+  private static String validatePath(String name) {
+    if (PATH_PATTERN.matcher(name).matches()) {
       return name;
     }
-    throw new PersistenceException("Invalid field name: " + name);
-  }
-
-  private static String validateArg(String name) {
-    if (ARGS_PATTERN.matcher(name).matches()) {
-      return name;
-    }
-    throw new PersistenceException("Invalid json field: " + name);
+    throw new PersistenceException("Invalid json path: " + name);
   }
 
   @Override
   @SuppressWarnings("rawtypes")
   public String render(Type firstArgumentType, List arguments, SessionFactoryImplementor factory) {
-    final StringBuilder buf = new StringBuilder();
-    final Iterator iter = arguments.iterator();
-    final List<String> path = new ArrayList<>();
-    buf.append(getName()).append("(");
-    buf.append(validateField((String) iter.next()));
-    while (iter.hasNext()) {
-      path.add(validateArg((String) iter.next()));
+    if (arguments.size() != 3) {
+      throw new PersistenceException("Invalid use of 'json_set', requires 3 arguments.");
     }
-    buf.append(", ");
-    buf.append(transformPath(path));
+
+    final StringBuilder buf = new StringBuilder();
+    final String field = (String) arguments.get(0);
+    final String path = (String) arguments.get(1);
+    final Object value = arguments.get(2);
+
+    buf.append(getName()).append("(");
+    buf.append(validatePath(field)).append(", ");
+    buf.append(transformPath(validatePath(path.substring(1, path.length() - 1)))).append(", ");
+    buf.append(transformValue(value));
     buf.append(")");
-    final String func = transformFunction(buf.toString());
-    return cast == null ? func : String.format("cast(nullif(%s, '') as %s)", func, cast);
+
+    return buf.toString();
   }
 }

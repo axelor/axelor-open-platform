@@ -17,69 +17,33 @@
  */
 package com.axelor.db.hibernate.dialect;
 
+import com.axelor.db.hibernate.dialect.function.MySQLJsonExtractFunction;
+import com.axelor.db.hibernate.dialect.function.MySQLJsonSetFunction;
 import com.axelor.db.hibernate.type.EncryptedTextType;
 import com.axelor.db.hibernate.type.JsonSqlTypeDescriptor;
 import com.axelor.db.hibernate.type.JsonType;
 import java.sql.Types;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.hibernate.boot.model.TypeContributions;
 import org.hibernate.dialect.MySQL57Dialect;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.StandardBasicTypes;
-import org.hibernate.type.Type;
 
 public class AxelorMySQL57Dialect extends MySQL57Dialect {
-
-  static class JsonExtractFunction extends AbstractJsonExtractFunction {
-
-    public JsonExtractFunction(Type type, String cast) {
-      super("json_extract", type, cast);
-    }
-
-    @Override
-    public String transformPath(List<String> path) {
-      return path.stream()
-          .map(item -> item.substring(1, item.length() - 1))
-          .collect(Collectors.joining(".", "'$.", "'"));
-    }
-
-    @Override
-    protected String transformFunction(String func) {
-      return String.format("json_unquote(%s)", func);
-    }
-  }
-
-  static class JsonSetFunction extends AbstractJsonSetFunction {
-
-    public JsonSetFunction() {
-      super("json_set");
-    }
-
-    @Override
-    protected String transformPath(String path) {
-      return "'$." + path + "'";
-    }
-
-    @Override
-    protected Object transformValue(Object value) {
-      return value;
-    }
-  }
 
   public AxelorMySQL57Dialect() {
     super();
     registerColumnType(Types.OTHER, "json");
-    registerFunction("json_set", new JsonSetFunction());
-    registerFunction("json_extract", new JsonExtractFunction(StandardBasicTypes.STRING, null));
-    registerFunction("json_extract_text", new JsonExtractFunction(StandardBasicTypes.STRING, null));
+    registerFunction("json_set", new MySQLJsonSetFunction());
+    registerFunction("json_extract", new MySQLJsonExtractFunction(StandardBasicTypes.STRING, null));
     registerFunction(
-        "json_extract_boolean", new JsonExtractFunction(StandardBasicTypes.BOOLEAN, null));
+        "json_extract_text", new MySQLJsonExtractFunction(StandardBasicTypes.STRING, null));
     registerFunction(
-        "json_extract_integer", new JsonExtractFunction(StandardBasicTypes.INTEGER, "signed"));
+        "json_extract_boolean", new MySQLJsonExtractFunction(StandardBasicTypes.BOOLEAN, null));
+    registerFunction(
+        "json_extract_integer", new MySQLJsonExtractFunction(StandardBasicTypes.INTEGER, "signed"));
     registerFunction(
         "json_extract_decimal",
-        new JsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "decimal(64,4)"));
+        new MySQLJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "decimal(64,4)"));
   }
 
   @Override

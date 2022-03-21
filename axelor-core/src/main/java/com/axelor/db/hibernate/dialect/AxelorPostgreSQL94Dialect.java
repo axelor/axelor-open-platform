@@ -17,60 +17,36 @@
  */
 package com.axelor.db.hibernate.dialect;
 
+import com.axelor.db.hibernate.dialect.function.PostgreSQLJsonExtractFunction;
+import com.axelor.db.hibernate.dialect.function.PostgreSQLJsonSetFunction;
 import com.axelor.db.hibernate.type.EncryptedTextType;
 import com.axelor.db.hibernate.type.JsonType;
 import com.axelor.db.hibernate.type.JsonbSqlTypeDescriptor;
 import java.sql.Types;
-import java.util.List;
 import org.hibernate.boot.model.TypeContributions;
 import org.hibernate.dialect.PostgreSQL94Dialect;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.StandardBasicTypes;
-import org.hibernate.type.Type;
 
 public class AxelorPostgreSQL94Dialect extends PostgreSQL94Dialect {
-
-  static class JsonExtractFunction extends AbstractJsonExtractFunction {
-
-    public JsonExtractFunction(Type type, String cast) {
-      super("jsonb_extract_path_text", type, cast);
-    }
-
-    @Override
-    protected String transformPath(List<String> path) {
-      return String.join(", ", path);
-    }
-  }
-
-  static class JsonSetFunction extends AbstractJsonSetFunction {
-
-    public JsonSetFunction() {
-      super("jsonb_set");
-    }
-
-    @Override
-    protected String transformPath(String path) {
-      return "'{" + path.replace('.', ',') + "}'";
-    }
-
-    @Override
-    protected Object transformValue(Object value) {
-      return String.format("to_jsonb(%s)", value);
-    }
-  }
 
   public AxelorPostgreSQL94Dialect() {
     super();
     registerColumnType(Types.OTHER, "jsonb");
-    registerFunction("json_set", new JsonSetFunction());
-    registerFunction("json_extract", new JsonExtractFunction(StandardBasicTypes.STRING, null));
-    registerFunction("json_extract_text", new JsonExtractFunction(StandardBasicTypes.STRING, null));
+    registerFunction("json_set", new PostgreSQLJsonSetFunction());
     registerFunction(
-        "json_extract_boolean", new JsonExtractFunction(StandardBasicTypes.BOOLEAN, "boolean"));
+        "json_extract", new PostgreSQLJsonExtractFunction(StandardBasicTypes.STRING, null));
     registerFunction(
-        "json_extract_integer", new JsonExtractFunction(StandardBasicTypes.INTEGER, "integer"));
+        "json_extract_text", new PostgreSQLJsonExtractFunction(StandardBasicTypes.STRING, null));
     registerFunction(
-        "json_extract_decimal", new JsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "numeric"));
+        "json_extract_boolean",
+        new PostgreSQLJsonExtractFunction(StandardBasicTypes.BOOLEAN, "boolean"));
+    registerFunction(
+        "json_extract_integer",
+        new PostgreSQLJsonExtractFunction(StandardBasicTypes.INTEGER, "integer"));
+    registerFunction(
+        "json_extract_decimal",
+        new PostgreSQLJsonExtractFunction(StandardBasicTypes.BIG_DECIMAL, "numeric"));
   }
 
   @Override
