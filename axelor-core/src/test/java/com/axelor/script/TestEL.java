@@ -17,12 +17,14 @@
  */
 package com.axelor.script;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.axelor.db.JpaRepository;
 import com.axelor.rpc.Context;
 import com.axelor.test.db.Contact;
+import com.axelor.test.db.repo.ContactRepository;
+import java.time.LocalDate;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -30,28 +32,39 @@ import org.junit.jupiter.api.TestMethodOrder;
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class TestEL extends ScriptTest {
 
-  private static final int COUNT = 1000;
-
   private static final String EXPR_INTERPOLATION =
-      "fmt:text('(%s) = %s %s (%s) = (%s) ', title.name, firstName, lastName, fullName, __user__)";
+      "fmt:text('(%s) = %s %s (%s) = (%s)', title.name, firstName, lastName, fullName, __user__)";
 
   private static final String EXPR_CONCAT =
-      "'(' += title.name += ') = ' += firstName += ' ' += lastName += ' (' += fullName += ') = (' += str(__user__) += ')' ";
+      "'(' += title.name += ') = ' += firstName += ' ' += lastName += ' (' += fullName += ') = (' += str(__user__) += ')'";
 
   // false all, to evaluate all conditions
   private static final String EXPR_CONDITION =
       "(is(title, Contact) || fullName == 'foo') || is(__ref__, Title) || (__parent__ == null) || (__self__ == __this__)";
 
-  private void doTestSpeed(String expr) {
-    ScriptHelper helper = new ELScriptHelper(context());
-    for (int i = 0; i < COUNT; i++) {
-      Object result = helper.eval(expr);
-      assertNotNull(result);
-    }
+  // TODO: test should pass
+  @Test
+  @Disabled
+  public void testImport() {
+    Context context = context();
+    ELScriptHelper helper = new ELScriptHelper(context);
+    Object actual;
+
+    // Not need of FQN
+    actual = helper.eval("LocalDate.of(2020, 5, 22)");
+    assertEquals(LocalDate.of(2020, 5, 22), actual);
+
+    // __repo__
+    actual = helper.eval("__repo__(Contact)");
+    assertTrue(actual instanceof ContactRepository);
+
+    // com.axelor.apps.tool imports
+    actual = helper.eval("StringUtils.isBlank(\"\")");
+    assertTrue((Boolean) actual);
   }
 
-  private void doCastTest(int counter) {
-
+  @Test
+  public void testEvalCast() {
     ScriptHelper helper = new ELScriptHelper(context());
     Object actual;
 
@@ -64,72 +77,43 @@ public class TestEL extends ScriptTest {
     actual = helper.eval("__parent__.asType(Contact)");
     assertTrue(actual instanceof Contact);
 
-    actual = helper.eval("__repo__(Contact)");
-    assertTrue(actual instanceof JpaRepository);
-
     actual = helper.eval("__ref__.fullName");
     assertTrue(actual instanceof String);
 
-    actual = helper.eval("__ref__.fullName += ' (" + counter + ")'");
+    actual = helper.eval("__ref__.fullName += ' (" + 0 + ")'");
+    assertEquals("Mr. John Smith (0)", actual);
 
-    assertNotNull(helper.eval("__config__.string"));
-    assertNotNull(helper.eval("__config__.world"));
-    assertNotNull(helper.eval("__config__.hello.contact()"));
+    actual = helper.eval("__config__.string");
+    assertEquals("some static text value", actual);
+
+    actual = helper.eval("__config__.world");
+    assertEquals("Hello world...", actual);
+
+    actual = helper.eval("__config__.hello.contact()");
+    assertTrue(actual instanceof Contact);
   }
 
   @Test
-  public void test01_casts() {
-    doCastTest(0);
-  }
+  public void testInterpolation() {
+    ScriptHelper helper = new ELScriptHelper(context());
+    Object result = helper.eval(EXPR_INTERPOLATION);
 
-  // @Test
-  public void test02_permgen() {
-    int counter = 0;
-    while (counter++ < 5000) {
-      doCastTest(counter);
-    }
+    assertEquals("(Mrs.) = John NAME (Mrs. John NAME) = (null)", result);
   }
 
   @Test
-  public void test10_warmup() {
-    doTestSpeed(EXPR_INTERPOLATION);
+  public void testConcat() {
+    ScriptHelper helper = new ELScriptHelper(context());
+    Object result = helper.eval(EXPR_CONCAT);
+
+    assertEquals("(Mrs.) = John NAME (Mrs. John NAME) = ()", result);
   }
 
   @Test
-  public void test11_interpolation() {
-    doTestSpeed(EXPR_INTERPOLATION);
-  }
+  public void testCondition() {
+    ScriptHelper helper = new ELScriptHelper(context());
+    Object result = helper.eval(EXPR_CONDITION);
 
-  @Test
-  public void test12_concat() {
-    doTestSpeed(EXPR_CONCAT);
-  }
-
-  @Test
-  public void test13_condition() {
-    doTestSpeed(EXPR_CONDITION);
-  }
-
-  @Test
-  public void test14_java_concat() {
-    Context context = context();
-    Contact contact = context.asType(Contact.class);
-    for (int i = 0; i < COUNT; i++) {
-      String result =
-          "("
-              + contact.getTitle().getName()
-              + ") ="
-              + " "
-              + contact.getFirstName()
-              + " "
-              + contact.getLastName()
-              + " ("
-              + contact.getFullName()
-              + ") ="
-              + " ("
-              + context.get("__user__")
-              + ")";
-      assertNotNull(result);
-    }
+    assertTrue((Boolean) result);
   }
 }
