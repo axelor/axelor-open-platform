@@ -17,11 +17,16 @@
  */
 package com.axelor.script;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.axelor.db.EntityHelper;
 import com.axelor.rpc.Context;
 import com.axelor.test.db.Contact;
+import com.axelor.test.db.repo.ContactRepository;
+import java.time.LocalDate;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -44,16 +49,32 @@ public class TestGroovy extends ScriptTest {
   private static final String EXPR_CONDITION =
       "(title instanceof Contact || fullName == 'foo') || (__ref__ instanceof Title) || (__parent__ == 0.102) || (__self__ == __this__)";
 
-  private void doTestSpeed(String expr) {
-    GroovyScriptHelper helper = new GroovyScriptHelper(context());
-    for (int i = 0; i < COUNT; i++) {
-      Object result = helper.eval(expr);
-      assertNotNull(result);
-    }
+  @Test
+  public void doJpaTest() {
+    final ScriptHelper helper = new GroovyScriptHelper(context());
+    final Object bean = helper.eval("doInJPA({ em -> em.find(Contact, id) })");
+    assertNotNull(bean);
+    assertTrue(bean instanceof Contact);
+    assertEquals(contact.getId(), ((Contact) bean).getId());
+    assertFalse(EntityHelper.isUninitialized((Contact) bean));
   }
 
-  private void doCastTest(int counter) {
+  @Test
+  public void testImport() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object actual;
 
+    // Not need of FQN
+    actual = helper.eval("LocalDate.of(2020, 5, 22)");
+    assertEquals(LocalDate.of(2020, 5, 22), actual);
+
+    // __repo__
+    actual = helper.eval("__repo__(Contact)");
+    assertTrue(actual instanceof ContactRepository);
+  }
+
+  @Test
+  public void testEvalCast() {
     GroovyScriptHelper helper = new GroovyScriptHelper(context());
     Object actual;
 
@@ -69,75 +90,39 @@ public class TestGroovy extends ScriptTest {
     actual = helper.eval("(__ref__ as Contact).fullName");
     assertTrue(actual instanceof String);
 
-    actual = helper.eval("(__ref__ as Contact).fullName + ' (" + counter + ")'");
+    actual = helper.eval("(__ref__ as Contact).fullName + ' (" + 0 + ")'");
+    assertEquals("Mr. John Smith (0)", actual);
   }
 
   @Test
-  public void doJpaTest() {
-    final ScriptHelper helper = new GroovyScriptHelper(context());
-    final Object bean = helper.eval("doInJPA({ em -> em.find(Contact, id) })");
-    assertNotNull(bean);
-    assertTrue(bean instanceof Contact);
+  public void testInterpolation() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval(EXPR_INTERPOLATION);
+
+    assertEquals("(Mrs.) = John NAME (Mrs. John NAME) = (null)", result.toString());
   }
 
   @Test
-  public void test01_casts() {
-    doCastTest(0);
-  }
+  public void testConcat() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval(EXPR_CONCAT);
 
-  // @Test
-  public void test02_permgen() {
-    int counter = 0;
-    while (counter++ < 5000) {
-      doCastTest(counter);
-    }
+    assertEquals("(Mrs.) = John NAME (Mrs. John NAME) = (null)", result);
   }
 
   @Test
-  public void test10_warmup() {
-    doTestSpeed(EXPR_INTERPOLATION);
+  public void testElvis() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval(EXPR_ELVIS);
+
+    assertEquals("(Mrs.) = John NAME (Mrs. John NAME) = (null)", result);
   }
 
   @Test
-  public void test11_interpolation() {
-    doTestSpeed(EXPR_INTERPOLATION);
-  }
+  public void testCondition() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval(EXPR_CONDITION);
 
-  @Test
-  public void test12_concat() {
-    doTestSpeed(EXPR_CONCAT);
-  }
-
-  @Test
-  public void test13_elvis() {
-    doTestSpeed(EXPR_ELVIS);
-  }
-
-  @Test
-  public void test14_condition() {
-    doTestSpeed(EXPR_CONDITION);
-  }
-
-  @Test
-  public void test15_java_concat() {
-    Context context = context();
-    Contact contact = context.asType(Contact.class);
-    for (int i = 0; i < COUNT; i++) {
-      String result =
-          "("
-              + contact.getTitle().getName()
-              + ") ="
-              + " "
-              + contact.getFirstName()
-              + " "
-              + contact.getLastName()
-              + " ("
-              + contact.getFullName()
-              + ") ="
-              + " ("
-              + context.get("__user__")
-              + ")";
-      assertNotNull(result);
-    }
+    assertTrue((Boolean) result);
   }
 }
