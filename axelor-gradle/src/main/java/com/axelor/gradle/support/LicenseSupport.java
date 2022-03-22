@@ -66,6 +66,7 @@ public class LicenseSupport extends AbstractSupport {
 
     license.setHeader(header);
     license.setIgnoreFailures(true);
+    license.setStrictCheck(true);
 
     license.mapping("java", "SLASHSTAR_STYLE");
     license.mapping("scss", "JAVADOC_STYLE");
@@ -107,6 +108,7 @@ public class LicenseSupport extends AbstractSupport {
                     task -> {
                       task.setEnabled(headerExists);
                       task.setSource(project.fileTree(src));
+                      task.setStrictCheck(true);
                       task.source(
                           project.fileTree(
                               webapp,
