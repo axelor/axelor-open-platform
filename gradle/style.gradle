@@ -1,28 +1,32 @@
 buildscript {
   repositories repos
   dependencies {
-    classpath "com.diffplug.spotless:spotless-plugin-gradle:5.15.0"
+    classpath "com.diffplug.spotless:spotless-plugin-gradle:6.3.0"
   }
 }
+
+/////
+// Root project (including buildSrc)
+/////
 
 apply plugin: com.diffplug.gradle.spotless.SpotlessPlugin
 
 spotless {
+  enforceCheck false
+
+  java {
+    target fileTree(projectDir) {
+      // buildSrc java files
+      include 'buildSrc/src/*/java/**/*.java'
+    }
+    googleJavaFormat()
+  }
   format 'misc', {
     target fileTree(projectDir) {
-      include '**/.gitignore'
-      include '**/*.gradle'
-      include '**/*.adoc'
-      include '**/*.sh'
-      include '**/*.html'
-      include '**/*.js'
-      include '**/*.css'
-      include '**/*.xml'
-      include '**/*.xsd'
-      exclude '**/webapp/lib/*'
-      exclude '**/webapp/dist/*'
-      exclude '**/webapp/node_modules/*'
-      exclude '**/build/*'
+      include '.gitignore'
+      include '*.gradle'
+      include 'gradle/*.gradle'
+      include 'documentation/*.yml'
     }
     indentWithSpaces(2)
     trimTrailingWhitespace()
@@ -35,28 +39,57 @@ spotless {
   }
 }
 
-spotlessMisc.dependsOn(spotlessMarkdown)
+/////
+// Sub projects
+/////
 
 subprojects { p ->
+
   apply plugin: com.diffplug.gradle.spotless.SpotlessPlugin
+
   spotless {
+    enforceCheck false
+
     java {
+      target fileTree(p.projectDir) {
+        include 'src/*/java/**/*.java'
+      }
       googleJavaFormat()
     }
-  }
-  task formatCode(dependsOn: ['licenseFormat', 'spotlessApply'])
-
-  // fix up-to-date check issue
-  p.afterEvaluate {
-    try {
-      p.spotlessJava.dependsOn(p.generateCode)
-    } catch (Exception e) {
+    format 'misc', {
+      target fileTree(p.projectDir) {
+        include '*.gradle'
+        include 'src/**/*.html'
+        include 'src/**/*.js'
+        include 'src/**/*.css'
+        include 'src/**/*.xml'
+        include 'src/**/*.xsd'
+        include 'src/**/*.jsp'
+        exclude 'src/**/webapp/lib/*'
+        if (p.name == 'axelor-tomcat') {
+          // Exclude tomcat configs files
+          exclude 'src/main/resources/conf/*'
+        }
+      }
+      indentWithSpaces(2)
+      trimTrailingWhitespace()
+      endWithNewline()
     }
   }
+
 }
 
-task formatCode(dependsOn: 'spotlessApply')
+/////
+// formatCode task
+/////
 
 allprojects {
-  build.dependsOn 'spotlessApply'
+  tasks.register('formatCode') {
+    description "Add license and format code."
+    group "Axelor"
+    if (tasks.findByName('licenseFormat')) {
+      dependsOn 'licenseFormat'
+    }
+    dependsOn'spotlessApply'
+  }
 }
