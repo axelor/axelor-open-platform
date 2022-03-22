@@ -3,9 +3,10 @@
  *
  * Copyright (C) 2005-2022 Axelor (<http://axelor.com>).
  *
- * This program is free software: you can redistribute it and/or  modify
- * it under the terms of the GNU Affero General Public License, version 3,
- * as published by the Free Software Foundation.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,20 +14,21 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package com.axelor.gradle.tasks;
 
+import com.axelor.common.FileUtils;
 import com.axelor.gradle.AxelorExtension;
 import com.axelor.gradle.AxelorPlugin;
 import com.axelor.gradle.AxelorUtils;
-import com.axelor.tools.x2j.Generator;
-import com.google.common.base.Charsets;
+import com.axelor.tools.code.entity.EntityGenerator;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -94,11 +96,12 @@ public class GenerateCode extends DefaultTask {
   private void generateInfo(AxelorExtension extension, List<ResolvedArtifact> artifacts)
       throws IOException {
     final Project project = getProject();
-    final File outputPath = new File(getResourceOutputDir(getProject()), "module.properties");
+    final File outputPath =
+        FileUtils.getFile(getResourceOutputDir(getProject()), "module.properties");
     try {
       outputPath.getParentFile().mkdirs();
     } catch (Exception e) {
-      getLogger().info("Error generating module.properties", e);
+      getLogger().error("Error generating module.properties", e);
     }
 
     getLogger().info("Generating: {}", outputPath.getParent());
@@ -106,7 +109,14 @@ public class GenerateCode extends DefaultTask {
     List<String> descriptionLines = new ArrayList<>();
     List<String> depends = new ArrayList<>();
 
-    artifacts.forEach(artifact -> depends.add(artifact.getName()));
+    artifacts.forEach(
+        artifact -> {
+          try {
+            depends.add(AxelorUtils.getModuleName(project, artifact));
+          } catch (Exception e) {
+            getLogger().error("Error generating module.properties", e);
+          }
+        });
 
     String description = extension.getDescription();
     if (description == null) {
@@ -136,15 +146,15 @@ public class GenerateCode extends DefaultTask {
       text.append("\n").append("depends = ").append(Joiner.on(", ").join(depends)).append("\n");
     }
 
-    Files.asCharSink(outputPath, Charsets.UTF_8).write(text);
+    Files.asCharSink(outputPath, StandardCharsets.UTF_8).write(text);
   }
 
-  private Generator buildGenerator(Project project) {
+  private EntityGenerator buildGenerator(Project project) {
     final File domainPath = getInputDir(project);
     final File targetPath = getJavaOutputDir(project);
     return formatter != null
-        ? new Generator(domainPath, targetPath, formatter)
-        : new Generator(domainPath, targetPath);
+        ? new EntityGenerator(domainPath, targetPath, formatter)
+        : new EntityGenerator(domainPath, targetPath);
   }
 
   @TaskAction
@@ -161,14 +171,14 @@ public class GenerateCode extends DefaultTask {
     generateInfo(extension, axelorArtifacts);
 
     // start code generation
-    final Generator generator = buildGenerator(project);
+    final EntityGenerator generator = buildGenerator(project);
 
     // add lookup generators
     for (ResolvedArtifact artifact : axelorArtifacts) {
       final Project sub = AxelorUtils.findProject(project, artifact);
       if (sub == null) {
         generator.addLookupSource(
-            Generator.forFiles(
+            EntityGenerator.forFiles(
                 project
                     .zipTree(artifact.getFile())
                     .matching(new PatternSet().include("**/domains/**"))

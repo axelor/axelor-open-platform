@@ -11,6 +11,8 @@ dependencies {
   implementation libs.plugin_license
   implementation libs.commons_csv
   implementation libs.snakeyaml
+  implementation libs.javax_jaxb
+  implementation libs.eclipselink_moxy
 }
 
 sourceSets {

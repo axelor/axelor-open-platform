@@ -30,6 +30,8 @@ dependencies {
   implementation libs.apache_tika_core
   implementation libs.plugin_license
   implementation libs.snakeyaml
+  implementation libs.javax_jaxb
+  implementation libs.eclipselink_moxy
 }
 
 test.enabled = false

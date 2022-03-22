@@ -22,11 +22,15 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -127,6 +131,30 @@ public class AxelorUtils {
         .isPresent();
   }
 
+  public static String getModuleName(Project project, ResolvedArtifact artifact)
+      throws IOException {
+
+    // Try by project
+    Project sub = findProject(project, artifact);
+    if (sub != null) {
+      return sub.getName();
+    }
+
+    // Try in jar
+
+    try (final URLClassLoader loader =
+            new URLClassLoader(new URL[] {artifact.getFile().toURI().toURL()});
+        final InputStream in = loader.getResourceAsStream("module.properties")) {
+      if (in != null) {
+        Properties props = new java.util.Properties();
+        props.load(in);
+        return (String) props.get("name");
+      } else {
+        throw new IOException("Unable to locate module.properties in " + artifact.getName());
+      }
+    }
+  }
+
   public static Project findProject(Project project, ResolvedArtifact artifact) {
     final ComponentIdentifier cid = artifact.getId().getComponentIdentifier();
     if (cid instanceof ProjectComponentIdentifier) {
@@ -137,6 +165,7 @@ public class AxelorUtils {
         sub =
             includedBuildRoots(project).stream()
                 .map(p -> p.findProject(path))
+                .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null);
       }
