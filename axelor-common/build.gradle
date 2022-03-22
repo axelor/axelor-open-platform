@@ -3,9 +3,6 @@ description = 'Axelor\'s common APIs'
 apply plugin: 'java'
 
 dependencies {
-
-  testImplementation libs.junit_jupiter
-
   implementation libs.guava
   implementation libs.asm
   implementation libs.commons_csv
@@ -14,10 +11,6 @@ dependencies {
 
 configurations {
   runtime.exclude module: 'jsr305'
-
-  // Remove Junit4, only keep Junit5
-  testImplementation.exclude group: 'junit', module: 'junit'
-  testImplementation.exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 }
 
 void writeManifest(File dir, boolean force) {
