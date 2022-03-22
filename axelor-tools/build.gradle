@@ -1,11 +1,8 @@
 description = 'Tooling to build Axelor apps'
 
 apply plugin: 'java-library'
-apply plugin: 'groovy'
 
 dependencies {
-  api libs.groovy
-
   implementation project(':axelor-common')
   implementation libs.guava
   implementation libs.plugin_license
@@ -13,21 +10,4 @@ dependencies {
   implementation libs.snakeyaml
   implementation libs.javax_jaxb
   implementation libs.eclipselink_moxy
-}
-
-sourceSets {
-  main {
-    java.srcDirs = []
-    groovy.srcDirs = ['src/main/java', 'src/main/groovy']
-  }
-}
-
-spotless {
-  groovy {
-    excludeJava()
-    greclipse()
-    indentWithSpaces(2)
-    trimTrailingWhitespace()
-    endWithNewline()
-  }
 }

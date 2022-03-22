@@ -1,5 +1,4 @@
 apply plugin: "java"
-apply plugin: "groovy"
 
 apply from: "../version.gradle"
 apply from: "../gradle/repos.gradle"
@@ -10,11 +9,8 @@ sourceSets {
   main {
     java {
       srcDirs '../axelor-common/src/main/java'
-    }
-    groovy {
       srcDirs '../axelor-gradle/src/main/java'
       srcDirs '../axelor-tools/src/main/java'
-      srcDirs '../axelor-tools/src/main/groovy'
     }
     resources {
       srcDirs '../axelor-common/src/main/resources'
