@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.rpc.Context;
 import com.axelor.test.db.Contact;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.MethodOrderer;
@@ -83,6 +84,28 @@ public class TestJavaScript extends ScriptTest {
     assertNotNull(map);
     assertTrue(map instanceof Map);
     assertEquals(2, ((Map<?, ?>) map).size());
+  }
+
+  @Test
+  public void doJsonTest() {
+    final ScriptHelper helper = new JavaScriptScriptHelper(context());
+    Object result = helper.eval("$attrs.nickName");
+    assertTrue(result instanceof String);
+    assertEquals("Some Name", result);
+
+    result = helper.eval("orderAmount");
+    assertTrue(result instanceof BigDecimal);
+    assertEquals(0, new BigDecimal("1000.20").compareTo((BigDecimal) result));
+
+    result = helper.eval("nickName");
+    assertTrue(result instanceof String);
+    assertEquals("Some Name", result);
+
+    result = helper.eval("guardian");
+    assertTrue(result instanceof Contact);
+
+    result = helper.eval("guardian.fullName");
+    assertNotNull(result);
   }
 
   @Test
