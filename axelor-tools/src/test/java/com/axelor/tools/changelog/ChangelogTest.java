@@ -15,16 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.tools;
+package com.axelor.tools.changelog;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.axelor.common.ResourceUtils;
-import com.axelor.tools.changelog.ChangelogEntry;
-import com.axelor.tools.changelog.ChangelogEntryParser;
-import com.axelor.tools.changelog.Release;
-import com.axelor.tools.changelog.ReleaseGenerator;
-import com.axelor.tools.changelog.ReleaseProcessor;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;

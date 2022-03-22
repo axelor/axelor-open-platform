@@ -15,12 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.axelor.tools;
+package com.axelor.tools.i18n;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.axelor.tools.i18n.I18nExtractor;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
