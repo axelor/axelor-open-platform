@@ -7,6 +7,8 @@ axelor {
   description = project.description
 }
 
+apply from: "${rootDir}/gradle/tomcat-el.gradle"
+
 dependencies {
   implementation libs.asm
 
@@ -48,7 +50,6 @@ dependencies {
   api libs.javax_jaxb
   api libs.graal_js
 
-  implementation libs.axelor_el
   implementation libs.jsoup
 
   api libs.quartz

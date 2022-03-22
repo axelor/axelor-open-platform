@@ -1,0 +1,58 @@
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath "gradle.plugin.com.github.johnrengelman:shadow:7.1.2"
+    }
+}
+
+configurations {
+    tomcatEl
+}
+
+dependencies {
+    tomcatEl "org.apache.tomcat:tomcat-el-api:${libsVersions.tomcat}"
+    tomcatEl "org.apache.tomcat:tomcat-jasper-el:${libsVersions.tomcat}"
+}
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.plugins.ide.eclipse.model.Library
+
+task relocateTomcatEl(type: ShadowJar) {
+    configurations = [project.configurations.tomcatEl]
+    archiveBaseName = "axelor-tomcat-el"
+    archiveVersion = "${libsVersions.tomcat}"
+
+    mergeServiceFiles()
+
+    exclude 'META-INF/LICENSE'
+    exclude 'META-INF/NOTICE'
+    exclude 'META-INF/web-fragment.xml'
+    exclude 'module-info.class'
+
+    relocate "javax.el", "com.axelor.shading.javax.el"
+    relocate "org.apache.el", "com.axelor.shading.org.apache.el"
+}
+
+jar {
+    dependsOn relocateTomcatEl
+    from(zipTree(relocateTomcatEl.archivePath)) {
+        exclude 'META-INF/MANIFEST.MF'
+    }
+}
+
+dependencies {
+    implementation files(relocateTomcatEl)
+}
+
+eclipse {
+    synchronizationTasks relocateTomcatEl
+    classpath {
+        file {
+            whenMerged {
+                entries += new Library(fileReference(file(relocateTomcatEl.archivePath)))
+            }
+        }
+    }
+}
