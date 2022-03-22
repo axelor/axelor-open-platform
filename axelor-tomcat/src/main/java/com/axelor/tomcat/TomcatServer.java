@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import javax.servlet.ServletException;
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
@@ -57,7 +56,7 @@ public class TomcatServer {
     }
   }
 
-  private Tomcat create() throws IOException, ServletException {
+  private Tomcat create() throws IOException {
     final Path baseDir = options.getBaseDir();
     final Path confDir = baseDir.resolve("conf");
     final Path logsDir = baseDir.resolve("logs");
@@ -113,11 +112,12 @@ public class TomcatServer {
     tomcat.setConnector(connector);
     tomcat.setPort(port);
 
-    final WebappLoader loader = new WebappLoader(getClass().getClassLoader());
+    final WebappLoader loader = new WebappLoader();
     final StandardContext context = (StandardContext) tomcat.addWebapp(contextPath, docBase);
     final StandardRoot resources = new StandardRoot();
 
     context.setLoader(loader);
+    context.setParentClassLoader(getClass().getClassLoader());
     context.setResources(resources);
     context.setUnpackWAR(false);
 
