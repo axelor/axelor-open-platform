@@ -17,10 +17,14 @@
  */
 package com.axelor.tools;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.tools.i18n.I18nExtractor;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.junit.Test;
+import java.util.Objects;
+import org.junit.jupiter.api.Test;
 
 public class I18nExtractorTest {
 
@@ -36,5 +40,8 @@ public class I18nExtractorTest {
     Path dest = base.resolve(Paths.get("build", "resources", "test"));
 
     tools.extract(src, dest, true, true);
+
+    assertTrue(dest.resolve("i18n/messages.csv").toFile().exists());
+    assertEquals(3, Objects.requireNonNull(dest.resolve("i18n").toFile().listFiles()).length);
   }
 }

@@ -17,6 +17,8 @@
  */
 package com.axelor.tools;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.axelor.common.ResourceUtils;
 import com.axelor.tools.changelog.ChangelogEntry;
 import com.axelor.tools.changelog.ChangelogEntryParser;
@@ -35,8 +37,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ChangelogTest {
 
@@ -50,7 +51,7 @@ public class ChangelogTest {
     String output =
         com.google.common.io.Files.asCharSource(outputFile, StandardCharsets.UTF_8).read();
 
-    Assert.assertEquals(output, new ReleaseGenerator().generate(release));
+    assertEquals(output, new ReleaseGenerator().generate(release));
   }
 
   List<ChangelogEntry> getEntries() throws URISyntaxException, IOException {
