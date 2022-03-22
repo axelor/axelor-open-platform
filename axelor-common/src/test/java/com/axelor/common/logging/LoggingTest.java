@@ -41,6 +41,7 @@ public class LoggingTest {
     properties.setProperty("logging.level.com.axelor", "trace");
 
     final LoggerConfiguration loggerConfig = new LoggerConfiguration(properties);
+    loggerConfig.skipDefaultConfig(true);
 
     final PrintStream sout = System.out;
     final StringBuilder builder = new StringBuilder();

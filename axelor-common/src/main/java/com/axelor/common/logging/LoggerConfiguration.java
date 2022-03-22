@@ -68,7 +68,8 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  * <b>logging.pattern.file</b> is set to <code>OFF</code>, file appender will be disabled<br>
  * If <b>logging.pattern.console</b> is set to <code>OFF</code>, console appender will be disabled
  * <br>
- * If <b>logback.xml</b> is found in classpath, no custom configuration is done.
+ * If <b>logback.xml</b> is found in classpath and <code>skipDefaultConfig</code> is false, no
+ * custom configuration is done.
  *
  * <p>The logging pattern can use <code>%clr()</code> to highlight based on log level, or <code>
  * %clr(){color}</code> with <code>faint, red, green, yellow, blue, magenta, cyan</code> as color to
@@ -98,6 +99,7 @@ public class LoggerConfiguration {
 
   private LoggerContext context;
   private Properties config;
+  private boolean skipDefaultConfig = false;
 
   public LoggerConfiguration(Properties config) {
     this.context = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -114,6 +116,10 @@ public class LoggerConfiguration {
 
   private void markUninstalled() {
     this.context.removeObject(LoggerConfiguration.class.getName());
+  }
+
+  public void skipDefaultConfig(boolean skipDefaultConfig) {
+    this.skipDefaultConfig = skipDefaultConfig;
   }
 
   public void install() {
@@ -163,7 +169,7 @@ public class LoggerConfiguration {
     }
 
     // don't do anything if default config found in classpath
-    if (ResourceUtils.getResource(DEFAULT_CONFIG) != null) {
+    if (!skipDefaultConfig && ResourceUtils.getResource(DEFAULT_CONFIG) != null) {
       return;
     }
 
