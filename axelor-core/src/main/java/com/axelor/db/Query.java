@@ -949,13 +949,13 @@ public class Query<T extends Model> {
    * <p>For example:
    *
    * <pre>
-   *    Query<Contact> q = Contact.all().filter("self.title.code = ?1 OR self.age > ?2", "mr", 20);
+   *    Query&lt;Contact&gt; q = Contact.all().filter("self.title.code = ?1 OR self.age &gt; ?2", "mr", 20);
    * </pre>
    *
    * Results in:
    *
    * <pre>
-   * SELECT self FROM Contact self LEFT JOIN self.title _title WHERE _title.code = ?1 OR self.age > ?2
+   * SELECT self FROM Contact self LEFT JOIN self.title _title WHERE _title.code = ?1 OR self.age &gt; ?2
    * </pre>
    *
    * So that all the records are matched even if <code>title</code> field is null.

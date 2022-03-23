@@ -157,7 +157,7 @@ public class AuthService {
   /**
    * Helper action to check user password.
    *
-   * @param request the request with username & password as context or data
+   * @param request the request with username and password as context or data
    * @param response the response, with user details if password matched
    */
   public void checkPassword(ActionRequest request, ActionResponse response) {

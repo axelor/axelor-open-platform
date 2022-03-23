@@ -493,7 +493,7 @@ public class XMLViews {
    * <p>This method will find view in following order:
    *
    * <ol>
-   *   <li>find custom view by name & current user
+   *   <li>find custom view by name and current user
    *   <li>find view matching given params with user's group
    *   <li>find view matching given params but have no groups
    * </ol>

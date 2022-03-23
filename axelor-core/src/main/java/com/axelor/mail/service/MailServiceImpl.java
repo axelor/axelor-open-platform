@@ -430,7 +430,7 @@ public class MailServiceImpl implements MailService, MailConstants {
    * sent by the system.
    *
    * @param email the incoming email message
-   * @return an instance of {@link final MailMessage} to save in database or null to ignore
+   * @return an instance of {@link MailMessage} to save in database or null to ignore
    * @throws MessagingException if there is any error accessing the given message
    * @throws IOException if there is any error accessing message content
    */

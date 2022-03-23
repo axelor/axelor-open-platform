@@ -63,9 +63,10 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  *   <li><b>logging.level.com.axelor</b> - the logging level of given logger
  * </ul>
  *
+ * <br>
  * If <b>logging.config</b> is given, all other properties will be ignored.<br>
- * If <b>logging.path</b> is not given, file appender will be disabled</br> If
- * <b>logging.pattern.file</b> is set to <code>OFF</code>, file appender will be disabled<br>
+ * If <b>logging.path</b> is not given, file appender will be disabled<br>
+ * If <b>logging.pattern.file</b> is set to <code>OFF</code>, file appender will be disabled<br>
  * If <b>logging.pattern.console</b> is set to <code>OFF</code>, console appender will be disabled
  * <br>
  * If <b>logback.xml</b> is found in classpath and <code>skipDefaultConfig</code> is false, no
