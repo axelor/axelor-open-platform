@@ -24,6 +24,6 @@
 <meta charset="UTF-8" />
 </head>
 <body>
-	<h2>authentication error</h2>
+  <h2>authentication error</h2>
 </body>
 </html>

@@ -52,13 +52,13 @@ String extraFoot = "/index-foot.jsp";
 String extraButtons = "/index-nav-buttons.jsp";
 
 if (pageContext.getServletContext().getResource(extraHead) == null) {
-	extraHead = null;
+  extraHead = null;
 }
 if (pageContext.getServletContext().getResource(extraFoot) == null) {
-	extraFoot = null;
+  extraFoot = null;
 }
 if (pageContext.getServletContext().getResource(extraButtons) == null) {
-	extraButtons = null;
+  extraButtons = null;
 }
 
 @SuppressWarnings("all")
@@ -155,18 +155,18 @@ String tenantId = (String) session.getAttribute("tenantId");
                   </li>
                   <% if (tenantMap != null && tenantMap.size() > 1) { %>
                   <li class="divider"></li>
-	              <li>
-	                <a href=""><strong><%= tenantMap.get(tenantId) %></strong></a>
-	              </li>
+                <li>
+                  <a href=""><strong><%= tenantMap.get(tenantId) %></strong></a>
+                </li>
                   <li class="dropdown-submenu">
-                  	<a tabIndex="-1" href="" x-translate>More...</a>
-                  	<ul class="dropdown-menu">
-                  	<% for (String key : tenantMap.keySet()) { %>
-                  	<% if (!key.equals(tenantId)) { %>
-                  	  <li><a href="callback?tenant=<%= key %>"><%= tenantMap.get(key) %></a></li>
-                  	<% } %>
-                  	<% } %>
-                  	</ul>
+                    <a tabIndex="-1" href="" x-translate>More...</a>
+                    <ul class="dropdown-menu">
+                    <% for (String key : tenantMap.keySet()) { %>
+                    <% if (!key.equals(tenantId)) { %>
+                      <li><a href="callback?tenant=<%= key %>"><%= tenantMap.get(key) %></a></li>
+                    <% } %>
+                    <% } %>
+                    </ul>
                   </li>
                   <% } %>
                   <li class="divider"></li>

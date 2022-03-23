@@ -39,7 +39,7 @@ Function<String, String> T = new Function<String, String>() {
     try {
       return I18n.get(t);
     } catch (Exception e) {
-      return t; 
+      return t;
     }
   }
 };
@@ -103,7 +103,7 @@ Set<String> centralClients = AuthPac4jModule.getCentralClients();
         </div>
 
         <% if (!centralClients.isEmpty()) { %>
-	      <div id="social-buttons" class="form-fields text-center">
+        <div id="social-buttons" class="form-fields text-center">
           <% for (String client : centralClients) { %>
             <%
             Map<String, String> info = AuthPac4jModule.getClientInfo(client);
@@ -134,7 +134,7 @@ Set<String> centralClients = AuthPac4jModule.getCentralClients();
                 <span class="add-on"><i class="fa fa-database"></i></span>
                 <select name="tenantId">
                 <% for (String key : tenants.keySet()) { %>
-                	<option value="<%= key %>" <%= (key.equals(tenantId) ? "selected" : "") %>><%= tenants.get(key) %></option>
+                  <option value="<%= key %>" <%= (key.equals(tenantId) ? "selected" : "") %>><%= tenants.get(key) %></option>
                 <% } %>
                 </select>
               </div>
@@ -153,40 +153,40 @@ Set<String> centralClients = AuthPac4jModule.getCentralClients();
         </div>
       </div>
       <div id="br-warning" class="alert alert-block alert-error hidden">
-	  	<h4><%= warningBrowser %></h4>
-	  	<ul>
-	  		<li>Chrome</li>
-	  		<li>Firefox</li>
-	  		<li>Safari</li>
-	  		<li>IE >= 11</li>
-	  	</ul>
-	  </div>
-	  <div id="ad-warning" class="alert hidden">
-	  	<h4><%= warningAdblock %></h4>
-	  	<div><%= warningAdblock2 %></div>
-	  </div>
+      <h4><%= warningBrowser %></h4>
+      <ul>
+        <li>Chrome</li>
+        <li>Firefox</li>
+        <li>Safari</li>
+        <li>IE >= 11</li>
+      </ul>
+    </div>
+    <div id="ad-warning" class="alert hidden">
+      <h4><%= warningAdblock %></h4>
+      <div><%= warningAdblock2 %></div>
+    </div>
     </div>
 
     <footer class="container-fluid">
       <p class="credit small"><%= copyright %></p>
     </footer>
-    
+
     <div id="adblock"></div>
 
     <script type="text/javascript">
     $(function () {
-	    if (axelor.browser.msie && !axelor.browser.rv) {
-	     	$('#br-warning').removeClass('hidden');
-	    }
-	    if ($('#adblock') === undefined || $('#adblock').is(':hidden')) {
-	     	$('#ad-warning').removeClass('hidden');
-	    }
-	    
-	    $("#social-buttons").on('click', 'button', function (e) {
-	     var client = $(e.currentTarget).data('provider');
-	     window.location.href = './?client_name=' + client
-	         + "&hash_location=" + encodeURIComponent(window.location.hash);
-	    });
+      if (axelor.browser.msie && !axelor.browser.rv) {
+         $('#br-warning').removeClass('hidden');
+      }
+      if ($('#adblock') === undefined || $('#adblock').is(':hidden')) {
+         $('#ad-warning').removeClass('hidden');
+      }
+
+      $("#social-buttons").on('click', 'button', function (e) {
+       var client = $(e.currentTarget).data('provider');
+       window.location.href = './?client_name=' + client
+           + "&hash_location=" + encodeURIComponent(window.location.hash);
+      });
 
         $('#login-form').submit(function(e) {
           document.getElementById("hash-location").value = window.location.hash;

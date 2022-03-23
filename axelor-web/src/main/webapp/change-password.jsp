@@ -94,10 +94,10 @@ String callbackUrl = AuthPac4jModule.getCallbackUrl();
         </div>
 
         <div class="alert alert-block alert-error text-center">
-					<h4><%= HtmlUtils.escape(errorMsg) %></h4>
-				</div>
+          <h4><%= HtmlUtils.escape(errorMsg) %></h4>
+        </div>
 
-			  <div class="panel-body">
+        <div class="panel-body">
           <form id="login-form" action="<%=callbackUrl%>" method="POST">
             <div class="form-fields">
               <div class="input-prepend">
@@ -126,15 +126,15 @@ String callbackUrl = AuthPac4jModule.getCallbackUrl();
                   required="required"
                   oninput="checkPasswordInputs()">
               </div>
-	            <div id="password-title" class="alert alert-block alert-info text-center">
-	              <h4><%= passwordPatternTitle %></h4>
-	            </div>
+              <div id="password-title" class="alert alert-block alert-info text-center">
+                <h4><%= passwordPatternTitle %></h4>
+              </div>
               <% if (tenants != null && tenants.size() > 1) { %>
               <div class="input-prepend">
                 <span class="add-on"><i class="fa fa-database"></i></span>
                 <select name="tenantId">
                 <% for (String key : tenants.keySet()) { %>
-                	<option value="<%= key %>" <%= (key.equals(tenantId) ? "selected" : "") %>><%= tenants.get(key) %></option>
+                  <option value="<%= key %>" <%= (key.equals(tenantId) ? "selected" : "") %>><%= tenants.get(key) %></option>
                 <% } %>
                 </select>
               </div>
