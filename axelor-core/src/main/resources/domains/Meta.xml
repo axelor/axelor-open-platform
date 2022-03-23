@@ -35,7 +35,7 @@
     <string name="xmlId" unique="true" />
     <string name="helpLink" />
     <boolean name="extension" />
-    <many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
+    <many-to-many name="groups" table="meta_view_groups" column="meta_view_id" column2="group_id" ref="com.axelor.auth.db.Group"/>
 
     <string name="dependentModules"/>
     <string name="dependentFeatures"/>
@@ -106,7 +106,7 @@
     <many-to-one name="action" ref="MetaAction"/>
     <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" />
 
-    <many-to-many name="groups" ref="com.axelor.auth.db.Group"/>
+    <many-to-many name="groups" table="meta_menu_groups" column="meta_menu_id" column2="group_id" ref="com.axelor.auth.db.Group"/>
     <many-to-many name="roles" ref="com.axelor.auth.db.Role"/>
 
     <string name="conditionToCheck" max="1024" title="Condition to check" help="Only use this menu-item if the given expression is true (ie `if` condition)."/>
