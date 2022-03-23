@@ -119,6 +119,20 @@
         </documentation>
       </annotation>
     </attribute>
+    <attribute name="check" type="string">
+      <annotation>
+        <documentation>
+          The expression to validate binding (Groovy boolean expression).
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="check-message" type="string">
+      <annotation>
+        <documentation>
+          The validation error message to show if `check` fails.
+        </documentation>
+      </annotation>
+    </attribute>
   </complexType>
 
   <complexType name="CSVInput">

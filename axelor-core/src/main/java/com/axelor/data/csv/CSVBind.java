@@ -64,6 +64,14 @@ public class CSVBind {
   @XStreamAsAttribute
   private Boolean conditionEmpty;
 
+  @XStreamAlias("check")
+  @XStreamAsAttribute
+  private String checkCondition;
+
+  @XStreamAlias("check-message")
+  @XStreamAsAttribute
+  private String checkMessage;
+
   @XStreamImplicit(itemFieldName = "bind")
   private List<CSVBind> bindings;
 
@@ -133,6 +141,22 @@ public class CSVBind {
 
   public void setConditionEmpty(Boolean conditionEmpty) {
     this.conditionEmpty = conditionEmpty;
+  }
+
+  public String getCheckCondition() {
+    return checkCondition;
+  }
+
+  public void setCheckCondition(String checkCondition) {
+    this.checkCondition = checkCondition;
+  }
+
+  public String getCheckMessage() {
+    return checkMessage;
+  }
+
+  public void setCheckMessage(String checkMessage) {
+    this.checkMessage = checkMessage;
   }
 
   public List<CSVBind> getBindings() {
@@ -237,6 +261,14 @@ public class CSVBind {
       return true;
     }
     String expr = condition + " ? true : false";
+    return (Boolean) helper.eval(expr, context);
+  }
+
+  public boolean check(Map<String, Object> context) {
+    if (Strings.isNullOrEmpty(checkCondition)) {
+      return true;
+    }
+    String expr = checkCondition + " ? true : false";
     return (Boolean) helper.eval(expr, context);
   }
 

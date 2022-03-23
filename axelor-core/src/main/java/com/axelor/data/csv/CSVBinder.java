@@ -17,6 +17,7 @@
  */
 package com.axelor.data.csv;
 
+import com.axelor.common.StringUtils;
 import com.axelor.data.AuditHelper;
 import com.axelor.data.adapter.DataAdapter;
 import com.axelor.db.JPA;
@@ -40,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
+import javax.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -332,6 +334,13 @@ public class CSVBinder {
       if (!cb.validate(values)) {
         LOG.trace("condition failed");
         continue;
+      }
+
+      if (!cb.check(values)) {
+        throw new ValidationException(
+            StringUtils.notBlank(cb.getCheckMessage())
+                ? cb.getCheckMessage()
+                : "Validation failed for field: " + cb.getField());
       }
 
       value = this.adapt(cb, value, values);
