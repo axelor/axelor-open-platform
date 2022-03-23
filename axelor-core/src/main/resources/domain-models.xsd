@@ -1050,20 +1050,6 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="lang" default="java">
-      <xsd:annotation>
-        <xsd:documentation>
-          Generate code in the given target language.
-        </xsd:documentation>
-        <xsd:documentation>DEPRECATED: This attribute is deprecated and will be removed in the next major version.</xsd:documentation>
-      </xsd:annotation>
-      <xsd:simpleType>
-        <xsd:restriction base="xsd:string">
-          <xsd:enumeration value="java" />
-          <xsd:enumeration value="groovy" />
-        </xsd:restriction>
-      </xsd:simpleType>
-    </xsd:attribute>
     <xsd:attribute name="logUpdates" type="xsd:boolean" default="true">
       <xsd:annotation>
         <xsd:documentation>
