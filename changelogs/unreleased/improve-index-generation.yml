@@ -1,0 +1,17 @@
+---
+title: Improve index generation
+type: feature
+description: |
+  We can now specify order on column names with `ASC` or `DESC`.
+  Some examples:
+  ```xml
+    <index columns="code,name"/>
+    <index columns="code ASC,name DESC"/>
+    <index columns="code,name DESC"/>
+  ```
+  
+  We can also specify whether the index is unique. 
+  ```xml
+    <index columns="code,name" unique="true"/>
+  ```
+  This will replace and makes `<unique-constraint ... />` obsolete in future.

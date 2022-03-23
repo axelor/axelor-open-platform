@@ -34,6 +34,9 @@ public class Index {
   @XmlAttribute(name = "columns", required = true)
   private String columns;
 
+  @XmlAttribute(name = "unique")
+  private Boolean unique;
+
   public String getName() {
     return name;
   }
@@ -50,17 +53,33 @@ public class Index {
     this.columns = value;
   }
 
-  protected String getColumn(Property property, String column) {
-    if (property == null) return column;
-    String col = property.getColumn();
-    if (notBlank(col)) return col;
-    if (property.isReference()) return property.getColumnAuto();
-    return column;
+  public Boolean getUnique() {
+    return unique;
+  }
+
+  public void setUnique(Boolean unique) {
+    this.unique = unique;
+  }
+
+  protected String getColumn(Entity entity, String indexColumn) {
+    String[] parts = indexColumn.split("\\s+");
+    String field = parts[0];
+    String orderBy = parts.length > 1 ? " " + parts[1] : "";
+
+    Property property = entity.findField(field);
+    if (property == null) {
+      return indexColumn;
+    }
+
+    String column = property.getColumn();
+    if (notBlank(column)) return column + orderBy;
+    if (property.isReference()) return property.getColumnAuto() + orderBy;
+    return indexColumn;
   }
 
   protected String getColumnList(Entity entity) {
     return list(getColumns()).stream()
-        .map(column -> getColumn(entity.findField(column), column))
+        .map(column -> getColumn(entity, column))
         .collect(Collectors.joining(", "));
   }
 
@@ -70,6 +89,9 @@ public class Index {
             .param("columnList", "{0:s}", getColumnList(entity));
     if (notBlank(name)) {
       annotation.param("name", "{0:s}", name);
+    }
+    if (isTrue(unique)) {
+      annotation.param("unique", "true");
     }
     return annotation;
   }

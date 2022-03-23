@@ -584,10 +584,41 @@
 
   <xsd:complexType name="Index">
     <xsd:attribute name="name" type="xsd:string" use="optional"/>
+    <xsd:attribute name="unique" type="xsd:string"/>
     <xsd:attribute name="columns" use="required">
       <xsd:annotation>
         <xsd:documentation>
-          List of column names (comma separated).
+          Comma separated list of column names.
+
+          &lt;br&gt;
+          &lt;br&gt;
+
+          The column names can be followed by either ASC or DESC.
+          If ASC or DESC is not specified, ASC is assumed.
+
+          &lt;br&gt;
+          &lt;br&gt;
+
+          Some examples:&lt;br&gt;&lt;br&gt;
+          ... columns="code,name"&lt;br&gt;
+          ... columns="code ASC,name DESC"&lt;br&gt;
+          ... columns="code,name DESC"&lt;br&gt;
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:pattern value="([a-zA-Z][a-zA-Z0-9_]+(\s+(ASC|DESC))?)(,([a-zA-Z][a-zA-Z0-9_]+(\s+(ASC|DESC))?))*" />
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="UniqueConstraint">
+    <xsd:attribute name="name" type="xsd:string" use="optional"/>
+    <xsd:attribute name="columns" use="required">
+      <xsd:annotation>
+        <xsd:documentation>
+          Comma separated list of column names.
         </xsd:documentation>
       </xsd:annotation>
       <xsd:simpleType>
@@ -928,7 +959,7 @@
           </xsd:annotation>
         </xsd:element>
       </xsd:choice>
-      <xsd:element name="unique-constraint" type="dm:Index" minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="unique-constraint" type="dm:UniqueConstraint" minOccurs="0" maxOccurs="unbounded">
         <xsd:annotation>
           <xsd:documentation>
             Define an unique constraint on the specified columns(s).

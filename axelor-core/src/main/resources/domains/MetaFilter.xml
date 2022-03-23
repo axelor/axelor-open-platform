@@ -20,7 +20,7 @@
     <boolean name="shared"/>
     <many-to-one name="user" column="user_id" ref="com.axelor.auth.db.User" required="true" />
 
-    <unique-constraint columns="name,filterView"/>
+    <index columns="name,filterView" unique="true"/>
   </entity>
 
 </domain-models>

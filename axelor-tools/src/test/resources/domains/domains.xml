@@ -92,7 +92,7 @@
       return getFullName();
       ]]>
     </string>
-    <string name="email" required="true" unique="true" initParam="true" massUpdate="true"/>
+    <string name="email" required="true" unique="true" initParam="true" massUpdate="true"  column="email_address"/>
     <string name="personalEmail" encrypted="true" />
     <binary name="personalPhoto" encrypted="true" />
     <string name="phone" max="20"  hashKey="false" massUpdate="true"/>
@@ -110,7 +110,7 @@
     <one-to-many name="addresses6" ref="Address" orderBy="area" orphanRemoval="false" />
 
     <index name="IDX_NAMES" columns="firstName,lastName,fullName"/>
-    <index columns="id,fullName,email"/>
+    <index columns="id,fullName DESC,email ASC"/>
     <track subscribe="true">
       <field name="fullName" />
       <field name="email" />
@@ -191,7 +191,7 @@
     <string name="someName"/>
     <string name="anotherName" column="another"/>
     <many-to-one name="myTitle" ref="Title"/>
-    <unique-constraint columns="someName,anotherName,myTitle"/>
+    <index columns="someName,anotherName,myTitle" unique="true"/>
   </entity>
 
   <!-- inheritance -->
