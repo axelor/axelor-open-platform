@@ -315,9 +315,13 @@ public class CSVImporter implements Importer {
           bean = this.importRow(values, binder, csvInput, context, false);
           count++;
         } catch (Exception e) {
+          int line = count + 1;
           LOG.error("Error while importing {}.", csvInput.getFileName());
-          LOG.error("Unable to import record: {}", Arrays.asList(values));
-          LOG.error("With following exception:", e);
+          LOG.error(
+              "Unable to import record #{}: {}",
+              line,
+              Arrays.asList(values),
+              ImportException.from(e));
 
           // Recover the transaction
           if (JPA.em().getTransaction().isActive()) {
