@@ -1,0 +1,3 @@
+---
+title: Fix undefined when calling search engine with route params
+type: fix

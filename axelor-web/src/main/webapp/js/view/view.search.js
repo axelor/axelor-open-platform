@@ -338,8 +338,9 @@ function SearchFormCtrl($scope, $element, ViewService) {
         if (!field.target || !$scope.record) return;
         var item = $element.find('[x-field=' + field.name + ']');
         var itemScope = item.data('$scope');
+        if (!itemScope) return;
         var value = itemScope.getValue();
-        if (value && itemScope && !itemScope.text && itemScope.select) {
+        if (value && !itemScope.text && itemScope.select) {
           itemScope.select(value);
         }
       });
