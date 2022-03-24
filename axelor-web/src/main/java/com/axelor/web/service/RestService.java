@@ -124,8 +124,7 @@ public class RestService extends ResourceService {
   @GET
   public Response find(
       @QueryParam("limit") @DefaultValue("40") int limit,
-      @QueryParam("offset") @DefaultValue("0") int offset,
-      @QueryParam("q") String query) {
+      @QueryParam("offset") @DefaultValue("0") int offset) {
 
     Request request = new Request();
     request.setModel(getModel());
