@@ -205,9 +205,12 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
         // Replace field with selection with the corresponding title
         _.each(selectionsFields[rec._model], function (field) {
           if (rec[field.as]) {
-            rec[field.as] = (_.find(field.selectionList, function(item) {
-              return _.isEqual(item.value, rec[field.as]);
-            }) || {}).title;
+            var items = rec[field.as].split(/\s*,\s*/).map(function(v) {
+              return (_.find(field.selectionList, function(item) {
+                return _.isEqual(item.value, v);
+              }) || {}).title
+            });
+            rec[field.as] = items.join(', ')
           }
         });
         // slickgrid expects unique `id` so generate them and store original one
