@@ -1,0 +1,18 @@
+---
+title: Search engine improvements
+type: change
+description: |
+  The search engine view has been improved. It allows to implement recursive filters for more flexibility on the search condition,
+  but also:
+  * Add support for `Enum` field type in search fields.
+  * Allow to define `limit` on each `select`. It gets preference over `limit` attribute of `search`.
+  * Add support for `enum` and `selection` (also autodetect `multi-select` values) for fields in result fields.
+  * Add support for returning only distinct records (based on `id`) on each `select`.
+  * Allow to add an `if` condition on `where`. It the value of the expression is false, the element is skipped.
+  * Add support for hiliting on row as well as on field.
+  * Add support for adding buttons in grid view.
+
+  Breakings changes:
+  * The `orderBy` fields should refere to field names of the object graph (and no more the `as` attribute).
+  * When searching on a multi-valued field (O2M/M2M), it shouldn't need to be suffixed with [] anymore. For example,
+  `items[].product` should now be `items.product`.
