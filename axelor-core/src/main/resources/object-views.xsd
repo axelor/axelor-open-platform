@@ -2366,12 +2366,19 @@
           </xsd:attribute>
         </xsd:complexType>
       </xsd:element>
-      <xsd:element name="where" type="tns:SearchSelectWhere">
+      <xsd:element name="where">
         <xsd:annotation>
           <xsd:documentation>
             Define a search filter.
           </xsd:documentation>
         </xsd:annotation>
+        <xsd:complexType>
+          <xsd:complexContent>
+            <xsd:extension base="tns:SearchSelectWhere">
+              <xsd:attribute name="if" use="prohibited" />
+            </xsd:extension>
+          </xsd:complexContent>
+        </xsd:complexType>
       </xsd:element>
     </xsd:sequence>
     <xsd:attribute name="model" type="xsd:string" use="required">
@@ -2563,6 +2570,14 @@
       <xsd:annotation>
         <xsd:documentation>
           Whether to search on archived records.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="if" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          If the result of the expression is false, evaluates against the input values,
+          then these elements are skipped.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>

@@ -459,6 +459,9 @@ public class Search extends AbstractView {
 
     @XmlAttribute private Boolean showArchived;
 
+    @XmlAttribute(name = "if")
+    private String condition;
+
     @XmlElement(name = "input")
     private List<SearchSelectInput> inputs;
 
@@ -479,6 +482,14 @@ public class Search extends AbstractView {
 
     public void setShowArchived(Boolean showArchived) {
       this.showArchived = showArchived;
+    }
+
+    public String getCondition() {
+      return condition;
+    }
+
+    public void setCondition(String condition) {
+      this.condition = condition;
     }
 
     public List<SearchSelectInput> getInputs() {
@@ -522,6 +533,10 @@ public class Search extends AbstractView {
     }
 
     Filter build(ScriptHelper handler) {
+
+      if (!handler.test(condition)) {
+        return null;
+      }
 
       List<Filter> filters = Lists.newArrayList();
       if (ObjectUtils.notEmpty(inputs)) {
