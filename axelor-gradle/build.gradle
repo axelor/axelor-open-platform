@@ -18,6 +18,7 @@ dependencies {
   implementation libs.guava
   implementation libs.commons_csv
   implementation libs.plugin_license
+  implementation libs.plugin_node
 
   tomcat project(":axelor-tomcat")
 

@@ -1,0 +1,29 @@
+---
+title: Use Gradle Node Plugin to run npm tasks
+type: feature
+description: |
+  No more need to install Node.js locally to build web resource bundles, aka `npm-build` task.
+  
+  If your project already depends on `gradle-node-plugin`, there will be conflicts between both. As the provided plugin 
+  is only applied on root project, the best fit is to delegate the process to a subproject. That way, the subproject 
+  can process and build your needs, and the root project can depends on that subproject and gets produced build.
+  
+  To use it, you need to Declare Node.js repository in `settings.gradle`, section `dependencyResolutionManagement` : 
+  ```gradle
+    // Declare the Node.js download repository
+    ivy {
+      name = "Node.js"
+      setUrl("https://nodejs.org/dist/")
+      patternLayout {
+        artifact("v[revision]/[artifact](-v[revision]-[classifier]).[ext]")
+      }
+      metadataSources {
+        artifact()
+      }
+      content {
+        includeModule("org.nodejs", "node")
+      }
+    }
+  ```
+  
+  See https://github.com/node-gradle/gradle-node-plugin/blob/3.1.1/docs/faq.md#is-this-plugin-compatible-with-centralized-repositories-declaration
