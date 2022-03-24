@@ -28,7 +28,7 @@ const cssnano = require('cssnano');
 
 const concat = require('broccoli-concat');
 const merge = require('broccoli-merge-trees');
-const uglify = require('broccoli-uglify-sourcemap');
+const Terser = require('broccoli-terser-sourcemap');
 const Funnel = require('broccoli-funnel');
 const Gzip = require('broccoli-gzip');
 const glob = require('glob');
@@ -48,7 +48,7 @@ function jsList(input) {
 }
 
 function minifyCss(name) {
-  const tree = postcss(app, {
+  const tree = new postcss(app, {
     map: false,
     include: ['css/' + name + '.css'],
     plugins: [
@@ -92,8 +92,8 @@ function minifyJs(name) {
     allowNone: true,
     outputFile: name + '.min.js',
   });
-  return uglify(tree, {
-    uglify: {
+  return new Terser(tree, {
+    terser: {
       compress: false,
       sourceMap: false,
     },
