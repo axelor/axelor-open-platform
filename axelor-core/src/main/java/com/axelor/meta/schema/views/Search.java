@@ -70,6 +70,10 @@ public class Search extends AbstractView {
   @XmlElementWrapper(name = "result-fields")
   private List<SearchResultField> resultFields;
 
+  @XmlElement(name = "button")
+  @XmlElementWrapper(name = "result-fields")
+  private List<Button> buttons;
+
   @XmlElement(name = "select")
   private List<SearchSelect> selects;
 
@@ -119,6 +123,14 @@ public class Search extends AbstractView {
 
   public void setHilites(List<Hilite> hilites) {
     this.hilites = hilites;
+  }
+
+  public List<Button> getButtons() {
+    return buttons;
+  }
+
+  public void setButtons(List<Button> buttons) {
+    this.buttons = buttons;
   }
 
   public ScriptHelper scriptHandler(Map<String, Object> variables) {

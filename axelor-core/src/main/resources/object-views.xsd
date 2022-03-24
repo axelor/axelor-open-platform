@@ -2284,6 +2284,7 @@
                   </xsd:annotation>
                 </xsd:element>
                 <xsd:element name="field" type="tns:SearchResultField" maxOccurs="unbounded"/>
+                <xsd:element name="button" type="tns:GridButton" minOccurs="0" maxOccurs="unbounded"/>
               </xsd:sequence>
             </xsd:complexType>
           </xsd:element>

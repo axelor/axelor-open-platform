@@ -2696,6 +2696,10 @@ Grid.prototype.onButtonClick = function(event, args) {
       if (current && current.id > 0 && (!context.id || context.id < 0)) {
         context.id = current.id;
       }
+      if (handlerScope.$parent.viewType && handlerScope.$parent._viewType === 'search') {
+        // in case of grid in a search view, the original id is stored in _id
+        context.id = current._id;
+      }
       return context;
     };
 
