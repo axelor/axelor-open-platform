@@ -18,12 +18,14 @@
 package com.axelor.meta.schema.views;
 
 import com.axelor.common.ObjectUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
 import com.axelor.db.mapper.Adapter;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.i18n.I18n;
+import com.axelor.meta.MetaStore;
 import com.axelor.rpc.filter.Filter;
 import com.axelor.rpc.filter.JPQLFilter;
 import com.axelor.rpc.filter.Operator;
@@ -212,7 +214,6 @@ public class Search extends AbstractView {
     @XmlAttribute(name = "grid-view")
     private String gridView;
 
-    @JsonIgnore
     @XmlElement(name = "field")
     private List<SearchSelectField> fields;
 
@@ -364,6 +365,14 @@ public class Search extends AbstractView {
 
     @XmlAttribute private String as;
 
+    @JsonIgnore
+    @XmlAttribute
+    private String selection;
+
+    @JsonIgnore
+    @XmlAttribute(name = "enum-type")
+    private String enumType;
+
     public String getName() {
       return name;
     }
@@ -378,6 +387,39 @@ public class Search extends AbstractView {
 
     public void setAs(String as) {
       this.as = as;
+    }
+
+    public void setSelection(String selection) {
+      this.selection = selection;
+    }
+
+    public String getSelection() {
+      return selection;
+    }
+
+    public void setEnumType(String enumType) {
+      this.enumType = enumType;
+    }
+
+    public String getEnumType() {
+      return enumType;
+    }
+
+    @JsonGetter("selectionList")
+    public List<Selection.Option> getSelectionList() {
+      if (StringUtils.notBlank(enumType)) {
+        try {
+          return MetaStore.getSelectionList(Class.forName(enumType));
+        } catch (ClassNotFoundException e) {
+          throw new RuntimeException("No such enum type found: " + enumType, e);
+        }
+      }
+
+      if (StringUtils.notBlank(selection)) {
+        return MetaStore.getSelectionList(selection);
+      }
+
+      return null;
     }
   }
 

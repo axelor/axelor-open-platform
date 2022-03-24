@@ -2350,6 +2350,20 @@
               </xsd:documentation>
             </xsd:annotation>
           </xsd:attribute>
+          <xsd:attribute name="enum-type">
+            <xsd:annotation>
+              <xsd:documentation>
+                If this is a enum field, specify the fully qualified enum type name.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="selection">
+            <xsd:annotation>
+              <xsd:documentation>
+                If this is a selection field, specify the target selection name.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
         </xsd:complexType>
       </xsd:element>
       <xsd:element name="where" type="tns:SearchSelectWhere">

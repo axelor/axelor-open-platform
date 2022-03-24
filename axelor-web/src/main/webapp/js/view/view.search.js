@@ -180,6 +180,13 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
 
     var selected = (scopes.toolbar.record || {}).objectSelect;
 
+    var selectionsFields = {}
+    _.each($scope._searchView.selects, function(select, i) {
+     selectionsFields[select.model] = _.filter(select.fields, function (item) {
+       return item.selectionList != null;
+     });
+    });
+
     _.extend(params,{
       __name: view.name,
       __selected: _.isEmpty(selected) ? null : selected.split(/,\s*/)
@@ -194,8 +201,16 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
       var res = response.data,
         records = res.data || [];
 
-      // slickgrid expects unique `id` so generate them and store original one
-      _.each(records, function(rec, i){
+      _.each(records, function(rec, i) {
+        // Replace field with selection with the corresponding title
+        _.each(selectionsFields[rec._model], function (field) {
+          if (rec[field.as]) {
+            rec[field.as] = (_.find(field.selectionList, function(item) {
+              return _.isEqual(item.value, rec[field.as]);
+            }) || {}).title;
+          }
+        });
+        // slickgrid expects unique `id` so generate them and store original one
         rec._id = rec.id;
         rec.id = i + 1;
       });
