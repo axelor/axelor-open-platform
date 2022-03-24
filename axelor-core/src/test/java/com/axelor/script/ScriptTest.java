@@ -397,7 +397,7 @@ public abstract class ScriptTest extends JpaTest {
     map.put("lastActivity", LocalDateTime.of(2021, 4, 29, 7, 57, 0));
 
     final Map<String, Object> guardian = new HashMap<>();
-    guardian.put("id", all(Contact.class).fetchOne().getId());
+    guardian.put("id", 1L);
 
     map.put("guardian", guardian);
 
