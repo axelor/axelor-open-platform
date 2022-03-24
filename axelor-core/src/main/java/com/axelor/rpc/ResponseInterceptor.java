@@ -28,6 +28,7 @@ import com.axelor.db.Model;
 import com.axelor.i18n.I18n;
 import com.google.common.base.Throwables;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -109,6 +110,10 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
       }
       if (ex instanceof ConstraintViolationException) {
         return onConstraintViolationException((ConstraintViolationException) ex, response);
+      }
+      if (ex instanceof SQLIntegrityConstraintViolationException) {
+        return onSQLIntegrityConstraintViolationException(
+            (SQLIntegrityConstraintViolationException) ex, response);
       }
       if (ex instanceof SQLException) {
         return onSQLException((SQLException) ex, response);
@@ -199,6 +204,47 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     return buildResponse(response, title, message, null);
   }
 
+  static final String REFERENCE_ERROR_TTILE = /*$$(*/ "Reference error" /*)*/;
+  static final String REFERENCE_ERROR_MESSAGE =
+      "The record(s) are referenced by other records, please remove all the references first." /*)*/;
+
+  static final String UNIQUE_VIOLATION_ERROR_TTILE = /*$$(*/ "Unique constraint violation" /*)*/;
+  static final String UNIQUE_VIOLATION_ERROR_MESSAGE = /*$$(*/
+      "The record(s) can't be updated as it violates unique constraint." /*)*/;
+
+  static final String DEFAULT_ERROR_TTILE = /*$$(*/ "SQL error" /*)*/;
+  static final String DEFAULT_ERROR_MESSAGE = /*$$(*/
+      "Unexpected database error occurred on the server." /*)*/;
+
+  private Response onSQLIntegrityConstraintViolationException(
+      SQLIntegrityConstraintViolationException e, Response response) {
+    int errorNumber = e.getErrorCode();
+
+    String title = null;
+    String message = null;
+
+    // https://dev.mysql.com/doc/refman/8.0/en/server-error-reference.html
+    switch (errorNumber) {
+      case 1217:
+        // fall through
+      case 1451: // foreign key violation
+        title = I18n.get(REFERENCE_ERROR_TTILE);
+        message = I18n.get(REFERENCE_ERROR_MESSAGE);
+        break;
+      case 1062: // unique constraint violation
+        title = I18n.get(UNIQUE_VIOLATION_ERROR_TTILE);
+        message = I18n.get(UNIQUE_VIOLATION_ERROR_MESSAGE);
+        break;
+      default:
+        title = I18n.get(DEFAULT_ERROR_TTILE);
+        message = I18n.get(DEFAULT_ERROR_MESSAGE);
+        break;
+    }
+
+    log.error("MySQL Error: {}", e.getMessage());
+    return buildResponse(response, title, message, "<p>" + e.getMessage() + "</p>");
+  }
+
   private Response onSQLException(SQLException e, Response response) {
 
     if (!(e instanceof PSQLException)) {
@@ -219,22 +265,20 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     // http://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
     switch (state) {
       case "23503": // foreign key violation
-        title = I18n.get("Reference error");
-        message =
-            I18n.get(
-                "The record(s) are referenced by other records, please remove all the references first.");
+        title = I18n.get(REFERENCE_ERROR_TTILE);
+        message = I18n.get(REFERENCE_ERROR_MESSAGE);
         break;
       case "23505": // unique constraint violation
-        title = I18n.get("Unique constraint violation");
-        message = I18n.get("The record(s) can't be updated as it violates unique constraint.");
+        title = I18n.get(UNIQUE_VIOLATION_ERROR_TTILE);
+        message = I18n.get(UNIQUE_VIOLATION_ERROR_MESSAGE);
         break;
       default:
-        title = I18n.get("SQL error");
-        message = I18n.get("Unexpected database error occurred on the server.");
+        title = I18n.get(DEFAULT_ERROR_TTILE);
+        message = I18n.get(DEFAULT_ERROR_MESSAGE);
         break;
     }
 
-    log.error("SQL Error: {}", e.getMessage());
+    log.error("PostgreSQL Error: {}", e.getMessage());
     return buildResponse(response, title, message, "<p>" + e.getMessage() + "</p>");
   }
 
