@@ -2285,7 +2285,7 @@
         <xsd:attribute name="limit" type="xsd:int" use="required">
           <xsd:annotation>
             <xsd:documentation>
-              Number of record to fetch.
+              Specify query result limit for each select.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -2367,12 +2367,24 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="title" type="xsd:string" />
-    <xsd:attribute name="view-title" type="xsd:string" />
+    <xsd:attribute name="title" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          The text displayed in the first column of the result grid view.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="view-title" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify an angular.js expression used to custom the opened tab title.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="selected" type="xsd:boolean">
       <xsd:annotation>
         <xsd:documentation>
-          Select objects will be selected by default.
+          Specify if the select object is selected by default.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -2409,6 +2421,14 @@
       <xsd:annotation>
         <xsd:documentation>
           The grid view to be used to list the selected records.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="limit" type="xsd:int">
+      <xsd:annotation>
+        <xsd:documentation>
+          Specify query result limit for the select. This attribute gets
+          preference over 'limit' attribute of 'search'.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>

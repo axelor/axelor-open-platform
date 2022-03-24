@@ -218,6 +218,8 @@ public class Search extends AbstractView {
 
     @JsonIgnore @XmlElement private SearchSelectWhere where;
 
+    @XmlAttribute private Integer limit;
+
     public String getModel() {
       return model;
     }
@@ -314,6 +316,14 @@ public class Search extends AbstractView {
 
     public void setWhere(SearchSelectWhere where) {
       this.where = where;
+    }
+
+    public void setLimit(Integer limit) {
+      this.limit = limit;
+    }
+
+    public Integer getLimit() {
+      return limit;
     }
 
     public Query<?>.Selector toQuery(ScriptHelper scriptHelper) {

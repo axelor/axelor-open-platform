@@ -658,8 +658,12 @@ public class MetaService {
       }
 
       LOG.debug("Query : {}", selector.toString());
+      int limit = search.getLimit();
+      if (select.getLimit() != null && select.getLimit() > 0) {
+        limit = select.getLimit();
+      }
 
-      List<?> items = selector.fetch(search.getLimit(), request.getOffset());
+      List<?> items = selector.fetch(limit, request.getOffset());
 
       LOG.debug("Found : {}", items.size());
 
