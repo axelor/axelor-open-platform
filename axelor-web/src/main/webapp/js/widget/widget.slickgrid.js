@@ -675,37 +675,54 @@ Grid.prototype.parse = function(view) {
       return;
     }
 
-    var menus = [sortable ? {
-      iconImage: "lib/slickgrid/images/sort-asc.gif",
-      title: _t("Sort Ascending"),
-      command: "sort-asc"
-    } : null, sortable ? {
-      iconImage: "lib/slickgrid/images/sort-desc.gif",
-      title: _t("Sort Descending"),
-      command: "sort-desc"
-    } : null, sortable ? {
-      separator: true
-    } : null, {
+    var sortableMenus = [];
+    if (sortable) {
+      sortableMenus = [{
+        iconImage: "lib/slickgrid/images/sort-asc.gif",
+        title: _t("Sort Ascending"),
+        command: "sort-asc"
+      }, {
+        iconImage: "lib/slickgrid/images/sort-desc.gif",
+        title: _t("Sort Descending"),
+        command: "sort-desc"
+      }];
+    }
+
+    var groupMenus = [{
       title: _t("Group by") + " <i>" + column.name + "</i>",
       command: "group-by"
     }, {
       title: _t("Ungroup"),
       command: "ungroup"
-    }, {
-      separator: true
-    }, {
+    }];
+
+    var hideMenus = [{
       title: _t("Hide") + " <i>" + column.name + "</i>",
       command: "hide"
     }];
 
-    if (view.name && axelor.config["user.viewCustomizationPermission"] && axelor.config["view.customization"] !== false) {
-      Array.prototype.push.apply(menus, [{
-        separator: true
-      }, {
+    var customMenus = [];
+    if (view.customizable !== false
+        && view.name
+        && axelor.config["user.viewCustomizationPermission"]
+        && axelor.config["view.customization"] !== false) {
+      customMenus = [{
         title: _t("Customize…"),
         command: "customize"
-      }]);
+      }];
     }
+
+    var menus = _.reduce([sortableMenus, groupMenus, hideMenus, customMenus], function(memo, item) {
+      if (item && _.isEmpty(item)) {
+        return memo;
+      }
+      if (!_.isEmpty(memo)) {
+        memo.push({
+          separator: true
+        });
+      }
+      return _.flatten([memo, item]);
+    }, []);
 
     menus = _.compact(menus);
 
