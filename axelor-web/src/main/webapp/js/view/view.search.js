@@ -43,6 +43,10 @@ function SearchViewCtrl($scope, $element, $http, DataSource, ViewService, MenuSe
         field.canEdit = false;
       }
 
+      if (["integer", "long", "decimal"].indexOf(field.type) > -1) {
+        field.nullable = true;
+      }
+
       if (field.type)
         field.type = field.type.toUpperCase();
       else
