@@ -160,6 +160,9 @@ public class Search extends AbstractView {
             return JPA.em().find(klass, Long.valueOf(((Map) input).get("id").toString()));
           }
         }
+        if (BigDecimal.class.isAssignableFrom(klass) && input == null) {
+          return null;
+        }
         if (klass != null) {
           return Adapter.adapt(input, klass, klass, null);
         }
