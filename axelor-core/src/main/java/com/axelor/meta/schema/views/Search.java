@@ -19,10 +19,8 @@ package com.axelor.meta.schema.views;
 
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
-import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.Query;
-import com.axelor.db.mapper.Adapter;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.i18n.I18n;
 import com.axelor.meta.MetaStore;
@@ -38,12 +36,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -64,13 +58,17 @@ public class Search extends AbstractView {
   @XmlAttribute(name = "search-form")
   private String searchForm;
 
-  @XmlElement(name = "field", type = SearchField.class)
+  @XmlElement(name = "field")
   @XmlElementWrapper(name = "search-fields")
-  private List<SearchField> searchFields;
+  private List<BaseSearchField> searchFields;
 
-  @XmlElement(name = "field", type = SearchField.class)
+  @XmlElement(name = "hilite")
   @XmlElementWrapper(name = "result-fields")
-  private List<SearchField> resultFields;
+  private List<Hilite> hilites;
+
+  @XmlElement(name = "field")
+  @XmlElementWrapper(name = "result-fields")
+  private List<SearchResultField> resultFields;
 
   @XmlElement(name = "select")
   private List<SearchSelect> selects;
@@ -91,26 +89,19 @@ public class Search extends AbstractView {
     this.searchForm = searchForm;
   }
 
-  public List<SearchField> getSearchFields() {
+  public List<BaseSearchField> getSearchFields() {
     return searchFields;
   }
 
-  public void setSearchFields(List<SearchField> searchFields) {
+  public void setSearchFields(List<BaseSearchField> searchFields) {
     this.searchFields = searchFields;
   }
 
-  public SearchField getSearchField(String name) {
-    for (SearchField field : searchFields) {
-      if (name.equals(field.getName())) return field;
-    }
-    return null;
-  }
-
-  public List<SearchField> getResultFields() {
+  public List<SearchResultField> getResultFields() {
     return resultFields;
   }
 
-  public void setResultFields(List<SearchField> resultFields) {
+  public void setResultFields(List<SearchResultField> resultFields) {
     this.resultFields = resultFields;
   }
 
@@ -122,73 +113,25 @@ public class Search extends AbstractView {
     this.selects = selects;
   }
 
-  @XmlType
-  @JsonInclude(Include.NON_NULL)
-  public static class SearchField extends Field {
+  public List<Hilite> getHilites() {
+    return hilites;
+  }
 
-    @XmlAttribute private Boolean multiple;
-
-    public Boolean getMultiple() {
-      return multiple;
-    }
-
-    public void setMultiple(Boolean multiple) {
-      this.multiple = multiple;
-    }
-
-    @JsonGetter("type")
-    @Override
-    public String getServerType() {
-      return super.getServerType();
-    }
-
-    public static Map<String, Class<?>> getTypes() {
-      return TYPES;
-    }
-
-    private static final Map<String, Class<?>> TYPES =
-        new ImmutableMap.Builder<String, Class<?>>()
-            .put("string", String.class)
-            .put("integer", Integer.class)
-            .put("decimal", BigDecimal.class)
-            .put("date", LocalDate.class)
-            .put("datetime", LocalDateTime.class)
-            .put("boolean", Boolean.class)
-            .build();
-
-    @SuppressWarnings("rawtypes")
-    public Object validate(Object input) {
-      try {
-        Class<?> klass = TYPES.get(getServerType());
-        if ("reference".equals(getServerType())) {
-          klass = Class.forName(getTarget());
-          if (input != null) {
-            return JPA.em().find(klass, Long.valueOf(((Map) input).get("id").toString()));
-          }
-        }
-        if ("enum".equals(getServerType())) {
-          return input;
-        }
-        if (klass != null && BigDecimal.class.isAssignableFrom(klass) && input == null) {
-          return null;
-        }
-        if (klass != null) {
-          return Adapter.adapt(input, klass, klass, null);
-        }
-      } catch (Exception e) {
-        // ignore
-      }
-      return input;
-    }
+  public void setHilites(List<Hilite> hilites) {
+    this.hilites = hilites;
   }
 
   public ScriptHelper scriptHandler(Map<String, Object> variables) {
     Map<String, Object> map = Maps.newHashMap(variables);
-    for (SearchField field : searchFields) {
+    for (BaseSearchField field : searchFields) {
       map.put(field.getName(), field.validate(variables.get(field.getName())));
     }
     return new CompositeScriptHelper(new ScriptBindings(map));
   }
+
+  @XmlType
+  @JsonInclude(Include.NON_NULL)
+  public static class SearchResultField extends BaseSearchField {}
 
   @XmlType
   public static class SearchSelect {
@@ -375,9 +318,7 @@ public class Search extends AbstractView {
 
     @XmlAttribute private String as;
 
-    @JsonIgnore
-    @XmlAttribute
-    private String selection;
+    @JsonIgnore @XmlAttribute private String selection;
 
     @JsonIgnore
     @XmlAttribute(name = "enum-type")
@@ -555,7 +496,7 @@ public class Search extends AbstractView {
 
             Filter filter;
             SearchSelectInputMatchStyle matchStyle = input.getMatchStyle();
-            if(matchStyle == null) {
+            if (matchStyle == null) {
               matchStyle = SearchSelectInputMatchStyle.EQUALS;
             }
 

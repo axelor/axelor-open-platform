@@ -1575,7 +1575,7 @@
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleView">
         <xsd:sequence>
-          <xsd:element name="column" type="tns:SearchField" maxOccurs="unbounded">
+          <xsd:element name="column" type="tns:BaseSearchField" maxOccurs="unbounded">
             <xsd:annotation>
               <xsd:documentation>
                 Define a tree column.
@@ -2069,7 +2069,7 @@
           <xsd:element name="search-fields" minOccurs="0">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="field" type="tns:SearchField" maxOccurs="2"/>
+                <xsd:element name="field" type="tns:ChartSearchField" maxOccurs="2"/>
               </xsd:sequence>
             </xsd:complexType>
           </xsd:element>
@@ -2262,17 +2262,9 @@
               </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
-              <xsd:choice maxOccurs="unbounded">
-                <xsd:element name="field">
-                  <xsd:complexType>
-                    <xsd:complexContent>
-                      <xsd:extension base="tns:SearchField">
-                        <xsd:attribute name="multiple" use="prohibited" />
-                      </xsd:extension>
-                    </xsd:complexContent>
-                  </xsd:complexType>
-                </xsd:element>
-              </xsd:choice>
+              <xsd:sequence>
+                <xsd:element name="field" type="tns:BaseSearchField" maxOccurs="unbounded"/>
+              </xsd:sequence>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="result-fields">
@@ -2284,17 +2276,14 @@
             </xsd:annotation>
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:choice maxOccurs="unbounded">
-                  <xsd:element name="field">
-                    <xsd:complexType>
-                      <xsd:complexContent>
-                        <xsd:extension base="tns:SearchField">
-                          <xsd:attribute name="multiple" use="prohibited" />
-                        </xsd:extension>
-                      </xsd:complexContent>
-                    </xsd:complexType>
-                  </xsd:element>
-                </xsd:choice>
+                <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" maxOccurs="unbounded">
+                  <xsd:annotation>
+                    <xsd:documentation>
+                      Hilite the field with given color/background-color/strong combination.
+                    </xsd:documentation>
+                  </xsd:annotation>
+                </xsd:element>
+                <xsd:element name="field" type="tns:SearchResultField" maxOccurs="unbounded"/>
               </xsd:sequence>
             </xsd:complexType>
           </xsd:element>
@@ -2316,33 +2305,6 @@
         </xsd:attribute>
       </xsd:extension>
     </xsd:complexContent>
-  </xsd:complexType>
-
-  <xsd:complexType name="SearchField">
-    <xsd:attribute name="name" type="xsd:string" use="required" />
-    <xsd:attribute name="title" type="xsd:string" />
-    <xsd:attribute name="type">
-      <xsd:simpleType>
-        <xsd:restriction base="xsd:string">
-          <xsd:enumeration value="string" />
-          <xsd:enumeration value="integer" />
-          <xsd:enumeration value="boolean" />
-          <xsd:enumeration value="decimal" />
-          <xsd:enumeration value="datetime" />
-          <xsd:enumeration value="date" />
-          <xsd:enumeration value="enum" />
-          <xsd:enumeration value="reference" />
-          <xsd:enumeration value="button" />
-        </xsd:restriction>
-      </xsd:simpleType>
-    </xsd:attribute>
-    <xsd:attribute name="target" type="xsd:string" />
-    <xsd:attribute name="target-name" type="xsd:string" />
-    <xsd:attribute name="domain" type="xsd:string" />
-    <xsd:attribute name="selection" type="xsd:string" />
-    <xsd:attribute name="widget" type="xsd:string" />
-    <xsd:attribute name="multiple" type="xsd:boolean" />
-    <xsd:anyAttribute processContents="skip" />
   </xsd:complexType>
 
   <xsd:complexType name="SearchSelect">
@@ -3800,5 +3762,55 @@
       <xsd:enumeration value="html"/>
     </xsd:restriction>
   </xsd:simpleType>
+
+  <xsd:complexType name="SearchResultField">
+    <xsd:complexContent>
+      <xsd:extension base="tns:BaseSearchField">
+        <xsd:sequence>
+          <xsd:element name="hilite" type="tns:Hilite" minOccurs="0" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>
+                Hilite the field with given color/background-color/strong combination.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="ChartSearchField">
+    <xsd:complexContent>
+      <xsd:extension base="tns:BaseSearchField">
+        <xsd:attribute name="multiple" type="xsd:boolean" />
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="BaseSearchField">
+    <xsd:attribute name="name" type="xsd:string" use="required" />
+    <xsd:attribute name="title" type="xsd:string" />
+    <xsd:attribute name="type">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="string" />
+          <xsd:enumeration value="integer" />
+          <xsd:enumeration value="boolean" />
+          <xsd:enumeration value="decimal" />
+          <xsd:enumeration value="datetime" />
+          <xsd:enumeration value="date" />
+          <xsd:enumeration value="enum" />
+          <xsd:enumeration value="reference" />
+          <xsd:enumeration value="button" />
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="target" type="xsd:string" />
+    <xsd:attribute name="target-name" type="xsd:string" />
+    <xsd:attribute name="domain" type="xsd:string" />
+    <xsd:attribute name="selection" type="xsd:string" />
+    <xsd:attribute name="widget" type="xsd:string" />
+    <xsd:anyAttribute processContents="skip" />
+  </xsd:complexType>
 
 </xsd:schema>

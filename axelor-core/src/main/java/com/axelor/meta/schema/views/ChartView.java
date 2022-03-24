@@ -18,7 +18,6 @@
 package com.axelor.meta.schema.views;
 
 import com.axelor.i18n.I18n;
-import com.axelor.meta.schema.views.Search.SearchField;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -36,9 +35,9 @@ public class ChartView extends AbstractView {
 
   @XmlAttribute private String onInit;
 
-  @XmlElement(name = "field", type = SearchField.class)
+  @XmlElement(name = "field", type = ChartSearchField.class)
   @XmlElementWrapper(name = "search-fields")
-  private List<SearchField> searchFields;
+  private List<ChartSearchField> searchFields;
 
   @JsonIgnore
   @XmlElement(name = "dataset")
@@ -58,7 +57,7 @@ public class ChartView extends AbstractView {
     return onInit;
   }
 
-  public List<SearchField> getSearchFields() {
+  public List<ChartSearchField> getSearchFields() {
     return searchFields;
   }
 

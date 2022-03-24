@@ -385,6 +385,7 @@ function SearchGridCtrl($scope, $element, ViewService, $interpolate) {
     var view = {
       title: 'Search',
       type: 'grid',
+      hilites: schema.hilites,
       editIcon: true,
       customizable: false,
       items: []

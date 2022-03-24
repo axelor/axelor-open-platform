@@ -19,7 +19,6 @@ package com.axelor.meta.schema.views;
 
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
-import com.axelor.meta.schema.views.Search.SearchField;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -57,7 +56,7 @@ public class TreeView extends AbstractView {
 
   @XmlType
   @JsonInclude(Include.NON_NULL)
-  public static class TreeColumn extends SearchField {}
+  public static class TreeColumn extends BaseSearchField {}
 
   @XmlType
   @JsonInclude(Include.NON_NULL)
