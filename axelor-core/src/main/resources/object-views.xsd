@@ -2256,6 +2256,11 @@
       <xsd:extension base="tns:SimpleView">
         <xsd:sequence>
           <xsd:element name="search-fields">
+            <xsd:annotation>
+              <xsd:documentation>
+                Defines the fields to be used to provide search criteria (inputs).
+              </xsd:documentation>
+            </xsd:annotation>
             <xsd:complexType>
               <xsd:choice maxOccurs="unbounded">
                 <xsd:element name="field" type="tns:SearchField" />
@@ -2263,6 +2268,12 @@
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="result-fields">
+            <xsd:annotation>
+              <xsd:documentation>
+                Defines the fields displayed in the grid view. They will
+                be mapped with the fields define in each &lt;search&gt;.
+              </xsd:documentation>
+            </xsd:annotation>
             <xsd:complexType>
               <xsd:choice maxOccurs="unbounded">
                 <xsd:element name="field" type="tns:SearchField" />
@@ -2316,69 +2327,76 @@
   </xsd:complexType>
 
   <xsd:complexType name="SearchSelect">
+    <xsd:annotation>
+      <xsd:documentation>
+        Defines search criteria per object and maps the object fields to the result fields.
+      </xsd:documentation>
+    </xsd:annotation>
     <xsd:sequence>
       <xsd:element name="field" maxOccurs="unbounded">
         <xsd:complexType>
-          <xsd:attribute name="name" type="xsd:string" use="required" />
-          <xsd:attribute name="as" type="xsd:string" use="required" />
+          <xsd:attribute name="name" type="xsd:string" use="required">
+            <xsd:annotation>
+              <xsd:documentation>
+                Match against any field from the object graph.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="as" type="xsd:string" use="required">
+            <xsd:annotation>
+              <xsd:documentation>
+                Map object graph field value to a result field.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
         </xsd:complexType>
       </xsd:element>
-      <xsd:element name="where">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="input" maxOccurs="unbounded">
-              <xsd:complexType>
-                <xsd:attribute name="name" type="xsd:string" use="required" />
-                <xsd:attribute name="field" type="xsd:string" use="required" />
-                <xsd:attribute name="matchStyle" default="equals">
-                  <xsd:simpleType>
-                    <xsd:restriction base="xsd:string">
-                      <xsd:enumeration value="startsWith" />
-                      <xsd:enumeration value="endsWith" />
-                      <xsd:enumeration value="contains" />
-                      <xsd:enumeration value="equals" />
-                      <xsd:enumeration value="notEquals" />
-                      <xsd:enumeration value="lessThan" />
-                      <xsd:enumeration value="greaterThan" />
-                      <xsd:enumeration value="lessOrEqual" />
-                      <xsd:enumeration value="greaterOrEqual" />
-                    </xsd:restriction>
-                  </xsd:simpleType>
-                </xsd:attribute>
-                <xsd:attribute name="if" type="xsd:string" />
-                <xsd:attribute name="expr" type="xsd:string" />
-              </xsd:complexType>
-            </xsd:element>
-          </xsd:sequence>
-          <xsd:attribute name="match" default="all">
-            <xsd:simpleType>
-              <xsd:restriction base="xsd:string">
-                <xsd:enumeration value="all" />
-                <xsd:enumeration value="any" />
-              </xsd:restriction>
-            </xsd:simpleType>
-          </xsd:attribute>
-          <xsd:attribute name="showArchived" type="xsd:boolean" default="false"/>
-        </xsd:complexType>
+      <xsd:element name="where" type="tns:SearchSelectWhere">
+        <xsd:annotation>
+          <xsd:documentation>
+            Define a search filter.
+          </xsd:documentation>
+        </xsd:annotation>
       </xsd:element>
     </xsd:sequence>
-    <xsd:attribute name="model" type="xsd:string" use="required" />
+    <xsd:attribute name="model" type="xsd:string" use="required">
+      <xsd:annotation>
+        <xsd:documentation>
+          Name of the model class for the search.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="title" type="xsd:string" />
     <xsd:attribute name="view-title" type="xsd:string" />
-    <xsd:attribute name="selected" type="xsd:boolean" />
+    <xsd:attribute name="selected" type="xsd:boolean">
+      <xsd:annotation>
+        <xsd:documentation>
+          Select objects will be selected by default.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="orderBy" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
-          List of comma separated field names optionally
-          prefix with `-` to order by DESC.
+          <![CDATA[
+          List of comma separated field names (from the object graph)
+          optionally prefix with `-` to order by DESC.
 
           For example:
 
           orderBy="name,-age"
+          ]]>
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
-    <xsd:attribute name="if" type="xsd:string" />
+    <xsd:attribute name="if" type="xsd:string">
+      <xsd:annotation>
+        <xsd:documentation>
+          If the result of the expression is false, evaluates against the input values,
+          then these elements are skipped.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
     <xsd:attribute name="form-view" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
@@ -2390,6 +2408,118 @@
       <xsd:annotation>
         <xsd:documentation>
           The grid view to be used to list the selected records.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="SearchSelectWhere">
+    <xsd:sequence>
+      <xsd:element name="input" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:attribute name="name" type="xsd:string" use="required">
+            <xsd:annotation>
+              <xsd:documentation>
+                Link to search field in order to provide
+                the value used in where condition.
+                Can be anything else if `expr` is used.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="field" type="xsd:string" use="required">
+            <xsd:annotation>
+              <xsd:documentation>
+                Match against any field from the object graph.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="matchStyle" default="equals">
+            <xsd:annotation>
+              <xsd:documentation>
+                <![CDATA[
+                How to match the input. Possible value can be:
+
+                - contains : if the field value contains the given input value
+                - startsWith : if field value starts with the given input value
+                - endsWith : if the field value ends with the given input value
+                - equals : if the field value equals the input value (default matchStyle)
+                - notEquals : if the field value is not equal to the input value
+                - lessThan : if field value is less than the input value
+                - greaterThan : if field value is greater than the input value
+                - lessOrEqual : if field value is less then or equal to the input value
+                - greaterOrEqual : if field value is greater than or equal to the input value
+                ]]>
+              </xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                <xsd:enumeration value="startsWith" />
+                <xsd:enumeration value="endsWith" />
+                <xsd:enumeration value="contains" />
+                <xsd:enumeration value="equals" />
+                <xsd:enumeration value="notEquals" />
+                <xsd:enumeration value="lessThan" />
+                <xsd:enumeration value="greaterThan" />
+                <xsd:enumeration value="lessOrEqual" />
+                <xsd:enumeration value="greaterOrEqual" />
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:attribute>
+          <xsd:attribute name="if" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>
+                If the result of the expression is false, evaluates against the input values,
+                then these elements are skipped.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+          <xsd:attribute name="expr" type="xsd:string">
+            <xsd:annotation>
+              <xsd:documentation>
+                The result of the expression, evaluates against the input values,
+                is used as the search input (instead using the provided input).
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:attribute>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="where" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>
+            Define a sub filter.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:complexContent>
+            <xsd:extension base="tns:SearchSelectWhere">
+              <xsd:attribute name="showArchived" use="prohibited" />
+            </xsd:extension>
+          </xsd:complexContent>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="match" default="all">
+      <xsd:annotation>
+        <xsd:documentation>
+          <![CDATA[
+          The SQL operator used between each sub filters or inputs.
+
+          - "all" is for an `AND` operator,
+          - "any" is for an `OR` operator.
+          ]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="all" />
+          <xsd:enumeration value="any" />
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="showArchived" type="xsd:boolean" default="false">
+      <xsd:annotation>
+        <xsd:documentation>
+          Whether to search on archived records.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -3039,7 +3169,7 @@
         <xsd:attribute name="name" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>
-              Comma seperated list of field names
+              Comma separated list of field names
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -3066,7 +3196,7 @@
         <xsd:attribute name="for" type="xsd:string" use="required">
           <xsd:annotation>
             <xsd:documentation>
-              Comma seperated list of field names.
+              Comma separated list of field names.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -3075,7 +3205,7 @@
             <xsd:documentation>
               Name of the attribute.&lt;br&gt;&lt;br&gt;
 
-              Exemple : hidden, readonly, ...
+              Example : hidden, readonly, ...
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>

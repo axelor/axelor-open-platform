@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.schema.views;
 
+import com.axelor.common.ObjectUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.db.QueryBinder;
@@ -330,8 +331,31 @@ public class Search extends AbstractView {
       builder.append(")");
       builder.append(" FROM ").append(klass.getSimpleName()).append(" self");
 
-      Map<String, Object> binding = where.build(builder, joinHelper, scriptHelper);
-      if (binding == null || binding.size() == 0) return null;
+      List<String> whereList = Lists.newArrayList();
+      Map<String, Object> binding = where.build(whereList, joinHelper, scriptHelper);
+      if (ObjectUtils.isEmpty(binding)) {
+        return null;
+      }
+
+      if (ObjectUtils.notEmpty(joinHelper.toString())) {
+        builder.append(" ").append(joinHelper.toString());
+      }
+
+      builder.append(" WHERE ");
+
+      boolean hasArchivedFilter = !Boolean.TRUE.equals(where.getShowArchived());
+      if (hasArchivedFilter) {
+        builder.append("(self.archived is null OR self.archived = false)");
+      }
+      if (ObjectUtils.notEmpty(whereList)) {
+        if (hasArchivedFilter) {
+          builder.append(" AND (");
+        }
+        builder.append(String.join(where.getJoinOperator(), whereList));
+        if (hasArchivedFilter) {
+          builder.append(")");
+        }
+      }
 
       List<String> orders = Lists.newArrayList();
       if (orderBy != null) {
@@ -389,6 +413,9 @@ public class Search extends AbstractView {
     @XmlElement(name = "input")
     private List<SearchSelectInput> inputs;
 
+    @XmlElement(name = "where")
+    private List<SearchSelectWhere> wheres;
+
     public String getMatch() {
       return match;
     }
@@ -399,6 +426,10 @@ public class Search extends AbstractView {
 
     public List<SearchSelectInput> getInputs() {
       return inputs;
+    }
+
+    public List<SearchSelectWhere> getWheres() {
+      return wheres;
     }
 
     @SuppressWarnings("rawtypes")
@@ -425,14 +456,14 @@ public class Search extends AbstractView {
       return value;
     }
 
-    Map<String, Object> build(StringBuilder builder, JoinHelper joinHelper, ScriptHelper handler) {
+    String getJoinOperator() {
+      return "any".equals(match) ? " OR " : " AND ";
+    }
 
-      List<String> where = Lists.newArrayList();
+    Map<String, Object> build(List<String> where, JoinHelper joinHelper, ScriptHelper handler) {
+
       Map<String, Object> binding = Maps.newHashMap();
       Multimap<String, String> groups = HashMultimap.create();
-      boolean filterArchived = !Boolean.TRUE.equals(showArchived);
-
-      String join = "any".equals(match) ? " OR " : " AND ";
 
       for (SearchSelectInput input : inputs) {
 
@@ -475,13 +506,6 @@ public class Search extends AbstractView {
             left = name;
           }
 
-          if ("archived".equals(input.getField())) {
-            filterArchived = !Boolean.TRUE.equals(value);
-            if (filterArchived) {
-              continue;
-            }
-          }
-
           String filter = null;
           String first = as.split("\\.")[0];
           as = as.replace('.', '_');
@@ -505,24 +529,23 @@ public class Search extends AbstractView {
         where.add(clause);
       }
 
-      if (where.size() > 0) {
-        builder.append(" ").append(joinHelper.toString());
+      if (ObjectUtils.notEmpty(wheres)) {
+        for (SearchSelectWhere subWhere : wheres) {
+          List<String> subWhereList = Lists.newArrayList();
+          Map<String, Object> subBindings = subWhere.build(subWhereList, joinHelper, handler);
+          if (ObjectUtils.isEmpty(subBindings)) {
+            continue;
+          }
+          binding.putAll(subBindings);
+          String filter = String.join(subWhere.getJoinOperator(), subWhereList);
+          if (subWhereList.size() > 1) {
+            filter = "(" + filter + ")";
+          }
+          where.add(filter);
+        }
       }
 
-      builder.append(" WHERE ");
-
-      if (filterArchived) {
-        builder.append("(self.archived is null OR self.archived = false)");
-      }
-
       if (where.size() > 0) {
-        if (filterArchived) {
-          builder.append(" AND (");
-        }
-        Joiner.on(join).appendTo(builder, where);
-        if (filterArchived) {
-          builder.append(")");
-        }
         return binding;
       }
 
