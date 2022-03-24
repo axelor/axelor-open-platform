@@ -87,6 +87,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
@@ -626,6 +630,11 @@ public class MetaService {
     return count;
   }
 
+  static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+    Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+    return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+  }
+
   @SuppressWarnings("all")
   public Response runSearch(Request request) {
     Response response = new Response();
@@ -664,6 +673,13 @@ public class MetaService {
       }
 
       List<?> items = selector.fetch(limit, request.getOffset());
+
+      if (Objects.equals(Boolean.TRUE, select.getDistinct())) {
+        items =
+            items.stream()
+                .filter(distinctByKey(map -> Long.valueOf(((Map) map).get("id").toString())))
+                .collect(Collectors.toList());
+      }
 
       LOG.debug("Found : {}", items.size());
 

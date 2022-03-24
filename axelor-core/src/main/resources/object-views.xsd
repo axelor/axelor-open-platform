@@ -2446,6 +2446,14 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="distinct" type="xsd:boolean" default="false">
+      <xsd:annotation>
+        <xsd:documentation>
+          Whether to return only distinct records (based on `id`). Useful when searching
+          on relational fields (O2M/M2M).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:complexType>
 
   <xsd:complexType name="SearchSelectWhere">

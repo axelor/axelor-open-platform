@@ -221,6 +221,8 @@ public class Search extends AbstractView {
 
     @XmlAttribute private Integer limit;
 
+    @XmlAttribute private Boolean distinct;
+
     public String getModel() {
       return model;
     }
@@ -325,6 +327,14 @@ public class Search extends AbstractView {
 
     public Integer getLimit() {
       return limit;
+    }
+
+    public Boolean getDistinct() {
+      return distinct;
+    }
+
+    public void setDistinct(Boolean distinct) {
+      this.distinct = distinct;
     }
 
     public Query<?>.Selector toQuery(ScriptHelper scriptHelper) {
