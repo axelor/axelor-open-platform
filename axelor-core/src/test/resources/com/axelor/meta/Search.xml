@@ -18,7 +18,7 @@
        <field name="value" type="decimal" />
      </result-fields>
 
-     <select model="com.axelor.test.db.Contact" orderBy="customer,-date">
+     <select model="com.axelor.test.db.Contact" orderBy="fullName,-dateOfBirth">
        <field name="fullName" as="customer"/>
        <field name="dateOfBirth" as="date"/>
        <where match="all">
@@ -27,8 +27,8 @@
          <input name="value" field="credit"/>
          <input name="title" field="title"/>
          <input name="customer" field="title.name"/>
-         <input name="country" field="addresses[].country.name" matchStyle="contains"/>
-         <input name="title.name" field="addresses[].contact.title.name" matchStyle="contains"/>
+         <input name="country" field="addresses.country.name" matchStyle="contains"/>
+         <input name="title.name" field="addresses.contact.title.name" matchStyle="contains"/>
        </where>
      </select>
 

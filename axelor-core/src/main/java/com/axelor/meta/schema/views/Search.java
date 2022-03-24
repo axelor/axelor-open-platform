@@ -20,11 +20,13 @@ package com.axelor.meta.schema.views;
 import com.axelor.common.ObjectUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
-import com.axelor.db.QueryBinder;
-import com.axelor.db.internal.DBHelper;
+import com.axelor.db.Query;
 import com.axelor.db.mapper.Adapter;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.i18n.I18n;
+import com.axelor.rpc.filter.Filter;
+import com.axelor.rpc.filter.JPQLFilter;
+import com.axelor.rpc.filter.Operator;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
@@ -33,24 +35,22 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import javax.persistence.Query;
+import java.util.stream.Collectors;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
@@ -130,6 +130,10 @@ public class Search extends AbstractView {
       return multiple;
     }
 
+    public void setMultiple(Boolean multiple) {
+      this.multiple = multiple;
+    }
+
     @JsonGetter("type")
     @Override
     public String getServerType() {
@@ -180,54 +184,6 @@ public class Search extends AbstractView {
     return new CompositeScriptHelper(new ScriptBindings(map));
   }
 
-  static class JoinHelper {
-
-    private Map<String, String> joins = Maps.newLinkedHashMap();
-
-    public String joinName(String name) {
-
-      String[] path = name.split("\\.");
-
-      String prefix = null;
-      String variable = name;
-
-      if (path.length > 1) {
-        variable = path[path.length - 1];
-        String joinOn = null;
-        for (int i = 0; i < path.length - 1; i++) {
-          String item = path[i].replace("[]", "");
-          if (prefix == null) {
-            joinOn = "self." + item;
-            prefix = "_" + item;
-          } else {
-            joinOn = prefix + "." + item;
-            prefix = prefix + "_" + item;
-          }
-          if (!joins.containsKey(joinOn)) {
-            joins.put(joinOn, prefix);
-          }
-        }
-      }
-
-      if (prefix == null) {
-        prefix = "self";
-      }
-
-      return prefix + "." + variable;
-    }
-
-    @Override
-    public String toString() {
-      if (joins.size() == 0) return "";
-      List<String> joinItems = Lists.newArrayList();
-      for (String key : joins.keySet()) {
-        String val = joins.get(key);
-        joinItems.add("LEFT JOIN " + key + " " + val);
-      }
-      return Joiner.on(" ").join(joinItems);
-    }
-  }
-
   @XmlType
   public static class SearchSelect {
 
@@ -258,14 +214,21 @@ public class Search extends AbstractView {
 
     @JsonIgnore @XmlElement private SearchSelectWhere where;
 
-    private transient String queryString;
-
-    public String getQueryString() {
-      return queryString;
-    }
-
     public String getModel() {
       return model;
+    }
+
+    public void setModel(String model) {
+      this.model = model;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<? extends Model> getModelClass() {
+      try {
+        return (Class<Model>) Class.forName(model);
+      } catch (ClassNotFoundException e) {
+        throw new IllegalArgumentException(e);
+      }
     }
 
     @JsonGetter("title")
@@ -281,104 +244,102 @@ public class Search extends AbstractView {
       return title;
     }
 
+    public void setTitle(String title) {
+      this.title = title;
+    }
+
     public String getViewTitle() {
       return viewTitle;
+    }
+
+    public void setViewTitle(String viewTitle) {
+      this.viewTitle = viewTitle;
     }
 
     public Boolean getSelected() {
       return selected;
     }
 
+    public void setSelected(Boolean selected) {
+      this.selected = selected;
+    }
+
     public String getOrderBy() {
       return orderBy;
+    }
+
+    public void setOrderBy(String orderBy) {
+      this.orderBy = orderBy;
     }
 
     public String getCondition() {
       return condition;
     }
 
+    public void setCondition(String condition) {
+      this.condition = condition;
+    }
+
     public String getFormView() {
       return formView;
+    }
+
+    public void setFormView(String formView) {
+      this.formView = formView;
     }
 
     public String getGridView() {
       return gridView;
     }
 
+    public void setGridView(String gridView) {
+      this.gridView = gridView;
+    }
+
     public List<SearchSelectField> getFields() {
       return fields;
+    }
+
+    public void setFields(List<SearchSelectField> fields) {
+      this.fields = fields;
     }
 
     public SearchSelectWhere getWhere() {
       return where;
     }
 
-    public Query toQuery(Search search, ScriptHelper scriptHelper) throws ClassNotFoundException {
+    public void setWhere(SearchSelectWhere where) {
+      this.where = where;
+    }
+
+    public Query<?>.Selector toQuery(ScriptHelper scriptHelper) {
 
       if (!scriptHelper.test(condition)) return null;
 
-      Class<?> klass = Class.forName(getModel());
-      List<String> selection = Lists.newArrayList("self.id AS id", "self.version AS version");
-      JoinHelper joinHelper = new JoinHelper();
+      Class<? extends Model> klass = getModelClass();
 
-      for (SearchSelectField field : fields) {
-        String name = field.getName();
-        String as = field.getAs();
-        name = joinHelper.joinName(name);
-        selection.add(String.format("%s AS %s", name, as));
-      }
-
-      StringBuilder builder = new StringBuilder();
-      builder.append("SELECT new map(");
-      Joiner.on(", ").appendTo(builder, selection);
-      builder.append(")");
-      builder.append(" FROM ").append(klass.getSimpleName()).append(" self");
-
-      List<String> whereList = Lists.newArrayList();
-      Map<String, Object> binding = where.build(whereList, joinHelper, scriptHelper);
-      if (ObjectUtils.isEmpty(binding)) {
+      List<Filter> all = Lists.newArrayList();
+      Filter filter = where.build(scriptHelper);
+      if (filter == null) {
         return null;
       }
 
-      if (ObjectUtils.notEmpty(joinHelper.toString())) {
-        builder.append(" ").append(joinHelper.toString());
-      }
-
-      builder.append(" WHERE ");
-
       boolean hasArchivedFilter = !Boolean.TRUE.equals(where.getShowArchived());
       if (hasArchivedFilter) {
-        builder.append("(self.archived is null OR self.archived = false)");
+        all.add(new JPQLFilter("self.archived IS NULL OR self.archived = FALSE"));
       }
-      if (ObjectUtils.notEmpty(whereList)) {
-        if (hasArchivedFilter) {
-          builder.append(" AND (");
-        }
-        builder.append(String.join(where.getJoinOperator(), whereList));
-        if (hasArchivedFilter) {
-          builder.append(")");
-        }
-      }
+      all.add(filter);
 
-      List<String> orders = Lists.newArrayList();
+      Query<?> query = Filter.and(all).build(klass);
       if (orderBy != null) {
-        for (String spec : Splitter.on(Pattern.compile(",\\s*")).split(orderBy)) {
-          if (spec.startsWith("-")) orders.add(spec.substring(1) + " DESC");
-          else orders.add(spec);
-        }
+        Splitter.on(Pattern.compile(",\\s*")).split(orderBy).forEach(query::order);
       }
 
-      if (orders.size() > 0) {
-        builder.append(" ORDER BY ");
-        Joiner.on(", ").appendTo(builder, orders);
-      }
-
-      queryString = builder.toString();
-
-      Query query = JPA.em().createQuery(queryString);
-      QueryBinder.of(query).bind(binding);
-
-      return query;
+      return query.select(
+          fields.stream()
+              .map(SearchSelectField::getName)
+              .collect(Collectors.toList())
+              .toArray(new String[] {}));
     }
   }
 
@@ -407,9 +368,28 @@ public class Search extends AbstractView {
   }
 
   @XmlType
+  @XmlEnum
+  public enum SearchSelectWhereMatch {
+    @XmlEnumValue("any")
+    ANY(Operator.OR),
+    @XmlEnumValue("all")
+    ALL(Operator.AND);
+
+    private final Operator operator;
+
+    SearchSelectWhereMatch(Operator operator) {
+      this.operator = operator;
+    }
+
+    public Operator getOperator() {
+      return operator;
+    }
+  }
+
+  @XmlType
   public static class SearchSelectWhere {
 
-    @XmlAttribute private String match;
+    @XmlAttribute private SearchSelectWhereMatch match;
 
     @XmlAttribute private Boolean showArchived;
 
@@ -419,20 +399,36 @@ public class Search extends AbstractView {
     @XmlElement(name = "where")
     private List<SearchSelectWhere> wheres;
 
-    public String getMatch() {
+    public SearchSelectWhereMatch getMatch() {
       return match;
+    }
+
+    public void setMatch(SearchSelectWhereMatch match) {
+      this.match = match;
     }
 
     public Boolean getShowArchived() {
       return showArchived;
     }
 
+    public void setShowArchived(Boolean showArchived) {
+      this.showArchived = showArchived;
+    }
+
     public List<SearchSelectInput> getInputs() {
       return inputs;
     }
 
+    public void setInputs(List<SearchSelectInput> inputs) {
+      this.inputs = inputs;
+    }
+
     public List<SearchSelectWhere> getWheres() {
       return wheres;
+    }
+
+    public void setWheres(List<SearchSelectWhere> wheres) {
+      this.wheres = wheres;
     }
 
     @SuppressWarnings("rawtypes")
@@ -459,101 +455,112 @@ public class Search extends AbstractView {
       return value;
     }
 
-    String getJoinOperator() {
-      return "any".equals(match) ? " OR " : " AND ";
-    }
+    Filter build(ScriptHelper handler) {
 
-    Map<String, Object> build(List<String> where, JoinHelper joinHelper, ScriptHelper handler) {
+      List<Filter> filters = Lists.newArrayList();
+      if (ObjectUtils.notEmpty(inputs)) {
+        for (SearchSelectInput input : inputs) {
 
-      Map<String, Object> binding = Maps.newHashMap();
-      Multimap<String, String> groups = HashMultimap.create();
+          if (!handler.test(input.condition)) continue;
 
-      for (SearchSelectInput input : inputs) {
+          String name = input.getField();
+          Object value = this.getValue(input, handler);
 
-        if (!handler.test(input.condition)) continue;
+          if (value != null) {
 
-        String name = input.getField();
-        String as = input.getName();
-        Object value = this.getValue(input, handler);
+            if (value instanceof String) {
+              value = ((String) value).trim();
+            }
 
-        if (value != null) {
+            Filter filter;
+            SearchSelectInputMatchStyle matchStyle = input.getMatchStyle();
+            if(matchStyle == null) {
+              matchStyle = SearchSelectInputMatchStyle.EQUALS;
+            }
 
-          name = joinHelper.joinName(name);
+            switch (matchStyle) {
+              case CONTAINS:
+                filter = Filter.like(name, value);
+                break;
+              case STARTS_WITH:
+                filter = Filter.like(name, value + "%");
+                break;
+              case ENDS_WITH:
+                filter = Filter.like(name, "%" + value);
+                break;
+              case LESS_THAN:
+                filter = Filter.lessThan(name, value);
+                break;
+              case GREATER_THAN:
+                filter = Filter.greaterThan(name, value);
+                break;
+              case LESS_OR_EQUAL:
+                filter = Filter.lessOrEqual(name, value);
+                break;
+              case GREATER_OR_EQUALS:
+                filter = Filter.greaterOrEqual(name, value);
+                break;
+              case NOT_EQUALS:
+                filter = Filter.notEquals(name, value);
+                break;
+              default:
+                filter = Filter.equals(name, value);
+                break;
+            }
 
-          String left = "LOWER(" + name + ")";
-          String operator = "LIKE";
-
-          if ("contains".equals(input.matchStyle)) {
-            value = "%" + value.toString().toLowerCase() + "%";
-          } else if ("startsWith".equals(input.matchStyle)) {
-            value = value.toString().toLowerCase() + "%";
-          } else if ("endsWith".equals(input.matchStyle)) {
-            value = "%" + value.toString().toLowerCase();
-          } else if ("lessThan".equals(input.matchStyle)) {
-            operator = "<";
-            left = name;
-          } else if ("greaterThan".equals(input.matchStyle)) {
-            operator = ">";
-            left = name;
-          } else if ("lessOrEqual".equals(input.matchStyle)) {
-            operator = "<=";
-            left = name;
-          } else if ("greaterOrEqual".equals(input.matchStyle)) {
-            operator = ">=";
-            left = name;
-          } else if ("notEquals".equals(input.matchStyle)) {
-            operator = "!=";
-            left = name;
-          } else {
-            operator = "=";
-            left = name;
+            filters.add(filter);
           }
-
-          String filter = null;
-          String first = as.split("\\.")[0];
-          as = as.replace('.', '_');
-
-          if ("LIKE".equals(operator) && DBHelper.isUnaccentEnabled()) {
-            filter = String.format("unaccent(%s) %s unaccent(:%s)", left, operator, as);
-          } else {
-            filter = String.format("%s %s :%s", left, operator, as);
-          }
-
-          binding.put(as, value);
-          groups.put(first, filter);
         }
-      }
-
-      for (Collection<String> items : groups.asMap().values()) {
-        String clause = Joiner.on(" OR ").join(items);
-        if (items.size() > 1) {
-          clause = "(" + clause + ")";
-        }
-        where.add(clause);
       }
 
       if (ObjectUtils.notEmpty(wheres)) {
         for (SearchSelectWhere subWhere : wheres) {
-          List<String> subWhereList = Lists.newArrayList();
-          Map<String, Object> subBindings = subWhere.build(subWhereList, joinHelper, handler);
-          if (ObjectUtils.isEmpty(subBindings)) {
+          Filter subFilters = subWhere.build(handler);
+          if (subFilters == null) {
             continue;
           }
-          binding.putAll(subBindings);
-          String filter = String.join(subWhere.getJoinOperator(), subWhereList);
-          if (subWhereList.size() > 1) {
-            filter = "(" + filter + ")";
-          }
-          where.add(filter);
+          filters.add(subFilters);
         }
       }
 
-      if (where.size() > 0) {
-        return binding;
+      if (ObjectUtils.isEmpty(filters)) {
+        return null;
       }
 
-      return null;
+      SearchSelectWhereMatch whereMatch = match;
+      if (whereMatch == null) {
+        whereMatch = SearchSelectWhereMatch.ALL;
+      }
+
+      if (Operator.OR == whereMatch.getOperator()) {
+        return Filter.or(filters);
+      } else {
+        return Filter.and(filters);
+      }
     }
+  }
+
+  @XmlType
+  @XmlEnum
+  public enum SearchSelectInputMatchStyle {
+    @XmlEnumValue("contains")
+    CONTAINS,
+    @XmlEnumValue("startsWith")
+    STARTS_WITH,
+    @XmlEnumValue("endsWith")
+    ENDS_WITH,
+    @XmlEnumValue("equals")
+    EQUALS,
+    @XmlEnumValue("notEquals")
+    NOT_EQUALS,
+    @XmlEnumValue("lessThan")
+    LESS_THAN,
+    @XmlEnumValue("greaterThan")
+    GREATER_THAN,
+    @XmlEnumValue("lessOrEqual")
+    LESS_OR_EQUAL,
+    @XmlEnumValue("greaterOrEqual")
+    GREATER_OR_EQUALS
   }
 
   @XmlType
@@ -563,7 +570,7 @@ public class Search extends AbstractView {
 
     @XmlAttribute private String field;
 
-    @XmlAttribute private String matchStyle;
+    @XmlAttribute private SearchSelectInputMatchStyle matchStyle;
 
     @XmlAttribute(name = "if")
     private String condition;
@@ -587,11 +594,11 @@ public class Search extends AbstractView {
       this.field = field;
     }
 
-    public String getMatchStyle() {
+    public SearchSelectInputMatchStyle getMatchStyle() {
       return matchStyle;
     }
 
-    public void setMatchStyle(String matchStyle) {
+    public void setMatchStyle(SearchSelectInputMatchStyle matchStyle) {
       this.matchStyle = matchStyle;
     }
 

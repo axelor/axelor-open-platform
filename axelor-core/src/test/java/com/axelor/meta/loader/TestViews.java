@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.common.ResourceUtils;
+import com.axelor.db.Query.Selector;
 import com.axelor.meta.MetaTest;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.views.AbstractView;
@@ -35,7 +36,6 @@ import com.google.inject.persist.Transactional;
 import java.net.URL;
 import java.util.Map;
 import javax.inject.Inject;
-import javax.persistence.Query;
 import org.junit.jupiter.api.Test;
 
 public class TestViews extends MetaTest {
@@ -101,12 +101,10 @@ public class TestViews extends MetaTest {
     ScriptHelper helper = search.scriptHandler(binding);
 
     for (Search.SearchSelect s : search.getSelects()) {
-      Query q = s.toQuery(search, helper);
+      Selector q = s.toQuery(helper);
       if (q == null) continue;
-      q.setFirstResult(0);
-      q.setMaxResults(search.getLimit());
 
-      assertNotNull(q.getResultList());
+      assertNotNull(q.fetch(search.getLimit(), 0));
     }
   }
 

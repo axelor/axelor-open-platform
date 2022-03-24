@@ -31,6 +31,7 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
+import com.axelor.db.Query.Selector;
 import com.axelor.db.QueryBinder;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.i18n.I18n;
@@ -60,6 +61,7 @@ import com.axelor.meta.schema.views.CustomView;
 import com.axelor.meta.schema.views.DataSet;
 import com.axelor.meta.schema.views.MenuItem;
 import com.axelor.meta.schema.views.Search;
+import com.axelor.meta.schema.views.Search.SearchSelectField;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Request;
@@ -648,26 +650,29 @@ public class MetaService {
       LOG.debug("Model : {}", select.getModel());
       LOG.debug("Param : {}", context);
 
-      Query query;
-      try {
-        query = select.toQuery(search, helper);
-      } catch (ClassNotFoundException e) {
-        throw new IllegalArgumentException(e);
-      }
-      List<?> items = Lists.newArrayList();
+      Selector selector = select.toQuery(helper);
 
-      LOG.debug("Query : {}", select.getQueryString());
-
-      if (query != null) {
-        query.setFirstResult(request.getOffset());
-        query.setMaxResults(search.getLimit());
-        items = query.getResultList();
+      if (selector == null) {
+        LOG.debug("No query to run for {}", select.getModel());
+        continue;
       }
+
+      LOG.debug("Query : {}", selector.toString());
+
+      List<?> items = selector.fetch(search.getLimit(), request.getOffset());
 
       LOG.debug("Found : {}", items.size());
 
       for (Object item : items) {
         if (item instanceof Map) {
+          Map<String, Object> map = (Map) item;
+          for (SearchSelectField field : select.getFields()) {
+            if (map.containsKey(field.getName())) {
+              map.put(field.getAs(), map.get(field.getName()));
+              map.remove(field.getName());
+            }
+          }
+
           ((Map) item).put("_model", select.getModel());
           ((Map) item).put("_modelTitle", select.getLocalizedTitle());
           ((Map) item).put("_form", select.getFormView());
