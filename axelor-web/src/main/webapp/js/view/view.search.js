@@ -386,6 +386,7 @@ function SearchGridCtrl($scope, $element, ViewService, $interpolate) {
       title: 'Search',
       type: 'grid',
       editIcon: true,
+      customizable: false,
       items: []
     };
 
