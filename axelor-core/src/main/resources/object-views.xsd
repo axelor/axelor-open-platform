@@ -2263,7 +2263,15 @@
             </xsd:annotation>
             <xsd:complexType>
               <xsd:choice maxOccurs="unbounded">
-                <xsd:element name="field" type="tns:SearchField" />
+                <xsd:element name="field">
+                  <xsd:complexType>
+                    <xsd:complexContent>
+                      <xsd:extension base="tns:SearchField">
+                        <xsd:attribute name="multiple" use="prohibited" />
+                      </xsd:extension>
+                    </xsd:complexContent>
+                  </xsd:complexType>
+                </xsd:element>
               </xsd:choice>
             </xsd:complexType>
           </xsd:element>
@@ -2275,9 +2283,19 @@
               </xsd:documentation>
             </xsd:annotation>
             <xsd:complexType>
-              <xsd:choice maxOccurs="unbounded">
-                <xsd:element name="field" type="tns:SearchField" />
-              </xsd:choice>
+              <xsd:sequence>
+                <xsd:choice maxOccurs="unbounded">
+                  <xsd:element name="field">
+                    <xsd:complexType>
+                      <xsd:complexContent>
+                        <xsd:extension base="tns:SearchField">
+                          <xsd:attribute name="multiple" use="prohibited" />
+                        </xsd:extension>
+                      </xsd:complexContent>
+                    </xsd:complexType>
+                  </xsd:element>
+                </xsd:choice>
+              </xsd:sequence>
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="select" type="tns:SearchSelect" maxOccurs="unbounded" />
