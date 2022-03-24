@@ -2312,6 +2312,7 @@
           <xsd:enumeration value="decimal" />
           <xsd:enumeration value="datetime" />
           <xsd:enumeration value="date" />
+          <xsd:enumeration value="enum" />
           <xsd:enumeration value="reference" />
           <xsd:enumeration value="button" />
         </xsd:restriction>

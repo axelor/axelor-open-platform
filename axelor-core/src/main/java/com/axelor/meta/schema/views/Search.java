@@ -157,20 +157,24 @@ public class Search extends AbstractView {
     @SuppressWarnings("rawtypes")
     public Object validate(Object input) {
       try {
-        Class<?> klass = (Class<?>) TYPES.get(getServerType());
+        Class<?> klass = TYPES.get(getServerType());
         if ("reference".equals(getServerType())) {
           klass = Class.forName(getTarget());
           if (input != null) {
             return JPA.em().find(klass, Long.valueOf(((Map) input).get("id").toString()));
           }
         }
-        if (BigDecimal.class.isAssignableFrom(klass) && input == null) {
+        if ("enum".equals(getServerType())) {
+          return input;
+        }
+        if (klass != null && BigDecimal.class.isAssignableFrom(klass) && input == null) {
           return null;
         }
         if (klass != null) {
           return Adapter.adapt(input, klass, klass, null);
         }
       } catch (Exception e) {
+        // ignore
       }
       return input;
     }
