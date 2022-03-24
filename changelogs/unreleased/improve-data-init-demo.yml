@@ -1,0 +1,6 @@
+---
+title: Improve groups and jobs `data-init`
+type: change
+description: |
+  The default `admins` group is now marked as technicalStaff. The default
+  `mail.fetcher` job is no more active by default.
