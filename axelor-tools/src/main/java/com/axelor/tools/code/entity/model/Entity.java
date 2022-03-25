@@ -273,6 +273,10 @@ public class Entity implements BaseType<Entity> {
     other.baseEntity = this;
     other.repositoryType = this.repositoryType;
 
+    if (other.cacheable != null) {
+      cacheable = other.cacheable;
+    }
+
     extraImports =
         Stream.of(extraImports, other.extraImports)
             .filter(Utils::notBlank)
