@@ -17,13 +17,12 @@
  */
 package com.axelor.auth;
 
-import com.google.inject.Key;
 import javax.servlet.ServletContext;
 import org.apache.shiro.guice.web.ShiroWebModule;
 
-public class AuthWebModule extends ShiroWebModule {
+public abstract class AuthWebModule extends ShiroWebModule {
 
-  public AuthWebModule(ServletContext servletContext) {
+  protected AuthWebModule(ServletContext servletContext) {
     super(servletContext);
   }
 
@@ -46,9 +45,5 @@ public class AuthWebModule extends ShiroWebModule {
     this.addFilterChain("/favicon.ico", ANON);
   }
 
-  protected void configureAuth() {
-    this.bindRealm().to(AuthRealm.class);
-    this.addFilterChain("/logout", LOGOUT);
-    this.addFilterChain("/**", Key.get(AuthFilter.class));
-  }
+  protected abstract void configureAuth();
 }

@@ -19,7 +19,6 @@ package com.axelor.auth.pac4j;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.auth.AuthFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.AuthWebModule;
 import com.axelor.common.StringUtils;
@@ -66,6 +65,9 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
+import org.apache.shiro.web.servlet.Cookie;
+import org.apache.shiro.web.servlet.Cookie.SameSiteOptions;
+import org.apache.shiro.web.servlet.SimpleCookie;
 import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.authorization.authorizer.csrf.CsrfAuthorizer;
 import org.pac4j.core.authorization.authorizer.csrf.CsrfTokenGenerator;
@@ -73,7 +75,6 @@ import org.pac4j.core.authorization.authorizer.csrf.DefaultCsrfTokenGenerator;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
-import org.pac4j.core.context.Cookie;
 import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.Pac4jConstants;
@@ -226,6 +227,9 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     authenticator.setRealms(realms);
     authenticator.setAuthenticationListeners(authenticationListeners);
     securityManager.setAuthenticator(authenticator);
+    securityManager.setSessionManager(new AxelorSessionManager());
+    securityManager.setRememberMeManager(new AxelorRememberMeManager());
+
     return securityManager;
   }
 
@@ -242,6 +246,15 @@ public abstract class AuthPac4jModule extends AuthWebModule {
   protected static boolean isNativeClient(WebContext context) {
     String origin = context.getRequestHeader("Origin");
     return StringUtils.isBlank(origin);
+  }
+
+  protected static boolean isSecure(HttpServletRequest request) {
+    return request.isSecure() || "https".equalsIgnoreCase(getProto(request));
+  }
+
+  private static String getProto(HttpServletRequest request) {
+    final String proto = request.getHeader("X-Forwarded-Proto");
+    return StringUtils.isBlank(proto) ? request.getScheme() : proto;
   }
 
   @Singleton
@@ -282,23 +295,26 @@ public abstract class AuthPac4jModule extends AuthWebModule {
 
     private void addResponseCookieAndHeader(WebContext context) {
       final String token = tokenGenerator.get(context);
-      final Cookie cookie = new Cookie(CSRF_COOKIE_NAME, token);
-      final HttpServletRequest request = ((J2EContext) context).getRequest();
+      final J2EContext httpContext = (J2EContext) context;
+      final HttpServletRequest request = httpContext.getRequest();
+      final HttpServletResponse response = httpContext.getResponse();
 
       String path = request.getContextPath();
       if (path.length() == 0) {
         path = "/";
       }
 
-      if (request.isSecure()) {
-        cookie.setSecure(true);
-      }
-
+      final Cookie cookie = new SimpleCookie(CSRF_COOKIE_NAME);
+      cookie.setValue(token);
       cookie.setDomain("");
       cookie.setPath(path);
-      context.addResponseCookie(cookie);
-      final J2EContext j2eContext = ((J2EContext) context);
-      AuthFilter.setSameSiteNone(j2eContext.getRequest(), j2eContext.getResponse());
+      cookie.setHttpOnly(false);
+      if (AuthPac4jModule.isSecure(request)) {
+        cookie.setSecure(true);
+        cookie.setSameSite(SameSiteOptions.NONE);
+      }
+      cookie.saveTo(request, response);
+
       context.setResponseHeader(CSRF_HEADER_NAME, token);
     }
   }
@@ -345,8 +361,6 @@ public abstract class AuthPac4jModule extends AuthWebModule {
                 Boolean inputDestroySession,
                 Boolean inputCentralLogout) {
 
-              AuthFilter.setSameSiteNone(context.getRequest(), context.getResponse());
-
               // Destroy web session.
               return super.perform(
                   context,
@@ -389,8 +403,6 @@ public abstract class AuthPac4jModule extends AuthWebModule {
                 Boolean inputMultiProfile,
                 Boolean inputRenewSession,
                 String client) {
-
-              AuthFilter.setSameSiteNone(context.getRequest(), context.getResponse());
 
               try {
                 context.getRequest().setCharacterEncoding("UTF-8");
@@ -479,8 +491,6 @@ public abstract class AuthPac4jModule extends AuthWebModule {
                 Boolean inputMultiProfile,
                 Object... parameters) {
 
-              AuthFilter.setSameSiteNone(context.getRequest(), context.getResponse());
-
               return super.perform(
                   context,
                   config,
@@ -525,8 +535,6 @@ public abstract class AuthPac4jModule extends AuthWebModule {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
-
-      AuthFilter.setSameSiteNone((HttpServletRequest) request, (HttpServletResponse) response);
 
       final Subject subject = SecurityUtils.getSubject();
       final boolean authenticated = subject.isAuthenticated();

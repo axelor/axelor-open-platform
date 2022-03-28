@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.JpaTest;
 import com.axelor.TestingHelpers;
-import com.axelor.auth.AuthFilter.UsernamePasswordTokenWithParams;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.Role;
@@ -62,8 +61,7 @@ public class AuthTest extends JpaTest {
 
   private void login(String user, String password) {
     final Subject subject = AuthUtils.getSubject();
-    final UsernamePasswordToken token =
-        new UsernamePasswordTokenWithParams(user, password, false, null, null);
+    final UsernamePasswordToken token = new UsernamePasswordToken(user, password);
 
     subject.login(token);
   }

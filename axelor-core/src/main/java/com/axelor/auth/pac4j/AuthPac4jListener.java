@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 public class AuthPac4jListener implements AuthenticationListener {
 
   @Inject private Event<PostLogin> postLogin;
+  @Inject private AxelorSessionManager sessionManager;
 
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -54,7 +55,7 @@ public class AuthPac4jListener implements AuthenticationListener {
       final User user = ((UserAuthenticationInfo) info).getUser();
 
       if (user != null) {
-        Beans.get(HttpServletRequest.class).changeSessionId();
+        sessionManager.changeSessionId();
         firePostLoginSuccess(token, user);
         return;
       }
