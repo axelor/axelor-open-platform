@@ -806,9 +806,17 @@ ActionHandler.prototype = {
     }
 
     if(data.notify) {
-      axelor.notify.info(data.notify.message, {
-        title: data.notify.title
-      });
+      if (_.isArray(data.notify)) {
+        _.each(data.notify, function(item) {
+          axelor.notify.info(item.message, {
+            title: item.title
+          });
+        });
+      } else {
+        axelor.notify.info(data.notify.message, {
+          title: data.notify.title
+        });
+      }
     }
 
     if(data.error) {
