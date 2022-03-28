@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_6.0.xsd">
+
+    <!-- Root menu 1 with 2 child's -->
+    <menuitem name="menu-root-1" title="Root 1" groups="admins,users"/>
+
+    <menuitem name="menu-root-1-1" parent="menu-root-1"
+              title="Menu 1-1"
+              action="menu-action"/>
+
+    <menuitem name="menu-root-1-2" parent="menu-root-1"
+              title="Menu 1-2"
+              action="menu-action" tag-count="true" tag-style="important"/>
+
+    <!-- Root menu without child's and no groups or roles -->
+    <menuitem name="menu-root-2" title="Root 2" action="menu-action" tag-count="true"/>
+
+    <!-- Root menu 3 with 2 child's -->
+    <menuitem name="menu-root-3" title="Root 3" groups="users"/>
+
+    <menuitem name="menu-root-3-1" parent="menu-root-3"
+              title="Menu 3-1"
+              action="menu-action" groups="admins"/>
+
+    <menuitem name="menu-root-3-2" parent="menu-root-3"
+              title="Menu 3-2"
+              action="menu-action" tag-count="true"/>
+
+    <menuitem name="menu-root-3-3" parent="menu-root-3"
+              title="Menu 3-3" hidden="true"
+              action="menu-action" tag-count="true"/>
+
+    <!-- Generic action -->
+    <action-view name="menu-action" title="Action" model="com.axelor.test.db.Contact">
+        <view type="cards" name="contact-cards"/>
+        <view type="form" name="contact-form"/>
+    </action-view>
+
+</object-views>
