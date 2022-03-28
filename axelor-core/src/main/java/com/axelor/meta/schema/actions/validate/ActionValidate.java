@@ -69,7 +69,7 @@ public class ActionValidate extends ActionResumable {
   @Override
   public Object evaluate(ActionHandler handler) {
 
-    final List<Map<String, String>> info = Lists.newArrayList();
+    Map<String, String> info = null;
     final List<Map<String, String>> notify = Lists.newArrayList();
     final Map<String, Object> result = Maps.newHashMap();
 
@@ -90,7 +90,8 @@ public class ActionValidate extends ActionResumable {
       Map<String, String> value = validator.toMap(message);
 
       if (validator instanceof Info) {
-        info.add(value);
+        // Only displays the first `info` in case of multiple matches
+        info = info == null ? value : info;
         continue;
       }
       if (validator instanceof Notify) {
@@ -104,7 +105,7 @@ public class ActionValidate extends ActionResumable {
         result.put("pending", String.format("%s[%d]", getName(), i + 1));
       }
 
-      if (!info.isEmpty()) {
+      if (info != null) {
         result.put(Info.KEY, info);
       }
       if (!notify.isEmpty()) {
@@ -114,7 +115,7 @@ public class ActionValidate extends ActionResumable {
       return result;
     }
 
-    if (!info.isEmpty()) {
+    if (info != null) {
       result.put(Info.KEY, info);
     }
     if (!notify.isEmpty()) {
