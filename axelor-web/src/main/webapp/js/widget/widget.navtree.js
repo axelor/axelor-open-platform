@@ -106,8 +106,8 @@ ui.directive('uiNavTree', ['MenuService', 'TagService', function(MenuService, Ta
         data.forEach(function (item) {
           var node = nodes[item.name];
           if (node) {
-            node.tag = item.tag;
-            node.tagStyle = item.tagStyle;
+            node.tag = item.value;
+            node.tagStyle = item.style;
             if (node.tagStyle) {
               node.tagCss = "label-" + node.tagStyle;
             }

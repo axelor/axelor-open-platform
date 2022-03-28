@@ -1,0 +1,11 @@
+---
+title: Refactoring menu and tags processing
+type: feature
+description: |
+  This is a refactoring on how menus and tags are processing. The original way was complex and mixing tags 
+  and menus rules in a single method. There is no changes on how it works.
+  
+  Now, menus and tags processing are separate. Moreover, instead of parsing each menu one by one (but also recursively 
+  checking parent access), it builds a tree. The tree is a representation of the menus' hierarchy, where each menu have 
+  a parent and some child's. Then the tree is traversed, checking each node access. When a node is allowed, it 
+  continues traversing each child's. When a node is not allowed, it skips the node and all the child's.

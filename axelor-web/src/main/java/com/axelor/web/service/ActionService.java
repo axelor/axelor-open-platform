@@ -17,20 +17,18 @@
  */
 package com.axelor.web.service;
 
+import com.axelor.auth.AuthUtils;
 import com.axelor.mail.web.MailController;
 import com.axelor.meta.ActionExecutor;
-import com.axelor.meta.schema.views.MenuItem;
-import com.axelor.meta.service.MetaService;
+import com.axelor.meta.service.menu.MenuService;
+import com.axelor.meta.service.tags.TagsService;
 import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
 import com.axelor.team.web.TaskController;
 import com.google.inject.servlet.RequestScoped;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -46,11 +44,13 @@ import javax.ws.rs.core.MediaType;
 @Path("/action")
 public class ActionService extends AbstractService {
 
-  @Inject private MetaService service;
+  @Inject private MenuService menuService;
 
-  @Inject private TaskController teamController;
+  @Inject private TagsService tagsService;
 
   @Inject private MailController mailController;
+
+  @Inject private TaskController teamController;
 
   @Inject private ActionExecutor actionExecutor;
 
@@ -59,7 +59,7 @@ public class ActionService extends AbstractService {
   public Response all() {
     Response response = new Response();
     try {
-      response.setData(service.getMenus(false));
+      response.setData(menuService.getMenus(AuthUtils.getUser()));
       response.setStatus(Response.STATUS_SUCCESS);
     } catch (Exception e) {
       if (LOG.isErrorEnabled()) LOG.error(e.getMessage(), e);
@@ -82,16 +82,8 @@ public class ActionService extends AbstractService {
 
   private Response tags(boolean inNamesOnly, List<String> names) {
     final ActionResponse response = new ActionResponse();
-    final List<Object> tags = new ArrayList<>();
     try {
-      for (MenuItem item : service.getMenus(true, inNamesOnly, names)) {
-        Map<String, Object> tag = new HashMap<>();
-        tag.put("name", item.getName());
-        tag.put("tag", item.getTag());
-        tag.put("tagStyle", item.getTagStyle());
-        tags.add(tag);
-      }
-      response.setValue("tags", tags);
+      response.setValue("tags", tagsService.get(names));
       response.setStatus(Response.STATUS_SUCCESS);
       mailController.countMail(null, response);
       teamController.countTasks(null, response);
