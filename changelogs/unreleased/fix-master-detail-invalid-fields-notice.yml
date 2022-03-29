@@ -1,0 +1,3 @@
+---
+title: Fix spurious invalid fields notice when master detail is not shown
+type: fix

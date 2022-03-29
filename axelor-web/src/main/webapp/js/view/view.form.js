@@ -1574,6 +1574,11 @@ ui.directive('uiViewForm', ['$compile', 'ViewService', function($compile, ViewSe
         if (isInline) {
           return false;
         }
+        // master-detail
+        var detailScope = $(this).parents('.nested-editor').first().scope();
+        if (detailScope && !detailScope.visible) {
+          return false;
+        }
         var elemScope = $(this).scope();
         if (elemScope.isHidden &&
           elemScope.isHidden()) {
