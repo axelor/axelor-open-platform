@@ -177,6 +177,7 @@ String tenantId = (String) session.getAttribute("tenantId");
               </li>
             </ul>
             <% if (extraButtons != null) { %> <jsp:include page="<%= extraButtons %>" /> <% } %>
+            <ul class="nav hidden-phone pull-right" data-nav-quick-menu-bar></ul>
           </div>
         </div>
       </div>

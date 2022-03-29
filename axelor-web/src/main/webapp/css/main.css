@@ -1039,3 +1039,17 @@ img.prefix-icon {
   padding-bottom: 0px;
   height: 28px;
 }
+
+/* quick menu */
+
+.navbar .pull-right.quick-menu-bar .quick-menu {
+  right: unset;
+}
+
+header .navbar .nav .dropdown-menu > li.quick-menu-item a {
+  padding-left: 10px;
+}
+
+ul.dropdown-menu.quick-menu {
+  width: max-content;
+}

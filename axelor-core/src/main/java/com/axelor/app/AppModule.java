@@ -25,7 +25,9 @@ import com.axelor.meta.db.repo.MetaJsonReferenceUpdater;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.ViewObserver;
 import com.axelor.report.ReportEngineProvider;
+import com.axelor.ui.QuickMenuCreator;
 import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.eclipse.birt.report.engine.api.IReportEngine;
@@ -60,6 +62,9 @@ public class AppModule extends AbstractModule {
 
     // events support
     install(new EventModule());
+
+    // Init QuickMenuCreator
+    Multibinder.newSetBinder(binder(), QuickMenuCreator.class);
 
     final List<Class<? extends AxelorModule>> moduleClasses =
         ModuleManager.getResolution().stream()

@@ -1,0 +1,81 @@
+= Quick Menus
+:toc:
+:toc-title:
+
+Quick Menus allow running some actions or/and add some shortcuts directly
+accessing on the default page.
+
+There is no restriction of the number of allowed quick menus displayed.
+For better readability and user experience, be sure to add only the necessary things.
+
+Menus are located in the toolbar top right corner of default page :
+
+image::quick-menus.png[]
+
+A quick menu have a title, a position in the top bar (the biggests on the right)
+and a list of items.
+Each item have a title, and a selected flag, an action that will be executed when
+clicking on that item and a context. The items are displayed according to their
+order of insertion in the list.
+
+The action can be an action-view or a rpc method. That action will take the item
+context as context. If the action is an action-view, a new tab will be opened.
+
+First, register the quick menu in module class :
+
+[source,java]
+----
+public class MyModule extends AxelorModule {
+
+  @Override
+  protected void configure() {
+    addQuickMenu(MyQuickMenu.class);
+  }
+}
+----
+
+then, to define the quick menu, create a class that implements `QuickMenuCreator` :
+
+[source,java]
+----
+public class MyQuickMenu implements QuickMenuCreator {
+
+  @Override
+  public QuickMenu create() {
+    return new QuickMenu(
+            "My projects",  <1>
+            0,              <2>
+            true,           <3>
+            getItems());    <4>
+  }
+
+  public List<QuickMenuItem> getItems() {
+    String action = ProjectController.class.getName() + ":updateDefaultProject";
+    List<QuickMenuItem> items = new ArrayList<>();
+    for (Project project :
+        Query.of(Project.class).filter("?1 MEMBER OF self.members", user).fetch(10)) {
+      boolean isDefaultProject = project.equals(user.getDefaultProject());
+      QuickMenuItem item =
+          new QuickMenuItem(
+              project.getName(),                            <5>
+              action,                                       <6>
+              new Context(project.getId(), Project.class),  <7>
+              isDefaultProject);                            <8>
+      items.add(item);
+    }
+    return items;
+  }
+}
+----
+<1> Name of the QuickMenu
+<2> Order of the QuickMenu
+<3> Whether to show selected state on items
+<4> List of QuickMenuItem associated to the QuickMenu
+<5> Title of the QuickMenuItem
+<6> Action of the QuickMenuItem
+<7> Context associated to the QuickMenuItem
+<8> selected state of the QuickMenuItem
+
+Makes sure to add the necessary permissions check to display or not the QuickMenu
+and the items. If returning _null_ in `create()` method or if the QuickMenu has no items,
+the quick menu will not be displayed.

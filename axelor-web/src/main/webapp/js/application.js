@@ -84,6 +84,7 @@
 //= js/widget/widget.navtabs.js
 //= js/widget/widget.navtree.js
 //= js/widget/widget.navmenu.js
+//= js/widget/widget.navquickmenu.js
 //= js/widget/widget.slickgrid.js
 //= js/widget/widget.dialog.js
 //= js/widget/widget.update.js

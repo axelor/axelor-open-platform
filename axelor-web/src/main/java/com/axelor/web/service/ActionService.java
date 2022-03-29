@@ -26,6 +26,7 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Response;
 import com.axelor.team.web.TaskController;
+import com.axelor.ui.QuickMenuService;
 import com.google.inject.servlet.RequestScoped;
 import java.util.Collections;
 import java.util.List;
@@ -87,6 +88,22 @@ public class ActionService extends AbstractService {
       response.setStatus(Response.STATUS_SUCCESS);
       mailController.countMail(null, response);
       teamController.countTasks(null, response);
+    } catch (Exception e) {
+      LOG.error(e.getMessage(), e);
+      response.setException(e);
+    }
+    return response;
+  }
+
+  @Inject private QuickMenuService quickMenus;
+
+  @GET
+  @Path("menu/quick")
+  public Response quickMenuBar() {
+    Response response = new Response();
+    try {
+      response.setData(quickMenus.get());
+      response.setStatus(Response.STATUS_SUCCESS);
     } catch (Exception e) {
       LOG.error(e.getMessage(), e);
       response.setException(e);

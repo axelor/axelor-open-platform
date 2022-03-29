@@ -43,6 +43,10 @@
       });
     }
 
+    function quick() {
+      return $http.get('ws/action/menu/quick');
+    }
+
     function tags() {
       // Select visible menus with tags
       var names = $('.tagged:visible').get().map(function(elem) {
@@ -66,6 +70,7 @@
     return {
       get: get,
       all: all,
+      quick: quick,
       tags: tags,
       action: action
     };
