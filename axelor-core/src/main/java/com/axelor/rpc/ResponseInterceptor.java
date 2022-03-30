@@ -223,7 +223,7 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     String title = null;
     String message = null;
 
-    // https://dev.mysql.com/doc/refman/8.0/en/server-error-reference.html
+    // https://dev.mysql.com/doc/mysql-errors/8.0/en/server-error-reference.html
     switch (errorNumber) {
       case 1217:
         // fall through
@@ -262,7 +262,7 @@ public class ResponseInterceptor extends JpaSupport implements MethodInterceptor
     String title = null;
     String message = null;
 
-    // http://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
+    // https://www.postgresql.org/docs/current/errcodes-appendix.html
     switch (state) {
       case "23503": // foreign key violation
         title = I18n.get(REFERENCE_ERROR_TTILE);
