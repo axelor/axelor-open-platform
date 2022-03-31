@@ -41,16 +41,11 @@ import javax.xml.namespace.QName;
 @JsonSubTypes({
   @Type(Field.class),
   @Type(Button.class),
-  @Type(Break.class),
   @Type(Spacer.class),
   @Type(Separator.class),
   @Type(Label.class),
   @Type(Static.class),
   @Type(Help.class),
-  @Type(Group.class),
-  @Type(Notebook.class),
-  @Type(Page.class),
-  @Type(Portlet.class),
   @Type(Dashlet.class)
 })
 public abstract class AbstractWidget {

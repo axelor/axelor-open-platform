@@ -26,8 +26,8 @@ import com.axelor.db.Query.Selector;
 import com.axelor.meta.MetaTest;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.views.AbstractView;
-import com.axelor.meta.schema.views.FormInclude;
 import com.axelor.meta.schema.views.FormView;
+import com.axelor.meta.schema.views.PanelInclude;
 import com.axelor.meta.schema.views.Search;
 import com.axelor.script.ScriptHelper;
 import com.axelor.test.db.Title;
@@ -121,7 +121,7 @@ public class TestViews extends MetaTest {
     assertTrue(form1 instanceof FormView);
     assertTrue(form2 instanceof FormView);
 
-    final FormInclude include = (FormInclude) ((FormView) form2).getItems().get(0);
+    final PanelInclude include = (PanelInclude) ((FormView) form2).getItems().get(0);
     final AbstractView included = include.getView();
 
     assertEquals(form1.getName(), included.getName());

@@ -18,8 +18,40 @@
 package com.axelor.meta.schema.views;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 @JsonTypeName("dashlet")
-public class Dashlet extends Portlet {}
+public class Dashlet extends AbstractPanel {
+
+  @XmlAttribute private String action;
+
+  @XmlAttribute private Boolean canSearch;
+
+  @XmlAttribute private String canEdit;
+
+  public String getAction() {
+    return action;
+  }
+
+  public void setAction(String action) {
+    this.action = action;
+  }
+
+  public Boolean getCanSearch() {
+    return canSearch;
+  }
+
+  public void setCanSearch(Boolean canSearch) {
+    this.canSearch = canSearch;
+  }
+
+  public String getCanEdit() {
+    return canEdit;
+  }
+
+  public void setCanEdit(String canEdit) {
+    this.canEdit = canEdit;
+  }
+}

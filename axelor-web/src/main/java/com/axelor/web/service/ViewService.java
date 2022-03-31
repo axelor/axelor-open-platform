@@ -37,12 +37,11 @@ import com.axelor.meta.schema.views.Button;
 import com.axelor.meta.schema.views.ContainerView;
 import com.axelor.meta.schema.views.Dashboard;
 import com.axelor.meta.schema.views.Field;
-import com.axelor.meta.schema.views.FormInclude;
 import com.axelor.meta.schema.views.GridView;
 import com.axelor.meta.schema.views.MenuItem;
-import com.axelor.meta.schema.views.Notebook;
 import com.axelor.meta.schema.views.Panel;
 import com.axelor.meta.schema.views.PanelField;
+import com.axelor.meta.schema.views.PanelInclude;
 import com.axelor.meta.schema.views.PanelRelated;
 import com.axelor.meta.schema.views.PanelTabs;
 import com.axelor.meta.schema.views.Search;
@@ -175,16 +174,14 @@ public class ViewService extends AbstractService {
 
   private Set<String> findNames(final Set<String> names, final AbstractWidget widget) {
     List<? extends AbstractWidget> all = null;
-    if (widget instanceof Notebook) {
-      all = ((Notebook) widget).getPages();
-    } else if (widget instanceof SimpleContainer) {
+    if (widget instanceof SimpleContainer) {
       all = ((SimpleContainer) widget).getItems();
     } else if (widget instanceof Panel) {
       all = ((Panel) widget).getItems();
     } else if (widget instanceof PanelTabs) {
       all = ((PanelTabs) widget).getItems();
-    } else if (widget instanceof FormInclude) {
-      names.addAll(findNames(((FormInclude) widget).getView()));
+    } else if (widget instanceof PanelInclude) {
+      names.addAll(findNames(((PanelInclude) widget).getView()));
     } else if (widget instanceof Field) {
       names.add(((Field) widget).getName());
       if (widget instanceof PanelField) {

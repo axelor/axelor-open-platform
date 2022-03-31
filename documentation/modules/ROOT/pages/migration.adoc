@@ -144,6 +144,7 @@ Notable Changes:
 * `hashKey`/`hashAll` (`hashCode`) → `equalsInclude`/`equalsIncludeAll` (`equals`)
 * `cachable` → `cacheable`
 * `axelor.report.dir` → `reports.design.dir`
+* Form widgets `<notebook>`, `<break>`, `<group>`, `<portlet>`, and `<include>` but also `cols` and `colWidths` form attributes used for legacy form layout -> Use panel layout instead
 
 == Authentication configuration
 

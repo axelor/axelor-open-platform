@@ -14,50 +14,32 @@
         <field name="dateOfBirth"/>
     </grid>
 
-    <form name="contact-form" title="Contact" model="com.axelor.contact.test.db.Contact" cols="2" colWidths="*,200"
+    <form name="contact-form" title="Contact" model="com.axelor.contact.test.db.Contact"
       onLoad="action-contact-defaults,action-contact-attrs"
       onSave="action-contact-validate">
-        <group title="Personal Information" colSpan="1" cols="4">
+        <panel title="Personal Information">
             <field name="title"/>
-            <break/>
+            <spacer/>
             <field name="firstName"/>
             <field name="lastName" onChange="com.axelor.contact.web.HelloController:guessEmail"/>
             <field name="email"/>
             <field name="phone"/>
             <field name="dateOfBirth"/>
-            <break/>
+            <spacer/>
             <field name="group" widget="SuggestBox"/>
             <field name="company" widget="SuggestBox"/>
-        </group>
-        <group title="Actions" colSpan="1" cols="1">
+        </panel>
+        <panel title="Actions" sidebar="true">
             <button name="greet" title="Send Greetings..." onClick="com.axelor.contact.web.HelloController:say"/>
             <button name="showHomePage" title="Home Page..." onClick="com.axelor.contact.web.HelloController:showHomePage"/>
             <button name="showCompanyList" title="Company List..." help="Demonstrate how to open new view from action." onClick="com.axelor.contact.web.HelloController:showCompanyList"/>
-        </group>
-        <notebook colSpan="1">
-            <page title="Address List" cols="4">
-                <field name="addresses" title="Address List" colSpan="4">
-                    <grid title="Address List">
-                        <field name="street"/>
-                        <field name="area"/>
-                        <field name="city"/>
-                        <field name="zip"/>
-                        <field name="country"/>
-                    </grid>
-                    <form title="Address" cols="4">
-                        <field name="street"/>
-                        <field name="area"/>
-                        <field name="city"/>
-                        <field name="zip"/>
-                        <field name="country"/>
-                        <button name="clickMe" title="Click Me!" onClick="com.axelor.contact.web.HelloController:about"/>
-                    </form>
-                </field>
-            </page>
-            <page title="Notes" cols="1">
-                <field name="notes" title="Notes"/>
-            </page>
-        </notebook>
+        </panel>
+        <panel-tabs>
+            <panel-related field="addresses" title="Address List" grid-view="address-grid" form-view="address-form"/>
+            <panel title="Notes">
+                <field name="notes" title="Notes" colSpan="12"/>
+            </panel>
+        </panel-tabs>
     </form>
 
     <action-attrs name="action-contact-attrs">

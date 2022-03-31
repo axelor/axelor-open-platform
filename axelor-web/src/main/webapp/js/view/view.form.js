@@ -1327,9 +1327,6 @@ ui.formBuild = function (scope, schema, fields) {
 
     $(items).each(function(){
 
-      if (this.type == 'break') {
-        return $('<br>').appendTo(parent);
-      }
       if (this.type == 'field') {
         delete this.type;
       }

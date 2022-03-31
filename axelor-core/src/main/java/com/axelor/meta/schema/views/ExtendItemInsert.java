@@ -40,12 +40,7 @@ public class ExtendItemInsert {
   private List<Menu> menubar;
 
   @XmlElements({
-    @XmlElement(name = "include", type = FormInclude.class),
-    @XmlElement(name = "portlet", type = Portlet.class),
-    @XmlElement(name = "group", type = Group.class),
-    @XmlElement(name = "notebook", type = Notebook.class),
     @XmlElement(name = "field", type = PanelField.class),
-    @XmlElement(name = "break", type = Break.class),
     @XmlElement(name = "spacer", type = Spacer.class),
     @XmlElement(name = "static", type = Static.class),
     @XmlElement(name = "separator", type = Separator.class),

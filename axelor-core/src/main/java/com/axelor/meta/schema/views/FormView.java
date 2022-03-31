@@ -34,10 +34,6 @@ import javax.xml.bind.annotation.XmlType;
 @JsonTypeName("form")
 public class FormView extends AbstractView implements ContainerView, ExtendableView {
 
-  @XmlAttribute private Integer cols;
-
-  @XmlAttribute private String colWidths;
-
   @XmlAttribute private String onLoad;
 
   @XmlAttribute private String onSave;
@@ -69,17 +65,7 @@ public class FormView extends AbstractView implements ContainerView, ExtendableV
   private List<Menu> menubar;
 
   @XmlElements({
-    @XmlElement(name = "include", type = FormInclude.class),
-    @XmlElement(name = "portlet", type = Portlet.class),
-    @XmlElement(name = "group", type = Group.class),
-    @XmlElement(name = "notebook", type = Notebook.class),
-    @XmlElement(name = "field", type = Field.class),
-    @XmlElement(name = "break", type = Break.class),
-    @XmlElement(name = "spacer", type = Spacer.class),
-    @XmlElement(name = "separator", type = Separator.class),
-    @XmlElement(name = "label", type = Label.class),
     @XmlElement(name = "help", type = Help.class),
-    @XmlElement(name = "button", type = Button.class),
     @XmlElement(name = "panel", type = Panel.class),
     @XmlElement(name = "panel-include", type = PanelInclude.class),
     @XmlElement(name = "panel-dashlet", type = Dashlet.class),
@@ -92,22 +78,6 @@ public class FormView extends AbstractView implements ContainerView, ExtendableV
 
   @XmlElement(name = "extend")
   private List<Extend> extendItems;
-
-  public Integer getCols() {
-    return cols;
-  }
-
-  public void setCols(Integer cols) {
-    this.cols = cols;
-  }
-
-  public String getColWidths() {
-    return colWidths;
-  }
-
-  public void setColWidths(String colWidths) {
-    this.colWidths = colWidths;
-  }
 
   public String getOnLoad() {
     return onLoad;
@@ -231,8 +201,8 @@ public class FormView extends AbstractView implements ContainerView, ExtendableV
     }
     for (AbstractWidget item : items) {
       item.setModel(super.getModel());
-      if (item instanceof FormInclude) {
-        ((FormInclude) item).setOwner(this);
+      if (item instanceof PanelInclude) {
+        ((PanelInclude) item).setOwner(this);
       }
     }
     return items;

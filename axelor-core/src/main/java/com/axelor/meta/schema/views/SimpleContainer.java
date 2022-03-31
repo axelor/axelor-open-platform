@@ -18,7 +18,6 @@
 package com.axelor.meta.schema.views;
 
 import java.util.List;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlTransient;
@@ -28,39 +27,14 @@ import javax.xml.bind.annotation.XmlType;
 @XmlTransient
 public abstract class SimpleContainer extends AbstractContainer {
 
-  @XmlAttribute private Integer cols;
-
-  @XmlAttribute private String colWidths;
-
   @XmlElements({
-    @XmlElement(name = "include", type = FormInclude.class),
-    @XmlElement(name = "portlet", type = Portlet.class),
-    @XmlElement(name = "group", type = Group.class),
-    @XmlElement(name = "notebook", type = Notebook.class),
     @XmlElement(name = "field", type = Field.class),
-    @XmlElement(name = "break", type = Break.class),
     @XmlElement(name = "spacer", type = Spacer.class),
     @XmlElement(name = "separator", type = Separator.class),
     @XmlElement(name = "label", type = Label.class),
     @XmlElement(name = "button", type = Button.class)
   })
   private List<AbstractWidget> items;
-
-  public Integer getCols() {
-    return cols;
-  }
-
-  public void setCols(Integer cols) {
-    this.cols = cols;
-  }
-
-  public String getColWidths() {
-    return colWidths;
-  }
-
-  public void setColWidths(String colWidths) {
-    this.colWidths = colWidths;
-  }
 
   public List<AbstractWidget> getItems() {
     if (items != null) {

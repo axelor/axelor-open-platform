@@ -517,22 +517,6 @@
     </xsd:complexContent>
   </xsd:complexType>
 
-  <xsd:complexType name="SimpleContainer" abstract="true">
-    <xsd:complexContent>
-      <xsd:extension base="tns:AbstractContainer">
-        <xsd:choice maxOccurs="unbounded" minOccurs="0">
-          <xsd:group ref="tns:FormWidgets" />
-        </xsd:choice>
-        <xsd:attribute name="cols" type="xsd:int">
-          <xsd:annotation>
-            <xsd:documentation>Number of columns inside the container.</xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="colWidths" type="xsd:string" />
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-
   <xsd:simpleType name="ColorNameStyle">
     <xsd:restriction base="xsd:string">
       <xsd:enumeration value="red" />
@@ -1426,7 +1410,15 @@
 
   <xsd:complexType name="Dashlet">
     <xsd:complexContent>
-      <xsd:extension base="tns:Portlet">
+      <xsd:extension base="tns:AbstractContainer">
+        <xsd:attribute name="action" type="xsd:string" use="required" />
+        <xsd:attribute name="canSearch" type="xsd:boolean">
+          <xsd:annotation>
+            <xsd:documentation>
+              Whether to enable search header on grid view dashlet.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="x-show-bars" type="xsd:boolean">
           <xsd:annotation>
             <xsd:documentation>Specify whether to show toolbar and menubar.</xsd:documentation>
@@ -1473,28 +1465,12 @@
           <xsd:sequence>
             <xsd:element name="toolbar" type="tns:Toolbar" minOccurs="0" />
             <xsd:element name="menubar" type="tns:Menubar" minOccurs="0" />
-            <xsd:choice minOccurs="0" maxOccurs="1">
-              <xsd:choice maxOccurs="unbounded">
-                <xsd:group ref="tns:FormPanels" />
-              </xsd:choice>
-              <xsd:choice maxOccurs="unbounded">
-                <xsd:group ref="tns:FormWidgets" />
-              </xsd:choice>
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+              <xsd:group ref="tns:FormPanels" />
             </xsd:choice>
             <xsd:element name="panel-mail" type="tns:PanelMail" minOccurs="0" />
           </xsd:sequence>
         </xsd:choice>
-        <xsd:attribute name="cols" type="xsd:int">
-          <xsd:annotation>
-            <xsd:documentation>Number of initial column for the form.</xsd:documentation>
-            <xsd:documentation>DEPRECATED: This attribute is deprecated and will be removed in the next major version. Use panel layout instead.</xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="colWidths" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>DEPRECATED: This attribute is deprecated and will be removed in the next major version. Use panel layout instead.</xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="onLoad" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>Comma separate list of actions to execute on load event.</xsd:documentation>
@@ -1990,21 +1966,6 @@
           <xsd:annotation>
             <xsd:documentation>
             Specify maximum number of columns when columnBy is a reference field.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-
-  <xsd:complexType name="Portlet">
-    <xsd:complexContent>
-      <xsd:extension base="tns:AbstractContainer">
-        <xsd:attribute name="action" type="xsd:string" use="required" />
-        <xsd:attribute name="canSearch" type="xsd:boolean">
-          <xsd:annotation>
-            <xsd:documentation>
-              Whether to enable search header on grid view portlet.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>
@@ -2564,74 +2525,6 @@
     </xsd:attribute>
   </xsd:complexType>
 
-  <xsd:complexType name="Group">
-    <xsd:complexContent>
-      <xsd:extension base="tns:SimpleContainer">
-        <xsd:attribute name="canCollapse" type="xsd:boolean">
-          <xsd:annotation>
-            <xsd:documentation>
-              Whether to collapse the group.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="collapseIf" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>
-              A JavaScript boolean expression against the current form values.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-
-  <xsd:complexType name="Page">
-    <xsd:complexContent>
-      <xsd:restriction base="tns:SimpleContainer">
-        <xsd:choice maxOccurs="unbounded" minOccurs="0">
-          <xsd:group ref="tns:FormWidgets" />
-        </xsd:choice>
-        <xsd:attribute name="title" type="xsd:string" use="required">
-          <xsd:annotation>
-            <xsd:documentation>
-              The display text.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="icon" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>
-              Path of the image.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="onSelect" type="xsd:string">
-          <xsd:annotation>
-            <xsd:documentation>
-              The actions will be executed after select the page.
-            </xsd:documentation>
-          </xsd:annotation>
-        </xsd:attribute>
-      </xsd:restriction>
-    </xsd:complexContent>
-  </xsd:complexType>
-
-  <xsd:complexType name="Notebook">
-    <xsd:complexContent>
-      <xsd:extension base="tns:AbstractContainer">
-        <xsd:sequence maxOccurs="unbounded">
-          <xsd:element name="page" type="tns:Page" />
-        </xsd:sequence>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-
-  <xsd:complexType name="Break">
-    <xsd:complexContent>
-      <xsd:extension base="tns:AbstractWidget" />
-    </xsd:complexContent>
-  </xsd:complexType>
-
   <xsd:complexType name="Spacer">
     <xsd:complexContent>
       <xsd:extension base="tns:SimpleWidget">
@@ -2955,56 +2848,6 @@
     <xsd:choice>
       <xsd:element name="field" type="tns:GridField" />
       <xsd:element name="button" type="tns:GridButton" />
-    </xsd:choice>
-  </xsd:group>
-
-  <xsd:group name="FormWidgets">
-    <xsd:choice>
-      <xsd:element name="include" type="tns:FormInclude">
-        <xsd:annotation>
-          <xsd:documentation>DEPRECATED: This field is deprecated and will be removed in the next major version. Use &lt;panel-include&gt; instead.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-      <xsd:element name="portlet" type="tns:Portlet">
-        <xsd:annotation>
-          <xsd:documentation>DEPRECATED: This field is deprecated and will be removed in the next major version. Use &lt;panel-dashlet&gt; instead.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-      <xsd:element name="group" type="tns:Group">
-        <xsd:annotation>
-          <xsd:documentation>DEPRECATED: This field is deprecated and will be removed in the next major version. Use &lt;panel&gt; instead.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-      <xsd:element name="notebook" type="tns:Notebook">
-        <xsd:annotation>
-          <xsd:documentation>DEPRECATED: This field is deprecated and will be removed in the next major version. Use &lt;panel-tabs&gt; instead.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-      <xsd:element name="field" type="tns:Field" />
-      <xsd:element name="break" type="tns:Break">
-        <xsd:annotation>
-          <xsd:documentation>
-            Break previous row and start new one.
-          </xsd:documentation>
-          <xsd:documentation>DEPRECATED: This field is deprecated and will be removed in the next major version. Use &lt;spacer&gt; instead.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-      <xsd:element name="spacer" type="tns:Spacer">
-        <xsd:annotation>
-          <xsd:documentation>
-            An empty place holder. It can be used to better layout components.
-          </xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-      <xsd:element name="separator" type="tns:Separator">
-        <xsd:annotation>
-          <xsd:documentation>
-            Separator can be used to define boundry.
-          </xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-      <xsd:element name="label" type="tns:Label" />
-      <xsd:element name="button" type="tns:Button" />
     </xsd:choice>
   </xsd:group>
 

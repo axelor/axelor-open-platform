@@ -4,13 +4,17 @@
   xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_6.0.xsd">
 
   <form name="contact-form1" title="Contact" model="com.axelor.test.db.Contact">
-    <field name="firstName"/>
-    <field name="lastName"/>
+    <panel>
+      <field name="firstName"/>
+      <field name="lastName"/>
+    </panel>
   </form>
 
   <form name="contact-form2" title="Contact" model="com.axelor.test.db.Contact">
-    <include view="contact-form1"/>
-    <field name="email"/>
+    <panel-include view="contact-form1"/>
+    <panel>
+      <field name="email"/>
+    </panel>
   </form>
 
 </object-views>
