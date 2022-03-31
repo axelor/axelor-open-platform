@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_6.0.xsd">
+
+    <grid name="base-grid" title="Base" model="com.axelor.test.db.Contact" orderBy="fullName">
+        <hilite background="warning" if="$contains(email, 'gmeil.com')"/>
+        <field name="fullName"/>
+        <field name="email">
+            <hilite strong="true" if="$contains(email, 'gmeil.com')"/>
+        </field>
+        <field name="phone"/>
+        <button name="btnTest" onClick="some" title="Btn Test"/>
+    </grid>
+
+</object-views>
