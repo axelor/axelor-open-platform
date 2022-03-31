@@ -28,6 +28,7 @@ import com.axelor.inject.Beans;
 import com.axelor.meta.MetaStore;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.inject.persist.UnitOfWork;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -267,7 +268,10 @@ public final class ViewWatcher {
               () -> {
                 synchronized (pendingModules) {
                   try {
-                    moduleManager.update(pendingModules, pendingPaths);
+                    doInSession(
+                        () -> {
+                          moduleManager.update(pendingModules, pendingPaths);
+                        });
                     MetaStore.clear();
                     I18nBundle.invalidate();
                   } catch (Exception e) {
@@ -281,6 +285,16 @@ public final class ViewWatcher {
               },
               UPDATE_DELAY,
               TimeUnit.MILLISECONDS);
+    }
+  }
+
+  void doInSession(Runnable task) {
+    UnitOfWork unitOfWork = Beans.get(UnitOfWork.class);
+    unitOfWork.begin();
+    try {
+      task.run();
+    } finally {
+      unitOfWork.end();
     }
   }
 

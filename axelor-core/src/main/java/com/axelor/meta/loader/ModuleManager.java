@@ -24,6 +24,7 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.db.JPA;
 import com.axelor.db.ParallelTransactionExecutor;
 import com.axelor.db.tenants.TenantResolver;
 import com.axelor.i18n.I18n;
@@ -257,6 +258,7 @@ public class ModuleManager {
             metaLoader.feedTransactionExecutor(
                 transactionExecutor, module, update, pathsToRestore));
     transactionExecutor.run();
+    JPA.em().clear();
   }
 
   public static boolean isInstalled(String module) {
