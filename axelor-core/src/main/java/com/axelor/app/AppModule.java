@@ -66,6 +66,8 @@ public class AppModule extends AbstractModule {
     // Init QuickMenuCreator
     Multibinder.newSetBinder(binder(), QuickMenuCreator.class);
 
+    bind(AppSettingsObserver.class);
+
     final List<Class<? extends AxelorModule>> moduleClasses =
         ModuleManager.getResolution().stream()
             .flatMap(name -> MetaScanner.findSubTypesOf(name, AxelorModule.class).find().stream())
@@ -85,7 +87,5 @@ public class AppModule extends AbstractModule {
         throw new RuntimeException(e);
       }
     }
-
-    bind(AppSettingsObserver.class);
   }
 }
