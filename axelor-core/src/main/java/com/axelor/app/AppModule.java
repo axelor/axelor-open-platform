@@ -24,6 +24,7 @@ import com.axelor.meta.MetaScanner;
 import com.axelor.meta.db.repo.MetaJsonReferenceUpdater;
 import com.axelor.meta.loader.ModuleManager;
 import com.axelor.meta.loader.ViewObserver;
+import com.axelor.meta.loader.ViewWatcherObserver;
 import com.axelor.report.ReportEngineProvider;
 import com.axelor.ui.QuickMenuCreator;
 import com.google.inject.AbstractModule;
@@ -67,6 +68,7 @@ public class AppModule extends AbstractModule {
     Multibinder.newSetBinder(binder(), QuickMenuCreator.class);
 
     bind(AppSettingsObserver.class);
+    bind(ViewWatcherObserver.class);
 
     final List<Class<? extends AxelorModule>> moduleClasses =
         ModuleManager.getResolution().stream()

@@ -23,9 +23,6 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 import com.axelor.common.reflections.Reflections;
-import com.axelor.event.Observes;
-import com.axelor.events.ShutdownEvent;
-import com.axelor.events.StartupEvent;
 import com.axelor.i18n.I18nBundle;
 import com.axelor.inject.Beans;
 import com.axelor.meta.MetaStore;
@@ -565,15 +562,4 @@ public final class ViewWatcher {
     }
   }
 
-  @Singleton
-  static class ViewWatcherLifecycleHandler {
-
-    public void onAppStart(@Observes StartupEvent event) {
-      ViewWatcher.getInstance().start();
-    }
-
-    public void onAppShutdown(@Observes ShutdownEvent event) {
-      ViewWatcher.getInstance().stop();
-    }
-  }
 }
