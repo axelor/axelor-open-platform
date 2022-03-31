@@ -48,13 +48,6 @@
       AND COALESCE(self.computed, FALSE) = :computed" />
     <finder-method name="findByModule" using="module" all="true" cacheable="true"/>
 
-    <finder-method name="findByDependentModule" using="String:module" all="true" orderBy="id"
-      filter="COALESCE(self.extension, FALSE) = FALSE
-      AND COALESCE(self.computed, FALSE) = FALSE
-      AND (self.dependentModules LIKE :module
-      OR self.dependentModules LIKE CONCAT('%,', :module, ',%')
-      OR self.dependentModules LIKE CONCAT(:module, ',%')
-      OR self.dependentModules LIKE CONCAT('%,', :module))" />
     <finder-method name="findByDependentFeature" using="String:feature" all="true" orderBy="id"
       filter="COALESCE(self.extension, FALSE) = FALSE
       AND COALESCE(self.computed, FALSE) = FALSE

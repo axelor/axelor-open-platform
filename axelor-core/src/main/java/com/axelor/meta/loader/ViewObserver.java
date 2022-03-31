@@ -20,7 +20,6 @@ package com.axelor.meta.loader;
 import com.axelor.db.JPA;
 import com.axelor.event.Observes;
 import com.axelor.events.FeatureChanged;
-import com.axelor.events.ModuleChanged;
 import com.axelor.events.PostRequest;
 import com.axelor.events.PreRequest;
 import com.axelor.events.RequestEvent;
@@ -48,10 +47,6 @@ public class ViewObserver {
   ViewObserver(MetaViewRepository metaViewRepo, XMLViews.FinalViewGenerator finalViewGenerator) {
     this.metaViewRepo = metaViewRepo;
     this.finalViewGenerator = finalViewGenerator;
-  }
-
-  void onModuleChanged(@Observes ModuleChanged event) {
-    finalViewGenerator.generate(metaViewRepo.findByDependentModule(event.getModuleName()));
   }
 
   void onFeatureChanged(@Observes FeatureChanged event) {

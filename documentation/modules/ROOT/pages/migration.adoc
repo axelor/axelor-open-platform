@@ -132,6 +132,8 @@ ALTER TABLE meta_module DROP COLUMN removable;
 ALTER TABLE meta_module DROP COLUMN pending;
 ----
 
+Also, `ModuleChanged` event associated to this feature has been removed.
+
 == Dropped deprecated features
 
 Features that were marked as deprecated in AOP v5 are now dropped.

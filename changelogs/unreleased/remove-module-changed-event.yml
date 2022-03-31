@@ -1,0 +1,5 @@
+---
+title: Remove ModuleChanged event
+type: remove
+description: |
+  Since dropping support of removable modules, this event is no more used.

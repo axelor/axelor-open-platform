@@ -26,9 +26,6 @@ import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.db.ParallelTransactionExecutor;
 import com.axelor.db.tenants.TenantResolver;
-import com.axelor.event.Event;
-import com.axelor.event.NamedLiteral;
-import com.axelor.events.ModuleChanged;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaModule;
@@ -68,8 +65,6 @@ public class ModuleManager {
 
   private final List<AbstractParallelLoader> metaLoaders;
 
-  private final Event<ModuleChanged> moduleChangedEvent;
-
   private static long lastRestored;
   private final Set<Path> pathsToRestore = new HashSet<>();
 
@@ -83,14 +78,12 @@ public class ModuleManager {
       ModelLoader modelLoader,
       I18nLoader i18nLoader,
       DataLoader dataLoader,
-      DemoLoader demoLoader,
-      Event<ModuleChanged> moduleChangedEvent) {
+      DemoLoader demoLoader) {
     this.authService = authService;
     this.modules = modules;
     this.viewLoader = viewLoader;
     this.dataLoader = dataLoader;
     this.demoLoader = demoLoader;
-    this.moduleChangedEvent = moduleChangedEvent;
     metaLoaders = ImmutableList.of(modelLoader, viewLoader, i18nLoader);
   }
 
@@ -254,10 +247,6 @@ public class ModuleManager {
     // finally update install state
     module.setPending(false);
     module.setInstalled(true);
-
-    moduleChangedEvent
-        .select(NamedLiteral.of(moduleName))
-        .fire(new ModuleChanged(moduleName, module.isInstalled()));
 
     return true;
   }
