@@ -324,4 +324,20 @@ public class DBHelper {
     }
     return false;
   }
+
+  /**
+   * Returns maximum number of workers.
+   *
+   * <p>Return the minimum between the JDBC connection max pool size and the number of processors
+   * available to the Java virtual machine.
+   *
+   * @return maximum number of workers
+   */
+  public static int getMaxWorkers() {
+    final AppSettings settings = AppSettings.get();
+    final int maxPoolSize =
+        settings.getInt(AvailableAppSettings.HIBERNATE_HIKARI_MAXIMUN_POOL_SIZE, 0);
+    int maxWorkers = Runtime.getRuntime().availableProcessors();
+    return maxPoolSize > 0 && maxPoolSize < maxWorkers ? maxPoolSize : maxWorkers;
+  }
 }

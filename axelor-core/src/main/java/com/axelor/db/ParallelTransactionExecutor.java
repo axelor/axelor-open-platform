@@ -17,8 +17,7 @@
  */
 package com.axelor.db;
 
-import com.axelor.app.AppSettings;
-import com.axelor.app.AvailableAppSettings;
+import com.axelor.db.internal.DBHelper;
 import com.axelor.db.tenants.TenantAware;
 import java.lang.invoke.MethodHandles;
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -67,15 +66,7 @@ public class ParallelTransactionExecutor {
    * processors.
    */
   public ParallelTransactionExecutor(String tenantId, String tenantHost) {
-    this(tenantId, tenantHost, getMaxWorkers());
-  }
-
-  private static int getMaxWorkers() {
-    final AppSettings settings = AppSettings.get();
-    final int maxPoolSize =
-        settings.getInt(AvailableAppSettings.HIBERNATE_HIKARI_MAXIMUM_POOL_SIZE, 0);
-    int maxWorkers = Runtime.getRuntime().availableProcessors();
-    return maxPoolSize > 0 && maxPoolSize < maxWorkers ? maxPoolSize : maxWorkers;
+    this(tenantId, tenantHost, DBHelper.getMaxWorkers());
   }
 
   /**
