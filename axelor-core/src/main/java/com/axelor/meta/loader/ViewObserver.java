@@ -39,18 +39,18 @@ public class ViewObserver {
 
   private final MetaViewRepository metaViewRepo;
 
-  private final XMLViews.FinalViewGenerator finalViewGenerator;
+  private final ViewGenerator viewGenerator;
 
   private final Set<String> toRegenerate = new HashSet<>();
 
   @Inject
-  ViewObserver(MetaViewRepository metaViewRepo, XMLViews.FinalViewGenerator finalViewGenerator) {
+  ViewObserver(MetaViewRepository metaViewRepo, ViewGenerator viewGenerator) {
     this.metaViewRepo = metaViewRepo;
-    this.finalViewGenerator = finalViewGenerator;
+    this.viewGenerator = viewGenerator;
   }
 
   void onFeatureChanged(@Observes FeatureChanged event) {
-    finalViewGenerator.generate(metaViewRepo.findByDependentFeature(event.getFeatureName()));
+    viewGenerator.generate(metaViewRepo.findByDependentFeature(event.getFeatureName()));
   }
 
   void onPostSave(
@@ -60,7 +60,7 @@ public class ViewObserver {
         values -> {
           final MetaView view = JPA.edit(MetaView.class, values);
           if (!Boolean.TRUE.equals(view.getComputed())) {
-            finalViewGenerator.generate(Collections.singletonList(view.getName()), true);
+            viewGenerator.generate(Collections.singletonList(view.getName()), true);
           }
         });
   }
@@ -79,7 +79,7 @@ public class ViewObserver {
   void onPostRemove(
       @Observes @Named(RequestEvent.REMOVE) @EntityType(MetaView.class) PostRequest event) {
     try {
-      finalViewGenerator.generate(toRegenerate, true);
+      viewGenerator.generate(toRegenerate, true);
     } finally {
       toRegenerate.clear();
     }

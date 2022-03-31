@@ -99,7 +99,7 @@ public class ViewLoader extends AbstractParallelLoader {
 
   @Inject private GroupRepository groups;
 
-  @Inject private XMLViews.FinalViewGenerator finalViewGenerator;
+  @Inject private ViewGenerator viewGenerator;
 
   private final Set<String> viewsToGenerate = ConcurrentHashMap.newKeySet();
   private final Map<String, List<String>> viewsToMigrate = new ConcurrentHashMap<>();
@@ -181,7 +181,7 @@ public class ViewLoader extends AbstractParallelLoader {
 
   private void generateFinalViews(boolean update) {
     try {
-      finalViewGenerator.generate(viewsToGenerate, update);
+      viewGenerator.generate(viewsToGenerate, update);
     } finally {
       viewsToGenerate.clear();
     }
