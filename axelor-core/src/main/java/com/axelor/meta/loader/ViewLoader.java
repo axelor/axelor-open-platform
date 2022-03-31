@@ -68,7 +68,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -190,16 +189,6 @@ public class ViewLoader extends AbstractParallelLoader {
 
   private static <T> List<T> getList(List<T> list) {
     return list != null ? list : Collections.emptyList();
-  }
-
-  @Transactional
-  void updateFrom(Path file, String moduleName) throws IOException, JAXBException {
-    final Module module = ModuleManager.getModule(moduleName);
-    try {
-      process(file.toUri().toURL(), module, true);
-    } finally {
-      doCleanUp();
-    }
   }
 
   void process(URL url, Module module, boolean update) throws IOException, JAXBException {

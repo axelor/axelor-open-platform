@@ -28,11 +28,8 @@ import com.axelor.inject.Beans;
 import com.axelor.meta.MetaStore;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
-import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -45,13 +42,10 @@ import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -62,11 +56,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.BiConsumer;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,17 +71,13 @@ public final class ViewWatcher {
 
   private WatchService watcher;
   private final Map<WatchKey, Path> keys = new HashMap<>();
-  private final List<ViewChangeEvent> pending = new ArrayList<>();
 
   private Set<String> pendingModules;
   private Set<Path> pendingPaths;
   private ScheduledExecutorService scheduler;
   private ScheduledFuture<?> scheduledFuture;
 
-  private Thread runner;
   private boolean running;
-
-  private BiConsumer<WatchEvent.Kind<?>, Path> watchEventHandler;
 
   private static final long UPDATE_DELAY =
       Optional.ofNullable(System.getProperty("axelor.view.watch.delay"))
@@ -143,39 +129,6 @@ public final class ViewWatcher {
     return instance;
   }
 
-  static synchronized void process() {
-    final ViewWatcher watcher = getInstance();
-    if (watcher.pending.isEmpty()) {
-      return;
-    }
-    final ViewLoader loader = Beans.get(ViewLoader.class);
-    try {
-      watcher.pending.forEach(
-          event -> {
-            if (event.isDelete()) {
-              // complete re-import is required
-              log.warn("File deleted: {}", event.getFile());
-            } else {
-              log.info("Updating views from: {}", event.getFile());
-              try {
-                loader.updateFrom(event.getFile(), event.getModule());
-              } catch (Exception e) {
-                log.error("Unable to update views from: {}", event.getFile(), e);
-              }
-            }
-          });
-    } finally {
-      watcher.pending.clear();
-    }
-  }
-
-  private synchronized void addPending(ViewChangeEvent event) {
-    if (pending.contains(event)) {
-      pending.remove(event);
-    }
-    pending.add(0, event);
-  }
-
   private boolean handleEvents() {
     // wait for key to be signaled
     final WatchKey key;
@@ -204,7 +157,7 @@ public final class ViewWatcher {
 
       try {
         if (Files.isReadable(file) && Files.size(file) > 0) {
-          watchEventHandler.accept(kind, file);
+          handlePath(kind, file);
         }
       } catch (Exception e) {
         log.error(e.getMessage(), e);
@@ -221,11 +174,6 @@ public final class ViewWatcher {
     }
 
     return true;
-  }
-
-  private void handleAgent(WatchEvent.Kind<?> kind, Path path) {
-    final Path modulePath = path.resolve(Paths.get("..", "..", "..", "..", "..")).normalize();
-    addPending(new ViewChangeEvent(kind, path, modulePath.toFile().getName()));
   }
 
   private void handlePath(WatchEvent.Kind<?> kind, Path path) {
@@ -357,59 +305,40 @@ public final class ViewWatcher {
   }
 
   private synchronized void registerAll() throws Exception {
-    final Pattern pattern = Pattern.compile(".*propertiesFilePath=([^,]+).*");
-    final Set<Path> paths =
-        ManagementFactory.getRuntimeMXBean().getInputArguments().stream()
-            .filter(s -> s.startsWith("-javaagent"))
-            .map(s -> pattern.matcher(s))
-            .filter(m -> m.matches())
-            .map(m -> m.group(1).trim())
-            .map(Paths::get)
-            .flatMap(
-                file -> {
-                  final Properties props = new Properties();
-                  try (InputStream is = new FileInputStream(file.toFile())) {
-                    props.load(is);
-                  } catch (IOException e) {
-                    log.error("unable to read: {}", file, e);
-                    throw new UncheckedIOException(e);
+    final Set<Path> paths = new HashSet<>();
+    final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+    Optional.ofNullable(classLoader.getResource(""))
+        .ifPresent(
+            rootResource -> {
+              switch (rootResource.getProtocol()) {
+                case "file":
+                  final Path path =
+                      Paths.get(toURI(rootResource)).resolve(Paths.get("..", "lib")).normalize();
+                  if (path.toFile().isDirectory()) {
+                    paths.add(path);
                   }
-                  final String resources = props.getProperty("watchResources", "");
-                  return Stream.of(resources.split(","));
-                })
-            .map(String::trim)
-            .map(Paths::get)
-            .map(p -> p.resolve("views"))
-            .filter(p -> p.toFile().isDirectory())
-            .collect(Collectors.toSet());
+                  break;
+                case "jar":
+                  final Path pathJar =
+                      Paths.get(toURI(rootResource.getPath())).getParent().getParent();
+                  if (Files.isDirectory(pathJar)) {
+                    paths.add(pathJar);
+                  }
+                  break;
+                default:
+                  log.error("Unsupported resource: {}", rootResource);
+              }
+            });
 
-    if (!paths.isEmpty()) {
-      watchEventHandler = this::handleAgent;
-    } else {
-      final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-      final Optional<URL> rootResourceOpt = Optional.ofNullable(classLoader.getResource(""));
-      rootResourceOpt.ifPresent(
-          rootResource -> {
-            final Path libPath =
-                Paths.get(toURI(rootResource)).resolve(Paths.get("..", "lib")).normalize();
-            if (libPath.toFile().isDirectory()) {
-              paths.add(libPath);
-            }
-          });
-
-      Reflections.findResources()
-          .byName("(domains|i18n|views)/(.*?)\\.(xml|csv)$")
-          .find()
-          .parallelStream()
-          .filter(url -> url.getPath().startsWith("/"))
-          .map(url -> Paths.get(toURI(url)).resolve("..").normalize())
-          .distinct()
-          .forEach(paths::add);
-
-      if (!paths.isEmpty()) {
-        watchEventHandler = this::handlePath;
-      }
-    }
+    Reflections.findResources()
+        .byName("(domains|i18n|views)/(.*?)\\.(xml|csv)$")
+        .find()
+        .parallelStream()
+        .filter(url -> url.getPath().startsWith("/"))
+        .map(url -> Paths.get(toURI(url)).resolve("..").normalize())
+        .distinct()
+        .forEach(paths::add);
 
     if (paths.isEmpty()) {
       return;
@@ -461,7 +390,7 @@ public final class ViewWatcher {
     pendingPaths = new HashSet<>();
     scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    runner =
+    Thread runner =
         new Thread(
             () -> {
               for (; ; ) {
@@ -507,59 +436,11 @@ public final class ViewWatcher {
     }
   }
 
-  static final class ViewChangeEvent {
-
-    private final WatchEvent.Kind<?> kind;
-    private final Path file;
-    private final String module;
-
-    public ViewChangeEvent(WatchEvent.Kind<?> kind, Path file, String module) {
-      this.kind = kind;
-      this.file = file;
-      this.module = module;
-    }
-
-    public boolean isCreate() {
-      return kind == ENTRY_CREATE;
-    }
-
-    public boolean isDelete() {
-      return kind == ENTRY_DELETE;
-    }
-
-    public boolean isModify() {
-      return kind == ENTRY_MODIFY;
-    }
-
-    public WatchEvent.Kind<?> getKind() {
-      return kind;
-    }
-
-    public Path getFile() {
-      return file;
-    }
-
-    public String getModule() {
-      return module;
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(0, file);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) return true;
-      if (!(obj instanceof ViewChangeEvent)) return false;
-      final ViewChangeEvent other = (ViewChangeEvent) obj;
-      return this.file.equals(other.file);
-    }
-
-    @Override
-    public String toString() {
-      return "[" + kind + ", " + file + "]";
+  private static URI toURI(String path) {
+    try {
+      return new URI(path);
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
     }
   }
-
 }

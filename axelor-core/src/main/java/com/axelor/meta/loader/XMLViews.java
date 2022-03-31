@@ -358,11 +358,6 @@ public class XMLViews {
     return (ObjectViews) unmarshaller.unmarshal(reader);
   }
 
-  /** Apply pending updates if auto-update watch is running. */
-  public static void applyHotUpdates() {
-    ViewWatcher.process();
-  }
-
   public static Map<String, Object> findViews(String model, Map<String, String> views) {
     final Map<String, Object> result = Maps.newHashMap();
     if (views == null || views.isEmpty()) {
@@ -520,9 +515,6 @@ public class XMLViews {
       custom = findCustomView(customViews, name, type, model);
     }
 
-    // make sure hot updates are applied
-    applyHotUpdates();
-
     // first find by name
     if (StringUtils.notBlank(name)) {
       // with group
@@ -591,7 +583,6 @@ public class XMLViews {
   }
 
   public static Action findAction(String name) {
-    applyHotUpdates();
     final MetaAction metaAction = Beans.get(MetaActionRepository.class).findByName(name);
     final Action action;
     try {
