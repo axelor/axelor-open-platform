@@ -247,14 +247,12 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
   }
 
   @Override
-  @Transactional
   public MetaJsonModel save(MetaJsonModel entity) {
     this.onSave(entity);
     return super.save(entity);
   }
 
   @Override
-  @Transactional
   public void remove(MetaJsonModel entity) {
     final EntityManager em = JPA.em();
     final Model[] related = {
