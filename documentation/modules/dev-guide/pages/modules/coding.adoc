@@ -155,7 +155,7 @@ action requests and responses. For more details see the {url-apidoc}.
 |refresh browser tab (send null data)
 
 |`refresh-tab`
-|refresh refresh current tab in the application (send null data) - _new in version 5.4_
+|refresh current tab in the application (send null data) - _new in version 5.4_
 
 |===
 
