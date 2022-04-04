@@ -24,6 +24,7 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.common.ObjectUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.ParallelTransactionExecutor;
 import com.axelor.db.tenants.TenantResolver;
@@ -36,7 +37,7 @@ import com.google.inject.persist.Transactional;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -92,25 +93,12 @@ public class ModuleManager {
     try {
       createUsers();
       resolve(update);
-      Beans.get(AuditableRunner.class)
-          .run(
-              () -> {
-                final List<Module> installed = new ArrayList<>();
-
-                // install modules
-                RESOLVER.all().stream()
-                    .peek(m -> log.info("Loading package {}...", m.getName()))
-                    .filter(m -> m.isPending())
-                    .forEach(
-                        m -> {
-                          if (installOne(m.getName(), update, withDemo)) {
-                            installed.add(m);
-                          }
-                        });
-
-                // second iteration ensures proper view sequence
-                installed.forEach(module -> viewLoader.doLast(module, update));
-              });
+      final List<Module> moduleList =
+          RESOLVER.all().stream()
+              .peek(m -> log.info("Loading package {}...", m.getName()))
+              .filter(Module::isPending)
+              .collect(Collectors.toList());
+      loadModules(moduleList, update, withDemo);
     } finally {
       encryptPasswords();
       doCleanUp();
@@ -118,30 +106,19 @@ public class ModuleManager {
   }
 
   public void update(boolean withDemo, String... moduleNames) {
-    final List<String> names = new ArrayList<>();
-    if (moduleNames != null) {
-      Collections.addAll(names, moduleNames);
-    }
+    final List<Module> moduleList = new ArrayList<>();
 
     try {
       createUsers();
       resolve(true);
-      if (names.isEmpty()) {
+      if (ObjectUtils.isEmpty(moduleNames)) {
+        RESOLVER.all().stream().filter(Module::isInstalled).forEach(moduleList::add);
+      } else {
         RESOLVER.all().stream()
-            .filter(Module::isInstalled)
-            .map(Module::getName)
-            .forEach(names::add);
+            .filter(m -> Arrays.asList(moduleNames).contains(m.getName()))
+            .forEach(moduleList::add);
       }
-      Beans.get(AuditableRunner.class)
-          .run(
-              () -> {
-                RESOLVER.all().stream()
-                    .filter(m -> names.contains(m.getName()))
-                    .forEach(m -> installOne(m.getName(), true, withDemo));
-                RESOLVER.all().stream()
-                    .filter(m -> names.contains(m.getName()))
-                    .forEach(m -> viewLoader.doLast(m, true));
-              });
+      loadModules(moduleList, true, withDemo);
     } finally {
       this.doCleanUp();
     }
@@ -153,17 +130,12 @@ public class ModuleManager {
     final List<Module> moduleList =
         RESOLVER.all().stream()
             .filter(m -> moduleNames.contains(m.getName()))
+            .peek(m -> m.setPending(true))
             .collect(Collectors.toList());
 
     try {
       pathsToRestore.addAll(paths);
-      Beans.get(AuditableRunner.class)
-          .run(
-              () -> {
-                moduleList.forEach(m -> m.setPending(true));
-                moduleList.forEach(m -> installOne(m.getName(), true, false));
-                moduleList.forEach(m -> viewLoader.doLast(m, true));
-              });
+      loadModules(moduleList, true, false);
     } finally {
       pathsToRestore.clear();
       doCleanUp(startTime);
@@ -183,6 +155,15 @@ public class ModuleManager {
       BUSY.set(false);
       loadData = true;
     }
+  }
+
+  private void loadModules(List<Module> moduleList, boolean update, boolean withDemo) {
+    Beans.get(AuditableRunner.class)
+        .run(
+            () -> {
+              moduleList.forEach(m -> installOne(m.getName(), update, withDemo));
+              moduleList.forEach(m -> viewLoader.doLast(m, update));
+            });
   }
 
   public boolean isLoadData() {
@@ -222,7 +203,8 @@ public class ModuleManager {
     final Module module = RESOLVER.get(moduleName);
     final MetaModule metaModule = modules.findByName(moduleName);
 
-    if (metaModule == null || !module.isPending()) {
+    if (metaModule == null) {
+      log.error("Trying to install an nonexistent module {}. Skipping...", moduleName);
       return false;
     }
 

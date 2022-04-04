@@ -133,7 +133,7 @@ public class ViewLoader extends AbstractParallelLoader {
     Set<?> unresolved = this.unresolvedKeys();
     if (!unresolved.isEmpty()) {
       log.error("Unresolved items: {}", unresolved);
-      throw new PersistenceException("There are some unresolve items; check the log.");
+      throw new PersistenceException("There are some unresolved items; check the log.");
     }
 
     migrateViews();
