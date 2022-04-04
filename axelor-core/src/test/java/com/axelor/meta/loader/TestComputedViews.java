@@ -60,7 +60,7 @@ public class TestComputedViews extends MetaTest {
 
   @Test
   public void testComputedViews() throws JAXBException {
-    long count = Beans.get(ViewGenerator.class).generate(List.of("base-grid"), true);
+    long count = Beans.get(ViewGenerator.class).process(List.of("base-grid"), true);
     assertEquals(1, count);
 
     MetaView originalView = viewRepository.findByNameAndComputed("base-grid", false);

@@ -56,6 +56,8 @@ public class ComputedViewProcessor {
       return null;
     }
 
+    LOG.debug("Compute view {} with extensions...", baseView.getName());
+
     Document document = processor.compute();
 
     final ObjectViews objectViews = XMLViews.unmarshal(document);
