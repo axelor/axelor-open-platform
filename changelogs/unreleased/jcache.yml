@@ -1,0 +1,6 @@
+---
+title: Use jcache in combination with Caffeine as second-level cache provider
+type: change
+description: |
+  Ehcache2 second-level cache is deprecated since Hibernate 5.3.
+  Use `jcache` in combination with Caffeine by default as second-level cache.

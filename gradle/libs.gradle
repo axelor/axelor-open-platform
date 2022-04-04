@@ -93,8 +93,18 @@ libs.hibernate = [
   "org.hibernate:hibernate-core:${versions.hibernate}",
   "org.hibernate:hibernate-hikaricp:${versions.hibernate}",
   "org.hibernate:hibernate-validator:${versions.hibernate_validator}",
-  "org.hibernate:hibernate-ehcache:${versions.hibernate}",
   "org.hibernate:hibernate-jcache:${versions.hibernate}"
+]
+
+// Caching libs
+libs.ehcache = "org.ehcache:ehcache:3.10.0"
+libs.redisson = "org.redisson:redisson-hibernate-53:3.17.0"
+libs.hazelcast = "com.hazelcast:hazelcast:5.1.1"
+libs.caffeine = "com.github.ben-manes.caffeine:jcache:3.0.6"
+libs.infinispan = [
+    "org.infinispan:infinispan-hibernate-cache-v53:13.0.8.Final",
+    "org.infinispan:infinispan-core:13.0.8.Final",
+    "org.infinispan:infinispan-jcache:13.0.8.Final"
 ]
 
 // Hibernate search

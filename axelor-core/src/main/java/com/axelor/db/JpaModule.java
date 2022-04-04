@@ -54,6 +54,10 @@ public class JpaModule extends AbstractModule {
 
   private static Logger log = LoggerFactory.getLogger(JpaModule.class);
 
+  private static final String DEFAULT_CACHE_REGION_FACTORY = "jcache";
+  private static final String DEFAULT_JCACHE_PROVIDER =
+      "com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider";
+
   private String jpaUnit;
   private boolean autoscan;
   private boolean autostart;
@@ -183,17 +187,17 @@ public class JpaModule extends AbstractModule {
     properties.put(Environment.USE_SECOND_LEVEL_CACHE, "true");
     properties.put(Environment.USE_QUERY_CACHE, "true");
 
-    final String jcacheProvider = settings.get(AvailableAppSettings.HIBERNATE_JAVAX_CACHE_PROVIDER);
-    final String jcacheConfig = settings.get(AvailableAppSettings.HIBERNATE_JAVAX_CACHE_URI);
-
-    if (jcacheProvider != null) {
-      // use jcache
-      properties.put(Environment.CACHE_REGION_FACTORY, "jcache");
+    final String cacheRegionFactory =
+        settings.get(AvailableAppSettings.HIBERNATE_CACHE_REGION_FACTORY);
+    if (StringUtils.isBlank(cacheRegionFactory)
+        || cacheRegionFactory.equals(DEFAULT_CACHE_REGION_FACTORY)) {
+      properties.put(Environment.CACHE_REGION_FACTORY, DEFAULT_CACHE_REGION_FACTORY);
+      final String jcacheProvider =
+          settings.get(
+              AvailableAppSettings.HIBERNATE_JAVAX_CACHE_PROVIDER, DEFAULT_JCACHE_PROVIDER);
       properties.put(ConfigSettings.PROVIDER, jcacheProvider);
-      properties.put(ConfigSettings.CONFIG_URI, jcacheConfig);
     } else {
-      // use ehcache
-      properties.put(Environment.CACHE_REGION_FACTORY, "ehcache");
+      properties.put(Environment.CACHE_REGION_FACTORY, cacheRegionFactory);
     }
   }
 

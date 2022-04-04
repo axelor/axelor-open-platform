@@ -125,8 +125,8 @@ public interface AvailableAppSettings {
   String HIBERNATE_JDBC_BATCH_SIZE = "hibernate.jdbc.batch_size";
   String HIBERNATE_JDBC_FETCH_SIZE = "hibernate.jdbc.fetch_size";
 
+  String HIBERNATE_CACHE_REGION_FACTORY = Environment.CACHE_REGION_FACTORY;
   String HIBERNATE_JAVAX_CACHE_PROVIDER = ConfigSettings.PROVIDER;
-  String HIBERNATE_JAVAX_CACHE_URI = ConfigSettings.CONFIG_URI;
 
   String JAVAX_PERSISTENCE_SHAREDCACHE_MODE = Environment.JPA_SHARED_CACHE_MODE;
 

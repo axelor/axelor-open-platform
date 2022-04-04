@@ -5,6 +5,12 @@
 :url-mysql: https://www.mysql.com/
 :url-oracle: http://www.oracle.com/technetwork/indexes/downloads/index.html#database
 
+:url-caffeine: https://github.com/ben-manes/caffeine
+:url-hazelcast: https://hazelcast.com/
+:url-redis: https://redis.io/
+:url-infinispan: https://infinispan.org/
+:url-ehcache: https://www.ehcache.org/
+
 In this chapter we will see various configuration options available to the {page-component-title}
 applications.
 
@@ -211,12 +217,74 @@ The `logging.pattern.console` can be used to change log message format for conso
 
 We can set logging for any package using `logging.level.<package.name>` keys.
 
-== EhCache Configuration
+== Cache Configuration
 
-The `ehcache.xml` located under `src/main/resources` provides ehcache
-configuration.
+Property `javax.persistence.sharedCache.mode` can be used to enable or disable second level caching.
 
-Please see ehcache documentation for more details.
+Following keys can be used :
+
+* `ALL` : Entities are always cached even if marked as non-cacheable.
+* `ENABLE_SELECTIVE` : Entities are not cached unless explicitly marked as cacheable
+(with the `@Cacheable` annotation). This is the recommended configuration.
+* `DISABLE_SELECTIVE` : Entities are cached unless explicitly marked as non-cacheable.
+* `NONE` (or anything else) : Completely disable second-level cache.
+
+`jcache` is used as second-level cache provider (default value for `hibernate.cache.region.factory_class`).
+
+By default `Caffeine` implementation is used with pre-configured settings. If you need more control on caching,
+add and edit `application.conf`. See `Caffeine` configs and settings.
+
+There is also populars caching libraries such as {url-ehcache}[Ehcache],
+{url-hazelcast}[Hazelcast], {url-redis}[Redis] or {url-infinispan}[Infinispan] that can be used instead of
+`Caffeine` by specifying properties `hibernate.cache.region.factory_class` and `hibernate.javax.cache.provider` :
+
+*Infinispan :*
+[source,gradle]
+----
+implementation "org.infinispan:infinispan-hibernate-cache-v53:${infinispan_version}"
+implementation "org.infinispan:infinispan-core:${infinispan_version}"
+implementation "org.infinispan:infinispan-jcache:${infinispan_version}"
+----
+[source,properties]
+----
+hibernate.cache.region.factory_class = infinispan
+hibernate.cache.infinispan.cfg = org/infinispan/hibernate/cache/commons/builder/infinispan-configs-local.xml
+----
+
+*Redis :*
+[source,gradle]
+----
+implementation "org.redisson:redisson-hibernate-53:${redisson_version}"
+----
+[source,properties]
+----
+hibernate.cache.region.factory_class = org.redisson.hibernate.RedissonRegionFactory
+# Make sure to add Redisson YAML config in classpath
+----
+
+*Hazelcast :*
+[source,gradle]
+----
+implementation "com.hazelcast:hazelcast:${hazelcast_version}"
+----
+[source,properties]
+----
+hibernate.javax.cache.provider = com.hazelcast.cache.impl.HazelcastServerCachingProvider
+# You may need to add `-Dhazelcast.ignoreXxeProtectionFailures=true` system property
+----
+
+*Ehcache :*
+[source,gradle]
+----
+implementation "org.ehcache:ehcache:${ehcache_version}"
+----
+[source,properties]
+----
+hibernate.javax.cache.provider = org.ehcache.jsr107.EhcacheCachingProvider
+----
+
+Makes sure to add required dependencies if you want to use another caching library. Refer to providers docs for
+extensive configuration : all properties prefix by `hibernate.` will be used.
 
 == Global Context Configuration
 

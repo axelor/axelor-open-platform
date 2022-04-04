@@ -28,8 +28,11 @@ dependencies {
   testImplementation libs.jdbc_hsqldb
   implementation libs.jdbc_postgres
   implementation libs.jdbc_mysql
+
   api libs.hibernate
+
   implementation libs.hibernate_search
+  implementation libs.caffeine
 
   implementation libs.flywaydb
 
@@ -65,4 +68,11 @@ dependencies {
 
   testImplementation libs.greenmail
   testImplementation libs.apache_ds
+
+  testImplementation libs.hazelcast
+  testImplementation libs.infinispan
+  testImplementation libs.ehcache
+  testImplementation libs.redisson
+  // Embedded Redis server for Redis test
+  testImplementation "it.ozimov:embedded-redis:0.7.3"
 }
