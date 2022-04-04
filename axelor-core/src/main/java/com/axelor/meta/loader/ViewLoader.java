@@ -202,7 +202,7 @@ public class ViewLoader extends AbstractParallelLoader {
       all = XMLViews.unmarshal(stream);
     }
 
-    getList(all.getViews()).forEach(view -> importView(view, module, update, getFileName(url)));
+    getList(all.getViews()).forEach(view -> importView(view, module, update));
 
     getList(all.getSelections()).forEach(selection -> importSelection(selection, module, update));
 
@@ -218,17 +218,11 @@ public class ViewLoader extends AbstractParallelLoader {
     getList(all.getActionMenus()).forEach(item -> importActionMenu(item, module, update));
   }
 
-  private static String getFileName(URL url) {
-    final String urlStr = url.getFile();
-    return urlStr.substring(urlStr.lastIndexOf('/') + 1);
+  private void importView(AbstractView view, Module module, boolean update) {
+    importView(view, module, update, -1);
   }
 
-  private void importView(AbstractView view, Module module, boolean update, String sourceFile) {
-    importView(view, module, update, sourceFile, -1);
-  }
-
-  private void importView(
-      AbstractView view, Module module, boolean update, String sourceFile, int priority) {
+  private void importView(AbstractView view, Module module, boolean update, int priority) {
 
     String xmlId = view.getXmlId();
     String name = view.getName();
@@ -800,7 +794,7 @@ public class ViewLoader extends AbstractParallelLoader {
   private String createDefaults(Module module, final Class<?> klass) {
     List<AbstractView> views = createDefaults(klass);
     for (AbstractView view : views) {
-      importView(view, module, false, null, 10);
+      importView(view, module, false, 10);
     }
     return XMLViews.toXml(views, false);
   }
