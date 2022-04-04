@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.loader;
 
+import com.axelor.common.ObjectUtils;
 import com.axelor.db.JPA;
 import com.axelor.event.Observes;
 import com.axelor.events.FeatureChanged;
@@ -30,7 +31,9 @@ import com.axelor.rpc.RequestUtils;
 import com.google.inject.Singleton;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -50,7 +53,18 @@ public class ViewObserver {
   }
 
   void onFeatureChanged(@Observes FeatureChanged event) {
-    viewGenerator.generate(metaViewRepo.findByDependentFeature(event.getFeatureName()));
+    List<String> names =
+        metaViewRepo
+            .findByDependentFeature(event.getFeatureName())
+            .select("name")
+            .fetch(0, 0)
+            .stream()
+            .map(it -> it.get("name").toString())
+            .collect(Collectors.toList());
+    if (ObjectUtils.isEmpty(names)) {
+      return;
+    }
+    viewGenerator.generate(names, true);
   }
 
   void onPostSave(

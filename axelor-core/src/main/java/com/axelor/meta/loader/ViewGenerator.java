@@ -2,7 +2,6 @@ package com.axelor.meta.loader;
 
 import com.axelor.common.ObjectUtils;
 import com.axelor.db.JPA;
-import com.axelor.db.Query;
 import com.axelor.db.internal.DBHelper;
 import com.axelor.meta.db.MetaView;
 import com.axelor.meta.db.repo.MetaViewRepository;
@@ -35,9 +34,9 @@ public class ViewGenerator {
   @Inject private MetaViewRepository metaViewRepo;
 
   @Transactional
-  public boolean generate(MetaView view) {
+  public boolean generateComputedView(MetaView view) {
     try {
-      return generateChecked(view);
+      return _generateComputedView(view);
     } catch (XPathExpressionException
         | ParserConfigurationException
         | SAXException
@@ -73,8 +72,7 @@ public class ViewGenerator {
         .setParameter("namesEmpty", namesEmpty);
   }
 
-  @Transactional(rollbackOn = Exception.class)
-  public boolean generateChecked(MetaView view)
+  private boolean _generateComputedView(MetaView view)
       throws ParserConfigurationException, SAXException, IOException, XPathExpressionException,
           JAXBException {
 
@@ -154,7 +152,8 @@ public class ViewGenerator {
 
   @Transactional
   public long generate(Collection<String> names, boolean update) {
-    final long count = generate(findForCompute(names, update));
+    TypedQuery<MetaView> query = findForCompute(names, update);
+    final long count = generate(query, 0, DBHelper.getJdbcFetchSize());
 
     if (count == 0L && ObjectUtils.notEmpty(names)) {
       metaViewRepo
@@ -167,50 +166,26 @@ public class ViewGenerator {
     return count;
   }
 
-  @Transactional
-  public long generate(TypedQuery<MetaView> query) {
-    query.setMaxResults(DBHelper.getJdbcFetchSize());
-    return generate(query, 0, DBHelper.getJdbcFetchSize());
-  }
-
   private long generate(TypedQuery<MetaView> query, int startOffset, int increment) {
     List<MetaView> views;
     int offset = startOffset;
     long count = 0;
 
-    while (!(views = fetch(query, offset)).isEmpty()) {
-      count += generate(views);
-      offset += increment;
-    }
-
-    return count;
-  }
-
-  private List<MetaView> fetch(TypedQuery<MetaView> query, int offset) {
+    query.setMaxResults(DBHelper.getJdbcFetchSize());
     query.setFirstResult(offset);
-    return query.getResultList();
-  }
-
-  @Transactional
-  public long generate(Query<MetaView> query) {
-    return generate(query, 0, DBHelper.getJdbcFetchSize());
-  }
-
-  private long generate(Query<MetaView> query, int startOffset, int increment) {
-    List<MetaView> views;
-    int offset = startOffset;
-    long count = 0;
-
-    while (!(views = query.fetch(DBHelper.getJdbcFetchSize(), offset)).isEmpty()) {
-      count += generate(views);
+    while (!(views = query.getResultList()).isEmpty()) {
+      count += generateComputedView(views);
       offset += increment;
+      query.setFirstResult(offset);
     }
 
     return count;
   }
 
-  @Transactional
-  public long generate(List<MetaView> views) {
-    return views.stream().map(view -> generate(view) ? 1L : 0L).mapToLong(Long::longValue).sum();
+  private long generateComputedView(List<MetaView> views) {
+    return views.stream()
+        .map(view -> generateComputedView(view) ? 1L : 0L)
+        .mapToLong(Long::longValue)
+        .sum();
   }
 }
