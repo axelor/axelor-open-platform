@@ -164,6 +164,7 @@ public class ModuleManager {
               moduleList.forEach(m -> installOne(m.getName(), update, withDemo));
               moduleList.forEach(m -> viewLoader.doLast(m, update));
             });
+    viewLoader.terminate(update);
   }
 
   public boolean isLoadData() {

@@ -137,6 +137,10 @@ public class ViewLoader extends AbstractParallelLoader {
     }
 
     migrateViews();
+  }
+
+  @Transactional
+  protected void terminate(boolean update) {
     linkMissingGroups();
     generateFinalViews(update);
   }
