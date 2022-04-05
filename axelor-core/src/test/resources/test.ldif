@@ -37,8 +37,7 @@ objectClass: organizationalPerson
 cn: John Smith
 sn: Smith
 uid: jsmith
-userPassword:: e1NTSEF9LzEwVUhNb2Y0RXhyVE9RNkgyVjVsTUVubVFkZzR0dEFJb3Qyb2c9P
- Q==
+userPassword: {SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=
 
 dn: cn=Tin Tin,ou=users,dc=test,dc=com
 objectClass: top
@@ -48,8 +47,7 @@ objectClass: organizationalPerson
 cn: Tin Tin
 sn: Tin
 uid: tin
-userPassword:: e1NTSEF9TUgxTlFjcDhDbHkxKzdDSkkwczAxZ3d1U0xaaHp3d1orQUpJeVE9P
- Q==
+userPassword: {SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=
 
 dn: cn=Teen Teen,ou=users,dc=test,dc=com
 objectClass: top
@@ -59,6 +57,5 @@ objectClass: organizationalPerson
 cn: Teen Teen
 sn: Teen
 uid: teen
-userPassword:: e1NTSEF9N2IwMnFvdk1yWmNRdnpITzNSd1VudmtiSjcrWkRUYnljb3Z6VFE9P
- Q==
+userPassword: {SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=
  

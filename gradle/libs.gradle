@@ -198,14 +198,8 @@ libs.pac4j_core = [
   "org.pac4j:pac4j-core:${versions.pac4j}"
 ]
 
-// Apache DS (for testing only)
-libs.apache_ds = [
-  "org.apache.directory.jdbm:apacheds-jdbm1:2.0.0-M3",
-  dependencies.create("org.apache.directory.server:apacheds-test-framework:2.0.0-M15") {
-    exclude group: "org.apache.directory.jdbm"
-    exclude group: "bouncycastle"
-  }
-]
+// UnboundID LDAP SDK (for testing only)
+libs.unboundid_ldapsdk = 'com.unboundid:unboundid-ldapsdk:6.0.4'
 
 // commons
 libs.commons_cli = "commons-cli:commons-cli:1.5.0"

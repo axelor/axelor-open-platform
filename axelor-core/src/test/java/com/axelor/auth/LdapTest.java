@@ -22,43 +22,39 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.axelor.JpaTestModule;
+import com.axelor.TestingHelpers;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
+import com.axelor.auth.extensions.LdapExtension;
 import com.axelor.auth.pac4j.AuthPac4jUserService;
 import com.axelor.auth.pac4j.AxelorLdapProfileService;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.axelor.test.GuiceExtension;
+import com.axelor.test.GuiceModules;
 import com.google.inject.persist.Transactional;
 import java.util.Properties;
 import javax.inject.Inject;
-import org.apache.directory.server.annotations.CreateLdapServer;
-import org.apache.directory.server.annotations.CreateTransport;
-import org.apache.directory.server.core.annotations.ApplyLdifFiles;
-import org.apache.directory.server.core.annotations.CreateDS;
-import org.apache.directory.server.core.annotations.CreatePartition;
-import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
-import org.apache.directory.server.ldap.LdapServer;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.ldap.profile.LdapProfile;
 
-@Disabled
-// @RunWith(FrameworkRunner.class)
-@CreateLdapServer(
-    transports = {@CreateTransport(protocol = "LDAP"), @CreateTransport(protocol = "LDAPS")})
-@CreateDS(
-    allowAnonAccess = true,
-    name = "axelor",
-    partitions = {@CreatePartition(name = "test", suffix = "dc=test,dc=com")})
-public class LdapTest extends AbstractLdapTestUnit {
+@GuiceModules(LdapTest.LdapTestModule.class)
+public class LdapTest {
 
-  private static LdapServer ldapServer = getLdapServer();
+  // Register LdapExtension before GuiceExtension in order to initialize ldap server before
+  @Order(0)
+  @RegisterExtension
+  public static LdapExtension ldapExtension = new LdapExtension();
+
+  @Order(1)
+  @RegisterExtension
+  public static GuiceExtension guiceExtension = new GuiceExtension();
 
   public static class LdapTestModule extends JpaTestModule {
 
@@ -68,7 +64,8 @@ public class LdapTest extends AbstractLdapTestUnit {
       Properties properties = new Properties();
 
       properties.put(
-          AvailableAppSettings.AUTH_LDAP_SERVER_URL, "ldap://localhost:" + ldapServer.getPort());
+          AvailableAppSettings.AUTH_LDAP_SERVER_URL,
+          "ldap://localhost:" + ldapExtension.getLdapPort());
       properties.put(AvailableAppSettings.AUTH_LDAP_SYSTEM_USER, "uid=admin,ou=system");
       properties.put(AvailableAppSettings.AUTH_LDAP_SYSTEM_PASSWORD, "secret");
 
@@ -85,94 +82,81 @@ public class LdapTest extends AbstractLdapTestUnit {
     }
   }
 
-  @Transactional
-  public static class LdapTestRunner {
-
-    @Inject private AxelorLdapProfileService authLdap;
-
-    @Inject private AuthPac4jUserService userService;
-
-    @Inject private UserRepository users;
-
-    @Inject private GroupRepository groups;
-
-    public void test() {
-
-      Group admins = new Group("admins", "Administrators");
-
-      groups.save(admins);
-
-      // make sure there are no users
-      ensureUsers(0);
-
-      // attempt login with wrong password
-      loginFailed();
-
-      // it should not create user
-      ensureUsers(0);
-
-      // attempt login with good password
-      loginSuccess();
-
-      // it should create an user
-      ensureUsers(1);
-
-      // attempt login again with good password
-      loginSuccess();
-
-      // it should not create new user, as it's already created
-      ensureUsers(1);
-
-      // make sure groups exists on ldap server
-      assertNotNull(authLdap.searchGroup("admins"));
-      assertNotNull(authLdap.searchGroup("users"));
-    }
-
-    void ensureUsers(int count) {
-      assertEquals(count, users.all().count());
-    }
-
-    void loginFailed() {
-      try {
-        authLdap.validate(new UsernamePasswordCredentials("jsmith", "Secret"), null);
-      } catch (CredentialsException e) {
-      }
-      User user = users.findByCode("jsmith");
-      assertNull(user);
-    }
-
-    void loginSuccess() {
-      LdapProfile p = authLdap.findById("jsmith");
-
-      System.out.println(p);
-
-      authLdap.validate(new UsernamePasswordCredentials("jsmith", "secret"), null);
-      LdapProfile profile = authLdap.findById("jsmith");
-      userService.saveUser(profile);
-
-      User user = users.findByCode("jsmith");
-      assertNotNull(user);
-      assertEquals("John Smith", user.getName());
-      assertNotNull(user.getGroup());
-      assertEquals("admins", user.getGroup().getCode());
-    }
+  @SuppressWarnings("ConstantConditions")
+  @AfterAll
+  public static void tearDown() {
+    TestingHelpers.logout();
+    TestingHelpers.resetSettings();
   }
 
-  private Injector injector;
+  @Inject private AxelorLdapProfileService authLdap;
 
-  @Inject private LdapTestRunner testRunner;
+  @Inject private AuthPac4jUserService userService;
 
-  @BeforeEach
-  public void setUp() {
-    if (injector == null) {
-      injector = Guice.createInjector(new LdapTestModule());
-      injector.injectMembers(this);
-    }
-  }
+  @Inject private UserRepository users;
+
+  @Inject private GroupRepository groups;
 
   @Test
-  @ApplyLdifFiles("test.ldif")
+  @Transactional
   public void test() {
-    testRunner.test();
+
+    Group admins = new Group("admins", "Administrators");
+
+    groups.save(admins);
+
+    // make sure there are no users
+    ensureUsers(0);
+
+    // attempt login with wrong password
+    loginFailed();
+
+    // it should not create user
+    ensureUsers(0);
+
+    // attempt login with good password
+    loginSuccess();
+
+    // it should create an user
+    ensureUsers(1);
+
+    // attempt login again with good password
+    loginSuccess();
+
+    // it should not create new user, as it's already created
+    ensureUsers(1);
+
+    // make sure groups exists on ldap server
+    assertNotNull(authLdap.searchGroup("admins"));
+    assertNotNull(authLdap.searchGroup("users"));
+  }
+
+  void ensureUsers(int count) {
+    assertEquals(count, users.all().count());
+  }
+
+  void loginFailed() {
+    try {
+      authLdap.validate(new UsernamePasswordCredentials("jsmith", "Password"), null);
+    } catch (CredentialsException e) {
+      // ignore
+    }
+    User user = users.findByCode("jsmith");
+    assertNull(user);
+  }
+
+  void loginSuccess() {
+    LdapProfile p = authLdap.findById("jsmith");
+    assertNotNull(p);
+
+    authLdap.validate(new UsernamePasswordCredentials("jsmith", "password"), null);
+    LdapProfile profile = authLdap.findById("jsmith");
+    userService.saveUser(profile);
+
+    User user = users.findByCode("jsmith");
+    assertNotNull(user);
+    assertEquals("John Smith", user.getName());
+    assertNotNull(user.getGroup());
+    assertEquals("admins", user.getGroup().getCode());
   }
 }
