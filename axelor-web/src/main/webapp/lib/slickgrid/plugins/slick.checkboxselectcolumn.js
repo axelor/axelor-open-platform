@@ -144,8 +144,8 @@
       if (dataContext) {
     	var type = _options.multiSelect ? "checkbox" : "radio";
         return _selectedRowsLookup[row]
-            ? "<label class='ibox'><input type='" + type + "' checked='checked'><span class='box'></span></label>"
-            : "<label class='ibox'><input type='" + type + "'><span class='box'></span></label>";
+            ? "<label class='ibox'><input name='" + columnDef.id + "'type='" + type + "' checked='checked'><span class='box'></span></label>"
+            : "<label class='ibox'><input name='" + columnDef.id + "'type='" + type + "'><span class='box'></span></label>";
       }
       return null;
     }
