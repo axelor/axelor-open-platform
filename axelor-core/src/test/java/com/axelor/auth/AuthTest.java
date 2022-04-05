@@ -34,6 +34,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -50,6 +51,16 @@ public class AuthTest extends JpaTest {
   public void setUp() {
     if (users.all().count() == 0) {
       createDemoData();
+    }
+  }
+
+  @AfterAll
+  public static void tearDown() {
+    final Subject subject = AuthUtils.getSubject();
+    try {
+      subject.logout();
+    } catch (Exception e) {
+      // ignore
     }
   }
 
