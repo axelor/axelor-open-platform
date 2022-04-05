@@ -1,0 +1,3 @@
+---
+title: Allow closing preference view manually with `canClose` or `close` action
+type: feature

@@ -32,6 +32,11 @@ function UserCtrl($scope, $element, $location, DataSource, ViewService) {
   ui.ViewCtrl($scope, DataSource, ViewService);
   ui.FormViewCtrl($scope, $element);
 
+  // Manage 'canClose' and `close` actions for preference view
+  $scope.closeTab = function(tab) {
+    $scope.onClose();
+  };
+
   $scope.onClose = function() {
     $scope.confirmDirty(doClose);
   };
