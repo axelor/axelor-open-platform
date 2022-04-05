@@ -14,7 +14,7 @@ versions.jackson = "2.13.2"
 versions.jackson_databind = "2.13.2.2"
 versions.shiro = "1.9.0"
 versions.buji_pac4j = "4.1.1"
-versions.pac4j = "3.8.3"
+versions.pac4j = "3.9.0"
 versions.ldaptive = "1.2.4"
 
 versions.junit4 = "4.13.2"
