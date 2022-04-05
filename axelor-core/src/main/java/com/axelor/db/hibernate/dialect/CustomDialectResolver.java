@@ -38,44 +38,65 @@ public class CustomDialectResolver implements DialectResolver {
     final String databaseName = info.getDatabaseName();
     final int majorVersion = info.getDatabaseMajorVersion();
     final int minorVersion = info.getDatabaseMinorVersion();
-    if (TargetDatabase.HSQLDB.equals(databaseName)) {
-      return new AxelorHSQLDialect();
+    final Dialect dialect = resolveDialect(databaseName, majorVersion, minorVersion);
+
+    if (dialect != null) {
+      log.info("Database engine: {} {}.{}", databaseName, majorVersion, minorVersion);
+      log.debug("Database dialect: {}", dialect);
     }
+
+    return dialect;
+  }
+
+  private Dialect resolveDialect(String databaseName, int majorVersion, int minorVersion) {
     if (TargetDatabase.POSTGRESQL.equals(databaseName)) {
-      // Don't support version < 9.4
-      if (majorVersion == 9) {
-        log.debug(
-            "Consider upgrading to 'PostgreSQL >= 10' for better performance and functionality.");
-        if (minorVersion == 4) {
-          return new AxelorPostgreSQL94Dialect();
-        } else if (minorVersion >= 5) {
-          return new AxelorPostgreSQL95Dialect();
-        }
-      } else if (majorVersion >= 10) {
+      if (majorVersion >= 10) {
         return new AxelorPostgreSQL10Dialect();
       }
 
+      // Don't support version < 9.4
+      if (majorVersion == 9) {
+        log.warn(
+            "Consider upgrading to 'PostgreSQL >= 10' for better performance and functionality.");
+        if (minorVersion >= 5) {
+          return new AxelorPostgreSQL95Dialect();
+        }
+        if (minorVersion == 4) {
+          return new AxelorPostgreSQL94Dialect();
+        }
+      }
+
       log.error("PostgreSQL 9.4 or later is required.");
+      return null;
     }
+
+    if (TargetDatabase.MYSQL.equals(databaseName)) {
+      // There is no MySQL 6 or 7, only MySQL 8.
+      if (majorVersion >= 8) {
+        return new AxelorMySQL8Dialect();
+      }
+
+      // Don't support version < 5.7
+      if (majorVersion == 5 && minorVersion >= 7) {
+        return new AxelorMySQL57Dialect();
+      }
+
+      log.error("MySQL 5.7 or later is required.");
+      return null;
+    }
+
     if (TargetDatabase.ORACLE.equals(databaseName)) {
       if (majorVersion >= 12) {
         return new AxelorOracle12cDialect();
       }
       log.error("Oracle 12c or later is required.");
+      return null;
     }
-    if (TargetDatabase.MYSQL.equals(databaseName)) {
-      // Don't support version < 5.7
-      if (majorVersion == 5) {
-        if (minorVersion >= 7) {
-          return new AxelorMySQL57Dialect();
-        }
-      } else if (majorVersion > 5) {
-        // There is no MySQL 6 or 7, only MySQL 8.
-        return new AxelorMySQL8Dialect();
-      }
 
-      log.error("MySQL 5.7 or later is required.");
+    if (TargetDatabase.HSQLDB.equals(databaseName)) {
+      return new AxelorHSQLDialect();
     }
+
     log.error("{} {}.{} is not supported.", databaseName, majorVersion, minorVersion);
     return null;
   }
