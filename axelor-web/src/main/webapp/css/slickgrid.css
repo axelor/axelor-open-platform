@@ -184,6 +184,10 @@
   height: 18px;
 }
 
+.slick-cell-checkboxsel .ibox input[type=radio] + .box:before {
+  border-radius: 100%;
+}
+
 .slick-cell-checkboxsel .ibox input:checked + .box:after {
   top: 4px;
   left: 3px;
