@@ -72,7 +72,7 @@ libs.asm = [
 libs.byte_buddy = "net.bytebuddy:byte-buddy:1.12.8"
 
 // Graal JS
-libs.graal_js = "org.graalvm.js:js:21.3.1"
+libs.graal_js = "org.graalvm.js:js:22.0.0.2"
 
 // javax libs
 libs.javax_jaxb = "javax.xml.bind:jaxb-api:2.3.1"
