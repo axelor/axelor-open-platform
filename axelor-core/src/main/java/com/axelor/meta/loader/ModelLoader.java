@@ -37,6 +37,8 @@ import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -44,6 +46,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class ModelLoader extends AbstractParallelLoader {
+
+  private static final Logger LOG = LoggerFactory.getLogger(ModelLoader.class);
 
   @Inject private MetaModelService service;
 
@@ -57,7 +61,7 @@ public class ModelLoader extends AbstractParallelLoader {
 
   @Override
   protected void doLoad(URL url, Module module, boolean update) {
-    log.debug("Importing: {}", url.getFile());
+    LOG.debug("Importing: {}", url.getFile());
 
     try (InputStream is = url.openStream()) {
       process(is, update);
@@ -123,7 +127,7 @@ public class ModelLoader extends AbstractParallelLoader {
     if ("Model".equals(name)) {
       return;
     }
-    log.debug("Loading model: {}", name);
+    LOG.debug("Loading model: {}", name);
     service.process(JPA.model(name));
   }
 
@@ -134,7 +138,7 @@ public class ModelLoader extends AbstractParallelLoader {
     final String name = element.getAttribute("name");
     final String fullName = packageName + "." + name;
 
-    log.debug("Loading enum: {}", fullName);
+    LOG.debug("Loading enum: {}", fullName);
 
     MetaEnum found = enums.findByName(fullName);
     if (found == null) {
@@ -155,7 +159,7 @@ public class ModelLoader extends AbstractParallelLoader {
       return;
     }
 
-    log.debug("Loading sequence: {}", name);
+    LOG.debug("Loading sequence: {}", name);
 
     MetaSequence entity = new MetaSequence(name);
 

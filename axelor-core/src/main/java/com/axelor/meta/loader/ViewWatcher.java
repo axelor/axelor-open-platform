@@ -63,7 +63,7 @@ import org.slf4j.LoggerFactory;
 
 public final class ViewWatcher {
 
-  private static final Logger log = LoggerFactory.getLogger(ViewWatcher.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ViewWatcher.class);
 
   private static ViewWatcher instance;
   private static ModuleManager moduleManager;
@@ -161,7 +161,7 @@ public final class ViewWatcher {
           handlePath(kind, file);
         }
       } catch (Exception e) {
-        log.error(e.getMessage(), e);
+        LOG.error(e.getMessage(), e);
       }
     }
 
@@ -190,7 +190,7 @@ public final class ViewWatcher {
         addPending(moduleName, path);
       }
     } catch (Exception e) {
-      log.error(e.getMessage(), e);
+      LOG.error(e.getMessage(), e);
     }
   }
 
@@ -229,7 +229,7 @@ public final class ViewWatcher {
         is = Files.newInputStream(propsPath);
       } catch (NoSuchFileException e) {
         // Not an Axelor module
-        log.trace("No module file for: {}", path);
+        LOG.trace("No module file for: {}", path);
         return null;
       }
       props.load(is);
@@ -275,7 +275,7 @@ public final class ViewWatcher {
                     MetaStore.clear();
                     I18nBundle.invalidate();
                   } catch (Exception e) {
-                    log.error(e.getMessage(), e);
+                    LOG.error(e.getMessage(), e);
                   } finally {
                     pendingModules.clear();
                     pendingPaths.clear();
@@ -310,7 +310,7 @@ public final class ViewWatcher {
 
         throw new RuntimeException(e.getCause());
       } catch (TimeoutException e) {
-        log.warn("Future {} is taking a long time to complete.", future);
+        LOG.warn("Future {} is taking a long time to complete.", future);
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
       }
@@ -341,7 +341,7 @@ public final class ViewWatcher {
                   }
                   break;
                 default:
-                  log.error("Unsupported resource: {}", rootResource);
+                  LOG.error("Unsupported resource: {}", rootResource);
               }
             });
 
@@ -362,15 +362,15 @@ public final class ViewWatcher {
       watcher = FileSystems.getDefault().newWatchService();
     }
 
-    log.info("Starting view watch...");
+    LOG.info("Starting view watch...");
 
     paths.forEach(
         p -> {
           try {
             keys.put(p.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY), p);
-            log.info("Watching: {}", p);
+            LOG.debug("Watching: {}", p);
           } catch (IOException e) {
-            log.warn("Unable to watch: {}", p);
+            LOG.warn("Unable to watch: {}", p);
           }
         });
   }
@@ -393,7 +393,7 @@ public final class ViewWatcher {
     try {
       registerAll();
     } catch (Exception e) {
-      log.error("Unable to start view watch.", e);
+      LOG.error("Unable to start view watch.", e);
       return;
     }
     if (keys.isEmpty()) {
@@ -423,7 +423,7 @@ public final class ViewWatcher {
   public void stop() {
     if (running) {
       running = false;
-      log.info("Stopping view watch....");
+      LOG.info("Stopping view watch....");
       keys.keySet().forEach(WatchKey::cancel);
       keys.clear();
       shutdownScheduler();

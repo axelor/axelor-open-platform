@@ -82,8 +82,12 @@ import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ViewLoader extends AbstractParallelLoader {
+
+  private static final Logger LOG = LoggerFactory.getLogger(ViewLoader.class);
 
   @Inject private ObjectMapper objectMapper;
 
@@ -107,12 +111,12 @@ public class ViewLoader extends AbstractParallelLoader {
 
   @Override
   protected void doLoad(URL file, Module module, boolean update) {
-    log.debug("Importing: {}", file.getFile());
+    LOG.debug("Importing: {}", file.getFile());
 
     try {
       process(file, module, update);
     } catch (IOException | JAXBException e) {
-      log.error("Error while loading {}", file);
+      LOG.error("Error while loading {}", file);
       throw new RuntimeException(e);
     }
   }
@@ -132,7 +136,7 @@ public class ViewLoader extends AbstractParallelLoader {
 
     Set<?> unresolved = this.unresolvedKeys();
     if (!unresolved.isEmpty()) {
-      log.error("Unresolved items: {}", unresolved);
+      LOG.error("Unresolved items: {}", unresolved);
       throw new PersistenceException("There are some unresolved items; check the log.");
     }
 
@@ -164,16 +168,20 @@ public class ViewLoader extends AbstractParallelLoader {
   }
 
   private void linkMissingGroups() {
+    if (ObjectUtils.isEmpty(groupsToCreate)) {
+      return;
+    }
+    LOG.info("Creating missing groups...");
     try {
       groupsToCreate.forEach(
           (code, adders) -> {
             final Group existingGroup = groups.findByCode(code);
             final Group group;
             if (existingGroup != null) {
-              log.debug("User group already created by data/demo: {}", code);
+              LOG.debug("User group already created by data/demo: {}", code);
               group = existingGroup;
             } else {
-              log.info("Creating a new user group: {}", code);
+              LOG.info("Creating a new user group: {}", code);
               group = groups.save(new Group(code, code));
             }
             adders.forEach(adder -> adder.accept(group));
@@ -184,6 +192,7 @@ public class ViewLoader extends AbstractParallelLoader {
   }
 
   private void generateFinalViews(boolean update) {
+    LOG.info("Generating computed views...");
     try {
       viewGenerator.process(viewsToGenerate, update);
     } finally {
@@ -231,7 +240,7 @@ public class ViewLoader extends AbstractParallelLoader {
 
     if (StringUtils.isBlank(xmlId)) {
       if (isVisited(view.getClass(), name)) {
-        log.error("duplicate view without 'id': {}", name);
+        LOG.error("duplicate view without 'id': {}", name);
         return;
       }
     } else if (isVisited(view.getClass(), xmlId)) {
@@ -244,12 +253,12 @@ public class ViewLoader extends AbstractParallelLoader {
       if (Boolean.TRUE.equals(view.getExtension())) {
         viewsToGenerate.add(view.getName());
       } else if (ObjectUtils.notEmpty(extendableView.getExtends())) {
-        log.error("View with extensions must have extension=\"true\": {}", getName(name, xmlId));
+        LOG.error("View with extensions must have extension=\"true\": {}", getName(name, xmlId));
         return;
       }
     }
 
-    log.debug("Loading view: {}", getName(name, xmlId));
+    LOG.debug("Loading view: {}", getName(name, xmlId));
     final String xml = XMLViews.toXml(view, true);
 
     if (type.matches("tree|chart|portal|dashboard|search|custom")) {
@@ -315,7 +324,7 @@ public class ViewLoader extends AbstractParallelLoader {
     if ("dashboard".equals(type) && !xml.equals(entity.getXml())) {
       int deleted = Beans.get(MetaService.class).removeCustomViews(entity);
       if (deleted > 0) {
-        log.info("{} custom views are deleted: {}", deleted, entity.getName());
+        LOG.info("{} custom views are deleted: {}", deleted, entity.getName());
       }
     }
 
@@ -353,14 +362,14 @@ public class ViewLoader extends AbstractParallelLoader {
 
     if (StringUtils.isBlank(xmlId)) {
       if (isVisited(Selection.class, name)) {
-        log.error("duplicate selection without 'id': {}", name);
+        LOG.error("duplicate selection without 'id': {}", name);
         return;
       }
     } else if (isVisited(Selection.class, xmlId)) {
       return;
     }
 
-    log.debug("Loading selection: {}", name);
+    LOG.debug("Loading selection: {}", name);
 
     MetaSelect entity = selects.findByID(xmlId);
     MetaSelect other = selects.findByName(selection.getName());
@@ -486,14 +495,14 @@ public class ViewLoader extends AbstractParallelLoader {
 
     if (StringUtils.isBlank(xmlId)) {
       if (isVisited(Action.class, name)) {
-        log.error("duplicate action without 'id': {}", name);
+        LOG.error("duplicate action without 'id': {}", name);
         return;
       }
     } else if (isVisited(Action.class, xmlId)) {
       return;
     }
 
-    log.debug("Loading action: {}", name);
+    LOG.debug("Loading action: {}", name);
 
     MetaAction entity = actions.findByID(xmlId);
     MetaAction other = actions.findByName(name);
@@ -559,14 +568,14 @@ public class ViewLoader extends AbstractParallelLoader {
 
   private void resolveActionOnMenu(Long menuId, Long actionId) {
     MetaMenu pending = menus.find(menuId);
-    log.debug("Resolved menu: {}", pending.getName());
+    LOG.debug("Resolved menu: {}", pending.getName());
     MetaAction actionEntity = actions.find(actionId);
     pending.setAction(actionEntity);
   }
 
   private void resolveActionOnActionMenu(Long menuId, Long actionId) {
     MetaActionMenu pending = actionMenus.find(menuId);
-    log.debug("Resolved action menu: {}", pending.getName());
+    LOG.debug("Resolved action menu: {}", pending.getName());
     MetaAction actionEntity = actions.find(actionId);
     pending.setAction(actionEntity);
   }
@@ -579,14 +588,14 @@ public class ViewLoader extends AbstractParallelLoader {
 
     if (StringUtils.isBlank(xmlId)) {
       if (isVisited(MenuItem.class, name)) {
-        log.error("duplicate menu without 'id': {}", name);
+        LOG.error("duplicate menu without 'id': {}", name);
         return;
       }
     } else if (isVisited(MenuItem.class, xmlId)) {
       return;
     }
 
-    log.debug("Loading menu: {}", name);
+    LOG.debug("Loading menu: {}", name);
 
     MetaMenu entity = menus.findByID(xmlId);
     MetaMenu other = menus.findByName(name);
@@ -642,7 +651,7 @@ public class ViewLoader extends AbstractParallelLoader {
     if (!Strings.isNullOrEmpty(menuItem.getParent())) {
       MetaMenu parent = menus.findByName(menuItem.getParent());
       if (parent == null) {
-        log.debug("Unresolved parent: {}", menuItem.getParent());
+        LOG.debug("Unresolved parent: {}", menuItem.getParent());
         this.setUnresolved(MetaMenu.class, menuItem.getParent(), entity.getId());
       } else {
         entity.setParent(parent);
@@ -652,7 +661,7 @@ public class ViewLoader extends AbstractParallelLoader {
     if (!StringUtils.isBlank(menuItem.getAction())) {
       MetaAction action = actions.findByName(menuItem.getAction());
       if (action == null) {
-        log.debug("Unresolved action: {}", menuItem.getAction());
+        LOG.debug("Unresolved action: {}", menuItem.getAction());
         setUnresolved(MetaMenu.class, menuItem.getAction(), entity.getId());
       } else {
         entity.setAction(action);
@@ -667,7 +676,7 @@ public class ViewLoader extends AbstractParallelLoader {
 
   private void resolveParentOnMenu(Long menuId, Long parentMenuId) {
     MetaMenu pending = menus.find(menuId);
-    log.debug("Resolved menu: {}", pending.getName());
+    LOG.debug("Resolved menu: {}", pending.getName());
     MetaMenu metaMenuEntity = menus.find(parentMenuId);
     pending.setParent(metaMenuEntity);
   }
@@ -679,14 +688,14 @@ public class ViewLoader extends AbstractParallelLoader {
 
     if (StringUtils.isBlank(xmlId)) {
       if (isVisited(MenuItem.class, name)) {
-        log.error("duplicate action menu without 'id': {}", name);
+        LOG.error("duplicate action menu without 'id': {}", name);
         return;
       }
     } else if (isVisited(MenuItem.class, xmlId)) {
       return;
     }
 
-    log.debug("Loading action menu: {}", name);
+    LOG.debug("Loading action menu: {}", name);
 
     MetaActionMenu entity = actionMenus.findByID(xmlId);
     MetaActionMenu other = actionMenus.findByName(name);
@@ -729,7 +738,7 @@ public class ViewLoader extends AbstractParallelLoader {
     if (!Strings.isNullOrEmpty(menuItem.getParent())) {
       MetaActionMenu parent = actionMenus.findByName(menuItem.getParent());
       if (parent == null) {
-        log.debug("Unresolved parent: {}", menuItem.getParent());
+        LOG.debug("Unresolved parent: {}", menuItem.getParent());
         this.setUnresolved(MetaActionMenu.class, menuItem.getParent(), entity.getId());
       } else {
         entity.setParent(parent);
@@ -739,7 +748,7 @@ public class ViewLoader extends AbstractParallelLoader {
     if (!StringUtils.isBlank(menuItem.getAction())) {
       MetaAction action = actions.findByName(menuItem.getAction());
       if (action == null) {
-        log.debug("Unresolved action: {}", menuItem.getAction());
+        LOG.debug("Unresolved action: {}", menuItem.getAction());
         setUnresolved(MetaActionMenu.class, menuItem.getAction(), entity.getId());
       } else {
         entity.setAction(action);
@@ -753,7 +762,7 @@ public class ViewLoader extends AbstractParallelLoader {
 
   private void resolveParentOnActionMenu(Long actionMenuId, Long parentActionMenuId) {
     MetaActionMenu pending = actionMenus.find(actionMenuId);
-    log.debug("Resolved action menu: {}", pending.getName());
+    LOG.debug("Resolved action menu: {}", pending.getName());
     MetaActionMenu metaActionMenuEntity = actionMenus.find(parentActionMenuId);
     pending.setParent(metaActionMenuEntity);
   }
@@ -782,11 +791,11 @@ public class ViewLoader extends AbstractParallelLoader {
       final File out = FileUtils.getFile(outputDir, "views", klass.getSimpleName() + ".xml");
       final String xml = createDefaults(module, klass);
       try {
-        log.debug("Creating default views: {}", out);
+        LOG.debug("Creating default views: {}", out);
         Files.createParentDirs(out);
         Files.asCharSink(out, Charsets.UTF_8).write(xml);
       } catch (IOException e) {
-        log.error("Unable to create: {}", out);
+        LOG.error("Unable to create: {}", out);
       }
     }
   }

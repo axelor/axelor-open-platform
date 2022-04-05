@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 abstract class AbstractLoader {
 
-  protected Logger log = LoggerFactory.getLogger(getClass().getSuperclass());
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractLoader.class);
 
   private static final Set<Entry<Class<?>, String>> visited = new HashSet<>();
   private static final Map<Class<?>, Multimap<String, Long>> unresolved = new HashMap<>();
@@ -52,7 +52,7 @@ abstract class AbstractLoader {
     synchronized (visited) {
       Entry<Class<?>, String> key = new SimpleImmutableEntry<>(type, name);
       if (visited.contains(key)) {
-        log.error("duplicate {} found: {}", type.getSimpleName(), name);
+        LOG.error("duplicate {} found: {}", type.getSimpleName(), name);
         return true;
       }
       visited.add(key);

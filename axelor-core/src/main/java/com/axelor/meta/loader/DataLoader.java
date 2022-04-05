@@ -35,9 +35,13 @@ import java.net.URL;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 class DataLoader extends AbstractLoader {
+
+  private static final Logger LOG = LoggerFactory.getLogger(DataLoader.class);
 
   private static final String DATA_DIR_NAME = "data-init";
 
@@ -63,7 +67,7 @@ class DataLoader extends AbstractLoader {
         importXml(config);
       }
     } catch (IOException e) {
-      log.error(e.getMessage(), e);
+      LOG.error(e.getMessage(), e);
       throw new RuntimeException(e);
     } finally {
       clean(tmp);
@@ -94,7 +98,7 @@ class DataLoader extends AbstractLoader {
       }
       reader.close();
     } catch (IOException e) {
-      log.error(e.getMessage(), e);
+      LOG.error(e.getMessage(), e);
     }
     return false;
   }
@@ -120,7 +124,7 @@ class DataLoader extends AbstractLoader {
       try (final InputStream is = file.openStream()) {
         copy(is, tmp, name);
       } catch (IOException e) {
-        log.error(e.getMessage(), e);
+        LOG.error(e.getMessage(), e);
         throw new RuntimeException(e);
       }
     }

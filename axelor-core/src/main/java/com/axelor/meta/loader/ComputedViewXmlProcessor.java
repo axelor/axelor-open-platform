@@ -27,7 +27,7 @@ import org.xml.sax.SAXException;
 /** Compute xml of computed views from base view and their extensions. */
 public class ComputedViewXmlProcessor extends AbstractXmlProcessor {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ComputedViewProcessor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ComputedViewXmlProcessor.class);
 
   private final MetaView baseView;
   private final List<MetaView> extendsViews;

@@ -42,8 +42,12 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class I18nLoader extends AbstractParallelLoader {
+
+  private static final Logger LOG = LoggerFactory.getLogger(I18nLoader.class);
 
   @Inject private MetaTranslationRepository translations;
 
@@ -51,12 +55,12 @@ public class I18nLoader extends AbstractParallelLoader {
 
   @Override
   protected void doLoad(URL file, Module module, boolean update) {
-    log.debug("Load translation: {}", file.getFile());
+    LOG.debug("Load translation: {}", file.getFile());
 
     try (InputStream is = file.openStream()) {
       process(is, file.getFile());
     } catch (IOException e) {
-      log.error("Unable to import file: {}", file.getFile());
+      LOG.error("Unable to import file: {}", file.getFile());
     }
   }
 

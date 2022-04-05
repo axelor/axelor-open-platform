@@ -37,7 +37,7 @@ import org.w3c.dom.NodeList;
 
 public abstract class AbstractXmlProcessor {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ComputedViewProcessor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractXmlProcessor.class);
 
   static final String TOOL_BAR = "toolbar";
   static final String MENU_BAR = "menubar";
