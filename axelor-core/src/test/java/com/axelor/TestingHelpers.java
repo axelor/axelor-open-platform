@@ -8,7 +8,7 @@ public class TestingHelpers {
 
   private TestingHelpers() {}
 
-  /** Reset AppSettings, else we can get properties set from other tests */
+  /** Reset AppSettings, or else we can get properties set from other tests */
   public static void resetSettings() {
 
     System.getProperties().stringPropertyNames().stream()

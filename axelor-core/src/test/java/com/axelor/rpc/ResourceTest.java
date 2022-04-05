@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.axelor.TestingHelpers;
 import com.axelor.db.JPA;
 import com.axelor.test.db.Address;
 import com.axelor.test.db.Circle;
@@ -36,6 +37,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class ResourceTest extends RpcTest {
@@ -43,6 +46,17 @@ public class ResourceTest extends RpcTest {
   @Inject Resource<Contact> resource;
 
   @Inject ContactRepository contacts;
+
+  @BeforeEach
+  @Transactional
+  public void ensureAuth() {
+    ensureAuth("admin", "admin");
+  }
+
+  @AfterAll
+  static void tearDown() {
+    TestingHelpers.logout();
+  }
 
   @Test
   public void testFields() throws Exception {

@@ -32,8 +32,6 @@ import com.axelor.db.JpaSecurity.AccessType;
 import com.google.inject.persist.Transactional;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.Subject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,13 +55,6 @@ public class AuthTest extends JpaTest {
   @AfterAll
   public static void tearDown() {
     TestingHelpers.logout();
-  }
-
-  private void login(String user, String password) {
-    final Subject subject = AuthUtils.getSubject();
-    final UsernamePasswordToken token = new UsernamePasswordToken(user, password);
-
-    subject.login(token);
   }
 
   private void createDemoData() {
