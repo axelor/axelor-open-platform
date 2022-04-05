@@ -1,5 +1,6 @@
 package com.axelor.cache;
 
+import com.axelor.TestingHelpers;
 import com.axelor.app.AppSettings;
 import com.axelor.test.GuiceModules;
 import org.hibernate.cfg.Environment;
@@ -20,7 +21,7 @@ public class RedisTest extends AbstractBaseCache {
 
     @Override
     protected void configure() {
-      resetSettings();
+      TestingHelpers.resetSettings();
 
       // start redis
       startRedis();

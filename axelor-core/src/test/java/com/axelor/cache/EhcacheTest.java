@@ -1,5 +1,6 @@
 package com.axelor.cache;
 
+import com.axelor.TestingHelpers;
 import com.axelor.app.AppSettings;
 import com.axelor.test.GuiceModules;
 import org.hibernate.cache.jcache.ConfigSettings;
@@ -11,7 +12,7 @@ public class EhcacheTest extends AbstractBaseCache {
 
     @Override
     protected void configure() {
-      resetSettings();
+      TestingHelpers.resetSettings();
 
       AppSettings.get()
           .getProperties()

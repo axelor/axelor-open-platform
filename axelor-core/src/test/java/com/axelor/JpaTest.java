@@ -17,14 +17,12 @@
  */
 package com.axelor;
 
-import com.axelor.app.AppSettings;
 import com.axelor.db.JpaFixture;
 import com.axelor.db.JpaSupport;
 import com.axelor.test.GuiceExtension;
 import com.axelor.test.GuiceModules;
 import com.axelor.test.db.Contact;
 import com.google.inject.persist.Transactional;
-import java.lang.reflect.Field;
 import javax.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -48,16 +46,5 @@ public abstract class JpaTest extends JpaSupport {
 
   protected void fixture(String name) {
     fixture.load(name);
-  }
-
-  /** Reset AppSettings, else we can get properties set from other tests */
-  protected static void resetSettings() {
-    try {
-      Field instance = AppSettings.class.getDeclaredField("instance");
-      instance.setAccessible(true);
-      instance.set(null, null);
-    } catch (Exception e) {
-      throw new RuntimeException();
-    }
   }
 }

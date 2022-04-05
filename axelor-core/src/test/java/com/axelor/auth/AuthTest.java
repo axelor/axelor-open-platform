@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.JpaTest;
+import com.axelor.TestingHelpers;
 import com.axelor.auth.AuthFilter.UsernamePasswordTokenWithParams;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
@@ -56,12 +57,7 @@ public class AuthTest extends JpaTest {
 
   @AfterAll
   public static void tearDown() {
-    final Subject subject = AuthUtils.getSubject();
-    try {
-      subject.logout();
-    } catch (Exception e) {
-      // ignore
-    }
+    TestingHelpers.logout();
   }
 
   private void login(String user, String password) {

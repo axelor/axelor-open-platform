@@ -1,5 +1,6 @@
 package com.axelor.cache;
 
+import com.axelor.TestingHelpers;
 import com.axelor.app.AppSettings;
 import com.axelor.test.GuiceModules;
 import org.hibernate.cfg.Environment;
@@ -17,7 +18,7 @@ public class InfinispanTest extends AbstractBaseCache {
 
     @Override
     protected void configure() {
-      resetSettings();
+      TestingHelpers.resetSettings();
 
       AppSettings.get().getProperties().put(Environment.CACHE_REGION_FACTORY, "infinispan");
 

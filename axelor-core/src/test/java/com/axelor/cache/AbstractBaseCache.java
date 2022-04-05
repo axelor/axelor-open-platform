@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.axelor.JpaTest;
 import com.axelor.JpaTestModule;
+import com.axelor.TestingHelpers;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.ObjectUtils;
@@ -85,7 +86,7 @@ public abstract class AbstractBaseCache extends JpaTest {
 
   @AfterAll
   public static void clear() {
-    resetSettings();
+    TestingHelpers.resetSettings();
   }
 
   @Test
