@@ -20,18 +20,11 @@ package com.axelor.auth.pac4j;
 import com.axelor.common.StringUtils;
 import com.axelor.event.Event;
 import com.axelor.event.NamedLiteral;
-import com.axelor.events.LoginRedirectException;
 import com.axelor.events.PostLogin;
-import com.axelor.inject.Beans;
 import io.buji.pac4j.token.Pac4jToken;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Collections;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.shiro.authc.CredentialsException;
-import org.apache.shiro.web.util.WebUtils;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.profile.CommonProfile;
@@ -51,21 +44,8 @@ public class AuthPac4jCredentialsHandler {
 
     final Pac4jToken token = new Pac4jToken(Collections.singletonList(profile), false);
 
-    try {
-      postLogin
-          .select(NamedLiteral.of(PostLogin.FAILURE))
-          .fire(new PostLogin(token, null, new CredentialsException(errorMessage)));
-    } catch (LoginRedirectException lre) {
-      issueRedirect(lre.getLocation());
-    }
-  }
-
-  private void issueRedirect(String url) {
-    try {
-      WebUtils.issueRedirect(
-          Beans.get(HttpServletRequest.class), Beans.get(HttpServletResponse.class), url);
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
+    postLogin
+        .select(NamedLiteral.of(PostLogin.FAILURE))
+        .fire(new PostLogin(token, null, new CredentialsException(errorMessage)));
   }
 }
