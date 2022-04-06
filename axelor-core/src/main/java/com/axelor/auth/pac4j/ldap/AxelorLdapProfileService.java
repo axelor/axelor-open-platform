@@ -3,9 +3,10 @@
  *
  * Copyright (C) 2005-2022 Axelor (<http://axelor.com>).
  *
- * This program is free software: you can redistribute it and/or  modify
- * it under the terms of the GNU Affero General Public License, version 3,
- * as published by the Free Software Foundation.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,37 +14,27 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.axelor.auth.pac4j;
+package com.axelor.auth.pac4j.ldap;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.auth.pac4j.AuthPac4jModuleLocal.AxelorAuthenticator;
+import com.axelor.auth.pac4j.AuthPac4jProfileService;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -80,14 +71,11 @@ import org.ldaptive.ssl.X509CredentialConfig;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.exception.BadCredentialsException;
-import org.pac4j.core.profile.converter.AbstractAttributeConverter;
-import org.pac4j.core.profile.converter.Converters;
-import org.pac4j.core.profile.definition.CommonProfileDefinition;
 import org.pac4j.ldap.profile.LdapProfile;
 import org.pac4j.ldap.profile.service.LdapProfileService;
 
 @Singleton
-public class AxelorLdapProfileService extends LdapProfileService implements AxelorAuthenticator {
+public class AxelorLdapProfileService extends LdapProfileService {
 
   private final String groupsDn;
   private final String groupFilter;
@@ -240,6 +228,7 @@ public class AxelorLdapProfileService extends LdapProfileService implements Axel
     }
 
     final Authenticator ldapAuthenticator = new Authenticator(dnResolver, handler);
+    ldapAuthenticator.setEntryResolver(new AxelorSearchEntryResolver());
 
     final String attributes = AxelorLdapProfileDefinition.getAttributes(idAttribute);
 
@@ -463,135 +452,5 @@ public class AxelorLdapProfileService extends LdapProfileService implements Axel
 
     ldapAttributes.addAll(binaryLdapAttributes);
     return ldapAttributes;
-  }
-
-  public static class AxelorLdapGroupDefinition {
-    public static final String NAME = "cn";
-    public static final String ID = "gidNumber";
-    public static final String OBJECT_CLASS = "objectClass";
-    public static final String UNIQUE_MEMBER = "uniqueMember";
-    public static final String MEMBER = "member";
-
-    public static final List<String> ATTRIBUTES =
-        ImmutableList.of(NAME, ID, OBJECT_CLASS, UNIQUE_MEMBER, MEMBER);
-  }
-
-  public static class AxelorLdapProfileDefinition extends CommonProfileDefinition<LdapProfile> {
-
-    public static final String USERNAME = "uid";
-    public static final String DISPLAY_NAME = "cn";
-    public static final String EMAIL = "mail";
-    public static final String FIRST_NAME = "givenName";
-    public static final String FAMILY_NAME = "sn";
-    public static final String LOCALE = "preferredLanguage";
-    public static final String PICTURE_JPEG = "jpegPhoto";
-    public static final String PASSWORD = "userPassword";
-
-    public static final List<String> ATTRIBUTES =
-        ImmutableList.of(
-            USERNAME,
-            EMAIL,
-            DISPLAY_NAME,
-            FIRST_NAME,
-            FAMILY_NAME,
-            LOCALE,
-            PICTURE_JPEG,
-            AxelorLdapGroupDefinition.ID);
-
-    public AxelorLdapProfileDefinition() {
-      super(x -> new AxelorLdapProfile());
-      Stream.of(USERNAME, EMAIL, DISPLAY_NAME, FIRST_NAME, FAMILY_NAME)
-          .forEach(attribute -> primary(attribute, Converters.STRING));
-      primary(LOCALE, Converters.LOCALE);
-      primary(AxelorLdapGroupDefinition.ID, Converters.INTEGER);
-      primary(PICTURE_JPEG, ByteArrayConverter.INSTANCE);
-    }
-
-    public static String getAttributes(String idAttribute) {
-      final Set<String> excludedAttributes = Sets.newHashSet(USERNAME);
-      switch (idAttribute) {
-        case USERNAME:
-          break;
-        case DISPLAY_NAME:
-          excludedAttributes.add(DISPLAY_NAME);
-          break;
-        default:
-          throw new IllegalArgumentException(
-              String.format("Illegal ID attribute: %s", idAttribute));
-      }
-      return ATTRIBUTES.stream()
-          .filter(attribute -> !excludedAttributes.contains(attribute))
-          .collect(Collectors.joining(","));
-    }
-  }
-
-  public static class AxelorLdapProfile extends LdapProfile {
-    private transient Path picturePath;
-
-    @Override
-    public String getUsername() {
-      return getId();
-    }
-
-    @Override
-    public String getEmail() {
-      return (String) getAttribute(AxelorLdapProfileDefinition.EMAIL);
-    }
-
-    @Override
-    public String getDisplayName() {
-      return (String) getAttribute(AxelorLdapProfileDefinition.DISPLAY_NAME);
-    }
-
-    @Override
-    public String getFirstName() {
-      return (String) getAttribute(AxelorLdapProfileDefinition.FIRST_NAME);
-    }
-
-    @Override
-    public String getFamilyName() {
-      return (String) getAttribute(AxelorLdapProfileDefinition.FAMILY_NAME);
-    }
-
-    @Override
-    public Locale getLocale() {
-      return (Locale) getAttribute(AxelorLdapProfileDefinition.LOCALE);
-    }
-
-    @Override
-    public URI getPictureUrl() {
-      if (picturePath != null && picturePath.toFile().exists()) {
-        return picturePath.toUri();
-      }
-
-      final byte[] jpegPhoto = (byte[]) getAttribute(AxelorLdapProfileDefinition.PICTURE_JPEG);
-      if (ObjectUtils.notEmpty(jpegPhoto)) {
-        try {
-          picturePath = Files.createTempFile(null, ".jpg");
-          Files.write(picturePath, jpegPhoto);
-          return picturePath.toUri();
-        } catch (IOException e) {
-          throw new UncheckedIOException(e);
-        }
-      }
-
-      return null;
-    }
-  }
-
-  public static class ByteArrayConverter extends AbstractAttributeConverter<byte[]> {
-
-    public static final ByteArrayConverter INSTANCE = new ByteArrayConverter();
-
-    protected ByteArrayConverter() {
-      super(byte[].class);
-    }
-
-    @Override
-    protected byte[] internalConvert(Object attribute) {
-      return ObjectUtils.isEmpty(attribute)
-          ? null
-          : Base64.getDecoder().decode(attribute.toString());
-    }
   }
 }

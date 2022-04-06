@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -43,6 +44,7 @@ import org.apache.shiro.web.util.WebUtils;
  * <p>Lets the Servlet container manage the sessions and uses SameSite attribute for secure
  * requests.
  */
+@Singleton
 public class AxelorSessionManager extends ServletContainerSessionManager {
 
   protected static final String COOKIE_ATTR_SEPARATOR = "; ";
@@ -63,7 +65,7 @@ public class AxelorSessionManager extends ServletContainerSessionManager {
   public void changeSessionId() {
     final HttpServletRequest request = Beans.get(HttpServletRequest.class);
     request.changeSessionId();
-    if (AuthPac4jModule.isSecure(request)) {
+    if (AuthPac4jInfo.isSecure(request)) {
       setSameSiteNone(Beans.get(HttpServletResponse.class));
     }
   }
@@ -71,7 +73,7 @@ public class AxelorSessionManager extends ServletContainerSessionManager {
   protected Session createSession(Object source, HttpServletRequest request, String host) {
     final HttpSession session = request.getSession();
 
-    if (session.isNew() && AuthPac4jModule.isSecure(request)) {
+    if (session.isNew() && AuthPac4jInfo.isSecure(request)) {
       final HttpServletResponse response = WebUtils.getHttpResponse(source);
       setSameSiteNone(response);
     }

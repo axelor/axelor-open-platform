@@ -1,0 +1,10 @@
+---
+title: Rework authentication implementation to use reflection and providers
+type: change
+description: |
+  Reflection is now used to configure authentication clients.
+  The new syntax is `auth.provider.<providerName>.<configurationName>`.
+  You may use any of the built-in providers: `google`, `facebook`, `github`, `azure`, `keycloak`,
+  `apple`, `oauth`, `oidc`, `saml`, `cas`.
+  Or you can configure any other clients supported by pac4j using your own custom provider name.
+  You may even create and use your own custom authentication clients.

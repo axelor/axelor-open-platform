@@ -18,7 +18,6 @@
 
 --%>
 <%@ taglib prefix="x" uri="WEB-INF/axelor.tld" %>
-<%@ page language="java" session="true" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page language="java" session="true" %>
 <%@ page import="java.util.Calendar" %>
@@ -29,8 +28,9 @@
 <%@ page import="java.util.function.Function"%>
 <%@ page import="org.pac4j.http.client.indirect.FormClient" %>
 <%@ page import="com.axelor.i18n.I18n" %>
+<%@ page import="com.axelor.inject.Beans" %>
 <%@ page import="com.axelor.app.AppSettings" %>
-<%@ page import="com.axelor.auth.pac4j.AuthPac4jModule" %>
+<%@ page import="com.axelor.auth.pac4j.AuthPac4jInfo" %>
 <%@ page import="com.axelor.common.HtmlUtils" %>
 <%
 
@@ -46,7 +46,6 @@ Function<String, String> T = new Function<String, String>() {
 
 String errorMsg = T.apply(request.getParameter(FormClient.ERROR_PARAMETER));
 
-String loginTitle = T.apply("Please sign in");
 String loginRemember = T.apply("Remember me");
 String loginSubmit = T.apply("Log in");
 
@@ -71,10 +70,9 @@ if (pageContext.getServletContext().getResource(loginHeader) == null) {
 Map<String, String> tenants = (Map) session.getAttribute("tenantMap");
 String tenantId = (String) session.getAttribute("tenantId");
 
-AppSettings settings = AppSettings.get();
-String callbackUrl = AuthPac4jModule.getCallbackUrl();
-
-Set<String> centralClients = AuthPac4jModule.getCentralClients();
+AuthPac4jInfo authPac4jInfo = Beans.get(AuthPac4jInfo.class);
+String callbackUrl = authPac4jInfo.getCallbackUrl();
+Set<String> centralClients = authPac4jInfo.getCentralClients();
 %>
 <!DOCTYPE html>
 <html>
@@ -106,7 +104,7 @@ Set<String> centralClients = AuthPac4jModule.getCentralClients();
         <div id="social-buttons" class="form-fields text-center">
           <% for (String client : centralClients) { %>
             <%
-            Map<String, String> info = AuthPac4jModule.getClientInfo(client);
+            Map<String, String> info = authPac4jInfo.getClientInfo(client);
             String title = info.get("title");
             String icon = info.get("icon");
             %>

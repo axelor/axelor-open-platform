@@ -3,9 +3,10 @@
  *
  * Copyright (C) 2005-2022 Axelor (<http://axelor.com>).
  *
- * This program is free software: you can redistribute it and/or  modify
- * it under the terms of the GNU Affero General Public License, version 3,
- * as published by the Free Software Foundation.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,7 +14,7 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package com.axelor.auth.pac4j;
 
@@ -35,23 +36,27 @@ import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.pac4j.core.profile.CommonProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class AuthPac4jUserService {
 
-  @Inject protected AuthService authService;
-  @Inject protected AuthPac4jProfileService profileService;
+  @Inject private AuthService authService;
 
-  @Inject protected UserRepository userRepo;
-  @Inject protected GroupRepository groupRepo;
+  @Inject private AuthPac4jProfileService profileService;
+
+  @Inject private UserRepository userRepo;
+
+  @Inject private GroupRepository groupRepo;
 
   private static final String DEFAULT_GROUP_CODE;
 
   static {
-    final AppSettings settings = AppSettings.get();
-    DEFAULT_GROUP_CODE = settings.get(AvailableAppSettings.AUTH_USER_DEFAULT_GROUP, "users");
+    DEFAULT_GROUP_CODE =
+        AppSettings.get().get(AvailableAppSettings.AUTH_USER_DEFAULT_GROUP, "users");
   }
 
   private static final Logger logger =
@@ -59,7 +64,7 @@ public class AuthPac4jUserService {
 
   @Nullable
   public User getUser(CommonProfile profile) {
-    final String codeOrEmail = profileService.getCodeOrEmail(profile);
+    final String codeOrEmail = profileService.getUserIdentifier(profile);
 
     if (codeOrEmail != null) {
       return userRepo.findByCodeOrEmail(codeOrEmail);
@@ -91,7 +96,7 @@ public class AuthPac4jUserService {
   @Transactional
   protected void persistUser(CommonProfile profile) {
     final User user =
-        new User(profileService.getCodeOrEmail(profile), profileService.getName(profile));
+        new User(profileService.getUserIdentifier(profile), profileService.getName(profile));
     user.setPassword(authService.encrypt(UUID.randomUUID().toString()));
 
     updateUser(user, profile);

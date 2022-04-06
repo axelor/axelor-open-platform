@@ -30,7 +30,7 @@ import com.axelor.auth.db.repo.GroupRepository;
 import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.auth.extensions.LdapExtension;
 import com.axelor.auth.pac4j.AuthPac4jUserService;
-import com.axelor.auth.pac4j.AxelorLdapProfileService;
+import com.axelor.auth.pac4j.ldap.AxelorLdapProfileService;
 import com.axelor.test.GuiceExtension;
 import com.axelor.test.GuiceModules;
 import com.google.inject.persist.Transactional;

@@ -22,5 +22,5 @@ dependencies {
 
   implementation libs.apache_shiro
   implementation libs.eclipselink_moxy
-  implementation libs.pac4j_core
+  implementation libs.buji_pac4j
 }

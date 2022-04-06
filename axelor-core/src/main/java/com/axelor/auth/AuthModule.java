@@ -17,15 +17,8 @@
  */
 package com.axelor.auth;
 
-import com.axelor.app.AppSettings;
-import com.axelor.app.AvailableAppSettings;
-import com.axelor.auth.pac4j.AuthPac4jModuleCas;
-import com.axelor.auth.pac4j.AuthPac4jModuleLocal;
-import com.axelor.auth.pac4j.AuthPac4jModuleOAuth;
-import com.axelor.auth.pac4j.AuthPac4jModuleOidc;
-import com.axelor.auth.pac4j.AuthPac4jModuleSaml;
-import com.axelor.auth.pac4j.AuthPac4jObserverCreate;
-import com.axelor.auth.pac4j.AuthPac4jObserverLink;
+import com.axelor.auth.pac4j.AuthPac4jModule;
+import com.axelor.auth.pac4j.AuthPac4jObserver;
 import com.axelor.db.JpaSecurity;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -61,50 +54,9 @@ public class AuthModule extends AbstractModule {
     // observe authentication-related events
     bind(AuthObserver.class);
 
-    // Pac4j
-    final AppSettings settings = AppSettings.get();
-    final String userProvisioning =
-        settings.get(AvailableAppSettings.AUTH_USER_PROVISIONING, "create");
-
-    // User provisioning
-    switch (userProvisioning) {
-      case "create":
-        // Create and update users
-        bind(AuthPac4jObserverCreate.class);
-        break;
-      case "link":
-        // Update users (must exist locally beforehand)
-        bind(AuthPac4jObserverLink.class);
-        break;
-      default:
-    }
-
-    // OpenID Connect
-    if (AuthPac4jModuleOidc.isEnabled()) {
-      install(new AuthPac4jModuleOidc(context));
-      return;
-    }
-
-    // OAuth
-    if (AuthPac4jModuleOAuth.isEnabled()) {
-      install(new AuthPac4jModuleOAuth(context));
-      return;
-    }
-
-    // SAML
-    if (AuthPac4jModuleSaml.isEnabled()) {
-      install(new AuthPac4jModuleSaml(context));
-      return;
-    }
-
-    // CAS
-    if (AuthPac4jModuleCas.isEnabled()) {
-      install(new AuthPac4jModuleCas(context));
-      return;
-    }
-
-    // Local
-    install(new AuthPac4jModuleLocal(context));
+    // pac4j
+    bind(AuthPac4jObserver.class);
+    install(new AuthPac4jModule(context));
   }
 
   static final class MyShiroModule extends ShiroModule {

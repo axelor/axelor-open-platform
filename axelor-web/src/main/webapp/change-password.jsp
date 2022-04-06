@@ -18,7 +18,6 @@
 
 --%>
 <%@ taglib prefix="x" uri="WEB-INF/axelor.tld" %>
-<%@ page language="java" session="true" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page language="java" session="true" %>
 <%@ page import="java.util.Calendar" %>
@@ -26,9 +25,10 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.function.Function"%>
 <%@ page import="com.axelor.i18n.I18n" %>
+<%@ page import="com.axelor.inject.Beans" %>
 <%@ page import="com.axelor.auth.AuthService" %>
 <%@ page import="com.axelor.app.AppSettings" %>
-<%@ page import="com.axelor.auth.pac4j.AuthPac4jModule" %>
+<%@ page import="com.axelor.auth.pac4j.AuthPac4jInfo" %>
 <%@ page import="org.pac4j.http.client.indirect.FormClient" %>
 <%@ page import="com.axelor.common.HtmlUtils" %>
 <%
@@ -71,9 +71,8 @@ String copyright = String.format("&copy; 2005 - %s Axelor. All Rights Reserved."
 Map<String, String> tenants = (Map) session.getAttribute("tenantMap");
 String tenantId = (String) session.getAttribute("tenantId");
 
-AppSettings settings = AppSettings.get();
-String callbackUrl = AuthPac4jModule.getCallbackUrl();
-
+AuthPac4jInfo authPac4jInfo = Beans.get(AuthPac4jInfo.class);
+String callbackUrl = authPac4jInfo.getCallbackUrl();
 %>
 <!DOCTYPE html>
 <html>

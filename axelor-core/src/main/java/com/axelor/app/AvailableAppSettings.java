@@ -156,6 +156,18 @@ public interface AvailableAppSettings {
   String LOGGING_PATTERN_FILE = "logging.pattern.file";
   String LOGGING_PATTERN_CONSOLE = "logging.pattern.console";
 
+  String AUTH_CALLBACK_URL = "auth.callback.url";
+  String AUTH_USER_PROVISIONING = "auth.user.provisioning";
+  String AUTH_USER_DEFAULT_GROUP = "auth.user.default.group";
+  String AUTH_USER_PRINCIPAL_ATTRIBUTE = "auth.user.principal.attribute";
+
+  String AUTH_LOGOUT_URL = "auth.logout.url";
+  String AUTH_LOGOUT_URL_PATTERN = "auth.logout.url.pattern";
+  String AUTH_LOGOUT_LOCAL = "auth.logout.local";
+  String AUTH_LOGOUT_CENTRAL = "auth.logout.central";
+
+  String AUTH_LOCAL_BASIC_AUTH_ENABLED = "auth.local.basic.auth.enabled";
+
   String AUTH_LDAP_SERVER_URL = "auth.ldap.server.url";
   String AUTH_LDAP_USER_BASE = "auth.ldap.user.base";
   String AUTH_LDAP_USER_FILTER = "auth.ldap.user.filter";
@@ -180,65 +192,4 @@ public interface AvailableAppSettings {
   String AUTH_LDAP_CREDENTIAL_AUTHENTICATION_KEY = "auth.ldap.credential.authentication.key";
   String AUTH_LDAP_CONNECT_TIMEOUT = "auth.ldap.connect.timeout";
   String AUTH_LDAP_RESPONSE_TIMEOUT = "auth.ldap.response.timeout";
-
-  String AUTH_LOCAL_BASIC_AUTH_ENABLED = "auth.local.basic.auth.enabled";
-
-  String AUTH_CAS_LOGIN_URL = "auth.cas.login.url";
-  String AUTH_CAS_PREFIX_URL = "auth.cas.prefix.url";
-  String AUTH_CAS_PROTOCOL = "auth.cas.protocol";
-  String AUTH_CAS_ENCODING = "auth.cas.encoding";
-  String AUTH_CAS_RENEW = "auth.cas.renew";
-  String AUTH_CAS_GATEWAY = "auth.cas.gateway";
-  String AUTH_CAS_TIME_TOLERANCE = "auth.cas.time.tolerance";
-  String AUTH_CAS_URL_RESOLVER_CLASS = "auth.cas.url.resolver.class";
-  String AUTH_CAS_DEFAULT_TICKET_VALIDATOR_CLASS = "auth.cas.default.ticket.validator.class";
-  String AUTH_CAS_PROXY_SUPPORT = "auth.cas.proxy.support";
-  String AUTH_CAS_LOGOUT_HANDLER_CLASS = "auth.cas.logout.handler.class";
-  String AUTH_CAS_CLIENT_TYPE = "auth.cas.client.type";
-  String AUTH_CAS_SERVICE_URL = "auth.cas.service.url";
-  String AUTH_CAS_USERNAME_PARAMETER = "auth.cas.username.parameter";
-  String AUTH_CAS_PASSWORD_PARAMETER = "auth.cas.password.parameter";
-  String AUTH_CAS_HEADER_NAME = "auth.cas.header.name";
-  String AUTH_CAS_PREFIX_HEADER = "auth.cas.prefix.header";
-  String AUTH_CAS_SERVER_PREFIX_URL = "auth.cas.server.url.prefix";
-  String AUTH_CAS_SERVICE = "auth.cas.service";
-  String AUTH_CAS_LOGOUT_URL = "auth.cas.logout.url";
-  String AUTH_CAS_ATTRS_USER_NAME = "auth.cas.attrs.user.name";
-  String AUTH_CAS_ATTRS_USER_EMAIL = "auth.cas.attrs.user.email";
-
-  String AUTH_CALLBACK_URL = "auth.callback.url";
-  String AUTH_USER_PROVISIONING = "auth.user.provisioning";
-  String AUTH_USER_DEFAULT_GROUP = "auth.user.default.group";
-  String AUTH_USER_PRINCIPAL_ATTRIBUTE = "auth.user.principal.attribute";
-
-  String AUTH_LOGOUT_URL = "auth.logout.url";
-  String AUTH_LOGOUT_URL_PATTERN = "auth.logout.url.pattern";
-  String AUTH_LOGOUT_LOCAL = "auth.logout.local";
-  String AUTH_LOGOUT_CENTRAL = "auth.logout.central";
-
-  String AUTH_SAML_KEYSTORE_PATH = "auth.saml.keystore.path";
-  String AUTH_SAML_KEYSTORE_PASSWORD = "auth.saml.keystore.password";
-  String AUTH_SAML_PRIVATE_KEY_PASSWORD = "auth.saml.private.key.password";
-  String AUTH_SAML_IDENTITY_PROVIDER_METADATA_PATH = "auth.saml.identity.provider.metadata.path";
-  String AUTH_SAML_MAXIMUM_AUTHENTICATION_LIFETIME = "auth.saml.maximum.authentication.lifetime";
-  String AUTH_SAML_SERVICE_PROVIDER_ENTITY_ID = "auth.saml.service.provider.entity.id";
-  String AUTH_SAML_SERVICE_PROVIDER_METADATA_PATH = "auth.saml.service.provider.metadata.path";
-  String AUTH_SAML_FORCE_AUTH = "auth.saml.force.auth";
-  String AUTH_SAML_PASSIVE = "auth.saml.passive";
-  String AUTH_SAML_AUTHN_REQUEST_BINDING_TYPE = "auth.saml.authn.request.binding.type";
-  String AUTH_SAML_RESPONSE_BINDING_TYPE = "auth.saml.response.binding.type";
-  String AUTH_SAML_USE_NAME_QUALIFIER = "auth.saml.use.name.qualifier";
-  String AUTH_SAML_ATTRIBUTE_CONSUMING_SERVICE_INDEX =
-      "auth.saml.attribute.consuming.service.index";
-  String AUTH_SAML_ASSERTION_CONSUMER_SERVICE_INDEX = "auth.saml.assertion.consumer.service.index";
-  String AUTH_SAML_BLACKLISTED_SIGNATURE_SIGNING_ALGORITHMS =
-      "auth.saml.blacklisted.signature.signing.algorithms";
-  String AUTH_SAML_SIGNATURE_ALGORITHMS = "auth.saml.signature.algorithms";
-  String AUTH_SAML_SIGNATURE_REFERENCE_DIGEST_METHODS =
-      "auth.saml.signature.reference.digest.methods";
-  String AUTH_SAML_SIGNATURE_CANONICALIZATION_ALGORITHM =
-      "auth.saml.signature.canonicalization.algorithm";
-  String AUTH_SAML_WANTS_ASSERTIONS_SIGNED = "auth.saml.wants.assertions.signed";
-  String AUTH_SAML_AUTHN_REQUEST_SIGNED = "auth.saml.authn.request.signed";
-  String AUTH_SAML_LOGOUT_REQUEST_SIGNED = "auth.saml.logout.request.signed";
 }

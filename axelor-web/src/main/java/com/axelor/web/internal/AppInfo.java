@@ -24,7 +24,7 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.ViewCustomizationPermission;
-import com.axelor.auth.pac4j.AuthPac4jModule;
+import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
 import com.axelor.db.mapper.Mapper;
@@ -34,6 +34,7 @@ import com.axelor.meta.db.MetaFile;
 import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
+import io.buji.pac4j.profile.ShiroProfileManager;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -46,9 +47,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
-import org.pac4j.core.context.J2EContext;
-import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.core.profile.ProfileManager;
+import org.pac4j.core.context.JEEContext;
 
 public class AppInfo {
 
@@ -134,14 +133,17 @@ public class AppInfo {
     map.put("application.themes", themes);
 
     // find central client name
-    final ProfileManager<CommonProfile> profileManager =
-        new ProfileManager<>(
-            new J2EContext(
-                Beans.get(HttpServletRequest.class), Beans.get(HttpServletResponse.class)));
+    final JEEContext jeeContext =
+        new JEEContext(Beans.get(HttpServletRequest.class), Beans.get(HttpServletResponse.class));
+    final ShiroProfileManager profileManager = new ShiroProfileManager(jeeContext);
 
     profileManager
         .get(true)
-        .filter(profile -> AuthPac4jModule.getCentralClients().contains(profile.getClientName()))
+        .filter(
+            profile ->
+                Beans.get(AuthPac4jInfo.class)
+                    .getCentralClients()
+                    .contains(profile.getClientName()))
         .ifPresent(profile -> map.put("auth.central.client", profile.getClientName()));
 
     return map;

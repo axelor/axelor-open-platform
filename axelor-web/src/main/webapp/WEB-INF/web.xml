@@ -66,4 +66,14 @@
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
 
+  <error-page>
+    <exception-type>org.apache.shiro.authc.UnknownAccountException</exception-type>
+    <location>/error.jsp</location>
+  </error-page>
+
+  <error-page>
+    <exception-type>org.pac4j.core.exception.TechnicalException</exception-type>
+    <location>/error.jsp</location>
+  </error-page>
+
 </web-app>

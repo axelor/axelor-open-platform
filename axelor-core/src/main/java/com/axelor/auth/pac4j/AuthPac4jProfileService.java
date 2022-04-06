@@ -3,9 +3,10 @@
  *
  * Copyright (C) 2005-2022 Axelor (<http://axelor.com>).
  *
- * This program is free software: you can redistribute it and/or  modify
- * it under the terms of the GNU Affero General Public License, version 3,
- * as published by the Free Software Foundation.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,12 +14,10 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package com.axelor.auth.pac4j;
 
-import com.axelor.app.AppSettings;
-import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.Permission;
 import com.axelor.auth.db.Role;
@@ -29,13 +28,13 @@ import com.axelor.common.StringUtils;
 import com.axelor.meta.db.MetaSelect;
 import com.axelor.meta.db.MetaSelectItem;
 import com.axelor.meta.db.repo.MetaSelectRepository;
-import com.google.inject.Singleton;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Locale;
@@ -46,18 +45,23 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.pac4j.core.profile.CommonProfile;
 
 @Singleton
 public class AuthPac4jProfileService {
-  @Inject protected GroupRepository groupRepo;
-  @Inject protected RoleRepository roleRepo;
-  @Inject protected PermissionRepository permissionRepo;
-  @Inject protected MetaSelectRepository metaSelectRepo;
+
+  @Inject private GroupRepository groupRepo;
+
+  @Inject private RoleRepository roleRepo;
+
+  @Inject private PermissionRepository permissionRepo;
+
+  @Inject private MetaSelectRepository metaSelectRepo;
 
   public static final String GROUP_ATTRIBUTE = "group";
 
-  public String getCodeOrEmail(CommonProfile profile) {
+  public String getUserIdentifier(CommonProfile profile) {
     return Stream.of(profile.getUsername(), profile.getEmail(), profile.getId())
         .filter(StringUtils::notBlank)
         .findFirst()
@@ -65,41 +69,15 @@ public class AuthPac4jProfileService {
   }
 
   public String getName(CommonProfile profile) {
-    // Backward-compatible CAS configuration
-    if (AuthPac4jModuleCas.isEnabled()) {
-      final Optional<String> name =
-          Optional.ofNullable(
-                  AppSettings.get().get(AvailableAppSettings.AUTH_CAS_ATTRS_USER_NAME, null))
-              .map(profile::getAttribute)
-              .map(Object::toString)
-              .filter(StringUtils::notBlank);
-      if (name.isPresent()) {
-        return name.get();
-      }
-    }
-
     if (StringUtils.notBlank(profile.getDisplayName())) {
       return profile.getDisplayName();
     }
 
-    return getCodeOrEmail(profile);
+    return getUserIdentifier(profile);
   }
 
   @Nullable
   public String getEmail(CommonProfile profile) {
-    // Backward-compatible CAS configuration
-    if (AuthPac4jModuleCas.isEnabled()) {
-      final Optional<String> email =
-          Optional.ofNullable(
-                  AppSettings.get().get(AvailableAppSettings.AUTH_CAS_ATTRS_USER_EMAIL, null))
-              .map(profile::getAttribute)
-              .map(Object::toString)
-              .filter(StringUtils::notBlank);
-      if (email.isPresent()) {
-        return email.get();
-      }
-    }
-
     return Stream.of(profile.getEmail(), profile.getId())
         .filter(StringUtils::notBlank)
         .filter(email -> email.matches(".+\\@.+\\..+"))
@@ -143,6 +121,9 @@ public class AuthPac4jProfileService {
   @Nullable
   public Group getGroup(CommonProfile profile) {
     return Optional.ofNullable(profile.getAttribute(GROUP_ATTRIBUTE))
+        .map(
+            group ->
+                group instanceof Collection ? ((Collection<?>) group).iterator().next() : group)
         .map(String::valueOf)
         .map(this::getGroup)
         .orElse(null);
@@ -150,11 +131,7 @@ public class AuthPac4jProfileService {
 
   @Nullable
   public Group getGroup(CommonProfile profile, String defaultGroupCode) {
-    final String groupCode =
-        Optional.ofNullable(profile.getAttribute(GROUP_ATTRIBUTE))
-            .map(String::valueOf)
-            .orElse(defaultGroupCode);
-    return getGroup(groupCode);
+    return Optional.ofNullable(getGroup(profile)).orElseGet(() -> getGroup(defaultGroupCode));
   }
 
   @Nullable

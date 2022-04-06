@@ -19,6 +19,7 @@
 package com.axelor.auth.pac4j;
 
 import java.util.function.Supplier;
+import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -38,6 +39,7 @@ import org.apache.shiro.web.util.WebUtils;
  * <p>This implements all of {@link org.apache.shiro.mgt.RememberMeManager} interface and uses
  * SameSite attribute for secure requests.
  */
+@Singleton
 public class AxelorRememberMeManager extends CookieRememberMeManager {
   private final Cookie secureCookie;
   private final ThreadLocal<HttpServletRequest> currentRequest = new ThreadLocal<>();
@@ -78,7 +80,7 @@ public class AxelorRememberMeManager extends CookieRememberMeManager {
   @Override
   public Cookie getCookie() {
     final HttpServletRequest request = getRequest();
-    return request != null && AuthPac4jModule.isSecure(request) ? secureCookie : super.getCookie();
+    return request != null && AuthPac4jInfo.isSecure(request) ? secureCookie : super.getCookie();
   }
 
   protected HttpServletRequest getRequest() {

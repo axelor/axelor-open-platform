@@ -3,9 +3,10 @@
  *
  * Copyright (C) 2005-2022 Axelor (<http://axelor.com>).
  *
- * This program is free software: you can redistribute it and/or  modify
- * it under the terms of the GNU Affero General Public License, version 3,
- * as published by the Free Software Foundation.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,9 +14,9 @@
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.axelor.auth.pac4j;
+package com.axelor.auth.pac4j.local;
 
 import com.axelor.common.StringUtils;
 import com.axelor.event.Event;
@@ -24,16 +25,16 @@ import com.axelor.events.PostLogin;
 import io.buji.pac4j.token.Pac4jToken;
 import java.util.Collections;
 import javax.inject.Inject;
-import org.apache.shiro.authc.CredentialsException;
 import org.pac4j.core.client.Client;
-import org.pac4j.core.context.Pac4jConstants;
+import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.util.Pac4jConstants;
 
-public class AuthPac4jCredentialsHandler {
+public class CredentialsHandler {
 
   @Inject private Event<PostLogin> postLogin;
 
-  public void handleInvalidCredentials(Client<?, ?> client, String username, String errorMessage) {
+  public void handleInvalidCredentials(Client<?> client, String username, CredentialsException e) {
     final CommonProfile profile = new CommonProfile();
     profile.setClientName(client.getName());
 
@@ -44,8 +45,6 @@ public class AuthPac4jCredentialsHandler {
 
     final Pac4jToken token = new Pac4jToken(Collections.singletonList(profile), false);
 
-    postLogin
-        .select(NamedLiteral.of(PostLogin.FAILURE))
-        .fire(new PostLogin(token, null, new CredentialsException(errorMessage)));
+    postLogin.select(NamedLiteral.of(PostLogin.FAILURE)).fire(new PostLogin(token, null, e));
   }
 }
