@@ -97,11 +97,12 @@ public class GenerateCode extends DefaultTask {
       throws IOException {
     final Project project = getProject();
     final File outputPath =
-        FileUtils.getFile(getResourceOutputDir(getProject()), "module.properties");
+        FileUtils.getFile(
+            getResourceOutputDir(getProject()), "META-INF", "axelor-module.properties");
     try {
       outputPath.getParentFile().mkdirs();
     } catch (Exception e) {
-      getLogger().error("Error generating module.properties", e);
+      getLogger().error("Error generating axelor-module.properties", e);
     }
 
     getLogger().info("Generating: {}", outputPath.getParent());
@@ -114,7 +115,7 @@ public class GenerateCode extends DefaultTask {
           try {
             depends.add(AxelorUtils.getModuleName(project, artifact));
           } catch (Exception e) {
-            getLogger().error("Error generating module.properties", e);
+            getLogger().error("Error generating axelor-module.properties", e);
           }
         });
 

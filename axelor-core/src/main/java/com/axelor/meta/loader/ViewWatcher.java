@@ -258,7 +258,7 @@ public final class ViewWatcher {
       if (pathStr.toLowerCase().endsWith(".jar")) {
         // resources in jar
         fs = FileSystems.newFileSystem(path, (ClassLoader) null);
-        propsPath = fs.getPath("module.properties");
+        propsPath = fs.getPath("META-INF", "axelor-module.properties");
       } else {
         for (final String location : ImmutableList.of("WEB-INF/classes", "main")) {
           final String subPathStr = Paths.get('/' + location).toString();
@@ -266,7 +266,7 @@ public final class ViewWatcher {
           if (index >= 0) {
             final Path current =
                 Paths.get(pathStr.substring(0, index))
-                    .resolve(Paths.get(location, "module.properties"));
+                    .resolve(Paths.get(location, "META-INF", "axelor-module.properties"));
             if (Files.exists(current)) {
               propsPath = current;
               break;

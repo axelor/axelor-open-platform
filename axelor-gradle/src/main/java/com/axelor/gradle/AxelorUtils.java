@@ -116,7 +116,7 @@ public class AxelorUtils {
     final Project sub = findProject(project, artifact);
     if (sub == null) {
       try (JarFile jar = new JarFile(artifact.getFile())) {
-        if (jar.getEntry("module.properties") != null) {
+        if (jar.getEntry("META-INF/axelor-module.properties") != null) {
           return true;
         }
       } catch (IOException e) {
@@ -144,13 +144,13 @@ public class AxelorUtils {
 
     try (final URLClassLoader loader =
             new URLClassLoader(new URL[] {artifact.getFile().toURI().toURL()});
-        final InputStream in = loader.getResourceAsStream("module.properties")) {
+        final InputStream in = loader.getResourceAsStream("META-INF/axelor-module.properties")) {
       if (in != null) {
         Properties props = new java.util.Properties();
         props.load(in);
         return (String) props.get("name");
       } else {
-        throw new IOException("Unable to locate module.properties in " + artifact.getName());
+        throw new IOException("Unable to locate axelor-module.properties in " + artifact.getName());
       }
     }
   }

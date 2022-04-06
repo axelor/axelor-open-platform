@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 /** This class provides some utility methods to scan class path for resources/classes. */
 public final class MetaScanner {
 
-  private static final String MODULE_PROPERTIES = "module.properties";
+  private static final String MODULE_PROPERTIES = "META-INF/axelor-module.properties";
   private static final String SCHEME_JAR = "jar";
 
   private static final List<String> BUILD_OUTPUT_PATHS =
