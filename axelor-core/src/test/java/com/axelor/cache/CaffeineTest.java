@@ -15,7 +15,7 @@ public class CaffeineTest extends AbstractBaseCache {
       TestingHelpers.resetSettings();
 
       AppSettings.get()
-          .getProperties()
+          .getInternalProperties()
           .put(
               ConfigSettings.PROVIDER,
               "com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider");

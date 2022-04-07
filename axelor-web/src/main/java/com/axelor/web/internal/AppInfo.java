@@ -109,14 +109,13 @@ public class AppInfo {
     map.put("file.upload.size", SETTINGS.get(AvailableAppSettings.FILE_UPLOAD_SIZE, "5"));
     map.put("application.sdk", VersionUtils.getVersion().version);
 
-    for (String key : SETTINGS.getProperties().stringPropertyNames()) {
-      if (key.startsWith("view.")) {
-        Object value = SETTINGS.get(key);
-        if ("true".equals(value) || "false".equals(value)) {
-          value = Boolean.parseBoolean(value.toString());
-        }
-        map.put(key, value);
+    Map<String, String> viewsProps = SETTINGS.getPropertiesStartingWith("view.");
+    for (Map.Entry<String, String> entry : viewsProps.entrySet()) {
+      Object value = entry.getValue();
+      if ("true".equals(value) || "false".equals(value)) {
+        value = Boolean.parseBoolean(value.toString());
       }
+      map.put(entry.getKey(), value);
     }
 
     final List<String> themes = new ArrayList<>();

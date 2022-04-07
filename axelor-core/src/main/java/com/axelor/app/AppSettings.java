@@ -18,47 +18,25 @@
 package com.axelor.app;
 
 import com.axelor.app.internal.AppFilter;
-import com.axelor.common.ResourceUtils;
+import com.axelor.app.settings.SettingsBuilder;
 import com.axelor.common.StringUtils;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class AppSettings {
 
-  private static final String DEFAULT_CONFIG_LOCATION = "application.properties";
-
-  private Properties properties;
+  private Map<String, String> properties;
 
   private static AppSettings instance;
 
   private AppSettings() {
-    String config = System.getProperty("axelor.config");
-    InputStream stream = null;
-    try {
-      if (StringUtils.isBlank(config)) {
-        stream = ResourceUtils.getResourceStream(config = DEFAULT_CONFIG_LOCATION);
-      } else {
-        stream = new FileInputStream(config);
-      }
-      try {
-        properties = new LinkedProperties();
-        properties.load(stream);
-      } finally {
-        stream.close();
-      }
-    } catch (Exception e) {
-      throw new RuntimeException("Unable to load application settings: " + config);
-    }
+    properties = new SettingsBuilder().buildSettings();
   }
 
   public static AppSettings get() {
@@ -69,12 +47,12 @@ public final class AppSettings {
   }
 
   public String get(String key) {
-    return sub(properties.getProperty(key));
+    return sub(properties.get(key));
   }
 
   public String get(String key, String defaultValue) {
-    String value = properties.getProperty(key, defaultValue);
-    if (value == null || "".equals(value.trim())) {
+    String value = properties.getOrDefault(key, defaultValue);
+    if (StringUtils.isBlank(value)) {
       value = defaultValue;
     }
     return sub(value);
@@ -92,18 +70,16 @@ public final class AppSettings {
 
   public int getInt(String key, int defaultValue) {
     try {
-      return Integer.parseInt(get(key).toString());
+      return Integer.parseInt(get(key));
     } catch (Exception e) {
+      // ignore
     }
     return defaultValue;
   }
 
   public boolean getBoolean(String key, boolean defaultValue) {
-    try {
-      return Boolean.parseBoolean(get(key).toString());
-    } catch (Exception e) {
-    }
-    return defaultValue;
+    final String value = get(key);
+    return StringUtils.notBlank(value) ? Boolean.parseBoolean(value) : defaultValue;
   }
 
   public String getPath(String key, String defaultValue) {
@@ -153,50 +129,47 @@ public final class AppSettings {
    *
    * @return the internal properties store
    */
-  public Properties getProperties() {
+  public Map<String, String> getInternalProperties() {
     return properties;
   }
 
-  /** Properties with keys in order of insertion */
-  public static class LinkedProperties extends Properties {
+  /**
+   * For internal use only.
+   *
+   * @return the internal properties store
+   */
+  public Map<String, String> getProperties() {
+    return Collections.unmodifiableMap(properties);
+  }
 
-    private static final long serialVersionUID = -1869328576799427860L;
-    private final Set<Object> keys = new LinkedHashSet<>();
+  /**
+   * Get all properties keys
+   *
+   * @return an unmodifiable {@link Set} of keys
+   */
+  public Set<String> getPropertiesKeys() {
+    return properties.keySet().stream().collect(Collectors.toUnmodifiableSet());
+  }
 
-    @Override
-    public synchronized Object put(Object key, Object value) {
-      keys.add(key);
-      return super.put(key, value);
-    }
+  /**
+   * Get properties keys starting with the given prefix
+   *
+   * @return an unmodifiable {@link Set} of keys
+   */
+  public Set<String> getPropertiesKeysStartingWith(String prefix) {
+    return properties.keySet().stream()
+        .filter(k -> k.startsWith(prefix))
+        .collect(Collectors.toUnmodifiableSet());
+  }
 
-    @Override
-    public synchronized void putAll(Map<? extends Object, ? extends Object> t) {
-      keys.addAll(t.keySet());
-      super.putAll(t);
-    }
-
-    @Override
-    public synchronized Object remove(Object key) {
-      keys.remove(key);
-      return super.remove(key);
-    }
-
-    @Override
-    public synchronized boolean remove(Object key, Object value) {
-      keys.remove(key);
-      return super.remove(key, value);
-    }
-
-    @Override
-    public Set<Object> keySet() {
-      return Collections.unmodifiableSet(keys);
-    }
-
-    @Override
-    public Set<String> stringPropertyNames() {
-      return keys.stream()
-          .map(Object::toString)
-          .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
+  /**
+   * Get properties where the key start with the given prefix
+   *
+   * @return an unmodifiable {@link Map} of matching properties
+   */
+  public Map<String, String> getPropertiesStartingWith(String prefix) {
+    return properties.entrySet().stream()
+        .filter(e -> e.getKey().startsWith(prefix))
+        .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 }

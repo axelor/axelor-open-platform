@@ -1,0 +1,10 @@
+application:
+  name: From ext yml
+  description: Desc ext yml
+
+views:
+  foo: Foo
+  some-bar: Bar
+
+my:
+  env: aEnv

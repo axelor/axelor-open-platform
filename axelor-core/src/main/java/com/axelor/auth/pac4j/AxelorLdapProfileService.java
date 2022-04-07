@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -100,47 +99,43 @@ public class AxelorLdapProfileService extends LdapProfileService implements Axel
     this(AppSettings.get().getProperties());
   }
 
-  public AxelorLdapProfileService(Properties properties) {
-    final String ldapUrl = properties.getProperty(AvailableAppSettings.AUTH_LDAP_SERVER_URL);
-    final String usersDn = properties.getProperty(AvailableAppSettings.AUTH_LDAP_USER_BASE);
+  public AxelorLdapProfileService(Map<String, String> properties) {
+    final String ldapUrl = properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_URL);
+    final String usersDn = properties.get(AvailableAppSettings.AUTH_LDAP_USER_BASE);
     final String idAttribute =
-        properties.getProperty(
+        properties.getOrDefault(
             AvailableAppSettings.AUTH_LDAP_USER_ID_ATTRIBUTE, AxelorLdapProfileDefinition.USERNAME);
     final String usernameAttribute =
-        properties.getProperty(
+        properties.getOrDefault(
             AvailableAppSettings.AUTH_LDAP_USER_USERNAME_ATTRIBUTE,
             AxelorLdapProfileDefinition.USERNAME);
     final String userFilter =
-        Optional.ofNullable(properties.getProperty(AvailableAppSettings.AUTH_LDAP_USER_FILTER))
+        Optional.ofNullable(properties.get(AvailableAppSettings.AUTH_LDAP_USER_FILTER))
             .map(property -> property.replace("{0}", "{user}"))
             .orElse(null);
     final String userDnFormat =
-        properties.getProperty(AvailableAppSettings.AUTH_LDAP_USER_DN_FORMAT, null);
-    final String systemDn = properties.getProperty(AvailableAppSettings.AUTH_LDAP_SYSTEM_USER);
-    final String systemPassword =
-        properties.getProperty(AvailableAppSettings.AUTH_LDAP_SYSTEM_PASSWORD);
-    final String authenticationType =
-        properties.getProperty(AvailableAppSettings.AUTH_LDAP_AUTH_TYPE);
+        properties.getOrDefault(AvailableAppSettings.AUTH_LDAP_USER_DN_FORMAT, null);
+    final String systemDn = properties.get(AvailableAppSettings.AUTH_LDAP_SYSTEM_USER);
+    final String systemPassword = properties.get(AvailableAppSettings.AUTH_LDAP_SYSTEM_PASSWORD);
+    final String authenticationType = properties.get(AvailableAppSettings.AUTH_LDAP_AUTH_TYPE);
     final boolean useSSL =
-        Optional.ofNullable(properties.getProperty(AvailableAppSettings.AUTH_LDAP_USE_SSL, null))
+        Optional.ofNullable(properties.getOrDefault(AvailableAppSettings.AUTH_LDAP_USE_SSL, null))
             .map(Boolean::parseBoolean)
             .orElseGet(() -> ldapUrl != null && ldapUrl.toLowerCase().startsWith("ldaps:"));
     final boolean useStartTLS =
-        Boolean.parseBoolean(properties.getProperty(AvailableAppSettings.AUTH_LDAP_USE_STARTTLS));
-    final String trustStore =
-        properties.getProperty(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_TRUST_STORE);
-    final String keyStore =
-        properties.getProperty(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_KEY_STORE);
+        Boolean.parseBoolean(properties.get(AvailableAppSettings.AUTH_LDAP_USE_STARTTLS));
+    final String trustStore = properties.get(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_TRUST_STORE);
+    final String keyStore = properties.get(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_KEY_STORE);
     final String trustCertificates =
-        properties.getProperty(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_TRUST_CERTIFICATES);
+        properties.get(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_TRUST_CERTIFICATES);
     final Duration connectTimeout =
-        Optional.ofNullable(properties.getProperty(AvailableAppSettings.AUTH_LDAP_CONNECT_TIMEOUT))
+        Optional.ofNullable(properties.get(AvailableAppSettings.AUTH_LDAP_CONNECT_TIMEOUT))
             .filter(StringUtils::notBlank)
             .map(Long::parseLong)
             .map(Duration::ofSeconds)
             .orElse(null);
     final Duration responseTimeout =
-        Optional.ofNullable(properties.getProperty(AvailableAppSettings.AUTH_LDAP_RESPONSE_TIMEOUT))
+        Optional.ofNullable(properties.get(AvailableAppSettings.AUTH_LDAP_RESPONSE_TIMEOUT))
             .filter(StringUtils::notBlank)
             .map(Long::parseLong)
             .map(Duration::ofSeconds)
@@ -152,12 +147,11 @@ public class AxelorLdapProfileService extends LdapProfileService implements Axel
 
     if (StringUtils.notBlank(trustStore) || StringUtils.notBlank(keyStore)) {
       final String storePassword =
-          properties.getProperty(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_STORE_PASSWORD);
-      final String storeType =
-          properties.getProperty(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_STORE_TYPE);
+          properties.get(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_STORE_PASSWORD);
+      final String storeType = properties.get(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_STORE_TYPE);
       final String[] storeAliases =
           Optional.ofNullable(
-                  properties.getProperty(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_STORE_ALIASES))
+                  properties.get(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_STORE_ALIASES))
               .map(storeAliasesProperty -> storeAliasesProperty.split("\\s*,\\s*"))
               .orElse(null);
       final KeyStoreCredentialConfig keyStoreCredentialConfig = new KeyStoreCredentialConfig();
@@ -175,10 +169,9 @@ public class AxelorLdapProfileService extends LdapProfileService implements Axel
       credentialConfig = keyStoreCredentialConfig;
     } else if (StringUtils.notBlank(trustCertificates)) {
       final String authenticationCertificate =
-          properties.getProperty(
-              AvailableAppSettings.AUTH_LDAP_CREDENTIAL_AUTHENTICATION_CERTIFICATE);
+          properties.get(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_AUTHENTICATION_CERTIFICATE);
       final String authenticationKey =
-          properties.getProperty(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_AUTHENTICATION_KEY);
+          properties.get(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_AUTHENTICATION_KEY);
       final X509CredentialConfig x509CredentialConfig = new X509CredentialConfig();
       x509CredentialConfig.setTrustCertificates(trustCertificates);
       x509CredentialConfig.setAuthenticationCertificate(authenticationCertificate);
@@ -188,8 +181,8 @@ public class AxelorLdapProfileService extends LdapProfileService implements Axel
       credentialConfig = null;
     }
 
-    groupsDn = properties.getProperty(AvailableAppSettings.AUTH_LDAP_GROUP_BASE);
-    groupFilter = properties.getProperty(AvailableAppSettings.AUTH_LDAP_GROUP_FILTER);
+    groupsDn = properties.get(AvailableAppSettings.AUTH_LDAP_GROUP_BASE);
+    groupFilter = properties.get(AvailableAppSettings.AUTH_LDAP_GROUP_FILTER);
 
     if (credentialConfig != null) {
       sslConfig = new SslConfig(credentialConfig);

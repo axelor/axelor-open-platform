@@ -21,7 +21,6 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.logging.LoggerConfiguration;
 import java.util.Properties;
-import java.util.function.Predicate;
 
 /** Helper to install/uninstall application logger. */
 public final class AppLogger {
@@ -33,9 +32,8 @@ public final class AppLogger {
   private static LoggerConfiguration createLoggerConfig() {
     final AppSettings settings = AppSettings.get();
     final Properties loggingConfig = new Properties();
-    final Predicate<String> isLogging = (n) -> n.startsWith("logging.");
-    settings.getProperties().stringPropertyNames().stream()
-        .filter(isLogging)
+    settings
+        .getPropertiesKeysStartingWith("logging.")
         .forEach(
             n -> {
               loggingConfig.setProperty(n, settings.get(n));

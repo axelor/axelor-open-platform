@@ -37,7 +37,6 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import javax.script.SimpleBindings;
 
@@ -197,11 +196,12 @@ public class ScriptBindings extends SimpleBindings {
     public ConfigContext() {
       if (CONFIG == null) {
         CONFIG = new HashMap<>();
-        final Properties properties = AppSettings.get().getProperties();
-        for (final Object item : properties.keySet()) {
-          final String name = item.toString();
-          final String expr = properties.getProperty(name);
-          if (!name.startsWith("context.") || isBlank(expr)) {
+        final Map<String, String> ctxProperties =
+            AppSettings.get().getPropertiesStartingWith("context.");
+        for (final Entry<String, String> entry : ctxProperties.entrySet()) {
+          final String name = entry.getKey();
+          final String expr = entry.getValue();
+          if (isBlank(expr)) {
             continue;
           }
           CONFIG.put(name.substring(8), expr);

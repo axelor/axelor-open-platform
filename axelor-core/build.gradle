@@ -78,3 +78,8 @@ dependencies {
     exclude group: 'org.slf4j', module: 'slf4j-simple'
   }
 }
+
+test {
+  // Avoid Warnings for Reflective Access in `AppSettingsTest`
+  jvmArgs = ["--add-opens", "java.base/java.util=ALL-UNNAMED", "--add-opens", "java.base/java.lang=ALL-UNNAMED"]
+}

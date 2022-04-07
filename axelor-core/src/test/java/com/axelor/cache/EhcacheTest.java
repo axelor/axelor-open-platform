@@ -15,7 +15,7 @@ public class EhcacheTest extends AbstractBaseCache {
       TestingHelpers.resetSettings();
 
       AppSettings.get()
-          .getProperties()
+          .getInternalProperties()
           .put(ConfigSettings.PROVIDER, "org.ehcache.jsr107.EhcacheCachingProvider");
 
       super.configure();

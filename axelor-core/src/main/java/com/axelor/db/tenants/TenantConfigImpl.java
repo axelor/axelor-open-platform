@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -80,9 +79,9 @@ public class TenantConfigImpl implements TenantConfig {
 
   private TenantConfigImpl() {}
 
-  public static List<TenantConfig> findByHost(Properties props, String host) {
+  public static List<TenantConfig> findByHost(Map<String, String> props, String host) {
     final List<TenantConfig> all = new ArrayList<>();
-    for (String key : props.stringPropertyNames()) {
+    for (String key : props.keySet()) {
       Matcher matcher = PATTERN_DB_NAME.matcher(key);
       if (matcher.matches()) {
         String tenantId = matcher.group(1);
@@ -106,7 +105,7 @@ public class TenantConfigImpl implements TenantConfig {
     return all;
   }
 
-  public static TenantConfig findById(Properties props, String tenantId) {
+  public static TenantConfig findById(Map<String, String> props, String tenantId) {
     if (CONFIGS.containsKey(tenantId)) {
       return CONFIGS.get(tenantId);
     }
@@ -141,15 +140,15 @@ public class TenantConfigImpl implements TenantConfig {
     return cfg;
   }
 
-  private static boolean matches(Properties props, String tenantId, String host) {
+  private static boolean matches(Map<String, String> props, String tenantId, String host) {
     final String key = "db." + tenantId + ".hosts";
-    final String hosts = props.getProperty(key, "");
+    final String hosts = props.getOrDefault(key, "");
     return StringUtils.isBlank(hosts) || Arrays.asList(hosts.split(",")).contains(host);
   }
 
-  private static String get(Properties props, String prefix, String name) {
+  private static String get(Map<String, String> props, String prefix, String name) {
     String key = prefix + "." + name;
-    String val = props.getProperty(key);
+    String val = props.get(key);
     return StringUtils.isBlank(val) ? null : val;
   }
 

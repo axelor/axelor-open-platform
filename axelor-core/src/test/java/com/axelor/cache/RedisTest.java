@@ -27,7 +27,7 @@ public class RedisTest extends AbstractBaseCache {
       startRedis();
 
       AppSettings.get()
-          .getProperties()
+          .getInternalProperties()
           .put(Environment.CACHE_REGION_FACTORY, "org.redisson.hibernate.RedissonRegionFactory");
 
       super.configure();

@@ -16,7 +16,7 @@ public class HazelcastTest extends AbstractBaseCache {
 
       System.setProperty("hazelcast.ignoreXxeProtectionFailures", "true");
       AppSettings.get()
-          .getProperties()
+          .getInternalProperties()
           .put(ConfigSettings.PROVIDER, "com.hazelcast.cache.impl.HazelcastServerCachingProvider");
 
       super.configure();

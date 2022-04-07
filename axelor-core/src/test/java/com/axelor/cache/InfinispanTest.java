@@ -20,7 +20,7 @@ public class InfinispanTest extends AbstractBaseCache {
     protected void configure() {
       TestingHelpers.resetSettings();
 
-      AppSettings.get().getProperties().put(Environment.CACHE_REGION_FACTORY, "infinispan");
+      AppSettings.get().getInternalProperties().put(Environment.CACHE_REGION_FACTORY, "infinispan");
 
       super.configure();
     }

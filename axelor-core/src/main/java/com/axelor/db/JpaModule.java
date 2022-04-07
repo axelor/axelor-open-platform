@@ -132,8 +132,8 @@ public class JpaModule extends AbstractModule {
     }
 
     // update properties with all hibernate.* settings from app configuration
-    settings.getProperties().stringPropertyNames().stream()
-        .filter(n -> n.startsWith("hibernate."))
+    settings
+        .getPropertiesKeysStartingWith("hibernate.")
         .forEach(n -> properties.put(n, settings.get(n)));
 
     configureCache(settings, properties);

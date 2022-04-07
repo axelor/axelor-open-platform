@@ -64,17 +64,15 @@ public abstract class AuthPac4jModuleMultiClient extends AuthPac4jModuleLocal {
     final Map<String, Map<String, String>> all = new LinkedHashMap<>();
     final AppSettings settings = AppSettings.get();
 
-    for (final String key : settings.getProperties().stringPropertyNames()) {
-      if (key.startsWith(prefix)) {
-        final String[] parts = key.substring(prefix.length()).split("\\.", 2);
-        if (parts.length > 1) {
-          final String provider = parts[0];
-          final String config = parts[1];
-          final String value = settings.get(key);
-          if (StringUtils.notBlank(value)) {
-            final Map<String, String> map = all.computeIfAbsent(provider, k -> new HashMap<>());
-            map.put(config, value);
-          }
+    for (final String key : settings.getPropertiesKeysStartingWith(prefix)) {
+      final String[] parts = key.substring(prefix.length()).split("\\.", 2);
+      if (parts.length > 1) {
+        final String provider = parts[0];
+        final String config = parts[1];
+        final String value = settings.get(key);
+        if (StringUtils.notBlank(value)) {
+          final Map<String, String> map = all.computeIfAbsent(provider, k -> new HashMap<>());
+          map.put(config, value);
         }
       }
     }

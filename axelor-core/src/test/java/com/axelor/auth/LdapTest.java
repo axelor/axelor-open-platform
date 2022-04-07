@@ -34,7 +34,8 @@ import com.axelor.auth.pac4j.AxelorLdapProfileService;
 import com.axelor.test.GuiceExtension;
 import com.axelor.test.GuiceModules;
 import com.google.inject.persist.Transactional;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 import javax.inject.Inject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Order;
@@ -61,7 +62,7 @@ public class LdapTest {
     @Override
     protected void configure() {
 
-      Properties properties = new Properties();
+      Map<String, String> properties = new HashMap<>();
 
       properties.put(
           AvailableAppSettings.AUTH_LDAP_SERVER_URL,

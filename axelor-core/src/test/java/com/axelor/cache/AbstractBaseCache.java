@@ -46,24 +46,24 @@ public abstract class AbstractBaseCache extends JpaTest {
     protected void configure() {
       // Enable cache as `ENABLE_SELECTIVE`
       AppSettings.get()
-          .getProperties()
+          .getInternalProperties()
           .put(
               AvailableAppSettings.JAVAX_PERSISTENCE_SHAREDCACHE_MODE,
               SharedCacheMode.ENABLE_SELECTIVE.toString());
       // Enable statistics
       AppSettings.get()
-          .getProperties()
+          .getInternalProperties()
           .put(AvailableSettings.GENERATE_STATISTICS, Boolean.TRUE.toString());
       // Use `read-write` cache strategy
       AppSettings.get()
-          .getProperties()
+          .getInternalProperties()
           .put(
               AvailableSettings.DEFAULT_CACHE_CONCURRENCY_STRATEGY,
               AccessType.READ_WRITE.getExternalName());
 
       // Avoid warning `created-on-the-fly`
       AppSettings.get()
-          .getProperties()
+          .getInternalProperties()
           .put("hibernate.javax.cache.missing_cache_strategy", "create");
 
       super.configure();
