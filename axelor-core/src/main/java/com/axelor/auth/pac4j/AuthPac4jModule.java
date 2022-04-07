@@ -22,6 +22,8 @@ import com.axelor.auth.pac4j.ldap.AxelorLdapProfileService;
 import com.axelor.auth.pac4j.local.AxelorAjaxRequestResolver;
 import com.axelor.auth.pac4j.local.AxelorDirectBasicAuthClient;
 import com.axelor.auth.pac4j.local.AxelorFormClient;
+import com.axelor.auth.pac4j.local.AxelorIndirectBasicAuthClient;
+import com.axelor.auth.pac4j.local.BasicAuthCallbackClientFinder;
 import com.axelor.auth.pac4j.local.JsonExtractor;
 import com.google.inject.Key;
 import com.google.inject.Provides;
@@ -30,6 +32,7 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import javax.servlet.ServletContext;
 import org.apache.shiro.authc.AuthenticationListener;
@@ -40,11 +43,13 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
+import org.pac4j.core.client.finder.DefaultCallbackClientFinder;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.credentials.extractor.FormExtractor;
 import org.pac4j.core.http.ajax.AjaxRequestResolver;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.indirect.FormClient;
+import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.ldap.profile.service.LdapProfileService;
 
 public class AuthPac4jModule extends ShiroWebModule {
@@ -90,6 +95,7 @@ public class AuthPac4jModule extends ShiroWebModule {
     bindAndExpose(FormExtractor.class).to(JsonExtractor.class);
     bindAndExpose(AjaxRequestResolver.class).to(AxelorAjaxRequestResolver.class);
 
+    bindAndExpose(IndirectBasicAuthClient.class).to(AxelorIndirectBasicAuthClient.class);
     bindAndExpose(DirectBasicAuthClient.class).to(AxelorDirectBasicAuthClient.class);
 
     bindAndExpose(LdapProfileService.class).to(AxelorLdapProfileService.class);
@@ -127,5 +133,18 @@ public class AuthPac4jModule extends ShiroWebModule {
     securityManager.setRememberMeManager(rememberMeManager);
 
     return securityManager;
+  }
+
+  @Provides
+  public DefaultCallbackClientFinder callbackClientFinder(List<Client> clients) {
+    final Optional<String> clientName =
+        clients.stream()
+            .filter(IndirectBasicAuthClient.class::isInstance)
+            .findFirst()
+            .map(Client::getName);
+    if (clientName.isPresent()) {
+      return new BasicAuthCallbackClientFinder(clientName.get());
+    }
+    return new DefaultCallbackClientFinder();
   }
 }

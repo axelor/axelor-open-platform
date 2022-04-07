@@ -23,6 +23,7 @@ import io.buji.pac4j.profile.ShiroProfileManager;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import javax.inject.Inject;
+import org.pac4j.core.client.finder.DefaultCallbackClientFinder;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.JEEContext;
 import org.pac4j.core.context.session.SessionStore;
@@ -44,9 +45,11 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic<Object, JEEContext
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   @Inject
-  public AxelorCallbackLogic(AxelorCsrfMatcher csrfMatcher) {
+  public AxelorCallbackLogic(
+      AxelorCsrfMatcher csrfMatcher, DefaultCallbackClientFinder clientFinder) {
     this.csrfMatcher = csrfMatcher;
     setProfileManagerFactory(ShiroProfileManager::new);
+    setClientFinder(clientFinder);
   }
 
   @Override

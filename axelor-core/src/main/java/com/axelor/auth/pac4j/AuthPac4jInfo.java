@@ -42,6 +42,7 @@ import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.indirect.FormClient;
+import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 
 @Singleton
 public class AuthPac4jInfo {
@@ -91,7 +92,10 @@ public class AuthPac4jInfo {
           Beans.get(Clients.class).getClients().stream()
               .filter(
                   client ->
-                      Stream.of(FormClient.class, DirectBasicAuthClient.class)
+                      Stream.of(
+                              FormClient.class,
+                              DirectBasicAuthClient.class,
+                              IndirectBasicAuthClient.class)
                           .noneMatch(cls -> cls.isInstance(client)))
               .map(Client::getName)
               .collect(Collectors.toCollection(LinkedHashSet::new));

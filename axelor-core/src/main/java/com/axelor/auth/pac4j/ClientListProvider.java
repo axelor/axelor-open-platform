@@ -46,6 +46,7 @@ import org.pac4j.core.client.IndirectClient;
 import org.pac4j.core.http.url.DefaultUrlResolver;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.indirect.FormClient;
+import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.ldap.profile.service.LdapProfileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -243,7 +244,10 @@ public class ClientListProvider implements Provider<List<Client>> {
 
     clients.addAll(centralClients);
 
-    if (settings.getBoolean(AvailableAppSettings.AUTH_LOCAL_BASIC_AUTH_ENABLED, !exclusive)) {
+    if (settings.getBoolean(AvailableAppSettings.AUTH_LOCAL_INDIRECT_BASIC_AUTH_ENABLED, false)) {
+      clients.add(Beans.get(IndirectBasicAuthClient.class));
+    }
+    if (settings.getBoolean(AvailableAppSettings.AUTH_LOCAL_DIRECT_BASIC_AUTH_ENABLED, false)) {
       clients.add(Beans.get(DirectBasicAuthClient.class));
     }
 
