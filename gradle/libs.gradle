@@ -262,3 +262,5 @@ libs.tomcat_embed = [
   "org.apache.tomcat.embed:tomcat-embed-jasper:${versions.tomcat_embed}",
   libs.javax_el
 ]
+
+libs.jasypt = "org.jasypt:jasypt:1.9.3"

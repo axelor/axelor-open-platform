@@ -9,12 +9,15 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.jasypt.encryption.StringEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SettingsBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(SettingsBuilder.class);
+
+  private StringEncryptor encryptor;
 
   public SettingsBuilder() {}
 
@@ -23,7 +26,42 @@ public class SettingsBuilder {
     for (AbstractSettingsSource source : getSettingsSources()) {
       values.putAll(source.getProperties());
     }
-    return values;
+    return parseProps(values);
+  }
+
+  private Map<String, String> parseProps(Map<String, String> props) {
+    for (Map.Entry<String, String> entry : props.entrySet()) {
+      if (SettingsUtils.isEncrypted(entry.getValue())) {
+        if (encryptor == null) {
+          // Init encryptor only if encoded values are present
+          // This is time-consuming
+          initEncryptor(props);
+        }
+        decode(entry);
+      }
+    }
+    return props;
+  }
+
+  private void decode(Map.Entry<String, String> entry) {
+    if (!SettingsUtils.isEncrypted(entry.getValue())) {
+      return;
+    }
+
+    try {
+      entry.setValue(
+          encryptor.decrypt(SettingsUtils.unwrapEncryptedValue(entry.getValue().trim())));
+    } catch (Exception e) {
+      LOG.error("a error : ", e);
+      throw new RuntimeException("Unable to decrypt property: " + entry.getKey(), e);
+    }
+  }
+
+  private void initEncryptor(Map<String, String> props) {
+    encryptor =
+        new StringEncryptorBuilder(
+                SettingsUtils.extractProperties(props, SettingsUtils.ENCRYPT_PROPS_PREFIX))
+            .build();
   }
 
   private List<AbstractSettingsSource> getSettingsSources() {

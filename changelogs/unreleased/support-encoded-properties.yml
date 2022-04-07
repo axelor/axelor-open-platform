@@ -1,0 +1,23 @@
+---
+title: Add support to encrypt secrets in properties
+type: feature
+description: |
+  Secrets defined in `axelor-config.properties` can be encrypted. 
+  Value should be wrapped in `ENC()` to indicate that the value is
+  encrypted : `db.default.password = ENC(<some_thing>)`
+  
+  To use encrypted secrets, `props.encryptor.password` properties
+  should be added : this is the secret key used to encrypt/decrypt data.
+  
+  Others optional properties can be added to use custom encryption : 
+  `props.encryptor.algorithm`, `props.encryptor.key-obtention-iterations`, 
+  `props.encryptor.provider-name`, `props.encryptor.provider-class-name`, 
+  `props.encryptor.salt-generator-classname`, `props.encryptor.iv-generator-classname`, 
+  and `props.encryptor.string-output-type`.
+  The default algorithm is `PBEWITHHMACSHA512ANDAES_256`.
+  
+  For convenience, a Gradle task `encryptText` have been added to generate 
+  the encrypted value of a string :
+  `./gradlew :encryptText --text="A secret to encode" --password="MySecureKey"`
+  This will generate for you, the necessary properties and the 
+  encrypted value to used inside `ENC()`.

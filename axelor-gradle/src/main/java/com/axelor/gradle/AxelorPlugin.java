@@ -26,6 +26,7 @@ import com.axelor.gradle.support.PublishSupport;
 import com.axelor.gradle.support.ScriptsSupport;
 import com.axelor.gradle.support.TomcatSupport;
 import com.axelor.gradle.support.WarSupport;
+import com.axelor.gradle.tasks.EncryptTextTask;
 import com.axelor.gradle.tasks.GenerateCode;
 import com.axelor.gradle.tasks.I18nTask;
 import com.axelor.gradle.tasks.UpdateVersion;
@@ -77,6 +78,7 @@ public class AxelorPlugin implements Plugin<Project> {
     configureCodeGeneration(project);
     configureJarSupport(project);
     configureWarSupport(project);
+    configureEncryptionSupport(project);
   }
 
   private boolean isCore(Project project) {
@@ -192,6 +194,18 @@ public class AxelorPlugin implements Plugin<Project> {
                   project
                       .files(sourceSet.getJava().getClassesDirectory().get().getAsFile())
                       .plus(sourceSet.getCompileClasspath()));
+            });
+  }
+
+  private void configureEncryptionSupport(Project project) {
+    project
+        .getTasks()
+        .create(
+            EncryptTextTask.TASK_NAME,
+            EncryptTextTask.class,
+            task -> {
+              task.setDescription(EncryptTextTask.TASK_DESCRIPTION);
+              task.setGroup(EncryptTextTask.TASK_GROUP);
             });
   }
 
