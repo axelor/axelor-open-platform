@@ -19,7 +19,7 @@ public class AppSettingGetPropTest {
     resetSettings();
   }
 
-  // Test with settings defined in src/test/resources/application.properties
+  // Test with settings defined in src/test/resources/axelor-config.properties
 
   @Test
   public void shouldGetOrDefault() {

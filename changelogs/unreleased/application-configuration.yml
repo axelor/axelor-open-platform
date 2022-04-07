@@ -3,7 +3,7 @@ title: Support YAML configuration format, env variables and system properties
 type: feature
 description: |
   Now support YAML format for internal configuration file :
-  `application.properties` can be in YAML format (`yml` or `yaml` ext).
+  `axelor-config.properties` can be in YAML format (`yml` or `yaml` ext).
   It should only have a one internal configuration file (in properties
   or YAML format).
   

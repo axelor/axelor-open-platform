@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * <p>This utility method {@link #migrate()} can be used to migrate encrypted field values if you
  * want to change encryption algorithm or password or salt.
  *
- * <p>Following encryption settings will be read from <code>application.properties</code> for the
+ * <p>Following encryption settings will be read from <code>axelor-config.properties</code> for the
  * migration.
  *
  * <ul>

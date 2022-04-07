@@ -30,9 +30,9 @@ import java.util.regex.Pattern;
 
 /**
  * The default implementation of {@link TenantConfig} uses configuration provided from
- * application.properties.
+ * axelor-config.properties.
  *
- * <p>The format of application.properties are as follows:
+ * <p>The format of axelor-config.properties are as follows:
  *
  * <pre>
  * db.default.visible = false

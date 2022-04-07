@@ -7,7 +7,7 @@ import java.util.Properties;
 
 public class SettingsUtils {
 
-  public static final String CONFIG_FILE_NAME = "application";
+  public static final String CONFIG_FILE_NAME = "axelor-config";
   public static final String EXTERNAL_CONFIG_SYSTEM_PROP = "axelor.config";
   public static final String EXTERNAL_CONFIG_ENV = "AXELOR_CONFIG";
 

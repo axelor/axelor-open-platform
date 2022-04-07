@@ -233,7 +233,7 @@ public class DBHelper {
    * Returns the shared cache mode (ie second-level cache).<br/>
    * <br/>
    * The result of this method corresponds to the <code>javax.persistence.sharedCache.mode</code>
-   * property in <code>application.properties<code/> if defined, else to the <code>shared-cache-mode</code>
+   * property in <code>axelor-config.properties<code/> if defined, else to the <code>shared-cache-mode</code>
    * element in the <code>persistence.xml</code> file.
    *
    * @return the second-level cache mode used

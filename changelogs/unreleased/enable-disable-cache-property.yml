@@ -1,7 +1,7 @@
 ---
-title: Allow to enable/disable cache from `application.properties`
+title: Allow to enable/disable cache from `axelor-config.properties`
 type: feature
 description: |
-  `javax.persistence.sharedCache.mode` property in `application.properties` can be used
+  `javax.persistence.sharedCache.mode` property in `axelor-config.properties` can be used
   to overwrite the `shared-cache-mode` from `persistence.xml`. It allow to enable/disable
   the shared cache mode (ie second-level cache).

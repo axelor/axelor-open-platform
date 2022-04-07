@@ -149,7 +149,7 @@ public class AppCli {
       try {
         service.migrate();
         println("Field encryption complete.");
-        println("Remove 'encryption.password.old' from 'application.properties'");
+        println("Remove 'encryption.password.old' from 'axelor-config.properties'");
         return 0;
       } catch (Exception e) {
         println("field value encryption failed.");

@@ -51,7 +51,7 @@ public class DBManager {
     log.info("Start field value encryption...");
     service.migrate();
     log.info("Field value encryption complete.");
-    log.info("Remove 'encryption.password.old' from 'application.properties'");
+    log.info("Remove 'encryption.password.old' from 'axelor-config.properties'");
   }
 
   private static void migrate() {
