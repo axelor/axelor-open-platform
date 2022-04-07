@@ -26,25 +26,108 @@ The most important of them is `axelor-config.properties`.
 
 == Application Configuration
 
-The `axelor-config.properties` provides various configuration options for the
-application. It's located under `src/main/resources/META-INF` directory of the
+AOP reads configuration values from multiple sources (in this ascendant order):
+
+* Internal configuration file under `src/main/resources`.
+* External configuration file using `AXELOR_CONFIG` environment variable
+or `axelor.config` system property.
+* Environment variables prefixed with `AXELOR_CONFIG_`
+* System properties prefixed with `axelor.config.`
+
+Each of these sources overrides values of the previous. The final configuration is the
+aggregation of the properties defined by all these sources.
+For example, a property configured using an environment property  overrides the value
+provided using the axelor-config.properties file.
+
+=== Internal configuration
+
+The main `axelor-config.properties` provides various configuration values for the
+application. It's located under `src/main/resources` directory of the
 application project.
 
-However, the application configuration can be provided from some external
-location using a JVM option.
+Note that this internal configuration file is optional.
+
+YAML format is also supported. `axelor-config.properties` can be in YAML format
+(`yml` or `yaml` ext). It should only have a one internal configuration file
+(in properties or YAML format).
+
+=== External configuration
+
+The external configuration file is similar to the internal configuration file.
+It can a properties file or a YAML file format.
+
+To use external configuration file, either add `AXELOR_CONFIG` environment variable
+or `axelor.config` system property. Note that system properties gets preferences
+over the environment variable
 
 [source,sh]
 ----
 $ export JAVA_OPTS="-Daxelor.config=/path/to/dev.properties"
 ----
 
-We can also provide configuration values using system properties using
-`axelor.config.<settings-name>` pattern like this:
+=== Environment variables
+
+Environment variables should be prefixed by `AXELOR_CONFIG_`.
+It uses the `AXELOR_CONFIG_<key>=value` format, where `<key>` is underscored
+uppercase equivalent of the configuration key. For example
+`db.default.user` becomes `AXELOR_CONFIG_DB_DEFAULT_USER`.
+
+[source,sh]
+----
+$ export AXELOR_CONFIG_DB_DEFAULT_PASSWORD=secret"
+----
+
+=== System properties
+
+System properties can be handed to the application through the `-D` flag during startup
+System properties should be prefixed by `axelor.config.`.
+It uses the `axelor.config<key>=value` format, where `<key>` is a setting name.
 
 [source,sh]
 ----
 $ export JAVA_OPTS="-Daxelor.config.db.default.password=secret"
 ----
+
+=== Encoded properties
+
+Configuration values can be encrypted. Value should be wrapped in `ENC()` to indicate
+that the value is encrypted : `db.default.password = ENC(<some_thing>)`
+
+To use encrypted secrets, `props.encryptor.password` properties
+should be added : this is the secret key used to encrypt/decrypt data.
+
+Others optional properties can be added to use custom encryption :
+
+* `props.encryptor.algorithm` :Algorithm to be used by the encryptor
+* `props.encryptor.key-obtention-iterations` : Number of hashing iterations to obtain the signing key
+* `props.encryptor.provider-name` : Name of the security provider to be asked for the encryption algorithm
+* `props.encryptor.provider-class-name` : Security provider to be used for obtaining the encryption algorithm
+* `props.encryptor.salt-generator-classname` : Salt generator to be used by the encryptor
+* `props.encryptor.iv-generator-classname` : IV generator to be used by the encryptor
+* `props.encryptor.string-output-type` : Sets the form in which String output will be encoded
+
+The default algorithm is `PBEWITHHMACSHA512ANDAES_256`. Most of the time,
+default encryption settings will be enough.
+
+For convenience, a Gradle task `encryptText` have been added to generate
+the encrypted value of a string :
+
+[source,bash]
+----
+$ ./gradlew :axelor-core:encryptText --text="A secret to encode" --password="MySecureKey"
+
+-------Configs-------
+props.encryptor.password = MySecureKey
+
+WARNING : Do not add property `props.encryptor.password` with the password in your configuration file.
+Use a reference to an external file : `file:<path_to_file>` as password value.
+
+-------OUTPUT-------
+EFevga4IJ68kgt+YS8nuRXt/7TmvL94aVGCU2l5WeBLDn4ie8tZM7UjypiBZA4rCTv4VogKAB1wRAJZpa3q12w==
+----
+
+This will generate for you, the necessary properties and the
+encrypted value to used inside `ENC()`.
 
 == Database Settings
 

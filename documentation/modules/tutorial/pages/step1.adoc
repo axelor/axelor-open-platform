@@ -161,7 +161,7 @@ $ ./gradlew build
 
 We also need to create following configuration files:
 
-. `src/main/resources/META-INF/axelor-config.properties` - the application config file
+. `src/main/resources/axelor-config.properties` - the application config file
 . `src/main/resources/META-INF/persistence.xml` - the jpa configuration file
 
 Please follow the xref:dev-guide:application/config.adoc[app configuration] guide for more details.

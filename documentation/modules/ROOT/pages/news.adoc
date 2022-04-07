@@ -15,7 +15,7 @@ This release has many breaking changes as we migrated to JDK-11.
 * Remove the experimental hotswap-agent support (as it was very buggy)
 * Drop removable modules support (this feature was hardly used)
 * The application configuration is now optional
-* The application configuration file is now named `META-INF/axelor-config.properties`
+* The application configuration file is now named `axelor-config.properties`
 * The application configuration can be defined via file, system props and environment vars
 
 == New Features
