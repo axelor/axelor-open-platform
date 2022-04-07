@@ -160,6 +160,7 @@ public interface AvailableAppSettings {
   String AUTH_USER_PROVISIONING = "auth.user.provisioning";
   String AUTH_USER_DEFAULT_GROUP = "auth.user.default.group";
   String AUTH_USER_PRINCIPAL_ATTRIBUTE = "auth.user.principal.attribute";
+  String AUTH_ORDER = "auth.order";
 
   String AUTH_LOGOUT_URL = "auth.logout.url";
   String AUTH_LOGOUT_URL_PATTERN = "auth.logout.url.pattern";

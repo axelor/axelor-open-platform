@@ -21,6 +21,7 @@ package com.axelor.auth.pac4j;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.Inflector;
+import com.axelor.common.ObjectUtils;
 import com.axelor.inject.Beans;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Provider;
@@ -178,7 +179,7 @@ public class ClientListProvider implements Provider<List<Client>> {
 
   @Inject
   public ClientListProvider(AuthPac4jInfo authPac4jInfo) {
-    final Map<String, Map<String, Object>> configs = new LinkedHashMap<>();
+    final Map<String, Map<String, Object>> initConfigs = new LinkedHashMap<>();
     final AppSettings settings = AppSettings.get();
     final Map<String, String> properties = settings.getInternalProperties();
     final String ldapServerUrl = settings.get(AvailableAppSettings.AUTH_LDAP_SERVER_URL, null);
@@ -197,12 +198,12 @@ public class ClientListProvider implements Provider<List<Client>> {
         String config = Inflector.getInstance().camelize(matcher.group("config"), true);
         Object value =
             SETTINGS_GETTERS.getOrDefault(config, (s, k) -> s.get(k, null)).apply(settings, key);
-        configs.computeIfAbsent(name, k -> new HashMap<>()).put(config, value);
+        initConfigs.computeIfAbsent(name, k -> new HashMap<>()).put(config, value);
       }
     }
 
     // set default values
-    configs
+    initConfigs
         .entrySet()
         .forEach(
             entry -> {
@@ -219,6 +220,23 @@ public class ClientListProvider implements Provider<List<Client>> {
               props.computeIfAbsent("exclusive", k -> config.isExclusive());
               props.computeIfAbsent("absoluteUrlRequired", k -> config.isAbsoluteUrlRequired());
             });
+
+    // order of providers displayed on login form
+    final Map<String, Map<String, Object>> configs;
+    final List<String> authOrder = settings.getList(AvailableAppSettings.AUTH_ORDER);
+    if (ObjectUtils.isEmpty(authOrder)) {
+      configs = initConfigs;
+    } else {
+      configs = new LinkedHashMap<>();
+      authOrder.forEach(
+          name -> {
+            final Map<String, Object> config = initConfigs.remove(name);
+            if (config != null) {
+              configs.put(name, config);
+            }
+          });
+      configs.putAll(initConfigs);
+    }
 
     @SuppressWarnings("rawtypes")
     final List<Client> centralClients =
