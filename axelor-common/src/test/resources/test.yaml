@@ -1,0 +1,10 @@
+---
+test: James
+name:
+  sub:
+    my-foo: Foo
+    my-bar: Bar
+    #ignore: true
+list:
+  - one
+  - two
