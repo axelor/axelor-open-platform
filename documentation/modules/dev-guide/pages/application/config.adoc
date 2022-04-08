@@ -107,14 +107,20 @@ Others optional properties can be added to use custom encryption :
 * `props.encryptor.string-output-type` : Sets the form in which String output will be encoded
 
 The default algorithm is `PBEWITHHMACSHA512ANDAES_256`. Most of the time,
-default encryption settings will be enough.
+default encryption configuration will be enough.
 
-For convenience, a Gradle task `encryptText` have been added to generate
-the encrypted value of a string :
+For convenience, 2 Gradle task has been added to deal with encryption :
+
+* `encryptText` : Encrypt a single given String
+* `encryptFile` : Search and encrypt for values wrapped with `ENC()` in configuration file
+
+==== Task 'encryptText'
+
+To encrypt a single given String, run:
 
 [source,bash]
 ----
-$ ./gradlew :axelor-core:encryptText --text="A secret to encode" --password="MySecureKey"
+$ ./gradlew :encryptText --text="A secret to encode" --password="MySecureKey"
 
 -------Configs-------
 props.encryptor.password = MySecureKey
@@ -128,6 +134,31 @@ EFevga4IJ68kgt+YS8nuRXt/7TmvL94aVGCU2l5WeBLDn4ie8tZM7UjypiBZA4rCTv4VogKAB1wRAJZp
 
 This will generate for you, the necessary properties and the
 encrypted value to used inside `ENC()`.
+
+==== Task 'encryptFile'
+
+To search and encrypt all properties wrapped with `ENC()` in configuration file, run:
+
+[source,bash]
+----
+$ ./gradlew :encryptFile --password="MySecureKey"
+
+-------Configs-------
+props.encryptor.password = MySecureKey
+
+WARNING : Do not add property `props.encryptor.password` with the password in your configuration file.
+Use a reference to an external file : `file:<path_to_file>` as password value.
+
+-------OUTPUT-------
+Found and encrypt 1 setting(s) : db.default.password
+----
+
+This will encrypt all settings in the configuration file for you.
+By default, it looks for a configuration file in current project. If needed,
+that file can be overridden with parameter `--file="<path_to_file>"`.
+Encryption settings (`algorithm`, `key-obtention-iterations`, ...) are
+determinate from that configuration file. This can be overridden with
+CLI arguments : `--algorithm="PBEWithMD5AndTripleDES"`, ...
 
 == Database Settings
 

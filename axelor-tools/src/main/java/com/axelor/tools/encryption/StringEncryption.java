@@ -1,3 +1,20 @@
+/*
+ * Axelor Business Solutions
+ *
+ * Copyright (C) 2005-2022 Axelor (<http://axelor.com>).
+ *
+ * This program is free software: you can redistribute it and/or  modify
+ * it under the terms of the GNU Affero General Public License, version 3,
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.axelor.tools.encryption;
 
 import com.axelor.common.StringUtils;
@@ -17,6 +34,8 @@ public class StringEncryption {
   private String ivGeneratorClassname = "org.jasypt.iv.RandomIvGenerator";
   private String stringOutputType;
 
+  private PBEStringEncryptor encryptor;
+
   public StringEncryption(
       String password,
       String algorithm,
@@ -34,6 +53,7 @@ public class StringEncryption {
     set(this::setSaltGeneratorClassname, saltGeneratorClassname);
     set(this::setIvGeneratorClassname, ivGeneratorClassname);
     set(this::setStringOutputType, stringOutputType);
+    encryptor = createEncryptor();
   }
 
   private void set(Consumer<String> consumer, String value) {
@@ -44,7 +64,6 @@ public class StringEncryption {
   }
 
   public String encrypt(String message) {
-    PBEStringEncryptor encryptor = createEncryptor();
     return encryptor.encrypt(message);
   }
 

@@ -26,6 +26,8 @@ import com.axelor.gradle.support.PublishSupport;
 import com.axelor.gradle.support.ScriptsSupport;
 import com.axelor.gradle.support.TomcatSupport;
 import com.axelor.gradle.support.WarSupport;
+import com.axelor.gradle.tasks.AbstractEncryptTask;
+import com.axelor.gradle.tasks.EncryptFileTask;
 import com.axelor.gradle.tasks.EncryptTextTask;
 import com.axelor.gradle.tasks.GenerateCode;
 import com.axelor.gradle.tasks.I18nTask;
@@ -205,7 +207,17 @@ public class AxelorPlugin implements Plugin<Project> {
             EncryptTextTask.class,
             task -> {
               task.setDescription(EncryptTextTask.TASK_DESCRIPTION);
-              task.setGroup(EncryptTextTask.TASK_GROUP);
+              task.setGroup(AbstractEncryptTask.TASK_GROUP);
+            });
+
+    project
+        .getTasks()
+        .create(
+            EncryptFileTask.TASK_NAME,
+            EncryptFileTask.class,
+            task -> {
+              task.setDescription(EncryptFileTask.TASK_DESCRIPTION);
+              task.setGroup(AbstractEncryptTask.TASK_GROUP);
             });
   }
 
