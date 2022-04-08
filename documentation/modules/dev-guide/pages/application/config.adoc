@@ -93,18 +93,18 @@ $ export JAVA_OPTS="-Daxelor.config.db.default.password=secret"
 Configuration values can be encrypted. Value should be wrapped in `ENC()` to indicate
 that the value is encrypted : `db.default.password = ENC(<some_thing>)`
 
-To use encrypted secrets, `props.encryptor.password` properties
+To use encrypted secrets, `config.encryptor.password` properties
 should be added : this is the secret key used to encrypt/decrypt data.
 
 Others optional properties can be added to use custom encryption :
 
-* `props.encryptor.algorithm` :Algorithm to be used by the encryptor
-* `props.encryptor.key-obtention-iterations` : Number of hashing iterations to obtain the signing key
-* `props.encryptor.provider-name` : Name of the security provider to be asked for the encryption algorithm
-* `props.encryptor.provider-class-name` : Security provider to be used for obtaining the encryption algorithm
-* `props.encryptor.salt-generator-classname` : Salt generator to be used by the encryptor
-* `props.encryptor.iv-generator-classname` : IV generator to be used by the encryptor
-* `props.encryptor.string-output-type` : Sets the form in which String output will be encoded
+* `config.encryptor.algorithm` :Algorithm to be used by the encryptor
+* `config.encryptor.key-obtention-iterations` : Number of hashing iterations to obtain the signing key
+* `config.encryptor.provider-name` : Name of the security provider to be asked for the encryption algorithm
+* `config.encryptor.provider-class-name` : Security provider to be used for obtaining the encryption algorithm
+* `config.encryptor.salt-generator-classname` : Salt generator to be used by the encryptor
+* `config.encryptor.iv-generator-classname` : IV generator to be used by the encryptor
+* `config.encryptor.string-output-type` : Sets the form in which String output will be encoded
 
 The default algorithm is `PBEWITHHMACSHA512ANDAES_256`. Most of the time,
 default encryption configuration will be enough.
@@ -123,9 +123,9 @@ To encrypt a single given String, run:
 $ ./gradlew :encryptText --text="A secret to encode" --password="MySecureKey"
 
 -------Configs-------
-props.encryptor.password = MySecureKey
+config.encryptor.password = MySecureKey
 
-WARNING : Do not add property `props.encryptor.password` with the password in your configuration file.
+WARNING : Do not add property `config.encryptor.password` with the password in your configuration file.
 Use a reference to an external file : `file:<path_to_file>` as password value.
 
 -------OUTPUT-------
@@ -144,9 +144,9 @@ To search and encrypt all properties wrapped with `ENC()` in configuration file,
 $ ./gradlew :encryptFile --password="MySecureKey"
 
 -------Configs-------
-props.encryptor.password = MySecureKey
+config.encryptor.password = MySecureKey
 
-WARNING : Do not add property `props.encryptor.password` with the password in your configuration file.
+WARNING : Do not add property `config.encryptor.password` with the password in your configuration file.
 Use a reference to an external file : `file:<path_to_file>` as password value.
 
 -------OUTPUT-------

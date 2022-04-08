@@ -38,7 +38,7 @@ public abstract class AbstractEncryptTask extends DefaultTask {
 
   public static final String TASK_GROUP = AxelorPlugin.AXELOR_BUILD_GROUP;
 
-  public static final String ENCRYPT_PROPS_PREFIX = "props.encryptor";
+  public static final String CONFIG_ENCRYPTOR_PREFIX = "config.encryptor";
 
   public static final String PASSWORD_KEY = "password";
   public static final String ALGORITHM_KEY = "algorithm";
@@ -125,6 +125,7 @@ public abstract class AbstractEncryptTask extends DefaultTask {
   }
 
   public abstract void doEncrypt();
+
   public abstract void printOutput();
 
   public void end() {
@@ -169,7 +170,7 @@ public abstract class AbstractEncryptTask extends DefaultTask {
     Map<String, String> properties = parseProperties(this.configurationPath);
     assignDefaultProperties(
         properties.entrySet().stream()
-            .filter(e -> e.getKey().startsWith(ENCRYPT_PROPS_PREFIX))
+            .filter(e -> e.getKey().startsWith(CONFIG_ENCRYPTOR_PREFIX))
             .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)));
   }
 
@@ -232,7 +233,7 @@ public abstract class AbstractEncryptTask extends DefaultTask {
   }
 
   private String extractProp(Map<String, String> props, String key) {
-    return props.get(ENCRYPT_PROPS_PREFIX + "." + key);
+    return props.get(CONFIG_ENCRYPTOR_PREFIX + "." + key);
   }
 
   private void printConfigs() {
@@ -248,17 +249,17 @@ public abstract class AbstractEncryptTask extends DefaultTask {
     printConfig(this.stringOutputType, STRING_OUTPUT_TYPE_KEY);
     log("");
     getLogger()
-            .lifecycle(
-                    String.format(
-                            "WARNING : Do not add property `%s.%s` with the password in your configuration file.\n"
-                                    + "Use a reference to an external file : `file:<path_to_file>` as password value.",
-                            ENCRYPT_PROPS_PREFIX, PASSWORD_KEY));
+        .lifecycle(
+            String.format(
+                "WARNING : Do not add property `%s.%s` with the password in your configuration file.\n"
+                    + "Use a reference to an external file : `file:<path_to_file>` as password value.",
+                CONFIG_ENCRYPTOR_PREFIX, PASSWORD_KEY));
   }
 
   private void printConfig(String value, String key) {
     if (StringUtils.isBlank(value)) {
       return;
     }
-    log(String.format("%s.%s = %s", ENCRYPT_PROPS_PREFIX, key, value));
+    log(String.format("%s.%s = %s", CONFIG_ENCRYPTOR_PREFIX, key, value));
   }
 }

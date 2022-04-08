@@ -17,13 +17,13 @@ public class SystemSettingSource extends MapSettingsSource {
 
   static Map<String, String> parse(Map<String, String> env) {
     return env.entrySet().stream()
-        .filter(e -> e.getKey().startsWith(SettingsUtils.SYSTEM_PREFIX))
+        .filter(e -> e.getKey().startsWith(SettingsUtils.SYSTEM_CONFIG_PREFIX))
         .collect(toMap(SystemSettingSource::processKey, Map.Entry::getValue));
   }
 
   static String processKey(Map.Entry<String, String> e) {
     return e.getKey()
-        .replaceFirst(SettingsUtils.SYSTEM_PREFIX, "")
+        .replaceFirst(SettingsUtils.SYSTEM_CONFIG_PREFIX, "")
         .replace(' ', '\0')
         .toLowerCase();
   }

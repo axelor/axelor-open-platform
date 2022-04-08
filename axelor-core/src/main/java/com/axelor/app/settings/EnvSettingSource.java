@@ -16,13 +16,13 @@ public class EnvSettingSource extends MapSettingsSource {
 
   static Map<String, String> parse(Map<String, String> env) {
     return env.entrySet().stream()
-        .filter(e -> e.getKey().startsWith(SettingsUtils.ENV_PREFIX))
+        .filter(e -> e.getKey().startsWith(SettingsUtils.ENV_CONFIG_PREFIX))
         .collect(toMap(EnvSettingSource::processKey, Map.Entry::getValue));
   }
 
   static String processKey(Map.Entry<String, String> e) {
     return e.getKey()
-        .replaceFirst(SettingsUtils.ENV_PREFIX, "")
+        .replaceFirst(SettingsUtils.ENV_CONFIG_PREFIX, "")
         .replace('_', '.')
         .replace(' ', '\0')
         .toLowerCase();

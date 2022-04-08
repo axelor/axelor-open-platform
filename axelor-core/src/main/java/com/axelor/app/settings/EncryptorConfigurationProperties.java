@@ -1,6 +1,6 @@
 package com.axelor.app.settings;
 
-import static com.axelor.app.settings.SettingsUtils.ENCRYPT_PROPS_PREFIX;
+import static com.axelor.app.settings.SettingsUtils.CONFIG_ENCRYPTOR_PREFIX;
 
 import com.axelor.common.StringUtils;
 import java.io.BufferedReader;
@@ -75,7 +75,7 @@ public class EncryptorConfigurationProperties {
   }
 
   private String extractProp(Map<String, String> props, String key) {
-    return props.get(ENCRYPT_PROPS_PREFIX + "." + key);
+    return props.get(CONFIG_ENCRYPTOR_PREFIX + "." + key);
   }
 
   public String getPassword() {

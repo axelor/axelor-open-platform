@@ -22,7 +22,7 @@ public class EncryptedSettingsTest {
       System.setProperty(
           "axelor.config.my.password",
           "ENC(t6TImm9F8ysWPXTvO07+ivdEo9MqKk1rdPHzXvNyfvU1dAuFfAVy/B2CehDJEeB409I9OzWyQMPRLYSq8jfMAQ==)");
-      System.setProperty("axelor.config.props.encryptor.password", "MySecureKey");
+      System.setProperty("axelor.config.config.encryptor.password", "MySecureKey");
     }
 
     @AfterEach
@@ -46,7 +46,7 @@ public class EncryptedSettingsTest {
       String file = ClassUtils.getResource("configs/test-encrypted.properties").getFile();
       System.setProperty("axelor.config", file);
 
-      System.setProperty("axelor.config.props.encryptor.password", "MySecureKey");
+      System.setProperty("axelor.config.config.encryptor.password", "MySecureKey");
     }
 
     @AfterEach
@@ -71,7 +71,7 @@ public class EncryptedSettingsTest {
       System.setProperty(
           "axelor.config.my.password",
           "ENC(t6TImm9F8ysWPXTvO07+ivdEo9MqKk1rdPHzXvNyfvU1dAuFfAVy/B2CehDJEeB409I9OzWyQMPRLYSq8jfMAQ==)");
-      System.setProperty("axelor.config.props.encryptor.password", resource.toString());
+      System.setProperty("axelor.config.config.encryptor.password", resource.toString());
     }
 
     @AfterEach

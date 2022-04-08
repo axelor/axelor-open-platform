@@ -9,10 +9,10 @@ public class SettingsUtils {
   public static final String EXTERNAL_CONFIG_SYSTEM_PROP = "axelor.config";
   public static final String EXTERNAL_CONFIG_ENV = "AXELOR_CONFIG";
 
-  public static final String ENV_PREFIX = "AXELOR_CONFIG_";
-  public static final String SYSTEM_PREFIX = "axelor.config.";
+  public static final String ENV_CONFIG_PREFIX = "AXELOR_CONFIG_";
+  public static final String SYSTEM_CONFIG_PREFIX = "axelor.config.";
 
-  public static final String ENCRYPT_PROPS_PREFIX = "props.encryptor";
+  public static final String CONFIG_ENCRYPTOR_PREFIX = "config.encryptor";
 
   public SettingsUtils() {}
 

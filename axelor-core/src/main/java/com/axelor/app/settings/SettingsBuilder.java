@@ -60,7 +60,7 @@ public class SettingsBuilder {
   private void initEncryptor(Map<String, String> props) {
     encryptor =
         new StringEncryptorBuilder(
-                SettingsUtils.extractProperties(props, SettingsUtils.ENCRYPT_PROPS_PREFIX))
+                SettingsUtils.extractProperties(props, SettingsUtils.CONFIG_ENCRYPTOR_PREFIX))
             .build();
   }
 
