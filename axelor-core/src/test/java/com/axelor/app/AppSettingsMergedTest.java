@@ -3,9 +3,10 @@ package com.axelor.app;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import com.axelor.TestingHelpers;
 import com.axelor.common.ClassUtils;
-import java.lang.reflect.Field;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,13 +15,18 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 
 public class AppSettingsMergedTest {
 
+  @BeforeAll
+  static void setup() {
+    TestingHelpers.resetSettings();
+  }
+
   /** Properties merged from internal file + ext file + env + system prop */
   @Nested
   class InternalFileMergedSettingsTest {
 
     @AfterEach
     void tearDown() {
-      resetSettings();
+      TestingHelpers.resetSettings();
     }
 
     @Test
@@ -47,7 +53,7 @@ public class AppSettingsMergedTest {
 
     @AfterEach
     void tearDown() {
-      resetSettings();
+      TestingHelpers.resetSettings();
     }
 
     @Test
@@ -81,7 +87,7 @@ public class AppSettingsMergedTest {
 
     @AfterEach
     void tearDown() {
-      resetSettings();
+      TestingHelpers.resetSettings();
     }
 
     @Test
@@ -124,19 +130,5 @@ public class AppSettingsMergedTest {
     System.setProperty("axelor.config", file);
 
     System.setProperty("axelor.config.my.env", "mySystemEnv");
-  }
-
-  protected static void resetSettings() {
-    System.getProperties().stringPropertyNames().stream()
-        .filter(it -> it.startsWith("axelor.config"))
-        .forEach(System::clearProperty);
-
-    try {
-      Field instance = AppSettings.class.getDeclaredField("instance");
-      instance.setAccessible(true);
-      instance.set(null, null);
-    } catch (Exception e) {
-      throw new RuntimeException();
-    }
   }
 }

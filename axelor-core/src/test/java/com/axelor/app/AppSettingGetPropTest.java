@@ -6,17 +6,23 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.lang.reflect.Field;
+import com.axelor.TestingHelpers;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class AppSettingGetPropTest {
 
+  @BeforeAll
+  static void setup() {
+    TestingHelpers.resetSettings();
+  }
+
   @AfterEach
   void tearDown() {
-    resetSettings();
+    TestingHelpers.resetSettings();
   }
 
   // Test with settings defined in src/test/resources/axelor-config.properties
@@ -97,15 +103,5 @@ public class AppSettingGetPropTest {
 
     settings.getInternalProperties().put(APPLICATION_MODE, "prod");
     assertTrue(settings.isProduction());
-  }
-
-  protected static void resetSettings() {
-    try {
-      Field instance = AppSettings.class.getDeclaredField("instance");
-      instance.setAccessible(true);
-      instance.set(null, null);
-    } catch (Exception e) {
-      throw new RuntimeException();
-    }
   }
 }

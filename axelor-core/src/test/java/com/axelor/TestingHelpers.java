@@ -10,6 +10,11 @@ public class TestingHelpers {
 
   /** Reset AppSettings, else we can get properties set from other tests */
   public static void resetSettings() {
+
+    System.getProperties().stringPropertyNames().stream()
+        .filter(it -> it.startsWith("axelor.config"))
+        .forEach(System::clearProperty);
+
     try {
       Field instance = AppSettings.class.getDeclaredField("instance");
       instance.setAccessible(true);

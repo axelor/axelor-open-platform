@@ -6,16 +6,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.axelor.TestingHelpers;
 import com.axelor.app.settings.EnvSettingSource;
 import com.axelor.app.settings.PropertiesSettingsSource;
 import com.axelor.app.settings.SystemSettingSource;
 import com.axelor.app.settings.YamlSettingsSource;
 import com.axelor.common.ClassUtils;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,9 +25,14 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 
 public class AppSettingsTest {
 
+  @BeforeAll
+  static void setup() {
+    TestingHelpers.resetSettings();
+  }
+
   @AfterEach
   void tearDown() {
-    resetSettings();
+    TestingHelpers.resetSettings();
   }
 
   @Test
@@ -63,6 +69,11 @@ public class AppSettingsTest {
   @Nested
   class YamlSettingsSourceTest {
 
+    @AfterEach
+    void tearDown() {
+      TestingHelpers.resetSettings();
+    }
+
     @Test
     void shouldLoadEmptyYaml() {
       YamlSettingsSource source = new YamlSettingsSource((URL) null);
@@ -82,6 +93,11 @@ public class AppSettingsTest {
   @Nested
   class PropertiesSettingsSourceTest {
 
+    @AfterEach
+    void tearDown() {
+      TestingHelpers.resetSettings();
+    }
+
     @Test
     void shouldLoadProperties() {
       PropertiesSettingsSource source =
@@ -95,6 +111,11 @@ public class AppSettingsTest {
   @Nested
   @ExtendWith(MyEnv.class)
   class EnvSettingsSourceTest {
+
+    @AfterEach
+    void tearDown() {
+      TestingHelpers.resetSettings();
+    }
 
     @Test
     void shouldLoadEnv() {
@@ -120,9 +141,7 @@ public class AppSettingsTest {
 
     @AfterEach
     void tearDown() {
-      for (String key : props.keySet()) {
-        System.clearProperty(key);
-      }
+      TestingHelpers.resetSettings();
     }
 
     @Test
@@ -144,16 +163,6 @@ public class AppSettingsTest {
       super.beforeAll(context);
       set("AXELOR_CONFIG_MY_ENV", "myEnv");
       set("AXELOR_CONFIG_VAR", "true");
-    }
-  }
-
-  protected static void resetSettings() {
-    try {
-      Field instance = AppSettings.class.getDeclaredField("instance");
-      instance.setAccessible(true);
-      instance.set(null, null);
-    } catch (Exception e) {
-      throw new RuntimeException();
     }
   }
 }

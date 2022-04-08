@@ -3,16 +3,22 @@ package com.axelor.app;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.axelor.TestingHelpers;
 import com.axelor.common.ClassUtils;
 import com.axelor.common.ResourceUtils;
-import java.lang.reflect.Field;
 import java.net.URL;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class EncryptedSettingsTest {
+
+  @BeforeAll
+  static void setup() {
+    TestingHelpers.resetSettings();
+  }
 
   @Nested
   class EncryptWithDefaultAlgorithmTest {
@@ -27,7 +33,7 @@ public class EncryptedSettingsTest {
 
     @AfterEach
     void tearDown() {
-      resetSettings();
+      TestingHelpers.resetSettings();
     }
 
     @Test
@@ -51,7 +57,7 @@ public class EncryptedSettingsTest {
 
     @AfterEach
     void tearDown() {
-      resetSettings();
+      TestingHelpers.resetSettings();
     }
 
     @Test
@@ -76,7 +82,7 @@ public class EncryptedSettingsTest {
 
     @AfterEach
     void tearDown() {
-      resetSettings();
+      TestingHelpers.resetSettings();
     }
 
     @Test
@@ -99,26 +105,12 @@ public class EncryptedSettingsTest {
 
     @AfterEach
     void tearDown() {
-      resetSettings();
+      TestingHelpers.resetSettings();
     }
 
     @Test
     public void test() {
       assertThrows(RuntimeException.class, AppSettings::get);
-    }
-  }
-
-  protected static void resetSettings() {
-    System.getProperties().stringPropertyNames().stream()
-        .filter(it -> it.startsWith("axelor.config"))
-        .forEach(System::clearProperty);
-
-    try {
-      Field instance = AppSettings.class.getDeclaredField("instance");
-      instance.setAccessible(true);
-      instance.set(null, null);
-    } catch (Exception e) {
-      throw new RuntimeException();
     }
   }
 }
