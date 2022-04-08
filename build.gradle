@@ -1,5 +1,8 @@
 buildscript {
   apply from: "gradle/repos.gradle"
+  dependencies {
+    classpath 'com.adarshr:gradle-test-logger-plugin:3.2.0'
+  }
 }
 
 apply plugin: "eclipse"
@@ -16,17 +19,19 @@ subprojects {
   apply plugin: com.axelor.gradle.support.EclipseSupport
   apply plugin: com.axelor.gradle.support.LicenseSupport
   apply plugin: com.axelor.gradle.support.PublishSupport
+  apply plugin: 'com.adarshr.test-logger'
 
   group = "com.axelor"
   version = rootProject.version
 
+  testlogger {
+    theme 'mocha'
+    slowThreshold 3000
+  }
+
   afterEvaluate {
     test {
       useJUnitPlatform()
-
-      beforeTest { descriptor ->
-        logger.lifecycle("Running: " + descriptor)
-      }
     }
   }
 
