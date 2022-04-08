@@ -1,9 +1,6 @@
 package com.axelor.app.settings;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 public class SettingsUtils {
@@ -18,20 +15,6 @@ public class SettingsUtils {
   public static final String ENCRYPT_PROPS_PREFIX = "props.encryptor";
 
   public SettingsUtils() {}
-
-  public static Map<String, String> propertiesToMap(Properties properties) {
-    Map<String, String> map = new HashMap<>();
-    synchronized (properties) {
-      Iterator iterator = properties.entrySet().iterator();
-
-      while (iterator.hasNext()) {
-        Map.Entry<Object, Object> entry = (Map.Entry) iterator.next();
-        map.put(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()));
-      }
-
-      return map;
-    }
-  }
 
   public static Map<String, String> extractProperties(Map<String, String> source, String prefix) {
     return source.entrySet().stream()

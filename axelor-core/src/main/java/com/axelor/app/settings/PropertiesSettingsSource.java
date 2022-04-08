@@ -1,6 +1,6 @@
 package com.axelor.app.settings;
 
-import java.io.InputStream;
+import com.axelor.common.PropertiesUtils;
 import java.net.URL;
 import java.util.Properties;
 import org.slf4j.Logger;
@@ -15,19 +15,15 @@ public class PropertiesSettingsSource extends MapSettingsSource {
   }
 
   public PropertiesSettingsSource(Properties properties) {
-    super(SettingsUtils.propertiesToMap(properties));
+    super(PropertiesUtils.propertiesToMap(properties));
   }
 
   private static Properties loadProperties(URL resource) {
-    Properties props = new Properties();
-    if (resource == null) {
-      return props;
-    }
-    try (InputStream stream = resource.openStream()) {
-      props.load(stream);
+    try {
+      return PropertiesUtils.loadProperties(resource);
     } catch (Exception e) {
       LOG.trace("Unable to open {} properties file.", resource);
     }
-    return props;
+    return new Properties();
   }
 }

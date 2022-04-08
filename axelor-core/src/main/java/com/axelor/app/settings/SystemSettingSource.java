@@ -2,6 +2,7 @@ package com.axelor.app.settings;
 
 import static java.util.stream.Collectors.toMap;
 
+import com.axelor.common.PropertiesUtils;
 import java.util.Map;
 
 public class SystemSettingSource extends MapSettingsSource {
@@ -11,7 +12,7 @@ public class SystemSettingSource extends MapSettingsSource {
   }
 
   static Map<String, String> getEnvProperties() {
-    return parse(SettingsUtils.propertiesToMap(System.getProperties()));
+    return parse(PropertiesUtils.propertiesToMap(System.getProperties()));
   }
 
   static Map<String, String> parse(Map<String, String> env) {
