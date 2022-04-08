@@ -21,14 +21,12 @@ package com.axelor.auth.pac4j;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.apache.shiro.web.servlet.Cookie;
-import org.apache.shiro.web.servlet.Cookie.SameSiteOptions;
-import org.apache.shiro.web.servlet.SimpleCookie;
-import org.pac4j.core.context.JEEContext;
+import org.pac4j.core.context.Cookie;
 import org.pac4j.core.context.WebContext;
+import org.pac4j.core.context.session.SessionStore;
+import org.pac4j.core.matching.matcher.csrf.CsrfTokenGenerator;
 import org.pac4j.core.matching.matcher.csrf.CsrfTokenGeneratorMatcher;
-import org.pac4j.core.matching.matcher.csrf.DefaultCsrfTokenGenerator;
+import org.pac4j.jee.context.JEEContext;
 
 @Singleton
 public class AxelorCsrfMatcher extends CsrfTokenGeneratorMatcher {
@@ -38,44 +36,40 @@ public class AxelorCsrfMatcher extends CsrfTokenGeneratorMatcher {
   private final String headerName;
 
   @Inject
-  public AxelorCsrfMatcher() {
-    this(AuthPac4jModule.CSRF_COOKIE_NAME, AuthPac4jModule.CSRF_HEADER_NAME);
+  public AxelorCsrfMatcher(AxelorCsrfGenerator csrfTokenGenerator) {
+    this(csrfTokenGenerator, AuthPac4jModule.CSRF_COOKIE_NAME, AuthPac4jModule.CSRF_HEADER_NAME);
   }
 
-  public AxelorCsrfMatcher(String cookieName, String headerName) {
-    super(new DefaultCsrfTokenGenerator());
+  public AxelorCsrfMatcher(
+      CsrfTokenGenerator csrfTokenGenerator, String cookieName, String headerName) {
+    super(csrfTokenGenerator);
     this.cookieName = cookieName;
     this.headerName = headerName;
   }
 
   @Override
-  public boolean matches(WebContext context) {
-    addResponseCookieAndHeader(context);
+  public boolean matches(WebContext context, SessionStore sessionStore) {
+    addResponseCookieAndHeader(context, sessionStore);
     return true;
   }
 
-  protected void addResponseCookieAndHeader(WebContext context) {
-    final String token = getCsrfTokenGenerator().get(context);
+  protected void addResponseCookieAndHeader(WebContext context, SessionStore sessionStore) {
+    final String token = getCsrfTokenGenerator().get(context, sessionStore);
     final JEEContext jeeContext = ((JEEContext) context);
     final HttpServletRequest request = jeeContext.getNativeRequest();
-    final HttpServletResponse response = jeeContext.getNativeResponse();
+    final String contextPath = request.getContextPath();
 
-    String path = request.getContextPath();
-    if (path.isEmpty()) {
-      path = "/";
-    }
-
-    final Cookie cookie = new SimpleCookie(cookieName);
-    cookie.setValue(token);
+    final var cookie = new Cookie(cookieName, token);
     cookie.setDomain("");
-    cookie.setPath(path);
+    cookie.setPath(contextPath.isEmpty() ? "/" : contextPath);
     cookie.setHttpOnly(false);
     if (AuthPac4jInfo.isSecure(request)) {
       cookie.setSecure(true);
-      cookie.setSameSite(SameSiteOptions.NONE);
+      cookie.setSameSitePolicy("None");
     }
-    cookie.saveTo(request, response);
 
+    context.addResponseCookie(cookie);
     context.setResponseHeader(headerName, token);
+    //    context.setRequestAttribute(Pac4jConstants.CSRF_TOKEN, token); // XXX
   }
 }

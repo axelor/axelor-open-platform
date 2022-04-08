@@ -25,19 +25,20 @@ import java.lang.invoke.MethodHandles;
 import javax.inject.Inject;
 import org.pac4j.core.client.finder.DefaultCallbackClientFinder;
 import org.pac4j.core.config.Config;
-import org.pac4j.core.context.JEEContext;
+import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.engine.DefaultCallbackLogic;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.exception.http.OkAction;
-import org.pac4j.core.exception.http.RedirectionActionHelper;
 import org.pac4j.core.exception.http.WithLocationAction;
 import org.pac4j.core.http.adapter.HttpActionAdapter;
+import org.pac4j.core.util.HttpActionHelper;
 import org.pac4j.core.util.Pac4jConstants;
+import org.pac4j.jee.context.JEEContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AxelorCallbackLogic extends DefaultCallbackLogic<Object, JEEContext> {
+public class AxelorCallbackLogic extends DefaultCallbackLogic {
 
   private final AxelorCsrfMatcher csrfMatcher;
 
@@ -54,45 +55,42 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic<Object, JEEContext
 
   @Override
   public Object perform(
-      JEEContext context,
+      WebContext webContext,
+      SessionStore sessionStore,
       Config config,
-      HttpActionAdapter<Object, JEEContext> httpActionAdapter,
+      HttpActionAdapter httpActionAdapter,
       String inputDefaultUrl,
-      Boolean inputSaveInSession,
-      Boolean inputMultiProfile,
       Boolean inputRenewSession,
-      String client) {
+      String defaultClient) {
 
     try {
+      final JEEContext context = (JEEContext) webContext;
       context.getNativeRequest().setCharacterEncoding("UTF-8");
     } catch (UnsupportedEncodingException e) {
       logger.error(e.getMessage(), e);
     }
 
     return super.perform(
-        context,
+        webContext,
+        sessionStore,
         config,
         httpActionAdapter,
         inputDefaultUrl,
-        inputSaveInSession,
-        inputMultiProfile,
         inputRenewSession,
-        client);
+        defaultClient);
   }
 
   @Override
-  protected HttpAction redirectToOriginallyRequestedUrl(JEEContext context, String defaultUrl) {
+  protected HttpAction redirectToOriginallyRequestedUrl(
+      WebContext context, SessionStore sessionStore, final String defaultUrl) {
 
     // Add CSRF token cookie and header
-    csrfMatcher.addResponseCookieAndHeader(context);
+    csrfMatcher.addResponseCookieAndHeader(context, sessionStore);
 
     // If XHR, return status code only
     if (AuthPac4jInfo.isXHR(context)) {
       return new OkAction(context.getRequestContent());
     }
-
-    @SuppressWarnings("unchecked")
-    final SessionStore<JEEContext> sessionStore = context.getSessionStore();
 
     final String requestedUrl =
         sessionStore
@@ -121,6 +119,6 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic<Object, JEEContext
     }
 
     logger.debug("redirectUrl: {}", redirectUrl);
-    return RedirectionActionHelper.buildRedirectUrlAction(context, redirectUrl);
+    return HttpActionHelper.buildRedirectUrlAction(context, redirectUrl);
   }
 }

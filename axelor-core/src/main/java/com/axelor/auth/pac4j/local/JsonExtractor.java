@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import org.pac4j.core.context.WebContext;
+import org.pac4j.core.context.session.SessionStore;
+import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.extractor.FormExtractor;
 import org.pac4j.core.util.Pac4jConstants;
@@ -35,11 +37,13 @@ public class JsonExtractor extends FormExtractor {
   }
 
   @Override
-  public Optional<UsernamePasswordCredentials> extract(WebContext context) {
-    return AuthPac4jInfo.isXHR(context) ? extractJson(context) : super.extract(context);
+  public Optional<Credentials> extract(WebContext context, SessionStore sessionStore) {
+    return AuthPac4jInfo.isXHR(context)
+        ? extractJson(context)
+        : super.extract(context, sessionStore);
   }
 
-  private Optional<UsernamePasswordCredentials> extractJson(WebContext context) {
+  private Optional<Credentials> extractJson(WebContext context) {
     final Map<?, ?> data;
     try {
       data = new ObjectMapper().readValue(context.getRequestContent(), Map.class);

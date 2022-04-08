@@ -36,13 +36,12 @@ import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
-import org.pac4j.core.context.JEEContext;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
+import org.pac4j.jee.context.JEEContext;
 
 @Singleton
 public class AuthPac4jInfo {
@@ -57,7 +56,7 @@ public class AuthPac4jInfo {
 
   private boolean absoluteUrlRequired;
 
-  private Authenticator<UsernamePasswordCredentials> authenticator;
+  private Authenticator authenticator;
 
   private final Map<String, Map<String, String>> clientInfo = new HashMap<>();
 
@@ -130,11 +129,11 @@ public class AuthPac4jInfo {
     return logoutUrl;
   }
 
-  public void setAuthenticator(Authenticator<UsernamePasswordCredentials> authenticator) {
+  public void setAuthenticator(Authenticator authenticator) {
     this.authenticator = authenticator;
   }
 
-  public Authenticator<UsernamePasswordCredentials> getAuthenticator() {
+  public Authenticator getAuthenticator() {
     if (authenticator == null) {
       authenticator = Beans.get(AxelorAuthenticator.class);
     }

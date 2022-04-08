@@ -22,7 +22,7 @@ import com.axelor.common.ObjectUtils;
 import java.util.Base64;
 import org.pac4j.core.profile.converter.AbstractAttributeConverter;
 
-public class ByteArrayConverter extends AbstractAttributeConverter<byte[]> {
+public class ByteArrayConverter extends AbstractAttributeConverter {
 
   public static final ByteArrayConverter INSTANCE = new ByteArrayConverter();
 

@@ -56,7 +56,6 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class ClientListProvider implements Provider<List<Client>> {
 
-  @SuppressWarnings("rawtypes")
   private final List<Client> clients = new ArrayList<>();
 
   private final boolean exclusive;
@@ -115,8 +114,8 @@ public class ClientListProvider implements Provider<List<Client>> {
           .put(
               "azure",
               ClientConfig.builder()
-                  .client("org.pac4j.oidc.client.AzureAdClient")
-                  .configuration("org.pac4j.oidc.config.AzureAdOidcConfiguration")
+                  .client("org.pac4j.oidc.client.AzureAd2Client")
+                  .configuration("org.pac4j.oidc.config.AzureAd2OidcConfiguration")
                   .title("Azure Active Directory")
                   .icon("img/signin/microsoft.svg")
                   .build())
@@ -238,7 +237,6 @@ public class ClientListProvider implements Provider<List<Client>> {
       configs.putAll(initConfigs);
     }
 
-    @SuppressWarnings("rawtypes")
     final List<Client> centralClients =
         configs.entrySet().stream()
             .map(e -> createClient(e.getKey(), e.getValue()))
@@ -272,7 +270,6 @@ public class ClientListProvider implements Provider<List<Client>> {
 
     // set titles and icons
     final Iterator<Map<String, Object>> configIt = configs.values().iterator();
-    @SuppressWarnings("rawtypes")
     final Iterator<Client> clientIt = centralClients.iterator();
     while (configIt.hasNext() && clientIt.hasNext()) {
       final Map<String, Object> props = configIt.next();
@@ -290,7 +287,6 @@ public class ClientListProvider implements Provider<List<Client>> {
   }
 
   @Override
-  @SuppressWarnings("rawtypes")
   public List<Client> get() {
     return clients;
   }
@@ -310,7 +306,6 @@ public class ClientListProvider implements Provider<List<Client>> {
     final Object client = inject(clientClass);
 
     if (client instanceof IndirectClient) {
-      @SuppressWarnings("rawtypes")
       final IndirectClient indirectClient = (IndirectClient) client;
       indirectClient.setUrlResolver(new DefaultUrlResolver(true));
     }

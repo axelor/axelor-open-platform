@@ -34,7 +34,7 @@ public class CredentialsHandler {
 
   @Inject private Event<PostLogin> postLogin;
 
-  public void handleInvalidCredentials(Client<?> client, String username, CredentialsException e) {
+  public void handleInvalidCredentials(Client client, String username, CredentialsException e) {
     final CommonProfile profile = new CommonProfile();
     profile.setClientName(client.getName());
 

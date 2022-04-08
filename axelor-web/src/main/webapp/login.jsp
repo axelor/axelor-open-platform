@@ -182,7 +182,7 @@ Set<String> centralClients = authPac4jInfo.getCentralClients();
 
       $("#social-buttons").on('click', 'button', function (e) {
        var client = $(e.currentTarget).data('provider');
-       window.location.href = './?client_name=' + client
+       window.location.href = './?force_client=' + client
            + "&hash_location=" + encodeURIComponent(window.location.hash);
       });
 

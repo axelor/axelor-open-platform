@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.pac4j.core.authorization.authorizer.CsrfAuthorizer;
 import org.pac4j.core.context.WebContext;
+import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.profile.UserProfile;
 
 @Singleton
@@ -39,12 +40,13 @@ public class AxelorCsrfAuthorizer extends CsrfAuthorizer {
   }
 
   @Override
-  public boolean isAuthorized(WebContext context, List<UserProfile> profiles) {
+  public boolean isAuthorized(
+      WebContext context, SessionStore sessionStore, List<UserProfile> profiles) {
     // Don't need CSRF check for native clients
     if (AuthPac4jInfo.isNativeClient(context)) {
       return true;
     }
 
-    return super.isAuthorized(context, profiles);
+    return super.isAuthorized(context, sessionStore, profiles);
   }
 }

@@ -19,51 +19,64 @@
 package com.axelor.auth.pac4j;
 
 import io.buji.pac4j.profile.ShiroProfileManager;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
-import org.pac4j.core.authorization.authorizer.DefaultAuthorizers;
+import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.authorization.checker.DefaultAuthorizationChecker;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.IndirectClient;
-import org.pac4j.core.context.JEEContext;
+import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
-import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.engine.DefaultSecurityLogic;
 import org.pac4j.core.http.ajax.AjaxRequestResolver;
 import org.pac4j.core.matching.checker.DefaultMatchingChecker;
-import org.pac4j.core.matching.matcher.DefaultMatchers;
+import org.pac4j.core.matching.matcher.Matcher;
+import org.pac4j.core.profile.UserProfile;
 import org.pac4j.core.util.Pac4jConstants;
 
-public class AxelorSecurityLogic extends DefaultSecurityLogic<Object, JEEContext> {
+public class AxelorSecurityLogic extends DefaultSecurityLogic {
 
   private final AuthPac4jInfo authPac4jInfo;
   static final String HASH_LOCATION_PARAMETER = "hash_location";
 
   @Inject
-  public AxelorSecurityLogic(AuthPac4jInfo authPac4jInfo) {
+  public AxelorSecurityLogic(
+      AuthPac4jInfo authPac4jInfo,
+      AxelorCsrfAuthorizer csrfAuthorizer,
+      AxelorCsrfMatcher csrfMatcher) {
     this.authPac4jInfo = authPac4jInfo;
     setProfileManagerFactory(ShiroProfileManager::new);
     setAuthorizationChecker(
         new DefaultAuthorizationChecker() {
 
           @Override
-          protected String computeDefaultAuthorizers(List<Client<? extends Credentials>> clients) {
+          protected List<Authorizer> computeDefaultAuthorizers(
+              WebContext context,
+              List<UserProfile> profiles,
+              List<Client> clients,
+              Map<String, Authorizer> authorizersMap) {
+
             if (clients.stream().anyMatch(IndirectClient.class::isInstance)) {
-              return AxelorCsrfAuthorizer.CSRF_AUTHORIZER_NAME;
+              return List.of(csrfAuthorizer);
             }
-            return DefaultAuthorizers.NONE;
+
+            return Collections.emptyList();
           }
         });
     setMatchingChecker(
         new DefaultMatchingChecker() {
 
           @Override
-          protected String computeDefaultMatchers(List<Client<? extends Credentials>> clients) {
+          protected List<Matcher> computeDefaultMatchers(
+              WebContext context, SessionStore sessionStore, List<Client> clients) {
+
             if (clients.stream().anyMatch(IndirectClient.class::isInstance)) {
-              return AxelorCsrfMatcher.CSRF_MATCHER_NAME;
+              return List.of(csrfMatcher);
             }
 
-            return DefaultMatchers.NONE;
+            return Collections.emptyList();
           }
         });
   }
@@ -72,23 +85,20 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic<Object, JEEContext
   // so that the requested URL saved before redirection will be used instead.
   @Override
   protected void saveRequestedUrl(
-      JEEContext context,
-      List<Client<? extends Credentials>> currentClients,
+      WebContext context,
+      SessionStore sessionStore,
+      List<Client> currentClients,
       AjaxRequestResolver ajaxRequestResolver) {
 
     context
         .getRequestParameter(HASH_LOCATION_PARAMETER)
         .ifPresent(
-            hashLocation -> {
-              @SuppressWarnings("unchecked")
-              final SessionStore<JEEContext> sessionStore = context.getSessionStore();
-              sessionStore.set(context, HASH_LOCATION_PARAMETER, hashLocation);
-            });
+            hashLocation -> sessionStore.set(context, HASH_LOCATION_PARAMETER, hashLocation));
 
-    if (context.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER).isEmpty()
+    if (context.getRequestParameter(Pac4jConstants.DEFAULT_FORCE_CLIENT_PARAMETER).isEmpty()
         || currentClients.size() != 1
         || !authPac4jInfo.getCentralClients().contains(currentClients.get(0).getName())) {
-      super.saveRequestedUrl(context, currentClients, ajaxRequestResolver);
+      super.saveRequestedUrl(context, sessionStore, currentClients, ajaxRequestResolver);
     }
   }
 }

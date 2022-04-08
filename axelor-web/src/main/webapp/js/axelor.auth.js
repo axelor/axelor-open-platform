@@ -77,7 +77,7 @@ angular.module('axelor.auth', []).provider('authService', function() {
       responseError: function error(response) {
         if (response.status === 401 && axelor.config['auth.central.client']) {
             // redirect to central login page
-            window.location.href = './?client_name=' + axelor.config['auth.central.client']
+            window.location.href = './?force_client=' + axelor.config['auth.central.client']
               + "&hash_location=" + encodeURIComponent(window.location.hash);
             return $q.reject(response);
         }

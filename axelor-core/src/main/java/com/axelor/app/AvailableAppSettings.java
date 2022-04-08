@@ -181,7 +181,6 @@ public interface AvailableAppSettings {
   String AUTH_LDAP_SYSTEM_USER = "auth.ldap.system.user";
   String AUTH_LDAP_SYSTEM_PASSWORD = "auth.ldap.system.password";
   String AUTH_LDAP_AUTH_TYPE = "auth.ldap.auth.type";
-  String AUTH_LDAP_USE_SSL = "auth.ldap.use.ssl";
   String AUTH_LDAP_USE_STARTTLS = "auth.ldap.use.starttls";
   String AUTH_LDAP_CREDENTIAL_TRUST_STORE = "auth.ldap.credential.trust.store";
   String AUTH_LDAP_CREDENTIAL_KEY_STORE = "auth.ldap.credential.key.store";

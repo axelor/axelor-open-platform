@@ -24,13 +24,14 @@ import com.axelor.inject.Beans;
 import java.util.Optional;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
+import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.extractor.FormExtractor;
 import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.exception.http.HttpAction;
-import org.pac4j.core.exception.http.RedirectionActionHelper;
 import org.pac4j.core.http.ajax.AjaxRequestResolver;
 import org.pac4j.core.util.CommonHelper;
+import org.pac4j.core.util.HttpActionHelper;
 import org.pac4j.http.client.indirect.FormClient;
 
 public class AxelorFormClient extends FormClient {
@@ -38,45 +39,53 @@ public class AxelorFormClient extends FormClient {
   private CredentialsHandler credentialsHandler;
 
   @Override
-  protected void clientInit() {
-    final AuthPac4jInfo authPac4jInfo = Beans.get(AuthPac4jInfo.class);
-    setLoginUrl(authPac4jInfo.getBaseUrl() + "/login.jsp");
-    defaultAuthenticator(authPac4jInfo.getAuthenticator());
-    setCredentialsExtractor(Beans.get(FormExtractor.class));
-    setAjaxRequestResolver(Beans.get(AjaxRequestResolver.class));
-    credentialsHandler = Beans.get(CredentialsHandler.class);
+  protected void internalInit(boolean forceReinit) {
+    if (credentialsHandler == null || forceReinit) {
+      credentialsHandler = Beans.get(CredentialsHandler.class);
+      final AuthPac4jInfo authPac4jInfo = Beans.get(AuthPac4jInfo.class);
+      setLoginUrl(authPac4jInfo.getBaseUrl() + "/login.jsp");
+      defaultAuthenticator(authPac4jInfo.getAuthenticator());
+      setCredentialsExtractor(Beans.get(FormExtractor.class));
+      setAjaxRequestResolver(Beans.get(AjaxRequestResolver.class));
+    }
 
-    super.clientInit();
+    super.internalInit(forceReinit);
   }
 
   @Override
-  protected Optional<UsernamePasswordCredentials> retrieveCredentials(WebContext context) {
+  protected Optional<Credentials> retrieveCredentials(
+      WebContext context, SessionStore sessionStore) {
     CommonHelper.assertNotNull("credentialsExtractor", getCredentialsExtractor());
     CommonHelper.assertNotNull("authenticator", getAuthenticator());
 
-    String username = context.getRequestParameter(getUsernameParameter()).orElse("");
-    final Optional<UsernamePasswordCredentials> credentials;
+    String username = context.getRequestParameter(getUsernameParameter()).orElse(null);
+    final Optional<Credentials> credentials;
     try {
       // retrieve credentials
-      credentials = getCredentialsExtractor().extract(context);
+      credentials = getCredentialsExtractor().extract(context, sessionStore);
       logger.debug("usernamePasswordCredentials: {}", credentials);
       if (credentials.isEmpty()) {
         throw handleInvalidCredentials(
             context,
+            sessionStore,
             username,
             "Username and password cannot be blank -> return to the form with error",
             MISSING_FIELD_ERROR);
       }
-      final UsernamePasswordCredentials cred = credentials.get();
+      final Credentials cred = credentials.get();
       // username in AJAX request
-      if (StringUtils.isBlank(username)) {
-        username = cred.getUsername();
+      if (StringUtils.isBlank(username) && cred instanceof UsernamePasswordCredentials) {
+        username = ((UsernamePasswordCredentials) cred).getUsername();
       }
       // validate credentials
-      getAuthenticator().validate(cred, context);
+      getAuthenticator().validate(cred, context, sessionStore);
     } catch (final CredentialsException e) {
       throw handleInvalidCredentials(
-          context, username, "Credentials validation fails -> return to the form with error", e);
+          context,
+          sessionStore,
+          username,
+          "Credentials validation fails -> return to the form with error",
+          e);
     }
 
     return credentials;
@@ -89,13 +98,21 @@ public class AxelorFormClient extends FormClient {
 
   @Override
   protected HttpAction handleInvalidCredentials(
-      WebContext context, String username, String message, String errorMessage) {
+      WebContext context,
+      SessionStore sessionStore,
+      String username,
+      String message,
+      String errorMessage) {
     return handleInvalidCredentials(
-        context, username, message, new CredentialsException(errorMessage));
+        context, sessionStore, username, message, new CredentialsException(errorMessage));
   }
 
   protected HttpAction handleInvalidCredentials(
-      WebContext context, String username, String message, CredentialsException e) {
+      WebContext context,
+      SessionStore sessionStore,
+      String username,
+      String message,
+      CredentialsException e) {
 
     final String errorMessage = computeErrorMessage(e);
 
@@ -104,22 +121,17 @@ public class AxelorFormClient extends FormClient {
 
       context
           .getRequestParameter("tenantId")
-          .ifPresent(
-              tenantId -> {
-                @SuppressWarnings("unchecked")
-                final SessionStore<WebContext> sessionStore = context.getSessionStore();
-                sessionStore.set(context, "tenantId", tenantId);
-              });
+          .ifPresent(tenantId -> sessionStore.set(context, "tenantId", tenantId));
 
       String redirectUrl =
           CommonHelper.addParameter("change-password.jsp", getUsernameParameter(), username);
       redirectUrl = CommonHelper.addParameter(redirectUrl, ERROR_PARAMETER, errorMessage);
-      return RedirectionActionHelper.buildRedirectUrlAction(context, redirectUrl);
+      return HttpActionHelper.buildRedirectUrlAction(context, redirectUrl);
     }
 
     logger.error("Authentication failed for user \"{}\": {}", username, errorMessage);
     credentialsHandler.handleInvalidCredentials(this, username, e);
     return super.handleInvalidCredentials(
-        context, username, message, AxelorAuthenticator.INCORRECT_CREDENTIALS);
+        context, sessionStore, username, message, AxelorAuthenticator.INCORRECT_CREDENTIALS);
   }
 }

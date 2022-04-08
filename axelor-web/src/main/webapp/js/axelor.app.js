@@ -362,7 +362,7 @@
           if (response.data.status === -7) { // STATUS_LOGIN_REQUIRED
             if (axelor.config['auth.central.client']) {
               // redirect to central login page
-              window.location.href = './?client_name=' + axelor.config['auth.central.client']
+              window.location.href = './?force_client=' + axelor.config['auth.central.client']
                 + "&hash_location=" + encodeURIComponent(window.location.hash);
             } else if (notSilent(response.config)) {
               // ajax login

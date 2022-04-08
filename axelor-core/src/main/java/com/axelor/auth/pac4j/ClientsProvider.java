@@ -31,8 +31,7 @@ public class ClientsProvider implements Provider<Clients> {
   private Clients clients;
 
   @Inject
-  public ClientsProvider(
-      AuthPac4jInfo authPac4jInfo, @SuppressWarnings("rawtypes") List<Client> clients) {
+  public ClientsProvider(AuthPac4jInfo authPac4jInfo, List<Client> clients) {
     this.clients = new Clients(authPac4jInfo.getCallbackUrl(), clients);
   }
 

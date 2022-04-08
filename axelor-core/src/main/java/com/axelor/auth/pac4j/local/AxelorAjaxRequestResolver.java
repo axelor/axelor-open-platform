@@ -21,6 +21,7 @@ package com.axelor.auth.pac4j.local;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
 import java.util.Optional;
 import org.pac4j.core.context.WebContext;
+import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.exception.http.UnauthorizedAction;
 import org.pac4j.core.exception.http.WithLocationAction;
@@ -30,27 +31,31 @@ import org.pac4j.core.redirect.RedirectionActionBuilder;
 public class AxelorAjaxRequestResolver extends DefaultAjaxRequestResolver {
 
   @Override
-  public boolean isAjax(WebContext context) {
-    return super.isAjax(context) || AuthPac4jInfo.isXHR(context);
+  public boolean isAjax(WebContext context, SessionStore sessionStore) {
+    return super.isAjax(context, sessionStore) || AuthPac4jInfo.isXHR(context);
   }
 
   @Override
   public HttpAction buildAjaxResponse(
-      WebContext context, RedirectionActionBuilder redirectionActionBuilder) {
-    if (isAjax(context)
-        && getUrl(context, redirectionActionBuilder)
-            .filter(url -> "login.jsp".equals(url))
+      WebContext context,
+      SessionStore sessionStore,
+      RedirectionActionBuilder redirectionActionBuilder) {
+    if (isAjax(context, sessionStore)
+        && getUrl(context, sessionStore, redirectionActionBuilder)
+            .filter("login.jsp"::equals)
             .isPresent()) {
       return UnauthorizedAction.INSTANCE;
     }
-    return super.buildAjaxResponse(context, redirectionActionBuilder);
+    return super.buildAjaxResponse(context, sessionStore, redirectionActionBuilder);
   }
 
   protected Optional<String> getUrl(
-      WebContext context, RedirectionActionBuilder redirectionActionBuilder) {
+      WebContext context,
+      SessionStore sessionStore,
+      RedirectionActionBuilder redirectionActionBuilder) {
     return redirectionActionBuilder
-        .getRedirectionAction(context)
-        .filter(action -> action instanceof WithLocationAction)
+        .getRedirectionAction(context, sessionStore)
+        .filter(WithLocationAction.class::isInstance)
         .map(action -> ((WithLocationAction) action).getLocation());
   }
 }

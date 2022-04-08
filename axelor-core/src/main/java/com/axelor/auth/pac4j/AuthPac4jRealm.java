@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.profile.UserProfile;
 
 public class AuthPac4jRealm extends Pac4jRealm {
 
@@ -51,7 +52,7 @@ public class AuthPac4jRealm extends Pac4jRealm {
     preLogin.fire(new PreLogin(authenticationToken));
 
     final Pac4jToken token = (Pac4jToken) authenticationToken;
-    final List<CommonProfile> profiles = token.getProfiles();
+    final List<UserProfile> profiles = token.getProfiles();
 
     @SuppressWarnings("unchecked")
     final Optional<CommonProfile> profileOpt = (Optional<CommonProfile>) token.getPrincipal();

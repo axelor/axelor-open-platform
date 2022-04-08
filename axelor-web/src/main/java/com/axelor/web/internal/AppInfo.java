@@ -47,7 +47,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
-import org.pac4j.core.context.JEEContext;
+import org.pac4j.jee.context.JEEContext;
+import org.pac4j.jee.context.session.JEESessionStore;
 
 public class AppInfo {
 
@@ -135,10 +136,11 @@ public class AppInfo {
     // find central client name
     final JEEContext jeeContext =
         new JEEContext(Beans.get(HttpServletRequest.class), Beans.get(HttpServletResponse.class));
-    final ShiroProfileManager profileManager = new ShiroProfileManager(jeeContext);
+    final ShiroProfileManager profileManager =
+        new ShiroProfileManager(jeeContext, JEESessionStore.INSTANCE);
 
     profileManager
-        .get(true)
+        .getProfile()
         .filter(
             profile ->
                 Beans.get(AuthPac4jInfo.class)

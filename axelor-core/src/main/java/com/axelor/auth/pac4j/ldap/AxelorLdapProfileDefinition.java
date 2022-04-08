@@ -24,9 +24,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.pac4j.core.profile.converter.Converters;
 import org.pac4j.core.profile.definition.CommonProfileDefinition;
-import org.pac4j.ldap.profile.LdapProfile;
 
-public class AxelorLdapProfileDefinition extends CommonProfileDefinition<LdapProfile> {
+public class AxelorLdapProfileDefinition extends CommonProfileDefinition {
 
   public static final String USERNAME = "uid";
   public static final String DISPLAY_NAME = "cn";

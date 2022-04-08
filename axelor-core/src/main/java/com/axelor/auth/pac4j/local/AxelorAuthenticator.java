@@ -25,6 +25,8 @@ import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.inject.Beans;
 import org.pac4j.core.context.WebContext;
+import org.pac4j.core.context.session.SessionStore;
+import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.exception.AccountNotFoundException;
@@ -33,7 +35,7 @@ import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.util.Pac4jConstants;
 
-public class AxelorAuthenticator implements Authenticator<UsernamePasswordCredentials> {
+public class AxelorAuthenticator implements Authenticator {
 
   public static final String INCORRECT_CREDENTIALS = /*$$(*/ "Wrong username or password" /*)*/;
   public static final String NO_CREDENTIALS = "No credentials";
@@ -46,7 +48,10 @@ public class AxelorAuthenticator implements Authenticator<UsernamePasswordCreden
   public static final String NEW_PASSWORD_PARAMETER = "newPassword";
 
   @Override
-  public void validate(UsernamePasswordCredentials credentials, WebContext context) {
+  public void validate(
+      Credentials inputCredentials, WebContext context, SessionStore sessionStore) {
+    final UsernamePasswordCredentials credentials = (UsernamePasswordCredentials) inputCredentials;
+
     if (credentials == null) {
       throw new BadCredentialsException(NO_CREDENTIALS);
     }

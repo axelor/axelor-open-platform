@@ -13,9 +13,9 @@ versions.resteasy = "4.7.6.Final"
 versions.jackson = "2.13.2"
 versions.jackson_databind = "2.13.2.2"
 versions.shiro = "1.9.0"
-versions.buji_pac4j = "5.0.1"
-versions.pac4j = "4.5.6"
-versions.ldaptive = "1.3.1"
+versions.buji_pac4j = "7.0.0"
+versions.pac4j = "5.4.2"
+versions.ldaptive = "2.1.0"
 
 versions.junit4 = "4.13.2"
 versions.junit5 = "5.8.2"
@@ -197,7 +197,6 @@ libs.pac4j = [
 ]
 
 libs.buji_pac4j = "io.buji:buji-pac4j:${versions.buji_pac4j}"
-
 
 // UnboundID LDAP SDK (for testing only)
 libs.unboundid_ldapsdk = 'com.unboundid:unboundid-ldapsdk:6.0.4'
