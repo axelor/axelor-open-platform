@@ -72,7 +72,7 @@ A chart view requires following information:
 * `onInit` - an action to be called during chart init
 * `<dataset>` - JPQL/SQL select query with select name aliases
 * `<category>` - defines the X-Axis of the chart with
-** `key` - the dataset field to be used to categories the data (used as X-Axis data points)
+** `key` - the dataset field to be used to categorize the data (used as X-Axis data points)
 ** `type` - category type can be, numeric, date, time, month, year or text
 ** `title` - category title displayed on X-Axis
 * `<series>` - list of data series defines the Y-Axis (for the moment only one series is allowed)
@@ -88,16 +88,19 @@ A chart view requires following information:
 
 == Config
 
-Charts can be configured with specific config values. These configuration may
+Charts can be configured with specific config values. These configurations may
 not be applicable to all chart types.
 
 Most important config values are:
 
 * `width` - width of the chart
 * `height` - height of the chart
-* `xFormat` - custom x-axis format
+* `xFormat` - custom x-axis format, like `MM-YYYY` or `DD/MM/YYYY`
 * `percent` - used with pie chart, show labels in percent
-* `colors` - specify base colors for charts,  each color is used to provide 5 gradient shades
+* `colors` - specify base colors for charts, each color is used to provide 4 gradient shades
+* `shades` - number of gradient shades used for colors
+* `hideLegend` - show/hide the legend
+* `min/max` -  used with gauge chart, define the minimum and maximum values.
 * `onClick` - call specified action with clicked data in context
 
 Please check the {nvd3}[NVD3 documentation] for more configurations.
@@ -105,7 +108,7 @@ Please check the {nvd3}[NVD3 documentation] for more configurations.
 == Colors
 
 Colors can be specified with colors config value (comma-separated). Each color
-is used to provide 5 gradient shades + 20 shades from d3's category20b preset.
+is used to provide 4 gradient shades + 20 shades from d3's category20b preset.
 
 [source,xml]
 ----
@@ -117,6 +120,9 @@ is used to provide 5 gradient shades + 20 shades from d3's category20b preset.
 
   <!-- or html hex colors -->
   <config name="colors" value="#31a354,#e6550d" />
+
+  <!-- with custom shades -->
+  <config name="shades" value="10" />
 
 </chart>
 ----
