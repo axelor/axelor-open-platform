@@ -2124,6 +2124,29 @@
               <xsd:attribute name="value" type="xsd:string" use="required" />
             </xsd:complexType>
           </xsd:element>
+          <xsd:element name="actions" minOccurs="0" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>
+                Define actions added on chart dashlet menu.
+              </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="action" minOccurs="1" maxOccurs="unbounded">
+                  <xsd:complexType>
+                    <xsd:annotation>
+                      <xsd:documentation>
+                        Define a chart action.
+                      </xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:attribute name="name" type="xsd:string" use="required"/>
+                    <xsd:attribute name="title" type="xsd:string"/>
+                    <xsd:attribute name="action" type="xsd:string" use="required"/>
+                  </xsd:complexType>
+                </xsd:element>
+              </xsd:sequence>
+            </xsd:complexType>
+          </xsd:element>
         </xsd:sequence>
         <xsd:attribute name="stacked" type="xsd:boolean" />
         <xsd:attribute name="onInit" type="xsd:string">

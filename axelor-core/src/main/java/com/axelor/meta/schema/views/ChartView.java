@@ -49,6 +49,10 @@ public class ChartView extends AbstractView {
 
   @XmlElement private List<ChartConfig> config;
 
+  @XmlElement(name = "action", type = ChartAction.class)
+  @XmlElementWrapper(name = "actions")
+  private List<ChartAction> actions;
+
   public Boolean getStacked() {
     return stacked;
   }
@@ -75,6 +79,10 @@ public class ChartView extends AbstractView {
 
   public List<ChartConfig> getConfig() {
     return config;
+  }
+
+  public List<ChartAction> getActions() {
+    return actions;
   }
 
   @XmlType
@@ -180,6 +188,34 @@ public class ChartView extends AbstractView {
 
     public String getValue() {
       return value;
+    }
+  }
+
+  @XmlType
+  public static class ChartAction {
+
+    @XmlAttribute private String name;
+
+    @XmlAttribute private String title;
+
+    @XmlAttribute private String action;
+
+    public String getName() {
+      return name;
+    }
+
+    @JsonIgnore
+    public String getTitle() {
+      return title;
+    }
+
+    public String getAction() {
+      return action;
+    }
+
+    @JsonGetter("title")
+    public String getLocalizedTitle() {
+      return I18n.get(title);
     }
   }
 }

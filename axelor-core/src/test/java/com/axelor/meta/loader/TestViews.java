@@ -26,6 +26,7 @@ import com.axelor.db.Query.Selector;
 import com.axelor.meta.MetaTest;
 import com.axelor.meta.schema.ObjectViews;
 import com.axelor.meta.schema.views.AbstractView;
+import com.axelor.meta.schema.views.ChartView;
 import com.axelor.meta.schema.views.FormView;
 import com.axelor.meta.schema.views.PanelInclude;
 import com.axelor.meta.schema.views.Search;
@@ -33,6 +34,7 @@ import com.axelor.script.ScriptHelper;
 import com.axelor.test.db.Title;
 import com.google.common.collect.Maps;
 import com.google.inject.persist.Transactional;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.Map;
 import javax.inject.Inject;
@@ -125,5 +127,22 @@ public class TestViews extends MetaTest {
     final AbstractView included = include.getView();
 
     assertEquals(form1.getName(), included.getName());
+  }
+
+  @Test
+  public void testChart() throws Exception {
+    ObjectViews views = this.unmarshal("com/axelor/meta/Charts.xml", ObjectViews.class);
+
+    ChartView chartView = (ChartView) views.getViews().get(0);
+
+    assertEquals(1, chartView.getActions().size());
+    assertEquals("testChartAction", chartView.getActions().get(0).getName());
+    assertEquals(
+        "com.axelor.meta.web.Hello:chartAction", chartView.getActions().get(0).getAction());
+
+    StringWriter writer = new StringWriter();
+    XMLViews.marshal(views, writer);
+
+    assertTrue(writer.toString().contains("com.axelor.meta.web.Hello:chartAction"));
   }
 }

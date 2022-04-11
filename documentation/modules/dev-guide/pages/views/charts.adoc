@@ -84,6 +84,7 @@ A chart view requires following information:
 * `<config>` - custom configuration data
 ** `name` - name of the configuration item
 ** `value` - configuration value
+* `<actions>` - add actions on chart menu
 
 == Config
 
@@ -119,3 +120,43 @@ is used to provide 5 gradient shades + 20 shades from d3's category20b preset.
 
 </chart>
 ----
+
+== Actions
+
+Adding actions on chart menu (gear icon on the top right) is supported using
+following syntax :
+
+[source,xml]
+----
+<chart ...>
+  ...
+  <actions>
+    <action name="myBtn1" title="Act1" action="com.axelor.Hello:myAction1"/>
+    <action name="myBtn2" title="Act2" action="some-action2"/>
+  </actions>
+</chart>
+----
+where :
+
+* `name` : Name of the action
+* `title` : Title of the button displayed on chart menu
+* `action` : Action to execute.
+
+`<actions>` should have at least one `<action>`.
+The action will get current chart name and data in context. Example :
+
+[source,json]
+----
+{
+  "_chart": "chart.sales.per.month.pie",              <1>
+  "_data": [{...}, ...],                              <2>
+  "_domainAction": "chart:chart.sales.per.month.pie", <3>
+  "_parent": {...},                                   <4>
+  "fromDate": "2022-04-20"                            <5>
+}
+----
+<1> : Name of the chart
+<2> : Dataset of the chart
+<3> : Dashlet action
+<4> : Parent context
+<5> : Fields data defined in `<search-fields>`

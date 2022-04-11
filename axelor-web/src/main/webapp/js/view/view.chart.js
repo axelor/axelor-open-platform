@@ -38,7 +38,7 @@ function ChartCtrl($scope, $element, $http, ActionService) {
   var viewChart = null;
   var searchScope = null;
   var clickHandler = null;
-  var actionHandler = null;
+  var actions = [];
 
   var loading = false;
   var unwatch = null;
@@ -84,13 +84,16 @@ function ChartCtrl($scope, $element, $http, ActionService) {
             action: data.config.onClick
           });
         }
-        if (data.config && data.config.onAction) {
-          actionHandler = ActionService.handler($scope, $element, {
-            action: data.config.onAction
+        if (data.actions && data.actions.length > 0) {
+          _.forEach(data.actions, function (act) {
+            actions.push({
+              name: act.name,
+              title: _t(act.title) || _.humanize(act.name),
+              actionHandler: ActionService.handler($scope, $element, {
+                  action: act.action
+                })
+            })
           });
-        }
-        if (data.config && data.config.onActionTitle) {
-          $scope.actionTitle = data.config.onActionTitle;
         }
       } else {
         data = _.extend({}, viewChart, data);
@@ -116,18 +119,23 @@ function ChartCtrl($scope, $element, $http, ActionService) {
     searchScope = formScope;
   };
 
-  $scope.hasAction = function () {
-    return !!actionHandler;
+  $scope.getActions = function() {
+    return actions;
   };
 
-  $scope.handleAction = function (data) {
-    if (actionHandler) {
-      actionHandler._getContext = function () {
+  $scope.hasActions = function () {
+    return actions && actions.length > 0;
+  };
+
+  $scope.handleAction = function (action, data) {
+    var handler = action.actionHandler;
+    if (handler) {
+      handler._getContext = function () {
         return _.extend({}, prepareContext(), { _data: data }, {
           _chart: view.name
         });
       };
-      actionHandler.handle();
+      handler.handle();
     }
   };
 
@@ -1044,8 +1052,8 @@ var directiveFn = function(){
           scope.onExport = function () {
             doExport(data);
           };
-          scope.onAction = function () {
-            scope.handleAction(data && data.dataset);
+          scope.onAction = function (action) {
+            scope.handleAction(action, data && data.dataset);
           };
           scope.$applyAsync();
           return;

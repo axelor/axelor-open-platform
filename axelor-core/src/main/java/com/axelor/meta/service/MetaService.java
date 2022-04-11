@@ -24,6 +24,7 @@ import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.ViewCustomizationPermission;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
@@ -45,6 +46,7 @@ import com.axelor.meta.loader.XMLViews;
 import com.axelor.meta.schema.actions.Action;
 import com.axelor.meta.schema.views.AbstractView;
 import com.axelor.meta.schema.views.ChartView;
+import com.axelor.meta.schema.views.ChartView.ChartAction;
 import com.axelor.meta.schema.views.ChartView.ChartConfig;
 import com.axelor.meta.schema.views.ChartView.ChartSeries;
 import com.axelor.meta.schema.views.CustomView;
@@ -529,6 +531,7 @@ public class MetaService {
 
     List<Object> series = Lists.newArrayList();
     Map<String, Object> config = Maps.newHashMap();
+    List<Map<String, Object>> actions = new ArrayList<>();
 
     for (ChartSeries cs : chart.getSeries()) {
       Map<String, Object> map = Maps.newHashMap();
@@ -547,8 +550,19 @@ public class MetaService {
       }
     }
 
+    if (ObjectUtils.notEmpty(chart.getActions())) {
+      for (ChartAction chartAction : chart.getActions()) {
+        Map<String, Object> chartActionMap = new HashMap<>();
+        chartActionMap.put("name", chartAction.getName());
+        chartActionMap.put("title", chartAction.getLocalizedTitle());
+        chartActionMap.put("action", chartAction.getAction());
+        actions.add(chartActionMap);
+      }
+    }
+
     data.put("series", series);
     data.put("config", config);
+    data.put("actions", actions);
     data.put("search", chart.getSearchFields());
     data.put("onInit", chart.getOnInit());
 

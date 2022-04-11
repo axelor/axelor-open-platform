@@ -221,3 +221,28 @@ auth.provider.myprovider.absoluteUrlRequired = false
 auth.provider.myprovider.key = 127736102816-tc5mmsfaasa399jhqkfbv48nftoc55ft.apps.googleusercontent.com
 auth.provider.myprovider.secret = qySuozNl72zzM5SKW-0kczwV
 ----
+
+== Charts
+
+Adding buttons on chart menu was working using the following syntax :
+
+[source,xml]
+----
+<chart ...>
+  ...
+  <config name="onAction" value="some-action"/>
+  <config name="onActionTitle" value="some-title"/>
+</chart>
+----
+
+This syntax has been updated to the following :
+[source,xml]
+----
+<chart ...>
+  ...
+  <actions>
+    <action name="myBtn1" title="My action 1" action="some-action1"/>
+    <action name="myBtn2" title="My action 2" action="some-action2"/>
+  </actions>
+</chart>
+----

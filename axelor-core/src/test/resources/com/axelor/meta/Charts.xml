@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_6.0.xsd">
+
+    <chart name="chart.credit.by.customer" title="Credit by customer">
+        <dataset type="sql">
+        <![CDATA[
+        SELECT
+            c.credit AS amount,
+            c.full_name AS customer
+        FROM
+            contact_contact c
+        ]]>
+        </dataset>
+        <category key="customer"/>
+        <series key="amount" type="pie" aggregate="sum"/>
+        <config name="onClick" value="com.axelor.meta.web.Hello:chartOnClick"/>
+        <actions>
+            <action name="testChartAction" title="A test" action="com.axelor.meta.web.Hello:chartAction"/>
+        </actions>
+    </chart>
+
+</object-views>
