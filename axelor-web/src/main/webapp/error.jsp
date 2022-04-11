@@ -19,20 +19,16 @@
 
 --%>
 <%@ taglib prefix="x" uri="WEB-INF/axelor.tld" %>
+<%@ page language="java" session="false" isErrorPage="true" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page language="java" session="false" isErrorPage="true"%>
-<%@ page import="java.util.function.Function"%>
-<%@ page import="java.util.Calendar" %>
-<%@ page import="java.util.ResourceBundle" %>
 <%@ page import="com.axelor.auth.pac4j.ClientListProvider" %>
 <%@ page import="com.axelor.common.HtmlUtils" %>
-<%@ page import="com.axelor.common.StringUtils"%>
 <%@ page import="com.axelor.web.internal.AppInfo" %>
-<%@ page import="com.axelor.i18n.I18n" %>
 <%@ page import="com.axelor.inject.Beans" %>
 <%@ page import="com.axelor.common.HtmlUtils" %>
 <%@ page import="org.apache.shiro.authc.UnknownAccountException" %>
 <%@ page import="org.pac4j.core.util.CommonHelper" %>
+<%@include file='common.jsp'%>
 <%
 String errorMsg;
 
@@ -48,31 +44,10 @@ if (!Beans.get(ClientListProvider.class).isExclusive()) {
   return;
 }
 
-final ResourceBundle bundle = I18n.getBundle(request.getLocale());
-Function<String, String> T = new Function<String, String>() {
-  public String apply(String t) {
-    try {
-      return bundle.getString(t);
-    } catch (Exception e) {
-      return t;
-    }
-  }
-};
-
-AppInfo info = new AppInfo();
-
-String loginHeader = "/login-header.jsp";
-if (pageContext.getServletContext().getResource(loginHeader) == null) {
-  loginHeader = null;
-}
-
-int year = Calendar.getInstance().get(Calendar.YEAR);
-String copyright = String.format("&copy; 2005 - %s Axelor. All Rights Reserved.", year);
-
 errorMsg = T.apply(errorMsg);
 %>
 <!DOCTYPE html>
-<html lang="<%= info.getPageLang() %>">
+<html lang="<%= pageLang %>">
 <head>
   <title>Error</title>
   <meta charset="utf-8">
@@ -83,14 +58,10 @@ errorMsg = T.apply(errorMsg);
   <x:script src="js/application.login.js" />
 </head>
 <body>
-  <% if (loginHeader != null) { %>
-  <jsp:include page="<%= loginHeader %>" />
-  <% } %>
-
   <div class="container-fluid">
     <div class="panel login-panel">
       <div class="panel-header panel-default">
-        <img src="img/axelor.png" width="192px" alt="Axelor">
+        <img src="<%= appLogo %>" width="192px" alt="Axelor">
       </div>
     </div>
     <div id="error-msg" class="alert alert-block alert-error text-center %>">
@@ -99,7 +70,7 @@ errorMsg = T.apply(errorMsg);
   </div>
 
   <footer class="container-fluid">
-    <p class="credit small"><%= copyright %></p>
+    <p class="credit small"><%= appCopyright %></p>
   </footer>
 </body>
 </html>

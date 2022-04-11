@@ -20,28 +20,14 @@
 <%@ taglib prefix="x" uri="WEB-INF/axelor.tld" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page language="java" session="true" %>
-<%@ page import="java.util.Calendar" %>
-<%@ page import="java.util.Date" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="java.util.function.Function"%>
-<%@ page import="com.axelor.i18n.I18n" %>
 <%@ page import="com.axelor.inject.Beans" %>
 <%@ page import="com.axelor.auth.AuthService" %>
-<%@ page import="com.axelor.app.AppSettings" %>
 <%@ page import="com.axelor.auth.pac4j.AuthPac4jInfo" %>
 <%@ page import="org.pac4j.http.client.indirect.FormClient" %>
 <%@ page import="com.axelor.common.HtmlUtils" %>
+<%@include file='common.jsp'%>
 <%
-
-Function<String, String> T = new Function<String, String>() {
-  public String apply(String t) {
-    try {
-      return I18n.get(t);
-    } catch (Exception e) {
-      return t;
-    }
-  }
-};
 
 AuthService authService = AuthService.getInstance();
 
@@ -64,9 +50,6 @@ String confirmPassword = T.apply("Confirm new password");
 String passwordPattern = authService.getPasswordPattern();
 String passwordPatternTitle = authService.getPasswordPatternTitle();
 
-int year = Calendar.getInstance().get(Calendar.YEAR);
-String copyright = String.format("&copy; 2005 - %s Axelor. All Rights Reserved.", year);
-
 @SuppressWarnings("all")
 Map<String, String> tenants = (Map) session.getAttribute("tenantMap");
 String tenantId = (String) session.getAttribute("tenantId");
@@ -75,7 +58,7 @@ AuthPac4jInfo authPac4jInfo = Beans.get(AuthPac4jInfo.class);
 String callbackUrl = authPac4jInfo.getCallbackUrl();
 %>
 <!DOCTYPE html>
-<html>
+<html lang="<%= pageLang %>">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -89,7 +72,7 @@ String callbackUrl = authPac4jInfo.getCallbackUrl();
     <div class="container-fluid">
       <div class="panel login-panel">
         <div class="panel-header panel-default">
-          <img src="img/axelor.png" width="192px">
+          <img src="<%= appLogo %>" width="192px">
         </div>
 
         <div class="alert alert-block alert-error text-center">
@@ -148,7 +131,7 @@ String callbackUrl = authPac4jInfo.getCallbackUrl();
     </div>
 
     <footer class="container-fluid">
-      <p class="credit small"><%= copyright %></p>
+      <p class="credit small"><%= appCopyright %></p>
     </footer>
 
     <script type="text/javascript">

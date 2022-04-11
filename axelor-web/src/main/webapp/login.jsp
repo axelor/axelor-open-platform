@@ -20,29 +20,15 @@
 <%@ taglib prefix="x" uri="WEB-INF/axelor.tld" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page language="java" session="true" %>
-<%@ page import="java.util.Calendar" %>
-<%@ page import="java.util.Date" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Map.Entry"%>
 <%@ page import="java.util.Set" %>
-<%@ page import="java.util.function.Function"%>
 <%@ page import="org.pac4j.http.client.indirect.FormClient" %>
-<%@ page import="com.axelor.i18n.I18n" %>
 <%@ page import="com.axelor.inject.Beans" %>
-<%@ page import="com.axelor.app.AppSettings" %>
 <%@ page import="com.axelor.auth.pac4j.AuthPac4jInfo" %>
 <%@ page import="com.axelor.common.HtmlUtils" %>
+<%@include file='common.jsp'%>
 <%
-
-Function<String, String> T = new Function<String, String>() {
-  public String apply(String t) {
-    try {
-      return I18n.get(t);
-    } catch (Exception e) {
-      return t;
-    }
-  }
-};
 
 String errorMsg = T.apply(request.getParameter(FormClient.ERROR_PARAMETER));
 
@@ -58,9 +44,6 @@ String warningAdblock2 = T.apply("Please disable the adblocker as it may slow do
 
 String loginWith = T.apply("Log in with %s");
 
-int year = Calendar.getInstance().get(Calendar.YEAR);
-String copyright = String.format("&copy; 2005 - %s Axelor. All Rights Reserved.", year);
-
 String loginHeader = "/login-header.jsp";
 if (pageContext.getServletContext().getResource(loginHeader) == null) {
   loginHeader = null;
@@ -75,7 +58,7 @@ String callbackUrl = authPac4jInfo.getCallbackUrl();
 Set<String> centralClients = authPac4jInfo.getCentralClients();
 %>
 <!DOCTYPE html>
-<html>
+<html lang="<%= pageLang %>">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -93,7 +76,7 @@ Set<String> centralClients = authPac4jInfo.getCentralClients();
     <div class="container-fluid">
       <div class="panel login-panel">
         <div class="panel-header panel-default">
-          <img src="img/axelor.png" width="192px">
+          <img src="<%= appLogo %>" width="192px">
         </div>
 
         <div id="error-msg" class="alert alert-block alert-error text-center <%= errorMsg == null ? "hidden" : "" %>">
@@ -166,7 +149,7 @@ Set<String> centralClients = authPac4jInfo.getCentralClients();
     </div>
 
     <footer class="container-fluid">
-      <p class="credit small"><%= copyright %></p>
+      <p class="credit small"><%= appCopyright %></p>
     </footer>
 
     <div id="adblock"></div>

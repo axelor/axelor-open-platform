@@ -35,7 +35,6 @@ import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import io.buji.pac4j.profile.ShiroProfileManager;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,7 +45,6 @@ import java.util.Optional;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.JspException;
 import org.pac4j.jee.context.JEEContext;
 import org.pac4j.jee.context.session.JEESessionStore;
 
@@ -166,7 +164,12 @@ public class AppInfo {
     return null;
   }
 
-  public String getLogo() throws JspException, IOException {
+  /**
+   * Gets user specific application logo, or falls back to default application logo.
+   *
+   * @return user specific logo link
+   */
+  public String getLogo() {
     final String logo = SETTINGS.get(AvailableAppSettings.APPLICATION_LOGO, "img/axelor.png");
     if (SETTINGS.get(AvailableAppSettings.CONTEXT_APP_LOGO) != null) {
       final ScriptBindings bindings = new ScriptBindings(new HashMap<>());
@@ -174,6 +177,7 @@ public class AppInfo {
       try {
         return getLink(helper.eval("__config__.appLogo"), logo);
       } catch (Exception e) {
+        // Ignore
       }
     }
     return logo;
