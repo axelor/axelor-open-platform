@@ -18,13 +18,20 @@
  */
 package com.axelor.auth.pac4j;
 
+import static org.pac4j.core.context.WebContextHelper.isDelete;
+import static org.pac4j.core.context.WebContextHelper.isPatch;
+import static org.pac4j.core.context.WebContextHelper.isPost;
+import static org.pac4j.core.context.WebContextHelper.isPut;
+
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.pac4j.core.authorization.authorizer.CsrfAuthorizer;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.profile.UserProfile;
+import org.pac4j.core.util.Pac4jConstants;
 
 @Singleton
 public class AxelorCsrfAuthorizer extends CsrfAuthorizer {
@@ -47,6 +54,38 @@ public class AxelorCsrfAuthorizer extends CsrfAuthorizer {
       return true;
     }
 
-    return super.isAuthorized(context, sessionStore, profiles);
+    return internalIsAuthorized(context, sessionStore, profiles);
+  }
+
+  /**
+   * Matches {@link AxelorCsrfGenerator} behavior.
+   *
+   * <p>Code taken from:
+   * https://github.com/pac4j/pac4j/blob/4.5.x/pac4j-core/src/main/java/org/pac4j/core/authorization/authorizer/CsrfAuthorizer.java#L40
+   *
+   * @param context the web context
+   * @param sessionStore the session store
+   * @param profiles the user profiles
+   * @return whether the access is authorized
+   */
+  protected boolean internalIsAuthorized(
+      WebContext context, SessionStore sessionStore, List<UserProfile> profiles) {
+    final boolean checkRequest =
+        isCheckAllRequests()
+            || isPost(context)
+            || isPut(context)
+            || isPatch(context)
+            || isDelete(context);
+    if (checkRequest) {
+      final String parameterToken = context.getRequestParameter(getParameterName()).orElse(null);
+      final String headerToken = context.getRequestHeader(getHeaderName()).orElse(null);
+      @SuppressWarnings("unchecked")
+      final Optional<String> sessionToken =
+          (Optional<String>) (Optional<?>) sessionStore.get(context, Pac4jConstants.CSRF_TOKEN);
+      return sessionToken.isPresent()
+          && (sessionToken.get().equals(parameterToken) || sessionToken.get().equals(headerToken));
+    } else {
+      return true;
+    }
   }
 }
