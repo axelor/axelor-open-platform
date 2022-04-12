@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -318,48 +319,71 @@ public class ClientListProvider implements Provider<List<Client>> {
       config = inject(configClass);
       setField(client, "configuration", config);
     } else {
-      // configure client directly if no configuration object
-      config = client;
+      config = null;
     }
+
+    final Consumer<Entry<String, Object>> configurer =
+        config != null
+            ? item -> setConfig(client, config, item.getKey(), item.getValue())
+            : item -> setField(client, item.getKey(), item.getValue());
 
     props.entrySet().stream()
         .filter(item -> !EXTRA_CONFIGS.contains(item.getKey()))
-        .forEach(
-            item -> {
-              try {
-                setField(config, item.getKey(), item.getValue());
-              } catch (Exception e) {
-                logger.error("Configuration error", e.getCause());
-              }
-            });
+        .forEach(configurer);
 
     return client;
   }
 
-  private void setField(Object obj, String property, Object value) {
+  private void setConfig(Object client, Object config, String property, Object value) {
+    final Exception configError;
+
     try {
-      final List<String> propertyParts = Arrays.asList(property.split("\\.", 2));
-      final Method setter = findSetter(obj.getClass(), propertyParts.get(0));
-      Class<?> type = setter.getParameterTypes()[0];
-      type = PRIMITIVE_TYPES.getOrDefault(type, type);
-
-      if (type.isAssignableFrom(Map.class)) {
-        final Method getter = findGetter(obj.getClass(), propertyParts.get(0));
-        @SuppressWarnings("unchecked")
-        Map<String, Object> map = (Map<String, Object>) getter.invoke(obj);
-        if (map == null) {
-          map = new LinkedHashMap<>();
-          setter.invoke(obj, map);
-        }
-        map.put(propertyParts.get(1), value);
-        return;
-      }
-
-      final Object converted = convert(type, value);
-      setter.invoke(obj, converted);
+      setFieldChecked(config, property, value);
+      return;
+    } catch (NoSuchMethodException e) {
+      configError = e;
     } catch (ReflectiveOperationException e) {
       throw new RuntimeException(e);
     }
+
+    try {
+      setFieldChecked(client, property, value);
+    } catch (NoSuchMethodException e) {
+      throw new RuntimeException(configError);
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void setField(Object obj, String property, Object value) {
+    try {
+      setFieldChecked(obj, property, value);
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void setFieldChecked(Object obj, String property, Object value)
+      throws ReflectiveOperationException {
+    final List<String> propertyParts = Arrays.asList(property.split("\\.", 2));
+    final Method setter = findSetter(obj.getClass(), propertyParts.get(0));
+    Class<?> type = setter.getParameterTypes()[0];
+    type = PRIMITIVE_TYPES.getOrDefault(type, type);
+
+    if (type.isAssignableFrom(Map.class)) {
+      final Method getter = findGetter(obj.getClass(), propertyParts.get(0));
+      @SuppressWarnings("unchecked")
+      Map<String, Object> map = (Map<String, Object>) getter.invoke(obj);
+      if (map == null) {
+        map = new LinkedHashMap<>();
+        setter.invoke(obj, map);
+      }
+      map.put(propertyParts.get(1), value);
+      return;
+    }
+
+    final Object converted = convert(type, value);
+    setter.invoke(obj, converted);
   }
 
   private Object convert(Class<?> type, Object value) throws ReflectiveOperationException {
