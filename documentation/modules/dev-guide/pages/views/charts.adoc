@@ -158,7 +158,8 @@ The action will get current chart name and data in context. Example :
   "_data": [{...}, ...],                              <2>
   "_domainAction": "chart:chart.sales.per.month.pie", <3>
   "_parent": {...},                                   <4>
-  "fromDate": "2022-04-20"                            <5>
+  "fromDate": "2022-04-20",                           <5>
+  "_signal": "myBtn1"                                 <6>
 }
 ----
 <1> : Name of the chart
@@ -166,3 +167,4 @@ The action will get current chart name and data in context. Example :
 <3> : Dashlet action
 <4> : Parent context
 <5> : Fields data defined in `<search-fields>`
+<6> : Action signal (ie, the name)

@@ -132,7 +132,8 @@ function ChartCtrl($scope, $element, $http, ActionService) {
     if (handler) {
       handler._getContext = function () {
         return _.extend({}, prepareContext(), { _data: data }, {
-          _chart: view.name
+          _chart: view.name,
+          _signal: action.name
         });
       };
       handler.handle();
@@ -143,7 +144,8 @@ function ChartCtrl($scope, $element, $http, ActionService) {
     if (clickHandler) {
       clickHandler._getContext = function () {
         return _.extend({}, prepareContext(), e.data.raw, {
-          _chart: view.name
+          _chart: view.name,
+          _signal: 'onClick'
         });
       };
       clickHandler.handle();
