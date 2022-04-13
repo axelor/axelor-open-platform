@@ -680,7 +680,7 @@ public class RestService extends ResourceService {
     }
 
     final String separator =
-        Optional.ofNullable(settings.get(AvailableAppSettings.DATA_EXPORT_SEPARTOR))
+        Optional.ofNullable(settings.get(AvailableAppSettings.DATA_EXPORT_SEPARATOR))
             .filter(StringUtils::notEmpty)
             .orElse(";");
     if (separator.length() != 1) {

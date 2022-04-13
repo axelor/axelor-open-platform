@@ -451,7 +451,7 @@
         config.DEV = config['application.mode'] == 'dev';
         config.PROD = config['application.mode'] == 'prod';
 
-        if (config['view.confirm.yes-no'] === true) {
+        if (config['view.confirm-yes-no'] === true) {
           _.extend(axelor.dialogs.config, {
             yesNo: true
           });

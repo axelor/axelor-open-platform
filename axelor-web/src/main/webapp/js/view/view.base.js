@@ -123,7 +123,7 @@ function ViewCtrl($scope, DataSource, ViewService) {
   }
 
   // hide toolbar button titles
-  $scope.tbTitleHide = !axelor.config['view.toolbar.titles'];
+  $scope.tbTitleHide = !axelor.config['view.toolbar.show-titles'];
 
   function switchAndEdit(id, readonly, callback) {
     $scope.switchTo('form', function(scope) {

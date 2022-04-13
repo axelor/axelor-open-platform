@@ -49,7 +49,7 @@
             onChange="action-condition-user-password"/>
           <field name="chkPassword" title="Confirm password" placeholder="confirm password" help="Confirm password of the new user (must be identical to the password)" widget="password" requiredIf="change || !id" validIf="chkPassword === newPassword"/>
         </panel>
-        <help>user.password.pattern.title</help>
+        <help>user.password.pattern-title</help>
       </panel>
     </panel>
     <panel-tabs>
@@ -73,7 +73,7 @@
           <field name="newPassword" title="New password" placeholder="new password" help="New password of the user" widget="password" requiredIf="change" validIf="!change || newPassword.length >= 4"
             onChange="action-condition-user-password"/>
           <field name="chkPassword" title="Confirm new password" placeholder="confirm new password" help="Confirm new password of the user (must be identical to the new password)" widget="password" requiredIf="change" validIf="chkPassword === newPassword"/>
-          <help>user.password.pattern.title</help>
+          <help>user.password.pattern-title</help>
       </panel>
     </panel>
   </form>

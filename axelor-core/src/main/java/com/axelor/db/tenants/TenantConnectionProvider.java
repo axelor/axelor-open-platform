@@ -90,9 +90,9 @@ public class TenantConnectionProvider
         Long.valueOf(settings.get(AvailableAppSettings.HIBERNATE_HIKARI_IDLE_TIMEOUT, "300000")));
     hc.setMaximumPoolSize(
         Integer.valueOf(
-            settings.get(AvailableAppSettings.HIBERNATE_HIKARI_MAXIMUN_POOL_SIZE, "20")));
+            settings.get(AvailableAppSettings.HIBERNATE_HIKARI_MAXIMUM_POOL_SIZE, "20")));
     hc.setMinimumIdle(
-        Integer.valueOf(settings.get(AvailableAppSettings.HIBERNATE_HIKARI_MINIMUN_IDLE, "5")));
+        Integer.valueOf(settings.get(AvailableAppSettings.HIBERNATE_HIKARI_MINIMUM_IDLE, "5")));
 
     return new HikariDataSource(hc);
   }

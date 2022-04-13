@@ -1044,7 +1044,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
   };
 
   $scope.canExport = function(full) {
-    var allowFull = axelor.config["view.adv-search.export.full"] !== false;
+    var allowFull = axelor.config["view.adv-search.export-full"] !== false;
     var handler = $scope.$parent.handler;
     if (handler && handler.hasPermission) {
       return full ? allowFull && handler.hasPermission('export') : handler.hasPermission('export');

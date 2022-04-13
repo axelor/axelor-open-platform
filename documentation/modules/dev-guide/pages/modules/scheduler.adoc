@@ -28,7 +28,7 @@ quartz.enable = false
 
 # total number of threads in quartz thread pool
 # the number of jobs that can run simultaneously
-quartz.threadCount = 5
+quartz.thread-count = 5
 ----
 
 == Jobs

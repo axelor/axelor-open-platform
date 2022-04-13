@@ -86,15 +86,15 @@ It can be controlled with following settings:
 # CORS settings to allow cross origin requests
 
 # regular expression to test allowed origin or * to allow all (not recommended)
-#cors.allow.origin = *
-#cors.allow.credentials = true
-#cors.allow.methods = GET,PUT,POST,DELETE,HEAD,OPTIONS
-#cors.allow.headers = Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers
-#cors.expose.headers =
-#cors.max.age = 1728000
+#cors.allow-origin = *
+#cors.allow-credentials = true
+#cors.allow-methods = GET,PUT,POST,DELETE,HEAD,OPTIONS
+#cors.allow-headers = Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers
+#cors.expose-headers =
+#cors.max-age = 1728000
 ----
 
-Generally, you should only set `cors.allow.origin` to a list of domains to allow.
+Generally, you should only set `cors.allow-origin` to a list of domains to allow.
 Other options should be left as it is.
 
 To avoid preflight cors requests, do not add `X-Requested-With` header and

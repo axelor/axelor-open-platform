@@ -48,7 +48,7 @@ public abstract class AbstractBaseCache extends JpaTest {
       AppSettings.get()
           .getInternalProperties()
           .put(
-              AvailableAppSettings.JAVAX_PERSISTENCE_SHAREDCACHE_MODE,
+              AvailableAppSettings.JAVAX_PERSISTENCE_SHARED_CACHE_MODE,
               SharedCacheMode.ENABLE_SELECTIVE.toString());
       // Enable statistics
       AppSettings.get()

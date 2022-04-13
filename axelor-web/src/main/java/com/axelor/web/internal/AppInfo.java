@@ -106,7 +106,7 @@ public class AppInfo {
     map.put("application.help", SETTINGS.get(AvailableAppSettings.APPLICATION_HELP));
     map.put("application.mode", SETTINGS.get(AvailableAppSettings.APPLICATION_MODE, "dev"));
 
-    map.put("file.upload.size", SETTINGS.get(AvailableAppSettings.FILE_UPLOAD_SIZE, "5"));
+    map.put("data.upload.max-size", SETTINGS.get(AvailableAppSettings.FILE_UPLOAD_SIZE, "5"));
     map.put("application.sdk", VersionUtils.getVersion().version);
 
     Map<String, String> viewsProps = SETTINGS.getPropertiesStartingWith("view.");

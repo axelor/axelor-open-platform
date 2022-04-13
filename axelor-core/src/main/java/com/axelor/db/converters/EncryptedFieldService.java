@@ -45,8 +45,8 @@ import org.slf4j.LoggerFactory;
  * migration.
  *
  * <ul>
- *   <li><code>encryption.algorithm.old</code> the old algorithm, empty if not set previously
- *   <li><code>encryption.password.old</code> the old password, empty if not set previously
+ *   <li><code>encryption.old-algorithm</code> the old algorithm, empty if not set previously
+ *   <li><code>encryption.old-password</code> the old password, empty if not set previously
  * </ul>
  *
  * and new settings:

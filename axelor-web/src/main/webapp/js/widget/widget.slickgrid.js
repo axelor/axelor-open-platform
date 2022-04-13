@@ -705,7 +705,7 @@ Grid.prototype.parse = function(view) {
     if (view.customizable !== false
         && view.name
         && axelor.config["user.viewCustomizationPermission"]
-        && axelor.config["view.customization"] !== false) {
+        && axelor.config["view.allow-customization"] !== false) {
       customMenus = [{
         title: _t("Customize…"),
         command: "customize"
@@ -2173,7 +2173,7 @@ Grid.prototype._showEditor = function (activeCell) {
       return promise;
     }
 
-    this.useEditorButtons = axelor.config["view.grid.editor.buttons"] !== false;
+    this.useEditorButtons = axelor.config["view.grid.editor-buttons"] !== false;
 
     var beforeFirstElem;
     var afterLastElem;

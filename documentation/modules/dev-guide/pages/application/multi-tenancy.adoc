@@ -20,7 +20,7 @@ database connections.
 [source,properties]
 ----
 # enable multi-tenancy
-application.multi_tenancy = true <1>
+application.multi-tenancy = true <1>
 
 db.default.visible = false <2>
 db.default.driver = org.postgresql.Driver

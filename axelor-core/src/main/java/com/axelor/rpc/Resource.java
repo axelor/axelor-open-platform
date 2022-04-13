@@ -153,7 +153,7 @@ public class Resource<T extends Model> {
       securityWarner =
           AppSettings.get()
                   .getBoolean(
-                      AvailableAppSettings.APPLICATION_DISABLE_PERMISSION_RELATIONAL_FIELDS, false)
+                      AvailableAppSettings.APPLICATION_PERMISSION_DISABLE_RELATIONAL_FIELD, false)
               ? Beans.get(AuthSecurityWarner.class)
               : Beans.get(JpaSecurity.class);
     }

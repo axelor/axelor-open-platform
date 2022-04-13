@@ -44,7 +44,7 @@ public class ActionExecutor {
     this.postActionEvent = postActionEvent;
     this.security =
         AppSettings.get()
-                .getBoolean(AvailableAppSettings.APPLICATION_DISABLE_PERMISSION_ACTIONS, false)
+                .getBoolean(AvailableAppSettings.APPLICATION_PERMISSION_DISABLE_ACTION, false)
             ? Beans.get(AuthSecurityWarner.class)
             : security;
   }

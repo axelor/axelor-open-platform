@@ -71,7 +71,7 @@ Extension views have one or more `<extend>` tags defining the extensions:
 | `if-module` | name of a module and only apply this extension if this module is installed _(optional)_
 |===
 
-The `if-feature` attribute works with a class extending `com.axelor.app.AppConfig` and specified by `application.config.provider` configuration in `axelor-config.properties` file:
+The `if-feature` attribute works with a class extending `com.axelor.app.AppConfig` and specified by `application.config-provider` configuration in `axelor-config.properties` file:
 
 [source,java]
 -----

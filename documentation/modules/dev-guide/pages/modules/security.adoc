@@ -188,7 +188,7 @@ If no callback URL is configured, it defaults to "base URL" + "/callback".
 -----
 # Single sign-on common configuration
 #
-# callback URL for all indirect clients (defaults to application.baseUrl + "/callback")
+# callback URL for all indirect clients (defaults to application.base-url + "/callback")
 auth.callback.url = http://localhost:8080/open-platform-demo/callback
 -----
 

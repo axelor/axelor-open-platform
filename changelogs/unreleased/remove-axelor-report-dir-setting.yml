@@ -1,5 +1,0 @@
----
-title: Remove deprecated `axelor.report.dir` settings
-type: remove
-description: |
-  Use `reports.design.dir` instead.

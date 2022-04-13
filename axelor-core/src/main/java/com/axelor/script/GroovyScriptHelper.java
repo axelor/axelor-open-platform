@@ -77,12 +77,13 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 
     try {
       cacheSize =
-          Integer.parseInt(System.getProperty(AvailableAppSettings.AXELOR_SCRIPT_CACHE_SIZE));
+          Integer.parseInt(System.getProperty(AvailableAppSettings.APPLICATION_SCRIPT_CACHE_SIZE));
     } catch (Exception e) {
     }
     try {
       cacheExpireTime =
-          Integer.parseInt(System.getProperty(AvailableAppSettings.AXELOR_SCRIPT_CACHE_EXPIRETIME));
+          Integer.parseInt(
+              System.getProperty(AvailableAppSettings.APPLICATION_SCRIPT_CACHE_EXPIRE_TIME));
     } catch (Exception e) {
     }
 

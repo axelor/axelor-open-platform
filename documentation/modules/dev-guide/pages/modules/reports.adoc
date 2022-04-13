@@ -16,14 +16,11 @@ Following configuration settings should be provided via `axelor-config.propertie
 # ~~~~~
 # this directory is searched for the rptdesign files
 # (fallbacks to designs provided by modules)
-reports.design.dir = {user.home}/axelor/reports
+reports.design-dir = {user.home}/axelor/reports
 
-# Storage path for report outputs
-reports.output.dir = {user.home}/axelor/reports-gen
 ----
 
-* `reports.design.dir` - the external directory of design files and related resources
-* `reports.output.dir` - the directory where generated reports are saved
+* `reports.design-dir` - the external directory of design files and related resources
 
 == Directory Structure
 
@@ -37,7 +34,7 @@ The reports directory structure should be as follow:
 The reports can also be provided from modules itself from the `src/main/resources/reports`
 directory which follows same structure.
 
-If `reports.design.dir` configuration is given, the resource locator first
+If `reports.design-dir` configuration is given, the resource locator first
 searches design files and related resources from that directory and fallbacks
 to the module provided resources.
 

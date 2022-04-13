@@ -780,7 +780,7 @@ ui.directive('uiDmsUploader', ['$q', '$http', function ($q, $http) {
       uploads.pending.length = 0;
     };
 
-    var uploadSize = +(axelor.config["file.upload.size"]) || 0;
+    var uploadSize = +(axelor.config["data.upload.max-size"]) || 0;
 
     function doUpload(files) {
       if (!scope.canCreateDocument(true)) {

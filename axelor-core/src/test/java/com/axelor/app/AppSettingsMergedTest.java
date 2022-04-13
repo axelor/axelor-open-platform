@@ -34,7 +34,7 @@ public class AppSettingsMergedTest {
       AppSettings setting = AppSettings.get();
 
       assertEquals(21, setting.getInternalProperties().size());
-      assertEquals("3", setting.get("quartz.threadCount"));
+      assertEquals("3", setting.get("quartz.thread-count"));
       assertEquals("Tests", setting.get("application.name"));
 
       // should not be found
@@ -61,7 +61,7 @@ public class AppSettingsMergedTest {
       AppSettings setting = AppSettings.get();
 
       assertEquals(23, setting.getInternalProperties().size());
-      assertEquals("3", setting.get("quartz.threadCount"));
+      assertEquals("3", setting.get("quartz.thread-count"));
 
       // external config should get preference
       assertEquals("From ext yml", setting.get("application.name"));
@@ -101,7 +101,7 @@ public class AppSettingsMergedTest {
       assertEquals("From ext yml", setting.get("application.name"));
 
       // should not be overridden
-      assertEquals("3", setting.get("quartz.threadCount"));
+      assertEquals("3", setting.get("quartz.thread-count"));
 
       // from env only
       assertEquals("true", setting.get("var"));

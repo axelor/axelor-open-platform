@@ -143,8 +143,55 @@ Notable Changes:
 * `LoginRedirectException` → `WebUtils.issueRedirect()`
 * `hashKey`/`hashAll` (`hashCode`) → `equalsInclude`/`equalsIncludeAll` (`equals`)
 * `cachable` → `cacheable`
-* `axelor.report.dir` → `reports.design.dir`
 * Form widgets `<notebook>`, `<break>`, `<group>`, `<portlet>`, and `<include>` but also `cols` and `colWidths` form attributes used for legacy form layout -> Use panel layout instead
+
+== Configurations naming
+
+To improve and uniform the configuration naming, a lot of them as been updated.
+Here is a list of all changes :
+
+[cols="2"]
+|===
+| Old name | New name
+| `view.single.tab` | `view.single-tab`
+| `view.tabs.max` | `view.max-tabs`
+| `view.confirm.yes-no` | `view.confirm-yes-no`
+| `view.customization` | `view.allow-customization`
+| `view.adv-search.export.full` | `view.adv-search.export.full`
+| `view.grid.editor.buttons` | `view.grid.editor-buttons`
+| `view.toolbar.titles` | `view.toolbar.show-titles`
+| `application.baseUrl` | `application.base-url`
+| `application.multi_tenancy` | `application.multi-tenancy`
+| `application.config.provider` | `application.config-provider`
+| `domain.blacklist.pattern` | `application.domain-blocklist-pattern`
+| `axelor.ScriptCacheSize` | `application.script.cache.size`
+| `axelor.ScriptCacheExpireTime` | `application.script.cache.expire-time`
+| `application.disable.action.permission` | `application.permission.disable-action`
+| `application.disable.relational.field.permission` | `application.permission.disable-relational-field`
+| `axelor.report.dir` | `reports.design-dir`
+| `reports.fonts.config` | `reports.fonts-config`
+| `template.search.dir` | `template.search-dir`
+| `file.upload.size` | `data.upload.max-size`
+| `file.upload.filename.pattern` | `data.upload.filename-pattern`
+| `file.upload.whitelist.pattern` | `data.upload.allowlist.pattern`
+| `file.upload.whitelist.types` | `data.upload.allowlist.types`
+| `file.upload.blacklist.pattern` | `data.upload.blocklist.pattern`
+| `file.upload.blacklist.types` | `data.upload.blocklist.types`
+| `cors.allow.origin` | `cors.allow-origin`
+| `cors.allow.credentials` | `cors.allow-credentials`
+| `cors.allow.methods` | `cors.allow-methods`
+| `cors.allow.headers` | `cors.allow-headers`
+| `cors.expose.headers` | `cors.expose-headers`
+| `cors.max.age` | `cors.max-age`
+| `quartz.threadCount` | `quartz.thread-count`
+| `user.password.pattern.title` | `user.password.pattern-title`
+| `encryption.algorithm.old` | `encryption.old-algorithm`
+| `encryption.password.old` | `encryption.old-password`
+| `mail.smtp.pass` | `mail.smtp.password`
+| `mail.smtp.connectionTimeout` | `mail.smtp.connection-timeout`
+| `mail.imap.pass` | `mail.imap.password`
+| `mail.imap.connectionTimeout` | `mail.imap.connection-timeout`
+|===
 
 == Authentication configuration
 

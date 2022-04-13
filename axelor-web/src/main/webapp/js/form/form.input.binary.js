@@ -191,7 +191,7 @@ ui.formInput('Image', 'ImageLink', {
 
     input.change(function(e, ui) {
       var file = input.get(0).files[0];
-      var uploadSize = +(axelor.config["file.upload.size"]) || 0;
+      var uploadSize = +(axelor.config["data.upload.max-size"]) || 0;
 
       // reset file selection
       input.get(0).value = null;

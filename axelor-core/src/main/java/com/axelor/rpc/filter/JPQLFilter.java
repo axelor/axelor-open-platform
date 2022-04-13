@@ -26,10 +26,12 @@ import java.util.regex.Pattern;
 public class JPQLFilter extends Filter {
 
   private static final Pattern BLACKLIST_PATTERN =
-      AppSettings.get().get(AvailableAppSettings.DOMAIN_BLACKLIST_PATTERN, null) == null
+      AppSettings.get().get(AvailableAppSettings.APPLICATION_DOMAIN_BLOCKLIST_PATTERN, null) == null
           ? null
           : Pattern.compile(
-              AppSettings.get().get(AvailableAppSettings.DOMAIN_BLACKLIST_PATTERN).trim(),
+              AppSettings.get()
+                  .get(AvailableAppSettings.APPLICATION_DOMAIN_BLOCKLIST_PATTERN)
+                  .trim(),
               Pattern.CASE_INSENSITIVE);
 
   private String jpql;

@@ -1,0 +1,7 @@
+---
+title: Adopt a better configurations naming
+type: change
+description: |
+  A lot of configurations names has been updated to have better 
+  and uniform naming across all settings. Refer to migration notes. 
+  

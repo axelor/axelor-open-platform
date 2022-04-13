@@ -107,7 +107,7 @@ public final class AppSettings {
    * Get the application base URL.
    *
    * <p>This method tries to calculate the base url from current http request. If the method is
-   * called outside of http request scope, it returns the value of <code>application.baseUrl</code>
+   * called outside of http request scope, it returns the value of <code>application.base-url</code>
    * configuration setting.
    *
    * @return application base url

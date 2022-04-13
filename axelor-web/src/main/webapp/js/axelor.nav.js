@@ -23,10 +23,10 @@ var app = angular.module("axelor.app");
 
 function useSingleTabOnly() {
   return axelor.device.mobile
-    || !!axelor.config['view.single.tab']
+    || !!axelor.config['view.single-tab']
     || axelor.config['user.singleTab']
-    || +(axelor.config["view.tabs.max"]) === 0
-    || +(axelor.config["view.tabs.max"]) === 1;
+    || +(axelor.config["view.max-tabs"]) === 0
+    || +(axelor.config["view.max-tabs"]) === 1;
 }
 
 app.factory('NavService', ['$location', 'MenuService', function($location, MenuService) {
@@ -194,7 +194,7 @@ app.factory('NavService', ['$location', 'MenuService', function($location, MenuS
 
   function __closeUnusedTabs() {
     if (MAX_TABS === undefined) {
-      MAX_TABS = +(axelor.config["view.tabs.max"]) || -1;
+      MAX_TABS = +(axelor.config["view.max-tabs"]) || -1;
     }
     if (MAX_TABS <= 0 || tabs.length < MAX_TABS) {
       return;

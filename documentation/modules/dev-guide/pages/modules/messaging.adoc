@@ -153,11 +153,11 @@ quartz.enable = true
 #mail.smtp.port = 587
 #mail.smtp.channel = starttls
 #mail.smtp.user = user@gmail.com
-#mail.smtp.pass = secret
+#mail.smtp.password = secret
 
 # timeout settings
 #mail.smtp.timeout = 60000
-#mail.smtp.connectionTimeout = 60000
+#mail.smtp.connection-timeout = 60000
 
 # IMAP configuration
 # ~~~~~
@@ -167,11 +167,11 @@ quartz.enable = true
 #mail.imap.port = 993
 #mail.imap.channel = ssl
 #mail.imap.user = user@gmail.com
-#mail.imap.pass = secret
+#mail.imap.password = secret
 
 # timeout settings
 #mail.imap.timeout = 60000
-#mail.imap.connectionTimeout = 60000
+#mail.imap.connection-timeout = 60000
 ----
 
 The `quartz` scheduler should be enabled to fetch incoming messages from the

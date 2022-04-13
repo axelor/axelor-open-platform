@@ -32,8 +32,8 @@ public class AppSettingsObserver {
 
     for (final String setting :
         ImmutableList.of(
-            AvailableAppSettings.APPLICATION_DISABLE_PERMISSION_RELATIONAL_FIELDS,
-            AvailableAppSettings.APPLICATION_DISABLE_PERMISSION_ACTIONS)) {
+            AvailableAppSettings.APPLICATION_PERMISSION_DISABLE_RELATIONAL_FIELD,
+            AvailableAppSettings.APPLICATION_PERMISSION_DISABLE_ACTION)) {
       if (settings.getBoolean(setting, false)) {
         log.warn(
             "\"{}\" breaks security. Use with caution and as last resort only. Will be removed in the future.",

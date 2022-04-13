@@ -63,7 +63,7 @@ public class MetaFiles {
   private static final String DEFAULT_UPLOAD_PATH = "{java.io.tmpdir}/axelor/attachments";
 
   private static final Path UPLOAD_PATH =
-      Paths.get(AppSettings.get().get(AvailableAppSettings.FILE_UPLOAD_DIR, DEFAULT_UPLOAD_PATH));
+      Paths.get(AppSettings.get().get(AvailableAppSettings.DATA_UPLOAD_DIR, DEFAULT_UPLOAD_PATH));
 
   private static final String UPLOAD_NAME_PATTERN_AUTO = "auto";
 

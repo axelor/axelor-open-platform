@@ -31,9 +31,9 @@ public abstract class AbstractEncryptedConverter<T, R> implements AttributeConve
       AppSettings.get().get(AvailableAppSettings.ENCRYPTION_PASSWORD);
 
   private static final String OLD_ENCRYPTION_ALGORITHM =
-      AppSettings.get().get(AvailableAppSettings.ENCRYPTION_ALGORITHM_OLD);
+      AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_ALGORITHM);
   private static final String OLD_ENCRYPTION_PASSWORD =
-      AppSettings.get().get(AvailableAppSettings.ENCRYPTION_PASSWORD_OLD);
+      AppSettings.get().get(AvailableAppSettings.ENCRYPTION_OLD_PASSWORD);
 
   private Encryptor<T, R> encryptor;
   private Encryptor<T, R> oldEncryptor;

@@ -194,45 +194,94 @@ db.default.password = secret
 
 == Others Settings
 
-[cols="1,9"]
+[cols="1,8,1"]
 |===
-| Key Name | Description
-| `application.name` | application name, e.g. axelor-erp
-| `application.name` | application name
-| `application.description` | application description
-| `application.version` | application version
-| `application.author` | application author
-| `application.copyright` | application copyright
-| `application.logo` | header logo. Should be 40px in height with transparent background (default is img/axelor-logo.png)
-| `application.home` | home website. Link to be used with header logo.
-| `application.help` | link to the online help
-| `application.mode` | application deployment mode. Can be `prod` or `dev` (default is dev)
-| `application.theme` | CSS theme. If not defined, default theme is used.
-| `application.locale` | default locale (if not set, system default is used)
-| `session.timeout` | session timeout in minutes (default is 60)
-| `file.upload.dir` | storage path for upload files for attachments (default is \{user.home}/.axelor/attachments)
-| `file.upload.size` | maximum upload size in MB (default is 5 MB)
-| `file.upload.whitelist.pattern` | whitelist file name pattern, only matching files will be allowed
-| `file.upload.blacklist.pattern` | blacklist file name pattern, maching files will be rejected
-| `file.upload.whitelist.types` | whitelist file mime types, detects content type
-| `file.upload.blacklist.types` | blacklist file mime types, detects content type
-| `reports.design.dir` | external directory for birt report designs (default is \{user.home}/.axelor/reports)
-| `reports.output.dir` | external directory for generated pdf reports (default is \{user.home}/.axelor/reports-gen)
-| `data.export.encoding` | data export (csv) encoding (default is ISO_8859_1)
-| `data.export.dir` | storage path for export action (default is \{user.home}/.axelor/data-export)
-| `data.import.demo-data` | whether to import demo data for the application (default is true)
-| `template.search.dir` | storage path for templates (default is \{user.home}/.axelor/templates)
-| `view.single.tab` | whether to use single tab layout (default is false)
-| `view.menubar.location` | set menu style. Can be `left`, `top` or `both` (default is left)
-| `view.toolbar.titles` | whether to show button titles in toolbar (default is false)
-| `view.confirm.yes-no` | whether show confirm dialog with yes/no buttons (default is Cancel/OK)
-| `view.grid.selection` | if set to `checkbox`, grid widgets will have checkbox selection enabled
+| Key Name | Description | Default
+| `application.name` | application name | My App
+| `application.description` | application description |
+| `application.version` | application version |
+| `application.author` | application author |
+| `application.copyright` | application copyright |
+| `application.logo` | header logo. Should be 40px in height with transparent background | img/axelor.png
+| `application.home` | home website. Link to be used with header logo |
+| `application.help` | online help. Link to be used in About page |
+| `application.mode` | application deployment mode. Can be `prod` or `dev` | dev
+| `application.theme` | CSS theme | default theme
+| `application.locale` | default locale | system default
+| `application.base-url` | base url of the application |
+| `application.multi-tenancy` | enable multi-tenancy | false
+| `application.config-provider` | `if-feature` custom class |
+| `application.domain-blocklist-pattern` | pattern to validate domain expressions |
+| `application.script.cache.size` | groovy scripts cache size | 500
+| `application.script.cache.expire-time` | groovy scripts cache entry expire time (in minutes) | 10
+| `application.permission.disable-action` | whether to not check action permissions | false
+| `application.permission.disable-relational-field` | whether to not check relational fields permissions | false
+| `view.single-tab` | whether to use single tab layout | false
+| `view.max-tabs` | define the maximum opened tabs allowed |
+| `view.menubar.location` | set menu style. Can be `left`, `top` or `both` | both
+| `view.toolbar.show-titles` | whether to show button titles in toolbar | false
+| `view.confirm-yes-no` | whether show confirm dialog with yes/no buttons (else is Cancel/OK) | false
+| `view.grid.selection` | if set to `checkbox`, grid widgets will have checkbox selection enabled |
+| `view.grid.editor-buttons` | whether to show confirm/cancel buttons from grid row editor | true
+| `view.allow-customization` | whether to disable views customization |
+| `view.adv-search.share` | whether to disable advance search sharing | true
+| `view.adv-search.export-full` | whether to disable export full option in advance search | true
+| `session.timeout` | session timeout (in minutes) | 60
+| `session.cookie.secure` | define session cookie as secure |
+| `encryption.password` | encryption password |
+| `encryption.algorithm` | encryption algorithm (CBC or GCM) |
+| `encryption.old-password` | old encryption password |
+| `encryption.old-algorithm` | old encryption algorithm (CBC or GCM) |
+| `reports.design-dir` | external directory for birt report designs | \{user.home}/.axelor/reports
+| `reports.fonts-config` | custom fonts config path for birt report designs |
+| `data.upload.dir` | storage path for upload files | \{user.home}/.axelor/attachments
+| `data.upload.max-size` | maximum upload size (in MB) | 5
+| `data.upload.filename-pattern` | upload filename pattern |
+| `data.upload.allowlist.pattern` | allowlist file name pattern, only matching files will be allowed |
+| `data.upload.blocklist.pattern` | blocklist file name pattern, matching files will be rejected |
+| `data.upload.allowlist.types` | allowlist content type can be used to allow file upload with matching content |
+| `data.upload.blocklist.types` | blocklist content type can be used to block file upload with matching content |
+| `data.export.encoding` | data export encoding | UTF-8
+| `data.export.dir` | storage path for export action | \{user.home}/.axelor/data-export
+| `data.export.max-size` | maximum number of records to export, -1 means unlimited | -1
+| `data.export.fetch-size` | export fetch size | 500
+| `data.export.separator` | default export separator | ';'
+| `data.export.locale` | define a fixed locale for all exports |
+| `data.import.demo-data` | whether to import demo data for the application | true
+| `template.search-dir` | template storage path for groovy template | \{user.home}/.axelor/templates
+| `cors.allow-origin` | comma-separated list of origins to allow | '*'
+| `cors.allow-credentials` | whether credentials are supported | true
+| `cors.allow-methods` | comma-separated list of methods to allow | GET,PUT,POST,DELETE,HEAD,OPTIONS
+| `cors.allow-headers` | comma-separated list of headers to allow in a request | Origin,Accept,Authorization,X-Requested-With,X-CSRF-Token,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers
+| `cors.expose-headers` | comma-separated list of headers to include in a response |
+| `cors.max-age` | how long the response from a pre-flight request can be cached by clients (in seconds) | 1728000
+| `cors.expose-headers` | comma-separated list of headers to include in a response |
+| `quartz.enable` | whether to enable quartz scheduler | false
+| `quartz.thread-count` | total number of threads in quartz thread pool | 3
+| `mail.smtp.host` | smtp server host |
+| `mail.smtp.port` | smtp server port |
+| `mail.smtp.user` | smtp login username |
+| `mail.smtp.password` | smtp password |
+| `mail.smtp.channel` | smtp encryption channel (starttls or ssl) |
+| `mail.smtp.timeout` | smtp socket read timeout | 60000
+| `mail.smtp.connection-timeout` | smtp socket connection timeout | 60000
+| `mail.smtp.from` | default from attribute |
+| `mail.imap.host` | imap server host |
+| `mail.imap.port` | imap server port |
+| `mail.imap.user` | imap login username |
+| `mail.imap.password` | imap password |
+| `mail.imap.channel` | imap encryption channel (starttls or ssl) |
+| `mail.imap.timeout` | imap socket read timeout | 60000
+| `mail.imap.connection-timeout` | imap socket connection timeout | 60000
 |===
 
 All specified path can use specials variables :
 
 * `{user.home}` : reference to the home directory, `System.getProperty("user.home")`
 * `{java.io.tmpdir}` : reference to the tmp directory, `System.getProperty("java.io.tmpdir")`
+* `{year}` : current year, `YYYY` format
+* `{month}` : current month, from `1` to `12`
+* `{day}` : current day, from `1` to `31`
 
 The differences between `prod` and `dev` mode are :
 
@@ -269,67 +318,6 @@ A minimal persistence xml file is required to confirm JPA requirements:
   </persistence-unit>
 </persistence>
 ----
-
-== Logging Configuration
-
-The logging can be configured from `axelor-config.properties` using following properties:
-
-[source,properties]
-----
-# Logging
-# ~~~~~
-# Custom logback configuration can be provided with `logging.config` property pointing
-# to a custom `logback.xml`. In this case, all the logging configuration provided here
-# will be ignored.
-#
-# Following settings can be used to configure logging system automatically.
-#
-#logging.path = {user.home}/.axelor/logs
-#logging.pattern.file = %d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- [%t] %-40.40logger{39} : %m%n
-#logging.pattern.console = %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n
-
-# Global logging
-logging.level.root = ERROR
-
-# Axelor logging
-
-# Log everything.
-logging.level.com.axelor = DEBUG
-
-# Hibernate logging
-
-# Log everything. Good for troubleshooting
-#logging.level.org.hibernate = INFO
-
-# Log all SQL DML statements as they are executed
-#logging.level.org.hibernate.SQL = DEBUG
-#logging.level.org.hibernate.engine.jdbc = DEBUG
-
-# Log all SQL DDL statements as they are executed
-#logging.level.org.hibernate.tool.hbm2ddl = INFO
-
-# Log all JDBC parameters
-#logging.level.org.hibernate.type = ALL
-
-# Log transactions
-#logging.level.org.hibernate.transaction = DEBUG
-
-# Log L2-Cache
-#logging.level.org.hibernate.cache = DEBUG
-
-# Log JDBC resource acquisition
-#logging.level.org.hibernate.jdbc = TRACE
-#logging.level.org.hibernate.service.jdbc = TRACE
-
-# Log connection pooling
-#logging.level.com.zaxxer.hikari = INFO
-----
-
-The `logging.path` can be used to save logs to file.
-The `logging.pattern.file` can be used to change log message format for file logging
-The `logging.pattern.console` can be used to change log message format for console logging
-
-We can set logging for any package using `logging.level.<package.name>` keys.
 
 == Cache Configuration
 

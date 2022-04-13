@@ -73,7 +73,7 @@ public class ParallelTransactionExecutor {
   private static int getMaxWorkers() {
     final AppSettings settings = AppSettings.get();
     final int maxPoolSize =
-        settings.getInt(AvailableAppSettings.HIBERNATE_HIKARI_MAXIMUN_POOL_SIZE, 0);
+        settings.getInt(AvailableAppSettings.HIBERNATE_HIKARI_MAXIMUM_POOL_SIZE, 0);
     int maxWorkers = Runtime.getRuntime().availableProcessors();
     return maxPoolSize > 0 && maxPoolSize < maxWorkers ? maxPoolSize : maxWorkers;
   }

@@ -139,7 +139,7 @@ public class MailServiceImpl implements MailService, MailConstants {
     final String host = settings.get(AvailableAppSettings.MAIL_SMTP_HOST);
     final String port = settings.get(AvailableAppSettings.MAIL_SMTP_PORT);
     final String user = settings.get(AvailableAppSettings.MAIL_SMTP_USER);
-    final String pass = settings.get(AvailableAppSettings.MAIL_SMTP_PASS);
+    final String pass = settings.get(AvailableAppSettings.MAIL_SMTP_PASSWORD);
     final String channel = settings.get(AvailableAppSettings.MAIL_SMTP_CHANNEL);
     final String from = settings.get(AvailableAppSettings.MAIL_SMTP_FROM);
 
@@ -185,7 +185,7 @@ public class MailServiceImpl implements MailService, MailConstants {
     final String host = settings.get(AvailableAppSettings.MAIL_IMAP_HOST);
     final String port = settings.get(AvailableAppSettings.MAIL_IMAP_PORT);
     final String user = settings.get(AvailableAppSettings.MAIL_IMAP_USER);
-    final String pass = settings.get(AvailableAppSettings.MAIL_IMAP_PASS);
+    final String pass = settings.get(AvailableAppSettings.MAIL_IMAP_PASSWORD);
     final String channel = settings.get(AvailableAppSettings.MAIL_IMAP_CHANNEL);
 
     final int timeout = settings.getInt(AvailableAppSettings.MAIL_IMAP_TIMEOUT, DEFAULT_TIMEOUT);
