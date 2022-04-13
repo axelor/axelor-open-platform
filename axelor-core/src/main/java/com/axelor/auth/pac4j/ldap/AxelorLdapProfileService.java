@@ -23,6 +23,7 @@ import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.pac4j.AuthPac4jProfileService;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
+import java.lang.invoke.MethodHandles;
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -67,6 +68,8 @@ import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.exception.BadCredentialsException;
 import org.pac4j.ldap.profile.LdapProfile;
 import org.pac4j.ldap.profile.service.LdapProfileService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 public class AxelorLdapProfileService extends LdapProfileService {
@@ -75,6 +78,8 @@ public class AxelorLdapProfileService extends LdapProfileService {
   private final String groupFilter;
 
   protected static final String FILTER_FORMAT = "(%s=%s)";
+
+  protected final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   @Inject
   public AxelorLdapProfileService() {
@@ -174,14 +179,6 @@ public class AxelorLdapProfileService extends LdapProfileService {
     if (useStartTLS) {
       config.setUseStartTLS(useStartTLS);
     }
-    if (StringUtils.notBlank(systemDn)) {
-      final BindConnectionInitializer initializer =
-          new BindConnectionInitializer(systemDn, new Credential(systemPassword));
-      if (saslConfig != null) {
-        initializer.setBindSaslConfig(saslConfig);
-      }
-      config.setConnectionInitializers(initializer);
-    }
     if (sslConfig != null) {
       config.setSslConfig(sslConfig);
     }
@@ -192,8 +189,31 @@ public class AxelorLdapProfileService extends LdapProfileService {
       config.setResponseTimeout(responseTimeout);
     }
 
+    final BindConnectionInitializer initializer;
+    if (StringUtils.notBlank(systemDn)) {
+      initializer = new BindConnectionInitializer(systemDn, new Credential(systemPassword));
+      if (saslConfig != null) {
+        initializer.setBindSaslConfig(saslConfig);
+      }
+      config.setConnectionInitializers(initializer);
+    } else {
+      initializer = null;
+    }
+
     final PooledConnectionFactory factory = new PooledConnectionFactory(config);
+    if (initializer != null) {
+      factory.setActivator(
+          conn -> {
+            try {
+              return initializer.initialize(conn).isSuccess();
+            } catch (LdapException e) {
+              logger.error(e.getMessage(), e);
+              return false;
+            }
+          });
+    }
     factory.initialize();
+    Runtime.getRuntime().addShutdownHook(new Thread(factory::close));
 
     final SimpleBindAuthenticationHandler handler = new SimpleBindAuthenticationHandler(factory);
 
