@@ -413,6 +413,7 @@ function GridViewCtrl($scope, $element) {
           format = 'YYYY/MM';
         } else if (/^\D*\d{1,2}\D+\d{1,2}\D*$/.test(val)) {
           format = monthFirst ? 'MM/DD' : 'DD/MM';
+          granularity = 'day';
         } else if (/^\D*\d{1,2}\D+\d{4,}\D*$/.test(val)) {
           format = 'MM/YYYY';
         } else if (/^\D*\d+\D+\d+\D+\d+\D*$/.test(val)) {
