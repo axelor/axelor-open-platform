@@ -59,8 +59,7 @@ public class AuthPac4jUserService {
         AppSettings.get().get(AvailableAppSettings.AUTH_USER_DEFAULT_GROUP, "users");
   }
 
-  private static final Logger logger =
-      LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+  protected final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   @Nullable
   public User getUser(CommonProfile profile) {
@@ -81,7 +80,7 @@ public class AuthPac4jUserService {
     process(profile, false);
   }
 
-  private void process(CommonProfile profile, boolean withCreate) {
+  protected void process(CommonProfile profile, boolean withCreate) {
     final User user = getUser(profile);
 
     if (user == null) {
