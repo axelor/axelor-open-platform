@@ -135,23 +135,67 @@ var CRITERION_PREPARATORS = {
 var FILTER_TRANSFORMERS = {
   "$inPast": function (filter) {
     var now = moment().locale(ui.getBrowserLocale());
-    filter.operator = "between";
-    filter.value = now.clone().subtract(filter.value, filter.timeUnit).startOf(filter.timeUnit).toDate();
-    filter.value2 = now.clone().endOf("day").toDate();
+    var value = now.clone().subtract(filter.value, filter.timeUnit).startOf(filter.timeUnit)
+      .toDate();
+    var value2 = axelor.nextOf(now.clone(), "day").toDate();
+    filter.operator = "and";
+    filter.criteria = [
+      {
+        fieldName: filter.fieldName,
+        operator: '>=',
+        value: value
+      },
+      {
+        fieldName: filter.fieldName,
+        operator: '<',
+        value: value2
+      }
+    ];
+    delete filter.fieldName;
+    delete filter.value;
     delete filter.timeUnit;
   },
   "$inNext": function (filter) {
     var now = moment().locale(ui.getBrowserLocale());
-    filter.operator = "between";
-    filter.value2 = now.clone().add(filter.value, filter.timeUnit).endOf(filter.timeUnit).toDate();
-    filter.value = now.clone().startOf("day").toDate();
+    var value = now.clone().startOf("day").toDate();
+    var value2 = axelor.nextOf(now.clone().add(filter.value, filter.timeUnit), filter.timeUnit)
+      .toDate();
+    filter.operator = "and";
+    filter.criteria = [
+      {
+        fieldName: filter.fieldName,
+        operator: '>=',
+        value: value
+      },
+      {
+        fieldName: filter.fieldName,
+        operator: '<',
+        value: value2
+      }
+    ];
+    delete filter.fieldName;
+    delete filter.value;
     delete filter.timeUnit;
   },
   "$inCurrent": function (filter) {
     var now = moment().locale(ui.getBrowserLocale());
-    filter.operator = "between";
-    filter.value = now.clone().startOf(filter.timeUnit).toDate();
-    filter.value2 = now.clone().endOf(filter.timeUnit).toDate();
+    var value = now.clone().startOf(filter.timeUnit).toDate();
+    var value2 = axelor.nextOf(now.clone(), filter.timeUnit).toDate();
+    filter.operator = "and";
+    filter.criteria = [
+      {
+        fieldName: filter.fieldName,
+        operator: '>=',
+        value: value
+      },
+      {
+        fieldName: filter.fieldName,
+        operator: '<',
+        value: value2
+      }
+    ];
+    delete filter.fieldName;
+    delete filter.value;
     delete filter.timeUnit;
   },
   "$isCurrentUser": function (filter) {
@@ -1435,7 +1479,7 @@ ui.directive('uiFilterBox', function() {
         search._domains = domains;
         search.criteria = process(search.criteria);
 
-        // process criteria for datetime fields, always use between operator
+        // process criteria for datetime fields
         function process(filter) {
           if (_.isArray(filter)) return _.map(filter, process);
           if (_.isArray(filter.criteria)) {
@@ -1458,47 +1502,150 @@ ui.directive('uiFilterBox', function() {
           if (name.indexOf('::') > -1 && (type === 'date' || type === 'datetime')) {
             filter = _.extend({}, filter);
             switch (filter.operator) {
-            case '>':
-              filter.value = moment(v1).endOf('day').toDate();
-              filter.value2 = undefined;
-              break;
-            case '<':
-              filter.value = moment(v1).startOf('day').toDate();
-              filter.value2 = undefined;
-              break;
-            case '=':
-              filter.operator = 'between';
-              filter.value = moment(v1).startOf('day').toDate();
-              filter.value2 = moment(v1).endOf('day').toDate();
-              break;
-            case '!=':
-              filter.operator = 'notBetween';
-              filter.value = moment(v1).startOf('day').toDate();
-              filter.value2 = moment(v1).endOf('day').toDate();
-              break;
-            case 'between':
-            case 'notBetween':
-              filter.value = moment(v1).startOf('day').toDate();
-              filter.value2 = moment(v2).endOf('day').toDate();
-              break;
+              case '=':
+                v2 = v1;
+                // fall through
+              case 'between':
+                if (!v2) {
+                  v2 = v1;
+                }
+                filter.operator = 'and';
+                filter.criteria = [
+                  {
+                    fieldName: filter.fieldName,
+                    operator: '>=',
+                    value: moment(v1).startOf('day').toDate()
+                  },
+                  {
+                    fieldName: filter.fieldName,
+                    operator: '<',
+                    value: axelor.nextOf(moment(v2), 'day').toDate()
+                  }
+                ];
+                filter.fieldName = undefined;
+                filter.value = undefined;
+                filter.value2 = undefined;
+                break;
+              case '!=':
+                v2 = v1;
+                // fall through
+              case 'notBetween':
+                if (!v2) {
+                  v2 = v1;
+                }
+                filter.operator = 'or';
+                filter.criteria = [
+                  {
+                    fieldName: filter.fieldName,
+                    operator: '<',
+                    value: moment(v1).startOf('day').toDate()
+                  },
+                  {
+                    fieldName: filter.fieldName,
+                    operator: '>=',
+                    value: axelor.nextOf(moment(v2), 'day').toDate()
+                  }
+                ];
+                filter.fieldName = undefined;
+                filter.value = undefined;
+                filter.value2 = undefined;
+                break;
+              case '<':
+              case '>=':
+                filter.value = moment(v1).startOf('day').toDate();
+                filter.value2 = undefined;
+                break;
+              case '>':
+                filter.operator = '>=';
+                filter.value = axelor.nextOf(moment(v1), 'day').toDate();
+                filter.value2 = undefined;
+                break;
+              case '<=':
+                filter.operator = '<';
+                filter.value = axelor.nextOf(value, 'day').toDate();
+                filter.value2 = undefined;
+                break;
             }
             return filter;
           }
 
-          if (filter.operator !== '=') return filter;
           if (type != 'datetime') return filter;
 
           if (!(/\d+-\d+\d+T/.test(filter.value) || _.isDate(filter.value))) {
             return filter;
           }
 
-          v1 = moment(v1).startOf('day').toDate();
-          v2 = moment(v1).endOf('day').toDate();
-          return _.extend({}, filter, {
-            operator: 'between',
-            value: v1,
-            value2: v2
-          });
+          switch (filter.operator) {
+            case '=':
+              v2 = v1;
+              // fall through
+            case 'between':
+              if (!v2) {
+                v2 = v1;
+              }
+              v1 = moment(v1).startOf('day').toDate();
+              v2 = axelor.nextOf(moment(v2), 'day').toDate();
+              filter.operator = 'and';
+              filter.criteria = [
+                {
+                  fieldName: filter.fieldName,
+                  operator: '>=',
+                  value: v1
+                },
+                {
+                  fieldName: filter.fieldName,
+                  operator: '<',
+                  value: v2
+                }
+              ];
+              filter.fieldName = undefined;
+              filter.value = undefined;
+              filter.value2 = undefined;
+              break;
+            case '!=':
+              v2 = v1;
+              // fall through
+            case 'notBetween':
+              if (!v2) {
+                v2 = v1;
+              }
+              v1 = moment(v1).startOf('day').toDate();
+              v2 = axelor.nextOf(moment(v2), 'day').toDate();
+              filter.operator = 'or';
+              filter.criteria = [
+                {
+                  fieldName: filter.fieldName,
+                  operator: '<',
+                  value: v1
+                },
+                {
+                  fieldName: filter.fieldName,
+                  operator: '>=',
+                  value: v2
+                }
+              ];
+              filter.fieldName = undefined;
+              filter.value = undefined;
+              filter.value2 = undefined;
+              break;
+            case '<':
+            case '>=':
+              filter.value = moment(v1).startOf('day').toDate();
+              filter.value2 = undefined;
+              break;
+            case '>':
+              filter.operator = '>=';
+              filter.value = axelor.nextOf(moment(v1), 'day').toDate();
+              filter.value2 = undefined;
+              break;
+            case '<=':
+              filter.operator = '<';
+              filter.value = axelor.nextOf(moment(v1), 'day').toDate();
+              filter.value2 = undefined;
+              break;
+          }
+
+          return filter;
         }
 
         function countCustom(criteria) {

@@ -368,9 +368,9 @@ function GridViewCtrl($scope, $element) {
       var field = $scope.fields[key] || _.findWhere(($scope.schema||{}).items, { name: key }) || {};
       var type = field.type || 'string';
       var operator = 'like';
-      var origValue = value;
       var value2;
       var granularity = 'day';
+      var subCriteria;
 
       //TODO: implement expression parser
 
@@ -383,6 +383,11 @@ function GridViewCtrl($scope, $element) {
       }
       if (field.selection) {
         type = 'selection';
+      }
+
+      // tag json fields
+      if (field.jsonField) {
+        key += '::' + (field.jsonType || 'text');
       }
 
       function stripOperator(val) {
@@ -445,18 +450,11 @@ function GridViewCtrl($scope, $element) {
         return val ? moment(val, format) : moment();
       }
 
-      function toDate(val) {
-        return val ? toMoment(val).format('YYYY-MM-DD') : val;
-      }
-
-      function toDateString(val) {
-          return moment.utc(val, ui.dateFormat).toDate().toISOString().split("T")[0];
-      }
-
       function setValues(transform, format) {
         value = transform(value);
         value2 = value2 ? transform(value2) : value2;
         switch (operator) {
+          case '=':
           case 'between':
             if (!value2) {
               value2 = value.clone();
@@ -467,23 +465,53 @@ function GridViewCtrl($scope, $element) {
               value2 = tmp;
             }
             value = format(value.startOf(granularity));
-            value2 = format(value2.endOf(granularity));
+            value2 = format(axelor.nextOf(value2, granularity));
+            operator = 'and';
+            subCriteria = [
+              {
+                fieldName: key,
+                operator: '>=',
+                value: value
+              },
+              {
+                fieldName: key,
+                operator: '<',
+                value: value2
+              }
+            ];
+            break;
+          case '!=':
+          case 'notBetween':
+            if (!value2) {
+              value2 = value.clone();
+            }
+            value = value ? format(value.startOf(granularity)) : value;
+            value2 = value2 ? format(axelor.nextOf(value2, granularity)) : value2;
+            operator = 'or';
+            subCriteria = [
+              {
+                fieldName: key,
+                operator: '<',
+                value: value
+              },
+              {
+                fieldName: key,
+                operator: '>=',
+                value: value2
+              }
+            ];
             break;
           case '<':
           case '>=':
             value = format(value.startOf(granularity));
             break;
           case '>':
+            operator = '>=';
+            value = format(axelor.nextOf(value, granularity));
+            break;
           case '<=':
-            value = format(value.endOf(granularity));
-            break;
-          case '=':
-            value = format(value);
-            break;
-          case '!=':
-            operator = 'notBetween';
-            value2 = value ? format(value.endOf(granularity)) : value;
-            value = value ? format(value.startOf(granularity)) : value;
+            operator = '<';
+            value = format(axelor.nextOf(value, granularity));
             break;
           default:
             value = format(value);
@@ -524,12 +552,10 @@ function GridViewCtrl($scope, $element) {
           break;
       }
 
-      // tag json fields
-      if (field.jsonField) {
-        key += '::' + (field.jsonType || 'text');
-      }
-
-      return {
+      return subCriteria ? {
+        operator: operator,
+        criteria: subCriteria
+      } : {
         fieldName: key,
         operator: operator,
         value: value,
@@ -545,6 +571,14 @@ function GridViewCtrl($scope, $element) {
     }
 
     context._model = context._model || $scope._model;
+
+    // Simplify criteria
+    if (criteria.criteria.length === 1) {
+      var subCriteria = criteria.criteria[0];
+      if (subCriteria.criteria) {
+        criteria = subCriteria;
+      }
+    }
 
     options = {
       filter: criteria,

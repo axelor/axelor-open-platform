@@ -156,4 +156,10 @@
     return jq.html.apply(this, sanitize(Array.prototype.slice.call(arguments)));
   };
 
+  // Mutates the original moment by setting it to the start of the next unit of time.
+  // Used for criteria with date ranges in order to exclude the upper limit.
+  axelor.nextOf = function (mm, timeUnit) {
+    return mm.add(1, timeUnit).startOf(timeUnit);
+  }
+
 })();
