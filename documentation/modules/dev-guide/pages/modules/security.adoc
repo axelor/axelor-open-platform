@@ -189,7 +189,7 @@ If no callback URL is configured, it defaults to "base URL" + "/callback".
 # Single sign-on common configuration
 #
 # callback URL for all indirect clients (defaults to application.base-url + "/callback")
-auth.callback.url = http://localhost:8080/open-platform-demo/callback
+auth.callback-url = http://localhost:8080/open-platform-demo/callback
 -----
 
 You can define how users provided by central authentication should be dealt with. You can choose between "create" (create and update users), "link" (only update users), and "none" (do nothing). You can also specify the default group for new users.
@@ -200,7 +200,7 @@ You can define how users provided by central authentication should be dealt with
 # user provisioning: create / link / none
 auth.user.provisioning = create
 # default group for created users
-auth.user.default.group = users
+auth.user.default-group = users
 -----
 
 You can define what logout URL to use when no `url` request parameter is provided to the logout endpoint.
@@ -210,9 +210,9 @@ By default, only local logout is performed, but you may choose whether central l
 [source,properties]
 -----
 # logout URL
-auth.logout.url =
+auth.logout.default-url =
 # logout URL pattern
-auth.logout.url.pattern =
+auth.logout.url-pattern =
 # remove profiles from session
 auth.logout.local = true
 # call identity provider logout endpoint
@@ -659,7 +659,7 @@ You may tweak user and group search if needed for your LDAP server.
 auth.ldap.user.filter = (uid={0})
 
 # user identifier attribute: uid / cn
-auth.ldap.user.id.attribute = uid
+auth.ldap.user.id-attribute = uid
 
 # template to search groups by user identifier
 auth.ldap.group.filter = (uniqueMember=uid={0},ou=users,dc=example,dc=com)
@@ -673,9 +673,9 @@ If you configure the system user, the {ldap-profile-service} will be able to cre
 [source,properties]
 -----
 # system user
-auth.ldap.system.user = uid=admin,ou=system
+auth.ldap.server.auth.user = uid=admin,ou=system
 # system password
-auth.ldap.system.password = secret
+auth.ldap.server.auth.password = secret
 -----
 
 User creation/update on the application side is controlled by the xref:auth-user-provisioning[`auth.user.provisioning`] configuration. With the base implementation, the LDAP server is accessed as read-only. If you want to achieve full synchronization, you need to configure the system user and implement your own synchronization logic.
@@ -707,12 +707,10 @@ You may configure the SASL mechanism and the connection security.
 [source,properties]
 -----
 # SASL authentication type: simple / CRAM-MD5 / DIGEST-MD5 / EXTERNAL / GSSAPI
-auth.ldap.auth.type = simple
+auth.ldap.server.auth.type = simple
 
-# use SSL
-auth.ldap.use.ssl = false
 # use StartTLS
-auth.ldap.use.starttls = false
+auth.ldap.server.starttls = false
 -----
 
 You may customize the truststore or keystore configuration.
@@ -720,16 +718,16 @@ You may customize the truststore or keystore configuration.
 [source,properties]
 -----
 # truststore
-auth.ldap.credential.trust.store =
-# keystore
-auth.ldap.credential.key.store =
+auth.ldap.server.ssl.trust-store.path =
+auth.ldap.server.ssl.trust-store.password =
+auth.ldap.server.ssl.trust-store.type =
+auth.ldap.server.ssl.trust-store.aliases =
 
-# Truststore/keystore password
-auth.ldap.credential.store.password =
-# Truststore/keystore type
-auth.ldap.credential.store.type =
-# comma-separated list of truststore/keystore aliases
-auth.ldap.credential.store.aliases =
+# keystore
+auth.ldap.server.ssl.key-store.path =
+auth.ldap.server.ssl.key-store.password =
+auth.ldap.server.ssl.key-store.type =
+auth.ldap.server.ssl.key-store.aliases =
 -----
 
 You may use X509 certificates for both authentication and trust.
@@ -737,11 +735,11 @@ You may use X509 certificates for both authentication and trust.
 [source,properties]
 -----
 # trust certificates
-auth.ldap.credential.trust.certificates =
+auth.ldap.server.ssl.cert.trust-path =
 # authentication certificate
-auth.ldap.credential.authentication.certificate =
+auth.ldap.server.ssl.cert.auth-path =
 # authentication key
-auth.ldap.credential.authentication.key =
+auth.ldap.server.ssl.cert.key-path =
 -----
 
 You may set the timeouts.
@@ -749,9 +747,9 @@ You may set the timeouts.
 [source,properties]
 -----
 # time that connections will block in seconds
-auth.ldap.connect.timeout =
+auth.ldap.server.connect-timeout =
 # time to wait for responses in seconds
-auth.ldap.response.timeout =
+auth.ldap.server.response-timeout =
 -----
 
 == Basic Authentication
@@ -761,5 +759,5 @@ You can enable direct basic authentication, which is a method to provide usernam
 [source,properties]
 -----
 # Basic authentication
-auth.local.basic.auth.enabled = false
+auth.local.basic-auth.direct.enabled = false
 -----

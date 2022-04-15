@@ -156,41 +156,49 @@ public interface AvailableAppSettings {
   String LOGGING_PATTERN_FILE = "logging.pattern.file";
   String LOGGING_PATTERN_CONSOLE = "logging.pattern.console";
 
-  String AUTH_CALLBACK_URL = "auth.callback.url";
-  String AUTH_USER_PROVISIONING = "auth.user.provisioning";
-  String AUTH_USER_DEFAULT_GROUP = "auth.user.default.group";
-  String AUTH_USER_PRINCIPAL_ATTRIBUTE = "auth.user.principal.attribute";
   String AUTH_ORDER = "auth.order";
+  String AUTH_CALLBACK_URL = "auth.callback-url";
 
-  String AUTH_LOGOUT_URL = "auth.logout.url";
-  String AUTH_LOGOUT_URL_PATTERN = "auth.logout.url.pattern";
+  String AUTH_USER_PROVISIONING = "auth.user.provisioning";
+  String AUTH_USER_DEFAULT_GROUP = "auth.user.default-group";
+  String AUTH_USER_PRINCIPAL_ATTRIBUTE = "auth.user.principal-attribute";
+
+  String AUTH_LOGOUT_DEFAULT_URL = "auth.logout.default-url";
+  String AUTH_LOGOUT_URL_PATTERN = "auth.logout.url-pattern";
   String AUTH_LOGOUT_LOCAL = "auth.logout.local";
   String AUTH_LOGOUT_CENTRAL = "auth.logout.central";
 
-  String AUTH_LOCAL_INDIRECT_BASIC_AUTH_ENABLED = "auth.local.indirect.basic.auth.enabled";
-  String AUTH_LOCAL_DIRECT_BASIC_AUTH_ENABLED = "auth.local.direct.basic.auth.enabled";
+  String AUTH_LOCAL_BASIC_AUTH_INDIRECT_ENABLED = "auth.local.basic-auth.indirect.enabled";
+  String AUTH_LOCAL_BASIC_AUTH_DIRECT_ENABLED = "auth.local.basic-auth.direct.enabled";
 
   String AUTH_LDAP_SERVER_URL = "auth.ldap.server.url";
+  String AUTH_LDAP_SERVER_CONNECT_TIMEOUT = "auth.ldap.server.connect-timeout";
+  String AUTH_LDAP_SERVER_RESPONSE_TIMEOUT = "auth.ldap.server.response-timeout";
+  String AUTH_LDAP_SERVER_STARTTLS = "auth.ldap.server.starttls";
+  String AUTH_LDAP_SERVER_AUTH_USER = "auth.ldap.server.auth.user";
+  String AUTH_LDAP_SERVER_AUTH_PASSWORD = "auth.ldap.server.auth.password";
+  String AUTH_LDAP_SERVER_AUTH_TYPE = "auth.ldap.server.auth.type";
+
   String AUTH_LDAP_USER_BASE = "auth.ldap.user.base";
   String AUTH_LDAP_USER_FILTER = "auth.ldap.user.filter";
-  String AUTH_LDAP_USER_DN_FORMAT = "auth.ldap.user.dn.format";
-  String AUTH_LDAP_USER_ID_ATTRIBUTE = "auth.ldap.user.id.attribute";
-  String AUTH_LDAP_USER_USERNAME_ATTRIBUTE = "auth.ldap.user.username.attribute";
+  String AUTH_LDAP_USER_DN_FORMAT = "auth.ldap.user.dn-format";
+  String AUTH_LDAP_USER_ID_ATTRIBUTE = "auth.ldap.user.id-attribute";
+  String AUTH_LDAP_USER_USERNAME_ATTRIBUTE = "auth.ldap.user.username-attribute";
+
   String AUTH_LDAP_GROUP_BASE = "auth.ldap.group.base";
   String AUTH_LDAP_GROUP_FILTER = "auth.ldap.group.filter";
-  String AUTH_LDAP_SYSTEM_USER = "auth.ldap.system.user";
-  String AUTH_LDAP_SYSTEM_PASSWORD = "auth.ldap.system.password";
-  String AUTH_LDAP_AUTH_TYPE = "auth.ldap.auth.type";
-  String AUTH_LDAP_USE_STARTTLS = "auth.ldap.use.starttls";
-  String AUTH_LDAP_CREDENTIAL_TRUST_STORE = "auth.ldap.credential.trust.store";
-  String AUTH_LDAP_CREDENTIAL_KEY_STORE = "auth.ldap.credential.key.store";
-  String AUTH_LDAP_CREDENTIAL_STORE_PASSWORD = "auth.ldap.credential.store.password";
-  String AUTH_LDAP_CREDENTIAL_STORE_TYPE = "auth.ldap.credential.store.type";
-  String AUTH_LDAP_CREDENTIAL_STORE_ALIASES = "auth.ldap.credential.store.aliases";
-  String AUTH_LDAP_CREDENTIAL_TRUST_CERTIFICATES = "auth.ldap.credential.trust.certificates";
-  String AUTH_LDAP_CREDENTIAL_AUTHENTICATION_CERTIFICATE =
-      "auth.ldap.credential.authentication.certificate";
-  String AUTH_LDAP_CREDENTIAL_AUTHENTICATION_KEY = "auth.ldap.credential.authentication.key";
-  String AUTH_LDAP_CONNECT_TIMEOUT = "auth.ldap.connect.timeout";
-  String AUTH_LDAP_RESPONSE_TIMEOUT = "auth.ldap.response.timeout";
+
+  String AUTH_LDAP_SERVER_SSL_TRUST_STORE_PATH = "auth.ldap.server.ssl.trust-store.path";
+  String AUTH_LDAP_SERVER_SSL_TRUST_STORE_PASSWORD = "auth.ldap.server.ssl.trust-store.password";
+  String AUTH_LDAP_SERVER_SSL_TRUST_STORE_TYPE = "auth.ldap.server.ssl.trust-store.type";
+  String AUTH_LDAP_SERVER_SSL_TRUST_STORE_ALIASES = "auth.ldap.server.ssl.trust-store.aliases";
+
+  String AUTH_LDAP_SERVER_SSL_KEY_STORE_PATH = "auth.ldap.server.ssl.key-store.path";
+  String AUTH_LDAP_SERVER_SSL_KEY_STORE_PASSWORD = "auth.ldap.server.ssl.key-store.password";
+  String AUTH_LDAP_SERVER_SSL_KEY_STORE_TYPE = "auth.ldap.server.ssl.key-store.type";
+  String AUTH_LDAP_SERVER_SSL_KEY_STORE_ALIASES = "auth.ldap.server.ssl.key-store.aliases";
+
+  String AUTH_LDAP_SERVER_SSL_CERT_TRUST_PATH = "auth.ldap.server.ssl.cert.trust-path";
+  String AUTH_LDAP_SERVER_SSL_CERT_AUTH_PATH = "auth.ldap.server.ssl.cert.auth-path";
+  String AUTH_LDAP_SERVER_SSL_CERT_KEY_PATH = "auth.ldap.server.ssl.cert.key-path";
 }

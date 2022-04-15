@@ -262,10 +262,10 @@ public class ClientListProvider implements Provider<List<Client>> {
 
     clients.addAll(centralClients);
 
-    if (settings.getBoolean(AvailableAppSettings.AUTH_LOCAL_INDIRECT_BASIC_AUTH_ENABLED, false)) {
+    if (settings.getBoolean(AvailableAppSettings.AUTH_LOCAL_BASIC_AUTH_INDIRECT_ENABLED, false)) {
       clients.add(Beans.get(IndirectBasicAuthClient.class));
     }
-    if (settings.getBoolean(AvailableAppSettings.AUTH_LOCAL_DIRECT_BASIC_AUTH_ENABLED, false)) {
+    if (settings.getBoolean(AvailableAppSettings.AUTH_LOCAL_BASIC_AUTH_DIRECT_ENABLED, false)) {
       clients.add(Beans.get(DirectBasicAuthClient.class));
     }
 

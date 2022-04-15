@@ -102,25 +102,27 @@ public class AxelorLdapProfileService extends LdapProfileService {
             .orElse(null);
     final String userDnFormat =
         properties.getOrDefault(AvailableAppSettings.AUTH_LDAP_USER_DN_FORMAT, null);
-    final String systemDn = properties.get(AvailableAppSettings.AUTH_LDAP_SYSTEM_USER);
+    final String systemDn = properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_AUTH_USER);
     final String systemPassword =
-        properties.get(AvailableAppSettings.AUTH_LDAP_SYSTEM_PASSWORD);
+        properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_AUTH_PASSWORD);
     final String authenticationType =
-        properties.get(AvailableAppSettings.AUTH_LDAP_AUTH_TYPE);
+        properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_AUTH_TYPE);
     final boolean useStartTLS =
-        Boolean.parseBoolean(properties.get(AvailableAppSettings.AUTH_LDAP_USE_STARTTLS));
-    final String trustStore = properties.get(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_TRUST_STORE);
-    final String keyStore = properties.get(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_KEY_STORE);
+        Boolean.parseBoolean(properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_STARTTLS));
+    final String trustStore =
+        properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_SSL_TRUST_STORE_PATH);
+    final String keyStore =
+        properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_SSL_KEY_STORE_PATH);
     final String trustCertificates =
-        properties.get(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_TRUST_CERTIFICATES);
+        properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_SSL_CERT_TRUST_PATH);
     final Duration connectTimeout =
-        Optional.ofNullable(properties.get(AvailableAppSettings.AUTH_LDAP_CONNECT_TIMEOUT))
+        Optional.ofNullable(properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_CONNECT_TIMEOUT))
             .filter(StringUtils::notBlank)
             .map(Long::parseLong)
             .map(Duration::ofSeconds)
             .orElse(null);
     final Duration responseTimeout =
-        Optional.ofNullable(properties.get(AvailableAppSettings.AUTH_LDAP_RESPONSE_TIMEOUT))
+        Optional.ofNullable(properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_RESPONSE_TIMEOUT))
             .filter(StringUtils::notBlank)
             .map(Long::parseLong)
             .map(Duration::ofSeconds)
@@ -130,33 +132,43 @@ public class AxelorLdapProfileService extends LdapProfileService {
     final SslConfig sslConfig;
     final CredentialConfig credentialConfig;
 
-    if (StringUtils.notBlank(trustStore) || StringUtils.notBlank(keyStore)) {
-      final String storePassword =
-          properties.get(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_STORE_PASSWORD);
-      final String storeType = properties.get(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_STORE_TYPE);
-      final String[] storeAliases =
+    if (StringUtils.notBlank(trustStore)) {
+      final String trustStorePassword =
+          properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_SSL_TRUST_STORE_PASSWORD);
+      final String trustStoreType =
+          properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_SSL_TRUST_STORE_TYPE);
+      final String[] trustStoreAliases =
           Optional.ofNullable(
-                  properties.get(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_STORE_ALIASES))
+                  properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_SSL_TRUST_STORE_ALIASES))
               .map(storeAliasesProperty -> storeAliasesProperty.split("\\s*,\\s*"))
               .orElse(null);
       final KeyStoreCredentialConfig keyStoreCredentialConfig = new KeyStoreCredentialConfig();
-      if (StringUtils.notBlank(trustStore)) {
-        keyStoreCredentialConfig.setTrustStore(trustStore);
-        keyStoreCredentialConfig.setTrustStorePassword(storePassword);
-        keyStoreCredentialConfig.setTrustStoreType(storeType);
-        keyStoreCredentialConfig.setTrustStoreAliases(storeAliases);
-      } else {
-        keyStoreCredentialConfig.setKeyStore(keyStore);
-        keyStoreCredentialConfig.setKeyStorePassword(storePassword);
-        keyStoreCredentialConfig.setKeyStoreType(storeType);
-        keyStoreCredentialConfig.setKeyStoreAliases(storeAliases);
-      }
+      keyStoreCredentialConfig.setTrustStore(trustStore);
+      keyStoreCredentialConfig.setTrustStorePassword(trustStorePassword);
+      keyStoreCredentialConfig.setTrustStoreType(trustStoreType);
+      keyStoreCredentialConfig.setTrustStoreAliases(trustStoreAliases);
+      credentialConfig = keyStoreCredentialConfig;
+    } else if (StringUtils.notBlank(keyStore)) {
+      final String keyStorePassword =
+          properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_SSL_KEY_STORE_PASSWORD);
+      final String keyStoreType =
+          properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_SSL_KEY_STORE_TYPE);
+      final String[] keyStoreAliases =
+          Optional.ofNullable(
+                  properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_SSL_KEY_STORE_ALIASES))
+              .map(storeAliasesProperty -> storeAliasesProperty.split("\\s*,\\s*"))
+              .orElse(null);
+      final KeyStoreCredentialConfig keyStoreCredentialConfig = new KeyStoreCredentialConfig();
+      keyStoreCredentialConfig.setKeyStore(keyStore);
+      keyStoreCredentialConfig.setKeyStorePassword(keyStorePassword);
+      keyStoreCredentialConfig.setKeyStoreType(keyStoreType);
+      keyStoreCredentialConfig.setKeyStoreAliases(keyStoreAliases);
       credentialConfig = keyStoreCredentialConfig;
     } else if (StringUtils.notBlank(trustCertificates)) {
       final String authenticationCertificate =
-          properties.get(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_AUTHENTICATION_CERTIFICATE);
+          properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_SSL_CERT_AUTH_PATH);
       final String authenticationKey =
-          properties.get(AvailableAppSettings.AUTH_LDAP_CREDENTIAL_AUTHENTICATION_KEY);
+          properties.get(AvailableAppSettings.AUTH_LDAP_SERVER_SSL_CERT_KEY_PATH);
       final X509CredentialConfig x509CredentialConfig = new X509CredentialConfig();
       x509CredentialConfig.setTrustCertificates(trustCertificates);
       x509CredentialConfig.setAuthenticationCertificate(authenticationCertificate);

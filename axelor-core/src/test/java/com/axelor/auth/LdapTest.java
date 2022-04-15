@@ -67,8 +67,8 @@ public class LdapTest {
       properties.put(
           AvailableAppSettings.AUTH_LDAP_SERVER_URL,
           "ldap://localhost:" + ldapExtension.getLdapPort());
-      properties.put(AvailableAppSettings.AUTH_LDAP_SYSTEM_USER, "uid=admin,ou=system");
-      properties.put(AvailableAppSettings.AUTH_LDAP_SYSTEM_PASSWORD, "secret");
+      properties.put(AvailableAppSettings.AUTH_LDAP_SERVER_AUTH_USER, "uid=admin,ou=system");
+      properties.put(AvailableAppSettings.AUTH_LDAP_SERVER_AUTH_PASSWORD, "secret");
 
       properties.put(AvailableAppSettings.AUTH_LDAP_GROUP_BASE, "ou=groups,dc=test,dc=com");
       properties.put(AvailableAppSettings.AUTH_LDAP_USER_BASE, "ou=users,dc=test,dc=com");

@@ -117,7 +117,7 @@ public class AuthPac4jInfo {
   public String getLogoutUrl() {
     if (logoutUrl == null) {
       final AppSettings settings = AppSettings.get();
-      String authLogoutUrl = settings.get(AvailableAppSettings.AUTH_LOGOUT_URL, null);
+      String authLogoutUrl = settings.get(AvailableAppSettings.AUTH_LOGOUT_DEFAULT_URL, null);
       if (StringUtils.isBlank(authLogoutUrl)) {
         authLogoutUrl = getBaseUrl();
         if (StringUtils.isBlank(authLogoutUrl)) {
