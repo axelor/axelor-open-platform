@@ -1,6 +1,6 @@
 ---
 title: Update join table columns names due to database reserved words conflicts
-type: changes
+type: change
 description: |
   Due to reserved words added in recent versions of supported databases, change columns name `groups` and `menus` 
   to respectively `group_id` and `meta_menu_id` in the join tables name `meta_menu_groups` and `meta_view_groups`.
