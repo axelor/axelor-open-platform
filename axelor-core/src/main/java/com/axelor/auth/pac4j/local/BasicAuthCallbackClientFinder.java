@@ -1,9 +1,9 @@
 package com.axelor.auth.pac4j.local;
 
+import com.axelor.auth.pac4j.AxelorCallbackClientFinder;
 import java.util.List;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
-import org.pac4j.core.client.finder.DefaultCallbackClientFinder;
 import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.context.WebContext;
 
@@ -11,7 +11,7 @@ import org.pac4j.core.context.WebContext;
  * Checks for basic auth request header and finds basic auth client when appropriate. This avoids
  * having to specify request parameter "client_name" when using IndirectBasicAuth.
  */
-public class BasicAuthCallbackClientFinder extends DefaultCallbackClientFinder {
+public class BasicAuthCallbackClientFinder extends AxelorCallbackClientFinder {
 
   private final String clientName;
 

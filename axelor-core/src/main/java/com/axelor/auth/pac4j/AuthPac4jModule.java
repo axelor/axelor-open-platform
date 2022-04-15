@@ -145,6 +145,6 @@ public class AuthPac4jModule extends ShiroWebModule {
     if (clientName.isPresent()) {
       return new BasicAuthCallbackClientFinder(clientName.get());
     }
-    return new DefaultCallbackClientFinder();
+    return new AxelorCallbackClientFinder();
   }
 }

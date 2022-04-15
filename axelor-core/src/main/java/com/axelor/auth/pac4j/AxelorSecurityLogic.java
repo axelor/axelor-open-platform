@@ -22,6 +22,7 @@ import io.buji.pac4j.profile.ShiroProfileManager;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.inject.Inject;
 import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.authorization.checker.DefaultAuthorizationChecker;
@@ -30,6 +31,8 @@ import org.pac4j.core.client.IndirectClient;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.engine.DefaultSecurityLogic;
+import org.pac4j.core.exception.http.HttpAction;
+import org.pac4j.core.exception.http.RedirectionAction;
 import org.pac4j.core.http.ajax.AjaxRequestResolver;
 import org.pac4j.core.matching.checker.DefaultMatchingChecker;
 import org.pac4j.core.matching.matcher.Matcher;
@@ -100,5 +103,20 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
         || !authPac4jInfo.getCentralClients().contains(currentClients.get(0).getName())) {
       super.saveRequestedUrl(context, sessionStore, currentClients, ajaxRequestResolver);
     }
+  }
+
+  @Override
+  protected HttpAction redirectToIdentityProvider(
+      WebContext context, SessionStore sessionStore, List<Client> currentClients) {
+
+    final var currentClient = (IndirectClient) currentClients.get(0);
+
+    if (currentClient.getRedirectionActionBuilder() == null) {
+      currentClient.init(true);
+    }
+
+    final Optional<RedirectionAction> action =
+        currentClient.getRedirectionAction(context, sessionStore);
+    return action.isPresent() ? action.get() : unauthorized(context, sessionStore, currentClients);
   }
 }
