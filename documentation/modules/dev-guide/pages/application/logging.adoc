@@ -9,8 +9,8 @@
 == Configuration
 
 {page-component-title} will auto configure logging so there is no need
-of any custom logging configuration file `logback.xml` unless you want
-total control on how to log (it's still possible).
+for any custom logging configuration file `logback.xml` unless you want
+total control over how to log (it's still possible).
 
 Generally, we will configure logging from `axelor-config.properties` files:
 

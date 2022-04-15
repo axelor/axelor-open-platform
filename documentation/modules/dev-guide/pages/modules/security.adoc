@@ -46,7 +46,7 @@ we will see in next section.
 Authorization, also called access control, is the process of determining access
 rights to resources in an application.
 
-Authorization is a critical element of any application but it can quickly
+Authorization is a critical element of any application, but it can quickly
 become very complex. Based on the simplicity of {shiro}, the {page-component-title} provides
 very simple yet powerful way to define authorization rules.
 
@@ -94,7 +94,7 @@ The permission object defines the access rule. It has the following properties:
 The `condition` is optional and the boolean flags are grant only, that is, `false`
 value doesn't mean deny.
 
-Some permission examples (pseudo code):
+Some permission examples (pseudocode):
 
 -----
 name: perm.sale.read.all
@@ -290,7 +290,7 @@ auth.oidc.generic.icon =
 auth.oidc.generic.exclusive = false
 -----
 
-In addition to client ID and secret configurations, you need to specify the discovery URI, ie. the URI to the document that provides details about the OpenID Connect provider's configuration.
+In addition to client ID and secret configurations, you need to specify the discovery URI, i.e. the URI to the document that provides details about the OpenID Connect provider's configuration.
 
 [source,properties]
 -----
@@ -536,7 +536,7 @@ auth.saml.authn.request.signed = false
 
 === CAS
 
-To login with a CAS server, you need to configure the CAS login URL and/or the CAS prefix URL (when different URLs are required). You can define the CAS protocol you want to support (CAS30 by default).
+To log in with a CAS server, you need to configure the CAS login URL and/or the CAS prefix URL (when different URLs are required). You can define the CAS protocol you want to support (CAS30 by default).
 
 [source,properties]
 -----

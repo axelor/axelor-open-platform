@@ -33,7 +33,7 @@ The authentication data is sent in the body of the request.
 Returns response with HTTP status `200` if login success otherwise returns
 HTTP status `401`.
 
-Only relevent headers and request body is shown.
+Only relevant headers and request body is shown.
 
 == Logout
 
@@ -46,7 +46,7 @@ GET /logout HTTP/1.1
 The login response returns session cookies which should be tracked by client
 application.
 
-Some of the libraries that can keep track of sessions:
+Some libraries that can keep track of sessions:
 
 * http://requests.ryanmccue.info/[Request for PHP]
 * http://docs.python-requests.org/en/latest/[Request for Python]

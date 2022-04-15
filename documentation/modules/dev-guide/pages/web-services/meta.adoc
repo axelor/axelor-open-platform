@@ -2,7 +2,7 @@
 :toc:
 :toc-title:
 
-Following are the services to get meta data of domain models.
+Following are the services to get metadata of domain models.
 
 == Get models
 
@@ -14,7 +14,7 @@ GET /ws/meta/models HTTP/1.1
 Accept: application/json
 ----
 
-.Respose:
+.Response:
 [source,json]
 -----
 {

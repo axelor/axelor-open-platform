@@ -2,10 +2,10 @@
 :toc:
 :toc-title:
 
-In chapter we will see the object views. The object views are xml definitions
+In this chapter we will see the object views. The object views are xml definitions
 about the user interface to represent the object models to the end users.
 
-The {page-component-title} support several kind of views for an object. These includes:
+The {page-component-title} support several kind of views for an object. This includes:
 
 * xref:views/grid.adoc[Grid] - shows the data list in as columns
 * xref:views/form.adoc[Form] - shows a single record in a form layout
@@ -19,12 +19,12 @@ The {page-component-title} support several kind of views for an object. These in
 
 The xref:views/grid.adoc[Grid] & xref:views/form.adoc[Form] views are the main views. If these
 views are not provided for model, a set of default views are generated automatically.
-However, they may not produce good looking interface, it's always advised to
+However, they may not produce good-looking interface, it's always advised to
 provide views for domain models.
 
 Like the object models, views are also defined using xml format.
 
-Each files should have proper declaration :
+Each file should have proper declaration:
 
 [source,xml]
 ----

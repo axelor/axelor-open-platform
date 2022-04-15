@@ -24,7 +24,7 @@ A grid view can be defined like this:
 <1> define a grid view for the given domain model
 <2> define a column bound to a field of the domain model
 
-The `<field>` tags can be used to define columns that binds to model fields.
+The `<field>` tags can be used to define columns that bind to model fields.
 
 The grid view has the following attributes:
 
@@ -35,7 +35,7 @@ The grid view has the following attributes:
 | *`name`* | name of the view, duplicate name is considered as overriding
 | *`model`* | the fully qualified name of the domain model this view belongs to
 | *`title`* | the grid title
-| `id` | if overriding some existing one, provide an unique id to identify this one
+| `id` | if overriding some existing one, provide a unique id to identify this one
 | `editable` | whether the grid is inline editable
 | `orderBy` | comma-separated list of field names to sort the records
 | `groupBy` | comma-separated list of field names to group the records
@@ -70,7 +70,7 @@ Let's see them in details:
 The `<field>` is the most important and required item in a grid view definition.
 It defines a column that binds to some field of the given domain object.
 
-It has following attributes:
+It has the following attributes:
 
 [cols="2,8"]
 |===

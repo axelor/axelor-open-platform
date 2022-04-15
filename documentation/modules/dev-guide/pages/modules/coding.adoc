@@ -8,7 +8,7 @@
 :url-kotlin: https://kotlinlang.org/
 :url-apidoc: http://docs.axelor.com/{page-component-name}/{page-component-version}/javadoc
 
-Till now we have seen how to define objects, view, actions using xml syntax.
+Until now, we have seen how to define objects, view, actions using xml syntax.
 However, the business code has to be implemented by writing some real code.
 
 Besides Java, the most natural candidates to write business code are pure JVM
@@ -133,13 +133,13 @@ public class HelloController {
   }
 }
 -----
-<1> controller lifecyle
+<1> controller lifecycle
 <2> inject a service
 <3> controller method
 <4> get the view context and convert to business object
 <5> call service method
 <6> mark the response to flash the message on client
-<7> free form controller method should be annotatted with `@CallMethod`
+<7> free form controller method should be annotated with `@CallMethod`
 <8> free form controller method
 
 The `ActionRequest` and `ActionResponse` are special classes to deal with
@@ -247,7 +247,7 @@ public class HelloServiceSaleImpl extends HelloServiceImpl {
 
   @Override
   public String say(Contact contact) {
-    log.info("Overrding the default HelloService.say ...");
+    log.info("Overriding the default HelloService.say ...");
     String message = super.say(contact);
     log.info("The default message was: {}", message);
     message = String.format("You are welcome '%s!'", contact.getFullName());
@@ -294,7 +294,7 @@ we can't bind same interface/implementation more then once in the application.
 If we have to do that in some case, the binding should be done from the main
 application module exclusively.
 
-Now, the application will pickup the `HelloServiceSaleImpl`
+Now, the application will pick up the `HelloServiceSaleImpl`
 for the `HelloService` interface and wherever you inject the `HelloService`, you
 will get an instance of the `HelloServiceSaleImpl` class.
 

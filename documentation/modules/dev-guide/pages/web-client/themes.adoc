@@ -70,7 +70,7 @@ _New in version 5.4:_
 - `hilite-black`
 - `hilite-white`
 
-Besides the dynamic hilite support, widget can also apply custom css using the
+Beside the dynamic hilite support, widget can also apply custom css using the
 `css` attribute.
 
 Following custom rules are defined:

@@ -91,20 +91,20 @@ $ export JAVA_OPTS="-Daxelor.config.db.default.password=secret"
 === Encoded properties
 
 Configuration values can be encrypted. Value should be wrapped in `ENC()` to indicate
-that the value is encrypted : `db.default.password = ENC(<some_thing>)`
+that the value is encrypted: `db.default.password = ENC(<some_thing>)`
 
 To use encrypted secrets, `config.encryptor.password` properties
-should be added : this is the secret key used to encrypt/decrypt data.
+should be added: this is the secret key used to encrypt/decrypt data.
 
-Others optional properties can be added to use custom encryption :
+Others optional properties can be added to use custom encryption:
 
-* `config.encryptor.algorithm` :Algorithm to be used by the encryptor
-* `config.encryptor.key-obtention-iterations` : Number of hashing iterations to obtain the signing key
-* `config.encryptor.provider-name` : Name of the security provider to be asked for the encryption algorithm
-* `config.encryptor.provider-class-name` : Security provider to be used for obtaining the encryption algorithm
-* `config.encryptor.salt-generator-classname` : Salt generator to be used by the encryptor
-* `config.encryptor.iv-generator-classname` : IV generator to be used by the encryptor
-* `config.encryptor.string-output-type` : Sets the form in which String output will be encoded
+* `config.encryptor.algorithm`:Algorithm to be used by the encryptor
+* `config.encryptor.key-obtention-iterations`: Number of hashing iterations to obtain the signing key
+* `config.encryptor.provider-name`: Name of the security provider to be asked for the encryption algorithm
+* `config.encryptor.provider-class-name`: Security provider to be used for obtaining the encryption algorithm
+* `config.encryptor.salt-generator-classname`: Salt generator to be used by the encryptor
+* `config.encryptor.iv-generator-classname`: IV generator to be used by the encryptor
+* `config.encryptor.string-output-type`: Sets the form in which String output will be encoded
 
 The default algorithm is `PBEWITHHMACSHA512ANDAES_256`. Most of the time,
 default encryption configuration will be enough.
@@ -275,15 +275,15 @@ db.default.password = secret
 | `mail.imap.connection-timeout` | imap socket connection timeout | 60000
 |===
 
-All specified path can use specials variables :
+All specified path can use special variables:
 
-* `{user.home}` : reference to the home directory, `System.getProperty("user.home")`
-* `{java.io.tmpdir}` : reference to the tmp directory, `System.getProperty("java.io.tmpdir")`
-* `{year}` : current year, `YYYY` format
-* `{month}` : current month, from `1` to `12`
-* `{day}` : current day, from `1` to `31`
+* `{user.home}`: reference to the home directory, `System.getProperty("user.home")`
+* `{java.io.tmpdir}`: reference to the tmp directory, `System.getProperty("java.io.tmpdir")`
+* `{year}`: current year, `YYYY` format
+* `{month}`: current month, from `1` to `12`
+* `{day}`: current day, from `1` to `31`
 
-The differences between `prod` and `dev` mode are :
+The differences between `prod` and `dev` mode are:
 
 * use minify js/css file.
 * use browser cache.
@@ -391,7 +391,7 @@ extensive configuration : all properties prefix by `hibernate.` will be used.
 == Global Context Configuration
 
 Besides the static configuration values, we can also provide configuration for
-dynamic global context with `context.` prefix. It's used by actions and script
+the dynamic global context with `context.` prefix. It's used by actions and script
 handlers when evaluating expressions and domain filters. The values can be
 referenced from expressions with special variable `\\__config__`.
 
@@ -478,4 +478,4 @@ The custom style is applied in following order:
 . user theme if available
 . custom style if provided
 
-So the custom style will aways override default and theme styles.
+So the custom style will always override default and theme styles.

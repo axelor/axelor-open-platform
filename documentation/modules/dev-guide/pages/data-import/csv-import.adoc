@@ -217,7 +217,7 @@ The format of ``csv-config.xml` for automatic import looks like this:
 
 == Advanced Import
 
-Sometime it's more convenient to import complex records at once instead of
+Sometimes it's more convenient to import complex records at once instead of
 providing different CSV for each object in the object graph.
 
 For example, sale orders, consider the following input:
@@ -330,7 +330,6 @@ expression and if found will be updated with provided values. If not, a new
 record will be created.
 
 The second binding is applied if the given if condition `email.empty` is
-evaluate to true. In this case, a new records is create with calculated
-email address.
+evaluated to true. In this case, a new record is created with a calculated email address.
 
 The if conditions should be simple groovy expressions.

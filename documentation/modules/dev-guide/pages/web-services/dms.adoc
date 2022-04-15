@@ -2,7 +2,7 @@
 :toc:
 :toc-title:
 
-These services provides basic access to various DMS features.
+These services provide basic access to various DMS features.
 
 == File listing
 
@@ -115,7 +115,7 @@ The headers are:
 - `X-File-Size` - actual file size
 - `X-File-Type` - file mime type
 
-If uploaded in chunk, first upload request with offset `0` returns an unique
+If uploaded in chunk, first upload request with offset `0` returns a unique
 file id. This file id should be passed as `X-File-Id` header on subsequent
 chunk uploads for remaining content.
 

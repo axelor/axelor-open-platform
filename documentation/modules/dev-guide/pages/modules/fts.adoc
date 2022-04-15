@@ -21,7 +21,7 @@ hibernate.search.default.indexBase = {user.home}/.axelor/indexes
 
 == Customization
 
-By default, only files and users are. Applications has to provide custom index configuration using
+By default, only files and users are. The application has to provide custom index configuration using
 hibernate search api by providing an implementation of `com.axelor.db.search.SearchMappingContributor`.
 
 .Example

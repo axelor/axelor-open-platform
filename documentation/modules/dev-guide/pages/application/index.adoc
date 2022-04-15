@@ -146,7 +146,7 @@ used by the application in `settings.gradle` file.
 The application project generally doesn't provide any implementation logic.
 The functionalities should be provided by creating modules.
 
-A module is again a gradle sub project. Typically created inside `modules` directory.
+A module is again a gradle sub project. Usually created inside `modules` directory.
 However, you can use any directory structure. See {url-gradle-multi}[gradle multi-project builds]
 documentation for more details.
 

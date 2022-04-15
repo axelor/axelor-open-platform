@@ -25,8 +25,8 @@ generally used as a `provider` action to the `<action-import>`.
 | read-timeout | read timeout in seconds (default 300 seconds).
 |===
 
-More then one SOAP action can be called in sequence. The result is returned as
-a collection string values returned by each actions respectively.
+More than one SOAP action can be called in sequence. The result is returned as
+a collection string values returned by each action respectively.
 
 The SOAP actions can be specified using:
 

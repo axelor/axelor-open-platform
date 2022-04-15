@@ -192,7 +192,7 @@ Content-Type: application/json
 
 You can see the `criteria` can be nested, to create complex search filters:
 
-Criteria has following attributes:
+Criteria has the following attributes:
 
 [cols="2,8"]
 |===

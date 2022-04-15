@@ -4,7 +4,7 @@
 
 Sometime while importing large data, it's required to process the data and
 transform it according to our needs. Doing this manually on all the CSV files
-is time consuming and error prone. Hoverer, {page-component-title} provides embed groovy
+is time-consuming and error-prone. However, {page-component-title} provides embed groovy
 scripting support to process/transform the data during the import process.
 
 You can specify inline groovy expressions to process individual field value,

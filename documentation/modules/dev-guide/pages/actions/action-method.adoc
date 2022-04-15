@@ -28,7 +28,7 @@ The method action requires following items:
 `action-method` can also be called from any objects with arbitrary arguments.
 The result of the method can be assigned to any field.
 
-Suppose the following controller :
+Suppose the following controller:
 
 [source,java]
 -----

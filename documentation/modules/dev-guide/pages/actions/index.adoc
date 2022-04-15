@@ -6,7 +6,7 @@
 :url-groovy: http://www.groovy-lang.org/
 
 In previous chapter we have checked about the object views. The views however
-requires actions to do something useful other then just CRUD operations.
+requires actions to do something useful other than just CRUD operations.
 
 The actions are also defined using xml and can be used to change views, objects,
 call controllers or doing some specific tasks like sending email, importing
@@ -24,11 +24,11 @@ Actions can be used to perform some advanced operations on the view, including:
 * calling controller methods
 * validating current record
 
-Actions are re-usable. So each action should be given an unique name.
+Actions are re-usable. So each action should be given a unique name.
 
 == Events
 
-Actions can be performed on various events. These includes:
+Actions can be performed on various events. This includes:
 
 * `onNew` - when creating new record
 * `onLoad` - when record is loaded in form view
@@ -87,7 +87,7 @@ The rules in details:
 
 The EL expressions can use following predefined helper functions:
 
-* `is(Object, Class)` - check whether the given object is instance of the the class
+* `is(Object, Class)` - check whether the given object is instance of the class
 * `as(Object, Class)` - cast the object as the given class (generally, casting is automatic in EL but useful to convert context to a model class)
 * `str(Object)` - convert object to string (if null, returns empty string "")
 * `imp(String)` - import a class by name
@@ -115,7 +115,7 @@ documentation for more details.
 
 == Built-ins variables
 
-Some built-in variables are available to be used with expressions. These includes:
+Some built-in variables are available to be used with expressions. This includes:
 
 * `\\__date__` - current date as `LocalDate`
 * `\\__time__` - current datetime as `LocalDateTime`

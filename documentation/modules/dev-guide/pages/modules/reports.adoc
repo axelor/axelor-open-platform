@@ -24,7 +24,7 @@ reports.design-dir = {user.home}/axelor/reports
 
 == Directory Structure
 
-The reports directory structure should be as follow:
+The reports directory structure should be as follows:
 
 * `reports` - contains design files (`.rptdesign`)
 * `reports/lib` - contains library files (`.rptlibrary`)
@@ -63,7 +63,7 @@ The `<action-report>` is used to define the action reports.
 | `attachment` | boolean, whether to attach the generated report to current object
 |===
 
-The action report can have following elements:
+The action report can have the following elements:
 
 * `<param>` - the report parameter
 ** `name` - name of the parameter

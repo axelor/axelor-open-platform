@@ -61,7 +61,7 @@ have to be provided.
 The response attributes are service dependent, only the specific attributes may
 be returned by the service.
 
-The `status` attribute can have following values:
+The `status` attribute can have the following values:
 
 [cols="2,8"]
 |===

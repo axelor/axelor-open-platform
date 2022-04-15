@@ -149,7 +149,7 @@ The custom fields are saved as `com.axelor.meta.db.MetaJsonField` records. Follo
 | whether the field should be visible in grid view
 
 | `minSize`
-| miniumum size of value
+| minimum size of value
 
 | `maxSize`
 | maximum size of value
@@ -173,7 +173,7 @@ The custom fields are saved as `com.axelor.meta.db.MetaJsonField` records. Follo
 | simple js expression to compute value
 
 | `enumType`
-| fully qualified name of the enum if it's a enum type field
+| fully qualified name of the enum if it's an enum type field
 
 | `formView`
 | if it's a relational field, the form view to use for popup editor
@@ -243,7 +243,7 @@ Following custom field types are supported:
 
 | `separator`
 | Separator
-| A virtual widget to create seperator widget
+| A virtual widget to create separator widget
 
 | `many-to-one`
 | ManyToOne
@@ -261,7 +261,7 @@ Following custom field types are supported:
 
 == Predefined fields
 
-Sometime we may have to predefine few custom fields. This can be done with data import feature.
+Sometimes we may have to predefine few custom fields. This can be done with data import feature.
 Here is an example data import rules and input format:
 
 .Input data
@@ -308,7 +308,7 @@ The `color` field is now contextual and will become visible only if product cate
 == Context-aware search
 
 In advanced search, the contextual fields can be used to search on specific context value.
-If searched with context a value, corresponding contetual fields will become visible in grid view.
+If searched with context a value, corresponding contextual fields will become visible in grid view.
 
 Following image shows a context field selection in top section of the advanced search popup.
 

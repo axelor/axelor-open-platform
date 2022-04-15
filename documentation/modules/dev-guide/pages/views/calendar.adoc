@@ -27,7 +27,7 @@ The calendar view attributes are:
 | *`name`* | name of the calendar view
 | `model` | fully qualified name of the domain model
 | `eventStart` | name of the field of type date/datetime to be used as event start time
-| `eventStop` | name of the field of type date/datetme to be used as event stop time
+| `eventStop` | name of the field of type date/datetime to be used as event stop time
 | `eventLength` | if eventStop is not given, the length of an event in hour (default is 1)
 | `dayLength` | working hours per day (default is 8)
 | `colorBy` | name of the field to be used to colorize the events (colors are used consistently according to the field and there is a maximum of 30 different colors)

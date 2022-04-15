@@ -77,7 +77,7 @@ Form view can have the following attributes:
 | *`name`* | name of the view, duplicates are considered overriding
 | *`model`* | fully qualified name of the domain model
 | *`title`* | the form view title
-| `id` | If overriding some existing one, provide an unique id to identify this one.
+| `id` | If overriding some existing one, provide a unique id to identify this one.
 | `editable` | whether the form is editable
 | `readonlyIf` | an {url-angular-expression}[angular.js] boolean expression to make form readonly
 | `onNew` | action to be called on creating new record
@@ -89,7 +89,7 @@ Form view can have the following attributes:
 | `canCopy` | an {url-angular-expression}[angular.js] boolean expression to the 'Copy' button
 | `canSave` | an {url-angular-expression}[angular.js] boolean expression to the 'Save' button
 | `canAttach` | an {url-angular-expression}[angular.js] boolean expression to the 'Attachment' button
-| `width` | The preferred width style of the view : `mini`, `mid` or `large`.
+| `width` | The preferred width style of the view: `mini`, `mid` or `large`.
 |===
 
 The form uses responsive layout that adjusts according to the available screen
@@ -103,8 +103,8 @@ columns.
 Let's see each type of panel.
 
 * `panel` - panel with 12 columns, generally used to put simple fields
-* `panel-tabs` - holds another panels which are shown as notebook tabs
-* `panel-stack` - holds another panels which are attached
+* `panel-tabs` - contains other panels which are shown as notebook tabs
+* `panel-stack` - contains other panels which are attached
 * `panel-related` - a panel to put o2m/m2m fields
 * `panel-include` - include another panel form
 * `panel-dashlet` - dashlet panel can be used to embed other views
@@ -147,7 +147,7 @@ A `panel` can have the following attributes:
 
 === Panel Tabs
 
-A `panel-tabs` holds another panels which are shown as notebook tabs. It includes
+A `panel-tabs` contains other panels which are shown as notebook tabs. It includes
 all `panel` attributes except for `itemSpan`, `title` and `showTitle`.
 
 [source,xml]
@@ -162,7 +162,7 @@ all `panel` attributes except for `itemSpan`, `title` and `showTitle`.
 
 === Panel Stack
 
-A `panel-stack` holds another panels. It is a stack of panels and child panels
+A `panel-stack` contains other panels. It is a stack of panels and child panels
 are placed one by one.
 
 It include all `panel` attributes except for `itemSpan`, `title` and `showTitle`.

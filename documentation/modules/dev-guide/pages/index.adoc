@@ -2,7 +2,7 @@
 :toc:
 :toc-title:
 
-The {page-component-title} is an business application development framework for Java.
+The {page-component-title} is a business application development framework for Java.
 
 This document provides in-depth documentation for developers. If you are new to
 the {page-component-title} don't forget to check the xref:getting-started:index.adoc[Getting Started] guide.

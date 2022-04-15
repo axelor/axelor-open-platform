@@ -10,7 +10,7 @@ destination system.
 
 Data transformation involves two key phases:
 
-1. Data Mapping: the assignment of data items from the source to the the destination
+1. Data Mapping: the assignment of data items from the source to the destination
 2. Data Import: the process of importing data based on the data mapping
 
 The {page-component-title} provides powerful way to achieve this with declarative manner

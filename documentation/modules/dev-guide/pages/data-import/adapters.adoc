@@ -54,7 +54,7 @@ The adapter then has to be registered from the mapping file like this:
 </adapter>
 -----
 
-Once registerred, it can be used like this:
+Once registered, it can be used like this:
 
 [source,xml]
 -----

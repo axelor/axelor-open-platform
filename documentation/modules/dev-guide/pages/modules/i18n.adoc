@@ -47,7 +47,7 @@ The corresponding database table only stores `key` and `message`.
 
 The key is original text extracted from the java, groovy or xml files. In case
 of fields where title is not given, the field name is automatically converted to
-human readable form.
+human-readable form.
 
 [source,xml]
 -----
@@ -58,8 +58,8 @@ human readable form.
 </entity>
 -----
 
-In this case, as there is no title given, a human readable text `Full name` is
-generated and used as key. Also the `help="true"` is used to automatically
+In this case, as there is no title given, a human-readable text `Full name` is
+generated and used as key. Also, the `help="true"` is used to automatically
 generate key for help attribute. The format of auto generate help key is
 `help:<entity>.<field>` so in this case a key `help:Contact.fullName` is
 generated.
@@ -126,7 +126,7 @@ Value translation feature allows us to translate record values.
 The value translations are stored with key in `value:<value>` format. For example, `value:Laptop` or
 `value:Hard Disk` etc.
 
-The field values can be translated by clicking on a flag icon visile on that field:
+The field values can be translated by clicking on a flag icon visible on that field:
 
 .Translate icon
 image::translation-icon.png[]

@@ -2,7 +2,7 @@
 :toc:
 :toc-title:
 
-The views represents the information to the users.
+The views represent the information to the users.
 
 * Grid View - represents data in tabular (list) form
 * Form View - represents data in html form

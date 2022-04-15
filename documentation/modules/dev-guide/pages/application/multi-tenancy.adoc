@@ -4,7 +4,7 @@
 
 The {page-component-title} v5 has added https://en.wikipedia.org/wiki/Multitenancy[multi-tenancy] support.
 The term multi-tenancy refers to a software architecture in which a single instance of software runs
-on a server and serves multiple tenants. A tenant is a group of users who share a common access with
+on a server and serves multiple tenants. A tenant is a group of users who share common access with
 specific privileges to the software instance.
 
 So now, a single instance of Axelor app can serve multiple tenants (users, companies etc).

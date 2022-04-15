@@ -17,5 +17,5 @@ using `action-view` using a view parameter `details-view`.
 <2> the form view used by this action
 <3> `details-view` params configures grid view to show details view on right side
 
-We can also provide alternative form view by specifing view name as `details-view` param value,
+We can also provide alternative form view by specifying view name as `details-view` param value,
 like `<view-param name="details-view" value="another-form-view" />`.

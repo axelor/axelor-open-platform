@@ -4,7 +4,7 @@
 
 The entity classes represents domain models and are defined using xml format.
 
-Each files should have proper declaration:
+Each file should have proper declaration:
 
 [source,xml]
 ----
@@ -79,7 +79,7 @@ A domain model is defined using `<entity>` tag, it supports some attributes.
 
 The `strategy` attribute can be used on base entity only.
 
-The `persistable` attribute can be used to define a non-persitable entity class
+The `persistable` attribute can be used to define a non-persistable entity class
 annotated with `@MappedSuperclass` that can be used as base class of other entities.
 
 The `<module>` tag can be used to define package names of the generated entities
@@ -105,7 +105,7 @@ The `<module>` tag can be used to define package names of the generated entities
 * `repo-package` - is optional, used as java package name of the generated repository class, defaults to `<package>.repo`
 * `table-prefix` - is optional, used as table name prefix, defaults to module `name`
 
-WARNING: If package name ends with .db, the second to last part of package name is used instead of module `name` for default table prefix, eg. if package is named `com.axelor.sale.db`, `sale` will be used as default table prefix.
+WARNING: If package name ends with .db, the second to last part of package name is used instead of module `name` for default table prefix, e.g. if package is named `com.axelor.sale.db`, `sale` will be used as default table prefix.
 
 == Fields
 
@@ -369,13 +369,13 @@ For JPQL query on `enum` fields, we must always use query parameter.
 
 [source,java]
 ----
-// this is correct way
+// this is a correct way
 TypedQuery<Order> query = em.createQuery(
   "SELECT s FROM Order s WHERE s.status = :status");
 
 query.setParameter("status", OrderStatus.OPEN);
 
-// this is wrong way
+// this is a wrong way
 TypedQuery<Order> query = em.createQuery(
   "SELECT s FROM Order s WHERE s.status = 'OPEN'");
 
@@ -395,7 +395,7 @@ Query<Order> q = Query.of(Order.class)
   .filter("self.status = ?1 OR self.status = ?2", "DRAFT", OrderStatus.OPEN);
 ----
 
-In scripting expressions, `enum` should be referenced using it's type name. For example:
+In scripting expressions, `enum` should be referenced using its type name. For example:
 
 [source,xml]
 ----
@@ -457,7 +457,7 @@ one-to-one relationship.
 | Attribute | Description
 
 | `ref` | name of the reference entity class (FQN if not in same package)
-| `mappedBy` | for bi-directional fields, name of the owner side field
+| `mappedBy` | for bidirectional fields, name of the owner side field
 |===
 
 [source,xml]
@@ -479,7 +479,7 @@ relationship.
 | Attribute | Description
 
 | `ref` | name of the reference entity class (FQN if not in same package)
-| `mappedBy` | for bi-directional fields, name of the inverse many-to-one field
+| `mappedBy` | for bidirectional fields, name of the inverse many-to-one field
 | `orphanRemoval` | whether to remove orphaned records (default true)
 | `orderBy` | specify the ordering of the collection value by the given field
 |===
@@ -500,7 +500,7 @@ relationship.
 | Attribute | Description
 
 | `ref` | name of the reference entity class (FQN if not in same package)
-| `mappedBy` | for bi-directional fields, name of the owner side field
+| `mappedBy` | for bidirectional fields, name of the owner side field
 | `orderBy` | specify the ordering of the collection value by the given field
 |===
 
@@ -521,7 +521,7 @@ in the `columns` attribute. A name can be defined with the `name` attribute.
 <index columns="firstName,lastName,fullName" name="idx_names"/>
 ----
 
-A index can be defined on a field using `index` attribute.
+An index can be defined on a field using `index` attribute.
 A custom index name can be provided (starting with 'idx_' prefix), else default
 index name is generated using table name and column name.
 By default, all reference fields, namecolumn, name and code are automatically indexed.
@@ -560,7 +560,7 @@ encryption.password = MySuperSecretKey
 #encryption.algorithm = CBC
 ----
 
-We can marked `<string>` and `<binary>` fields as encrypted like this:
+We can mark `<string>` and `<binary>` fields as encrypted like this:
 
 [source,xml]
 ----

@@ -27,7 +27,7 @@ The sequence can be defined like this:
 </domain-models>
 ----
 
-The `<sequence>` tag has following attributes:
+The `<sequence>` tag has the following attributes:
 
 [cols="2,8"]
 |===

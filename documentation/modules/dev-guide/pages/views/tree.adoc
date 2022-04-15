@@ -51,7 +51,7 @@ The columns are bound to node fields described below.
 
 Tree view requires `<node>` items to define data sources for the tree nodes.
 
-The `<node>` item can have following attributes:
+The `<node>` item can have the following attributes:
 
 [cols="2,8"]
 |===
@@ -62,7 +62,7 @@ The `<node>` item can have following attributes:
 | `domain` | domain filter to restrict node data
 | `orderBy` | comma-separated list of field name to order the node data
 | `draggable` | whether the node is draggable
-| `onClick` | action to execute when double click on a node
+| `onClick` | action to execute when double-click on a node
 |===
 
 The first node item should define data source of the type referenced by the

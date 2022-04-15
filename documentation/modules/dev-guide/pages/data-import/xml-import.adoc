@@ -85,7 +85,7 @@ file looks like this:
 
 You can see the mapping is almost identical to CSV mapping format. The only
 difference is the `<bind>` tag which required `node` attribute that tags xpath
-expressions to bind a perticular node to the object field.
+expressions to bind a particular node to the object field.
 
 Let's see the binding in details:
 

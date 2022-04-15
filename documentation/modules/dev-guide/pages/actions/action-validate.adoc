@@ -34,7 +34,7 @@ The validate action requires following items:
 * `<info>` - define an information condition
 ** `if` - a boolean expression against the current context
 ** `message` - the message to show if condition failed
-* `<notify>` - define an notification condition
+* `<notify>` - define a notification condition
 ** `if` - a boolean expression against the current context
 ** `message` - the message to show if condition failed
 

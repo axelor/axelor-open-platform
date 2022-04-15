@@ -149,6 +149,6 @@ Two custom template tags are provided:
   * `@sums` - comma-separated list for dataset field to show sum
 
 The `@` means the attribute value is static and `=` mean the attribute value is
-a dynamic expression. Don't include the them in template, it's just for information.
+a dynamic expression. Don't include them in template, it's just for information.
 
 See the listing for some examples.
