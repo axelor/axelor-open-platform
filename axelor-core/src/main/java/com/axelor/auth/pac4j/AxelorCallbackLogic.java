@@ -51,6 +51,7 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
     this.csrfMatcher = csrfMatcher;
     setProfileManagerFactory(ShiroProfileManager::new);
     setClientFinder(clientFinder);
+    setErrorUrl("error.jsp");
   }
 
   @Override
@@ -120,5 +121,12 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
 
     logger.debug("redirectUrl: {}", redirectUrl);
     return HttpActionHelper.buildRedirectUrlAction(context, redirectUrl);
+  }
+
+  @Override
+  protected Object handleException(
+      Exception e, HttpActionAdapter httpActionAdapter, WebContext context) {
+    logger.error("Unable to handle login : {}", e.getMessage());
+    return super.handleException(e, httpActionAdapter, context);
   }
 }

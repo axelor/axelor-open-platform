@@ -33,13 +33,18 @@ import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.engine.DefaultSecurityLogic;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.exception.http.RedirectionAction;
+import org.pac4j.core.http.adapter.HttpActionAdapter;
 import org.pac4j.core.http.ajax.AjaxRequestResolver;
 import org.pac4j.core.matching.checker.DefaultMatchingChecker;
 import org.pac4j.core.matching.matcher.Matcher;
 import org.pac4j.core.profile.UserProfile;
 import org.pac4j.core.util.Pac4jConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AxelorSecurityLogic extends DefaultSecurityLogic {
+
+  private static final Logger LOG = LoggerFactory.getLogger(AxelorSecurityLogic.class);
 
   private final AuthPac4jInfo authPac4jInfo;
   static final String HASH_LOCATION_PARAMETER = "hash_location";
@@ -51,6 +56,7 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
       AxelorCsrfMatcher csrfMatcher) {
     this.authPac4jInfo = authPac4jInfo;
     setProfileManagerFactory(ShiroProfileManager::new);
+    setErrorUrl("error.jsp");
     setAuthorizationChecker(
         new DefaultAuthorizationChecker() {
 
@@ -118,5 +124,12 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
     final Optional<RedirectionAction> action =
         currentClient.getRedirectionAction(context, sessionStore);
     return action.isPresent() ? action.get() : unauthorized(context, sessionStore, currentClients);
+  }
+
+  @Override
+  protected Object handleException(
+      Exception e, HttpActionAdapter httpActionAdapter, WebContext context) {
+    LOG.error("Unable to handle login : {}", e.getMessage());
+    return super.handleException(e, httpActionAdapter, context);
   }
 }
