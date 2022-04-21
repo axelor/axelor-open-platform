@@ -20,7 +20,6 @@ package com.axelor.auth.pac4j;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.pac4j.core.client.Client;
@@ -29,7 +28,6 @@ import org.pac4j.core.client.IndirectClient;
 import org.pac4j.core.client.finder.DefaultCallbackClientFinder;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.util.CommonHelper;
-import org.pac4j.core.util.Pac4jConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,12 +42,9 @@ public class AxelorCallbackClientFinder extends DefaultCallbackClientFinder {
 
     final List<Client> result = new ArrayList<>();
     final List<Client> indirectClients = new ArrayList<>();
-    final List<String> clientNameList =
-        Arrays.asList(clientNames.split(Pac4jConstants.ELEMENT_SEPARATOR));
 
     clients.findAllClients().stream()
         .filter(IndirectClient.class::isInstance)
-        .filter(client -> clientNameList.contains(client.getName()))
         .map(IndirectClient.class::cast)
         .forEach(
             indirectClient -> {
