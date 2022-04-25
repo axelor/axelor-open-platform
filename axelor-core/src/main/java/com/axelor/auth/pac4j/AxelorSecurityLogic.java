@@ -39,21 +39,21 @@ import org.pac4j.core.matching.checker.DefaultMatchingChecker;
 import org.pac4j.core.matching.matcher.Matcher;
 import org.pac4j.core.profile.UserProfile;
 import org.pac4j.core.util.Pac4jConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class AxelorSecurityLogic extends DefaultSecurityLogic {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AxelorSecurityLogic.class);
-
+  private final ErrorHandler errorHandler;
   private final AuthPac4jInfo authPac4jInfo;
+
   static final String HASH_LOCATION_PARAMETER = "hash_location";
 
   @Inject
   public AxelorSecurityLogic(
+      ErrorHandler errorHandler,
       AuthPac4jInfo authPac4jInfo,
       AxelorCsrfAuthorizer csrfAuthorizer,
       AxelorCsrfMatcher csrfMatcher) {
+    this.errorHandler = errorHandler;
     this.authPac4jInfo = authPac4jInfo;
     setProfileManagerFactory(ShiroProfileManager::new);
     setErrorUrl("error.jsp");
@@ -129,7 +129,7 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
   @Override
   protected Object handleException(
       Exception e, HttpActionAdapter httpActionAdapter, WebContext context) {
-    LOG.error("Unable to handle login : {}", e.getMessage());
+    errorHandler.handleException(e, httpActionAdapter, context);
     return super.handleException(e, httpActionAdapter, context);
   }
 }

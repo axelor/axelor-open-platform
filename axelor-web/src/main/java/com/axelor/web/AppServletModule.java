@@ -37,7 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Module;
 import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matchers;
-import com.google.inject.persist.jpa.AxelorPersistFilter;
+import com.google.inject.persist.PersistFilter;
 import com.google.inject.servlet.ServletModule;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -93,7 +93,7 @@ public class AppServletModule extends ServletModule {
             // pre-session tenant filter should be come before PersistFilter
             filter("*").through(PreSessionTenantFilter.class);
             // order is important, PersistFilter must come first
-            filter("*").through(AxelorPersistFilter.class);
+            filter("*").through(PersistFilter.class);
             filter("*").through(AppFilter.class);
             filter("*").through(GuiceShiroFilter.class);
             // pre-session tenant filter should be come after shiro filter

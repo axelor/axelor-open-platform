@@ -30,13 +30,7 @@
 <%@ page import="org.pac4j.core.util.CommonHelper" %>
 <%@include file='common.jsp'%>
 <%
-String errorMsg;
-
-if (exception instanceof UnknownAccountException) {
-  errorMsg = /*$$(*/ "User doesn’t exist." /*)*/;
-} else {
-  errorMsg = /*$$(*/ "Authentication error" /*)*/;
-}
+String errorMsg = /*$$(*/ "Authentication error" /*)*/;
 
 if (!Beans.get(ClientListProvider.class).isExclusive()) {
   String url = CommonHelper.addParameter("login.jsp", "error", errorMsg);

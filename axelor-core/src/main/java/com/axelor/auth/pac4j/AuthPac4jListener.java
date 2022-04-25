@@ -43,6 +43,8 @@ public class AuthPac4jListener implements AuthenticationListener {
   @Inject private AuthPac4jProfileService profileService;
   @Inject private AxelorSessionManager sessionManager;
 
+  private static final String UNKNOWN_USER = "User not found: %s";
+
   @Override
   public void onSuccess(AuthenticationToken token, AuthenticationInfo info) {
     if (info instanceof UserAuthenticationInfo) {
@@ -61,7 +63,8 @@ public class AuthPac4jListener implements AuthenticationListener {
         profile
             .map(profileService::getUserIdentifier)
             .orElseGet(() -> String.valueOf(token.getPrincipal()));
-    final UnknownAccountException exception = new UnknownAccountException(username);
+    final String msg = String.format(UNKNOWN_USER, username);
+    final UnknownAccountException exception = new UnknownAccountException(msg);
 
     firePostLoginFailure(token, exception);
     SecurityUtils.getSubject().logout();

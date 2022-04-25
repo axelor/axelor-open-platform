@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 public class AxelorCallbackLogic extends DefaultCallbackLogic {
 
+  private final ErrorHandler errorHandler;
   private final AxelorCsrfMatcher csrfMatcher;
 
   private static final Logger logger =
@@ -47,7 +48,10 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
 
   @Inject
   public AxelorCallbackLogic(
-      AxelorCsrfMatcher csrfMatcher, DefaultCallbackClientFinder clientFinder) {
+      ErrorHandler errorHandler,
+      AxelorCsrfMatcher csrfMatcher,
+      DefaultCallbackClientFinder clientFinder) {
+    this.errorHandler = errorHandler;
     this.csrfMatcher = csrfMatcher;
     setProfileManagerFactory(ShiroProfileManager::new);
     setClientFinder(clientFinder);
@@ -68,7 +72,7 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
       final JEEContext context = (JEEContext) webContext;
       context.getNativeRequest().setCharacterEncoding("UTF-8");
     } catch (UnsupportedEncodingException e) {
-      logger.error(e.getMessage(), e);
+      return handleException(e, httpActionAdapter, webContext);
     }
 
     return super.perform(
@@ -126,7 +130,7 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
   @Override
   protected Object handleException(
       Exception e, HttpActionAdapter httpActionAdapter, WebContext context) {
-    logger.error("Unable to handle login : {}", e.getMessage());
+    errorHandler.handleException(e, httpActionAdapter, context);
     return super.handleException(e, httpActionAdapter, context);
   }
 }

@@ -20,7 +20,7 @@ package com.axelor.web;
 import com.axelor.web.db.Repository;
 import com.axelor.web.service.RestService;
 import com.axelor.web.service.ViewService;
-import com.google.inject.persist.jpa.AxelorPersistFilter;
+import com.google.inject.persist.PersistFilter;
 import com.google.inject.servlet.ServletModule;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -46,7 +46,7 @@ public class WebTestModule extends ServletModule {
   protected void configureServlets() {
 
     install(new TestModule());
-    filter("*").through(AxelorPersistFilter.class);
+    filter("*").through(PersistFilter.class);
 
     bind(RestService.class);
     bind(ViewService.class);

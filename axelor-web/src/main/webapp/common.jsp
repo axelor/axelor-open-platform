@@ -19,14 +19,15 @@
 --%>
 <%@ taglib prefix="x" uri="WEB-INF/axelor.tld" %>
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%@ page import="java.util.function.Function"%>
+<%@ page import="java.util.function.UnaryOperator" %>
+<%@ page import="java.util.ResourceBundle" %>
 <%@ page import="com.axelor.i18n.I18n" %>
 <%@ page import="com.axelor.web.internal.AppInfo" %>
 <%@ page import="com.axelor.app.AppSettings" %>
 <%@ page import="com.axelor.app.AvailableAppSettings" %>
 <%
 
-Function<String, String> T = new Function<String, String>() {
+final UnaryOperator<String> T = new UnaryOperator<String>() {
   public String apply(String t) {
     try {
       return I18n.get(t);
