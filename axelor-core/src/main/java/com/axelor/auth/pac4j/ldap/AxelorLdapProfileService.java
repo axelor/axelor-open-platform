@@ -40,6 +40,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.ldaptive.BindConnectionInitializer;
 import org.ldaptive.ConnectionConfig;
+import org.ldaptive.ConnectionFactory;
 import org.ldaptive.Credential;
 import org.ldaptive.LdapAttribute;
 import org.ldaptive.LdapEntry;
@@ -213,6 +214,14 @@ public class AxelorLdapProfileService extends LdapProfileService {
     }
 
     final PooledConnectionFactory factory = new PooledConnectionFactory(config);
+    Runtime.getRuntime()
+        .addShutdownHook(
+            new Thread(
+                () -> {
+                  if (factory.isInitialized()) {
+                    factory.close();
+                  }
+                }));
     if (initializer != null) {
       factory.setActivator(
           conn -> {
@@ -224,8 +233,6 @@ public class AxelorLdapProfileService extends LdapProfileService {
             }
           });
     }
-    factory.initialize();
-    Runtime.getRuntime().addShutdownHook(new Thread(factory::close));
 
     final SimpleBindAuthenticationHandler handler = new SimpleBindAuthenticationHandler(factory);
 
@@ -257,6 +264,23 @@ public class AxelorLdapProfileService extends LdapProfileService {
     setUsernameAttribute(usernameAttribute);
     setPasswordAttribute(AxelorLdapProfileDefinition.PASSWORD);
     setProfileDefinition(new AxelorLdapProfileDefinition());
+  }
+
+  @Override
+  protected boolean shouldInitialize(boolean forceReinit) {
+    final ConnectionFactory factory = getConnectionFactory();
+    return super.shouldInitialize(forceReinit)
+        || factory instanceof PooledConnectionFactory
+            && !((PooledConnectionFactory) factory).isInitialized();
+  }
+
+  @Override
+  protected void internalInit(boolean forceReinit) {
+    final ConnectionFactory factory = getConnectionFactory();
+    if (factory instanceof PooledConnectionFactory) {
+      ((PooledConnectionFactory) factory).initialize();
+    }
+    super.internalInit(forceReinit);
   }
 
   @Override
