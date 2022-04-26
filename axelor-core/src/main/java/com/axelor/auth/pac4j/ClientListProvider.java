@@ -262,12 +262,21 @@ public class ClientListProvider implements Provider<List<Client>> {
 
     clients.addAll(centralClients);
 
-    if (settings.getBoolean(AvailableAppSettings.AUTH_LOCAL_BASIC_AUTH_INDIRECT_ENABLED, false)) {
-      clients.add(Beans.get(IndirectBasicAuthClient.class));
-    }
-    if (settings.getBoolean(AvailableAppSettings.AUTH_LOCAL_BASIC_AUTH_DIRECT_ENABLED, false)) {
-      clients.add(Beans.get(DirectBasicAuthClient.class));
-    }
+    settings
+        .getList(AvailableAppSettings.AUTH_LOCAL_BASIC_AUTH)
+        .forEach(
+            name -> {
+              switch (name.toLowerCase()) {
+                case "indirect":
+                  clients.add(Beans.get(IndirectBasicAuthClient.class));
+                  break;
+                case "direct":
+                  clients.add(Beans.get(DirectBasicAuthClient.class));
+                  break;
+                default:
+                  throw new IllegalArgumentException("Invalid basic auth client: " + name);
+              }
+            });
 
     // set titles and icons
     final Iterator<Map<String, Object>> configIt = configs.values().iterator();

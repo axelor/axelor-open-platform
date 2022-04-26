@@ -168,8 +168,7 @@ public interface AvailableAppSettings {
   String AUTH_LOGOUT_LOCAL = "auth.logout.local";
   String AUTH_LOGOUT_CENTRAL = "auth.logout.central";
 
-  String AUTH_LOCAL_BASIC_AUTH_INDIRECT_ENABLED = "auth.local.basic-auth.indirect.enabled";
-  String AUTH_LOCAL_BASIC_AUTH_DIRECT_ENABLED = "auth.local.basic-auth.direct.enabled";
+  String AUTH_LOCAL_BASIC_AUTH = "auth.local.basic-auth";
 
   String AUTH_LDAP_SERVER_URL = "auth.ldap.server.url";
   String AUTH_LDAP_SERVER_CONNECT_TIMEOUT = "auth.ldap.server.connect-timeout";

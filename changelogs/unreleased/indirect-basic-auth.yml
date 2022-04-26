@@ -1,6 +1,12 @@
 ---
-title: Support indirect basic auth client via setting `auth.local.indirect.basic.auth.enabled`
+title: Support indirect/direct basic auth client via setting `auth.local.basic-auth`
 type: change
-description:
-  Indirect basic auth allows to log in on callback.
-  `auth.local.basic.auth.enabled` changed to `auth.local.direct.basic.auth.enabled`.
+description: |
+  Indirect basic auth allows to log in on callback, while direct basic auth requires credentials in each request.
+
+  ```properties
+  # enable indirect and/or direct basic auth
+  auth.local.basic-auth = indirect, direct
+  ```
+
+  `auth.local.basic.auth.enabled`, which was for direct basic auth only, is removed.

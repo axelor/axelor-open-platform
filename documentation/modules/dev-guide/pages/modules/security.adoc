@@ -754,10 +754,15 @@ auth.ldap.server.response-timeout =
 
 == Basic Authentication
 
-You can enable direct basic authentication, which is a method to provide username and password when making a request (disabled by default).
+You can enable basic authentication, which is a method to provide username and password when making a request (disabled by default).
+There are two kinds of basic authentication: `indirect` and `direct`.
+
+* Indirect basic authentication: user has to provide username and password to the callback url before making further requests.
+When the user is done, they may call the logout endpoint.
+* Direct basic authentication: user has to provide username and password in each request.
 
 [source,properties]
 -----
 # Basic authentication
-auth.local.basic-auth.direct.enabled = false
+auth.local.basic-auth = indirect, direct
 -----
