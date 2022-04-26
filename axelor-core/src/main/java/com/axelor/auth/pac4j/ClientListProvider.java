@@ -22,6 +22,7 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.common.Inflector;
 import com.axelor.common.ObjectUtils;
+import com.axelor.common.StringUtils;
 import com.axelor.inject.Beans;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Provider;
@@ -285,8 +286,13 @@ public class ClientListProvider implements Provider<List<Client>> {
       final Map<String, Object> props = configIt.next();
       final String name = clientIt.next().getName();
       final String title = (String) props.getOrDefault("title", name);
-      final String icon = (String) props.getOrDefault("icon", "");
-      authPac4jInfo.setClientInfo(name, Map.of("title", title, "icon", icon));
+      final String icon = (String) props.get("icon");
+      final Map<String, String> info = new HashMap<>();
+      info.put("title", title);
+      if (StringUtils.notBlank(icon)) {
+        info.put("icon", icon);
+      }
+      authPac4jInfo.setClientInfo(name, info);
     }
 
     if (logger.isInfoEnabled()) {

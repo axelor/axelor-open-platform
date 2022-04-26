@@ -92,7 +92,9 @@ Set<String> centralClients = authPac4jInfo.getCentralClients();
             String icon = info.get("icon");
             %>
             <button class="btn" type="button" data-provider="<%= client %>">
+              <% if (icon != null) { %>
               <img class="social-logo <%= client %>" src="<%= icon %>" alt="<%= title %>" title="<%= title %>">
+              <% } %>
               <div class="social-title"><%= String.format(loginWith, title) %></div>
             </button>
             <% } %>
