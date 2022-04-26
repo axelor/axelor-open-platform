@@ -66,38 +66,6 @@ public class ClientListProvider implements Provider<List<Client>> {
   private static final Map<String, ClientConfig> CONFIGS =
       new ImmutableMap.Builder<String, ClientConfig>()
           .put(
-              "oauth",
-              ClientConfig.builder()
-                  .client("org.pac4j.oauth.client.GenericOAuth20Client")
-                  .configuration("org.pac4j.oauth.config.OAuth20Configuration")
-                  .title("OAuth 2.0")
-                  .icon("img/signin/oauth.svg")
-                  .build())
-          .put(
-              "google",
-              ClientConfig.builder()
-                  .client("org.pac4j.oauth.client.Google2Client")
-                  .configuration("org.pac4j.oauth.config.OAuth20Configuration")
-                  .title("Google")
-                  .icon("img/signin/google.svg")
-                  .build())
-          .put(
-              "facebook",
-              ClientConfig.builder()
-                  .client("org.pac4j.oauth.client.FacebookClient")
-                  .configuration("org.pac4j.oauth.config.FacebookConfiguration")
-                  .title("Facebook")
-                  .icon("img/signin/facebook.svg")
-                  .build())
-          .put(
-              "github",
-              ClientConfig.builder()
-                  .client("org.pac4j.oauth.client.GitHubClient")
-                  .configuration("org.pac4j.oauth.config.OAuth20Configuration")
-                  .title("GitHub")
-                  .icon("img/signin/github.svg")
-                  .build())
-          .put(
               "oidc",
               ClientConfig.builder()
                   .client("org.pac4j.oidc.client.OidcClient")
@@ -114,6 +82,14 @@ public class ClientListProvider implements Provider<List<Client>> {
                   .icon("img/signin/keycloak.svg")
                   .build())
           .put(
+              "google",
+              ClientConfig.builder()
+                  .client("org.pac4j.oidc.client.GoogleOidcClient")
+                  .configuration("org.pac4j.oidc.config.OidcConfiguration")
+                  .title("Google")
+                  .icon("img/signin/google.svg")
+                  .build())
+          .put(
               "azure",
               ClientConfig.builder()
                   .client("org.pac4j.oidc.client.AzureAd2Client")
@@ -128,6 +104,30 @@ public class ClientListProvider implements Provider<List<Client>> {
                   .configuration("org.pac4j.oidc.config.AppleOidcConfiguration")
                   .title("Apple")
                   .icon("img/signin/apple.svg")
+                  .build())
+          .put(
+              "oauth",
+              ClientConfig.builder()
+                  .client("org.pac4j.oauth.client.GenericOAuth20Client")
+                  .configuration("org.pac4j.oauth.config.OAuth20Configuration")
+                  .title("OAuth 2.0")
+                  .icon("img/signin/oauth.svg")
+                  .build())
+          .put(
+              "facebook",
+              ClientConfig.builder()
+                  .client("org.pac4j.oauth.client.FacebookClient")
+                  .configuration("org.pac4j.oauth.config.FacebookConfiguration")
+                  .title("Facebook")
+                  .icon("img/signin/facebook.svg")
+                  .build())
+          .put(
+              "github",
+              ClientConfig.builder()
+                  .client("org.pac4j.oauth.client.GitHubClient")
+                  .configuration("org.pac4j.oauth.config.OAuth20Configuration")
+                  .title("GitHub")
+                  .icon("img/signin/github.svg")
                   .build())
           .put(
               "saml",
