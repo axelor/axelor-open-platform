@@ -43,6 +43,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.pac4j.core.client.Client;
@@ -69,7 +70,6 @@ public class ClientListProvider implements Provider<List<Client>> {
               "oidc",
               ClientConfig.builder()
                   .client("org.pac4j.oidc.client.OidcClient")
-                  .configuration("org.pac4j.oidc.config.OidcConfiguration")
                   .title("OpenID Connect")
                   .icon("img/signin/openid.svg")
                   .build())
@@ -77,7 +77,6 @@ public class ClientListProvider implements Provider<List<Client>> {
               "keycloak",
               ClientConfig.builder()
                   .client("org.pac4j.oidc.client.KeycloakOidcClient")
-                  .configuration("org.pac4j.oidc.config.KeycloakOidcConfiguration")
                   .title("Keycloak")
                   .icon("img/signin/keycloak.svg")
                   .build())
@@ -85,7 +84,6 @@ public class ClientListProvider implements Provider<List<Client>> {
               "google",
               ClientConfig.builder()
                   .client("org.pac4j.oidc.client.GoogleOidcClient")
-                  .configuration("org.pac4j.oidc.config.OidcConfiguration")
                   .title("Google")
                   .icon("img/signin/google.svg")
                   .build())
@@ -93,7 +91,6 @@ public class ClientListProvider implements Provider<List<Client>> {
               "azure",
               ClientConfig.builder()
                   .client("org.pac4j.oidc.client.AzureAd2Client")
-                  .configuration("org.pac4j.oidc.config.AzureAd2OidcConfiguration")
                   .title("Azure Active Directory")
                   .icon("img/signin/microsoft.svg")
                   .build())
@@ -101,7 +98,6 @@ public class ClientListProvider implements Provider<List<Client>> {
               "apple",
               ClientConfig.builder()
                   .client("org.pac4j.oidc.client.AppleClient")
-                  .configuration("org.pac4j.oidc.config.AppleOidcConfiguration")
                   .title("Apple")
                   .icon("img/signin/apple.svg")
                   .build())
@@ -109,7 +105,6 @@ public class ClientListProvider implements Provider<List<Client>> {
               "oauth",
               ClientConfig.builder()
                   .client("org.pac4j.oauth.client.GenericOAuth20Client")
-                  .configuration("org.pac4j.oauth.config.OAuth20Configuration")
                   .title("OAuth 2.0")
                   .icon("img/signin/oauth.svg")
                   .build())
@@ -117,7 +112,6 @@ public class ClientListProvider implements Provider<List<Client>> {
               "facebook",
               ClientConfig.builder()
                   .client("org.pac4j.oauth.client.FacebookClient")
-                  .configuration("org.pac4j.oauth.config.FacebookConfiguration")
                   .title("Facebook")
                   .icon("img/signin/facebook.svg")
                   .build())
@@ -125,7 +119,6 @@ public class ClientListProvider implements Provider<List<Client>> {
               "github",
               ClientConfig.builder()
                   .client("org.pac4j.oauth.client.GitHubClient")
-                  .configuration("org.pac4j.oauth.config.OAuth20Configuration")
                   .title("GitHub")
                   .icon("img/signin/github.svg")
                   .build())
@@ -133,7 +126,6 @@ public class ClientListProvider implements Provider<List<Client>> {
               "saml",
               ClientConfig.builder()
                   .client("org.pac4j.saml.client.SAML2Client")
-                  .configuration("org.pac4j.saml.config.SAML2Configuration")
                   .title("SAML 2.0")
                   .icon("img/signin/saml.svg")
                   .requiresAbsoluteUrl()
@@ -143,7 +135,6 @@ public class ClientListProvider implements Provider<List<Client>> {
               "cas",
               ClientConfig.builder()
                   .client("org.pac4j.cas.client.CasClient")
-                  .configuration("org.pac4j.cas.config.CasConfiguration")
                   .title("CAS")
                   .icon("img/signin/cas.png")
                   .exclusive()
@@ -327,10 +318,16 @@ public class ClientListProvider implements Provider<List<Client>> {
     }
 
     final String configClassName = (String) props.get("configuration");
+    final Class<?> configClass;
     final Object config;
 
     if (configClassName != null) {
-      final Class<?> configClass = findClass(configClassName);
+      configClass = findClass(configClassName);
+    } else {
+      configClass = findConfigurationClass(clientClass);
+    }
+
+    if (configClass != null) {
       config = inject(configClass);
       setField(client, "configuration", config);
     } else {
@@ -347,6 +344,26 @@ public class ClientListProvider implements Provider<List<Client>> {
         .forEach(configurer);
 
     return client;
+  }
+
+  @Nullable
+  private Class<?> findConfigurationClass(Class<?> clientClass) {
+    final Class<?> baseConfigClass;
+
+    try {
+      final Method getter = findGetter(clientClass, "configuration");
+      baseConfigClass = getter.getReturnType();
+    } catch (NoSuchMethodException e) {
+      return null;
+    }
+
+    // Find specialized configuration class from constructors if any.
+    return Stream.of(clientClass.getConstructors())
+        .filter(constructor -> constructor.getParameterCount() == 1)
+        .<Class<?>>map(constructor -> constructor.getParameterTypes()[0])
+        .filter(baseConfigClass::isAssignableFrom)
+        .findFirst()
+        .orElse(baseConfigClass);
   }
 
   private void setConfig(Object client, Object config, String property, Object value) {
