@@ -230,7 +230,7 @@ public class ClientListProvider implements Provider<List<Client>> {
       configs.putAll(initConfigs);
     }
 
-    final List<Client> centralClients =
+    final List<Client> configuredClients =
         configs.entrySet().stream()
             .map(e -> createClient(e.getKey(), e.getValue()))
             .map(Client.class::cast)
@@ -252,7 +252,7 @@ public class ClientListProvider implements Provider<List<Client>> {
       authPac4jInfo.requireAbsoluteUrl();
     }
 
-    clients.addAll(centralClients);
+    clients.addAll(configuredClients);
 
     settings
         .getList(AvailableAppSettings.AUTH_LOCAL_BASIC_AUTH)
@@ -272,10 +272,14 @@ public class ClientListProvider implements Provider<List<Client>> {
 
     // set titles and icons
     final Iterator<Map<String, Object>> configIt = configs.values().iterator();
-    final Iterator<Client> clientIt = centralClients.iterator();
+    final Iterator<Client> clientIt = configuredClients.iterator();
     while (configIt.hasNext() && clientIt.hasNext()) {
       final Map<String, Object> props = configIt.next();
-      final String name = clientIt.next().getName();
+      final Client client = clientIt.next();
+      if (!(client instanceof IndirectClient)) {
+        continue;
+      }
+      final String name = client.getName();
       final String title = (String) props.getOrDefault("title", name);
       final String icon = (String) props.get("icon");
       final Map<String, String> info = new HashMap<>();
