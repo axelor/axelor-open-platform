@@ -30,6 +30,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -291,9 +292,22 @@ public class ClientListProvider implements Provider<List<Client>> {
     }
 
     if (logger.isInfoEnabled()) {
-      final String clientNames =
-          clients.stream().map(Client::getName).collect(Collectors.joining(", "));
-      logger.info("Clients: {}", clientNames);
+      final Map<Boolean, List<Client>> groupedClients =
+          clients.stream().collect(Collectors.groupingBy(IndirectClient.class::isInstance));
+      final String indirectClientNames =
+          groupedClients.getOrDefault(true, Collections.emptyList()).stream()
+              .map(Client::getName)
+              .collect(Collectors.joining(", "));
+      if (!indirectClientNames.isEmpty()) {
+        logger.info("Indirect clients: {}", indirectClientNames);
+      }
+      final String directClientNames =
+          groupedClients.getOrDefault(false, Collections.emptyList()).stream()
+              .map(Client::getName)
+              .collect(Collectors.joining(", "));
+      if (!directClientNames.isEmpty()) {
+        logger.info("Direct clients: {}", directClientNames);
+      }
     }
   }
 
