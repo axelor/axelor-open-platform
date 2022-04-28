@@ -441,12 +441,24 @@ public class ClientListProvider implements Provider<List<Client>> {
 
   private Method findGetter(Class<?> klass, String property) throws NoSuchMethodException {
     final String getter = "get" + Inflector.getInstance().camelize(property);
-    return Stream.of(klass.getMethods())
-        .filter(m -> m.getName().equalsIgnoreCase(getter))
-        .filter(m -> m.getParameterCount() == 0)
-        .findAny()
-        .orElseThrow(
-            () -> new NoSuchMethodException(String.format("%s.%s", klass.getName(), getter)));
+    final List<Method> getterMethods =
+        Stream.of(klass.getMethods())
+            .filter(m -> m.getName().equalsIgnoreCase(getter))
+            .filter(m -> m.getParameterCount() == 0)
+            .collect(Collectors.toList());
+
+    if (getterMethods.isEmpty()) {
+      throw new NoSuchMethodException(String.format("%s.%s", klass.getName(), getter));
+    }
+
+    Method result = getterMethods.get(0);
+    for (final Method method : getterMethods.subList(1, getterMethods.size())) {
+      if (result.getReturnType().isAssignableFrom(method.getReturnType())) {
+        result = method;
+      }
+    }
+
+    return result;
   }
 
   private Method findSetter(Class<?> klass, String property) throws NoSuchMethodException {
