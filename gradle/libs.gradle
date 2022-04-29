@@ -4,12 +4,12 @@ def versions = ext.libsVersions = [:]
 // versions
 versions.guice = "5.1.0"
 versions.guava = "31.1-jre"
-versions.hibernate = "5.6.7.Final"
+versions.hibernate = "5.6.8.Final"
 versions.hibernate_validator = "6.2.3.Final"
 versions.hibernate_search = "5.11.10.Final"
 
 versions.groovy = "3.0.10"
-versions.resteasy = "4.7.5.Final"
+versions.resteasy = "4.7.6.Final"
 versions.jackson = "2.13.2"
 versions.jackson_databind = "2.13.2.2"
 versions.shiro = "1.8.0"
@@ -24,6 +24,8 @@ versions.slf4j = "1.7.36"
 
 versions.tomcat = "9.0.62"
 versions.tomcat_embed = "${versions.tomcat}"
+
+versions.asm = "9.3"
 
 // unit testing
 libs.junit = "junit:junit:${versions.junit4}"
@@ -61,15 +63,15 @@ libs.guice_persist = "com.google.inject.extensions:guice-persist:${versions.guic
 
 // ASM
 libs.asm = [
-  "org.ow2.asm:asm:9.2",
-  "org.ow2.asm:asm-commons:9.2",
-  "org.ow2.asm:asm-util:9.2",
-  "org.ow2.asm:asm-tree:9.2",
-  "org.ow2.asm:asm-analysis:9.2"
+  "org.ow2.asm:asm:${versions.asm}",
+  "org.ow2.asm:asm-commons:${versions.asm}",
+  "org.ow2.asm:asm-util:${versions.asm}",
+  "org.ow2.asm:asm-tree:${versions.asm}",
+  "org.ow2.asm:asm-analysis:${versions.asm}"
 ]
 
 // Byte Buddy
-libs.byte_buddy = "net.bytebuddy:byte-buddy:1.12.8"
+libs.byte_buddy = "net.bytebuddy:byte-buddy:1.12.9"
 
 // Graal JS
 libs.graal_js = "org.graalvm.js:js:22.0.0.2"
@@ -86,8 +88,8 @@ libs.javax_el = "org.glassfish:jakarta.el:3.0.4"
 
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.6.1"
-libs.jdbc_postgres = "org.postgresql:postgresql:42.3.3"
-libs.jdbc_mysql = "mysql:mysql-connector-java:8.0.28"
+libs.jdbc_postgres = "org.postgresql:postgresql:42.3.4"
+libs.jdbc_mysql = "mysql:mysql-connector-java:8.0.29"
 
 // Hibernate
 libs.hibernate = [
@@ -99,13 +101,13 @@ libs.hibernate = [
 
 // Caching libs
 libs.ehcache = "org.ehcache:ehcache:3.10.0"
-libs.redisson = "org.redisson:redisson-hibernate-53:3.17.0"
+libs.redisson = "org.redisson:redisson-hibernate-53:3.17.1"
 libs.hazelcast = "com.hazelcast:hazelcast:5.1.1"
-libs.caffeine = "com.github.ben-manes.caffeine:jcache:3.0.6"
+libs.caffeine = "com.github.ben-manes.caffeine:jcache:3.1.0"
 libs.infinispan = [
-    "org.infinispan:infinispan-hibernate-cache-v53:13.0.8.Final",
-    "org.infinispan:infinispan-core:13.0.8.Final",
-    "org.infinispan:infinispan-jcache:13.0.8.Final"
+    "org.infinispan:infinispan-hibernate-cache-v53:13.0.9.Final",
+    "org.infinispan:infinispan-core:13.0.9.Final",
+    "org.infinispan:infinispan-jcache:13.0.9.Final"
 ]
 
 // Hibernate search
@@ -115,7 +117,7 @@ libs.hibernate_search = "org.hibernate:hibernate-search-orm:${versions.hibernate
 libs.apache_tika_core = "org.apache.tika:tika-core:2.3.0"
 
 // flyway
-libs.flywaydb = "org.flywaydb:flyway-core:8.5.5"
+libs.flywaydb = "org.flywaydb:flyway-core:8.5.10"
 
 // eclipselink
 libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.7.10"
@@ -143,7 +145,7 @@ def resteasy_module = { name ->
 libs.resteasy = [
     resteasy_module("resteasy-core"),
     resteasy_module("resteasy-jackson2-provider"),
-    "io.smallrye.config:smallrye-config:1.6.1"
+    "io.smallrye.config:smallrye-config:1.13.1"
 ]
 
 libs.resteasy_multipart = resteasy_module("resteasy-multipart-provider")
@@ -247,7 +249,7 @@ libs.xstream = [
 libs.jsoup = "org.jsoup:jsoup:1.14.3"
 
 // StringTemplate
-libs.ST4 = "org.antlr:ST4:4.3.2"
+libs.ST4 = "org.antlr:ST4:4.3.3"
 
 // gradle tooling
 libs.gradle_tooling = "org.gradle:gradle-tooling-api:${gradle.gradleVersion}"

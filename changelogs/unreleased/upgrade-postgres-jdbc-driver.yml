@@ -1,5 +1,5 @@
 ---
-title: Upgrade PostgreSQL Jdbc to 42.3.3
+title: Upgrade PostgreSQL Jdbc to 42.3.4
 type: change
 description: |
   This add support new `SCRAM-SHA-256` password encryption method which is  

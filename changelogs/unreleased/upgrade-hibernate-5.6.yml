@@ -1,5 +1,5 @@
 ---
-title: Upgrade to Hibernate 5.6.5.Final
+title: Upgrade to Hibernate 5.6.8.Final
 type: change
 description: |
   Most notably, positional parameters for native queries are now one-based.
