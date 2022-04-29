@@ -324,7 +324,8 @@ public class ClientListProvider implements Provider<List<Client>> {
     final String clientClassName = (String) props.get("client");
 
     if (clientClassName == null) {
-      throw new RuntimeException(String.format("Unsupported provider: %s", name));
+      throw new RuntimeException(
+          String.format("Must specify client with custom provider: %s", name));
     }
 
     final Class<?> clientClass = findClass(clientClassName);
