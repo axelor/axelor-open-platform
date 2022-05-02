@@ -37,10 +37,8 @@ public class PropertiesUtils {
   public static Map<String, String> propertiesToMap(Properties properties) {
     Map<String, String> map = new HashMap<>();
     synchronized (properties) {
-      Iterator iterator = properties.entrySet().iterator();
 
-      while (iterator.hasNext()) {
-        Map.Entry<Object, Object> entry = (Map.Entry) iterator.next();
+      for (Map.Entry<Object, Object> entry : properties.entrySet()) {
         map.put(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()));
       }
 
