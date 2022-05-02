@@ -240,7 +240,7 @@ function CalendarViewCtrl($scope, $element) {
       titleText = titleText || value || _t('Unknown');
     }
 
-    info.title = ("" + titleText);
+    info.title = axelor.sanitize(titleText);
     info.allDay = isAllDay(info);
     info.className = info.allDay ? "calendar-event-allDay" : "calendar-event-day";
 

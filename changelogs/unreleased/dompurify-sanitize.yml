@@ -1,0 +1,6 @@
+---
+title: Sanitize HTML where it is needed with DOMPurify
+type: feature
+description: |
+  Instead of sanitizing all jQuery.html calls, use DOMPurify to sanitize HTML where it is needed only.
+  This should reduce scripting load in the web client.

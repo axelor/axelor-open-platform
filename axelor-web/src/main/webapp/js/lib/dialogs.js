@@ -107,7 +107,7 @@
     box: function(str, options) {
 
       var opts = $.extend({}, options);
-      var title = opts.title || _t('Information');
+      var title = axelor.sanitize(opts.title) || _t('Information');
       var onClose = opts.onClose || $.noop;
       var onOpen = opts.onOpen || $.noop;
       var css = opts.css || 'ui-dialog-info';
@@ -121,7 +121,11 @@
         }
       ];
 
-      var element = $('<div class="message-box" style="padding: 15px;"></div>').attr('title', title).html(str);
+      _.each(buttons, function (button) {
+        button.text = axelor.sanitize(button.text);
+      });
+
+      var element = $('<div class="message-box" style="padding: 15px;"></div>').attr('title', title).staticHtml(str);
       var dialog = element.dialog({
         dialogClass: 'ui-dialog-responsive ui-dialog-small ui-dialog-dragged ' + css,
         resizable: false,

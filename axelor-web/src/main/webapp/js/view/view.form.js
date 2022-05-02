@@ -1455,7 +1455,7 @@ ui.formBuild = function (scope, schema, fields) {
       item.attr('ui-widget-states', '');
 
       if (type == 'button' || type == 'static-label') {
-        item.html(this.title);
+        item.staticHtml(this.title);
       }
 
       if (/button|group|tabs|tab|separator|spacer|static|static-label/.test(type)) {

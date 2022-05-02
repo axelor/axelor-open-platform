@@ -416,7 +416,7 @@ _.extend(Factory.prototype, {
     }
 
     if (typeof value === 'string') {
-      value = axelor.sanitize(value).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+      value = value.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
     }
 
     if (type === "button" || type === "progress") {
@@ -632,7 +632,6 @@ Grid.prototype.parse = function(view) {
     }
 
     var column = {
-      name: item.title || field.title || item.autoTitle || _.chain(item.name).humanize().titleize().value(),
       id: item.name,
       field: item.name,
       toolTip: item.help,
@@ -645,6 +644,9 @@ Grid.prototype.parse = function(view) {
       headerCssClass: type,
       xpath: path
     };
+
+    var title = item.title || field.title;
+    column.name = title ? axelor.sanitize(title) : item.autoTitle || _.chain(item.name).humanize().titleize().value();
 
     var minWidth = view.colWidth || 100;
 

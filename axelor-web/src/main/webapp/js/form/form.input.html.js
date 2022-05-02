@@ -342,7 +342,7 @@ ui.formInput('Html', {
     }
 
     scope.$render_editable = function () {
-      var value = scope.getValue() || "";
+      var value = axelor.sanitize(scope.getValue()) || "";
       scope.text = scope.format(value);
 
       var current = shellActive ? shell : textElement;
@@ -648,7 +648,7 @@ ui.directive('uiBindTemplate', ['$interpolate', function($interpolate){
 
       function update() {
         var output = expand(scope, template) || "";
-        element.html(output);
+        element.staticHtml(output);
       }
 
       scope.$watch("text", function(text, old) {

@@ -93,7 +93,7 @@ function TreeViewCtrl($scope, $element, DataSource, ActionService) {
       return last = loader;
     });
 
-    $scope.viewTitle = schema.title;
+    $scope.viewTitle = axelor.sanitize(schema.title);
 
     $scope.columns = columns;
     $scope.loaders = loaders;
@@ -188,7 +188,7 @@ function Column(scope, col) {
 
   this.css = col.type || 'string';
   this.name = col.name;
-  this.title = col.title || col.autoTitle;
+  this.title = axelor.sanitize(col.title || col.autoTitle);
 
   if (this.title === null || this.title === undefined) {
     this.title = _.humanize(col.name);
@@ -556,7 +556,7 @@ ui.directive('uiViewTree', function(){
         tr.data('$record', record);
 
         _.each(scope.columns, function(col) {
-          $('<td>').html(col.cellText(record)).appendTo(tr);
+          $('<td>').staticHtml(col.cellText(record)).appendTo(tr);
         });
 
         if (scope.draggable && (record.$folder || scope._countOn || !record.$parent)) {

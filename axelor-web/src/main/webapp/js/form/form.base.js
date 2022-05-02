@@ -54,6 +54,39 @@ ui.formCompile = function(element, attrs, linkerFn) {
     var getViewDef = this.getViewDef || scope.getViewDef || function() { return {}; };
 
     var field = getViewDef.call(scope, element);
+
+    var fieldTitle = field.title;
+    var fieldTitleSanitized = false;
+    Object.defineProperty(field, 'title', {
+      get: function() {
+        if (!fieldTitleSanitized) {
+          fieldTitle = axelor.sanitize(fieldTitle);
+          fieldTitleSanitized = true;
+        }
+        return fieldTitle;
+      },
+      set: function(value) {
+        fieldTitle = value;
+        fieldTitleSanitized = false;
+      }
+    });
+
+    var fieldText = field.text;
+    var fieldTextSanitized = false;
+    Object.defineProperty(field, 'text', {
+      get: function() {
+        if (!fieldTextSanitized) {
+          fieldText = axelor.sanitize(fieldText);
+          fieldTextSanitized = true;
+        }
+        return fieldText;
+      },
+      set: function(value) {
+        fieldText = value;
+        fieldTextSanitized = false;
+      }
+    });
+
     var props = _.extend(_.pick(field, 'readonly,required,hidden,collapse,precision,scale,prompt,title,domain,css,icon,selection-in'.split(',')),
                _.pick(field.widgetAttrs || {}, 'precision,scale,domain'.split(',')));
 

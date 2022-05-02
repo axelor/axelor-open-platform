@@ -146,7 +146,7 @@ ui.formWidget('BaseSelect', {
     };
 
     function renderItem(ul, item) {
-      var el = $("<li>").append($("<a>").append($("<span>").html(item.label))).appendTo(ul);
+      var el = $("<li>").append($("<a>").append($("<span>").staticHtml(item.label))).appendTo(ul);
       if (item.color) {
         el.addClass('tag-select-list-item').addClass(item.color);
       }

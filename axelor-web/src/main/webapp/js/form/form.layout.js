@@ -98,7 +98,7 @@ function TableLayout(items, attrs, $scope, $compile) {
     }
 
     if (numCols > 1 && !noTitle && title) {
-      var label = $('<label ui-label></label>').html(title).attr('x-for-widget', el.attr('id')),
+      var label = $('<label ui-label></label>').staticHtml(title).attr('x-for-widget', el.attr('id')),
         labelElem = $compile(label)(labelScope || $scope);
       el.data('label', labelElem);
       return add(el, labelElem);
@@ -257,7 +257,7 @@ function PanelLayout(items, attrs, $scope, $compile) {
     }
 
     if (!noTitle && title) {
-      var label = $('<label ui-label></label>').html(title).attr('x-for-widget', el.attr('id')),
+      var label = $('<label ui-label></label>').staticHtml(title).attr('x-for-widget', el.attr('id')),
         labelElem = $compile(label)(labelScope || $scope);
       el.data('label', labelElem);
       return add(el, labelElem);
