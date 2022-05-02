@@ -66,6 +66,7 @@
 
 //= lib/intl-tel-input/js/intlTelInput.js
 
+//= lib/DOMPurify/purify.js
 //= js/axelor.ns.js
 //= js/axelor.ng.js
 

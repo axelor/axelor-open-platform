@@ -101,61 +101,31 @@
 
   axelor.readCookie = readCookie;
 
-  function sanitizeElement(element) {
+  if (typeof DOMPurify !== 'undefined') {
 
-    var attrs = _.filter(element.attributes, function(a) {
-      var attr = a.name;
-      var value = a.value;
-
-      if (["src", "href", "action"].indexOf(attr) > -1 && value) {
-        value = value.replace(/[\x00-\x20]+/g, ''); // https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet#Embedded_tab
-        value = value.replace(/<\!\-\-.*?\-\-\>/g, ''); // remove comments which might be interpreted as xml
+    // this function removes <script> and event attributes (onerror, onload etc.) from the given html text
+    function sanitize() {
+      if (arguments.length === 0) {
+        return;
       }
-
-      return _.startsWith(attr, "on") || (value && value.match(/^javascript\:/i));
-    });
-
-    _.each(attrs, function (a) {
-      $(element).removeAttr(a.name);
-    });
-  }
-
-  // this function removes <script> and event attributes (onerror, onload etc.) from the given html text
-  function sanitizeText(html) {
-    if (typeof html !== 'string') {
-      return html;
+      var args = arguments.length === 1 ? arguments[0] : Array.prototype.slice.call(arguments);
+      return Array.isArray(args) ? args.map(function (item) {
+        return Array.isArray(item) ? sanitize(item) : DOMPurify.sanitize(item);
+      }) : DOMPurify.sanitize(args);
     }
 
-    var value = "<div>" + html + "</div>";
-    var elems = $($.parseHTML(value, null, false));
+    axelor.sanitize = sanitize;
 
-    elems.find('*').each(function() {
-      sanitizeElement(this);
-    });
+    // sanitize jquery html function
+    var jq = {
+      html: $.fn.html
+    };
 
-    return elems.html();
+    $.fn.staticHtml = function staticHtml() {
+      var args = Array.prototype.slice.call(arguments);
+      return jq.html.apply(this, sanitize(args));
+    };
   }
-
-  function sanitize() {
-    if (arguments.length === 0) {
-      return;
-    }
-    var args = arguments.length === 1 ? arguments[0] : Array.prototype.slice.call(arguments);
-    return Array.isArray(args) ? args.map(function (item) {
-      return Array.isArray(item) ? sanitize(item) : sanitizeText(item);
-    }) : sanitizeText(args);
-  }
-
-  axelor.sanitize = sanitize;
-
-  // sanitize jquery html function
-  var jq = {
-    html: $.fn.html
-  };
-
-  $.fn.html = function html() {
-    return jq.html.apply(this, sanitize(Array.prototype.slice.call(arguments)));
-  };
 
   // Mutates the original moment by setting it to the start of the next unit of time.
   // Used for criteria with date ranges in order to exclude the upper limit.
