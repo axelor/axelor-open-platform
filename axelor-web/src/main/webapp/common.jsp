@@ -26,12 +26,13 @@
 <%@ page import="com.axelor.web.internal.AppInfo" %>
 <%@ page import="com.axelor.app.AppSettings" %>
 <%@ page import="com.axelor.app.AvailableAppSettings" %>
+<%@ page import="com.axelor.common.HtmlUtils" %>
 <%
 
 final UnaryOperator<String> T = new UnaryOperator<String>() {
   public String apply(String t) {
     try {
-      return I18n.get(t);
+      return HtmlUtils.escape(I18n.get(t));
     } catch (Exception e) {
       return t;
     }
