@@ -34,6 +34,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import javax.inject.Inject;
+
+import com.google.inject.persist.Transactional;
 import org.junit.jupiter.api.Test;
 
 @GuiceModules(RepositoryTest.MyModule.class)
@@ -78,6 +80,7 @@ public class RepositoryTest extends JpaTest {
   }
 
   @Test
+  @Transactional
   public void testFindByIds() {
     List<Contact> contacts = Beans.get(ContactRepository.class).findByIds(Arrays.asList(1L, 2L));
     assertNotNull(contacts);

@@ -129,6 +129,7 @@ public class QueryTest extends JpaTest {
   }
 
   @Test
+  @Transactional
   public void testStream() {
     final Query<Contact> q = all(Contact.class);
     final List<?> first = q.fetch();
