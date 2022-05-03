@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -37,7 +36,6 @@ public class PropertiesUtils {
   public static Map<String, String> propertiesToMap(Properties properties) {
     Map<String, String> map = new HashMap<>();
     synchronized (properties) {
-
       for (Map.Entry<Object, Object> entry : properties.entrySet()) {
         map.put(String.valueOf(entry.getKey()), String.valueOf(entry.getValue()));
       }

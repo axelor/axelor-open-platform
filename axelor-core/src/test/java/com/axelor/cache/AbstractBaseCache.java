@@ -72,13 +72,13 @@ public abstract class AbstractBaseCache extends JpaTest {
 
   @BeforeAll
   public static void doInit() {
-      doInSession(
+    doInSession(
+        () -> {
+          JPA.runInTransaction(
               () -> {
-                  JPA.runInTransaction(
-                          () -> {
-                              JPA.all(Person.class).remove();
-                          });
+                JPA.all(Person.class).remove();
               });
+        });
     doInSession(
         () -> {
           JPA.runInTransaction(
