@@ -34,7 +34,6 @@ import com.axelor.test.db.repo.ContactRepository;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
-import com.google.inject.persist.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -61,18 +60,6 @@ public class TestActions extends MetaTest {
     assertNotNull(views.getActions());
 
     MetaStore.resister(views);
-    ensureContact();
-  }
-
-  @Transactional
-  void ensureContact() {
-    if (contacts.all().count() == 0) {
-      Contact c = new Contact();
-      c.setFirstName("John");
-      c.setLastName("Smith");
-      c.setEmail("john.smith@gmail.com");
-      contacts.save(c);
-    }
   }
 
   private ActionHandler createHandler(String action, Map<String, Object> context) {

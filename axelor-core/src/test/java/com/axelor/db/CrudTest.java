@@ -47,18 +47,15 @@ public class CrudTest extends JpaTest {
 
   @BeforeEach
   public void setUp() {
-    if (all(Contact.class).count() > 0) {
-      return;
-    }
-
     final Contact contact = new Contact();
     contact.setFirstName("My");
     contact.setLastName("Name");
     contact.setEmail("my.name@gmail.com");
 
-    final Title title = new Title();
-    title.setCode("mr");
-    title.setName("Mr.");
+    Title title = JPA.all(Title.class).filter("self.code = ?1", "t1").fetchOne();
+    title = title == null ? new Title() : title;
+    title.setCode("t1");
+    title.setName("Title 1");
     contact.setTitle(title);
 
     final Country country = new Country();
@@ -94,8 +91,8 @@ public class CrudTest extends JpaTest {
     contact.setEmail("teen.teen@gmail.com");
 
     Title title = new Title();
-    title.setCode("miss");
-    title.setName("Miss.");
+    title.setCode("t2");
+    title.setName("Title 2");
     contact.setTitle(title);
 
     Country country = new Country();
@@ -134,7 +131,7 @@ public class CrudTest extends JpaTest {
     assertNotSame(contact, c2);
   }
 
-  @Test()
+  @Test
   public void testUpdate() {
     final Contact contact = all(Contact.class).filter("self.firstName = ?1", "My").fetchOne();
     assertNotNull(contact);
@@ -157,7 +154,7 @@ public class CrudTest extends JpaTest {
     assertThrows(OptimisticLockException.class, () -> contacts.save(contact));
   }
 
-  @Test()
+  @Test
   public void testDeleteUpdated() {
     final Contact contact = all(Contact.class).filter("self.firstName = ?1", "My").fetchOne();
     assertNotNull(contact);
@@ -168,7 +165,7 @@ public class CrudTest extends JpaTest {
     assertThrows(OptimisticLockException.class, () -> contacts.remove(contact));
   }
 
-  @Test()
+  @Test
   public void testDelete() {
     final Contact contact = all(Contact.class).filter("self.firstName = ?1", "My").fetchOne();
     assertNotNull(contact);
