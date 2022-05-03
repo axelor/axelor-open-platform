@@ -97,7 +97,7 @@ var customDirective = ["$compile", function ($compile) {
       var evalScope = axelor.$evalScope(scope);
 
       function render(template) {
-        var elem = $('<span>' + axelor.sanitize(template.trim()) + '</span>');
+        var elem = $('<span>' + template.trim() + '</span>');
         if (elem.children().length === 1) {
           elem = elem.children().first();
         }
