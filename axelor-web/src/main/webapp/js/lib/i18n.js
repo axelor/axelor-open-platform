@@ -22,6 +22,10 @@
 
 var bundle = (window._t || {}).bundle || {};
 
+_.each(bundle, function (message, key) {
+  bundle[key] = axelor.sanitize(message);
+})
+
 function gettext(key) {
   var message = bundle[key] || bundle[(key||'').trim()] || key;
   if (message && arguments.length > 1) {
@@ -31,7 +35,7 @@ function gettext(key) {
       message = message.replace(placeholder, value);
     }
   }
-  return axelor.sanitize(message);
+  return message;
 }
 
 this._t = gettext;
