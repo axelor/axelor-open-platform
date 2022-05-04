@@ -176,10 +176,7 @@ var Formatters = {
 
     var text = (value||{})[key];
 
-    return text
-      ? _.escapeHTML(
-          axelor.sanitize(text + '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'))
-      : "";
+    return _.escapeHTML(text);
   },
 
   "one-to-many": function(field, value) {
@@ -413,10 +410,6 @@ _.extend(Factory.prototype, {
     }
     if (_.isArray(field.selectionList) && widget !== "select-progress") {
       type = "selection";
-    }
-
-    if (typeof value === 'string') {
-      value = value.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
     }
 
     if (type === "button" || type === "progress") {
