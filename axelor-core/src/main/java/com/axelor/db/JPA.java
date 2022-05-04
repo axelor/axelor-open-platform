@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -639,6 +640,25 @@ public final class JPA {
         txn.rollback();
       }
     }
+  }
+
+  /**
+   * Run the given <code>task</code> inside a transaction that is committed after the task is
+   * completed and return the task result.
+   *
+   * @param <T>
+   * @param task
+   * @return task result
+   */
+  public static <T> T withTransaction(Supplier<T> task) {
+    final var holder =
+        new Object() {
+          T result;
+        };
+
+    runInTransaction(() -> holder.result = task.get());
+
+    return holder.result;
   }
 
   /**

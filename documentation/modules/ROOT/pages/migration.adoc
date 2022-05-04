@@ -249,6 +249,12 @@ This syntax has been updated to the following :
 </chart>
 ----
 
+== PreRequest/PostRequest events
+
+`PreRequest`/`PostRequest` events are now fired outside of transactions.
+This fixes accessing the created/update records in a multithreaded process from `PostRequest` observers.
+However you can no longer rollback the request process in a `PostRequest` observer.
+
 == Others
 
 - `com.axelor.event.Priority` annotation has been removed in favor of `javax.annotation.Priority`.

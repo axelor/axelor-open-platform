@@ -76,7 +76,6 @@ import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.inject.TypeLiteral;
-import com.google.inject.persist.Transactional;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -1054,84 +1053,88 @@ public class Resource<T extends Model> {
     return user;
   }
 
-  @Transactional
   @SuppressWarnings("all")
   public Response save(final Request request) {
 
     final Response response = new Response();
     final Repository repository = JpaRepository.of(model);
 
-    List<Object> records = request.getRecords();
-    List<Object> data = Lists.newArrayList();
+    final List<Object> records;
+
+    if (ObjectUtils.isEmpty(request.getRecords())) {
+      if (ObjectUtils.isEmpty(request.getData())) {
+        response.setStatus(Response.STATUS_FAILURE);
+        firePostRequestEvent(RequestEvent.SAVE, request, response);
+        return response;
+      }
+      records = Collections.singletonList(request.getData());
+    } else {
+      records = request.getRecords();
+    }
 
     firePreRequestEvent(RequestEvent.SAVE, request);
 
-    if ((records == null || records.isEmpty()) && request.getData() == null) {
-      response.setStatus(Response.STATUS_FAILURE);
-      firePostRequestEvent(RequestEvent.SAVE, request, response);
-      return response;
-    }
-
-    if (records == null) {
-      records = Lists.newArrayList();
-      records.add(request.getData());
-    }
-
-    String[] names = {};
+    final List<Object> data = Lists.newArrayList();
+    final String[] names;
     if (request.getFields() != null) {
-      names = request.getFields().toArray(names);
+      names = request.getFields().toArray(new String[0]);
+    } else {
+      names = new String[0];
     }
 
     final Mapper mapper = Mapper.of(model);
 
-    for (Object record : records) {
+    JPA.runInTransaction(
+        () -> {
+          for (Object record : records) {
 
-      if (record == null) {
-        continue;
-      }
+            if (record == null) {
+              continue;
+            }
 
-      record = (Map) repository.validate((Map) record, request.getContext());
+            record = (Map) repository.validate((Map) record, request.getContext());
 
-      final Long id = findId((Map) record);
-      final JpaSecurity.AccessType accessType;
+            final Long id = findId((Map) record);
+            final JpaSecurity.AccessType accessType;
 
-      // Check for permissions on main object
-      if (id == null || id <= 0L) {
-        accessType = JpaSecurity.CAN_CREATE;
-        security.get().check(accessType, model);
-      } else {
-        accessType = JpaSecurity.CAN_WRITE;
-        security.get().check(accessType, model, id);
-      }
+            // Check for permissions on main object
+            if (id == null || id <= 0L) {
+              accessType = JpaSecurity.CAN_CREATE;
+              security.get().check(accessType, model);
+            } else {
+              accessType = JpaSecurity.CAN_WRITE;
+              security.get().check(accessType, model, id);
+            }
 
-      // Check for permissions on relational fields
-      checkRelationalPermissions((Map<String, Object>) record, mapper);
+            // Check for permissions on relational fields
+            checkRelationalPermissions((Map<String, Object>) record, mapper);
 
-      Map<String, Object> orig = (Map) ((Map) record).get("_original");
-      JPA.verify(model, orig);
+            Map<String, Object> orig = (Map) ((Map) record).get("_original");
+            JPA.verify(model, orig);
 
-      Model bean = JPA.edit(model, (Map) record);
+            Model bean = JPA.edit(model, (Map) record);
 
-      // if user, update password
-      if (bean instanceof User) {
-        changeUserPassword((User) bean, (Map) record);
-      }
+            // if user, update password
+            if (bean instanceof User) {
+              changeUserPassword((User) bean, (Map) record);
+            }
 
-      bean = JPA.manage(bean);
-      if (repository != null) {
-        bean = repository.save(bean);
-      }
+            bean = JPA.manage(bean);
+            if (repository != null) {
+              bean = repository.save(bean);
+            }
 
-      // check permission rules again
-      security.get().check(accessType, model, bean.getId());
+            // check permission rules again
+            security.get().check(accessType, model, bean.getId());
 
-      // if it's a translation object, invalidate cache
-      if (bean instanceof MetaTranslation) {
-        I18nBundle.invalidate();
-      }
+            // if it's a translation object, invalidate cache
+            if (bean instanceof MetaTranslation) {
+              I18nBundle.invalidate();
+            }
 
-      data.add(repository.populate(toMap(bean, names), request.getContext()));
-    }
+            data.add(repository.populate(toMap(bean, names), request.getContext()));
+          }
+        });
 
     response.setData(data);
     response.setStatus(Response.STATUS_SUCCESS);
@@ -1185,7 +1188,6 @@ public class Resource<T extends Model> {
     checkRelationalPermissions(recordMap, Mapper.of(target));
   }
 
-  @Transactional
   public Response updateMass(Request request) {
 
     security.get().check(JpaSecurity.CAN_WRITE, model);
@@ -1207,7 +1209,8 @@ public class Resource<T extends Model> {
 
     @SuppressWarnings("all")
     Map<String, Object> values = (Map) data.get(0);
-    response.setTotal(query.update(values, AuthUtils.getUser()));
+    final int total = JPA.withTransaction(() -> query.update(values, AuthUtils.getUser()));
+    response.setTotal(total);
 
     LOG.debug("Records updated: {}", response.getTotal());
 
@@ -1218,7 +1221,6 @@ public class Resource<T extends Model> {
     return response;
   }
 
-  @Transactional
   @SuppressWarnings("all")
   public Response remove(long id, Request request) {
 
@@ -1234,16 +1236,21 @@ public class Resource<T extends Model> {
 
     firePreRequestEvent(RequestEvent.REMOVE, req);
 
-    Model bean = JPA.edit(model, data);
-    if (bean.getId() != null) {
-      if (repository == null) {
-        JPA.remove(bean);
-      } else {
-        repository.remove(bean);
-      }
-    }
+    final Model removedBean =
+        JPA.withTransaction(
+            () -> {
+              Model bean = JPA.edit(model, data);
+              if (bean.getId() != null) {
+                if (repository == null) {
+                  JPA.remove(bean);
+                } else {
+                  repository.remove(bean);
+                }
+              }
+              return bean;
+            });
 
-    response.setData(ImmutableList.of(toMapCompact(bean)));
+    response.setData(ImmutableList.of(toMapCompact(removedBean)));
     response.setStatus(Response.STATUS_SUCCESS);
 
     firePostRequestEvent(RequestEvent.REMOVE, req, response);
@@ -1251,7 +1258,6 @@ public class Resource<T extends Model> {
     return response;
   }
 
-  @Transactional
   @SuppressWarnings("all")
   public Response remove(Request request) {
 
@@ -1265,33 +1271,36 @@ public class Resource<T extends Model> {
 
     firePreRequestEvent(RequestEvent.REMOVE, request);
 
-    final List<Model> entities = Lists.newArrayList();
+    JPA.runInTransaction(
+        () -> {
+          final List<Model> entities = Lists.newArrayList();
 
-    for (Object record : records) {
-      Map map = (Map) record;
-      Long id = Longs.tryParse(map.get("id").toString());
-      Integer version = null;
-      try {
-        version = Ints.tryParse(map.get("version").toString());
-      } catch (Exception e) {
-      }
+          for (Object record : records) {
+            Map map = (Map) record;
+            Long id = Longs.tryParse(map.get("id").toString());
+            Integer version = null;
+            try {
+              version = Ints.tryParse(map.get("version").toString());
+            } catch (Exception e) {
+            }
 
-      security.get().check(JpaSecurity.CAN_REMOVE, model, id);
-      Model bean = JPA.find(model, id);
+            security.get().check(JpaSecurity.CAN_REMOVE, model, id);
+            Model bean = JPA.find(model, id);
 
-      if (bean == null || (version != null && !Objects.equal(version, bean.getVersion()))) {
-        throw new OptimisticLockException(new StaleObjectStateException(model.getName(), id));
-      }
-      entities.add(bean);
-    }
+            if (bean == null || (version != null && !Objects.equal(version, bean.getVersion()))) {
+              throw new OptimisticLockException(new StaleObjectStateException(model.getName(), id));
+            }
+            entities.add(bean);
+          }
 
-    for (Model entity : entities) {
-      if (repository == null) {
-        JPA.remove(entity);
-      } else {
-        repository.remove(entity);
-      }
-    }
+          for (Model entity : entities) {
+            if (repository == null) {
+              JPA.remove(entity);
+            } else {
+              repository.remove(entity);
+            }
+          }
+        });
 
     response.setData(records);
     response.setStatus(Response.STATUS_SUCCESS);
