@@ -224,6 +224,7 @@ public class ViewGenerator {
             throw new RuntimeException(e.getCause());
           }
         });
+    JPA.clear();
 
     return Arrays.stream(counts).mapToLong(Long::longValue).sum();
   }
