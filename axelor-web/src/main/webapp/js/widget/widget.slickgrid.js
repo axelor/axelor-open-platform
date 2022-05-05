@@ -2816,6 +2816,11 @@ Grid.prototype.groupBy = function(names) {
           if (jsonValue) {
             jsonValue = angular.fromJson(jsonValue);
             value = jsonValue[field.jsonPath];
+          } else {
+            jsonValue = item[name];
+            if (jsonValue) {
+              value = angular.fromJson(jsonValue);
+            }
           }
         }
         return (formatter ? formatter(field, value, item, grid) : value) || _t('N/A');
