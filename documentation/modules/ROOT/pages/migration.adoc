@@ -248,3 +248,7 @@ This syntax has been updated to the following :
   </actions>
 </chart>
 ----
+
+== Others
+
+- `com.axelor.event.Priority` annotation has been removed in favor of `javax.annotation.Priority`.
