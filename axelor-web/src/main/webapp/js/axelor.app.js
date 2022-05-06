@@ -457,6 +457,8 @@
             yesNo: true
           });
         }
+
+        $("body").trigger("app:config-fetched", config);
       });
     }
 

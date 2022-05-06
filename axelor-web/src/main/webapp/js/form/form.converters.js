@@ -53,10 +53,25 @@
     return getFirstBrowserLanguage() || axelor.config['user.lang'] || 'en';
   }
 
+  // Gets preferred locale based on user language and browser locale.
+  function getPreferredLocale() {
+    var userLanguage = (axelor.config["user.lang"] || "").replace("_", "-") || "";
+    if (userLanguage.indexOf("-") >= 0) {
+      return userLanguage;
+    }
+    return (
+      _.find(window.navigator.languages, function (language) {
+        return (
+          !userLanguage || language.indexOf("-") >= 0 && language.split('-')[0] === userLanguage
+        );
+      }) || userLanguage || getBrowserLocale()
+    );
+  }
+
   function addCurrency(value, symbol) {
     if (value && symbol) {
       var val = '' + value;
-      var lang = getBrowserLocale().split(/-|_/)[0];
+      var lang = getPreferredLocale().split(/-|_/)[0];
       if (lang === 'fr') {
         return _.endsWith(val, symbol) ? val : val + ' ' + symbol;
       }
@@ -156,7 +171,7 @@
         options.currencyDisplay = currencyDisplay
       }
       try {
-        return new Intl.NumberFormat(getBrowserLocale(), options).format(value);
+        return new Intl.NumberFormat(getPreferredLocale(), options).format(value);
       } catch (e) {
         // Fall back to adding currency symbol
         return addCurrency(value, currency);
@@ -182,7 +197,7 @@
       } else {
         options.maximumFractionDigits = 1;
       }
-      return new Intl.NumberFormat(getBrowserLocale(), options).format(value);
+      return new Intl.NumberFormat(getPreferredLocale(), options).format(value);
     };
   });
 
@@ -202,7 +217,7 @@
       if (format === undefined || format == null) {
         return value && value.length > 10 ? formatDateTime(null, value) : formatDate(value);
       }
-      return moment(value).locale(getBrowserLocale()).format(format);
+      return moment(value).locale(getPreferredLocale()).format(format);
     };
   });
 
@@ -212,7 +227,7 @@
       return value;
     }
     if (num === 0 || num) {
-      return num.toLocaleString(getBrowserLocale(), {
+      return num.toLocaleString(getPreferredLocale(), {
         minimumFractionDigits: scale,
         maximumFractionDigits: scale
       });
@@ -239,16 +254,19 @@
   ui.setNested = setNested;
   ui.canSetNested = canSetNested;
   ui.getNestedTrKey = getNestedTrKey;
-  ui.getBrowserLocale = getBrowserLocale;
+  ui.getPreferredLocale = getPreferredLocale;
 
-  var mm = moment().clone();
-  mm.locale(getBrowserLocale());
-  var dateFormat = (mm.localeData()._longDateFormat.L || 'DD/MM/YYYY')
-    .replace(/\u200f/g, '') // ar
-    .replace(/YYYY年MMMD日/g, 'YYYY-MM-DD') // zh-tw
-    .replace(/MMM/g, 'MM') // Don't support MMM
-    .replace(/\bD\b/g, 'DD') // D -> DD
-    .replace(/\bM\b/g, 'MM'); // M -> MM
+  var dateFormat = 'DD/MM/YYYY';
+  $("body").on("app:config-fetched", function () {
+    var mm = moment().clone();
+    mm.locale(getPreferredLocale());
+    dateFormat = (mm.localeData()._longDateFormat.L || dateFormat)
+      .replace(/\u200f/g, '') // ar
+      .replace(/YYYY年MMMD日/g, 'YYYY-MM-DD') // zh-tw
+      .replace(/MMM/g, 'MM') // Don't support MMM
+      .replace(/\bD\b/g, 'DD') // D -> DD
+      .replace(/\bM\b/g, 'MM'); // M -> MM
+  });
 
   Object.defineProperty(ui, 'dateFormat', {
     get: function () {
@@ -393,7 +411,7 @@
 
   // Returns a copy of list sorted in lexicographic order, running each value through iteratee
   function sortBy(list, iteratee) {
-    var locale = getBrowserLocale(); // Use getPreferredLocale in v6
+    var locale = getPreferredLocale();
     var localeCompare = Intl.Collator(locale).compare;
     var result = (list || []).slice();
 

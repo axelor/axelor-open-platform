@@ -135,7 +135,7 @@ var CRITERION_PREPARATORS = {
 
 var FILTER_TRANSFORMERS = {
   "$inPast": function (filter) {
-    var now = moment().locale(ui.getBrowserLocale());
+    var now = moment().locale(ui.getPreferredLocale());
     var value = now.clone().subtract(filter.value, filter.timeUnit).startOf(filter.timeUnit)
       .toDate();
     var value2 = axelor.nextOf(now.clone(), "day").toDate();
@@ -157,7 +157,7 @@ var FILTER_TRANSFORMERS = {
     delete filter.timeUnit;
   },
   "$inNext": function (filter) {
-    var now = moment().locale(ui.getBrowserLocale());
+    var now = moment().locale(ui.getPreferredLocale());
     var value = now.clone().startOf("day").toDate();
     var value2 = axelor.nextOf(now.clone().add(filter.value, filter.timeUnit), filter.timeUnit)
       .toDate();
@@ -179,7 +179,7 @@ var FILTER_TRANSFORMERS = {
     delete filter.timeUnit;
   },
   "$inCurrent": function (filter) {
-    var now = moment().locale(ui.getBrowserLocale());
+    var now = moment().locale(ui.getPreferredLocale());
     var value = now.clone().startOf(filter.timeUnit).toDate();
     var value2 = axelor.nextOf(now.clone(), filter.timeUnit).toDate();
     filter.operator = "and";

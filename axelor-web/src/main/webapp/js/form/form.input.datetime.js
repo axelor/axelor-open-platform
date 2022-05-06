@@ -22,92 +22,94 @@
 
 var ui = angular.module('axelor.ui');
 
-var regional = {
-  monthNames: [
-    _t('January'),
-    _t('February'),
-    _t('March'),
-    _t('April'),
-    _t('May'),
-    _t('June'),
-    _t('July'),
-    _t('August'),
-    _t('September'),
-    _t('October'),
-    _t('November'),
-    _t('December')],
+$("body").on("app:config-fetched", function () {
+  var regional = {
+    monthNames: [
+      _t('January'),
+      _t('February'),
+      _t('March'),
+      _t('April'),
+      _t('May'),
+      _t('June'),
+      _t('July'),
+      _t('August'),
+      _t('September'),
+      _t('October'),
+      _t('November'),
+      _t('December')],
 
-  monthNamesShort: [
-    _t('Jan'),
-    _t('Feb'),
-    _t('Mar'),
-    _t('Apr'),
-    _t('May'),
-    _t('Jun'),
-    _t('Jul'),
-    _t('Aug'),
-    _t('Sep'),
-    _t('Oct'),
-    _t('Nov'),
-    _t('Dec')],
+    monthNamesShort: [
+      _t('Jan'),
+      _t('Feb'),
+      _t('Mar'),
+      _t('Apr'),
+      _t('May'),
+      _t('Jun'),
+      _t('Jul'),
+      _t('Aug'),
+      _t('Sep'),
+      _t('Oct'),
+      _t('Nov'),
+      _t('Dec')],
 
-  dayNames: [
-    _t('Sunday'),
-    _t('Monday'),
-    _t('Tuesday'),
-    _t('Wednesday'),
-    _t('Thursday'),
-    _t('Friday'),
-    _t('Saturday')],
+    dayNames: [
+      _t('Sunday'),
+      _t('Monday'),
+      _t('Tuesday'),
+      _t('Wednesday'),
+      _t('Thursday'),
+      _t('Friday'),
+      _t('Saturday')],
 
-  dayNamesShort :	[_t('Sun'), _t('Mon'), _t('Tue'), _t('Wed'), _t('Thu'), _t('Fri'), _t('Sat')],
-   dayNamesMin :	[_t('Su'), _t('Mo'), _t('Tu'), _t('We'), _t('Th'), _t('Fr'), _t('Sa')],
-  weekHeader : 	_t('Wk'),
-  timeText:     _t('Time'),
-  hourText : 		_t('Hour'),
-  minuteText : 	_t('Minute'),
-  secondText : 	_t('Second'),
-  currentText : 	_t('Now'),
-  closeText :		_t('Close'),
-  prevText : 		_t('Prev'),
-  nextText : 		_t('Next'),
-  firstDay: 		moment.localeData(ui.getBrowserLocale()).firstDayOfWeek()
-};
+    dayNamesShort :	[_t('Sun'), _t('Mon'), _t('Tue'), _t('Wed'), _t('Thu'), _t('Fri'), _t('Sat')],
+     dayNamesMin :	[_t('Su'), _t('Mo'), _t('Tu'), _t('We'), _t('Th'), _t('Fr'), _t('Sa')],
+    weekHeader : 	_t('Wk'),
+    timeText:     _t('Time'),
+    hourText : 		_t('Hour'),
+    minuteText : 	_t('Minute'),
+    secondText : 	_t('Second'),
+    currentText : 	_t('Now'),
+    closeText :		_t('Close'),
+    prevText : 		_t('Prev'),
+    nextText : 		_t('Next'),
+    firstDay: 		moment.localeData(ui.getPreferredLocale()).firstDayOfWeek()
+  };
 
-// configure datepicker
-$.timepicker.setDefaults(regional);
-$.datepicker.setDefaults(regional);
+  // configure datepicker
+  $.timepicker.setDefaults(regional);
+  $.datepicker.setDefaults(regional);
 
-// configure moment.js
-moment.locale('en', {
-  months: regional.monthNames,
-  monthsShort: regional.monthNamesShort,
-  weekdays: regional.dayNames,
-  weekdaysShort: regional.dayNamesShort,
-  weekdaysMin: regional.dayNamesMin,
-  calendar : {
-        sameDay : _t('[Today at] LT'),
-        nextDay : _t('[Tomorrow at] LT'),
-        nextWeek : _t('dddd [at] LT'),
-        lastDay : _t('[Yesterday at] LT'),
-        lastWeek : _t('[Last] dddd [at] LT'),
-        sameElse : _t('L')
-    },
-  relativeTime : {
-        future : _t("in %s"),
-        past : _t("%s ago"),
-        s : _t("a few seconds"),
-        m : _t("a minute"),
-        mm : _t("%d minutes"),
-        h : _t("an hour"),
-        hh : _t("%d hours"),
-        d : _t("a day"),
-        dd : _t("%d days"),
-        M : _t("a month"),
-        MM : _t("%d months"),
-        y : _t("a year"),
-        yy : _t("%d years")
-    }
+  // configure moment.js
+  moment.locale('en', {
+    months: regional.monthNames,
+    monthsShort: regional.monthNamesShort,
+    weekdays: regional.dayNames,
+    weekdaysShort: regional.dayNamesShort,
+    weekdaysMin: regional.dayNamesMin,
+    calendar : {
+          sameDay : _t('[Today at] LT'),
+          nextDay : _t('[Tomorrow at] LT'),
+          nextWeek : _t('dddd [at] LT'),
+          lastDay : _t('[Yesterday at] LT'),
+          lastWeek : _t('[Last] dddd [at] LT'),
+          sameElse : _t('L')
+      },
+    relativeTime : {
+          future : _t("in %s"),
+          past : _t("%s ago"),
+          s : _t("a few seconds"),
+          m : _t("a minute"),
+          mm : _t("%d minutes"),
+          h : _t("an hour"),
+          hh : _t("%d hours"),
+          d : _t("a day"),
+          dd : _t("%d days"),
+          M : _t("a month"),
+          MM : _t("%d months"),
+          y : _t("a year"),
+          yy : _t("%d years")
+      }
+  });
 });
 
 // configure ui.mask
