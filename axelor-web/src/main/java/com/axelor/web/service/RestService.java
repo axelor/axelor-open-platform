@@ -22,6 +22,7 @@ import static com.axelor.common.ObjectUtils.isEmpty;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
+import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
@@ -74,6 +75,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -733,8 +735,27 @@ public class RestService extends ResourceService {
     updateContext(request);
 
     // ServletRequest#getLocale() returns server locale if no Accept-Language header is set.
-    final Locale locale = CSV_LOCALE != null ? CSV_LOCALE : httpRequest.getLocale();
+    final Locale locale = CSV_LOCALE != null ? CSV_LOCALE : getPreferredLocale();
     return getResource().export(request, CSV_CHARSET, locale, CSV_SEPARATOR);
+  }
+
+  /**
+   * Gets locale based on user language and request locales
+   *
+   * @return preferred locale
+   */
+  private Locale getPreferredLocale() {
+    final Locale locale = AppFilter.getLocale();
+    if (StringUtils.isBlank(locale.getCountry())) {
+      final Enumeration<Locale> requestLocales = httpRequest.getLocales();
+      while (requestLocales.hasMoreElements()) {
+        final Locale requestLocale = requestLocales.nextElement();
+        if (Objects.equals(locale.getLanguage(), requestLocale.getLanguage())) {
+          return requestLocale;
+        }
+      }
+    }
+    return locale;
   }
 
   @GET
