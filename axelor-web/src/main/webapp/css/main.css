@@ -1041,6 +1041,10 @@ img.prefix-icon {
   height: 28px;
 }
 
+input::placeholder {
+  opacity: 0.5;
+}
+
 /* quick menu */
 
 .navbar .pull-right.quick-menu-bar .quick-menu {
