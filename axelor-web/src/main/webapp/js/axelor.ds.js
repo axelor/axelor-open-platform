@@ -232,7 +232,10 @@
         var items = [];
 
         if (view.helpOverride && view.helpOverride.length) {
-          helps = _.groupBy(view.helpOverride || [], 'type');
+          var helpOverride = _.map(view.helpOverride, function (item) {
+            return item.help ? _.extend({}, item, {help: axelor.sanitize(item.help)}) : item;
+          });
+          helps = _.groupBy(helpOverride || [], 'type');
           helps = meta.helps = _.object(_.map(helps, function(items, key) {
             return [key, _.reduce(items, function(memo, item) {
               memo[item.field] = item;
