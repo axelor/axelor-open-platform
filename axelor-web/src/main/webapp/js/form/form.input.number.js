@@ -254,7 +254,7 @@ ui.formInput('Number', {
       if (_.isNumber(max) && value > max)
         value = max;
 
-      updateModel(value, false);
+      element.val(value);
     }
 
     if (props.minSize !== undefined)
