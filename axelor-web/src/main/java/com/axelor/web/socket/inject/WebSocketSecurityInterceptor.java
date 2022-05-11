@@ -18,6 +18,8 @@
  */
 package com.axelor.web.socket.inject;
 
+import com.axelor.inject.Beans;
+import com.google.inject.persist.UnitOfWork;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
@@ -42,15 +44,23 @@ public class WebSocketSecurityInterceptor implements MethodInterceptor {
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+  private UnitOfWork unitOfWork;
+
   private <T> T withAuth(Session session, Function<Subject, T> task) {
+    if (unitOfWork == null) {
+      unitOfWork = Beans.get(UnitOfWork.class);
+    }
+
     Object manager = session.getUserProperties().get(SecurityManager.class.getName());
     Object subject = session.getUserProperties().get(Subject.class.getName());
+    unitOfWork.begin();
     try {
       ThreadContext.bind((SecurityManager) manager);
       ThreadContext.bind((Subject) subject);
       return task.apply((Subject) subject);
     } finally {
       ThreadContext.remove();
+      unitOfWork.end();
     }
   }
 
