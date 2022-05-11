@@ -18,12 +18,14 @@
  */
 package com.axelor.web.socket.inject;
 
+import com.axelor.db.tenants.TenantResolver;
 import com.axelor.inject.Beans;
 import com.google.inject.persist.UnitOfWork;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -44,16 +46,21 @@ public class WebSocketSecurityInterceptor implements MethodInterceptor {
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  private UnitOfWork unitOfWork;
-
   private <T> T withAuth(Session session, Function<Subject, T> task) {
-    if (unitOfWork == null) {
-      unitOfWork = Beans.get(UnitOfWork.class);
-    }
+    final Map<String, Object> properties = session.getUserProperties();
+    final Object manager = properties.get(SecurityManager.class.getName());
+    final Object subject = properties.get(Subject.class.getName());
 
-    Object manager = session.getUserProperties().get(SecurityManager.class.getName());
-    Object subject = session.getUserProperties().get(Subject.class.getName());
-    unitOfWork.begin();
+    final String tenantId = (String) properties.get(WebSocketConfigurator.TENANT_ID);
+    final String tenantHost = (String) properties.get(WebSocketConfigurator.TENANT_HOST);
+    TenantResolver.setCurrentTenant(tenantId, tenantHost);
+
+    final UnitOfWork unitOfWork = Beans.get(UnitOfWork.class);
+    try {
+      unitOfWork.begin();
+    } catch (IllegalStateException e) {
+      // Ignore
+    }
     try {
       ThreadContext.bind((SecurityManager) manager);
       ThreadContext.bind((Subject) subject);

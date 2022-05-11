@@ -33,6 +33,12 @@ public class TenantResolver implements CurrentTenantIdentifierResolver {
     enabled = TenantModule.isEnabled();
   }
 
+  public static void setCurrentTenant(String tenantId, String tenantHost) {
+    if (!enabled) return;
+    CURRENT_TENANT.set(tenantId);
+    CURRENT_HOST.set(tenantHost);
+  }
+
   public static String currentTenantIdentifier() {
     if (!enabled) return null;
     final String tenant = CURRENT_TENANT.get();

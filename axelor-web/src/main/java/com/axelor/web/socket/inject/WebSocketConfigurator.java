@@ -18,8 +18,10 @@
  */
 package com.axelor.web.socket.inject;
 
+import com.axelor.db.tenants.TenantResolver;
 import com.axelor.inject.Beans;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpSession;
@@ -32,6 +34,9 @@ import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
 
 public class WebSocketConfigurator extends ServerEndpointConfig.Configurator {
+
+  static final String TENANT_ID = "tenant-id";
+  static final String TENANT_HOST = "tenant-host";
 
   @Override
   public <T> T getEndpointInstance(Class<T> endpointClass) throws InstantiationException {
@@ -60,9 +65,18 @@ public class WebSocketConfigurator extends ServerEndpointConfig.Configurator {
   public void modifyHandshake(
       ServerEndpointConfig sec, HandshakeRequest request, HandshakeResponse response) {
     HttpSession httpSession = (HttpSession) request.getHttpSession();
-    sec.getUserProperties().put(HttpSession.class.getName(), httpSession);
-    sec.getUserProperties().put(Subject.class.getName(), SecurityUtils.getSubject());
-    sec.getUserProperties()
-        .put(SecurityManager.class.getName(), SecurityUtils.getSecurityManager());
+    final Map<String, Object> properties = sec.getUserProperties();
+    properties.put(HttpSession.class.getName(), httpSession);
+    properties.put(Subject.class.getName(), SecurityUtils.getSubject());
+    properties.put(SecurityManager.class.getName(), SecurityUtils.getSecurityManager());
+
+    final String tenantId = TenantResolver.currentTenantIdentifier();
+    if (tenantId != null) {
+      properties.put(TENANT_ID, tenantId);
+    }
+    final String tenantHost = TenantResolver.currentTenantHost();
+    if (tenantHost != null) {
+      properties.put(TENANT_HOST, tenantHost);
+    }
   }
 }
