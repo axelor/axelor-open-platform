@@ -53,12 +53,6 @@ public class TagsChannel extends Channel {
   }
 
   @Override
-  public void onSubscribe(Session session) {}
-
-  @Override
-  public void onUnsubscribe(Session session) {}
-
-  @Override
   @Transactional
   public void onMessage(Session session, Message message) {
     final ActionResponse response = new ActionResponse();

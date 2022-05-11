@@ -27,9 +27,9 @@ public abstract class Channel {
 
   public abstract String getName();
 
-  public abstract void onSubscribe(Session session);
+  public void onSubscribe(Session session) {}
 
-  public abstract void onUnsubscribe(Session session);
+  public void onUnsubscribe(Session session) {}
 
   public abstract void onMessage(Session session, Message message);
 
@@ -39,6 +39,10 @@ public abstract class Channel {
     message.setType(MessageType.MSG);
     message.setData(data);
     session.getBasicRemote().sendObject(message);
+  }
+
+  public boolean isEnabled() {
+    return true;
   }
 
   protected User getUser(Session session) {

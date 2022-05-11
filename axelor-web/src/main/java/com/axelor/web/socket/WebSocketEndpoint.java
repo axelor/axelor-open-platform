@@ -58,13 +58,15 @@ public class WebSocketEndpoint {
   @Inject
   public WebSocketEndpoint(Logger log, Set<Channel> channels) {
     this.log = log;
-    channels.stream()
-        .filter(channel -> StringUtils.notBlank(channel.getName()))
-        .forEach(this::register);
+    channels.stream().filter(Channel::isEnabled).forEach(this::register);
   }
 
   private void register(Channel channel) {
     String name = channel.getName();
+    if (StringUtils.isBlank(name)) {
+      throw new IllegalArgumentException(
+          "Channel must have a name: " + channel.getClass().getName());
+    }
     if (CHANNELS.containsKey(name)) {
       throw new IllegalStateException("Duplicate channel found: " + name);
     }
