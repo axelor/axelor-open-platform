@@ -296,7 +296,7 @@ ui.directive('uiHelpPopover', function() {
       value = value.join(', ');
     }
 
-    addRow(_t('Orig. Value'), value);
+    addRow(_t('Orig. Value'), axelor.sanitize(value));
   }
 
   function doLink(scope, element, attrs) {
