@@ -1,0 +1,5 @@
+---
+title: Implement support to see users on same view in realtime
+type: feature
+description: |
+  Feature can be disabled with `view.view-watcher` property. By default, it is enabled.

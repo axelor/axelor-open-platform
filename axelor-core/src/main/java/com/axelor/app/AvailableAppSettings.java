@@ -67,6 +67,8 @@ public interface AvailableAppSettings {
   String VIEW_GRID_SELECTION = "view.grid.selection";
   String VIEW_GRID_EDITOR_BUTTONS = "view.grid.editor-buttons";
 
+  String VIEW_VIEW_WATCHER = "view.view-watcher";
+
   String API_PAGINATION_MAX_PER_PAGE = "api.pagination.max-per-page";
   String API_PAGINATION_DEFAULT_PER_PAGE = "api.pagination.default-per-page";
 

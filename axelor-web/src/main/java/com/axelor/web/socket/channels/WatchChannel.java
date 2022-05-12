@@ -66,6 +66,11 @@ public class WatchChannel extends Channel {
   }
 
   @Override
+  public boolean isEnabled() {
+    return AppSettings.get().getBoolean(AvailableAppSettings.VIEW_VIEW_WATCHER, true);
+  }
+
+  @Override
   public void onUnsubscribe(Session session) {
     Set<String> keys = ROOMS.keySet();
     remove(session, keys.toArray(new String[] {}));

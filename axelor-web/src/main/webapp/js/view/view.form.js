@@ -1726,7 +1726,7 @@ ui.directive('uiViewWatcher', ['Socket', function (Socket) {
     replace: true,
     link: function (scope, element, attrs) {
 
-      if (axelor.device.mobile) {
+      if (axelor.device.mobile || axelor.config['view.collaboration'] === false) {
         return;
       }
 
