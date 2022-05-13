@@ -1,0 +1,3 @@
+---
+title: Fix ignored canNew attribute and permissions when pressing enter on last row of editable grid
+type: fix
