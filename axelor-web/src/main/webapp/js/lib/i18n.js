@@ -24,7 +24,7 @@ var bundle = (window._t || {}).bundle || {};
 
 _.each(bundle, function (message, key) {
   bundle[key] = axelor.sanitize(message);
-})
+});
 
 function gettext(key) {
   var message = bundle[key] || bundle[(key||'').trim()] || key;
