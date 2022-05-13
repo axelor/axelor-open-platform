@@ -1595,7 +1595,7 @@ Grid.prototype.onKeyDown = function (e) {
     if (this.isEditActive()) {
       var promise = that.commitEdit();
       promise.then(function () {
-        if (args.row === grid.getDataLength() - 1) {
+        if (that.canAdd() && args.row === grid.getDataLength() - 1) {
           that.addNewRow();
         }
       }, function () {
@@ -2172,7 +2172,7 @@ Grid.prototype._showEditor = function (activeCell) {
           e.preventDefault();
           doCommit().then(function () {
             var args = grid.getActiveCell();
-            if (args.row === grid.getDataLength() - 1) {
+            if (that.canAdd() && args.row === grid.getDataLength() - 1) {
               that.addNewRow();
             }
           });
