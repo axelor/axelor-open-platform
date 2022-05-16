@@ -397,7 +397,7 @@ ui.directive('uiTranslateIcon', ['$q', function ($q) {
 
           if (all.length) {
             $q.all(all).then(function () {
-              var lang = axelor.config['user.lang'] || en;
+              var lang = axelor.config['user.lang'] || 'en';
               var key = 'value:' + scope.getValue();
               var trKey = '$t:' + scope.field.name;
               return trDs.search({
