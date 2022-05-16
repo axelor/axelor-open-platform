@@ -167,6 +167,7 @@
       element.children(".markdown-loading").remove();
       element.children(".markdown-editor").toggleClass("hidden", false);
 
+      var recordId = (scope.record || {}).id;
       var editor = null;
       var Editor = toastui.Editor;
       var codeSyntaxHighlight = Editor.plugin.codeSyntaxHighlight;
@@ -298,10 +299,18 @@
       });
 
       scope.$render_editable = function () {
+        var currentRecordId = (scope.record || {}).id;
+        if (editor && currentRecordId === recordId) {
+          return;
+        }
+        recordId = currentRecordId;
         var value = getValue(scope);
 
+        // Empty any previous editor
+        var el = element.children(".markdown-editor").first().empty();
+
         var options = {
-          el: element.children(".markdown-editor").first()[0],
+          el: el[0],
           initialValue: value,
           theme: editorTheme,
           language: editorLocale,
@@ -310,12 +319,6 @@
           plugins: [[codeSyntaxHighlight, { highlighter: Prism }]],
           toolbarItems: toolbarItems,
           events: {
-            load: function (ed) {
-              // Needed in case of resetting with empty value
-              if (_.isEmpty(value)) {
-                ed.setMarkdown(value);
-              }
-            },
             blur: function () {
               setValue(scope, editor.getMarkdown());
             }
