@@ -73,7 +73,7 @@
   width: 36% !important;
 }
 
-.panel-layout .form-item>a.btn, .panel-layout .form-item-container .toastui-editor-toolbar button {
+.panel-layout .form-item-container .toastui-editor-toolbar button {
   width: unset;
 }
 
