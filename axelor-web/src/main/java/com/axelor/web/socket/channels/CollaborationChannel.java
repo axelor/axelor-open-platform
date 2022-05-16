@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2021 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2022 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -51,14 +51,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public class WatchChannel extends Channel {
+public class CollaborationChannel extends Channel {
 
-  private static final String NAME = "watch";
+  private static final String NAME = "collaboration";
 
   private static final Multimap<String, Session> ROOMS =
       Multimaps.newMultimap(new ConcurrentHashMap<>(), CopyOnWriteArrayList::new);
 
-  private static final Logger log = LoggerFactory.getLogger(WatchChannel.class);
+  private static final Logger log = LoggerFactory.getLogger(CollaborationChannel.class);
 
   @Override
   public String getName() {
@@ -67,7 +67,7 @@ public class WatchChannel extends Channel {
 
   @Override
   public boolean isEnabled() {
-    return AppSettings.get().getBoolean(AvailableAppSettings.VIEW_VIEW_WATCHER, true);
+    return AppSettings.get().getBoolean(AvailableAppSettings.VIEW_COLLABORATION, true);
   }
 
   @Override
@@ -78,31 +78,31 @@ public class WatchChannel extends Channel {
 
   @Override
   public void onMessage(Session session, Message message) {
-    WatchData data = getData(message);
+    CollaborationData data = getData(message);
     User user = getUser(session);
 
     data.setUser(user);
 
-    if (data.command == WatchCommand.JOIN) {
+    if (data.command == CollaborationCommand.JOIN) {
       welcome(session, data);
     }
 
-    if (data.command == WatchCommand.LEFT) {
+    if (data.command == CollaborationCommand.LEFT) {
       remove(session, data.getKey());
     }
 
     broadcast(session, data);
   }
 
-  private WatchData getData(Message message) {
+  private CollaborationData getData(Message message) {
     ObjectMapper mapper = Beans.get(ObjectMapper.class);
-    return mapper.convertValue(message.getData(), WatchData.class);
+    return mapper.convertValue(message.getData(), CollaborationData.class);
   }
 
-  private void welcome(Session session, WatchData data) {
+  private void welcome(Session session, CollaborationData data) {
     ROOMS.put(data.getKey(), session);
 
-    WatchData resp = new WatchData();
+    CollaborationData resp = new CollaborationData();
     resp.model = data.model;
     resp.record = data.record;
     resp.user = data.user;
@@ -122,10 +122,10 @@ public class WatchChannel extends Channel {
         ROOMS.removeAll(key);
       }
 
-      WatchData data = new WatchData();
+      CollaborationData data = new CollaborationData();
       String[] parts = key.split(":");
 
-      data.command = WatchCommand.LEFT;
+      data.command = CollaborationCommand.LEFT;
       data.user = getUser(client);
       data.model = parts[0];
       data.record = parts[1];
@@ -134,7 +134,7 @@ public class WatchChannel extends Channel {
     }
   }
 
-  private void broadcast(Session session, WatchData data) {
+  private void broadcast(Session session, CollaborationData data) {
     String key = data.getKey();
     for (Session client : ROOMS.get(key)) {
       try {
@@ -156,7 +156,7 @@ public class WatchChannel extends Channel {
     return ROOMS.get(key).stream().map(client -> getUser(client)).collect(Collectors.toList());
   }
 
-  public static enum WatchCommand {
+  public enum CollaborationCommand {
     LEFT,
     JOIN,
     EDIT,
@@ -164,13 +164,13 @@ public class WatchChannel extends Channel {
   }
 
   @JsonInclude(Include.NON_NULL)
-  public static class WatchData {
+  public static class CollaborationData {
 
     private String model;
 
     private String record;
 
-    private WatchCommand command;
+    private CollaborationCommand command;
 
     private String message;
 
@@ -196,11 +196,11 @@ public class WatchChannel extends Channel {
       this.record = record;
     }
 
-    public WatchCommand getCommand() {
+    public CollaborationCommand getCommand() {
       return command;
     }
 
-    public void setCommand(WatchCommand command) {
+    public void setCommand(CollaborationCommand command) {
       this.command = command;
     }
 

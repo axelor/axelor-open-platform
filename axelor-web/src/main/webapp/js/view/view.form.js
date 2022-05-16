@@ -1720,7 +1720,7 @@ ui.formWidget('uiWkfStatus', {
     "</div>"
 });
 
-ui.directive('uiViewWatcher', ['Socket', function (Socket) {
+ui.directive('uiViewCollaboration', ['Socket', function (Socket) {
   return {
     scope: true,
     replace: true,
@@ -1730,7 +1730,7 @@ ui.directive('uiViewWatcher', ['Socket', function (Socket) {
         return;
       }
 
-      var channel = Socket("watch");
+      var channel = Socket("collaboration");
 
       var users = {};
       var model = scope._model;
@@ -1835,11 +1835,11 @@ ui.directive('uiViewWatcher', ['Socket', function (Socket) {
       });
     },
     template: `
-    <ul class="nav menu-bar view-watcher hidden-phone" ng-show="users.length &gt; 1">
+    <ul class="nav menu-bar view-collaboration hidden-phone" ng-show="users.length &gt; 1">
       <li class="dropdown menu button-menu">
-        <a class="dropdown-toggle btn view-watcher-toggle" data-toggle="dropdown" title="{{ 'Watchers' | t}}">
-          <span class="view-watcher-users">{{message}}</span>
-          <span class="view-watcher-action" ng-show="subtitle">{{subtitle}}</span>
+        <a class="dropdown-toggle btn view-collaboration-toggle" data-toggle="dropdown" title="{{ 'Watchers' | t}}">
+          <span class="view-collaboration-users">{{message}}</span>
+          <span class="view-collaboration-action" ng-show="subtitle">{{subtitle}}</span>
         </a>
         <ul class="dropdown-menu">
           <li ng-repeat="user in users track by user.id"><a href="">{{user.name}}</a></li>
