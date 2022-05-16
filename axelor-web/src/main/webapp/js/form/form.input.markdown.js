@@ -278,7 +278,9 @@
         ["scrollSync"]
       ];
 
-      if ((scope.field || {}).lite) {
+      var field = scope.field || {}
+
+      if (field.lite) {
         var liteToolbarItems = [];
         _.each(toolbarItems, function (items) {
           items = _.where(items, { removable: undefined });
@@ -297,6 +299,10 @@
         else if (!isNaN(value)) value = +value;
         widgetAttrs[key] = value;
       });
+
+      if (field.height) {
+        widgetAttrs.height = field.height;
+      }
 
       scope.$render_editable = function () {
         var currentRecordId = (scope.record || {}).id;
