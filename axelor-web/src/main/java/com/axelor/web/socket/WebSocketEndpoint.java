@@ -69,7 +69,9 @@ public class WebSocketEndpoint {
   }
 
   @OnOpen
-  public void onOpen(Session session, EndpointConfig config) {}
+  public void onOpen(Session session, EndpointConfig config) {
+    // Nothing to do
+  }
 
   @OnClose
   public void onClose(Session session, CloseReason reason) {

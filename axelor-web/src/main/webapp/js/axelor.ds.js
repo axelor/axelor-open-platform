@@ -230,7 +230,7 @@
     var unsubscribe = channel.subscribe(message => {
       var values = message.values;
       $rootScope.$apply(() => listeners.forEach(cb => cb(values)));
-      });
+    });
 
     var pending = false;
     var pendingReset = () => {

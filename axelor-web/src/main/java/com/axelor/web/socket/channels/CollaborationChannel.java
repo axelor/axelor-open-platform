@@ -29,6 +29,7 @@ import com.axelor.web.socket.Message;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,6 +38,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +76,7 @@ public class CollaborationChannel extends Channel {
   @Override
   public void onUnsubscribe(Session session) {
     Set<String> keys = ROOMS.keySet();
-    remove(session, keys.toArray(new String[] {}));
+    remove(session, keys);
   }
 
   @Override
@@ -83,15 +86,18 @@ public class CollaborationChannel extends Channel {
 
     data.setUser(user);
 
-    if (data.command == CollaborationCommand.JOIN) {
-      welcome(session, data);
+    switch (data.getCommand()) {
+      case JOIN:
+        welcome(session, data);
+        break;
+      case LEFT:
+        remove(session, data.getKey());
+        return;
+      default:
+        break;
     }
 
-    if (data.command == CollaborationCommand.LEFT) {
-      remove(session, data.getKey());
-    }
-
-    broadcast(session, data);
+    broadcast(data);
   }
 
   private CollaborationData getData(Message message) {
@@ -103,10 +109,10 @@ public class CollaborationChannel extends Channel {
     ROOMS.put(data.getKey(), session);
 
     CollaborationData resp = new CollaborationData();
-    resp.model = data.model;
-    resp.record = data.record;
-    resp.user = data.user;
-    resp.users = getUsers(session, data.getKey());
+    resp.setModel(data.getModel());
+    resp.setRecord(data.getRecord());
+    resp.setUser(data.getUser());
+    resp.setUsers(getUsers(data.getKey()));
 
     try {
       this.send(session, resp);
@@ -115,7 +121,11 @@ public class CollaborationChannel extends Channel {
     }
   }
 
-  private void remove(Session client, String... keys) {
+  private void remove(Session client, String key) {
+    remove(client, Collections.singleton(key));
+  }
+
+  private void remove(Session client, Collection<String> keys) {
     for (String key : keys) {
       ROOMS.remove(key, client);
       if (ROOMS.get(key).isEmpty()) {
@@ -125,16 +135,16 @@ public class CollaborationChannel extends Channel {
       CollaborationData data = new CollaborationData();
       String[] parts = key.split(":");
 
-      data.command = CollaborationCommand.LEFT;
-      data.user = getUser(client);
-      data.model = parts[0];
-      data.record = parts[1];
+      data.setCommand(CollaborationCommand.LEFT);
+      data.setUser(getUser(client));
+      data.setModel(parts[0]);
+      data.setRecord(parts[1]);
 
-      broadcast(client, data);
+      broadcast(data);
     }
   }
 
-  private void broadcast(Session session, CollaborationData data) {
+  private void broadcast(CollaborationData data) {
     String key = data.getKey();
     for (Session client : ROOMS.get(key)) {
       try {
@@ -152,8 +162,8 @@ public class CollaborationChannel extends Channel {
     }
   }
 
-  private List<User> getUsers(Session session, String key) {
-    return ROOMS.get(key).stream().map(client -> getUser(client)).collect(Collectors.toList());
+  private List<User> getUsers(String key) {
+    return ROOMS.get(key).stream().map(this::getUser).collect(Collectors.toList());
   }
 
   public enum CollaborationCommand {
@@ -168,7 +178,8 @@ public class CollaborationChannel extends Channel {
 
     private String model;
 
-    private String record;
+    @JsonProperty("record")
+    private String rec;
 
     private CollaborationCommand command;
 
@@ -189,11 +200,11 @@ public class CollaborationChannel extends Channel {
     }
 
     public String getRecord() {
-      return record;
+      return rec;
     }
 
-    public void setRecord(String record) {
-      this.record = record;
+    public void setRecord(String rec) {
+      this.rec = rec;
     }
 
     public CollaborationCommand getCommand() {
@@ -206,7 +217,7 @@ public class CollaborationChannel extends Channel {
 
     @JsonIgnore
     public String getKey() {
-      return String.format("%s:%s", model, record);
+      return String.format("%s:%s", model, rec);
     }
 
     public String getMessage() {

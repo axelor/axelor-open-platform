@@ -1747,7 +1747,7 @@ ui.directive('uiViewCollaboration', ['Socket', function (Socket) {
 
         if (data.users) {
           _.each(data.users, u => users[u.id] = u);
-        };
+        }
 
         if (data.command === 'LEFT') {
           delete users[user.id];
