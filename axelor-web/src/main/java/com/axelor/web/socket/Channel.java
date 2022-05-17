@@ -18,6 +18,7 @@
  */
 package com.axelor.web.socket;
 
+import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import java.io.IOException;
 import javax.websocket.EncodeException;
@@ -46,6 +47,8 @@ public abstract class Channel {
   }
 
   protected User getUser(Session session) {
-    return WebSocketEndpoint.getUser(session);
+    return session.getUserPrincipal() == null
+        ? null
+        : AuthUtils.getUser(session.getUserPrincipal().getName());
   }
 }

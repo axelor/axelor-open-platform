@@ -18,11 +18,7 @@
  */
 package com.axelor.web.socket;
 
-import com.axelor.auth.AuthUtils;
-import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
-import com.axelor.db.mapper.Mapper;
-import com.axelor.db.mapper.Property;
 import com.axelor.web.socket.inject.WebSocketConfigurator;
 import com.axelor.web.socket.inject.WebSocketSecurity;
 import java.util.Map;
@@ -51,8 +47,6 @@ public class WebSocketEndpoint {
 
   private static final Map<String, Channel> CHANNELS = new ConcurrentHashMap<>();
 
-  private static final String PROPERTY_USER = "session.user";
-
   private final Logger log;
 
   @Inject
@@ -74,34 +68,8 @@ public class WebSocketEndpoint {
     CHANNELS.put(name, channel);
   }
 
-  protected static User getUser(Session session) {
-    User linked = (User) session.getUserProperties().get(PROPERTY_USER);
-    if (linked != null) {
-      return linked;
-    }
-
-    User user = new User();
-    User auth = AuthUtils.getUser();
-
-    Mapper mapper = Mapper.of(User.class);
-
-    user.setId(auth.getId());
-    user.setName(auth.getName());
-    user.setCode(auth.getCode());
-    user.setEmail(auth.getEmail());
-
-    Property name = mapper.getNameField();
-    if (name != null) {
-      name.set(user, name.get(auth));
-    }
-
-    return user;
-  }
-
   @OnOpen
-  public void onOpen(Session session, EndpointConfig config) {
-    session.getUserProperties().put(PROPERTY_USER, getUser(session));
-  }
+  public void onOpen(Session session, EndpointConfig config) {}
 
   @OnClose
   public void onClose(Session session, CloseReason reason) {
