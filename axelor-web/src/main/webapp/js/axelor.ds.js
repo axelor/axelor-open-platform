@@ -156,7 +156,6 @@
     }
 
     $rootScope.$on('$destroy', disconnect);
-    $rootScope.$on('event:auth-loginRequired', reconnect);
     $rootScope.$on('event:auth-loginConfirmed', reconnect);
     $rootScope.$on('event:http-response:200', reconnect);
 
