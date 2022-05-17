@@ -1720,119 +1720,12 @@ ui.formWidget('uiWkfStatus', {
     "</div>"
 });
 
-ui.directive('uiViewCollaboration', ['Socket', function (Socket) {
+ui.directive('uiViewCollaboration', ['CollaborationService', function (CollaborationService) {
   return {
     scope: true,
     replace: true,
     link: function (scope, element, attrs) {
-
-      if (axelor.device.mobile || axelor.config['view.collaboration'] === false) {
-        return;
-      }
-
-      var channel = Socket("collaboration");
-
-      var users = {};
-      var model = scope._model;
-      var recordId = null;
-
-      var unsubscribe = channel.subscribe(function (message) {
-
-        var data = message;
-        var user = data.user;
-
-        if (message.model !== model || message.record !== "" + recordId) {
-          return;
-        }
-
-        if (data.users) {
-          _.each(data.users, u => users[u.id] = u);
-        }
-
-        if (data.command === 'LEFT') {
-          delete users[user.id];
-        }
-
-        if (data.command === 'JOIN') {
-          users[user.id] = user;
-        }
-
-        if (data.command === 'EDIT') {
-          (users[user.id] || {}).editing = true;
-        }
-
-        if (data.command === 'IDLE') {
-          (users[user.id] || {}).editing = false;
-        }
-
-        scope.$apply(function () {
-          scope.users = Object.values(users);
-          scope.message = _t('{0} users here', scope.users.length);
-          var actionUser = user.editing ? user : scope.users.find(u => u.editing);
-          var userName = axelor.config["user.nameField"] || 'name';
-          scope.subtitle = actionUser
-            ? _t('{0} is editing…', actionUser[userName])
-            : _t('Nobody is editing.');
-        });
-      });
-
-      var join = _.throttle(function (id) {
-        recordId = id;
-        if (id) {
-          channel.send({ command: 'JOIN', model: model, record: id });
-          users = {};
-          scope.users = [];
-        }
-      });
-
-      var leave = _.throttle(function (id) {
-        if (id) {
-          channel.send({ command: 'LEFT', model: model, record: id });
-        }
-      });
-
-      var unwatchId = scope.$watch('record.id', function (id, old) {
-        if (id === old) return;
-        leave(recordId);
-        if (id > 0) {
-          join(id);
-        }
-      });
-
-      var resetTimer = null;
-
-      var notifyEdit = _.throttle(function () {
-        clearTimeout(resetTimer);
-        if (recordId) {
-          channel.send({ command: 'EDIT', model: model, record: recordId }).then(resetEditing);
-        }
-      }, 300);
-
-      var notifyIdle = _.throttle(function () {
-        clearTimeout(resetTimer);
-        if (recordId) {
-          channel.send({ command: 'IDLE', model: model, record: recordId });
-        }
-      }, 300);
-
-      var resetEditing = function () {
-        clearTimeout(resetTimer);
-        resetTimer = setTimeout(notifyIdle, 1000);
-      };
-
-      scope.$on('on:record-change', function (event, rec) {
-        if (rec && rec.id === recordId) {
-          notifyEdit();
-        } else {
-          notifyIdle();
-        }
-      });
-
-      scope.$on('$destroy', function () {
-        unwatchId();
-        leave(recordId);
-        unsubscribe();
-      });
+      CollaborationService.register(scope);
     },
     template: `
     <ul class="nav menu-bar view-collaboration hidden-phone" ng-show="users.length &gt; 1">

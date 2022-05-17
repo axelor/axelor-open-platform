@@ -61,6 +61,9 @@ public class CollaborationChannel extends Channel {
   private static final Multimap<String, Session> ROOMS =
       Multimaps.newMultimap(new ConcurrentHashMap<>(), CopyOnWriteArrayList::new);
 
+  private static final Map<String, Map<String, CollaborationState>> STATES =
+      new ConcurrentHashMap<>();
+
   private static final Logger log = LoggerFactory.getLogger(CollaborationChannel.class);
 
   @Override
@@ -93,11 +96,16 @@ public class CollaborationChannel extends Channel {
       case LEFT:
         remove(session, data.getKey());
         return;
+      case EDITABLE:
+      case DIRTY:
+      case SAVE:
+        updateState(data);
+        break;
       default:
         break;
     }
 
-    broadcast(data);
+    broadcast(session, data);
   }
 
   private CollaborationData getData(Message message) {
@@ -127,26 +135,31 @@ public class CollaborationChannel extends Channel {
 
   private void remove(Session client, Collection<String> keys) {
     for (String key : keys) {
-      ROOMS.remove(key, client);
+      boolean removed = ROOMS.remove(key, client);
       if (ROOMS.get(key).isEmpty()) {
         ROOMS.removeAll(key);
+        STATES.remove(key);
       }
+      if (removed) {
+        CollaborationData data = new CollaborationData();
+        String[] parts = key.split(":");
 
-      CollaborationData data = new CollaborationData();
-      String[] parts = key.split(":");
+        data.setCommand(CollaborationCommand.LEFT);
+        data.setUser(getUser(client));
+        data.setModel(parts[0]);
+        data.setRecord(parts[1]);
 
-      data.setCommand(CollaborationCommand.LEFT);
-      data.setUser(getUser(client));
-      data.setModel(parts[0]);
-      data.setRecord(parts[1]);
-
-      broadcast(data);
+        broadcast(client, data);
+      }
     }
   }
 
-  private void broadcast(CollaborationData data) {
+  private void broadcast(Session session, CollaborationData data) {
     String key = data.getKey();
     for (Session client : ROOMS.get(key)) {
+      if (client == session) {
+        continue;
+      }
       try {
         send(client, data);
       } catch (EncodeException e) {
@@ -166,11 +179,78 @@ public class CollaborationChannel extends Channel {
     return ROOMS.get(key).stream().map(this::getUser).collect(Collectors.toList());
   }
 
+  private void updateState(CollaborationData data) {
+    final Map<String, CollaborationState> map = data.getStates();
+    final CollaborationState state =
+        map.computeIfAbsent(data.getUser().getCode(), key -> new CollaborationState());
+
+    switch (data.getCommand()) {
+      case EDITABLE:
+        state.setEditable((Boolean) data.getMessage());
+        break;
+      case DIRTY:
+        state.setDirty((Boolean) data.getMessage());
+        break;
+      case SAVE:
+        state.setVersion((Long) data.getMessage());
+        break;
+      default:
+        break;
+    }
+  }
+
   public enum CollaborationCommand {
     LEFT,
     JOIN,
     EDIT,
     IDLE,
+    EDITABLE,
+    DIRTY,
+    SAVE,
+  }
+
+  @JsonInclude(Include.NON_NULL)
+  public static class CollaborationState {
+
+    private Boolean editable;
+
+    private Boolean dirty;
+
+    private Long version;
+
+    private Map<String, Object> changes;
+
+    public Boolean isEditable() {
+      return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+      this.editable = editable;
+    }
+
+    public Boolean isDirty() {
+      return dirty;
+    }
+
+    public void setDirty(Boolean dirty) {
+      this.dirty = dirty;
+    }
+
+    public Long getVersion() {
+      return version;
+    }
+
+    public void setVersion(Long version) {
+      this.version = version;
+    }
+
+    public Map<String, Object> getPendingChanges() {
+      return changes;
+    }
+
+    public void setPendingChanges(Map<String, Object> pendingChanges) {
+      this.changes = pendingChanges;
+    }
   }
 
   @JsonInclude(Include.NON_NULL)
@@ -183,7 +263,7 @@ public class CollaborationChannel extends Channel {
 
     private CollaborationCommand command;
 
-    private String message;
+    private Object message;
 
     @JsonSerialize(using = UserSerializer.class)
     private User user;
@@ -220,11 +300,11 @@ public class CollaborationChannel extends Channel {
       return String.format("%s:%s", model, rec);
     }
 
-    public String getMessage() {
+    public Object getMessage() {
       return message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(Object message) {
       this.message = message;
     }
 
@@ -242,6 +322,10 @@ public class CollaborationChannel extends Channel {
 
     public void setUsers(List<User> users) {
       this.users = users;
+    }
+
+    public Map<String, CollaborationState> getStates() {
+      return STATES.computeIfAbsent(getKey(), key -> new ConcurrentHashMap<>());
     }
   }
 

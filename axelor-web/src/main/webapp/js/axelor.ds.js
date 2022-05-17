@@ -200,6 +200,186 @@
     };
   }]);
 
+  ds.factory('CollaborationService', ['$rootScope', 'Socket', function ($rootScope, Socket) {
+    var functions = {
+      register: angular.noop
+    };
+
+    if (axelor.device.mobile || axelor.config['view.collaboration'] === false) {
+      return functions;
+    }
+
+    var allScopes = {};
+    var allUsers = {};
+    var channel = Socket("collaboration");
+
+    function getKey(model, recordId) {
+      return model + ':' + recordId;
+    }
+
+    var unsubscribe = channel.subscribe(function (message) {
+      var key = getKey(message.model, message.record);
+      var scopes = allScopes[key];
+
+      if (_.isEmpty(scopes)) {
+        return;
+      }
+
+      var users = allUsers[key];
+
+      if (!users) {
+        allUsers[key] = users = {};
+      }
+
+      var data = message;
+      var user = data.user;
+
+      if (data.users) {
+        _.each(data.users, u => users[u.id] = u);
+      }
+      
+
+      if (data.command === 'LEFT') {
+        delete users[user.id];
+      } else if (data.command === 'JOIN') {
+        users[user.id] = user;
+      } else if (data.command === 'EDIT') {
+        (users[user.id] || {}).editing = true;
+      } else if (data.command === 'IDLE') {
+        (users[user.id] || {}).editing = false;
+      }
+
+      _.each(scopes, function (scope) {
+        scope.$apply(function () {
+          if (data.command === 'EDITABLE') {
+            
+            return;
+          }
+
+          scope.users = Object.values(users);
+          scope.message = _t('{0} users viewing', scope.users.length);
+          var actionUser = user.editing ? user : scope.users.find(u => u.editing);
+          var userName = axelor.config["user.nameField"] || 'name';
+          scope.subtitle = actionUser
+            ? _t('{0} is editing…', actionUser[userName])
+            : '';
+        });
+      });
+    });
+
+    functions.register = function (scope) {
+      var model = scope._model;
+      var recordId = null;
+
+      var join = function (id) {
+        recordId = id;
+        if (id) {
+          var key = getKey(scope._model, id);
+          var scopes = allScopes[key];
+          if (!scopes) {
+            scopes = allScopes[key] = [];
+          }
+          var index = scopes.indexOf(scope);
+          if (index >= 0) {
+            console.error("Already joined: " + key);
+            return;
+          }
+          scopes.push(scope)
+          allUsers[key] = {};
+
+          channel.send({ command: 'JOIN', model: model, record: id });
+          scope.users = [];
+        }
+      };
+
+      var leave = function (id) {
+        if (id) {
+          var key = getKey(scope._model, id);
+          var scopes = allScopes[key];
+          var index = scopes.indexOf(scope);
+          if (index >= 0) {
+            scopes.splice(index, 1);
+            channel.send({ command: 'LEFT', model: model, record: id });
+          }
+          if (_.isEmpty(scopes)) {
+            allUsers[key] = {};
+          }
+        }
+      };
+
+      var unwatchId = scope.$watch('record.id', function (id, old) {
+        if (id === old) return;
+        leave(recordId);
+        if (id > 0) {
+          join(id);
+        }
+      });
+
+      var resetTimer = null;
+
+      var notifyEdit = _.throttle(function () {
+        clearTimeout(resetTimer);
+        if (recordId) {
+          channel.send({ command: 'EDIT', model: model, record: recordId }).then(resetEditing);
+        }
+      }, 300);
+
+      var notifyIdle = _.throttle(function () {
+        clearTimeout(resetTimer);
+        if (recordId) {
+          channel.send({ command: 'IDLE', model: model, record: recordId });
+        }
+      }, 300);
+
+      var resetEditing = function () {
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(notifyIdle, 1000);
+      };
+
+      /*
+      scope.$on('on:record-change', function (event, rec) {
+        if (rec && rec.id === recordId) {
+          notifyEdit();
+        } else {
+          notifyIdle();
+        }
+      });
+      */
+
+      var unwatchEditable = scope.$watch('isEditable()', _.throttle(function (editable) {
+        if (recordId == null) return;
+        channel.send({ command: 'EDITABLE', model: model, record: recordId, message: editable });
+      }, 300));
+
+      var initialDirty;
+      var unwatchDirty = scope.$watch('isDirty()', _.throttle(function (dirty) {
+        if (recordId == null) return;
+        if (initialDirty !== undefined) {
+          channel.send({ command: 'DIRTY', model: model, record: recordId, message: dirty });
+        }
+        initialDirty = dirty;
+      }, 300));
+
+      scope.$on('ds:saved', function (e, source) {
+        var version = (source._data[0] || {}).version
+        if (version > 0) {
+          channel.send({ command: 'SAVE', model: model, record: recordId, message: version });
+        }
+      });
+
+      scope.$on('$destroy', function () {
+        unwatchId();
+        unwatchEditable();
+        unwatchDirty();
+        leave(recordId);
+      });
+
+      $rootScope.$on('$destroy', unsubscribe);
+    }
+
+    return functions;
+  }]);
+
   ds.factory('TagService', ['$q', '$timeout', '$rootScope', 'Socket', function($q, $timeout, $rootScope, Socket) {
 
     var POLL_INTERVAL = 10000;
