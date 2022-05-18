@@ -446,6 +446,26 @@ little version of the widget.
 <field name="note" widget="html" x-lite="true"/>
 ----
 
+== Markdown
+
+The Markdown widget is implemented with https://github.com/nhn/tui.editor[TOAST UI Editor]
+and supports GitHub Flavored Markdown.
+
+[source,xml]
+----
+<field name="comment" widget="markdown"/>
+----
+
+[cols="2,8"]
+|===
+| Attribute            | Description
+
+|`x-lite`              | Enable lite toolbar (defaults to `false`)
+|`x-preview-style`     | Markdown editor's preview style: `tab` (default), `vertical`
+|`x-initial-edit-type` | Initial editor type: `markdown` (default), `wysiwyg`
+|`x-autofocus`         | Automatically focus on edit  (defaults to `false`)
+|===
+
 == Extra Attributes
 
 In addition to the common properties, widgets supports the following extra properties
