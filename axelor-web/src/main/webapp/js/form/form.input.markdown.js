@@ -300,9 +300,12 @@
         widgetAttrs[key] = value;
       });
 
-      if (field.height) {
-        widgetAttrs.height = field.height;
-      }
+      ['height', 'placeholder'].forEach(function (attr) {
+        var value = field[attr];
+        if (value !== undefined) {
+          widgetAttrs[attr] = value;
+        }
+      });
 
       scope.$render_editable = function () {
         var value = getValue(scope);
