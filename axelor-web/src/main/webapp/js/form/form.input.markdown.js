@@ -305,12 +305,19 @@
       }
 
       scope.$render_editable = function () {
+        var value = getValue(scope);
         var currentRecordId = (scope.record || {}).id;
+
+        // Staying on same record
         if (editor && currentRecordId === recordId) {
+          if (value !== (editor.getMarkdown() || undefined)) {
+            editor.setMarkdown(value);
+          }
           return;
         }
+
+        // Opened or switched to another record
         recordId = currentRecordId;
-        var value = getValue(scope);
 
         // Empty any previous editor
         var el = element.children(".markdown-editor").first().empty();
