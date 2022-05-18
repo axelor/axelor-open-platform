@@ -29,7 +29,6 @@ import com.axelor.web.socket.Message;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import javax.inject.Singleton;
 import javax.websocket.EncodeException;
@@ -58,13 +56,15 @@ public class CollaborationChannel extends Channel {
 
   private static final String NAME = "collaboration";
 
+  // <key, set of sessions>
   private static final Multimap<String, Session> ROOMS =
-      Multimaps.newMultimap(new ConcurrentHashMap<>(), CopyOnWriteArrayList::new);
+      Multimaps.newSetMultimap(new ConcurrentHashMap<>(), ConcurrentHashMap::newKeySet);
 
+  // <key, <user code, state>>
   private static final Map<String, Map<String, CollaborationState>> STATES =
       new ConcurrentHashMap<>();
 
-  private static final Logger log = LoggerFactory.getLogger(CollaborationChannel.class);
+  private static final Logger logger = LoggerFactory.getLogger(CollaborationChannel.class);
 
   @Override
   public String getName() {
@@ -86,7 +86,6 @@ public class CollaborationChannel extends Channel {
   public void onMessage(Session session, Message message) {
     CollaborationData data = getData(message);
     User user = getUser(session);
-
     data.setUser(user);
 
     switch (data.getCommand()) {
@@ -96,9 +95,7 @@ public class CollaborationChannel extends Channel {
       case LEFT:
         remove(session, data.getKey());
         return;
-      case EDITABLE:
-      case DIRTY:
-      case SAVE:
+      case STATE:
         updateState(data);
         break;
       default:
@@ -116,16 +113,20 @@ public class CollaborationChannel extends Channel {
   private void welcome(Session session, CollaborationData data) {
     ROOMS.put(data.getKey(), session);
 
-    CollaborationData resp = new CollaborationData();
+    final CollaborationData resp = new CollaborationData();
     resp.setModel(data.getModel());
-    resp.setRecord(data.getRecord());
+    resp.setRecordId(data.getRecordId());
     resp.setUser(data.getUser());
-    resp.setUsers(getUsers(data.getKey()));
+    final String key = data.getKey();
+    resp.setUsers(getUsers(key));
+    resp.setStates(getStates(key));
+
+    updateState(data);
 
     try {
       this.send(session, resp);
     } catch (IOException | EncodeException e) {
-      log.error(e.getMessage(), e);
+      logger.error(e.getMessage(), e);
     }
   }
 
@@ -134,8 +135,14 @@ public class CollaborationChannel extends Channel {
   }
 
   private void remove(Session client, Collection<String> keys) {
-    for (String key : keys) {
-      boolean removed = ROOMS.remove(key, client);
+    for (final String key : keys) {
+      final boolean removed = ROOMS.remove(key, client);
+
+      final Map<String, CollaborationState> states = STATES.get(key);
+      if (states != null) {
+        states.remove(client.getUserPrincipal().getName());
+      }
+
       if (ROOMS.get(key).isEmpty()) {
         ROOMS.removeAll(key);
         STATES.remove(key);
@@ -147,7 +154,7 @@ public class CollaborationChannel extends Channel {
         data.setCommand(CollaborationCommand.LEFT);
         data.setUser(getUser(client));
         data.setModel(parts[0]);
-        data.setRecord(parts[1]);
+        data.setRecordId(Long.valueOf(parts[1]));
 
         broadcast(client, data);
       }
@@ -179,77 +186,77 @@ public class CollaborationChannel extends Channel {
     return ROOMS.get(key).stream().map(this::getUser).collect(Collectors.toList());
   }
 
-  private void updateState(CollaborationData data) {
-    final Map<String, CollaborationState> map = data.getStates();
-    final CollaborationState state =
-        map.computeIfAbsent(data.getUser().getCode(), key -> new CollaborationState());
+  public Map<String, CollaborationState> getStates(String key) {
+    return STATES.computeIfAbsent(key, k -> new ConcurrentHashMap<>());
+  }
 
-    switch (data.getCommand()) {
-      case EDITABLE:
-        state.setEditable((Boolean) data.getMessage());
-        break;
-      case DIRTY:
-        state.setDirty((Boolean) data.getMessage());
-        break;
-      case SAVE:
-        state.setVersion((Long) data.getMessage());
-        break;
-      default:
-        break;
+  private CollaborationState getState(CollaborationData data) {
+    final Map<String, CollaborationState> map = getStates(data.getKey());
+    return map.computeIfAbsent(data.getUser().getCode(), key -> new CollaborationState());
+  }
+
+  private void updateState(CollaborationData data) {
+    @SuppressWarnings("unchecked")
+    final Map<String, Object> message = (Map<String, Object>) data.getMessage();
+    if (message == null) {
+      return;
+    }
+
+    final CollaborationState state = getState(data);
+
+    final Boolean editable = (Boolean) message.get("editable");
+    if (editable != null) {
+      state.setEditable(editable);
+    }
+
+    final Boolean dirty = (Boolean) message.get("dirty");
+    if (dirty != null) {
+      state.setDirty(dirty);
+    }
+
+    final Number version = (Number) message.get("version");
+    if (version != null) {
+      state.setVersion(version.longValue());
     }
   }
 
   public enum CollaborationCommand {
     LEFT,
     JOIN,
-    EDIT,
-    IDLE,
-    EDITABLE,
-    DIRTY,
-    SAVE,
+    STATE
   }
 
   @JsonInclude(Include.NON_NULL)
   public static class CollaborationState {
 
-    private Boolean editable;
+    private boolean editable;
 
-    private Boolean dirty;
+    private boolean dirty;
 
-    private Long version;
+    private long version;
 
-    private Map<String, Object> changes;
-
-    public Boolean isEditable() {
+    public boolean isEditable() {
       return editable;
     }
 
-    public void setEditable(Boolean editable) {
+    public void setEditable(boolean editable) {
       this.editable = editable;
     }
 
-    public Boolean isDirty() {
+    public boolean isDirty() {
       return dirty;
     }
 
-    public void setDirty(Boolean dirty) {
+    public void setDirty(boolean dirty) {
       this.dirty = dirty;
     }
 
-    public Long getVersion() {
+    public long getVersion() {
       return version;
     }
 
-    public void setVersion(Long version) {
+    public void setVersion(long version) {
       this.version = version;
-    }
-
-    public Map<String, Object> getPendingChanges() {
-      return changes;
-    }
-
-    public void setPendingChanges(Map<String, Object> pendingChanges) {
-      this.changes = pendingChanges;
     }
   }
 
@@ -258,8 +265,7 @@ public class CollaborationChannel extends Channel {
 
     private String model;
 
-    @JsonProperty("record")
-    private String rec;
+    private Long recordId;
 
     private CollaborationCommand command;
 
@@ -271,6 +277,8 @@ public class CollaborationChannel extends Channel {
     @JsonSerialize(using = UserListSerializer.class)
     private List<User> users;
 
+    private Map<String, CollaborationState> states;
+
     public String getModel() {
       return model;
     }
@@ -279,12 +287,12 @@ public class CollaborationChannel extends Channel {
       this.model = model;
     }
 
-    public String getRecord() {
-      return rec;
+    public Long getRecordId() {
+      return recordId;
     }
 
-    public void setRecord(String rec) {
-      this.rec = rec;
+    public void setRecordId(Long recordId) {
+      this.recordId = recordId;
     }
 
     public CollaborationCommand getCommand() {
@@ -297,7 +305,7 @@ public class CollaborationChannel extends Channel {
 
     @JsonIgnore
     public String getKey() {
-      return String.format("%s:%s", model, rec);
+      return String.format("%s:%d", model, recordId);
     }
 
     public Object getMessage() {
@@ -325,7 +333,11 @@ public class CollaborationChannel extends Channel {
     }
 
     public Map<String, CollaborationState> getStates() {
-      return STATES.computeIfAbsent(getKey(), key -> new ConcurrentHashMap<>());
+      return states;
+    }
+
+    public void setStates(Map<String, CollaborationState> states) {
+      this.states = states;
     }
   }
 
@@ -342,12 +354,7 @@ public class CollaborationChannel extends Channel {
       Map<String, Object> values = new HashMap<>();
 
       values.put("id", user.getId());
-      values.put("name", user.getName());
       values.put("code", user.getCode());
-
-      if (user.getEmail() != null) {
-        values.put("email", user.getEmail());
-      }
 
       Property nameField = mapper.getNameField();
       if (nameField != null) {
@@ -355,6 +362,8 @@ public class CollaborationChannel extends Channel {
         if (nameValue != null) {
           values.put(nameField.getName(), nameValue);
         }
+      } else {
+        values.put("name", user.getName());
       }
 
       return values;

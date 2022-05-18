@@ -1720,27 +1720,4 @@ ui.formWidget('uiWkfStatus', {
     "</div>"
 });
 
-ui.directive('uiViewCollaboration', ['CollaborationService', function (CollaborationService) {
-  return {
-    scope: true,
-    replace: true,
-    link: function (scope, element, attrs) {
-      CollaborationService.register(scope);
-    },
-    template: `
-    <ul class="nav menu-bar view-collaboration hidden-phone" ng-show="users.length &gt; 1">
-      <li class="dropdown menu button-menu">
-        <a class="dropdown-toggle btn view-collaboration-toggle" data-toggle="dropdown" title="{{ 'Watchers' | t}}">
-          <span class="view-collaboration-users">{{message}}</span>
-          <span class="view-collaboration-action" ng-show="subtitle">{{subtitle}}</span>
-        </a>
-        <ul class="dropdown-menu">
-          <li ng-repeat="user in users track by user.id"><a href="">{{user.name}}</a></li>
-        </ul>
-      </li>
-    </ul>
-    `
-  };
-}]);
-
 })();
