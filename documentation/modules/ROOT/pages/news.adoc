@@ -10,7 +10,7 @@ The main highlights are :
 
 * Upgrade to JDK-11
 * Upgrade to Apache Tomcat® 9.x
-* Upgrade to Gradle 7.4.1
+* Upgrade to Gradle 7.4.2
 * Upgrade to Groovy 3.0
 * Migrate to GraalVM JavaScript engine (drop nashorn engine)
 * Add WebSocket support for tag polling
