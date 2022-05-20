@@ -14,11 +14,3 @@ select btn:[Import project from external model] and select btn:[Gradle]. From ne
 * repeat `./gradlew generateCode` whenever you add/change any domain model definitions
 * repeat `./gradlew copyWebapp` if you run gradle clean task or delete build directory
 ====
-
-To run the application from IDEA, generate launcher config by running following command:
-
-  $ ./gradlew generateLauncher
-
-You can see `open-platform-demo (run)` launcher configuration that you can use to run/debug application from the IDE.
-
-IMPORTANT: make sure to build the project before launching the application
