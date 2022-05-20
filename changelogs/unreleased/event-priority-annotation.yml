@@ -1,3 +1,0 @@
----
-title: Remove `com.axelor.event.Priority` in favor of `javax.annotation.Priority`
-type: change

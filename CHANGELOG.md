@@ -1,3 +1,665 @@
+## 6.0.0 (2022-05-20)
+
+#### Changes
+
+* Re-implement action-ws using http client
+* Update join table columns names due to database reserved words conflicts
+
+  <details>
+  
+  Due to reserved words added in recent versions of supported databases, change columns name `groups` and `menus` 
+  to respectively `group_id` and `meta_menu_id` in the join tables name `meta_menu_groups` and `meta_view_groups`.
+  
+  Use these SQL statements to upgrade existing database :
+  ```sql
+  ALTER TABLE meta_menu_groups RENAME COLUMN groups TO group_id;
+  ALTER TABLE meta_menu_groups RENAME COLUMN menus TO meta_menu_id;
+  ALTER TABLE meta_view_groups RENAME COLUMN groups TO group_id;
+  ALTER TABLE meta_view_groups RENAME COLUMN views TO meta_view_id;
+  ```
+  
+  </details>
+
+* Upgrade from Guice 4.2.2 to 5.1.0
+* Remove `com.axelor.event.Priority` in favor of `javax.annotation.Priority`
+* Not allowed to customize the search engine grid
+* Upgrade to Hibernate Search 5.11.10.Final
+* Search engine improvements
+
+  <details>
+  
+  The search engine view has been improved. It allows to implement recursive filters for more flexibility on the search condition,
+  but also:
+  * Add support for `Enum` field type in search fields.
+  * Allow to define `limit` on each `select`. It gets preference over `limit` attribute of `search`.
+  * Add support for `enum` and `selection` (also autodetect `multi-select` values) for fields in result fields.
+  * Add support for returning only distinct records (based on `id`) on each `select`.
+  * Allow to add an `if` condition on `where`. It the value of the expression is false, the element is skipped.
+  * Add support for hiliting on row as well as on field.
+  * Add support for adding buttons in grid view.
+  
+  Breakings changes:
+  * The `orderBy` fields should refere to field names of the object graph (and no more the `as` attribute).
+  * When searching on a multi-valued field (O2M/M2M), it shouldn't need to be suffixed with [] anymore. For example,
+  `items[].product` should now be `items.product`.
+  
+  </details>
+
+* Improve groups and jobs `data-init`
+
+  <details>
+  
+  The default `admins` group is now marked as technicalStaff. The default
+  `mail.fetcher` job is no more active by default.
+  
+  </details>
+
+* Upgrade to StringTemplate 4.3.3
+* Format numbers, dates, and currencies preferably according to the user language
+
+  <details>
+  
+  Formatting of numbers, dates, and currencies used to be based on browser locale only.
+  Now, formatting is done preferably according to the user language.
+  If the user language has no country information, we select the first browser locale
+  that matches the user language.
+  
+  </details>
+
+* Upgrade to Guava 31.1-jre
+* Rename `application.properties` to `axelor-config.properties`
+
+  <details>
+  
+  The internal configuration file `application.properties` is renamed to `axelor-config.properties`
+  
+  </details>
+
+* Upgrade from JDK 8 to JDK 11
+
+  <details>
+  
+  https://docs.oracle.com/en/java/javase/11/migrate/index.html#JSMIG-GUID-7744EF96-5899-4FB2-B34E-86D49B2E89B6
+  
+  </details>
+
+* Upgrade to Spotless 6.5.1
+* Use jcache in combination with Caffeine as second-level cache provider
+
+  <details>
+  
+  Ehcache2 second-level cache is deprecated since Hibernate 5.3.
+  Use `jcache` in combination with Caffeine by default as second-level cache.
+  
+  </details>
+
+* Rework actions on chart menu
+
+  <details>
+  
+  Adding buttons on chart menu was working using the following syntax :
+  `<config name="onAction" value="some-action"/>`
+  
+  This syntax has been updated to the following :
+  ```
+  <actions>
+  <action name="myBtn1" title="My action 1" action="some-action1"/>
+  <action name="myBtn2" title="My action 2" action="some-action2"/>
+  </actions>
+  ```
+  
+  This allows to support more than 1 button on chart menu, but also
+  provide a flexible usage of the feature.
+  
+  </details>
+
+* Upgrade PostgreSQL Jdbc to 42.3.4
+
+  <details>
+  
+  This add support new `SCRAM-SHA-256` password encryption method which is  
+  now the default password encryption method is PostgreSQL 14.
+  
+  Jdbc also introduce a change about Timestamp rouding : 2018-06-03T23:59:59.999999999 is rounded to 
+  2018-06-04 00:00:00 (previously it was rounded to 2022-03-08 23:59:59.999). This new behavior follow psql’s suit.
+  Especially if you work with Datetime/Timestamp having `LocalTime.MAX` as time, make sure to adjust your query.
+  
+  </details>
+
+* Adopt a better configurations naming
+
+  <details>
+  
+  A lot of configurations names has been updated to have better 
+  and uniform naming across all settings. Refer to migration notes.
+  
+  </details>
+
+* Support indirect/direct basic auth client via setting `auth.local.basic-auth`
+
+  <details>
+  
+  Indirect basic auth allows to log in on callback, while direct basic auth requires credentials in each request.
+  
+  ```properties
+  # enable indirect and/or direct basic auth
+  auth.local.basic-auth = indirect, direct
+  ```
+  
+  `auth.local.basic.auth.enabled`, which was for direct basic auth only, is removed.
+  
+  </details>
+
+* Upgrade to Hibernate 5.6.8.Final
+
+  <details>
+  
+  Most notably, positional parameters for native queries are now one-based.
+  
+  </details>
+
+* Upgrade to intl-tel-input 17.0.16
+* Upgrade to Gradle 7.4.2
+* Fire PreRequest and PostRequest events outside of transactions
+
+  <details>
+  
+  `PreRequest`/`PostRequest` events are now fired outside of transactions.
+  This fixes accessing the created/update records in a multithreaded process from `PostRequest` observers.
+  However you can no longer rollback the request process in a `PostRequest` observer.
+  
+  </details>
+
+* Upgrade to Apache Tomcat® 9.x
+* Upgrade to pac4j 5.4.3
+* Reimplement code generator in Java
+
+  <details>
+  
+  Dropped old code generator written in Groovy in favor of a new code generator written in Java.
+  
+  </details>
+
+* Upgrade JUnit4 from 4.12 to 4.13.2
+* Upgrade from Groovy 2.4.10 to 3.0.10
+
+  <details>
+  
+  Beware of breaking changes.
+  See release note for more details :
+  - https://groovy-lang.org/releasenotes/groovy-2.5.html
+  - https://groovy-lang.org/releasenotes/groovy-2.6.html
+  - https://groovy-lang.org/releasenotes/groovy-3.0.html
+  
+  </details>
+
+* Merge `com.axelor.app` and `com.axelor.app-module` gradle plugins
+
+  <details>
+  
+  Now there is only a single `com.axelor.app` plugin. All modules
+  should use the app plugin only.
+  
+  Now all axelor modules are axelor apps.
+  
+  </details>
+
+* Upgrade to Hibernate Validator 6.2.3.Final
+* Default gantt view mode is now `month` instead of `week`
+
+  <details>
+  
+  This can be changed on `<gantt>` view definition using the 
+  `mode` attribute.
+  
+  </details>
+
+* Upgrade to Shiro 1.9.0
+* Replace nashorn script helper with GraalJS engine
+
+  <details>
+  
+  The nashorn script engine is deprecated in JDK-11 and has some
+  incompatible changes than JDK-8.
+  
+  The new implementation uses GraalJS which supports latest ECMAScript features.
+  
+  The collection helpers `listOf`, `setOf` and `mapOf` are removed as corresponding
+  native JavaScript objects are passed with appropriate Java equivalent wrapper to the
+  Java calls.
+  
+  </details>
+
+* Rename method `getCodeOrEmail` to `getUserIdentifier` in `AuthPac4jProfileService`
+
+  <details>
+  
+  Use a more generic method name, because users may override and use custom behavior.
+  
+  </details>
+
+* Rework authentication implementation to use reflection and providers
+
+  <details>
+  
+  Reflection is now used to configure authentication clients.
+  The new syntax is `auth.provider.<providerName>.<configurationName>`.
+  You may use any of the built-in providers: `google`, `facebook`, `github`, `azure`, `keycloak`,
+  `apple`, `oauth`, `oidc`, `saml`, `cas`.
+  Or you can configure any other clients supported by pac4j using your own custom provider name.
+  You may even create and use your own custom authentication clients.
+  
+  </details>
+
+* Upgrade to Quartz 2.3.2
+
+#### Features
+
+* Allow to customize notify/info/alert/error message modal/notification
+
+  <details>
+  
+  This allow to add more customization on modal/notification : 
+  - `notify` : allow to change the title of the notification
+  - `info` : allow to change the title of the popup and the title of the confirm button
+  - `alert` : allow to change the title of the popup and the title of the confirm and cancel button
+  - `error` : allow to change the title of the popup and the title of the confirm button
+  
+  Example usage:
+  
+  ```xml
+  <action-validate name="my-action">
+    <notify message="A notification" title="My notif"/>
+    <info message="This is an info" title="My info" confirm-btn-title="Got it"/>
+    <alert message="This is an alert" title="My alert" confirm-btn-title="Got it" cancel-btn-title="Abort"/>
+    <error message="This is an error" title="My error" confirm-btn-title="I understand" cancel-btn-title="Do something else"/>
+  </action-validate>
+  ```
+  
+  or with `ActionResponse`:
+  
+  ```java
+    response.setNotify("A notification", "My notif");
+    response.setInfo("This is an info", "My info", "Got it");
+    response.setAlert("This is an alert", "My alert", "Got it");
+    response.setError("This is an error", "My error", "I understand", "Do something else");
+  ```
+  
+  </details>
+
+* Parallelize generation of computed views
+* Use Gradle Node Plugin to run npm tasks
+
+  <details>
+  
+  No more need to install Node.js locally to build web resource bundles, aka `npm-build` task.
+  
+  If your project already depends on `gradle-node-plugin`, there will be conflicts between both. As the provided plugin 
+  is only applied on root project, the best fit is to delegate the process to a subproject. That way, the subproject 
+  can process and build your needs, and the root project can depends on that subproject and gets produced build.
+  
+  To use it, you need to Declare Node.js repository in `settings.gradle`, section `dependencyResolutionManagement` : 
+  ```gradle
+    // Declare the Node.js download repository
+    ivy {
+      name = "Node.js"
+      setUrl("https://nodejs.org/dist/")
+      patternLayout {
+        artifact("v[revision]/[artifact](-v[revision]-[classifier]).[ext]")
+      }
+      metadataSources {
+        artifact()
+      }
+      content {
+        includeModule("org.nodejs", "node")
+      }
+    }
+  ```
+  
+  See https://github.com/node-gradle/gradle-node-plugin/blob/3.1.1/docs/faq.md#is-this-plugin-compatible-with-centralized-repositories-declaration
+  
+  </details>
+
+* Implement WebSocket support
+* Add support to encrypt secrets in properties
+
+  <details>
+  
+  Secrets defined in `axelor-config.properties` can be encrypted. 
+  Value should be wrapped in `ENC()` to indicate that the value is
+  encrypted : `db.default.password = ENC(<some_thing>)`
+  
+  To use encrypted secrets, `config.encryptor.password` properties
+  should be added : this is the secret key used to encrypt/decrypt data.
+  
+  Others optional properties can be added to use custom encryption : 
+  `config.encryptor.algorithm`, `config.encryptor.key-obtention-iterations`, 
+  `config.encryptor.provider-name`, `config.encryptor.provider-class-name`, 
+  `config.encryptor.salt-generator-classname`, `config.encryptor.iv-generator-classname`, 
+  and `config.encryptor.string-output-type`.
+  The default algorithm is `PBEWITHHMACSHA512ANDAES_256`.
+  
+  For convenience, a Gradle task `encryptText` have been added to generate 
+  the encrypted value of a string :
+  `./gradlew :encryptText --text="A secret to encode" --password="MySecureKey"`
+  This will generate for you, the necessary properties and the 
+  encrypted value to used inside `ENC()`.
+  
+  </details>
+
+* Add application setting `auth.order` to set authentication provider order
+
+  <details>
+  
+  Because of multisource application settings, settings order is undefined.
+  Use `auth.order` if you require authentication providers to be displayed in a specific order
+  on login page.
+  
+  </details>
+
+* Add JpaRepository#findByIds(List<Long>) method to find multiple entities by their primary key
+* Add support to MySQL 8
+* Allow closing preference view manually with `canClose` or `close` action
+* Add validation support for csv import
+
+  <details>
+  
+  Two new attributes added to validate data being imported.
+  
+  - `check` - boolean expression
+  - `check-message` - the validation message
+  
+  If `check` fails, the `check-message` or default validation message
+  is shown and import will be terminated.
+  
+  </details>
+
+* Add Gantt view attribute `mode`
+
+  <details>
+  
+  Gantt view attribute `mode` allows to define the default view mode.
+  It can be set to `year`, `month`, `week`, or `day`.
+  
+  </details>
+
+* Add some predefinied css classes for dialogs and notify components
+* Sanitize HTML where it is needed with DOMPurify
+
+  <details>
+  
+  Instead of sanitizing all jQuery.html calls, use DOMPurify to sanitize HTML where it is needed only.
+  This should reduce scripting load in the web client.
+  
+  </details>
+
+* Perform accent-insensitive navigation search
+* Refactoring menu and tags processing
+
+  <details>
+  
+  This is a refactoring on how menus and tags are processing. The original way was complex and mixing tags 
+  and menus rules in a single method. There is no changes on how it works.
+  
+  Now, menus and tags processing are separate. Moreover, instead of parsing each menu one by one (but also recursively 
+  checking parent access), it builds a tree. The tree is a representation of the menus' hierarchy, where each menu have 
+  a parent and some child's. Then the tree is traversed, checking each node access. When a node is allowed, it 
+  continues traversing each child's. When a node is not allowed, it skips the node and all the child's.
+  
+  </details>
+
+* Support YAML configuration format, env variables and system properties
+
+  <details>
+  
+  Now support YAML format for internal configuration file :
+  `axelor-config.properties` can be in YAML format (`yml` or `yaml` ext).
+  It should only have a one internal configuration file (in properties
+  or YAML format).
+  
+  External configuration file can be provided by using system properties
+  (`axelor.config=<path_to_file>`) or using env variables
+  (`AXELOR_CONFIG=<path_to_file>`). Same as the internal configuration
+  file, it also supports YAML format.
+  
+  The internal configuration file is now optional. Final properties
+  are built using internal configuration file + external configuration
+  file + env variable + system properties. If variables are redefined,
+  they will take preferences over the previous values.
+  
+  Configuration values can also be provided with system properties
+  using `axelor.config.<key>=value` format. For example
+  `db.default.user` becomes `axelor.config.db.default.user`.
+  
+  Configuration values can also be provided with environment variables
+  using `AXELOR_CONFIG_<key>=value` format, where `<key>` is underscored
+  uppercase equivalent of the configuration key. For example
+  `db.default.user` becomes `AXELOR_CONFIG_DB_DEFAULT_USER`.
+  
+  </details>
+
+* Add `QuickMenu` to allow running actions from default page
+
+  <details>
+  
+  Example usage:
+  
+  ```java
+  public class MyQuickMenu implements QuickMenuCreator {
+  
+    @Override
+    public QuickMenu create() {
+      final QuickMenu menu = new QuickMenu();
+      menu.setTitle("My menu");
+      menu.setOrder(0);
+      menu.setShowingSelected(false);
+      menu.setItems(
+          List.of(
+              new QuickMenu.Item("All projects", "project.all"),
+              new QuickMenu.Item("All tasks", "project.task.all")));
+      return menu;
+    }
+  }
+  ```
+  
+  and register the QuickMenu in module configuration : 
+  
+  ```java
+  public class MyModule extends AxelorModule {
+  
+    @Override
+    protected void configure() {
+      addQuickMenu(MyQuickMenu.class);
+    }
+  }
+  ```
+  
+  </details>
+
+* Improve index generation
+
+  <details>
+  
+  We can now specify order on column names with `ASC` or `DESC`.
+  Some examples:
+  ```xml
+    <index columns="code,name"/>
+    <index columns="code ASC,name DESC"/>
+    <index columns="code,name DESC"/>
+  ```
+  
+  We can also specify whether the index is unique. 
+  ```xml
+    <index columns="code,name" unique="true"/>
+  ```
+  This will replace and makes `<unique-constraint ... />` obsolete in future.
+  
+  </details>
+
+* Allow to enable/disable cache from `axelor-config.properties`
+
+  <details>
+  
+  `javax.persistence.sharedCache.mode` property in `axelor-config.properties` can be used
+  to overwrite the `shared-cache-mode` from `persistence.xml`. It allow to enable/disable
+  the shared cache mode (ie second-level cache).
+  
+  </details>
+
+* Add support to manage multiple matching notify in `action-validate`
+
+#### Fixed
+
+* Fix undefined when calling search engine with route params
+* Fix secure cookie on login attempt or change tenant request
+* Prevent concurrent meta restoring
+* Fix usage of multiple matching `info` in `action-validate`
+
+  <details>
+  
+  In `action-validate`, if there is multiple `info` matching,
+  only the first will be displayed on UI.
+  
+  </details>
+
+* Fix radio style for grid selector
+* Fix MySQL exception reporting
+* Use whole value comparisons in datetime searches instead of using `between` operator
+
+  <details>
+  
+  PostgreSQL JDBC driver 42.2.3+ introduce a change on how Timestamp are rounded : 
+  https://github.com/pgjdbc/pgjdbc/issues/1211
+  
+  For example, `2018-06-03T23:59:59.999999999` is rounded to `2018-06-04 00:00:00`
+  Previously `2018-06-03T23:59:59.999999999` was rounded to `2022-03-08 23:59:59.999`
+  
+  If nanoseconds is greater than 999999500 , value is now rounded. This is how PostgreSQL works :
+  ```
+  $ insert into some_table(date) VALUES('2018-06-03 23:59:59.999999999');
+           date            
+  ----------------------------
+  2018-06-04 00:00:00
+  ```
+  
+  The `between` operator used when searching on date/dateTime in UI have been updated to use 
+  `>=` and `<` operators instead.
+  
+  </details>
+
+* Fix JAXP usage
+
+  <details>
+  
+  Thread safe usage of JAXP API. Use `XMLUtils` to protect XML Parsers from XXE attacks 
+  but also disable external entity processing.
+  
+  </details>
+
+#### Removed
+
+* Remove deprecated usage of `hashKey` and `hashAll` attributes
+
+  <details>
+  
+  Use `equalsInclude` and `equalsIncludeAll` instead.
+  
+  </details>
+
+* Remove deprecated `Query#fetchSteam` methods
+
+  <details>
+  
+  Use `Query#fetchStream` instead.
+  
+  </details>
+
+* Remove domain model lang attribute
+
+  <details>
+  
+  Domain models are generated in Java only.
+  
+  </details>
+
+* Remove dependency to OpenCSV
+* Remove deprecated `ActionHandler(ActionRequest)` method
+
+  <details>
+  
+  Use `ActionExecutor#newActionHandler(ActionRequest)` instead
+  
+  </details>
+
+* Remove deprecated `Context#getParentContext` method
+
+  <details>
+  
+  Use `Context#getParent` instead.
+  
+  </details>
+
+* Remove deprecated `cachable` domain attribute
+
+  <details>
+  
+  Use `cacheable` attribute instead.
+  
+  </details>
+
+* Remove ModuleChanged event
+
+  <details>
+  
+  Since dropping support of removable modules, this event is no more used.
+  
+  </details>
+
+* Remove deprecated `LoginRedirectException`
+
+  <details>
+  
+  Use `WebUtils.issueRedirect` instead.
+  
+  </details>
+
+* Remove IDE app launcher support
+* Remove `setFlash` in `ActionResponse` to be aligned with `action-validate#info`
+
+  <details>
+  
+  Use `setInfo` instead.
+  
+  </details>
+
+* Remove legacy form widgets `<notebook>`, `<break>`, `<group>`, `<portlet>`, and `<include>`
+
+  <details>
+  
+  Form widgets `<notebook>`, `<break>`, `<group>`, `<portlet>`, and `<include>` are deprecated.
+  `cols` and `colWidths` form attributes used for legacy form layout are also deprecated.
+  Those have be removed. Use panel layout instead.
+  
+  </details>
+
+* Drop removable module support
+
+  <details>
+  
+  The feature is not used by any axelor apps and has many
+  technical issues.
+  
+  Run following SQL script to drop unnecessary columns
+  
+  ```
+  alter table meta_module drop column installed;
+  alter table meta_module drop column removable;
+  alter table meta_module drop column pending;
+  ```
+  
+  </details>
+
+
 ## 5.4.13 (2022-03-11)
 
 #### Features

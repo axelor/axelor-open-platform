@@ -1,7 +1,0 @@
----
-title: Fire PreRequest and PostRequest events outside of transactions
-type: change
-description: |
-  `PreRequest`/`PostRequest` events are now fired outside of transactions.
-  This fixes accessing the created/update records in a multithreaded process from `PostRequest` observers.
-  However you can no longer rollback the request process in a `PostRequest` observer.

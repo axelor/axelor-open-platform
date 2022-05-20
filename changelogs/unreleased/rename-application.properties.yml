@@ -1,5 +1,0 @@
----
-title: Rename `application.properties` to `axelor-config.properties`
-type: change
-description: |
-  The internal configuration file `application.properties` is renamed to `axelor-config.properties`

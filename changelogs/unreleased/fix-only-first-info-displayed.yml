@@ -1,6 +1,0 @@
----
-title: Fix usage of multiple matching `info` in `action-validate`
-type: fix
-description: |
-  In `action-validate`, if there is multiple `info` matching,
-  only the first will be displayed on UI.

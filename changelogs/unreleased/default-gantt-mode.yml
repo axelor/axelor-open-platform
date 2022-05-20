@@ -1,6 +1,0 @@
----
-title: Default gantt view mode is now `month` instead of `week`
-type: change
-description: |
-  This can be changed on `<gantt>` view definition using the 
-  `mode` attribute.

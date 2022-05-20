@@ -1,7 +1,0 @@
----
-title: Remove legacy form widgets `<notebook>`, `<break>`, `<group>`, `<portlet>`, and `<include>`
-type: remove
-description: |
-  Form widgets `<notebook>`, `<break>`, `<group>`, `<portlet>`, and `<include>` are deprecated.
-  `cols` and `colWidths` form attributes used for legacy form layout are also deprecated.
-  Those have be removed. Use panel layout instead.

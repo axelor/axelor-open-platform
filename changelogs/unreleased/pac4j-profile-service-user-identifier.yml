@@ -1,5 +1,0 @@
----
-title: Rename method `getCodeOrEmail` to `getUserIdentifier` in `AuthPac4jProfileService`
-type: change
-description: |
-  Use a more generic method name, because users may override and use custom behavior.

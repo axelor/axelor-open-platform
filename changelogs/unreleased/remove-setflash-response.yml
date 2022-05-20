@@ -1,5 +1,0 @@
----
-title: Remove `setFlash` in `ActionResponse` to be aligned with `action-validate#info`
-type: remove
-description: |
-  Use `setInfo` instead.

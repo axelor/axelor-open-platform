@@ -1,5 +1,0 @@
----
-title: Remove deprecated `cachable` domain attribute
-type: remove
-description: |
-  Use `cacheable` attribute instead.

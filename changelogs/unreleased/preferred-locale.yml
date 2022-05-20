@@ -1,8 +1,0 @@
----
-title: Format numbers, dates, and currencies preferably according to the user language
-type: change
-description: |
-  Formatting of numbers, dates, and currencies used to be based on browser locale only.
-  Now, formatting is done preferably according to the user language.
-  If the user language has no country information, we select the first browser locale
-  that matches the user language.

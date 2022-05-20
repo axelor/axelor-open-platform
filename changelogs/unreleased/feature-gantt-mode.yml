@@ -1,6 +1,0 @@
----
-title: Add Gantt view attribute `mode`
-type: feature
-description: |
-  Gantt view attribute `mode` allows to define the default view mode.
-  It can be set to `year`, `month`, `week`, or `day`.

@@ -1,5 +1,0 @@
----
-title: Reimplement code generator in Java
-type: change
-description: |
-  Dropped old code generator written in Groovy in favor of a new code generator written in Java.

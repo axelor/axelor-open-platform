@@ -1,5 +1,0 @@
----
-title: Remove domain model lang attribute
-type: remove
-description: |
-  Domain models are generated in Java only.

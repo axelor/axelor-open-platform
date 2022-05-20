@@ -1,5 +1,0 @@
----
-title: Remove deprecated `Context#getParentContext` method
-type: remove
-description: |
-  Use `Context#getParent` instead.

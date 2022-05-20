@@ -1,7 +1,0 @@
----
-title: Add application setting `auth.order` to set authentication provider order
-type: feature
-description: |
-  Because of multisource application settings, settings order is undefined.
-  Use `auth.order` if you require authentication providers to be displayed in a specific order
-  on login page.
