@@ -173,6 +173,7 @@ Here is a list of all changes :
 | `axelor.report.dir` | `reports.design-dir`
 | `reports.fonts.config` | `reports.fonts-config`
 | `template.search.dir` | `template.search-dir`
+| `file.upload.dir` | `data.upload.dir`
 | `file.upload.size` | `data.upload.max-size`
 | `file.upload.filename.pattern` | `data.upload.filename-pattern`
 | `file.upload.whitelist.pattern` | `data.upload.allowlist.pattern`
