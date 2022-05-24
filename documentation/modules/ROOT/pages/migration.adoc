@@ -10,6 +10,7 @@
 :url-graalvm-js: https://www.graalvm.org/reference-manual/js/NashornMigrationGuide/
 :url-junit-upgrade: https://www.baeldung.com/junit-5-migration
 :url-pac4j-clients: http://www.pac4j.org/4.5.x/docs/clients.html
+:url-application-configuration: xref:dev-guide:application/config.adoc#application-configuration
 
 In this document, we will see the major steps required to migrate from 5.x to 6.0.
 
@@ -35,8 +36,7 @@ allprojects {
 
 Also make sure to use JDK 11 in the IDE as well as in your terminal (if needed).
 
-In JAVA 8, JAXB was part of standard JDK. It has been removed in JDK 11. To use JAXB API in Java 11, you need to use
-separate library : `javax.xml.bind:jaxb-api`, `com.sun.xml.bind:jaxb-core`, `com.sun.xml.bind:jaxb-impl` and `javax.activation:activation`
+In JAVA 8, JAXB was part of standard JDK. It has been removed in JDK 11. To use JAXB API in Java 11, you need to use separate libraries: `javax.xml.bind:jaxb-api`, `com.sun.xml.bind:jaxb-core`, `com.sun.xml.bind:jaxb-impl` and `javax.activation:activation`
 
 See the {url-jdk-upgrade}[JDK 11 migration guide] for details.
 
@@ -53,7 +53,7 @@ Please check the {url-pg-upgrade}[PostgreSQL 12 upgrade guide] for details.
 == Gradle 5 to Gradle 7
 
 ----
-./gradlew wrapper --gradle-version 7.2
+./gradlew wrapper --gradle-version 7.4.2
 ----
 
 === Dependencies
@@ -81,9 +81,9 @@ There is now a single `com.axelor.app` plugin, ie. all Axelor modules are Axelor
 
 See the Gradle upgrade guides for details:
 
-* https://docs.gradle.org/7.3/userguide/upgrading_version_5.html
-* https://docs.gradle.org/7.3/userguide/upgrading_version_6.html
-* https://docs.gradle.org/7.3/userguide/upgrading_version_7.html
+* https://docs.gradle.org/7.4/userguide/upgrading_version_5.html
+* https://docs.gradle.org/7.4/userguide/upgrading_version_6.html
+* https://docs.gradle.org/7.4/userguide/upgrading_version_7.html
 
 == Groovy 2 to Groovy 3
 
@@ -118,6 +118,7 @@ Some notable new reserved keywords:
 * `signal`
 * `size`
 * `uid`
+* `lead`
 
 == Dropped removable modules
 
@@ -146,6 +147,16 @@ Notable Changes:
 * `hashKey`/`hashAll` (`hashCode`) → `equalsInclude`/`equalsIncludeAll` (`equals`)
 * `cachable` → `cacheable`
 * Form widgets `<notebook>`, `<break>`, `<group>`, `<portlet>`, and `<include>` but also `cols` and `colWidths` form attributes used for legacy form layout -> Use panel layout instead
+
+=== Other removed/renamed features
+
+* `ActionResponse.setFlash()` → `ActionResponse.setInfo()`
+
+== Application configuration
+
+Internal configuration file `application.properties` has been renamed to `axelor-config.properties`. YAML format is also supported.
+
+See {url-application-configuration}[Application configuration] for details.
 
 == Configurations naming
 
@@ -227,7 +238,7 @@ auth.provider.myprovider.secret = qySuozNl72zzM5SKW-0kczwV
 
 == Charts
 
-Adding buttons on chart menu was working using the following syntax :
+Adding buttons on chart menu was working using the following syntax:
 
 [source,xml]
 ----
@@ -238,7 +249,7 @@ Adding buttons on chart menu was working using the following syntax :
 </chart>
 ----
 
-This syntax has been updated to the following :
+This syntax has been updated to the following:
 [source,xml]
 ----
 <chart ...>
