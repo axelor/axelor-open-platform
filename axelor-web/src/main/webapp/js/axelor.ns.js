@@ -109,9 +109,24 @@
         return;
       }
       var args = arguments.length === 1 ? arguments[0] : Array.prototype.slice.call(arguments);
-      return Array.isArray(args) ? args.map(function (item) {
-        return Array.isArray(item) ? sanitize(item) : DOMPurify.sanitize(item);
-      }) : DOMPurify.sanitize(args);
+
+      if (Array.isArray(args)) {
+        return args.map(function (item) {
+          if (Array.isArray(item)) {
+            return sanitize(item);
+          }
+          if (item instanceof jQuery) {
+            return $(DOMPurify.sanitize(item[0]));
+          }
+          return DOMPurify.sanitize(item);
+        });
+      }
+
+      if (args instanceof jQuery) {
+        return $(DOMPurify.sanitize(args[0]));
+      }
+
+      return DOMPurify.sanitize(args);
     }
 
     axelor.sanitize = sanitize;
