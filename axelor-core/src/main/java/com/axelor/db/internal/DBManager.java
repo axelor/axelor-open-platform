@@ -18,18 +18,29 @@
  */
 package com.axelor.db.internal;
 
+import com.axelor.app.AppModule;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppLogger;
+import com.axelor.auth.AuthModule;
+import com.axelor.db.JpaModule;
 import com.axelor.db.converters.EncryptedFieldService;
 import com.axelor.inject.Beans;
 import com.axelor.meta.loader.ModuleManager;
+import com.axelor.rpc.ObjectMapperProvider;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DBManager {
+
+  private static final String PERSISTENCE_UNIT = "persistenceUnit";
 
   private static Logger log = LoggerFactory.getLogger(DBManager.class);
 
@@ -108,12 +119,36 @@ public class DBManager {
     }
   }
 
+  private static void withInjector(Consumer<Injector> task) {
+    final Injector injector = Guice.createInjector(new MyModule(PERSISTENCE_UNIT));
+    task.accept(injector);
+  }
+
   public static void main(String[] args) {
     AppLogger.install();
     try {
-      process(args);
+      withInjector(injector -> process(args));
     } finally {
       AppLogger.uninstall();
+    }
+  }
+
+  static class MyModule extends AbstractModule {
+
+    private String jpaUnit;
+
+    public MyModule(String jpaUnit) {
+      this.jpaUnit = jpaUnit;
+    }
+
+    @Override
+    protected void configure() {
+
+      bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
+
+      install(new JpaModule(jpaUnit));
+      install(new AuthModule());
+      install(new AppModule());
     }
   }
 }
