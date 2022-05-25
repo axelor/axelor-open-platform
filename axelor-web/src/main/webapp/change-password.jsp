@@ -145,10 +145,6 @@ String callbackUrl = authPac4jInfo.getCallbackUrl();
       confirmPasswordElem.setCustomValidity(newPasswordElem.value !== confirmPasswordElem.value
           ? "<%= confirmPasswordMismatch %>" : "");
     }
-
-    $("#confirmPasswordId").bind("copy paste", function(e) {
-      e.preventDefault();
-    });
     </script>
   </body>
 </html>
