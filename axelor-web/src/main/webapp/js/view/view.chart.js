@@ -124,6 +124,7 @@ function ChartCtrl($scope, $element, $http, ActionService) {
     if (actionHandler) {
       actionHandler._getContext = function () {
         return _.extend({}, prepareContext(), { _data: data }, {
+          _model: $scope._model || 'com.axelor.meta.db.MetaView',
           _chart: view.name
         });
       };
@@ -135,6 +136,7 @@ function ChartCtrl($scope, $element, $http, ActionService) {
     if (clickHandler) {
       clickHandler._getContext = function () {
         return _.extend({}, prepareContext(), e.data.raw, {
+          _model: $scope._model || 'com.axelor.meta.db.MetaView',
           _chart: view.name
         });
       };
