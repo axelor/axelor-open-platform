@@ -133,6 +133,7 @@ function ChartCtrl($scope, $element, $http, ActionService) {
     if (handler) {
       handler._getContext = function () {
         return _.extend({}, prepareContext(), { _data: data }, {
+          _model: $scope._model || "com.axelor.script.ScriptBindings",
           _chart: view.name,
           _signal: action.name
         });
@@ -145,6 +146,7 @@ function ChartCtrl($scope, $element, $http, ActionService) {
     if (clickHandler) {
       clickHandler._getContext = function () {
         return _.extend({}, prepareContext(), e.data.raw, {
+          _model: $scope._model || "com.axelor.script.ScriptBindings",
           _chart: view.name,
           _signal: 'onClick'
         });

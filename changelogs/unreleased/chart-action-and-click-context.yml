@@ -1,0 +1,5 @@
+---
+title: Fix chart onAction and onClick having no context
+type: fix
+description: |
+  onAction and onClick should have context just like onInit.
