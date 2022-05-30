@@ -10,8 +10,7 @@ versions.hibernate_search = "5.11.10.Final"
 
 versions.groovy = "3.0.10"
 versions.resteasy = "4.7.6.Final"
-versions.jackson = "2.13.2"
-versions.jackson_databind = "2.13.2.2"
+versions.jackson = "2.13.3"
 versions.shiro = "1.9.0"
 versions.buji_pac4j = "7.0.0"
 versions.pac4j = "5.4.3"
@@ -161,7 +160,7 @@ libs.resteasy_server = [
 // jackson
 libs.jackson_libs = [
   "com.fasterxml.jackson.core:jackson-core:${versions.jackson}",
-  "com.fasterxml.jackson.core:jackson-databind:${versions.jackson_databind}",
+  "com.fasterxml.jackson.core:jackson-databind:${versions.jackson}",
   "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}",
   "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:${versions.jackson}",
   "com.fasterxml.jackson.datatype:jackson-datatype-guava:${versions.jackson}",
