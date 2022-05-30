@@ -225,7 +225,6 @@
 
 .ui-dialog-small .ui-dialog-content {
   height: auto !important;
-  overflow: inherit;
 }
 
 .ui-dialog-small .ui-dialog-buttonpane {
