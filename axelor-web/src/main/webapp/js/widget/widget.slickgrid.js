@@ -1963,7 +1963,8 @@ Grid.prototype.canAdd = function () {
   var handler = this.handler || {};
   if (!this.editable) return false;
   if (handler.isReadonly && handler.isReadonly()) return false;
-  return handler.canNew && handler.canNew();
+  return handler.canNew && handler.canNew()
+      && handler.hasPermission && handler.hasPermission('create');
 };
 
 Grid.prototype.setEditors = function(form, formScope, forEdit) {
