@@ -89,7 +89,7 @@ libs.websocket_api = "javax.websocket:javax.websocket-api:1.1"
 
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.6.1"
-libs.jdbc_postgres = "org.postgresql:postgresql:42.3.4"
+libs.jdbc_postgres = "org.postgresql:postgresql:42.3.6"
 libs.jdbc_mysql = "mysql:mysql-connector-java:8.0.29"
 
 // Hibernate
