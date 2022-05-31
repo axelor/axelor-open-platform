@@ -1,0 +1,5 @@
+---
+title: Fix grouping by extra custom field in grid view
+type: fix
+description: |
+  Fix grouping by custom field defined on JSON field other than default `attrs`.
