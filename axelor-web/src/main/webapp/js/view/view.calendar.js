@@ -132,11 +132,16 @@ function CalendarViewCtrl($scope, $element) {
       }
     }
 
+    var context = this._context;
+    if ($scope.getContext) {
+      context = _.extend({}, this._context, $scope.getContext())
+    }
+
     var opts = {
       fields: fields,
       filter: criteria,
       domain: this._domain,
-      context: this._context,
+      context: context,
       store: false,
       limit: -1
     };
