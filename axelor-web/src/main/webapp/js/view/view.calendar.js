@@ -789,6 +789,12 @@ angular.module('axelor.ui').directive('uiPortletCalendar', function () {
         element.parent().height(height);
       });
       scope.showPager = true;
+      scope.$on("on:edit", function () {
+        scope.refresh();
+      });
+      scope.onRefresh = function () {
+        scope.refresh();
+      }
     },
     template:
       "<div class='portlet-calendar' ui-portlet-refresh>" +
