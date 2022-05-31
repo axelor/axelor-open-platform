@@ -4,14 +4,13 @@ def versions = ext.libsVersions = [:]
 // versions
 versions.guice = "5.1.0"
 versions.guava = "31.1-jre"
-versions.hibernate = "5.6.8.Final"
+versions.hibernate = "5.6.9.Final"
 versions.hibernate_validator = "6.2.3.Final"
 versions.hibernate_search = "5.11.10.Final"
 
 versions.groovy = "3.0.10"
 versions.resteasy = "4.7.6.Final"
-versions.jackson = "2.13.2"
-versions.jackson_databind = "2.13.2.2"
+versions.jackson = "2.13.3"
 versions.shiro = "1.9.0"
 versions.buji_pac4j = "7.0.0"
 versions.pac4j = "5.4.3"
@@ -22,7 +21,7 @@ versions.junit5 = "5.8.2"
 
 versions.slf4j = "1.7.36"
 
-versions.tomcat = "9.0.62"
+versions.tomcat = "9.0.63"
 versions.tomcat_embed = "${versions.tomcat}"
 
 versions.asm = "9.3"
@@ -71,7 +70,7 @@ libs.asm = [
 ]
 
 // Byte Buddy
-libs.byte_buddy = "net.bytebuddy:byte-buddy:1.12.9"
+libs.byte_buddy = "net.bytebuddy:byte-buddy:1.12.10"
 
 // Graal JS
 libs.graal_js = "org.graalvm.js:js:22.0.0.2"
@@ -83,13 +82,13 @@ libs.javax_servlet_jsp = "javax.servlet.jsp:javax.servlet.jsp-api:2.3.3"
 libs.javax_validation = "javax.validation:validation-api:2.0.1.Final"
 libs.javax_el = ["org.apache.tomcat:tomcat-jasper:${versions.tomcat}", "org.apache.tomcat:tomcat-el-api:${versions.tomcat}"]
 libs.javax_mail = "com.sun.mail:javax.mail:1.6.2"
-libs.greenmail = "com.icegreen:greenmail-junit5:1.6.8"
+libs.greenmail = "com.icegreen:greenmail-junit5:1.6.9"
 libs.javax_el = "org.glassfish:jakarta.el:3.0.4"
 libs.websocket_api = "javax.websocket:javax.websocket-api:1.1"
 
 // jdbc
 libs.jdbc_hsqldb = "org.hsqldb:hsqldb:2.6.1"
-libs.jdbc_postgres = "org.postgresql:postgresql:42.3.4"
+libs.jdbc_postgres = "org.postgresql:postgresql:42.3.6"
 libs.jdbc_mysql = "mysql:mysql-connector-java:8.0.29"
 
 // Hibernate
@@ -102,13 +101,13 @@ libs.hibernate = [
 
 // Caching libs
 libs.ehcache = "org.ehcache:ehcache:3.10.0"
-libs.redisson = "org.redisson:redisson-hibernate-53:3.17.1"
+libs.redisson = "org.redisson:redisson-hibernate-53:3.17.3"
 libs.hazelcast = "com.hazelcast:hazelcast:5.1.1"
 libs.caffeine = "com.github.ben-manes.caffeine:jcache:3.1.0"
 libs.infinispan = [
-    "org.infinispan:infinispan-hibernate-cache-v53:13.0.9.Final",
-    "org.infinispan:infinispan-core:13.0.9.Final",
-    "org.infinispan:infinispan-jcache:13.0.9.Final"
+    "org.infinispan:infinispan-hibernate-cache-v53:13.0.10.Final",
+    "org.infinispan:infinispan-core:13.0.10.Final",
+    "org.infinispan:infinispan-jcache:13.0.10.Final"
 ]
 
 // Hibernate search
@@ -118,7 +117,7 @@ libs.hibernate_search = "org.hibernate:hibernate-search-orm:${versions.hibernate
 libs.apache_tika_core = "org.apache.tika:tika-core:2.3.0"
 
 // flyway
-libs.flywaydb = "org.flywaydb:flyway-core:8.5.10"
+libs.flywaydb = "org.flywaydb:flyway-core:8.5.11"
 
 // eclipselink
 libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.7.10"
@@ -161,7 +160,7 @@ libs.resteasy_server = [
 // jackson
 libs.jackson_libs = [
   "com.fasterxml.jackson.core:jackson-core:${versions.jackson}",
-  "com.fasterxml.jackson.core:jackson-databind:${versions.jackson_databind}",
+  "com.fasterxml.jackson.core:jackson-databind:${versions.jackson}",
   "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}",
   "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:${versions.jackson}",
   "com.fasterxml.jackson.datatype:jackson-datatype-guava:${versions.jackson}",
@@ -200,7 +199,7 @@ libs.pac4j = [
 libs.buji_pac4j = "io.buji:buji-pac4j:${versions.buji_pac4j}"
 
 // UnboundID LDAP SDK (for testing only)
-libs.unboundid_ldapsdk = 'com.unboundid:unboundid-ldapsdk:6.0.4'
+libs.unboundid_ldapsdk = 'com.unboundid:unboundid-ldapsdk:6.0.5'
 
 // commons
 libs.commons_cli = "commons-cli:commons-cli:1.5.0"
