@@ -101,6 +101,7 @@ public class AppInfo {
     map.put("application.version", SETTINGS.get(AvailableAppSettings.APPLICATION_VERSION));
     map.put("application.author", SETTINGS.get(AvailableAppSettings.APPLICATION_AUTHOR));
     map.put("application.copyright", SETTINGS.get(AvailableAppSettings.APPLICATION_COPYRIGHT));
+    map.put("application.logo", getLogo());
     map.put("application.home", SETTINGS.get(AvailableAppSettings.APPLICATION_HOME));
     map.put("application.help", SETTINGS.get(AvailableAppSettings.APPLICATION_HELP));
     map.put("application.mode", SETTINGS.get(AvailableAppSettings.APPLICATION_MODE, "dev"));
