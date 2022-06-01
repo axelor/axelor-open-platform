@@ -49,12 +49,14 @@ final class ModuleResolver {
       String title = props.getProperty("title");
       String description = props.getProperty("description");
       String version = props.getProperty("version");
+      boolean application = "true".equals(props.getProperty("application"));
 
       Module module = add(name, depends);
 
       module.setTitle(title);
       module.setDescription(description);
       module.setVersion(version);
+      module.setApplication(application);
     }
 
     for (String name : modules.keySet()) {

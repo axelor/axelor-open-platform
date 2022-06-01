@@ -143,6 +143,10 @@ public class GenerateCode extends DefaultTask {
         .append(Joiner.on("\\n").join(descriptionLines))
         .append("\n");
 
+    if (project == project.getRootProject()) {
+      text.append("\n").append("application = true").append("\n");
+    }
+
     if (!depends.isEmpty()) {
       text.append("\n").append("depends = ").append(Joiner.on(", ").join(depends)).append("\n");
     }

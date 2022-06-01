@@ -276,6 +276,7 @@ public class ModuleManager {
         stored.setTitle(title);
         stored.setDescription(description);
         stored.setModuleVersion(version);
+        stored.setApplication(module.isApplication());
         stored = modules.save(stored);
         module.setPending(true);
       }
