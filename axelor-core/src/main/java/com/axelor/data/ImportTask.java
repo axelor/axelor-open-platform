@@ -20,6 +20,7 @@ package com.axelor.data;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,12 +28,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
+import java.util.Collection;
 
 /** Import task configures input sources and provides error handler. */
-public abstract class ImportTask {
+public abstract class ImportTask implements Closeable {
 
-  public Multimap<String, Reader> readers = ArrayListMultimap.create();
+  private final Multimap<String, Reader> readers = ArrayListMultimap.create();
 
   /**
    * Configure the input sources using the various {@code input} methods.
@@ -45,6 +48,12 @@ public abstract class ImportTask {
    * @see #input(String, Reader)
    */
   public abstract void configure() throws IOException;
+
+  public void init() throws IOException {
+    if (readers.isEmpty()) {
+      configure();
+    }
+  }
 
   /**
    * Provide import error handler.
@@ -128,5 +137,36 @@ public abstract class ImportTask {
    */
   public void input(String inputName, Reader reader) {
     readers.put(inputName, reader);
+  }
+
+  public Collection<Reader> getReader(String filename) {
+    return readers.get(filename);
+  }
+
+  @Override
+  public void close() {
+    int errorCount = 0;
+    IOException firstError = null;
+
+    try {
+      for (final Reader reader : readers.values()) {
+        // Try to close everything even if there are errors
+        try {
+          reader.close();
+        } catch (IOException e) {
+          ++errorCount;
+          if (firstError == null) {
+            firstError = e;
+          }
+        }
+      }
+    } finally {
+      readers.clear();
+    }
+
+    if (firstError != null) {
+      throw new UncheckedIOException(
+          String.format("%d errors upon closing import task", errorCount), firstError);
+    }
   }
 }

@@ -152,11 +152,9 @@ public class CSVImporter implements Importer {
    */
   public void run(ImportTask task) {
     try {
-      if (task.readers.isEmpty()) {
-        task.configure();
-      }
+      task.init();
       for (CSVInput input : config.getInputs()) {
-        for (Reader reader : task.readers.get(input.getFileName())) {
+        for (Reader reader : task.getReader(input.getFileName())) {
           try {
             this.process(input, reader);
           } catch (IOException e) {
@@ -184,7 +182,7 @@ public class CSVImporter implements Importer {
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
     } finally {
-      task.readers.clear();
+      task.close();
     }
   }
 
