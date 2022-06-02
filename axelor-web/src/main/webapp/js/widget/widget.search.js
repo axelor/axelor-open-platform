@@ -1350,10 +1350,11 @@ ui.directive('uiFilterBox', function() {
         });
 
         var custom = data.criteria || {};
+        var criteria = _.map(custom.criteria, function (c) { return _.omit(c, '$new'); } );
 
         custom = _.extend({
           operator: custom.operator,
-          criteria: custom.criteria
+          criteria: criteria
         });
 
         var value = {
