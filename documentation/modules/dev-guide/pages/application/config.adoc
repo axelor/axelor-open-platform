@@ -444,7 +444,29 @@ header logo per user. For example:
 context.appLogo = com.axelor.custom.LogoService:getLogo
 ----
 
-The `getLogo()` method then can return link to user specific application logo.
+The `getLogo` method should return either:
+
+* a string, link to logo image (`img/my-logo.png`)
+* an instance of `MetaFile` pointing to the logo file
+
+Here is an example in case it returns a `MetaFile`:
+
+[source,java]
+----
+public class LogoService {
+
+  public MetaFile getLogo() {
+    final User user = AuthUtils.getUser();
+    if(user == null || user.getActiveCompany() == null) {
+        return null;
+    }
+    return user.getActiveCompany().getLogo();
+  }
+}
+----
+
+If return value is null, it will show default logo specified
+with `application.logo` in configuration file.
 
 == Custom Style
 
