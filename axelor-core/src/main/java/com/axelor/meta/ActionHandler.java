@@ -96,7 +96,7 @@ public class ActionHandler {
       Pattern.compile("^\\s*(select\\[\\]|select|action|call|eval):\\s*(.*)");
 
   private static final Set<Class<? extends Model>> ALWAYS_PERMITTED_MODELS =
-      ImmutableSet.of(MetaAction.class, MetaFilter.class, MailMessage.class);
+      ImmutableSet.of(MetaAction.class, MetaFilter.class);
 
   ActionHandler(
       ActionRequest request,

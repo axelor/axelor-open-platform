@@ -21,6 +21,7 @@ package com.axelor.meta.schema.actions;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
 import com.axelor.i18n.I18n;
+import com.axelor.mail.db.MailMessage;
 import com.axelor.meta.ActionHandler;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.ContextEntity;
@@ -238,6 +239,19 @@ public class ActionView extends Action {
     result.put("params", viewParams);
 
     return result;
+  }
+
+  @Override
+  protected void checkPermission(ActionHandler handler) {
+    final Class<?> checkClass = handler.findModelClass(getModel());
+
+    if (checkClass == null
+            || !Model.class.isAssignableFrom(checkClass)
+            || MailMessage.class == checkClass) {
+      return;
+    }
+
+    super.checkPermission(handler);
   }
 
   @Override
