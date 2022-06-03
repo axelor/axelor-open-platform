@@ -28,14 +28,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.util.Collection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Import task configures input sources and provides error handler. */
 public abstract class ImportTask implements Closeable {
 
   private final Multimap<String, Reader> readers = ArrayListMultimap.create();
+
+  private static final Logger logger = LoggerFactory.getLogger(ImportTask.class);
 
   /**
    * Configure the input sources using the various {@code input} methods.
@@ -145,28 +148,14 @@ public abstract class ImportTask implements Closeable {
 
   @Override
   public void close() {
-    int errorCount = 0;
-    IOException firstError = null;
-
-    try {
-      for (final Reader reader : readers.values()) {
-        // Try to close everything even if there are errors
-        try {
-          reader.close();
-        } catch (IOException e) {
-          ++errorCount;
-          if (firstError == null) {
-            firstError = e;
-          }
-        }
+    for (final Reader reader : readers.values()) {
+      try {
+        reader.close();
+      } catch (IOException e) {
+        logger.error("Error while closing reader: " + e.getMessage(), e);
       }
-    } finally {
-      readers.clear();
     }
 
-    if (firstError != null) {
-      throw new UncheckedIOException(
-          String.format("%d errors upon closing import task", errorCount), firstError);
-    }
+    readers.clear();
   }
 }
