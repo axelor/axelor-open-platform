@@ -44,7 +44,6 @@ import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.db.repo.MailFollowerRepository;
 import com.axelor.mail.db.repo.MailMessageRepository;
 import com.axelor.mail.service.MailService;
-import com.axelor.mail.web.MailController;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.MetaStore;
 import com.axelor.meta.db.MetaFile;
@@ -52,8 +51,6 @@ import com.axelor.meta.db.MetaModule;
 import com.axelor.meta.db.repo.MetaFileRepository;
 import com.axelor.meta.db.repo.MetaModuleRepository;
 import com.axelor.meta.service.MetaService;
-import com.axelor.rpc.ActionRequest;
-import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Context;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
@@ -759,84 +756,6 @@ public class RestService extends ResourceService {
   }
 
   @GET
-  @Path("messages")
-  public Response messages(
-      @QueryParam("folder") String folder,
-      @QueryParam("parent") Long parentId,
-      @QueryParam("count") boolean count,
-      @QueryParam("limit") @DefaultValue("10") Integer limit,
-      @QueryParam("offset") @DefaultValue("0") Integer offset,
-      @QueryParam("relatedId") Long relatedId,
-      @QueryParam("relatedModel") String relatedModel) {
-
-    final MailController ctrl = Beans.get(MailController.class);
-
-    final ActionRequest req = new ActionRequest();
-    final ActionResponse res = new ActionResponse();
-
-    req.setModel(relatedModel);
-    req.setOffset(offset);
-    req.setLimit(limit);
-
-    Class<?> relatedClass = null;
-    Model related = null;
-
-    try {
-      relatedClass = Class.forName(relatedModel);
-    } catch (Exception e) {
-    }
-
-    if (relatedClass != null && relatedId != null) {
-      final Class<? extends Model> modelClass = relatedClass.asSubclass(Model.class);
-      Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, modelClass, relatedId);
-      JpaRepository<?> repo = JpaRepository.of(modelClass);
-      if (repo != null) {
-        related = repo.find(relatedId);
-      }
-    }
-
-    if (related != null) {
-      final List<Object> records = new ArrayList<>();
-      records.add(related);
-      req.setRecords(records);
-      ctrl.related(req, res);
-      return res;
-    }
-
-    if (count) {
-      ctrl.countUnread(req, res);
-      return res;
-    }
-
-    if (parentId != null) {
-      List<Object> records = new ArrayList<>();
-      records.add(parentId);
-      req.setRecords(records);
-      ctrl.replies(req, res);
-      return res;
-    }
-
-    if (folder == null) {
-      return res;
-    }
-
-    switch (folder) {
-      case "archive":
-        ctrl.archived(req, res);
-        return res;
-      case "important":
-        ctrl.important(req, res);
-        return res;
-      case "unread":
-        ctrl.unread(req, res);
-        return res;
-      default:
-        ctrl.inbox(req, res);
-        return res;
-    }
-  }
-
-  @GET
   @Path("{id}/followers")
   public Response messageFollowers(@PathParam("id") long id) {
     final Class<? extends Model> entityClass = entityClass();
@@ -951,11 +870,5 @@ public class RestService extends ResourceService {
     response.setStatus(Response.STATUS_SUCCESS);
 
     return response;
-  }
-
-  @POST
-  @Path("{id}/messageRemove")
-  public Response messageRemove(@PathParam("id") long id) {
-    return getResource().removeMessage(id);
   }
 }

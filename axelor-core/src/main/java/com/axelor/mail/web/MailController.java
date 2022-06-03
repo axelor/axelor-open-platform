@@ -139,6 +139,7 @@ public class MailController extends JpaSupport {
     response.setData(all);
     response.setOffset(request.getOffset());
     response.setTotal(total);
+    response.setStatus(Response.STATUS_SUCCESS);
   }
 
   public void important(ActionRequest request, ActionResponse response) {
@@ -149,6 +150,7 @@ public class MailController extends JpaSupport {
     response.setData(all);
     response.setOffset(request.getOffset());
     response.setTotal(total);
+    response.setStatus(Response.STATUS_SUCCESS);
   }
 
   public void archived(ActionRequest request, ActionResponse response) {
@@ -159,6 +161,7 @@ public class MailController extends JpaSupport {
     response.setData(all);
     response.setOffset(request.getOffset());
     response.setTotal(total);
+    response.setStatus(Response.STATUS_SUCCESS);
   }
 
   public void related(ActionRequest request, ActionResponse response) {
@@ -180,6 +183,7 @@ public class MailController extends JpaSupport {
     response.setData(data);
     response.setOffset(request.getOffset());
     response.setTotal(count);
+    response.setStatus(Response.STATUS_SUCCESS);
   }
 
   public void replies(ActionRequest request, ActionResponse response) {

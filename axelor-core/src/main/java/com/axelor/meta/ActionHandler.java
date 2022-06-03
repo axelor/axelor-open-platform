@@ -29,7 +29,6 @@ import com.axelor.event.NamedLiteral;
 import com.axelor.events.PostAction;
 import com.axelor.events.PreAction;
 import com.axelor.inject.Beans;
-import com.axelor.mail.db.MailMessage;
 import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaFilter;
 import com.axelor.meta.schema.actions.Action;

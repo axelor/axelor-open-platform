@@ -246,8 +246,8 @@ public class ActionView extends Action {
     final Class<?> checkClass = handler.findModelClass(getModel());
 
     if (checkClass == null
-            || !Model.class.isAssignableFrom(checkClass)
-            || MailMessage.class == checkClass) {
+        || !Model.class.isAssignableFrom(checkClass)
+        || MailMessage.class == checkClass) {
       return;
     }
 
