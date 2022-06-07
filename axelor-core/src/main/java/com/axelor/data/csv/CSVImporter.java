@@ -183,7 +183,7 @@ public class CSVImporter implements Importer {
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
     } finally {
-      task.readers.clear();
+      task.close();
     }
   }
 
@@ -225,7 +225,9 @@ public class CSVImporter implements Importer {
    * @throws ClassNotFoundException
    */
   private void process(CSVInput input, File file) throws IOException, ClassNotFoundException {
-    this.process(input, newReader(new FileInputStream(file)));
+    try (final Reader reader = newReader(new FileInputStream(file))) {
+      this.process(input, reader);
+    }
   }
 
   /** Creates a reader capable of handling BOMs. */

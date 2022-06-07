@@ -36,7 +36,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,7 +171,7 @@ public class XMLImporter implements Importer {
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
     } finally {
-      task.readers.clear();
+      task.close();
     }
   }
 
@@ -183,10 +183,10 @@ public class XMLImporter implements Importer {
    * @throws ImportException
    */
   private void process(XMLInput input, File file) throws ImportException {
-    try {
+    try (final Reader reader =
+        new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
       log.info("Importing: {}", file.getName());
-      this.process(
-          input, new InputStreamReader(new FileInputStream(file), Charset.forName("UTF-8")));
+      this.process(input, reader);
     } catch (IOException e) {
       throw new ImportException(e);
     }

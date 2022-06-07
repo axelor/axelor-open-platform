@@ -19,6 +19,7 @@ package com.axelor.data;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,10 +28,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Import task configures input sources and provides error handler. */
-public abstract class ImportTask {
+public abstract class ImportTask implements Closeable {
 
+  private static final Logger logger = LoggerFactory.getLogger(ImportTask.class);
   public Multimap<String, Reader> readers = ArrayListMultimap.create();
 
   /**
@@ -127,5 +131,18 @@ public abstract class ImportTask {
    */
   public void input(String inputName, Reader reader) {
     readers.put(inputName, reader);
+  }
+
+  @Override
+  public void close() {
+    for (final Reader reader : readers.values()) {
+      try {
+        reader.close();
+      } catch (IOException e) {
+        logger.error("Error while closing reader: " + e.getMessage(), e);
+      }
+    }
+
+    readers.clear();
   }
 }
