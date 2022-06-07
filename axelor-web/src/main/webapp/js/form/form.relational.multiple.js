@@ -861,6 +861,39 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
         }
       }, true);
     }
+
+    var superRender = model.$render;
+    model.$render = function () {
+      superRender.apply(model, arguments);
+      var extraFields = [scope.field.targetName, scope.field.colorField]
+        .filter(function (name) { return name; });
+      if (_.isEmpty(extraFields)) return;
+      var items = scope.getItems();
+      var missing = _.filter(items, function (item) {
+        return !_.isEmpty(_.difference(extraFields, Object.keys(item)));
+      });
+      if (_.isEmpty(missing)) return;
+      scope._dataSource.search({
+        fields: extraFields,
+        filter: {
+          operator: 'and',
+          criteria: [{
+            fieldName: 'id',
+            operator: 'in',
+            value: _.pluck(missing, 'id')
+          }]
+        }
+      }).success(function (records) {
+        _.each(records, function (record) {
+          var item = _.findWhere(items, {id: record.id});
+          if (item) {
+            _.extend(item, _.pick(record, extraFields));
+          }
+        });
+        scope.format(items);
+      });
+    }
+
   },
 
   link_editable: function(scope, element, attrs, model) {
