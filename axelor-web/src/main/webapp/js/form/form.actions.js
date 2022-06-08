@@ -1226,7 +1226,7 @@ ActionHandler.prototype = {
         var view = _.findWhere(tab.views, { type: "html" });
         if (view) {
           var url = view.name || view.resource;
-          var fileName = tab.params.fileName || "true";
+          var fileName = tab.params.fileName;
           ui.download(url, fileName);
           return scope.$applyAsync();
         }

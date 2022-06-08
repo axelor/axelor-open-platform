@@ -1765,11 +1765,32 @@ ui.directive("uiDmsPopup", ['$compile', function ($compile) {
 
 ui.download = function download(url, fileName) {
 
-  function doDownload() {
+  // Gets filename from Content-Disposition
+  function getFilename(disposition) {
+    var results = /filename\*=UTF-8''([\w%\-\.]+)/i.exec(disposition);
+    if (results) {
+      return decodeURIComponent(results[1]);
+    }
+
+    results = /filename=(['"])?(.*?)\1/i.exec(disposition);
+    if (results) {
+      return results[2];
+    }
+
+    return null;
+  }
+
+  function doDownload(data, status, xhr) {
     var link = document.createElement('a');
 
-    link.innerHTML = name;
-    link.download = name;
+    var disposition = xhr.getResponseHeader('Content-Disposition');
+    var actualFilename = getFilename(disposition);
+    if (!_.isBlank(actualFilename)) {
+      name = actualFilename;
+    }
+
+    link.innerHTML = name || "File";
+    link.download = name || true;
     link.href = url;
 
     _.extend(link.style, {
@@ -1790,8 +1811,14 @@ ui.download = function download(url, fileName) {
       link.click();
     }, 100);
 
-    var fname = "<strong>" + name + "</strong>";
-    axelor.notify.info(_t("Downloading {0}...", fname));
+    var msg;
+    if (_.isBlank(name)) {
+      msg = _t("Downloading file…");
+    } else {
+      var fname = "<strong>" + name + "</strong>";
+      msg = _t("Downloading {0}…", fname);
+    }
+    axelor.notify.info("<p>" + msg + "</p>");
   }
 
   var name = axelor.sanitize(fileName) || "";
@@ -1801,8 +1828,14 @@ ui.download = function download(url, fileName) {
     success : doDownload,
     error : function (e) {
       if (e.status == 404) {
-        var fname = "<strong>" + name + "</strong>";
-        axelor.notify.error("<p>" + _t("File {0} does not exist.", fname) + "</p>");
+        var msg;
+        if (_.isBlank(name)) {
+          msg = _t("File does not exist.");
+        } else {
+          var fname = "<strong>" + name + "</strong>";
+          msg = _t("File {0} does not exist.", fname);
+        }
+        axelor.notify.error("<p>" + msg + "</p>");
       }
     }
   });
