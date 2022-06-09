@@ -19,7 +19,6 @@
 package com.axelor.web.service;
 
 import static com.axelor.common.ObjectUtils.isEmpty;
-
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
@@ -99,7 +98,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 import javax.xml.bind.DatatypeConverter;
@@ -325,20 +323,6 @@ public class RestService extends ResourceService {
     in.close();
   }
 
-  private String getFileName(MultivaluedMap<String, String> headers) {
-    final String[] parts = headers.getFirst("Content-Disposition").split(";");
-    for (String filename : parts) {
-      if ((filename.trim().startsWith("filename"))) {
-        String name = filename.split("=")[1].trim();
-        // remove quotes
-        name = name.replaceAll("^\"|\"$", "");
-        // on IE11, sometime we get full path, so get name only
-        return new File(name).getName();
-      }
-    }
-    return null;
-  }
-
   @POST
   @Path("upload")
   @Produces(MediaType.APPLICATION_JSON)
@@ -346,26 +330,25 @@ public class RestService extends ResourceService {
   public Response upload(final MultipartFormDataInput input) throws IOException {
 
     final Map<String, List<InputPart>> formData = input.getFormDataMap();
-    final InputPart filePart = formData.get("file").get(0);
     final InputPart requestPart = formData.get("request").get(0);
-    final InputPart fieldPart = formData.get("field").get(0);
 
-    final boolean isAttachment = MetaFile.class.getName().equals(getModel());
-    final String field = fieldPart.getBodyAsString();
-    final String fileName = getFileName(filePart.getHeaders());
-    final String fileType = filePart.getHeaders().getFirst("Content-Type");
+    final Request request =
+        Beans.get(ObjectMapper.class).readValue(requestPart.getBodyAsString(), Request.class);
+    request.setModel(getModel());
+    final Map<String, Object> data = request.getData();
+
+    final String fileName = String.valueOf(data.get("fileName"));
+    final String fileType = String.valueOf(data.get("fileType"));
 
     // check if file name is valid
     MetaFiles.checkPath(fileName);
     MetaFiles.checkType(fileType);
 
+    final InputPart filePart = formData.get("file").get(0);
+    final InputPart fieldPart = formData.get("field").get(0);
+    final boolean isAttachment = MetaFile.class.getName().equals(getModel());
+    final String field = fieldPart.getBodyAsString();
     final InputStream fileStream = filePart.getBody(InputStream.class, null);
-    final Request request =
-        Beans.get(ObjectMapper.class).readValue(requestPart.getBodyAsString(), Request.class);
-
-    request.setModel(getModel());
-
-    final Map<String, Object> data = request.getData();
 
     if (!isAttachment) {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -418,7 +401,9 @@ public class RestService extends ResourceService {
                 uploadSave(new FileInputStream(inputFile), output);
               }
             })
-        .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+        .header(
+            "Content-Disposition",
+            "attachment; " + FileService.buildContentDispositionFilename(fileName))
         .build();
   }
 
@@ -490,7 +475,9 @@ public class RestService extends ResourceService {
     }
 
     return javax.ws.rs.core.Response.ok(data)
-        .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+        .header(
+            "Content-Disposition",
+            "attachment; " + FileService.buildContentDispositionFilename(fileName))
         .build();
   }
 

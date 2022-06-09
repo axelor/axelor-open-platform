@@ -575,11 +575,17 @@ public class DmsService {
     final ResponseBuilder builder = javax.ws.rs.core.Response.ok(content, type);
 
     if (inline && type != MediaType.APPLICATION_OCTET_STREAM_TYPE) {
-      return builder.header("Content-Disposition", "inline; filename=\"" + fileName + "\"").build();
+      return builder
+          .header(
+              "Content-Disposition",
+              "inline; " + FileService.buildContentDispositionFilename(fileName))
+          .build();
     }
 
     return builder
-        .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+        .header(
+            "Content-Disposition",
+            "attachment; " + FileService.buildContentDispositionFilename(fileName))
         .header("Content-Transfer-Encoding", "binary")
         .build();
   }

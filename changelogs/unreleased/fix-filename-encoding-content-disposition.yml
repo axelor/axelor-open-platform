@@ -1,0 +1,3 @@
+---
+title: Fix downloaded filename encoding in Content-Disposition header
+type: fix
