@@ -439,7 +439,7 @@ public class RestService extends ResourceService {
 
     if (MetaFile.class.isAssignableFrom(klass)) {
       permitted =
-          Objects.equals(mapper.get(bean, "createdBy"), AuthUtils.getUser())
+          bean != null && Objects.equals(mapper.get(bean, "createdBy"), AuthUtils.getUser())
               || checkMetaFileParentPermission(id, parentId, parentModel);
     } else {
       permitted = false;
