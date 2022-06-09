@@ -80,6 +80,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -383,7 +384,7 @@ public class RestService extends ResourceService {
     entity.setFileName(metaFile.getFileName());
     entity.setFileType(metaFile.getFileType());
 
-    File tmp = files.upload(fileStream, 0, -1, fileName);
+    File tmp = files.upload(fileStream, 0, -1, UUID.randomUUID().toString());
     entity = files.upload(tmp, entity);
 
     final Response response = new Response();
