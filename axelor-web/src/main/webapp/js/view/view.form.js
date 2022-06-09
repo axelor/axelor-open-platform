@@ -587,6 +587,10 @@ function FormViewCtrl($scope, $element) {
     return $scope.hasButton('attach');
   };
 
+  $scope.canShowAuditLog = function() {
+    return $scope.hasButton('log');
+  };
+
   $scope.canCancel = function() {
     return $scope.$$dirty;
   };
@@ -1239,9 +1243,15 @@ function FormViewCtrl($scope, $element) {
       },
       action: "wkf-instance-view-from-record"
     }, {
+      visible: function () {
+        return $scope.canShowAuditLog();
+      }
     }, {
       active: function () {
         return $scope.hasAuditLog();
+      },
+      visible: function () {
+        return $scope.canShowAuditLog();
       },
       title: _t('Last modified...'),
       click: showLog

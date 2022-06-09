@@ -271,7 +271,7 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
         var toolbar = [];
         _.each(schema.toolbar, function(button){
           button.custom = true;
-          if (/^(new|edit|save|delete|copy|cancel|back|refresh|search|export|log|files)$/.test(button.name)) {
+          if (/^(new|edit|save|delete|copy|cancel|back|refresh|archive|attach|log)$/.test(button.name)) {
             hiddenButtons[button.name] = button;
             button.custom = false;
           }
