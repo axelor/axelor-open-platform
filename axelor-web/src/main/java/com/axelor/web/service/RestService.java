@@ -400,9 +400,11 @@ public class RestService extends ResourceService {
       "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
   @SuppressWarnings("all")
-  private javax.ws.rs.core.Response download(MetaFile metaFile) {
+  private javax.ws.rs.core.Response download(MetaFile metaFile, String fileName) {
     final Mapper mapper = Mapper.of(MetaFile.class);
-    final String fileName = (String) mapper.get(metaFile, "fileName");
+    if (StringUtils.isBlank(fileName)) {
+      fileName = (String) mapper.get(metaFile, "fileName");
+    }
     final String filePath = (String) mapper.get(metaFile, "filePath");
     final File inputFile = Beans.get(MetaFiles.class).getPath(filePath).toFile();
     if (!inputFile.exists()) {
@@ -429,7 +431,8 @@ public class RestService extends ResourceService {
       @PathParam("field") String field,
       @QueryParam("image") boolean isImage,
       @QueryParam("parentId") Long parentId,
-      @QueryParam("parentModel") String parentModel)
+      @QueryParam("parentModel") String parentModel,
+      @QueryParam("fileName") String fileName)
       throws IOException {
 
     final Class klass = getResource().getModel();
@@ -454,14 +457,16 @@ public class RestService extends ResourceService {
     }
 
     if (bean instanceof MetaFile) {
-      return download((MetaFile) bean);
+      return download((MetaFile) bean, fileName);
     }
 
-    String fileName = getModel() + "_" + field;
+    if (StringUtils.isBlank(fileName)) {
+      fileName = getModel() + "_" + field;
+    }
     Object data = mapper.get(bean, field);
 
     if (data instanceof MetaFile) {
-      return download((MetaFile) data);
+      return download((MetaFile) data, fileName);
     }
 
     if (isImage) {
