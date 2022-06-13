@@ -1821,6 +1821,12 @@ ui.download = function download(url, fileName) {
   }
 
   var name = axelor.sanitize(fileName) || "";
+  if (fileName) {
+    url += ( /\?/.test( url ) ? "&" : "?" ) + jQuery.param({
+      "fileName": name
+    });
+  }
+
   $.ajax({
     url : url,
     type : 'HEAD',
