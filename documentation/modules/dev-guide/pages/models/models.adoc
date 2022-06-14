@@ -74,6 +74,7 @@ A domain model is defined using `<entity>` tag, it supports some attributes.
 * `persistable` - whether this entity is persistable (in database).
 * `strategy=[SINGLE|JOINED|CLASS]` - inheritance strategy (default is SINGLE)
 * `equalsIncludeAll` - whether to include all the simple non-function fields in equality test (default is false) - _new in version 5.4_
+* `jsonAttrs` - whether to enable/disable generating "attrs" json field
 
 The `strategy` attribute can be used on base entity only.
 
@@ -162,7 +163,9 @@ The field accepts following additional attributes:
 | `multiline` | whether the string is multiline text (used by UI components)
 | `translatable` | whether the field value is translatable
 | `password` | whether the field is storing password text
-| `encrypted` | whether the field is encrypted
+| `encrypted` | whether the field is encrypted (<<Field Encryption,learn more>>)
+| `json` | whether the field is used to store json data
+| `namecolumn` | whether this is a name column (used by UI components to display the record)
 |===
 
 example:
@@ -435,6 +438,8 @@ many-to-one relationship.
 | Attribute | Description
 
 | `ref` | name of the reference entity class (FQN if not in same package)
+| `table` | specify the join table name.
+| `column2` | name of the foreign key column in the underlying database table referring the non-owing table.
 |===
 
 example:
@@ -455,6 +460,9 @@ one-to-one relationship.
 
 | `ref` | name of the reference entity class (FQN if not in same package)
 | `mappedBy` | for bidirectional fields, name of the owner side field
+| `orphanRemoval` | specify whether to remove orphaned records if they have been removed from the relationship.
+| `table` | specify the join table name.
+| `column2` | name of the foreign key column in the underlying database table referring the non-owing table.
 |===
 
 [source,xml]
@@ -479,6 +487,8 @@ relationship.
 | `mappedBy` | for bidirectional fields, name of the inverse many-to-one field
 | `orphanRemoval` | whether to remove orphaned records (default true)
 | `orderBy` | specify the ordering of the collection value by the given field
+| `table` | specify the join table name.
+| `column2` | name of the foreign key column in the underlying database table referring the non-owing table.
 |===
 
 [source,xml]
@@ -498,7 +508,9 @@ relationship.
 
 | `ref` | name of the reference entity class (FQN if not in same package)
 | `mappedBy` | for bidirectional fields, name of the owner side field
-| `orderBy` | specify the ordering of the collection value by the given field
+| `orderBy` | specify the ordering of the collection value by the given field.
+| `table` | specify the join table name.
+| `column2` | name of the foreign key column in the underlying database table referring the non-owing table.
 |===
 
 [source,xml]
