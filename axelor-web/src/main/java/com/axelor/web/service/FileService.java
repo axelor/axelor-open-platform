@@ -25,6 +25,7 @@ import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.schema.actions.ActionExport;
 import com.axelor.meta.schema.actions.validate.ActionValidateBuilder;
 import com.axelor.meta.schema.actions.validate.validator.ValidatorType;
+import com.google.common.base.Preconditions;
 import com.google.common.net.PercentEscaper;
 import com.google.inject.persist.Transactional;
 import com.google.inject.servlet.RequestScoped;
@@ -142,7 +143,7 @@ public class FileService extends AbstractService {
 
     final Map<String, Object> data = new HashMap<>();
     try {
-      fileName = URLDecoder.decode(fileName, "UTF-8");
+      fileName = sanitizeFilename(URLDecoder.decode(fileName, "UTF-8"));
 
       // check if file name is valid
       MetaFiles.checkPath(fileName);
@@ -187,5 +188,37 @@ public class FileService extends AbstractService {
     }
 
     return "filename*=UTF-8''" + new PercentEscaper("", false).escape(filename);
+  }
+
+  /**
+   * Sanitizes a filename, replacing whitespace with dashes and removing special characters that are
+   * either illegal on some operating systems or that cause escaping.
+   *
+   * @param filename
+   * @return sanitized filename
+   */
+  static String sanitizeFilename(String filename) {
+    Preconditions.checkArgument(StringUtils.notBlank(filename));
+
+    final int pos = filename.lastIndexOf('.');
+    final String name;
+    final String ext;
+
+    if (pos >= 0) {
+      name = filename.substring(0, pos);
+      ext = filename.substring(pos);
+    } else {
+      name = filename;
+      ext = "";
+    }
+
+    return sanitizeFilenamePart(name) + sanitizeFilenamePart(ext);
+  }
+
+  private static String sanitizeFilenamePart(String part) {
+    part = part.replaceAll("[?\\[\\]/\\\\=<>:;,\'\"&$#*()|~`!{}%+\0]", "");
+    part = part.replaceAll("[\\s\\-\u2013\u2014]+", "-");
+    part = part.replaceAll("(?:^-+)|(?:-+$)", "");
+    return part;
   }
 }

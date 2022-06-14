@@ -1,0 +1,6 @@
+---
+title: Sanitize uploaded filenames
+type: feature
+description: |
+  Sanitize uploaded filenames, replacing whitespace with dashes and removing special characters that are
+  either illegal on some operating systems or that cause escaping

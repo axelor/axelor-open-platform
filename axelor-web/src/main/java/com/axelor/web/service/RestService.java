@@ -19,6 +19,7 @@
 package com.axelor.web.service;
 
 import static com.axelor.common.ObjectUtils.isEmpty;
+
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
@@ -337,12 +338,14 @@ public class RestService extends ResourceService {
     request.setModel(getModel());
     final Map<String, Object> data = request.getData();
 
-    final String fileName = String.valueOf(data.get("fileName"));
+    final String fileName = FileService.sanitizeFilename(String.valueOf(data.get("fileName")));
     final String fileType = String.valueOf(data.get("fileType"));
 
     // check if file name is valid
     MetaFiles.checkPath(fileName);
     MetaFiles.checkType(fileType);
+
+    data.put("fileName", fileName);
 
     final InputPart filePart = formData.get("file").get(0);
     final InputPart fieldPart = formData.get("field").get(0);
