@@ -141,4 +141,11 @@ public class ObjectViews {
   public void setActions(List<Action> actions) {
     this.actions = actions;
   }
+
+  public static String getSecureNamespace() {
+    if (NAMESPACE.startsWith("http:")) {
+      return "https:" + NAMESPACE.substring(5);
+    }
+    return NAMESPACE;
+  }
 }

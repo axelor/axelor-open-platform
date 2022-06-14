@@ -124,7 +124,7 @@ public class XMLViews {
     marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
     marshaller.setProperty(
         Marshaller.JAXB_SCHEMA_LOCATION,
-        ObjectViews.NAMESPACE + " " + ObjectViews.NAMESPACE + "/" + REMOTE_SCHEMA);
+        ObjectViews.NAMESPACE + " " + ObjectViews.getSecureNamespace() + "/" + REMOTE_SCHEMA);
 
     for (String name : INDENT_PROPERTIES) {
       try {
@@ -204,7 +204,7 @@ public class XMLViews {
         .append(" xsi:schemaLocation='")
         .append(ObjectViews.NAMESPACE)
         .append(" ")
-        .append(ObjectViews.NAMESPACE + "/" + REMOTE_SCHEMA)
+        .append(ObjectViews.getSecureNamespace() + "/" + REMOTE_SCHEMA)
         .append("'")
         .append(">\n")
         .append(xml)
