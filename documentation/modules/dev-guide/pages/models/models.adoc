@@ -12,7 +12,7 @@ Each file should have proper declaration:
 <domain-models xmlns="http://axelor.com/xml/ns/domain-models"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
-  http://axelor.com/xml/ns/domain-models/domain-models_6.0.xsd">
+  https://axelor.com/xml/ns/domain-models/domain-models_6.0.xsd">
 
   <!-- entity definitions here -->
 

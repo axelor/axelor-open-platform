@@ -32,7 +32,7 @@ Each file should have proper declaration:
 <object-views xmlns="http://axelor.com/xml/ns/object-views"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://axelor.com/xml/ns/object-views
-  http://axelor.com/xml/ns/object-views/object-views_6.0.xsd">
+  https://axelor.com/xml/ns/object-views/object-views_6.0.xsd">
 
   <!-- views definitions here -->
 
