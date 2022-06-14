@@ -155,7 +155,6 @@ Each field type supports some attributes. Here are few of them:
 | transient | whether the field is transient
 | initParam | whether the field can be used for a contructor
 | equalsInclude | whether the field is included in equality test
-| hashKey | whether the field can be used for hashCode calculation
 | massUpdate | whether to allow mass update on this field
 | formula | sql formula if this is a formula field
 | ref | referenced object (relational fields)

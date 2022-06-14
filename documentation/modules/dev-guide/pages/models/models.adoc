@@ -69,13 +69,11 @@ A domain model is defined using `<entity>` tag, it supports some attributes.
 * `repository=[none|default|abstract]` - how to generate repository class
 * `table` - table name for the entity
 * `logUpdates` - whether to enable update logging (default is true)
-* `lang` - language of the generated source code (default is java)
 * `extends` - inheritance base entity class
 * `implements` - list of interfaces to implement (generally empty, or confirming the getter/setter)
 * `persistable` - whether this entity is persistable (in database).
 * `strategy=[SINGLE|JOINED|CLASS]` - inheritance strategy (default is SINGLE)
 * `equalsIncludeAll` - whether to include all the simple non-function fields in equality test (default is false) - _new in version 5.4_
-* `hashAll` - whether to use all the simple non-function fields as hash keys (default is false)
 
 The `strategy` attribute can be used on base entity only.
 
@@ -143,7 +141,6 @@ Non-relational fields have the following extra attributes:
 | `nullable` | allow null value to be stored for fields that by default uses their system default when value is not given
 | `selection` | selection key name
 | `equalsInclude` | whether the field is included in equality test - _new in version 5.4_
-| `hashKey` | whether to consider this field as hashCode candidate
 | `formula` | whether this is a native SQL formula field
 |===
 
