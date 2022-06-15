@@ -410,7 +410,7 @@ public class RestService extends ResourceService {
             })
         .header(
             "Content-Disposition",
-                ContentDisposition.attachment().filename(fileName).build().toString())
+            ContentDisposition.attachment().filename(fileName).build().toString())
         .build();
   }
 
@@ -484,7 +484,7 @@ public class RestService extends ResourceService {
     return javax.ws.rs.core.Response.ok(data)
         .header(
             "Content-Disposition",
-                ContentDisposition.attachment().filename(fileName).build().toString())
+            ContentDisposition.attachment().filename(fileName).build().toString())
         .build();
   }
 

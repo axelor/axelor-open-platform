@@ -579,14 +579,14 @@ public class DmsService {
       return builder
           .header(
               "Content-Disposition",
-                  ContentDisposition.inline().filename(fileName).build().toString())
+              ContentDisposition.inline().filename(fileName).build().toString())
           .build();
     }
 
     return builder
         .header(
             "Content-Disposition",
-                ContentDisposition.attachment().filename(fileName).build().toString())
+            ContentDisposition.attachment().filename(fileName).build().toString())
         .header("Content-Transfer-Encoding", "binary")
         .build();
   }

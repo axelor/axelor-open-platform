@@ -194,18 +194,20 @@ public final class FileUtils {
 
   private static final char ILLEGAL_FILENAME_CHARS_REPLACE = '-';
   private static final Character[] INVALID_FILENAME_CHARS = {
-          '?', '[', ']', '/', '\\', '=', '<', '>', ':', ';', ',', '\'',
-          '"', '&', '$', '#', '*', '(', ')', '|', '~', '`', '!', '{',
-          '}', '%', '+', '’', '«', '»', '”', '“', 0x7F, '\n', '\r', '\t'
+    '?', '[', ']', '/', '\\', '=', '<', '>', ':', ';', ',', '\'',
+    '"', '&', '$', '#', '*', '(', ')', '|', '~', '`', '!', '{',
+    '}', '%', '+', '’', '«', '»', '”', '“', 0x7F, '\n', '\r', '\t'
   };
 
   /**
    * Sanitizes a filename, replacing with dash
+   *
    * <ul>
-   *  <li>Removes special characters that are illegal in filenames on certain operating systems
-   *  <li>Replaces spaces and consecutive underscore with a single dash
-   *  <li>Trims dot, dash and underscore from beginning and end of filename
-   *  <ul>
+   *   <li>Removes special characters that are illegal in filenames on certain operating systems
+   *   <li>Replaces spaces and consecutive underscore with a single dash
+   *   <li>Trims dot, dash and underscore from beginning and end of filename
+   *       <ul>
+   *
    * @param originalFileName The filename to be sanitized
    * @return string The sanitized filename
    */
@@ -234,7 +236,10 @@ public final class FileUtils {
     }
     fileName = new String(chars);
     // consecutive underscore
-    fileName = fileName.replaceAll("(" + ILLEGAL_FILENAME_CHARS_REPLACE + ")+", String.valueOf(ILLEGAL_FILENAME_CHARS_REPLACE));
+    fileName =
+        fileName.replaceAll(
+            "(" + ILLEGAL_FILENAME_CHARS_REPLACE + ")+",
+            String.valueOf(ILLEGAL_FILENAME_CHARS_REPLACE));
     // start or end with dot, dash or underscore
     fileName = fileName.replaceAll("(?:^[-_.]+)|(?:[-_.]+$)", "");
     return fileName;

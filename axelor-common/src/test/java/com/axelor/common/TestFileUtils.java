@@ -70,11 +70,11 @@ public class TestFileUtils {
   public void testSafeFileName() {
     assertNull(FileUtils.safeFileName(null));
     assertEquals(FileUtils.safeFileName(""), "");
-    
-    //trim
+
+    // trim
     assertEquals("toto.txt", FileUtils.safeFileName(" toto.txt "));
 
-    //accent
+    // accent
     assertEquals("Cesar.txt", FileUtils.safeFileName("César.txt"));
 
     // illegal

@@ -162,9 +162,8 @@ public final class StringUtils {
   /**
    * Returns <code>true</code> if the text is in the ASCII charset.
    *
-   * @param  text the text to check
-   * @return <code>true</code> if the text is in the ASCII charset;
-   *         <code>false</code> otherwise
+   * @param text the text to check
+   * @return <code>true</code> if the text is in the ASCII charset; <code>false</code> otherwise
    */
   public static boolean isAscii(CharSequence text) {
     if (text == null) {
@@ -185,9 +184,9 @@ public final class StringUtils {
   /**
    * Returns <code>true</code> if the character is in the ASCII charset.
    *
-   * @param  c the character to check
-   * @return <code>true</code> if the character is in the ASCII charset;
-   *         <code>false</code> otherwise
+   * @param c the character to check
+   * @return <code>true</code> if the character is in the ASCII charset; <code>false</code>
+   *     otherwise
    */
   public static boolean isAscii(char c) {
     int i = c;

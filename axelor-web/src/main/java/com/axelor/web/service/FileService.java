@@ -19,15 +19,12 @@
 package com.axelor.web.service;
 
 import com.axelor.common.FileUtils;
-import com.axelor.common.StringUtils;
 import com.axelor.common.http.ContentDisposition;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.schema.actions.ActionExport;
 import com.axelor.meta.schema.actions.validate.ActionValidateBuilder;
 import com.axelor.meta.schema.actions.validate.validator.ValidatorType;
-import com.google.common.base.Preconditions;
-import com.google.common.net.PercentEscaper;
 import com.google.inject.persist.Transactional;
 import com.google.inject.servlet.RequestScoped;
 import java.io.File;
@@ -35,7 +32,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,7 +65,8 @@ public class FileService extends AbstractService {
     }
     return javax.ws.rs.core.Response.ok(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)
         .header(
-            "Content-Disposition", ContentDisposition.attachment().filename(file.getName()).build().toString())
+            "Content-Disposition",
+            ContentDisposition.attachment().filename(file.getName()).build().toString())
         .header("Content-Transfer-Encoding", "binary")
         .build();
   }
@@ -98,12 +95,16 @@ public class FileService extends AbstractService {
 
     if (type != MediaType.APPLICATION_OCTET_STREAM_TYPE) {
       return builder
-          .header("Content-Disposition", ContentDisposition.inline().filename(fileName).build().toString())
+          .header(
+              "Content-Disposition",
+              ContentDisposition.inline().filename(fileName).build().toString())
           .build();
     }
 
     return builder
-        .header("Content-Disposition", ContentDisposition.attachment().filename(fileName).build().toString())
+        .header(
+            "Content-Disposition",
+            ContentDisposition.attachment().filename(fileName).build().toString())
         .header("Content-Transfer-Encoding", "binary")
         .build();
   }
@@ -181,5 +182,4 @@ public class FileService extends AbstractService {
 
     return javax.ws.rs.core.Response.ok(data).build();
   }
-
 }
