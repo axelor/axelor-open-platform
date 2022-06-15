@@ -22,10 +22,53 @@
 
 var ui = angular.module('axelor.ui');
 
-ui.factory('MessageService', ['$q', '$timeout', 'DataSource', 'TagService', function($q, $timeout, DataSource, TagService) {
+ui.factory('MessageSource', ['$http', function ($http) {
+    function getMessages(params) {
+      return $http.get('ws/messages', {params: params});
+    }
 
-  var dsFlags = DataSource.create('com.axelor.mail.db.MailFlags');
-  var dsMessage = DataSource.create('com.axelor.mail.db.MailMessage');
+    function getRecordMessages(relatedId, relatedModel, limit, offset) {
+      return getMessages({relatedId: relatedId, relatedModel: relatedModel,
+                          limit: limit, offset: offset});
+    }
+
+    function getFolder(folder, limit, offset) {
+      return getMessages({folder: folder, limit: limit, offset: offset});
+    }
+
+    function getMessage(id) {
+      return $http.get('ws/messages/' + id);
+    }
+
+    function getCount() {
+      return $http.get('ws/messages/count');
+    }
+
+    function getReplies(id) {
+      return $http.get('ws/messages/' + id + '/replies');
+    }
+
+    function deleteMessage(id) {
+      return $http.delete('ws/messages/' + id);
+    }
+
+    function postFlags(records) {
+      return $http.post('ws/messages/flag', {records: records});
+    }
+
+    return {
+      messages: getMessages,
+      recordMessages: getRecordMessages,
+      folder: getFolder,
+      message: getMessage,
+      count: getCount,
+      replies: getReplies,
+      remove: deleteMessage,
+      flags: postFlags
+    }
+}]);
+
+ui.factory('MessageService', ['$q', '$timeout', 'DataSource', 'MessageSource', 'TagService', function($q, $timeout, DataSource, MessageSource, TagService) {
 
   var pollResult = {};
 
@@ -56,7 +99,7 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', 'TagService', func
    */
   function getMessages(options) {
     var opts = _.extend({}, options);
-    return dsMessage.messages(opts);
+    return MessageSource.messages(opts);
   }
 
   /**
@@ -65,11 +108,8 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', 'TagService', func
    */
   function getReplies(parent) {
     var deferred = $q.defer();
-    var opts = {
-      parent: parent.id
-    };
 
-    var promise = dsMessage.messages(opts)
+    var promise = MessageSource.replies((parent || {}).id)
     .error(deferred.reject)
     .success(function (res) {
       var records = res.data || [];
@@ -95,34 +135,34 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', 'TagService', func
    */
   function flagMessage(message, flagState) {
     var messages = _.isArray(message) ? message : [message];
-    var ref = {};
-    var all = _.map(messages, function (message) {
-      var flags = _.extend({}, message.$flags);
+    var all = _.map(messages, function (msg) {
+      var flags = _.extend({}, _.omit(msg.$flags, 'version'));
       if (flagState === 1) flags.isRead = true;
-      if (flagState === -1) flags.isRead = false;
-      if (flagState === 2) flags.isStarred = true;
-      if (flagState === -2) flags.isStarred = false;
-      if (flagState === 3) flags.isArchived = true;
-      if (flagState === -3) flags.isArchived = false;
+      else if (flagState === -1) flags.isRead = false;
+      else if (flagState === 2) flags.isStarred = true;
+      else if (flagState === -2) flags.isStarred = false;
+      else if (flagState === 3) flags.isArchived = true;
+      else if (flagState === -3) flags.isArchived = false;
 
-      flags.message = _.pick(message, 'id');
-      flags.user = {
-        id: axelor.config['user.id']
-      };
-
-      ref[""+message.id] = message;
+      flags.messageId = msg.id;
 
       return flags;
     });
 
-    var promise = dsFlags.saveAll(all);
-    promise.success(function (records) {
-      _.each(records, function (rec) {
-        var msg = ref[""+rec.message.id];
-        if (msg) {
-          msg.$flags = _.pick(rec, ['id', 'version', 'isStarred', 'isRead', 'isArchived']);
-        }
+    var promise = MessageSource.flags(all);
+    promise.success(function (response) {
+      if (response.status) {
+        var data = response.data || {};
+        axelor.notify.error(data.message || response.status, {title: data.title});
+        return;
+      }
+      _.each(messages, function (msg, index) {
+        var flags = all[index];
+        if (!msg.$flags) msg.$flags = {};
+        _.extend(msg.$flags, _.omit(flags, 'messageId'));
+        delete msg.$flags.version; // version is outdated after flags update
       });
+
       // force unread check
       if (flagState === 1 || flagState == -1) {
         TagService.find();
@@ -133,7 +173,7 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', 'TagService', func
   }
 
   function removeMessage(message) {
-    var promise = dsMessage.messageRemove(message);
+    var promise = MessageSource.remove((message || {}).id);
     promise.then(function () {
       TagService.find(); // force unread check
     });
