@@ -326,7 +326,7 @@ public class MetaFiles {
       Path target = getUploadPath(targetName);
       Path targetDir = target.getParent();
       while (Files.exists(target)) {
-        targetName = fileNameBase + " (" + counter++ + ")" + fileNameExt;
+        targetName = fileNameBase + "-" + counter++ + fileNameExt;
         target = targetDir.resolve(targetName);
       }
       return target;
