@@ -50,10 +50,25 @@ abstract class AbstractLoader {
    * @return true if the name is already visited false otherwise
    */
   protected boolean isVisited(Class<?> type, String name) {
+    if (isVisitedInternal(type, name)) {
+      LOG.error("Duplicate {} found without 'id': {}", type.getSimpleName(), name);
+      return true;
+    }
+    return false;
+  }
+
+  protected boolean isVisitedWithId(Class<?> type, String xmlId) {
+    if (isVisitedInternal(null, xmlId)) {
+      LOG.error("Duplicate {} found with 'id': {}", type.getSimpleName(), xmlId);
+      return true;
+    }
+    return false;
+  }
+
+  private boolean isVisitedInternal(Class<?> type, String name) {
     synchronized (visited) {
       Entry<Class<?>, String> key = new SimpleImmutableEntry<>(type, name);
       if (visited.contains(key)) {
-        LOG.error("duplicate {} found: {}", type.getSimpleName(), name);
         return true;
       }
       visited.add(key);

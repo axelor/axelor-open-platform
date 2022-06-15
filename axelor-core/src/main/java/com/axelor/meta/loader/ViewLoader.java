@@ -241,10 +241,9 @@ public class ViewLoader extends AbstractParallelLoader {
 
     if (StringUtils.isBlank(xmlId)) {
       if (isVisited(view.getClass(), name)) {
-        LOG.error("duplicate view without 'id': {}", name);
         return;
       }
-    } else if (isVisited(view.getClass(), xmlId)) {
+    } else if (isVisitedWithId(view.getClass(), xmlId)) {
       return;
     }
 
@@ -363,10 +362,9 @@ public class ViewLoader extends AbstractParallelLoader {
 
     if (StringUtils.isBlank(xmlId)) {
       if (isVisited(Selection.class, name)) {
-        LOG.error("duplicate selection without 'id': {}", name);
         return;
       }
-    } else if (isVisited(Selection.class, xmlId)) {
+    } else if (isVisitedWithId(Selection.class, xmlId)) {
       return;
     }
 
@@ -496,10 +494,9 @@ public class ViewLoader extends AbstractParallelLoader {
 
     if (StringUtils.isBlank(xmlId)) {
       if (isVisited(Action.class, name)) {
-        LOG.error("duplicate action without 'id': {}", name);
         return;
       }
-    } else if (isVisited(Action.class, xmlId)) {
+    } else if (isVisitedWithId(Action.class, xmlId)) {
       return;
     }
 
@@ -589,10 +586,9 @@ public class ViewLoader extends AbstractParallelLoader {
 
     if (StringUtils.isBlank(xmlId)) {
       if (isVisited(MenuItem.class, name)) {
-        LOG.error("duplicate menu without 'id': {}", name);
         return;
       }
-    } else if (isVisited(MenuItem.class, xmlId)) {
+    } else if (isVisitedWithId(MenuItem.class, xmlId)) {
       return;
     }
 
@@ -689,10 +685,9 @@ public class ViewLoader extends AbstractParallelLoader {
 
     if (StringUtils.isBlank(xmlId)) {
       if (isVisited(MenuItem.class, name)) {
-        LOG.error("duplicate action menu without 'id': {}", name);
         return;
       }
-    } else if (isVisited(MenuItem.class, xmlId)) {
+    } else if (isVisitedWithId(MenuItem.class, xmlId)) {
       return;
     }
 
