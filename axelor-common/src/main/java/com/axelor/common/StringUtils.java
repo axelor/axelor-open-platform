@@ -158,4 +158,44 @@ public final class StringUtils {
         .map(line -> line.replaceFirst("^\\s+\\|", ""))
         .collect(Collectors.joining("\n"));
   }
+
+  /**
+   * Returns <code>true</code> if the text is in the ASCII charset.
+   *
+   * @param  text the text to check
+   * @return <code>true</code> if the text is in the ASCII charset;
+   *         <code>false</code> otherwise
+   */
+  public static boolean isAscii(CharSequence text) {
+    if (text == null) {
+      return false;
+    }
+
+    boolean ascii = true;
+
+    for (int i = 0; i < text.length(); i++) {
+      if (!isAscii(text.charAt(i))) {
+        ascii = false;
+        break;
+      }
+    }
+    return ascii;
+  }
+
+  /**
+   * Returns <code>true</code> if the character is in the ASCII charset.
+   *
+   * @param  c the character to check
+   * @return <code>true</code> if the character is in the ASCII charset;
+   *         <code>false</code> otherwise
+   */
+  public static boolean isAscii(char c) {
+    int i = c;
+
+    if ((i >= 32) && (i <= 126)) {
+      return true;
+    }
+
+    return false;
+  }
 }

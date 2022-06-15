@@ -20,6 +20,7 @@ package com.axelor.web.service;
 
 import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
+import com.axelor.common.http.ContentDisposition;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.db.MetaFile;
 import com.axelor.meta.schema.actions.ActionExport;
@@ -68,7 +69,7 @@ public class FileService extends AbstractService {
     }
     return javax.ws.rs.core.Response.ok(file, MediaType.APPLICATION_OCTET_STREAM_TYPE)
         .header(
-            "Content-Disposition", "attachment; " + buildContentDispositionFilename(file.getName()))
+            "Content-Disposition", ContentDisposition.attachment().filename(file.getName()).build().toString())
         .header("Content-Transfer-Encoding", "binary")
         .build();
   }
@@ -97,12 +98,12 @@ public class FileService extends AbstractService {
 
     if (type != MediaType.APPLICATION_OCTET_STREAM_TYPE) {
       return builder
-          .header("Content-Disposition", "inline; " + buildContentDispositionFilename(fileName))
+          .header("Content-Disposition", ContentDisposition.inline().filename(fileName).build().toString())
           .build();
     }
 
     return builder
-        .header("Content-Disposition", "attachment; " + buildContentDispositionFilename(fileName))
+        .header("Content-Disposition", ContentDisposition.attachment().filename(fileName).build().toString())
         .header("Content-Transfer-Encoding", "binary")
         .build();
   }
@@ -176,18 +177,6 @@ public class FileService extends AbstractService {
     }
 
     return javax.ws.rs.core.Response.ok(data).build();
-  }
-
-  static String buildContentDispositionFilename(String filename) {
-    if (StringUtils.isBlank(filename)) {
-      return "";
-    }
-    if (StandardCharsets.US_ASCII.newEncoder().canEncode(filename)
-        && !filename.matches(".*[\";].*")) {
-      return "filename=\"" + filename + "\"";
-    }
-
-    return "filename*=UTF-8''" + new PercentEscaper("", false).escape(filename);
   }
 
   /**

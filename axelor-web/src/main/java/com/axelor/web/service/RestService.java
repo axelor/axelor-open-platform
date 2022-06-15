@@ -26,6 +26,7 @@ import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
 import com.axelor.common.StringUtils;
+import com.axelor.common.http.ContentDisposition;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
@@ -406,7 +407,7 @@ public class RestService extends ResourceService {
             })
         .header(
             "Content-Disposition",
-            "attachment; " + FileService.buildContentDispositionFilename(fileName))
+                ContentDisposition.attachment().filename(fileName).build().toString())
         .build();
   }
 
@@ -480,7 +481,7 @@ public class RestService extends ResourceService {
     return javax.ws.rs.core.Response.ok(data)
         .header(
             "Content-Disposition",
-            "attachment; " + FileService.buildContentDispositionFilename(fileName))
+                ContentDisposition.attachment().filename(fileName).build().toString())
         .build();
   }
 

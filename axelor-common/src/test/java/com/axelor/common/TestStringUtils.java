@@ -100,4 +100,28 @@ public class TestStringUtils {
     assertEquals("Cesar", StringUtils.stripAccent("César"));
     assertEquals("Andre", StringUtils.stripAccent("André"));
   }
+
+  @Test
+  public void testAsciiChar() {
+    assertTrue(StringUtils.isAscii(' '));
+    assertTrue(StringUtils.isAscii('a'));
+    assertTrue(StringUtils.isAscii('A'));
+    assertTrue(StringUtils.isAscii('3'));
+    assertTrue(StringUtils.isAscii('-'));
+    assertFalse(StringUtils.isAscii('\n'));
+    assertFalse(StringUtils.isAscii('é'));
+  }
+
+  @Test
+  public void testAsciiText() {
+    assertFalse(StringUtils.isAscii(null));
+    assertTrue(StringUtils.isAscii(""));
+    assertTrue(StringUtils.isAscii(" "));
+    assertTrue(StringUtils.isAscii("Toto"));
+    assertTrue(StringUtils.isAscii("ab12"));
+    assertTrue(StringUtils.isAscii("!ab-c~"));
+    assertTrue(StringUtils.isAscii("\u0020")); // space
+    assertFalse(StringUtils.isAscii("\u00FC")); // ü
+    assertFalse(StringUtils.isAscii("é"));
+  }
 }

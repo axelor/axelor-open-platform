@@ -23,6 +23,7 @@ import com.axelor.auth.db.User;
 import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.csv.CSVFile;
+import com.axelor.common.http.ContentDisposition;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaSecurity;
 import com.axelor.db.Model;
@@ -578,14 +579,14 @@ public class DmsService {
       return builder
           .header(
               "Content-Disposition",
-              "inline; " + FileService.buildContentDispositionFilename(fileName))
+                  ContentDisposition.inline().filename(fileName).build().toString())
           .build();
     }
 
     return builder
         .header(
             "Content-Disposition",
-            "attachment; " + FileService.buildContentDispositionFilename(fileName))
+                ContentDisposition.attachment().filename(fileName).build().toString())
         .header("Content-Transfer-Encoding", "binary")
         .build();
   }
