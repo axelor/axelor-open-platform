@@ -21,6 +21,7 @@ package com.axelor.common;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -63,5 +64,31 @@ public class TestFileUtils {
     }
 
     assertFalse(target.exists());
+  }
+
+  @Test
+  public void testSafeFileName() {
+    assertNull(FileUtils.safeFileName(null));
+    assertEquals(FileUtils.safeFileName(""), "");
+    
+    //trim
+    assertEquals("toto.txt", FileUtils.safeFileName(" toto.txt "));
+
+    //accent
+    assertEquals("Cesar.txt", FileUtils.safeFileName("César.txt"));
+
+    // illegal
+    assertEquals("", FileUtils.safeFileName("?[]/\\=<>:;,'\"&$#*()|~`!{',}%+’«»”“"));
+
+    // space
+    assertEquals("a-fil-e.txt", FileUtils.safeFileName("a fil e.txt"));
+
+    // illegal start and end chars
+    assertEquals("a-file.txt", FileUtils.safeFileName("-a file.txt"));
+    assertEquals("a-file.txt", FileUtils.safeFileName(".a file.txt."));
+
+    // legal
+    assertEquals("toto.txt", FileUtils.safeFileName("toto.txt"));
+    assertEquals("漢字.txt", FileUtils.safeFileName("漢字.txt"));
   }
 }

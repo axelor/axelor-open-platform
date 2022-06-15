@@ -191,4 +191,52 @@ public final class FileUtils {
       return CONTINUE;
     }
   }
+
+  private static final char ILLEGAL_FILENAME_CHARS_REPLACE = '-';
+  private static final Character[] INVALID_FILENAME_CHARS = {
+          '?', '[', ']', '/', '\\', '=', '<', '>', ':', ';', ',', '\'',
+          '"', '&', '$', '#', '*', '(', ')', '|', '~', '`', '!', '{',
+          '}', '%', '+', '’', '«', '»', '”', '“', 0x7F, '\n', '\r', '\t'
+  };
+
+  /**
+   * Sanitizes a filename, replacing with dash
+   * <ul>
+   *  <li>Removes special characters that are illegal in filenames on certain operating systems
+   *  <li>Replaces spaces and consecutive underscore with a single dash
+   *  <li>Trims dot, dash and underscore from beginning and end of filename
+   *  <ul>
+   * @param originalFileName The filename to be sanitized
+   * @return string The sanitized filename
+   */
+  public static String safeFileName(String originalFileName) {
+    if (StringUtils.isEmpty(originalFileName)) {
+      return originalFileName;
+    }
+    // trim
+    String fileName = originalFileName.trim();
+    // unaccent
+    fileName = StringUtils.stripAccent(fileName);
+    // replace illegal and space
+    char[] chars = fileName.toCharArray();
+    for (int i = 0; i < chars.length; i++) {
+      char c = chars[i];
+      if (c == '\u0020') {
+        chars[i] = ILLEGAL_FILENAME_CHARS_REPLACE;
+        continue;
+      }
+      for (char illegal : INVALID_FILENAME_CHARS) {
+        if (c == illegal) {
+          chars[i] = ILLEGAL_FILENAME_CHARS_REPLACE;
+          break;
+        }
+      }
+    }
+    fileName = new String(chars);
+    // consecutive underscore
+    fileName = fileName.replaceAll("(" + ILLEGAL_FILENAME_CHARS_REPLACE + ")+", String.valueOf(ILLEGAL_FILENAME_CHARS_REPLACE));
+    // start or end with dot, dash or underscore
+    fileName = fileName.replaceAll("(?:^[-_.]+)|(?:[-_.]+$)", "");
+    return fileName;
+  }
 }
