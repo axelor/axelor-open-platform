@@ -1767,14 +1767,15 @@ ui.download = function download(url, fileName) {
 
   // Gets filename from Content-Disposition
   function getFilename(disposition) {
-    var results = /filename\*=UTF-8''([\w%\-\.]+)/i.exec(disposition);
+    var results = /filename\*=UTF-8''(.*)/i.exec(disposition);
     if (results) {
       return decodeURIComponent(results[1]);
     }
 
-    results = /filename=(['"])?(.*?)\1/i.exec(disposition);
+    results = /filename=(.*)/i.exec(disposition);
     if (results) {
-      return results[2];
+      // remove trailing double quote
+      return results[1].replace(/^"(.+(?="$))"$/, '$1');
     }
 
     return null;
