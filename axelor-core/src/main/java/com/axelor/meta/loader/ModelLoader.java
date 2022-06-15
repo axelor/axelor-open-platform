@@ -151,7 +151,7 @@ public class ModelLoader extends AbstractParallelLoader {
   private void importSequences(Element element, boolean update) {
     String name = element.getAttribute("name");
 
-    if (isVisited(MetaSequence.class, name)) {
+    if (isVisited(MetaSequence.class, name, null)) {
       return;
     }
     if (sequences.findByName(name) != null) {

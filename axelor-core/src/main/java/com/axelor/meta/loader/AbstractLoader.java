@@ -17,6 +17,7 @@
  */
 package com.axelor.meta.loader;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -42,22 +43,56 @@ abstract class AbstractLoader {
   private static final List<Runnable> resolveTasks = new ArrayList<>();
 
   /**
-   * Check whether the given name is already visited.
+   * Checks whether an element is already visited. Element can be either identified the pair {@code
+   * type}/{@code name} or by its {@code xmlId}.
    *
-   * @param type the key type
-   * @param name the key name
-   * @return true if the name is already visited false otherwise
+   * @param type element type
+   * @param name element name
+   * @param baseType element base type
+   * @param xmlId element xmlId
+   * @return whether the element is already visited
    */
-  protected boolean isVisited(Class<?> type, String name) {
+  protected boolean isVisited(Class<?> type, String name, Class<?> baseType, String xmlId) {
+    final Class<?> entryType;
+    final String entryName;
+    final boolean withoutId = StringUtils.isBlank(xmlId);
+
+    if (withoutId) {
+      entryType = type;
+      entryName = name;
+    } else {
+      entryType = baseType;
+      entryName = xmlId;
+    }
+
     synchronized (visited) {
-      Entry<Class<?>, String> key = new SimpleImmutableEntry<>(type, name);
+      final Entry<Class<?>, String> key = new SimpleImmutableEntry<>(entryType, entryName);
       if (visited.contains(key)) {
-        log.error("duplicate {} found: {}", type.getSimpleName(), name);
+        log.error(
+                "Duplicate {} found {} 'id': {}",
+                type.getSimpleName(),
+                withoutId ? "without" : "with",
+                entryName);
         return true;
       }
       visited.add(key);
       return false;
     }
+  }
+
+
+
+  /**
+   * Checks whether an element is already visited. Element can be either identified the pair {@code
+   * type}/{@code name} or by its {@code xmlId}.
+   *
+   * @param type element type
+   * @param name element name
+   * @param xmlId element xmlId
+   * @return whether the element is already visited
+   */
+  protected boolean isVisited(Class<?> type, String name, String xmlId) {
+    return isVisited(type, name, type, xmlId);
   }
 
   /**

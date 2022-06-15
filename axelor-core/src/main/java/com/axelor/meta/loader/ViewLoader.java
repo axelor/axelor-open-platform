@@ -242,12 +242,7 @@ public class ViewLoader extends AbstractParallelLoader {
     String type = view.getType();
     String modelName = view.getModel();
 
-    if (StringUtils.isBlank(xmlId)) {
-      if (isVisited(view.getClass(), name)) {
-        log.error("duplicate view without 'id': {}", name);
-        return;
-      }
-    } else if (isVisited(view.getClass(), xmlId)) {
+    if (isVisited(view.getClass(), name, AbstractView.class, xmlId)) {
       return;
     }
 
@@ -364,12 +359,7 @@ public class ViewLoader extends AbstractParallelLoader {
     String name = selection.getName();
     String xmlId = selection.getXmlId();
 
-    if (StringUtils.isBlank(xmlId)) {
-      if (isVisited(Selection.class, name)) {
-        log.error("duplicate selection without 'id': {}", name);
-        return;
-      }
-    } else if (isVisited(Selection.class, xmlId)) {
+    if (isVisited(Selection.class, name, xmlId)) {
       return;
     }
 
@@ -497,12 +487,7 @@ public class ViewLoader extends AbstractParallelLoader {
     String name = action.getName();
     String xmlId = action.getXmlId();
 
-    if (StringUtils.isBlank(xmlId)) {
-      if (isVisited(Action.class, name)) {
-        log.error("duplicate action without 'id': {}", name);
-        return;
-      }
-    } else if (isVisited(Action.class, xmlId)) {
+    if (isVisited(Action.class, name, xmlId)) {
       return;
     }
 
@@ -590,12 +575,7 @@ public class ViewLoader extends AbstractParallelLoader {
     String name = menuItem.getName();
     String xmlId = menuItem.getXmlId();
 
-    if (StringUtils.isBlank(xmlId)) {
-      if (isVisited(MenuItem.class, name)) {
-        log.error("duplicate menu without 'id': {}", name);
-        return;
-      }
-    } else if (isVisited(MenuItem.class, xmlId)) {
+    if (isVisited(MenuItem.class, name, xmlId)) {
       return;
     }
 
@@ -690,12 +670,7 @@ public class ViewLoader extends AbstractParallelLoader {
     String name = menuItem.getName();
     String xmlId = menuItem.getXmlId();
 
-    if (StringUtils.isBlank(xmlId)) {
-      if (isVisited(MenuItem.class, name)) {
-        log.error("duplicate action menu without 'id': {}", name);
-        return;
-      }
-    } else if (isVisited(MenuItem.class, xmlId)) {
+    if (isVisited(MenuItem.class, name, xmlId)) {
       return;
     }
 
