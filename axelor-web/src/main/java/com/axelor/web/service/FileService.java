@@ -144,19 +144,22 @@ public class FileService extends AbstractService {
 
     final Map<String, Object> data = new HashMap<>();
     try {
-      fileName = sanitizeFilename(URLDecoder.decode(fileName, "UTF-8"));
+      fileName = URLDecoder.decode(fileName, "UTF-8");
+      final String safeFileName = FileUtils.safeFileName(fileName);
 
       // check if file name is valid
-      MetaFiles.checkPath(fileName);
+      MetaFiles.checkPath(safeFileName);
       MetaFiles.checkType(fileType);
       final File file = files.upload(stream, fileOffset, fileSize, fileId);
       // check if file content is valid
       MetaFiles.checkType(file);
       if (Files.size(file.toPath()) == fileSize) {
         final MetaFile meta = new MetaFile();
-        meta.setFileName(fileName);
+        meta.setFileName(safeFileName);
         meta.setFileType(fileType);
         files.upload(file, meta);
+        // Keep original file name
+        meta.setFileName(fileName);
         return javax.ws.rs.core.Response.ok(meta).build();
       }
     } catch (IllegalArgumentException e) {
@@ -179,35 +182,4 @@ public class FileService extends AbstractService {
     return javax.ws.rs.core.Response.ok(data).build();
   }
 
-  /**
-   * Sanitizes a filename, replacing whitespace with dashes and removing special characters that are
-   * either illegal on some operating systems or that cause escaping.
-   *
-   * @param filename
-   * @return sanitized filename
-   */
-  static String sanitizeFilename(String filename) {
-    Preconditions.checkArgument(StringUtils.notBlank(filename));
-
-    final int pos = filename.lastIndexOf('.');
-    final String name;
-    final String ext;
-
-    if (pos >= 0) {
-      name = filename.substring(0, pos);
-      ext = filename.substring(pos);
-    } else {
-      name = filename;
-      ext = "";
-    }
-
-    return sanitizeFilenamePart(name) + sanitizeFilenamePart(ext);
-  }
-
-  private static String sanitizeFilenamePart(String part) {
-    part = part.replaceAll("[?\\[\\]/\\\\=<>:;,\'\"&$#*()|~`!{}%+\0]", "");
-    part = part.replaceAll("[\\s\\-\u2013\u2014]+", "-");
-    part = part.replaceAll("(?:^-+)|(?:-+$)", "");
-    return part;
-  }
 }

@@ -25,6 +25,7 @@ import com.axelor.app.AvailableAppSettings;
 import com.axelor.app.internal.AppFilter;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
+import com.axelor.common.FileUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.http.ContentDisposition;
 import com.axelor.db.EntityHelper;
@@ -339,14 +340,13 @@ public class RestService extends ResourceService {
     request.setModel(getModel());
     final Map<String, Object> data = request.getData();
 
-    final String fileName = FileService.sanitizeFilename(String.valueOf(data.get("fileName")));
+    final String originalFileName = String.valueOf(data.get("fileName"));
+    final String safeFileName = FileUtils.safeFileName(originalFileName);
     final String fileType = String.valueOf(data.get("fileType"));
 
     // check if file name is valid
-    MetaFiles.checkPath(fileName);
+    MetaFiles.checkPath(safeFileName);
     MetaFiles.checkType(fileType);
-
-    data.put("fileName", fileName);
 
     final InputPart filePart = formData.get("file").get(0);
     final InputPart fieldPart = formData.get("field").get(0);
@@ -361,6 +361,8 @@ public class RestService extends ResourceService {
       return getResource().save(request);
     }
 
+    data.put("fileName", safeFileName);
+
     final MetaFiles files = Beans.get(MetaFiles.class);
     final MetaFileRepository repo = Beans.get(MetaFileRepository.class);
     final MetaFile metaFile = Mapper.toBean(MetaFile.class, data);
@@ -370,11 +372,12 @@ public class RestService extends ResourceService {
       entity = repo.find(metaFile.getId());
     }
 
-    entity.setFileName(metaFile.getFileName());
+    entity.setFileName(safeFileName);
     entity.setFileType(metaFile.getFileType());
 
     File tmp = files.upload(fileStream, 0, -1, UUID.randomUUID().toString());
-    entity = files.upload(tmp, entity);
+    final MetaFile updatedEntity = files.upload(tmp, entity);
+    JPA.runInTransaction(() -> updatedEntity.setFileName(originalFileName));
 
     final Response response = new Response();
     response.setData(Arrays.asList(entity));

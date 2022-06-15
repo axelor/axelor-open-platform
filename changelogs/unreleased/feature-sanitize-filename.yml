@@ -2,5 +2,7 @@
 title: Sanitize uploaded filenames
 type: feature
 description: |
-  Sanitize uploaded filenames, replacing whitespace with dashes and removing special characters that are
-  either illegal on some operating systems or that cause escaping
+  Sanitize uploaded filenames :
+  - Removes special characters that are illegal in filenames on certain operating systems
+  - Replaces spaces and consecutive underscore with a single dash
+  - Trims dot, dash and underscore from beginning and end of filename
