@@ -205,7 +205,8 @@ public final class FileUtils {
    * <ul>
    *   <li>Removes special characters that are illegal in filenames on certain operating systems
    *   <li>Replaces spaces and consecutive underscore with a single dash
-   *   <li>Trims dot, dash and underscore from beginning and end of filename
+   *   <li>Trims dot, dash and underscore from beginning and end of filename (with and without the
+   *       extension part)
    *       <ul>
    *
    * @param originalFileName The filename to be sanitized
@@ -240,8 +241,61 @@ public final class FileUtils {
         fileName.replaceAll(
             "(" + ILLEGAL_FILENAME_CHARS_REPLACE + ")+",
             String.valueOf(ILLEGAL_FILENAME_CHARS_REPLACE));
-    // start or end with dot, dash or underscore
+    // leading and trailing dot/dash/underscore
     fileName = fileName.replaceAll("(?:^[-_.]+)|(?:[-_.]+$)", "");
+    // leading and trailing dot/dash/underscore on file name only (without extension)
+    if (fileName.indexOf('.') > 0) {
+      String extension = getExtension(fileName);
+      String fileNameWithoutExtension =
+          stripExtension(fileName).replaceAll("(?:^[-_.]+)|(?:[-_.]+$)", "");
+      fileName = fileNameWithoutExtension + "." + extension;
+    }
+    // end
+    return fileName;
+  }
+
+  /**
+   * Gets the extension part of the given fileName
+   *
+   * <p>It returns the extension of the fileName after the last dot
+   *
+   * @param fileName the fileName to retrieve the extension of
+   * @return the extension of the file or an empty string is not found or null if the given filename
+   *     is null
+   */
+  public static String getExtension(String fileName) {
+    if (fileName == null) {
+      return null;
+    }
+
+    int pos = fileName.lastIndexOf('.');
+
+    if (pos > 0) {
+      return fileName.substring(pos + 1);
+    }
+
+    return "";
+  }
+
+  /**
+   * Strip the extension part of the given fileName
+   *
+   * <p>It returns the name of file before the last dot
+   *
+   * @param fileName the fileName to strip the extension
+   * @return the file name
+   */
+  public static String stripExtension(String fileName) {
+    if (fileName == null) {
+      return null;
+    }
+
+    int pos = fileName.lastIndexOf('.');
+
+    if (pos > 0) {
+      return fileName.substring(0, pos);
+    }
+
     return fileName;
   }
 }

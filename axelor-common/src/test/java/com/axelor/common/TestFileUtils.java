@@ -86,9 +86,33 @@ public class TestFileUtils {
     // illegal start and end chars
     assertEquals("a-file.txt", FileUtils.safeFileName("-a file.txt"));
     assertEquals("a-file.txt", FileUtils.safeFileName(".a file.txt."));
+    assertEquals("hello.txt", FileUtils.safeFileName("hello .txt"));
+    assertEquals("hello.txt", FileUtils.safeFileName("hello-_..txt"));
+    assertEquals("hello.txt", FileUtils.safeFileName("-hello-_..txt "));
 
     // legal
     assertEquals("toto.txt", FileUtils.safeFileName("toto.txt"));
     assertEquals("漢字.txt", FileUtils.safeFileName("漢字.txt"));
+    assertEquals("hello.txt", FileUtils.safeFileName(" hello.txt"));
+  }
+
+  @Test
+  public void testStripExtension() {
+    assertNull(FileUtils.stripExtension(null));
+    assertEquals("", FileUtils.stripExtension(""));
+    assertEquals("hello", FileUtils.stripExtension("hello.txt"));
+    assertEquals("hello", FileUtils.stripExtension("hello"));
+    assertEquals("hel.lo", FileUtils.stripExtension("hel.lo.txt"));
+    assertEquals("../filename", FileUtils.stripExtension("../filename.ext"));
+  }
+
+  @Test
+  public void testGetExtension() {
+    assertNull(FileUtils.getExtension(null));
+    assertEquals("", FileUtils.getExtension(""));
+    assertEquals("txt", FileUtils.getExtension("hello.txt"));
+    assertEquals("", FileUtils.getExtension("hello"));
+    assertEquals("txt", FileUtils.getExtension("hel.lo.txt"));
+    assertEquals("ext", FileUtils.getExtension("../filename.ext"));
   }
 }
