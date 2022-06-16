@@ -1785,10 +1785,7 @@ ui.download = function download(url, fileName) {
     var link = document.createElement('a');
 
     var disposition = xhr.getResponseHeader('Content-Disposition');
-    var actualFilename = getFilename(disposition);
-    if (!_.isBlank(actualFilename)) {
-      name = actualFilename;
-    }
+    var name = getFilename(disposition) || fileName || "";
 
     link.innerHTML = name || "File";
     link.download = name || true;
@@ -1816,16 +1813,15 @@ ui.download = function download(url, fileName) {
     if (_.isBlank(name)) {
       msg = _t("Downloading file…");
     } else {
-      var fname = "<strong>" + name + "</strong>";
+      var fname = "<strong>" + axelor.sanitize(name) + "</strong>";
       msg = _t("Downloading {0}…", fname);
     }
     axelor.notify.info("<p>" + msg + "</p>");
   }
 
-  var name = axelor.sanitize(fileName) || "";
   if (fileName) {
     url += ( /\?/.test( url ) ? "&" : "?" ) + jQuery.param({
-      "fileName": name
+      "fileName": fileName
     });
   }
 
@@ -1836,10 +1832,10 @@ ui.download = function download(url, fileName) {
     error : function (e) {
       if (e.status == 404) {
         var msg;
-        if (_.isBlank(name)) {
+        if (_.isBlank(fileName)) {
           msg = _t("File does not exist.");
         } else {
-          var fname = "<strong>" + name + "</strong>";
+          var fname = "<strong>" + axelor.sanitize(fileName) + "</strong>";
           msg = _t("File {0} does not exist.", fname);
         }
         axelor.notify.error("<p>" + msg + "</p>");
