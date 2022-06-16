@@ -114,11 +114,11 @@ public class TestFiles extends MetaTest {
     assertNotNull(dms2.getParent());
     assertEquals(dms1.getParent(), dms2.getParent());
 
-    // attach 2nd file again, it should create new file with name "dms-test2 (1)"
+    // attach 2nd file again, it should create new file with name "dms-test2-1"
     DMSFile dms3 = files.attach(new FileInputStream(tmp2.toFile()), "dms-test2", contact);
 
     assertNotNull(dms3);
-    assertEquals(dms3.getMetaFile().getFilePath(), "dms-test2 (1)");
+    assertEquals("dms-test2-1", dms3.getMetaFile().getFilePath());
 
     // clean up uploaded files
     files.delete(dms1);
