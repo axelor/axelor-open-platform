@@ -132,7 +132,7 @@
           Name of the column in the underlying database table (should be
           defined when the field name is reserved word in database systems).&lt;br&gt;&lt;br&gt;
           When used on many-to-many with 'table' attribute, it's used as the foreign key column
-          in the underlying database table referring the owing table.
+          in the underlying database table referring the owning table.
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
@@ -363,7 +363,7 @@
         <xsd:attribute name="column2" type="xsd:string">
           <xsd:annotation>
             <xsd:documentation>
-            Name of the foreign key column in the underlying database table referring the non-owing table.
+            Name of the foreign key column in the underlying database table referring the non-owning table.
             </xsd:documentation>
           </xsd:annotation>
         </xsd:attribute>

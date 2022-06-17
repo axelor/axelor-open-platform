@@ -439,7 +439,7 @@ many-to-one relationship.
 
 | `ref` | name of the reference entity class (FQN if not in same package)
 | `table` | specify the join table name.
-| `column2` | name of the foreign key column in the underlying database table referring the non-owing table.
+| `column2` | name of the foreign key column in the underlying database table referring the non-owning table.
 |===
 
 example:
@@ -462,7 +462,7 @@ one-to-one relationship.
 | `mappedBy` | for bidirectional fields, name of the owner side field
 | `orphanRemoval` | specify whether to remove orphaned records if they have been removed from the relationship.
 | `table` | specify the join table name.
-| `column2` | name of the foreign key column in the underlying database table referring the non-owing table.
+| `column2` | name of the foreign key column in the underlying database table referring the non-owning table.
 |===
 
 [source,xml]
@@ -488,7 +488,7 @@ relationship.
 | `orphanRemoval` | whether to remove orphaned records (default true)
 | `orderBy` | specify the ordering of the collection value by the given field
 | `table` | specify the join table name.
-| `column2` | name of the foreign key column in the underlying database table referring the non-owing table.
+| `column2` | name of the foreign key column in the underlying database table referring the non-owning table.
 |===
 
 [source,xml]
@@ -510,7 +510,7 @@ relationship.
 | `mappedBy` | for bidirectional fields, name of the owner side field
 | `orderBy` | specify the ordering of the collection value by the given field.
 | `table` | specify the join table name.
-| `column2` | name of the foreign key column in the underlying database table referring the non-owing table.
+| `column2` | name of the foreign key column in the underlying database table referring the non-owning table.
 |===
 
 [source,xml]
