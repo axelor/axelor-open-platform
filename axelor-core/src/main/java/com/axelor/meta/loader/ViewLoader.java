@@ -135,10 +135,13 @@ public class ViewLoader extends AbstractParallelLoader {
 
     runResolveTasks();
 
-    Set<?> unresolved = this.unresolvedKeys();
+    Set<?> unresolved = unresolvedKeys();
     if (!unresolved.isEmpty()) {
-      LOG.error("Unresolved items: {}", unresolved);
-      throw new PersistenceException("There are some unresolved items; check the log.");
+      LOG.error("Found {} unresolved item(s): {}", unresolved.size(), unresolved);
+      throw new PersistenceException(
+          String.format(
+              "Found %d unresolved item(s). Please check the logs for details.",
+              unresolved.size()));
     }
 
     migrateViews();
@@ -148,6 +151,11 @@ public class ViewLoader extends AbstractParallelLoader {
   protected void terminate(boolean update) {
     linkMissingGroups();
     generateFinalViews(update);
+
+    final Set<String> duplicates = getDuplicates();
+    if (!duplicates.isEmpty()) {
+      LOG.error("Found {} duplicate item(s): {}", duplicates.size(), duplicates);
+    }
   }
 
   private void migrateViews() {

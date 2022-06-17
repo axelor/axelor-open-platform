@@ -37,6 +37,7 @@ abstract class AbstractLoader {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractLoader.class);
 
   private static final Map<Entry<Class<?>, String>, Boolean> visited = new ConcurrentHashMap<>();
+  private static final Set<String> duplicates = ConcurrentHashMap.newKeySet();
   private static final Map<Entry<Class<?>, String>, Set<Long>> unresolved =
       new ConcurrentHashMap<>();
   private static final Collection<Runnable> resolveTasks = new ConcurrentLinkedQueue<>();
@@ -68,6 +69,8 @@ abstract class AbstractLoader {
       return false;
     }
 
+    duplicates.add(entryName);
+
     LOG.error(
         "Duplicate {} found {} 'id': {}",
         type.getSimpleName(),
@@ -87,6 +90,15 @@ abstract class AbstractLoader {
    */
   protected boolean isVisited(Class<?> type, String name, String xmlId) {
     return isVisited(type, name, type, xmlId);
+  }
+
+  /**
+   * Returns items that have been visited several times.
+   *
+   * @return duplicate items
+   */
+  protected Set<String> getDuplicates() {
+    return duplicates;
   }
 
   /**
@@ -168,6 +180,7 @@ abstract class AbstractLoader {
 
   static void doCleanUp() {
     visited.clear();
+    duplicates.clear();
     unresolved.clear();
     resolveTasks.clear();
   }
