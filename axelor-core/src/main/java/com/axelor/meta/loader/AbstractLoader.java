@@ -20,18 +20,15 @@ package com.axelor.meta.loader;
 
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,9 +36,10 @@ abstract class AbstractLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractLoader.class);
 
-  private static final Set<Entry<Class<?>, String>> visited = new HashSet<>();
-  private static final Map<Class<?>, Multimap<String, Long>> unresolved = new HashMap<>();
-  private static final List<Runnable> resolveTasks = new ArrayList<>();
+  private static final Map<Entry<Class<?>, String>, Boolean> visited = new ConcurrentHashMap<>();
+  private static final Map<Entry<Class<?>, String>, Set<Long>> unresolved =
+      new ConcurrentHashMap<>();
+  private static final Collection<Runnable> resolveTasks = new ConcurrentLinkedQueue<>();
 
   /**
    * Checks whether an element is already visited. Element can be either identified the pair {@code
@@ -51,7 +49,7 @@ abstract class AbstractLoader {
    * @param name element name
    * @param baseType element base type
    * @param xmlId element xmlId
-   * @return whether the element is already visited
+   * @return whether the element is already visited or not
    */
   protected boolean isVisited(Class<?> type, String name, Class<?> baseType, String xmlId) {
     final Class<?> entryType;
@@ -66,19 +64,16 @@ abstract class AbstractLoader {
       entryName = xmlId;
     }
 
-    synchronized (visited) {
-      final Entry<Class<?>, String> key = new SimpleImmutableEntry<>(entryType, entryName);
-      if (visited.contains(key)) {
-        LOG.error(
-            "Duplicate {} found {} 'id': {}",
-            type.getSimpleName(),
-            withoutId ? "without" : "with",
-            entryName);
-        return true;
-      }
-      visited.add(key);
+    if (visited.putIfAbsent(Map.entry(entryType, entryName), Boolean.TRUE) == null) {
       return false;
     }
+
+    LOG.error(
+        "Duplicate {} found {} 'id': {}",
+        type.getSimpleName(),
+        withoutId ? "without" : "with",
+        entryName);
+    return true;
   }
 
   /**
@@ -88,7 +83,7 @@ abstract class AbstractLoader {
    * @param type element type
    * @param name element name
    * @param xmlId element xmlId
-   * @return whether the element is already visited
+   * @return whether the element is already visited or not
    */
   protected boolean isVisited(Class<?> type, String name, String xmlId) {
     return isVisited(type, name, type, xmlId);
@@ -97,59 +92,49 @@ abstract class AbstractLoader {
   /**
    * Put a value of the given type for resolution for the given unresolved key.<br>
    * <br>
-   * The value is put inside a {@link Multimap} with unresolvedKey as the key.
+   * The value is put inside a {@link Map} with unresolvedKey as the key.
    *
    * @param type
    * @param unresolvedKey
    * @param entityId
    */
   protected <T> void setUnresolved(Class<T> type, String unresolvedKey, Long entityId) {
-    synchronized (unresolved) {
-      final Multimap<String, Long> mm =
-          unresolved.computeIfAbsent(type, key -> HashMultimap.create());
-      mm.put(unresolvedKey, entityId);
-    }
+    final Set<Long> entityIds =
+        unresolved.computeIfAbsent(
+            Map.entry(type, unresolvedKey), key -> ConcurrentHashMap.newKeySet());
+    entityIds.add(entityId);
   }
 
   /**
    * Resolve the given unresolved key.<br>
    * <br>
    * All the pending values of the unresolved key are returned for further processing. The values
-   * are removed from the backing {@link Multimap}.
+   * are removed from the backing {@link Map}.
    *
    * @param type the type of pending objects
    * @param unresolvedKey the unresolved key
    * @return a set of all the pending objects
    */
   protected <T> Set<Long> resolve(Class<T> type, String unresolvedKey) {
-    synchronized (unresolved) {
-      Set<Long> entityIds = Sets.newHashSet();
-      Multimap<String, Long> mm = unresolved.get(type);
-      if (mm == null) {
-        return entityIds;
-      }
-      for (Long item : mm.get(unresolvedKey)) {
-        entityIds.add((Long) item);
-      }
-      mm.removeAll(unresolvedKey);
-      return entityIds;
+    final Set<Long> entityIds = unresolved.remove(Map.entry(type, unresolvedKey));
+    if (entityIds == null) {
+      return Collections.emptySet();
     }
+    return entityIds;
   }
 
   protected void addResolveTask(
       Class<?> type, String name, Long entityId, BiConsumer<Long, Long> consumer) {
-    Runnable task = () -> resolve(type, name).forEach(id -> consumer.accept(id, entityId));
-    synchronized (resolveTasks) {
-      resolveTasks.add(task);
-    }
+    final Runnable task = () -> resolve(type, name).forEach(id -> consumer.accept(id, entityId));
+    resolveTasks.add(task);
   }
 
   protected void runResolveTasks() {
-    if (resolveTasks.isEmpty()) {
-      return;
-    }
-
     synchronized (resolveTasks) {
+      if (resolveTasks.isEmpty()) {
+        return;
+      }
+
       resolveTasks.forEach(task -> JPA.runInTransaction(task::run));
       resolveTasks.clear();
     }
@@ -161,13 +146,7 @@ abstract class AbstractLoader {
    * @return set of unresolved keys
    */
   protected Set<String> unresolvedKeys() {
-    synchronized (unresolved) {
-      Set<String> names = Sets.newHashSet();
-      for (Multimap<String, Long> mm : unresolved.values()) {
-        names.addAll(mm.keySet());
-      }
-      return names;
-    }
+    return unresolved.keySet().stream().map(Entry::getValue).collect(Collectors.toSet());
   }
 
   /**
@@ -188,15 +167,9 @@ abstract class AbstractLoader {
   void doLast(Module module, boolean update) {}
 
   static void doCleanUp() {
-    synchronized (visited) {
-      visited.clear();
-    }
-    synchronized (unresolved) {
-      unresolved.clear();
-    }
-    synchronized (resolveTasks) {
-      resolveTasks.clear();
-    }
+    visited.clear();
+    unresolved.clear();
+    resolveTasks.clear();
   }
 
   public final void load(Module module, boolean update) {
