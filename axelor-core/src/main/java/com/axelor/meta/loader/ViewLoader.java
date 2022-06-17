@@ -239,7 +239,7 @@ public class ViewLoader extends AbstractParallelLoader {
     String type = view.getType();
     String modelName = view.getModel();
 
-    if (isVisited(view.getClass(), name, xmlId)) {
+    if (isVisited(view.getClass(), name, AbstractView.class, xmlId)) {
       return;
     }
 

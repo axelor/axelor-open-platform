@@ -44,43 +44,54 @@ abstract class AbstractLoader {
   private static final List<Runnable> resolveTasks = new ArrayList<>();
 
   /**
-   * Checks whether the given type/name or xmlId is already visited. if xmlId is not blank, uses it
-   * as the only key. Otherwise, uses the pair type/name as key.
+   * Checks whether an element is already visited. Element can be either identified the pair {@code
+   * type}/{@code name} or by its {@code xmlId}.
    *
-   * @param type the key type
-   * @param name the key name
-   * @param xmlId the xmlId
-   * @return true if the name is already visited false otherwise
+   * @param type element type
+   * @param name element name
+   * @param baseType element base type
+   * @param xmlId element xmlId
+   * @return whether the element is already visited
    */
-  protected boolean isVisited(Class<?> type, String name, String xmlId) {
-    return StringUtils.isBlank(xmlId) ? isVisited(type, name) : isVisitedId(type, xmlId);
-  }
+  protected boolean isVisited(Class<?> type, String name, Class<?> baseType, String xmlId) {
+    final Class<?> entryType;
+    final String entryName;
+    final boolean withoutId = StringUtils.isBlank(xmlId);
 
-  protected boolean isVisited(Class<?> type, String name) {
-    if (isVisitedInternal(type, name)) {
-      LOG.error("Duplicate {} found without 'id': {}", type.getSimpleName(), name);
-      return true;
+    if (withoutId) {
+      entryType = type;
+      entryName = name;
+    } else {
+      entryType = baseType;
+      entryName = xmlId;
     }
-    return false;
-  }
 
-  protected boolean isVisitedId(Class<?> type, String xmlId) {
-    if (isVisitedInternal(null, xmlId)) {
-      LOG.error("Duplicate {} found with 'id': {}", type.getSimpleName(), xmlId);
-      return true;
-    }
-    return false;
-  }
-
-  private boolean isVisitedInternal(Class<?> type, String name) {
     synchronized (visited) {
-      Entry<Class<?>, String> key = new SimpleImmutableEntry<>(type, name);
+      final Entry<Class<?>, String> key = new SimpleImmutableEntry<>(entryType, entryName);
       if (visited.contains(key)) {
+        LOG.error(
+            "Duplicate {} found {} 'id': {}",
+            type.getSimpleName(),
+            withoutId ? "without" : "with",
+            entryName);
         return true;
       }
       visited.add(key);
       return false;
     }
+  }
+
+  /**
+   * Checks whether an element is already visited. Element can be either identified the pair {@code
+   * type}/{@code name} or by its {@code xmlId}.
+   *
+   * @param type element type
+   * @param name element name
+   * @param xmlId element xmlId
+   * @return whether the element is already visited
+   */
+  protected boolean isVisited(Class<?> type, String name, String xmlId) {
+    return isVisited(type, name, type, xmlId);
   }
 
   /**
