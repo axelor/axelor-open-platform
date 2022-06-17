@@ -239,11 +239,7 @@ public class ViewLoader extends AbstractParallelLoader {
     String type = view.getType();
     String modelName = view.getModel();
 
-    if (StringUtils.isBlank(xmlId)) {
-      if (isVisited(view.getClass(), name)) {
-        return;
-      }
-    } else if (isVisitedWithId(view.getClass(), xmlId)) {
+    if (isVisited(view.getClass(), name, xmlId)) {
       return;
     }
 
@@ -360,11 +356,7 @@ public class ViewLoader extends AbstractParallelLoader {
     String name = selection.getName();
     String xmlId = selection.getXmlId();
 
-    if (StringUtils.isBlank(xmlId)) {
-      if (isVisited(Selection.class, name)) {
-        return;
-      }
-    } else if (isVisitedWithId(Selection.class, xmlId)) {
+    if (isVisited(Selection.class, name, xmlId)) {
       return;
     }
 
@@ -492,11 +484,7 @@ public class ViewLoader extends AbstractParallelLoader {
     String name = action.getName();
     String xmlId = action.getXmlId();
 
-    if (StringUtils.isBlank(xmlId)) {
-      if (isVisited(Action.class, name)) {
-        return;
-      }
-    } else if (isVisitedWithId(Action.class, xmlId)) {
+    if (isVisited(Action.class, name, xmlId)) {
       return;
     }
 
@@ -584,11 +572,7 @@ public class ViewLoader extends AbstractParallelLoader {
     String name = menuItem.getName();
     String xmlId = menuItem.getXmlId();
 
-    if (StringUtils.isBlank(xmlId)) {
-      if (isVisited(MenuItem.class, name)) {
-        return;
-      }
-    } else if (isVisitedWithId(MenuItem.class, xmlId)) {
+    if (isVisited(MenuItem.class, name, xmlId)) {
       return;
     }
 
@@ -683,11 +667,7 @@ public class ViewLoader extends AbstractParallelLoader {
     String name = menuItem.getName();
     String xmlId = menuItem.getXmlId();
 
-    if (StringUtils.isBlank(xmlId)) {
-      if (isVisited(MenuItem.class, name)) {
-        return;
-      }
-    } else if (isVisitedWithId(MenuItem.class, xmlId)) {
+    if (isVisited(MenuItem.class, name, xmlId)) {
       return;
     }
 

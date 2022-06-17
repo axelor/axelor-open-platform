@@ -18,6 +18,7 @@
  */
 package com.axelor.meta.loader;
 
+import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -43,12 +44,18 @@ abstract class AbstractLoader {
   private static final List<Runnable> resolveTasks = new ArrayList<>();
 
   /**
-   * Check whether the given name is already visited.
+   * Checks whether the given type/name or xmlId is already visited. if xmlId is not blank, uses it
+   * as the only key. Otherwise, uses the pair type/name as key.
    *
    * @param type the key type
    * @param name the key name
+   * @param xmlId the xmlId
    * @return true if the name is already visited false otherwise
    */
+  protected boolean isVisited(Class<?> type, String name, String xmlId) {
+    return StringUtils.isBlank(xmlId) ? isVisited(type, name) : isVisitedId(type, xmlId);
+  }
+
   protected boolean isVisited(Class<?> type, String name) {
     if (isVisitedInternal(type, name)) {
       LOG.error("Duplicate {} found without 'id': {}", type.getSimpleName(), name);
@@ -57,7 +64,7 @@ abstract class AbstractLoader {
     return false;
   }
 
-  protected boolean isVisitedWithId(Class<?> type, String xmlId) {
+  protected boolean isVisitedId(Class<?> type, String xmlId) {
     if (isVisitedInternal(null, xmlId)) {
       LOG.error("Duplicate {} found with 'id': {}", type.getSimpleName(), xmlId);
       return true;
