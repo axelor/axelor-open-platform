@@ -23,8 +23,10 @@
 var ui = angular.module('axelor.ui');
 
 ui.factory('MessageSource', ['$http', function ($http) {
+    var messagesPath = 'ws/messages';
+
     function getMessages(params) {
-      return $http.get('ws/messages', {params: params});
+      return $http.get(messagesPath, {params: params});
     }
 
     function getRecordMessages(relatedId, relatedModel, limit, offset) {
@@ -36,24 +38,24 @@ ui.factory('MessageSource', ['$http', function ($http) {
       return getMessages({folder: folder, limit: limit, offset: offset});
     }
 
-    function getMessage(id) {
-      return $http.get('ws/messages/' + id);
-    }
-
     function getCount() {
-      return $http.get('ws/messages/count');
+      return $http.get(messagesPath + '/count');
     }
 
-    function getReplies(id) {
-      return $http.get('ws/messages/' + id + '/replies');
+    function getMessage(id) {
+      return $http.get(messagesPath + '/' + id);
     }
 
     function deleteMessage(id) {
-      return $http.delete('ws/messages/' + id);
+      return $http.delete(messagesPath + '/' + id);
+    }
+
+    function getReplies(id) {
+      return $http.get(messagesPath + '/' + id + '/replies');
     }
 
     function postFlags(records) {
-      return $http.post('ws/messages/flag', {records: records});
+      return $http.post(messagesPath + '/flag', {records: records});
     }
 
     return {
