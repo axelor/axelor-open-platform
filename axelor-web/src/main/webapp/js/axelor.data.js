@@ -450,13 +450,6 @@
         return promise;
       },
 
-      messageCount: function (options) {
-        var opts = _.extend({}, options, {
-          count: true
-        });
-        return this.messages(opts);
-      },
-
       messagePost: function (id, text, options) {
 
         var opts = _.extend({}, options);
@@ -483,25 +476,6 @@
           promise.then(null, fn);
           return promise;
         };
-        return promise;
-      },
-
-      messageRemove: function (message) {
-        var page = this._page;
-        var records = this._data;
-        var promise = this._request('messageRemove', message.id).post();
-
-        promise.success = function (fn) {
-          promise.then(function (response) {
-            fn(records, page);
-          });
-          return promise;
-        };
-        promise.error = function (fn) {
-          promise.then(null, fn);
-          return promise;
-        };
-
         return promise;
       },
 
