@@ -1055,6 +1055,7 @@ ui.directive('uiPortletRefresh', ['NavService', function (NavService) {
     var onRefresh = scope.onRefresh.bind(scope);
     var unwatch = false;
     var loading = false;
+    var recordId = (scope.record || {}).id;
 
     scope.onRefresh = function () {
       var tab = NavService.getSelected();
@@ -1088,6 +1089,21 @@ ui.directive('uiPortletRefresh', ['NavService', function (NavService) {
         });
       });
     };
+
+    scope.$on('on:edit', function () {
+      var id = (scope.record || {}).id;
+      if (recordId !== id) {
+        recordId = id;
+        if (scope.clearFilters) {
+          // grid column search
+          scope.clearFilters();
+        } else {
+          // filter box
+          scope.$broadcast('on:clear-filter');
+        }
+        scope._dataSource._filter = null;
+      }
+    });
   };
 }])
 
