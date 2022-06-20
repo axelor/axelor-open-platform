@@ -1,7 +1,8 @@
 ---
-title: Fix mail message permission requirements
-type: anomaly
+title: Rework mail message endpoints
+type: change
 description:
-  We should not need to give permission to `MailMessage` to access the mail menus and to remove one’s messages.
-  `MailMessage` actions are now always allowed in order to open mail views.
-  A new REST endpoint `messageRemove` is used to remove one’s messages.
+  Some mail message endpoints has been reworked to use dedicated path. This avoid to give permission 
+  to `MailMessage` or `MailFlag` objects in order to access the mail menus and deal with messages and flags.
+  `MailMessage` action-view is now always allowed in order to open mail views.
+
