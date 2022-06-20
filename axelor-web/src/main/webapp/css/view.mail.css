@@ -93,7 +93,7 @@
 }
 
 .mail-thread .avatar:not([class*=bg-]) {
-    background-color: #0275d8;
+    background-color: #ffffff;
 }
 
 .mail-thread .avatar:hover,

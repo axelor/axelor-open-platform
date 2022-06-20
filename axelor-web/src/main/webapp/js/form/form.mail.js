@@ -399,6 +399,9 @@ ui.formWidget('uiMailMessages', {
     ];
 
     $scope.userColor = function (message) {
+      if (message.$avatar) {
+        return;
+      }
       var user = message.$author;
       if (!user) return null;
       if (userColors[user.code]) {
