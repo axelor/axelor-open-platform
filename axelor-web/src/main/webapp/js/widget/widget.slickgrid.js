@@ -1017,7 +1017,12 @@ Grid.prototype._doInit = function(view) {
       handler._simpleFilters = null;
     }
 
+    function getFilters() {
+      return filters;
+    }
+
     handler.clearFilters = clearFilters;
+    handler.getFilters = getFilters;
 
     filtersRow.on('keyup', ':input', updateFilters);
     filtersRow.on('keypress', ':input', function(event){

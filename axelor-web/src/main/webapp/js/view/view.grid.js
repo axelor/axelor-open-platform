@@ -576,6 +576,7 @@ function GridViewCtrl($scope, $element) {
     if (advance && advance.archived !== undefined) {
       options.archived = advance.archived;
     }
+
     return ds.search(options).then(fixPage);
   };
 
@@ -1186,7 +1187,7 @@ ui.directive('uiPortletGrid', function(){
       });
 
       $scope.onRefresh = function () {
-        $scope.filter({});
+        $scope.filter($scope.getFilters ? $scope.getFilters() : {});
       };
 
       var _onShow = $scope.onShow;
