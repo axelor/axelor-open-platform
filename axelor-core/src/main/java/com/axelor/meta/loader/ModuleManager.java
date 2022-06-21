@@ -28,7 +28,6 @@ import com.axelor.auth.db.repo.UserRepository;
 import com.axelor.common.ObjectUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.ParallelTransactionExecutor;
-import com.axelor.db.tenants.TenantResolver;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
 import com.axelor.meta.db.MetaModule;
@@ -233,10 +232,7 @@ public class ModuleManager {
   }
 
   private void installMeta(Module module, boolean update) {
-    final String tenantId = TenantResolver.currentTenantIdentifier();
-    final String tenantHost = TenantResolver.currentTenantHost();
-    final ParallelTransactionExecutor transactionExecutor =
-        new ParallelTransactionExecutor(tenantId, tenantHost);
+    final ParallelTransactionExecutor transactionExecutor = new ParallelTransactionExecutor();
     metaLoaders.forEach(
         metaLoader ->
             metaLoader.feedTransactionExecutor(

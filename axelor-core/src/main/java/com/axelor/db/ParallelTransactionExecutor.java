@@ -20,6 +20,7 @@ package com.axelor.db;
 
 import com.axelor.db.internal.DBHelper;
 import com.axelor.db.tenants.TenantAware;
+import com.axelor.db.tenants.TenantResolver;
 import java.lang.invoke.MethodHandles;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
@@ -66,6 +67,21 @@ public class ParallelTransactionExecutor {
    * Instantiates a parallel transaction executor with as many workers as there are available
    * processors.
    */
+  public ParallelTransactionExecutor() {
+    this(
+        TenantResolver.currentTenantIdentifier(),
+        TenantResolver.currentTenantHost(),
+        DBHelper.getMaxWorkers());
+  }
+
+  /**
+   * Instantiates a parallel transaction executor with as many workers as there are available
+   * processors.
+   */
+  /**
+   * @param tenantId
+   * @param tenantHost
+   */
   public ParallelTransactionExecutor(String tenantId, String tenantHost) {
     this(tenantId, tenantHost, DBHelper.getMaxWorkers());
   }
@@ -73,6 +89,8 @@ public class ParallelTransactionExecutor {
   /**
    * Instantiates a parallel transaction executor with the specified number of workers.
    *
+   * @param tenantId
+   * @param tenantHost
    * @param numWorkers
    */
   public ParallelTransactionExecutor(String tenantId, String tenantHost, int numWorkers) {
