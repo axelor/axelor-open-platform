@@ -1,0 +1,12 @@
+---
+title: Run views loader tasks only once
+type: change
+description: |
+  Introduce viewLoader `terminate` after loading all modules.
+  
+  Some tasks need to be run only once after all modules have been
+  installed/loaded. These tasks are the missing group creation and
+  generation of computed views.
+  
+  This will significantly improve the generation of computed views
+  as it will be run once when all modules are loaded.

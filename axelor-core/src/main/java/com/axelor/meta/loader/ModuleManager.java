@@ -143,6 +143,7 @@ public class ModuleManager {
                     .map(Module::getName)
                     .forEach(this::uninstall);
               });
+      viewLoader.terminate(update);
     } finally {
       this.encryptPasswords();
       this.doCleanUp();
@@ -175,6 +176,7 @@ public class ModuleManager {
       resolver.all().stream()
           .filter(m -> names.contains(m.getName()))
           .forEach(m -> viewLoader.doLast(m, true));
+      viewLoader.terminate(true);
     } finally {
       this.doCleanUp();
     }
@@ -192,6 +194,7 @@ public class ModuleManager {
       pathsToRestore.addAll(paths);
       moduleList.forEach(m -> install(m, true, false));
       moduleList.forEach(m -> viewLoader.doLast(m, true));
+      viewLoader.terminate(true);
     } finally {
       pathsToRestore.clear();
       doCleanUp(startTime);
@@ -241,6 +244,7 @@ public class ModuleManager {
           .map(Module::getName)
           .forEach(name -> install(name, update, withDemo, true));
       resolver.resolve(moduleName).stream().forEach(m -> viewLoader.doLast(m, update));
+      viewLoader.terminate(update);
     } finally {
       this.doCleanUp();
     }
