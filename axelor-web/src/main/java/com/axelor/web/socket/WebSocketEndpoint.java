@@ -78,6 +78,12 @@ public class WebSocketEndpoint {
 
   @OnError
   public void onError(Session session, Throwable thr) {
+    // Client sent a message, but the session has already closed.
+    if (session != null && !session.isOpen()) {
+      log.trace(thr.getMessage(), thr);
+      return;
+    }
+
     log.error(thr.getMessage(), thr);
   }
 
