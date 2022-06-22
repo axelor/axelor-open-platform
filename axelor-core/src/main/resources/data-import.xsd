@@ -215,7 +215,12 @@
         <attribute name="search-call" type="string">
           <annotation>
             <documentation>
+              <![CDATA[
               Call a method to return a bean.
+
+              Used to search a bean in case of complex searching. `search` JPQL
+              expression will be ignored in favor of `search-call` method.
+               ]]>
             </documentation>
           </annotation>
         </attribute>

@@ -115,7 +115,58 @@ The `<input>` tag is used to map a source csv file to a target model type.
 | `update` | `true` to only allow updating (if an existing record is not found, it will not be created)
 | `call` | call a method on the transformed object before saving it to database
 | `prepare-context` | call a method to prepare context before transforming the csv row
+| `search-call` | call a method to return a bean. Used to search a bean in case of complex searching. `search` JPQL expression will be ignored in favor of `search-call` method.
 |===
+
+Here is an example of java methods :
+
+[source,java]
+-----
+public class DemoImport {
+
+    /**
+     * This method is called with `prepare-context` attribute.
+     * It prepares the global context before transforming the csv row.
+     */
+    public void prepareData(Map context) {
+
+        Order order = new Order();
+        order.setCreateDate(new LocalDate());
+        order.setOrderDate(new LocalDate());
+
+        context.put("_saleOrder", order);
+    }
+
+    /**
+     * This method is called with `search-call` attribute.
+     *
+     * This method is called  in favor of `search` JPQL expression.
+     *
+     * @param values the value map that represents the csv row being imported
+     * @return the bean object to update
+     */
+    public Object searchData(Map values){
+        Object bean = searchForRecord(values);
+        return bean;
+    }
+
+    /**
+     * This method is called with `call` attribute.
+     *
+     * This method is called for each record being imported.
+     *
+     * @param bean the bean instance created from the imported record
+     * @param values the value map that represents the imported data
+     * @return the bean object to persist (in most cases the same bean object)
+     */
+    public Object importData(Object bean, Map values){
+        Order order = (Order) bean;
+        // do something with order
+        return order;
+    }
+
+}
+-----
 
 The `<input>` can be used in many ways. You can see the first four inputs in the
 example are very simple. This is because of automatic import as the csv header
