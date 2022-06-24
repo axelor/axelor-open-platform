@@ -303,7 +303,7 @@ ui.directive('uiViewDashlet', ['$compile', function($compile){
 
         if (scope.onRefresh) {
           // if lazy, load data
-          if (lazy) {
+          if (lazy || scope._requiresLazyLoading) {
             scope.onRefresh();
           }
 
