@@ -94,6 +94,7 @@ var customDirective = ["$compile", function ($compile) {
     controller: CustomViewCtrl,
     link: function (scope, element, attrs, ctrl) {
 
+      scope._requiresLazyLoading = true;
       var evalScope = axelor.$evalScope(scope);
 
       function render(template) {
