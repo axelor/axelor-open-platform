@@ -678,12 +678,31 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
       return editable;
     };
 
-    scope.refresh = function(record) {
+    var delayedRefreshNeeded = false;
+
+    function isVisible() {
+      return element.is(':visible');
+    }
+
+    scope.$watch(isVisible, function (visible) {
+      if (!visible || !delayedRefreshNeeded) return;
+      doRefresh();
+      delayedRefreshNeeded = false;
+    })
+
+    scope.refresh = function () {
+      delayedRefreshNeeded = !isVisible();
+      if (!delayedRefreshNeeded) {
+        doRefresh();
+      }
+    };
+
+    function doRefresh() {
       if (calRange.start && calRange.end) {
         return RecordManager.events(calRange.start, calRange.end, options.timezone, function () {});
       }
       return main.fullCalendar("refetchEvents");
-    };
+    }
 
     scope.filterEvents = function() {
       RecordManager.filter();
