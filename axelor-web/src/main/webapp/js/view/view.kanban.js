@@ -405,6 +405,7 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
 
       function fetch(options) {
         var opts = _.extend({
+          action: scope._viewAction,
           offset: 0,
           sortBy: [view.sequenceBy],
           fields: _.pluck(scope.fields, 'name')
