@@ -1,0 +1,5 @@
+---
+title: Fix missing `_domainAction` from context of kanban in dashlet
+type: fix
+description: |
+  The attribute `_domainAction` is needed to reevaluate the context server-side.
