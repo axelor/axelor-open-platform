@@ -138,6 +138,7 @@ function CalendarViewCtrl($scope, $element) {
     }
 
     var opts = {
+      action: $scope._viewAction,
       fields: fields,
       filter: criteria,
       domain: this._domain,
