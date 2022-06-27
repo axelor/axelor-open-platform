@@ -1,3 +1,144 @@
+## 6.0.1 (2022-06-27)
+
+#### Changes
+
+* Upgrade embedded Tomcat from 9.0.62 to 9.0.63
+* Upgrade Hibernate ORM from 5.6.8.Final to 5.6.9.Final
+* Upgrade Byte Buddy from 1.12.9 to 1.12.10
+* Upgrade Infinispan from 13.0.9 to 13.0.10
+* Upgrade Redisson from 3.17.1 to 3.17.3
+* Upgrade PostgreSQL JDBC from 42.3.4 to 42.3.6
+* Upgrade Flyway from 8.5.10 to 8.5.11
+* Upgrade Jackson from 2.13.2 to 2.13.3
+* Upgrade UnboundID LDAP SDK from 6.0.4 to 6.0.5
+* Rework mail message endpoints
+
+  <details>
+  
+  Some mail message endpoints has been reworked to use dedicated path. This avoid to give permission 
+  to `MailMessage` or `MailFlag` objects in order to access the mail menus and deal with messages and flags.
+  `MailMessage` action-view is now always allowed in order to open mail views.
+  
+  </details>
+
+* Upgrade GreenMail from 1.6.8 to 1.6.9
+
+#### Features
+
+* Update file name format for duplicate file name
+
+  <details>
+  
+  Update format from `file (1).txt` to `file-1.txt`. This avoids 
+  necessary space in file name.
+  
+  </details>
+
+* Show configured application logo in about page
+* Report duplicate view items at the end of the view loading process
+* Sanitize uploaded filenames
+
+  <details>
+  
+  Sanitize uploaded filenames :
+  - Removes special characters that are illegal in filenames on certain operating systems
+  - Replaces spaces and consecutive underscore with a single dash
+  - Trims dot, dash and underscore from beginning and end of filename
+  
+  </details>
+
+#### Fixed
+
+* Don’t save meta filters with spurious `$new` attribute
+* Fix saving filter with string field
+
+  <details>
+  
+  In the case of string fields with operators `isNull` and `notNull`,
+  filter was transformed in order to check for null or empty.
+  But by doing that, original criteria was lost, breaking meta filter saving.
+  
+  Instead, use new virtual operators `$isEmpty` and `$notEmpty`
+  which perform client-side transformation.
+  
+  </details>
+
+* Fix MetaModule#application flag not filled
+* Take column filters into account when refreshing dashlets
+* Fix calendar dashlet refresh after refreshing/saving form view
+* Fix mail thread avatar img display
+* Fix downloaded filename from html action-view
+* Fix uploading file if a file with the same name exist
+* Fix missing name and color fields from selector with TagSelect widget
+* Fix missing `_domainAction` from context of kanban in dashlet
+
+  <details>
+  
+  The attribute `_domainAction` is needed to reevaluate the context server-side.
+  
+  </details>
+
+* Fix ignored canNew attribute and permissions when pressing enter on last row of editable grid
+* Fix deadlock when loading views of different types with same 'id'
+* Fix meta file not found error
+* Fix downloaded filename encoding in Content-Disposition header
+* Clear dashlet filters when changing to another record
+* Allow users to paste into password fields on change password form
+
+  <details>
+  
+  Preventing password pasting undermines good security policy.
+  https://web.dev/password-inputs-can-be-pasted-into/?utm_source=lighthouse&utm_medium=devtools
+  
+  </details>
+
+* Fix duplicate data loading for grid dashlets on dashboards
+* Fix closing of resources in CSV/XML importers
+* Fix chart onAction and onClick having no context
+
+  <details>
+  
+  onAction and onClick should have context just like onInit.
+  
+  </details>
+
+* Fix keyboard shortcut popup content
+* Fix grouping by extra custom field in grid view
+
+  <details>
+  
+  Fix grouping by custom field defined on JSON field other than default `attrs`.
+  
+  </details>
+
+* Fix too many redirects error in case of missing pac4j user profile
+* Fix missing `_domainAction` from context of calendar in dashlet
+
+  <details>
+  
+  The attribute `_domainAction` is needed to reevaluate the context server-side.
+  
+  </details>
+
+* Fix hide issue on archive/attach/log grid built-in toolbar buttons
+
+  <details>
+  
+  `hidden` attribute on built-in toolbar buttons wasn't taken into account for 
+  archive/attach/log buttons.
+  
+  For example:
+  ```xml
+  <toolbar>
+    <button name="log" onClick=" " hidden="true"/> <-- Hide audit log button -->
+    <button name="attach" onClick=" " hidden="true"/> <-- Hide attachment button -->
+    <button name="archive" onClick=" " hidden="true"/> <-- Hide archive/unarchive button -->
+  </toolbar>
+  ```
+  
+  </details>
+
+
 ## 6.0.0 (2022-05-20)
 
 #### Changes

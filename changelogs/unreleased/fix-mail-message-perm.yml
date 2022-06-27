@@ -1,8 +1,0 @@
----
-title: Rework mail message endpoints
-type: change
-description:
-  Some mail message endpoints has been reworked to use dedicated path. This avoid to give permission 
-  to `MailMessage` or `MailFlag` objects in order to access the mail menus and deal with messages and flags.
-  `MailMessage` action-view is now always allowed in order to open mail views.
-

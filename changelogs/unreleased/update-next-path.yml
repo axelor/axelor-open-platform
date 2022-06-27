@@ -1,6 +1,0 @@
----
-title: Update file name format for duplicate file name
-type: feature
-description:
-  Update format from `file (1).txt` to `file-1.txt`. This avoids 
-  necessary space in file name.
