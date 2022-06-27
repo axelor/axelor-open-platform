@@ -1,0 +1,6 @@
+---
+title: Commit editable grid when closing popup without confirming
+type: fix
+description: |
+  In a popup containing an editable grid, the line being edited was not committed if we directly
+  close the popup via the "OK" button without clicking on "Confirm" in the editable grid.

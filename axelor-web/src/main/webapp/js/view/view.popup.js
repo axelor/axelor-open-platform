@@ -200,7 +200,10 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
   }
 
   $scope.onOK = function() {
-    $scope.$timeout(onOK, 10);
+    $scope.$broadcast('on:before-save', $scope.record);
+    $scope.afterGridEdit(function () {
+      $scope.$timeout(onOK, 10);
+    });
   };
 
   $scope.onBeforeClose = function(event, ui) {
