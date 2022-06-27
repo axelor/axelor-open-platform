@@ -1,3 +1,0 @@
----
-title: Fix deadlock when loading views of different types with same 'id'
-type: fix

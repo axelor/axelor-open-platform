@@ -1,3 +1,80 @@
+## 5.4.14 (2022-06-27)
+
+#### Features
+
+* Add validation support for csv import
+
+  <details>
+  
+  Two new attributes added to validate data being imported.
+  
+  - `check` - boolean expression
+  - `check-message` - the validation message
+  
+  If `check` fails, the `check-message` or default validation message
+  is shown and import will be terminated.
+  
+  </details>
+
+#### Fixed
+
+* Fix saving filter with string field
+
+  <details>
+  
+  In the case of string fields with operators `isNull` and `notNull`,
+  filter was transformed in order to check for null or empty.
+  But by doing that, original criteria was lost, breaking meta filter saving.
+  
+  Instead, use new virtual operators `$isEmpty` and `$notEmpty`
+  which perform client-side transformation.
+  
+  </details>
+
+* Take column filters into account when refreshing dashlets
+* Fix calendar dashlet refresh after refreshing/saving form view
+* Fix downloaded filename from html action-view
+* Fix uploading file if a file with the same name exist
+* Fix missing name and color fields from selector with TagSelect widget
+* Fix missing `_domainAction` from context of kanban in dashlet
+
+  <details>
+  
+  The attribute `_domainAction` is needed to reevaluate the context server-side.
+  
+  </details>
+
+* Fix ignored canNew attribute and permissions when pressing enter on last row of editable grid
+* Fix deadlock when loading views of different types with same 'id'
+* Fix meta file not found error
+* Clear dashlet filters when changing to another record
+* Fix duplicate data loading for grid dashlets on dashboards
+* Fix closing of resources in CSV/XML importers
+* Fix chart onAction and onClick having no context
+
+  <details>
+  
+  onAction and onClick should have context just like onInit.
+  
+  </details>
+
+* Fix grouping by extra custom field in grid view
+
+  <details>
+  
+  Fix grouping by custom field defined on JSON field other than default `attrs`.
+  
+  </details>
+
+* Fix missing `_domainAction` from context of calendar in dashlet
+
+  <details>
+  
+  The attribute `_domainAction` is needed to reevaluate the context server-side.
+  
+  </details>
+
+
 ## 5.4.13 (2022-03-11)
 
 #### Features
