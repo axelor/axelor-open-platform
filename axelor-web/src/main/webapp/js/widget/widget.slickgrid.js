@@ -1606,11 +1606,13 @@ Grid.prototype.onKeyDown = function (e) {
 
   if (e.isDefaultPrevented()) return;
   if (e.keyCode === 27) { // ESCAPE
+    e.stopPropagation();
     that.cancelEdit({focus: true, cancel: true});
     return;
   }
   if (e.keyCode === 13) { // ENTER
     if (this.isEditActive()) {
+      e.stopPropagation();
       var promise = that.commitEdit();
       promise.then(function () {
         if (that.canAdd() && args.row === grid.getDataLength() - 1) {
@@ -1620,6 +1622,7 @@ Grid.prototype.onKeyDown = function (e) {
         that.focusInvalidCell(grid.getActiveCell());
       });
     } else if (this.isCellEditable(args.row, args.cell)){
+      e.stopPropagation();
       that.showEditor();
     }
   }
