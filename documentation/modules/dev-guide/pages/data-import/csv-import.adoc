@@ -266,6 +266,18 @@ The format of ``csv-config.xml` for automatic import looks like this:
 </csv-inputs>
 -----
 
+If you need to override an automatic binding, the best way to process is to bind the column
+to a context value, then use that context value in the binding to the field.
+
+Example:
+[source,xml]
+-----
+<input file="contacts.csv" type="com.axelor.contact.db.Contact">
+  <bind to="_lastName" column="lastName"/>
+  <bind to="lastName" eval="_lastName + ..." if="..."/>
+</input>
+-----
+
 == Advanced Import
 
 Sometimes it's more convenient to import complex records at once instead of
