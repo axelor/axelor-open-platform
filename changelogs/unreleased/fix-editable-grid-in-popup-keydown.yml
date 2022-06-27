@@ -1,0 +1,5 @@
+---
+title: Prevent popup from handling editable grid key down events
+type: fix
+description: |
+  This fixes popup closing when pressing escape in editable grid.
