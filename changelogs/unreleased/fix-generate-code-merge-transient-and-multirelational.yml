@@ -1,0 +1,3 @@
+---
+title: Allow code generator to merge transient and multirelational fields
+type: fix

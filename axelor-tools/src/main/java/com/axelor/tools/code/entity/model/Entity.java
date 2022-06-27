@@ -222,7 +222,7 @@ public class Entity implements BaseType<Entity> {
 
   private boolean isCompatible(Property existing, Property property) {
     if (existing == null) return true;
-    if (existing.isCollection() || isTrue(existing.getTransient()) || existing.isPrimary()) {
+    if (existing.isPrimary()) {
       return false;
     }
     if (!Objects.equals(existing.getType(), property.getType())) return false;
