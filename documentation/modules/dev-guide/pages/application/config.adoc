@@ -226,6 +226,7 @@ db.default.password = secret
 | `view.allow-customization` | whether to disable views customization |
 | `view.adv-search.share` | whether to disable advance search sharing | true
 | `view.adv-search.export-full` | whether to disable export full option in advance search | true
+| `api.pagination.max-per-page` | define the maximum number of items per page, -1 means unlimited | -1
 | `session.timeout` | session timeout (in minutes) | 60
 | `session.cookie.secure` | define session cookie as secure |
 | `encryption.password` | encryption password |

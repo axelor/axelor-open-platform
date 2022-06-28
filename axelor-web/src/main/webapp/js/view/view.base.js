@@ -343,12 +343,12 @@ ui.DSViewCtrl = function DSViewCtrl(type, $scope, $element) {
     if (page) {
       return page.limit;
     }
-    return 40;
+    return axelor.getDefaultPageSize();
   };
 
   $scope.setPageSize = function(value) {
     var page = ds && ds._page,
-      limit = Math.max(0, +value) || 40;
+      limit = Math.max(0, +value) || axelor.getDefaultPageSize();
     if (page && page.limit != limit) {
       page.limit = limit;
       $scope.onRefresh();
@@ -630,12 +630,21 @@ ui.directive('uiRecordPager', function(){
 
       var elText = element.find('.record-pager-text').show(),
         elChanger = element.find('.record-pager-change').hide(),
-        elInput = elChanger.find('input');
+        elInput = elChanger.find('input'),
+        MAX_PAGE_SIZE = axelor.config['api.pagination.max-per-page'] || -1;
 
       scope.showText = attrs.uiRecordPager !== "no-text";
 
       function updatePageSize() {
         var size = +(elInput.val()) || 0;
+        if (MAX_PAGE_SIZE > -1 && size > MAX_PAGE_SIZE) {
+          size = MAX_PAGE_SIZE;
+          elInput.val(size);
+          elInput.tooltip('show');
+          setTimeout(function() {
+            elInput.tooltip('hide');
+          }, 3000);
+        }
         if (scope.setPageSize && size > 0) {
           scope.setPageSize(size);
         }
@@ -655,6 +664,16 @@ ui.directive('uiRecordPager', function(){
         updatePageSize();
       });
 
+      if (MAX_PAGE_SIZE > -1) {
+        elInput.tooltip({
+          html: true,
+          title: _t('Display limited to {0}', MAX_PAGE_SIZE),
+          placement: 'top',
+          container: 'body',
+          trigger: 'manual'
+        });
+      }
+
       elChanger.keyup(function(e) {
         if(e.keyCode == 13) { // ENTER
           updatePageSize();
@@ -667,7 +686,7 @@ ui.directive('uiRecordPager', function(){
       '<span ng-show="showText">'+
         '<span class="record-pager-text">{{pagerText()}}</span>'+
       '<span class="input-append record-pager-change">'+
-        '<input type="text" style="width: 30px;" value="{{getPageSize()}}">'+
+        '<input type="number" style="width: 30px;" ng-value="getPageSize()">'+
         '<button type="button" class="btn add-on"><i class="fa fa-check"></i></button>'+
       '</span>'+
       '</span>'+

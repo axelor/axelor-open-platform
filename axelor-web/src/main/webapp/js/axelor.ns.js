@@ -146,6 +146,19 @@
   // Used for criteria with date ranges in order to exclude the upper limit.
   axelor.nextOf = function (mm, timeUnit) {
     return mm.add(1, timeUnit).startOf(timeUnit);
-  }
+  };
+
+  var INITIAL_PAGE_SIZE = 40;
+  /**
+   * Get the default number of items to display per page.
+   *
+   * @returns {number} page size
+   */
+  axelor.getDefaultPageSize = function() {
+    if (axelor.config['api.pagination.max-per-page'] > 0) {
+      return Math.min(axelor.config['api.pagination.max-per-page'], INITIAL_PAGE_SIZE);
+    }
+    return INITIAL_PAGE_SIZE;
+  };
 
 })();
