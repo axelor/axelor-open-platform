@@ -1944,6 +1944,10 @@ Grid.prototype.addNewRow = function () {
     var item = _.extend({ id: 0 }, formScope.defaultValues);
 
     data.addItem(item);
+
+    // Data length can increase by more than 1 (in case of column grouping).
+    cell.row = grid.getDataLength() - 1;
+
     grid.invalidateRow(data.length);
     grid.focus();
     grid.setActiveCell(cell.row, cell.cell);
