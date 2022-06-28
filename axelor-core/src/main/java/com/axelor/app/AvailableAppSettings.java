@@ -58,6 +58,8 @@ public interface AvailableAppSettings {
   String AXELOR_SCRIPT_CACHE_SIZE = "axelor.ScriptCacheSize";
   String AXELOR_SCRIPT_CACHE_EXPIRETIME = "axelor.ScriptCacheExpireTime";
 
+  String API_PAGINATION_MAX_PER_PAGE = "api.pagination.max-per-page";
+
   String CONTEXT_APP_STYLE = "context.appStyle";
   String CONTEXT_APP_LOGO = "context.appLogo";
 

@@ -81,7 +81,7 @@
     function DataSource(model, options) {
 
       var opts = extend({
-        limit	: DataSource.DEFAULT_LIMIT,
+        limit	: axelor.getDefaultPageSize(),
         domain	: null,
         context	: null
       }, options);
@@ -114,8 +114,6 @@
 
       this._listeners = {};
     }
-
-    DataSource.DEFAULT_LIMIT = 40;
 
     DataSource.prototype = {
 

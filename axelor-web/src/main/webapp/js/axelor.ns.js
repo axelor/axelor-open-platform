@@ -156,4 +156,17 @@
     return jq.html.apply(this, sanitize(Array.prototype.slice.call(arguments)));
   };
 
+  var INITIAL_PAGE_SIZE = 40;
+  /**
+   * Get the default number of items to display per page.
+   *
+   * @returns {number} page size
+   */
+  axelor.getDefaultPageSize = function() {
+    if (axelor.config['api.pagination.max-per-page'] > 0) {
+      return Math.min(axelor.config['api.pagination.max-per-page'], INITIAL_PAGE_SIZE);
+    }
+    return INITIAL_PAGE_SIZE;
+  };
+
 })();
