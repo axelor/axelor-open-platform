@@ -77,7 +77,7 @@ The `if` expressions are simple JEL boolean expressions evaluated against curren
 values of the record.
 
 By default, `<field>` are tracked only if it's value is changed and given `if`
-expression evaluates to `true`.
+expression evaluates to `true`. O2M/M2M/binary type fields aren't supported.
 
 A root message is created when record is created. All the followup messages are
 considered as replies to this root message. This done to keep change tracking
