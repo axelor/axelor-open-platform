@@ -145,7 +145,9 @@ Non-relational fields have the following extra attributes:
 | `formula` | whether this is a native SQL formula field
 |===
 
-=== String
+=== Field types
+
+==== String
 
 The `<string>` field is used to define textual data fields.
 
@@ -192,7 +194,7 @@ Translated values are stored in same general translation table (no context saved
 The `encrypted` field values are stored in database using AES-256 encrypted values.
 The password should be provided from application config file using `encryption.password` key.
 
-=== Boolean
+==== Boolean
 
 The `<boolean>` field is used to define boolean type fields.
 
@@ -203,7 +205,7 @@ example:
 <boolean name="active" />
 ----
 
-=== Integer
+==== Integer
 
 The `<integer>` field is used to define non-decimal numeric fields.
 
@@ -223,7 +225,7 @@ example:
 <integer name="count"/>
 ----
 
-=== Long
+==== Long
 
 The `<long>` field is used to define non-decimal numeric field where value can't
 be represented by `integer` type.
@@ -246,7 +248,7 @@ example:
 <long name="counter"/>
 ----
 
-=== Decimal
+==== Decimal
 
 The `<decimal>` field is used to define decimal type fields using `java.math.BigDecimal` java type.
 
@@ -267,7 +269,7 @@ example:
 <decimal name="price" precision="8" scale="2" />
 ----
 
-=== Date
+==== Date
 
 The `<date>` field is used to define fields to store date using `java.time.LocalDate` java type.
 
@@ -278,7 +280,7 @@ example:
 <date name="orderDate" />
 ----
 
-=== Time
+==== Time
 
 The `<time` field is used to define fields to store time values using the
 `java.time.LocalTime` java type.
@@ -290,7 +292,7 @@ example:
 <time name="duration" />
 ----
 
-=== DateTime
+==== DateTime
 
 The `<datetime>` field is used to define fields to store datetime values using
 the `java.time.LocalDateTime` java type.
@@ -312,7 +314,7 @@ example:
 <datetime name="startsOn" tz="true"/>
 ----
 
-=== Enum
+==== Enum
 
 The `<enum>` field is used to define fields with Java enumeration type.
 
@@ -405,7 +407,7 @@ In scripting expressions, `enum` should be referenced using its type name. For e
   error="Invalid value..." />
 ----
 
-=== Binary
+==== Binary
 
 The `<binary>` field is used to store binary blobs.
 
@@ -428,7 +430,7 @@ example:
 <binary name="report" />
 ----
 
-=== ManyToOne
+==== ManyToOne
 
 The `<many-to-one>` field is used to define a single value reference field using
 many-to-one relationship.
@@ -449,7 +451,7 @@ example:
 <many-to-one name="customer" ref="com.axelor.contact.db.Contact" />
 ----
 
-=== OneToOne
+==== OneToOne
 
 The `<one-to-one>` field is used to define a single value reference field using
 one-to-one relationship.
@@ -474,7 +476,7 @@ one-to-one relationship.
 <one-to-one name="engine" ref="com.axelor.cars.db.Engine" mappedBy="car"/>
 ----
 
-=== OneToMany
+==== OneToMany
 
 The `<one-to-many>` field is used to define multi-value fields using one-to-many
 relationship.
@@ -497,7 +499,7 @@ relationship.
 <one-to-many name="addresses" ref="Address" mappedBy="contact" />
 ----
 
-=== ManyToMany
+==== ManyToMany
 
 The `<many-to-many>` field is used to define multi-value fields using many-to-many
 relationship.
@@ -516,6 +518,36 @@ relationship.
 [source,xml]
 ----
 <many-to-many name="taxes" ref="Tax" />
+----
+
+=== Other usages
+
+==== Formula
+
+The `formula="true"` on a field is used to define a SQL fragment (aka formula) instead of mapping a property into a column.
+This kind of property is read-only (its value is calculated by your formula fragment). This field will not be created/saved
+in database.
+
+The SQL fragment defined can be as complex as you want, and it can even include subselects.
+
+WARNING: You should be aware that the formula field usage takes a native SQL clause which may affect database portability.
+
+[source,xml]
+----
+<string name="fullName" namecolumn="true" search="firstName,lastName" formula="true">
+  <![CDATA[
+        CASE
+            WHEN title IS NULL THEN first_name || ' ' || last_name
+            ELSE (SELECT contact_title.name FROM contact_title WHERE contact_title.id = title) || ' ' || first_name || ' ' || last_name
+        END
+  ]]>
+</string>
+
+<string name="owner" formula="true">
+  <![CDATA[
+        ( SELECT CASE WHEN c.type = 'owner' THEN c.firstname + ' ' + c.lastname END FROM contacts c where c.folder_id = id )
+  ]]>
+</string>
 ----
 
 == Index
