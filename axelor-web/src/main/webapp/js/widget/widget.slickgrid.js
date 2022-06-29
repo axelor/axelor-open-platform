@@ -1613,9 +1613,10 @@ Grid.prototype.onKeyDown = function (e) {
   if (e.keyCode === 13) { // ENTER
     if (this.isEditActive()) {
       e.stopPropagation();
+      var isLastRow = args.row === grid.getDataLength() - 1;
       var promise = that.commitEdit();
       promise.then(function () {
-        if (that.canAdd() && args.row === grid.getDataLength() - 1) {
+        if (that.canAdd() && isLastRow) {
           that.addNewRow();
         }
       }, function () {
@@ -2196,9 +2197,10 @@ Grid.prototype._showEditor = function (activeCell) {
       confirm.keydown(function (e) {
         if (e.keyCode === 13) {
           e.preventDefault();
+          var isLastRow = args.row === grid.getDataLength() - 1;
           doCommit().then(function () {
             var args = grid.getActiveCell();
-            if (that.canAdd() && args.row === grid.getDataLength() - 1) {
+            if (that.canAdd() && isLastRow) {
               that.addNewRow();
             }
           });
