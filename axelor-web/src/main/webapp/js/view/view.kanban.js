@@ -344,7 +344,7 @@ ui.directive('uiKanban', function () {
   return {
     replace: true,
     template:
-      "<div class='kanban-view row-fluid' ng-clsss='::schema.css'>" +
+      "<div class='kanban-view row-fluid' ng-class='::schema.css'>" +
         "<div class='kanban-column' ng-repeat='column in ::columns' ui-kanban-column>" +
           "<h3>{{::column.title}}</h3>" +
           "<div class='input-group' ng-if='::column.canCreate' ng-show='hasPermission(\"create\")'>" +
