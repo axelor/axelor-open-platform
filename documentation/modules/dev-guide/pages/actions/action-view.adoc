@@ -154,3 +154,10 @@ The `tag-style` can be one of the:
 - `warning`
 - `inverse`
 - `info`
+
+The menus are displayed to users with the following rules:
+
+* Don't allow access to root menus by default: top menus are restricted by default, so roles/groups are needed in order to be
+displayed to users.
+* Allow access to all non-root menus by default: if submenus have no roles nor groups assigned, they are available to all.
+Or else, submenus are displayed to users belonging to the given groups/roles.
