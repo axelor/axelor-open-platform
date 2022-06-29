@@ -74,7 +74,7 @@ function BaseCardsCtrl(type, $scope, $element, ViewService) {
       $scope.showEditor(record, readonly);
       return true;
     }
-  }
+  };
 
   $scope.onRefresh = function () {
     return $scope.filter({});
@@ -237,7 +237,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ViewService', 'ActionService
     if (columnBy.target) {
       $scope.toColumnValue = function (value) {
         return { id : value };
-      }
+      };
     }
   };
 
@@ -377,7 +377,7 @@ ui.directive('uiKanban', function () {
           "</div>" +
         "</div>" +
       "</div>"
-  }
+  };
 });
 
 ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
@@ -819,7 +819,7 @@ function linker(scope, element, atts) {
       opts.context = _.extend({id: null}, scope._context, scope.getContext());
     }
     return opts;
-  }
+  };
 
   scope.filter = function (options) {
     var opts = scope.prepareFilter(options);
