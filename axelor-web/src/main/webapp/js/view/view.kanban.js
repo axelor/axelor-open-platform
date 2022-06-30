@@ -399,7 +399,7 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
       };
 
       ds._context = _.extend({}, scope._dataSource._context);
-      ds._page.limit = view.limit || parseInt(scope._viewParams.params.limit) || 20;
+      ds._page.limit = view.limit || parseInt((scope._viewParams.params || {}).limit) || 20;
       ds._sortBy = [view.sequenceBy];
       ds._domain = scope._dataSource._domain;
       ds._filter = columnFilter;
