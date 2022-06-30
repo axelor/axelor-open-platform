@@ -2272,7 +2272,7 @@ Grid.prototype._showEditor = function (activeCell) {
           || elem.hasClass("ui-widget-overlay"));
       }
 
-      this.checkAutoCommit = function (e) {
+      function checkAutoCommit(e) {
         if (cannotCommit($(e.target))) {
           return;
         }
@@ -2281,8 +2281,15 @@ Grid.prototype._showEditor = function (activeCell) {
         } else {
           that.cancelEdit();
         }
-        $("body").off("click", this.checkAutoCommit);
       }
+
+      this.scope.$on('on:grid-edit-start', function () {
+        that.scope.$timeout(function () { $(document).on('click', checkAutoCommit); });
+      });
+
+      this.scope.$on('on:grid-edit-end', function () {
+        $(document).off('click', checkAutoCommit);
+      });
     }
 
     form.on('keydown', '.form-item-container :input:first', function (e) {
@@ -2362,10 +2369,6 @@ Grid.prototype._showEditor = function (activeCell) {
   setTimeout(function () {
     form.css('visibility', '');
   }, 100)
-
-  if (this.checkAutoCommit) {
-    $("body").on("click", this.checkAutoCommit);
-  }
 
   var unwatchScrollbar = this.scope.$watch(function () {
     return viewPort.prop("clientHeight");
