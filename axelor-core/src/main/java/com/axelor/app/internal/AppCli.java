@@ -32,12 +32,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.servlet.RequestScoped;
+import com.google.inject.servlet.RequestScoper;
+import com.google.inject.servlet.ServletScopes;
+import java.util.Collections;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AppCli {
 
   private static final String PROGRAM_NAME = "axelor";
   private static final String PERSISTENCE_UNIT = "persistenceUnit";
+
+  private static final Logger logger = LoggerFactory.getLogger(AppCli.class);
 
   static class MyOptions {
 
@@ -89,7 +97,7 @@ public class AppCli {
 
     @Override
     protected void configure() {
-
+      bindScope(RequestScoped.class, ServletScopes.REQUEST);
       bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
 
       install(new JpaModule(jpaUnit));
@@ -142,39 +150,43 @@ public class AppCli {
     }
 
     Injector injector = Guice.createInjector(new MyModule(PERSISTENCE_UNIT));
+    final RequestScoper scope = ServletScopes.scopeRequest(Collections.emptyMap());
+    try (final RequestScoper.CloseableScope ignored = scope.open()) {
 
-    if (opts.encrypt) {
-      System.setProperty("database.encrypt.migrate", "true");
-      EncryptedFieldService service = injector.getInstance(EncryptedFieldService.class);
-      try {
-        service.migrate();
-        println("Field encryption complete.");
-        println("Remove 'encryption.password.old' from 'application.properties'");
-        return 0;
-      } catch (Exception e) {
-        println("field value encryption failed.");
-        println(e.getMessage());
-        if (opts.verbose == Boolean.TRUE) {
-          e.printStackTrace();
+      if (opts.encrypt) {
+        System.setProperty("database.encrypt.migrate", "true");
+        EncryptedFieldService service = injector.getInstance(EncryptedFieldService.class);
+        try {
+          service.migrate();
+          println("Field encryption complete.");
+          println("Remove 'encryption.password.old' from 'application.properties'");
+          return 0;
+        } catch (Exception e) {
+          println("field value encryption failed.");
+          println(e.getMessage());
+          if (opts.verbose == Boolean.TRUE) {
+            e.printStackTrace();
+          }
+          return -1;
         }
-        return -1;
       }
+
+      ModuleManager manager = injector.getInstance(ModuleManager.class);
+
+      boolean demo = AppSettings.get().getBoolean(AvailableAppSettings.DATA_IMPORT_DEMO_DATA, true);
+
+      if (opts.init == Boolean.TRUE) {
+        manager.initialize(opts.update == Boolean.TRUE, demo);
+        return 0;
+      }
+
+      String[] names = {};
+      if (opts.modules != null) {
+        names = opts.modules.toArray(new String[] {});
+      }
+      manager.update(demo, names);
     }
 
-    ModuleManager manager = injector.getInstance(ModuleManager.class);
-
-    boolean demo = AppSettings.get().getBoolean(AvailableAppSettings.DATA_IMPORT_DEMO_DATA, true);
-
-    if (opts.init == Boolean.TRUE) {
-      manager.initialize(opts.update == Boolean.TRUE, demo);
-      return 0;
-    }
-
-    String[] names = {};
-    if (opts.modules != null) {
-      names = opts.modules.toArray(new String[] {});
-    }
-    manager.update(demo, names);
     return 0;
   }
 
@@ -184,6 +196,7 @@ public class AppCli {
       AppLogger.install();
       status = process(args);
     } catch (Exception e) {
+      logger.error(e.getMessage(), e);
       status = -1;
     } finally {
       AppLogger.uninstall();
