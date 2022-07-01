@@ -32,7 +32,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.servlet.RequestScoped;
+import com.google.inject.servlet.RequestScoper;
+import com.google.inject.servlet.ServletScopes;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
@@ -127,7 +131,13 @@ public class DBManager {
   public static void main(String[] args) {
     AppLogger.install();
     try {
-      withInjector(injector -> process(args));
+      withInjector(
+          injector -> {
+            final RequestScoper scope = ServletScopes.scopeRequest(Collections.emptyMap());
+            try (final RequestScoper.CloseableScope ignored = scope.open()) {
+              process(args);
+            }
+          });
     } finally {
       AppLogger.uninstall();
     }
@@ -143,7 +153,7 @@ public class DBManager {
 
     @Override
     protected void configure() {
-
+      bindScope(RequestScoped.class, ServletScopes.REQUEST);
       bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
 
       install(new JpaModule(jpaUnit));
