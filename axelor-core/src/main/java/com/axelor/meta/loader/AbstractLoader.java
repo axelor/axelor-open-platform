@@ -69,18 +69,16 @@ abstract class AbstractLoader {
       final Entry<Class<?>, String> key = new SimpleImmutableEntry<>(entryType, entryName);
       if (visited.contains(key)) {
         log.error(
-                "Duplicate {} found {} 'id': {}",
-                type.getSimpleName(),
-                withoutId ? "without" : "with",
-                entryName);
+            "Duplicate {} found {} 'id': {}",
+            type.getSimpleName(),
+            withoutId ? "without" : "with",
+            entryName);
         return true;
       }
       visited.add(key);
       return false;
     }
   }
-
-
 
   /**
    * Checks whether an element is already visited. Element can be either identified the pair {@code
