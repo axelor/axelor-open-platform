@@ -545,7 +545,9 @@ ui.directive('uiKanbanColumn', ["ActionService", function (ActionService) {
         element.find('[ui-sortable]').sortable("option", "appendTo", element.parent());
       });
 
-      fetch();
+      if (!scope.editRecord) {
+        fetch();
+      }
     }
   };
 }]);
