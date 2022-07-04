@@ -297,6 +297,10 @@ ui.directive('uiHelpPopover', function() {
     }
 
     addRow(_t('Orig. Value'), axelor.sanitize(value));
+
+    if (scope._viewAction) {
+      addRow(_t('Action'), scope._viewAction);
+    }
   }
 
   function doLink(scope, element, attrs) {
