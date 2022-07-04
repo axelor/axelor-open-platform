@@ -106,7 +106,9 @@ public class AppInfo {
     map.put("application.help", SETTINGS.get(AvailableAppSettings.APPLICATION_HELP));
     map.put("application.mode", SETTINGS.get(AvailableAppSettings.APPLICATION_MODE, "dev"));
 
-    map.put("api.pagination.max-per-page", SETTINGS.getInt(AvailableAppSettings.API_PAGINATION_MAX_PER_PAGE, -1));
+    map.put(
+        "api.pagination.max-per-page",
+        SETTINGS.getInt(AvailableAppSettings.API_PAGINATION_MAX_PER_PAGE, -1));
     map.put("file.upload.size", SETTINGS.get(AvailableAppSettings.FILE_UPLOAD_SIZE, "5"));
     map.put("application.sdk", VersionUtils.getVersion().version);
 
