@@ -114,7 +114,7 @@ libs.infinispan = [
 libs.hibernate_search = "org.hibernate:hibernate-search-orm:${versions.hibernate_search}"
 
 // apache tika
-libs.apache_tika_core = "org.apache.tika:tika-core:2.3.0"
+libs.apache_tika_core = "org.apache.tika:tika-core:2.4.1"
 
 // flyway
 libs.flywaydb = "org.flywaydb:flyway-core:8.5.11"
