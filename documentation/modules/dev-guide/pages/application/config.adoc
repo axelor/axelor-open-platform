@@ -229,7 +229,7 @@ db.default.password = secret
 | `view.form.check-version` | whether to check version value for concurrent updates when switching tabs | false
 | `user.password.pattern` | pattern to validate user password | .{4,}
 | `user.password.pattern-title` | title displayed for the password pattern | "Please use at least 4 characters."
-| `api.pagination.max-per-page` | define the maximum number of items per page, -1 means unlimited | -1
+| `api.pagination.max-per-page` | define the maximum number of items per page, -1 means unlimited | 500
 | `session.timeout` | session timeout (in minutes) | 60
 | `session.cookie.secure` | define session cookie as secure |
 | `encryption.password` | encryption password |

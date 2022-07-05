@@ -631,7 +631,7 @@ ui.directive('uiRecordPager', function(){
       var elText = element.find('.record-pager-text').show(),
         elChanger = element.find('.record-pager-change').hide(),
         elInput = elChanger.find('input'),
-        MAX_PAGE_SIZE = axelor.config['api.pagination.max-per-page'] || -1;
+        MAX_PAGE_SIZE = axelor.config['api.pagination.max-per-page'] || 500;
 
       scope.showText = attrs.uiRecordPager !== "no-text";
 

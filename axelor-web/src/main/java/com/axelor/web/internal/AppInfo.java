@@ -108,7 +108,7 @@ public class AppInfo {
 
     map.put(
         "api.pagination.max-per-page",
-        SETTINGS.getInt(AvailableAppSettings.API_PAGINATION_MAX_PER_PAGE, -1));
+        SETTINGS.getInt(AvailableAppSettings.API_PAGINATION_MAX_PER_PAGE, 500));
     map.put("data.upload.max-size", SETTINGS.get(AvailableAppSettings.FILE_UPLOAD_SIZE, "5"));
     map.put("application.sdk", VersionUtils.getVersion().version);
 

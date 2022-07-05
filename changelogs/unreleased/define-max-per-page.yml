@@ -1,0 +1,5 @@
+title: Define maximum number of records per page
+type: change
+description: |
+  This change the default `api.pagination.max-per-page`, currently allowing unlimited 
+  number of records per page, to 500.
