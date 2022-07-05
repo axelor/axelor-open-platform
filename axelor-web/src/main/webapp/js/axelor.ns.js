@@ -161,10 +161,13 @@
    * @returns {number} page size
    */
   axelor.getDefaultPageSize = function() {
+    var defaultSize = axelor.config['api.pagination.default-per-page'] > 0
+        ? axelor.config['api.pagination.default-per-page']
+        : INITIAL_PAGE_SIZE;
     if (axelor.config['api.pagination.max-per-page'] > 0) {
-      return Math.min(axelor.config['api.pagination.max-per-page'], INITIAL_PAGE_SIZE);
+      return Math.min(axelor.config['api.pagination.max-per-page'], defaultSize);
     }
-    return INITIAL_PAGE_SIZE;
+    return defaultSize;
   };
 
 })();

@@ -230,6 +230,7 @@ db.default.password = secret
 | `user.password.pattern` | pattern to validate user password | .{4,}
 | `user.password.pattern-title` | title displayed for the password pattern | "Please use at least 4 characters."
 | `api.pagination.max-per-page` | define the maximum number of items per page, -1 means unlimited | 500
+| `api.pagination.default-per-page` | define the default number of items per page | 40
 | `session.timeout` | session timeout (in minutes) | 60
 | `session.cookie.secure` | define session cookie as secure |
 | `encryption.password` | encryption password |

@@ -1,0 +1,12 @@
+title: Introduce default number of items displayed per page config
+type: feature
+description: |
+  Introduce new config `api.pagination.default-per-page` :
+  
+  ```
+  # Define the default number of items per page
+  api.pagination.default-per-page = 40
+  ```
+  
+  This config is used in UI, especially in grid views, to define the default number of items 
+  displayed per page. Default value is still 40 records.
