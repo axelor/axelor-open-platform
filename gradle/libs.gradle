@@ -242,7 +242,7 @@ libs.quartz = dependencies.create("org.quartz-scheduler:quartz:2.3.2") {
 // xstream
 libs.xstream = [
   "com.thoughtworks.xstream:xstream:1.4.19",
-  "com.fasterxml.woodstox:woodstox-core:6.2.8"
+  "com.fasterxml.woodstox:woodstox-core:6.3.0"
 ]
 
 // jsoup for html parsing & sanitize
