@@ -1,0 +1,5 @@
+---
+title: Fix view computing after installing removable module
+type: fix
+description: |
+  After installing a removable module, need to update all views that have extensions.

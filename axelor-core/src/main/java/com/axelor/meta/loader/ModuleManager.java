@@ -115,11 +115,10 @@ public class ModuleManager {
     try {
       createUsers();
       resolve(true);
+      final List<Module> newlyInstalledModules = new ArrayList<>();
       Beans.get(AuditableRunner.class)
           .run(
               () -> {
-                final List<Module> newlyInstalledModules = new ArrayList<>();
-
                 // install modules
                 resolver.all().stream()
                     .filter(m -> !m.isRemovable() || m.isInstalled())
@@ -143,7 +142,7 @@ public class ModuleManager {
                     .map(Module::getName)
                     .forEach(this::uninstall);
               });
-      viewLoader.terminate(update);
+      viewLoader.terminate(update || !newlyInstalledModules.isEmpty());
     } finally {
       this.encryptPasswords();
       this.doCleanUp();
