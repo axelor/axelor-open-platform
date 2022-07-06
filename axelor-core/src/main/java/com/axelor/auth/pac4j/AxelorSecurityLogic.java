@@ -19,18 +19,15 @@
 package com.axelor.auth.pac4j;
 
 import io.buji.pac4j.profile.ShiroProfileManager;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.pac4j.core.authorization.authorizer.Authorizer;
-import org.pac4j.core.authorization.checker.DefaultAuthorizationChecker;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.IndirectClient;
+import org.pac4j.core.config.Config;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.engine.DefaultSecurityLogic;
@@ -38,9 +35,7 @@ import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.exception.http.RedirectionAction;
 import org.pac4j.core.http.adapter.HttpActionAdapter;
 import org.pac4j.core.http.ajax.AjaxRequestResolver;
-import org.pac4j.core.matching.checker.DefaultMatchingChecker;
 import org.pac4j.core.matching.matcher.Matcher;
-import org.pac4j.core.profile.UserProfile;
 import org.pac4j.core.util.Pac4jConstants;
 
 @Singleton
@@ -53,45 +48,24 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
 
   @Inject
   public AxelorSecurityLogic(
-      ErrorHandler errorHandler,
-      AuthPac4jInfo authPac4jInfo,
-      AxelorCsrfAuthorizer csrfAuthorizer,
-      AxelorCsrfMatcher csrfMatcher) {
+      ErrorHandler errorHandler, AuthPac4jInfo authPac4jInfo, Config config) {
     this.errorHandler = errorHandler;
     this.authPac4jInfo = authPac4jInfo;
     setProfileManagerFactory(ShiroProfileManager::new);
     setErrorUrl("error.jsp");
+
+    final List<Authorizer> authorizers =
+        config.getAuthorizers().values().stream().collect(Collectors.toUnmodifiableList());
     setAuthorizationChecker(
-        new DefaultAuthorizationChecker() {
+        (context, sessionStore, profiles, authorizerNames, authorizersMap, clients) ->
+            authorizers.stream()
+                .allMatch(authorizer -> authorizer.isAuthorized(context, sessionStore, profiles)));
 
-          @Override
-          protected List<Authorizer> computeDefaultAuthorizers(
-              WebContext context,
-              List<UserProfile> profiles,
-              List<Client> clients,
-              Map<String, Authorizer> authorizersMap) {
-
-            if (clients.stream().anyMatch(IndirectClient.class::isInstance)) {
-              return List.of(csrfAuthorizer);
-            }
-
-            return Collections.emptyList();
-          }
-        });
+    final List<Matcher> matchers =
+        config.getMatchers().values().stream().collect(Collectors.toUnmodifiableList());
     setMatchingChecker(
-        new DefaultMatchingChecker() {
-
-          @Override
-          protected List<Matcher> computeDefaultMatchers(
-              WebContext context, SessionStore sessionStore, List<Client> clients) {
-
-            if (clients.stream().anyMatch(IndirectClient.class::isInstance)) {
-              return List.of(csrfMatcher);
-            }
-
-            return Collections.emptyList();
-          }
-        });
+        (context, sessionStore, matcherNames, matchersMap, clients) ->
+            matchers.stream().allMatch(matcher -> matcher.matches(context, sessionStore)));
   }
 
   // Don't save requested URL if redirected to a non-default central client,

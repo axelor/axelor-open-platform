@@ -30,11 +30,11 @@ public class AxelorSecurityFilter extends SecurityFilter {
 
   @Inject
   public AxelorSecurityFilter(Config config, AxelorSecurityLogic securityLogic) {
+    setSecurityLogic(securityLogic);
     setConfig(config);
     setClients(
         config.getClients().getClients().stream()
             .map(Client::getName)
             .collect(Collectors.joining(",")));
-    setSecurityLogic(securityLogic);
   }
 }

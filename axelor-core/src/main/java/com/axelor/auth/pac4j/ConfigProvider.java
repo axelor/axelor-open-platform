@@ -19,11 +19,8 @@
 package com.axelor.auth.pac4j;
 
 import com.google.inject.Provider;
-import java.util.Collections;
-import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 
@@ -35,9 +32,8 @@ public class ConfigProvider implements Provider<Config> {
   @Inject
   public ConfigProvider(
       Clients clients, AxelorCsrfAuthorizer csrfAuthorizer, AxelorCsrfMatcher csrfMatcher) {
-    final Map<String, Authorizer> authorizers =
-        Collections.singletonMap(AxelorCsrfAuthorizer.CSRF_AUTHORIZER_NAME, csrfAuthorizer);
-    config = new Config(clients, authorizers);
+    config = new Config(clients);
+    config.addAuthorizer(AxelorCsrfAuthorizer.CSRF_AUTHORIZER_NAME, csrfAuthorizer);
     config.addMatcher(AxelorCsrfMatcher.CSRF_MATCHER_NAME, csrfMatcher);
   }
 
