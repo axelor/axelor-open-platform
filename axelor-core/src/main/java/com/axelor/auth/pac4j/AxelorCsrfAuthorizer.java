@@ -25,6 +25,7 @@ import static org.pac4j.core.context.WebContextHelper.isPut;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.pac4j.core.authorization.authorizer.CsrfAuthorizer;
@@ -37,24 +38,27 @@ import org.pac4j.core.util.Pac4jConstants;
 public class AxelorCsrfAuthorizer extends CsrfAuthorizer {
   public static final String CSRF_AUTHORIZER_NAME = "axelorCsrf";
 
-  @Inject
-  public AxelorCsrfAuthorizer() {
-    this(AuthPac4jModule.CSRF_HEADER_NAME, AuthPac4jModule.CSRF_HEADER_NAME);
-  }
+  private final Set<String> directClients;
 
-  public AxelorCsrfAuthorizer(String parameterName, final String headerName) {
-    super(parameterName, headerName);
+  @Inject
+  public AxelorCsrfAuthorizer(ClientListProvider clientListProvider) {
+    super(AuthPac4jModule.CSRF_HEADER_NAME, AuthPac4jModule.CSRF_HEADER_NAME);
+    directClients = clientListProvider.getDirectClientNames();
   }
 
   @Override
   public boolean isAuthorized(
       WebContext context, SessionStore sessionStore, List<UserProfile> profiles) {
-    // Don't need CSRF check for native clients
-    if (AuthPac4jInfo.isNativeClient(context)) {
+    // No CSRF check for native clients nor direct clients
+    if (AuthPac4jInfo.isNativeClient(context) || isDirectClient(profiles)) {
       return true;
     }
 
     return internalIsAuthorized(context, sessionStore, profiles);
+  }
+
+  private boolean isDirectClient(List<UserProfile> profiles) {
+    return !profiles.isEmpty() && directClients.contains(profiles.get(0).getClientName());
   }
 
   /**
@@ -84,8 +88,7 @@ public class AxelorCsrfAuthorizer extends CsrfAuthorizer {
           (Optional<String>) (Optional<?>) sessionStore.get(context, Pac4jConstants.CSRF_TOKEN);
       return sessionToken.isPresent()
           && (sessionToken.get().equals(parameterToken) || sessionToken.get().equals(headerToken));
-    } else {
-      return true;
     }
+    return true;
   }
 }

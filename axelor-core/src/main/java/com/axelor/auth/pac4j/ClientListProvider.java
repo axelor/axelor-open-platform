@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -61,6 +62,10 @@ import org.slf4j.LoggerFactory;
 public class ClientListProvider implements Provider<List<Client>> {
 
   private final List<Client> clients = new ArrayList<>();
+
+  private final Set<String> indirectClientNames;
+
+  private final Set<String> directClientNames;
 
   private final boolean exclusive;
 
@@ -291,29 +296,39 @@ public class ClientListProvider implements Provider<List<Client>> {
       authPac4jInfo.setClientInfo(name, info);
     }
 
-    if (logger.isInfoEnabled()) {
-      final Map<Boolean, List<Client>> groupedClients =
-          clients.stream().collect(Collectors.groupingBy(IndirectClient.class::isInstance));
-      final String indirectClientNames =
-          groupedClients.getOrDefault(true, Collections.emptyList()).stream()
-              .map(Client::getName)
-              .collect(Collectors.joining(", "));
-      if (!indirectClientNames.isEmpty()) {
-        logger.info("Indirect clients: {}", indirectClientNames);
-      }
-      final String directClientNames =
-          groupedClients.getOrDefault(false, Collections.emptyList()).stream()
-              .map(Client::getName)
-              .collect(Collectors.joining(", "));
-      if (!directClientNames.isEmpty()) {
-        logger.info("Direct clients: {}", directClientNames);
-      }
+    final Map<Boolean, List<Client>> groupedClients =
+        clients.stream().collect(Collectors.groupingBy(IndirectClient.class::isInstance));
+    indirectClientNames =
+        Collections.unmodifiableSet(
+            (Set<String>)
+                groupedClients.getOrDefault(true, Collections.emptyList()).stream()
+                    .map(Client::getName)
+                    .collect(Collectors.toCollection(LinkedHashSet::new)));
+    if (!indirectClientNames.isEmpty()) {
+      logger.info("Indirect clients: {}", indirectClientNames);
+    }
+    directClientNames =
+        Collections.unmodifiableSet(
+            (Set<String>)
+                groupedClients.getOrDefault(false, Collections.emptyList()).stream()
+                    .map(Client::getName)
+                    .collect(Collectors.toCollection(LinkedHashSet::new)));
+    if (!directClientNames.isEmpty()) {
+      logger.info("Direct clients: {}", directClientNames);
     }
   }
 
   @Override
   public List<Client> get() {
     return clients;
+  }
+
+  public Set<String> getIndirectClientNames() {
+    return indirectClientNames;
+  }
+
+  public Set<String> getDirectClientNames() {
+    return directClientNames;
   }
 
   public boolean isExclusive() {

@@ -1,0 +1,3 @@
+---
+title: Don’t check for CSRF tokens with direct clients
+type: fix
