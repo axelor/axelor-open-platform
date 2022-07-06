@@ -25,6 +25,7 @@ import io.buji.pac4j.filter.LogoutFilter;
 import java.io.IOException;
 import java.util.Optional;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -34,6 +35,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.shiro.subject.Subject;
 import org.pac4j.core.config.Config;
 
+@Singleton
 public class AxelorLogoutFilter extends LogoutFilter {
 
   @Inject

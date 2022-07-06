@@ -20,8 +20,10 @@ package com.axelor.auth.pac4j;
 
 import io.buji.pac4j.profile.ShiroProfileManager;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.pac4j.core.engine.DefaultLogoutLogic;
 
+@Singleton
 public class AxelorLogoutLogic extends DefaultLogoutLogic {
 
   @Inject

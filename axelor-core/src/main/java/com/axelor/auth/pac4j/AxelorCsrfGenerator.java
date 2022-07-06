@@ -19,6 +19,7 @@
 package com.axelor.auth.pac4j;
 
 import java.util.Optional;
+import javax.inject.Singleton;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.matching.matcher.csrf.DefaultCsrfTokenGenerator;
@@ -34,6 +35,7 @@ import org.pac4j.core.util.Pac4jConstants;
  * <p>Code taken from:
  * https://github.com/pac4j/pac4j/blob/4.5.x/pac4j-core/src/main/java/org/pac4j/core/matching/matcher/csrf/DefaultCsrfTokenGenerator.java
  */
+@Singleton
 public class AxelorCsrfGenerator extends DefaultCsrfTokenGenerator {
 
   @Override

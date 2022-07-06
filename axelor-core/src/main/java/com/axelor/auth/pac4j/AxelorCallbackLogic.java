@@ -23,6 +23,7 @@ import io.buji.pac4j.profile.ShiroProfileManager;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.pac4j.core.client.finder.DefaultCallbackClientFinder;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.WebContext;
@@ -38,6 +39,7 @@ import org.pac4j.jee.context.JEEContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class AxelorCallbackLogic extends DefaultCallbackLogic {
 
   private final ErrorHandler errorHandler;

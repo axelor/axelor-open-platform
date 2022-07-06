@@ -22,8 +22,10 @@ import com.axelor.app.AppSettings;
 import com.axelor.common.StringUtils;
 import io.buji.pac4j.filter.CallbackFilter;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.pac4j.core.config.Config;
 
+@Singleton
 public class AxelorCallbackFilter extends CallbackFilter {
 
   @Inject

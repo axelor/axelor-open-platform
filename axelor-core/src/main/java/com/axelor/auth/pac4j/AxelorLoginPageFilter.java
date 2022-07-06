@@ -23,6 +23,7 @@ import io.buji.pac4j.profile.ShiroProfileManager;
 import java.io.IOException;
 import java.util.Optional;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -40,6 +41,7 @@ import org.pac4j.jee.context.session.JEESessionStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class AxelorLoginPageFilter implements Filter {
 
   private final AxelorCallbackFilter axelorCallbackFilter;
