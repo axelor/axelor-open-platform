@@ -27,6 +27,10 @@ import com.axelor.tools.code.JavaCode;
 import com.axelor.tools.code.JavaDoc;
 import com.axelor.tools.code.JavaField;
 import com.axelor.tools.code.JavaMethod;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +39,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -46,7 +53,7 @@ import javax.xml.bind.annotation.XmlValue;
 @XmlType
 public abstract class Property {
 
-  @XmlValue private String content;
+  @Overridable @XmlValue private String content;
 
   @XmlAttribute(name = "name", required = true)
   private String name;
@@ -56,39 +63,50 @@ public abstract class Property {
   @XmlAttribute(name = "column")
   private String column;
 
+  @Overridable
   @XmlAttribute(name = "title")
   private String title;
 
+  @Overridable
   @XmlAttribute(name = "help")
   private String help;
 
+  @Overridable
   @XmlAttribute(name = "required")
   private Boolean required;
 
+  @Overridable
   @XmlAttribute(name = "readonly")
   private Boolean readonly;
 
+  @Overridable
   @XmlAttribute(name = "hidden")
   private Boolean hidden;
 
+  @Overridable(PersistedChecker.class)
   @XmlAttribute(name = "transient")
   private Boolean _transient;
 
+  @Overridable
   @XmlAttribute(name = "default")
   private String _default;
 
+  @Overridable
   @XmlAttribute(name = "unique")
   private Boolean unique;
 
   @XmlAttribute(name = "initParam")
   private Boolean initParam;
 
+  @Overridable
   @XmlAttribute(name = "index")
   private String index;
 
+  @Overridable
   @XmlAttribute(name = "massUpdate")
   private Boolean massUpdate;
 
+  @Overridable
   @XmlAttribute(name = "copy")
   private Boolean copy;
 
@@ -98,9 +116,11 @@ public abstract class Property {
   @XmlAttribute(name = "mappedBy")
   private String mappedBy;
 
+  @Overridable
   @XmlAttribute(name = "orphanRemoval")
   private Boolean orphanRemoval;
 
+  @Overridable
   @XmlAttribute(name = "orderBy")
   private String orderBy;
 
@@ -110,68 +130,169 @@ public abstract class Property {
   @XmlAttribute(name = "column2")
   private String column2;
 
+  @Overridable
   @XmlAttribute(name = "nullable")
   private Boolean nullable;
 
+  @Overridable
   @XmlAttribute(name = "selection")
   private String selection;
 
+  @Overridable
   @XmlAttribute(name = "equalsInclude")
   private Boolean equalsInclude;
 
+  @Overridable(PersistedChecker.class)
   @XmlAttribute(name = "formula")
   private Boolean formula;
 
+  @Overridable
   @XmlAttribute(name = "min")
   private String min;
 
+  @Overridable
   @XmlAttribute(name = "max")
   private String max;
 
+  @Overridable
   @XmlAttribute(name = "precision")
   private Integer precision;
 
+  @Overridable
   @XmlAttribute(name = "scale")
   private Integer scale;
 
+  @Overridable
   @XmlAttribute(name = "image")
   private Boolean image;
 
+  @Overridable
   @XmlAttribute(name = "encrypted")
   private Boolean encrypted;
 
   @XmlAttribute(name = "tz")
   private Boolean tz;
 
+  @Overridable
   @XmlAttribute(name = "multiline")
   private Boolean multiline;
 
+  @Overridable(LargeChecker.class)
   @XmlAttribute(name = "large")
   private Boolean large;
 
+  @Overridable
   @XmlAttribute(name = "namecolumn")
   private Boolean nameField;
 
+  @Overridable
   @XmlAttribute(name = "search")
   private String search;
 
   @XmlAttribute(name = "json")
   private Boolean json;
 
+  @Overridable
   @XmlAttribute(name = "password")
   private Boolean password;
 
+  @Overridable
   @XmlAttribute(name = "sequence")
   private String sequence;
 
+  @Overridable
   @XmlAttribute(name = "translatable")
   private Boolean translatable;
 
-  @XmlAttribute private Boolean insertable;
+  @Overridable @XmlAttribute private Boolean insertable;
 
-  @XmlAttribute private Boolean updatable;
+  @Overridable @XmlAttribute private Boolean updatable;
 
-  public Property() {
+  private static class LargeChecker implements BiConsumer<Object, Object> {
+    @Override
+    public void accept(Object a, Object b) {
+      if (isTrue((Boolean) a) && isFalse((Boolean) b)) {
+        throw new IllegalArgumentException("large field cannot become non-large");
+      }
+    }
+  }
+
+  private static class PersistedChecker implements BiConsumer<Object, Object> {
+    @Override
+    public void accept(Object a, Object b) {
+      if (notTrue((Boolean) a) && isTrue((Boolean) b)) {
+        throw new IllegalArgumentException("persisted field cannot become non-persisted");
+      }
+    }
+  }
+
+  private static List<PropertyAttribute> attributes = null;
+
+  public static List<PropertyAttribute> getAttributes() {
+    if (attributes != null) {
+      return attributes;
+    }
+
+    final BeanInfo beanInfo;
+    try {
+      beanInfo = Introspector.getBeanInfo(Property.class);
+    } catch (IntrospectionException e) {
+      throw new RuntimeException(e);
+    }
+
+    final Map<String, PropertyDescriptor> descriptors =
+        Arrays.stream(beanInfo.getPropertyDescriptors())
+            .collect(
+                Collectors.toUnmodifiableMap(PropertyDescriptor::getName, Function.identity()));
+    final BiConsumer<Object, Object> notOverridable =
+        (a, b) -> {
+          throw new IllegalArgumentException("this attribute is not overridable");
+        };
+    final Map<Class<? extends BiConsumer<Object, Object>>, BiConsumer<Object, Object>>
+        checkOverrides = new HashMap<>();
+
+    attributes =
+        Arrays.stream(Property.class.getDeclaredFields())
+            .filter(
+                field ->
+                    field.isAnnotationPresent(XmlAttribute.class)
+                        || field.isAnnotationPresent(XmlValue.class))
+            .map(
+                field -> {
+                  final String fieldName = field.getName().replaceAll("(?:^_+)|(?:_+$)", "");
+                  final String attributeName =
+                      Optional.ofNullable(field.getAnnotation(XmlAttribute.class))
+                          .map(XmlAttribute::name)
+                          .filter(name -> !name.startsWith("#"))
+                          .orElse(fieldName);
+                  final Overridable overridableAnnotation = field.getAnnotation(Overridable.class);
+                  final BiConsumer<Object, Object> checkOverride =
+                      overridableAnnotation == null
+                          ? notOverridable
+                          : checkOverrides.computeIfAbsent(
+                              overridableAnnotation.value(),
+                              cls -> {
+                                try {
+                                  return cls.getDeclaredConstructor().newInstance();
+                                } catch (ReflectiveOperationException e) {
+                                  throw new RuntimeException(e);
+                                }
+                              });
+
+                  if (field.isAnnotationPresent(XmlValue.class)) {
+                    return PropertyAttribute.ofValue(
+                        attributeName, descriptors.get(fieldName), checkOverride);
+                  }
+
+                  return PropertyAttribute.of(
+                      attributeName, descriptors.get(fieldName), checkOverride);
+                })
+            .collect(Collectors.toUnmodifiableList());
+
+    return attributes;
+  }
+
+  protected Property() {
     this.type =
         PropertyType.valueOf(
             getClass().getAnnotation(XmlType.class).name().toUpperCase().replace('-', '_'));

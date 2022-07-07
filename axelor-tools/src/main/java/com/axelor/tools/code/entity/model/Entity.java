@@ -36,6 +36,8 @@ import com.axelor.tools.code.JavaDoc;
 import com.axelor.tools.code.JavaField;
 import com.axelor.tools.code.JavaMethod;
 import com.axelor.tools.code.JavaType;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -52,6 +54,8 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @XmlType
 public class Entity implements BaseType<Entity> {
@@ -113,6 +117,8 @@ public class Entity implements BaseType<Entity> {
   private String repositoryType;
 
   private transient boolean hasExtends;
+
+  private static final Logger logger = LoggerFactory.getLogger(Entity.class);
 
   @XmlElements({
     @XmlElement(name = "string", type = Property.StringProperty.class),
@@ -220,17 +226,6 @@ public class Entity implements BaseType<Entity> {
     equalsAll = isTrue(equalsAll);
   }
 
-  private boolean isCompatible(Property existing, Property property) {
-    if (existing == null) return true;
-    if (existing.isPrimary()) {
-      return false;
-    }
-    if (!Objects.equals(existing.getType(), property.getType())) return false;
-    if (!Objects.equals(existing.getTarget(), property.getTarget())) return false;
-    if (isTrue(existing.getLarge()) && notTrue(property.getLarge())) return false;
-    return true;
-  }
-
   public Property findField(String name) {
     return getFields().stream()
         .filter(p -> Objects.equals(p.getName(), name))
@@ -242,18 +237,13 @@ public class Entity implements BaseType<Entity> {
   public void merge(Entity other) {
     for (Property prop : other.getFields()) {
       Property existing = findField(prop.getName());
-      if (isCompatible(existing, prop)) {
-        prop.setInitParam(false); // can't be a constructor param
-        if (existing != null) {
-          fields.remove(existing);
-          if (isTrue(existing.getInitParam())) {
-            prop.setInitParam(true); // unless existing is a constructor param
-          }
-        }
+      if (existing == null) {
         fields.add(prop);
-        if (isTrue(prop.getNameField())) {
-          nameField = prop;
-        }
+      } else if (!merge(existing, prop)) {
+        continue;
+      }
+      if (isTrue(prop.getNameField())) {
+        nameField = prop;
       }
     }
 
@@ -286,6 +276,78 @@ public class Entity implements BaseType<Entity> {
         Stream.of(extraCode, other.extraCode)
             .filter(Utils::notBlank)
             .collect(Collectors.joining("\n"));
+  }
+
+  private boolean merge(Property existing, Property property) {
+    if (!isCompatible(existing, property)) {
+      return false;
+    }
+
+    try {
+      for (final PropertyAttribute attribute : Property.getAttributes()) {
+        merge(attribute, existing, property);
+      }
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException(e);
+    }
+    return true;
+  }
+
+  private boolean isCompatible(Property existing, Property property) {
+    if (existing.isPrimary()) {
+      logger.error("{}.{}: cannot merge primary field", getName(), existing.getName());
+      return false;
+    }
+    if (!Objects.equals(existing.getType(), property.getType())) {
+      logger.error(
+          "{}.{}: incompatible types: from '{}' to '{}'",
+          getName(),
+          existing.getName(),
+          existing.getType(),
+          property.getType());
+      return false;
+    }
+    return true;
+  }
+
+  private void merge(PropertyAttribute attribute, Property existing, Property property)
+      throws ReflectiveOperationException {
+    final PropertyDescriptor descriptor = attribute.getDescriptor();
+    final Method readMethod = descriptor.getReadMethod();
+    final Object otherValue = readMethod.invoke(property);
+
+    if (attribute.isEmpty(otherValue)) {
+      return;
+    }
+
+    final Object value = readMethod.invoke(existing);
+
+    if (Objects.equals(value, otherValue)) {
+      return;
+    }
+
+    try {
+      attribute.checkOverride(value, otherValue);
+    } catch (IllegalArgumentException e) {
+      logger.error(
+          "{}.{}: attribute '{}': {}: from '{}' to '{}'",
+          getName(),
+          existing.getName(),
+          attribute.getName(),
+          e.getMessage(),
+          value,
+          otherValue);
+      return;
+    }
+
+    descriptor.getWriteMethod().invoke(existing, otherValue);
+    logger.debug(
+        "{}.{}: attribute '{}' is overridden: from '{}' to '{}'",
+        getName(),
+        existing.getName(),
+        attribute.getName(),
+        value,
+        otherValue);
   }
 
   public boolean addField(Property field) {

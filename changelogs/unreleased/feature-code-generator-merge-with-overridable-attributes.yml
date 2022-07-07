@@ -1,0 +1,19 @@
+---
+title: Generate code with merged item attributes instead of completely replacing them
+type: feature
+description: |
+  This applies to both entities and enums.
+
+  In the case of entity fields, there are a few restrictions:
+    * Attributes that are not overridable:
+      * `initParam`
+      * `column`
+      * `column2`
+      * `ref`
+      * `mappedBy`
+      * `table`
+      * `tz`
+      * `json`
+    * Attributes that are overridable with some conditions:
+      * `large`: large field cannot become non-large
+      * `transient` and `formula`: persisted field cannot become non-persisted
