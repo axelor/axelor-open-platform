@@ -280,9 +280,9 @@ All specified path can use special variables:
 
 * `{user.home}`: reference to the home directory, `System.getProperty("user.home")`
 * `{java.io.tmpdir}`: reference to the tmp directory, `System.getProperty("java.io.tmpdir")`
-* `{year}`: current year, `YYYY` format
-* `{month}`: current month, from `1` to `12`
-* `{day}`: current day, from `1` to `31`
+* `\{year}`: current year, `YYYY` format
+* `\{month}`: current month, from `1` to `12`
+* `\{day}`: current day, from `1` to `31`
 
 The differences between `prod` and `dev` mode are:
 
