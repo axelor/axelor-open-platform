@@ -16,5 +16,5 @@ xref:tutorial:index.adoc[Quick Tutorial]::
   to create your first application.
 xref:dev-guide:index.adoc[Developer Guide]::
   These topics describe how to use Axelor Open Platform as a developer.
-link:javadoc[API Documentation]::
+xref:javadoc[API Documentation]::
   The {page-component-title} {page-component-version} javadoc api documentation.
