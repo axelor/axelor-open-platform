@@ -6,7 +6,7 @@ The documentation is build using [Antora](https://antora.org/), a static site ge
 
 ## Local Preview
 
-To generate the Antora Docs site, you first need to [install Antora](https://docs.antora.org/antora/2.3/install/install-antora/). 
+To generate the Antora Docs site, you first need to [install Antora](https://docs.antora.org/antora/3.0/install/install-antora/). 
 Once Antora is installed, run the `antora` command on the playbook file.
 
 ```bash
