@@ -1034,18 +1034,18 @@ public abstract class Property {
 
   private List<JavaAnnotation> $size() {
 
-    if (min == null && max == null) {
+    if (isBlank(min) && isBlank(max)) {
       return null;
     }
 
     final List<JavaAnnotation> all = new ArrayList<>();
 
     if (type == PropertyType.DECIMAL) {
-      if (min != null)
+      if (notBlank(min))
         all.add(
             new JavaAnnotation("javax.validation.constraints.DecimalMin")
                 .param("value", "{0:s}", min));
-      if (max != null)
+      if (notBlank(max))
         all.add(
             new JavaAnnotation("javax.validation.constraints.DecimalMax")
                 .param("value", "{0:s}", max));
@@ -1053,7 +1053,7 @@ public abstract class Property {
     }
 
     if (type == PropertyType.STRING) {
-      if (isTrue(encrypted) && max != null && Integer.valueOf(max) < 256) {
+      if (isTrue(encrypted) && notBlank(max) && Integer.valueOf(max) < 256) {
         throw new IllegalArgumentException("Encrypted field size should be more than 255.");
       }
       all.add(
@@ -1063,9 +1063,9 @@ public abstract class Property {
       return all;
     }
 
-    if (min != null)
+    if (notBlank(min))
       all.add(new JavaAnnotation("javax.validation.constraints.Min").param("value", min));
-    if (max != null)
+    if (notBlank(max))
       all.add(new JavaAnnotation("javax.validation.constraints.Max").param("value", max));
 
     return all;
