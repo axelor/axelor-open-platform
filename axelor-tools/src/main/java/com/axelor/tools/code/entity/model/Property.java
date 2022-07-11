@@ -1009,6 +1009,7 @@ public abstract class Property {
       String text = content;
 
       text = StringUtils.stripIndent(text); // remove extra indentation
+      text = text.replaceAll("(?:^\\s+)|(?:\\s+$)", ""); // remove leading/trailing spaces
       text = text.replaceAll("\"", "\\\\\\\\\""); // escape quotes
       text = text.replaceAll("\n", "\\\\\\\\n\" + \n  \""); // concat multi-line formular
       text = "\"(" + text + ")\"";
