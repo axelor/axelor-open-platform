@@ -40,7 +40,7 @@ ui.prepareContext = function(model, values, dummyValues, parentContext) {
   }
 
   function compact(item) {
-    if (!item || _.isNumber(item)) return item;
+    if (!_.isObject(item)) return item;
     if (item.id > 0 && item.version === undefined && !item.$dirty) {
       return _.extend({
         id: item.id,
