@@ -314,9 +314,9 @@ public class MailServiceImpl implements MailService, MailConstants {
                 + "<ul>"
                 + "<% for (def item : tracks) { %>"
                 + "<% if (item.containsKey('displayValue')) { %>"
-                + "<li><strong>${item.title}</strong>: <span>${item.oldDisplayValue}</span> &raquo; <span>${item.displayValue}</span></li>"
+                + "<li><strong>${item.title}</strong>: <span>${item.oldDisplayValue}</span> → <span>${item.displayValue}</span></li>"
                 + "<% } else { %>"
-                + "<li><strong>${item.title}</strong>: <span>${item.oldValue}</span> &raquo; <span>${item.value}</span></li>"
+                + "<li><strong>${item.title}</strong>: <span>${item.oldValue}</span> → <span>${item.value}</span></li>"
                 + "<% } %>"
                 + "<% } %>"
                 + "</ul>");

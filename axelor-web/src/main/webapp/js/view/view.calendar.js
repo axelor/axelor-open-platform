@@ -601,7 +601,7 @@ angular.module('axelor.ui').directive('uiViewCalendar', ['ViewService', 'ActionS
           }
 
           $('<a class="pull-right" href="javascript: void(0)"></a>')
-          .append(_t("Edit event")).append("<strong> »</strong>")
+          .append(_t("Edit event"))
           .appendTo(html)
           .click(function(e){
             hideBubble();

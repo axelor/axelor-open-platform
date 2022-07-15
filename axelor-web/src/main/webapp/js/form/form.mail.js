@@ -257,7 +257,7 @@ ui.directive('uiMailMessage', function () {
           item.displayValue = item.displayValue || format(item, item.value);
           item.oldDisplayValue = item.oldDisplayValue || format(item, item.oldValue);
           if (item.oldDisplayValue !== undefined) {
-            item.displayValue = item.oldDisplayValue + " &raquo; " + item.displayValue;
+            item.displayValue = item.oldDisplayValue + " → " + item.displayValue;
           }
         });
       }
