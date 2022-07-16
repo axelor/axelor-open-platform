@@ -366,6 +366,14 @@ public class CollaborationChannel extends Channel {
         values.put("name", user.getName());
       }
 
+      if (user.getImage() != null) {
+        values.put(
+            "$avatar",
+            String.format(
+                "ws/rest/%s/%d/image/download?image=true&v=%d",
+                User.class.getName(), user.getId(), user.getVersion()));
+      }
+
       return values;
     }
   }

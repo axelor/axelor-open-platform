@@ -1808,6 +1808,33 @@ label.has-help > span:after,
   margin-top: 4px;
 }
 
+.view-collaboration .dropdown-menu > li > a {
+  padding: 3px 6px;
+  cursor: default;
+}
+
+.view-collaboration .avatar {
+  display: inline-block;
+  width: 18px;
+  margin-bottom: 0px;
+  margin-right: 2px;
+  border-radius: 500px;
+  text-align: center;
+  color: #ffffff;
+  text-transform: uppercase;
+  padding-left: 0;
+  padding-right: 0;
+  text-shadow: 1px 1px 0 rgba(0,0,0,.15);
+}
+
+.view-collaboration .avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 500px;
+  vertical-align: inherit;
+  margin-bottom: -3px;
+}
+
 ::-webkit-input-placeholder {
   font-size: 12px;
 }

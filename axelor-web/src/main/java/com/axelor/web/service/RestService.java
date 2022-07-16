@@ -387,16 +387,21 @@ public class RestService extends ResourceService {
       "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
   @SuppressWarnings("all")
-  private javax.ws.rs.core.Response download(MetaFile metaFile, String fileName) {
-    final Mapper mapper = Mapper.of(MetaFile.class);
+  private javax.ws.rs.core.Response download(
+      MetaFile metaFile, String fileName, boolean checkOnly) {
     if (StringUtils.isBlank(fileName)) {
-      fileName = (String) mapper.get(metaFile, "fileName");
+      fileName = (String) metaFile.getFileName();
     }
-    final String filePath = (String) mapper.get(metaFile, "filePath");
-    final File inputFile = Beans.get(MetaFiles.class).getPath(filePath).toFile();
+    final String filePath = (String) metaFile.getFilePath();
+    final File inputFile = MetaFiles.getPath(filePath).toFile();
     if (!inputFile.exists()) {
       return javax.ws.rs.core.Response.status(Status.NOT_FOUND).build();
     }
+
+    if (checkOnly) {
+      return javax.ws.rs.core.Response.ok().build();
+    }
+
     return javax.ws.rs.core.Response.ok(
             new StreamingOutput() {
 
@@ -411,18 +416,15 @@ public class RestService extends ResourceService {
         .build();
   }
 
-  @GET
-  @Path("{id}/{field}/download")
-  @Produces(MediaType.APPLICATION_OCTET_STREAM)
-  @SuppressWarnings("all")
-  public javax.ws.rs.core.Response download(
-      @PathParam("id") Long id,
-      @PathParam("field") String field,
-      @QueryParam("image") boolean isImage,
-      @QueryParam("parentId") Long parentId,
-      @QueryParam("parentModel") String parentModel,
-      @QueryParam("fileName") String fileName)
-      throws IOException {
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private javax.ws.rs.core.Response download(
+      Long id,
+      String field,
+      boolean isImage,
+      Long parentId,
+      String parentModel,
+      String fileName,
+      boolean checkOnly) {
 
     final Class klass = getResource().getModel();
     final boolean permitted;
@@ -446,7 +448,7 @@ public class RestService extends ResourceService {
     }
 
     if (bean instanceof MetaFile) {
-      return download((MetaFile) bean, fileName);
+      return download((MetaFile) bean, fileName, checkOnly);
     }
 
     if (StringUtils.isBlank(fileName)) {
@@ -455,10 +457,13 @@ public class RestService extends ResourceService {
     Object data = mapper.get(bean, field);
 
     if (data instanceof MetaFile) {
-      return download((MetaFile) data, fileName);
+      return download((MetaFile) data, fileName, checkOnly);
     }
 
     if (isImage) {
+      if (checkOnly) {
+        return javax.ws.rs.core.Response.ok().build();
+      }
       String base64 = BLANK_IMAGE;
       if (data instanceof byte[]) {
         base64 = new String((byte[]) data);
@@ -478,11 +483,44 @@ public class RestService extends ResourceService {
       return javax.ws.rs.core.Response.noContent().build();
     }
 
+    if (checkOnly) {
+      return javax.ws.rs.core.Response.ok().build();
+    }
+
     return javax.ws.rs.core.Response.ok(data)
         .header(
             "Content-Disposition",
             ContentDisposition.attachment().filename(fileName).build().toString())
         .build();
+  }
+
+  @HEAD
+  @Path("{id}/{field}/download")
+  public javax.ws.rs.core.Response downloadCheck(
+      @PathParam("id") Long id,
+      @PathParam("field") String field,
+      @QueryParam("image") boolean isImage,
+      @QueryParam("parentId") Long parentId,
+      @QueryParam("parentModel") String parentModel,
+      @QueryParam("fileName") String fileName) {
+
+    return download(id, field, isImage, parentId, parentModel, fileName, true);
+  }
+
+  @GET
+  @Path("{id}/{field}/download")
+  @Produces(MediaType.APPLICATION_OCTET_STREAM)
+  @SuppressWarnings("all")
+  public javax.ws.rs.core.Response download(
+      @PathParam("id") Long id,
+      @PathParam("field") String field,
+      @QueryParam("image") boolean isImage,
+      @QueryParam("parentId") Long parentId,
+      @QueryParam("parentModel") String parentModel,
+      @QueryParam("fileName") String fileName)
+      throws IOException {
+
+    return download(id, field, isImage, parentId, parentModel, fileName, false);
   }
 
   private boolean checkMetaFileParentPermission(Long id, Long parentId, String parentModel) {

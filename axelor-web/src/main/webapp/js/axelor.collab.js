@@ -23,7 +23,7 @@
   var ds = angular.module('axelor.ds');
   var ui = angular.module('axelor.ui');
 
-  ds.factory('CollaborationService', ['$rootScope', 'Socket', function ($rootScope, Socket) {
+  ds.factory('CollaborationService', ['$rootScope', 'Socket', 'UserService', function ($rootScope, Socket, UserService) {
     var functions = {
       register: angular.noop
     };
@@ -107,21 +107,21 @@
 
       users = scope.users.filter(u => (u.$state || {}).dirty && currentUserCode !== u.code);
       if (!_.isEmpty(users)) {
-        scope.subtitle = _t('Dirtied by {0}', getUsersRepr(users, userName));
+        scope.subtitle = _t('Pending changes: {0}', getUsersRepr(users));
         return;
       }
 
       users = scope.users.filter(u => (u.$state || {}).editable && currentUserCode !== u.code);
       if (!_.isEmpty(users)) {
-        scope.subtitle = _t('Editing: {0}', getUsersRepr(users, userName));
+        scope.subtitle = _t('Edit: {0}', getUsersRepr(users));
         return;
       }
 
       scope.subtitle = null;
     }
 
-    function getUsersRepr(users, userName) {
-      var names = users.map(user => user[userName]);
+    function getUsersRepr(users) {
+      var names = users.map(user => UserService.getName(user));
       return getArrayRepr(names, 1);
     }
 
@@ -251,12 +251,138 @@
     return functions;
   }]);
 
-  ui.directive('uiViewCollaboration', ['CollaborationService', function (CollaborationService) {
+
+  ds.factory('UserService', [function () {
+    var userName = axelor.config['user.nameField'] || 'name';
+
+    function getName(user) {
+      return user[userName] || user.name;
+    }
+
+    var userColors = {};
+    var usedColors = [];
+    var colorNames = [
+      'blue',
+      'green',
+      'red',
+      'orange',
+      'yellow',
+      'olive',
+      'teal',
+      'violet',
+      'purple',
+      'pink',
+      'brown'
+    ];
+
+    function getColor(user) {
+      if (!user) return null;
+      if (userColors[user.code]) {
+        return userColors[user.code];
+      }
+      if (usedColors.length === colorNames.length) {
+        usedColors = [];
+      }
+      var color = _.find(colorNames, function (n) {
+        return usedColors.indexOf(n) === -1;
+      });
+      usedColors.push(color);
+      var bgColor = 'bg-' + color;
+      userColors[user.code] = bgColor;
+      return bgColor;
+    }
+
+    var allowedUrls = new Map();
+    var allowedUrlsMaxSize = 1000;
+    var fetchingUrls = {};
+
+    function trimMap(map, maxSize) {
+      if (map.size <= maxSize) return;
+      const it = map.keys();
+      const half = maxSize / 2;
+      while (map.size > half) {
+        map.delete(it.next().value);
+      }
+    }
+
+    function checkUrl(url, onAllowed, onForbidden) {
+      trimMap(allowedUrls, allowedUrlsMaxSize);
+
+      onAllowed = onAllowed || angular.noop;
+      onForbidden = onForbidden || angular.noop;
+
+      var perm = allowedUrls.get(url);
+      if (perm !== undefined) {
+        if (perm) {
+          onAllowed(url);
+        } else {
+          onForbidden(url);
+        }
+        return;
+      }
+
+      var fetchingUrl = fetchingUrls[url];
+      if (fetchingUrl) {
+        fetchingUrl.then(data => {
+          if (data.status < 400) {
+            onAllowed(url);
+          } else {
+            onForbidden(url);
+          }
+        })
+        return;
+      }
+
+      fetchingUrls[url] = fetch(url, { method: 'HEAD' }).then(data => {
+        if (data.status < 400) {
+          allowedUrls.set(url, true);
+          onAllowed(url);
+        } else {
+          allowedUrls.set(url, false);
+          onForbidden(url);
+        }
+        return data;
+      }).catch(error => {
+        console.error(error);
+      }).finally(() => {
+        delete fetchingUrls[url];
+      });
+    }
+
+    return {
+      getName: getName,
+      getColor: getColor,
+      checkUrl: checkUrl
+    }
+  }]);
+
+  ui.directive('uiViewCollaboration', ['CollaborationService', 'UserService', function (CollaborationService, UserService) {
     return {
       scope: true,
       replace: true,
       link: function (scope) {
         CollaborationService.register(scope);
+
+        scope.userName = function (user) {
+          return UserService.getName(user);
+        };
+
+        scope.userColor = function (user) {
+          if (user.$avatar) {
+            return null;
+          }
+          return UserService.getColor(user);
+        };
+
+        scope.$watch('users', function (users) {
+          _.each(users, user => {
+            if (user.$avatar) {
+              var url = user.$avatar;
+              delete user.$avatar;
+              UserService.checkUrl(url, () => user.$avatar = url);
+            }
+          });
+        });
       },
       template: `
       <ul class="nav menu-bar view-collaboration hidden-phone" ng-show="users.length &gt; 1">
@@ -266,7 +392,15 @@
             <span class="view-collaboration-action" ng-show="subtitle">{{subtitle}}</span>
           </a>
           <ul class="dropdown-menu">
-            <li ng-repeat="user in users track by user.id"><a href="">{{user.name}}</a></li>
+            <li ng-repeat="user in users track by user.id">
+              <a href="">
+                <span class="avatar" ng-class="userColor(user)" title="{{userName(user)}}">
+                  <span ng-if="!user.$avatar">{{userName(user)[0]}}</span>
+                  <img ng-if='user.$avatar' ng-src='{{user.$avatar}}' width='20px'>
+                </span>
+                {{userName(user)}}
+              </a>
+            </li>
           </ul>
         </li>
       </ul>

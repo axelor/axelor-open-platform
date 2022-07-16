@@ -381,41 +381,14 @@ ui.directive('uiMailMessage', function () {
 
 ui.formWidget('uiMailMessages', {
   scope: true,
-  controller: ['$scope', 'MessageService', function ($scope, MessageService) {
-
-    var userColors = {};
-    var usedColors = [];
-    var colorNames = [
-      'blue',
-      'green',
-      'red',
-      'orange',
-      'yellow',
-      'olive',
-      'teal',
-      'violet',
-      'purple',
-      'pink',
-      'brown'
-    ];
+  controller: ['$scope', 'MessageService', 'UserService', function ($scope, MessageService, UserService) {
 
     $scope.userColor = function (message) {
       if (message.$avatar) {
         return;
       }
       var user = message.$author;
-      if (!user) return null;
-      if (userColors[user.code]) {
-        return userColors[user.code];
-      }
-      if (usedColors.length === colorNames.length) {
-        usedColors = [];
-      }
-      var color = _.find(colorNames, function (n) {
-        return usedColors.indexOf(n) === -1;
-      });
-      usedColors.push(color);
-      return userColors[user.code] = 'bg-' + color;
+      return UserService.getColor(user);
     };
 
     function updateReadCount(messages) {
