@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -112,6 +113,7 @@ public class CollaborationChannel extends Channel {
 
   private void welcome(Session session, CollaborationData data) {
     ROOMS.put(data.getKey(), session);
+    getState(data);
 
     final CollaborationData resp = new CollaborationData();
     resp.setModel(data.getModel());
@@ -137,8 +139,8 @@ public class CollaborationChannel extends Channel {
   private void remove(Session client, Collection<String> keys) {
     for (final String key : keys) {
       final boolean removed = ROOMS.remove(key, client);
-
       final Map<String, CollaborationState> states = STATES.get(key);
+
       if (states != null) {
         states.remove(client.getUserPrincipal().getName());
       }
@@ -147,6 +149,7 @@ public class CollaborationChannel extends Channel {
         ROOMS.removeAll(key);
         STATES.remove(key);
       }
+
       if (removed) {
         CollaborationData data = new CollaborationData();
         String[] parts = key.split(":");
@@ -229,11 +232,23 @@ public class CollaborationChannel extends Channel {
   @JsonInclude(Include.NON_NULL)
   public static class CollaborationState {
 
+    private final LocalDateTime joinDate = LocalDateTime.now();
+
     private boolean editable;
+
+    private LocalDateTime editableDate;
 
     private boolean dirty;
 
+    private LocalDateTime dirtyDate;
+
     private long version;
+
+    private LocalDateTime versionDate;
+
+    public LocalDateTime getJoinDate() {
+      return joinDate;
+    }
 
     public boolean isEditable() {
       return editable;
@@ -241,6 +256,11 @@ public class CollaborationChannel extends Channel {
 
     public void setEditable(boolean editable) {
       this.editable = editable;
+      editableDate = LocalDateTime.now();
+    }
+
+    public LocalDateTime getEditableDate() {
+      return editableDate;
     }
 
     public boolean isDirty() {
@@ -249,6 +269,11 @@ public class CollaborationChannel extends Channel {
 
     public void setDirty(boolean dirty) {
       this.dirty = dirty;
+      dirtyDate = LocalDateTime.now();
+    }
+
+    public LocalDateTime getDirtyDate() {
+      return dirtyDate;
     }
 
     public long getVersion() {
@@ -257,6 +282,11 @@ public class CollaborationChannel extends Channel {
 
     public void setVersion(long version) {
       this.version = version;
+      versionDate = LocalDateTime.now();
+    }
+
+    public LocalDateTime getVersionDate() {
+      return versionDate;
     }
   }
 

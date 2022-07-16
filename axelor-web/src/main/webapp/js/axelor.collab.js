@@ -82,38 +82,55 @@
             delete users[user.id];
           } else if (data.command === 'JOIN') {
             users[user.id] = user || {};
+            users[user.id].$state = { joinDate: moment() };
           } else if (data.command === 'STATE') {
             _.extend(users[user.id], user || {});
-            users[user.id].$state = _.extend(users[user.id].$state || {}, data.message);
+            var msg = _.extend({}, data.message);
+            if (msg.version <= (scope.record || {}).version) {
+              delete msg.version;
+              delete msg.versionDate;
+            }
+            _.chain(Object.keys(msg)).filter(k => !_.endsWith(k, 'Date')).each(k => {
+              var dateKey = k + 'Date';
+              var dateValue = msg[dateKey];
+              msg[dateKey] = dateValue ? moment(dateValue) : moment();
+            });
+            users[user.id].$state = _.extend(users[user.id].$state || {}, msg);
           }
 
           scope.users = Object.values(users);
           applyStates(scope.users, data.states);
-          scope.message = _t('{0} users viewing', scope.users.length);
+          scope.message = _t('{0} users', scope.users.length);
           setSubtitle(scope);
         });
       });
     });
 
-    // Show third-party activity in subtitle
     function setSubtitle(scope) {
-      var user = _.max(scope.users, u => (u.$state || {}).version);
-      if (_.isObject(user) && (user.$state || {}).version > 0 && currentUserCode !== user.code) {
+      var user = _.reduce(scope.users, (a, b) => {
+        const stateA = a.$state || {};
+        const stateB = b.$state || {};
+        if (stateA.version > stateB.version) return a;
+        if (stateA.version < stateB.version) return b;
+        return stateA.versionDate < stateB.versionDate ? b : a;
+      });
+      if (_.isObject(user) && (user.$state || {}).version > (scope.record || {}).version
+        && user.code !== currentUserCode) {
         scope.subtitle = _t('Saved: {0}', getUsersRepr([user]));
         return;
       }
 
       var users;
 
-      users = scope.users.filter(u => (u.$state || {}).dirty && currentUserCode !== u.code);
+      users = scope.users.filter(u => (u.$state || {}).dirty && u.code !== currentUserCode);
       if (!_.isEmpty(users)) {
         scope.subtitle = _t('Pending changes: {0}', getUsersRepr(users));
         return;
       }
 
-      users = scope.users.filter(u => (u.$state || {}).editable && currentUserCode !== u.code);
+      users = scope.users.filter(u => (u.$state || {}).editable && u.code !== currentUserCode);
       if (!_.isEmpty(users)) {
-        scope.subtitle = _t('Edit: {0}', getUsersRepr(users));
+        scope.subtitle = _t('Editing: {0}', getUsersRepr(users));
         return;
       }
 
@@ -134,6 +151,9 @@
       if (_.isEmpty(states)) return;
       _.each(users, user => {
         var state = states[user.code] || {};
+        _.chain(Object.keys(state)).filter(k => _.endsWith(k, 'Date')).each(k => {
+          state[k] = moment(state[k]);
+        });
         user.$state = state;
       });
     }
@@ -193,6 +213,9 @@
           }
           recordId = null;
           scope.users = [];
+          lastVersion = null;
+          lastEditable = false;
+          lastDirty = false;
         }
       };
 
@@ -204,7 +227,7 @@
         }
       });
 
-      var lastVersion;
+      var lastVersion = null;
       var unwatchVersion = scope.$watch('record.version', function (version) {
         if (!version) return;
         if (lastVersion) {
@@ -212,6 +235,10 @@
             command: 'STATE', model: model, recordId: recordId,
             message: { version: version }
           });
+          var currentUser = _.findWhere(scope.users, { code: currentUserCode });
+          if (currentUser) {
+            _.extend(currentUser.$state, { version: version, versionDate: moment() });
+          }
         }
         lastVersion = version;
       });
@@ -224,6 +251,10 @@
           command: 'STATE', model: model, recordId: recordId,
           message: { editable: editable }
         });
+        var currentUser = _.findWhere(scope.users, { code: currentUserCode });
+        if (currentUser) {
+          _.extend(currentUser.$state, { editable: editable, editableDate: moment() });
+        }
       }, WAIT));
 
       const WAIT = 500;
@@ -235,6 +266,10 @@
           command: 'STATE', model: model, recordId: recordId,
           message: { dirty: dirty }
         });
+        var currentUser = _.findWhere(scope.users, { code: currentUserCode });
+        if (currentUser) {
+          _.extend(currentUser.$state, { dirty: dirty, dirtyDate: moment() });
+        }
       }, WAIT));
 
       scope.$on('$destroy', function () {
@@ -362,16 +397,38 @@
       replace: true,
       link: function (scope) {
         CollaborationService.register(scope);
+        var locale = ui.getPreferredLocale();
 
-        scope.userName = function (user) {
-          return UserService.getName(user);
+        function formatDate(date) {
+          return moment(date).locale(locale).fromNow();
+        }
+
+        scope.userText = function (user) {
+          var extra;
+          var state = user.$state || {};
+          var dateKey = _.chain(Object.keys(state))
+            .filter(k => _.endsWith(k, 'Date') && state[k.slice(0, -4)])
+            .reduce((a, b) => !a || state[a] < state[b] ? b : a, '').value().slice(0, -4);
+
+          if (dateKey === 'version') {
+            extra = _.sprintf(_t('saved %s'), formatDate(state.versionDate));
+          } else if (dateKey === 'dirty') {
+            extra = _.sprintf(_t('dirty since %s'), formatDate(state.dirtyDate));
+          } else if (dateKey === 'editable') {
+            extra = _.sprintf(_t('editing since %s'), formatDate(state.editableDate));
+          } else {
+            extra = _.sprintf(_t('joined %s'), formatDate(state.joinDate));
+          }
+
+          return _.sprintf('%s (%s)', UserService.getName(user), extra);
+        };
+
+        scope.userInitial = function (user) {
+          return UserService.getName(user)[0];
         };
 
         scope.userColor = function (user) {
-          if (user.$avatar) {
-            return null;
-          }
-          return UserService.getColor(user);
+          return user.$avatar ? null : UserService.getColor(user);
         };
 
         scope.$watch('users', function (users) {
@@ -395,10 +452,10 @@
             <li ng-repeat="user in users track by user.id">
               <a href="">
                 <span class="avatar" ng-class="userColor(user)" title="{{userName(user)}}">
-                  <span ng-if="!user.$avatar">{{userName(user)[0]}}</span>
-                  <img ng-if='user.$avatar' ng-src='{{user.$avatar}}' width='20px'>
+                  <span ng-if="!user.$avatar">{{userInitial(user)}}</span>
+                  <img ng-if='user.$avatar' ng-src='{{user.$avatar}}'>
                 </span>
-                {{userName(user)}}
+                {{userText(user)}}
               </a>
             </li>
           </ul>
