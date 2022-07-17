@@ -194,13 +194,20 @@ ui.factory('MessageService', ['$q', '$timeout', 'DataSource', 'MessageSource', '
   };
 }]);
 
-ui.directive('uiMailMessage', function () {
+ui.directive('uiMailMessage', ['UserService', function (UserService) {
   return {
     require: '^uiMailMessages',
     replace: true,
     link: function (scope, element, attrs) {
 
       var message = scope.message;
+
+      if (message.$avatar) {
+        var url = message.$avatar;
+        delete message.$avatar;
+        UserService.checkUrl(url, () => message.$avatar = url);
+      }
+
       var body = message.body || "{}";
       if (body.indexOf("{") === 0) {
         body = angular.fromJson(body);
@@ -377,7 +384,7 @@ ui.directive('uiMailMessage', function () {
         "<div ui-mail-composer ng-if='::message.$thread'></div>" +
       "</div>"
   };
-});
+}]);
 
 ui.formWidget('uiMailMessages', {
   scope: true,
