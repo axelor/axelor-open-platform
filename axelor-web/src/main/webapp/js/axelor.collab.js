@@ -23,6 +23,9 @@
   var ds = angular.module('axelor.ds');
   var ui = angular.module('axelor.ui');
 
+  const MAX_USERNAME_LENGTH = 30;
+  const MAX_SUBTITLE_USERS = 2;
+
   ds.factory('CollaborationService', ['$rootScope', 'Socket', 'UserService', function ($rootScope, Socket, UserService) {
     var functions = {
       register: angular.noop
@@ -142,8 +145,8 @@
     }
 
     function getUsersRepr(users) {
-      var names = users.map(user => UserService.getName(user));
-      return getArrayRepr(names, 1);
+      var names = users.map(user => UserService.getName(user, MAX_USERNAME_LENGTH));
+      return getArrayRepr(names, MAX_SUBTITLE_USERS);
     }
 
     function getArrayRepr(array, maxLength) {
@@ -294,8 +297,14 @@
   ds.factory('UserService', [function () {
     var userName = axelor.config['user.nameField'] || 'name';
 
-    function getName(user) {
-      return user[userName] || user.name;
+    function getName(user, maxLength) {
+      var name = user[userName] || user.name || '?';
+
+      if (maxLength && name.length > maxLength) {
+        name = name.slice(0, maxLength) + '…';
+      }
+
+      return name;
     }
 
     var userColors = {};
@@ -429,7 +438,8 @@
             userClass = 'text-success';
           }
 
-          return _.sprintf('<span class="%s">%s (%s)</span>', userClass, UserService.getName(user), extra);
+          return _.sprintf('%s <span class="%s">(%s)</span>',
+            UserService.getName(user, MAX_USERNAME_LENGTH), userClass, extra);
         };
 
         scope.userInitial = function (user) {
