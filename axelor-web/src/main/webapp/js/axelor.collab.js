@@ -89,6 +89,9 @@
           } else if (data.command === 'STATE') {
             _.extend(users[user.id], user || {});
             var msg = _.extend({}, data.message);
+            if (msg.version && msg.dirty === undefined) {
+              msg.dirty = false;
+            }
             if (msg.version <= (scope.record || {}).version) {
               delete msg.version;
               delete msg.versionDate;
@@ -238,13 +241,18 @@
       var unwatchVersion = scope.$watch('record.version', function (version) {
         if (!version) return;
         if (lastVersion) {
+          lastDirty = false;
           channel.send({
             command: 'STATE', model: model, recordId: recordId,
             message: { version: version }
           });
           var currentUser = _.findWhere(scope.users, { code: currentUserCode });
           if (currentUser) {
-            _.extend(currentUser.$state, { version: version, versionDate: moment() });
+            var now = moment();
+            _.extend(currentUser.$state, {
+              version: version, versionDate: now,
+              dirty: lastDirty, dirtyDate: now,
+            });
           }
         }
         lastVersion = version;

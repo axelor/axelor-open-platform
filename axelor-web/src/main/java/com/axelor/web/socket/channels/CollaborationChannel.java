@@ -283,6 +283,7 @@ public class CollaborationChannel extends Channel {
     public void setVersion(long version) {
       this.version = version;
       versionDate = LocalDateTime.now();
+      setDirty(false);
     }
 
     public LocalDateTime getVersionDate() {
