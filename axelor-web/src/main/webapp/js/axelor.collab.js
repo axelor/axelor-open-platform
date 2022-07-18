@@ -107,6 +107,9 @@
     });
 
     function setSubtitle(scope) {
+      scope.subtitle = null;
+      scope.subtitleClass = null;
+
       var user = _.reduce(scope.users, (a, b) => {
         const stateA = a.$state || {};
         const stateB = b.$state || {};
@@ -117,6 +120,7 @@
       if (_.isObject(user) && (user.$state || {}).version > (scope.record || {}).version
         && user.code !== currentUserCode) {
         scope.subtitle = _t('Saved: {0}', getUsersRepr([user]));
+        scope.subtitleClass = 'text-error';
         return;
       }
 
@@ -125,16 +129,15 @@
       users = scope.users.filter(u => (u.$state || {}).dirty && u.code !== currentUserCode);
       if (!_.isEmpty(users)) {
         scope.subtitle = _t('Pending changes: {0}', getUsersRepr(users));
+        scope.subtitleClass = 'text-warning';
         return;
       }
 
       users = scope.users.filter(u => (u.$state || {}).editable && u.code !== currentUserCode);
       if (!_.isEmpty(users)) {
         scope.subtitle = _t('Editing: {0}', getUsersRepr(users));
-        return;
+        scope.subtitleClass = 'text-info';
       }
-
-      scope.subtitle = null;
     }
 
     function getUsersRepr(users) {
@@ -404,6 +407,7 @@
         }
 
         scope.userText = function (user) {
+          var userClass = '';
           var extra;
           var state = user.$state || {};
           var dateKey = _.chain(Object.keys(state))
@@ -412,15 +416,19 @@
 
           if (dateKey === 'version') {
             extra = _.sprintf(_t('saved %s'), formatDate(state.versionDate));
+            userClass = 'text-error';
           } else if (dateKey === 'dirty') {
-            extra = _.sprintf(_t('dirty since %s'), formatDate(state.dirtyDate));
+            extra = _.sprintf(_t('pending changes since %s'), formatDate(state.dirtyDate));
+            userClass = 'text-warning';
           } else if (dateKey === 'editable') {
             extra = _.sprintf(_t('editing since %s'), formatDate(state.editableDate));
+            userClass = 'text-info';
           } else {
             extra = _.sprintf(_t('joined %s'), formatDate(state.joinDate));
+            userClass = 'text-success';
           }
 
-          return _.sprintf('%s (%s)', UserService.getName(user), extra);
+          return _.sprintf('<span class="%s">%s (%s)</span>', userClass, UserService.getName(user), extra);
         };
 
         scope.userInitial = function (user) {
@@ -446,7 +454,7 @@
         <li class="dropdown menu button-menu">
           <a class="dropdown-toggle btn view-collaboration-toggle" data-toggle="dropdown" title="{{ 'Watchers' | t}}">
             <span class="view-collaboration-users">{{message}}</span>
-            <span class="view-collaboration-action" ng-show="subtitle">{{subtitle}}</span>
+            <span class="view-collaboration-action" ng-show="subtitle" ng-class="subtitleClass">{{subtitle}}</span>
           </a>
           <ul class="dropdown-menu">
             <li ng-repeat="user in users track by user.id">
@@ -455,7 +463,7 @@
                   <span ng-if="!user.$avatar">{{userInitial(user)}}</span>
                   <img ng-if='user.$avatar' ng-src='{{user.$avatar}}'>
                 </span>
-                {{userText(user)}}
+                <span ng-bind-html="userText(user)"></span>
               </a>
             </li>
           </ul>
