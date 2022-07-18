@@ -789,7 +789,7 @@ ui.formInput('SingleSelect', 'MultiSelect', {
     var selectItems = scope.selectItems;
 
     scope.selectItems = function(items) {
-      selectItems.call(scope, _.last(items));
+      selectItems.call(scope, _.last(items) || null);
     };
   }
 });
