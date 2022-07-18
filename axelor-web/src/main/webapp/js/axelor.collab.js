@@ -100,6 +100,7 @@
 
           scope.users = Object.values(users);
           applyStates(scope.users, data.states);
+          scope.users.sort((a, b) => (a.$state || {}).joinDate - (b.$state || {}).joinDate);
           scope.message = _t('{0} users', scope.users.length);
           setSubtitle(scope);
         });
