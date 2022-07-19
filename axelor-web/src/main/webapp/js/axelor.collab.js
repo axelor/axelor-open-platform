@@ -89,7 +89,7 @@
           } else if (data.command === 'STATE') {
             _.extend(users[user.id], user || {});
             var msg = _.extend({}, data.message);
-            if (msg.version && msg.dirty === undefined) {
+            if (msg.version != null && msg.dirty === undefined) {
               msg.dirty = false;
             }
             if (msg.version <= (scope.record || {}).version) {
@@ -120,9 +120,11 @@
       var user = _.reduce(scope.users, (a, b) => {
         const stateA = a.$state || {};
         const stateB = b.$state || {};
-        if (stateA.version > stateB.version) return a;
-        if (stateA.version < stateB.version) return b;
-        return stateA.versionDate < stateB.versionDate ? b : a;
+        const versionA = stateA.version || 0;
+        const versionB = stateB.version || 0;
+        if (versionA > versionB) return a;
+        if (versionA < versionB) return b;
+        return stateB.versionDate && stateA.versionDate < stateB.versionDate ? b : a;
       });
       if (_.isObject(user) && (user.$state || {}).version > (scope.record || {}).version
         && user.code !== currentUserCode) {
@@ -239,8 +241,8 @@
 
       var lastVersion = null;
       var unwatchVersion = scope.$watch('record.version', function (version) {
-        if (!version) return;
-        if (lastVersion) {
+        if (version == null) return;
+        if (lastVersion != null) {
           lastDirty = false;
           channel.send({
             command: 'STATE', model: model, recordId: recordId,
@@ -275,7 +277,8 @@
       const WAIT = 500;
       var lastDirty = false;
       var unwatchDirty = scope.$watch('isDirty()', _.throttle(function (dirty) {
-        if (recordId == null || lastDirty === dirty) return;
+        if (recordId == null || lastDirty === dirty
+          || lastVersion != (scope.record || {}).version) return;
         lastDirty = dirty;
         channel.send({
           command: 'STATE', model: model, recordId: recordId,

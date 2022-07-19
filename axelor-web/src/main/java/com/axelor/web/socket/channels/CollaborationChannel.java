@@ -234,15 +234,15 @@ public class CollaborationChannel extends Channel {
 
     private final LocalDateTime joinDate = LocalDateTime.now();
 
-    private boolean editable;
+    private Boolean editable;
 
     private LocalDateTime editableDate;
 
-    private boolean dirty;
+    private Boolean dirty;
 
     private LocalDateTime dirtyDate;
 
-    private long version;
+    private Long version;
 
     private LocalDateTime versionDate;
 
@@ -250,11 +250,11 @@ public class CollaborationChannel extends Channel {
       return joinDate;
     }
 
-    public boolean isEditable() {
+    public Boolean isEditable() {
       return editable;
     }
 
-    public void setEditable(boolean editable) {
+    public void setEditable(Boolean editable) {
       this.editable = editable;
       editableDate = LocalDateTime.now();
     }
@@ -263,11 +263,11 @@ public class CollaborationChannel extends Channel {
       return editableDate;
     }
 
-    public boolean isDirty() {
+    public Boolean isDirty() {
       return dirty;
     }
 
-    public void setDirty(boolean dirty) {
+    public void setDirty(Boolean dirty) {
       this.dirty = dirty;
       dirtyDate = LocalDateTime.now();
     }
@@ -276,11 +276,11 @@ public class CollaborationChannel extends Channel {
       return dirtyDate;
     }
 
-    public long getVersion() {
+    public Long getVersion() {
       return version;
     }
 
-    public void setVersion(long version) {
+    public void setVersion(Long version) {
       this.version = version;
       versionDate = LocalDateTime.now();
       setDirty(false);
