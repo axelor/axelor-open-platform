@@ -1,0 +1,3 @@
+---
+title: Fix TypeError when user has insufficient permission to display a panel tab
+type: fix
