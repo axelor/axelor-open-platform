@@ -245,13 +245,14 @@ ui.formWidget('PanelTabs', {
 
     var doOnSelectPending = false;
     var doOnSelect = _.debounce(function () {
-      if (doOnSelectPending) {
-        return;
-      }
-      var elemScope = ((selected || {}).elem || {}).scope();
-      if (!elemScope) {
-        return;
-      }
+      if (doOnSelectPending) return;
+
+      var elem = (selected || {}).elem;
+      if (!elem) return;
+
+      var elemScope = elem.scope && elem.scope();
+      if (!elemScope) return;
+
       doOnSelectPending = true;
       scope.waitForActions(function () {
         if (elemScope.handleSelect) {
