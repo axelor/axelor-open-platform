@@ -135,7 +135,7 @@
 
       users = scope.users.filter(u => (u.$state || {}).dirty && u.code !== currentUserCode);
       if (!_.isEmpty(users)) {
-        scope.subtitle = _t('Pending changes: {0}', getUsersRepr(users));
+        scope.subtitle = _t('Dirty: {0}', getUsersRepr(users));
         scope.subtitleClass = 'text-warning';
         return;
       }
@@ -436,7 +436,7 @@
             extra = _.sprintf(_t('saved %s'), formatDate(state.versionDate));
             userClass = 'text-error';
           } else if (dateKey === 'dirty') {
-            extra = _.sprintf(_t('pending changes since %s'), formatDate(state.dirtyDate));
+            extra = _.sprintf(_t('dirty since %s'), formatDate(state.dirtyDate));
             userClass = 'text-warning';
           } else if (dateKey === 'editable') {
             extra = _.sprintf(_t('editing since %s'), formatDate(state.editableDate));
@@ -469,9 +469,9 @@
         });
       },
       template: `
-      <ul class="nav menu-bar view-collaboration hidden-phone" ng-show="users.length &gt; 1">
+      <ul class="nav menu-bar view-collaboration hidden-phone" ng-show="users && users.length > 1">
         <li class="dropdown menu button-menu">
-          <a class="dropdown-toggle btn view-collaboration-toggle" data-toggle="dropdown" title="{{ 'Watchers' | t}}">
+          <a class="dropdown-toggle btn view-collaboration-toggle" data-toggle="dropdown" title="{{ 'Users on this record' | t }}">
             <span class="view-collaboration-users">{{message}}</span>
             <span class="view-collaboration-action" ng-show="subtitle" ng-class="subtitleClass">{{subtitle}}</span>
           </a>
