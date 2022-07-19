@@ -299,6 +299,7 @@
       });
 
       $rootScope.$on('$destroy', unsubscribe);
+      return true;
     }
 
     return functions;
@@ -420,7 +421,10 @@
       scope: true,
       replace: true,
       link: function (scope) {
-        CollaborationService.register(scope);
+        if (!CollaborationService.register(scope)) {
+          return;
+        }
+
         var locale = ui.getPreferredLocale();
 
         function formatDate(date) {
