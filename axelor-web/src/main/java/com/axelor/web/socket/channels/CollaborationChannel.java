@@ -20,6 +20,7 @@ package com.axelor.web.socket.channels;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
+import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.db.mapper.Mapper;
 import com.axelor.db.mapper.Property;
@@ -43,6 +44,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -65,6 +67,8 @@ public class CollaborationChannel extends Channel {
   private static final Map<String, Map<String, CollaborationState>> STATES =
       new ConcurrentHashMap<>();
 
+  private static final String CAN_VIEW_COLLABORATION = "canViewCollaboration";
+
   private static final Logger logger = LoggerFactory.getLogger(CollaborationChannel.class);
 
   @Override
@@ -75,6 +79,16 @@ public class CollaborationChannel extends Channel {
   @Override
   public boolean isEnabled() {
     return AppSettings.get().getBoolean(AvailableAppSettings.VIEW_COLLABORATION, true);
+  }
+
+  @Override
+  public void onSubscribe(Session session) {
+    final boolean canViewCollaboration =
+        Optional.of(getUser(session))
+            .map(User::getGroup)
+            .map(Group::getCanViewCollaboration)
+            .orElse(false);
+    session.getUserProperties().put(CAN_VIEW_COLLABORATION, canViewCollaboration);
   }
 
   @Override
@@ -104,6 +118,17 @@ public class CollaborationChannel extends Channel {
     }
 
     broadcast(session, data);
+  }
+
+  @Override
+  public void send(Session session, Object data) throws IOException, EncodeException {
+    if (canViewCollaboration(session)) {
+      super.send(session, data);
+    }
+  }
+
+  private boolean canViewCollaboration(Session session) {
+    return Boolean.TRUE.equals(session.getUserProperties().get(CAN_VIEW_COLLABORATION));
   }
 
   private CollaborationData getData(Message message) {
@@ -403,6 +428,13 @@ public class CollaborationChannel extends Channel {
             String.format(
                 "ws/rest/%s/%d/image/download?image=true&v=%d",
                 User.class.getName(), user.getId(), user.getVersion()));
+      }
+
+      final boolean canViewCollaboration =
+          Optional.of(user).map(User::getGroup).map(Group::getCanViewCollaboration).orElse(false);
+
+      if (!canViewCollaboration) {
+        values.put('$' + CAN_VIEW_COLLABORATION, canViewCollaboration);
       }
 
       return values;

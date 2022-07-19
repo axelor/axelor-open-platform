@@ -28,6 +28,7 @@
         <field name="__actionSelect" title="Action" widget="SuggestBox" canNew="false" target="com.axelor.meta.db.MetaAction" target-name="name" domain="self.type = 'action-view' and self.home = true"/>
       </panel>
       <field name="technicalStaff"/>
+      <field name="canViewCollaboration"/>
       <field name="viewCustomizationPermission"/>
     </panel>
     <panel-tabs>

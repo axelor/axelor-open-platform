@@ -353,6 +353,7 @@
 "The record has been updated or delete by another action.",,,
 "The {0}={1} event can't call 'save' action on unsaved o2m item.",,,
 "There are some invalid rows.",,,
+"This user cannot view collaborators.",,,
 "Thu",,,
 "Thursday",,,
 "Time",,,

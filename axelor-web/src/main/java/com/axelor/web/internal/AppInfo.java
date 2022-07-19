@@ -87,6 +87,7 @@ public class AppInfo {
       map.put("user.navigator", group.getNavigation());
       map.put("user.technical", group.getTechnicalStaff());
       map.put("user.group", group.getCode());
+      map.put("user.canViewCollaboration", group.getCanViewCollaboration());
       map.put(
           "user.viewCustomizationPermission",
           Optional.ofNullable(group.getViewCustomizationPermission())

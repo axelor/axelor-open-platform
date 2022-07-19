@@ -1835,6 +1835,11 @@ label.has-help > span:after,
   margin-bottom: -3px;
 }
 
+.blind-collab-user {
+	opacity: 0.5;
+	font-style: italic;
+}
+
 ::-webkit-input-placeholder {
   font-size: 12px;
 }

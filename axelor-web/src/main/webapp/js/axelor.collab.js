@@ -419,11 +419,13 @@
   ui.directive('uiViewCollaboration', ['CollaborationService', 'UserService', function (CollaborationService, UserService) {
     return {
       scope: true,
-      replace: true,
       link: function (scope) {
-        if (!CollaborationService.register(scope)) {
+        if (!CollaborationService.register(scope)
+          || axelor.config['user.canViewCollaboration'] === false) {
           return;
         }
+
+        scope.enabled = true;
 
         var locale = ui.getPreferredLocale();
 
@@ -431,8 +433,12 @@
           return moment(date).locale(locale).fromNow();
         }
 
+        scope.userName = function (user) {
+          return UserService.getName(user);
+        }
+
         scope.userText = function (user) {
-          var userClass = '';
+          var extraClass = '';
           var extra;
           var state = user.$state || {};
           var dateKey = _.chain(Object.keys(state))
@@ -441,20 +447,26 @@
 
           if (dateKey === 'version') {
             extra = _.sprintf(_t('saved %s'), formatDate(state.versionDate));
-            userClass = 'text-error';
+            extraClass = 'text-error';
           } else if (dateKey === 'dirty') {
             extra = _.sprintf(_t('dirty since %s'), formatDate(state.dirtyDate));
-            userClass = 'text-warning';
+            extraClass = 'text-warning';
           } else if (dateKey === 'editable') {
             extra = _.sprintf(_t('editing since %s'), formatDate(state.editableDate));
-            userClass = 'text-info';
+            extraClass = 'text-info';
           } else {
             extra = _.sprintf(_t('joined %s'), formatDate(state.joinDate));
-            userClass = 'text-success';
+            extraClass = 'text-success';
           }
 
-          return _.sprintf('%s <span class="%s">(%s)</span>',
-            UserService.getName(user, MAX_USERNAME_LENGTH), userClass, extra);
+          const userNameElem = $('<span>').text(UserService.getName(user, MAX_USERNAME_LENGTH));
+          if (user.$canViewCollaboration === false) {
+            userNameElem.addClass('blind-collab-user')
+              .attr('title', _t('This user cannot view collaborators.'));
+          }
+          const extraElem = $('<span>').text(extra).addClass(extraClass);
+
+          return userNameElem[0].outerHTML + ' ' + extraElem[0].outerHTML;
         };
 
         scope.userInitial = function (user) {
@@ -476,18 +488,18 @@
         });
       },
       template: `
-      <ul class="nav menu-bar view-collaboration hidden-phone" ng-show="users && users.length > 1">
+      <ul ng-if="enabled" class="nav menu-bar view-collaboration hidden-phone" ng-show="users && users.length > 1">
         <li class="dropdown menu button-menu">
           <a class="dropdown-toggle btn view-collaboration-toggle" data-toggle="dropdown" title="{{ 'Users on this record' | t }}">
             <span class="view-collaboration-users">{{message}}</span>
             <span class="view-collaboration-action" ng-show="subtitle" ng-class="subtitleClass">{{subtitle}}</span>
           </a>
-          <ul class="dropdown-menu">
+          <ul class="dropdown-menu pull-right">
             <li ng-repeat="user in users track by user.id">
               <a href="">
                 <span class="avatar" ng-class="userColor(user)" title="{{userName(user)}}">
                   <span ng-if="!user.$avatar">{{userInitial(user)}}</span>
-                  <img ng-if='user.$avatar' ng-src='{{user.$avatar}}'>
+                  <img ng-if='user.$avatar' ng-src='{{user.$avatar}}' alt="{{userName(user)}}">
                 </span>
                 <span ng-bind-html="userText(user)"></span>
               </a>

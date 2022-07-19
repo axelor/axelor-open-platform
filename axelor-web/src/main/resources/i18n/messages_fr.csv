@@ -353,6 +353,7 @@
 "The record has been updated or delete by another action.","L'enregistrement a été modifié ou supprimé par une autre action.",,
 "The {0}={1} event can't call 'save' action on unsaved o2m item.","L'événement {0}={1} ne peut pas appeler l'action «save» sur un élément de O2M non persisté.",,
 "There are some invalid rows.","Il y a des lignes invalides.",,
+"This user cannot view collaborators.","Cet utilisateur ne voit pas les collaborateurs.",,
 "Thu","Jeu",,
 "Thursday","Jeudi",,
 "Time","Heure",,

@@ -16,6 +16,7 @@
     <string name="homeAction" help="Default home action."/>
 
     <boolean name="technicalStaff" help="Specify whether the members of this group are technical staff." />
+    <boolean name="canViewCollaboration" default="true" help="Specify whether the members of this group can view collaboration"/>
     <enum name="viewCustomizationPermission" ref="ViewCustomizationPermission" default="NOT_ALLOWED" title="View customization"/>
 
     <many-to-many name="roles" ref="Role" />
