@@ -35,6 +35,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 @WebSocketSecurity
@@ -47,11 +48,10 @@ public class WebSocketEndpoint {
 
   private static final Map<String, Channel> CHANNELS = new ConcurrentHashMap<>();
 
-  private final Logger log;
+  private static final Logger log = LoggerFactory.getLogger(WebSocketEndpoint.class);
 
   @Inject
-  public WebSocketEndpoint(Logger log, Set<Channel> channels) {
-    this.log = log;
+  public WebSocketEndpoint(Set<Channel> channels) {
     channels.stream().filter(Channel::isEnabled).forEach(this::register);
   }
 

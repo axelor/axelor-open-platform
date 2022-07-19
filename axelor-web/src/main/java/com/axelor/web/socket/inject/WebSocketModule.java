@@ -19,6 +19,7 @@
 package com.axelor.web.socket.inject;
 
 import com.axelor.web.socket.Channel;
+import com.axelor.web.socket.WebSocketEndpoint;
 import com.axelor.web.socket.channels.CollaborationChannel;
 import com.axelor.web.socket.channels.TagsChannel;
 import com.google.inject.AbstractModule;
@@ -33,5 +34,7 @@ public class WebSocketModule extends AbstractModule {
     final Multibinder<Channel> multibinder = Multibinder.newSetBinder(binder(), Channel.class);
     multibinder.addBinding().to(TagsChannel.class);
     multibinder.addBinding().to(CollaborationChannel.class);
+
+    bind(WebSocketEndpoint.class).asEagerSingleton();
   }
 }
