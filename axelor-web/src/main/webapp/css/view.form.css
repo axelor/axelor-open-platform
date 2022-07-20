@@ -1803,7 +1803,6 @@ label.has-help > span:after,
 
 .view-collaboration-action {
   font-size: 75%;
-  font-style: oblique;
   line-height: 1;
   margin-top: 4px;
 }
@@ -1811,6 +1810,10 @@ label.has-help > span:after,
 .view-collaboration .dropdown-menu > li > a {
   padding: 3px 6px;
   cursor: default;
+}
+
+.view-collaboration-state {
+  margin-right: 2px;
 }
 
 .view-collaboration .avatar {
@@ -1835,9 +1838,8 @@ label.has-help > span:after,
   margin-bottom: -3px;
 }
 
-.blind-collab-user {
-	opacity: 0.5;
-	font-style: italic;
+.blind-collaboration-user {
+  opacity: 0.5;
 }
 
 ::-webkit-input-placeholder {

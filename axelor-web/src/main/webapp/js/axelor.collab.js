@@ -108,16 +108,20 @@
           applyStates(scope.users, data.states);
           scope.users.sort((a, b) => (a.$state || {}).joinDate - (b.$state || {}).joinDate);
           scope.message = _t('{0} users', scope.users.length);
-          setSubtitle(scope);
+          setInfo(scope);
         });
       });
     });
 
-    function setSubtitle(scope) {
+    function setInfo(scope) {
       scope.subtitle = null;
       scope.subtitleClass = null;
+      scope.subtitleTooltip = null;
+      scope.tooltip = _t("{0} users on this record", (scope.users || []).length);
 
-      var user = _.reduce(scope.users, (a, b) => {
+      var recordVersion = (scope.record || {}).version;
+
+      var saveUser = _.reduce(scope.users, (a, b) => {
         const stateA = a.$state || {};
         const stateB = b.$state || {};
         const versionA = stateA.version || 0;
@@ -126,20 +130,29 @@
         if (versionA < versionB) return b;
         return stateB.versionDate && stateA.versionDate < stateB.versionDate ? b : a;
       });
-      if (_.isObject(user) && (user.$state || {}).version > (scope.record || {}).version
-        && user.code !== currentUserCode) {
-        scope.subtitle = _t('Saved: {0}', getUsersRepr([user]));
+      if (_.isObject(saveUser) && (saveUser.$state || {}).version > recordVersion
+        && saveUser.code !== currentUserCode) {
+        scope.subtitle = '<i class="fa fa-floppy-o"/> ' + getUsersRepr([saveUser]);
         scope.subtitleClass = 'text-error';
+        scope.subtitleTooltip = _t("Saved {0}", formatDate((saveUser.$state || {}).versionDate));
         return;
       }
 
-      var users;
-
-      users = scope.users.filter(u => (u.$state || {}).dirty && u.code !== currentUserCode);
-      if (!_.isEmpty(users)) {
-        scope.subtitle = _t('Editing: {0}', getUsersRepr(users));
+      var dirtyUsers;
+      dirtyUsers = scope.users.filter(u => (u.$state || {}).dirty
+        && ((u.$state || {}).version == null || (u.$state || {}).version <= recordVersion)
+        && u.code !== currentUserCode);
+      if (!_.isEmpty(dirtyUsers)) {
+        scope.subtitle = '<i class="fa fa-pencil"/> ' + getUsersRepr(dirtyUsers);
         scope.subtitleClass = 'text-warning';
+        scope.subtitleTooltip = _t("Editing since {0}", formatDate((dirtyUsers[0].$state || {}).dirtyDate));
       }
+    }
+
+    var locale = ui.getPreferredLocale();
+
+    function formatDate(date) {
+      return moment(date).locale(locale).fromNow();
     }
 
     function getUsersRepr(users) {
@@ -246,6 +259,7 @@
               version: version, versionDate: now,
               dirty: lastDirty, dirtyDate: now,
             });
+            scope.$emit('collaboration-users-updated', scope.users);
           }
         }
         lastVersion = version;
@@ -264,6 +278,7 @@
         var currentUser = _.findWhere(scope.users, { code: currentUserCode });
         if (currentUser) {
           _.extend(currentUser.$state, { dirty: dirty, dirtyDate: moment() });
+          scope.$emit('collaboration-users-updated', scope.users);
         }
       }, WAIT));
 
@@ -403,43 +418,41 @@
 
         scope.enabled = true;
 
+        var currentUserCode = axelor.config['user.login'];
         var locale = ui.getPreferredLocale();
 
         function formatDate(date) {
           return moment(date).locale(locale).fromNow();
         }
 
-        scope.userName = function (user) {
-          return UserService.getName(user);
-        }
+        var computeUserData = function (user) {
+          let dateKey;
+          const state = user.$state || {};
+          const recordVersion = (scope.record || {}).version;
 
-        scope.userText = function (user) {
-          var extraClass = '';
-          var extra;
-          var state = user.$state || {};
-          var dateKey = _.chain(Object.keys(state))
-            .filter(k => _.endsWith(k, 'Date') && state[k.slice(0, -4)])
-            .reduce((a, b) => !a || state[a] < state[b] ? b : a, '').value().slice(0, -4);
+          if (state.version > recordVersion
+            || state.version === recordVersion && user.code === currentUserCode) {
+            dateKey = 'version';
+          } else if (state.dirty && (state.version == null || state.version <= recordVersion)) {
+            dateKey = 'dirty';
+          }
 
           if (dateKey === 'version') {
-            extra = _.sprintf(_t('saved %s'), formatDate(state.versionDate));
-            extraClass = 'text-error';
+            user.$stateIcon = 'fa fa-floppy-o text-error';
+            user.$tooltip = _t('Saved {0}', formatDate(state.versionDate));
           } else if (dateKey === 'dirty') {
-            extra = _.sprintf(_t('editing since %s'), formatDate(state.dirtyDate));
-            extraClass = 'text-warning';
+            user.$stateIcon = 'fa fa-pencil text-warning';
+            user.$tooltip = _t('Editing since {0}', formatDate(state.dirtyDate));
           } else {
-            extra = _.sprintf(_t('joined %s'), formatDate(state.joinDate));
-            extraClass = 'text-success';
+            user.$stateIcon = 'fa fa-file-text-o text-success';
+            user.$tooltip = _t('Joined {0}', formatDate(state.joinDate));
           }
 
-          const userNameElem = $('<span>').text(UserService.getName(user, MAX_USERNAME_LENGTH));
-          if (user.$canViewCollaboration === false) {
-            userNameElem.addClass('blind-collab-user')
-              .attr('title', _t('This user cannot view collaborators.'));
-          }
-          const extraElem = $('<span>').text(extra).addClass(extraClass);
+          user.$class = user.$canViewCollaboration === false ? 'blind-collaboration-user' : null;
+        };
 
-          return userNameElem[0].outerHTML + ' ' + extraElem[0].outerHTML;
+        scope.userName = function (user) {
+          return UserService.getName(user);
         };
 
         scope.userInitial = function (user) {
@@ -452,6 +465,7 @@
 
         scope.$watch('users', function (users) {
           _.each(users, user => {
+            computeUserData(user);
             if (user.$avatar) {
               var url = user.$avatar;
               delete user.$avatar;
@@ -459,22 +473,29 @@
             }
           });
         });
+
+        scope.$on('collaboration-users-updated', function () {
+          _.each(scope.users, user => computeUserData(user));
+        })
       },
       template: `
       <ul ng-if="enabled" class="nav menu-bar view-collaboration hidden-phone" ng-show="users && users.length > 1">
         <li class="dropdown menu button-menu">
-          <a class="dropdown-toggle btn view-collaboration-toggle" data-toggle="dropdown" title="{{ 'Users on this record' | t }}">
+          <a class="dropdown-toggle btn view-collaboration-toggle" data-toggle="dropdown" title="{{tooltip}}">
             <span class="view-collaboration-users">{{message}}</span>
-            <span class="view-collaboration-action" ng-show="subtitle" ng-class="subtitleClass">{{subtitle}}</span>
+            <span class="view-collaboration-action" ng-show="subtitle" ng-class="subtitleClass" ng-bind-html="subtitle" title="{{subtitleTooltip}}"/>
           </a>
           <ul class="dropdown-menu pull-right">
-            <li ng-repeat="user in users track by user.id">
+            <li ng-repeat="user in users track by user.id" title={{user.$tooltip}} class="view-collaboration-user">
               <a href="">
-                <span class="avatar" ng-class="userColor(user)" title="{{userName(user)}}">
-                  <span ng-if="!user.$avatar">{{userInitial(user)}}</span>
-                  <img ng-if='user.$avatar' ng-src='{{user.$avatar}}' alt="{{userName(user)}}">
+                <i class="view-collaboration-state" ng-show="user.$stateIcon" ng-class="user.$stateIcon"/>
+                <span ng-class="user.$class">
+                  <span class="avatar" ng-class="userColor(user)" title="{{userName(user)}}">
+                    <span ng-if="!user.$avatar">{{userInitial(user)}}</span>
+                    <img ng-if='user.$avatar' ng-src='{{user.$avatar}}' alt="{{userName(user)}}">
+                  </span>
+                  {{userName(user)}}
                 </span>
-                <span ng-bind-html="userText(user)"></span>
               </a>
             </li>
           </ul>
