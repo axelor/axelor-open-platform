@@ -1807,6 +1807,12 @@ label.has-help > span:after,
   margin-top: 4px;
 }
 
+.view-collaboration-action, .view-collaboration-user > a {
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .view-collaboration .dropdown-menu > li > a {
   padding: 3px 6px;
   cursor: default;
