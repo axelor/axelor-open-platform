@@ -232,11 +232,6 @@ public class CollaborationChannel extends Channel {
 
     final CollaborationState state = getState(data);
 
-    final Boolean editable = (Boolean) message.get("editable");
-    if (editable != null) {
-      state.setEditable(editable);
-    }
-
     final Boolean dirty = (Boolean) message.get("dirty");
     if (dirty != null) {
       state.setDirty(dirty);
@@ -259,10 +254,6 @@ public class CollaborationChannel extends Channel {
 
     private final LocalDateTime joinDate = LocalDateTime.now();
 
-    private Boolean editable;
-
-    private LocalDateTime editableDate;
-
     private Boolean dirty;
 
     private LocalDateTime dirtyDate;
@@ -273,19 +264,6 @@ public class CollaborationChannel extends Channel {
 
     public LocalDateTime getJoinDate() {
       return joinDate;
-    }
-
-    public Boolean isEditable() {
-      return editable;
-    }
-
-    public void setEditable(Boolean editable) {
-      this.editable = editable;
-      editableDate = LocalDateTime.now();
-    }
-
-    public LocalDateTime getEditableDate() {
-      return editableDate;
     }
 
     public Boolean isDirty() {

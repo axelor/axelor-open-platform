@@ -137,15 +137,8 @@
 
       users = scope.users.filter(u => (u.$state || {}).dirty && u.code !== currentUserCode);
       if (!_.isEmpty(users)) {
-        scope.subtitle = _t('Dirty: {0}', getUsersRepr(users));
-        scope.subtitleClass = 'text-warning';
-        return;
-      }
-
-      users = scope.users.filter(u => (u.$state || {}).editable && u.code !== currentUserCode);
-      if (!_.isEmpty(users)) {
         scope.subtitle = _t('Editing: {0}', getUsersRepr(users));
-        scope.subtitleClass = 'text-info';
+        scope.subtitleClass = 'text-warning';
       }
     }
 
@@ -178,7 +171,7 @@
         if (recordId) {
           channel.send({
             command: 'JOIN', model: model, recordId: recordId,
-            message: { editable: scope.isEditable(), dirty: scope.isDirty() }
+            message: { dirty: scope.isDirty() }
           });
         }
       }
@@ -201,7 +194,6 @@
           allUsers[key] = {};
 
           var message;
-          if (scope.isEditable()) message = _.extend(message || {}, { editable: true });
           if (scope.isDirty()) message = _.extend(message || {}, { dirty: true });
 
           channel.send({ command: 'JOIN', model: model, recordId: id, message: message });
@@ -226,7 +218,6 @@
           recordId = null;
           scope.users = [];
           lastVersion = null;
-          lastEditable = false;
           lastDirty = false;
         }
       };
@@ -260,20 +251,6 @@
         lastVersion = version;
       });
 
-      var lastEditable = false;
-      var unwatchEditable = scope.$watch('isEditable()', _.throttle(function (editable) {
-        if (recordId == null || lastEditable === editable) return;
-        lastEditable = editable;
-        channel.send({
-          command: 'STATE', model: model, recordId: recordId,
-          message: { editable: editable }
-        });
-        var currentUser = _.findWhere(scope.users, { code: currentUserCode });
-        if (currentUser) {
-          _.extend(currentUser.$state, { editable: editable, editableDate: moment() });
-        }
-      }, WAIT));
-
       const WAIT = 500;
       var lastDirty = false;
       var unwatchDirty = scope.$watch('isDirty()', _.throttle(function (dirty) {
@@ -293,7 +270,6 @@
       scope.$on('$destroy', function () {
         unwatchId();
         unwatchVersion();
-        unwatchEditable();
         unwatchDirty();
         leave(recordId);
       });
@@ -449,11 +425,8 @@
             extra = _.sprintf(_t('saved %s'), formatDate(state.versionDate));
             extraClass = 'text-error';
           } else if (dateKey === 'dirty') {
-            extra = _.sprintf(_t('dirty since %s'), formatDate(state.dirtyDate));
+            extra = _.sprintf(_t('editing since %s'), formatDate(state.dirtyDate));
             extraClass = 'text-warning';
-          } else if (dateKey === 'editable') {
-            extra = _.sprintf(_t('editing since %s'), formatDate(state.editableDate));
-            extraClass = 'text-info';
           } else {
             extra = _.sprintf(_t('joined %s'), formatDate(state.joinDate));
             extraClass = 'text-success';
