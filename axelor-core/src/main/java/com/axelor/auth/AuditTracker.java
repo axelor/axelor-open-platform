@@ -279,7 +279,7 @@ final class AuditTracker {
       final Object value = values.get(name);
       final Object oldValue = oldValues.get(name);
 
-      if (previousState != null && Objects.equal(value, oldValue)) {
+      if (Objects.equal(value, oldValue)) {
         continue;
       }
 
