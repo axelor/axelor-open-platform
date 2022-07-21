@@ -283,6 +283,11 @@
   margin: 0 0 4px 26px;
 }
 
+.mail-message .track-fields .track-field-empty {
+  opacity: 0.6;
+  font-style: italic;
+}
+
 .mail-message .track-tags {
 }
 

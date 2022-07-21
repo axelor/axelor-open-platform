@@ -253,11 +253,12 @@ ui.directive('uiMailMessage', function () {
       }
 
       if (body && body.tracks) {
+        var emptyValue = '<span class="track-field-empty">' + _t('None') + '</span>';
         _.each(body.tracks, function (item) {
           item.displayValue = item.displayValue || format(item, item.value);
           item.oldDisplayValue = item.oldDisplayValue || format(item, item.oldValue);
           if (item.oldDisplayValue !== undefined) {
-            item.displayValue = item.oldDisplayValue + " → " + item.displayValue;
+            item.displayValue = item.oldDisplayValue + " → " + (item.displayValue || emptyValue);
           }
         });
       }
