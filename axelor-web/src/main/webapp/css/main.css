@@ -494,7 +494,8 @@ header .navbar .nav-link-user-sub {
 .ui-dialog > [ui-view-popup] > .view-pane > .view-container .html-view {
   height: 450px;
 }
-.ui-dialog.maximized > [ui-view-popup] > .view-pane > .view-container .grid-view {
+.ui-dialog.maximized > [ui-view-popup] > .view-pane > .view-container .grid-view,
+.ui-dialog.maximized > [ui-view-popup] > .view-pane > .view-container .html-view {
   position: absolute !important;
   height: auto;
 }
