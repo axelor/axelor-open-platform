@@ -33,7 +33,7 @@ public class ScriptsSupport extends AbstractSupport {
 
   public static final String DATABASE_CONFIGURATION = "database";
 
-  public static final String NODE_VERSION = "16.15.0";
+  public static final String NODE_VERSION = "16.16.0";
 
   public static final String NPM_INSTALL_TASK_NAME = "npm-install";
   public static final String NPM_BUILD_TASK_NAME = "npm-build";
