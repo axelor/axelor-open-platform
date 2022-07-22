@@ -8,6 +8,7 @@ description: |
   attribute is not specified
   * Format data according to field type, including selection with translation
   * Support field translatable attribute
+  * Sticky header and footer
 
   Example:
   ```xml

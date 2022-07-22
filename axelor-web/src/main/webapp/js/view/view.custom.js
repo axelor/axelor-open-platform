@@ -254,15 +254,48 @@ ui.directive('reportTable',  function() {
         return scope.format(res, name);
       };
 
+      var activeSort = {
+        key: null,
+        descending: false
+      };
+
+      scope.onSort = function (col) {
+        if (activeSort.key === col.name) {
+          activeSort.descending = !activeSort.descending;
+        } else {
+          activeSort.key = col.name;
+          activeSort.descending = false;
+        }
+        if (['integer', 'long', 'decimal'].indexOf(col.type) < 0) {
+          scope.data = axelor.sortBy(scope.data, function (item) {
+            return scope.format(item[activeSort.key], activeSort.key) || '';
+          }, activeSort.descending);
+        } else {
+          scope.data = _.sortBy(scope.data, activeSort.descending ? function (item) {
+            return -item[activeSort.key] || 0;
+          } : function (item) {
+            return +item[activeSort.key] || 0;
+          });
+        }
+      }
+
+      scope.sortIndicator = function (col) {
+        if (activeSort.key !== col.name) return null;
+        return 'slick-sort-indicator-' + (activeSort.descending ? 'desc' : 'asc');
+      }
+
+      var backgroundColor = $('body').css('background-color');
+      var style = backgroundColor ? { backgroundColor: backgroundColor } : null;
+      scope.headerStyle = scope.footerStyle = style;
+
       setTimeout(function () {
-        element.parents('.dashlet:first')
-          .addClass("report-table");
+        element.parents('.dashlet:first').addClass("report-table");
       });
     },
     replace: true,
     template:
       "<table class='table table-striped'>" +
-        "<thead>" +
+        "<thead ng-style='headerStyle'>" +
           "<tr>" +
             "<th ng-repeat='col in cols' ng-class='col.type'>{{col.title | t}}</th>" +
           "</tr>" +
@@ -272,7 +305,7 @@ ui.directive('reportTable',  function() {
             "<td ng-repeat='col in cols' ng-class='col.type'>{{format(row[col.name], col.name)}}</td>" +
           "</tr>" +
         "</tbody>" +
-        "<tfoot ng-if='sums.length'>" +
+        "<tfoot ng-if='sums.length' ng-style='footerStyle'>" +
           "<tr>" +
             "<td ng-repeat='col in cols' ng-class='col.type'>{{sum(col.name)}}</td>" +
           "</tr>" +
