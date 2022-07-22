@@ -119,14 +119,14 @@
       var recordVersion = (scope.record || {}).version;
 
       var saveUser = _.reduce(scope.users, (a, b) => {
-        const stateA = a.$state || {};
-        const stateB = b.$state || {};
+        const stateA = (a || {}).$state || {};
+        const stateB = (b || {}).$state || {};
         const versionA = stateA.version || 0;
         const versionB = stateB.version || 0;
         if (versionA > versionB) return a;
         if (versionA < versionB) return b;
         return stateB.versionDate && stateA.versionDate < stateB.versionDate ? b : a;
-      });
+      }, null);
       if (_.isObject(saveUser) && (saveUser.$state || {}).version > recordVersion
         && saveUser.code !== currentUserCode) {
         scope.subtitle = '<i class="fa fa-floppy-o"/> ' + getUsersRepr([saveUser]);
@@ -255,6 +255,11 @@
           }
         }
         lastVersion = version;
+        if (attrsReset) {
+          attrsReset = false;
+          setInfo(scope);
+          scope.$emit('collaboration-users-updated', scope.users);
+        }
       });
 
       const WAIT = 500;
@@ -273,6 +278,24 @@
           scope.$emit('collaboration-users-updated', scope.users);
         }
       }, WAIT));
+
+      var attrsReset = false;
+      scope.$on('on:attrs-reset', function () {
+        if (recordId == null) return;
+        var currentUser = _.findWhere(scope.users, { code: currentUserCode });
+        if (!currentUser) return;
+        attrsReset = true;
+        lastVersion = null;
+        var state = currentUser.$state;
+        if (!state) return;
+        if (state.dirty) {
+          state.dirty = false;
+          channel.send({
+            command: 'STATE', model: model, recordId: recordId,
+            message: { dirty: state.dirty }
+          });
+        }
+      });
 
       scope.$on('$destroy', function () {
         unwatchId();
