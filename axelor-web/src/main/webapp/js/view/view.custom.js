@@ -178,7 +178,7 @@ ui.directive('reportTable',  function() {
     link: function (scope, element, attrs) {
 
       var cols = [];
-      var sums = (scope.sums||'').split(',');
+      var sums = (attrs.sums||'').split(/\s*,\s*/);
       var fields = {};
       var schema = scope.$parent.schema;
 
@@ -190,7 +190,7 @@ ui.directive('reportTable',  function() {
           var col = _.extend({}, field, field.widgetAttrs, {
             name: name,
             title: field.title || field.autoTitle || _.humanize(name),
-            type: field.selection ? 'selection' : field.serverType || field.type
+            type: field.serverType || 'string'
           });
           fields[name] = col;
           cols.push(col);
@@ -198,8 +198,8 @@ ui.directive('reportTable',  function() {
         scope.cols = cols;
       }
 
-      if (scope.columns) {
-        makeColumns((scope.columns||'').split(','));
+      if (attrs.columns) {
+        makeColumns((attrs.columns||'').split(/\s*,\s*/));
       } else {
         var unwatch = scope.$watch('data', function reportDataWatch(data) {
           if (data) {
@@ -214,24 +214,26 @@ ui.directive('reportTable',  function() {
       scope.sums = sums;
 
       scope.format = function(value, name) {
-        if (value === null || value === undefined) {
+        if (value == null) {
           return "";
         }
 
         var field = fields[name] || {};
+        var type = field.selection ? 'selection' : field.type;
+        var context;
 
-        if (field.translatable) {
-          return _t('value:' + value);
+        if (field.translatable && type === 'string') {
+          var trKey = 'value:' + value;
+          var trValue = _t(trKey);
+          if (trValue !== trKey) {
+            context = {};
+            context['$t:' + field.name] = trValue;
+          }
         }
 
-        if (field.selection) {
-          value = '' + value;
-        }
-
-        var formatter = ui.formatters[field.type];
-
+        var formatter = ui.formatters[type];
         if (formatter) {
-          return formatter(field, value);
+          return formatter(field, value, context);
         }
 
         return value;

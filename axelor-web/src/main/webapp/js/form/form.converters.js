@@ -338,9 +338,10 @@
     },
 
     "many-to-one": function(field, value) {
-      return value
-        ? (field.targetName ? value[field.targetName] : (value.name || value.code || value.id || ""))
-        : "";
+      if (!value) return "";
+      if (!field.targetName) return value.name || value.code || value.id || "";
+      var trKey = '$t:' + field.targetName;
+      return value[trKey] || value[field.targetName];
     },
 
     "one-to-many": function(field, value) {
@@ -352,7 +353,7 @@
     },
 
     "selection": function(field, value) {
-      var cmp = field.type === "integer" ? function(a, b) { return a == b ; } : _.isEqual;
+      var cmp = ["integer", "long"].indexOf(field.type) < 0 ? _.isEqual : function(a, b) { return a == b ; };
       var res = _.find(field.selectionList, function(item){
         return cmp(item.value, value);
       }) || {};
