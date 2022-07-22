@@ -411,7 +411,7 @@
   };
 
   // Returns a copy of list sorted in lexicographic order, running each value through iteratee
-  function sortBy(list, iteratee) {
+  function sortBy(list, iteratee, descending) {
     var locale = getPreferredLocale();
     var localeCompare = Intl.Collator(locale).compare;
     var result = (list || []).slice();
@@ -421,7 +421,9 @@
       function (value) { return toKey(iteratee(value)); } :
       function (value) { return toKey(value[iteratee]); };
 
-    return result.sort(function (a, b) {
+    return result.sort(descending ? function (a, b) {
+      return localeCompare(getKey(b), getKey(a));
+    } : function (a, b) {
       return localeCompare(getKey(a), getKey(b));
     });
   }

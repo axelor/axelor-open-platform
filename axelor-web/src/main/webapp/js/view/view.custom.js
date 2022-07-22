@@ -294,7 +294,10 @@ ui.directive('reportTable',  function() {
       "<table class='table table-striped'>" +
         "<thead ng-style='headerStyle'>" +
           "<tr>" +
-            "<th ng-repeat='col in cols' ng-class='col.type'>{{col.title | t}}</th>" +
+            "<th ng-repeat='col in cols' ng-class='col.type' ng-click='onSort(col)'>" +
+              "<span>{{col.title | t}}</span>" +
+              "<span class='slick-sort-indicator' ng-class='sortIndicator(col)'/>" +
+            "</th>" +
           "</tr>" +
         "</thead>" +
         "<tbody>" +

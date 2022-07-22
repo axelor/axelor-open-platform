@@ -10,6 +10,7 @@ description: |
   * Support field translatable attribute
   * Sticky header and footer
   * Skip having to define data='data'
+  * Ability to sort by columns
 
   Example:
   ```xml
