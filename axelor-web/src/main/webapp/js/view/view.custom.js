@@ -175,17 +175,12 @@ ui.directive('reportBox', function() {
 
 ui.directive('reportTable',  function() {
   return {
-    scope: {
-      data: '=',
-      columns: '@',
-      sums: '@'
-    },
     link: function (scope, element, attrs) {
 
       var cols = [];
       var sums = (scope.sums||'').split(',');
       var fields = {};
-      var schema = scope.$parent.$parent.schema;
+      var schema = scope.$parent.schema;
 
       function makeColumns(names) {
         cols = [];
