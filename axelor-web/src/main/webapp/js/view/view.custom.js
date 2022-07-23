@@ -219,7 +219,7 @@ ui.directive('reportTable',  function() {
         }
 
         var field = fields[name] || {};
-        var type = field.selection ? 'selection' : field.type;
+        var type = scope.getType(field);
         var context;
 
         if (field.translatable && type === 'string') {
@@ -231,7 +231,7 @@ ui.directive('reportTable',  function() {
           }
         }
 
-        var formatter = ui.formatters[type];
+        var formatter = ui.gridFormatters[type] || ui.formatters[type];
         if (formatter) {
           return formatter(field, value, context);
         }
@@ -250,6 +250,10 @@ ui.directive('reportTable',  function() {
         });
         return scope.format(res, name);
       };
+
+      scope.getType = function (col) {
+        return col.selection ? 'selection' : col.type;
+      }
 
       var activeSort = {
         key: null,
@@ -291,10 +295,10 @@ ui.directive('reportTable',  function() {
     },
     replace: true,
     template:
-      "<table class='table table-striped'>" +
+      "<table class='table table-striped readonly'>" +
         "<thead ng-style='headerStyle'>" +
           "<tr>" +
-            "<th ng-repeat='col in cols' ng-class='col.type' ng-click='onSort(col)'>" +
+            "<th ng-repeat='col in cols' ng-class='getType(col)' ng-click='onSort(col)'>" +
               "<span>{{col.title | t}}</span>" +
               "<span class='slick-sort-indicator' ng-class='sortIndicator(col)'/>" +
             "</th>" +
@@ -302,12 +306,12 @@ ui.directive('reportTable',  function() {
         "</thead>" +
         "<tbody>" +
           "<tr ng-repeat='row in data'>" +
-            "<td ng-repeat='col in cols' ng-class='col.type'>{{format(row[col.name], col.name)}}</td>" +
+            "<td ng-repeat='col in cols' ng-class='getType(col)' ng-bind-html='format(row[col.name], col.name)'/>" +
           "</tr>" +
         "</tbody>" +
         "<tfoot ng-if='sums.length' ng-style='footerStyle'>" +
           "<tr>" +
-            "<td ng-repeat='col in cols' ng-class='col.type'>{{sum(col.name)}}</td>" +
+            "<td ng-repeat='col in cols' ng-class='getType(col)'>{{sum(col.name)}}</td>" +
           "</tr>" +
         "</tfoot>" +
       "</table>"

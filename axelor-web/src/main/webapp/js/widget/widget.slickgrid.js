@@ -259,12 +259,12 @@ var Formatters = {
       return '<span class="'+ css +'"><span class="tag-text">'+v.title+'</span></span>';
     };
 
-    if (value && field.widget === 'single-select') {
+    if (value != null && field.widget === 'single-select') {
       var item = formatTag(findSelect(value));
       return '<span class="tag-select">' + item + '</span>';
     }
 
-    if (value && field.widget === 'multi-select') {
+    if (value != null && field.widget === 'multi-select') {
       var items = value.split(/\s*,\s*/).map(findSelect).map(formatTag);
       return '<span class="tag-select">' + items.join(' ') + '</span>';
     }
@@ -335,6 +335,8 @@ var Formatters = {
 };
 
 Formatters.text = Formatters.string;
+
+ui.gridFormatters = Formatters;
 
 var GroupFormatters = {
   "one-to-one": function(field, value, record) {
