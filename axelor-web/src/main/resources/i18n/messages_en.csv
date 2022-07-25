@@ -397,7 +397,7 @@
 "Year",,,
 "Years",,,
 "Yes",,,
-"You are not allow to upload a file bigger than",,,
+"You are not allowed to upload a file bigger than {0} MB.",,,
 "You can't create document here.",,,
 "[Last] dddd [at] LT",,,
 "[Today at] LT",,,

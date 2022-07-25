@@ -397,7 +397,7 @@
 "Year","Année",,
 "Years","Années",,
 "Yes","Oui",,
-"You are not allow to upload a file bigger than","Vous n'êtes pas autoriser à uploader un fichier plus grand que",,
+"You are not allowed to upload a file bigger than {0} MB.","Vous n’êtes pas autorisé(e) à envoyer un fichier de plus de {0} Mo.",,
 "You can't create document here.","Vous ne pouvez pas créer un document ici.",,
 "[Last] dddd [at] LT","dddd [dernier à] LT",,
 "[Today at] LT","[Aujourd'hui à] LT",,

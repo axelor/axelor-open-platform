@@ -202,7 +202,8 @@ ui.formInput('Image', 'ImageLink', {
       }
 
       if(uploadSize > 0 && file.size > 1048576 * uploadSize) {
-        return axelor.dialogs.say(_t("You are not allow to upload a file bigger than") + ' ' + uploadSize + 'MB');
+        return axelor.dialogs.say(_t("You are not allowed to upload a file bigger than {0} MB.",
+          uploadSize));
       }
 
       if (!isBinary) {
