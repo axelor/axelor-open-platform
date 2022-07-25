@@ -125,7 +125,11 @@
         button.text = axelor.sanitize(button.text);
       });
 
-      var element = $('<div class="message-box" style="padding: 15px;"></div>').attr('title', title).staticHtml(str);
+      if (!(str instanceof jQuery)) {
+        str = axelor.sanitize(str);
+      }
+
+      var element = $('<div class="message-box" style="padding: 15px;"></div>').attr('title', title).html(str);
       var dialog = element.dialog({
         dialogClass: 'ui-dialog-responsive ui-dialog-small ui-dialog-dragged ' + css,
         resizable: false,
