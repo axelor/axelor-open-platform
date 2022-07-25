@@ -398,6 +398,16 @@
     right: 36px;
 }
 
+.report-box .dashlet-body .report-icon {
+	position: absolute;
+	top: 65px;
+	font-size: 30px;
+}
+
+.report-box .dashlet-body .report-icon + div {
+	margin-left: 42px;
+}
+
 .report-table tfoot td {
   border-top: 1px solid #ccc;
   font-weight: 600;

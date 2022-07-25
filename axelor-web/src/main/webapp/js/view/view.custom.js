@@ -147,26 +147,51 @@ ui.directive('uiPortletCustom', customDirective);
 ui.directive('reportBox', function() {
   return {
     scope: {
-      value: '=',
+      icon: '@',
       label: '@',
+      value: '=',
       percent: '=',
       up: '=',
       tag: '=',
       tagCss: '='
     },
     link: function (scope, element, attrs) {
+
+      scope.format = function (value) {
+        var formatter = isNaN(+value) ? ui.formatters.string : ui.formatters.decimal;
+        return formatter({}, value);
+      }
+
+      scope.percentStyle = function () {
+        var type;
+        if (scope.up == null) {
+          type = 'info';
+        } else {
+          type = scope.up ? 'success' : 'error';
+        }
+        return 'text-' + type;
+      }
+
+      scope.percentLevelStyle = function () {
+        if (scope.up == null) return null;
+        return 'fa-level-' + (scope.up ? 'up' : 'down');
+      }
+
       setTimeout(function () {
-        element.parents('.dashlet:first')
-          .addClass("report-box");
+        element.parents('.dashlet:first').addClass("report-box");
+        element.removeClass('hidden');
       });
     },
     replace: true,
     template:
-      "<div class='report-box'>" +
-        "<h1>{{value}}</h1>" +
-        "<small>{{label}}</small>" +
-        "<div class='font-bold text-info pull-right' ng-show='percent'>" +
-          "<span>{{percent}}</span> <i class='fa fa-level-up'></i>" +
+      "<div class='report-data hidden'>" +
+        "<i class='report-icon fa {{icon}}' ng-if='icon'/>" +
+        "<div>" +
+          "<h1>{{format(value)}}</h1>" +
+          "<small>{{label | t}}</small>" +
+          "<div class='font-bold pull-right' ng-class='percentStyle()' ng-show='percent'>" +
+            "<span>{{percent | percent}}</span> <i class='fa' ng-class='percentLevelStyle()'/>" +
+          "</div>" +
         "</div>" +
         "<div class='report-tags' ng-if='tag'><span class='label' ng-class='tagCss'>{{tag}}</span></div>" +
       "</div>"
