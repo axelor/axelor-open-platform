@@ -5,8 +5,10 @@
 :url-fontawesome: http://fortawesome.github.io/Font-Awesome/icons
 :url-angular-templates: https://docs.angularjs.org/guide/templates
 
-The custom view allows to show arbitrary data using custom templates. This view
-is generally useful to create readonly reports.
+== Usage
+
+The custom view allows to show arbitrary data using templates. This view
+is generally useful for creating readonly reports.
 
 The custom view definition is:
 
@@ -35,11 +37,11 @@ The custom view definition is:
 </custom>
 -----
 
-Some examples:
+Example usage with a custom template:
 
 [source,xml]
 -----
-<!-- dashboard box with custom template -->
+<!-- Dashboard box with custom template -->
 <custom name="report.total.sale" title="Total sale" css="report-box">
   <dataset type="jpql">
   <![CDATA[
@@ -57,41 +59,6 @@ Some examples:
   ]]>
   </template>
 </custom>
-
-<!-- using predefined template and method call for dataset -->
-<report name="report.total.sale" title="Total sale">
-  <dataset type="rpc">
-  <![CDATA[
-  com.axelor.sale.web.SomeController:someMethod
-  ]]>
-  </dataset>
-  <template>
-  <![CDATA[
-  <report-box
-    icon='fa-search'
-    label='Total sales this month' value='first.total'
-    percent='first.percent'
-    up='first.increased'
-    tag='first.tag' tag-css='first.tagStyle'></report-box>
-  ]]>
-  </template>
-</report>
-
-<!-- dashboard data table with predefined template tag -->
-<report name="report.sales" title="Sales">
-  <field name="total" type="decimal" x-scale="2" />
-  <dataset type="jpql" limit="10">
-  <![CDATA[
-  select self.name as name, c.fullName as customer, self.totalAmount as total
-  from Order self left join self.customer as c
-  ]]>
-  </dataset>
-  <template>
-  <![CDATA[
-  <report-table data='data' columns='name,customer,total' sums='total'></report-table>
-  ]]>
-  </template>
-</report>
 -----
 
 The attributes are:
@@ -110,45 +77,126 @@ The elements are:
 | Element | Description
 | `<field>` | field definitions for the dataset (optional, can be multiple)
 | *`<dataset>`* | dataset definition
-| *`<template>`* | custom template
+| *`<template>`* | an {url-angular-templates}[angular.js template]
 |===
 
-== Field
+=== Field
 
 The `<field>` element can be used to provide metadata information about a dataset
-item. This is same as fields in `grid` view.
+item. This is the same as fields in `grid` view.
 
-== DataSet
+=== DataSet
 
-The `<dataset>` element is used to define custom dataset.
+The `<dataset>` element is used to define a dataset.
 
 * `type` - dataset type (`jpql`, `sql` or `rpc`)
 * `limit` - query result limit (in case of `jpql` and `sql`)
 
-== Template
+=== Template
 
-The `<template>` element is used to define custom {url-angular-templates}[angular.js template]
+The `<template>` element is used to define an {url-angular-templates}[angular.js template]
 to render the data.
 
 The dataset result is available as `data` and the first result of the data is
 available as `first`.
 
-Two custom template tags are provided:
+== Built-in templates
 
-* `<report-box>` - render data as a small simple report box (useful in dashboard)
-  * `@icon` - {url-fontawesome}[Font Awesome] icon name
-  * `=value` - a number value in dataset
-  * `@label` - a label to describe the value
-  * `=percent` - a percent value in dataset
-  * `=up` - boolean expression to say if value is up or down
-  * `=tag` - a tag to show on title area of the box
-  * `=tag-style` - css class to apply to tag
-* `<report-table>` - render the dataset as table
-  * `=data` - the data to render as table
-  * `@columns` - comma-separated list of dataset fields as table columns
-  * `@sums` - comma-separated list for dataset field to show sum
+Two template tags are built in:
 
-The `@` means the attribute value is static and `=` mean the attribute value is
-a dynamic expression. Don't include them in template, it's just for information.
+=== report-box
 
-See the listing for some examples.
+This template renders data as a small and simple report box (useful in dashboard).
+
+Static attributes:
+
+* `icon` - {url-fontawesome}[Font Awesome] icon name
+* `label` - a label to describe the value
+
+Dynamic expressions:
+
+* `value` - a number value in dataset
+* `percent` - a percent value in dataset (formatted with `percent` filter)
+* `up` - boolean expression for the up or down icon beside the percent value (or no icon if null)
+* `tag` - a tag to show on title area of the box
+* `tag-css` - CSS class to apply to tag
+
+Example usage:
+
+[source,xml]
+-----
+<!-- Sample custom view definition using report-box template -->
+<custom name="report-box-sales-month" title="Sales this month">
+  <dataset type="rpc">com.axelor.sale.web.SaleOrderController:reportMonthly</dataset>
+  <template>
+  <![CDATA[
+  <report-box icon='fa-search' label='Total sales' value='first.total'
+    percent='first.percent' up='first.up' tag='first.tag' tag-css='first.tagCss'/>
+  ]]>
+  </template>
+</custom>
+-----
+
+[source,java]
+-----
+public class SaleOrderController {
+
+  public void reportMonthly(ActionRequest request, ActionResponse response) {
+    // ...
+
+    Map<String, Object> data = new HashMap<>();
+    data.put("total", total);
+    data.put("percent", percent);
+    data.put("up", total.compareTo(last) > 0);
+    data.put("tag", I18n.get("Monthly"));
+    data.put("tagCss", "label-success");
+
+    // This data will be put into dataset.
+    // For report-box, we send a list with a single item accessible as `first`.
+    response.setData(List.of(data));
+  }
+}
+-----
+
+.Sample report box
+image::custom-view-report-box.png[Sample report box]
+
+=== report-table
+
+This template renders the dataset as a table. It uses field metadata for formatting and can use any widgets supported on `grid` view. It also supports sorting by columns.
+
+Static attributes:
+
+  * `columns` - comma-separated list of dataset fields as table columns (if not specified, uses keys from dataset items)
+  * `sums` - comma-separated list of dataset fields to show sums
+
+Example usage:
+
+[source,xml]
+-----
+<!-- Sample custom view definition using report-table template -->
+<custom name="report-table-order-lines" title="Order lines">
+  <field name="name" title="Order name"/>
+  <field name="statusSelect" title="Status" type="integer"
+    selection="selection-order-status" widget="single-select"/>
+  <field name="productName" title="Product" type="string" x-translatable="true"/>
+  <field name="total" type="decimal" x-scale="2"/>
+  <dataset type="jpql" limit="40">
+  <![CDATA[
+  SELECT self.name AS name, self.statusSelect AS statusSelect,
+    item.product.name as productName, item.quantity * item.price AS total
+  FROM Order self
+  JOIN self.items item
+  ORDER BY self.name
+  ]]>
+  </dataset>
+  <template>
+  <![CDATA[
+  <report-table sums='total'/>
+  ]]>
+  </template>
+</custom>
+-----
+
+.Sample report table
+image::custom-view-report-table.png[Sample report table]
