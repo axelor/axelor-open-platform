@@ -1819,7 +1819,7 @@ ui.download = function download(url, fileName) {
     axelor.notify.info("<p>" + msg + "</p>");
   }
 
-  if (fileName) {
+  if (!_.startsWith(url, "data:") && fileName) {
     url += ( /\?/.test( url ) ? "&" : "?" ) + jQuery.param({
       "fileName": fileName
     });
