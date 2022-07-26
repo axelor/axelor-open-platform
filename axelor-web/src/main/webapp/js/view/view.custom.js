@@ -87,6 +87,15 @@ function CustomViewCtrl($scope, $http, DataSource, ViewService) {
       $scope.data = (res.data||{}).dataset;
     });
   };
+
+  $scope.canExport = function() {
+    return false;
+  };
+
+  $scope.onExport = function() {
+
+  };
+
 }
 
 var customDirective = ["$compile", function ($compile) {
@@ -160,7 +169,7 @@ ui.directive('reportBox', function() {
       scope.format = function (value) {
         var formatter = isNaN(+value) ? ui.formatters.string : ui.formatters.decimal;
         return formatter({}, value);
-      }
+      };
 
       scope.percentStyle = function () {
         var type;
@@ -170,12 +179,12 @@ ui.directive('reportBox', function() {
           type = scope.up ? 'success' : 'error';
         }
         return 'text-' + type;
-      }
+      };
 
       scope.percentLevelStyle = function () {
         if (scope.up == null) return null;
         return 'fa-level-' + (scope.up ? 'up' : 'down');
-      }
+      };
 
       setTimeout(function () {
         element.parents('.dashlet:first').addClass("report-box");
@@ -236,6 +245,31 @@ ui.directive('reportTable',  function() {
         });
       }
 
+      scope.$parent.canExport = function() {
+        return true;
+      };
+
+      scope.$parent.onExport = function() {
+        var dataset = scope.data || [];
+
+        var header = _.pluck(scope.cols, 'title');
+        var content = "data:text/csv;charset=utf-8," + header.join(';') + '\n';
+
+        dataset.forEach(function (item) {
+          var row = _.pluck(scope.cols, 'name').map(function (key) {
+            var val = item[key];
+            if (val === undefined || val === null) {
+              val = '';
+            }
+            return '"' + ('' + val).replace(/"/g, '""') + '"';
+          });
+          content += row.join(';') + '\n';
+        });
+
+        var name = (scope.$parent.title || 'export').toLowerCase();
+        ui.download(encodeURI(content), _.underscored(name) + '.csv');
+      };
+
       scope.sums = sums;
 
       scope.format = function(value, name) {
@@ -278,7 +312,7 @@ ui.directive('reportTable',  function() {
 
       scope.getType = function (col) {
         return col.selection ? 'selection' : col.type;
-      }
+      };
 
       var activeSort = {
         key: null,
@@ -303,12 +337,12 @@ ui.directive('reportTable',  function() {
             return +item[activeSort.key] || 0;
           });
         }
-      }
+      };
 
       scope.sortIndicator = function (col) {
         if (activeSort.key !== col.name) return null;
         return 'slick-sort-indicator-' + (activeSort.descending ? 'desc' : 'asc');
-      }
+      };
 
       var backgroundColor = $('body').css('background-color');
       var style = backgroundColor ? { backgroundColor: backgroundColor } : null;
