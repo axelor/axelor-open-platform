@@ -1002,9 +1002,14 @@ function FilterFormCtrl($scope, $element, ViewService) {
           filter.operator !== 'notNull')) {
         criterion.fieldName += '.' + filter.targetName;
       } else if (/-many/.test(filter.type) && (
-          filter.operator !== 'isNull' ||
-          filter.operator !== 'notNull')) {
-        criterion.fieldName += '.id';
+          filter.operator === 'isNull' ||
+          filter.operator === 'notNull')) {
+        var jsonTypePos = criterion.fieldName.indexOf('::');
+        if (jsonTypePos >= 0) {
+          criterion.fieldName = criterion.fieldName.substring(0, jsonTypePos);
+        } else {
+          criterion.fieldName += '.id';
+        }
       }
 
       if (criterion.operator == "true") {
