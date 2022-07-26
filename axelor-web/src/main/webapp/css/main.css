@@ -1059,31 +1059,3 @@ header .navbar .nav .dropdown-menu > li.quick-menu-item a {
 ul.dropdown-menu.quick-menu {
   width: max-content;
 }
-
-.report-table th.integer,
-.report-table th.long,
-.report-table th.decimal,
-.report-table td.integer,
-.report-table td.long,
-.report-table td.decimal {
-  text-align: right;
-}
-
-.report-table table thead,
-.report-table table tfoot {
-  position: sticky;
-  background: white;
-}
-
-.report-table table thead {
-  inset-block-start: 0;
-  box-shadow: inset 0 -1px 0 #e7e7e7;
-}
-.report-table table tfoot {
-  inset-block-end: 0;
-  box-shadow: inset 0 1px 0 #e7e7e7;
-}
-
-.report-table table thead th {
-  box-shadow: inset -1px 0 #e7e7e7;
-}
