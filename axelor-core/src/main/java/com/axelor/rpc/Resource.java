@@ -829,7 +829,17 @@ public class Resource<T extends Model> {
         for (Object value : row) {
           Object objValue = value == null ? "" : value;
           if (selection.containsKey(index)) {
-            objValue = selection.get(index).get(objValue.toString());
+            final Map sel = selection.get(index);
+            objValue =
+                Arrays.stream(objValue.toString().split("\\s*,\\s*"))
+                    .map(
+                        part -> {
+                          Object val = sel.get(part);
+                          return ObjectUtils.isEmpty(val) ? part : val;
+                        })
+                    .filter(java.util.Objects::nonNull)
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(", "));
           }
           if (objValue instanceof String) {
             if (translatableNames.contains(names.get(index))) {
