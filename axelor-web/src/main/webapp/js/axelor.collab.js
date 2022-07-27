@@ -79,26 +79,11 @@
 
 
           if (data.command === 'LEFT') {
-            delete users[user.id];
+            processLeft(user, users, scope);
           } else if (data.command === 'JOIN') {
-            users[user.id] = user || {};
-            users[user.id].$state = { joinDate: moment() };
+            processJoin(user, users);
           } else if (data.command === 'STATE') {
-            _.extend(users[user.id], user || {});
-            var msg = _.extend({}, data.message);
-            if (msg.version != null && msg.dirty === undefined) {
-              msg.dirty = false;
-            }
-            if (msg.version <= (scope.record || {}).version) {
-              delete msg.version;
-              delete msg.versionDate;
-            }
-            _.chain(Object.keys(msg)).filter(k => !_.endsWith(k, 'Date')).each(k => {
-              var dateKey = k + 'Date';
-              var dateValue = msg[dateKey];
-              msg[dateKey] = dateValue ? moment(dateValue) : moment();
-            });
-            users[user.id].$state = _.extend(users[user.id].$state || {}, msg);
+            processState(user, users, scope, data);
           }
 
           scope.users = Object.values(users);
@@ -109,6 +94,49 @@
         });
       });
     });
+
+    function processLeft(user, users, scope) {
+      user = users[user.id];
+      const state = (user || {}).$state || {};
+      const recordVersion = (scope.record || {}).version;
+
+      // Keep user if they saved the record.
+      if (state.version > recordVersion) {
+        state.leftDate = moment();
+        return;
+      }
+
+      delete users[user.id];
+    }
+
+    function processJoin(user, users) {
+      let state = (users[user.id] || {}).$state;
+      if (state) {
+        delete state.leftDate;
+      } else {
+        users[user.id] = user || {};
+        state = users[user.id].$state = {};
+      }
+      _.extend(state, { joinDate: moment() });
+    }
+
+    function processState(user, users, scope, data) {
+      _.extend(users[user.id], user || {});
+      var msg = _.extend({}, data.message);
+      if (msg.version != null && msg.dirty === undefined) {
+        msg.dirty = false;
+      }
+      if (msg.version <= (scope.record || {}).version) {
+        delete msg.version;
+        delete msg.versionDate;
+      }
+      _.chain(Object.keys(msg)).filter(k => !_.endsWith(k, 'Date')).each(k => {
+        var dateKey = k + 'Date';
+        var dateValue = msg[dateKey];
+        msg[dateKey] = dateValue ? moment(dateValue) : moment();
+      });
+      users[user.id].$state = _.extend(users[user.id].$state || {}, msg);
+    }
 
     function setInfo(scope) {
       scope.subtitle = null;
@@ -440,14 +468,19 @@
           const state = user.$state || {};
           const recordVersion = (scope.record || {}).version;
 
-          if (state.version > recordVersion
+          if (state.leftDate) {
+            dateKey = 'left';
+          } else if (state.version > recordVersion
             || state.version === recordVersion && user.code === currentUserCode) {
             dateKey = 'version';
           } else if (state.dirty && (state.version == null || state.version <= recordVersion)) {
             dateKey = 'dirty';
           }
 
-          if (dateKey === 'version') {
+          if (dateKey === 'left') {
+            user.$stateIcon = 'fa fa-sign-out text-error'
+            user.$tooltip = _t('Saved and left {0}', formatDate(state.leftDate));
+          } else if (dateKey === 'version') {
             user.$stateIcon = 'fa fa-floppy-o text-error';
             user.$tooltip = _t('Saved {0}', formatDate(state.versionDate));
           } else if (dateKey === 'dirty') {
