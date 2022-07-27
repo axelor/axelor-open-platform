@@ -294,7 +294,7 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ViewService', 'ActionService
     return doSave();
   };
 
-  $scope.onRefresh = function () {
+  $scope.onRefresh = $scope.reload = function () {
     $scope.$broadcast("on:refresh");
   };
 
@@ -553,7 +553,7 @@ ui.directive('uiCards', function () {
   return {
     link: function (scope, element, attrs) {
       var onRefresh = scope.onRefresh;
-      scope.onRefresh = function () {
+      scope.onRefresh = scope.reload = function () {
         scope.records = null;
         return onRefresh.apply(scope, arguments);
       };
