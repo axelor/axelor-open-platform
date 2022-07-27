@@ -197,7 +197,7 @@ ui.directive('reportBox', function() {
         "<i class='report-icon fa {{icon}}' ng-if='icon'/>" +
         "<div>" +
           "<h1>{{format(value)}}</h1>" +
-          "<small>{{label | t}}</small>" +
+          "<small>{{_t(label)}}</small>" +
           "<div class='font-bold pull-right' ng-class='percentStyle()' ng-show='percent'>" +
             "<span>{{percent | percent}}</span> <i class='fa' ng-class='percentLevelStyle()'/>" +
           "</div>" +
@@ -223,7 +223,7 @@ ui.directive('reportTable',  function() {
           var field = _.findWhere(schema.items, { name: name }) || {};
           var col = _.extend({}, field, field.widgetAttrs, {
             name: name,
-            title: field.title || field.autoTitle || _.humanize(name),
+            title: field.title || field.autoTitle || _t(_.humanize(name)),
             type: field.serverType || 'string'
           });
           fields[name] = col;
@@ -358,7 +358,7 @@ ui.directive('reportTable',  function() {
         "<thead ng-style='headerStyle'>" +
           "<tr>" +
             "<th ng-repeat='col in cols' ng-class='getType(col)' ng-click='onSort(col)'>" +
-              "<span>{{col.title | t}}</span>" +
+              "<span>{{col.title}}</span>" +
               "<span class='slick-sort-indicator' ng-class='sortIndicator(col)'/>" +
             "</th>" +
           "</tr>" +
