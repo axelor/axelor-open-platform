@@ -272,20 +272,20 @@ ui.directive('reportTable',  function() {
 
       scope.sums = sums;
 
-      scope.format = function(value, name) {
+      scope.format = function(row, name) {
+        var value = row[name];
         if (value == null) {
           return "";
         }
 
         var field = fields[name] || {};
         var type = scope.getType(field);
-        var context;
+        var context = _.extend({}, row);
 
         if (field.translatable && type === 'string') {
           var trKey = 'value:' + value;
           var trValue = _t(trKey);
           if (trValue !== trKey) {
-            context = {};
             context['$t:' + field.name] = trValue;
           }
         }
@@ -307,7 +307,9 @@ ui.directive('reportTable',  function() {
           var val = +(row[name]) || 0;
           res += val;
         });
-        return scope.format(res, name);
+        return scope.format({
+          [name]: res
+        }, name);
       };
 
       scope.getType = function (col) {
@@ -328,7 +330,7 @@ ui.directive('reportTable',  function() {
         }
         if (['integer', 'long', 'decimal'].indexOf(col.type) < 0) {
           scope.data = axelor.sortBy(scope.data, function (item) {
-            return scope.format(item[activeSort.key], activeSort.key) || '';
+            return scope.format(item, activeSort.key) || '';
           }, activeSort.descending);
         } else {
           scope.data = _.sortBy(scope.data, activeSort.descending ? function (item) {
@@ -365,7 +367,7 @@ ui.directive('reportTable',  function() {
         "</thead>" +
         "<tbody>" +
           "<tr ng-repeat='row in data'>" +
-            "<td ng-repeat='col in cols' ng-class='getType(col)' ng-bind-html='format(row[col.name], col.name)'/>" +
+            "<td ng-repeat='col in cols' ng-class='getType(col)' ng-bind-html='format(row, col.name)'/>" +
           "</tr>" +
         "</tbody>" +
         "<tfoot ng-if='sums.length' ng-style='footerStyle'>" +
