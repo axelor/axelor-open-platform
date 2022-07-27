@@ -80,3 +80,24 @@
 .report-table table thead th {
   box-shadow: inset -1px 0 #e7e7e7;
 }
+
+.report-table table tr td {
+  height: 28px;
+  line-height: 24px;
+  padding: 2px 8px;
+  margin: 0;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+.report-table table tr td .tag-select {
+  min-height: 25px;
+}
+
+.report-table table tr td .tag-select .label {
+  padding: 0px 5px;
+}
+
+.report-table table tr td .tag-select .tag-text {
+  line-height: 15px;
+}
