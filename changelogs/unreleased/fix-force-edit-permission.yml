@@ -1,0 +1,3 @@
+---
+title: Ignore forceEdit if user has no write permission
+type: fix

@@ -312,7 +312,8 @@ function FormViewCtrl($scope, $element) {
   };
 
   $scope.isEditable = function() {
-    return $scope.isForceEdit() || (editable && !$scope.isForceReadonly());
+    return $scope.hasPermission('write')
+      && ($scope.isForceEdit() || (editable && !$scope.isForceReadonly()));
   };
 
   $scope.setEditable = function() {
