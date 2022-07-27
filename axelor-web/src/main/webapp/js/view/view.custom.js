@@ -212,7 +212,7 @@ ui.directive('reportTable',  function() {
     link: function (scope, element, attrs) {
 
       var cols = [];
-      var sums = (attrs.sums||'').split(/\s*,\s*/);
+      var sums = attrs.sums ? attrs.sums.split(/\s*,\s*/) : [];
       var fields = {};
       var schema = scope.$parent.schema;
 
@@ -370,7 +370,7 @@ ui.directive('reportTable',  function() {
             "<td ng-repeat='col in cols' ng-class='getType(col)' ng-bind-html='format(row, col.name)'/>" +
           "</tr>" +
         "</tbody>" +
-        "<tfoot ng-if='sums.length' ng-style='footerStyle'>" +
+        "<tfoot ng-if='sums.length > 0' ng-style='footerStyle'>" +
           "<tr>" +
             "<td ng-repeat='col in cols' ng-class='getType(col)'>{{sum(col.name)}}</td>" +
           "</tr>" +
