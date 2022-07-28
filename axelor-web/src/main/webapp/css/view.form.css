@@ -1805,10 +1805,14 @@ label.has-help > span:after,
   font-size: 75%;
   line-height: 1;
   margin-top: 4px;
+  max-width: 150px;
+}
+
+.view-collaboration-user > a {
+  max-width: 250px;
 }
 
 .view-collaboration-action, .view-collaboration-user > a {
-  max-width: 250px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
