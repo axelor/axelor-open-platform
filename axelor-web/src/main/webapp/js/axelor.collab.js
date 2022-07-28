@@ -89,7 +89,6 @@
           scope.users = Object.values(users);
           applyStates(scope.users, data.states);
           scope.users.sort((a, b) => (a.$state || {}).joinDate - (b.$state || {}).joinDate);
-          scope.message = _t('{0} users', scope.users.length);
           setInfo(scope);
         });
       });
@@ -139,6 +138,7 @@
     }
 
     function setInfo(scope) {
+      scope.message = _t('{0} users', scope.users.length);
       scope.subtitle = null;
       scope.subtitleClass = null;
       scope.subtitleTooltip = null;
@@ -279,16 +279,30 @@
               version: version, versionDate: now,
               dirty: lastDirty, dirtyDate: now,
             });
-            scope.$emit('collaboration-users-updated', scope.users);
+            removeLeftUsers();
           }
         }
         lastVersion = version;
         if (attrsReset) {
           attrsReset = false;
-          setInfo(scope);
-          scope.$emit('collaboration-users-updated', scope.users);
+          removeLeftUsers();
         }
       });
+
+      function removeLeftUsers() {
+        const recordVersion = (scope.record || {}).version;
+        const users = _.filter(scope.users, user => {
+          if (!user) return false;
+          const state = user.$state || {};
+          if (!state.leftDate) return true;
+          return state.version > recordVersion;
+        });
+        const changed = (scope.users || []).length != users.length;
+        scope.users = users;
+        if (changed) {
+          setInfo(scope);
+        }
+      }
 
       const WAIT = 500;
       var lastDirty = false;
