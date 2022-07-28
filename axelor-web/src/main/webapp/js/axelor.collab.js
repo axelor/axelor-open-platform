@@ -470,8 +470,7 @@
 
           if (state.leftDate) {
             dateKey = 'left';
-          } else if (state.version > recordVersion
-            || state.version === recordVersion && user.code === currentUserCode) {
+          } else if (state.version > recordVersion) {
             dateKey = 'version';
           } else if (state.dirty && (state.version == null || state.version <= recordVersion)) {
             dateKey = 'dirty';
