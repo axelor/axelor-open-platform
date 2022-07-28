@@ -498,6 +498,14 @@
           return UserService.getName(user);
         };
 
+        scope.userNameOrMe = function (user) {
+          return (user || {}).code === currentUserCode ? _t("Me") : UserService.getName(user);
+        };
+
+        scope.userNameStyle = function (user) {
+          return (user || {}).code === currentUserCode ? 'self-collaboration-user' : null;
+        }
+
         scope.userInitial = function (user) {
           return UserService.getName(user)[0];
         };
@@ -537,7 +545,7 @@
                     <span ng-if="!user.$avatar">{{userInitial(user)}}</span>
                     <img ng-if='user.$avatar' ng-src='{{user.$avatar}}' alt="{{userName(user)}}">
                   </span>
-                  {{userName(user)}}
+                  <span ng-bind="userNameOrMe(user)" ng-class="userNameStyle(user)"/>
                 </span>
               </a>
             </li>

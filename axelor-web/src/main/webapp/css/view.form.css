@@ -1844,6 +1844,10 @@ label.has-help > span:after,
   margin-bottom: -3px;
 }
 
+.self-collaboration-user {
+	font-style: italic;
+}
+
 .blind-collaboration-user {
   opacity: 0.5;
 }
