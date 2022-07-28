@@ -408,13 +408,6 @@ public class CollaborationChannel extends Channel {
                 User.class.getName(), user.getId(), user.getVersion()));
       }
 
-      final boolean canViewCollaboration =
-          Optional.of(user).map(User::getGroup).map(Group::getCanViewCollaboration).orElse(false);
-
-      if (!canViewCollaboration) {
-        values.put('$' + CAN_VIEW_COLLABORATION, canViewCollaboration);
-      }
-
       return values;
     }
   }

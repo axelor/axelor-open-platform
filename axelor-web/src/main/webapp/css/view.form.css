@@ -1845,11 +1845,7 @@ label.has-help > span:after,
 }
 
 .self-collaboration-user {
-	font-style: italic;
-}
-
-.blind-collaboration-user {
-  opacity: 0.5;
+  font-style: italic;
 }
 
 ::-webkit-input-placeholder {

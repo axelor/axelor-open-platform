@@ -490,8 +490,6 @@
             user.$stateIcon = 'fa fa-file-text-o text-success';
             user.$tooltip = _t('Joined {0}', formatDate(state.joinDate));
           }
-
-          user.$class = user.$canViewCollaboration === false ? 'blind-collaboration-user' : null;
         };
 
         scope.userName = function (user) {
@@ -540,13 +538,11 @@
             <li ng-repeat="user in users track by user.id" title={{user.$tooltip}} class="view-collaboration-user">
               <a href="">
                 <i class="view-collaboration-state" ng-show="user.$stateIcon" ng-class="user.$stateIcon"/>
-                <span ng-class="user.$class">
-                  <span class="avatar" ng-class="userColor(user)" title="{{userName(user)}}">
-                    <span ng-if="!user.$avatar">{{userInitial(user)}}</span>
-                    <img ng-if='user.$avatar' ng-src='{{user.$avatar}}' alt="{{userName(user)}}">
-                  </span>
-                  <span ng-bind="userNameOrMe(user)" ng-class="userNameStyle(user)"/>
+                <span class="avatar" ng-class="userColor(user)" title="{{userName(user)}}">
+                  <span ng-if="!user.$avatar">{{userInitial(user)}}</span>
+                  <img ng-if='user.$avatar' ng-src='{{user.$avatar}}' alt="{{userName(user)}}">
                 </span>
+                <span ng-bind="userNameOrMe(user)" ng-class="userNameStyle(user)"/>
               </a>
             </li>
           </ul>
