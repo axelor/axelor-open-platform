@@ -193,7 +193,7 @@ ui.directive('reportTable',  function() {
           var field = _.findWhere(schema.items, { name: name }) || {};
           var col = _.extend({}, field, field.widgetAttrs, {
             name: name,
-            title: _.humanize(name)
+            title: field.title || field.autoTitle || _t(_.humanize(name)),
           });
           fields[name] = col;
           cols.push(col);
@@ -220,8 +220,18 @@ ui.directive('reportTable',  function() {
         if (value === null || value === undefined) {
           return "";
         }
-        var field = fields[name];
-        if (field && field.scale) {
+        var field = fields[name] || {};
+        if (field.translatable) {
+          var trKey = 'value:' + value;
+          var trValue = _t(trKey);
+          if (trValue !== trKey) {
+            return trValue;
+          }
+        }
+        if (field.selection) {
+          return ui.formatters.selection(field, value);
+        }
+        if (field.scale) {
           var val = +(value);
           if (_.isNumber(val)) {
             return val.toFixed(field.scale);
