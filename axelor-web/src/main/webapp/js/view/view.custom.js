@@ -229,7 +229,7 @@ ui.directive('reportTable',  function() {
           }
         }
         if (field.selection) {
-          return ui.formatters.selection(field, value);
+          return ui.formatters.selection(field, value + '');
         }
         if (field.scale) {
           var val = +(value);
