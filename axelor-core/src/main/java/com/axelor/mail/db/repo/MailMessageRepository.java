@@ -37,10 +37,8 @@ import com.axelor.mail.db.MailMessage;
 import com.axelor.mail.service.MailService;
 import com.axelor.meta.MetaFiles;
 import com.axelor.meta.MetaStore;
-import com.axelor.meta.db.MetaAction;
 import com.axelor.meta.db.MetaAttachment;
 import com.axelor.meta.db.MetaFile;
-import com.axelor.meta.db.repo.MetaActionRepository;
 import com.axelor.meta.db.repo.MetaAttachmentRepository;
 import com.axelor.meta.schema.views.Selection;
 import com.axelor.rpc.Resource;
@@ -66,8 +64,6 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
   @Inject private MailService mailService;
 
   @Inject private MetaAttachmentRepository attachmentRepo;
-
-  @Inject private MetaActionRepository actionRepo;
 
   private Logger log = LoggerFactory.getLogger(MailMessageRepository.class);
 
@@ -353,14 +349,6 @@ public class MailMessageRepository extends JpaRepository<MailMessage> {
 
     if (author != null) {
       final String authorModel = EntityHelper.getEntityClass(author).getName();
-      final MetaAction authorAction =
-          actionRepo
-              .all()
-              .filter("self.type = 'action-view' and self.model = ?", authorModel)
-              .fetchOne();
-      if (authorAction != null) {
-        details.put("$authorAction", authorAction.getName());
-      }
       details.put("$authorModel", authorModel);
     }
 
