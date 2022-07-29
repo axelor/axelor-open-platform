@@ -1,0 +1,7 @@
+---
+title: Fix the view opened on mail thread creator link
+type: fix
+description: |
+  The `user-info-form` view can be bypassed if we refresh the browser tab after 
+  clicking on mail thread creator. The view is now opened in popup. If no view 
+  is defined, nothing is opened (no more fallback on `user-form`).
