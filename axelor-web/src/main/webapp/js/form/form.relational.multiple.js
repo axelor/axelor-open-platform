@@ -835,10 +835,25 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
       }
       scope.showEditor(item);
     };
+
+    scope.isRequired = function() {
+      return scope.attr("required") && _.isEmpty(scope.text);
+    };
+
+    scope.validate = function (viewValue) {
+      return !scope.isRequired() || !_.isEmpty(viewValue);
+    };
   },
 
   link: function(scope, element, attrs, model) {
     this._super.apply(this, arguments);
+
+    var validate = model.$validators.valid || function () { return true; };
+    model.$validators.valid = function(modelValue, viewValue) {
+      if (scope.isRequired() && _.isEmpty(viewValue)) return false;
+      return validate.call(model.$validators, viewValue);
+    };
+
     var field = scope.field;
     // special case for json fields
     if (field.jsonField) {
