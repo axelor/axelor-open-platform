@@ -1098,10 +1098,9 @@ ui.formWidget('PanelMail', {
 
     $scope.showAuthor = function (message) {
       var msg = message || {};
-      var act = msg.$authorAction;
       var author = msg.$author;
       var model = msg.$authorModel;
-      if (!author || !author.id) {
+      if (!author || !author.id || model !== "com.axelor.auth.db.User") {
         return;
       }
 
@@ -1109,7 +1108,7 @@ ui.formWidget('PanelMail', {
         NavService.openTab({
           title: _t('User'),
           action: _.uniqueId('$act'),
-          model: model,
+          model: "com.axelor.auth.db.User",
           viewType: "form",
           $popupParent: true,
           views: [{ type: "form", name: name }],
@@ -1125,7 +1124,7 @@ ui.formWidget('PanelMail', {
         });
       }
 
-      ViewService.getMetaDef(model, {
+      ViewService.getMetaDef("com.axelor.auth.db.User", {
         type: 'form',
         name: 'user-info-form'
       }).then(function (meta) {

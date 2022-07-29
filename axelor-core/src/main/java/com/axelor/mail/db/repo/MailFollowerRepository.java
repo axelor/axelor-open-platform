@@ -147,7 +147,6 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
 
     final List<Map<String, Object>> all = new ArrayList<>();
     final MailService mailService = Beans.get(MailService.class);
-    final MetaActionRepository actionRepo = Beans.get(MetaActionRepository.class);
 
     for (MailFollower follower : followers) {
       if (follower.getArchived() == Boolean.TRUE) {
@@ -162,14 +161,6 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
       }
       final Map<String, Object> details = new HashMap<>();
       final String authorModel = EntityHelper.getEntityClass(author).getName();
-      final MetaAction authorAction =
-          actionRepo
-              .all()
-              .filter("self.type = 'action-view' and self.model = ?", authorModel)
-              .fetchOne();
-      if (authorAction != null) {
-        details.put("$authorAction", authorAction.getName());
-      }
       details.put("$authorModel", authorModel);
       details.put("id", follower.getId());
       details.put("$author", Resource.toMapCompact(author));
