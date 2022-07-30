@@ -1787,6 +1787,10 @@ label.has-help > span:after,
   font-size: 14px;
 }
 
+.view-collaboration {
+  max-height: 32px;
+}
+
 .view-collaboration .button-menu a.btn {
   display: inline-flex;
   flex-direction: column;
