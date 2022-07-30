@@ -163,8 +163,7 @@
         return;
       }
 
-      var dirtyUsers;
-      dirtyUsers = scope.users.filter(u => (u.$state || {}).dirty
+      var dirtyUsers = scope.users.filter(u => (u.$state || {}).dirty
         && ((u.$state || {}).version == null || (u.$state || {}).version <= recordVersion)
         && u.code !== currentUserCode);
       if (!_.isEmpty(dirtyUsers)) {
@@ -220,14 +219,16 @@
           }
           var index = scopes.indexOf(scope);
           if (index >= 0) {
-            console.error("Already joined: " + key);
+            console.error(`Already joined: ${key}`);
             return;
           }
           scopes.push(scope)
           allUsers[key] = {};
 
           var message;
-          if (scope.isDirty()) message = _.extend(message || {}, { dirty: true });
+          if (scope.isDirty()) {
+            message = _.extend(message || {}, { dirty: true });
+          }
 
           channel.send({ command: 'JOIN', model: model, recordId: id, message: message });
           scope.users = [];
@@ -491,16 +492,16 @@
           }
 
           if (dateKey === 'left') {
-            user.$stateIcon = 'fa fa-sign-out text-error'
+            user.$stateIcon = 'fa-sign-out text-error'
             user.$tooltip = _t('Saved and left {0}', formatDate(state.leftDate));
           } else if (dateKey === 'version') {
-            user.$stateIcon = 'fa fa-floppy-o text-error';
+            user.$stateIcon = 'fa-floppy-o text-error';
             user.$tooltip = _t('Saved {0}', formatDate(state.versionDate));
           } else if (dateKey === 'dirty') {
-            user.$stateIcon = 'fa fa-pencil text-warning';
+            user.$stateIcon = 'fa-pencil text-warning';
             user.$tooltip = _t('Editing since {0}', formatDate(state.dirtyDate));
           } else {
-            user.$stateIcon = 'fa fa-file-text-o text-success';
+            user.$stateIcon = 'fa-file-text-o text-success';
             user.$tooltip = _t('Joined {0}', formatDate(state.joinDate));
           }
         };
@@ -550,12 +551,12 @@
           <ul class="dropdown-menu pull-right">
             <li ng-repeat="user in users track by user.id" title={{user.$tooltip}} class="view-collaboration-user">
               <a href="">
-                <i class="view-collaboration-state" ng-show="user.$stateIcon" ng-class="user.$stateIcon"/>
-                <span class="avatar" ng-class="userColor(user)" title="{{userName(user)}}">
-                  <span ng-if="!user.$avatar">{{userInitial(user)}}</span>
-                  <img ng-if='user.$avatar' ng-src='{{user.$avatar}}' alt="{{userName(user)}}">
+                <i class="view-collaboration-state fa" ng-class="user.$stateIcon"/>
+                <span class="avatar" ng-class="userColor(user)" title="{{::userName(user)}}">
+                  <span ng-if="!user.$avatar">{{::userInitial(user)}}</span>
+                  <img ng-if='user.$avatar' ng-src='{{user.$avatar}}' alt="{{::userName(user)}}">
                 </span>
-                <span ng-bind="userNameOrMe(user)" ng-class="userNameStyle(user)"/>
+                <span ng-bind="::userNameOrMe(user)" ng-class="::userNameStyle(user)"/>
               </a>
             </li>
           </ul>
