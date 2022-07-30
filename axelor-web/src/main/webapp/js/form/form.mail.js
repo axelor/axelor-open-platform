@@ -205,7 +205,10 @@ ui.directive('uiMailMessage', ['UserService', function (UserService) {
       if (message.$avatar) {
         var url = message.$avatar;
         delete message.$avatar;
-        UserService.checkUrl(url, () => message.$avatar = url);
+        UserService.checkUrl(url, () => {
+          message.$avatar = url;
+          scope.$timeout(() => element.find('.avatar').css('background-color', ''));
+        });
       }
 
       var body = message.body || "{}";
@@ -271,9 +274,9 @@ ui.directive('uiMailMessage', ['UserService', function (UserService) {
       }
 
       message.$title = (body||{}).title || message.subject;
-      if (!message.$avatar) {
-        var a = scope.$userName(message) || "";
-        message.$a = a[0] || "?";
+
+      scope.userInitial = function (message) {
+        return (scope.$userName(message) || '')[0] || '?';
       }
 
       scope.showFull = !message.summary;
@@ -298,7 +301,7 @@ ui.directive('uiMailMessage', ['UserService', function (UserService) {
       "<div class='fade'>" +
         "<a href='' class='pull-left avatar' ng-class='userColor(message)' title='{{::$userName(message)}}' ng-click='showAuthor(message)'>" +
           "<img ng-if='message.$avatar' ng-src='{{::message.$avatar}}' width='32px'>" +
-          "<span ng-if='message.$a'>{{::message.$a}}</span>" +
+          "<span ng-if='!message.$avatar'>{{::userInitial(message)}}</span>" +
         "</a>" +
         "<div class='mail-message'>" +
           "<span class='arrow left'></span>" +
