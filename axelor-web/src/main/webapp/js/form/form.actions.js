@@ -1101,8 +1101,10 @@ ActionHandler.prototype = {
           break;
         case 'url':
         case 'url:set':
-          if (item.is('[ui-portlet]')) {
-            item.find('iframe:first').attr('src', value);
+          if (item.is('[ui-dashlet]')) {
+            itemScope.waitForActions(function () {
+              item.find('iframe:first').attr('src', value);
+            }, 100);
           }
           break;
         case 'value':
