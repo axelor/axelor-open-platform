@@ -38,8 +38,7 @@ The following attributes can be changed:
 * `hidden` - show/hide the field
 * `domain` - change the domain filter of relational field
 * `title` - change the title of the field
-* `value` - the value to set
-* `value:set` - same as `value`
+* `value` or `value:set` - the value to set
 * `value:add` - add a new item to the multi-valued relational field
 * `value:del` - remove an item from the multi-valued relational field value
 * `collapse` - collapsed state of a panel
@@ -49,3 +48,7 @@ The following attributes can be changed:
 * `icon` - icon of an element
 * `refresh` - refresh a dashlet
 * `selection-in` - The filter on the selection
+* `focus` - focus the field
+* `active` - open the given panel if included in a panel-tabs
+* `url` or `url:set` - change the iframe url in dashlet
+* `prompt` - change prompt message of button
