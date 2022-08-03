@@ -1,3 +1,0 @@
----
-title: Fix uninitialized injector when running database task
-type: fix

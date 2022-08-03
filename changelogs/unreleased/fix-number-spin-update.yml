@@ -1,5 +1,0 @@
----
-title: Don’t update the number value on spin events
-type: fix
-description: |
-  This fixes action iconsistencies between changing number value via manual input and spinner.

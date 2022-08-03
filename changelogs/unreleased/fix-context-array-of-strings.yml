@@ -1,9 +1,0 @@
----
-title: Fix array of strings in context
-type: fix
-description: |
-  For example:
-
-  ```xml
-    <context name="_myStrings" expr="eval: ['hello', 'world']"/>
-  ```

@@ -1,8 +1,0 @@
-title: Minor fields tracking UI improvements
-type: feature
-description: |
-  Add minor fields tracking UI improvements : 
-  
-  - Use right arrow character instead of right angle quote
-  - Display `None` instead of an empty value
-  - On create event, don't generate tracking on empty field

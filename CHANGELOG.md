@@ -1,3 +1,184 @@
+## 6.0.2 (2022-08-03)
+
+#### Features
+
+* Improve report-box template in custom view
+
+  <details>
+  
+  * Implement icon attribute
+  * Format value
+  * Translate label
+  * Implement dynamic percent style
+  * Implement dynamic percent level style
+  * Fix tag positioning
+  
+  </details>
+
+* Add config to define the maximum number of items displayed per page.
+
+  <details>
+  
+  Introduce new config `api.pagination.max-per-page` :
+  
+  ```
+  # Define the maximum number of items per page
+  api.pagination.max-per-page = 1000
+  ```
+  
+  This config is used globally in UI to limit and set the maximum number of items 
+  displayed per page. -1 means unlimited (default value). This will block users who 
+  try to get a high number of records. Fetch a too large dataset can result in 
+  some high server side load.
+  
+  </details>
+
+* Minor fields tracking UI improvements
+
+  <details>
+  
+  Add minor fields tracking UI improvements : 
+  
+  - Use right arrow character instead of right angle quote
+  - Display `None` instead of an empty value
+  - On create event, don't generate tracking on empty field
+  
+  </details>
+
+* Improve `report-table` custom view
+
+  <details>
+  
+  * Translate titles
+  * Use title attribute from fields
+  * Preserve column declaration order from dataset if report-table columns
+  attribute is not specified
+  * Format data according to field type, including selection with translation
+  * Support field translatable attribute
+  * Sticky header and footer
+  * Skip having to define data='data'
+  * Ability to sort by columns
+  * Ability to use widgets supported in grid views
+  * Allow to export dataset from dashlet export button
+  
+  Example:
+  ```xml
+  <custom name="my-report-order-lines" title="Order lines">
+    <field name="statusSelect" type="integer" selection="selection-order-status" title="Status"/>
+    <field name="product" type="string" x-translatable="true"/>
+    <field name="total" type="decimal" x-scale="2" />
+    <dataset type="jpql" limit="10">
+    <![CDATA[
+    SELECT self.name AS name, self.statusSelect AS statusSelect,
+           item.product.name as product, item.quantity * item.price AS total
+    FROM Order self
+    LEFT JOIN self.customer AS c
+    LEFT JOIN self.items AS item
+    WHERE c = :customer
+    ORDER BY self.name
+    ]]>
+    </dataset>
+    <template>
+    <![CDATA[
+    <report-table sums='total'></report-table>
+    ]]>
+    </template>
+  </custom>
+  ```
+  
+  </details>
+
+#### Fixed
+
+* Fix chart dashlet data export
+* Fix unregistered request scope causing database task to fail
+
+  <details>
+  
+  If application has any bound RequestScoped classes, it will cause the database task to fail
+  to install AppModule with "No scope is bound to com.google.inject.servlet.RequestScoped." error.
+  
+  </details>
+
+* Fix advanced search with custom any-to-many fields
+* Fix html view height in popup
+* Ignore forceEdit if user has no write permission
+* Fix TypeError when user has insufficient permission to display a panel tab
+* Fix duplicate data loading of kanban dashlet inside form view
+* Fix context of kanban in dashlet
+
+  <details>
+  
+  Apply the same context behavior as other dashlets,
+  ie. merge action-view context with current record context.
+  
+  Instead of domain, use criteria (as it is done for calendars) for the `columnBy` filter,
+  as to avoid conflict with current record context.
+  
+  </details>
+
+* Fix reload action on cards and kanban view
+* Fix grid JS error if action sent a list of IDs instead of a list of records
+* Don’t update the number value on spin events
+
+  <details>
+  
+  This fixes action iconsistencies between changing number value via manual input and spinner.
+  
+  </details>
+
+* Take into account view-param limit on kanban views
+* Fix spurious invalid fields notice when master detail is not shown
+* Fix adding row on top editable grid when editor buttons are disabled
+* Prevent popup from handling editable grid key down events
+
+  <details>
+  
+  This fixes popup closing when pressing escape in editable grid.
+  
+  </details>
+
+* Fix the view opened on mail thread creator link
+
+  <details>
+  
+  The `user-info-form` view can be bypassed if we refresh the browser tab after 
+  clicking on mail thread creator. The view is now opened in popup. If no view 
+  is defined, nothing is opened (no more fallback on `user-form`).
+  
+  </details>
+
+* Fix grid column search combined with predefined and custom search filters
+* Don’t check for CSRF tokens with direct clients
+* Don't reload dashlet calendar data when the widget is not visible
+* Fix adding row on grouped editable grid
+* Fix array of strings in context
+
+  <details>
+  
+  For example:
+  
+  ```xml
+    <context name="_myStrings" expr="eval: ['hello', 'world']"/>
+  ```
+  
+  </details>
+
+* Commit editable grid when closing popup without confirming
+
+  <details>
+  
+  In a popup containing an editable grid, the line being edited was not committed if we directly
+  close the popup via the "OK" button without clicking on "Confirm" in the editable grid.
+  
+  </details>
+
+* Fix missing group on views and menus when loading
+* Fix emptying a field using SingleSelect widget
+* Fix uninitialized injector when running database task
+* Fix broken translation popup
+* Fix exporting selection field if multi-select widget is used
+
 ## 6.0.1 (2022-06-27)
 
 #### Changes
