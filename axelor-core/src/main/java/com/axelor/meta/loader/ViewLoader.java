@@ -147,7 +147,6 @@ public class ViewLoader extends AbstractParallelLoader {
     migrateViews();
   }
 
-  @Transactional
   protected void terminate(boolean update) {
     linkMissingGroups();
     generateFinalViews(update);
@@ -176,7 +175,8 @@ public class ViewLoader extends AbstractParallelLoader {
     }
   }
 
-  private void linkMissingGroups() {
+  @Transactional
+  protected void linkMissingGroups() {
     if (ObjectUtils.isEmpty(groupsToCreate)) {
       return;
     }
