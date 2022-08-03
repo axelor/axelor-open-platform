@@ -1,3 +1,0 @@
----
-title: Fix grid JS error if action sent a list of IDs instead of a list of records
-type: fix

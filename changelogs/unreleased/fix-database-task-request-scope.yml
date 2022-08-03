@@ -1,6 +1,0 @@
----
-title: Fix unregistered request scope causing database task to fail
-type: fix
-description: |
-  If application has any bound RequestScoped classes, it will cause the database task to fail
-  to install AppModule with "No scope is bound to com.google.inject.servlet.RequestScoped." error.

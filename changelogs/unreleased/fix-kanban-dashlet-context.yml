@@ -1,9 +1,0 @@
----
-title: Fix context of kanban in dashlet
-type: fix
-description: |
-  Apply the same context behavior as other dashlets,
-  ie. merge action-view context with current record context.
-
-  Instead of domain, use criteria (as it is done for calendars) for the `columnBy` filter,
-  as to avoid conflict with current record context.
