@@ -819,6 +819,39 @@
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>
+    <xsd:attribute name="x-preview-style" default="tab">
+      <xsd:annotation>
+        <xsd:documentation>
+          Markdown editor's preview style: `tab` (default), `vertical`
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="tab"/>
+          <xsd:enumeration value="vertical"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="x-initial-edit-type" default="markdown">
+      <xsd:annotation>
+        <xsd:documentation>
+          Initial markdown widget editor type: `markdown` (default), `wysiwyg`
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="markdown"/>
+          <xsd:enumeration value="wysiwyg"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="x-hide-mode-switch" type="xsd:boolean" default="false">
+      <xsd:annotation>
+        <xsd:documentation>
+          Whether to hide edit type switch tab bar (defaults to `false`)
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
   </xsd:attributeGroup>
 
   <xsd:attributeGroup name="RelationalAttributes">
