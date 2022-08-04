@@ -449,7 +449,7 @@ little version of the widget.
 == Markdown
 
 The Markdown widget is implemented with https://github.com/nhn/tui.editor[TOAST UI Editor]
-and supports GitHub Flavored Markdown.
+and supports https://commonmark.org/[CommonMark] and https://github.github.com/gfm/[GFM] specifications.
 
 [source,xml]
 ----
@@ -463,7 +463,7 @@ and supports GitHub Flavored Markdown.
 |`x-lite`              | Enable lite toolbar (defaults to `false`)
 |`x-preview-style`     | Markdown editor's preview style: `tab` (default), `vertical`
 |`x-initial-edit-type` | Initial editor type: `markdown` (default), `wysiwyg`
-|`x-autofocus`         | Automatically focus on edit  (defaults to `false`)
+|`x-hide-mode-switch` | Whether to hide edit typo switch tab bar (defaults to `false`)
 |===
 
 == Extra Attributes

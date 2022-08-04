@@ -278,7 +278,8 @@
         ["scrollSync"]
       ];
 
-      var field = scope.field || {}
+      var field = scope.field || {};
+      var widgetAttrs = field.widgetAttrs;
 
       if (field.lite) {
         var liteToolbarItems = [];
@@ -291,21 +292,21 @@
         toolbarItems = liteToolbarItems;
       }
 
-      var widgetAttrs = _.extend({}, (scope.field || {}).widgetAttrs);
-      _.each(Object.keys(widgetAttrs), function (key) {
-        var value = widgetAttrs[key];
-        if (value === 'true') value = true;
-        else if (value === 'false') value = false;
-        else if (!isNaN(value)) value = +value;
-        widgetAttrs[key] = value;
-      });
+      var moreOptions = {};
+      moreOptions['previewStyle'] = widgetAttrs.previewStyle || 'tab';
+      moreOptions['initialEditType'] = widgetAttrs.initialEditType || 'markdown';
+      moreOptions['hideModeSwitch'] = widgetAttrs.hideModeSwitch || false;
 
       ['height', 'placeholder'].forEach(function (attr) {
         var value = field[attr];
         if (value !== undefined) {
-          widgetAttrs[attr] = value;
+          moreOptions[attr] = value;
         }
       });
+
+      if (field.height && /^(\d+)$/.test(field.height)) {
+        moreOptions.height = field.height + 'px';
+      }
 
       scope.$render_editable = function () {
         var value = getValue(scope);
@@ -340,7 +341,7 @@
             }
           }
         };
-        _.extend(options, widgetAttrs);
+        _.extend(options, moreOptions);
 
         // Need to create new editor each time, until undo/redo history reset is supported:
         // https://github.com/nhn/tui.editor/issues/2010
