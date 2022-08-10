@@ -77,6 +77,7 @@ public class AuthPac4jModule extends ShiroWebModule {
     addFilterChain("/login.jsp", Key.get(AxelorLoginPageFilter.class));
     addFilterChain("/logout", Key.get(AxelorLogoutFilter.class));
     addFilterChain("/callback", Key.get(AxelorCallbackFilter.class));
+    addFilterChain("/callback/**", Key.get(AxelorCallbackFilter.class));
     addFilterChain("/**", Key.get(AxelorSecurityFilter.class));
 
     bindRealm().to(AuthPac4jRealm.class);
