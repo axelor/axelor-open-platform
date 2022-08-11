@@ -27,7 +27,7 @@ ui.HtmlViewCtrl.$inject = ['$scope', '$element', '$sce', '$interpolate'];
 function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
 
   var views = $scope._views;
-  var stamp = -1;
+  var stamp = 0;
 
   $scope.view = views.html;
 
@@ -61,12 +61,14 @@ function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
     $scope.updateRoute();
   };
 
-  $scope.onRefresh = function () {
-    if (stamp > -1) {
-      stamp = new Date().getTime();
-    } else {
-      stamp = 0;
+  $scope.$on('on:tab-reload', function(e, tab) {
+    if ($scope === e.targetScope && $scope.onRefresh) {
+      $scope.onRefresh();
     }
+  });
+
+  $scope.onRefresh = function () {
+    stamp = new Date().getTime();
   };
 
   $scope.getRouteOptions = function() {
