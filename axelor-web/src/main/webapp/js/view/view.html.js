@@ -68,9 +68,26 @@ function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
     }
   });
 
+  var updateTimer = null;
   $scope.onRefresh = function () {
-    stamp = new Date().getTime();
+    if (updateTimer != null) {
+      clearTimeout(updateTimer);
+    }
+    updateTimer = $scope.$timeout(function () {
+      stamp = new Date().getTime();
+      updateTimer = null;
+    }, 300);
   };
+
+  $scope.$on("on:edit", function (event, rec) {
+    if (rec && rec.id) {
+      $scope.onRefresh();
+    }
+  });
+
+  $scope.$on("on:new", function () {
+    $scope.onRefresh();
+  });
 
   $scope.getRouteOptions = function() {
     return {
