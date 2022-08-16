@@ -5,7 +5,7 @@
 
   <grid name="meta-schedule-grid" title="Schedules" model="com.axelor.meta.db.MetaSchedule" editable="true">
     <toolbar>
-      <button name="btnRestart" showIf="isServiceEnable" title="Restart jobs" prompt="This may terminate any running jobs. Are sure to continue ?" onClick="save,com.axelor.meta.web.JobController:restart"/>
+      <button name="btnRestart" showIf="isServiceEnable" title="Restart jobs" prompt="This may terminate any running jobs. Are sure to continue ?" onClick="com.axelor.meta.web.JobController:restart"/>
       <button name="btnStop" showIf="isServiceEnable" title="Stop service" prompt="This may terminate any running jobs. Are sure to continue ?" onClick="com.axelor.meta.web.JobController:stop"/>
     </toolbar>
     <field name="name" />
