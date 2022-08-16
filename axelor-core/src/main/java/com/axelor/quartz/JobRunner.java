@@ -217,9 +217,13 @@ public class JobRunner {
   /** Reconfigure the scheduler and restart. */
   public void restart() {
     try {
-      scheduler.clear();
+      if (scheduler.isShutdown()) {
+        scheduler = Beans.get(Scheduler.class);
+      } else {
+        scheduler.clear();
+      }
     } catch (SchedulerException e) {
-      log.error("Unable to clear existing jobs...");
+      log.error("Unable to restart the scheduler...");
       log.trace("Scheduler error: {}", e.getMessage(), e);
       throw new RuntimeException(e);
     }
