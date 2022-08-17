@@ -35,7 +35,6 @@ import com.google.common.primitives.Longs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.quartz.CronScheduleBuilder;
@@ -68,14 +67,17 @@ public class JobRunner {
 
   private int total;
 
-  @Inject
-  public JobRunner(Scheduler scheduler) {
-    this.scheduler = scheduler;
-  }
-
   @CallMethod
   public boolean isEnabled() {
     return AppSettings.get().getBoolean(AvailableAppSettings.QUARTZ_ENABLE, false);
+  }
+
+  private boolean isStopped() {
+    try {
+      return scheduler == null || scheduler.isShutdown();
+    } catch (SchedulerException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /** Configure all schedulers. */
@@ -170,6 +172,10 @@ public class JobRunner {
       throw new IllegalStateException(I18n.get("The scheduler service is disabled."));
     }
 
+    if (isStopped()) {
+      throw new IllegalStateException(I18n.get("The scheduler service has been stopped."));
+    }
+
     Preconditions.checkNotNull(meta);
 
     JobKey jobKey = new JobKey(meta.getName());
@@ -191,6 +197,9 @@ public class JobRunner {
     if (!isEnabled()) {
       throw new IllegalStateException(I18n.get("The scheduler service is disabled."));
     }
+    if (isStopped()) {
+      scheduler = Beans.get(Scheduler.class);
+    }
     this.configure();
     log.info("Starting scheduler...");
     try {
@@ -205,9 +214,16 @@ public class JobRunner {
 
   /** Stop the scheduler. */
   public void stop() {
+    if (isStopped()) {
+      log.info("The job scheduler is already stopped.");
+      return;
+    }
+
     log.info("Stopping scheduler...");
+
     try {
       scheduler.shutdown(true);
+      scheduler = null;
     } catch (SchedulerException e) {
       log.error("Unable to stop the scheduler...");
       log.trace("Scheduler error: {}", e.getMessage(), e);
@@ -217,16 +233,14 @@ public class JobRunner {
 
   /** Reconfigure the scheduler and restart. */
   public void restart() {
-    try {
-      if (scheduler.isShutdown()) {
-        scheduler = Beans.get(Scheduler.class);
-      } else {
+    if (!isStopped()) {
+      try {
         scheduler.clear();
+      } catch (SchedulerException e) {
+        log.error("Unable to clear existing jobs...");
+        log.trace("Scheduler error: {}", e.getMessage(), e);
+        throw new RuntimeException(e);
       }
-    } catch (SchedulerException e) {
-      log.error("Unable to restart the scheduler...");
-      log.trace("Scheduler error: {}", e.getMessage(), e);
-      throw new RuntimeException(e);
     }
     total = 0;
     this.start();
@@ -235,12 +249,7 @@ public class JobRunner {
   public void onRemove(
       @Observes @Named(PreRequest.REMOVE) @EntityType(MetaSchedule.class) PreRequest event) {
 
-    if (!isEnabled()) return;
-    try {
-      if (scheduler.isShutdown()) return;
-    } catch (SchedulerException e) {
-      // ignore
-    }
+    if (!isEnabled() || isStopped()) return;
 
     List<Object> records = new ArrayList<>();
     if (event.getRequest().getRecords().isEmpty()) {
