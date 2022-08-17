@@ -546,7 +546,20 @@ ActionHandler.prototype = {
       deferred.reject();
       return deferred.promise;
     }
-    if (validateOnly || (scope.isDirty && !scope.isDirty())) {
+
+    // Record may not be dirty but still have default values to save
+    function isSavable() {
+      if (scope.isDirty && scope.isDirty()) return true;
+      return !(scope.record || {}).id && notEmpty(scope.record);
+    }
+
+    function notEmpty(record) {
+      return _.some(record, function (value) {
+        return _.isObject(value) ? notEmpty(value) : value !== undefined;
+      });
+    }
+
+    if (validateOnly || !isSavable()) {
       deferred.resolve();
       return deferred.promise;
     }
