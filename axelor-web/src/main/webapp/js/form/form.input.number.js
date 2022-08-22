@@ -53,7 +53,24 @@ ui.formInput('Number', {
       var scale = [scope.attr('scale'), (props.widgetAttrs || {}).scale, props.scale]
         .find(function (val) { return val !== undefined && val !== null; });
       if (_.isString(scale)) {
-        scale = scope.$eval(scale, scope.getContext());
+        var context = scope.getContext();
+        _.chain(scope.fields).map(function (field) {
+          return (field || {}).name;
+        }).filter(function (fieldName) {
+          return _.contains(fieldName, '.');
+        }).each(function (fieldName) {
+          var val = context[fieldName];
+          if (val !== undefined) {
+            ui.setNested(context, fieldName, val);
+          }
+        });
+        var jsonField = _.find((scope.handler || {}).fields, function (field) {
+          return field.json;
+        });
+        if (jsonField && context[jsonField.name] !== undefined) {
+          context[jsonField.name] = angular.fromJson(context[jsonField.name]);
+        }
+        scale = scope.$eval(scale, context);
       }
       return _.isNumber(scale) ? scale : 2;
     };

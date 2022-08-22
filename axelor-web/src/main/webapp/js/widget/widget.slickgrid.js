@@ -132,11 +132,24 @@ var Formatters = {
       .find(function (val) { return val !== undefined && val !== null; });
     if (_.isString(scale)) {
       context = _.extend({}, context);
-      Object.keys(context)
-        .filter(function (name) { return name.indexOf(".") >= 0; })
-        .forEach(function (name) {
-          ui.setNested(context, name, context[name]);
-      });
+      if ((grid || {}).cols) {
+        grid.cols
+          .map(function (col) {
+            return col.descriptor;
+          }).filter(function (desc) {
+            return _.contains((desc || {}).name, '.') && context[desc.name] !== undefined;
+          }).forEach(function (desc) {
+            dotToNested(context, desc);
+          });
+        var jsonField = grid.cols.map(function (col) {
+          return (col.descriptor || {}).jsonField;
+        }).find(function (name) {
+          return name;
+        });
+        if (jsonField && context[jsonField] !== undefined) {
+          context[jsonField] = angular.fromJson(context[jsonField]);
+        }
+      }
       _.defaults(context, (grid.handler || {})._context);
       field = _.extend({}, field, {scale: grid.scope.$eval(scale, context)});
     }
@@ -2081,6 +2094,15 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
           && !((handler.fields || {})[name] || {}).json) {
         delete result[name];
       }
+    });
+
+    // Dotted fields may be outdated while editing
+    _.chain(formScope.fields).map(function (field) {
+      return (field || {}).name;
+    }).filter(function (fieldName) {
+      return _.contains(fieldName, '.');
+    }).each(function (fieldName) {
+      nestedToDot(result, fieldName);
     });
 
     return result;
