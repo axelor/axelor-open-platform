@@ -2047,9 +2047,11 @@ Grid.prototype.setEditors = function(form, formScope, forEdit) {
     var item = cell ? grid.getDataItem(cell.row) : {};
     var record = formScope.record || {};
     var result = _.extend({}, item, record, { id: item.id });
+    var handler = formScope.handler || {};
 
     _.each(result, function(value, name) {
-      if (_.isObject(value) && !_.isArray(value) && value.id === undefined && !_.startsWith(name, '$')) {
+      if (_.isObject(value) && !_.isArray(value) && value.id === undefined && !_.startsWith(name, '$')
+          && !((handler.fields || {})[name] || {}).json) {
         delete result[name];
       }
     });
@@ -2398,6 +2400,15 @@ Grid.prototype._showEditor = function (activeCell) {
     .map(function (col) { return col.descriptor; })
     .filter(function (field) { return field && field.name && field.name.indexOf('.') > -1 && record[field.name] !== undefined; })
     .forEach(function (field) { dotToNested(record, field); });
+
+  var jsonField = this.cols.map(function (col) {
+    return (col.descriptor || {}).jsonField;
+  }).find(function (name) {
+    return name;
+  });
+  if (jsonField && record[jsonField] !== undefined) {
+    record[jsonField] = angular.fromJson(record[jsonField]);
+  }
 
   formScope.editRecord(record);
 };
