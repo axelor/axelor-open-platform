@@ -280,17 +280,18 @@
               version: version, versionDate: now,
               dirty: lastDirty, dirtyDate: now,
             });
-            removeLeftUsers();
+            updateUsers();
           }
         }
         lastVersion = version;
         if (attrsReset) {
           attrsReset = false;
-          removeLeftUsers();
+          updateUsers();
         }
       });
 
-      function removeLeftUsers() {
+      // Remove left users and update users info
+      function updateUsers() {
         const recordVersion = (scope.record || {}).version;
         const users = _.filter(scope.users, user => {
           if (!user) return false;
@@ -298,11 +299,8 @@
           if (!state.leftDate) return true;
           return state.version > recordVersion;
         });
-        const changed = (scope.users || []).length != users.length;
         scope.users = users;
-        if (changed) {
-          setInfo(scope);
-        }
+        setInfo(scope);
       }
 
       const WAIT = 500;
