@@ -146,8 +146,12 @@ String tenantId = (String) session.getAttribute("tenantId");
               <li class="divider-vertical"></li>
               <li class="dropdown">
                 <a href="javascript:" class="dropdown-toggle nav-link-user" data-toggle="dropdown">
-                  <img ng-if="$user.image" ng-src="{{ $user.image }}" width="20px">
-                  <i class="fa fa-user" ng-if="!$user.image"></i>
+                  <span class="avatar" title="{{::$user.name}}">
+                    <img ng-if="$user.image" ng-src="{{::$user.image}}" alt="{{::$user.name}}">
+                    <span ng-if="!$user.image" ng-class="::$user.color">
+                      {{::$user.name[0]}}
+                    </span>
+                  </span>
                   <b class="caret"></b>
                 </a>
                 <ul class="dropdown-menu">

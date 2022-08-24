@@ -121,6 +121,18 @@ header .navbar .nav-shortcuts .nav-link-tasks .badge {
     right: -3px;
 }
 
+header .navbar .nav-shortcuts .avatar > * {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  display: inline-block;
+  text-align: center;
+  color: #fff;
+  text-shadow: none;
+  text-transform: uppercase;
+  border-radius: 50%;
+}
+
 header .navbar .nav-link-user > img {
   width: 20px;
   height: 20px;

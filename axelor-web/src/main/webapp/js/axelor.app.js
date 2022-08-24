@@ -441,15 +441,22 @@
 
   module.controller('AppCtrl', AppCtrl);
 
-  AppCtrl.$inject = ['$rootScope', '$exceptionHandler', '$scope', '$http', '$route', 'authService', 'MessageService', 'NavService'];
-  function AppCtrl($rootScope, $exceptionHandler, $scope, $http, $route, authService, MessageService, NavService) {
+  AppCtrl.$inject = ['$rootScope', '$exceptionHandler', '$scope', '$http', '$route', 'authService', 'MessageService', 'NavService', 'UserService'];
+  function AppCtrl($rootScope, $exceptionHandler, $scope, $http, $route, authService, MessageService, NavService, UserService) {
 
     function fetchConfig() {
       return $http.get('ws/app/info').then(function(response) {
         var config = _.extend(axelor.config, response.data);
         $scope.$user.id = config["user.id"];
         $scope.$user.name = config["user.name"];
-        $scope.$user.image = config["user.image"];
+        var image = config["user.image"];
+
+        UserService.checkUrl(image, function () {
+          $scope.$user.image = image;
+        }, function () {
+          $scope.$user.color = UserService.getColor({code: config['user.login']});
+        });
+
         config.DEV = config['application.mode'] == 'dev';
         config.PROD = config['application.mode'] == 'prod';
 

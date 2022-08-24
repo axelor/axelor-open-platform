@@ -83,6 +83,11 @@
       onAllowed = onAllowed || angular.noop;
       onForbidden = onForbidden || angular.noop;
 
+      if (!url) {
+        onForbidden(url);
+        return;
+      }
+
       var perm = allowedUrls.get(url);
       if (perm !== undefined) {
         if (perm) {
