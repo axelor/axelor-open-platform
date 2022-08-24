@@ -117,7 +117,7 @@ libs.hibernate_search = "org.hibernate:hibernate-search-orm:${versions.hibernate
 libs.apache_tika_core = "org.apache.tika:tika-core:2.4.1"
 
 // flyway
-libs.flywaydb = "org.flywaydb:flyway-core:8.5.13"
+libs.flywaydb = "org.flywaydb:flyway-core:9.3.1"
 
 // eclipselink
 libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.7.11"
