@@ -120,7 +120,7 @@ libs.apache_tika_core = "org.apache.tika:tika-core:2.4.1"
 libs.flywaydb = "org.flywaydb:flyway-core:8.5.13"
 
 // eclipselink
-libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.7.10"
+libs.eclipselink_moxy = "org.eclipse.persistence:org.eclipse.persistence.moxy:2.7.11"
 
 // groovy
 libs.groovy = [
