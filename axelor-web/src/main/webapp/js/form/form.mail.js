@@ -68,7 +68,7 @@ ui.factory('MessageSource', ['$http', function ($http) {
       replies: getReplies,
       remove: deleteMessage,
       flags: postFlags
-    }
+    };
 }]);
 
 ui.factory('MessageService', ['$q', '$timeout', 'DataSource', 'MessageSource', 'TagService', function($q, $timeout, DataSource, MessageSource, TagService) {
@@ -278,7 +278,7 @@ ui.directive('uiMailMessage', ['UserService', function (UserService) {
 
       scope.userInitial = function (message) {
         return (scope.$userName(message) || '')[0] || '?';
-      }
+      };
 
       scope.showFull = !message.summary;
       scope.onShowFull = function () {

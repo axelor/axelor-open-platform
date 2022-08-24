@@ -40,7 +40,7 @@
     function onOpen() {
       _.each(rejoins, function (rejoin) {
         rejoin();
-      })
+      });
     }
 
     var channel = Socket("collaboration", { onopen: onOpen });
@@ -77,7 +77,6 @@
           if (data.users) {
             _.each(data.users, u => users[u.id] = u);
           }
-
 
           if (data.command === 'LEFT') {
             processLeft(user, users, scope);
@@ -207,7 +206,7 @@
             message: { dirty: scope.isDirty() }
           });
         }
-      }
+      };
 
       var join = function (id) {
         recordId = id;
@@ -223,7 +222,7 @@
             console.error(`Already joined: ${key}`);
             return;
           }
-          scopes.push(scope)
+          scopes.push(scope);
           allUsers[key] = {};
 
           var message;
@@ -350,7 +349,7 @@
 
       $rootScope.$on('$destroy', unsubscribe);
       return true;
-    }
+    };
 
     return functions;
   }]);
@@ -434,7 +433,7 @@
           } else {
             onForbidden(url);
           }
-        })
+        });
         return;
       }
 
@@ -458,7 +457,7 @@
       getName: getName,
       getColor: getColor,
       checkUrl: checkUrl
-    }
+    };
   }]);
 
   ui.directive('uiViewCollaboration', ['CollaborationService', 'UserService', function (CollaborationService, UserService) {
@@ -493,7 +492,7 @@
           }
 
           if (dateKey === 'left') {
-            user.$stateIcon = 'fa-sign-out text-error'
+            user.$stateIcon = 'fa-sign-out text-error';
             user.$tooltip = _t('Saved and left {0}', formatDate(state.leftDate));
           } else if (dateKey === 'version') {
             user.$stateIcon = 'fa-floppy-o text-error';
@@ -517,7 +516,7 @@
 
         scope.userNameStyle = function (user) {
           return (user || {}).code === currentUserCode ? 'self-collaboration-user' : null;
-        }
+        };
 
         scope.userInitial = function (user) {
           return UserService.getName(user)[0];
@@ -540,7 +539,7 @@
 
         scope.$on('collaboration-users-updated', function () {
           _.each(scope.users, user => computeUserData(user));
-        })
+        });
       },
       template: `
       <ul ng-if="enabled" class="nav menu-bar view-collaboration hidden-phone" ng-show="users && users.length > 1">

@@ -154,7 +154,7 @@
 
     var send = function(type, channel, data) {
       return connect().then(() => ws.send(JSON.stringify({ type: type, channel: channel, data: data })));
-    }
+    };
 
     $rootScope.$on('$destroy', disconnect);
     $rootScope.$on('event:auth-loginConfirmed', reconnect);
@@ -321,7 +321,7 @@
           }
 
           function lastShownIsButton(itemList) {
-            var found = findLast(itemList, function (item) { return item && !item.hidden });
+            var found = findLast(itemList, function (item) { return item && !item.hidden; });
             return found && found.type === "button";
           }
 
