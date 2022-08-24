@@ -82,6 +82,7 @@
 //= js/axelor.ui.js
 //= js/axelor.nav.js
 //= js/axelor.prefs.js
+//= js/axelor.user.js
 //= js/axelor.collab.js
 
 //= js/widget/widget.navtabs.js
