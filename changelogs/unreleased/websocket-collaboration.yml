@@ -2,6 +2,8 @@
 title: Implement support to see users on same view in realtime
 type: feature
 description: |
+  This allows to see users that are seeing/editing/updating the current opened record.
+
   Feature can be disabled with `view.collaboration` property. By default, it is enabled.
   On groups, there is a new boolean `canViewCollaboration` to determine whether members
   can view collaboration (`true` by default).
