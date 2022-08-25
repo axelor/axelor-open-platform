@@ -261,6 +261,11 @@
         leave(recordId);
         if (id > 0) {
           join(id);
+          // Version watch is not triggered with prev/next navigation
+          // if version stays the same between records.
+          if (old > 0) {
+            lastVersion = (scope.record || {}).version;
+          }
         }
       });
 
