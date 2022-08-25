@@ -57,14 +57,10 @@ public class CollaborationChannel extends Channel {
 
   private static final String NAME = "collaboration";
 
-  // <key, set of sessions>
-  private static final Map<String, Set<Session>> ROOMS = new ConcurrentHashMap<>();
-
-  // <key, <user code, state>>
-  private static final Map<String, Map<String, CollaborationState>> STATES =
-      new ConcurrentHashMap<>();
-
   private static final String CAN_VIEW_COLLABORATION = "canViewCollaboration";
+
+  // <key, room>
+  private static final Map<String, CollaborationRoom> ROOMS = new ConcurrentHashMap<>();
 
   private static final Logger logger = LoggerFactory.getLogger(CollaborationChannel.class);
 
@@ -134,7 +130,7 @@ public class CollaborationChannel extends Channel {
   }
 
   private void welcome(Session session, CollaborationData data) {
-    ROOMS.computeIfAbsent(data.getKey(), k -> ConcurrentHashMap.newKeySet()).add(session);
+    ROOMS.computeIfAbsent(data.getKey(), k -> new CollaborationRoom()).getSessions().add(session);
     getState(data);
 
     final CollaborationData resp = new CollaborationData();
@@ -160,17 +156,20 @@ public class CollaborationChannel extends Channel {
 
   private void remove(Session client, Collection<String> keys) {
     for (final String key : keys) {
-      final Set<Session> sessions = ROOMS.getOrDefault(key, Collections.emptySet());
-      final boolean removed = !sessions.isEmpty() && sessions.remove(client);
-      final Map<String, CollaborationState> states = STATES.get(key);
+      final CollaborationRoom room = ROOMS.get(key);
 
-      if (states != null) {
-        states.remove(client.getUserPrincipal().getName());
+      if (room == null) {
+        continue;
       }
+
+      final Set<Session> sessions = room.getSessions();
+      final boolean removed = sessions.remove(client);
+
+      final Map<String, CollaborationState> states = room.getStates();
+      states.remove(client.getUserPrincipal().getName());
 
       if (sessions.isEmpty()) {
         ROOMS.remove(key);
-        STATES.remove(key);
       }
 
       if (removed) {
@@ -188,8 +187,14 @@ public class CollaborationChannel extends Channel {
   }
 
   private void broadcast(Session session, CollaborationData data) {
-    String key = data.getKey();
-    for (Session client : ROOMS.getOrDefault(key, Collections.emptySet())) {
+    final String key = data.getKey();
+    final CollaborationRoom room = ROOMS.get(key);
+
+    if (room == null) {
+      return;
+    }
+
+    for (final Session client : room.getSessions()) {
       if (client == session) {
         continue;
       }
@@ -209,13 +214,13 @@ public class CollaborationChannel extends Channel {
   }
 
   private List<User> getUsers(String key) {
-    return ROOMS.getOrDefault(key, Collections.emptySet()).stream()
-        .map(this::getUser)
-        .collect(Collectors.toList());
+    final CollaborationRoom room = ROOMS.computeIfAbsent(key, k -> new CollaborationRoom());
+    return room.getSessions().stream().map(this::getUser).collect(Collectors.toList());
   }
 
   public Map<String, CollaborationState> getStates(String key) {
-    return STATES.computeIfAbsent(key, k -> new ConcurrentHashMap<>());
+    final CollaborationRoom room = ROOMS.computeIfAbsent(key, k -> new CollaborationRoom());
+    return room.getStates();
   }
 
   private CollaborationState getState(CollaborationData data) {
@@ -372,6 +377,21 @@ public class CollaborationChannel extends Channel {
 
     public void setStates(Map<String, CollaborationState> states) {
       this.states = states;
+    }
+  }
+
+  private static class CollaborationRoom {
+    private final Set<Session> sessions = ConcurrentHashMap.newKeySet();
+
+    // <user code, state>
+    private final Map<String, CollaborationState> states = new ConcurrentHashMap<>();
+
+    public Set<Session> getSessions() {
+      return sessions;
+    }
+
+    public Map<String, CollaborationState> getStates() {
+      return states;
     }
   }
 
