@@ -35,8 +35,6 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -60,8 +58,7 @@ public class CollaborationChannel extends Channel {
   private static final String NAME = "collaboration";
 
   // <key, set of sessions>
-  private static final Multimap<String, Session> ROOMS =
-      Multimaps.newSetMultimap(new ConcurrentHashMap<>(), ConcurrentHashMap::newKeySet);
+  private static final Map<String, Set<Session>> ROOMS = new ConcurrentHashMap<>();
 
   // <key, <user code, state>>
   private static final Map<String, Map<String, CollaborationState>> STATES =
@@ -137,7 +134,7 @@ public class CollaborationChannel extends Channel {
   }
 
   private void welcome(Session session, CollaborationData data) {
-    ROOMS.put(data.getKey(), session);
+    ROOMS.computeIfAbsent(data.getKey(), k -> ConcurrentHashMap.newKeySet()).add(session);
     getState(data);
 
     final CollaborationData resp = new CollaborationData();
@@ -163,15 +160,16 @@ public class CollaborationChannel extends Channel {
 
   private void remove(Session client, Collection<String> keys) {
     for (final String key : keys) {
-      final boolean removed = ROOMS.remove(key, client);
+      final Set<Session> sessions = ROOMS.getOrDefault(key, Collections.emptySet());
+      final boolean removed = !sessions.isEmpty() && sessions.remove(client);
       final Map<String, CollaborationState> states = STATES.get(key);
 
       if (states != null) {
         states.remove(client.getUserPrincipal().getName());
       }
 
-      if (ROOMS.get(key).isEmpty()) {
-        ROOMS.removeAll(key);
+      if (sessions.isEmpty()) {
+        ROOMS.remove(key);
         STATES.remove(key);
       }
 
@@ -191,7 +189,7 @@ public class CollaborationChannel extends Channel {
 
   private void broadcast(Session session, CollaborationData data) {
     String key = data.getKey();
-    for (Session client : ROOMS.get(key)) {
+    for (Session client : ROOMS.getOrDefault(key, Collections.emptySet())) {
       if (client == session) {
         continue;
       }
@@ -211,7 +209,9 @@ public class CollaborationChannel extends Channel {
   }
 
   private List<User> getUsers(String key) {
-    return ROOMS.get(key).stream().map(this::getUser).collect(Collectors.toList());
+    return ROOMS.getOrDefault(key, Collections.emptySet()).stream()
+        .map(this::getUser)
+        .collect(Collectors.toList());
   }
 
   public Map<String, CollaborationState> getStates(String key) {
