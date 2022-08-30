@@ -22,6 +22,7 @@ import com.axelor.app.AvailableAppSettings;
 import com.axelor.db.JPA;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
+import com.axelor.db.Model;
 import com.axelor.rpc.Context;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -58,6 +59,12 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
       JPA.runInTransaction(() -> result[0] = task.apply(JPA.em()));
       return (T) result[0];
     }
+
+    public static JpaRepository<? extends Model> repoOf(Class<?> klass) {
+      Class<?> k =
+          Model.class.isAssignableFrom(klass) ? klass : JpaScanner.findModel(klass.getSimpleName());
+      return JpaRepository.of(k.asSubclass(Model.class));
+    }
   }
 
   static {
@@ -66,7 +73,7 @@ public class GroovyScriptHelper extends AbstractScriptHelper {
 
     final ImportCustomizer importCustomizer = new ImportCustomizer();
 
-    importCustomizer.addStaticImport("__repo__", JpaRepository.class.getName(), "of");
+    importCustomizer.addStaticImport("__repo__", Helpers.class.getName(), "repoOf");
     importCustomizer.addStaticImport(Helpers.class.getName(), "doInJPA");
 
     importCustomizer.addImports("java.time.ZonedDateTime");

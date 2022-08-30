@@ -18,8 +18,8 @@
  */
 package com.axelor.data;
 
-import com.axelor.db.JpaRepository;
 import com.axelor.db.JpaScanner;
+import com.axelor.script.GroovyScriptHelper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -56,7 +56,9 @@ public final class DataScriptHelper {
 
   static {
     final ImportCustomizer importCustomizer = new ImportCustomizer();
-    importCustomizer.addStaticImport("__repo__", JpaRepository.class.getName(), "of");
+
+    importCustomizer.addStaticImport(
+        "__repo__", GroovyScriptHelper.Helpers.class.getName(), "repoOf");
 
     configIndy.getOptimizationOptions().put("indy", true);
     configIndy.getOptimizationOptions().put("int", false);

@@ -1,0 +1,3 @@
+---
+title: Fix model class resolution in Groovy expressions
+type: fix
