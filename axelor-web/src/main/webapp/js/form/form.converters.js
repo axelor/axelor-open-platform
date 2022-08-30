@@ -380,12 +380,24 @@
 
   ui.formatters["enum"] = ui.formatters.selection;
 
-  function findField(scope, name) {
+  function findField(scope, name, elemScope) {
+    var field;
     if (scope.field && scope.field.target) {
-      return ((scope.field.viewer||{}).fields||{})[name]
+      field = ((scope.field.viewer||{}).fields||{})[name]
         || ((scope.field.editor||{}).fields||{})[name];
+    } else {
+      field = (scope.viewItems || scope.fields || {})[name];
     }
-    return (scope.viewItems || scope.fields || {})[name];
+    var widgetAttrs;
+    if ((scope.field || {}).name === name) {
+      widgetAttrs = (scope.field || {}).widgetAttrs;
+    } else if (elemScope) {
+      widgetAttrs = (elemScope.field || {}).widgetAttrs;
+    }
+    if (!_.isEmpty(widgetAttrs)) {
+      field = _.extend({}, field, {widgetAttrs: widgetAttrs});
+    }
+    return field;
   }
 
   ui.formatters.$image = function (scope, fieldName, imageName) {
@@ -415,7 +427,11 @@
     if (value === undefined || value === null) {
       return "";
     }
-    var field = findField(scope, fieldName) || scope.field;
+    var elemScope = findElemScope(scope, fieldName);
+    if (elemScope && elemScope.localeValue) {
+      return elemScope.localeValue();
+    }
+    var field = findField(scope, fieldName, elemScope) || scope.field;
     if (!field) {
       return value;
     }
@@ -426,6 +442,14 @@
     }
     return value;
   };
+
+  function findElemScope(scope, fieldName) {
+    if ((scope.field || {}).name === fieldName) {
+      return scope;
+    }
+    var elem = findForm(scope.$element).find(_.sprintf(".ng-scope[x-field='%s']:first", fieldName));
+    return elem.length && elem.scope ? elem.scope() : null;
+  }
 
   function findForm(elem) {
     var formElement = elem;

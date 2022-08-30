@@ -489,6 +489,7 @@ ui.formDirective = function(name, object) {
           scope.$moment = function(d) { return moment(d); };
           scope.$number = function(d) { return +d; };
           scope.$image = function (fieldName, imageName) { return ui.formatters.$image(this, fieldName, imageName); };
+          scope.$element = element;
           scope.$fmt = function (fieldName, fieldValue) {
             var args = [this, fieldName];
             if (arguments.length > 1) {
