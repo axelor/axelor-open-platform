@@ -893,9 +893,7 @@ ActionHandler.prototype = {
     }
 
     if (data.validate || data.save) {
-      scope.$emit('on:before-save-action', rootScope.record);
-
-      rootScope.afterGridEdit(function () {
+      var handleSave = function () {
         scope.$timeout(function () {
           self._handleSave(!!data.validate).then(function () {
             scope.ajaxStop(function () {
@@ -903,7 +901,14 @@ ActionHandler.prototype = {
             }, 100);
           }, deferred.reject);
         });
-      });
+      };
+
+      if (rootScope.afterGridEdit) {
+        scope.$emit('on:before-save-action', rootScope.record);
+        rootScope.afterGridEdit(handleSave);
+      } else {
+        handleSave();
+      }
 
       return deferred.promise;
     }
