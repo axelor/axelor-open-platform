@@ -114,7 +114,7 @@ ui.formInput('Number', {
 
     scope.localeValue = function localeValue() {
       var value = scope.getValue();
-      var field = isDecimal ? _.extend({}, scope.field, {
+      var field = isDecimal ? _.extend({}, _.omit(scope.field, 'widgetAttrs'), {
         scale: scope.scale(),
         precision: precision()
       }) : scope.field;
