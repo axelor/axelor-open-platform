@@ -1102,9 +1102,13 @@ ActionHandler.prototype = {
         case 'url':
         case 'url:set':
           if (item.is('[ui-dashlet]')) {
-            itemScope.waitForActions(function () {
-              item.find('iframe:first').attr('src', value);
-            }, 100);
+            itemScope.attr('url', value);
+
+            // Refresh if dashlet is already loaded
+            var dashletScope = item.find('.dashlet').scope() || {};
+            if (dashletScope.view && dashletScope.onRefresh) {
+              dashletScope.onRefresh();
+            }
           }
           break;
         case 'value':
