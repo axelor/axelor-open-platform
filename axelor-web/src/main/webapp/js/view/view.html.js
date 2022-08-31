@@ -39,7 +39,7 @@ function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
   $scope.getURL = function () {
     var view = $scope.view;
     if (view) {
-      var url = view.name || view.resource;
+      var url = $scope.attr && $scope.attr('url') || view.name || view.resource;
       if (url && url.indexOf('{{') > -1) {
         url = $interpolate(url)($scope.getContext());
       }
