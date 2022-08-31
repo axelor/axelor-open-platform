@@ -28,7 +28,6 @@ ui.HtmlViewCtrl.$inject = ['$scope', '$element', '$sce', '$interpolate'];
 function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
 
   var views = $scope._views;
-  var stamp = 0;
 
   $scope.view = views.html;
 
@@ -38,20 +37,19 @@ function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
     return _.extend({}, params.context, parent.getContext ? parent.getContext() : {});
   };
 
-  $scope.getURL = function getURL() {
+  $scope.getURL = function () {
     var view = $scope.view;
     if (view) {
       var url = view.name || view.resource;
       if (url && url.indexOf('{{') > -1) {
         url = $interpolate(url)($scope.getContext());
       }
-      if (stamp > 0) {
-        var q = url.lastIndexOf('?');
-        if (q > -1) {
-          url += "&t" + stamp;
-        } else {
-          url += "?t" + stamp;
-        }
+      var stamp = new Date().getTime();
+      var q = url.lastIndexOf('?');
+      if (q > -1) {
+        url += "&t" + stamp;
+      } else {
+        url += "?t" + stamp;
       }
       return $sce.trustAsResourceUrl(url);
     }
@@ -68,16 +66,11 @@ function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
     }
   });
 
-  var updateTimer = null;
   $scope.onRefresh = function () {
-    if (updateTimer != null) {
-      clearTimeout(updateTimer);
-    }
-    updateTimer = $scope.$timeout(function () {
-      stamp = new Date().getTime();
-      updateTimer = null;
-    }, 300);
+    $scope.url = $scope.getURL();
   };
+
+  $scope.onRefresh();
 
   $scope.$on("on:edit", function (event, rec) {
     if (rec && rec.id) {
@@ -139,7 +132,7 @@ var directiveFn = function(){
     },
     template:
     '<div class="iframe-container">'+
-      '<iframe ng-src="{{getURL()}}" frameborder="0" scrolling="auto"></iframe>'+
+      '<iframe ng-src="{{url}}" frameborder="0" scrolling="auto"></iframe>'+
     '</div>'
   };
 };
