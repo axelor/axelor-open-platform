@@ -146,7 +146,7 @@ public class AuthPac4jUserService {
         user.setImage(image);
       }
     } catch (IOException e) {
-      logger.error(e.getMessage(), e);
+      logger.error("Cannot get image for user '{}': {}", user.getCode(), e.toString());
     }
   }
 

@@ -1,0 +1,6 @@
+---
+title: Use access token to retrieve user profile picture from OpenID Connect
+type: fix
+description: |
+  This fixes retrieving user profile picture from Azure Active Directory,
+  where sending the access token is required.

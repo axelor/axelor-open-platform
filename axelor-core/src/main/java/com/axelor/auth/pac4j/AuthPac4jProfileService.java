@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -46,7 +47,10 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.pac4j.core.context.HttpConstants;
 import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.oidc.profile.OidcProfile;
+import org.pac4j.oidc.profile.OidcProfileDefinition;
 
 @Singleton
 public class AuthPac4jProfileService {
@@ -115,7 +119,25 @@ public class AuthPac4jProfileService {
   @Nullable
   public byte[] getImage(CommonProfile profile) throws IOException {
     final URI uri = profile.getPictureUrl();
-    return uri != null ? downloadUrl(uri.toURL()) : null;
+
+    if (uri == null) {
+      return null;
+    }
+
+    if (profile instanceof OidcProfile) {
+      final Map<String, String> requestProperties =
+          Optional.ofNullable(profile.getAttribute(OidcProfileDefinition.ACCESS_TOKEN))
+              .map(
+                  token ->
+                      Collections.singletonMap(
+                          HttpConstants.AUTHORIZATION_HEADER,
+                          HttpConstants.BEARER_HEADER_PREFIX + token.toString()))
+              .orElse(Collections.emptyMap());
+
+      return downloadUrl(uri.toURL(), requestProperties);
+    }
+
+    return downloadUrl(uri.toURL());
   }
 
   @Nullable
@@ -169,8 +191,13 @@ public class AuthPac4jProfileService {
   private static final int DOWNLOAD_CHUNK_SIZE = 32768;
 
   protected byte[] downloadUrl(URL url) throws IOException {
+    return downloadUrl(url, Collections.emptyMap());
+  }
+
+  protected byte[] downloadUrl(URL url, Map<String, String> requestProperties) throws IOException {
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
     final URLConnection conn = url.openConnection();
+    requestProperties.forEach(conn::setRequestProperty);
     final byte[] chunk = new byte[DOWNLOAD_CHUNK_SIZE];
 
     conn.setConnectTimeout(DOWNLOAD_TIMEOUT);
