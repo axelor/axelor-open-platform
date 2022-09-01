@@ -29,6 +29,7 @@ import com.axelor.meta.db.repo.MetaJsonModelRepository;
 import com.axelor.meta.db.repo.MetaSelectRepository;
 import com.axelor.rpc.Context;
 import com.axelor.test.db.Contact;
+import com.axelor.test.db.EnumStatusNumber;
 import com.axelor.test.db.Title;
 import com.axelor.test.db.repo.ContactRepository;
 import com.axelor.test.db.repo.TitleRepository;
@@ -352,7 +353,7 @@ public abstract class ScriptTest extends JpaTest {
     values.put("title", t);
 
     values.put("contactType", "customer");
-    values.put("contactStatus", 1);
+    values.put("contactStatus", EnumStatusNumber.ONE);
 
     values.put("attrs", getCustomerAttrsJson());
     values.put("anotherAttrs", getCustomerAnotherAttrsJson());

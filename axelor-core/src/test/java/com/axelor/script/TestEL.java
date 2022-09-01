@@ -125,4 +125,12 @@ public class TestEL extends ScriptTest {
 
     assertTrue((Boolean) result);
   }
+
+  @Test
+  public void testEnum() {
+    ScriptHelper helper = new ELScriptHelper(context());
+    Object result = helper.eval("EnumStatusNumber.ONE == contactStatus");
+
+    assertTrue((Boolean) result);
+  }
 }

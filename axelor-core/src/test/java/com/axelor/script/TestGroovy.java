@@ -135,4 +135,12 @@ public class TestGroovy extends ScriptTest {
 
     assertTrue((Boolean) result);
   }
+
+  @Test
+  public void testEnum() {
+    GroovyScriptHelper helper = new GroovyScriptHelper(context());
+    Object result = helper.eval("EnumStatusNumber.ONE == contactStatus");
+
+    assertTrue((Boolean) result);
+  }
 }
