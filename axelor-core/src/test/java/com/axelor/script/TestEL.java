@@ -23,7 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.axelor.rpc.Context;
 import com.axelor.test.db.Contact;
+import com.axelor.test.db.Currency;
 import com.axelor.test.db.repo.ContactRepository;
+import com.axelor.test.db.repo.CurrencyRepository;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
@@ -58,6 +60,12 @@ public class TestEL extends ScriptTest {
     // __repo__
     actual = helper.eval("__repo__(Contact)");
     assertTrue(actual instanceof ContactRepository);
+
+    actual = helper.eval("__repo__(Currency)");
+    assertTrue(actual instanceof CurrencyRepository);
+
+    actual = helper.eval("Currency");
+    assertTrue(((Class) actual).isAssignableFrom(Currency.class));
 
     // com.axelor.apps.tool imports
     actual = helper.eval("StringUtils.isBlank(\"\")");

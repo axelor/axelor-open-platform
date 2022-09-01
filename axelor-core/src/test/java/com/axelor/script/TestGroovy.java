@@ -27,6 +27,7 @@ import com.axelor.db.EntityHelper;
 import com.axelor.rpc.Context;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.repo.ContactRepository;
+import com.axelor.test.db.repo.CurrencyRepository;
 import java.time.LocalDate;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -72,6 +73,14 @@ public class TestGroovy extends ScriptTest {
     // __repo__
     actual = helper.eval("__repo__(Contact)");
     assertTrue(actual instanceof ContactRepository);
+
+    // Currency is also part of java.util package. When used
+    // with __repo__ it should resolve the Model class
+    actual = helper.eval("__repo__(Currency)");
+    assertTrue(actual instanceof CurrencyRepository);
+
+    actual = helper.eval("Currency");
+    assertTrue(((Class) actual).isAssignableFrom(java.util.Currency.class));
   }
 
   @Test
