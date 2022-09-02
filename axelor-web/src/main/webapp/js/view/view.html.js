@@ -65,8 +65,24 @@ function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
     }
   });
 
+  var refreshing = false;
   $scope.onRefresh = function () {
-    $scope.url = $scope.getURL();
+    if (refreshing) return;
+    refreshing = true;
+
+    var unwatch = $scope.$watch(function () {
+      return $element.is(':hidden');
+    }, function (hidden) {
+      if (hidden) return;
+      unwatch();
+
+      $scope.waitForActions(function () {
+        $scope.ajaxStop(function () {
+          $scope.url = $scope.getURL();
+          refreshing = false;
+        });
+      });
+    });
   };
 
   $scope.onRefresh();
