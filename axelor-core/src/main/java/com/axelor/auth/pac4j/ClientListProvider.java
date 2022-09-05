@@ -193,10 +193,23 @@ public class ClientListProvider implements Provider<List<Client>> {
       Matcher matcher = AUTH_PROVIDER_PATTERN.matcher(key);
       if (matcher.matches()) {
         String name = matcher.group("name");
-        String config = Inflector.getInstance().camelize(matcher.group("config"), true);
+        String[] config = matcher.group("config").split("\\.", 2);
+        config[0] = Inflector.getInstance().camelize(config[0], true);
         Object value =
             SETTINGS_GETTERS.getOrDefault(config, (s, k) -> s.get(k, null)).apply(settings, key);
-        initConfigs.computeIfAbsent(name, k -> new HashMap<>()).put(config, value);
+
+        final Map<String, Object> initConfig =
+            initConfigs.computeIfAbsent(name, k -> new HashMap<>());
+
+        if (config.length > 1) {
+          // string-object map config
+          @SuppressWarnings("unchecked")
+          final Map<String, Object> map =
+              (Map<String, Object>) initConfig.computeIfAbsent(config[0], k -> new HashMap<>());
+          map.put(config[1], value);
+        } else {
+          initConfig.put(config[0], value);
+        }
       }
     }
 
@@ -431,23 +444,9 @@ public class ClientListProvider implements Provider<List<Client>> {
 
   private void setFieldChecked(Object obj, String property, Object value)
       throws ReflectiveOperationException {
-    final List<String> propertyParts = Arrays.asList(property.split("\\.", 2));
-    final Method setter = findSetter(obj.getClass(), propertyParts.get(0));
+    final Method setter = findSetter(obj.getClass(), property);
     Class<?> type = setter.getParameterTypes()[0];
     type = PRIMITIVE_TYPES.getOrDefault(type, type);
-
-    if (type.isAssignableFrom(Map.class)) {
-      final Method getter = findGetter(obj.getClass(), propertyParts.get(0));
-      @SuppressWarnings("unchecked")
-      Map<String, Object> map = (Map<String, Object>) getter.invoke(obj);
-      if (map == null) {
-        map = new LinkedHashMap<>();
-        setter.invoke(obj, map);
-      }
-      map.put(propertyParts.get(1), value);
-      return;
-    }
-
     final Object converted = convert(type, value);
     setter.invoke(obj, converted);
   }

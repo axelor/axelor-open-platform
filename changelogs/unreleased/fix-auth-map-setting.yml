@@ -1,0 +1,13 @@
+---
+title: Fix setting authentication map property
+type: fix
+description: |
+  This fixes setting `GenericOAuth20Client.profileAttrs`.
+  Issue happened when there was no getter.
+
+  ```properties
+  # profile attributes: map of key: type|tag
+  # supported types: Integer, Boolean, Color, Gender, Locale, Long, URI, String (default)
+  auth.provider.oauth.profile-attrs.age = Integer|age
+  auth.provider.oauth.profile-attrs.is_admin = Boolean|is_admin
+  ```
