@@ -468,6 +468,24 @@ and supports https://commonmark.org/[CommonMark] and https://github.github.com/g
 |`x-hide-mode-switch` | Whether to hide edit typo switch tab bar (defaults to `false`)
 |===
 
+== InfoButton
+
+This can be used on a button to dispay data bound to a record value (real or dummy).
+If the name of the button is the name of a field, it is bound to that field.
+Otherwise, use the `x-field` attribute to specify the bound field.
+
+When using `x-field`, the button and the field are 2 distinct elements. Any attributes
+defined on that field will be used to format the value. Moreover, this allows to change
+the button attributes without impact on the bound field.
+
+[source,xml]
+----
+<panel>
+  <button name="amountBtn" title="Amount" widget="info-button" x-field="totalAmount" onClick="my-action"/>
+  <field name="amount" hidden="true"/>
+</panel>
+----
+
 == Extra Attributes
 
 In addition to the common properties, widgets supports the following extra properties

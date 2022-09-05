@@ -447,6 +447,10 @@
     if ((scope.field || {}).name === fieldName) {
       return scope;
     }
+    if (!scope.$element) {
+      console.error(_.sprintf('Scope element needed to find form for field "%s"', fieldName));
+      return scope;
+    }
     var elem = findForm(scope.$element).find(_.sprintf(".ng-scope[x-field='%s']:first", fieldName));
     return elem.length && elem.scope ? elem.scope() : null;
   }

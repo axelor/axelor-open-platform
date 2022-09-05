@@ -857,15 +857,18 @@ ui.formItem('InfoButton', 'Button', {
     this._super.apply(this, arguments);
     var field = scope.field || {};
     scope.title = field.title;
+    scope.$element = element;
     scope.$watch('attr("title")', function infoButtonTitleWatch(title, old) {
       if (!title || title === old) return;
       scope.title = title;
     });
     Object.defineProperty(scope, 'value', {
-      get: function () {
-        return field.currency
-          ? ui.formatters.decimal(field, (scope.record || {})[field.name], scope.record)
-          : ui.formatters.$fmt(scope, field.name);
+      get: field.field ? function () {
+          return ui.formatters.$fmt(scope, field.field);
+        } : function () {
+          return field.currency
+            ? ui.formatters.decimal(field, (scope.record || {})[field.name], scope.record)
+            : ui.formatters.$fmt(scope, field.name);
       }
     });
   },
