@@ -457,7 +457,7 @@
           </xsd:annotation>
           <xsd:simpleType>
             <xsd:restriction base="xsd:string">
-              <xsd:pattern value="[a-z][a-zA-Z0-9_]+(,[a-z][a-zA-Z0-9_]+)*" />
+              <xsd:pattern value="[a-z][a-zA-Z0-9_]+(,[a-z][a-zA-Z0-9_]+)*|^$" />
             </xsd:restriction>
           </xsd:simpleType>
         </xsd:attribute>

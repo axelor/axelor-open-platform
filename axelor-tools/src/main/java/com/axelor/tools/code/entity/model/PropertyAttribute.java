@@ -30,7 +30,7 @@ public class PropertyAttribute {
   private final PropertyDescriptor descriptor;
 
   private final BiConsumer<Object, Object> checkOverride;
-  private final Predicate<Object> isEmpty;
+  private final Predicate<Object> isAbsent;
 
   public static PropertyAttribute of(
       String name, PropertyDescriptor descriptor, BiConsumer<Object, Object> checkOverride) {
@@ -47,12 +47,12 @@ public class PropertyAttribute {
       String name,
       PropertyDescriptor descriptor,
       BiConsumer<Object, Object> checkOverride,
-      Predicate<Object> isEmpty) {
+      Predicate<Object> isAbsent) {
     Preconditions.checkNotNull(descriptor);
     this.name = StringUtils.notBlank(name) ? name : descriptor.getName();
     this.descriptor = descriptor;
     this.checkOverride = checkOverride != null ? checkOverride : (a, b) -> {};
-    this.isEmpty = isEmpty;
+    this.isAbsent = isAbsent;
   }
 
   public String getName() {
@@ -67,7 +67,7 @@ public class PropertyAttribute {
     checkOverride.accept(a, b);
   }
 
-  public boolean isEmpty(Object a) {
-    return isEmpty.test(a);
+  public boolean isAbsent(Object a) {
+    return isAbsent.test(a);
   }
 }

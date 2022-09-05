@@ -29,6 +29,7 @@ import static com.axelor.tools.code.entity.model.Utils.notTrue;
 import static com.axelor.tools.code.entity.model.Utils.stream;
 
 import com.axelor.common.Inflector;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.tools.code.JavaAnnotation;
 import com.axelor.tools.code.JavaCode;
@@ -314,11 +315,13 @@ public class Entity implements BaseType<Entity> {
       throws ReflectiveOperationException {
     final PropertyDescriptor descriptor = attribute.getDescriptor();
     final Method readMethod = descriptor.getReadMethod();
-    final Object otherValue = readMethod.invoke(property);
+    Object otherValue = readMethod.invoke(property);
 
-    if (attribute.isEmpty(otherValue)) {
+    if (attribute.isAbsent(otherValue)) {
       return;
     }
+
+    otherValue = ObjectUtils.isEmpty(otherValue) ? null : otherValue;
 
     final Object value = readMethod.invoke(existing);
 
