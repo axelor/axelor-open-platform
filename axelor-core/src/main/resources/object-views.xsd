@@ -778,7 +778,11 @@
     <xsd:attribute name="x-scale" type="xsd:string">
       <xsd:annotation>
         <xsd:documentation>
+          <![CDATA[
           The scale of the decimal value (total number of digits in decimal part).
+
+          It accepts an integer for a fix scale, or a field name for a dynamic evaluation.
+          ]]>
         </xsd:documentation>
       </xsd:annotation>
     </xsd:attribute>

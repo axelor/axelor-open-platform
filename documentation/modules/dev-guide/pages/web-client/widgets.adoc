@@ -76,13 +76,15 @@ Number widget has specials attributes:
 
 * `min`: lowest bound of the value
 * `max`: upper bound of the value
-* `x-scale`: scale of the decimal value (total number of digits in decimal part).
+* `x-scale`: scale of the decimal value (total number of digits in decimal part). It accepts an integer
+for a fix scale, or a field name for a dynamic evaluation.
 * `x-precision`: precision of the decimal value (total number of digits).
 
 [source,xml]
 ----
 <field name="integer" widget="Integer"/>
 <field name="decimal" widget="Decimal" x-scale="2" x-precision="18"/>
+<field name="decimal" widget="Decimal" x-scale="currency.decimalPlaces" x-precision="18"/>
 ----
 
 == DateTime
@@ -496,7 +498,9 @@ depending on the widget/type.
 | `x-limit` | specify the maximum number of items in suggest box list
 | `x-search-limit` | specify the default page limit of search popup
 | `x-precision` | precision of the decimal value (total number of digits)
-| `x-scale` | scale of the decimal value (total number of digits in decimal part)
+| `x-scale` | scale of the decimal value (total number of digits in decimal part).
+
+It accepts an integer for a fix scale, or a field name for a dynamic evaluation.
 | `x-true-text` | the display value for "true" state of a boolean widget
 | `x-false-text` | specify the display value for "false" state of a boolean widget
 | `x-big` | allow duration of more than 100 hours in a duration widget
