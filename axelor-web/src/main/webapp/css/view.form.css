@@ -1070,13 +1070,14 @@ label.has-help > span:after,
 
 .tag-select-placeholder {
   position: absolute;
-  top: 3px;
   left: 0;
   right: 16px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #999999;
+  color: #777777;
+  font-size: 12px;
+  opacity: 0.5;
 }
 
 .ng-invalid > .tag-select:focus,
@@ -1094,7 +1095,7 @@ label.has-help > span:after,
 .tag-select li,
 .tag-select .label {
   display: inline-block;
-  margin: 2px;
+  margin: 2px 2px 2px 0px;
 }
 
 .tag-select .label,
@@ -1784,11 +1785,6 @@ label.has-help > span:after,
 .wkf-status li {
   margin: 2px;
   font-size: 14px;
-}
-
-.tag-select-placeholder {
-    color: #777;
-    font-size: 12px;
 }
 
 ::-webkit-input-placeholder {
