@@ -2450,6 +2450,20 @@ Grid.prototype._showEditor = function (activeCell) {
     .filter(function (field) { return field && field.name && field.name.indexOf('.') > -1 && record[field.name] !== undefined; })
     .forEach(function (field) { dotToNested(record, field); });
 
+  // Apply widgetAttrs from cols to form item scopes
+  // (Actions might update cols widgetAttrs)
+  this.cols
+    .map(function (col) { return col.descriptor; })
+    .filter(function (field) { return field && field.name && !_.isEmpty(field.widgetAttrs); })
+    .forEach(function (field) {
+      var fieldScope = form.find(_.sprintf('[x-field="%s"]', field.name)).scope();
+      if (fieldScope && fieldScope.attr) {
+        _.each(field.widgetAttrs, function (value, key) {
+          fieldScope.attr(key, value);
+        });
+      }
+    });
+
   var jsonField = this.cols.map(function (col) {
     return (col.descriptor || {}).jsonField;
   }).find(function (name) {
