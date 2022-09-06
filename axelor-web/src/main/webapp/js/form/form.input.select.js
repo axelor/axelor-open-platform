@@ -741,14 +741,14 @@ ui.formInput('MultiSelect', 'Select', {
 
     scope.$render_editable = function() {
       if (placeholder) {
-        placeholder.toggleClass('hidden', !!scope.getValue());
+        placeholder.toggleClass('hidden', !_.isEmpty(scope.getValue()));
       }
       return input.val('');
     };
 
     input.on("input blur", function () {
       if (placeholder) {
-        placeholder.toggleClass('hidden', !!(input.val() || scope.getValue()));
+        placeholder.toggleClass('hidden', !_.isEmpty(input.val() || scope.getValue()));
       }
     });
 
