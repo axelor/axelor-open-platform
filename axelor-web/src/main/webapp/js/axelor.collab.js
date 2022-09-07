@@ -29,7 +29,7 @@
       register: angular.noop
     };
 
-    if (axelor.config['view.collaboration'] === false) {
+    if (axelor.config['view.collaboration.enabled'] === false) {
       return functions;
     }
 

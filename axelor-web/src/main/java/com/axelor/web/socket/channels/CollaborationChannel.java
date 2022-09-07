@@ -71,7 +71,7 @@ public class CollaborationChannel extends Channel {
 
   @Override
   public boolean isEnabled() {
-    return AppSettings.get().getBoolean(AvailableAppSettings.VIEW_COLLABORATION, true);
+    return AppSettings.get().getBoolean(AvailableAppSettings.VIEW_COLLABORATION_ENABLED, true);
   }
 
   @Override
