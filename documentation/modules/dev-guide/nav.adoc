@@ -70,6 +70,7 @@
 ** xref:web-client/index.adoc[Web Client]
 *** xref:web-client/views.adoc[Views]
 *** xref:web-client/widgets.adoc[Widgets]
+*** xref:web-client/quick-menu.adoc[Quick menus]
 *** xref:web-client/themes.adoc[Themes]
 *** xref:web-client/shortcuts.adoc[Shortcuts]
 *** xref:web-client/advanced.adoc[Advanced Customization]
