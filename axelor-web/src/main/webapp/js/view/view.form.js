@@ -637,8 +637,8 @@ function FormViewCtrl($scope, $element) {
           promise.then(reset, reset);
           promise = promise.then(function () {
             if ($scope.record && $scope.record.id > 0) return; // record may have been saved, see RM-13558
+            var rec = _.extend({}, defaults, $scope.record);
             if ($scope.isDirty()) {
-              var rec = _.extend({}, defaults, $scope.record);
               var old = $scope.$$original;
               var res = $scope.editRecord(rec);
               if (rec) {
@@ -649,7 +649,7 @@ function FormViewCtrl($scope, $element) {
               }
               return res;
             } else if (defaults) {
-              $scope.editRecord(defaults);
+              $scope.editRecord(rec);
             }
           });
         }
