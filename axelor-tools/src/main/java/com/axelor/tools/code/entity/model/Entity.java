@@ -291,6 +291,7 @@ public class Entity implements BaseType<Entity> {
     } catch (ReflectiveOperationException e) {
       throw new RuntimeException(e);
     }
+    logger.trace("Merged {}.{}", getName(), existing.getName());
     return true;
   }
 
