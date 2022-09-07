@@ -1,0 +1,55 @@
+= Views Collaboration
+:toc:
+:toc-title:
+
+Views collaboration allows to see users that are seeing/editing/updating the current opened record.
+
+== Overview
+
+When you open a record, you can quickly see users that are on the same record. The number of current users
+is displayed on the right side of the record toolbar : `2 users`. Click on it will show the list of them :
+
+image::listing-users-collaboration.png[]
+
+The details of each user are as :
+
+- The first icon is the current state of the user.
++
+--
+It can be one of the 3 states :
+
+** Watching : The user is only watching the record and didn't make any changes.
+
+image::collaboration-user-view-state.png[]
+
+** Editing : The user is doing change on the record.
+
+image::collaboration-user-edit-state.png[]
+
+** Saved : The user updated and saved the record.
+
+image::collaboration-user-save-state.png[]
+
+--
++
+- The second is the user profile picture
+- Last one is the username. `Me` is displayed for the current connected user.
+
+Whenever a user is editing or saved the record, it will be displayed on the record toolbar,
+below the number of users :
+
+[frame=none,grid=none,cols="1,1"]
+|===
+a|image::collaboration-user-edit.png[]
+a|image::collaboration-user-save.png[]
+|===
+
+== Options
+
+Feature can be disabled with `view.collaboration` property. By default, it is enabled.
+On groups, there is a boolean `canViewCollaboration` to determine whether members
+can view collaboration (`true` by default).
+
+== Limitation
+
+Only records displayed on top form are supported. Popup and others record rendering aren't supported.
