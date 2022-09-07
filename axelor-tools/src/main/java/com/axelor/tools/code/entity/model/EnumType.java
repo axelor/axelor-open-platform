@@ -29,11 +29,15 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Consumer;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @XmlType
 public class EnumType implements BaseType<EnumType> {
@@ -48,6 +52,8 @@ public class EnumType implements BaseType<EnumType> {
 
   @XmlElement(name = "item")
   private List<EnumItem> items;
+
+  private static final Logger logger = LoggerFactory.getLogger(EnumType.class);
 
   void afterUnmarshal(Unmarshaller unmarshaller, Object parent) {
     final Namespace ns = ((DomainModels) parent).getNamespace();
@@ -81,10 +87,6 @@ public class EnumType implements BaseType<EnumType> {
     return this.items;
   }
 
-  private boolean isCompatible(EnumItem existing, EnumItem item) {
-    return existing == null || Objects.equals(existing.getName(), item.getName());
-  }
-
   public EnumItem findItem(String name) {
     return getItems().stream()
         .filter(p -> Objects.equals(p.getName(), name))
@@ -96,13 +98,47 @@ public class EnumType implements BaseType<EnumType> {
   public void merge(EnumType other) {
     for (EnumItem item : other.items) {
       EnumItem existing = findItem(item.getName());
-      if (isCompatible(existing, item)) {
-        if (existing != null) {
-          items.remove(existing);
-        }
+      if (existing == null) {
         items.add(item);
+      } else {
+        merge(existing, item);
       }
     }
+  }
+
+  private void merge(EnumItem existing, EnumItem item) {
+    merge(existing.getName(), "title", existing.getTitle(), item.getTitle(), existing::setTitle);
+    dontMerge(existing.getName(), "value", existing.getValue(), item.getValue());
+    merge(existing.getName(), "help", existing.getHelp(), item.getHelp(), existing::setHelp);
+    logger.trace("Merged {}.{}", getName(), existing.getName());
+  }
+
+  private <T> void merge(String itemName, String name, T value, T otherValue, Consumer<T> setter) {
+    Optional.ofNullable(otherValue)
+        .ifPresent(
+            v -> {
+              setter.accept(v);
+              logger.debug(
+                  "{}.{}: attribute '{}' is overridden: from '{}' to '{}'",
+                  getName(),
+                  itemName,
+                  name,
+                  value,
+                  otherValue);
+            });
+  }
+
+  private <T> void dontMerge(String itemName, String name, T value, T otherValue) {
+    Optional.ofNullable(otherValue)
+        .ifPresent(
+            v ->
+                logger.error(
+                    "{}.{}: attribute '{}' is not overriddable: from '{}' to '{}'",
+                    getName(),
+                    itemName,
+                    name,
+                    value,
+                    otherValue));
   }
 
   @Override
