@@ -414,23 +414,26 @@ public class ClientListProvider implements Provider<List<Client>> {
   }
 
   private void setConfig(Object client, Object config, String property, Object value) {
-    final Exception configError;
+    Exception configError = null;
 
     try {
       setFieldChecked(config, property, value);
-      return;
     } catch (NoSuchMethodException e) {
       configError = e;
     } catch (ReflectiveOperationException e) {
       throw new RuntimeException(e);
     }
 
+    // always try to set on client in case of duplicate property
+    // see `scope` on both GenericOAuth20Client and OAuthConfiguration
+
     try {
       setFieldChecked(client, property, value);
-    } catch (NoSuchMethodException e) {
-      throw new RuntimeException(configError);
     } catch (ReflectiveOperationException e) {
-      throw new RuntimeException(e);
+      // don't throw exception if config has been set
+      if (configError != null) {
+        throw new RuntimeException(configError);
+      }
     }
   }
 

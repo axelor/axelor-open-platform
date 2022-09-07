@@ -1,0 +1,7 @@
+---
+title: Fix auth properties that exist in client and configuration
+type: fix
+description: |
+  When a property exists in the configuration and the client, try to set both.
+  
+  For example, `scope` exists in both `GenericOAuth20Client` and `OAuthConfiguration`.
