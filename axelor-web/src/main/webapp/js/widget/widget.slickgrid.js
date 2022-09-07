@@ -3284,6 +3284,10 @@ ui.directive("uiSlickColumnsForm", function () {
       scope.doClose = function () {
         element.dialog("close");
       };
+
+      scope.isEditable = function () {
+        return true;
+      };
     },
     template: "<div ui-dialog ui-view-form x-handler='true' x-on-ok='onSaveView' x-buttons='buttons'></div>"
   };
