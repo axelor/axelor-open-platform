@@ -1,0 +1,9 @@
+---
+title: Fix saving boolean false filter
+type: fix
+description: |
+  In the case of boolean fields with operator `false`,
+  filter was transformed in order to check for null or false.
+  But by doing that, original criteria was lost, breaking meta filter saving.
+  Replaced client-side operators `true` and `false` by new virtual operators
+  `$isTrue` and `$isFalse` which perform client-side transformation.
