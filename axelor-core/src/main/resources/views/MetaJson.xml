@@ -164,7 +164,7 @@
       <field name="menuParent" title="Parent menu" domain="self.action is null" canNew="true" form-view="meta-menu-form"/>
       <field name="menuIcon" title="Icon"/>
       <field name="menuBackground" title="Icon background"/>
-      <field name="menuOrder" title="Order"/>
+      <field name="menuOrder" title="aop.meta.order"/>
       <field name="menuTop" title="Show in top menu"/>
     </panel>
     <panel-tabs>

@@ -77,7 +77,7 @@
     ]]>
 
     <integer name="priority" />
-    <integer name="order" column="order_seq" title="Menu order"/>
+    <integer name="order" column="order_seq" title="aop.meta.order"/>
     <string name="xmlId" unique="true" />
     <string name="name" required="true"/>
     <string name="title" required="true" namecolumn="true"/>
@@ -117,7 +117,7 @@
     ]]>
 
     <integer name="priority" />
-    <integer name="order" column="order_seq" />
+    <integer name="order" column="order_seq" title="aop.meta.order"/>
     <string name="xmlId" unique="true" />
     <string name="name" required="true"/>
     <string name="title" required="true" namecolumn="true"/>
@@ -183,7 +183,7 @@
     <string name="icon" help="The image icon to show in UI widgets" />
     <string name="color" help="The color to use for tags" selection="color.name.selection"/>
     <string name="data" help="The addition data for UI widgets" max="1024" />
-    <integer name="order" column="order_seq"/>
+    <integer name="order" column="order_seq" title="aop.meta.order"/>
     <boolean name="hidden" />
     <many-to-one name="select" ref="MetaSelect" column="select_id" required="true"/>
   </entity>
@@ -243,7 +243,7 @@
     <string name="name" column="attr_name" required="true" />
     <string name="value" column="attr_value" required="true" />
     <string name="condition" column="condition_value" max="1024" />
-    <integer name="order" column="order_seq" />
+    <integer name="order" column="order_seq" title="aop.meta.order"/>
     <many-to-many name="roles" ref="com.axelor.auth.db.Role" />
   </entity>
 
