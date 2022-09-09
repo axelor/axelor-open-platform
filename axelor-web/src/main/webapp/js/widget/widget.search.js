@@ -42,8 +42,8 @@ var OPERATORS = {
   "isNull"	: _t("is null"),
   "notNull" 	: _t("is not null"),
 
-  "true"		: _t("is true"),
-  "false" 	: _t("is false"),
+  "$isTrue"		: _t("is true"),
+  "$isFalse" 	: _t("is false"),
 
   "$isEmpty"  : _t("is empty"),
   "$notEmpty"   : _t("is not empty"),
@@ -61,7 +61,7 @@ var OPERATORS_BY_TYPE = {
   "text"		: ["like", "notLike", "$isEmpty", "$notEmpty"],
   "string"	: ["=", "!=", "like", "notLike", "$isEmpty", "$notEmpty"],
   "integer"	: ["=", "!=", ">=", "<=", ">", "<", "between", "notBetween", "isNull", "notNull"],
-  "boolean"	: ["true", "false"]
+  "boolean"	: ["$isTrue", "$isFalse"]
 };
 
 _.each(["long", "decimal", "time"], function(type) {
@@ -88,6 +88,8 @@ var EXTRA_OPERATORS_BY_TARGET = {
 };
 
 var CAN_SHOW = {
+  "$isTrue": { input: false },
+  "$isFalse": { input: false },
   "$isEmpty": { input: false },
   "$notEmpty": { input: false },
   "$inPast": { timeUnit: true },
@@ -139,6 +141,29 @@ var CRITERION_PREPARATORS = {
 };
 
 var FILTER_TRANSFORMERS = {
+  "$isTrue": function (filter) {
+    _.extend(filter, {
+      operator: "=",
+      value: true,
+    });
+  },
+  "$isFalse": function (filter) {
+    _.extend(filter, {
+      operator: "or",
+      criteria: [
+        {
+          fieldName: filter.fieldName,
+          operator: "isNull"
+        },
+        {
+          fieldName: filter.fieldName,
+          operator: "=",
+          value: false
+        }
+      ]
+    });
+    delete filter.fieldName;
+  },
   "$isEmpty": function (filter) {
     _.extend(filter, {
       operator: "or",
@@ -338,7 +363,6 @@ ui.directive('uiFilterItem', function() {
         }
         return scope.filter && !scope.canShowSelect() && !scope.canShowTags() &&
              scope.filter.operator && !(
-             scope.filter.type == 'boolean' ||
              scope.filter.operator == 'isNull' ||
              scope.filter.operator == 'notNull');
       };
@@ -916,13 +940,6 @@ function FilterFormCtrl($scope, $element, ViewService) {
       if (criterionPreparator) {
         criterionPreparator(filter, item);
       } else {
-        if (item.operator === '=' && filter.value === true) {
-          filter.operator = 'true';
-        }
-        if (filter.operator === '=' && filter.value === false) {
-          filter.operator = 'false';
-        }
-
         if (field.type === 'date' || field.type === 'datetime') {
           if (filter.value) {
             filter.value = moment(filter.value).toDate();
@@ -1010,27 +1027,6 @@ function FilterFormCtrl($scope, $element, ViewService) {
         } else {
           criterion.fieldName += '.id';
         }
-      }
-
-      if (criterion.operator == "true") {
-        criterion.operator = "=";
-        criterion.value = true;
-      }
-      if (criterion.operator == "false") {
-        criterion = {
-          operator: "or",
-          criteria: [
-              {
-                fieldName: filter.field,
-                operator: "=",
-                value: false
-              },
-              {
-                fieldName: filter.field,
-                operator: "isNull"
-              }
-          ]
-        };
       }
 
       if (criterion.operator == "between" || criterion.operator == "notBetween") {
