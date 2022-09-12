@@ -223,9 +223,12 @@ db.default.password = secret
 | `view.confirm-yes-no` | whether show confirm dialog with yes/no buttons (else is Cancel/OK) | false
 | `view.grid.selection` | if set to `checkbox`, grid widgets will have checkbox selection enabled |
 | `view.grid.editor-buttons` | whether to show confirm/cancel buttons from grid row editor | true
-| `view.allow-customization` | whether to disable views customization |
+| `view.allow-customization` | whether to disable views customization | true
 | `view.adv-search.share` | whether to disable advance search sharing | true
 | `view.adv-search.export-full` | whether to disable export full option in advance search | true
+| `view.form.check-version` | whether to check version value for concurrent updates when switching tabs | false
+| `user.password.pattern` | pattern to validate user password | .{4,}
+| `user.password.pattern-title` | title displayed for the password pattern | "Please use at least 4 characters."
 | `api.pagination.max-per-page` | define the maximum number of items per page, -1 means unlimited | -1
 | `session.timeout` | session timeout (in minutes) | 60
 | `session.cookie.secure` | define session cookie as secure |
@@ -319,6 +322,19 @@ A minimal persistence xml file is required to confirm JPA requirements:
   </persistence-unit>
 </persistence>
 ----
+
+Some JPA/Hibernate configurations can also be set in `axelor-config.properties` file :
+
+[cols="1,8,1"]
+|===
+| `hibernate.hikari.minimumIdle` | minimum number of idle connections to maintain in the pool | 5
+| `hibernate.hikari.maximumPoolSize` | maximum size that the pool is allowed to reach | 20
+| `hibernate.hikari.idleTimeout` | maximum amount of time that a connection is allowed to sit idle in the pool | 300000
+| `hibernate.jdbc.batch_size` | maximum number of statements batch together before asking the driver to execute the batch | 20
+| `hibernate.jdbc.fetch_size` | JDBC fetch size | 20
+|===
+
+All others `hibernate.*` properties are also passed to Hibernate.
 
 == Cache Configuration
 
