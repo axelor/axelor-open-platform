@@ -847,6 +847,12 @@ function FilterFormCtrl($scope, $element, ViewService) {
     $scope.clearFilter(options);
   });
 
+  function findFieldName(filter) {
+    if (filter.fieldName) return filter.fieldName;
+    if (!_.isEmpty(filter.criteria)) return findFieldName(_.first(filter.criteria));
+    return '';
+  }
+
   function select(custom) {
 
     var criteria = custom.criteria;
@@ -856,7 +862,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
     if (filters && filters.length && filters.length < 3) {
       var first = _.first(filters);
       var last = _.last(filters);
-      var name = first.fieldName.replace('.id', '');
+      var name = findFieldName(first).replace('.id', '');
       if (contextFieldNames.indexOf(name) > -1) {
         $scope.contextData = {
             field: $scope.fields[name],
@@ -872,7 +878,7 @@ function FilterFormCtrl($scope, $element, ViewService) {
 
     _.each(filters, function(item) {
 
-      var fieldName = item.fieldName || '';
+      var fieldName = findFieldName(item);
       if (fieldName && $scope.fields[fieldName] === undefined && fieldName.indexOf('.') > -1 && fieldName.indexOf('::') === -1) {
         fieldName = fieldName.substring(0, fieldName.lastIndexOf('.'));
       }
@@ -895,6 +901,16 @@ function FilterFormCtrl($scope, $element, ViewService) {
       if (criterionPreparator) {
         criterionPreparator(filter, item);
       } else {
+        if (item.operator === '=' && filter.value === true) {
+          filter.operator = '$isTrue';
+        } else if (filter.operator === '=' && filter.value === false
+          || angular.equals(item, {
+            operator: 'or',
+            criteria: [{fieldName: fieldName, operator: '=', value: false},
+                       {fieldName: fieldName, operator: 'isNull'}]})) {
+          filter.operator = '$isFalse';
+        }
+
         if (field.type === 'date' || field.type === 'datetime') {
           if (filter.value) {
             filter.value = moment(filter.value).toDate();
