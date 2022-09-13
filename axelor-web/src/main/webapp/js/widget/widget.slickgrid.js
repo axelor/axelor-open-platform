@@ -620,6 +620,10 @@ Grid.prototype.parse = function(view) {
 
     switch (field.type) {
     case 'field': // dummy field
+      if (!handler._parentModel) {
+        sortable = false;
+      }
+      break;
     case 'icon':
     case 'button':
     case 'one-to-many':
@@ -628,10 +632,11 @@ Grid.prototype.parse = function(view) {
       break;
     }
 
-    if (field.transient
+    if (!handler._parentModel
+      && (field.transient
         || field.dummy && !field.jsonField
         || field.json
-        || field.encrypted) {
+        || field.encrypted)) {
       sortable = false;
     }
 
