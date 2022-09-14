@@ -1,0 +1,8 @@
+title: Implement client-side sorting of o2m/m2m grids
+type: feature
+description: |
+  When there were some pending changes on a grid, sorting used to be disabled.
+  This is no longer the case thanks to client-side sorting.
+  Also transient/dummy fields can now be sorted.
+  Only o2m/m2m grids can be sorted client-side.
+  Other grid views that use pagination still send search request upon sorting.

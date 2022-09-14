@@ -375,67 +375,42 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 
   };
 
+  // Client-side sorting (prevent losing O2M changes)
   $scope.onSort = function(event, args) {
+    var sortBy = (args.sortCols || []).map(function (column) {
+      var field = column.sortCol.field;
+      return column.sortAsc ? field : '-' + field;
+    });
 
-    //TODO: implement client side sorting (prevent losing O2M changes).
-    if ($scope.isDirty() && !$scope.editorCanSave) {
-      return;
-    }
+    var items = $scope.getItems();
+    var columns = args.grid.getColumns();
+    var jsonFields = {};
 
-    var records = $scope.getItems();
-    if (records == null || records.length === 0)
-      return;
+    items = axelor.sortBy(items, sortBy, function (item, key) {
+      var column = _.findWhere(columns, { field: key }) || {};
+      var descriptor = column.descriptor || {};
 
-    for (var i = 0; i < records.length; i++) {
-      var item = records[i];
-      if (item.$dirty || !item.id || item.id <= 0) {
-        return;
-      }
-    }
-
-    var sortBy = [];
-
-    angular.forEach(args.sortCols, function(column){
-      var field = column.sortCol.descriptor;
-      var name = column.sortCol.field;
-      if (field.jsonField) {
-        if (field.type === 'many-to-one' && field.targetName) {
-          name = name + "." + field.targetName;
+      if (descriptor.jsonField) {
+        var json = jsonFields[item.id];
+        if (!json) {
+          json = jsonFields[item.id] = angular.fromJson(item[descriptor.jsonField]) || {};
         }
-        name += '::' + ('integer,boolean,decimal'.indexOf(field.type) > -1 ? field.type : 'text');
+        item = json;
+        key = descriptor.jsonPath;
       }
-      var spec = column.sortAsc ? name : '-' + name;
-      sortBy.push(spec);
+
+      var value = ui.findNested(item, '$t:' + key) || ui.findNested(item, key);
+
+      if (_.isObject(value)) {
+        var targetName = descriptor.targetName || 'id';
+        value = ui.findNested(value, '$t:' + targetName) || ui.findNested(value, targetName);
+      }
+
+      return value;
     });
 
-    var ids = _.pluck(records, 'id');
-    var criterion = {
-      'fieldName': 'id',
-      'operator': 'in',
-      'value': ids
-    };
-
-    var fields = $scope.selectFields();
-    var filter = {
-      operator: 'and',
-      criteria: [criterion]
-    };
-
-    var context = _.pick($scope.getContext(), ['id', '_model']);
-    context._field = $scope.field.name;
-    context._field_ids = ids;
-
-    $scope.selection = [];
-    $scope._dataSource.search({
-      filter: filter,
-      fields: fields,
-      sortBy: sortBy,
-      archived: true,
-      limit: -1,
-      domain: null,
-      context: context
-    });
-  };
+    $scope.setItems(items);
+  }
 
   $scope.onShow = function(viewPromise) {
 
