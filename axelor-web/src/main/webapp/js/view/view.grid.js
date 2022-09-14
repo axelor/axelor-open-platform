@@ -762,10 +762,12 @@ function GridViewCtrl($scope, $element) {
     if ($scope.record && $scope.field) {
       var recordItems = $scope.record[$scope.field.name];
       if (recordItems && recordItems.length === items.length) {
-        _.each(recordItems, function (recordItem, index) {
+        _.each(recordItems, function (recordItem) {
           // Some items might be IDs
-          if (_.isObject(recordItem)) {
-            recordItem.selected = items[index].selected;
+          if (!_.isObject(recordItem)) return;
+          var found = _.findWhere(items, { id: recordItem.id });
+          if (found) {
+            recordItem.selected = found.selected;
           }
         });
       }
