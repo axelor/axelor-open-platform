@@ -1,0 +1,8 @@
+---
+title: Let JpaFixture items persist error propagate
+type: change
+description: |
+  JpaFixture is used for tests.
+
+  In case of data error, tests failed without the actual cause, and there is no point in continuing
+  and have obscure errors happen on wrong data.

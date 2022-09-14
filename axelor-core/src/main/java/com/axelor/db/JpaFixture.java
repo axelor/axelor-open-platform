@@ -202,11 +202,7 @@ public class JpaFixture {
     data.load(stream);
 
     for (Object item : Lists.reverse(Lists.newArrayList(objects.values()))) {
-      try {
-        JPA.manage((Model) item);
-      } catch (Exception e) {
-        log.error(e.getMessage(), e);
-      }
+      JPA.manage((Model) item);
     }
   }
 }
