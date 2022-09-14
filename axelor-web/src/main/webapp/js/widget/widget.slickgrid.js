@@ -184,7 +184,7 @@ var Formatters = {
   },
 
   "many-to-one": function(field, value, record) {
-    var key = field.targetName;
+    var key = field.targetName || 'id';
     var keyDot = field.name + '.' + key;
 
     // consider dotted value in case custom target-name is given

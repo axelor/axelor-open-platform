@@ -1,0 +1,3 @@
+---
+title: Fix blank m2o in grid when there is no namecolumn
+type: fix
