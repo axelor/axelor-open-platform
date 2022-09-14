@@ -620,14 +620,14 @@ Grid.prototype.parse = function(view) {
 
     switch (field.type) {
     case 'field': // dummy field
+    case 'one-to-many':
+    case 'many-to-many':
       if (!handler._parentModel) {
         sortable = false;
       }
       break;
     case 'icon':
     case 'button':
-    case 'one-to-many':
-    case 'many-to-many':
       sortable = false;
       break;
     }

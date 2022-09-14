@@ -401,7 +401,9 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 
       var value = ui.findNested(item, '$t:' + key) || ui.findNested(item, key);
 
-      if (_.isObject(value)) {
+      if (_.isArray(value)) {
+        return value.length;
+      } else if (_.isObject(value)) {
         var targetName = descriptor.targetName || 'id';
         value = ui.findNested(value, '$t:' + targetName) || ui.findNested(value, targetName);
       }
