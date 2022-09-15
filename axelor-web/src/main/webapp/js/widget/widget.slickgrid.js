@@ -1963,7 +1963,7 @@ Grid.prototype.addNewRow = function () {
     if (formScope.defaultValues === null) {
       formScope.defaultValues = {};
       _.each(formScope.fields, function (field, name) {
-        if (field.defaultValue !== undefined) {
+        if (name.indexOf('.') === -1 && field.defaultValue !== undefined) {
           formScope.defaultValues[name] = field.defaultValue;
         }
       });
