@@ -486,6 +486,10 @@ public class XMLViews {
     return findView(name, type, model, null);
   }
 
+  public static boolean isCustomizationEnabled() {
+    return customizationEnabled.get();
+  }
+
   /**
    * Find view by the given parameters.
    *
@@ -515,7 +519,7 @@ public class XMLViews {
     MetaViewCustom custom = null;
 
     // find personalized view
-    if (Boolean.TRUE.equals(customizationEnabled.get()) && module == null && user != null) {
+    if (Boolean.TRUE.equals(isCustomizationEnabled()) && module == null && user != null) {
       custom = findCustomView(customViews, name, type, model);
     }
 
