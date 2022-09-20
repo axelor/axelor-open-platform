@@ -42,7 +42,6 @@ dependencies {
 
   api libs.ST4
   api libs.apache_shiro
-  implementation libs.snakeyaml
   api libs.xstream
   api libs.commons_csv
 

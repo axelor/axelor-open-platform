@@ -26,4 +26,5 @@ dependencies {
   implementation libs.resteasy_client
   implementation libs.resteasy_server
   implementation libs.jackson_libs
+  implementation libs.snakeyaml
 }
