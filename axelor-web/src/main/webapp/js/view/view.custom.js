@@ -221,6 +221,7 @@ ui.directive('reportTable',  function() {
         fields = {};
         _.each(names, function (name) {
           var field = _.findWhere(schema.items, { name: name }) || {};
+          if (field.hidden) return;
           var col = _.extend({}, field, field.widgetAttrs, {
             name: name,
             title: field.title || field.autoTitle || _t(_.humanize(name)),
