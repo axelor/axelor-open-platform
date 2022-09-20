@@ -330,7 +330,7 @@ ui.directive('reportTable',  function() {
         }
 
         var sortKey = (activeSort.descending ? '-' : '') + activeSort.key;
-        var extractor = col.type === 'string' ? scope.format : null;
+        var extractor = col.type === 'string' && _.isEmpty(col.selectionList) ? scope.format : null;
         scope.data = axelor.sortBy(scope.data, sortKey, extractor);
       };
 
