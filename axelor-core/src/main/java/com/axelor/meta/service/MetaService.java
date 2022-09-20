@@ -202,6 +202,7 @@ public class MetaService {
 
   private ViewCustomizationPermission getViewCustomizationPermission(User user) {
     return Optional.ofNullable(user)
+        .filter(u -> XMLViews.isCustomizationEnabled())
         .map(User::getGroup)
         .map(Group::getViewCustomizationPermission)
         .orElse(ViewCustomizationPermission.NOT_ALLOWED);
