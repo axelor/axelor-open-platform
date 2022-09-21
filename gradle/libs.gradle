@@ -95,7 +95,7 @@ libs.jdbc_mysql = "mysql:mysql-connector-java:8.0.30"
 libs.hibernate = [
   "org.hibernate:hibernate-core:${versions.hibernate}",
   "org.hibernate:hibernate-hikaricp:${versions.hibernate}",
-  "org.hibernate:hibernate-validator:${versions.hibernate_validator}",
+  "org.hibernate.validator:hibernate-validator:${versions.hibernate_validator}",
   "org.hibernate:hibernate-jcache:${versions.hibernate}"
 ]
 
