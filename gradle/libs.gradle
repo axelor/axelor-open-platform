@@ -53,7 +53,7 @@ libs.guava = [
 ]
 
 // yaml
-libs.snakeyaml = "org.yaml:snakeyaml:1.30"
+libs.snakeyaml = "org.yaml:snakeyaml:1.32"
 
 // Guice
 libs.guice = "com.google.inject:guice:${versions.guice}"
