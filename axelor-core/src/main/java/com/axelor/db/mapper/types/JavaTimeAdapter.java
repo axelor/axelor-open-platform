@@ -101,6 +101,50 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
           .withZoneSameInstant(ZoneId.systemDefault());
     } catch (Exception e) {
     }
+    try {
+      return ZonedDateTime.parse(String.valueOf(value));
+    } catch (Exception e) {
+    }
+    throw new IllegalArgumentException("Unable to convert value: " + value);
+  }
+
+  private LocalDate toLocalDate(Object value) {
+    if (value == null) {
+      return LocalDate.now();
+    }
+    if (value instanceof LocalDate) {
+      return (LocalDate) value;
+    }
+    if (value instanceof ZonedDateTime) {
+      return ((ZonedDateTime) value).toLocalDate();
+    }
+    if (value instanceof Date) {
+      return ((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+    if (value instanceof Calendar) {
+      return ((Calendar) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+    try {
+      return ZonedDateTime.from(((Temporal) value)).toLocalDate();
+    } catch (Exception e) {
+    }
+    try {
+      return OffsetDateTime.parse(value.toString())
+          .atZoneSameInstant(ZoneId.systemDefault())
+          .toLocalDate();
+    } catch (Exception e) {
+    }
+    try {
+      return LocalDateTime.parse(value.toString()).atZone(ZoneId.systemDefault()).toLocalDate();
+    } catch (Exception e) {
+    }
+    try {
+      return LocalDate.parse(value.toString())
+          .atStartOfDay()
+          .atZone(ZoneId.systemDefault())
+          .toLocalDate();
+    } catch (Exception e) {
+    }
     throw new IllegalArgumentException("Unable to convert value: " + value);
   }
 
@@ -118,7 +162,7 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
     @Override
     public Object adapt(
         Object value, Class<?> actualType, Type genericType, Annotation[] annotations) {
-      return value instanceof LocalDate ? value : toZonedDateTime(value).toLocalDate();
+      return toLocalDate(value);
     }
   }
 

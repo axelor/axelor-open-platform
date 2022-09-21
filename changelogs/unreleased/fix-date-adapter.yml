@@ -1,0 +1,5 @@
+---
+title: Fix timezone issues with date adapter
+type: fix
+description: |
+  When the server is running on UTC- timezone, date could be converted back by one day.
