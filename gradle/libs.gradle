@@ -199,7 +199,7 @@ libs.pac4j = [
 libs.buji_pac4j = "io.buji:buji-pac4j:${versions.buji_pac4j}"
 
 // UnboundID LDAP SDK (for testing only)
-libs.unboundid_ldapsdk = 'com.unboundid:unboundid-ldapsdk:6.0.5'
+libs.unboundid_ldapsdk = 'com.unboundid:unboundid-ldapsdk:6.0.6'
 
 // commons
 libs.commons_cli = "commons-cli:commons-cli:1.5.0"
