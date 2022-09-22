@@ -478,6 +478,12 @@ header .dropdown-submenu:focus > a {
   height: 21px;
 }
 
+[ui-view-form] .form-item-container.large input {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+
 [ui-view-form] .tag-select li.tag-selector input {
   min-height: 18px;
   height: 18px;

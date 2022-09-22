@@ -1,0 +1,3 @@
+---
+title: Fix clipped field in Modern theme when using `css="large"` on WebKit-based browsers
+type: fix
