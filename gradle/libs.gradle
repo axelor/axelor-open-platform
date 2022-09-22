@@ -249,7 +249,7 @@ libs.xstream = [
 libs.jsoup = "org.jsoup:jsoup:1.15.3"
 
 // StringTemplate
-libs.ST4 = "org.antlr:ST4:4.3.3"
+libs.ST4 = "org.antlr:ST4:4.3.4"
 
 // gradle tooling
 libs.gradle_tooling = "org.gradle:gradle-tooling-api:${gradle.gradleVersion}"
