@@ -116,6 +116,19 @@
       this._listeners = {};
     }
 
+    function transform(item) {
+      if (_.isArray(item)) return _.map(item, transform);
+      if (_.isArray(item.criteria)) {
+        item.criteria = transform(item.criteria);
+        return item;
+      }
+      if (item.transformer) {
+        item.transformer(item);
+        delete item.transformer;
+      }
+      return item;
+    }
+
     DataSource.prototype = {
 
       constructor: DataSource,
@@ -258,19 +271,6 @@
             }
             _.each(value, setVersion);
           }
-        }
-
-        function transform(item) {
-          if (_.isArray(item)) return _.map(item, transform);
-          if (_.isArray(item.criteria)) {
-            item.criteria = transform(item.criteria);
-            return item;
-          }
-          if (item.transformer) {
-            item.transformer(item);
-            delete item.transformer;
-          }
-          return item;
         }
 
         var opts = _.extend({
@@ -744,9 +744,11 @@
           _domain: domain,
           _domainContext: context,
           _archived: this._showArchived
-        }, filter);
+        }, angular.copy(filter));
 
-
+        if (query.criteria && query.criteria.length) {
+          transform(query.criteria);
+        }
 
         var promise = this._request('updateMass').post({
           records: [values],
@@ -1048,7 +1050,11 @@
           _domainContext: context,
           _domainAction: action || undefined,
           _archived: this._showArchived
-        }, filter);
+        }, angular.copy(filter));
+
+        if (query.criteria && query.criteria.length) {
+          transform(query.criteria);
+        }
 
         var params = {
           fields: fields,

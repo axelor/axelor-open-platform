@@ -1,0 +1,6 @@
+---
+title: Apply client-side operators on export and masss update
+type: fix
+description: |
+  Applying client-side operators was done on search only.
+  Now, it is also done on exports and mass updates.
