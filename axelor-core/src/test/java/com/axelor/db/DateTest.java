@@ -19,10 +19,13 @@
 package com.axelor.db;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import com.axelor.db.mapper.Adapter;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -45,6 +48,10 @@ class DateTest {
     final LocalDate expected = LocalDate.now();
     runInTimeZones(
         () -> {
+          {
+            final Object actual = Adapter.adapt(null, LocalDate.class, null, null);
+            assertNull(actual);
+          }
           {
             final String value = expected.toString();
             final Object actual = Adapter.adapt(value, LocalDate.class, null, null);
@@ -82,9 +89,13 @@ class DateTest {
 
   @Test
   void testLocalDateTime() {
-    final LocalDateTime expected = LocalDateTime.now();
+    final LocalDateTime expected = LocalDate.now().atTime(LocalTime.NOON);
     runInTimeZones(
         () -> {
+          {
+            final Object actual = Adapter.adapt(null, LocalDateTime.class, null, null);
+            assertNull(actual);
+          }
           {
             final String value = expected.toString();
             final Object actual = Adapter.adapt(value, LocalDateTime.class, null, null);
@@ -121,9 +132,14 @@ class DateTest {
 
   @Test
   void testZonedDateTime() {
-    final ZonedDateTime expected = ZonedDateTime.now();
+    final ZonedDateTime expected =
+        LocalDate.now().atTime(LocalTime.NOON).atZone(ZoneId.systemDefault());
     runInTimeZones(
         () -> {
+          {
+            final Object actual = Adapter.adapt(null, ZonedDateTime.class, null, null);
+            assertNull(actual);
+          }
           {
             final String value = expected.toString();
             final Object actual = Adapter.adapt(value, ZonedDateTime.class, null, null);

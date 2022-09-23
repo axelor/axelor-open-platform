@@ -72,7 +72,7 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
 
   private ZonedDateTime toZonedDateTime(Object value) {
     if (value == null) {
-      return ZonedDateTime.now();
+      return null;
     }
     if (value instanceof ZonedDateTime) {
       return (ZonedDateTime) value;
@@ -110,7 +110,7 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
 
   private LocalDate toLocalDate(Object value) {
     if (value == null) {
-      return LocalDate.now();
+      return null;
     }
     if (value instanceof LocalDate) {
       return (LocalDate) value;
@@ -153,7 +153,7 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
     @Override
     public Object adapt(
         Object value, Class<?> actualType, Type genericType, Annotation[] annotations) {
-      return value instanceof ZonedDateTime ? value : toZonedDateTime(value);
+      return toZonedDateTime(value);
     }
   }
 
