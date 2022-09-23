@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_6.0.xsd">
+
+  <module name="merge" package="com.axelor.merge.db" />
+
+  <entity name="MyEntity">
+    <string name="myString" title="My String" max="10" required="true" default="AAA"/>
+    <string name="myString2" title="Test" max="10" min="1" default="BB" required="true" hidden="true" index="true" search="myString2"/>
+
+    <string name="myTransient" transient="false" title="Old"/>
+    <string name="myField"/>
+    <datetime name="myDate" tz="false"/>
+    <integer name="myInt"/>
+
+    <many-to-one name="myParent" ref="MyEntity" index="false"/>
+    <one-to-many name="myCollection" ref="MyEntity" mappedBy="myParent" title="Old"/>
+  </entity>
+
+</domain-models>

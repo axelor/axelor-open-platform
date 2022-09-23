@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_6.0.xsd">
+
+  <module name="merge" package="com.axelor.merge.db" />
+
+  <entity name="MyEntity">
+    <!-- Should merge with all the initial attributes -->
+    <string name="myString"/>
+
+    <!-- Should override existing attribute-->
+    <string name="myString2" title="Test New" max="" min="" default="BBB" required="false" hidden="false" index="false" search="myString2,myString"/>
+
+    <!-- Should not be able to set a non-transient to transient field -->
+    <string name="myTransient" transient="true" title="New"/>
+
+    <!-- Should not be able to override few attributes -->
+    <string name="myField" initParam="false" json="false" column="aColumn"/>
+    <datetime name="myDate" tz="true"/>
+
+    <!-- Should not be able to change the field type -->
+    <decimal name="myInt"/>
+
+    <!-- Should not be able to override ref and mappedBy attributes -->
+    <many-to-one name="myParent" ref="MyEntity2"/>
+    <one-to-many name="myCollection" ref="MyEntity2" mappedBy="myParent2" title="New"/>
+  </entity>
+
+</domain-models>

@@ -11,4 +11,6 @@ dependencies {
   implementation libs.javax_jaxb
   implementation libs.eclipselink_moxy
   implementation libs.jasypt
+
+  testImplementation project(':axelor-core')
 }
