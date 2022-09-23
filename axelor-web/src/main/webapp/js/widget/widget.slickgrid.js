@@ -618,6 +618,10 @@ Grid.prototype.parse = function(view) {
       ? view.sortable !== false
       : field.sortable !== false;
 
+    if (view.canMove) {
+      sortable = false;
+    }
+
     switch (field.type) {
     case 'field': // dummy field
     case 'one-to-many':
