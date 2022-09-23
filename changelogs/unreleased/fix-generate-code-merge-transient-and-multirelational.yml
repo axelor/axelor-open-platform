@@ -1,3 +1,6 @@
 ---
 title: Allow code generator to merge transient and multirelational fields
-type: fix
+type: feature
+description: |
+  Previously it was not able to override any attributes of transients and collections fields.
+  Now it is allow to change some of their attributes.
