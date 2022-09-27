@@ -1517,88 +1517,34 @@ ui.directive('uiFilterBox', function() {
             filter.transformer = transformer;
           }
 
-          var name = filter.fieldName;
           var type = (($scope.fields||$scope.$parent.fields||{})[filter.fieldName]||{}).type;
 
           var v1 = filter.value;
           var v2 = filter.value2;
 
-          // if json date/datetime field
-          if (name.indexOf('::') > -1 && (type === 'date' || type === 'datetime')) {
-            filter = _.extend({}, filter);
-            switch (filter.operator) {
-              case '=':
-                v2 = v1;
-                // fall through
-              case 'between':
-                if (!v2) {
-                  v2 = v1;
-                }
-                filter.operator = 'and';
-                filter.criteria = [
-                  {
-                    fieldName: filter.fieldName,
-                    operator: '>=',
-                    value: moment(v1).startOf('day').toDate()
-                  },
-                  {
-                    fieldName: filter.fieldName,
-                    operator: '<',
-                    value: axelor.nextOf(moment(v2), 'day').toDate()
-                  }
-                ];
-                filter.fieldName = undefined;
-                filter.value = undefined;
-                filter.value2 = undefined;
-                break;
-              case '!=':
-                v2 = v1;
-                // fall through
-              case 'notBetween':
-                if (!v2) {
-                  v2 = v1;
-                }
-                filter.operator = 'or';
-                filter.criteria = [
-                  {
-                    fieldName: filter.fieldName,
-                    operator: '<',
-                    value: moment(v1).startOf('day').toDate()
-                  },
-                  {
-                    fieldName: filter.fieldName,
-                    operator: '>=',
-                    value: axelor.nextOf(moment(v2), 'day').toDate()
-                  }
-                ];
-                filter.fieldName = undefined;
-                filter.value = undefined;
-                filter.value2 = undefined;
-                break;
-              case '<':
-              case '>=':
-                filter.value = moment(v1).startOf('day').toDate();
-                filter.value2 = undefined;
-                break;
-              case '>':
-                filter.operator = '>=';
-                filter.value = axelor.nextOf(moment(v1), 'day').toDate();
-                filter.value2 = undefined;
-                break;
-              case '<=':
-                filter.operator = '<';
-                filter.value = axelor.nextOf(value, 'day').toDate();
-                filter.value2 = undefined;
-                break;
+          function isMomentCompatible(value) {
+            return value instanceof moment
+              || _.isDate(value)
+              || /\d+-\d+-\d+/.test(value);
+          }
+
+          if (!isMomentCompatible(v1) || v2 && !isMomentCompatible(v2)) {
+            return filter;
+          }
+
+          if (type === 'date') {
+            function toDate(value) {
+              return moment(value).startOf('day').format('YYYY-MM-DD');
+            }
+
+            filter.value = toDate(v1);
+            if (v2) {
+              filter.value2 = toDate(v2);
             }
             return filter;
           }
 
-          if (type != 'datetime') return filter;
-
-          if (!(/\d+-\d+\d+T/.test(filter.value) || _.isDate(filter.value))) {
-            return filter;
-          }
+          if (type !== 'datetime') return filter;
 
           switch (filter.operator) {
             case '=':
