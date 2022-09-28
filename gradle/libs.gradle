@@ -224,6 +224,7 @@ libs.birt_runtime = [
     exclude module: "xmlbeans"
     exclude module: "flute"
     exclude module: "org.apache.commons.codec"
+    exclude module: "com.ibm.icu"
   },
   // overrides
   dependencies.create("xerces:xercesImpl:2.12.2") {

@@ -1,0 +1,3 @@
+---
+title: Fix dependency conflict between GraalJS and Birt with package "com.ibm.icu"
+type: fix
