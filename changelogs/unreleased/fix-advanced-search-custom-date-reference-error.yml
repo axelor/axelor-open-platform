@@ -1,3 +1,0 @@
----
-title: Fix ReferenceError with "<=" operator on custom date/datetime fields
-type: fix

@@ -1,3 +1,122 @@
+## 6.0.3 (2022-09-28)
+
+#### Features
+
+* Add view action to help popover
+
+#### Fixed
+
+* Fix missing item context after creating M2M item from popup
+* Check for `view.allow-customization` setting when saving customized view
+* Fix save action on top grid preventing further actions
+* Fix wrong css class applied on editable grid
+* Fix custom fields on editable grid
+* Fix restarting jobs after scheduler shutdown
+* Fix model class resolution in Groovy expressions
+* Fix refreshing html dashlet when record changes
+* Fix non editable grid view customization popup
+* Fix required field using TagSelect widget
+* Skip default values of dotted field in editable grid
+* Fix timezone issues with date adapter
+
+  <details>
+  
+  When the server is running on UTC- timezone, date could be converted back by one day.
+  
+  </details>
+
+* Fix conflicting `Order` title
+* Fix saving boolean false filter
+
+  <details>
+  
+  In the case of boolean fields with operator `false`,
+  filter was transformed in order to check for null or false.
+  But by doing that, original criteria was lost, breaking meta filter saving.
+  Replaced client-side operators `true` and `false` by new virtual operators
+  `$isTrue` and `$isFalse` which perform client-side transformation.
+  
+  </details>
+
+* Fix ReferenceError with "<=" operator on custom date/datetime fields
+* Fix sidebar toggle on window resize
+* Fix client authentication using path based callback url
+
+  <details>
+  
+  Some clients, ie AzureAd2Client, use path based callback url (/callback/AzureAd2Client) instead of default query based callback url (/callback?client_name=AzureAd2Client).
+  
+  </details>
+
+* Fix missing TagSelect placeholder until we add and remove an item
+* Fix auth properties that exist in client and configuration
+
+  <details>
+  
+  When a property exists in the configuration and the client, try to set both.
+  
+  For example, `scope` exists in both `GenericOAuth20Client` and `OAuthConfiguration`.
+  
+  </details>
+
+* Fix clipped field in Modern theme when using `css="large"` on WebKit-based browsers
+* Apply client-side operators on export and masss update
+
+  <details>
+  
+  Applying client-side operators was done on search only.
+  Now, it is also done on exports and mass updates.
+  
+  </details>
+
+* Fix setting $-prefixed dummy fields from onNew with default values
+
+  <details>
+  
+  Issue happened when setting $-prefixed dummy fields from onNew
+  and record has some default values.
+  
+  </details>
+
+* Fix wrong selected rows after grid sorting
+* Fix custom date/datetime criteria processing combined with column search
+* Use access token to retrieve user profile picture from OpenID Connect
+
+  <details>
+  
+  This fixes retrieving user profile picture from Azure Active Directory,
+  where sending the access token is required.
+  
+  </details>
+
+* Fix refreshing html view from tab right click
+* Fix save action with only default values
+
+  <details>
+  
+  This allow to save a record that contain default values (generally coming from domain definition) 
+  when calling `save` action. This behavior will be same as the toolbar save button behavior.
+  
+  </details>
+
+* Fix changing dashlet url from `action-attrs`
+* Fix setting authentication map property
+
+  <details>
+  
+  This fixes setting `GenericOAuth20Client.profileAttrs`.
+  Issue happened when there was no getter.
+  
+  ```properties
+  # profile attributes: map of key: type|tag
+  # supported types: Integer, Boolean, Color, Gender, Locale, Long, URI, String (default)
+  auth.provider.oauth.profile-attrs.age = Integer|age
+  auth.provider.oauth.profile-attrs.is_admin = Boolean|is_admin
+  ```
+  
+  </details>
+
+
 ## 6.0.2 (2022-08-03)
 
 #### Features

@@ -1,6 +1,0 @@
----
-title: Fix setting $-prefixed dummy fields from onNew with default values
-type: fix
-description: |
-  Issue happened when setting $-prefixed dummy fields from onNew
-  and record has some default values.
