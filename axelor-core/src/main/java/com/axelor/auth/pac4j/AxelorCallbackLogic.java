@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.client.finder.DefaultCallbackClientFinder;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.context.JEEContext;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.engine.DefaultCallbackLogic;
@@ -37,7 +38,6 @@ import org.pac4j.core.exception.http.WithLocationAction;
 import org.pac4j.core.http.adapter.HttpActionAdapter;
 import org.pac4j.core.util.HttpActionHelper;
 import org.pac4j.core.util.Pac4jConstants;
-import org.pac4j.jee.context.JEEContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -18,10 +18,10 @@
  */
 package com.axelor.auth.pac4j;
 
-import io.buji.pac4j.filter.CallbackFilter;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.pac4j.core.config.Config;
+import org.pac4j.jee.filter.CallbackFilter;
 
 @Singleton
 public class AxelorCallbackFilter extends CallbackFilter {

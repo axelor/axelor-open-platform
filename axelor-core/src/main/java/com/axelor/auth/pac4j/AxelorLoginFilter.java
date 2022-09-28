@@ -19,7 +19,6 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.auth.AuthUtils;
-import io.buji.pac4j.filter.SecurityFilter;
 import java.io.IOException;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -33,11 +32,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.pac4j.core.client.Clients;
+import org.pac4j.core.context.JEEContext;
+import org.pac4j.core.context.session.JEESessionStore;
 import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.core.profile.UserProfile;
 import org.pac4j.core.profile.factory.ProfileManagerFactory;
-import org.pac4j.jee.context.JEEContext;
-import org.pac4j.jee.context.session.JEESessionStore;
+import org.pac4j.jee.filter.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

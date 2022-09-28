@@ -21,7 +21,6 @@ package com.axelor.auth.pac4j;
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
-import io.buji.pac4j.filter.LogoutFilter;
 import java.io.IOException;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -34,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.shiro.subject.Subject;
 import org.pac4j.core.config.Config;
+import org.pac4j.jee.filter.LogoutFilter;
 
 @Singleton
 public class AxelorLogoutFilter extends LogoutFilter {
