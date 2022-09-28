@@ -7,7 +7,7 @@ and resources to help you learn about {page-component-title}.
 
 xref:news.adoc[What's New]::
   Describes what is new in {page-component-title} {page-component-version}.
-xref:migration.adoc[Migration Guide]::
+xref:migrations.adoc[Migration Guide]::
   Describes the steps required to migrate from {page-component-title} 5.x to {page-component-version}.
 xref:getting-started:index.adoc[Getting Started]::
   These topics describe how to get started with {page-component-title} as a developer.

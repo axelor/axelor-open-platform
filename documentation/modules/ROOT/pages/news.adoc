@@ -24,4 +24,4 @@ be defined via file, system props or environment vars.
 * Some deprecated features and usage have been removed
 
 Please check the {product-changelog}[change log] for detailed list of changes and
-the xref:ROOT:migration.adoc[migration guide].
+the xref:ROOT:migrations.adoc[migration guide].

@@ -1,4 +1,4 @@
-= Migration Guide
+= 6.0 Migration Guide
 :toc:
 :toc-title:
 
@@ -11,8 +11,12 @@
 :url-junit-upgrade: https://www.baeldung.com/junit-5-migration
 :url-pac4j-clients: http://www.pac4j.org/4.5.x/docs/clients.html
 :url-application-configuration: xref:dev-guide:application/config.adoc#application-configuration
+:product-version-changelog: https://github.com/axelor/axelor-open-platform/blob/6.0/CHANGELOG.md
 
-In this document, we will see the major steps required to migrate from 5.x to 6.0.
+In this document, we will see the major steps to migrate from 5.x to 6.0.
+
+NOTE: Please check the {product-version-changelog}[change log] for detailed list of fixes, changes and improvements
+introduced in 6.0
 
 == Java 8 to Java 11
 

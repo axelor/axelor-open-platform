@@ -1,0 +1,89 @@
+= 6.1 Migration Guide
+:toc:
+:toc-title:
+
+:url-jdk-upgrade: https://docs.oracle.com/en/java/javase/11/migrate/index.html
+:url-tomcat-9: https://tomcat.apache.org/tomcat-9.0-doc/index.html
+:url-pg-upgrade: https://www.postgresql.org/docs/12/upgrading.html
+:url-gradle-docs: https://docs.gradle.org/7.3/userguide/userguide.html
+:product-version-changelog: https://github.com/axelor/axelor-open-platform/blob/6.1/CHANGELOG.md
+
+In this document, we will see the major steps to migrate from 6.0 to 6.1.
+
+NOTE: Please check the {product-version-changelog}[change log] for detailed list of fixes, changes and improvements
+introduced in 6.1
+
+== Overriding entity fields
+
+Previously, the code generator replaced the field definition by the new one. It was resulting in potential issues if
+some changes were added to the main field between two versions.
+
+Now the code generator will merge initial field attributes with overridable attributes.
+So, only necessarily attributes that need to be overridden should be defined in the overwritten entity.
+
+This applies to both entities and enums.
+
+In the case of entity fields, there are a few restrictions:
+
+- Attributes that are not overridable:
+  * `initParam`
+  * `column`
+  * `column2`
+  * `ref`
+  * `mappedBy`
+  * `table`
+  * `tz`
+  * `json`
+- Attributes that are overridable with some conditions:
+  * `large`: large field cannot become non-large
+  * `transient` and `formula`: persisted field cannot become non-persisted
+
+Transient and multirelational fields that were previously not overridable now are.
+
+== View collaboration
+
+Views collaboration allows to see users that are seeing/editing/updating the current opened record. More information
+xref:dev-guide:web-client/collaboration.adoc[here]
+
+This feature can be disabled with `view.collaboration.enabled` property.
+
+== Client-side sorting of o2m/m2m grids
+
+Current o2m/m2m fields sorting is done using HTTP search request. So it was not able to sort such fields when the field
+value was dirty (i.e. contains some pending changes).
+
+Now o2m/m2m fields are sorted on client side. So no matter the field contains pending change, it can be sorted (only
+restricted when records can be moved). Also dummy and transient fields can be sorted.
+
+== Grid pagination
+
+Previously, we implemented `api.pagination.max-items-per-page` to define the maximum number of records displayed per page.
+Current default behavior is unlimited (but can be changed in configuration file), so a user can change the settings in
+grid views and display an unlimited number of records. This is causing serious performance issues on large entities.
+
+Now, the maximum number of records a user can display per page is limited to *500*.
+
+Also, we introduce a new configuration `api.pagination.default-per-page` to define the default number of items
+displayed per page. Default value is still 40 records.
+
+== Scale on grid
+
+Changing a field `scale` was effective only on form view. Now, `scale` attribute on a decimal field can be changed on a
+grid column by an action.
+
+Also, the `x-scale` attribute now accepts a field name for a dynamic evaluation. Grid and form view are both supported.
+
+[source,xml]
+----
+<field name="decimalField" widget="Decimal" x-scale="currency.decimalPlaces" x-precision="18"/>
+----
+
+== Bound field in InfoButton widget
+
+When using `info-button` widget, the name attribute of the button bind to a real or dummy field. It was causing issues
+to change the button attributes and the field attributes separately using `action-attrs`. Moreover, the values displayed
+in the button was not formatted according to the field definition.
+
+We introduced `x-field` attribute on `info-button` widget to specify the bound field. When using `x-field`, the button
+and the field are 2 distinct elements. Any attributes defined on that field will be used to format the value. Moreover,
+this allows to change the button attributes without impact on the bound field.
