@@ -1,6 +1,0 @@
----
-title: Fix save action with only default values
-type: fix
-description: |
-  This allow to save a record that contain default values (generally coming from domain definition) 
-  when calling `save` action. This behavior will be same as the toolbar save button behavior.

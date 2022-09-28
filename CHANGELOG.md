@@ -1,3 +1,71 @@
+## 5.4.16 (2022-09-28)
+
+#### Fixed
+
+* Fix missing item context after creating M2M item from popup
+* Check for `view.allow-customization` setting when saving customized view
+* Fix wrong css class applied on editable grid
+* Fix custom fields on editable grid
+* Fix restarting jobs after scheduler shutdown
+* Fix refreshing html dashlet when record changes
+* Fix non editable grid view customization popup
+* Fix required field using TagSelect widget
+* Skip default values of dotted field in editable grid
+* Fix saving boolean false filter
+
+  <details>
+  
+  In the case of boolean fields with operator `false`,
+  filter was transformed in order to check for null or false.
+  But by doing that, original criteria was lost, breaking meta filter saving.
+  Replaced client-side operators `true` and `false` by new virtual operators
+  `$isTrue` and `$isFalse` which perform client-side transformation.
+  
+  </details>
+
+* Fix sidebar toggle on window resize
+* Fix client authentication using path based callback url
+
+  <details>
+  
+  Some clients, ie AzureAdClient, use path based callback url (/callback/AzureAdClient) instead of default query based callback url (/callback?client_name=AzureAdClient).
+  
+  </details>
+
+* Fix missing TagSelect placeholder until we add and remove an item
+* Fix clipped field in Modern theme when using `css="large"` on WebKit-based browsers
+* Apply client-side operators on export and masss update
+
+  <details>
+  
+  Applying client-side operators was done on search only.
+  Now, it is also done on exports and mass updates.
+  
+  </details>
+
+* Fix setting $-prefixed dummy fields from onNew with default values
+
+  <details>
+  
+  Issue happened when setting $-prefixed dummy fields from onNew
+  and record has some default values.
+  
+  </details>
+
+* Fix wrong selected rows after grid sorting
+* Fix custom date/datetime criteria processing combined with column search
+* Fix refreshing html view from tab right click
+* Fix save action with only default values
+
+  <details>
+  
+  This allow to save a record that contain default values (generally coming from domain definition) 
+  when calling `save` action. This behavior will be same as the toolbar save button behavior.
+  
+  </details>
+
+* Fix changing dashlet url from `action-attrs`
+
 ## 5.4.15 (2022-08-03)
 
 #### Features

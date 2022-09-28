@@ -1,7 +1,0 @@
----
-title: Fix client authentication using path based callback url
-type: fix
-description:
-  Some clients, ie AzureAdClient, use path based callback url
-  (/callback/AzureAdClient) instead of default query based callback
-  url (/callback?client_name=AzureAdClient).
