@@ -1,8 +1,23 @@
 = Release Notes
 :toc:
+:toclevels: 1
 :toc-title:
 
-:product-changelog: https://github.com/axelor/axelor-open-platform/blob/{page-component-version}/CHANGELOG.md
+:github-repo-url: https://github.com/axelor/axelor-open-platform
+
+== 6.1
+
+The main highlights are:
+
+* Code generator now merge entity fields attributes instead of replacing them
+* Implement views collaboration, allowing to see users that are seeing/editing/updating
+* Client-side sorting of o2m/m2m grids
+* Customizations of grid pagination
+
+Please check the {github-repo-url}/blob/6.1/CHANGELOG.md[change log] for detailed list of changes and
+the xref:ROOT:migrations/migration-6.1.adoc[6.1 migration guide].
+
+== 6.0
 
 This release adds a significant number of upgrades and new features.
 
@@ -20,8 +35,102 @@ in Groovy in favor of a new code generator written in Java.
 * Re-implement authentication support
 * Application configuration is now `axelor-config.properties`. Properties can
 be defined via file, system props or environment vars.
-* Many dependencies upgrades : Hibernate, Guice, JDBC, ...
+* Many dependencies upgrades: Hibernate, Guice, JDBC, ...
 * Some deprecated features and usage have been removed
 
-Please check the {product-changelog}[change log] for detailed list of changes and
-the xref:ROOT:migrations.adoc[migration guide].
+Please check the {github-repo-url}/blob/6.0/CHANGELOG.md[change log] for detailed list of changes and
+the xref:ROOT:migrations/migration-6.0.adoc[6.0 migration guide].
+
+== 5.4
+
+This release comes with some important new features.
+
+=== New Features
+
+* Implement grid view customization
+* Add support for defining view attrs externally
+* Numeric/Decimal/Date/DateTime format support based on browser language
+* Add support to show workflow status on top of the form
+
+=== Fixes & Enhancements
+
+Please check the {github-repo-url}/blob/5.4/CHANGELOG.md[change log] for detailed list of changes.
+
+== 5.3
+
+This release comes with some important new features.
+
+=== New Features
+
+* Refactor grid widget to improve inline edit experience
+* Gradle has been upgraded to 5.6.4
+* Parallelize loading of meta data
+* Add support for Basic Auth
+* Add CSRF protection
+
+=== Fixes & Enhancements
+
+Please check the {github-repo-url}/blob/5.3/CHANGELOG.md[change log] for detailed list of changes.
+
+== 5.2
+
+This release comes with some important new features.
+
+=== New Features
+
+* Add support for SAML2
+* Add support for OpenID Connect
+* Add support for more CAS client types
+* Add support for OAuth
+* Allow to add anonymous rest endpoints
+
+=== Fixes & Enhancements
+
+Please check the {github-repo-url}/blob/5.2/CHANGELOG.md[change log] for detailed list of changes.
+
+
+== 5.1
+
+This release comes with some important new features.
+
+=== New Features
+
+* Migrate to OpenJDK 8
+* New event system similar to CDI 2.0 event api
+* Support for JPA event listeners
+* Complete re-write of view extensions
+
+=== Fixes & Enhancements
+
+Please check the {github-repo-url}/blob/5.1/CHANGELOG.md[change log] for detailed list of changes.
+
+== 5.0
+
+This release comes with tons of new features, new refreshed look and feel and
+much more.
+
+=== New Features
+
+* Migrate to Java 8
+* Migrate to Hibernate 5
+* Migrate to java.time api (dropped joda.time)
+* Tomcat 8.5
+* Superfast HikariCP connection pool
+* Oracle support (min version 12c)
+* MySQL support (min version 5.7)
+* Multi-Tenancy support
+* Custom fields support
+* Custom models support
+* Encrypted fields support
+* JavaScript scripting support
+* JCache integration for hibernate L2-cache
+* IntelliJ IDEA support
+* Eclipse support with buildship
+* Experimental hotswap support
+
+and a lot more...
+
+=== Fixes & Enhancements
+
+Please check the {github-repo-url}/blob/5.0/CHANGELOG.md[change log] for detailed list of changes.
+
