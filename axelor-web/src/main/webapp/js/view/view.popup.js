@@ -182,7 +182,7 @@ function EditorCtrl($scope, $element, DataSource, ViewService, $q) {
         return $scope.onSave({fireOnLoad: false}).then(function(record, page) {
           // wait for onSave actions
           $scope.waitForActions(function(){
-            record.$id = recordId;
+            record.$id = recordId || record.id;
             close(record, true);
           });
         });
