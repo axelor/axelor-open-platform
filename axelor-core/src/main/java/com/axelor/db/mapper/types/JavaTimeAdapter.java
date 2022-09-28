@@ -43,7 +43,6 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
   public Object adapt(
       Object value, Class<?> actualType, Type genericType, Annotation[] annotations) {
 
-    // TODO: check for annotation to return current date if value is null
     if (value == null || (value instanceof String && "".equals(((String) value).trim()))) {
       return null;
     }
@@ -125,7 +124,11 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
       return ((Calendar) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
     try {
-      return ZonedDateTime.from(((Temporal) value)).toLocalDate();
+      return LocalDate.parse(value.toString());
+    } catch (Exception e) {
+    }
+    try {
+      return LocalDateTime.parse(value.toString()).atZone(ZoneId.systemDefault()).toLocalDate();
     } catch (Exception e) {
     }
     try {
@@ -135,14 +138,7 @@ public class JavaTimeAdapter implements TypeAdapter<Object> {
     } catch (Exception e) {
     }
     try {
-      return LocalDateTime.parse(value.toString()).atZone(ZoneId.systemDefault()).toLocalDate();
-    } catch (Exception e) {
-    }
-    try {
-      return LocalDate.parse(value.toString())
-          .atStartOfDay()
-          .atZone(ZoneId.systemDefault())
-          .toLocalDate();
+      return ZonedDateTime.from(((Temporal) value)).toLocalDate();
     } catch (Exception e) {
     }
     throw new IllegalArgumentException("Unable to convert value: " + value);
