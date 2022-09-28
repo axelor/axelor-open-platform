@@ -6,15 +6,15 @@ Welcome to the {page-component-title} Documentation. Here you will find informat
 and resources to help you learn about {page-component-title}.
 
 xref:news.adoc[What's New]::
-  Describes what is new in {page-component-title} {page-component-version}.
+  Describes what is new in {page-component-title}.
 xref:migrations.adoc[Migration Guide]::
-  Describes the steps required to migrate from {page-component-title} 5.x to {page-component-version}.
+  Describes the steps to migrate to newer versions.
 xref:getting-started:index.adoc[Getting Started]::
   These topics describe how to get started with {page-component-title} as a developer.
 xref:tutorial:index.adoc[Quick Tutorial]::
   This tutorial will quickly introduce you to the {page-component-title} and guide you
   to create your first application.
 xref:dev-guide:index.adoc[Developer Guide]::
-  These topics describe how to use Axelor Open Platform as a developer.
+  These topics describe how to use {page-component-title} as a developer.
 xref:javadoc[API Documentation]::
   The {page-component-title} {page-component-version} javadoc api documentation.
