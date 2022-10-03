@@ -1277,7 +1277,11 @@ Grid.prototype._doInit = function(view) {
       });
     }
   }
+  function detachGrid() {
+    _containerH = _containerW = 0;
+  }
   scope.$on('dom:attach', resetScroll);
+  scope.$on('dom:detach', detachGrid);
   scope.$on('tab:select', resetScroll);
 
   function setWidthChanged() {
