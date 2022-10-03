@@ -888,6 +888,11 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
         return !_.isEmpty(_.difference(extraFields, Object.keys(item)));
       });
       if (_.isEmpty(missing)) return;
+
+      var ids = _.pluck(missing, 'id');
+      var context = _.pick(scope.getContext(), ['id', '_model']);
+      context._field = scope.field.name;
+      context._field_ids = ids;
       scope._dataSource.search({
         fields: extraFields,
         filter: {
@@ -895,9 +900,13 @@ ui.formInput('TagSelect', 'ManyToMany', 'MultiSelect', {
           criteria: [{
             fieldName: 'id',
             operator: 'in',
-            value: _.pluck(missing, 'id')
+            value: ids
           }]
-        }
+        },
+        archived: true,
+        limit: -1,
+        domain: null,
+        context: context,
       }).success(function (records) {
         _.each(records, function (record) {
           var item = _.findWhere(items, {id: record.id});
