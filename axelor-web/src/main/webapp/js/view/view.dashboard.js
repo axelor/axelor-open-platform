@@ -106,8 +106,11 @@ ui.directive('uiViewDashboard', ['ViewService', function(ViewService) {
         },
         stop: function (event, ui) {
           var schema = scope.schema;
-          var items = _.map(scope.row, function (item) {
-            return schema.items[item.$index];
+          var items = [];
+
+          scope.row.forEach(function (item, i) {
+            items.push(schema.items[item.$index]);
+            item.$index = i;
           });
 
           if (angular.equals(schema.items, items)) {
