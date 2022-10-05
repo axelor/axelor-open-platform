@@ -1,0 +1,3 @@
+---
+title: Fix chart context evaluation when calling from action-view
+type: fix
