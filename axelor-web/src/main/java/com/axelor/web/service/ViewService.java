@@ -54,6 +54,7 @@ import com.axelor.rpc.ActionRequest;
 import com.axelor.rpc.ActionResponse;
 import com.axelor.rpc.Request;
 import com.axelor.rpc.Response;
+import com.axelor.script.ScriptBindings;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -478,6 +479,7 @@ public class ViewService extends AbstractService {
     if (data == null || data.get("_domainAction") == null) {
       return service.getChart(name, request);
     }
+    data.put("_model", ScriptBindings.class.getName());
     ViewService.updateContext((String) data.get("_domainAction"), data);
     return service.getChart(name, request);
   }
@@ -489,6 +491,7 @@ public class ViewService extends AbstractService {
     if (data == null || data.get("_domainAction") == null) {
       return service.getDataSet(name, request);
     }
+    data.put("_model", ScriptBindings.class.getName());
     ViewService.updateContext((String) data.get("_domainAction"), data);
     return service.getDataSet(name, request);
   }
