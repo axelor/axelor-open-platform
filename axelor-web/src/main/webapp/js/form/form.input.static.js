@@ -745,11 +745,20 @@ ui.formItem('Button', {
         function fireOnClick() {
           setEnable(scope.fireAction("onClick"));
         }
+
         if (scope.grid && scope.grid.isEditActive && scope.grid.isEditActive()) {
           scope.grid.commitEdit().then(fireOnClick, function () { setEnable(true); });
-        } else {
-          fireOnClick()
+          return;
         }
+
+        scope.fireBeforeSave();
+        scope.waitForActions(function () {
+          var unwatch = scope.$watch('_gridEditCount', function (count) {
+            if (count) return;
+            unwatch();
+            fireOnClick();
+          });
+        });
       }
 
       setDisabled(true);
