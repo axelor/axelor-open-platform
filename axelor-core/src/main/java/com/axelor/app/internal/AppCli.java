@@ -53,32 +53,32 @@ public class AppCli {
         names = {"-h", "--help"},
         description = "show this help message",
         help = true)
-    public Boolean showHelp;
+    public Boolean showHelp = Boolean.FALSE;
 
     @Parameter(
         names = {"-i", "--init"},
         description = "initialize the database")
-    public Boolean init;
+    public Boolean init = Boolean.FALSE;
 
     @Parameter(
         names = {"-u", "--update"},
         description = "update the installed modules")
-    public Boolean update;
+    public Boolean update = Boolean.FALSE;
 
     @Parameter(
         names = {"-M", "--migrate"},
         description = "run the db migration scripts")
-    public Boolean migrate;
+    public Boolean migrate = Boolean.FALSE;
 
     @Parameter(
         names = {"-E", "--encrypt"},
         description = "update encrypted values")
-    public Boolean encrypt;
+    public Boolean encrypt = Boolean.FALSE;
 
     @Parameter(
         names = {"--verbose"},
         description = "verbose ouput")
-    public Boolean verbose;
+    public Boolean verbose = Boolean.FALSE;
 
     @Parameter(
         names = {"-m", "--modules"},
@@ -153,7 +153,7 @@ public class AppCli {
     final RequestScoper scope = ServletScopes.scopeRequest(Collections.emptyMap());
     try (final RequestScoper.CloseableScope ignored = scope.open()) {
 
-      if (opts.encrypt) {
+      if (opts.encrypt == Boolean.TRUE) {
         System.setProperty("database.encrypt.migrate", "true");
         EncryptedFieldService service = injector.getInstance(EncryptedFieldService.class);
         try {
