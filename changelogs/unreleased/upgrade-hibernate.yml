@@ -1,0 +1,4 @@
+title: Upgrade Hibernate from 5.6.9 to 5.6.12
+type: change
+description: |
+  This fixes null mapped one-to-one field on an entity loaded from L2 cache.

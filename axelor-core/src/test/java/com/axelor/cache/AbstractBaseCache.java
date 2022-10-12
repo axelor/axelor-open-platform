@@ -20,6 +20,7 @@ package com.axelor.cache;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -33,6 +34,8 @@ import com.axelor.db.JPA;
 import com.axelor.inject.Beans;
 import com.axelor.test.db.Contact;
 import com.axelor.test.db.Person;
+import com.axelor.test.db.Product;
+import com.axelor.test.db.ProductConfig;
 import com.axelor.test.db.repo.PersonRepository;
 import com.google.inject.persist.UnitOfWork;
 import java.util.Arrays;
@@ -321,6 +324,51 @@ public abstract class AbstractBaseCache extends JpaTest {
           Person person = JPA.find(Person.class, aPersonId.get());
           assertEquals("my-unique-code2", person.getCode());
           assertEquals("John Doe 2", person.getName());
+        });
+  }
+
+  @Test
+  public void testOneToOne() {
+    final var ids =
+        new Object() {
+          Long product;
+          Long config;
+        };
+
+    doInSession(
+        () -> {
+          // Create a Product
+          JPA.runInTransaction(
+              () -> {
+                Product product = new Product();
+                JPA.persist(product);
+                ids.product = product.getId();
+              });
+
+          // Create a ProductConfig and associate it with a Product
+          JPA.runInTransaction(
+              () -> {
+                Product product = JPA.find(Product.class, ids.product);
+                ProductConfig config = new ProductConfig();
+                config.setProduct(product);
+                JPA.persist(config);
+                ids.config = config.getId();
+              });
+        });
+
+    doInSession(
+        () -> {
+          // Fetch and check data
+          JPA.runInTransaction(
+              () -> {
+                Product product = JPA.find(Product.class, ids.product);
+                assertNotNull(product.getConfig());
+                assertEquals(ids.config, product.getConfig().getId());
+
+                ProductConfig config = JPA.find(ProductConfig.class, ids.config);
+                assertNotNull(config.getProduct());
+                assertEquals(ids.product, config.getProduct().getId());
+              });
         });
   }
 
