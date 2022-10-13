@@ -26,6 +26,7 @@
 
 #### Fixed
 
+* Fix going into edit mode in editable grid with large horizontal scrolling
 * Fix m2m field update issue
 
   <details>
@@ -37,8 +38,6 @@
   with all necessary fields by itself.
   
   </details>
-
-* Fix going into edit mode in editable grid with large horizontal scrolling
 
 #### Security
 
