@@ -34,6 +34,7 @@ import com.axelor.rpc.ResponseInterceptor;
 import com.axelor.web.servlet.CorsFilter;
 import com.axelor.web.servlet.I18nServlet;
 import com.axelor.web.servlet.NoCacheFilter;
+import com.axelor.web.servlet.ProxyFilter;
 import com.axelor.web.socket.inject.WebSocketModule;
 import com.axelor.web.socket.inject.WebSocketSecurity;
 import com.axelor.web.socket.inject.WebSocketSecurityInterceptor;
@@ -96,6 +97,7 @@ public class AppServletModule extends ServletModule {
           @Override
           protected void configureServlets() {
             // check for CORS requests earlier
+            filter("*").through(ProxyFilter.class);
             filter("*").through(CorsFilter.class);
             // pre-session tenant filter should be come before PersistFilter
             filter("*").through(PreSessionTenantFilter.class);

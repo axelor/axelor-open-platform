@@ -19,6 +19,9 @@
 package com.axelor.common;
 
 import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -196,5 +199,47 @@ public final class StringUtils {
     }
 
     return false;
+  }
+
+  /**
+   * Split the given text into an array using the given delimiter.
+   *
+   * <p>The result parts are trimmed and empty part omitted.
+   *
+   * @param text the text to slip
+   * @param delimiter the delimiter
+   * @return array of string
+   */
+  public static String[] splitToArray(String text, String delimiter) {
+    return splitToArray(text, delimiter, true, true);
+  }
+
+  /**
+   * Split the given text into an array using the given delimiter.
+   *
+   * @param text the text to slip
+   * @param delimiter the delimiter
+   * @param trimResult whatever to trim the result parts
+   * @param ignoreEmpty whatever to omit empty part
+   * @return array of string
+   */
+  public static String[] splitToArray(
+      String text, String delimiter, boolean trimResult, boolean ignoreEmpty) {
+    if (text == null) {
+      return new String[0];
+    }
+
+    StringTokenizer tokenizer = new StringTokenizer(text, delimiter);
+    List<String> parts = new ArrayList<>();
+    while (tokenizer.hasMoreTokens()) {
+      String token = tokenizer.nextToken();
+      if (trimResult) {
+        token = token.trim();
+      }
+      if (!ignoreEmpty || notBlank(token)) {
+        parts.add(token);
+      }
+    }
+    return parts.toArray(new String[0]);
   }
 }

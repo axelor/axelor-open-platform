@@ -22,7 +22,6 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
-import com.axelor.common.StringUtils;
 import com.google.inject.Singleton;
 import java.io.IOException;
 import java.util.Locale;
@@ -69,18 +68,12 @@ public class AppFilter implements Filter {
     return LANGUAGE.get();
   }
 
-  private String getHeader(ServletRequest req, String name, String defaultValue) {
-    final String value = ((HttpServletRequest) req).getHeader(name);
-    return StringUtils.isBlank(value) ? defaultValue : value;
-  }
-
   private String computeBaseUrl(ServletRequest req) {
-    final String proto = getHeader(req, "X-Forwarded-Proto", req.getScheme());
-    final String port = getHeader(req, "X-Forwarded-Port", "" + req.getServerPort());
-    final String host = getHeader(req, "X-Forwarded-Host", req.getServerName());
-    final String context =
-        getHeader(req, "X-Forwarded-Context", req.getServletContext().getContextPath());
-    return port.equals("80") || port.equals("443")
+    final String proto = req.getScheme();
+    final int port = req.getServerPort();
+    final String host = req.getServerName();
+    final String context = ((HttpServletRequest) req).getContextPath();
+    return port == 80 || port == 443
         ? proto + "://" + host + context
         : proto + "://" + host + ":" + port + context;
   }

@@ -18,6 +18,7 @@
  */
 package com.axelor.common;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -123,5 +124,21 @@ public class TestStringUtils {
     assertTrue(StringUtils.isAscii("\u0020")); // space
     assertFalse(StringUtils.isAscii("\u00FC")); // ü
     assertFalse(StringUtils.isAscii("é"));
+  }
+
+  @Test
+  public void testSplitToArray() {
+    assertEquals(0, StringUtils.splitToArray(null, ",").length);
+    assertEquals(0, StringUtils.splitToArray("", ",").length);
+    assertEquals(0, StringUtils.splitToArray(" ", ",").length);
+
+    assertArrayEquals(new String[] {"foo"}, StringUtils.splitToArray("foo", ","));
+    assertArrayEquals(new String[] {"foo", "bar"}, StringUtils.splitToArray("foo,bar", ","));
+    assertArrayEquals(new String[] {"foo", "bar"}, StringUtils.splitToArray("foo,,bar", ","));
+    assertArrayEquals(new String[] {"foo", "bar"}, StringUtils.splitToArray("foo , , bar", ","));
+
+    assertArrayEquals(
+        new String[] {"foo ", " ", " bar"},
+        StringUtils.splitToArray("foo , , bar", ",", false, false));
   }
 }

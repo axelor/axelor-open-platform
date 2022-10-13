@@ -152,13 +152,4 @@ public class AuthPac4jInfo {
   public static boolean isNativeClient(WebContext context) {
     return context.getRequestHeader("Origin").isEmpty();
   }
-
-  public static boolean isSecure(HttpServletRequest request) {
-    return request.isSecure() || "https".equalsIgnoreCase(getProto(request));
-  }
-
-  private static String getProto(HttpServletRequest request) {
-    final String proto = request.getHeader("X-Forwarded-Proto");
-    return StringUtils.isBlank(proto) ? request.getScheme() : proto;
-  }
 }

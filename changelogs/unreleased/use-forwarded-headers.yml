@@ -1,0 +1,14 @@
+---
+title: Improve support of `X-Forwarded-*` headers
+type: feature
+description: |
+  App is now having full support of `X-Forwarded-*` headers and provide 
+  better usage of proxy management.
+  
+  Supported headers are : `X-Forwarded-Host`, `X-Forwarded-Port`, 
+  `X-Forwarded-Proto`, `X-Forwarded-Prefix`, `X-Forwarded-For`.
+  
+  Note that now `X-Forwarded-Prefix` is used instead of `X-Forwarded-Context`.
+  
+  This avoid custom proxy configuration to rewrite the location or cookie path.
+  

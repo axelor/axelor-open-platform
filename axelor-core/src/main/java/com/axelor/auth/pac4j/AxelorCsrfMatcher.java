@@ -63,7 +63,7 @@ public class AxelorCsrfMatcher extends CsrfTokenGeneratorMatcher {
     cookie.setDomain("");
     cookie.setPath(contextPath.isEmpty() ? "/" : contextPath);
     cookie.setHttpOnly(false);
-    if (AuthPac4jInfo.isSecure(request)) {
+    if (request.isSecure()) {
       cookie.setSecure(true);
       cookie.setSameSitePolicy("None");
     }

@@ -20,7 +20,6 @@ package com.axelor.db.tenants;
 
 import com.axelor.auth.AuthUtils;
 import com.axelor.auth.db.User;
-import com.axelor.auth.pac4j.AuthPac4jInfo;
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -124,7 +123,7 @@ public abstract class AbstractTenantFilter implements Filter {
     Cookie cookie = getCookie(request, name);
     if (cookie == null) {
       cookie = new Cookie(name, value);
-      if (AuthPac4jInfo.isSecure(request)) {
+      if (request.isSecure()) {
         cookie.setSecure(true);
       }
     } else {

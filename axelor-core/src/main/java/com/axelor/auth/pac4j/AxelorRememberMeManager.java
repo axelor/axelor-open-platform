@@ -80,7 +80,7 @@ public class AxelorRememberMeManager extends CookieRememberMeManager {
   @Override
   public Cookie getCookie() {
     final HttpServletRequest request = getRequest();
-    return request != null && AuthPac4jInfo.isSecure(request) ? secureCookie : super.getCookie();
+    return request != null && request.isSecure() ? secureCookie : super.getCookie();
   }
 
   protected HttpServletRequest getRequest() {

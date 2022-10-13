@@ -20,10 +20,12 @@ package com.axelor.auth.pac4j;
 
 import com.axelor.inject.Beans;
 import com.google.common.collect.Lists;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
@@ -65,20 +67,42 @@ public class AxelorSessionManager extends ServletContainerSessionManager {
   public void changeSessionId() {
     final HttpServletRequest request = Beans.get(HttpServletRequest.class);
     request.changeSessionId();
-    if (AuthPac4jInfo.isSecure(request)) {
+    if (request.isSecure()) {
       setSameSiteNone(Beans.get(HttpServletResponse.class));
     }
+
+    updateCookiePath(Beans.get(HttpServletResponse.class), request.getContextPath());
   }
 
   protected Session createSession(Object source, HttpServletRequest request, String host) {
-    final HttpSession session = request.getSession();
+    final HttpSession httpSession = request.getSession();
+    final HttpServletResponse response = WebUtils.getHttpResponse(source);
 
-    if (session.isNew() && AuthPac4jInfo.isSecure(request)) {
-      final HttpServletResponse response = WebUtils.getHttpResponse(source);
+    if (httpSession.isNew() && request.isSecure()) {
       setSameSiteNone(response);
     }
 
-    return createSession(session, host);
+    Session session = createSession(httpSession, host);
+
+    updateCookiePath(response, request.getContextPath());
+
+    return session;
+  }
+
+  private void updateCookiePath(HttpServletResponse httpResponse, String contextPath) {
+    Collection<String> headers = httpResponse.getHeaders(HttpHeaders.SET_COOKIE);
+    for (String header : headers) {
+      httpResponse.setHeader(HttpHeaders.SET_COOKIE, updateCookiePath(header, contextPath));
+    }
+  }
+
+  private String updateCookiePath(String header, String contextPath) {
+    if (contextPath.length() == 0) {
+      contextPath = "/";
+    }
+    return Pattern.compile("(Path|path)=(.*);")
+        .matcher(header)
+        .replaceAll("$1=" + contextPath + ";");
   }
 
   protected void setSameSiteNone(HttpServletResponse response) {
