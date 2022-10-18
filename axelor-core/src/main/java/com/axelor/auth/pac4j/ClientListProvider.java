@@ -50,7 +50,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.client.IndirectClient;
-import org.pac4j.core.http.url.DefaultUrlResolver;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
@@ -134,7 +133,6 @@ public class ClientListProvider implements Provider<List<Client>> {
                   .client("org.pac4j.saml.client.SAML2Client")
                   .title("SAML 2.0")
                   .icon("img/signin/saml.svg")
-                  .requiresAbsoluteUrl()
                   .exclusive()
                   .build())
           .put(
@@ -148,14 +146,10 @@ public class ClientListProvider implements Provider<List<Client>> {
           .build();
 
   private static final Map<String, BiFunction<AppSettings, String, Object>> SETTINGS_GETTERS =
-      Map.of(
-          "exclusive",
-          (settings, key) -> settings.getBoolean(key, false),
-          "absoluteUrlRequired",
-          (settings, key) -> settings.getBoolean(key, false));
+      Map.of("exclusive", (settings, key) -> settings.getBoolean(key, false));
 
   private static final Set<String> EXTRA_CONFIGS =
-      Set.of("client", "configuration", "title", "icon", "exclusive", "absoluteUrlRequired");
+      Set.of("client", "configuration", "title", "icon", "exclusive");
 
   private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPES =
       new ImmutableMap.Builder<Class<?>, Class<?>>()
@@ -229,7 +223,6 @@ public class ClientListProvider implements Provider<List<Client>> {
               props.computeIfAbsent("title", k -> config.getTitle());
               props.computeIfAbsent("icon", k -> config.getIcon());
               props.computeIfAbsent("exclusive", k -> config.isExclusive());
-              props.computeIfAbsent("absoluteUrlRequired", k -> config.isAbsoluteUrlRequired());
             });
 
     // order of providers displayed on login form
@@ -263,12 +256,6 @@ public class ClientListProvider implements Provider<List<Client>> {
       exclusive = false;
     } else {
       exclusive = true;
-    }
-
-    // check for clients requiring absolute callback URL
-    if (configs.values().stream()
-        .anyMatch(props -> (boolean) props.getOrDefault("absoluteUrlRequired", false))) {
-      authPac4jInfo.requireAbsoluteUrl();
     }
 
     clients.addAll(configuredClients);
@@ -361,7 +348,7 @@ public class ClientListProvider implements Provider<List<Client>> {
 
     if (client instanceof IndirectClient) {
       final IndirectClient indirectClient = (IndirectClient) client;
-      indirectClient.setUrlResolver(new DefaultUrlResolver(true));
+      indirectClient.setUrlResolver(new AxelorUrlResolver());
     }
 
     final String configClassName = (String) props.get("configuration");

@@ -29,7 +29,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import org.apache.shiro.web.util.WebUtils;
 
 /**
  * Wrap the request to reflect the original protocol, scheme, Host and prefix using the
@@ -96,7 +95,7 @@ public class ProxyFilter implements Filter {
 
     @Override
     public int getServerPort() {
-      return this.forwardedPort == -1 ? (isSecure() ? 443 : 80) : this.forwardedPort;
+      return this.forwardedPort == -1 ? this.delegate.get().getServerPort() : this.forwardedPort;
     }
 
     @Override
@@ -170,7 +169,7 @@ public class ProxyFilter implements Filter {
           while (endIndex > 0 && item.charAt(endIndex - 1) == '/') {
             endIndex--;
           }
-          prefix.append((endIndex != item.length() ? item.substring(0, endIndex) : item));
+          prefix.append(endIndex != item.length() ? item.substring(0, endIndex) : item);
         }
         return prefix.toString();
       }
@@ -187,7 +186,11 @@ public class ProxyFilter implements Filter {
 
     private String initRequestUri() {
       if (this.forwardedPrefix != null) {
-        return this.forwardedPrefix + WebUtils.getPathWithinApplication(this.delegate.get());
+        return this.forwardedPrefix
+            + this.delegate
+                .get()
+                .getRequestURI()
+                .replaceFirst(this.delegate.get().getContextPath(), "");
       }
       return null;
     }

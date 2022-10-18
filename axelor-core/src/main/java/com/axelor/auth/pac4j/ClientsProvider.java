@@ -32,7 +32,7 @@ public class ClientsProvider implements Provider<Clients> {
 
   @Inject
   public ClientsProvider(AuthPac4jInfo authPac4jInfo, List<Client> clients) {
-    this.clients = new Clients(authPac4jInfo.getCallbackUrl(), clients);
+    this.clients = new Clients("/callback", clients);
   }
 
   @Override

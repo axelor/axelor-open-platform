@@ -18,28 +18,35 @@
  */
 package com.axelor.auth.pac4j;
 
-import com.axelor.app.AppSettings;
-import com.axelor.common.StringUtils;
 import io.buji.pac4j.filter.CallbackFilter;
+import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import org.pac4j.core.config.Config;
 
 @Singleton
 public class AxelorCallbackFilter extends CallbackFilter {
 
+  private AuthPac4jInfo authPac4jInfo;
+
   @Inject
-  public AxelorCallbackFilter(Config config, AxelorCallbackLogic callbackLogic) {
+  public AxelorCallbackFilter(
+      Config config, AxelorCallbackLogic callbackLogic, AuthPac4jInfo authPac4jInfo) {
+    this.authPac4jInfo = authPac4jInfo;
     setConfig(config);
-
-    final AppSettings settings = AppSettings.get();
-    final String defaultUrl = settings.getBaseURL();
-
-    if (StringUtils.notBlank(defaultUrl)) {
-      setDefaultUrl(defaultUrl);
-    }
-
     setDefaultClient(config.getClients().getClients().get(0).getName());
     setCallbackLogic(callbackLogic);
+  }
+
+  @Override
+  public void doFilter(
+      ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
+      throws IOException, ServletException {
+    setDefaultUrl(authPac4jInfo.getBaseUrl());
+    super.doFilter(servletRequest, servletResponse, filterChain);
   }
 }

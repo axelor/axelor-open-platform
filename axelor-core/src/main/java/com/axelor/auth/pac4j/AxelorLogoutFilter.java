@@ -38,6 +38,8 @@ import org.pac4j.core.config.Config;
 @Singleton
 public class AxelorLogoutFilter extends LogoutFilter {
 
+  private AuthPac4jInfo authPac4jInfo;
+
   @Inject
   public AxelorLogoutFilter(
       Config config, AxelorLogoutLogic logoutLogic, AuthPac4jInfo authPac4jInfo) {
@@ -48,8 +50,8 @@ public class AxelorLogoutFilter extends LogoutFilter {
     final boolean centralLogout =
         settings.getBoolean(AvailableAppSettings.AUTH_LOGOUT_CENTRAL, false);
 
+    this.authPac4jInfo = authPac4jInfo;
     setConfig(config);
-    setDefaultUrl(authPac4jInfo.getLogoutUrl());
     setLogoutUrlPattern(logoutUrlPattern);
     setLocalLogout(localLogout);
     setCentralLogout(centralLogout);
@@ -60,6 +62,8 @@ public class AxelorLogoutFilter extends LogoutFilter {
   public void doFilter(
       ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
       throws IOException, ServletException {
+
+    setDefaultUrl(authPac4jInfo.getLogoutUrl());
 
     super.doFilter(servletRequest, servletResponse, filterChain);
 

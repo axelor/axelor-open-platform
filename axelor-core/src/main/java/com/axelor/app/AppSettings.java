@@ -118,6 +118,9 @@ public final class AppSettings {
     if (url == null) {
       url = get(AvailableAppSettings.APPLICATION_BASE_URL);
     }
+    if (StringUtils.notBlank(url) && url.endsWith("/")) {
+      url = url.substring(0, url.length() - 1);
+    }
     return url;
   }
 

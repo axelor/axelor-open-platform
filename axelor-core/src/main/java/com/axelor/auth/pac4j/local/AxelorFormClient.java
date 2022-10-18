@@ -19,7 +19,9 @@
 package com.axelor.auth.pac4j.local;
 
 import com.axelor.auth.pac4j.AuthPac4jInfo;
+import com.axelor.auth.pac4j.AxelorUrlResolver;
 import com.axelor.common.StringUtils;
+import com.axelor.common.UriBuilder;
 import com.axelor.inject.Beans;
 import java.util.Optional;
 import org.pac4j.core.context.WebContext;
@@ -43,10 +45,11 @@ public class AxelorFormClient extends FormClient {
     if (credentialsHandler == null || forceReinit) {
       credentialsHandler = Beans.get(CredentialsHandler.class);
       final AuthPac4jInfo authPac4jInfo = Beans.get(AuthPac4jInfo.class);
-      setLoginUrl(authPac4jInfo.getBaseUrl() + "/login.jsp");
+      setLoginUrl("/login.jsp");
       defaultAuthenticator(authPac4jInfo.getAuthenticator());
       setCredentialsExtractor(Beans.get(FormExtractor.class));
       setAjaxRequestResolver(Beans.get(AjaxRequestResolver.class));
+      setUrlResolver(new AxelorUrlResolver());
     }
 
     super.internalInit(forceReinit);
@@ -124,14 +127,40 @@ public class AxelorFormClient extends FormClient {
           .ifPresent(tenantId -> sessionStore.set(context, "tenantId", tenantId));
 
       String redirectUrl =
-          CommonHelper.addParameter("change-password.jsp", getUsernameParameter(), username);
-      redirectUrl = CommonHelper.addParameter(redirectUrl, ERROR_PARAMETER, errorMessage);
+          UriBuilder.from(urlResolver.compute("/change-password.jsp", context))
+              .addQueryParam(getUsernameParameter(), username)
+              .addQueryParam(ERROR_PARAMETER, errorMessage)
+              .toUri()
+              .toString();
       return HttpActionHelper.buildRedirectUrlAction(context, redirectUrl);
     }
 
     logger.error("Authentication failed for user \"{}\": {}", username, errorMessage);
     credentialsHandler.handleInvalidCredentials(this, username, e);
-    return super.handleInvalidCredentials(
+    return handleInvalidCredentialsInternal(
         context, sessionStore, username, message, AxelorAuthenticator.INCORRECT_CREDENTIALS);
+  }
+
+  // Make sure to compute an absolute redirection url
+  protected HttpAction handleInvalidCredentialsInternal(
+      final WebContext context,
+      final SessionStore sessionStore,
+      final String username,
+      String message,
+      String errorMessage) {
+    // it's an AJAX request -> unauthorized (instead of a redirection)
+    if (getAjaxRequestResolver().isAjax(context, sessionStore)) {
+      logger.info("AJAX request detected -> returning 401");
+      return HttpActionHelper.buildUnauthenticatedAction(context);
+    } else {
+      String redirectionUrl =
+          UriBuilder.from(urlResolver.compute(getLoginUrl(), context))
+              .addQueryParam(getUsernameParameter(), username)
+              .addQueryParam(ERROR_PARAMETER, errorMessage)
+              .toUri()
+              .toString();
+      logger.debug("redirectionUrl: {}", redirectionUrl);
+      return HttpActionHelper.buildRedirectUrlAction(context, redirectionUrl);
+    }
   }
 }

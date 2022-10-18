@@ -234,7 +234,6 @@ auth.provider.myprovider.configuration = org.pac4j.oauth.config.OAuth20Configura
 auth.provider.myprovider.title = Google
 auth.provider.myprovider.icon = img/signin/google.svg
 auth.provider.myprovider.exclusive = false
-auth.provider.myprovider.absoluteUrlRequired = false
 
 auth.provider.myprovider.key = 127736102816-tc5mmsfaasa399jhqkfbv48nftoc55ft.apps.googleusercontent.com
 auth.provider.myprovider.secret = qySuozNl72zzM5SKW-0kczwV

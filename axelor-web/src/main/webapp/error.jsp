@@ -23,17 +23,16 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="com.axelor.auth.pac4j.ClientListProvider" %>
 <%@ page import="com.axelor.common.HtmlUtils" %>
-<%@ page import="com.axelor.web.internal.AppInfo" %>
+<%@ page import="com.axelor.auth.pac4j.AuthPac4jInfo" %>
 <%@ page import="com.axelor.inject.Beans" %>
 <%@ page import="com.axelor.common.HtmlUtils" %>
-<%@ page import="org.apache.shiro.authc.UnknownAccountException" %>
-<%@ page import="org.pac4j.core.util.CommonHelper" %>
+<%@ page import="com.axelor.common.UriBuilder" %>
 <%@include file='common.jsp'%>
 <%
 String errorMsg = /*$$(*/ "Authentication error" /*)*/;
 
 if (!Beans.get(ClientListProvider.class).isExclusive()) {
-  String url = CommonHelper.addParameter("login.jsp", "error", errorMsg);
+  String url = UriBuilder.from(Beans.get(AuthPac4jInfo.class).getBaseUrl()).addPath("/login.jsp").addQueryParam("error", errorMsg).toUri().toString();
   response.sendRedirect(url);
   return;
 }

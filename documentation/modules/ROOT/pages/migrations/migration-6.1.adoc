@@ -87,3 +87,57 @@ in the button was not formatted according to the field definition.
 We introduced `x-field` attribute on `info-button` widget to specify the bound field. When using `x-field`, the button
 and the field are 2 distinct elements. Any attributes defined on that field will be used to format the value. Moreover,
 this allows to change the button attributes without impact on the bound field.
+
+== Proxy support
+
+Using proxy in front of the application was working but requires adding a few extra configuration on proxy in order to
+rewrite the cookie path but also the Location.
+
+We improve support when HTTP requests are forwarded by a proxy server. The following `X-Forwarded-*` headers are supported:
+`X-Forwarded-Host`, `X-Forwarded-Port`, `X-Forwarded-Proto`, `X-Forwarded-Prefix`, `X-Forwarded-For`. Redirections will
+use these headers. Proxy configuration will be easier as it doesn't require to rewrite the cookie path and the
+Location (now returning absolute URLs).
+
+Here is an example based on `Nginx`:
+
+[source,bash]
+----
+|--------|  https://example.com/my-app   |-------|  http://internal:8080/some  |--------|
+| Client |  -------------------------->  | Proxy |  ------------------------>  | Tomcat |
+|------- |                               |-------|                             |--------|
+----
+
+[source,nginx]
+----
+location = /my-app {
+    return 302 /my-app/;
+}
+
+location /my-app/ {
+
+    # Proxy support
+    proxy_redirect          off;
+    proxy_set_header        Host                $host;
+    proxy_set_header        X-Forwarded-Host    $host;
+    proxy_set_header        X-Forwarded-For     $proxy_add_x_forwarded_for;
+    proxy_set_header        X-Forwarded-Proto   $scheme;
+    proxy_set_header        X-Forwarded-Port    443;
+    proxy_set_header        X-Forwarded-Prefix  /my-app;
+
+    # WebSocket support
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+
+    proxy_pass http://internal:8080/some/;
+}
+----
+
+
+[WARNING]
+====
+Note that following changes:
+
+- `X-Forwarded-Context` support removed in favor of `X-Forwarded-Prefix`.
+- The configuration property `auth.provider.xx.absoluteUrlRequired` has been removed.
+====

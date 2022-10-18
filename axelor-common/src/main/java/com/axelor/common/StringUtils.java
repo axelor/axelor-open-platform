@@ -219,8 +219,8 @@ public final class StringUtils {
    *
    * @param text the text to slip
    * @param delimiter the delimiter
-   * @param trimResult whatever to trim the result parts
-   * @param ignoreEmpty whatever to omit empty part
+   * @param trimResult whether to trim the result parts
+   * @param ignoreEmpty whether to omit empty part
    * @return array of string
    */
   public static String[] splitToArray(

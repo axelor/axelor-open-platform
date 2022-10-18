@@ -22,9 +22,8 @@ import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
 import com.axelor.auth.pac4j.local.AxelorAuthenticator;
 import com.axelor.common.StringUtils;
+import com.axelor.common.UriBuilder;
 import com.axelor.inject.Beans;
-import com.google.common.base.Preconditions;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -48,14 +47,6 @@ public class AuthPac4jInfo {
 
   private Set<String> centralClients;
 
-  private String baseUrl;
-
-  private String callbackUrl;
-
-  private String logoutUrl;
-
-  private boolean absoluteUrlRequired;
-
   private Authenticator authenticator;
 
   private final Map<String, Map<String, String>> clientInfo = new HashMap<>();
@@ -69,20 +60,8 @@ public class AuthPac4jInfo {
     clientInfo.put(clientName, info);
   }
 
-  public void requireAbsoluteUrl() {
-    Preconditions.checkArgument(baseUrl == null);
-    absoluteUrlRequired = true;
-  }
-
   public String getBaseUrl() {
-    if (baseUrl == null) {
-      baseUrl = AppSettings.get().getBaseURL();
-      if (baseUrl != null && !absoluteUrlRequired) {
-        baseUrl = URI.create(baseUrl).getPath();
-      }
-    }
-
-    return baseUrl;
+    return AppSettings.get().getBaseURL();
   }
 
   public Set<String> getCentralClients() {
@@ -100,31 +79,34 @@ public class AuthPac4jInfo {
     return centralClients;
   }
 
+  /**
+   * Return the main callback endpoint for users authentication
+   *
+   * @return url form where the users are authenticated
+   */
   public String getCallbackUrl() {
-    if (callbackUrl == null) {
-      final AppSettings settings = AppSettings.get();
-      String authCallbackUrl = settings.get(AvailableAppSettings.AUTH_CALLBACK_URL, null);
-      if (StringUtils.isBlank(authCallbackUrl)) {
-        authCallbackUrl = getBaseUrl() + "/callback";
-      }
-      callbackUrl = authCallbackUrl;
+    String authCallbackUrl = AppSettings.get().get(AvailableAppSettings.AUTH_CALLBACK_URL, null);
+    if (StringUtils.isBlank(authCallbackUrl)) {
+      authCallbackUrl = UriBuilder.from(getBaseUrl()).addPath("/callback").toUri().toString();
     }
-    return callbackUrl;
+    return authCallbackUrl;
   }
 
+  /**
+   * Return the default post logout url.
+   *
+   * @return url where the users will be redirected after logout
+   */
   public String getLogoutUrl() {
-    if (logoutUrl == null) {
-      final AppSettings settings = AppSettings.get();
-      String authLogoutUrl = settings.get(AvailableAppSettings.AUTH_LOGOUT_DEFAULT_URL, null);
+    final AppSettings settings = AppSettings.get();
+    String authLogoutUrl = settings.get(AvailableAppSettings.AUTH_LOGOUT_DEFAULT_URL, null);
+    if (StringUtils.isBlank(authLogoutUrl)) {
+      authLogoutUrl = getBaseUrl();
       if (StringUtils.isBlank(authLogoutUrl)) {
-        authLogoutUrl = getBaseUrl();
-        if (StringUtils.isBlank(authLogoutUrl)) {
-          authLogoutUrl = ".";
-        }
+        authLogoutUrl = ".";
       }
-      logoutUrl = authLogoutUrl;
     }
-    return logoutUrl;
+    return authLogoutUrl;
   }
 
   public void setAuthenticator(Authenticator authenticator) {

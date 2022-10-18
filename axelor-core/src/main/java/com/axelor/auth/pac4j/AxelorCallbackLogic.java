@@ -19,6 +19,7 @@
 package com.axelor.auth.pac4j;
 
 import com.axelor.common.StringUtils;
+import com.axelor.common.UriBuilder;
 import io.buji.pac4j.profile.ShiroProfileManager;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
@@ -44,6 +45,7 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
 
   private final ErrorHandler errorHandler;
   private final AxelorCsrfMatcher csrfMatcher;
+  private final AuthPac4jInfo pac4jInfo;
 
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -52,12 +54,13 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
   public AxelorCallbackLogic(
       ErrorHandler errorHandler,
       AxelorCsrfMatcher csrfMatcher,
-      DefaultCallbackClientFinder clientFinder) {
+      DefaultCallbackClientFinder clientFinder,
+      AuthPac4jInfo pac4jInfo) {
     this.errorHandler = errorHandler;
     this.csrfMatcher = csrfMatcher;
+    this.pac4jInfo = pac4jInfo;
     setProfileManagerFactory(ShiroProfileManager::new);
     setClientFinder(clientFinder);
-    setErrorUrl("error.jsp");
   }
 
   @Override
@@ -69,6 +72,8 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
       String inputDefaultUrl,
       Boolean inputRenewSession,
       String defaultClient) {
+
+    setErrorUrl(UriBuilder.from(pac4jInfo.getBaseUrl()).addPath("/error.jsp").toUri().toString());
 
     try {
       final JEEContext context = (JEEContext) webContext;
@@ -122,7 +127,7 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
                         .map(String::valueOf))
             .orElse("");
     if (StringUtils.notBlank(hashLocation)) {
-      redirectUrl = redirectUrl + hashLocation;
+      redirectUrl = UriBuilder.from(redirectUrl).setFragment(hashLocation).toUri().toString();
     }
 
     logger.debug("redirectUrl: {}", redirectUrl);

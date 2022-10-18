@@ -1,0 +1,3 @@
+---
+title: `X-Forwarded-Context` support removed in favor of `X-Forwarded-Prefix`
+type: change

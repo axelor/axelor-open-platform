@@ -1,0 +1,3 @@
+---
+title: Remove `auth.provider.xx.absoluteUrlRequired` property
+type: change

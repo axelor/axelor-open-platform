@@ -18,6 +18,7 @@
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.common.UriBuilder;
 import io.buji.pac4j.profile.ShiroProfileManager;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,7 @@ import org.pac4j.core.config.Config;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.engine.DefaultSecurityLogic;
+import org.pac4j.core.engine.SecurityGrantedAccessAdapter;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.exception.http.RedirectionAction;
 import org.pac4j.core.http.adapter.HttpActionAdapter;
@@ -52,7 +54,6 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
     this.errorHandler = errorHandler;
     this.authPac4jInfo = authPac4jInfo;
     setProfileManagerFactory(ShiroProfileManager::new);
-    setErrorUrl("error.jsp");
 
     final List<Authorizer> authorizers =
         config.getAuthorizers().values().stream().collect(Collectors.toUnmodifiableList());
@@ -66,6 +67,31 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
     setMatchingChecker(
         (context, sessionStore, matcherNames, matchersMap, clients) ->
             matchers.stream().allMatch(matcher -> matcher.matches(context, sessionStore)));
+  }
+
+  @Override
+  public Object perform(
+      WebContext context,
+      SessionStore sessionStore,
+      Config config,
+      SecurityGrantedAccessAdapter securityGrantedAccessAdapter,
+      HttpActionAdapter httpActionAdapter,
+      String clients,
+      String authorizers,
+      String matchers,
+      Object... parameters) {
+    setErrorUrl(
+        UriBuilder.from(authPac4jInfo.getBaseUrl()).addPath("/error.jsp").toUri().toString());
+    return super.perform(
+        context,
+        sessionStore,
+        config,
+        securityGrantedAccessAdapter,
+        httpActionAdapter,
+        clients,
+        authorizers,
+        matchers,
+        parameters);
   }
 
   // Don't save requested URL if redirected to a non-default central client,

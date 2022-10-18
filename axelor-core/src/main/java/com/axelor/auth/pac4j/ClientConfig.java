@@ -23,7 +23,6 @@ public class ClientConfig {
   private String configuration;
   private String title;
   private String icon;
-  private boolean absoluteUrlRequired;
   private boolean exclusive;
 
   public String getClient() {
@@ -60,14 +59,6 @@ public class ClientConfig {
 
   public boolean isExclusive() {
     return exclusive;
-  }
-
-  public boolean isAbsoluteUrlRequired() {
-    return absoluteUrlRequired;
-  }
-
-  public void setAbsoluteUrlRequired(boolean absoluteUrlRequired) {
-    this.absoluteUrlRequired = absoluteUrlRequired;
   }
 
   public void setExclusive(boolean exclusive) {
@@ -107,11 +98,6 @@ public class ClientConfig {
 
     public Builder exclusive() {
       clientConfig.setExclusive(true);
-      return this;
-    }
-
-    public Builder requiresAbsoluteUrl() {
-      clientConfig.setAbsoluteUrlRequired(true);
       return this;
     }
   }
