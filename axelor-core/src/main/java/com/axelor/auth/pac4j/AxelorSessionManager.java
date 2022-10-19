@@ -90,9 +90,13 @@ public class AxelorSessionManager extends ServletContainerSessionManager {
   }
 
   private void updateCookiePath(HttpServletResponse httpResponse, String contextPath) {
-    Collection<String> headers = httpResponse.getHeaders(HttpHeaders.SET_COOKIE);
-    for (String header : headers) {
-      httpResponse.setHeader(HttpHeaders.SET_COOKIE, updateCookiePath(header, contextPath));
+    final Iterator<String> it = httpResponse.getHeaders(HttpHeaders.SET_COOKIE).iterator();
+
+    if (it.hasNext()) {
+      httpResponse.setHeader(HttpHeaders.SET_COOKIE, updateCookiePath(it.next(), contextPath));
+      while (it.hasNext()) {
+        httpResponse.addHeader(HttpHeaders.SET_COOKIE, updateCookiePath(it.next(), contextPath));
+      }
     }
   }
 
