@@ -20,7 +20,6 @@ package com.axelor.auth.pac4j;
 
 import com.axelor.inject.Beans;
 import com.google.common.collect.Lists;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +49,7 @@ import org.apache.shiro.web.util.WebUtils;
 public class AxelorSessionManager extends ServletContainerSessionManager {
 
   protected static final String COOKIE_ATTR_SEPARATOR = "; ";
+  private static final Pattern COOKIE_PATH_PATTERN = Pattern.compile("(Path|path)=(.*?);");
 
   @Override
   public Session start(SessionContext context) throws AuthorizationException {
@@ -100,9 +100,7 @@ public class AxelorSessionManager extends ServletContainerSessionManager {
     if (contextPath.length() == 0) {
       contextPath = "/";
     }
-    return Pattern.compile("(Path|path)=(.*);")
-        .matcher(header)
-        .replaceAll("$1=" + contextPath + ";");
+    return COOKIE_PATH_PATTERN.matcher(header).replaceAll("$1=" + contextPath + ";");
   }
 
   protected void setSameSiteNone(HttpServletResponse response) {
