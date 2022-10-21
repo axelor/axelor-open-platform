@@ -18,20 +18,56 @@
  */
 package com.axelor.auth.pac4j;
 
+import com.axelor.common.UriBuilder;
 import java.lang.invoke.MethodHandles;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.pac4j.core.context.WebContext;
+import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.http.adapter.HttpActionAdapter;
+import org.pac4j.core.util.HttpActionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class ErrorHandler {
 
   private static final Logger logger =
       LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  public void handleException(
+  private final AuthPac4jInfo pac4jInfo;
+
+  @Inject
+  public ErrorHandler(AuthPac4jInfo pac4jInfo) {
+    this.pac4jInfo = pac4jInfo;
+  }
+
+  public Object handleException(
       Exception e, HttpActionAdapter httpActionAdapter, WebContext context) {
     logger.error(e.getMessage());
     logger.debug(e.getMessage(), e);
+
+    if (httpActionAdapter == null || context == null) {
+      throw runtimeException(e);
+    }
+
+    if (e instanceof HttpAction) {
+      final var action = (HttpAction) e;
+      logger.debug("extra HTTP action required in security: {}", action.getCode());
+      return httpActionAdapter.adapt(action, context);
+    }
+
+    final String errorUrl =
+        UriBuilder.from(pac4jInfo.getBaseUrl()).addPath("/error.jsp").toUri().toString();
+    final HttpAction action = HttpActionHelper.buildRedirectUrlAction(context, errorUrl);
+    return httpActionAdapter.adapt(action, context);
+  }
+
+  protected RuntimeException runtimeException(final Exception exception) {
+    if (exception instanceof RuntimeException) {
+      throw (RuntimeException) exception;
+    } else {
+      throw new RuntimeException(exception);
+    }
   }
 }

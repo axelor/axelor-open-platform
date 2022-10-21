@@ -31,12 +31,8 @@ import org.pac4j.core.config.Config;
 @Singleton
 public class AxelorCallbackFilter extends CallbackFilter {
 
-  private AuthPac4jInfo authPac4jInfo;
-
   @Inject
-  public AxelorCallbackFilter(
-      Config config, AxelorCallbackLogic callbackLogic, AuthPac4jInfo authPac4jInfo) {
-    this.authPac4jInfo = authPac4jInfo;
+  public AxelorCallbackFilter(Config config, AxelorCallbackLogic callbackLogic) {
     setConfig(config);
     setDefaultClient(config.getClients().getClients().get(0).getName());
     setCallbackLogic(callbackLogic);
@@ -46,7 +42,6 @@ public class AxelorCallbackFilter extends CallbackFilter {
   public void doFilter(
       ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
       throws IOException, ServletException {
-    setDefaultUrl(authPac4jInfo.getBaseUrl());
     super.doFilter(servletRequest, servletResponse, filterChain);
   }
 }

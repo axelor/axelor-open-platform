@@ -18,7 +18,6 @@
  */
 package com.axelor.auth.pac4j;
 
-import com.axelor.common.UriBuilder;
 import io.buji.pac4j.profile.ShiroProfileManager;
 import java.util.List;
 import java.util.Optional;
@@ -80,8 +79,6 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
       String authorizers,
       String matchers,
       Object... parameters) {
-    setErrorUrl(
-        UriBuilder.from(authPac4jInfo.getBaseUrl()).addPath("/error.jsp").toUri().toString());
     return super.perform(
         context,
         sessionStore,
@@ -133,7 +130,6 @@ public class AxelorSecurityLogic extends DefaultSecurityLogic {
   @Override
   protected Object handleException(
       Exception e, HttpActionAdapter httpActionAdapter, WebContext context) {
-    errorHandler.handleException(e, httpActionAdapter, context);
-    return super.handleException(e, httpActionAdapter, context);
+    return errorHandler.handleException(e, httpActionAdapter, context);
   }
 }

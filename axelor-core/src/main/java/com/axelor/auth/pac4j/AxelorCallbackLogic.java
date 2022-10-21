@@ -73,8 +73,6 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
       Boolean inputRenewSession,
       String defaultClient) {
 
-    setErrorUrl(UriBuilder.from(pac4jInfo.getBaseUrl()).addPath("/error.jsp").toUri().toString());
-
     try {
       final JEEContext context = (JEEContext) webContext;
       context.getNativeRequest().setCharacterEncoding("UTF-8");
@@ -87,7 +85,7 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
         sessionStore,
         config,
         httpActionAdapter,
-        inputDefaultUrl,
+        pac4jInfo.getBaseUrl(),
         inputRenewSession,
         defaultClient);
   }
@@ -137,7 +135,6 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
   @Override
   protected Object handleException(
       Exception e, HttpActionAdapter httpActionAdapter, WebContext context) {
-    errorHandler.handleException(e, httpActionAdapter, context);
-    return super.handleException(e, httpActionAdapter, context);
+    return errorHandler.handleException(e, httpActionAdapter, context);
   }
 }
