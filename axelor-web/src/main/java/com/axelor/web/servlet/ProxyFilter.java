@@ -186,11 +186,12 @@ public class ProxyFilter implements Filter {
 
     private String initRequestUri() {
       if (this.forwardedPrefix != null) {
-        return this.forwardedPrefix
-            + this.delegate
-                .get()
-                .getRequestURI()
-                .replaceFirst(this.delegate.get().getContextPath(), "");
+        String initialRequestURI = this.delegate.get().getRequestURI();
+        if (initialRequestURI.startsWith(this.delegate.get().getContextPath())) {
+          initialRequestURI =
+              initialRequestURI.substring(this.delegate.get().getContextPath().length());
+        }
+        return this.forwardedPrefix + initialRequestURI;
       }
       return null;
     }
