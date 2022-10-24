@@ -18,25 +18,16 @@
  */
 package com.axelor.tools.code;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.axelor.common.FileUtils;
 import com.axelor.db.annotations.Widget;
 import com.axelor.tools.code.entity.EntityGenerator;
-import org.hibernate.annotations.Type;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.tools.DiagnosticCollector;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.StandardLocation;
-import javax.tools.ToolProvider;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -52,124 +43,143 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
+import javax.tools.ToolProvider;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import org.hibernate.annotations.Type;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestMergeFields {
 
-    private static final Path srcGenPath = Path.of("build/src-gen");
-    private static final Path targetPath = srcGenPath.resolve("com/axelor/merge");
+  private static final Path srcGenPath = Path.of("build/src-gen");
+  private static final Path targetPath = srcGenPath.resolve("com/axelor/merge");
 
-    private static ClassLoader classLoader;
+  private static ClassLoader classLoader;
 
-    @BeforeAll
-    public static void generateCode() throws IOException {
-        clean();
-        generate();
-        compile();
+  @BeforeAll
+  public static void generateCode() throws IOException {
+    clean();
+    generate();
+    compile();
+  }
+
+  @Test
+  public void testMerge() throws Exception {
+    String fieldName = "myString";
+    assertEquals("My String", getAnnotation(fieldName, Widget.class).title());
+    assertEquals(10, getAnnotation(fieldName, Size.class).max());
+    assertNotNull(getAnnotation(fieldName, NotNull.class));
+    assertEquals(
+        "AAA", getField(fieldName).get(loadClass().getDeclaredConstructor().newInstance()));
+  }
+
+  @Test
+  public void testOverride() throws Exception {
+    String fieldName = "myString2";
+
+    assertEquals("Test New", getAnnotation(fieldName, Widget.class).title());
+    assertNull(getAnnotation(fieldName, Size.class));
+    assertEquals(
+        "BBB", getField(fieldName).get(loadClass().getDeclaredConstructor().newInstance()));
+    assertNull(getAnnotation(fieldName, NotNull.class));
+    assertFalse(getAnnotation(fieldName, Widget.class).hidden());
+    assertArrayEquals(
+        new String[] {"myString2", "myString"}, getAnnotation(fieldName, Widget.class).search());
+    assertEquals(0, loadClass().getAnnotation(Table.class).indexes().length);
+
+    // Transient and relational fields can be overridden
+    assertEquals("New", getAnnotation("myTransient", Widget.class).title());
+    assertEquals("New", getAnnotation("myCollection", Widget.class).title());
+  }
+
+  @Test
+  public void testNotAllowed() throws Exception {
+    assertNull(getAnnotation("myTransient", Transient.class));
+
+    assertEquals(1, loadClass().getDeclaredConstructors().length);
+    assertNull(getAnnotation("myField", Type.class));
+    assertNull(getAnnotation("myField", JoinColumn.class));
+
+    assertTrue(getField("myDate").getType().isAssignableFrom(LocalDateTime.class));
+
+    assertTrue(getField("myInt").getType().isAssignableFrom(Integer.class));
+
+    assertEquals("myParent", getAnnotation("myCollection", OneToMany.class).mappedBy());
+  }
+
+  private static void compile() throws IOException {
+    JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+    DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+    StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
+    File temp = Files.createTempDirectory(null).toFile();
+    fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Collections.singletonList(temp));
+
+    final List<File> files = new ArrayList<>();
+
+    try (Stream<Path> walk = java.nio.file.Files.walk(targetPath)) {
+      walk.map(Path::toFile).filter(f -> f.getName().endsWith(".java")).forEach(files::add);
     }
 
-    @Test
-    public void testMerge() throws Exception {
-        String fieldName = "myString";
-        assertEquals("My String", getAnnotation(fieldName, Widget.class).title());
-        assertEquals(10, getAnnotation(fieldName, Size.class).max());
-        assertNotNull(getAnnotation(fieldName, NotNull.class));
-        assertEquals("AAA", getField(fieldName).get(loadClass().getDeclaredConstructor().newInstance()));
+    JavaCompiler.CompilationTask task =
+        compiler.getTask(
+            null,
+            fileManager,
+            null,
+            null,
+            null,
+            fileManager.getJavaFileObjects(files.toArray(new File[files.size()])));
+
+    boolean result = task.call();
+    if (!result) {
+      throw new RuntimeException(
+          diagnostics.getDiagnostics().stream()
+              .map(it -> it.getMessage(Locale.getDefault()))
+              .collect(Collectors.joining("\n")));
     }
 
-    @Test
-    public void testOverride() throws Exception {
-        String fieldName = "myString2";
+    classLoader =
+        new URLClassLoader(
+            new URL[] {temp.toURI().toURL()}, Thread.currentThread().getContextClassLoader());
+  }
 
-        assertEquals("Test New", getAnnotation(fieldName, Widget.class).title());
-        assertNull(getAnnotation(fieldName, Size.class));
-        assertEquals("BBB", getField(fieldName).get(loadClass().getDeclaredConstructor().newInstance()));
-        assertNull(getAnnotation(fieldName, NotNull.class));
-        assertFalse(getAnnotation(fieldName, Widget.class).hidden());
-        assertArrayEquals(new String[]{"myString2", "myString"}, getAnnotation(fieldName, Widget.class).search());
-        assertEquals(0, loadClass().getAnnotation(Table.class).indexes().length);
+  private static void generate() throws IOException {
+    File domainPath = new File("src/test/resources/merging/module2");
+    EntityGenerator gen = new EntityGenerator(domainPath, srcGenPath.toFile());
 
-        // Transient and relational fields can be overridden
-        assertEquals("New", getAnnotation("myTransient", Widget.class).title());
-        assertEquals("New", getAnnotation("myCollection", Widget.class).title());
+    domainPath = new File("src/test/resources/merging/module1");
+    EntityGenerator lookup = new EntityGenerator(domainPath, srcGenPath.toFile());
+
+    gen.addLookupSource(lookup);
+    gen.start();
+  }
+
+  private static void clean() throws IOException {
+    if (targetPath.toFile().exists()) {
+      FileUtils.deleteDirectory(targetPath);
     }
+  }
 
-    @Test
-    public void testNotAllowed() throws Exception {
-        assertNull(getAnnotation("myTransient", Transient.class));
+  <T extends Annotation> T getAnnotation(String name, Class<T> annotation) throws Exception {
+    return getField(name).getDeclaredAnnotation(annotation);
+  }
 
-        assertEquals(1, loadClass().getDeclaredConstructors().length);
-        assertNull(getAnnotation("myField", Type.class));
-        assertNull(getAnnotation("myField", JoinColumn.class));
+  Field getField(String name) throws Exception {
+    Field field = loadClass().getDeclaredField(name);
+    field.setAccessible(true);
+    return field;
+  }
 
-        assertTrue(getField("myDate").getType().isAssignableFrom(LocalDateTime.class));
-
-        assertTrue(getField("myInt").getType().isAssignableFrom(Integer.class));
-
-        assertEquals("myParent", getAnnotation("myCollection", OneToMany.class).mappedBy());
-    }
-
-    private static void compile() throws IOException {
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-        StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
-        File temp = Files.createTempDirectory(null).toFile();
-        fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Collections.singletonList(temp));
-
-        final List<File> files = new ArrayList<>();
-
-        try (Stream<Path> walk = java.nio.file.Files.walk(targetPath)) {
-            walk.map(Path::toFile)
-                    .filter(f -> f.getName().endsWith(".java"))
-                    .forEach(files::add);
-        }
-
-        JavaCompiler.CompilationTask task = compiler.getTask(null,
-                fileManager, null, null, null, fileManager.getJavaFileObjects(files.toArray(new File[files.size()])));
-
-        boolean result = task.call();
-        if (!result) {
-            throw new RuntimeException(diagnostics.getDiagnostics().stream().map(it -> it.getMessage(Locale.getDefault())).collect(Collectors.joining("\n")));
-        }
-
-        classLoader = new URLClassLoader(new URL[]{ temp.toURI().toURL() }, Thread.currentThread().getContextClassLoader());
-    }
-
-    private static void generate() throws IOException {
-        File domainPath = new File("src/test/resources/merging/module2");
-        EntityGenerator gen = new EntityGenerator(domainPath, srcGenPath.toFile());
-
-        domainPath = new File("src/test/resources/merging/module1");
-        EntityGenerator lookup = new EntityGenerator(domainPath, srcGenPath.toFile());
-
-        gen.addLookupSource(lookup);
-        gen.start();
-    }
-
-    private static void clean() throws IOException {
-        if (targetPath.toFile().exists()) {
-            FileUtils.deleteDirectory(targetPath);
-        }
-    }
-
-    <T extends Annotation> T getAnnotation(String name, Class<T> annotation) throws Exception {
-        return getField(name).getDeclaredAnnotation(annotation);
-    }
-
-    Field getField(String name) throws Exception {
-        Field field = loadClass().getDeclaredField(name);
-        field.setAccessible(true);
-        return field;
-    }
-
-    Class<?> loadClass() throws Exception {
-        return classLoader.loadClass("com.axelor.merge.db.MyEntity");
-    }
-
+  Class<?> loadClass() throws Exception {
+    return classLoader.loadClass("com.axelor.merge.db.MyEntity");
+  }
 }
