@@ -48,8 +48,8 @@ ui.formCompile = function(element, attrs, linkerFn) {
   function link(scope, element, attrs, controller) {
 
     element.addClass(this.css);
-    // XXX: editable grid : don't add to form parent, only on a cell container
-    if(!element.parent().is("form")) {
+    // XXX: editable grid : don't add to form parent
+    if(!(element.parent().scope && element.parent().scope() && element.parent().scope()._isEditorScope)) {
       element.parent().addClass(this.cellCss);
     }
     element.data('$attrs', attrs); // store the attrs object for event handlers
