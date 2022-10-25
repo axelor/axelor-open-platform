@@ -836,8 +836,8 @@ function FormViewCtrl($scope, $element) {
     }
   };
 
-  $scope.fireBeforeSave = function (task) {
-    $scope.$broadcast('on:before-save');
+  $scope.fireBeforeSave = function () {
+    return $scope.$broadcast('on:before-save');
   };
 
   $scope.onSave = function(options) {

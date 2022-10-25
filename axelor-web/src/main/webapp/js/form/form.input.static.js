@@ -746,7 +746,13 @@ ui.formItem('Button', {
           return;
         }
 
-        scope.fireBeforeSave && scope.fireBeforeSave();
+        if (scope.fireBeforeSave) {
+          var event = scope.fireBeforeSave();
+          if (event.defaultPrevented) {
+            setEnable(true);
+            return;
+          }
+        }
         scope.waitForActions(function () {
           var unwatch = scope.$watch('_gridEditCount', function (count) {
             if (count) return;
