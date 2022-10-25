@@ -751,7 +751,7 @@ ui.formItem('Button', {
           return;
         }
 
-        scope.fireBeforeSave();
+        scope.fireBeforeSave && scope.fireBeforeSave();
         scope.waitForActions(function () {
           var unwatch = scope.$watch('_gridEditCount', function (count) {
             if (count) return;
