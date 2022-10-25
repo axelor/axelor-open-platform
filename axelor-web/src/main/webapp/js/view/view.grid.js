@@ -186,6 +186,14 @@ function GridViewCtrl($scope, $element) {
       }
     };
 
+    var details = $scope.$details;
+    var viewportScroll;
+
+    if (details) {
+      var viewport = $element.find('> [ui-view-grid] .slick-viewport').first();
+      viewportScroll = { top: viewport.scrollTop(), left: viewport.scrollLeft() };
+    }
+
     //XXX: clear existing items (bug?)
     if (dataView.getLength()) {
       dataView.beginUpdate();
@@ -201,7 +209,6 @@ function GridViewCtrl($scope, $element) {
         page = pageInfo;
     }
 
-    var details = $scope.$details;
     if (details) {
       var onSyncDetails = function() {
         var record = details.record || {};
@@ -221,6 +228,7 @@ function GridViewCtrl($scope, $element) {
           removeOnSyncDetails();
         });
       }
+      $scope.$broadcast('grid:set-scroll', { scroll: viewportScroll });
     } else {
       syncSelection();
     }

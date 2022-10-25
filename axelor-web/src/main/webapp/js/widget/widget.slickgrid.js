@@ -1319,6 +1319,17 @@ Grid.prototype._doInit = function(view) {
     }
   });
 
+  scope.$on('grid:set-scroll', function (e, args) {
+    if (args.scroll.top) {
+      var viewport = $(grid.getCanvasNode()).parent();
+      viewport.scrollTop(args.scroll.top - 1); // XXX chrome update issue?
+      scope.$timeout(function () {
+        viewport.scrollTop(args.scroll.top);
+        viewport.scrollLeft(args.scroll.left);
+      }, 10);
+    }
+  });
+
   scope.$on('$destroy', function () {
     if (that.editorForm) {
       that.editorForm.remove();
