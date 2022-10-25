@@ -219,8 +219,13 @@ function GridViewCtrl($scope, $element) {
         }
         syncSelection();
       }
+      function selectionHasChanged() {
+        return !_.isEqual(selectionIds, dataView.mapRowsToIds(selection));
+      }
       if (_.isEmpty(details.record)) {
         details.$timeout(onSyncDetails);
+      } else if (selectionHasChanged()) {
+        details.selectionChanged();
       } else {
         var removeOnSyncDetails = details.$on('on:edit', function() {
           onSyncDetails();
@@ -815,8 +820,10 @@ function GridViewCtrl($scope, $element) {
 
     var dataView = $scope.dataView;
     var selected = _.map($scope.selection || [], function(index) {
-      return dataView.getItem(index).id;
+      var item = dataView.getItem(index);
+      return item && item.id;
     });
+    selected = _.compact(selected);
 
     return selected.length ? { _ids: selected } : {};
   };
