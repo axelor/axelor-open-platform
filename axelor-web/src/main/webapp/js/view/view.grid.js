@@ -649,6 +649,13 @@ function GridViewCtrl($scope, $element) {
   };
 
   $scope.onEdit = function(force) {
+    if ($scope.$details) {
+      $scope.$details._skipLoad = true;
+      setTimeout(function () {
+        $scope.$details._skipLoad = false;
+      }, 300);
+      $scope.$details.hideDetailsForm();
+    }
     page.index = $scope.pagerIndex(true);
     $scope.switchTo('form', function (formScope) {
       formScope.__canForceEdit = force;
@@ -707,8 +714,8 @@ function GridViewCtrl($scope, $element) {
 
   $scope.onRefresh = function() {
     if ($scope.$details) {
-      $scope.$details.onNew().then(function () {
-        $scope.reload();
+      $scope.reload().then(function() {
+        $scope.$details.selectionChanged(true);
       });
     } else {
       $scope.reload();
@@ -792,7 +799,7 @@ function GridViewCtrl($scope, $element) {
     });
 
     if ($scope.$details) {
-      $scope.$details.selectionChanged(selection);
+      $scope.$details.selectionChanged();
     }
   };
 
@@ -975,26 +982,36 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
       $scope.setEditable(true);
       $scope.show();
 
-      function doEdit(index) {
+      $scope._hasDetailsRecord = false;
+
+      function doEdit(index, force) {
+        $scope.$broadcast("on:attrs-reset");
         var found = ds.at(index);
         var record = $scope.record;
-        if (record && found.id === record.id) return;
+        if (!force && record && found.id === record.id) return;
+        $scope._hasDetailsRecord = true;
         $scope.doRead(found.id).success(function(record) {
           $scope.edit(record);
         });
       }
 
-      $scope.selectionChanged = _.debounce(function () {
+      $scope.selectionChanged = _.debounce(function (force) {
+        if($scope._skipLoad) {
+          $scope._skipLoad = false;
+          return;
+        }
         var current = $scope.record || {};
         var first = parent.pagerIndex(true);
         if (first > -1) {
-          doEdit(first);
+          doEdit(first, force);
         } else if (current.id > 0) {
+          $scope._hasDetailsRecord = false;
           $scope.edit(null);
         }
       }, 300);
 
       $scope.$on("on:new", function(e) {
+        $scope._hasDetailsRecord = true;
         var dataView = parent.dataView;
         if (dataView && dataView.$syncSelection) {
           dataView.$syncSelection([], [], true);
@@ -1011,6 +1028,25 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
           }
         }
       });
+
+      $scope.canShowForm = function() {
+        return $scope._hasDetailsRecord;
+      };
+
+      function hideDetailsForm() {
+        $scope.$broadcast("on:attrs-reset");
+        $scope.edit(null, false);
+        $scope._hasDetailsRecord = false;
+      }
+
+      $scope.hideDetailsForm = function() {
+        hideDetailsForm();
+      };
+
+      $scope.closeDetailsView = function() {
+        $scope.confirmDirty(hideDetailsForm);
+      };
+
     }],
     link: function (scope, element, attrs) {
       var overlay = $("<div class='slickgrid-overlay'>");

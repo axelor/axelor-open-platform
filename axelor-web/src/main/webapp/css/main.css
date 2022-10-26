@@ -521,6 +521,15 @@ header .navbar .nav-link-user-sub {
   border-right: 1px solid #ddd;
 }
 
+.details-view-empty-message .details-view-empty-text {
+  display: block !important;
+  position: absolute;
+  top: 48%;
+  width: 100%;
+  font-weight: 400;
+  text-align: center;
+}
+
 .grid-view > .details-view {
   position: absolute !important;
   top: 40px; left: 50%; right: 0px; bottom: 0px;

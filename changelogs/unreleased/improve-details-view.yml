@@ -1,0 +1,8 @@
+title: Improve details-view usage
+type: feature
+description: |
+  In a details-view, the form view can be closed on demand or if there is no selected 
+  line. When we delete a line in the grid, the record in the form is no more displayed.
+  
+  This also fix duplicated requests, missing onLoad/onNew calls in some conditions and 
+  reset attrs states on form view.
