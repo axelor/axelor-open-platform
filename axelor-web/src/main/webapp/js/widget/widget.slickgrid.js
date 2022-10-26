@@ -2477,15 +2477,25 @@ function commitEdit(noWait) {
     });
   }
 
+  var scope = this.editorScope;
+
+  function onFulfilled() {
+    cleanUp();
+    scope.$emit('on:grid-edit-success', scope.record);
+  }
+
+  function onRejected() {
+    cleanUp();
+    scope.$emit('on:grid-edit-failure', scope.record);
+  }
+
   this._commitPromise = promise;
-  promise.then(cleanUp, cleanUp);
+  promise.then(onFulfilled, onRejected);
 
   if (!this.isEditActive()) {
     defer.resolve();
     return promise;
   }
-
-  var scope = this.editorScope;
 
   if (!scope || !scope.isValid()) {
     defer.reject();
