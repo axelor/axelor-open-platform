@@ -684,7 +684,7 @@ public class MetaFiles {
   }
 
   /**
-   * Delete the given {@link MetaFile} instance along with the file content.
+   * Delete the given {@link MetaFile} instance along with the file content if it exists.
    *
    * @param metaFile the file to delete
    * @throws IOException if unable to delete file
@@ -694,16 +694,18 @@ public class MetaFiles {
     Preconditions.checkNotNull(metaFile);
 
     Path target = getUploadPath(metaFile.getFilePath());
-    Path tmp = createTempFile(null, null);
 
     filesRepo.remove(metaFile);
 
-    Files.move(target, tmp, MOVE_OPTIONS);
-    try {
-      Files.deleteIfExists(tmp);
-    } catch (IOException e) {
-      Files.move(tmp, target);
-      throw e;
+    if (Files.exists(target)) {
+      Path tmp = createTempFile(null, null);
+      Files.move(target, tmp, MOVE_OPTIONS);
+      try {
+        Files.delete(tmp);
+      } catch (IOException e) {
+        Files.move(tmp, target);
+        throw e;
+      }
     }
   }
 

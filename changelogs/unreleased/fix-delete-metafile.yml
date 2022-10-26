@@ -1,0 +1,3 @@
+---
+title: Fix delete metafile if target file is not found
+type: fix
