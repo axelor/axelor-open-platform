@@ -754,17 +754,29 @@ ui.formItem('Button', {
         if (scope.fireBeforeSave) {
           var event = scope.fireBeforeSave();
           if (event.defaultPrevented) {
-            setEnable(true);
+            enable();
             return;
           }
         }
-        scope.waitForActions(function () {
-          var unwatch = scope.$watch('_gridEditCount', function (count) {
-            if (count) return;
-            unwatch();
-            fireOnClick();
+
+        var unregisterers = [];
+        function unregister() {
+          unregisterers.forEach(function (unregisterer) {
+            unregisterer();
           });
-        });
+        }
+
+        unregisterers.push(scope.$watch('_gridEditCount', function (count) {
+          if (count) return;
+          unregister();
+          fireOnClick();
+        }));
+
+        var formScope = ui.findForm(element).scope();
+        unregisterers.push(formScope.$on('on:grid-edit-failure', function () {
+          unregister();
+          enable();
+        }));
       }
 
       setDisabled(true);

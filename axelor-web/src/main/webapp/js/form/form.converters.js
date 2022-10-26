@@ -410,6 +410,24 @@
     return value;
   };
 
+  function findForm(elem) {
+    var formElement = elem;
+
+    if (formElement.is('form')) {
+      return formElement;
+    }
+
+    formElement = elem.data('$editorForm') || elem.parents('form:first');
+    if (!formElement || !formElement.get(0)) { // toolbar button
+      formElement = elem.parents('.form-view:first').find('form:first');
+    }
+    if (formElement.length === 0) {
+      formElement = elem;
+    }
+    return formElement;
+  }
+  ui.findForm = findForm;
+
   // Returns a copy of list sorted in lexicographic order, running each value through iteratee
   function sortBy(list, iteratee, descending) {
     var locale = getPreferredLocale();
