@@ -2978,7 +2978,7 @@ ui.directive("uiSlickColumnsForm", function () {
       view: "="
     },
     controller: ["$scope", "$element", 'DataSource', 'ViewService', function($scope, $element, DataSource, ViewService) {
-      var searchLimit = 200;
+      var searchLimit = 0;
       var excludedFieldNames = ["id", "version"];
       var columnDomain = "self.metaModel.fullName = :_modelName AND self.name NOT IN :_excludedFieldNames";
       var columnContext = {"_modelName": $scope.target, "_excludedFieldNames": excludedFieldNames};
@@ -3097,10 +3097,9 @@ ui.directive("uiSlickColumnsForm", function () {
           record.$title = title;
         });
         if (page.from === 0) {
+          // add the extra fields at the end of the first page only
           _.each(extraFields, function (field) {
-            if (!_.findWhere(records, { name: field.name })) {
-              records.push(field);
-            }
+            records.push(field);
           });
           if (!_.isEmpty(extraFields)) {
             // adjust page info if we add extra fields to the search results
@@ -3133,7 +3132,7 @@ ui.directive("uiSlickColumnsForm", function () {
                 item.id = item.$id = --fakeId;
                 extraFields.push(item);
               });
-            })
+            });
         }
 
         ds.search({
@@ -3146,6 +3145,14 @@ ui.directive("uiSlickColumnsForm", function () {
             a[x.name] = x;
             return a;
           }, {});
+
+          _.each(recordsMap, function(field) {
+            var index = findIndex(extraFields, function (item) { return item.name === field.name; });
+            if(index >= 0) {
+              field.$title = extraFields[index].$title;
+              extraFields.splice(index, 1);
+            }
+          });
 
           var items = [];
           var jsonFields = [];
@@ -3162,7 +3169,7 @@ ui.directive("uiSlickColumnsForm", function () {
           });
 
           // Remove attrs at default index
-          var buttonIndex = findIndex(items, function (item) { return item && item.type === "button" });
+          var buttonIndex = findIndex(items, function (item) { return item && item.type === "button"; });
           var lastIndex = findLastIndex(items, function (item) { return item && !item.hidden; });
           var defaultJsonIndex;
           if (buttonIndex < 0 || (items[lastIndex] || {}).type !== "button") {
@@ -3188,9 +3195,9 @@ ui.directive("uiSlickColumnsForm", function () {
             var rec = recordsMap[x.name];
             if (!rec || x.type !== 'field') {
               rec = x;
-              rec.$title = x.autoTitle || x.title || _t(humanizeName(x.name));
+              rec.$title = rec.$title || x.autoTitle || x.title || _t(humanizeName(x.name));
             } else {
-              rec.$title = x.title || _t(rec.label) || x.autoTitle || _t(humanizeName(x.name));
+              rec.$title = rec.$title || x.title || _t(rec.label) || x.autoTitle || _t(humanizeName(x.name));
             }
             rec = _.extend({}, rec, { hidden: x.hidden });
             if (rec.id === undefined) {
