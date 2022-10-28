@@ -550,7 +550,7 @@ ui.directive('uiSelectorPopup', function(){
     template:
     '<div ui-dialog ui-dialog-size x-on-ok="onOK">'+
         '<div ui-view-grid x-view="schema" x-data-view="dataView" x-handler="this" x-editable="false" x-selector="{{selectMode}}"></div>'+
-        '<div ui-record-pager></div>'+
+        '<div ui-record-pager class="pull-right"></div>'+
         '<div class="ui-dialog-buttonset-left pull-left" ng-show="canNew()">'+
           '<button class="btn" ng-click="onCreate()" x-translate>Create</button>'+
         '</div>'+
