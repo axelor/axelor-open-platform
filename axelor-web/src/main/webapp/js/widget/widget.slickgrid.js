@@ -3117,10 +3117,17 @@ ui.directive("uiSlickColumnsForm", function () {
         });
         if (page.from === 0) {
           // add the extra fields at the end of the first page only
-          _.each(extraFields, function (field) {
+          var ds = e.targetScope._dataSource || {};
+          var filter = ds._filter || {};
+          var criteria = _.first(filter.criteria) || {};
+          var searchInput = (criteria.value || '').toLowerCase();
+          var fields = _.filter(extraFields, function (field) {
+            return field.name.toLowerCase().indexOf(searchInput) >= 0;
+          });
+          _.each(fields, function (field) {
             records.push(field);
           });
-          if (!_.isEmpty(extraFields)) {
+          if (!_.isEmpty(fields)) {
             // adjust page info if we add extra fields to the search results
             page.total = Math.max(_.size(records), page.total);
             page.to = page.size = _.size(records);
