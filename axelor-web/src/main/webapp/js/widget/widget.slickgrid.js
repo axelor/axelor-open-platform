@@ -3121,6 +3121,11 @@ ui.directive("uiSlickColumnsForm", function () {
               records.push(field);
             }
           });
+          if (!_.isEmpty(extraFields)) {
+            // adjust page info if we add extra fields to the search results
+            page.total = Math.max(_.size(records), page.total);
+            page.to = page.size = _.size(records);
+          }
         }
         if (!(e.targetScope._dataSource || {})._sortBy) {
           records.sort(function (first, second) {
