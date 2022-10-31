@@ -3208,8 +3208,8 @@ ui.directive("uiSlickColumnsForm", function () {
             }
             rec = _.extend({}, rec, { hidden: x.hidden });
             if (rec.id === undefined) {
-              --fakeId;
-              rec = _.extend({}, rec, { id: fakeId, $id: fakeId });
+              var id = (_.findWhere(extraFields, { name: rec.name }) || {}).id || --fakeId;
+              rec = _.extend({}, rec, { id: id, $id: id });
             }
             if (rec.name.indexOf(".") >= 0 || rec.type && rec.type !== "field") {
               extraFields.push(rec);
