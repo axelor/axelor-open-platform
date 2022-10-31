@@ -3125,7 +3125,9 @@ ui.directive("uiSlickColumnsForm", function () {
             return field.name.toLowerCase().indexOf(searchInput) >= 0;
           });
           _.each(fields, function (field) {
-            records.push(field);
+            if (!_.findWhere(records, { name: field.name })) {
+              records.push(field);
+            }
           });
           if (!_.isEmpty(fields)) {
             // adjust page info if we add extra fields to the search results
@@ -3154,7 +3156,8 @@ ui.directive("uiSlickColumnsForm", function () {
                   }
                   return;
                 }
-                item.$title = item.title || item.autoTitle || _t(humanizeName(item.name));
+                var existing =  _.findWhere($scope.view.items, { name: item.name }) || {};
+                item.$title = existing.title || item.title || item.autoTitle || _t(humanizeName(item.name));
                 item.id = item.$id = --fakeId;
                 extraFields.push(item);
               });
@@ -3171,14 +3174,6 @@ ui.directive("uiSlickColumnsForm", function () {
             a[x.name] = x;
             return a;
           }, {});
-
-          _.each(recordsMap, function(field) {
-            var index = findIndex(extraFields, function (item) { return item.name === field.name; });
-            if(index >= 0) {
-              field.$title = extraFields[index].$title;
-              extraFields.splice(index, 1);
-            }
-          });
 
           var items = [];
           var jsonFields = [];
@@ -3223,7 +3218,12 @@ ui.directive("uiSlickColumnsForm", function () {
               rec = x;
               rec.$title = rec.$title || x.autoTitle || x.title || _t(humanizeName(x.name));
             } else {
-              rec.$title = rec.$title || x.title || _t(rec.label) || x.autoTitle || _t(humanizeName(x.name));
+              var item = _.findWhere($scope.view.items, { name: rec.name });
+              if (item) {
+                rec.$title = item.title || item.autoTitle;
+              } else {
+                rec.$title = rec.$title || x.title || _t(rec.label) || x.autoTitle || _t(humanizeName(x.name));
+              }
             }
             rec = _.extend({}, rec, { hidden: x.hidden });
             if (rec.id === undefined) {
@@ -3281,6 +3281,12 @@ ui.directive("uiSlickColumnsForm", function () {
             var item = existing[x.name] || { name: x.name, type: "field" };
             if (x.title) {
               item.title = x.title;
+            } else {
+              // preserve titles from search-filters fields
+              var filterField = _.findWhere(extraFields, { name: x.name });
+              if (filterField) {
+                item.title = filterField.$title;
+              }
             }
             delete item.hidden;
             items.push(item);
