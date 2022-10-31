@@ -1,0 +1,5 @@
+---
+title: Update meta field labels and descriptions when restoring meta models
+type: feature
+description: |
+  Update meta field labels so that they can be used in grid customization.

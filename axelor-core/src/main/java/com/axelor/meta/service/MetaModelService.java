@@ -116,14 +116,18 @@ public class MetaModelService {
     Mapper mapper = Mapper.of(klass);
 
     for (Property property : mapper.getProperties()) {
-      if (fields
+      final MetaField field =
+          fields
               .all()
               .filter("self.metaModel = ?1 AND self.name = ?2", metaModel, property.getName())
-              .count()
-          == 0) {
+              .fetchOne();
+      if (field == null) {
         metaModel
             .getMetaFields()
             .add(createField(metaModel, getField(klass, property.getName()), property));
+      } else {
+        field.setLabel(property.getTitle());
+        field.setDescription(property.getHelp());
       }
     }
 
