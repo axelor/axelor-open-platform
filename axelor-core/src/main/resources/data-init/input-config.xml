@@ -8,6 +8,7 @@
       <bind node="@code" to="code" />
       <bind node="@name" to="name" />
       <bind node="@technicalStaff" to="technicalStaff" />
+      <bind node="@viewCustomizationPermission" to="viewCustomizationPermission" />
     </bind>
 
     <bind node="user" type="com.axelor.auth.db.User" update="true" search="self.code = :code" call="com.axelor.auth.AuthService:encrypt">

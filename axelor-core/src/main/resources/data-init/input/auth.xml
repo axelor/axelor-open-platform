@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <auth>
 
-  <group code="admins" name="Administrator" technicalStaff="true"/>
+  <group code="admins" name="Administrator" technicalStaff="true" viewCustomizationPermission="CAN_CUSTOMIZE"/>
 
   <user code="admin" name="Administrator" group="admins" password="admin" />
 
