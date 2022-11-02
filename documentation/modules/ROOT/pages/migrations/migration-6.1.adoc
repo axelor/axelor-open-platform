@@ -141,3 +141,19 @@ Note that following changes:
 - `X-Forwarded-Context` support removed in favor of `X-Forwarded-Prefix`.
 - The configuration property `auth.provider.xx.absoluteUrlRequired` has been removed.
 ====
+
+== Dependencies upgrade
+
+Some dependencies have been upgraded to newer versions. Check the {product-version-changelog}[change log] for detailed
+list.
+
+Gradle has also been upgraded to a newer version. Upgrade the Gradle Wrapper to benefit from new features and
+improvements : `./gradlew wrapper --gradle-version 7.5.1`.
+
+[NOTE]
+====
+Note that running the wrapper task once will update `gradle-wrapper.properties` only, but leave the wrapper itself in
+`gradle-wrapper.jar` untouched. This is usually fine as new versions of Gradle can be run even with ancient wrapper
+files. If you nevertheless want all the wrapper files to be completely up-to-date, you’ll need to run the `wrapper`
+task a second time.
+====
