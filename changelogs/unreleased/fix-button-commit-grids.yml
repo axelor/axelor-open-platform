@@ -1,6 +1,0 @@
----
-title: Make sure grids have committed before firing button action
-type: fix
-description: |
-  Fixes application that can become unresponsive after clicking on a button on a form view
-  while having uncommitted editable grids.

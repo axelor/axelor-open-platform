@@ -1,3 +1,0 @@
----
-title: Fix NPE when running database task without encrypt option
-type: fix
