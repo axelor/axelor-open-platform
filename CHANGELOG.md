@@ -1,3 +1,70 @@
+## 6.0.4 (2022-11-02)
+
+#### Changes
+
+* Upgrade Hibernate from 5.6.9 to 5.6.12
+
+  <details>
+  
+  This fixes null mapped one-to-one field on an entity loaded from L2 cache.
+  
+  </details>
+
+#### Features
+
+* Update meta field labels and descriptions when restoring meta models
+
+  <details>
+  
+  Update meta field labels so that they can be used in grid customization.
+  
+  </details>
+
+* Improve details-view usage
+
+  <details>
+  
+  In a details-view, the form view can be closed on demand or if there is no selected 
+  line. When we delete a line in the grid, the record in the form is no more displayed.
+  
+  This also fix duplicated requests, missing onLoad/onNew calls in some conditions and 
+  reset attrs states on form view.
+  
+  </details>
+
+#### Fixed
+
+* Preserve scroll position after saving form in details view
+* Fix grouped grid display when already initialized
+* Fix chart context evaluation when calling from action-view
+* Fix page on grid customization popup when containing extra fields
+* Make sure grids have committed before firing button action
+
+  <details>
+  
+  Fixes application that can become unresponsive after clicking on a button on a form view
+  while having uncommitted editable grids.
+  
+  </details>
+
+* Fix record pager display issue in popup
+* Fix missing cell css applied on item's parent
+* Merge search-filter fields title with the model field title in grid customization popup
+* Fix query fetching missing fields in TagSelect widget
+* Fix delete metafile if target file is not found
+* Fix dependency conflict between GraalJS and Birt with package "com.ibm.icu"
+* Fix adding duplicate dotted field in grid customization
+
+  <details>
+  
+  Fix adding duplicate dotted field in grid customization
+  when it exists both in view and search filters.
+  
+  </details>
+
+* Fix customize dashboard with drag & drop
+* Fix wrong number of attachments displayed on record toolbar paper clip icon
+
 ## 6.0.3 (2022-09-28)
 
 #### Features

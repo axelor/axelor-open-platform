@@ -1,6 +1,0 @@
----
-title: Fix adding duplicate dotted field in grid customization
-type: fix
-description: |
-  Fix adding duplicate dotted field in grid customization
-  when it exists both in view and search filters.
