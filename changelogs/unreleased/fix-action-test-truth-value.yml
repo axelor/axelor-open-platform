@@ -1,8 +1,0 @@
----
-title: Fix truth value of action test expressions
-type: fix
-description: |
-  When evaluating action test expressions, "expr" should have the same truth value as "!!expr".
-
-  It was working with types boolean, integer, date, time, datetime, enum, references (any-to-one),
-  but was failing with long, decimal, string, binary, collections (any-to-many).

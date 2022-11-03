@@ -1,3 +1,268 @@
+## 6.1.0 (2022-11-03)
+
+#### Changes
+
+* Change code generator strategy to merge item attributes
+
+  <details>
+  
+  Previously, the code generator replace the field definition by the new one. Now 
+  the code generator will merge initial field attributes with overridable attributes.
+  So, only necessarily attributes that need to be override should be defined in the 
+  overwritten entity.
+  
+  This applies to both entities and enums.
+  
+  In the case of entity fields, there are a few restrictions:
+    * Attributes that are not overridable:
+      * `initParam`
+      * `column`
+      * `column2`
+      * `ref`
+      * `mappedBy`
+      * `table`
+      * `tz`
+      * `json`
+    * Attributes that are overridable with some conditions:
+      * `large`: large field cannot become non-large
+      * `transient` and `formula`: persisted field cannot become non-persisted
+  
+  </details>
+
+* Remove `auth.provider.xx.absoluteUrlRequired` property
+* Allow setting min/max to blank in order to remove the attribute in code generator
+* Define maximum number of records per page
+
+  <details>
+  
+  This change the default `api.pagination.max-per-page`, currently allowing unlimited 
+  number of records per page, to 500.
+  
+  </details>
+
+* Admins group can now customize views by default
+* Disable sorting on grids having `canMove="true"`
+* Let JpaFixture items persist error propagate
+
+  <details>
+  
+  JpaFixture is used for tests.
+  
+  In case of data error, tests failed without the actual cause, and there is no point in continuing
+  and have obscure errors happen on wrong data.
+  
+  </details>
+
+* Support of `X-Forwarded-Context` header removed in favor of `X-Forwarded-Prefix`
+* Reorder HTML widget buttons for consistency with Markdown widget
+* Reorder toolbar icons for consistency with Markdown widget
+* Move JpaFixture to axelor-test module
+* Upgrade HSQL JDBC from 2.6.1 to 2.7.0
+* Upgrade MySQL JDBC from 8.0.29 to 8.0.30
+* Upgrade UnboundID LDAP SDK from 6.0.5 to 6.0.6
+* Upgrade Junit from 5.8.2 to 5.9.1
+* Upgrade Upgrade embedded Tomcat from 9.0.63 to 9.0.65
+* Upgrade StringTemplate from 4.3.3 to 4.3.4
+* Upgrade Greenmail from 1.6.9 to 1.6.10
+* Upgrade Redisson from 3.17.3 to 3.17.6
+* Upgrade Resteasy from 4.7.6 to 4.7.7
+* Upgrade Groovy from 3.0.10 to 3.0.13
+* Upgrade Flyway from 8.5.11 to 9.3.1
+* Upgrade Hibernate Validator from 6.2.3 to 6.2.4
+* Upgrade Woodstox from 6.2.8 to 6.3.1
+* Upgrade Undertow from 2.2.17 to 2.2.19
+* Upgrade EclipseLink MOXy from 2.7.10 to 2.7.11
+* Upgrade Shiro from 1.9.0 to 1.9.1
+* Upgrade Spotless from 6.5.1 to 6.11.0
+* Upgrade Jsoup from 1.14.3 to 1.15.3
+* Upgrade Pac4j from 5.4.3 to 5.4.5
+* Upgrade Caffeine from 3.1.0 to 3.1.1
+* Upgrade Hazelcast from 5.1.1 to 5.1.3
+* Upgrade Jackson from 2.13.3 to 2.13.4
+* Upgrade Infinispan from 13.0.10 to 13.0.11
+* Upgrade PostgreSQL JDBC from 42.3.6 to 42.5.0
+* Upgrade Tika from 2.3.0 to 2.4.1
+* Upgrade Byte Buddy from 1.12.10 to 1.12.17
+* Upgrade Ehcache from 3.10.0 to 3.10.1
+* Upgrade Gradle from 7.4.2 to 7.5.1
+* Upgrade Gradle Node Plugin from 3.2.1 to 3.4.0
+
+#### Features
+
+* Improve support of `X-Forwarded-*` headers
+
+  <details>
+  
+  App now have full support for `X-Forwarded-*` headers and provides
+  better usage of proxy management.
+  
+  Supported headers are: `X-Forwarded-Host`, `X-Forwarded-Port`, 
+  `X-Forwarded-Proto`, `X-Forwarded-Prefix`, `X-Forwarded-For`.
+  
+  pac4j usage is now based on the current request. When redirecting urls, 
+  the Location is now absolute and no more relative to current servlet path.
+  This avoids custom proxy configuration to rewrite the location or cookie path.
+  
+  </details>
+
+* Implement setting scale on grid column by action
+
+  <details>
+  
+  `scale` attribute on a decimal field can be change on a grid column by an action.
+  
+  ```xml
+  <action-attrs name="action-set-scale">
+    <attribute for="items.price" name="scale" expr="eval: 10"/>
+  </action-attrs>
+  
+  <form ...>
+    ...
+    <panel-related field="items">
+      ...
+      <field name="price"/>
+    </panel-related>
+    ...
+  </form>
+  ```
+  
+  </details>
+
+* Displays the number of displayed and totaled items on the DMS list view
+* Use colored letter on top right corner as placeholder user icon
+
+  <details>
+  
+  This aligns user display with mail message and collaboration.
+  
+  </details>
+
+* Implement Markdown widget using TOAST UI Editor with Code Syntax Highlight Plugin
+
+  <details>
+  
+  Example:
+  
+  ```xml
+  <field name="myTextField" widget="markdown"/>
+  ```
+  
+  | Attribute           | Description                                                    |
+  | ------------------- | -------------------------------------------------------------- |
+  |`x-lite`             | Enable lite toolbar (defaults to `false`)                      |
+  |`x-preview-style`    | Markdown editor's preview style: `tab` (default), `vertical`   |
+  |`x-initial-edit-type`| Initial editor type: `markdown` (default), `wysiwyg`           |
+  |`x-hide-mode-switch` | Whether to hide edit typo switch tab bar (defaults to `false`) |
+  
+  </details>
+
+* Fall back to colored letter user image in mail message thread in case of permission failure
+* Allow to get value of field with selection in string templates
+
+  <details>
+  
+  For example, use `<SaleOrder.statusSelect.value>` to get the value of the selection.
+  With `<SaleOrder.statusSelect>`, you still get the title of the selection.
+  
+  </details>
+
+* Support x-field attribute with InfoButton widget to specify the bound field
+
+  <details>
+  
+  Example:
+  
+  Use the `x-field` attribute on `info-button` widget to specify the bound field. When using `x-field`, 
+  the button and the field are 2 distinct elements. Any attributes defined on that field will be used to 
+  format the value. Moreover, this allows to change the button attributes without impact on the bound field.
+  
+  ```xml
+  <panel>
+    <button name="amountBtn" title="Amount" widget="info-button" x-field="totalAmount" onClick="my-action"/>
+    <field name="amount" hidden="true"/>
+  </panel>
+  ```
+  
+  </details>
+
+* Dynamically evaluate x-scale from context
+
+  <details>
+  
+  On a decimal field, `x-scale` attribute accept an field name for a dynamic evaluation.
+  Grid and form view are both supported.
+  
+  ```xml
+  <field name="decimalField" widget="Decimal" x-scale="currency.decimalPlaces" x-precision="18"/>
+  ```
+  
+  </details>
+
+* Implement support to see users on same view in realtime
+
+  <details>
+  
+  This allows to see users that are seeing/editing/updating the current opened record.
+  
+  Feature can be disabled with `view.collaboration.enabled` property. By default, it is enabled.
+  On groups, there is a new boolean `canViewCollaboration` to determine whether members
+  can view collaboration (`true` by default).
+  
+  </details>
+
+* Introduce default number of items displayed per page config
+
+  <details>
+  
+  Introduce new config `api.pagination.default-per-page` :
+  
+  ```
+  # Define the default number of items per page
+  api.pagination.default-per-page = 40
+  ```
+  
+  This config is used in UI, especially in grid views, to define the default number of items 
+  displayed per page. Default value is still 40 records.
+  
+  </details>
+
+* Allow code generator to merge transient and multirelational fields
+
+  <details>
+  
+  Previously it was not able to override any attributes of transients and collections fields.
+  Now it is allow to change some of their attributes.
+  
+  </details>
+
+* Implement client-side sorting of o2m/m2m grids
+
+  <details>
+  
+  When there were some pending changes on a grid, sorting used to be disabled.
+  This is no longer the case thanks to client-side sorting.
+  Also transient/dummy fields can now be sorted.
+  Only o2m/m2m grids can be sorted client-side.
+  Other grid views that use pagination still send search request upon sorting.
+  
+  </details>
+
+#### Fixed
+
+* Fix truth value of action test expressions
+
+  <details>
+  
+  When evaluating action test expressions, "expr" should have the same truth value as "!!expr".
+  
+  It was working with types boolean, integer, date, time, datetime, enum, references (any-to-one),
+  but was failing with long, decimal, string, binary, collections (any-to-many).
+  
+  </details>
+
+* Fix x-scale="0"
+* Fix blank m2o in grid when there is no namecolumn
+
 ## 6.0.4 (2022-11-02)
 
 #### Changes
