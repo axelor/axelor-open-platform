@@ -322,9 +322,16 @@
       return formatNumber(field, value);
     },
 
-    "decimal": function(field, value, context) {
+    "decimal": function(field, value, context, scope) {
       var scale = [(field.widgetAttrs || {}).scale, field.scale, 2]
-        .find(function (val) { return _.isNumber(val); });
+        .map(function (val) {
+          if (scope && _.isString(val)) {
+            val = scope.$eval(val, context);
+          }
+          return val;
+        }).find(function (val) {
+          return _.isNumber(val);
+        });
       var currency = (field.widgetAttrs||{}).currency || field.currency;
 
       var text = formatNumber(field, value, scale);
@@ -438,7 +445,7 @@
     var type = field.selection ? "selection" : field.serverType || field.type;
     var formatter = ui.formatters[type];
     if (formatter) {
-      return formatter(field, value, context);
+      return formatter(field, value, context, scope);
     }
     return value;
   };
