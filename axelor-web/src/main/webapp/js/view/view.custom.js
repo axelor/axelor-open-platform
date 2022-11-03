@@ -105,6 +105,7 @@ var customDirective = ["$compile", function ($compile) {
 
       scope._requiresLazyLoading = true;
       var evalScope = axelor.$evalScope(scope);
+      scope.$element = evalScope.$element = element;
 
       function render(template) {
         var elem = $('<span>' + template.trim() + '</span>');

@@ -625,6 +625,7 @@ ui.directive('uiCard', ["$compile", function ($compile) {
       var body = element.find(".kanban-card-body");
       var record = scope.record;
       var evalScope = axelor.$evalScope(scope);
+      scope.$element = evalScope.$element = element;
 
       evalScope.record = record;
       evalScope.getContext = scope.getContext = function () {
