@@ -81,6 +81,30 @@ public class TenantConfigImpl implements TenantConfig {
 
   private TenantConfigImpl() {}
 
+  public static List<TenantConfig> findAll(Map<String, String> props) {
+    final List<TenantConfig> all = new ArrayList<>();
+    for (String key : props.keySet()) {
+      Matcher matcher = PATTERN_DB_NAME.matcher(key);
+      if (matcher.matches()) {
+        final String tenantId = matcher.group(1);
+        all.add(findById(props, tenantId));
+      }
+    }
+    if (all.isEmpty()) {
+      all.add(findById(props, DEFAULT_TENANT_ID));
+    }
+
+    // sort by name
+    try {
+      all.sort((a, b) -> a.getTenantName().compareTo(b.getTenantName()));
+    } catch (Exception e) {
+    }
+
+    all.removeIf(Objects::isNull);
+
+    return all;
+  }
+
   public static List<TenantConfig> findByHost(Map<String, String> props, String host) {
     final List<TenantConfig> all = new ArrayList<>();
     for (String key : props.keySet()) {

@@ -18,10 +18,16 @@
  */
 package com.axelor.quartz;
 
+import com.axelor.common.StringUtils;
+import com.axelor.db.tenants.TenantAware;
+import com.axelor.db.tenants.TenantConfig;
+import com.axelor.db.tenants.TenantConfigProvider;
+import com.axelor.inject.Beans;
 import com.google.inject.servlet.RequestScoped;
 import com.google.inject.servlet.RequestScoper;
 import com.google.inject.servlet.ServletScopes;
 import java.util.Collections;
+import java.util.Optional;
 import org.quartz.Job;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -49,13 +55,28 @@ public class GuiceJobRunShell extends JobRunShell {
     this.sched = sched;
   }
 
+  private void doRun() {
+    Optional.ofNullable(firedTriggerBundle.getJobDetail())
+        .map(x -> x.getKey())
+        .map(x -> x.getGroup()) // group is tenant id
+        .filter(StringUtils::notBlank)
+        .ifPresentOrElse(this::run, super::run);
+  }
+
+  private void run(String tenantId) {
+    final TenantConfig config = Beans.get(TenantConfigProvider.class).find(tenantId);
+    if (Boolean.TRUE.equals(config.getActive())) {
+      new TenantAware(super::run).tenantId(tenantId).withTransaction(false).run();
+    }
+  }
+
   @Override
   public void run() {
     final RequestScoper scope = ServletScopes.scopeRequest(Collections.emptyMap());
     try (RequestScoper.CloseableScope ignored = scope.open()) {
       try {
         super.initialize(this.sched);
-        super.run();
+        this.doRun();
       } catch (SchedulerException e) {
         resources
             .getJobStore()

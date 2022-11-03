@@ -20,7 +20,6 @@ package com.axelor.web;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
-import com.axelor.db.tenants.TenantModule;
 import com.axelor.event.Event;
 import com.axelor.events.ShutdownEvent;
 import com.axelor.events.StartupEvent;
@@ -61,11 +60,7 @@ public class AppStartup extends HttpServlet {
 
     try {
       if (jobRunner.isEnabled()) {
-        if (TenantModule.isEnabled()) {
-          log.info("Scheduler is not supported in multi-tenant mode.");
-        } else {
-          jobRunner.start();
-        }
+        jobRunner.init();
       }
     } catch (Exception e) {
       log.error(e.getMessage(), e);
@@ -79,7 +74,7 @@ public class AppStartup extends HttpServlet {
   public void destroy() {
     try {
       shutdownEvent.fire(new ShutdownEvent());
-      jobRunner.stop();
+      jobRunner.shutdown();
       ReportExecutor.shutdown();
       FileStoreFactory.shutdown();
     } catch (Exception e) {

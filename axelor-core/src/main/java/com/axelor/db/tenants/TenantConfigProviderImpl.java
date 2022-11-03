@@ -33,4 +33,9 @@ public class TenantConfigProviderImpl implements TenantConfigProvider {
   public List<TenantConfig> findAll(String host) {
     return TenantConfigImpl.findByHost(AppSettings.get().getProperties(), host);
   }
+
+  @Override
+  public List<TenantConfig> findAll() {
+    return TenantConfigImpl.findAll(AppSettings.get().getProperties());
+  }
 }

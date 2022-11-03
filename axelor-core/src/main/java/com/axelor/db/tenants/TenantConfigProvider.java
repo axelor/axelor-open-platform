@@ -40,4 +40,11 @@ public interface TenantConfigProvider {
    * @return list of all {@link TenantConfig} matching the given hostname
    */
   List<TenantConfig> findAll(String host);
+
+  /**
+   * Find all {@link TenantConfig}.
+   *
+   * @return list of all {@link TenantConfig}
+   */
+  List<TenantConfig> findAll();
 }
