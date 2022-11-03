@@ -20,12 +20,14 @@ package com.axelor.db.tenants;
 
 import com.axelor.app.AppSettings;
 import com.axelor.app.AvailableAppSettings;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.google.common.base.Preconditions;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import java.util.Map;
+import java.time.Duration;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;
 import org.hibernate.engine.jdbc.connections.spi.AbstractDataSourceBasedMultiTenantConnectionProviderImpl;
 import org.hibernate.service.spi.ServiceRegistryAwareService;
@@ -43,9 +45,21 @@ public class TenantConnectionProvider
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TenantConnectionProvider.class);
 
-  private TenantConfigProvider configProvider;
+  private transient TenantConfigProvider configProvider;
 
-  private final Map<String, DataSource> dataSourceMap = new ConcurrentHashMap<>();
+  private final transient LoadingCache<String, HikariDataSource> dataSourceCache =
+      Caffeine.newBuilder()
+          .weakValues()
+          .expireAfterAccess(Duration.ofHours(1))
+          .removalListener(
+              (String id, HikariDataSource source, RemovalCause cause) -> {
+                if (source != null) {
+                  source.close();
+                }
+              })
+          .build(
+              tenantIdentifier ->
+                  createDataSource(validate(configProvider.find(tenantIdentifier))));
 
   @Override
   protected final DataSource selectAnyDataSource() {
@@ -53,19 +67,17 @@ public class TenantConnectionProvider
   }
 
   @Override
-  protected DataSource selectDataSource(String tenantIdentifier) {
+  protected final DataSource selectDataSource(String tenantIdentifier) {
     if (configProvider.find(tenantIdentifier) == null) {
-      dataSourceMap.remove(tenantIdentifier);
+      dataSourceCache.invalidate(tenantIdentifier);
       LOGGER.debug("no such tenant found: {}", tenantIdentifier);
-      throw new TenantNotFoundException("No such tenant found: " + tenantIdentifier);
+      throw new TenantNotFoundException(tenantIdentifier);
     }
-
-    LOGGER.trace("using tenant: {}", tenantIdentifier);
-    return dataSourceMap.computeIfAbsent(
-        tenantIdentifier, t -> createDataSource(validate(configProvider.find(tenantIdentifier))));
+    LOGGER.debug("using tenant: {}", tenantIdentifier);
+    return dataSourceCache.get(tenantIdentifier);
   }
 
-  private DataSource createDataSource(TenantConfig config) {
+  private HikariDataSource createDataSource(TenantConfig config) {
     LOGGER.debug("creating datasource for tenant config: {}", config);
 
     final AppSettings settings = AppSettings.get();
@@ -78,13 +90,10 @@ public class TenantConnectionProvider
     hc.setPassword(config.getJdbcPassword());
     hc.setAutoCommit(false);
 
-    hc.setIdleTimeout(
-        Long.valueOf(settings.get(AvailableAppSettings.HIBERNATE_HIKARI_IDLE_TIMEOUT, "300000")));
+    hc.setIdleTimeout(settings.getInt(AvailableAppSettings.HIBERNATE_HIKARI_IDLE_TIMEOUT, 300000));
     hc.setMaximumPoolSize(
-        Integer.valueOf(
-            settings.get(AvailableAppSettings.HIBERNATE_HIKARI_MAXIMUM_POOL_SIZE, "20")));
-    hc.setMinimumIdle(
-        Integer.valueOf(settings.get(AvailableAppSettings.HIBERNATE_HIKARI_MINIMUM_IDLE, "5")));
+        settings.getInt(AvailableAppSettings.HIBERNATE_HIKARI_MAXIMUM_POOL_SIZE, 20));
+    hc.setMinimumIdle(0);
 
     return new HikariDataSource(hc);
   }
@@ -101,7 +110,7 @@ public class TenantConnectionProvider
 
   @Override
   public void stop() {
-    dataSourceMap.clear();
+    dataSourceCache.invalidateAll();
   }
 
   @Override
