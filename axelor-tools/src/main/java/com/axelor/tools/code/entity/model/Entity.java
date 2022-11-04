@@ -239,6 +239,10 @@ public class Entity implements BaseType<Entity> {
     for (Property prop : other.getFields()) {
       Property existing = findField(prop.getName());
       if (existing == null) {
+        if (isTrue(prop.getInitParam())) {
+          prop.setInitParam(false);
+          logger.error("{}.{}: adding initParam is not allowed", getName(), prop.getName());
+        }
         fields.add(prop);
       } else if (!merge(existing, prop)) {
         continue;

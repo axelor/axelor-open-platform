@@ -1,0 +1,6 @@
+---
+title: Forbid adding init params
+type: fix
+description: |
+  When merging properties, it should be forbidden to add any init params,
+  whether we're overriding fields or adding fields.
