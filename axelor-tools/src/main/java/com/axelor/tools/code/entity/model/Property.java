@@ -110,6 +110,7 @@ public abstract class Property {
   @XmlAttribute(name = "copy")
   private Boolean copy;
 
+  @Overridable(SameTargetChecker.class)
   @XmlAttribute(name = "ref")
   private String target;
 
@@ -222,6 +223,23 @@ public abstract class Property {
     public void accept(Object a, Object b) {
       if (notTrue((Boolean) a) && isTrue((Boolean) b)) {
         throw new IllegalArgumentException("persisted field cannot become non-persisted");
+      }
+    }
+  }
+
+  private static class SameTargetChecker implements BiConsumer<Object, Object> {
+    @Override
+    public void accept(Object a, Object b) {
+      String first = String.valueOf(a);
+      String second = String.valueOf(b);
+      final int firstIndex = first.lastIndexOf('.');
+      final int secondIndex = second.lastIndexOf('.');
+      if (firstIndex >= 0 || secondIndex >= 0) {
+        first = first.substring(firstIndex + 1);
+        second = second.substring(secondIndex + 1);
+      }
+      if (!Objects.equals(first, second)) {
+        throw new IllegalArgumentException("cannot change reference entity");
       }
     }
   }

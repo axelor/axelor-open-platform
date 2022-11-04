@@ -1,0 +1,7 @@
+---
+title: Don't warn about unchanged ref when merging entity props in code generator
+type: fix
+description: |
+  `ref` may be specified as simple name or fully qualified name.
+  When one is using simple name, compare by simple name only,
+  as to avoid spurious warning.
