@@ -5,6 +5,7 @@ include "axelor-gradle"
 include "axelor-test"
 include "axelor-core"
 include "axelor-web"
+include "axelor-front"
 
 if (JavaVersion.current() != JavaVersion.VERSION_11) {
   throw new GradleException("This build requires JDK-11.")
