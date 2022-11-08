@@ -1,0 +1,11 @@
+= 7.0 Migration Guide
+:toc:
+:toc-title:
+
+:product-version-changelog: https://github.com/axelor/axelor-open-platform/blob/7.0/CHANGELOG.md
+
+In this document, we will see the major steps to migrate from 6.1 to 7.0.
+
+NOTE: Please check the {product-version-changelog}[change log] for detailed list of fixes, changes and improvements
+introduced in 7.0
+
