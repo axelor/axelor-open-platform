@@ -91,9 +91,11 @@ public class AxelorPlugin implements Plugin<Project> {
 
   private void configureJarSupport(Project project) {
     // include webapp resources in jar
-    project
-        .getTasks()
-        .withType(Jar.class, jar -> jar.into("webapp", spec -> spec.from("src/main/webapp")));
+    if (project != project.getRootProject()) {
+      project
+          .getTasks()
+          .withType(Jar.class, jar -> jar.into("webapp", spec -> spec.from("src/main/webapp")));
+    }
 
     // include core dependencies
     if (!isCore(project)) {
