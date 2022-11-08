@@ -90,6 +90,10 @@ public class AxelorPlugin implements Plugin<Project> {
   }
 
   private void configureJarSupport(Project project) {
+    if (isCore(project)) {
+      return;
+    }
+
     // include webapp resources in jar
     if (project != project.getRootProject()) {
       project
@@ -98,11 +102,9 @@ public class AxelorPlugin implements Plugin<Project> {
     }
 
     // include core dependencies
-    if (!isCore(project)) {
-      project.getDependencies().add("implementation", "com.axelor:axelor-core:" + version);
-      project.getDependencies().add("implementation", "com.axelor:axelor-web:" + version);
-      project.getDependencies().add("testImplementation", "com.axelor:axelor-test:" + version);
-    }
+    project.getDependencies().add("implementation", "com.axelor:axelor-core:" + version);
+    project.getDependencies().add("implementation", "com.axelor:axelor-web:" + version);
+    project.getDependencies().add("testImplementation", "com.axelor:axelor-test:" + version);
   }
 
   private void configureWarSupport(Project project) {

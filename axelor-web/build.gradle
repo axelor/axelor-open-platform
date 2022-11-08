@@ -25,3 +25,14 @@ dependencies {
   implementation libs.eclipselink_moxy
   implementation libs.buji_pac4j
 }
+
+jar {
+  dependsOn ':axelor-front:buildFront'
+  into('webapp') {
+    from "src/main/webapp"
+    from "${rootDir}/axelor-front/dist"
+    duplicatesStrategy 'exclude'
+  }
+}
+
+processResources.dependsOn ':axelor-front:buildFront'

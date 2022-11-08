@@ -43,6 +43,20 @@ public class CopyWebapp extends DefaultTask {
   }
 
   @InputFiles
+  public List<FileTree> getFrontFiles() {
+    List<FileTree> files = new ArrayList<>();
+    AxelorUtils.findAxelorArtifacts(getProject()).stream()
+            .filter(it -> "axelor-web".equals(it.getName()))
+            .forEach(artifact -> {
+              Project module = AxelorUtils.findProject(getProject(), artifact);
+              if(module != null) {
+                files.add(module.fileTree("../axelor-front/dist"));
+              }
+            });
+    return files;
+  }
+
+  @InputFiles
   public List<FileTree> getFiles() {
     List<FileTree> files = new ArrayList<>();
 
@@ -70,6 +84,10 @@ public class CopyWebapp extends DefaultTask {
           task.setDuplicatesStrategy(DuplicatesStrategy.INCLUDE);
           task.into(project.getBuildDir());
           task.from(getFiles());
+          task.into(project.getBuildDir().toPath().resolve("/webapp").toFile(), copySpec -> {
+            copySpec.from(getFrontFiles());
+            copySpec.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
+          });
         });
   }
 }
