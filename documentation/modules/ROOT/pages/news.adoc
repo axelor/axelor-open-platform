@@ -5,6 +5,15 @@
 
 :github-repo-url: https://github.com/axelor/axelor-open-platform
 
+== 7.0
+
+The main highlights are :
+
+- Migrate to new front-end built on top of React
+
+Please check the {github-repo-url}/blob/7.0/CHANGELOG.md[change log] for detailed list of changes and
+the xref:ROOT:migrations/migration-7.0.adoc[7.0 migration guide].
+
 == 6.1
 
 The main highlights are:

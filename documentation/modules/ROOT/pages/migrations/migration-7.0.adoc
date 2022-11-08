@@ -9,3 +9,11 @@ In this document, we will see the major steps to migrate from 6.1 to 7.0.
 NOTE: Please check the {product-version-changelog}[change log] for detailed list of fixes, changes and improvements
 introduced in 7.0
 
+== Migrate to new front-end built on top of React
+
+Current Angular front-end is now dropped in favor of new front-end built on top of React.
+
+Here are the following changes due to this change :
+
+- `npm-install` Gradle task has been removed.
+
