@@ -71,10 +71,10 @@ public class AuthPac4jModule extends ShiroWebModule {
     addFilterChain("/ico/**", ANON);
     addFilterChain("/css/**", ANON);
     addFilterChain("/js/**", ANON);
-    addFilterChain("/error.jsp", ANON);
+    addFilterChain("/assets/**", ANON);
+    addFilterChain("/index.html", ANON);
+    addFilterChain("/manifest.json", ANON);
     addFilterChain("/favicon.ico", ANON);
-    addFilterChain("/change-password.jsp", ANON);
-    addFilterChain("/login.jsp", Key.get(AxelorLoginPageFilter.class));
     addFilterChain("/logout", Key.get(AxelorLogoutFilter.class));
     addFilterChain("/callback", Key.get(AxelorCallbackFilter.class));
     addFilterChain("/callback/**", Key.get(AxelorCallbackFilter.class));
