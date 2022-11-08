@@ -26,6 +26,7 @@ import com.axelor.auth.db.Group;
 import com.axelor.auth.db.User;
 import com.axelor.auth.db.ViewCustomizationPermission;
 import com.axelor.auth.pac4j.AuthPac4jInfo;
+import com.axelor.common.ObjectUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.common.VersionUtils;
 import com.axelor.db.mapper.Mapper;
@@ -126,13 +127,16 @@ public class AppInfo {
     }
 
     final List<String> themes = new ArrayList<>();
-    for (String path : context.getResourcePaths("/css")) {
-      try {
-        if (path.endsWith("/") && context.getResource(path + "theme.css") != null) {
-          path = path.replace("/css/", "").replace("/", "");
-          themes.add(path);
+    // TODO: there is no more theme on v7
+    if(ObjectUtils.notEmpty(context.getResourcePaths("/css"))) {
+      for (String path : context.getResourcePaths("/css")) {
+        try {
+          if (path.endsWith("/") && context.getResource(path + "theme.css") != null) {
+            path = path.replace("/css/", "").replace("/", "");
+            themes.add(path);
+          }
+        } catch (MalformedURLException e) {
         }
-      } catch (MalformedURLException e) {
       }
     }
 
