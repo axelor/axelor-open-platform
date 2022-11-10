@@ -60,6 +60,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.servlet.RequestScoped;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,6 +105,10 @@ public class ViewService extends AbstractService {
   @GET
   @Path("models")
   @SuppressWarnings("all")
+  @Tag(name = "Models")
+  @Operation(
+      summary = "Get list of all domain models",
+      description = "This service returns list of all domain models.")
   public Response models() {
 
     final Response response = new Response();
@@ -124,6 +131,10 @@ public class ViewService extends AbstractService {
   @GET
   @Path("fields/{model}")
   @SuppressWarnings("all")
+  @Tag(name = "Models")
+  @Operation(
+      summary = "Get properties of a domain model",
+      description = "This service can be used to get properties of a domain model.")
   public Response fields(
       @PathParam("model") String model, @QueryParam("jsonModel") String jsonModel) {
     final Response response = new Response();
@@ -165,6 +176,7 @@ public class ViewService extends AbstractService {
 
   @GET
   @Path("views/{model}")
+  @Hidden
   public Response views(@PathParam("model") String model) {
     final MultivaluedMap<String, String> params = getUriInfo().getQueryParameters(true);
     final Map<String, String> views = Maps.newHashMap();
@@ -254,6 +266,7 @@ public class ViewService extends AbstractService {
 
   @GET
   @Path("view")
+  @Hidden
   public Response view(
       @QueryParam("model") String model,
       @QueryParam("name") String name,
@@ -301,6 +314,7 @@ public class ViewService extends AbstractService {
 
   @POST
   @Path("view")
+  @Hidden
   public Response view(Request request) {
 
     final Map<String, Object> data = request.getData();
@@ -312,6 +326,7 @@ public class ViewService extends AbstractService {
 
   @POST
   @Path("view/fields")
+  @Hidden
   public Response viewFields(Request request) {
     final Response response = new Response();
     response.setData(MetaStore.findFields(request.getBeanClass(), request.getFields()));
@@ -320,6 +335,7 @@ public class ViewService extends AbstractService {
 
   @POST
   @Path("view/save")
+  @Hidden
   public Response save(Request request) {
     final Map<String, Object> data = request.getData();
     final ObjectMapper om = Beans.get(ObjectMapper.class);
@@ -452,6 +468,7 @@ public class ViewService extends AbstractService {
 
   @GET
   @Path("chart/{name}")
+  @Hidden
   public Response chart(@PathParam("name") String name) {
     final MultivaluedMap<String, String> params = getUriInfo().getQueryParameters(true);
     final Map<String, Object> context = Maps.newHashMap();
@@ -472,6 +489,7 @@ public class ViewService extends AbstractService {
 
   @POST
   @Path("chart/{name}")
+  @Hidden
   public Response chart(@PathParam("name") String name, Request request) {
     final Map<String, Object> data = request.getData();
     if (data == null || data.get("_domainAction") == null) {
@@ -484,6 +502,7 @@ public class ViewService extends AbstractService {
 
   @POST
   @Path("custom/{name}")
+  @Hidden
   public Response dataset(@PathParam("name") String name, Request request) {
     final Map<String, Object> data = request.getData();
     if (data == null || data.get("_domainAction") == null) {

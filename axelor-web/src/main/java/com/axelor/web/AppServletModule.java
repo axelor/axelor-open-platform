@@ -31,6 +31,7 @@ import com.axelor.rpc.Request;
 import com.axelor.rpc.RequestFilter;
 import com.axelor.rpc.Response;
 import com.axelor.rpc.ResponseInterceptor;
+import com.axelor.web.openapi.OpenApiModule;
 import com.axelor.web.servlet.CorsFilter;
 import com.axelor.web.servlet.I18nServlet;
 import com.axelor.web.servlet.NoCacheFilter;
@@ -110,6 +111,8 @@ public class AppServletModule extends ServletModule {
           }
         });
 
+    install(new OpenApiModule());
+
     // install additional modules
     for (Module module : getModules()) {
       install(module);
@@ -161,7 +164,6 @@ public class AppServletModule extends ServletModule {
 
     // register the session listener
     getServletContext().addListener(new AppSessionListener());
-
     // run additional configuration tasks
     this.afterConfigureServlets();
   }

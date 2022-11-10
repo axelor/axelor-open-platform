@@ -42,6 +42,9 @@ import com.axelor.script.ScriptHelper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Longs;
 import com.google.inject.servlet.RequestScoped;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -84,10 +87,11 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.csv.CSVPrinter;
 import org.eclipse.persistence.annotations.Transformation;
 
+@RequestScoped
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/dms")
-@RequestScoped
+@Tag(name = "DMS")
 public class DmsService {
 
   @Context private HttpServletRequest httpRequest;
@@ -99,6 +103,9 @@ public class DmsService {
 
   @GET
   @Path("files")
+  @Operation(
+      summary = "File listing",
+      description = "This service can be used to find list of files under a specific directory.")
   public Response listFiles(
       @QueryParam("parent") Long parentId, @QueryParam("pattern") String pattern) {
     final Response response = new Response();
@@ -132,6 +139,10 @@ public class DmsService {
 
   @GET
   @Path("attachments/{model}/{id}")
+  @Operation(
+      summary = "List attachments",
+      description =
+          "This service can be used to find list of files attached to some specific record.")
   public Response attachments(@PathParam("model") String model, @PathParam("id") Long id) {
     final Response response = new Response();
     final List<?> records =
@@ -151,6 +162,10 @@ public class DmsService {
 
   @PUT
   @Path("attachments/{model}/{id}")
+  @Operation(
+      summary = "Add attachment",
+      description =
+          "The MetaFile record obtained with upload service can be used to create attachments.")
   @Transformation
   public Response addAttachments(
       @PathParam("model") String model, @PathParam("id") Long id, Request request) {
@@ -197,6 +212,7 @@ public class DmsService {
 
   @GET
   @Path("offline")
+  @Hidden
   public Response getOfflineFiles(
       @QueryParam("limit") int limit, @QueryParam("offset") int offset) {
 
@@ -236,6 +252,7 @@ public class DmsService {
 
   @POST
   @Path("offline")
+  @Hidden
   public Response offline(Request request) {
     final Response response = new Response();
     final List<?> ids = request.getRecords();
@@ -273,6 +290,7 @@ public class DmsService {
 
   @HEAD
   @Path("offline/{id}")
+  @Hidden
   public javax.ws.rs.core.Response doDownloadCheck(@PathParam("id") long id) {
     final DMSFile file = repository.find(id);
     return findFile(file) == null
@@ -282,6 +300,7 @@ public class DmsService {
 
   @GET
   @Path("offline/{id}")
+  @Hidden
   public javax.ws.rs.core.Response doDownload(@PathParam("id") long id) {
 
     final DMSFile file = repository.find(id);
@@ -305,6 +324,7 @@ public class DmsService {
 
   @POST
   @Path("download/batch")
+  @Hidden
   public javax.ws.rs.core.Response onDownload(Request request) {
 
     final List<Object> ids = request.getRecords();
@@ -381,12 +401,17 @@ public class DmsService {
   @GET
   @Path("download/{id}")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
+  @Operation(
+      summary = "File download",
+      description =
+          "This service can be used to download a file. It should be used as normal http request.")
   public javax.ws.rs.core.Response doDownload(@PathParam("id") String batchOrId) {
     return getAttachmentResponse(batchOrId, false);
   }
 
   @GET
   @Path("inline/{id}")
+  @Hidden
   public javax.ws.rs.core.Response doInline(@PathParam("id") String batchOrId) {
     return getAttachmentResponse(batchOrId, true);
   }

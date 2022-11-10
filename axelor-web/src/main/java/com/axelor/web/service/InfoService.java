@@ -41,6 +41,9 @@ import com.axelor.script.CompositeScriptHelper;
 import com.axelor.script.ScriptBindings;
 import com.axelor.script.ScriptHelper;
 import com.google.inject.servlet.RequestScoped;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -95,6 +98,8 @@ public class InfoService extends AbstractService {
    */
   @GET
   @Path("info")
+  @Tag(name = "Metadata")
+  @Operation(summary = "Retrieve metadata information for the application")
   public Map<String, Object> info() {
     final User user = AuthUtils.getUser();
     final Map<String, Object> map = new HashMap<>();
@@ -318,12 +323,14 @@ public class InfoService extends AbstractService {
 
   @GET
   @Path("logo")
+  @Hidden
   public Response getLogoContent() {
     return getImageContent(getLogo());
   }
 
   @GET
   @Path("icon")
+  @Hidden
   public Response getIconContent() {
     return getImageContent(getIcon());
   }

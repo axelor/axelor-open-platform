@@ -27,6 +27,9 @@ import com.axelor.meta.schema.actions.validate.ActionValidateBuilder;
 import com.axelor.meta.schema.actions.validate.validator.ValidatorType;
 import com.google.inject.persist.Transactional;
 import com.google.inject.servlet.RequestScoped;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -52,12 +55,14 @@ import javax.ws.rs.core.Response.Status;
 
 @RequestScoped
 @Path("/files")
+@Tag(name = "DMS")
 public class FileService extends AbstractService {
 
   @Inject private MetaFiles files;
 
   @GET
   @Path("data-export/{name:.*}")
+  @Hidden
   public javax.ws.rs.core.Response exportFile(@PathParam("name") final String name) {
     final File file = FileUtils.getFile(ActionExport.getExportPath(), name);
     if (!file.isFile()) {
@@ -73,6 +78,7 @@ public class FileService extends AbstractService {
 
   @GET
   @Path("report/{link:.*}")
+  @Hidden
   public javax.ws.rs.core.Response reportFile(
       @PathParam("link") final String link, @QueryParam("name") final String name) {
 
@@ -112,6 +118,7 @@ public class FileService extends AbstractService {
   @DELETE
   @Path("upload/{fileId}")
   @Produces(MediaType.APPLICATION_JSON)
+  @Hidden
   public javax.ws.rs.core.Response clean(@PathParam("fileId") String fileId) {
     try {
       files.clean(fileId);
@@ -125,6 +132,10 @@ public class FileService extends AbstractService {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_OCTET_STREAM)
   @Transactional
+  @Operation(
+      summary = "File upload",
+      description =
+          "The upload service doesn’t include file to DMS directly, but creates MetaFile records pointing to the uploaded file. The MetaFile record can be used later to create a DMSFile record (normal or attachment).")
   public javax.ws.rs.core.Response upload(
       @HeaderParam("X-File-Id") String fileId,
       @HeaderParam("X-File-Name") String fileName,

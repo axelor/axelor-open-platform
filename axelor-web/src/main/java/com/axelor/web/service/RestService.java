@@ -61,6 +61,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import com.google.inject.servlet.RequestScoped;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -151,6 +154,8 @@ public class RestService extends ResourceService {
   }
 
   @GET
+  @Tag(name = "Read record")
+  @Operation(summary = "Find records", description = "This service returns list of records.")
   public Response find(
       @QueryParam("limit") @DefaultValue("40") int limit,
       @QueryParam("offset") @DefaultValue("0") int offset) {
@@ -179,6 +184,8 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("search")
+  @Tag(name = "Read record")
+  @Operation(summary = "Search records", description = "This service returns list of records.")
   public Response find(Request request) {
     if (request == null) {
       request = new Request();
@@ -193,6 +200,7 @@ public class RestService extends ResourceService {
   }
 
   @POST
+  @Hidden
   public Response save(Request request) {
     if (request == null || (isEmpty(request.getRecords()) && isEmpty(request.getData()))) {
       return fail();
@@ -202,18 +210,27 @@ public class RestService extends ResourceService {
   }
 
   @PUT
+  @Tag(name = "Create record")
+  @Operation(summary = "Create record", description = "This service returns the created record.")
   public Response create(Request request) {
     return save(request);
   }
 
   @GET
   @Path("{id}")
+  @Tag(name = "Read record")
+  @Operation(summary = "Read a record", description = "This service returns one record.")
   public Response read(@PathParam("id") long id) {
     return getResource().read(id);
   }
 
   @POST
   @Path("{id}/fetch")
+  @Tag(name = "Read record")
+  @Operation(
+      summary = "Advanced Read",
+      description =
+          "This is a specialized read service besides the standard REST service to partially read record.")
   public Response fetch(@PathParam("id") long id, Request request) {
     final User user = AuthUtils.getUser();
 
@@ -259,6 +276,11 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("{id}")
+  @Tag(name = "Update record")
+  @Operation(
+      summary = "Update a record",
+      description =
+          "This service returns the updated record. !Important : Version number is used in order to ensure non-conflicting modifications of the record, and thus must be specified.!")
   public Response update(@PathParam("id") long id, Request request) {
     if (request == null || isEmpty(request.getData())) {
       return fail();
@@ -277,6 +299,11 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("updateMass")
+  @Tag(name = "Update record")
+  @Operation(
+      summary = "Update records in mass",
+      description =
+          "This service returns list of updated records. !Important : Version number is used in order to ensure non-conflicting modifications of the record, and thus must be specified.!")
   public Response updateMass(Request request) {
     if (request == null || isEmpty(request.getData())) {
       return fail();
@@ -287,6 +314,10 @@ public class RestService extends ResourceService {
 
   @DELETE
   @Path("{id}")
+  @Tag(name = "Delete record")
+  @Operation(
+      summary = "Delete a record",
+      description = "This service returns list of deleted record ids.")
   public Response delete(@PathParam("id") long id, @QueryParam("version") int version) {
     Request request = new Request();
     request.setModel(getModel());
@@ -296,6 +327,7 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("{id}/remove")
+  @Hidden
   public Response remove(@PathParam("id") long id, Request request) {
     if (request == null || isEmpty(request.getData())) {
       return fail();
@@ -306,6 +338,11 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("removeAll")
+  @Tag(name = "Delete record")
+  @Operation(
+      summary = "Delete a record",
+      description =
+          "This is a specialized delete service besides the standard REST service to delete records in bulk.")
   public Response remove(Request request) {
     if (request == null || isEmpty(request.getRecords())) {
       return fail();
@@ -316,12 +353,15 @@ public class RestService extends ResourceService {
 
   @GET
   @Path("{id}/copy")
+  @Tag(name = "Create record")
+  @Operation(summary = "Copy record", description = "This service returns the copied record.")
   public Response copy(@PathParam("id") long id) {
     return getResource().copy(id);
   }
 
   @GET
   @Path("{id}/details")
+  @Hidden
   public Response details(@PathParam("id") long id, @QueryParam("name") String name) {
     Request request = new Request();
     Map<String, Object> data = new HashMap<String, Object>();
@@ -349,6 +389,7 @@ public class RestService extends ResourceService {
   @Path("upload")
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.MULTIPART_FORM_DATA)
+  @Hidden
   public Response upload(final MultipartFormDataInput input) throws IOException {
 
     final Map<String, List<InputPart>> formData = input.getFormDataMap();
@@ -518,6 +559,7 @@ public class RestService extends ResourceService {
 
   @HEAD
   @Path("{id}/{field}/download")
+  @Hidden
   public javax.ws.rs.core.Response downloadCheck(
       @PathParam("id") Long id,
       @PathParam("field") String field,
@@ -533,6 +575,7 @@ public class RestService extends ResourceService {
   @Path("{id}/{field}/download")
   @Produces(MediaType.APPLICATION_OCTET_STREAM)
   @SuppressWarnings("all")
+  @Hidden
   public javax.ws.rs.core.Response download(
       @PathParam("id") Long id,
       @PathParam("field") String field,
@@ -653,6 +696,7 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("{id}/attachment")
+  @Hidden
   public Response attachment(@PathParam("id") long id, Request request) {
     if (request == null || isEmpty(request.getFields())) {
       return fail();
@@ -667,6 +711,7 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("removeAttachment")
+  @Hidden
   public Response removeAttachment(Request request) {
     if (request == null || isEmpty(request.getRecords())) {
       return fail();
@@ -685,6 +730,7 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("{id}/addAttachment")
+  @Hidden
   public Response addAttachment(@PathParam("id") long id, Request request) {
     if (request == null || isEmpty(request.getData())) {
       return fail();
@@ -699,6 +745,7 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("verify")
+  @Hidden
   public Response verify(Request request) {
     if (request == null || isEmpty(request.getData())) {
       return fail();
@@ -709,6 +756,7 @@ public class RestService extends ResourceService {
 
   @GET
   @Path("perms")
+  @Hidden
   public Response perms(@QueryParam("action") String action, @QueryParam("id") Long id) {
     if (action != null) {
       if (id != null) {
@@ -724,6 +772,7 @@ public class RestService extends ResourceService {
 
   @HEAD
   @Path("export/{name}")
+  @Hidden
   public javax.ws.rs.core.Response exportCheck(@PathParam("name") final String name) {
     return Files.exists(MetaFiles.findTempFile(name))
         ? javax.ws.rs.core.Response.ok().build()
@@ -733,6 +782,7 @@ public class RestService extends ResourceService {
   @GET
   @Path("export/{name}")
   @Produces("text/csv")
+  @Hidden
   public StreamingOutput export(@PathParam("name") final String name) {
 
     final java.nio.file.Path temp = MetaFiles.findTempFile(name);
@@ -755,6 +805,7 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("export")
+  @Hidden
   public Response export(Request request) {
     if (request == null || request.getFields() == null) {
       return fail();
@@ -789,6 +840,7 @@ public class RestService extends ResourceService {
 
   @GET
   @Path("{id}/followers")
+  @Hidden
   public Response messageFollowers(@PathParam("id") long id) {
     final Class<? extends Model> entityClass = entityClass();
     Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
@@ -807,6 +859,7 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("{id}/follow")
+  @Hidden
   public Response messageFollow(@PathParam("id") long id, Request request) {
     final Class<? extends Model> entityClass = entityClass();
     Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
@@ -845,6 +898,7 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("{id}/unfollow")
+  @Hidden
   public Response messageUnfollow(@PathParam("id") long id, Request request) {
     final Class<? extends Model> entityClass = entityClass();
     Beans.get(JpaSecurity.class).check(JpaSecurity.CAN_READ, entityClass, id);
@@ -872,6 +926,7 @@ public class RestService extends ResourceService {
 
   @POST
   @Path("{id}/message")
+  @Hidden
   public Response messagePost(@PathParam("id") long id, Request request) {
     if (request == null || isEmpty(request.getData())) {
       return fail();

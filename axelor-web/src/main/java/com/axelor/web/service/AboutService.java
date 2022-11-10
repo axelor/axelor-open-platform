@@ -28,6 +28,7 @@ import com.axelor.db.tenants.TenantResolver;
 import com.axelor.web.AppSessionListener;
 import com.axelor.web.internal.AppInfo;
 import com.google.inject.servlet.RequestScoped;
+import io.swagger.v3.oas.annotations.Hidden;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +49,7 @@ import javax.ws.rs.core.MediaType;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/app")
+@Hidden
 public class AboutService extends AbstractService {
 
   @Context private HttpServletRequest request;

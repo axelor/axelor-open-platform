@@ -159,6 +159,8 @@ libs.resteasy_server = [
   "io.undertow:undertow-servlet:2.2.30.Final"
 ]
 
+libs.swagger_jaxrs2 = "io.swagger.core.v3:swagger-jaxrs2:2.2.20"
+
 // jackson
 libs.jackson_libs = [
   "com.fasterxml.jackson.core:jackson-core:${versions.jackson}",

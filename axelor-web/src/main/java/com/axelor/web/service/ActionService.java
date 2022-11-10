@@ -28,6 +28,8 @@ import com.axelor.rpc.Resource;
 import com.axelor.rpc.Response;
 import com.axelor.ui.QuickMenuService;
 import com.google.inject.servlet.RequestScoped;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -42,6 +44,7 @@ import javax.ws.rs.core.MediaType;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/action")
+@Tag(name = "Actions")
 public class ActionService extends AbstractService {
 
   @Inject private MenuService menuService;
@@ -52,6 +55,7 @@ public class ActionService extends AbstractService {
 
   @GET
   @Path("menu/all")
+  @Hidden
   public Response all() {
     Response response = new Response();
     try {
@@ -66,6 +70,7 @@ public class ActionService extends AbstractService {
 
   @GET
   @Path("menu/quick")
+  @Hidden
   public Response quickMenuBar() {
     Response response = new Response();
     try {
@@ -80,6 +85,7 @@ public class ActionService extends AbstractService {
 
   @GET
   @Path("menu/fav")
+  @Hidden
   public Response favMenuBar() {
     Response response = new Response();
     MetaMenuRepository menus = Beans.get(MetaMenuRepository.class);

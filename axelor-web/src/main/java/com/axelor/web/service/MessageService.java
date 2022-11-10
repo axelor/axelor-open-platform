@@ -42,6 +42,9 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.persist.Transactional;
 import com.google.inject.servlet.RequestScoped;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -62,6 +65,7 @@ import org.apache.shiro.authz.UnauthorizedException;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/messages")
+@Tag(name = "Messages")
 public class MessageService extends AbstractService {
 
   /**
@@ -72,6 +76,9 @@ public class MessageService extends AbstractService {
    */
   @GET
   @Path("{id}")
+  @Operation(
+      summary = "Read message",
+      description = "This service returns the message for the given message id.")
   public Response getMessage(@PathParam("id") long id) {
     final ActionResponse res = new ActionResponse();
     final MailMessage message = JPA.edit(MailMessage.class, ImmutableMap.of("id", id));
@@ -104,6 +111,10 @@ public class MessageService extends AbstractService {
    * @return response
    */
   @GET
+  @Operation(
+      summary = "Read messages",
+      description =
+          "This service returns all messages for the given folder or an entity identified by the given relatedId and relatedModel.")
   public Response messages(
       @QueryParam("folder") @DefaultValue("inbox") String folder,
       @QueryParam("relatedId") Long relatedId,
@@ -197,6 +208,9 @@ public class MessageService extends AbstractService {
    */
   @GET
   @Path("{id}/replies")
+  @Operation(
+      summary = "Read replies",
+      description = "This service returns all replied of the message identified with the given id.")
   public Response replies(@PathParam("id") long id) {
     final ActionRequest req = new ActionRequest();
     final ActionResponse res = new ActionResponse();
@@ -216,6 +230,7 @@ public class MessageService extends AbstractService {
    */
   @GET
   @Path("/count")
+  @Hidden
   public Response count() {
     final ActionRequest req = new ActionRequest();
     final ActionResponse res = new ActionResponse();
@@ -232,6 +247,9 @@ public class MessageService extends AbstractService {
    */
   @DELETE
   @Path("{id}")
+  @Operation(
+      summary = "Delete message",
+      description = "This service delete message identified with the given id.")
   public Response messageRemove(@PathParam("id") long id) {
     removeMessage(id);
 
@@ -271,6 +289,9 @@ public class MessageService extends AbstractService {
    */
   @POST
   @Path("{id}/flag")
+  @Operation(
+      summary = "Flag message",
+      description = "This service flag message identified with the given id.")
   public Response flagMessage(@PathParam("id") long id, Request request) {
     final ActionResponse res = new ActionResponse();
 
@@ -291,6 +312,9 @@ public class MessageService extends AbstractService {
    */
   @POST
   @Path("flag")
+  @Operation(
+      summary = "Flag message",
+      description = "This service flag message messages contains in the given request.")
   public Response flagMessages(Request request) {
     final ActionResponse res = new ActionResponse();
 
