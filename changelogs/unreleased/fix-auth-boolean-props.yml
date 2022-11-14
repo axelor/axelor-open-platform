@@ -1,0 +1,3 @@
+---
+title: Fix auth provider setting `exclusive`
+type: fix

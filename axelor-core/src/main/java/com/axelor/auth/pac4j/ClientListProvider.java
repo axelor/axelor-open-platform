@@ -190,7 +190,7 @@ public class ClientListProvider implements Provider<List<Client>> {
         String[] config = matcher.group("config").split("\\.", 2);
         config[0] = Inflector.getInstance().camelize(config[0], true);
         Object value =
-            SETTINGS_GETTERS.getOrDefault(config, (s, k) -> s.get(k, null)).apply(settings, key);
+            SETTINGS_GETTERS.getOrDefault(config[0], (s, k) -> s.get(k, null)).apply(settings, key);
 
         final Map<String, Object> initConfig =
             initConfigs.computeIfAbsent(name, k -> new HashMap<>());
