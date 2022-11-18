@@ -132,7 +132,8 @@ var Formatters = {
       .find(function (val) { return val !== undefined && val !== null; });
     if (_.isString(scale)) {
       context = _.extend({}, context);
-      if ((grid || {}).cols) {
+      grid = grid || {};
+      if (grid.cols) {
         grid.cols
           .map(function (col) {
             return col.descriptor;
@@ -151,7 +152,9 @@ var Formatters = {
         }
       }
       _.defaults(context, (grid.handler || {})._context);
-      field = _.extend({}, field, {scale: grid.scope.$eval(scale, context)});
+      if (grid.scope) {
+        field = _.extend({}, field, {scale: grid.scope.$eval(scale, context)});
+      }
     }
     return ui.formatters.decimal(field, value, context);
   },
@@ -373,29 +376,32 @@ var GroupFormatters = {
   }
 };
 
-function totalsFormatter(totals, columnDef) {
+function newTotalsFormatter(grid) {
 
-  var field = columnDef.descriptor;
-  if (["integer", "long", "decimal"].indexOf(field.type) === -1) {
-    return "";
+  return function totalsFormatter(totals, columnDef) {
+  
+    var field = columnDef.descriptor;
+    if (["integer", "long", "decimal"].indexOf(field.type) === -1) {
+      return "";
+    }
+  
+    var vals = totals[field.aggregate || 'sum'] || {};
+    var val = vals[field.name];
+  
+    var type = field.type;
+    var widget = field.widget;
+  
+    if (["duration"].indexOf(widget) >= 0) {
+      type = widget;
+    }
+  
+    var formatter = Formatters[type];
+    if (formatter) {
+      return formatter(field, val, _.first((totals.group || {}).rows), grid);
+    }
+  
+    return val;
   }
-
-  var vals = totals[field.aggregate || 'sum'] || {};
-  var val = vals[field.name];
-
-  var type = field.type;
-  var widget = field.widget;
-
-  if (["duration"].indexOf(widget) >= 0) {
-    type = widget;
-  }
-
-  var formatter = Formatters[type];
-  if (formatter) {
-    return formatter(field, val);
-  }
-
-  return val;
 }
 
 function Factory(grid) {
@@ -700,7 +706,7 @@ Grid.prototype.parse = function(view) {
     cols.push(column);
 
     if (field.aggregate) {
-      column.groupTotalsFormatter = totalsFormatter;
+      column.groupTotalsFormatter = newTotalsFormatter(that);
     }
 
     if (field.type === "button" || field.type === "icon") {
