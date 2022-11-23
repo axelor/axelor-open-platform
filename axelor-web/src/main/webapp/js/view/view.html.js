@@ -36,23 +36,26 @@ function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
     return _.extend({}, params.context, parent.getContext ? parent.getContext() : {});
   };
 
-  $scope.getURL = function () {
+  $scope.getUrl = function () {
     var view = $scope.view;
-    if (view) {
-      var url = $scope.attr && $scope.attr('url') || view.name || view.resource;
-      if (url && url.indexOf('{{') > -1) {
-        url = $interpolate(url)($scope.getContext());
-      }
-      var stamp = new Date().getTime();
-      var q = url.lastIndexOf('?');
-      if (q > -1) {
-        url += "&t" + stamp;
-      } else {
-        url += "?t" + stamp;
-      }
-      return $sce.trustAsResourceUrl(url);
+    if (!view) return null;
+    var url = $scope.attr && $scope.attr('url') || view.name || view.resource;
+    if (url && url.indexOf('{{') > -1) {
+      url = $interpolate(url)($scope.getContext());
     }
-    return null;
+    return url;
+  };
+
+  $scope.getTimestampedUrl = function (url) {
+    if (!url) return null;
+    var stamp = new Date().getTime();
+    var q = url.lastIndexOf('?');
+    if (q > -1) {
+      url += "&t" + stamp;
+    } else {
+      url += "?t" + stamp;
+    }
+    return $sce.trustAsResourceUrl(url);
   };
 
   $scope.show = function() {
@@ -78,8 +81,12 @@ function HtmlViewCtrl($scope, $element, $sce, $interpolate) {
 
       $scope.waitForActions(function () {
         $scope.ajaxStop(function () {
-          $scope.url = $scope.getURL();
-          refreshing = false;
+          var unwatchUrl = $scope.$watch('getUrl()', function (url) {
+            if (!url) return;
+            unwatchUrl();
+            $scope.url = $scope.getTimestampedUrl(url);
+            refreshing = false;
+          });
         });
       });
     });
