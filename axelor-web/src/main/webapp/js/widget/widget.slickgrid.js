@@ -127,36 +127,46 @@ var Formatters = {
     return ui.formatters.integer(field, value);
   },
 
-  "decimal": function(field, value, context, grid) {
+  "decimal": function(field, value, rows, grid) {
+    if (!_.isArray(rows)) {
+      rows = [rows];
+    }
     var scale = [(field.widgetAttrs || {}).scale, field.scale]
       .find(function (val) { return val !== undefined && val !== null; });
     if (_.isString(scale)) {
-      context = _.extend({}, context);
       grid = grid || {};
-      if (grid.cols) {
-        grid.cols
-          .map(function (col) {
-            return col.descriptor;
-          }).filter(function (desc) {
-            return _.contains((desc || {}).name, '.') && context[desc.name] !== undefined;
-          }).forEach(function (desc) {
-            dotToNested(context, desc);
+      for (var i = 0; i < rows.length; ++i) {
+        rows[i] = _.extend({}, rows[i]);
+        var context = rows[i];
+        if (grid.cols) {
+          grid.cols
+            .map(function (col) {
+              return col.descriptor;
+            }).filter(function (desc) {
+              return _.contains((desc || {}).name, '.') && context[desc.name] !== undefined;
+            }).forEach(function (desc) {
+              dotToNested(context, desc);
+            });
+          var jsonField = grid.cols.map(function (col) {
+            return (col.descriptor || {}).jsonField;
+          }).find(function (name) {
+            return name;
           });
-        var jsonField = grid.cols.map(function (col) {
-          return (col.descriptor || {}).jsonField;
-        }).find(function (name) {
-          return name;
-        });
-        if (jsonField && context[jsonField] !== undefined) {
-          context[jsonField] = angular.fromJson(context[jsonField]);
+          if (jsonField && context[jsonField] !== undefined) {
+            context[jsonField] = angular.fromJson(context[jsonField]);
+          }
         }
+        _.defaults(context, (grid.handler || {})._context);
       }
-      _.defaults(context, (grid.handler || {})._context);
+
       if (grid.scope) {
-        field = _.extend({}, field, {scale: grid.scope.$eval(scale, context)});
+        var maxScale = _.chain(rows).map(function (ctx) {
+          return grid.scope.$eval(scale, ctx);
+        }).max().value();
+        field = _.extend({}, field, {scale: maxScale});
       }
     }
-    return ui.formatters.decimal(field, value, context);
+    return ui.formatters.decimal(field, value, _.first(rows));
   },
 
   "boolean": function(field, value) {
@@ -397,7 +407,10 @@ function newTotalsFormatter(grid) {
   
     var formatter = Formatters[type];
     if (formatter) {
-      return formatter(field, val, _.first((totals.group || {}).rows), grid);
+      if (type === 'decimal') {
+        return formatter(field, val, (totals.group || {}).rows, grid);
+      }
+      return formatter(field, val);
     }
   
     return val;
