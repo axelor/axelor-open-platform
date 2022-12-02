@@ -161,7 +161,8 @@ var Formatters = {
 
       if (grid.scope) {
         var maxScale = _.chain(rows).map(function (ctx) {
-          return grid.scope.$eval(scale, ctx);
+          var rowScale = grid.scope.$eval(scale, ctx);
+          return rowScale !== null && rowScale !== undefined && rowScale !== '' ? rowScale : 2;
         }).max().value();
         field = _.extend({}, field, {scale: maxScale});
       }
