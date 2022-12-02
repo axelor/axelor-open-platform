@@ -663,7 +663,7 @@ function InlineManyToOneCtrl($scope, $element, DataSource, ViewService) {
       type: 'form',
       items: field.editor.items
     }];
-    names = _.pluck(field.editor.items, 'name');
+    names = _.pluck(field.editor.fields, 'name');
     names = _.compact(names);
   } else if (field.viewer && field.viewer.depends) {
     names = field.viewer.depends.split(/\s*,\s*/);
