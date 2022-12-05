@@ -1021,10 +1021,10 @@ ui.directive('uiViewDetails', ['DataSource', 'ViewService', function(DataSource,
       $scope._hasDetailsRecord = false;
 
       function doEdit(index, force) {
-        $scope.$broadcast("on:attrs-reset");
         var found = ds.at(index);
         var record = $scope.record;
         if (!force && record && found.id === record.id) return;
+        $scope.$broadcast("on:attrs-reset");
         $scope._hasDetailsRecord = true;
         $scope.doRead(found.id).success(function(record) {
           $scope.edit(record);
