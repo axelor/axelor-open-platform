@@ -479,7 +479,7 @@ ui.directive('uiEditorPopup', function() {
           scope.waitForActions(function () {
             scope.isPopupOpen = isOpen;
             scope.$$popupStack.pop(1);
-          }, 2000); // delay couple of seconds to that popup can cleanup
+          });
         });
         element.on('dialogopen', function (e) {
           scope.isPopupOpen = isOpen = true;
