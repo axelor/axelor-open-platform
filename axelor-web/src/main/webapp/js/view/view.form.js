@@ -637,7 +637,16 @@ function FormViewCtrl($scope, $element) {
           promise.then(reset, reset);
           promise = promise.then(function () {
             if ($scope.record && $scope.record.id > 0) return; // record may have been saved, see RM-13558
-            var rec = _.extend({}, defaults, $scope.record);
+
+            // Filter defaults to only include keys without dots
+            var dotlessDefaults = {};
+            _.each(defaults, function (value, key) {
+              if ((key || '').indexOf('.') < 0) {
+                dotlessDefaults[key] = value;
+              }
+            });
+
+            var rec = _.extend({}, dotlessDefaults, $scope.record);
             if ($scope.isDirty()) {
               var old = $scope.$$original;
               var res = $scope.editRecord(rec);
