@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models xmlns="http://axelor.com/xml/ns/domain-models"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://axelor.com/xml/ns/domain-models https://axelor.com/xml/ns/domain-models/domain-models_6.1.xsd">
+
+  <module name="merge" package="com.axelor.merge.db" />
+
+  <entity name="MyName0">
+    <string name="myName" />
+  </entity>
+
+  <entity name="MyName1">
+    <string name="myName" />
+  </entity>
+
+  <entity name="MyName2">
+    <string name="myName" namecolumn="false" />
+  </entity>
+
+  <entity name="MyName3">
+    <string name="myName" namecolumn="false" />
+  </entity>
+
+  <entity name="MyName4">
+    <string name="myName" namecolumn="true" />
+  </entity>
+
+  <entity name="MyName5">
+    <string name="myName" namecolumn="true" />
+  </entity>
+
+</domain-models>

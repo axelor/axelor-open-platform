@@ -248,7 +248,7 @@ public class Entity implements BaseType<Entity> {
         continue;
       }
       if (isTrue(prop.getNameField())) {
-        nameField = prop;
+        nameField = Objects.requireNonNullElse(existing, prop);
       }
     }
 
