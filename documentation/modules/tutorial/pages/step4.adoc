@@ -53,7 +53,7 @@ we'll see how to create `grid` and `form` views for the `Contact` model:
     <panel name="aboutMePanel" title="About me">
         <field name="notes" showTitle="false" colSpan="12"/>
     </panel>
-    <panel-related name="addressesPanel
+    <panel-related name="addressesPanel"
                    field="addresses" <6>
                    form-view="address-form-popup"> <7>
         <field name="street"/>
