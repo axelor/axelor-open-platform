@@ -417,6 +417,70 @@ and we can use the reference widget like this:
 
 NOTE: Use `data-grid` or `data-form` attributes to specify different views
 
+== RefLink
+
+In edit mode, this widget is the same as `<<RefSelect>>`. But in readonly mode, it only displays the link to the record (the type is not displayed).
+
+Example usage from `TeamTask`:
+[source,xml]
+----
+<field name="relatedModel"
+  title="Link"
+  colSpan="12"
+  widget="ref-link"
+  selection="team.task.links"
+  x-related="relatedId" />
+----
+
+== EvalRefSelect
+
+This widget can be used to select reference value depending
+on dynamic target model value. The following attributes should be
+provided:
+
+- `x-eval-target`: expression to find target model
+- `x-eval-target-name`: expression to find target model name field
+- `x-eval-value`: expression to get/set reference value (id)
+- `x-eval-title`: expression to get/set reference title (name value)
+
+Example usage from `MetaJsonField`:
+[source,xml]
+----
+<field name="contextFieldValue" colSpan="6" title="Value" showIf="model"
+  widget="eval-ref-select"
+  x-eval-target="record.contextFieldTarget"
+  x-eval-target-name="record.contextFieldTargetName"
+  x-eval-value="record.contextFieldValue"
+  x-eval-title="record.contextFieldTitle" />
+----
+
+== RefText
+
+This widget can be used to select string field value of a record.
+
+- `x-target`: target model
+- `x-target-name`: target model name field
+- `x-target-search`: optional additional field value in selection list, displayed as `x-target-name` (`x-target-search`)
+- `x-domain`: optional domain filter on target model
+
+Example where we select model name of meta model:
+[source,xml]
+----
+<field name="model" required="true" widget="ref-text"
+  x-target="com.axelor.meta.db.MetaModel"
+  x-target-name="fullName" />
+----
+
+Example where we select name of meta view, add module name in selection list, and use a domain filter:
+[source,xml]
+----
+<field name="view" widget="ref-text"
+  x-target="com.axelor.meta.db.MetaView"
+  x-target-name="name"
+  x-target-search="module"
+  x-domain="self.model = :model AND self.type IN ('form', 'grid')" />
+----
+
 == CodeEditor
 
 The CodeEditor widget is a special widget for string data fields to use a code
