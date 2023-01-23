@@ -27,7 +27,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 /** This class defines from static helper methods to deal with YAML. */
 public class YamlUtils {
@@ -48,7 +50,7 @@ public class YamlUtils {
     }
 
     try (InputStream stream = resource.openStream()) {
-      Yaml yaml = new Yaml();
+      Yaml yaml = new Yaml(new SafeConstructor(new LoaderOptions()));
       return yaml.load(stream);
     }
   }

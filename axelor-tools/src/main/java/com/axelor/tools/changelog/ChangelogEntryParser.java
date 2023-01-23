@@ -24,7 +24,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 public class ChangelogEntryParser {
 
@@ -37,7 +39,7 @@ public class ChangelogEntryParser {
   }
 
   private Map<String, Object> loadYaml(File file) throws IOException {
-    Yaml yaml = new Yaml();
+    Yaml yaml = new Yaml(new SafeConstructor(new LoaderOptions()));
     try (InputStream ios = new FileInputStream(file)) {
       return yaml.load(ios);
     }
