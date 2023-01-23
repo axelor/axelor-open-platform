@@ -54,7 +54,7 @@ public class ChangelogTest {
     URL changelogsUrl = ResourceUtils.getResource("changelogs/entries/");
     ChangelogEntryParser parser = new ChangelogEntryParser();
 
-    try (Stream<Path> stream = Files.list(Paths.get(changelogsUrl.toURI()))) {
+    try (Stream<Path> stream = Files.list(Paths.get(changelogsUrl.toURI())).sorted()) {
       return stream
           .map(Path::toFile)
           .map(
