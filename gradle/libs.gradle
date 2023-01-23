@@ -82,7 +82,7 @@ libs.javax_servlet_jsp = "javax.servlet.jsp:javax.servlet.jsp-api:2.3.3"
 libs.javax_validation = "javax.validation:validation-api:2.0.1.Final"
 libs.javax_el = ["org.apache.tomcat:tomcat-jasper:${versions.tomcat}", "org.apache.tomcat:tomcat-el-api:${versions.tomcat}"]
 libs.javax_mail = "com.sun.mail:javax.mail:1.6.2"
-libs.greenmail = "com.icegreen:greenmail-junit5:1.6.10"
+libs.greenmail = "com.icegreen:greenmail-junit5:1.6.12"
 libs.javax_el = "org.glassfish:jakarta.el:3.0.4"
 libs.websocket_api = "javax.websocket:javax.websocket-api:1.1"
 
