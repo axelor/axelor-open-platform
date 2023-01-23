@@ -10,7 +10,7 @@ versions.hibernate_search = "5.11.10.Final"
 
 versions.groovy = "3.0.14"
 versions.resteasy = "4.7.7.Final"
-versions.jackson = "2.13.4"
+versions.jackson = "2.14.2"
 versions.shiro = "1.9.1"
 versions.buji_pac4j = "7.0.0"
 versions.pac4j = "5.4.5"
