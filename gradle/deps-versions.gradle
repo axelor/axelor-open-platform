@@ -3,7 +3,7 @@ import com.axelor.gradle.util.VersionNumber
 buildscript {
     repositories repos
     dependencies {
-        classpath "com.github.ben-manes:gradle-versions-plugin:0.42.0"
+        classpath "com.github.ben-manes:gradle-versions-plugin:0.44.0"
     }
 }
 
