@@ -256,7 +256,7 @@ libs.gradle_tooling = "org.gradle:gradle-tooling-api:${gradle.gradleVersion}"
 
 // gradle plugins
 libs.plugin_license = "gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1"
-libs.plugin_node = "com.github.node-gradle:gradle-node-plugin:3.4.0"
+libs.plugin_node = "com.github.node-gradle:gradle-node-plugin:3.5.1"
 
 // embeded tomcat
 libs.tomcat_embed = [
