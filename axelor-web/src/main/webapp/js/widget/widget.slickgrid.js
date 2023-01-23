@@ -1,7 +1,7 @@
 /*
  * Axelor Business Solutions
  *
- * Copyright (C) 2005-2022 Axelor (<http://axelor.com>).
+ * Copyright (C) 2005-2023 Axelor (<http://axelor.com>).
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -390,22 +390,22 @@ var GroupFormatters = {
 function newTotalsFormatter(grid) {
 
   return function totalsFormatter(totals, columnDef) {
-  
+
     var field = columnDef.descriptor;
     if (["integer", "long", "decimal"].indexOf(field.type) === -1) {
       return "";
     }
-  
+
     var vals = totals[field.aggregate || 'sum'] || {};
     var val = vals[field.name];
-  
+
     var type = field.type;
     var widget = field.widget;
-  
+
     if (["duration"].indexOf(widget) >= 0) {
       type = widget;
     }
-  
+
     var formatter = Formatters[type];
     if (formatter) {
       if (type === 'decimal') {
@@ -413,7 +413,7 @@ function newTotalsFormatter(grid) {
       }
       return formatter(field, val);
     }
-  
+
     return val;
   }
 }
