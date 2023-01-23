@@ -114,7 +114,9 @@ libs.infinispan = [
 libs.hibernate_search = "org.hibernate:hibernate-search-orm:${versions.hibernate_search}"
 
 // apache tika
-libs.apache_tika_core = "org.apache.tika:tika-core:2.4.1"
+libs.apache_tika_core = dependencies.create("org.apache.tika:tika-core:2.6.0") {
+    exclude group: 'org.slf4j', module: 'slf4j-api'
+}
 
 // flyway
 libs.flywaydb = "org.flywaydb:flyway-core:9.3.1"
