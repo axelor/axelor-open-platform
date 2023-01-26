@@ -272,6 +272,15 @@ The binary widget is file upload widget used with `binary` fields.
 <field name="content" widget="binary" />
 ----
 
+== BinaryLink
+
+This widget can be used with `many-to-one` fields referencing `com.axelor.meta.db.MetaFile` records. It allows single click download and upload.
+
+[source,xml]
+----
+<field name="metaFile" widget="binary-link" />
+----
+
 == Image
 
 The image widget is used with `binary` fields that stores image data or
