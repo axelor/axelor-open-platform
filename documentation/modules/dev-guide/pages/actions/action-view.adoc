@@ -41,7 +41,7 @@ The `<view-param>` parameter name accepts the following options:
 * `details-view` - `true` to show grid and form views side by side
 * `search-filters` - name of custom xref:views/grid.adoc#advanced-search[search filters]
 * `default-search-filters` - comma-separated list of search filter names to apply by default (used in conjunction with `search-filters`) - _new in version 5.4.2_
-* `limit` - maximum number of records per page (grid view) or per column (kanban view)
+* `limit` - maximum number of records per page (grid/cards view) or per column (kanban view)
 * `popup` - `true` to open view as popup, `reload` to reload parent upon closing the popup
 * `popup-save` - `false` to hide OK button used to save record upon closing the popup
 * `popup.maximized` - `true` to open as maximized popup
@@ -49,6 +49,8 @@ The `<view-param>` parameter name accepts the following options:
 * `show-confirm` - `false` to disable dirty check
 * `reload-dotted` - `true` to refresh the grid when switching back from form view
 * `download` - `true` to mark view as pointing to a downloadable link
+* `kanban-hide-columns` - hide specific columns in kanban (comma separated list of names)
+* `kanban-column-width` - desired kanban column width
 
 Special context variable names
 
