@@ -267,6 +267,11 @@ but one additional icon to select existing records.
 
 The binary widget is file upload widget used with `binary` fields.
 
+Binary widget has specials attributes:
+
+* `x-accept`: Specify the file types the file input should accept. Can be a filename extension or a MIME type
+(see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#unique_file_type_specifiers[MDN doc])
+
 [source,xml]
 ----
 <field name="content" widget="binary" />
@@ -274,7 +279,13 @@ The binary widget is file upload widget used with `binary` fields.
 
 == BinaryLink
 
-This widget can be used with `many-to-one` fields referencing `com.axelor.meta.db.MetaFile` records. It allows single click download and upload.
+This widget can be used with `many-to-one` fields referencing `com.axelor.meta.db.MetaFile` records. It allows
+single click download and upload.
+
+BinaryLink widget has specials attributes:
+
+* `x-accept`: Specify the file types the file input should accept. Can be a filename extension or a MIME type
+(see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#unique_file_type_specifiers[MDN doc])
 
 [source,xml]
 ----
@@ -285,6 +296,11 @@ This widget can be used with `many-to-one` fields referencing `com.axelor.meta.d
 
 The image widget is used with `binary` fields that stores image data or
 `many-to-one` fields referencing `com.axelor.meta.db.MetaFile` records.
+
+Image widget has specials attributes:
+
+* `x-accept`: Specify the file types the file input should accept. Can be a filename extension or a MIME type
+(see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#unique_file_type_specifiers[MDN doc])
 
 [source,xml]
 ----
