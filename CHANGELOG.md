@@ -1,3 +1,14 @@
+## 5.4.18 (2023-02-06)
+
+#### Fixed
+
+* Fix dirty view when an editor contain a button
+* Fix chart dashlet data export
+* Fix onnew popup actions called with delay
+* Fix  hidden panels/buttons in editor when the record changes
+* Fix details from view attrs reset when reloading from grid/tab
+* Fix tab refresh with HTML dashlet
+
 ## 5.4.17 (2022-11-02)
 
 #### Features
