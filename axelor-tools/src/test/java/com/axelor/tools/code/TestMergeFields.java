@@ -227,7 +227,7 @@ public class TestMergeFields {
   }
 
   Class<?> loadEntity(String name) throws Exception {
-    return classLoader.loadClass("com.axelor.merge.db."+ name);
+    return classLoader.loadClass("com.axelor.merge.db." + name);
   }
 
   List<Class<?>> loadEntities(String name) throws Exception {
