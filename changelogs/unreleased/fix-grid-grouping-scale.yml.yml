@@ -1,6 +1,0 @@
----
-title: Fix grid grouping with evaluated scale
-type: fix
-description: |
-  Fix grid grouping when there are fields using scale evaluation (`x-scale="field"`).
-  Use the maximum scale in the group for the formatted aggregation.

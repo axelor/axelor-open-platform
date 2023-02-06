@@ -1,3 +1,54 @@
+## 6.1.1 (2023-02-06)
+
+#### Fixed
+
+* Fix dirty view when an editor contain a button
+* Don't set default value on dotted fields of existing records
+
+  <details>
+  
+  This fixes values mismatch of dotted fields having default values after saving new record
+  from form view and switching back to grid.
+  
+  </details>
+
+* Fix merging of namecolumn fields in code generator
+* Fix multiple grouping on grid
+* Fix reloading meta on systems having high number of cores
+* Fix onnew popup actions called with delay
+* Fix  hidden panels/buttons in editor when the record changes
+* Fix details from view attrs reset when reloading from grid/tab
+* Fix auth provider setting `exclusive`
+* Forbid adding init params
+
+  <details>
+  
+  When merging properties, it should be forbidden to add any init params,
+  whether we're overriding fields or adding fields.
+  
+  </details>
+
+* Don't warn about unchanged ref when merging entity props in code generator
+
+  <details>
+  
+  `ref` may be specified as simple name or fully qualified name.
+  When one is using simple name, compare by simple name only,
+  as to avoid spurious warning.
+  
+  </details>
+
+* Fix tab refresh with HTML dashlet
+* Fix grid grouping with evaluated scale
+
+  <details>
+  
+  Fix grid grouping when there are fields using scale evaluation (`x-scale="field"`).
+  Use the maximum scale in the group for the formatted aggregation.
+  
+  </details>
+
+
 ## 6.1.0 (2022-11-03)
 
 #### Changes

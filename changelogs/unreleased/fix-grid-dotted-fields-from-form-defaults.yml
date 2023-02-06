@@ -1,6 +1,0 @@
----
-title: Don't set default value on dotted fields of existing records
-type: fix
-description: |
-  This fixes values mismatch of dotted fields having default values after saving new record
-  from form view and switching back to grid.
