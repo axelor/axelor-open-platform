@@ -160,10 +160,10 @@ var Formatters = {
       }
 
       if (grid.scope) {
-        var maxScale = _.chain(rows).map(function (ctx) {
+        var maxScale = rows.length ? _.chain(rows).map(function (ctx) {
           var rowScale = grid.scope.$eval(scale, ctx);
           return rowScale !== null && rowScale !== undefined && rowScale !== '' ? rowScale : 2;
-        }).max().value();
+        }).max().value() : 2;
         field = _.extend({}, field, {scale: maxScale});
       }
     }
@@ -409,7 +409,12 @@ function newTotalsFormatter(grid) {
     var formatter = Formatters[type];
     if (formatter) {
       if (type === 'decimal') {
-        return formatter(field, val, (totals.group || {}).rows, grid);
+        var group = totals.group || {};
+        while (_.isArray(group.groups)) {
+          group = group.groups[0];
+        }
+        var rows = (group || {}).rows;
+        return formatter(field, val, rows, grid);
       }
       return formatter(field, val);
     }
