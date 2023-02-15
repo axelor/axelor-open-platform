@@ -38,5 +38,5 @@ task installFrontDeps(type: YarnTask) {
 }
 
 clean {
-    delete ".yarn/cache", ".yarn/unplugged", ".yarn/install-state.gz", "dist"
+    delete ".yarn/cache", ".yarn/unplugged", ".yarn/install-state.gz", "dist", "node_modules"
 }
