@@ -27,7 +27,6 @@ dependencies {
 }
 
 jar {
-  dependsOn ':axelor-front:buildFront'
   into('webapp') {
     from "src/main/webapp"
     from "${rootDir}/axelor-front/dist"
