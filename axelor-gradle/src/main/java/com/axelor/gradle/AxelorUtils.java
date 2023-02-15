@@ -132,6 +132,8 @@ public class AxelorUtils {
         .isPresent();
   }
 
+  private static final Object LOCK = new Object();
+
   public static String getModuleName(Project project, ResolvedArtifact artifact)
       throws IOException {
 
@@ -143,16 +145,20 @@ public class AxelorUtils {
 
     // Try in jar
 
-    try (final URLClassLoader loader =
-            new URLClassLoader(new URL[] {artifact.getFile().toURI().toURL()});
-        final InputStream in = loader.getResourceAsStream("META-INF/axelor-module.properties")) {
-      if (in != null) {
-        Properties props = new java.util.Properties();
-        props.load(in);
-        return (String) props.get("name");
-      } else {
-        throw new IOException("Unable to locate axelor-module.properties in " + artifact.getName());
+    synchronized (LOCK) {
+
+      try (final URLClassLoader loader =
+              new URLClassLoader(new URL[] {artifact.getFile().toURI().toURL()});
+          final InputStream in = loader.getResourceAsStream("META-INF/axelor-module.properties")) {
+        if (in != null) {
+          Properties props = new java.util.Properties();
+          props.load(in);
+          return (String) props.get("name");
+        } else {
+          throw new IOException("Unable to locate axelor-module.properties in " + artifact.getName());
+        }
       }
+
     }
   }
 
