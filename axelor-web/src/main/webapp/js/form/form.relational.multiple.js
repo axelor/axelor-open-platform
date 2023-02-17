@@ -623,7 +623,7 @@ ui.formInput('OneToMany', {
           }
         });
         scope.$watch("isReadonly()", function o2mReadonlyWatch(readonly) {
-          inst.readonly = readonly || !scope.canEdit()
+          inst.readonly = readonly;
           var _editIcon = scope.canView() || (!readonly && scope.canEdit());
           if (_editIcon != editIcon) {
             inst.showColumn('_edit_column', editIcon = _editIcon);
