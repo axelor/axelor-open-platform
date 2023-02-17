@@ -672,6 +672,7 @@
         var that = this,
           page = this._page,
           records = this._data,
+          sortBy = this._sortBy,
           promise = this._request().post({
             fields: fields,
             records: items
@@ -701,6 +702,10 @@
               break;
             }
             i ++;
+          }
+
+          if (sortBy && sortBy.length) {
+            records = axelor.sortBy(records, (sortBy[0] || '').replace(/^\-/, ''));
           }
 
           that.trigger('change', records, page);
