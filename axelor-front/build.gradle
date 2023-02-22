@@ -1,0 +1,42 @@
+description = 'Axelor\'s Front-end'
+
+buildscript {
+    repositories repos
+    dependencies {
+        classpath "com.github.node-gradle:gradle-node-plugin:3.5.0"
+    }
+}
+
+apply plugin: 'base'
+apply plugin: 'com.github.node-gradle.node'
+
+node {
+    version = '16.18.1'
+    yarnVersion = '1.22.19'
+    download = true
+}
+
+task buildFront(type: YarnTask) {
+    group = 'axelor'
+    description = 'Build Front-end'
+
+    outputs.dir('dist')
+    inputs.files('package.json', 'yarn.lock')
+    inputs.dir('src')
+    inputs.dir('public')
+    inputs.dir(fileTree(".yarn"))
+
+    dependsOn 'installFrontDeps'
+    args = ["run", "build"]
+}
+
+task installFrontDeps(type: YarnTask) {
+    group = 'axelor'
+    description = 'Install Front-end dependencies'
+
+    args = ['install']
+}
+
+clean {
+    delete ".yarn/cache", ".yarn/unplugged", ".yarn/install-state.gz", "dist"
+}
