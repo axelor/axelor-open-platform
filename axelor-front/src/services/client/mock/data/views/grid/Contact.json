@@ -1,0 +1,223 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 86,
+      "modelId": 47,
+      "name": "contact-grid",
+      "title": "Contacts",
+      "model": "com.axelor.contact.db.Contact",
+      "editable": true,
+      "editIcon": true,
+      "hilites": [
+        {
+          "color": null,
+          "background": "warning",
+          "strong": null,
+          "condition": "$contains(lastName, 'bbb')",
+          "css": "hilite-warning"
+        }
+      ],
+      "items": [
+        {
+          "type": "field",
+          "name": "fullName",
+          "autoTitle": "Full name"
+        },
+        {
+          "type": "field",
+          "name": "firstName",
+          "hilites": [
+            {
+              "color": "danger",
+              "background": null,
+              "strong": true,
+              "condition": "$contains(firstName, 'aaa')",
+              "css": "hilite-danger-text strong"
+            }
+          ],
+          "autoTitle": "First name"
+        },
+        {
+          "type": "field",
+          "name": "lastName",
+          "autoTitle": "Last name"
+        },
+        {
+          "type": "field",
+          "name": "email",
+          "autoTitle": "Email"
+        },
+        {
+          "type": "field",
+          "name": "phone",
+          "widget": "phone",
+          "autoTitle": "Phone"
+        },
+        {
+          "type": "field",
+          "name": "company",
+          "target": "com.axelor.contact.db.Company",
+          "targetName": "name",
+          "autoTitle": "Company"
+        },
+        {
+          "type": "field",
+          "name": "dateOfBirth",
+          "hilites": [
+            {
+              "color": "danger",
+              "background": null,
+              "strong": true,
+              "condition": "$moment().diff(dateOfBirth, 'years') < 18",
+              "css": "hilite-danger-text strong"
+            }
+          ],
+          "autoTitle": "Date of birth"
+        },
+        {
+          "type": "field",
+          "name": "addresses",
+          "target": "com.axelor.contact.db.Address",
+          "views": [
+            {
+              "type": "grid",
+              "title": "Address List",
+              "model": "com.axelor.contact.db.Address",
+              "editIcon": true,
+              "items": [
+                {
+                  "type": "field",
+                  "name": "street",
+                  "autoTitle": "Street"
+                },
+                {
+                  "type": "field",
+                  "name": "area",
+                  "autoTitle": "Area"
+                },
+                {
+                  "type": "field",
+                  "name": "city",
+                  "autoTitle": "City"
+                }
+              ]
+            },
+            {
+              "type": "form",
+              "title": "Address",
+              "model": "com.axelor.contact.db.Address",
+              "items": [
+                {
+                  "type": "panel",
+                  "items": [
+                    {
+                      "type": "field",
+                      "name": "street",
+                      "autoTitle": "Street"
+                    },
+                    {
+                      "type": "field",
+                      "name": "area",
+                      "autoTitle": "Area"
+                    },
+                    {
+                      "type": "field",
+                      "name": "city",
+                      "autoTitle": "City"
+                    },
+                    {
+                      "type": "field",
+                      "name": "zip",
+                      "autoTitle": "Zip"
+                    },
+                    {
+                      "type": "field",
+                      "name": "country",
+                      "target": "com.axelor.contact.db.Country",
+                      "targetName": "name",
+                      "autoTitle": "Country"
+                    },
+                    {
+                      "type": "button",
+                      "name": "clickMe",
+                      "title": "Click Me!",
+                      "onClick": "action-contact-address-about"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "autoTitle": "Addresses"
+        }
+      ],
+      "type": "grid"
+    },
+    "perms": {
+      "massUpdate": true
+    },
+    "fields": [
+      {
+        "name": "firstName",
+        "type": "STRING",
+        "title": "First name",
+        "required": true
+      },
+      {
+        "name": "lastName",
+        "type": "STRING",
+        "title": "Last name",
+        "required": true
+      },
+      {
+        "targetName": null,
+        "targetSearch": [],
+        "name": "addresses",
+        "perms": null,
+        "type": "ONE_TO_MANY",
+        "title": "Addresses",
+        "mappedBy": "contact",
+        "target": "com.axelor.contact.db.Address"
+      },
+      {
+        "virtual": true,
+        "readonly": true,
+        "name": "phone",
+        "type": "STRING",
+        "title": "Phone"
+      },
+      {
+        "virtual": true,
+        "nameSearch": ["firstName", "lastName"],
+        "readonly": true,
+        "nameColumn": true,
+        "name": "fullName",
+        "type": "STRING",
+        "title": "Full name"
+      },
+      {
+        "massUpdate": true,
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "company",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Company",
+        "target": "com.axelor.contact.db.Company"
+      },
+      {
+        "name": "dateOfBirth",
+        "type": "DATE",
+        "title": "Date of birth"
+      },
+      {
+        "virtual": true,
+        "readonly": true,
+        "name": "email",
+        "type": "STRING",
+        "title": "Email"
+      }
+    ]
+  }
+}

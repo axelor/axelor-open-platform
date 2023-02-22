@@ -1,0 +1,207 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 96,
+      "modelId": 52,
+      "name": "product-grid",
+      "title": "Products",
+      "model": "com.axelor.sale.db.Product",
+      "editIcon": true,
+      "items": [
+        {
+          "type": "field",
+          "name": "name",
+          "autoTitle": "Name"
+        },
+        {
+          "type": "field",
+          "name": "category",
+          "target": "com.axelor.sale.db.ProductCategory",
+          "targetName": "name",
+          "autoTitle": "Category"
+        },
+        {
+          "type": "field",
+          "name": "price",
+          "autoTitle": "Price"
+        },
+        {
+          "type": "field",
+          "name": "color",
+          "widget": "SingleSelect",
+          "autoTitle": "Color"
+        },
+        {
+          "type": "field",
+          "name": "attrs",
+          "jsonFields": [],
+          "autoTitle": "Attrs"
+        }
+      ],
+      "type": "grid"
+    },
+    "perms": null,
+    "fields": [
+      {
+        "selection": "product.color.selection",
+        "name": "color",
+        "selectionList": [
+          {
+            "value": "black",
+            "icon": null,
+            "color": "black ",
+            "order": 0,
+            "hidden": false,
+            "data": null,
+            "title": "Black"
+          },
+          {
+            "value": "cyan",
+            "icon": null,
+            "color": "cyan",
+            "order": 0,
+            "hidden": false,
+            "data": null,
+            "title": "Cyan"
+          },
+          {
+            "value": "white",
+            "icon": null,
+            "color": "white",
+            "order": 1,
+            "hidden": false,
+            "data": null,
+            "title": "White"
+          },
+          {
+            "value": "teal",
+            "icon": null,
+            "color": "teal",
+            "order": 1,
+            "hidden": false,
+            "data": null,
+            "title": "Teal"
+          },
+          {
+            "value": "gray",
+            "icon": null,
+            "color": "grey",
+            "order": 2,
+            "hidden": false,
+            "data": null,
+            "title": "Gray"
+          },
+          {
+            "value": "red",
+            "icon": null,
+            "color": "red",
+            "order": 3,
+            "hidden": false,
+            "data": null,
+            "title": "Red"
+          },
+          {
+            "value": "green",
+            "icon": null,
+            "color": "green",
+            "order": 4,
+            "hidden": false,
+            "data": null,
+            "title": "Green"
+          },
+          {
+            "value": "blue",
+            "icon": null,
+            "color": "blue",
+            "order": 5,
+            "hidden": false,
+            "data": null,
+            "title": "Blue"
+          },
+          {
+            "value": "yellow",
+            "icon": null,
+            "color": "yellow",
+            "order": 6,
+            "hidden": false,
+            "data": null,
+            "title": "Yellow"
+          },
+          {
+            "value": "chocolate",
+            "icon": null,
+            "color": "brown",
+            "order": 7,
+            "hidden": false,
+            "data": null,
+            "title": "Brown"
+          },
+          {
+            "value": "orange",
+            "icon": null,
+            "color": "orange",
+            "order": 8,
+            "hidden": false,
+            "data": null,
+            "title": "Orange"
+          },
+          {
+            "value": "purple",
+            "icon": null,
+            "color": "purple",
+            "order": 9,
+            "hidden": false,
+            "data": null,
+            "title": "Purple"
+          },
+          {
+            "value": "pink",
+            "icon": null,
+            "color": "pink",
+            "order": 10,
+            "hidden": false,
+            "data": null,
+            "title": "Pink"
+          }
+        ],
+        "type": "STRING",
+        "title": "Color"
+      },
+      {
+        "nullable": true,
+        "precision": 20,
+        "name": "price",
+        "scale": 2,
+        "type": "DECIMAL",
+        "title": "Price"
+      },
+      {
+        "translatable": true,
+        "nullable": true,
+        "unique": true,
+        "name": "name",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "category",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Category",
+        "target": "com.axelor.sale.db.ProductCategory"
+      },
+      {
+        "name": "attrs",
+        "json": true,
+        "type": "STRING",
+        "title": "Attributes"
+      }
+    ]
+  }
+}

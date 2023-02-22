@@ -1,0 +1,298 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 33,
+      "modelId": 19,
+      "name": "group-form",
+      "title": "Group",
+      "model": "com.axelor.auth.db.Group",
+      "toolbar": [
+        {
+          "type": "button",
+          "name": "showPermissions",
+          "title": "Show permissions",
+          "hideIf": "permissions == null || permissions.length == 0",
+          "onClick": "action-group-view-permissions"
+        }
+      ],
+      "type": "form",
+      "items": [
+        {
+          "type": "panel",
+          "title": "Overview",
+          "items": [
+            {
+              "type": "field",
+              "name": "name",
+              "onChange": "action-condition-group-validName",
+              "validIf": "name.length >= 2",
+              "autoTitle": "Name"
+            },
+            {
+              "type": "field",
+              "name": "code",
+              "readonlyIf": "id && code == 'admins'",
+              "onChange": "action-condition-group-validCode",
+              "validIf": "code.length >= 2",
+              "autoTitle": "Code"
+            },
+            {
+              "type": "field",
+              "name": "navigation",
+              "autoTitle": "Navigation"
+            },
+            {
+              "type": "panel",
+              "stacked": true,
+              "items": [
+                {
+                  "type": "field",
+                  "name": "homeAction",
+                  "hidden": true,
+                  "bind": "{{__actionSelect.name}}",
+                  "autoTitle": "Home action"
+                },
+                {
+                  "type": "field",
+                  "name": "__actionSelect",
+                  "title": "Action",
+                  "widget": "SuggestBox",
+                  "canNew": "false",
+                  "target": "com.axelor.meta.db.MetaAction",
+                  "targetName": "name",
+                  "domain": "self.type = 'action-view' and self.home = true"
+                }
+              ]
+            },
+            {
+              "type": "field",
+              "name": "technicalStaff",
+              "autoTitle": "Technical staff"
+            },
+            {
+              "type": "field",
+              "name": "canViewCollaboration",
+              "autoTitle": "Can view collaboration"
+            },
+            {
+              "type": "field",
+              "name": "viewCustomizationPermission",
+              "autoTitle": "View customization permission"
+            }
+          ]
+        },
+        {
+          "type": "panel-tabs",
+          "items": [
+            {
+              "type": "panel-related",
+              "name": "roles",
+              "serverType": "MANY_TO_MANY",
+              "formView": "role-form",
+              "gridView": "role-grid",
+              "items": []
+            },
+            {
+              "type": "panel-related",
+              "name": "permissions",
+              "serverType": "MANY_TO_MANY",
+              "formView": "permission-form",
+              "gridView": "simple-permission-grid",
+              "items": []
+            },
+            {
+              "type": "panel-related",
+              "name": "metaPermissions",
+              "serverType": "MANY_TO_MANY",
+              "items": []
+            },
+            {
+              "type": "panel-related",
+              "name": "menus",
+              "serverType": "MANY_TO_MANY",
+              "formView": "meta-menu-form",
+              "gridView": "simple-meta-menu-grid",
+              "items": []
+            },
+            {
+              "type": "panel-related",
+              "name": "views",
+              "serverType": "MANY_TO_MANY",
+              "formView": "meta-view-form",
+              "gridView": "simple-meta-view-grid",
+              "items": []
+            }
+          ]
+        }
+      ]
+    },
+    "perms": null,
+    "fields": [
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "code",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Code",
+        "required": true
+      },
+      {
+        "defaultValue": "NOT_ALLOWED",
+        "name": "viewCustomizationPermission",
+        "enumType": "com.axelor.auth.db.ViewCustomizationPermission",
+        "selectionList": [
+          {
+            "value": "NOT_ALLOWED",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": 0
+            },
+            "title": "Not allowed"
+          },
+          {
+            "value": "CAN_CUSTOMIZE",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": 1
+            },
+            "title": "Can customize"
+          },
+          {
+            "value": "CAN_SHARE",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": 2
+            },
+            "title": "Can share"
+          }
+        ],
+        "type": "ENUM",
+        "title": "View customization"
+      },
+      {
+        "help": "Specify whether the members of this group can view collaboration",
+        "defaultValue": true,
+        "name": "canViewCollaboration",
+        "type": "BOOLEAN",
+        "title": "Can view collaboration"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "roles",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Roles",
+        "target": "com.axelor.auth.db.Role"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "metaPermissions",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Permissions (fields)",
+        "target": "com.axelor.meta.db.MetaPermission"
+      },
+      {
+        "selection": "select.user.navigation",
+        "name": "navigation",
+        "selectionList": [
+          {
+            "value": "visible",
+            "icon": null,
+            "color": null,
+            "order": 0,
+            "hidden": false,
+            "data": null,
+            "title": "Visible"
+          },
+          {
+            "value": "hidden",
+            "icon": null,
+            "color": null,
+            "order": 1,
+            "hidden": false,
+            "data": null,
+            "title": "Hidden"
+          },
+          {
+            "value": "collapse",
+            "icon": null,
+            "color": null,
+            "order": 2,
+            "hidden": false,
+            "data": null,
+            "title": "Collapse"
+          }
+        ],
+        "type": "STRING",
+        "title": "Navigation"
+      },
+      {
+        "help": "Specify whether the members of this group are technical staff.",
+        "defaultValue": false,
+        "name": "technicalStaff",
+        "type": "BOOLEAN",
+        "title": "Technical staff"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "permissions",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Permissions",
+        "target": "com.axelor.auth.db.Permission"
+      },
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "name",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      },
+      {
+        "targetName": "title",
+        "targetSearch": ["title"],
+        "name": "menus",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Menus",
+        "mappedBy": "groups",
+        "target": "com.axelor.meta.db.MetaMenu"
+      },
+      {
+        "help": "Default home action.",
+        "name": "homeAction",
+        "type": "STRING",
+        "title": "Home action"
+      },
+      {
+        "targetName": "title",
+        "targetSearch": ["title"],
+        "name": "views",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Views",
+        "mappedBy": "groups",
+        "target": "com.axelor.meta.db.MetaView"
+      }
+    ]
+  }
+}

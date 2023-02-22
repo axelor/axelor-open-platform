@@ -1,0 +1,350 @@
+{
+  "status": 0,
+  "offset": 0,
+  "total": 10,
+  "data": [
+    {
+      "image": {
+        "fileName": "laptop-touchscreen.png",
+        "id": 3,
+        "$version": 0
+      },
+      "code": "laptop-touchscreen",
+      "notes": "With an 11.6-inch HD screen and slim, lightweight frame, the laptop offers an ultra-compact, portable solution for email, browsing and more. ",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "color": "gray",
+      "updatedOn": "2023-02-20T12:08:21.363771Z",
+      "createdOn": "2023-02-20T12:08:21.351631Z",
+      "version": 1,
+      "attrs": null,
+      "colorVariants": "red,black",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "price": "120.15",
+      "name": "11.6-inch Touchscreen Laptop",
+      "id": 2,
+      "category": {
+        "code": "laptop",
+        "name": "Laptops",
+        "id": 3,
+        "$version": 0
+      },
+      "selected": false
+    },
+    {
+      "image": null,
+      "code": "laptop-metal",
+      "notes": "The slim and lightweight laptop now features diamond-cut edges and textured finishes, and is available in 3 distinct colors that have been chosen to reflect your personality.",
+      "updatedBy": null,
+      "color": "chocolate",
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:21.381334Z",
+      "version": 0,
+      "attrs": null,
+      "colorVariants": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "price": "199.99",
+      "name": "Full HD 15.6 Inch Metal Laptop",
+      "id": 3,
+      "category": {
+        "code": "laptop",
+        "name": "Laptops",
+        "id": 3,
+        "$version": 0
+      },
+      "selected": false
+    },
+    {
+      "image": {
+        "fileName": "food-processor.png",
+        "id": 12,
+        "$version": 0
+      },
+      "code": "food-processor",
+      "notes": "Multifunctional Food Processor: Includes 11 attachments, own Topchef food processor, means you get blender, chopper, citrus juicer, knead dough machine, mixer, etc. It meets your most demands of cooking preparation, save time and money.",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "color": "teal",
+      "updatedOn": "2023-02-20T12:08:21.537985Z",
+      "createdOn": "2023-02-20T12:08:21.527814Z",
+      "version": 1,
+      "attrs": null,
+      "colorVariants": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "price": null,
+      "name": "Multifunctional Food Processor",
+      "id": 8,
+      "category": {
+        "code": "kitchen-home",
+        "name": "Kitchen & Home Appliances",
+        "id": 7,
+        "$version": 0
+      },
+      "selected": false
+    },
+    {
+      "image": {
+        "fileName": "storage-box.png",
+        "id": 14,
+        "$version": 0
+      },
+      "code": "storage-box",
+      "notes": "Ideal outdoor storage box for garden tools and equipment, furniture cushions and accessories",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "color": "yellow",
+      "updatedOn": "2023-02-20T12:08:21.566598Z",
+      "createdOn": "2023-02-20T12:08:21.554975Z",
+      "version": 1,
+      "attrs": null,
+      "colorVariants": "gray",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "price": null,
+      "name": "Outdoor Storage Box",
+      "id": 9,
+      "category": {
+        "code": "garden-outdoor",
+        "name": "Garden & Outdoors",
+        "id": 8,
+        "$version": 0
+      },
+      "selected": false
+    },
+    {
+      "image": {
+        "fileName": "LOUNGECHAIR.png",
+        "id": 16,
+        "$version": 0
+      },
+      "code": "LOUNGECHAIR",
+      "notes": "Tough and durable powder coated steel frame with anti corrosion coating guarantees a long life outside",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "color": "black",
+      "updatedOn": "2023-02-20T12:08:21.594091Z",
+      "createdOn": "2023-02-20T12:08:21.583197Z",
+      "version": 1,
+      "attrs": null,
+      "colorVariants": "gray",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "price": "87.21",
+      "name": "Patio Lounge Chair",
+      "id": 10,
+      "category": {
+        "code": "garden-outdoor",
+        "name": "Garden & Outdoors",
+        "id": 8,
+        "$version": 0
+      },
+      "selected": false
+    },
+    {
+      "image": {
+        "fileName": "slice-toaster.png",
+        "id": 8,
+        "$version": 0
+      },
+      "code": "slice-toaster",
+      "notes": "Frozen setting - no need to de-frost your bread first for ease and convenience",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "color": "black",
+      "updatedOn": "2023-02-20T12:08:21.464635Z",
+      "createdOn": "2023-02-20T12:08:21.454426Z",
+      "version": 1,
+      "attrs": null,
+      "colorVariants": "pink,red,green",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "price": "86.00",
+      "name": "Slice Toaster",
+      "id": 6,
+      "category": {
+        "code": "kitchen-home",
+        "name": "Kitchen & Home Appliances",
+        "id": 7,
+        "$version": 0
+      },
+      "selected": false
+    },
+    {
+      "image": {
+        "fileName": "microwave.png",
+        "id": 10,
+        "$version": 0
+      },
+      "code": "microwave",
+      "notes": "Slimline design, 27L - Larger turntable (34cm)",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "color": "white",
+      "updatedOn": "2023-02-20T12:08:21.509860Z",
+      "createdOn": "2023-02-20T12:08:21.498057Z",
+      "version": 1,
+      "attrs": null,
+      "colorVariants": "green,blue",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "price": "99.99",
+      "name": "Small Combination Microwave Oven & Grill",
+      "id": 7,
+      "category": {
+        "code": "kitchen-home",
+        "name": "Kitchen & Home Appliances",
+        "id": 7,
+        "$version": 0
+      },
+      "selected": false
+    },
+    {
+      "image": null,
+      "code": "the-age-of-ai",
+      "notes": "An AI learned to win chess by making moves human grand masters had never conceived. Another AI discovered a new antibiotic by analysing molecular properties human scientists did not understand.",
+      "updatedBy": null,
+      "color": null,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:21.431423Z",
+      "version": 0,
+      "attrs": null,
+      "colorVariants": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "price": "30.50",
+      "name": "The Age of AI: And Our Human Future",
+      "id": 5,
+      "category": {
+        "code": "books",
+        "name": "Books",
+        "id": 5,
+        "$version": 0
+      },
+      "selected": false
+    },
+    {
+      "image": null,
+      "code": "the-universe",
+      "notes": "We once thought of our Earth as unique, but we have now discovered thousands of alien planets, and that’s barely a fraction of the worlds that are out there. And there are more stars in the Universe than grains of sand on every planet in the Solar System.",
+      "updatedBy": null,
+      "color": null,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:21.404895Z",
+      "version": 0,
+      "attrs": null,
+      "colorVariants": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "price": "20.00",
+      "name": "The Universe",
+      "id": 4,
+      "category": {
+        "code": "books",
+        "name": "Books",
+        "id": 5,
+        "$version": 0
+      },
+      "selected": false
+    },
+    {
+      "image": {
+        "fileName": "wireless-keyboard.png",
+        "id": 1,
+        "$version": 0
+      },
+      "code": "wireless-keyboard",
+      "notes": "Slim Wireless Keyboard and Mouse Set, 2.4G Cordless",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "color": "black",
+      "updatedOn": "2023-02-20T12:08:21.301039Z",
+      "createdOn": "2023-02-20T12:08:21.172933Z",
+      "version": 1,
+      "attrs": null,
+      "colorVariants": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "price": "170.99",
+      "name": "Wireless Keyboard",
+      "id": 1,
+      "category": {
+        "code": "computers",
+        "name": "Computers",
+        "id": 2,
+        "$version": 0
+      },
+      "selected": false
+    }
+  ]
+}

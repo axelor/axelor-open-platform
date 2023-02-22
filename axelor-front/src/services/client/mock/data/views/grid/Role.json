@@ -1,0 +1,32 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 12,
+      "modelId": 4,
+      "name": "role-grid",
+      "title": "Roles",
+      "model": "com.axelor.auth.db.Role",
+      "editIcon": true,
+      "items": [
+        {
+          "type": "field",
+          "name": "name",
+          "autoTitle": "Name"
+        }
+      ],
+      "type": "grid"
+    },
+    "perms": null,
+    "fields": [
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "name",
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      }
+    ]
+  }
+}

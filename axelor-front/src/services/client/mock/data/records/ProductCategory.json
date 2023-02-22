@@ -1,0 +1,171 @@
+{
+  "status": 0,
+  "offset": 0,
+  "total": 8,
+  "data": [
+    {
+      "parent": null,
+      "code": "books",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Books",
+      "id": 5,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:21.134578Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "parent": null,
+      "code": "computers",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Computers",
+      "id": 2,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:21.125221Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "parent": {
+        "code": "home-garden",
+        "name": "Home & Garden",
+        "id": 6,
+        "$version": 0
+      },
+      "code": "garden-outdoor",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Garden & Outdoors",
+      "id": 8,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:21.143107Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "parent": null,
+      "code": "home-garden",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Home & Garden",
+      "id": 6,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:21.137387Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "parent": {
+        "code": "home-garden",
+        "name": "Home & Garden",
+        "id": 6,
+        "$version": 0
+      },
+      "code": "kitchen-home",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Kitchen & Home Appliances",
+      "id": 7,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:21.140176Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "parent": {
+        "code": "computers",
+        "name": "Computers",
+        "id": 2,
+        "$version": 0
+      },
+      "code": "laptop",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Laptops",
+      "id": 3,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:21.129194Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "parent": {
+        "code": "computers",
+        "name": "Computers",
+        "id": 2,
+        "$version": 0
+      },
+      "code": "monitor",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Monitors",
+      "id": 4,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:21.132093Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "parent": null,
+      "code": "services",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Services",
+      "id": 1,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:21.122589Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 15,
+      "modelId": 5,
+      "name": "simple-permission-grid",
+      "title": "Permissions",
+      "model": "com.axelor.auth.db.Permission",
+      "editIcon": true,
+      "items": [
+        {
+          "type": "field",
+          "name": "name",
+          "autoTitle": "Name"
+        },
+        {
+          "type": "field",
+          "name": "object",
+          "autoTitle": "Object"
+        }
+      ],
+      "type": "grid"
+    },
+    "perms": null,
+    "fields": [
+      {
+        "help": "An unique permission name.",
+        "nullable": true,
+        "unique": true,
+        "name": "name",
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      },
+      {
+        "help": "Fully qualified object name or wild card package name.",
+        "name": "object",
+        "type": "STRING",
+        "title": "Object",
+        "required": true
+      }
+    ]
+  }
+}

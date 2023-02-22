@@ -1,0 +1,95 @@
+{
+  "status": 0,
+  "data": {
+    "jsonFields": {},
+    "model": "com.axelor.meta.db.MetaPermission",
+    "perms": {
+      "massUpdate": true
+    },
+    "fields": [
+      {
+        "massUpdate": true,
+        "name": "archived",
+        "type": "BOOLEAN",
+        "title": "Archived"
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "updatedBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Updated by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "createdBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Created by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "name",
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      },
+      {
+        "defaultValue": true,
+        "name": "active",
+        "type": "BOOLEAN",
+        "title": "Active"
+      },
+      {
+        "targetName": null,
+        "targetSearch": [],
+        "name": "rules",
+        "perms": null,
+        "type": "ONE_TO_MANY",
+        "title": "Rules",
+        "mappedBy": "metaPermission",
+        "target": "com.axelor.meta.db.MetaPermissionRule"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "id",
+        "type": "LONG",
+        "title": "Id",
+        "primary": true
+      },
+      {
+        "readonly": true,
+        "name": "updatedOn",
+        "type": "DATETIME",
+        "title": "Updated on"
+      },
+      {
+        "readonly": true,
+        "name": "createdOn",
+        "type": "DATETIME",
+        "title": "Created on"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "version",
+        "type": "INTEGER",
+        "title": "Version"
+      },
+      {
+        "name": "object",
+        "type": "STRING",
+        "title": "Object",
+        "required": true
+      }
+    ]
+  }
+}

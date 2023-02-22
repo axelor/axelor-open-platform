@@ -1,0 +1,224 @@
+{
+  "status": 0,
+  "data": {
+    "jsonFields": {},
+    "model": "com.axelor.meta.db.MetaAction",
+    "perms": {
+      "massUpdate": true
+    },
+    "fields": [
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "updatedBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Updated by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "name": "module",
+        "type": "STRING",
+        "title": "Module"
+      },
+      {
+        "readonly": true,
+        "name": "updatedOn",
+        "type": "DATETIME",
+        "title": "Updated on"
+      },
+      {
+        "defaultValue": 0,
+        "name": "priority",
+        "type": "INTEGER",
+        "title": "Priority"
+      },
+      {
+        "selection": "action.type.selection",
+        "name": "type",
+        "selectionList": [
+          {
+            "value": "action-attrs",
+            "icon": null,
+            "color": null,
+            "order": 0,
+            "hidden": false,
+            "data": null,
+            "title": "action-attrs"
+          },
+          {
+            "value": "action-view",
+            "icon": null,
+            "color": null,
+            "order": 1,
+            "hidden": false,
+            "data": null,
+            "title": "action-view"
+          },
+          {
+            "value": "action-script",
+            "icon": null,
+            "color": null,
+            "order": 2,
+            "hidden": false,
+            "data": null,
+            "title": "action-script"
+          },
+          {
+            "value": "action-group",
+            "icon": null,
+            "color": null,
+            "order": 3,
+            "hidden": false,
+            "data": null,
+            "title": "action-group"
+          },
+          {
+            "value": "action-validate",
+            "icon": null,
+            "color": null,
+            "order": 4,
+            "hidden": false,
+            "data": null,
+            "title": "action-validate"
+          },
+          {
+            "value": "action-condition",
+            "icon": null,
+            "color": null,
+            "order": 5,
+            "hidden": false,
+            "data": null,
+            "title": "action-condition"
+          },
+          {
+            "value": "action-record",
+            "icon": null,
+            "color": null,
+            "order": 6,
+            "hidden": false,
+            "data": null,
+            "title": "action-record"
+          },
+          {
+            "value": "action-method",
+            "icon": null,
+            "color": null,
+            "order": 7,
+            "hidden": false,
+            "data": null,
+            "title": "action-method"
+          },
+          {
+            "value": "action-import",
+            "icon": null,
+            "color": null,
+            "order": 8,
+            "hidden": false,
+            "data": null,
+            "title": "action-import"
+          },
+          {
+            "value": "action-export",
+            "icon": null,
+            "color": null,
+            "order": 9,
+            "hidden": false,
+            "data": null,
+            "title": "action-export"
+          },
+          {
+            "value": "action-report",
+            "icon": null,
+            "color": null,
+            "order": 10,
+            "hidden": false,
+            "data": null,
+            "title": "action-report"
+          },
+          {
+            "value": "action-ws",
+            "icon": null,
+            "color": null,
+            "order": 11,
+            "hidden": false,
+            "data": null,
+            "title": "action-ws"
+          }
+        ],
+        "type": "STRING",
+        "title": "Type",
+        "required": true
+      },
+      {
+        "readonly": true,
+        "name": "createdOn",
+        "type": "DATETIME",
+        "title": "Created on"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "version",
+        "type": "INTEGER",
+        "title": "Version"
+      },
+      {
+        "help": "Specify whether this action can be used as home action.",
+        "defaultValue": false,
+        "name": "home",
+        "type": "BOOLEAN",
+        "title": "Used as home action"
+      },
+      {
+        "massUpdate": true,
+        "name": "archived",
+        "type": "BOOLEAN",
+        "title": "Archived"
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "createdBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Created by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "name": "xml",
+        "type": "TEXT",
+        "title": "Xml",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      },
+      {
+        "name": "model",
+        "type": "STRING",
+        "title": "Model"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "id",
+        "type": "LONG",
+        "title": "Id",
+        "primary": true
+      },
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "xmlId",
+        "type": "STRING",
+        "title": "Xml"
+      }
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "status": 0,
+  "data": {
+    "jsonFields": {},
+    "model": "com.axelor.auth.db.ViewCustomizationPermission",
+    "perms": null,
+    "fields": [
+      {
+        "name": "value",
+        "type": "INTEGER",
+        "title": "Value"
+      }
+    ]
+  }
+}

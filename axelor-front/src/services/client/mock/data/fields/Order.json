@@ -1,0 +1,208 @@
+{
+  "status": 0,
+  "data": {
+    "jsonFields": {
+      "attrs": {}
+    },
+    "model": "com.axelor.sale.db.Order",
+    "perms": {
+      "massUpdate": true
+    },
+    "fields": [
+      {
+        "defaultValue": "0",
+        "precision": 20,
+        "name": "amount",
+        "scale": 4,
+        "type": "DECIMAL",
+        "title": "Amount"
+      },
+      {
+        "name": "notes",
+        "type": "TEXT",
+        "title": "Notes"
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "updatedBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Updated by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "readonly": true,
+        "name": "updatedOn",
+        "type": "DATETIME",
+        "title": "Updated on"
+      },
+      {
+        "defaultValue": false,
+        "name": "confirmed",
+        "type": "BOOLEAN",
+        "title": "Confirmed"
+      },
+      {
+        "readonly": true,
+        "name": "createdOn",
+        "type": "DATETIME",
+        "title": "Created on"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "version",
+        "type": "INTEGER",
+        "title": "Version"
+      },
+      {
+        "name": "attrs",
+        "json": true,
+        "type": "STRING",
+        "title": "Attributes"
+      },
+      {
+        "massUpdate": true,
+        "name": "archived",
+        "type": "BOOLEAN",
+        "title": "Archived"
+      },
+      {
+        "name": "confirmDate",
+        "type": "DATE",
+        "title": "Confirm date"
+      },
+      {
+        "defaultValue": "0",
+        "precision": 20,
+        "name": "totalAmount",
+        "scale": 4,
+        "type": "DECIMAL",
+        "title": "Total amount"
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "createdBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Created by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "sequence": true,
+        "readonly": true,
+        "name": "name",
+        "type": "STRING",
+        "title": "Name"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "currency",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Currency",
+        "required": true,
+        "target": "com.axelor.sale.db.Currency"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "id",
+        "type": "LONG",
+        "title": "Id",
+        "primary": true
+      },
+      {
+        "defaultValue": "0",
+        "precision": 20,
+        "name": "taxAmount",
+        "scale": 4,
+        "type": "DECIMAL",
+        "title": "Tax amount"
+      },
+      {
+        "targetName": null,
+        "targetSearch": [],
+        "name": "items",
+        "perms": null,
+        "type": "ONE_TO_MANY",
+        "title": "Items",
+        "mappedBy": "order",
+        "target": "com.axelor.sale.db.OrderLine"
+      },
+      {
+        "name": "orderDate",
+        "type": "DATE",
+        "title": "Order date",
+        "required": true
+      },
+      {
+        "targetName": "fullName",
+        "targetSearch": ["fullName", "firstName", "lastName"],
+        "name": "customer",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Customer",
+        "required": true,
+        "target": "com.axelor.contact.db.Contact"
+      },
+      {
+        "name": "status",
+        "enumType": "com.axelor.sale.db.OrderStatus",
+        "selectionList": [
+          {
+            "value": "DRAFT",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": "draft"
+            },
+            "title": "Draft"
+          },
+          {
+            "value": "OPEN",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": "open"
+            },
+            "title": "Open"
+          },
+          {
+            "value": "CLOSED",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": "closed"
+            },
+            "title": "Closed"
+          },
+          {
+            "value": "CANCELED",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": "canceled"
+            },
+            "title": "Canceled"
+          }
+        ],
+        "type": "ENUM",
+        "title": "Status"
+      }
+    ]
+  }
+}

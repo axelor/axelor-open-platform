@@ -1,0 +1,112 @@
+{
+  "status": 0,
+  "offset": 0,
+  "total": 4,
+  "data": [
+    {
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "permissions": [
+        {
+          "name": "perm.auth.self",
+          "id": 3,
+          "$version": 0
+        }
+      ],
+      "metaPermissions": [],
+      "name": "role.manager",
+      "description": "Manager",
+      "updatedOn": null,
+      "id": 3,
+      "menus": [],
+      "createdOn": "2023-02-20T12:08:17.117282Z",
+      "version": 0,
+      "selected": false
+    },
+    {
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "permissions": [
+        {
+          "name": "perm.auth.create",
+          "id": 2,
+          "$version": 0
+        },
+        {
+          "name": "perm.auth.self",
+          "id": 3,
+          "$version": 0
+        }
+      ],
+      "metaPermissions": [],
+      "name": "role.moderator",
+      "description": "Moderator",
+      "updatedOn": null,
+      "id": 2,
+      "menus": [],
+      "createdOn": "2023-02-20T12:08:17.110026Z",
+      "version": 0,
+      "selected": false
+    },
+    {
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "permissions": [
+        {
+          "name": "perm.auth.all",
+          "id": 1,
+          "$version": 0
+        }
+      ],
+      "metaPermissions": [],
+      "name": "role.super",
+      "description": "Super",
+      "updatedOn": null,
+      "id": 1,
+      "menus": [],
+      "createdOn": "2023-02-20T12:08:17.102678Z",
+      "version": 0,
+      "selected": false
+    },
+    {
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "permissions": [
+        {
+          "name": "perm.auth.my",
+          "id": 4,
+          "$version": 0
+        }
+      ],
+      "metaPermissions": [],
+      "name": "role.user",
+      "description": "User",
+      "updatedOn": null,
+      "id": 4,
+      "menus": [],
+      "createdOn": "2023-02-20T12:08:17.127493Z",
+      "version": 0,
+      "selected": false
+    }
+  ]
+}

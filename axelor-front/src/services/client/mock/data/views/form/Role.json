@@ -1,0 +1,95 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 18,
+      "modelId": 4,
+      "name": "role-form",
+      "title": "Role",
+      "model": "com.axelor.auth.db.Role",
+      "type": "form",
+      "items": [
+        {
+          "type": "panel",
+          "title": "Overview",
+          "items": [
+            {
+              "type": "field",
+              "name": "name",
+              "autoTitle": "Name"
+            },
+            {
+              "type": "field",
+              "name": "description",
+              "autoTitle": "Description"
+            }
+          ]
+        },
+        {
+          "type": "panel-related",
+          "name": "permissions",
+          "serverType": "MANY_TO_MANY",
+          "items": []
+        },
+        {
+          "type": "panel-related",
+          "name": "metaPermissions",
+          "serverType": "MANY_TO_MANY",
+          "items": []
+        },
+        {
+          "type": "panel-related",
+          "name": "menus",
+          "serverType": "MANY_TO_MANY",
+          "formView": "meta-menu-form",
+          "gridView": "simple-meta-menu-grid",
+          "items": []
+        }
+      ]
+    },
+    "perms": null,
+    "fields": [
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "permissions",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Permissions",
+        "target": "com.axelor.auth.db.Permission"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "metaPermissions",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Permissions (fields)",
+        "target": "com.axelor.meta.db.MetaPermission"
+      },
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "name",
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      },
+      {
+        "name": "description",
+        "type": "STRING",
+        "title": "Description"
+      },
+      {
+        "targetName": "title",
+        "targetSearch": ["title"],
+        "name": "menus",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Menus",
+        "mappedBy": "roles",
+        "target": "com.axelor.meta.db.MetaMenu"
+      }
+    ]
+  }
+}

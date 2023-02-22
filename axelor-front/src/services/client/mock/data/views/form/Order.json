@@ -1,0 +1,427 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 104,
+      "modelId": 53,
+      "name": "order-form",
+      "title": "Order",
+      "model": "com.axelor.sale.db.Order",
+      "onSave": "check-order-values,action-sale-order-validate",
+      "onNew": "default-order-record",
+      "toolbar": [
+        {
+          "type": "button",
+          "name": "btnPrint",
+          "title": "Print",
+          "showTitle": false,
+          "showIf": "id",
+          "icon": "fa-print",
+          "onClick": "print.sale.order"
+        }
+      ],
+      "type": "form",
+      "items": [
+        {
+          "type": "panel",
+          "title": "Order Details",
+          "items": [
+            {
+              "type": "field",
+              "name": "name",
+              "autoTitle": "Name"
+            },
+            {
+              "type": "field",
+              "name": "status",
+              "readonly": true,
+              "widget": "nav-select",
+              "autoTitle": "Status"
+            },
+            {
+              "type": "field",
+              "name": "customer",
+              "readonlyIf": "confirmed",
+              "target": "com.axelor.contact.db.Contact",
+              "targetName": "fullName",
+              "formView": "contact-form",
+              "gridView": "contact-grid",
+              "autoTitle": "Customer"
+            },
+            {
+              "type": "field",
+              "name": "confirmed",
+              "widget": "boolean-switch",
+              "onChange": "com.axelor.sale.web.SaleOrderController:onConfirm",
+              "autoTitle": "Confirmed"
+            },
+            {
+              "type": "field",
+              "name": "orderDate",
+              "readonlyIf": "confirmed",
+              "autoTitle": "Order date"
+            },
+            {
+              "type": "field",
+              "name": "confirmDate",
+              "requiredIf": "confirmed",
+              "validIf": "confirmDate == null || $moment(confirmDate) >= $moment(orderDate)",
+              "autoTitle": "Confirm date"
+            },
+            {
+              "type": "field",
+              "name": "currency",
+              "readonlyIf": "confirmed",
+              "onChange": "com.axelor.sale.web.SaleOrderController:calculate",
+              "target": "com.axelor.sale.db.Currency",
+              "targetName": "name",
+              "formView": "currency-form",
+              "gridView": "currency-grid",
+              "autoTitle": "Currency"
+            }
+          ]
+        },
+        {
+          "type": "panel-tabs",
+          "items": [
+            {
+              "type": "panel-related",
+              "name": "items",
+              "readonlyIf": "confirmed",
+              "serverType": "ONE_TO_MANY",
+              "editable": true,
+              "orderBy": "sequence",
+              "onChange": "com.axelor.sale.web.SaleOrderController:calculate",
+              "canMove": true,
+              "items": [
+                {
+                  "type": "field",
+                  "name": "product",
+                  "onChange": "action-order-line-change-product",
+                  "autoTitle": "Product"
+                },
+                {
+                  "type": "field",
+                  "name": "price",
+                  "autoTitle": "Price"
+                },
+                {
+                  "type": "field",
+                  "name": "quantity",
+                  "autoTitle": "Quantity"
+                },
+                {
+                  "type": "field",
+                  "name": "taxes",
+                  "autoTitle": "Taxes"
+                }
+              ],
+              "fields": [
+                {
+                  "targetName": "name",
+                  "targetSearch": ["name", "code"],
+                  "name": "product",
+                  "perms": null,
+                  "type": "MANY_TO_ONE",
+                  "title": "Product",
+                  "required": true,
+                  "target": "com.axelor.sale.db.Product"
+                },
+                {
+                  "defaultValue": "0",
+                  "precision": 20,
+                  "name": "price",
+                  "scale": 4,
+                  "minSize": "0.0",
+                  "type": "DECIMAL",
+                  "title": "Price",
+                  "required": true
+                },
+                {
+                  "defaultValue": 0,
+                  "name": "quantity",
+                  "minSize": 1,
+                  "type": "INTEGER",
+                  "title": "Quantity",
+                  "required": true
+                },
+                {
+                  "targetName": "name",
+                  "targetSearch": ["name", "code"],
+                  "name": "taxes",
+                  "perms": null,
+                  "type": "MANY_TO_MANY",
+                  "title": "Taxes",
+                  "target": "com.axelor.sale.db.Tax"
+                }
+              ]
+            },
+            {
+              "type": "panel",
+              "title": "Notes",
+              "items": [
+                {
+                  "type": "field",
+                  "name": "notes",
+                  "showTitle": false,
+                  "colSpan": 12,
+                  "widget": "html",
+                  "autoTitle": "Notes"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "panel",
+          "items": [
+            {
+              "type": "panel",
+              "colSpan": 4,
+              "itemSpan": 12,
+              "items": [
+                {
+                  "type": "button",
+                  "name": "btnTotalAmount",
+                  "title": "Total amount",
+                  "css": "btn-primary",
+                  "icon": "fa-bar-chart",
+                  "onClick": "check-order-dates,com.axelor.sale.web.SaleOrderController:calculate,save",
+                  "widget": "info-button",
+                  "widgetAttrs": {
+                    "field": "totalAmount"
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "btnExport",
+                  "title": "Export",
+                  "showIf": "id",
+                  "onClick": "export.sale.order"
+                }
+              ]
+            },
+            {
+              "type": "panel",
+              "readonly": true,
+              "colSpan": 8,
+              "css": "order-subtotal",
+              "items": [
+                {
+                  "type": "field",
+                  "name": "totalAmount",
+                  "showTitle": false,
+                  "colSpan": 12,
+                  "viewer": {
+                    "type": "viewer",
+                    "depends": "amount,taxAmount,totalAmount,currency.symbol",
+                    "template": "\n\n            <dl class=\"dl-horizontal\">\n              <dt x-translate>Amount</dt>\n              <dd>{{$fmt('amount')}} {{$fmt('currency.symbol')}}</dd>\n              <dt x-translate>Tax amount</dt>\n              <dd>{{$fmt('taxAmount')}} {{$fmt('currency.symbol')}}</dd>\n              <dt class=\"order-subtotal-total\" x-translate>Total amount</dt>\n              <dd class=\"order-subtotal-total\">{{$fmt('totalAmount')}} {{$fmt('currency.symbol')}}</dd>\n            </dl>\n\n        "
+                  },
+                  "widgetAttrs": {
+                    "scale": "currency.decimalPlaces"
+                  },
+                  "autoTitle": "Total amount"
+                },
+                {
+                  "type": "field",
+                  "name": "amount",
+                  "hidden": true,
+                  "widgetAttrs": {
+                    "scale": "currency.decimalPlaces"
+                  },
+                  "autoTitle": "Amount"
+                },
+                {
+                  "type": "field",
+                  "name": "taxAmount",
+                  "hidden": true,
+                  "widgetAttrs": {
+                    "scale": "currency.decimalPlaces"
+                  },
+                  "autoTitle": "Tax amount"
+                },
+                {
+                  "type": "field",
+                  "name": "currency.symbol",
+                  "hidden": true,
+                  "autoTitle": "Symbol"
+                },
+                {
+                  "type": "field",
+                  "name": "currency.decimalPlaces",
+                  "hidden": true,
+                  "autoTitle": "Decimal places"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "panel-mail",
+          "items": [
+            {
+              "type": "mail-messages",
+              "limit": 4
+            },
+            {
+              "type": "mail-followers"
+            }
+          ]
+        }
+      ]
+    },
+    "perms": null,
+    "fields": [
+      {
+        "defaultValue": "0",
+        "precision": 20,
+        "name": "amount",
+        "scale": 4,
+        "type": "DECIMAL",
+        "title": "Amount"
+      },
+      {
+        "readonly": true,
+        "defaultValue": 2,
+        "name": "currency.decimalPlaces",
+        "minSize": 0,
+        "type": "INTEGER",
+        "title": "Decimal places"
+      },
+      {
+        "name": "notes",
+        "type": "TEXT",
+        "title": "Notes"
+      },
+      {
+        "readonly": true,
+        "name": "currency.symbol",
+        "type": "STRING",
+        "title": "Symbol",
+        "required": true
+      },
+      {
+        "defaultValue": false,
+        "name": "confirmed",
+        "type": "BOOLEAN",
+        "title": "Confirmed"
+      },
+      {
+        "name": "confirmDate",
+        "type": "DATE",
+        "title": "Confirm date"
+      },
+      {
+        "defaultValue": "0",
+        "precision": 20,
+        "name": "totalAmount",
+        "scale": 4,
+        "type": "DECIMAL",
+        "title": "Total amount"
+      },
+      {
+        "sequence": true,
+        "readonly": true,
+        "name": "name",
+        "type": "STRING",
+        "title": "Name"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "currency",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Currency",
+        "required": true,
+        "target": "com.axelor.sale.db.Currency"
+      },
+      {
+        "defaultValue": "0",
+        "precision": 20,
+        "name": "taxAmount",
+        "scale": 4,
+        "type": "DECIMAL",
+        "title": "Tax amount"
+      },
+      {
+        "name": "orderDate",
+        "type": "DATE",
+        "title": "Order date",
+        "required": true
+      },
+      {
+        "targetName": null,
+        "targetSearch": [],
+        "name": "items",
+        "perms": null,
+        "type": "ONE_TO_MANY",
+        "title": "Items",
+        "mappedBy": "order",
+        "target": "com.axelor.sale.db.OrderLine"
+      },
+      {
+        "name": "status",
+        "enumType": "com.axelor.sale.db.OrderStatus",
+        "selectionList": [
+          {
+            "value": "DRAFT",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": "draft"
+            },
+            "title": "Draft"
+          },
+          {
+            "value": "OPEN",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": "open"
+            },
+            "title": "Open"
+          },
+          {
+            "value": "CLOSED",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": "closed"
+            },
+            "title": "Closed"
+          },
+          {
+            "value": "CANCELED",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": "canceled"
+            },
+            "title": "Canceled"
+          }
+        ],
+        "type": "ENUM",
+        "title": "Status"
+      },
+      {
+        "targetName": "fullName",
+        "targetSearch": ["fullName", "firstName", "lastName"],
+        "name": "customer",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Customer",
+        "required": true,
+        "target": "com.axelor.contact.db.Contact"
+      }
+    ]
+  }
+}

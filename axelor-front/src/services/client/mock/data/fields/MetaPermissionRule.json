@@ -1,0 +1,109 @@
+{
+  "status": 0,
+  "data": {
+    "jsonFields": {},
+    "model": "com.axelor.meta.db.MetaPermissionRule",
+    "perms": {
+      "massUpdate": true
+    },
+    "fields": [
+      {
+        "defaultValue": false,
+        "name": "canExport",
+        "type": "BOOLEAN",
+        "title": "Export"
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "updatedBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Updated by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "defaultValue": false,
+        "name": "canRead",
+        "type": "BOOLEAN",
+        "title": "Read"
+      },
+      {
+        "defaultValue": false,
+        "name": "canWrite",
+        "type": "BOOLEAN",
+        "title": "Write"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "metaPermission",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Meta permission",
+        "required": true,
+        "target": "com.axelor.meta.db.MetaPermission"
+      },
+      {
+        "readonly": true,
+        "name": "updatedOn",
+        "type": "DATETIME",
+        "title": "Updated on"
+      },
+      {
+        "readonly": true,
+        "name": "createdOn",
+        "type": "DATETIME",
+        "title": "Created on"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "version",
+        "type": "INTEGER",
+        "title": "Version"
+      },
+      {
+        "massUpdate": true,
+        "name": "archived",
+        "type": "BOOLEAN",
+        "title": "Archived"
+      },
+      {
+        "name": "hideIf",
+        "type": "STRING",
+        "title": "Hide if"
+      },
+      {
+        "name": "field",
+        "type": "STRING",
+        "title": "Field",
+        "required": true
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "createdBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Created by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "id",
+        "type": "LONG",
+        "title": "Id",
+        "primary": true
+      },
+      {
+        "name": "readonlyIf",
+        "type": "STRING",
+        "title": "Readonly if"
+      }
+    ]
+  }
+}

@@ -1,0 +1,229 @@
+{
+  "status": 0,
+  "data": {
+    "jsonFields": {},
+    "model": "com.axelor.auth.db.Group",
+    "perms": {
+      "massUpdate": true
+    },
+    "fields": [
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "code",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Code",
+        "required": true
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "updatedBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Updated by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "defaultValue": "NOT_ALLOWED",
+        "name": "viewCustomizationPermission",
+        "enumType": "com.axelor.auth.db.ViewCustomizationPermission",
+        "selectionList": [
+          {
+            "value": "NOT_ALLOWED",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": 0
+            },
+            "title": "Not allowed"
+          },
+          {
+            "value": "CAN_CUSTOMIZE",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": 1
+            },
+            "title": "Can customize"
+          },
+          {
+            "value": "CAN_SHARE",
+            "icon": null,
+            "color": null,
+            "order": null,
+            "hidden": null,
+            "data": {
+              "value": 2
+            },
+            "title": "Can share"
+          }
+        ],
+        "type": "ENUM",
+        "title": "View customization"
+      },
+      {
+        "help": "Specify whether the members of this group can view collaboration",
+        "defaultValue": true,
+        "name": "canViewCollaboration",
+        "type": "BOOLEAN",
+        "title": "Can view collaboration"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "metaPermissions",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Permissions (fields)",
+        "target": "com.axelor.meta.db.MetaPermission"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "roles",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Roles",
+        "target": "com.axelor.auth.db.Role"
+      },
+      {
+        "readonly": true,
+        "name": "updatedOn",
+        "type": "DATETIME",
+        "title": "Updated on"
+      },
+      {
+        "readonly": true,
+        "name": "createdOn",
+        "type": "DATETIME",
+        "title": "Created on"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "version",
+        "type": "INTEGER",
+        "title": "Version"
+      },
+      {
+        "massUpdate": true,
+        "name": "archived",
+        "type": "BOOLEAN",
+        "title": "Archived"
+      },
+      {
+        "selection": "select.user.navigation",
+        "name": "navigation",
+        "selectionList": [
+          {
+            "value": "visible",
+            "icon": null,
+            "color": null,
+            "order": 0,
+            "hidden": false,
+            "data": null,
+            "title": "Visible"
+          },
+          {
+            "value": "hidden",
+            "icon": null,
+            "color": null,
+            "order": 1,
+            "hidden": false,
+            "data": null,
+            "title": "Hidden"
+          },
+          {
+            "value": "collapse",
+            "icon": null,
+            "color": null,
+            "order": 2,
+            "hidden": false,
+            "data": null,
+            "title": "Collapse"
+          }
+        ],
+        "type": "STRING",
+        "title": "Navigation"
+      },
+      {
+        "help": "Specify whether the members of this group are technical staff.",
+        "defaultValue": false,
+        "name": "technicalStaff",
+        "type": "BOOLEAN",
+        "title": "Technical staff"
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "createdBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Created by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "permissions",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Permissions",
+        "target": "com.axelor.auth.db.Permission"
+      },
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "name",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "id",
+        "type": "LONG",
+        "title": "Id",
+        "primary": true
+      },
+      {
+        "targetName": "title",
+        "targetSearch": ["title"],
+        "name": "menus",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Menus",
+        "mappedBy": "groups",
+        "target": "com.axelor.meta.db.MetaMenu"
+      },
+      {
+        "help": "Default home action.",
+        "name": "homeAction",
+        "type": "STRING",
+        "title": "Home action"
+      },
+      {
+        "targetName": "title",
+        "targetSearch": ["title"],
+        "name": "views",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Views",
+        "mappedBy": "groups",
+        "target": "com.axelor.meta.db.MetaView"
+      }
+    ]
+  }
+}

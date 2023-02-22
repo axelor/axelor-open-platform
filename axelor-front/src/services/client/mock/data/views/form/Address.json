@@ -1,0 +1,111 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 82,
+      "modelId": 44,
+      "name": "address-form",
+      "title": "Address",
+      "model": "com.axelor.contact.db.Address",
+      "type": "form",
+      "items": [
+        {
+          "type": "panel",
+          "title": "Overview",
+          "items": [
+            {
+              "type": "field",
+              "name": "contact",
+              "colSpan": 12,
+              "target": "com.axelor.contact.db.Contact",
+              "targetName": "fullName",
+              "autoTitle": "Contact"
+            },
+            {
+              "type": "field",
+              "name": "street",
+              "autoTitle": "Street"
+            },
+            {
+              "type": "field",
+              "name": "area",
+              "autoTitle": "Area"
+            },
+            {
+              "type": "field",
+              "name": "city",
+              "autoTitle": "City"
+            },
+            {
+              "type": "field",
+              "name": "zip",
+              "autoTitle": "Zip"
+            },
+            {
+              "type": "field",
+              "name": "state",
+              "autoTitle": "State"
+            },
+            {
+              "type": "field",
+              "name": "country",
+              "target": "com.axelor.contact.db.Country",
+              "targetName": "name",
+              "autoTitle": "Country"
+            }
+          ]
+        }
+      ]
+    },
+    "perms": null,
+    "fields": [
+      {
+        "name": "area",
+        "maxSize": 255,
+        "type": "STRING",
+        "title": "Area"
+      },
+      {
+        "name": "zip",
+        "type": "STRING",
+        "title": "Zip"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "country",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Country",
+        "target": "com.axelor.contact.db.Country"
+      },
+      {
+        "name": "city",
+        "type": "STRING",
+        "title": "City"
+      },
+      {
+        "name": "street",
+        "maxSize": 255,
+        "type": "STRING",
+        "title": "Street",
+        "required": true
+      },
+      {
+        "targetName": "fullName",
+        "targetSearch": ["fullName", "firstName", "lastName"],
+        "name": "contact",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Contact",
+        "required": true,
+        "target": "com.axelor.contact.db.Contact"
+      },
+      {
+        "name": "state",
+        "type": "STRING",
+        "title": "State"
+      }
+    ]
+  }
+}

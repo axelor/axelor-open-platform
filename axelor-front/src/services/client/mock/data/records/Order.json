@@ -1,0 +1,989 @@
+{
+  "status": 0,
+  "offset": 0,
+  "total": 20,
+  "data": [
+    {
+      "amount": "9451.1300",
+      "notes": "Nam sole orto magnitudine angusti gurgitis sed",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "draft",
+      "updatedOn": "2023-02-20T12:08:22.658761Z",
+      "confirmed": false,
+      "createdOn": "2023-02-20T12:08:21.831615Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": null,
+      "totalAmount": "10365.7800",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00001",
+      "currency": {
+        "code": "EUR",
+        "name": "Euro",
+        "id": 1,
+        "$version": 0
+      },
+      "id": 1,
+      "taxAmount": "914.6500",
+      "items": [
+        {
+          "id": 2,
+          "$version": 0
+        },
+        {
+          "id": 3,
+          "$version": 0
+        },
+        {
+          "id": 1,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-15",
+      "selected": false,
+      "customer": {
+        "fullName": "Mr Fredrick Brandt",
+        "id": 1,
+        "$version": 0
+      },
+      "status": "DRAFT"
+    },
+    {
+      "amount": "4038.1800",
+      "notes": "Alii summum decus in carruchis solito altioribus",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "draft",
+      "updatedOn": "2023-02-20T12:08:22.668072Z",
+      "confirmed": false,
+      "createdOn": "2023-02-20T12:08:21.840507Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": null,
+      "totalAmount": "4214.3700",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00002",
+      "currency": {
+        "code": "EUR",
+        "name": "Euro",
+        "id": 1,
+        "$version": 0
+      },
+      "id": 2,
+      "taxAmount": "176.1900",
+      "items": [
+        {
+          "id": 5,
+          "$version": 0
+        },
+        {
+          "id": 4,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-16",
+      "selected": false,
+      "customer": {
+        "fullName": "Mr Fredrick Brandt",
+        "id": 1,
+        "$version": 0
+      },
+      "status": "DRAFT"
+    },
+    {
+      "amount": "8854.3200",
+      "notes": "Alios autem dicere aiunt multo etiam inhumanius",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "closed",
+      "updatedOn": "2023-02-20T12:08:22.679989Z",
+      "confirmed": false,
+      "createdOn": "2023-02-20T12:08:21.851471Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": null,
+      "totalAmount": "11595.1500",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00003",
+      "currency": {
+        "code": "USD",
+        "name": "US Dollar",
+        "id": 2,
+        "$version": 0
+      },
+      "id": 3,
+      "taxAmount": "2740.8300",
+      "items": [
+        {
+          "id": 6,
+          "$version": 0
+        },
+        {
+          "id": 7,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-17",
+      "selected": false,
+      "customer": {
+        "fullName": "Miss Rivka Booth",
+        "id": 5,
+        "$version": 0
+      },
+      "status": "CLOSED"
+    },
+    {
+      "amount": "1033.6500",
+      "notes": "Quibus occurrere bene pertinax miles explicatis",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "closed",
+      "updatedOn": "2023-02-20T12:08:22.690715Z",
+      "confirmed": false,
+      "createdOn": "2023-02-20T12:08:21.860203Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": null,
+      "totalAmount": "1178.3600",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00004",
+      "currency": {
+        "code": "EUR",
+        "name": "Euro",
+        "id": 1,
+        "$version": 0
+      },
+      "id": 4,
+      "taxAmount": "144.7100",
+      "items": [
+        {
+          "id": 8,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-06",
+      "selected": false,
+      "customer": {
+        "fullName": "Mr Betty Russell",
+        "id": 9,
+        "$version": 0
+      },
+      "status": "CLOSED"
+    },
+    {
+      "amount": "5081.0500",
+      "notes": "Constituendi autem sunt qui sint in amicitia fines",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "open",
+      "updatedOn": "2023-02-20T12:08:22.701970Z",
+      "confirmed": true,
+      "createdOn": "2023-02-20T12:08:21.867740Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": "2023-02-18",
+      "totalAmount": "6097.2600",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00005",
+      "currency": {
+        "code": "USD",
+        "name": "US Dollar",
+        "id": 2,
+        "$version": 0
+      },
+      "id": 5,
+      "taxAmount": "1016.2100",
+      "items": [
+        {
+          "id": 11,
+          "$version": 0
+        },
+        {
+          "id": 10,
+          "$version": 0
+        },
+        {
+          "id": 9,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-18",
+      "selected": false,
+      "customer": {
+        "fullName": "Mr Norbert Dupont",
+        "id": 15,
+        "$version": 0
+      },
+      "status": "OPEN"
+    },
+    {
+      "amount": "0.0000",
+      "notes": "Saraceni tamen nec amici nobis umquam nec hostes",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "draft",
+      "updatedOn": "2023-02-20T12:08:22.711061Z",
+      "confirmed": false,
+      "createdOn": "2023-02-20T12:08:21.883902Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": null,
+      "totalAmount": "0.0000",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00006",
+      "currency": {
+        "code": "JPY",
+        "name": "Japanese Yen",
+        "id": 3,
+        "$version": 0
+      },
+      "id": 6,
+      "taxAmount": "0.0000",
+      "items": [],
+      "orderDate": "2023-02-20",
+      "selected": false,
+      "customer": {
+        "fullName": "Mr Olivier Martinez",
+        "id": 12,
+        "$version": 0
+      },
+      "status": "DRAFT"
+    },
+    {
+      "amount": "0.0000",
+      "notes": "Haec igitur prima lex amicitiae sanciatur, ut ab",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "draft",
+      "updatedOn": "2023-02-20T12:08:22.729451Z",
+      "confirmed": false,
+      "createdOn": "2023-02-20T12:08:21.900446Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": null,
+      "totalAmount": "0.0000",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00007",
+      "currency": {
+        "code": "BHD",
+        "name": "Bahraini Dinar",
+        "id": 4,
+        "$version": 0
+      },
+      "id": 7,
+      "taxAmount": "0.0000",
+      "items": [],
+      "orderDate": "2023-02-19",
+      "selected": false,
+      "customer": {
+        "fullName": "Mr Thomas Sydney",
+        "id": 18,
+        "$version": 0
+      },
+      "status": "DRAFT"
+    },
+    {
+      "amount": "5441.2200",
+      "notes": "Erat autem diritatis eius hoc quoque indicium nec",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "open",
+      "updatedOn": "2023-02-20T12:08:22.739238Z",
+      "confirmed": true,
+      "createdOn": "2023-02-20T12:08:21.908659Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": "2023-02-19",
+      "totalAmount": "6529.4600",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00008",
+      "currency": {
+        "code": "EUR",
+        "name": "Euro",
+        "id": 1,
+        "$version": 0
+      },
+      "id": 8,
+      "taxAmount": "1088.2400",
+      "items": [
+        {
+          "id": 12,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-19",
+      "selected": false,
+      "customer": {
+        "fullName": "Mr David Joy",
+        "id": 20,
+        "$version": 0
+      },
+      "status": "OPEN"
+    },
+    {
+      "amount": "921.4800",
+      "notes": "Post hoc impie perpetratum quod in aliis quoque",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "open",
+      "updatedOn": "2023-02-20T12:08:22.750605Z",
+      "confirmed": false,
+      "createdOn": "2023-02-20T12:08:21.916527Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": null,
+      "totalAmount": "958.3400",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00009",
+      "currency": {
+        "code": "EUR",
+        "name": "Euro",
+        "id": 1,
+        "$version": 0
+      },
+      "id": 9,
+      "taxAmount": "36.8600",
+      "items": [
+        {
+          "id": 13,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-20",
+      "selected": false,
+      "customer": {
+        "fullName": "Mrs Samina Wright",
+        "id": 2,
+        "$version": 0
+      },
+      "status": "OPEN"
+    },
+    {
+      "amount": "3684.8900",
+      "notes": "Proinde die funestis interrogationibus praestituto",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "canceled",
+      "updatedOn": "2023-02-20T12:08:22.765167Z",
+      "confirmed": false,
+      "createdOn": "2023-02-20T12:08:21.930002Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": null,
+      "totalAmount": "4141.2600",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00010",
+      "currency": {
+        "code": "USD",
+        "name": "US Dollar",
+        "id": 2,
+        "$version": 0
+      },
+      "id": 10,
+      "taxAmount": "456.3700",
+      "items": [
+        {
+          "id": 14,
+          "$version": 0
+        },
+        {
+          "id": 15,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-10",
+      "selected": false,
+      "customer": {
+        "fullName": "Miss Charee Jacques",
+        "id": 14,
+        "$version": 0
+      },
+      "status": "CANCELED"
+    },
+    {
+      "amount": "1213.8000",
+      "notes": "Etenim si attendere diligenter, existimare vere de",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "canceled",
+      "updatedOn": "2023-02-20T12:08:22.772797Z",
+      "confirmed": false,
+      "createdOn": "2023-02-20T12:08:21.942168Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": null,
+      "totalAmount": "1383.7320",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00011",
+      "currency": {
+        "code": "BHD",
+        "name": "Bahraini Dinar",
+        "id": 4,
+        "$version": 0
+      },
+      "id": 11,
+      "taxAmount": "169.9320",
+      "items": [
+        {
+          "id": 16,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-15",
+      "selected": false,
+      "customer": {
+        "fullName": "Mrs Jeana Salomon",
+        "id": 16,
+        "$version": 0
+      },
+      "status": "CANCELED"
+    },
+    {
+      "amount": "3712.3800",
+      "notes": "Proinde die funestis interrogationibus praestituto",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "canceled",
+      "updatedOn": "2023-02-20T12:08:22.781687Z",
+      "confirmed": false,
+      "createdOn": "2023-02-20T12:08:21.948875Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": null,
+      "totalAmount": "4226.2300",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00012",
+      "currency": {
+        "code": "USD",
+        "name": "US Dollar",
+        "id": 2,
+        "$version": 0
+      },
+      "id": 12,
+      "taxAmount": "513.8500",
+      "items": [
+        {
+          "id": 18,
+          "$version": 0
+        },
+        {
+          "id": 17,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-11",
+      "selected": false,
+      "customer": {
+        "fullName": "Mrs Vienna Robert",
+        "id": 13,
+        "$version": 0
+      },
+      "status": "CANCELED"
+    },
+    {
+      "amount": "2578.8700",
+      "notes": "Eodem tempore Serenianus ex duce, cuius ignavia",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "canceled",
+      "updatedOn": "2023-02-20T12:08:22.791409Z",
+      "confirmed": false,
+      "createdOn": "2023-02-20T12:08:21.956137Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": null,
+      "totalAmount": "2578.8700",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00013",
+      "currency": {
+        "code": "EUR",
+        "name": "Euro",
+        "id": 1,
+        "$version": 0
+      },
+      "id": 13,
+      "taxAmount": "0.0000",
+      "items": [
+        {
+          "id": 20,
+          "$version": 0
+        },
+        {
+          "id": 19,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-19",
+      "selected": false,
+      "customer": {
+        "fullName": "Mrs Daniele Garcia",
+        "id": 10,
+        "$version": 0
+      },
+      "status": "CANCELED"
+    },
+    {
+      "amount": "54.0000",
+      "notes": "Altera sententia est, quae definit amicitiam",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "open",
+      "updatedOn": "2023-02-20T12:08:22.799764Z",
+      "confirmed": true,
+      "createdOn": "2023-02-20T12:08:21.964095Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": "2023-02-20",
+      "totalAmount": "54.0000",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00014",
+      "currency": {
+        "code": "JPY",
+        "name": "Japanese Yen",
+        "id": 3,
+        "$version": 0
+      },
+      "id": 14,
+      "taxAmount": "0.0000",
+      "items": [
+        {
+          "id": 22,
+          "$version": 0
+        },
+        {
+          "id": 21,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-20",
+      "selected": false,
+      "customer": {
+        "fullName": "Mrs Daniele Garcia",
+        "id": 10,
+        "$version": 0
+      },
+      "status": "OPEN"
+    },
+    {
+      "amount": "364.1000",
+      "notes": "Ex turba vero imae sortis et paupertinae in",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "open",
+      "updatedOn": "2023-02-20T12:08:22.808309Z",
+      "confirmed": true,
+      "createdOn": "2023-02-20T12:08:21.968941Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": "2023-01-15",
+      "totalAmount": "364.1000",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00015",
+      "currency": {
+        "code": "EUR",
+        "name": "Euro",
+        "id": 1,
+        "$version": 0
+      },
+      "id": 15,
+      "taxAmount": "0.0000",
+      "items": [
+        {
+          "id": 23,
+          "$version": 0
+        },
+        {
+          "id": 24,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-01-15",
+      "selected": false,
+      "customer": {
+        "fullName": "Mrs Daniele Garcia",
+        "id": 10,
+        "$version": 0
+      },
+      "status": "OPEN"
+    },
+    {
+      "amount": "20.0000",
+      "notes": "Ideo urbs venerabilis post superbas efferatarum",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "draft",
+      "updatedOn": "2023-02-20T12:08:22.818675Z",
+      "confirmed": true,
+      "createdOn": "2023-02-20T12:08:21.977249Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": "2023-02-20",
+      "totalAmount": "20.0000",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00016",
+      "currency": {
+        "code": "EUR",
+        "name": "Euro",
+        "id": 1,
+        "$version": 0
+      },
+      "id": 16,
+      "taxAmount": "0.0000",
+      "items": [
+        {
+          "id": 25,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-20",
+      "selected": false,
+      "customer": {
+        "fullName": "Miss Lucille Gilbert",
+        "id": 8,
+        "$version": 0
+      },
+      "status": "DRAFT"
+    },
+    {
+      "amount": "393.3000",
+      "notes": "Horum adventum praedocti speculationibus fidis",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "draft",
+      "updatedOn": "2023-02-20T12:08:22.828401Z",
+      "confirmed": true,
+      "createdOn": "2023-02-20T12:08:21.983446Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": "2023-02-20",
+      "totalAmount": "409.0300",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00017",
+      "currency": {
+        "code": "EUR",
+        "name": "Euro",
+        "id": 1,
+        "$version": 0
+      },
+      "id": 17,
+      "taxAmount": "15.7300",
+      "items": [
+        {
+          "id": 26,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-20",
+      "selected": false,
+      "customer": {
+        "fullName": "Mrs Sidrah Hobbs",
+        "id": 7,
+        "$version": 0
+      },
+      "status": "DRAFT"
+    },
+    {
+      "amount": "25.0000",
+      "notes": "Proinde concepta rabie saeviore, quam desperatio",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "draft",
+      "updatedOn": "2023-02-20T12:08:22.840437Z",
+      "confirmed": true,
+      "createdOn": "2023-02-20T12:08:21.990363Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": "2023-02-19",
+      "totalAmount": "25.0000",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00018",
+      "currency": {
+        "code": "JPY",
+        "name": "Japanese Yen",
+        "id": 3,
+        "$version": 0
+      },
+      "id": 18,
+      "taxAmount": "0.0000",
+      "items": [
+        {
+          "id": 28,
+          "$version": 0
+        },
+        {
+          "id": 27,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-19",
+      "selected": false,
+      "customer": {
+        "fullName": "Mrs Jenina Abraham",
+        "id": 19,
+        "$version": 0
+      },
+      "status": "DRAFT"
+    },
+    {
+      "amount": "99.9900",
+      "notes": "Haec subinde Constantius audiens et quaedam",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "draft",
+      "updatedOn": "2023-02-20T12:08:22.848610Z",
+      "confirmed": true,
+      "createdOn": "2023-02-20T12:08:21.998017Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": "2023-02-15",
+      "totalAmount": "119.9880",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00019",
+      "currency": {
+        "code": "BHD",
+        "name": "Bahraini Dinar",
+        "id": 4,
+        "$version": 0
+      },
+      "id": 19,
+      "taxAmount": "19.9980",
+      "items": [
+        {
+          "id": 29,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-15",
+      "selected": false,
+      "customer": {
+        "fullName": "Miss Marjorie Marshall",
+        "id": 3,
+        "$version": 0
+      },
+      "status": "DRAFT"
+    },
+    {
+      "amount": "54.8200",
+      "notes": "Intellectum est enim mihi quidem in multis, et",
+      "updatedBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "status$value": "draft",
+      "updatedOn": "2023-02-20T12:08:22.854704Z",
+      "confirmed": true,
+      "createdOn": "2023-02-20T12:08:22.003333Z",
+      "version": 1,
+      "attrs": null,
+      "confirmDate": "2023-02-19",
+      "totalAmount": "65.7800",
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "SO00020",
+      "currency": {
+        "code": "EUR",
+        "name": "Euro",
+        "id": 1,
+        "$version": 0
+      },
+      "id": 20,
+      "taxAmount": "10.9600",
+      "items": [
+        {
+          "id": 31,
+          "$version": 0
+        },
+        {
+          "id": 30,
+          "$version": 0
+        }
+      ],
+      "orderDate": "2023-02-18",
+      "selected": false,
+      "customer": {
+        "fullName": "Miss Rivka Booth",
+        "id": 5,
+        "$version": 0
+      },
+      "status": "DRAFT"
+    }
+  ]
+}

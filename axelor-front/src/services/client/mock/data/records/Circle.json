@@ -1,0 +1,126 @@
+{
+  "status": 0,
+  "offset": 0,
+  "total": 7,
+  "data": [
+    {
+      "code": "business",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Business",
+      "id": 3,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.440782Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "colleagues",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Colleagues",
+      "id": 5,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.445556Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "customers",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Customers",
+      "id": 4,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.443198Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "employees",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Employees",
+      "id": 6,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.447154Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "family",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Family",
+      "id": 1,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.435164Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "friends",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Friends",
+      "id": 2,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.439059Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "suppliers",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Suppliers",
+      "id": 7,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.448612Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    }
+  ]
+}

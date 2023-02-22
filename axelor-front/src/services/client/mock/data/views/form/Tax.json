@@ -1,0 +1,70 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 106,
+      "modelId": 50,
+      "name": "tax-form",
+      "title": "Tax",
+      "model": "com.axelor.sale.db.Tax",
+      "width": "mini",
+      "type": "form",
+      "items": [
+        {
+          "type": "panel",
+          "title": "Overview",
+          "itemSpan": 12,
+          "items": [
+            {
+              "type": "field",
+              "name": "code",
+              "autoTitle": "Code"
+            },
+            {
+              "type": "field",
+              "name": "name",
+              "autoTitle": "Name"
+            },
+            {
+              "type": "field",
+              "name": "rate",
+              "autoTitle": "Rate"
+            }
+          ]
+        }
+      ]
+    },
+    "perms": null,
+    "fields": [
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "code",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Code",
+        "required": true
+      },
+      {
+        "defaultValue": "0",
+        "precision": 6,
+        "name": "rate",
+        "scale": 4,
+        "minSize": "0.0",
+        "type": "DECIMAL",
+        "title": "Rate"
+      },
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "name",
+        "maxSize": 2147483647,
+        "minSize": 2,
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      }
+    ]
+  }
+}

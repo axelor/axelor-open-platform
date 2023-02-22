@@ -1,0 +1,281 @@
+{
+  "status": 0,
+  "data": {
+    "jsonFields": {},
+    "model": "com.axelor.meta.db.MetaMenu",
+    "perms": {
+      "massUpdate": true
+    },
+    "fields": [
+      {
+        "targetName": "title",
+        "targetSearch": ["title"],
+        "name": "parent",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Parent",
+        "target": "com.axelor.meta.db.MetaMenu"
+      },
+      {
+        "help": "Only use this menu-item if the given module is installed (ie `if-module` condition).",
+        "name": "moduleToCheck",
+        "type": "STRING",
+        "title": "Module to check"
+      },
+      {
+        "defaultValue": false,
+        "name": "hidden",
+        "type": "BOOLEAN",
+        "title": "Hidden menu"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "roles",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Roles",
+        "target": "com.axelor.auth.db.Role"
+      },
+      {
+        "name": "icon",
+        "type": "STRING",
+        "title": "Icon"
+      },
+      {
+        "name": "link",
+        "type": "STRING",
+        "title": "Link"
+      },
+      {
+        "nameColumn": true,
+        "name": "title",
+        "type": "STRING",
+        "title": "Title",
+        "required": true
+      },
+      {
+        "readonly": true,
+        "name": "createdOn",
+        "type": "DATETIME",
+        "title": "Created on"
+      },
+      {
+        "massUpdate": true,
+        "name": "archived",
+        "type": "BOOLEAN",
+        "title": "Archived"
+      },
+      {
+        "nullable": true,
+        "defaultValue": false,
+        "name": "top",
+        "type": "BOOLEAN",
+        "title": "Top menu"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name"],
+        "name": "action",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Action",
+        "target": "com.axelor.meta.db.MetaAction"
+      },
+      {
+        "help": "Only use this menu-item if the given expression is true (ie `if` condition).",
+        "name": "conditionToCheck",
+        "maxSize": 1024,
+        "type": "STRING",
+        "title": "Condition to check"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "id",
+        "type": "LONG",
+        "title": "Id",
+        "primary": true
+      },
+      {
+        "name": "tag",
+        "type": "STRING",
+        "title": "Tag label"
+      },
+      {
+        "nullable": true,
+        "unique": true,
+        "name": "xmlId",
+        "type": "STRING",
+        "title": "Xml"
+      },
+      {
+        "name": "iconBackground",
+        "type": "STRING",
+        "title": "Icon background"
+      },
+      {
+        "nullable": true,
+        "defaultValue": 0,
+        "name": "order",
+        "type": "INTEGER",
+        "title": "Order"
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "updatedBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Updated by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "name": "tagGet",
+        "type": "STRING",
+        "title": "Tag method"
+      },
+      {
+        "name": "module",
+        "type": "STRING",
+        "title": "Module"
+      },
+      {
+        "selection": "label.style.selection",
+        "name": "tagStyle",
+        "selectionList": [
+          {
+            "value": "default",
+            "icon": null,
+            "color": null,
+            "order": 0,
+            "hidden": false,
+            "data": null,
+            "title": "Default"
+          },
+          {
+            "value": "important",
+            "icon": null,
+            "color": null,
+            "order": 1,
+            "hidden": false,
+            "data": null,
+            "title": "Important"
+          },
+          {
+            "value": "success",
+            "icon": null,
+            "color": null,
+            "order": 2,
+            "hidden": false,
+            "data": null,
+            "title": "Success"
+          },
+          {
+            "value": "warning",
+            "icon": null,
+            "color": null,
+            "order": 3,
+            "hidden": false,
+            "data": null,
+            "title": "Warning"
+          },
+          {
+            "value": "inverse",
+            "icon": null,
+            "color": null,
+            "order": 4,
+            "hidden": false,
+            "data": null,
+            "title": "Inverse"
+          },
+          {
+            "value": "info",
+            "icon": null,
+            "color": null,
+            "order": 5,
+            "hidden": false,
+            "data": null,
+            "title": "Information"
+          }
+        ],
+        "type": "STRING",
+        "title": "Tag style"
+      },
+      {
+        "nullable": true,
+        "defaultValue": false,
+        "name": "mobile",
+        "type": "BOOLEAN",
+        "title": "Mobile menu"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "groups",
+        "perms": null,
+        "type": "MANY_TO_MANY",
+        "title": "Groups",
+        "target": "com.axelor.auth.db.Group"
+      },
+      {
+        "readonly": true,
+        "name": "updatedOn",
+        "type": "DATETIME",
+        "title": "Updated on"
+      },
+      {
+        "defaultValue": 0,
+        "name": "priority",
+        "type": "INTEGER",
+        "title": "Priority"
+      },
+      {
+        "readonly": true,
+        "hidden": true,
+        "name": "version",
+        "type": "INTEGER",
+        "title": "Version"
+      },
+      {
+        "targetName": "name",
+        "readonly": true,
+        "targetSearch": ["name", "code"],
+        "name": "createdBy",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "Created by",
+        "target": "com.axelor.auth.db.User"
+      },
+      {
+        "nullable": true,
+        "defaultValue": true,
+        "name": "left",
+        "type": "BOOLEAN",
+        "title": "Left menu"
+      },
+      {
+        "name": "name",
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      },
+      {
+        "defaultValue": false,
+        "name": "tagCount",
+        "type": "BOOLEAN",
+        "title": "Tag count"
+      },
+      {
+        "targetName": "name",
+        "targetSearch": ["name", "code"],
+        "name": "user",
+        "perms": null,
+        "type": "MANY_TO_ONE",
+        "title": "User",
+        "target": "com.axelor.auth.db.User"
+      }
+    ]
+  }
+}

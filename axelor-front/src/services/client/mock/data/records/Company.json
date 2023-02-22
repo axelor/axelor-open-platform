@@ -1,0 +1,183 @@
+{
+  "status": 0,
+  "offset": 0,
+  "total": 6,
+  "data": [
+    {
+      "parent": null,
+      "code": "agco",
+      "notes": null,
+      "updatedBy": null,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.468398Z",
+      "version": 0,
+      "attrs": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "AGCO",
+      "id": 6,
+      "employees": [
+        {
+          "fullName": "Miss Lucille Gilbert",
+          "id": 8,
+          "$version": 0
+        }
+      ],
+      "selected": false
+    },
+    {
+      "parent": null,
+      "code": "axelor",
+      "notes": null,
+      "updatedBy": null,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.457208Z",
+      "version": 0,
+      "attrs": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Axelor SAS",
+      "id": 1,
+      "employees": [
+        {
+          "fullName": "Mr Fredrick Brandt",
+          "id": 1,
+          "$version": 0
+        },
+        {
+          "fullName": "Mrs Jeana Salomon",
+          "id": 16,
+          "$version": 0
+        }
+      ],
+      "selected": false
+    },
+    {
+      "parent": null,
+      "code": "cof",
+      "notes": null,
+      "updatedBy": null,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.463038Z",
+      "version": 0,
+      "attrs": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Capital One Financial",
+      "id": 3,
+      "employees": [
+        {
+          "fullName": "Miss Rivka Booth",
+          "id": 5,
+          "$version": 0
+        }
+      ],
+      "selected": false
+    },
+    {
+      "parent": null,
+      "code": "graphic_packaging_holding",
+      "notes": null,
+      "updatedBy": null,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.460627Z",
+      "version": 0,
+      "attrs": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Graphic Packaging Holding",
+      "id": 2,
+      "employees": [
+        {
+          "fullName": "Mrs Samina Wright",
+          "id": 2,
+          "$version": 0
+        }
+      ],
+      "selected": false
+    },
+    {
+      "parent": null,
+      "code": "jbhts",
+      "notes": null,
+      "updatedBy": null,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.466685Z",
+      "version": 0,
+      "attrs": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "J.B. Hunt Transport Services",
+      "id": 5,
+      "employees": [
+        {
+          "fullName": "Mrs Sidrah Hobbs",
+          "id": 7,
+          "$version": 0
+        },
+        {
+          "fullName": "Mr Betty Russell",
+          "id": 9,
+          "$version": 0
+        },
+        {
+          "fullName": "Mrs Daniele Garcia",
+          "id": 10,
+          "$version": 0
+        }
+      ],
+      "selected": false
+    },
+    {
+      "parent": null,
+      "code": "lennar",
+      "notes": null,
+      "updatedBy": null,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:20.464917Z",
+      "version": 0,
+      "attrs": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "name": "Lennar",
+      "id": 4,
+      "employees": [
+        {
+          "fullName": "Mr Benn Lucero",
+          "id": 6,
+          "$version": 0
+        },
+        {
+          "fullName": "Miss Sherilyn Dennis",
+          "id": 17,
+          "$version": 0
+        }
+      ],
+      "selected": false
+    }
+  ]
+}

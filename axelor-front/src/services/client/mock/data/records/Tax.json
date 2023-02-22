@@ -1,0 +1,79 @@
+{
+  "status": 0,
+  "offset": 0,
+  "total": 4,
+  "data": [
+    {
+      "code": "custom",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "rate": "0.0400",
+      "name": "Custom 4%",
+      "id": 4,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:21.647205Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "normal",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "rate": "0.2000",
+      "name": "Normal 20%",
+      "id": 1,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:21.637010Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "reduced10",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "rate": "0.1000",
+      "name": "Reduced 10%",
+      "id": 3,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:21.645104Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    },
+    {
+      "code": "reduced14",
+      "updatedBy": null,
+      "createdBy": {
+        "code": "admin",
+        "name": "Administrator",
+        "id": 1,
+        "$version": 2
+      },
+      "rate": "0.1400",
+      "name": "Reduced 14%",
+      "id": 2,
+      "updatedOn": null,
+      "createdOn": "2023-02-20T12:08:21.643181Z",
+      "version": 0,
+      "selected": false,
+      "attrs": null
+    }
+  ]
+}

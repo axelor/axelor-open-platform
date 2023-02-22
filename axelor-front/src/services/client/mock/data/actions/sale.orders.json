@@ -1,0 +1,23 @@
+{
+  "status": 0,
+  "data": [
+    {
+      "view": {
+        "domain": null,
+        "icon": null,
+        "viewType": "grid",
+        "context": { "_id": null },
+        "actionId": 70,
+        "model": "com.axelor.sale.db.Order",
+        "title": "Sale Orders",
+        "params": { "search-filters": "filter-sales" },
+        "views": [
+          { "name": null, "type": "grid" },
+          { "name": null, "type": "cards" },
+          { "name": null, "type": "form" },
+          { "name": "sales-timeline", "type": "calendar" }
+        ]
+      }
+    }
+  ]
+}

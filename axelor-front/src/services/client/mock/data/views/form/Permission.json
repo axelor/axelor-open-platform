@@ -1,0 +1,153 @@
+{
+  "status": 0,
+  "data": {
+    "view": {
+      "viewId": 29,
+      "modelId": 5,
+      "name": "permission-form",
+      "title": "Permission",
+      "model": "com.axelor.auth.db.Permission",
+      "type": "form",
+      "items": [
+        {
+          "type": "panel",
+          "title": "Overview",
+          "items": [
+            {
+              "type": "field",
+              "name": "name",
+              "autoTitle": "Name"
+            },
+            {
+              "type": "field",
+              "name": "object",
+              "autoTitle": "Object"
+            }
+          ]
+        },
+        {
+          "type": "panel",
+          "title": "Allow",
+          "itemSpan": 2,
+          "items": [
+            {
+              "type": "field",
+              "name": "canRead",
+              "widget": "inline-checkbox",
+              "autoTitle": "Can read"
+            },
+            {
+              "type": "field",
+              "name": "canWrite",
+              "widget": "inline-checkbox",
+              "autoTitle": "Can write"
+            },
+            {
+              "type": "field",
+              "name": "canCreate",
+              "widget": "inline-checkbox",
+              "autoTitle": "Can create"
+            },
+            {
+              "type": "field",
+              "name": "canRemove",
+              "widget": "inline-checkbox",
+              "autoTitle": "Can remove"
+            },
+            {
+              "type": "field",
+              "name": "canExport",
+              "widget": "inline-checkbox",
+              "autoTitle": "Can export"
+            }
+          ]
+        },
+        {
+          "type": "panel",
+          "title": "Condition",
+          "itemSpan": 12,
+          "items": [
+            {
+              "type": "field",
+              "name": "condition",
+              "title": "Condition"
+            },
+            {
+              "type": "field",
+              "name": "conditionParams",
+              "title": "Params"
+            }
+          ]
+        }
+      ]
+    },
+    "perms": null,
+    "fields": [
+      {
+        "help": "Whether to grant export access.",
+        "defaultValue": false,
+        "name": "canExport",
+        "type": "BOOLEAN",
+        "title": "Export"
+      },
+      {
+        "help": "Whether to grant remove access.",
+        "defaultValue": false,
+        "name": "canRemove",
+        "type": "BOOLEAN",
+        "title": "Remove"
+      },
+      {
+        "help": "Domain filter as condition.",
+        "nullable": true,
+        "name": "condition",
+        "maxSize": 1024,
+        "type": "STRING",
+        "title": "Condition"
+      },
+      {
+        "help": "Whether to grant read access.",
+        "defaultValue": false,
+        "name": "canRead",
+        "type": "BOOLEAN",
+        "title": "Read"
+      },
+      {
+        "help": "An unique permission name.",
+        "nullable": true,
+        "unique": true,
+        "name": "name",
+        "type": "STRING",
+        "title": "Name",
+        "required": true
+      },
+      {
+        "help": "Whether to grant write access.",
+        "defaultValue": false,
+        "name": "canWrite",
+        "type": "BOOLEAN",
+        "title": "Write"
+      },
+      {
+        "help": "Comma separated list of params for the condition.",
+        "name": "conditionParams",
+        "type": "STRING",
+        "title": "Condition params"
+      },
+      {
+        "help": "Whether to grant create access.",
+        "defaultValue": false,
+        "name": "canCreate",
+        "type": "BOOLEAN",
+        "title": "Create"
+      },
+      {
+        "help": "Fully qualified object name or wild card package name.",
+        "name": "object",
+        "type": "STRING",
+        "title": "Object",
+        "required": true
+      }
+    ]
+  }
+}
