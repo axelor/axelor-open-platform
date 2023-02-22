@@ -1,0 +1,11 @@
+---
+title: Improve resolution of AOP core dependencies
+type: change
+description: |
+  Use AOP version defined in root project. This avoids to use a version
+  coming from transitive dependencies.
+  
+  For example, if a module is built and published using AOP version 6.1.2
+  and the root project use AOP version 6.1.1, it will now use the AOP
+  version of the project, ie 6.1.1 (instead of getting the AOP version of
+  the transitive dependency of the module).

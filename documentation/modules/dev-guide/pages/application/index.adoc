@@ -141,6 +141,22 @@ The `include 'modules:axelor-contact'` line tells gradle to include the module
 `axelor-contact` in current build cycle. It is required to list all the modules
 used by the application in `settings.gradle` file.
 
+=== AOP dependencies resolution
+
+By default, Gradle resolves dependency version conflicts by using the newest version
+of the library. This is generally ok, but sometimes, depending on the modules used and
+on AOP versions used when they have been published, it may use an unwanted version.
+
+In order to avoid using an AOP version coming from transitive dependencies (selected by Gradle)
+and thus using the AOP version defined in the project itself, apply the `DependenciesSupport`
+plugin on the root project:
+
+.settings.gradle
+[source,gradle]
+----
+apply plugin: com.axelor.gradle.support.DependenciesSupport
+----
+
 == Module
 
 The application project generally doesn't provide any implementation logic.
