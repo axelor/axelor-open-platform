@@ -31,6 +31,8 @@ gradlePlugin {
     axelorPlugin {
       id = "com.axelor.app"
       implementationClass = "com.axelor.gradle.AxelorPlugin"
+      displayName = "Axelor Gradle plugin"
+      description = "Gradle plugin for integrating Axelor"
     }
   }
 }
