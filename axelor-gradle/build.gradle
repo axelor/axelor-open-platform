@@ -52,8 +52,3 @@ classes.doLast {
   generateLibsList "database"
   generateLibsList "provided"
 }
-
-// prevent double publish
-tasks.withType(PublishToMavenRepository).all {
-  enabled = name != 'publishMavenJavaPublicationToMavenRepository'
-}
