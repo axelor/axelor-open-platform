@@ -51,24 +51,22 @@ subprojects {
 
   project.afterEvaluate {
     publishing {
-      publications {
-        mavenJava {
-          pom {
-            name = 'Axelor AOP - ' + project.name
-            description = project.description
-            url = 'https://github.com/axelor/axelor-open-platform'
+      publications.all {
+        pom {
+          name = 'Axelor AOP - ' + project.name
+          description = project.description
+          url = 'https://github.com/axelor/axelor-open-platform'
 
-            organization {
-              name = 'Axelor'
-              url = 'https://axelor.com'
-            }
+          organization {
+            name = 'Axelor'
+            url = 'https://axelor.com'
+          }
 
-            licenses {
-              license {
-                name = 'GNU Affero General Public License version 3'
-                url = 'https://www.gnu.org/licenses/agpl-3.0.html'
-                distribution = 'repo'
-              }
+          licenses {
+            license {
+              name = 'GNU Affero General Public License version 3'
+              url = 'https://www.gnu.org/licenses/agpl-3.0.html'
+              distribution = 'repo'
             }
           }
         }
