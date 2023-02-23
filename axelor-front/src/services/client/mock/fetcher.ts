@@ -37,13 +37,8 @@ const handleInfo: Handler = () => async () => {
   return respond(module);
 };
 
-const handleMenuAll: Handler = () => async () => {
-  const module = await import("./data/app/menu.json");
-  return respond(module);
-};
-
-const handleMenuQuick: Handler = () => async () => {
-  const module = await import("./data/app/menu-quick.json");
+const handleMenu: Handler = (type) => async () => {
+  const module = await import(`./data/app/menu-${type}.json`);
   return respond(module);
 };
 
@@ -160,8 +155,7 @@ const handlers: Record<string, Handler> = {
   "/callback": handleLogin,
   "/logout": handleLogout,
   "/ws/app/info": handleInfo,
-  "/ws/action/menu/all": handleMenuAll,
-  "/ws/action/menu/quick": handleMenuQuick,
+  "/ws/action/menu/(?<type>[^/]+)": handleMenu,
   "/ws/action/com.axelor.meta.web.MetaFilterController:findFilters":
     handleFilters,
   "/ws/meta/fields/(?<model>[^/]+)": handleFields,

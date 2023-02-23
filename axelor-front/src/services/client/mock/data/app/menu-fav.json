@@ -1,0 +1,12 @@
+{
+  "status": 0,
+  "data": [
+    {
+      "name": "/ds/sale.orders/list/1",
+      "link": "/ds/sale.orders/list/1",
+      "id": 99,
+      "title": "Sale Orders",
+      "version": 0
+    }
+  ]
+}

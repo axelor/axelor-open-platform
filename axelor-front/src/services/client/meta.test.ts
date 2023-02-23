@@ -5,8 +5,22 @@ setupMock();
 import * as meta from "./meta";
 
 describe("meta tests", async () => {
-  it("should load menus", async () => {
-    const menus = await meta.menus();
+  it("should load all menus", async () => {
+    const menus = await meta.menus("all");
+    expect(menus).toBeDefined();
+    expect(menus.length).toBeGreaterThan(0);
+    expect(menus[0].name).toBeDefined();
+  });
+
+  it("should load quick menus", async () => {
+    const menus = await meta.menus("quick");
+    expect(menus).toBeDefined();
+    expect(menus.length).toBeGreaterThan(0);
+    expect(menus[0].title).toBeDefined();
+  });
+
+  it("should load favorite menus", async () => {
+    const menus = await meta.menus("fav");
     expect(menus).toBeDefined();
     expect(menus.length).toBeGreaterThan(0);
     expect(menus[0].name).toBeDefined();

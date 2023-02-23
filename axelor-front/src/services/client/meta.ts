@@ -10,8 +10,10 @@ import {
   ViewTypes,
 } from "./meta.types";
 
-export async function menus(): Promise<MenuItem[]> {
-  const url = "ws/action/menu/all";
+export type MenuType = "all" | "quick" | "fav";
+
+export async function menus(type: MenuType): Promise<MenuItem[]> {
+  const url = `ws/action/menu/${type}`;
   const resp = await request({ url });
 
   if (resp.ok) {
