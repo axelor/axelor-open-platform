@@ -283,6 +283,11 @@ function OneToManyCtrl($scope, $element, DataSource, ViewService, initCallback) 
 
   $scope.viewCanExport = function () {
     if (!$scope.field || !($scope.field.widgetAttrs||{}).canExport) return false;
+    var ids = _.compact(_.pluck($scope.getValue(), 'id'));
+    if (ids.length === 0
+        || _.some($scope.getValue(), function (item) { return (item || {}).$dirty; })) {
+      return false;
+    }
     return this.hasPermission("export") && this.canExport();
   };
 

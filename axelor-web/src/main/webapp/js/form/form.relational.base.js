@@ -321,6 +321,27 @@ function RefFieldCtrl($scope, $element, DataSource, ViewService, initCallback) {
     });
   };
 
+  var _onExport = $scope.onExport;
+  $scope.onExport = function() {
+    if(!_onExport) {
+      return;
+    }
+    var _ds = fetchDS();
+    _ds._domain = "self.id in (:_field_ids)";
+
+    var context = _.pick($scope.getContext(), ['id', '_model']);
+    var ids = _.compact(_.pluck($scope.getValue(), 'id'));
+    if (ids.length === 0) {
+      return;
+    }
+
+    context._field = field.name;
+    context._field_ids = ids;
+    _ds._lastContext = context;
+    _ds._showArchived = true;
+    _onExport(false, _ds);
+  };
+
   $scope.fetchSelection = function(request, response) {
     var fn = fetchSelection.bind(this);
     var onSelect = this.$events.onSelect;
