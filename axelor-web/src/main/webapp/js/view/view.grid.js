@@ -904,7 +904,7 @@ function GridViewCtrl($scope, $element) {
     });
   };
 
-  $scope.onExport = function (full) {
+  $scope.onExport = function (full, dataSource) {
     var view = $scope.view || $scope.schema || {};
     if (!view.items) return;
 
@@ -917,7 +917,7 @@ function GridViewCtrl($scope, $element) {
          .filter(function (name) { return names.indexOf(name) > -1; })
          .value();
 
-    return ds.export_(fields).success(function(res) {
+    return (dataSource || ds).export_(fields).success(function(res) {
       var fileName = res.fileName;
       var filePath = 'ws/rest/' + $scope._model + '/export/' + fileName;
       if (ds._page.total > res.exportSize) {
