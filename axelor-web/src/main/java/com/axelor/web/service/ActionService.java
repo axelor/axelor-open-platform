@@ -19,12 +19,16 @@
 package com.axelor.web.service;
 
 import com.axelor.auth.AuthUtils;
+import com.axelor.inject.Beans;
 import com.axelor.meta.ActionExecutor;
+import com.axelor.meta.db.repo.MetaMenuRepository;
 import com.axelor.meta.service.menu.MenuService;
 import com.axelor.rpc.ActionRequest;
+import com.axelor.rpc.Resource;
 import com.axelor.rpc.Response;
 import com.axelor.ui.QuickMenuService;
 import com.google.inject.servlet.RequestScoped;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -66,6 +70,29 @@ public class ActionService extends AbstractService {
     Response response = new Response();
     try {
       response.setData(quickMenus.get());
+      response.setStatus(Response.STATUS_SUCCESS);
+    } catch (Exception e) {
+      LOG.error(e.getMessage(), e);
+      response.setException(e);
+    }
+    return response;
+  }
+
+  @GET
+  @Path("menu/fav")
+  public Response favMenuBar() {
+    Response response = new Response();
+    MetaMenuRepository menus = Beans.get(MetaMenuRepository.class);
+    try {
+      response.setData(
+          menus
+              .all()
+              .filter("self.user = :__user__ and self.link is not null")
+              .order("-priority")
+              .fetch()
+              .stream()
+              .map(x -> Resource.toMap(x, "id", "version", "name", "link", "priority"))
+              .collect(Collectors.toList()));
       response.setStatus(Response.STATUS_SUCCESS);
     } catch (Exception e) {
       LOG.error(e.getMessage(), e);
