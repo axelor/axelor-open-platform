@@ -1478,12 +1478,14 @@ ui.directive('uiFilterBox', function() {
           var v2 = filter.value2;
 
           // if json date/datetime field
-          if (name.indexOf('::') > -1 && (type === 'date' || type === 'datetime')) {
+          if (type === 'date' || type === 'datetime') {
             switch (filter.operator) {
+            case '<=':
             case '>':
               filter.value = moment(v1).endOf('day').toDate();
               filter.value2 = undefined;
               break;
+            case '>=':
             case '<':
               filter.value = moment(v1).startOf('day').toDate();
               filter.value2 = undefined;
