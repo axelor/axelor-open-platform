@@ -710,8 +710,8 @@
             i ++;
           }
 
-          if (sortBy && sortBy.length) {
-            records = axelor.sortBy(records, (sortBy[0] || '').replace(/^\-/, ''));
+          if (sortBy && sortBy.length === 1 && sortBy[0] === 'sequence') {
+            records = axelor.sortBy(records, sortBy[0]);
           }
 
           that.trigger('change', records, page);
