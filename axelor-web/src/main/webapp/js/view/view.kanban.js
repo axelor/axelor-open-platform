@@ -337,6 +337,10 @@ ui.controller("KanbanCtrl", ['$scope', '$element', 'ViewService', 'ActionService
       $scope.$applyAsync();
     }
   };
+
+  $scope.isAllowedToExport = function () {
+    return false;
+  };
 }]);
 
 ui.directive('uiKanban', function () {
