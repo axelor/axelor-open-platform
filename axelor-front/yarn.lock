@@ -1488,10 +1488,11 @@ __metadata:
     "@types/react-transition-group": ^4.4.5
     "@types/testing-library__jest-dom": ^5.14.5
     "@vitejs/plugin-react-swc": ^3.0.0
-    axios: ^1.3.3
     bootstrap-icons: ^1.10.3
     clsx: ^1.2.1
+    immer: ^9.0.19
     jotai: ^2.0.2
+    jotai-immer: ^0.2.0
     jsdom: ^21.1.0
     lodash: ^4.17.21
     parse5: ^7.1.2
@@ -1508,17 +1509,6 @@ __metadata:
     vitest: ^0.28.5
   languageName: unknown
   linkType: soft
-
-"axios@npm:^1.3.3":
-  version: 1.3.3
-  resolution: "axios@npm:1.3.3"
-  dependencies:
-    follow-redirects: ^1.15.0
-    form-data: ^4.0.0
-    proxy-from-env: ^1.1.0
-  checksum: b734a4bc348e2fa27150a7d4289d783fa405feb3f79f8daf28fd05813a12c8525ae9d3854aafe7ba041b005a4a751a0ba3b923331ceed41296ae14c7e54e2f26
-  languageName: node
-  linkType: hard
 
 "babel-plugin-macros@npm:^3.1.0":
   version: 3.1.0
@@ -2424,16 +2414,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.15.0":
-  version: 1.15.2
-  resolution: "follow-redirects@npm:1.15.2"
-  peerDependenciesMeta:
-    debug:
-      optional: true
-  checksum: faa66059b66358ba65c234c2f2a37fcec029dc22775f35d9ad6abac56003268baf41e55f9ee645957b32c7d9f62baf1f0b906e68267276f54ec4b4c597c2b190
-  languageName: node
-  linkType: hard
-
 "for-each@npm:^0.3.3":
   version: 0.3.3
   resolution: "for-each@npm:0.3.3"
@@ -2748,7 +2728,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"immer@npm:^9.0.18":
+"immer@npm:^9.0.18, immer@npm:^9.0.19":
   version: 9.0.19
   resolution: "immer@npm:9.0.19"
   checksum: f02ee53989989c287cd548a3d817fccf0bfe56db919755ee94a72ea3ae78a00363fba93ee6c010fe54a664380c29c53d44ed4091c6a86cae60957ad2cfabc010
@@ -3139,6 +3119,17 @@ __metadata:
     graceful-fs: ^4.2.9
     picomatch: ^2.2.3
   checksum: 606b3e6077895baf8fb4ad4d08c134f37a6b81d5ba77ae654c942b1ae4b7294ab3b5a0eb93db34f129407b367970cf3b76bf5c80897b30f215f2bc8bf20a5f3f
+  languageName: node
+  linkType: hard
+
+"jotai-immer@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "jotai-immer@npm:0.2.0"
+  peerDependencies:
+    immer: "*"
+    jotai: ">=1.11.0"
+    react: ">=17.0.0"
+  checksum: 6860557e0e1550e5c7393b46632ecd90a803774c9b88f69a52b38bf14061ebc0a1de0c8484edd6b956d85de603dca5d06b50ed164bc12a83514c0bcf5d394a5c
   languageName: node
   linkType: hard
 
@@ -3883,13 +3874,6 @@ __metadata:
     object-assign: ^4.1.1
     react-is: ^16.13.1
   checksum: c056d3f1c057cb7ff8344c645450e14f088a915d078dcda795041765047fa080d38e5d626560ccaac94a4e16e3aa15f3557c1a9a8d1174530955e992c675e459
-  languageName: node
-  linkType: hard
-
-"proxy-from-env@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "proxy-from-env@npm:1.1.0"
-  checksum: ed7fcc2ba0a33404958e34d95d18638249a68c430e30fcb6c478497d72739ba64ce9810a24f53a7d921d0c065e5b78e3822759800698167256b04659366ca4d4
   languageName: node
   linkType: hard
 
