@@ -1,9 +1,10 @@
 import { ThemeProvider } from "@axelor/ui";
+import { Routes } from "./routes";
 
 function App() {
   return (
     <ThemeProvider>
-      <div></div>
+      <Routes />
     </ThemeProvider>
   );
 }
