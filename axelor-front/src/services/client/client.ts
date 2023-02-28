@@ -4,11 +4,13 @@ import { $request, $use } from "../http";
 // interceptors
 
 $use(async (args, next) => {
+  const { init = {} } = args;
   args.init = {
-    ...args.init,
+    ...init,
     credentials: "include",
     headers: {
-      Accept: "application/json, */*",
+      ...init.headers,
+      Accept: "application/json",
     },
   };
   return next();
