@@ -18,9 +18,9 @@
  */
 package com.axelor.db.tenants;
 
+import com.axelor.auth.pac4j.local.AxelorFormClient;
 import com.axelor.common.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Map;
@@ -43,7 +43,7 @@ import javax.servlet.http.HttpSession;
 public class PreSessionTenantFilter extends AbstractTenantFilter {
 
   private static final Set<String> LOGIN_OR_CALLBACK_PAGE =
-      ImmutableSet.of("/login.jsp", "/callback");
+      Set.of(AxelorFormClient.LOGIN_URL, "/callback");
 
   private boolean isLoginRequest(HttpServletRequest request) {
     return LOGIN_OR_CALLBACK_PAGE.contains(request.getServletPath());
