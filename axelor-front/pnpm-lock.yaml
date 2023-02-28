@@ -13,7 +13,9 @@ specifiers:
   '@types/testing-library__jest-dom': ^5.14.5
   '@vitejs/plugin-react-swc': ^3.2.0
   bootstrap-icons: ^1.10.3
+  bootstrap-sass: 2.3.2
   clsx: ^1.2.1
+  font-awesome: ^4.7.0
   immer: ^9.0.19
   jotai: ^2.0.2
   jotai-immer: ^0.2.0
@@ -36,7 +38,9 @@ dependencies:
   '@axelor/ui': 0.0.13_dsl2t6le5ionuvy6psyzfsg3gq
   '@babel/standalone': 7.21.2
   bootstrap-icons: 1.10.3
+  bootstrap-sass: 2.3.2
   clsx: 1.2.1
+  font-awesome: 4.7.0
   immer: 9.0.19
   jotai: 2.0.2_react@18.2.0
   jotai-immer: 0.2.0_cacwipmf43ym6kjnb5peobozjq
@@ -1259,6 +1263,10 @@ packages:
     resolution: {integrity: sha512-7Qvj0j0idEm/DdX9Q0CpxAnJYqBCFCiUI6qzSPYfERMcokVuV9Mdm/AJiVZI8+Gawe4h/l6zFcOzvV7oXCZArw==}
     dev: false
 
+  /bootstrap-sass/2.3.2:
+    resolution: {integrity: sha512-wMrr+dc1ORsOrf74+rHNkyhgRfA6tE3xzY4zacm6mDGgYDhkYHyLP6rybIqDGihjXo9nCL9zqUFGGXPcHSooHw==}
+    dev: false
+
   /bootstrap/5.2.3_@popperjs+core@2.11.6:
     resolution: {integrity: sha512-cEKPM+fwb3cT8NzQZYEu4HilJ3anCrWqh3CHAok1p9jXqMPsPTBhU25fBckEJHJ/p+tTxTFTsFQGM+gaHpi3QQ==}
     peerDependencies:
@@ -1739,6 +1747,11 @@ packages:
     resolution: {integrity: sha512-bX/u4FJ+F0Pp6b/8Q9W8Br/JaLJ7rrhOJAzai9JU8bh4BPdOjEATy4pxHcbBBxFjPN4d1oHy7/KqknEdOetm9w==}
     dependencies:
       tabbable: 6.1.1
+    dev: false
+
+  /font-awesome/4.7.0:
+    resolution: {integrity: sha512-U6kGnykA/6bFmg1M/oT9EkFeIYv7JlX3bozwQJWiiLz6L0w3F5vBVPxHlwyX/vtNq1ckcpRKOB9f2Qal/VtFpg==}
+    engines: {node: '>=0.10.3'}
     dev: false
 
   /for-each/0.3.3:
