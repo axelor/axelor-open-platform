@@ -3,7 +3,7 @@ description = 'Axelor\'s Front-end'
 buildscript {
     repositories repos
     dependencies {
-        classpath "com.github.node-gradle:gradle-node-plugin:3.5.0"
+        classpath "com.github.node-gradle:gradle-node-plugin:3.5.1"
     }
 }
 
@@ -11,26 +11,25 @@ apply plugin: 'base'
 apply plugin: 'com.github.node-gradle.node'
 
 node {
-    version = '16.18.1'
-    yarnVersion = '1.22.19'
+    version = '18.14.0'
+    pnpmVersion = '7.28.0'
     download = true
 }
 
-task buildFront(type: YarnTask) {
+task buildFront(type: PnpmTask) {
     group = 'axelor'
     description = 'Build Front-end'
 
     outputs.dir('dist')
-    inputs.files('package.json', 'yarn.lock')
+    inputs.files('package.json', 'pnpm-lock.yaml')
     inputs.dir('src')
     inputs.dir('public')
-    inputs.dir(fileTree(".yarn"))
 
     dependsOn 'installFrontDeps'
     args = ["run", "build"]
 }
 
-task installFrontDeps(type: YarnTask) {
+task installFrontDeps(type: PnpmTask) {
     group = 'axelor'
     description = 'Install Front-end dependencies'
 
@@ -38,5 +37,5 @@ task installFrontDeps(type: YarnTask) {
 }
 
 clean {
-    delete ".yarn/cache", ".yarn/unplugged", ".yarn/install-state.gz", "dist", "node_modules"
+    delete "dist", "node_modules"
 }

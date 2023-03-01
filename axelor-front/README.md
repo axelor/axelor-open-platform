@@ -7,14 +7,22 @@ The next generation web frontend of Axelor.
 ### Engines
 
 - node >= v18.14.0
-- yarn >= 3.4.1
+- pnpm >= 7.28.0
 
 ## Quickstart
+
+Run following commands to enable `pnpn` package manager with `corepack`:
+
+```bash
+# pnpm
+corepack enable
+corepack prepare pnpm@latest --activate
+```
 
 Run following command from terminal to install dependencies:
 
 ```bash
-yarn install
+pnpm install
 ```
 
 In [.env](.env), update the proxy settings. This will forward requests to that instance :
@@ -28,7 +36,7 @@ VITE_PROXY_CONTEXT=/
 Then, to start dev server, run following command from terminal:
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 Wait and the application should start in browser at: http://localhost:5173/
@@ -38,7 +46,7 @@ Wait and the application should start in browser at: http://localhost:5173/
 Run following command to create a directory with a production build of your app :
 
 ```
-yarn build
+pnpm build
 ```
 
 Production build are available under `dist` directory.
