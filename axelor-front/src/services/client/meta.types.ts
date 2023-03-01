@@ -127,7 +127,8 @@ export interface Button extends Widget {
 export interface ButtonGroup extends Container {}
 
 export interface MenuItem extends Widget {
-  title?: string;
+  name: string;
+  title: string;
   xmlId?: string;
   parent?: string;
   icon?: string;
@@ -616,8 +617,8 @@ export interface ActionView {
   xmlId?: string;
   actionId?: number;
   model?: string;
-  name?: string;
-  title?: string;
+  name: string;
+  title: string;
   icon?: string;
   home?: boolean;
   domain?: string;
