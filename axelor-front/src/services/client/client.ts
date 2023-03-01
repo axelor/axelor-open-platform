@@ -1,16 +1,30 @@
 import { isArrayLikeObject, isPlainObject } from "lodash";
 import { $request, $use } from "../http";
 
+const readCookie = (name: string) => {
+  const match = document.cookie.match(
+    new RegExp("(^|;\\s*)(" + name + ")=([^;]*)")
+  );
+  return match ? decodeURIComponent(match[3]) : null;
+};
+
 // interceptors
 
 $use(async (args, next) => {
   const { init = {} } = args;
+  const token = readCookie("CSRF-TOKEN");
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+  };
+
+  if (token) headers["X-CSRF-Token"] = token;
+
   args.init = {
     ...init,
     credentials: "include",
     headers: {
       ...init.headers,
-      Accept: "application/json",
+      ...headers,
     },
   };
   return next();
