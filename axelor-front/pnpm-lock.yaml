@@ -1,6 +1,9 @@
 lockfileVersion: 5.4
 
 patchedDependencies:
+  font-awesome@4.7.0:
+    hash: b36n7p33c4ewtt5v6is5moc24u
+    path: patches/font-awesome@4.7.0.patch
   bootstrap-sass@2.3.2:
     hash: amlqeundhlkijzm252e5cmoznm
     path: patches/bootstrap-sass@2.3.2.patch
@@ -45,7 +48,7 @@ dependencies:
   bootstrap-icons: 1.10.3
   bootstrap-sass: 2.3.2_amlqeundhlkijzm252e5cmoznm
   clsx: 1.2.1
-  font-awesome: 4.7.0
+  font-awesome: 4.7.0_b36n7p33c4ewtt5v6is5moc24u
   immer: 9.0.19
   jotai: 2.0.2_react@18.2.0
   jotai-immer: 0.2.0_cacwipmf43ym6kjnb5peobozjq
@@ -1755,10 +1758,11 @@ packages:
       tabbable: 6.1.1
     dev: false
 
-  /font-awesome/4.7.0:
+  /font-awesome/4.7.0_b36n7p33c4ewtt5v6is5moc24u:
     resolution: {integrity: sha512-U6kGnykA/6bFmg1M/oT9EkFeIYv7JlX3bozwQJWiiLz6L0w3F5vBVPxHlwyX/vtNq1ckcpRKOB9f2Qal/VtFpg==}
     engines: {node: '>=0.10.3'}
     dev: false
+    patched: true
 
   /for-each/0.3.3:
     resolution: {integrity: sha512-jqYfLp7mo9vIyQf8ykW2v7A+2N4QjeCeI5+Dz9XraiO1ign81wjiH7Fb9vSOWvQfNtmSa4H2RoQTrrXivdUZmw==}

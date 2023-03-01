@@ -1,0 +1,113 @@
+diff --git a/scss/_core.scss b/scss/_core.scss
+index 7425ef85fc80ce6b035065906fc27490715e3733..04ab1e5e3051842e26fe9bd3fa8e732dfc87df37 100644
+--- a/scss/_core.scss
++++ b/scss/_core.scss
+@@ -1,9 +1,11 @@
+ // Base Class Definition
+ // -------------------------
+ 
++@use "sass:list";
++
+ .#{$fa-css-prefix} {
+   display: inline-block;
+-  font: normal normal normal #{$fa-font-size-base}/#{$fa-line-height-base} FontAwesome; // shortening font declaration
++  font: normal normal normal list.slash($fa-font-size-base, $fa-line-height-base) FontAwesome; // shortening font declaration
+   font-size: inherit; // can't have font-size inherit on line above, so need to override
+   text-rendering: auto; // optimizelegibility throws things off #1094
+   -webkit-font-smoothing: antialiased;
+diff --git a/scss/_fixed-width.scss b/scss/_fixed-width.scss
+index b221c98133a4d4a8449c848ccb69bf631d1c3e5d..5411f9538569318a88d1d3bb39413ad6c1a38458 100644
+--- a/scss/_fixed-width.scss
++++ b/scss/_fixed-width.scss
+@@ -1,6 +1,8 @@
+ // Fixed Width Icons
+ // -------------------------
++@use "sass:math";
++
+ .#{$fa-css-prefix}-fw {
+-  width: (18em / 14);
++  width: math.div(18em, 14);
+   text-align: center;
+ }
+diff --git a/scss/_larger.scss b/scss/_larger.scss
+index 41e9a8184aa287c5970cc8415e3c5a6310dc9f79..a4065941fa04d034c30cf5a6287d06eb72813b6c 100644
+--- a/scss/_larger.scss
++++ b/scss/_larger.scss
+@@ -2,9 +2,11 @@
+ // -------------------------
+ 
+ /* makes the font 33% larger relative to the icon container */
++@use "sass:math";
++
+ .#{$fa-css-prefix}-lg {
+-  font-size: (4em / 3);
+-  line-height: (3em / 4);
++  font-size: math.div(4em, 3);
++  line-height: (3em * 0.25);
+   vertical-align: -15%;
+ }
+ .#{$fa-css-prefix}-2x { font-size: 2em; }
+diff --git a/scss/_list.scss b/scss/_list.scss
+index 7d1e4d54d6c293333eb638aa56feba7b62e15564..988e6f87a6666c6308d35d3e42a71fe8fad3d2ec 100644
+--- a/scss/_list.scss
++++ b/scss/_list.scss
+@@ -1,6 +1,8 @@
+ // List Icons
+ // -------------------------
+ 
++@use "sass:math";
++
+ .#{$fa-css-prefix}-ul {
+   padding-left: 0;
+   margin-left: $fa-li-width;
+@@ -11,9 +13,9 @@
+   position: absolute;
+   left: -$fa-li-width;
+   width: $fa-li-width;
+-  top: (2em / 14);
++  top: math.div(2em, 14);
+   text-align: center;
+   &.#{$fa-css-prefix}-lg {
+-    left: -$fa-li-width + (4em / 14);
++    left: -$fa-li-width + math.div(4em, 14);
+   }
+ }
+diff --git a/scss/_mixins.scss b/scss/_mixins.scss
+index c3bbd5745d35bebda3e16ce18aeff7a4a0ce5ae1..86f51385b8cfd78ee5e7723fd2079e00f57e08f8 100644
+--- a/scss/_mixins.scss
++++ b/scss/_mixins.scss
+@@ -1,9 +1,11 @@
+ // Mixins
+ // --------------------------
+ 
++@use "sass:list";
++
+ @mixin fa-icon() {
+   display: inline-block;
+-  font: normal normal normal #{$fa-font-size-base}/#{$fa-line-height-base} FontAwesome; // shortening font declaration
++  font: normal normal normal list.slash($fa-font-size-base, $fa-line-height-base) FontAwesome; // shortening font declaration
+   font-size: inherit; // can't have font-size inherit on line above, so need to override
+   text-rendering: auto; // optimizelegibility throws things off #1094
+   -webkit-font-smoothing: antialiased;
+diff --git a/scss/_variables.scss b/scss/_variables.scss
+index 498fc4a087c614614166df2e9f08bb5e0071daf4..61062f9719440f6116d07414553bb41140d9d26e 100644
+--- a/scss/_variables.scss
++++ b/scss/_variables.scss
+@@ -1,6 +1,8 @@
+ // Variables
+ // --------------------------
+ 
++@use "sass:math";
++
+ $fa-font-path:        "../fonts" !default;
+ $fa-font-size-base:   14px !default;
+ $fa-line-height-base: 1 !default;
+@@ -9,7 +11,7 @@ $fa-css-prefix:       fa !default;
+ $fa-version:          "4.7.0" !default;
+ $fa-border-color:     #eee !default;
+ $fa-inverse:          #fff !default;
+-$fa-li-width:         (30em / 14) !default;
++$fa-li-width:         math.div(30em, 14) !default;
+ 
+ $fa-var-500px: "\f26e";
+ $fa-var-address-book: "\f2b9";

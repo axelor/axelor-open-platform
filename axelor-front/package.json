@@ -51,7 +51,8 @@
   "packageManager": "pnpm@7.28.0",
   "pnpm": {
     "patchedDependencies": {
-      "bootstrap-sass@2.3.2": "patches/bootstrap-sass@2.3.2.patch"
+      "bootstrap-sass@2.3.2": "patches/bootstrap-sass@2.3.2.patch",
+      "font-awesome@4.7.0": "patches/font-awesome@4.7.0.patch"
     }
   }
 }
