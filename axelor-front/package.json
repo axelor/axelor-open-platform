@@ -48,5 +48,10 @@
     "vite-plugin-svgr": "^2.4.0",
     "vitest": "^0.29.2"
   },
-  "packageManager": "pnpm@7.28.0"
+  "packageManager": "pnpm@7.28.0",
+  "pnpm": {
+    "patchedDependencies": {
+      "bootstrap-sass@2.3.2": "patches/bootstrap-sass@2.3.2.patch"
+    }
+  }
 }

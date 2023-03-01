@@ -1,5 +1,10 @@
 lockfileVersion: 5.4
 
+patchedDependencies:
+  bootstrap-sass@2.3.2:
+    hash: amlqeundhlkijzm252e5cmoznm
+    path: patches/bootstrap-sass@2.3.2.patch
+
 specifiers:
   '@axelor/ui': ^0.0.13
   '@babel/standalone': ^7.21.2
@@ -38,7 +43,7 @@ dependencies:
   '@axelor/ui': 0.0.13_dsl2t6le5ionuvy6psyzfsg3gq
   '@babel/standalone': 7.21.2
   bootstrap-icons: 1.10.3
-  bootstrap-sass: 2.3.2
+  bootstrap-sass: 2.3.2_amlqeundhlkijzm252e5cmoznm
   clsx: 1.2.1
   font-awesome: 4.7.0
   immer: 9.0.19
@@ -1263,9 +1268,10 @@ packages:
     resolution: {integrity: sha512-7Qvj0j0idEm/DdX9Q0CpxAnJYqBCFCiUI6qzSPYfERMcokVuV9Mdm/AJiVZI8+Gawe4h/l6zFcOzvV7oXCZArw==}
     dev: false
 
-  /bootstrap-sass/2.3.2:
+  /bootstrap-sass/2.3.2_amlqeundhlkijzm252e5cmoznm:
     resolution: {integrity: sha512-wMrr+dc1ORsOrf74+rHNkyhgRfA6tE3xzY4zacm6mDGgYDhkYHyLP6rybIqDGihjXo9nCL9zqUFGGXPcHSooHw==}
     dev: false
+    patched: true
 
   /bootstrap/5.2.3_@popperjs+core@2.11.6:
     resolution: {integrity: sha512-cEKPM+fwb3cT8NzQZYEu4HilJ3anCrWqh3CHAok1p9jXqMPsPTBhU25fBckEJHJ/p+tTxTFTsFQGM+gaHpi3QQ==}
