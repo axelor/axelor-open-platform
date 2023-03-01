@@ -21,13 +21,55 @@ package com.axelor.auth.pac4j;
 import io.buji.pac4j.profile.ShiroProfileManager;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.pac4j.core.config.Config;
+import org.pac4j.core.context.WebContext;
+import org.pac4j.core.context.session.SessionStore;
 import org.pac4j.core.engine.DefaultLogoutLogic;
+import org.pac4j.core.http.adapter.HttpActionAdapter;
+import org.pac4j.core.http.ajax.AjaxRequestResolver;
 
 @Singleton
 public class AxelorLogoutLogic extends DefaultLogoutLogic {
 
+  private final AjaxRequestResolver ajaxRequestResolver;
+  private final boolean exclusive;
+
   @Inject
-  public AxelorLogoutLogic() {
+  public AxelorLogoutLogic(
+      AjaxRequestResolver ajaxRequestResolver, ClientListProvider clientListProvider) {
+    this.ajaxRequestResolver = ajaxRequestResolver;
+    this.exclusive = clientListProvider.isExclusive();
     setProfileManagerFactory(ShiroProfileManager::new);
+  }
+
+  @Override
+  public Object perform(
+      WebContext context,
+      SessionStore sessionStore,
+      Config config,
+      HttpActionAdapter httpActionAdapter,
+      String defaultUrl,
+      String inputLogoutUrlPattern,
+      Boolean inputLocalLogout,
+      Boolean inputDestroySession,
+      Boolean inputCentralLogout) {
+
+    final String redirectUrl =
+        exclusive
+                || Boolean.TRUE.equals(inputCentralLogout)
+                || !ajaxRequestResolver.isAjax(context, sessionStore)
+            ? defaultUrl
+            : null;
+
+    return super.perform(
+        context,
+        sessionStore,
+        config,
+        httpActionAdapter,
+        redirectUrl,
+        inputLogoutUrlPattern,
+        inputLocalLogout,
+        inputDestroySession,
+        inputCentralLogout);
   }
 }
