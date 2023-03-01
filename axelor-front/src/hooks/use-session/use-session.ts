@@ -3,6 +3,7 @@ import { SessionInfo } from "@/services/client/session";
 import { atom, useAtom } from "jotai";
 
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const infoAtom = atom<SessionInfo | null>(null);
 
@@ -10,6 +11,7 @@ export function useSession() {
   const [info, setInfo] = useAtom(infoAtom);
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const login = useCallback(async (username: string, password: string) => {
     await session
@@ -24,7 +26,7 @@ export function useSession() {
       await session.logout();
     } catch (e) {
     } finally {
-      setInfo(null);
+      navigate(0);
     }
   }, []);
 
