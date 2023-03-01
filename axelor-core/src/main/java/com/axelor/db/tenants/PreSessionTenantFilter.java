@@ -18,13 +18,11 @@
  */
 package com.axelor.db.tenants;
 
-import com.axelor.auth.pac4j.local.AxelorFormClient;
 import com.axelor.common.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Map;
-import java.util.Set;
 import javax.inject.Singleton;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -42,11 +40,10 @@ import javax.servlet.http.HttpSession;
 @Singleton
 public class PreSessionTenantFilter extends AbstractTenantFilter {
 
-  private static final Set<String> LOGIN_OR_CALLBACK_PAGE =
-      Set.of(AxelorFormClient.LOGIN_URL, "/callback");
+  private static final String LOGIN_PAGE = "/callback";
 
   private boolean isLoginRequest(HttpServletRequest request) {
-    return LOGIN_OR_CALLBACK_PAGE.contains(request.getServletPath());
+    return LOGIN_PAGE.equals(request.getServletPath());
   }
 
   private boolean isLoginSubmit(HttpServletRequest request) {
