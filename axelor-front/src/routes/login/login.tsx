@@ -11,18 +11,24 @@ const YEAR = new Date().getFullYear();
 export function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showError, setShowError] = useState(false);
 
   const location = useLocation();
-  const { login, info, error } = useSession();
+  const { login, info, error, loading } = useSession();
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     (event) => {
       event.preventDefault();
-      login(username, password);
+      login(username, password).then(() => {
+        if (error) {
+          setShowError(true);
+        }
+      });
     },
     [username, password]
   );
 
+  if (loading) return null;
   if (info) {
     let { from } = location.state || { from: { pathname: "/" } };
     if (from === "/login") from = "/";
@@ -72,7 +78,7 @@ export function Login() {
               Remember me
             </Box>
           </Box>
-          {error && (
+          {error && showError && (
             <Box
               as="p"
               color="danger"
@@ -83,7 +89,7 @@ export function Login() {
               pb={2}
               className={styles.error}
             >
-              <span>Failed!</span> <span>{error}</span>
+              <span>Wrong username or password</span>
             </Box>
           )}
           <Button type="submit" variant="primary" mt={2} w={100}>

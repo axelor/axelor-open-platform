@@ -1,4 +1,4 @@
-import { useSessionInfo } from "@/hooks/use-session";
+import { useSession } from "@/hooks/use-session";
 import {
   createHashRouter,
   Navigate,
@@ -12,7 +12,7 @@ import { Root } from "./root";
 import { System } from "./system";
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
-  const { info, loading } = useSessionInfo();
+  const { info, loading } = useSession();
   const location = useLocation();
   if (loading) return <div>Loading</div>;
   if (info) {

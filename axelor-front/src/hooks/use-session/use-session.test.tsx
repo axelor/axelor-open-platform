@@ -1,6 +1,6 @@
 import { act, fireEvent, render, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
-import { useSession, useSessionInfo } from "./use-session";
+import { useSession } from "./use-session";
 
 vi.mock("../../services/client/session", () => {
   let user: string | null = null;
@@ -47,7 +47,7 @@ afterEach(() => {
 });
 
 const App = () => {
-  const { loading, info } = useSessionInfo();
+  const { loading, info } = useSession();
   if (loading) {
     return <div data-testid="loading">Loading...</div>;
   }
