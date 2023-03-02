@@ -1,4 +1,4 @@
-import { useTabs } from "@/hooks/use-tabs/use-tabs";
+import { useTabs } from "@/hooks/use-tabs";
 import { Box, NavTabs as Tabs } from "@axelor/ui";
 import { useCallback, useMemo } from "react";
 import { Outlet } from "react-router-dom";
