@@ -26,7 +26,7 @@ describe("data tests", async () => {
 
     // the mock loader doesn't filter/sort/page/select
     expect(res).toBeDefined();
-    expect(res.totalCount).toBeGreaterThan(0);
+    expect(res.page?.totalCount).toBeGreaterThan(0);
     expect(res.records).toBeDefined();
     expect(res.records.length).toBeGreaterThan(0);
     expect(res.records[0].id).toBeGreaterThan(0);

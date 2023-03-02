@@ -13,10 +13,14 @@ export type SearchOptions = {
   };
 };
 
-export type SearchResult = {
+export type SearchPage = {
   offset?: number;
   limit?: number;
-  totalCount: number;
+  totalCount?: number;
+};
+
+export type SearchResult = {
+  page: SearchPage;
   records: DataRecord[];
 };
 
@@ -71,10 +75,12 @@ export class DataSource {
 
       return status === 0
         ? {
-            offset,
-            limit,
-            totalCount,
             records,
+            page: {
+              offset,
+              limit,
+              totalCount,
+            },
           }
         : Promise.reject(500);
     }
