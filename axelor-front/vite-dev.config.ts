@@ -1,5 +1,8 @@
+import react from "@vitejs/plugin-react";
+import jotaiDebugLabel from "jotai/babel/plugin-debug-label";
+import jotaiReactRefresh from "jotai/babel/plugin-react-refresh";
 import { loadEnv, mergeConfig } from "vite";
-import { defineConfig } from "vitest/config";
+import { defineConfig, UserConfig } from "vitest/config";
 import viteConfig from "./vite.config";
 
 let env = loadEnv("dev", process.cwd(), "");
@@ -7,9 +10,19 @@ let base = env.VITE_PROXY_CONTEXT ?? "/";
 
 base = base.endsWith("/") ? base : `${base}/`;
 
+const { plugins, ...conf } = viteConfig as UserConfig;
+
+// replace react plugin
+plugins[0] = react({
+  babel: {
+    plugins: [jotaiDebugLabel, jotaiReactRefresh],
+  },
+});
+
 export default mergeConfig(
-  viteConfig,
+  conf,
   defineConfig({
+    plugins,
     base,
     server: {
       proxy: ["callback", "logout", "img", "ws", "js", "websocket"].reduce(
