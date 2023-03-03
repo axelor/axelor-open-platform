@@ -1,6 +1,7 @@
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useMeta } from "@/hooks/use-meta";
 import { useRoute } from "@/hooks/use-route";
+import { useSession } from "@/hooks/use-session";
 import { useTabs } from "@/hooks/use-tabs";
 import { ActionView } from "@/services/client/meta.types";
 import { useEffect, useRef } from "react";
@@ -20,21 +21,27 @@ export function View() {
   const { action } = useParams();
   const { active, items, open } = useTabs();
   const { findActionView } = useMeta();
+  const { info } = useSession();
 
   const pathRef = useRef<string>();
 
   useAsyncEffect(async () => {
-    if (action) {
+    const name = action ?? info?.user?.action ?? active?.name;
+    if (name) {
       let tab = items.find((x) => x.name === action);
       if (tab === undefined) {
-        tab = await findActionView(action);
+        tab = await findActionView(name);
       }
       if (tab) {
         pathRef.current = getURL(tab);
         open(tab);
+        // if coming from other places
+        if (!action) {
+          redirect(pathRef.current);
+        }
       }
     }
-  }, [action, items, open]);
+  }, [action, active, items, open]);
 
   useEffect(() => {
     const tab = active;
