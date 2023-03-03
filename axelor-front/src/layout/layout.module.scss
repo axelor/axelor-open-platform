@@ -1,8 +1,5 @@
-.hide {
-  display: none !important;
-}
-
 .content {
+  position: relative;
   max-height: fit-content;
   min-height: 1px;
 }
@@ -10,4 +7,17 @@
 .sidebar {
   overflow: auto;
   width: 250px;
+}
+
+.page {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgb(var(--bs-body-bg-rgb));
+  z-index: 1;
+}
+
+.page:empty {
+  display: none;
 }

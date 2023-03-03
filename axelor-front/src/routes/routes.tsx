@@ -3,13 +3,14 @@ import {
   createHashRouter,
   Navigate,
   RouterProvider,
-  useLocation,
+  useLocation
 } from "react-router-dom";
 import { About } from "./about";
 import { Login } from "./login";
 import { Profile } from "./profile";
 import { Root } from "./root";
 import { System } from "./system";
+import { View } from "./view";
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const { info, loading } = useSession();
@@ -35,8 +36,12 @@ const router = createHashRouter([
     ),
     children: [
       {
-        path: "/ds",
-        element: <div></div>,
+        path: "/",
+        element: <View />,
+      },
+      {
+        path: "/ds/:action/:type?/:id?",
+        element: <View />,
       },
       {
         path: "/about",
