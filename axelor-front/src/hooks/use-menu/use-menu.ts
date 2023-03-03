@@ -1,7 +1,8 @@
 import * as meta from "@/services/client/meta";
 import { MenuItem } from "@/services/client/meta.types";
 import { atom, useAtom } from "jotai";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
+import { useAsyncEffect } from "../use-async-effect";
 
 const menusAtom = atom<MenuItem[]>([]);
 
@@ -9,7 +10,8 @@ export function useMenu() {
   const [menus, setMenus] = useAtom(menusAtom);
   const [loading, setLoading] = useState(false);
 
-  const load = useCallback(async () => {
+  useAsyncEffect(async () => {
+    if (loading || menus.length) return;
     setLoading(true);
     try {
       const res = await meta.menus("all");
@@ -17,11 +19,6 @@ export function useMenu() {
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  useEffect(() => {
-    if (loading || menus.length) return;
-    load();
   }, []);
 
   return {

@@ -1,3 +1,4 @@
+import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useMeta } from "@/hooks/use-meta";
 import { useRoute } from "@/hooks/use-route";
 import { useTabs } from "@/hooks/use-tabs";
@@ -22,19 +23,16 @@ export function View() {
 
   const pathRef = useRef<string>();
 
-  useEffect(() => {
+  useAsyncEffect(async () => {
     if (action) {
-      const load = async () => {
-        let tab = items.find((x) => x.name === action);
-        if (tab === undefined) {
-          tab = await findActionView(action);
-        }
-        if (tab) {
-          pathRef.current = getURL(tab);
-          open(tab);
-        }
-      };
-      load();
+      let tab = items.find((x) => x.name === action);
+      if (tab === undefined) {
+        tab = await findActionView(action);
+      }
+      if (tab) {
+        pathRef.current = getURL(tab);
+        open(tab);
+      }
     }
   }, [action, items, open]);
 

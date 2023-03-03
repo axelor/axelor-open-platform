@@ -2,8 +2,9 @@ import * as session from "@/services/client/session";
 import { SessionInfo } from "@/services/client/session";
 import { atom, useAtom } from "jotai";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAsyncEffect } from "../use-async-effect";
 
 const infoAtom = atom<SessionInfo | null>(null);
 
@@ -30,12 +31,10 @@ export function useSession() {
     }
   }, []);
 
-  useEffect(() => {
+  useAsyncEffect(async () => {
     if (loading || info) return;
-    // this code will execute twice during development
-    // this is because of the react strict-mode
     setLoading(true);
-    session
+    await session
       .info()
       .then((x) => (x.user ? x : null))
       .then((x) => setInfo(x))
