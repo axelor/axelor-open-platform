@@ -62,7 +62,7 @@ export function useDataStore(
 
       return res;
     },
-    [ds, opts, setOpts, setRecords, setPage]
+    [prepareOptions, ds, setOpts, setRecords, setPage]
   );
 
   const doRead = useCallback(
@@ -110,13 +110,16 @@ export function useDataStore(
 
       return res;
     },
-    [ds, setRecords, setPage]
+    [ds, records, setRecords, setPage]
   );
 
-  const doExport = useCallback(async (options: SearchOptions) => {
-    const args = prepareOptions(options);
-    return ds.export(args);
-  }, []);
+  const doExport = useCallback(
+    async (options: SearchOptions) => {
+      const args = prepareOptions(options);
+      return ds.export(args);
+    },
+    [ds, prepareOptions]
+  );
 
   return {
     records,

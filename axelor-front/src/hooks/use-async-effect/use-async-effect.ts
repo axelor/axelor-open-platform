@@ -38,5 +38,5 @@ export function useAsyncEffect(
         result();
       }
     };
-  }, deps);
+  }, deps); // eslint-disable-line react-hooks/exhaustive-deps
 }

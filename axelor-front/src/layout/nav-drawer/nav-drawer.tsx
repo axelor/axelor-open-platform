@@ -27,6 +27,10 @@ function load(res: MenuItem[]) {
         : ({ color }) => <Icon as={BiListIcon} style={{ color }} />;
     }
 
+    if (iconBackground) {
+      props.iconColor = iconBackground;
+    }
+
     return props;
   };
   return menus.filter((item) => !item.parent).map(toNavItemProps);

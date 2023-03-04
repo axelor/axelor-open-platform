@@ -1,5 +1,4 @@
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import { vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import * as parser from "./parser";
 
@@ -147,6 +146,7 @@ describe("parser", () => {
   });
 
   it("should not allow javascript: URLs", () => {
+    // eslint-disable-next-line no-script-url
     const ctx = { x: `javascript: alert(1)`, y: "some?value=1" };
     expect(() =>
       parser.parse(`<a href="javaScript: alert(1)">Test</a>`)(ctx)
