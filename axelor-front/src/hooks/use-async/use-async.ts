@@ -1,4 +1,5 @@
-import { DependencyList, useCallback, useEffect, useState } from "react";
+import { DependencyList, useState } from "react";
+import { useAsyncEffect } from "../use-async-effect";
 
 export function useAsync<T>(
   func: () => Promise<T>,
@@ -12,7 +13,7 @@ export function useAsync<T>(
   const [data, setData] = useState<T>();
   const [error, setError] = useState<any>();
 
-  const load = useCallback(async () => {
+  useAsyncEffect(async () => {
     setState("loading");
     try {
       const res = await func();
@@ -22,12 +23,7 @@ export function useAsync<T>(
       setError(e);
       setState("hasError");
     }
-  }, deps ?? []);
-
-  useEffect(() => {
-    if (state) return;
-    load();
-  }, [load]);
+  }, deps);
 
   return {
     state: state ?? "loading",
