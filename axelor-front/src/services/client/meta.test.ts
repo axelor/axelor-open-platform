@@ -1,7 +1,3 @@
-// setup mock
-import setupMock from "./mock/setup";
-setupMock();
-
 import * as meta from "./meta";
 
 describe("meta tests", async () => {

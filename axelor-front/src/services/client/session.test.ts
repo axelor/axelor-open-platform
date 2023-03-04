@@ -1,7 +1,3 @@
-// setup mock
-import setupMock from "./mock/setup";
-setupMock();
-
 import * as session from "./session";
 
 describe("session tests", async () => {

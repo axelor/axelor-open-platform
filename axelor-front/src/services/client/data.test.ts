@@ -1,7 +1,3 @@
-// setup mock
-import setupMock from "./mock/setup";
-setupMock();
-
 import { DataSource } from "./data";
 
 describe("data tests", async () => {
