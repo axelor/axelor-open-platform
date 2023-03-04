@@ -1,9 +1,9 @@
+import { navigate } from "@/routes";
 import * as session from "@/services/client/session";
 import { SessionInfo } from "@/services/client/session";
 import { atom, useAtom } from "jotai";
 
 import { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAsyncEffect } from "../use-async-effect";
 
 const infoAtom = atom<SessionInfo | null>(null);
@@ -12,7 +12,6 @@ export function useSession() {
   const [info, setInfo] = useAtom(infoAtom);
   const [error, setError] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const login = useCallback(async (username: string, password: string) => {
     await session

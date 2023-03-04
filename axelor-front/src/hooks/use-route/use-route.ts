@@ -1,21 +1,21 @@
+import { navigate } from "@/routes";
 import { useCallback, useEffect, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 export function useRoute() {
   const location = useLocation();
-  const navigate = useNavigate();
 
-  const refs = useRef({ location, navigate });
+  const refs = useRef({ location });
 
   const redirect = useCallback((path: string) => {
     if (path !== refs.current.location.pathname) {
-      refs.current.navigate(path);
+      navigate(path);
     }
   }, []);
 
   useEffect(() => {
-    refs.current = { location, navigate };
-  }, [location, navigate]);
+    refs.current = { location };
+  }, [location]);
 
   return {
     location,

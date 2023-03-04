@@ -3,7 +3,7 @@ import {
   createHashRouter,
   Navigate,
   RouterProvider,
-  useLocation
+  useLocation,
 } from "react-router-dom";
 import { About } from "./about";
 import { Login } from "./login";
@@ -58,6 +58,8 @@ const router = createHashRouter([
     ],
   },
 ]);
+
+export const navigate = router.navigate;
 
 export function Routes() {
   return <RouterProvider router={router} />;

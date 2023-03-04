@@ -1,4 +1,4 @@
-import { act, fireEvent, render, waitFor } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import { vi } from "vitest";
 import { useSession } from "./use-session";
 
@@ -87,14 +87,14 @@ const LogoutButton = () => {
 
 describe("use-session tests", async () => {
   it("should handle session", async () => {
-    const res = await act(() => render(<App />));
+    const res = render(<App />);
 
-    const login = await waitFor(() => res.getByTestId("login"));
+    const login = await res.findByTestId("login");
     expect(login).toHaveTextContent("Login");
 
     fireEvent.click(login);
 
-    const logout = await waitFor(() => res.getByTestId("logout"));
+    const logout = await res.findByTestId("logout");
     expect(logout).toHaveTextContent("Logout");
   });
 });
