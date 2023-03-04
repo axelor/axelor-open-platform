@@ -10,7 +10,8 @@
     "build:staging": "tsc && vite build --config vite-staging.config.ts",
     "preview": "vite preview",
     "format": "prettier --write \"**/*.{ts,tsx,md,json,css,scss,html}\"",
-    "test": "vitest"
+    "test": "vitest",
+    "lint": "eslint src"
   },
   "dependencies": {
     "@axelor/ui": "^0.0.13",
@@ -40,6 +41,9 @@
     "@types/react-transition-group": "^4.4.5",
     "@types/testing-library__jest-dom": "^5.14.5",
     "@vitejs/plugin-react": "^3.1.0",
+    "eslint": "^8.35.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-config-react-app": "^7.0.1",
     "prettier": "^2.8.4",
     "rimraf": "^4.1.2",
     "sass": "^1.58.3",
@@ -53,6 +57,12 @@
     "patchedDependencies": {
       "bootstrap-sass@2.3.2": "patches/bootstrap-sass@2.3.2.patch",
       "font-awesome@4.7.0": "patches/font-awesome@4.7.0.patch"
+    },
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "@babel/*",
+        "@eslint/*"
+      ]
     }
   }
 }
