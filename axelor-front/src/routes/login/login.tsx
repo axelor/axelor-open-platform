@@ -19,13 +19,13 @@ export function Login() {
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     (event) => {
       event.preventDefault();
-      login(username, password).then(() => {
+      login({ username, password }).then(() => {
         if (error) {
           setShowError(true);
         }
       });
     },
-    [username, password]
+    [error, login, username, password]
   );
 
   if (loading) return null;

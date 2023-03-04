@@ -70,7 +70,15 @@ const App = () => {
 const LoginButton = () => {
   const { login } = useSession();
   return (
-    <button data-testid="login" onClick={() => login("test", "test")}>
+    <button
+      data-testid="login"
+      onClick={() =>
+        login({
+          username: "test",
+          password: "test",
+        })
+      }
+    >
       Login
     </button>
   );
