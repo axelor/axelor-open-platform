@@ -622,7 +622,7 @@ export interface ActionView {
   icon?: string;
   home?: boolean;
   domain?: string;
-  viewType?: string;
+  viewType: string;
   views?: View[];
   context?: DataContext;
   params?: DataRecord;

@@ -113,7 +113,7 @@ export async function view<
 
   if (resp.ok) {
     const { status, data } = await resp.json();
-    return status === 0 ? data : Promise.reject(500);
+    return status === 0 ? { model, ...data } : Promise.reject(500);
   }
 
   return Promise.reject(resp.status);
