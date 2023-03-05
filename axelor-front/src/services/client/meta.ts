@@ -70,7 +70,7 @@ export interface MetaData {
   perms?: Perms;
 }
 
-export interface ViewData<T> extends MetaData {
+export interface ViewData<T> extends Partial<MetaData> {
   view: T;
 }
 
@@ -88,11 +88,16 @@ export async function fields(model: string): Promise<MetaData> {
   return Promise.reject(resp.status);
 }
 
-export async function view<T extends keyof ViewTypes, V = ViewTypes[T]>(
-  model: string,
-  options: { type: T; name?: string; context?: Record<string, any> }
-): Promise<ViewData<V>> {
-  const { type, name, context } = options;
+export async function view<
+  T extends keyof ViewTypes,
+  V = ViewTypes[T]
+>(options: {
+  type: T;
+  name?: string;
+  model?: string;
+  context?: Record<string, any>;
+}): Promise<ViewData<V>> {
+  const { type, name, model, context } = options;
   const resp = await request({
     url: "ws/meta/view",
     method: "POST",

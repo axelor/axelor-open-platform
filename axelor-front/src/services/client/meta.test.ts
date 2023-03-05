@@ -45,7 +45,8 @@ describe("meta tests", async () => {
   });
 
   it("should load views", async () => {
-    const res = await meta.view("com.axelor.sale.order.Order", {
+    const res = await meta.view({
+      model: "com.axelor.sale.order.Order",
       type: "form",
     });
     expect(res).toBeDefined();

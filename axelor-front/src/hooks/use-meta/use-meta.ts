@@ -1,12 +1,14 @@
 import * as meta from "@/services/client/meta";
-import { ActionView } from "@/services/client/meta.types";
+import { ActionView, View } from "@/services/client/meta.types";
 import { atom, useAtom } from "jotai";
 import { useCallback } from "react";
 
 const actionViewsAtom = atom<Record<string, ActionView>>({});
+const viewsAtom = atom<Record<string, View>>({});
 
 export function useMeta() {
   const [actionViews, setActionViews] = useAtom(actionViewsAtom);
+  const [views, setViews] = useAtom(viewsAtom);
 
   const findActionView = useCallback(
     async (name: string) => {
@@ -21,6 +23,12 @@ export function useMeta() {
     },
     [actionViews, setActionViews]
   );
+
+  const findView = (opts: {
+    type: string;
+    name?: string;
+    model?: string;
+  }) => {};
 
   return {
     findActionView,
