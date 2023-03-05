@@ -6,7 +6,6 @@ import {
   SearchPage,
 } from "@/services/client/data";
 import { DataRecord } from "@/services/client/data.types";
-import { atom, useAtom } from "jotai";
 import { useCallback, useMemo, useState } from "react";
 
 export interface DataStore extends DataSource {
@@ -20,13 +19,11 @@ export function useDataStore(
   model: string,
   options: SearchOptions = {}
 ): DataStore {
-  const [recordsAtom] = useState(() => atom<DataRecord[]>([]));
-  const [pageAtom] = useState(() => atom<SearchPage>({}));
-  const [optsAtom] = useState(() => atom<SearchOptions>(options));
-
-  const [records, setRecords] = useAtom(recordsAtom);
-  const [page, setPage] = useAtom(pageAtom);
-  const [opts, setOpts] = useAtom(optsAtom);
+  const [records, setRecords] = useState<DataRecord[]>([]);
+  const [page, setPage] = useState<SearchPage>({
+    limit: 40,
+  });
+  const [opts, setOpts] = useState<SearchOptions>(options);
 
   const ds = useMemo(() => new DataSource(model), [model]);
 
@@ -41,11 +38,12 @@ export function useDataStore(
       };
       return {
         ...opts,
+        ...page,
         ...options,
         filter,
       };
     },
-    [opts]
+    [opts, page]
   );
 
   const doSearch = useCallback(
