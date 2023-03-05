@@ -1,14 +1,23 @@
 import { ActionView } from "@/services/client/meta.types";
-import { atom, useAtom } from "jotai";
+import { atom, useAtomValue, useSetAtom } from "jotai";
+import { useCallback } from "react";
+import { useMeta } from "../use-meta";
 
-const tabAtom = atom<ActionView | null>(null);
-const tabsAtom = atom<ActionView[]>([]);
+export type Tab = {
+  id: string;
+  title: string;
+  dirty?: boolean;
+  view: ActionView;
+};
 
-const openAtom = atom(null, (get, set, tab: ActionView) => {
+const tabAtom = atom<Tab | null>(null);
+const tabsAtom = atom<Tab[]>([]);
+
+const openAtom = atom(null, (get, set, tab: Tab) => {
   const tabs = get(tabsAtom);
   const curr = get(tabAtom);
   if (curr === tab) return;
-  const found = tabs.find((x) => x.name === tab.name);
+  const found = tabs.find((x) => x.id === tab.id);
   if (found) {
     set(tabAtom, found);
   } else {
@@ -17,22 +26,48 @@ const openAtom = atom(null, (get, set, tab: ActionView) => {
   }
 });
 
-const closeAtom = atom(null, (get, set, tab: ActionView) => {
+const closeAtom = atom(null, (get, set, tab: Tab) => {
   const tabs = get(tabsAtom);
-  const index = tabs.findIndex((x) => x.name === tab.name);
+  const index = tabs.findIndex((x) => x.id === tab.id);
   if (index > -1) {
     const prev = tabs[index - 1] ?? null;
-    set(tabsAtom, (state) => state.filter((x) => x.name !== tab.name));
+    set(tabsAtom, (state) => state.filter((x) => x.id !== tab.id));
     set(tabAtom, prev);
   }
 });
 
 export function useTabs() {
-  const [active] = useAtom(tabAtom);
-  const [items] = useAtom(tabsAtom);
+  const active = useAtomValue(tabAtom);
+  const items = useAtomValue(tabsAtom);
+  const { findActionView } = useMeta();
 
-  const [, open] = useAtom(openAtom);
-  const [, close] = useAtom(closeAtom);
+  const openTab = useSetAtom(openAtom);
+  const close = useSetAtom(closeAtom);
+
+  const open = useCallback(
+    async (tab: Tab | string) => {
+      const id = typeof tab === "string" ? tab : tab.id;
+      let found = items.find((x) => x.id === id);
+      if (found === undefined) {
+        const view = await findActionView(id);
+        if (view) {
+          const { title } = view;
+          found = {
+            id,
+            title,
+            view,
+          };
+        }
+      }
+
+      if (found) {
+        openTab(found);
+      }
+
+      return found ?? null;
+    },
+    [items, openTab, findActionView]
+  );
 
   return {
     active,

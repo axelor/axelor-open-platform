@@ -3,25 +3,10 @@ import { Box, NavTabs as Tabs } from "@axelor/ui";
 import { useCallback } from "react";
 
 export function NavTabs() {
-  const tabs = useTabs();
-  const items = tabs.items.map((tab) => {
-    return {
-      id: tab.name,
-      title: tab.title,
-    };
-  });
+  const { active, items, open } = useTabs();
+  const value = active?.id;
 
-  const value = tabs.active?.name;
-
-  const handleSelect = useCallback(
-    (e: any, tab: any) => {
-      const found = tabs.items.find((x) => x.name === tab.id);
-      if (found) {
-        tabs.open(found);
-      }
-    },
-    [tabs]
-  );
+  const handleSelect = useCallback((e: any, tab: any) => open(tab.id), [open]);
 
   return (
     <Box d="flex" flexDirection="column" overflow="hidden" flexGrow={1}>

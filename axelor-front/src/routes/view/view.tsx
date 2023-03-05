@@ -1,13 +1,16 @@
 import { useAsyncEffect } from "@/hooks/use-async-effect";
-import { useMeta } from "@/hooks/use-meta";
 import { useRoute } from "@/hooks/use-route";
 import { useSession } from "@/hooks/use-session";
-import { useTabs } from "@/hooks/use-tabs";
-import { ActionView } from "@/services/client/meta.types";
-import { useEffect, useRef } from "react";
+import { Tab, useTabs } from "@/hooks/use-tabs";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-const getURL = (tab: ActionView) => `/ds/${tab.name}`;
+const getURL = (tab: Tab | null) => {
+  const id = tab?.id;
+  if (id && !id.startsWith("$")) {
+    return `/ds/${id}`;
+  }
+};
 
 /**
  * This component doesn't render anything but keeps
@@ -20,37 +23,25 @@ export function View() {
 
   const { action } = useParams();
   const { active, items, open } = useTabs();
-  const { findActionView } = useMeta();
   const { info } = useSession();
 
-  const pathRef = useRef<string>();
-
   useAsyncEffect(async () => {
-    const name = action ?? info?.user?.action ?? active?.name;
+    const name = action ?? info?.user?.action ?? active?.id;
     if (name) {
-      let tab = items.find((x) => x.name === action);
-      if (tab === undefined) {
-        tab = await findActionView(name);
-      }
-      if (tab) {
-        pathRef.current = getURL(tab);
-        open(tab);
+      const tab = await open(name);
+      const path = getURL(tab);
+      if (path && !action) {
         // if coming from other places
-        if (!action) {
-          redirect(pathRef.current);
-        }
+        redirect(path);
       }
     }
   }, [action, active, items, open]);
 
   useEffect(() => {
     const tab = active;
-    if (tab) {
-      const path = getURL(tab);
-      if (path && path !== pathRef.current) {
-        pathRef.current = path;
-        redirect(path);
-      }
+    const path = getURL(tab);
+    if (path) {
+      redirect(path);
     }
   }, [redirect, active]);
 

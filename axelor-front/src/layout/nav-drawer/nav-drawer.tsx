@@ -1,5 +1,4 @@
 import { useMenu } from "@/hooks/use-menu";
-import { useMeta } from "@/hooks/use-meta";
 import { useTabs } from "@/hooks/use-tabs";
 import { MenuItem } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
@@ -39,19 +38,15 @@ function load(res: MenuItem[]) {
 export function NavDrawer() {
   const tabs = useTabs();
   const { loading, menus } = useMenu();
-  const { findActionView } = useMeta();
 
   const handleClick = useCallback(
     async (e: any, item: any) => {
       const menu = menus.find((x) => x.name === item.id);
       if (menu?.action) {
-        const view = await findActionView(menu.action);
-        if (view) {
-          tabs.open(view);
-        }
+        await tabs.open(menu.action);
       }
     },
-    [tabs, menus, findActionView]
+    [tabs, menus]
   );
 
   const items = useMemo(() => load(menus), [menus]);
