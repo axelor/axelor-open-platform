@@ -1,4 +1,4 @@
-import { DependencyList, useState } from "react";
+import { DependencyList, useRef, useState } from "react";
 import { useAsyncEffect } from "../use-async-effect";
 
 export function useAsync<T>(
@@ -10,14 +10,14 @@ export function useAsync<T>(
   error?: any;
 } {
   const [state, setState] = useState<"loading" | "hasData" | "hasError">();
-  const [data, setData] = useState<T>();
   const [error, setError] = useState<any>();
+  const dataRef = useRef<T>();
 
   useAsyncEffect(async () => {
     setState("loading");
     try {
       const res = await func();
-      setData(res);
+      dataRef.current = res;
       setState("hasData");
     } catch (e) {
       setError(e);
@@ -27,7 +27,7 @@ export function useAsync<T>(
 
   return {
     state: state ?? "loading",
-    data,
+    data: dataRef.current,
     error,
   };
 }
