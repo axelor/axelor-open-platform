@@ -174,7 +174,7 @@ Here is a list of all changes :
 | `view.tabs.max` | `view.max-tabs`
 | `view.confirm.yes-no` | `view.confirm-yes-no`
 | `view.customization` | `view.allow-customization`
-| `view.adv-search.export.full` | `view.adv-search.export.full`
+| `view.adv-search.export.full` | `view.adv-search.export-full`
 | `view.grid.editor.buttons` | `view.grid.editor-buttons`
 | `view.toolbar.titles` | `view.toolbar.show-titles`
 | `application.baseUrl` | `application.base-url`
