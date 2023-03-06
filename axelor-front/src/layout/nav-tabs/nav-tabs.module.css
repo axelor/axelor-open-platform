@@ -1,0 +1,7 @@
+.tabContent {
+  display: none;
+}
+
+.tabContent.active {
+  display: flex;
+}
