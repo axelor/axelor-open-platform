@@ -276,7 +276,11 @@ export function accept(params: ActionView) {
   }, {});
 }
 
-export function process(meta: ViewData<any>, view: Schema, parent?: Schema) {
+export function processView(
+  meta: ViewData<any>,
+  view: Schema,
+  parent?: Schema
+) {
   var fields: Record<string, Schema[]> = {};
 
   meta = meta || {};
@@ -408,7 +412,7 @@ export function process(meta: ViewData<any>, view: Schema, parent?: Schema) {
     );
 
     if (item.items) {
-      process(meta, item, view);
+      processView(meta, item, view);
     }
 
     if (item.password) {
@@ -559,9 +563,17 @@ export function process(meta: ViewData<any>, view: Schema, parent?: Schema) {
           type: "field",
           name: "$wkfStatus",
           showTitle: false,
-          widget: "WkfStatus",
+          widget: "wkf-status",
         },
       ],
     });
   }
+}
+
+export function processWidgets(schema: Schema) {
+  if (Array.isArray(schema.items)) {
+    schema.items.forEach(processWidgets);
+  }
+  schema.uid = crypto.randomUUID();
+  return schema;
 }

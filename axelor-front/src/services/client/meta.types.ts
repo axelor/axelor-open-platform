@@ -66,6 +66,7 @@ export interface Property {
 }
 
 export interface Widget {
+  uid: string;
   type: string;
   name?: string;
   title?: string;
@@ -398,6 +399,7 @@ export interface HelpOverride {
 }
 
 export interface View {
+  uid: string;
   type: string;
   xmlId?: string;
   viewId?: number;
