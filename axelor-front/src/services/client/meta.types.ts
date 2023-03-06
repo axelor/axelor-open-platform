@@ -56,6 +56,13 @@ export interface Property {
   reference?: boolean;
   collection?: boolean;
   enum?: boolean;
+
+  // by view service
+  autoTitle?: string;
+  selectionList?: Selection[];
+  widget?: string;
+  widgetAttrs?: string | Record<string, any>;
+  jsonField?: string;
 }
 
 export interface Widget {
@@ -77,7 +84,7 @@ export interface Widget {
   width?: string;
   autoTitle?: string;
   widget?: string;
-  widgetAttrs?: any;
+  widgetAttrs?: string | Record<string, any>;
 }
 
 export interface Container extends Widget {
@@ -88,7 +95,7 @@ export interface Viewer {
   type: "viewer";
   depends?: string;
   template?: string;
-  fields?: Property[];
+  fields?: Property[] | Record<string, Property>; // incoming is array, processed to object
 }
 
 export interface Editor extends Omit<Panel, "type"> {
@@ -98,7 +105,7 @@ export interface Editor extends Omit<Panel, "type"> {
   showOnNew?: boolean;
   onNew?: string;
   items?: (Field | Button | Spacer | Separator | Label | Panel)[];
-  fields?: Property[];
+  fields?: Property[] | Record<string, Property>; // incoming is array, processed to object
 }
 
 export interface Tooltip extends Omit<Viewer, "type"> {
@@ -359,6 +366,14 @@ export interface Perms {
 export interface JsonField extends Omit<Field, "type"> {
   name: string;
   type: string;
+
+  model: string;
+  modelField: string; // same as jsonField
+
+  sequence: number;
+  columnSequence: number;
+  visibleInGrid?: boolean;
+
   jsonTarget?: string;
   jsonField?: string;
   jsonPath?: string;
@@ -373,6 +388,13 @@ export interface Selection {
   order?: number;
   hidden?: boolean;
   data?: any;
+}
+
+export interface HelpOverride {
+  type: "tooltip" | "placehoder" | "inline";
+  field: string;
+  help: string;
+  style?: string;
 }
 
 export interface View {
@@ -392,12 +414,7 @@ export interface View {
   width?: string;
   minWidth?: string;
   maxWidth?: string;
-  helpOverride?: {
-    field?: string;
-    type?: string;
-    help?: string;
-    style?: string;
-  };
+  helpOverride?: HelpOverride[];
   items?: Widget[];
 }
 
@@ -681,3 +698,15 @@ export type ViewType =
 export type ViewTypes<Types extends { type: string } = ViewType> = {
   [T in Types as T["type"]]: T;
 };
+
+// the above types will be too much restrictive during
+// processing schema json. This simplified schema type
+// can be used instead.
+export interface Schema {
+  type?: string;
+  name?: string;
+  title?: string;
+  help?: string;
+  items?: Schema[];
+  [K: string]: any;
+}

@@ -2,6 +2,7 @@ import * as meta from "@/services/client/meta";
 import { ActionView } from "@/services/client/meta.types";
 import { atom, useAtom } from "jotai";
 import { useCallback } from "react";
+import { process } from "./utils";
 
 const actionViewsAtom = atom<Record<string, ActionView>>({});
 const viewsAtom = atom<Record<string, meta.ViewData<any>>>({});
@@ -43,7 +44,9 @@ export function useMeta() {
       }
 
       view = await meta.view({ type: type as any, name, model });
-      view = processView(view);
+
+      // process the meta data
+      process(view, view.view);
 
       setViews((state) => ({ ...state, [key]: view }));
 
@@ -70,9 +73,4 @@ export function useMeta() {
     findFields,
     findView,
   };
-}
-
-function processView<T>(data: meta.ViewData<T>): meta.ViewData<T> {
-  // TODO: process view
-  return data;
 }

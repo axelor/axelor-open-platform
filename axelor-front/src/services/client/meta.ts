@@ -2,6 +2,7 @@ import { request } from "./client";
 import { Criteria, DataContext } from "./data.types";
 import {
   ActionView,
+  HelpOverride,
   JsonField,
   MenuItem,
   Perms,
@@ -65,13 +66,15 @@ export async function filters(name: string): Promise<SavedFilter[]> {
 
 export interface MetaData {
   model: string;
-  fields: Record<string, Property>;
+  fields: Property[] | Record<string, Property>; // incoming is array, processed to object;
   jsonFields?: Record<string, Record<string, JsonField>>;
   perms?: Perms;
 }
 
 export interface ViewData<T> extends Partial<MetaData> {
   view: T;
+  jsonAttrs?: JsonField[];
+  helps?: Record<string, Record<string, HelpOverride>>;
 }
 
 export async function fields(model: string): Promise<MetaData> {
