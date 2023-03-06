@@ -1,4 +1,5 @@
-import { render, waitFor } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
+import { afterEach, vi } from "vitest";
 import { useAsync } from "./use-async";
 
 const App = ({ loader }: { loader: () => Promise<any> }) => {
@@ -20,21 +21,33 @@ const loader = async (value: string) => {
       } else {
         resolve(value);
       }
-    });
+    }, 100);
   });
 };
 
+beforeEach(() => {
+  vi.useFakeTimers();
+});
+
+afterEach(() => {
+  vi.runOnlyPendingTimers();
+  vi.useRealTimers();
+});
+
 describe("use-async tests", () => {
   it("should load async data", async () => {
-    const res = render(<App loader={() => loader("Hi!")} />);
-    expect(res.getByTestId("loading")).toHaveTextContent("Loading...");
-    const data = await waitFor(() => res.getByTestId("data"));
+    render(<App loader={() => loader("Hi!")} />);
+    expect(screen.getByTestId("loading")).toHaveTextContent("Loading...");
+    await act(() => vi.advanceTimersByTime(100));
+    const data = screen.getByTestId("data");
     expect(data).toHaveTextContent("Hi!");
   });
 
   it("should catch async error", async () => {
-    const res = render(<App loader={() => loader("failed!")} />);
-    const error = await waitFor(() => res.getByTestId("error"));
+    render(<App loader={() => loader("failed!")} />);
+    expect(screen.getByTestId("loading")).toHaveTextContent("Loading...");
+    await act(() => vi.advanceTimersByTime(100));
+    const error = screen.getByTestId("error");
     expect(error).toHaveTextContent("failed!");
   });
 });

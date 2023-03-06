@@ -23,16 +23,16 @@ export function useAsyncEffect(
     let signal = abortRef.current!.signal;
     let result: AsyncEffectCallbackResult;
     let load = async () => {
-      await Promise.resolve(); // wait for clean up in strict mode
       if (canceled || signal.aborted) {
         return;
       }
       result = await effect(signal);
     };
 
-    load();
+    const timer = setTimeout(load);
 
     return () => {
+      clearTimeout(timer);
       canceled = true;
       if (result) {
         result();
