@@ -59,6 +59,7 @@ export interface Property {
 }
 
 export interface Widget {
+  type: string;
   name?: string;
   title?: string;
   help?: string;
@@ -75,6 +76,8 @@ export interface Widget {
   height?: string;
   width?: string;
   autoTitle?: string;
+  widget?: string;
+  widgetAttrs?: any;
 }
 
 export interface Container extends Widget {
@@ -82,12 +85,14 @@ export interface Container extends Widget {
 }
 
 export interface Viewer {
+  type: "viewer";
   depends?: string;
   template?: string;
   fields?: Property[];
 }
 
-export interface Editor extends Panel {
+export interface Editor extends Omit<Panel, "type"> {
+  type: "editor";
   layout?: string;
   viewer?: boolean;
   showOnNew?: boolean;
@@ -96,7 +101,8 @@ export interface Editor extends Panel {
   fields?: Property[];
 }
 
-export interface Tooltip extends Viewer {
+export interface Tooltip extends Omit<Viewer, "type"> {
+  type: "tooltip";
   call?: string;
 }
 
@@ -108,25 +114,34 @@ export interface Hilite {
   css?: string;
 }
 
-export interface Label extends Widget {}
+export interface Label extends Widget {
+  type: "label";
+}
 
-export interface Spacer extends Widget {}
+export interface Spacer extends Widget {
+  type: "spacer";
+}
 
-export interface Separator extends Widget {}
+export interface Separator extends Widget {
+  type: "seperator";
+}
 
 export interface Button extends Widget {
+  type: "button";
   icon?: string;
   iconHover?: string;
   link?: string;
   prompt?: string;
   onClick?: string;
-  widget?: string;
   title?: string;
 }
 
-export interface ButtonGroup extends Container {}
+export interface ButtonGroup extends Container {
+  type: "button-group";
+}
 
 export interface MenuItem extends Widget {
+  type: "menu-item";
   name: string;
   title: string;
   xmlId?: string;
@@ -148,18 +163,27 @@ export interface MenuItem extends Widget {
   hasTag?: boolean;
 }
 
+export interface MenuDivider extends Widget {
+  type: "menu-item-devider"; // XXX: typo
+}
+
 export interface Menu extends Widget {
+  type: "menu";
   icon?: string;
-  items?: (MenuItem | Menu)[];
+  items?: (MenuItem | MenuDivider | Menu)[];
 }
 
 export interface Static extends Widget {
+  type: "static";
   text?: string;
 }
 
-export interface Help extends Static {}
+export interface Help extends Omit<Static, "type"> {
+  type: "help";
+}
 
 export interface Field extends Widget {
+  type: "field";
   name: string;
   serverType?: string;
   placeholder?: string;
@@ -225,6 +249,7 @@ export interface Field extends Widget {
 }
 
 export interface Panel extends Container {
+  type: "panel";
   itemSpan?: number;
   showFrame?: boolean;
   sidebar?: boolean;
@@ -252,7 +277,8 @@ export interface Panel extends Container {
   )[];
 }
 
-export interface PanelRelated extends Panel {
+export interface PanelRelated extends Omit<Panel, "type"> {
+  type: "panel-related";
   name?: string;
   serverType?: string;
   formView?: string;
@@ -284,33 +310,42 @@ export interface PanelRelated extends Panel {
   perms?: Perms;
 }
 
-export interface PanelDashlet extends Panel {
+export interface PanelDashlet extends Omit<Panel, "type"> {
+  type: "dashlet";
   action?: string;
   canSearch?: boolean;
   canEdit?: string;
 }
 
-export interface PanelInclude extends Panel {
+export interface PanelInclude extends Omit<Panel, "type"> {
+  type: "include";
   name?: string;
   module?: string;
   view?: View;
 }
 
 export interface PanelTabs extends Widget {
+  type: "panel-tabs";
   items?: (Panel | PanelRelated | PanelDashlet | PanelInclude)[];
 }
 
-export interface PanelStack extends PanelTabs {}
+export interface PanelStack extends Omit<PanelTabs, "type"> {
+  type: "panel-stack";
+}
 
-export interface PanelMail extends Panel {
+export interface PanelMail extends Omit<Panel, "type" | "items"> {
+  type: "panel-mail";
   items?: (MailMessages | MailFollowers)[];
 }
 
 export interface MailMessages extends Widget {
+  type: "mail-messages";
   limit?: number;
 }
 
-export interface MailFollowers extends Widget {}
+export interface MailFollowers extends Widget {
+  type: "mail-followers";
+}
 
 export interface Perms {
   read?: boolean;
@@ -321,8 +356,9 @@ export interface Perms {
   massUpdate?: boolean;
 }
 
-export interface JsonField extends Field {
+export interface JsonField extends Omit<Field, "type"> {
   name: string;
+  type: string;
   jsonTarget?: string;
   jsonField?: string;
   jsonPath?: string;
@@ -336,6 +372,7 @@ export interface Selection {
   color?: string;
   order?: number;
   hidden?: boolean;
+  data?: any;
 }
 
 export interface View {
@@ -458,9 +495,9 @@ export interface TreeView extends View {
   nodes?: TreeNode[];
 }
 
-export interface SearchField extends Field {
+export interface SearchField extends Omit<Field, "type"> {
   multiple?: boolean;
-  type?: string;
+  type?: "string" | "integer" | "decimal" | "date" | "datetime" | "boolean";
 }
 
 export interface ChartCategory {
