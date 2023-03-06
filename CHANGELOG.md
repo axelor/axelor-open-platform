@@ -1,3 +1,14 @@
+## 5.4.19 (2023-03-06)
+
+#### Fixed
+
+* Disable exporting on Kanban views
+* Fix onChange triggered after grid edit cancel
+* Fix moving record on top level grid
+* Fix grid not editable depending on readonly/canEdit conditions
+* Fix export on relational fields
+* Fix spinner buttons triggering onChange inside editable grid
+
 ## 5.4.18 (2023-02-06)
 
 #### Fixed
