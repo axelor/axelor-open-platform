@@ -19,7 +19,7 @@ versions.ldaptive = "2.1.1"
 versions.junit4 = "4.13.2"
 versions.junit5 = "5.9.2"
 
-versions.slf4j = "1.7.36"
+versions.slf4j = "2.0.7"
 
 versions.tomcat = "9.0.71"
 versions.tomcat_embed = "${versions.tomcat}"
@@ -41,8 +41,8 @@ libs.slf4j_base = [
 ]
 
 libs.slf4j_logback = libs.slf4j_base + [
-  "ch.qos.logback:logback-core:1.2.11",
-  "ch.qos.logback:logback-classic:1.2.11",
+  "ch.qos.logback:logback-core:1.3.7",
+  "ch.qos.logback:logback-classic:1.3.7",
   "org.fusesource.jansi:jansi:2.4.0"
 ]
 
