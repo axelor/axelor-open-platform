@@ -556,24 +556,27 @@ export function processView(
     // wkf status
     view.items?.unshift({
       colSpan: 12,
-      type: "panel",
-      items: [
-        {
-          colSpan: 12,
-          type: "field",
-          name: "$wkfStatus",
-          showTitle: false,
-          widget: "wkf-status",
-        },
-      ],
+      type: "field",
+      name: "$wkfStatus",
+      showTitle: false,
+      widget: "wkf-status",
     });
   }
 }
 
-export function processWidgets(schema: Schema) {
-  if (Array.isArray(schema.items)) {
-    schema.items.forEach(processWidgets);
-  }
+export function processWidgets(schema: Schema, parent?: Schema) {
   schema.uid = crypto.randomUUID();
+  schema.colSpan = schema.colSpan ?? parent?.itemSpan;
+
+  if (schema.sidebar) {
+    schema.itemSpan = schema.itemSpan ?? 12;
+    schema.colSpan = 12;
+  }
+
+  if (Array.isArray(schema.items)) {
+    schema.items.forEach((x) => processWidgets(x, schema));
+    schema.colSpan = schema.colSpan ?? parent?.itemSpan ?? 12;
+  }
+
   return schema;
 }
