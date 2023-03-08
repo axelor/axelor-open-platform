@@ -2,8 +2,8 @@ import { useAsync } from "@/hooks/use-async";
 import { useDataStore } from "@/hooks/use-data-store";
 import { useMeta } from "@/hooks/use-meta";
 import { Tab } from "@/hooks/use-tabs";
-import { ViewData } from "@/services/client/meta";
 import { toCamelCase, toKebabCase } from "@/utils/names";
+import { ViewProps } from "@/views/types";
 
 function useViewComp(tab: Tab) {
   return useAsync(async () => {
@@ -26,15 +26,7 @@ function useViewSchema(tab: Tab) {
   );
 }
 
-function DataViews({
-  tab,
-  schema,
-  component: Comp,
-}: {
-  tab: Tab;
-  schema: ViewData<any>;
-  component: React.ElementType;
-}) {
+function DataView({ tab, meta, component: Comp }: ViewProps<any>) {
   const { view } = tab;
   const { model, domain, context } = view;
   const dataStore = useDataStore(model!, {
@@ -44,7 +36,7 @@ function DataViews({
     },
   });
 
-  return <Comp tab={tab} schema={schema} dataStore={dataStore} />;
+  return <Comp tab={tab} meta={meta} dataStore={dataStore} />;
 }
 
 export function Views({ tab, className }: { tab: Tab; className?: string }) {
@@ -55,20 +47,18 @@ export function Views({ tab, className }: { tab: Tab; className?: string }) {
     return <div>Loading...</div>;
   }
 
-  const schema = viewSchema.data;
+  const meta = viewSchema.data;
   const Comp = viewComp.data;
 
-  if (schema?.model && Comp) {
+  if (meta?.model && Comp) {
     return (
       <div className={className}>
-        <DataViews tab={tab} schema={schema} component={Comp} />
+        <DataView tab={tab} meta={meta} component={Comp} />
       </div>
     );
   }
 
   return (
-    <div className={className}>
-      {Comp && <Comp tab={tab} schema={schema} />}
-    </div>
+    <div className={className}>{Comp && <Comp tab={tab} meta={meta} />}</div>
   );
 }
