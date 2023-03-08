@@ -565,7 +565,6 @@ export function processView(
 }
 
 export function processWidgets(schema: Schema, parent?: Schema) {
-  schema.uid = crypto.randomUUID();
   schema.colSpan = schema.colSpan ?? parent?.itemSpan;
 
   if (schema.sidebar) {
