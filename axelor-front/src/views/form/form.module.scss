@@ -9,3 +9,23 @@
   padding: 0.5rem;
   flex: 1;
 }
+
+.formLayout {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.main,
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.main {
+  flex: 1;
+}
+
+.side {
+  width: 300px;
+}
