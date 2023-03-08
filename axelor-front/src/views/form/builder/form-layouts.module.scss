@@ -1,0 +1,33 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  align-items: start;
+  gap: 0.5rem;
+}
+
+.grid > {
+  .gridItem {
+    grid-column: span 6;
+  }
+  .grid {
+    grid-column: span 12;
+  }
+}
+
+@for $i from 1 through 12 {
+  .grid[data-cols="#{$i}"] {
+    grid-template-columns: repeat(#{$i}, 1fr);
+  }
+}
+
+@for $i from 1 through 12 {
+  .grid > .gridItem[data-colspan="#{$i}"] {
+    grid-column: span #{$i};
+  }
+}
+
+@for $i from 1 through 12 {
+  .grid > .gridItem[data-rowspan="#{$i}"] {
+    grid-row: span #{$i};
+  }
+}

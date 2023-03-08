@@ -1,5 +1,6 @@
 .tabContent {
   display: none;
+  overflow: auto;
 }
 
 .tabContent.active {
