@@ -91,7 +91,7 @@ public class ModuleManager {
 
   public void initialize(final boolean update, final boolean withDemo) {
     try {
-      createUsers();
+      createDefault();
       resolve(update);
       final List<Module> moduleList =
           RESOLVER.all().stream()
@@ -100,7 +100,6 @@ public class ModuleManager {
               .collect(Collectors.toList());
       loadModules(moduleList, update, withDemo);
     } finally {
-      encryptPasswords();
       doCleanUp();
     }
   }
@@ -109,7 +108,6 @@ public class ModuleManager {
     final List<Module> moduleList = new ArrayList<>();
 
     try {
-      createUsers();
       resolve(true);
       if (ObjectUtils.isEmpty(moduleNames)) {
         RESOLVER.all().stream().filter(Module::isInstalled).forEach(moduleList::add);
@@ -292,18 +290,16 @@ public class ModuleManager {
     }
   }
 
+  /**
+   * Create the default user (<code>admin</code>) and groups (<code>admins</code>, <code>users</code>).
+   */
   @Transactional
-  void createUsers() {
+  void createDefault() {
 
     final UserRepository users = Beans.get(UserRepository.class);
     final GroupRepository groups = Beans.get(GroupRepository.class);
 
     if (users.all().count() != 0) {
-      // encrypt plain passwords
-      for (User user :
-          users.all().filter("self.password not like :shiro").bind("shiro", "$shiro1$%").fetch()) {
-        authService.encrypt(user);
-      }
       return;
     }
 
@@ -340,16 +336,4 @@ public class ModuleManager {
     admin = users.save(admin);
   }
 
-  @Transactional
-  public void encryptPasswords() {
-    final UserRepository users = Beans.get(UserRepository.class);
-
-    if (users.all().count() != 0) {
-      // encrypt plain passwords
-      for (User user :
-          users.all().filter("self.password not like :shiro").bind("shiro", "$shiro1$%").fetch()) {
-        authService.encrypt(user);
-      }
-    }
-  }
 }
