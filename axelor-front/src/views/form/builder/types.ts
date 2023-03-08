@@ -31,6 +31,7 @@ export interface WidgetProps {
   schema: Schema;
   formAtom: PrimitiveAtom<FormState>;
   widgetAtom: PrimitiveAtom<WidgetState>;
+  readonly?: boolean;
 }
 
 export interface FieldProps<T> extends WidgetProps {
@@ -41,6 +42,7 @@ export interface FieldProps<T> extends WidgetProps {
 export interface FormProps {
   meta: ViewData<FormView>;
   className?: string;
+  readonly?: boolean;
   layout?: FormLayout;
 }
 
@@ -48,4 +50,5 @@ export type FormLayout = (props: {
   schema: Schema;
   formAtom: PrimitiveAtom<FormState>;
   className?: string;
+  readonly?: boolean;
 }) => JSX.Element;

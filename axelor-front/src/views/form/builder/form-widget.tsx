@@ -1,5 +1,5 @@
 import { Schema } from "@/services/client/meta.types";
-import { PrimitiveAtom } from "jotai";
+import { PrimitiveAtom, useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useMemo } from "react";
 import { useWidgetComp } from "./hooks";
@@ -9,8 +9,9 @@ import { defaultAttrs } from "./utils";
 export function FormWidget(props: {
   schema: Schema;
   formAtom: PrimitiveAtom<FormState>;
+  readonly?: boolean;
 }) {
-  const { schema, formAtom } = props;
+  const { schema, formAtom, readonly } = props;
 
   const widgetAtom = useMemo(() => {
     const { uid } = schema;
@@ -19,6 +20,8 @@ export function FormWidget(props: {
       o.prop("states").prop(uid).valueOr({ attrs })
     );
   }, [formAtom, schema]);
+
+  const { attrs } = useAtomValue(widgetAtom);
 
   const widget = schema.widget!;
   const type = schema.type;
@@ -33,6 +36,7 @@ export function FormWidget(props: {
     schema,
     formAtom,
     widgetAtom,
+    readonly: readonly ?? attrs.readonly,
   };
 
   if (Comp) {

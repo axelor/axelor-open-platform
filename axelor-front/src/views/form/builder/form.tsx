@@ -10,6 +10,7 @@ import { GridLayout } from "./form-layouts";
 export function Form({
   meta,
   className,
+  readonly,
   layout: Layout = GridLayout,
 }: FormProps) {
   const { fields = {}, view } = meta;
@@ -25,5 +26,12 @@ export function Form({
     return atom<FormState>({ record, states, fields: fields as any });
   }, [fields]);
 
-  return <Layout className={className} schema={schema} formAtom={formAtom} />;
+  return (
+    <Layout
+      className={className}
+      readonly={readonly}
+      schema={schema}
+      formAtom={formAtom}
+    />
+  );
 }

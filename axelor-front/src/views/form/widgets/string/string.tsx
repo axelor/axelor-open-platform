@@ -5,6 +5,7 @@ import styles from "./string.module.css";
 
 export function String({
   schema,
+  readonly,
   formAtom,
   widgetAtom,
   valueAtom,
@@ -19,13 +20,16 @@ export function String({
   return (
     <div className={styles.string}>
       <label htmlFor={uid}>{title}</label>
-      <Input
-        type="text"
-        id={uid}
-        value={value}
-        required={required}
-        onChange={(e) => setValue(e.target.value)}
-      />
+      {readonly && <div className={styles.value}>{value}</div>}
+      {readonly || (
+        <Input
+          type="text"
+          id={uid}
+          value={value}
+          required={required}
+          onChange={(e) => setValue(e.target.value)}
+        />
+      )}
     </div>
   );
 }
