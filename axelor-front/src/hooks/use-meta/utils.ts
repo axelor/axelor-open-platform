@@ -569,12 +569,13 @@ export function processWidgets(schema: Schema, parent?: Schema) {
 
   if (schema.sidebar) {
     schema.itemSpan = schema.itemSpan ?? 12;
-    schema.colSpan = 12;
   }
 
   if (Array.isArray(schema.items)) {
     schema.items.forEach((x) => processWidgets(x, schema));
-    schema.colSpan = schema.colSpan ?? parent?.itemSpan ?? 12;
+    if (!parent) {
+      schema.colSpan = schema.colSpan ?? 12;
+    }
   }
 
   return schema;
