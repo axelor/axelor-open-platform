@@ -1,7 +1,6 @@
 import { Input } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
-import { FieldProps } from "../../builder";
-import styles from "./string.module.css";
+import { FieldContainer, FieldProps } from "../../builder";
 
 export function String({
   schema,
@@ -18,9 +17,18 @@ export function String({
   const [value = "", setValue] = useAtom(valueAtom);
 
   return (
-    <div className={styles.string}>
+    <FieldContainer readonly={readonly}>
       <label htmlFor={uid}>{title}</label>
-      {readonly && <div className={styles.value}>{value}</div>}
+      {readonly && (
+        <Input
+          type="text"
+          defaultValue={value}
+          disabled
+          readOnly
+          bg="body"
+          border={false}
+        />
+      )}
       {readonly || (
         <Input
           type="text"
@@ -30,6 +38,6 @@ export function String({
           onChange={(e) => setValue(e.target.value)}
         />
       )}
-    </div>
+    </FieldContainer>
   );
 }

@@ -1,13 +1,13 @@
 .panel {
-  border: 1px solid lightgray;
+  display: flex;
+  flex-direction: column;
 }
 
 .panelHeader,
 .panelBody {
-  padding: 0.5rem;
+  padding: 0.75rem;
 }
 
 .panelHeader {
   font-weight: 600;
-  border-bottom: 1px solid lightgray;
 }

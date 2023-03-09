@@ -1,3 +1,4 @@
+import { Box } from "@axelor/ui";
 import { GridLayout, WidgetProps } from "../../builder";
 import styles from "./panel.module.css";
 
@@ -6,13 +7,15 @@ export function Panel(props: WidgetProps) {
   const { title } = schema;
 
   return (
-    <div className={styles.panel}>
-      {title && <div className={styles.panelHeader}>{title}</div>}
-      <GridLayout
-        className={styles.panelBody}
-        formAtom={formAtom}
-        schema={schema}
-      />
-    </div>
+    <Box className={styles.panel} rounded border>
+      {title && (
+        <Box className={styles.panelHeader} borderBottom>
+          {title}
+        </Box>
+      )}
+      <Box className={styles.panelBody}>
+        <GridLayout formAtom={formAtom} schema={schema} />
+      </Box>
+    </Box>
   );
 }

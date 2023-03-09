@@ -1,9 +1,0 @@
-.string {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.value {
-  line-height: 1rem;
-}
