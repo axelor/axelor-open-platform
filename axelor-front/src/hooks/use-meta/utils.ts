@@ -281,8 +281,6 @@ export function processView(
   view: Schema,
   parent?: Schema
 ) {
-  var fields: Record<string, Schema[]> = {};
-
   meta = meta || {};
   view = view || {};
 
@@ -397,11 +395,20 @@ export function processView(
     processWidget(item);
     processSelection(item);
 
-    _.forEach(fields[item.name!], (value, key) => {
-      if (!item.hasOwnProperty(key)) {
-        item[key] = value;
-      }
-    });
+    // -to-many ?
+    if (Array.isArray(view.fields)) {
+      view.fields = processFields(view.fields);
+    }
+
+    const fields = view.fields ?? meta.fields ?? {};
+
+    if (item.name) {
+      _.forEach(fields[item.name], (value, key) => {
+        if (!item.hasOwnProperty(key)) {
+          item[key] = value;
+        }
+      });
+    }
 
     ["canNew", "canView", "canEdit", "canRemove", "canSelect"].forEach(
       (name) => {

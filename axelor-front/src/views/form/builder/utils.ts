@@ -31,7 +31,7 @@ export function processView(schema: Schema, fields: Record<string, Property>) {
 
   if (res.items) {
     res.items = res.items.map((item) =>
-      processView(item, item.fields ?? fields)
+      processView(item, res.fields ?? fields)
     );
   }
 
