@@ -8,7 +8,7 @@ import {
   Perms,
   Property,
   SavedFilter,
-  ViewTypes,
+  ViewTypes
 } from "./meta.types";
 
 export type MenuType = "all" | "quick" | "fav";
@@ -127,10 +127,9 @@ export type ActionOptions = {
   model: string;
   data?: Criteria & {
     context?: DataContext;
-    _domain: string;
+    _domain?: string;
     _domainContext?: DataContext;
     _archived?: boolean;
-    _signal?: string;
   };
 };
 
@@ -138,6 +137,7 @@ export async function action(options: ActionOptions) {
   const url = "ws/action";
   const resp = await request({
     url,
+    method: "POST",
     body: options,
   });
 

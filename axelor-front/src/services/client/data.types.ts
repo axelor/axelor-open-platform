@@ -24,7 +24,7 @@ export type DataContext = DataRecord & {
   _source?: string;
   _viewType?: string;
   _viewName?: string;
-  _views: View[];
+  _views?: View[];
 };
 
 export type FilterOp =
