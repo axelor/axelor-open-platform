@@ -1,7 +1,6 @@
 import { findActionView } from "@/services/client/meta-cache";
 import { ActionView } from "@/services/client/meta.types";
 import { atom, useAtomValue, useSetAtom } from "jotai";
-import { useCallback } from "react";
 
 export type Tab = {
   id: string;
@@ -13,25 +12,44 @@ export type Tab = {
 const tabAtom = atom<Tab | null>(null);
 const tabsAtom = atom<Tab[]>([]);
 
-const openAtom = atom(null, (get, set, tab: Tab) => {
-  const tabs = get(tabsAtom);
-  const curr = get(tabAtom);
-  if (curr === tab) return;
-  const found = tabs.find((x) => x.id === tab.id);
-  if (found) {
-    set(tabAtom, found);
-  } else {
-    set(tabsAtom, (state) => [...state, tab]);
-    set(tabAtom, tab);
-  }
-});
+const viewName = (view: ActionView | string) =>
+  typeof view === "string" ? view : view.name;
 
-const closeAtom = atom(null, (get, set, tab: Tab) => {
+const openAtom = atom(
+  null,
+  async (get, set, view: ActionView | string): Promise<Tab | null> => {
+    const tabs = get(tabsAtom);
+    const curr = get(tabAtom);
+
+    const name = viewName(view);
+    const found = tabs.find((x) => x.id === name);
+
+    if (found && curr === found) return null;
+    if (found) {
+      set(tabAtom, found);
+      return found;
+    }
+
+    const actionView = await findActionView(name);
+    if (actionView) {
+      const { name: id, title } = actionView;
+      const tab = { id, title, view: actionView };
+      set(tabsAtom, (state) => [...state, tab]);
+      set(tabAtom, tab);
+      return tab;
+    }
+
+    return null;
+  }
+);
+
+const closeAtom = atom(null, async (get, set, view: ActionView | string) => {
   const tabs = get(tabsAtom);
-  const index = tabs.findIndex((x) => x.id === tab.id);
+  const name = viewName(view);
+  const index = tabs.findIndex((x) => x.id === name);
   if (index > -1) {
     const prev = tabs[index - 1] ?? null;
-    set(tabsAtom, (state) => state.filter((x) => x.id !== tab.id));
+    set(tabsAtom, (state) => state.filter((x) => x.id !== name));
     set(tabAtom, prev);
   }
 });
@@ -40,33 +58,8 @@ export function useTabs() {
   const active = useAtomValue(tabAtom);
   const items = useAtomValue(tabsAtom);
 
-  const openTab = useSetAtom(openAtom);
+  const open = useSetAtom(openAtom);
   const close = useSetAtom(closeAtom);
-
-  const open = useCallback(
-    async (tab: Tab | string) => {
-      const id = typeof tab === "string" ? tab : tab.id;
-      let found = items.find((x) => x.id === id);
-      if (found === undefined) {
-        const view = await findActionView(id);
-        if (view) {
-          const { title } = view;
-          found = {
-            id,
-            title,
-            view,
-          };
-        }
-      }
-
-      if (found) {
-        openTab(found);
-      }
-
-      return found ?? null;
-    },
-    [items, openTab]
-  );
 
   return {
     active,
