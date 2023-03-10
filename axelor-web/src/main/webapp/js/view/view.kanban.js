@@ -178,6 +178,36 @@ function BaseCardsCtrl(type, $scope, $element, ViewService) {
       }
     });
   };
+
+  $scope.canNew = function () {
+    return $scope.hasButton("new");
+  };
+
+  $scope.onHotKey = function (e, action) {
+    switch (action) {
+      case "refresh":
+        $scope.onRefresh();
+        break;
+      case "new":
+        if ($scope.canNew()) {
+          $scope.onNew();
+        }
+        break;
+      case "next":
+        if ($scope.canNext()) {
+          $scope.onNext();
+        }
+        break;
+      case "prev":
+        if ($scope.canPrev()) {
+          $scope.onPrev();
+        }
+        break;
+    }
+
+    $scope.$applyAsync();
+    return false;
+  };
 }
 
 ui.controller("CardsCtrl", ['$scope', '$element', 'ViewService', function CardsCtrl($scope, $element, ViewService) {
