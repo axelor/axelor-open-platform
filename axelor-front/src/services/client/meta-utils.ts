@@ -1,6 +1,6 @@
-import { ViewData } from "@/services/client/meta";
-import { ActionView, Property, Schema } from "@/services/client/meta.types";
 import _ from "lodash";
+import { ViewData } from "./meta";
+import { ActionView, Property, Schema } from "./meta.types";
 
 function processJsonForm(view: Schema) {
   if (view.type !== "form") return view;

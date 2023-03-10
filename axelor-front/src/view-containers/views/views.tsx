@@ -1,7 +1,7 @@
 import { useAsync } from "@/hooks/use-async";
 import { useDataStore } from "@/hooks/use-data-store";
-import { useMeta } from "@/hooks/use-meta";
 import { Tab } from "@/hooks/use-tabs";
+import { findView } from "@/services/client/meta-cache";
 import { toCamelCase, toKebabCase } from "@/utils/names";
 import { ViewProps } from "@/views/types";
 
@@ -19,7 +19,6 @@ function useViewSchema(tab: Tab) {
   const { viewType: type, model, views = [] } = view;
   const { name } = views.find((x) => x.type === type) ?? {};
 
-  const { findView } = useMeta();
   return useAsync(
     async () => findView({ type, name, model }),
     [type, name, model]

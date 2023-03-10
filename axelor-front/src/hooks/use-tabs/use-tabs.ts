@@ -1,7 +1,7 @@
+import { findActionView } from "@/services/client/meta-cache";
 import { ActionView } from "@/services/client/meta.types";
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useCallback } from "react";
-import { useMeta } from "../use-meta";
 
 export type Tab = {
   id: string;
@@ -39,7 +39,6 @@ const closeAtom = atom(null, (get, set, tab: Tab) => {
 export function useTabs() {
   const active = useAtomValue(tabAtom);
   const items = useAtomValue(tabsAtom);
-  const { findActionView } = useMeta();
 
   const openTab = useSetAtom(openAtom);
   const close = useSetAtom(closeAtom);
@@ -66,7 +65,7 @@ export function useTabs() {
 
       return found ?? null;
     },
-    [items, openTab, findActionView]
+    [items, openTab]
   );
 
   return {
