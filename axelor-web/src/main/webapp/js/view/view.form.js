@@ -1285,7 +1285,7 @@ function FormViewCtrl($scope, $element) {
     if (action === "refresh") {
       $scope.onRefresh();
     }
-    if (action === "new") {
+    if (action === "new" && $scope.canNew()) {
       $scope.onNew();
     }
     if (action === "edit") {
