@@ -1,28 +1,67 @@
 import {
   actionView as fetchAction,
   fields as fetchFields,
-  MetaData,
   view as fetchView,
-  ViewData,
+  type MetaData,
+  type ViewData,
 } from "./meta";
 import { processView, processWidgets } from "./meta-utils";
-import { ActionView, ViewType } from "./meta.types";
+import { type ActionView, type ViewType } from "./meta.types";
 
-const CACHE: Record<string, Promise<any>> = {};
+type CacheEntry = {
+  value: Promise<any>;
+  accessAt: number;
+  accessCount: number;
+};
 
-const makeKey = (type: string, ...args: any[]) => {
-  const parts = [type, ...args].flat().filter(Boolean);
-  return parts.join(":");
+const cache = new Map<string, CacheEntry>();
+
+const minHits = 5;
+const minTime = 1000 * 60 * 60; // miliseconds
+
+const evictLeastUsed = () => {
+  const now = Date.now();
+  const leastUsed: string[] = [];
+
+  for (const [key, entry] of cache.entries()) {
+    const diff = now - entry.accessAt;
+    const hits = entry.accessCount;
+    if (hits < minHits && diff > minTime) {
+      leastUsed.push(key);
+    }
+  }
+
+  for (const key of leastUsed) {
+    cache.delete(key);
+  }
+};
+
+const getOrLoad = (names: any[], load: () => Promise<any>) => {
+  const key = names.join(":");
+  const entry = cache.get(key);
+  if (entry) {
+    entry.accessAt = Date.now();
+    entry.accessCount += 1;
+    return entry.value;
+  }
+
+  const value = load();
+  cache.set(key, {
+    accessAt: Date.now(),
+    accessCount: 1,
+    value,
+  });
+
+  // evict old and least used entries
+  evictLeastUsed();
+
+  return value;
 };
 
 export async function findActionView(name: string): Promise<ActionView> {
-  let key = makeKey("action", name);
-  let res = CACHE[key];
-  if (res) {
-    return res;
-  }
-  res = CACHE[key] = fetchAction(name).then((view) => ({ ...view, name }));
-  return res;
+  return getOrLoad(["action", name], () =>
+    fetchAction(name).then((view) => ({ ...view, name }))
+  );
 }
 
 export async function findView<T extends ViewType>({
@@ -34,32 +73,16 @@ export async function findView<T extends ViewType>({
   name?: string;
   model?: string;
 }): Promise<ViewData<T>> {
-  let key = makeKey("view", type, name, model);
-  let res = CACHE[key];
-  if (res) {
-    return res;
-  }
-
-  res = CACHE[key] = fetchView({ type: type as any, name, model }).then(
-    (data) => {
+  return getOrLoad(["views", model, type, name], () =>
+    fetchView({ type: type as any, name, model }).then((data) => {
       // process the meta data
       processView(data, data.view);
       processWidgets(data.view);
       return data;
-    }
+    })
   );
-
-  return res;
 }
 
 export async function findFields(model: string): Promise<MetaData> {
-  const key = makeKey("fields", model);
-
-  let res = CACHE[key];
-  if (res) {
-    return res;
-  }
-
-  res = CACHE[key] = fetchFields(model);
-  return res;
+  return getOrLoad(["fields", model], () => fetchFields(model));
 }
