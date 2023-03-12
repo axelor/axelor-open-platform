@@ -3,11 +3,6 @@
   flex-direction: column;
 }
 
-.panelHeader,
-.panelBody {
-  padding: 0.75rem;
-}
-
 .panelHeader {
   font-weight: 600;
 }
