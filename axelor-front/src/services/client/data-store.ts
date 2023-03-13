@@ -1,3 +1,5 @@
+import { isEqual } from "lodash";
+
 import {
   DataSource,
   DeleteOption,
@@ -7,6 +9,10 @@ import {
   SearchResult,
 } from "./data";
 import { DataRecord } from "./data.types";
+
+function ifDiff<T>(current: T, value: T): T {
+  return isEqual(current, value) ? current : value;
+}
 
 export type DataStoreListener = (ds: DataStore) => void;
 
@@ -56,7 +62,7 @@ export class DataStore extends DataSource {
 
   #prepareOption(options: SearchOptions) {
     const opts = this.#options;
-    const page = this.#page;
+    const { offset, limit } = this.#page;
     const { _domain, _domainContext } = opts?.filter ?? {};
     const filter = {
       _domain,
@@ -65,21 +71,35 @@ export class DataStore extends DataSource {
     };
     return {
       ...opts,
-      ...page,
+      offset,
+      limit,
       ...options,
       filter,
     };
+  }
+
+  #accept(options: SearchOptions, page: SearchPage, records: DataRecord[]) {
+    const _options = ifDiff(this.#options, options);
+    const _records = ifDiff(this.#records, records);
+    const _page = ifDiff(this.#page, page);
+
+    const changed =
+      this.#options !== _options ||
+      this.#records !== _records ||
+      this.#page !== _page;
+
+    this.#options = _options;
+    this.#records = _records;
+    this.#page = _page;
+
+    if (changed) this.#notify();
   }
 
   async search(options: SearchOptions): Promise<SearchResult> {
     const opts = this.#prepareOption(options);
     const { page, records } = await super.search(opts);
 
-    this.#options = opts;
-    this.#records = records;
-    this.#page = page;
-
-    this.#notify();
+    this.#accept(opts, page, records);
 
     return {
       page,
@@ -96,13 +116,13 @@ export class DataStore extends DataSource {
     const page = this.#page;
     const { totalCount = this.records.length } = page;
 
-    this.#records = this.#records.filter((x) => !ids.includes(x.id!));
-    this.#page = {
+    const _records = this.#records.filter((x) => !ids.includes(x.id!));
+    const _page = {
       ...page,
       totalCount: totalCount - res,
     };
 
-    this.#notify();
+    this.#accept(this.#options, _page, _records);
 
     return res;
   }

@@ -10,6 +10,6 @@ export function useDataStore<T>(
     return store.subscribe(() => {
       setState(() => selector(store));
     });
-  });
+  }, [store, selector]);
   return state;
 }
