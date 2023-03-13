@@ -23,6 +23,7 @@
     "immer": "^9.0.19",
     "jotai": "^2.0.2",
     "jotai-immer": "^0.2.0",
+    "jotai-molecules": "^1.1.0",
     "jotai-optics": "^0.3.0",
     "jsdom": "^21.1.0",
     "lodash": "^4.17.21",
@@ -31,6 +32,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.2",
+    "react-transition-group": "^4.4.5",
     "sanitize-html": "^2.10.0"
   },
   "devDependencies": {

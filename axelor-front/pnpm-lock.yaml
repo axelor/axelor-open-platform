@@ -30,6 +30,7 @@ specifiers:
   immer: ^9.0.19
   jotai: ^2.0.2
   jotai-immer: ^0.2.0
+  jotai-molecules: ^1.1.0
   jotai-optics: ^0.3.0
   jsdom: ^21.1.0
   lodash: ^4.17.21
@@ -39,6 +40,7 @@ specifiers:
   react: ^18.2.0
   react-dom: ^18.2.0
   react-router-dom: ^6.8.2
+  react-transition-group: ^4.4.5
   rimraf: ^4.1.2
   sanitize-html: ^2.10.0
   sass: ^1.58.3
@@ -57,6 +59,7 @@ dependencies:
   immer: 9.0.19
   jotai: 2.0.2_react@18.2.0
   jotai-immer: 0.2.0_cacwipmf43ym6kjnb5peobozjq
+  jotai-molecules: 1.1.0_jotai@2.0.2+react@18.2.0
   jotai-optics: 0.3.0_ve3mdc235hz7dbpwcxdq6wzsxq
   jsdom: 21.1.0
   lodash: 4.17.21
@@ -65,6 +68,7 @@ dependencies:
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-router-dom: 6.8.2_biqbaboplfbrettd7655fr4n2y
+  react-transition-group: 4.4.5_biqbaboplfbrettd7655fr4n2y
   sanitize-html: 2.10.0
 
 devDependencies:
@@ -4537,6 +4541,17 @@ packages:
       react: '>=17.0.0'
     dependencies:
       immer: 9.0.19
+      jotai: 2.0.2_react@18.2.0
+      react: 18.2.0
+    dev: false
+
+  /jotai-molecules/1.1.0_jotai@2.0.2+react@18.2.0:
+    resolution: {integrity: sha512-d/Z1zRqKXIdPC2PdrTJIIvGT15DvibRlSvtPEWHMHaEVhd0iYO+yGlswm+Hcz7z4ptxb9idNoEl/38dVOVo1Vw==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      jotai: '>=1'
+      react: '>=16'
+    dependencies:
       jotai: 2.0.2_react@18.2.0
       react: 18.2.0
     dev: false
