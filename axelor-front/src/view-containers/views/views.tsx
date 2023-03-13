@@ -1,6 +1,6 @@
 import { useAsync } from "@/hooks/use-async";
-import { DataStore, useDataStore } from "@/hooks/use-data-store";
 import { Tab } from "@/hooks/use-tabs";
+import { DataStore } from "@/services/client/data-store";
 import { findView } from "@/services/client/meta-cache";
 import { toCamelCase, toKebabCase } from "@/utils/names";
 import { ScopeProvider } from "jotai-molecules";
@@ -72,7 +72,7 @@ const DataViews = memo(function DataViews({
 }) {
   const { view } = tab;
   const { domain, context } = view;
-  const dataStore = useDataStore(model, {
+  const dataStore = new DataStore(model, {
     filter: {
       _domain: domain,
       _domainContext: context,

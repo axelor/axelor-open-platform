@@ -1,8 +1,26 @@
-import { DataStore } from "@/hooks/use-data-store";
+import { DataStore } from "@/services/client/data-store";
 import { ViewData } from "@/services/client/meta";
-import { View } from "@/services/client/meta.types";
+import {
+  CalendarView,
+  CardsView,
+  FormView,
+  GanttView,
+  GridView,
+  KanbanView,
+  View,
+} from "@/services/client/meta.types";
 
-export interface ViewProps<T extends View> {
-  meta: ViewData<T>;
-  dataStore?: DataStore;
-}
+export type ViewProps<T extends View> = T extends
+  | GridView
+  | FormView
+  | CardsView
+  | KanbanView
+  | CalendarView
+  | GanttView
+  ? {
+      meta: ViewData<T>;
+      dataStore: DataStore;
+    }
+  : {
+      meta: ViewData<T>;
+    };
