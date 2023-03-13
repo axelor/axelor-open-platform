@@ -616,7 +616,7 @@ export interface CalendarView extends View {
   mode?: CalendarModeType;
   colorBy?: string;
   onChange?: string;
-  eventStart?: string;
+  eventStart: string;
   eventStop?: string;
   eventLength?: number;
   dayLength?: number;

@@ -1,50 +1,51 @@
+import {
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+  lazy,
+  Suspense,
+} from "react";
+
+import { Box } from "@axelor/ui/core";
+import { SchedulerProps, SchedulerEvent, View } from "@axelor/ui/scheduler";
+
 import { CalendarView } from "@/services/client/meta.types";
+
+import { useAsync } from "@/hooks/use-async";
+import { useSession } from "@/hooks/use-session";
+
+import { Property } from "../../services/client/meta.types";
+import { Criteria } from "../../services/client/data.types";
+import { addDate } from "../../utils/date";
+
 import { ViewProps } from "../types";
 
-import { useState, useMemo, useCallback, useEffect } from "react";
-import { atom, useAtom } from "jotai";
+import { Filter } from "./components/types";
+import Loading from "./components/loading";
+import { getEventFilters, getTimes } from "./utils";
 
-import {
-  Scheduler,
-  SchedulerProps,
-  SchedulerEvent,
-  Event,
-  View,
-} from "@axelor/ui/scheduler";
+import styles from "./calendar.module.scss";
+import { DEFAULT_COLOR } from "./colors";
 
-import { Tab } from "@/hooks/use-tabs";
-import { DataStore } from "@/hooks/use-data-store";
-import { useAsync } from "@/hooks/use-async";
+const Scheduler = lazy(() => import("./components/scheduler"));
+const DatePicker = lazy(() => import("./components/date-picker"));
+const Filters = lazy(() => import("./components/filters"));
 
-import { ViewData } from "@/services/client/meta";
-
-import {
-  ActionView,
-  HelpOverride,
-  JsonField,
-  MenuItem,
-  Perms,
-  Property,
-  SavedFilter,
-  ViewTypes,
-} from "../../services/client/meta.types";
-
-import { Criteria } from "../../services/client/data.types";
-import { getStartOf, getNextOf, addDate } from "../../utils/date";
-
-import { useSession } from "@/hooks/use-session";
-import { useMoment } from "@/hooks/use-moment";
-
-function getTimes(date: Date | string, view: View) {
-  return { start: getStartOf(date, view), end: getNextOf(date, view) };
-}
+const eventStyler = ({
+  event,
+}: {
+  event: SchedulerEvent & { $backgroundColor?: string };
+}) => ({
+  style: { backgroundColor: event.$backgroundColor },
+});
 
 export function Calendar(props: ViewProps<CalendarView>) {
   const {
-    meta: { view: metaView, fields: metaFields, perms: metaPerms },
-    dataStore = {} as DataStore,
+    meta: { view: metaView, fields: _metaFields, perms: metaPerms },
+    dataStore,
   } = props;
-  const { search = () => {}, records = [] } = dataStore;
+  const metaFields = _metaFields as Record<string, Property>;
 
   const {
     eventStart,
@@ -58,16 +59,13 @@ export function Calendar(props: ViewProps<CalendarView>) {
     () => session.data?.api?.pagination?.maxPerPage || -1,
     [session]
   );
-  const { momentLocale } = useMoment();
 
   const searchFieldNames = useMemo(() => {
-    const schemaFieldNames = Object.keys(
-      metaFields as Record<string, Property>
-    );
+    const schemaFieldNames = Object.keys(metaFields);
     const viewFieldNames = [eventStart, eventStop, colorBy].filter(
       (field) => field
-    );
-    return [...new Set([...schemaFieldNames, ...viewFieldNames])]; // XXX: custom fields?
+    ) as string[];
+    return [...new Set([...schemaFieldNames, ...viewFieldNames])];
   }, [metaFields, eventStart, eventStop, colorBy]);
 
   const [calendarDate, setCalendarDate] = useState<Date>(() => new Date());
@@ -93,28 +91,30 @@ export function Calendar(props: ViewProps<CalendarView>) {
         },
       ],
     };
-    const stopCriteria: Criteria = eventStop && {
-      operator: "and",
-      criteria: [
-        {
-          fieldName: eventStop,
-          operator: ">=",
-          value: calendarStart,
-        },
-        {
-          fieldName: eventStart, // include intermediate events: RM-31366
-          operator: "<",
-          value: calendarEnd,
-        },
-      ],
-    };
+    const stopCriteria: Criteria | null = eventStop
+      ? ({
+          operator: "and",
+          criteria: [
+            {
+              fieldName: eventStop,
+              operator: ">=",
+              value: calendarStart,
+            },
+            {
+              fieldName: eventStart, // include intermediate events: RM-31366
+              operator: "<",
+              value: calendarEnd,
+            },
+          ],
+        } as Criteria)
+      : null;
     const filter = stopCriteria
       ? ({
           operator: "or",
           criteria: [startCriteria, stopCriteria],
         } as Criteria)
       : startCriteria;
-    return await search({
+    return await dataStore.search({
       fields: searchFieldNames,
       filter,
       limit: maxPerPage,
@@ -128,11 +128,14 @@ export function Calendar(props: ViewProps<CalendarView>) {
     maxPerPage,
   ]);
 
-  const calendarEvents: SchedulerProps["events"] = useMemo(() => {
-    return records.map((record) => {
+  const _calendarEvents: SchedulerProps["events"] = useMemo(() => {
+    if (data.state !== "hasData") {
+      return [];
+    }
+    return (dataStore.records || []).map((record) => {
       const { id, name: title } = record;
       const start = new Date(record[eventStart] as string);
-      const recordStop = record[eventStop] as string;
+      const recordStop = eventStop && (record[eventStop] as string);
       const end = recordStop
         ? new Date(recordStop)
         : addDate(start, eventLength, "hours");
@@ -144,7 +147,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
         record,
       };
     }) as SchedulerProps["events"];
-  }, [records, eventStart, eventStop, eventLength]);
+  }, [data.state, dataStore.records, eventStart, eventStop, eventLength]);
 
   const handleNavigationChange = useCallback((date: Date) => {
     setCalendarDate(date);
@@ -154,18 +157,75 @@ export function Calendar(props: ViewProps<CalendarView>) {
     setCalendarMode(view);
   }, []);
 
-  if (data.state === "loading" || !momentLocale) {
-    return <div>Loading</div>;
+  // Filters
+
+  const [filters, setFilters] = useState<Filter[]>([]);
+
+  const calendarEvents: SchedulerProps["events"] = useMemo(() => {
+    const checkedFilters = filters.filter((x) => x.checked);
+    const showAll = checkedFilters.length === 0;
+    return (_calendarEvents || []).reduce(
+      (list: object[], event: SchedulerEvent) => {
+        const filter = (showAll ? filters : checkedFilters).find(
+          (filter: Filter) => filter.match!(event)
+        );
+        return filter || showAll
+          ? [
+              ...list,
+              {
+                ...event,
+                $backgroundColor: (filter || {}).color || DEFAULT_COLOR,
+              },
+            ]
+          : list;
+      },
+      []
+    ) as SchedulerEvent[];
+  }, [_calendarEvents, filters]);
+
+  const colorByField = colorBy ? metaFields[colorBy] : null;
+
+  useEffect(() => {
+    colorByField &&
+      setFilters(getEventFilters(_calendarEvents || [], colorByField));
+  }, [_calendarEvents, colorByField]);
+
+  function handleFilterChange(ind: number) {
+    if (ind > -1) {
+      setFilters((filters) =>
+        filters.map((filter, index) =>
+          index === ind ? { ...filter, checked: !filter.checked } : filter
+        )
+      );
+    }
   }
 
   return (
-    <Scheduler
-      events={calendarEvents}
-      date={calendarDate}
-      view={calendarMode}
-      onNavigationChange={handleNavigationChange}
-      onViewChange={handleViewChange}
-      style={{ height: 800, width: "100%" }}
-    />
+    <Suspense fallback={<Loading />}>
+      <Box d="flex" flexDirection="row" flexGrow={1} className={styles["root"]}>
+        <Box d="flex" p={2} pe={0} className={styles["scheduler-panel"]}>
+          <Scheduler
+            events={calendarEvents}
+            date={calendarDate}
+            view={calendarMode}
+            onNavigationChange={handleNavigationChange}
+            onViewChange={handleViewChange}
+            eventStyler={eventStyler}
+            style={{ width: "100%" }}
+          />
+        </Box>
+        <Box flex={1} p={2} className={styles["calendar-panel"]}>
+          <DatePicker
+            selected={calendarDate}
+            onChange={(date: Date) => {
+              setCalendarDate(date);
+              handleNavigationChange(date);
+            }}
+            {...({ inline: true } as any)}
+          />
+          <Filters data={filters} onChange={handleFilterChange} />
+        </Box>
+      </Box>
+    </Suspense>
   );
 }
