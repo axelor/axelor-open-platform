@@ -17,7 +17,8 @@
     "jsx": "react-jsx",
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@axelor/ui/*": ["./node_modules/@axelor/ui/src/*"]
     }
   },
   "include": ["src"],
