@@ -1,3 +1,5 @@
-export function Html() {
-  return <div>Html</div>
+import { ViewProps } from "../types";
+
+export function Html(props: ViewProps<any>) {
+  return <div>Html</div>;
 }

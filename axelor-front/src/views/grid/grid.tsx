@@ -1,21 +1,6 @@
-import { useAsync } from "@/hooks/use-async";
-import { DataStore } from "@/hooks/use-data-store";
-import { Tab } from "@/hooks/use-tabs";
-import { ViewData } from "@/services/client/meta";
+import { GridView } from "@/services/client/meta.types";
+import { ViewProps } from "../types";
 
-export function Grid(props: {
-  tab: Tab;
-  schema: ViewData<any>;
-  dataStore: DataStore;
-}) {
-  const { search } = props.dataStore;
-  const data = useAsync(async () => {
-    return await search({});
-  }, []);
-
-  if (data.state === "loading") {
-    return <div>Loading</div>;
-  }
-
+export function Grid(props: ViewProps<GridView>) {
   return <div>Grid</div>;
 }
