@@ -9,8 +9,9 @@ import { DataRecord } from "@/services/client/data.types";
 import { useCallback, useMemo, useState } from "react";
 
 export interface DataStore extends DataSource {
-  readonly records: DataRecord[];
   readonly page: SearchPage;
+  readonly records: DataRecord[];
+  readonly options: SearchOptions;
 }
 
 export function useDataStore(model: string): DataStore;
@@ -120,9 +121,10 @@ export function useDataStore(
   );
 
   return {
-    records,
-    page,
     model,
+    page,
+    records,
+    options: opts,
     search: doSearch,
     read: doRead,
     save: doSave,
