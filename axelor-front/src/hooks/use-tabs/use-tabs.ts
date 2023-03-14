@@ -1,3 +1,4 @@
+import { navigate } from "@/routes";
 import { findActionView } from "@/services/client/meta-cache";
 import { ActionView } from "@/services/client/meta.types";
 import { atom, useAtomValue, useSetAtom } from "jotai";
@@ -46,11 +47,23 @@ const openAtom = atom(
 const closeAtom = atom(null, async (get, set, view: ActionView | string) => {
   const tabs = get(tabsAtom);
   const name = viewName(view);
-  const index = tabs.findIndex((x) => x.id === name);
-  if (index > -1) {
-    const prev = tabs[index - 1] ?? null;
-    set(tabsAtom, (state) => state.filter((x) => x.id !== name));
-    set(tabAtom, prev);
+  const found = tabs.find((x) => x.id === name);
+  if (found) {
+    let index = tabs.indexOf(found);
+    let next = get(tabAtom);
+    if (next === found) {
+      next = tabs[index + 1] ?? tabs[index - 1];
+    }
+
+    const newTabs = tabs.filter((x) => x.id !== name);
+
+    set(tabsAtom, newTabs);
+    set(tabAtom, next ?? null);
+
+    // if it was a last tab
+    if (newTabs.length === 0) {
+      navigate("/");
+    }
   }
 });
 

@@ -1,0 +1,35 @@
+.tabs {
+  padding-top: 0.5rem;
+}
+
+.tabContent {
+  display: none;
+  overflow: auto;
+}
+
+.tabContent.active {
+  display: flex;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  .tabTitle {
+    margin: 0 0.5rem;
+  }
+  .tabClose {
+    display: inline-flex;
+    color: rgba(0, 0, 0, 0.5);
+    &:hover {
+      color: inherit;
+    }
+  }
+  .tabIcon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
