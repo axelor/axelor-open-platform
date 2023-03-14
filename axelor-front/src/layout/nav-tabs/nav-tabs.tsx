@@ -1,4 +1,5 @@
 import { useMenu } from "@/hooks/use-menu";
+import { useSession } from "@/hooks/use-session";
 import { Tab, useTabs } from "@/hooks/use-tabs";
 import { MenuItem } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
@@ -73,6 +74,9 @@ const NavTab = memo(function NavTab({
   const { id, title } = tab;
   const { icon, iconColor } = useIcon(id);
 
+  const { info } = useSession();
+  const showClose = tab.id !== info?.user?.action;
+
   const handleClose = useCallback<React.MouseEventHandler<HTMLDivElement>>(
     (e) => {
       e.preventDefault();
@@ -86,9 +90,11 @@ const NavTab = memo(function NavTab({
     <div className={styles.tab}>
       {icon && <NavIcon icon={icon} iconColor={iconColor} />}
       <div className={styles.tabTitle}>{title}</div>
-      <div className={styles.tabClose} onClick={handleClose}>
-        <MaterialIcon icon="close" weight={300} opticalSize={20} />
-      </div>
+      {showClose && (
+        <div className={styles.tabClose} onClick={handleClose}>
+          <MaterialIcon icon="close" weight={300} opticalSize={20} />
+        </div>
+      )}
     </div>
   );
 });
