@@ -4,16 +4,22 @@ import { NavDrawer } from "./nav-drawer";
 import { NavHeader } from "./nav-header";
 import { NavTabs } from "./nav-tabs";
 
+import clsx from "clsx";
 import styles from "./layout.module.scss";
+import { useSidebar } from "./nav-drawer/hook";
 
 export function Layout() {
+  const { sidebar } = useSidebar();
   return (
     <Box d="flex" flexDirection="column" vh={100}>
-      <Box borderBottom p={3}>
-        <NavHeader />
-      </Box>
+      <NavHeader />
       <Box d="flex" flexGrow={1} className={styles.content}>
-        <Box as="nav" flex="0 0 auto" borderEnd className={styles.sidebar}>
+        <Box
+          as="nav"
+          flex="0 0 auto"
+          borderEnd
+          className={clsx(styles.sidebar, { [styles.hide]: !sidebar })}
+        >
           <NavDrawer />
         </Box>
         <Box d="flex" flexDirection="column" overflow="hidden" flexGrow={1}>

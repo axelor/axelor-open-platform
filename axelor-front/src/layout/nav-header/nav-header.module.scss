@@ -1,0 +1,25 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+
+.menuToggle {
+  display: flex;
+  align-items: center;
+  user-select: none;
+  cursor: pointer;
+}
+
+.topMenu {
+  flex: 1;
+}
+
+.appLogo {
+  svg {
+    display: block;
+    height: 32px;
+    width: 100px !important;
+  }
+}

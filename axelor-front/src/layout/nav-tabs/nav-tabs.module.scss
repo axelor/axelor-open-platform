@@ -1,5 +1,7 @@
 .tabs {
   padding-top: 0.5rem;
+  position: relative;
+  z-index: 0;
 }
 
 .tabContent {

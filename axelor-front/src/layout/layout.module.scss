@@ -6,7 +6,11 @@
 
 .sidebar {
   overflow: auto;
-  width: 250px;
+  width: 300px;
+  left: 0;
+  &.hide {
+    display: none;
+  }
 }
 
 .page {
@@ -15,7 +19,6 @@
   width: 100%;
   height: 100%;
   background: rgb(var(--bs-body-bg-rgb));
-  z-index: 1;
 }
 
 .page:empty {
