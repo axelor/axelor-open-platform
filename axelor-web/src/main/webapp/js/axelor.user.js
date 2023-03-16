@@ -22,9 +22,13 @@
   "use strict";
 
   var ds = angular.module('axelor.ds');
+  var userName = 'name';
+
+  $("body").on("app:config-fetched", function () {
+    userName = axelor.config['user.nameField'] || userName;
+  });
 
   ds.factory('UserService', [function () {
-    var userName = axelor.config['user.nameField'] || 'name';
 
     function getName(user) {
       if (!user) return null;
