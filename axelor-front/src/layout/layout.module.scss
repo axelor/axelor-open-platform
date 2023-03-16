@@ -1,3 +1,5 @@
+$sidebar-width: 300px;
+
 .content {
   position: relative;
   max-height: fit-content;
@@ -6,10 +8,23 @@
 
 .sidebar {
   overflow: auto;
-  width: 300px;
-  left: 0;
-  &.hide {
-    display: none;
+  width: $sidebar-width;
+  margin-left: -$sidebar-width;
+  transition: all 225ms cubic-bezier(0.6, 0, 0.4, 1) 0ms;
+}
+
+.showSidebar .sidebar {
+  opacity: 1;
+  margin-left: 0;
+}
+
+[dir="rtl"] {
+  .sidebar {
+    margin-left: 0;
+    margin-right: -$sidebar-width;
+  }
+  .showSidebar .sidebar {
+    margin-right: 0;
   }
 }
 

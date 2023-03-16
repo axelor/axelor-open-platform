@@ -1,12 +1,15 @@
 .tabs {
-  padding-top: 0.5rem;
   position: relative;
   z-index: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
 }
 
 .tabContent {
   display: none;
-  overflow: auto;
+  flex: 1;
 }
 
 .tabContent.active {

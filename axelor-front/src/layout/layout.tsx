@@ -13,12 +13,16 @@ export function Layout() {
   return (
     <Box d="flex" flexDirection="column" vh={100}>
       <NavHeader />
-      <Box d="flex" flexGrow={1} className={styles.content}>
+      <Box
+        d="flex"
+        flexGrow={1}
+        className={clsx(styles.content, { [styles.showSidebar]: sidebar })}
+      >
         <Box
           as="nav"
           flex="0 0 auto"
           borderEnd
-          className={clsx(styles.sidebar, { [styles.hide]: !sidebar })}
+          className={clsx(styles.sidebar)}
         >
           <NavDrawer />
         </Box>
