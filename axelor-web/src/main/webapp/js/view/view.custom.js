@@ -22,8 +22,8 @@
 
 var ui = angular.module("axelor.ui");
 
-CustomViewCtrl.$inject = ['$scope', '$http', 'DataSource', 'ViewService'];
-function CustomViewCtrl($scope, $http, DataSource, ViewService) {
+CustomViewCtrl.$inject = ['$scope', '$element', '$http', 'DataSource', 'ViewService'];
+function CustomViewCtrl($scope, $element, $http, DataSource, ViewService) {
 
   ui.ViewCtrl.call(this, $scope, DataSource, ViewService);
 
@@ -77,14 +77,33 @@ function CustomViewCtrl($scope, $http, DataSource, ViewService) {
     return context;
   };
 
+  var refreshing = false;
   $scope.onRefresh = function() {
-    var context = _.extend({}, $scope.getContext(), { _domainAction: $scope._viewAction });
-    var params = {
-      data: context
-    };
-    return $http.post('ws/meta/custom/' + view.name, params).then(function(response) {
-      var res = response.data;
-      $scope.data = (res.data||{}).dataset;
+
+    if (refreshing) return;
+    refreshing = true;
+
+    var unwatch = $scope.$watch(function () {
+      return $element.is(':hidden');
+    }, function (hidden) {
+      if (hidden) return;
+      unwatch();
+
+      $scope.waitForActions(function () {
+        $scope.ajaxStop(function () {
+          var context = _.extend({}, $scope.getContext(), { _domainAction: $scope._viewAction });
+          var params = {
+            data: context
+          };
+          $http.post('ws/meta/custom/' + view.name, params).then(function(response) {
+            var res = response.data;
+            $scope.data = (res.data||{}).dataset;
+          }, function() {
+            $scope.data = {};
+          });
+          refreshing = false;
+        });
+      });
     });
   };
 
