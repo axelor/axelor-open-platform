@@ -2388,8 +2388,8 @@ Grid.prototype._showEditor = function (activeCell) {
     delete that.uninstallScrollbarWatcher;
   }
 
+  !this._editorVisible && this.scope.$emit('on:grid-edit-start', this);
   this._editorVisible = grid._editorVisible = true;
-  this.scope.$emit('on:grid-edit-start', this);
   this.adjustEditor(args);
 
   var item = grid.getDataItem(args.row) || {};
@@ -2432,8 +2432,8 @@ Grid.prototype.cancelEdit = function (opts) {
     this.uninstallScrollbarWatcher();
   }
 
- this._editorVisible = this.grid._editorVisible = false;
-  this.scope.$emit('on:grid-edit-end', this, opts);
+  this._editorVisible && this.scope.$emit('on:grid-edit-end', this, opts);
+  this._editorVisible = this.grid._editorVisible = false;
   if (this.handler.dataView.getItemById(0)) {
     this.handler.dataView.deleteItem(0);
   }
