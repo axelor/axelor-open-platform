@@ -66,7 +66,7 @@ export async function filters(name: string): Promise<SavedFilter[]> {
 
 export interface MetaData {
   model: string;
-  fields: Property[] | Record<string, Property>; // incoming is array, processed to object;
+  fields: Record<string, Property>; // incoming is array, processed to object;
   jsonFields?: Record<string, Record<string, JsonField>>;
   perms?: Perms;
 }

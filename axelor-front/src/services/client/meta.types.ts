@@ -72,7 +72,7 @@ export interface Property {
   autoTitle?: string;
   selectionList?: Selection[];
   widget?: string;
-  widgetAttrs?: string | Record<string, any>;
+  widgetAttrs?: Record<string, any>; // incoming is string, processed to object
   jsonField?: string;
 }
 
@@ -96,7 +96,7 @@ export interface Widget {
   width?: string;
   autoTitle?: string;
   widget?: string;
-  widgetAttrs?: string | Record<string, any>;
+  widgetAttrs?: Record<string, any>; // incoming is string, processed to object
 }
 
 export interface Container extends Widget {
@@ -107,7 +107,7 @@ export interface Viewer {
   type: "viewer";
   depends?: string;
   template?: string;
-  fields?: Property[] | Record<string, Property>; // incoming is array, processed to object
+  fields?: Record<string, Property>; // incoming is array, processed to object
 }
 
 export interface Editor extends Omit<Panel, "type"> {
@@ -117,7 +117,7 @@ export interface Editor extends Omit<Panel, "type"> {
   showOnNew?: boolean;
   onNew?: string;
   items?: (Field | Button | Spacer | Separator | Label | Panel)[];
-  fields?: Property[] | Record<string, Property>; // incoming is array, processed to object
+  fields?: Record<string, Property>; // incoming is array, processed to object
 }
 
 export interface Tooltip extends Omit<Viewer, "type"> {
