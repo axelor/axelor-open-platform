@@ -18,6 +18,8 @@ export type PropertyType =
   | "ONE_TO_MANY"
   | "MANY_TO_MANY";
 
+export type DirectionType = "horizontal" | "vertical";
+
 export interface Property {
   name: string;
   type: PropertyType;
@@ -33,7 +35,7 @@ export interface Property {
   maxSize?: number | string;
   minSize?: number | string;
   precision?: number;
-  scale?: number;
+  scale?: number | string;
   title?: string;
   help?: string;
   image?: boolean;
@@ -50,12 +52,21 @@ export interface Property {
   translatable?: boolean;
   encrypted?: boolean;
   defaultNow?: boolean;
+  defaultValue?: any;
   nameSearch?: string[];
   selection?: string;
   version?: boolean;
   reference?: boolean;
   collection?: boolean;
   enum?: boolean;
+
+  // x-* attributes
+  order?: string;
+  currency?: string;
+  trueText?: string;
+  falseText?: string;
+  big?: boolean;
+  seconds?: boolean;
 
   // by view service
   autoTitle?: string;
@@ -142,6 +153,7 @@ export interface Button extends Widget {
   prompt?: string;
   onClick?: string;
   title?: string;
+  field?: string;
 }
 
 export interface ButtonGroup extends Container {
@@ -190,7 +202,7 @@ export interface Help extends Omit<Static, "type"> {
   type: "help";
 }
 
-export interface Field extends Widget {
+export interface Field extends Widget, Omit<Property, "type" | "sequence"> {
   type: "field";
   name: string;
   serverType?: string;
@@ -202,6 +214,8 @@ export interface Field extends Widget {
   canView?: string;
   canEdit?: string;
   canRemove?: string;
+  canCopy?: boolean;
+  canExport?: boolean;
   onChange?: string;
   onSelect?: string;
   target?: string;
@@ -235,12 +249,14 @@ export interface Field extends Widget {
   iconActive?: string;
   exclusive?: boolean;
   showIcons?: string;
-  direction?: string;
+  showBars?: boolean;
+  direction?: DirectionType;
   codeSyntax?: string;
   codeTheme?: string;
   lite?: boolean;
   labels?: boolean;
   orderBy?: string;
+  order?: string;
   limit?: number;
   searchLimit?: number;
   colorField?: string;
@@ -285,6 +301,8 @@ export interface Panel extends Container {
   )[];
 }
 
+export type SelectorType = "checkbox" | "single" | null;
+
 export interface PanelRelated extends Omit<Panel, "type"> {
   type: "panel-related";
   name?: string;
@@ -293,7 +311,7 @@ export interface PanelRelated extends Omit<Panel, "type"> {
   gridView?: string;
   searchLimit?: number;
   rowHeight?: number;
-  selector?: string;
+  selector?: SelectorType;
   editable?: boolean;
   required?: boolean;
   requiredIf?: string;
@@ -316,6 +334,7 @@ export interface PanelRelated extends Omit<Panel, "type"> {
   items?: (Field | Button)[];
   fields?: Property[];
   perms?: Perms;
+  showBars?: boolean;
 }
 
 export interface PanelDashlet extends Omit<Panel, "type"> {
@@ -323,6 +342,7 @@ export interface PanelDashlet extends Omit<Panel, "type"> {
   action?: string;
   canSearch?: boolean;
   canEdit?: string;
+  showBars?: boolean;
 }
 
 export interface PanelInclude extends Omit<Panel, "type"> {
@@ -466,7 +486,7 @@ export interface GridView extends View {
   rowHeight?: number;
   colWidth?: number;
   noFetch?: boolean;
-  selector?: string;
+  selector?: SelectorType;
   inlineHelp?: Help;
   toolbar?: Button[];
   menubar?: Menu[];
@@ -568,9 +588,11 @@ export interface KanbanView extends View {
   columns?: Selection[];
 }
 
+export type CalendarModeType = "month" | "week" | "day";
+
 export interface CalendarView extends View {
   type: "calendar";
-  mode?: string;
+  mode?: CalendarModeType;
   colorBy?: string;
   onChange?: string;
   eventStart?: string;
@@ -580,9 +602,11 @@ export interface CalendarView extends View {
   items?: Widget[];
 }
 
+export type GanttModeType = "year" | CalendarModeType;
+
 export interface GanttView extends View {
   type: "gantt";
-  mode?: string;
+  mode?: GanttModeType;
   taskStart?: string;
   taskDuration?: string;
   taskEnd?: string;
