@@ -13,10 +13,10 @@ import { System } from "./system";
 import { View } from "./view";
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
-  const { info, loading } = useSession();
+  const { state, data } = useSession();
   const location = useLocation();
-  if (loading) return <div>Loading</div>;
-  if (info) {
+  if (state === "loading") return <div>Loading</div>;
+  if (data) {
     return children;
   }
   return <Navigate to="/login" state={{ from: location }} />;

@@ -8,7 +8,7 @@ import { useSidebar } from "../nav-drawer/hook";
 import styles from "./nav-header.module.scss";
 
 function FarItems() {
-  const { info, logout } = useSession();
+  const { data, logout } = useSession();
   return (
     <CommandBar
       items={[
@@ -67,7 +67,7 @@ function FarItems() {
           items: [
             {
               id: "profile",
-              title: info?.user.name,
+              title: data?.user.name,
               subtitle: "Preferences",
               onClick: () => navigate("/profile"),
             },
@@ -97,9 +97,9 @@ function FarItems() {
 }
 
 export function NavHeader() {
-  const { info } = useSession();
+  const { data } = useSession();
   const { sidebar, setSidebar } = useSidebar();
-  const appHome = info?.app.home ?? "#/";
+  const appHome = data?.app.home ?? "#/";
   return (
     <Box className={styles.header} borderBottom>
       <Box className={styles.menuToggle} onClick={(e) => setSidebar(!sidebar)}>

@@ -14,7 +14,7 @@ export function Login() {
   const [showError, setShowError] = useState(false);
 
   const location = useLocation();
-  const { login, info, error, loading } = useSession();
+  const { state, data, error, login } = useSession();
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = useCallback(
     (event) => {
@@ -28,8 +28,8 @@ export function Login() {
     [error, login, username, password]
   );
 
-  if (loading) return null;
-  if (info) {
+  if (state === "loading") return null;
+  if (data) {
     let { from } = location.state || { from: { pathname: "/" } };
     if (from === "/login") from = "/";
     return <Navigate to={from} />;

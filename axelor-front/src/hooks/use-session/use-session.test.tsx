@@ -47,14 +47,14 @@ afterEach(() => {
 });
 
 const App = () => {
-  const { loading, info } = useSession();
-  if (loading) {
+  const { state, data } = useSession();
+  if (state === "loading") {
     return <div data-testid="loading">Loading...</div>;
   }
-  if (info) {
+  if (data) {
     return (
       <div data-testid="logged-in">
-        <h4>{info.user.name}</h4>
+        <h4>{data.user.name}</h4>
         <LogoutButton />
       </div>
     );

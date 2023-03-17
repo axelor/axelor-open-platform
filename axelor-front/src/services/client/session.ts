@@ -81,43 +81,79 @@ const INFO_MAPPINGS = {
   "view.menubar.location": "view.menubar.location",
 };
 
-export async function info() {
-  const url = "ws/app/info";
-  const resp = await request({ url });
+export type SessionListener = (info: SessionInfo | null) => void;
 
-  if (!resp.ok) {
-    return Promise.reject(resp.status);
+export class Session {
+  #info: SessionInfo | null = null;
+  #listeners = new Set<SessionListener>();
+
+  #notify() {
+    this.#listeners.forEach((fn) => fn(this.#info));
   }
 
-  const data = await resp.json();
-  const tmp: any = {};
-
-  if (data["data.upload.max-size"]) {
-    data["data.upload.max-size"] = parseInt(data["data.upload.max-size"]);
+  subscribe(listener: SessionListener) {
+    this.#listeners.add(listener);
+    return () => {
+      this.#listeners.delete(listener);
+    };
   }
 
-  for (let [key, target] of Object.entries(INFO_MAPPINGS)) {
-    if (key in data) {
-      set(tmp, target, data[key]);
+  get info() {
+    return this.#info;
+  }
+
+  async init() {
+    return this.#info || (await this.#load());
+  }
+
+  async #load() {
+    const url = "ws/app/info";
+    const resp = await request({ url });
+
+    if (!resp.ok) {
+      return Promise.reject(resp.status);
     }
+
+    const data = await resp.json();
+    const tmp: any = {};
+
+    if (data["data.upload.max-size"]) {
+      data["data.upload.max-size"] = parseInt(data["data.upload.max-size"]);
+    }
+
+    for (let [key, target] of Object.entries(INFO_MAPPINGS)) {
+      if (key in data) {
+        set(tmp, target, data[key]);
+      }
+    }
+
+    this.#info = tmp as SessionInfo;
+    this.#notify();
+
+    return this.#info;
   }
 
-  return tmp as SessionInfo;
+  async login(args: {
+    username: string;
+    password: string;
+  }): Promise<SessionInfo> {
+    const { status, ok } = await request({
+      url: "callback",
+      method: "POST",
+      body: args,
+    });
+
+    return ok ? await this.#load() : Promise.reject(status);
+  }
+
+  async logout() {
+    const { status } = await request({ url: "logout" });
+
+    this.#info = null;
+    this.#notify();
+
+    return status;
+  }
 }
 
-export const login = async (args: {
-  username: string;
-  password: string;
-}): Promise<SessionInfo> => {
-  const resp = await request({
-    url: "callback",
-    method: "POST",
-    body: args,
-  });
-  return resp.ok ? await info() : Promise.reject(resp.status);
-};
-
-export const logout = async () => {
-  const res = await request({ url: "logout" });
-  return res.status;
-};
+export const session = new Session();

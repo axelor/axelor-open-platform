@@ -74,8 +74,8 @@ const NavTab = memo(function NavTab({
   const { id, title } = tab;
   const { icon, iconColor } = useIcon(id);
 
-  const { info } = useSession();
-  const showClose = tab.id !== info?.user?.action;
+  const { data } = useSession();
+  const showClose = tab.id !== data?.user?.action;
 
   const handleClose = useCallback<React.MouseEventHandler<HTMLDivElement>>(
     (e) => {

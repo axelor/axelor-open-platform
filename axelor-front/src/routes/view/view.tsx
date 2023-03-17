@@ -23,10 +23,10 @@ export function View() {
 
   const { action } = useParams();
   const { active, items, open } = useTabs();
-  const { info } = useSession();
+  const { data } = useSession();
 
   useAsyncEffect(async () => {
-    const name = action ?? info?.user?.action ?? active?.id;
+    const name = action ?? data?.user?.action ?? active?.id;
     if (name) {
       const tab = await open(name);
       const path = getURL(tab);
@@ -35,7 +35,7 @@ export function View() {
         redirect(path);
       }
     }
-  }, [action, active, items, open]);
+  }, [action, active, items, data, open]);
 
   useEffect(() => {
     const tab = active;
