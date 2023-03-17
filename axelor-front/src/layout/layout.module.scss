@@ -2,8 +2,8 @@ $sidebar-width: 300px;
 
 .content {
   position: relative;
-  max-height: fit-content;
-  min-height: 1px;
+  min-width: 0;
+  min-height: 0;
 }
 
 .sidebar {
@@ -26,6 +26,11 @@ $sidebar-width: 300px;
   .showSidebar .sidebar {
     margin-right: 0;
   }
+}
+
+.tabs {
+  min-width: 0;
+  min-height: 0;
 }
 
 .page {

@@ -26,7 +26,7 @@ export function Layout() {
         >
           <NavDrawer />
         </Box>
-        <Box d="flex" flexDirection="column" overflow="hidden" flexGrow={1}>
+        <Box d="flex" flexDirection="column" flexGrow={1} className={styles.tabs}>
           <NavTabs />
           <div className={styles.page}>
             <Outlet />
