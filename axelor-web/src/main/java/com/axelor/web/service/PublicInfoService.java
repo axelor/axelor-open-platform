@@ -47,7 +47,7 @@ public class PublicInfoService extends AbstractService {
 
   @Context private HttpServletRequest request;
 
-  @Inject private AuthPac4jInfo pac4jInfo = Beans.get(AuthPac4jInfo.class);
+  @Inject private AuthPac4jInfo pac4jInfo;
 
   private static final AppSettings SETTINGS = AppSettings.get();
 
@@ -59,7 +59,6 @@ public class PublicInfoService extends AbstractService {
 
   private Map<String, Object> info(final ServletContext context) {
     final Map<String, Object> map = new HashMap<>();
-    final AppInfo info = new AppInfo();
 
     map.put("application", appInfo());
     if (ObjectUtils.notEmpty(pac4jInfo.getCentralClients())) {
@@ -75,6 +74,9 @@ public class PublicInfoService extends AbstractService {
     for (String client : pac4jInfo.getCentralClients()) {
       Map<String, Object> clientMap = new HashMap<>();
       Map<String, String> info = pac4jInfo.getClientInfo(client);
+      if (info == null) {
+        continue;
+      }
 
       clientMap.put("name", client);
       clientMap.put("icon", info.get("icon"));
