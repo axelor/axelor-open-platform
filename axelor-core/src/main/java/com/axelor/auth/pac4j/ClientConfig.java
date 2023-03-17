@@ -18,6 +18,10 @@
  */
 package com.axelor.auth.pac4j;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 public class ClientConfig {
   private String client;
   private String configuration;
@@ -100,5 +104,26 @@ public class ClientConfig {
       clientConfig.setExclusive(true);
       return this;
     }
+  }
+
+  public Map<String, Object> toMap() {
+    final Map<String, Object> map = new HashMap<>();
+
+    map.put("client", client);
+
+    if (configuration != null) {
+      map.put("configuration", configuration);
+    }
+    if (title != null) {
+      map.put("title", title);
+    }
+    if (icon != null) {
+      map.put("icon", icon);
+    }
+    if (exclusive) {
+      map.put("exclusive", exclusive);
+    }
+
+    return Collections.unmodifiableMap(map);
   }
 }

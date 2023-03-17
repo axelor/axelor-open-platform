@@ -38,6 +38,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -71,6 +73,9 @@ public class ClientListProvider implements Provider<List<Client>> {
   // Default client configurations
   private static final Map<String, ClientConfig> CONFIGS =
       new ImmutableMap.Builder<String, ClientConfig>()
+          .put(
+              "form",
+              ClientConfig.builder().client("org.pac4j.http.client.indirect.FormClient").build())
           .put(
               "oidc",
               ClientConfig.builder()
@@ -218,11 +223,7 @@ public class ClientListProvider implements Provider<List<Client>> {
                 return;
               }
               final Map<String, Object> props = entry.getValue();
-              props.computeIfAbsent("client", k -> config.getClient());
-              props.computeIfAbsent("configuration", k -> config.getConfiguration());
-              props.computeIfAbsent("title", k -> config.getTitle());
-              props.computeIfAbsent("icon", k -> config.getIcon());
-              props.computeIfAbsent("exclusive", k -> config.isExclusive());
+              config.toMap().forEach(props::putIfAbsent);
             });
 
     // order of providers displayed on login form
@@ -234,10 +235,14 @@ public class ClientListProvider implements Provider<List<Client>> {
       configs = new LinkedHashMap<>();
       authOrder.forEach(
           name -> {
-            final Map<String, Object> config = initConfigs.remove(name);
-            if (config != null) {
-              configs.put(name, config);
+            Map<String, Object> config = initConfigs.remove(name);
+            if (config == null) {
+              config =
+                  Optional.ofNullable(CONFIGS.get(name))
+                      .orElseThrow(() -> new NoSuchElementException(name))
+                      .toMap();
             }
+            configs.put(name, config);
           });
       configs.putAll(initConfigs);
     }
@@ -245,14 +250,15 @@ public class ClientListProvider implements Provider<List<Client>> {
     final List<Client> configuredClients =
         configs.entrySet().stream()
             .map(e -> createClient(e.getKey(), e.getValue()))
-            .map(Client.class::cast)
             .collect(Collectors.toList());
 
     // check for exclusive clients
     if (configs.isEmpty()
         || configs.size() > 1
         || !((boolean) configs.values().iterator().next().getOrDefault("exclusive", false))) {
-      clients.add(Beans.get(FormClient.class));
+      if (configuredClients.stream().noneMatch(FormClient.class::isInstance)) {
+        clients.add(createClient("form", CONFIGS.get("form").toMap()));
+      }
       exclusive = false;
     } else {
       exclusive = true;
@@ -335,7 +341,7 @@ public class ClientListProvider implements Provider<List<Client>> {
     return exclusive;
   }
 
-  private Object createClient(String name, Map<String, Object> props) {
+  private Client createClient(String name, Map<String, Object> props) {
     final String clientClassName = (String) props.get("client");
 
     if (clientClassName == null) {
@@ -344,7 +350,7 @@ public class ClientListProvider implements Provider<List<Client>> {
     }
 
     final Class<?> clientClass = findClass(clientClassName);
-    final Object client = inject(clientClass);
+    final Client client = (Client) inject(clientClass);
 
     if (client instanceof IndirectClient) {
       final IndirectClient indirectClient = (IndirectClient) client;
