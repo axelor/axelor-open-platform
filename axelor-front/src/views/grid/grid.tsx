@@ -75,6 +75,7 @@ export function Grid(props: ViewProps<GridView>) {
   return (
     <div className={styles.grid}>
       <ViewToolBar
+        meta={meta}
         actions={[
           {
             key: "new",

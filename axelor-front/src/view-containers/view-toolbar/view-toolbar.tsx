@@ -1,11 +1,13 @@
+import { useCallback, useMemo } from "react";
+
 import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
-import { useView } from "../views/hooks";
+import { MaterialIconProps } from "@axelor/ui/src/icons/meterial-icon";
 
 import { useSession } from "@/hooks/use-session";
-import { View } from "@/services/client/meta.types";
+import { ViewData } from "@/services/client/meta";
 import { toTitleCase } from "@/utils/names";
-import { MaterialIconProps } from "@axelor/ui/src/icons/meterial-icon";
-import { useCallback, useMemo } from "react";
+
+import { useView } from "../views/hooks";
 import styles from "./view-toolbar.module.scss";
 
 export type ViewToolBarProps = {
@@ -16,6 +18,7 @@ export type ViewToolBarProps = {
     onNext: () => any;
     onPrev: () => any;
   };
+  meta: ViewData<any>;
 };
 
 const ViewIcons: Record<string, MaterialIconProps["icon"]> = {
@@ -32,6 +35,7 @@ const ViewIcons: Record<string, MaterialIconProps["icon"]> = {
 
 export function ViewToolBar(props: ViewToolBarProps) {
   const {
+    meta,
     actions = [],
     children,
     pagination: { text: pageTextOrComp, onNext, onPrev } = {},
@@ -77,7 +81,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
 
   const farItems = useMemo(() => {
     const items: CommandItemProps[] = [];
-    const view: View | null = {} as any; // TODO: get current view meta
+    const view = meta.view;
 
     if (view?.viewId) {
       items.push({

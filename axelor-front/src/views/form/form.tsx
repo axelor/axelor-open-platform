@@ -13,7 +13,39 @@ import styles from "./form.module.scss";
 export function Form({ meta }: ViewProps<FormView>) {
   return (
     <div className={styles.formViewContainer}>
-      <ToolBar />
+      <ViewToolBar
+        meta={meta}
+        actions={[
+          {
+            key: "new",
+            text: "New",
+            iconProps: {
+              icon: "add",
+            },
+          },
+          {
+            key: "edit",
+            text: "Edit",
+            iconProps: {
+              icon: "edit",
+            },
+          },
+          {
+            key: "save",
+            text: "Save",
+            iconProps: {
+              icon: "save",
+            },
+          },
+          {
+            key: "delete",
+            text: "Delete",
+            iconProps: {
+              icon: "delete",
+            },
+          },
+        ]}
+      />
       <div className={styles.formViewScroller}>
         <FormComponent
           className={styles.formView}
@@ -24,43 +56,6 @@ export function Form({ meta }: ViewProps<FormView>) {
     </div>
   );
 }
-
-const ToolBar = () => {
-  return (
-    <ViewToolBar
-      actions={[
-        {
-          key: "new",
-          text: "New",
-          iconProps: {
-            icon: "add",
-          },
-        },
-        {
-          key: "edit",
-          text: "Edit",
-          iconProps: {
-            icon: "edit",
-          },
-        },
-        {
-          key: "save",
-          text: "Save",
-          iconProps: {
-            icon: "save",
-          },
-        },
-        {
-          key: "delete",
-          text: "Delete",
-          iconProps: {
-            icon: "delete",
-          },
-        },
-      ]}
-    />
-  );
-};
 
 const Layout: FormLayout = ({ schema, formAtom, className }) => {
   const ref = useRef<HTMLDivElement | null>(null);
