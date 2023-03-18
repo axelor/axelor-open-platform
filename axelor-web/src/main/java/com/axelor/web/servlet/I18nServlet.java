@@ -45,7 +45,7 @@ public class I18nServlet extends HttpServlet {
   private static final String CONTENT_ENCODING = "Content-Encoding";
   private static final String ACCEPT_ENCODING = "Accept-Encoding";
   private static final String GZIP_ENCODING = "gzip";
-  private static final String CONTENT_TYPE = "application/javascript; charset=utf8";
+  private static final String CONTENT_TYPE = "application/json; charset=utf8";
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -71,10 +71,6 @@ public class I18nServlet extends HttpServlet {
       out = new GZIPOutputStream(out);
     }
 
-    final StringBuilder builder = new StringBuilder();
-    builder.append("(function() {");
-    builder.append("this._t={};_t.bundle=");
-
     Enumeration<String> keys = bundle.getKeys();
     Map<String, String> messages = new HashMap<>();
 
@@ -85,14 +81,12 @@ public class I18nServlet extends HttpServlet {
 
     try {
       final ObjectMapper mapper = Beans.get(ObjectMapper.class);
-      builder.append(mapper.writeValueAsString(messages)).append(";");
-      builder.append("}(this));");
+      final String json = mapper.writeValueAsString(messages);
+      out.write(json.getBytes(Charset.forName("UTF-8")));
     } catch (Exception e) {
       resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      return;
+    } finally {
+      out.close();
     }
-
-    out.write(builder.toString().getBytes(Charset.forName("UTF-8")));
-    out.close();
   }
 }
