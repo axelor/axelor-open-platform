@@ -1,8 +1,8 @@
-import * as session from "./session";
+import { session } from "./session";
 
 describe("session tests", async () => {
   it("should load app info", async () => {
-    const res = await session.info();
+    const res = await session.init();
     expect(res).toBeDefined();
     expect(res.app).toBeDefined();
     expect(res.app?.author).toBe("Axelor");
