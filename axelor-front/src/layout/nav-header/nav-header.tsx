@@ -13,8 +13,8 @@ function FarItems() {
     <CommandBar
       items={[
         {
-          id: "home",
-          title: "Home",
+          key: "home",
+          text: "Home",
           iconOnly: true,
           iconProps: {
             icon: "home",
@@ -22,71 +22,71 @@ function FarItems() {
           onClick: () => navigate("/"),
         },
         {
-          id: "fav",
-          title: "Favorite",
+          key: "fav",
+          text: "Favorite",
           iconOnly: true,
           iconProps: {
             icon: "bookmark",
           },
           items: [
             {
-              id: "fav-add",
-              title: "Add favorite",
+              key: "fav-add",
+              text: "Add favorite",
             },
-            { id: "fav-d1", divider: true },
-            { id: "fav-d2", divider: true },
+            { key: "fav-d1", divider: true },
+            { key: "fav-d2", divider: true },
             {
-              id: "fav-organise",
-              title: "Organise favorites...",
+              key: "fav-organise",
+              text: "Organise favorites...",
             },
           ],
         },
         {
-          id: "mail",
-          title: "Mails",
+          key: "mail",
+          text: "Mails",
           iconOnly: true,
           iconProps: {
             icon: "mail",
           },
         },
         {
-          id: "messages",
-          title: "Messages",
+          key: "messages",
+          text: "Messages",
           iconOnly: true,
           iconProps: {
             icon: "notifications",
           },
         },
         {
-          id: "user",
-          title: "User",
+          key: "user",
+          text: "User",
           iconOnly: true,
           iconProps: {
             icon: "person",
           },
           items: [
             {
-              id: "profile",
-              title: data?.user.name,
-              subtitle: "Preferences",
+              key: "profile",
+              text: data?.user.name,
+              subtext: "Preferences",
               onClick: () => navigate("/profile"),
             },
             {
-              id: "d-person",
+              key: "d-person",
               divider: true,
             },
             {
-              id: "shortcuts",
-              title: "Shortcuts",
+              key: "shortcuts",
+              text: "Shortcuts",
             },
             {
-              id: "about",
-              title: "About",
+              key: "about",
+              text: "About",
               onClick: () => navigate("/about"),
             },
             {
-              id: "logout",
-              title: "Logout",
+              key: "logout",
+              text: "Logout",
               onClick: () => logout(),
             },
           ],
