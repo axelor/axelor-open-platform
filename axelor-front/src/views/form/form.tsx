@@ -1,7 +1,10 @@
-import { useContainerQuery } from "@/hooks/use-container-query";
-import { FormView } from "@/services/client/meta.types";
 import clsx from "clsx";
 import { useMemo, useRef } from "react";
+
+import { useContainerQuery } from "@/hooks/use-container-query";
+import { FormView } from "@/services/client/meta.types";
+import { ViewToolBar } from "@/view-containers/view-toolbar";
+
 import { ViewProps } from "../types";
 import { Form as FormComponent, FormLayout, FormWidget } from "./builder";
 
@@ -10,10 +13,54 @@ import styles from "./form.module.scss";
 export function Form({ meta }: ViewProps<FormView>) {
   return (
     <div className={styles.formViewContainer}>
-      <FormComponent className={styles.formView} meta={meta} layout={Layout} />
+      <ToolBar />
+      <div className={styles.formViewScroller}>
+        <FormComponent
+          className={styles.formView}
+          meta={meta}
+          layout={Layout}
+        />
+      </div>
     </div>
   );
 }
+
+const ToolBar = () => {
+  return (
+    <ViewToolBar
+      actions={[
+        {
+          key: "new",
+          text: "New",
+          iconProps: {
+            icon: "add",
+          },
+        },
+        {
+          key: "edit",
+          text: "Edit",
+          iconProps: {
+            icon: "edit",
+          },
+        },
+        {
+          key: "save",
+          text: "Save",
+          iconProps: {
+            icon: "save",
+          },
+        },
+        {
+          key: "delete",
+          text: "Delete",
+          iconProps: {
+            icon: "delete",
+          },
+        },
+      ]}
+    />
+  );
+};
 
 const Layout: FormLayout = ({ schema, formAtom, className }) => {
   const ref = useRef<HTMLDivElement | null>(null);
