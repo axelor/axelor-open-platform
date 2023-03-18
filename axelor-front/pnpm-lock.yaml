@@ -23,6 +23,7 @@ specifiers:
   bootstrap-icons: ^1.10.3
   bootstrap-sass: 2.3.2
   clsx: ^1.2.1
+  dayjs: ^1.11.7
   eslint: ^8.35.0
   eslint-config-prettier: ^8.6.0
   eslint-config-react-app: ^7.0.1
@@ -55,6 +56,7 @@ dependencies:
   bootstrap-icons: 1.10.3
   bootstrap-sass: 2.3.2_amlqeundhlkijzm252e5cmoznm
   clsx: 1.2.1
+  dayjs: 1.11.7
   font-awesome: 4.7.0_b36n7p33c4ewtt5v6is5moc24u
   immer: 9.0.19
   jotai: 2.0.2_react@18.2.0
@@ -114,7 +116,7 @@ packages:
       bootstrap: 5.2.3_@popperjs+core@2.11.6
       bootstrap-icons: 1.10.3
       csstype: 3.1.1
-      focus-trap: 7.3.1
+      focus-trap: 7.4.0
       immer: 9.0.19
       moment: 2.29.4
       react: 18.2.0
@@ -2061,14 +2063,14 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
 
-  /@floating-ui/core/1.2.1:
-    resolution: {integrity: sha512-LSqwPZkK3rYfD7GKoIeExXOyYx6Q1O4iqZWwIehDNuv3Dv425FIAE8PRwtAx1imEolFTHgBEcoFHm9MDnYgPCg==}
+  /@floating-ui/core/1.2.4:
+    resolution: {integrity: sha512-SQOeVbMwb1di+mVWWJLpsUTToKfqVNioXys011beCAhyOIFtS+GQoW4EQSneuxzmQKddExDwQ+X0hLl4lJJaSQ==}
     dev: false
 
-  /@floating-ui/dom/1.2.1:
-    resolution: {integrity: sha512-Rt45SmRiV8eU+xXSB9t0uMYiQ/ZWGE/jumse2o3i5RGlyvcbqOF4q+1qBnzLE2kZ5JGhq0iMkcGXUKbFe7MpTA==}
+  /@floating-ui/dom/1.2.4:
+    resolution: {integrity: sha512-4+k+BLhtWj+peCU60gp0+rHeR8+Ohqx6kjJf/lHMnJ8JD5Qj6jytcq1+SZzRwD7rvHKRhR7TDiWWddrNrfwQLg==}
     dependencies:
-      '@floating-ui/core': 1.2.1
+      '@floating-ui/core': 1.2.4
     dev: false
 
   /@humanwhocodes/config-array/0.11.8:
@@ -4007,8 +4009,8 @@ packages:
     resolution: {integrity: sha512-5nqDSxl8nn5BSNxyR3n4I6eDmbolI6WT+QqR547RwxQapgjQBmtktdP+HTBb/a/zLsbzERTONyUB5pefh5TtjQ==}
     dev: true
 
-  /focus-trap/7.3.1:
-    resolution: {integrity: sha512-bX/u4FJ+F0Pp6b/8Q9W8Br/JaLJ7rrhOJAzai9JU8bh4BPdOjEATy4pxHcbBBxFjPN4d1oHy7/KqknEdOetm9w==}
+  /focus-trap/7.4.0:
+    resolution: {integrity: sha512-yI7FwUqU4TVb+7t6PaQ3spT/42r/KLEi8mtdGoQo2li/kFzmu9URmalTvw7xCCJtSOyhBxscvEAmvjeN9iHARg==}
     dependencies:
       tabbable: 6.1.1
     dev: false
@@ -4759,8 +4761,8 @@ packages:
       yallist: 4.0.0
     dev: true
 
-  /luxon/3.2.1:
-    resolution: {integrity: sha512-QrwPArQCNLAKGO/C+ZIilgIuDnEnKx5QYODdDtbFaxzsbZcc/a7WFq7MhsVYgRlwawLtvOUESTlfJ+hc/USqPg==}
+  /luxon/3.3.0:
+    resolution: {integrity: sha512-An0UCfG/rSiqtAIiBPO0Y9/zAnHUZxAMiCpTd5h2smgsj7GGmcenvrvww2cqNA8/4A5ZrD1gJpHN2mIHZQF+Mg==}
     engines: {node: '>=12'}
     dev: false
 
@@ -5158,7 +5160,7 @@ packages:
       invariant: 2.2.4
       lodash: 4.17.21
       lodash-es: 4.17.21
-      luxon: 3.2.1
+      luxon: 3.3.0
       memoize-one: 6.0.0
       moment: 2.29.4
       moment-timezone: 0.5.41
@@ -5300,7 +5302,7 @@ packages:
       '@babel/runtime': 7.21.0
       '@emotion/cache': 11.10.5
       '@emotion/react': 11.10.6_pmekkgnqduwlme35zpnqhenc34
-      '@floating-ui/dom': 1.2.1
+      '@floating-ui/dom': 1.2.4
       '@types/react-transition-group': 4.4.5
       memoize-one: 6.0.0
       prop-types: 15.8.1

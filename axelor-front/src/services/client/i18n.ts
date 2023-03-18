@@ -1,0 +1,21 @@
+import { request } from "./client";
+
+// load the translation catalog
+const bundle = await request({
+  url: "js/messages.js",
+}).then((res) => res.json());
+
+export module i18n {
+  export function get(text: string): string;
+  export function get(text: string, ...args: any[]): string {
+    let message = bundle[text] || bundle[(text || "").trim()] || text;
+    if (message && args.length > 1) {
+      for (let i = 1; i < args.length; i++) {
+        let placeholder = new RegExp("\\{" + (i - 1) + "\\}", "g");
+        let value = args[i];
+        message = message.replace(placeholder, value);
+      }
+    }
+    return message;
+  }
+}
