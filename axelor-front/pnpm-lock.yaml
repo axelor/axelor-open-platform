@@ -39,6 +39,8 @@ specifiers:
   parse5: ^7.1.2
   prettier: ^2.8.4
   react: ^18.2.0
+  react-dnd: ^16.0.1
+  react-dnd-html5-backend: ^16.0.1
   react-dom: ^18.2.0
   react-router-dom: ^6.8.2
   react-transition-group: ^4.4.5
@@ -68,6 +70,8 @@ dependencies:
   optics-ts: 2.4.0
   parse5: 7.1.2
   react: 18.2.0
+  react-dnd: 16.0.1_uqw6rmshllsnsa7jjbo2hvworm
+  react-dnd-html5-backend: 16.0.1
   react-dom: 18.2.0_react@18.2.0
   react-router-dom: 6.8.2_biqbaboplfbrettd7655fr4n2y
   react-transition-group: 4.4.5_biqbaboplfbrettd7655fr4n2y

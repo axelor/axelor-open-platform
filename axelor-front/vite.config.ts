@@ -15,7 +15,13 @@ export default defineConfig({
     }),
   ],
   optimizeDeps: {
-    include: ["react/jsx-runtime"],
+    include: [
+      "react/jsx-runtime",
+      "react-dnd-html5-backend",
+      "jotai-immer",
+      "jotai-optics",
+      "dayjs",
+    ],
   },
   resolve: {
     alias: [
