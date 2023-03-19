@@ -1,13 +1,16 @@
+import { useAtom } from "jotai";
+import { ScopeProvider } from "jotai-molecules";
+import { memo } from "react";
+
 import { useAsync } from "@/hooks/use-async";
-import { Tab } from "@/hooks/use-tabs";
+import { Tab, TabAtom, TabState } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
 import { findView } from "@/services/client/meta-cache";
 import { toCamelCase, toKebabCase } from "@/utils/names";
-import { ScopeProvider } from "jotai-molecules";
-import { memo } from "react";
-import { useView, ViewScope, ViewState } from "./hooks";
 
-function useViewComp(state: ViewState) {
+import { ViewScope } from "./scope";
+
+function useViewComp(state: TabState) {
   return useAsync(async () => {
     const type = toKebabCase(state.type);
     const name = toCamelCase(type);
@@ -16,9 +19,9 @@ function useViewComp(state: ViewState) {
   }, [state]);
 }
 
-function useViewSchema(state: ViewState) {
-  const { type, model, view } = state;
-  const { views = [] } = view;
+function useViewSchema(state: TabState) {
+  const { type, model, action } = state;
+  const { views = [] } = action;
   const { name } = views.find((x) => x.type === type) ?? {};
 
   return useAsync(
@@ -27,8 +30,14 @@ function useViewSchema(state: ViewState) {
   );
 }
 
-function View({ dataStore }: { dataStore?: DataStore }) {
-  const [view] = useView();
+function View({
+  tabAtom,
+  dataStore,
+}: {
+  tabAtom: TabAtom;
+  dataStore?: DataStore;
+}) {
+  const [view] = useAtom(tabAtom);
   const viewSchema = useViewSchema(view);
   const viewComp = useViewComp(view);
 
@@ -40,27 +49,14 @@ function View({ dataStore }: { dataStore?: DataStore }) {
   const Comp = viewComp.data;
 
   if (Comp) {
-    return <Comp meta={meta} dataStore={dataStore} />;
+    return (
+      <ScopeProvider scope={ViewScope} value={tabAtom}>
+        <Comp meta={meta} dataStore={dataStore} />;
+      </ScopeProvider>
+    );
   }
 
   return null;
-}
-
-function ViewPane({ tab, dataStore }: { tab: Tab; dataStore?: DataStore }) {
-  const { view } = tab;
-  const { viewType: type, model } = view;
-
-  const initialState = {
-    ...tab,
-    type,
-    model,
-  };
-
-  return (
-    <ScopeProvider scope={ViewScope} value={initialState}>
-      <View dataStore={dataStore} />
-    </ScopeProvider>
-  );
 }
 
 const DataViews = memo(function DataViews({
@@ -78,7 +74,7 @@ const DataViews = memo(function DataViews({
       _domainContext: context,
     },
   });
-  return <ViewPane tab={tab} dataStore={dataStore} />;
+  return <View tabAtom={tab.state} dataStore={dataStore} />;
 });
 
 export function Views({ tab, className }: { tab: Tab; className?: string }) {
@@ -93,7 +89,7 @@ export function Views({ tab, className }: { tab: Tab; className?: string }) {
   }
   return (
     <div className={className}>
-      <ViewPane tab={tab} />
+      <View tabAtom={tab.state} />
     </div>
   );
 }
