@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { memo } from "react";
 
@@ -60,36 +60,37 @@ function View({
 }
 
 const DataViews = memo(function DataViews({
-  tab,
+  tabAtom,
   model,
 }: {
-  tab: Tab;
+  tabAtom: TabAtom;
   model: string;
 }) {
-  const { view } = tab;
-  const { domain, context } = view;
+  const viewState = useAtomValue(tabAtom);
+  const { domain, context } = viewState.action;
   const dataStore = new DataStore(model, {
     filter: {
       _domain: domain,
       _domainContext: context,
     },
   });
-  return <View tabAtom={tab.state} dataStore={dataStore} />;
+  return <View tabAtom={tabAtom} dataStore={dataStore} />;
 });
 
 export function Views({ tab, className }: { tab: Tab; className?: string }) {
-  const { view } = tab;
-  const { model } = view;
+  const tabAtom = tab.state;
+  const tabState = useAtomValue(tabAtom);
+  const { model } = tabState;
   if (model) {
     return (
       <div className={className}>
-        <DataViews tab={tab} model={model} />
+        <DataViews tabAtom={tabAtom} model={model} />
       </div>
     );
   }
   return (
     <div className={className}>
-      <View tabAtom={tab.state} />
+      <View tabAtom={tabAtom} />
     </div>
   );
 }

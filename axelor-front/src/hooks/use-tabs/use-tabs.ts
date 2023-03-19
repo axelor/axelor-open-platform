@@ -23,7 +23,6 @@ export type TabAtom = PrimitiveAtom<TabState>;
 export type Tab = {
   id: string;
   title: string;
-  view: ActionView;
   state: TabAtom;
 };
 
