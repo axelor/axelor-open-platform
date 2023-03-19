@@ -1,7 +1,9 @@
+import { atom, useAtomValue, useSetAtom } from "jotai";
+import { selectAtom } from "jotai/utils";
+
 import { navigate } from "@/routes";
 import { findActionView } from "@/services/client/meta-cache";
 import { ActionView } from "@/services/client/meta.types";
-import { atom, useAtomValue, useSetAtom } from "jotai";
 
 export type Tab = {
   id: string;
@@ -10,8 +12,13 @@ export type Tab = {
   view: ActionView;
 };
 
-const tabAtom = atom<Tab | null>(null);
-const tabsAtom = atom<Tab[]>([]);
+const tabsAtom = atom<{ active?: string; tabs: Tab[] }>({
+  tabs: [],
+});
+
+const activeAtom = selectAtom(tabsAtom, (state) =>
+  state.tabs.find((x) => x.id === state.active)
+);
 
 const viewName = (view: ActionView | string) =>
   typeof view === "string" ? view : view.name;
@@ -19,15 +26,16 @@ const viewName = (view: ActionView | string) =>
 const openAtom = atom(
   null,
   async (get, set, view: ActionView | string): Promise<Tab | null> => {
-    const tabs = get(tabsAtom);
-    const curr = get(tabAtom);
+    const { active, tabs } = get(tabsAtom);
 
     const name = viewName(view);
     const found = tabs.find((x) => x.id === name);
 
-    if (found && curr === found) return null;
+    if (found && found.id === active) return null;
     if (found) {
-      set(tabAtom, found);
+      set(tabsAtom, (prev) => {
+        return { ...prev, active: name };
+      });
       return found;
     }
 
@@ -35,8 +43,12 @@ const openAtom = atom(
     if (actionView) {
       const { name: id, title } = actionView;
       const tab = { id, title, view: actionView };
-      set(tabsAtom, (state) => [...state, tab]);
-      set(tabAtom, tab);
+      set(tabsAtom, (state) => {
+        return {
+          active: tab.id,
+          tabs: [...state.tabs, tab],
+        };
+      });
       return tab;
     }
 
@@ -45,20 +57,23 @@ const openAtom = atom(
 );
 
 const closeAtom = atom(null, async (get, set, view: ActionView | string) => {
-  const tabs = get(tabsAtom);
+  const { active, tabs } = get(tabsAtom);
   const name = viewName(view);
   const found = tabs.find((x) => x.id === name);
   if (found) {
     let index = tabs.indexOf(found);
-    let next = get(tabAtom);
-    if (next === found) {
-      next = tabs[index + 1] ?? tabs[index - 1];
+    let next = active;
+
+    if (next === name) {
+      next = tabs[index + 1]?.id ?? tabs[index - 1]?.id;
     }
 
     const newTabs = tabs.filter((x) => x.id !== name);
 
-    set(tabsAtom, newTabs);
-    set(tabAtom, next ?? null);
+    set(tabsAtom, {
+      active: next,
+      tabs: newTabs,
+    });
 
     // if it was a last tab
     if (newTabs.length === 0) {
@@ -68,8 +83,8 @@ const closeAtom = atom(null, async (get, set, view: ActionView | string) => {
 });
 
 export function useTabs() {
-  const active = useAtomValue(tabAtom);
-  const items = useAtomValue(tabsAtom);
+  const { tabs: items } = useAtomValue(tabsAtom);
+  const active = useAtomValue(activeAtom) ?? null;
 
   const open = useSetAtom(openAtom);
   const close = useSetAtom(closeAtom);
