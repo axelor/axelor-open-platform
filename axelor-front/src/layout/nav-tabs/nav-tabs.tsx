@@ -9,6 +9,7 @@ import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 import clsx from "clsx";
 import { memo, useCallback, useEffect, useRef } from "react";
 
+import { useAtomValue } from "jotai";
 import styles from "./nav-tabs.module.scss";
 
 function useIcon(id: string) {
@@ -71,8 +72,8 @@ const NavTab = memo(function NavTab({
   ...props
 }: NavItemProps & { close: (view: any) => any }) {
   const tab = props as Tab;
-  const { id, title } = tab;
-  const { icon, iconColor } = useIcon(id);
+  const { title } = useAtomValue(tab.state);
+  const { icon, iconColor } = useIcon(tab.id);
 
   const { data } = useSession();
   const showClose = tab.id !== data?.user?.action;

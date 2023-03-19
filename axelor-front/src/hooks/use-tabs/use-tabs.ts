@@ -1,15 +1,30 @@
-import { atom, useAtomValue, useSetAtom } from "jotai";
+import { PrimitiveAtom, atom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom } from "jotai/utils";
 
 import { navigate } from "@/routes";
 import { findActionView } from "@/services/client/meta-cache";
 import { ActionView } from "@/services/client/meta.types";
 
+export type TabState = {
+  readonly action: ActionView;
+  readonly model?: string;
+  title: string;
+  type: string;
+  dirty?: boolean;
+  route?: {
+    mode?: string;
+    id?: string;
+    qs?: Record<string, string>;
+  };
+};
+
+export type TabAtom = PrimitiveAtom<TabState>;
+
 export type Tab = {
   id: string;
   title: string;
-  dirty?: boolean;
   view: ActionView;
+  state: TabAtom;
 };
 
 const tabsAtom = atom<{ active?: string; tabs: Tab[] }>({
@@ -42,7 +57,17 @@ const openAtom = atom(
     const actionView = await findActionView(name);
     if (actionView) {
       const { name: id, title } = actionView;
-      const tab = { id, title, view: actionView };
+      const tab = {
+        id,
+        title,
+        view: actionView,
+        state: atom<TabState>({
+          action: actionView,
+          model: actionView.model,
+          type: actionView.viewType,
+          title,
+        }),
+      };
       set(tabsAtom, (state) => {
         return {
           active: tab.id,
