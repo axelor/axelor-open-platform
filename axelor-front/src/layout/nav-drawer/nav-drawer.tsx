@@ -1,10 +1,12 @@
+import { useCallback, useMemo } from "react";
+
+import { Box, NavBar, NavItemProps } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+
 import { useMenu } from "@/hooks/use-menu";
 import { useTabs } from "@/hooks/use-tabs";
 import { MenuItem } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
-import { Box, Icon, NavBar, NavItemProps } from "@axelor/ui";
-import { ReactComponent as BiListIcon } from "bootstrap-icons/icons/list.svg";
-import { useCallback, useMemo } from "react";
 
 function load(res: MenuItem[]) {
   const menus = res.filter((item) => item.left !== false);
@@ -23,7 +25,11 @@ function load(res: MenuItem[]) {
     if (icon || !item.parent) {
       props.icon = icon
         ? ({ color }) => <i className={legacyClassNames("fa", icon)} />
-        : ({ color }) => <Icon as={BiListIcon} style={{ color }} />;
+        : ({ color }) => (
+            <Box d="inline-flex" style={{ color }}>
+              <MaterialIcon icon="list" />
+            </Box>
+          );
     }
 
     if (iconBackground) {
