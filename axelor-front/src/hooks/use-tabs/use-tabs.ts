@@ -1,21 +1,23 @@
 import { WritableAtom, atom, useAtomValue, useSetAtom } from "jotai";
 import { selectAtom } from "jotai/utils";
-import { isEqual } from "lodash";
+import { isEqual, isNil, omitBy } from "lodash";
 
 import { navigate } from "@/routes";
 import { findActionView } from "@/services/client/meta-cache";
 import { ActionView } from "@/services/client/meta.types";
 
+export type TabRoute = {
+  action: string;
+  mode?: string;
+  id?: string;
+  qs?: Record<string, string>;
+};
+
 export type TabState = {
   title: string;
   type: string;
   dirty?: boolean;
-  route?: {
-    action: string;
-    mode?: string;
-    id?: string;
-    qs?: Record<string, string>;
-  };
+  routes?: Record<string, TabRoute>;
 };
 
 export type TabAtom = WritableAtom<TabState, Partial<TabState>[], void>;
@@ -53,13 +55,39 @@ const getViewType = (mode: string) => {
   return mode;
 };
 
+const updateRouteState = (state: TabState, route?: TabRoute) => {
+  const { action, id, qs } = route ?? {};
+  const type = getViewType(route?.mode ?? state.type);
+  const mode = route?.mode ?? getViewMode(state.type);
+  const prev = state.routes?.[type];
+  const next = {
+    ...prev,
+    action,
+    mode,
+    id,
+    qs,
+  };
+
+  let p = omitBy(prev, isNil) as any;
+  let n = omitBy(next, isNil) as any;
+
+  let routeSame = isEqual(p, n);
+  if (routeSame && type === state.type) {
+    return state;
+  }
+
+  if (routeSame) n = prev;
+
+  return { ...state, type, routes: { ...state.routes, [type]: n } };
+};
+
 const openAtom = atom(
   null,
   async (
     get,
     set,
     view: ActionView | string,
-    route?: TabState["route"]
+    route?: TabRoute
   ): Promise<Tab | null> => {
     const { active, tabs } = get(tabsAtom);
 
@@ -68,15 +96,8 @@ const openAtom = atom(
 
     if (found) {
       const viewState = get(found.state);
-      const type = getViewType(route?.mode ?? viewState.type);
-      set(found.state, {
-        type,
-        route: {
-          ...viewState.route,
-          ...route,
-          action: name,
-        },
-      });
+      const newState = updateRouteState(viewState, route);
+      set(found.state, newState);
     }
 
     if (found && found.id === active) return null;
@@ -91,42 +112,25 @@ const openAtom = atom(
       const type = getViewType(route?.mode ?? viewType);
       const mode = getViewMode(type, route?.mode);
 
-      const tabAtom = atom<TabState>({
-        type,
-        title,
-        route: {
+      const initState = updateRouteState(
+        { type, title },
+        {
           ...route,
           mode,
           action: id,
-        },
-      });
+        }
+      );
+
+      const tabAtom = atom<TabState>(initState);
 
       // create a derived atom to intercept mutation
       const state: TabAtom = atom(
         (get) => get(tabAtom),
         (get, set, arg) => {
           const prev = get(tabAtom);
-          if (prev === arg) {
-            return;
+          if (prev !== arg) {
+            set(tabAtom, () => ({ ...prev, ...arg }));
           }
-
-          const value = { ...prev, ...arg };
-
-          if (isEqual(value, prev)) {
-            return;
-          }
-
-          // type changed, update route mode
-          if (prev.type !== value.type) {
-            const mode = getViewMode(value.type);
-            value.route = {
-              ...value.route,
-              mode,
-              action: id,
-            };
-          }
-
-          set(tabAtom, (state) => value);
         }
       );
 

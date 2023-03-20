@@ -46,7 +46,8 @@ export function View() {
 
   useAsyncEffect(async () => {
     if (viewState) {
-      const { route: { action, mode, id } = {} } = viewState;
+      const { type } = viewState;
+      const { action, mode, id } = viewState?.routes?.[type] ?? {};
       const path = getURL(action, mode, id);
       if (path && path !== pathRef.current) {
         pathRef.current = path;
