@@ -42,7 +42,6 @@ public abstract class AuthWebModule extends ShiroWebModule {
     this.addFilterChain("/ico/**", ANON);
     this.addFilterChain("/css/**", ANON);
     this.addFilterChain("/js/**", ANON);
-    this.addFilterChain("/error.jsp", ANON);
     this.addFilterChain("/favicon.ico", ANON);
   }
 

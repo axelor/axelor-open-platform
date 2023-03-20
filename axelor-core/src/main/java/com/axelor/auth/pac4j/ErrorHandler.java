@@ -58,7 +58,7 @@ public class ErrorHandler {
     }
 
     final String errorUrl =
-        UriBuilder.from(pac4jInfo.getBaseUrl()).addPath("/error.jsp").toUri().toString();
+        UriBuilder.from(pac4jInfo.getBaseUrl()).addQueryParam("error", null).toUri().toString();
     final HttpAction action = HttpActionHelper.buildRedirectUrlAction(context, errorUrl);
     return httpActionAdapter.adapt(action, context);
   }
