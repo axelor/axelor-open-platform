@@ -55,13 +55,16 @@ const getViewType = (mode: string) => {
   return mode;
 };
 
-const updateRouteState = (state: TabState, route?: TabRoute) => {
-  const { action, id, qs } = route ?? {};
+const updateRouteState = (
+  action: string,
+  state: TabState,
+  route?: Partial<TabRoute>
+) => {
+  const { id, qs } = route ?? {};
   const type = getViewType(route?.mode ?? state.type);
   const mode = route?.mode ?? getViewMode(state.type);
   const prev = state.routes?.[type];
   const next = {
-    ...prev,
     action,
     mode,
     id,
@@ -87,7 +90,7 @@ const openAtom = atom(
     get,
     set,
     view: ActionView | string,
-    route?: TabRoute
+    route?: Omit<TabRoute, "action">
   ): Promise<Tab | null> => {
     const { active, tabs } = get(tabsAtom);
 
@@ -96,7 +99,7 @@ const openAtom = atom(
 
     if (found) {
       const viewState = get(found.state);
-      const newState = updateRouteState(viewState, route);
+      const newState = updateRouteState(name, viewState, route);
       set(found.state, newState);
     }
 
@@ -113,11 +116,11 @@ const openAtom = atom(
       const mode = getViewMode(type, route?.mode);
 
       const initState = updateRouteState(
+        id,
         { type, title },
         {
           ...route,
           mode,
-          action: id,
         }
       );
 
