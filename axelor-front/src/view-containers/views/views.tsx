@@ -2,6 +2,8 @@ import { useAtom, useAtomValue } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { memo } from "react";
 
+import { Box, Fade } from "@axelor/ui";
+
 import { useAsync } from "@/hooks/use-async";
 import { Tab, TabAtom, TabState } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
@@ -42,7 +44,7 @@ function View({
   const viewComp = useViewComp(view);
 
   if (viewSchema.state === "loading" || viewComp.state === "loading") {
-    return <div>Loading...</div>;
+    return null;
   }
 
   const meta = viewSchema.data;
@@ -51,7 +53,11 @@ function View({
   if (Comp) {
     return (
       <ScopeProvider scope={ViewScope} value={tabAtom}>
-        <Comp meta={meta} dataStore={dataStore} />;
+        <Fade in={true} timeout={400} mountOnEnter>
+          <Box d="flex" flex={1} style={{ minWidth: 0, minHeight: 0 }}>
+            <Comp meta={meta} dataStore={dataStore} />
+          </Box>
+        </Fade>
       </ScopeProvider>
     );
   }
