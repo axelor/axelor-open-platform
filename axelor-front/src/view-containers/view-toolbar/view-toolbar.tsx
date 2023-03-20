@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 
 import { Box, CommandBar, CommandItemProps } from "@axelor/ui";
 import { MaterialIconProps } from "@axelor/ui/src/icons/meterial-icon";
@@ -7,7 +7,7 @@ import { useSession } from "@/hooks/use-session";
 import { ViewData } from "@/services/client/meta";
 import { toTitleCase } from "@/utils/names";
 
-import { useViewAction, useViewState } from "../views/scope";
+import { useViewAction, useViewState, useViewSwitch } from "../views/scope";
 import styles from "./view-toolbar.module.scss";
 
 export type ViewToolBarProps = {
@@ -45,15 +45,8 @@ export function ViewToolBar(props: ViewToolBarProps) {
 
   const { data: sessionInfo } = useSession();
   const { actionId, views = [] } = useViewAction();
-  const [viewState, setViewState] = useViewState();
-  const { type: viewType } = viewState;
-
-  const switchTo = useCallback(
-    (type: string) => {
-      setViewState({ type });
-    },
-    [setViewState]
-  );
+  const [{ type: viewType }] = useViewState();
+  const switchTo = useViewSwitch();
 
   const switchActions = useMemo(() => {
     if (views.length === 1) return;
