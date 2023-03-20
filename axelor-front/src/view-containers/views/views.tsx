@@ -52,8 +52,6 @@ function ViewContainer({
   const viewSchema = useViewSchema(viewOpts);
   const viewComp = useViewComp(view.type);
 
-  // console.log(view);
-
   if (viewSchema.state === "loading" || viewComp.state === "loading") {
     return <Loader />;
   }
