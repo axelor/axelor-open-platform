@@ -5,6 +5,7 @@ import { generatePath, useParams } from "react-router-dom";
 import { useAsyncEffect } from "@/hooks/use-async-effect";
 import { useRoute } from "@/hooks/use-route";
 import { Tab, useTabs } from "@/hooks/use-tabs";
+import { session } from "@/services/client/session";
 
 const getURL = (
   action: string | null = null,
@@ -63,6 +64,11 @@ export function View() {
         mode: viewMode,
         id: viewId,
       });
+    } else {
+      const homeAction = session.info?.user.action;
+      if (homeAction) {
+        await open(homeAction);
+      }
     }
   }, [open, viewAction, viewMode, viewId]);
 
