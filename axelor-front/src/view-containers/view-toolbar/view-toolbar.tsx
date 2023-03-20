@@ -53,9 +53,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
 
   const switchTo = useCallback(
     (type: string) => {
-      setViewState((prev) => {
-        return prev.type === type ? prev : { ...prev, type };
-      });
+      setViewState({ type });
     },
     [setViewState]
   );

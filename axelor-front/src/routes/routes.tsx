@@ -1,10 +1,12 @@
-import { useSession } from "@/hooks/use-session";
 import {
   createHashRouter,
   Navigate,
   RouterProvider,
   useLocation,
 } from "react-router-dom";
+
+import { useSession } from "@/hooks/use-session";
+
 import { About } from "./about";
 import { Login } from "./login";
 import { Profile } from "./profile";
@@ -40,7 +42,7 @@ const router = createHashRouter([
         element: <View />,
       },
       {
-        path: "/ds/:action/:type?/:id?",
+        path: "/ds/:action/:mode?/:id?",
         element: <View />,
       },
       {

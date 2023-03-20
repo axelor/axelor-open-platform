@@ -1,17 +1,20 @@
 import { atom, useAtom, useAtomValue } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
 
-import { TabAtom, TabState } from "@/hooks/use-tabs";
+import { TabAtom } from "@/hooks/use-tabs";
 
-const fallbackAtom = atom<TabState>({
-  action: {
-    name: "",
+const fallbackAtom: TabAtom = atom(
+  () => ({
+    action: {
+      name: "",
+      title: "",
+      viewType: "",
+    },
     title: "",
-    viewType: "",
-  },
-  title: "",
-  type: "",
-});
+    type: "",
+  }),
+  () => {}
+);
 
 export const ViewScope = createScope<TabAtom>(fallbackAtom);
 
