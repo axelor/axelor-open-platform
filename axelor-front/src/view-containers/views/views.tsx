@@ -10,6 +10,7 @@ import { DataStore } from "@/services/client/data-store";
 import { findView } from "@/services/client/meta-cache";
 import { toCamelCase, toKebabCase } from "@/utils/names";
 
+import { Loader } from "@/components/loader/loader";
 import { ViewScope } from "./scope";
 
 function useViewComp(state: TabState) {
@@ -44,7 +45,7 @@ function View({
   const viewComp = useViewComp(view);
 
   if (viewSchema.state === "loading" || viewComp.state === "loading") {
-    return null;
+    return <Loader />;
   }
 
   const meta = viewSchema.data;
