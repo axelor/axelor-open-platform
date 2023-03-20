@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.axelor.auth.pac4j;
+package com.axelor.auth.pac4j;  
 
 import com.axelor.common.StringUtils;
 import com.axelor.common.UriBuilder;
@@ -25,6 +25,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.pac4j.core.client.BaseClient;
 import org.pac4j.core.client.finder.DefaultCallbackClientFinder;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.WebContext;
@@ -88,6 +89,52 @@ public class AxelorCallbackLogic extends DefaultCallbackLogic {
         pac4jInfo.getBaseUrl(),
         inputRenewSession,
         defaultClient);
+  }
+
+  /**
+   * Redefined to account for failed clients
+   *
+   * @see com.axelor.auth.pac4j.AxelorCallbackClientFinder
+   */
+  @Override
+  protected void renewSession(
+      final WebContext context, final SessionStore sessionStore, final Config config) {
+    final var optOldSessionId = sessionStore.getSessionId(context, true);
+    if (optOldSessionId.isEmpty()) {
+      logger.error(
+          "No old session identifier retrieved although the session creation has been requested");
+    } else {
+      final var oldSessionId = optOldSessionId.get();
+      final var renewed = sessionStore.renewSession(context);
+      if (renewed) {
+        final var optNewSessionId = sessionStore.getSessionId(context, true);
+        if (optNewSessionId.isEmpty()) {
+          logger.error(
+              "No new session identifier retrieved although the session creation has been requested");
+        } else {
+          final var newSessionId = optNewSessionId.get();
+          logger.debug("Renewing session: {} -> {}", oldSessionId, newSessionId);
+          final var clients = config.getClients();
+          if (clients != null) {
+            final var clientList = clients.getClients();
+            for (final var client : clientList) {
+              final var baseClient = (BaseClient) client;
+
+              // Don't fail because of any unavailable clients.
+              if (baseClient.isInitialized()) {
+                try {
+                  baseClient.notifySessionRenewal(oldSessionId, context, sessionStore);
+                } catch (Exception e) {
+                  logger.error(e.getMessage(), e);
+                }
+              }
+            }
+          }
+        }
+      } else {
+        logger.error("Unable to renew the session. The session store may not support this feature");
+      }
+    }
   }
 
   @Override
