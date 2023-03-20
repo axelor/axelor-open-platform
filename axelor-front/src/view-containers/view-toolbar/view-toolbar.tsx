@@ -7,7 +7,7 @@ import { useSession } from "@/hooks/use-session";
 import { ViewData } from "@/services/client/meta";
 import { toTitleCase } from "@/utils/names";
 
-import { useViewState } from "../views/scope";
+import { useViewAction, useViewState } from "../views/scope";
 import styles from "./view-toolbar.module.scss";
 
 export type ViewToolBarProps = {
@@ -44,12 +44,9 @@ export function ViewToolBar(props: ViewToolBarProps) {
   const pageActions = onPrev || onNext;
 
   const { data: sessionInfo } = useSession();
+  const { actionId, views = [] } = useViewAction();
   const [viewState, setViewState] = useViewState();
-
-  const {
-    type: viewType,
-    action: { views = [] },
-  } = viewState;
+  const { type: viewType } = viewState;
 
   const switchTo = useCallback(
     (type: string) => {
@@ -95,7 +92,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
       });
     }
 
-    if (viewState?.action.actionId) {
+    if (actionId) {
       items.push({
         key: "action",
         text: "Action...",
@@ -112,7 +109,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
     };
 
     return [command];
-  }, [meta.view, viewState?.action.actionId]);
+  }, [actionId, meta.view]);
 
   const pageText =
     typeof pageTextOrComp === "string" ? pageTextOrComp : undefined;

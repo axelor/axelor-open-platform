@@ -1,15 +1,17 @@
+import clsx from "clsx";
+import { memo, useCallback, useEffect, useRef } from "react";
+import { useAtomValue } from "jotai";
+
+import { Box, NavItemProps, NavTabs as Tabs } from "@axelor/ui";
+import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
+
 import { useMenu } from "@/hooks/use-menu";
 import { useSession } from "@/hooks/use-session";
 import { Tab, useTabs } from "@/hooks/use-tabs";
 import { MenuItem } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { Views } from "@/view-containers/views";
-import { Box, NavItemProps, NavTabs as Tabs } from "@axelor/ui";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
-import clsx from "clsx";
-import { memo, useCallback, useEffect, useRef } from "react";
 
-import { useAtomValue } from "jotai";
 import styles from "./nav-tabs.module.scss";
 
 function useIcon(id: string) {
@@ -121,13 +123,14 @@ export function NavTabs() {
         onChange={handleSelect}
       />
       {items.map((tab) => (
-        <Views
+        <div
           key={tab.id}
-          tab={tab}
           className={clsx(styles.tabContent, {
             [styles.active]: tab.id === value,
           })}
-        />
+        >
+          <Views tab={tab} />
+        </div>
       ))}
     </Box>
   );

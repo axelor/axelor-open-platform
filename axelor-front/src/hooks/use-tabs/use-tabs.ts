@@ -7,12 +7,11 @@ import { findActionView } from "@/services/client/meta-cache";
 import { ActionView } from "@/services/client/meta.types";
 
 export type TabState = {
-  readonly action: ActionView;
-  readonly model?: string;
   title: string;
   type: string;
   dirty?: boolean;
   route?: {
+    action: string;
     mode?: string;
     id?: string;
     qs?: Record<string, string>;
@@ -22,8 +21,9 @@ export type TabState = {
 export type TabAtom = WritableAtom<TabState, Partial<TabState>[], void>;
 
 export type Tab = {
-  id: string;
-  title: string;
+  readonly id: string;
+  readonly title: string;
+  readonly action: ActionView;
   state: TabAtom;
 };
 
@@ -74,6 +74,7 @@ const openAtom = atom(
         route: {
           ...viewState.route,
           ...route,
+          action: name,
         },
       });
     }
@@ -86,18 +87,17 @@ const openAtom = atom(
 
     const actionView = await findActionView(name);
     if (actionView) {
-      const { name: id, title, model, viewType } = actionView;
+      const { name: id, title, viewType } = actionView;
       const type = getViewType(route?.mode ?? viewType);
       const mode = getViewMode(type, route?.mode);
 
       const tabAtom = atom<TabState>({
-        action: actionView,
-        model,
         type,
         title,
         route: {
           ...route,
           mode,
+          action: id,
         },
       });
 
@@ -105,12 +105,11 @@ const openAtom = atom(
       const state: TabAtom = atom(
         (get) => get(tabAtom),
         (get, set, arg) => {
-          const state = get(tabAtom);
-          if (state === arg) {
+          const prev = get(tabAtom);
+          if (prev === arg) {
             return;
           }
 
-          const { action, ...prev } = state;
           const value = { ...prev, ...arg };
 
           if (isEqual(value, prev)) {
@@ -123,16 +122,18 @@ const openAtom = atom(
             value.route = {
               ...value.route,
               mode,
+              action: id,
             };
           }
 
-          set(tabAtom, (state) => ({ action, ...value }));
+          set(tabAtom, (state) => value);
         }
       );
 
       const tab = {
         id,
         title,
+        action: actionView,
         state: state,
       };
 

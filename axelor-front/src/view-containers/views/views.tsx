@@ -1,48 +1,58 @@
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 
 import { Box, Fade } from "@axelor/ui";
 
+import { Loader } from "@/components/loader/loader";
 import { useAsync } from "@/hooks/use-async";
-import { Tab, TabAtom, TabState } from "@/hooks/use-tabs";
+import { Tab } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
 import { findView } from "@/services/client/meta-cache";
 import { toCamelCase, toKebabCase } from "@/utils/names";
 
-import { Loader } from "@/components/loader/loader";
 import { ViewScope } from "./scope";
 
-function useViewComp(state: TabState) {
+function useViewComp(viewType: string) {
   return useAsync(async () => {
-    const type = toKebabCase(state.type);
+    const type = toKebabCase(viewType);
     const name = toCamelCase(type);
     const { [name]: Comp } = await import(`../../views/${type}/index.ts`);
     return Comp as React.ElementType;
-  }, [state]);
+  }, [viewType]);
 }
 
-function useViewSchema(state: TabState) {
-  const { type, model, action } = state;
-  const { views = [] } = action;
-  const { name } = views.find((x) => x.type === type) ?? {};
-
+function useViewSchema({
+  name,
+  type,
+  model,
+}: {
+  type: string;
+  name?: string;
+  model?: string;
+}) {
   return useAsync(
     async () => findView({ type, name, model }),
     [type, name, model]
   );
 }
 
-function View({
-  tabAtom,
+function ViewContainer({
+  tab,
+  view,
   dataStore,
 }: {
-  tabAtom: TabAtom;
+  tab: Tab;
+  view: { name?: string; type: string };
   dataStore?: DataStore;
 }) {
-  const [view] = useAtom(tabAtom);
-  const viewSchema = useViewSchema(view);
-  const viewComp = useViewComp(view);
+  const { model } = tab.action;
+
+  const viewOpts = useMemo(() => ({ model, ...view }), [model, view]);
+  const viewSchema = useViewSchema(viewOpts);
+  const viewComp = useViewComp(view.type);
+
+  // console.log(view);
 
   if (viewSchema.state === "loading" || viewComp.state === "loading") {
     return <Loader />;
@@ -53,12 +63,32 @@ function View({
 
   if (Comp) {
     return (
-      <ScopeProvider scope={ViewScope} value={tabAtom}>
-        <Fade in={true} timeout={400} mountOnEnter>
-          <Box d="flex" flex={1} style={{ minWidth: 0, minHeight: 0 }}>
-            <Comp meta={meta} dataStore={dataStore} />
-          </Box>
-        </Fade>
+      <Fade in={true} timeout={400} mountOnEnter>
+        <Box d="flex" flex={1} style={{ minWidth: 0, minHeight: 0 }}>
+          <Comp meta={meta} dataStore={dataStore} />
+        </Box>
+      </Fade>
+    );
+  }
+
+  return null;
+}
+
+function ViewPane({ tab, dataStore }: { tab: Tab; dataStore?: DataStore }) {
+  const {
+    action: { views = [] },
+  } = tab;
+  const tabAtom = tab.state;
+  const viewState = useAtomValue(tabAtom);
+  const view = useMemo(
+    () => views.find((x) => x.type === viewState.type),
+    [viewState.type, views]
+  );
+
+  if (view) {
+    return (
+      <ScopeProvider scope={ViewScope} value={tab}>
+        <ViewContainer view={view} tab={tab} dataStore={dataStore} />
       </ScopeProvider>
     );
   }
@@ -67,37 +97,25 @@ function View({
 }
 
 const DataViews = memo(function DataViews({
-  tabAtom,
+  tab,
   model,
 }: {
-  tabAtom: TabAtom;
+  tab: Tab;
   model: string;
 }) {
-  const viewState = useAtomValue(tabAtom);
-  const { domain, context } = viewState.action;
+  const {
+    action: { domain, context },
+  } = tab;
   const dataStore = new DataStore(model, {
     filter: {
       _domain: domain,
       _domainContext: context,
     },
   });
-  return <View tabAtom={tabAtom} dataStore={dataStore} />;
+  return <ViewPane tab={tab} dataStore={dataStore} />;
 });
 
-export function Views({ tab, className }: { tab: Tab; className?: string }) {
-  const tabAtom = tab.state;
-  const tabState = useAtomValue(tabAtom);
-  const { model } = tabState;
-  if (model) {
-    return (
-      <div className={className}>
-        <DataViews tabAtom={tabAtom} model={model} />
-      </div>
-    );
-  }
-  return (
-    <div className={className}>
-      <View tabAtom={tabAtom} />
-    </div>
-  );
-}
+export const Views = memo(function Views({ tab }: { tab: Tab }) {
+  const model = tab.action.model;
+  return model ? <DataViews tab={tab} model={model} /> : <ViewPane tab={tab} />;
+});

@@ -46,9 +46,8 @@ export function View() {
 
   useAsyncEffect(async () => {
     if (viewState) {
-      const { action, route = {} } = viewState;
-      const { mode, id } = route;
-      const path = getURL(action.name, mode, id);
+      const { route: { action, mode, id } = {} } = viewState;
+      const path = getURL(action, mode, id);
       if (path && path !== pathRef.current) {
         pathRef.current = path;
         redirect(path);
@@ -61,6 +60,7 @@ export function View() {
       const path = getURL(viewAction, viewMode, viewId);
       pathRef.current = path;
       await open(viewAction, {
+        action: viewAction,
         mode: viewMode,
         id: viewId,
       });

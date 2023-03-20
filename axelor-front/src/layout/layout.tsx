@@ -1,12 +1,13 @@
 import { Box } from "@axelor/ui";
+import clsx from "clsx";
 import { Outlet } from "react-router-dom";
+
 import { NavDrawer } from "./nav-drawer";
+import { useSidebar } from "./nav-drawer/hook";
 import { NavHeader } from "./nav-header";
 import { NavTabs } from "./nav-tabs";
 
-import clsx from "clsx";
 import styles from "./layout.module.scss";
-import { useSidebar } from "./nav-drawer/hook";
 
 export function Layout() {
   const { sidebar } = useSidebar();
@@ -26,7 +27,12 @@ export function Layout() {
         >
           <NavDrawer />
         </Box>
-        <Box d="flex" flexDirection="column" flexGrow={1} className={styles.tabs}>
+        <Box
+          d="flex"
+          flexDirection="column"
+          flexGrow={1}
+          className={styles.tabs}
+        >
           <NavTabs />
           <div className={styles.page}>
             <Outlet />
