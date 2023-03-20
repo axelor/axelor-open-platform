@@ -27,16 +27,20 @@ const SUPPORTED_CURRENCY_CODES: Record<string, string> = {
 const normalizeLocale = (locale: string) => toKebabCase(locale);
 const shortLocale = (locale: string) => toKebabCase(locale).split("-")[0];
 
-let locale: string = findLocale();
-let dateFormat: string = await findDateFormat();
-let currency: string = findCurrencyCode();
+let locale = "";
+let dateFormat = "";
+let currency = "";
 
-// listen for session change
-session.subscribe(async (info) => {
+async function init() {
   locale = findLocale();
   currency = findCurrencyCode();
   dateFormat = await findDateFormat();
-});
+}
+
+await init();
+
+// listen for session change
+session.subscribe(init);
 
 function findCurrencyCode() {
   return (
@@ -53,7 +57,7 @@ async function findDateFormat() {
     const { default: data } = await import(
       `../../../node_modules/dayjs/esm/locale/${found}.js`
     );
-    const format = data.formats.L;
+    const format = data?.formats?.L;
     if (format) {
       return format
         .replace(/\u200f/g, "") // ar
@@ -63,7 +67,7 @@ async function findDateFormat() {
         .replace(/\bM\b/g, "MM"); // M -> MM
     }
   }
-  return dateFormat ?? DATE_FORMAT;
+  return dateFormat || DATE_FORMAT;
 }
 
 function findLocale() {
