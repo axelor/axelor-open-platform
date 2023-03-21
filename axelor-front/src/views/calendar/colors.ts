@@ -1,4 +1,6 @@
 const _usedColors: Record<string, string> = {};
+let _usedColorIndex = 0;
+
 const _randomColors: Record<string, string> = {};
 
 const colors: string[] = [
@@ -53,9 +55,9 @@ export const DEFAULT_COLOR = "var(--bs-link-color)";
 
 export function getColor(value: string): string {
   function findColor() {
-    const used = Object.values(_usedColors);
-    const list = colors.filter((c) => !used.includes(c));
-    return list[0] || colors[0];
+    const color = colors[_usedColorIndex];
+    _usedColorIndex = (_usedColorIndex + 1) % colors.length;
+    return color;
   }
   return _usedColors[value] || (_usedColors[value] = findColor());
 }
