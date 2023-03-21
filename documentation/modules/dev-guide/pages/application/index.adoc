@@ -96,6 +96,7 @@ The `com.axelor.app` gradle plugin defines an extension point `axelor` where
 we can define various properties.
 
 * title - display title for the application
+* description - a short description of the application
 
 Another important build script is the `settings.gradle` where we configure
 the gradle build and aggregates all the feature module projects to be used
@@ -125,6 +126,19 @@ dependencyResolutionManagement {
     maven {
       url 'https://repository.axelor.com/nexus/repository/maven-public/'
     }
+    ivy { <4>
+      name = "Node.js"
+      setUrl("https://nodejs.org/dist/")
+      patternLayout {
+        artifact("v[revision]/[artifact](-v[revision]-[classifier]).[ext]")
+      }
+      metadataSources {
+        artifact()
+      }
+      content {
+        includeModule("org.nodejs", "node")
+      }
+    }
   }
 }
 
@@ -136,6 +150,7 @@ include 'modules:axelor-contact'
 <1> The axelor maven repository
 <2> The axelor app gradle plugin version
 <3> Use maven central but don't load `com.axelor` from it
+<4> The Node.js repository
 
 The `include 'modules:axelor-contact'` line tells gradle to include the module
 `axelor-contact` in current build cycle. It is required to list all the modules
