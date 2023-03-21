@@ -18,6 +18,16 @@ export type TabRoute = {
 };
 
 /**
+ * Additional state of a specific view type.
+ *
+ */
+export type TabProps = {
+  scrollY?: number;
+  scrollX?: number;
+  selectedCell?: number[];
+};
+
+/**
  * The TabState represents volatile state of a tab.
  *
  */
@@ -46,6 +56,12 @@ export type TabState = {
    *
    */
   routes?: Record<string, TabRoute>;
+
+  /**
+   * Keep track of additional state per view type.
+   *
+   */
+  props?: Record<string, TabProps>;
 };
 
 /**
