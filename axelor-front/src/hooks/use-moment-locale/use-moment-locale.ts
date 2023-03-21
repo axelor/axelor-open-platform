@@ -169,5 +169,5 @@ export function useMomentLocale() {
     setMomentLocale(moment.locale(supportedLocale));
   }, [locale, setMomentLocale]);
 
-  return momentLocale;
+  return { momentLocale, moment };
 }

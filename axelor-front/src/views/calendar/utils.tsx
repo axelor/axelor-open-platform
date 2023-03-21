@@ -3,10 +3,7 @@ import { getStartOf, getNextOf } from "../../utils/date";
 import getObjectValue from "lodash/get";
 
 import {
-  Scheduler,
-  SchedulerProps,
-  SchedulerEvent,
-  Event,
+  SchedulerEvent
 } from "@axelor/ui/scheduler";
 import { getColor } from "./colors";
 

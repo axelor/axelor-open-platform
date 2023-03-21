@@ -1,6 +1,9 @@
-$bg-white: #ffffff;
-
 .calendar {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+
   & .rbc-off-range-bg {
     background-color: #e6e6e6;
   }
@@ -35,9 +38,7 @@ $bg-white: #ffffff;
 
 .scheduler-panel {
   width: 90%;
-  background-color: $bg-white;
 }
 
 .calendar-panel {
-  background-color: $bg-white;
 }

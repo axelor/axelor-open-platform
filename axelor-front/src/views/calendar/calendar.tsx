@@ -1,36 +1,31 @@
-import {
-  useState,
-  useMemo,
-  useCallback,
-  useEffect,
-  lazy,
-  Suspense,
-} from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 
-import { Box } from "@axelor/ui/core";
-import { SchedulerProps, SchedulerEvent, View } from "@axelor/ui/scheduler";
+import { Box, CommandItemProps } from "@axelor/ui/core";
+import { SchedulerEvent, View } from "@axelor/ui/scheduler";
 
 import { CalendarView } from "@/services/client/meta.types";
 
 import { useAsync } from "@/hooks/use-async";
 import { useSession } from "@/hooks/use-session";
 
-import { Property } from "../../services/client/meta.types";
+import { i18n } from "@/services/client/i18n";
 import { Criteria } from "../../services/client/data.types";
-import { addDate } from "../../utils/date";
+import { TimeUnit, addDate } from "../../utils/date";
 
 import { ViewProps } from "../types";
 
+import Scheduler from "./components/scheduler";
+import DatePicker from "./components/date-picker";
+import Filters from "./components/filters";
 import { Filter } from "./components/types";
-import Loading from "./components/loading";
+
 import { getEventFilters, getTimes } from "./utils";
 
 import styles from "./calendar.module.scss";
 import { DEFAULT_COLOR } from "./colors";
-
-const Scheduler = lazy(() => import("./components/scheduler"));
-const DatePicker = lazy(() => import("./components/date-picker"));
-const Filters = lazy(() => import("./components/filters"));
+import { ViewToolBar } from "@/view-containers/view-toolbar";
+import { MaterialIconProps } from "@axelor/ui/src/icons/meterial-icon";
+import { useMomentLocale } from "@/hooks/use-moment-locale";
 
 const eventStyler = ({
   event,
@@ -40,30 +35,38 @@ const eventStyler = ({
   style: { backgroundColor: event.$backgroundColor },
 });
 
-function CalendarToobar(props: any) {
-  console.log(props);
-  return null;
+const components = {
+  week: {
+    header: ({ date, localizer }: any) => {
+      return localizer.format(date, "ddd D");
+    },
+  },
+  toolbar: () => null,
+};
+
+interface DateFormatMap {
+  [key: string]: (date: Date) => string;
+}
+
+export function formatDate(date: Date, unit: TimeUnit, moment: any) {
+  const DATE_FORMATTERS: DateFormatMap = {
+    month: (date) => moment(date).format("MMMM YYYY"),
+    week: (date) =>
+      i18n.get(
+        "{0} – Week {1}",
+        moment(date).format("MMMM YYYY"),
+        moment(date).format("w")
+      ),
+    day: (date) => moment(date).format("LL"),
+  };
+
+  const formatter = DATE_FORMATTERS[unit] || DATE_FORMATTERS.day;
+  return formatter(date);
 }
 
 export function Calendar(props: ViewProps<CalendarView>) {
-  const components = useMemo(
-    () => ({
-      week: {
-        header: ({ date, localizer }: any) => {
-          return localizer.format(date, "ddd D");
-        },
-      },
-      // toolbar: CalendarToobar,
-    }),
-    []
-  );
-
-  const {
-    meta: { view: metaView, fields: _metaFields, perms: metaPerms },
-    dataStore,
-  } = props;
-  const metaFields = _metaFields as Record<string, Property>;
-
+  const { meta, dataStore } = props;
+  const { view: metaView, fields: metaFields, perms: metaPerms } = meta;
   const {
     eventStart,
     eventStop,
@@ -71,14 +74,17 @@ export function Calendar(props: ViewProps<CalendarView>) {
     colorBy,
     mode: initialMode = "month",
   } = metaView;
+
+  const t = i18n.get;
   const session = useSession();
+  const momentLocale = useMomentLocale();
   const maxPerPage = useMemo(
     () => session.data?.api?.pagination?.maxPerPage || -1,
     [session]
   );
 
   const searchFieldNames = useMemo(() => {
-    const schemaFieldNames = Object.keys(metaFields);
+    const schemaFieldNames = Object.keys(metaFields || {});
     const viewFieldNames = [eventStart, eventStop, colorBy].filter(
       (field) => field
     ) as string[];
@@ -92,7 +98,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     return getTimes(calendarDate, calendarMode);
   }, [calendarDate, calendarMode]);
 
-  useAsync(async () => {
+  const filter = useMemo(() => {
     const startCriteria: Criteria = {
       operator: "and",
       criteria: [
@@ -125,27 +131,27 @@ export function Calendar(props: ViewProps<CalendarView>) {
           ],
         } as Criteria)
       : null;
-    const filter = stopCriteria
+    return stopCriteria
       ? ({
           operator: "or",
           criteria: [startCriteria, stopCriteria],
         } as Criteria)
       : startCriteria;
-    return await dataStore.search({
-      fields: searchFieldNames,
-      filter,
-      limit: maxPerPage,
-    });
-  }, [
-    calendarStart,
-    calendarEnd,
-    searchFieldNames,
-    eventStart,
-    eventStop,
-    maxPerPage,
-  ]);
+  }, [calendarStart, calendarEnd, eventStart, eventStop]);
 
-  const _calendarEvents: SchedulerEvent[] = useMemo(() => {
+  const handleRefresh = useCallback(
+    async () =>
+      await dataStore.search({
+        filter,
+        fields: searchFieldNames,
+        limit: maxPerPage,
+      }),
+    [dataStore, filter, searchFieldNames, maxPerPage]
+  );
+
+  useAsync(handleRefresh, [dataStore]);
+
+  const unfilteredCalendarEvents: SchedulerEvent[] = useMemo(() => {
     return (dataStore.records || []).map((record) => {
       const { id, name: title } = record;
       const start = new Date(record[eventStart] as string);
@@ -173,14 +179,14 @@ export function Calendar(props: ViewProps<CalendarView>) {
 
   // Filters
 
-  const colorByField = colorBy ? metaFields[colorBy] : null;
+  const colorByField = colorBy && metaFields?.[colorBy];
 
   const [filters, setFilters] = useState<Filter[]>([]);
 
   useEffect(() => {
     colorByField &&
-      setFilters(getEventFilters(_calendarEvents || [], colorByField));
-  }, [_calendarEvents, colorByField]);
+      setFilters(getEventFilters(unfilteredCalendarEvents || [], colorByField));
+  }, [unfilteredCalendarEvents, colorByField]);
 
   const handleFilterChange = useCallback((ind: number) => {
     if (ind > -1) {
@@ -195,30 +201,121 @@ export function Calendar(props: ViewProps<CalendarView>) {
   const calendarEvents: SchedulerEvent[] = useMemo(() => {
     const checkedFilters = filters.filter((x) => x.checked);
     const showAll = checkedFilters.length === 0;
-    return _calendarEvents.reduce((list: object[], event: SchedulerEvent) => {
-      const filter = (showAll ? filters : checkedFilters).find(
-        (filter: Filter) => filter.match!(event)
-      );
-      return filter || showAll
-        ? [
-            ...list,
-            {
-              ...event,
-              $backgroundColor: (filter || {}).color || DEFAULT_COLOR,
-            },
-          ]
-        : list;
-    }, []) as SchedulerEvent[];
-  }, [_calendarEvents, filters]);
+    return unfilteredCalendarEvents.reduce(
+      (list: object[], event: SchedulerEvent) => {
+        const filter = (showAll ? filters : checkedFilters).find(
+          (filter: Filter) => filter.match!(event)
+        );
+        return filter || showAll
+          ? [
+              ...list,
+              {
+                ...event,
+                $backgroundColor: (filter || {}).color || DEFAULT_COLOR,
+              },
+            ]
+          : list;
+      },
+      []
+    ) as SchedulerEvent[];
+  }, [unfilteredCalendarEvents, filters]);
+
+  // Toobar
+
+  const handleNav = useCallback(
+    (amount: 1 | -1) => {
+      setCalendarDate((date) => addDate(date, amount, calendarMode));
+    },
+    [calendarMode]
+  );
+
+  const handleNext = useCallback(() => handleNav(1), [handleNav]);
+  const handlePrev = useCallback(() => handleNav(-1), [handleNav]);
+
+  const handleToday = useCallback(() => {
+    setCalendarDate(new Date());
+  }, []);
+
+  const calendarTitle = useMemo(() => {
+    const { moment } = momentLocale;
+    return formatDate(calendarDate, calendarMode, moment);
+  }, [calendarDate, calendarMode, momentLocale]);
+
+  const actions = useMemo<CommandItemProps[]>(() => {
+    const views: {
+      view: View;
+      text: string;
+      iconProps: MaterialIconProps;
+    }[] = [
+      {
+        view: "month",
+        text: t("Month"),
+        iconProps: { icon: "calendar_view_month" },
+      },
+      { view: "week", text: t("Week"), iconProps: { icon: "calendar_view_week" } },
+      { view: "day", text: t("Day"), iconProps: { icon: "calendar_view_day" } },
+    ];
+
+    const today = new Date();
+    const inToday = today >= calendarStart && today <= calendarEnd;
+
+    return [
+      ...views.map(({ view, text, iconProps }) => ({
+        key: view,
+        text: text,
+        description: text,
+        iconProps,
+        iconOnly: false,
+        checked: view === calendarMode,
+        onClick: () => handleViewChange(view),
+      })),
+      {
+        key: "modeDivider",
+        divider: true,
+      },
+      {
+        key: "today",
+        text: t("Today"),
+        description: t("Today"),
+        iconProps: {
+          icon: "today",
+        },
+        iconOnly: false,
+        checked: inToday,
+        onClick: handleToday,
+      },
+      {
+        key: "refresh",
+        text: t("Refresh"),
+        description: t("Refresh"),
+        iconProps: {
+          icon: "refresh",
+        },
+        iconOnly: false,
+        onClick: handleRefresh,
+      },
+    ];
+  }, [
+    calendarStart,
+    calendarEnd,
+    handleToday,
+    handleRefresh,
+    calendarMode,
+    handleViewChange,
+  ]);
 
   return (
-    <Suspense fallback={<Loading />}>
-      <Box
-        d="flex"
-        flexDirection="row"
-        flexGrow={1}
-        className={styles["calendar"]}
-      >
+    <div className={styles.calendar}>
+      <ViewToolBar
+        meta={meta}
+        actions={actions}
+        pagination={{
+          text: calendarTitle,
+          onNext: handleNext,
+          onPrev: handlePrev,
+        }}
+      />
+      <Box d="flex" flexDirection="row" flexGrow={1}>
         <Box d="flex" p={2} pe={0} className={styles["scheduler-panel"]}>
           <Scheduler
             events={calendarEvents}
@@ -243,6 +340,6 @@ export function Calendar(props: ViewProps<CalendarView>) {
           <Filters data={filters} onChange={handleFilterChange} />
         </Box>
       </Box>
-    </Suspense>
+    </div>
   );
 }
