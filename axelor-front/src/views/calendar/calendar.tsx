@@ -40,7 +40,24 @@ const eventStyler = ({
   style: { backgroundColor: event.$backgroundColor },
 });
 
+function CalendarToobar(props: any) {
+  console.log(props);
+  return null;
+}
+
 export function Calendar(props: ViewProps<CalendarView>) {
+  const components = useMemo(
+    () => ({
+      week: {
+        header: ({ date, localizer }: any) => {
+          return localizer.format(date, "ddd D");
+        },
+      },
+      // toolbar: CalendarToobar,
+    }),
+    []
+  );
+
   const {
     meta: { view: metaView, fields: _metaFields, perms: metaPerms },
     dataStore,
@@ -75,7 +92,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     return getTimes(calendarDate, calendarMode);
   }, [calendarDate, calendarMode]);
 
-  const data = useAsync(async () => {
+  useAsync(async () => {
     const startCriteria: Criteria = {
       operator: "and",
       criteria: [
@@ -128,10 +145,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     maxPerPage,
   ]);
 
-  const _calendarEvents: SchedulerProps["events"] = useMemo(() => {
-    if (data.state !== "hasData") {
-      return [];
-    }
+  const _calendarEvents: SchedulerEvent[] = useMemo(() => {
     return (dataStore.records || []).map((record) => {
       const { id, name: title } = record;
       const start = new Date(record[eventStart] as string);
@@ -145,9 +159,9 @@ export function Calendar(props: ViewProps<CalendarView>) {
         start,
         end,
         record,
-      };
-    }) as SchedulerProps["events"];
-  }, [data.state, dataStore.records, eventStart, eventStop, eventLength]);
+      } as SchedulerEvent;
+    });
+  }, [dataStore.records, eventStart, eventStop, eventLength]);
 
   const handleNavigationChange = useCallback((date: Date) => {
     setCalendarDate(date);
@@ -159,38 +173,16 @@ export function Calendar(props: ViewProps<CalendarView>) {
 
   // Filters
 
-  const [filters, setFilters] = useState<Filter[]>([]);
-
-  const calendarEvents: SchedulerProps["events"] = useMemo(() => {
-    const checkedFilters = filters.filter((x) => x.checked);
-    const showAll = checkedFilters.length === 0;
-    return (_calendarEvents || []).reduce(
-      (list: object[], event: SchedulerEvent) => {
-        const filter = (showAll ? filters : checkedFilters).find(
-          (filter: Filter) => filter.match!(event)
-        );
-        return filter || showAll
-          ? [
-              ...list,
-              {
-                ...event,
-                $backgroundColor: (filter || {}).color || DEFAULT_COLOR,
-              },
-            ]
-          : list;
-      },
-      []
-    ) as SchedulerEvent[];
-  }, [_calendarEvents, filters]);
-
   const colorByField = colorBy ? metaFields[colorBy] : null;
+
+  const [filters, setFilters] = useState<Filter[]>([]);
 
   useEffect(() => {
     colorByField &&
       setFilters(getEventFilters(_calendarEvents || [], colorByField));
   }, [_calendarEvents, colorByField]);
 
-  function handleFilterChange(ind: number) {
+  const handleFilterChange = useCallback((ind: number) => {
     if (ind > -1) {
       setFilters((filters) =>
         filters.map((filter, index) =>
@@ -198,11 +190,35 @@ export function Calendar(props: ViewProps<CalendarView>) {
         )
       );
     }
-  }
+  }, []);
+
+  const calendarEvents: SchedulerEvent[] = useMemo(() => {
+    const checkedFilters = filters.filter((x) => x.checked);
+    const showAll = checkedFilters.length === 0;
+    return _calendarEvents.reduce((list: object[], event: SchedulerEvent) => {
+      const filter = (showAll ? filters : checkedFilters).find(
+        (filter: Filter) => filter.match!(event)
+      );
+      return filter || showAll
+        ? [
+            ...list,
+            {
+              ...event,
+              $backgroundColor: (filter || {}).color || DEFAULT_COLOR,
+            },
+          ]
+        : list;
+    }, []) as SchedulerEvent[];
+  }, [_calendarEvents, filters]);
 
   return (
     <Suspense fallback={<Loading />}>
-      <Box d="flex" flexDirection="row" flexGrow={1} className={styles["root"]}>
+      <Box
+        d="flex"
+        flexDirection="row"
+        flexGrow={1}
+        className={styles["calendar"]}
+      >
         <Box d="flex" p={2} pe={0} className={styles["scheduler-panel"]}>
           <Scheduler
             events={calendarEvents}
@@ -211,6 +227,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
             onNavigationChange={handleNavigationChange}
             onViewChange={handleViewChange}
             eventStyler={eventStyler}
+            components={components}
             style={{ width: "100%" }}
           />
         </Box>
