@@ -8,13 +8,13 @@ import { FormAtom, FormState, WidgetState } from "./types";
 import { defaultAttrs } from "./utils";
 
 export function createFormAtom(props: {
+  record: DataRecord;
   fields: Record<string, Property>;
   parent?: PrimitiveAtom<FormState>;
 }) {
-  const { fields, parent } = props;
+  const { record, fields, parent } = props;
   const states: Record<string, WidgetState> = {};
-  const record: DataRecord = {};
-  return atom<FormState>({ record, states, fields, parent });
+  return atom<FormState>({ record: { ...record }, states, fields, parent });
 }
 
 export function createWidgetAtom(props: {
@@ -30,6 +30,7 @@ export function createWidgetAtom(props: {
 }
 
 export const fallbackFormAtom = createFormAtom({
+  record: {},
   fields: {},
 });
 

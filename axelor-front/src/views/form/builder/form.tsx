@@ -1,13 +1,14 @@
 import { useMemo } from "react";
 
+import { createFormAtom } from "./atoms";
 import { GridLayout } from "./form-layouts";
 import { FormProps } from "./types";
 import { processView } from "./utils";
-import { createFormAtom } from "./atoms";
 
 export function Form({
   schema: view,
-  fields = {},
+  fields,
+  record,
   formAtom: parent,
   className,
   readonly,
@@ -15,8 +16,8 @@ export function Form({
 }: FormProps) {
   const schema = useMemo(() => processView(view, fields), [view, fields]);
   const formAtom = useMemo(
-    () => createFormAtom({ fields, parent }),
-    [fields, parent]
+    () => createFormAtom({ record, fields, parent }),
+    [record, fields, parent]
   );
   return (
     <Layout

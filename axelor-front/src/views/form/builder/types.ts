@@ -44,6 +44,7 @@ export interface FieldProps<T> extends WidgetProps {
 }
 
 export interface FormProps extends WidgetProps {
+  record: DataRecord;
   fields: Record<string, Property>;
   className?: string;
   layout?: FormLayout;
