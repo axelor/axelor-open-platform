@@ -16,7 +16,7 @@ import format from "@/utils/format";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 
 import { ViewProps } from "../types";
-
+import { useViewProps } from "@/view-containers/views/scope";
 import styles from "./grid.module.scss";
 
 function formatter(column: Field, value: any, record: any) {
@@ -29,9 +29,20 @@ function formatter(column: Field, value: any, record: any) {
 export function Grid(props: ViewProps<GridView>) {
   const { meta, dataStore } = props;
   const { view, fields } = meta;
+  const [viewProps, setViewProps] = useViewProps();
 
   const [state, setState] = useAtom(
-    useMemo(() => atomWithImmer<GridState>({ rows: [], columns: [] }), [])
+    useMemo(
+      () =>
+        atomWithImmer<GridState>({
+          rows: [],
+          columns: [],
+          selectedCell: viewProps?.selectedCell,
+          selectedRows: [viewProps?.selectedCell?.[0]!],
+        }),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      []
+    )
   );
 
   const records = useDataStore(dataStore, (ds) => ds.records);
@@ -72,6 +83,12 @@ export function Grid(props: ViewProps<GridView>) {
       onSearch();
     }
   }, [dataStore]);
+
+  useEffect(() => {
+    if (viewProps?.selectedCell !== state.selectedCell) {
+      setViewProps({ selectedCell: state.selectedCell ?? undefined });
+    }
+  }, [viewProps, setViewProps, state.selectedCell]);
 
   if (init.state === "loading") return null;
 
