@@ -18,7 +18,7 @@ import format from "@/utils/format";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 
 import { ViewProps } from "../types";
-import { useViewProps } from "@/view-containers/views/scope";
+import { useViewProps, useViewSwitch } from "@/view-containers/views/scope";
 import styles from "./grid.module.scss";
 import { Box } from "@axelor/ui";
 
@@ -33,6 +33,7 @@ export function Grid(props: ViewProps<GridView>) {
   const { meta, dataStore } = props;
   const { view, fields } = meta;
   const [viewProps, setViewProps] = useViewProps();
+  const switchTo = useViewSwitch();
 
   const [state, setState] = useAtom(
     useMemo(
@@ -41,7 +42,9 @@ export function Grid(props: ViewProps<GridView>) {
           rows: [],
           columns: [],
           selectedCell: viewProps?.selectedCell,
-          selectedRows: [viewProps?.selectedCell?.[0]!],
+          selectedRows: viewProps?.selectedCell
+            ? [viewProps?.selectedCell?.[0]!]
+            : null,
         }),
       // eslint-disable-next-line react-hooks/exhaustive-deps
       []
@@ -102,6 +105,16 @@ export function Grid(props: ViewProps<GridView>) {
     await dataStore.search({ fields: names });
   }, [dataStore, names]);
 
+  const onEdit = useCallback(
+    (record: GridRow["record"]) => {
+      switchTo({
+        id: record.id,
+        mode: "edit",
+      });
+    },
+    [switchTo]
+  );
+
   const init = useAsync(async () => {
     if (dataStore.records.length === 0) {
       onSearch();
@@ -117,17 +130,20 @@ export function Grid(props: ViewProps<GridView>) {
       rowIndex: number
     ) => {
       if (col.name === "$$edit") {
-      // TODO: open record i.e. row.record in edit mode
+        onEdit(row.record);
       }
     },
-    []
+    [onEdit]
   );
 
   const handleRowDoubleClick = useCallback(
     (e: React.SyntheticEvent, row: GridRow, rowIndex: number) => {
-      // TODO: open record i.e. row.record in view mode
+      switchTo({
+        id: row.record.id,
+        mode: "view",
+      });
     },
-    []
+    [switchTo]
   );
 
   useEffect(() => {
@@ -155,6 +171,13 @@ export function Grid(props: ViewProps<GridView>) {
             text: "Edit",
             iconProps: {
               icon: "edit",
+            },
+            disabled: (state?.selectedRows || []).length === 0,
+            onClick: () => {
+              const { rows, selectedRows } = state;
+              const [rowIndex] = selectedRows || [];
+              const record = rows[rowIndex]?.record;
+              record && onEdit(record);
             },
           },
           {
