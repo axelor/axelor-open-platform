@@ -3,7 +3,7 @@ import _ from "lodash";
 
 import { DataContext } from "@/services/client/data.types";
 import { l10n } from "@/services/client/l10n";
-import { Field } from "@/services/client/meta.types";
+import { Field, JsonField } from "@/services/client/meta.types";
 
 import { toKebabCase } from "./names";
 
@@ -26,6 +26,15 @@ function getTimeFormat(opts: FormatOptions = {}) {
 function getDateTimeFormat(opts: FormatOptions = {}) {
   const dateFormat = l10n.getDateFormat();
   return dateFormat + " " + getTimeFormat(opts);
+}
+
+function getJSON(jsonStr: string) {
+  let value = {};
+  try {
+    value = JSON.parse(jsonStr);
+  } finally {
+    return value;
+  }
 }
 
 const formatDuration: Formatter = (value, opts = {}) => {
@@ -177,7 +186,13 @@ const format: Formatter = (value, opts = {}) => {
   let val = value;
   let name = props?.name;
 
-  if (name?.includes(".") && value === undefined) {
+  if ((props as JsonField).jsonField) {
+    const { jsonField, jsonPath } = props as JsonField;
+    val = _.get(
+      getJSON(_.get(context, jsonField as string)),
+      jsonPath as string
+    );
+  } else if (name?.includes(".") && value === undefined) {
     val = _.get(context, name);
   }
 

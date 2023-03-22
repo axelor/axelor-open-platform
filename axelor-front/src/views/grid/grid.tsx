@@ -2,6 +2,7 @@ import { useAtom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
 import { useCallback, useMemo } from "react";
 
+import _ from "lodash";
 import {
   Grid as AxGrid,
   GridProvider as AxGridProvider,
@@ -10,7 +11,7 @@ import {
 
 import { useAsync } from "@/hooks/use-async";
 import { useDataStore } from "@/hooks/use-data-store";
-import { Field, GridView } from "@/services/client/meta.types";
+import { Field, JsonField, GridView } from "@/services/client/meta.types";
 import format from "@/utils/format";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 
@@ -43,7 +44,9 @@ export function Grid(props: ViewProps<GridView>) {
       const attrs = item.widgetAttrs;
       const serverType = field?.type;
 
-      if (field) {
+      if ((item as JsonField).jsonField) {
+        names.push((item as JsonField).jsonField as string);
+      } else if (field) {
         names.push(field.name);
       }
 
@@ -57,7 +60,7 @@ export function Grid(props: ViewProps<GridView>) {
       };
     });
 
-    return { columns, names };
+    return { columns, names: _.uniq(names) };
   }, [view, fields]);
 
   const onSearch = useCallback(async () => {
