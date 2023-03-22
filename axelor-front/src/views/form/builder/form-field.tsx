@@ -1,5 +1,6 @@
-import { Box } from "@axelor/ui";
 import clsx from "clsx";
+
+import { Box } from "@axelor/ui";
 
 import styles from "./form-field.module.css";
 

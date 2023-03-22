@@ -1,6 +1,8 @@
+import { uniqueId } from "lodash";
+
 import { Property, Schema } from "@/services/client/meta.types";
 import { toKebabCase } from "@/utils/names";
-import { uniqueId } from "lodash";
+
 import { Attrs, DEFAULT_ATTRS } from "./types";
 
 export function defaultAttrs(schema: Schema): Attrs {

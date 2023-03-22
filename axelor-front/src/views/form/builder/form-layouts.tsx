@@ -1,9 +1,11 @@
-import { Schema } from "@/services/client/meta.types";
 import clsx from "clsx";
+
+import { Schema } from "@/services/client/meta.types";
+
 import { FormLayout } from "./types";
+import { FormWidget } from "./form-widget";
 
 import styles from "./form-layouts.module.scss";
-import { FormWidget } from "./form-widget";
 
 export const GridLayout: FormLayout = ({ schema, formAtom, className }) => {
   const { cols, items = [] } = schema;

@@ -1,8 +1,7 @@
-import { DataContext, DataRecord } from "@/services/client/data.types";
-import { FormView, Property, Schema } from "@/services/client/meta.types";
 import { PrimitiveAtom } from "jotai";
 
-import { ViewData } from "@/services/client/meta";
+import { DataContext, DataRecord } from "@/services/client/data.types";
+import { Property, Schema } from "@/services/client/meta.types";
 
 // TODO: add more attrs that can be changed
 export const DEFAULT_ATTRS = {
@@ -24,13 +23,18 @@ export interface WidgetState {
 export interface FormState {
   record: DataRecord;
   states: Record<string, WidgetState>;
-  fields: Record<string, Property>;
+  readonly fields: Record<string, Property>;
+  readonly parent?: FormAtom;
 }
+
+export type WidgetAtom = PrimitiveAtom<WidgetState>;
+
+export type FormAtom = PrimitiveAtom<FormState>;
 
 export interface WidgetProps {
   schema: Schema;
-  formAtom: PrimitiveAtom<FormState>;
-  widgetAtom: PrimitiveAtom<WidgetState>;
+  formAtom: FormAtom;
+  widgetAtom: WidgetAtom;
   readonly?: boolean;
 }
 
@@ -39,16 +43,14 @@ export interface FieldProps<T> extends WidgetProps {
   valueAtom: PrimitiveAtom<T>;
 }
 
-export interface FormProps {
-  meta: ViewData<FormView>;
+export interface FormProps extends WidgetProps {
+  fields: Record<string, Property>;
   className?: string;
-  readonly?: boolean;
   layout?: FormLayout;
 }
 
-export type FormLayout = (props: {
-  schema: Schema;
-  formAtom: PrimitiveAtom<FormState>;
-  className?: string;
-  readonly?: boolean;
-}) => JSX.Element;
+export type FormLayout = (
+  props: Omit<WidgetProps, "widgetAtom"> & {
+    className?: string;
+  }
+) => JSX.Element;

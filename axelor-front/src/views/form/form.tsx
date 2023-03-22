@@ -6,7 +6,9 @@ import { FormView } from "@/services/client/meta.types";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 
 import { ViewProps } from "../types";
+
 import { Form as FormComponent, FormLayout, FormWidget } from "./builder";
+import { fallbackFormAtom, fallbackWidgetAtom } from "./builder/atoms";
 
 import styles from "./form.module.scss";
 
@@ -49,8 +51,11 @@ export function Form({ meta }: ViewProps<FormView>) {
       <div className={styles.formViewScroller}>
         <FormComponent
           className={styles.formView}
-          meta={meta}
+          schema={meta.view}
+          fields={meta.fields!}
           layout={Layout}
+          formAtom={fallbackFormAtom}
+          widgetAtom={fallbackWidgetAtom}
         />
       </div>
     </div>

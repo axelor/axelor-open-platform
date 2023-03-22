@@ -1,28 +1,23 @@
-import { atom } from "jotai";
 import { useMemo } from "react";
 
-import { DataRecord } from "@/services/client/data.types";
-
 import { GridLayout } from "./form-layouts";
-import { FormProps, FormState, WidgetState } from "./types";
+import { FormProps } from "./types";
 import { processView } from "./utils";
+import { createFormAtom } from "./atoms";
 
 export function Form({
-  meta,
+  schema: view,
+  fields = {},
+  formAtom: parent,
   className,
   readonly,
   layout: Layout = GridLayout,
 }: FormProps) {
-  const { fields = {}, view } = meta;
-
   const schema = useMemo(() => processView(view, fields), [view, fields]);
-
-  const formAtom = useMemo(() => {
-    const states: Record<string, WidgetState> = {};
-    const record: DataRecord = {};
-    return atom<FormState>({ record, states, fields: fields });
-  }, [fields]);
-
+  const formAtom = useMemo(
+    () => createFormAtom({ fields, parent }),
+    [fields, parent]
+  );
   return (
     <Layout
       className={className}

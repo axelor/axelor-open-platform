@@ -1,25 +1,18 @@
-import { Schema } from "@/services/client/meta.types";
-import { PrimitiveAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useMemo } from "react";
-import { useWidgetComp } from "./hooks";
-import { FormState, WidgetProps } from "./types";
-import { defaultAttrs } from "./utils";
 
-export function FormWidget(props: {
-  schema: Schema;
-  formAtom: PrimitiveAtom<FormState>;
-  readonly?: boolean;
-}) {
+import { createWidgetAtom } from "./atoms";
+import { useWidgetComp } from "./hooks";
+import { WidgetProps } from "./types";
+
+export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
   const { schema, formAtom, readonly } = props;
 
-  const widgetAtom = useMemo(() => {
-    const { uid } = schema;
-    const attrs = defaultAttrs(schema);
-    return focusAtom(formAtom, (o) =>
-      o.prop("states").prop(uid).valueOr({ attrs })
-    );
-  }, [formAtom, schema]);
+  const widgetAtom = useMemo(
+    () => createWidgetAtom({ schema, formAtom }),
+    [formAtom, schema]
+  );
 
   const { attrs } = useAtomValue(widgetAtom);
 
@@ -46,9 +39,7 @@ export function FormWidget(props: {
       <Comp {...widgetProps} />
     );
   }
-  return (
-    <Unknown schema={schema} formAtom={formAtom} widgetAtom={widgetAtom} />
-  );
+  return <Unknown {...widgetProps} />;
 }
 
 function FormField(props: WidgetProps & { component: React.ElementType }) {
