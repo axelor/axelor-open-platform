@@ -23,6 +23,7 @@ export interface WidgetState {
 export interface FormState {
   record: DataRecord;
   states: Record<string, WidgetState>;
+  readonly model: string;
   readonly fields: Record<string, Property>;
   readonly parent?: FormAtom;
 }

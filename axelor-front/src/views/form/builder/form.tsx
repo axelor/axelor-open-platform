@@ -15,9 +15,10 @@ export function Form({
   layout: Layout = GridLayout,
 }: FormProps) {
   const schema = useMemo(() => processView(view, fields), [view, fields]);
+  const model = schema.model;
   const formAtom = useMemo(
-    () => createFormAtom({ record, fields, parent }),
-    [record, fields, parent]
+    () => createFormAtom({ model, record, fields, parent }),
+    [model, record, fields, parent]
   );
   return (
     <Layout
