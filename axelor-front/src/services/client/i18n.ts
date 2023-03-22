@@ -5,8 +5,7 @@ const bundle = await request({
   url: "js/messages.js",
 }).then((res) => res.json());
 
-export module i18n {
-  export function get(text: string): string;
+export namespace i18n {
   export function get(text: string, ...args: any[]): string {
     let message = bundle[text] || bundle[(text || "").trim()] || text;
     if (message && args.length > 1) {
