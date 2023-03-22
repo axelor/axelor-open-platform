@@ -5,14 +5,7 @@ export type DataRecord = {
   version?: number | null;
   $version?: number | null;
   selected?: boolean;
-  [k: string]:
-    | null
-    | undefined
-    | number
-    | boolean
-    | string
-    | DataRecord
-    | DataRecord[];
+  [k: string]: any;
 };
 
 export type DataContext = DataRecord & {
