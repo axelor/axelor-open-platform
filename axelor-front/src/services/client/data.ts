@@ -70,7 +70,7 @@ export class DataSource {
         status,
         offset,
         total: totalCount,
-        data: records,
+        data: records = [],
       } = await resp.json();
 
       return status === 0
