@@ -1,23 +1,22 @@
 import clsx from "clsx";
 import { useMemo, useRef } from "react";
-import { useParams } from "react-router-dom";
 
+import { useAsync } from "@/hooks/use-async";
 import { useContainerQuery } from "@/hooks/use-container-query";
+import { DataRecord } from "@/services/client/data.types";
 import { FormView } from "@/services/client/meta.types";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
+import { useViewRoute } from "@/view-containers/views/scope";
 
 import { ViewProps } from "../types";
 
 import { Form as FormComponent, FormLayout, FormWidget } from "./builder";
 import { fallbackFormAtom, fallbackWidgetAtom } from "./builder/atoms";
 
-import { useAsync } from "@/hooks/use-async";
-import { DataRecord } from "@/services/client/data.types";
-
 import styles from "./form.module.scss";
 
 export function Form({ meta, dataStore }: ViewProps<FormView>) {
-  const { id } = useParams();
+  const { id } = useViewRoute();
   const { data } = useAsync(async (): Promise<DataRecord> => {
     if (id) {
       const fields = Object.keys(meta.fields ?? {});

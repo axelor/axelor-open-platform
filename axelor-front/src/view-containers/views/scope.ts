@@ -2,7 +2,7 @@ import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
 import { useCallback } from "react";
 
-import { Tab, TabAtom, TabProps, useTabs } from "@/hooks/use-tabs";
+import { Tab, TabAtom, TabProps, TabRoute, useTabs } from "@/hooks/use-tabs";
 
 const fallbackAtom: TabAtom = atom(
   () => ({
@@ -104,7 +104,7 @@ export function useViewSwitch() {
 
 /**
  * This hook can be used to keep track of view specific state in tab.
- * 
+ *
  */
 export function useViewProps() {
   const [{ type, props }, setViewState] = useViewState();
@@ -128,4 +128,13 @@ export function useViewProps() {
   );
 
   return [state, setState] as const;
+}
+
+/**
+ * This hook should be used by views to get the current route options.
+ *
+ */
+export function useViewRoute() {
+  const [{ routes, type }] = useViewState();
+  return routes?.[type] as TabRoute;
 }
