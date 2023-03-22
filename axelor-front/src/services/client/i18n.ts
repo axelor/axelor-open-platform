@@ -8,7 +8,7 @@ const bundle = await request({
 export namespace i18n {
   export function get(text: string, ...args: any[]): string {
     let message = bundle[text] || bundle[(text || "").trim()] || text;
-    if (message && args.length > 1) {
+    if (message && args.length) {
       for (let i = 0; i < args.length; i++) {
         let placeholder = new RegExp(`\\{${i}\\}`, "g");
         let value = args[i];
