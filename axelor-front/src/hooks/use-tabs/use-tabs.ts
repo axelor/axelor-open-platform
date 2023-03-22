@@ -235,7 +235,7 @@ const openAtom = atom(
         (get, set, arg) => {
           const prev = get(tabAtom);
           if (prev !== arg) {
-            set(tabAtom, () => ({ ...prev, ...arg }));
+            set(tabAtom, (state) => updateRouteState(id, { ...state, ...arg }));
           }
         }
       );
