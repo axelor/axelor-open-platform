@@ -48,8 +48,7 @@ function ViewContainer({
 }) {
   const { model } = tab.action;
 
-  const viewOpts = useMemo(() => ({ model, ...view }), [model, view]);
-  const viewSchema = useViewSchema(viewOpts);
+  const viewSchema = useViewSchema({ model, ...view });
   const viewComp = useViewComp(view.type);
 
   if (viewSchema.state === "loading" || viewComp.state === "loading") {
