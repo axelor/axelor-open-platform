@@ -1,13 +1,20 @@
-import { View } from "@axelor/ui/scheduler";
-import { getStartOf, getNextOf } from "../../utils/date";
+import { View, SchedulerEvent } from "@axelor/ui/scheduler";
 import getObjectValue from "lodash/get";
 
-import {
-  SchedulerEvent
-} from "@axelor/ui/scheduler";
+import { i18n } from "@/services/client/i18n";
+import { getStartOf, getNextOf, TimeUnit } from "../../utils/date";
 import { getColor } from "./colors";
 
+const { get: t } = i18n;
+
 export function getTimes(date: Date | string, view: View) {
+  if (view === "month") {
+    return {
+      start: getStartOf(getStartOf(date, "month"), "week"),
+      end: getNextOf(getNextOf(date, "month"), "week"),
+    };
+  }
+
   return { start: getStartOf(date, view), end: getNextOf(date, view) };
 }
 
@@ -53,4 +60,24 @@ export function getEventFilters(events: SchedulerEvent[], colorField: any) {
     }
     return list;
   }, []);
+}
+
+interface DateFormatMap {
+  [key: string]: (date: Date) => string;
+}
+
+export function formatDate(date: Date, unit: TimeUnit, moment: any) {
+  const DATE_FORMATTERS: DateFormatMap = {
+    month: (date) => moment(date).format("MMMM YYYY"),
+    week: (date) =>
+      t(
+        "{0} – Week {1}",
+        moment(date).format("MMMM YYYY"),
+        moment(date).format("w")
+      ),
+    day: (date) => moment(date).format("LL"),
+  };
+
+  const formatter = DATE_FORMATTERS[unit] || DATE_FORMATTERS.day;
+  return formatter(date);
 }

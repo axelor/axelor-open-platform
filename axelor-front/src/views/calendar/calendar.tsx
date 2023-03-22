@@ -10,7 +10,6 @@ import { useSession } from "@/hooks/use-session";
 
 import { i18n } from "@/services/client/i18n";
 import { Criteria } from "../../services/client/data.types";
-import { TimeUnit, addDate } from "../../utils/date";
 
 import { ViewProps } from "../types";
 
@@ -19,13 +18,16 @@ import DatePicker from "./components/date-picker";
 import Filters from "./components/filters";
 import { Filter } from "./components/types";
 
-import { getEventFilters, getTimes } from "./utils";
+import { formatDate, getEventFilters, getTimes } from "./utils";
 
 import styles from "./calendar.module.scss";
 import { DEFAULT_COLOR } from "./colors";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { MaterialIconProps } from "@axelor/ui/src/icons/meterial-icon";
 import { useMomentLocale } from "@/hooks/use-moment-locale";
+import { addDate } from "@/utils/date";
+
+const { get: t } = i18n;
 
 const eventStyler = ({
   event,
@@ -44,26 +46,6 @@ const components = {
   toolbar: () => null,
 };
 
-interface DateFormatMap {
-  [key: string]: (date: Date) => string;
-}
-
-export function formatDate(date: Date, unit: TimeUnit, moment: any) {
-  const DATE_FORMATTERS: DateFormatMap = {
-    month: (date) => moment(date).format("MMMM YYYY"),
-    week: (date) =>
-      i18n.get(
-        "{0} – Week {1}",
-        moment(date).format("MMMM YYYY"),
-        moment(date).format("w")
-      ),
-    day: (date) => moment(date).format("LL"),
-  };
-
-  const formatter = DATE_FORMATTERS[unit] || DATE_FORMATTERS.day;
-  return formatter(date);
-}
-
 export function Calendar(props: ViewProps<CalendarView>) {
   const { meta, dataStore } = props;
   const { view: metaView, fields: metaFields, perms: metaPerms } = meta;
@@ -75,7 +57,6 @@ export function Calendar(props: ViewProps<CalendarView>) {
     mode: initialMode = "month",
   } = metaView;
 
-  const t = i18n.get;
   const session = useSession();
   const momentLocale = useMomentLocale();
   const maxPerPage = useMemo(
@@ -149,7 +130,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
     [dataStore, filter, searchFieldNames, maxPerPage]
   );
 
-  useAsync(handleRefresh, [dataStore]);
+  useAsync(handleRefresh, [dataStore, filter]);
 
   const unfilteredCalendarEvents: SchedulerEvent[] = useMemo(() => {
     return (dataStore.records || []).map((record) => {
@@ -252,7 +233,11 @@ export function Calendar(props: ViewProps<CalendarView>) {
         text: t("Month"),
         iconProps: { icon: "calendar_view_month" },
       },
-      { view: "week", text: t("Week"), iconProps: { icon: "calendar_view_week" } },
+      {
+        view: "week",
+        text: t("Week"),
+        iconProps: { icon: "calendar_view_week" },
+      },
       { view: "day", text: t("Day"), iconProps: { icon: "calendar_view_day" } },
     ];
 
