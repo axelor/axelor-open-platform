@@ -1,0 +1,17 @@
+.icon {
+  display: block;
+}
+.hoverIcon {
+  display: none;
+}
+
+.container {
+  &:hover {
+    & .icon {
+      display: none;
+    }
+    & .hoverIcon {
+      display: block;
+    }
+  }
+}
