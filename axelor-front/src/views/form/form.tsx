@@ -16,7 +16,7 @@ import { fallbackFormAtom, fallbackWidgetAtom } from "./builder/atoms";
 import styles from "./form.module.scss";
 
 export function Form({ meta, dataStore }: ViewProps<FormView>) {
-  const { id } = useViewRoute();
+  const { id } = useViewRoute("form");
   const { data } = useAsync(async (): Promise<DataRecord> => {
     if (id) {
       const fields = Object.keys(meta.fields ?? {});

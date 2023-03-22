@@ -133,8 +133,11 @@ export function useViewProps() {
 /**
  * This hook should be used by views to get the current route options.
  *
+ * @param type the view type for which to get the route options
+ * @returns TabRoute option of the given view type
  */
-export function useViewRoute() {
-  const [{ routes, type }] = useViewState();
-  return routes?.[type] as TabRoute;
+export function useViewRoute(type: string) {
+  const [{ routes }] = useViewState();
+  const options = routes?.[type] ?? {};
+  return options as TabRoute;
 }
