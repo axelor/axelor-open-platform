@@ -8,7 +8,7 @@ import {
   Perms,
   Property,
   SavedFilter,
-  ViewTypes
+  ViewTypes,
 } from "./meta.types";
 
 export type MenuType = "all" | "quick" | "fav";
@@ -75,6 +75,7 @@ export interface ViewData<T> extends Partial<MetaData> {
   view: T;
   jsonAttrs?: JsonField[];
   helps?: Record<string, Record<string, HelpOverride>>;
+  related?: Record<string, string[]>; // additional fields after view processing
 }
 
 export async function fields(model: string): Promise<MetaData> {
