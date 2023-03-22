@@ -37,15 +37,6 @@ const eventStyler = ({
   style: { backgroundColor: event.$backgroundColor },
 });
 
-const components = {
-  week: {
-    header: ({ date, localizer }: any) => {
-      return localizer.format(date, "ddd D");
-    },
-  },
-  toolbar: () => null,
-};
-
 export function Calendar(props: ViewProps<CalendarView>) {
   const { meta, dataStore } = props;
   const { view: metaView, fields: metaFields, perms: metaPerms } = meta;
@@ -63,6 +54,30 @@ export function Calendar(props: ViewProps<CalendarView>) {
     () => session.data?.api?.pagination?.maxPerPage || -1,
     [session]
   );
+
+  const isDateCalendar = useMemo(
+    () => metaFields?.[eventStart]?.type === "DATE",
+    [metaFields, eventStart]
+  );
+
+  const components = useMemo(() => {
+    const timeComponents = isDateCalendar
+      ? {
+          dayColumnWrapper: () => null,
+          timeSlotWrapper: () => null,
+          timeGutterWrapper: () => null,
+        }
+      : {};
+    return {
+      week: {
+        header: ({ date, localizer }: any) => {
+          return localizer.format(date, "ddd D");
+        },
+      },
+      toolbar: () => null,
+      ...timeComponents,
+    };
+  }, [isDateCalendar]);
 
   const searchFieldNames = useMemo(() => {
     const schemaFieldNames = Object.keys(metaFields || {});
@@ -146,9 +161,10 @@ export function Calendar(props: ViewProps<CalendarView>) {
         start,
         end,
         record,
+        allDay: isDateCalendar,
       } as SchedulerEvent;
     });
-  }, [dataStore.records, eventStart, eventStop, eventLength]);
+  }, [dataStore.records, eventStart, eventStop, eventLength, isDateCalendar]);
 
   const handleNavigationChange = useCallback((date: Date) => {
     setCalendarDate(date);
