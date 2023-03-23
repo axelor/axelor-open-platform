@@ -18,6 +18,7 @@
  */
 package com.axelor.meta.db.repo;
 
+import com.axelor.common.HtmlUtils;
 import com.axelor.common.StringUtils;
 import com.axelor.db.JPA;
 import com.axelor.db.Model;
@@ -92,7 +93,7 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
             .append('"')
             .append(" title=")
             .append('"')
-            .append(gridView.getTitle())
+            .append(HtmlUtils.escapeAttribute(gridView.getTitle()))
             .append('"')
             .append(" model=")
             .append('"')
@@ -154,7 +155,7 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
             .append('"')
             .append(" title=")
             .append('"')
-            .append(formView.getTitle())
+            .append(HtmlUtils.escapeAttribute(formView.getTitle()))
             .append('"')
             .append(" model=")
             .append('"')
@@ -217,7 +218,7 @@ public class MetaJsonModelRepository extends AbstractMetaJsonModelRepository {
               .append('"')
               .append(" title=")
               .append('"')
-              .append(menu.getTitle())
+              .append(HtmlUtils.escapeAttribute(menu.getTitle()))
               .append('"')
               .append(" model=")
               .append('"')
