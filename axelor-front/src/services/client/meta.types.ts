@@ -627,6 +627,11 @@ export interface CustomView extends View {
   template?: string;
 }
 
+export interface HtmlView extends View {
+  type: "html";
+  resource?: string;
+}
+
 export interface Dashboard extends View {
   type: "dashboard";
   items?: PanelDashlet[];
@@ -706,6 +711,7 @@ export interface ActionView {
   views?: View[];
   context?: DataContext;
   params?: DataRecord;
+  resource?: string; // url resource
 }
 
 export type ViewType =
@@ -718,6 +724,7 @@ export type ViewType =
   | GanttView
   | ChartView
   | CustomView
+  | HtmlView
   | SearchView
   | SearchFilters;
 
