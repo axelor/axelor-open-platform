@@ -1,5 +1,5 @@
 import { request } from "./client";
-import { Criteria, DataContext } from "./data.types";
+import { Criteria, DataContext, DataRecord } from "./data.types";
 import {
   ActionView,
   HelpOverride,
@@ -134,7 +134,66 @@ export type ActionOptions = {
   };
 };
 
-export async function action(options: ActionOptions) {
+export type ActionResult = {
+  pending?: string;
+  exportFile?: string;
+  signal?: string;
+  signalData?: any;
+  info?: {
+    title?: string;
+    message: string;
+    confirmBtnTitle?: string;
+  };
+  error?: {
+    title?: string;
+    message: string;
+    action?: string;
+    confirmBtnTitle?: string;
+  };
+  alert?: {
+    title?: string;
+    message: string;
+    action?: string;
+    confirmBtnTitle?: string;
+    cancelBtnTitle?: string;
+  };
+  notify?:
+    | { title: string; message: string }
+    | { title: string; message: string }[];
+  errors?: Record<string, string>;
+  values?: DataRecord;
+  attrs?: Record<string, Record<string, any>>;
+  reload?: boolean;
+  validate?: boolean;
+  close?: boolean;
+  canClose?: boolean;
+  save?: boolean;
+  new?: boolean;
+  view?: ActionView;
+  report?: boolean;
+  reportLink?: string;
+  reportFile?: string;
+  reportFormat?: "pdf" | "html";
+  attached?: {
+    id: number;
+    fileName: string;
+  };
+};
+
+function prepareActionResult(data: any): ActionResult[] {
+  if (Array.isArray(data)) {
+    return data.map((item) => {
+      const { "signal-data": signalData, ...rest } = item;
+      return {
+        ...rest,
+        signalData,
+      };
+    });
+  }
+  return [];
+}
+
+export async function action(options: ActionOptions): Promise<ActionResult[]> {
   const url = "ws/action";
   const resp = await request({
     url,
@@ -144,7 +203,7 @@ export async function action(options: ActionOptions) {
 
   if (resp.ok) {
     const { status, data } = await resp.json();
-    return status === 0 ? data : Promise.reject(500);
+    return status === 0 ? prepareActionResult(data) : Promise.reject(500);
   }
 
   return Promise.reject(resp.status);
