@@ -10,6 +10,7 @@ import { NavHeader } from "./nav-header";
 import { NavTabs } from "./nav-tabs";
 
 import styles from "./layout.module.scss";
+import { AlertsProvider } from "@/components/alerts";
 
 export function Layout() {
   const { sidebar } = useSidebar();
@@ -42,6 +43,7 @@ export function Layout() {
         </Box>
       </Box>
       <DialogsProvider />
+      <AlertsProvider />
     </Box>
   );
 }
