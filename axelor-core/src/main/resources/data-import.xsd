@@ -1,7 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Axelor Business Solutions
+
+    Copyright (C) 2005-2023 Axelor (<http://axelor.com>).
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+-->
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://axelor.com/xml/ns/data-import"
   xmlns:db="http://axelor.com/xml/ns/data-import"
   elementFormDefault="qualified" version="6.1">
+
+  <annotation>
+    <documentation>
+      XML Schema for the data import configuration file.
+    </documentation>
+  </annotation>
 
   <element name="csv-inputs">
     <annotation>

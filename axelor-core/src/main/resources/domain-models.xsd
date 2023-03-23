@@ -1,7 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Axelor Business Solutions
+
+    Copyright (C) 2005-2023 Axelor (<http://axelor.com>).
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+-->
 <xsd:schema targetNamespace="http://axelor.com/xml/ns/domain-models"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dm="http://axelor.com/xml/ns/domain-models"
   elementFormDefault="qualified" attributeFormDefault="unqualified" version="6.1">
+
+  <xsd:annotation>
+    <xsd:documentation>
+      XML Schema for the domain models definition.
+    </xsd:documentation>
+  </xsd:annotation>
 
   <xsd:element name="domain-models">
     <xsd:complexType>
