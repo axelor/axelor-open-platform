@@ -2,7 +2,6 @@ import { useAtom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
 import { useCallback, useEffect, useMemo } from "react";
 import _ from "lodash";
-import { Box } from "@axelor/ui";
 import {
   Grid as AxGrid,
   GridProvider as AxGridProvider,
@@ -11,10 +10,10 @@ import {
   GridRowProps,
   GridState,
 } from "@axelor/ui/grid";
-import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
 import { Field, JsonField, GridView } from "@/services/client/meta.types";
 import { Row as RowRenderer } from "./renderers/row";
+import { Cell as CellRenderer } from "./renderers/cell";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { ViewProps } from "../types";
 import { useViewProps, useViewSwitch } from "@/view-containers/views/scope";
@@ -81,21 +80,12 @@ export function Grid(props: ViewProps<GridView>) {
       columns.unshift({
         title: "",
         name: "$$edit",
-        renderer: ({ style, onClick, className }: any) => (
-          <Box
-            d="flex"
-            justifyContent="center"
-            alignItems="center"
-            {...{ style, onClick, className }}
-          >
-            <MaterialIcon icon="edit" opticalSize={20} />
-          </Box>
-        ),
+        widget: "edit-icon",
         computed: true,
         sortable: false,
         searchable: false,
         width: 32,
-      });
+      } as GridColumn);
     }
 
     return { columns, names: _.uniq(names) };
@@ -239,6 +229,7 @@ export function Grid(props: ViewProps<GridView>) {
           columns={columns}
           state={state}
           setState={setState}
+          cellRenderer={CellRenderer}
           rowRenderer={CustomRowRenderer}
           onCellClick={handleCellClick}
           onRowDoubleClick={handleRowDoubleClick}
