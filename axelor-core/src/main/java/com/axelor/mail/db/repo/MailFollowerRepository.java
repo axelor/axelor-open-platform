@@ -18,6 +18,7 @@
 package com.axelor.mail.db.repo;
 
 import com.axelor.auth.db.User;
+import com.axelor.common.HtmlUtils;
 import com.axelor.db.EntityHelper;
 import com.axelor.db.JpaRepository;
 import com.axelor.db.Model;
@@ -208,7 +209,7 @@ public class MailFollowerRepository extends JpaRepository<MailFollower> {
       action.setXml(
           ""
               + "<action-view title='"
-              + actionTitle
+              + HtmlUtils.escapeAttribute(actionTitle)
               + "' name='"
               + actionName
               + "' model='"
