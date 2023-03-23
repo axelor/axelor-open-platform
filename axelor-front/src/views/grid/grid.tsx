@@ -2,25 +2,26 @@ import { useAtom } from "jotai";
 import { atomWithImmer } from "jotai-immer";
 import { useCallback, useEffect, useMemo } from "react";
 import _ from "lodash";
+import { Box } from "@axelor/ui";
 import {
   Grid as AxGrid,
   GridProvider as AxGridProvider,
   GridColumn,
   GridRow,
+  GridRowProps,
   GridState,
 } from "@axelor/ui/grid";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
 
-import { useAsync } from "@/hooks/use-async";
-import { useDataStore } from "@/hooks/use-data-store";
 import { Field, JsonField, GridView } from "@/services/client/meta.types";
-import format from "@/utils/format";
+import { Row as RowRenderer } from "./renderers/row";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-
 import { ViewProps } from "../types";
 import { useViewProps, useViewSwitch } from "@/view-containers/views/scope";
+import { useAsync } from "@/hooks/use-async";
+import { useDataStore } from "@/hooks/use-data-store";
+import format from "@/utils/format";
 import styles from "./grid.module.scss";
-import { Box } from "@axelor/ui";
 
 function formatter(column: Field, value: any, record: any) {
   return format(value, {
@@ -50,7 +51,6 @@ export function Grid(props: ViewProps<GridView>) {
       []
     )
   );
-
   const records = useDataStore(dataStore, (ds) => ds.records);
 
   const { columns, names } = useMemo(() => {
@@ -146,6 +146,14 @@ export function Grid(props: ViewProps<GridView>) {
     [switchTo]
   );
 
+  const CustomRowRenderer = useMemo(() => {
+    const { hilites } = view;
+    if (!(hilites || []).length) return;
+    return (props: GridRowProps) => (
+      <RowRenderer {...props} hilites={hilites} />
+    );
+  }, [view]);
+
   useEffect(() => {
     if (viewProps?.selectedCell !== state.selectedCell) {
       setViewProps({ selectedCell: state.selectedCell ?? undefined });
@@ -231,6 +239,7 @@ export function Grid(props: ViewProps<GridView>) {
           columns={columns}
           state={state}
           setState={setState}
+          rowRenderer={CustomRowRenderer}
           onCellClick={handleCellClick}
           onRowDoubleClick={handleRowDoubleClick}
         />
