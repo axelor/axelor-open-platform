@@ -1,8 +1,8 @@
-import { Box } from "@axelor/ui";
+import clsx from "clsx";
+import { Box, Badge } from "@axelor/ui";
 import { GridColumnProps } from "@axelor/ui/src/grid/grid-column";
-import classes from "./single-select.module.scss";
 import { Field } from "@/services/client/meta.types";
-import { legacyClassNames } from "@/styles/legacy";
+import classes from "./single-select.module.scss";
 
 export function SingleSelect(props: GridColumnProps) {
   const { data, value } = props;
@@ -12,20 +12,19 @@ export function SingleSelect(props: GridColumnProps) {
     (item) => String(item.value) === String(value)
   );
 
-  return value && (
-    <Box
-      as="span"
-      px={2}
-      className={legacyClassNames(
-        classes["single-select"],
-        "label",
-        "label-primary",
-        classes[option?.color || "blue"]
-      )}
-    >
-      <Box as="span" className={classes["tag-text"]}>
-        {option?.title || value}
-      </Box>
-    </Box>
+  return (
+    value && (
+      <Badge
+        px={2}
+        className={clsx(
+          classes["single-select"],
+          classes[(option?.color || "blue").trim()]
+        )}
+      >
+        <Box as="span" className={classes["tag-text"]}>
+          {option?.title || value}
+        </Box>
+      </Badge>
+    )
   );
 }
