@@ -2,6 +2,8 @@ import { Box } from "@axelor/ui";
 import clsx from "clsx";
 import { Outlet } from "react-router-dom";
 
+import { DialogsProvider } from "@/components/dialogs";
+
 import { NavDrawer } from "./nav-drawer";
 import { useSidebar } from "./nav-drawer/hook";
 import { NavHeader } from "./nav-header";
@@ -39,6 +41,7 @@ export function Layout() {
           </div>
         </Box>
       </Box>
+      <DialogsProvider />
     </Box>
   );
 }
