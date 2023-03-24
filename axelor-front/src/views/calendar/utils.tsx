@@ -1,8 +1,9 @@
 import { View, SchedulerEvent } from "@axelor/ui/scheduler";
 import getObjectValue from "lodash/get";
+import dayjs, { ManipulateType } from "dayjs";
 
 import { i18n } from "@/services/client/i18n";
-import { getStartOf, getNextOf, TimeUnit } from "../../utils/date";
+import { getStartOf, getNextOf } from "../../utils/date";
 import { getColor } from "./colors";
 
 const { get: t } = i18n;
@@ -66,16 +67,16 @@ interface DateFormatMap {
   [key: string]: (date: Date) => string;
 }
 
-export function formatDate(date: Date, unit: TimeUnit, moment: any) {
+export function formatDate(date: Date, unit: ManipulateType) {
   const DATE_FORMATTERS: DateFormatMap = {
-    month: (date) => moment(date).format("MMMM YYYY"),
+    month: (date) => dayjs(date).format("MMMM YYYY"),
     week: (date) =>
       t(
         "{0} – Week {1}",
-        moment(date).format("MMMM YYYY"),
-        moment(date).format("w")
+        dayjs(date).format("MMMM YYYY"),
+        dayjs(date).format("w")
       ),
-    day: (date) => moment(date).format("LL"),
+    day: (date) => dayjs(date).format("LL"),
   };
 
   const formatter = DATE_FORMATTERS[unit] || DATE_FORMATTERS.day;

@@ -1,13 +1,11 @@
-import moment from "moment";
+import dayjs, { ManipulateType } from "dayjs";
 
-export type TimeUnit = moment.unitOfTime.DurationConstructor;
-
-export function addDate(date: Date | string, amount: number, unit: TimeUnit) {
-  return moment(date).add(amount, unit).toDate();
+export function addDate(date: Date | string, amount: number, unit: ManipulateType) {
+  return dayjs(date).add(amount, unit).toDate();
 }
-export function getStartOf(date: Date | string, unit: TimeUnit) {
-  return moment(date).startOf(unit).toDate();
+export function getStartOf(date: Date | string, unit: ManipulateType) {
+  return dayjs(date).startOf(unit).toDate();
 }
-export function getNextOf(date: Date | string, unit: TimeUnit) {
-  return moment(date).add(1, unit).startOf(unit).toDate();
+export function getNextOf(date: Date | string, unit: ManipulateType) {
+  return dayjs(date).add(1, unit).startOf(unit).toDate();
 }

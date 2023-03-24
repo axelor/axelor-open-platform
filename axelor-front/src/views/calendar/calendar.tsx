@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 
 import { Box, CommandItemProps } from "@axelor/ui/core";
-import { SchedulerEvent, View } from "@axelor/ui/scheduler";
+import { Scheduler, SchedulerEvent, View } from "@axelor/ui/scheduler";
 
 import { CalendarView } from "@/services/client/meta.types";
 
@@ -9,11 +9,11 @@ import { useAsync } from "@/hooks/use-async";
 import { useSession } from "@/hooks/use-session";
 
 import { i18n } from "@/services/client/i18n";
-import { Criteria } from "../../services/client/data.types";
+import { l10n } from "@/services/client/l10n";
+import { Criteria } from "@/services/client/data.types";
 
 import { ViewProps } from "../types";
 
-import Scheduler from "./components/scheduler";
 import DatePicker from "./components/date-picker";
 import Filters from "./components/filters";
 import { Filter } from "./components/types";
@@ -24,7 +24,6 @@ import styles from "./calendar.module.scss";
 import { DEFAULT_COLOR } from "./colors";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
 import { MaterialIconProps } from "@axelor/ui/src/icons/meterial-icon";
-import { useMomentLocale } from "@/hooks/use-moment-locale";
 import { addDate } from "@/utils/date";
 
 const { get: t } = i18n;
@@ -48,8 +47,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
     mode: initialMode = "month",
   } = metaView;
 
+  l10n.getLocale();
   const session = useSession();
-  const momentLocale = useMomentLocale();
   const maxPerPage = useMemo(
     () => session.data?.api?.pagination?.maxPerPage || -1,
     [session]
@@ -234,9 +233,8 @@ export function Calendar(props: ViewProps<CalendarView>) {
   }, []);
 
   const calendarTitle = useMemo(() => {
-    const { moment } = momentLocale;
-    return formatDate(calendarDate, calendarMode, moment);
-  }, [calendarDate, calendarMode, momentLocale]);
+    return formatDate(calendarDate, calendarMode);
+  }, [calendarDate, calendarMode]);
 
   const actions = useMemo<CommandItemProps[]>(() => {
     const views: {
@@ -305,15 +303,25 @@ export function Calendar(props: ViewProps<CalendarView>) {
     handleViewChange,
   ]);
 
+  const handleDateChange = useCallback(
+    (date: Date) => {
+      setCalendarDate(date);
+      handleNavigationChange(date);
+    },
+    [handleNavigationChange]
+  );
+
   return (
     <div className={styles.calendar}>
       <ViewToolBar
         meta={meta}
         actions={actions}
         pagination={{
-          text: calendarTitle,
+          canPrev: true,
+          canNext: true,
           onNext: handleNext,
           onPrev: handlePrev,
+          text: calendarTitle,
         }}
       />
       <Box d="flex" flexDirection="row" flexGrow={1}>
@@ -332,10 +340,7 @@ export function Calendar(props: ViewProps<CalendarView>) {
         <Box flex={1} p={2} className={styles["calendar-panel"]}>
           <DatePicker
             selected={calendarDate}
-            onChange={(date: Date) => {
-              setCalendarDate(date);
-              handleNavigationChange(date);
-            }}
+            onChange={handleDateChange}
             {...({ inline: true } as any)}
           />
           <Filters data={filters} onChange={handleFilterChange} />
