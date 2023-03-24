@@ -5,12 +5,9 @@ import {
 } from "@/services/client/data.types";
 
 export interface ActionHandler {
-  getAttr(target: string, name: string): any;
   setAttr(target: string, name: string, value: any): any;
-
   setFocus(target: string): void;
 
-  getValue(name: string): any;
   setValue(name: string, value: any): void;
   addValue(name: string, value: any): void;
   delValue(name: string, value: any): void;

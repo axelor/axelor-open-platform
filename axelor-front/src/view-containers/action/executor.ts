@@ -250,7 +250,9 @@ export class DefaultActionExecutor implements ActionExecutor {
 
     if (data.report) {
       if (data.attached) {
-        const attachments = this.#handler.getValue("$attachments") ?? 0;
+        const context = this.#handler.getContext();
+        const attachments =
+          context["$attachments"] ?? context["attachments"] ?? 0;
         this.#handler.setValue("$attachments", attachments + 1);
         const confirmed = await dialogs.confirm({
           title: i18n.get("Download"),

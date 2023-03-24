@@ -2,12 +2,9 @@ import { DataRecord } from "@/services/client/data.types";
 import { ActionHandler } from "./types";
 
 export class DefaultActionHandler implements ActionHandler {
-  getAttr(target: string, name: string) {}
   setAttr(target: string, name: string, value: any) {}
-
   setFocus(target: string) {}
 
-  getValue(name: string) {}
   setValue(name: string, value: any) {}
   addValue(name: string, value: any) {}
   delValue(name: string, value: any) {}
