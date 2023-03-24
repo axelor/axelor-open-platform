@@ -1,8 +1,10 @@
 import { uniqueId } from "lodash";
 
+import { openTab_internal as openTab } from "@/hooks/use-tabs";
 import { i18n } from "@/services/client/i18n";
 import { ActionResult, action as executeAction } from "@/services/client/meta";
 import { ActionView, HtmlView, View } from "@/services/client/meta.types";
+import { download } from "@/utils/download";
 
 import { alerts } from "@/components/alerts";
 import { dialogs } from "@/components/dialogs";
@@ -38,7 +40,9 @@ export class DefaultActionExecutor implements ActionExecutor {
       return this.#execute(action, options);
     } catch (e) {
       if (typeof e === "string") {
-        this.#handler.showError(e);
+        dialogs.error({
+          content: e,
+        });
       }
       return Promise.reject(e);
     }
@@ -113,7 +117,7 @@ export class DefaultActionExecutor implements ActionExecutor {
   async #handle(data: ActionResult, options?: ActionOptions) {
     if (data.exportFile) {
       const link = "ws/files/data-export/" + data.exportFile;
-      this.#handler.download(link, data.exportFile);
+      await download(link, data.exportFile);
     }
 
     if (data.signal === "refresh-app") {
@@ -207,7 +211,7 @@ export class DefaultActionExecutor implements ActionExecutor {
         await this.#execute(data.pending, options);
       }
       if (data.view) {
-        this.#handler.open(data.view);
+        this.#openView(data.view);
       }
       return;
     }
@@ -257,7 +261,7 @@ export class DefaultActionExecutor implements ActionExecutor {
 
         if (confirmed) {
           var url = `ws/rest/com.axelor.meta.db.MetaFile/${data.attached.id}/content/download`;
-          return this.#handler.download(url, data.attached.fileName);
+          return download(url, data.attached.fileName);
         }
         return;
       }
@@ -271,7 +275,7 @@ export class DefaultActionExecutor implements ActionExecutor {
             viewType: "html",
           });
         } else {
-          this.#handler.download(url);
+          download(url);
         }
       }
     }
@@ -320,7 +324,7 @@ export class DefaultActionExecutor implements ActionExecutor {
 
       if (view && url && tab.params?.download) {
         const fileName = tab.params?.fileName;
-        return this.#handler.download(url, fileName);
+        return download(url, fileName);
       }
 
       if (view && url && tab.params?.target === "_blank") {
@@ -329,7 +333,7 @@ export class DefaultActionExecutor implements ActionExecutor {
       }
     }
 
-    return this.#handler.open(tab);
+    return openTab(tab);
   }
 
   async #handleAttrs(data: Record<string, Record<string, any>>) {

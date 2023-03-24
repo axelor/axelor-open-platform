@@ -3,7 +3,6 @@ import {
   DataContext,
   DataRecord,
 } from "@/services/client/data.types";
-import { ActionView } from "@/services/client/meta.types";
 
 export interface ActionHandler {
   getAttr(target: string, name: string): any;
@@ -18,23 +17,16 @@ export interface ActionHandler {
 
   setValues(values: DataRecord): Promise<void>;
 
-  showError(message: string): Promise<boolean>;
-  showAlert(message: string): Promise<boolean>;
-  showNotice(message: string): Promise<void>;
+  save(record?: DataRecord): Promise<void>;
+  edit(record?: DataRecord | null): Promise<void>;
 
-  save(): Promise<void>;
-  save(record: DataRecord): Promise<void>;
-  edit(record: DataRecord | null): Promise<void>;
   validate(): Promise<void>;
 
   refresh(target?: string): Promise<void>;
 
-  getContext(): DataContext;
-
-  open(action: ActionView): Promise<void>;
   close(): Promise<void>;
 
-  download(url: string, fileName?: string): Promise<void>;
+  getContext(): DataContext;
 
   onSignal(signal: string, data?: any): Promise<void>;
 }
