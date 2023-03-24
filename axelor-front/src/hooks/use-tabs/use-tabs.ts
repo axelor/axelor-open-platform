@@ -1,4 +1,10 @@
-import { WritableAtom, atom, useAtomValue, useSetAtom } from "jotai";
+import {
+  WritableAtom,
+  atom,
+  getDefaultStore,
+  useAtomValue,
+  useSetAtom,
+} from "jotai";
 import { selectAtom } from "jotai/utils";
 import { isEqual, isNil, omitBy } from "lodash";
 
@@ -212,7 +218,11 @@ const openAtom = atom(
       return found;
     }
 
-    const actionView = await findActionView(name);
+    const actionView =
+      typeof view === "object" && view.views?.length
+        ? view
+        : await findActionView(name);
+
     if (actionView) {
       const { name: id, title, viewType } = actionView;
       const type = getViewType(route?.mode ?? viewType);
@@ -308,4 +318,9 @@ export function useTabs() {
     open,
     close,
   };
+}
+
+// for internal use only with action handler
+export function openTab_internal(view: ActionView) {
+  getDefaultStore().set(openAtom, view);
 }
