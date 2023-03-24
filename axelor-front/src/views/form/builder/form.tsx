@@ -1,7 +1,12 @@
+import { useSetAtom } from "jotai";
+import { ScopeProvider } from "jotai-molecules";
 import { useMemo } from "react";
 
-import { createFormAtom } from "./atoms";
+import { DefaultActionExecutor } from "@/view-containers/action";
+
+import { contextAtom, createFormAtom } from "./atoms";
 import { GridLayout } from "./form-layouts";
+import { FormActionHandler, FormScope } from "./scope";
 import { FormProps } from "./types";
 import { processView } from "./utils";
 
@@ -20,12 +25,34 @@ export function Form({
     () => createFormAtom({ model, record, fields, parent }),
     [model, record, fields, parent]
   );
+
+  const prepareContext = useSetAtom(contextAtom);
+
+  const actionHandler = useMemo(
+    () => new FormActionHandler(() => prepareContext(formAtom)),
+    [formAtom, prepareContext]
+  );
+
+  const actionExecutor = useMemo(
+    () => new DefaultActionExecutor(actionHandler),
+    [actionHandler]
+  );
+
   return (
-    <Layout
-      className={className}
-      readonly={readonly}
-      schema={schema}
-      formAtom={formAtom}
-    />
+    <ScopeProvider
+      scope={FormScope}
+      value={{
+        actionHandler,
+        actionExecutor,
+        formAtom,
+      }}
+    >
+      <Layout
+        className={className}
+        readonly={readonly}
+        schema={schema}
+        formAtom={formAtom}
+      />
+    </ScopeProvider>
   );
 }
