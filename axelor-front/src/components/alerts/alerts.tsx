@@ -6,8 +6,10 @@ import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 import { Alert, AlertHeader, Portal, useTheme } from "@axelor/ui";
 
-import styles from "./alerts.module.css";
 import { i18n } from "@/services/client/i18n";
+import { SenitizedContent } from "@/utils/sanitize";
+
+import styles from "./alerts.module.css";
 
 export type AlertType =
   | "primary"
@@ -116,6 +118,9 @@ function AlertContainer({ id, type = "info", title, message }: AlertProps) {
       clearTimeout(timer);
     };
   }, [id]);
+  if (typeof message === "string") {
+    message = <SenitizedContent content={message} />;
+  }
   return (
     <Alert variant={type} shadow className={styles.alert}>
       <AlertHeader>{title}</AlertHeader>

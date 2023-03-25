@@ -15,6 +15,7 @@ import {
 } from "@axelor/ui";
 
 import { i18n } from "@/services/client/i18n";
+import { SenitizedContent } from "@/utils/sanitize";
 
 import styles from "./dialogs.module.css";
 
@@ -75,6 +76,10 @@ export module dialogs {
           { ...confirmButton, title: yesTitle ?? confirmButton.title },
         ]
       : [{ ...confirmButton, title: yesTitle ?? confirmButton.title }];
+
+    if (typeof content === "string") {
+      content = <SenitizedContent content={content} />;
+    }
 
     return new Promise<boolean>((resolve) => {
       showDialog({
