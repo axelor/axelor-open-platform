@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import { createWidgetAtom } from "./atoms";
 import { useWidgetComp } from "./hooks";
-import { useHandleAttrs } from "./scope";
+import { useActionAttrs } from "./scope";
 import { WidgetProps } from "./types";
 
 export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
@@ -16,7 +16,7 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
   );
 
   // handle attrs changes
-  useHandleAttrs(schema, widgetAtom);
+  useActionAttrs(schema, widgetAtom);
 
   const { attrs } = useAtomValue(widgetAtom);
 

@@ -1,42 +1,61 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
 import { createScope, molecule, useMolecule } from "jotai-molecules";
+import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
 
 import { DataContext } from "@/services/client/data.types";
-import { ActionExecutor, DefaultActionHandler } from "@/view-containers/action";
-
 import { Schema } from "@/services/client/meta.types";
-import { useEffect, useRef } from "react";
+import {
+  ActionExecutor,
+  DefaultActionExecutor,
+  DefaultActionHandler,
+} from "@/view-containers/action";
+
+import { fallbackFormAtom } from "./atoms";
 import { FormAtom, WidgetAtom } from "./types";
 
+interface TargetData {
+  type: string;
+  target: string;
+  value: any;
+}
+
+interface AttrData extends TargetData {
+  type: "attr";
+  name: string;
+}
+
+interface ValueData extends TargetData {
+  type: "value";
+  op: "set" | "add" | "del";
+}
+
+interface FocusData extends TargetData {
+  type: "focus";
+}
+
+type ActionData = AttrData | ValueData | FocusData;
+
 type ContextCreator = () => DataContext;
-type ActionListener = (data: any) => void | boolean;
+type ActionListener = (data: ActionData) => void;
 
 export class FormActionHandler extends DefaultActionHandler {
   #prepareContext: ContextCreator;
-  #listeners: Map<string, Set<ActionListener>> = new Map();
+  #listeners = new Set<ActionListener>();
 
   constructor(prepareContext: ContextCreator) {
     super();
     this.#prepareContext = prepareContext;
   }
 
-  subscribe(event: string, subscriber: ActionListener) {
-    const listeners =
-      this.#listeners.get(event) ??
-      this.#listeners.set(event, new Set()).get(event)!;
-    listeners.add(subscriber);
+  subscribe(subscriber: ActionListener) {
+    this.#listeners.add(subscriber);
     return () => {
-      listeners.delete(subscriber);
+      this.#listeners.delete(subscriber);
     };
   }
 
-  #notify(event: string, data: any) {
-    const listeners = this.#listeners.get(event) ?? [];
-    for (const fn of listeners) {
-      if (fn(data) === false) {
-        break;
-      }
-    }
+  #notify(data: ActionData) {
+    this.#listeners.forEach((fn) => fn(data));
   }
 
   getContext() {
@@ -44,15 +63,20 @@ export class FormActionHandler extends DefaultActionHandler {
   }
 
   setAttr(target: string, name: string, value: any) {
-    const event = `attr:change:${target}`;
-    const data = {
-      [name]: value,
-    };
-    this.#notify(event, data);
+    this.#notify({
+      type: "attr",
+      target,
+      name,
+      value,
+    });
   }
 
   setFocus(target: string) {
-    this.#notify(`focus:${target}`, true);
+    this.#notify({
+      type: "focus",
+      target,
+      value: true,
+    });
   }
 }
 
@@ -62,7 +86,14 @@ type FormScopeState = {
   formAtom: FormAtom;
 };
 
-export const FormScope = createScope<FormScopeState>({} as any); // we'll always provide initialValue
+const fallbackHandler = new FormActionHandler(() => ({}));
+const fallbackExecutor = new DefaultActionExecutor(fallbackHandler);
+
+export const FormScope = createScope<FormScopeState>({
+  actionHandler: fallbackHandler,
+  actionExecutor: fallbackExecutor,
+  formAtom: fallbackFormAtom,
+});
 
 const formMolecule = molecule((getMol, getScope) => {
   const initialView = getScope(FormScope);
@@ -74,29 +105,62 @@ export function useFormScope() {
   return useAtomValue(scopeAtom);
 }
 
-export function useHandleAttrs(schema: Schema, widgetAtom: WidgetAtom) {
-  const canceledRef = useRef<boolean>(false);
+function useActionData<T extends ActionData>(
+  check: (data: ActionData) => boolean,
+  handler: (data: T) => void
+) {
+  const { actionHandler } = useFormScope();
+  const dataRef = useRef<ActionData | null>(null);
+  const doneRef = useRef<boolean>(false);
+
+  const subscribe = useCallback(
+    (callback: () => any) => {
+      return actionHandler.subscribe((data) => {
+        if (check(data)) {
+          dataRef.current = data;
+          callback();
+        }
+      });
+    },
+    [actionHandler, check]
+  );
+
+  const data = useSyncExternalStore(subscribe, () => dataRef.current);
 
   useEffect(() => {
-    canceledRef.current = false;
+    doneRef.current = false;
     return () => {
-      canceledRef.current = true;
+      doneRef.current = true;
     };
   });
 
-  const { actionHandler } = useFormScope();
-  const setAttrs = useSetAtom(widgetAtom);
-
   useEffect(() => {
-    if (canceledRef.current) return;
-    if (schema.name) {
-      return actionHandler.subscribe(`attr:change:${schema.name}`, (data) => {
-        if (canceledRef.current) return;
+    if (doneRef.current) return;
+    if (data) {
+      handler(data as T);
+    }
+  }, [handler, data]);
+}
+
+export function useActionAttrs(schema: Schema, widgetAtom: WidgetAtom) {
+  const setAttrs = useSetAtom(widgetAtom);
+  useActionData<AttrData>(
+    useCallback(
+      (data) => data.target === schema.name && data.type === "attr",
+      [schema.name]
+    ),
+    useCallback(
+      (data) => {
         setAttrs((prev) => {
           const { attrs } = prev;
-          return { ...prev, attrs: { ...attrs, ...data } };
+          const { name, value } = data;
+          return {
+            ...prev,
+            attrs: { ...attrs, [name]: value },
+          };
         });
-      });
-    }
-  }, [actionHandler, schema.name, setAttrs]);
+      },
+      [setAttrs]
+    )
+  );
 }
