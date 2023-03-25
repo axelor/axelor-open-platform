@@ -1,0 +1,16 @@
+.icon {
+  display: inline-flex;
+}
+
+.iconHover {
+  display: none;
+}
+
+.button:hover {
+  .hideOnHover {
+    display: none;
+  }
+  .showOnHover {
+    display: inline-flex;
+  }
+}
