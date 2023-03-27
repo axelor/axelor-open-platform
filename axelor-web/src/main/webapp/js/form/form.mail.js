@@ -951,15 +951,17 @@ ui.formWidget('uiMailComposer', {
       };
       scope.onEditEmail(record, function (record) {
         var map = record.$recipientsMap || {};
-        var recipients = record.recipients || "";
+        var recipients = record.recipients;
 
-        record.recipients = _.map(recipients.split(","), function (item) {
-          var email = item.trim();
-          return _.extend({
-            address: email,
-            personal: (map[email]||{}).label || email
+        if (recipients) {
+          record.recipients = _.map(recipients.split(","), function (item) {
+            var email = item.trim();
+            return _.extend({
+              address: email,
+              personal: (map[email]||{}).label || email
+            });
           });
-        });
+        }
 
         scope.sendEmail(record);
       });
@@ -1032,15 +1034,18 @@ ui.formWidget('uiMailFollowers', {
       $scope.onEditEmail(record, function (record) {
 
         var map = record.$recipientsMap || {};
-        var recipients = record.recipients || "";
+        var recipients = record.recipients;
 
-        record.recipients = _.map(recipients.split(","), function (item) {
-          var email = item.trim();
-          return _.extend({
-            address: email,
-            personal: (map[email]||{}).label || email
+        if (recipients) {
+          record.recipients = _.map(recipients.split(","), function (item) {
+            var email = item.trim();
+            return _.extend({
+              address: email,
+              personal: (map[email]||{}).label || email
+            });
           });
-        });
+        }
+
         sendEmail(record);
       });
     };
