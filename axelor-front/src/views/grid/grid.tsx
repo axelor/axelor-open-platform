@@ -67,19 +67,21 @@ export function Grid(props: ViewProps<GridView>) {
         names.push(field.name);
       }
 
-      if (item.type === 'button') {
-        columnAttrs.width = (item.width || 32) as number;
+      if (item.width) {
+        columnAttrs.width = parseInt(item.width as string);
+        columnAttrs.computed = true;
+      }
+
+      if (item.type === "button") {
+        columnAttrs.computed = true;
+        columnAttrs.width = columnAttrs.width || 32;
         columnAttrs.title = " ";
       }
 
-      if (item.width || columnAttrs.width) {
-        columnAttrs.computed = true;
-      }
-      
-      if(item.hidden) {
+      if (item.hidden) {
         columnAttrs.visible = false;
       }
-      
+
       return {
         ...field,
         ...item,
