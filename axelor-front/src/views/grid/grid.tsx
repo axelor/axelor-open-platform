@@ -78,6 +78,10 @@ export function Grid(props: ViewProps<GridView>) {
         columnAttrs.title = " ";
       }
 
+      if (field?.type === "BOOLEAN" && !item.widget) {
+        (columnAttrs as Field).widget = "boolean";
+      }
+
       if (item.hidden) {
         columnAttrs.visible = false;
       }

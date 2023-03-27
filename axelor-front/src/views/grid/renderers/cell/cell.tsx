@@ -8,7 +8,8 @@ import { useWidgetComp } from "../../hooks";
 
 function CellRenderer(props: GridColumnProps) {
   const { type, widget } = props.data as Field;
-  const { data: Comp } = useWidgetComp((widget || type)!);
+  const { state, data: Comp } = useWidgetComp((widget || type)!);
+  if (state === "loading") return null;
   return (Comp ? <Comp {...props} /> : props.children) as React.ReactElement;
 }
 
