@@ -921,6 +921,10 @@ public class RestService extends ResourceService {
     final Context ctx = new Context(request.getData(), MailMessage.class);
     final MailMessage msg = EntityHelper.getEntity(ctx.asType(MailMessage.class));
 
+    if (StringUtils.isBlank(msg.getBody())) {
+      return fail();
+    }
+
     final Model entity = repo.find(id);
     final List<?> ids = (List<?>) request.getData().get("files");
     List<MetaFile> files = null;

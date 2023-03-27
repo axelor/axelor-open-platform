@@ -863,6 +863,9 @@ ui.formWidget('uiMailComposer', {
         recipients: recipients
       }).success(function (res) {
         var message = _.first(res.data);
+        if (!message) {
+          return;
+        }
         var messages = $scope.$parent.messages || [];
 
         $scope.post = null;
