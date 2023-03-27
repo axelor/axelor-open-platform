@@ -59,6 +59,7 @@ export function Grid(props: ViewProps<GridView>) {
       const title = item.title ?? item.autoTitle;
       const attrs = item.widgetAttrs;
       const serverType = field?.type;
+      const columnAttrs: Partial<GridColumn> = {};
 
       if ((item as JsonField).jsonField) {
         names.push((item as JsonField).jsonField as string);
@@ -66,6 +67,19 @@ export function Grid(props: ViewProps<GridView>) {
         names.push(field.name);
       }
 
+      if (item.type === 'button') {
+        columnAttrs.width = (item.width || 32) as number;
+        columnAttrs.title = " ";
+      }
+
+      if (item.width || columnAttrs.width) {
+        columnAttrs.computed = true;
+      }
+      
+      if(item.hidden) {
+        columnAttrs.visible = false;
+      }
+      
       return {
         ...field,
         ...item,
@@ -73,6 +87,7 @@ export function Grid(props: ViewProps<GridView>) {
         serverType,
         title,
         formatter,
+        ...columnAttrs,
       } as any;
     });
 

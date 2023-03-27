@@ -6,15 +6,15 @@ import { Box } from "@axelor/ui";
 import { GridColumnProps } from "@axelor/ui/grid/grid-column";
 import { useWidgetComp } from "../../hooks";
 
-function WidgetCell(props: GridColumnProps) {
-  const { widget } = props.data as Field;
-  const { data: Comp } = useWidgetComp(widget!);
+function CellRenderer(props: GridColumnProps) {
+  const { type, widget } = props.data as Field;
+  const { data: Comp } = useWidgetComp((widget || type)!);
   return (Comp ? <Comp {...props} /> : props.children) as React.ReactElement;
 }
 
 export function Cell(props: GridColumnProps) {
   const { data, record } = props;
-  const { widget, hilites } = data as Field;
+  const { type, widget, hilites } = data as Field;
   const { children, style, className, onClick } =
     props as React.HTMLAttributes<HTMLDivElement>;
 
@@ -29,8 +29,8 @@ export function Cell(props: GridColumnProps) {
   );
 
   function render() {
-    if (widget) {
-      return <WidgetCell {...props} />;
+    if (widget || type !== "field") {
+      return <CellRenderer {...props} />;
     }
     return children;
   }
