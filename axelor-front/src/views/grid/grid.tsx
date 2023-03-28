@@ -22,19 +22,18 @@ export function Grid(props: ViewProps<GridView>) {
       ? [viewProps?.selectedCell?.[0]!]
       : null,
   });
+  const { orderBy } = state;
 
   const onSearch = useCallback(
     (options: SearchOptions = {}) => {
-      return dataStore.search(options);
+      const sortBy = orderBy
+        ? orderBy.map(
+            (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
+          )
+        : null;
+      return dataStore.search({ ...(sortBy ? { sortBy } : {}), ...options });
     },
-    [dataStore]
-  );
-
-  const onSearch = useCallback(
-    (options: SearchOptions = {}) => {
-      return dataStore.search(options);
-    },
-    [dataStore]
+    [dataStore, orderBy]
   );
 
   const onEdit = useCallback(
@@ -141,6 +140,7 @@ export function Grid(props: ViewProps<GridView>) {
         fields={fields}
         state={state}
         setState={setState}
+        sortType={"live"}
         onEdit={onEdit}
         onView={onView}
         onSearch={onSearch}
