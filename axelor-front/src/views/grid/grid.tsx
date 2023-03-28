@@ -1,6 +1,7 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { GridRow } from "@axelor/ui/grid";
 import { Box } from "@axelor/ui";
+import { atom, useAtom } from "jotai";
 import { GridView } from "@/services/client/meta.types";
 import { SearchOptions } from "@/services/client/data";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
@@ -10,7 +11,12 @@ import { useViewProps, useViewSwitch } from "@/view-containers/views/scope";
 import { useGridState } from "./builder/utils";
 import { i18n } from "@/services/client/i18n";
 import { dialogs } from "@/components/dialogs";
+import { session } from "@/services/client/session";
+import AdvanceSearch from "@/view-containers/advance-search/advance-search";
 import styles from "./grid.module.scss";
+
+const domains: any = [];
+const filters: any = [];
 
 export function Grid(props: ViewProps<GridView>) {
   const { meta, dataStore } = props;
@@ -18,6 +24,9 @@ export function Grid(props: ViewProps<GridView>) {
   const [viewProps, setViewProps] = useViewProps();
   const switchTo = useViewSwitch();
 
+  const [advanceSearch, setAdvancedSearch] = useAtom<any>(
+    useMemo(() => atom({}), [])
+  );
   const [state, setState] = useGridState({
     selectedCell: viewProps?.selectedCell,
     selectedRows: viewProps?.selectedCell
@@ -35,14 +44,19 @@ export function Grid(props: ViewProps<GridView>) {
 
   const onSearch = useCallback(
     (options: SearchOptions = {}) => {
+      const { query } = advanceSearch as any;
       const sortBy = orderBy
         ? orderBy.map(
             (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
           )
         : null;
-      return dataStore.search({ ...(sortBy ? { sortBy } : {}), ...options });
+      return dataStore.search({
+        ...(sortBy ? { sortBy } : {}),
+        filter: query,
+        ...options,
+      });
     },
-    [dataStore, orderBy]
+    [advanceSearch, dataStore, orderBy]
   );
 
   const onDelete = useCallback(
@@ -122,6 +136,8 @@ export function Grid(props: ViewProps<GridView>) {
   const canPrev = page.offset! > 0;
   const canNext = page.offset! + page.limit! < page.totalCount!;
   const hasRowSelected = (selectedRows || []).length > 0;
+  const user = session.info?.user!;
+  const advanceSearchConfig = session.info?.view?.advanceSearch;
 
   return (
     <div className={styles.grid}>
@@ -194,7 +210,26 @@ export function Grid(props: ViewProps<GridView>) {
             </Box>
           ),
         }}
-      />
+      >
+        <AdvanceSearch
+          canShare={advanceSearchConfig?.share !== false}
+          canExportFull={advanceSearchConfig?.exportFull !== false}
+          userId={user.id}
+          userGroup={user.group}
+          translate={i18n.get}
+          items={view.items}
+          value={advanceSearch}
+          setValue={setAdvancedSearch}
+          {...({
+            fields,
+            filters,
+            domains,
+            onSave: () => {},
+            onExport: () => {},
+            onDelete: () => {},
+          } as any)}
+        />
+      </ViewToolBar>
       <GridComponent
         dataStore={dataStore}
         view={view}

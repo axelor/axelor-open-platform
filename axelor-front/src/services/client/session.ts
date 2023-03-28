@@ -40,6 +40,10 @@ export interface SessionInfo {
     collaboration: boolean;
     customizationPermission: number;
     customization: boolean;
+    advanceSearch?: {
+      share?: boolean;
+      exportFull?: boolean;
+    };
     grid?: {
       editorButtons: boolean;
     };
@@ -79,6 +83,8 @@ const INFO_MAPPINGS = {
   "view.allow-customization": "view.customization",
   "view.grid.editor-buttons": "view.grid.editorButtons",
   "view.menubar.location": "view.menubar.location",
+  "view.adv-search.share": "view.advanceSearch.share",
+  "view.adv-search.export-full": "view.advanceSearch.exportFull",
 };
 
 export type SessionListener = (info: SessionInfo | null) => void;
