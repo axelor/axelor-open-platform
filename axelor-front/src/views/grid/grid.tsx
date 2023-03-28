@@ -58,7 +58,7 @@ export function Grid(props: ViewProps<GridView>) {
 
   useEffect(() => {
     if (viewProps?.selectedCell !== state.selectedCell) {
-      setViewProps({ selectedCell: state.selectedCell ?? undefined });
+      setViewProps({ selectedCell: state.selectedCell! });
     }
   }, [viewProps, setViewProps, state.selectedCell]);
 
