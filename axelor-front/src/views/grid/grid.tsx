@@ -63,6 +63,10 @@ export function Grid(props: ViewProps<GridView>) {
     }
   }, [viewProps, setViewProps, state.selectedCell]);
 
+  const { page } = dataStore;
+  const canPrev = page.offset! > 0;
+  const canNext = page.offset! + page.limit! < page.totalCount!;
+
   return (
     <div className={styles.grid}>
       <ViewToolBar
@@ -116,6 +120,20 @@ export function Grid(props: ViewProps<GridView>) {
             onClick: () => onSearch(),
           },
         ]}
+        pagination={{
+          onPrev: () =>
+            canPrev && onSearch({ offset: page.offset! - page.limit! }),
+          onNext: () =>
+            canNext && onSearch({ offset: page.offset! + page.limit! }),
+          text: () => (
+            <Box>
+              <Box as="span">
+                {page.offset! + 1} to {page.offset! + page.limit!} of{" "}
+                {page.totalCount}
+              </Box>
+            </Box>
+          ),
+        }}
       />
       <GridComponent
         dataStore={dataStore}
