@@ -85,6 +85,33 @@ export function Grid(props: ViewProps<GridView>) {
     [switchTo]
   );
 
+  const onArchiveOrUnArchive = useCallback(
+    async (archived: boolean) => {
+      const confirmed = await dialogs.confirm({
+        title: i18n.get("Question"),
+        content: i18n.get(
+          `Do you really want to ${
+            archived ? "" : "un"
+          }archive the selected record(s)?`
+        ),
+      });
+      if (!confirmed) return;
+      const records = selectedRows!
+        .map((ind) => rows[ind]?.record)
+        .map((record) => ({
+          id: record.id,
+          version: record.version,
+          archived,
+        }));
+      try {
+        await dataStore.save(records);
+        onSearch();
+        clearSelection();
+      } catch {}
+    },
+    [rows, selectedRows, dataStore, clearSelection, onSearch]
+  );
+
   useEffect(() => {
     if (viewProps?.selectedCell !== state.selectedCell) {
       setViewProps({ selectedCell: state.selectedCell! });
@@ -131,10 +158,12 @@ export function Grid(props: ViewProps<GridView>) {
               {
                 key: "archive",
                 text: "Archive",
+                onClick: () => onArchiveOrUnArchive(true),
               },
               {
                 key: "unarchive",
                 text: "Unarchive",
+                onClick: () => onArchiveOrUnArchive(false),
               },
             ],
             disabled: !hasRowSelected,

@@ -104,14 +104,12 @@ export class DataSource {
     return Promise.reject(resp.status);
   }
 
-  async save(record: DataRecord): Promise<DataRecord> {
+  async save(data: DataRecord | DataRecord[]): Promise<DataRecord> {
     const url = `ws/rest/${this.model}`;
     const resp = await request({
       url,
       method: "POST",
-      body: {
-        data: record,
-      },
+      body: Array.isArray(data) ? { records: data } : { data },
     });
 
     if (resp.ok) {
