@@ -8,6 +8,8 @@ import { Grid as GridComponent } from "./builder";
 import { ViewProps } from "../types";
 import { useViewProps, useViewSwitch } from "@/view-containers/views/scope";
 import { useGridState } from "./builder/utils";
+import { i18n } from "@/services/client/i18n";
+import { dialogs } from "@/components/dialogs";
 import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
@@ -22,7 +24,14 @@ export function Grid(props: ViewProps<GridView>) {
       ? [viewProps?.selectedCell?.[0]!]
       : null,
   });
-  const { orderBy } = state;
+  const { orderBy, rows, selectedRows } = state;
+
+  const clearSelection = useCallback(() => {
+    setState((draft) => {
+      draft.selectedRows = null;
+      draft.selectedCell = null;
+    });
+  }, [setState]);
 
   const onSearch = useCallback(
     (options: SearchOptions = {}) => {
@@ -34,6 +43,26 @@ export function Grid(props: ViewProps<GridView>) {
       return dataStore.search({ ...(sortBy ? { sortBy } : {}), ...options });
     },
     [dataStore, orderBy]
+  );
+
+  const onDelete = useCallback(
+    async (records: GridRow["record"][]) => {
+      const confirmed = await dialogs.confirm({
+        title: i18n.get("Question"),
+        content: i18n.get(
+          "Do you really want to delete the selected record(s)?"
+        ),
+      });
+      if (confirmed) {
+        try {
+          await dataStore.delete(
+            records.map(({ id, version }) => ({ id, version }))
+          );
+          clearSelection();
+        } catch {}
+      }
+    },
+    [dataStore, clearSelection]
   );
 
   const onEdit = useCallback(
@@ -65,6 +94,7 @@ export function Grid(props: ViewProps<GridView>) {
   const { page } = dataStore;
   const canPrev = page.offset! > 0;
   const canNext = page.offset! + page.limit! < page.totalCount!;
+  const hasRowSelected = (selectedRows || []).length > 0;
 
   return (
     <div className={styles.grid}>
@@ -84,9 +114,8 @@ export function Grid(props: ViewProps<GridView>) {
             iconProps: {
               icon: "edit",
             },
-            disabled: (state?.selectedRows || []).length === 0,
+            disabled: !hasRowSelected,
             onClick: () => {
-              const { rows, selectedRows } = state;
               const [rowIndex] = selectedRows || [];
               const record = rows[rowIndex]?.record;
               record && onEdit(record);
@@ -108,7 +137,10 @@ export function Grid(props: ViewProps<GridView>) {
                 text: "Unarchive",
               },
             ],
-            onClick: () => {},
+            disabled: !hasRowSelected,
+            onClick: () => {
+              onDelete(selectedRows!.map((ind) => rows[ind]?.record));
+            },
           },
           {
             key: "refresh",
