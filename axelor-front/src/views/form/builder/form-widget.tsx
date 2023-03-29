@@ -35,7 +35,7 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
   };
 
   if (Comp) {
-    return type === "field" ? (
+    return ["field", "panel-related"].includes(type!) ? (
       <FormField component={Comp} {...widgetProps} />
     ) : (
       <Comp {...widgetProps} />
