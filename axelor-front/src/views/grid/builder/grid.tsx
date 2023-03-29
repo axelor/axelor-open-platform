@@ -11,9 +11,7 @@ import {
 } from "@axelor/ui/grid";
 
 import { useAsync } from "@/hooks/use-async";
-import { useDataStore } from "@/hooks/use-data-store";
 import { SearchOptions, SearchResult } from "@/services/client/data";
-import { DataStore } from "@/services/client/data-store";
 import { MetaData } from "@/services/client/meta";
 import { Field, GridView, JsonField } from "@/services/client/meta.types";
 import format from "@/utils/format";
@@ -30,12 +28,11 @@ function formatter(column: Field, value: any, record: any) {
 
 export function Grid(
   props: Partial<GridProps> & {
-    dataStore: DataStore;
     view: GridView;
     fields?: MetaData["fields"];
     searchOptions?: Partial<SearchOptions>;
     showEditIcon?: boolean;
-    onSearch: (options?: SearchOptions) => Promise<SearchResult>;
+    onSearch: (options?: SearchOptions) => Promise<SearchResult | undefined>;
     onEdit?: (record: GridRow["record"]) => any;
     onView?: (record: GridRow["record"]) => any;
   }
@@ -43,7 +40,6 @@ export function Grid(
   const {
     view,
     fields,
-    dataStore,
     searchOptions,
     showEditIcon = true,
     onSearch,
@@ -51,8 +47,6 @@ export function Grid(
     onView,
     ...gridProps
   } = props;
-
-  const records = useDataStore(dataStore, (ds) => ds.records);
 
   const { columns, names } = useMemo(() => {
     const names: string[] = [];
@@ -168,10 +162,10 @@ export function Grid(
         onCellClick={handleCellClick}
         onRowDoubleClick={handleRowDoubleClick}
         {...gridProps}
+        records={gridProps.records!}
         state={gridProps.state!}
         setState={gridProps.setState!}
         columns={columns}
-        records={records}
       />
     </AxGridProvider>
   );

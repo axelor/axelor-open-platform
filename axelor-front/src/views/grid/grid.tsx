@@ -22,7 +22,7 @@ import {
 import { ViewProps } from "../types";
 import { Grid as GridComponent } from "./builder";
 import { useGridState } from "./builder/utils";
-
+import { useDataStore } from "@/hooks/use-data-store";
 import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
@@ -45,7 +45,7 @@ export function Grid(props: ViewProps<GridView>) {
       ? [viewProps?.selectedCell?.[0]!]
       : null,
   });
-
+  const records = useDataStore(dataStore, (ds) => ds.records);
   const { orderBy, rows, selectedRows } = state;
 
   const clearSelection = useCallback(() => {
@@ -294,6 +294,7 @@ export function Grid(props: ViewProps<GridView>) {
       )}
       <GridComponent
         dataStore={dataStore}
+        records={records}
         view={view}
         fields={fields}
         state={state}
