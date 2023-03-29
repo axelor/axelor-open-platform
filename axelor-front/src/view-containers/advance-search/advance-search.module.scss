@@ -1,0 +1,31 @@
+$bg-white: #ffffff;
+$bg-shade: #fbfbff;
+
+.root {
+  width: 250px;
+  margin: 0 0.25rem;
+  & svg {
+    color: var(--bs-link-color) !important;
+    font-size: var(--toolbar-icon-size);
+  }
+}
+
+.popper {
+  background-color: $bg-white;
+  min-width: 480px;
+  z-index: 1;
+}
+
+.input {
+  padding-top: 0.2875rem;
+  padding-bottom: 0.2875rem;
+  padding-left: 0.75rem !important;
+}
+.chipList {
+  height: auto;
+  --bs-link-color: #fff;
+}
+
+.close {
+  cursor: pointer;
+}

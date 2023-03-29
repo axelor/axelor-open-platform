@@ -97,7 +97,7 @@ export class DataStore extends DataSource {
 
   async search(options: SearchOptions): Promise<SearchResult> {
     const opts = this.#prepareOption(options);
-    const { page, records } = await super.search(opts);
+    const { page, records = [] } = await super.search(opts);
 
     this.#accept(opts, page, records);
 
