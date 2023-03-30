@@ -45,14 +45,18 @@ export async function actionView(name: string): Promise<ActionView> {
 
 export async function filters(name: string): Promise<SavedFilter[]> {
   const url = "ws/action/com.axelor.meta.web.MetaFilterController:findFilters";
+  const model = "com.axelor.meta.db.MetaFilter";
   const resp = await request({
     url,
     method: "POST",
     body: {
-      context: {
-        filterView: name,
+      data: {
+        context: {
+          filterView: name,
+        },
+        model,
       },
-      model: "com.axelor.meta.db.MetaFilter",
+      model,
     },
   });
 
