@@ -1,4 +1,4 @@
-import { PrimitiveAtom } from "jotai";
+import { PrimitiveAtom, WritableAtom } from "jotai";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { Property, Schema } from "@/services/client/meta.types";
@@ -32,6 +32,12 @@ export type WidgetAtom = PrimitiveAtom<WidgetState>;
 
 export type FormAtom = PrimitiveAtom<FormState>;
 
+export type ValueAtom<T> = WritableAtom<
+  T | null | undefined,
+  [value: T | null | undefined, fireOnChange: boolean],
+  void
+>;
+
 export interface WidgetProps {
   schema: Schema;
   formAtom: FormAtom;
@@ -41,7 +47,7 @@ export interface WidgetProps {
 
 export interface FieldProps<T> extends WidgetProps {
   schema: Schema & { name: string };
-  valueAtom: PrimitiveAtom<T>;
+  valueAtom: ValueAtom<T>;
 }
 
 export interface FormProps extends WidgetProps {

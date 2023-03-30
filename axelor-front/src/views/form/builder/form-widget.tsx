@@ -1,10 +1,10 @@
-import { useAtomValue } from "jotai";
+import { atom, useAtomValue } from "jotai";
 import { focusAtom } from "jotai-optics";
 import { useMemo } from "react";
 
 import { createWidgetAtom } from "./atoms";
 import { useWidgetComp } from "./hooks";
-import { useActionAttrs } from "./scope";
+import { useActionAttrs, useFormScope } from "./scope";
 import { WidgetProps } from "./types";
 
 export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
@@ -49,11 +49,26 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
 function FormField(props: WidgetProps & { component: React.ElementType }) {
   const { schema, formAtom, component: Comp } = props;
   const name = schema.name!;
+  const onChange = schema.onChange;
 
-  const valueAtom = useMemo(
-    () => focusAtom(formAtom, (o) => o.prop("record").prop(name)),
-    [formAtom, name]
-  );
+  const { actionExecutor } = useFormScope();
+
+  const valueAtom = useMemo(() => {
+    const lensAtom = focusAtom(formAtom, (o) => o.prop("record").prop(name));
+    return atom(
+      (get) => get(lensAtom),
+      (get, set, value: any, fireOnChange: boolean = false) => {
+        set(lensAtom, value);
+        if (onChange && fireOnChange) {
+          actionExecutor.execute(onChange, {
+            context: {
+              _source: name,
+            },
+          });
+        }
+      }
+    );
+  }, [actionExecutor, formAtom, name, onChange]);
 
   return <Comp {...props} valueAtom={valueAtom} />;
 }
