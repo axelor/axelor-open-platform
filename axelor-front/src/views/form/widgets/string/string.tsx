@@ -1,5 +1,6 @@
 import { Input } from "@axelor/ui";
 import { useAtom, useAtomValue } from "jotai";
+import { useCallback } from "react";
 import { FieldContainer, FieldProps } from "../../builder";
 
 export function String({
@@ -14,7 +15,15 @@ export function String({
   const { attrs } = useAtomValue(widgetAtom);
   const { required } = attrs;
 
-  const [value = "", setValue] = useAtom(valueAtom);
+  const [value, setValue] = useAtom(valueAtom);
+  const defaultValue = value ?? "";
+
+  const handleBlur = useCallback<React.FocusEventHandler<HTMLInputElement>>(
+    (e) => {
+      setValue(e.target.value, true);
+    },
+    [setValue]
+  );
 
   return (
     <FieldContainer readonly={readonly}>
@@ -22,7 +31,7 @@ export function String({
       {readonly && (
         <Input
           type="text"
-          defaultValue={value}
+          defaultValue={defaultValue}
           disabled
           readOnly
           bg="body"
@@ -33,9 +42,9 @@ export function String({
         <Input
           type="text"
           id={uid}
-          value={value}
+          defaultValue={defaultValue}
           required={required}
-          onChange={(e) => setValue(e.target.value)}
+          onBlur={handleBlur}
         />
       )}
     </FieldContainer>
