@@ -34,7 +34,7 @@ export type FormAtom = PrimitiveAtom<FormState>;
 
 export type ValueAtom<T> = WritableAtom<
   T | null | undefined,
-  [value: T | null | undefined, fireOnChange: boolean],
+  [value: T | null | undefined, fireOnChange?: boolean],
   void
 >;
 
