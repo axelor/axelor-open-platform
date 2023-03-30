@@ -15,11 +15,8 @@ import { session } from "@/services/client/session";
 import AdvanceSearch from "@/view-containers/advance-search/advance-search";
 import styles from "./grid.module.scss";
 
-const domains: any = [];
-const filters: any = [];
-
 export function Grid(props: ViewProps<GridView>) {
-  const { meta, dataStore } = props;
+  const { meta, dataStore, domains, filters } = props;
   const { view, fields } = meta;
   const [viewProps, setViewProps] = useViewProps();
   const switchTo = useViewSwitch();

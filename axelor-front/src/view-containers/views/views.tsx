@@ -9,6 +9,12 @@ import { useAsync } from "@/hooks/use-async";
 import { Tab } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
 import { findView } from "@/services/client/meta-cache";
+import { filters as fetchFilters } from "@/services/client/meta";
+import {
+  SavedFilter,
+  SearchFilter,
+  SearchFilters,
+} from "@/services/client/meta.types";
 import { toCamelCase, toKebabCase } from "@/utils/names";
 
 import { ViewScope } from "./scope";
@@ -41,10 +47,14 @@ function ViewContainer({
   tab,
   view,
   dataStore,
+  filters,
+  domains,
 }: {
   tab: Tab;
   view: { name?: string; type: string };
   dataStore?: DataStore;
+  filters?: SavedFilter[];
+  domains?: SearchFilter[];
 }) {
   const { model } = tab.action;
 
@@ -62,7 +72,12 @@ function ViewContainer({
     return (
       <Fade in={true} timeout={400} mountOnEnter>
         <Box d="flex" flex={1} style={{ minWidth: 0, minHeight: 0 }}>
-          <Comp meta={meta} dataStore={dataStore} />
+          <Comp
+            meta={meta}
+            dataStore={dataStore}
+            filters={filters}
+            domains={domains}
+          />
         </Box>
       </Fade>
     );
@@ -73,7 +88,7 @@ function ViewContainer({
 
 function ViewPane({ tab, dataStore }: { tab: Tab; dataStore?: DataStore }) {
   const {
-    action: { views = [] },
+    action: { name: actionName, views = [], params, model },
   } = tab;
   const tabAtom = tab.state;
   const viewState = useAtomValue(tabAtom);
@@ -82,10 +97,36 @@ function ViewPane({ tab, dataStore }: { tab: Tab; dataStore?: DataStore }) {
     [viewState.type, views]
   );
 
+  const filterName = (params || {})["search-filters"];
+
+  const { data: savedFilters } = useAsync<SavedFilter[]>(async () => {
+    const name = filterName || `act:${actionName}`;
+    return await fetchFilters(name);
+  }, [actionName, filterName]);
+
+  const { data: searchFilters } = useAsync<SearchFilter[]>(async () => {
+    if (!filterName) return [];
+    const res = await findView<SearchFilters>({
+      name: filterName,
+      type: "search-filters",
+      model,
+    });
+    return (res?.view?.filters || []).map((filter) => ({
+      ...filter,
+      id: filter.name,
+    }));
+  }, [model, filterName]);
+
   if (view) {
     return (
       <ScopeProvider scope={ViewScope} value={tab}>
-        <ViewContainer view={view} tab={tab} dataStore={dataStore} />
+        <ViewContainer
+          view={view}
+          tab={tab}
+          dataStore={dataStore}
+          filters={savedFilters}
+          domains={searchFilters}
+        />
       </ScopeProvider>
     );
   }
