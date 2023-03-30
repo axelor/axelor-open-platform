@@ -389,7 +389,7 @@ function AdvanceSearch({
       isSingleFilter
     ) {
       state = { ...state, operator };
-      let query = { archived, operator };
+      let query = { archived, operator, criteria: [] };
       if (values.length > 0 || (contextField?.name && contextField?.value)) {
         query = {
           archived,

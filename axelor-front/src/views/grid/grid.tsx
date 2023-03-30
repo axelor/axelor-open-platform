@@ -52,7 +52,12 @@ export function Grid(props: ViewProps<GridView>) {
         : null;
       return dataStore.search({
         ...(sortBy ? { sortBy } : {}),
-        filter: query,
+        filter: query
+          ? {
+              _archived: query.archived,
+              ...query,
+            }
+          : {},
         ...options,
       });
     },
