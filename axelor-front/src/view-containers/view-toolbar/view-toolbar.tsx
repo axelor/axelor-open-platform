@@ -15,6 +15,8 @@ export type ViewToolBarProps = {
   children?: React.ReactNode;
   pagination?: {
     text?: string | (() => JSX.Element);
+    canNext?: boolean;
+    canPrev?: boolean;
     onNext: () => any;
     onPrev: () => any;
   };
@@ -38,7 +40,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
     meta,
     actions = [],
     children,
-    pagination: { text: pageTextOrComp, onNext, onPrev } = {},
+    pagination: { text: pageTextOrComp, canNext, canPrev, onNext, onPrev } = {},
   } = props;
 
   const pageActions = onPrev || onNext;
@@ -135,6 +137,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
               iconProps: {
                 icon: "navigate_before",
               },
+              disabled: !canPrev,
               onClick: onPrev,
             },
             {
@@ -144,6 +147,7 @@ export function ViewToolBar(props: ViewToolBarProps) {
               iconProps: {
                 icon: "navigate_next",
               },
+              disabled: !canNext,
               onClick: onNext,
             },
           ]}

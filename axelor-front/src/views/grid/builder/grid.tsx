@@ -27,16 +27,25 @@ function formatter(column: Field, value: any, record: any) {
 
 export function Grid(
   props: Partial<GridProps> & {
-    onEdit?: (record: GridRow["record"]) => any;
-    onView?: (record: GridRow["record"]) => any;
-    onSearch: (options?: SearchOptions) => Promise<SearchResult>;
     dataStore: DataStore;
     view: GridView;
     fields?: MetaData["fields"];
+    searchOptions?: Partial<SearchOptions>;
+    onSearch: (options?: SearchOptions) => Promise<SearchResult>;
+    onEdit?: (record: GridRow["record"]) => any;
+    onView?: (record: GridRow["record"]) => any;
   }
 ) {
-  const { view, fields, dataStore, onSearch, onEdit, onView, ...gridProps } =
-    props;
+  const {
+    view,
+    fields,
+    dataStore,
+    searchOptions,
+    onSearch,
+    onEdit,
+    onView,
+    ...gridProps
+  } = props;
 
   const records = useDataStore(dataStore, (ds) => ds.records);
 
@@ -101,8 +110,8 @@ export function Grid(
   }, [view, fields]);
 
   const init = useAsync(async () => {
-    onSearch({ fields: names });
-  }, [onSearch, names]);
+    onSearch({ ...searchOptions, fields: names });
+  }, [onSearch, searchOptions, names]);
 
   const handleCellClick = useCallback(
     (

@@ -11,12 +11,14 @@ import { useViewProps, useViewSwitch } from "@/view-containers/views/scope";
 import { useGridState } from "./builder/utils";
 import { i18n } from "@/services/client/i18n";
 import { dialogs } from "@/components/dialogs";
+import { useViewRoute } from "@/view-containers/views/scope";
 import AdvanceSearch from "@/view-containers/advance-search";
 import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
   const { meta, dataStore, domains } = props;
   const { view, fields } = meta;
+  const { id: pageNo } = useViewRoute("grid");
   const [viewProps, setViewProps] = useViewProps();
   const switchTo = useViewSwitch();
 
@@ -127,16 +129,34 @@ export function Grid(props: ViewProps<GridView>) {
     [rows, selectedRows, dataStore, clearSelection, onSearch]
   );
 
+  const { page } = dataStore;
+  const canPrev = page.offset! > 0;
+  const canNext = page.offset! + page.limit! < page.totalCount!;
+  const hasRowSelected = (selectedRows || []).length > 0;
+
+  useEffect(() => {
+    const shouldRedirectToLastPage = page.offset! > page.totalCount!;
+    if (shouldRedirectToLastPage) {
+      const lastPage = Math.ceil(page.totalCount! / page.limit!);
+      lastPage &&
+        switchTo({
+          id: String(lastPage),
+          mode: "list",
+        });
+    }
+  }, [page, switchTo]);
+
   useEffect(() => {
     if (viewProps?.selectedCell !== state.selectedCell) {
       setViewProps({ selectedCell: state.selectedCell! });
     }
   }, [viewProps, setViewProps, state.selectedCell]);
 
-  const { page } = dataStore;
-  const canPrev = page.offset! > 0;
-  const canNext = page.offset! + page.limit! < page.totalCount!;
-  const hasRowSelected = (selectedRows || []).length > 0;
+  const searchOptions = useMemo(() => {
+    if (pageNo) {
+      return { offset: (+pageNo - 1) * page.limit! };
+    }
+  }, [pageNo, page.limit]);
 
   return (
     <div className={styles.grid}>
@@ -196,10 +216,11 @@ export function Grid(props: ViewProps<GridView>) {
           },
         ]}
         pagination={{
-          onPrev: () =>
-            canPrev && onSearch({ offset: page.offset! - page.limit! }),
+          canPrev,
+          canNext,
+          onPrev: () => switchTo({ id: String(+pageNo! - 1), mode: "list" }),
           onNext: () =>
-            canNext && onSearch({ offset: page.offset! + page.limit! }),
+            switchTo({ id: String(+(pageNo || 1) + 1), mode: "list" }),
           text: () => (
             <Box>
               <Box as="span" className={styles.paginationText}>
@@ -230,6 +251,7 @@ export function Grid(props: ViewProps<GridView>) {
         state={state}
         setState={setState}
         sortType={"live"}
+        searchOptions={searchOptions}
         onEdit={onEdit}
         onView={onView}
         onSearch={onSearch}
