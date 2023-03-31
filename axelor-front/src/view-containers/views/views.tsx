@@ -1,4 +1,4 @@
-import { useAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { memo, useMemo } from "react";
 
@@ -10,10 +10,7 @@ import { Tab } from "@/hooks/use-tabs";
 import { DataStore } from "@/services/client/data-store";
 import { findView } from "@/services/client/meta-cache";
 import { filters as fetchFilters } from "@/services/client/meta";
-import {
-  SearchFilter,
-  SearchFilters,
-} from "@/services/client/meta.types";
+import { SearchFilter, SearchFilters } from "@/services/client/meta.types";
 import { toCamelCase, toKebabCase } from "@/utils/names";
 
 import { ViewScope } from "./scope";
@@ -78,39 +75,24 @@ function ViewContainer({
   return null;
 }
 
-function ViewPane({ tab, dataStore }: { tab: Tab; dataStore?: DataStore }) {
+function ViewPane({
+  tab,
+  dataStore,
+  domains,
+}: {
+  tab: Tab;
+  dataStore?: DataStore;
+  domains?: SearchFilter[];
+}) {
   const {
-    action: { name: actionName, views = [], params, model },
+    action: { views = [] },
   } = tab;
   const tabAtom = tab.state;
-  const [viewState, setViewState] = useAtom(tabAtom);
+  const viewState = useAtomValue(tabAtom);
   const view = useMemo(
     () => views.find((x) => x.type === viewState.type),
     [viewState.type, views]
   );
-
-  const filterName = (params || {})["search-filters"];
-
-  useAsync<void>(async () => {
-    const name = filterName || `act:${actionName}`;
-    const filters = await fetchFilters(name);
-    setViewState({
-      filters: filters,
-    });
-  }, [actionName, filterName]);
-
-  const { data: searchFilters } = useAsync<SearchFilter[]>(async () => {
-    if (!filterName) return [];
-    const res = await findView<SearchFilters>({
-      name: filterName,
-      type: "search-filters",
-      model,
-    });
-    return (res?.view?.filters || []).map((filter) => ({
-      ...filter,
-      id: filter.name,
-    }));
-  }, [model, filterName]);
 
   if (view) {
     return (
@@ -119,7 +101,7 @@ function ViewPane({ tab, dataStore }: { tab: Tab; dataStore?: DataStore }) {
           view={view}
           tab={tab}
           dataStore={dataStore}
-          domains={searchFilters}
+          domains={domains}
         />
       </ScopeProvider>
     );
@@ -136,7 +118,7 @@ const DataViews = memo(function DataViews({
   model: string;
 }) {
   const {
-    action: { domain, context },
+    action: { name: actionName, domain, context, params },
   } = tab;
   const dataStore = new DataStore(model, {
     filter: {
@@ -144,7 +126,30 @@ const DataViews = memo(function DataViews({
       _domainContext: context,
     },
   });
-  return <ViewPane tab={tab} dataStore={dataStore} />;
+  const setViewState = useSetAtom(tab.state);
+
+  const filterName = (params || {})["search-filters"];
+
+  useAsync<void>(async () => {
+    const name = filterName || `act:${actionName}`;
+    const filters = await fetchFilters(name);
+    setViewState({ filters: filters });
+  }, [actionName, filterName]);
+
+  const { data: searchFilters } = useAsync<SearchFilter[]>(async () => {
+    if (!filterName) return [];
+    const res = await findView<SearchFilters>({
+      name: filterName,
+      type: "search-filters",
+      model,
+    });
+    return (res?.view?.filters || []).map((filter) => ({
+      ...filter,
+      id: filter.name,
+    }));
+  }, [model, filterName]);
+
+  return <ViewPane tab={tab} dataStore={dataStore} domains={searchFilters} />;
 });
 
 export const Views = memo(function Views({ tab }: { tab: Tab }) {
