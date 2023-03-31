@@ -203,9 +203,13 @@ export function Grid(props: ViewProps<GridView>) {
             canNext && onSearch({ offset: page.offset! + page.limit! }),
           text: () => (
             <Box>
-              <Box as="span">
-                {page.offset! + 1} to {page.offset! + page.limit!} of{" "}
-                {page.totalCount}
+              <Box as="span" className={styles.paginationText}>
+                {page.offset! + 1} to{" "}
+                {Math.min(
+                  page.offset! + page.limit!,
+                  page.totalCount as number
+                )}{" "}
+                of {page.totalCount}
               </Box>
             </Box>
           ),
