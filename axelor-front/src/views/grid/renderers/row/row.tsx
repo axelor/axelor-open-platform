@@ -3,9 +3,9 @@ import { Hilite } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { Box } from "@axelor/ui";
 import { GridRowProps } from "@axelor/ui/src/grid";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 
-export function Row(
+export const Row = memo(function Row(
   props: GridRowProps & {
     hilites?: Hilite[];
   }
@@ -36,4 +36,4 @@ export function Row(
       }}
     />
   );
-}
+});

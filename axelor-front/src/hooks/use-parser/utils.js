@@ -1,34 +1,43 @@
+import { LoadingCache } from "@/utils/cache";
 import { parseSafe } from "./parser";
 
-export const parseTemplate = (str) => {
-  const text1 = str.replace(/(?!(\$|\\))\{{/g, "$1${");
-  const text = text1.replace(/(?!(\$|\\))\}}/g, "}");
+const cache = new LoadingCache();
 
-  if (!text.includes("${")) {
-    return () => text;
-  }
-  const resFn = parseSafe("`" + text + "`");
-  return (...args) => {
-    try {
-      const result = resFn(...args);
-      return result && result.replace(/undefined/gi, "").replace(/null/g, "");
-    } catch {
-      console.error(`Invalid template line : ${text}`);
-      return null;
+const makeKey = (...args) => args.map((x) => x || "").join(":");
+
+export const parseTemplate = (str) => {
+  return cache.get(makeKey("template", str), () => {
+    const text1 = str.replace(/(?!(\$|\\))\{{/g, "$1${");
+    const text = text1.replace(/(?!(\$|\\))\}}/g, "}");
+
+    if (!text.includes("${")) {
+      return () => text;
     }
-  };
+    const resFn = parseSafe("`" + text + "`");
+    return (...args) => {
+      try {
+        const result = resFn(...args);
+        return result && result.replace(/undefined/gi, "").replace(/null/g, "");
+      } catch {
+        console.error(`Invalid template line : ${text}`);
+        return null;
+      }
+    };
+  });
 };
 
 export const parseExpression = (str) => {
-  const fn = parseSafe(str);
-  return (...args) => {
-    try {
-      return fn(...args);
-    } catch {
-      console.error(`Invalid expression : ${str}`);
-      return false;
-    }
-  };
+  return cache.get(makeKey("expr", str), () => {
+    const fn = parseSafe(str);
+    return (...args) => {
+      try {
+        return fn(...args);
+      } catch {
+        console.error(`Invalid expression : ${str}`);
+        return false;
+      }
+    };
+  });
 };
 
 export const isObject = (v) => v.startsWith("{");
@@ -102,5 +111,7 @@ function resolveFilter(match) {
 }
 
 export function parseAngularExp(str) {
-  return parseTemplate(str.replace(/\{\{(.*?)\}\}/g, resolveFilter));
+  return cache.get(makeKey("ng-expr", str), () =>
+    parseTemplate(str.replace(/\{\{(.*?)\}\}/g, resolveFilter))
+  );
 }
