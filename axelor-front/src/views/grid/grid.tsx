@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { GridRow } from "@axelor/ui/grid";
-import { Box } from "@axelor/ui";
 import { atom, useAtom } from "jotai";
 import { GridView } from "@/services/client/meta.types";
 import { SearchOptions } from "@/services/client/data";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { Grid as GridComponent } from "./builder";
+import { Grid as GridComponent, GridPager } from "./builder";
 import { ViewProps } from "../types";
 import { useViewProps, useViewSwitch } from "@/view-containers/views/scope";
 import { useGridState } from "./builder/utils";
@@ -221,18 +220,7 @@ export function Grid(props: ViewProps<GridView>) {
           onPrev: () => switchTo({ id: String(+pageNo! - 1), mode: "list" }),
           onNext: () =>
             switchTo({ id: String(+(pageNo || 1) + 1), mode: "list" }),
-          text: () => (
-            <Box>
-              <Box as="span" className={styles.paginationText}>
-                {page.offset! + 1} to{" "}
-                {Math.min(
-                  page.offset! + page.limit!,
-                  page.totalCount as number
-                )}{" "}
-                of {page.totalCount}
-              </Box>
-            </Box>
-          ),
+          text: () => <GridPager page={page} onPageChange={onSearch} />,
         }}
       >
         <AdvanceSearch
