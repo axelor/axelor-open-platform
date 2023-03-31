@@ -1,4 +1,4 @@
-import { Cache } from "@/utils/cache";
+import { LoadingCache } from "@/utils/cache";
 
 import {
   actionView as fetchAction,
@@ -10,12 +10,12 @@ import {
 import { processView, processWidgets } from "./meta-utils";
 import { type ActionView, type ViewType } from "./meta.types";
 
-const cache = new Cache<Promise<any>>();
+const cache = new LoadingCache<Promise<any>>();
 
 const makeKey = (...args: any[]) => args.map((x) => x || "").join(":");
 
 export async function findActionView(name: string): Promise<ActionView> {
-  return cache.getOrLoad(makeKey("action", name), () =>
+  return cache.get(makeKey("action", name), () =>
     fetchAction(name).then((view) => ({ ...view, name }))
   );
 }
@@ -29,7 +29,7 @@ export async function findView<T extends ViewType>({
   name?: string;
   model?: string;
 }): Promise<ViewData<T>> {
-  return cache.getOrLoad(makeKey("view", model, type, name), () =>
+  return cache.get(makeKey("view", model, type, name), () =>
     fetchView({ type: type as any, name, model }).then((data) => {
       // process the meta data
       processView(data, data.view);
@@ -40,5 +40,5 @@ export async function findView<T extends ViewType>({
 }
 
 export async function findFields(model: string): Promise<MetaData> {
-  return cache.getOrLoad(makeKey("meta", model), () => fetchFields(model));
+  return cache.get(makeKey("meta", model), () => fetchFields(model));
 }
