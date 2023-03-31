@@ -1,9 +1,10 @@
 /* eslint-disable no-new-func */
-import React from "react";
-import sanitizeHTML from "sanitize-html";
 import * as Babel from "@babel/standalone";
+import React from "react";
 
-const blacklist = ["eval", "Function", "Reflect", "Proxy"];
+import { sanitize } from "@/utils/sanitize";
+
+const blockedList = ["eval", "Function", "Reflect", "Proxy"];
 const sanitizeURL = ["xlinkHref", "src", "href", "action", "formAction"];
 
 function ScopeTransformer({ types: t, template }) {
@@ -52,7 +53,7 @@ function ScopeTransformer({ types: t, template }) {
       file,
       "trapElement",
       `function %%name%%(element) {
-        const whitelist = [
+        const allowed = [
           'dir', 'class', 'style', 'draggable', 'value', 'checked', 'selected', 'multiple', 'cols', 'placeholder',
           'clientTop', 'clientLeft', 'clientWidth', 'clientHeight',
           'offsetTop', 'offsetLeft', 'offsetWidth', 'offsetHeight',
@@ -61,7 +62,7 @@ function ScopeTransformer({ types: t, template }) {
         ];
         return new Proxy(element || {}, {
           has(target, name) {
-            return whitelist.includes(name);
+            return allowed.includes(name);
           },
           get(target, name) {
             const value = this.has(target, name) ? Reflect.get(target, name) : undefined;
@@ -78,14 +79,14 @@ function ScopeTransformer({ types: t, template }) {
       "trapEvent",
       `function %%name%%(handler) {
         const elements = ['target', 'currentTarget'];
-        const blacklist = ['nativeEvent'];
+        const blocked = ['nativeEvent'];
         return function (event) {
           const e = new Proxy(event, {
             has(target, name) {
-              return !blacklist.includes(name) && Reflect.has(target, name);
+              return !blocked.includes(name) && Reflect.has(target, name);
             },
             get(target, name) {
-              if (blacklist.includes(name)) return undefined;
+              if (blocked.includes(name)) return undefined;
               const value = Reflect.get(target, name);
               return elements.includes(name) ? %%proxy%%(value) : typeof value === 'function' ? value.bind(target) : value;
             },
@@ -217,7 +218,7 @@ function ScopeTransformer({ types: t, template }) {
         const { node, parent, scope } = path;
         if (!node.loc) return;
         if (
-          blacklist.includes(node.name) &&
+          blockedList.includes(node.name) &&
           (parent.computed || parent.property !== node)
         ) {
           throw path.buildCodeFrameError(
@@ -376,16 +377,6 @@ const defaultOptions = {
   ],
   plugins: ["ScopeTransformer"],
 };
-
-function sanitize(text) {
-  return sanitizeHTML(text, {
-    allowedTags: [...sanitizeHTML.defaults.allowedTags, "img"],
-    allowedAttributes: {
-      ...sanitizeHTML.defaults.allowedAttributes,
-      img: ["alt", "src", "srcset", "sizes"],
-    },
-  });
-}
 
 export function parse(text, options = {}) {
   const opts = Object.assign({}, defaultOptions, options);

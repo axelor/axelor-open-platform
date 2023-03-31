@@ -1,17 +1,8 @@
+import DOMPurify from "dompurify";
 import { createElement, memo, useMemo } from "react";
-import sanitizeHTML from "sanitize-html";
-
-const allowedTags = [...sanitizeHTML.defaults.allowedTags, "img"];
-const allowedAttributes = {
-  ...sanitizeHTML.defaults.allowedAttributes,
-  img: ["alt", "src", "srcset", "sizes"],
-};
 
 export function sanitize(text: string) {
-  return sanitizeHTML(text, {
-    allowedTags,
-    allowedAttributes,
-  });
+  return DOMPurify.sanitize(text);
 }
 
 export const SenitizedContent = memo(function SenitizedContent({

@@ -20,6 +20,7 @@
     "bootstrap-sass": "2.3.2",
     "clsx": "^1.2.1",
     "dayjs": "^1.11.7",
+    "dompurify": "^3.0.1",
     "font-awesome": "^4.7.0",
     "immer": "^9.0.19",
     "jotai": "^2.0.2",
@@ -35,18 +36,17 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.2",
-    "react-transition-group": "^4.4.5",
-    "sanitize-html": "^2.10.0"
+    "react-transition-group": "^4.4.5"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
+    "@types/dompurify": "^3.0.0",
     "@types/lodash": "^4.14.191",
     "@types/node": "^18.14.2",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@types/react-transition-group": "^4.4.5",
-    "@types/sanitize-html": "^2.9.0",
     "@types/testing-library__jest-dom": "^5.14.5",
     "@vitejs/plugin-react": "^3.1.0",
     "eslint": "^8.35.0",
