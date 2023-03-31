@@ -3,6 +3,7 @@ import { createScope, molecule, useMolecule } from "jotai-molecules";
 import { useCallback } from "react";
 
 import { Tab, TabAtom, TabProps, TabRoute, useTabs } from "@/hooks/use-tabs";
+import { SavedFilter } from "@/services/client/meta.types";
 
 const fallbackAtom: TabAtom = atom(
   () => ({
@@ -125,6 +126,23 @@ export function useViewProps() {
       setViewState({ props: newProps });
     },
     [props, setViewState, state, type]
+  );
+
+  return [state, setState] as const;
+}
+
+/**
+ * This hook can be used to get/set filters of tab
+ *
+ */
+export function useViewFilters() {
+  const [{ filters: state }, setViewState] = useViewState();
+
+  const setState = useCallback(
+    (filters: SavedFilter[]) => {
+      setViewState({ filters });
+    },
+    [setViewState]
   );
 
   return [state, setState] as const;

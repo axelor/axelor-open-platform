@@ -68,6 +68,52 @@ export async function filters(name: string): Promise<SavedFilter[]> {
   return Promise.reject(resp.status);
 }
 
+export async function saveFilter(filter: SavedFilter) {
+  const url = "ws/action/com.axelor.meta.web.MetaFilterController:saveFilter";
+  const model = "com.axelor.meta.db.MetaFilter";
+  const resp = await request({
+    url,
+    method: "POST",
+    body: {
+      data: {
+        context: filter,
+        model,
+      },
+      model,
+    },
+  });
+
+  if (resp.ok) {
+    const { status, data } = await resp.json();
+    return status === 0 ? data : Promise.reject(500);
+  }
+
+  return Promise.reject(resp.status);
+}
+
+export async function removeFilter(filter: SavedFilter) {
+  const url = "ws/action/com.axelor.meta.web.MetaFilterController:removeFilter";
+  const model = "com.axelor.meta.db.MetaFilter";
+  const resp = await request({
+    url,
+    method: "POST",
+    body: {
+      data: {
+        context: { name: filter.name, filterView: filter.filterView },
+        model,
+      },
+      model,
+    },
+  });
+
+  if (resp.ok) {
+    const { status, data } = await resp.json();
+    return status === 0 ? data : Promise.reject(500);
+  }
+
+  return Promise.reject(resp.status);
+}
+
 export interface MetaData {
   model: string;
   fields: Record<string, Property>; // incoming is array, processed to object;

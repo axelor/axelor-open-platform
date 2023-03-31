@@ -11,12 +11,11 @@ import { useViewProps, useViewSwitch } from "@/view-containers/views/scope";
 import { useGridState } from "./builder/utils";
 import { i18n } from "@/services/client/i18n";
 import { dialogs } from "@/components/dialogs";
-import { session } from "@/services/client/session";
-import AdvanceSearch from "@/view-containers/advance-search/advance-search";
+import AdvanceSearch from "@/view-containers/advance-search";
 import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
-  const { meta, dataStore, domains, filters } = props;
+  const { meta, dataStore, domains } = props;
   const { view, fields } = meta;
   const [viewProps, setViewProps] = useViewProps();
   const switchTo = useViewSwitch();
@@ -138,8 +137,6 @@ export function Grid(props: ViewProps<GridView>) {
   const canPrev = page.offset! > 0;
   const canNext = page.offset! + page.limit! < page.totalCount!;
   const hasRowSelected = (selectedRows || []).length > 0;
-  const user = session.info?.user!;
-  const advanceSearchConfig = session.info?.view?.advanceSearch;
 
   return (
     <div className={styles.grid}>
@@ -218,22 +215,12 @@ export function Grid(props: ViewProps<GridView>) {
         }}
       >
         <AdvanceSearch
-          canShare={advanceSearchConfig?.share !== false}
-          canExportFull={advanceSearchConfig?.exportFull !== false}
-          userId={user.id}
-          userGroup={user.group}
-          translate={i18n.get}
+          dataStore={dataStore}
           items={view.items}
+          fields={fields}
+          domains={domains}
           value={advanceSearch}
           setValue={setAdvancedSearch}
-          {...({
-            fields,
-            filters,
-            domains,
-            onSave: () => {},
-            onExport: () => {},
-            onDelete: () => {},
-          } as any)}
         />
       </ViewToolBar>
       <GridComponent

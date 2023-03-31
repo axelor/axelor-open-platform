@@ -7,7 +7,6 @@ import {
   GanttView,
   GridView,
   KanbanView,
-  SavedFilter,
   SearchFilter,
   View,
 } from "@/services/client/meta.types";
@@ -22,7 +21,6 @@ export type ViewProps<T extends View> = T extends
   ? {
       meta: ViewData<T>;
       dataStore: DataStore;
-      filters?: SavedFilter[];
       domains?: SearchFilter[];
     }
   : {

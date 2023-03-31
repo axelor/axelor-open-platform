@@ -48,7 +48,7 @@ function EditorInput({
             className="title"
             placeholder={t("Save filter as")}
             value={title}
-            onChange={(value) => onChange("title", value)}
+            onChange={(e) => onChange("title", e.target.value)}
           />
         </Box>
         {canShare && (

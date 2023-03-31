@@ -1,4 +1,4 @@
-import { useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { ScopeProvider } from "jotai-molecules";
 import { memo, useMemo } from "react";
 
@@ -11,7 +11,6 @@ import { DataStore } from "@/services/client/data-store";
 import { findView } from "@/services/client/meta-cache";
 import { filters as fetchFilters } from "@/services/client/meta";
 import {
-  SavedFilter,
   SearchFilter,
   SearchFilters,
 } from "@/services/client/meta.types";
@@ -47,13 +46,11 @@ function ViewContainer({
   tab,
   view,
   dataStore,
-  filters,
   domains,
 }: {
   tab: Tab;
   view: { name?: string; type: string };
   dataStore?: DataStore;
-  filters?: SavedFilter[];
   domains?: SearchFilter[];
 }) {
   const { model } = tab.action;
@@ -72,12 +69,7 @@ function ViewContainer({
     return (
       <Fade in={true} timeout={400} mountOnEnter>
         <Box d="flex" flex={1} style={{ minWidth: 0, minHeight: 0 }}>
-          <Comp
-            meta={meta}
-            dataStore={dataStore}
-            filters={filters}
-            domains={domains}
-          />
+          <Comp meta={meta} dataStore={dataStore} domains={domains} />
         </Box>
       </Fade>
     );
@@ -91,7 +83,7 @@ function ViewPane({ tab, dataStore }: { tab: Tab; dataStore?: DataStore }) {
     action: { name: actionName, views = [], params, model },
   } = tab;
   const tabAtom = tab.state;
-  const viewState = useAtomValue(tabAtom);
+  const [viewState, setViewState] = useAtom(tabAtom);
   const view = useMemo(
     () => views.find((x) => x.type === viewState.type),
     [viewState.type, views]
@@ -99,9 +91,12 @@ function ViewPane({ tab, dataStore }: { tab: Tab; dataStore?: DataStore }) {
 
   const filterName = (params || {})["search-filters"];
 
-  const { data: savedFilters } = useAsync<SavedFilter[]>(async () => {
+  useAsync<void>(async () => {
     const name = filterName || `act:${actionName}`;
-    return await fetchFilters(name);
+    const filters = await fetchFilters(name);
+    setViewState({
+      filters: filters,
+    });
   }, [actionName, filterName]);
 
   const { data: searchFilters } = useAsync<SearchFilter[]>(async () => {
@@ -124,7 +119,6 @@ function ViewPane({ tab, dataStore }: { tab: Tab; dataStore?: DataStore }) {
           view={view}
           tab={tab}
           dataStore={dataStore}
-          filters={savedFilters}
           domains={searchFilters}
         />
       </ScopeProvider>

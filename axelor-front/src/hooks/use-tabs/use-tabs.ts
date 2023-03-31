@@ -10,7 +10,7 @@ import { isEqual, isNil, omitBy } from "lodash";
 
 import { navigate } from "@/routes";
 import { findActionView } from "@/services/client/meta-cache";
-import { ActionView } from "@/services/client/meta.types";
+import { ActionView, SavedFilter } from "@/services/client/meta.types";
 
 /**
  * The route state of a specific view type.
@@ -56,6 +56,12 @@ export type TabState = {
    * Can be used to show confirmation dialong before closing the tab.
    */
   dirty?: boolean;
+
+  /**
+   * Keeps track of filters per tab.
+   *
+   */
+  filters?: SavedFilter[];
 
   /**
    * Keeps track of route options per view type.

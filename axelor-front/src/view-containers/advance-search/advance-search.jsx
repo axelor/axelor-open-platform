@@ -515,9 +515,9 @@ function AdvanceSearch({
     record && setSavedFilter(record);
   }
 
-  function handleFilterRemove(filter) {
-    onDelete(filter);
-    handleClear();
+  async function handleFilterRemove(filter) {
+    const hasRemoved = await onDelete(filter);
+    hasRemoved && handleClear();
   }
 
   const state = value?.state || {};
