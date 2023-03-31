@@ -2,7 +2,7 @@ import { Box, Badge } from "@axelor/ui";
 import clsx from "clsx";
 import classes from "./chip.module.scss";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
-
+import { legacyClassNames } from "@/styles/legacy";
 
 export function Chip({
   className,
@@ -14,7 +14,7 @@ export function Chip({
   deleteIconProps = {},
   ...rest
 }) {
-  const color = _color || "default";
+  const color = _color || "blue";
   function renderLabel() {
     return (
       <>
@@ -35,7 +35,7 @@ export function Chip({
     );
   }
 
-  const chipCss = classes[(color || value).trim()];
+  const chipCss = legacyClassNames(`bg-${(color || value).trim()}`);
   if (!chipCss) return renderLabel();
   return (
     <Badge
@@ -48,4 +48,3 @@ export function Chip({
     </Badge>
   );
 }
-
