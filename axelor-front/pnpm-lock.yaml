@@ -57,6 +57,9 @@ dependencies:
   lodash:
     specifier: ^4.17.21
     version: 4.17.21
+  monaco-editor:
+    specifier: ^0.36.1
+    version: 0.36.1
   optics-ts:
     specifier: ^2.4.0
     version: 2.4.0
@@ -4895,6 +4898,10 @@ packages:
 
   /moment@2.29.4:
     resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
+    dev: false
+
+  /monaco-editor@0.36.1:
+    resolution: {integrity: sha512-/CaclMHKQ3A6rnzBzOADfwdSJ25BFoFT0Emxsc4zYVyav5SkK9iA6lEtIeuN/oRYbwPgviJT+t3l+sjFa28jYg==}
     dev: false
 
   /ms@2.1.2:
