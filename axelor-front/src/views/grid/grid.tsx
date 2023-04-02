@@ -1,17 +1,24 @@
-import { useCallback, useEffect, useMemo } from "react";
-import { GridRow } from "@axelor/ui/grid";
 import { atom, useAtom } from "jotai";
-import { GridView } from "@/services/client/meta.types";
-import { SearchOptions } from "@/services/client/data";
-import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { Grid as GridComponent, GridPager } from "./builder";
-import { ViewProps } from "../types";
-import { useViewProps, useViewSwitch } from "@/view-containers/views/scope";
-import { useGridState } from "./builder/utils";
-import { i18n } from "@/services/client/i18n";
+import { useCallback, useEffect, useMemo } from "react";
+
+import { GridRow } from "@axelor/ui/grid";
+
 import { dialogs } from "@/components/dialogs";
-import { useViewRoute } from "@/view-containers/views/scope";
+import { SearchOptions } from "@/services/client/data";
+import { i18n } from "@/services/client/i18n";
+import { GridView } from "@/services/client/meta.types";
 import AdvanceSearch from "@/view-containers/advance-search";
+import { ViewToolBar } from "@/view-containers/view-toolbar";
+import {
+  useViewProps,
+  useViewRoute,
+  useViewSwitch,
+} from "@/view-containers/views/scope";
+
+import { ViewProps } from "../types";
+import { Grid as GridComponent, GridPager } from "./builder";
+import { useGridState } from "./builder/utils";
+
 import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
@@ -24,12 +31,14 @@ export function Grid(props: ViewProps<GridView>) {
   const [advanceSearch, setAdvancedSearch] = useAtom<any>(
     useMemo(() => atom({}), [])
   );
+
   const [state, setState] = useGridState({
     selectedCell: viewProps?.selectedCell,
     selectedRows: viewProps?.selectedCell
       ? [viewProps?.selectedCell?.[0]!]
       : null,
   });
+
   const { orderBy, rows, selectedRows } = state;
 
   const clearSelection = useCallback(() => {
@@ -41,20 +50,14 @@ export function Grid(props: ViewProps<GridView>) {
 
   const onSearch = useCallback(
     (options: SearchOptions = {}) => {
-      const { query } = advanceSearch as any;
-      const sortBy = orderBy
-        ? orderBy.map(
-            (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
-          )
-        : null;
+      const { query = {} } = advanceSearch;
+      const { archived: _archived } = query;
+      const sortBy = orderBy?.map(
+        (column) => `${column.order === "desc" ? "-" : ""}${column.name}`
+      );
       return dataStore.search({
-        ...(sortBy ? { sortBy } : {}),
-        filter: query
-          ? {
-              _archived: query.archived,
-              ...query,
-            }
-          : {},
+        sortBy,
+        filter: { ...query, _archived },
         ...options,
       });
     },
@@ -105,11 +108,9 @@ export function Grid(props: ViewProps<GridView>) {
     async (archived: boolean) => {
       const confirmed = await dialogs.confirm({
         title: i18n.get("Question"),
-        content: i18n.get(
-          `Do you really want to ${
-            archived ? "" : "un"
-          }archive the selected record(s)?`
-        ),
+        content: archived
+          ? i18n.get(`Do you really want to archive the selected record(s)?`)
+          : i18n.get(`Do you really want to unarchive the selected record(s)?`),
       });
       if (!confirmed) return;
       const records = selectedRows!
@@ -164,14 +165,14 @@ export function Grid(props: ViewProps<GridView>) {
         actions={[
           {
             key: "new",
-            text: "New",
+            text: i18n.get("New"),
             iconProps: {
               icon: "add",
             },
           },
           {
             key: "edit",
-            text: "Edit",
+            text: i18n.get("Edit"),
             iconProps: {
               icon: "edit",
             },
@@ -184,19 +185,19 @@ export function Grid(props: ViewProps<GridView>) {
           },
           {
             key: "delete",
-            text: "Delete",
+            text: i18n.get("Delete"),
             iconProps: {
               icon: "delete",
             },
             items: [
               {
                 key: "archive",
-                text: "Archive",
+                text: i18n.get("Archive"),
                 onClick: () => onArchiveOrUnArchive(true),
               },
               {
                 key: "unarchive",
-                text: "Unarchive",
+                text: i18n.get("Unarchive"),
                 onClick: () => onArchiveOrUnArchive(false),
               },
             ],
@@ -207,7 +208,7 @@ export function Grid(props: ViewProps<GridView>) {
           },
           {
             key: "refresh",
-            text: "Refresh",
+            text: i18n.get("Refresh"),
             iconProps: {
               icon: "refresh",
             },
