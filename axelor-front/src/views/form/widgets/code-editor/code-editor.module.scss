@@ -1,0 +1,8 @@
+.container {
+  margin: 0.5rem 0;
+  border: 1px solid transparent;
+  & > * {
+    height: inherit !important;
+    width: inherit !important;
+  }
+}
