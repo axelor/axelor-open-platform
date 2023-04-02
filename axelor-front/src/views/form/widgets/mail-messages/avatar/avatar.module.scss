@@ -1,0 +1,25 @@
+.user-img,
+.avatar {
+  height: 100%;
+  width: 100%;
+}
+.user-img {
+  border-radius: 50%;
+}
+
+.avatar {
+  color: var(--bs-white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: bold;
+  border-radius: 100%;
+}
+
+.text {
+  color: var(--bs-black);
+  background-color: var(--bs-gray-200);
+  font-size: 0.75rem;
+  font-weight: normal;
+}

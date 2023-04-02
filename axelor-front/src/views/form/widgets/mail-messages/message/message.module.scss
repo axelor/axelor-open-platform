@@ -1,0 +1,59 @@
+.root {
+  max-width: 1024px;
+}
+
+.message-container {
+  width: calc(100% + 2rem);
+  margin: 0 0.6rem 0.6rem -2rem;
+  .rtl & {
+    margin: 0 -2rem 0.6rem 0.6rem;
+  }
+}
+
+.arrow-right {
+  width: 0.75rem;
+  height: 0.75rem;
+  left: 3.5rem;
+  top: 0.75rem;
+  transform: rotate(-45deg);
+  background: var(--bs-white);
+  .rtl & {
+    left: unset;
+    right: 3.5rem;
+    transform: rotate(45deg);
+  }
+}
+
+
+.root a {
+  cursor: pointer;
+  color: var(--bs-link-color) !important;
+  text-decoration: none !important;
+  &:hover,
+  &:focus {
+    color: var(--bs-link-hover-color) !important;
+    text-decoration: underline !important;
+  }
+}
+
+
+.avatar {
+  margin: 0.65rem;
+  margin-top: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  font-size: 1.25rem;
+  align-items: center;
+  flex-shrink: 0;
+  user-select: none;
+  border-radius: 50%;
+  justify-content: center;
+  color: var(--bs-white);
+}
+
+.pull-right {
+  float: right;
+}
