@@ -15,6 +15,7 @@ export function BooleanSwitch({
       <Switch
         id={uid}
         checked={value ?? false}
+        readOnly={readonly}
         onChange={(e) => setValue(!value)}
         value=""
       />
