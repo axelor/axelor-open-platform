@@ -46,8 +46,11 @@ export function FormWidget(props: Omit<WidgetProps, "widgetAtom">) {
   return <Unknown {...widgetProps} />;
 }
 
-function FormField(props: WidgetProps & { component: React.ElementType }) {
-  const { schema, formAtom, component: Comp } = props;
+function FormField({
+  component: Comp,
+  ...props
+}: WidgetProps & { component: React.ElementType }) {
+  const { schema, formAtom } = props;
   const name = schema.name!;
   const onChange = schema.onChange;
 
