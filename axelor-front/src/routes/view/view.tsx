@@ -15,6 +15,11 @@ const getURL = (
   if (!action || action.startsWith("$")) {
     return null;
   }
+
+  if (mode === "list") {
+    id = id ?? "1";
+  }
+
   return generatePath("/ds/:action/:mode?/:id?", {
     action,
     mode,
