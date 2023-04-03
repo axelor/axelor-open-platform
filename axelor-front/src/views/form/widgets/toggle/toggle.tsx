@@ -10,7 +10,7 @@ export function Toggle({ schema, readonly, valueAtom }: FieldProps<boolean>) {
   return (
     <FieldContainer className={classes.container} readonly={readonly}>
       <InputLabel htmlFor={uid}>{title}</InputLabel>
-      <Button variant="light" id={uid} onClick={() => !readonly && setValue(!value)}>
+      <Button variant="light" id={uid} onClick={() => !readonly && setValue(!value, true)}>
         <Box
           as="i"
           me={2}

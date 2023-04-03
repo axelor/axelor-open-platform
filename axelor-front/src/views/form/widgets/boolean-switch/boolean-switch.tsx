@@ -16,7 +16,7 @@ export function BooleanSwitch({
         id={uid}
         checked={value ?? false}
         readOnly={readonly}
-        onChange={(e) => setValue(!value)}
+        onChange={() => setValue(!value, true)}
         value=""
       />
     </FieldContainer>
