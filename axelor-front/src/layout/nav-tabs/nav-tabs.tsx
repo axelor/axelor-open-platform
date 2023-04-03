@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import { memo, useCallback, useEffect, useRef } from "react";
 import { useAtomValue } from "jotai";
+import { memo, useCallback, useEffect, useRef } from "react";
 
 import { Box, NavItemProps, NavTabs as Tabs } from "@axelor/ui";
 import { MaterialIcon } from "@axelor/ui/icons/meterial-icon";
@@ -12,6 +12,7 @@ import { MenuItem } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { Views } from "@/view-containers/views";
 
+import { PopupViews } from "@/view-containers/view-popup";
 import styles from "./nav-tabs.module.scss";
 
 function useIcon(id: string) {
@@ -103,7 +104,7 @@ const NavTab = memo(function NavTab({
 });
 
 export function NavTabs() {
-  const { active, items, open, close } = useTabs();
+  const { active, items, popups, open, close } = useTabs();
   const value = active?.id;
 
   const handleSelect = useCallback((e: any, tab: any) => open(tab.id), [open]);
@@ -131,6 +132,9 @@ export function NavTabs() {
         >
           <Views tab={tab} />
         </div>
+      ))}
+      {popups.map((tab) => (
+        <PopupViews key={tab.id} tab={tab} />
       ))}
     </Box>
   );
