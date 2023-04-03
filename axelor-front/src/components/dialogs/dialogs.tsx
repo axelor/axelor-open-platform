@@ -32,6 +32,13 @@ export type DialogOptions = {
   header?: React.ReactNode;
   footer?: React.ReactNode;
   buttons?: DialogButton[];
+  size?: "sm" | "md" | "lg" | "xl";
+  classes?: {
+    root?: string;
+    content?: string;
+    header?: string;
+    footer?: string;
+  };
   onClose?: (result: boolean) => void;
 };
 
@@ -129,7 +136,7 @@ function Dialogs() {
   return (
     <Portal>
       {dialogs.map((dialog) => (
-        <DialogContainer key={dialog.id} {...dialog} />
+        <ModalDialog key={dialog.id} {...dialog} />
       ))}
       {dialogs.length > 0 && (
         <Fade in={true}>
@@ -161,14 +168,16 @@ const defaultButtons: DialogButton[] = [
 
 const defaultOnClose = () => {};
 
-function DialogContainer(props: DialogProps) {
+export function ModalDialog(props: DialogProps) {
   const {
     id,
+    size,
     title,
     content,
     header,
     footer,
     buttons = defaultButtons,
+    classes = {},
     onClose = defaultOnClose,
   } = props;
   const [open, setOpen] = useState<boolean>(true);
@@ -183,13 +192,16 @@ function DialogContainer(props: DialogProps) {
   );
 
   return (
-    <Dialog open={open}>
-      <DialogHeader onCloseClick={(e) => close(false)}>
+    <Dialog open={open} scrollable size={size} className={classes.root}>
+      <DialogHeader
+        onCloseClick={(e) => close(false)}
+        className={classes.header}
+      >
         <DialogTitle>{title}</DialogTitle>
         {header}
       </DialogHeader>
-      <DialogContent>{content}</DialogContent>
-      <DialogFooter>
+      <DialogContent className={classes.content}>{content}</DialogContent>
+      <DialogFooter className={classes.footer}>
         {footer}
         {buttons.map((button) => (
           <Button
