@@ -1,0 +1,264 @@
+@use "sass:math";
+$spacing: 0.25rem;
+$bg-white: #fff;
+$bg-white-shade: #eee;
+
+.relative {
+  position: relative;
+}
+
+.custom-html-editor-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100px;
+  width: '100%';
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  & textarea {
+    background-color: inherit;
+    color: inherit;
+  }
+}
+
+.custom-html-editor-content[data-placeholder]:empty:before {
+  content: attr(data-placeholder);
+}
+
+.custom-html-editor-container textarea,
+.custom-html-editor-content {
+  flex: 1;
+  min-height: 100px;
+  position: relative;
+  padding: $spacing * 2;
+  overflow: auto;
+  outline: none;
+  word-wrap: break-word;
+  color: var(--text-color);
+}
+
+.custom-html-editor-popup {
+  border-radius: 0;
+  background: $bg-white;
+  box-shadow: 0 $spacing $spacing * 2 rgba(0, 0, 0, 0.2);
+  background-clip: padding-box;
+  width: auto !important;
+  position: absolute;
+  z-index: 9999;
+  color: var(--text-color);
+  background: rgba(255, 255, 255, 0.9);
+  left: -50%;
+  border: 1px solid var(--bs-border-color);
+  border-radius: $spacing * 2;
+  border-radius: 0.2rem;
+  user-select: none;
+
+  [dir='rtl'] & {
+    left: unset;
+    right: -50%;
+  }
+  &.custom-html-editor-popuphover {
+    width: auto;
+  }
+}
+
+.custom-html-editor-toolbar-icon {
+  font-family: FontAwesome;
+  padding: $spacing $spacing * 1.5;
+  font-size: 0.85rem;
+  font-family: FontAwesome;
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+  cursor: pointer;
+
+  &:hover {
+    color: inherit;
+    background-color: $bg-white-shade;
+  }
+
+  &.disabled {
+    opacity: 0.3;
+    color: inherit;
+    background-color: inherit;
+    cursor: default;
+  }
+}
+
+.custom-html-editor-toolbar {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  border-bottom: 1px solid var(--bs-border-color);
+
+  a,
+  a:hover,
+  a:link,
+  a:visited {
+    text-decoration: none;
+  }
+}
+
+.custom-html-editor-plugin-list {
+  overflow: hidden;
+  background-color: inherit;
+  a {
+    &,
+    &:link,
+    &:visited {
+      display: block;
+      color: black;
+      padding: $spacing $spacing * 2;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    &:hover {
+      color: $bg-white;
+      background-color: $bg-white-shade;
+    }
+  }
+  & pre {
+    padding: math.div($spacing, 2) $spacing 0;
+  }
+
+  & h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  pre,
+  blockquote {
+    margin: 0;
+  }
+}
+
+.custom-html-editor-plugin-list,
+.html-item .html-content {
+  & h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 600;
+  }
+  & h1 {
+    font-size: 1.5rem;
+  }
+  & h2 {
+    font-size: 1.4rem;
+  }
+  & h3 {
+    font-size: 1.3rem;
+  }
+  & h4 {
+    font-size: 1.2rem;
+  }
+  & h5 {
+    font-size: 1.1rem;
+  }
+  & h6 {
+    font-size: 1rem;
+  }
+}
+
+input.custom-html-editor-input {
+  margin: 0;
+}
+
+.custom-html-editor-toolbar-divider {
+  background-color: var(--bs-border-color);
+  display: inline-block;
+  height: 1.65rem;
+  margin-left: 0;
+  margin-right: 0;
+  vertical-align: middle;
+  width: 1px;
+}
+
+/** normalize bootstrap css for content */
+.html-item .html-content blockquote {
+  margin: 0 0 0.5rem 2.5rem;
+  border: none;
+  padding: 0;
+  [dir='rtl'] & {
+    margin: 0 2.5rem 0.5rem 0;
+  }
+
+  & p {
+    font-size: 0.85rem;
+    font-weight: inherit;
+    line-height: 1.2rem;
+  }
+}
+
+/** force same style on chrome */
+.html-item .html-content blockquote[style*='margin: 0 0 0 2.5rem'] {
+  margin: 0 0 0.5rem 2.5rem !important;
+}
+[dir='rtl'] .html-item .html-content blockquote[style*='margin: 0 2.5rem 0 0'] {
+  margin: 0 2.5rem 0.5rem 0 !important;
+}
+
+.color-palette-table {
+  border-collapse: collapse;
+  & td {
+    width: 0.5em;
+    height: 0.5em;
+    cursor: pointer;
+    user-select: none;
+  }
+}
+
+.custom-html-editor-form {
+  padding: $spacing * 2;
+  white-space: nowrap;
+  background: $bg-white;
+  & .custom-html-editor-toolbar-icon {
+    margin-left: $spacing;
+    border-radius: $spacing;
+    [dir='rtl'] & {
+      margin-left: unset;
+      margin-right: $spacing;
+    }
+  }
+}
+
+.custom-html-editor-browse {
+  position: relative;
+  left: 0;
+  top: 0;
+  height: 3rem;
+  line-height: 3rem;
+  border: 2px dashed var(--bs-border-color);
+  padding: $spacing * 2;
+  color: var(--text-color);
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: $spacing * 2;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  [dir='rtl'] & {
+    left: unset;
+    right: 0;
+  }
+
+  & input[type='file'] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    [dir='rtl'] & {
+      left: unset;
+      right: 0;
+    }
+  }
+}
