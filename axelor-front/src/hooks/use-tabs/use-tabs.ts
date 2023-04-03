@@ -114,8 +114,9 @@ export type Tab = {
   state: TabAtom;
 };
 
-const tabsAtom = atom<{ active?: string; tabs: Tab[] }>({
+const tabsAtom = atom<{ active?: string; tabs: Tab[]; popups: Tab[] }>({
   tabs: [],
+  popups: [],
 });
 
 const activeAtom = selectAtom(tabsAtom, (state) =>
@@ -199,7 +200,54 @@ export type OpenTab = (
  */
 export type CloseTab = (view: ActionView | string) => void;
 
-const openAtom = atom(
+export async function initTab(
+  view: ActionView | string,
+  route?: Omit<TabRoute, "action">
+) {
+  const actionName = viewName(view);
+  const actionView =
+    typeof view === "object" && view.views?.length
+      ? view
+      : await findActionView(actionName);
+
+  if (actionView) {
+    const { name: id, title, viewType } = actionView;
+    const type = getViewType(route?.mode ?? viewType);
+    const mode = getViewMode(type, route?.mode);
+
+    const initState = updateRouteState(id, { type, title }, { ...route, mode });
+
+    const tabAtom = atom<TabState>(initState);
+
+    // create a derived atom to intercept mutation
+    const state: TabAtom = atom(
+      (get) => get(tabAtom),
+      (get, set, arg) => {
+        const prev = get(tabAtom);
+        if (prev !== arg) {
+          set(tabAtom, (state) => {
+            const type = arg?.type ?? prev.type;
+            const route = arg?.routes?.[type] ?? prev.routes?.[type];
+            return updateRouteState(id, { ...state, ...arg }, route);
+          });
+        }
+      }
+    );
+
+    const tab: Tab = {
+      id,
+      title,
+      action: actionView,
+      state: state,
+    };
+
+    return tab;
+  }
+
+  return null;
+}
+
+const openTabAtom = atom(
   null,
   async (
     get,
@@ -207,10 +255,11 @@ const openAtom = atom(
     view: ActionView | string,
     route?: Omit<TabRoute, "action">
   ): Promise<Tab | null> => {
-    const { active, tabs } = get(tabsAtom);
+    const { active, tabs, popups } = get(tabsAtom);
 
     const name = viewName(view);
-    const found = tabs.find((x) => x.id === name);
+    const found =
+      tabs.find((x) => x.id === name) ?? popups.find((x) => x.id === name);
 
     if (found) {
       const viewState = get(found.state);
@@ -219,68 +268,32 @@ const openAtom = atom(
     }
 
     if (found && found.id === active) return null;
-    if (found) {
+    if (found && tabs.includes(found)) {
       set(tabsAtom, (prev) => ({ ...prev, active: name }));
+    }
+    if (found) {
       return found;
     }
 
-    const actionView =
-      typeof view === "object" && view.views?.length
-        ? view
-        : await findActionView(name);
+    const tab = await initTab(view, route);
+    const popup = Boolean(tab?.action?.params?.popup);
 
-    if (actionView) {
-      const { name: id, title, viewType } = actionView;
-      const type = getViewType(route?.mode ?? viewType);
-      const mode = getViewMode(type, route?.mode);
-
-      const initState = updateRouteState(
-        id,
-        { type, title },
-        {
-          ...route,
-          mode,
-        }
-      );
-
-      const tabAtom = atom<TabState>(initState);
-
-      // create a derived atom to intercept mutation
-      const state: TabAtom = atom(
-        (get) => get(tabAtom),
-        (get, set, arg) => {
-          const prev = get(tabAtom);
-          if (prev !== arg) {
-            set(tabAtom, (state) => {
-              const type = arg?.type ?? prev.type;
-              const route = arg?.routes?.[type] ?? prev.routes?.[type];
-              return updateRouteState(id, { ...state, ...arg }, route);
-            });
-          }
-        }
-      );
-
-      const tab = {
-        id,
-        title,
-        action: actionView,
-        state: state,
-      };
-
-      set(tabsAtom, (state) => ({
-        active: tab.id,
-        tabs: [...state.tabs, tab],
-      }));
-
-      return tab;
+    if (tab) {
+      set(tabsAtom, (state) => {
+        const { active, tabs, popups } = state;
+        const newState = popup
+          ? { active, tabs, popups: [...popups, tab] }
+          : { active: tab.id, tabs: [...tabs, tab], popups };
+        return newState;
+      });
     }
 
-    return null;
+    return tab;
   }
 );
 
-const closeAtom = atom(null, async (get, set, view: ActionView | string) => {
-  const { active, tabs } = get(tabsAtom);
+const closeTabAtom = atom(null, async (get, set, view: ActionView | string) => {
+  const { active, tabs, popups } = get(tabsAtom);
   const name = viewName(view);
   const found = tabs.find((x) => x.id === name);
   if (found) {
@@ -292,16 +305,28 @@ const closeAtom = atom(null, async (get, set, view: ActionView | string) => {
     }
 
     const newTabs = tabs.filter((x) => x.id !== name);
-
     set(tabsAtom, {
       active: next,
       tabs: newTabs,
+      popups,
     });
 
     // if it was a last tab
     if (newTabs.length === 0) {
       navigate("/");
     }
+
+    return;
+  }
+
+  const popup = popups.find((x) => x.id === name);
+  if (popup) {
+    const newPopups = popups.filter((x) => x.id !== name);
+    set(tabsAtom, {
+      active,
+      tabs,
+      popups: newPopups,
+    });
   }
 });
 
@@ -312,15 +337,16 @@ const closeAtom = atom(null, async (get, set, view: ActionView | string) => {
  *          methods to open new views or close a view.
  */
 export function useTabs() {
-  const { tabs: items } = useAtomValue(tabsAtom);
+  const { tabs: items, popups } = useAtomValue(tabsAtom);
   const active = useAtomValue(activeAtom) ?? null;
 
-  const open: OpenTab = useSetAtom(openAtom);
-  const close: CloseTab = useSetAtom(closeAtom);
+  const open: OpenTab = useSetAtom(openTabAtom);
+  const close: CloseTab = useSetAtom(closeTabAtom);
 
   return {
     active,
     items,
+    popups,
     open,
     close,
   };
@@ -328,5 +354,5 @@ export function useTabs() {
 
 // for internal use only with action handler
 export function openTab_internal(view: ActionView) {
-  getDefaultStore().set(openAtom, view);
+  getDefaultStore().set(openTabAtom, view);
 }
