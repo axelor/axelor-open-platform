@@ -31,6 +31,7 @@ export function Grid(
     view: GridView;
     fields?: MetaData["fields"];
     searchOptions?: Partial<SearchOptions>;
+    showEditIcon?: boolean;
     onSearch: (options?: SearchOptions) => Promise<SearchResult>;
     onEdit?: (record: GridRow["record"]) => any;
     onView?: (record: GridRow["record"]) => any;
@@ -41,6 +42,7 @@ export function Grid(
     fields,
     dataStore,
     searchOptions,
+    showEditIcon = true,
     onSearch,
     onEdit,
     onView,
@@ -94,7 +96,7 @@ export function Grid(
       } as any;
     });
 
-    if (view.editIcon !== false) {
+    if (showEditIcon && view.editIcon !== false) {
       columns.unshift({
         title: "",
         name: "$$edit",
@@ -107,7 +109,7 @@ export function Grid(
     }
 
     return { columns, names: uniq(names) };
-  }, [view, fields]);
+  }, [view.items, view.editIcon, showEditIcon, fields]);
 
   const init = useAsync(async () => {
     onSearch({ ...searchOptions, fields: names });
