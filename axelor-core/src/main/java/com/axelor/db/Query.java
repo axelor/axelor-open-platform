@@ -419,8 +419,8 @@ public class Query<T extends Model> {
    * @return the matched record at given offset, or null if there are no results.
    */
   public T fetchOne(int offset) {
-      List<T> resultList = fetch(1, offset);
-      return resultList == null || resultList.isEmpty() ? null : resultList.get(0);
+    List<T> resultList = fetch(1, offset);
+    return resultList == null || resultList.isEmpty() ? null : resultList.get(0);
   }
 
   /**
