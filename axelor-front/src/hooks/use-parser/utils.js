@@ -122,8 +122,14 @@ function resolveFilter(match) {
   return "{{" + code + "}}";
 }
 
-export function parseAngularExp(str) {
-  return cache.get(makeKey("ng-expr", str), () =>
-    parseTemplate(str.replace(/\{\{(.*?)\}\}/g, resolveFilter))
+/**
+ * Parse the given expression.
+ *
+ * @param {string} expr the expression to parse
+ * @returns {(context: object) => any}
+ */
+export function parseAngularExp(expr) {
+  return cache.get(makeKey("ng-expr", expr), () =>
+    parseTemplate(expr.replace(/\{\{(.*?)\}\}/g, resolveFilter))
   );
 }

@@ -1,21 +1,21 @@
-import React from "react";
-import { parseFragment } from "parse5";
 import { legacyClassNames } from "@/styles/legacy";
 import get from "lodash/get";
 import isEmpty from "lodash/isEmpty";
+import { parseFragment } from "parse5";
+import React from "react";
 import {
   ATTRIBUTES,
-  HTML_REACT_ATTRIBUTES,
   HTML_ATTRIBUTES,
+  HTML_REACT_ATTRIBUTES,
 } from "./constants";
 import {
-  parseTemplate,
-  parseExpression,
   getStyleObject,
-  isObject,
   isArray,
-  stringToObject,
+  isObject,
   parseAngularExp,
+  parseExpression,
+  parseTemplate,
+  stringToObject,
 } from "./utils";
 
 const REACT_COMPONENTS = [];
@@ -154,6 +154,10 @@ export const ATTR_EVALUATOR = {
 };
 
 function process(root) {
+  /**
+   * @param {any} element
+   * @returns {(props: {context: DataContext}) => JSX.Element | null}
+   */
   function processElement(element) {
     if (element === undefined) return;
     const { value, tagName } = element;
@@ -394,7 +398,7 @@ function replaceTag(str) {
   return tag + closingTag;
 }
 
-function processTemplate(template) {
+export function processTemplate(template) {
   const newTemplate = template.replace(/<([^/>]+)\/>/g, replaceTag);
   const { childNodes = [] } = parseFragment(newTemplate);
   const hasSingleChild = childNodes.length === 1;
@@ -410,25 +414,4 @@ function processTemplate(template) {
         }
   );
   return process(tree);
-}
-
-function TemplateError({ context = {} }) {
-  return (
-    <div>
-      <h4> Record: {context?.record?.id} </h4>
-    </div>
-  );
-}
-
-const CACHE = {};
-
-export function useTemplate(template) {
-  try {
-    return (
-      CACHE[template] || (CACHE[template] = processTemplate(template.trim()))
-    );
-  } catch (err) {
-    console.log(err);
-    return TemplateError;
-  }
 }

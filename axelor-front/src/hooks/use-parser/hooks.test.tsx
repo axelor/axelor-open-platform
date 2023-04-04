@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { useTemplate } from "./use-parser";
+import { useTemplate } from "./hooks";
 
 describe("use-parser tests", () => {
   function TestComponent({ template, ...props }: any) {
