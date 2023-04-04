@@ -129,6 +129,28 @@ const formatNumber: Formatter = (value, opts = {}) => {
   return value;
 };
 
+const formatPercent: Formatter = (value, opts = {}) => {
+  const { props, context = {} } = opts;
+  let { scale } = props ?? {};
+
+  // referencing another field in the context?
+  if (typeof scale === "string") {
+    scale = (_.get(context, scale) as number) ?? scale;
+  }
+
+  let num = +value;
+  if (num === 0 || num) {
+    const opts: Intl.NumberFormatOptions = { style: "percent" };
+    if (scale) {
+      opts.minimumFractionDigits = +scale;
+      opts.maximumFractionDigits = +scale;
+    }
+    return l10n.formatNumber(num, opts);
+  }
+
+  return value;
+};
+
 const formatBoolean: Formatter = (value, opts = {}) => {
   return Boolean(value).toString();
 };
@@ -160,6 +182,7 @@ export const Formatters = {
   integer: formatNumber,
   long: formatNumber,
   decimal: formatNumber,
+  percent: formatPercent,
   boolean: formatBoolean,
   date: formatDate,
   time: formatTime,
