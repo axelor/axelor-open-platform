@@ -16,10 +16,11 @@ import {
 } from "@/view-containers/views/scope";
 
 import { ViewProps } from "../types";
-import { Grid as GridComponent, GridPager } from "./builder";
+import { Grid as GridComponent } from "./builder";
 import { useGridState } from "./builder/utils";
 
 import styles from "./grid.module.scss";
+import { PageText } from "@/components/page-text";
 
 export function Grid(props: ViewProps<GridView>) {
   const { meta, dataStore, domains } = props;
@@ -223,7 +224,7 @@ export function Grid(props: ViewProps<GridView>) {
           canNext,
           onPrev: () => switchTo({ id: String(currentPage - 1), mode: "list" }),
           onNext: () => switchTo({ id: String(currentPage + 1), mode: "list" }),
-          text: () => <GridPager page={page} onPageChange={onSearch} />,
+          text: () => <PageText dataStore={dataStore} />,
         }}
       >
         <AdvanceSearch
