@@ -1,1 +1,1 @@
-export * from "./template-utils";
+export * from "./hooks";
