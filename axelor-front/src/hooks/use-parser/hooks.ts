@@ -1,6 +1,7 @@
 import { createElement, useCallback, useMemo } from "react";
 
 import { DataContext } from "@/services/client/data.types";
+import { Hilite } from "@/services/client/meta.types";
 import { EvalContextOptions, createEvalContext } from "./eval-context";
 import { processTemplate } from "./template-utils";
 import { parseAngularExp, parseExpression } from "./utils";
@@ -30,4 +31,16 @@ export function useTemplate(template: string) {
       return createElement(Comp, { context });
     };
   }, [template]);
+}
+
+export function useHilites(hilites: Hilite[]) {
+  return useCallback(
+    (context: DataContext, options?: EvalContextOptions) => {
+      const evalContext = createEvalContext(context, options);
+      return hilites.filter((x) =>
+        parseExpression(x.condition ?? "")(evalContext)
+      );
+    },
+    [hilites]
+  );
 }
