@@ -5,9 +5,15 @@ const cache = new LoadingCache();
 
 const makeKey = (...args) => args.map((x) => x || "").join(":");
 
-export const parseTemplate = (str) => {
-  return cache.get(makeKey("template", str), () => {
-    const text1 = str.replace(/(?!(\$|\\))\{{/g, "$1${");
+/**
+ * Parse the given template.
+ *
+ * @param {string} tmpl the tempalte the parse
+ * @returns {(context: object) => any}
+ */
+export const parseTemplate = (tmpl) => {
+  return cache.get(makeKey("template", tmpl), () => {
+    const text1 = tmpl.replace(/(?!(\$|\\))\{{/g, "$1${");
     const text = text1.replace(/(?!(\$|\\))\}}/g, "}");
 
     if (!text.includes("${")) {
@@ -26,14 +32,20 @@ export const parseTemplate = (str) => {
   });
 };
 
-export const parseExpression = (str) => {
-  return cache.get(makeKey("expr", str), () => {
-    const fn = parseSafe(str);
+/**
+ * Parse the given expression.
+ *
+ * @param {string} expr the expression to parse
+ * @returns {(context: object) => any}
+ */
+export const parseExpression = (expr) => {
+  return cache.get(makeKey("expr", expr), () => {
+    const fn = parseSafe(expr);
     return (...args) => {
       try {
         return fn(...args);
       } catch {
-        console.error(`Invalid expression : ${str}`);
+        console.error(`Invalid expression : ${expr}`);
         return false;
       }
     };
