@@ -103,10 +103,6 @@ const formatNumber: Formatter = (value, opts = {}) => {
     return value;
   }
 
-  if (scale === undefined) {
-    return value;
-  }
-
   // referencing another field in the context?
   if (typeof scale === "string") {
     scale = (_.get(context, scale) as number) ?? scale;
@@ -119,10 +115,11 @@ const formatNumber: Formatter = (value, opts = {}) => {
 
   let num = +value;
   if (num === 0 || num) {
-    const opts: Intl.NumberFormatOptions = {
-      minimumFractionDigits: +scale,
-      maximumFractionDigits: +scale,
-    };
+    const opts: Intl.NumberFormatOptions = {};
+    if (scale || currency) {
+      opts.minimumFractionDigits = +(scale ?? 2);
+      opts.maximumFractionDigits = +(scale ?? 2);
+    }
     if (currency) {
       opts.style = "currency";
       opts.currency = currency;
