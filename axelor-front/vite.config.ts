@@ -16,11 +16,21 @@ export default defineConfig({
   ],
   optimizeDeps: {
     include: [
+      "@babel/standalone",
       "react/jsx-runtime",
       "react-dnd-html5-backend",
       "jotai-immer",
       "jotai-optics",
       "dayjs",
+      "lodash",
+      "lodash/uniq",
+      "lodash/isNumber",
+      "lodash/isNaN",
+      "lodash/isObject",
+      "lodash/get",
+      "lodash/isEmpty",
+      "immer",
+      "parse5",
     ],
   },
   resolve: {
