@@ -8,3 +8,16 @@
   opacity: 0.4;
   z-index: 1;
 }
+
+.title {
+  flex: 1;
+}
+
+.content {
+  display: flex;
+  padding: 0;
+}
+
+.box {
+  padding: var(--bs-modal-padding);
+}

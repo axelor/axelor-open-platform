@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { Provider, atom, createStore, useAtomValue } from "jotai";
 import { uniqueId } from "lodash";
 import { useCallback, useState } from "react";
@@ -42,8 +43,9 @@ export type DialogOptions = {
   onClose?: (result: boolean) => void;
 };
 
-type DialogProps = DialogOptions & {
+type DialogProps = {
   id: string;
+  options: DialogOptions;
 };
 
 const dialogsAtom = atom<DialogProps[]>([]);
@@ -51,18 +53,35 @@ const dialogsStore = createStore();
 
 function showDialog(options: DialogOptions) {
   const id = uniqueId("d");
-  dialogsStore.set(dialogsAtom, (prev) => [...prev, { id, ...options }]);
-}
-
-function closeDialog(id: string) {
-  const dialogs = dialogsStore.get(dialogsAtom);
-  const found = dialogs.find((x) => x.id === id);
-  if (found) {
+  dialogsStore.set(dialogsAtom, (prev) => [...prev, { id, options }]);
+  return () => {
     dialogsStore.set(dialogsAtom, (prev) => prev.filter((x) => x.id !== id));
-  }
+  };
 }
 
 export module dialogs {
+  export async function modal(options: DialogOptions) {
+    const { onClose, classes, ...rest } = options;
+    const handleClose = async (result: boolean) => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(result);
+          onClose?.(result);
+          close();
+        }, 100);
+      });
+    };
+    const close = showDialog({
+      ...rest,
+      classes: {
+        ...classes,
+        content: clsx(styles.content, classes?.content),
+      },
+      onClose: handleClose,
+    });
+    return handleClose;
+  }
+
   export async function box({
     title = i18n.get("Information"),
     content,
@@ -88,12 +107,16 @@ export module dialogs {
       content = <SenitizedContent content={content} />;
     }
 
-    return new Promise<boolean>((resolve) => {
-      showDialog({
+    return new Promise<boolean>(async (resolve) => {
+      const close = await modal({
         title,
         content,
         buttons,
-        onClose: resolve,
+        classes: { content: styles.box },
+        onClose: async (result) => {
+          await close(result);
+          resolve(result);
+        },
       });
     });
   }
@@ -135,8 +158,8 @@ function Dialogs() {
   const dialogs = useAtomValue(dialogsAtom);
   return (
     <Portal>
-      {dialogs.map((dialog) => (
-        <ModalDialog key={dialog.id} {...dialog} />
+      {dialogs.map(({ id, options }) => (
+        <ModalDialog key={id} {...options} />
       ))}
       {dialogs.length > 0 && (
         <Fade in={true}>
@@ -168,9 +191,8 @@ const defaultButtons: DialogButton[] = [
 
 const defaultOnClose = () => {};
 
-export function ModalDialog(props: DialogProps) {
+export function ModalDialog(props: DialogOptions) {
   const {
-    id,
     size,
     title,
     content,
@@ -186,9 +208,8 @@ export function ModalDialog(props: DialogProps) {
     (result: boolean) => {
       setOpen(false);
       onClose(result);
-      setTimeout(() => closeDialog(id), 300);
     },
-    [id, onClose]
+    [onClose]
   );
 
   return (
@@ -197,7 +218,7 @@ export function ModalDialog(props: DialogProps) {
         onCloseClick={(e) => close(false)}
         className={classes.header}
       >
-        <DialogTitle>{title}</DialogTitle>
+        <DialogTitle className={styles.title}>{title}</DialogTitle>
         {header}
       </DialogHeader>
       <DialogContent className={classes.content}>{content}</DialogContent>
