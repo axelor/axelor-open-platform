@@ -1,10 +1,9 @@
-import { useMemo } from "react";
-import { parseExpression } from "@/hooks/use-parser/utils";
 import { Field } from "@/services/client/meta.types";
 import { legacyClassNames } from "@/styles/legacy";
 import { Box } from "@axelor/ui";
 import { GridColumnProps } from "@axelor/ui/grid/grid-column";
 import { useWidgetComp } from "../../hooks";
+import { useHilites } from "@/hooks/use-parser";
 
 function CellRenderer(props: GridColumnProps) {
   const { type, widget } = props.data as Field;
@@ -18,16 +17,7 @@ export function Cell(props: GridColumnProps) {
   const { type, widget, hilites } = data as Field;
   const { children, style, className, onClick } =
     props as React.HTMLAttributes<HTMLDivElement>;
-
-  const $className = useMemo(
-    () =>
-      (hilites || [])
-        .filter(({ condition }) => parseExpression(condition)(record))
-        .slice(0, 1)
-        .map((x) => x.css)
-        .join(" "),
-    [hilites, record]
-  );
+  const $className = useHilites(hilites ?? [])(record)?.[0]?.css;
 
   function render() {
     if (widget || type !== "field") {
