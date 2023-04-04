@@ -8,7 +8,7 @@ const makeKey = (...args) => args.map((x) => x || "").join(":");
 /**
  * Parse the given template.
  *
- * @param {string} tmpl the tempalte the parse
+ * @param {string} tmpl the tempalte to parse
  * @returns {(context: object) => any}
  */
 export const parseTemplate = (tmpl) => {
@@ -110,7 +110,7 @@ function resolveFilter(match) {
   let code = arr.shift().trim();
   arr.forEach((a) => {
     const [filterName, ...values] = a.trim().split(":");
-    const value = values.join(":");
+    const value = values.join(",");
     if (filterName && SUPPORTED_FILTERS.includes(filterName)) {
       if (value) {
         code = `__${filterName.trim()}(${code},${value})`;
