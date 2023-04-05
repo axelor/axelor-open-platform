@@ -15,4 +15,3 @@ While submitting, please remove or obfuscate any private data.
 
 After it has been submitted, the Security Team will investigate the vulnerability, determine its effects and 
 criticality and notify to the reporter.
-
