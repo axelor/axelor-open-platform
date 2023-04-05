@@ -4,6 +4,30 @@ import {
   DataRecord,
 } from "@/services/client/data.types";
 
+export interface IActionData {
+  type: string;
+  target: string;
+  value: any;
+}
+
+export interface ActionAttrData extends IActionData {
+  type: "attr";
+  name: string;
+}
+
+export interface ActionValueData extends IActionData {
+  type: "value";
+  op: "set" | "add" | "del";
+}
+
+export interface ActionFocusData extends IActionData {
+  type: "focus";
+}
+
+export type ActionData = ActionAttrData | ActionValueData | ActionFocusData;
+
+export type ActionListener = (data: ActionData) => void;
+
 export interface ActionHandler {
   setAttr(target: string, name: string, value: any): any;
   setFocus(target: string): void;
@@ -26,6 +50,10 @@ export interface ActionHandler {
   getContext(): DataContext;
 
   onSignal(signal: string, data?: any): Promise<void>;
+
+  subscribe(subscriber: ActionListener): () => void;
+
+  notify(data: ActionData): void;
 }
 
 export type ActionOptions = {
