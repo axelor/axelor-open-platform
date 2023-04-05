@@ -10,14 +10,19 @@ import { useViewRoute } from "@/view-containers/views/scope";
 
 import { ViewProps } from "../types";
 
-import { Form as FormComponent, FormLayout, FormWidget } from "./builder";
-import { fallbackFormAtom, fallbackWidgetAtom } from "./builder/atoms";
+import {
+  Form as FormComponent,
+  FormLayout,
+  FormWidget,
+  useFormHandlers,
+} from "./builder";
+import { fallbackWidgetAtom } from "./builder/atoms";
 
 import styles from "./form.module.scss";
 
 export function Form({ meta, dataStore }: ViewProps<FormView>) {
   const { id } = useViewRoute("form");
-  const { data } = useAsync(async (): Promise<DataRecord> => {
+  const { data: record = {} } = useAsync(async (): Promise<DataRecord> => {
     if (id) {
       const fields = Object.keys(meta.fields ?? {});
       const related = meta.related;
@@ -29,7 +34,10 @@ export function Form({ meta, dataStore }: ViewProps<FormView>) {
     return {};
   }, [id, meta, dataStore]);
 
-  const record = data ?? {};
+  const { formAtom, actionHandler, actionExecutor } = useFormHandlers(
+    meta,
+    record
+  );
 
   return (
     <div className={styles.formViewContainer}>
@@ -72,8 +80,10 @@ export function Form({ meta, dataStore }: ViewProps<FormView>) {
           schema={meta.view}
           fields={meta.fields!}
           record={record}
+          formAtom={formAtom}
+          actionHandler={actionHandler}
+          actionExecutor={actionExecutor}
           layout={Layout}
-          formAtom={fallbackFormAtom}
           widgetAtom={fallbackWidgetAtom}
         />
       </div>

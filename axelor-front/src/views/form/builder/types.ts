@@ -2,6 +2,7 @@ import { PrimitiveAtom, WritableAtom } from "jotai";
 
 import { DataContext, DataRecord } from "@/services/client/data.types";
 import { Property, Schema } from "@/services/client/meta.types";
+import { ActionExecutor, ActionHandler } from "@/view-containers/action";
 
 // TODO: add more attrs that can be changed
 export const DEFAULT_ATTRS = {
@@ -53,6 +54,8 @@ export interface FieldProps<T> extends WidgetProps {
 export interface FormProps extends WidgetProps {
   record: DataRecord;
   fields: Record<string, Property>;
+  actionHandler: ActionHandler;
+  actionExecutor: ActionExecutor;
   className?: string;
   layout?: FormLayout;
 }
