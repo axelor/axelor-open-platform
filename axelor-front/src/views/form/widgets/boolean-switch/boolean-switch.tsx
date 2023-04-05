@@ -1,4 +1,4 @@
-import { InputLabel, Switch } from "@axelor/ui";
+import { Switch } from "@axelor/ui";
 import { FieldContainer, FieldProps } from "../../builder";
 import { useAtom } from "jotai";
 
@@ -11,7 +11,7 @@ export function BooleanSwitch({
   const [value = false, setValue] = useAtom(valueAtom);
   return (
     <FieldContainer readonly={readonly}>
-      <InputLabel htmlFor={uid}>{title}</InputLabel>
+      <label htmlFor={uid}>{title}</label>
       <Switch
         id={uid}
         checked={value ?? false}

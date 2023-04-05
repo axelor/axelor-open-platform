@@ -1,4 +1,4 @@
-import { Box, Button, InputLabel } from "@axelor/ui";
+import { Box, Button } from "@axelor/ui";
 import { FieldContainer, FieldProps } from "../../builder";
 import { useAtom } from "jotai";
 import { legacyClassNames } from "@/styles/legacy";
@@ -9,7 +9,7 @@ export function Toggle({ schema, readonly, valueAtom }: FieldProps<boolean>) {
   const [value = false, setValue] = useAtom(valueAtom);
   return (
     <FieldContainer className={classes.container} readonly={readonly}>
-      <InputLabel htmlFor={uid}>{title}</InputLabel>
+      <label htmlFor={uid}>{title}</label>
       <Button variant="light" id={uid} onClick={() => !readonly && setValue(!value, true)}>
         <Box
           as="i"

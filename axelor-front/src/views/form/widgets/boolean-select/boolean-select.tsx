@@ -1,4 +1,4 @@
-import { Input, InputLabel, Select } from "@axelor/ui";
+import { Input, Select } from "@axelor/ui";
 import { FieldContainer, FieldProps } from "../../builder";
 import { useAtom } from "jotai";
 import { useCallback, useMemo } from "react";
@@ -42,7 +42,7 @@ export function BooleanSelect({
 
   return (
     <FieldContainer readonly={readonly}>
-      <InputLabel htmlFor={uid}>{title}</InputLabel>
+      <label htmlFor={uid}>{title}</label>
       {readonly ? (
         <Input
           type="text"

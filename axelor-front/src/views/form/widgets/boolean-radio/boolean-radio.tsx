@@ -1,4 +1,4 @@
-import { Box, Input, InputLabel } from "@axelor/ui";
+import { Box, Input } from "@axelor/ui";
 import { FieldContainer, FieldProps } from "../../builder";
 import { useAtom } from "jotai";
 import { i18n } from "@/services/client/i18n";
@@ -35,7 +35,7 @@ export function BooleanRadio({
 
   return (
     <FieldContainer readonly={readonly}>
-      <InputLabel htmlFor={uid}>{title}</InputLabel>
+      <label htmlFor={uid}>{title}</label>
       <Box
         d="flex"
         flexDirection={direction === 'vertical' ? "column" : "row"}
