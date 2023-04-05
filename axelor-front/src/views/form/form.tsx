@@ -20,6 +20,7 @@ import {
 } from "./builder";
 import { fallbackWidgetAtom } from "./builder/atoms";
 
+import { DataStore } from "@/services/client/data-store";
 import styles from "./form.module.scss";
 
 export function Form({ meta, dataStore }: ViewProps<FormView>) {
@@ -92,9 +93,9 @@ export function Form({ meta, dataStore }: ViewProps<FormView>) {
       async (get, set) => {
         const rec = get(formAtom).record;
         const res = await dataStore.save(rec);
-        set(formAtom, (prev) => ({ ...prev, record: res }));
+        doEdit(res);
       },
-      [dataStore, formAtom]
+      [dataStore, doEdit, formAtom]
     )
   );
 
@@ -164,6 +165,8 @@ export function Form({ meta, dataStore }: ViewProps<FormView>) {
 
   const onAudit = useAtomCallback(useCallback(async (get, set) => {}, []));
 
+  const pagination = usePagination(dataStore, record, doEdit);
+
   return (
     <div className={styles.formViewContainer}>
       <ViewToolBar
@@ -231,6 +234,7 @@ export function Form({ meta, dataStore }: ViewProps<FormView>) {
             ],
           },
         ]}
+        pagination={pagination}
       />
       <div className={styles.formViewScroller}>
         <FormComponent
@@ -247,6 +251,51 @@ export function Form({ meta, dataStore }: ViewProps<FormView>) {
       </div>
     </div>
   );
+}
+
+function usePagination(
+  dataStore: DataStore,
+  record: DataRecord,
+  doEdit: (rec: DataRecord) => any
+) {
+  const { offset = 0, limit = 0, totalCount = 0 } = dataStore.page;
+  const index = dataStore.records.findIndex((x) => x.id === record.id);
+
+  const onPrev = useCallback(async () => {
+    let prev = dataStore.records[index - 1];
+    if (prev === undefined) {
+      const { records = [] } = await dataStore.search({
+        offset: offset - limit,
+      });
+      prev = records[records.length - 1];
+    }
+    doEdit(prev);
+  }, [dataStore, doEdit, index, limit, offset]);
+
+  const onNext = useCallback(async () => {
+    let next = dataStore.records[index + 1];
+    if (next === undefined) {
+      const { records = [] } = await dataStore.search({
+        offset: offset + limit,
+      });
+      next = records[0];
+    }
+    doEdit(next);
+  }, [dataStore, doEdit, index, limit, offset]);
+
+  const canPrev = index > -1 && offset + index > 0;
+  const canNext = index > -1 && offset + index < totalCount - 1;
+
+  const text =
+    index > -1 ? i18n.get("{0} of {1}", offset + index + 1, totalCount) : "";
+
+  return {
+    canPrev,
+    canNext,
+    onPrev,
+    onNext,
+    text,
+  };
 }
 
 const Layout: FormLayout = ({ schema, formAtom, className }) => {
