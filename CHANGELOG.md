@@ -1,3 +1,27 @@
+## 5.4.20 (2023-04-05)
+
+#### Fixed
+
+* Don't reload dashlet custom view when the widget is not visible
+* Fix empty recipients list when posting message or adding followers
+* Fix missing "refresh", "new", "prev", and "next" keyboard shortcuts on cards and kanban views
+* Fix editable grid preventing save
+
+  <details>
+  
+  On slow network and/or big grids, going in and out of grid edit
+  may trigger duplicate grid edit events and mess with the counting
+  of active editable grids. This could cause saving to fail.
+  
+  </details>
+
+* Escape data when generating xml
+* Don't allow to post message without body
+
+#### Security
+
+* Check `canNew` view attribute with "create new record" keyboard shortcut
+
 ## 5.4.19 (2023-03-06)
 
 #### Fixed
