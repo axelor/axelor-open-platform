@@ -1,3 +1,58 @@
+## 6.1.2 (2023-04-05)
+
+#### Changes
+
+* Improve resolution of AOP core dependencies
+
+  <details>
+  
+  Use AOP version defined in root project. This avoids to use a version
+  coming from transitive dependencies.
+  
+  For example, if a module is built and published using AOP version 6.1.2
+  and the root project use AOP version 6.1.1, it will now use the AOP
+  version of the project, ie 6.1.1 (instead of getting the AOP version of
+  the transitive dependency of the module).
+  
+  </details>
+
+#### Fixed
+
+* Don't reload dashlet custom view when the widget is not visible
+* Disable exporting on Kanban views
+* Fix empty recipients list when posting message or adding followers
+* Fix onChange triggered after grid edit cancel
+* Fix missing "refresh", "new", "prev", and "next" keyboard shortcuts on cards and kanban views
+* Fix moving record on top level grid
+* Fix grid not editable depending on readonly/canEdit conditions
+* Fix redefined User namecolumn in collaboration widget
+
+  <details>
+  
+  When the namecolumn of the User entity is redefined,
+  it was not taken into account in the collaboration widget.
+  
+  </details>
+
+* Fix editable grid preventing save
+
+  <details>
+  
+  On slow network and/or big grids, going in and out of grid edit
+  may trigger duplicate grid edit events and mess with the counting
+  of active editable grids. This could cause saving to fail.
+  
+  </details>
+
+* Fix export on relational fields
+* Fix spinner buttons triggering onChange inside editable grid
+* Escape data when generating xml
+* Don't allow to post message without body
+
+#### Security
+
+* Check `canNew` view attribute with "create new record" keyboard shortcut
+
 ## 6.1.1 (2023-02-06)
 
 #### Fixed

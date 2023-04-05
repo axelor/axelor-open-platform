@@ -1,7 +1,0 @@
----
-title: Fix editable grid preventing save
-type: fix
-description: |
-  On slow network and/or big grids, going in and out of grid edit
-  may trigger duplicate grid edit events and mess with the counting
-  of active editable grids. This could cause saving to fail.

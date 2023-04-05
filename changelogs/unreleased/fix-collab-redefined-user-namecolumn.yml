@@ -1,6 +1,0 @@
----
-title: Fix redefined User namecolumn in collaboration widget
-type: fix
-description: |
-  When the namecolumn of the User entity is redefined,
-  it was not taken into account in the collaboration widget.
