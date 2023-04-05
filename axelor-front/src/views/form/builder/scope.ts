@@ -106,6 +106,7 @@ function useActionData<T extends ActionData>(
     if (doneRef.current) return;
     if (data) {
       handler(data as T);
+      dataRef.current = null;
     }
   }, [handler, data]);
 }
