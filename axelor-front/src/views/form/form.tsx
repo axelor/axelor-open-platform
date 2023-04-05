@@ -1,15 +1,17 @@
 import clsx from "clsx";
-import { useMemo, useRef } from "react";
+import { useAtomCallback } from "jotai/utils";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
+import { dialogs } from "@/components/dialogs";
 import { useAsync } from "@/hooks/use-async";
 import { useContainerQuery } from "@/hooks/use-container-query";
 import { DataRecord } from "@/services/client/data.types";
+import { i18n } from "@/services/client/i18n";
 import { FormView } from "@/services/client/meta.types";
 import { ViewToolBar } from "@/view-containers/view-toolbar";
-import { useViewRoute } from "@/view-containers/views/scope";
+import { useViewRoute, useViewSwitch } from "@/view-containers/views/scope";
 
 import { ViewProps } from "../types";
-
 import {
   Form as FormComponent,
   FormLayout,
@@ -22,7 +24,8 @@ import styles from "./form.module.scss";
 
 export function Form({ meta, dataStore }: ViewProps<FormView>) {
   const { id } = useViewRoute("form");
-  const { data: record = {} } = useAsync(async (): Promise<DataRecord> => {
+
+  const fetchRecord = useCallback(async (): Promise<DataRecord> => {
     if (id) {
       const fields = Object.keys(meta.fields ?? {});
       const related = meta.related;
@@ -32,12 +35,134 @@ export function Form({ meta, dataStore }: ViewProps<FormView>) {
       });
     }
     return {};
-  }, [id, meta, dataStore]);
+  }, [dataStore, id, meta.fields, meta.related]);
+
+  const { data: record = {} } = useAsync(fetchRecord, [id, meta, dataStore]);
 
   const { formAtom, actionHandler, actionExecutor } = useFormHandlers(
     meta,
     record
   );
+
+  const editRef = useRef<DataRecord | null>(null);
+
+  const switchTo = useViewSwitch();
+
+  const doEdit = useAtomCallback(
+    useCallback(
+      async (get, set, record: DataRecord | null) => {
+        const lastId = id;
+        const nextId = String(record?.id ?? "");
+
+        editRef.current = record;
+
+        if (nextId !== lastId) {
+          switchTo({
+            mode: "edit",
+            id: nextId,
+          });
+        }
+
+        set(formAtom, (prev) => ({
+          ...prev,
+          states: {},
+          record: record ?? {},
+        }));
+      },
+      [formAtom, id, switchTo]
+    )
+  );
+
+  useEffect(() => {
+    if (id) return;
+    doEdit(editRef.current);
+  }, [doEdit, id]);
+
+  const onNew = useAtomCallback(
+    useCallback(
+      async (get, set) => {
+        doEdit(null);
+      },
+      [doEdit]
+    )
+  );
+
+  const onSave = useAtomCallback(
+    useCallback(
+      async (get, set) => {
+        const rec = get(formAtom).record;
+        const res = await dataStore.save(rec);
+        set(formAtom, (prev) => ({ ...prev, record: res }));
+      },
+      [dataStore, formAtom]
+    )
+  );
+
+  const onRefresh = useAtomCallback(
+    useCallback(
+      async (get, set) => {
+        const rec = await fetchRecord();
+        await doEdit(rec);
+      },
+      [doEdit, fetchRecord]
+    )
+  );
+
+  const onDelete = useAtomCallback(
+    useCallback(
+      async (get, set) => {
+        if (record.id) {
+          const confirmed = await dialogs.confirm({
+            content: i18n.get(
+              "Do you really want to delete the selected record?"
+            ),
+          });
+          if (confirmed) {
+            const id = record.id!;
+            const version = record.version!;
+            await dataStore.delete({ id, version });
+            switchTo({ mode: "list" });
+          }
+        }
+      },
+      [dataStore, record.id, record.version, switchTo]
+    )
+  );
+
+  const onCopy = useAtomCallback(
+    useCallback(
+      async (get, set) => {
+        if (record.id) {
+          const rec = await dataStore.copy(record.id);
+          doEdit(rec);
+        }
+      },
+      [dataStore, doEdit, record.id]
+    )
+  );
+
+  const onArchive = useAtomCallback(
+    useCallback(
+      async (get, set) => {
+        if (record.id) {
+          const confirmed = await dialogs.confirm({
+            content: i18n.get(
+              "Do you really want to archive the selected record?"
+            ),
+          });
+          if (confirmed) {
+            const id = record.id!;
+            const version = record.version!;
+            await dataStore.save({ id, version, archived: true });
+            switchTo({ mode: "list" });
+          }
+        }
+      },
+      [dataStore, record.id, record.version, switchTo]
+    )
+  );
+
+  const onAudit = useAtomCallback(useCallback(async (get, set) => {}, []));
 
   return (
     <div className={styles.formViewContainer}>
@@ -46,31 +171,64 @@ export function Form({ meta, dataStore }: ViewProps<FormView>) {
         actions={[
           {
             key: "new",
-            text: "New",
+            text: i18n.get("New"),
             iconProps: {
               icon: "add",
             },
-          },
-          {
-            key: "edit",
-            text: "Edit",
-            iconProps: {
-              icon: "edit",
-            },
+            onClick: onNew,
           },
           {
             key: "save",
-            text: "Save",
+            text: i18n.get("Save"),
             iconProps: {
               icon: "save",
             },
+            onClick: onSave,
           },
           {
-            key: "delete",
-            text: "Delete",
+            key: "more",
+            iconOnly: true,
             iconProps: {
-              icon: "delete",
+              icon: "arrow_drop_down",
             },
+            items: [
+              {
+                key: "refresh",
+                text: i18n.get("Refresh"),
+                onClick: onRefresh,
+              },
+              {
+                key: "delete",
+                text: i18n.get("Delete"),
+                iconProps: {
+                  icon: "delete",
+                },
+                onClick: onDelete,
+              },
+              {
+                key: "copy",
+                text: i18n.get("Duplicate"),
+                onClick: onCopy,
+              },
+              {
+                key: "s1",
+                divider: true,
+              },
+              {
+                key: "archive",
+                text: i18n.get("Archive"),
+                onClick: onArchive,
+              },
+              {
+                key: "s2",
+                divider: true,
+              },
+              {
+                key: "audit",
+                text: i18n.get("Last modified..."),
+                onClick: onAudit,
+              },
+            ],
           },
         ]}
       />
