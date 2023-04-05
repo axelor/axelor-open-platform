@@ -1,16 +1,19 @@
 import { useAtomValue } from "jotai";
 
-import { Input } from "@axelor/ui";
-
+import { InputHTMLAttributes, useCallback, useState } from "react";
+import { Input, InputProps } from "@axelor/ui";
 import { FieldContainer, FieldProps } from "../../builder";
 import { useInput } from "../../builder/hooks";
 
 export function String({
+  inputProps,
   schema,
   readonly,
   widgetAtom,
   valueAtom,
-}: FieldProps<string>) {
+}: FieldProps<string> & {
+  inputProps?: InputHTMLAttributes<HTMLInputElement>;
+}) {
   const { uid, title } = schema;
 
   const { attrs } = useAtomValue(widgetAtom);
@@ -31,6 +34,7 @@ export function String({
           readOnly
           bg="body"
           border={false}
+          {...(inputProps as InputProps)}
         />
       )}
       {readonly || (
@@ -41,6 +45,7 @@ export function String({
           required={required}
           onChange={onChange}
           onBlur={onBlur}
+          {...(inputProps as InputProps)}
         />
       )}
     </FieldContainer>
