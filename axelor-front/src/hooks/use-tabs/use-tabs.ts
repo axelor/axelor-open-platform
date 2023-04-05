@@ -158,7 +158,7 @@ const updateRouteState = (
   route?: Partial<TabRoute>
 ) => {
   const type = getViewType(route?.mode ?? state.type);
-  const { id, qs } = route ?? state.routes?.[type] ?? {};
+  const { id = "", qs = "" } = route ?? state.routes?.[type] ?? {};
   const mode = route?.mode ?? getViewMode(state.type);
   const prev = state.routes?.[type];
   const next = {
