@@ -75,6 +75,7 @@ export module dialogs {
       ...rest,
       classes: {
         ...classes,
+        root: clsx(styles.root, classes?.root),
         content: clsx(styles.content, classes?.content),
       },
       onClose: handleClose,
@@ -161,11 +162,6 @@ function Dialogs() {
       {dialogs.map(({ id, options }) => (
         <ModalDialog key={id} {...options} />
       ))}
-      {dialogs.length > 0 && (
-        <Fade in={true}>
-          <Box className={styles.backdrop}></Box>
-        </Fade>
-      )}
     </Portal>
   );
 }
@@ -213,28 +209,33 @@ export function ModalDialog(props: DialogOptions) {
   );
 
   return (
-    <Dialog open={open} scrollable size={size} className={classes.root}>
-      <DialogHeader
-        onCloseClick={(e) => close(false)}
-        className={classes.header}
-      >
-        <DialogTitle className={styles.title}>{title}</DialogTitle>
-        {header}
-      </DialogHeader>
-      <DialogContent className={classes.content}>{content}</DialogContent>
-      <DialogFooter className={classes.footer}>
-        {footer}
-        {buttons.map((button) => (
-          <Button
-            key={button.name}
-            type="button"
-            variant={button.variant}
-            onClick={() => button.onClick(close)}
-          >
-            {button.title}
-          </Button>
-        ))}
-      </DialogFooter>
-    </Dialog>
+    <>
+      <Dialog open={open} scrollable size={size} className={classes.root}>
+        <DialogHeader
+          onCloseClick={(e) => close(false)}
+          className={classes.header}
+        >
+          <DialogTitle className={styles.title}>{title}</DialogTitle>
+          {header}
+        </DialogHeader>
+        <DialogContent className={classes.content}>{content}</DialogContent>
+        <DialogFooter className={classes.footer}>
+          {footer}
+          {buttons.map((button) => (
+            <Button
+              key={button.name}
+              type="button"
+              variant={button.variant}
+              onClick={() => button.onClick(close)}
+            >
+              {button.title}
+            </Button>
+          ))}
+        </DialogFooter>
+      </Dialog>
+      <Fade in={open}>
+        <Box className={styles.backdrop}></Box>
+      </Fade>
+    </>
   );
 }

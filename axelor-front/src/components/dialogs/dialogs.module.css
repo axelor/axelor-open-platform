@@ -1,3 +1,7 @@
+.root {
+  z-index: inherit;
+}
+
 .backdrop {
   position: fixed;
   top: 0;
@@ -6,7 +10,6 @@
   height: 100%;
   background-color: #000;
   opacity: 0.4;
-  z-index: 1;
 }
 
 .title {
