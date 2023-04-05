@@ -130,7 +130,7 @@ export function Grid(props: ViewProps<GridView>) {
     [rows, selectedRows, dataStore, clearSelection, onSearch]
   );
 
-  const currentPage = +(viewRoute?.id ?? 1);
+  const currentPage = +(viewRoute?.id || 1);
 
   const { page } = dataStore;
   const { offset = 0, limit = 40, totalCount = 0 } = page;

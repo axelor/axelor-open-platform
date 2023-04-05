@@ -17,7 +17,7 @@ const getURL = (
   }
 
   if (mode === "list") {
-    id = id ?? "1";
+    id = id || "1";
   }
 
   return generatePath("/ds/:action/:mode?/:id?", {
