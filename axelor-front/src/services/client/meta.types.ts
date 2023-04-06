@@ -419,7 +419,6 @@ export interface HelpOverride {
 }
 
 export interface View {
-  uid: string;
   type: string;
   xmlId?: string;
   viewId?: number;
