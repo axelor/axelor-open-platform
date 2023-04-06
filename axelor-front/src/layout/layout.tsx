@@ -1,8 +1,11 @@
-import { Box } from "@axelor/ui";
 import clsx from "clsx";
 import { Outlet } from "react-router-dom";
 
+import { Box } from "@axelor/ui";
+
+import { AlertsProvider } from "@/components/alerts";
 import { DialogsProvider } from "@/components/dialogs";
+import { PopupsProvider } from "@/view-containers/view-popup";
 
 import { NavDrawer } from "./nav-drawer";
 import { useSidebar } from "./nav-drawer/hook";
@@ -10,7 +13,6 @@ import { NavHeader } from "./nav-header";
 import { NavTabs } from "./nav-tabs";
 
 import styles from "./layout.module.scss";
-import { AlertsProvider } from "@/components/alerts";
 
 export function Layout() {
   const { sidebar } = useSidebar();
@@ -42,6 +44,7 @@ export function Layout() {
           </div>
         </Box>
       </Box>
+      <PopupsProvider />
       <DialogsProvider />
       <AlertsProvider />
     </Box>
