@@ -104,10 +104,16 @@ function FormContainer({
     )
   );
 
-  const onRefresh = useCallback(async () => {
-    const rec = await doRead(record.id ?? "");
-    await doEdit(rec);
-  }, [doEdit, doRead, record.id]);
+  const onRefresh = useAtomCallback(
+    useCallback(
+      async (get) => {
+        const cur = get(formAtom).record;
+        const rec = await doRead(cur.id ?? "");
+        await doEdit(rec);
+      },
+      [doEdit, doRead, formAtom]
+    )
+  );
 
   const onDelete = useCallback(async () => {
     if (record.id) {
