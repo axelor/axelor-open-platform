@@ -91,6 +91,8 @@ export function useViewSwitch() {
 
   const switchTo = useCallback<SwitchTo>(
     (arg) => {
+      // XXX: this may happen during HMR as useViewTab may pickup fallbackTab
+      if (!action) return;
       if (typeof arg === "string") {
         setViewState({ type: arg });
       } else {
