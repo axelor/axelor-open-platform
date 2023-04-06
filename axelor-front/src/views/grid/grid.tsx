@@ -1,5 +1,5 @@
 import { atom, useAtom } from "jotai";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { GridRow } from "@axelor/ui/grid";
 
@@ -30,6 +30,7 @@ export function Grid(props: ViewProps<GridView>) {
 
   const viewRoute = useViewRoute("grid");
   const [viewProps, setViewProps] = useViewProps();
+  const pageSetRef = useRef(false);
 
   const switchTo = useViewSwitch();
 
@@ -145,14 +146,19 @@ export function Grid(props: ViewProps<GridView>) {
     });
   }, [state, onSearch, setPopupOptions, popup, dataStore]);
 
-  const currentPage = +(viewRoute?.id || 1);
-
   const { page } = dataStore;
   const { offset = 0, limit = 40, totalCount = 0 } = page;
 
   const canPrev = offset > 0;
   const canNext = offset + limit < totalCount;
   const hasRowSelected = !!selectedRows?.length;
+  const currentPage = useMemo(() => {
+    if (pageSetRef.current || dataStore.records.length === 0) {
+      return +(viewRoute?.id || 1);
+    }
+    pageSetRef.current = true;
+    return Math.floor(offset / limit) + 1;
+  }, [dataStore, offset, limit, viewRoute?.id]);
 
   useEffect(() => {
     let nextPage = currentPage;
