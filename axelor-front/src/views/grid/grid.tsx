@@ -13,20 +13,24 @@ import {
   useViewProps,
   useViewRoute,
   useViewSwitch,
+  useViewTab,
 } from "@/view-containers/views/scope";
 
 import { ViewProps } from "../types";
 import { Grid as GridComponent } from "./builder";
 import { useGridState } from "./builder/utils";
 
-import styles from "./grid.module.scss";
 import { PageText } from "@/components/page-text";
+import { useSetPopupOptions } from "@/view-containers/view-popup";
+import styles from "./grid.module.scss";
 
 export function Grid(props: ViewProps<GridView>) {
   const { meta, dataStore, domains } = props;
   const { view, fields } = meta;
+
   const viewRoute = useViewRoute("grid");
   const [viewProps, setViewProps] = useViewProps();
+
   const switchTo = useViewSwitch();
 
   const [advanceSearch, setAdvancedSearch] = useAtom<any>(
@@ -130,6 +134,17 @@ export function Grid(props: ViewProps<GridView>) {
     [rows, selectedRows, dataStore, clearSelection, onSearch]
   );
 
+  const { popup, popupOptions } = useViewTab();
+  const setPopupOptions = useSetPopupOptions();
+  useEffect(() => {
+    if (!popup) return;
+    setPopupOptions({
+      data: state,
+      dataStore: dataStore,
+      onSearch,
+    });
+  }, [state, onSearch, setPopupOptions, popup, dataStore]);
+
   const currentPage = +(viewRoute?.id || 1);
 
   const { page } = dataStore;
@@ -162,80 +177,97 @@ export function Grid(props: ViewProps<GridView>) {
     }
   }, [currentPage, limit]);
 
+  const showToolbar = popupOptions?.showToolbar !== false;
+  const showEditIcon = popupOptions?.showEditIcon !== false;
+  const showCheckbox = popupOptions?.multiSelect !== false;
+
+  const popupProps: any = popup
+    ? {
+        showEditIcon,
+        allowSelection: true,
+        selectionType: showCheckbox ? "multiple" : "single",
+        allowCheckboxSelection: showCheckbox,
+      }
+    : {};
+
   return (
     <div className={styles.grid}>
-      <ViewToolBar
-        meta={meta}
-        actions={[
-          {
-            key: "new",
-            text: i18n.get("New"),
-            iconProps: {
-              icon: "add",
-            },
-          },
-          {
-            key: "edit",
-            text: i18n.get("Edit"),
-            iconProps: {
-              icon: "edit",
-            },
-            disabled: !hasRowSelected,
-            onClick: () => {
-              const [rowIndex] = selectedRows || [];
-              const record = rows[rowIndex]?.record;
-              record && onEdit(record);
-            },
-          },
-          {
-            key: "delete",
-            text: i18n.get("Delete"),
-            iconProps: {
-              icon: "delete",
-            },
-            items: [
-              {
-                key: "archive",
-                text: i18n.get("Archive"),
-                onClick: () => onArchiveOrUnArchive(true),
+      {showToolbar && (
+        <ViewToolBar
+          meta={meta}
+          actions={[
+            {
+              key: "new",
+              text: i18n.get("New"),
+              iconProps: {
+                icon: "add",
               },
-              {
-                key: "unarchive",
-                text: i18n.get("Unarchive"),
-                onClick: () => onArchiveOrUnArchive(false),
+            },
+            {
+              key: "edit",
+              text: i18n.get("Edit"),
+              iconProps: {
+                icon: "edit",
               },
-            ],
-            disabled: !hasRowSelected,
-            onClick: () => {
-              onDelete(selectedRows!.map((ind) => rows[ind]?.record));
+              disabled: !hasRowSelected,
+              onClick: () => {
+                const [rowIndex] = selectedRows || [];
+                const record = rows[rowIndex]?.record;
+                record && onEdit(record);
+              },
             },
-          },
-          {
-            key: "refresh",
-            text: i18n.get("Refresh"),
-            iconProps: {
-              icon: "refresh",
+            {
+              key: "delete",
+              text: i18n.get("Delete"),
+              iconProps: {
+                icon: "delete",
+              },
+              items: [
+                {
+                  key: "archive",
+                  text: i18n.get("Archive"),
+                  onClick: () => onArchiveOrUnArchive(true),
+                },
+                {
+                  key: "unarchive",
+                  text: i18n.get("Unarchive"),
+                  onClick: () => onArchiveOrUnArchive(false),
+                },
+              ],
+              disabled: !hasRowSelected,
+              onClick: () => {
+                onDelete(selectedRows!.map((ind) => rows[ind]?.record));
+              },
             },
-            onClick: () => onSearch(),
-          },
-        ]}
-        pagination={{
-          canPrev,
-          canNext,
-          onPrev: () => switchTo({ id: String(currentPage - 1), mode: "list" }),
-          onNext: () => switchTo({ id: String(currentPage + 1), mode: "list" }),
-          text: () => <PageText dataStore={dataStore} />,
-        }}
-      >
-        <AdvanceSearch
-          dataStore={dataStore}
-          items={view.items}
-          fields={fields}
-          domains={domains}
-          value={advanceSearch}
-          setValue={setAdvancedSearch}
-        />
-      </ViewToolBar>
+            {
+              key: "refresh",
+              text: i18n.get("Refresh"),
+              iconProps: {
+                icon: "refresh",
+              },
+              onClick: () => onSearch(),
+            },
+          ]}
+          pagination={{
+            canPrev,
+            canNext,
+            onPrev: () =>
+              switchTo({ id: String(currentPage - 1), mode: "list" }),
+            onNext: () =>
+              switchTo({ id: String(currentPage + 1), mode: "list" }),
+            text: () => <PageText dataStore={dataStore} />,
+          }}
+        >
+          <AdvanceSearch
+            dataStore={dataStore}
+            items={view.items}
+            fields={fields}
+            domains={domains}
+            value={advanceSearch}
+            setValue={setAdvancedSearch}
+          />
+        </ViewToolBar>
+      )}
       <GridComponent
         dataStore={dataStore}
         view={view}
@@ -247,6 +279,7 @@ export function Grid(props: ViewProps<GridView>) {
         onEdit={onEdit}
         onView={onView}
         onSearch={onSearch}
+        {...popupProps}
       />
     </div>
   );
