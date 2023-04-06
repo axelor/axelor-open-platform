@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { Provider, atom, createStore, useAtomValue } from "jotai";
 import { uniqueId } from "lodash";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 
 import {
   Box,
@@ -40,7 +40,8 @@ export type DialogOptions = {
     header?: string;
     footer?: string;
   };
-  onClose?: (result: boolean) => void;
+  open: boolean;
+  onClose: (result: boolean) => void;
 };
 
 type DialogProps = {
@@ -61,7 +62,7 @@ function showDialog(options: DialogOptions) {
 
 export module dialogs {
   export async function modal(options: DialogOptions) {
-    const { onClose, classes, ...rest } = options;
+    const { onClose, open = true, ...rest } = options;
     const handleClose = async (result: boolean) => {
       return new Promise((resolve) => {
         setTimeout(() => {
@@ -72,13 +73,9 @@ export module dialogs {
       });
     };
     const close = showDialog({
-      ...rest,
-      classes: {
-        ...classes,
-        root: clsx(styles.root, classes?.root),
-        content: clsx(styles.content, classes?.content),
-      },
+      open,
       onClose: handleClose,
+      ...rest,
     });
     return handleClose;
   }
@@ -110,6 +107,7 @@ export module dialogs {
 
     return new Promise<boolean>(async (resolve) => {
       const close = await modal({
+        open: true,
         title,
         content,
         buttons,
@@ -185,10 +183,9 @@ const defaultButtons: DialogButton[] = [
   },
 ];
 
-const defaultOnClose = () => {};
-
 export function ModalDialog(props: DialogOptions) {
   const {
+    open,
     size,
     title,
     content,
@@ -196,21 +193,19 @@ export function ModalDialog(props: DialogOptions) {
     footer,
     buttons = defaultButtons,
     classes = {},
-    onClose = defaultOnClose,
+    onClose,
   } = props;
-  const [open, setOpen] = useState<boolean>(true);
 
-  const close = useCallback(
-    (result: boolean) => {
-      setOpen(false);
-      onClose(result);
-    },
-    [onClose]
-  );
+  const close = useCallback((result: boolean) => onClose(result), [onClose]);
 
   return (
     <>
-      <Dialog open={open} scrollable size={size} className={classes.root}>
+      <Dialog
+        open={open}
+        scrollable
+        size={size}
+        className={clsx(classes.root, styles.root)}
+      >
         <DialogHeader
           onCloseClick={(e) => close(false)}
           className={classes.header}
@@ -218,7 +213,9 @@ export function ModalDialog(props: DialogOptions) {
           <DialogTitle className={styles.title}>{title}</DialogTitle>
           {header}
         </DialogHeader>
-        <DialogContent className={classes.content}>{content}</DialogContent>
+        <DialogContent className={clsx(classes.content, styles.content)}>
+          {content}
+        </DialogContent>
         <DialogFooter className={classes.footer}>
           {footer}
           {buttons.map((button) => (
@@ -233,7 +230,7 @@ export function ModalDialog(props: DialogOptions) {
           ))}
         </DialogFooter>
       </Dialog>
-      <Fade in={open}>
+      <Fade in={open} unmountOnExit mountOnEnter>
         <Box className={styles.backdrop}></Box>
       </Fade>
     </>
